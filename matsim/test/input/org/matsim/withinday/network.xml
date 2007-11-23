@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+
+<network name="withinday test network">
+	<nodes>
+		<node id="1" x="1" y="1" />
+		<node id="2" x="2" y="1" />
+		<node id="3" x="3" y="1" />
+		<node id="31" x="4" y="0" />
+		<node id="32" x="4" y="2" />
+		<node id="4" x="5" y="1" />
+		<node id="5" x="6" y="1" />
+		<node id="6" x="7" y="0" />
+	</nodes>
+	<links>
+		<link id="1" from="1" to="2" length="1" capacity="1" freespeed="1" permlanes="1" />
+		<link id="2" from="2" to="3" length="1" capacity="1" freespeed="1" permlanes="1" />
+		<link id="3" from="3" to="31" length="1" capacity="1" freespeed="1" permlanes="1" />
+		<link id="4" from="3" to="32" length="1" capacity="1" freespeed="1" permlanes="1" />
+		<link id="5" from="31" to="4" length="1" capacity="1" freespeed="1" permlanes="1" />
+		<link id="6" from="32" to="4" length="1" capacity="1" freespeed="1" permlanes="1" />
+		<link id="7" from="4" to="5" length="1" capacity="1" freespeed="1" permlanes="1" />
+		<link id="8" from="5" to="6" length="1" capacity="1" freespeed="1" permlanes="1" />
+	</links>
+</network>

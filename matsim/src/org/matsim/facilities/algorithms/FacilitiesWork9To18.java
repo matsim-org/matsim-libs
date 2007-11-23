@@ -1,0 +1,124 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FacilitiesWork9To18.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.facilities.algorithms;
+
+import java.util.Iterator;
+import java.util.TreeMap;
+
+import org.matsim.enterprisecensus.EnterpriseCensus;
+import org.matsim.enterprisecensus.EnterpriseCensusParser;
+import org.matsim.enterprisecensus.EnterpriseCensusWriter;
+import org.matsim.facilities.Activity;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.Facility;
+import org.matsim.facilities.Opentime;
+
+public class FacilitiesWork9To18 extends FacilitiesAlgorithm {
+
+	private EnterpriseCensus myCensus;
+
+	public FacilitiesWork9To18() {
+		super();
+	}
+
+	@Override
+	public void run(Facilities facilities) {
+
+		int hectareCnt = 0, facilityCnt = 0;
+		int skip = 1;
+		int B01S2, B01S3, B01EQTS2, B01EQTS3, jobsPerFacility;
+		String reli, X, Y;
+		Facility f;
+		Activity a;
+
+		System.out.println("  creating EnterpriseCensus object... ");
+		this.myCensus = new EnterpriseCensus();
+		System.out.println("  done.");
+
+		System.out.println("  reading enterprise census files into EnterpriseCensus object... ");
+		EnterpriseCensusParser myCensusParser = new EnterpriseCensusParser(this.myCensus);
+		try {
+			myCensusParser.parse(this.myCensus);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("  done.");
+
+		System.out.println("  creating facilities... ");
+		TreeMap<String, double[]> ecHectars = this.myCensus.getEnterpriseCensusHectareAggregation();
+		Iterator<String> it = ecHectars.keySet().iterator();
+		while (it.hasNext()) {
+			reli = it.next();
+			B01S2 = this.myCensus.getHectareAttributeFloor(reli, "B01S2");
+			B01S3 = this.myCensus.getHectareAttributeFloor(reli, "B01S3");
+			B01EQTS2 = this.myCensus.getHectareAttributeRound(reli, "B01EQTS2");
+			B01EQTS3 = this.myCensus.getHectareAttributeRound(reli, "B01EQTS3");
+			X = Integer.toString(this.myCensus.getHectareAttributeFloor(reli, "X"));
+			Y = Integer.toString(this.myCensus.getHectareAttributeFloor(reli, "Y"));
+
+			for (int i=0; i<B01S2; i++) {
+				f = facilities.createFacility(Integer.toString(facilityCnt++), X, Y);
+				a = f.createActivity("work");
+
+				// equally distribute jobs among facilities
+				// as a test here, not exactly the number of avail workplaces :-)
+				// in the data, the number of fulltime job equivalents is >0, but the rounding might be ==0
+				// but there has to be at least one job
+				jobsPerFacility = Math.max(B01EQTS2 / B01S2, 1);
+				a.setCapacity(jobsPerFacility);
+
+				a.addOpentime(new Opentime("wk", "9:00", "18:00"));
+			}
+
+			for (int i=0; i<B01S3; i++) {
+				f = facilities.createFacility(Integer.toString(facilityCnt++), X, Y);
+				a = f.createActivity("work");
+
+				// equally distribute jobs among facilities
+				// as a test here, not exactly the number of avail workplaces :-)
+				// in the data, the number of fulltime job equivalents is >0, but the rounding might be ==0
+				// but there has to be at least one job
+				jobsPerFacility = Math.max(B01EQTS3 / B01S3, 1);
+				a.setCapacity(jobsPerFacility);
+
+				a.addOpentime(new Opentime("wk", "9:00", "18:00"));
+			}
+
+			hectareCnt++;
+			//System.out.println("\t\t\tProcessed " + hectareCnt + " hectares.");
+			if ((hectareCnt % skip) == 0) {
+				System.out.println("\t\t\tProcessed " + hectareCnt + " hectares.");
+				skip *= 2;
+			}
+		}
+		System.out.println("  creating facilities...DONE.");
+
+		System.out.println("  writing EnterpriseCensus object to output file... ");
+		EnterpriseCensusWriter myCensusWriter = new EnterpriseCensusWriter();
+		try {
+			myCensusWriter.write(this.myCensus);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("  done.");
+	}
+
+}

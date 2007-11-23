@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<events>
+	<event time="21610" agent="1" link="2" activity="0" act_type="" type="actend"  />
+	<event time="21620" agent="2" link="3" leg="1" type="departure"  />
+	<event time="21630" agent="3" link="4" leg="2" type="wait2link"  />
+	<event time="21640" agent="4" link="5" type="left link"  />
+	<event time="21650" agent="5" link="6" type="entered link"  />
+	<event time="21660" agent="6" link="7" leg="5" type="arrival"  />
+	<event time="21670" agent="7" link="8" activity="0" act_type="" type="actstart"  />
+	<event time="21680" agent="8" link="9" leg="7" type="stuckAndAbort"  />
+</events>

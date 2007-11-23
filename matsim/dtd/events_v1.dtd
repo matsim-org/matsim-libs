@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- ============================================================ -->
+
+<!ELEMENT events        (event*)>
+<!ATTLIST events
+          xml:lang       NMTOKEN "de-CH">
+
+<!ELEMENT event		EMPTY>
+<!ATTLIST event
+		  time		CDATA #REQUIRED
+		  type		(departure|arrival|wait2link|position|stuckAndAbort) #REQUIRED
+		  agentId	CDATA #IMPLIED
+		  legnum	CDATA #IMPLIED
+		  link		CDATA #IMPLIED
+		  fromNode	CDATA #IMPLIED
+		  x			CDATA #IMPLIED
+		  y			CDATA #IMPLIED
+>
+
+<!-- ============================================================ -->
+
+<!-- ROOT ELEMENT events:
+     collection of <event>s  -->
+
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT event:
+     A single event. -->
+
+<!-- ATTRIBUTE time:
+     Timestamp of the event
+     format: "hh:mm[:ss]"
+     if the seconds are missing, :00 is assumed -->
+
+<!-- ATTRIBUTE type:
+     one of the predefined types for an event
+     format: string -->
+
+<!-- ATTRIBUTE agentId:
+     the id of the agent which caused the event
+     format: integer number -->
+
+<!-- ATTRIBUTE legnum:
+     ? usually zero??
+     format: integer number -->
+
+<!-- ATTRIBUTE link:
+     the id of the link the event occured on
+     format: integer number -->
+
+<!-- ATTRIBUTE fromNode:
+     node id ?
+     format: integer number -->
+
+<!-- ATTRIBUTE x:
+     the current position (x-part of coordinate) of the agent
+     format: float number -->
+
+<!-- ATTRIBUTE y:
+     the current position (y-part of coordinate) of the agent
+     format: float number -->
+
+<!-- ============================================================ -->

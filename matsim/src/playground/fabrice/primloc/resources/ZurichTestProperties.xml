@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Zurich test case</comment>
+	<entry key="costFileName">/org/matsim/playground/fabrice/primloc/resources/zh_costs.txt</entry>
+	<entry key="zoneFileName">/org/matsim/playground/fabrice/primloc/resources/zh_zones.txt</entry>
+	<entry key="jobsFileName">/org/matsim/playground/fabrice/primloc/resources/zh_jobs.txt</entry>
+	<entry key="homesFileName">/org/matsim/playground/fabrice/primloc/resources/zh_homes.txt</entry>
+	<entry key="maxiter">100</entry>
+	<entry key="mu">90.0</entry>
+	<entry key="theta">0.5</entry>
+	<entry key="threshold1">1E-4</entry>
+	<entry key="threshold2">1E-5</entry>
+	<entry key="threshold3">1E-3</entry>
+	<entry key="verbose">true</entry>
+</properties>
+

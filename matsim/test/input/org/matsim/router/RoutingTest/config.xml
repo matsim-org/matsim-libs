@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="outputTimeFormat" value="HH:mm:ss" />
+		<param name="numberOfThreads" value="0" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="test/scenarios/berlin/network.xml.gz" />
+	</module>
+
+	<module name="planCalcScore">
+		<param name="traveling" value="-6" />
+	</module>
+
+</config>

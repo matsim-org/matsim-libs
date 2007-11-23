@@ -1,0 +1,105 @@
+<style>
+html {
+	margin:0;
+	padding:0;
+	font-family:Verdana, Arial, sans-serif;
+}
+
+body {
+  margin:0;
+  border:0;
+  padding:0;
+  height:100%;
+  max-height:100%;
+  background:#fff;
+  font-size:76%;
+  font-family:Verdana, Arial, sans-serif;
+  overflow: hidden;
+}
+
+#header {
+  height:180px;
+  background: url(http://www.matsim.org/themes/matsim/images/body.png) repeat-x;
+  color:#fff;
+}
+
+#header h3 {
+	margin:0;
+	padding:20px 20px 5px 0;
+	text-align:right;
+	color:#eee;
+	font-size: 90%;
+}
+
+#header h2 {
+	margin:0;
+	padding:0 20px 0 0;
+	text-align:right;
+}
+
+#logo {
+	height:100px;
+	float:left;
+	width:250px;
+	padding-left:20px;
+	color: #eee;
+}
+
+#footer {
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:37px;
+    overflow:auto;
+    text-align:right;
+   	border-top:3px double #1860C0;
+	color:#ccc; /* alternative: #999 */
+}
+
+#contents {
+    position:fixed;
+    top:105px;
+    left:270px;
+    width:auto;
+    bottom:40px;
+    right:0;
+    overflow:auto;
+    padding:10px;
+}
+
+	
+#links {
+    position:fixed;
+    top:105px;
+    left:20px;
+    bottom:40px;
+    width:240px;
+    overflow:auto;
+    padding-right: 7px;
+    border-right: 3px solid #eee;
+}
+
+#links h3 {
+	font-family:"Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+	font-size:16px;
+	color:#777;
+	font-weight:bold;
+	letter-spacing:-1px;
+}
+
+#links a {
+	text-decoration:none;
+	color:#1860C0;
+}
+#links a:hover {
+	text-decoration:underline;
+}
+#links a:visited {
+	color:#777;
+}
+
+p {width:880px;}
+img {border:none;}
+</style>
+

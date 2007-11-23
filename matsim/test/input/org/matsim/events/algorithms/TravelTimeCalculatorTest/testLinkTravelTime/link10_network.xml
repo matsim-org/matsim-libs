@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+
+<!-- an excerpt from berlin/network.xml -->
+
+<network>
+
+	<nodes>
+		<node id="883" x="4577791.0" y="5807954.0" type="20" />
+		<node id="885" x="4577812.0" y="5809360.0" type="30" />
+	</nodes>
+
+	<links capperiod="12:00">
+		<link id="10" from="885" to="883" length="1514.0" freespeed="13.8888" capacity="9800.0" permlanes="1" oneway="1" origid="1077" />
+	</links>
+
+</network>

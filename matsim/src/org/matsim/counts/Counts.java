@@ -1,0 +1,137 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Counts.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.counts;
+import java.util.ArrayList;
+import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+import org.matsim.counts.algorithms.CountsAlgorithm;
+import org.matsim.utils.identifiers.IdI;
+
+public class Counts {
+
+	private static Counts singleton = null;
+	private String name = null;
+	private String desc = null;
+	private int year = 0;
+	private String layer = null;
+	private final TreeMap<IdI, Count> counts = new TreeMap<IdI, Count>();
+	private final ArrayList<CountsAlgorithm> algorithms = new ArrayList<CountsAlgorithm>();
+
+	private final static Logger log = Logger.getLogger(Counts.class);
+
+	private Counts() {
+	}
+
+	public static final Counts getSingleton() {
+		if (singleton == null) {
+			singleton = new Counts();
+			log.info("Created counts singleton.");
+		}
+		return singleton;
+	}
+
+	public final void addAlgorithm(CountsAlgorithm algo) {
+		this.algorithms.add(algo);
+	}
+
+	public final void runAlgorithms() {
+		for (int i = 0; i < this.algorithms.size(); i++) {
+			CountsAlgorithm algo = this.algorithms.get(i);
+			algo.run(this);
+		}
+	}
+
+	public final void clearAlgorithms() {
+		this.algorithms.clear();
+	}
+
+	/**
+	 * @param locId
+	 * @param csId
+	 * @return the created Count object, or null if it could not be created (maybe because it already exists)
+	 */
+	public final Count createCount(final IdI locId, final String csId) {
+		// check id string for uniqueness
+		if (this.counts.containsKey(locId)) {
+			return null;
+		}
+		Count c = new Count(locId,csId);
+		this.counts.put(locId, c);
+		return c;
+	}
+
+	protected final void setName(final String name) {
+		this.name = name;
+	}
+
+	protected final void setDescription(final String desc) {
+		this.desc = desc;
+	}
+
+	protected final void setYear(final int year) {
+		this.year = year;
+	}
+
+	protected final void setLayer(final String layer) {
+		this.layer = layer;
+	}
+
+	public ArrayList<CountsAlgorithm> getAlgorithms() {
+		return this.algorithms;
+	}
+
+	public final String getName() {
+		return this.name;
+	}
+
+	public final String getDescription() {
+		return this.desc;
+	}
+
+	public final int getYear() {
+		return this.year;
+	}
+
+	public final String getLayer() {
+		return this.layer;
+	}
+
+	public final TreeMap<IdI, Count> getCounts() {
+		return this.counts;
+	}
+
+	public final Count getCount(final IdI locId) {
+		return this.counts.get(locId);
+	}
+
+	//needed for testing
+	public static final void reset() {
+		singleton=null;
+	}
+
+	@Override
+	public final String toString() {
+		return "[name=" + this.name + "]" +
+				"[nof_counts=" + this.counts.size() + "]" +
+				"[nof_algorithms=" + this.algorithms.size() + "]";
+	}
+}

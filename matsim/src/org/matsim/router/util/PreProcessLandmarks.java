@@ -1,0 +1,294 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PreProcessLandmarks.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.router.util;
+
+import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.PriorityQueue;
+
+import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
+
+/**
+ * Pre-processes a given network, gathering information which
+ * can be used by a AStarLandmarks when computing least-cost paths
+ * between a start and an end node. Specifically, designates some
+ * nodes in the network that act as landmarks and computes the distance
+ * from and to each node in the network to each of the landmarks.
+ * @author lnicolas
+ */
+public class PreProcessLandmarks extends PreProcessEuclidean {
+
+	Rectangle2D.Double travelZone;
+
+	int landmarkCount;
+
+	private Node[] landmarks;
+
+	public PreProcessLandmarks(final TravelMinCostI costFunction) {
+		this(costFunction, new Rectangle2D.Double());
+	}
+
+	public PreProcessLandmarks(final TravelMinCostI costFunction, final int landmarkCount) {
+		this(costFunction, new Rectangle2D.Double(), landmarkCount);
+	}
+
+	/**
+	 * @param costFunction
+	 * @param travelZone The area within which the landmarks should lie. If you know the
+	 * plans before routing, you could
+	 * invoke org.matsim.demandmodeling.plans.algorithms.FromToSummary as a preprocess and
+	 * pass the travel zone to this constructor. Narrowing the zone where the landmarks should
+	 * be put normally improves the routing speed of AStarLandmarks.
+	 */
+	public PreProcessLandmarks(final TravelMinCostI costFunction,
+			final Rectangle2D.Double travelZone) {
+		this(costFunction, travelZone, 16);
+	}
+
+	/**
+	 * @param costFunction
+	 * @param travelZone The area within which the landmarks should lie. If you know the
+	 * plans before routing, you could
+	 * invoke org.matsim.demandmodeling.plans.algorithms.FromToSummary as a preprocess and
+	 * pass the travel zone to this constructor. Narrowing the zone where the landmarks should
+	 * be put normally improves the routing speed of AStarLandmarks.
+	 * @param landmarkCount
+	 */
+	public PreProcessLandmarks(final TravelMinCostI costFunction,
+			final Rectangle2D.Double travelZone, final int landmarkCount) {
+		super(costFunction);
+
+		this.travelZone = travelZone;
+		this.landmarkCount = landmarkCount;
+	}
+
+	@Override
+	public void run(final NetworkLayer network) {
+		super.run(network);
+
+		System.out.println("Putting landmarks on network...");
+		long now = System.currentTimeMillis();
+		LandmarkerPieSlices landmarker = new LandmarkerPieSlices(this.landmarkCount,
+				this.travelZone);
+		landmarker.run(network);
+		System.out.println("done in " + (System.currentTimeMillis() - now) + " ms");
+
+		System.out.println("Calculating distance from each node to each of the " + this.landmarkCount + " landmarks...");
+		now = System.currentTimeMillis();
+
+		this.landmarks = landmarker.getLandmarks();
+
+		for (int i = 0; i < this.landmarks.length; i++) {
+			expandLandmark(this.landmarks[i], i);
+		}
+
+		for (Object obj : network.getNodes()) {
+			Node n = (Node) obj;
+			LandmarksRole r = (LandmarksRole) getRole(n);
+			r.updateMinMaxTravelTimes();
+		}
+
+		for (Object obj : network.getNodes()) {
+			Node n = (Node) obj;
+			LandmarksRole r = (LandmarksRole) getRole(n);
+			for (int i = 0; i < this.landmarks.length; i++) {
+				if (r.getMinLandmarkTravelTime(i) > r.getMaxLandmarkTravelTime(i)) {
+					System.out.println("Min > max for node " + n.getId() + " and landmark " + i);
+				}
+			}
+		}
+
+		System.out.println("done in " + (System.currentTimeMillis() - now) + " ms");
+	}
+
+	void expandLandmark(final Node startNode, final int landmarkIndex) {
+		LandmarksTravelTimeComparator comparator = new LandmarksTravelTimeComparator(
+				this.roleIndex, landmarkIndex);
+		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(100,
+				comparator);
+		LandmarksRole role = (LandmarksRole) getRole(startNode);
+		role.setToLandmarkTravelTime(landmarkIndex, 0.0);
+		role.setFromLandmarkTravelTime(landmarkIndex, 0.0);
+		pendingNodes.add(startNode);
+		while (pendingNodes.isEmpty() == false) {
+			Node node = pendingNodes.poll();
+			double toTravTime = ((LandmarksRole) getRole(node))
+					.getToLandmarkTravelTime(landmarkIndex);
+			expandLinks(landmarkIndex, pendingNodes, node.getInLinks(),
+					toTravTime, false);
+			double fromTravTime = ((LandmarksRole) getRole(node))
+					.getFromLandmarkTravelTime(landmarkIndex);
+			expandLinks(landmarkIndex, pendingNodes, node.getOutLinks(),
+					fromTravTime, true);
+		}
+	}
+
+	/**
+	 * @param landmarkIndex
+	 * @param nodes
+	 * @param outlinks
+	 */
+	private void expandLinks(final int landmarkIndex, final PriorityQueue<Node> nodes,
+			final BasicLinkSetI links, final double travTime, final boolean expandFromLandmark) {
+		LandmarksRole role;
+		Iterator<?> iter = links.iterator();
+		while (iter.hasNext()) {
+			Link l = (Link) iter.next();
+			Node n;
+			if (expandFromLandmark == true) {
+				n = l.getToNode();
+			} else {
+				n = l.getFromNode();
+			}
+			double linkTravTime = this.costFunction.getLinkMinimumTravelCost(l);
+			role = (LandmarksRole) getRole(n);
+			double totalTravelTime = travTime + linkTravTime;
+			if (expandFromLandmark == true) {
+				if (role.getFromLandmarkTravelTime(landmarkIndex) > totalTravelTime) {
+					role.setFromLandmarkTravelTime(landmarkIndex, totalTravelTime);
+					nodes.add(n);
+				}
+			} else {
+				if (role.getToLandmarkTravelTime(landmarkIndex) > totalTravelTime) {
+					role.setToLandmarkTravelTime(landmarkIndex, totalTravelTime);
+					nodes.add(n);
+				}
+			}
+		}
+	}
+
+	public Node[] getLandmarks() {
+
+		return this.landmarks;
+	}
+
+	@Override
+	DeadEndRole getRole(final Node n) {
+		LandmarksRole r = (LandmarksRole) n.getRole(this.roleIndex);
+		if (r == null) {
+			r = new LandmarksRole(this.landmarkCount);
+			n.setRole(this.roleIndex, r);
+		}
+		return r;
+	}
+
+	public class LandmarksRole extends DeadEndRole {
+
+		double[] landmarkTravelTime1;
+
+		double[] landmarkTravelTime2;
+
+		LandmarksRole(final int landmarkCount) {
+			this.landmarkTravelTime2 = new double[landmarkCount];
+			this.landmarkTravelTime1 = new double[landmarkCount];
+			for (int i = 0; i < this.landmarkTravelTime2.length; i++) {
+				this.landmarkTravelTime2[i] = Double.POSITIVE_INFINITY;
+				this.landmarkTravelTime1[i] = Double.POSITIVE_INFINITY;
+			}
+		}
+
+		void setToLandmarkTravelTime(final int landmarkIndex, final double travelTime) {
+			this.landmarkTravelTime2[landmarkIndex] = travelTime;
+		}
+
+		void setFromLandmarkTravelTime(final int landmarkIndex, final double travelTime) {
+			this.landmarkTravelTime1[landmarkIndex] = travelTime;
+		}
+
+		double getToLandmarkTravelTime(final int landmarkIndex) {
+			return this.landmarkTravelTime2[landmarkIndex];
+		}
+
+		double getFromLandmarkTravelTime(final int landmarkIndex) {
+			return this.landmarkTravelTime1[landmarkIndex];
+		}
+
+		void updateMinMaxTravelTimes() {
+			for (int i = 0; i < this.landmarkTravelTime1.length; i++) {
+				setTravelTimes(i, this.landmarkTravelTime2[i],
+						this.landmarkTravelTime1[i]);
+			}
+		}
+
+		public void setTravelTimes(final int landmarkIndex, final double travelTime1,
+				final double travelTime2) {
+			if (travelTime1 > travelTime2) {
+				this.landmarkTravelTime2[landmarkIndex] = travelTime1;
+				this.landmarkTravelTime1[landmarkIndex] = travelTime2;
+			} else {
+				this.landmarkTravelTime1[landmarkIndex] = travelTime1;
+				this.landmarkTravelTime2[landmarkIndex] = travelTime2;
+			}
+		}
+
+		public double getMinLandmarkTravelTime(final int landmarkIndex) {
+			return this.landmarkTravelTime1[landmarkIndex];
+		}
+
+		public double getMaxLandmarkTravelTime(final int landmarkIndex) {
+			return this.landmarkTravelTime2[landmarkIndex];
+		}
+	}
+
+	/**
+	 * Sorts the Nodes ascending according to their ToLandmarkTravelTime. We assume that the
+	 * ToLandmarkTravelTime is somewhat similar to the FromLandmarkTravelTime,
+	 * so ordering the nodes according to one of these values produces a similar
+	 * ordered list as if to order them according to the other value...
+	 *
+	 * @author lnicolas
+	 *
+	 */
+	static public class LandmarksTravelTimeComparator implements Comparator<Node>, Serializable {
+		private static final long serialVersionUID = 1L;
+
+		private final int roleIndex;
+
+		private final int landmarkIndex;
+
+		public LandmarksTravelTimeComparator(final int roleIndex, final int landmarkIndex) {
+			this.roleIndex = roleIndex;
+			this.landmarkIndex = landmarkIndex;
+		}
+
+		public int compare(final Node n1, final Node n2) {
+
+			double c1 = ((LandmarksRole) n1.getRole(this.roleIndex))
+					.getToLandmarkTravelTime(this.landmarkIndex);
+			double c2 = ((LandmarksRole) n2.getRole(this.roleIndex))
+					.getToLandmarkTravelTime(this.landmarkIndex);
+
+			if (c1 < c2) {
+				return -1;
+			} else if (c1 == c2) {
+				return n1.compareTo(n2);
+			} else {
+				return +1;
+			}
+		}
+	}
+
+}

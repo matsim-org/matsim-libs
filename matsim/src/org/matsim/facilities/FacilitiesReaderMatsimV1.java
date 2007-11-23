@@ -1,0 +1,122 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FacilitiesReaderMatsimV1.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+
+package org.matsim.facilities;
+
+import java.io.IOException;
+import java.util.Stack;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.matsim.gbl.Gbl;
+import org.matsim.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
+/**
+ * A reader for facilities-files of MATSim according to <code>facilities_v1.dtd</code>.
+ *
+ * @author mrieser
+ * @author balmermi
+ */
+public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
+
+	private final static String FACILITIES = "facilities";
+	private final static String FACILITY = "facility";
+	private final static String ACTIVITY = "activity";
+	private final static String CAPACITY = "capacity";
+	private final static String OPENTIME = "opentime";
+
+	private final Facilities facilities;
+	private Facility currfacility = null;
+	private Activity curractivity = null;
+	
+	public FacilitiesReaderMatsimV1(final Facilities facilities) {
+		this.facilities = facilities;
+	}
+
+	@Override
+	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+		if (FACILITIES.equals(name)) {
+			startFacilities(atts);
+		} else if (FACILITY.equals(name)) {
+			startFacility(atts);
+		} else if (ACTIVITY.equals(name)) {
+			startActivity(atts);
+		} else if (CAPACITY.equals(name)) {
+			startCapacity(atts);
+		} else if (OPENTIME.equals(name)) {
+			startOpentime(atts);
+		}
+	}
+
+	@Override
+	public void endTag(final String name, final String content, final Stack<String> context) {
+		if (FACILITY.equals(name)) {
+			this.currfacility = null;
+		} else if (ACTIVITY.equals(name)) {
+			this.curractivity = null;
+		}
+	}
+
+	private void startFacilities(final Attributes atts) {
+		this.facilities.setName(atts.getValue("name"));
+		if (atts.getValue("aggregation_layer") != null) {
+			Gbl.warningMsg(this.getClass(),"startFacilities(...)","aggregation_layer is deprecated.");
+		}
+	}
+	
+	private void startFacility(final Attributes atts) {
+		this.currfacility = this.facilities.createFacility(atts.getValue("id"),atts.getValue("x"),atts.getValue("y"));
+	}
+	
+	private void startActivity(final Attributes atts) {
+		this.curractivity = this.currfacility.createActivity(atts.getValue("type"));
+	}
+	
+	private void startCapacity(final Attributes atts) {
+		this.curractivity.setCapacity(atts.getValue("value"));
+	}
+	
+	private void startOpentime(final Attributes atts) {
+		this.curractivity.createOpentime(atts.getValue("day"),atts.getValue("start_time"),atts.getValue("end_time"));
+	}
+
+	
+	/**
+	 * Parses the specified facilities file. This method calls {@link #parse(String)}, but handles all
+	 * possible exceptions on its own.
+	 *
+	 * @param filename The name of the file to parse.
+	 */
+	public void readFile(final String filename) {
+		try {
+			parse(filename);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}

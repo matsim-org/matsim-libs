@@ -1,0 +1,109 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FacilitiesWriter.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.facilities;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.TreeSet;
+
+import org.matsim.gbl.Gbl;
+import org.matsim.utils.io.IOUtils;
+import org.matsim.world.Location;
+import org.matsim.writer.Writer;
+
+public class FacilitiesWriter extends Writer {
+
+	//////////////////////////////////////////////////////////////////////
+	// member variables
+	//////////////////////////////////////////////////////////////////////
+
+	private FacilitiesWriterHandler handler = null;
+	private final Facilities facilities;
+
+	//////////////////////////////////////////////////////////////////////
+	// constructors
+	//////////////////////////////////////////////////////////////////////
+
+	public FacilitiesWriter(final Facilities facilities) {
+		super();
+		this.facilities = facilities;
+		this.outfile = Gbl.getConfig().facilities().getOutputFile();
+		this.version = null;
+		// always use newest version, currently v1
+		this.dtd = "http://www.matsim.org/files/dtd/facilities_v1.dtd";
+		this.handler = new FacilitiesWriterHandlerImplV1();
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// write methods
+	//////////////////////////////////////////////////////////////////////
+
+	@Override
+	public final void write() {
+		try {
+			this.out = IOUtils.getBufferedWriter(this.outfile);
+			writeHeader("facilities");
+			this.handler.startFacilities(this.facilities, this.out);
+			this.handler.writeSeparator(this.out);
+			Iterator<Location> f_it = this.facilities.getLocations().values().iterator();
+			while (f_it.hasNext()) {
+				Facility f = (Facility)f_it.next();
+				this.handler.startFacility(f, this.out);
+				Iterator<Activity> a_it = f.getActivities().values().iterator();
+				while (a_it.hasNext()) {
+					Activity a = a_it.next();
+					this.handler.startActivity(a, this.out);
+					this.handler.startCapacity(a, this.out);
+					this.handler.endCapacity(this.out);
+					Iterator<TreeSet<Opentime>> o_set_it = a.getOpentimes().values().iterator();
+					while (o_set_it.hasNext()) {
+						TreeSet<Opentime> o_set = o_set_it.next();
+						Iterator<Opentime> o_it = o_set.iterator();
+						while (o_it.hasNext()) {
+							Opentime o = o_it.next();
+							this.handler.startOpentime(o, this.out);
+							this.handler.endOpentime(this.out);
+						}
+					}
+					this.handler.endActivity(this.out);
+				}
+				this.handler.endFacility(this.out);
+				this.handler.writeSeparator(this.out);
+				this.out.flush();
+			}
+			this.handler.endFacilities(this.out);
+			this.out.flush();
+			this.out.close();
+		}
+		catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// print methods
+	//////////////////////////////////////////////////////////////////////
+
+	@Override
+	public final String toString() {
+		return super.toString();
+	}
+}

@@ -1,0 +1,134 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CountsReaderMatsimV1.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+
+/* *********************************************************************** *
+ *                    org.matsim.demandmodeling.config                     *
+ *                     ConfigReaderHandlerImplV1.java                      *
+ *                          ---------------------                          *
+ * copyright       : (C) 2006 by                                           *
+ *                   Michael Balmer, Konrad Meister, Marcel Rieser,        *
+ *                   David Strippgen, Kai Nagel, Kay W. Axhausen,          *
+ *                   Technische Universitaet Berlin (TU-Berlin) and        *
+ *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
+ * email           : balmermi at gmail dot com                             *
+ *                 : rieser at gmail dot com                               *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.counts;
+
+import java.io.IOException;
+import java.util.Stack;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
+import org.matsim.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
+/**
+ * A reader for counts-files of MATSim according to <code>counts_v1.xsd</code>.
+ *
+ * @author mrieser
+ */
+public class CountsReaderMatsimV1 extends MatsimXmlParser {
+
+	private final static String COUNTS = "counts";
+	private final static String COUNT = "count";
+	private final static String VOLUME = "volume";
+
+	private final Counts counts;
+	private Count currcount = null;
+
+	private static final Logger log = Logger.getLogger(CountsReaderMatsimV1.class);
+
+	public CountsReaderMatsimV1(final Counts counts) {
+		this.counts = counts;
+	}
+
+	@Override
+	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+		if (VOLUME.equals(name)) {
+			startVolume(atts);
+		} else if (COUNT.equals(name)) {
+			startCount(atts);
+		} else if (COUNTS.equals(name)) {
+			startCounts(atts);
+		}
+	}
+
+	@Override
+	public void endTag(final String name, final String content, final Stack<String> context) {
+
+	}
+
+	private void startCounts(final Attributes meta) {
+		this.counts.setName(meta.getValue("name"));
+		this.counts.setDescription(meta.getValue("desc"));
+		this.counts.setYear(Integer.parseInt(meta.getValue("year")));
+		this.counts.setLayer(meta.getValue("layer"));
+	}
+
+	private void startCount(final Attributes meta) {
+		int locId = Integer.parseInt(meta.getValue("loc_id"));
+		this.currcount = this.counts.createCount(new Id(locId), meta.getValue("cs_id"));
+		if (this.currcount == null) {
+			log.info("There is already a counts object for location " + locId +
+					". The counts for loc_id=" + locId + ", cs_id=" + meta.getValue("cs_id") + " will be ignored.");
+		}
+	}
+
+	private void startVolume(final Attributes meta) {
+		if (this.currcount != null) {
+			this.currcount.createVolume(Integer.parseInt(meta.getValue("h")), Double.parseDouble(meta.getValue("val")));
+		}
+	}
+
+
+	/**
+	 * Parses the specified counts file. This method calls {@link #parse(String)}, but handles all
+	 * possible exceptions on its own.
+	 *
+	 * @param filename The name of the file to parse.
+	 */
+	public void readFile(final String filename) {
+		try {
+			parse(filename);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
