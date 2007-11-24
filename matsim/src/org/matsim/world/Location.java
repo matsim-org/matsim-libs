@@ -28,6 +28,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 
 /**

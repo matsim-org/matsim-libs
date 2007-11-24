@@ -22,23 +22,15 @@ package org.matsim.network;
 
 import org.matsim.mobsim.QueueNetworkLayer;
 
-import playground.marcel.ptnetwork.PtNetworkLayer;
-
 public class NetworkLayerBuilder {
 	public static final int NETWORK_DEFAULT = 0;
 	public static final int NETWORK_SIMULATION = 1;
-//	public static final int NETWORK_ROUTER = 2;
-	public static final int NETWORK_PT = 3;
-	
+
 	private static int type = 0;
-	
+
 	public static NetworkLayer newNetworkLayer() {
 		NetworkLayer result = null;
-		switch (type)
-		{
-			case NETWORK_PT:
-				result = new PtNetworkLayer();
-				break;
+		switch (type) {
 			case NETWORK_SIMULATION:
 				result = new QueueNetworkLayer();
 				break;
@@ -49,7 +41,7 @@ public class NetworkLayerBuilder {
 		};
 		return result;
 	}
-	
+
 	public static void setNetworkLayerType(int newtype) { type = newtype; }
-	
+
 }

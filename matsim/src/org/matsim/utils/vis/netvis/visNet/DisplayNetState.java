@@ -34,11 +34,13 @@ public class DisplayNetState extends NetStateA {
         super(indexConfig);
     }
 
-    protected final BufferedStateA newNodeState(BasicNodeI node) {
+    @Override
+		protected final BufferedStateA newNodeState(BasicNodeI node) {
         return new DisplayNodeState((DrawableNodeI) node);
     }
 
-    protected final BufferedStateA newLinkState(BasicLinkI link) {
+    @Override
+		protected final BufferedStateA newLinkState(BasicLinkI link) {
         return new DisplayLinkState((DrawableLinkI) link);
     }
 

@@ -70,7 +70,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 
 	@Override
 	public void run(Person person) {
-		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
+		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
 
 		// calc plan distance and main purpose
 		double plan_dist = 0.0;

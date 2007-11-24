@@ -35,7 +35,9 @@ public class AllTests {
 		if (outputDir.exists()) {
 			IOUtils.deleteDirectory(outputDir);
 		}
-		outputDir.mkdir();
+		if (!outputDir.mkdir()) {
+			System.err.println("Could not create output directory " + outputDir + ". Trying to continue anyway.");
+		}
 
 		TestSuite suite = new TestSuite("All tests for org.matsim");
 		//$JUnit-BEGIN$

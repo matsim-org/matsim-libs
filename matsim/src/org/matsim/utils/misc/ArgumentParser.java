@@ -25,53 +25,53 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <p>This class analyses arguments passed on program start-up and provides an 
+ * <p>This class analyses arguments passed on program start-up and provides an
  * iterator for easy access to the single options and arguments.
  * The parser understands normal arguments (like filenames) and options
  * (arguments beginning with - or --) and supports value-assignments of options
  * (e.g. "-rate 10" or "-rate=10").</p>
- * 
- * <p>Additionally, the parser can be instructed to specifically expect short 
- * options. In that case, options starting with one hyphen can only be one 
- * character long. If more than one character follow a single hyphen, each 
+ *
+ * <p>Additionally, the parser can be instructed to specifically expect short
+ * options. In that case, options starting with one hyphen can only be one
+ * character long. If more than one character follow a single hyphen, each
  * character will be interpreted as an option. The iterator returns every
  * option on its own in that case.<br/>
- * 
+ *
  * Example: <code>tar -xzvf file</code><br />
  * If shortOptions are enabled, the above argument list would be translated into
  * <code>tar -x -z -v -f file</code>, whereas if shortOptions are disabled, a
- * single option named "xzvf" should exist (like in <code>java -jar 
+ * single option named "xzvf" should exist (like in <code>java -jar
  * file.jar</code>).</p>
- * 
+ *
  * <p>Value assignments to options can be delimitted by a space or the equal-sign.
- * In both cases, option and value are separated into two entities and returned 
+ * In both cases, option and value are separated into two entities and returned
  * separately by the iterator.<br />
- * 
- * Example: <code>myapp -start 5</code> or <code>myapp -start=5</code> both 
+ *
+ * Example: <code>myapp -start 5</code> or <code>myapp -start=5</code> both
  * work.</p>
- * 
+ *
  *
  * @author mrieser
  */
 public class ArgumentParser implements Iterable<String> {
 
-	private List<String> args = null; 
+	private List<String> args = null;
 	private boolean enableShortOptions = true;
-	
+
 	/**
 	 * Constructs a new <code>ArgumentParser</code> with support for shortOptions
 	 * disabled.
-	 * 
+	 *
 	 * @param args The arguments to parse.
 	 */
 	public ArgumentParser(String[] args) {
 		this(args, false);
 	}
-	
+
 	/**
-	 * Constructs a new <code>ArgumentParser</code> with the specified behaviour 
+	 * Constructs a new <code>ArgumentParser</code> with the specified behaviour
 	 * regarding shortOptions.
-	 * 
+	 *
 	 * @param args The arguments to parse.
 	 * @param enableShortOptions whether options with a single hyphen should be
 	 * 		treated as short options (only one character long) or not.
@@ -82,15 +82,15 @@ public class ArgumentParser implements Iterable<String> {
 		parse(args);
 	}
 
-	
+
 	/**
 	 * Returns an iterator over all single options and arguments.
 	 */
 	public Iterator<String> iterator() {
 		return this.args.iterator();
 	}
-	
-	
+
+
 	private void parse(String[] args) {
 		if (this.enableShortOptions) {
 			for (String arg : args) {
@@ -112,7 +112,7 @@ public class ArgumentParser implements Iterable<String> {
 			}
 		}
 	}
-	
+
 	private void parseShortOption(String arg) {
 		if (arg.length() == 0) {
 			this.args.add("-");
@@ -133,12 +133,12 @@ public class ArgumentParser implements Iterable<String> {
 					this.args.add(arg.substring(i+1));
 					return;
 				}
-			} else {
-				this.args.add("-" + ch);
 			}
+			// else...
+			this.args.add("-" + ch);
 		}
 	}
-	
+
 	private void parseLongOption(String arg) {
 		StringBuilder argname = new StringBuilder("--");
 		for (int i = 0; i < arg.length(); i++) {
@@ -157,9 +157,9 @@ public class ArgumentParser implements Iterable<String> {
 					this.args.add(arg.substring(i + 1));
 					return;
 				}
-			} else {
-				argname.append(ch);
 			}
+			// else...
+			argname.append(ch);
 		}
 		this.args.add(argname.toString());
 	}
@@ -195,5 +195,5 @@ public class ArgumentParser implements Iterable<String> {
 		}
 		this.args.add(argname.toString());
 	}
-	
+
 }

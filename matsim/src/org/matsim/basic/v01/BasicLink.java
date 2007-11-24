@@ -24,17 +24,17 @@ import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Coord;
 import org.matsim.world.Location;
 
-public class BasicLink 
+public class BasicLink
 // <L extends BasicLinkI, N extends BasicNodeI > // and then change all BasicLink/BasicNode below into L and N
-extends Location 
+extends Location
 implements BasicLinkI
 {
-	protected BasicNode from = null;
-	protected BasicNode to = null;
+	protected BasicNodeI from = null;
+	protected BasicNodeI to = null;
 
 	protected double length = Double.NaN;
 	protected double freespeed = Double.NaN;
@@ -72,7 +72,7 @@ implements BasicLinkI
 	public double calcDistance(CoordI coord) {
 		return this.center.calcDistance(coord);
 	}
-	
+
 	public BasicNodeI getFromNode() {
 		return from;
 	}
@@ -82,12 +82,12 @@ implements BasicLinkI
 	}
 
 	public boolean setFromNode(BasicNodeI node) {
-		this.from = (BasicNode)node;
+		this.from = node;
 		return true;
 	}
 
 	public boolean setToNode(BasicNodeI node) {
-		this.to = (BasicNode)node;
+		this.to = node;
 		return true;
 	}
 

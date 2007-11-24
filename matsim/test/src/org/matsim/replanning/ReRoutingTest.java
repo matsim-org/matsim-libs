@@ -28,7 +28,7 @@ import org.matsim.utils.CRCChecksum;
 
 public class ReRoutingTest extends MatsimTestCase {
 
-	public void testRerouting() {
+	public void testReRouting() {
 		loadConfig(getInputDirectory() + "config.xml");
 
 		SimulationTimer.reset(10);

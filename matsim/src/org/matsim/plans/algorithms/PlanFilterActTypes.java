@@ -56,6 +56,7 @@ public class PlanFilterActTypes extends PersonAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		for (Iterator<Plan> iter = person.getPlans().iterator(); iter.hasNext(); ) {
 			Plan plan = iter.next();

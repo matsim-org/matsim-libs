@@ -32,16 +32,16 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 /**
  * outputs the amount of public traffic user into a .txt-file
  * @author ychen
- * 
+ *
  */
 public class PtCheck extends PersonAlgorithm {
 	/**
-	 * @param personCnt - Counter of all read persons
+	 * Counter of all read persons
 	 */
 	private int personCnt;
 
 	/**
-	 * @param ptUserCnt - Count of all persons, who use public transport
+	 * Count of all persons, who use public transport
 	 */
 	private int ptUserCnt;
 
@@ -50,11 +50,6 @@ public class PtCheck extends PersonAlgorithm {
 	 */
 	private DataOutputStream out;
 
-	/**
-	 * Constructor
-	 * @throws IOException
-	 * 
-	 */
 	public PtCheck(String fileName) throws IOException {
 		out = new DataOutputStream(new BufferedOutputStream(
 				new FileOutputStream(new File(fileName))));
@@ -64,10 +59,6 @@ public class PtCheck extends PersonAlgorithm {
 		ptUserCnt = 0;
 	}
 
-	/**
-	 * count
-	 * @see org.matsim.plans.algorithms.PersonAlgorithmI#run(org.matsim.plans.Person)
-	 */
 	@Override
 	public void run(Person person) {
 		// TODO Auto-generated method stub
@@ -79,10 +70,8 @@ public class PtCheck extends PersonAlgorithm {
 	public double getPtRate() {
 		if (personCnt > 0)
 			return (double) ptUserCnt / (double) personCnt;
-		else {
-			System.err.println("there is no persons gecheckt!!");
-			return -1.0;
-		}
+		System.err.println("there is no persons gecheckt!!");
+		return -1.0;
 	}
 
 	/**

@@ -31,7 +31,7 @@ public class ControlerConfigGroup extends Module {
 	private static final String FIRST_ITERATION = "firstIteration";
 	private static final String LAST_ITERATION = "lastIteration";
 
-	private String outputDirectory = "";
+	private String outputDirectory = "./output";
 	private int firstIteration = 0;
 	private int lastIteration = 1000;
 

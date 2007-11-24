@@ -166,7 +166,6 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 
 	/* ----------------------------SETTER---------------------*/
 	 /** sets the pattern of "Benutzerdefiniert Attribut"
-	 * @param pattern Pattern of a "Benutzerdefiniertes Attribut"
 	 * TODO I'm not sure that this function really does what it should do... -marcel
 	 */
 	public void setPattern() {

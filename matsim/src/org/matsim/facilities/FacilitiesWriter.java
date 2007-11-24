@@ -63,7 +63,7 @@ public class FacilitiesWriter extends Writer {
 			writeHeader("facilities");
 			this.handler.startFacilities(this.facilities, this.out);
 			this.handler.writeSeparator(this.out);
-			Iterator<Location> f_it = this.facilities.getLocations().values().iterator();
+			Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
 			while (f_it.hasNext()) {
 				Facility f = (Facility)f_it.next();
 				this.handler.startFacility(f, this.out);

@@ -77,11 +77,12 @@ public class PersonDrawActivtiySpaces extends PersonAlgorithm {
 		// indicator = 0 -> border
 		return indicator;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////
 	// run method
 	// ////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		final Knowledge know = person.getKnowledge();
 		if (know == null) {
@@ -146,11 +147,11 @@ public class PersonDrawActivtiySpaces extends PersonAlgorithm {
 
 				if (as instanceof ActivitySpaceEllipse) {
 					ActivitySpaceEllipse ase = (ActivitySpaceEllipse) as;
-					double a = (Double) ase.getParam("a");
-					double b = (Double) ase.getParam("b");
-					double theta = (Double) ase.getParam("theta");
-					double x = (Double) ase.getParam("x");
-					double y = (Double) ase.getParam("y");
+					double a = ase.getParam("a").doubleValue();
+					double b = ase.getParam("b").doubleValue();
+					double theta = ase.getParam("theta").doubleValue();
+					double x = ase.getParam("x").doubleValue();
+					double y = ase.getParam("y").doubleValue();
 
 					FileWriter fw = new FileWriter("output/pid" + person.getId() + "_ellipse_" + act_type + ".dat");
 					BufferedWriter out = new BufferedWriter(fw);
@@ -178,11 +179,11 @@ public class PersonDrawActivtiySpaces extends PersonAlgorithm {
 				}
 				else if (as instanceof ActivitySpaceCassini) {
 					ActivitySpaceCassini asc = (ActivitySpaceCassini) as;
-					double a = (Double) asc.getParam("a");
-					double b = (Double) asc.getParam("b");
-					double theta = (Double) asc.getParam("theta");
-					double x = (Double) asc.getParam("x");
-					double y = (Double) asc.getParam("y");
+					double a = asc.getParam("a").doubleValue();
+					double b = asc.getParam("b").doubleValue();
+					double theta = asc.getParam("theta").doubleValue();
+					double x = asc.getParam("x").doubleValue();
+					double y = asc.getParam("y").doubleValue();
 
 					FileWriter fw = new FileWriter("output/pid" + person.getId() + "_cassini_" + act_type + ".dat");
 					BufferedWriter out = new BufferedWriter(fw);
@@ -210,12 +211,12 @@ public class PersonDrawActivtiySpaces extends PersonAlgorithm {
 				}
 				else if (as instanceof ActivitySpaceSuperEllipse) {
 					ActivitySpaceSuperEllipse ass = (ActivitySpaceSuperEllipse) as;
-					double a = (Double) ass.getParam("a");
-					double b = (Double) ass.getParam("b");
-					double theta = (Double) ass.getParam("theta");
-					double x = (Double) ass.getParam("x");
-					double y = (Double) ass.getParam("y");
-					double r = (Double) ass.getParam("r");
+					double a = ass.getParam("a").doubleValue();
+					double b = ass.getParam("b").doubleValue();
+					double theta = ass.getParam("theta").doubleValue();
+					double x = ass.getParam("x").doubleValue();
+					double y = ass.getParam("y").doubleValue();
+					double r = ass.getParam("r").doubleValue();
 
 					FileWriter fw = new FileWriter("output/pid" + person.getId() + "_superellipse_" + act_type + ".dat");
 					BufferedWriter out = new BufferedWriter(fw);
@@ -277,17 +278,15 @@ public class PersonDrawActivtiySpaces extends PersonAlgorithm {
 				}
 				else if (as instanceof ActivitySpaceBean) {
 					ActivitySpaceBean asb = (ActivitySpaceBean) as;
-					double a = (Double) asb.getParam("a");
-					double b = (Double) asb.getParam("b");
-					double theta = (Double) asb.getParam("theta");
-					double x = (Double) asb.getParam("x");
-					double y = (Double) asb.getParam("y");
-					
+					double a = asb.getParam("a").doubleValue();
+					double b = asb.getParam("b").doubleValue();
+					double theta = asb.getParam("theta").doubleValue();
+					double x = asb.getParam("x").doubleValue();
+					double y = asb.getParam("y").doubleValue();
+
 					FileWriter fw = new FileWriter("output/pid" + person.getId() + "_bean_" + act_type + ".dat");
 					BufferedWriter out = new BufferedWriter(fw);
 					for (double t=0.0; t<2.0*Math.PI; t=t+2.0*Math.PI/360.0) {
-//						System.out.println();
-//						System.out.println("t="+t+":");
 						double vx_in = 0.0;
 						double vy_in = 0.0;
 						double vx_out = Math.cos(theta+t);

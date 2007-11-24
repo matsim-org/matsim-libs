@@ -22,29 +22,26 @@ package org.matsim.network;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 
 public class NetworkWriterHandlerImplTNodes {
-	
+
 	private final NetworkLayer network;
 	private BufferedWriter out;
-	
+
 	public NetworkWriterHandlerImplTNodes(final NetworkLayer network) {
 		this.network = network;
 	}
-	
+
 	public void writeFile(String filename) {
 		try {
-			
+
 			this.out = IOUtils.getBufferedWriter(filename);
 
 			startNodes();
-			Iterator<Node> n_it = this.network.getNodes().iterator();
-			while (n_it.hasNext()) {
-				Node n = n_it.next();
+			for (Node n : this.network.getNodes().values()) {
 				writeNode(n);
 			}
 			out.close();

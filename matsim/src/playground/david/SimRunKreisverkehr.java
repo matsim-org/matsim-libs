@@ -20,13 +20,10 @@
 
 package playground.david;
 
-import java.util.Iterator;
-
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
@@ -38,7 +35,7 @@ import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 
 public class SimRunKreisverkehr {
-	
+
 	public static void main(String[] args) {
 //		String netFileName = "test/simple/equil_net.xml";
 //		String popFileName = "test/simple/equil_plans.xml";
@@ -50,18 +47,15 @@ public class SimRunKreisverkehr {
 		String[] args2 = {arg0, "E:/Development/tmp/dtd/config_v1.dtd"};
 		Gbl.startMeasurement();
 		Gbl.createConfig(args2);
-		
+
 		World world = Gbl.getWorld();
-		
+
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
-		
-		BasicLinkSetI links = network.getLinks();
-		Iterator it = links.iterator();
+
 		int cellcount = 0;
-		while (it.hasNext()){
-			QueueLink link = (QueueLink)it.next();
+		for (QueueLink link : network.getLinks().values()) {
 			double length = link.getLength()*link.getLanes();
 			cellcount += Math.min(1,(int)(length/7.5));
 		}
@@ -78,7 +72,7 @@ public class SimRunKreisverkehr {
 //			}
 //		}
 //		System.exit(0);
-		
+
 		Plans population = new MyPopulation();
 		// Read plans file with special Reader Implementation
 		PlansReaderI plansReader = new MatsimPlansReader(population);
@@ -89,7 +83,7 @@ public class SimRunKreisverkehr {
 		events.addHandler(new EventWriterXML("MatSimJEventsXML.txt"));
 		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
 		world.setEvents(events);
-		
+
 		//Config.getSingleton().setParam(Simulation.SIMULATION, Simulation.STARTTIME, "05:55:00");
 		//Config.getSingleton().setParam(Simulation.SIMULATION, Simulation.ENDTIME, "08:00:00");
 
@@ -98,10 +92,10 @@ public class SimRunKreisverkehr {
 
 
 		sim.run();
-		
+
 		events.resetHandlers(1); //for closing files etc..
-		
-		Gbl.printElapsedTime();		
+
+		Gbl.printElapsedTime();
 
 		String[] visargs = {"../../tmp/testWrite"};
 		NetVis.main(visargs);
@@ -115,7 +109,7 @@ public class SimRunKreisverkehr {
 
 // Ich finde, so etwas wie new XYZSimulation ( plans, network/world, events ) macht sehr viel Sinn.
 
-// Es muss moeglich sein, die Implementationen zu erweitern.  Bei Plans ist das klar: 
+// Es muss moeglich sein, die Implementationen zu erweitern.  Bei Plans ist das klar:
 // class MyPlans extends Plans ... und dann Plans plans = new MyPlans().  Bei Network/World
 // ist mir das nicht mehr klar.
 
@@ -123,7 +117,7 @@ public class SimRunKreisverkehr {
 // factory-Methode zu definieren.  Bei den readern mag das bzgl. dtd-Version noch Sinn machen;
 // beim networkLayer sehe ich das eher nicht.
 
-// Allgemeineres Argument: Soweit ich das im Moment verstehe, muessen neue network types in 
+// Allgemeineres Argument: Soweit ich das im Moment verstehe, muessen neue network types in
 // NetworkLayerBuilder.newNetworkLayer eingetragen werden.  Das ist ganz sicher nicht gut, denn
 // es bedeutet, dass neue Netzwerk-Typen nur eingetragen werden koennen, indem man in den
 // vorhandenen code eingreift.  Das wuerden wir doch gar nicht wollen, oder???
@@ -134,16 +128,16 @@ public class SimRunKreisverkehr {
 
 ////	Gbl.createWorld();
 ////	Gbl.createFacilities();
-//	
+//
 //	World world = World.getSingleton() ;
 //	//NetworkLayer network = world.createNetworkLayer() ;
-//	
+//
 //	QueueNetworkLayer net = new QueueNetworkLayer();
 //	//NetworkReader  = new Networl
 //	world.setNetworkLayer(net);
-//	
-//	
-//	
+//
+//
+//
 ////	Ich glaube, so etwas wie
 ////	    Network network = new MyNetwork();
 ////		world.addNetwork(network) ;
@@ -155,53 +149,53 @@ public class SimRunKreisverkehr {
 //
 //	NetworkParser network_parser = new NetworkParser(network);
 //	network_parser.parse();
-//			
+//
 //	Plans plans = new Plans();
 //	PlansReaderI plansReader = PlansReaderBuilder.getPlansReader(plans) ;
 //	plansReader.read();
-//	
+//
 //	// run sim
 //	Simulation sim = new QueueSimulation ( network, plans, null );
 //	sim.doSim() ;
-//	
+//
 ////	Gbl.createWorld() ;
-	
+
 //		// KOMISCH:
-//		
+//
 //		World world = World.createSingleton() ;
-//		
+//
 //		Network network = new MyNetwork() ;
 //		network.read() ;
 //		world.addNetworkLayer ( network ) ;
-//		
+//
 //		Population population = new MyPopulation() ;
 //		population.read() ;
 //		world.addPopulation(population);
 //
 //		Events events = new Myevents() ;
 //		world.addEvents ( events ) ;
-//		
-//		MobSim sim = new MySimulation(  ) ;	
+//
+//		MobSim sim = new MySimulation(  ) ;
 //		world.addSimulation ( sim ) ;
-//		
-//		
+//
+//
 //		world.addAlgorithm( reroute, 10);
 //		//world.addAlgorithm(...)args;
 //		world.compose();
-//		
-//		
+//
+//
 //		for ( int iteration=1 ; iteration<=99 ; iteration++ ) {
-//		
+//
 //			world.run() ;
-//			
+//
 //			PlansAlgorithm routeAlgo = new Router(network);
 //			population.addAlgorithm(routeAlgo, 10);
-//			
+//
 //			PlansAlgorithm scndLocAlgo = new MyLocAlgo(network) ;
 //			population.addAlgorithm( scndLocAlgo, 10 ) ;
-//			
+//
 //			population.connectAlgorithms() ;
-//			
+//
 //			population.runPersonAlgorithms() ;
-//		
+//
 //		}

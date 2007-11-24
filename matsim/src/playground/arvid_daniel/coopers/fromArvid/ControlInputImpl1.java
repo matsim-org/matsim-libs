@@ -72,10 +72,12 @@ public class ControlInputImpl1 extends AbstractControlInputImpl
 	public void reset(final int iteration) {
 	}
 
+	@Override
 	public void handleEvent(final EventAgentDeparture event) {
 		super.handleEvent(event);
 	}
 
+	@Override
 	public void handleEvent(final EventAgentArrival event) {
 		super.handleEvent(event);
 	}

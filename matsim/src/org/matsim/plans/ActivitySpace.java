@@ -57,7 +57,7 @@ public abstract class ActivitySpace {
 	protected static final int DEBUG_LEVEL = 1;
 
 	protected String act_type = null;
-	protected TreeMap<String,Double> params = new TreeMap<String,Double>();
+	protected TreeMap<String, Double> params = new TreeMap<String,Double>();
 
 	//////////////////////////////////////////////////////////////////////
 	// add methods
@@ -83,7 +83,7 @@ public abstract class ActivitySpace {
 		return this.act_type;
 	}
 
-	public final Object getParam(final String name) {
+	public final Double getParam(final String name) {
 		return this.params.get(name);
 	}
 

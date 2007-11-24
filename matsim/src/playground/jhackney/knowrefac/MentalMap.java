@@ -23,8 +23,8 @@ package playground.jhackney.knowrefac;
 
 import java.util.Collection;
 import java.util.Hashtable;
-import java.util.Iterator;
 
+import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -34,7 +34,7 @@ import org.matsim.plans.Knowledge;
 import org.matsim.plans.Plan;
 import org.matsim.world.Location;
 /**
- * 
+ *
  * @author fmarchal, jhackney
  *
  */
@@ -56,7 +56,7 @@ public class MentalMap {
 
     public void initialMatchActsActivities (Plan myPlan){
 	// Associate the act in the plan with a random facility on the link
-	Iterator planActIter = (Iterator) myPlan.getIteratorAct();
+	ActIterator planActIter = myPlan.getIteratorAct();
 	while(planActIter.hasNext()){
 	    Act myAct = (Act) planActIter.next();
 	    Link myLink = myAct.getLink();
@@ -81,7 +81,7 @@ public class MentalMap {
 
 		Gbl.errorMsg("stop, no activity found for act "+myAct.getType()+" at "+myAct.getLink().getId());
 	    }
-	}   
+	}
     }
 
     public void updateMatchActsActivities (Act myact, Activity myactivity){
@@ -110,7 +110,7 @@ public class MentalMap {
     //---?---------//
     public void setPlanActivities (Plan myPlan){
 	// Associate the act in the plan with a random facility on the link
-	Iterator planActIter = (Iterator) myPlan.getIteratorAct();
+	ActIterator planActIter = myPlan.getIteratorAct();
 	while(planActIter.hasNext()){
 	    Act myAct = (Act) planActIter.next();
 	    Link myLink = myAct.getLink();
@@ -169,7 +169,7 @@ public class MentalMap {
 //  Move to Knowledge?
 //  public final ArrayList<Activity> getActivitiesOnLink(final String type, final Link link) {
 //  ArrayList<Activity> acts = new ArrayList<Activity>();
-//  ArrayList<Activity> activities = knowledge.getActivities(type);		
+//  ArrayList<Activity> activities = knowledge.getActivities(type);
 //  for (int i=0; i<activities.size(); i++) {
 //  Activity a = activities.get(i);
 //  if (a.getType().equals(type) && a.getFacility().getLink().equals(link)) {
@@ -179,12 +179,12 @@ public class MentalMap {
 //  return acts;
 //  }
     public int getNumKnownFacilities(){
-	return knowledge.getActivities().size(); 
+	return knowledge.getActivities().size();
     }
 
 
 
-    //-----------------------old and in the way------------------------//    
+    //-----------------------old and in the way------------------------//
     // We need a private structure that manages efficiently
     // requests for activities of a given type, facilities where
     // an activity type can be performed etc.
@@ -203,8 +203,8 @@ public class MentalMap {
 //  }
 
 //  public CoolPlace getRandomCoolPlace(){
-//  Vector<CoolPlace> v = new Vector<CoolPlace>(); 
-//  for( HashSet<CoolPlace> tree : places.values() )		
+//  Vector<CoolPlace> v = new Vector<CoolPlace>();
+//  for( HashSet<CoolPlace> tree : places.values() )
 //  v.addAll( tree );
 //  return v.get( Gbl.random.nextInt( v.size()));
 //  }
@@ -230,7 +230,7 @@ public class MentalMap {
 //  public int getNumKnownFacilities(){
 //  int num=0;
 //  Vector<CoolPlace> v = new Vector<CoolPlace>();
-//  for( HashSet<CoolPlace> tree : places.values() )		
+//  for( HashSet<CoolPlace> tree : places.values() )
 //  v.addAll( tree );
 //  num=v.size();
 ////Iterator viter = v.iterator();
@@ -242,7 +242,7 @@ public class MentalMap {
 //  }
 //  public Vector<CoolPlace> getAllPlaces(){
 //  Vector<CoolPlace> v = new Vector<CoolPlace>();
-//  for( HashSet<CoolPlace> tree : places.values() )		
+//  for( HashSet<CoolPlace> tree : places.values() )
 //  v.addAll( tree );
 //  return v;
 //  }

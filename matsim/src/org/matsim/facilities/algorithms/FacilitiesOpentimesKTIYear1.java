@@ -29,59 +29,56 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
-import org.matsim.world.Location;
 
 public class FacilitiesOpentimesKTIYear1 extends FacilitiesAlgorithm {
 
 	private TreeMap<String, Opentime> openingTimes = new TreeMap<String, Opentime>();
-	
+
 	public FacilitiesOpentimesKTIYear1() {
 		super();
 	}
 
+	@Override
 	public void run(Facilities facilities) {
-		
+
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-		
+
 		this.loadOpeningTimes();
-		
-		Iterator<Location> f_it = facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			
-			Facility f = (Facility)f_it.next();
+
+		for (Facility f : facilities.getFacilities().values()) {
 			Iterator<Activity> a_it = f.getActivities().values().iterator();
 			while (a_it.hasNext()) {
-				
+
 				Activity a = a_it.next();
 				String actType = a.getType();
-				
+
 				// delete all existing open times info
 				TreeMap<String, TreeSet<Opentime>> o = a.getOpentimes();
 				o.clear();
-				
+
 				if (openingTimes.containsKey(actType)) {
-					
+
 					a.addOpentime(openingTimes.get(actType));
-					
+
 				}
 				else {
-					
+
 					Gbl.warningMsg(
-							this.getClass(), 
-							"run(...)", 
+							this.getClass(),
+							"run(...)",
 							"For activity type " + actType + " no opening time is defined");
-					
+
 				}
 			}
-			
+
 		}
 
 		System.out.println("    done.");
 
 	}
-	
+
 	private void loadOpeningTimes() {
-		
+
 		openingTimes.put("work", new Opentime("wkday", "7:00", "18:00"));
 		openingTimes.put("shop", new Opentime("wkday", "8:00", "20:00"));
 		openingTimes.put("education", new Opentime("wkday", "7:00", "18:00"));

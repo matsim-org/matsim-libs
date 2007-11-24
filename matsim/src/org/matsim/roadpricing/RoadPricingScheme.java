@@ -113,7 +113,7 @@ public class RoadPricingScheme {
 		return this.costs;
 	}
 
-	/** Returns all Cost objects as an array for faster iteration. */
+	/** @return Returns all Cost objects as an array for faster iteration. */
 	public Cost[] getCostArray() {
 		if (this.cacheIsInvalid) buildCache();
 		return this.costCache;

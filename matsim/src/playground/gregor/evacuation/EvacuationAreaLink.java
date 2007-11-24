@@ -21,19 +21,20 @@
 package playground.gregor.evacuation;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.utils.identifiers.IdI;
 
 /**
  * @author glaemmel
  *
  */
 
-// simple evacuation link description, according to the 
+// simple evacuation link description, according to the
 // desasterarea xml file
 public class EvacuationAreaLink {
-	private Id id;
+	private IdI id;
 	private double deadline;
-	
-	public EvacuationAreaLink(Id id, double deadline){
+
+	public EvacuationAreaLink(IdI id, double deadline){
 		this.id = id;
 		this.deadline = deadline;
 	}
@@ -41,12 +42,12 @@ public class EvacuationAreaLink {
 		this.id = new Id(id);
 		this.deadline = deadline;
 	}
-	
-	
-	public Id getId(){ return this.id; }
+
+
+	public IdI getId() { return this.id; }
 	public double getDeadline() { return this.deadline; }
-	
-	public void setId(Id id){ this.id = id; }
+
+	public void setId(IdI id){ this.id = id; }
 	public void setDeadline(double deadline) { this.deadline = deadline; }
-	
+
 }

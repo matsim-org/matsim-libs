@@ -220,6 +220,7 @@ public class KnowledgeV4 {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public final String toString() {
 		return "[desc=" + this.desc + "]" + "[nof_activities=" + this.activities.size() + "]";
 	}

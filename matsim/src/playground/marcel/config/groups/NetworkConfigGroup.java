@@ -24,6 +24,7 @@ public class NetworkConfigGroup extends AbstractFileIOConfigGroup {
 
 	public static final String GROUP_NAME = "network";
 	
+	@Override
 	public String getName() {
 		return GROUP_NAME;
 	}

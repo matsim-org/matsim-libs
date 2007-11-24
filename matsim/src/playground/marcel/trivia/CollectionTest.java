@@ -37,6 +37,7 @@ public class CollectionTest {
 			this.id = id;
 		}
 		
+		@Override
 		public String toString() {
 			return "[" + id + " @ " + time + "]";
 		}

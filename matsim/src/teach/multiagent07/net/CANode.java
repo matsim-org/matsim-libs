@@ -43,8 +43,8 @@ public class CANode extends BasicNode {
 		Vehicle veh = link.getFirstVeh();
 
 		if (veh != null) {
-			CALink outlink = veh.getNextLink(outlinks);
-			
+			CALink outlink = veh.getNextLink(outlinks.values());
+
 			if (outlink.hasSpace()) {
 				link.removeFirstVeh();
 				outlink.addVeh(veh);
@@ -56,31 +56,31 @@ public class CANode extends BasicNode {
 
 	private void randomMove(int time) {
 		List<CALink> inList = new ArrayList<CALink>();
-		
-		for (Object in : inlinks) inList.add((CALink)in);
+
+		for (Object in : inlinks.values()) inList.add((CALink)in);
 		Collections.shuffle(inList);
 
 		for (CALink link : inList) {
 			moveVehicleOverNode(link);
 		}
-		
+
 	}
 
 	private Id vorfahrtLinkId = new Id("15");
-	
+
 	private void moveVorfahrt12(int time) {
 		if (this.id.equals(new Id("12")) ){
 
 			CALink specialLink = (CALink)inlinks.get(vorfahrtLinkId);
 			moveVehicleOverNode(specialLink);
-			
+
 			// Code from randomMove!
 			List<CALink> inList = new ArrayList<CALink>();
-			for (Object link : inlinks) inList.add((CALink)link);
+			for (Object link : inlinks.values()) inList.add((CALink)link);
 			Collections.shuffle(inList);
-			
+
 			for (CALink link : inList) {
-				if (!link.getId().equals(vorfahrtLinkId)) 
+				if (!link.getId().equals(vorfahrtLinkId))
 					 moveVehicleOverNode(link);
 			}
 		} else randomMove(time);
@@ -105,16 +105,16 @@ public class CANode extends BasicNode {
 
 	public CANode(String id) {
 		super(id);
-		// TODO Auto-generated constructor stub
 	}
 
 	// additional data
 	private CoordI coord;
-	
+
 	public void setCoord(CoordI coord) {
 		this.coord = coord;
 	}
-	
+
+	@Override
 	public CoordI getCoord() {
 		return this.coord;
 	}

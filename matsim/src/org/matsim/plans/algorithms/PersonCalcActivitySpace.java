@@ -72,6 +72,7 @@ public class PersonCalcActivitySpace extends PersonAlgorithm {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 	
+	@Override
 	public void run(Person person) {
 
 		// Check if knowledge exists

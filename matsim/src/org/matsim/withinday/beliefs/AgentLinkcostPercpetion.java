@@ -46,8 +46,6 @@ public class AgentLinkcostPercpetion implements TravelTimeI {
 
 	private TravelTimeI reactProvider;
 
-	private double w_c;
-
 	private double w_t;
 
 	private double phi_1 = this.random.nextGaussian();
@@ -79,8 +77,7 @@ public class AgentLinkcostPercpetion implements TravelTimeI {
 		if (link.equals(this.agent.getVehicle().getCurrentLink())) {
 			return t_star(link, time, this.phi_1, this.phi_2);
 		}
-		else if (this.agent.getVehicle().getCurrentLink().getToNode().getOutLinks()
-				.contains(link)) {
+		else if (this.agent.getVehicle().getCurrentLink().getToNode().getOutLinks().containsKey(link.getId())) {
 			// The link is observable.
 			return t_star(link, time, this.phi_1, this.phi_2);
 		}
@@ -98,7 +95,6 @@ public class AgentLinkcostPercpetion implements TravelTimeI {
 
 		Link link = this.agent.getVehicle().getCurrentLink();
 
-		double c_star = c_star(link, time_s, this.phi_1, this.phi_2);
 		int t_star = t_star(link, time_s, this.phi_1, this.phi_2);
 
 		double histTTime = this.histProvider.getLinkTravelTime(link, time_s);
@@ -109,18 +105,6 @@ public class AgentLinkcostPercpetion implements TravelTimeI {
 			this.w_t = 1;
 			log.warn("Division by zero! Historical travel time is zero");
 		}
-	}
-
-	private double c_star(final Link link, final double time_s, final double phi_1, final double phi_2) {
-		double c_r = this.reactProvider.getLinkTravelTime(link, time_s);
-		double c_h = this.histProvider.getLinkTravelTime(link, time_s);
-
-		double epsilon_c1 = this.k_1 * c_r * phi_1;
-		double epsilon_c2 = this.k_2 * Math.abs(((c_r + epsilon_c1) / c_h) - 1) * phi_2;
-
-		double c_star = c_r + epsilon_c1 + epsilon_c2;
-		c_star = applyBoundary(c_star, link);
-		return c_star;
 	}
 
 	private int t_star(final Link link, final double time_s, final double phi_1, final double phi_2) {

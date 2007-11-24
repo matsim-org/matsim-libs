@@ -41,7 +41,8 @@ class MoviePlayer extends TimerTask {
         this.viz = viz;
     }
 
-    public void run() {
+    @Override
+		public void run() {
         try {
             reader.toNextTimeStep();
         } catch (IOException e) {

@@ -190,6 +190,7 @@ public class Knowledge {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public final String toString() {
 		return "[desc=" + this.desc + "]" + "[nof_activities=" + this.activities.size() + "]";
 	}

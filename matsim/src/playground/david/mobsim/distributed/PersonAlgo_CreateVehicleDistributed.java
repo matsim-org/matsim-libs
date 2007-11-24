@@ -66,7 +66,7 @@ public class PersonAlgo_CreateVehicleDistributed extends PersonAlgo_CreateVehicl
 			
 			// this is the starting point for our vehicle, so put it in the queue
 			QueueNode actNode = (QueueNode)act.getLink().getToNode();
-			return actNode.getPartitionID();
+			return actNode.getPartitionId();
 		}
 		return -1;
 	}
@@ -74,6 +74,7 @@ public class PersonAlgo_CreateVehicleDistributed extends PersonAlgo_CreateVehicl
 	/* (non-Javadoc)
 	 * @see org.matsim.plans.algorithms.PersonAlgorithm#run(org.matsim.plans.Person)
 	 */
+	@Override
 	public void run(Person person) {
 		// Choose Plan to follow
 		List plaene = person.getPlans();

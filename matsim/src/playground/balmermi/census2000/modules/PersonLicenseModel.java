@@ -36,10 +36,10 @@ public class PersonLicenseModel extends PersonAlgorithm implements PlanAlgorithm
 
 	private static final String NO = "no";
 	private static final String YES = "yes";
-	
+
 	private final ModelLicenseOwnership model = new ModelLicenseOwnership();
 	private final Persons persons;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -54,8 +54,9 @@ public class PersonLicenseModel extends PersonAlgorithm implements PlanAlgorithm
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
-		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
+		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
 		model.setAge(p.getAge());
 		model.setHHDimension(p.getHousehold().getPersonCount());
 		model.setHHKids(p.getHousehold().getKidCount());

@@ -21,7 +21,6 @@
 package org.matsim.plans.algorithms;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -111,9 +110,7 @@ public class PlansCalcTravelDistance extends PersonAlgorithm implements PlanAlgo
 			Node from = nodes.get(i);
 			Node to = nodes.get(i+1);
 
-			Iterator<?> ol_it = from.getOutLinks().iterator();
-			while (ol_it.hasNext()) {
-				Link currlink = (Link)ol_it.next();
+			for (Link currlink : from.getOutLinks().values()) {
 				if (currlink.getToNode().equals(to)) {
 					dist += currlink.getLength();
 					break;

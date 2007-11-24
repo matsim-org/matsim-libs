@@ -20,6 +20,10 @@
 
 package org.matsim.roadpricing;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -32,13 +36,6 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.Route;
-import org.matsim.roadpricing.CalcPaidToll;
-import org.matsim.roadpricing.PlansCalcAreaTollRoute;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingScoringFunctionFactory;
-import org.matsim.roadpricing.RoadPricingWriterXMLv1;
-import org.matsim.roadpricing.TollTravelCostCalculator;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -47,6 +44,7 @@ import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
+import org.xml.sax.SAXException;
 
 public class RoadPricingTest extends MatsimTestCase {
 
@@ -207,48 +205,45 @@ public class RoadPricingTest extends MatsimTestCase {
 
 	/**
 	 * Tests reader and writer to ensure that reading and writing does not modify the schemes.
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
 	 */
-	public void testWriteReadWrite() {
+	public void testWriteReadWrite() throws SAXException, ParserConfigurationException, IOException {
 
 		final String origFile = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/roadpricing1.xml";
 		final String tmpFile1 = getOutputDirectory() + "roadpricing1.xml";
 		final String tmpFile2 = getOutputDirectory() + "roadpricing2.xml";
 
-		try {
+		QueueNetworkLayer network = createNetwork1();
+		// first, read the scheme from file
+		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(network);
+		reader1.parse(origFile);
+		RoadPricingScheme scheme1 = reader1.getScheme();
 
-			QueueNetworkLayer network = createNetwork1();
-			// first, read the scheme from file
-			RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(network);
-			reader1.parse(origFile);
-			RoadPricingScheme scheme1 = reader1.getScheme();
+		// write the scheme to a file
+		RoadPricingWriterXMLv1 writer1 = new RoadPricingWriterXMLv1(scheme1);
+		writer1.writeFile(tmpFile1);
 
-			// write the scheme to a file
-			RoadPricingWriterXMLv1 writer1 = new RoadPricingWriterXMLv1(scheme1);
-			writer1.writeFile(tmpFile1);
+		/* we cannot yet compare the written file with the original file, as the
+		 * original file may have be edited manually and may have other indentation
+		 * than the written one. Thus, read this file again and write it again and
+		 * compare them.
+		 */
 
-			/* we cannot yet compare the written file with the original file, as the
-			 * original file may have be edited manually and may have other indentation
-			 * than the written one. Thus, read this file again and write it again and
-			 * compare them.
-			 */
+		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(network);
+		reader2.parse(tmpFile1);
+		RoadPricingScheme scheme2 = reader2.getScheme();
 
-			RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(network);
-			reader2.parse(tmpFile1);
-			RoadPricingScheme scheme2 = reader2.getScheme();
+		// write the scheme to a file
+		RoadPricingWriterXMLv1 writer2 = new RoadPricingWriterXMLv1(scheme2);
+		writer2.writeFile(tmpFile2);
 
-			// write the scheme to a file
-			RoadPricingWriterXMLv1 writer2 = new RoadPricingWriterXMLv1(scheme2);
-			writer2.writeFile(tmpFile2);
+		// now compare the two files
+		long cksum1 = CRCChecksum.getCRCFromFile(tmpFile1);
+		long cksum2 = CRCChecksum.getCRCFromFile(tmpFile2);
 
-			// now compare the two files
-			long cksum1 = CRCChecksum.getCRCFromFile(tmpFile1);
-			long cksum2 = CRCChecksum.getCRCFromFile(tmpFile2);
-
-			assertEquals(cksum1, cksum2);
-
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		assertEquals(cksum1, cksum2);
 	}
 
 	public void testDistanceToll() {

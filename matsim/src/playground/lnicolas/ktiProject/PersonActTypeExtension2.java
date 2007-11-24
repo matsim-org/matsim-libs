@@ -66,6 +66,7 @@ public class PersonActTypeExtension2 extends PersonAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		int remainingActTime = 24 - homeActTypeDuration; // hours
 		

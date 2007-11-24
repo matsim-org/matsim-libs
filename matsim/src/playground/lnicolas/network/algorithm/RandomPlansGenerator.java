@@ -34,33 +34,32 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class RandomPlansGenerator extends NetworkAlgorithm {
 
 	int cellSize = 5000;
 	int distanceTolerance = 500;
-	
+
 	private double minX;
 	private double minY;
 	private double givenFromToDistance;
 	private int tripCount;
 	private Plans plans;
-	
+
 	public RandomPlansGenerator(double avgFromToDistance,
 			int tripCount) {
 		this.givenFromToDistance = avgFromToDistance;
 		this.tripCount = tripCount;
 	}
-	
+
 	private ArrayList<Node>[][] initCells(NetworkLayer network) {
 		this.minX = Double.MAX_VALUE;
 		this.minY = Double.MAX_VALUE;
 		double maxX = Double.MIN_VALUE;
 		double maxY = Double.MIN_VALUE;
-		
-		for (Object obj : network.getNodes()) {
-			Node n = (Node)obj;
+
+		for (Node n : network.getNodes().values()) {
 			if (n.getCoord().getX() > maxX) {
 				maxX = n.getCoord().getX();
 			}
@@ -74,7 +73,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 				minY = n.getCoord().getY();
 			}
 		}
-		
+
 		int cellColumnCount = (int) Math.ceil((maxX - minX) / cellSize);
 		int cellRowCount = (int) Math.ceil((maxY - minY) / cellSize);
 		ArrayList<Node>[][] cells
@@ -84,18 +83,17 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 				cells[i][j] = new ArrayList<Node>();
 			}
 		}
-		
+
 		// Put each node in the appropriate cell
-		for (Object obj : network.getNodes()) {
-			Node n = (Node)obj;
+		for (Node n : network.getNodes().values()) {
 			int row = (int)(n.getCoord().getY() - minY) / cellSize;
 			int column = (int)(n.getCoord().getX() - minX) / cellSize;
 			cells[row][column].add(n);
 		}
-		
+
 		System.out.println("Rows: " + cellRowCount + ", columns: "
 				+ cellColumnCount);
-		
+
 		int emptyCount = 0;
 		int cellCount = 0;
 		for (int i = 0; i < cellRowCount; i++) {
@@ -108,16 +106,16 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 			}
 		}
 		System.out.println(emptyCount + " of " + cellCount + " are empty");
-		
+
 		return cells;
 	}
 
 	private void generateTrips(NetworkLayer network, ArrayList<Node>[][] cells) {
-		
+
 		Gbl.random.nextDouble(); // draw one because of strange "not-randomness" in the first draw...
-		
+
 		// Take a random cell and determine the cells that are givenFromToDistance
-		// away from it 
+		// away from it
 		Plans plans = new Plans();
 		for (int i = 0; i < tripCount; i++) {
 			if (addPlan(cells, plans, i) == false) {
@@ -125,24 +123,24 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 					+ givenFromToDistance);
 			}
 		}
-		
+
 		PlansWriter plans_writer = new PlansWriter(plans);
 		plans_writer.write();
 		System.out.println("Wrote plans to "
 				+ Gbl.getConfig().plans().getOutputFile());
-		
+
 		this.plans = plans;
 	}
 
 	private void generateTrips(NetworkLayer network) {
-		List<Node> fromNodes = new ArrayList<Node>(network.getNodes());
-		List<Node> toNodes = new ArrayList<Node>(network.getNodes());
+		List<Node> fromNodes = new ArrayList<Node>(network.getNodes().values());
+		List<Node> toNodes = new ArrayList<Node>(network.getNodes().values());
 		Iterator<Node> fromIt = fromNodes.iterator();
 		int i = 0;
 //		String statusString = "|----------+-----------|";
 //		System.out.println(statusString);
 		Plans plans = new Plans();
-		
+
 		while (i < this.tripCount) {
 			if (fromIt.hasNext() == false) {
 				fromIt = fromNodes.iterator();
@@ -168,18 +166,18 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 				addPlan(plans, i, toNode, fromNode);
 				i++;
 			}
-			
+
 //			if (i % (this.tripCount / statusString.length()) == 0) {
 //				System.out.print(".");
 //				System.out.flush();
 //			}
 		}
-		
+
 		PlansWriter plans_writer = new PlansWriter(plans);
 		plans_writer.write();
 		System.out.println("Wrote plans to "
 				+ Gbl.getConfig().plans().getOutputFile());
-		
+
 		this.plans = plans;
 	}
 
@@ -216,7 +214,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 					+ givenFromToDistance);
 			return false;
 		}
-		
+
 		return addPlan(plans, id, toNode, fromNode);
 	}
 
@@ -229,19 +227,19 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 			e.printStackTrace();
 			return false;
 		}
-		Link fromLink = (Link) fromNode.getInLinks().iterator().next();
+		Link fromLink = fromNode.getInLinks().values().iterator().next();
 		int startTime = (int) (Gbl.random.nextDouble() * 60*60*24);
 		try {
 			plan.createAct("w", -1, -1, fromLink, startTime, 0, 0, false);
 			plan.createLeg("0", "car", null, null, null);
-			Link toLink = (Link) toNode.getInLinks().iterator().next();
+			Link toLink = toNode.getInLinks().values().iterator().next();
 			int endTime = (int) (Gbl.random.nextDouble() * 60*60*2);
 			plan.createAct("w", -1, -1, toLink, startTime + endTime, 0, 0, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -283,7 +281,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		// Now generate the trips
 		generateTrips(network, cells);
 	}
-	
+
 	public void runDumb(NetworkLayer network) {
 		generateTrips(network);
 	}

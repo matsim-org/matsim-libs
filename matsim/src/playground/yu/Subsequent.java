@@ -22,6 +22,7 @@ package playground.yu;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -29,43 +30,39 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeSetI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.world.Coord;
+import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.writer.MatsimXmlWriter;
 
 /**
  * analyses MATSim networkfile
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class Subsequent extends MatsimXmlWriter {
 
-	private BasicLinkSetI links;
+	private Map<IdI, ? extends Link> links;
 
 	/**
-	 * criterion to judge Capacity
+	 * Criterion to judge Capacity
 	 */
 	private static double BETA = 0.0;
 
 	/**
-	 * the important intermediate result...
-	 * 
-	 * @param String
-	 *            (args0) - ssLinkId: the "default next" linkId of the "current"
-	 *            Link
-	 * @param String
-	 *            (args1) - linkId: the "current" Link
+	 * The important intermediate result.
+	 *
+	 * (arg0) - ssLinkId: the "default next" linkId of the "current" Link
+	 * (arg1) - linkId: the "current" Link
 	 */
 	private TreeMap<String, String> ssLinks = new TreeMap<String, String>();
 
 	/**
 	 * Constructor transfers the links of network to local links
-	 * 
+	 *
 	 * @param network
 	 */
 	public Subsequent(NetworkLayer network) {
@@ -92,33 +89,26 @@ public class Subsequent extends MatsimXmlWriter {
 		 *            |deltaTheta of outLink-link|
 		 */
 		Map<String, Double> absDeltaThetas = new TreeMap<String, Double>();
-		for (Iterator iter = links.iterator(); iter.hasNext();) {
-			Link l = (Link) iter.next();
+		for (Link l : links.values()) {
 			Node from = l.getFromNode();
 			Node to = l.getToNode();
-			BasicNodeSetI outNodes = to.getOutNodes();
+			Collection<? extends Node> outNodes = to.getOutNodes().values();
 			absDeltaThetas.clear();
 			if (outNodes.size() > 1) {
 
-				for (Iterator it = outNodes.iterator(); it.hasNext();) {
-					Node out = (Node) it.next();
+				for (Node out : outNodes) {
 					Coord cFrom = from.getCoord();
 					Coord cTo = to.getCoord();
 					double xTo = cTo.getX();
 					double yTo = cTo.getY();
 					Coord cOut = out.getCoord();
-					double deltaTheta = Math.atan2(cOut.getY() - yTo, cOut
-							.getX()
-							- xTo)
-							- Math
-									.atan2(yTo - cFrom.getY(), xTo
-											- cFrom.getX());
+					double deltaTheta = Math.atan2(cOut.getY() - yTo, cOut.getX() - xTo)
+							- Math.atan2(yTo - cFrom.getY(), xTo- cFrom.getX());
 					while (deltaTheta < -Math.PI)
 						deltaTheta += 2.0 * Math.PI;
 					while (deltaTheta > Math.PI)
 						deltaTheta -= 2.0 * Math.PI;
-					absDeltaThetas.put(out.getId().toString(), Math
-							.abs(deltaTheta));
+					absDeltaThetas.put(out.getId().toString(), Math.abs(deltaTheta));
 				}
 				ssLinks.put(computeSubsequentLink(l, absDeltaThetas), l.getId()
 						.toString());
@@ -136,7 +126,7 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * Calculates the "default next" linkId intermediately
-	 * 
+	 *
 	 * @param thetas
 	 * @return
 	 */
@@ -186,7 +176,7 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * gets the link, who has suitable fromNode(Id) and toNode(Id)
-	 * 
+	 *
 	 * @param outNodeId -
 	 *            one of outNodeIds of a toNode
 	 * @param l -
@@ -194,22 +184,17 @@ public class Subsequent extends MatsimXmlWriter {
 	 * @return the link, whose toNodeId="outNodeId" and fromNodeId = l.toNode-Id
 	 */
 	public Link findOutLink(String outNodeId, Link l) {
-		Link outL = null;
-		BasicLinkSetI outLinks = l.getToNode().getOutLinks();
-		for (Iterator linkIt = outLinks.iterator(); linkIt.hasNext();) {
-			outL = (Link) linkIt.next();
+		for (Link outL : l.getToNode().getOutLinks().values()) {
 			if (outL.getToNode().getId().toString().equals(outNodeId))
 				return outL;
 		}
-		if (outL.equals(null))
-			System.err
-					.println("[WARNING]The link you are looking for doesn'/t exist in the network!");
-		return outL;
+		System.err.println("[WARNING]The link you are looking for doesn'/t exist in the network!");
+		return null;
 	}
 
 	/**
 	 * writes linkId and the "default next" linkId into a .xml-file
-	 * 
+	 *
 	 * @param filename
 	 * @throws IOException
 	 */
@@ -223,7 +208,7 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * writes contents (ssLinkId-linkId-pair) into the writer.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	private void write() throws IOException {

@@ -46,10 +46,11 @@ package org.matsim.utils.misc;
 
 /**
  * @author mrieser
- * 
- * a minimal interface for a multimap
- * feel free to extend with other map-functions when needed
- *	
+ *
+ * A minimal interface for a multimap. Feel free to extend with other map-functions when needed
+ *
+ * @param <K> The type of keys in the map.
+ * @param <V> The type of values in the map.
  */
 public interface MultiMap<K, V> {
 	V put(K key, V value);

@@ -28,7 +28,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Filters out plans from persons where none of the act's locations are within

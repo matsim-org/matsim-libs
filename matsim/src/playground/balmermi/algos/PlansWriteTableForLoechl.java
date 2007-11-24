@@ -101,6 +101,7 @@ public class PlansWriteTableForLoechl extends PersonAlgorithm implements PlanAlg
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		int nofPlans = person.getPlans().size();
 
@@ -113,7 +114,7 @@ public class PlansWriteTableForLoechl extends PersonAlgorithm implements PlanAlg
 		}
 		
 		for (int planId = 0; planId < nofPlans; planId++) {
-			Plan plan = (Plan)person.getPlans().get(planId);
+			Plan plan = person.getPlans().get(planId);
 			try {
 				handlePlan(plan);
 			} catch (Exception e) {

@@ -20,13 +20,12 @@
 
 package playground.lnicolas.network.algorithm;
 
-import java.util.Iterator;
+import java.util.Collection;
 
-import org.matsim.basic.v01.IdSet;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * @author lnicolas
@@ -61,11 +60,8 @@ public class NetworkCutter extends NetworkAlgorithm {
 
 	private void cutNetwork(NetworkLayer network, int roleIndex) {
 
-		IdSet allNodesCopy = new IdSet();
-		allNodesCopy.addAll(network.getNodes());
-		Iterator it = allNodesCopy.iterator();
-		while (it.hasNext()) {
-			Node n = (Node)it.next();
+		Collection<? extends Node> allNodesCopy = network.getNodes().values();
+		for (Node n : allNodesCopy) {
 			NetworkCutterRole r = getRole(n, roleIndex);
 
 			if (r.isWithinTargetRectangle() == false) {
@@ -75,10 +71,7 @@ public class NetworkCutter extends NetworkAlgorithm {
 	}
 
 	private void markNodes(NetworkLayer network, int roleIndex) {
-		Iterator it = network.getNodes().iterator();
-
-		while (it.hasNext()) {
-			Node n = (Node)it.next();
+		for (Node n : network.getNodes().values()) {
 			Coord c = n.getCoord();
 			NetworkCutterRole r = getRole(n, roleIndex);
 

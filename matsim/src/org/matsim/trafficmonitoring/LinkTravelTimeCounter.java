@@ -31,11 +31,8 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 
-
-
 /**
  * @author dgrether
- *
  */
 public class LinkTravelTimeCounter implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI,
 EventHandlerAgentArrivalI {
@@ -44,18 +41,17 @@ EventHandlerAgentArrivalI {
 	 */
 	private static LinkTravelTimeCounter instance;
 
-	private Map<String, Double> enterEvents;
-	
-	private Map<String, Double> travelTimes;
-	
-	public static void init(final Events events, final int numberOfLinks) {
-		instance = new LinkTravelTimeCounter();
-		events.addHandler(instance);
-		instance.enterEvents = new HashMap<String, Double>(numberOfLinks);
-		instance.travelTimes = new HashMap<String, Double>(numberOfLinks);
+	final private Map<String, Double> enterEvents;
+	final private Map<String, Double> travelTimes;
+
+	private LinkTravelTimeCounter(final int numberOfLinks) {
+		this.enterEvents = new HashMap<String, Double>(numberOfLinks);
+		this.travelTimes = new HashMap<String, Double>(numberOfLinks);
 	}
-	
-	private LinkTravelTimeCounter() {
+
+	public static void init(final Events events, final int numberOfLinks) {
+		instance = new LinkTravelTimeCounter(numberOfLinks);
+		events.addHandler(instance);
 	}
 
 	public void handleEvent(final EventLinkEnter event) {
@@ -75,15 +71,15 @@ EventHandlerAgentArrivalI {
 	}
 
 	public void handleEvent(final EventAgentArrival event) {
-		this.enterEvents.remove(event.agentId);	
+		this.enterEvents.remove(event.agentId);
 	}
 
 	public Double getLastLinkTravelTime(final String linkId) {
 		return this.travelTimes.get(linkId);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return the singleton if initialized correctly
 	 */
 	public static synchronized LinkTravelTimeCounter getInstance() {

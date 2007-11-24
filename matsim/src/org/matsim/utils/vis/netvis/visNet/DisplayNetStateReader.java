@@ -40,7 +40,8 @@ public class DisplayNetStateReader extends StreamReaderA {
 
     // --------------- IMPLEMENTATION OF BasicStateWriter ---------------
 
-    protected StateI newState() {
+    @Override
+		protected StateI newState() {
         return new DisplayNetState(getIndexConfig());
     }
 

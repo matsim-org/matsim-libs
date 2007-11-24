@@ -51,6 +51,7 @@ public class Count {
 	 * 
 	 * @return s
 	 */
+	@Override
 	public String toString(){
 		String s = Double.toString(value);
 		return s;

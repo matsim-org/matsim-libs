@@ -54,7 +54,7 @@ public class WorldBottom2TopCompletion extends WorldAlgorithm {
 	private final boolean completeNetFacMapping(final MappingRule m) {
 		Facilities up_facilities = (Facilities)m.getUpLayer();
 		NetworkLayer down_network = (NetworkLayer)m.getDownLayer();
-		Iterator<Location> f_it = up_facilities.getLocations().values().iterator();
+		Iterator<? extends Location> f_it = up_facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility up_f = (Facility)f_it.next();
 			Link down_link = down_network.getNearestRightEntryLink(up_f.getCenter());
@@ -89,26 +89,31 @@ public class WorldBottom2TopCompletion extends WorldAlgorithm {
 			else { Gbl.errorMsg("This should never happen!"); }
 		}
 		else if (down_layer instanceof Facilities) {
-			if (up_layer instanceof ZoneLayer) { return this.completeFacZoneMapping(m); }
-			else { Gbl.errorMsg("This should never happen!"); }
+			if (up_layer instanceof ZoneLayer) {
+				return this.completeFacZoneMapping(m);
+			}
+			Gbl.errorMsg("This should never happen!");
 		}
 		else if (down_layer instanceof ZoneLayer) {
-			if (up_layer instanceof ZoneLayer) { return this.completeZoneZoneMapping(m); }
-			else { Gbl.errorMsg("This should never happen!"); }
+			if (up_layer instanceof ZoneLayer) {
+				return this.completeZoneZoneMapping(m);
+			}
+			Gbl.errorMsg("This should never happen!");
 		}
 		else { Gbl.errorMsg("That's very weird!!!"); }
 		return false;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(World world) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
 		world.complete();
-		
+
 		int nof_layers = world.getLayers().size();
 		if (nof_layers == 0) { System.out.println("      nof_layers=0: Nothing to do."); }
 		else if (nof_layers == 1) { System.out.println("      nof_layers=1: Nothing to do."); }

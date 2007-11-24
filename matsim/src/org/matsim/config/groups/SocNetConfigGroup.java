@@ -126,7 +126,8 @@ public class SocNetConfigGroup extends Module {
     }
 
 //  @Override
-    public final String getValue(final String key) {
+    @Override
+		public final String getValue(final String key) {
 	if (SOCNET_GRAPHALGO.equals(key)){
 	    return getSocNetAlgo();
 	} else if (SOCNET_KBAR.equals(key)) {

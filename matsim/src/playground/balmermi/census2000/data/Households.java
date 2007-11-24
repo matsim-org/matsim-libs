@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class Households {
 
@@ -74,7 +74,7 @@ public class Households {
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final Household getHousehold(Integer hh_id) {
 		return this.households.get(hh_id);
 	}
@@ -104,10 +104,10 @@ public class Households {
 				int hhtpw = Integer.parseInt(entries[8].trim());
 				int hh_cat = this.getHouseholdCategory(hhtpz,hhtpw);
 				if (hh_cat > -1) {
-					Integer hh_id = Integer.parseInt(entries[2].trim());
+					Integer hh_id = Integer.valueOf(entries[2].trim());
 					Household hh = this.households.get(hh_id);
 					if (hh == null) {
-						Integer muni_id = Integer.parseInt(entries[1].trim());
+						int muni_id = Integer.parseInt(entries[1].trim());
 						Municipality m = this.municipalities.getMunicipality(muni_id);
 						if (m == null) {
 							System.out.println("    Household id=" + hh_id + " ignored. (Municipality id=" + muni_id + " does not exist)");
@@ -138,7 +138,7 @@ public class Households {
 					System.out.println("    Line " + line_cnt + ": # households = " + this.households.size());
 				}
 				line_cnt++;
-			}	
+			}
 			buffered_reader.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);

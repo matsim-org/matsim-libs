@@ -50,6 +50,7 @@ public class PlanPlotActLocations extends PersonAlgorithm implements PlanAlgorit
 		}
 	}
 	
+	@Override
 	public void run(Person person) {
 		for(Plan plan : person.getPlans()) {
 			if (plan.isSelected()) {

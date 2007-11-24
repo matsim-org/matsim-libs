@@ -41,10 +41,10 @@ import org.matsim.utils.vis.kml.LineStyle;
 import org.matsim.utils.vis.kml.NetworkLink;
 import org.matsim.utils.vis.kml.Placemark;
 import org.matsim.utils.vis.kml.Point;
-import org.matsim.utils.vis.kml.Region;
 import org.matsim.utils.vis.kml.Style;
 import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 import org.matsim.utils.vis.kml.Link.ViewRefreshMode;
+import org.matsim.utils.vis.kml.fields.Color;
 
 public class PopulationExportToKML extends PlansAlgorithm {
 
@@ -146,7 +146,7 @@ public class PopulationExportToKML extends PlansAlgorithm {
 				this.masterDocument.addStyle(aStyle);
 				IconStyle anIconStyle = new IconStyle(
 						new Icon(new String(this.iconHREFs.get((int)Math.ceil(age.doubleValue()/10.0)))),
-						IconStyle.DEFAULT_COLOR,
+						null,
 						IconStyle.DEFAULT_COLOR_MODE,
 						this.iconScales.get(sizeClass)
 						);
@@ -159,7 +159,7 @@ public class PopulationExportToKML extends PlansAlgorithm {
 		// KML network link style
 		this.networkStyle = new Style("networkLinkStyle");
 		this.masterDocument.addStyle(this.networkStyle);
-		this.networkStyle.setLineStyle(new LineStyle("7fff0000", LineStyle.DEFAULT_COLOR_MODE, 5));
+		this.networkStyle.setLineStyle(new LineStyle(new Color("7f", "ff", "00", "00"), LineStyle.DEFAULT_COLOR_MODE, 5));
 
 	}
 
@@ -476,15 +476,6 @@ public class PopulationExportToKML extends PlansAlgorithm {
 
 			northEastCorner = CoordWGS84.createFromCH1903(kmlX + regionSize, kmlY + regionSize);
 
-			// create the region
-			Region theRegion = new Region(
-					northEastCorner.getLatitude(),
-					southWestCorner.getLatitude(),
-					southWestCorner.getLongitude(),
-					northEastCorner.getLongitude(),
-					512,
-					Region.DEFAULT_MAX_LOD_PIXELS);
-
 			this.kmls.put(kmlId, newKML);
 
 			KML parentKML;
@@ -499,18 +490,7 @@ public class PopulationExportToKML extends PlansAlgorithm {
 
 			// add the Link to the parent KML (including the region)
 			if (!parentDocument.containsFeature(kmlId)) {
-				NetworkLink nl = new NetworkLink(
-						kmlId,
-						new org.matsim.utils.vis.kml.Link(
-								kmlId,
-								ViewRefreshMode.ON_REGION),
-								Feature.DEFAULT_NAME,
-								Feature.DEFAULT_DESCRIPTION,
-								Feature.DEFAULT_LOOK_AT,
-								Feature.DEFAULT_STYLE_URL,
-								Feature.DEFAULT_VISIBILITY,
-								theRegion,
-								Feature.DEFAULT_TIME_PRIMITIVE);
+				NetworkLink nl = new NetworkLink(kmlId, new org.matsim.utils.vis.kml.Link(kmlId, ViewRefreshMode.ON_REGION));
 				parentDocument.addFeature(nl);
 			}
 

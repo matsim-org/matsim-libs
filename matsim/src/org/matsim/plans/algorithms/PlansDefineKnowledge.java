@@ -53,13 +53,14 @@ public class PlansDefineKnowledge extends PlansAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Plans plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// get home and other activities
 		ArrayList<Activity> home_acts = new ArrayList<Activity>();
 		ArrayList<Activity> other_acts = new ArrayList<Activity>();
-		Iterator<Location> loc_it = Gbl.getWorld().getLayer(Facilities.LAYER_TYPE).getLocations().values().iterator();
+		Iterator<? extends Location> loc_it = Gbl.getWorld().getLayer(Facilities.LAYER_TYPE).getLocations().values().iterator();
 		while (loc_it.hasNext()) {
 			Facility f = (Facility)loc_it.next();
 			Iterator<Activity> a_it = f.getActivities().values().iterator();
@@ -82,7 +83,7 @@ public class PlansDefineKnowledge extends PlansAlgorithm {
 				k.addActivity(other_acts.get(index));
 			}
 		}
-		
+
 		System.out.println("    done.");
 	}
 }

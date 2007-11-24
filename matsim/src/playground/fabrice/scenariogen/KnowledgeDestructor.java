@@ -109,6 +109,7 @@ public class KnowledgeDestructor {
 	
 	class PlansKnowledgeDestructor extends PlansAlgorithm {
 
+		@Override
 		public void run(Plans plans) {
 			for( Person person : plans.getPersons().values() ){
 				TreeMap<String, ActivityFacilities> actfacs = person.getKnowledge().getActivityFacilities();

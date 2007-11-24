@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="05:55:00" />
+		<param name="endTime" value="08:00:00" />
+	</module>
+
+</config>

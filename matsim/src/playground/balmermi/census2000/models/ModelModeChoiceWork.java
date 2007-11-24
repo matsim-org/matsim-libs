@@ -64,6 +64,7 @@ public class ModelModeChoiceWork extends ModelModeChoice {
 
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	protected final double calcWalkUtil() {
 		//Computes for this person the utility of choosing walk as transportation mode 
 		//when the tour (plan) has work as main purpose
@@ -75,6 +76,7 @@ public class ModelModeChoiceWork extends ModelModeChoice {
 		return util;
 	}
 
+	@Override
 	protected final double calcBikeUtil() {
 		if (!bike) { return Double.NEGATIVE_INFINITY; }
 		double util = 0.0;
@@ -83,6 +85,7 @@ public class ModelModeChoiceWork extends ModelModeChoice {
 		return util;
 	}
 
+	@Override
 	protected final double calcCarUtil() {
 		double util = 0.0;
 		util += B_Const_c_Work * 1.0;
@@ -98,6 +101,7 @@ public class ModelModeChoiceWork extends ModelModeChoice {
 		return util;
 	}
 
+	@Override
 	protected final double calcPublicUtil() {
 		double util = 0.0;
 		util += B_Season_pt_Work * tickets ;
@@ -113,6 +117,7 @@ public class ModelModeChoiceWork extends ModelModeChoice {
 		return util;
 	}
 
+	@Override
 	protected final double calcOtherUtil() {
 		double util = 0.0;
 		util += B_Const_ot_Work * 1.0;

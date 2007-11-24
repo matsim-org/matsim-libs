@@ -20,6 +20,10 @@
 
 package org.matsim.interfaces.networks.basicNet;
 
+import java.util.Map;
+
+import org.matsim.utils.identifiers.IdI;
+
 /**
  * A topological network representation.
  */
@@ -31,21 +35,21 @@ public interface BasicNetI {
      * adjacent network elements.
      */
     public void connect();
-    
+
     /**
      * Returns a set of this network's nodes. This set might be empty, but it
      * must not be <code>null</code>.
-     * 
+     *
      * @return a set of this network's nodes
      */
-    public BasicNodeSetI getNodes();
+    public Map<IdI, ? extends BasicNodeI> getNodes();
 
     /**
      * Returns a set of this network's links. This set might be empty, but it
      * must not be <code>null</code>.
-     * 
+     *
      * @return a set of this network's links
      */
-    public BasicLinkSetI getLinks();
+    public Map<IdI, ? extends BasicLinkI> getLinks();
 
 }

@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -38,12 +37,12 @@ import org.matsim.trafficmonitoring.LinkTravelTimeCounter;
  */
 public class NextLinkTravelTimePerception implements TravelTimeI, AgentPercepts {
 
-	
+
 	Map<Link, Double> linkMap;
 
 	private int sightDistance;
-	
-	
+
+
 	public NextLinkTravelTimePerception(final int agentVisibilityRange) {
 		this.linkMap = new HashMap<Link, Double>();
 		this.sightDistance = agentVisibilityRange;
@@ -55,7 +54,7 @@ public class NextLinkTravelTimePerception implements TravelTimeI, AgentPercepts 
 	public double getLinkTravelTime(final Link link, final double time) {
 		Double travelTime = this.linkMap.get(link);
 		if (travelTime != null) {
-			return travelTime;
+			return travelTime.doubleValue();
 		}
 		return 0;
 	}
@@ -68,10 +67,10 @@ public class NextLinkTravelTimePerception implements TravelTimeI, AgentPercepts 
 		int depth = 0;
 		while (!nodes.isEmpty()) {
 			current = nodes.remove(0);
-			for (Link l : (Set<Link>)current.getOutLinks()) {
+			for (Link l : current.getOutLinks().values()) {
 				this.linkMap.put(l, LinkTravelTimeCounter.getInstance().getLastLinkTravelTime(l.getId().toString()));
 				if (depth < this.sightDistance) {
-					nodes.add(l.getToNode());					
+					nodes.add(l.getToNode());
 				}
 			}
 			depth++;

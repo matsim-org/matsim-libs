@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+
+<network name="two-routes test network">
+
+	<nodes>
+  		<node id="1" x="-2500.0" y="0" /> 
+  		<node id="2" x="-2000.0" y="0" /> 
+  		<node id="3" x="-1500" y="0" /> 
+  		<node id="6" x="-469.8" y="400" /> 
+  		<node id="7" x="-439.8" y="400" />
+  		<node id="8" x="-469.8" y="-400" /> 
+  		<node id="9" x="-439.8" y="-400" />
+  		<node id="12" x="0" y="0" /> 
+  		<node id="13" x="1000.0" y="0" /> 
+  		<node id="14" x="1000.0" y="-1000.0" /> 
+  		<node id="15" x="-2500.0" y="-1000.0" /> 
+  		
+  	</nodes>
+  	<links capperiod="01:00:00">
+  		<link id="1" from="1" to="2" length="500.00" capacity="3000" freespeed="27.78" permlanes="1" /> 
+  		<link id="2" from="2" to="3" length="500.00" capacity="6000" freespeed="27.78" permlanes="1" /> 
+  		<link id="5" from="3" to="6" length="1105.00" capacity="3500" freespeed="27.78" permlanes="1" /> 
+   		<link id="6" from="6" to="7" length="30.00" capacity="1900" freespeed="27.78" permlanes="1" /> 
+
+   		<link id="7" from="3" to="8" length="1105.00" capacity="3500" freespeed="27.78" permlanes="1" /> 
+   		<link id="8" from="8" to="9" length="30.00" capacity="1900" freespeed="27.78" permlanes="1" /> 
+  		<link id="16" from="9" to="12" length="594.5" capacity="3000" freespeed="27.78" permlanes="1" />
+
+  		<link id="14" from="7" to="12" length="594.5" capacity="3000" freespeed="27.78" permlanes="1" /> 
+
+  		<link id="20" from="12" to="13" length="1000.00" capacity="6000" freespeed="27.78" permlanes="1" /> 
+  		<link id="21" from="13" to="14" length="1000.00" capacity="6000" freespeed="27.78" permlanes="1" /> 
+  		<link id="22" from="14" to="15" length="3500.00" capacity="3000" freespeed="27.78" permlanes="1" /> 
+  		<link id="23" from="15" to="1" length="1000.00" capacity="3000" freespeed="27.78" permlanes="1" /> 
+  	</links>
+</network>

@@ -40,6 +40,7 @@ public class EventAgentWait2Link extends AgentEvent {
 		super(time, aId, legId, linkId);
 	}
 
+	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
 		//impl.addAttribute("","","Flag", "", Integer.toString(4));
@@ -47,10 +48,12 @@ public class EventAgentWait2Link extends AgentEvent {
 		return impl;
 	}
 
+	@Override
 	public String toString() {
 		return asString() + "4\twait2link";
 	}
 
+	@Override
 	public void rebuild(Plans population, NetworkLayer network) {
 		rebuildAgentData(population,network);
 	}

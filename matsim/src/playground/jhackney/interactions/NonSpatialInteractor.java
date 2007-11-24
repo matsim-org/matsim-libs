@@ -29,7 +29,7 @@ import playground.jhackney.socialnet.SocialNetwork;
  * This Interactor lets agents exchange knowledge.
  *
  * These are wrappers for the person knowledge exchange methods
- * 
+ *
  * @author J.Hackney
  */
 public class NonSpatialInteractor{
@@ -62,7 +62,7 @@ public class NonSpatialInteractor{
 
 //	Pick a random link
 	for(int i=0;i<numPicks;i++){
-	    int rndInt1 = (int) Gbl.random.nextInt(Integer.MAX_VALUE);
+	    int rndInt1 = Gbl.random.nextInt(Integer.MAX_VALUE);
 	    int linkno = rndInt1 % links.length;
 	    SocialNetEdge mySocialLink = (SocialNetEdge) links[linkno];
 
@@ -89,7 +89,7 @@ public class NonSpatialInteractor{
      * we introduce people and THEN see if the relationship can be supported by the geography.
      * If not (i.e. if the people do not visit each other any more), the relationship disappears
      * after a time, anyway.
-     * 
+     *
      * @author jhackney
      * @param iteration
      */
@@ -102,7 +102,7 @@ public class NonSpatialInteractor{
 	for(int i=0;i<numPicks;i++){
 
 //	    Get a random social link
-	    int rndInt1 = (int) Gbl.random.nextInt(Integer.MAX_VALUE);
+	    int rndInt1 = Gbl.random.nextInt(Integer.MAX_VALUE);
 	    int linkno = rndInt1 % links.length;
 	    SocialNetEdge myLink = (SocialNetEdge) links[linkno];
 

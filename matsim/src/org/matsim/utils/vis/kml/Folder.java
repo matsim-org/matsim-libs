@@ -54,6 +54,7 @@ public class Folder extends Container {
 	 * @param description
 	 * the <a href="http://earth.google.com/kml/kml_tags.html#desription">
 	 * description</a> of the new folder.
+	 * @param address
 	 * @param lookAt
 	 * @param styleUrl
 	 * @param visibility

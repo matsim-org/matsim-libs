@@ -85,8 +85,9 @@ public class PersonCensusSummaryTables extends PersonAlgorithm implements PlanAl
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
-		playground.balmermi.census2000.data.Person p = persons.getPerson(Integer.parseInt(person.getId().toString()));
+		playground.balmermi.census2000.data.Person p = persons.getPerson(Integer.valueOf(person.getId().toString()));
 		Household hh = p.getHousehold();
 		Municipality muni = hh.getMunicipality();
 		try {

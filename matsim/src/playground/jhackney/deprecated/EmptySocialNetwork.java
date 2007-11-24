@@ -37,7 +37,7 @@ public class EmptySocialNetwork extends SocialNetwork{
 	setupIter=1;
 
 	personList = plans.getPersons().values().toArray();
-	numPersons = (int) personList.length;
+	numPersons = personList.length;
 	numLinks = 0;
     }
 
@@ -48,13 +48,13 @@ public class EmptySocialNetwork extends SocialNetwork{
 		+ " links were prevented from being added multiple times.");
 	System.out.println(" " + this.getClass()
 		+ ": kbar, numPersons, numLinks = ["
-		+ (double) (2. * (numLinks - countMultiples) / numPersons)
+		+ (2. * (numLinks - countMultiples) / numPersons)
 		+ ", " + numPersons + ", " + (numLinks - countMultiples) + "]");
     }
 
     public void removeLinks() {
 	// TODO Auto-generated method stub
-	
+
     }
 
 

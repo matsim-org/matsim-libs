@@ -32,7 +32,7 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Filters all persons out whose routes do not lead at least once through

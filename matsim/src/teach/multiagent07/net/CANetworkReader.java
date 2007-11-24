@@ -37,26 +37,27 @@ public class CANetworkReader extends DefaultHandler {
 
 	private CANetwork net;
 	private String fileName;
-	
+
 	public CANetworkReader(CANetwork net, String filename) {
 		this.net = net;
 		this.fileName = filename;
 	}
 
-	public void startElement(String uri, String localName, String qName, 
+	@Override
+	public void startElement(String uri, String localName, String qName,
 			Attributes attributes) throws SAXException {
 		if (qName.equals("node")) {
-			
+
 			CANode node = net.newNode(attributes.getValue("id"));
 			node.setCoord(new Coord(Double.parseDouble(attributes.getValue("x")),
 					Double.parseDouble(attributes.getValue("y"))));
 			net.add(node);
 			//System.out.println(node);
 		} else if (qName.equals("link")) {
-			
+
 			CALink link = net.newLink(attributes.getValue("id"));
-			BasicNodeI from = (BasicNodeI) net.getNodes().get(new Id(attributes.getValue("from")));
-			BasicNodeI to = (BasicNodeI) net.getNodes().get(new Id(attributes.getValue("to")));
+			BasicNodeI from = net.getNodes().get(new Id(attributes.getValue("from")));
+			BasicNodeI to = net.getNodes().get(new Id(attributes.getValue("to")));
 			link.setFromNode(from);
 			link.setToNode(to);
 			link.setLength(Double.parseDouble(attributes.getValue("length")));

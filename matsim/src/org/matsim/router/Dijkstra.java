@@ -23,11 +23,9 @@ package org.matsim.router;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -294,8 +292,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	void relaxNode(final Node outNode, final Node toNode,
-			final PriorityQueueBucket<Node> pendingNodes) {
+	void relaxNode(final Node outNode, final Node toNode, final PriorityQueueBucket<Node> pendingNodes) {
 
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
@@ -304,10 +301,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 		if (this.pruneDeadEnds == true) {
 			ddOutData = getPreProcessRole(outNode);
 		}
-		BasicLinkSetI outlinks = outNode.getOutLinks();
-		Iterator iter = outlinks.iterator();
-		while (iter.hasNext()) {
-			Link l = (Link) iter.next();
+		for (Link l : outNode.getOutLinks().values()) {
 			Node n = l.getToNode();
 			if (this.pruneDeadEnds == true) {
 				PreProcessDijkstra.DeadEndRole ddData = getPreProcessRole(n);
@@ -468,9 +462,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * Resets all nodes in the network as if they have not been visited yet.
 	 */
 	private void resetNetworkVisited() {
-		Iterator nIter = this.network.getNodes().iterator();
-		while (nIter.hasNext()) {
-			Node node = (Node) nIter.next();
+		for (Node node : this.network.getNodes().values()) {
 			DijkstraNodeData data = getData(node);
 			data.resetVisited();
 		}

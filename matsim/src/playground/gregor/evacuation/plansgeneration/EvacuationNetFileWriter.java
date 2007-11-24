@@ -25,8 +25,8 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.identifiers.IdI;
 
 import playground.gregor.evacuation.EvacuationAreaLink;
 
@@ -43,16 +43,16 @@ import playground.gregor.evacuation.EvacuationAreaLink;
 public class EvacuationNetFileWriter extends MatsimXmlWriter {
 
 
-	
-	
-	HashMap<Id,EvacuationAreaLink> links;
-		
-	public EvacuationNetFileWriter(HashMap<Id, EvacuationAreaLink> links) {
-	
+
+
+	HashMap<IdI, EvacuationAreaLink> links;
+
+	public EvacuationNetFileWriter(HashMap<IdI, EvacuationAreaLink> links) {
+
 			this.links = links;
 	}
-	
-	
+
+
 	public void writeFile(String filename) {
 		try {
 			openFile(filename);
@@ -76,26 +76,26 @@ public class EvacuationNetFileWriter extends MatsimXmlWriter {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void write() throws IOException {
 		this.writer.write("<!DOCTYPE evacuationarea SYSTEM \"evacuationarea_v1.dtd\">");
 		this.writer.write("<evacuationarea>" + NL);
 		writeBody("\t");
 		this.writer.write("</evacuationarea>" + NL);
 	}
-	
+
 	private void writeBody(String indent) throws IOException {
 		Iterator it = links.values().iterator();
 		while (it.hasNext()){
 			EvacuationAreaLink link = (EvacuationAreaLink) it.next();
-			this.writer.write(indent +"<link id=\"" + link.getId() + "\" deadline=\"" 
+			this.writer.write(indent +"<link id=\"" + link.getId() + "\" deadline=\""
 					+ Gbl.writeTime(link.getDeadline()) + "\" />\n");
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 }
 
 

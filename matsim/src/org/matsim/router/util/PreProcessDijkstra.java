@@ -22,11 +22,12 @@ package org.matsim.router.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
-import org.matsim.interfaces.networks.basicNet.BasicNodeSetI;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
+import org.matsim.utils.identifiers.IdI;
 
 /**
  * Pre-processes a given network, gathering information which
@@ -63,11 +64,10 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 		long now = System.currentTimeMillis();
 
 		DeadEndRole role;
-		for (Object obj : network.getNodes()) {
-			Node node = (Node) obj;
+		for (Node node : network.getNodes().values()) {
 			role = getRole(node);
 
-			BasicNodeSetI incidentNodes = node.getIncidentNodes();
+			Map<IdI, ? extends Node> incidentNodes = node.getIncidentNodes();
 			if (incidentNodes.size() == 1) {
 				ArrayList<Node> deadEndNodes = new ArrayList<Node>();
 
@@ -82,9 +82,9 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 					// whether we already processed this node.
 					role.setDeadEndEntryNode(node);
 
-					Iterator it = incidentNodes.iterator();
+					Iterator<? extends Node> it = incidentNodes.values().iterator();
 					while (role.getDeadEndEntryNode() != null && it.hasNext()) {
-						node = (Node) it.next();
+						node = it.next();
 						role = getRole(node);
 					}
 					if (role.getDeadEndEntryNode() == null) {
@@ -103,8 +103,7 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 
 		// Now set the proper deadEndEntryNode for each node
 		int deadEndNodeCount = 0;
-		for (Object obj : network.getNodes()) {
-			Node node = (Node) obj;
+		for (Node node : network.getNodes().values()) {
 			role = getRole(node);
 			for (Node n : role.getDeadEndNodes()) {
 				DeadEndRole r = getRole(n);

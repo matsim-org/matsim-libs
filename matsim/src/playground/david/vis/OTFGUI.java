@@ -101,11 +101,10 @@ public class OTFGUI {
 
 		VisConfig visConfig = VisConfig.newDefaultConfig();
 		visConfig.set(VisConfig.LINK_WIDTH_FACTOR, "15");
-		visConfig.set(VisConfig.AGENT_GIF_FILE, "./test/gunnar/AgentCar.gif");
 
 		RendererA backgroundRenderer = new BackgroundRenderer(visConfig);
 //		LinkSetRendererVehiclesOnly linkSetRenderer = new LinkSetRendererVehiclesOnly<OTFVisNet>(visConfig, visnet);
-		LinkSetRendererVehiclesOnly linkSetRenderer = new LinkSetRendererVehiclesOnly<OTFVisNet>(visConfig, visnet);
+		LinkSetRendererVehiclesOnly<OTFVisNet> linkSetRenderer = new LinkSetRendererVehiclesOnly<OTFVisNet>(visConfig, visnet);
 		linkSetRenderer.setControlToolbar(null);
 		linkSetRenderer.append(backgroundRenderer);
 		agentRenderer = new OTFAgentRenderer(visConfig, visnet);

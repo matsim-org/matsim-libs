@@ -53,64 +53,42 @@ public class ConfigReaderMatsimXml_v1 extends MatsimXmlParser {
 	public static final String XML_VALUE = "value";
 
 	private static final String CONFIG = "config";
-	private static final String CONFIG_OUTDTD = "outputConfigDTD";
-	private static final String CONFIG_OUTVERSION = "outputVersion";
-	private static final String CONFIG_OUTFILE = "outputConfigFile";
 
 	private static final String GBL = "global";
 	private static final String GBL_SEED = "randomSeed";
 	private static final String GBL_OUTTIMEFORMAT = "outputTimeFormat";
-	private static final String GBL_GLOBAL_DTD_BASE = "globalDTDBase";
 	private static final String GBL_LOCAL_DTD_BASE = "localDTDBase";
 
 	private static final String WORLD = "world";
 	private static final String WORLD_INFILE = "inputWorldFile";
-	private static final String WORLD_LOCALINPUTDTD = "localInputDTD";
-	private static final String WORLD_OUTDTD = "outputWorldDTD";
 	private static final String WORLD_OUTVERSION = "outputVersion";
 	private static final String WORLD_OUTFILE = "outputWorldFile";
 
 	private static final String NETWORK = "network";
 	private static final String NETWORK_INFILE = "inputNetworkFile";
-	private static final String NETWORK_LOCALINPUTDTD = "localInputDTD";
-	private static final String NETWORK_OUTDTD = "outputNetworkDTD";
 	private static final String NETWORK_OUTVERSION = "outputVersion";
 	private static final String NETWORK_OUTFILE = "outputNetworkFile";
 
 	private static final String FACILITIES = "facilities";
 	private static final String FACILITIES_INFILE = "inputFacilitiesFile";
-	private static final String FACILITIES_LOCALINPUTDTD = "localInputDTD";
-	private static final String FACILITIES_OUTDTD = "outputFacilitiesDTD";
 	private static final String FACILITIES_OUTVERSION = "outputVersion";
 	private static final String FACILITIES_OUTFILE = "outputFacilitiesFile";
 
 	private static final String MATRICES = "matrices";
 	private static final String MATRICES_INFILE = "inputMatricesFile";
-	private static final String MATRICES_LOCALINPUTDTD = "localInputDTD";
-	private static final String MATRICES_OUTDTD = "outputMatricesDTD";
 	private static final String MATRICES_OUTVERSION = "outputVersion";
 	private static final String MATRICES_OUTFILE = "outputMatricesFile";
 
 	private static final String PLANS = "plans";
-	private static final String PLANS_INPUTVERSION = "inputVersion";
 	private static final String PLANS_INFILE = "inputPlansFile";
-	private static final String PLANS_LOCALINPUTDTD = "localInputDTD";
-	private static final String PLANS_OUTDTD = "outputPlansDTD";
 	private static final String PLANS_OUTVERSION = "outputVersion";
 	private static final String PLANS_OUTFILE = "outputPlansFile";
 	private static final String PLANS_OUTSAMPLE = "outputSample";
 	private static final String PLANS_SWITCHOFFSTREAMING = "switchOffPlansStreaming";
 	private static final String NO = "no";
 
-	private static final String PLANSCFN = "plansCreateFromNetwork";
-	private static final String PLANSCFN_P2C = "person2CellsProportion";
-
-	private static final String PLANSACR = "plansActChainReduction";
-	private static final String PLANSACR_CUT = "cumulativeFractionCut";
-
 	private static final String EVENTS = "events";
 	private static final String EVENTS_INFILE = "inputFile";
-	private static final String EVENTS_INFORMAT = "inputFormat";
 	private static final String EVENTS_OUTFILE = "outputFile";
 	private static final String EVENTS_OUTFORMAT = "outputFormat";
 
@@ -203,8 +181,6 @@ public class ConfigReaderMatsimXml_v1 extends MatsimXmlParser {
 		WorldConfigGroup group = this.config.world();
 		if (WORLD_INFILE.equals(paramName)) {
 			group.setInputFile(value);
-		} else if (WORLD_LOCALINPUTDTD.equals(value)) {
-			group.setInputFormat(value); // TODO [MR] not yet optimal
 		} else if (WORLD_OUTFILE.equals(paramName)) {
 			group.setOutputFile(value);
 		} else if (WORLD_OUTVERSION.equals(paramName)) {
@@ -218,8 +194,6 @@ public class ConfigReaderMatsimXml_v1 extends MatsimXmlParser {
 		NetworkConfigGroup group = this.config.network();
 		if (NETWORK_INFILE.equals(paramName)) {
 			group.setInputFile(value);
-		} else if (NETWORK_LOCALINPUTDTD.equals(value)) {
-			group.setInputFormat(value); // TODO [MR] not yet optimal
 		} else if (NETWORK_OUTFILE.equals(paramName)) {
 			group.setOutputFile(value);
 		} else if (NETWORK_OUTVERSION.equals(paramName)) {
@@ -233,8 +207,6 @@ public class ConfigReaderMatsimXml_v1 extends MatsimXmlParser {
 		FacilitiesConfigGroup group = this.config.facilities();
 		if (FACILITIES_INFILE.equals(paramName)) {
 			group.setInputFile(value);
-		} else if (FACILITIES_LOCALINPUTDTD.equals(value)) {
-			group.setInputFormat(value); // TODO [MR] not yet optimal
 		} else if (FACILITIES_OUTFILE.equals(paramName)) {
 			group.setOutputFile(value);
 		} else if (FACILITIES_OUTVERSION.equals(paramName)) {
@@ -248,8 +220,6 @@ public class ConfigReaderMatsimXml_v1 extends MatsimXmlParser {
 		MatricesConfigGroup group = this.config.matrices();
 		if (MATRICES_INFILE.equals(paramName)) {
 			group.setInputFile(value);
-		} else if (MATRICES_LOCALINPUTDTD.equals(value)) {
-			group.setInputFormat(value); // TODO [MR] not yet optimal
 		} else if (MATRICES_OUTFILE.equals(paramName)) {
 			group.setOutputFile(value);
 		} else if (MATRICES_OUTVERSION.equals(paramName)) {
@@ -263,8 +233,6 @@ public class ConfigReaderMatsimXml_v1 extends MatsimXmlParser {
 		PlansConfigGroup group = this.config.plans();
 		if (PLANS_INFILE.equals(paramName)) {
 			group.setInputFile(value);
-		} else if (PLANS_INPUTVERSION.equals(value)) {
-			group.setInputFormat(value);
 		} else if (PLANS_OUTFILE.equals(paramName)) {
 			group.setOutputFile(value);
 		} else if (PLANS_OUTVERSION.equals(paramName)) {
@@ -282,8 +250,6 @@ public class ConfigReaderMatsimXml_v1 extends MatsimXmlParser {
 		EventsConfigGroup group = this.config.events();
 		if (EVENTS_INFILE.equals(paramName)) {
 			group.setInputFile(value);
-		} else if (EVENTS_INFORMAT.equals(value)) {
-			group.setInputFormat(value);
 		} else if (EVENTS_OUTFILE.equals(paramName)) {
 			group.setOutputFile(value);
 		} else if (EVENTS_OUTFORMAT.equals(paramName)) {

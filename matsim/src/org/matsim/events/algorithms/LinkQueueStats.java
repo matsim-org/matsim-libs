@@ -35,7 +35,7 @@ import org.matsim.gbl.Gbl;
 /**
  * Counts the number of vehicles on a link. It can output a list of times and
  * corresponding numbers of vehicles on a link at that time.
- * 
+ *
  * @author mrieser
  */
 public class LinkQueueStats implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
@@ -43,11 +43,11 @@ public class LinkQueueStats implements EventHandlerLinkEnterI, EventHandlerLinkL
 	private String linkId;
 	private SortedSet<Double> enterTimes = new TreeSet<Double>();
 	private SortedSet<Double> leaveTimes = new TreeSet<Double>();
-	
+
 	public LinkQueueStats(String linkId) {
 		this.linkId = linkId;
 	}
-	
+
 	public void handleEvent(EventLinkEnter event) {
 		if (event.linkId.equals(this.linkId)) {
 			enterTimes.add(event.time);
@@ -68,7 +68,7 @@ public class LinkQueueStats implements EventHandlerLinkEnterI, EventHandlerLinkL
 	public void dumpStats(Writer out) throws IOException {
 		double time = 0;
 		int count = 0;
-		
+
 		Iterator<Double> enterIter = enterTimes.iterator();
 		Iterator<Double> leaveIter = leaveTimes.iterator();
 		if (!enterIter.hasNext()) {
@@ -79,47 +79,51 @@ public class LinkQueueStats implements EventHandlerLinkEnterI, EventHandlerLinkL
 		Double leaveTime = leaveIter.next();
 		while (enterTime != null || leaveTime != null) {
 			if (enterTime == null) {
+				double dLeaveTime = leaveTime.doubleValue();
 				// decrease
-				if (time != leaveTime) {
+				if (time != dLeaveTime) {
 					dumpLine(out, time, count);
-					time = leaveTime;
+					time = dLeaveTime;
 				}
 				count--;
 				leaveTime = leaveIter.hasNext() ? leaveIter.next() : null;
 			} else if (leaveTime == null) {
+				double dEnterTime = enterTime.doubleValue();
 				// increase
-				if (time != enterTime) {
+				if (time != dEnterTime) {
 					dumpLine(out, time, count);
-					time = enterTime;
+					time = dEnterTime;
 				}
 				count++;
 				enterTime = enterIter.hasNext() ? enterIter.next() : null;
 			} else {
-				if (leaveTime <= enterTime) {
+				double dLeaveTime = leaveTime.doubleValue();
+				double dEnterTime = enterTime.doubleValue();
+				if (dLeaveTime <= dEnterTime) {
 					// decrease
-					if (time != leaveTime) {
+					if (time != dLeaveTime) {
 						dumpLine(out, time, count);
-						time = leaveTime;
+						time = dLeaveTime;
 					}
 					count--;
 					leaveTime = leaveIter.hasNext() ? leaveIter.next() : null;
 				} else {
 					// leaveTime > enterTime
 					// increase
-					if (time != enterTime) {
+					if (time != dEnterTime) {
 						dumpLine(out, time, count);
-						time = enterTime;
+						time = dEnterTime;
 					}
 					count++;
 					enterTime = enterIter.hasNext() ? enterIter.next() : null;
 				}
 			}
 		}
-		
+
 	}
 
 	private void dumpLine(Writer out, double time, int count) throws IOException {
 		out.write(Gbl.writeTime(time, Gbl.TIMEFORMAT_HHMMSS) + "\t" + time + "\t" + count + "\n");
 	}
-	
+
 }

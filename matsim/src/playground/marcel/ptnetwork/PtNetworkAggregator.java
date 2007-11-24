@@ -32,7 +32,7 @@ import org.matsim.utils.identifiers.IdI;
  * Aggregates a PtNetworkLayer from HaltePunkte to HalteBereiche. In the
  * resulting network, only links from HalteBereich to HalteBereich exist, but
  * none from HaltePunkt to HaltePunkt.
- * 
+ *
  * @author mrieser
  */
 public class PtNetworkAggregator {
@@ -58,7 +58,7 @@ public class PtNetworkAggregator {
 		this.linkMatching = new TreeMap<IdI, IdI>();
 
 		// first, add all Haltebereiche-Nodes
-		for (Iterator<Node> iter = ptNetwork.getNodes().iterator(); iter.hasNext(); ) {
+		for (Iterator<? extends Node> iter = ptNetwork.getNodes().values().iterator(); iter.hasNext(); ) {
 			Node ptNode = iter.next();
 			if (PtNetworkLayer.PEDESTRIAN_TYPE.equals(ptNode.getType())) {
 				this.network.createNode(ptNode.getId().toString(),
@@ -68,7 +68,7 @@ public class PtNetworkAggregator {
 		}
 
 		// now add links between the Haltebereichen
-		for (Iterator<Link> iter = ptNetwork.getLinks().iterator(); iter.hasNext(); ) {
+		for (Iterator<? extends Link> iter = ptNetwork.getLinks().values().iterator(); iter.hasNext(); ) {
 			Link ptLink = iter.next();
 			if (PtNetworkLayer.PEDESTRIAN_TYPE.equals(ptLink.getFromNode().getType())
 					|| PtNetworkLayer.PEDESTRIAN_TYPE.equals(ptLink.getToNode().getType())) {
@@ -88,7 +88,7 @@ public class PtNetworkAggregator {
 	}
 
 	private Node findHaltebereich(Node node) {
-		for (Iterator iter = node.getOutNodes().iterator(); iter.hasNext(); ) {
+		for (Iterator iter = node.getOutNodes().values().iterator(); iter.hasNext(); ) {
 			Node otherNode = (Node) iter.next();
 			if (PtNetworkLayer.PEDESTRIAN_TYPE.equals(otherNode.getType())) {
 				return otherNode;
@@ -98,7 +98,7 @@ public class PtNetworkAggregator {
 	}
 
 	private Link findConnectingLink(Node fromNode, Node toNode) {
-		for (Iterator iter = fromNode.getOutLinks().iterator(); iter.hasNext(); ) {
+		for (Iterator iter = fromNode.getOutLinks().values().iterator(); iter.hasNext(); ) {
 			Link link = (Link)iter.next();
 			if (link.getToNode() == toNode) {
 				return link;

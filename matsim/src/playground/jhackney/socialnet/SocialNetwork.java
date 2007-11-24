@@ -92,8 +92,8 @@ public class SocialNetwork {
 
 	int numLinks = (int) ((kbar * personList.length) / 2.);
 	for (int i = 0; i < numLinks; i++) {
-	    Person person1 = (Person) personList[Gbl.random.nextInt(personList.length)];
-	    Person person2 = (Person) personList[Gbl.random.nextInt(personList.length)];
+	    Person person1 = personList[Gbl.random.nextInt(personList.length)];
+	    Person person2 = personList[Gbl.random.nextInt(personList.length)];
 
 //	    makeSocialContact( person1, person2, -1);
 	    makeSocialContact(person1, person2, 0, "initialized");
@@ -245,7 +245,7 @@ public class SocialNetwork {
 		SocialNetEdge myLink = (SocialNetEdge) it_link.next();
 		double randremove=Gbl.random.nextDouble();
 		int degree =myLink.getPersonFrom().getKnowledge().egoNet.getOutDegree();
-		if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*(double)degree ) {
+		if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*degree ) {
 		    linksToRemove.add(myLink);
 		}
 	    }
@@ -260,7 +260,7 @@ public class SocialNetwork {
 		SocialNetEdge myLink = (SocialNetEdge) it_link.next();
 		double randremove=Gbl.random.nextDouble();
 		int age =iteration - myLink.getTimeLastUsed();
-		if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*(double) age ) {
+		if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*age ) {
 		    linksToRemove.add(myLink);
 		}
 	    }

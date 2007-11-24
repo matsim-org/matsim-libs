@@ -41,6 +41,7 @@ public class PlansConfigGroup extends AbstractFileIOConfigGroup {
 		return GROUP_NAME;
 	}
 	
+	@Override
 	public String getValue(String key) {
 		if (key.equals(PLANS_STREAMING)) {
 			return (usePlansStreaming() ? "true" : "false");
@@ -51,6 +52,7 @@ public class PlansConfigGroup extends AbstractFileIOConfigGroup {
 		}
 	}
 
+	@Override
 	public void setValue(String key, String value) {
 		if (key.equals(PLANS_STREAMING)) {
 			usePlansStreaming(value.equals("true") || value.equals("yes"));

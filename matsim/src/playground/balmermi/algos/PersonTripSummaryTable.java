@@ -94,6 +94,7 @@ public class PersonTripSummaryTable extends PersonAlgorithm implements PlanAlgor
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		// plans
 		Plan plan = person.getSelectedPlan();

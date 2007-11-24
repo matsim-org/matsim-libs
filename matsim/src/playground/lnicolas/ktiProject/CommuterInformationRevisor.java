@@ -51,8 +51,8 @@ public class CommuterInformationRevisor {
 	/**
 	 * Removes entries from the given commuter matrices that point to zones that
 	 * contain no facility (or only facilities with zero capacity) for the respective
-	 * activity. Adds commuter entries to the nearest zone for zones whose home activity 
-	 * capacity is greater 0 (i.e. where there may live persons) but for which there 
+	 * activity. Adds commuter entries to the nearest zone for zones whose home activity
+	 * capacity is greater 0 (i.e. where there may live persons) but for which there
 	 * are no outgoing work or education entries in the respective commuter matrix.
 	 * @param workCommuterMatrix
 	 * @param educationCommuterMatrix
@@ -61,17 +61,17 @@ public class CommuterInformationRevisor {
 			Matrix<String> educationCommuterMatrix) {
 		removeCommuterEntriesWithZeroToCapacity(workCommuterMatrix,
 				GroupFacilitiesPerZone.workActType);
-		addMissingCommuterEntries(workCommuterMatrix, 
+		addMissingCommuterEntries(workCommuterMatrix,
 				GroupFacilitiesPerZone.workActType);
-		removeCommuterEntriesWithZeroToCapacity(educationCommuterMatrix, 
+		removeCommuterEntriesWithZeroToCapacity(educationCommuterMatrix,
 				GroupFacilitiesPerZone.eduActType);
-		addMissingCommuterEntries(educationCommuterMatrix, 
+		addMissingCommuterEntries(educationCommuterMatrix,
 				GroupFacilitiesPerZone.eduActType);
 	}
-	
+
 	/**
-	 * Adds commuter entries to the nearest zone for zones whose home activity 
-	 * capacity is greater 0 (i.e. where there may live persons) but for which there 
+	 * Adds commuter entries to the nearest zone for zones whose home activity
+	 * capacity is greater 0 (i.e. where there may live persons) but for which there
 	 * are no outgoing {@code actType} entries in the respective commuter matrix
 	 * {@code commuterMatrix}.
 	 * @param commuterMatrix
@@ -79,7 +79,7 @@ public class CommuterInformationRevisor {
 	 */
 	private void addMissingCommuterEntries(Matrix<String> commuterMatrix, String actType) {
 		for (Zone zone : zones) {
-			if (CommuterInformationGenerator.getCapacity(facilities, 
+			if (CommuterInformationGenerator.getCapacity(facilities,
 					CommuterInformationGenerator.homeActType, zone) > 0) {
 				ArrayList<Entry<String>> fromZoneDistr =
 					commuterMatrix.getFromLocEntries(zone);
@@ -89,7 +89,7 @@ public class CommuterInformationRevisor {
 					commuterMatrix.setEntry(zone, toZone, "1");
 					System.out.println(actType + " from zone " + zone.getName() + " (" + zone.getId()
 							+ ") is now done in zone " + toZone.getName() + " (" + toZone.getId() +
-							"). Distance is " + 
+							"). Distance is " +
 							Math.round(zone.getCenter().calcDistance(toZone.getCenter())));
 				}
 			}
@@ -121,7 +121,7 @@ public class CommuterInformationRevisor {
 	private void removeCommuterEntriesWithZeroToCapacity(
 			Matrix<String> commuterMatrix, String actType) {
 		for (Zone zone : zones) {
-			int capacityCount = 
+			int capacityCount =
 				CommuterInformationGenerator.getCapacity(facilities,
 						actType, zone);
 			if (capacityCount == 0) {
@@ -129,17 +129,17 @@ public class CommuterInformationRevisor {
 			}
 		}
 	}
-	
+
 	private boolean containsActivityFacility(Location location, String activityType) {
 		Set<IdI> facilityIds = location.getDownMapping().keySet();
 		for (IdI facilityId : facilityIds) {
-			Facility facility = facilities.getFacility(facilityId.toString());
+			Facility facility = (Facility)facilities.getLocation(facilityId);
 			Activity activity = facility.getActivity(activityType);
 			if (activity != null && activity.getCapacity() > 0) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 }

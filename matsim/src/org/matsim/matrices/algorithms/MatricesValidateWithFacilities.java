@@ -72,7 +72,7 @@ public class MatricesValidateWithFacilities extends MatricesAlgorithm {
 	private final Location findNearestLocation(final Location location, final String act_type) {
 		Facility nearest_facility = null;
 		double distance = Double.MAX_VALUE;
-		Iterator<Location> f_it = this.facilities.getLocations().values().iterator();
+		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
 			if (f.getActivities().containsKey(act_type)) {
@@ -112,7 +112,7 @@ public class MatricesValidateWithFacilities extends MatricesAlgorithm {
 			System.out.println("      checking matrix " + m.toString() + "...");
 
 			System.out.println("        finding locs without any downmapping and remove all from- and to-trips...");
-			Iterator<Location> loc_it = m_l.getLocations().values().iterator();
+			Iterator<? extends Location> loc_it = m_l.getLocations().values().iterator();
 			while (loc_it.hasNext()) {
 				Location loc = loc_it.next();
 				if (loc.getDownMapping().isEmpty()) {
@@ -124,10 +124,10 @@ public class MatricesValidateWithFacilities extends MatricesAlgorithm {
 			System.out.println("        done.");
 
 			System.out.println("        remove all trips with no 'home' facility at 'from' and no '" + act_type + "' facility at 'to'...");
-			Iterator<Location> from_loc_it = m_l.getLocations().values().iterator();
+			Iterator<? extends Location> from_loc_it = m_l.getLocations().values().iterator();
 			while (from_loc_it.hasNext()) {
 				Location from_loc = from_loc_it.next();
-				Iterator<Location> to_loc_it = m_l.getLocations().values().iterator();
+				Iterator<? extends Location> to_loc_it = m_l.getLocations().values().iterator();
 				while (to_loc_it.hasNext()) {
 					Location to_loc = to_loc_it.next();
 

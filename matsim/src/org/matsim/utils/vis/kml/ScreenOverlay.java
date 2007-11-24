@@ -28,7 +28,7 @@ import org.matsim.utils.vis.kml.fields.Vec2Type;
 
 /**
  * @author dgrether
- * @see <a 
+ * @see <a
  * href="http://code.google.com/apis/kml/documentation/kml_tags_21.html#screenoverlay">
  * KML-ScreenOverlay [code.google.com]</a>
  */
@@ -44,18 +44,18 @@ public class ScreenOverlay extends Overlay {
 	 * be specified in different ways—for example, x can be in pixels and y can be
 	 * a fraction. The origin of the coordinate system is in the lower left corner
 	 * of the image.
-	 * 
+	 *
 	 * x - Either the number of pixels, a fractional component of the image, or a
 	 * pixel inset indicating the x component of a point on the overlay image.
-	 * 
+	 *
 	 * y - Either the number of pixels, a fractional component of the image, or a
 	 * pixel inset indicating the y component of a point on the overlay image.
-	 * 
+	 *
 	 * xunits - Units in which the x value is specified. Default="fraction". A
 	 * value of "fraction" indicates the x value is a fraction of the image. A
 	 * value of "pixels" indicates the x value in pixels. A value of "insetPixels"
 	 * indicates the indent from the right edge of the image.
-	 * 
+	 *
 	 * yunits - Units in which the y value is specified. Default="fraction". A
 	 * value of "fraction" indicates the y value is a fraction of the image. A
 	 * value of "pixels" indicates the y value in pixels. A value of "insetPixels"
@@ -71,23 +71,23 @@ public class ScreenOverlay extends Overlay {
 	 * corner of the screen. The x and y positions can be specified in different
 	 * ways—for example, x can be in pixels and y can be a fraction. The origin of
 	 * the coordinate system is in the lower left corner of the screen.
-	 * 
+	 *
 	 * x - Either the number of pixels, a fractional component of the screen, or a
 	 * pixel inset indicating the x component of a point on the screen.
-	 * 
+	 *
 	 * y - Either the number of pixels, a fractional component of the screen, or a
 	 * pixel inset indicating the y component of a point on the screen.
-	 * 
+	 *
 	 * xunits - Units in which the x value is specified. Default="fraction". A
 	 * value of "fraction" indicates the x value is a fraction of the screen. A
 	 * value of "pixels" indicates the x value in pixels. A value of "insetPixels"
 	 * indicates the indent from the right edge of the screen.
-	 * 
+	 *
 	 * yunits - Units in which the y value is specified. Default=fraction. A value
 	 * of fraction indicates the y value is a fraction of the screen. A value of
 	 * "pixels" indicates the y value in pixels. A value of "insetPixels"
 	 * indicates the indent from the top edge of the screen.
-	 * 
+	 *
 	 */
 	private Vec2Type screenXY;
 
@@ -98,7 +98,7 @@ public class ScreenOverlay extends Overlay {
 
 	/**
 	 * Specifies the size of the image for the screen overlay, as follows:
-	 * 
+	 *
 	 * A value of −1 indicates to use the native dimension A value of 0 indicates
 	 * to maintain the aspect ratio A value of n sets the value of the dimension
 	 */
@@ -122,6 +122,7 @@ public class ScreenOverlay extends Overlay {
 	 * @param id
 	 * @param name
 	 * @param description
+	 * @param address
 	 * @param lookAt
 	 * @param styleUrl
 	 * @param visibility
@@ -142,7 +143,7 @@ public class ScreenOverlay extends Overlay {
 		out.write(Object.getOffset(offset, offsetString));
 		out.write("<ScreenOverlay>");
 		out.newLine();
-		
+
 		super.writeObject(out, version, offset + 1, offsetString);
 
 		if (this.overlayXY != null) {
@@ -195,7 +196,7 @@ public class ScreenOverlay extends Overlay {
 	}
 	/**
 	 * sets the screen xy vector of this ScreenOverlay
-	 * @param screenxy 
+	 * @param screenxy
 	 */
 	public void setScreenXY(Vec2Type screenxy) {
 		this.screenXY = screenxy;
@@ -207,7 +208,7 @@ public class ScreenOverlay extends Overlay {
 	public void setRotationXY(Vec2Type rotationXY) {
 		this.rotationXY = rotationXY;
 	}
-	
+
 	/**
 	 * Specifies the size of the image for the screen overlay, as follows:
 	 * <ul>
@@ -215,14 +216,14 @@ public class ScreenOverlay extends Overlay {
 	 * <li>A value of 0 indicates to maintain the aspect ratio</li>
 	 * <li>A value of n sets the value of the dimension</li>
 	 * </ul>
-	 * The size can be specified individually for the x- and y-direction 
+	 * The size can be specified individually for the x- and y-direction
 	 *
 	 * @param size
 	 */
 	public void setSize(Vec2Type size) {
 		this.size = size;
 	}
-	
+
 	/**
 	 * Indicates the angle of rotation of the parent object. A value of 0 means no
 	 * rotation. The value is an angle in degrees counterclockwise starting from

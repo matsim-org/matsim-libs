@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -70,8 +69,8 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 	private final ZoneLayer layer;
 	private final Persons persons;
 	private final String outfile;
-	
-	private final HashMap<Id,int[]> zones = new HashMap<Id,int[]>();
+
+	private final HashMap<IdI, int[]> zones = new HashMap<IdI, int[]>();
 	private final String[] heads = {"p","male","female",
 	                                "age05","age67","age814","age1517","age1865","age66inf",
 	                                "licyes","licno",
@@ -86,7 +85,7 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 	                                "trip01","trip15","trip520","trip2050","trip50inf",
 	                                "plan05","plan520","plan2050","plan50100","plan100inf",
 	                                WALK,BIKE,CAR,PT,UNDEF,"muni_id"};
- 
+
     //////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -109,15 +108,15 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 	private final void initHash() {
 		int z_cnt = this.layer.getLocations().size();
 		int att_cnt = this.heads.length-1; // Note: muni_id is not part of the array
-		Iterator<Location> z_it = this.layer.getLocations().values().iterator();
+		Iterator<? extends Location> z_it = this.layer.getLocations().values().iterator();
 		while (z_it.hasNext()) {
 			Zone z = (Zone)z_it.next();
 			int[] atts = new int[att_cnt];
 			for (int i=0; i<att_cnt; i++) { atts[i] = 0; }
-			this.zones.put((Id)z.getId(),atts);
+			this.zones.put(z.getId(),atts);
 		}
 	}
-	
+
 	private final void open() {
 		try {
 			fw = new FileWriter(outfile);
@@ -131,16 +130,16 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 			System.exit(-1);
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// final method
 	//////////////////////////////////////////////////////////////////////
 
 	public final void close() {
 		try {
-			Iterator<Id> id_it = this.zones.keySet().iterator();
+			Iterator<IdI> id_it = this.zones.keySet().iterator();
 			while (id_it.hasNext()) {
-				Id id = id_it.next();
+				IdI id = id_it.next();
 				int[] vals = this.zones.get(id);
 				for (int i=0; i<vals.length; i++) { out.write(vals[i] + "\t"); }
 				out.write(id + "\n");
@@ -174,7 +173,7 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 		int index = w*2*2*2 + e*2*2 + s*2 + l;
 		return index + offset;
 	}
-	
+
 	private final int calcPlanIndex(Plan plan, int offset) {
 		double dist = 0.0;
 		Iterator<?> act_it = plan.getIteratorAct();
@@ -192,7 +191,7 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 		else if (dist < 100000.0) { return 3 + offset; }
 		else { return 4 + offset; }
 	}
-	
+
 	private final int countActs(Plan plan) {
 		int cnt = 0;
 		Iterator<?> act_it = plan.getIteratorAct();
@@ -220,58 +219,59 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 		}
 		return cnts;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
 		IdI zone_id = p.getHousehold().getMunicipality().getZone().getId();
 		int[] vals = this.zones.get(zone_id);
 
 		vals[0]++;
-		
+
 		if (M.equals(person.getSex())) { vals[1]++; }
 		else if (F.equals(person.getSex())) { vals[2]++; }
 		else { Gbl.errorMsg("Person id=" + person.getId() + ": Attribute 'sex' is wrong!"); }
-		
+
 		if (person.getAge() < 6) { vals[3]++; }
 		else if (person.getAge() < 8) { vals[4]++; }
 		else if (person.getAge() < 15) { vals[5]++; }
 		else if (person.getAge() < 18) { vals[6]++; }
 		else if (person.getAge() < 66) { vals[7]++; }
 		else { vals[8]++; }
-		
+
 		if (YES.equals(person.getLicense())) { vals[9]++; }
 		else if (NO.equals(person.getLicense())) { vals[10]++; }
 		else { Gbl.errorMsg("Person id=" + person.getId() + ": Attribute 'license' is wrong!"); }
-		
+
 		if (NEVER.equals(person.getCarAvail())) { vals[11]++; }
 		else if (SOMETIMES.equals(person.getCarAvail())) { vals[12]++; }
 		else if (ALWAYS.equals(person.getCarAvail())) { vals[13]++; }
 		else { Gbl.errorMsg("Person id=" + person.getId() + ": Attribute 'car_avail' is wrong!"); }
-		
+
 		if (YES.equals(person.getEmployed())) { vals[14]++; }
 		else if (NO.equals(person.getEmployed())) { vals[15]++; }
 		else { Gbl.errorMsg("Person id=" + person.getId() + ": Attribute 'employed' is wrong!"); }
-		
+
 		if (!person.getTravelcards().isEmpty()) { vals[16]++; }
 		else { vals[17]++; }
-		
+
 		int index = this.calcChainIndex(person.getSelectedPlan(),18); // returns 18-33
 		if ((index < 18) || (33 < index)) { Gbl.errorMsg("Person id=" + person.getId() + ": returning wrong index!"); }
 		vals[index]++;
-		
+
 		vals[34] += this.countActs(person.getSelectedPlan());
-		
+
 		int[] cnts = this.countTrips(person.getSelectedPlan()); // returns an array of size = 5
 		for (int i=0; i<cnts.length; i++) { vals[35+i] += cnts[i]; }
-		
+
 		index = this.calcPlanIndex(person.getSelectedPlan(),40); // returns 40-44
 		if ((index < 40) || (45 < index)) { Gbl.errorMsg("Person id=" + person.getId() + ": returning wrong index!"); }
 		vals[index]++;
-		
+
 		String mode = ((Leg)person.getSelectedPlan().getActsLegs().get(1)).getMode();
 		if (WALK.equals(mode)) { vals[45]++; }
 		else if (BIKE.equals(mode)) { vals[46]++; }

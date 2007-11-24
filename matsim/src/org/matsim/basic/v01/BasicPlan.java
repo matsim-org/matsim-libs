@@ -134,6 +134,7 @@ public class BasicPlan implements Serializable {
 
 	/**
 	 * Getter for the Iterator class defined above
+	 * @return A special iterator over acts and legs.
 	 */
 	public ActLegIterator getIterator() {
 		return new ActLegIterator();

@@ -44,9 +44,9 @@ public class QueueNode extends Node {
 	// only used when doing DistributedSimulation,
 	// but I did not want to inherit for just this info
 	//////////////////////////////////////////////////////////////////////
-	private int partitionID = 0;
-	public int getPartitionID() {return this.partitionID;}
-	public void setPartitionID(final int partitionID) {this.partitionID = partitionID;}
+	private int partitionId = 0;
+	public int getPartitionId() {return this.partitionId;}
+	public void setPartitionId(final int partitionId) {this.partitionId = partitionId;}
 
 	//////////////////////////////////////////////////////////////////////
 	//constructor
@@ -61,7 +61,7 @@ public class QueueNode extends Node {
 	@SuppressWarnings("unchecked") // TODO [DS] cleanup for Java 5.0: use generics!
 	private void buildCache() {
 		this.inLinksArrayCache = new QueueLink[this.inlinks.size()];
-		this.inLinksArrayCache = (QueueLink[]) this.inlinks.toArray(this.inLinksArrayCache);
+		this.inLinksArrayCache = this.inlinks.values().toArray(this.inLinksArrayCache);
 		this.tempLinks = new QueueLink[this.inlinks.size()];
 		this.auxLinks = new QueueLink[this.inlinks.size()];
 		this.cacheIsInvalid = false;
@@ -128,7 +128,7 @@ public class QueueNode extends Node {
 //		}
 //		active = false ;
 //	}
-	
+
 	/**
 	 * Moves vehicles from the inlinks' buffer to the outlinks where possible.<br>
 	 * The inLinks are randomly chosen, and for each link all vehicles in the
@@ -145,7 +145,7 @@ public class QueueNode extends Node {
 	 */
 	public void moveNode(final double now) {
 		/* called by the framework, do all necessary action for node movement here */
-		
+
 //		if ( !active ) {
 //			return ;
 //		}

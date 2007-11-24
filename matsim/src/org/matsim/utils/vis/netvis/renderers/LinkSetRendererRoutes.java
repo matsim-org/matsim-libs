@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.FileDialog;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -49,6 +48,7 @@ import org.matsim.plans.Route;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.ControlToolbar;
 import org.matsim.utils.vis.netvis.gui.NetJComponent;
@@ -163,8 +163,7 @@ public class LinkSetRendererRoutes extends RendererA {
 		if (strokeWidth > (100.0 / scale)) strokeWidth = 100.0 / scale;  // max pixel-width on screen
 		display.setStroke(new BasicStroke((float)strokeWidth));
 
-		for (Iterator it = this.network.getLinks().iterator(); it.hasNext();) {
-			DisplayLink link = (DisplayLink)it.next();
+		for (DisplayableLinkI link : network.getLinks().values()) {
 
 			if (!comp.checkLineInClip(link.getStartEasting(), link.getStartNorthing(),
 					link.getEndEasting(), link.getEndNorthing())) {

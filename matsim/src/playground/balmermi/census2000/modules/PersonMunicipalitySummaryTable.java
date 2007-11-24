@@ -105,8 +105,9 @@ public class PersonMunicipalitySummaryTable extends PersonAlgorithm implements P
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
-		playground.balmermi.census2000.data.Person p = persons.getPerson(Integer.parseInt(person.getId().toString()));
+		playground.balmermi.census2000.data.Person p = persons.getPerson(Integer.valueOf(person.getId().toString()));
 		Household hh = p.getHousehold();
 		Municipality muni = hh.getMunicipality();
 
@@ -121,11 +122,11 @@ public class PersonMunicipalitySummaryTable extends PersonAlgorithm implements P
 		}
 		v[0]++;
 		if (!this.hhs.contains(hh)) { v[1]++; this.hhs.add(hh); }
-		
+
 		if (person.getAge() < 18) { v[2]++; }
 		else if (person.getAge() < 66) { v[3]++; }
 		else { v[4]++; }
-		
+
 		if (p.isMale()) { v[5]++; }
 		if (p.isSwiss()) { v[6]++; }
 		if (person.isEmpoyed()) { v[7]++; }

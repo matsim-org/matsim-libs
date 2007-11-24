@@ -22,11 +22,11 @@ package org.matsim.router.util;
 
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -105,18 +105,16 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			expandLandmark(this.landmarks[i], i);
 		}
 
-		for (Object obj : network.getNodes()) {
-			Node n = (Node) obj;
-			LandmarksRole r = (LandmarksRole) getRole(n);
+		for (Node node : network.getNodes().values()) {
+			LandmarksRole r = (LandmarksRole) getRole(node);
 			r.updateMinMaxTravelTimes();
 		}
 
-		for (Object obj : network.getNodes()) {
-			Node n = (Node) obj;
-			LandmarksRole r = (LandmarksRole) getRole(n);
+		for (Node node : network.getNodes().values()) {
+			LandmarksRole r = (LandmarksRole) getRole(node);
 			for (int i = 0; i < this.landmarks.length; i++) {
 				if (r.getMinLandmarkTravelTime(i) > r.getMaxLandmarkTravelTime(i)) {
-					System.out.println("Min > max for node " + n.getId() + " and landmark " + i);
+					System.out.println("Min > max for node " + node.getId() + " and landmark " + i);
 				}
 			}
 		}
@@ -137,11 +135,11 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			Node node = pendingNodes.poll();
 			double toTravTime = ((LandmarksRole) getRole(node))
 					.getToLandmarkTravelTime(landmarkIndex);
-			expandLinks(landmarkIndex, pendingNodes, node.getInLinks(),
+			expandLinks(landmarkIndex, pendingNodes, node.getInLinks().values(),
 					toTravTime, false);
 			double fromTravTime = ((LandmarksRole) getRole(node))
 					.getFromLandmarkTravelTime(landmarkIndex);
-			expandLinks(landmarkIndex, pendingNodes, node.getOutLinks(),
+			expandLinks(landmarkIndex, pendingNodes, node.getOutLinks().values(),
 					fromTravTime, true);
 		}
 	}
@@ -152,7 +150,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * @param outlinks
 	 */
 	private void expandLinks(final int landmarkIndex, final PriorityQueue<Node> nodes,
-			final BasicLinkSetI links, final double travTime, final boolean expandFromLandmark) {
+			final Collection<? extends Link> links, final double travTime, final boolean expandFromLandmark) {
 		LandmarksRole role;
 		Iterator<?> iter = links.iterator();
 		while (iter.hasNext()) {

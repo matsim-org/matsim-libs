@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class TempHP {
 

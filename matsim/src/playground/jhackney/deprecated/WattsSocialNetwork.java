@@ -47,6 +47,7 @@ public class WattsSocialNetwork extends SocialNetwork {
 				+ ".addLinks is not written yet.");			
 	}
 
+	@Override
 	public ArrayList<SocialNetEdge> getLinks() {
 		// TODO Auto-generated method stub
 		return null;

@@ -20,13 +20,10 @@
 
 package org.matsim.facilities.algorithms;
 
-import java.util.Iterator;
-
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.world.Location;
 
 public class FacilitiesRandomizeHectareCoordinates extends FacilitiesAlgorithm {
 
@@ -38,19 +35,12 @@ public class FacilitiesRandomizeHectareCoordinates extends FacilitiesAlgorithm {
 
 	@Override
 	public void run(Facilities facilities) {
-
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		CoordI coord;
-
-		Iterator<Location> f_it = facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-
-			Facility f = (Facility)f_it.next();
-			coord = f.getCenter();
+		for (Facility f : facilities.getFacilities().values()) {
+			CoordI coord = f.getCenter();
 			coord.setX((Double.valueOf(coord.getX()).intValue() / 100) * 100 + Gbl.random.nextInt(99));
 			coord.setY((Double.valueOf(coord.getY()).intValue() / 100) * 100 + Gbl.random.nextInt(99));
-
 		}
 
 		System.out.println("    done.");

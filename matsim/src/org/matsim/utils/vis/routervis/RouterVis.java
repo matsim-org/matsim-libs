@@ -114,7 +114,7 @@ public class RouterVis {
 		IdI toNodeId;
 
 		log.info("starting RouterVis demo");
-		String testConfigFile = "./test/shared/router-vis-test/configs/routerVisConf.xml";
+		String testConfigFile = "./examples/siouxfalls/config.xml";
 
 		if (args.length == 3) {
 			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});

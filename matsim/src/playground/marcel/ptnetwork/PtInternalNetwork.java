@@ -32,7 +32,7 @@ import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.misc.QuadTree;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 import playground.marcel.ptnetwork.tempelements.TempFZP;
 import playground.marcel.ptnetwork.tempelements.TempFZPPkt;

@@ -22,15 +22,15 @@ package playground.lnicolas.network.algorithm;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
-import org.matsim.basic.v01.IdSet;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class NetworkReducer extends NetworkAlgorithm {
 
@@ -46,8 +46,7 @@ public class NetworkReducer extends NetworkAlgorithm {
 	private Node getStartNode(NetworkLayer network) {
 		double dist = Double.MAX_VALUE;
 		Node startNode = null;
-		for (Object obj : network.getNodes()) {
-			Node n = (Node) obj;
+		for (Node n : network.getNodes().values()) {
 			double d = n.getCoord().calcDistance(startCoord);
 			if (d < dist) {
 				dist = d;
@@ -70,15 +69,11 @@ public class NetworkReducer extends NetworkAlgorithm {
 	}
 
 	private void reduceNetwork(NetworkLayer network, int roleIndex) {
-		IdSet allNodesCopy = new IdSet();
-		allNodesCopy.addAll(network.getNodes());
-		Iterator it = allNodesCopy.iterator();
-		while (it.hasNext()) {
-			Node n = (Node) it.next();
-			NetworkReducerRole r = getRole(n, roleIndex);
-
+		List<Node> allNodesCopy = new ArrayList<Node>(network.getNodes().values());
+		for (Node node : allNodesCopy) {
+			NetworkReducerRole r = getRole(node, roleIndex);
 			if (r.isInResultingNetwork() == false) {
-				network.removeNode(n);
+				network.removeNode(node);
 			}
 		}
 	}
@@ -92,16 +87,15 @@ public class NetworkReducer extends NetworkAlgorithm {
 
 		while (pendingNodes.isEmpty() == false && linkCount < nOfLinks) {
 			Node node = pendingNodes.remove(0);
-			linkCount = processLinks(node.getOutLinks(), roleIndex, linkCount, pendingNodes);
-			linkCount = processLinks(node.getInLinks(), roleIndex, linkCount, pendingNodes);
+			linkCount = processLinks(node.getOutLinks().values(), roleIndex, linkCount, pendingNodes);
+			linkCount = processLinks(node.getInLinks().values(), roleIndex, linkCount, pendingNodes);
 		}
 	}
 
-	private int processLinks(BasicLinkSetI links, int roleIndex, int linkCount,
-			ArrayList<Node> pendingNodes) {
-		Iterator iter = links.iterator();
+	private int processLinks(Collection<? extends Link> links, int roleIndex, int linkCount, ArrayList<Node> pendingNodes) {
+		Iterator<? extends Link> iter = links.iterator();
 		while (iter.hasNext() && linkCount < nOfLinks) {
-			Link l = (Link) iter.next();
+			Link l = iter.next();
 			Node n = l.getToNode();
 			NetworkReducerRole r = getRole(n, roleIndex);
 			if (r.isInResultingNetwork() == false) {
@@ -120,9 +114,7 @@ public class NetworkReducer extends NetworkAlgorithm {
 		double minY = Double.MAX_VALUE;
 		double maxY = Double.MIN_VALUE;
 
-		Iterator it = network.getNodes().iterator();
-		while (it.hasNext()) {
-			Node n = (Node) it.next();
+		for (Node n : network.getNodes().values()) {
 			NetworkReducerRole r = getRole(n, roleIndex);
 
 			if (r.isInResultingNetwork() == true) {

@@ -227,7 +227,8 @@ public class ControlToolbar extends JToolBar implements ActionListener, ItemList
         reader.toTimeStep(newTime_s);
     }
 
-    public void paint(Graphics g) {
+    @Override
+		public void paint(Graphics g) {
         if (reader != null)
             updateTimeLabel();
         super.paint(g);

@@ -24,6 +24,7 @@ public class EventsConfigGroup extends AbstractFileIOConfigGroup {
 
 	public static final String GROUP_NAME = "events";
 	
+	@Override
 	public String getName() {
 		return GROUP_NAME;
 	}

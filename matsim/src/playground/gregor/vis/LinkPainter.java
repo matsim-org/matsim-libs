@@ -23,7 +23,6 @@ package playground.gregor.vis;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
@@ -104,10 +103,9 @@ public class LinkPainter extends DisplayNetStateWriter {
 
     @Override
     protected double getLinkDisplValue(final BasicLinkI link, final int index) {
-    	Id id = (Id) link.getId();
 		LinkAttribute attrib;
-		if (linkData.containsKey(id)) {
-			attrib = linkData.get(id);
+		if (linkData.containsKey(link.getId())) {
+			attrib = linkData.get(link.getId());
 		} else {
 //			attrib = new LinkAttribute(id);
 //			linkStats.put(id, attrib);
@@ -118,10 +116,9 @@ public class LinkPainter extends DisplayNetStateWriter {
 
     @Override
     public String getLinkDisplLabel(final BasicLinkI link) {
-        Id id = (Id) link.getId();
 		LinkAttribute attrib;
-		if (linkData.containsKey(id)) {
-			attrib = linkData.get(id);
+		if (linkData.containsKey(link.getId())) {
+			attrib = linkData.get(link.getId());
 		} else {
 //			attrib = new LinkAttribute(id);
 //			linkStats.put(id, attrib);

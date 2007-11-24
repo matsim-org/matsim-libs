@@ -20,31 +20,33 @@
 
 package org.matsim.basic.v01;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeSetI;
+import org.matsim.utils.identifiers.IdI;
 
-public class BasicNet implements BasicNetI{
-	protected final BasicLinkSetI links  = new BasicLinkSet();
-	protected final BasicNodeSetI nodes  = new BasicNodeSet();
+public class BasicNet implements BasicNetI {
+	protected final TreeMap<IdI, BasicLinkI> links = new TreeMap<IdI, BasicLinkI>();
+	protected final TreeMap<IdI, BasicNodeI> nodes = new TreeMap<IdI, BasicNodeI>();
 
 	public boolean add(BasicNodeI node) {
-		nodes.add(node);
+		nodes.put(node.getId(), node);
 		return true;
 	}
 
 	public boolean add(BasicLinkI link) {
-		links.add(link);
+		links.put(link.getId(), link);
 		return true;
 	}
 
-	public BasicLinkSetI getLinks() {
+	public Map<IdI, ? extends BasicLinkI> getLinks() {
 		return links;
 	}
 
-	public BasicNodeSetI getNodes() {
+	public Map<IdI, ? extends BasicNodeI> getNodes() {
 		return nodes;
 	}
 

@@ -60,7 +60,7 @@ public class FacilitiesCombine extends FacilitiesAlgorithm {
 		// TreeMap<XCOORD,TreeMap<YCOORD,FACILITY>>
 		TreeMap<Double,TreeMap<Double,Facility>> facs = new TreeMap<Double, TreeMap<Double,Facility>>();
 
-		Iterator<Location> f_it = facilities.getLocations().values().iterator();
+		Iterator<? extends Location> f_it = facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
 			Double x = f.getCenter().getX();
@@ -107,7 +107,7 @@ public class FacilitiesCombine extends FacilitiesAlgorithm {
 			}
 		}
 
-		TreeMap<IdI,Location> fs = facilities.getLocations();
+		TreeMap<IdI, Facility> fs = (TreeMap<IdI, Facility>) facilities.getFacilities();
 		fs.clear();
 
 		Iterator<TreeMap<Double,Facility>> t_it = facs.values().iterator();

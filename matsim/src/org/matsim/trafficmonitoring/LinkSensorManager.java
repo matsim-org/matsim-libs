@@ -31,13 +31,13 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
  * This class can be used as EventHandler of the demandmodeling.events.Event.class.
  * If added there as Handler it counts the traffic on each link which was set in the
  * appropriate method of this class.
- * 
+ *
  * @author dgrether
  *
  */
 public class LinkSensorManager implements EventHandlerLinkLeaveI {
 	/**
-	 * zero 
+	 * zero
 	 */
 	private static final Integer ZERO = Integer.valueOf(0);
 	/**
@@ -46,13 +46,13 @@ public class LinkSensorManager implements EventHandlerLinkLeaveI {
 	 */
 	private Map<String, Integer> linkCountMap;
 	/**
-	 * Initializes the fields 
+	 * Initializes the fields
 	 */
 	public LinkSensorManager() {
 		this.linkCountMap = new HashMap<String, Integer>();
 	}
 	/**
-	 * Adds a traffic sensor to the link with the given id. 
+	 * Adds a traffic sensor to the link with the given id.
 	 * @param id
 	 */
 	public void addLinkSensor(final String id) {
@@ -60,8 +60,8 @@ public class LinkSensorManager implements EventHandlerLinkLeaveI {
 	}
 	/**
 	 * Reads the current traffic count for the Link which id is given as parameter.
-	 * When the amount of traffic is read the traffic count is set to zero, i.e. the 
-	 * number of cars traveling over this link is the number of cars since the last 
+	 * When the amount of traffic is read the traffic count is set to zero, i.e. the
+	 * number of cars traveling over this link is the number of cars since the last
 	 * call of this method.
 	 * @param id
 	 * @return the  number of cars for link id since the last time the link traffic was queried by this method
@@ -70,11 +70,9 @@ public class LinkSensorManager implements EventHandlerLinkLeaveI {
 		if (this.linkCountMap.containsKey(id)) {
 			int i = this.linkCountMap.get(id).intValue();
 			this.linkCountMap.put(id, ZERO);
-			return i;	
+			return i;
 		}
-		else {
-			throw new IllegalArgumentException();
-		}
+		throw new IllegalArgumentException();
 	}
 	/**
 	 * For each LinkLeaveEvent the corresponding traffic count value is incremented.
@@ -86,14 +84,14 @@ public class LinkSensorManager implements EventHandlerLinkLeaveI {
 			i++;
 			this.linkCountMap.put(event.linkId, Integer.valueOf(i));
 		}
-		
+
 	}
 	/**
 	 * Resets traffic count data for all links to zero
 	 * @see org.matsim.events.handler.EventHandlerI#reset(int)
 	 */
 	public void reset(final int iteration) {
-		
+
 		for (String id : this.linkCountMap.keySet()) {
 			this.linkCountMap.put(id, ZERO);
 		}

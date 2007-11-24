@@ -24,7 +24,6 @@ package org.matsim.utils.vis.routervis;
 
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -80,7 +79,6 @@ public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, Vi
 			doSnapshot();
 		}
 
-
 		return route;
 	}
 
@@ -109,13 +107,11 @@ public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, Vi
 			final double currCost, final Node outNode, final Node toNode) {
 		boolean succ = super.addToPendingNodes(l, n, pendingNodes, currTime, currCost, outNode, toNode);
 
-		if (succ){
-			//test if the node was revisited - if so the former shortest
-			//path has to be canceled...
-			Iterator it = l.getToNode().getInLinks().iterator();
-			while (it.hasNext()){
-				Link link = (Link) it.next();
-				if (this.writer.getLinkDisplValue(link,0) == 0.25){
+		if (succ) {
+			/* test if the node was revisited - if so the former shortest
+			 * path has to be canceled... */
+			for (Link link : l.getToNode().getInLinks().values()) {
+				if (this.writer.getLinkDisplValue(link,0) == 0.25) {
 					this.writer.setLinkColor(link.getId(), 0.9);
 				}
 			}

@@ -37,16 +37,16 @@ public class GeneratePlans {
 
 	/**
 	 * Generating an extra stream of traffic in a certain area of the Berlin network
-	 * 
+	 *
 	 * @param plans2
 	 * @param net
 	 */
 
 	public static void createCOOPERSSpecificVehicles(Plans plans2, QueueNetworkLayer net) {
 		// Erzeuge einen strom von vehicles, die die autobahn runter wollen
-		Link startLink1 = (Link)net.getLinks().get("7829");
-		Link startLink2 = (Link)net.getLinks().get("8453");
-		Link destLink = (Link)net.getLinks().get("8380");
+		Link startLink1 = net.getLinks().get("7829");
+		Link startLink2 = net.getLinks().get("8453");
+		Link destLink = net.getLinks().get("8380");
 		Random rnd = new Random(4711);
 
 		Gbl.getConfig().setParam("planCalcScore", "traveling", "-3600");
@@ -63,7 +63,7 @@ public class GeneratePlans {
 			Plan plan = new Plan("0","0",person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 3.*3600;
-			Link startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2; 
+			Link startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2;
 			Act actstart = new Act("h", 0,0, startLink, 0, endTime, endTime, false);
 			Act actEnd = new Act("h", 0,0, destLink, arrivalTime, arrivalTime + 3*3600, 3*3600, false);
 

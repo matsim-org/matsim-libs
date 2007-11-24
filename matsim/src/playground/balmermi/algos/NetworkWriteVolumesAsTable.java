@@ -23,7 +23,6 @@ package playground.balmermi.algos;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Random;
 
 import org.matsim.network.Link;
@@ -80,21 +79,20 @@ public class NetworkWriteVolumesAsTable extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-		
+
 		int capperiod = network.getCapacityPeriod();
 		capperiod = capperiod / 3600;
 		System.out.println("      capperiod = " + capperiod);
 
 		try {
-			Iterator<?> l_it = network.getLinks().iterator();
-			while (l_it.hasNext()) {
-				Link l = (Link)l_it.next();
+			for (Link l : network.getLinks().values()) {
 				IdI l_id = l.getId();
-				
+
 				Random r = new Random();
-				
+
 				if (r.nextDouble() > 0.99) {
 					for (int i=0; i<3600*24; i=i+30*60) {
 						double cap_max = l.getCapacity()/capperiod/2;
@@ -102,7 +100,7 @@ public class NetworkWriteVolumesAsTable extends NetworkAlgorithm {
 						out.write("st" + l_id + "\t" + l_id + "\t" + i + "\t" + (i+30*60) + "\t" + cap + "\n");
 						out.flush();
 					}
-				} 
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

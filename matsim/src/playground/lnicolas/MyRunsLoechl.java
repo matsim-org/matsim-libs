@@ -111,7 +111,7 @@ public class MyRunsLoechl extends MyRuns {
 	 * @param arg
 	 */
 	private static void writeLeastDistanceToPointOfInterest(final String arg) {
-		Collection<Location> facs = (Gbl.getWorld().getLayer(Facilities.LAYER_TYPE)).getLocations().values();
+		Collection<? extends Location> facs = (Gbl.getWorld().getLayer(Facilities.LAYER_TYPE)).getLocations().values();
 		TreeMap<IdI, Link> nearestLinks = new TreeMap<IdI, Link>();
 
 		// get Autobahnauffahrten, ptStops, railstations and CDBs
@@ -219,7 +219,7 @@ public class MyRunsLoechl extends MyRuns {
 	}
 
 	private static void writeFacilitiesInVicinity() {
-		Collection<Location> facs = (Gbl.getWorld().getLayer(Facilities.LAYER_TYPE)).getLocations().values();
+		Collection<? extends Location> facs = (Gbl.getWorld().getLayer(Facilities.LAYER_TYPE)).getLocations().values();
 
 		TreeMap<IdI, Link> nearestLinks = new TreeMap<IdI, Link>();
 
@@ -463,7 +463,7 @@ class CalcFacilitiesInVicinityThread extends Thread {
 		String filename = this.outputPath + tmp[tmp.length - 1] + this.id + ".txt.gz";
 		System.out.println("Output file name: " + filename);
 
-		Collection<Location> facilities = facs.getLocations().values();
+		Collection<? extends Location> facilities = facs.getLocations().values();
 		String statusString = "|----------+-----------|";
 
 		LeastCostPathCalculator router = new AStarLandmarks(this.network, this.preRouter,

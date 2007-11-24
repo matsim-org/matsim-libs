@@ -366,7 +366,6 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	 * reads all activity utility values from the config-file
 	 */
 	private static final void readUtilityValues() {
-		int i=0;
 		CharyparNagelScoringConfigGroup config = Gbl.getConfig().charyparNagelScoring();
 
 		for (ActivityParams params : config.getActivityParams()) {

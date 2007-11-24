@@ -24,9 +24,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
-import org.matsim.interfaces.networks.basicNet.BasicNodeSetI;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.world.Location;
@@ -34,7 +32,7 @@ import org.matsim.world.ZoneLayer;
 
 /**
  * @author mrieser
- * 
+ *
  * creates an "Anbindungstabelle" for use with VISUM.<br/>
  * The Anbindungstabelle contains information about which node is connected
  * to which zone (tvz, taz) for mapping the zone-based demand to the network
@@ -45,12 +43,12 @@ import org.matsim.world.ZoneLayer;
 public class VisumAnbindungstabelleWriter {
 
 	public VisumAnbindungstabelleWriter() {
-		
+
 	}
-	
+
 	public void write(String filename, NetworkLayer network, ZoneLayer zones) {
 		BufferedWriter out = null;
-		
+
 		try {
 			out = new BufferedWriter(new FileWriter(filename));
 			// HEADER
@@ -63,14 +61,11 @@ public class VisumAnbindungstabelleWriter {
 			out.write("3.000;Net;DEU;KM\n");
 			out.write("\n");
 			out.write("*\n");
-			out.write("*\n"); 
+			out.write("*\n");
 			out.write("* Tabelle: Anbindungen\n");
 			out.write("$ANBINDUNG:BEZNR;KNOTNR;RICHTUNG;TYPNR;VSYSSET\n");
 
-			BasicNodeSetI nodes = network.getNodes();
-			Iterator iter = nodes.iterator();
-			while (iter.hasNext()) {
-				Node node = (Node)iter.next();
+			for (Node node : network.getNodes().values()) {
 				String visum = "";
 				// ANBINDUNG:BEZNR
 				ArrayList<Location> locs = zones.getNearestLocations(node.getCoord(), null);

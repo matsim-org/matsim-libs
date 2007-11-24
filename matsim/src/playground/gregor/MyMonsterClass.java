@@ -58,7 +58,7 @@ import org.matsim.plans.algorithms.PlansFilterActInArea;
 import org.matsim.plans.algorithms.XY2Links;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.World;
 import org.matsim.writer.MatsimWriter;
 
@@ -223,9 +223,7 @@ public class MyMonsterClass {
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
-		 Iterator it  = network.getLinks().iterator();
-		while (it.hasNext()){
-			Link link = (Link) it.next();
+		for (Link link : network.getLinks().values()) {
 			link.setFreespeed(1.666);
 			link.setCapacity(link.getCapacity() * 8.19 );
 		}
@@ -536,8 +534,7 @@ public class MyMonsterClass {
 		System.out.println("done. ");
 
 		System.out.println("extracting aoi ...");
-		Collection<Link> links = network.getLinks();
-		for (Link link : links) {
+		for (Link link : network.getLinks().values()) {
 			Node from = link.getFromNode();
 			Node to = link.getToNode();
 			double fromDist = from.getCoord().calcDistance(center);
@@ -702,22 +699,16 @@ public class MyMonsterClass {
 		double minX = Math.min(A.getX(),B.getX());
 		double minY = Math.min(A.getY(),B.getY());
 
-
-		Iterator it = network.getLinks().iterator();
-		Iterator it1 = network.getNodes().iterator();
-
 		QueueNetworkLayer new_network = new QueueNetworkLayer();
 
-		while (it1.hasNext()) {
-			QueueNode node = (QueueNode) it1.next();
+		for (QueueNode node : network.getNodes().values()) {
 			if (node.getCoord().getX() <= maxX && node.getCoord().getX() >= minX )
 				if (node.getCoord().getY() <= maxY && node.getCoord().getY() >= minY )
 					new_network.createNode(node.getId().toString(), Double.toString(node.getCoord().getX()), Double.toString(node.getCoord().getY()), node.getType());
 		}
 
 		int extracted = 0;
-		while (it.hasNext()) {
-			QueueLink link = (QueueLink) it.next();
+		for (QueueLink link : network.getLinks().values()) {
 			Coord from = link.getFromNode().getCoord();
 			Coord to = link.getToNode().getCoord();
 			if (from.getX() <= maxX && (from.getX() >= minX)) {

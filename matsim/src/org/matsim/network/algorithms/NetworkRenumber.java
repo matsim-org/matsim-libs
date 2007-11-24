@@ -20,8 +20,6 @@
 
 package org.matsim.network.algorithms;
 
-import java.util.Iterator;
-
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -41,13 +39,13 @@ public class NetworkRenumber extends NetworkAlgorithm {
 	// predefined values for use in constructor
 	public static final boolean RENUMBER_IDS = false;
 	public static final boolean RESTORE_IDS = true;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
 	private boolean restore;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -55,7 +53,7 @@ public class NetworkRenumber extends NetworkAlgorithm {
 	public NetworkRenumber() {
 		this(false);
 	}
-	
+
 	public NetworkRenumber(final boolean restore) {
 		super();
 		this.restore = restore;
@@ -65,38 +63,31 @@ public class NetworkRenumber extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(final NetworkLayer network) {
 		// renumber links and nodes if requested
 		if (this.restore) {
 			// restore
-			Iterator nIter = network.getNodes().iterator();
-			while (nIter.hasNext()) {
-				Node node = (Node)nIter.next();
+			for (Node node : network.getNodes().values()) {
 				node.setId(new Id(node.getOrigId()));
 				node.setOrigId(null);
 			}
 
-			Iterator lIter = network.getLinks().iterator();
-			while (lIter.hasNext()) {
-				Link link = (Link)lIter.next();
+			for (Link link : network.getLinks().values()) {
 				link.setId(new Id(link.getOrigId()));
 				link.setOrigId(null);
-			}			
+			}
 		} 	else {
 			// renumber
 			int id = 1;
-			Iterator nIter = network.getNodes().iterator();
-			while (nIter.hasNext()) {
-				Node node = (Node)nIter.next();
+			for (Node node : network.getNodes().values()) {
 				node.setOrigId(node.getId().toString());
 				node.setId(new Id(id));
 				id++;
 			}
 
 			id = 1;
-			Iterator lIter = network.getLinks().iterator();
-			while (lIter.hasNext()) {
-				Link link = (Link)lIter.next();
+			for (Link link : network.getLinks().values()) {
 				link.setOrigId(link.getId().toString());
 				link.setId(new Id(id));
 				id++;

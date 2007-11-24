@@ -25,16 +25,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicIdentified;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.vis.netvis.DisplayableLinkI;
+import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableLinkI;
 
 /**
  * @author gunnar
  */
-public class DisplayLink extends BasicIdentified implements DrawableLinkI, BasicLinkI {
+public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI {
 
 	private BasicNodeI fromNode;
 	private BasicNodeI toNode;
@@ -45,15 +46,13 @@ public class DisplayLink extends BasicIdentified implements DrawableLinkI, Basic
 	private double nodeDist;
 	private double[] displayValue = new double[1];
 	private String displayLabel;
-	private List agents = new ArrayList();
+	private List<DrawableAgentI> agents = new ArrayList<DrawableAgentI>();
+	protected IdI id;
 
 	// -------------------- CONSTRUCTION AND INITIALIZATION --------------------
 
 	DisplayLink(IdI id, DisplayNet network) {
-		super(id);
-	}
-
-	void clear() {
+		this.id = id;
 	}
 
 	public void setDisplValueCnt(int cnt) {
@@ -197,11 +196,17 @@ public class DisplayLink extends BasicIdentified implements DrawableLinkI, Basic
 		return displayLabel;
 	}
 
-	public Collection getMovingAgents() {
+	public Collection<DrawableAgentI> getMovingAgents() {
 		return agents;
 	}
 
-	public void setMovingAgents(List newAgents) {
+	public void setMovingAgents(List<DrawableAgentI> newAgents) {
 		this.agents = newAgents;
 	}
+
+
+	public IdI getId() {
+		return this.id;
+	}
+
 }

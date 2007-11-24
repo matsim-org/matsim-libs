@@ -53,23 +53,22 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.Plans;
 
-public class DistributedQueueSimulation extends QueueSimulation implements
-		DistributedSimulationRemoteI {
+public class DistributedQueueSimulation extends QueueSimulation implements DistributedSimulationRemoteI {
 
 	private Object simStepStart = new Object();
 	private Object simStepDone = new Object();
 	private int count = 0, accu = 0;
 	private static Map<Integer, Remote> partSims = new TreeMap<Integer, Remote>();
 	private static Map<Integer, String> partSimsIP = new TreeMap<Integer, String>();
-	private static ArrayList partitionTable = null;
+	private static ArrayList<Integer> partitionTable = null;
 	private static ArrayList<Process> processes = new ArrayList<Process>();
 
-	public DistributedQueueSimulation(QueueNetworkLayer network, Plans plans, Events events)throws RemoteException {
+	public DistributedQueueSimulation(QueueNetworkLayer network, Plans plans, Events events) {
 		super(network, plans, events);
 	}
 
-	public static void sendVehicle(int partID, String driverID, List actLegs) {
-		PartialSimulationRemoteI proc = (PartialSimulationRemoteI)partSims.get(partID);
+	public static void sendVehicle(int partId, String driverID, List actLegs) {
+		PartialSimulationRemoteI proc = (PartialSimulationRemoteI)partSims.get(partId);
 		try {
 			proc.createVehicle(driverID, actLegs);
 		} catch (RemoteException e) {
@@ -206,6 +205,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 		return living != 0 ;
 	}
 
+	@Override
 	protected void prepareSim()
 	{
 		if (events == null)  {
@@ -215,6 +215,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 		}
 	}
 
+	@Override
 	protected void cleanupSim()
 	{
 		if (myeventwriter != null )myeventwriter.reset(0);
@@ -224,9 +225,9 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 	class ProcHandler {
 		String procname;
 		Process proc;
-		
+
 	}
-	
+
 	/**
 	 * in arg[0] we find which shell to use e.g. "rsh" or "ssh"
 	 * in arg[1] we find the classpath to mobsim e.g. "e:/Development/workspace/matsimJ-HEAD/bin"
@@ -245,7 +246,8 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 	     Runtime run = Runtime.getRuntime();
 	     run.addShutdownHook( new Thread()
 	     {
-	    	 public void run()
+	    	 @Override
+				public void run()
 	    	 {
 	    		 System.out.println( "Program cancelled by Ctrl-C, flushing files!" );
 	    		 Date endtime = new Date();
@@ -279,11 +281,11 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 		String clientIPs = 	Gbl.getConfig().getParam(SIMULATION, CLIENTLIST);
 		String localConfig = Gbl.getConfig().getParam(SIMULATION, LOCALCONFIG);
 		String localDTD = Gbl.getConfig().getParam(SIMULATION, LOCALCONFIGDTD);
-		
+
 		StringTokenizer tokenizer = new StringTokenizer( clientIPs );
 
 		while ( tokenizer.hasMoreTokens() ) {
-			try { 
+			try {
 				String ipadress = tokenizer.nextToken();
 				DistributedQueueSimulation.partSimsIP.put(testRMI.count, ipadress);
 				String command =  shellpath + " " + ipadress + " java " + JavaVMOptions + " -classpath \"" + classpath + "\" org.matsim.demandmodeling.mobsim.distributed.PartialQueueSimulation ";
@@ -302,7 +304,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 
 //		// just FOR TESTING additionla partSim must be started by hand!
 //		testRMI.partSimsIP.put(testRMI.count, "192.168.35.73");
-//		testRMI.count++; 
+//		testRMI.count++;
 
 //		try {
 //			Thread.sleep(1000);
@@ -326,7 +328,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 		testRMI.waitSimStepDone();  // WAIT FOR Signal B: Network read
 
 		testRMI.prepareNetwork();
-		
+
 		testRMI.signalNextSimStep(); // RELEASE Signal B
 		testRMI.waitSimStepDone();  // WAIT FOR Signal C: Registered RMI links
 		System.out.println("wait in main" + testRMI.accu +" done by MainSim");
@@ -348,32 +350,33 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
 		testRMI.run();
 		Date endtime = new Date();
-		System.out.println("simulation Time: " + ((endtime.getTime() - testRMI.starttime.getTime())/1000));
-		System.out.println("simulation Time: " + Gbl.writeTime((int) ((endtime.getTime() - testRMI.starttime.getTime())/1000)));
+		System.out.println("simulation Time: " + ((endtime.getTime() - testRMI.starttime.getTime()) / 1000));
+		System.out.println("simulation Time: "
+				+ Gbl.writeTime((int) ((endtime.getTime() - testRMI.starttime.getTime()) / 1000)));
 
-        for (Object s : DistributedQueueSimulation.partSims.values()) {
-        	PartialSimulationRemoteI proc = (PartialSimulationRemoteI)s;
- 			System.out.println("destroying process: " + proc);
-        	try {
+		for (Object s : DistributedQueueSimulation.partSims.values()) {
+			PartialSimulationRemoteI proc = (PartialSimulationRemoteI) s;
+			System.out.println("destroying process: " + proc);
+			try {
 				proc.exit();
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
-         }
+		}
 
-        System.out.println("Simstep sending last nextsimstep done ");
+		System.out.println("Simstep sending last nextsimstep done ");
 		testRMI.signalNextSimStep();
-		testRMI.waitSimStepDone();  // WAIT FOR Signal B: Ready and WAITING for sim to start
+		testRMI.waitSimStepDone(); // WAIT FOR Signal B: Ready and WAITING for sim
+																// to start
 		System.out.println("Simstep done by MainSim");
 
 		testRMI.signalNextSimStep();
 		unregisterWithRMI("Dsim", testRMI);
-//		unregisterWithRMI("RLink4", link1);
+		// unregisterWithRMI("RLink4", link1);
 		try {
 			String[] liste = Naming.list("localhost");
 			for( String li : liste)
 			System.out.println("FORGOTTEN" + li);
-
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
@@ -382,13 +385,13 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 		if (haveCreatedRegistry) UnicastRemoteObject.unexportObject(reg, true);
 	}
 
-	synchronized public void incActivePartSims(int partID) throws RemoteException {
+	synchronized public void incActivePartSims(int partId) throws RemoteException {
 		try {
-			String rmilookup = "rmi://" + partSimsIP.get(partID) + ":/PSim"+ partID;
+			String rmilookup = "rmi://" + partSimsIP.get(partId) + ":/PSim"+ partId;
 			Remote server = Naming.lookup(rmilookup);
 			System.out.println("added "+rmilookup + "done by MainSim" +server + partSims.size());
-			System.out.println("added "+partID + "done by MainSim" + partSims.size());
-			partSims.put(partID, server); //TODO DS Something more useful as Object!
+			System.out.println("added "+partId + "done by MainSim" + partSims.size());
+			partSims.put(partId, server); //TODO DS Something more useful as Object!
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (RemoteException e) {
@@ -398,17 +401,16 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 		}
 	}
 
-	synchronized public void decActivePartSims(int partID) throws RemoteException {
-		System.out.println("remove "+partID + "done by MainSim" + partSims.size());
-		partSims.remove(partID);
+	synchronized public void decActivePartSims(int partId) throws RemoteException {
+		System.out.println("remove "+partId + "done by MainSim" + partSims.size());
+		partSims.remove(partId);
 	}
 
 	public void add(Vehicle veh) throws RemoteException {
 		// TODO Auto-generated method stub
-		
 	}
 
-	public Map getPartIDIP() throws RemoteException {
+	public Map<Integer, String> getPartIDIP() throws RemoteException {
 		return partSimsIP;
 	}
 
@@ -421,6 +423,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 		return (int)SimulationTimer.getSimStartTime();
 	}
 
+	@Override
 	protected void prepareNetwork() {
 		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		network = (QueueNetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
@@ -434,7 +437,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 		network.beforeSim();
 	}
 
-	public ArrayList getPartitionTable() throws RemoteException {
+	public ArrayList<Integer> getPartitionTable() throws RemoteException {
 		return partitionTable;
 	}
 
@@ -448,39 +451,39 @@ public class DistributedQueueSimulation extends QueueSimulation implements
 		// process event as usual
 		events.processEvent(event);
 	}
-	
+
 	private LinkedList<BasicEvent> pendingEvents = new LinkedList<BasicEvent>();
 	private int lastTimes[] = new int[512];
 	// Note: returns true if all lastTimes are equal, OR if only one partition is there
-	private boolean checkForEqualLastTimes() 
+	private boolean checkForEqualLastTimes()
 	{
 		for(int i= 0; i < partSims.size()-1 ; i++) {
-			if (lastTimes[i] != lastTimes[i+1])return false; 
+			if (lastTimes[i] != lastTimes[i+1])return false;
 		}
 		return true;
 	}
-	
+
 	synchronized public void addEventList(LinkedList<BasicEvent> eventlist, int lastTime, int partID) throws RemoteException {
 		BasicEvent event = null;
 
 		// Sort all event into pendingEvents List. Update lastTime[partID]
 		ListIterator<BasicEvent> newIt = eventlist.listIterator(eventlist.size());
 		ListIterator<BasicEvent> oldIt = pendingEvents.listIterator(pendingEvents.size());
-		
+
 		while (newIt.hasPrevious()) {
 			event = newIt.previous();
 			while (oldIt.hasPrevious() && oldIt.previous().time > event.time);
 			oldIt.add (event);
 		}
 		lastTimes[partID] = lastTime;
-		
+
 		// every time, all lastTimes have catched up it is safe to dump the whole
 		// eventslist
 //		int size1 = pendingEvents.size();
 		boolean hasEqualLastTimes = checkForEqualLastTimes();
 		if (hasEqualLastTimes ){
 			oldIt = pendingEvents.listIterator();
-			while (oldIt.hasNext()) 
+			while (oldIt.hasNext())
 			{
 				event = oldIt.next();
 //				if (event.time <= minLastTime)

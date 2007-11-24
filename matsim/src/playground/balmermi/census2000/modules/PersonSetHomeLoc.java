@@ -31,8 +31,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.misc.QuadTree;
-import org.matsim.world.Coord;
-import org.matsim.world.Location;
+import org.matsim.utils.geometry.shared.Coord;
 
 import playground.balmermi.census2000.data.Persons;
 
@@ -48,7 +47,7 @@ public class PersonSetHomeLoc extends PersonAlgorithm implements PlanAlgorithmI 
 	private final Facilities facilities;
 	private final Persons persons;
 	private QuadTree<Facility> homeFacQuadTree = null;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -73,9 +72,7 @@ public class PersonSetHomeLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		Iterator<Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(HOME) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
@@ -89,9 +86,7 @@ public class PersonSetHomeLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.homeFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(HOME) != null) {
 				this.homeFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
@@ -104,8 +99,9 @@ public class PersonSetHomeLoc extends PersonAlgorithm implements PlanAlgorithmI 
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
-		Integer p_id = Integer.parseInt(person.getId().toString());
+		Integer p_id = Integer.valueOf(person.getId().toString());
 		Coord coord = persons.getPerson(p_id).getHousehold().getCoord();
 		Facility f = this.homeFacQuadTree.get(coord.getX(),coord.getY());
 		Plan plan = person.getSelectedPlan();
@@ -113,8 +109,8 @@ public class PersonSetHomeLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		while (act_it.hasNext()) {
 			Act act = (Act)act_it.next();
 			if (H.equals(act.getType())) {
-				act.setCoord((Coord)f.getCenter());
-			} 
+				act.setCoord(f.getCenter());
+			}
 		}
 	}
 

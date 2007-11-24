@@ -24,11 +24,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.Iterator;
 
+import org.matsim.utils.vis.netvis.DisplayableLinkI;
+import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.NetJComponent;
-import org.matsim.utils.vis.netvis.visNet.DisplayAgent;
 import org.matsim.utils.vis.netvis.visNet.DisplayLink;
 import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 
@@ -67,9 +67,7 @@ public class LinkSetRendererTRANSIMS extends RendererA {
 
         display.setStroke(new BasicStroke(Math.round(0.05 * this.laneWidth)));
 
-        for (Iterator it = this.network.getLinks().iterator(); it.hasNext();) {
-            DisplayLink link = (DisplayLink) it.next();
-
+        for (DisplayableLinkI link : network.getLinks().values()) {
             if (!comp.checkLineInClip(link.getStartEasting(), link
                     .getStartNorthing(), link.getEndEasting(), link
                     .getEndNorthing())) {
@@ -120,10 +118,7 @@ public class LinkSetRendererTRANSIMS extends RendererA {
             }
 
             if (link.getMovingAgents() != null && drawAgents)
-                for (Iterator agentIt = link.getMovingAgents().iterator(); agentIt
-                        .hasNext();) {
-
-                    DisplayAgent agent = (DisplayAgent) agentIt.next();
+            	for (DrawableAgentI agent : link.getMovingAgents()) {
 
                     final int lane =  agent.getLane();
 

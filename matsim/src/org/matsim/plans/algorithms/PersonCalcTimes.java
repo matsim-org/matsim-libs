@@ -57,7 +57,8 @@ public class PersonCalcTimes extends PersonAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-  public void run(Person person) {
+  @Override
+	public void run(Person person) {
 		List plans = person.getPlans();
 		for (int i=0; i<plans.size(); i++) {
 			Plan plan = (Plan)plans.get(i);

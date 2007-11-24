@@ -29,8 +29,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.networks.basicNet.BasicNodeSetI;
 import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -38,23 +38,19 @@ import org.matsim.utils.identifiers.IdI;
 
 public class MetisExeWrapper {
 
-	public static ArrayList<Integer> decomposeNetwork (NetworkLayer network, int parts, String networkID) throws IOException
-	{
+	public static ArrayList<Integer> decomposeNetwork (QueueNetworkLayer network, int parts, String networkID) throws IOException {
 		if (parts > 1) {
 			writeNetworkToFile(network, networkID);
 			callMetisExe(networkID, parts);
 			return readPartitionInfoFromFile(network, networkID, parts);
 		}
-
 		return null;
 	}
-	public static ArrayList<Integer> readPartitionInfoFromFile(NetworkLayer network, String myID, int parts) throws IOException {
+
+	public static ArrayList<Integer> readPartitionInfoFromFile(QueueNetworkLayer network, String myID, int parts) throws IOException {
 		int count = 1;
 		TreeMap<Integer, IdI> IDToInt = new TreeMap<Integer, IdI>();
-		BasicNodeSetI nodes = network.getNodes();
-		// make up a mapping of node IDs to their position in the array, but this time the other way round
-		for (Object key : nodes) {
-			Node node = (Node)key;
+		for (Node node : network.getNodes().values()) {
 			IDToInt.put(count++, node.getId());
 		}
 
@@ -66,10 +62,10 @@ public class MetisExeWrapper {
 			in = new BufferedReader( new FileReader(filename));
 			for (String s; (s = in.readLine()) != null; ) {
 				int partition = Integer.parseInt(s);
-				QueueNode node = (QueueNode)nodes.get(IDToInt.get(count));
+				QueueNode node = (QueueNode)network.getNode(IDToInt.get(count).toString());
 				//System.out.println("METIS mapped node: " + IDToInt.get(count).toString() + " to partition " + partition);
 				// Set nodes Partition info
-				node.setPartitionID(partition);
+				node.setPartitionId(partition);
 				test.add(partition);
 				count++;
 			}
@@ -81,11 +77,10 @@ public class MetisExeWrapper {
 		count = 0;
 		int linkcount = 0;
 		int fromID = 0, toID = 0;
-		for (Object iter : network.getLinks()) {
-			QueueLink link = (QueueLink)iter;
+		for (QueueLink link : network.getLinks().values()) {
 			linkcount++;
-			fromID = ((QueueNode)link.getFromNode()).getPartitionID();
-			toID = ((QueueNode)link.getToNode()).getPartitionID();
+			fromID = ((QueueNode)link.getFromNode()).getPartitionId();
+			toID = ((QueueNode)link.getToNode()).getPartitionId();
 
 			if (fromID != toID) {
 				count++;
@@ -103,7 +98,7 @@ public class MetisExeWrapper {
 		try {
 			in = new BufferedReader( new InputStreamReader(p.getInputStream()) );
 			for (String s; (s = in.readLine()) != null; ) System.out.println( s );
-	
+
 			try {
 				p.waitFor();
 			} catch (InterruptedException e) {
@@ -123,30 +118,25 @@ public class MetisExeWrapper {
 		BufferedWriter out = null;
 		try {
 			out = new BufferedWriter(new FileWriter("MetiscompatibleGraph"+myID+".txt"));
-	
-			BasicNodeSetI nodes = network.getNodes();
+
 			// write node, link count in first row
-			out.write(" " + nodes.size() + " " + network.getLocations().size() + "\n");
-	
+			out.write(" " + network.getNodes().size() + " " + network.getLocations().size() + "\n");
+
 			int count = 1;
 			// make up a mapping of node IDs to their position in the array
-			for (Object key : nodes) {
-				Node node = (Node)key;
+			for (Node node : network.getNodes().values()) {
 				IDToInt.put(node.getId(), count++);
 			}
-	
+
 			// Save every node with all its connected nodes
-			for (Object key : nodes) {
-				Node node = (Node)key;
+			for (Node node : network.getNodes().values()) {
 				// save all incoming nodes
-				for (Object key2 : node.getInNodes()) {
-					Node node2 = (Node)key2;
+				for (Node node2 : node.getInNodes().values()) {
 					int nodeCount = IDToInt.get(node2.getId());
 					out.write(" " + nodeCount);
 				}
 				// write outgoing nodes
-				for (Object key2 : node.getOutNodes()) {
-					Node node2 = (Node)key2;
+				for (Node node2 : node.getOutNodes().values()) {
 					int nodeCount = IDToInt.get(node2.getId());
 					out.write(" " + nodeCount);
 				}

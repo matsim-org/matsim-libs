@@ -50,7 +50,7 @@ public class RandomSocialNetwork extends SocialNetwork {
 	kbar = Integer.parseInt(Gbl.getConfig().socnetmodule().getSocNetKbar());
 	System.out.println(" Links the Persons together in UNDIRECTED Erd�s/R�nyi random graph. Dorogovtsev and Mendes 2003.");
 	personList = plans.getPersons().values().toArray();
-	numPersons = (int) personList.length;
+	numPersons = personList.length;
 	numLinks = (int) ((kbar * numPersons) / 2.);
 
 	System.out.println(" kbar, numPersons, numLinks approximately= [" + kbar + ", " + numPersons + ", " + numLinks

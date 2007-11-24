@@ -111,7 +111,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 
 	public void reset(final int iteration) {
 		this.eventLinks.clear();
-		for (Link link : (Iterable<Link>) this.network.getLinks()) {
+		for (Link link : this.network.getLinks().values()) {
 			this.eventLinks.put(link.getId().toString(), new EventLink(link, this.capCorrectionFactor));
 		}
 		this.eventAgents.clear();

@@ -26,7 +26,7 @@ import org.matsim.network.Node;
 
 public class NetworkUtils {
 
-	public static double[] getBoundingBox(Collection<Node> nodes) {
+	public static double[] getBoundingBox(Collection<? extends Node> nodes) {
 		double[] bBox = new double[4];
 		bBox[0] = Double.MIN_VALUE;
 		bBox[1] = Double.MAX_VALUE;

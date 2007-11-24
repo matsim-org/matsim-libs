@@ -24,17 +24,16 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.net.URL;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.vis.netvis.DisplayableLinkI;
+import org.matsim.utils.vis.netvis.DisplayableNetI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.ControlToolbar;
 import org.matsim.utils.vis.netvis.gui.NetJComponent;
@@ -44,9 +43,7 @@ import org.matsim.utils.vis.netvis.visNet.DisplayAgent;
 import org.matsim.utils.vis.netvis.visNet.DisplayLink;
 import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 
-import sun.awt.image.ToolkitImage;
-
-public class LinkSetRendererVehiclesOnly<NET extends DisplayNet> extends RendererA {
+public class LinkSetRendererVehiclesOnly<NET extends DisplayableNetI> extends RendererA {
 
 	private final boolean RANDOMIZE_LANES = false;
 
@@ -55,8 +52,6 @@ public class LinkSetRendererVehiclesOnly<NET extends DisplayNet> extends Rendere
 	private final ValueColorizer colorizer = new ValueColorizer();
 
 	private final NET network;
-
-	private Image agentPic = null;
 
 	private double laneWidth;
 
@@ -69,23 +64,7 @@ public class LinkSetRendererVehiclesOnly<NET extends DisplayNet> extends Rendere
 		super(visConfig);
 		this.network =  network;
 		this.isOTF = (network instanceof OTFVisNet);
-
-		URL url = null;
-		try {
-			url = this.getClass().getClassLoader().getResource(
-					visConfig.get(VisConfig.AGENT_GIF_FILE));
-
-			if (url != null)
-				this.agentPic = Toolkit.getDefaultToolkit().getImage(url);
-			else
-				this.agentPic = Toolkit.getDefaultToolkit().createImage(
-						visConfig.get(VisConfig.AGENT_GIF_FILE));
-
-		} catch (NullPointerException e) {
-		}
-
-		this.laneWidth = DisplayLink.LANE_WIDTH
-		* visConfig.getLinkWidthFactor();
+		this.laneWidth = DisplayLink.LANE_WIDTH * visConfig.getLinkWidthFactor();
 	}
 
 	private boolean redrawLanes = false;
@@ -102,12 +81,6 @@ public class LinkSetRendererVehiclesOnly<NET extends DisplayNet> extends Rendere
 		target.paint(imdisplay);
 
 		return image;
-	}
-
-	@Override
-	public void setTargetComponent(NetJComponent comp) {
-		super.setTargetComponent(comp);
-		comp.prepareImage(agentPic, comp);
 	}
 
 	// -------------------- RENDERING --------------------
@@ -158,7 +131,7 @@ public class LinkSetRendererVehiclesOnly<NET extends DisplayNet> extends Rendere
 		if (isOTF) {
 			it = ((OTFVisNet)network).getLinks().iterator();
 		} else  {
-			it = ((DisplayNet)network).getLinks().iterator();
+			it = ((DisplayNet)network).getLinks().values().iterator();
 		}
 
 		for (; it.hasNext();)
@@ -253,10 +226,10 @@ public class LinkSetRendererVehiclesOnly<NET extends DisplayNet> extends Rendere
 			display.setTransform(originalTransform);
 
 			Iterator it = null;
-			if (network instanceof DisplayNet) {
-				it = ((DisplayNet)network).getLinks().iterator();
-			} else if (network instanceof OTFVisNet) {
+			if (isOTF) {
 				it = ((OTFVisNet)network).getLinks().iterator();
+			} else  {
+				it = ((DisplayNet)network).getLinks().values().iterator();
 			}
 
 			for (; it.hasNext();) {
@@ -328,14 +301,7 @@ public class LinkSetRendererVehiclesOnly<NET extends DisplayNet> extends Rendere
 						 } else {
 							 display.setColor(colorizer.getColor(0.1 + 0.9*link.getDisplayValue(0)));
 						 }
-						 if (agentPic != null
-		                            && ((ToolkitImage) agentPic).hasError() != true) {
-		                        display.drawImage(agentPic, (int)x, y, (int)Math
-		                                .round(agentLength), (int)Math.round(agentWidth),
-		                                getNetJComponent());
-		                    } else
-						 display.fillOval((int)Math.round(x + offsetX), y, (int)Math.round(agentLength),
-								 (int)Math.round(agentWidth));
+						 display.fillOval((int)Math.round(x + offsetX), y, (int)Math.round(agentLength), (int)Math.round(agentWidth));
 
 							if (isOTF && ((OTFVisNet)network).selectedAgents.contains(((OTFVisNet.DisplayAgent)agent).id)) {
 								// Also: Draw a circle around the selected agent

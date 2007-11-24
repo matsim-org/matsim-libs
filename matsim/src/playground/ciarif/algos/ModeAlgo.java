@@ -46,6 +46,7 @@ public class ModeAlgo extends PersonAlgorithm{
 	//////////////////////////////////////////////////////////////////////
 
   
+	@Override
 	public void run(Person person) {
 		
 		double rd = Gbl.random.nextDouble();
@@ -55,7 +56,7 @@ public class ModeAlgo extends PersonAlgorithm{
 		for (int i=1; i<acts_legs.size()-1; i=i+2) {
 			Leg leg = (Leg)acts_legs.get(i);
 			if (rd<0.5){
-				((Leg)leg).setMode("train");
+				(leg).setMode("train");
 			}
 		}
 	}

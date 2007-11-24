@@ -38,7 +38,7 @@ import org.matsim.plans.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.misc.QuadTree;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalculator{
 
@@ -82,7 +82,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		// much faster than it is at the moment. remove?
 		ArrayList<PtNode> nearestNodes = new ArrayList<PtNode>();
 		double shortestDistance = Double.MAX_VALUE;
-		for (Iterator it = this.nodes.iterator(); it.hasNext(); ) {
+		for (Iterator it = this.nodes.values().iterator(); it.hasNext(); ) {
 			PtNode node = (PtNode)it.next();
 			if (PEDESTRIAN_TYPE.equals(node.getType())) {
 				double distance = node.getCoord().calcDistance(coord);
@@ -140,19 +140,19 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 
 	public ArrayList<PtNode> getDeadEnds(){
 		ArrayList<PtNode> deads= new ArrayList<PtNode>();
-		for (Iterator it = this.nodes.iterator();it.hasNext();){
+		for (Iterator it = this.nodes.values().iterator();it.hasNext();){
 			PtNode node = (PtNode) it.next();
 			if(PEDESTRIAN_TYPE.equals(node.getType())) {
 				int totalin=0;
 				int totalout=0;
-				for(Iterator it2 = node.getOutLinks().iterator();it2.hasNext();){
+				for(Iterator it2 = node.getOutLinks().values().iterator();it2.hasNext();){
 					PtLink link = (PtLink)it2.next();
 					PtNode node2 = (PtNode) link.getToNode();
 					totalin+=(node2.getInLinks().size()-1);
 					totalout+=(node2.getOutLinks().size()-1);
 				}
 				if((totalout==0)||(totalin==0)){
-					for(Iterator it2 = node.getOutLinks().iterator();it2.hasNext();){
+					for(Iterator it2 = node.getOutLinks().values().iterator();it2.hasNext();){
 						PtLink link = (PtLink)it2.next();
 						PtNode node2 = (PtNode) link.getToNode();
 						System.out.println("found dead end in node: "+node2.getId());
@@ -181,14 +181,14 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 				// node must be pedestrian node (Haltebereich) with only one Hp attached
 				while (!branchDone) {
 					// searach for the next (only one) non-pedNode which is linked to act
-					for (Iterator it = act.getOutLinks().iterator(); it.hasNext(); ) {
+					for (Iterator it = act.getOutLinks().values().iterator(); it.hasNext(); ) {
 						PtLink link = (PtLink)it.next();
 						if(link.getType()==null){
 							nxt=(PtNode)link.getToNode();
 						}
 					}
 
-					for(Iterator it = nxt.getOutLinks().iterator();it.hasNext();){
+					for(Iterator it = nxt.getOutLinks().values().iterator();it.hasNext();){
 						PtLink link = (PtLink)it.next();
 						if(PEDESTRIAN_TYPE.equals(link.getType())){
 							PtNode nxtPed = (PtNode) link.getToNode();
@@ -210,14 +210,14 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 				handled = true;
 			} else if(node.getInLinks().size()==2) {
 				while (!branchDone) {
-					for(Iterator it = act.getInLinks().iterator();it.hasNext();){
+					for(Iterator it = act.getInLinks().values().iterator();it.hasNext();){
 						PtLink link = (PtLink)it.next();
 						if (link.getType()==null) {
 							nxt=(PtNode)link.getFromNode();
 						}
 					}
 
-					for (Iterator it = nxt.getOutLinks().iterator();it.hasNext();) {
+					for (Iterator it = nxt.getOutLinks().values().iterator();it.hasNext();) {
 						PtLink link = (PtLink)it.next();
 						if(PEDESTRIAN_TYPE.equals(link.getType())){
 							PtNode nxtPed = (PtNode) link.getToNode();
@@ -267,7 +267,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 			/* okay, now we have to re-initialize all nodes, as our counter will
 			 * "wrap around" and we could no longer be sure the counter-values are
 			 * unique.         */
-			for (Iterator it2 = this.nodes.iterator(); it2.hasNext();) {
+			for (Iterator it2 = this.nodes.values().iterator(); it2.hasNext();) {
 				PtNode node = (PtNode) it2.next();
 				node.dijkstraCounter = Long.MIN_VALUE;
 			}
@@ -285,7 +285,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 //			in the following departure nodes are already expanded
 //			touched links have changecost, those must not be considered
 
-			for (Iterator it4 = actNode.getOutLinks().iterator(); it4.hasNext();) {
+			for (Iterator it4 = actNode.getOutLinks().values().iterator(); it4.hasNext();) {
 				PtLink link = (PtLink) it4.next();
 				PtNode node = (PtNode) link.getToNode();
 				int linktime = link.getDynTTime(actNode.actTime);
@@ -317,7 +317,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 			PtNode actNode = pending.first();
 			pending.remove(actNode);
 
-			for (Iterator it2 = actNode.getOutLinks().iterator(); it2.hasNext();) {
+			for (Iterator it2 = actNode.getOutLinks().values().iterator(); it2.hasNext();) {
 				PtLink link = (PtLink) it2.next();
 				PtNode node = (PtNode) link.getToNode();
 				int linktime = link.getDynTTime(actNode.actTime);
@@ -392,7 +392,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 
 			SortedSet<PtNode> pending = new TreeSet<PtNode>(new PtNodeCostComparator());
 
-			for (Iterator it2 = this.nodes.iterator();it2.hasNext();){
+			for (Iterator it2 = this.nodes.values().iterator();it2.hasNext();){
 				PtNode node =(PtNode)it2.next();
 				node.actCost=Integer.MAX_VALUE;
 				node.actTime=Integer.MAX_VALUE;
@@ -410,7 +410,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 				PtNode actNode = pending.first();
 				pending.remove(actNode);
 
-				for(Iterator it2 = actNode.getOutLinks().iterator();it2.hasNext();){
+				for(Iterator it2 = actNode.getOutLinks().values().iterator();it2.hasNext();){
 					PtLink link = (PtLink) it2.next();
 					PtNode node = (PtNode)link.getToNode();
 					int linktime = link.getDynTTime(actNode.actTime);
@@ -481,7 +481,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		if(route.getRoute()!=null){
 			ArrayList<Node> routeNodes = route.getRoute();
 			for(int i=0; i<(routeNodes.size()-1);i++){
-				for(Iterator it = routeNodes.get(i).getOutLinks().iterator();it.hasNext();){
+				for(Iterator it = routeNodes.get(i).getOutLinks().values().iterator();it.hasNext();){
 					Link link = (Link)it.next();
 					if(link.getToNode().equals(routeNodes.get(i+1))){
 						link.setLanes(5);
@@ -525,9 +525,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		Iterator n_it = this.nodes.iterator();
-		while (n_it.hasNext()) {
-			Node n = (Node)n_it.next();
+		for (Node n : this.nodes.values()) {
 			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
 			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
 			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
@@ -539,7 +537,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		maxy += 1.0;
 		System.out.println("building quad tree: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.pedNodeQuadTree = new QuadTree<PtNode>(minx, miny, maxx, maxy);
-		n_it = this.nodes.iterator();
+		Iterator<Node> n_it = this.nodes.values().iterator();
 		while (n_it.hasNext()) {
 			PtNode n = (PtNode)n_it.next();
 			if (PEDESTRIAN_TYPE.equals(n.getType())) {

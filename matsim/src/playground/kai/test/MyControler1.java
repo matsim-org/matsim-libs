@@ -49,25 +49,25 @@ import org.matsim.gbl.Gbl;
 
 
 public class MyControler1 extends Controler {
-		
+
 	public static void main(final String[] args) {
-		
+
 		if ( args.length==0 ) {
-//			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});	
-			Gbl.createConfig(new String[] {"./test/shared/roundabout/configs/config.xml"});	
+//			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});
+			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
 		} else {
 			Gbl.createConfig(args) ;
 		}
-				
+
 		final MyControler1 controler = new MyControler1();
 		controler.setOverwriteFiles(true) ;
-		
+
 		controler.run(null);
-		
-//		// Visulize
+
+//		// Visualize
 //		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
 //		NetVis.main(visargs);
 
-	}	
+	}
 
 }

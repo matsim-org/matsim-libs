@@ -52,7 +52,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.WorldUtils;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 

@@ -37,8 +37,9 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.misc.QuadTree;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
+import org.matsim.world.Location;
 
 public class PlansKnowledgeCreator extends PlansAlgorithm {
 
@@ -76,9 +77,11 @@ public class PlansKnowledgeCreator extends PlansAlgorithm {
 
 	void buildQuatrees(){
 		System.out.println("  computing the bounding box");
+		Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+
 		Layer facLayer = Gbl.getWorld().getLayer( "facility" );
 		if( facLayer == null )
-			facLayer = Facilities.getSingleton().getAggregationLayer();
+			facLayer = facilities.getAggregationLayer();
 		GetLayerBoundingBox glbb = new GetLayerBoundingBox( facLayer );
 		Gbl.getWorld().addAlgorithm(glbb);
 		Gbl.getWorld().runAlgorithms();
@@ -88,18 +91,11 @@ public class PlansKnowledgeCreator extends PlansAlgorithm {
 
 		System.out.println(" building the quadtrees");
 
-		Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
-
-		Layer aggLayer = facilities.getAggregationLayer();
-		if( aggLayer == null ){
-			System.out.println("No aggregation layer for facilities -> mapping to network");
-			aggLayer = Gbl.getWorld().getBottomLayer();
-			facilities.setAggregationLayer(aggLayer.getName());
-		}
 
 		// We create one quadtree for each activity type
 
-		for( Facility facility : facilities.getFacilities().values() ){
+		for (Location location : facilities.getLocations().values() ){
+			Facility facility = (Facility) location;
 			CoordI coord = facility.getCenter();
 			for( String act_type : facility.getActivities().keySet() ){
 				QuadTree<Facility> quad = quadtrees.get( act_type );

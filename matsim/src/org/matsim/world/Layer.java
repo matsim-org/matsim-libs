@@ -60,7 +60,7 @@ public abstract class Layer {
 		this.type = type;
 		this.name = name;
 	}
-	
+
 	protected Layer(final String type, final String name) {
 		this(new Id(type),name);
 	}
@@ -82,7 +82,7 @@ public abstract class Layer {
 		}
 		this.down_rule = down_rule;
 	}
-	
+
 	public final void setName(final String name) {
 		this.name = name;
 	}
@@ -90,17 +90,17 @@ public abstract class Layer {
 	//////////////////////////////////////////////////////////////////////
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	protected final boolean removeUpRule() {
 		if (this.up_rule == null) { return true; }
 		if (this.up_rule.getUpLayer().down_rule == null) { Gbl.errorMsg("This should never happen!"); }
-		
+
 		Iterator<Location> l_it = this.locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllUpMappings(); }
 
 		l_it = this.up_rule.getUpLayer().locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllDownMappings(); }
-		
+
 		this.up_rule.getUpLayer().down_rule = null;
 		this.up_rule = null;
 		return true;
@@ -109,13 +109,13 @@ public abstract class Layer {
 	protected final boolean removeDownRule() {
 		if (this.down_rule == null) { return true; }
 		if (this.down_rule.getDownLayer().up_rule == null) { Gbl.errorMsg("This should never happen!"); }
-		
+
 		Iterator<Location> l_it = this.locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllDownMappings(); }
 
 		l_it = this.down_rule.getDownLayer().locations.values().iterator();
 		while (l_it.hasNext()) { l_it.next().removeAllUpMappings(); }
-		
+
 		this.down_rule.getDownLayer().up_rule = null;
 		this.up_rule = null;
 		return true;
@@ -178,7 +178,7 @@ public abstract class Layer {
 		return locs;
 	}
 
-	public final TreeMap<IdI,Location> getLocations() {
+	public final TreeMap<IdI, ? extends Location> getLocations() {
 		return this.locations;
 	}
 

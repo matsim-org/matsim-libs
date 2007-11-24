@@ -21,7 +21,6 @@
 package org.matsim.withinday.trafficmanagement;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -112,9 +111,7 @@ public class VDSSign {
 		if ((disValue < -1 * this.deadZoneSystemOutput) || (disValue > this.deadZoneSystemOutput)) {
 			return disValue;
 		}
-		else {
-			return 0;
-		}
+		return 0;
 	}
 
 	public void calculateOutput(final double time) {
@@ -292,7 +289,7 @@ public class VDSSign {
 	private List<Node> calculateInLinks(final Link signLink,
 			final Node firstRouteNode) {
 		List<Node> ret = new LinkedList<Node>();
-		for (Link l : (Collection<Link>) firstRouteNode.getInLinks()) {
+		for (Link l : firstRouteNode.getInLinks().values()) {
 			if (l.getFromNode().equals(signLink.getToNode())) {
 				ret.add(l.getFromNode());
 			}
@@ -310,8 +307,7 @@ public class VDSSign {
 		if (destLink.getFromNode().equals(lastRouteNode)) {
 			return ret;
 		}
-		for (Link l : (Collection<Link>) this.directionLink.getFromNode()
-				.getInLinks()) {
+		for (Link l : this.directionLink.getFromNode().getInLinks().values()) {
 			if (l.getFromNode().equals(lastRouteNode)) {
 				ret.add(l.getToNode());
 			}
@@ -384,8 +380,8 @@ public class VDSSign {
 	}
 
 	/**
-	 * @param deadZoneIn
-	 *          the deadZoneIn to set
+	 * @param deadZone
+	 *          the deadZone to set
 	 */
 	public void setDeadZoneSystemOutput(final double deadZone) {
 		this.deadZoneSystemOutput = deadZone;
@@ -417,7 +413,7 @@ public class VDSSign {
 		this.directionLink = link;
 	}
 
-	public void setUpdateTime(final Integer time) {
+	public void setUpdateTime(final int time) {
 		this.messageHoldTime = time;
 	}
 

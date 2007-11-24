@@ -44,10 +44,11 @@ import playground.jhackney.socialnet.SocialNetwork;
  * Better: Persons visiting same facility in time window with minimum duration.
  * Better: Persons visiting same facility in time window with min duration and min frequency
  * (this is a history we don't have)
- *  
+ *
  * @author J. Hackney
  * @deprecated
  */
+@Deprecated
 public class SpatialInteractor {
 
     SocialNetwork net;
@@ -73,7 +74,7 @@ public class SpatialInteractor {
      * Evidently one has to re-scale the weights to 1.0 AFTER knowing WHICH facilities a
      * particular person has visited ... ?
      * @author jhackney
-     *  
+     *
      */
     public void interact(Plans plans, String[] facTypes, double[] facFractions, int iteration) {
 	// TODO make this faster by pre-picking which agents meet in which facilities,
@@ -98,7 +99,7 @@ public class SpatialInteractor {
 	    }
 	}
     }
-    
+
     private void personsMeetFaceToFace(TreeMap<Integer, ArrayList<Person>> locationVisitTable, int iteration, double d, String facType) {
 	// TODO Auto-generated method stub
 	System.out.println("  "+pct_interacting+" fraction of the following people per facility will have a chance to initiate an interaction.");
@@ -124,7 +125,7 @@ public class SpatialInteractor {
 	    // should call the network generator to modify them.
 	    generateLinks1(personsAtLocation, iteration, d);
 	}
-	System.out.println(" Clearing \"Visited\" table of facility type " + facType);	
+	System.out.println(" Clearing \"Visited\" table of facility type " + facType);
     }
 
     private TreeMap<Integer, ArrayList<Person>> whoVisitedWhere(String facType, Plans plans) {
@@ -134,7 +135,7 @@ public class SpatialInteractor {
 
 	persons = peeple.toArray();
 
-	int numIter = (int) (persons.length);
+	int numIter = persons.length;
 	for (int i = 0; i < numIter; i++) {
 	    Person p1 = (Person) persons[i];
 	    ArrayList<Link> allf1 = pff.personGetVisitedLocations(p1, facType);

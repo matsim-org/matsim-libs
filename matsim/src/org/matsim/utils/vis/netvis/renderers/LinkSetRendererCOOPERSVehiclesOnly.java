@@ -29,12 +29,12 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.util.Iterator;
 
+import org.matsim.utils.vis.netvis.DisplayableLinkI;
+import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.ControlToolbar;
 import org.matsim.utils.vis.netvis.gui.NetJComponent;
-import org.matsim.utils.vis.netvis.visNet.DisplayAgent;
 import org.matsim.utils.vis.netvis.visNet.DisplayLink;
 import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 
@@ -85,13 +85,8 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 
 		NetJComponent comp = getNetJComponent();
 		AffineTransform originalTransform = display.getTransform();
-		
-		Iterator it = null;
-		it = network.getLinks().iterator();
 
-		for (; it.hasNext();) 
-		{
-			DisplayLink link = (DisplayLink) it.next();
+		for (DisplayableLinkI link : network.getLinks().values()) {
 
 			if (!comp.checkLineInClip(link.getStartEasting(), link
 					.getStartNorthing(), link.getEndEasting(), link
@@ -102,11 +97,11 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 			if (link.getStartEasting() == link.getEndEasting()
 					&& link.getStartNorthing() == link.getEndNorthing())
 				continue;
-			
+
 			AffineTransform linkTransform = new AffineTransform(
 			originalTransform);
 			linkTransform.concatenate(boxTransform);
-			
+
 			display.setTransform(linkTransform);
 			Polygon poly = new Polygon();
 	        double dy = link.getEndEasting() - link.getStartEasting();
@@ -152,12 +147,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 			display.drawImage(image, null, 0, 0);
 			display.setTransform(originalTransform);
 
-			Iterator it = null;
-			it = network.getLinks().iterator();
-
-			for (; it.hasNext();) {
-				DisplayLink link = (DisplayLink) it.next();
-
+			for (DisplayableLinkI link : network.getLinks().values()) {
 				if (!comp.checkLineInClip(link.getStartEasting(), link
 						.getStartNorthing(), link.getEndEasting(), link
 						.getEndNorthing())) {
@@ -178,7 +168,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 				final int lanes = link.getLanes();
 				/*
 				 * (2) RENDER VEHICLES
-				 * 
+				 *
 				 * IMPORTANT: If you modify this, ensure proper rendering of angents
 				 * on multi-lane links!
 				 */
@@ -187,10 +177,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 				 final double agentLength = agentWidth*1.2;
 
 				 if (link.getMovingAgents() != null && drawAgents)
-					 for (Iterator agentIt = link.getMovingAgents().iterator(); agentIt
-					 .hasNext();) {
-
-						 DisplayAgent agent = (DisplayAgent) agentIt.next();
+					 for (DrawableAgentI agent : link.getMovingAgents()) {
 
 						 final int lane = (RANDOMIZE_LANES ? (agent.hashCode()
 								 % lanes + 1) : agent.getLane());
@@ -209,7 +196,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 						 }
 						 display.fillOval((int)Math.round(x + offsetX), y, (int)Math.round(agentLength),
 								 (int)Math.round(agentWidth));
-						 
+
 					 }
 			}
 		}

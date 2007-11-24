@@ -35,7 +35,6 @@ import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
-import org.matsim.world.ZoneLayer;
 
 /**
  * Associates household income information to persons, based on the average income
@@ -52,7 +51,7 @@ public class Income2000Generator {
 
 	public Income2000Generator(World world,
 			TreeMap<IdI, MunicipalityInformation> mInfo) {
-		TreeMap<IdI, Location> locations = ((ZoneLayer) world.getLayer("municipality")).getLocations();
+		TreeMap<IdI, ? extends Location> locations = world.getLayer("municipality").getLocations();
 		this.municipalityInfo = new TreeMap<IdI, MunicipalityInformation>();
 		this.municipalities = new ArrayList<Zone>();
 		// Remove those entries that contain invalid income 2000 information

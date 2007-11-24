@@ -22,7 +22,7 @@ package playground.fabrice.primloc;
 
 /**
  * Solves primary location choice with capacity constraints.
- * The method is described in : F. Marchal (2005), "A trip generation method for time-dependent 
+ * The method is described in : F. Marchal (2005), "A trip generation method for time-dependent
  * large-scale simulations of transport and land-use", Networks and Spatial Economics 5(2),
  * Kluwer Academic Publishers, 179-192.
  * @author Fabrice Marchal
@@ -39,17 +39,13 @@ import Jama.Matrix;
 
 public class PrimlocEngine {
 
-	/**
-	 * @param args
-	 */
-	
-	// 
+	//
 	// Main data structures
 	//
-	
+
 	int numZ;    // number of zones
 	double N;    // total number of trips
-	
+
 	double P[];  // number of residents
 	double J[];  // number of jobs
 	double X[];  // rent patterns
@@ -57,12 +53,12 @@ public class PrimlocEngine {
 	Matrix cij;  // Input:		travel impedances
 	Matrix ecij; // Internal:	exp( - cij/ mu )
 	Matrix trips;  // Output:		Trip matrix
-	Matrix calib;  // Input: 		calibration matrix 
-	
-	// 
+	Matrix calib;  // Input: 		calibration matrix
+
+	//
 	// Parameters of the solver
 	//
-	
+
 	int maxiter=100;
 	double mu=1.0;
 	double theta=0.5;
@@ -72,52 +68,52 @@ public class PrimlocEngine {
 	DecimalFormat df;
 	boolean verbose;
 	boolean calibration;
-	
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
 		SomeIO.testSolver( 800);
-		
+
 		testZurich();
 	}
 
 	static void testZurich(){
-	
+
 		PrimlocEngine plc = new PrimlocEngine();
-		
+
 		TreeMap<Integer,Integer> zonemap; // model_ID to internal_ID
-		
+
 		zonemap = plc.initProperties( plc.getClass().getResource("/org/matsim/playground/fabrice/primloc/resources/ZurichTestProperties.xml") );
-		
+
 		plc.calib = plc.gravityModelMatrix();
-		
+
 		plc.calibrationProcess();
-		
+
 		SomeIO.saveResults( plc.X, zonemap, "/tmp/rent.txt" );
 	}
-	
+
 	PrimlocEngine(){
 		df = (DecimalFormat) DecimalFormat.getInstance();
 		df.applyPattern("0.###E0");
 	}
-	
+
 	void calibrationProcess(){
-		
+
 		double muC = mu;
 		double muL = mu;
 		double muR = mu;
 		double errC = 0.0;
 		double errL = Double.NEGATIVE_INFINITY;
 		double errR = Double.NEGATIVE_INFINITY;
-		
+
 		runModel();
-		errC = calibrationError();		
+		errC = calibrationError();
 		System.out.println("Mu: "+df.format(mu)+"\tError: "+df.format(errC));
-		
+
 		while( errL < errC ){
 			mu = muL = mu/2;
 			setupECij();
-			runModel();		
+			runModel();
 			errL = calibrationError();
 			System.out.println("Mu inf: "+df.format(mu)+"\tError: "+df.format(errL));
 			if( errL < errC ){
@@ -136,11 +132,11 @@ public class PrimlocEngine {
 			errR = calibrationError();
 			System.out.println("Mu sup: "+df.format(mu)+"\tError: "+df.format(errR));
 		}
-		
+
 		while( Math.min( errR-errC, errL-errC)/errC > threshold3 ){
 			mu = (muC+muL)/2;
 			setupECij();
-			runModel();		
+			runModel();
 			double err = calibrationError();
 			System.out.println("Mu : "+df.format(mu)+"\tError: "+df.format(err));
 			if( err< errC ){
@@ -185,8 +181,8 @@ public class PrimlocEngine {
 		}
 		return Math.sqrt(sum/(numZ*numZ));
 	}
-	
-	
+
+
 	void normalizeJobVector(){
 		double sumJ=0.0;
 		for( int i=0;i<numZ;i++)
@@ -197,7 +193,7 @@ public class PrimlocEngine {
 	}
 
 	void runModel(){
-		
+
 		initRent();
 
 		if( verbose ){
@@ -206,7 +202,7 @@ public class PrimlocEngine {
 			rentStatistics();
 			System.out.println("========");
 		}
-		
+
 		iterativeSubstitutions();
 		solvequs();
 
@@ -216,25 +212,25 @@ public class PrimlocEngine {
 			rentStatistics();
 			System.out.println("========");
 		}
-		
+
 		computeTripMatrix();
 		computeFinalRents();
 	}
-	
+
 	void computeTripMatrix(){
 		// Compute the logsums Zk
 		double Z[] = new double[ numZ ];
 		for( int j=0; j<numZ; j++ )
 			for( int k=0; k<numZ; k++ )
 				Z[j] += ecij.get(k, j) * X[k];
-		
+
 		// Compute the O-D matrix Trips
 		trips = new Matrix( numZ, numZ );
 		for(int i=0;i<numZ;i++)
 			for( int j=0;j<numZ;j++)
 				trips.set(i, j, J[j] * ecij.get(i, j) * X[i] / Z[j] );
 	}
-	
+
 	void computeFinalRents(){
 		// Restore rent values in X
 		double minir = Double.POSITIVE_INFINITY;
@@ -244,16 +240,16 @@ public class PrimlocEngine {
 				minir = X[i];
 		}
 		for( int i=0; i<numZ; i++)
-			X[i] -= minir;		
+			X[i] -= minir;
 	}
 
 	TreeMap<Integer,Integer> initProperties( URL propurl ){
-		
+
 		String zoneFileName=null;
 		String costFileName=null;
 		String homesFileName=null;
 		String jobsFileName=null;
-		
+
 		Properties props = new Properties();
 		try{
 			props.loadFromXML( propurl.openStream() );
@@ -273,22 +269,22 @@ public class PrimlocEngine {
 			xc.printStackTrace();
 			System.exit(-1);
 		}
-		
+
 		//
 		// 1) Read the zone indices
-		//	  
-		
+		//
+
 		HashSet<Integer> zoneids = SomeIO.readZoneIDs(zoneFileName);
 		numZ=zoneids.size();
-		
+
 		if( verbose ){
 			System.out.println("Data:");
 			System.out.println(" . #zones:"+numZ);
 		}
-		
+
 		int idx=0;
 		TreeMap<Integer,Integer> zonemap = new TreeMap<Integer,Integer>();
-		
+
 		for( Integer id : zoneids )
 			zonemap.put( id, idx++ );
 
@@ -312,7 +308,7 @@ public class PrimlocEngine {
 				cij.set(i, i, mincij );
 		}
 		setupECij();
-		
+
 		double meanCost=0.0;
 		double stdCost=0.0;
 		for( int i=0; i<numZ; i++ ){
@@ -322,17 +318,17 @@ public class PrimlocEngine {
 				stdCost += v*v;
 			}
 		}
-		
+
 		meanCost = meanCost/(numZ*numZ);
 		stdCost = stdCost/(numZ*numZ) - meanCost*meanCost;
 		if( verbose )
-			System.out.println(" . Travel costs  mean="+meanCost+" std.dev.= "+Math.sqrt(stdCost));  
+			System.out.println(" . Travel costs  mean="+meanCost+" std.dev.= "+Math.sqrt(stdCost));
 
-		// 
+		//
 		// 3) read the homes and jobs files
 		// These matrices can be sparse
 		//
-		
+
 		P = SomeIO.readZoneAttribute( numZ, homesFileName, zonemap );
 		J = SomeIO.readZoneAttribute( numZ, jobsFileName, zonemap );
 
@@ -357,11 +353,11 @@ public class PrimlocEngine {
 
 		if( verbose )
 			System.out.println(" . Trip tables: #jobs=#homes= "+N);
-		
+
 		return zonemap;
 	}
 
-	
+
 	void initRent(){
 		X = new double[ numZ ];
 		// Initialize rent with the solution of the
@@ -375,7 +371,7 @@ public class PrimlocEngine {
 		if( undefs> 0 )
 			System.err.println("Warning: rent undefined in "+undefs+" locations");
 	}
-	
+
 	void rentStatistics(){
 
 		double minix=Double.POSITIVE_INFINITY;
@@ -403,7 +399,7 @@ public class PrimlocEngine {
 		double maxR = -mu*Math.log(minix);
 		System.out.println("Rent: [ "+ df.format(minR) + ", " + df.format(maxR) + " ]\t sigma: " + df.format(sigmaR) );
 	}
-	
+
 	void setupECij(){
 		ecij = new Matrix( numZ, numZ );
 		for( int i=0; i<numZ; i++)
@@ -416,7 +412,7 @@ public class PrimlocEngine {
 		double[] Z  = new double[ numZ ];
 		double[] DX = new double[ numZ ];
 
-		// 
+		//
 		// External data: P[i], J[i], C[ij]
 		//
 		// Unkown: X[i] where X[i] = exp( -rent[i] /mu )
@@ -433,7 +429,7 @@ public class PrimlocEngine {
 		//
 
 		for( int iterations=0; iterations<maxiter; iterations++){
-			int i; 
+			int i;
 
 //			#pragma omp parallel for
 			for(i=0;i<numZ;i++){
@@ -472,14 +468,14 @@ public class PrimlocEngine {
 			if( verbose ){
 				if( (iterations %10 == 0) || (residual < threshold1 ) ){
 					System.out.println("Iteration: " + iterations + " Residual:" + df.format(residual) );
-					rentStatistics();      
+					rentStatistics();
 				}
 			}
 			if( residual < threshold1 )
 				break;
 		}
 	}
-	
+
 	void solvequs(){
 		// Since X[i] are known up to a multiplicative factor,
 		// we assume that X[numZ-1] is known and
@@ -490,7 +486,7 @@ public class PrimlocEngine {
 			double[] Z = new double[ numZ ];
 			Matrix A = new Matrix( numR, numR ); // Jacobi Matrix
 			double[] B = new double[numR];
-			
+
 			// Compute the logsums Zk
 
 			//#pragma omp parallel for
@@ -509,16 +505,16 @@ public class PrimlocEngine {
 				B[i] = B[i]*X[i];
 				B[i] = B[i]-P[i];
 			}
-			
+
 			double sumx=0.0;
 			double residual=0.0;
 			for( int i=0; i<numR; i++ ){
 				sumx += X[i]*X[i];
 				residual=residual+B[i]*B[i];
 			}
-			residual =  Math.sqrt( residual/sumx );	
+			residual =  Math.sqrt( residual/sumx );
 			if( verbose )
-				System.out.println( "Residual:\t"+df.format(residual) );	
+				System.out.println( "Residual:\t"+df.format(residual) );
 			if( residual < threshold2 )
 				break;
 
@@ -539,25 +535,25 @@ public class PrimlocEngine {
 					A.set(i,j, A.get(i, j)- tsum*X[i] );
 				}
 			}
-			
-			Matrix b = new Matrix( B, numR );			
+
+			Matrix b = new Matrix( B, numR );
 			long timeMill = System.currentTimeMillis();
 			Matrix x = A.solve( b );
 			timeMill = System.currentTimeMillis() - timeMill;
 			double duration = timeMill / 1000.0;
 			if( verbose )
-				System.out.println("Solved in:\t"+duration+" s");		
+				System.out.println("Solved in:\t"+duration+" s");
 
 			for( int i=0; i<numR; i++ )
 				X[i] = X[i] - theta*x.get(i, 0);
-	        
+
 			if( verbose )
 				rentStatistics();
-			
-		}   
+
+		}
 	}
-	
-	
+
+
 	Matrix gravityModelMatrix(){
 		Matrix grav = new Matrix( numZ, numZ );
 		double sum1=0.0;
@@ -568,7 +564,7 @@ public class PrimlocEngine {
 				sum1+=v;
 			}
 		}
-		
+
 		double v=0.0;
 		for( int i=0; i<numZ; i++ )
 			for( int j=0; j<numZ; j++){
@@ -577,7 +573,7 @@ public class PrimlocEngine {
 			}
 		return grav;
 	}
-	
+
 	double sumofel( Matrix A ){
 		double z=0.0;
 		for( int i=0; i<A.getRowDimension();i++)
@@ -585,7 +581,7 @@ public class PrimlocEngine {
 				z+=A.get(i, j);
 		return z;
 	}
-	
+
 	double[] getCijScale( int n ){
 		// Return scale of cij
 		double[] vals = new double[ n ];
@@ -604,9 +600,9 @@ public class PrimlocEngine {
 			vals[i]=min+(i*(max-min))/n;
 		return vals;
 	}
-	
+
 	double[] histogram( Matrix x, double[] vals){
-		double[] bins = new double[ vals.length ];		
+		double[] bins = new double[ vals.length ];
 		for( int i=0;i<numZ;i++){
 			for( int j=0;j<numZ;j++){
 				double v = x.get(i, j);
@@ -618,7 +614,7 @@ public class PrimlocEngine {
 		}
 		return bins;
 	}
-	
+
 	double getHistogramError( Matrix x, Matrix y ){
 		double error = 0.0;
 		double[] scale = getCijScale( 100 );

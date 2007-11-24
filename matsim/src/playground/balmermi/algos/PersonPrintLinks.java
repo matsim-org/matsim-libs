@@ -47,6 +47,7 @@ public class PersonPrintLinks extends PersonAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		Plan plan = person.getPlans().get(0);
 		Iterator leg_it = plan.getIteratorLeg();

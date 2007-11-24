@@ -32,7 +32,7 @@ public class RouterNode extends CANode {
 	}
 
 	public static class CostComparator implements Comparator<RouterNode> {
-		
+
 		public int compare(RouterNode n1, RouterNode n2) {
 			if (n1.cost_ < n2.cost_) {
 				return -1;
@@ -43,7 +43,7 @@ public class RouterNode extends CANode {
 			}
 		}
 	};
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -55,7 +55,10 @@ public class RouterNode extends CANode {
 	public boolean isHandled = false;
 
 	/**
-	 * returns true if the visited-flag or the arrival time changed, false otherwise
+	 * @param comingFrom
+	 * @param cost
+	 * @param time
+	 * @return true if the visited-flag or the arrival time changed, false otherwise
 	 */
 	public boolean visit(RouterNode comingFrom, double cost, double time) {
 //		if (!visited_) {
@@ -73,7 +76,7 @@ public class RouterNode extends CANode {
 			return false;
 		}
 */	}
-	
+
 	public void resetVisited() {
 		visited_ = false;
 		prev_ = null;
@@ -99,7 +102,7 @@ public class RouterNode extends CANode {
 	public double getTime() {
 		return time_;
 	}
-	
+
 	public RouterNode getPrevNode() {
 		return prev_;
 	}
@@ -108,13 +111,14 @@ public class RouterNode extends CANode {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public final String toString() {
-		return super.toString() + 
+		return super.toString() +
 				"[time=" + this.time_ + "]" +
 				"[cost=" + this.cost_ + "]" +
 				"[visited=" + this.visited_ + "]";
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// other methods
 	//////////////////////////////////////////////////////////////////////

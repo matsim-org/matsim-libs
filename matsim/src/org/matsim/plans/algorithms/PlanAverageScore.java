@@ -48,6 +48,7 @@ public class PlanAverageScore extends PersonAlgorithm implements PlanAlgorithmI 
 
 	// TODO PlanCalcScore should NOT inherit from PersonAlgorithm, because it is a PlanAlgorithm
 	// this functionality is only provided a.t.m. until the complete PlanAlgorithm-API is ready.
+	@Override
 	public void run(Person person) {
 		Iterator<Plan> iter = person.getPlans().iterator();
 		while (iter.hasNext()) {

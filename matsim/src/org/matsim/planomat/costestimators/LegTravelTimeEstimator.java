@@ -27,28 +27,30 @@ import org.matsim.world.Location;
 /**
  * Interface for the estimation of the travel time of a leg. Implement it
  * with your theory about what travel time an agent expects: The same all over
- * the day, bee line distance, based on events from the last iteration... 
- * 
+ * the day, bee line distance, based on events from the last iteration...
+ *
  * @author meisterk
  *
  */
 public interface LegTravelTimeEstimator {
-	
+
 	/**
 	 * Implement your assumption on travel time estimation here.
-	 * 
+	 *
 	 * @param personId identifier of the replanning person
-	 * @param departureTime the departure time of the leg 
+	 * @param departureTime the departure time of the leg
 	 * @param origin the location of the prior activity
 	 * @param destination the location of the next activity
-	 * @return
+	 * @param route
+	 * @param mode
+	 * @return Returns a travel time estimation.
 	 */
 	public double getLegTravelTimeEstimation(
-			IdI personId, 
-			double departureTime, 
-			Location origin, 
+			IdI personId,
+			double departureTime,
+			Location origin,
 			Location destination,
 			Route route,
 			String mode);
-	
+
 }

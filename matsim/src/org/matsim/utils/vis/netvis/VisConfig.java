@@ -41,8 +41,6 @@ public class VisConfig extends ConfigModule {
 
     public static final String USE_ANTI_ALIASING = "antialiasing";
 
-    public static final String AGENT_GIF_FILE = "agentgif";
-
     // -------------------- CONSTRUCTION --------------------
 
     public VisConfig(String fileName) {
@@ -56,14 +54,15 @@ public class VisConfig extends ConfigModule {
     private VisConfig() {
         super(MODULE_NAME);
         set(LOGO, "MATSim");
-        set(DELAY, "1000");
-        set(LINK_WIDTH_FACTOR, "10");
+        set(DELAY, "500");
+        set(LINK_WIDTH_FACTOR, "20");
         set(SHOW_NODE_LABELS, "false");
         set(SHOW_LINK_LABELS, "false");
-        set(USE_ANTI_ALIASING, "false");
+        set(USE_ANTI_ALIASING, "true");
     }
 
-    public boolean isComplete() {
+    @Override
+		public boolean isComplete() {
         return true; // don't need anything
     }
 

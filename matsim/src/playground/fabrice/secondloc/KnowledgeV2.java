@@ -108,6 +108,7 @@ public class KnowledgeV2 {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public final String toString() {
 		return "[desc=" + this.desc + "]" +
 				"[nof_activityfacilities=" + this.activityfacilities.size() + "]";

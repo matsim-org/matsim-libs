@@ -49,10 +49,12 @@ import java.util.Vector;
 
 /**
  * @author mrieser
- * 
+ *
  * a MultiMap implementation using internally a TreeMap
+ * @param <K> The type of keys in the TreeMultiMap.
+ * @param <V> The type of values in the TreeMultiMap.
  */
-public class TreeMultiMap<K, V> implements MultiMap {
+public class TreeMultiMap<K, V> implements MultiMap<K, V> {
 
 	TreeMap<K, Entry<V>> map = null;;
 
@@ -60,14 +62,14 @@ public class TreeMultiMap<K, V> implements MultiMap {
 		map = new TreeMap<K, Entry<V>>();
 	}
 
-	
+
 	public TreeMultiMap(Comparator<K> c) {
 		map = new TreeMap<K, Entry<V>>(c);
 	}
-	
-	
+
+
 	/**
-	 * 
+	 *
 	 * @param key
 	 * @param value
 	 * @return the inserted <pre>value</pre>
@@ -104,8 +106,8 @@ public class TreeMultiMap<K, V> implements MultiMap {
 
 	static class Entry<VV> {
 		public Vector<VV> data = new Vector<VV>();
-		
-		
+
+
 	}
 
 }

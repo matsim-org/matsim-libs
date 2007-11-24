@@ -22,11 +22,9 @@ package playground.lnicolas.routing;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.PriorityQueue;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -40,7 +38,7 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 
 //	private final static String ROLE_NAME = "NetworkDijkstra";
 
-	private final NetworkLayer network_;
+	private final NetworkLayer network;
 	private final TravelCostI costFunction_;
 	private final TravelTimeI timeFunction_;
 	private static int roleIndex_ = -1;
@@ -58,7 +56,7 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 
 	public NetworkDijkstra(final NetworkLayer network, final TravelCostI costFunction,
 			final TravelTimeI timeFunction) {
-		this.network_ = network;
+		this.network = network;
 		this.costFunction_ = costFunction;
 		this.timeFunction_ = timeFunction;
 		if (roleIndex_ == -1) roleIndex_ = network.requestNodeRole();
@@ -78,9 +76,7 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 
 		long now = System.currentTimeMillis();
 		// first make sure the cost and visit flags are all reset
-		Iterator nIter = this.network_.getNodes().iterator();
-		while (nIter.hasNext()) {
-			Node node = (Node)nIter.next();
+		for (Node node : this.network.getNodes().values()) {
 			DijkstraRole role = getDijkstraRole(node);
 			role.resetVisited();
 		}
@@ -113,10 +109,7 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 			DijkstraRole outRole = getDijkstraRole(outNode);
 			double currTime = outRole.getTime();
 			double currCost = outRole.getCost();
-			BasicLinkSetI outlinks = outNode.getOutLinks();
-			Iterator<Link> iter = outlinks.iterator();
-			while (iter.hasNext()) {
-				Link l = iter.next();
+			for (Link l : outNode.getOutLinks().values()) {
 				Node n = l.getToNode();
 				DijkstraRole nRole = getDijkstraRole(n);
 				double travelTime = this.timeFunction_.getLinkTravelTime(l, currTime);
@@ -166,9 +159,7 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 
 	private final Route calcCheapestRoute_MM(final Node fromNode, final Node toNode, final int starttime) {
 		// first make sure the cost and visit flags are all reset
-		Iterator<Node> nIter = this.network_.getNodes().iterator();
-		while (nIter.hasNext()) {
-			Node node = nIter.next();
+		for (Node node : this.network.getNodes().values()) {
 			DijkstraRole role = getDijkstraRole(node);
 			role.resetVisited();
 		}
@@ -199,10 +190,7 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 
 				double currTime = outRole.getTime();
 				double currCost = outRole.getCost();
-				BasicLinkSetI outlinks = outNode.getOutLinks();
-				Iterator<Link> iter = outlinks.iterator();
-				while (iter.hasNext()) {
-					Link l = iter.next();
+				for (Link l : outNode.getOutLinks().values()) {
 					Node n = l.getToNode();
 					DijkstraRole nRole = getDijkstraRole(n);
 					double travelTime = this.timeFunction_.getLinkTravelTime(l, currTime);

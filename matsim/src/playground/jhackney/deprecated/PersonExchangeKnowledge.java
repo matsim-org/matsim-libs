@@ -65,7 +65,7 @@ public class PersonExchangeKnowledge {
      * This method takes a link and exchanges information along it about facilities
      * of a certain type that the agents at each end of the link know about. No
      * scoring, it's all random.
-     * 
+     *
      * @author jhackney
      * @param net
      * @param curLink
@@ -80,8 +80,8 @@ public class PersonExchangeKnowledge {
 
 	// get a random facility from Person 2's list
 	// and add it to Person 1's knowledge
-	if ((int) allf2.size() > 0) {
-	    Facility f21 = allf2.get((int) (Gbl.random.nextInt((int) allf2.size())));
+	if (allf2.size() > 0) {
+	    Facility f21 = allf2.get(Gbl.random.nextInt(allf2.size()));
 	    this.acquireNewKnowledge(p1, f21, facType);
 	}
 
@@ -92,7 +92,7 @@ public class PersonExchangeKnowledge {
 	    ArrayList<Facility> allf1 = pff.personGetKnownFacilities(p1, facType);
 	    // get a random facility from the list
 	    if (allf1.size() > 0) {
-		Facility f12 = allf1.get(((int) Gbl.random.nextInt(Integer.MAX_VALUE) % allf1.size()));
+		Facility f12 = allf1.get((Gbl.random.nextInt(Integer.MAX_VALUE) % allf1.size()));
 		this.acquireNewKnowledge(p2, f12, facType);
 	    }
 	}
@@ -106,7 +106,7 @@ public class PersonExchangeKnowledge {
      * have enough friends (saturation).
      * NOTE: a slow-running algorithm simulating friends in a chain becoming a cluster.
      * NOTE: even if A has only 1 link, it can make a new friend this turn
-     * 
+     *
      * @author jhackney
      * @param net
      * @param myLink
@@ -139,7 +139,7 @@ public class PersonExchangeKnowledge {
      * have enough friends (saturation).
      * NOTE: it does not take into account whether C is saturated with friends.
      * NOTE: nothing happens if A only has one friend
-     * 
+     *
      * @author jhackney
      * @param net
      * @param myLink

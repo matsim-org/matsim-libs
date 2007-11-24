@@ -47,6 +47,7 @@ public class QueueRemoteLink extends QueueLink implements RemoteLinkI {
 
 	}
 
+	@Override
 	protected boolean isActive() {
 		// Activte/ Deactivate does not work for parallel version
 		// DS TODO repair this

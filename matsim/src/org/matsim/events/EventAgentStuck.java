@@ -40,6 +40,7 @@ public class EventAgentStuck extends AgentEvent {
 		super(time, agentId, legId, linkId);
 	}
 
+	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
 		//impl.addAttribute("","","Flag", "", Integer.toString(3));
@@ -47,10 +48,12 @@ public class EventAgentStuck extends AgentEvent {
 		return impl;
 	}
 
+	@Override
 	public String toString() {
 		return asString() + "3\tstuckAndAbort";
 	}
 
+	@Override
 	public void rebuild(Plans population, NetworkLayer network) {
 		rebuildAgentData(population,network);
 	}

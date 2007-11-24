@@ -31,19 +31,18 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.world.Coord;
+import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.geometry.shared.Coord;
 
 import playground.jhackney.algorithms.PersonCalculateActivitySpaces;
 import playground.jhackney.algorithms.PlanEuclideanLength;
 import playground.jhackney.socialnet.SocialNetEdge;
 import playground.jhackney.socialnet.SocialNetwork;
-
 import cern.colt.list.DoubleArrayList;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
@@ -66,9 +65,9 @@ import edu.uci.ics.jung.utils.UserData;
  * IMPORTANT: you must have the JUNG jar (at least 1.7 and preferably the newest) as
  * well as Apache Commons Collections jar (at least 3.1) and
  * Cern Colt jar externally linked.
- * 
+ *
  * @author jhackney
- * 
+ *
  */
 public class SocialNetworkStatistics {
 
@@ -84,7 +83,7 @@ public class SocialNetworkStatistics {
     // This is a map of MatSim Person ID to the JUNG vertex object
     // (The JUNG Vertex UserDatum container is used
     // to get the Person ID given a Vertex object
-    TreeMap<Id, Vertex> verticesPersons = new TreeMap<Id, Vertex>();
+    TreeMap<IdI, Vertex> verticesPersons = new TreeMap<IdI, Vertex>();
 
     public SocialNetworkStatistics(){
 //	File snDir =new File(statsoutdir);
@@ -113,7 +112,7 @@ public class SocialNetworkStatistics {
 	String aoutfile = statsoutdir+"agent.txt";
 	String eoutfile = statsoutdir+"edge.txt";
 	String goutfile = statsoutdir+"graph.txt";
-	    
+
 	try {
 	    eout = new BufferedWriter(new FileWriter(eoutfile));
 	    eout.write("iter tlast tfirst dist egoid alterid purpose timesmet\n");
@@ -130,11 +129,11 @@ public class SocialNetworkStatistics {
 
 //	String directory = statsoutdir;
 	File snDir =new File(outputPath);
-	
+
 	String aoutfile = outputPath+"/agent.txt";
 	String eoutfile = outputPath+"/edge.txt";
 	String goutfile = outputPath+"/graph.txt";
-	
+
 	if(!snDir.mkdir() && !snDir.exists()){
 	    Gbl.errorMsg("Cannot make directory "+statsoutdir);
 	}
@@ -151,7 +150,7 @@ public class SocialNetworkStatistics {
 	catch (IOException ex) {
 	}
     }
-    
+
     public void calculate(int iteration, SocialNetwork snet, Plans plans){
 	// First instantiate the JUNG-compatible graph structure
 	if (snet.UNDIRECTED) {
@@ -167,7 +166,7 @@ public class SocialNetworkStatistics {
 	// Now you can run whatever statistics you want on g, its vertices, or
 	// its edges
 
-//	Prepare aggregate graph stats	
+//	Prepare aggregate graph stats
 	clusterMap = GraphStatistics.clusteringCoefficients(g);
 	double deg = getGraphAvgDeg(g);
 	System.out.println("   avg degree "+ deg);
@@ -201,8 +200,8 @@ public class SocialNetworkStatistics {
 	    Person pFrom = dyad.elementAt(0);
 	    Person pTo = dyad.elementAt(1);
 //	    Average duration of a social link
-	    double x1 = (double) (iter-Integer.parseInt(myEdge.getUserDatum("timeLastUsed").toString()));
-	    double x2 = (double) (Integer.parseInt(myEdge.getUserDatum("visitNum").toString()));
+	    double x1 = (iter-Integer.parseInt(myEdge.getUserDatum("timeLastUsed").toString()));
+	    double x2 = (Integer.parseInt(myEdge.getUserDatum("visitNum").toString()));
 	    smDur.accumulate(x1);
 	    smNum.accumulate(x2);
 	    try{
@@ -211,7 +210,7 @@ public class SocialNetworkStatistics {
 	    }catch (IOException ex){}
 	}
 	try{
-	gout.write(" "+smDD.average()+" "+smDur.average()+" "+smNum.average()/((double) iter));
+	gout.write(" "+smDD.average()+" "+smDur.average()+" "+smNum.average()/(iter));
 	gout.newLine();
 	}catch (IOException ex){}
     }
@@ -233,8 +232,8 @@ public class SocialNetworkStatistics {
 	Coord fromCoord = (Coord) ((Act) pFrom.getSelectedPlan().getActsLegs().get(0)).getCoord();
 	Vertex vTo = (Vertex) myEdge.getEndpoints().getSecond();
 	Person pTo = plans.getPerson(vTo.getUserDatum("personId").toString());
-	Coord toCoord = (Coord) ((Act) pTo.getSelectedPlan().getActsLegs().get(0)).getCoord();	
-	dist = fromCoord.calcDistance(toCoord);	
+	Coord toCoord = (Coord) ((Act) pTo.getSelectedPlan().getActsLegs().get(0)).getCoord();
+	dist = fromCoord.calcDistance(toCoord);
 	return dist;
     }
     private void makeDegreeHistogram(int iteration) {
@@ -252,10 +251,10 @@ public class SocialNetworkStatistics {
 	System.out.println("   max degree " + degvals.get(degvals.size() - 1));
 	return (int) degvals.get(degvals.size() - 1);
     }
-    
+
     private double getGraphAvgDeg(Graph g) {
 	// TODO Auto-generated method stub
-	return (double) 2.* g.numEdges()/g.numVertices();
+	return 2.* g.numEdges()/g.numVertices();
     }
 
     private void runPersonStatistics(int iter, Plans plans){
@@ -274,7 +273,7 @@ public class SocialNetworkStatistics {
 	Iterator ivert=vertices.iterator();
 
 	while(ivert.hasNext()){
-	    
+
 	    Vertex myVert = (Vertex) ivert.next();
 	    Person myPerson =plans.getPerson(myVert.getUserDatum("personId").toString());
 //	    Agent ID
@@ -300,7 +299,7 @@ public class SocialNetworkStatistics {
 		    }
 		thisPlan.setType(planType);
 	    }
-//	    Agent's degree	    
+//	    Agent's degree
 	    int deg=myVert.degree();
 //	    Agent's clustering coeff
 //	    Note that the JUNG algorithm counts a node with degree = 1 as having
@@ -339,7 +338,7 @@ public class SocialNetworkStatistics {
 		// aSd is NaN
 	    }else{
 		smASD3.accumulate(aSd3);
-	    }	    
+	    }
 	}
 //	Ratio of clustering in this graph relative to an Erd�s/Renyi graph
 //	See Watts 1999 book on Small Worlds
@@ -358,7 +357,7 @@ public class SocialNetworkStatistics {
     /**
      * Glues MatSim egonets together to make a JUNG graph object for further
      * analysis with JUNG statistical package.
-     * 
+     *
      * @author jhackney
      * @param g
      * @param snet

@@ -40,8 +40,6 @@ import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.BasicEventHandlerI;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeSetI;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
@@ -61,7 +59,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 
 	class PartialEventsHandler implements BasicEventHandlerI {
 
-		private final LinkedList<BasicEvent> eventList = new LinkedList<BasicEvent>(); 
+		private final LinkedList<BasicEvent> eventList = new LinkedList<BasicEvent>();
 		//private EventWriterTXT txtwriter = new EventWriterTXT("PartSimEvents"+ partID);
 		public void catchEvent (final int time, final BasicEvent event)
 		{
@@ -85,7 +83,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 			}
 			this.eventList.clear();
 		}
-		public void purgeEvents(final int now) 
+		public void purgeEvents(final int now)
 		{
 			try {
 				PartialQueueSimulation.this.host.addEventList(this.eventList, now, PartialQueueSimulation.this.partID);
@@ -101,17 +99,17 @@ public class PartialQueueSimulation extends QueueSimulation implements
 	DistributedSimulationRemoteI host;
 	private String simname;
 	private int partID;
-	private Map partSimsIP;
+	private Map<Integer, String> partSimsIP;
 	private boolean exitNow = false;
 	// Is main server calling metis, or should PartailServer do it on its own?
 	private final boolean doLocalDecomp = false;
 	private PartialEventsHandler eventhandler = null;
 
-	
-	public PartialQueueSimulation(final QueueNetworkLayer network, final Plans plans, final Events events) throws RemoteException {
+
+	public PartialQueueSimulation(final QueueNetworkLayer network, final Plans plans, final Events events) {
 		super(network, plans, events);
 	}
-	
+
 	public void initPartition(final int ID, final String hostname) throws RemoteException {
 		try {
 			this.partID = ID;
@@ -130,7 +128,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 	}
 
 	int step = 0;
-	protected boolean doSimStep(final int time) 
+	protected boolean doSimStep(final int time)
 	{
 		// do Sim stuff!
 		super.doSimStep(time);
@@ -146,7 +144,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 		}
 		return this.exitNow == false;
 	}
-	
+
 	@Override
 	protected void prepareSim()
 	{
@@ -175,7 +173,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 		          "stderr", "", directory);
 		    System.setErr(
 		        new PrintStream(new FileOutputStream(tempFile)));
-		    tempFile = File.createTempFile("stdout", 
+		    tempFile = File.createTempFile("stdout",
 		                 "", directory);
 		    System.setOut(
 		        new PrintStream(new FileOutputStream(tempFile)));
@@ -186,7 +184,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 		      t.printStackTrace(System.err);
 		      }
 		  }
-		
+
 	// TODO [DS] I don't think there should be a main method in this class.
 	// Tests should be done as external test-cases / marcel
 	public static void main(final String[] args) {
@@ -231,7 +229,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 
 
 			pq.run();
-			
+
 			events.resetHandlers(0);  // send last events, flushing eventsbuffer
 			pq.host.decActivePartSims(pq.partID);
 			DistributedQueueSimulation.unregisterWithRMI("PSim"+ args[0],pq);
@@ -245,104 +243,103 @@ public class PartialQueueSimulation extends QueueSimulation implements
 	}
 
 	private void connectNetwork() {
-   	    for (Object iter : this.network.getLinks()) {
-   	    	QueueLink link = (QueueLink)iter;
-   	    	int fromID = ((QueueNode)link.getFromNode()).getPartitionID();
-   	    	int toID = ((QueueNode)link.getToNode()).getPartitionID();
-   	    	
-   	    	if ((fromID != toID) && (fromID == this.partID)) {
-    			// this link goes out to another CPU
-   	    		((QueueRemoteLink)link).connectToRemoteLink((String)this.partSimsIP.get(toID));
-   	    	} 
-   	    }
+		for (QueueLink link : this.network.getLinks().values()) {
+			int fromID = ((QueueNode) link.getFromNode()).getPartitionId();
+			int toID = ((QueueNode) link.getToNode()).getPartitionId();
+
+			if ((fromID != toID) && (fromID == this.partID)) {
+				// this link goes out to another CPU
+				((QueueRemoteLink) link).connectToRemoteLink(this.partSimsIP.get(toID));
+			}
+		}
 	}
 
 	private QueueRemoteLink replaceLink(final QueueLink linkold) {
 		IdI key = linkold.getId();
 		QueueRemoteLink linknew = new QueueRemoteLink(linkold, this.network);
 		Node from = linkold.getFromNode();
-		BasicLinkSetI outlinks = from.getOutLinks();
-		if(outlinks.containsId(key)){
+		if(from.getOutLinks().containsKey(key)){
 			System.out.println("outl key exits "+key.toString());
-			outlinks.remove(linkold);
+			from.removeOutLink(linkold);
 		}
-		outlinks.add(linknew);
-		System.out.println("outl:"+outlinks.toString());
+		from.addOutLink(linknew);
 		Node to = linkold.getToNode();
-		BasicLinkSetI inlinks = to.getInLinks();
-		if(inlinks.containsId(key)){
+		if (to.getInLinks().containsKey(key)){
 			System.out.println("inl key exits "+key.toString());
-			inlinks.remove(linkold);
+			to.removeInLink(linkold);
 		}
-		inlinks.add(linknew);
+		to.addInLink(linknew);
 
 		return linknew;
 	}
+
 	private void prepareLinks(final boolean startup) {
 		int count = 0;
-   	    int linkcount = 0;
-   	    int fromID = 0, toID = 0;
-//   	    TreeMap remoteLinks = new TreeMap();
-   	    for (Object iter : this.network.getLinks()) {
-   	    	QueueLink link = (QueueLink)iter;
-   	    	linkcount++;
-   	    	fromID = ((QueueNode)link.getFromNode()).getPartitionID();
-   	    	toID = ((QueueNode)link.getToNode()).getPartitionID();
-   	    	
-   	    	if (fromID != this.partID && toID != this.partID) {
-   	    		// both nodes are not on my partition, remove link
-   	    	}else if (fromID != toID) {
-   	    		count++;
-   	    		if (toID == this.partID) {
-   	    			// that link needs to receive messages fomr other CPUs
-   	    			if (startup) 
-    				{
-   	    				// exchange Normal QueueLink with remote
-   	    				QueueRemoteLink link2  = replaceLink(link);
-   	    				this.network.getLinks().add(link2);
-	    				link2.initRemoteVisibility(); //open RMI interface to talk to other partition
-    				} else ((QueueRemoteLink)link).exitRemoteVisibility();
-   	    		} else if ((fromID == this.partID) && startup) {
-   	    			// this link goes out to another CPU
-   	   				// exchange Normal QueueLink with remote
-   	   				QueueRemoteLink link2  = replaceLink(link);
-    				this.network.getLinks().add(link2);
-   	    			// gets connected in connectNetwork()
-   	    		}
-   	    	} 
-   	    }
+		int linkcount = 0;
+		int fromID = 0, toID = 0;
+		// TreeMap remoteLinks = new TreeMap();
+		for (QueueLink link : this.network.getLinks().values()) {
+			linkcount++;
+			fromID = ((QueueNode) link.getFromNode()).getPartitionId();
+			toID = ((QueueNode) link.getToNode()).getPartitionId();
+
+			if (fromID != this.partID && toID != this.partID) {
+				// both nodes are not on my partition, remove link
+			} else if (fromID != toID) {
+				count++;
+				if (toID == this.partID) {
+					// that link needs to receive messages fomr other CPUs
+					if (startup) {
+						// exchange Normal QueueLink with remote
+						QueueRemoteLink link2 = replaceLink(link);
+						((Map<IdI, QueueLink>) this.network.getLinks()).put(link2.getId(), link2);
+						link2.initRemoteVisibility(); // open RMI interface to talk to other
+																					// partition
+					} else
+						((QueueRemoteLink) link).exitRemoteVisibility();
+				} else if ((fromID == this.partID) && startup) {
+					// this link goes out to another CPU
+					// exchange Normal QueueLink with remote
+					QueueRemoteLink link2 = replaceLink(link);
+					((Map<IdI, QueueLink>) this.network.getLinks()).put(link2.getId(), link2);
+					// gets connected in connectNetwork()
+				}
+			}
+		}
 	}
 
 	private void compactLinks() {
-   	    int fromID = 0, toID = 0;
-   	    int size = this.network.getSimLinksArray().size();
-		Iterator l_it = this.network.getSimLinksArray().iterator();
+		int fromID = 0, toID = 0;
+		int size = this.network.getSimLinksArray().size();
+		Iterator<QueueLink> l_it = this.network.getSimLinksArray().iterator();
 
 		while (l_it.hasNext()) {
-			QueueLink link = (QueueLink)l_it.next();
-   	    	fromID = ((QueueNode)link.getFromNode()).getPartitionID();
-   	    	toID = ((QueueNode)link.getToNode()).getPartitionID();
-   	    	
-   	    	if (fromID != this.partID && toID != this.partID) {
-   	    		// both nodes are not on my partition, remove link
-   	    		l_it.remove();
-   	    	} 
+			QueueLink link = l_it.next();
+			fromID = ((QueueNode) link.getFromNode()).getPartitionId();
+			toID = ((QueueNode) link.getToNode()).getPartitionId();
+
+			if (fromID != this.partID && toID != this.partID) {
+				// both nodes are not on my partition, remove link
+				l_it.remove();
+			}
 		}
 
-   	    System.out.println("Link size reduced from "+ size + " to " + this.network.getSimLinksArray().size()+ " that is " + (size - this.network.getSimLinksArray().size()) + " less");
+		System.out.println("Link size reduced from " + size + " to " + this.network.getSimLinksArray().size() + " that is "
+				+ (size - this.network.getSimLinksArray().size()) + " less");
 	}
 
 	private void compactNodes() {
-   	    int size = this.network.getSimNodesArray().size();
-		Iterator n_it = this.network.getSimNodesArray().iterator();
+		int size = this.network.getSimNodesArray().size();
+		Iterator<QueueNode> n_it = this.network.getSimNodesArray().iterator();
 		while (n_it.hasNext()) {
-			QueueNode node = (QueueNode)n_it.next();
-   	    	if (node.getPartitionID() != this.partID) {
-   	    		// both nodes are not on my partition, remove link
-   	    		n_it.remove();
-   	    	} 
+			QueueNode node = n_it.next();
+			if (node.getPartitionId() != this.partID) {
+				// both nodes are not on my partition, remove link
+				n_it.remove();
+			}
 		}
-   	    System.out.println("Node size reduced from "+ size + " to " + this.network.getSimNodesArray().size()+ " that is " + (size-this.network.getSimNodesArray().size()) + " less");
+		System.out.println("Node size reduced from " + size + " to " + this.network.getSimNodesArray().size() + " that is "
+				+ (size - this.network.getSimNodesArray().size()) + " less");
 	}
 
 	private void compactNetwork() {
@@ -354,21 +351,16 @@ public class PartialQueueSimulation extends QueueSimulation implements
 		return isLiving();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.demandmodeling.mobsim.QueueSimulator#prepareNetwork()
-	 */
 	@Override
 	protected void prepareNetwork() {
 		// call metis for decomposition
 		try {
 			if (this.doLocalDecomp) MetisExeWrapper.decomposeNetwork(this.network, this.partSimsIP.size(), Integer.toString(this.partID));
 			else {
-				BasicNodeSetI nodes = this.network.getNodes();
-				ArrayList table = this.host.getPartitionTable();
+				ArrayList<Integer> table = this.host.getPartitionTable();
 				int count = 0;
-				for (Object id : nodes) {
-					QueueNode node = (QueueNode)id;
-					node.setPartitionID((Integer)table.get(count++));
+				for (QueueNode node : this.network.getNodes().values()) {
+					node.setPartitionId(table.get(count++).intValue());
 				}
 			}
 		} catch (IOException e) {
@@ -387,7 +379,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 
 	public void exit() throws RemoteException {
 
-		this.exitNow = true;		
+		this.exitNow = true;
 	}
 
 	public void createVehicle(final String driverID, final List actLegs) throws RemoteException {
@@ -401,7 +393,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 		//for (Node n : route.getRoute()) {
 		//	System.out.print(n.getID() + ",");
 		//}
-		
+
 		//System.out.println("at link " + actLegs.get(0).toString() + "veh createLiving veh on part"+this.partID + ":" + getLiving());
 	}
 

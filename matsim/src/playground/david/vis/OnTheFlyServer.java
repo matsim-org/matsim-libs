@@ -87,7 +87,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 			new SslRMIServerSocketFactory());
 
 		    result = new OnTheFlyServer(ReadableName, network, population);
-		    
+
 		    // Bind this object instance to the name "HelloServer"
 		    registry.bind("DSOTFServer_" + ReadableName, result);
 
@@ -98,7 +98,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 		}
 	return 	result;
 	}
-	
+
 	public void cleanup() {
 		try {
 			//Naming.unbind("DSOTFServer_" + UserReadableName);
@@ -133,7 +133,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 	public int getStatus(double time){
 		localTime = (int)time;
-		
+
 		if (updateState) {
 			synchronized (out) {
 				updateOut(time);
@@ -150,7 +150,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 				status = PAUSE;
 			}
 		}
-		
+
 		if (status == PAUSE) {
 
 			synchronized(paused) {
@@ -194,7 +194,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 	public  byte[] getStateBuffer() throws RemoteException {
 		updateState = true;
 		if (status == PAUSE) step();
-		
+
 		if (updateState) {
 			try {
 				synchronized (updateFinished) {
@@ -215,7 +215,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 	public OTFVisNet getNet(OTFNetHandler handler) throws RemoteException {
 		this.handler = handler;
 		net.handler = handler;
-		
+
 		return net;
 	}
 

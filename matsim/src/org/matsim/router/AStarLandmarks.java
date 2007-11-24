@@ -96,6 +96,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	/**
 	 * @param network Where we do the routing.
 	 * @param preProcessData The pre-process data (containing the landmarks etc.).
+	 * @param costFunction
 	 * @param timeFunction Calculates the travel time on links.
 	 * @param overdoFactor The factor which is multiplied with the output of the
 	 * A* heuristic function. The higher the overdo factor the greedier the router,
@@ -113,7 +114,7 @@ public class AStarLandmarks extends AStarEuclidean {
 
 	/**
 	 * @see org.matsim.router.Dijkstra#calcLeastCostPath(org.matsim.network.Node,
-	 *      org.matsim.network.Node, int)
+	 *      org.matsim.network.Node, double)
 	 */
 	@Override
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double startTime) {

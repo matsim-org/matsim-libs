@@ -43,8 +43,6 @@ import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.algorithms.TravelTimeCalculator;
 import org.matsim.events.handler.EventHandlerI;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -83,7 +81,6 @@ import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
@@ -102,7 +99,6 @@ import org.matsim.utils.vis.kml.Style;
 import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.world.Location;
 
-import playground.meisterk.facilities.FacilitiesExportToGUESS;
 import playground.meisterk.strc2007.PersonScenarioBoxCut;
 
 public class MyRuns {
@@ -303,8 +299,8 @@ public class MyRuns {
 				Feature.DEFAULT_TIME_PRIMITIVE);
 		myKMLDocument.addFeature(populationFolder);
 
-		TransformationFactory tf = new TransformationFactory();
-		CH1903LV03toWGS84 trafo = (CH1903LV03toWGS84) tf.getCoordinateTransformation(tf.CH1903_LV03, tf.WGS84);
+		 CoordinateTransformationI trafo = TransformationFactory.getCoordinateTransformation(
+				TransformationFactory.CH1903_LV03, TransformationFactory.WGS84);
 
 		for (Person person : matsimAgentPopulation.getPersons().values()) {
 			List<Plan> plans = person.getPlans();
@@ -349,9 +345,7 @@ public class MyRuns {
 				Feature.DEFAULT_TIME_PRIMITIVE);
 		myKMLDocument.addFeature(networkCutFolder);
 
-		Iterator l_it = network.getLinks().iterator();
-		while (l_it.hasNext()) {
-			Link link = (Link)l_it.next();
+		for (Link link : network.getLinks().values()) {
 			networkCutFolder.addFeature(MyRuns.generateLinkPlacemark(link, linkStyle, trafo));
 		}
 
@@ -497,12 +491,12 @@ public class MyRuns {
 		Placemark linkPlacemark = null;
 
 		Node fromNode = link.getFromNode();
-		org.matsim.world.Coord fromNodeWorldCoord = fromNode.getCoord();
+		org.matsim.utils.geometry.shared.Coord fromNodeWorldCoord = fromNode.getCoord();
 		org.matsim.utils.geometry.shared.Coord fromNodeGeometryCoord = (Coord) trafo.transform(new Coord(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
 		Point fromPoint = new Point(fromNodeGeometryCoord.getX(), fromNodeGeometryCoord.getY(), 0.0);
 
 		Node toNode = link.getToNode();
-		org.matsim.world.Coord toNodeWorldCoord = toNode.getCoord();
+		org.matsim.utils.geometry.shared.Coord toNodeWorldCoord = toNode.getCoord();
 		org.matsim.utils.geometry.shared.Coord toNodeGeometryCoord = (Coord) trafo.transform(new Coord(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 		Point toPoint = new Point(toNodeGeometryCoord.getX(), toNodeGeometryCoord.getY(), 0.0);
 
@@ -1204,21 +1198,6 @@ public class MyRuns {
 		}
 
 		System.out.println(plan.getScore());
-
-	}
-
-	private static void writeGUESSFile() {
-
-		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  adding and running facilities algorithms... ");
-		//facilities.addAlgorithm(new FacilitiesRandomizeHectareCoordinates());
-		facilities.addAlgorithm(new FacilitiesExportToGUESS());
-		facilities.runAlgorithms();
-		System.out.println("  done.");
 
 	}
 

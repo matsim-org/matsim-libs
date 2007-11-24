@@ -24,6 +24,7 @@ public class FacilitiesConfigGroup extends AbstractFileIOConfigGroup {
 
 	public static final String GROUP_NAME = "facilities";
 	
+	@Override
 	public String getName() {
 		return GROUP_NAME;
 	}

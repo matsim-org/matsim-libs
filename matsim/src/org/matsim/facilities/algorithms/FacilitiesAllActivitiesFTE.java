@@ -100,7 +100,7 @@ public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
 		int hectareCnt = 0, facilityCnt = 0;
 		int skip = 1;
 		int numFacilities, numFTEs, numSectorFTE = Integer.MAX_VALUE, sizeRange;
-		String reli, X, Y, attributeId, tempFacilityId, activityId;
+		String X, Y, attributeId, tempFacilityId, activityId;
 		Facility f;
 		Activity a;
 
@@ -118,16 +118,13 @@ public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
 		System.out.println("  done.");
 
 		System.out.println("  creating facilities... ");
-		Set ecHectares = this.myCensus.getHectareAggregationKeys();
+		Set<String> ecHectares = this.myCensus.getHectareAggregationKeys();
 
 		TreeSet<String> sector2_attributeIds = this.myCensus.getHectareAttributeIdentifiersBySector(2);
 		TreeSet<String> sector3_attributeIds = this.myCensus.getHectareAttributeIdentifiersBySector(3);
-		Iterator attributeIds_it = null;
+		Iterator<String> attributeIds_it = null;
 
-		Iterator ecHectares_it = ecHectares.iterator();
-		while (ecHectares_it.hasNext()) {
-
-			reli = (String) ecHectares_it.next();
+		for (String reli : ecHectares) {
 			X = Integer.toString(this.myCensus.getHectareAttributeFloor(reli, "X"));
 			Y = Integer.toString(this.myCensus.getHectareAttributeFloor(reli, "Y"));
 
@@ -146,7 +143,7 @@ public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
 
 				// create temporary facilities with minimum number of FTEs
 				while (attributeIds_it.hasNext()) {
-					attributeId = (String) attributeIds_it.next();
+					attributeId = attributeIds_it.next();
 					numFacilities = this.myCensus.getHectareAttributeFloor(reli, attributeId);
 					// assign minimum work capacity, here number of fulltime equivalents
 					sizeRange =	Integer.parseInt(attributeId.substring(attributeId.length() - 1));

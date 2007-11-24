@@ -28,7 +28,7 @@ import org.matsim.utils.WorldUtils;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;

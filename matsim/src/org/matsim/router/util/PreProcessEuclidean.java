@@ -20,8 +20,6 @@
 
 package org.matsim.router.util;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -31,7 +29,7 @@ import org.matsim.network.NetworkLayer;
  * AStarEuclidean when computing least-cost paths between a start and an end
  * node. Specifically, computes the minimal travel cost per length unit over all
  * links, which is used by AStarEuclidean's heuristic function during routing.
- * 
+ *
  * @author lnicolas
  */
 public class PreProcessEuclidean extends PreProcessDijkstra {
@@ -65,9 +63,8 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 	}
 
 	void updateMinTravelCostPerLength(final NetworkLayer network) {
-		for (Object link : network.getLinks()) {
-			double minCost = this.costFunction.getLinkMinimumTravelCost((Link) link)
-					/ ((Link) link).getLength();
+		for (Link link : network.getLinks().values()) {
+			double minCost = this.costFunction.getLinkMinimumTravelCost(link) / link.getLength();
 			if (getMinTravelCostPerLength() > minCost) {
 				setMinTravelCostPerLength(minCost);
 			}
@@ -75,15 +72,12 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 	}
 
 	private boolean checkLinkLengths(final NetworkLayer network) {
-		Set links = network.getLinks();
-		for (Object obj : links) {
-			Link l = (Link) obj;
-			double linkLength = l.getLength();
-			double eucDist = l.getFromNode().getCoord().calcDistance(
-					l.getToNode().getCoord());
+		for (Link link : network.getLinks().values()) {
+			double linkLength = link.getLength();
+			double eucDist = link.getFromNode().getCoord().calcDistance(link.getToNode().getCoord());
 			if (linkLength < eucDist) {
 				if (log.isDebugEnabled()) {
-					log.debug("link " + l.getId() + " has length " + linkLength + " which is smaller than the euclidean distance " + eucDist);
+					log.debug("link " + link.getId() + " has length " + linkLength + " which is smaller than the euclidean distance " + eucDist);
 				}
 				return false;
 			}

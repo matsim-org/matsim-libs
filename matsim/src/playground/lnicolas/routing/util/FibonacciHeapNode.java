@@ -115,7 +115,8 @@ public class FibonacciHeapNode<T>
      *
      * @return string representing this object
      */
-    public String toString()
+    @Override
+		public String toString()
     {
         if (true) {
             return Double.toString(key);

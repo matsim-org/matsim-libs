@@ -22,7 +22,6 @@ package playground.meisterk.strc2007;
 
 import java.util.List;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -118,10 +117,10 @@ public class PersonScenarioBoxCut extends PersonAlgorithm {
 
 	private void addLinkToCutNetwork(Link link) {
 
-		org.matsim.world.Coord nodeCoord = null;
+		org.matsim.utils.geometry.shared.Coord nodeCoord = null;
 
 		// is the link already in the cut network? if not, add it
-		if (this.networkTouched.getLink((Id)link.getId()) == null) {
+		if (this.networkTouched.getLink(link.getId()) == null) {
 
 			// are the nodes already in the cut network? if not, add them
 			Node fromNode = link.getFromNode();

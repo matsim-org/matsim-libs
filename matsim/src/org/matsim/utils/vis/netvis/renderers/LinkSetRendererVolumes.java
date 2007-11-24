@@ -24,23 +24,23 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.Iterator;
 
+import org.matsim.utils.vis.netvis.DisplayableLinkI;
+import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.ControlToolbar;
 import org.matsim.utils.vis.netvis.gui.NetJComponent;
-import org.matsim.utils.vis.netvis.visNet.DisplayAgent;
 import org.matsim.utils.vis.netvis.visNet.DisplayLink;
 import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 
 public class LinkSetRendererVolumes extends RendererA {
 
 	ControlToolbar toolbar = null;
-	
+
   static double flowCapFactor = 0.10;
   static double timeFactor = 1.0;
   static double netCapFactor = flowCapFactor * timeFactor;
-  	
+
     private final ValueColorizer colorizer = new ValueColorizer(new double[] { 0.0, 1000.0 * netCapFactor, 2000.0 * netCapFactor, 3000.0 * netCapFactor, 4000.0 * netCapFactor }, new Color[] {
         Color.WHITE, Color.GREEN, Color.YELLOW, Color.RED, Color.BLUE });
 
@@ -51,40 +51,40 @@ public class LinkSetRendererVolumes extends RendererA {
     public LinkSetRendererVolumes(VisConfig visConfig, DisplayNet network) {
         super(visConfig);
         this.network = network;
-       
+
         this.linkWidth = DisplayLink.LANE_WIDTH * visConfig.getLinkWidthFactor();
     }
 
-    public void setTargetComponent(NetJComponent comp) {
+    @Override
+		public void setTargetComponent(NetJComponent comp) {
         super.setTargetComponent(comp);
     }
 
     // -------------------- RENDERING --------------------
 
-    protected synchronized void myRendering(Graphics2D display, AffineTransform boxTransform) {
+    @Override
+		protected synchronized void myRendering(Graphics2D display, AffineTransform boxTransform) {
     	String test = getVisConfig().get("ShowAgents");
-    	boolean drawAgents = test == null || test.equals("true");  
+    	boolean drawAgents = test == null || test.equals("true");
         this.linkWidth = DisplayLink.LANE_WIDTH* getVisConfig().getLinkWidthFactor();
 
 
         NetJComponent comp = getNetJComponent();
-        
+
         AffineTransform originalTransform = display.getTransform();
 
         double scale = 1.0;
         if (this.toolbar != null) {
         	scale = this.toolbar.getScale();
         }
-        
+
         //display.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         double strokeWidth = 0.1 * linkWidth;
         if (strokeWidth < (20.0 / scale)) strokeWidth = 20.0 / scale; // min pixel-width on screen
         if (strokeWidth > (100.0 / scale)) strokeWidth = 100.0 / scale;  // max pixel-width on screen
         display.setStroke(new BasicStroke((float)strokeWidth));
-        
-        for (Iterator it = network.getLinks().iterator(); it.hasNext();) {
-            DisplayLink link = (DisplayLink) it.next();
 
+        for (DisplayableLinkI link : network.getLinks().values()) {
             if (!comp.checkLineInClip(link.getStartEasting(), link.getStartNorthing(),
             		link.getEndEasting(), link.getEndNorthing())) {
             	continue;
@@ -103,7 +103,7 @@ public class LinkSetRendererVolumes extends RendererA {
             int cellLength_m = (int)Math.round(link.getLength_m() / link.getDisplayValueCount());
             int cellWidth_m = (int)Math.round(linkWidth * (link.getDisplayValue(0) / 180.0));
             int cellStart_m = 0;
-            
+
             for (int i = 0; i < link.getDisplayValueCount(); i++) {
 
                 display.setColor(colorizer.getColor(link.getDisplayValue(i)));
@@ -134,10 +134,7 @@ public class LinkSetRendererVolumes extends RendererA {
             }
 
             if (link.getMovingAgents() != null && drawAgents)
-                for (Iterator agentIt = link.getMovingAgents().iterator(); agentIt
-                        .hasNext();) {
-
-                    DisplayAgent agent = (DisplayAgent) agentIt.next();
+            		for (DrawableAgentI agent : link.getMovingAgents()) {
 
                     // |--- generate transform --->
 
@@ -171,5 +168,5 @@ public class LinkSetRendererVolumes extends RendererA {
     public void setControlToolbar(ControlToolbar toolbar) {
     	this.toolbar = toolbar;
     }
-    
+
 }

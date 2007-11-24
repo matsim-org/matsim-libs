@@ -54,6 +54,7 @@ public class PlansCalcSocialNet2 extends PlansAlgorithm {
 
 	}
 
+	@Override
 	public void run(Plans plans) {
 
 

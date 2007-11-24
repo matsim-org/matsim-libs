@@ -51,34 +51,34 @@ public class DatapulsPopulationGenerator {
 	int buildingsFileLineCount  = -1;
 	String censuspopFilename	= "";
 	int censuspopFileLineCount  = -1;
-	
+
 	TreeMap<String, BuildingInformation> buildingsInformation;
 	TreeMap<String, HouseholdInformation> householdsInformation;
 	ArrayList<PersonInformation> personsInformation;
 
 	TreeMap<String, ArrayList<String>> householdsPerBuilding;
-	
+
 	TreeMap<Integer, Integer> censusPersonsPerAge;
 	private TreeMap<Integer, Integer> censusEmployeesPerAge;
-	
+
 	ArrayList<Person> persons;
 	ArrayList<HouseholdI> households;
-	
+
 	final int censusEmployedPersonCount = 3836312;
-	
+
 	public DatapulsPopulationGenerator(String inputFolder) {
 		householdsPerBuilding = new TreeMap<String, ArrayList<String>>();
-		
+
 		buildingsInformation = new TreeMap<String, BuildingInformation>();
 		householdsInformation = new TreeMap<String, HouseholdInformation>();
 		personsInformation = new ArrayList<PersonInformation>();
-		
+
 		censusPersonsPerAge = new TreeMap<Integer, Integer>();
 		censusEmployeesPerAge = new TreeMap<Integer, Integer>();
-		
+
 		persons = new ArrayList<Person>();
 		households = new ArrayList<HouseholdI>();
-		
+
 		populationFilename	= inputFolder + "cdb_kti_2006.txt";
 		populationFileLineCount = getLineCount(populationFilename);
 		buildingsFilename	= inputFolder + "lig_kti_2006.txt";
@@ -86,40 +86,40 @@ public class DatapulsPopulationGenerator {
 		censuspopFilename	= inputFolder + "ETHZ_Pers.tab";
 		censuspopFileLineCount  = getLineCount(censuspopFilename);
 	}
-	
+
 	public Plans run() {
 		System.out.println("reading building information...");
 		createBuildings();
 		System.out.println("done.");
-		
+
 		System.out.println("createPersonsInformation ...");
 		createPersonsInformation();
 		System.out.println("done.");
-		
+
 		System.out.println("reading census population...");
 		processCensusData();
 		System.out.println("done.");
-		
+
 		System.out.println("upSamplePersons...");
 		upSamplePersons(censuspopFileLineCount);
 		System.out.println("done.");
-		
+
 		System.out.println("creating persons...");
 		Plans plans = createPlans();
 		System.out.println("done.");
-		
+
 		return plans;
 	}
-	
+
 	public Plans runWithoutUpsampling() {
 		System.out.println("reading building information...");
 		createBuildings();
 		System.out.println("done.");
-		
+
 		System.out.println("createPersonsInformation ...");
 		createPersonsInformation();
 		System.out.println("done.");
-		
+
 		int noEmployeesCnt = 0;
 		int noPersonsCnt = 0;
 		for (BuildingInformation bInfo : buildingsInformation.values()) {
@@ -133,14 +133,14 @@ public class DatapulsPopulationGenerator {
 		System.out.println(noEmployeesCnt + " out of " + buildingsInformation.size() +
 				" buildings contain no employed persons, " + noPersonsCnt
 				+ " buildings contain no persons at all.");
-		
+
 		System.out.println("creating persons...");
 		Plans plans = createPlans();
 		System.out.println("done.");
-		
+
 		return plans;
 	}
-	
+
 	public static int getLineCount(String filename) {
 		int fileLineCount = -1;
 		try {
@@ -162,7 +162,7 @@ public class DatapulsPopulationGenerator {
 	private void createPersonsInformation() {
 		TreeMap<String, Integer> currEmplPersPerBuil = new TreeMap<String, Integer>();
 		TreeMap<String, Integer> currForeignersPerBuilding = new TreeMap<String, Integer>();
-		
+
 		int employedCount = 0;
 		int invalidSexCount = 0;
 		int invalidAgeCount = 0;
@@ -179,32 +179,32 @@ public class DatapulsPopulationGenerator {
 				String buildingID = entries[19].trim();
 				if (buildingsInformation.containsKey(buildingID)) {
 					int age = getAge(entries[9].trim());
-					
+
 					if (age >= 0) {
 						boolean employed = getEmployed(buildingID,
 							currEmplPersPerBuil, buildingsInformation, age);
-					
+
 						// get sex
 						String sex = getSex(entries[12].trim());
 						int sexIndex = getSexIndex(entries[12].trim());
 						if (sexIndex == 0) {
 							invalidSexCount++;
 						}
-						
+
 						// Get nationality
 						String nationality = getNationality(buildingID, buildingsInformation,
 								currForeignersPerBuilding);
 						if (nationality == null) {
 							invalidNationalityCount++;
 						}
-						
+
 						// process employed flag
 						if (employed == true) {
 							employedCount++;
 						}
-	
+
 						String householdID = entries[13].trim();
-					
+
 						HouseholdInformation hInfo = householdsInformation.get(
 								householdID + buildingID);
 						if (hInfo == null) {
@@ -220,7 +220,7 @@ public class DatapulsPopulationGenerator {
 					} else if (age < 0) {
 						invalidAgeCount++;
 					}
-					
+
 					i++;
 					if (i % (populationFileLineCount / statusString.length()) == 0) {
 						System.out.print(".");
@@ -228,12 +228,12 @@ public class DatapulsPopulationGenerator {
 					}
 				}
 			}
-			
+
 			bufferedReader.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		
+
 		System.out.println(personsInformation.size() + " persons");
 		System.out.println(invalidSexCount + " persons are of unknown gender");
 		System.out.println(invalidAgeCount + " persons are of unknown age (< 0)");
@@ -280,7 +280,7 @@ public class DatapulsPopulationGenerator {
 				System.out.flush();
 			}
 		}
-		
+
 		System.out.println("done.");
 
 		return plans;
@@ -288,7 +288,7 @@ public class DatapulsPopulationGenerator {
 
 	private void upSamplePersons(int popSize) {
 		double additionalPersonsFraction = (double)popSize / personsInformation.size();
-		
+
 		TreeMap<Integer, Integer> currentPersonCount = new TreeMap<Integer, Integer>();
 		TreeMap<Integer, Integer> currentEmployeeCount = new TreeMap<Integer, Integer>();
 		// init currentAgeCount
@@ -316,21 +316,21 @@ public class DatapulsPopulationGenerator {
 		}
 		ArrayList<Integer> missingAges = new ArrayList<Integer>(currentPersonCount.keySet());
 		int newForeignerCnt = (int)(foreignerCnt * additionalPersonsFraction);
-		
+
 		System.out.println("Before upsamling: " + emplPersCnt + " of " + popSize + " persons work ("
 				+ (double)emplPersCnt/popSize + "%)");
-		
-		ArrayList<Double> householdSizeDistribution = 
+
+		ArrayList<Double> householdSizeDistribution =
 			getHouseholdSizeDistribution(householdsInformation);
 		TreeMap<String, HouseholdInformation> newHouseholdsPerBuilding =
 			new TreeMap<String, HouseholdInformation>();
 		TreeMap<String, Integer> newHouseholdSizes = new TreeMap<String, Integer>();
-		
+
 		String statusString = "|----------+-----------|";
 		System.out.println(statusString);
-		
+
 		ArrayList<String> buildingArray = new ArrayList<String>(buildingsInformation.keySet());
-		int additionalPersonCount = popSize - personsInformation.size(); 
+		int additionalPersonCount = popSize - personsInformation.size();
 		double avgGenAge = 0;
 		int maxGenAge = 0;
 		for (int i = personsInformation.size(); i < popSize; i++) {
@@ -338,7 +338,7 @@ public class DatapulsPopulationGenerator {
 			String buildingID = buildingArray.get(Gbl.random.nextInt(buildingArray.size()));
 			BuildingInformation bInfo = buildingsInformation.get(buildingID);
 			bInfo.addPerson();
-			
+
 			String nationality = "swiss";
 			// add a foreigner to the building, if needed
 			if (foreignerCnt < newForeignerCnt) {
@@ -346,7 +346,7 @@ public class DatapulsPopulationGenerator {
 				foreignerCnt++;
 			}
 			String householdID = null;
-			// select the new household (or create a new household) in this building 
+			// select the new household (or create a new household) in this building
 			// and add a person to it
 			HouseholdInformation hInfo = newHouseholdsPerBuilding.get(buildingID);
 			if (hInfo == null || newHouseholdSizes.get(buildingID) == hInfo.getPersonCount()) {
@@ -368,14 +368,14 @@ public class DatapulsPopulationGenerator {
 				hInfo = new HouseholdInformation();
 				householdsInformation.put(householdID + buildingID, hInfo);
 				bInfo.addHousehold();
-				
+
 				hhArray.add(householdID + buildingID);
-				
+
 				newHouseholdSizes.put(buildingID, generateHouseholdSize(householdSizeDistribution));
 				newHouseholdsPerBuilding.put(buildingID, hInfo);
 			}
 			hInfo.addPerson();
-			
+
 			// create personInformation
 			int age = generateAge(currentPersonCount, missingAges);
 			if (age < 18) {
@@ -390,11 +390,11 @@ public class DatapulsPopulationGenerator {
 			if (employed) {
 				emplPersCnt++;
 			}
-			
+
 			String sex = generateSex();
-			personsInformation.add(new PersonInformation(age, sex, employed, nationality, 
+			personsInformation.add(new PersonInformation(age, sex, employed, nationality,
 					bInfo, hInfo));
-			
+
 			if (i % (additionalPersonCount / statusString.length()) == 0) {
 				System.out.print(".");
 				System.out.flush();
@@ -406,9 +406,9 @@ public class DatapulsPopulationGenerator {
 		System.out.println("additionalPersonsFraction =  " + additionalPersonsFraction);
 		System.out.println(emplPersCnt + " of " + popSize + " persons work ("
 				+ (double)emplPersCnt/popSize + "%)");
-		System.out.println("Currently " + foreignerCnt + " of " + 
+		System.out.println("Currently " + foreignerCnt + " of " +
 				popSize + " persons are foreigners");
-		
+
 		upSampleRetirees(emplPersCnt, currentEmployeeCount);
 	}
 
@@ -480,7 +480,7 @@ public class DatapulsPopulationGenerator {
 			}
 			householdCount++;
 		}
-		
+
 		ArrayList<Double> hSizeDistr = new ArrayList<Double>();
 		// create household size distribution
 		double householdFrac = 0;
@@ -490,7 +490,7 @@ public class DatapulsPopulationGenerator {
 			}
 			hSizeDistr.add(householdFrac);
 		}
-		
+
 		return hSizeDistr;
 	}
 
@@ -520,7 +520,7 @@ public class DatapulsPopulationGenerator {
 				nationality = "swiss";
 			}
 		}
-		
+
 		return nationality;
 	}
 
@@ -553,7 +553,7 @@ public class DatapulsPopulationGenerator {
 
 	private int generateAge(TreeMap<Integer, Integer> currentAgeCount,
 			ArrayList<Integer> missingAges) {
-		
+
 		int ageIndex = Gbl.random.nextInt(missingAges.size());
 		int age = missingAges.get(ageIndex);
 		int curAgeCnt = 0;
@@ -587,10 +587,10 @@ public class DatapulsPopulationGenerator {
 			currentEmployeeCountPerAge.put(age, curEmplCnt);
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	private Boolean getEmployed(String buildingID,
 			TreeMap<String, Integer> currEmplPersPerBuil,
 			TreeMap<String, BuildingInformation> buildingsInformation, int age) {
@@ -601,7 +601,7 @@ public class DatapulsPopulationGenerator {
 		boolean employed = false;
 		if (buildingsInformation.containsKey(buildingID) == false) {
 			return null;
-		} else if ((age >= 16 || age == -1) 
+		} else if ((age >= 16 || age == -1)
 			&& curEmplPersCount < buildingsInformation.get(buildingID).getEmployedPersonCount()) {
 			currEmplPersPerBuil.put(buildingID, curEmplPersCount + 1);
 			employed = true;
@@ -619,23 +619,23 @@ public class DatapulsPopulationGenerator {
 		if (string.equals("") == false) {
 			age = Integer.parseInt(string);
 		}
-		
+
 		age = 2006 - age;
 		if (age < 0 || age > 125) {
 			age = -1;
 		}
-		
+
 		return age;
 	}
 
 	/**
-	 * reads in the number of persons per building and the household sizes 
+	 * reads in the number of persons per building and the household sizes
 	 * based on the populationfilename file
 	 */
 	void getNofPersonsPerBuilding() {
 		String statusString = "|----------+-----------|";
 		System.out.println(statusString);
-		
+
 		try {
 			FileReader fileReader = new FileReader(populationFilename);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -644,7 +644,7 @@ public class DatapulsPopulationGenerator {
 			int i = 0;
 			while ((currentLine = bufferedReader.readLine()) != null) {
 				String[] entries = currentLine.split("\t", -1);
-				
+
 				String buildingID = entries[19].trim();
 				if (buildingsInformation.containsKey(buildingID)) {
 					BuildingInformation bInfo = buildingsInformation.get(buildingID);
@@ -657,24 +657,24 @@ public class DatapulsPopulationGenerator {
 					}
 					householdIDs.add(householdID);
 				}
-				
+
 				i++;
 				if (i % (lineCount / statusString.length()) == 0) {
 					System.out.print(".");
 					System.out.flush();
 				}
 			}
-			
+
 			bufferedReader.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
 	}
-	
+
 	void processCensusData() {
 		String statusString = "|----------+-----------|";
 		System.out.println(statusString);
-		
+
 		try {
 			FileReader fileReader = new FileReader(censuspopFilename);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -685,7 +685,7 @@ public class DatapulsPopulationGenerator {
 			currentLine = bufferedReader.readLine();
 			while ((currentLine = bufferedReader.readLine()) != null) {
 				String[] entries = currentLine.split("\t", -1);
-				
+
 				int age    = Integer.parseInt(entries[16].trim());
 				if (age < 0 || age > 120) {
 					Gbl.errorMsg("Line " + lineIndex + ": wrong format of age=" + age + "!");
@@ -695,7 +695,7 @@ public class DatapulsPopulationGenerator {
 					count = censusPersonsPerAge.get(age);
 				}
 				censusPersonsPerAge.put(age, count + 1);
-				
+
 				int employedIndex    = Integer.parseInt(entries[88].trim());
 				boolean employed = false;
 				if (employedIndex >= 11 && employedIndex <= 14) {
@@ -715,14 +715,14 @@ public class DatapulsPopulationGenerator {
 					}
 					censusEmployeesPerAge.put(age, count + 1);
 				}
-				
+
 				lineIndex++;
 				if (lineIndex % (lineCount / statusString.length()) == 0) {
 					System.out.print(".");
 					System.out.flush();
 				}
 			}
-			
+
 			bufferedReader.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -732,10 +732,10 @@ public class DatapulsPopulationGenerator {
 //		int employedPersonsCount = 0;
 //		TreeMap<Integer, Integer> nonEmployedPersonsPerAge = new TreeMap<Integer, Integer>();
 //		int nonEmployedPersonsCount = 0;
-//		
+//
 //		String statusString = "|----------+-----------|";
 //		System.out.println(statusString);
-//		
+//
 //		try {
 //			FileReader fileReader = new FileReader(censuspopFilename);
 //			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -747,15 +747,15 @@ public class DatapulsPopulationGenerator {
 //			while ((currentLine = bufferedReader.readLine()) != null) {
 //				String[] entries = currentLine.split("\t", -1);
 //				lineIndex++;
-//				
+//
 //				int age    = Integer.parseInt(entries[16].trim());
 //				if (age < 0 || age > 120) {
 //					Gbl.errorMsg("Line " + lineIndex + ": wrong format of age=" + age + "!");
 //				}
-//				
+//
 //				int employed = Integer.parseInt(entries[88].trim());
 //
-//				int currentPersonsCount = 1; 
+//				int currentPersonsCount = 1;
 //				if (employed >= 11 && employed <= 14) {
 //					if (employedPersonsPerAge.containsKey(age)) {
 //						currentPersonsCount = employedPersonsPerAge.get(age) + 1;
@@ -772,19 +772,19 @@ public class DatapulsPopulationGenerator {
 //				} else {
 //					Gbl.errorMsg("Line " + lineIndex + ": wrong format of employed=" + employed + "!");
 //				}
-//				
+//
 //				lineIndex++;
 //				if (lineIndex % (lineCount / statusString.length()) == 0) {
 //					System.out.print(".");
 //					System.out.flush();
 //				}
 //			}
-//			
+//
 //			bufferedReader.close();
 //		} catch (IOException e) {
 //			Gbl.errorMsg(e);
 //		}
-//		
+//
 //		// create age distribution, both for employed and non-employed persons
 //		double procEmplPersFrac = 0;
 //		double procNonEmplPersFrac = 0;
@@ -801,7 +801,7 @@ public class DatapulsPopulationGenerator {
 //			}
 //			censusNonEmplAgeDistr.add(procNonEmplPersFrac);
 //		}
-	
+
 	/**
 	 * reads in the number of employed persons per building based on the buildingsfilename file
 	 */
@@ -809,7 +809,7 @@ public class DatapulsPopulationGenerator {
 
 		String statusString = "|----------+-----------|";
 		System.out.println(statusString);
-		
+
 		try {
 			FileReader fileReader = new FileReader(buildingsFilename);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -823,17 +823,17 @@ public class DatapulsPopulationGenerator {
 			int noEmployeesInBuildingCount = 0;
 			int lineIndex = 0;
 			while ((currentLine = bufferedReader.readLine()) != null) {
-				
+
 				String[] entries = currentLine.split("\t", -1);
-				
+
 				String buildingID = entries[39].trim();
-				
+
 				// Get the buying power per House hold and building
-				// process it only if there is a valid buying power 
+				// process it only if there is a valid buying power
 				// associated to the building
 				int buyingPower = Integer.parseInt(entries[10].trim());
 				int householdCount = Integer.parseInt(entries[5].trim());
-				
+
 				if (buyingPower < 0) {
 					buyingPower = Integer.MIN_VALUE;
 					invalidBuyingPowerCount++;
@@ -843,25 +843,25 @@ public class DatapulsPopulationGenerator {
 					if (buyingPower == 0) {
 						noBuyingPowerCount++;
 					}
-				
+
 					buildingCount++;
-					
+
 					int personCount = Integer.parseInt(entries[4].trim());
 					double employedFraction   = Double.parseDouble(entries[21].trim());
 					double alienFraction   = Double.parseDouble(entries[8].trim());
 					int xCoord   = Integer.parseInt(entries[2].trim());
 					int yCoord   = Integer.parseInt(entries[3].trim());
-					
+
 					if (employedFraction <= 0) {
 						noEmployeesInBuildingCount++;
 					}
-					
+
 					// 1.7 ist der Faktor um den Nettolohn II in den Bruttolohn umzurechnen (Pi*Daumen)
 					buildingsInformation.put(buildingID, new BuildingInformation(householdCount,
 							buyingPower * 1.7 * 1000, employedFraction, alienFraction, xCoord, yCoord));
-	
+
 					totalPersonCount += personCount;
-	
+
 				}
 
 				lineIndex++;
@@ -871,7 +871,7 @@ public class DatapulsPopulationGenerator {
 				}
 			}
 			bufferedReader.close();
-		
+
 			System.out.println(buildingCount + " buildings");
 			System.out.println(noBuyingPowerCount + " have no buying power," +
 				invalidBuyingPowerCount + " have invalid buying power," +
@@ -880,29 +880,20 @@ public class DatapulsPopulationGenerator {
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		
+
 		getNofPersonsPerBuilding();
 
 	}
-	
+
 	class PersonInformation {
-		
+
 		private int age;
 		private String sex;
 		private boolean employed;
 		private String nationality;
 		private BuildingInformation bInfo;
 		private HouseholdInformation hInfo;
-		
-		/**
-		 * @param id
-		 * @param age
-		 * @param sex
-		 * @param employed
-		 * @param nationality
-		 * @param buildingID
-		 * @param householdID
-		 */
+
 		public PersonInformation(int age, String sex, boolean employed,
 				String nationality, BuildingInformation bInfo, HouseholdInformation hInfo) {
 			super();
@@ -913,7 +904,7 @@ public class DatapulsPopulationGenerator {
 			this.bInfo = bInfo;
 			this.hInfo = hInfo;
 		}
-		
+
 		public void setIsEmployed(boolean employed) {
 			this.employed = employed;
 		}
@@ -921,53 +912,48 @@ public class DatapulsPopulationGenerator {
 		public String getNationality() {
 			return nationality;
 		}
-		
+
 		public String getSex() {
 			return sex;
 		}
-		
+
 		public int getAge() {
 			return age;
 		}
-		
+
 		public HouseholdInformation getHouseholdInformation() {
 			return hInfo;
 		}
-		
+
 		public BuildingInformation getBuildingInformation() {
 			return bInfo;
 		}
-		
+
 		public boolean getIsForeigner() {
 			return (nationality.equals("swiss") == false);
 		}
-		
+
 		public boolean getIsEmployed() {
 			return employed;
 		}
 	}
-	
+
 	class HouseholdInformation implements HouseholdI {
 		private int personCount;
 		private int kidCount;
 		private double income;
-		
-		/**
-		 * @param personIDs
-		 * @param id
-		 * @param buildingID
-		 */
+
 		public HouseholdInformation() {
 			super();
 			personCount = 0;
 			kidCount = 0;
 //			this.buildingID = buildingID;
 		}
-		
+
 		public int getPersonCount() {
 			return personCount;
 		}
-		
+
 		public int getKidCount() {
 			return kidCount;
 		}
@@ -975,20 +961,20 @@ public class DatapulsPopulationGenerator {
 		public void addPerson() {
 			personCount++;
 		}
-		
+
 		public void addKid() {
 			kidCount++;
 		}
-		
+
 		public double getIncome() {
 			return income;
 		}
-		
+
 		public void setIncome(double income) {
 			this.income = income;
 		}
 	}
-	
+
 	class BuildingInformation {
 		private int personCount;
 		private int householdCount;
@@ -997,7 +983,7 @@ public class DatapulsPopulationGenerator {
 		private double foreignerFraction;
 		private int xCoord;
 		private int yCoord;
-		
+
 		public BuildingInformation(int householdCount, double buyingPower,
 				double employedFraction, double alienFraction, int xCoord, int yCoord) {
 			super();
@@ -1009,7 +995,7 @@ public class DatapulsPopulationGenerator {
 			this.xCoord = xCoord;
 			this.yCoord = yCoord;
 		}
-		
+
 		public double getBuyingValuePerHH() {
 			return buyingPower / householdCount;
 		}
@@ -1049,12 +1035,10 @@ public class DatapulsPopulationGenerator {
 		public int getHouseholdCount() {
 			return householdCount;
 		}
-		/**
-		 * @return the householdCount
-		 */
+
 		public void addHousehold() {
 			// Increment the buyingPower, such that the buyingPower per household remains the same
-			buyingPower += (double)buyingPower / householdCount;
+			buyingPower += buyingPower / householdCount;
 			householdCount++;
 		}
 

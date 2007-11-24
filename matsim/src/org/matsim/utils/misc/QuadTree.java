@@ -36,6 +36,7 @@ import java.util.Iterator;
  * once at the same location.
  *
  * @author mrieser
+ * @param <T> The type of data to be stored in the QuadTree.
  */
 public class QuadTree<T> {
 

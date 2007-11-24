@@ -45,9 +45,9 @@ import org.matsim.utils.vis.netvis.visNet.DisplayNodeState;
  * <code>open()</code>; (4) call <code>dump(int)</code> arbitrarily often;
  * (5) call <code>close()</code>. Results can then be viewed via
  * <code>NetVis</code>'s main function.
- * 
+ *
  * @author gunnar
- * 
+ *
  */
 public class DisplayNetStateWriter extends StreamWriterA {
 
@@ -69,7 +69,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
 
     /*
      * -------------------- MINIMAL INTERFACE DEFINITION --------------------
-     * 
+     *
      * Overriding this function suffices to paint nodes and links with colors
      * and to write labels on top of them. Only functions of interest need to be
      * overridden.
@@ -109,7 +109,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
 
     /*
      * -------------------- INTERFACE DEFINITION --------------------
-     * 
+     *
      * Extended functionality that allows for drawing of individual cells.
      * Overriding these functions invalidates the simple link coloring functions
      * given above.
@@ -143,7 +143,8 @@ public class DisplayNetStateWriter extends StreamWriterA {
 
     // ----------------- IMPLEMENTATION OF BasicStateWriter -----------------
 
-    protected final StateI newState() {
+    @Override
+		protected final StateI newState() {
         return new MyNetworkState(getIndexConfig());
     }
 
@@ -155,11 +156,13 @@ public class DisplayNetStateWriter extends StreamWriterA {
             super(indexConfig);
         }
 
-        protected BufferedStateA newNodeState(BasicNodeI node) {
+        @Override
+				protected BufferedStateA newNodeState(BasicNodeI node) {
             return new DisplayNodeState(new MyDrawableNode(node));
         }
 
-        protected BufferedStateA newLinkState(BasicLinkI link) {
+        @Override
+				protected BufferedStateA newLinkState(BasicLinkI link) {
             return new DisplayLinkState(new MyDrawableLink(link));
         }
     }
@@ -202,7 +205,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
             return getLinkDisplLabel(link);
         }
 
-        public Collection getMovingAgents() {
+        public Collection<? extends DrawableAgentI> getMovingAgents() {
             return getAgentsOnLink(link);
         }
 
@@ -218,7 +221,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
 
 /**
  * Vanilla constructor for use without any further configuration.
- * 
+ *
  * @param network
  *            The network to be displayed. Note that the network elements must
  *            implement interfaces as defined in <code>drawableNet000</code>
@@ -268,7 +271,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
 // // do nothing: super.open(...) is already called in constructor
 // }
 /**
- * 
+ *
  */
 // public void dump(int time_s) throws IOException {
 // super.dump(time_s);

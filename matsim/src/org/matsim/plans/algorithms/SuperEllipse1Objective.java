@@ -50,7 +50,7 @@ import java.util.TreeMap;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.optimization.ObjectiveI;
 import org.matsim.utils.optimization.ParamPoint;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Objective Function based on a SuperEllipse. The superellipse is defined as

@@ -25,8 +25,7 @@ import java.util.Iterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.world.Coord;
-import org.matsim.world.Location;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class FacilitiesSummary extends FacilitiesAlgorithm {
 
@@ -50,6 +49,7 @@ public class FacilitiesSummary extends FacilitiesAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		int f_cnt = 0;
@@ -59,9 +59,7 @@ public class FacilitiesSummary extends FacilitiesAlgorithm {
 		//            home,work,education,shop,leisure
 		int caps[] = {0   ,   0,        0,   0,      0};
 		int unlimit_cap_cnt = 0;
-		Iterator<Location> f_it = facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : facilities.getFacilities().values()) {
 			f_cnt++;
 			if (f.getCenter().getX() > max_coord.getX()) { max_coord.setX(f.getCenter().getX()); }
 			if (f.getCenter().getY() > max_coord.getY()) { max_coord.setY(f.getCenter().getY()); }

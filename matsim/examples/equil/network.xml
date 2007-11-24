@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
 
-<network name="equil test network" xml:lang="de-CH">
+<network name="equil test network">
    <nodes>
       <node id="1" x="-20000" y="0"/>
       <node id="2" x="-15000" y="0"/>

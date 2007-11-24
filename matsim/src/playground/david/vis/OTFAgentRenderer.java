@@ -23,11 +23,8 @@ package playground.david.vis;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.net.URL;
 import java.util.List;
 
 import org.matsim.plans.Act;
@@ -50,8 +47,6 @@ class OTFAgentRenderer extends RendererA {
 
 	private final OTFVisNet network;
 
-	private Image agentPic = null;
-
 	private double laneWidth;
 
 	private BufferedImage image;
@@ -63,23 +58,7 @@ class OTFAgentRenderer extends RendererA {
 	OTFAgentRenderer(VisConfig visConfig, OTFVisNet network) {
 		super(visConfig);
 		this.network =  network;
-
-		URL url = null;
-		try {
-			url = this.getClass().getClassLoader().getResource(
-					visConfig.get(VisConfig.AGENT_GIF_FILE));
-
-			if (url != null)
-				this.agentPic = Toolkit.getDefaultToolkit().getImage(url);
-			else
-				this.agentPic = Toolkit.getDefaultToolkit().createImage(
-						visConfig.get(VisConfig.AGENT_GIF_FILE));
-
-		} catch (NullPointerException e) {
-		}
-
-		this.laneWidth = DisplayLink.LANE_WIDTH
-		* visConfig.getLinkWidthFactor();
+		this.laneWidth = DisplayLink.LANE_WIDTH * visConfig.getLinkWidthFactor();
 	}
 
 	// -------------------- RENDERING --------------------

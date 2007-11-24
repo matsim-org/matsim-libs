@@ -30,7 +30,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 import playground.balmermi.census2000.data.Persons;
 import playground.balmermi.census2000.models.ModelMobiliyTools;
@@ -68,7 +68,7 @@ public class PersonMobilityToolModel extends PersonAlgorithm implements PlanAlgo
 
 	@Override
 	public void run(Person person) {
-		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
+		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
 		Iterator<BasicAct> act_it = person.getSelectedPlan().getIteratorAct();
 		CoordI home_coord = null;
 		CoordI work_coord = null;

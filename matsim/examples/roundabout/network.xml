@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+
+<network name="roundabout test network" xml:lang="de-CH">
+   <nodes>
+      <node id="1" x="-2000" y="0" />
+      <node id="2" x="-1000" y="0" />
+
+      <node id="3" x="0"     y="-2000" />
+      <node id="4" x="0"     y="-1000" />
+
+      <node id="5" x="2000"  y="0" />
+      <node id="6" x="1000"  y="0" />
+
+      <node id="7" x="0"     y="2000" />
+      <node id="8" x="0"     y="1000" />
+    </nodes>
+    <links capperiod="01:00:00">
+      <link id="12" from="1" to="2" length="1000" capacity="1800" freespeed="27.78" permlanes="1" />
+      <link id="21" from="2" to="1" length="1000" capacity="1800" freespeed="27.78" permlanes="1" />
+      <link id="34" from="3" to="4" length="1000" capacity="1800" freespeed="27.78" permlanes="1" />
+      <link id="43" from="4" to="3" length="1000" capacity="1800" freespeed="27.78" permlanes="1" />
+      <link id="56" from="5" to="6" length="1000" capacity="1800" freespeed="27.78" permlanes="1" />
+      <link id="65" from="6" to="5" length="1000" capacity="1800" freespeed="27.78" permlanes="1" />
+      <link id="78" from="7" to="8" length="1000" capacity="1800" freespeed="27.78" permlanes="1" />
+      <link id="87" from="8" to="7" length="1000" capacity="1800" freespeed="27.78" permlanes="1" />
+
+      <link id="24" from="2" to="4" length="1400" capacity="1800" freespeed="27.78" permlanes="1" />
+      <link id="46" from="4" to="6" length="1400" capacity="1800" freespeed="27.78" permlanes="1" />
+      <link id="68" from="6" to="8" length="1400" capacity="1800" freespeed="27.78" permlanes="1" />
+      <link id="82" from="8" to="2" length="1400" capacity="1800" freespeed="27.78" permlanes="1" />
+   </links>
+</network>

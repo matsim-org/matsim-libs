@@ -29,7 +29,6 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
-import org.matsim.world.Location;
 
 public class FacilityWriteTable extends FacilitiesAlgorithm {
 
@@ -40,7 +39,7 @@ public class FacilityWriteTable extends FacilitiesAlgorithm {
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
 	private String act_type;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -82,13 +81,12 @@ public class FacilityWriteTable extends FacilitiesAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		try {
-			Iterator<Location> f_it = facilities.getLocations().values().iterator();
-			while (f_it.hasNext()) {
-				Facility f = (Facility)f_it.next();
+			for (Facility f : facilities.getFacilities().values()) {
 				Iterator<Activity> a_it = f.getActivities().values().iterator();
 				while (a_it.hasNext()) {
 					Activity a = a_it.next();

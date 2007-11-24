@@ -85,6 +85,7 @@ public class PersonInitDemandSummaryTable extends PersonAlgorithm implements Pla
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		try {
 			// person attributes

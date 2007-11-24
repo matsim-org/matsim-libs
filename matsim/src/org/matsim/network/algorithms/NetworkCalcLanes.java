@@ -20,8 +20,6 @@
 
 package org.matsim.network.algorithms;
 
-import java.util.Iterator;
-
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
@@ -33,7 +31,7 @@ public class NetworkCalcLanes extends NetworkAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public NetworkCalcLanes() {
 		super();
 	}
@@ -42,11 +40,10 @@ public class NetworkCalcLanes extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(NetworkLayer network) {
 		double capDivider = network.getCapacityPeriod();
-		Iterator lIter = network.getLinks().iterator();
-		while (lIter.hasNext()) {
-			Link link = (Link)lIter.next();
+		for (Link link : network.getLinks().values()) {
 			double capacity = link.getCapacity();
 			double cap1h = capacity * 3600.0 / capDivider;
 

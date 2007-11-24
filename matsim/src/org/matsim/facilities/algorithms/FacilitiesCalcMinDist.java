@@ -20,12 +20,9 @@
 
 package org.matsim.facilities.algorithms;
 
-import java.util.Iterator;
-
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.world.Location;
 
 public class FacilitiesCalcMinDist extends FacilitiesAlgorithm {
 
@@ -49,20 +46,17 @@ public class FacilitiesCalcMinDist extends FacilitiesAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-		
+
 		double min_dist = Double.MAX_VALUE;
-		
-		Iterator<Location> f_it = facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+
+		for (Facility f : facilities.getFacilities().values()) {
 			CoordI c = f.getCenter();
 			System.out.println("      Facility id = " + f.getId());
-			
-			Iterator<Location> f2_it = facilities.getLocations().values().iterator();
-			while (f2_it.hasNext()) {
-				Facility f2 = (Facility)f2_it.next();
+
+			for (Facility f2 : facilities.getFacilities().values()) {
 				if (!f2.equals(f)) {
 					CoordI c2 = f2.getCenter();
 					double dist = c2.calcDistance(c);

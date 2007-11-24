@@ -34,9 +34,8 @@ public class BackgroundRenderer extends RendererA {
         super(visConfig);
     }
 
-    // -------------------- RENDERING --------------------
-
-    protected void myRendering(Graphics2D display, AffineTransform boxTransform) {
+    @Override
+		protected void myRendering(Graphics2D display, AffineTransform boxTransform) {
 
         Rectangle visRect = getNetJComponent().getVisibleRect();
 
@@ -50,16 +49,13 @@ public class BackgroundRenderer extends RendererA {
             int targetLogoHeight = visRect.height * 8 / 10;
             int targetLogoWidth = visRect.width * 9 / 10;
 
-            display.setFont(new Font(display.getFont().getName(), Font.BOLD,
-                    targetLogoHeight));
+            display.setFont(new Font(display.getFont().getName(), Font.BOLD, targetLogoHeight));
             int trueLogoWidth = display.getFontMetrics().stringWidth(logo);
 
-            double scaling = Math.min((double) targetLogoWidth / trueLogoWidth,
-                    1);
+            double scaling = Math.min((double) targetLogoWidth / trueLogoWidth, 1);
 
             int scaledLogoHeight = (int)Math.round(scaling * targetLogoHeight);
-            display.setFont(new Font(display.getFont().getName(), Font.PLAIN,
-                    scaledLogoHeight));
+            display.setFont(new Font(display.getFont().getName(), Font.PLAIN, scaledLogoHeight));
             int scaledLogoWidth = display.getFontMetrics().stringWidth(logo);
 
             display.setColor(new Color(0.98f, 0.98f, 0.98f));

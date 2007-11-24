@@ -55,7 +55,7 @@ public class PersonSummary extends PersonAlgorithm implements PlanAlgorithmI {
 	private final int [] license_groups = new int[5];
 	private final int [][] caravail_groups = new int[5][3];
 	private final int [] employed_groups = new int[5];
-	
+
 	private final int [][] trip_mode_cnts = new int[5][5];
 	private final int [][] plan_mode_cnts = new int[5][5];
 
@@ -90,6 +90,7 @@ public class PersonSummary extends PersonAlgorithm implements PlanAlgorithmI {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		if (person.getAge() > 99) {
 			return;
@@ -143,7 +144,7 @@ public class PersonSummary extends PersonAlgorithm implements PlanAlgorithmI {
 		}
 
 		for (int i=0; i<person.getPlans().size(); i++) {
-			Plan plan = (Plan)person.getPlans().get(i);
+			Plan plan = person.getPlans().get(i);
 
 			int acts = 0;
 			for (int j=0; j<plan.getActsLegs().size(); j=j+2) {
@@ -151,9 +152,9 @@ public class PersonSummary extends PersonAlgorithm implements PlanAlgorithmI {
 				act_cnt++;
 			}
 
-			av_act_per_plan = av_act_per_plan * (double)plan_cnt + acts;
+			av_act_per_plan = av_act_per_plan * plan_cnt + acts;
 			plan_cnt++;
-			av_act_per_plan = av_act_per_plan / (double)plan_cnt;
+			av_act_per_plan = av_act_per_plan / plan_cnt;
 		}
 
 		ArrayList<Object> acts_legs = person.getSelectedPlan().getActsLegs();
@@ -183,13 +184,13 @@ public class PersonSummary extends PersonAlgorithm implements PlanAlgorithmI {
 			else if (trip_dist < 10000) { trip_col = 2; }
 			else if (trip_dist < 20000) { trip_col = 3; }
 			else { trip_col = 4; }
-			
+
 			this.trip_mode_cnts[trip_row][trip_col]++;
-			
+
 			plan_row = trip_row;
 			plan_dist += trip_dist;
 		}
-		
+
 		// get plan col (plan dist)
 		int plan_col = -1;
 		if (plan_dist < 5000) { plan_col = 0; }

@@ -26,13 +26,12 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
-import org.matsim.world.Location;
 
 /**
  * <p>
  * <b>MATSim-FUSION Module</b>
  * </p>
- * 
+ *
  * <p>
  * For each given activity of each given facility, the capacity will be set to 1
  * if no capacity is defined.
@@ -43,7 +42,7 @@ import org.matsim.world.Location;
  * capacity is set to 1, one log line will be written.
  * No log lines are written for other activity types.
  * </p>
- * 
+ *
  * @author Michael Balmer
  */
 public class FacilitiesSetCapacity extends FacilitiesAlgorithm {
@@ -73,12 +72,11 @@ public class FacilitiesSetCapacity extends FacilitiesAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
-		Iterator<Location> f_it = facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : facilities.getFacilities().values()) {
 			Iterator<Activity> act_it = f.getActivities().values().iterator();
 			while (act_it.hasNext()) {
 				Activity activity = act_it.next();

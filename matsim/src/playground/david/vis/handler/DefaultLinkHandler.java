@@ -54,6 +54,7 @@ public class DefaultLinkHandler  extends OTFParamProviderA implements  OTFLinkHa
             out.writeUTF(displText);
     }
 	
+	@Override
 	public float getFloatParam(int index) throws UnsupportedOperationException {
 		switch(index) {
 		case 1: return value;
@@ -61,6 +62,7 @@ public class DefaultLinkHandler  extends OTFParamProviderA implements  OTFLinkHa
 		return 0; // throw exception here
 	}
 
+	@Override
 	public String getStringParam(int index) throws UnsupportedOperationException {
 		return text;
 	}

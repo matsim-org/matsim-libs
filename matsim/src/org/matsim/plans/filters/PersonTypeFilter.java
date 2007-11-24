@@ -32,6 +32,7 @@ public class PersonTypeFilter extends AbstractPersonFilter {
 		this.type = type;
 	}
 
+	@Override
 	public boolean judge(Person person) {
 		return type.equals(person.getType());
 	}

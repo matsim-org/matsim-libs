@@ -25,7 +25,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.utils.vis.netvis.DrawableAgentI;
@@ -50,6 +49,7 @@ public final class DisplayLinkState extends BufferedStateA {
 	/**
 	 * Not to be called by extending classes.
 	 */
+	@Override
 	public final void writeMyself(DataOutputStream out) throws IOException {
 		/*
 		 * (1) write display value count
@@ -73,15 +73,14 @@ public final class DisplayLinkState extends BufferedStateA {
 		/*
 		 * (4) write agents
 		 */
-		Collection agents = link.getMovingAgents();
+		Collection<? extends DrawableAgentI> agents = link.getMovingAgents();
 		if (agents != null) {
 			/*
 			 * (4.1) write agent count
 			 */
 			out.writeInt(agents.size());
 
-			for (Iterator it = agents.iterator(); it.hasNext();) {
-				DrawableAgentI agent = (DrawableAgentI) it.next();
+			for (DrawableAgentI agent : agents) {
 				/*
 				 * (4.2.1) write agent position in link
 				 */
@@ -98,6 +97,7 @@ public final class DisplayLinkState extends BufferedStateA {
 	/**
 	 * Not to be called by extending classes.
 	 */
+	@Override
 	public final void readMyself(DataInputStream in) throws IOException {
 		DisplayLink displLink = (DisplayLink) link;
 
@@ -118,7 +118,7 @@ public final class DisplayLinkState extends BufferedStateA {
 		/*
 		 * (4) read agents
 		 */
-		List agentsNow = new ArrayList();
+		List<DrawableAgentI> agentsNow = new ArrayList<DrawableAgentI>();
 		// displLink.getMovingAgents().clear();
 		/*
 		 * (4.1) read agent count

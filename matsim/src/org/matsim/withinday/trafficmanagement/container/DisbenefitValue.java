@@ -40,6 +40,7 @@ public class DisbenefitValue {
 		this.simTime=sim_time;
 	}
 	
+	@Override
 	public String toString(){
 		String s = Double.toString(value);
 		return s;

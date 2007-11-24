@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -139,7 +138,7 @@ import org.matsim.visum.VisumAnbindungstabelleWriter;
 import org.matsim.visum.VisumMatrixReader;
 import org.matsim.visum.VisumMatrixWriter;
 import org.matsim.visum.VisumWriteRoutes;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Location;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -441,8 +440,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  extracting aoi... at " + (new Date()));
-		final Collection<Link> links = network.getLinks();
-		for (final Link link : links) {
+		for (Link link : network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
 			if ((from.getCoord().calcDistance(center) <= radius) || (to.getCoord().calcDistance(center) <= radius)) {
@@ -549,7 +547,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  searching link...");
-		final Link link = (Link)network.getLinks().get(Integer.toString(linkId));
+		final Link link = network.getLinks().get(Integer.toString(linkId));
 		final Node fromNode = link.getFromNode();
 		final Node toNode = link.getToNode();
 		System.out.println("  done.");
@@ -1230,11 +1228,11 @@ public class MyRuns {
 
 		System.out.println("  done.");
 		final String pedNodeType = "P";
-		for (final Iterator iter = ptNetwork.getNodes().iterator(); iter.hasNext(); ) {
+		for (final Iterator<? extends Node> iter = ptNetwork.getNodes().values().iterator(); iter.hasNext(); ) {
 			final PtNode node = (PtNode) iter.next();
 			if (pedNodeType.equals(node.getType())) {
 				if (node.getIncidentLinks().size() == 2) {
-					final PtNode node2 = (PtNode)node.getOutNodes().iterator().next();
+					final PtNode node2 = (PtNode)node.getOutNodes().values().iterator().next();
 					if (node2.getIncidentLinks().size() == 3) {
 						System.out.println("HP " + node2.getId() + " (part of HB " + node.getId() + ") is a dead end.");
 					}
@@ -2667,8 +2665,7 @@ public class MyRuns {
 	private static Geometry getNetworkAsKml(final NetworkLayer network, final TreeMap<IdI, Integer> linkVolumes, final CoordinateTransformationI coordTransform) {
 		final MultiGeometry networkGeom = new MultiGeometry();
 
-		for (final Iterator iter = network.getLinks().iterator(); iter.hasNext(); ) {
-			final Link link = (Link) iter.next();
+		for (Link link : network.getLinks().values()) {
 			Integer volume = linkVolumes.get(link.getId());
 			if (volume == null) volume = 0;
 			final CoordI fromCoord = coordTransform.transform(link.getFromNode().getCoord());

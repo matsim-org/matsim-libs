@@ -47,16 +47,16 @@ class FilterPersons extends PersonAlgorithm{
 	public FilterPersons() {
 		super();
 		//Find relevant nodes to look for
-		QueueLink link1 = (QueueLink)FilterBerlinKutter.network.getLinks().get(new Id(1655));
+		QueueLink link1 = FilterBerlinKutter.network.getLinks().get(new Id(1655));
 		relevantFromNodes.add(link1.getFromNode());
 		relevantToNodes.add(link1.getToNode());
-		link1 = (QueueLink)FilterBerlinKutter.network.getLinks().get(new Id(1659));
+		link1 = FilterBerlinKutter.network.getLinks().get(new Id(1659));
 		relevantFromNodes.add(link1.getFromNode());
 		relevantToNodes.add(link1.getToNode());
-		link1 = (QueueLink)FilterBerlinKutter.network.getLinks().get(new Id(1663));
+		link1 = FilterBerlinKutter.network.getLinks().get(new Id(1663));
 		relevantFromNodes.add(link1.getFromNode());
 		relevantToNodes.add(link1.getToNode());
-		link1 = (QueueLink)FilterBerlinKutter.network.getLinks().get(new Id(1668));
+		link1 = FilterBerlinKutter.network.getLinks().get(new Id(1668));
 		relevantFromNodes.add(link1.getFromNode());
 		relevantToNodes.add(link1.getToNode());
 	}

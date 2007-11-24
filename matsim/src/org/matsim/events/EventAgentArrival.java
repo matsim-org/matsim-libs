@@ -40,6 +40,7 @@ public class EventAgentArrival extends AgentEvent {
 		super(time, agentId, legId, linkId);
 	}
 
+	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
 		//impl.addAttribute("","","Flag", "", Integer.toString(0));
@@ -47,10 +48,12 @@ public class EventAgentArrival extends AgentEvent {
 		return impl;
 	}
 
+	@Override
 	public String toString() {
 		return asString() + "0\tarrival";
 	}
 
+	@Override
 	public void rebuild(Plans population, NetworkLayer network) {
 		rebuildAgentData(population,network);
 	}

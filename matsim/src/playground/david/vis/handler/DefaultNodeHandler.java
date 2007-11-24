@@ -44,6 +44,7 @@ public class DefaultNodeHandler extends OTFParamProviderA implements  OTFNodeHan
         out.writeUTF("");
     }
 	
+	@Override
 	public float getFloatParam(int index) throws UnsupportedOperationException {
 		switch(index) {
 		case 1: return value;
@@ -51,6 +52,7 @@ public class DefaultNodeHandler extends OTFParamProviderA implements  OTFNodeHan
 		return 0; // throw exception here
 	}
 
+	@Override
 	public String getStringParam(int index) throws UnsupportedOperationException {
 		return text;
 	}

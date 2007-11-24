@@ -31,6 +31,7 @@ public class CreatePlannedVehicles extends PersonHandler {
 		this.sim = sim;
 	}
 	
+	@Override
 	public void handlePerson(Person person) {
 		PlannedDriverVehicle driver = new PlannedDriverVehicle(person, sim);
 		CALink startLink = (CALink)driver.getDepartureLink();

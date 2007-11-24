@@ -20,7 +20,7 @@
 
 package playground.gregor.multipath;
 
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * The BeelineDifferenceTracer calculates the deviance from the hypothetical OD connection for a given Coord.

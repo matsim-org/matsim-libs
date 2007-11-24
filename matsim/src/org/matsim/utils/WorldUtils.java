@@ -25,7 +25,7 @@ import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;

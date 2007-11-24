@@ -30,29 +30,27 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.world.Coord;
+import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.writer.MatsimXmlWriter;
 
 /**
  * (like Subsequent) calculates the "default next" linkId of a current link in
  * MATSim networkfile with respect to Capacity (i.e. BEAT=1) and Geometry
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class SubsequentCapacity extends MatsimXmlWriter {
 
-	private BasicLinkSetI links;
+	private Map<IdI, ? extends Link> links;
 
 	/**
-	 * @param String
-	 *            (args0) - ssLinkId
-	 * @param String
-	 *            (args1) - linkId
+	 * (arg0) - ssLinkId
+	 * (arg1) - linkId
 	 */
 	private TreeMap<String, String> ssLinks = new TreeMap<String, String>();
 
@@ -70,34 +68,30 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void compute() {
 		Map<String, Double> caps = new TreeMap<String, Double>();
 		List<String> toCompareAngles = new ArrayList<String>();
 
-		for (Iterator iter = links.iterator(); iter.hasNext();) {
+		for (Link l : links.values()) {
 			caps.clear();
 			toCompareAngles.clear();
 			outLinksMap.clear();
 
-			Link l = (Link) iter.next();
 			Node to = l.getToNode();
-			BasicLinkSetI outLinks = to.getOutLinks();
+			Collection<? extends Link> outLinks = to.getOutLinks().values();
 
-			for (Iterator outLinkIt = outLinks.iterator(); outLinkIt.hasNext();) {
-				Link outLink = (Link) outLinkIt.next();
+			for (Link outLink : outLinks) {
 				String outLinkId = outLink.getId().toString();
 				caps.put(outLinkId, outLink.getCapacity());
 				outLinksMap.put(outLinkId, outLink);
 				// TODO: can man delete outLinksMap?
 			}
 			String nextOutLinkId = "";
-			if (caps.size() == 1)
-				for (Iterator outLinkIdIter = outLinksMap.keySet().iterator(); outLinkIdIter
-						.hasNext();)
-					nextOutLinkId = (String) outLinkIdIter.next();
-			else if (caps.size() > 1) {
+			if (caps.size() == 1) {
+				nextOutLinkId = outLinksMap.keySet().iterator().next();
+			} else if (caps.size() > 1) {
 				Collection<Double> capsValues = caps.values();
 				double maxCap = Collections.max(capsValues);
 				double minCap = Collections.min(capsValues);
@@ -132,7 +126,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 	/**
 	 * Calculates the "default next" LinkId with respect to Geometry i.e.
 	 * angles, if there is 2 outLinks with the same Capacity
-	 * 
+	 *
 	 * @param l - the current link
 	 * @param nextLinksIds - a list of outLinks with the same Capacity, size <= 2
 	 * @return the "default next" LinkId
@@ -202,8 +196,8 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 		writer.write("<subsequent>\n");
 		// links
 		writer.write("\t<links>\n");
-		for (Iterator it = ssLinks.entrySet().iterator(); it.hasNext();) {
-			Entry<String, String> next = (Entry<String, String>) it.next();
+		for (Iterator<Entry<String, String>> it = ssLinks.entrySet().iterator(); it.hasNext();) {
+			Entry<String, String> next = it.next();
 			writer.write("\t\t<link id=\"" + next.getValue()
 					+ "\" subsequentLinkId=\"" + next.getKey() + "\" />\n");
 		}

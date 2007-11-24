@@ -45,7 +45,6 @@ package playground.andreas.itsumo;
  * *********************************************************************** */
 
 import java.io.File;
-import java.util.Iterator;
 
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
@@ -61,7 +60,7 @@ import org.matsim.utils.vis.netvis.NetVis;
 
 
 public class MyControler1 extends Controler {
-	
+
 	protected int[] generateDistribution(Link[] netLinks, int popSize, Link[] givenLinks, double[] probs) {
 
 		int[] quant = new int[netLinks.length];
@@ -82,7 +81,7 @@ public class MyControler1 extends Controler {
 			if (!aux[i])
 				quant[i] = 0;
 		}
-		
+
 		// equally distribute the rest of agents on the remaining links
 		int others = rest / (netLinks.length - givenLinks.length);
 		for (int i=0; i<netLinks.length; i++) {
@@ -91,7 +90,7 @@ public class MyControler1 extends Controler {
 				rest -= quant[i];
 			}
 		}
-		
+
 		// handle rouding difference
 		while (rest > 0) {
 			for (int i=0; i<netLinks.length; i++) {
@@ -103,42 +102,39 @@ public class MyControler1 extends Controler {
 				}
 			}
 		}
-		
+
 		return quant;
 	}
-	
+
+	@Override
 	protected void runMobSim() {
 		ItsumoSim sim = new ItsumoSim(this.population, this.events);
 		sim.run();
 	}
-	
+
 	@Override
 	protected Plans loadPopulation() {
-		
-		Link[] netLinks = new Link[network.getLinks().size()];
-		int n=0;
-		for (Iterator iter = network.getLinks().iterator(); iter.hasNext();) {
-			netLinks[n++] = (Link) iter.next();
-		}
-		
+
+		Link[] netLinks = network.getLinks().values().toArray(new Link[network.getLinks().size()]);
+
 		// maybe 400, 500, 600, 700
-		int popSize = 700; 
-		
+		int popSize = 700;
+
 		Link[] source = {network.getLink("181"), network.getLink("159"), network.getLink("75")};
 		double[] probSource = {0.05, 0.04, 0.03};
-		
+
 		Link[] dest = {network.getLink("207")};
 		double[] probDest = {0.6};
-		
+
 		int[] quantSource = generateDistribution(netLinks, popSize, source, probSource);
 		int[] quantDest = generateDistribution(netLinks, popSize, dest, probDest);
-		
+
 		Link[] agentsSource = new Link[popSize];
 		Link[] agentsDest = new Link[popSize];
-		
 
-		
-		
+
+
+
 		for (int i=0; i<popSize; i++) {
 			for (int j=0; j<network.getLinks().size(); j++) {
 				if (quantSource[j] > 0) {
@@ -147,7 +143,7 @@ public class MyControler1 extends Controler {
 					break;
 				}
 			}
-			
+
 			boolean safe = false;
 			for (int j=0; j<network.getLinks().size(); j++) {
 				if (quantDest[j] > 0 && !netLinks[j].equals(agentsSource[i])) {
@@ -157,7 +153,7 @@ public class MyControler1 extends Controler {
 					break;
 				}
 			}
-			
+
 			if (!safe) {
 				for (int j=0; j<network.getLinks().size(); j++) {
 					if (quantDest[j] > 0) {
@@ -167,61 +163,61 @@ public class MyControler1 extends Controler {
 					}
 				}
 			}
-		}		
-		
-		
+		}
+
+
 		Plans population = new Plans(Plans.NO_STREAMING);
 
 		printNote("", "  generating plans... ");
-		
+
 		for (int i=0; i<popSize; i++) {
 			generatePerson(i+1, agentsSource[i], agentsDest[i], population);
 		}
-		
+
 		/* ANDREAS CODE
 
 		// Plans generation for the sesam scenario
-		
+
 		int ii = 1;
 		Link destLink = network.getLink("207");
 		Link sourceLink = null;
-		
-		// Put 6 Agents at every link except the destLink		
+
+		// Put 6 Agents at every link except the destLink
 		for (Iterator iter = network.getLinks().iterator(); iter.hasNext();) {
 			sourceLink = (Link) iter.next();
-			
-			if (!sourceLink.equals(destLink)){				
-				for (int jj = 1; jj <= 6; jj++) {					
+
+			if (!sourceLink.equals(destLink)){
+				for (int jj = 1; jj <= 6; jj++) {
 					generatePerson(ii, sourceLink, destLink, population);
-					ii++;					
-				}						
-			}		
-						
+					ii++;
+				}
+			}
+
 		}
-		
+
 		// Put another 24 agents at link 181 (C2B2) > 30 agents on the link now
 		sourceLink = network.getLink("181");
 		for (int jj = 1; jj <= 24; jj++) {
 			generatePerson(ii, sourceLink, destLink, population);
-			ii++;			
-		}	
-		
+			ii++;
+		}
+
 		// Put another 19 agents at link 159 (E1D1) > 25 agents on the link now
 		sourceLink = network.getLink("159");
 		for (int jj = 1; jj <= 19; jj++) {
 			generatePerson(ii, sourceLink, destLink, population);
-			ii++;			
-		}	
-		
+			ii++;
+		}
+
 		// Put another 14 agents at link 75 (B5B4) > 20 agents on the link now
 		sourceLink = network.getLink("75");
 		for (int jj = 1; jj <= 14; jj++) {
 			generatePerson(ii, sourceLink, destLink, population);
 			ii++;
-		}	
-		
+		}
+
 		ANDREAS CODE */
-		
+
 		printNote("", "  done");
 
 		return population;
@@ -229,10 +225,10 @@ public class MyControler1 extends Controler {
 
 	}
 
-	//	/*	Comment it, if you want to read a native MATSim network	
+	//	/*	Comment it, if you want to read a native MATSim network
 	@Override
 	protected NetworkLayer loadNetwork() {
-	
+
 		printNote("", "  creating network layer... ");
 		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
@@ -257,30 +253,30 @@ public class MyControler1 extends Controler {
 	 *
 	 */
 	protected void makeVis(){
-		
-		File driversLog = new File("./drivers.txt");		
+
+		File driversLog = new File("./drivers.txt");
 		File visDir = new File("./output/vis");
 		File eventsFile = new File("./output/vis/events.txt");
-				
+
 		if (driversLog.exists()){
 			visDir.mkdir();
 			driversLog.renameTo(eventsFile);
-			
+
 			Events2Snapshot events2Snapshot = new org.matsim.run.Events2Snapshot();
-			events2Snapshot.run(eventsFile, Gbl.getConfig(), network);			
-			
+			events2Snapshot.run(eventsFile, Gbl.getConfig(), network);
+
 			// Run NetVis if possible
 			if (Gbl.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
-				String[] visargs = {"./output/vis/Snapshot"};						
+				String[] visargs = {"./output/vis/Snapshot"};
 				NetVis.main(visargs);
-			}			
-			
+			}
+
 		} else {
 			System.err.println("Couldn't find " + driversLog);
 			System.exit(0);
-		}		
+		}
 	}
-	
+
 	private void generatePerson(int ii, Link sourceLink, Link destLink, Plans population){
 		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
 		Plan plan = new Plan(p);
@@ -288,26 +284,26 @@ public class MyControler1 extends Controler {
 			plan.createAct("h", 100., 100., sourceLink, 0., 0*60*60., 0., true);
 			plan.createLeg("1", "car", null, null, null);
 			plan.createAct("h", 200., 200., destLink, 8*60*60, 0., 0., true);
-			
+
 			p.addPlan(plan);
-			population.addPerson(p);			
+			population.addPerson(p);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
-	
+
 	public static void main(final String[] args) {
-		
+
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./test/shared/itsumo-sesam-scenario/config.xml"});	
+			Gbl.createConfig(new String[] {"./examples/itsumo-sesam-scenario/config.xml"});
 		} else {
 			Gbl.createConfig(args) ;
 		}
-				
+
 		final MyControler1 controler = new MyControler1();
 		controler.setOverwriteFiles(true) ;
-		
+
 //		// this comes directly from marcel's master controler
 //		Runtime run = Runtime.getRuntime();
 //		run.addShutdownHook( new Thread()
@@ -321,8 +317,8 @@ public class MyControler1 extends Controler {
 
 		//controler.setTraveltimeBinSize(1);
 		controler.run(null);
-		
+
 		controler.makeVis();
-	}	
+	}
 
 }

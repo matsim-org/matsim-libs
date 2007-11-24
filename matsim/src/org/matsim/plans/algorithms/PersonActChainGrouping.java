@@ -73,6 +73,7 @@ public class PersonActChainGrouping extends PersonAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 
 		if (person.getPlans().size() != 1) {

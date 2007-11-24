@@ -53,13 +53,13 @@ public class SpatialInteractor {
 
 //		Shuffle the list of attendees at the socializing opportunity
 //		and let a percentage of them interact
-		List<Person> people = java.util.Collections.list(java.util.Collections.enumeration(event.getAttendees()));		
+		List<Person> people = java.util.Collections.list(java.util.Collections.enumeration(event.getAttendees()));
 		java.util.Collections.shuffle(people);
 		Object personList[] = people.toArray();
 		int numPersons = personList.length;
 
 //		for (int i = 0; i < (int) (numPersons * pct_interacting); i++) {
-		for (int i = 0; i < (int) (numPersons); i++) {		
+		for (int i = 0; i < numPersons; i++) {
 		    Person p1 = (Person) personList[i];
 
 		    if (interaction_type.equals("random")) {

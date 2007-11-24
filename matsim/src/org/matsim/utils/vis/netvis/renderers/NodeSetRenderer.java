@@ -24,7 +24,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.Iterator;
 
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.NetJComponent;
@@ -33,14 +32,12 @@ import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 import org.matsim.utils.vis.netvis.visNet.DisplayNode;
 
 /**
- * 
  * @author gunnar
- *
  */
 public class NodeSetRenderer extends RendererA {
 
-    public static boolean RENDER_NODES = false;
-    
+    public static final boolean RENDER_NODES = false;
+
     private final DisplayNet network;
 
     public NodeSetRenderer(VisConfig visConfig, DisplayNet network) {
@@ -48,20 +45,21 @@ public class NodeSetRenderer extends RendererA {
         this.network = network;
     }
 
-    public void setTargetComponent(NetJComponent comp) {
+    @Override
+		public void setTargetComponent(NetJComponent comp) {
         super.setTargetComponent(comp);
     }
 
     // -------------------- RENDERING --------------------
 
-    protected synchronized void myRendering(Graphics2D display,
+    @Override
+		protected synchronized void myRendering(Graphics2D display,
             AffineTransform boxTransform) {
-        
+
         if (!RENDER_NODES)
             return;
-        
-        final double laneWidth = DisplayLink.LANE_WIDTH
-                * getVisConfig().getLinkWidthFactor();
+
+        final double laneWidth = DisplayLink.LANE_WIDTH * getVisConfig().getLinkWidthFactor();
         NetJComponent comp = getNetJComponent();
         AffineTransform originalTransform = display.getTransform();
         display.setStroke(new BasicStroke(Math.round(0.05 * laneWidth)));
@@ -70,9 +68,7 @@ public class NodeSetRenderer extends RendererA {
         nodeTransform.concatenate(boxTransform);
         display.setTransform(nodeTransform);
 
-        for (Iterator it = network.getNodes().iterator(); it.hasNext();) {
-            final DisplayNode node = (DisplayNode) it.next();
-
+        for (DisplayNode node : this.network.getNodes().values()) {
             final double x = node.getEasting();
             final double y = node.getNorthing();
 

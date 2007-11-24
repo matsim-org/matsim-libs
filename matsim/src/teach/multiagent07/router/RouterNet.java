@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
+import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 
 import teach.multiagent07.net.CALink;
 import teach.multiagent07.net.CANetwork;
@@ -35,11 +35,13 @@ import teach.multiagent07.net.CANode;
 
 public class RouterNet extends CANetwork {
 
+	@Override
 	public CALink newLink(String label) {
 		RouterLink link = new RouterLink(label);
 		return link;
 	}
 
+	@Override
 	public CANode newNode(String label) {
 		RouterNode node = new RouterNode(label);
 		return node;
@@ -49,7 +51,7 @@ public class RouterNet extends CANetwork {
 	public final List<RouterNode> calcCheapestRoute(RouterNode fromNode, RouterNode toNode, double starttime) {
 
 		// first make sure the cost and visit flags are all reset
-		Iterator nIter = this.getNodes().iterator();
+		Iterator nIter = this.getNodes().values().iterator();
 		while (nIter.hasNext()) {
 			RouterNode node = (RouterNode)nIter.next();
 			node.resetVisited();
@@ -78,14 +80,12 @@ public class RouterNet extends CANetwork {
 
 			double currTime = outNode.getTime();
 			double currCost = outNode.getCost();
-			BasicLinkSetI outlinks = outNode.getOutLinks();
-			Iterator<RouterLink> iter = outlinks.iterator();
-			while (iter.hasNext()) {
-				RouterLink link = iter.next();
+			for (BasicLinkI l : outNode.getOutLinks().values()) {
+				RouterLink link = (RouterLink) l;
 				RouterNode node = (RouterNode)link.getToNode();
 				double travelTime = link.getTravelTime(currTime);
 				double travelCost = link.getLength() / link.getFreespeed();
-				
+
 				double nCost = node.getCost();
 				if (!node.isVisited()) {
 					node.visit(outNode, currCost + travelCost, currTime + travelTime);
@@ -93,11 +93,11 @@ public class RouterNet extends CANetwork {
 				} else if (currCost + travelCost < nCost) {
 					// remove the old entry of node n
 					// there must be one in the queue, as the visited flag is set!
-					
+
 					Iterator<RouterNode> iter2 = pendingNodes.iterator();
 					while (iter2.hasNext() && iter2.next() != node) ;
 					iter2.remove();
-					
+
 					node.visit(outNode, currCost + travelCost, currTime + travelTime);
 
 					pendingNodes.add(node);

@@ -26,12 +26,12 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.SAXException;
 
@@ -65,7 +65,7 @@ public class EvacuationQSimControler extends Controler {
 	@Override
 	protected void loadData() {
 		super.loadData();
-		HashMap<Id,EvacuationAreaLink> desasterAreaLinks = new HashMap<Id,EvacuationAreaLink>();
+		HashMap<IdI, EvacuationAreaLink> desasterAreaLinks = new HashMap<IdI, EvacuationAreaLink>();
 		EvacuationNetFileReader enfr = new EvacuationNetFileReader(desasterAreaLinks);
 		try {
 			enfr.readFile("networks/desaster_area.xml.gz");

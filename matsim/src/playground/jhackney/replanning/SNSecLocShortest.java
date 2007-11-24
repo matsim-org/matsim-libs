@@ -30,7 +30,7 @@ import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 import playground.jhackney.algorithms.PlanEuclideanLength;
 import playground.jhackney.run.SNReplanning;
@@ -102,7 +102,7 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 // Pick a random ACTIVITY of this type from knowledge
 		
 		List<Activity> actList = k.getActivities(type);
-		Facility fFromKnowledge = (Facility) actList.get(Gbl.random.nextInt( actList.size())).getFacility();
+		Facility fFromKnowledge = actList.get(Gbl.random.nextInt( actList.size())).getFacility();
 
 // And replace the activity in the chain with it (only changes the facility)
 		

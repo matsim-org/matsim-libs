@@ -20,22 +20,33 @@
 
 package org.matsim.interfaces.networks.basicNet;
 
-import org.matsim.utils.identifiers.IdentifiedI;
+import java.util.Map;
+
+import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.identifiers.IdI;
 
 /**
  * A topological representation of an network node.
  */
-public interface BasicNodeI extends IdentifiedI {
+public interface BasicNodeI {
+
+  /**
+   * Returns a non-<code>null</code> instance of <code>IdI</code> that
+   * uniquely identifies this object.
+   *
+   * @return this object's identifier
+   */
+  public IdI getId();
 
     /**
      * Adds a non-<code>null</code> link to this node's set of ingoing links.
-     * 
+     *
      * @param link
      *            the <code>BasicLinkI</code> to be added
-     * 
+     *
      * @return <code>true</code>> if <code>link</code> has been added and
      *         <code>false</code> otherwise
-     * 
+     *
      * @throws IllegalArgumentException
      *             if <code>link</code> is <code>null</code>
      */
@@ -44,13 +55,13 @@ public interface BasicNodeI extends IdentifiedI {
     /**
      * Adds a non-<code>null</code> link to this node's set of outgoing
      * links.
-     * 
+     *
      * @param link
      *            the <code>BasicLinkI</code> to be added
-     * 
+     *
      * @return <code>true</code> if <code>link</code> has been added and
      *         <code>false</code> otherwise
-     * 
+     *
      * @throws IllegalArgumentException
      *             if <code>link</code> is <code>null</code>
      */
@@ -59,17 +70,18 @@ public interface BasicNodeI extends IdentifiedI {
     /**
      * Returns this node's set of ingoing links. This set might be empty, but it
      * must not be <code>null</code>.
-     * 
+     *
      * @return this node's ingoing links
      */
-    public BasicLinkSetI getInLinks();
+    public Map<IdI, ? extends BasicLinkI> getInLinks();
 
     /**
      * Returns this node's set of outgoing links. This set might be empty, but
      * it must not be <code>null</code>.
-     * 
+     *
      * @return this node's outgoing links
      */
-    public BasicLinkSetI getOutLinks();
+    public Map<IdI, ? extends BasicLinkI> getOutLinks();
 
+    public CoordI getCoord();
 }

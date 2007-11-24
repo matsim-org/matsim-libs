@@ -30,7 +30,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class Act extends BasicAct implements Serializable{
 

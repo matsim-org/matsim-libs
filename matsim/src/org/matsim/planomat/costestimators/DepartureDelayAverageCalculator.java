@@ -21,7 +21,6 @@
 package org.matsim.planomat.costestimators;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.events.EventAgentDeparture;
@@ -37,9 +36,9 @@ public class DepartureDelayAverageCalculator implements EventHandlerAgentDepartu
 	private NetworkLayer network;
 	private int timeBinSize;
 	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
-	
+
 	private int roleIndex;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
@@ -57,11 +56,11 @@ public class DepartureDelayAverageCalculator implements EventHandlerAgentDepartu
 	//////////////////////////////////////////////////////////////////////
 
 	public double getLinkDepartureDelay(Link link, double departureTime) {
-		
+
 		return this.getDepartureDelayRole(link).getDepartureDelay(departureTime);
-		
+
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// Implementation of link role
 	//////////////////////////////////////////////////////////////////////
@@ -97,26 +96,26 @@ public class DepartureDelayAverageCalculator implements EventHandlerAgentDepartu
 		public double getDepartureDelay(double time) {
 
 			double departureDelay = 0.0;
-			
+
 			Integer index = Integer.valueOf(getTimeSlotIndex(time));
 			Double sum = this.timeSum.get(index);
-			
+
 			if (sum != null) {
-				
+
 				Integer cnt = this.timeCnt.get(index);
 				if (cnt != null) {
 					double cnt2 = cnt.doubleValue();
 					departureDelay = sum.doubleValue() / cnt2;
 				}
-				
+
 			}
 			// else
 			// return 0.0 if there were no departures in this time range
 
 			return departureDelay;
-		
+
 		}
-		
+
 		public void resetDepartureDelays() {
 			int nofSlots = ((27*3600)/DepartureDelayAverageCalculator.this.timeBinSize);	// default number of slots
 			this.timeSum = new HashMap<Integer, Double>(nofSlots);
@@ -124,7 +123,7 @@ public class DepartureDelayAverageCalculator implements EventHandlerAgentDepartu
 		}
 
 	}
-	
+
 	private DepartureDelayRole getDepartureDelayRole(Link l) {
 		DepartureDelayRole r = (DepartureDelayRole)l.getRole(this.roleIndex);
 		if (null == r) {
@@ -133,11 +132,11 @@ public class DepartureDelayAverageCalculator implements EventHandlerAgentDepartu
 		}
 		return r;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// Implementation of EventAlgorithmI
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public void handleEvent(EventAgentDeparture event) {
 		DepartureEvent depEvent = new DepartureEvent(new Id(event.agentId), event.getAttributes().getValue("leg"));
 		this.departureEventsTimes.put(depEvent, event.time);
@@ -158,15 +157,13 @@ public class DepartureDelayAverageCalculator implements EventHandlerAgentDepartu
 			}
 		}
 	}
-	
+
 	public void resetDepartureDelays() {
-		// WARNING: this method iterates over the entire network
-		// and eventually creates the roles. This might become very
-		// resource intensive and should be avoided!
-		// it's fine for the equil-net, but not for bigger networks
-		Iterator iter = this.network.getLinks().iterator();
-		while (iter.hasNext()) {
-			Link link = (Link)iter.next();
+		/* WARNING: this method iterates over the entire network
+		 * and eventually creates the roles. This might become very
+		 * resource intensive and should be avoided!
+		 * it's fine for the equil-net, but not for bigger networks */
+		for (Link link : this.network.getLinks().values()) {
 			getDepartureDelayRole(link).resetDepartureDelays();
 		}
 		this.departureEventsTimes.clear();
@@ -179,10 +176,9 @@ public class DepartureDelayAverageCalculator implements EventHandlerAgentDepartu
 	//////////////////////////////////////////////////////////////////////
 	// Overriding Object
 	//////////////////////////////////////////////////////////////////////
-	
+
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return this.getClass().getSimpleName();
 	}
 

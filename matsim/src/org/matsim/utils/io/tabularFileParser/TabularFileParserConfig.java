@@ -22,15 +22,13 @@ package org.matsim.utils.io.tabularFileParser;
 
 /**
  * Configuration for a <code>TabularFileParser</code>.
- * 
+ *
  * @author gunnar
- * 
+ *
  */
 public class TabularFileParserConfig {
 
     // -------------------- CLASS VARIABLES --------------------
-
-    private static final String ONCE = "{1}";
 
     private static final String ANYTHING = ".*";
 
@@ -60,7 +58,7 @@ public class TabularFileParserConfig {
 
     /**
      * Sets the file to be parsed.
-     * 
+     *
      * @param file
      *            the file to be parsed
      */
@@ -73,7 +71,7 @@ public class TabularFileParserConfig {
     /**
      * Sets the regular expression that identifies the the first line of the
      * file section to be parsed.
-     * 
+     *
      * @param regex
      *            the regular expression that identifies the the first line of
      *            the file section to be parsed
@@ -85,7 +83,7 @@ public class TabularFileParserConfig {
     /**
      * Sets the regular expression that identifies the first line <em>after</em>
      * the file section to be parsed.
-     * 
+     *
      * @param regex
      *            the regular expression that identifies the first line
      *            <em>after</em> the file section to be parsed
@@ -97,7 +95,7 @@ public class TabularFileParserConfig {
     /**
      * Sets the regular expression that identifies lines to be ignored during
      * parsing.
-     * 
+     *
      * @param regex
      *            the regular expression that identifies lines to be ignored
      *            during parsing
@@ -109,7 +107,7 @@ public class TabularFileParserConfig {
     /**
      * Sets the regular expression that identifies splitting locations in a
      * parsed line.
-     * 
+     *
      * @param regex
      *            the regular expression that identifies splitting locations in
      *            a parsed line
@@ -123,7 +121,7 @@ public class TabularFileParserConfig {
     /**
      * Parsing starts with the first occurrence of <code>tag</code> at the
      * beginning of a line.
-     * 
+     *
      * @param tag
      *            the first line to be parsed begins with this
      *            <code>String</code>
@@ -136,7 +134,7 @@ public class TabularFileParserConfig {
     /**
      * Parsing ends with the first occurence of <code>tag</code> at the
      * beginning of a line.
-     * 
+     *
      * @param tag
      *            the line before which parsing stops begins with this
      *            <code>String</code>
@@ -149,7 +147,7 @@ public class TabularFileParserConfig {
     /**
      * All lines that begin with an element in the <code>tags</code> array are
      * ignored
-     * 
+     *
      * @param tags
      *            an array of line beginnings that are to be ignored
      */
@@ -161,7 +159,7 @@ public class TabularFileParserConfig {
      * A line is split into seperate rows wherever the parser encounters an
      * element of the <code>tags</code> array, which is be preceeded and
      * succeeded by zero or more whitespaces.
-     * 
+     *
      * @param tags
      *            an array of <code>String</code>s denoting column delimiters
      */
@@ -176,7 +174,7 @@ public class TabularFileParserConfig {
 
     private String alternativeExpr(String[] alternatives) {
         StringBuffer result = new StringBuffer();
-        
+
         if (alternatives != null)
             for (int i = 0; i < alternatives.length; i++) {
                 result.append(quote(alternatives[i]));
@@ -214,7 +212,8 @@ public class TabularFileParserConfig {
 
     // MISC
 
-    public String toString() {
+    @Override
+		public String toString() {
         StringBuffer result = new StringBuffer("TabularFileParserConfig:\n");
 
         result.append("\tfile=" + file + "\n");

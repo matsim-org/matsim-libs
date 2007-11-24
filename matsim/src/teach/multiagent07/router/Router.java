@@ -92,14 +92,14 @@ public class Router implements EventHandlerI{
 	}
 
 	public void TTDump() {
-		for (Object o : net.getLinks()) {
+		for (Object o : net.getLinks().values()) {
 			RouterLink link = (RouterLink)o;
 			link.printTravelTimeDump();
 		}
 	}
 
 	public void resetTravelTimes() {
-		for (Object o : net.getLinks()) {
+		for (Object o : net.getLinks().values()) {
 			RouterLink link = (RouterLink)o;
 			link.resetTravelTimes();
 		}

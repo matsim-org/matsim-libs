@@ -24,21 +24,24 @@ import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicNet;
 
-public class CANetwork extends BasicNet{
+public class CANetwork extends BasicNet {
 
+	@Override
 	public CANode newNode(String label) {
 		CANode node = new CANode(label);
 		return node;
 	}
 
+	@Override
 	public CALink newLink(String label) {
 		CALink link = new CALink(label);
 		return link;
 	}
 
+	@Override
 	public void connect() {
 		// fill up outlinks/inlinks information in nodes
-		Iterator i = links.iterator();
+		Iterator i = links.values().iterator();
 		while (i.hasNext()) {
 			CALink link = (CALink)i.next();
 			link.getToNode().addInLink(link);
@@ -47,17 +50,17 @@ public class CANetwork extends BasicNet{
 	}
 
 	public void randomfill(double d) {
-		for (Object l : links) ((CALink)l).randomFill(d);
+		for (Object l : links.values()) ((CALink)l).randomFill(d);
 	}
-	
+
 	public void build() {
-		for (Object l : links) ((CALink)l).build();
+		for (Object l : links.values()) ((CALink)l).build();
 		//for (Object n : nodes) ((CANode)n).build();
 	}
 
 	public void move(int time) {
-		for (Object l : links) ((CALink)l).move(time);
-		for (Object n : nodes) ((CANode)n).move(time);
+		for (Object l : links.values()) ((CALink)l).move(time);
+		for (Object n : nodes.values()) ((CANode)n).move(time);
 	}
 
 }

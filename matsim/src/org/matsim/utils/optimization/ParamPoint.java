@@ -84,6 +84,7 @@ public class ParamPoint {
 		return result;
 	}
 	
+	@Override
 	public String toString() {
 		String result = "[dimension="+dimension_+"][values={"+values_[0];
 		for (int i = 1; i < dimension_; i++) {

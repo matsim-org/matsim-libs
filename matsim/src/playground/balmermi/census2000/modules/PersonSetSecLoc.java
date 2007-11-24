@@ -34,8 +34,7 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.misc.QuadTree;
-import org.matsim.world.Coord;
-import org.matsim.world.Location;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Zone;
 
 import playground.balmermi.census2000.data.Persons;
@@ -88,9 +87,7 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		Iterator<Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(SHOP) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
@@ -104,9 +101,7 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.shopFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(SHOP) != null) {
 				this.shopFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
@@ -122,9 +117,7 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		Iterator<Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(LEISURE) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
@@ -138,9 +131,7 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.leisFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(LEISURE) != null) {
 				this.leisFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
@@ -156,9 +147,7 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		Iterator<Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(EDUCATION) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
@@ -172,9 +161,7 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.educFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}

@@ -76,12 +76,13 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 	private double time = TimeFormatter.UNDEFINED_TIME;
 
 	private NetworkLayer network;
-	
+
 	private final TimeFormatter timeFormatter = new TimeFormatter(TimeFormatter.TIMEFORMAT_HHMMSS);
 	/**
 	 * Initializes the main kml document and kmz-file. Writes the MATSim logo and car icon to the file.
 	 * @param filename
 	 * @param coordTransform
+	 * @param network
 	 */
 	public KmlRegionSnapshotWriter(final String filename, final CoordinateTransformationI coordTransform, final NetworkLayer network) {
 		this.network = network;
@@ -93,7 +94,7 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 		this.mainDoc = new Document(filename);
 		this.mainDoc.setName("mainDoc");
 		this.mainKml.setFeature(this.mainDoc);
-		
+
 		//set car style
 		Icon icon;
 		try {
@@ -109,16 +110,16 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 		this.carStyle = new Style("redCarStyle");
 		this.carStyle.setIconStyle(new IconStyle(icon, MatsimKmlStyleFactory.MATSIMRED, ColorStyle.DEFAULT_COLOR_MODE, 0.5));
 		this.mainDoc.addStyle(this.carStyle);
-		
+
 		this.mainFolder = new Folder("networklinksfolder");
 		this.mainFolder.setName("mainFolder");
 		this.mainDoc.addFeature(this.mainFolder);
 		//add network
 		KmlNetworkWriter netWriter = new KmlNetworkWriter(this.network, this.coordTransform);
 		this.mainDoc.addFeature(netWriter.getNetworkFolder());
-		
-		
-		
+
+
+
 		//set logo
 		try {
 			MatsimKMLLogo logo;
@@ -128,7 +129,7 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 			Gbl.warningMsg(KmlSnapshotWriter.class, "KmlSnapshotWriter(...)", "Cannot read matsim logo file! The logo will not be added to the kmz");
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void beginSnapshot(final double time) {
@@ -137,7 +138,7 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 		this.timeKml = new KML();
 		this.timeDoc = new Document(timeStr);
 		this.timeDoc.setName(timeStr);
-		this.timeKml.setFeature(this.timeDoc); 
+		this.timeKml.setFeature(this.timeDoc);
 		this.timeDoc.addStyle(this.carStyle);
 		this.timePlacemark = new Placemark(timeStr);
 		this.timePlacemark.setName(timeStr);
@@ -192,8 +193,8 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 		this.writer.writeMainKml(this.mainKml);
 		this.writer.close();
 	}
-	
-	
-	
+
+
+
 
 }

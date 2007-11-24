@@ -27,7 +27,6 @@ import java.util.Iterator;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -275,9 +274,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	 * Resets all nodes in the network as if they have not been visited yet.
 	 */
 	private void resetNetworkVisited() {
-		Iterator nIter = this.network.getNodes().iterator();
-		while (nIter.hasNext()) {
-			Node node = (Node) nIter.next();
+		for (Node node : this.network.getNodes().values()) {
 			NodeData data = getData(node);
 			data.resetVisited();
 		}
@@ -319,10 +316,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 		double currCost = outNodeD.getCost();
 
 
-		BasicLinkSetI outlinks = outNodeD.getMatSimNode().getOutLinks();
-		Iterator iter = outlinks.iterator();
-		while (iter.hasNext()) {
-			Link l = (Link) iter.next();
+		for (Link l : outNodeD.getMatsimNode().getOutLinks().values()) {
 			Node n = l.getToNode();
 
 			//prevent u-turn exploration
@@ -362,7 +356,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
 
 		NodeData toNodeData = getData(n);
-		double trace = this.tracer.getTrace(fromNodeData.getTrace(),fromNodeData.getMatSimNode().getCoord(), l.getLength(), n.getCoord());
+		double trace = this.tracer.getTrace(fromNodeData.getTrace(),fromNodeData.getMatsimNode().getCoord(), l.getLength(), n.getCoord());
 
 
 
@@ -476,7 +470,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	private boolean revisitNode(NodeData toNodeData, PriorityQueueBucket<NodeData> pendingNodes, double time, double cost, NodeData fromNodeData, double trace) {
 
 		for (NodeData backNode : toNodeData.getBackNodesData()){
-			NodeData shadowNode = new NodeData(toNodeData.getMatSimNode(),this.tracer);
+			NodeData shadowNode = new NodeData(toNodeData.getMatsimNode(),this.tracer);
 			shadowNode.visit(backNode, toNodeData.getCost(), toNodeData.getTime(), iterationID, toNodeData.getTrace());
 			toNodeData.decoupleNode(backNode);
 			pendingNodes.add(shadowNode);
@@ -518,7 +512,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	private boolean trackPath(NodeData toNodeData, PriorityQueueBucket<NodeData> pendingNodes, double time, double cost, NodeData fromNodeData, double trace, double linkCost) {
 
 
-		NodeData shadowNode = new NodeData(toNodeData.getMatSimNode(),this.tracer);
+		NodeData shadowNode = new NodeData(toNodeData.getMatsimNode(),this.tracer);
 
 		shadowNode.visit(fromNodeData, cost, time, iterationID, trace);
 		shadowNode.setSortCost(toNodeData.getCost());
@@ -628,10 +622,10 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 			}
 			if (current.getId() == begin.getId())
 				continue;
-			if (excluded.contains(current.getMatSimNode()))
+			if (excluded.contains(current.getMatsimNode()))
 				continue;
 
-			if(current.getMatSimNode().getId().toString().equals("101500010")){
+			if(current.getMatsimNode().getId().toString().equals("101500010")){
 				int i = 0; i++;
 			}
 
@@ -640,21 +634,18 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 			HashSet<Node> backNodes = new HashSet<Node>();
 			while (it.hasNext()){
 				NodeData tmp = (NodeData) it.next();
-				Node back = tmp.getMatSimNode();
+				Node back = tmp.getMatsimNode();
 //				tmp.setSortCost(1/tmp.getCost());
 				efficientNodes.add(tmp);
 				backNodes.add(back);
 
 			}
-			Node from = current.getMatSimNode();
+			Node from = current.getMatsimNode();
 			((LinkPainter)this.netStateWriter).setNodeMsg(from.getId(), getString(current.getCost()));
-
-			it = from.getInLinks().iterator();
 
 			current.computeProbs();
 
-			while (it.hasNext()){
-				Link l = ((Link)it.next());
+			for (Link l : from.getInLinks().values()) {
 				Node tmp = l.getFromNode();
 //				if (((LinkPainter)this.netStateWriter).linkAttribExist(l.getId()))
 //					excluded.add(tmp);

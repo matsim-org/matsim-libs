@@ -26,7 +26,7 @@ import java.util.PriorityQueue;
 
 public class PriorityQueueBucket<T> {
 
-	/** Maximales Fassungsverm&ouml;gen einer Subqueue */
+	/** Maximales Fassungsvermoegen einer Subqueue */
 	private int bucketSize; // Groesse jedes Buckets
 
 	/** Array von Subqueues */
@@ -36,7 +36,7 @@ public class PriorityQueueBucket<T> {
 
 	/**
 	 * Einzelne Priorityqueue.
-	 * 
+	 *
 	 * F&uuml;r {@link #bucketSize bucket_size == 1 }.
 	 */
 
@@ -47,16 +47,13 @@ public class PriorityQueueBucket<T> {
 	}
 
 	/**
-	 * Erzeugt eine leere Priorityqueue.
-	 * 
-	 * @param maxKey
-	 *            der h&ouml;chste m&ouml;gliche Key, nur nichtnegative Zahlen
-	 *            sind erlaubt
-	 * @param bucketSize
-	 *            die maximale Anzahl von Elementen in einer Subqueue.
+	 * Creates a new, empty PriorityQueue.
+	 *
+	 * @param maxKey the highest possible key, only non-negative values are allowed
+	 * @param bucketSize the highest number of elements in a sub-queue
+	 * @param comparator
 	 */
-	public PriorityQueueBucket(int maxKey, int bucketSize,
-			KeyComparator<T> comparator) {
+	public PriorityQueueBucket(int maxKey, int bucketSize, KeyComparator<T> comparator) {
 		this.bucketSize = bucketSize;
 		this.comparator = comparator;
 
@@ -160,13 +157,13 @@ public class PriorityQueueBucket<T> {
 	public Iterator<T> iterator() {
 		return new BucketIterator<T>(this);
 	}
-	
+
 	class BucketIterator<T2> implements Iterator<T2> {
 
 		int currentBucketIndex = 0;
 		Iterator<T2> currentBucketIterator;
 		PriorityQueueBucket<T2> priorityQueue;
-		
+
 		public BucketIterator(PriorityQueueBucket<T2> pq) {
 			priorityQueue = pq;
 			currentBucketIndex = 0;
@@ -178,7 +175,7 @@ public class PriorityQueueBucket<T> {
 				currentBucketIterator = priorityQueue.bucketList.get(currentBucketIndex).iterator();
 			}
 		}
-		
+
 		public boolean hasNext() {
 			if (currentBucketIterator == null) {
 				return false;

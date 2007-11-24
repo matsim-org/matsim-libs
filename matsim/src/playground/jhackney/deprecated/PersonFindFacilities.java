@@ -47,8 +47,7 @@ public class PersonFindFacilities {
 	if (know == null) {
 	    Gbl.errorMsg("Knowledge is not defined!");
 	}
-	final TreeMap<String, ActivityFacilities> af = know
-		.getActivityFacilities();
+	final TreeMap<String, ActivityFacilities> af = know.getActivityFacilities();
 	ArrayList<Facility> facilities = new ArrayList<Facility>();
 	final Iterator<ActivityFacilities> afIter = af.values().iterator();
 	while (afIter.hasNext()) {

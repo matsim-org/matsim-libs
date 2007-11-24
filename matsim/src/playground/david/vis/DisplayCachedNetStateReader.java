@@ -26,20 +26,20 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.utils.io.streaming.StateI;
+import org.matsim.utils.vis.netvis.streaming.StateI;
 import org.matsim.utils.vis.netvis.visNet.DisplayNetStateReader;
 
 public class DisplayCachedNetStateReader extends DisplayNetStateReader {
-	
+
 	public ByteBuffer bb = null;
-	
+
 		public DisplayCachedNetStateReader(BasicNetI network, String filePrefix) {
 		super(network, filePrefix);
 	}
 
 		private long endPos = 0;
 		private FileChannel fc = null;
-		
+
 		public void updateBuffer(StateI target) throws IOException {
 			for (int i = 0; i <= buffer.length; i++) {
 				DisplayCachedNetState dbuffer = (DisplayCachedNetState)buffer[i];
@@ -47,6 +47,7 @@ public class DisplayCachedNetStateReader extends DisplayNetStateReader {
 				if (dbuffer == target) break;
 			}
 		}
+		@Override
 		protected void loadBuffer() throws IOException {
 
 		        // CHECK
@@ -66,18 +67,19 @@ public class DisplayCachedNetStateReader extends DisplayNetStateReader {
 		    	endPos = fc.size();///4;
 		    	bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, endPos);
 
-		        for (int i = 0; i < buffer.length;i++) { 
+		        for (int i = 0; i < buffer.length;i++) {
 					DisplayCachedNetState dbuffer = (DisplayCachedNetState)buffer[i];
 		        	dbuffer.pos = -1;
 		        	dbuffer.myReader = this;
 		        }
-		        
+
 		        buffer[0].setState();
-		            
+
 
 		    }
-		
-    protected StateI newState() {
+
+    @Override
+		protected StateI newState() {
         return new DisplayCachedNetState(getIndexConfig());
     }
 

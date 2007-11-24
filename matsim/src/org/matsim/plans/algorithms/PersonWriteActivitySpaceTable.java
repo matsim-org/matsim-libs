@@ -49,7 +49,7 @@ public class PersonWriteActivitySpaceTable extends PersonAlgorithm {
 
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
@@ -123,6 +123,7 @@ public class PersonWriteActivitySpaceTable extends PersonAlgorithm {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		final Knowledge know = person.getKnowledge();
 		if (know == null) {
@@ -138,7 +139,7 @@ public class PersonWriteActivitySpaceTable extends PersonAlgorithm {
 		double [] area_work = {Double.NaN,Double.NaN,Double.NaN,Double.NaN};
 		double [] area_leis = {Double.NaN,Double.NaN,Double.NaN,Double.NaN};
 		double [] area_educ = {Double.NaN,Double.NaN,Double.NaN,Double.NaN};
-		
+
 		// calc the number of visits per activity type
 		TreeMap<String, Integer> loc_cnts = new TreeMap<String, Integer>();
 		Iterator<String> at_it = know.getActivityTypes().iterator();
@@ -160,20 +161,20 @@ public class PersonWriteActivitySpaceTable extends PersonAlgorithm {
 				if (as instanceof ActivitySpaceEllipse) {
 					ActivitySpaceEllipse ase = (ActivitySpaceEllipse)as;
 					as_type = EllipseObjective.OBJECTIVE_NAME;
-					double x = (Double)ase.getParam("x");
-					double y = (Double)ase.getParam("y");
-					double theta = (Double)ase.getParam("theta");
-					double a = (Double)ase.getParam("a");
-					double b = (Double)ase.getParam("b");
-					double cover = (Double)ase.getParam("cover");
-					
+					double x = ase.getParam("x").doubleValue();
+					double y = ase.getParam("y").doubleValue();
+					double theta = ase.getParam("theta").doubleValue();
+					double a = ase.getParam("a").doubleValue();
+					double b = ase.getParam("b").doubleValue();
+					double cover = ase.getParam("cover").doubleValue();
+
 					double area = Math.PI*a*b;
 
 					out.write(pid + "\t" + person.getAge() + "\t" + person.getSex() + "\t" + person.getCarAvail() + "\t"+ person.getLicense() + "\t"+ act_type + "\t" +
 					          loc_cnts.get(act_type) + "\t" + as_type + "\t" +
 					          area + "\t" + cover + "\t" + x + "\t" + y + "\t" +
 					          theta + "\t" + a + "\t" + b + "\n");
-					
+
 					if (act_type.equals("all")) { area_all[1] = area; }
 					else if (act_type.equals("home")) { area_home[1] = area; }
 					else if (act_type.equals("work")) { area_work[1] = area; }
@@ -185,13 +186,13 @@ public class PersonWriteActivitySpaceTable extends PersonAlgorithm {
 				else if (as instanceof ActivitySpaceCassini) {
 					ActivitySpaceCassini asc = (ActivitySpaceCassini)as;
 					as_type = CassiniObjective.OBJECTIVE_NAME;
-					double x = (Double)asc.getParam("x");
-					double y = (Double)asc.getParam("y");
-					double theta = (Double)asc.getParam("theta");
-					double a = (Double)asc.getParam("a");
-					double b = (Double)asc.getParam("b");
-					double cover = (Double)asc.getParam("cover");
-					
+					double x = asc.getParam("x").doubleValue();
+					double y = asc.getParam("y").doubleValue();
+					double theta = asc.getParam("theta").doubleValue();
+					double a = asc.getParam("a").doubleValue();
+					double b = asc.getParam("b").doubleValue();
+					double cover = asc.getParam("cover").doubleValue();
+
 					double area = 0.0;
 					// area Integral
 					double stepSize = (Math.PI/2.0)/25.0; // Denominator decides accuracy level
@@ -217,14 +218,14 @@ public class PersonWriteActivitySpaceTable extends PersonAlgorithm {
 				else if (as instanceof ActivitySpaceSuperEllipse) {
 					ActivitySpaceSuperEllipse ass = (ActivitySpaceSuperEllipse)as;
 					as_type = SuperEllipseObjective.OBJECTIVE_NAME;
-					double x = (Double)ass.getParam("x");
-					double y = (Double)ass.getParam("y");
-					double theta = (Double)ass.getParam("theta");
-					double a = (Double)ass.getParam("a");
-					double b = (Double)ass.getParam("b");
-					double cover = (Double)ass.getParam("cover");
-					double r = (Double)ass.getParam("r");
-					
+					double x = ass.getParam("x").doubleValue();
+					double y = ass.getParam("y").doubleValue();
+					double theta = ass.getParam("theta").doubleValue();
+					double a = ass.getParam("a").doubleValue();
+					double b = ass.getParam("b").doubleValue();
+					double cover = ass.getParam("cover").doubleValue();
+					double r = ass.getParam("r").doubleValue();
+
 					double area = a*b*Math.sqrt(Math.PI)*(Math.pow(4.0,1.0-1.0/r)*dgamma(1.0+1.0/r)/dgamma(0.5+1/r));
 
 					out.write(pid + "\t" + person.getAge() + "\t" + person.getSex() + "\t" + person.getCarAvail() + "\t"+ person.getLicense() + "\t"+ act_type + "\t" +
@@ -243,12 +244,12 @@ public class PersonWriteActivitySpaceTable extends PersonAlgorithm {
 				else if (as instanceof ActivitySpaceBean) {
 					ActivitySpaceBean asb = (ActivitySpaceBean)as;
 					as_type = BeanObjective.OBJECTIVE_NAME;
-					double x = (Double)asb.getParam("x");
-					double y = (Double)asb.getParam("y");
-					double theta = (Double)asb.getParam("theta");
-					double a = (Double)asb.getParam("a");
-					double b = (Double)asb.getParam("b");
-					double cover = (Double)asb.getParam("cover");
+					double x = asb.getParam("x").doubleValue();
+					double y = asb.getParam("y").doubleValue();
+					double theta = asb.getParam("theta").doubleValue();
+					double a = asb.getParam("a").doubleValue();
+					double b = asb.getParam("b").doubleValue();
+					double cover = asb.getParam("cover").doubleValue();
 
 					// approximation
 					// TODO: is that really correct? if yes, then the bean is something very special!

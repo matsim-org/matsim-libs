@@ -21,7 +21,6 @@
 package org.matsim.withinday.coopers.routeprovider;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -36,7 +35,7 @@ import org.matsim.withinday.trafficmanagement.VDSSign;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class CoopersRouteProvider extends AbstractRouteProvider implements
 		RouteProvider {
@@ -49,7 +48,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider implements
 //	private VDSSign currentSign;
 
 	private Route currentRoute;
-	
+
 	private HierarchicalRouteProvider hierarchicalProvider;
 
 	public CoopersRouteProvider(final AStarLandmarksRouteProvider aStarProvider,
@@ -59,7 +58,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider implements
 	}
 
 	/**
-	 * 
+	 *
 	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.network.Link,
 	 *      org.matsim.plans.Route)
 	 */
@@ -93,9 +92,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider implements
 		// we have to check if the last node of the subRoute has an outgoing link
 		// which is equal to the direction link
 		ArrayList<Node> route = subRoute.getRoute();
-		for (Iterator<Link> iter = route.get(route.size() - 1).getOutLinks()
-				.iterator(); iter.hasNext();) {
-			Link link = iter.next();
+		for (Link link : route.get(route.size() - 1).getOutLinks().values()) {
 			if (link.equals(directionLink)) {
 				return true;
 			}
@@ -104,8 +101,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider implements
 	}
 
 	@Override
-	public Route requestRoute(final Link departureLink,
-			final Link destinationLink, final double time) {
+	public Route requestRoute(final Link departureLink, final Link destinationLink, final double time) {
 		if (this.currentRoute != null) {
 			CurrentSignRouteProvider current = new CurrentSignRouteProvider(
 					this.currentRoute);
@@ -115,15 +111,13 @@ public class CoopersRouteProvider extends AbstractRouteProvider implements
 			this.hierarchicalProvider.removeRouteProvider(current);
 			return ret;
 		}
-		else {
-			throw new RuntimeException("requestRoute should never be called, if the sign doesn't provide a route!");
-		}
+		throw new RuntimeException("requestRoute should never be called, if the sign doesn't provide a route!");
 	}
 
 	/**
 	 * This method is not implemented in this class. It is only overwritten to use
 	 * the already implemented methods of AbstractRouteProvider.
-	 * 
+	 *
 	 * @see org.matsim.withinday.routeprovider.AbstractRouteProvider#requestRoute(org.matsim.network.Node,
 	 *      org.matsim.network.Node, double)
 	 */

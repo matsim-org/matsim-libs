@@ -53,6 +53,7 @@ public class NashTime {
 	 * 
 	 * @return s
 	 */
+	@Override
 	public String toString(){
 		String s = Double.toString(time);
 		return s;

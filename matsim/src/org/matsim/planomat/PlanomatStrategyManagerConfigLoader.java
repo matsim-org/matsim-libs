@@ -45,18 +45,18 @@ import org.matsim.router.util.TravelTimeI;
 public class PlanomatStrategyManagerConfigLoader {
 
 	public static void load(
-			Config config, 
-			StrategyManager manager, 
-			NetworkLayer network, 
-			TravelCostI travelCostCalc, 
+			Config config,
+			StrategyManager manager,
+			NetworkLayer network,
+			TravelCostI travelCostCalc,
 			TravelTimeI travelTimeCalc,
 			LegTravelTimeEstimator legTravelTimeEstimator) {
-		
+
 		String maxvalue = Gbl.getConfig().findParam("strategy", "maxAgentPlanMemorySize");
 		if (maxvalue != null){
 			manager.setMaxPlansPerAgent(Integer.parseInt(maxvalue));
 		}
-		
+
 		int externalCounter = 0;
 		int i = 0;
 		while (true) {
@@ -80,14 +80,14 @@ public class PlanomatStrategyManagerConfigLoader {
 
 				int controlerFirstIteration = Gbl.getConfig().controler().getFirstIteration();
 				int controlerLastIteration = Gbl.getConfig().controler().getLastIteration();
-				
+
 				for (int iter = controlerFirstIteration; iter <= controlerLastIteration; iter++) {
-					
+
 					double newModuleProbability = PlanomatStrategyManagerConfigLoader.getDecayingModuleProbability(iter, 100, rate);
 					manager.addChangeRequest(iter, strategy, newModuleProbability);
-					
+
 				}
-				
+
 			} else if (classname.equals("ReRoute_Landmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
@@ -114,34 +114,34 @@ public class PlanomatStrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
-				
+
 				int controlerFirstIteration = Gbl.getConfig().controler().getFirstIteration();
 				int controlerLastIteration = Gbl.getConfig().controler().getLastIteration();
-				
+
 				for (int iter = controlerFirstIteration; iter <= controlerLastIteration; iter++) {
-					
+
 					double newModuleProbability = PlanomatStrategyManagerConfigLoader.getDecayingModuleProbability(iter, 100, rate);
 					manager.addChangeRequest(iter, strategy, newModuleProbability);
-					
+
 				}
-				
+
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
-				
+
 				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 				preProcessRoutingData.run(network);
 				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
-				
+
 				int controlerFirstIteration = Gbl.getConfig().controler().getFirstIteration();
 				int controlerLastIteration = Gbl.getConfig().controler().getLastIteration();
-				
+
 				for (int iter = controlerFirstIteration; iter <= controlerLastIteration; iter++) {
-					
+
 					double newModuleProbability = PlanomatStrategyManagerConfigLoader.getDecayingModuleProbability(iter, controlerFirstIteration, rate);
 					manager.addChangeRequest(iter, strategy, newModuleProbability);
-					
+
 				}
 			} else if (classname.equals("BestScore")) {
 				strategy = new PlanStrategy(new BestPlanSelector());
@@ -166,33 +166,33 @@ public class PlanomatStrategyManagerConfigLoader {
 				manager.addChangeRequest(maxIter + 1, strategy, 0.0);
 			}
 		}
-		
+
 	}
-	
+
 	// HIER WEITER!!!
 	public static double getDecayingModuleProbability(int iteration, int iterationStartDecay, double pReplanInit) {
-		
+
 		double pReplan = 0.0;
 
 		// everything hard wired...
-		
+
 		double pReplanFinal = 0.0;
 		int iterOffset = 0;
 		double slope = 1.0;
-		
+
 		// at first, use the typical replanning share from the config file
 		if (iteration <= iterationStartDecay) {
-			
+
 			pReplan = 0.1;
 		}
 		// then use the decaying replanning share
 		else {
-			
-			pReplan = Math.min(pReplanInit, slope / ((double) (iteration - iterationStartDecay + iterOffset)) + pReplanFinal);
-			
+
+			pReplan = Math.min(pReplanInit, slope / (iteration - iterationStartDecay + iterOffset) + pReplanFinal);
+
 		}
 		return pReplan;
-		
+
 	}
 
 }

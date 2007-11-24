@@ -22,7 +22,6 @@ package org.matsim.utils.vis.routervis;
 
 import java.util.HashMap;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
 import org.matsim.utils.identifiers.IdI;
@@ -79,10 +78,9 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
 	///////////////////////////////////////////////////////////////
     @Override
     protected double getLinkDisplValue(final BasicLinkI link, final int index) {
-    	Id id = (Id) link.getId();
 		LinkAttribute attrib;
-		if (linkStates.containsKey(id)) {
-			attrib = linkStates.get(id);
+		if (linkStates.containsKey(link.getId())) {
+			attrib = linkStates.get(link.getId());
 		} else {
 			return 0;
 		}
@@ -91,10 +89,9 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
 
     @Override
     protected String getLinkDisplLabel(final BasicLinkI link) {
-        Id id = (Id) link.getId();
 		LinkAttribute attrib;
-		if (linkStates.containsKey(id)) {
-			attrib = linkStates.get(id);
+		if (linkStates.containsKey(link.getId())) {
+			attrib = linkStates.get(link.getId());
 		} else {
 			return "null";
 		}

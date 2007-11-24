@@ -23,10 +23,12 @@ package org.matsim.utils.collections;
 
 /**
  * This generic class implements a commonly used data structure which is not present in
- * the current collection framework. Although it could be simulated with a List containing 
+ * the current collection framework. Although it could be simulated with a List containing
  * two Objects, this implementation offers type safety and maximizes convenience for programmers.
  * @author dgrether
  *
+ * @param <A>
+ * @param <B>
  */
 public class Tuple<A extends Object, B extends Object> {
 	/**
@@ -36,7 +38,7 @@ public class Tuple<A extends Object, B extends Object> {
 	/**
 	 * Second entry of the tuple
 	 */
-	private B second; 
+	private B second;
 	/**
 	 * Creates a new tuple with the two entries.
 	 * @param first
@@ -46,13 +48,13 @@ public class Tuple<A extends Object, B extends Object> {
 		this.first = first;
 		this.second = second;
 	}
-	
+
 	public A getFirst() {
 		return first;
 	}
-	
+
 	public B getSecond() {
 		return second;
 	}
-	
+
 }

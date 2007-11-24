@@ -24,6 +24,7 @@ public class MatricesConfigGroup extends AbstractFileIOConfigGroup {
 
 	public static final String GROUP_NAME = "matrices";
 	
+	@Override
 	public String getName() {
 		return GROUP_NAME;
 	}

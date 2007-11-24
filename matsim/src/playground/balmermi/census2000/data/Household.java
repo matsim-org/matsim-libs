@@ -23,7 +23,7 @@ package playground.balmermi.census2000.data;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class Household implements Comparable<Household>  {
 

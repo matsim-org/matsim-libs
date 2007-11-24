@@ -31,9 +31,11 @@ public interface SimStateWriterI {
 
     /**
      * Asks the writer to dump the current state to an appropriate file.
-     * 
+     * @param time_s
+     *
      * @return <code>true</code> if the writer actually wrote something and
      *         <code>false</code> otherwise
+     * @throws IOException
      */
     public boolean dump(int time_s) throws IOException;
 

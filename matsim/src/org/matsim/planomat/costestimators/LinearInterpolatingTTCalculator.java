@@ -21,7 +21,6 @@
 package org.matsim.planomat.costestimators;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventLinkEnter;
@@ -39,11 +38,11 @@ import org.matsim.router.util.TravelTimeI;
  * from a piecewise linear interpolation of the time bin based constant
  * estimation. Mainly a copy of TravelTimeCalculator, should be reworked
  * in order to have nice source code!
- * 
+ *
  * @author meisterk
  *
  */
-public class LinearInterpolatingTTCalculator 
+public class LinearInterpolatingTTCalculator
 implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArrivalI, TravelTimeI {
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
@@ -143,19 +142,19 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 		}
 
 		public double getTravelTime(double now) {
-			
+
 			double tTravelEstimation = 0.0;
 			Double sumA, sumB;
 			Integer cntA, cntB;
-			
+
 			double offset = LinearInterpolatingTTCalculator.this.timeslice / 2.0;
-			
-			Integer indexA = Integer.valueOf(getTimeSlotIndex(now - offset));
+
+			int indexA = getTimeSlotIndex(now - offset);
 			double xA = (indexA * LinearInterpolatingTTCalculator.this.timeslice) + offset;
-			Integer indexB = indexA + 1;
+			int indexB = indexA + 1;
 			double xB = (indexB * LinearInterpolatingTTCalculator.this.timeslice) + offset;
-			
-			Double tTravelA = getLinkMinimumTravelTime(this.link);
+
+			double tTravelA = getLinkMinimumTravelTime(this.link);
 			// belehr mich eines besseren
 			sumA = this.timeSum.get(indexA);
 			if (sumA != null) {
@@ -165,7 +164,7 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 				}
 			}
 
-			Double tTravelB = getLinkMinimumTravelTime(this.link);
+			double tTravelB = getLinkMinimumTravelTime(this.link);
 			// belehr mich eines besseren
 			sumB = this.timeSum.get(indexB);
 			if (sumB != null) {
@@ -176,10 +175,10 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 			}
 
 			// linear interpolation
-			
+
 			double m = (tTravelB - tTravelA) / (xB - xA);
 			tTravelEstimation = tTravelA + m * (now - xA);
-			
+
 			return tTravelEstimation;
 		}
 
@@ -198,9 +197,7 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 	}
 
 	public void resetTravelTimes() {
-		Iterator iter = this.network.getLinks().iterator();
-		while (iter.hasNext()) {
-			Link link = (Link)iter.next();
+		for (Link link : this.network.getLinks().values()) {
 			getTravelTimeRole(link).resetTravelTimes();
 		}
 		this.enterEvents.clear();
@@ -212,8 +209,8 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 
 	public void reset(int iteration) {
 		resetTravelTimes();
-	}	
-	
+	}
+
 	public void handleEvent(EventLinkEnter event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
 		this.enterEvents.put(e, event.time);
@@ -266,5 +263,5 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 		// TODO Auto-generated method stub
 		return this.getClass().getSimpleName();
 	}
-	
+
 }

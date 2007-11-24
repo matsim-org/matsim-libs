@@ -32,7 +32,7 @@ import org.matsim.plans.Route;
 import org.matsim.plans.filters.PersonIntersectAreaFilter;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Some tests for org.matsim.plans.filters.PersonIntersectAreaFilter.

@@ -45,7 +45,7 @@ import org.matsim.mobsim.QueueNode;
 import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.plans.Plan;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.vis.netvis.visNet.DisplayableNetI;
+import org.matsim.utils.vis.netvis.DisplayableNetI;
 
 import playground.david.vis.handler.DefaultAgentHandler;
 import playground.david.vis.handler.DefaultLinkHandler;
@@ -62,8 +62,8 @@ import playground.david.vis.interfaces.OTFParamProvider;
  * so we do not need any memory while not watching a sim
  * otherwise put x,y into Vehicle give QueueLink an updatepositions method that only
  * gets called when vis is active
- * 
- * Problems: 
+ *
+ * Problems:
  * 1 we do NOT have an agent class!
  * 2 should i make link/agent/node Identified, is needed for persistent observation
  * increases interface but exchanges unreadable getParam(4) with clear getId()
@@ -74,7 +74,7 @@ import playground.david.vis.interfaces.OTFParamProvider;
  * CHANGES:
  * Every node/L/A should have a Reference to a datahandler.
  * This reference should be ZERO on startup
- * ONLY if the reference is overridden, we will use the overridden Handler, else some default handler (makes it easier to 
+ * ONLY if the reference is overridden, we will use the overridden Handler, else some default handler (makes it easier to
  * change the default handeler on the fly)
  * Maybe we have a OTFHandable Interface including setHander getHandler
  * How about the getSrc, which was used right now to either store QueueLink or OTFLinkHndler in OFVisNet.Link
@@ -83,10 +83,9 @@ import playground.david.vis.interfaces.OTFParamProvider;
  * OTFVisNet {
  *  Map<String, OTFLinkHandler> links;
  *  ...
- *  
+ *
  */
-public class OTFVisNet implements Serializable, DisplayableNetI 
-{
+public class OTFVisNet implements Serializable, DisplayableNetI {
 
 	public static class DefaultHandler implements OTFNetHandler {
 
@@ -101,9 +100,9 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 		public OTFNodeHandler<QueueNode> getNodeHandler() {
 			return new DefaultNodeHandler();
 		}
-		
+
 	}
-	
+
 	private static final long serialVersionUID = 1L;
 	public static final double zoomFactorX = 1.;
 	public static final double zoomFactorY = 1.;
@@ -116,47 +115,42 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 	private double maxEasting;
 	private double minNorthing;
 	private double maxNorthing;
-	private double diagonal;
-	
+
 	protected OTFNetHandler handler;
 
 	public OTFVisNet(QueueNetworkLayer source) {
 
 		handler = new DefaultHandler();
-		
-		Iterator<QueueNode> iter = source.getNodes().iterator();
-		while (iter.hasNext()) {
-			QueueNode node = iter.next();
+
+		for (QueueNode node : source.getNodes().values()) {
 			Node nodeOTF = new Node (node);
-    		CoordI coord = node.getCoord();
-    		coord.setXY(coord.getX()*zoomFactorX, coord.getY()*zoomFactorY);
-    		nodeOTF.setCoords(coord);
+   		CoordI coord = node.getCoord();
+   		coord.setXY(coord.getX()*zoomFactorX, coord.getY()*zoomFactorY);
+   		nodeOTF.setCoords(coord);
 			nodes.put(node.getId().toString(), nodeOTF);
 		}
 
-		iter = source.getLinks().iterator();
-		while (iter.hasNext()) {
-			BasicLinkI link = (BasicLinkI) iter.next();
-			Link linkOTF = new Link (link);
+		for (QueueLink link : source.getLinks().values()) {
+			Link linkOTF = new Link(link);
 			links.put(link.getId().toString(), linkOTF);
 		}
 		updateBoundingBox();
-		
+
 		for (Iterator<Node> it = nodes.values().iterator(); it.hasNext();) {
 			Node node = it.next();
 			node.setEasting(node.getEasting() - minEasting);
 			node.setNorthing(node.getNorthing() - minNorthing);
 		}
-		
+
 //		maxEasting = maxEasting - minEasting;
 //		maxNorthing = maxNorthing - minNorthing;
 //		minEasting = 0;
 //		minNorthing = 0;
-		
+
 		connect();
-	
+
 	}
-	
+
 	public void updateBoundingBox(){
 		minEasting = Double.POSITIVE_INFINITY;
 		maxEasting = Double.NEGATIVE_INFINITY;
@@ -173,8 +167,7 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 
 		final double easting = maxEasting - minEasting;
 		final double northing = maxNorthing - minNorthing;
-		diagonal = Math.sqrt(easting * easting + northing * northing);
-	
+
 	}
 
 	public void connect() {
@@ -182,13 +175,13 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 			Node node = it.next();
 			node.links = new LinkedList<Link>();
 		}
-		
+
 		for (Iterator<Link> it = links.values().iterator(); it.hasNext();) {
 			Link link = it.next();
 			link.to.addLink(link);
 			link.from.addLink(link);
 		}
-		
+
 		for (Iterator<Node> it = nodes.values().iterator(); it.hasNext();) {
 			Node node = it.next();
 			node.sortLinks();
@@ -217,16 +210,13 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 
 		public String id;
 	}
-	
+
 	public class Node implements Serializable {
 		private static final long serialVersionUID = 1L;
 		String id;
 		private double easting;
 		private double northing;
-		
-		private float test;
-		private transient String test2;
-		
+
 		public transient Object src;
 		public transient List<Link> links = new LinkedList<Link>();
 
@@ -235,7 +225,7 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 			this.easting = coords.getX();
 			this.northing = coords.getY();
 		}
-		
+
 		public synchronized double getEasting() {
 			return easting;
 		}
@@ -265,12 +255,12 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 			// TODO Auto-generated method stub
 
 		}
-		
+
 		class ThetaComparator implements Comparator<Link>, Serializable {
 			public int compare(final Link link1, final Link link2) {
 				float theta1 = theta(easting, northing, link1.getMiddleEasting(), link1.getMiddleNorthing());
 				float theta2 = theta(easting, northing, link2.getMiddleEasting(), link2.getMiddleNorthing());
-				
+
 				if (theta1 > theta2)
 					return 1;
 				if (theta1 < theta2)
@@ -283,23 +273,23 @@ public class OTFVisNet implements Serializable, DisplayableNetI
     		float t = 0.f;
     		double dx = x2 - x1;
     		double dy = y2 - y1;
-    		
+
     		if (dx == 0 && dy == 0 ) t = 0.f;
     		else t = (float)(dy/(Math.abs(dx) + Math.abs(dy)));
-    		
+
     		if (dx <0) t = 2-t;
     		else if (dy < 0 ) t = 4+t;
     		return t*90.f;
     	}
-       	
+
 		public void sortLinks() {
 	       Collections.sort(links, new ThetaComparator());
 		}
-		
+
 		public List<Link> getLinks() {
 			return links;
 		}
-		
+
 		public QueueNode getSrc() {return (QueueNode)src;}
 
 		public void setSrc(OTFNodeHandler data) {
@@ -322,7 +312,7 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 		private float x;
 		private float y;
 		private int state;
-		
+
 		public float getX() {
 			return x;
 		}
@@ -347,11 +337,11 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 		public void setId(String id) {
 			this.id = id;
 		}
-		
+
 	}
 	public class Link implements Serializable {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 		String id;
@@ -360,10 +350,10 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 		transient Object src;
 		public final static double laneWidth = 20;
 
-		
+
 		float displValue = 0;
 		int lanes = 1;
-		
+
 		double nodeDist;
 		boolean isVisible = false;
 		transient private final AffineTransform linear2PlaneTransform = null;
@@ -397,7 +387,7 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 		public String getId() {
 			return id;
 		}
-		
+
 		public Node getFromNode() {
 			return from;
 		}
@@ -446,14 +436,12 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 		public double getLength_m() {
 			return nodeDist;
 		}
- 
+
 		public String getDisplayText() {
 			return id.toString();
 		}
 
-
-		  private AffineTransform newLinear2PlaneTransform(double offset_m,
-		            double displayedLength_m) {
+	  private AffineTransform newLinear2PlaneTransform(double offset_m, double displayedLength_m) {
 
 		        // 3. translate link onto original position
 		        double tx = getStartEasting();
@@ -498,12 +486,11 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 		public void setSrc(OTFLinkHandler data) {
 			src = data;
 		}
-		
 	}
 
-	/* 
+	/*
 	 * for the DisplayablbeNetI Interface
-	 */ 
+	 */
 
     public double minEasting() {
         return minEasting;
@@ -521,20 +508,15 @@ public class OTFVisNet implements Serializable, DisplayableNetI
         return maxNorthing;
     }
 
-    public double diagonal() {
-        return diagonal;
-    }
 
-    
-    
     /*
-     * readin and wirting to a bytestrem
-     * 
+     * reading and writing to a bytestream
+     *
      */
-    
+
 	public final void readAgents(DataInputStream in) throws IOException {
 		List<OTFAgentHandler> newAgents = new ArrayList<OTFAgentHandler>();
-		
+
 		int agentCnt = in.readInt();
 		while (agentCnt != 0) {
 			for (int i = 0; i < agentCnt; i++) {
@@ -545,17 +527,17 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 			}
 			agentCnt = in.readInt();
 		};
-		
+
 		setAgents(newAgents);
 	}
-	
+
 
 	  /**
      * Not to be called by extending classes.
      */
 	transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
-	
-	
+
+
 	public void writeLinkAgents(QueueLink link, OTFAgentHandler<PositionInfo> agentHandler, DataOutputStream out) throws IOException {
         /*
          * (4) write agents
@@ -563,16 +545,16 @@ public class OTFVisNet implements Serializable, DisplayableNetI
         positions.clear();
 		link.getVehiclePositions(positions);
 		if (positions.size() == 0) return;
-		
+
 		out.writeInt(positions.size());
-		
+
 		if (agentHandler != null)
 			for (PositionInfo pos : positions) {
 			agentHandler.writeAgent(pos, out);
 		}
 	}
-	
-	
+
+
     public final void readNode(OTFVisNet.Node displNode, DataInputStream in) throws IOException {
 		in.readInt();
 		displNode.setDisplayValue(in.readFloat());
@@ -580,12 +562,12 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 		//displNode.links = new LinkedList<Link>();
 	}
 
-	
+
 
     public void readMyself(DataInputStream in) throws IOException {
-		
+
     	//in.reset();
-		
+
 		for (OTFVisNet.Node node : nodes.values())
 			if (node != null) {
 				OTFNodeHandler data = handler.getNodeHandler();
@@ -599,16 +581,16 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 				data.readLink(in);
 				link.setSrc(data);
 			}
-		
+
 			readAgents(in);
 
 		return;
 	}
-    
+
     public void writeAgents(DataOutputStream out) throws IOException {
 		OTFAgentHandler<PositionInfo> agentHandler = handler.getAgentHandler();
 		agentHandler.setOTFNet(this);
-		
+
 		for (OTFVisNet.Link link : links.values())
 			if (link != null) {
 				writeLinkAgents(link.getSrc(), agentHandler, out);
@@ -617,22 +599,22 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 
     public void writeMyself(OTFNetHandler newHandler, DataOutputStream out) throws IOException {
     	if (newHandler != null) this.handler = newHandler;
-    	
+
 		OTFNodeHandler<QueueNode> nodeHandler = handler.getNodeHandler();
 		OTFLinkHandler<QueueLink> linkHandler = handler.getLinkHandler();
-		
-		if( nodeHandler != null) 
+
+		if( nodeHandler != null)
 			for (OTFVisNet.Node node : nodes.values())
 			if (node != null) {
 				nodeHandler.writeNode(node.getSrc(), out);
 			}
 
-		if( linkHandler != null) 
+		if( linkHandler != null)
 		for (OTFVisNet.Link link : links.values())
 			if (link != null) {
 				linkHandler.writeLink(link.getSrc(), out);
 			}
-		
+
 		writeAgents(out);
 
 		out.writeInt(0); // terminate agent reading by a zero
@@ -642,11 +624,11 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 
     transient public Point2D.Double lastClicked = null;
     transient public Point2D.Double pos = new Point2D.Double();
-    
+
     public Link lastLink = null;
-    
+
     public List<String> selectedAgents = new ArrayList<String>();
-    
+
 	public String getAgentId(Point2D.Double p) {
 		String result = new String("");
 		Link link = findNearestLink(p);
@@ -659,13 +641,13 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 			double bestPos = Double.MAX_VALUE;
 			OTFParamProvider bestMatch = null;
 			pos = new Point2D.Double();
-			
+
 			// vergleiche mit pos des agent auf dem link
      		for(OTFAgentHandler agentH :  agents) {
      			OTFParamProvider agent = (OTFParamProvider) agentH;
-    			int xPosIndex = agent.getIndex("PosX"); 
-     			int yPosIndex = agent.getIndex("PosY"); 
-     			int IdIndex = agent.getIndex("Id"); 
+    			int xPosIndex = agent.getIndex("PosX");
+     			int yPosIndex = agent.getIndex("PosY");
+     			int IdIndex = agent.getIndex("Id");
 				double dist = p.distance(agent.getFloatParam(xPosIndex), agent.getFloatParam(yPosIndex));
 				if (dist < bestPos ) {
 					bestPos = dist;
@@ -673,7 +655,7 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 					result = bestMatch.getStringParam(IdIndex);
 				}
 			}
-				
+
 			if(bestMatch != null) {
 				selectedAgents.clear();
 				selectedAgents.add(result);
@@ -693,11 +675,11 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 		Line2D line = new Line2D.Double();
 		double dist = 0;
 		double minDist = Double.MAX_VALUE;
-		
+
 		for (OTFVisNet.Link link : links.values())
 			if (link != null && link.isVisible) {
 				line.setLine(link.from.easting, link.from.northing, link.to.easting, link.to.northing);
-				dist = Math.abs(line.ptSegDist(p)); 
+				dist = Math.abs(line.ptSegDist(p));
 //				double distStart = p.distance(link.from.easting,link.from.northing);
 //				double distEnd = p.distance(link.to.easting, link.to.northing);
 //				dist= Math.min(distEnd,distStart);
@@ -708,7 +690,7 @@ public class OTFVisNet implements Serializable, DisplayableNetI
 			}
 		return result;
 	}
-	
+
 	public void convertToDipsplayList(Plan plan) {
 		// just male the nodes in a color of choice first
 	}

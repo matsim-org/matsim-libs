@@ -23,11 +23,6 @@ package org.matsim.counts;
 import java.io.File;
 import java.util.Iterator;
 
-import org.matsim.config.Config;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsWriter;
-import org.matsim.counts.Volume;
 import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -78,7 +73,7 @@ public class CountsParserWriterTest extends MatsimTestCase {
 		// what to test?
 		// check if xml file not empty
 
-		Config config = Gbl.getConfig();
+		Gbl.getConfig();
 		String filename = this.getOutputDirectory() + "output_counts.xml";
 		CountsWriter counts_writer = new CountsWriter(Counts.getSingleton(), filename);
 		counts_writer.write();

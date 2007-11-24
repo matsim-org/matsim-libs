@@ -43,6 +43,7 @@ import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -63,34 +64,35 @@ public class PopulationGeneratorControler {
 	 * Path to the folder where the output data is written to
 	 */
 	private final static String outputFolder =  "/data/matsim-t/lnicolas/";
-	
+
 	private Plans plans;
 	private ArrayList<Person> population;
 	private ArrayList<HouseholdI> households;
 	private ArrayList<Zone> homeZones;
 	private ArrayList<Zone> referenceZones;
-	private TreeMap<Id, MunicipalityInformation> municipalityInfo;
+	private TreeMap<IdI, MunicipalityInformation> municipalityInfo;
 	private ArrayList<Zone> primaryActZones;
 	private GroupFacilitiesPerZone facsPerZone;
 	private NetworkLayer network;
 
 	/**
-	 * The facilities (entreprise census plus home facilities of switzerland), 
+	 * The facilities (entreprise census plus home facilities of switzerland),
 	 * the world (mapping the facilities to zones, i.e. municipalities) and the commuter
 	 * matrices describing where people living within a specific municipality go to work
 	 * must exist before calling this constructor!
 	 *
 	 */
 	public PopulationGeneratorControler(NetworkLayer network) {
-		
+
 		this.network = network;
-		
+		Facilities facilities = (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+
 		/**
 		 * Get the ZoneLayer containing the municipalities
 		 */
-		referenceZones = new ArrayList<Zone>(((ZoneLayer) Gbl.getWorld().getLayer(
-				new Id("municipality"))).getLocations());
-		
+		referenceZones = new ArrayList((Gbl.getWorld().getLayer(
+				new Id("municipality"))).getLocations().values());
+
 		/**
 		 * Read additional information per municipality from the given input file
 		 */
@@ -98,7 +100,7 @@ public class PopulationGeneratorControler {
 				inputFolder + "world_ch_gem.xml.txt", referenceZones);
 		homeZones = new ArrayList<Zone>();
 		primaryActZones = new ArrayList<Zone>();
-		
+
 		/**
 		 * Add only those zones to the set of initial home zones (i.e. zones where
 		 * people live) for which there exist additional information
@@ -108,16 +110,16 @@ public class PopulationGeneratorControler {
 				homeZones.add(zone);
 			}
 		}
-		
+
 		/**
 		 * Group facilities per zone for faster lookup of facilities per zone
 		 */
 		facsPerZone = new GroupFacilitiesPerZone();
-		System.out.println("Building QuadTree of facility coords for " 
+		System.out.println("Building QuadTree of facility coords for "
 				+ "each zone...");
-		facsPerZone.run(referenceZones, Facilities.getSingleton());
+		facsPerZone.run(referenceZones, facilities);
 		System.out.println("done");
-		
+
 		/**
 		 * Get the layer that connects the each facility to the zones it lies in.
 		 */
@@ -126,19 +128,19 @@ public class PopulationGeneratorControler {
 		// A Facility and the corresponding Facility Location (enclosing the given Facility)
 		// have the same Id
 		Location location = null;
-		for (Facility facility : Facilities.getSingleton().getFacilities().values()) {
+		for (Location facility : facilities.getLocations().values()) {
 			location = facilityLocations.getLocation(facility.getId());
 			if (location == null) {
 				Gbl.errorMsg("There exists no facility location for facility " + facility.getId());
 			}
-			facility.setLocation(location);
+			((Facility) facility).setLocation(location);
 		}
 	}
-	
+
 	/**
-	 * Generates an population out of the datapuls 2006 information by 
+	 * Generates an population out of the datapuls 2006 information by
 	 * upsampling the population to the same amount of people as in the census 2000 and
-	 * adding several information to each person, like work and home locations, 
+	 * adding several information to each person, like work and home locations,
 	 * initial activity chains, mobility tools etc.
 	 */
 	public Plans generateCompleteUpsampledDatapuls2006Population() {
@@ -146,7 +148,7 @@ public class PopulationGeneratorControler {
 		enrichInitialPopulation("datapuls2006");
 		return plans;
 	}
-	
+
 	/**
 	 * Generates an population out of the census 2000 information by adding several
 	 * information to each person, like work and home locations, initial activity chains,
@@ -157,7 +159,7 @@ public class PopulationGeneratorControler {
 		enrichInitialPopulation("census2000");
 		return plans;
 	}
-	
+
 	private void enrichInitialPopulation(String popId) {
 		writePlans(plans, outputFolder + "population" + popId + "_noMobilityInfo.xml.gz");
 		addMobilityInformationToPopulation();
@@ -177,9 +179,9 @@ public class PopulationGeneratorControler {
 		createInitialRoutes(network, plans);
 		writePlans(plans, outputFolder + "population" + popId + "_complete.xml.gz");
 	}
-	
+
 	/**
-	 * Generates an initial population out of the datapuls information by 
+	 * Generates an initial population out of the datapuls information by
 	 * upsampling the population to the same amount of people as in the census 2000.
 	 */
 	public Plans generateInitialUpsampledDatapuls2006Population() {
@@ -190,15 +192,15 @@ public class PopulationGeneratorControler {
 		plans = popGen.run();
 		population = popGen.getPersons();
 		households = popGen.getHouseholds();
-		
+
 		/**
 		 * Map each person to a home zone
 		 */
 		homeZones = MobilityResourceGenerator.mapPersonsToZones(population, homeZones);
-		
+
 		return plans;
 	}
-	
+
 	/**
 	 * Generates an initial population out of the datapuls information, without
 	 * upsampling the population, i.e. only keep those persons for which
@@ -211,10 +213,10 @@ public class PopulationGeneratorControler {
 		households = popGen.getHouseholds();
 		homeZones = MobilityResourceGenerator.mapPersonsToZones(population,
 				homeZones);
-		
+
 		return plans;
 	}
-	
+
 	/**
 	 * Generates an initial population out of the census 2000 information.
 	 */
@@ -226,7 +228,7 @@ public class PopulationGeneratorControler {
 		plans = popGen.run();
 		population = popGen.getPersons();
 		households = popGen.getHouseholds();
-		
+
 		/**
 		 * Map each person to a home zone (ignoring zones for which there exists no
 		 * income information) and add income information (based on its home zone) to it
@@ -234,21 +236,21 @@ public class PopulationGeneratorControler {
 		homeZones = Income2000Generator.mapPersonsToZones(population,
 				homeZones, municipalityInfo);
 		addCensusIncomeInformationToPopulation();
-		
+
 		return plans;
 	}
-	
+
 	/**
 	 * Sets a person's income to the average income of the zone (municipality) it lives in
 	 * @param population Input persons
 	 * @param households For each person, the household he/she is part of
 	 * @param zones For each person the zone he/she lives in
-	 * @param world 
+	 * @param world
 	 * @param incomeInfo Additional information for each zone
 	 */
 	private void addCensusIncomeInformationToPopulation() {
 		System.out.println("Adding municipality income information to population...");
-		
+
 		Income2000Generator incInfGen = new Income2000Generator(Gbl.getWorld(),
 				municipalityInfo);
 		String statusString = "|----------+-----------|";
@@ -268,14 +270,14 @@ public class PopulationGeneratorControler {
 		}
 		System.out.println("done");
 	}
-	
+
 	/**
 	 * Adds mobility information to each person (whether he/she owns a GA, a halbtax, has
 	 * a license etc.)
 	 * @param population Input persons
 	 * @param households For each person, the household he/she is part of
 	 * @param zones For each person the zone he/she lives in
-	 * @param world 
+	 * @param world
 	 * @param incomeInfo Additional information for each zone
 	 */
 	void addMobilityInformationToPopulation() {
@@ -284,7 +286,7 @@ public class PopulationGeneratorControler {
 			new LicenseOwnershipGenerator(Gbl.getWorld(), municipalityInfo);
 		MobilityResourceGenerator mobInfGen =
 			new MobilityResourceGenerator(Gbl.getWorld(), municipalityInfo);
-		
+
 		String statusString = "|----------+-----------|";
 		System.out.println(statusString);
 		for (int i = 0; i < population.size(); i++) {
@@ -300,18 +302,18 @@ public class PopulationGeneratorControler {
 		}
 		System.out.println("done");
 	}
-	
+
 	Plans scaleDownGAOwnershipFraction(double newGAOwningFraction) {
 		/**
 		 * It seems that too many people own a GA after that, so scale down the fraction
-		 * of people owning a GA to the given fraction (usually 0.09) 
+		 * of people owning a GA to the given fraction (usually 0.09)
 		 */
 		System.out.println("Scaling down GA ownership to a fraction of " + newGAOwningFraction);
 		MobilityResourceGenerator.scaleDownGAOwnershipFraction(plans, newGAOwningFraction);
-		
+
 		return plans;
 	}
-	
+
 	Plans addActivityChainsToPopulation() {
 		/**
 		 * Get the reference plans of the micro census 2005. They are used to assign initial
@@ -336,10 +338,10 @@ public class PopulationGeneratorControler {
 		PlansGenerator plansGen = new PlansGenerator(plans, referencePlans);
 		plansGen.run(plans);
 		System.out.println();
-		
+
 		return plans;
 	}
-	
+
 	/**
 	 * Assigns coordinates to the "h" (home) acts of a person's plan.
 	 * @return The modified plans
@@ -347,24 +349,24 @@ public class PopulationGeneratorControler {
 	Plans mapHomeActivitiesToFacilities() {
 		/**
 		 * Map persons to a home facility
-		 */ 
+		 */
 		System.out.println("Mapping persons to home facilities...");
-		PersonToHomeFacilityMapper homeFacMapper = 
+		PersonToHomeFacilityMapper homeFacMapper =
 			new PersonToHomeFacilityMapper(population, homeZones,
 					facsPerZone);
 		homeFacMapper.run();
 		System.out.println("done");
-		
+
 		return plans;
 	}
-	
+
 	/**
-	 * Assigns coordinates to the primary activity acts (work or education) 
+	 * Assigns coordinates to the primary activity acts (work or education)
 	 * of a person's plan.
 	 * @return The modified plans
 	 */
 	Plans mapPrimaryActivitiesToFacilities() {
-		
+
 		/**
 		 * Get the commuter matrices in order to assign commuter information to the population
 		 */
@@ -375,26 +377,26 @@ public class PopulationGeneratorControler {
 //		/**
 //		 * "Clean up" the commuter matrices, i.e. remove entries pointing to zones
 //		 * that have no facilities that allow performing the respective activity
-//		 * and add missing entries starting at zones that contain facitlities that 
+//		 * and add missing entries starting at zones that contain facitlities that
 //		 * allow the "home" activity (people living there must work somewhere for example,
 //		 * so we have to add those missing entries).
 //		 */
 //		CommuterInformationRevisor commuterRev =
 //			new CommuterInformationRevisor(referenceZones, Facilities.getSingleton());
 //		commuterRev.run(workCommuterMatrix, educationCommuterMatrix);
-		
+
 		/**
-		 * Map persons to facilities where they perform their primary activitiy (i.e. 
+		 * Map persons to facilities where they perform their primary activitiy (i.e.
 		 * work or education).
 		 */
-		CommuterInformationGenerator commuterGen = 
+		CommuterInformationGenerator commuterGen =
 			new CommuterInformationGenerator(population, homeZones,
 					facsPerZone);
 		System.out.println("Generating commuter information...");
 		commuterGen.run(workCommuterMatrix, educationCommuterMatrix);
 		System.out.println("done");
-		
-		TreeMap<Id, Zone> tmpZones = new TreeMap<Id, Zone>();
+
+		TreeMap<IdI, Zone> tmpZones = new TreeMap<IdI, Zone>();
 		for (Zone zone : referenceZones) {
 			tmpZones.put(zone.getId(), zone);
 		}
@@ -416,10 +418,10 @@ public class PopulationGeneratorControler {
 				primaryActZones.add(null);
 			}
 		}
-		
+
 		return plans;
 	}
-	
+
 	/**
 	 * Assigns coordinates to those acts of a person's plan that have no coords yet.
 	 * @return The modified plans
@@ -434,10 +436,10 @@ public class PopulationGeneratorControler {
 					referenceZones);
 		secondaryLocGen.run(population, homeZones, primaryActZones);
 		System.out.println("done");
-		
+
 		return plans;
 	}
-	
+
 	static void setAllLegModesToCar(Plans plans) {
 		/**
 		 * Set all leg modes to "car"
@@ -451,7 +453,7 @@ public class PopulationGeneratorControler {
 			}
 		}
 	}
-	
+
 	static void mapActCoordsToLinks(NetworkLayer network, Plans plans) {
 		/**
 		 * Map the activities to links of the underlying network (yet we had only swiss coordinates
@@ -463,10 +465,10 @@ public class PopulationGeneratorControler {
 		runMultiThreadedPlansAlgo(plans, xy2lAlgo);
 		System.out.println("done");
 	}
-	
+
 	static void createInitialRoutes(NetworkLayer network, Plans plans) {
 		/**
-		 * Create initial routes such that a person can get from one act to the next act 
+		 * Create initial routes such that a person can get from one act to the next act
 		 */
 		System.out.println("Creating routes...");
 		PreProcessLandmarks preProcessRoutingData =
@@ -475,11 +477,11 @@ public class PopulationGeneratorControler {
 		ReRouteLandmarks router = new ReRouteLandmarks(
 				network, new FreespeedTravelTimeCost(),
 				new FreespeedTravelTimeCost(), preProcessRoutingData);
-		
+
 		long now = System.currentTimeMillis();
-		
+
 		runMultiThreadedPlansAlgo(plans, router);
-		
+
 		now = System.currentTimeMillis() - now;
 		System.out.println("Average elapsed time for routing :\n" +
 				(int) (now / (24 * 60 * 60 * 1000F))
@@ -489,7 +491,7 @@ public class PopulationGeneratorControler {
 				+ (int) (now % 1000) + " msecs; " + "(" + now
 				+ " msecs in total)");
 	}
-	
+
 	private static void runMultiThreadedPlansAlgo(Plans plans, MultithreadedModuleA algo) {
 		Iterator<Person> pIt = plans.getPersons().values().iterator();
 		algo.init();
@@ -501,10 +503,10 @@ public class PopulationGeneratorControler {
 		}
 		algo.finish();
 	}
-	
+
 	private static void writePlans(Plans plans, String outFilename) {
 		System.out.println("Writing plans to " + outFilename);
-		PlansWriter plansWriter = new PlansWriter(plans, outFilename, 
+		PlansWriter plansWriter = new PlansWriter(plans, outFilename,
 				Gbl.getConfig().plans().getOutputVersion());
 		plansWriter.setUseCompression(true);
 		plans.setPlansWriter(plansWriter);

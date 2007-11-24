@@ -777,7 +777,9 @@ public class Controler {
 	}
 
 	private final void makeIterationPath(final int iteration) {
-		new File(getIterationPath(iteration)).mkdir();
+		if (!(new File(getIterationPath(iteration)).mkdir())) {
+			log.warn("Could not create iteration directory " + getIterationPath(iteration) + ".");
+		}
 	}
 
 	/**

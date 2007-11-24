@@ -55,6 +55,7 @@ public abstract class Overlay extends Feature {
 	 * @param id
 	 * @param name
 	 * @param description
+	 * @param address
 	 * @param lookAt
 	 * @param styleUrl
 	 * @param visibility

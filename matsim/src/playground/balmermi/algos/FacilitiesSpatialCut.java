@@ -29,7 +29,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Location;
 
 public class FacilitiesSpatialCut extends FacilitiesAlgorithm {
@@ -41,7 +41,7 @@ public class FacilitiesSpatialCut extends FacilitiesAlgorithm {
 	// Zurich Cut
 	private final Coord min = new Coord(669000.0,223900.0);
 	private final Coord max = new Coord(717000.0,283400.0);
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -58,11 +58,12 @@ public class FacilitiesSpatialCut extends FacilitiesAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-		
+
 		ArrayList<Facility> f_array = new ArrayList<Facility>();
-		Iterator<Location> f_it = facilities.getLocations().values().iterator();
+		Iterator<? extends Location> f_it = facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
 			CoordI c = f.getCenter();
@@ -74,15 +75,15 @@ public class FacilitiesSpatialCut extends FacilitiesAlgorithm {
 			else { // outside
 			}
 		}
-		
-		TreeMap<IdI,Location> fs = facilities.getLocations();
+
+		TreeMap<IdI, Facility> fs = (TreeMap<IdI, Facility>) facilities.getFacilities();
 		fs.clear();
-		
+
 		for (int i=0; i<f_array.size(); i++) {
 			Facility f = f_array.get(i);
-			fs.put(f.getId(),f);
+			fs.put(f.getId(), f);
 		}
-		
+
 		System.out.println("    done.");
 	}
 }

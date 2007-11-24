@@ -21,13 +21,14 @@
 package org.matsim.facilities;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
 
 public class Facilities extends Layer {
@@ -50,7 +51,7 @@ public class Facilities extends Layer {
 	public Facilities(final String name) {
 		super(LAYER_TYPE,name);
 	}
-	
+
 	public Facilities() {
 		this(null);
 	}
@@ -74,7 +75,7 @@ public class Facilities extends Layer {
 		}
 		return f;
 	}
-	
+
 	public final Facility createFacility(final String id, final String x, final String y) {
 		return this.createFacility(new Id(id),new Coord(x,y));
 	}
@@ -113,6 +114,11 @@ public class Facilities extends Layer {
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
+
+	@SuppressWarnings("unchecked")
+	public final Map<IdI, ? extends Facility> getFacilities() {
+		return (Map<IdI, ? extends Facility>) this.locations;
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// print methods

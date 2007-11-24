@@ -34,12 +34,12 @@ import org.matsim.withinday.mobsim.OccupiedVehicle;
  *
  */
 public class WithindayCreateVehiclePersonAlgorithm extends PersonAlgo_CreateVehicle {
-	
+
 	private WithindayControler controler;
-	
+
 	/**
 	 * For performance reasons the constructor needs the size of the population as only argument.
-	 * @param popsize
+	 * @param controler
 	 */
 	public WithindayCreateVehiclePersonAlgorithm(final WithindayControler controler) {
 		this.controler = controler;

@@ -114,7 +114,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		}
 		if (atts.getValue("capDivider") != null) {
 			log.warn("[capDivider defined. it will be used but should be gone somewhen]");
-			String capperiod = new String(atts.getValue("capDivider") + ":00:00");
+			String capperiod = atts.getValue("capDivider") + ":00:00";
 			this.network.setCapacityPeriod(capperiod);
 		}
 	}

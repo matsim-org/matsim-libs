@@ -21,7 +21,6 @@
 package org.matsim.plans.algorithms;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -31,7 +30,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class XY2Links extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -60,13 +59,12 @@ public class XY2Links extends PersonAlgorithm implements PlanAlgorithmI {
 		this.minLength = minLength;
 
 		this.linksArray = new ArrayList<Link>();
-		Iterator<?> iter = network.getLinks().iterator();
-		while (iter.hasNext()) {
-			Link link = (Link)iter.next();
+		for (Link link : network.getLinks().values()) {
 			if (link.getLength() >= minLength) {
 				this.linksArray.add(link);
 			}
 		}
+
 		// build nodesArray from linksArray
 		this.nodesArray = new ArrayList<Node>();
 		for (Link link: this.linksArray) {
@@ -119,9 +117,7 @@ public class XY2Links extends PersonAlgorithm implements PlanAlgorithmI {
 		shortestDistance = Double.MAX_VALUE; // reset the value
 		Link nearestLink2 = null; // the nearest link without any restrictions
 		double shortestDistance2 = Double.MAX_VALUE;
-		Iterator<?> lIter = nearestNode.getOutLinks().iterator();
-		while (lIter.hasNext()) {
-			Link link = (Link) lIter.next();
+		for (Link link : nearestNode.getOutLinks().values()) {
 			double dist = link.calcDistance(coord);
 
 			if (link.getLength() >= this.minLength) {

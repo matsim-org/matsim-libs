@@ -49,10 +49,6 @@ import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
 
 public class KmlSnapshotWriter implements SnapshotWriterI {
-	/**
-	 * some colors, each in hex: alpha blue green red 15,15,190
-	 */
-	private static final String RED = "ff0f0fbe";
 
 	private KML mainKml = null;
 	private Document mainDoc = null;

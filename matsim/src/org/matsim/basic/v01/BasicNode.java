@@ -20,53 +20,58 @@
 
 package org.matsim.basic.v01;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.world.Coord;
+import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.geometry.shared.Coord;
 
-public class BasicNode extends BasicIdentified implements BasicNodeI{
-	protected final BasicLinkSetI inlinks  = new BasicLinkSet();
-	protected final BasicLinkSetI outlinks = new BasicLinkSet();
+public class BasicNode implements BasicNodeI {
+	protected final Map<IdI, BasicLinkI> inlinks  = new HashMap<IdI, BasicLinkI>(4, 0.95f);
+	protected final Map<IdI, BasicLinkI> outlinks = new HashMap<IdI, BasicLinkI>(4, 0.95f);
 
-	// TODO [balmermi]: Since the basic link is a location, it MUST have
-	// defined some geographical information (coords). These are defined
-	// by its from- and to-node. Therefore, the BasicNode MUST have a coordinate
-	// defined. See also BasicLink. If this is not O.K., then the BasicLink must
-	// not extend Location.
+	/* TODO [balmermi]: Since the basic link is a location, it MUST have
+	 * defined some geographical information (coords). These are defined
+	 * by its from- and to-node. Therefore, the BasicNode MUST have a coordinate
+	 * defined. See also BasicLink. If this is not O.K., then the BasicLink must
+	 * not extend Location. */
 	protected final CoordI coord;
+	protected IdI id;
 
-	public BasicNode(String str, CoordI coord) {
-		super(new Id(str));
+	public BasicNode(String id, CoordI coord) {
+		this.id = new Id(id);
 		if (coord == null) { Gbl.errorMsg("Coord must be defined!"); }
 		this.coord = coord;
 	}
 
 	// TODO [balmermi] see above why ...
 	@Deprecated
-	public BasicNode(String str) {
-		super(new Id(str));
-		this.coord = new Coord(0,0);
+	public BasicNode(String id) {
+		this(id, new Coord(0, 0));
 	}
 
 	public boolean addInLink(BasicLinkI link) {
-		return inlinks.add(link);
+		inlinks.put(link.getId(), link);
+		return true;
 	}
 
 
 	public boolean addOutLink(BasicLinkI link) {
-		return outlinks.add(link);
+		outlinks.put(link.getId(), link);
+		return true;
 	}
 
 
-	public BasicLinkSetI getInLinks() {
+	public Map<IdI, ? extends BasicLinkI> getInLinks() {
 		return inlinks;
 	}
 
 
-	public BasicLinkSetI getOutLinks() {
+	public Map<IdI, ? extends BasicLinkI> getOutLinks() {
 		return outlinks;
 	}
 
@@ -74,4 +79,18 @@ public class BasicNode extends BasicIdentified implements BasicNodeI{
 	public CoordI getCoord() {
 		return this.coord;
 	}
+
+
+	public IdI getId() {
+		return this.id;
+	}
+
+	public void setId(final IdI id) {
+		this.id = id;
+	}
+
+	public void setId(final String idstring) {
+		this.id = new Id(idstring);
+	}
+
 }

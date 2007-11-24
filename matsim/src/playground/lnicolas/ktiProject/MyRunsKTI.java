@@ -102,8 +102,8 @@ public class MyRunsKTI extends MyRuns {
 			/**
 			 * Get the ZoneLayer containing the municipalities
 			 */
-			referenceZones = new ArrayList<Zone>(((ZoneLayer) Gbl.getWorld().getLayer(
-					new Id("municipality"))).getLocations());
+			referenceZones = new ArrayList((Gbl.getWorld().getLayer(
+					new Id("municipality"))).getLocations().values());
 
 			/**
 			 * Read additional information per municipality from the given input file
@@ -244,7 +244,7 @@ public class MyRunsKTI extends MyRuns {
 			 * Again some analysis...
 			 */
 			analyzePopulation(population, homeZones, args[2],
-					((ZoneLayer) Gbl.getWorld().getLayer(new Id("municipality"))).getLocations());
+					((ZoneLayer) Gbl.getWorld().getLayer(new Id("municipality"))).getLocations().values());
 			analyzePopulation(plans, args[2]);
 			MicroCensus2005ActChainGenerator.writeActChainDistributionWorkNoWork(
 					plans, outputFolder + "actChainDistr" + args[2] + ".csv");
@@ -525,8 +525,8 @@ public class MyRunsKTI extends MyRuns {
 				+ "each zone...");
 		readWorld();
 		ArrayList<Zone> referenceZones =
-			new ArrayList<Zone>(((ZoneLayer) Gbl.getWorld().getLayer(
-		new Id("municipality"))).getLocations());
+			new ArrayList((Gbl.getWorld().getLayer(
+		new Id("municipality"))).getLocations().values());
 		facsPerZone.run(referenceZones, facilities);
 		System.out.println("done");
 

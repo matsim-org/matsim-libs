@@ -35,7 +35,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Generates a Plans object (i.e. a set of persons with some attributes like age, sex etc.)
@@ -47,46 +47,46 @@ import org.matsim.world.Coord;
 public class CensusPopulationGenerator {
 	static String populationFilename	= "";
 	static int populationFileLineCount = -1;
-	
+
 	ArrayList<HouseholdI> households = new ArrayList<HouseholdI>();
 	ArrayList<Person> persons = new ArrayList<Person>();
-	
+
 	public CensusPopulationGenerator(String inputFolder) {
 		populationFilename	= inputFolder + "ETHZ_Pers.tab";
-		populationFileLineCount = 
+		populationFileLineCount =
 			DatapulsPopulationGenerator.getLineCount(populationFilename);
 	}
-	
+
 	/**
 	 * @return a Plans object (i.e. a set of persons with some attributes like age, sex etc.)
-	 * based on the given tab-separated {@code populationFilename}. 
+	 * based on the given tab-separated {@code populationFilename}.
 	 */
 	public Plans run() {
-		
+
 		System.out.println("creating household information...");
 		getHouseholdInformation();
 		System.out.println("done.");
-		
+
 		System.out.println("creating persons...");
 		Plans plans = createPlans();
 		System.out.println("done.");
-		
+
 		return plans;
 	}
-	
+
 	/**
-	 * Each person in the data is associated to a household ID. Out of these IDs, we can 
+	 * Each person in the data is associated to a household ID. Out of these IDs, we can
 	 * build HouseholdInformation object which contain the persons within the respective household.
-	 * The HouseholdInformation objects in turn can then be used to count the number of 
-	 * household members and the number of kids per household and the household income for each person.  
+	 * The HouseholdInformation objects in turn can then be used to count the number of
+	 * household members and the number of kids per household and the household income for each person.
 	 */
 	private void getHouseholdInformation() {
 		TreeMap<String, HouseholdInformation> householdsInformation =
 			new TreeMap<String, HouseholdInformation>();
-		
+
 		String statusString = "|----------+-----------|";
 		System.out.println(statusString);
-		
+
 		int invalidHouseholdTypeCount = 0;
 		try {
 	// how the input file looks like:
@@ -100,12 +100,12 @@ public class CensusPopulationGenerator {
 			String currentLine = bufferedReader.readLine();
 			int lineIndex = 0;
 			while ((currentLine = bufferedReader.readLine()) != null) {
-				
+
 				String[] entries = currentLine.split("\t", -1);
-				
+
 				// HHNR (the key of the the HouseholdInformation)
 				String hhId = entries[3].trim();
-				
+
 				HouseholdInformation hInfo = null;
 				// balmermi: either "HHTPZ" or "HHTPW" or -1 (no value)
 				int hType = getHouseholdType(entries);
@@ -123,7 +123,6 @@ public class CensusPopulationGenerator {
 					hInfo = new HouseholdInformation(/*hType*/);
 				} else {
 //					System.out.println("Invalid household type: " + hType);
-					hInfo = null;
 					invalidHouseholdTypeCount++;
 				}
 				if (hInfo != null) {
@@ -132,52 +131,52 @@ public class CensusPopulationGenerator {
 					hInfo.addPerson(personId, age);
 				}
 				households.add(hInfo);
-				
+
 				lineIndex++;
 				if (lineIndex % (populationFileLineCount / statusString.length()) == 0) {
 					System.out.print(".");
 					System.out.flush();
 				}
 			}
-			
+
 			bufferedReader.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		
+
 		System.out.println(invalidHouseholdTypeCount + " persons are linked to households of " +
 				"invalid type. Omitting them.");
 	}
-	
+
 	/**
-	 * A helper function that writes out a file with the id, coordinates and number of 
-	 * persons of a building. This information was used to enrich the enterprise census data with 
+	 * A helper function that writes out a file with the id, coordinates and number of
+	 * persons of a building. This information was used to enrich the enterprise census data with
 	 * home facilities.
 	 * @param filename
 	 */
 	public static void writeBuildingInformation(String filename) {
 		TreeMap<Integer, Integer> personsPerBuilding = new TreeMap<Integer, Integer>();
 		TreeMap<Integer, Coord> buildingCoords = new TreeMap<Integer, Coord>();
-		
+
 		String statusString = "|----------+-----------|";
 		System.out.println(statusString);
-		
+
 		try {
 	// how the input file looks like:
 	//
 	// head:    KANT    ZGDE    GEBAEUDE_ID     HHNR    WOHNUNG_NR      PERSON_ID       ZKRS    GLOC2   GLOC3   GLOC4   WKAT    GEM2    PARTNR  GETG    GEMT    GEJA    ALTJ    AKL5    AGRP    VALTJ  GORT    GORTCH  GORTAUS GESL    ZIVL    ZIVJ    HMAT    CHJA    ZNAT    NATI    NATUNO  AUSW    WO5M    WO5CH   WO5AUS  ELTERN  ZKIND   GJKIND_1   GJKIND_2        GJKIND_3        GJKIND_4        GJKIND_L        GJKIND_J        STHHZ   STHHW   RPHHZ   RPHHW   EPNRZ   EPNRW   HHTPZ   HHTPW   APERZ   APERW   WKATA   SPRA    MSPR    HSPR    SHSD    SHHD    SHPR    SHFR    SHTB    SHIT    SHRR    SHEN    SHAN    BSPR    SBSD    SBHD    SBPR    SBFR    SBTB    SBIT    SBRR    SBEN    SBAN    GEGW    HABG    UHAB    FHAB    HFAB    HBAB    LSAB    MPAB    BLAB    BSAB    OSAB    KAUS    AMS     BGRAD   KAZEIT  ERWS    MAMS    KAMS    VOLL    TZT1    TZT2    ETOA    ARLO    STSU    KSTZ    NENSS   IAUS    RENT    HAFA    FRTA    HVOLL   HTZS    HAZEIT  HIAUS   HHAFA   HFRTA   ERBE    PBER    ISCO    SOPK    BETGR   UNTGR   ANOGA   AREFO   AGDE    AZKRS   AGLOC2  AGLOC3  AGLOC4  AORT    ADIST   APEND   AWMIN   AWOFT   AWTAGE  AVEMI   AWEGM   AVMKE   AVELO   AMOFA   AMRAD   APKWL   APKWM   AWBUS   ABAHN   ATRAM   APOST   AVAND   SGDE    SZKRS   SGLOC2  SGLOC3  SGLOC4  SORT    SDIST   SPEND   SWMIN   SWOFT   SWTAGE  SVEMI   SWEGM   SVMKE   SVELO   SMOFA   SMRAD   SPKWL   SPKWM   SSBUS   SBAHN   STRAM   SPOST   SVAND   SNOGA   SREFO   XACH    YACH
 	// example: 12      2701    1030475         1943680 1       5       -7      11              112             0               1       -9      -9      4       12      1974    26      25      25      26     4       3946    -8      2       1       -9      1       -8      -7      8100    1       -9      2       2701    -8      0       -8      -8         -8      -8      -8      -8      -8      111     111     1       1       0       0       1000    1000    1       1       1       110     1111    200     1       0       0       0       0       0       0       0       0       400     1       1       0       0       0       0       0       0       0       -8      31      0       0       0       1       0       0       0       1       1       0       11      11      6       124     10      1       1       0       0       0       0       0       0       0       0       0       1       1       43.0    -8      43.0    -8      6       6       86504   -7      -7      91      10      10      8511A   21      2701    2109    21                                  1       0       1       -7      1       5       390     0       0       1       0       0       0       0       0       0       1       0       0       -8      0                                                       -8      0       -8      -8      -8      -8      -8      0       -8      -8      -8      -8      -8      -8      -8      -8      -8      -8      -8      -8      -8      610100  268000
 	// index:   0          1          2          3      4               5               6       7       8       9 ...
-		
+
 			FileReader fileReader = new FileReader(populationFilename);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			// Skip header
 			String currentLine = bufferedReader.readLine();
 			int lineIndex = 0;
 			while ((currentLine = bufferedReader.readLine()) != null) {
-				
+
 				String[] entries = currentLine.split("\t", -1);
-				
+
 //				Integer personId = Integer.parseInt(entries[5].trim());
 				Integer buildingId = Integer.parseInt(entries[2].trim());
 				int personCount = 0;
@@ -189,20 +188,20 @@ public class CensusPopulationGenerator {
 					buildingCoords.put(buildingId, new Coord(xCoord, yCoord));
 				}
 				personsPerBuilding.put(buildingId, personCount + 1);
-				
+
 				lineIndex++;
 				if (lineIndex % (populationFileLineCount / statusString.length()) == 0) {
 					System.out.print(".");
 					System.out.flush();
 				}
 			}
-			
+
 			bufferedReader.close();
-			
+
 			System.out.println();
 			System.out.println(statusString);
 			lineIndex = 0;
-			
+
 			BufferedWriter out;
 			out = new BufferedWriter(new FileWriter(filename));
 			out.write("buildingID\txCoord\tyCoord\tpersonCount\n");
@@ -212,20 +211,20 @@ public class CensusPopulationGenerator {
 				out.write(entry.getKey() + "\t" + coord.getX() + "\t" + coord.getY()
 						+ "\t" + entry.getValue() + "\n");
 			}
-			
+
 			lineIndex++;
 			if (lineIndex % (personsPerBuilding.size() / statusString.length()) == 0) {
 				System.out.print(".");
 				System.out.flush();
 			}
-			
+
 			out.close();
 			System.out.println("Home facilities written to " + filename);
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
 	}
-	
+
 	private int getHouseholdType(String[] entries) {
 		int type = Integer.parseInt(entries[49].trim());
 		if (type == -9) {
@@ -244,10 +243,10 @@ public class CensusPopulationGenerator {
 	private Plans createPlans(/*Double[] kidCountDistr*/) {
 		String statusString = "|----------+-----------|";
 		System.out.println(statusString);
-		
+
 		Plans plans = new Plans();
-		
-		
+
+
 		try {
 	// how the input file looks like:
 	//
@@ -261,17 +260,17 @@ public class CensusPopulationGenerator {
 			int lineIndex = 0;
 //			int unknownNationalityCount = 0;
 			while ((currentLine = bufferedReader.readLine()) != null) {
-				
+
 				HouseholdInformation hInfo = (HouseholdInformation) households.get(lineIndex);
 				if (hInfo != null) {
 					int hh_personCount = hInfo.getPersonCount();
 					int hh_kidCount = hInfo.getKidCount();
 					String[] entries = currentLine.split("\t", -1);
-					
+
 					int id   = Integer.parseInt(entries[5].trim());
-					
+
 					int age    = Integer.parseInt(entries[16].trim());
-	
+
 					int sexIndex    = Integer.parseInt(entries[23].trim());
 					String sex = null;
 					if (sexIndex == 1) {
@@ -279,7 +278,7 @@ public class CensusPopulationGenerator {
 					} else if (sexIndex == 2) {
 						sex = "f";
 					}
-	
+
 					int nationalityIndex    = Integer.parseInt(entries[26].trim());
 					String nationality = null;
 					if (nationalityIndex < 1 || nationalityIndex > 2) {
@@ -293,7 +292,7 @@ public class CensusPopulationGenerator {
 						nationality = "unknown";
 	//					unknownNationalityCount++;
 					}
-					
+
 					int employedIndex    = Integer.parseInt(entries[88].trim());
 					String employed = null;
 					if (employedIndex >= 11 && employedIndex <= 14) {
@@ -306,7 +305,7 @@ public class CensusPopulationGenerator {
 						Gbl.errorMsg("Line $.: wrong format of employed="
 								+ entries[36] + "!");
 					}
-	
+
 					int transport = Integer.parseInt(entries[136].trim());
 					String car = "never";
 					if (transport == 1) {
@@ -332,21 +331,21 @@ public class CensusPopulationGenerator {
 					if (transport == 1) {
 						car = "sometimes";
 					}
-	
+
 					String license = "no";
 					if (car.equals("always") || car.equals("sometimes")) {
 						license = "yes";
 					}
-	
+
 					Person person = new Person(Integer.toString(id), sex,
 							Integer.toString(age), license, car, employed);
 					person.setNationality(nationality);
 //							nationality, null, Integer.toString(hh_personCount),
 //							Integer.toString(hh_kidCount));
-					
+
 					int actX = Integer.parseInt(entries[170].trim());
 					int actY = Integer.parseInt(entries[171].trim());
-					
+
 					Act act = new Act(PersonToHomeFacilityMapper.homeActType,
 							actX, actY, null, 0, 30, 30, true);
 					Plan plan = new Plan(person);
@@ -357,7 +356,7 @@ public class CensusPopulationGenerator {
 					} catch (Exception e) {
 						Gbl.errorMsg(e);
 					}
-					
+
 					persons.add(person);
 					hInfo.addPerson(person);
 				}
@@ -368,12 +367,12 @@ public class CensusPopulationGenerator {
 					System.out.flush();
 				}
 			}
-			
+
 			bufferedReader.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		
+
 		// remove the invalid household entries
 		Iterator<HouseholdI> hIt = households.iterator();
 		while (hIt.hasNext()) {
@@ -383,48 +382,48 @@ public class CensusPopulationGenerator {
 		}
 		return plans;
 	}
-	
+
 	/**
-	 * A person in {@code persons} at index <i>i</i> belongs to the household in 
+	 * A person in {@code persons} at index <i>i</i> belongs to the household in
 	 * {@code households} at the same index <i>i</i>.
 	 * @return The persons that were generated.
 	 */
 	public ArrayList<Person> getPersons() {
 		return persons;
 	}
-	
+
 	/**
-	 * A person in {@code persons} at index <i>i</i> belongs to the household in 
+	 * A person in {@code persons} at index <i>i</i> belongs to the household in
 	 * {@code households} at the same index <i>i</i>.
 	 * @return The households that were generated.
 	 */
 	public ArrayList<HouseholdI> getHouseholds() {
 		return households;
 	}
-	
+
 	public class HouseholdInformation implements HouseholdI {
-		
+
 		ArrayList<String> memberIds;
 		ArrayList<Person> members;
 		private int kidCount;
 		private double income;
-		
+
 //		private int typeIndex = -1;
-		
+
 		public HouseholdInformation(/*int typeIndex*/) {
 			memberIds = new ArrayList<String>();
-			members = new ArrayList<Person>(); 
+			members = new ArrayList<Person>();
 			kidCount = 0;
 //			this.typeIndex = typeIndex;
 		}
-		
+
 		void addPerson(String personId, int age) {
 			memberIds.add(personId);
 			if (age < 18) {
 				addKid();
 			}
 		}
-		
+
 		void addPerson(Person person) {
 			members.add(person);
 		}
@@ -432,23 +431,23 @@ public class CensusPopulationGenerator {
 		private void addKid() {
 			this.kidCount ++;
 		}
-		
+
 		public int getPersonCount() {
 			return memberIds.size();
 		}
-		
+
 		public int getKidCount() {
 			return kidCount;
 		}
-		
+
 		public double getIncome() {
 			return income;
 		}
-		
+
 		public void setIncome(double income) {
 			this.income = income;
 		}
-		
+
 		public ArrayList<Person> getPersons() {
 			return members;
 		}

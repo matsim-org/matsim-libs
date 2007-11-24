@@ -77,11 +77,10 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 
 			out.writeInt(positions.size());
 
-			if (agentHandler != null)
-				for (PositionInfo pos : positions) {
+			for (PositionInfo pos : positions) {
 				agentHandler.writeAgent(pos, out);
-			}
 	    }
+	  }
 	}
 
 	private FileOutputStream outStream = null;

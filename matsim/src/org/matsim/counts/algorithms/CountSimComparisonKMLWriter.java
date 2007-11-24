@@ -57,7 +57,7 @@ import org.matsim.utils.vis.kml.TimeSpan;
 import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.utils.vis.kml.fields.Vec2Type;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 /**
  * @author dgrether
  *

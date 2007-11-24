@@ -87,6 +87,7 @@ public class Icon extends Object {
 	 * 
 	 * @deprecated since KML version 2.1
 	 */
+	@Deprecated
 	public Icon(String href, int x, int y, int w, int h) {
 		
 		super("");

@@ -24,7 +24,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Falsifies a network, so it can more legally be redistributed, by moving the nodes by a random amount
@@ -32,7 +32,6 @@ import org.matsim.world.Coord;
  * Additionally, the link length will be set to the euclidean distance between the from- and to-node.
  *
  * @author mrieser
- *
  */
 public class NetworkFalsifier extends NetworkAlgorithm {
 
@@ -42,19 +41,16 @@ public class NetworkFalsifier extends NetworkAlgorithm {
 		this.distance = distance;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void run(NetworkLayer network) {
-		Iterable<Node> nodes = network.getNodes();
 		double maxDistance = this.distance * 2.0;
-		for (Node node : nodes) {
+		for (Node node : network.getNodes().values()) {
 			Coord coord = node.getCoord();
 			coord.setXY(coord.getX() + (Gbl.random.nextDouble() - 0.5) *  maxDistance,
 					coord.getY() + (Gbl.random.nextDouble() - 0.5) * maxDistance);
 		}
 
-		Iterable<Link> links = network.getLinks();
-		for (Link link : links) {
+		for (Link link : network.getLinks().values()) {
 			Coord fromCoord = link.getFromNode().getCoord();
 			Coord toCoord = link.getToNode().getCoord();
 			link.setLength(fromCoord.calcDistance(toCoord));

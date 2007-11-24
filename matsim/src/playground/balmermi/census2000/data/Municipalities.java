@@ -59,10 +59,10 @@ public class Municipalities {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Municipality getMunicipality(Integer m_id) {
+	public final Municipality getMunicipality(int m_id) {
 		return this.municipalities.get(new Id(m_id));
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// methods
 	//////////////////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ public class Municipalities {
 
 				// Kanton	Kt_Name	Gem_Nr	Gem_Name	Bev_total	Eink_2000	RG_verk	Benzin_95
 				// 0        1       2       3           4           5           6       7
-				
+
 				Integer m_id = Integer.parseInt(entries[2].trim());
 				Location l = Gbl.getWorld().getLayer(MUNICIPALITY).getLocation(m_id);
 				if (l == null) {
@@ -95,7 +95,7 @@ public class Municipalities {
 					m.fuelcost = Double.parseDouble(entries[7].trim());
 				}
 				line_cnt++;
-			}	
+			}
 			buffered_reader.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);

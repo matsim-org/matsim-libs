@@ -41,37 +41,26 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
  * this Class counts and writes the amount of "new" filtered links as well as
  * that of "old" links by reading "old" plansfile, gets compression ratio of the
  * sparely new network with sparely linkroute.
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class CompressRoute extends PersonAlgorithm {
 	/**
-	 * @param String
-	 *            (args0) - ssLinkId: the id of the "default next" link of the
-	 *            current link
-	 * @param String
-	 *            (args1) - linkId: the id of a current link
+	 * (arg0) - ssLinkId: the id of the "default next" link of the current link
+	 * (arg1) - linkId: the id of a current link
 	 */
 	private Map<String, String> ssLinks = new TreeMap<String, String>();
 
 	private DataOutputStream out;
 
-	/**
-	 * @param oldLinksNr -
-	 *            Counter of "old" links
-	 * @param newLinksNr -
-	 *            Counter of "new" filtered links
-	 */
-	private int oldLinksNr, newLinksNr;
+	/** Counter of "old" links */
+	private int oldLinksNr;
 
-	/**
-	 * Constructor
-	 * 
-	 * @throws IOException
-	 * 
-	 */
-	public CompressRoute(Map ssLinks, Plans plans, String fileName)
+	/** Counter of "new" filtered links */
+	private int newLinksNr;
+
+	public CompressRoute(Map<String, String> ssLinks, Plans plans, String fileName)
 			throws IOException {
 		this.ssLinks = ssLinks;
 		out = new DataOutputStream(new BufferedOutputStream(
@@ -85,7 +74,7 @@ public class CompressRoute extends PersonAlgorithm {
 	/**
 	 * counts and writes the amount of "old" links and that of "new" filtered
 	 * links
-	 * 
+	 *
 	 * @see org.matsim.plans.algorithms.PersonAlgorithm#run(org.matsim.plans.Person)
 	 */
 	@Override
@@ -140,7 +129,7 @@ public class CompressRoute extends PersonAlgorithm {
 				newLinksNr += newLinks.size();
 				while (!newLinks.empty()) {
 					try {
-						out.writeBytes(((Link) (newLinks.pop())).getId()
+						out.writeBytes(((newLinks.pop())).getId()
 								.toString());
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -164,7 +153,7 @@ public class CompressRoute extends PersonAlgorithm {
 
 	/**
 	 * writes the count of "old" links and "new" links
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void writeEnd() throws IOException {

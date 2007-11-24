@@ -200,6 +200,7 @@ public class PersonSetActChains extends PersonAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 
 		String group = null;

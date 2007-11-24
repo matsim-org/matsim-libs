@@ -21,7 +21,6 @@
 package playground.balmermi.algos;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -50,15 +49,14 @@ public class NetworkAdaptCHNavtec extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		ArrayList<Link> link90 = new ArrayList<Link>();
-		
+
 		System.out.println("      adapt lanes and caps...");
-		Iterator<Link> l_it = network.getLinks().iterator();
-		while (l_it.hasNext()) {
-			Link l = l_it.next();
+		for (Link l : network.getLinks().values()) {
 			int type = Integer.parseInt(l.getType());
 			if ((type == 13) || (type == 16)) {
 				System.out.println("        link id=" + l.getId() + "; type=" + l.getType() + "; lanes=" + l.getLanes() + " ==> lanes=3");
@@ -83,7 +81,7 @@ public class NetworkAdaptCHNavtec extends NetworkAlgorithm {
 			}
 		}
 		System.out.println("      done.");
-		
+
 		System.out.println("      remove links with type = 90...");
 		for (int i=0; i<link90.size(); i++) {
 			Link l = link90.get(i);

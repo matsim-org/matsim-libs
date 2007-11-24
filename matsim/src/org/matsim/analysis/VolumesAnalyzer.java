@@ -32,13 +32,11 @@ public class VolumesAnalyzer implements EventHandlerLinkLeaveI {
 	private final int timeBinSize;
 	private final int maxTime;
 	private final int maxSlotIndex;
-	private final NetworkLayer network;
 	private final TreeMap<String, int[]> links = new TreeMap<String, int[]>();
 
 	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final NetworkLayer network) {
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
-		this.network = network;
 		this.maxSlotIndex = (this.maxTime/this.timeBinSize) + 1;
 	}
 

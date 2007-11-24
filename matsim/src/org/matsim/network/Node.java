@@ -22,18 +22,15 @@ package org.matsim.network;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicLinkSet;
 import org.matsim.basic.v01.BasicNode;
-import org.matsim.basic.v01.BasicNodeSet;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeSetI;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.ResizableArray;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class Node extends BasicNode implements Comparable<Node> {
 
@@ -41,8 +38,8 @@ public class Node extends BasicNode implements Comparable<Node> {
 	// constants
 	//////////////////////////////////////////////////////////////////////
 
-	// see "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
-	// for description of node types. It's the graph matching paper.
+	/* See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
+	 * for description of node types. It's the graph matching paper. */
 	public final static int EMPTY        = 0;
 	public final static int SOURCE       = 1;
 	public final static int SINK         = 2;
@@ -60,9 +57,9 @@ public class Node extends BasicNode implements Comparable<Node> {
 	private String type = null;
 	protected String origid = null;
 
-	// the topo_type member should not be here, instead using a role or
-	// inheritance would make more sence. topo_type is calculated by
-	// org.matsim.demandmodeling.network.algorithms.NetworkCalcTopoType
+	/* TODO [balmermi] The topo_type member should not be here, instead using a role or
+	 * inheritance would make more sense. topo_type is calculated by
+	 * org.matsim.network.algorithms.NetworkCalcTopoType */
 	private int topoType = Integer.MIN_VALUE;
 
 	private final ResizableArray<Object> roles = new ResizableArray<Object>(5);
@@ -105,13 +102,13 @@ public class Node extends BasicNode implements Comparable<Node> {
 	public boolean addInLink(final BasicLinkI inlink) {
 	//public boolean addInLink(Link inlink) {
 		IdI linkid = inlink.getId();
-		if (this.inlinks.containsId(linkid)) {
+		if (this.inlinks.containsKey(linkid)) {
 			Gbl.errorMsg(this + "[inlink_id=" + inlink.getId() + " already exists]");
 		}
-		if (this.outlinks.containsId(linkid)) {
+		if (this.outlinks.containsKey(linkid)) {
 			Gbl.warningMsg(this.getClass(),"addInLink(...)",this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
 		}
-		this.inlinks.add(inlink);
+		this.inlinks.put(linkid, inlink);
 		return true;
 	}
 
@@ -119,13 +116,13 @@ public class Node extends BasicNode implements Comparable<Node> {
 	public boolean addOutLink(final BasicLinkI outlink) {
 	//public boolean addOutLink(Link outlink) {
 		IdI linkid = outlink.getId();
-		if (this.outlinks.containsId(linkid)) {
+		if (this.outlinks.containsKey(linkid)) {
 			Gbl.errorMsg(this + "[inlink_id=" + outlink.getId() + " already exists]");
 		}
-		if (this.inlinks.containsId(linkid)) {
+		if (this.inlinks.containsKey(linkid)) {
 			Gbl.warningMsg(this.getClass(),"addOutLink(...)",this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
 		}
-		this.outlinks.add(outlink);
+		this.outlinks.put(linkid, outlink);
 		return true;
 	}
 
@@ -161,18 +158,14 @@ public class Node extends BasicNode implements Comparable<Node> {
 	// the new collections convention seems to be that the return type is boolean, and "true" is returned when
 	// the collection is modified, and "false" else.  kai, dec06
 	public final void removeInLink(final Link inlink) {
-		this.inlinks.remove(inlink);
+		this.inlinks.remove(inlink.getId());
 	}
 
 	// normally, the removed object should be passed back (like in other utils) balmermi
 	// see above (removeInLink).  kai, dec06
 	public final void removeOutLink(final Link outlink) {
-		this.outlinks.remove(outlink);
+		this.outlinks.remove(outlink.getId());
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// query methods
-	//////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////
 	// get methods
@@ -191,37 +184,33 @@ public class Node extends BasicNode implements Comparable<Node> {
 		return (Coord) this.coord;
 	}
 
-	public final BasicLinkSetI getIncidentLinks() {
-		BasicLinkSetI links = new BasicLinkSet();
-		links.addAll(this.inlinks);
-		links.addAll(this.outlinks);
+	public final Map<IdI, ? extends Link> getIncidentLinks() {
+		Map<IdI, Link> links = new TreeMap<IdI, Link>(getInLinks());
+		links.putAll(getOutLinks());
 		return links;
 	}
 
-	public final BasicNodeSetI getInNodes() {
-		BasicNodeSetI nodes = new BasicNodeSet();
-		Iterator it = this.inlinks.iterator();
-		while (it.hasNext()) {
-			Link l = (Link)it.next();
-			nodes.add(l.getFromNode());
+	public final Map<IdI, ? extends Node> getInNodes() {
+		Map<IdI, Node> nodes = new TreeMap<IdI, Node>();
+		for (Link link : getInLinks().values()) {
+			Node node = link.getFromNode();
+			nodes.put(node.getId(), node);
 		}
 		return nodes;
 	}
 
-	public final BasicNodeSetI getOutNodes() {
-		BasicNodeSetI nodes = new BasicNodeSet();
-		Iterator it = this.outlinks.iterator();
-		while (it.hasNext()) {
-			Link l = (Link)it.next();
-			nodes.add(l.getToNode());
+	public final Map<IdI, ? extends Node> getOutNodes() {
+		Map<IdI, Node> nodes = new TreeMap<IdI, Node>();
+		for (Link link : getOutLinks().values()) {
+			Node node = link.getToNode();
+			nodes.put(node.getId(), node);
 		}
 		return nodes;
 	}
 
-	public final BasicNodeSetI getIncidentNodes() {
-		BasicNodeSetI nodes = new BasicNodeSet();
-		nodes.addAll(this.getInNodes());
-		nodes.addAll(this.getOutNodes());
+	public final Map<IdI, ? extends Node> getIncidentNodes() {
+		Map<IdI, Node> nodes = new TreeMap<IdI, Node>(getInNodes());
+		nodes.putAll(getOutNodes());
 		return nodes;
 	}
 
@@ -241,6 +230,18 @@ public class Node extends BasicNode implements Comparable<Node> {
 		public int compare(final Node n1, final Node n2) {
 			return n1.getId().toString().compareTo(n2.getId().toString());
 		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<IdI, ? extends Link> getInLinks() {
+		return (Map<IdI, Link>) super.getInLinks();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<IdI, ? extends Link> getOutLinks() {
+		return (Map<IdI, Link>)super.getOutLinks();
 	}
 
 	//////////////////////////////////////////////////////////////////////

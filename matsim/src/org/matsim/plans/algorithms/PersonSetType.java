@@ -31,6 +31,7 @@ public class PersonSetType extends PersonAlgorithm {
 		this.type = type;
 	}
 	
+	@Override
 	public void run(Person person) {
 		person.setType(type);
 	}

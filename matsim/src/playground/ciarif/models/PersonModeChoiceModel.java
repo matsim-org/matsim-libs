@@ -31,7 +31,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 import playground.balmermi.census2000.data.Persons;
 

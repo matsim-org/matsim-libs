@@ -37,7 +37,7 @@ public class NetworkMergeDoubleLinks extends NetworkAlgorithm {
 	// 1 := additive merge (sum cap, max freespeed, sum lanes, max length)
 	// 2 := max merge (max cap, max freespeed, max lanes, max length)
 	private static final int mergetype = 2;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -87,22 +87,20 @@ public class NetworkMergeDoubleLinks extends NetworkAlgorithm {
 			Gbl.errorMsg("'mergetype' not known!");
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-		
-		Iterator<?> n_it = network.getNodes().iterator();
-		while (n_it.hasNext()) {
-			Node n = (Node)n_it.next();
-			
-			Iterator<?> l1_it = n.getOutLinks().iterator();
+
+		for (Node n : network.getNodes().values()) {
+			Iterator<?> l1_it = n.getOutLinks().values().iterator();
 			while (l1_it.hasNext()) {
 				Link l1 = (Link)l1_it.next();
-				Iterator<?> l2_it = n.getOutLinks().iterator();
+				Iterator<?> l2_it = n.getOutLinks().values().iterator();
 				while (l2_it.hasNext()) {
 					Link l2 = (Link)l2_it.next();
 					if (!l2.equals(l1)) {
@@ -110,8 +108,8 @@ public class NetworkMergeDoubleLinks extends NetworkAlgorithm {
 							System.out.println("      Node id=" + n.getId());
 							this.mergeLink2IntoLink1(l1, l2, network);
 							// restart
-							l1_it = n.getOutLinks().iterator();
-							l2_it = n.getOutLinks().iterator();
+							l1_it = n.getOutLinks().values().iterator();
+							l2_it = n.getOutLinks().values().iterator();
 						}
 					}
 				}

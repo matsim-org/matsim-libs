@@ -21,7 +21,6 @@
 package org.matsim.network;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
@@ -65,22 +64,18 @@ public class NetworkWriter extends Writer {
 			this.out = IOUtils.getBufferedWriter(this.outfile);
 
 			this.writeHeader("network");
-			
+
 			this.handler.startNetwork(this.network, this.out);
 			this.handler.writeSeparator(this.out);
 			this.handler.startNodes(this.network, this.out);
-			Iterator<Node> n_it = this.network.getNodes().iterator();
-			while (n_it.hasNext()) {
-				Node n = n_it.next();
+			for (Node n : this.network.getNodes().values()) {
 				this.handler.startNode(n, this.out);
 				this.handler.endNode(this.out);
 			}
 			this.handler.endNodes(this.out);
 			this.handler.writeSeparator(this.out);
 			this.handler.startLinks(this.network, this.out);
-			Iterator<Link> l_it = this.network.getLinks().iterator();
-			while (l_it.hasNext()) {
-				Link l = l_it.next();
+			for (Link l : this.network.getLinks().values()) {
 				this.handler.startLink(l, this.out);
 				this.handler.endLink(this.out);
 			}

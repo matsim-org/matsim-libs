@@ -20,124 +20,114 @@
 
 package org.matsim.utils.vis.netvis.visNet;
 
-import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicLinkSet;
-import org.matsim.basic.v01.BasicNodeSet;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeSetI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.vis.netvis.DisplayableLinkI;
+import org.matsim.utils.vis.netvis.DisplayableNetI;
 
 /**
  * @author gunnar
- * 
+ *
  */
-public class DisplayNet implements BasicNetI {
+public class DisplayNet implements BasicNetI, DisplayableNetI {
 
-    // -------------------- MEMBER VARIABLES --------------------
+	// -------------------- MEMBER VARIABLES --------------------
 
-    private double minEasting;
-    private double maxEasting;
-    private double minNorthing;
-    private double maxNorthing;
+	private double minEasting;
+	private double maxEasting;
+	private double minNorthing;
+	private double maxNorthing;
 
-    private final BasicNodeSet nodes = new BasicNodeSet();
-    private final BasicLinkSet links = new BasicLinkSet();
- 
-    // -------------------- CONSTRUCTION --------------------
+	private final Map<IdI, DisplayNode> nodes = new TreeMap<IdI, DisplayNode>();
+	private final Map<IdI, DisplayLink> links = new TreeMap<IdI, DisplayLink>();
 
-    public DisplayNet(NetworkLayer layer) {
-    	// first create nodes
-    	for (Iterator it = layer.getNodes().iterator(); it.hasNext();) {
-  			BasicNodeI node = (BasicNodeI) it.next();
+	// -------------------- CONSTRUCTION --------------------
 
- 				DisplayNode node2 = new DisplayNode(node.getId(), this);
- 				node2.setCoord(((Node)node).getCoord());
+	public DisplayNet(NetworkLayer layer) {
+		// first create nodes
+		for (BasicNodeI node : layer.getNodes().values()) {
+			DisplayNode node2 = new DisplayNode(node.getId(), this);
+			node2.setCoord(((Node) node).getCoord());
+			nodes.put(node2.getId(), node2);
+		}
 
- 				nodes.add(node2);
-  		}
-    	
-    	// second, create links
-    	for (Iterator it = layer.getLinks().iterator(); it.hasNext();) {
-  			BasicLinkI link = (BasicLinkI) it.next();
- 				DisplayLink link2 = new DisplayLink(link.getId(), this);
+		// second, create links
+		for (BasicLinkI link : layer.getLinks().values()) {
+			DisplayLink link2 = new DisplayLink(link.getId(), this);
 
-  				BasicNodeI from = (BasicNodeI) this.getNodes().get(link.getFromNode().getId());
-  				from.addOutLink(link2);
-  				link2.setFromNode(from);
+			BasicNodeI from = this.getNodes().get(link.getFromNode().getId());
+			from.addOutLink(link2);
+			link2.setFromNode(from);
 
-  				BasicNodeI to = (BasicNodeI) this.getNodes().get(link.getToNode().getId());
-  				to.addInLink(link2);
-  				link2.setToNode(to);
-  				
-          link2.setLength_m(((Link)link).getLength());
-          link2.setLanes(((Link)link).getLanes());
+			BasicNodeI to = this.getNodes().get(link.getToNode().getId());
+			to.addInLink(link2);
+			link2.setToNode(to);
 
- 					links.add(link2);
-  		}
-    	
-    	// third, build/complete the network
-    	this.build();
-    }
-    
-    public void clear() {
-        Iterator it = getLinks().iterator();
-        while (it.hasNext())
-            ((DisplayLink) it.next()).clear();
-    }
+			link2.setLength_m(((Link) link).getLength());
+			link2.setLanes(((Link) link).getLanes());
 
- // -------------------- IMPLEMENTATION OF BasicNetworkI --------------------
+			links.put(link2.getId(), link2);
+		}
 
-    public void connect() {
-    }
+		// third, build/complete the network
+		this.build();
+	}
 
-    public BasicNodeSetI getNodes() {
-        return nodes;
-    }
+	// -------------------- IMPLEMENTATION OF BasicNetworkI --------------------
 
-    public BasicLinkSetI getLinks() {
-        return links;
-    }
-    
-    // -------------------- OVERRIDING OF TrafficNet --------------------
+	public void connect() {
+	}
 
-    public void build() {
-      for (Iterator it = getLinks().iterator(); it.hasNext();)
-        ((DisplayLink) it.next()).build();
+	public Map<IdI, ? extends DisplayNode> getNodes() {
+		return nodes;
+	}
 
-        minEasting = Double.POSITIVE_INFINITY;
-        maxEasting = Double.NEGATIVE_INFINITY;
-        minNorthing = Double.POSITIVE_INFINITY;
-        maxNorthing = Double.NEGATIVE_INFINITY;
+	public Map<IdI, ? extends DisplayableLinkI> getLinks() {
+		return links;
+	}
 
-        for (Iterator it = getNodes().iterator(); it.hasNext();) {
-            DisplayNode node = (DisplayNode) it.next();
-            minEasting = Math.min(minEasting, node.getEasting());
-            maxEasting = Math.max(maxEasting, node.getEasting());
-            minNorthing = Math.min(minNorthing, node.getNorthing());
-            maxNorthing = Math.max(maxNorthing, node.getNorthing());
-        }
-    }
+	// -------------------- OVERRIDING OF TrafficNet --------------------
 
-    public double minEasting() {
-        return minEasting;
-    }
+	public void build() {
+		for (DisplayableLinkI link : getLinks().values()) {
+			link.build();
+		}
 
-    public double maxEasting() {
-        return maxEasting;
-    }
+		minEasting = Double.POSITIVE_INFINITY;
+		maxEasting = Double.NEGATIVE_INFINITY;
+		minNorthing = Double.POSITIVE_INFINITY;
+		maxNorthing = Double.NEGATIVE_INFINITY;
 
-    public double minNorthing() {
-        return minNorthing;
-    }
+		for (DisplayNode node : getNodes().values()) {
+			minEasting = Math.min(minEasting, node.getEasting());
+			maxEasting = Math.max(maxEasting, node.getEasting());
+			minNorthing = Math.min(minNorthing, node.getNorthing());
+			maxNorthing = Math.max(maxNorthing, node.getNorthing());
+		}
+	}
 
-    public double maxNorthing() {
-        return maxNorthing;
-    }
+	public double minEasting() {
+		return minEasting;
+	}
+
+	public double maxEasting() {
+		return maxEasting;
+	}
+
+	public double minNorthing() {
+		return minNorthing;
+	}
+
+	public double maxNorthing() {
+		return maxNorthing;
+	}
 
 }

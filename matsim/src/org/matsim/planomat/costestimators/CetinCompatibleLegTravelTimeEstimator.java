@@ -27,19 +27,18 @@ import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 /**
- * This class estimates travel times from events produced by the 
+ * This class estimates travel times from events produced by the
  * deterministic time-step-driven queue-based agent traffic simulation (DQSim).
  * <p>
  *  In constrast to <code>CharyparEtAlCompatibleLegTravelTimeEstimator</code>,
  * <ul>
- * <li> the link of the origin activity is not simulated, 
+ * <li> the link of the origin activity is not simulated,
  *   and thus not included in this leg travel time estimation.
- * <li> the link of the destination activity is simulated, 
+ * <li> the link of the destination activity is simulated,
  *   and thus has to be included in this leg travel time estimation.
  * </ul>
  * <p>
- * @see Cetin, N. (2005) Large-scale parallel graph-based simulations, 
- * Ph.D. Thesis, ETH Zurich, Zurich.)
+ * @see "Cetin, N. (2005) Large-scale parallel graph-based simulations, Ph.D. Thesis, ETH Zurich, Zurich.)"
  * @author meisterk
  *
 */
@@ -50,23 +49,24 @@ public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTi
 			DepartureDelayAverageCalculator depDelayCalc) {
 
 		super(linkTravelTimeEstimator, depDelayCalc);
-	
+
 	}
 
+	@Override
 	public double getLegTravelTimeEstimation(
 			IdI personId,
-			double departureTime, 
-			Location origin, 
+			double departureTime,
+			Location origin,
 			Location destination,
-			Route route, 
+			Route route,
 			String mode) {
 
 		double now = departureTime;
-		
+
 		now = this.processDeparture((Link) origin, now);
 		now = this.processRouteTravelTime(route, now);
 		now = this.processLink((Link) destination, now);
-		
+
 		return (now - departureTime);
 	}
 }

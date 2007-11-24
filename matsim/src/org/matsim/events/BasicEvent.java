@@ -42,6 +42,7 @@ public abstract class BasicEvent implements Serializable{
 	BasicEvent(double time, String agentId) {this.time = time; this.agentId = agentId;}
 	
 	public abstract Attributes getAttributes();
+	@Override
 	public abstract String toString();
 
 	public abstract void rebuild(Plans population, NetworkLayer network);

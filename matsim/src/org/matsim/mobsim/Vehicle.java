@@ -22,14 +22,13 @@ package org.matsim.mobsim;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.EventActivityEnd;
 import org.matsim.events.EventActivityStart;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
+import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -38,9 +37,9 @@ import org.matsim.plans.Route;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 
 public class Vehicle implements Serializable, DrawableAgentI {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	static private int globalID = 0;
 	public double lastMoveTime = 0;
 	protected String driverId;
@@ -104,16 +103,12 @@ public class Vehicle implements Serializable, DrawableAgentI {
 			return this.destinationLink;
 		}
 
-		BasicLinkSetI nextLinks = this.currentLink.getToNode().getOutLinks();
-
 		Node destNode = (Node)route.get(this.currentNode);
 
-		Iterator i = nextLinks.iterator();
-		while (i.hasNext()) {
-			QueueLink link = (QueueLink)i.next();
-			if(link.getToNode() == destNode) {
-				this.cachedNextLink = link; //save time in later calls, if link is congested
-				return link;
+		for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
+			if (link.getToNode() == destNode) {
+				this.cachedNextLink = (QueueLink)link; //save time in later calls, if link is congested
+				return (QueueLink)link;
 			}
 		}
 		return null;
@@ -336,6 +331,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	protected void transferToMobsim() {
 		this.currentLink.addParking(this);
 	}
-  
+
 
 }

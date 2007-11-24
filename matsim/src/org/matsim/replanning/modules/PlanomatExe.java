@@ -48,7 +48,7 @@ public class PlanomatExe extends ExternalModule {
 	private static final String SCENARIO_DIRECT_VERBOSITY = "directVerbosity";
 	private static final String SCENARIO_CONSERVE_DISK_SPACE = "conserveDiskSpace";
 	private static final String SCENARIO_LAST_ITERATION = "lastIteration";
-	
+
 	public PlanomatExe(final String exePath) {
 		super(exePath, "planomat");
 	}
@@ -56,7 +56,6 @@ public class PlanomatExe extends ExternalModule {
 	@Override
 	protected PlansWriter getPlansWriterHandler() {
 		String filename = this.outFileRoot + "/" + this.moduleId + ExternalInFileName;
-		String dtd = "http://www.vsp.tu-berlin.de/projects/Matsim/data/dtd/plans_v0.dtd";
 		String version = "v0";
 		return new PlansWriter(new Plans(Plans.USE_STREAMING), filename, version);
 	}
@@ -75,7 +74,7 @@ public class PlanomatExe extends ExternalModule {
 		Module rootModule = this.extConfig.createModule("root_dir");
 		rootModule.addParam("root_dir", this.outFileRoot);
 
-		
+
 		this.extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
 		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
 		int iteration = Controler.getIteration() - 1;

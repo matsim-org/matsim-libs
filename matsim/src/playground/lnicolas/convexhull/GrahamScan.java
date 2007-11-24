@@ -64,13 +64,13 @@ public class GrahamScan
 	}
 
 	// get the first stairs-point (which is on the left edge)
-	Node sm = (Node)stairs.firstElement();
+	Node sm = stairs.firstElement();
 
 	// start building the convex hull
 	//   - sm is in the convex hull
 	Stack<Node> hull = new Stack<Node>();
 	hull.push(sm);
-	
+
 	// add the rest of the stairs to the hull
 	// - to complete the convex hull properly, we have to make sure that
 	//   we try to add stair[0] as the last point
@@ -79,10 +79,10 @@ public class GrahamScan
 	while (i < stairs.size())
 	{
 	    // pi = next point to be processed
-		Node pi = (Node) stairs.elementAt(i);
+		Node pi = stairs.elementAt(i);
 
 	    // pl = top point on the hull stack
-		Node pl = (Node) hull.peek();
+		Node pl = hull.peek();
 
 	    // if pi == pl, skip pi
 	    if (pl.getId() == pi.getId()) {
@@ -96,11 +96,11 @@ public class GrahamScan
 	    	i = i + 1;
 	    	continue;
 	    }
-	    
+
 	    // there are at least two points on the hull - do the
 	    // left-turn test
 	    hull.pop();
-	    Node pll = (Node)hull.peek();
+	    Node pll = hull.peek();
 	    if (leftTurn(pll, pl, pi)) {
 	    	hull.push(pl);
 	    	hull.push(pi);
@@ -108,7 +108,7 @@ public class GrahamScan
 	    	continue;
 	    }
 	}
-	
+
 	// get rid of the last point, because it is already
 	// at the beginning of the hull
 	hull.pop();
@@ -243,6 +243,7 @@ public class GrahamScan
 		if (sw.size() > 0) {
 			// sort SW points by increasing X-coordinate
 			Sort.quick(sw, new ComparatorAdapter() {
+				@Override
 				public int compare(Object o1, Object o2) {
 					if (((Node) o1).getCoord().getX() < ((Node) o2).getCoord().getX()) {
 						return 1;
@@ -281,6 +282,7 @@ public class GrahamScan
 		if (se.size() > 0) {
 			// sort SE points by increasing Y-coordinate
 			Sort.quick(se, new ComparatorAdapter() {
+				@Override
 				public int compare(Object o1, Object o2) {
 					if (((Node) o1).getCoord().getY() < ((Node) o2).getCoord().getY()) {
 						return 1;
@@ -319,6 +321,7 @@ public class GrahamScan
 		if (ne.size() > 0) {
 			// sort NE points by decreasing X-coordinate
 			Sort.quick(ne, new ComparatorAdapter() {
+				@Override
 				public int compare(Object o1, Object o2) {
 					if (((Node) o1).getCoord().getX() > ((Node) o2).getCoord().getX()) {
 						return 1;
@@ -357,6 +360,7 @@ public class GrahamScan
 		if (nw.size() > 0) {
 			// sort NW points by decreasing Y-coordinate
 			Sort.quick(nw, new ComparatorAdapter() {
+				@Override
 				public int compare(Object o1, Object o2) {
 					if (((Node) o1).getCoord().getY() > ((Node) o2).getCoord().getY()) {
 						return 1;
@@ -396,7 +400,7 @@ public class GrahamScan
     /**
 	 * Determines whether two oriented line segments form a left turn. The line
 	 * segments are specified by AB, and BC.
-	 * 
+	 *
 	 * @param a
 	 *            convexHull.CPoint - point A
 	 * @param b
@@ -443,7 +447,7 @@ public class GrahamScan
 
     /**
 	 * Prints out a list of points.
-	 * 
+	 *
 	 * @param str
 	 *            string to be printed before the list
 	 * @param points

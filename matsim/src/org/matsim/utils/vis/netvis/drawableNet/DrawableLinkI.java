@@ -22,14 +22,16 @@ package org.matsim.utils.vis.netvis.drawableNet;
 
 import java.util.Collection;
 
+import org.matsim.utils.vis.netvis.DrawableAgentI;
+
 public interface DrawableLinkI {
 
     public int getDisplayValueCount();
-    
+
     public double getDisplayValue(int index);
 
     public String getDisplayText();
 
-    public Collection getMovingAgents();
-        
+    public Collection<? extends DrawableAgentI> getMovingAgents();
+
 }

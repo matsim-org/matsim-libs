@@ -80,9 +80,9 @@ public class EgoNet {
     }
 
     public int getOutDegree(){
-	return (int) this.getEgoLinks().size();
+	return this.getEgoLinks().size();
     }
-    
+
     public Person getRandomPerson( Person me ) {
 	int size = egoLinks.size();
 	if( size == 0 )
@@ -100,8 +100,8 @@ public class EgoNet {
     public Integer getId() {
 	return id;
     }
-// 
-    
+//
+
     public ArrayList<Person> getAlters() {
 	ArrayList<Person> alterList= new ArrayList<Person>();
 	Iterator meit=egoLinks.iterator();

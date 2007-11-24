@@ -40,13 +40,14 @@ public class RouterLink extends CALink {
 		return slice;
 	}
 	
+	@Override
 	public void build() {
 		super.build();
 		resetTravelTimes();
 	}
 
 	public void resetTravelTimes() {
-		int nofSlots = (int)((27*3600)/timeslice_);	// default number of slots
+		int nofSlots = ((27*3600)/timeslice_);	// default number of slots
 		timeSum_ = new HashMap<Integer, Long>(nofSlots);
 		timeCnt_ = new HashMap<Integer, Integer>(nofSlots);
 	}

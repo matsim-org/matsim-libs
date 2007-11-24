@@ -52,11 +52,13 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 		this.indexConfig = indexConfig;
 	}
 
+	@Override
 	public void setState() throws IOException {
 		if (pos == -1) myReader.updateBuffer(this);
 		else readMyselfBB(myReader.bb);
 	}
 
+	@Override
 	public void getState() throws IOException {
 	}
 
@@ -177,6 +179,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 
 	}
 
+	@Override
 	public void writeMyself(DataOutputStream out) throws IOException {
 		// is not used
 	}

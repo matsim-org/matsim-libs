@@ -104,6 +104,7 @@ public class Entry<T> {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public final String toString() {
 		return "[" + this.f_loc.getId() + "===" + this.value.toString() + "==>" + this.t_loc.getId() + "]";
 	}

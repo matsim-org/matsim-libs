@@ -25,14 +25,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -290,9 +287,7 @@ public class DCLogit implements LeastCostPathCalculator{
 
 			}
 			Node from = network.getNode(data.id.toString());
-			Iterator it = from.getInLinks().iterator();
-			while (it.hasNext()){
-				Link l = ((Link)it.next());
+			for (Link l : from.getInLinks().values()) {
 				Node tmp = l.getFromNode();
 				if (((LinkPainter)this.netStateWriter).linkAttribExist(l.getId()))
 					excluded.add(tmp);
@@ -322,22 +317,15 @@ public class DCLogit implements LeastCostPathCalculator{
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	void relaxNode(Node outNode, Node toNode,
-			PriorityQueueBucket<Node> pendingNodes) {
+	void relaxNode(Node outNode, Node toNode, PriorityQueueBucket<Node> pendingNodes) {
 
 		DCLogitNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
 		double currCost = outData.getCost();
 
-
-		BasicLinkSetI outlinks = outNode.getOutLinks();
-		Iterator iter = outlinks.iterator();
-		while (iter.hasNext()) {
-			Link l = (Link) iter.next();
-
+		for (Link l : outNode.getOutLinks().values()) {
 			Node n = l.getToNode();
-			addToPendingNodes(l, n, pendingNodes, currTime, currCost,
-						outNode, toNode);
+			addToPendingNodes(l, n, pendingNodes, currTime, currCost, outNode, toNode);
 		}
 	}
 
@@ -504,9 +492,7 @@ public class DCLogit implements LeastCostPathCalculator{
 	 * Resets all nodes in the network as if they have not been visited yet.
 	 */
 	private void resetNetworkVisited() {
-		Iterator nIter = this.network.getNodes().iterator();
-		while (nIter.hasNext()) {
-			Node node = (Node) nIter.next();
+		for (Node node : this.network.getNodes().values()) {
 			DCLogitNodeData data = getData(node);
 			data.resetVisited();
 		}
@@ -695,7 +681,7 @@ public class DCLogit implements LeastCostPathCalculator{
 				return 0;
 
 			for (BackLink link : backLinks){
-				if (link.fromNode.getId() == ((Id)id))
+				if (link.fromNode.getId().equals(id))
 					continue;
 				inPaths += link.inPaths;
 			}

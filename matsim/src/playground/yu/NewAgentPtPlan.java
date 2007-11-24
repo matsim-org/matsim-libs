@@ -36,9 +36,9 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI {
 	/**
@@ -48,7 +48,7 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
@@ -91,8 +91,7 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 		for (Plan copyPlan : copyPlans) {
 			person.addPlan(copyPlan);
 		}
-		if (person != null)
-			pw.writePerson(person);
+		pw.writePerson(person);
 	}
 
 }

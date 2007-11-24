@@ -46,10 +46,10 @@ public class GlobalConfigGroup extends Module {
 	private String localDtdBase = "dtd/";
 	private boolean useRoadPricing = false;
 	private int numberOfThreads = 2;
-	private String coordinateSystem = null;
+	private String coordinateSystem = "Atlantis";
 
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
-	
+
 	@Override
 	public String getValue(final String key) {
 		if (RANDOM_SEED.equals(key)) {

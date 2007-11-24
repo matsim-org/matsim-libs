@@ -50,32 +50,28 @@ public class TabularFileParser {
         final String regex = this.config.getStartRegex();
         if (regex == null)
             return true;
-        else
-            return line.matches(regex);
+        return line.matches(regex);
     }
 
     private boolean isEnd(String line) {
         final String regex = this.config.getEndRegex();
         if (regex == null)
             return false;
-        else
-            return line.matches(regex);
+        return line.matches(regex);
     }
 
     private boolean isComment(String line) {
         final String regex = this.config.getCommentRegex();
         if (regex == null)
             return false;
-        else
-            return line.matches(regex);
+        return line.matches(regex);
     }
 
     private String[] split(String line) {
         final String regex = this.config.getDelimiterRegex();
         if (regex == null)
             return new String[] { line };
-        else
-            return line.split(regex);
+        return line.split(regex);
     }
 
     /**

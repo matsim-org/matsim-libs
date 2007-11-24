@@ -22,23 +22,19 @@ package org.matsim.network;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicLinkSet;
-import org.matsim.basic.v01.BasicNodeSet;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeSetI;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.QuadTree;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
+import org.matsim.world.Location;
 
 public class NetworkLayer extends Layer implements BasicNetI {
 
@@ -51,13 +47,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 	protected int capperiod = Integer.MIN_VALUE ;
 
-	// TODO [balmermi] I have moved the 'BasicLinkSetI locations' from Layer to here to get
-	// rid of it in the Layer. Since 'BasicLinkSetI locations' affects a lot of classes,
-	// i have now introduced a doubled data structure for this class:
-	// 'BasicLinkSetI links' and 'TreeMap<IdI,Location> locations' (from Layer class)
-	// This is very unfortunate, but otherwise I will never get to an end of re-structuring... *gmpf*
-	protected BasicLinkSetI links = new BasicLinkSet();
-	protected BasicNodeSetI nodes = new BasicNodeSet();
+	protected Map<IdI, Node> nodes = new TreeMap<IdI, Node>();
 
 	private final ArrayList<NetworkAlgorithm> algorithms = new ArrayList<NetworkAlgorithm>();
 
@@ -73,7 +63,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	// ////////////////////////////////////////////////////////////////////
 
 	public NetworkLayer() {
-		super(LAYER_TYPE,null);
+		super(LAYER_TYPE, null);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -82,7 +72,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	// ////////////////////////////////////////////////////////////////////
 
 	protected Node newNode(final String id, final String x, final String y, final String type) {
-		return new Node(id,x,y,type);
+		return new Node(id, x, y, type);
 	}
 
 	protected Link newLink(final NetworkLayer network, final String id, final Node from, final Node to,
@@ -93,9 +83,9 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 	public final Node createNode(final String id, final String x, final String y, final String type) {
 		IdI i = new Id(id);
-		if (this.nodes.containsId(i)) { Gbl.errorMsg(this + "[id=" + id + " already exists]"); }
+		if (this.nodes.containsKey(i)) { Gbl.errorMsg(this + "[id=" + id + " already exists]"); }
 		Node n = newNode(id, x, y, type);
-		this.nodes.add(n);
+		this.nodes.put(i, n);
 		if (this.nodeQuadTree != null) {
 			// we changed the nodes, invalidate the quadTree
 			this.nodeQuadTree.clear();
@@ -108,21 +98,19 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	                             final String freespeed, final String capacity, final String permlanes,
 	                             final String origid, final String type) {
 		Id f = new Id(from);
-		Node from_node = (Node)this.nodes.get(f);
+		Node from_node = this.nodes.get(f);
 		if (from_node == null) { Gbl.errorMsg(this+"[from="+from+" does not exist]"); }
 
 		Id t = new Id(to);
-		Node to_node = (Node)this.nodes.get(t);
+		Node to_node = this.nodes.get(t);
 		if (to_node == null) { Gbl.errorMsg(this+"[to="+to+" does not exist]"); }
 
 		Id l = new Id(id);
 		if (this.locations.containsKey(l)) { Gbl.errorMsg("Link id=" + id + " already exists in 'locations'!"); }
-		if (this.links.containsId(l)) { Gbl.errorMsg("Link id=" + id + " already exists in 'links'! SERIOUS WARNING: The 'if' statement above already should have produced this error!!!"); }
 		Link link = newLink(this,id,from_node,to_node,length,freespeed,capacity,permlanes,origid,type);
 		from_node.addOutLink(link);
 		to_node.addInLink(link);
 		this.locations.put(link.getId(),link);
-		this.links.add(link);
 		return link;
 	}
 
@@ -168,12 +156,12 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		return this.capperiod;
 	}
 
-	public BasicNodeSetI getNodes() {
+	public Map<IdI, ? extends Node> getNodes() {
 		return this.nodes;
 	}
 
 	public final Node getNode(final String id) {
-		return (Node)this.nodes.get(id);
+		return this.nodes.get(new Id(id));
 	}
 
 	/**
@@ -197,9 +185,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		// It would be nicer to find the nearest link on the "right" side of the coordinate.
 		// (For Great Britain it would be the "left" side. Could be a global config param...)
 		double shortestDistance = Double.MAX_VALUE;
-		Iterator<Link> l_it = nearestNode.getIncidentLinks().iterator();
-		while (l_it.hasNext()) {
-			Link link = l_it.next();
+		for (Link link : nearestNode.getIncidentLinks().values()) {
 			double dist = link.calcDistance(coord);
 			if (dist < shortestDistance) {
 				shortestDistance = dist;
@@ -238,9 +224,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		// now find nearest link from the nearest node
 		double shortestRightDistance = Double.MAX_VALUE; // reset the value
 		double shortestOverallDistance = Double.MAX_VALUE; // reset the value
-		Iterator lIter = nearestNode.getIncidentLinks().iterator();
-		while (lIter.hasNext()) {
-			Link link = (Link) lIter.next();
+		for (Link link : nearestNode.getIncidentLinks().values()) {
 			double dist = link.calcDistance(coord);
 			if (dist < shortestRightDistance) {
 				// Generate a vector representing the link
@@ -310,7 +294,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	 */
 	public boolean removeLink(final Link link) {
 		IdI id = link.getId();
-		Link l = (Link)this.links.get(id);
+		Link l = (Link)this.locations.get(id);
 
 		if (l == null) { return false; }
 
@@ -319,7 +303,6 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		Node to = l.getToNode();
 		to.removeInLink(l);
 
-		this.links.remove(l);
 		if (this.locations.remove(l.getId()) == null) { Gbl.errorMsg("Link id=" + l.getId() + " not found in 'locations' even it was found in 'links'"); }
 		return true;
 	}
@@ -341,17 +324,20 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	 */
 	public boolean removeNode(final Node node) {
 		IdI id = node.getId();
-		Node n = (Node)this.nodes.get(id);
+		Node n = this.nodes.get(id);
 
 		if (n == null) { return false; }
 
-		Iterator l_it = n.getIncidentLinks().iterator();
-		while (l_it.hasNext()) {
-			Link l = (Link)l_it.next();
-			if (!this.removeLink(l)) { Gbl.errorMsg("Link id=" + l.getId() + " could not be removed while removing Node id=" + n.getId()); }
+		for (Link l : n.getIncidentLinks().values()) {
+			if (!this.removeLink(l)) {
+				Gbl.errorMsg("Link id=" + l.getId() + " could not be removed while removing Node id=" + n.getId());
+			}
 		}
-		if (this.nodeQuadTree != null) { this.nodeQuadTree.remove(n.getCoord().getX(),n.getCoord().getY(),n); }
-		return this.nodes.remove(n);
+		if (this.nodeQuadTree != null) {
+			this.nodeQuadTree.remove(n.getCoord().getX(),n.getCoord().getY(),n);
+		}
+		this.nodes.remove(id);
+		return true;
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -366,37 +352,6 @@ public class NetworkLayer extends Layer implements BasicNetI {
 				"[nof_algorithms=" + this.algorithms.size() + "]";
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// methods from BasicNetI
-	// ////////////////////////////////////////////////////////////////////
-
-	/**
-	 * yyyy:
-	 *
-	 * * QueueNetworkLayer needs to be at least a BasicNetworkI, in order to use Gunnar's viewer.
-	 *
-	 * * Could have QueueNetworkLayer implement the BasicNetworkI.  But if one looks at what that interface
-	 *   does, it is in fact better at the level here.  So I leave the dummy implementations and hope
-	 *   for better times.
-	 *
-	 * kai, dec06
-	 */
-	public BasicNodeI newNode(final String label) {
-        throw new UnsupportedOperationException("Do not use this constructor!");
-	}
-
-	public BasicLinkI newLink(final String label) {
-        throw new UnsupportedOperationException("Do not use this constructor!");
-	}
-
-	public boolean add(final BasicNodeI node) {
-        throw new UnsupportedOperationException("Do not use this constructor!");
-	}
-
-	public boolean add(final BasicLinkI link) {
-        throw new UnsupportedOperationException("Do not use this constructor!");
-	}
-
 	public void connect() {
 		buildQuadTree();
 	}
@@ -407,9 +362,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		Iterator<Node> n_it = this.nodes.iterator();
-		while (n_it.hasNext()) {
-			Node n = n_it.next();
+		for (Node n : this.nodes.values()) {
 			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
 			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
 			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
@@ -421,25 +374,24 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		maxy += 1.0;
 		System.out.println("building quad tree: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.nodeQuadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
-		n_it = this.nodes.iterator();
-		while (n_it.hasNext()) {
-			Node n = n_it.next();
+		for (Node n : this.nodes.values()) {
 			this.nodeQuadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
 		}
 		Gbl.printRoundTime();
 	}
 
-	public BasicLinkSetI getLinks() {
-		return this.links;
+	@SuppressWarnings("unchecked")
+	public Map<IdI, ? extends Link> getLinks() {
+		return (Map<IdI, Link>) this.getLocations();
 	}
 
 	public Link getLink(final String linkId) {
 		Id i = new Id(linkId);
-		return (Link) this.links.get(i);
+		return (Link) this.locations.get(i);
 	}
 
 	public Link getLink(final IdI linkId) {
-		return (Link) this.links.get(linkId);
+		return (Link) this.locations.get(linkId);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -460,9 +412,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 			this.nodeRoles.add(Integer.valueOf(index));
 			if (index > this.maxNodeRoleIndex) {
 				int newMax = (int) (1.2 * index) + 1;
-				Iterator iter = this.nodes.iterator();
-				while (iter.hasNext()) {
-					Node node = (Node)iter.next();
+				for (Node node : this.nodes.values()) {
 					node.setMaxRoleIndex(newMax);
 				}
 				this.maxNodeRoleIndex = newMax;
@@ -475,9 +425,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 	public final synchronized void releaseNodeRole(final int roleIndex) {
 		// clear all stored roles
-		Iterator iter = this.nodes.iterator();
-		while (iter.hasNext()) {
-			Node node = (Node)iter.next();
+		for (Node node : this.nodes.values()) {
 			node.setRole(roleIndex, null);
 		}
 		// clear the index
@@ -496,10 +444,8 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		this.linkRoles.add(Integer.valueOf(index));
 		if (index > this.maxLinkRoleIndex) {
 			int newMax = (int) (1.2 * index) + 1;
-			Iterator iter = this.links.iterator();
-			while (iter.hasNext()) {
-				Link link = (Link)iter.next();
-				link.setMaxRoleIndex(newMax);
+			for (Location location : this.locations.values()) {
+				((Link) location).setMaxRoleIndex(newMax);
 			}
 			this.maxLinkRoleIndex = newMax;
 		}

@@ -23,7 +23,6 @@ package org.matsim.utils.vis.netvis.config;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +30,7 @@ import java.util.Map;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
@@ -38,7 +38,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * 
+ *
  * @author gunnar
  *
  */
@@ -60,9 +60,9 @@ public class IndexationConfig extends DefaultHandler {
    * xml attribute
    */
   public static final String MODULE_NAME_ATTR = "name";
-  
+
   public static final String MODULE_CLASS_ATTR = "class";
-	
+
     public static final String CONFIG_NAME = "indexation";
 
     private static final String NETWORK_ELEM = "network";
@@ -102,6 +102,8 @@ public class IndexationConfig extends DefaultHandler {
      * Constructs this instance by mapping the indexation configuration
      * contained in <code>fileName</code> onto the elements contained in
      * <code>network</code>.
+     * @param network
+     * @param fileName
      */
     public IndexationConfig(BasicNetI network, String fileName) {
         this.network = network;
@@ -112,10 +114,11 @@ public class IndexationConfig extends DefaultHandler {
     /**
      * Constructs this instance by internally indexing all elements of
      * <code>network</code>.
+     * @param network
      */
     public IndexationConfig(BasicNetI network) {
-        createNodeIndices(new ArrayList<BasicNodeI>(network.getNodes()));
-        createLinkIndices(new ArrayList<BasicLinkI>(network.getLinks()));
+        createNodeIndices(new ArrayList<BasicNodeI>(network.getNodes().values()));
+        createLinkIndices(new ArrayList<BasicLinkI>(network.getLinks().values()));
     }
 
     private void createNodeIndices(List<BasicNodeI> nodes) {
@@ -173,6 +176,7 @@ public class IndexationConfig extends DefaultHandler {
     }
 
     /**
+     * @param node
      * @return node's (nonnegative) index and -1 if node is not contained or
      *         null
      */
@@ -188,6 +192,7 @@ public class IndexationConfig extends DefaultHandler {
     }
 
     /**
+     * @param link
      * @return link's (nonnegative) index and -1 if link is not contained or
      *         null
      */
@@ -229,8 +234,7 @@ public class IndexationConfig extends DefaultHandler {
     }
 
     private void startNode(Attributes attrs) {
-        BasicNodeI node = (BasicNodeI) network.getNodes().get(
-                attrs.getValue(NODE_ID_ATTR));
+        BasicNodeI node = network.getNodes().get(new Id(attrs.getValue(NODE_ID_ATTR)));
         if (node != null)
             nodes.add(node);
         else
@@ -238,8 +242,7 @@ public class IndexationConfig extends DefaultHandler {
     }
 
     private void startLink(Attributes attrs) {
-        BasicLinkI link = (BasicLinkI) network.getLinks().get(
-                attrs.getValue(LINK_ID_ATTR));
+        BasicLinkI link = network.getLinks().get(new Id(attrs.getValue(LINK_ID_ATTR)));
         if (link != null)
             links.add(link);
         else
@@ -302,24 +305,31 @@ public class IndexationConfig extends DefaultHandler {
      * Checks if <code>indexConfig</code> indexes all nodes and links of
      * <code>net</code>. If the check is <code>strict</code>, all elements
      * indexed by this instance must also be contained in <code>net</code>.
+     * @param net
+     * @param strict
+     * @return see description
      */
     public boolean indexes(BasicNetI net, boolean strict) {
         if (strict && net.getNodes().size() != nodes.size())
             return false;
         if (strict && net.getLinks().size() != links.size())
             return false;
-        for (Iterator it = net.getNodes().iterator(); it.hasNext();)
-            if (getIndex((BasicNodeI) it.next()) < 0)
+        for (BasicNodeI node : net.getNodes().values()) {
+            if (getIndex(node) < 0)
                 return false;
-        for (Iterator it = net.getLinks().iterator(); it.hasNext();)
-            if (getIndex((BasicLinkI) it.next()) < 0)
+        }
+        for (BasicLinkI link : net.getLinks().values()) {
+            if (getIndex(link) < 0)
                 return false;
+        }
         return true;
     }
 
     /**
      * Checks if <code>this</code> and <code>other</coder> represent the same
      * indexation.
+     * @param other
+     * @return see description
      */
     public boolean equals(IndexationConfig other) {
         if (this.nodes.size() != other.nodes.size())

@@ -47,7 +47,8 @@ public class JGNSocialNetwork extends SocialNetwork {
 	System.out.println("*** " + this.getClass() + ".addLinks is not written yet.");
     }
 
-    public ArrayList getLinks() {
+    @Override
+		public ArrayList getLinks() {
 	// TODO Auto-generated method stub
 	return null;
     }

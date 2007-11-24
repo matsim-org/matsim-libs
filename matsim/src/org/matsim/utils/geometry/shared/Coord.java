@@ -20,14 +20,18 @@
 
 package org.matsim.utils.geometry.shared;
 
+import java.io.Serializable;
+
 import org.matsim.utils.geometry.CoordI;
 
-public class Coord implements CoordI {
+public class Coord implements Serializable, CoordI {
+
+	private static final long serialVersionUID = 1L;
 
 	private double x = 0.0;
 	private double y = 0.0;
-	
-	public Coord(double x, double y) {
+
+	public Coord(final double x, final double y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -40,7 +44,7 @@ public class Coord implements CoordI {
 		this.x = coord.getX();
 		this.y = coord.getY();
 	}
-	
+
 	public final double calcDistance(final CoordI other) {
 		double xDiff = other.getX()-this.x;
 		double yDiff = other.getY()-this.y;
@@ -66,5 +70,10 @@ public class Coord implements CoordI {
 	public void setXY(double x, double y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	@Override
+	public final String toString() {
+		return "[x=" + this.x + "][y=" + this.y + "]";
 	}
 }

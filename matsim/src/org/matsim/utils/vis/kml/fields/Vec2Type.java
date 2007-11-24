@@ -98,7 +98,8 @@ public class Vec2Type {
   /**
    * Returns a String useable for kml output.
    */
-  public String toString() {
+  @Override
+	public String toString() {
   	StringBuffer buffer = new StringBuffer();
   	buffer.append(XSTRING);
   	buffer.append(Double.toString(x));

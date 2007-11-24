@@ -23,7 +23,6 @@ package org.matsim.network.algorithms;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -70,7 +69,7 @@ public class NetworkWriteAsTable extends NetworkAlgorithm {
 			Gbl.errorMsg(e);
 		}
 	}
-	
+
 	public NetworkWriteAsTable() {
 		this("output");
 	}
@@ -115,15 +114,11 @@ public class NetworkWriteAsTable extends NetworkAlgorithm {
 		System.out.println("      capperiod = " + capperiod);
 
 		try {
-			Iterator<Node> n_it = network.getNodes().iterator();
-			while (n_it.hasNext()) {
-				Node n = n_it.next();
+			for (Node n : network.getNodes().values()) {
 				this.out_n.write(n.getId() + "\t" + n.getCoord().getX() + "\t" + n.getCoord().getY() + "\n");
 				this.out_n.flush();
 			}
-			Iterator<Link> l_it = network.getLinks().iterator();
-			while (l_it.hasNext()) {
-				Link l = l_it.next();
+			for (Link l : network.getLinks().values()) {
 				Node f = l.getFromNode();
 				Node t = l.getToNode();
 				this.out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");

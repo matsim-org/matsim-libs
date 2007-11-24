@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import org.matsim.basic.v01.IdSet;
 import org.matsim.events.algorithms.TravelTimeCalculator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -250,8 +249,7 @@ public class MyRunsRouting extends MyRuns {
 		int shortLinkCnt = 0;
 		ArrayList<Link> superShortLinks = new ArrayList<Link>();
 		ArrayList<Double> superShortLinkLengths = new ArrayList<Double>();
-		for (Object obj : network.getLinks()) {
-			Link link = (Link) obj;
+		for (Link link : network.getLinks().values()) {
 
 			double linkLength = link.getLength();
 			double eucDist = link.getFromNode().getCoord().calcDistance(
@@ -321,8 +319,7 @@ public class MyRunsRouting extends MyRuns {
 		double avgShortLinkLength = 0;
 		double avgShortEucDist = 0;
 
-		for (Object obj : network.getLinks()) {
-			Link link = (Link) obj;
+		for (Link link : network.getLinks().values()) {
 
 			double linkLength = link.getLength();
 			double eucDist = link.getFromNode().getCoord().calcDistance(
@@ -358,8 +355,7 @@ public class MyRunsRouting extends MyRuns {
 		double avgNodeDegree = 0;
 		int i = 0;
 		int oneWayNodeCount = 0;
-		for (Object obj : network.getNodes()) {
-			Node n = (Node)obj;
+		for (Node n : network.getNodes().values()) {
 			avgNodeDegree = (i*avgNodeDegree + n.getIncidentLinks().size()) / (i+1);
 			if (n.getOutLinks().size() == 1 && n.getInLinks().size() == 1) {
 				oneWayNodeCount++;
@@ -374,8 +370,7 @@ public class MyRunsRouting extends MyRuns {
 		i = 0;
 		double totalLength = 0;
 		double totalEucDist = 0;
-		for (Object obj : network.getLinks()) {
-			Link l = (Link)obj;
+		for (Link l : network.getLinks().values()) {
 			avgLinkLength = (i*avgLinkLength + l.getLength()) / (i+1);
 			avgLinkFreespeed = (i*avgLinkFreespeed + l.getFreespeed()) / (i+1);
 			totalLength += l.getLength();
@@ -391,8 +386,8 @@ public class MyRunsRouting extends MyRuns {
 
 	private static void printNetworkConvexHull(String[] args) {
 		Vector<Node> nodes = new Vector<Node>();
-		for (Object obj : network.getNodes()) {
-			nodes.add((Node)obj);
+		for (Node node : network.getNodes().values()) {
+			nodes.add(node);
 		}
 		nodes = GrahamScan.computeHull(nodes);
 
@@ -407,13 +402,10 @@ public class MyRunsRouting extends MyRuns {
 		new MatsimNetworkReader(network).readFile("/home/lnicolas/data/studies/schweiz/2network/normalizedNetwork.xml");
 		System.out.println("  done.");
 
-		IdSet allNodesCopy = new IdSet();
-		allNodesCopy.addAll(network.getNodes());
-		Iterator it = allNodesCopy.iterator();
+		Collection<Node> allNodesCopy = new ArrayList<Node>(network.getNodes().values());
 		int tot = network.getNodes().size();
 		int i = 0;
-		while (it.hasNext()) {
-			Node n = (Node)it.next();
+		for (Node n : allNodesCopy) {
 			if (convexHull.contains((int)n.getCoord().getX(), (int)n.getCoord().getY()) == false) {
 				network.removeNode(n);
 				i++;
@@ -434,8 +426,8 @@ public class MyRunsRouting extends MyRuns {
 
 	private static void countOneWayNodes() {
 		int oneWayNodeCnt = 0;
-		for (Object n : network.getNodes()) {
-			if (((Node)n).getOutLinks().size() == 1) {
+		for (Node n : network.getNodes().values()) {
+			if (n.getOutLinks().size() == 1) {
 				oneWayNodeCnt++;
 			}
 		}
@@ -445,8 +437,7 @@ public class MyRunsRouting extends MyRuns {
 				+ "%)");
 	}
 
-	private static void generateRandomPlansInTravelZone(double xCenter, double yCenter, double nodeDist,
-			int tripCount) {
+	private static void generateRandomPlansInTravelZone(double xCenter, double yCenter, double nodeDist, int tripCount) {
 		RandomPlansInTravelZoneGenerator gen = new RandomPlansInTravelZoneGenerator(xCenter, yCenter, nodeDist, tripCount);
 
 		network.addAlgorithm(gen);
@@ -475,11 +466,7 @@ public class MyRunsRouting extends MyRuns {
 		System.out.print("Generating " + tripCount + " random plans...");
 		System.out.flush();
 
-		Iterator it = network.getLinks().iterator();
-		ArrayList<Link> links = new ArrayList<Link>();
-		while (it.hasNext()) {
-			links.add((Link) it.next());
-		}
+		ArrayList<Link> links = new ArrayList<Link>(network.getLinks().values());
 		Plans plans = new Plans();
 		PlansWriter plansWriter = new PlansWriter(plans);
 		plans.setPlansWriter(plansWriter);

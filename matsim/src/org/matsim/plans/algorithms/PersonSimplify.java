@@ -48,6 +48,7 @@ public class PersonSimplify extends PersonAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		List plans = person.getPlans();
 		for (int i=0; i<plans.size(); i++) {

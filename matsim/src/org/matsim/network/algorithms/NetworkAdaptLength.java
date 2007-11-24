@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class NetworkAdaptLength extends NetworkAlgorithm {
 
@@ -52,7 +52,7 @@ public class NetworkAdaptLength extends NetworkAlgorithm {
 	public void run(final NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		Iterator<Link> l_it = network.getLinks().iterator();
+		Iterator<? extends Link> l_it = network.getLinks().values().iterator();
 		while (l_it.hasNext()) {
 			Link l = l_it.next();
 			Coord fc = l.getFromNode().getCoord();

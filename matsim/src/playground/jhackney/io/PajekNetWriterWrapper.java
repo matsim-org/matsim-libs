@@ -25,13 +25,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
+import org.matsim.utils.identifiers.IdI;
 
 import playground.jhackney.socialnet.SocialNetEdge;
 import playground.jhackney.socialnet.SocialNetwork;
-
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -58,7 +57,7 @@ public class PajekNetWriterWrapper {
     // This is a map of MatSim Person ID to the JUNG vertex object
     // (The JUNG Vertex UserDatum container is used
     // to get the Person ID given a Vertex object
-    TreeMap<Id, Vertex> verticesPersons = new TreeMap<Id, Vertex>();
+    TreeMap<IdI, Vertex> verticesPersons = new TreeMap<IdI, Vertex>();
 
     public PajekNetWriterWrapper(String outputPath, SocialNetwork snet, Plans plans) {
 
@@ -111,11 +110,11 @@ public class PajekNetWriterWrapper {
     /**
      * Glues MatSim egonets together to make a JUNG graph object for further
      * analysis with JUNG statistical package.
-     * 
+     *
      * @author jhackney
      * @param snet
      * @param plans
-     * @throws UniqueLabelException 
+     * @throws UniqueLabelException
      */
     private void fillGraph(Graph g, SocialNetwork snet, Plans plans) {
 

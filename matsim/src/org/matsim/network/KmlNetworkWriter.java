@@ -20,8 +20,6 @@
 
 package org.matsim.network;
 
-import java.util.Set;
-
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.vis.kml.Feature;
@@ -32,28 +30,26 @@ import org.matsim.utils.vis.kml.Point;
 import org.matsim.utils.vis.kml.Style;
 import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
 
-
 /**
  * @author dgrether
- *
  */
 public class KmlNetworkWriter {
 
 	private CoordinateTransformationI coordTransform = null;
-	
+
 	private NetworkLayer network;
 
 	private MatsimKmlStyleFactory factory;
-	
+
 	private Style networkStyle;
-	
+
 	public KmlNetworkWriter(final NetworkLayer network, final CoordinateTransformationI coordTransform) {
 		this.network = network;
 		this.coordTransform = coordTransform;
 		this.factory = new MatsimKmlStyleFactory();
 	}
-	
-	
+
+
 	public Folder getNetworkFolder() {
 		Folder folder = new Folder(this.network.getName());
 		folder.setName("MATSIM Network: " + this.network.getName());
@@ -65,16 +61,14 @@ public class KmlNetworkWriter {
 		Folder linkFolder = new Folder(this.network.getName() + "links");
 		linkFolder.setName("Links");
 		folder.addFeature(linkFolder);
-		
-		Set<Node> networkNodes = this.network.getNodes();
-		for (Node n : networkNodes) {
+
+		for (Node n : network.getNodes().values()) {
 			nodeFolder.addFeature(createNodeFeature(n));
 		}
-		Set<Link> networkLinks = this.network.getLinks();
-		for (Link l : networkLinks) {
+		for (Link l : network.getLinks().values()) {
 			linkFolder.addFeature(createLinkFeature(l));
 		}
-		
+
 		return folder;
 	}
 
@@ -100,5 +94,5 @@ public class KmlNetworkWriter {
 		p.setStyleUrl(this.networkStyle.getStyleUrl());
 		return p;
 	}
-	
+
 }

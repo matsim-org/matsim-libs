@@ -22,7 +22,7 @@ package org.matsim.util;
 
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.WorldUtils;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class WorldUtilsTest extends MatsimTestCase {
 

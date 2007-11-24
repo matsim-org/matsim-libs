@@ -73,6 +73,7 @@ public class Placemark extends Feature {
 	 * @param description
 	 * the <a href="http://earth.google.com/kml/kml_tags_21.html#description">
 	 * description</a> of the new placemark.
+	 * @param address
 	 * @param lookAt
 	 * the <a href="http://earth.google.com/kml/kml_tags_21.html#lookat">
 	 * lookAt</a> property of the new placemark.

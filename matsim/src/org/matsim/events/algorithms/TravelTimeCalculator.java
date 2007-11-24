@@ -107,11 +107,11 @@ public class TravelTimeCalculator implements EventHandlerLinkEnterI, EventHandle
 	public TravelTimeCalculator(final NetworkLayer network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
-	
+
 	public TravelTimeCalculator(final NetworkLayer network, final int timeslice) {
 		this(network, timeslice, 30*3600); // default: 30 hours at most
 	}
-	
+
 	public TravelTimeCalculator(final NetworkLayer network, final int timeslice, final int maxTime) {
 		this.network = network;
 		this.timeslice = timeslice;
@@ -121,8 +121,8 @@ public class TravelTimeCalculator implements EventHandlerLinkEnterI, EventHandle
 	}
 
 	public void resetTravelTimes() {
-		for (Object link : this.network.getLinks()) {
-			TravelTimeRole r = getTravelTimeRole((Link) link);
+		for (Link link : this.network.getLinks().values()) {
+			TravelTimeRole r = getTravelTimeRole(link);
 			r.resetTravelTimes();
 		}
 		this.enterEvents.clear();
@@ -191,6 +191,6 @@ public class TravelTimeCalculator implements EventHandlerLinkEnterI, EventHandle
 		// TODO Auto-generated method stub
 		return this.getClass().getSimpleName();
 	}
-	
-	
+
+
 }

@@ -20,13 +20,11 @@
 
 package org.matsim.network.algorithms;
 
-import java.util.Iterator;
-
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class NetworkSummary extends NetworkAlgorithm {
 
@@ -67,9 +65,7 @@ public class NetworkSummary extends NetworkAlgorithm {
 		int max_link_id = Integer.MIN_VALUE;
 		int link_cnt = 0;
 
-		Iterator<?> n_it = network.getNodes().iterator();
-		while (n_it.hasNext()) {
-			Node node = (Node)n_it.next();
+		for (Node node : network.getNodes().values()) {
 			node_cnt++;
 			int node_getID = Integer.parseInt(node.getId().toString());
 			if (min_node_id > node_getID) { min_node_id = node_getID; }
@@ -82,9 +78,7 @@ public class NetworkSummary extends NetworkAlgorithm {
 			if (y < this.minY) { this.minY = y; }
 		}
 
-		Iterator<?> l_it = network.getLinks().iterator();
-		while (l_it.hasNext()) {
-			Link link = (Link)l_it.next();
+		for (Link link : network.getLinks().values()) {
 			link_cnt++;
 			int link_getID = Integer.parseInt(link.getId().toString());
 			if (min_link_id > link_getID) { min_link_id = link_getID; }

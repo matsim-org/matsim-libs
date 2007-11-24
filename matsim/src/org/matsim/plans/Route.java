@@ -123,7 +123,7 @@ public class Route extends BasicRoute<Node> implements  Serializable{
 	public final void setDist(final double dist) {
 		this.dist = dist;
 	}
-	
+
 	public static void setNodeBuilder(final NodeBuilder builder) {
 		nodeBuilder = builder;
 	}
@@ -179,8 +179,8 @@ public class Route extends BasicRoute<Node> implements  Serializable{
 			if (notfirst) {
 				// search link from prevNode to node
 				boolean linkFound = false;
-				for (Iterator iter = prevNode.getOutLinks().iterator(); iter.hasNext() && !linkFound; ) {
-					Link link = (Link)iter.next();
+				for (Iterator<? extends Link> iter = prevNode.getOutLinks().values().iterator(); iter.hasNext() && !linkFound; ) {
+					Link link = iter.next();
 					if (link.getToNode() == node) {
 						links[idx] = link;
 						idx++;
@@ -210,7 +210,7 @@ public class Route extends BasicRoute<Node> implements  Serializable{
 		}
 		this.dist = distance;
 	}
-	
+
 	/**
 	 * This method returns a new Route object with the subroute of this beginning at fromNode
 	 * till toNode. If from or twoNode are not found in this, an IllegalArgumentException is thrown.
@@ -229,7 +229,7 @@ public class Route extends BasicRoute<Node> implements  Serializable{
 		ret.route = new ArrayList<Node>(nodeList);
 		return ret;
 	}
-	
+
 
 	// This routebuilder could be exchanged for suppliing other
 	//kinds of network e.g. in OnTheFlyClient
@@ -254,7 +254,7 @@ public class Route extends BasicRoute<Node> implements  Serializable{
   /////////////////////////////////////////////////////////////////
 	//output methods
   /////////////////////////////////////////////////////////////////
-	
+
 	private void readObject(final ObjectInputStream s)
 	  throws IOException, ClassNotFoundException
 	{

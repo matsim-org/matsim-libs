@@ -31,8 +31,6 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
-import org.matsim.plans.ActivityFacilities;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PlansAlgorithm;
@@ -42,36 +40,36 @@ import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-
 import Jama.Matrix;
 
 public class PrimlocDriver  extends PlansAlgorithm {
 
 	final static String module_name = "primary location choice";
-	
+
 	PrimlocEngine core = new PrimlocEngine();
 	Zone[] zones;
 	Layer zonelayer;
 	HashMap<Zone,Integer> zoneids = new HashMap<Zone,Integer>();
-	HashMap<Zone, ArrayList<Facility>> primActFacilitiesPerZone = 
-		new HashMap<Zone, ArrayList<Facility>>(); 
+	HashMap<Zone, ArrayList<Facility>> primActFacilitiesPerZone =
+		new HashMap<Zone, ArrayList<Facility>>();
 	String primaryActivityName;
-	
+
+	@Override
 	public void run(Plans plans) {
-		
+
 		// Run the core location choice model
 		if( core.calibration )
 			core.calibrationProcess();
 		else
 			core.runModel();
-		
-		// Modify the plans of the agents accordingly 
+
+		// Modify the plans of the agents accordingly
 		// For each agent: replace the location of the primary
 		// activity in the selected plan
-		
+
 		modifyPlans( plans );
 	}
-	
+
 	void modifyPlans( Plans plans ){
 		String primaryActivityName = Gbl.getConfig().getParam( module_name, "primary activity");
 		for( Person guy : plans.getPersons().values() ){
@@ -98,7 +96,7 @@ public class PrimlocDriver  extends PlansAlgorithm {
 					// Hack: it is then reassigned to a random zone
 					list2 = primActFacilitiesPerZone.get( zones[(int)(Math.random()*core.numZ)] );
 				}
-				facility = list2.get( (int)(Math.random()*list2.size()));	
+				facility = list2.get( (int)(Math.random()*list2.size()));
 				// Change the knowledge of the person too
 				TreeMap<String,ActivityFacilities> tm = guy.getKnowledge().getActivityFacilities();
 				actfac = tm.get(primaryActivityName);
@@ -107,47 +105,47 @@ public class PrimlocDriver  extends PlansAlgorithm {
 					tm.remove(primaryActivityName);
 				actfac = new ActivityFacilities(primaryActivityName);
 				actfac.addFacility(facility);
-				tm.put(primaryActivityName, actfac);		
+				tm.put(primaryActivityName, actfac);
 			}
 		}
 	}
 
-	
+
 	void setup( Plans plans ){
-		
+
 		getZonesAndParams();
-		
+
 		getTravelImpedances();
-		
+
 		getNumberHomesPerZone( plans );
-		
+
 		getNumberJobsPerZone();
-		
+
 		hack();
-		
+
 		if( core.calibration )
 			loadCalibrationMatrix();
 	}
-	
+
 	void getZonesAndParams(){
 		Config cfg = Gbl.getConfig();
 		primaryActivityName = Gbl.getConfig().getParam( module_name, "primary activity");
 		String layerName = cfg.getParam( module_name, "aggregation layer");
 		if( layerName == null )
 			Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs an aggregation layer" ) );
-		
+
 		zonelayer = Gbl.getWorld().getLayer( layerName );
-		
+
 		if( ! (zonelayer instanceof ZoneLayer) )
 			Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Zone Layer") );
-	
+
 		// Fetch parameters from the config file
 		Double mu = Double.parseDouble( cfg.getParam(module_name, "mu") );
 		if( cfg.getParam( module_name, "calibration matrix" ) != null ){
 			Gbl.warningMsg( getClass(), "getZonesAndParams", "Matrix importation unsupported - calibration matrix ignored");
 			// core.calibration = true
 		}
-		
+
 		Double theta = Double.parseDouble( cfg.getParam(module_name, "theta") );
 		Double threshold1 = Double.parseDouble( cfg.getParam(module_name, "threshold1") );
 		Double threshold2 = Double.parseDouble( cfg.getParam(module_name, "threshold2") );
@@ -162,12 +160,12 @@ public class PrimlocDriver  extends PlansAlgorithm {
 		core.threshold3 = threshold3.doubleValue();
 		core.maxiter = maxiter.intValue();
 		core.verbose = verbose.booleanValue();
-		
+
 		// We store the zones in a given way so that
 		// we do not rely on the order in the collection
-		Collection<Location> listloc = zonelayer.getLocations().values();
+		Collection<? extends Location> listloc = zonelayer.getLocations().values();
 		int internalID=0;
-		core.numZ = listloc.size(); 
+		core.numZ = listloc.size();
 		zones = new Zone[ core.numZ ];
 		for(  Object obj : listloc ){
 			Zone zone = (Zone) obj;
@@ -177,17 +175,17 @@ public class PrimlocDriver  extends PlansAlgorithm {
 			internalID++;
 		}
 	}
-	
+
 	void loadCalibrationMatrix(){
 		// read the matric from the following URL: cfg.getParam( module_name, "calibration matrix" ) );
 		// core.calib = ...
 	}
-	
+
 	void getTravelImpedances(){
 		// Compute a simple Travel impedance matrix
 		// with euclidean distance
 		core.cij = new Matrix( core.numZ, core.numZ );
-		
+
 		for( int i=0; i<core.numZ; i++){
 			for( int j=0; j<core.numZ; j++){
 				core.cij.set( i, j, zones[i].calcDistance( zones[j].getCenter() ) );
@@ -200,39 +198,39 @@ public class PrimlocDriver  extends PlansAlgorithm {
 		}
 		core.setupECij();
 	}
-	
+
 	void getNumberHomesPerZone( Plans plans ){
 		core.P = new double[ core.numZ ];
 		// Determine how many employed persons live in each zone
 		Map<IdI, Person> agents = plans.getPersons();
-		for( Person guy : agents.values() ){			
+		for( Person guy : agents.values() ){
 			ActivityFacilities actfac = guy.getKnowledge().getActivityFacilities().get("home");
-			Facility facility = actfac.getFacilities().get(actfac.getFacilities().firstKey());	
+			Facility facility = actfac.getFacilities().get(actfac.getFacilities().firstKey());
 			ArrayList<Location> list = zonelayer.getNearestLocations( facility.getLocation().getCenter(), null);
 			Zone homezone = (Zone) list.get(0);
 			if( homezone == null )
 				Gbl.warningMsg( this.getClass(), "setup", "Homeless employed person (poor guy)" );
 			else
-				core.P[ zoneids.get(homezone) ]++;	
+				core.P[ zoneids.get(homezone) ]++;
 		}
 	}
-	
+
 	void getNumberJobsPerZone(){
 		core.J = new double[ core.numZ ];
 		// Determine the number of jobs per zone
 		// and remember the work facilities that belong to given zones
-		Collection<Facility> facilities = Facilities.getSingleton().getFacilities().values();
+		Collection<? extends Facility> facilities = Facilities.getSingleton().getFacilities().values();
 		for( Facility facility : facilities ){
 			Activity act = facility.getActivity( primaryActivityName );
 			if( act != null ){
-				ArrayList<Location> list = zonelayer.getNearestLocations( facility.getLocation().getCenter(), null); 
+				ArrayList<Location> list = zonelayer.getNearestLocations( facility.getLocation().getCenter(), null);
 				Zone zone = (Zone) list.get(0);
 				core.J[ zoneids.get(zone) ] += act.getCapacity();
 				primActFacilitiesPerZone.get( zone ).add( facility );
 			}
 		}
 	}
-	
+
 	void hack(){
 		// Hack to ensure that no element is zero (singular matrix)
 		core.N = 0.0;
@@ -241,7 +239,7 @@ public class PrimlocDriver  extends PlansAlgorithm {
 			core.J[i] = Math.max(1.0, core.J[i]);
 			core.N += core.P[i];
 		}
-		System.out.println("# employed "+core.N);		
+		System.out.println("# employed "+core.N);
 		core.normalizeJobVector();
 		System.out.println("Zone attribute vector:");
 		for( int i=0; i<core.numZ; i++){

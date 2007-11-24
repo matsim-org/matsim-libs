@@ -38,7 +38,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class PlansCalcRandomViaRoute extends PersonAlgorithm implements PlanAlgorithmI {
 

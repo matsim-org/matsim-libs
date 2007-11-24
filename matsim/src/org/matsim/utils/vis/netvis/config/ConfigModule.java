@@ -31,16 +31,14 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * 
  * @author gunnar
- * 
  */
 public class ConfigModule extends DefaultHandler implements ConfigModuleI {
 
     // -------------------- CLASS VARIABLES --------------------
 
   public static final String MODULE_CLASS_ATTR = "class";
-	
+
     public static final String PARAM_ELEM = "param";
 
     public static final String PARAM_NAME_ATTR = "name";
@@ -64,7 +62,7 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
     public ConfigModule(String moduleName, String fileName) {
         this.moduleName = moduleName;
         File cfgfile = new File(fileName);
-        this.setRootFile(cfgfile.getParent());
+//        this.setRootFile(cfgfile.getParent());
         read(fileName);
         completeCache();
     }
@@ -95,7 +93,7 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
      * To be overridden by subclasses that perform more specific checks.
      * Indicates if a subclass configuration module is "complete", depending on
      * its specific purpose.
-     * 
+     *
      * @return <code>true</code> by default
      */
     public boolean isComplete() {
@@ -113,7 +111,7 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
     /**
      * To be overridden by subclasses that cache values. Is called by
      * <code>set(String,String)</code>. Does nothing by default.
-     * 
+     *
      * @param name
      *            name of the parameter to be cached
      * @param value

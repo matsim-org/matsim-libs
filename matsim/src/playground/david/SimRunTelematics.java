@@ -28,7 +28,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
-import org.matsim.utils.misc.integration.TelematicsSimWrapper;
 import org.matsim.world.World;
 
 public class SimRunTelematics {

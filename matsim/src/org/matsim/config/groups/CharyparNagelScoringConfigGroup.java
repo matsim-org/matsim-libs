@@ -183,6 +183,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		}
 	}
 	
+	@Override
 	protected TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		

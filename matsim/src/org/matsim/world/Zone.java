@@ -22,6 +22,7 @@ package org.matsim.world;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 
 /**
@@ -59,7 +60,7 @@ public class Zone extends Location {
 		this.setArea(0.0);
 		this.setName(null);
 	}
-	
+
 	protected Zone(final ZoneLayer layer, final IdI id, final CoordI center,
 	               final CoordI min, final CoordI max, final double area, final String name) {
 		super(layer,id,center);
@@ -68,7 +69,7 @@ public class Zone extends Location {
 		this.setArea(area);
 		this.setName(name);
 	}
-	
+
 	protected Zone(final ZoneLayer layer, final String id, final CoordI center,
 	               final CoordI min, final CoordI max, final String area, final String name) {
 		super(layer,id,center);
@@ -101,7 +102,7 @@ public class Zone extends Location {
 	 * ......|.....|.......         9: outside on bottom-right<br>
 	 * </code>
 	 * </p>
-	 * 
+	 *
 	 * @param coord
 	 * @see org.matsim.world.Location#calcDistance(org.matsim.utils.geometry.CoordI)
 	 * @return distance to that zone

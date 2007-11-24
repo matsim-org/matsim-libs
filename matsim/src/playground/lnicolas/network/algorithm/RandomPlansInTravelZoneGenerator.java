@@ -60,8 +60,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Node> fromNodes = new ArrayList<Node>();
 
-		for (Object obj : network.getNodes()) {
-			Node n = (Node)obj;
+		for (Node n : network.getNodes().values()) {
 			if (this.outerZone.contains(n.getCoord().getX(), n.getCoord().getY())) {
 				nodes.add(n);
 				if (this.innerZone.contains(n.getCoord().getX(), n.getCoord().getY()) == false) {
@@ -103,7 +102,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 				avgFromToDistance = (avgFromToDistance * i + n.getCoord()
 						.calcDistance(toNode.getCoord()))
 						/ (i + 1);
-				Link toLink = (Link) toNode.getInLinks().iterator().next();
+				Link toLink = toNode.getInLinks().values().iterator().next();
 				addTrip(plan, toLink, i);
 				n = toNode;
 			}

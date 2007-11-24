@@ -60,7 +60,6 @@ public abstract class PrintStreamATTA extends PrintStreamVisum9_3A {
 					new FileOutputStream(new File(fileName))));
 			out.writeBytes("$VISION\n*\n*\n* Tabelle: ");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

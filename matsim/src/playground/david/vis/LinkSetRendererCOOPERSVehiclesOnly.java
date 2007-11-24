@@ -24,17 +24,16 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.net.URL;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.vis.netvis.DisplayableLinkI;
+import org.matsim.utils.vis.netvis.DisplayableNetI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.ControlToolbar;
 import org.matsim.utils.vis.netvis.gui.NetJComponent;
@@ -55,8 +54,6 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 
 	private final NET network;
 
-	private Image agentPic = null;
-
 	private double laneWidth;
 
 	private BufferedImage image;
@@ -68,20 +65,6 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 		super(visConfig);
 		this.network =  network;
 		this.isOTF = (network instanceof OTFVisNet);
-
-		URL url = null;
-		try {
-			url = this.getClass().getClassLoader().getResource(
-					visConfig.get(VisConfig.AGENT_GIF_FILE));
-
-			if (url != null)
-				this.agentPic = Toolkit.getDefaultToolkit().getImage(url);
-			else
-				this.agentPic = Toolkit.getDefaultToolkit().createImage(
-						visConfig.get(VisConfig.AGENT_GIF_FILE));
-
-		} catch (NullPointerException e) {
-		}
 
 		this.laneWidth = DisplayLink.LANE_WIDTH
 		* visConfig.getLinkWidthFactor();
@@ -101,12 +84,6 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 		target.paint(imdisplay);
 
 		return image;
-	}
-
-	@Override
-	public void setTargetComponent(NetJComponent comp) {
-		super.setTargetComponent(comp);
-		comp.prepareImage(agentPic, comp);
 	}
 
 	// -------------------- RENDERING --------------------
@@ -157,13 +134,12 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 		if (isOTF) {
 			it = ((OTFVisNet)network).getLinks().iterator();
 		} else  {
-			it = ((DisplayNet)network).getLinks().iterator();
+			it = ((DisplayNet)network).getLinks().values().iterator();
 		}
 
 		for (; it.hasNext();)
 		{
 			DisplayableLinkI link = (DisplayableLinkI) it.next();
-
 			if (isOTF) {
 				((OTFVisNet.Link)link).setVisible(false);
 			}
@@ -252,13 +228,14 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 			display.setTransform(originalTransform);
 
 			Iterator it = null;
-			if (network instanceof DisplayNet) {
-				it = ((DisplayNet)network).getLinks().iterator();
-			} else if (network instanceof OTFVisNet) {
+			if (isOTF) {
 				it = ((OTFVisNet)network).getLinks().iterator();
+			} else  {
+				it = ((DisplayNet)network).getLinks().values().iterator();
 			}
 
-			for (; it.hasNext();) {
+			for (; it.hasNext();)
+			{
 				DisplayableLinkI link = (DisplayableLinkI) it.next();
 
 				if (!comp.checkLineInClip(link.getStartEasting(), link

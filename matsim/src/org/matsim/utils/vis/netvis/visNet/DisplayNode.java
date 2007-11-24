@@ -20,10 +20,10 @@
 
 package org.matsim.utils.vis.netvis.visNet;
 
-import org.matsim.basic.v01.BasicIdentified;
-import org.matsim.basic.v01.BasicLinkSet;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
@@ -32,7 +32,7 @@ import org.matsim.utils.vis.netvis.drawableNet.DrawableNodeI;
 /**
  * @author gunnar
  */
-public class DisplayNode extends BasicIdentified implements DrawableNodeI, BasicNodeI {
+public class DisplayNode implements DrawableNodeI, BasicNodeI {
 
 	// -------------------- CLASS VARIABLES --------------------
 
@@ -40,18 +40,19 @@ public class DisplayNode extends BasicIdentified implements DrawableNodeI, Basic
 
 	// -------------------- MEMBER VARIABLES --------------------
 
-	private final BasicLinkSet inLinks;
-	private final BasicLinkSet outLinks;
+	private final Map<IdI, BasicLinkI> inLinks;
+	private final Map<IdI, BasicLinkI> outLinks;
 	private CoordI coord = null;
 	private double displayValue;
 	private String displayLabel;
+	protected IdI id;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public DisplayNode(IdI id, DisplayNet network) {
-		super(id);
-		inLinks = new BasicLinkSet();
-		outLinks = new BasicLinkSet();
+		this.id = id;
+		inLinks = new TreeMap<IdI, BasicLinkI>();
+		outLinks = new TreeMap<IdI, BasicLinkI>();
 	}
 
 	// -------------------- SETTERS --------------------
@@ -67,18 +68,20 @@ public class DisplayNode extends BasicIdentified implements DrawableNodeI, Basic
 	// -------------------- IMPLEMENTATION of BasicNodeI --------------------
 
 	public boolean addInLink(BasicLinkI link) {
-		return inLinks.add(link);
+		inLinks.put(link.getId(), link);
+		return true;
 	}
 
 	public boolean addOutLink(BasicLinkI link) {
-		return outLinks.add(link);
+		outLinks.put(link.getId(), link);
+		return true;
 	}
 
-	public BasicLinkSetI getInLinks() {
+	public Map<IdI, ? extends BasicLinkI> getInLinks() {
 		return inLinks;
 	}
 
-	public BasicLinkSetI getOutLinks() {
+	public Map<IdI, ? extends BasicLinkI> getOutLinks() {
 		return outLinks;
 	}
 
@@ -112,8 +115,14 @@ public class DisplayNode extends BasicIdentified implements DrawableNodeI, Basic
 
 	// -------------------- MISC --------------------
 
+	@Override
 	public String toString() {
 		return super.toString() + " at (" + getEasting() + "/" + getNorthing() + ")";
+	}
+
+
+	public IdI getId() {
+		return this.id;
 	}
 
 }

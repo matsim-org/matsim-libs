@@ -105,6 +105,7 @@ public class PlanSummary extends PersonAlgorithm implements PlanAlgorithmI {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		for (int i=0; i<person.getPlans().size(); i++) {
 			Plan plan = person.getPlans().get(i);

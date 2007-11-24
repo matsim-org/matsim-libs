@@ -20,11 +20,12 @@
 
 package teach.multiagent07.simulation;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicLink;
 import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.networks.basicNet.BasicLinkSetI;
+import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.utils.identifiers.IdI;
 
 import teach.multiagent07.net.CALink;
@@ -62,26 +63,30 @@ public class Vehicle {
 
 	}
 
-	public CALink getNextLink(BasicLinkSetI outlinks) {
+	public CALink getNextLink(Collection<? extends BasicLinkI> outlinks) {
 		//return getNextLink23(outlinks);
 		return getNextLinkNormal(outlinks);
 	}
 
 	private Id hauptstrasseId = new Id("23");
 
-	public CALink getNextLink23(BasicLinkSetI outlinks) {
+	public CALink getNextLink23(Collection<? extends BasicLinkI> outlinks) {
 		CALink erg = null;
 
-		if(outlinks.containsId(hauptstrasseId) && Math.random() < 0.8) {
-			erg = (CALink)outlinks.get(hauptstrasseId);
-		} else {
-			erg = getNextLinkNormal(outlinks);
+		for (BasicLinkI link : outlinks) {
+			if (link.getId().equals(hauptstrasseId)) {
+				erg = (CALink) link;
+			}
 		}
-		return erg;
+
+		if (erg != null && Math.random() < 0.8) {
+			return erg;
+		}
+		return getNextLinkNormal(outlinks);
 	}
 
 
-	public CALink getNextLinkNormal(BasicLinkSetI outlinks) {
+	public CALink getNextLinkNormal(Collection<? extends BasicLinkI> outlinks) {
 		CALink erg = null;
 
 		int rnd = (int)(Math.random() * outlinks.size());

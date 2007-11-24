@@ -20,8 +20,6 @@
 
 package playground.meisterk.strc2007;
 
-import java.util.Iterator;
-
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -47,76 +45,72 @@ public class NetworkCutBox extends NetworkAlgorithm {
 	@Override
 	public void run(NetworkLayer network) {
 
-		org.matsim.world.Coord nodeCoord = null;
-		
+		org.matsim.utils.geometry.shared.Coord nodeCoord = null;
+
 		// add all nodes that are in the box to the box network
-		Iterator n_it = network.getNodes().iterator();
-		while (n_it.hasNext()) {
-			Node node = (Node)n_it.next();
+		for (Node node : network.getNodes().values()) {
 			nodeCoord = node.getCoord();
 			if (
-					(nodeCoord.getX() > this.west) && 
-					(nodeCoord.getX() < this.east) && 
-					(nodeCoord.getY() > this.south) && 
+					(nodeCoord.getX() > this.west) &&
+					(nodeCoord.getX() < this.east) &&
+					(nodeCoord.getY() > this.south) &&
 					(nodeCoord.getY() < this.north)) {
 
 				this.networkCut.createNode(
-						node.getId().toString(), 
-						Double.toString(nodeCoord.getX()), 
-						Double.toString(nodeCoord.getY()), 
+						node.getId().toString(),
+						Double.toString(nodeCoord.getX()),
+						Double.toString(nodeCoord.getY()),
 						node.getType());
 
 			}
 		}
 
 		// add all adjacent links to the box network
-		Iterator l_it = network.getLinks().iterator();
-		while (l_it.hasNext()) {
-			Link link = (Link)l_it.next();
+		for (Link link : network.getLinks().values()) {
 			Node fromNode = link.getFromNode();
 			Node toNode = link.getToNode();
 			if (
-					(this.networkCut.getNode(fromNode.getId().toString()) != null) || 
+					(this.networkCut.getNode(fromNode.getId().toString()) != null) ||
 					(this.networkCut.getNode(toNode.getId().toString()) != null)) {
 
 				// add nodes if they are not yet in it
 				if (this.networkCut.getNode(fromNode.getId().toString()) == null) {
-					
+
 					nodeCoord = fromNode.getCoord();
 					this.networkCut.createNode(
-							fromNode.getId().toString(), 
-							Double.toString(nodeCoord.getX()), 
-							Double.toString(nodeCoord.getY()), 
+							fromNode.getId().toString(),
+							Double.toString(nodeCoord.getX()),
+							Double.toString(nodeCoord.getY()),
 							fromNode.getType());
-					
+
 				}
-				
+
 				// add nodes if they are not yet in it
 				if (this.networkCut.getNode(toNode.getId().toString()) == null) {
-					
+
 					nodeCoord = toNode.getCoord();
 					this.networkCut.createNode(
-							toNode.getId().toString(), 
-							Double.toString(nodeCoord.getX()), 
-							Double.toString(nodeCoord.getY()), 
+							toNode.getId().toString(),
+							Double.toString(nodeCoord.getX()),
+							Double.toString(nodeCoord.getY()),
 							toNode.getType());
-					
+
 				}
 
 				// add link
 				this.networkCut.createLink(
-						link.getId().toString(), 
-						fromNode.getId().toString(), 
-						toNode.getId().toString(), 
-						Double.toString(link.getLength()), 
-						Double.toString(link.getFreespeed()), 
-						Double.toString(link.getCapacity()), 
-						Integer.toString(link.getLanes()), 
-						link.getOrigId(), 
+						link.getId().toString(),
+						fromNode.getId().toString(),
+						toNode.getId().toString(),
+						Double.toString(link.getLength()),
+						Double.toString(link.getFreespeed()),
+						Double.toString(link.getCapacity()),
+						Integer.toString(link.getLanes()),
+						link.getOrigId(),
 						link.getType());
 
 			}
-		}		
+		}
 	}
 
 	public NetworkLayer getNetworkCut() {

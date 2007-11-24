@@ -23,19 +23,20 @@ package org.matsim.basic.v01;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.utils.identifiers.IdI;
 
-
-public class BasicPerson<T extends BasicPlan> extends BasicIdentified{
+public class BasicPerson<T extends BasicPlan> {
 
 	protected List<T> plans = new ArrayList<T>(6);
 	protected T selectedPlan = null;
+	protected IdI id;
 
 	public BasicPerson(String id) {
-		super(new Id(id));
+		this(new Id(id));
 	}
 
 	public BasicPerson(Id id) {
-		super(id);
+		this.id = id;
 	}
 
 	public void addPlan(T plan) {
@@ -64,6 +65,18 @@ public class BasicPerson<T extends BasicPlan> extends BasicIdentified{
 
 	public List<T> getPlans() {
 		return plans;
+	}
+
+	public IdI getId() {
+		return this.id;
+	}
+
+	public void setId(final IdI id) {
+		this.id = id;
+	}
+
+	public void setId(final String idstring) {
+		this.id = new Id(idstring);
 	}
 
 }

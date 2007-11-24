@@ -27,7 +27,6 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
-import org.matsim.world.Location;
 
 public class FacilitiesDefineCapAndOpentime extends FacilitiesAlgorithm {
 
@@ -57,6 +56,7 @@ public class FacilitiesDefineCapAndOpentime extends FacilitiesAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
@@ -66,9 +66,7 @@ public class FacilitiesDefineCapAndOpentime extends FacilitiesAlgorithm {
 		int shop_cnt = 0;
 		int leis_cnt = 0;
 
-		Iterator<Location> f_it = facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : facilities.getFacilities().values()) {
 			Iterator<String> at_it = f.getActivities().keySet().iterator();
 			while (at_it.hasNext()) {
 				String at = at_it.next();
@@ -86,9 +84,7 @@ public class FacilitiesDefineCapAndOpentime extends FacilitiesAlgorithm {
 		System.out.println("      shop_cnt = " + shop_cnt);
 		System.out.println("      leis_cnt = " + leis_cnt);
 
-		f_it = facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : facilities.getFacilities().values()) {
 			Iterator<Activity> a_it = f.getActivities().values().iterator();
 			while (a_it.hasNext()) {
 				Activity a = a_it.next();

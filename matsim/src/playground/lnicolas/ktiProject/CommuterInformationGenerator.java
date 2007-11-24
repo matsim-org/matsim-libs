@@ -42,7 +42,7 @@ import org.matsim.world.Zone;
 
 /**
  * This class adds coordinates to the primary activities <i>act</i>
- * (the activities after the initial home activity) of a person, if they are of type 
+ * (the activities after the initial home activity) of a person, if they are of type
  * "w" or "e". The coordinates are determined as follows:
  * Based on the given {@code workCommuterMatrix} and {@code educationCommuterMatrix}, a zone
  * for the respective activity <i>act</i> is determined (based on the zone of the person's home activity),
@@ -53,9 +53,9 @@ import org.matsim.world.Zone;
 public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 
 	final String statusString = "|----------+-----------|";
-	
+
 	int maxFacilityId = 100000000;
-	
+
 	ArrayList<Location> primaryActLocations = new ArrayList<Location>();
 
 	/**
@@ -74,8 +74,8 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 	}
 
 	/**
-	 * First, the persons that have primary work activities are processed: 
-	 * The coordinates af these activities are set. Then, 
+	 * First, the persons that have primary work activities are processed:
+	 * The coordinates af these activities are set. Then,
 	 * the persons that have primary education activities are processed.
 	 * @param workCommuterMatrix
 	 * @param educationCommuterMatrix
@@ -83,13 +83,13 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 	public void run(Matrix<String> workCommuterMatrix,
 			Matrix<String> educationCommuterMatrix) {
 		System.out.println(statusString);
-		
+
 		setWorkFacilities(workCommuterMatrix);
 		setEducationFacilities(educationCommuterMatrix);
-		
+
 		System.out.println();
 	}
-	
+
 	private void setWorkFacilities(Matrix<String> workCommuterMatrix) {
 		for (int i = 0; i < population.size(); i++) {
 			Person person = population.get(i);
@@ -97,14 +97,14 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 			if (planContainsType(plan, PlansGenerator.workActType)) {
 				setWorkFacility(i, workCommuterMatrix);
 			}
-			
+
 			if (i % (population.size() * 2 / statusString.length()) == 0) {
 				System.out.print(".");
 				System.out.flush();
 			}
 		}
 	}
-	
+
 	private void setEducationFacilities(Matrix<String> educationCommuterMatrix) {
 		for (int i = 0; i < population.size(); i++) {
 			Person person = population.get(i);
@@ -113,14 +113,14 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 					&& planContainsType(plan, PlansGenerator.eduActType)) {
 				setEducationFacility(i, educationCommuterMatrix);
 			}
-			
+
 			if (i % (population.size() * 2 / statusString.length()) == 0) {
 				System.out.print(".");
 				System.out.flush();
 			}
 		}
 	}
-	
+
 	private void setWorkFacility(int index,
 			Matrix<String> workCommuterMatrix) {
 		Person person = population.get(index);
@@ -137,7 +137,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 					" matrix for zone " + homeZone.getName() + " (" + homeZone.getId() + ")");
 		}
 		Facility workFacility = facilities.getRandomFacility(
-				workLocation.getId(), 
+				workLocation.getId(),
 				PlansGenerator.workActType);
 //		if (workFacility == null) {
 //			Zone z = facilities.getNearestZone(workLocation.getId(), PlansGenerator.workActType);
@@ -147,18 +147,17 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 //				return;
 //			}
 //		}
-		
+
 		primaryActLocations.set(index, workLocation);
 //		Knowledge knowledge =
 //			person.createKnowledge("Created based on enterprise census of 2000");
 //		knowledge.setDesc(knowledge.getDesc() + ";" + workLocation.getId());
 //		ActivityFacilities actFac = knowledge.createActivityFacility(workActType);
 //		actFac.addFacility(workFacility);
-		
-		PersonToHomeFacilityMapper.setActCoord(person,
-				workFacility.getCoord(), PlansGenerator.workActType);
+
+		PersonToHomeFacilityMapper.setActCoord(person, workFacility.getCenter(), PlansGenerator.workActType);
 	}
-	
+
 	private void setEducationFacility(int index,
 			Matrix<String> educationCommuterMatrix) {
 		Person person = population.get(index);
@@ -173,7 +172,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 			Gbl.errorMsg("There exists no to education zone for in the commuter" +
 					" matrix for zone " + homeZone.getName() + " (" + homeZone.getId() + ")");
 		}
-		Facility eduFacility = facilities.getRandomFacility(eduLocation.getId(), 
+		Facility eduFacility = facilities.getRandomFacility(eduLocation.getId(),
 				PlansGenerator.eduActType);
 //		if (eduFacility == null) {
 //			Zone z = facilities.getNearestZone(eduLocation.getId(), PlansGenerator.eduActType);
@@ -183,16 +182,15 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 //				return;
 //			}
 //		}
-		
+
 		primaryActLocations.set(index, eduLocation);
 //		Knowledge knowledge =
 //			person.createKnowledge("Created based on enterprise census of 2000");
 //		knowledge.setDesc(knowledge.getDesc() + ";" + eduLocation.getId());
 //		ActivityFacilities actFac = knowledge.createActivityFacility(eduActType);
 //		actFac.addFacility(eduFacility);
-		
-		PersonToHomeFacilityMapper.setActCoord(person,
-				eduFacility.getCoord(), PlansGenerator.eduActType);
+
+		PersonToHomeFacilityMapper.setActCoord(person, eduFacility.getCenter(), PlansGenerator.eduActType);
 	}
 
 //	private Facility createFacility(Location location, String activityType) {
@@ -211,7 +209,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 //		Activity act = facility.createActivity(activityType);
 //		act.addOpentime(new Opentime("wk", "07:00:00", "18:00:00"));
 //		act.setCapacity(1);
-//		
+//
 //		return facility;
 //	}
 
@@ -223,7 +221,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 //				return facility;
 //			}
 //		}
-//		
+//
 //		return null;
 //	}
 
@@ -247,7 +245,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 				return entry.getToLocation();
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -265,10 +263,10 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 	static public void writeCommuterDistribution(String filename,
 			ArrayList<Zone> zones, Facilities facilities, Matrix commuterMatrix, String actType) {
 		BufferedWriter out;
-		
+
 		String statusString = "|----------+-----------|";
 		System.out.println(statusString);
-		
+
 		int i = 0;
 		try {
 			out = new BufferedWriter(new FileWriter(filename));
@@ -286,7 +284,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 
 				out.write(zone.getId() + "\t" + commuterCount + "\t"
 						+ capacityCount + "\n");
-				
+
 				i++;
 				if (i % (zones.size() / statusString.length()) == 0) {
 					System.out.print(".");
@@ -305,7 +303,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 		Set<IdI> facilityIds = zone.getDownMapping().keySet();
 		int capacityCount = 0;
 		for (IdI facilityId : facilityIds) {
-			Facility facility = facilities.getFacility(facilityId.toString());
+			Facility facility = (Facility)facilities.getLocation(facilityId);
 			if (facility != null) {
 				Activity activity = facility.getActivity(actType);
 				if (activity != null) {

@@ -135,7 +135,8 @@ public abstract class BufferedStateA implements StateI {
             this.source = baos;
         }
 
-        public void reset() {
+        @Override
+				public void reset() {
             super.buf = source.getBuffer();
             super.count = source.getCount();
             super.pos = 0;

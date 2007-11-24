@@ -20,43 +20,24 @@
 
 package org.matsim.network.algorithms;
 
-import java.util.Iterator;
-
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
-// see "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
-// for description of node types. It's the graph matching paper.
+/* See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
+ * for a description of node types. It's the graph matching paper. */
 
 public class NetworkCalcTopoType extends NetworkAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
 
 	public NetworkCalcTopoType() {
 		super();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
+	@Override
 	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		Iterator<?> n_it = network.getNodes().iterator();
-		while (n_it.hasNext()) {
-			Node n = (Node)n_it.next();
+		for (Node n : network.getNodes().values()) {
 			if (n.getIncidentLinks().size() == 0) { n.setTopoType(Node.EMPTY); }
 			else if (n.getInLinks().size() == 0) { n.setTopoType(Node.SOURCE); }
 			else if (n.getOutLinks().size() == 0) {n.setTopoType(Node.SINK); }
@@ -74,12 +55,10 @@ public class NetworkCalcTopoType extends NetworkAlgorithm {
 		}
 
 		int [] cnt = {0,0,0,0,0,0,0,0,0};
-		n_it = network.getNodes().iterator();
-		while (n_it.hasNext()) {
-			Node n = (Node)n_it.next();
+		for (Node n : network.getNodes().values()) {
 			cnt[n.getTopoType()] = cnt[n.getTopoType()]+1;
 		}
-		
+
 		System.out.println("      #nodes        = " + network.getNodes().size());
 		System.out.println("      #EMTPY        = " + cnt[Node.EMPTY]);
 		System.out.println("      #SOURCE       = " + cnt[Node.SOURCE]);
@@ -90,12 +69,7 @@ public class NetworkCalcTopoType extends NetworkAlgorithm {
 		System.out.println("      #START1WAY    = " + cnt[Node.START1WAY]);
 		System.out.println("      #END1WAY      = " + cnt[Node.END1WAY]);
 		System.out.println("      #INTERSECTION = " + cnt[Node.INTERSECTION]);
-		
-		
+
 		System.out.println("    done.");
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
 }

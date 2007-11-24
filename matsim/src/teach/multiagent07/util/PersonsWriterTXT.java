@@ -28,6 +28,7 @@ import teach.multiagent07.population.PersonHandler;
 
 public class PersonsWriterTXT extends PersonHandler{
 
+	@Override
 	public void handlePerson(Person person) {
 		System.out.println("Person: " + person.getId());
 		

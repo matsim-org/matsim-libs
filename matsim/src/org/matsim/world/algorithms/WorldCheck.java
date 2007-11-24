@@ -55,8 +55,11 @@ public class WorldCheck extends WorldAlgorithm {
 		System.out.println("          number of layers = " + layers.size());
 		System.out.println("          number of rules = " + rules.size());
 		if (layers.isEmpty()) {
-			if (rules.isEmpty()) { return true; }
-			else { System.out.println("            => STRUCTURE NOT VALID!"); return false; }
+			if (rules.isEmpty()) {
+				return true;
+			}
+			System.out.println("            => STRUCTURE NOT VALID!");
+			return false;
 		}
 		else if (layers.size() == 1) {
 			if (!rules.isEmpty()) { System.out.println("            => STRUCTURE NOT VALID!"); return false; }
@@ -64,7 +67,7 @@ public class WorldCheck extends WorldAlgorithm {
 		else { // two or more layers
 			if (layers.size() != (rules.size()+1))  { System.out.println("            => STRUCTURE NOT VALID!"); return false; }
 		}
-		
+
 		int l_cnt = 0;
 		int m_cnt = 0;
 		Layer l = world.getTopLayer();
@@ -93,7 +96,7 @@ public class WorldCheck extends WorldAlgorithm {
 		System.out.println("      done.");
 		return true;
 	}
-	
+
 	private final boolean checkMapping(final Layer down_layer, final Layer up_layer) {
 		System.out.println("      running checkMapping(final Layer down_layer, final Layer up_layer)...");
 
@@ -110,14 +113,15 @@ public class WorldCheck extends WorldAlgorithm {
 		System.out.println("      done.");
 		return true;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(World world) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-		
+
 		boolean ok = this.checkStructure(world);
 		if (!ok) { Gbl.errorMsg("Layer/MappingRule structure not valid!"); }
 

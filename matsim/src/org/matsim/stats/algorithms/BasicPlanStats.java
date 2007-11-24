@@ -48,6 +48,7 @@ public class BasicPlanStats extends AbstractPlanStatsAlgorithm  {
 		return xxSum / calls - (getAvg() * getAvg());
 	}
 	
+	@Override
 	public void printStats(){
 		System.out.print( " " + calls + " " + getAvg() + " " + getVar());
 	}

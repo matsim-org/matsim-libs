@@ -24,11 +24,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.Iterator;
 
+import org.matsim.utils.vis.netvis.DisplayableLinkI;
+import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.NetJComponent;
-import org.matsim.utils.vis.netvis.visNet.DisplayAgent;
 import org.matsim.utils.vis.netvis.visNet.DisplayLink;
 import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 
@@ -52,13 +52,15 @@ public class LinkSetRenderer extends RendererA {
                 * visConfig.getLinkWidthFactor();
     }
 
-    public void setTargetComponent(NetJComponent comp) {
+    @Override
+		public void setTargetComponent(NetJComponent comp) {
         super.setTargetComponent(comp);
     }
 
     // -------------------- RENDERING --------------------
 
-    protected synchronized void myRendering(Graphics2D display,
+    @Override
+		protected synchronized void myRendering(Graphics2D display,
             AffineTransform boxTransform) {
         String test = getVisConfig().get("ShowAgents");
         boolean drawAgents = test == null || test.equals("true");
@@ -71,10 +73,8 @@ public class LinkSetRenderer extends RendererA {
 
         display.setStroke(new BasicStroke(Math.round(0.05 * laneWidth)));
 
-        for (Iterator it = network.getLinks().iterator(); it.hasNext();) {
-            DisplayLink link = (DisplayLink) it.next();
-
-            if (!comp.checkLineInClip(link.getStartEasting(), link
+        for (DisplayableLinkI link : network.getLinks().values()) {
+        	if (!comp.checkLineInClip(link.getStartEasting(), link
                     .getStartNorthing(), link.getEndEasting(), link
                     .getEndNorthing())) {
                 continue;
@@ -123,7 +123,7 @@ public class LinkSetRenderer extends RendererA {
 
             /*
              * (2) RENDER VEHICLES
-             * 
+             *
              * IMPORTANT: If you modify this, ensure proper rendering of agents
              * on multi-lane links!
              */
@@ -142,10 +142,7 @@ public class LinkSetRenderer extends RendererA {
             }
 
             if (link.getMovingAgents() != null && drawAgents)
-                for (Iterator agentIt = link.getMovingAgents().iterator(); agentIt.hasNext();) {
-
-                    DisplayAgent agent = (DisplayAgent) agentIt.next();
-
+            	for (DrawableAgentI agent : link.getMovingAgents()) {
                     final int lane = (RANDOMIZE_LANES ? (agent.hashCode()
                             % lanes + 1) : agent.getLane());
 

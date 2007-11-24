@@ -24,8 +24,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.Iterator;
 
+import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.ControlToolbar;
 import org.matsim.utils.vis.netvis.gui.NetJComponent;
@@ -35,7 +35,7 @@ import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 public class LinkSetRendererLanes extends RendererA {
 
 	ControlToolbar toolbar = null;
-	
+
     private final ValueColorizer colorizer = new ValueColorizer(new double[] { 1.0, 2.0, 3.0, 4.0, 5.0 }, new Color[] {
         Color.DARK_GRAY, Color.YELLOW, Color.GREEN, Color.BLUE, Color.RED });
 
@@ -46,17 +46,19 @@ public class LinkSetRendererLanes extends RendererA {
     public LinkSetRendererLanes(VisConfig visConfig, DisplayNet network) {
         super(visConfig);
         this.network = network;
-        
+
         this.linkWidth = DisplayLink.LANE_WIDTH * visConfig.getLinkWidthFactor();
     }
 
-    public void setTargetComponent(NetJComponent comp) {
+    @Override
+		public void setTargetComponent(NetJComponent comp) {
         super.setTargetComponent(comp);
     }
 
     // -------------------- RENDERING --------------------
 
-    protected synchronized void myRendering(Graphics2D display, AffineTransform boxTransform) {
+    @Override
+		protected synchronized void myRendering(Graphics2D display, AffineTransform boxTransform) {
     	this.linkWidth = DisplayLink.LANE_WIDTH* getVisConfig().getLinkWidthFactor();
 
     	NetJComponent comp = getNetJComponent();
@@ -74,9 +76,7 @@ public class LinkSetRendererLanes extends RendererA {
     	if (strokeWidth > (100.0 / scale)) strokeWidth = 100.0 / scale;  // max pixel-width on screen
     	display.setStroke(new BasicStroke((float)strokeWidth));
 
-    	for (Iterator it = network.getLinks().iterator(); it.hasNext();) {
-    		DisplayLink link = (DisplayLink) it.next();
-
+    	for (DisplayableLinkI link : network.getLinks().values()) {
     		if (!comp.checkLineInClip(link.getStartEasting(), link.getStartNorthing(),
     				link.getEndEasting(), link.getEndNorthing())) {
     			continue;
@@ -115,5 +115,5 @@ public class LinkSetRendererLanes extends RendererA {
     public void setControlToolbar(ControlToolbar toolbar) {
     	this.toolbar = toolbar;
     }
-    
+
 }

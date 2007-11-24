@@ -22,6 +22,7 @@ package org.matsim.router.util;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
@@ -31,7 +32,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.NetworkUtils;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 
 class LandmarkerPieSlices extends NetworkAlgorithm {
 
@@ -55,12 +56,11 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		this.travelZone = travelZone;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void run(final NetworkLayer network) {
-		Set<Node> nodes;
+		Collection<? extends Node> nodes;
 		if (this.travelZone.getHeight() == 0 || this.travelZone.getWidth() == 0) {
-			nodes = network.getNodes();
+			nodes = network.getNodes().values();
 		} else {
 			nodes = getNodesInTravelZone(network, this.travelZone);
 		}
@@ -79,11 +79,8 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		minX -= (maxX - minX) * this.zoneExpansion;
 		maxY += (maxY - minY) * this.zoneExpansion;
 		minY -= (maxY - minY) * this.zoneExpansion;
-		Iterator nIter = network.getNodes().iterator();
 		Set<Node> resultNodes = new TreeSet<Node>();
-		while (nIter.hasNext() == true) {
-			Node n = (Node) nIter.next();
-
+		for (Node n : network.getNodes().values()) {
 			if (n.getCoord().getX() <= maxX && n.getCoord().getX() >= minX
 					&& n.getCoord().getY() <= maxY
 					&& n.getCoord().getY() >= minY) {
@@ -94,7 +91,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		return resultNodes;
 	}
 
-	public void run(Set<Node> nodes, int roleIndex) {
+	public void run(Collection<? extends Node> nodes, int roleIndex) {
 
 		this.roleIndex = roleIndex;
 
@@ -103,8 +100,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		putLandmarks(nodes, this.landmarks.length);
 	}
 
-	@SuppressWarnings("unchecked")
-	void putLandmarks(Set<Node> nodes, int landmarkCount) {
+	void putLandmarks(Collection<? extends Node> nodes, int landmarkCount) {
 
 		ArrayList<ArrayList<Node>> sectors = new ArrayList<ArrayList<Node>>();
 
@@ -126,7 +122,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		System.out.println("done");
 	}
 
-	private double[][] fillSectors(ArrayList<ArrayList<Node>> sectors, Set<Node> nodes) {
+	private double[][] fillSectors(ArrayList<ArrayList<Node>> sectors, Collection<? extends Node> nodes) {
 //		double[][] angles = new double[landmarks.length][2];
 		ArrayList<double[]> angles = new ArrayList<double[]>();
 		// Sort nodes according to angle
@@ -314,7 +310,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		}
 	}
 
-	public Coord getCenter(Set<Node> nodes) {
+	public Coord getCenter(Collection<? extends Node> nodes) {
 		double[] bBox = NetworkUtils.getBoundingBox(nodes);
 		double maxX = bBox[0];
 		double minX = bBox[1];

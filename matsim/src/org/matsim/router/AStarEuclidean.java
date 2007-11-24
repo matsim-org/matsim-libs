@@ -308,6 +308,8 @@ public class AStarEuclidean extends Dijkstra {
 	 */
 	public static class ComparatorAStarNodeCost extends ComparatorDijkstraCost {
 
+		private static final long serialVersionUID = 1L;
+
 		/**
 		 * @param data A map to look up the data with information about cost.
 		 */

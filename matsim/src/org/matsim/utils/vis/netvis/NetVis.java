@@ -46,7 +46,6 @@ import org.matsim.utils.vis.netvis.renderers.LabelRenderer;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRenderer;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererCOOPERSVehiclesOnly;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererLanes;
-import org.matsim.utils.vis.netvis.renderers.LinkSetRendererPtRoutes;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererRoutes;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererStuck;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererTRANSIMS;
@@ -102,7 +101,6 @@ public class NetVis {
     	else if (rendererName.equals("LinkSetRendererLanes")) linkSetRenderer = new LinkSetRendererLanes(visConfig, network);
     	else if (rendererName.equals("LinkSetRendererStuck")) linkSetRenderer = new LinkSetRendererStuck(visConfig, network);
     	else if (rendererName.equals("LinkSetRendererRoutes")) linkSetRenderer = new LinkSetRendererRoutes(visConfig, network);
-    	else if (rendererName.equals("LinkSetRendererPtRoutes")) linkSetRenderer = new LinkSetRendererPtRoutes(visConfig, network);
     	else if (rendererName.equals("LinkSetRendererCOOPERSVehiclesOnly")) linkSetRenderer = new LinkSetRendererCOOPERSVehiclesOnly(visConfig, network);
     	else linkSetRenderer = new LinkSetRenderer(visConfig, network);
 
@@ -142,7 +140,7 @@ public class NetVis {
         networkScrollPane = new NetVisScrollPane(networkComponent);
         // networkScrollPane.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
         vizFrame.getContentPane().add(networkScrollPane, BorderLayout.CENTER);
-        vizMouseHandler handi = new vizMouseHandler();
+        VisMouseHandler handi = new VisMouseHandler();
         networkScrollPane.addMouseMotionListener(handi);
         networkScrollPane.addMouseListener(handi);
         networkScrollPane.getViewport().addChangeListener(handi);
@@ -166,8 +164,9 @@ public class NetVis {
        		 reader.toStart();
        	 } catch (Exception e) {
        		 System.err.println("There is a problem with the movie files: " + e);
-       		 System.err.println("I will only display the network.");
-       		 reader = null;
+       		 System.err.println("I'm not sure the movie will display correctly.");
+       		 e.printStackTrace();
+       		 // reader = null;
        	 }
        	 return reader;
     }
@@ -257,7 +256,7 @@ public class NetVis {
     	}
     }
 
-    class vizMouseHandler extends MouseInputAdapter implements ChangeListener {
+    class VisMouseHandler extends MouseInputAdapter implements ChangeListener {
         public Point start = null;
 
         public Rectangle currentRect = null;

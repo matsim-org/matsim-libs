@@ -23,10 +23,10 @@ package org.matsim.analysis;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -73,7 +73,7 @@ public class CalcLinkStats {
 		this.count++;
 		// TODO verify analyzer and ttimes have hourly timeBin-Settings
 		for (String linkId : this.linkData.keySet()) {
-			Link link = (Link)this.network.getLinks().get(linkId);
+			Link link = this.network.getLinks().get(new Id(linkId));
 			int[] volumes = analyzer.getVolumesForLink(linkId);
 			LinkData data = this.linkData.get(linkId);
 			int sum = 0; // daily (0-24) sum
@@ -129,8 +129,7 @@ public class CalcLinkStats {
 		this.count = 0;
 
 		// initialize our data-table
-		for (Iterator iter = this.network.getLinks().iterator(); iter.hasNext(); ) {
-			BasicLinkI link = (BasicLinkI)iter.next();
+		for (BasicLinkI link : this.network.getLinks().values()) {
 			String linkId = link.getId().toString();
 			LinkData data = new LinkData(new int[NOF_STATS][this.nofHours + 1], new double[NOF_STATS][this.nofHours]);
 			for (int i = 0; i < data.volumes.length; i++) {
@@ -171,7 +170,7 @@ public class CalcLinkStats {
 			// write data
 			for (String linkId : this.linkData.keySet()) {
 				LinkData data = this.linkData.get(linkId);
-				Link link = (Link)this.network.getLinks().get(linkId);
+				Link link = this.network.getLinks().get(new Id(linkId));
 
 				out.write(linkId);
 				if (link.getOrigId() == null) {

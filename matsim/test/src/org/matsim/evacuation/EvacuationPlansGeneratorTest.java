@@ -25,10 +25,6 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.evacuation.EvacuationAreaFileReader;
-import org.matsim.evacuation.EvacuationAreaLink;
-import org.matsim.evacuation.EvacuationPlansGeneratorAndNetworkTrimmer;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
@@ -38,6 +34,7 @@ import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
@@ -65,7 +62,7 @@ public class EvacuationPlansGeneratorTest extends MatsimTestCase {
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(positionInfo);
 
-		HashMap<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
+		HashMap<IdI, EvacuationAreaLink> evacuationAreaLinks = new HashMap<IdI, EvacuationAreaLink>();
 		EvacuationAreaFileReader enfr = new EvacuationAreaFileReader(evacuationAreaLinks);
 		try {
 			enfr.readFile(evacuationAreaLinksFile);

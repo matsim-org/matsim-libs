@@ -41,6 +41,7 @@ public class TicketAlgo extends PersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
   
+	@Override
 	public void run(Person person) {
 		double rd3 = Gbl.random.nextDouble();
 		if (person.getEmployed() == "no") {

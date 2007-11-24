@@ -47,6 +47,7 @@ public class PlanReplaceLegModes extends PersonAlgorithm implements PlanAlgorith
 		toMode = to;
 	}
 
+	@Override
 	public void run(Person person) {
 		for (Plan plan : person.getPlans()) {
 			run(plan);

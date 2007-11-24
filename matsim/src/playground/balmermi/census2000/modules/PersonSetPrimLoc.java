@@ -37,7 +37,7 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.QuadTree;
-import org.matsim.world.Coord;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -55,13 +55,13 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 	private static final IdI MUNICIPALITY = new Id("municipality");
 	private static final String EDUCATION = "education";
 	private static final String WORK = "work";
-	
+
 	private final Facilities facilities;
 	private final Persons persons;
 	private final Matrices matrices;
-	private final TreeMap<Id,ArrayList<Facility>> zone_work_fac_mapping = new TreeMap<Id,ArrayList<Facility>>();
-	private final TreeMap<Id,ArrayList<Facility>> zone_educ_fac_mapping = new TreeMap<Id,ArrayList<Facility>>();
-	
+	private final TreeMap<IdI, ArrayList<Facility>> zone_work_fac_mapping = new TreeMap<IdI, ArrayList<Facility>>();
+	private final TreeMap<IdI, ArrayList<Facility>> zone_educ_fac_mapping = new TreeMap<IdI, ArrayList<Facility>>();
+
 	private QuadTree<Facility> workFacQuadTree = null;
 	private QuadTree<Facility> educFacQuadTree = null;
 
@@ -92,9 +92,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		Iterator<Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(WORK) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
@@ -108,9 +106,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.workFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(WORK) != null) {
 				this.workFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
@@ -126,9 +122,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		Iterator<Location> f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(EDUCATION) != null) {
 				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
@@ -142,9 +136,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.educFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		f_it = this.facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility f = (Facility)f_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			if (f.getActivity(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 			}
@@ -155,11 +147,11 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 
 	public final void buildZoneFacilityMapping() {
 		ZoneLayer layer = (ZoneLayer)Gbl.getWorld().getLayer(MUNICIPALITY);
-		Iterator<Location> f_it = this.facilities.getLocations().values().iterator();
+		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
 			ArrayList<Zone> zones = new ArrayList<Zone>();
-			Iterator<Location> z_it = layer.getLocations().values().iterator();
+			Iterator<? extends Location> z_it = layer.getLocations().values().iterator();
 			while (z_it.hasNext()) {
 				Zone z = (Zone)z_it.next();
 				if (z.contains(f.getCenter())) { zones.add(z); }
@@ -177,18 +169,18 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 				ArrayList<Facility> facs = zone_work_fac_mapping.get(z.getId());
 				if (facs == null) { facs = new ArrayList<Facility>(); }
 				facs.add(f);
-				zone_work_fac_mapping.put((Id)z.getId(),facs);
+				zone_work_fac_mapping.put(z.getId(),facs);
 			}
 			if (f.getActivity(EDUCATION) != null) {
 				ArrayList<Facility> facs = zone_educ_fac_mapping.get(z.getId());
 				if (facs == null) { facs = new ArrayList<Facility>(); }
 				facs.add(f);
-				zone_educ_fac_mapping.put((Id)z.getId(),facs);
+				zone_educ_fac_mapping.put(z.getId(),facs);
 			}
 		}
-		
+
 		System.out.println("      Zone to work-facility mapping:");
-		Iterator<Id> z_it = this.zone_work_fac_mapping.keySet().iterator();
+		Iterator<IdI> z_it = this.zone_work_fac_mapping.keySet().iterator();
 		while (z_it.hasNext()) {
 			Zone z = (Zone)layer.getLocation(z_it.next());
 			ArrayList<Facility> facs = this.zone_work_fac_mapping.get(z.getId());
@@ -202,7 +194,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 			System.out.println("        Zone id=" + z.getId() + " ==> #facs=" + facs.size());
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
@@ -229,7 +221,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 
 	private final Facility getPrimActFacility(ArrayList<Facility> facs, String act_type) {
 		if (facs.isEmpty()) { Gbl.errorMsg("facs are empty! This should not happen!"); }
-		
+
 		int[] dist_sum = new int[facs.size()];
 		dist_sum[0] = facs.get(0).getActivity(act_type).getCapacity();
 		if ((dist_sum[0] <= 0) || (dist_sum[0] == Integer.MAX_VALUE)) {
@@ -254,11 +246,12 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		Gbl.errorMsg("It should never reach this line!");
 		return null;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void run(Person person) {
 		ArrayList<Act> work_list = new ArrayList<Act>();
 		ArrayList<Act> educ_list = new ArrayList<Act>();

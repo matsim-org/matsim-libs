@@ -47,7 +47,7 @@ public class Color {
 	/**
 	 * blue value of this color
 	 */
-	private int blue;	
+	private int blue;
 	/**
 	 * green value of this color
 	 */
@@ -56,25 +56,25 @@ public class Color {
 	 * red value of this color
 	 */
 	private int red;
-	
+
 	public static final Color DEFAULT_COLOR = new Color("ff","ff","ff","ff");
-	
+
 //	in hex: alpha blue green red
 //	<color>ffffffff</color>
-	
+
 	/**
 	 * Creates a color object from an kml native implementation
 	 * @param alpha string containing a hex value in 00..ff
 	 * @param blue string containing a hex value in 00..ff
 	 * @param green string containing a hex value in 00..ff
 	 * @param red string containing a hex value in 00..ff
-	 * 
+	 *
 	 */
 	public Color(final String alpha, final String blue, final String green, final String red) {
-		this.alpha = Integer.valueOf(alpha, 16);
-		this.blue = Integer.valueOf(blue, 16);
-		this.green = Integer.valueOf(green, 16);
-		this.red = Integer.valueOf(red, 16);
+		this.alpha = Integer.parseInt(alpha, 16);
+		this.blue = Integer.parseInt(blue, 16);
+		this.green = Integer.parseInt(green, 16);
+		this.red = Integer.parseInt(red, 16);
 	}
 	/**
 	 * Creates a color object from an RGB value, alpha is set to maximum
@@ -83,12 +83,12 @@ public class Color {
 	 * @param blue a value in 0..255
 	 */
 	public Color(final int red, final int green, final int blue) {
-		this.alpha = Integer.valueOf(FF, 16);
+		this.alpha = Integer.parseInt(FF, 16);
 		this.blue = blue;
 		this.green = green;
 		this.red = red;
 	}
-	
+
 	/**
 	 * Creates a color object from an RGB value
 	 * @param alpha a value in 0..255
@@ -102,7 +102,7 @@ public class Color {
 		this.green = green;
 		this.red = red;
 	}
-	
+
 	private String to2DigitHexString(final int value) {
 		String s = Integer.toHexString(value);
 		if (s.length() == 1) {
@@ -111,14 +111,11 @@ public class Color {
 			b.append(s);
 			return b.toString();
 		}
-		else {
-			return s;
-		}
-		
+		return s;
 	}
-	
+
   /**
-   * Returns a String useable for kml output.
+   * Returns a String usable for kml output.
    */
   @Override
 	public String toString() {

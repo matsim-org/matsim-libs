@@ -20,22 +20,30 @@
 
 package org.matsim.interfaces.networks.basicNet;
 
-import org.matsim.utils.identifiers.IdentifiedI;
+import org.matsim.utils.identifiers.IdI;
 
 /**
  * A topological representation of a network link.
  */
-public interface BasicLinkI extends IdentifiedI {
+public interface BasicLinkI {
+
+  /**
+   * Returns a non-<code>null</code> instance of <code>IdI</code> that
+   * uniquely identifies this object.
+   *
+   * @return this object's identifier
+   */
+  public IdI getId();
 
     /**
      * Sets this link's non-<code>null</code> upstream node.
-     * 
+     *
      * @param node
      *            the <code>BasicNodeI</code> to be set
-     * 
+     *
      * @return <true> if <code>node</code> has been set and <code>false</code>
      *         otherwise
-     * 
+     *
      * @throws IllegalArgumentException
      *             if <code>node</code> is <code>null</code>
      */
@@ -43,13 +51,13 @@ public interface BasicLinkI extends IdentifiedI {
 
     /**
      * Sets this link's non-<code>null</code> downstream node.
-     * 
+     *
      * @param node
      *            the <code>BasicNodeI</code> to be set
-     * 
+     *
      * @return <code>true</code> if <code>node</code> has been set and
      *         <code>false</code> otherwise
-     * 
+     *
      * @throws IllegalArgumentException
      *             if <code>node</code> is <code>null</code>
      */
@@ -57,14 +65,14 @@ public interface BasicLinkI extends IdentifiedI {
 
     /**
      * Returns this link's upstream node. Must not return <code>null</code>.
-     * 
+     *
      * @return this link's upstream node
      */
     public BasicNodeI getFromNode();
 
     /**
      * Returns this link's downstream node. Must not return <code>null</code>.
-     * 
+     *
      * @return this link's downstream node
      */
     public BasicNodeI getToNode();

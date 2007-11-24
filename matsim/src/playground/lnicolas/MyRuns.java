@@ -124,8 +124,8 @@ public class MyRuns {
 		double maxLinkLength = 0;
 		int linkCount = 0;
 
-		for (Object obj : network.getLinks()) {
-			double l = ((Link)obj).getLength();
+		for (Link link : network.getLinks().values()) {
+			double l = link.getLength();
 			if (l > maxLinkLength) {
 				maxLinkLength = l;
 			}
@@ -142,8 +142,8 @@ public class MyRuns {
 			binCount += binLength;
 		}
 
-		for (Object obj : network.getLinks()) {
-			double l = ((Link)obj).getLength();
+		for (Link link : network.getLinks().values()) {
+			double l = link.getLength();
 			int c = lengthDistr.get((int)(l/binLength));
 			c++;
 			lengthDistr.set((int)(l/binLength), c);
@@ -233,8 +233,7 @@ public class MyRuns {
 		double minCoordSum = Double.MAX_VALUE;
 		double maxCoordSum = Double.MIN_VALUE;
 
-		for (Object obj1 : network.getNodes()) {
-			Node n = (Node) obj1;
+		for (Node n : network.getNodes().values()) {
 			double coordSum = n.getCoord().getX() + n.getCoord().getY();
 			if (coordSum > maxCoordSum) {
 				maxNode = n;

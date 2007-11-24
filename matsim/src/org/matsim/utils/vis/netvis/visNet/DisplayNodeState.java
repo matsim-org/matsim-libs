@@ -42,7 +42,8 @@ public final class DisplayNodeState extends BufferedStateA {
 
     // -------------------- FROM/TO STREAM --------------------
 
-    public final void writeMyself(DataOutputStream out) throws IOException {
+    @Override
+		public final void writeMyself(DataOutputStream out) throws IOException {
         /*
          * (1) write display value
          */
@@ -57,7 +58,8 @@ public final class DisplayNodeState extends BufferedStateA {
             out.writeUTF(displLabel);
     }
 
-    public final void readMyself(DataInputStream in) throws IOException {
+    @Override
+		public final void readMyself(DataInputStream in) throws IOException {
         DisplayNode displNode = (DisplayNode) node;
         /*
          * (2) read display value
