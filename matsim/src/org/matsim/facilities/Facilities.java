@@ -27,8 +27,8 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Layer;
 
 public class Facilities extends Layer {
@@ -117,7 +117,7 @@ public class Facilities extends Layer {
 
 	@SuppressWarnings("unchecked")
 	public final Map<IdI, ? extends Facility> getFacilities() {
-		return (Map<IdI, ? extends Facility>) this.locations;
+		return (Map<IdI, ? extends Facility>) getLocations();
 	}
 
 	//////////////////////////////////////////////////////////////////////
