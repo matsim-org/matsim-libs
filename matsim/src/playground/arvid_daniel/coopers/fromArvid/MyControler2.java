@@ -29,14 +29,14 @@ public class MyControler2 extends CoopersControler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String[] conf = {"./test/arvid_daniel/input/testExtended/config.xml"};
+		String[] conf = {"../studies/arvidDaniel/input/testBasic/config.xml"};
 		MyControler2 controler = new MyControler2();
 		controler.setOverwriteFiles(true);
 		controler.run(conf);	
 
 		
 		// Visulize
-		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
+		String[] visargs = {"../studies/arvidDaniel/output/ITERS/it.0/Snapshot"};
 		
 		NetVis.main(visargs);
 	}
