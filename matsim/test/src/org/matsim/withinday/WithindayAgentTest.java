@@ -42,7 +42,7 @@ import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
-import org.matsim.withinday.trafficmanagement.controltheorycontroler.BangBangControler;
+import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 
 /**
  * @author dgrether
@@ -110,7 +110,7 @@ public class WithindayAgentTest extends TestCase {
 		sign.setSignLink(this.network.getLink("2"));
 		sign.setDirectionLink(this.network.getLink("7"));
 		sign.setBenefitControl(false);
-		sign.setUpdateTime(1);
+		sign.setMessageHoldTime(1);
 		sign.setControlEvents(1);
 		sign.setDeadZoneSystemInput(0.0);
 		sign.setDeadZoneSystemOutput(0.0);
