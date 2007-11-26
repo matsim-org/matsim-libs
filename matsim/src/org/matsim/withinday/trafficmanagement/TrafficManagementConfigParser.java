@@ -39,6 +39,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import playground.arvid_daniel.coopers.fromArvid.ControlInputImpl1;
+import playground.arvid_daniel.coopers.fromArvid.ControlInputImplDAccident;
 import playground.arvid_daniel.coopers.fromArvid.ControlInputImplDistribution;
 import playground.arvid_daniel.coopers.fromArvid.ControlInputImplSB;
 import playground.arvid_daniel.coopers.fromArvid.ControlInputImplSBNoise;
@@ -99,7 +100,9 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	private static final String CONTROLINPUTSBNOISE = "ControlInputImplSBNoise";
 	
 	private static final String CONTROLINPUTDISTRIBUTION = "ControlInputImplDistribution";
-	
+
+	private static final String CONTROLINPUTDACCIDENT = "ControlInputImplDAccident";
+
 	private final static String CONTROLINPUT = "controlInput";
 	
 	private final static String ACCIDENT = "accident";
@@ -278,6 +281,11 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		else if (content.trim().compareTo(CONTROLINPUTSBNOISE) == 0) {
 			ControlInputImplSBNoise controlInput = new ControlInputImplSBNoise();
 			controlInput.setAccidents(this.trafficManagement.getAccidents());
+			this.events.addHandler(controlInput);
+			return controlInput;
+		}
+		else if (content.trim().compareTo(CONTROLINPUTDACCIDENT) == 0) {
+			ControlInputImplDAccident controlInput = new ControlInputImplDAccident();
 			this.events.addHandler(controlInput);
 			return controlInput;
 		}
