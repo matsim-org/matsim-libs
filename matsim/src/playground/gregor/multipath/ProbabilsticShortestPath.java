@@ -143,7 +143,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 
 		while (stillSearching) {
 
-//			//TODO DEBUG
+			//			//TODO DEBUG
 //			if (count++ >= snapShotSlowDown) {
 //				try {
 //					count = 0;
