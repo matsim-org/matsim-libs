@@ -32,9 +32,9 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
 import org.matsim.utils.io.MatsimXmlParser;
-import org.matsim.withinday.trafficmanagement.controltheorycontroler.BangBangControler;
-import org.matsim.withinday.trafficmanagement.controltheorycontroler.FeedbackControler;
-import org.matsim.withinday.trafficmanagement.controltheorycontroler.NoControl;
+import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
+import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
+import org.matsim.withinday.trafficmanagement.feedbackcontroler.NoControl;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -184,7 +184,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.vdsSign.setControler(controler);
 		}
 		else if (name.equalsIgnoreCase(MESSAGEHOLDTIME)) {
-			this.vdsSign.setUpdateTime(Integer.valueOf(content));
+			this.vdsSign.setMessageHoldTime(Integer.valueOf(content));
 		}
 		else if (name.equalsIgnoreCase(CONTROLEVENTS)) {
 			this.vdsSign.setControlEvents(Integer.valueOf(content));
