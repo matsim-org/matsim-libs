@@ -29,7 +29,7 @@ public class MyControler2 extends CoopersControler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String[] conf = {"../studies/arvidDaniel/input/testBasic/config.xml"};
+		String[] conf = {"../studies/arvidDaniel/input/testExtended/config.xml"};
 		MyControler2 controler = new MyControler2();
 		controler.setOverwriteFiles(true);
 		controler.run(conf);	

@@ -186,16 +186,13 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			}
 			
 //			Flow = agents / seconds:
-			double flow = list.size() / (list.getLast() - list.getFirst());
+			double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
 			this.linkFlows.put(event.linkId, flow);
 		}
 		
 		super.handleEvent(event);
 	}
 	
-	public double getOutFlow(String linkId) {
-		return this.linkFlows.get(linkId);
-	}
 
 	public void reset(final int iteration) {
 		this.writer.close();
@@ -245,23 +242,24 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			isQueueOnRoute = true;
 			
 			for ( int i = routeLinks.length - 1; i >= 0; i-- ) {
-				String link = routeLinks[i].getId().toString();
+				String linkId = routeLinks[i].getId().toString();
 
 //				To avoid round of errors, the difference has to be at last 1 second
-				if ( this.ttMeasured.get(link) > this.ttFreeSpeeds.get(link) + 1) {
+				if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId)) {
 					bottleNeckCongested = true;
 					currentBottleNeck = routeLinks[i];
-					currentBottleNeckFlow = this.linkFlows.get(currentBottleNeck.getId().toString());
+					currentBottleNeckFlow = getFlow(currentBottleNeck);
 					
 					System.out.println("");
-
+					log.info("Current bottleneck capacity is " + currentBottleNeckCapacity + " and the measured link's flow is " + currentBottleNeckFlow);
+					
+//					If measured flow for some reason (inexact measuring) is higher than the links capacity, use the capacity 
 					if ( currentBottleNeckFlow	< currentBottleNeckCapacity) {
 						currentBottleNeckCapacity = currentBottleNeckFlow;
 					}
 					else  // measuring is inexact
 						System.err.println("Measured tt is longer than ttfreespeed, but measured flow is not reduced.");
 					
-					log.info("Current bottleneck capacity is " + currentBottleNeckCapacity + " and the link's flow is " + currentBottleNeckFlow);
 
 //				do not check links before current bottleneck
 				break; 
@@ -338,13 +336,23 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 						
 		// count agents on congested part of the route 
 		int agentsToQueueAtBottleNeck = 0;
-		for (int i = 0; i <= firstCongestedLink; i++) {
+		double ttFreeSpeedBeforeBottleNeck = 0;
+		double predictedTT;
+		for (int i = 0; i <= bottleNeckLinkIndexInArray; i++) {
 			agentsToQueueAtBottleNeck += 
 				this.numberOfAgents.get(routeLinks[i].getId().toString());
+			ttFreeSpeedBeforeBottleNeck += this.ttFreeSpeeds.get(routeLinks[i].getId().toString());
+
 		}
-	
-		double predictedTT = 
+		if (agentsToQueueAtBottleNeck / currentBottleNeckCapacity > ttFreeSpeedBeforeBottleNeck) {
+			predictedTT = 
 			(agentsToQueueAtBottleNeck / currentBottleNeckCapacity) + ttFreeSpeedPart;
+		} else {
+			predictedTT = getFreeSpeedRouteTravelTime(route);
+		}
+		
+	
+		
 
 			log.info("Predicted travel time = Agents / current capacity + freespeed = " + 
 					agentsToQueueAtBottleNeck +" / "+currentBottleNeckCapacity +" + "+ ttFreeSpeedPart);
