@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BangBangControler.java
+ * FeedbackControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,29 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.trafficmanagement.controltheorycontroler;
-
+package org.matsim.withinday.trafficmanagement.feedbackcontroler;
 
 /**
- * Implementation of a bang-bang controller with a control signal that is
- * bounded between -1 and 1.
+ * Interface that defines an automatic feedback controller with a control signal that 
+ * is bounded between -1 and 1.
+ * 
+ * @author dgrether
  * 
  */
-public class BangBangControler implements FeedbackControler {
-
+public interface FeedbackControler {
 	/**
-	 * The control algorithm
+	 * The control algorithm that transforms the output to an input
 	 * 
 	 * @param output
 	 * 
 	 * @return input
 	 */
-	public double control(double output) {
-		if (output > 0)
-			return -1;
-		else if (output < 0)
-			return 1;
-		else
-			return 0;
-	}
+	public double control(double output);
+
 }

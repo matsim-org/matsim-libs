@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PControler.java
+ * PIDControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,59 +18,95 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.trafficmanagement.controltheorycontroler;
+package org.matsim.withinday.trafficmanagement.feedbackcontroler;
 
 
 
 /**
- * Implementation of a proportional controller with a control signal that s bounded 
- * between -1 and 1
- *
+ * Implementation of a general PID-controller with differntiated data and a
+ * control signal that is bounded between -1 and 1.
+ * 
  */
-public class PControler implements FeedbackControler {
+public class PIDControler implements FeedbackControler {
 
-	// ---------------------- Instance variable (control paramter) ------------------
+	// --------------------------- Instance variables -----------------
 
+	// Control parameters
 	private double K;
+
+	private double Ti;
+
+	private double Td;
+
+	double[] states;
+
+	double lastInput;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param K
-	 * 				The control parameter
+	 * @param Ti
+	 * @param Td
+	 *            The control parameters
 	 */
-	public PControler(double K) {
+	public PIDControler(double K, double Ti, double Td) {
 		this.K = K;
+		this.Ti = Ti;
+		this.Td = Td;
+		double[] s = { 0, 0, 0 };
+		this.states = s;
+		this.lastInput = 0;
 	}
 
 	/**
-	 * Sets the control parameter
+	 * Sets the control parameters
 	 * 
 	 * @param K
-	 * 				The control parameter
+	 * @param Ti
+	 * @param Td
 	 */
-	public void setParameters(double K) {
+	public void setParameters(double K, double Ti, double Td) {
 		this.K = K;
+		this.Ti = Ti;
+		this.Td = Td;
 	}
 
 	/**
 	 * The control algorithm
+	 * 
+	 * @param output
+	 *            The system output
+	 * 
+	 * @return input The control signal
 	 */
 	public double control(double output) {
 
 		double input;
 
-		//		PID calculations
+		// Updates the states
 
-		input = -1 * K * output;
+		states[2] = states[1];
+		states[1] = states[0];
+		states[0] = output;
 
-		//		Boundary cuts
+		// PID calculations
 
-		if (input <= 1 && input >= -1) {
-			return input;
-		} else if (input > 1)
-			return input = 1;
+		double dU = -1
+				* K
+				* ((states[0] - states[1]) + (1 / Ti) * states[0] + Td
+						* (states[0] - 2 * states[1] + states[2]));
+
+		// Boundary cuts
+
+		if (lastInput + dU <= 1 && lastInput + dU >= -1) {
+			lastInput = lastInput + dU;
+			input = lastInput;
+		} else if (lastInput + dU > 1)
+			input = 1;
 		else
-			return input = -1;
+			input = -1;
+
+		return input;
 	}
 }

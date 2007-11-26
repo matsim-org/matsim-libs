@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FeedbackControler.java
+ * PControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,23 +18,59 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.trafficmanagement.controltheorycontroler;
+package org.matsim.withinday.trafficmanagement.feedbackcontroler;
+
+
 
 /**
- * Interface that defines an automatic feedback controller with a control signal that 
- * is bounded between -1 and 1.
- * 
- * @author dgrether
- * 
+ * Implementation of a proportional controller with a control signal that s bounded 
+ * between -1 and 1
+ *
  */
-public interface FeedbackControler {
-	/**
-	 * The control algorithm that transforms the output to an input
-	 * 
-	 * @param output
-	 * 
-	 * @return input
-	 */
-	public double control(double output);
+public class PControler implements FeedbackControler {
 
+	// ---------------------- Instance variable (control paramter) ------------------
+
+	private double K;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param K
+	 * 				The control parameter
+	 */
+	public PControler(double K) {
+		this.K = K;
+	}
+
+	/**
+	 * Sets the control parameter
+	 * 
+	 * @param K
+	 * 				The control parameter
+	 */
+	public void setParameters(double K) {
+		this.K = K;
+	}
+
+	/**
+	 * The control algorithm
+	 */
+	public double control(double output) {
+
+		double input;
+
+		//		PID calculations
+
+		input = -1 * K * output;
+
+		//		Boundary cuts
+
+		if (input <= 1 && input >= -1) {
+			return input;
+		} else if (input > 1)
+			return input = 1;
+		else
+			return input = -1;
+	}
 }
