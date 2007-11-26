@@ -30,7 +30,7 @@ import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
-import org.matsim.withinday.trafficmanagement.controltheorycontroler.FeedbackControler;
+import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 
 /**
  *
@@ -177,8 +177,8 @@ public class VDSSign {
 		}
 		boolean allEqual = true;
 		this.currentRouteSet.clear();
-		if ((this.nominalSplitting - this.deadZoneSystemInput < input)	&& (input < this.nominalSplitting + this.deadZoneSystemInput)) {
-			log.trace("System input in DeadZone, switching sign off!");
+		if ((this.nominalSplitting - this.deadZoneSystemInput <= input)	&& (input <= this.nominalSplitting + this.deadZoneSystemInput)) {
+			log.trace("System input equal to nominalSplitting or in DeadZone of system input, switching sign off!");
 			allEqual = true;
 			for (int i = 0; i < this.controlEvents; i++) {
 				this.currentRouteSet.add(null);
@@ -214,7 +214,7 @@ public class VDSSign {
 					else if ((input < Gbl.random.nextDouble()) && (zeros < numberOfZeros)) {
 						this.currentRouteSet.add((ones + zeros), this.alternativeRoute);
 						zeros++;
-						log.debug("0, i.e. alternative route");
+						log.trace("0, i.e. alternative route");
 					}
 				}
 			}
@@ -413,7 +413,7 @@ public class VDSSign {
 		this.directionLink = link;
 	}
 
-	public void setUpdateTime(final int time) {
+	public void setMessageHoldTime(final int time) {
 		this.messageHoldTime = time;
 	}
 
