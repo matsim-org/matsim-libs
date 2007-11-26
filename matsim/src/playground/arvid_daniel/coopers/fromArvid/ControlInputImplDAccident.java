@@ -41,11 +41,13 @@ import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**
- * Just like ControlInputSB, this model checks if the agents
- * before the bottleneck will cause a queue or not, and based 
- * on that predicts the nashtime. 
- * However, the prediction is improved by checking the 
- * distribution of the traffic before the bottleneck.
+ * Just like ControlInputSB, this model checks if the agents before 
+ * the bottleneck will cause a queue or not, and based on that predicts
+ * the time difference between two alternative routes.
+ * 
+ *  This model automatically and continuosly detects bottlenecks and 
+ *  therefore does not use information about the accident.
+ * 
  * 
  * @author abergsten and dzetterberg
  */
@@ -99,7 +101,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		this.writer.open();
 		
 		
-//		initialize ttMeasured with ttFreeSpeeds and linkFlows with zero
+//		Initialize ttMeasured with ttFreeSpeeds and linkFlows with zero.
 //		Main route
 		Link[] routeLinks = this.getMainRoute().getLinkRoute();
 		for (Link l : routeLinks) {
@@ -173,14 +175,15 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			list.removeFirst();
 			list.add(event.time);
 			}
-			else if (1 < list.size() || list.size() < 5)
+			else if (1 < list.size() || list.size() < 5) {
 				list.add(event.time);
-			else if ( list.size() == 0 ) {
+			} else if ( list.size() == 0 ) {
 				list.add(event.time - 1);
 				list.add(event.time);
 			}
-			else 
-				System.err.println("Error: number of enter event times stored exceeds 5!");		
+			else {
+				System.err.println("Error: number of enter event times stored exceeds 5!");
+			}
 			
 //			Flow = agents / seconds:
 			double flow = list.size() / (list.getLast() - list.getFirst());
@@ -230,14 +233,15 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	
 	private double getPredictedTravelTime(final Route route,
 			final Link bottleNeckLink) {
+		
 		Link currentBottleNeck = bottleNeckLink;
 		Link[] routeLinks = route.getLinkRoute();
 		boolean isQueueOnRoute = false;
 		boolean bottleNeckCongested = false;
-		double currentBottleNeckCapacity = this.capacities.get(currentBottleNeck.getId().toString());
-		double currentBottleNeckFlow = this.linkFlows.get(currentBottleNeck.getId().toString());
+		double currentBottleNeckCapacity = getCapacity(currentBottleNeck);
+		double currentBottleNeckFlow = getFlow(currentBottleNeck);
 
-			if (this.getMeasuredRouteTravelTime(route) > this.getFreeSpeedRouteTravelTime(route) ) {
+			if (getMeasuredRouteTravelTime(route) > getFreeSpeedRouteTravelTime(route) ) {
 			isQueueOnRoute = true;
 			
 			for ( int i = routeLinks.length - 1; i >= 0; i-- ) {
@@ -364,6 +368,16 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			e.printStackTrace();
 		}
 		return getPredictedNashTime();
+	}
+	
+	public double getFlow(Link link) {
+		double flow = this.linkFlows.get(link.getId().toString());
+		return flow;
+	}
+	
+	public double getCapacity(Link link) {
+		double capacity = this.capacities.get(link.getId().toString());
+		return capacity;
 	}
 
 }
