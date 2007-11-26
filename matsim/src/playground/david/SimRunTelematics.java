@@ -54,11 +54,11 @@ public class SimRunTelematics {
 		events.addHandler(new EventWriterTXT("EventsTelematicsSimWrapper.txt"));
 		world.setEvents(events);
 		
-		TelematicsSimWrapper sim = new TelematicsSimWrapper(netFileName,population, events);
+		//TelematicsSimWrapper sim = new TelematicsSimWrapper(netFileName,population, events);
 		//sim.setStartEndTime(0,30000);
 		//sim.run();
 		// oder 
-		sim.run(0*60*60, 10*60*60);
+		//sim.run(0*60*60, 10*60*60);
 		
 	}
 
