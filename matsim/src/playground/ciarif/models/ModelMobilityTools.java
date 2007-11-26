@@ -29,93 +29,89 @@ public class ModelMobilityTools {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final double B0_GAS95_P = -1.3747168e+000;
-	private static final double B0_HH_DIM = +1.8519173e-001;
-	private static final double B0_HH_KIDS = -6.8637703e-002;
-	private static final double B1_AGE = +1.5308959e-001;
-	private static final double B1_AGE_LN = -1.7366217e+000;
-	private static final double B1_AGE_SEX = -2.4642458e-002;
-	private static final double B1_AGE_SQ = +1.4655707e-003;
-	private static final double B1_FRENCH = -1.3304756e+000;
-	private static final double B1_GEN = +1.3249964e+000;
-	private static final double B1_INC = +3.1856321e-001;
-	private static final double B1_INC_LN = -1.0369679e-001;
-	private static final double B1_INC_SQ = -1.0161130e-002;
-	private static final double B1_ITALIAN = -9.4174300e-001;
-	private static final double B1_NAT = +8.9172801e-001;
-	private static final double B1_T2 = +4.8744613e-001;
-	private static final double B1_T3 = +9.8479954e-001;
-	private static final double B1_T4 = +1.2085380e+000;
-	private static final double B1_T5 = +1.3534957e+000;
-	private static final double B1_W_E_DIST = -3.6895583e-005;
-	private static final double B2_AGE = -4.1488669e-001;
-	private static final double B2_AGE_LN = +1.0533422e+001;
-	private static final double B2_AGE_SEX = +6.1815687e-003;
-	private static final double B2_AGE_SQ = +1.6963341e-003;
-	private static final double B2_FRENCH = +1.6439993e-001;
-	private static final double B2_GEN = +5.2913082e-001;
-	private static final double B2_INC = +1.7899927e-001;
-	private static final double B2_INC_LN = +1.0274846e-001;
-	private static final double B2_INC_SQ = -1.0274846e-001;
-	private static final double B2_ITALIAN = +5.5102854e-001;
-	private static final double B2_NAT = +7.9417233-001;
-	private static final double B2_T2 = +8.3935137e-001;
-	private static final double B2_T3 = +1.0932893e+000;
-	private static final double B2_T4 = +1.4767330e+000;
-	private static final double B2_T5 = +1.7120490e+000;
-	private static final double B2_W_E_DIST = +3.1602868e-005;
-	private static final double B3_AGE = -6.7972513e-002;
-	private static final double B3_AGE_LN = +1.7386385e+000;
-	private static final double B3_AGE_SEX = +2.2658816e-003;
-	private static final double B3_AGE_SQ = +2.0214453e-004;
-	private static final double B3_GEN = -3.7301596e-002;
-	private static final double B3_INC = +7.6523606e-002;
-	private static final double B3_INC_LN = -4.3553585e-002;
-	private static final double B3_INC_SQ = -1.5087563e-003;
-	private static final double B3_NAT = +8.0695049e-001;
-	private static final double B3_T2 = -6.3631171e-001;
-	private static final double B3_T3 = -3.7814508e-001;
-	private static final double B3_T4 = -5.8141117e-001;
-	private static final double B3_T5 = -9.1254621e-001;
-	private static final double B3_W_E_DIST = +4.6258239e-005;
-	private static final double B4_AGE = +2.7800712e-001;
-	private static final double B4_AGE_LN = -5.0392905e+000;
-	private static final double B4_AGE_SEX = -6.9136356e-004;
-	private static final double B4_AGE_SQ = -2.0070719e-003;
-	private static final double B4_FRENCH = -1.8462767e+000;
-	private static final double B4_GEN = +9.3001714e-002;
-	private static final double B4_INC = +5.4223347e-001;
-	private static final double B4_INC_LN = -5.3339773e-001;
-	private static final double B4_INC_SQ = -1.4806047e-002;
-	private static final double B4_ITALIAN = -1.7078714e+000;
-	private static final double B4_NAT = +1.6586562e+000;
-	private static final double B4_T2 = -6.8027995e-002;
-	private static final double B4_T3 = +1.6764483e-001;
-	private static final double B4_T4 = +2.0102510e-001;
-	private static final double B4_T5 = -3.1332454e-002;
-	private static final double B4_W_E_DIST = +4.1951885e-005;
-	
-	private static final double B5_AGE = -2.0857020e-001;
-	private static final double B5_AGE_LN = +6.2487346e+000;
-	private static final double B5_AGE_SEX = +5.8652982e-003;
-	private static final double B5_AGE_SQ = +7.8388047e-004;
-	private static final double B5_FRENCH = -6.0817122e-001;
-	private static final double B5_GEN = +2.2564616e-001;
-	private static final double B5_INC = +3.8396470e-001;
-	private static final double B5_INC_LN = -1.5536946e-001;
-	private static final double B5_INC_SQ = -7.1894039e-003;
-	private static final double B5_ITALIAN = -8.9246762e-001;
-	private static final double B5_NAT = +1.3928543e+000;
-	private static final double B5_T2 = +3.6643303e-001;
-	private static final double B5_T3 = +6.1872312e-001;
-	private static final double B5_T4 = +8.6858026e-001;
-	private static final double B5_T5 = +7.1583654e-001;
-	private static final double B5_W_E_DIST = +4.3733178e-005;
-	private static final double KONST1 = +1.1260062-001;
-	private static final double KONST2 = -2.6218601e+001;
-	private static final double KONST3 = -5.2957412e+000;
-	private static final double KONST4 = +8.1598019e+000;
-	private static final double KONST5 = -1.8162738e+001;
+	private static final double B0_GAS95_P = -1.2957811e+000;
+	private static final double B0_HH_DIM = +1.4608430e-001;
+	private static final double B0_HH_KIDS = -5.4094257e-002;
+	private static final double B1_AGE_18_29 = +9.3633111e-002;
+	private static final double B1_AGE_60 = -8.5914328e-001;
+	private static final double B1_AGE_SEX = -3.3176276e-002;
+	private static final double B1_FRENCH = -1.3222215e+000;
+	private static final double B1_GEN = +1.6745826e+000;
+	private static final double B1_INC_12 = +9.6015133e-001;
+	private static final double B1_INC_4 = -8.3574517e-001;
+	private static final double B1_INC_8_12 = +4.1639338e-001;
+	private static final double B1_ITALIAN = -9.3684671e-001;
+	private static final double B1_NAT = +8.3670645e-001;
+	private static final double B1_T2 = +4.6616179e-001;
+	private static final double B1_T3 = +9.6655131e-001;
+	private static final double B1_T4 = +1.1979197e+000;
+	private static final double B1_T5 = +1.3626437e+000;
+	private static final double B1_W_E_DIST = -3.5280912e-005;
+	private static final double B2_AGE_18_29 = -1.7633305e-001;
+	private static final double B2_AGE_60 = -5.3550974e-001;
+	private static final double B2_AGE_SEX = +1.5848388e-003;
+	private static final double B2_FRENCH = +1.6759431e-001;
+	private static final double B2_GEN = +7.0292617e-001;
+	private static final double B2_INC_12 = +1.4939409e+000;
+	private static final double B2_INC_4 = -7.3483549e-001;
+	private static final double B2_INC_8_12 = +6.9240154e-001;
+	private static final double B2_ITALIAN = +5.3283188e-001;
+	private static final double B2_NAT = +7.05506333-001;
+	private static final double B2_T2 = +8.0754814e-001;
+	private static final double B2_T3 = +1.0547861e+000;
+	private static final double B2_T4 = +1.4480490e+000;
+	private static final double B2_T5 = +1.6913581e+000;
+	private static final double B2_W_E_DIST = +3.1583928e-005;
+	private static final double B3_AGE_12_17 = -1.8218924e-001;
+	private static final double B3_AGE_18_29 = +2.9131596e-001;
+	private static final double B3_AGE_60 = -2.0115026e-001;
+	private static final double B3_AGE_6_11 = -8.112659e-001;
+	private static final double B3_AGE_SEX = +1.4142018e-003;
+	private static final double B3_GEN = -1.7009944e-002;
+	private static final double B3_INC_12 = +3.7940817e-001;
+	private static final double B3_INC_4 = -5.8499360e-002;
+	private static final double B3_INC_8_12 = +3.5589653e-001;
+	private static final double B3_NAT = +7.6781459e-001;
+	private static final double B3_T2 = -6.4973000e-001;
+	private static final double B3_T3 = -3.9207519e-001;
+	private static final double B3_T4 = -5.8959534e-001;
+	private static final double B3_T5 = -9.1325318e-001;
+	private static final double B3_W_E_DIST = +4.6224506e-005;
+	private static final double B4_AGE_18_29 = +3.9536559e-001;
+	private static final double B4_AGE_60 = -5.5530334e-001;
+	private static final double B4_AGE_SEX = -1.1765808e-002;
+	private static final double B4_FRENCH = -1.8035350e+000;
+	private static final double B4_GEN = +5.3184756e-001;
+	private static final double B4_INC_12 = +1.7285220e+000;
+	private static final double B4_INC_4 = -1.0058346e+000;
+	private static final double B4_INC_8_12 = +9.4541946e-001;
+	private static final double B4_ITALIAN = -1.6527274e+000;
+	private static final double B4_NAT = +1.5960829e+000;
+	private static final double B4_T2 = -9.0671684e-002;
+	private static final double B4_T3 = +1.4828357e-001;
+	private static final double B4_T4 = +2.1596504e-001;
+	private static final double B4_T5 = +2.4716905e-002;
+	private static final double B4_W_E_DIST = +4.2815586e-005;
+	private static final double B5_AGE_18_29 = -4.6618995e-001;
+	private static final double B5_AGE_60 = +3.8088325e-003;
+	private static final double B5_AGE_SEX = +7.7849939e-003;
+	private static final double B5_FRENCH = -5.8355826e-001;
+	private static final double B5_GEN = +9.3959603e-002;
+	private static final double B5_INC_12 = +1.9991203e+000;
+	private static final double B5_INC_4 = -1.0593960e+000;
+	private static final double B5_INC_8_12 = +9.4722134e-001;
+	private static final double B5_ITALIAN = -8.9535261e-001;
+	private static final double B5_NAT = +1.3489224e+000;
+	private static final double B5_T2 = +3.5924078e-001;
+	private static final double B5_T3 = +6.0108309e-001;
+	private static final double B5_T4 = +8.6789855e-001;
+	private static final double B5_T5 = +7.1406685e-001;
+	private static final double B5_W_E_DIST = +4.3587748e-005;
+	private static final double KONST1 = -1.2297866+000;
+	private static final double KONST2 = -1.4998450e-001;
+	private static final double KONST3 = -1.1246506e+000;
+	private static final double KONST4 = -8.9209655e-001;
+	private static final double KONST5 = -4.6626479e-001;
 	
 	private double age; // 0-[unlimited]
 	private double sex; // male = 1; female = 0
@@ -289,16 +285,17 @@ public class ModelMobilityTools {
 		double util = 0.0;
 		if (license == 0.0) { return Double.NEGATIVE_INFINITY; }
 		util += KONST1 * 1.0;
-		util += B1_AGE * age;
-		util += B1_AGE_SQ * (age * age); // check that
-		util += B1_AGE_LN * Math.log(age);
 		util += B1_GEN * sex;
 		util += B1_AGE_SEX * (age * sex);
 		util += B1_NAT * nat;
 		util += B1_W_E_DIST * disthw;
-		util += B1_INC * inc;
-		util += B1_INC_SQ * (inc * inc);
-		util += B1_INC_LN * Math.log(inc);
+		if (age >=30 & age <60) { /*reference type*/}
+		else if (age >= 18 & age <30) {util += B1_AGE_18_29 * 1.0; }
+		else if (age >= 60) {util += B1_AGE_60 * 1.0; }
+		if (inc >=4 & inc < 8){ /* reference type */ }
+		else if (inc < 4 ){util += B1_INC_4 * 1.0; }
+		else if (inc >=8 & inc < 12) {util += B1_INC_8_12 * 1.0;}
+		else if (inc >= 12) {util += B1_INC_12 * 1.0;}
 		if (udeg == 1) { /* reference type */ }
 		else if (udeg == 2) { util += B1_T2 * 1.0; }
 		else if (udeg == 3) { util += B1_T3 * 1.0; }
@@ -322,16 +319,17 @@ public class ModelMobilityTools {
 		double util = 0.0;
 		if (license == 0.0) { return Double.NEGATIVE_INFINITY; }
 		util += KONST2 * 1.0;
-		util += B2_AGE * age;
-		util += B2_AGE_SQ * (age * age);
-		util += B2_AGE_LN * Math.log(age);
 		util += B2_GEN * sex;
 		util += B2_AGE_SEX * (age * sex);
 		util += B2_NAT * nat;
 		util += B2_W_E_DIST * disthw;
-		util += B2_INC * inc;
-		util += B2_INC_SQ * (inc * inc);
-		util += B2_INC_LN * Math.log(inc);
+		if (age >=30 & age <60) { /*reference type*/}
+		else if (age >= 18 & age <30) {util += B2_AGE_18_29 * 1.0; }
+		else if (age >= 60) {util += B2_AGE_60 * 1.0; }
+		if (inc >=4 & inc < 8){ /* reference type */ }
+		else if (inc < 4 ){util += B2_INC_4 * 1.0; }
+		else if (inc >=8 & inc < 12) {util += B2_INC_8_12 * 1.0;}
+		else if (inc >= 12) {util += B2_INC_12 * 1.0;}
 		if (udeg == 1) { /* reference type */ }
 		else if (udeg == 2) { util += B2_T2 * 1.0; }
 		else if (udeg == 3) { util += B2_T3 * 1.0; }
@@ -353,16 +351,19 @@ public class ModelMobilityTools {
 		// B3_T2 * T2 + B3_T3 * T3 + B3_T4 * T4 + B3_T5 * T5
 		double util = 0.0;
 		util += KONST3 * 1.0;
-		util += B3_AGE * age;
-		util += B3_AGE_SQ * (age * age); // check that
-		util += B3_AGE_LN * Math.log(age);
 		util += B3_GEN * sex;
 		util += B3_AGE_SEX * (age * sex);
 		util += B3_NAT * nat;
 		util += B3_W_E_DIST * disthw;
-		util += B3_INC * inc;
-		util += B3_INC_SQ * (inc * inc);
-		util += B3_INC_LN * Math.log(inc);
+		if (age >=30 & age <60) { /*reference type*/}
+		else if (age >= 6 & age <12) {util += B3_AGE_6_11 * 1.0; }
+		else if (age >= 12 & age <18) {util += B3_AGE_12_17 * 1.0; }
+		else if (age >= 18 & age <30) {util += B3_AGE_18_29 * 1.0; }
+		else if (age >= 60) {util += B3_AGE_60 * 1.0; }
+		if (inc >=4 & inc < 8){ /* reference type */ }
+		else if (inc < 4 ){util += B3_INC_4 * 1.0; }
+		else if (inc >=8 & inc < 12) {util += B3_INC_8_12 * 1.0;}
+		else if (inc >= 12) {util += B3_INC_12 * 1.0;}
 		if (udeg == 1) { /* reference type */ }
 		else if (udeg == 2) { util += B3_T2 * 1.0; }
 		else if (udeg == 3) { util += B3_T3 * 1.0; }
@@ -382,16 +383,17 @@ public class ModelMobilityTools {
 		double util = 0.0;
 		if (license == 0.0) { return Double.NEGATIVE_INFINITY; }
 		util += KONST4 * 1.0;
-		util += B4_AGE * age;
-		util += B4_AGE_SQ * (age * age); // check that
-		util += B4_AGE_LN * Math.log(age);
 		util += B4_GEN * sex;
 		util += B4_AGE_SEX * (age * sex);
 		util += B4_NAT * nat;
 		util += B4_W_E_DIST * disthw;
-		util += B4_INC * inc;
-		util += B4_INC_SQ * (inc * inc);
-		util += B4_INC_LN * Math.log(inc);
+		if (age >=30 & age <60) { /*reference type*/}
+		else if (age >= 18 & age <30) {util += B4_AGE_18_29 * 1.0; }
+		else if (age >= 60) {util += B4_AGE_60 * 1.0; }
+		if (inc >=4 & inc < 8){ /* reference type */ }
+		else if (inc < 4 ){util += B4_INC_4 * 1.0; }
+		else if (inc >=8 & inc < 12) {util += B4_INC_8_12 * 1.0;}
+		else if (inc >= 12) {util += B4_INC_12 * 1.0;}
 		if (udeg == 1) { /* reference type */ }
 		else if (udeg == 2) { util += B4_T2 * 1.0; }
 		else if (udeg == 3) { util += B4_T3 * 1.0; }
@@ -415,16 +417,17 @@ public class ModelMobilityTools {
 		double util = 0.0;
 		if (license == 0.0) { return Double.NEGATIVE_INFINITY; }
 		util += KONST5 * 1.0;
-		util += B5_AGE * age;
-		util += B5_AGE_SQ * (age * age); // check that
-		util += B5_AGE_LN * Math.log(age);
 		util += B5_GEN * sex;
 		util += B5_AGE_SEX * (age * sex);
 		util += B5_NAT * nat;
 		util += B5_W_E_DIST * disthw;
-		util += B5_INC * inc;
-		util += B5_INC_SQ * (inc * inc);
-		util += B5_INC_LN * Math.log(inc);
+		if (age >=30 & age <60) { /*reference type*/}
+		else if (age >= 18 & age <30) {util += B5_AGE_18_29 * 1.0; }
+		else if (age >= 60) {util += B5_AGE_60 * 1.0; }
+		if (inc >=4 & inc < 8){ /* reference type */ }
+		else if (inc < 4 ){util += B5_INC_4 * 1.0; }
+		else if (inc >=8 & inc < 12) {util += B5_INC_8_12 * 1.0;}
+		else if (inc >= 12) {util += B5_INC_12 * 1.0;}
 		if (udeg == 1) { /* reference type */ }
 		else if (udeg == 2) { util += B5_T2 * 1.0; }
 		else if (udeg == 3) { util += B5_T3 * 1.0; }
