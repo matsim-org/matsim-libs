@@ -29,14 +29,14 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class EventLinkEnter extends LinkEvent {
 
-	private static final long serialVersionUID = -5174978275673657199L;
+	private static final long serialVersionUID = 1L;
 
-	public EventLinkEnter(double time, String agentId, String linkId, Person agent, Link lnk) {
-		super(time, agentId, linkId, agent, lnk);
+	public EventLinkEnter(final double time, final String agentId, final int legId, final String linkId, final Person agent, final Link link) {
+		super(time, agentId, linkId, agent, legId, link);
 	}
 
-	public EventLinkEnter(double time, String agentId, String linkId) {
-		super(time, agentId, linkId);
+	public EventLinkEnter(final double time, final String agentId, final int legId, final String linkId) {
+		super(time, agentId, legId, linkId);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class EventLinkEnter extends LinkEvent {
 	}
 
 	@Override
-	public void rebuild(Plans population, NetworkLayer network) {
+	public void rebuild(final Plans population, final NetworkLayer network) {
 		rebuildLinkData(population, network);
 	}
 

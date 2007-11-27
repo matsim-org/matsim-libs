@@ -57,15 +57,16 @@ public class EventsReaderTXTv1 {
 
 	}
 
-	static public final void createEvent(final Events events, final int time, final String agentId, final int legNumber, final String linkId, final int nodeId, final int flag, final String desc, final int activity, final String acttype) {
+	static public final void createEvent(final Events events, final int time, final String agentId, final int legNumber,
+			final String linkId, final int nodeId, final int flag, final String desc, final int activity, final String acttype) {
 		BasicEvent data = null;
 
 		switch (flag) {
 			case 2:
-				data = new EventLinkLeave(time, agentId, linkId);
+				data = new EventLinkLeave(time, agentId, legNumber, linkId);
 				break;
 			case 5:
-				data = new EventLinkEnter(time, agentId, linkId);
+				data = new EventLinkEnter(time, agentId, legNumber, linkId);
 				break;
 			case 3:
 				data = new EventAgentStuck(time, agentId, legNumber, linkId);
@@ -83,10 +84,18 @@ public class EventsReaderTXTv1 {
 				data = new EventAgentArrival(time, agentId, legNumber, linkId);
 				break;
 			case 7:
-				data = new EventActivityStart(time, agentId, linkId, activity, acttype);
+				if ("".equals(acttype) && desc != null) {
+					data = new EventActivityStart(time, agentId, linkId, activity, desc.replace("actstart ", ""));
+				} else {
+					data = new EventActivityStart(time, agentId, linkId, activity, acttype);
+				}
 				break;
 			case 8:
-				data = new EventActivityEnd(time, agentId, linkId, activity, acttype);
+				if ("".equals(acttype) && desc != null) {
+					data = new EventActivityEnd(time, agentId, linkId, activity, desc.replace("actend ", ""));
+				} else {
+					data = new EventActivityEnd(time, agentId, linkId, activity, acttype);
+				}
 				break;
 		}
 		if (data != null) events.processEvent(data);
@@ -103,7 +112,7 @@ public class EventsReaderTXTv1 {
 									result[3],		// linkID
 									Integer.parseInt(result[4]),		// nodeID
 									Integer.parseInt(result[5]),		// flag
-									result[6], 0,"");		// description
+									result[6], 0, "");		// description
 		}
 	}
 

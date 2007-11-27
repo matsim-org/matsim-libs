@@ -30,17 +30,17 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.xml.sax.helpers.AttributesImpl;
 
-abstract class AgentEvent extends BasicEvent {
+public abstract class AgentEvent extends BasicEvent {
 
-	//includes data about the agent and agent internas like legnumber, etc
-	private int legId;
+	//includes data about the agent and agent internalss like legnumber, etc
+	public int legId;
 	public transient Leg leg;
-	
+
 	public String linkId;
 	public transient Link link;
-		
 
-	AgentEvent(double time, String agentId, int legId,  String linkId, Person agent, Leg leg, Link link) {
+
+	AgentEvent(final double time, final String agentId, final int legId,  final String linkId, final Person agent, final Leg leg, final Link link) {
 		super(time, agentId, agent);
 		this.legId = legId;
 		this.leg = leg;
@@ -48,35 +48,33 @@ abstract class AgentEvent extends BasicEvent {
 		this.link = link;
 	}
 
-	AgentEvent(double time, String agentId, int legId, String linkId) {
+	AgentEvent(final double time, final String agentId, final int legId, final String linkId) {
 		super(time, agentId);
 		this.legId = legId;
 		this.linkId = linkId;
 	}
 
-
 	// Helper methods
 	protected AttributesImpl getAttributesImpl() {
 		AttributesImpl attr = new AttributesImpl();
 
-		long time = (long)this.time; // TODO [DS] output sollte auf "double" umgestellt werden
-		attr.addAttribute("","","time", "", Long.toString(time));
-		attr.addAttribute("","","agent", "", agentId);
-		attr.addAttribute("","","link", "", linkId);
-		attr.addAttribute("","","leg", "", Integer.toString(legId));
+		long time = (long)this.time; // TODO [DS] switch to double for times
+		attr.addAttribute("", "", "time", "", Long.toString(time));
+		attr.addAttribute("", "", "agent", "", this.agentId);
+		attr.addAttribute("", "", "link", "", this.linkId);
+		attr.addAttribute("", "", "leg", "", Integer.toString(this.legId));
 		return attr;
 	}
 
 	protected String asString() {
-		return getTimeString(this.time) + agentId + "\t"+ legId + "\t"+ linkId + "\t0\t"; // FLAG + DESCRIPTION is mising here: concat later
+		return getTimeString(this.time) + this.agentId + "\t"+ this.legId + "\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is mising here: concat later
 	}
 
-
-	protected void rebuildAgentData(Plans population, NetworkLayer network) {
-		agent = population.getPerson(agentId);
-		List<Plan> plans = agent.getPlans();
+	protected void rebuildAgentData(final Plans population, final NetworkLayer network) {
+		this.agent = population.getPerson(this.agentId);
+		List<Plan> plans = this.agent.getPlans();
 		Plan selPlan = null;
 		for (Plan plan : plans) if (plan.isSelected())selPlan = plan;
-		leg = (Leg)selPlan.getActsLegs().get(legId*2+1);
+		this.leg = (Leg)selPlan.getActsLegs().get(this.legId*2+1);
 	}
 }

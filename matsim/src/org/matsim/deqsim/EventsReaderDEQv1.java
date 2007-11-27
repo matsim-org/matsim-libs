@@ -156,10 +156,10 @@ public class EventsReaderDEQv1 {
 
 		switch (flag) {
 			case 2:
-				event = new EventLinkLeave(time, Integer.toString(agentID), Integer.toString(linkID));
+				event = new EventLinkLeave(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
 				break;
 			case 5:
-				event = new EventLinkEnter(time, Integer.toString(agentID), Integer.toString(linkID));
+				event = new EventLinkEnter(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
 				break;
 			case 4:
 				event = new EventAgentWait2Link(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));

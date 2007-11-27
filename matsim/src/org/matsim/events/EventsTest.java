@@ -199,9 +199,9 @@ public class EventsTest {
         System.out.println("--------------------------------------");
 		events.computeEvent(new EventAgentArrival(0,"2",0,"3"));
         System.out.println("--------------------------------------");
-		events.computeEvent(new EventLinkLeave(0,"1","1"));
+		events.computeEvent(new EventLinkLeave(0, "1", 0, "1"));
         System.out.println("--------------------------------------");
-		events.computeEvent(new EventLinkEnter(0,"2","1"));
+		events.computeEvent(new EventLinkEnter(0, "2", 0, "1"));
         System.out.println("--------------------------------------");
 		BasicEvent ev = new EventAgentNoRoute(0,"3",0,"30");
 		events.computeEvent(ev);

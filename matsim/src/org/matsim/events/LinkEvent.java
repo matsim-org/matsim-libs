@@ -26,39 +26,43 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.xml.sax.helpers.AttributesImpl;
 
-abstract class LinkEvent extends BasicEvent{
-	
+abstract class LinkEvent extends BasicEvent {
+
 	public String linkId;
 	public transient Link link;
-	
-	LinkEvent(double time, String aID, String lID, Person agent, Link lnk) { 
-		super(time, aID, agent); 
-		linkId = lID; 
-		link = lnk;
+	public int legId;
+
+	LinkEvent(final double time, final String agentId, final String linkId, final Person agent, final int legId, final Link link) {
+		super(time, agentId, agent);
+		this.legId = legId;
+		this.linkId = linkId;
+		this.link = link;
 	}
-	
-	LinkEvent(double time, String aID, String lID) { 
-		super(time, aID); 
-		linkId = lID; 
+
+	LinkEvent(final double time, final String agentId, final int legId, final String linkId) {
+		super(time, agentId);
+		this.legId = legId;
+		this.linkId = linkId;
 	}
-	
+
 	protected AttributesImpl getAttributesImpl() {
 		AttributesImpl attr = new AttributesImpl();
 
-		long time = (long)this.time; // DS TODO output sollte auf "double" umgestellt werden
+		long time = (long)this.time; // TODO [DS] switch to double for times
 		attr.addAttribute("","","time", "", Long.toString(time));
-		attr.addAttribute("","","agent", "", agentId);
-		attr.addAttribute("","","link", "", linkId);
+		attr.addAttribute("","","agent", "", this.agentId);
+		attr.addAttribute("","","link", "", this.linkId);
+		attr.addAttribute("","","leg", "", Integer.toString(this.legId));
 		return attr;
 	}
 
 	protected String asString() {
-		return getTimeString(this.time) + agentId + "\t0\t" + linkId + "\t0\t"; // FLAG + DESCRIPTION is mising here: concat later
+		return getTimeString(this.time) + this.agentId + "\t" + this.legId + "\t" + this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
 	}
-	
-	protected void rebuildLinkData(Plans population, NetworkLayer network) {
-		agent = population.getPerson(agentId);
-		link = (Link)network.getLocation(linkId);
+
+	protected void rebuildLinkData(final Plans population, final NetworkLayer network) {
+		this.agent = population.getPerson(this.agentId);
+		this.link = (Link)network.getLocation(this.linkId);
 	}
 
 }

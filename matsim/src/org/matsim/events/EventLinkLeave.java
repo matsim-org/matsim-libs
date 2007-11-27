@@ -29,20 +29,19 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class EventLinkLeave extends LinkEvent {
 
-	private static final long serialVersionUID = -6876760768039952024L;
+	private static final long serialVersionUID = 1L;
 
-	public EventLinkLeave(double time, String agentId, String linkId, Person agent, Link lnk) {
-		super(time, agentId, linkId, agent, lnk);
+	public EventLinkLeave(final double time, final String agentId, final int legId, final String linkId, final Person agent, final Link link) {
+		super(time, agentId, linkId, agent, legId, link);
 	}
 
-	public EventLinkLeave(double time, String agentId, String linkId) {
-		super(time, agentId, linkId);
+	public EventLinkLeave(final double time, final String agentId, final int legId, final String linkId) {
+		super(time, agentId, legId, linkId);
 	}
 
 	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
-		//impl.addAttribute("","","Flag", "", Integer.toString(2));
 		impl.addAttribute("","","type", "", "left link");
 		return impl;
 	}
@@ -53,7 +52,7 @@ public class EventLinkLeave extends LinkEvent {
 	}
 
 	@Override
-	public void rebuild(Plans population, NetworkLayer network) {
+	public void rebuild(final Plans population, final NetworkLayer network) {
 		rebuildLinkData(population, network);
 	}
 

@@ -20,9 +20,6 @@
 
 package org.matsim.events;
 
-import org.matsim.events.BasicEvent;
-import org.matsim.events.EventLinkLeave;
-import org.matsim.events.Events;
 import org.matsim.events.handler.BasicEventHandlerI;
 import org.matsim.events.handler.EventHandlerI;
 import org.matsim.testcases.MatsimTestCase;
@@ -48,10 +45,10 @@ public class EventsHandlerHierarchy extends MatsimTestCase {
 		Events events = new Events();
 
 		EventHandlerI cc = new B();
-		events.computeEvent(new EventLinkLeave(0.,"",""));
+		events.computeEvent(new EventLinkLeave(0., "", 0, ""));
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
-		events.computeEvent(new EventLinkLeave(0.,"",""));
+		events.computeEvent(new EventLinkLeave(0., "", 0, ""));
 		assertEquals(this.eventHandled, 1);
 	}
 }

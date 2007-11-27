@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.PriorityQueue;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventAgentStuck;
@@ -161,7 +160,7 @@ public class QueueLink extends Link {
 			if ( spaceCapWarningCount <=10 ) {
 				System.err.println(" link " + this.id + " too small: enlarge spaceCap");
 				if ( spaceCapWarningCount == 10 ) {
-					System.err.println(" Additional warnings of this type are suppressed.");					
+					System.err.println(" Additional warnings of this type are suppressed.");
 				}
 				spaceCapWarningCount++ ;
 			}
@@ -302,7 +301,7 @@ public class QueueLink extends Link {
 
 			// using the following line instead should, I think, be an easy way to make the mobsim
 			// stochastic. not tested. kai
-//			} else if ( Gbl.random.nextDouble() < this.buffercap_accumulate ) { 
+//			} else if ( Gbl.random.nextDouble() < this.buffercap_accumulate ) {
 
 			} else if (this.buffercap_accumulate >= 1.0) {
 				this.buffercap_accumulate--;
@@ -391,8 +390,8 @@ public class QueueLink extends Link {
 		this.vehQueue.add(veh);
 		veh.setDepartureTime_s((int) (now + this.freeTravelDuration));
 		QueueSimulation.getEvents().processEvent(
-				new EventLinkEnter(now, veh.getDriverID(), getId().toString(), veh
-						.getDriver(), this));
+				new EventLinkEnter(now, veh.getDriverID(), veh.getCurrentLegNumber(),
+						this.getId().toString(), veh.getDriver(), this));
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -430,7 +429,8 @@ public class QueueLink extends Link {
 		}
 
 		QueueSimulation.getEvents().processEvent(
-				new EventLinkLeave(now, veh.getDriverID(), getId().toString(), veh.getDriver(), this));
+				new EventLinkLeave(now, veh.getDriverID(), veh.getCurrentLegNumber(),
+						this.getId().toString(), veh.getDriver(), this));
 
 		return veh;
 	}
@@ -453,10 +453,10 @@ public class QueueLink extends Link {
 		return this.buffercount == 0;
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// returns TRUE if there is less veh in (buffer + veh Queue) == the
-	// whole link, than the links cap == #lanes * linklength
-	// ////////////////////////////////////////////////////////////////////
+	/**
+	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (= the whole link),
+	 * than there is space for vehicles.
+	 */
 	synchronized public boolean hasSpace() {
 		if (this.vehQueue.size() < getSpaceCap())
 			return true;
@@ -467,9 +467,9 @@ public class QueueLink extends Link {
 		return this.vehQueue.size();
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// if there is less veh in buffer than the flowCapacitys ceil (<=)
-	// ////////////////////////////////////////////////////////////////////
+	/**
+	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
+	 */
 	private boolean hasBufferSpace() {
 		if (this.buffercount < this.timeCapCeil)
 			return true;
@@ -732,8 +732,7 @@ public class QueueLink extends Link {
 		private static final long serialVersionUID = 1L;
 
 		public int compare(final QueueLink o1, final QueueLink o2) {
-//			return o1.getId().compareTo(o2.getId());
-			return ((Id)o1.getId()).compareTo(((Id)o2.getId()));
+			return o1.getId().toString().compareTo(o2.getId().toString());
 		}
 
 	}

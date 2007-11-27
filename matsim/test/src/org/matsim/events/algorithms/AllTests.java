@@ -28,6 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.matsim.events.algorithms");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(CalcLegNumberTest.class);
 		suite.addTestSuite(TravelTimeCalculatorTest.class);
 		//$JUnit-END$
 		return suite;

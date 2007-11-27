@@ -35,7 +35,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class AbstractControlInputImplTest extends MatsimTestCase {
 
 	private static final String networkPath = "./test/input/org/matsim/withinday/trafficmanagement/AbstractControlInputImplTest/testAbstractControlInputImpl/network.xml";
-	
+
 	/**
 	 * @see junit.framework.TestCase#setUp()
 	 */
@@ -55,72 +55,72 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 		route1.setRoute("3 6 7 12");
 		Route route2 = new Route();
 		route2.setRoute("3 8 9 12");
-		
+
 		//control input test class
 		ControlInputTestImpl ci = new ControlInputTestImpl();
 		ci.setMainRoute(route1);
 		ci.setAlternativeRoute(route2);
 		ci.init();
-		
+
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		EventLinkEnter enterEvent = new EventLinkEnter(0.0, "0", "5");
+		EventLinkEnter enterEvent = new EventLinkEnter(0.0, "0", 0, "5");
 		ci.handleEvent(enterEvent);
 		assertEquals(1, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		enterEvent = new EventLinkEnter(0.0, "1", "5");	
+		enterEvent = new EventLinkEnter(0.0, "1", 0, "5");
 		ci.handleEvent(enterEvent);
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		EventLinkLeave leaveEvent = new EventLinkLeave(1.0, "0", "5");
+		EventLinkLeave leaveEvent = new EventLinkLeave(1.0, "0", 0, "5");
 		ci.handleEvent(leaveEvent);
-		enterEvent = new EventLinkEnter(1.0, "0", "6");
+		enterEvent = new EventLinkEnter(1.0, "0", 0, "6");
 		ci.handleEvent(enterEvent);
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		enterEvent = new EventLinkEnter(1.0, "2", "7");
+		enterEvent = new EventLinkEnter(1.0, "2", 0, "7");
 		ci.handleEvent(enterEvent);
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(1, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new EventLinkLeave(2.0, "2", "7");
+		leaveEvent = new EventLinkLeave(2.0, "2", 0, "7");
 		ci.handleEvent(leaveEvent);
-		enterEvent = new EventLinkEnter(2.0, "2", "8");
+		enterEvent = new EventLinkEnter(2.0, "2", 0, "8");
 		ci.handleEvent(enterEvent);
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(1, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new EventLinkLeave(3.0, "2", "8");
+		leaveEvent = new EventLinkLeave(3.0, "2", 0, "8");
 		ci.handleEvent(leaveEvent);
-		enterEvent = new EventLinkEnter(3.0, "2", "16");
+		enterEvent = new EventLinkEnter(3.0, "2", 0, "16");
 		ci.handleEvent(enterEvent);
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(1, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new EventLinkLeave(4.0, "2", "16");
+		leaveEvent = new EventLinkLeave(4.0, "2", 0, "16");
 		ci.handleEvent(leaveEvent);
-		enterEvent = new EventLinkEnter(4.0, "2", "20");
+		enterEvent = new EventLinkEnter(4.0, "2", 0, "20");
 		ci.handleEvent(enterEvent);
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new EventLinkLeave(4.0, "1", "5");
+		leaveEvent = new EventLinkLeave(4.0, "1", 0, "5");
 		ci.handleEvent(leaveEvent);
-		enterEvent = new EventLinkEnter(4.0, "1", "6");
+		enterEvent = new EventLinkEnter(4.0, "1", 0, "6");
 		ci.handleEvent(enterEvent);
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new EventLinkLeave(4.0, "1", "5");
+		leaveEvent = new EventLinkLeave(4.0, "1", 0, "5");
 		ci.handleEvent(leaveEvent);
-		enterEvent = new EventLinkEnter(4.0, "1", "6");
+		enterEvent = new EventLinkEnter(4.0, "1", 0, "6");
 		ci.handleEvent(enterEvent);
 		assertEquals(2, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-		leaveEvent = new EventLinkLeave(4.0, "1", "6");
+		leaveEvent = new EventLinkLeave(4.0, "1", 0, "6");
 		ci.handleEvent(leaveEvent);
-		enterEvent = new EventLinkEnter(4.0, "1", "20");
+		enterEvent = new EventLinkEnter(4.0, "1", 0, "20");
 		ci.handleEvent(enterEvent);
 		assertEquals(1, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));
-    leaveEvent = new EventLinkLeave(1.0, "0", "6");
+    leaveEvent = new EventLinkLeave(1.0, "0", 0, "6");
 		ci.handleEvent(leaveEvent);
-		enterEvent = new EventLinkEnter(1.0, "0", "20");
+		enterEvent = new EventLinkEnter(1.0, "0", 0, "20");
 		ci.handleEvent(enterEvent);
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route1));
 		assertEquals(0, ci.getNumberOfVehiclesOnRoute(route2));

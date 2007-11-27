@@ -1,0 +1,117 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CalcLegNumbers.java.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.events.algorithms;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
+import org.matsim.events.AgentEvent;
+import org.matsim.events.EventAgentArrival;
+import org.matsim.events.EventAgentDeparture;
+import org.matsim.events.EventAgentNoRoute;
+import org.matsim.events.EventAgentStuck;
+import org.matsim.events.EventAgentWait2Link;
+import org.matsim.events.EventLinkEnter;
+import org.matsim.events.EventLinkLeave;
+import org.matsim.events.handler.EventHandlerAgentArrivalI;
+import org.matsim.events.handler.EventHandlerAgentDepartureI;
+import org.matsim.events.handler.EventHandlerAgentNoRouteI;
+import org.matsim.events.handler.EventHandlerAgentStuckI;
+import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
+import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.utils.identifiers.IdI;
+
+/**
+ * Sets the correct leg-number in events. For each agent, a counter is increased with every departure event, starting with 0 at the first departure event.
+ *
+ * @author mrieser
+ */
+public class CalcLegNumber implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, EventHandlerAgentWait2LinkI,
+		EventHandlerAgentStuckI, EventHandlerAgentNoRouteI, EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
+
+	/**
+	 * Map containing <agent-id, legCount>.
+	 */
+	final private Map<IdI, Integer> legCounters = new TreeMap<IdI, Integer>();
+
+	final private static Logger log = Logger.getLogger(CalcLegNumber.class);
+
+	public void reset(final int iteration) {
+		this.legCounters.clear();
+	}
+
+	public void handleEvent(final EventAgentDeparture event) {
+		Id id = new Id(event.agentId);
+		Integer counter = this.legCounters.get(id);
+		if (counter == null) {
+			event.legId = 0;
+		} else {
+			event.legId = counter.intValue() + 1;
+		}
+		this.legCounters.put(id, Integer.valueOf(event.legId));
+	}
+
+	public void handleEvent(final EventAgentArrival event) {
+		setLegNumber(event);
+	}
+
+	public void handleEvent(final EventAgentWait2Link event) {
+		setLegNumber(event);
+	}
+
+	public void handleEvent(final EventAgentStuck event) {
+		setLegNumber(event);
+	}
+
+	public void handleEvent(final EventAgentNoRoute event) {
+		setLegNumber(event);
+	}
+
+	public void handleEvent(final EventLinkEnter event) {
+		Integer counter = this.legCounters.get(new Id(event.agentId));
+		if (counter == null) {
+			log.warn("Cannot find leg counter for agent " + event.agentId + " for event at time " + event.time + ". Most likely, a departure-event is missing for this agent.");
+			return;
+		}
+		event.legId = counter.intValue();
+	}
+
+	public void handleEvent(final EventLinkLeave event) {
+		Integer counter = this.legCounters.get(new Id(event.agentId));
+		if (counter == null) {
+			log.warn("Cannot find leg counter for agent " + event.agentId + " for event at time " + event.time + ". Most likely, a departure-event is missing for this agent.");
+			return;
+		}
+		event.legId = counter.intValue();
+	}
+
+	private void setLegNumber(final AgentEvent event) {
+		Integer counter = this.legCounters.get(new Id(event.agentId));
+		if (counter == null) {
+			log.warn("Cannot find leg counter for agent " + event.agentId + " for event at time " + event.time + ". Most likely, a departure-event is missing for this agent.");
+			return;
+		}
+		event.legId = counter.intValue();
+	}
+}
