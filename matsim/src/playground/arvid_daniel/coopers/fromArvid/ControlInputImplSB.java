@@ -23,6 +23,7 @@ package playground.arvid_daniel.coopers.fromArvid;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventLinkEnter;
@@ -46,36 +47,37 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /* Does the same as ControlInputImpl1.java, but also:
 Predicts the travel time on the two routes, WITHOUT base traffic flows.
-Travel time on the congested route is calculated by dividing the route 
-in two parts, one before and one after the accident location. 
+Travel time on the congested route is calculated by dividing the route
+in two parts, one before and one after the accident location.
 Model checks if there will be a queue or not and calculates the travel times according to
-the outflow through the bottleneck and the free flow velocity. 
+the outflow through the bottleneck and the free flow velocity.
 */
 
-public class ControlInputImplSB extends AbstractControlInputImpl 
-implements EventHandlerLinkLeaveI, EventHandlerLinkEnterI, 
+public class ControlInputImplSB extends AbstractControlInputImpl
+implements EventHandlerLinkLeaveI, EventHandlerLinkEnterI,
 EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
-	
-	
+
+	private static final Logger log = Logger.getLogger(ControlInputImplSB.class);
+
 	double predTTRoute1;
-	
+
 	double predTTRoute2;
-	
+
 	private ControlInputWriter writer;
-	
+
 	private List<Accident> accidents;
 
 	public ControlInputImplSB() {
 		super();
 		this.writer = new ControlInputWriter();
 	}
-	
+
 	@Override
 	public void init() {
 		super.init();
 		this.writer.open();
 	}
-	
+
 	@Override
 	public void handleEvent(final EventLinkEnter event) {
 		super.handleEvent(event);
@@ -104,16 +106,16 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
 	// calculates the predictive NashTime with a single-bottle-neck-model.
 	public double getPredictedNashTime() {
 		if (this.accidents.isEmpty()) {
-			throw new UnsupportedOperationException("To use this controler an accident has to be set"); 
+			throw new UnsupportedOperationException("To use this controler an accident has to be set");
 		}
 		String accidentLinkId = this.accidents.get(0).getLinkId();
-		
-		
+
+
 		Link bottleNeckLinkRoute1 = searchAccidentsOnRoutes(accidentLinkId);
-		
+
 //		use first link on alternative route as default
 //		Link bottleNeckLinkRoute2 = this.alternativeRoute.getLinkRoute()[0];
-		
+
 //		use natural bottle neck as default link
 		Link bottleNeckLinkRoute2 = this.altRouteNaturalBottleNeck;
 
@@ -121,12 +123,12 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
 		this.predTTRoute2 = getPredictedTravelTime(this.alternativeRoute,	bottleNeckLinkRoute2);
 		if (log.isTraceEnabled()) {
 			log.trace("predicted time route 1: " + this.predTTRoute1);
-			log.debug("predicted time route 2: " + this.predTTRoute2);
+			log.trace("predicted time route 2: " + this.predTTRoute2);
 		}
 		return this.predTTRoute1 - this.predTTRoute2;
 	}
 
-	
+
 	private double getPredictedTravelTime(final Route route,
 			final Link bottleNeckLink) {
 		Link [] routeLinks = route.getLinkRoute();
@@ -141,18 +143,18 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
 				break;
 			}
 		}
-		
+
 		// count agents and free speed travel time(really only needed once..  if bottleneck does not move)
 		// BEFORE bottleneck
 		int agentsBeforeBottleNeck = 0;
 		for (int i = 0; i <= bottleNeckLinkNumber; i++) {
 			agentsBeforeBottleNeck += this.numberOfAgents.get(routeLinks[i]
 					.getId().toString());
-		
+
 			ttFreeSpeedBeforeBottleNeck += this.ttFreeSpeeds.get(routeLinks[i]
 					.getId().toString());
 		}
-		
+
 		// sum up free speed travel time(really only needed once...) AFTER
 		// bottleneck
 		double ttFreeSpeedAfterBottleNeck = 0 ;
@@ -160,7 +162,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
 			ttFreeSpeedAfterBottleNeck += this.ttFreeSpeeds.get(routeLinks[i]
 					.getId().toString());
 			}
-			
+
 		if (agentsBeforeBottleNeck / bottleNeckCapacity > ttFreeSpeedBeforeBottleNeck) {
 				predictedTT = (agentsBeforeBottleNeck / bottleNeckCapacity)
 					+ ttFreeSpeedAfterBottleNeck;
@@ -199,7 +201,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return getPredictedNashTime();
 
 	}
