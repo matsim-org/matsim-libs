@@ -237,7 +237,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			}
 		}
 
-		if ((this.lastTime1 > 0.) && (this.lastTime2 > 0.)
+		if ((this.lastTime1 >= 0.) && (this.lastTime2 >= 0.)
 				&& timeDifferenceHasChanged) {
 			this.timeDifference = this.lastTime1 - this.lastTime2;
 			if (log.isTraceEnabled()) {
