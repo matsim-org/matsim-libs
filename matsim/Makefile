@@ -7,9 +7,10 @@
 # add or override variables and define phony tags
 
 
-MAINCLASS = org/matsim/demandmodeling/Tests
+MAINCLASS = org/matsim/run/Controler
 CONFIG = config.xml
 DTD = config_v1.dtd
+MEMORY = -Xms1450m -Xmx1800m
 
 ######################################################################
 # do NOT change that!
@@ -20,7 +21,6 @@ SOURCEPATH = src
 JAVA = java -classpath $(LIBS):$(CLASSPATH)
 JAVAC = javac -source 1.5 -sourcepath $(SOURCEPATH) -classpath $(LIBS):$(CLASSPATH)
 PROFILER =
-MEMORY = -Xms1450m -Xmx1800m
 JAVAX = $(MEMORY) -enableassertions $(PROFILER)
 
 ######################################################################
@@ -46,15 +46,6 @@ compile:
 	$(JAVAC) $(SOURCEPATH)/$(MAINCLASS).java -d $(CLASSPATH)
 	@echo "------------------------------------------------------------"
 
-# strategy modules are loaded dynamically (classname given in config-file)
-# thus they are not referenced anywhere in the sourcecode and will not be compiled
-# together with the MainClass. So, let's compile them manually if needed.
-compile_strategies:
-	@echo "------------------------------------------------------------"
-	-mkdir $(CLASSPATH)
-	$(JAVAC) $(SOURCEPATH)/org/matsim/demandmodeling/plans/strategies/*.java -d $(CLASSPATH)
-	@echo "------------------------------------------------------------"
-
 run: compile
 	@echo "------------------------------------------------------------"
 	$(JAVA) $(JAVAX) $(MAINCLASS) $(CONFIG) $(DTD)
@@ -69,11 +60,3 @@ clean:
 	-rm -r $(CLASSPATH)
 	@echo "------------------------------------------------------------"
 
-######################################################################
-# example runs for published versions
-
-triangle:
-	${MAKE} MAINCLASS=org/matsim/demandmodeling/TriangleTest CONFIG=config_triangle.xml run
-
-validation:
-	${MAKE} MAINCLASS=org/matsim/demandmodeling/ValidationTest CONFIG=config_output-validation.xml run
