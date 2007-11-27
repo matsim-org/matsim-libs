@@ -45,66 +45,66 @@ import playground.arvid_daniel.coopers.fromArvid.ControlInputImplSB;
  */
 public abstract class AbstractControlInputImpl implements ControlInput, EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
 
-	protected static final Logger log = Logger.getLogger(ControlInputImplSB.class);
-	
+	private static final Logger log = Logger.getLogger(AbstractControlInputImpl.class);
+
 	protected Route mainRoute;
-	
+
 	protected Route alternativeRoute;
 
 	protected Map<String, Integer> numberOfAgents;
-	
+
 	protected Map <String, Double> ttFreeSpeeds;
 
 	protected String firstLinkOnMainRoute;
-	
+
 	protected String firstLinkOnAlternativeRoute;
-	
+
 	protected String lastLinkOnMainRoute;
-	
+
 	protected String lastLinkOnAlternativeRoute;
-	
+
 	protected Map<String, Double> enterEvents1;
 
 	protected Map<String, Double> enterEvents2;
-	
+
 	protected double lastTime1;
 
 	protected double lastTime2;
 
 	protected double timeDifference;
-	
+
 	protected Link altRouteNaturalBottleNeck;
-	
+
 	protected Link mainRouteNaturalBottleNeck;
 
 	protected double ttFreeSpeedAltRoute;
 
 	protected double ttFreeSpeedMainRoute;
 
-	
+
 	public AbstractControlInputImpl() {
 		this.numberOfAgents = new HashMap<String, Integer>();
 		this.enterEvents1 = new HashMap<String, Double>();
 		this.enterEvents2 = new HashMap<String, Double>();
 		this.ttFreeSpeeds = new HashMap<String, Double>();
-		
+
 		this.lastTime1 = 0.0;
 		this.lastTime2 = 0.0;
 		this.timeDifference = 0.0;
 		this.ttFreeSpeedAltRoute = 0.0;
 		this.ttFreeSpeedMainRoute = 0.0;
-		
+
 	}
-	
+
 
 	public Route getMainRoute() {
 		return this.mainRoute;
 	}
-	
+
 	public Route getAlternativeRoute() {
 		return this.alternativeRoute;
 	}
-	
+
 	public void setAlternativeRoute(final Route route) {
 		this.alternativeRoute = route;
 	}
@@ -115,7 +115,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 	}
 
 
-	
+
 	public int getNumberOfVehiclesOnRoute(final Route route) {
 		Link[] links = route.getLinkRoute();
 		int ret = 0;
@@ -138,12 +138,12 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (!this.numberOfAgents.containsKey(l.getId().toString()))  {
 				this.numberOfAgents.put(l.getId().toString(), Integer.valueOf(0));
 			}
-			
+
 			double tt = l.getLength()/l.getFreespeed();
 			this.ttFreeSpeeds.put(l.getId().toString(), tt );
 			this.ttFreeSpeedAltRoute += tt;
 		}
-		
+
 //		find the natural bottleneck on the alternative route
 		Link[] altRouteLinks = this.getAlternativeRoute().getLinkRoute();
 		altRouteNaturalBottleNeck = altRouteLinks[0];
@@ -151,12 +151,12 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if ( altRouteLinks[i].getCapacity() < altRouteNaturalBottleNeck.getCapacity() )
 				altRouteNaturalBottleNeck = altRouteLinks[i];
 		}
-		
-			
+
+
 		routeLinks = this.getMainRoute().getLinkRoute();
 		this.firstLinkOnMainRoute = routeLinks[0].getId().toString();
 		this.lastLinkOnMainRoute = routeLinks[routeLinks.length-1].getId().toString();
-		double tt;		
+		double tt;
 		for (Link l : routeLinks) {
 			if (!this.numberOfAgents.containsKey(l.getId().toString()))  {
 				this.numberOfAgents.put(l.getId().toString(), Integer.valueOf(0));
@@ -166,35 +166,35 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			this.ttFreeSpeedMainRoute += tt;
 
 		}
-		
+
 //		find the natural bottleneck on the main route
 		Link[] mainRouteLinks = this.getMainRoute().getLinkRoute();
 		mainRouteNaturalBottleNeck = mainRouteLinks[0];
 		for ( int i = 1; i < mainRouteLinks.length; i++ ) {
 			if ( mainRouteLinks[i].getCapacity() < mainRouteNaturalBottleNeck.getCapacity() )
-				mainRouteNaturalBottleNeck = mainRouteLinks[i];	
+				mainRouteNaturalBottleNeck = mainRouteLinks[i];
 		}
 	}
 
 	// memorize linkEnterEvents on the first links of the two alternative routes:
 	public void handleEvent(final EventLinkEnter event) {
 		// count the agents on the route links
-		
+
 		if (event.linkId.equals(this.firstLinkOnMainRoute)) {
 			this.enterEvents1.put(event.agentId, event.time);
 		}
 		else if (event.linkId.equals(this.firstLinkOnAlternativeRoute)) {
 			this.enterEvents2.put(event.agentId, event.time);
 		}
-		
+
 		if (this.numberOfAgents.containsKey(event.linkId)) {
 			int number = this.numberOfAgents.get(event.linkId);
 			number++;
 			this.numberOfAgents.put(event.linkId, Integer.valueOf(number));
 		}
-				
+
 	}
-	
+
 	public void handleEvent(final EventLinkLeave event) {
 		// decrease current #agents
 		if (this.numberOfAgents.containsKey(event.linkId)) {
@@ -203,7 +203,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			this.numberOfAgents.put(event.linkId, Integer.valueOf(number));
 		}
 
-		
+
 		// if someone leaves one of the last links of the two alternative routes,
 		// then
 		// - check if that vehicle entered at the beginning
@@ -236,14 +236,14 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 				}
 			}
 		}
-		
+
 		if ((this.lastTime1 > 0.) && (this.lastTime2 > 0.)
 				&& timeDifferenceHasChanged) {
 			this.timeDifference = this.lastTime1 - this.lastTime2;
 			if (log.isTraceEnabled()) {
 				log.trace("time at route 1: " + this.lastTime1);
 				log.trace("time at route 2: " + this.lastTime2);
-				log.trace("timeDifference changed: " + this.timeDifference);		}			
+				log.trace("timeDifference changed: " + this.timeDifference);		}
 			}
 	}
 
@@ -274,7 +274,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			throw new IllegalArgumentException(
 			"This route object does not exist!");
 	}
-	
+
 	public double getMeasuredRouteTravelTime(Route route) {
 		if (route == this.mainRoute )
 			return this.lastTime1;
