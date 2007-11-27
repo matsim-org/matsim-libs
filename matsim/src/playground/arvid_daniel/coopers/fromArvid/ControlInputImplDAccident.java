@@ -245,20 +245,20 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 				String linkId = routeLinks[i].getId().toString();
 
 //				To avoid round of errors, the difference has to be at last 1 second
-				if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId)) {
+				if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId) + 10)  {
 					bottleNeckCongested = true;
 					currentBottleNeck = routeLinks[i];
 					currentBottleNeckFlow = getFlow(currentBottleNeck);
 					
-					System.out.println("");
-					log.info("Current bottleneck capacity is " + currentBottleNeckCapacity + " and the measured link's flow is " + currentBottleNeckFlow);
+//					System.out.println("");
+					log.debug("Current bottleneck capacity is " + currentBottleNeckCapacity + " and the measured link's flow is " + currentBottleNeckFlow);
 					
 //					If measured flow for some reason (inexact measuring) is higher than the links capacity, use the capacity 
 					if ( currentBottleNeckFlow	< currentBottleNeckCapacity) {
 						currentBottleNeckCapacity = currentBottleNeckFlow;
 					}
 					else  // measuring is inexact
-						System.err.println("Measured tt is longer than ttfreespeed, but measured flow is not reduced.");
+						log.debug("Measured tt is longer than ttfreespeed, but measured flow is not reduced.");
 					
 
 //				do not check links before current bottleneck
@@ -271,9 +271,9 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		
 
 		if ( !isQueueOnRoute )
-			log.info("No queue on route (no capacity reduction was found)");
+			log.debug("No queue on route (no capacity reduction was found)");
 		else if (isQueueOnRoute != bottleNeckCongested)
-			log.error("There is queue on the route, but not longer than one second on for any individual link");
+			log.debug("There is queue on the route, but not longer than one second on for any individual link");
 
 		
 		// get the array index of the bottleneck link
@@ -288,7 +288,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 //		int j = bottleNeckLinkNumber;
 		double ttFreeSpeedPart = 0.0;
 
-		log.info("The BN index is " + bottleNeckLinkIndexInArray + " (link " + currentBottleNeck.getId().toString() + ").");
+		log.debug("The BN index is " + bottleNeckLinkIndexInArray + " (link " + currentBottleNeck.getId().toString() + ").");
 		
 //		Agents after bottleneck drive free speed (bottle neck index + 1)
 		for (int i = bottleNeckLinkIndexInArray + 1; i <= routeLinks.length - 1; i++) {
@@ -296,17 +296,17 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		}
 			
 		int firstCongestedLink = bottleNeckLinkIndexInArray;
-		/*
-		if ( !bottleNeckCongested ) {
+		
+/*		if ( !bottleNeckCongested ) {
 
 //			Agents before bottleneck drive free speed if they are on sparsely trafficated links
 			int j = bottleNeckLinkIndexInArray;
 //			System.out.println("Bottleneck link index: " + j);
 			while ( j >= 0 && 
-				(this.numberOfAgents.get(routeLinks[j].getId().asString()) / currentBottleNeckCapacity)
-					<= this.ttFreeSpeeds.get(routeLinks[j].getId().asString()) ) {	// is this criterium ok?
+				(this.numberOfAgents.get(routeLinks[j].getId().toString()) / currentBottleNeckCapacity)
+					<= this.ttFreeSpeeds.get(routeLinks[j].getId().toString()) ) {	// is this criterium ok?
 				
-				ttFreeSpeedPart += this.ttFreeSpeeds.get(routeLinks[j].getId().asString());
+				ttFreeSpeedPart += this.ttFreeSpeeds.get(routeLinks[j].getId().toString());
 				System.out.println("Adding to total free speed part before bottle neck; not-congested-link index " + j);
 				j--;
 				
@@ -316,34 +316,20 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		
 		else {
 			firstCongestedLink = bottleNeckLinkIndexInArray;
-		}
-		*/
-		/* The following lines are for the distribution check, which 
-		 * is obsolete in its current form. The code is kept in case
-		 * anyone wants to update and use the distribution check.
+		}*/
 		  
-//		Agents before bottleneck drive free speed if they are on sparsely trafficated links
-		System.out.println("Bottleneck link index: " + j);
-		while ( j >= 0 && 
-			(this.numberOfAgents.get(routeLinks[j].getId().asString()) / currentBottleNeckCapacity)
-				<= this.ttFreeSpeeds.get(routeLinks[j].getId().asString()) ) {
-			
-			ttFreeSpeedPart += this.ttFreeSpeeds.get(routeLinks[j].getId().asString());
-			System.out.println("Adding to total free speed part before bottle neck; link index " + j);
-			j--;
-		}
-		*/
 						
 		// count agents on congested part of the route 
 		int agentsToQueueAtBottleNeck = 0;
 		double ttFreeSpeedBeforeBottleNeck = 0;
 		double predictedTT;
-		for (int i = 0; i <= bottleNeckLinkIndexInArray; i++) {
+		for (int i = 0; i <= firstCongestedLink; i++) {
 			agentsToQueueAtBottleNeck += 
 				this.numberOfAgents.get(routeLinks[i].getId().toString());
 			ttFreeSpeedBeforeBottleNeck += this.ttFreeSpeeds.get(routeLinks[i].getId().toString());
 
 		}
+		
 		if (agentsToQueueAtBottleNeck / currentBottleNeckCapacity > ttFreeSpeedBeforeBottleNeck) {
 			predictedTT = 
 			(agentsToQueueAtBottleNeck / currentBottleNeckCapacity) + ttFreeSpeedPart;
@@ -351,13 +337,16 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			predictedTT = getFreeSpeedRouteTravelTime(route);
 		}
 		
+//		predictedTT = (agentsToQueueAtBottleNeck / currentBottleNeckCapacity) + ttFreeSpeedPart;
+
+		
 	
 		
 
-			log.info("Predicted travel time = Agents / current capacity + freespeed = " + 
+			log.debug("Predicted travel time = Agents / current capacity + freespeed = " + 
 					agentsToQueueAtBottleNeck +" / "+currentBottleNeckCapacity +" + "+ ttFreeSpeedPart);
-			log.info("Predicted route tt is " + predictedTT);
-			log.info("Route freespeed tt is " + this.getFreeSpeedRouteTravelTime(route));
+			log.debug("Predicted route tt is " + predictedTT);
+			log.debug("Route freespeed tt is " + this.getFreeSpeedRouteTravelTime(route));
 
 		return predictedTT;
 	}
