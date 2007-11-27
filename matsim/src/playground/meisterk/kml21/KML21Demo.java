@@ -27,7 +27,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.matsim.demandmodeling.gbl.Gbl;
+import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.shared.CoordWGS84;
 
 import playground.meisterk.kml21.util.Util;
