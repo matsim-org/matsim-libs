@@ -75,6 +75,7 @@ public class TreeMultiMap<K, V> implements MultiMap<K, V> {
 	 * @return the inserted <pre>value</pre>
 	 */
 //	public V put(K key, V value) {	// eclipse says this is not valid despite the same line being in the interface
+	// FIXME [kn] bei mir erzeugt "public Object put( Object ..." einen Fehler, und "public V put(K ..." keinen.  !!!
 	@SuppressWarnings("unchecked")
 	public Object put(Object key, Object value) {
 		Entry<V> entry = map.get(key);
