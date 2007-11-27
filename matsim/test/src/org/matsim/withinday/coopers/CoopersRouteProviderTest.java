@@ -38,6 +38,7 @@ import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
+import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
 
 
 /**
@@ -52,7 +53,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	private Route route1;
 
 	private Route route2;
-	
+
 	/**
 	 * @see junit.framework.TestCase#setUp()
 	 */
@@ -61,7 +62,7 @@ public class CoopersRouteProviderTest extends TestCase {
 		super.setUp();
 		this.network = this.loadNetwork(networkFile);
 	}
-	
+
 	private NetworkLayer loadNetwork(final String filename) {
 		Gbl.reset();
 		NetworkLayer network = new NetworkLayer();
@@ -70,7 +71,7 @@ public class CoopersRouteProviderTest extends TestCase {
 		parser.readFile(filename);
 		return network;
 	}
-	
+
 	private VDSSign createSign() {
 		VDSSign sign = new VDSSign();
 		sign.setSignLink(this.network.getLink("1"));
@@ -80,13 +81,13 @@ public class CoopersRouteProviderTest extends TestCase {
 		sign.setControlEvents(1);
 		sign.setDeadZoneSystemInput(0.0);
 		sign.setDeadZoneSystemOutput(0.0);
-		sign.setNominalSplitting(1);
-		sign.setControler(new BangBangControler());	
+		sign.setNominalSplitting(0.5);
+		sign.setControler(new ConstantControler(1.0));
 		sign.setCompliance(1.0);
 		//create control input
 		EmptyControlInputImpl controlInput = new EmptyControlInputImpl();
 		controlInput.setNashTime(0);
-		
+
 		this.route1 = new Route();
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
@@ -108,15 +109,15 @@ public class CoopersRouteProviderTest extends TestCase {
 		sign.calculateOutput(SimulationTimer.getTime());
 		return sign;
 	}
-	
+
 	private CoopersRouteProvider createRouteProvider() {
 		AStarLandmarksRouteProvider aStarProvider = new AStarLandmarksRouteProvider(this.network);
 		List<VDSSign> signs = new LinkedList<VDSSign>();
 		signs.add(createSign());
 		return new CoopersRouteProvider(aStarProvider, signs);
 	}
-	
-	
+
+
 	/**
 	 * Test method for {@link org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider#providesRoute(org.matsim.network.Link, org.matsim.plans.Route)}.
 	 */
@@ -153,9 +154,9 @@ public class CoopersRouteProviderTest extends TestCase {
 	  nodes.remove(nodes.size() -1);
 	  agentRoute.setRoute(nodes);
 	  assertTrue(provider.providesRoute(linkNo1, agentRoute));
-	  
-	}	
-	
+
+	}
+
 	/**
 	 * Test method for {@link org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider#requestRoute(org.matsim.network.Link, org.matsim.network.Link, double)}.
 	 */
@@ -187,7 +188,7 @@ public class CoopersRouteProviderTest extends TestCase {
 		for (int i = 0; i < r.getRoute().size(); i++) {
 			assertEquals(providerRouteNodes.get(i), r.getRoute().get(i));
 		}
-	  
+
 	  r = provider.requestRoute(linkNo1, this.network.getLink("8"), SimulationTimer.getTime());
 	  providerRouteNodes.add(this.network.getNode("5"));
 //	  log.debug("Route is: " + LogRouteUtils.getNodeRoute(r));
