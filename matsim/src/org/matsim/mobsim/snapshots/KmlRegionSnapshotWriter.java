@@ -101,7 +101,7 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 			this.writer.addNonKMLFile("res/car.png", "data/car.png");
 			icon = new Icon("./car.png");
 			//TODO think about that  and check comments in catch
-			this.writer.addNonKMLFile(MatsimKmlStyleFactory.DEFAULTNODEICON, MatsimKmlStyleFactory.DEFAULTNODEICON);
+			this.writer.addNonKMLFile(MatsimKmlStyleFactory.DEFAULTNODEICONLOCATION, MatsimKmlStyleFactory.DEFAULTNODEICON);
 		} catch (IOException e1) {
 			Gbl.warningMsg(KmlSnapshotWriter.class, "KmlSnapshotWriter(..)", "cannot write car icon to kmz, trying to use icon from http://maps.google.com/mapfiles/kml/pal4/icon15.png");
 			icon = new Icon("http://maps.google.com/mapfiles/kml/pal4/icon15.png");
@@ -115,8 +115,12 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 		this.mainFolder.setName("mainFolder");
 		this.mainDoc.addFeature(this.mainFolder);
 		//add network
-		KmlNetworkWriter netWriter = new KmlNetworkWriter(this.network, this.coordTransform);
-		this.mainDoc.addFeature(netWriter.getNetworkFolder());
+		KmlNetworkWriter netWriter = new KmlNetworkWriter(this.network, this.coordTransform, this.writer);
+		try {
+			this.mainDoc.addFeature(netWriter.getNetworkFolder());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
 
 
