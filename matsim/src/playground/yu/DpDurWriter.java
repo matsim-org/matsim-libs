@@ -26,14 +26,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.matsim.config.Config;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.Events;
-import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.gbl.Gbl;
 
 /**
  * @author ychen
@@ -83,13 +79,13 @@ public class DpDurWriter extends EventWriterTXT {
 			// int depS = depT - depH * 3600 - depM * 60;
 
 			int arrT = (int) event.time;
-			int arrH = arrT / 3600;
-			int arrM = (arrT - arrH * 3600) / 60;
+			// int arrH = arrT / 3600;
+			// int arrM = (arrT - arrH * 3600) / 60;
 			// int arrS = arrT - arrH * 3600 - arrM * 60;
 
 			int dur = arrT - depT;
 
-			String depTId = Integer.toString(depH)+":"
+			String depTId = Integer.toString(depH) + ":"
 					+ Integer.toString((depM / 5) * 5);
 			ArrayList<Integer> al = new ArrayList<Integer>();
 			if (dpDurVol.containsKey(depTId)) {
@@ -125,7 +121,7 @@ public class DpDurWriter extends EventWriterTXT {
 		writeLine(fileHead);
 		String line = "";
 		for (String dpT : dpTSet) {
-			line="";
+			line = "";
 			line += dpT + "\t";
 			ArrayList<Integer> al = dpDurVol.get(dpT);
 			for (Integer i : al) {
