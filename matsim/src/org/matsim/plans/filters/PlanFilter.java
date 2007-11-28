@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PlanFilter.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,16 +20,25 @@
 
 package org.matsim.plans.filters;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.filters.filter.FilterI;
+import org.matsim.plans.Plan;
+import org.matsim.plans.algorithms.PlanAlgorithmI;
 
-public class AllTests {
+public interface PlanFilter extends PlanAlgorithmI, FilterI {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.plans.filters");
-		suite.addTestSuite(PersonIntersectAreaFilterTest.class);
-		suite.addTestSuite(RouteLinkFilterTest.class);
-		return suite;
-	}
+	/**
+	 * Judges whether the plan will be selected or not.
+	 *
+	 * @param plan
+	 * @return true if the plan meets the criterion of the filter.
+	 */
+	boolean judge(Plan plan);
+
+	/**
+	 * Sends the person to the next algorithm
+	 *
+	 * @param plan
+	 */
+	void run(Plan plan);
 
 }

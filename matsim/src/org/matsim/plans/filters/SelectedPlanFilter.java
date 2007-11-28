@@ -20,26 +20,27 @@
 
 package org.matsim.plans.filters;
 
-import org.matsim.filters.filter.Filter;
 import org.matsim.plans.Person;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 
-public class SelectedPlanFilter extends Filter implements PersonFilterI {
+public class SelectedPlanFilter extends AbstractPersonFilter {
 
 	private final PlanAlgorithmI nextAlgo;
-	
-	public SelectedPlanFilter(PlanAlgorithmI nextAlgo) {
+
+	public SelectedPlanFilter(final PlanAlgorithmI nextAlgo) {
 		this.nextAlgo = nextAlgo;
 	}
-	
-	public boolean judge(Person person) {
+
+	@Override
+	public boolean judge(final Person person) {
 		return true;
 	}
 
-	public void run(Person person) {
+	@Override
+	public void run(final Person person) {
 		count();
-		nextAlgo.run(person.getSelectedPlan());
+		this.nextAlgo.run(person.getSelectedPlan());
 	}
 
-	
+
 }

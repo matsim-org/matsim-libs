@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * RouteLinkFilter.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,16 +20,42 @@
 
 package org.matsim.plans.filters;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.HashSet;
+import java.util.Set;
 
-public class AllTests {
+import org.matsim.basic.v01.BasicPlan.LegIterator;
+import org.matsim.network.Link;
+import org.matsim.plans.Leg;
+import org.matsim.plans.Plan;
+import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.utils.identifiers.IdI;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.plans.filters");
-		suite.addTestSuite(PersonIntersectAreaFilterTest.class);
-		suite.addTestSuite(RouteLinkFilterTest.class);
-		return suite;
+public class RouteLinkFilter extends AbstractPlanFilter {
+
+	private final Set<IdI> linkIds;
+
+	public RouteLinkFilter(final PlanAlgorithmI nextAlgo) {
+		this.nextAlgorithm = nextAlgo;
+		this.linkIds = new HashSet<IdI>();
+	}
+
+	public void addLink(final IdI linkId) {
+		this.linkIds.add(linkId);
+	}
+
+	@Override
+	public boolean judge(final Plan plan) {
+		LegIterator iter = plan.getIteratorLeg();
+		while (iter.hasNext()) {
+			Leg leg = (Leg)iter.next();
+			Link[] links = leg.getRoute().getLinkRoute();
+			for (Link link : links) {
+				if (this.linkIds.contains(link.getId())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

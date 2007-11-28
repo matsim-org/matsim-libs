@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * AbstractPlanFilter.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,16 +20,29 @@
 
 package org.matsim.plans.filters;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.plans.Plan;
+import org.matsim.plans.algorithms.PlanAlgorithmI;
 
-public class AllTests {
+public abstract class AbstractPlanFilter implements PlanFilter, PlanAlgorithmI {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.plans.filters");
-		suite.addTestSuite(PersonIntersectAreaFilterTest.class);
-		suite.addTestSuite(RouteLinkFilterTest.class);
-		return suite;
+	protected PlanAlgorithmI nextAlgorithm = null;
+	private int count = 0;
+
+	abstract public boolean judge(Plan plan);
+
+	public void run(final Plan plan) {
+		if (judge(plan)) {
+			count();
+			this.nextAlgorithm.run(plan);
+		}
+	}
+
+	public void count() {
+		this.count++;
+	}
+
+	public int getCount() {
+		return this.count;
 	}
 
 }
