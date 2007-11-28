@@ -76,7 +76,7 @@ class PersonAlgo_CheckSelected extends PersonAlgorithm {
 public class QueueSimulation extends Simulation {
 
   // do write snapshot every n seconds
-	static int SNAPSHOT_PERIOD = 60;
+	private int snapshotPeriod = 60;
 	// do write info to console every n sec (sim time)
 	protected static final int INFO_PERIOD = 3600;
 
@@ -91,7 +91,6 @@ public class QueueSimulation extends Simulation {
 	private final List<SnapshotWriterI> snapshotWriters = new ArrayList<SnapshotWriterI>();
 
 	private final Config config;
-
 
 	/**
 	 * teleportationList includes all vehicle that have transportation modes unknown to
@@ -145,10 +144,10 @@ public class QueueSimulation extends Simulation {
 
 	private void createSnapshotwriter() {
 		// Initialize Snapshot file
-		SNAPSHOT_PERIOD = (int) this.config.simulation().getSnapshotPeriod();
+		this.snapshotPeriod = (int) this.config.simulation().getSnapshotPeriod();
 
 		// A snapshot period of 0 or less indicates that there should be NO snapshot written
-		if (SNAPSHOT_PERIOD > 0 ) {
+		if (this.snapshotPeriod > 0 ) {
 			String snapshotFormat =  this.config.simulation().getSnapshotFormat();
 
 			if (snapshotFormat.contains("plansfile")) {
@@ -189,10 +188,10 @@ public class QueueSimulation extends Simulation {
 					buffers = Math.max(5, Math.min(500000/buffers, 100));
 				} else buffers = Integer.parseInt(buffString);
 
-				this.netStateWriter = new QueueNetStateWriter(this.network, networkFile.getAbsolutePath(), myvisconf, snapshotFile, SNAPSHOT_PERIOD, buffers);
+				this.netStateWriter = new QueueNetStateWriter(this.network, networkFile.getAbsolutePath(), myvisconf, snapshotFile, this.snapshotPeriod, buffers);
 				this.netStateWriter.open();
 			}
-		} else SNAPSHOT_PERIOD = 300*3600; // make sure snapshot is never called
+		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -299,7 +298,7 @@ public class QueueSimulation extends Simulation {
 
 	@Override
 	public void afterSimStep(final double time) {
-		if (time % SNAPSHOT_PERIOD == 0) {
+		if (time % this.snapshotPeriod == 0) {
 			doSnapshot(time);
 		}
 	}
