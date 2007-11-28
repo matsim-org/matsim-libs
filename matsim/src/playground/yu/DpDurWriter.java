@@ -22,6 +22,8 @@
  */
 package playground.yu;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -29,13 +31,16 @@ import java.util.Set;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.algorithms.EventWriterTXT;
+import org.matsim.events.handler.BasicEventHandlerI;
+import org.matsim.utils.io.IOUtils;
 
 /**
  * @author ychen
  * 
  */
-public class DpDurWriter extends EventWriterTXT {
+public class DpDurWriter implements BasicEventHandlerI {
+	private BufferedWriter out = null;
+
 	/**
 	 * @param args0 -
 	 *            agentId;
@@ -56,58 +61,52 @@ public class DpDurWriter extends EventWriterTXT {
 	 * @param filename
 	 */
 	public DpDurWriter(String filename) {
-		super(filename);
+		init(filename);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.events.algorithms.EventWriterTXT#handleEvent(org.matsim.events.BasicEvent)
-	 */
-	@Override
 	public void handleEvent(BasicEvent event) {
 		String agentId = event.agentId;
 		if (event instanceof EventAgentDeparture) {
-			if (Integer.parseInt(event.getAttributes().getValue("leg")) == 0)
-				agentDepTimes.put(agentId, (int) event.time);
+			// if (Integer.parseInt(event.getAttributes().getValue("leg")) == 0)
+			agentDepTimes.put(agentId, (int) event.time);
 		} else if (event instanceof EventAgentArrival
 				&& agentDepTimes.containsKey(agentId)) {
-
 			int depT = agentDepTimes.remove(agentId);
 			int depH = depT / 3600;
 			int depM = (depT - depH * 3600) / 60;
-			// int depS = depT - depH * 3600 - depM * 60;
-
 			int arrT = (int) event.time;
-			// int arrH = arrT / 3600;
-			// int arrM = (arrT - arrH * 3600) / 60;
-			// int arrS = arrT - arrH * 3600 - arrM * 60;
-
 			int dur = arrT - depT;
-
 			String depTId = Integer.toString(depH) + ":"
 					+ Integer.toString((depM / 5) * 5);
 			ArrayList<Integer> al = new ArrayList<Integer>();
 			if (dpDurVol.containsKey(depTId)) {
 				al = dpDurVol.get(depTId);
 			} else {
-				for (int i = 0; i < 36; i++) {
+				dpDurVol.put(depTId, al);
+			}
+			if (dur / 300 >= al.size()) {
+				for (int i = al.size(); i <= dur / 300; i++) {
 					al.add(0);
 				}
-				dpDurVol.put(depTId, al);
 			}
 			al.set(dur / 300, al.get(dur / 300).intValue() + 1);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.events.algorithms.EventWriterTXT#init(java.lang.String)
-	 */
-	@Override
 	public void init(String outfilename) {
-		super.init(outfilename);
+		if (this.out != null) {
+			try {
+				this.out.close();
+				this.out = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			this.out = IOUtils.getBufferedWriter(outfilename);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		agentDepTimes = new HashMap<String, Integer>();
 		dpDurVol = new HashMap<String, ArrayList<Integer>>();
 	}
@@ -128,6 +127,30 @@ public class DpDurWriter extends EventWriterTXT {
 				line += i + "\t";
 			}
 			writeLine(line);
+		}
+	}
+
+	private void writeLine(String line) {
+		try {
+			this.out.write(line);
+			this.out.write("\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void reset(int iteration) {
+		closefile();
+	}
+
+	public void closefile() {
+		if (this.out != null) {
+			try {
+				this.out.close();
+				this.out = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

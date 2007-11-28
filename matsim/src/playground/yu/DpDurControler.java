@@ -43,9 +43,9 @@ public class DpDurControler {
 		events.addHandler(ddw);// TODO...
 
 		System.out.println("  reading the eventsfile (TXTv1) ...");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
+		new MatsimEventsReader(events).readFile(config.events().getInputFile());//Man can also use readFile("..../...txt") hier
 		System.out.println("  done.");
-		
+
 		ddw.writeMatrix();
 		ddw.closefile();
 	}
