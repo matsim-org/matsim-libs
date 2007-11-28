@@ -40,6 +40,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
@@ -57,7 +58,7 @@ import org.matsim.utils.vis.kml.TimeSpan;
 import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.utils.vis.kml.fields.Vec2Type;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.vis.matsimkml.NetworkFeatureFactory;
 /**
  * @author dgrether
  *
@@ -68,38 +69,6 @@ CountSimComparisonWriter {
 	 * constant for the name of the links
 	 */
 	private static final String LINK = "Link: ";
-	/**
-	 * constant for the link description
-	 */
-	private static final String STARTCDATA = "<![CDATA[";
-	/**
-	 * constant for the link description
-	 */
-	private static final String ENDCDATA = "]]>";
-	/**
-	 * constant for the link description
-	 */
-	private static final String STARTH2 = "<h2>";
-	/**
-	 * constant for the link description
-	 */
-	private static final String ENDH2 = "</h2>";
-	/**
-	 * constant for the link description
-	 */
-	private static final String STARTH3 = "<h3>";
-	/**
-	 * constant for the link description
-	 */
-	private static final String ENDH3 = "</h3>";
-	/**
-	 * constant for the link description
-	 */
-	private static final String STARTP = "<p>";
-	/**
-	 * constant for the link description
-	 */
-	private static final String ENDP = "</p>";
 	/**
 	 * constant for the link description
 	 */
@@ -480,43 +449,43 @@ CountSimComparisonWriter {
 	 */
 	private String createPlacemarkDescription(final String linkid, final CountSimComparison csc, final double relativeError, final int timestep) {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(STARTCDATA);
+		buffer.append(NetworkFeatureFactory.STARTCDATA);
 // buffer.append(STARTH1);
 // buffer.append(LINK);
 // buffer.append(linkid);
 // buffer.append(ENDH1);
-		buffer.append(STARTH2);
+		buffer.append(NetworkFeatureFactory.STARTH2);
 		buffer.append(LINK);
 		buffer.append(linkid);
-		buffer.append(ENDH2);
-		buffer.append(STARTH3);
+		buffer.append(NetworkFeatureFactory.ENDH2);
+		buffer.append(NetworkFeatureFactory.STARTH3);
 		buffer.append(H24OVERVIEW);
-		buffer.append(ENDH3);
-		buffer.append(STARTP);
+		buffer.append(NetworkFeatureFactory.ENDH3);
+		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(IMG);
 		buffer.append(this.countsLoadCurveGraphMap.get(linkid));
 		buffer.append(IMGEND);
-		buffer.append(ENDP);
-		buffer.append(STARTH3);
+		buffer.append(NetworkFeatureFactory.ENDP);
+		buffer.append(NetworkFeatureFactory.STARTH3);
 		buffer.append(DETAILSFROM);
 		buffer.append((this.timestepToString(timestep -1)));
 		buffer.append(OCLOCKTO);
 		buffer.append(this.timestepToString(timestep));
 		buffer.append(OCLOCK);
-		buffer.append(ENDH3);
-		buffer.append(STARTP);
+		buffer.append(NetworkFeatureFactory.ENDH3);
+		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(ASTRAVALUE);
 		buffer.append(csc.getCountValue());
-		buffer.append(ENDP);
-		buffer.append(STARTP);
+		buffer.append(NetworkFeatureFactory.ENDP);
+		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(MATSIMVALUE);
 		buffer.append(csc.getSimulationValue());
-		buffer.append(ENDP);
-		buffer.append(STARTP);
+		buffer.append(NetworkFeatureFactory.ENDP);
+		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(RELERROR);
 		buffer.append(relativeError);
-		buffer.append(ENDP);
-		buffer.append(ENDCDATA);
+		buffer.append(NetworkFeatureFactory.ENDP);
+		buffer.append(NetworkFeatureFactory.ENDCDATA);
 		return buffer.toString();
 	}
 
