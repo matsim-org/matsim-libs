@@ -20,79 +20,64 @@
 
 package org.matsim.network;
 
-import org.matsim.utils.geometry.CoordI;
+import java.io.IOException;
+
 import org.matsim.utils.geometry.CoordinateTransformationI;
-import org.matsim.utils.vis.kml.Feature;
 import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.LineString;
-import org.matsim.utils.vis.kml.Placemark;
-import org.matsim.utils.vis.kml.Point;
+import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.kml.Style;
 import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
+import org.matsim.utils.vis.matsimkml.NetworkFeatureFactory;
 
 /**
  * @author dgrether
  */
 public class KmlNetworkWriter {
 
-	private CoordinateTransformationI coordTransform = null;
-
 	private NetworkLayer network;
 
-	private MatsimKmlStyleFactory factory;
+	private MatsimKmlStyleFactory styleFactory;
 
-	private Style networkStyle;
+	private Style networkLinkStyle;
 
-	public KmlNetworkWriter(final NetworkLayer network, final CoordinateTransformationI coordTransform) {
+	private NetworkFeatureFactory networkFeatureFactory;
+
+	private Style networkNodeStyle;
+
+	public KmlNetworkWriter(final NetworkLayer network, final CoordinateTransformationI coordTransform, KMZWriter writer) {
 		this.network = network;
-		this.coordTransform = coordTransform;
-		this.factory = new MatsimKmlStyleFactory();
+		this.styleFactory = new MatsimKmlStyleFactory(writer);
+		this.networkFeatureFactory = new NetworkFeatureFactory(coordTransform);
 	}
 
 
-	public Folder getNetworkFolder() {
+	public Folder getNetworkFolder() throws IOException {
 		Folder folder = new Folder(this.network.getName());
 		folder.setName("MATSIM Network: " + this.network.getName());
-		this.networkStyle = this.factory.createDefaultNetworkStyle();
-		folder.addStyle(this.networkStyle);
+		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
+		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
 		Folder nodeFolder = new Folder(this.network.getName() + "nodes");
 		nodeFolder.setName("Nodes");
+		nodeFolder.addStyle(this.networkNodeStyle);
 		folder.addFeature(nodeFolder);
 		Folder linkFolder = new Folder(this.network.getName() + "links");
 		linkFolder.setName("Links");
+		linkFolder.addStyle(this.networkLinkStyle);
 		folder.addFeature(linkFolder);
 
-		for (Node n : network.getNodes().values()) {
-			nodeFolder.addFeature(createNodeFeature(n));
+		for (Node n : this.network.getNodes().values()) {
+			nodeFolder.addFeature(this.networkFeatureFactory.createNodeFeature(n, this.networkNodeStyle));
 		}
-		for (Link l : network.getLinks().values()) {
-			linkFolder.addFeature(createLinkFeature(l));
+		for (Link l : this.network.getLinks().values()) {
+			linkFolder.addFeature(this.networkFeatureFactory.createLinkFeature(l, this.networkLinkStyle));
 		}
 
 		return folder;
 	}
 
 
-	private Feature createLinkFeature(final Link l) {
-		Placemark p = new Placemark(l.getId().toString());
-		p.setName(l.getId().toString());
-		CoordI fromCoord = this.coordTransform.transform(l.getFromNode().getCoord());
-		CoordI toCoord = this.coordTransform.transform(l.getToNode().getCoord());
-		LineString line = new LineString(new Point(fromCoord.getX(), fromCoord.getY(), 0.0), new Point(toCoord.getX(), toCoord.getY(), 0.0));
-		p.setGeometry(line);
-		p.setStyleUrl(this.networkStyle.getStyleUrl());
-		return p;
-	}
 
 
-	private Feature createNodeFeature(final Node n) {
-		Placemark p = new Placemark(n.getId().toString());
-		p.setName(n.getId().toString());
-		CoordI coord = this.coordTransform.transform(n.getCoord());
-		Point point = new Point(coord.getX(), coord.getY(), 0.0);
-		p.setGeometry(point);
-		p.setStyleUrl(this.networkStyle.getStyleUrl());
-		return p;
-	}
+
 
 }
