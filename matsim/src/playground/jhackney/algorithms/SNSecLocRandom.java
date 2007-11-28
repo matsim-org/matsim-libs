@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.replanning;
+package playground.jhackney.algorithms;
 
 import java.util.List;
 

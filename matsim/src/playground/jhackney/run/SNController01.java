@@ -73,12 +73,12 @@ import org.matsim.scoring.EventsToScore;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 
+import playground.jhackney.algorithms.SNSecLocShortest;
 import playground.jhackney.interactions.NonSpatialInteractor;
 import playground.jhackney.interactions.SpatialInteractor;
 import playground.jhackney.interactions.SpatialSocialOpportunityTracker;
 import playground.jhackney.io.PajekWriter1;
 import playground.jhackney.replanning.SNFacilitySwitcher;
-import playground.jhackney.replanning.SNSecLocShortest;
 import playground.jhackney.socialnet.SocialNetwork;
 import playground.jhackney.statistics.SocialNetworkStatistics;
 

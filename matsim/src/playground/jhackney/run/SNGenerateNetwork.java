@@ -74,6 +74,7 @@ import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
+import playground.jhackney.algorithms.SNSecLocShortest;
 import playground.jhackney.interactions.NonSpatialInteractor;
 import playground.jhackney.interactions.SocializingOpportunity;
 import playground.jhackney.interactions.SpatialInteractor;
@@ -82,7 +83,6 @@ import playground.jhackney.io.PajekNetWriterWrapper;
 import playground.jhackney.io.PajekWriter1;
 import playground.jhackney.replanning.DummyMobSim;
 import playground.jhackney.replanning.SNFacilitySwitcher;
-import playground.jhackney.replanning.SNSecLocShortest;
 import playground.jhackney.scoring.SNScoringFunctionFactory01;
 import playground.jhackney.socialnet.SocialNetwork;
 import playground.jhackney.statistics.SocialNetworkStatistics;
