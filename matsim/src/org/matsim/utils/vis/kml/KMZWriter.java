@@ -47,9 +47,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.log4j.Logger;
 import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 
 /**
@@ -62,11 +65,15 @@ import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
  */
 public class KMZWriter {
 
+	private static final Logger log = Logger.getLogger(KMZWriter.class);
+
 	private KMLWriter.XMLNS xmlNS = null;
 
 	private BufferedWriter out = null;
 
 	private ZipOutputStream zipOut = null;
+
+	private Map<String, String> nonKmlFiles = new HashMap<String, String>();
 
 	/**
 	 * Creates a new kmz-file and a writer for it and opens the file for writing.
@@ -169,7 +176,11 @@ public class KMZWriter {
 	 */
 	public void addNonKMLFile(final String filename, final String inZipFilename)
 			throws IOException {
-
+		if (this.nonKmlFiles.containsKey(filename) && (inZipFilename.compareTo(this.nonKmlFiles.get(filename)) == 0)) {
+			log.warn("File: " + filename + " is already included in the kmz as " + inZipFilename);
+			return;
+		}
+		this.nonKmlFiles.put(filename, inZipFilename);
 		FileInputStream inStream = null;
 		try {
 			inStream = new FileInputStream(filename);
@@ -179,7 +190,7 @@ public class KMZWriter {
 			// Create a zip entry and add it to the zip.
 			ZipEntry entry = new ZipEntry(inZipFilename);
 			this.zipOut.putNextEntry(entry);
-	
+
 			// Read the file the file and write it to the zip.
 			while ((bytesRead = inStream.read(buffer)) != -1) {
 				this.zipOut.write(buffer, 0, bytesRead);
