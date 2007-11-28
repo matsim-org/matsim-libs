@@ -19,7 +19,7 @@
       <node id="14" x="5000" y="-10000"/>
       <node id="15" x="-20000" y="-10000"/>
    </nodes>
-   <links capDivider="1" capdivider="1" capperiod="01:00:00" capPeriod="01:00:00">
+   <links capperiod="01:00:00">
       <link id="1" from="1" to="2" length="10000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
       <link id="2" from="2" to="3" length="10000.00" capacity="3600" freespeed="27.78" permlanes="1"  />
       <link id="3" from="2" to="4" length="10000.00" capacity="3600" freespeed="27.78" permlanes="1"  />
