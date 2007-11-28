@@ -23,6 +23,7 @@ package playground.dgrether.visualization;
 import java.io.IOException;
 import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.MatsimNetworkReader;
@@ -38,9 +39,11 @@ import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class KmlNetworkVisualizer {
+
+	private static final Logger log = Logger.getLogger(KmlNetworkVisualizer.class);
 
 	private NetworkLayer networkLayer;
 
@@ -49,13 +52,13 @@ public class KmlNetworkVisualizer {
 	private Document mainDoc;
 
 	private Folder mainFolder;
-	
+
 	private KMZWriter writer;
 	public KmlNetworkVisualizer(final String networkFile, final String outputPath) {
 		Gbl.createConfig(null);
 		this.networkLayer = loadNetwork(networkFile);
 		this.write(outputPath);
-		
+
 	}
 
 	private void write(final String filename) {
@@ -73,21 +76,22 @@ public class KmlNetworkVisualizer {
 			// add the matsim logo to the kml
 			MatsimKMLLogo logo = new MatsimKMLLogo(this.writer);
 			this.mainFolder.addFeature(logo);
+			KmlNetworkWriter netWriter = new KmlNetworkWriter(this.networkLayer,
+					new GK4toWGS84(), this.writer);
+			Folder networkFolder = netWriter.getNetworkFolder();
+			this.mainFolder.addFeature(networkFolder);
 		} catch (IOException e) {
-			Gbl.errorMsg("Cannot create legend or logo cause: " + e.getMessage());
+			Gbl.errorMsg("Cannot create kmz or logo cause: " + e.getMessage());
 			e.printStackTrace();
 		}
-		KmlNetworkWriter netWriter = new KmlNetworkWriter(this.networkLayer,
-				new GK4toWGS84());
-		Folder networkFolder = netWriter.getNetworkFolder();
-		this.mainFolder.addFeature(networkFolder);
 		this.writer.writeMainKml(this.mainKml);
 		this.writer.close();
+		log.info("Network written to kmz!");
 	}
 
 	/**
 	 * load the network
-	 * 
+	 *
 	 * @return the network layer
 	 */
 	protected NetworkLayer loadNetwork(final String networkFile) {
@@ -109,7 +113,7 @@ public class KmlNetworkVisualizer {
 	/**
 	 * an internal routine to generated some (nicely?) formatted output. This
 	 * helps that status output looks about the same every time output is written.
-	 * 
+	 *
 	 * @param header
 	 *          the header to print, e.g. a module-name or similar. If empty
 	 *          <code>""</code>, no header will be printed at all
@@ -142,6 +146,9 @@ public class KmlNetworkVisualizer {
 		}
 		else {
 			new KmlNetworkVisualizer(args[0], args[1]);
+//			new KmlNetworkVisualizer("./examples/equil/network.xml", "./output/equil.kmz");
+//			new KmlNetworkVisualizer("../../cvsRep/vsp-cvs/studies/berlin-wip/network/wip_net.xml", "./output/wipNet.kmz");
+
 		}
 	}
 
