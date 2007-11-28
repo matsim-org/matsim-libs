@@ -39,6 +39,8 @@ import org.matsim.utils.io.IOUtils;
  * 
  */
 public class DpDurWriter implements BasicEventHandlerI {
+	private int maxDur = 0;
+
 	private BufferedWriter out = null;
 
 	/**
@@ -76,6 +78,9 @@ public class DpDurWriter implements BasicEventHandlerI {
 			int depM = (depT - depH * 3600) / 60;
 			int arrT = (int) event.time;
 			int dur = arrT - depT;
+			if (dur > maxDur) {
+				maxDur = dur;
+			}
 			String depTId = Integer.toString(depH) + ":"
 					+ Integer.toString((depM / 5) * 5);
 			ArrayList<Integer> al = new ArrayList<Integer>();
@@ -114,7 +119,7 @@ public class DpDurWriter implements BasicEventHandlerI {
 	public void writeMatrix() {
 		Set<String> dpTSet = dpDurVol.keySet();
 		String fileHead = "\t";
-		for (int i = 5; i <= 180; i += 5) {
+		for (int i = 0; i <= maxDur / 60; i += 5) {
 			fileHead += Integer.toString(i) + "\t";
 		}
 		writeLine(fileHead);
@@ -132,8 +137,8 @@ public class DpDurWriter implements BasicEventHandlerI {
 
 	private void writeLine(String line) {
 		try {
-			this.out.write(line);
-			this.out.write("\n");
+			this.out.write(line + "\n");
+			// this.out.write("\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
