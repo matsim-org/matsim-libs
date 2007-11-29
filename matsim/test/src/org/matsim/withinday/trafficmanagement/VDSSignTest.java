@@ -32,7 +32,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
-import org.matsim.withinday.trafficmanagement.VDSSign;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
 
@@ -115,7 +114,7 @@ public class VDSSignTest extends TestCase {
 
 	public void testSignInitialization() {
 		VDSSign sign = this.createSign();
-		sign.init();
+		sign.setupIteration();
 		//test for side effects of init
 		assertEquals("side effect in VDSSign init()", this.route1, this.controlInput.getMainRoute());
 		assertEquals("side effect in VDSSign init()", this.route2, this.controlInput.getAlternativeRoute());
@@ -126,8 +125,8 @@ public class VDSSignTest extends TestCase {
 		System.out.println();
 		log.debug("starting testBasicRouteCompletion...");
 		VDSSign sign = this.createSign();
-		sign.init();
-		sign.open();
+		sign.setupIteration();
+		sign.simulationPrepared();
 		log.debug("test's system time: " + this.systemTime);
 		this.controlInput.setNashTime(-1);
 		sign.calculateOutput(this.systemTime);
@@ -157,8 +156,8 @@ public class VDSSignTest extends TestCase {
 		VDSSign sign = this.createSign();
 		sign.setSignLink(this.network.getLink("1"));
 		sign.setDirectionLink(this.network.getLink("8"));
-		sign.init();
-		sign.open();
+		sign.setupIteration();
+		sign.simulationPrepared();
 		this.controlInput.setNashTime(-1);
 		sign.calculateOutput(this.systemTime);
 		Route r1 = sign.requestRoute();
@@ -191,8 +190,8 @@ public class VDSSignTest extends TestCase {
 		log.debug("starting testRequestRoute...");
 		SimulationTimer.reset();
 		VDSSign sign = this.createSign();
-		sign.init();
-		sign.open();
+		sign.setupIteration();
+		sign.simulationPrepared();
 		//test control
 		this.controlInput.setNashTime(0);
 		sign.calculateOutput(this.systemTime);
@@ -237,8 +236,8 @@ public class VDSSignTest extends TestCase {
 		VDSSign sign = this.createSign();
 		int messageHoldTime = 30;
 		sign.setMessageHoldTime(messageHoldTime);
-		sign.init();
-		sign.open();
+		sign.setupIteration();
+		sign.simulationPrepared();
 		//test control
 		this.controlInput.setNashTime(0);
 //		log.debug("Route is: " + LogRouteUtils.getNodeRoute(r));
@@ -284,8 +283,8 @@ public class VDSSignTest extends TestCase {
 		sign.setMessageHoldTime(messageHoldTime);
 		sign.setControlEvents(controlEvents);
 		sign.setControler(new ConstantControler(1));
-		sign.init();
-		sign.open();
+		sign.setupIteration();
+		sign.simulationPrepared();
 		//test control
 //		log.debug("Route is: " + LogRouteUtils.getNodeRoute(r));
 		for (int i = 0; i < controlEvents * messageHoldTime; i++) {
