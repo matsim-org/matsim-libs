@@ -33,12 +33,15 @@ public interface ControlInput {
 	public Route getMainRoute();
 
 	public Route getAlternativeRoute();
-	
+
 	public void init();
-	
+
 	public int getNumberOfVehiclesOnRoute(Route route);
 
 	public void setMainRoute(Route route);
 
 	public void setAlternativeRoute(Route route);
+
+	public double getMeasuredRouteTravelTime(Route route);
+
 }
