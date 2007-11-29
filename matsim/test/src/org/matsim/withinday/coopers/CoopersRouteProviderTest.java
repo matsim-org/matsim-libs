@@ -37,7 +37,6 @@ import org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
-import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
 
 
@@ -104,8 +103,8 @@ public class CoopersRouteProviderTest extends TestCase {
 		controlInput.setAlternativeRoute(this.route2);
 		//set control input
 		sign.setControlInput(controlInput);
-		sign.init();
-		sign.open();
+		sign.setupIteration();
+		sign.simulationPrepared();
 		sign.calculateOutput(SimulationTimer.getTime());
 		return sign;
 	}

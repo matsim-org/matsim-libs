@@ -38,11 +38,9 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
-import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
-import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
 
 /**
@@ -125,8 +123,8 @@ public class WithindayAgentTest extends TestCase {
 		controlInput.setAlternativeRoute(this.route2);
 		// set control input
 		sign.setControlInput(controlInput);
-		sign.init();
-		sign.open();
+		sign.setupIteration();
+		sign.simulationPrepared();
 		sign.calculateOutput(SimulationTimer.getTime());
 		return sign;
 	}
