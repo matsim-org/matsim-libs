@@ -35,6 +35,8 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.network.Link;
 import org.matsim.plans.Route;
 
+
+
 /**
  * @author dgrether
  *
@@ -63,9 +65,9 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 
 	protected Map<String, Double> enterEvents2;
 
-	protected double lastTime1;
+	protected double lastTimeMainRoute;
 
-	protected double lastTime2;
+	protected double lastTimeAlternativeRoute;
 
 	protected double timeDifference;
 
@@ -84,13 +86,14 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 		this.enterEvents2 = new HashMap<String, Double>();
 		this.ttFreeSpeeds = new HashMap<String, Double>();
 
-		this.lastTime1 = 0.0;
-		this.lastTime2 = 0.0;
+		this.lastTimeMainRoute = 0.0;
+		this.lastTimeAlternativeRoute = 0.0;
 		this.timeDifference = 0.0;
 		this.ttFreeSpeedAltRoute = 0.0;
 		this.ttFreeSpeedMainRoute = 0.0;
 
 	}
+
 
 	public Route getMainRoute() {
 		return this.mainRoute;
@@ -104,9 +107,12 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 		this.alternativeRoute = route;
 	}
 
+
 	public void setMainRoute(final Route route) {
 		this.mainRoute = route;
 	}
+
+
 
 	public int getNumberOfVehiclesOnRoute(final Route route) {
 		Link[] links = route.getLinkRoute();
@@ -120,6 +126,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 	/**
 	 * @see org.matsim.withinday.trafficmanagement.ControlInput#init()
 	 */
+
 	public void init() {
 		Link [] routeLinks;
 		routeLinks = this.getAlternativeRoute().getLinkRoute();
@@ -143,6 +150,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 				this.altRouteNaturalBottleNeck = altRouteLinks[i];
 		}
 
+
 		routeLinks = this.getMainRoute().getLinkRoute();
 		this.firstLinkOnMainRoute = routeLinks[0].getId().toString();
 		this.lastLinkOnMainRoute = routeLinks[routeLinks.length-1].getId().toString();
@@ -154,6 +162,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			tt = l.getLength()/l.getFreespeed();
 			this.ttFreeSpeeds.put(l.getId().toString(), tt );
 			this.ttFreeSpeedMainRoute += tt;
+
 		}
 
 //		find the natural bottleneck on the main route
@@ -203,7 +212,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (t1 != null) {
 				double deltaT = event.time - t1;
 				if (deltaT >= 0) {
-					this.lastTime1 = deltaT;
+					this.lastTimeMainRoute = deltaT;
 					timeDifferenceHasChanged = true;
 				}
 				else {
@@ -216,7 +225,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (t1 != null) {
 				double deltaT = event.time - t1;
 				if (deltaT >= 0) {
-					this.lastTime2 = deltaT;
+					this.lastTimeAlternativeRoute = deltaT;
 					timeDifferenceHasChanged = true;
 				}
 				else {
@@ -226,12 +235,12 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			}
 		}
 
-		if ((this.lastTime1 >= 0.) && (this.lastTime2 >= 0.)
+		if ((this.lastTimeMainRoute >= 0.) && (this.lastTimeAlternativeRoute >= 0.)
 				&& timeDifferenceHasChanged) {
-			this.timeDifference = this.lastTime1 - this.lastTime2;
+			this.timeDifference = this.lastTimeMainRoute - this.lastTimeAlternativeRoute;
 			if (log.isTraceEnabled()) {
-				log.trace("time at route 1: " + this.lastTime1);
-				log.trace("time at route 2: " + this.lastTime2);
+				log.trace("time at main route: " + this.lastTimeMainRoute);
+				log.trace("time at alternative route 2: " + this.lastTimeAlternativeRoute);
 				log.trace("timeDifference changed: " + this.timeDifference);		}
 			}
 	}
@@ -254,7 +263,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 		}
 	}
 
-	public double getFreeSpeedRouteTravelTime(final Route route) {
+	public double getFreeSpeedRouteTravelTime(Route route) {
 		if (route == this.mainRoute )
 			return this.ttFreeSpeedMainRoute;
 		else if ( route == this.alternativeRoute )
@@ -266,9 +275,9 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 
 	public double getMeasuredRouteTravelTime(final Route route) {
 		if (route == this.mainRoute )
-			return this.lastTime1;
+			return this.lastTimeMainRoute;
 		else if ( route == this.alternativeRoute )
-			return this.lastTime2;
+			return this.lastTimeAlternativeRoute;
 		else
 			throw new IllegalArgumentException(
 			"This route object does not exist!");
