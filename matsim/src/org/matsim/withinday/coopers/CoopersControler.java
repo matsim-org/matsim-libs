@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.coopers;
 
+import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.withinday.WithindayControler;
 
 
@@ -30,10 +31,12 @@ import org.matsim.withinday.WithindayControler;
 public class CoopersControler extends WithindayControler {
 
 	@Override
-	protected void startup() {
-		super.startup();
+	protected void setupIteration(final int iteration) {
+		super.setupIteration(iteration);
 		this.factory = new CoopersAgentLogicFactory(this.network, this.config.charyparNagelScoring(), this.trafficManagement.getVDSSigns());
 	}
+
+
 
 
 	@Override
@@ -50,11 +53,13 @@ public class CoopersControler extends WithindayControler {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		new CoopersControler().run(args);
+		CoopersControler c = new CoopersControler();
+		c.setOverwriteFiles(true);
+		c.run(args);
 
 		// Visulize
-//		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
-//		NetVis.main(visargs);
+		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
+		NetVis.main(visargs);
 	}
 
 }
