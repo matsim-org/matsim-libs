@@ -150,7 +150,33 @@ public class NetworkFeatureFactory {
 		buffer.append(NetworkFeatureFactory.ENDH3);
 		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(NetworkFeatureFactory.ENDP);
+
+		buffer.append(NetworkFeatureFactory.STARTH3);
+		buffer.append("Attributes: ");
+		buffer.append(NetworkFeatureFactory.ENDH3);
+		buffer.append(NetworkFeatureFactory.STARTP);
+		buffer.append(STARTUL);
+		buffer.append(STARTLI);
+		buffer.append("Freespeed: ");
+		buffer.append(l.getFreespeed());
+		buffer.append(ENDLI);
+		buffer.append(STARTLI);
+		buffer.append("Capacity: ");
+		buffer.append(l.getCapacity());
+		buffer.append(ENDLI);
+		buffer.append(STARTLI);
+		buffer.append("Number of Lanes: ");
+		buffer.append(l.getLanes());
+		buffer.append(ENDLI);
+		buffer.append(STARTLI);
+		buffer.append("Length: ");
+		buffer.append(l.getLength());
+		buffer.append(ENDLI);
+		buffer.append(ENDUL);
+		buffer.append(NetworkFeatureFactory.ENDP);
+
 		buffer.append(NetworkFeatureFactory.ENDCDATA);
+
 		return buffer.toString();
 
 	}
@@ -170,7 +196,10 @@ public class NetworkFeatureFactory {
 		buffer.append(STARTUL);
 		for (Link l : n.getInLinks().values()) {
 			buffer.append(STARTLI);
+			buffer.append("Link: " );
 			buffer.append(l.getId());
+			buffer.append(" from Node: " );
+			buffer.append(l.getFromNode().getId());
 			buffer.append(ENDLI);
 		}
 		buffer.append(ENDUL);
@@ -182,7 +211,10 @@ public class NetworkFeatureFactory {
 		buffer.append(STARTUL);
 		for (Link l : n.getOutLinks().values()) {
 			buffer.append(STARTLI);
+			buffer.append("Link: " );
 			buffer.append(l.getId());
+			buffer.append(" to Node: ");
+			buffer.append(l.getToNode().getId());
 			buffer.append(ENDLI);
 		}
 		buffer.append(ENDUL);
