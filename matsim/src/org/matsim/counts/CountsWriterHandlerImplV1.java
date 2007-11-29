@@ -39,8 +39,9 @@ public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 		}
 		out.write(" year=\"" + counts.getYear() + "\" ");
 		if (counts.getLayer() != null) {
-			out.write(" layer=\"" + counts.getLayer() + "\"> \n");
+			out.write(" layer=\"" + counts.getLayer() + "\" \n");
 		}
+		out.write(" > \n");
 	}
 	public void endCounts(final BufferedWriter out) throws IOException {
 		out.write("</counts>\n");
@@ -64,7 +65,7 @@ public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 	public void startVolume(final Volume volume, final BufferedWriter out) throws IOException {
 		out.write("\t\t<volume");
 		out.write(" h=\"" + volume.getHour() + "\"");
-		out.write(" value=\"" + volume.getValue() + "\"");
+		out.write(" val=\"" + volume.getValue() + "\"");
 		out.write(" />\n");
 	}
 	public void endVolume(final BufferedWriter out) throws IOException {
