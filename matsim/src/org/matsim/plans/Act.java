@@ -32,13 +32,13 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 
-public class Act extends BasicAct implements Serializable{
+public class Act extends BasicAct implements Serializable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final long serialVersionUID = 4319965778110179621L;
+	private static final long serialVersionUID = 1L;
 
 	private int refId = Integer.MIN_VALUE;
 	private CoordI coord = null;
@@ -141,21 +141,21 @@ public class Act extends BasicAct implements Serializable{
 	public final int getRefId() {
 		return this.refId;
 	}
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
 
-	protected void setLinkFromString(final String link)
-	{
+	protected void setLinkFromString(final String link) {
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		if (network == null) {
-			Gbl.errorMsg(this + "[link=" + link +" network layer does not exist]");
+			throw new RuntimeException("Network layer does not exist");
 		}
 		this.link = (Link)network.getLocation(link);
 		if (this.link == null) {
-			Gbl.errorMsg(this + "[link=" + link +" link does not exist]");
+			throw new RuntimeException("link=" + link +" does not exist");
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////
+	// print methods
+	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public final String toString() {
@@ -171,8 +171,7 @@ public class Act extends BasicAct implements Serializable{
 
 	// BasicAct is not yet serializable, so we have to serialize it by hand
 	// plus Link Reference serialized as ID int
-	private void writeObject(final ObjectOutputStream s) throws IOException
-	{
+	private void writeObject(final ObjectOutputStream s) throws IOException {
 	    // The standard non-transient fields.
 	  s.defaultWriteObject();
 	  s.writeDouble(getStartTime());
@@ -185,16 +184,18 @@ public class Act extends BasicAct implements Serializable{
 	// This routebuilder could be exchanged for suppliing other
 	//kinds of network e.g. in OnTheFlyClient
 	public static class LinkBuilder {
-		private static NetworkLayer network = null;
+		private NetworkLayer network = null;
 
 		public void addLink(final Act act, final String linkId) {
-			network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-			if (network == null) {
-				Gbl.errorMsg(this + "[link=" + linkId +" network layer does not exist]");
+			if (this.network == null) {
+				this.network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+				if (this.network == null) {
+					throw new RuntimeException("Network layer does not exist.");
+				}
 			}
-			act.link = (Link)network.getLocation(linkId);
+			act.link = (Link)this.network.getLocation(linkId);
 			if (act.link == null) {
-				Gbl.errorMsg(this + "[link=" + linkId +" link does not exist]");
+				throw new RuntimeException("link=" + linkId +" does not exist.");
 			}
 		}
 	}
@@ -205,9 +206,7 @@ public class Act extends BasicAct implements Serializable{
 		linkBuilder = builder;
 	}
 
-	private void readObject(final ObjectInputStream s)
-	  throws IOException, ClassNotFoundException
-	{
+	private void readObject(final ObjectInputStream s) throws IOException, ClassNotFoundException {
 	  // the `size' field.
 	  s.defaultReadObject();
 	  setStartTime(s.readDouble());

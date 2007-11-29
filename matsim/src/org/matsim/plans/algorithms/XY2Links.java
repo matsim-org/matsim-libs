@@ -22,7 +22,6 @@ package org.matsim.plans.algorithms;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -170,7 +169,7 @@ public class XY2Links extends PersonAlgorithm implements PlanAlgorithmI {
 			Act act = (Act)actslegs.get(j);
 			Link link = getNearestLink(act.getCoord());
 			if (null == link) {
-				Gbl.errorMsg("getNearestLink returned Null!");
+				throw new RuntimeException("getNearestLink returned Null!");
 			}
 			act.setLink(link);
 			double dist = link.calcDistance(act.getCoord());

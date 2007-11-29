@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.identifiers.IdI;
@@ -44,21 +43,21 @@ public class RoadPricingScheme {
 	private boolean cacheIsInvalid = true;
 	private Cost[] costCache = null;
 
-	public RoadPricingScheme(NetworkLayer network) {
+	public RoadPricingScheme(final NetworkLayer network) {
 		this.network = network;
 		this.links = new TreeMap<IdI, Link>();
 		this.costs = new ArrayList<Cost>();
 	}
 
-	public void addLink(String linkId) {
+	public void addLink(final String linkId) {
 		Link link = this.network.getLink(linkId);
 		if (link == null) {
-			Gbl.errorMsg("Link " + linkId + " for road pricing scheme cannot be found in associated network.");
+			throw new RuntimeException("Link " + linkId + " for road pricing scheme cannot be found in associated network.");
 		}
 		this.links.put(link.getId(), link);
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -66,7 +65,7 @@ public class RoadPricingScheme {
 		return this.name;
 	}
 
-	public void setType(String type) {
+	public void setType(final String type) {
 		this.type = type.intern();
 	}
 
@@ -82,7 +81,7 @@ public class RoadPricingScheme {
 		return this.active;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -129,7 +128,7 @@ public class RoadPricingScheme {
 	 * <code>null</code> if the link is either not part of the tolling scheme
 	 * or there is no toll at the specified time for the link.
 	 */
-	public Cost getLinkCost(IdI linkId, double time) {
+	public Cost getLinkCost(final IdI linkId, final double time) {
 		if (this.cacheIsInvalid) buildCache();
 		if (this.links.keySet().contains(linkId)) {
 			for (Cost cost : this.costCache) {
