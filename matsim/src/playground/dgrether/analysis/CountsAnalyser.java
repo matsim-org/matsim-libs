@@ -36,7 +36,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkLayerBuilder;
-import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.utils.geometry.transformations.TransformationFactory;
 
 /**
  * This class is able to compare traffic counts with traffic in the simulation.
@@ -125,6 +125,8 @@ public class CountsAnalyser {
 	 */
 	private CalcLinkStats linkStats;
 
+	private String coordSystem;
+
 	/**
 	 *
 	 * @param config
@@ -175,9 +177,12 @@ public class CountsAnalyser {
 		this.distanceFilter = config.counts().getDistanceFilter();
 		System.out.println("  Distance filter: " + this.distanceFilter);
 		System.out.println("  Scale Factor: " + config.counts().getCountsScaleFactor());
+		this.coordSystem = config.global().getCoordinateSystem();
+		System.out.println("  Coordinate System: " + this.coordSystem);
 		System.out.println("  reading LinkAttributes from: " + linksAttributeFilename);
 		this.linkStats = new CalcLinkStats(this.network);
 		this.linkStats.readFile(linksAttributeFilename);
+
 		System.out.println("  done.");
 	}
 
@@ -192,7 +197,8 @@ public class CountsAnalyser {
 		// processing counts
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats,
 				Counts.getSingleton(), this.network);
-		cca.setDistanceFilter(this.distanceFilter, this.distanceFilterCenterNode);
+		if ((this.distanceFilter != null) && (this.distanceFilterCenterNode != null))
+			cca.setDistanceFilter(this.distanceFilter, this.distanceFilterCenterNode);
 		cca.setCountsScaleFactor(Gbl.getConfig().counts().getCountsScaleFactor());
 		cca.run(Counts.getSingleton());
 		return cca.getComparison();
@@ -210,7 +216,7 @@ public class CountsAnalyser {
 		List<CountSimComparison> countsComparisonList = createCountsComparisonList(this.linkStats);
 		if (format.compareToIgnoreCase("kml") == 0) {
 			CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-					countsComparisonList, this.network, new CH1903LV03toWGS84());
+					countsComparisonList, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
 			kmlWriter.setTimeFilter(this.timeFilter);
 			kmlWriter.setIterationNumber(this.iterationNumber);
 			kmlWriter.write(filename);
