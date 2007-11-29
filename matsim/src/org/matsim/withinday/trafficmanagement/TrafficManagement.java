@@ -63,6 +63,13 @@ public class TrafficManagement {
 		return this.accidents;
 	}
 
+	public void setupIteration(final int iteration) {
+		for (VDSSign s : this.signs) {
+			s.setupIteration();
+		}
+
+	}
+
 	/**
 	 * This method is called after the prepareSim() method of the QueueSimulation was
 	 * run. It is used to initialize all elements in the TrafficManagement which
@@ -70,7 +77,13 @@ public class TrafficManagement {
 	 */
 	public void simulationPrepared() {
 		for (VDSSign s : this.signs) {
-			s.open();
+			s.simulationPrepared();
+		}
+	}
+
+	public void finishIteration() {
+		for (VDSSign s : this.signs) {
+			s.finishInteration();
 		}
 	}
 
