@@ -22,7 +22,7 @@ package org.matsim.basic.v01;
 
 import org.matsim.utils.identifiers.IdI;
 
-public class Id implements IdI, Comparable<Id> {
+public class Id implements IdI {
 
 	private final String id;
 
@@ -49,6 +49,10 @@ public class Id implements IdI, Comparable<Id> {
 
 	public int compareTo(final Id o) {
 		return this.id.compareTo(o.id);
+	}
+
+	public int compareTo(final IdI id) {
+		return this.id.toString().compareTo(id.toString());
 	}
 
 	@Override

@@ -20,10 +20,11 @@
 
 package org.matsim.utils.identifiers;
 
+
 /**
  * Represents a unique identifier.
  */
-public interface IdI {
+public interface IdI extends Comparable<IdI> {
 
     /**
      * This function must return a unique, non-<code>null</code> <code>String</code>
