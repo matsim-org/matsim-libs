@@ -283,8 +283,35 @@ public class CalcLinkStats {
 						data.volumes[SUM][this.nofHours] = Integer.parseInt(parts[8 + this.nofHours*3]);
 						data.volumes[MAX][this.nofHours] = Integer.parseInt(parts[9 + this.nofHours*3]);
 					}
-				} else {
-					System.err.println("CalcLinkStats.readFile(); line cannot be parsed: " + line);
+				}
+				else if (parts.length == 153) {
+					String linkId = parts[0];
+					LinkData data = this.linkData.get(linkId);
+					if (data == null) {
+						System.err.println("CalcLinkStats.readFile(); unknown link: " + linkId);
+					} else {
+						int baseTTimes;
+						for (int i = 0; i < this.nofHours; i++) {
+							data.volumes[MIN][i] = Integer.parseInt(parts[6 + i*3]);
+							data.volumes[SUM][i] = Integer.parseInt(parts[7 + i*3]);
+							data.volumes[MAX][i] = Integer.parseInt(parts[8 + i*3]);
+							baseTTimes = 6 + (this.nofHours+1)*3;
+							data.ttimes[MIN][i] = Double.parseDouble(parts[baseTTimes + i*3]);
+							if (data.volumes[SUM][i] == 0) {
+								data.ttimes[SUM][i] = Double.parseDouble(parts[baseTTimes + i*3 + 1]);
+							} else {
+								data.ttimes[SUM][i] = Double.parseDouble(parts[baseTTimes + i*3 + 1]) * data.volumes[SUM][i];
+							}
+							data.ttimes[MAX][i] = Double.parseDouble(parts[baseTTimes + i*3 + 2]);
+						}
+						data.volumes[MIN][this.nofHours] = Integer.parseInt(parts[6 + this.nofHours*3]);
+						data.volumes[SUM][this.nofHours] = Integer.parseInt(parts[7 + this.nofHours*3]);
+						data.volumes[MAX][this.nofHours] = Integer.parseInt(parts[8 + this.nofHours*3]);
+					}
+				}
+				else {
+					System.err.println("CalcLinkStats.readFile(); line cannot be parsed: " + line + " number of colums is: " + parts.length);
+					break;
 				}
 				line = reader.readLine();
 			}
