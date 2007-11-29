@@ -176,7 +176,7 @@ public class EventsReaderDEQv1 {
 
 
 	private class BinaryEventsReader {
-		private BasicEvent event = null;
+		BasicEvent event = null;
 		private BasicEvent next = null;
 		private final DataInputStream in;
 		private final String filename;
