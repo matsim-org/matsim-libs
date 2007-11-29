@@ -52,12 +52,7 @@ import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
 import org.matsim.withinday.trafficmanagement.Accident;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
-/*
- * FIXME [kn] Because this class was build to replace NashWriter, it inherits a serious flaw:
- * This class takes args of type Route in ctor, and returns arguments of
- * type route at getRoute, but these routes are of different type (one with FakeLink, the other
- * with behavioral links).
- */
+
 
 /*
  * Does the same as ControlInputImplSB.java, but also:
@@ -65,11 +60,10 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  The additional flows are measured and are assumed to be constant during the
  simulation time for the prediction. The additional agents are then included in the
  travel time calculation
+ 
+ There is one user set parameter named flowUpdateTime, which determines how often to measure the
+ additional flows from in- and outlinks. Default is to update every minute.
 */
-
-
-//TODO: ADD AGENTS ONLY FROM LINKS BEFORE THE BOTTLENECK
-//clean up, move some variables to Abstract, for example linkRoute...
 
 
 public class ControlInputImplSBNoise extends AbstractControlInputImpl implements EventHandlerLinkLeaveI,
@@ -118,7 +112,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 
 	private double ttFreeSpeedAfterBottleNeckMainRoute;
 
-	private double ttFreeSpeedAfterBottleNeckAlternativeRoute;
+//	private double ttFreeSpeedAfterBottleNeckAlternativeRoute;
 
 	private int additionalAgentsMainRoute = 0;
 
@@ -135,6 +129,12 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 	private List<Link> routeLinksListMainRoute = new ArrayList<Link>();
 
 	private List<Link> routeLinksListAlternativeRoute = new ArrayList<Link>();
+	
+	private double ttFreeSpeedMainRoute = 0;
+	
+	private double ttFreeSpeedAlternativeRoute = 0;
+	
+	private static final double FLOWUPDATETIME = 100;
 
 	public ControlInputImplSBNoise() {
 		super();
@@ -292,7 +292,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 
 		String accidentLinkId = this.accidents.get(0).getLinkId();
 		bottleNeckLinkMainRoute = searchAccidentsOnRoutes(accidentLinkId);
-		bottleNeckLinkAlternativeRoute = routeLinksAlternativeRoute[0]; //first link on route as a default value
+		bottleNeckLinkAlternativeRoute = altRouteNaturalBottleNeck;
 		additionalAgentsMainRoute = getAdditionalAgents(mainRoute);
 		additionalAgentsAlternativeRoute = getAdditionalAgents(alternativeRoute);
 
@@ -342,20 +342,14 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 			ttFreeSpeedBeforeBottleNeck += this.ttFreeSpeeds.get(routeLinks[i]
 					.getId().toString());
 		}
-
+		
 		// sum up free speed travel time AFTER bottleneck
 		ttFreeSpeedAfterBottleNeck = 0 ;
 		for (int i = bottleNeckLinkNumber + 1; i <routeLinks.length ; i++) {
 		ttFreeSpeedAfterBottleNeck += this.ttFreeSpeeds.get(routeLinks[i]
 				.getId().toString());
 		}
-		if(route == mainRoute){
-			ttFreeSpeedAfterBottleNeckMainRoute = ttFreeSpeedAfterBottleNeck;
-		}
-		else{
-			ttFreeSpeedAfterBottleNeckAlternativeRoute = ttFreeSpeedAfterBottleNeck;
-		}
-
+		
 		if (agentsBeforeBottleNeck / bottleNeckCapacity > ttFreeSpeedBeforeBottleNeck) {
 				predictedTT = agentsBeforeBottleNeck / bottleNeckCapacity
 					+ ttFreeSpeedAfterBottleNeck;
@@ -363,6 +357,16 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 			predictedTT = ttFreeSpeedBeforeBottleNeck
 					+ ttFreeSpeedAfterBottleNeck;
 				}
+		
+		if(route == mainRoute){
+			ttFreeSpeedAfterBottleNeckMainRoute = ttFreeSpeedAfterBottleNeck;
+			ttFreeSpeedMainRoute = ttFreeSpeedBeforeBottleNeck + ttFreeSpeedAfterBottleNeck;
+		}
+		else{
+//			ttFreeSpeedAfterBottleNeckAlternativeRoute = ttFreeSpeedAfterBottleNeck;
+			ttFreeSpeedAlternativeRoute = ttFreeSpeedBeforeBottleNeck + ttFreeSpeedAfterBottleNeck;
+		}
+
 		return predictedTT;
 	}
 
@@ -381,34 +385,35 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 			Iterator<Link> it1 = inLinksMainRoute.iterator();
 			while(it1.hasNext()){
 				Link inLink = it1.next();
-				double inflow = getInFlow(inLink, mainRoute);
-				double weightedInFlow;
-				//don't include Links after the bottleNeck. Alsa takes care of null-case
+				double inFlow = getInFlow(inLink, mainRoute);
+				double weightedInFlow = 0;
+				//don't include Links after the bottleNeck. Also takes care of null-case
 				if(inFlowDistancesMainRoute.get(inLink.getId().toString()) == null
 						|| inFlowDistancesMainRoute.get(inLink.getId().toString()) > distanceToBottleNeck){
 					weightedInFlow = 0;
 				}
 				else{
-					weightedInFlow = inflow * inFlowDistancesMainRoute.get(inLink.getId().toString());
-				}
+					weightedInFlow = inFlow * inFlowDistancesMainRoute.get(inLink.getId().toString());				}
 				weightedNetFlow += weightedInFlow;
+				
 			}
 			Iterator<Link> it2 = outLinksMainRoute.iterator();
 			while(it2.hasNext()){
 				Link outLink = it2.next();
-				double outflow = getOutFlow(outLink, mainRoute);
-				double weightedOutFlow;
-				if(outFlowDistancesAlternativeRoute.get(outLink.getId().toString()) == null
+				double outFlow = getOutFlow(outLink, mainRoute);
+				double weightedOutFlow = 0;
+				if(outFlowDistancesMainRoute.get(outLink.getId().toString()) == null
 						|| outFlowDistancesMainRoute.get(outLink.getId().toString()) > distanceToBottleNeck){
 						weightedOutFlow = 0;
 				}
 				else{
-					weightedOutFlow = outflow * outFlowDistancesAlternativeRoute.get(outLink.getId().toString());
+					weightedOutFlow = outFlow * outFlowDistancesMainRoute.get(outLink.getId().toString());
 				}
 				weightedNetFlow -= weightedOutFlow;
 			}
 			netFlow = weightedNetFlow / distanceToBottleNeck;
 			ttToBottleNeck = getPredictedTravelTime(mainRoute, bottleNeckLinkMainRoute) - ttFreeSpeedAfterBottleNeckMainRoute;
+//			ttToBottleNeck = ttFreeSpeedMainRoute;
 		}
 
 		//AlternativeRoute
@@ -417,33 +422,34 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 			Iterator<Link> it3 = inLinksAlternativeRoute.iterator();
 			while(it3.hasNext()){
 				Link inLink = it3.next();
-				double inflow = getInFlow(inLink, alternativeRoute);
-				double weightedInFlow;
+				double inFlow = getInFlow(inLink, alternativeRoute);
+				double weightedInFlow = 0;
 				if(inFlowDistancesAlternativeRoute.get(inLink.getId().toString()) == null
 						|| inFlowDistancesAlternativeRoute.get(inLink.getId().toString()) > distanceToBottleNeck){
 					weightedInFlow = 0;
 				}
 				else{
-					weightedInFlow = inflow * inFlowDistancesAlternativeRoute.get(inLink.getId().toString());
+					weightedInFlow = inFlow * inFlowDistancesAlternativeRoute.get(inLink.getId().toString());
 				}
 				weightedNetFlow += weightedInFlow;
 			}
-			Iterator<Link> it4 = outLinksMainRoute.iterator();
+			Iterator<Link> it4 = outLinksAlternativeRoute.iterator();
 			while(it4.hasNext()){
 				Link outLink = it4.next();
-				double outflow = getOutFlow(outLink, alternativeRoute);
-				double weightedOutFlow;
+				double outFlow = getOutFlow(outLink, alternativeRoute);
+				double weightedOutFlow = 0;
 				if(outFlowDistancesAlternativeRoute.get(outLink.getId().toString()) == null
 						|| outFlowDistancesAlternativeRoute.get(outLink.getId().toString()) > distanceToBottleNeck){
 						weightedOutFlow = 0;
 				}
 				else{
-					weightedOutFlow = outflow * outFlowDistancesAlternativeRoute.get(outLink.getId().toString());
+					weightedOutFlow = outFlow * outFlowDistancesAlternativeRoute.get(outLink.getId().toString());
 				}
 				weightedNetFlow -= weightedOutFlow;
 			}
-			netFlow = weightedNetFlow / distanceToBottleNeck;
-			ttToBottleNeck = getPredictedTravelTime(alternativeRoute, bottleNeckLinkAlternativeRoute) - ttFreeSpeedAfterBottleNeckAlternativeRoute;
+			netFlow = (weightedNetFlow / distanceToBottleNeck);
+			ttToBottleNeck = ttFreeSpeedAlternativeRoute;
+//			ttToBottleNeck = getPredictedTravelTime(alternativeRoute, bottleNeckLinkAlternativeRoute) - ttFreeSpeedAfterBottleNeckAlternativeRoute;
 		}
 		return (int)(ttToBottleNeck * netFlow);
 	}
@@ -454,8 +460,12 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 		if(route == mainRoute){
 			flow = outFlowsMainRoute.get(outLink.getId().toString());
 		}
-		else{
+		else if(route == alternativeRoute){
 			flow = outFlowsAlternativeRoute.get(outLink.getId().toString());
+		}
+		else{
+			flow = 0;
+			System.err.println("Something is wrong, this shouldn't happen!");
 		}
 		return flow;
 	}
@@ -466,8 +476,12 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 		if(route == mainRoute){
 			flow = inFlowsMainRoute.get(inLink.getId().toString());
 		}
-		else{
+		else if(route == alternativeRoute){
 			flow = inFlowsAlternativeRoute.get(inLink.getId().toString());
+		}
+		else{
+			flow = 0;
+			System.err.println("Something is wrong, this shouldn't happen!");
 		}
 		return flow;
 	}
@@ -500,15 +514,20 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
 		//set new in and outflows and reset numbersPassedOnInAndOutLinks every five minutes
 		double simTime = SimulationTimer.getTime();
-		if(simTime%10 == 0){
+				
+		//reset the additionalAgents ... hmmm...for debugging..
+		additionalAgentsMainRoute = 0;
+		additionalAgentsAlternativeRoute = 0;
+		
+		if(simTime%FLOWUPDATETIME == 0){
 			//inLinksMainRoute
 			Iterator<Link> iter1 = inLinksMainRoute.iterator();
 			while(iter1.hasNext()){
 				Link inLink = iter1.next();
-				double flow = (double)numbersPassedOnInAndOutLinks.get(inLink.getId().toString())/10;
+				double flow = (double)numbersPassedOnInAndOutLinks.get(inLink.getId().toString())/FLOWUPDATETIME;
 				inFlowsMainRoute.put(inLink.getId().toString(), flow);
 				numbersPassedOnInAndOutLinks.put(inLink.getId().toString(), 0);
 			}
@@ -517,7 +536,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 			Iterator<Link> iter2 = outLinksMainRoute.iterator();
 			while(iter2.hasNext()){
 				Link outLink = iter2.next();
-				double flow = numbersPassedOnInAndOutLinks.get(outLink.getId().toString())/10;
+				double flow = (double)numbersPassedOnInAndOutLinks.get(outLink.getId().toString())/FLOWUPDATETIME;
 				outFlowsMainRoute.put(outLink.getId().toString(), flow);
 				numbersPassedOnInAndOutLinks.put(outLink.getId().toString(), 0);
 			}
@@ -525,7 +544,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 			Iterator<Link> iter3 = inLinksAlternativeRoute.iterator();
 			while(iter3.hasNext()){
 				Link inLink = iter3.next();
-				double flow = numbersPassedOnInAndOutLinks.get(inLink.getId().toString())/10;
+				double flow = (double)numbersPassedOnInAndOutLinks.get(inLink.getId().toString())/FLOWUPDATETIME;
 				inFlowsAlternativeRoute.put(inLink.getId().toString(), flow);
 				numbersPassedOnInAndOutLinks.put(inLink.getId().toString(), 0);
 			}
@@ -534,7 +553,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 			Iterator<Link> iter4 = inLinksAlternativeRoute.iterator();
 			while(iter4.hasNext()){
 				Link outLink = iter4.next();
-				double flow = numbersPassedOnInAndOutLinks.get(outLink.getId().toString())/10;
+				double flow = (double)numbersPassedOnInAndOutLinks.get(outLink.getId().toString())/FLOWUPDATETIME;
 				outFlowsAlternativeRoute.put(outLink.getId().toString(), flow);
 				numbersPassedOnInAndOutLinks.put(outLink.getId().toString(), 0);
 			}
