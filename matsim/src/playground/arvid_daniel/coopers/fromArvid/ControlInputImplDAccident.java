@@ -52,11 +52,12 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  * @author abergsten and dzetterberg
  */
 
-/*
- * FIXME [kn] Because this class was build to replace NashWriter, it inherits a serious flaw:
- * This class takes args of type Route in ctor, and returns arguments of
- * type route at getRoute, but these routes are of different type (one with FakeLink, the other
- * with behavioral links).
+/* User parameters are:
+ * NUMBEROFFLOWEVENTS - The flow calculations are based on the last NUMBEROFFLOWEVENTS 
+ * 						agents. A higher value means better predictions if congestion.
+ * IGNOREDQUEUINGIME  - Additional link travel times up to IGNOREDQUEUINGIME will not be 
+ * 						considered a sign of temporary capacity reduction.
+ * 
  */
 
 /* TODO [abergsten] iterate approach to find several "charges" of traffic 
@@ -66,7 +67,7 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
 
 
 
-public class ControlInputImplDAccident extends AbstractControlInputImpl 
+public class ControlInputImplDAccident extends AbstractControlInputImpl
 implements EventHandlerLinkLeaveI, EventHandlerLinkEnterI, 
 EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
@@ -84,7 +85,11 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	private Map<String, Double> enterLinkEvents = new HashMap<String, Double>();
 	
 	private Map <String, Double> linkFlows = new HashMap<String, Double>();
+	
+	private static final int NUMBEROFFLOWEVENTS = 20;
 
+	private static final double IGNOREDQUEUINGIME = 5;
+	
 	private Map <String, List<Double>> enterLinkEventTimes = new HashMap<String, List<Double>>();
 	
 	private Map<String, Double> capacities = new HashMap<String, Double> ();
@@ -171,18 +176,18 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 //		Stores 5 last events and calculates flow
 		if (this.linkFlows.containsKey(event.linkId)) {
 			LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes.get(event.linkId);
-			if ( list.size() == 5 ) {
+			if ( list.size() == NUMBEROFFLOWEVENTS ) {
 			list.removeFirst();
 			list.add(event.time);
 			}
-			else if (1 < list.size() || list.size() < 5) {
+			else if (1 < list.size() || list.size() < NUMBEROFFLOWEVENTS) {
 				list.add(event.time);
 			} else if ( list.size() == 0 ) {
 				list.add(event.time - 1);
 				list.add(event.time);
 			}
 			else {
-				System.err.println("Error: number of enter event times stored exceeds 5!");
+				System.err.println("Error: number of enter event times stored exceeds numberofflowevents!");
 			}
 			
 //			Flow = agents / seconds:
@@ -244,8 +249,8 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			for ( int i = routeLinks.length - 1; i >= 0; i-- ) {
 				String linkId = routeLinks[i].getId().toString();
 
-//				To avoid round of errors, the difference has to be at last 1 second
-				if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId) + 10)  {
+//				The difference has to be at least IGNOREDQUEUINGIME seconds to avoid using incorrect flows 
+				if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId) + IGNOREDQUEUINGIME)  {
 					bottleNeckCongested = true;
 					currentBottleNeck = routeLinks[i];
 					currentBottleNeckFlow = getFlow(currentBottleNeck);
@@ -304,7 +309,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 //			System.out.println("Bottleneck link index: " + j);
 			while ( j >= 0 && 
 				(this.numberOfAgents.get(routeLinks[j].getId().toString()) / currentBottleNeckCapacity)
-					<= this.ttFreeSpeeds.get(routeLinks[j].getId().toString()) ) {	// is this criterium ok?
+					<= this.ttFreeSpeeds.get(routeLinks[j].getId().toString()) ) {	// is this criterium ok? -NOOO IT'S NOT!
 				
 				ttFreeSpeedPart += this.ttFreeSpeeds.get(routeLinks[j].getId().toString());
 				System.out.println("Adding to total free speed part before bottle neck; not-congested-link index " + j);
