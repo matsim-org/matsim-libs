@@ -20,8 +20,6 @@
 
 package org.matsim.events;
 
-import java.util.List;
-
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Leg;
@@ -72,9 +70,7 @@ public abstract class AgentEvent extends BasicEvent {
 
 	protected void rebuildAgentData(final Plans population, final NetworkLayer network) {
 		this.agent = population.getPerson(this.agentId);
-		List<Plan> plans = this.agent.getPlans();
-		Plan selPlan = null;
-		for (Plan plan : plans) if (plan.isSelected())selPlan = plan;
+		Plan selPlan = this.agent.getSelectedPlan();
 		this.leg = (Leg)selPlan.getActsLegs().get(this.legId*2+1);
 	}
 }
