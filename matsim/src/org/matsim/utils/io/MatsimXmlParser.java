@@ -189,7 +189,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			return new InputSource(is);
 		} catch (IOException e) {
 			// There was a problem getting the (remote) file, just show the error as information for the user
-			System.err.println(e.toString());
+			Logger.getLogger(this.getClass()).error(e.toString());
 		}
 
 		// systemId could not be resolved, try it locally
