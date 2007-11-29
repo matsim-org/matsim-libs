@@ -19,11 +19,8 @@
  * *********************************************************************** */
 
 package org.matsim.withinday.trafficmanagement;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.events.Events;
@@ -36,7 +33,6 @@ import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControle
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.NoControl;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import playground.arvid_daniel.coopers.fromArvid.ControlInputImpl1;
 import playground.arvid_daniel.coopers.fromArvid.ControlInputImplDAccident;
@@ -48,7 +44,7 @@ import playground.arvid_daniel.coopers.fromArvid.ControlInputImplSBNoise;
 public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(TrafficManagementConfigParser.class);
-	
+
 	private final static String TRAFFICMANAGEMENT = "trafficmanagement";
 
 	private final static String GUIDANCEDEVICE = "guidanceDevice";
@@ -74,46 +70,50 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	private final static String BENEFITCONTROL = "benefitControl";
 
 	private final static String MAINROUTE = "mainRoute";
-	
+
 	private final static String ALTERNATIVEROUTE = "alternativeRoute";
-	
+
 	private final static String NODE = "node";
-	
+
 	private final static String ID = "id";
-	
+
 	private final static String FEEDBACKCONTROLER = "feedBackControler";
 
 	private static final String BANGBANGCONTROLER = "BangBangControler";
 
 //	private static final String CONSTANTCONTROLER = "ConstantControler";
-	
+
 	private static final String NOCONTROL = "NoControl";
-	
+
 //	private static final String PCONTROLER = "PControler";
-	
+
 //	private static final String PIDCONTROLER = "PIDControler";
-	
+
 	private static final String CONTROLINPUTSB = "ControlInputImplSB";
-	
+
 	private static final String CONTROLINPUT1 = "ControlInputImpl1";
-	
+
 	private static final String CONTROLINPUTSBNOISE = "ControlInputImplSBNoise";
-	
+
 	private static final String CONTROLINPUTDISTRIBUTION = "ControlInputImplDistribution";
 
 	private static final String CONTROLINPUTDACCIDENT = "ControlInputImplDAccident";
 
 	private final static String CONTROLINPUT = "controlInput";
-	
+
 	private final static String ACCIDENT = "accident";
-	
+
 	private final static String LINKID = "linkId";
-	
+
 	private final static String CAPACITYREDUCTIONFACTOR ="capacityReductionFactor";
-	
+
 	private final static String STARTTIME = "startTime";
-	
+
 	private final static String ENDTIME = "endTime";
+
+	private final static String OUTPUT = "output";
+
+	private final static String SPREADSHEETFILE = "spreadsheetfile";
 
 	private TrafficManagement trafficManagement;
 
@@ -123,19 +123,18 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private NetworkLayer network;
 
-	private String configPath;
-	
 	private ControlInput controlInput;
 
 	private Accident accident;
 
 	private Events events;
-	
+
+	private VDSSignOutput vdsSignOutput;
+
 
 	public TrafficManagementConfigParser(final NetworkLayer network,
-			final String trafficManagementConfig, final Events events) {
+			final Events events) {
 		this.network = network;
-		this.configPath = trafficManagementConfig;
 		this.events = events;
 	}
 
@@ -163,6 +162,9 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 				throw new RuntimeException("The Node with the id: " + id
 						+ " could not be found in the network");
 			}
+		}
+		else if (name.equalsIgnoreCase(OUTPUT)) {
+			this.vdsSignOutput = new VDSSignOutput();
 		}
 	}
 	@Override
@@ -204,7 +206,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		else if (name.equalsIgnoreCase(SIGNLINK)) {
 			Link l = this.network.getLink(content);
 			if (l != null) {
-				this.vdsSign.setSignLink(l);				
+				this.vdsSign.setSignLink(l);
 			}
 			else {
 				throw new IllegalArgumentException("the sign link of the sign could not be found in the network!");
@@ -213,7 +215,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		else if (name.equalsIgnoreCase(DIRECTIONLINKS)) {
 			Link l = this.network.getLink(content);
 			if (l != null) {
-				this.vdsSign.setDirectionLink(l);				
+				this.vdsSign.setDirectionLink(l);
 			}
 			else {
 				throw new IllegalArgumentException("the direction link of the sign could not be found in the network!");
@@ -226,7 +228,6 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.vdsSign.setBenefitControl(Boolean.parseBoolean(content));
 		}
 		else if (name.equalsIgnoreCase(GUIDANCEDEVICE)) {
-			this.vdsSign.init();
 			this.trafficManagement.addVDSSign(this.vdsSign);
 		}
 		else if (name.equalsIgnoreCase(CONTROLINPUT)) {
@@ -247,6 +248,12 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		else if (name.equalsIgnoreCase(ACCIDENT)) {
 			this.trafficManagement.addAccident(this.accident);
 			this.accident = null;
+		}
+		else if (name.equalsIgnoreCase(SPREADSHEETFILE)) {
+			this.vdsSignOutput.setSpreadsheetFile(content);
+		}
+		else if (name.equalsIgnoreCase(OUTPUT)) {
+			this.vdsSign.setOutput(this.vdsSignOutput);
 		}
 	}
 
@@ -289,25 +296,14 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.events.addHandler(controlInput);
 			return controlInput;
 		}
-		
+
 		throw new IllegalArgumentException("The ControlInput of xml is not known in the TrafficManagementConfiguration.");
 	}
 
-	public TrafficManagement initTrafficManagement() {
-		try {
-			super.parse(this.configPath);
-
-			return this.trafficManagement;
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public TrafficManagement getTrafficManagement() {
+		if (this.trafficManagement == null) {
+			throw new RuntimeException("call parse(...) first!");
 		}
-		return null;
+		return this.trafficManagement;
 	}
 }
