@@ -507,9 +507,9 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 	public double getNashTime() {
 		try {
 			this.writer.writeAgentsOnLinks(this.numberOfAgents);
-			this.writer.writeTravelTimesMainRoute(this.lastTime1,
+			this.writer.writeTravelTimesMainRoute(this.lastTimeMainRoute,
 					this.predTTMainRoute);
-			this.writer.writeTravelTimesAlternativeRoute(this.lastTime2,
+			this.writer.writeTravelTimesAlternativeRoute(this.lastTimeAlternativeRoute,
 					this.predTTAlternativeRoute);
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -263,9 +263,9 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
 		try {
 			this.writer.writeAgentsOnLinks(this.numberOfAgents);
-			this.writer.writeTravelTimesMainRoute(this.lastTime1,
+			this.writer.writeTravelTimesMainRoute(this.lastTimeMainRoute,
 					this.predTTRoute1);
-			this.writer.writeTravelTimesAlternativeRoute(this.lastTime2,
+			this.writer.writeTravelTimesAlternativeRoute(this.lastTimeAlternativeRoute,
 					this.predTTRoute2);
 		} catch (IOException e) {
 			e.printStackTrace();
