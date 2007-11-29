@@ -37,7 +37,7 @@ endif
 
 ######################################################################
 
-.PHONY: compile compile_strategies run tags clean
+.PHONY: compile run tags clean
 
 compile:
 	@echo "------------------------------------------------------------"
