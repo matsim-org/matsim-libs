@@ -22,13 +22,12 @@ package org.matsim.counts;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.counts.algorithms.CountsAlgorithm;
 import org.matsim.utils.identifiers.IdI;
 
 public class Counts {
 
-	private static Counts singleton = null;
+	private static Counts singleton = new Counts();
 	private String name = null;
 	private String desc = null;
 	private int year = 0;
@@ -36,20 +35,14 @@ public class Counts {
 	private final TreeMap<IdI, Count> counts = new TreeMap<IdI, Count>();
 	private final ArrayList<CountsAlgorithm> algorithms = new ArrayList<CountsAlgorithm>();
 
-	private final static Logger log = Logger.getLogger(Counts.class);
-
 	private Counts() {
 	}
 
 	public static final Counts getSingleton() {
-		if (singleton == null) {
-			singleton = new Counts();
-			log.info("Created counts singleton.");
-		}
 		return singleton;
 	}
 
-	public final void addAlgorithm(CountsAlgorithm algo) {
+	public final void addAlgorithm(final CountsAlgorithm algo) {
 		this.algorithms.add(algo);
 	}
 
@@ -125,7 +118,7 @@ public class Counts {
 
 	//needed for testing
 	public static final void reset() {
-		singleton=null;
+		singleton = new Counts();
 	}
 
 	@Override

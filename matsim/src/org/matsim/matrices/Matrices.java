@@ -23,7 +23,6 @@ package org.matsim.matrices;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.matrices.algorithms.MatricesAlgorithm;
 import org.matsim.world.Layer;
@@ -34,13 +33,11 @@ public class Matrices {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static Matrices singleton = null;
+	private static Matrices singleton = new Matrices();
 
 	private String name = null;
 	private final TreeMap<String, Matrix> matrices = new TreeMap<String, Matrix>();
 	private final ArrayList<MatricesAlgorithm> algorithms = new ArrayList<MatricesAlgorithm>();
-
-	private final static Logger log = Logger.getLogger(Matrices.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// Constructors
@@ -54,10 +51,6 @@ public class Matrices {
 	//////////////////////////////////////////////////////////////////////
 
 	public static final Matrices getSingleton() {
-		if (singleton == null) {
-			singleton = new Matrices();
-			log.info("Created matrices singleton");
-		}
 		return singleton;
 	}
 
