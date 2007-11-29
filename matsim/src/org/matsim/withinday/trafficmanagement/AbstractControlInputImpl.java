@@ -35,10 +35,6 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.network.Link;
 import org.matsim.plans.Route;
 
-import playground.arvid_daniel.coopers.fromArvid.ControlInputImplSB;
-
-
-
 /**
  * @author dgrether
  *
@@ -96,7 +92,6 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 
 	}
 
-
 	public Route getMainRoute() {
 		return this.mainRoute;
 	}
@@ -109,12 +104,9 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 		this.alternativeRoute = route;
 	}
 
-
 	public void setMainRoute(final Route route) {
 		this.mainRoute = route;
 	}
-
-
 
 	public int getNumberOfVehiclesOnRoute(final Route route) {
 		Link[] links = route.getLinkRoute();
@@ -128,7 +120,6 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 	/**
 	 * @see org.matsim.withinday.trafficmanagement.ControlInput#init()
 	 */
-
 	public void init() {
 		Link [] routeLinks;
 		routeLinks = this.getAlternativeRoute().getLinkRoute();
@@ -146,12 +137,11 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 
 //		find the natural bottleneck on the alternative route
 		Link[] altRouteLinks = this.getAlternativeRoute().getLinkRoute();
-		altRouteNaturalBottleNeck = altRouteLinks[0];
+		this.altRouteNaturalBottleNeck = altRouteLinks[0];
 		for ( int i = 1; i < altRouteLinks.length; i++ ) {
-			if ( altRouteLinks[i].getCapacity() < altRouteNaturalBottleNeck.getCapacity() )
-				altRouteNaturalBottleNeck = altRouteLinks[i];
+			if ( altRouteLinks[i].getCapacity() < this.altRouteNaturalBottleNeck.getCapacity() )
+				this.altRouteNaturalBottleNeck = altRouteLinks[i];
 		}
-
 
 		routeLinks = this.getMainRoute().getLinkRoute();
 		this.firstLinkOnMainRoute = routeLinks[0].getId().toString();
@@ -164,15 +154,14 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			tt = l.getLength()/l.getFreespeed();
 			this.ttFreeSpeeds.put(l.getId().toString(), tt );
 			this.ttFreeSpeedMainRoute += tt;
-
 		}
 
 //		find the natural bottleneck on the main route
 		Link[] mainRouteLinks = this.getMainRoute().getLinkRoute();
-		mainRouteNaturalBottleNeck = mainRouteLinks[0];
+		this.mainRouteNaturalBottleNeck = mainRouteLinks[0];
 		for ( int i = 1; i < mainRouteLinks.length; i++ ) {
-			if ( mainRouteLinks[i].getCapacity() < mainRouteNaturalBottleNeck.getCapacity() )
-				mainRouteNaturalBottleNeck = mainRouteLinks[i];
+			if ( mainRouteLinks[i].getCapacity() < this.mainRouteNaturalBottleNeck.getCapacity() )
+				this.mainRouteNaturalBottleNeck = mainRouteLinks[i];
 		}
 	}
 
@@ -265,7 +254,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 		}
 	}
 
-	public double getFreeSpeedRouteTravelTime(Route route) {
+	public double getFreeSpeedRouteTravelTime(final Route route) {
 		if (route == this.mainRoute )
 			return this.ttFreeSpeedMainRoute;
 		else if ( route == this.alternativeRoute )
@@ -275,7 +264,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			"This route object does not exist!");
 	}
 
-	public double getMeasuredRouteTravelTime(Route route) {
+	public double getMeasuredRouteTravelTime(final Route route) {
 		if (route == this.mainRoute )
 			return this.lastTime1;
 		else if ( route == this.alternativeRoute )
