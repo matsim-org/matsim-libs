@@ -79,19 +79,19 @@ public class Counts {
 		return c;
 	}
 
-	protected final void setName(final String name) {
+	public final void setName(final String name) {
 		this.name = name;
 	}
 
-	protected final void setDescription(final String desc) {
+	public final void setDescription(final String desc) {
 		this.desc = desc;
 	}
 
-	protected final void setYear(final int year) {
+	public final void setYear(final int year) {
 		this.year = year;
 	}
 
-	protected final void setLayer(final String layer) {
+	public final void setLayer(final String layer) {
 		this.layer = layer;
 	}
 

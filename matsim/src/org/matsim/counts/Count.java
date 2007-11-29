@@ -37,7 +37,7 @@ public class Count {
 		this.csId = csId;
 	}
 
-	protected final Volume createVolume(final int h, final double val) {
+	public final Volume createVolume(final int h, final double val) {
 		// overkill?
 		Volume v = new Volume(h,val);
 		this.volumes_.put(Integer.valueOf(h), v);
