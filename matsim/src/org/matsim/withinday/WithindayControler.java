@@ -20,7 +20,10 @@
 
 package org.matsim.withinday;
 
+import java.io.IOException;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
@@ -32,6 +35,7 @@ import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.Accident;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 import org.matsim.withinday.trafficmanagement.TrafficManagementConfigParser;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -65,17 +69,35 @@ public class WithindayControler extends Controler {
 	@Override
 	protected void startup() {
 		super.startup();
-		this.factory = new WithindayAgentLogicFactory(this.network, this.config.charyparNagelScoring());
 		LinkTravelTimeCounter.init(this.events, this.network.getLinks().size());
 	//initialize the traffic management
 		String trafficManagementConfig = this.config.withinday().getTrafficManagementConfiguration();
 		if (trafficManagementConfig != null) {
-			this.trafficManagementConfigurator = new TrafficManagementConfigParser(this.network, trafficManagementConfig, this.events);
-			this.trafficManagement = this.trafficManagementConfigurator.initTrafficManagement();
+			this.trafficManagementConfigurator = new TrafficManagementConfigParser(this.network, this.events);
+			try {
+				this.trafficManagementConfigurator.parse(trafficManagementConfig);
+			} catch (SAXException e) {
+				log.error("An error occured while parsing the trafficmanagement configuration, the traffic management will not be used!");
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				log.error("An error occured while parsing the trafficmanagement configuration, the traffic management will not be used!");
+				e.printStackTrace();
+			} catch (IOException e) {
+				log.error("An error occured while parsing the trafficmanagement configuration, the traffic management will not be used!");
+				e.printStackTrace();
+			}
 		}
 
 	}
 
+	@Override
+	protected void setupIteration(final int iteration) {
+		this.factory = new WithindayAgentLogicFactory(this.network, this.config.charyparNagelScoring());
+		if (this.trafficManagementConfigurator != null) {
+			this.trafficManagement = this.trafficManagementConfigurator.getTrafficManagement();
+			this.trafficManagement.setupIteration(iteration);
+		}
+	}
 
 
 	@Override
@@ -140,6 +162,10 @@ public class WithindayControler extends Controler {
 
 	}
 
+	@Override
+	protected void finishIteration(final int iteration) {
+		this.trafficManagement.finishIteration();
+	}
 
 	/**
 	 * @param args
