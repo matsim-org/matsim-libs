@@ -31,14 +31,13 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 import org.matsim.plans.algorithms.XY2Links;
+import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-
-import playground.balmermi.algos.PlansCalcRandomViaRoute;
 
 public class InitRouteCreation {
 
 	public static void createInitRoutes() {
-		
+
 		System.out.println("MATSim-IIDM: create initial routes.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -64,10 +63,9 @@ public class InitRouteCreation {
 		System.out.println("  adding person modules... ");
 		plans.addAlgorithm(new XY2Links(network));
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-//		plans.addAlgorithm(new PlansCalcRoute(network, timeCostCalc, timeCostCalc));
-		plans.addAlgorithm(new PlansCalcRandomViaRoute(network,timeCostCalc,timeCostCalc));
+		plans.addAlgorithm(new PlansCalcRoute(network, timeCostCalc, timeCostCalc));
 		System.out.println("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
@@ -76,14 +74,14 @@ public class InitRouteCreation {
 		plans.runAlgorithms();
 		plansWriter.write();
 		System.out.println("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing network xml file... ");
 		NetworkWriter net_writer = new NetworkWriter(network);
 		net_writer.write();
 		System.out.println("  done.");
-		
+
 		System.out.println("  writing config xml file... ");
 		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
 		config_writer.write();
@@ -92,7 +90,7 @@ public class InitRouteCreation {
 		System.out.println("done.");
 		System.out.println();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
