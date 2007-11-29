@@ -28,23 +28,25 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 
 /**
+ * controler for creating a matrix (departureTime, Duration, volume)
  * @author ychen
  *
  */
 public class DpDurControler {
 
 	/**
-	 * @param args
+	 * @param args - config-file
 	 */
 	public static void main(String[] args) {
 		Config config = Gbl.createConfig(args);
 		DpDurWriter ddw = new DpDurWriter(config.events().getOutputFile());
+		
 		Events events = new Events();
 		events.addHandler(ddw);// TODO...
 
-		System.out.println("  reading the eventsfile (TXTv1) ...");
+		System.out.println("@reading the eventsfile (TXTv1) ...");
 		new MatsimEventsReader(events).readFile(config.events().getInputFile());//Man can also use readFile("..../...txt") hier
-		System.out.println("  done.");
+		System.out.println("@done.");
 
 		ddw.writeMatrix();
 		ddw.closefile();

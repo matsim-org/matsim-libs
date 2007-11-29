@@ -35,6 +35,8 @@ import org.matsim.events.handler.BasicEventHandlerI;
 import org.matsim.utils.io.IOUtils;
 
 /**
+ * creats a matrix (departureTime, Duration, volume)
+ * 
  * @author ychen
  * 
  */
@@ -121,7 +123,7 @@ public class DpDurWriter implements BasicEventHandlerI {
 		String fileHead = "\t";
 		for (int i = 0; i <= maxDur / 60; i += 5) {
 			fileHead += Integer.toString(i) + "\t";
-		}
+		}// "5" --> 5min ~ 9min59s
 		writeLine(fileHead);
 		String line = "";
 		for (String dpT : dpTSet) {
@@ -132,13 +134,12 @@ public class DpDurWriter implements BasicEventHandlerI {
 				line += i + "\t";
 			}
 			writeLine(line);
-		}
+		}// dpT : 7:05 --> 7:05:00 ~ 7:09:59
 	}
 
 	private void writeLine(String line) {
 		try {
 			this.out.write(line + "\n");
-			// this.out.write("\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
