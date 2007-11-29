@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.trafficmanagement;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,22 +76,33 @@ public class VDSSign {
 
 	private double complianceRate;
 
+	private VDSSignOutput signOutput;
+
 	public VDSSign() {
 	}
 
-	public void init() {
+	public void setupIteration() {
 		this.controlUpdateTime = this.messageHoldTime * this.controlEvents;
 		// completes the routes, i.e. calculates out and inlinks
 		this.mainRoute = completeRoute(this.controlInput.getMainRoute());
 		this.alternativeRoute = completeRoute(this.controlInput.getAlternativeRoute());
 		this.currentRouteSet = new ArrayList<Route>(this.controlEvents);
+		if (this.signOutput != null) {
+			try {
+				this.signOutput.init();
+			} catch (IOException e) {
+				log.error("Cannot create output files for VDSSign, no output will be written");
+				e.printStackTrace();
+				this.signOutput = null;
+			}
+		}
 	}
 
 	/**
 	 * Sets the time for the first guidance message generation.
 	 *
 	 */
-	public void open() {
+	public void simulationPrepared() {
 		this.nextUpdate = SimulationTimer.getTime();
 	}
 
@@ -120,6 +132,9 @@ public class VDSSign {
 			log.trace("");
 			log.trace("System time: " + time);
 			log.trace("NashTime: " + nashTime);
+		}
+		if (this.signOutput != null) {
+			this.signOutput.addMeasurement(time, this.controlInput.getMeasuredRouteTravelTime(this.controlInput.getMainRoute()), this.controlInput.getMeasuredRouteTravelTime(this.controlInput.getAlternativeRoute()), nashTime);
 		}
 		if (time == this.nextUpdate) {
 			// Choosing the output for the controler, y(t) or d(t),
@@ -419,6 +434,16 @@ public class VDSSign {
 
 	public void setCompliance(final double complianceRate) {
 		this.complianceRate = complianceRate;
+	}
+
+	public void setOutput(VDSSignOutput vdsSignOutput) {
+		this.signOutput = vdsSignOutput;
+	}
+
+	public void finishInteration() {
+		if (this.signOutput != null) {
+			this.signOutput.close();
+		}
 	}
 
 }
