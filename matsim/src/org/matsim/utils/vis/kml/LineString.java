@@ -33,44 +33,41 @@ import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
  */
 public class LineString extends Geometry {
 
+	private final ArrayList<Point> points;
 
-	private ArrayList<Point> points;
-	
 	/**
-	 * Constructs a new <code>LineString</code> object using 
+	 * Constructs a new <code>LineString</code> object using
 	 * two <code>Point</code> objects.
-	 * 
+	 *
 	 * @param fromPoint
 	 * the one end of the line
 	 * @param toPoint
 	 * the other end of the line
 	 */
-	public LineString(Point fromPoint, Point toPoint) {
+	public LineString(final Point fromPoint, final Point toPoint) {
 		super();
 		this.points = new ArrayList<Point>();
 		this.points.add(fromPoint);
 		this.points.add(toPoint);
 	}
 
-	
 	/**
-	 * Constructs a new <code>LineString</code> object using 
+	 * Constructs a new <code>LineString</code> object using
 	 * an <code>ArrayList<Point></code> object.
-	 * 
+	 *
 	 * @param points
 	 * an ArrayList of <a href="http://earth.google.com/kml/kml_tags.html#point">
-	 * Point</a>  
+	 * Point</a>
 	 */
-	public LineString(ArrayList<Point> points) {
+	public LineString(final ArrayList<Point> points) {
 		super();
 		this.points = points;
 	}
 
-	
 	/**
-	 * Constructs a new <code>LineString</code> object using 
+	 * Constructs a new <code>LineString</code> object using
 	 * two <code>Point</code> objects, and user-defined geometry attributes.
-	 * 
+	 *
 	 * @param fromPoint
 	 * the one end <a href="http://earth.google.com/kml/kml_tags.html#point">
 	 * Point</a> of the line
@@ -87,19 +84,17 @@ public class LineString extends Geometry {
 	 * the <a href="http://earth.google.com/kml/kml_tags_21.html#altitudemode">
 	 * altitude mode</a> property of the new line string.
 	 */
-	public LineString(Point fromPoint, Point toPoint, boolean extrude, boolean tessellate, AltitudeMode altitudeMode) {
-		
+	public LineString(final Point fromPoint, final Point toPoint, final boolean extrude, final boolean tessellate, final AltitudeMode altitudeMode) {
 		super(extrude, tessellate, altitudeMode);
+		this.points = new ArrayList<Point>();
 		this.points.add(fromPoint);
 		this.points.add(toPoint);
-		
 	}
-	
-	
+
 	/**
-	 * Constructs a new <code>LineString</code> object using 
+	 * Constructs a new <code>LineString</code> object using
 	 * an <code>ArrayList<Point></code> object, and user-defined geometry attributes.
-	 * 
+	 *
 	 * @param points
 	 * An ArrayList of <a href="http://earth.google.com/kml/kml_tags.html#point">
 	 * Points
@@ -113,45 +108,35 @@ public class LineString extends Geometry {
 	 * the <a href="http://earth.google.com/kml/kml_tags_21.html#altitudemode">
 	 * altitude mode</a> property of the new line string.
 	 */
-	public LineString(ArrayList<Point> points, boolean extrude, boolean tessellate, AltitudeMode altitudeMode) {
-		
+	public LineString(final ArrayList<Point> points, final boolean extrude, final boolean tessellate, final AltitudeMode altitudeMode) {
 		super(extrude, tessellate, altitudeMode);
 		this.points = points;
-		
 	}
-	
-	
-	@Override
-	protected void writeObject(BufferedWriter out, XMLNS version, int offset, String offsetString) throws IOException {
 
+	@Override
+	protected void writeObject(final BufferedWriter out, final XMLNS version, final int offset, final String offsetString) throws IOException {
 		out.write(Object.getOffset(offset, offsetString));
 		out.write("<LineString>");
 		out.newLine();
 
 		super.writeObject(out, version, offset + 1, offsetString);
-		
+
 		out.write(Object.getOffset(offset + 1, offsetString));
 		out.write("<coordinates>");
-//		out.newLine();
-		
-		for (Point point : this.points){
+
+		for (Point point : this.points) {
 			out.write(Object.getOffset(offset + 2, offsetString));
-			out.write(
-					point.getLongitude() + "," +
-					point.getLatitude() + "," +
-					point.getAltitude()				
-					);
-			out.newLine();			
+			out.write(point.getLongitude() + "," + point.getLatitude() + "," + point.getAltitude());
+			out.newLine();
 		}
 
 		out.write(Object.getOffset(offset + 1, offsetString));
 		out.write("</coordinates>");
 		out.newLine();
-		
+
 		out.write(Object.getOffset(offset, offsetString));
 		out.write("</LineString>");
 		out.newLine();
-			
-	}	
-	
+	}
+
 }
