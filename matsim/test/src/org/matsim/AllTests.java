@@ -42,6 +42,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("All tests for org.matsim");
 		//$JUnit-BEGIN$
 		suite.addTest(org.matsim.controler.AllTests.suite());
+		suite.addTest(org.matsim.counts.AllTests.suite());
 		suite.addTest(org.matsim.evacuation.AllTests.suite());
 		suite.addTest(org.matsim.events.AllTests.suite());
 		suite.addTest(org.matsim.facilities.AllTests.suite());
@@ -52,12 +53,10 @@ public class AllTests {
 		suite.addTest(org.matsim.roadpricing.AllTests.suite());
 		suite.addTest(org.matsim.router.AllTests.suite());
 		suite.addTest(org.matsim.trafficmonitoring.AllTests.suite());
-		suite.addTest(org.matsim.util.AllTests.suite());
-		suite.addTest(org.matsim.world.AllTests.suite());
-		suite.addTest(org.matsim.examples.AllTests.suite());
 		suite.addTest(org.matsim.utils.AllTests.suite());
-		suite.addTest(org.matsim.counts.AllTests.suite());
+		suite.addTest(org.matsim.world.AllTests.suite());
 		suite.addTest(org.matsim.withinday.AllTests.suite());
+		suite.addTest(org.matsim.examples.AllTests.suite());
 		//$JUnit-END$
 		return suite;
 	}

@@ -30,6 +30,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTest(org.matsim.utils.geometry.shared.AllTests.suite());
 		suite.addTest(org.matsim.utils.misc.AllTests.suite());
+		suite.addTestSuite(WorldUtilsTest.class);
 		//$JUnit-END$
 		return suite;
 	}

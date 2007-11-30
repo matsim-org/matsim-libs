@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.util;
+package org.matsim.utils;
 
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.WorldUtils;
