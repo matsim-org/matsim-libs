@@ -28,6 +28,8 @@ import java.io.IOException;
 
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
  * @author yu
@@ -36,15 +38,37 @@ import org.jfree.chart.JFreeChart;
 public abstract class ChartUtil {
 	protected JFreeChart chart_;
 
-	public abstract JFreeChart createChart(String title, String xAxisLabel,
-			String yAxisLabel);
-	public abstract void addData(Object[] values);
+	protected DefaultCategoryDataset dataset0;
+
+	protected CategoryPlot plot_;
+
+	public ChartUtil(String title, String categoryAxisLabel,
+			String valueAxisLabel) {
+		dataset0 = new DefaultCategoryDataset();
+		chart_ = createChart(title, categoryAxisLabel, valueAxisLabel);
+		plot_ = chart_.getCategoryPlot();
+	}
+
+	protected abstract JFreeChart createChart(String title,
+			String categoryAxisLabel, String valueAxisLabel);
+
 	public void saveAsPng(String filename, int width, int height) {
 		try {
 			ChartUtilities.saveChartAsPNG(new File(filename), chart_, width,
 					height);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void addValue(DefaultCategoryDataset dataset, double value,
+			Comparable rowKey, Comparable columnKey) {
+		dataset.addValue(value, rowKey, columnKey);
+	}
+
+	public void setDataSets(DefaultCategoryDataset[] dataSets) {
+		for (int i = 0; i < dataSets.length; i++) {
+			plot_.setDataset(i + 1, dataSets[i]);
 		}
 	}
 }
