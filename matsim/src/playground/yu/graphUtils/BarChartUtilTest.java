@@ -33,14 +33,17 @@ public class BarChartUtilTest {
 	 */
 	public static void main(String[] args) {
 		BarChartUtil bcu=new BarChartUtil("Ueberschrift","x-Achse","yAchse");
-		bcu.addValue(bcu.dataset0, 25.0, "rowKeyA", "1");
-		bcu.addValue(bcu.dataset0, 28.0, "rowKeyA", "2");
-		bcu.addValue(bcu.dataset0, 15.0, "rowKeyA", "3");
-		bcu.addValue(bcu.dataset0, 35.0, "rowKeyB", "1");
-		bcu.addValue(bcu.dataset0, 19.0, "rowKeyB", "2");
-		bcu.addValue(bcu.dataset0, 26.0, "rowKeyB", "3");
-		bcu.addValue(bcu.dataset0, 21.0, "rowKeyA", "4");
-		bcu.addValue(bcu.dataset0, 22.0, "rowKeyB", "4");
+		bcu.addValue(25.0, "rowKeyA", "1");
+		bcu.addValue(28.0, "rowKeyA", "2");
+		bcu.addValue(15.0, "rowKeyA", "3");
+		bcu.addValue(35.0, "rowKeyB", "1");
+		bcu.addValue(19.0, "rowKeyB", "2");
+		bcu.addValue(26.0, "rowKeyB", "3");
+		bcu.addValue(21.0, "rowKeyA", "4");
+		bcu.addValue(22.0, "rowKeyB", "4");
+//		for(int i=0;i<100;i++){
+//			bcu.addValue(Math.random(),"0",Integer.toString(i));
+//		}
 		bcu.saveAsPng("T:/Temp/bar.png", 800, 600);
 		System.out.println("@done.");
 	}

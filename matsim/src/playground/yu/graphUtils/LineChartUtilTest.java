@@ -34,14 +34,17 @@ public class LineChartUtilTest {
 	 */
 	public static void main(String[] args) {
 		LineChartUtil lcu=new LineChartUtil("Ueberschrift","x-Achse","yAchse");
-        lcu.addValue(lcu.dataset0, 25.0, "A", "1");
-		lcu.addValue(lcu.dataset0, 28.0, "A", "2");
-		lcu.addValue(lcu.dataset0, 15.0, "A", "3");
-		lcu.addValue(lcu.dataset0, 35.0, "B", "1");
-		lcu.addValue(lcu.dataset0, 19.0, "B", "2");
-		lcu.addValue(lcu.dataset0, 26.0, "B", "3");
-		lcu.addValue(lcu.dataset0, 21.0, "A", "4");
-		lcu.addValue(lcu.dataset0, 22.0, "B", "4");
+//        lcu.addValue(25.0, "A", "1");
+//		lcu.addValue(28.0, "A", "2");
+//		lcu.addValue(15.0, "A", "3");
+//		lcu.addValue(35.0, "B", "1");
+//		lcu.addValue(19.0, "B", "2");
+//		lcu.addValue(26.0, "B", "3");
+//		lcu.addValue(21.0, "A", "4");
+//		lcu.addValue(22.0, "B", "4");
+		for(int i=0;i<100;i++){
+			lcu.addValue(Math.random(),"0",Integer.toString(i));
+		}
         lcu.saveAsPng("T:/Temp/line.png", 800, 600);
 		System.out.println("@done.");
 	}

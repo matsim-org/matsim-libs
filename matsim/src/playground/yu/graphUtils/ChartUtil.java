@@ -66,6 +66,9 @@ public abstract class ChartUtil {
 		dataset.addValue(value, y, x);
 	}
 
+	public void addValue(double value,Comparable y, Comparable x){
+		dataset0.addValue(value,y,x);
+	}//only a type of Chart in a pic.
 	public void setDataSets(DefaultCategoryDataset[] dataSets) {
 		for (int i = 0; i < dataSets.length; i++) {
 			plot_.setDataset(i + 1, dataSets[i]);

@@ -78,6 +78,12 @@ public class TimeControler extends Controler {
 			this.events.addHandler(timeWriter);
 			this.events.addHandler(bTV);
 		}
+		if (iteration == 0) {
+			this.config.simulation().setSnapshotPeriod(0);
+		}
+		if (iteration == 500) {
+			this.config.simulation().setSnapshotPeriod(60);
+		}
 	}
 
 	public static void main(String[] args) {
