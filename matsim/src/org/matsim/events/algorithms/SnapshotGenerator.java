@@ -209,6 +209,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 		}
 
 		public void arrival(final EventAgent agent) {
+			this.buffer.remove(agent);
 			this.drivingQueue.remove(agent);
 			this.parkingQueue.add(agent);
 		}
