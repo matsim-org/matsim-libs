@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.matsim.events.BasicEvent;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.handler.BasicEventHandlerI;
+import org.matsim.events.handler.EventHandlerAgentArrivalI;
+import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -40,7 +40,7 @@ import org.matsim.utils.io.IOUtils;
  * @author ychen
  * 
  */
-public class DpDurWriter implements BasicEventHandlerI {
+public class DpDurWriter implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI {
 	private int maxDur = 0;
 
 	private BufferedWriter out = null;
@@ -66,38 +66,6 @@ public class DpDurWriter implements BasicEventHandlerI {
 	 */
 	public DpDurWriter(String filename) {
 		init(filename);
-	}
-
-	public void handleEvent(BasicEvent event) {
-		String agentId = event.agentId;
-		if (event instanceof EventAgentDeparture) {
-			// if (Integer.parseInt(event.getAttributes().getValue("leg")) == 0)
-			agentDepTimes.put(agentId, (int) event.time);
-		} else if (event instanceof EventAgentArrival
-				&& agentDepTimes.containsKey(agentId)) {
-			int depT = agentDepTimes.remove(agentId);
-			int depH = depT / 3600;
-			int depM = (depT - depH * 3600) / 60;
-			int arrT = (int) event.time;
-			int dur = arrT - depT;
-			if (dur > maxDur) {
-				maxDur = dur;
-			}
-			String depTId = Integer.toString(depH) + ":"
-					+ Integer.toString((depM / 5) * 5);
-			ArrayList<Integer> al = new ArrayList<Integer>();
-			if (dpDurVol.containsKey(depTId)) {
-				al = dpDurVol.get(depTId);
-			} else {
-				dpDurVol.put(depTId, al);
-			}
-			if (dur / 300 >= al.size()) {
-				for (int i = al.size(); i <= dur / 300; i++) {
-					al.add(0);
-				}
-			}
-			al.set(dur / 300, al.get(dur / 300).intValue() + 1);
-		}
 	}
 
 	public void init(String outfilename) {
@@ -157,6 +125,39 @@ public class DpDurWriter implements BasicEventHandlerI {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	public void handleEvent(EventAgentDeparture event) {
+		String agentId=event.agentId;
+		agentDepTimes.put(agentId, (int) event.time);
+	}
+
+	public void handleEvent(EventAgentArrival event) {
+		String agentId=event.agentId;
+		if (agentDepTimes.containsKey(agentId)) {
+			int depT = agentDepTimes.remove(agentId);
+			int depH = depT / 3600;
+			int depM = (depT - depH * 3600) / 60;
+			int arrT = (int) event.time;
+			int dur = arrT - depT;
+			if (dur > maxDur) {
+				maxDur = dur;
+			}
+			String depTId = Integer.toString(depH) + ":"
+					+ Integer.toString((depM / 5) * 5);
+			ArrayList<Integer> al = new ArrayList<Integer>();
+			if (dpDurVol.containsKey(depTId)) {
+				al = dpDurVol.get(depTId);
+			} else {
+				dpDurVol.put(depTId, al);
+			}
+			if (dur / 300 >= al.size()) {
+				for (int i = al.size(); i <= dur / 300; i++) {
+					al.add(0);
+				}
+			}
+			al.set(dur / 300, al.get(dur / 300).intValue() + 1);
 		}
 	}
 }
