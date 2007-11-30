@@ -62,8 +62,8 @@ public abstract class ChartUtil {
 	}
 
 	public void addValue(DefaultCategoryDataset dataset, double value,
-			Comparable rowKey, Comparable columnKey) {
-		dataset.addValue(value, rowKey, columnKey);
+			Comparable y, Comparable x) {
+		dataset.addValue(value, y, x);
 	}
 
 	public void setDataSets(DefaultCategoryDataset[] dataSets) {

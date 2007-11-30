@@ -37,9 +37,8 @@ public class LineChartUtil extends ChartUtil {
 	 * @param categoryAxisLabel
 	 * @param valueAxisLabel
 	 */
-	public LineChartUtil(String title, String categoryAxisLabel,
-			String valueAxisLabel) {
-		super(title, categoryAxisLabel, valueAxisLabel);
+	public LineChartUtil(String title, String xAxisLabel, String yAxisLabel) {
+		super(title, xAxisLabel, yAxisLabel);
 	}
 
 	/* (non-Javadoc)
@@ -55,5 +54,4 @@ public class LineChartUtil extends ChartUtil {
 				);
 		return chart_;
 	}
-
 }
