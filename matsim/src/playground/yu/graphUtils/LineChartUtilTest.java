@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BarChartUtil.java
+ * barCharUtilTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 /**
  * 
  */
 package playground.yu.graphUtils;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 
 /**
- * @author yu
- * 
+ * @author ychen
+ *
  */
-public class BarChartUtil extends ChartUtil {
-	public BarChartUtil(String title, String categoryAxisLabel,
-			String valueAxisLabel) {
-		super(title, categoryAxisLabel, valueAxisLabel);
-	}
+public class LineChartUtilTest {
 
-	protected JFreeChart createChart(String title, String xAxisLabel,
-			String yAxisLabel) {
-		chart_ = ChartFactory.createBarChart(title, xAxisLabel, yAxisLabel,
-				dataset0, PlotOrientation.VERTICAL, true, // legend?
-				true, // tooltips?
-				false // URLs?
-				);
-		return chart_;
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		LineChartUtil lcu=new LineChartUtil("Ueberschrift","x-Achse","yAchse");
+        lcu.addValue(lcu.dataset0, 25.0, "A", "1");
+		lcu.addValue(lcu.dataset0, 28.0, "A", "2");
+		lcu.addValue(lcu.dataset0, 15.0, "A", "3");
+		lcu.addValue(lcu.dataset0, 35.0, "B", "1");
+		lcu.addValue(lcu.dataset0, 19.0, "B", "2");
+		lcu.addValue(lcu.dataset0, 26.0, "B", "3");
+		lcu.addValue(lcu.dataset0, 21.0, "A", "4");
+		lcu.addValue(lcu.dataset0, 22.0, "B", "4");
+        lcu.saveAsPng("T:/Temp/line.png", 800, 600);
+		System.out.println("@done.");
 	}
 }

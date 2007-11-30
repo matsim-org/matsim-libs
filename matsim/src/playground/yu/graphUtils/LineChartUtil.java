@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BarChartUtil.java
+ * LineChartUtil.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +17,6 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 /**
  * 
  */
@@ -28,22 +27,33 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 
 /**
- * @author yu
- * 
+ * @author ychen
+ *
  */
-public class BarChartUtil extends ChartUtil {
-	public BarChartUtil(String title, String categoryAxisLabel,
+public class LineChartUtil extends ChartUtil {
+
+	/**
+	 * @param title
+	 * @param categoryAxisLabel
+	 * @param valueAxisLabel
+	 */
+	public LineChartUtil(String title, String categoryAxisLabel,
 			String valueAxisLabel) {
 		super(title, categoryAxisLabel, valueAxisLabel);
 	}
 
+	/* (non-Javadoc)
+	 * @see playground.yu.graphUtils.ChartUtil#createChart(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
 	protected JFreeChart createChart(String title, String xAxisLabel,
 			String yAxisLabel) {
-		chart_ = ChartFactory.createBarChart(title, xAxisLabel, yAxisLabel,
+		chart_ = ChartFactory.createLineChart(title, xAxisLabel, yAxisLabel,
 				dataset0, PlotOrientation.VERTICAL, true, // legend?
 				true, // tooltips?
 				false // URLs?
 				);
 		return chart_;
 	}
+
 }

@@ -42,10 +42,10 @@ public abstract class ChartUtil {
 
 	protected CategoryPlot plot_;
 
-	public ChartUtil(String title, String categoryAxisLabel,
-			String valueAxisLabel) {
+	public ChartUtil(String title, String xAxisLabel,
+			String yAxisLabel) {
 		dataset0 = new DefaultCategoryDataset();
-		chart_ = createChart(title, categoryAxisLabel, valueAxisLabel);
+		chart_ = createChart(title, xAxisLabel, yAxisLabel);
 		plot_ = chart_.getCategoryPlot();
 	}
 

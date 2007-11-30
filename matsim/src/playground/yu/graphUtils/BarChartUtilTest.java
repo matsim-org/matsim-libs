@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BarChartUtil.java
+ * BarChartUtilTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 /**
  * 
  */
 package playground.yu.graphUtils;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-
 /**
- * @author yu
- * 
+ * @author ychen
+ *
  */
-public class BarChartUtil extends ChartUtil {
-	public BarChartUtil(String title, String categoryAxisLabel,
-			String valueAxisLabel) {
-		super(title, categoryAxisLabel, valueAxisLabel);
-	}
+public class BarChartUtilTest {
 
-	protected JFreeChart createChart(String title, String xAxisLabel,
-			String yAxisLabel) {
-		chart_ = ChartFactory.createBarChart(title, xAxisLabel, yAxisLabel,
-				dataset0, PlotOrientation.VERTICAL, true, // legend?
-				true, // tooltips?
-				false // URLs?
-				);
-		return chart_;
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		BarChartUtil bcu=new BarChartUtil("Ueberschrift","x-Achse","yAchse");
+		bcu.addValue(bcu.dataset0, 25.0, "rowKeyA", "1");
+		bcu.addValue(bcu.dataset0, 28.0, "rowKeyA", "2");
+		bcu.addValue(bcu.dataset0, 15.0, "rowKeyA", "3");
+		bcu.addValue(bcu.dataset0, 35.0, "rowKeyB", "1");
+		bcu.addValue(bcu.dataset0, 19.0, "rowKeyB", "2");
+		bcu.addValue(bcu.dataset0, 26.0, "rowKeyB", "3");
+		bcu.addValue(bcu.dataset0, 21.0, "rowKeyA", "4");
+		bcu.addValue(bcu.dataset0, 22.0, "rowKeyB", "4");
+		bcu.saveAsPng("T:/Temp/bar.png", 800, 600);
+		System.out.println("@done.");
 	}
 }

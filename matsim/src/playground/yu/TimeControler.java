@@ -62,8 +62,8 @@ public class TimeControler extends Controler {
 	 */
 	public TimeControler() {
 		super();
-		timeWriter = new TimeWriter("./test/yu/timeEvents.txt");
-		bTV=new BottleneckTraVol("./test/yu/bottleneckTraVol.txt");
+		timeWriter = new TimeWriter("./test/input/org/matsim/events/algorithms/Bottleneck/timeEvents.txt");
+		bTV=new BottleneckTraVol("./test/input/org/matsim/events/algorithms/Bottleneck/bottleneckTraVol.txt");
 	}
 
 	/*
@@ -82,7 +82,9 @@ public class TimeControler extends Controler {
 
 	public static void main(String[] args) {
 		final TimeControler ctl = new TimeControler();
+		System.out.println(args);
 		ctl.run(args);
+		System.out.println(args);
 		ctl.timeWriter.closefile();
 		ctl.bTV.closefile();
 		System.exit(0);
