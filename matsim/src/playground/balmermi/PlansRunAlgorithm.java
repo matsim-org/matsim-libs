@@ -32,6 +32,9 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 import org.matsim.plans.algorithms.PlansFilterByLegMode;
+import org.matsim.plans.algorithms.XY2Links;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
 public class PlansRunAlgorithm {
 
@@ -66,6 +69,9 @@ public class PlansRunAlgorithm {
 
 		System.out.println("  running plans module... ");
 		new PlansFilterByLegMode("car",true).run(plans);
+		new XY2Links(network).run(plans);
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		new PlansCalcRoute(network, timeCostCalc, timeCostCalc).run(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
