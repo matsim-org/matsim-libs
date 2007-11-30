@@ -20,6 +20,8 @@
 
 package playground.arvid_daniel.coopers.fromArvid;
 
+import java.io.IOException;
+
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventLinkEnter;
@@ -46,12 +48,18 @@ public class ControlInputImpl1 extends AbstractControlInputImpl
 		implements EventHandlerLinkLeaveI, EventHandlerLinkEnterI,
 		EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
+	private ControlInputWriter writer;
+	
+	
 	public ControlInputImpl1() {
+		this.writer = new ControlInputWriter();
 	}
 
 	@Override
 	public void init() {
 		super.init();
+		this.writer.open();
+
 	}
 	
 	@Override
@@ -66,10 +74,21 @@ public class ControlInputImpl1 extends AbstractControlInputImpl
 		
   
 		public double getNashTime() {
+
+			try {
+				this.writer.writeTravelTimesMainRoute(this.lastTime1,
+						this.lastTime1);
+				this.writer.writeTravelTimesAlternativeRoute(this.lastTime2,
+						this.lastTime2);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 			return this.timeDifference;
 		}
 
 	public void reset(final int iteration) {
+		this.writer.close();
 	}
 
 	@Override
