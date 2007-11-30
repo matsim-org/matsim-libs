@@ -19,30 +19,6 @@
  * *********************************************************************** */
 
 package playground.andreas.itsumo;
-/*
- * $Id: MyControler1.java,v 1.3 2007/11/20 15:31:20 fboffo Exp $
- */
-
-/* *********************************************************************** *
- *                                                                         *
- *                                                                         *
- *                          ---------------------                          *
- * copyright       : (C) 2007 by Michael Balmer, Marcel Rieser,            *
- *                   David Strippgen, Gunnar Flötteröd, Konrad Meister,    *
- *                   Kai Nagel, Kay W. Axhausen                            *
- *                   Technische Universitaet Berlin (TU-Berlin) and        *
- *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
 
 import java.io.File;
 
@@ -115,15 +91,15 @@ public class MyControler1 extends Controler {
 	@Override
 	protected Plans loadPopulation() {
 
-		Link[] netLinks = network.getLinks().values().toArray(new Link[network.getLinks().size()]);
+		Link[] netLinks = this.network.getLinks().values().toArray(new Link[this.network.getLinks().size()]);
 
 		// maybe 400, 500, 600, 700
 		int popSize = 700;
 
-		Link[] source = {network.getLink("181"), network.getLink("159"), network.getLink("75")};
+		Link[] source = {this.network.getLink("181"), this.network.getLink("159"), this.network.getLink("75")};
 		double[] probSource = {0.05, 0.04, 0.03};
 
-		Link[] dest = {network.getLink("207")};
+		Link[] dest = {this.network.getLink("207")};
 		double[] probDest = {0.6};
 
 		int[] quantSource = generateDistribution(netLinks, popSize, source, probSource);
@@ -136,7 +112,7 @@ public class MyControler1 extends Controler {
 
 
 		for (int i=0; i<popSize; i++) {
-			for (int j=0; j<network.getLinks().size(); j++) {
+			for (int j=0,n=this.network.getLinks().size(); j<n; j++) {
 				if (quantSource[j] > 0) {
 					agentsSource[i] = netLinks[j];
 					quantSource[j]--;
@@ -145,7 +121,7 @@ public class MyControler1 extends Controler {
 			}
 
 			boolean safe = false;
-			for (int j=0; j<network.getLinks().size(); j++) {
+			for (int j=0,n=this.network.getLinks().size(); j<n; j++) {
 				if (quantDest[j] > 0 && !netLinks[j].equals(agentsSource[i])) {
 					agentsDest[i] = netLinks[j];
 					quantDest[j]--;
@@ -155,7 +131,7 @@ public class MyControler1 extends Controler {
 			}
 
 			if (!safe) {
-				for (int j=0; j<network.getLinks().size(); j++) {
+				for (int j=0,n=this.network.getLinks().size(); j<n; j++) {
 					if (quantDest[j] > 0) {
 						agentsDest[i] = netLinks[j];
 						quantDest[j]--;
@@ -237,8 +213,6 @@ public class MyControler1 extends Controler {
 		printNote("", "  reading network xml file... ");
 		ITSUMONetworkReader reader = new ITSUMONetworkReader(network);
 		reader.read(Gbl.getConfig().getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile"));
-//		NetworkParser network_parser = new NetworkParser(network);
-//		network_parser.parse();
 
 		NetworkWriter network_writer = new NetworkWriter(network);
 		network_writer.write();
@@ -263,7 +237,7 @@ public class MyControler1 extends Controler {
 			driversLog.renameTo(eventsFile);
 
 			Events2Snapshot events2Snapshot = new org.matsim.run.Events2Snapshot();
-			events2Snapshot.run(eventsFile, Gbl.getConfig(), network);
+			events2Snapshot.run(eventsFile, Gbl.getConfig(), this.network);
 
 			// Run NetVis if possible
 			if (Gbl.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
@@ -303,17 +277,6 @@ public class MyControler1 extends Controler {
 
 		final MyControler1 controler = new MyControler1();
 		controler.setOverwriteFiles(true) ;
-
-//		// this comes directly from marcel's master controler
-//		Runtime run = Runtime.getRuntime();
-//		run.addShutdownHook( new Thread()
-//				{
-//					@Override
-//					public void run()
-//					{
-//						controler.shutdown(true);
-//					}
-//				} );
 
 		//controler.setTraveltimeBinSize(1);
 		controler.run(null);
