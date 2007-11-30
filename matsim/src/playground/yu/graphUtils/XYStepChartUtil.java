@@ -24,8 +24,6 @@
 package playground.yu.graphUtils;
 
 import java.awt.Font;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -42,13 +40,6 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class XYStepChartUtil extends ChartUtil{
 	protected XYSeriesCollection dataSet_ = new XYSeriesCollection();
-
-	/**
-	 * 
-	 */
-	public XYStepChartUtil() {
-		super();
-	}
 
 	public JFreeChart createChart(String title, String xAxisLabel,
 			String yAxisLabel) {

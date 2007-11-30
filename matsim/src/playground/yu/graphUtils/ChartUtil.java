@@ -23,6 +23,10 @@
  */
 package playground.yu.graphUtils;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 
 /**
@@ -32,15 +36,15 @@ import org.jfree.chart.JFreeChart;
 public abstract class ChartUtil {
 	protected JFreeChart chart_;
 
-	/**
-	 * 
-	 */
-	public ChartUtil() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
 	public abstract JFreeChart createChart(String title, String xAxisLabel,
 			String yAxisLabel);
 	public abstract void addData(Object[] values);
+	public void saveAsPng(String filename, int width, int height) {
+		try {
+			ChartUtilities.saveChartAsPNG(new File(filename), chart_, width,
+					height);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

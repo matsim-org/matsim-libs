@@ -26,11 +26,8 @@ package playground.yu.graphUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.IOException;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.CategoryAxis;
@@ -108,14 +105,7 @@ public abstract class BarChartUtil extends ChartUtil{
 		plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
 		return chart_;
 	}
-	public void saveAsPng(String filename, int width, int height) {
-		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), chart_, width,
-					height);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+
 	@Override
 	public void addData(Object[] values) {
 		// TODO Auto-generated method stub
