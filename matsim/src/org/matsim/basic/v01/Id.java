@@ -52,7 +52,7 @@ public class Id implements IdI {
 	}
 
 	public int compareTo(final IdI id) {
-		return this.id.toString().compareTo(id.toString());
+		return this.id.compareTo(id.toString());
 	}
 
 	@Override
