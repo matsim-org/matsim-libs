@@ -76,10 +76,10 @@ public class ControlInputImpl1 extends AbstractControlInputImpl
 		public double getNashTime() {
 
 			try {
-				this.writer.writeTravelTimesMainRoute(this.lastTime1,
-						this.lastTime1);
-				this.writer.writeTravelTimesAlternativeRoute(this.lastTime2,
-						this.lastTime2);
+				this.writer.writeTravelTimesMainRoute(this.lastTimeMainRoute,
+						this.lastTimeMainRoute);
+				this.writer.writeTravelTimesAlternativeRoute(this.lastTimeAlternativeRoute,
+						this.lastTimeAlternativeRoute);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
