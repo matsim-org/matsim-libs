@@ -20,10 +20,9 @@
 
 package org.matsim.plans.algorithms;
 
-import java.util.Iterator;
-
+import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 
@@ -33,45 +32,41 @@ import org.matsim.plans.Plans;
  */
 public class PlansFilterActInArea extends PersonAlgorithm {
 
-	private static NetworkLayer network;
-	private static Plans plans;
-	private static String actType;
-	
-	public PlansFilterActInArea(NetworkLayer net, String a){
-		network = net;
-		actType = a;
-		plans =  new Plans();
+	private final NetworkLayer network;
+	private final Plans plans;
+	private String actType;
+
+	public PlansFilterActInArea(final NetworkLayer net, final String a){
+		this.network = net;
+		this.actType = a;
+		this.plans =  new Plans();
 	}
-	
-	public void setArea(String a){
-		actType = a;
+
+	public void setArea(final String a){
+		this.actType = a;
 	}
-	
+
 	@Override
-	public void run(Person person) {
-		Iterator it = person.getSelectedPlan().getIteratorAct();
+	public void run(final Person person) {
+		ActIterator it = person.getSelectedPlan().getIteratorAct();
 		while (it.hasNext()){
-			Act act = (Act) it.next();
+			BasicAct act = it.next();
 			String type = act.getType();
-			if (type.contains(actType)) {
-				if(network.getLink(act.getLink().getId().toString()) != null) {
+			if (type.contains(this.actType)) {
+				if(this.network.getLink(act.getLink().getId().toString()) != null) {
 					try {
-						plans.addPerson(person);
+						this.plans.addPerson(person);
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
-				
 				}
 				return;
 			}
 		}
-		
 	}
-	
+
 	public Plans getPlans(){
-		return plans;
+		return this.plans;
 	}
 
 }
