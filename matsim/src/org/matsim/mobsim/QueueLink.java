@@ -230,8 +230,8 @@ public class QueueLink extends Link {
 
 			/* Remove vehicle from parkingList
 			 * Do that as the last step to guarantee that the link is ACTIVE all the time
-			 * because veh.reinit() calls addParking which might come to the false conclusion,
-			 * that this link needs to be activated, as parkingqueue is empty */
+			 * because veh.reinitVeh() calls addParking which might come to the false conclusion,
+			 * that this link needs to be activated, as parkingQueue is empty */
 
 			this.parkingList.poll();
 		}
@@ -247,31 +247,30 @@ public class QueueLink extends Link {
 					break;
 
 				Vehicle veh = i.next();
-				this.buffer.add(veh);
-				this.buffercount++;
-				veh.setLastMovedTime(now);
+				addToBuffer(veh, now);
 
 				QueueSimulation.getEvents().processEvent(
-						new EventAgentWait2Link(now, veh.getDriverID(), veh
-								.getCurrentLegNumber(), getId().toString(), veh
-								.getDriver(), veh.getCurrentLeg(), this));
+						new EventAgentWait2Link(now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(),
+								veh.getDriver(), veh.getCurrentLeg(), this));
 
 				i.remove();
 			}
 		}
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// move veh from link to buffer, according to bufer caps and dep time of veh
-	// ////////////////////////////////////////////////////////////////////
+	/**
+	 * Move vehicles from link to buffer, according to buffer capacity and departure time of vehicle.
+	 *
+	 * @param now The current time.
+	 */
 	synchronized private void moveLinkToBuffer(final double now) {
 		// move items if possible
 		double max_buffercap = this.timeCap;
 
 		for (ListIterator<Vehicle> i = this.vehQueue.listIterator(); i.hasNext();) {
 			Vehicle veh = i.next();
-			if ( veh.getDepartureTime_s() > now ) {
-				break ;
+			if (veh.getDepartureTime_s() > now) {
+				break;
 			}
 
 			// Check if veh has reached destination:
@@ -283,32 +282,24 @@ public class QueueLink extends Link {
 				continue;
 			}
 
-			// is there still room left in the buffer, or is he overcrowded
-			// from the last time steps?
-			if ( !hasBufferSpace() ) {
+			// is there still room left in the buffer, or is he overcrowded from the last time steps?
+			if (!hasBufferSpace()) {
 				break;
 			}
 
-			if (max_buffercap >= 1.) {
+			if (max_buffercap >= 1.0) {
 				max_buffercap--;
-
-				this.buffer.add(veh);
-				this.buffercount++;
-				veh.setLastMovedTime(now);
+				addToBuffer(veh, now);
 				i.remove();
+				continue;
 
-				continue ;
-
-			// using the following line instead should, I think, be an easy way to make the mobsim
-			// stochastic. not tested. kai
+			/* using the following line instead should, I think, be an easy way to make the mobsim
+			 * stochastic. not tested. kai   */
 //			} else if ( Gbl.random.nextDouble() < this.buffercap_accumulate ) {
 
 			} else if (this.buffercap_accumulate >= 1.0) {
 				this.buffercap_accumulate--;
-
-				this.buffer.add(veh);
-				this.buffercount++;
-				veh.setLastMovedTime(now);
+				addToBuffer(veh, now);
 				i.remove();
 				break;
 			} else {
@@ -316,7 +307,7 @@ public class QueueLink extends Link {
 			}
 		}
 
-		/* if there is an fractional piece of buffercapacity left over
+		/* if there is an fractional piece of bufferCapacity left over
 		 * leave it for the next iteration so it might accumulate to a whole agent.
 		 */
 		if (this.buffercap_accumulate < 1.0) {
@@ -331,39 +322,33 @@ public class QueueLink extends Link {
 		 * is not delayed).
 		 */
 		return (this.buffercap_accumulate < 1.0)
-				|| ((this.parkingList.size() + this.vehQueue.size() + this.waitingList.size() ) != 0);
+				|| ((this.parkingList.size() + this.vehQueue.size() + this.waitingList.size()) != 0);
 	}
 
 	public void activateLink() {
 		if (!isActive()) {
 			((QueueNetworkLayer) this.layer).addActiveLink(this);
 		}
-//		QueueNode toNode = (QueueNode) this.getToNode() ;
-//		toNode.activateNode() ;
 	}
 
 	// ////////////////////////////////////////////////////////////////////
 	// called from framework, do everything related to link movement here
 	// ////////////////////////////////////////////////////////////////////
 	public boolean moveLink(final double now) {
-
-		// move vehicles from parking into waitqueue if applicable
+		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
 		// move vehicles from link to buffer
 		moveLinkToBuffer(now);
-		// move vehicles from waitqueue into buffer if possible
+		// move vehicles from waitingQueue into buffer if possible
 		moveWaitToBuffer(now);
 
 		return isActive();
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// called from framework, do everything related to link movement here
-	// ////////////////////////////////////////////////////////////////////
 	public boolean moveLinkWaitFirst(final double now) {
-		// move vehicles from parking into waitqueue if applicable
+		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
-		// move vehicles from waitqueue into buffer if possible
+		// move vehicles from waitingQueue into buffer if possible
 		moveWaitToBuffer(now);
 		// move vehicles from link to buffer
 		moveLinkToBuffer(now);
@@ -433,6 +418,13 @@ public class QueueLink extends Link {
 						this.getId().toString(), veh.getDriver(), this));
 
 		return veh;
+	}
+
+	private void addToBuffer(final Vehicle veh, final double now) {
+		this.buffer.add(veh);
+		this.buffercount++;
+		veh.setLastMovedTime(now);
+		((QueueNode) this.getToNode()).activateNode();
 	}
 
 	/*
@@ -701,26 +693,6 @@ public class QueueLink extends Link {
 			vehs.add(veh);
 		}
 
-		// OLD vis method deprecated DS 06/07
-//		double d = this.getLength()	/ (double) (this.vehQueue.size() + this.buffercount);
-//		int i = 0;
-//		for (Vehicle veh : this.vehQueue) {
-//			AgentOnLink veh2 = new AgentOnLink();
-//			veh2.posInLink_m = i * d;
-//			if (writeTimeCap)
-//				veh2.lane = veh.getSpeed() == 0. ? 2 : 1;
-//			vehs.add(veh2);
-//			i++;
-//		}
-//
-//		for (Vehicle veh : this.buffer) {
-//			AgentOnLink veh2 = new AgentOnLink();
-//			veh2.posInLink_m = i * d;
-//			if (writeTimeCap)
-//				veh2.lane = veh.getSpeed() == 0. ? 2 : 1;
-//			vehs.add(veh2);
-//			i++;
-//		}
 		return vehs;
 	}
 
@@ -734,7 +706,6 @@ public class QueueLink extends Link {
 		public int compare(final QueueLink o1, final QueueLink o2) {
 			return o1.getId().toString().compareTo(o2.getId().toString());
 		}
-
 	}
 
 	// search for vehicleId..

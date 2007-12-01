@@ -38,15 +38,14 @@ public class QueueNode extends Node {
 	private QueueLink[] tempLinks = null;
 	private QueueLink[] auxLinks = null;
 
+	private boolean active = true;
 
-	//////////////////////////////////////////////////////////////////////
-	// Get/Set partitionID generated be MetisExeWrapper
-	// only used when doing DistributedSimulation,
-	// but I did not want to inherit for just this info
-	//////////////////////////////////////////////////////////////////////
+	/* Get/Set partitionID generated be MetisExeWrapper
+	 * only used when doing DistributedSimulation,
+	 * but I did not want to inherit for just this info */
 	private int partitionId = 0;
-	public int getPartitionId() {return this.partitionId;}
-	public void setPartitionId(final int partitionId) {this.partitionId = partitionId;}
+	public int getPartitionId() { return this.partitionId; }
+	public void setPartitionId(final int partitionId) { this.partitionId = partitionId; }
 
 	//////////////////////////////////////////////////////////////////////
 	//constructor
@@ -55,10 +54,6 @@ public class QueueNode extends Node {
 		super(id, x, y, type);
 	}
 
-	public void finishInit() {
-	}
-
-	@SuppressWarnings("unchecked") // TODO [DS] cleanup for Java 5.0: use generics!
 	private void buildCache() {
 		this.inLinksArrayCache = new QueueLink[this.inlinks.size()];
 		this.inLinksArrayCache = this.inlinks.values().toArray(this.inLinksArrayCache);
@@ -118,16 +113,7 @@ public class QueueNode extends Node {
 		return true;
 	}
 
-//	private boolean active = true ;
-//	public void activateNode() { active = true ; }
-//	public void checkNodeForDeActivation() {
-//		for ( QueueLink inLink : this.inLinksArrayCache ) {
-//			if ( inLink.isActive() ) {
-//				return ;
-//			}
-//		}
-//		active = false ;
-//	}
+	final public void activateNode() { this.active = true; }
 
 	/**
 	 * Moves vehicles from the inlinks' buffer to the outlinks where possible.<br>
@@ -146,9 +132,9 @@ public class QueueNode extends Node {
 	public void moveNode(final double now) {
 		/* called by the framework, do all necessary action for node movement here */
 
-//		if ( !active ) {
-//			return ;
-//		}
+		if (!this.active) {
+			return;
+		}
 
 		if (this.cacheIsInvalid) {
 			buildCache();
@@ -156,7 +142,7 @@ public class QueueNode extends Node {
 
 		int tempCounter = 0;
 		double tempCap = 0.0;
-		// Check all incomming links for buffered agents
+		// Check all incoming links for buffered agents
 		for (QueueLink link : this.inLinksArrayCache) {
 			if (!link.bufferIsEmpty()) {
 				this.tempLinks[tempCounter] = link;
@@ -165,7 +151,10 @@ public class QueueNode extends Node {
 			}
 		}
 
-		if (tempCounter == 0) return; // Nothing to do
+		if (tempCounter == 0) {
+			this.active = false;
+			return; // Nothing to do
+		}
 
 		int auxCounter = 0;
 		// randomize based on capacity

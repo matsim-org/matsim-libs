@@ -276,11 +276,11 @@ public class QueueSimulation extends Simulation {
 	/**
 	 * Do one step of the simulation run.
 	 *
-	 * @return true if the sim needs to continue
+	 * @return true if the simulation needs to continue
 	 */
 	@Override
 	public boolean doSimStep(final double time) {
-		QueueSimulation.moveVehiclesWithUnknownLegMode(time);
+		this.moveVehiclesWithUnknownLegMode(time);
 		this.network.simStep(time);
 
 		if (time % INFO_PERIOD == 0) {
@@ -339,7 +339,7 @@ public class QueueSimulation extends Simulation {
 		teleportationList.add(veh);
 	}
 
-	public static final void moveVehiclesWithUnknownLegMode(final double now) {
+	private final void moveVehiclesWithUnknownLegMode(final double now) {
 	  	while (teleportationList.peek() != null ) {
 	  		Vehicle veh = teleportationList.peek();
 	  		if (veh.getDepartureTime_s() <= now) {

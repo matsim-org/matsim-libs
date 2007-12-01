@@ -22,7 +22,6 @@ package org.matsim.mobsim;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -36,10 +35,9 @@ import org.matsim.utils.identifiers.IdI;
  * @author david
  *
  * QueueNetworkLayer is responsible for creating the QueueLinks/Nodes and for
- * implementing doSim ( TODO [DS] which should be moved into an Simulatable interface)
+ * implementing doSim
  */
-public class QueueNetworkLayer extends NetworkLayer
-{
+public class QueueNetworkLayer extends NetworkLayer {
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
 	 * car is in one of the many queues).
@@ -49,9 +47,9 @@ public class QueueNetworkLayer extends NetworkLayer
 	 */
 	private boolean simulateAllLinks = false;
 
-	private ArrayList<QueueLink> simLinksArray = new ArrayList<QueueLink>();
+	private final ArrayList<QueueLink> simLinksArray = new ArrayList<QueueLink>();
 	private ArrayList<QueueNode> simNodesArray = new ArrayList<QueueNode>();
-	private ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
+	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
 
 	// set to true to move vehicles from waitingList before vehQueue
 	final static boolean moveWaitFirst = false;
@@ -74,11 +72,11 @@ public class QueueNetworkLayer extends NetworkLayer
 		 * but the parallel version put only the relevant nodes here
 		 * We still need the whole net on the parallel version, to reconstruct routes
 		 * on vehicle-receiving, etc. */
-		simNodesArray = new ArrayList<QueueNode>(getNodes().values());
-		simLinksArray.clear();
+		this.simNodesArray = new ArrayList<QueueNode>(getNodes().values());
+		this.simLinksArray.clear();
 
 		if (this.simulateAllLinks) {
-			simLinksArray.addAll(getLinks().values());
+			this.simLinksArray.addAll(getLinks().values());
 		}
 
 		// finish init for links
@@ -91,52 +89,49 @@ public class QueueNetworkLayer extends NetworkLayer
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
 	 */
-	public void simStep(double time) {
-		Iterator<QueueNode> nodes = simNodesArray.iterator();
-		while(nodes.hasNext()) {
-			nodes.next().moveNode(time);
+	public void simStep(final double time) {
+		for (QueueNode node : this.simNodesArray) {
+			node.moveNode(time);
 		}
 		reactivateLinks();
 		moveLinks(time);
 	}
 
-	protected void moveLinks(double time) {
-		boolean isActive = true;
-
-		ListIterator<QueueLink> links = simLinksArray.listIterator();
-		QueueLink link = null;
+	protected void moveLinks(final double time) {
+		ListIterator<QueueLink> links = this.simLinksArray.listIterator();
+		QueueLink link;
+		boolean isActive;
 
 		// TODO [kn] this is in my view unstable code.  Should be
 		// while (links.hasNext()) {
-		//    link = links.next() ;
+		//    link = links.next();
 		//    if ( moveWaitFirst ) {
-		//        isActive = link.moveLinkWaitFirst(time) ;
+		//        isActive = link.moveLinkWaitFirst(time);
 		//    } else {
-		//          isActive = ...isActive ;
+		//          isActive = ...isActive;
 		//    }
 		//    if ( !isActive ...
+		// kai, nov07
+		/* well, we just moved the if (moveWaitFirst) outside of the while-loop,
+		 * so we have the if only once and not for every link. marcel, dez07 */
 
 		if (moveWaitFirst) {
 
-			while(links.hasNext()) {
+			while (links.hasNext()) {
 				link = links.next();
 				isActive = link.moveLinkWaitFirst(time);
 				if (!isActive && !this.simulateAllLinks) {
 					links.remove();
-//					QueueNode toNode = (QueueNode) link.getToNode() ;
-//					toNode.checkNodeForDeActivation() ;
 				}
 			}
 
 		} else {
 
-			while(links.hasNext()) {
+			while (links.hasNext()) {
 				link = links.next();
 				isActive = link.moveLink(time);
 				if (!isActive && !this.simulateAllLinks) {
 					links.remove();
-//					QueueNode toNode = (QueueNode) link.getToNode() ;
-//					toNode.checkNodeForDeActivation() ;
 				}
 			}
 
@@ -159,14 +154,14 @@ public class QueueNetworkLayer extends NetworkLayer
 	 * @return Returns the simLinksArray.
 	 */
 	public ArrayList<QueueLink> getSimLinksArray() {
-		return simLinksArray;
+		return this.simLinksArray;
 	}
 
 	/**
 	 * @return Returns the simNodesArray.
 	 */
 	public ArrayList<QueueNode> getSimNodesArray() {
-		return simNodesArray;
+		return this.simNodesArray;
 	}
 
 	public void afterSim() {
@@ -181,29 +176,29 @@ public class QueueNetworkLayer extends NetworkLayer
 		}
 	}
 
-	public void addActiveLink(QueueLink link) {
+	public void addActiveLink(final QueueLink link) {
 		if (!this.simulateAllLinks) {
-			simActivateThis.add(link);
+			this.simActivateThis.add(link);
 		}
 	}
 
 	private void reactivateLinks() {
-		if (!this.simulateAllLinks && !simActivateThis.isEmpty()) {
-			simLinksArray.addAll(simActivateThis);
-			simActivateThis.clear();
+		if (!this.simulateAllLinks && !this.simActivateThis.isEmpty()) {
+			this.simLinksArray.addAll(this.simActivateThis);
+			this.simActivateThis.clear();
 		}
 	}
 
 	@Override
-	public boolean removeLink(Link link) {
+	public boolean removeLink(final Link link) {
 		((QueueLink)link).clearVehicles();
 		// we have to remove the link from both locations and simLinkArray
-		simLinksArray.remove(link);
+		this.simLinksArray.remove(link);
 		return super.removeLink(link);
 	}
 	@Override
-	public boolean removeNode(Node node) {
-		simNodesArray.remove(node);
+	public boolean removeNode(final Node node) {
+		this.simNodesArray.remove(node);
 		return super.removeNode(node);
 	}
 
