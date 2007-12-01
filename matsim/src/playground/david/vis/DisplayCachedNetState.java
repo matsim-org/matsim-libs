@@ -48,25 +48,25 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 	public DisplayCachedNetStateReader myReader = null;
 	public int pos = -1;
 
-	public DisplayCachedNetState(IndexationConfig indexConfig) {
+	public DisplayCachedNetState(final IndexationConfig indexConfig) {
 		this.indexConfig = indexConfig;
 	}
 
 	@Override
 	public void setState() throws IOException {
-		if (pos == -1) myReader.updateBuffer(this);
-		else readMyselfBB(myReader.bb);
+		if (this.pos == -1) this.myReader.updateBuffer(this);
+		else readMyselfBB(this.myReader.bb);
 	}
 
 	@Override
 	public void getState() throws IOException {
 	}
 
-	public void readMyselfBB(ByteBuffer in) throws IOException {
-		if (pos == -1) pos = in.position();
-		else in.position(pos);
+	public void readMyselfBB(final ByteBuffer in) throws IOException {
+		if (this.pos == -1) this.pos = in.position();
+		else in.position(this.pos);
 
-		for (BasicNodeI node : indexConfig.getIndexedNodeView())
+		for (BasicNodeI node : this.indexConfig.getIndexedNodeView())
 			if (node != null) {
 				readNodeBB(node, in);
 			}else {
@@ -74,7 +74,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 		        in.position(in.position()+length);
 			}
 
-		for (BasicLinkI link : indexConfig.getIndexedLinkView())
+		for (BasicLinkI link : this.indexConfig.getIndexedLinkView())
 			if (link != null) {
 				readLinkBB(link, in);
 			}else {
@@ -86,23 +86,23 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 		return;
 	}
 
-	private final void readToBuffer(ByteBuffer in) throws IOException {
+	private final void readToBuffer(final ByteBuffer in) throws IOException {
         int length = in.getInt();
     	for (int i = 0; i < length; i++) {
 			// ---------------------------
-			baos.write(in.get());
+			this.baos.write(in.get());
 			// ---------------------------
 		}
 	}
 
-	public final void readNodeBB(BasicNodeI node, ByteBuffer in) throws IOException {
+	public final void readNodeBB(final BasicNodeI node, final ByteBuffer in) throws IOException {
 		DisplayNode displNode = (DisplayNode) node;
         int length = in.getInt();
 		displNode.setDisplayValue(in.getFloat());
 		displNode.setDisplayText(readUTF(in));
 	}
 
-	public final void readLinkBB(BasicLinkI link, ByteBuffer in) throws IOException {
+	public final void readLinkBB(final BasicLinkI link, final ByteBuffer in) throws IOException {
         int length = in.getInt();
 		DisplayLink displLink = (DisplayLink) link;
 		int valueCnt = in.getInt();
@@ -121,7 +121,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 		displLink.setMovingAgents(agentsNow);
 	}
 
-	public final void readNode(BasicNodeI node, DataInputStream in) throws IOException {
+	public final void readNode(final BasicNodeI node, final DataInputStream in) throws IOException {
 
 		DisplayNode displNode = (DisplayNode) node;
 		/*
@@ -134,7 +134,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 		displNode.setDisplayText(in.readUTF());
 	}
 
-	public final void readLink(BasicLinkI link, DataInputStream in) throws IOException {
+	public final void readLink(final BasicLinkI link, final DataInputStream in) throws IOException {
 		DisplayLink displLink = (DisplayLink) link;
 
 		/*
@@ -180,19 +180,19 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 	}
 
 	@Override
-	public void writeMyself(DataOutputStream out) throws IOException {
+	public void writeMyself(final DataOutputStream out) throws IOException {
 		// is not used
 	}
 
 	@Override
-	public void readMyself(DataInputStream in) throws IOException {
+	public void readMyself(final DataInputStream in) throws IOException {
 		// TODO Auto-generated method stub
 		// is not used
 	}
 
 
 
-    static final int writeUTF(String str, ByteBuffer out) throws IOException {
+    static final int writeUTF(final String str, final ByteBuffer out) throws IOException {
         int strlen = str.length();
 	int utflen = 0;
 	int c, count = 0;
@@ -245,7 +245,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
     }
 
 
-	   public final static String readUTF(ByteBuffer in) throws IOException {
+	   public final static String readUTF(final ByteBuffer in) throws IOException {
 	        int utflen = in.getShort();
 	        byte[] bytearr = null;
 	        char[] chararr = null;
@@ -311,18 +311,18 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 	        return new String(chararr, 0, chararr_count);
 	    }
 
-		public void writeMyselfBB(ByteBuffer out) throws IOException {
-			if (pos == -1) pos = out.position();
-			else out.position(pos);
+		public void writeMyselfBB(final ByteBuffer out) throws IOException {
+			if (this.pos == -1) this.pos = out.position();
+			else out.position(this.pos);
 
-			for (BasicNodeI node : indexConfig.getIndexedNodeView())
+			for (BasicNodeI node : this.indexConfig.getIndexedNodeView())
 				if (node != null) {
 					writeNodeBB(node, out);
 				}else {
 					out.putInt(0);
 				}
 
-			for (BasicLinkI link : indexConfig.getIndexedLinkView())
+			for (BasicLinkI link : this.indexConfig.getIndexedLinkView())
 				if (link != null) {
 					writeLinkBB(link, out);
 				}else {
@@ -332,14 +332,14 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 			return;
 		}
 
-		private void writeLinkBB(BasicLinkI link, ByteBuffer out) throws IOException {
+		private void writeLinkBB(final BasicLinkI link, final ByteBuffer out) throws IOException {
 			QueueLink qLink = (QueueLink) link;
 			out.putInt(0);
 			out.putInt(1); // value count of link colors, always 1
 	        double value = qLink.getDisplayableSpaceCapValue();
 	        out.putFloat((float)value);
 	        writeUTF(qLink.getId().toString(), out);
-	        Collection<? extends DrawableAgentI> coll = qLink.getDrawableCollection(false);
+	        Collection<? extends DrawableAgentI> coll = qLink.getDrawableCollection();
 	        out.putInt(coll.size());
 	        Iterator<? extends DrawableAgentI> iter = coll.iterator();
 	        while(iter.hasNext()) {
@@ -349,7 +349,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 	        }
 		}
 
-		private void writeNodeBB(BasicNodeI node, ByteBuffer out) throws IOException {
+		private void writeNodeBB(final BasicNodeI node, final ByteBuffer out) throws IOException {
 			QueueNode qNode = (QueueNode) node;
 			out.putInt(0);
 	        out.putFloat((float)0.);

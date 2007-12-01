@@ -40,7 +40,7 @@ public class QueueNetStateWriter extends DisplayNetStateWriter {
     @Override
     protected Collection<AgentOnLink> getAgentsOnLink(final BasicLinkI link) {
         QueueLink qlink = (QueueLink) link;
-        return qlink.getDrawableCollection(!writeSpaceCap);
+        return qlink.getDrawableCollection();
     }
 
     public QueueNetStateWriter(final BasicNetI network, final String networkFileName,

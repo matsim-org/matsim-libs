@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.network.Link;
@@ -33,6 +34,7 @@ import org.matsim.utils.identifiers.IdI;
 
 /**
  * @author david
+ * @author mrieser // node de-/activation, activationQueue for parking vehicles
  *
  * QueueNetworkLayer is responsible for creating the QueueLinks/Nodes and for
  * implementing doSim
@@ -45,11 +47,17 @@ public class QueueNetworkLayer extends NetworkLayer {
 	 * the links are processed influences the order of events within one time step. Thus, just comparing the event-files will not
 	 * work, but first sorting the two event-files by time and agent-id and then comparing them, will work.
 	 */
-	private boolean simulateAllLinks = false;
+	private final static boolean simulateAllLinks = false;
 
+	/** This is the collection of links that have to be moved in the simulation */
 	private final ArrayList<QueueLink> simLinksArray = new ArrayList<QueueLink>();
-	private ArrayList<QueueNode> simNodesArray = new ArrayList<QueueNode>();
+	/** This is the collection of nodes that have to be moved in the simulation */
+	private final ArrayList<QueueNode> simNodesArray = new ArrayList<QueueNode>();
+	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
+	/** This is a queue of links and times, at which the links will have to be activated again. This queue is mostly used
+	 * when vehicles are parking on a link but no other traffic occurs on that link. */
+	private final PriorityQueue<LinkActivation> activationQueue = new PriorityQueue<LinkActivation>();
 
 	// set to true to move vehicles from waitingList before vehQueue
 	final static boolean moveWaitFirst = false;
@@ -67,15 +75,11 @@ public class QueueNetworkLayer extends NetworkLayer {
 	}
 
 	public void beforeSim() {
-		/* This is the  array of links/nodes that have to be moved in the simulation
-		 * in the single CPU version this will be ALL links/nodes
-		 * but the parallel version put only the relevant nodes here
-		 * We still need the whole net on the parallel version, to reconstruct routes
-		 * on vehicle-receiving, etc. */
-		this.simNodesArray = new ArrayList<QueueNode>(getNodes().values());
-		this.simLinksArray.clear();
+		this.simNodesArray.clear();
+		this.simNodesArray.addAll(getNodes().values());
 
-		if (this.simulateAllLinks) {
+		this.simLinksArray.clear();
+		if (simulateAllLinks) {
 			this.simLinksArray.addAll(getLinks().values());
 		}
 
@@ -93,7 +97,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 		for (QueueNode node : this.simNodesArray) {
 			node.moveNode(time);
 		}
-		reactivateLinks();
+		reactivateLinks(time);
 		moveLinks(time);
 	}
 
@@ -120,7 +124,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 			while (links.hasNext()) {
 				link = links.next();
 				isActive = link.moveLinkWaitFirst(time);
-				if (!isActive && !this.simulateAllLinks) {
+				if (!isActive && !simulateAllLinks) {
 					links.remove();
 				}
 			}
@@ -130,7 +134,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 			while (links.hasNext()) {
 				link = links.next();
 				isActive = link.moveLink(time);
-				if (!isActive && !this.simulateAllLinks) {
+				if (!isActive && !simulateAllLinks) {
 					links.remove();
 				}
 			}
@@ -153,14 +157,14 @@ public class QueueNetworkLayer extends NetworkLayer {
 	/**
 	 * @return Returns the simLinksArray.
 	 */
-	public ArrayList<QueueLink> getSimLinksArray() {
+	public Collection<QueueLink> getSimulatedLinks() {
 		return this.simLinksArray;
 	}
 
 	/**
 	 * @return Returns the simNodesArray.
 	 */
-	public ArrayList<QueueNode> getSimNodesArray() {
+	public Collection<QueueNode> getSimulatedNodes() {
 		return this.simNodesArray;
 	}
 
@@ -171,21 +175,36 @@ public class QueueNetworkLayer extends NetworkLayer {
 		 * when handling the nodes.
 		 */
 		for (QueueLink link : getLinks().values()) {
-			link.linkStatus = QueueLink.LinkStatus.DEFAULT;
 			link.clearVehicles();
 		}
 	}
 
 	public void addActiveLink(final QueueLink link) {
-		if (!this.simulateAllLinks) {
+		if (!simulateAllLinks) {
 			this.simActivateThis.add(link);
 		}
 	}
 
-	private void reactivateLinks() {
-		if (!this.simulateAllLinks && !this.simActivateThis.isEmpty()) {
-			this.simLinksArray.addAll(this.simActivateThis);
-			this.simActivateThis.clear();
+	private void reactivateLinks(final double now) {
+		if (!simulateAllLinks) {
+			// links being activated because somebody's leaving on that link
+			LinkActivation activation = this.activationQueue.peek();
+			while (activation != null && activation.time <= now) {
+				activation = this.activationQueue.poll();
+				activation.link.activateLink();
+				activation = this.activationQueue.peek();
+			}
+			// links being activated because somebody's driving on them
+			if (!this.simActivateThis.isEmpty()) {
+				this.simLinksArray.addAll(this.simActivateThis);
+				this.simActivateThis.clear();
+			}
+		}
+	}
+
+	public void setLinkActivation(final double time, final QueueLink link) {
+		if (!simulateAllLinks) {
+			this.activationQueue.add(new LinkActivation(time, link));
 		}
 	}
 
@@ -196,6 +215,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 		this.simLinksArray.remove(link);
 		return super.removeLink(link);
 	}
+
 	@Override
 	public boolean removeNode(final Node node) {
 		this.simNodesArray.remove(node);
@@ -212,6 +232,34 @@ public class QueueNetworkLayer extends NetworkLayer {
 	@SuppressWarnings("unchecked")
 	public Map<IdI, ? extends QueueNode> getNodes() {
 		return (Map<IdI, ? extends QueueNode>)super.getNodes();
+	}
+
+	final private static class LinkActivation implements Comparable<LinkActivation> {
+		final public double time;
+		final public QueueLink link;
+		public LinkActivation(final double time, final QueueLink link) {
+			this.time = time;
+			this.link = link;
+		}
+
+		public int compareTo(final LinkActivation o) {
+			if (this.time < o.time) return -1;
+			if (this.time > o.time) return +1;
+			return 0;
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (obj == null) return false;
+			if (!(obj instanceof LinkActivation)) return false;
+			LinkActivation la = (LinkActivation)obj;
+			return (this.time == la.time) && (this.link.equals(la.link));
+		}
+
+		@Override
+		public int hashCode() {
+			return this.link.hashCode();
+		}
 	}
 
 }

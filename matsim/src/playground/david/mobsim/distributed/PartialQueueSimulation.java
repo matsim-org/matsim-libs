@@ -196,7 +196,10 @@ public class PartialQueueSimulation extends QueueSimulation implements
 		Gbl.createWorld();
 
 		try {
-			PartialQueueSimulation pq = new PartialQueueSimulation(null,null,null);
+			NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
+			QueueNetworkLayer network = (QueueNetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+
+			PartialQueueSimulation pq = new PartialQueueSimulation(network, null, null);
 			DistributedQueueSimulation.registerWithRMI("PSim"+ args[0], pq);
 			pq.simname =  args[2];
 			pq.initPartition(Integer.parseInt(args[0]), args[1]);
@@ -204,8 +207,6 @@ public class PartialQueueSimulation extends QueueSimulation implements
 			pq.host.signalSimStepDone(pq.partID,1); // SEND Signal A: Ready and WAITING to connect ot others
 			pq.partSimsIP = pq.host.getPartIDIP();
 
-			NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
-			pq.network = (QueueNetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 			new MatsimNetworkReader(pq.network).readFile(config.network().getInputFile());
 			pq.host.signalSimStepDone(pq.partID,1); // SEND Signal B: Network read
 			pq.prepareNetwork();
@@ -310,8 +311,8 @@ public class PartialQueueSimulation extends QueueSimulation implements
 
 	private void compactLinks() {
 		int fromID = 0, toID = 0;
-		int size = this.network.getSimLinksArray().size();
-		Iterator<QueueLink> l_it = this.network.getSimLinksArray().iterator();
+		int size = this.network.getSimulatedLinks().size();
+		Iterator<QueueLink> l_it = this.network.getSimulatedLinks().iterator();
 
 		while (l_it.hasNext()) {
 			QueueLink link = l_it.next();
@@ -324,13 +325,13 @@ public class PartialQueueSimulation extends QueueSimulation implements
 			}
 		}
 
-		System.out.println("Link size reduced from " + size + " to " + this.network.getSimLinksArray().size() + " that is "
-				+ (size - this.network.getSimLinksArray().size()) + " less");
+		System.out.println("Link size reduced from " + size + " to " + this.network.getSimulatedLinks().size() + " that is "
+				+ (size - this.network.getSimulatedLinks().size()) + " less");
 	}
 
 	private void compactNodes() {
-		int size = this.network.getSimNodesArray().size();
-		Iterator<QueueNode> n_it = this.network.getSimNodesArray().iterator();
+		int size = this.network.getSimulatedNodes().size();
+		Iterator<QueueNode> n_it = this.network.getSimulatedNodes().iterator();
 		while (n_it.hasNext()) {
 			QueueNode node = n_it.next();
 			if (node.getPartitionId() != this.partID) {
@@ -338,8 +339,8 @@ public class PartialQueueSimulation extends QueueSimulation implements
 				n_it.remove();
 			}
 		}
-		System.out.println("Node size reduced from " + size + " to " + this.network.getSimNodesArray().size() + " that is "
-				+ (size - this.network.getSimNodesArray().size()) + " less");
+		System.out.println("Node size reduced from " + size + " to " + this.network.getSimulatedNodes().size() + " that is "
+				+ (size - this.network.getSimulatedNodes().size()) + " less");
 	}
 
 	private void compactNetwork() {

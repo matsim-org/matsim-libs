@@ -26,9 +26,10 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
+import org.apache.log4j.Logger;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventAgentStuck;
@@ -63,43 +64,40 @@ public class QueueLink extends Link {
 			new VehicleDepartureTimeComparator());
 
 	/**
-	 * all veh from parking list move to the waiting list as soon as their time
-	 * has come. they are then filled into the vehQueue, depending on free space
+	 * All vehicles from parkingList move to the waitingList as soon as their time
+	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
-	private final List<Vehicle> waitingList = new LinkedList<Vehicle>();
-
-	// TODO [DS] is ArrayList the right List for this (better use a Queue)
+	private final Queue<Vehicle> waitingList = new LinkedList<Vehicle>();
 
 	/**
-	 * the list of veh that have not yet reached the end of the link according
+	 * The list of vehicles that have not yet reached the end of the link according
 	 * to the free travel speed of the link
 	 */
-	private final List<Vehicle> vehQueue = new ArrayList<Vehicle>();
+	private final Queue<Vehicle> vehQueue = new LinkedList<Vehicle>();
 
 	/**
 	 * buffer is holding all vehicles that are ready to cross the outgoing
 	 * intersection
 	 */
-	private final List<Vehicle> buffer = new LinkedList<Vehicle>();
-	private int buffercount = 0;
+	private final Queue<Vehicle> buffer = new LinkedList<Vehicle>();
 
 	protected double freeTravelDuration;
 
-	protected double spaceCap = 10.0;
+	protected double spaceCap;
 
-	private double timeCap = 10.0;
-
-	private int timeCapCeil = 10; // optimization, cache Math.ceil(timeCap)
+	/** The number of vehicles able to leave the buffer in one time step (usually 1s). */
+	private double timeCap;
+	private int timeCapCeil; // optimization, cache Math.ceil(timeCap)
+	private double timeCapFraction; // optimization, cache timeCap - (int)timeCap
 
 	protected double buffercap_accumulate = 1.0;
 
-	protected double euklideanDist = 0.0;
+	final protected double euklideanDist;
 
-	// the status of the link - needed for with-in-day replaning
-	public enum LinkStatus { DEFAULT, BLOCKED };
-	public LinkStatus linkStatus = LinkStatus.DEFAULT;
+	private boolean active = false;
 
+	final private static Logger log = Logger.getLogger(QueueLink.class);
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -114,6 +112,8 @@ public class QueueLink extends Link {
 		// yy: I am really not so happy about these indirect constructors with
 		// long argument lists. But be it if other people
 		// like them. kai, nov06
+
+		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
 
 		/* moved capacity calculation to a method, to be able to call it from outside
 		 * e.g. for reducing cap in case of an incident             */
@@ -130,8 +130,7 @@ public class QueueLink extends Link {
 
 		/* factor to scale down capacity from file to capacity per sim time
 		 * step, assuming flowCapFactor=1:    */
-		double simTickCapFactor = SimulationTimer.getSimTickTime()
-				/ network.getCapacityPeriod();
+		double simTickCapFactor = SimulationTimer.getSimTickTime() / network.getCapacityPeriod();
 
 		/* multiplying capacity from file by simTickCapFactor **and**
 		 * flowCapFactor:                     */
@@ -140,15 +139,15 @@ public class QueueLink extends Link {
 		// also computing the ceiling of the capacity:
 		this.timeCapCeil = (int) Math.ceil(this.timeCap);
 
+		// ... and also the fractional part of timeCap
+		this.timeCapFraction = this.timeCap - (int) this.timeCap;
+
 		// first guess at storageCapacity:
-		this.spaceCap = (this.length * this.permlanes) / NetworkLayer.CELL_LENGTH
-				* storageCapFactor;
+		this.spaceCap = (this.length * this.permlanes) / NetworkLayer.CELL_LENGTH * storageCapFactor;
 
 		/* storage capacity needs to be at least enough to handle the
 		 * cap_per_time_step:                  */
 		this.spaceCap = Math.max(this.spaceCap, this.timeCapCeil);
-
-		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
 
 		this.freeTravelDuration = getLength() / getFreespeed();
 
@@ -158,9 +157,9 @@ public class QueueLink extends Link {
 		 */
 		if (this.spaceCap < this.freeTravelDuration * this.timeCap) {
 			if ( spaceCapWarningCount <=10 ) {
-				System.err.println(" link " + this.id + " too small: enlarge spaceCap");
+				log.warn("Link " + this.id + " too small: enlarge spaceCap");
 				if ( spaceCapWarningCount == 10 ) {
-					System.err.println(" Additional warnings of this type are suppressed.");
+					log.warn("Additional warnings of this type are suppressed.");
 				}
 				spaceCapWarningCount++ ;
 			}
@@ -223,8 +222,8 @@ public class QueueLink extends Link {
 				if (hasRoute) {
 					this.waitingList.add(veh);
 				} else {
-				// this is the case where (hopefully) the next act happens at the same location as this act
-				processVehicleArrival(now, veh);
+					// this is the case where (hopefully) the next act happens at the same location as this act
+					processVehicleArrival(now, veh);
 				}
 			}
 
@@ -242,18 +241,18 @@ public class QueueLink extends Link {
 	// ////////////////////////////////////////////////////////////////////
 	private void moveWaitToBuffer(final double now) {
 		if (!this.waitingList.isEmpty()) {
-			for (ListIterator<Vehicle> i = this.waitingList.listIterator(); i.hasNext();) {
+			Vehicle veh;
+			while ((veh = this.waitingList.peek()) != null) {
 				if (!hasBufferSpace())
 					break;
 
-				Vehicle veh = i.next();
 				addToBuffer(veh, now);
 
 				QueueSimulation.getEvents().processEvent(
 						new EventAgentWait2Link(now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(),
 								veh.getDriver(), veh.getCurrentLeg(), this));
 
-				i.remove();
+				this.waitingList.poll(); // remove the just handled vehicle from waitingList
 			}
 		}
 	}
@@ -263,12 +262,12 @@ public class QueueLink extends Link {
 	 *
 	 * @param now The current time.
 	 */
-	synchronized private void moveLinkToBuffer(final double now) {
+	private void moveLinkToBuffer(final double now) {
 		// move items if possible
 		double max_buffercap = this.timeCap;
 
-		for (ListIterator<Vehicle> i = this.vehQueue.listIterator(); i.hasNext();) {
-			Vehicle veh = i.next();
+		Vehicle veh;
+		while ((veh = this.vehQueue.peek()) != null) {
 			if (veh.getDepartureTime_s() > now) {
 				break;
 			}
@@ -278,7 +277,7 @@ public class QueueLink extends Link {
 				processVehicleArrival(now, veh);
 
 				// remove _after_ processing the arrival to keep link active
-				i.remove();
+				this.vehQueue.poll();
 				continue;
 			}
 
@@ -290,7 +289,7 @@ public class QueueLink extends Link {
 			if (max_buffercap >= 1.0) {
 				max_buffercap--;
 				addToBuffer(veh, now);
-				i.remove();
+				this.vehQueue.poll();
 				continue;
 
 			/* using the following line instead should, I think, be an easy way to make the mobsim
@@ -300,7 +299,7 @@ public class QueueLink extends Link {
 			} else if (this.buffercap_accumulate >= 1.0) {
 				this.buffercap_accumulate--;
 				addToBuffer(veh, now);
-				i.remove();
+				this.vehQueue.poll();
 				break;
 			} else {
 				break;
@@ -311,23 +310,24 @@ public class QueueLink extends Link {
 		 * leave it for the next iteration so it might accumulate to a whole agent.
 		 */
 		if (this.buffercap_accumulate < 1.0) {
-			this.buffercap_accumulate += this.timeCap - (int) this.timeCap;
+			this.buffercap_accumulate += this.timeCapFraction;
 		}
 	}
 
-	protected boolean isActive() {
+	private boolean updateActiveStatus() {
 		/* Leave link active as long as there are vehicles on the link (ignore
 		 * buffer because the buffer gets emptied by nodes and not links) and leave
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		return (this.buffercap_accumulate < 1.0)
-				|| ((this.parkingList.size() + this.vehQueue.size() + this.waitingList.size()) != 0);
+		this.active = (this.buffercap_accumulate < 1.0) || ((this.vehQueue.size() + this.waitingList.size()) != 0);
+		return this.active;
 	}
 
 	public void activateLink() {
-		if (!isActive()) {
+		if (!this.active) {
 			((QueueNetworkLayer) this.layer).addActiveLink(this);
+			this.active = true;
 		}
 	}
 
@@ -342,7 +342,7 @@ public class QueueLink extends Link {
 		// move vehicles from waitingQueue into buffer if possible
 		moveWaitToBuffer(now);
 
-		return isActive();
+		return updateActiveStatus();
 	}
 
 	public boolean moveLinkWaitFirst(final double now) {
@@ -353,12 +353,13 @@ public class QueueLink extends Link {
 		// move vehicles from link to buffer
 		moveLinkToBuffer(now);
 
-		return isActive();
+		return updateActiveStatus();
 	}
 
 	public void addParking(final Vehicle veh) {
-		activateLink();
+//		activateLink();
 		this.parkingList.add(veh);
+		((QueueNetworkLayer) this.layer).setLinkActivation(veh.getDepartureTime_s(), this);
 	}
 
 	/**
@@ -367,7 +368,7 @@ public class QueueLink extends Link {
 	 *
 	 * @param veh the vehicle
 	 */
-	synchronized public void add(final Vehicle veh) {
+	public void add(final Vehicle veh) {
 		double now = SimulationTimer.getTime();
 
 		activateLink();
@@ -405,11 +406,9 @@ public class QueueLink extends Link {
 	 */
 	public Vehicle popFirstFromBuffer() {
 		double now = SimulationTimer.getTime();
-		Vehicle veh = this.buffer.get(0);
-		this.buffer.remove(0);
-		this.buffercount--;
-		if (this.buffercount != 0) {
-			Vehicle v2 = this.buffer.get(0);
+		Vehicle veh = this.buffer.poll();
+		Vehicle v2 = this.buffer.peek();
+		if (v2 != null) {
 			v2.setLastMovedTime(now);
 		}
 
@@ -422,7 +421,6 @@ public class QueueLink extends Link {
 
 	private void addToBuffer(final Vehicle veh, final double now) {
 		this.buffer.add(veh);
-		this.buffercount++;
 		veh.setLastMovedTime(now);
 		((QueueNode) this.getToNode()).activateNode();
 	}
@@ -433,7 +431,7 @@ public class QueueLink extends Link {
 	 * @see java.util.List#get(int)
 	 */
 	public Vehicle getFirstFromBuffer() {
-		return this.buffer.get(0);
+		return this.buffer.peek();
 	}
 
 	/*
@@ -442,20 +440,20 @@ public class QueueLink extends Link {
 	 * @see java.util.List#isEmpty()
 	 */
 	public boolean bufferIsEmpty() {
-		return this.buffercount == 0;
+		return this.buffer.isEmpty();
 	}
 
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (= the whole link),
 	 * than there is space for vehicles.
 	 */
-	synchronized public boolean hasSpace() {
+	public boolean hasSpace() {
 		if (this.vehQueue.size() < getSpaceCap())
 			return true;
 		return false;
 	}
 
-	synchronized protected int vehOnLinkCount() {
+	protected int vehOnLinkCount() {
 		return this.vehQueue.size();
 	}
 
@@ -463,17 +461,14 @@ public class QueueLink extends Link {
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
 	private boolean hasBufferSpace() {
-		if (this.buffercount < this.timeCapCeil)
-			return true;
-		return false;
+		return (this.buffer.size() < this.timeCapCeil);
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// Value for coloring the link in viz
-	// actual veh count / maxcap
-	// ////////////////////////////////////////////////////////////////////
+	/**
+	 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
+	 */
 	public double getDisplayableSpaceCapValue() {
-		return (this.buffercount + this.vehQueue.size()) / this.spaceCap;
+		return (this.buffer.size() + this.vehQueue.size()) / this.spaceCap;
 	}
 
 	/**
@@ -486,10 +481,9 @@ public class QueueLink extends Link {
 	 * @return A measure for the number of vehicles being delayed on this link.
 	 */
 	public double getDisplayableTimeCapValue() {
-		int count = this.buffercount;
+		int count = this.buffer.size();
 		double now = SimulationTimer.getTime();
-		for (ListIterator<Vehicle> i = this.vehQueue.listIterator(); i.hasNext();) {
-			Vehicle veh = i.next();
+		for (Vehicle veh : this.vehQueue) {
 			// Check if veh has reached destination
 			if (veh.getDepartureTime_s() <= now) {
 				count++;
@@ -520,7 +514,7 @@ public class QueueLink extends Link {
 		return vehicles;
 	}
 
-	synchronized public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
+	public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
 		double now = SimulationTimer.getTime();
 		int cnt = 0;
 		double queueLen = 0.0; // the length of the queue jammed vehicles build at the end of the link
@@ -532,7 +526,7 @@ public class QueueLink extends Link {
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.buffer) {
 			cnt++;
-			// distance from fnode:
+			// distance from fromNode:
 			double distanceFromFromNode = this.euklideanDist - cnt * vehLen;
 
 			// lane:
@@ -655,7 +649,6 @@ public class QueueLink extends Link {
 		Simulation.decLiving(this.buffer.size());
 		Simulation.incLost(this.buffer.size());
 		this.buffer.clear();
-		this.buffercount = 0;
 	}
 
 	// //////////////////////////////////////////////////////////
@@ -675,12 +668,7 @@ public class QueueLink extends Link {
 		}
 	}
 
-	/* If writeTimeCap then we use LinkSetRendererTRANSIMS to create a
-	 * transims-like output.
-	 * Vehicles that are to long on the link are drawn red other ones green
-	 * also vehicles in buffer are drawn yellow (unlike TRANSIMS!)
-	 */
-	public Collection<AgentOnLink> getDrawableCollection(final boolean writeTimeCap) {
+	public Collection<AgentOnLink> getDrawableCollection() {
 
 
 		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();

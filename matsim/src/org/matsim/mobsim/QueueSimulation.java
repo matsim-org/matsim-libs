@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.events.EventAgentArrival;
@@ -75,29 +76,29 @@ class PersonAlgo_CheckSelected extends PersonAlgorithm {
 //////////////////////////////////////////////////////////////////////
 public class QueueSimulation extends Simulation {
 
-  // do write snapshot every n seconds
-	private int snapshotPeriod = 60;
-	// do write info to console every n sec (sim time)
+	private int snapshotPeriod = Integer.MAX_VALUE;
+
 	protected static final int INFO_PERIOD = 3600;
 
-	protected QueueNetworkLayer network = null;
+	private final Config config;
+	protected final Plans plans;
+	protected final QueueNetworkLayer network;
+
 	private PersonAlgo_CreateVehicle veh_algo = new PersonAlgo_CreateVehicle();
 	protected EventWriterTXT myeventwriter = null;
 
 	protected static Events events = null; // TODO [MR] instead of making this static and Links/Nodes using QueueSimulation.getEvents(), Gbl should hold a global events-object
-	protected Plans plans = null;
 	protected DisplayNetStateWriter netStateWriter = null;
 
 	private final List<SnapshotWriterI> snapshotWriters = new ArrayList<SnapshotWriterI>();
 
-	private final Config config;
-
 	/**
 	 * teleportationList includes all vehicle that have transportation modes unknown to
-	 * the queueSimulation (i.e. != "car") or have two activities on the same link
+	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
 	private static PriorityQueue<Vehicle> teleportationList = new PriorityQueue<Vehicle>(30, new VehicleDepartureTimeComparator());
 
+	final private static Logger log = Logger.getLogger(QueueSimulation.class);
 
 	public QueueSimulation(final QueueNetworkLayer net, final Plans plans, final Events events) {
 		super();
@@ -109,11 +110,9 @@ public class QueueSimulation extends Simulation {
 
 	// creating vehicles with PersonAlgo_CreateVehicles
 	protected final void createAgents() {
-		System.out.println ( "==   entering createAgents() ...") ;
 
 		if (this.plans == null) {
-			Gbl.errorMsg("QueueSimulation.createAgents(): no valid Population found (plans == null)");
-			System.exit(1);
+			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		// add veh algo and run it through all plans
 		if (this.veh_algo != null) {
@@ -124,7 +123,6 @@ public class QueueSimulation extends Simulation {
 			this.plans.clearAlgorithms();
 		}
 
-		System.out.println("==   done with createAgents()");
 	}
 
 	protected void prepareNetwork() {
@@ -199,20 +197,11 @@ public class QueueSimulation extends Simulation {
 	//////////////////////////////////////////////////////////////////////
 	@Override
 	protected void  prepareSim() {
-		System.out.println ( "==   entering prepareSim() ...") ;
-
-		// get global config
-		// Parallel init
-		// seed random
-		// decompose domains
-		// Build links ans nodes
-		prepareNetwork();
-
-		// Check for Events
-		if (events == null){
-			Gbl.errorMsg("QueueSimulation.prepareSim(): no valid Events Object (events == null)");
-			System.exit(1);
+		if (events == null) {
+			throw new RuntimeException("No valid Events Object (events == null)");
 		}
+
+		prepareNetwork();
 
 		double startTime = this.config.simulation().getStartTime();
 		this.stopTime = this.config.simulation().getEndTime();
@@ -224,20 +213,12 @@ public class QueueSimulation extends Simulation {
 		SimulationTimer.setTime(startTime);
 
 		createAgents();
-		// Parallel:: shrink the network
 
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		SimulationTimer.setSimStartTime(Math.max(startTime,SimulationTimer.getSimStartTime()));
-		// I changed this from updateSimStartTime to setSimStartTime because the
-		// original version did not what it should have done (updateSimStartTime
-		// accepts new times only of they are _smaller_ than what is already
-		// there.  kai, jan07
-
 		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
 
 		createSnapshotwriter();
-
-		System.out.println ( "==   done with prepareSim().") ;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -245,7 +226,6 @@ public class QueueSimulation extends Simulation {
 	//////////////////////////////////////////////////////////////////////
 	@Override
 	protected void cleanupSim() {
-		System.out.println ( "==   entering cleanupSim() ...") ;
 
 		this.network.afterSim();
 		double now = SimulationTimer.getTime();
@@ -262,15 +242,14 @@ public class QueueSimulation extends Simulation {
 		}
 
 		if (this.netStateWriter != null) {
-            try {
-                this.netStateWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            this.netStateWriter = null;
-	}
+			try {
+				this.netStateWriter.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			this.netStateWriter = null;
+		}
 
-		System.out.println ( "==   done with cleanupSim().") ;
 	}
 
 	/**
@@ -287,9 +266,9 @@ public class QueueSimulation extends Simulation {
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
 			double diffsim  = time - SimulationTimer.getSimStartTime();
-			int nofActiveLinks = this.network.getSimLinksArray().size();
-			System.out.println(Gbl.writeTime(time) + ": #Veh= " + getLiving() + " lost: " + getLost() + " #links: " + nofActiveLinks
-					+ " simT: " + diffsim + "s realT: " + (diffreal) + "s; (s/r): " + (diffsim/(diffreal+0.0000001)));
+			int nofActiveLinks = this.network.getSimulatedLinks().size();
+			log.info("SIMULATION AT " + Gbl.writeTime(time) + ": #Veh=" + getLiving() + " lost=" + getLost() + " #links=" + nofActiveLinks
+					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 			Gbl.printMemoryUsage();
 		}
 
@@ -318,7 +297,7 @@ public class QueueSimulation extends Simulation {
 
 		if (this.netStateWriter != null) {
 			try {
-				this.netStateWriter.dump((int)time); 	// TODO [DS] netstatewriter vertraegt kein double
+				this.netStateWriter.dump((int)time);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -345,7 +324,8 @@ public class QueueSimulation extends Simulation {
 	  		if (veh.getDepartureTime_s() <= now) {
 	  			teleportationList.poll();
 
-				getEvents().processEvent(new EventAgentArrival(now, veh.getDriverID(), veh.getCurrentLegNumber(), veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink())) ;  // ok
+				getEvents().processEvent(new EventAgentArrival(now, veh.getDriverID(), veh.getCurrentLegNumber(),
+						veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 	  			veh.reachActivity();
 
 	  		} else break;
