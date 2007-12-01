@@ -160,7 +160,7 @@ public abstract class Gbl {
 		long freeMem = Runtime.getRuntime().freeMemory();
 		long usedMem = totalMem - freeMem;
 		log.info("used RAM: " + usedMem + "B = " + (usedMem/1024) + "kB = " + (usedMem/1024/1024) + "MB" +
-				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB\n");
+				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB");
 	}
 
 	/** This method will soon be deprecated. Please start using Logger.info() for informational output.
