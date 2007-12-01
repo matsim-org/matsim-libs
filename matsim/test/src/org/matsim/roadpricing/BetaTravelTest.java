@@ -45,6 +45,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		loadConfig(getInputDirectory() + "config.xml");
 		TestControler controler = new TestControler();
 		controler.setOverwriteFiles(true);
+		controler.setCreateLegHistogramPNG(false);
 		controler.run(null);
 	}
 
@@ -52,6 +53,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		loadConfig(getInputDirectory() + "config.xml");
 		TestControler controler = new TestControler();
 		controler.setOverwriteFiles(true);
+		controler.setCreateLegHistogramPNG(false);
 		controler.run(null);
 	}
 

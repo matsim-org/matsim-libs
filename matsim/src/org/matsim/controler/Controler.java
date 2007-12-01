@@ -150,6 +150,8 @@ public class Controler {
 
 	private static final String logProperties = "log4j.properties";
 
+	private boolean createLegHistogramPNG = true;
+
 	static {
 		URL url = Loader.getResource(logProperties);
 		if (url != null) {
@@ -205,7 +207,7 @@ public class Controler {
 		if (this.config.counts().getCountsFileName() != null) {
 			this.addControlerListener(new CountControlerListener(this.config));
 		}
-		this.addControlerListener(new LegHistogramListener(this.events, true));
+		this.addControlerListener(new LegHistogramListener(this.events, this.createLegHistogramPNG));
 
 		this.minIteration = this.config.controler().getFirstIteration();
 		this.maxIterations = this.config.controler().getLastIteration();
@@ -828,6 +830,15 @@ public class Controler {
 	 */
 	public final int getTraveltimeBinSize() {
 		return this.traveltimeBinSize;
+	}
+
+	/** Specifies whether the leg histogram should also be generated as a PNG graphics. The creation uses
+	 * a small amount of time, but large enough to slow down small scenarios like test cases and  equil-net.
+	 *
+	 * @param createPng true if a PNG graphics should be generated each iteration.
+	 */
+	public final void setCreateLegHistogramPNG(final boolean createPng) {
+		this.createLegHistogramPNG = createPng;
 	}
 
 	/**
