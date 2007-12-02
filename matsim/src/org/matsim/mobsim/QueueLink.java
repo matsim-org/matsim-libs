@@ -173,6 +173,7 @@ public class QueueLink extends Link {
 	// ////////////////////////////////////////////////////////////////////
 	public void finishInit() {
 	  this.buffercap_accumulate = 1.0;
+	  this.active = false;
 	}
 
 	private void processVehicleArrival(final double now, final Vehicle veh ) {
@@ -357,7 +358,6 @@ public class QueueLink extends Link {
 	}
 
 	public void addParking(final Vehicle veh) {
-//		activateLink();
 		this.parkingList.add(veh);
 		((QueueNetworkLayer) this.layer).setLinkActivation(veh.getDepartureTime_s(), this);
 	}
