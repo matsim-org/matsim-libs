@@ -38,7 +38,7 @@ public class QueueNode extends Node {
 	private QueueLink[] tempLinks = null;
 	private QueueLink[] auxLinks = null;
 
-	private boolean active = true;
+	private boolean active = false;
 
 	/* Get/Set partitionID generated be MetisExeWrapper
 	 * only used when doing DistributedSimulation,
