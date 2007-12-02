@@ -98,6 +98,7 @@ public class GlobalConfigGroup extends Module {
 		addNotNullParameterToMap(map, OUTPUT_TIME_FORMAT);
 		addNotNullParameterToMap(map, LOCAL_DTD_BASE);
 		addNotNullParameterToMap(map, COORDINATE_SYSTEM);
+		addNotNullParameterToMap(map, NUMBER_OF_THREADS);
 		return map;
 	}
 
