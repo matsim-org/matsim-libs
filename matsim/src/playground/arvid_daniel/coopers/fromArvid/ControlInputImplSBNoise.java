@@ -54,14 +54,17 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
 
 
 
+/**
+* Does the same as ControlInputImplSB.java, but also:
+* takes in- and outflows from other roads into the travel time calculations.
+* The additional flows are measured and are assumed to be constant during the
+* simulation time for the prediction. The additional agents are then included in the
+* travel time calculation
+*/
+
 /*
- * Does the same as ControlInputImplSB.java, but also:
- takes in- and outflows from other roads into the travel time calculations.
- The additional flows are measured and are assumed to be constant during the
- simulation time for the prediction. The additional agents are then included in the
- travel time calculation
- 
- There is one user set parameter named flowUpdateTime, which determines how often to measure the
+ USER PARAMETERS ARE:
+ FLOWUPDATETIME, which determines how often to measure the
  additional flows from in- and outlinks. Default is to update every minute.
 */
 
@@ -110,7 +113,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 
 	private Link bottleNeckLinkAlternativeRoute;
 
-	private double ttFreeSpeedAfterBottleNeckMainRoute;
+//	private double ttFreeSpeedAfterBottleNeckMainRoute;
 
 //	private double ttFreeSpeedAfterBottleNeckAlternativeRoute;
 
@@ -130,11 +133,11 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 
 	private List<Link> routeLinksListAlternativeRoute = new ArrayList<Link>();
 	
-	private double ttFreeSpeedMainRoute = 0;
+	private double ttFreeSpeedBeforeBottleNeckMainRoute = 0;
 	
-	private double ttFreeSpeedAlternativeRoute = 0;
+	private double ttFreeSpeedBeforeBottleNeckAlternativeRoute = 0;
 	
-	private static final double FLOWUPDATETIME = 100;
+	private static final double FLOWUPDATETIME = 30;
 
 	public ControlInputImplSBNoise() {
 		super();
@@ -359,12 +362,12 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 				}
 		
 		if(route == mainRoute){
-			ttFreeSpeedAfterBottleNeckMainRoute = ttFreeSpeedAfterBottleNeck;
-			ttFreeSpeedMainRoute = ttFreeSpeedBeforeBottleNeck + ttFreeSpeedAfterBottleNeck;
+//			ttFreeSpeedAfterBottleNeckMainRoute = ttFreeSpeedAfterBottleNeck;
+			ttFreeSpeedBeforeBottleNeckMainRoute = ttFreeSpeedBeforeBottleNeck + ttFreeSpeedAfterBottleNeck;
 		}
 		else{
 //			ttFreeSpeedAfterBottleNeckAlternativeRoute = ttFreeSpeedAfterBottleNeck;
-			ttFreeSpeedAlternativeRoute = ttFreeSpeedBeforeBottleNeck + ttFreeSpeedAfterBottleNeck;
+			ttFreeSpeedBeforeBottleNeckAlternativeRoute = ttFreeSpeedBeforeBottleNeck + ttFreeSpeedAfterBottleNeck;
 		}
 
 		return predictedTT;
@@ -412,8 +415,8 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 				weightedNetFlow -= weightedOutFlow;
 			}
 			netFlow = weightedNetFlow / distanceToBottleNeck;
-			ttToBottleNeck = getPredictedTravelTime(mainRoute, bottleNeckLinkMainRoute) - ttFreeSpeedAfterBottleNeckMainRoute;
-//			ttToBottleNeck = ttFreeSpeedMainRoute;
+//			ttToBottleNeck = getPredictedTravelTime(mainRoute, bottleNeckLinkMainRoute) - ttFreeSpeedAfterBottleNeckMainRoute;
+			ttToBottleNeck = ttFreeSpeedBeforeBottleNeckMainRoute;
 		}
 
 		//AlternativeRoute
@@ -448,7 +451,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 				weightedNetFlow -= weightedOutFlow;
 			}
 			netFlow = (weightedNetFlow / distanceToBottleNeck);
-			ttToBottleNeck = ttFreeSpeedAlternativeRoute;
+			ttToBottleNeck = ttFreeSpeedBeforeBottleNeckAlternativeRoute;
 //			ttToBottleNeck = getPredictedTravelTime(alternativeRoute, bottleNeckLinkAlternativeRoute) - ttFreeSpeedAfterBottleNeckAlternativeRoute;
 		}
 		return (int)(ttToBottleNeck * netFlow);
