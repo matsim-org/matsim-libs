@@ -53,9 +53,11 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  */
 
 /* User parameters are:
- * NUMBEROFFLOWEVENTS - The flow calculations are based on the last NUMBEROFFLOWEVENTS 
+ * DISTRIBUTIONCHECK	True means that model checks traffic distribution before bottle
+ * 						neck.
+ * NUMBEROFFLOWEVENTS	The flow calculations are based on the last NUMBEROFFLOWEVENTS 
  * 						agents. A higher value means better predictions if congestion.
- * IGNOREDQUEUINGIME  - Additional link travel times up to IGNOREDQUEUINGIME will not be 
+ * IGNOREDQUEUINGIME	Additional link travel times up to IGNOREDQUEUINGIME will not be 
  * 						considered a sign of temporary capacity reduction.
  * 
  */
@@ -65,12 +67,16 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  */
 
 
-
-
 public class ControlInputImplDAccident extends AbstractControlInputImpl
 implements EventHandlerLinkLeaveI, EventHandlerLinkEnterI, 
 EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
+	
+	private static final int NUMBEROFFLOWEVENTS = 20;
+
+	private static final double IGNOREDQUEUINGIME = 5;
+	
+	private static final boolean DISTRIBUTIONCHECK = false;
 	
 	private static final Logger log = Logger.getLogger(ControlInputImplDAccident.class);
 
@@ -85,10 +91,6 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	private Map<String, Double> enterLinkEvents = new HashMap<String, Double>();
 	
 	private Map <String, Double> linkFlows = new HashMap<String, Double>();
-	
-	private static final int NUMBEROFFLOWEVENTS = 20;
-
-	private static final double IGNOREDQUEUINGIME = 5;
 	
 	private Map <String, List<Double>> enterLinkEventTimes = new HashMap<String, List<Double>>();
 	
@@ -173,7 +175,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
 		}
 		
-//		Stores 5 last events and calculates flow
+//		Stores [NUMBEROFFLOWEVENTS] last events and calculates flow
 		if (this.linkFlows.containsKey(event.linkId)) {
 			LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes.get(event.linkId);
 			if ( list.size() == NUMBEROFFLOWEVENTS ) {
@@ -249,7 +251,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			for ( int i = routeLinks.length - 1; i >= 0; i-- ) {
 				String linkId = routeLinks[i].getId().toString();
 
-//				The difference has to be at least IGNOREDQUEUINGIME seconds to avoid using incorrect flows 
+//				The difference has to be at least [IGNOREDQUEUINGIME] seconds to avoid using incorrect flows 
 				if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId) + IGNOREDQUEUINGIME)  {
 					bottleNeckCongested = true;
 					currentBottleNeck = routeLinks[i];
@@ -282,57 +284,86 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
 		
 		// get the array index of the bottleneck link
-		int bottleNeckLinkIndexInArray = 0;
+		int bottleNeckArrayIndex = 0;
 		for (int i = 0; i < routeLinks.length; i++) {
 			if (currentBottleNeck.equals(routeLinks[i])) {
-				bottleNeckLinkIndexInArray = i;
+				bottleNeckArrayIndex = i;
 				break;
 			}
 		}
 		
-//		int j = bottleNeckLinkNumber;
 		double ttFreeSpeedPart = 0.0;
-
-		log.debug("The BN index is " + bottleNeckLinkIndexInArray + " (link " + currentBottleNeck.getId().toString() + ").");
-		
-//		Agents after bottleneck drive free speed (bottle neck index + 1)
-		for (int i = bottleNeckLinkIndexInArray + 1; i <= routeLinks.length - 1; i++) {
-			ttFreeSpeedPart += this.ttFreeSpeeds.get(routeLinks[i].getId().toString());
-		}
-			
-		int firstCongestedLink = bottleNeckLinkIndexInArray;
-		
-/*		if ( !bottleNeckCongested ) {
-
-//			Agents before bottleneck drive free speed if they are on sparsely trafficated links
-			int j = bottleNeckLinkIndexInArray;
-//			System.out.println("Bottleneck link index: " + j);
-			while ( j >= 0 && 
-				(this.numberOfAgents.get(routeLinks[j].getId().toString()) / currentBottleNeckCapacity)
-					<= this.ttFreeSpeeds.get(routeLinks[j].getId().toString()) ) {	// is this criterium ok? -NOOO IT'S NOT!
-				
-				ttFreeSpeedPart += this.ttFreeSpeeds.get(routeLinks[j].getId().toString());
-				System.out.println("Adding to total free speed part before bottle neck; not-congested-link index " + j);
-				j--;
-				
-			}
-			firstCongestedLink = j;
-		}
-		
-		else {
-			firstCongestedLink = bottleNeckLinkIndexInArray;
-		}*/
-		  
-						
-		// count agents on congested part of the route 
+		double predictedTT;
 		int agentsToQueueAtBottleNeck = 0;
 		double ttFreeSpeedBeforeBottleNeck = 0;
-		double predictedTT;
+
+		log.debug("The BN index is " + bottleNeckArrayIndex + " (link " + currentBottleNeck.getId().toString() + ").");
+		
+//		Agents after bottleneck drive free speed (bottle neck index + 1)
+		for (int i = bottleNeckArrayIndex + 1; i <= routeLinks.length - 1; i++) {
+			ttFreeSpeedPart += this.ttFreeSpeeds.get(routeLinks[i].getId().toString());
+		}
+		
+
+		if (DISTRIBUTIONCHECK) {
+			Link criticalCongestedLink = null;
+			int arrayIndexCCL = 0;
+			
+			for (int r = bottleNeckArrayIndex; r >= 0; r--) {
+				Link link = routeLinks[r];
+				double linkAgents = this.numberOfAgents.get(link.getId().toString());
+				double linkFreeSpeedTT = this.ttFreeSpeeds.get(link.getId().toString());
+				
+				if ( (linkAgents / currentBottleNeckCapacity) <= linkFreeSpeedTT ) {
+					ttFreeSpeedPart += linkFreeSpeedTT;
+//					System.out.println("Link " + link.getId().toString() + " was not congested. Added to freeSpeedPart.");
+				}
+				
+				else {
+					
+					int agentsUpToLink = 0;
+					double freeSpeedUpToLink = 0;
+					for (int p = 0; p <= r; p++ ) {
+						agentsUpToLink += this.numberOfAgents.get(routeLinks[p].getId().toString());
+						freeSpeedUpToLink += this.ttFreeSpeeds.get(routeLinks[p].getId().toString());					
+					}
+					if ( (agentsUpToLink / currentBottleNeckCapacity) >= freeSpeedUpToLink ) {
+						criticalCongestedLink = link; //we only care about agents up to and including
+						agentsToQueueAtBottleNeck = agentsUpToLink;
+
+						
+//						System.out.println("Link " + link.getId().toString() + " was congested and all agents before ( " + agentsToQueueAtBottleNeck + " ) will queue." );
+						break;
+					}				
+					else {
+						ttFreeSpeedPart += linkFreeSpeedTT;
+//						System.out.println("Link " + link.getId().toString() + " was congested but queue will dissolve before you arrive at BN." );
+					}
+				}
+			}
+			if (criticalCongestedLink != null) {
+//				System.out.println("You will queue with agents ahead of you up to and including link " + arrayIndexCCL);
+			}
+			else {
+//				System.out.println("You will not queue at the bottleneck. There was no critical congestend link.");
+			}				
+			
+			predictedTT = 
+				(agentsToQueueAtBottleNeck / currentBottleNeckCapacity) + ttFreeSpeedPart;
+//			System.out.println("predicted tt = agentsToQueueAtBottleNeck / bottleNeckCapacity + ttFreeSpeedPart = " +
+//					agentsToQueueAtBottleNeck + " / " + bottleNeckCapacity + " + " + ttFreeSpeedPart + " = " + predictedTT);
+		}
+		
+//		Run without distribution check
+		else {
+		int firstCongestedLink = bottleNeckArrayIndex;
+		
+		// count agents on congested part of the route 
+
 		for (int i = 0; i <= firstCongestedLink; i++) {
 			agentsToQueueAtBottleNeck += 
 				this.numberOfAgents.get(routeLinks[i].getId().toString());
 			ttFreeSpeedBeforeBottleNeck += this.ttFreeSpeeds.get(routeLinks[i].getId().toString());
-
 		}
 		
 		if (agentsToQueueAtBottleNeck / currentBottleNeckCapacity > ttFreeSpeedBeforeBottleNeck) {
@@ -341,18 +372,11 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		} else {
 			predictedTT = getFreeSpeedRouteTravelTime(route);
 		}
-		
-//		predictedTT = (agentsToQueueAtBottleNeck / currentBottleNeckCapacity) + ttFreeSpeedPart;
-
-		
-	
-		
-
 			log.debug("Predicted travel time = Agents / current capacity + freespeed = " + 
 					agentsToQueueAtBottleNeck +" / "+currentBottleNeckCapacity +" + "+ ttFreeSpeedPart);
 			log.debug("Predicted route tt is " + predictedTT);
 			log.debug("Route freespeed tt is " + this.getFreeSpeedRouteTravelTime(route));
-
+		}
 		return predictedTT;
 	}
 	

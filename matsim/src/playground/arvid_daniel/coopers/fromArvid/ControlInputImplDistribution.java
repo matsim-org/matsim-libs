@@ -56,6 +56,7 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /* TODO [abergsten] iterate approach to find several "charges" of traffic 
  * with distances between them.
+ * Fixed: abergsten
  */
 
 
@@ -142,13 +143,13 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		 */ 
 		double ttFreeSpeedPart = 0.0;
 
-		System.out.println("");
-		System.out.println("BN link is " + routeLinks[bottleNeckArrayIndex].getId().toString() + ", index: "+ bottleNeckArrayIndex);
+//		System.out.println("");
+//		System.out.println("BN link is " + routeLinks[bottleNeckArrayIndex].getId().toString() + ", index: "+ bottleNeckArrayIndex);
 		
 //		Sum up free speed links after BN
 		for (int i = bottleNeckArrayIndex + 1; i < routeLinks.length; i++)  {
 			ttFreeSpeedPart += this.ttFreeSpeeds.get(routeLinks[i].getId().toString());
-			System.out.println("ttfreespeedpart, added link " + routeLinks[i].getId().toString() + " with index " + i + " after BN. " + ttFreeSpeedPart);
+//			System.out.println("ttfreespeedpart, added link " + routeLinks[i].getId().toString() + " with index " + i + " after BN. " + ttFreeSpeedPart);
 		}
 
 		Link criticalCongestedLink = null;
@@ -162,7 +163,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			
 			if ( (linkAgents / bottleNeckCapacity) <= linkFreeSpeedTT ) {
 				ttFreeSpeedPart += linkFreeSpeedTT;
-				System.out.println("Link " + link.getId().toString() + " was not congested. Added to freeSpeedPart.");
+//				System.out.println("Link " + link.getId().toString() + " was not congested. Added to freeSpeedPart.");
 
 			}
 			
@@ -179,67 +180,30 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 					agentsToQueueAtBottleNeck = agentsUpToLink;
 
 					
-					System.out.println("Link " + link.getId().toString() + " was congested and all agents before ( " + agentsToQueueAtBottleNeck + " ) will queue." );
+//					System.out.println("Link " + link.getId().toString() + " was congested and all agents before ( " + agentsToQueueAtBottleNeck + " ) will queue." );
 					break;
 				}
 				
 				else {
 					ttFreeSpeedPart += linkFreeSpeedTT;
-					System.out.println("Link " + link.getId().toString() + " was congested but queue will dissolve before you arrive at BN." );
+//					System.out.println("Link " + link.getId().toString() + " was congested but queue will dissolve before you arrive at BN." );
 
 				}
 			}
 		}
 		if (criticalCongestedLink != null) {
-			System.out.println("You will queue with agents ahead of you up to and including link " + arrayIndexCCL);
+//			System.out.println("You will queue with agents ahead of you up to and including link " + arrayIndexCCL);
 		}
 		else {
-			System.out.println("You will not queue at the bottleneck. There was no critical congestend link.");
+//			System.out.println("You will not queue at the bottleneck. There was no critical congestend link.");
 		}
 			
 		
 		double predictedTT = 
 			(agentsToQueueAtBottleNeck / bottleNeckCapacity) + ttFreeSpeedPart;
-		System.out.println("predicted tt = agentsToQueueAtBottleNeck / bottleNeckCapacity + ttFreeSpeedPart = " +
-				agentsToQueueAtBottleNeck + " / " + bottleNeckCapacity + " + " + ttFreeSpeedPart + " = " + predictedTT);
+//		System.out.println("predicted tt = agentsToQueueAtBottleNeck / bottleNeckCapacity + ttFreeSpeedPart = " +
+//				agentsToQueueAtBottleNeck + " / " + bottleNeckCapacity + " + " + ttFreeSpeedPart + " = " + predictedTT);
 		return predictedTT;
-		
-		/*
-		while ( k >= 0 && 
-				(this.numberOfAgents.get(routeLinks[k].getId().toString()) / bottleNeckCapacity) 
-				<= this.ttFreeSpeeds.get(routeLinks[k].getId().toString()) ) {
-			
-			ttFreeSpeedPart += this.ttFreeSpeeds.get(routeLinks[k].getId().toString());
-			System.out.println("ttfreespeedpart, added link " + routeLinks[k].getId().toString() + " with index " + k + " cus low traffic");
-			k--;
-			System.out.println("now checking distribution for link with index " + k);
-		}
-		System.out.println("The link with index " + k + " will cause queue at BN");
-		
-		 *
-		 *
-		// count agents on congested part of the route 
-		for (int i = 0; i <= bottleNeckArrayIndex; i++) {
-			agentsToQueueAtBottleNeck += 
-				this.numberOfAgents.get(routeLinks[i].getId().toString());
-			System.out.println("Agents on link with index " + i + " will queue at BN");
-		}
-		/
-		/*
-		for (alla länkar bakifrån)
-			
-			if (not congestend)
-				addera till ttfreespeed
-			
-			else
-				if (summan av agenter tom länken / flaskhalsen >= ttfreespeed tom länken)
-					så utgör detta ködelen
-					break
-					
-				else 
-					addera länken till ttfreespeed
-			
-		 */
 	}
 	
 
@@ -272,16 +236,6 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		}
 		return getPredictedNashTime();
 	}
-	
-//	public boolean isCongested(Link link, ) {
-//		
-//		if (this.numberOfAgents.get(link.getId().toString()) / bottleNeckCapacity) 
-//		<= this.ttFreeSpeeds.get(routeLinks[j].getId().toString()
-//		
-//		if 
-//		
-//		return false;
-//	}
 
 	public void setAccidents(final List<Accident> accidents) {
 		this.accidents = accidents;
