@@ -20,6 +20,7 @@
 
 package org.matsim.replanning.modules;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.plans.algorithms.PlanMutateTimeAllocation;
 
@@ -28,8 +29,19 @@ public class TimeAllocationMutator extends MultithreadedModuleA {
 	private int mutationRange = 1800;// TODO [MR] should be a config-option
 
 	public TimeAllocationMutator() {
+		String range = null;
+		try {
+			range = Gbl.getConfig().getParam("TimeAllocationMutator","mutationRange");
+		}
+		catch (IllegalArgumentException e) {
+			Gbl.noteMsg(this.getClass(),"TimeAllocationMutator()","No mutation range defined in the config file. Using 1800 sec.");
+		}
+		if (range != null) {
+			this.mutationRange = Integer.parseInt(range);
+			Gbl.noteMsg(this.getClass(),"TimeAllocationMutator()","mutation range = " + this.mutationRange + ".");
+		}
 	}
-	
+
 	public TimeAllocationMutator(final int muntation_range) {
 		this.mutationRange = muntation_range;
 	}
