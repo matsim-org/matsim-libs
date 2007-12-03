@@ -114,7 +114,7 @@
 <!-- ====================================================================== -->
 
 	<module name="TimeAllocationMutator">
-		<param name="mutationRange" value="14400"/>
+		<param name="mutationRange" value="7200"/>
 	</module>
 
 <!-- ====================================================================== -->
