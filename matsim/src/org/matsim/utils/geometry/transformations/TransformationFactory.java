@@ -34,6 +34,7 @@ public class TransformationFactory {
 	public final static String CH1903_LV03 = "CH1903_LV03";
 	public final static String GK4 = "GK4";
 	public final static String ATLANTIS = "Atlantis";
+	public final static String WGS84_UTM47S = "WGS84_UTM47S";
 	
 	/**
 	 * Returns a coordinate transformation to transform coordinates from one
@@ -50,6 +51,7 @@ public class TransformationFactory {
 		if (WGS84.equals(fromSystem) && (CH1903_LV03.equals(toSystem))) return new WGS84toCH1903LV03();
 		if (GK4.equals(fromSystem) && WGS84.equals(toSystem)) return new GK4toWGS84();
 		if (ATLANTIS.equals(fromSystem) && WGS84.equals(toSystem)) return new AtlantisToWGS84();
+		if (WGS84_UTM47S.equals(fromSystem) && WGS84.equals(toSystem)) return new GeotoolsTransformation(WGS84_UTM47S,WGS84);
 		throw new IllegalArgumentException(
 				"No coordinate-transformation found for transforming from " + fromSystem + " to " + toSystem);
 	}

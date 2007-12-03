@@ -28,7 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.matsim.utils");
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.utils.geometry.shared.AllTests.suite());
+		suite.addTest(org.matsim.utils.geometry.AllTests.suite());
 		suite.addTest(org.matsim.utils.misc.AllTests.suite());
 		suite.addTestSuite(WorldUtilsTest.class);
 		//$JUnit-END$
