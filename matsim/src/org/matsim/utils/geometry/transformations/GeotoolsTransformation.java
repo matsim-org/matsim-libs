@@ -1,6 +1,23 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * GeotoolsTransformation.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.utils.geometry.transformations;
 
 import org.geotools.geometry.jts.JTS;
@@ -64,9 +81,9 @@ public class GeotoolsTransformation implements CoordinateTransformationI {
 	
 	private CoordinateReferenceSystem getCRS(String crsString){
 		String wkt_CRS;
-		if (crsString.equals(TransformationFactory.WGS84)) {
+		if (TransformationFactory.WGS84.equals(crsString)) {
 			wkt_CRS = WGS84;
-		} else if (crsString.equals(TransformationFactory.WGS84_UTM47S)) {
+		} else if (TransformationFactory.WGS84_UTM47S.equals(crsString)) {
 			wkt_CRS = WGS84_UTM47S;
 		} else {
 			throw new IllegalArgumentException("Coordinate system " + crsString + " is not known!");
@@ -76,8 +93,8 @@ public class GeotoolsTransformation implements CoordinateTransformationI {
 		try {
 			crs =  CRS.parseWKT(wkt_CRS);
 		} catch (Exception e) {
-//			e.printStackTrace();
-//			System.exit(-1);
+			e.printStackTrace();
+			System.exit(-1);
 		}
 		return crs;
 	}
