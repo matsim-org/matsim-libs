@@ -27,13 +27,13 @@ package playground.yu.graphUtils;
  * @author ychen
  *
  */
-public class LineChartUtilTest {
+public class BarChartUtilTest {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		LineChartUtil lcu=new LineChartUtil("Ueberschrift","x-Achse","yAchse");
+		BarChartUtil bcu=new BarChartUtil("Ueberschrift","x-Achse","yAchse");
 //        lcu.addValue(25.0, "A", "1");
 //		lcu.addValue(28.0, "A", "2");
 //		lcu.addValue(15.0, "A", "3");
@@ -43,15 +43,15 @@ public class LineChartUtilTest {
 //		lcu.addValue(21.0, "A", "4");
 //		lcu.addValue(22.0, "B", "4");
 		for(int i=0;i<100;i++){
-			lcu.addValue(Math.random(),"0",Integer.toString(i));
+			bcu.addValue(Math.random(),"0",Integer.toString(i));
 		}
-        lcu.saveAsPng("T:/Temp/line1.png", 800, 600);
+        bcu.saveAsPng("T:/Temp/bar1.png", 800, 600);
 		System.out.println("1@done.");
-		lcu=new LineChartUtil("Ueberschrift","x-Achse","yAchse");
+		bcu=new BarChartUtil("Ueberschrift","x-Achse","yAchse");
 		for(int i=0;i<100;i++){
-			lcu.addValue(Math.random(),Integer.toString(i));
+			bcu.addValue(Math.random(),Integer.toString(i));
 		}
-		lcu.saveAsPng("T:/Temp/line2.png",800,600);
+		bcu.saveAsPng("T:/Temp/bar2.png",800,600);
 		System.out.println("2@done.");
 	}
 }

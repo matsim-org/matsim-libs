@@ -61,14 +61,19 @@ public abstract class ChartUtil {
 		}
 	}
 
-	public void addValue(DefaultCategoryDataset dataset, double value,
-			Comparable y, Comparable x) {
-		dataset.addValue(value, y, x);
-	}
+	public void addValue(DefaultCategoryDataset dataset, double yValue,
+			Comparable yKey, Comparable xValue) {
+		dataset.addValue(yValue, yKey, xValue);
+	}//There are at least 2 y-axes in a chart
 
-	public void addValue(double value,Comparable y, Comparable x){
-		dataset0.addValue(value,y,x);
-	}//only a type of Chart in a pic.
+	public void addValue(double yValue,Comparable yKey, Comparable xValue){
+		dataset0.addValue(yValue,yKey,xValue);
+	}//There is only a y-axis in a chart.
+	
+	public void addValue(double yValue, Comparable xValue){
+		addValue(yValue,"",xValue);
+	}//There is only a y-axis and only a y-key in a chart.
+	
 	public void setDataSets(DefaultCategoryDataset[] dataSets) {
 		for (int i = 0; i < dataSets.length; i++) {
 			plot_.setDataset(i + 1, dataSets[i]);
