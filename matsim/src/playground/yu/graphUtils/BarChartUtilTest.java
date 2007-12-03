@@ -47,6 +47,7 @@ public class BarChartUtilTest {
 		}
         bcu.saveAsPng("T:/Temp/bar1.png", 800, 600);
 		System.out.println("1@done.");
+		
 		bcu=new BarChartUtil("Ueberschrift","x-Achse","yAchse");
 		for(int i=0;i<100;i++){
 			bcu.addValue(Math.random(),Integer.toString(i));

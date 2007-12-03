@@ -64,7 +64,7 @@ public abstract class ChartUtil {
 	public void addValue(DefaultCategoryDataset dataset, double yValue,
 			Comparable yKey, Comparable xValue) {
 		dataset.addValue(yValue, yKey, xValue);
-	}//There are at least 2 y-axes in a chart
+	}//This function can used, when there are at least 2 y-axes in a chart
 
 	public void addValue(double yValue,Comparable yKey, Comparable xValue){
 		dataset0.addValue(yValue,yKey,xValue);
@@ -78,5 +78,5 @@ public abstract class ChartUtil {
 		for (int i = 0; i < dataSets.length; i++) {
 			plot_.setDataset(i + 1, dataSets[i]);
 		}
-	}
+	}//This function can used, when there are at least 2 y-axes in a chart
 }

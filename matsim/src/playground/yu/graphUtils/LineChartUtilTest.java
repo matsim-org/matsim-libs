@@ -47,6 +47,7 @@ public class LineChartUtilTest {
 		}
         lcu.saveAsPng("T:/Temp/line1.png", 800, 600);
 		System.out.println("1@done.");
+		
 		lcu=new LineChartUtil("Ueberschrift","x-Achse","yAchse");
 		for(int i=0;i<100;i++){
 			lcu.addValue(Math.random(),Integer.toString(i));
