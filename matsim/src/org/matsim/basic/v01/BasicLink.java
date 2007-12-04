@@ -74,11 +74,11 @@ implements BasicLinkI
 	}
 
 	public BasicNodeI getFromNode() {
-		return from;
+		return this.from;
 	}
 
 	public BasicNodeI getToNode() {
-		return to;
+		return this.to;
 	}
 
 	public boolean setFromNode(BasicNodeI node) {
@@ -90,9 +90,14 @@ implements BasicLinkI
 		this.to = node;
 		return true;
 	}
-
+	/**
+	 * This method returns the capacity as set in the xml defining the network. Be aware
+	 * that this capacity is not normalized in time, it depends on the period set
+	 * in the network file (the capperiod attribute).
+	 * @return the capacity per network's capperiod timestep
+	 */
 	public double getCapacity() {
-		return capacity;
+		return this.capacity;
 	}
 
 	public void setCapacity(double capacity) {
@@ -100,7 +105,7 @@ implements BasicLinkI
 	}
 
 	public double getFreespeed() {
-		return freespeed;
+		return this.freespeed;
 	}
 
 	public void setFreespeed(double freespeed) {
@@ -108,7 +113,7 @@ implements BasicLinkI
 	}
 
 	public double getLength() {
-		return length;
+		return this.length;
 	}
 
 	public void setLength(double length) {
