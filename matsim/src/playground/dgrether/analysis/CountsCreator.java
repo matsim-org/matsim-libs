@@ -61,9 +61,15 @@ public class CountsCreator {
 		this.network = loadNetwork(networkPath);
 		log.info("  creating routes...");
 		Route r1 = new Route();
-		r1.setRoute("9232  1563  1558  1562  1564  1000597  1565  1525  1519  1518 1776  1780  1000498  1000497  1786  1000470  1794  1795  1797  1806  1809  1811  1758  1757  1754");
+		//the nodes of carls master thesis main route
+//		r1.setRoute("9232  1563  1558  1562  1564  1000597  1565  1525  1519  1518 1776  1780  1000498  1000497  1786  1000470  1794  1795  1797  1806  1809  1811  1758  1757  1754");
+		//the nodes of davids otf scenario
+		r1.setRoute("9296 9298 9294 9282 9281");
 		Route r2 = new Route();
-		r2.setRoute("9231 9234 9243 9218 9189 9210 9193 9206 9283 9295 9299 9297 9285 9288 9305");
+		//the nodes of carls master thesis alternative route
+//		r2.setRoute("9231 9234 9243 9218 9189 9210 9193 9206 9283 9295 9299 9297 9285 9288 9305");
+		//the nodes of davids otf scenario
+		r2.setRoute("9286 1725 1727 1722 1718 9284 9281");
 		log.info("  creating routes done");
 		Set<Link> links = new HashSet<Link>(r2.getRoute().size() + r1.getRoute().size());
 		for (Link l : r1.getLinkRoute()) {
@@ -87,11 +93,12 @@ public class CountsCreator {
 			ql = (QueueLink) l;
 			c = counts.createCount(l.getId(), l.getId().toString());
 			for (int i = 1; i < 25; i++) {
-				c.createVolume(i, ql.getMaxFlow_veh_s()*3600);
+				c.createVolume(i, ql.getSimulatedFlowCapacity()*3600);
 			}
 		}
 		CountsWriter cw = new CountsWriter(counts, "./output/counts.xml");
 		cw.write();
+		log.info("counts written successfully to: ./output/counts.xml");
 	}
 
 	/**
