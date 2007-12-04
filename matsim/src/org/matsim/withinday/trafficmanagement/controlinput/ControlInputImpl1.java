@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.arvid_daniel.coopers.fromArvid;
+package org.matsim.withinday.trafficmanagement.controlinput;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

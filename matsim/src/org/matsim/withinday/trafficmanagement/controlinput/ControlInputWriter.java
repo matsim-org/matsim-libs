@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.arvid_daniel.coopers.fromArvid;
+package org.matsim.withinday.trafficmanagement.controlinput;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -33,7 +33,7 @@ import java.util.Map.Entry;
  */
 public class ControlInputWriter {
 
-	private static final String outputDirectory = "../studies/arvidDaniel/output/";
+	private static final String outputDirectory = "./output/";
 
 	/**
    * the separator used between columns
@@ -45,21 +45,21 @@ public class ControlInputWriter {
    */
 	private static final String NEWLINE = "\n";
 
-	
+
 	private static final String numberofAgentsFile = "numberOfAgentsOnLinks.txt";
 
 	private static final String traveltimesroute1File = "travelTimesRoute1.txt";
-	
+
 	private static final String traveltimesroute2File = "travelTimesRoute2.txt";
-	
+
 	private BufferedWriter agentOnLinks = null;
-	
+
 	private BufferedWriter travelTimesRoute1 = null;
-	
+
 	private BufferedWriter travelTimesRoute2 = null;
-	
+
 	private boolean writeAgentsOnLinksFirstRun = true;
-	
+
 	public ControlInputWriter() {
 	}
 
@@ -93,7 +93,7 @@ public class ControlInputWriter {
 		this.agentOnLinks.flush();
 
 	}
-	
+
 	public void writeTravelTimesMainRoute(final double measuredTT, final double predTT) throws IOException {
 		this.travelTimesRoute1.write(Double.toString(measuredTT));
 		this.travelTimesRoute1.write(SEPARATOR);
@@ -109,7 +109,7 @@ public class ControlInputWriter {
 		this.travelTimesRoute2.write(NEWLINE);
 		this.travelTimesRoute2.flush();
 	}
-	
+
 	public void close() {
 		try {
 			this.agentOnLinks.close();
