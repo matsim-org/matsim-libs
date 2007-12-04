@@ -20,6 +20,8 @@
 
 package playground.arvid_daniel.coopers.fromArvid;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -267,6 +269,44 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 	}
 
 	public void reset(final int iteration) {
+		BufferedWriter w1 = null;
+		BufferedWriter w2 = null;
+		try{
+			w1 = new BufferedWriter(new FileWriter("../studies/arvidDaniel/output/ttMeasuredMainRoute.txt"));
+			w2 = new BufferedWriter(new FileWriter("../studies/arvidDaniel/output/ttMeasuredAlternativeRoute.txt"));
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		
+		Iterator<Double> it1 = ttMeasuredMainRoute.iterator();
+		try{
+			while(it1.hasNext()){
+				double measuredTimeMainRoute = it1.next();
+				w1.write(Double.toString(measuredTimeMainRoute));
+				w1.write("\n");
+				w1.flush();
+			}	
+		}catch (IOException e){
+			e.printStackTrace();
+		}	
+			
+		Iterator<Double> it2 = ttMeasuredAlternativeRoute.iterator();
+		try{
+			while(it2.hasNext()){
+				double measuredTimeAlternativeRoute = it2.next();
+				w2.write(Double.toString(measuredTimeAlternativeRoute));
+				w2.write("\n");
+				w2.flush();
+			}
+		}catch (IOException e){
+				e.printStackTrace();
+		}			
+		try {
+			w1.close();
+			w2.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		this.writer.close();
 	}
 
@@ -363,11 +403,11 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 		
 		if(route == mainRoute){
 //			ttFreeSpeedAfterBottleNeckMainRoute = ttFreeSpeedAfterBottleNeck;
-			ttFreeSpeedBeforeBottleNeckMainRoute = ttFreeSpeedBeforeBottleNeck + ttFreeSpeedAfterBottleNeck;
+			ttFreeSpeedBeforeBottleNeckMainRoute = ttFreeSpeedBeforeBottleNeck;
 		}
 		else{
 //			ttFreeSpeedAfterBottleNeckAlternativeRoute = ttFreeSpeedAfterBottleNeck;
-			ttFreeSpeedBeforeBottleNeckAlternativeRoute = ttFreeSpeedBeforeBottleNeck + ttFreeSpeedAfterBottleNeck;
+			ttFreeSpeedBeforeBottleNeckAlternativeRoute = ttFreeSpeedBeforeBottleNeck;
 		}
 
 		return predictedTT;
@@ -521,7 +561,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 		//set new in and outflows and reset numbersPassedOnInAndOutLinks every five minutes
 		double simTime = SimulationTimer.getTime();
 				
-		//reset the additionalAgents ... hmmm...for debugging..
+		//reset the additionalAgents ...
 		additionalAgentsMainRoute = 0;
 		additionalAgentsAlternativeRoute = 0;
 		
