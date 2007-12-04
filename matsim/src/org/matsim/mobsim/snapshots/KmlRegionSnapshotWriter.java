@@ -115,7 +115,7 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 		this.mainFolder.setName("mainFolder");
 		this.mainDoc.addFeature(this.mainFolder);
 		//add network
-		KmlNetworkWriter netWriter = new KmlNetworkWriter(this.network, this.coordTransform, this.writer);
+		KmlNetworkWriter netWriter = new KmlNetworkWriter(this.network, this.coordTransform, this.writer, this.mainDoc);
 		try {
 			this.mainDoc.addFeature(netWriter.getNetworkFolder());
 		} catch (IOException e1) {
