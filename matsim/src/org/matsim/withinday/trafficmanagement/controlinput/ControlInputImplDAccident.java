@@ -38,6 +38,8 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.plans.Route;
 import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
@@ -125,7 +127,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			}
 			
 			if (!this.capacities.containsKey(l.getId().toString()))  {
-				this.capacities.put(l.getId().toString(), l.getCapacity() / 3600);
+				this.capacities.put(l.getId().toString(), ((QueueLink)l).getSimulatedFlowCapacity()/SimulationTimer.getSimTickTime());
 			}
 			
 			if (!this.enterLinkEventTimes.containsKey(l.getId().toString()))  {
@@ -147,7 +149,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			}
 			
 			if (!this.capacities.containsKey(l.getId().toString()))  {
-				this.capacities.put(l.getId().toString(), l.getCapacity() / 3600);
+				this.capacities.put(l.getId().toString(), ((QueueLink)l).getSimulatedFlowCapacity()/SimulationTimer.getSimTickTime());
 			}
 			
 			if (!this.enterLinkEventTimes.containsKey(l.getId().toString()))  {
