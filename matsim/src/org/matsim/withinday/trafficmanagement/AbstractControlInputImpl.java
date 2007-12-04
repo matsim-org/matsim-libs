@@ -20,7 +20,9 @@
 
 package org.matsim.withinday.trafficmanagement;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -78,6 +80,10 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 	protected double ttFreeSpeedAltRoute;
 
 	protected double ttFreeSpeedMainRoute;
+	
+	protected List<Double> ttMeasuredMainRoute  = new ArrayList<Double>();
+	
+	protected List<Double> ttMeasuredAlternativeRoute = new ArrayList<Double>();
 
 
 	public AbstractControlInputImpl() {
@@ -213,6 +219,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 				double deltaT = event.time - t1;
 				if (deltaT >= 0) {
 					this.lastTimeMainRoute = deltaT;
+					ttMeasuredMainRoute.add(deltaT);
 					timeDifferenceHasChanged = true;
 				}
 				else {
@@ -226,6 +233,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 				double deltaT = event.time - t1;
 				if (deltaT >= 0) {
 					this.lastTimeAlternativeRoute = deltaT;
+					ttMeasuredAlternativeRoute.add(deltaT);
 					timeDifferenceHasChanged = true;
 				}
 				else {
