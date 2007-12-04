@@ -339,7 +339,7 @@ public class Plan extends BasicPlan {
 		this.actsLegs.add(pos, act);
 		this.actsLegs.add(pos, leg);
 	}
-	
+
 	public Leg getPreviousLeg(final Act act) {
 		int index = this.getActLegIndex(act);
 		if (index != -1) {
@@ -355,15 +355,15 @@ public class Plan extends BasicPlan {
 		}
 		return null;
 	}
-	
+
 	public Leg getNextLeg(final Act act) {
 		int index = this.getActLegIndex(act);
-		if (index != -1) {
+		if ((index < this.actsLegs.size() - 1) && (index != -1)) {
 			return (Leg) this.actsLegs.get(index+1);
 		}
 		return null;
 	}
-	
+
 	public Act getNextActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
@@ -383,5 +383,9 @@ public class Plan extends BasicPlan {
 		}
 		throw new IllegalArgumentException("Method calls only valid with a Leg or Act instance as parameter!");
 	}
-	
+
+	public Act getFirstActivity() {
+		return (Act) this.actsLegs.get(0);
+	}
+
 }
