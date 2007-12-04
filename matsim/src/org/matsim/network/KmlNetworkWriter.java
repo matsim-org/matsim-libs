@@ -23,6 +23,7 @@ package org.matsim.network;
 import java.io.IOException;
 
 import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.kml.Style;
@@ -44,9 +45,9 @@ public class KmlNetworkWriter {
 
 	private Style networkNodeStyle;
 
-	public KmlNetworkWriter(final NetworkLayer network, final CoordinateTransformationI coordTransform, KMZWriter writer) {
+	public KmlNetworkWriter(final NetworkLayer network, final CoordinateTransformationI coordTransform, KMZWriter writer, Document doc) {
 		this.network = network;
-		this.styleFactory = new MatsimKmlStyleFactory(writer);
+		this.styleFactory = new MatsimKmlStyleFactory(writer, doc);
 		this.networkFeatureFactory = new NetworkFeatureFactory(coordTransform);
 	}
 
@@ -58,11 +59,11 @@ public class KmlNetworkWriter {
 		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
 		Folder nodeFolder = new Folder(this.network.getName() + "nodes");
 		nodeFolder.setName("Nodes");
-		nodeFolder.addStyle(this.networkNodeStyle);
+//		nodeFolder.addStyle(this.networkNodeStyle);
 		folder.addFeature(nodeFolder);
 		Folder linkFolder = new Folder(this.network.getName() + "links");
 		linkFolder.setName("Links");
-		linkFolder.addStyle(this.networkLinkStyle);
+//		linkFolder.addStyle(this.networkLinkStyle);
 		folder.addFeature(linkFolder);
 
 		for (Node n : this.network.getNodes().values()) {
