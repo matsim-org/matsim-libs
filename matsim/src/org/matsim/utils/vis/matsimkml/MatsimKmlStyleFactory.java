@@ -23,6 +23,7 @@ package org.matsim.utils.vis.matsimkml;
 import java.io.IOException;
 
 import org.matsim.utils.vis.kml.ColorStyle;
+import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Icon;
 import org.matsim.utils.vis.kml.IconStyle;
 import org.matsim.utils.vis.kml.KMZWriter;
@@ -68,33 +69,46 @@ public class MatsimKmlStyleFactory {
 	 */
 	private KMZWriter writer = null;
 
-	public MatsimKmlStyleFactory(KMZWriter writer) {
+	private Document document;
+
+	private Style defaultnetworknodestyle;
+
+	private Style defaultnetworklinkstyle;
+
+	public MatsimKmlStyleFactory(KMZWriter writer, Document document) {
 		this.writer = writer;
+		this.document = document;
 	}
 
 
 	public Style createDefaultNetworkNodeStyle() throws IOException {
-		Style style = new Style("defaultnetworknodestyle");
-		Icon icon = new Icon(DEFAULTNODEICON);
+		if (this.defaultnetworknodestyle == null) {
+			this.defaultnetworknodestyle = new Style("defaultnetworknodestyle");
+			Icon icon = new Icon(DEFAULTNODEICON);
 
-		this.writer.addNonKMLFile(DEFAULTNODEICONLOCATION, DEFAULTNODEICON);
-		IconStyle iStyle = new IconStyle(icon, MATSIMRED, IconStyle.DEFAULT_COLOR_MODE, ICONSCALE);
-		style.setIconStyle(iStyle);
-//		LineStyle lineStyle = new LineStyle(MATSIMGREY, ColorStyle.DEFAULT_COLOR_MODE, 12);
-//		style.setLineStyle(lineStyle);
-		return style;
+			this.writer.addNonKMLFile(DEFAULTNODEICONLOCATION, DEFAULTNODEICON);
+			IconStyle iStyle = new IconStyle(icon, MATSIMRED, IconStyle.DEFAULT_COLOR_MODE, ICONSCALE);
+			this.defaultnetworknodestyle.setIconStyle(iStyle);
+			this.document.addStyle(this.defaultnetworknodestyle);
+//			LineStyle lineStyle = new LineStyle(MATSIMGREY, ColorStyle.DEFAULT_COLOR_MODE, 12);
+//			style.setLineStyle(lineStyle);
+		}
+		return this.defaultnetworknodestyle;
 	}
 
 	public Style createDefaultNetworkLinkStyle() throws IOException {
-		Style style = new Style("defaultnetworklinkstyle");
-		Icon icon = new Icon(DEFAULTLINKICON);
+		if (this.defaultnetworklinkstyle == null) {
+			this.defaultnetworklinkstyle = new Style("defaultnetworklinkstyle");
+			Icon icon = new Icon(DEFAULTLINKICON);
 
-		this.writer.addNonKMLFile(DEFAULTNODEICONLOCATION, DEFAULTLINKICON);
-		IconStyle iStyle = new IconStyle(icon, MATSIMWHITE, IconStyle.DEFAULT_COLOR_MODE, ICONSCALE);
-		style.setIconStyle(iStyle);
-		LineStyle lineStyle = new LineStyle(MATSIMGREY, ColorStyle.DEFAULT_COLOR_MODE, 12);
-		style.setLineStyle(lineStyle);
-		return style;
+			this.writer.addNonKMLFile(DEFAULTNODEICONLOCATION, DEFAULTLINKICON);
+			IconStyle iStyle = new IconStyle(icon, MATSIMWHITE, IconStyle.DEFAULT_COLOR_MODE, ICONSCALE);
+			this.defaultnetworklinkstyle.setIconStyle(iStyle);
+			LineStyle lineStyle = new LineStyle(MATSIMGREY, ColorStyle.DEFAULT_COLOR_MODE, 12);
+			this.defaultnetworklinkstyle.setLineStyle(lineStyle);
+			this.document.addStyle(this.defaultnetworklinkstyle);
+		}
+		return this.defaultnetworklinkstyle;
 	}
 
 

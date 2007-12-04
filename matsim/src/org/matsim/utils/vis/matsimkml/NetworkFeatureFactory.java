@@ -23,6 +23,8 @@ package org.matsim.utils.vis.matsimkml;
 import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
+import org.matsim.plans.Act;
+import org.matsim.plans.Leg;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.vis.kml.Feature;
@@ -123,7 +125,7 @@ public class NetworkFeatureFactory {
 
 
 	public Feature createNodeFeature(final Node n, Style networkStyle) {
-		Placemark p = new Placemark("node" + n.getId().toString());
+		Placemark p = new Placemark(MatsimKmlIdPool.getInstance().getKmlId());
 		p.setName(n.getId().toString());
 		CoordI coord = this.coordTransform.transform(n.getCoord());
 		Point point = new Point(coord.getX(), coord.getY(), 0.0);
@@ -132,6 +134,33 @@ public class NetworkFeatureFactory {
 		p.setDescription(createNodeDescription(n));
 		return p;
 	}
+
+	public Feature createActFeature(Act act, Style style) {
+		Placemark p = new Placemark(MatsimKmlIdPool.getInstance().getKmlId());
+		p.setName("Activity on link: " + act.getLinkId().toString());
+		CoordI coord = this.coordTransform.transform(act.getCoord());
+		Point point = new Point(coord.getX(), coord.getY(), 0.0);
+		p.setGeometry(point);
+		p.setStyleUrl(style.getStyleUrl());
+//		p.setDescription(createNodeDescription(n));
+		return p;
+	}
+
+
+
+	public Feature createLegFeature(Leg leg, Style style) {
+		Folder folder = new Folder(MatsimKmlIdPool.getInstance().getKmlId());
+		folder.setName(String.valueOf(leg.getNum()));
+//		String description = createLegDescription(leg);
+		for (Link l : leg.getRoute().getLinkRoute()) {
+			folder.addFeature(createLinkFeature(l, style));
+		}
+		for (Node n : leg.getRoute().getRoute()) {
+			folder.addFeature(createNodeFeature(n, style));
+		}
+		return folder;
+	}
+
 
 	private String createLinkDescription(Link l) {
 		StringBuffer buffer = new StringBuffer();
@@ -223,4 +252,7 @@ public class NetworkFeatureFactory {
 		return buffer.toString();
 
 	}
+
+
+
 }
