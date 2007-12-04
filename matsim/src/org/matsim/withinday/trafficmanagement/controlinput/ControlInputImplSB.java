@@ -35,6 +35,8 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.plans.Route;
 import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
@@ -161,7 +163,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
 		Link bottleNeckLinkRoute2 = this.altRouteNaturalBottleNeck;
 
 		this.predTTRoute1 = getPredictedTravelTime(this.mainRoute, bottleNeckLinkRoute1);
-		this.predTTRoute2 = getPredictedTravelTime(this.alternativeRoute,	bottleNeckLinkRoute2);
+		this.predTTRoute2 = getPredictedTravelTime(this.alternativeRoute, bottleNeckLinkRoute2);
 		if (log.isTraceEnabled()) {
 			log.trace("predicted time route 1: " + this.predTTRoute1);
 			log.trace("predicted time route 2: " + this.predTTRoute2);
@@ -174,7 +176,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
 			final Link bottleNeckLink) {
 		Link [] routeLinks = route.getLinkRoute();
 		double ttFreeSpeedBeforeBottleNeck = 0.0;
-		double bottleNeckCapacity = bottleNeckLink.getCapacity()/3600;
+		double bottleNeckCapacity = ((QueueLink)bottleNeckLink).getSimulatedFlowCapacity()/SimulationTimer.getSimTickTime();
 		double predictedTT;
 		// get the array index of the bottleneck link
 		int bottleNeckLinkNumber = 0;
