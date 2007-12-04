@@ -29,16 +29,16 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
 import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplDAccident;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplDistribution;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplSB;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplSBNoise;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.NoControl;
 import org.xml.sax.Attributes;
 
-import playground.arvid_daniel.coopers.fromArvid.ControlInputImpl1;
-import playground.arvid_daniel.coopers.fromArvid.ControlInputImplDAccident;
-import playground.arvid_daniel.coopers.fromArvid.ControlInputImplDistribution;
-import playground.arvid_daniel.coopers.fromArvid.ControlInputImplSB;
-import playground.arvid_daniel.coopers.fromArvid.ControlInputImplSBNoise;
 
 
 public class TrafficManagementConfigParser extends MatsimXmlParser {
