@@ -22,6 +22,7 @@ package org.matsim.scoring;
 
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
@@ -106,10 +107,15 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
 	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
-	 * values each time from a string, this whole init() concecpt can be removed and with this
+	 * values each time from a string, this whole init() concept can be removed and with this
 	 * also this public member.  -marcel, 07aug07
 	 */
 	public static boolean initialized = false;
+
+	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
+	public static boolean scoreActs = true;
+
+	private static final Logger log = Logger.getLogger(CharyparNagelScoringFunction.class);
 
 	public CharyparNagelScoringFunction(final Plan plan) {
 		init();
@@ -214,10 +220,12 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),
-				Math.min(marginalUtilityOfTraveling, marginalUtilityOfWaiting)) * 3600.0 * 24.0;
-		// TODO 24 has to be replaced by a variable like scenarioConfig::scenario_dur
+				Math.min(marginalUtilityOfTraveling, marginalUtilityOfWaiting)) * 3600.0 * 24.0; // SCENARIO_DURATION
+		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
 
 		readUtilityValues();
+		scoreActs = (marginalUtilityOfPerforming != 0 || marginalUtilityOfWaiting != 0 ||
+				marginalUtilityOfLateArrival != 0 || marginalUtilityOfEarlyDeparture != 0);
 		initialized = true;
 	}
 
@@ -225,7 +233,6 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
-			Gbl.errorMsg("Could not find utility param for " + act.getType());
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
 
@@ -264,18 +271,23 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
 
-		if (openingTime >= 0 && closingTime >= 0) {
-			if ((openingTime > departureTime) || (closingTime < arrivalTime)) {
-				// agent could not perform action
-				activityStart = departureTime;
-				activityEnd = departureTime;
+		if (openingTime >= 0 || closingTime >= 0) {
+			if (openingTime >= 0 && closingTime >= 0) {
+				if ((openingTime > departureTime) || (closingTime < arrivalTime)) {
+					// agent could not perform action
+					activityStart = departureTime;
+					activityEnd = departureTime;
+				} else {
+					if (arrivalTime < openingTime) {
+						activityStart = openingTime;
+					}
+					if (closingTime < departureTime) {
+						activityEnd = closingTime;
+					}
+				}
 			} else {
-				if (arrivalTime < openingTime) {
-					activityStart = openingTime;
-				}
-				if (closingTime < departureTime) {
-					activityEnd = closingTime;
-				}
+				log.error("Only one of activityOpeningTime and activityClosingTime is defined for activity type " +
+						act.getType() +", but they both must be defined for having an influence on the score.");
 			}
 		}
 		double duration = activityEnd - activityStart;
@@ -398,8 +410,19 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 			this.firstActTime = time;
 			this.firstActType = act.getType();
 		} else if (this.index == this.lastActIndex) {
-			// TODO [MR] check if the first and last act type are the same, currently this is assumed to always be true
-			this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act);
+			String lastActType = act.getType();
+			if (lastActType.equals(this.firstActType)) {
+				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
+			} else {
+				if (scoreActs) {
+					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
+					// score first activity
+					Act firstAct = (Act)this.plan.getActsLegs().get(0);
+					this.score += calcActScore(0.0, this.firstActTime, firstAct);
+					// score last activity
+					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION
+				}
+			}
 		} else {
 			this.score += calcActScore(this.lastTime, time, act);
 		}
