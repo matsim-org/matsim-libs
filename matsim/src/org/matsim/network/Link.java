@@ -20,6 +20,7 @@
 
 package org.matsim.network;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLink;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
@@ -28,6 +29,8 @@ import org.matsim.utils.misc.ResizableArray;
 
 public class Link extends BasicLink {
 
+	private final static Logger log = Logger.getLogger(Link.class);
+
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -35,6 +38,8 @@ public class Link extends BasicLink {
 	protected String type = null;
 	protected String origid = null;
 	private final ResizableArray<Object> roles = new ResizableArray<Object>(5);
+
+	private double flowCapacity;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -51,6 +56,8 @@ public class Link extends BasicLink {
 		this.permlanes = Integer.parseInt(permlanes);
 		this.origid = origid;
 		this.type = type;
+		calcFlowCapacity();
+		// do some semantic checks
 		if (this.from.equals(this.to)) { Gbl.warningMsg(this.getClass(), "Link(...)", this+"[from=to="+this.to+" link is a loop]"); }
 		if (this.freespeed <= 0.0) { Gbl.errorMsg(this+"[freespeed="+freespeed+" not allowed]"); }
 		if (this.capacity <= 0.0) { Gbl.errorMsg(this+"[capacity="+capacity+" not allowed]"); }
@@ -64,6 +71,12 @@ public class Link extends BasicLink {
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
+
+	private void calcFlowCapacity() {
+		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+//		log.debug("capacity period: " + capacityPeriod);
+			this.flowCapacity = this.capacity / capacityPeriod;
+	}
 
 	@Override
 	public final double calcDistance(final CoordI coord) {
@@ -113,6 +126,17 @@ public class Link extends BasicLink {
 			return this.roles.get(idx);
 		}
 		return null;
+	}
+
+	/**
+	 * This method returns the normalized capacity of the link, i.e. the
+	 * capacity of vehicles per second. Be aware that it will not consider the
+	 * capacity reduction factors set in the config and used in the simulation. If interested
+	 * in this values, check the appropriate methods of QueueLink.
+	 * @return the flow capacity of this link per second
+	 */
+	public final double getFlowCapacity() {
+		return this.flowCapacity;
 	}
 
 	//////////////////////////////////////////////////////////////////////
