@@ -34,6 +34,8 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.plans.Route;
 import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
@@ -168,7 +170,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	private double getPredictedTravelTime(final Route route,
 			final Link bottleNeckLink) {
 		Link[] routeLinks = route.getLinkRoute();
-		double bottleNeckCapacity = bottleNeckLink.getCapacity() / 3600;
+		double bottleNeckCapacity = ((QueueLink)bottleNeckLink).getSimulatedFlowCapacity()/SimulationTimer.getSimTickTime();
 	
 		// get the array index of the bottleneck link
 		int bottleNeckArrayIndex = 0;
