@@ -84,17 +84,14 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	 */
 	public void setAccident(final Accident a) {
 		QueueLink accidentLink = (QueueLink) this.network.getLink(a.getLinkId());
-		double oldCap = accidentLink.getCapacity();
-
-		this.capacityEvents.add(new CapacityChangeEvent(a.getStartTime(), accidentLink, oldCap
-				* a.getCapacityReductionFactor()));
-		this.capacityEvents.add(new CapacityChangeEvent(a.getEndTime(), accidentLink, oldCap));
+		this.capacityEvents.add(new CapacityChangeEvent(a.getStartTime(), accidentLink, a.getCapacityReductionFactor()));
+		this.capacityEvents.add(new CapacityChangeEvent(a.getEndTime(), accidentLink, 1/a.getCapacityReductionFactor()));
 	}
 
 	private void doCapacityChanges(final double time) {
 		while ((this.capacityEvents.size() != 0) && (this.capacityEvents.peek().getTime() < time)) {
 			CapacityChangeEvent event = this.capacityEvents.poll();
-			event.getLink().recalcCapacity(event.getCapacity(), this.network);
+			event.getLink().changeSimulatedFlowCapacity(event.getCapacityScaleFactor());
 		}
 	}
 
