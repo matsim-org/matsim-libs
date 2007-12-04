@@ -130,11 +130,11 @@ public class QueueLink extends Link {
 
 		/* factor to scale down capacity from file to capacity per sim time
 		 * step, assuming flowCapFactor=1:    */
-		double simTickCapFactor = SimulationTimer.getSimTickTime() / network.getCapacityPeriod();
+//		double simTickCapFactor = SimulationTimer.getSimTickTime() / network.getCapacityPeriod();
 
 		/* multiplying capacity from file by simTickCapFactor **and**
 		 * flowCapFactor:                     */
-		this.timeCap = this.capacity * simTickCapFactor * flowCapFactor;
+		this.timeCap = this.capacity / network.getCapacityPeriod() * SimulationTimer.getSimTickTime() * flowCapFactor;
 
 		// also computing the ceiling of the capacity:
 		this.timeCapCeil = (int) Math.ceil(this.timeCap);
@@ -214,7 +214,7 @@ public class QueueLink extends Link {
 			 */
 			Leg actLeg = veh.getCurrentLeg();
 
-			boolean hasRoute = actLeg.getRoute() != null && actLeg.getRoute().getRoute().size() != 0;
+			boolean hasRoute = (actLeg.getRoute() != null) && (actLeg.getRoute().getRoute().size() != 0);
 			boolean unknownMode = !actLeg.getMode().equals("car");
 
 			if (unknownMode) {
