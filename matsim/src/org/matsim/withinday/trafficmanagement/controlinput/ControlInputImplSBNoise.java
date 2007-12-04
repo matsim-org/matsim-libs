@@ -46,6 +46,7 @@ import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -350,7 +351,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 			final Link bottleNeckLink) {
 		double ttFreeSpeedBeforeBottleNeck = 0.0;
 		double ttFreeSpeedAfterBottleNeck;
-		double bottleNeckCapacity = bottleNeckLink.getCapacity()/3600;
+		double bottleNeckCapacity = ((QueueLink)bottleNeckLink).getSimulatedFlowCapacity()/SimulationTimer.getSimTickTime();
 		double predictedTT;
 		Link [] routeLinks;
 		if(route == mainRoute){
