@@ -34,13 +34,13 @@ public class CapacityChangeEvent implements Comparable<CapacityChangeEvent> {
 
 	private QueueLink link;
 
-	private double capacity;
+	private double capactiyScaleFactor;
 
 	public CapacityChangeEvent(final double time, final QueueLink link,
-			final double capacity) {
+			final double capacityFactor) {
 		this.time = time;
 		this.link = link;
-		this.capacity = capacity;
+		this.capactiyScaleFactor = capacityFactor;
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class CapacityChangeEvent implements Comparable<CapacityChangeEvent> {
 		return 0;
 	}
 
-	
+
 	/**
 	 * @return the time
 	 */
@@ -65,7 +65,7 @@ public class CapacityChangeEvent implements Comparable<CapacityChangeEvent> {
 		return this.time;
 	}
 
-	
+
 	/**
 	 * @return the link
 	 */
@@ -73,11 +73,11 @@ public class CapacityChangeEvent implements Comparable<CapacityChangeEvent> {
 		return this.link;
 	}
 
-	
+
 	/**
 	 * @return the capacity
 	 */
-	public double getCapacity() {
-		return this.capacity;
+	public double getCapacityScaleFactor() {
+		return this.capactiyScaleFactor;
 	}
 }
