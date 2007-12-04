@@ -20,10 +20,8 @@
 
 package org.matsim.mobsim;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -52,6 +50,10 @@ import org.matsim.utils.vis.netvis.DrawableAgentI;
  * Queue Model Link implementation
  */
 public class QueueLink extends Link {
+
+	final private static Logger log = Logger.getLogger(QueueLink.class);
+
+	private static int spaceCapWarningCount = 0 ;
 
 	// ////////////////////////////////////////////////////////////////////
 	// Queue Model specific stuff
@@ -84,10 +86,10 @@ public class QueueLink extends Link {
 
 	protected double freeTravelDuration;
 
-	protected double spaceCap;
+	protected double storageCapacity;
 
 	/** The number of vehicles able to leave the buffer in one time step (usually 1s). */
-	private double timeCap;
+	private double simulatedFlowCapacity;
 	private int timeCapCeil; // optimization, cache Math.ceil(timeCap)
 	private double timeCapFraction; // optimization, cache timeCap - (int)timeCap
 
@@ -96,8 +98,6 @@ public class QueueLink extends Link {
 	final protected double euklideanDist;
 
 	private boolean active = false;
-
-	final private static Logger log = Logger.getLogger(QueueLink.class);
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -114,48 +114,48 @@ public class QueueLink extends Link {
 		// like them. kai, nov06
 
 		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
+		this.freeTravelDuration = getLength() / getFreespeed();
 
-		/* moved capacity calculation to a method, to be able to call it from outside
+		/* moved capacity calculation to two methods, to be able to call it from outside
 		 * e.g. for reducing cap in case of an incident             */
-		recalcCapacity(this.capacity, network);
+		initFlowCapacity();
+		recalcCapacity();
 	}
 
-	public void recalcCapacity(final double capacity, final NetworkLayer network) {
-		super.setCapacity(capacity);
+	private void initFlowCapacity() {
 		/* network.capperiod is in hours, we need it per sim-tick and multiplied
 		 * with flowCapFactor                */
 		double flowCapFactor = Gbl.getConfig().simulation().getFlowCapFactor();
 
-		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
-
-		/* factor to scale down capacity from file to capacity per sim time
-		 * step, assuming flowCapFactor=1:    */
-//		double simTickCapFactor = SimulationTimer.getSimTickTime() / network.getCapacityPeriod();
-
 		/* multiplying capacity from file by simTickCapFactor **and**
 		 * flowCapFactor:                     */
-		this.timeCap = this.capacity / network.getCapacityPeriod() * SimulationTimer.getSimTickTime() * flowCapFactor;
+		this.simulatedFlowCapacity = this.getFlowCapacity() * SimulationTimer.getSimTickTime() * flowCapFactor;
+	}
+
+
+	private void recalcCapacity() {
+		/* network.capperiod is in hours, we need it per sim-tick and multiplied
+		 * with flowCapFactor                */
+		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
 		// also computing the ceiling of the capacity:
-		this.timeCapCeil = (int) Math.ceil(this.timeCap);
+		this.timeCapCeil = (int) Math.ceil(this.simulatedFlowCapacity);
 
 		// ... and also the fractional part of timeCap
-		this.timeCapFraction = this.timeCap - (int) this.timeCap;
+		this.timeCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
-		this.spaceCap = (this.length * this.permlanes) / NetworkLayer.CELL_LENGTH * storageCapFactor;
+		this.storageCapacity = (this.length * this.permlanes) / NetworkLayer.CELL_LENGTH * storageCapFactor;
 
 		/* storage capacity needs to be at least enough to handle the
 		 * cap_per_time_step:                  */
-		this.spaceCap = Math.max(this.spaceCap, this.timeCapCeil);
-
-		this.freeTravelDuration = getLength() / getFreespeed();
+		this.storageCapacity = Math.max(this.storageCapacity, this.timeCapCeil);
 
 		/* If speed on link is relatively slow, then we need MORE cells than the above spaceCap to handle the flowCap. Example:
 		 * Assume freeSpeedTravelTime (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap TWO times the flowCap to
 		 * handle the flowCap.
 		 */
-		if (this.spaceCap < this.freeTravelDuration * this.timeCap) {
+		if (this.storageCapacity < this.freeTravelDuration * this.simulatedFlowCapacity) {
 			if ( spaceCapWarningCount <=10 ) {
 				log.warn("Link " + this.id + " too small: enlarge spaceCap");
 				if ( spaceCapWarningCount == 10 ) {
@@ -163,10 +163,19 @@ public class QueueLink extends Link {
 				}
 				spaceCapWarningCount++ ;
 			}
-			this.spaceCap = this.freeTravelDuration * this.timeCap;
+			this.storageCapacity = this.freeTravelDuration * this.simulatedFlowCapacity;
 		}
 	}
-	static int spaceCapWarningCount = 0 ;
+
+	/**
+	 * This method will scale the simulated flow capacity by the given factor, and recalculate the
+	 * timeCapCeil and Fraction attributes of QueueLink. Furthermore it checks the storage Capacity of the link
+	 * and change it if needed.
+	 */
+	public void changeSimulatedFlowCapacity(double factor) {
+		this.simulatedFlowCapacity = this.simulatedFlowCapacity * factor;
+		recalcCapacity();
+	}
 
 	// ////////////////////////////////////////////////////////////////////
 	// Is called after link has been read completely
@@ -265,7 +274,7 @@ public class QueueLink extends Link {
 	 */
 	private void moveLinkToBuffer(final double now) {
 		// move items if possible
-		double max_buffercap = this.timeCap;
+		double max_buffercap = this.simulatedFlowCapacity;
 
 		Vehicle veh;
 		while ((veh = this.vehQueue.peek()) != null) {
@@ -335,7 +344,7 @@ public class QueueLink extends Link {
 	// ////////////////////////////////////////////////////////////////////
 	// called from framework, do everything related to link movement here
 	// ////////////////////////////////////////////////////////////////////
-	public boolean moveLink(final double now) {
+	boolean moveLink(final double now) {
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
 		// move vehicles from link to buffer
@@ -346,7 +355,7 @@ public class QueueLink extends Link {
 		return updateActiveStatus();
 	}
 
-	public boolean moveLinkWaitFirst(final double now) {
+	boolean moveLinkWaitFirst(final double now) {
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
 		// move vehicles from waitingQueue into buffer if possible
@@ -357,7 +366,7 @@ public class QueueLink extends Link {
 		return updateActiveStatus();
 	}
 
-	public void addParking(final Vehicle veh) {
+	void addParking(final Vehicle veh) {
 		this.parkingList.add(veh);
 		((QueueNetworkLayer) this.layer).setLinkActivation(veh.getDepartureTime_s(), this);
 	}
@@ -384,6 +393,18 @@ public class QueueLink extends Link {
 	// getter / setter
 	// ////////////////////////////////////////////////////////////////////
 
+
+	/**
+	 * This method returns the normalized capacity of the link, i.e. the
+	 * capacity of vehicles per second. It is considering the
+	 * capacity reduction factors set in the config and the simulation's tick time.
+	 * @return the flow capacity of this link per second, scaled by the config values and in relation to the SimulationTimer's
+	 * simticktime.
+	 */
+	public double getSimulatedFlowCapacity() {
+		return this.simulatedFlowCapacity;
+	}
+
 	/**
 	 * @return Returns the freeTravelDuration.
 	 */
@@ -391,20 +412,12 @@ public class QueueLink extends Link {
 		return this.freeTravelDuration;
 	}
 
-	/**
-	 * @param freeTravelDuration
-	 *            The freeTravelDuration to set.
-	 */
-	public void setFreeTravelDuration(final double freeTravelDuration) {
-		this.freeTravelDuration = freeTravelDuration;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 *
 	 * @see java.util.List#get(int)
 	 */
-	public Vehicle popFirstFromBuffer() {
+	 Vehicle popFirstFromBuffer() {
 		double now = SimulationTimer.getTime();
 		Vehicle veh = this.buffer.poll();
 		Vehicle v2 = this.buffer.peek();
@@ -430,7 +443,7 @@ public class QueueLink extends Link {
 	 *
 	 * @see java.util.List#get(int)
 	 */
-	public Vehicle getFirstFromBuffer() {
+	Vehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
 
@@ -439,7 +452,7 @@ public class QueueLink extends Link {
 	 *
 	 * @see java.util.List#isEmpty()
 	 */
-	public boolean bufferIsEmpty() {
+	boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
 	}
 
@@ -468,7 +481,7 @@ public class QueueLink extends Link {
 	 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
 	 */
 	public double getDisplayableSpaceCapValue() {
-		return (this.buffer.size() + this.vehQueue.size()) / this.spaceCap;
+		return (this.buffer.size() + this.vehQueue.size()) / this.storageCapacity;
 	}
 
 	/**
@@ -489,14 +502,14 @@ public class QueueLink extends Link {
 				count++;
 			}
 		}
-		return count * 2.0 / this.spaceCap;
+		return count * 2.0 / this.storageCapacity;
 	}
 
 	/**
 	 * @return Returns the maxCap.
 	 */
 	public double getSpaceCap() {
-		return this.spaceCap;
+		return this.storageCapacity;
 	}
 
 	/**
@@ -520,7 +533,7 @@ public class QueueLink extends Link {
 		double queueLen = 0.0; // the length of the queue jammed vehicles build at the end of the link
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 		double vehLen = Math.min(	// the length of a vehicle in visualization
-				this.euklideanDist / this.spaceCap, // all vehicles must have place on the link
+				this.euklideanDist / this.storageCapacity, // all vehicles must have place on the link
 				NetworkLayer.CELL_LENGTH / storageCapFactor); // a vehicle should not be larger than it's actual size
 
 		// put all cars in the buffer one after the other
@@ -534,7 +547,7 @@ public class QueueLink extends Link {
 
 			// speed:
 			double speed = getFreespeed();
-			int cmp = (int) (veh.getDepartureTime_s() + 1.0 / this.timeCap + 2.0);
+			int cmp = (int) (veh.getDepartureTime_s() + 1.0 / this.simulatedFlowCapacity + 2.0);
 
 			if (now > cmp) {
 				speed = 0.0;
@@ -606,7 +619,7 @@ public class QueueLink extends Link {
 		return positions;
 	}
 
-	public void clearVehicles() {
+	void clearVehicles() {
 		double now = SimulationTimer.getTime();
 
 		for (Vehicle veh : this.parkingList) {
@@ -685,15 +698,7 @@ public class QueueLink extends Link {
 	}
 
 	public double getMaxFlow_veh_s() {
-		return this.timeCap;
-	}
-
-	public static class IdComparator implements Comparator<QueueLink>, Serializable {
-		private static final long serialVersionUID = 1L;
-
-		public int compare(final QueueLink o1, final QueueLink o2) {
-			return o1.getId().toString().compareTo(o2.getId().toString());
-		}
+		return this.simulatedFlowCapacity;
 	}
 
 	// search for vehicleId..
