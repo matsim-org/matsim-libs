@@ -33,7 +33,8 @@ import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 
 import playground.balmermi.census2000.data.Persons;
-import playground.balmermi.census2000.models.ModelMobiliyTools;
+//import playground.ciarif.models.ModelMobiliyTools;
+//import playground.balmermi.census2000.models.ModelMobiliyTools;
 
 public class PersonMobilityToolModel extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -49,7 +50,7 @@ public class PersonMobilityToolModel extends PersonAlgorithm implements PlanAlgo
 	private static final String H = "h";
 	private static final Coord ZERO = new Coord(0.0,0.0);
 
-	private final ModelMobiliyTools model = new ModelMobiliyTools();
+	private final ModelMobilityTools model = new ModelMobilityTools();
 	private final Persons persons;
 
 	//////////////////////////////////////////////////////////////////////
@@ -84,8 +85,6 @@ public class PersonMobilityToolModel extends PersonAlgorithm implements PlanAlgo
 			distance = work_coord.calcDistance(home_coord);
 		}
 
-		// 1-26
-		int c_id = p.getHousehold().getMunicipality().getCantonId();
 
 		model.setAge(p.getAge());
 		model.setDistanceHome2Work(distance);
@@ -98,6 +97,12 @@ public class PersonMobilityToolModel extends PersonAlgorithm implements PlanAlgo
 		model.setSex(p.isMale());
 		model.setUrbanDegree(p.getHousehold().getMunicipality().getRegType());
 
+
+		// 1-9 and 11-20 = 1 (German); 10 and 22-26 = 2 (French); 21 = 3 (Italian) 
+		int c_id = p.getHousehold().getMunicipality().getCantonId();
+		if ((1 <= c_id) && (c_id <= 9) || (11 <= c_id) && (c_id <= 20)) {model.setLanguage(1);}
+		if ((22 <= c_id) && (c_id <= 26) || (c_id == 10)) {model.setLanguage(2);}
+		if (c_id == 21) {model.setLanguage(3);}
 		int mobtype = model.calcMobilityTools();
 		if ((3 <= mobtype) && (mobtype <= 5)) { person.addTravelcard(UNKNOWN); }
 		person.setCarAvail(null);
