@@ -15,15 +15,14 @@ MEMORY = -Xms1450m -Xmx1800m
 ######################################################################
 # do NOT change that!
 
-LIBS := libs/log4j-1.2.15.jar
-LIBS := $(LIBS):libs/jgap-3.1.jar
-LIBS := $(LIBS):libs/colt.jar
-LIBS := $(LIBS):libs/jung-1.7.6.jar
+LIBS := libs/colt.jar
 LIBS := $(LIBS):libs/commons-collections-3.2.jar
-LIBS := $(LIBS):libs/concurrent.jar
 LIBS := $(LIBS):libs/itext-2.0.4.jar
 LIBS := $(LIBS):libs/jcommon-1.0.10.jar
 LIBS := $(LIBS):libs/jfreechart-1.0.6.modified.0.jar
+LIBS := $(LIBS):libs/jgap-3.1.jar
+LIBS := $(LIBS):libs/jung-1.7.6.jar
+LIBS := $(LIBS):libs/log4j-1.2.15.jar
 
 LIBS := $(LIBS):libs/geotools/ant-optional-1.5.1.jar
 LIBS := $(LIBS):libs/geotools/batik-awt-util-1.6.jar
@@ -42,12 +41,10 @@ LIBS := $(LIBS):libs/geotools/batik-xml-1.6.jar
 LIBS := $(LIBS):libs/geotools/common-2.1.0.jar
 LIBS := $(LIBS):libs/geotools/commons-beanutils-1.4.jar
 LIBS := $(LIBS):libs/geotools/commons-cli-2.0-gt2-pre1.jar
-LIBS := $(LIBS):libs/geotools/commons-collections-2.0.jar
 LIBS := $(LIBS):libs/geotools/commons-io-1.2.jar
 LIBS := $(LIBS):libs/geotools/commons-jxpath-1.2.jar
 LIBS := $(LIBS):libs/geotools/commons-lang-2.1.jar
 LIBS := $(LIBS):libs/geotools/commons-logging-1.0.4.jar
-LIBS := $(LIBS):libs/geotools/commons-logging-1.0.jar
 LIBS := $(LIBS):libs/geotools/commons-pool-1.3.jar
 LIBS := $(LIBS):libs/geotools/concurrent-1.3.4.jar
 LIBS := $(LIBS):libs/geotools/db2jcc_dummy-8.2.1.jar
@@ -119,8 +116,6 @@ LIBS := $(LIBS):libs/geotools/jlfgr-1.0.jar
 LIBS := $(LIBS):libs/geotools/jsr108-0.01.jar
 LIBS := $(LIBS):libs/geotools/jta-1.0.1B.jar
 LIBS := $(LIBS):libs/geotools/jts-1.7.1.jar
-LIBS := $(LIBS):libs/geotools/junit-3.8.1.jar
-LIBS := $(LIBS):libs/geotools/log4j-1.2.6.jar
 LIBS := $(LIBS):libs/geotools/mysql-connector-java-3.0.10.jar
 LIBS := $(LIBS):libs/geotools/picocontainer-1.2.jar
 LIBS := $(LIBS):libs/geotools/postgis-driver-1.0.jar
