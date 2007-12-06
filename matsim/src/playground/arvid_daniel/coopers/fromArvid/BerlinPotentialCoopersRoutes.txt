@@ -1,0 +1,45 @@
+
+
+
+STEGLITZ
+sign link one (smaller) 855
+sign link two (bigger) 6871
+
+if there are two sign links routes should start at 1342
+
+IF SIGNLINK 6871
+beginning of alternative route 9180 1342 1348 1349 1375 1585 1581 1583 1587 1641 1644 1645 1648 5210 2420 9275 9272
+highway  9180 9183 9181 9261 9265 9269 9408 9409 9404 9400 9403 9402 9398 9394 9414 9276 9272
+
+destination link: 7686
+
+accident link 8391 between 16 - 17 pm 50%
+
+
+
+SPANDAUER DAMM:
+        <mainRoute>
+        <node id ="9296" />
+        <node id ="9298" />
+        <node id ="9294" />
+        <node id ="9282" />
+	      <node id="9281" />
+      </mainRoute>
+      <alternativeRoute>
+        <node id ="9286" />
+        <node id ="1725" />
+        <node id ="1727" />
+        <node id ="1722" />
+        <node id ="1718" />
+        <node id ="9284" />
+        <node id ="9281" />
+      </alternativeRoute>
+      
+      
+CARL MASTER THESIS (TEGEL, MESSE):
+
+  Route r1 = new Route();
+r1.setRoute("9232  1563  1558  1562  1564  1000597  1565  1525  1519  1518 1776  1780  1000498  1000497  1786  1000470  1794  1795  1797  1806  1809  1811  1758  1757  1754");
+Route r2 = new Route();
+r2.setRoute("9231 9234 9243 9218 9189 9210 9193 9206 9283 9295 9299 9297 9285 9288 9305");
+
