@@ -74,14 +74,14 @@ public class TimeControler extends Controler {
 	@Override
 	protected void setupIteration(int iteration) {
 		super.setupIteration(iteration);
-		if (iteration == 500){
+		if (iteration == 1000){
 			this.events.addHandler(timeWriter);
 			this.events.addHandler(bTV);
 		}
 		if (iteration == 0) {
 			this.config.simulation().setSnapshotPeriod(0);
 		}
-		if (iteration == 500) {
+		if (iteration == 1000) {
 			this.config.simulation().setSnapshotPeriod(60);
 		}
 	}
