@@ -21,6 +21,8 @@
 package org.matsim.plans;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -80,7 +82,7 @@ public class Knowledge {
 		this.facilities.put(f.getId(), f);
 		return true;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
@@ -98,7 +100,7 @@ public class Knowledge {
 		}
 		return false;
 	}
-	
+
 	public final boolean removeActivites(final String act_type) {
 		boolean removed = false;
 		for (int i=0; i<this.activities.size(); i++) {
@@ -110,7 +112,7 @@ public class Knowledge {
 		}
 		return removed;
 	}
-	
+
 	public final boolean removeFacility(final Facility facility) {
 		Facility f_removed = this.facilities.remove(facility.getId());
 		if (f_removed == null) { return false; }
@@ -122,7 +124,20 @@ public class Knowledge {
 		}
 		return this.activities.removeAll(to_be_removed);
 	}
-	
+
+	public final boolean removeAllFacilities() {
+		Collection<Facility> facs = this.facilities.values();
+		Iterator<Facility> f_it = facs.iterator();
+		while (f_it.hasNext()) {
+			Facility f = f_it.next();
+			boolean b = this.removeFacility(f);
+			if (!b) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
@@ -138,7 +153,7 @@ public class Knowledge {
 	public final boolean containsFacility(final IdI id) {
 		return this.facilities.containsKey(id);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
@@ -146,7 +161,7 @@ public class Knowledge {
 	public final TreeMap<IdI,Facility> getFacilities() {
 		return this.facilities;
 	}
-	
+
 	public final TreeMap<IdI,Facility> getFacilities(final String act_type) {
 		TreeMap<IdI,Facility> facs = new TreeMap<IdI, Facility>();
 		for (int i=0; i<this.activities.size(); i++) {
@@ -160,7 +175,7 @@ public class Knowledge {
 	public final ArrayList<Activity> getActivities() {
 		return this.activities;
 	}
-	
+
 	public final ArrayList<Activity> getActivities(final String act_type) {
 		ArrayList<Activity> acts = new ArrayList<Activity>();
 		for (int i=0; i<this.activities.size(); i++) {
@@ -169,7 +184,7 @@ public class Knowledge {
 		}
 		return acts;
 	}
-	
+
 	public final TreeSet<String> getActivityTypes() {
 		TreeSet<String> act_types = new TreeSet<String>();
 		for (int i=0; i<this.activities.size(); i++) {
@@ -177,7 +192,7 @@ public class Knowledge {
 		}
 		return act_types;
 	}
-	
+
 	public final String getDesc() {
 		return this.desc;
 	}
@@ -185,7 +200,7 @@ public class Knowledge {
 	public final ArrayList<ActivitySpace> getActivitySpaces() {
 		return this.act_spaces;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////

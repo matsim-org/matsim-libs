@@ -20,20 +20,23 @@
 
 package playground.balmermi;
 
-import org.matsim.config.ConfigWriter;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.facilities.algorithms.FacilitiesScenarioCut;
 import org.matsim.gbl.Gbl;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.MatricesWriter;
-import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.WorldWriter;
-import org.matsim.world.ZoneLayer;
-
-import playground.balmermi.census2000.modules.FacilitiesSetCapacity;
-import playground.balmermi.census2000.modules.MatricesCompleteBasedOnFacilities;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.network.algorithms.NetworkScenarioCut;
+import org.matsim.network.algorithms.NetworkSummary;
+import org.matsim.network.algorithms.NetworkWriteAsTable;
+import org.matsim.plans.MatsimPlansReader;
+import org.matsim.plans.Plans;
+import org.matsim.plans.PlansReaderI;
+import org.matsim.plans.algorithms.PersonRemoveReferences;
+import org.matsim.plans.algorithms.PlansScenarioCut;
+import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class ScenarioParsing {
 
@@ -45,54 +48,78 @@ public class ScenarioParsing {
 
 		System.out.println("TEST RUN 01:");
 
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
-		System.out.println("  done.");
+//		System.out.println("  reading world xml file... ");
+//		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
+//		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+//		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
 		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		System.out.println("  done.");
 
-		System.out.println("  reading matrices xml file... ");
-		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton());
-		reader.readFile(Gbl.getConfig().matrices().getInputFile());
+		System.out.println("  reading the network...");
+//		NetworkLayer network = null;
+//		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
+		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		System.out.println("  done.");
+
+		//		System.out.println("  reading matrices xml file... ");
+//		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton());
+//		reader.readFile(Gbl.getConfig().matrices().getInputFile());
+//		System.out.println("  done.");
+
+		System.out.println("  reding plans xml file... ");
+		Plans plans = new Plans();
+		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		System.out.println("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		// ch.cut.640000.200000.740000.310000.xml
+		CoordI min = new Coord(640000.0,200000.0);
+		CoordI max = new Coord(740000.0,310000.0);
+
+		System.out.println("  running plans algos... ");
+		new PersonRemoveReferences().run(plans);
+		new PlansScenarioCut(min,max).run(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running facilities algos... ");
-		new FacilitiesSetCapacity().run(facilities);
+//		new FacilitiesSetCapacity().run(facilities);
+		new FacilitiesScenarioCut(min,max).run(facilities);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  running matrices algos... ");
-		new MatricesCompleteBasedOnFacilities(facilities, (ZoneLayer)Gbl.getWorld().getLayer("municipality")).run(Matrices.getSingleton());
+		System.out.println("  running network algos... ");
+		network.addAlgorithm(new NetworkSummary());
+		new NetworkScenarioCut(min,max).run(network);
+		network.addAlgorithm(new NetworkSummary());
+		network.addAlgorithm(new NetworkCleaner(false));
+		network.addAlgorithm(new NetworkSummary());
+		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
+		network.addAlgorithm(nwat);
+		network.runAlgorithms();
+		nwat.close();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  writing matrices xml file... ");
-		MatricesWriter mat_writer = new MatricesWriter(Matrices.getSingleton());
-		mat_writer.write();
-		System.out.println("  done.");
+//		System.out.println("  running matrices algos... ");
+//		new MatricesCompleteBasedOnFacilities(facilities, (ZoneLayer)Gbl.getWorld().getLayer("municipality")).run(Matrices.getSingleton());
+//		System.out.println("  done.");
 
-		System.out.println("  writing facilities xml file... ");
-		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
-		fac_writer.write();
-		System.out.println("  done.");
+		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
-		world_writer.write();
-		System.out.println("  done.");
-
-		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
-		config_writer.write();
-		System.out.println("  done.");
+		Scenario.writePlans(plans);
+		Scenario.writeNetwork(network);
+		Scenario.writeFacilities(facilities);
+		Scenario.writeConfig();
 
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();
