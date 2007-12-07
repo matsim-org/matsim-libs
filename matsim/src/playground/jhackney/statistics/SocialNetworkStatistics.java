@@ -280,7 +280,7 @@ public class SocialNetworkStatistics {
 	    int id=Integer.parseInt(myVert.getUserDatum("personId").toString());
 //	    Agent's Home Location ID
 	    Act myAct=(Act) myPerson.getSelectedPlan().getActsLegs().get(0);
-	    String homeId = myAct.getLinkId();
+	    String homeId = myAct.getLinkId().toString();
 //	    Agent's approx activity space diameter (radius to all alters)
 	    double aSd1 = pcasd1.getPersonASD1(plans, myPerson);
 //	    Agent's approx activity space diamter (radius to all activities)

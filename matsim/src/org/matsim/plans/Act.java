@@ -31,6 +31,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.identifiers.IdI;
 
 public class Act extends BasicAct implements Serializable {
 
@@ -238,8 +239,8 @@ public class Act extends BasicAct implements Serializable {
 	}
 
 
-	public final String getLinkId() { // convenience method
-		return this.link.getId().toString();
+	public final IdI getLinkId() { // convenience method
+		return this.link.getId();
 	}
 
 }
