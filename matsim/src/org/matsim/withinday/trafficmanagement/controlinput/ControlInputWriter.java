@@ -33,7 +33,7 @@ import java.util.Map.Entry;
  */
 public class ControlInputWriter {
 
-	private static final String outputDirectory = "./output/";
+	private static final String outputDirectory = "../studies/arvidDaniel/output/";
 
 	/**
    * the separator used between columns
