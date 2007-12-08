@@ -35,6 +35,9 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.algorithms.PersonRemoveReferences;
 import org.matsim.plans.algorithms.PlansScenarioCut;
+import org.matsim.plans.algorithms.XY2Links;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 
@@ -58,7 +61,7 @@ public class ScenarioParsing {
 		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		System.out.println("  done.");
 
-		System.out.println("  reading the network...");
+		System.out.println("  reading the network xml file...");
 //		NetworkLayer network = null;
 //		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
@@ -82,21 +85,21 @@ public class ScenarioParsing {
 		CoordI min = new Coord(640000.0,200000.0);
 		CoordI max = new Coord(740000.0,310000.0);
 
-		System.out.println("  running plans algos... ");
+		System.out.println("  running plans modules... ");
 		new PersonRemoveReferences().run(plans);
 		new PlansScenarioCut(min,max).run(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  running facilities algos... ");
+		System.out.println("  running facilities modules... ");
 //		new FacilitiesSetCapacity().run(facilities);
 		new FacilitiesScenarioCut(min,max).run(facilities);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  running network algos... ");
+		System.out.println("  running network modules... ");
 		network.addAlgorithm(new NetworkSummary());
 		new NetworkScenarioCut(min,max).run(network);
 		network.addAlgorithm(new NetworkSummary());
@@ -106,6 +109,14 @@ public class ScenarioParsing {
 		network.addAlgorithm(nwat);
 		network.runAlgorithms();
 		nwat.close();
+		System.out.println("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		System.out.println("  running plans modules... ");
+		new XY2Links(network).run(plans);
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
