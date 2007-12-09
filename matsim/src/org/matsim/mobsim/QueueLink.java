@@ -532,14 +532,14 @@ public class QueueLink extends Link {
 		double queueLen = 0.0; // the length of the queue jammed vehicles build at the end of the link
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 		double vehLen = Math.min(	// the length of a vehicle in visualization
-				this.euklideanDist / this.storageCapacity, // all vehicles must have place on the link
+				this.length / this.storageCapacity, // all vehicles must have place on the link
 				NetworkLayer.CELL_LENGTH / storageCapFactor); // a vehicle should not be larger than it's actual size
 
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.buffer) {
 			cnt++;
 			// distance from fromNode:
-			double distanceFromFromNode = this.euklideanDist - cnt * vehLen;
+			double distanceFromFromNode = this.length - cnt * vehLen;
 
 			// lane:
 			int lane = 1 + (veh.getID() % getLanes());
@@ -570,10 +570,10 @@ public class QueueLink extends Link {
 		for (Vehicle veh : this.vehQueue) {
 			double speed = getFreespeed();
 			double travelTime = now - (veh.getDepartureTime_s() - this.freeTravelDuration);
-			double distanceOnLink = (this.freeTravelDuration == 0.0 ? 0.0 : ((travelTime / this.freeTravelDuration) * this.euklideanDist));
-			if (distanceOnLink > this.euklideanDist - queueLen) { // vehicle is already in queue
+			double distanceOnLink = (this.freeTravelDuration == 0.0 ? 0.0 : ((travelTime / this.freeTravelDuration) * this.length));
+			if (distanceOnLink > this.length - queueLen) { // vehicle is already in queue
 				queueLen += vehLen;
-				distanceOnLink = this.euklideanDist - queueLen;
+				distanceOnLink = this.length - queueLen;
 				speed = 0.0;
 			}
 			if (distanceOnLink >= lastDistance) {

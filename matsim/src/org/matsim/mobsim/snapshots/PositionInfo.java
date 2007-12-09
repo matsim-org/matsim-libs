@@ -36,33 +36,33 @@ public class PositionInfo {
 	private static final double LANE_WIDTH = 3.75;
 	private static final double PI_HALF = Math.PI / 2.0;
 	private static final double TWO_PI = 2.0 * Math.PI;
-	
+
 	final private IdI agentId;
-	
+
 	final private double easting;
 	final private double northing;
 	final private double elevation;
 	final private double azimuth;
 	final private double distanceOnLink;
-	
+
 	final private double speed;
-	
+
 	final private VehicleState vehicleState;
 	final private Link link;
 
 	// the constructor does all the work:
 	/**
 	 * Creates a new PositionInfo based on the agent's position between to nodes.
-	 * 
+	 *
 	 * @param agentId The id of the agent.
 	 * @param link The link the vehicle is currently driving or parking on.
 	 * @param distanceOnLink The distance of the agent from the fromNode of the link.
-	 * @param lane The number of the lane the agent is on. 
+	 * @param lane The number of the lane the agent is on.
 	 * 		Lanes are counted from the middle of a bi-directional link, beginning with 1.
 	 * @param speed The speed the agent is travelling with.
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
 	 */
-	public PositionInfo(IdI agentId, Link link, double distanceOnLink, int lane, double speed, VehicleState vehicleState) {
+	public PositionInfo(final IdI agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState) {
 		this.agentId = agentId;
 		this.link = link;
 		this.speed = speed;
@@ -83,8 +83,9 @@ public class PositionInfo {
 			}
 		}
 		if (theta < 0.0) theta += TWO_PI;
-		this.easting  = fromCoord.getX() + Math.cos(theta) * distanceOnLink + Math.sin(theta) * LANE_WIDTH * lane;
-		this.northing = fromCoord.getY() + Math.sin(theta) * distanceOnLink - Math.cos(theta) * LANE_WIDTH * lane;
+		double correction = link.getEuklideanDistance() / link.getLength();
+		this.easting  = fromCoord.getX() + Math.cos(theta) * distanceOnLink * correction + Math.sin(theta) * LANE_WIDTH * lane;
+		this.northing = fromCoord.getY() + Math.sin(theta) * distanceOnLink * correction - Math.cos(theta) * LANE_WIDTH * lane;
 		this.elevation = 0.0;
 		this.azimuth = theta / (TWO_PI) * 360;
 		this.vehicleState = vehicleState;
@@ -92,7 +93,7 @@ public class PositionInfo {
 
 	/**
 	 * Creates a new PositionInfo with the specified position and speed.
-	 * 
+	 *
 	 * @param driverId
 	 * @param easting
 	 * @param northing
@@ -101,7 +102,7 @@ public class PositionInfo {
 	 * @param speed
 	 * @param vehicleState The state of the vehicle (Parking, Driving)
 	 */
-	public PositionInfo(IdI driverId, double easting, double northing, double elevation, double azimuth, double speed, VehicleState vehicleState) {
+	public PositionInfo(final IdI driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final VehicleState vehicleState) {
 		this.agentId = driverId;
 		this.link = null;
 		this.easting = easting;
@@ -136,7 +137,7 @@ public class PositionInfo {
 	public double getSpeed() {
 		return this.speed;
 	}
-	
+
 	public VehicleState getVehicleState(){
 		return this.vehicleState;
 	}
@@ -146,7 +147,7 @@ public class PositionInfo {
 	}
 
 	public double getDistanceOnLink() {
-		return distanceOnLink;
+		return this.distanceOnLink;
 	}
 
 }
