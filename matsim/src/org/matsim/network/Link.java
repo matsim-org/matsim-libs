@@ -41,6 +41,8 @@ public class Link extends BasicLink {
 
 	private double flowCapacity;
 
+	protected final double euklideanDist;
+
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
@@ -56,6 +58,7 @@ public class Link extends BasicLink {
 		this.permlanes = Integer.parseInt(permlanes);
 		this.origid = origid;
 		this.type = type;
+		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
 		calcFlowCapacity();
 		// do some semantic checks
 		if (this.from.equals(this.to)) { Gbl.warningMsg(this.getClass(), "Link(...)", this+"[from=to="+this.to+" link is a loop]"); }
@@ -126,6 +129,11 @@ public class Link extends BasicLink {
 			return this.roles.get(idx);
 		}
 		return null;
+	}
+
+	/** @return Returns the euklidean distance between from- and to-node. */
+	public final double getEuklideanDistance() {
+		return this.euklideanDist;
 	}
 
 	/**

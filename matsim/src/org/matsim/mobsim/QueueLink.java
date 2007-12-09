@@ -89,13 +89,11 @@ public class QueueLink extends Link {
 	protected double storageCapacity;
 
 	/** The number of vehicles able to leave the buffer in one time step (usually 1s). */
-	private double simulatedFlowCapacity;
+	private double simulatedFlowCapacity; // previously called timeCap
 	private int timeCapCeil; // optimization, cache Math.ceil(timeCap)
 	private double timeCapFraction; // optimization, cache timeCap - (int)timeCap
 
 	protected double buffercap_accumulate = 1.0;
-
-	final protected double euklideanDist;
 
 	private boolean active = false;
 
@@ -113,7 +111,6 @@ public class QueueLink extends Link {
 		// long argument lists. But be it if other people
 		// like them. kai, nov06
 
-		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
 		this.freeTravelDuration = getLength() / getFreespeed();
 
 		/* moved capacity calculation to two methods, to be able to call it from outside
@@ -171,8 +168,10 @@ public class QueueLink extends Link {
 	 * This method will scale the simulated flow capacity by the given factor, and recalculate the
 	 * timeCapCeil and Fraction attributes of QueueLink. Furthermore it checks the storage Capacity of the link
 	 * and change it if needed.
+	 *
+	 * @param factor
 	 */
-	public void changeSimulatedFlowCapacity(double factor) {
+	public void changeSimulatedFlowCapacity(final double factor) {
 		this.simulatedFlowCapacity = this.simulatedFlowCapacity * factor;
 		recalcCapacity();
 	}
