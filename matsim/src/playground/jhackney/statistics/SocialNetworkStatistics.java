@@ -36,8 +36,8 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.identifiers.IdI;
 
 import playground.jhackney.algorithms.PersonCalculateActivitySpaces;
 import playground.jhackney.algorithms.PlanEuclideanLength;
@@ -163,6 +163,7 @@ public class SocialNetworkStatistics {
 	fillGraph(g, snet, plans);
 
 	System.out.println("   MatSim social network converted into a JUNG graph for analysis");
+	System.out.println("     >> See Palla et al for k-clustering calculations or check JUNG");
 	// Now you can run whatever statistics you want on g, its vertices, or
 	// its edges
 
