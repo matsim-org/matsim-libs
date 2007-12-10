@@ -1,0 +1,2 @@
+java -classpath classes org/matsim/demandmodeling/deqsim/BinaryEvents2TextEvents /data/matsim-t/scratch/balmermi/sandbox00/vsp-cvs/devel/matsim/matsimJ/output/run210a/ITERS/it.20/20.deq_events.dat.0 output/20.events.txt.gz
+

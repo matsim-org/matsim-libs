@@ -35,6 +35,7 @@ import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
 import playground.balmermi.Scenario;
+import playground.balmermi.algos.PersonSetNearestFacCoord;
 
 public class MakeScenario {
 
@@ -90,7 +91,7 @@ public class MakeScenario {
 		System.out.println("  running facilities modules... ");
 //		new FacilitiesSetCapacity().run(facilities);
 //		new FacilitiesScenarioCut(min,max).run(facilities);
-		double pct=0.01;
+		double pct=0.1;
 		new FacilitiesMakeSample(pct).run(facilities);
 		System.out.println("  done.");
 
@@ -111,6 +112,7 @@ public class MakeScenario {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running plans modules... ");
+		new PersonSetNearestFacCoord(facilities).run(plans);
 		new XY2Links(network).run(plans);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
