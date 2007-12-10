@@ -2,9 +2,9 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
 		<!ENTITY PROJBASE     ".">
-		<!ENTITY STUDYBASE    "C:/Documents and Settings/jhackney/My Documents/sandbox00/vsp-cvs/studies/jhackney/input">
+		<!ENTITY STUDYBASE    "input">
 		<!ENTITY RUNSBASE     "runs">
-		<!ENTITY OUTPUTBASE   "C:/Documents and Settings/jhackney/My Documents/sandbox00/vsp-cvs/studies/jhackney/output">
+		<!ENTITY OUTPUTBASE   "output">
 		<!ENTITY INPUTBASE    "input">
 		<!ENTITY ANALYSISBASE "analysis">
 		<!ENTITY LOCALDTDBASE "dtd">
