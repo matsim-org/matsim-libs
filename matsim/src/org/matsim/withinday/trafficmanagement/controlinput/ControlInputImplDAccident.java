@@ -412,11 +412,11 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		if (agentsToQueueAtBottleNeck / currentBottleNeckCapacity > ttFreeSpeedBeforeBottleNeck) {
 			predictedTT = 
 			(agentsToQueueAtBottleNeck / currentBottleNeckCapacity) + ttFreeSpeedPart;
+			log.debug("Predicted travel time = Agents / current capacity + freespeed = " + 
+					agentsToQueueAtBottleNeck +" / "+currentBottleNeckCapacity +" + "+ ttFreeSpeedPart);
 		} else {
 			predictedTT = getFreeSpeedRouteTravelTime(route);
 		}
-			log.debug("Predicted travel time = Agents / current capacity + freespeed = " + 
-					agentsToQueueAtBottleNeck +" / "+currentBottleNeckCapacity +" + "+ ttFreeSpeedPart);
 			log.debug("Predicted route tt is " + predictedTT);
 			log.debug("Route freespeed tt is " + this.getFreeSpeedRouteTravelTime(route));
 		}
