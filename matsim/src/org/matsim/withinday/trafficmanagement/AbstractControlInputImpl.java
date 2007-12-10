@@ -152,7 +152,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 		Link[] altRouteLinks = this.getAlternativeRoute().getLinkRoute();
 		this.altRouteNaturalBottleNeck = altRouteLinks[0];
 		for ( int i = 1; i < altRouteLinks.length; i++ ) {
-			if ( altRouteLinks[i].getCapacity() < this.altRouteNaturalBottleNeck.getCapacity() )
+			if ( altRouteLinks[i].getCapacity() <= this.altRouteNaturalBottleNeck.getCapacity() )
 				this.altRouteNaturalBottleNeck = altRouteLinks[i];
 		}
 
