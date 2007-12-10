@@ -24,11 +24,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkLayerBuilder;
-import org.matsim.network.algorithms.NetworkCalcTopoType;
-import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
 import org.matsim.network.algorithms.NetworkSummary;
-import org.matsim.network.algorithms.NetworkWriteAsTable;
+import org.matsim.network.algorithms.NetworkTransform;
+import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 
 public class CleanNetwork {
 
@@ -54,18 +52,22 @@ public class CleanNetwork {
 		System.out.println("  running Network Validation and cleaning algorithms... ");
 //		network.addAlgorithm(new NetworkSummary());
 //		network.addAlgorithm(new NetworkAdaptCHNavtec());
-		network.addAlgorithm(new NetworkSummary());
-		network.addAlgorithm(new NetworkCleaner(false));
-		network.addAlgorithm(new NetworkSummary());
-		network.addAlgorithm(new NetworkMergeDoubleLinks());
-		network.addAlgorithm(new NetworkSummary());
-		network.addAlgorithm(new NetworkCalcTopoType());
-		network.addAlgorithm(new NetworkSummary());
-		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
-		network.addAlgorithm(nwat);
-		network.addAlgorithm(new NetworkSummary());
-		network.runAlgorithms();
-		nwat.close();
+//		network.addAlgorithm(new NetworkSummary());
+//		network.addAlgorithm(new NetworkCleaner(false));
+//		network.addAlgorithm(new NetworkSummary());
+//		network.addAlgorithm(new NetworkMergeDoubleLinks());
+//		network.addAlgorithm(new NetworkSummary());
+//		network.addAlgorithm(new NetworkCalcTopoType());
+//		network.addAlgorithm(new NetworkSummary());
+//		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
+//		network.addAlgorithm(nwat);
+//		network.addAlgorithm(new NetworkSummary());
+//		network.runAlgorithms();
+//		nwat.close();
+
+		new NetworkSummary().run(network);
+		new NetworkTransform(new CH1903LV03toWGS84()).run(network);
+		new NetworkSummary().run(network);
 		System.out.println("  done.");
 
 //		System.out.println("  writing the network...");
