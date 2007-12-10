@@ -31,14 +31,10 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 
-import playground.balmermi.algos.PersonCalcTripDistances;
-import playground.balmermi.algos.PersonInitDemandSummaryTable;
-import playground.balmermi.algos.PersonTripSummaryTable;
-
 public class PersonStreaming {
 
 	public static void run() {
-		
+
 		System.out.println("person streaming...");
 
 		//////////////////////////////////////////////////////////////////////
@@ -62,13 +58,13 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt");
-		plans.addAlgorithm(pidst);
-		plans.addAlgorithm(new PersonCalcTripDistances());
-		PersonTripSummaryTable ptst = new PersonTripSummaryTable("output/output_trip-summary-table.txt");
-		plans.addAlgorithm(ptst);
+//		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt");
+//		plans.addAlgorithm(pidst);
+//		plans.addAlgorithm(new PersonCalcTripDistances());
+//		PersonTripSummaryTable ptst = new PersonTripSummaryTable("output/output_trip-summary-table.txt");
+//		plans.addAlgorithm(ptst);
 		System.out.println("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
@@ -77,21 +73,21 @@ public class PersonStreaming {
 		plans.runAlgorithms();
 		plansWriter.write();
 		System.out.println("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  finishing algorithms... ");
-		pidst.close();
-		ptst.close();
+//		pidst.close();
+//		ptst.close();
 		System.out.println("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing network xml file... ");
 		NetworkWriter net_writer = new NetworkWriter(network);
 		net_writer.write();
 		System.out.println("  done.");
-		
+
 		System.out.println("  writing config xml file... ");
 		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
 		config_writer.write();
@@ -100,7 +96,7 @@ public class PersonStreaming {
 		System.out.println("done.");
 		System.out.println();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
