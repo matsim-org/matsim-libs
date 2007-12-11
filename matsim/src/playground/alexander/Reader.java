@@ -29,10 +29,10 @@ public class Reader {
 		if(Integer.parseInt(result[0]) == 1){
 			
 		}
-		if(Integer.parseInt(result[1] == 1)){
+		if(Integer.parseInt(result[1]) == 1){
 			
 		}
-		if(Integer.parseInt(result[2] == 1)){
+		if(Integer.parseInt(result[2]) == 1){
 			
 		}
 		
