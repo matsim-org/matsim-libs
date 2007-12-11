@@ -839,7 +839,7 @@ public class MyRuns {
 
 	}
 
-	private static NetworkLayer initWorldNetwork() {
+	public static NetworkLayer initWorldNetwork() {
 
 		NetworkLayer network = null;
 
@@ -862,7 +862,7 @@ public class MyRuns {
 		return network;
 	}
 
-	private static Plans initMatsimAgentPopulation(boolean isStreaming, ArrayList<PlansAlgorithm> algos) {
+	public static Plans initMatsimAgentPopulation(boolean isStreaming, ArrayList<PlansAlgorithm> algos) {
 
 		Plans population = null;
 
