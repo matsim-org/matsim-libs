@@ -31,6 +31,12 @@ import org.matsim.plans.Plan;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 
+/**
+ * Assigns each activity in a plan a link where the activity takes place
+ * based on the coordinates given for the activity.
+ *
+ * @author mrieser
+ */
 public class XY2Links extends PersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
@@ -137,11 +143,11 @@ public class XY2Links extends PersonAlgorithm implements PlanAlgorithmI {
 		return nearestLink;
 	}
 
-
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
+	/** Assigns links to each activity in all plans of the person. */
 	@Override
 	public void run(final Person person) {
 		int nofPlans = person.getPlans().size();
@@ -156,6 +162,7 @@ public class XY2Links extends PersonAlgorithm implements PlanAlgorithmI {
 		}
 	}
 
+	/** Assigns links to each activity in the plan. */
 	public void run(final Plan plan) {
 		processPlan(plan);
 	}
