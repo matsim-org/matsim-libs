@@ -1059,7 +1059,7 @@ public class SNReplanning  {
 			Iterator<Plan> piter=person.getPlans().iterator();
 			while (piter.hasNext()){
 				Plan plan = piter.next();
-				k.map.matchInitialActsToActivities(plan);
+				k.map.matchActsToActivities(plan);
 			}
 		}
 	}

@@ -1090,7 +1090,7 @@ public class SNController01 {
 	// activities list in knowledge
 	for( Person person : plans.getPersons().values() ){
 //	    person.getKnowledge().map.setPlanActivities(person.getSelectedPlan());
-	    person.getKnowledge().map.matchInitialActsToActivities(person.getSelectedPlan());
+	    person.getKnowledge().map.matchActsToActivities(person.getSelectedPlan());
 	}
     }
 

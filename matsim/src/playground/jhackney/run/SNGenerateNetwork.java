@@ -1091,7 +1091,7 @@ public class SNGenerateNetwork {
 	// Map agents' knowledge to their experience in the plan
 	for( Person person : plans.getPersons().values() ){
 //	    person.getKnowledge().map.setPlanActivities(person.getSelectedPlan());
-	    person.getKnowledge().map.matchInitialActsToActivities(person.getSelectedPlan());
+	    person.getKnowledge().map.matchActsToActivities(person.getSelectedPlan());
 	}
     }
 

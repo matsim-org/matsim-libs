@@ -55,7 +55,7 @@ public class MentalMap {
 		this.knowledge=knowledge;
 	}
 
-	public void matchInitialActsToActivities (Plan myPlan){
+	public void matchActsToActivities (Plan myPlan){
 		// Associate each act in the plan with a random facility on the link
 		ActIterator planActIter = myPlan.getIteratorAct();
 		while(planActIter.hasNext()){

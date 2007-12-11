@@ -34,8 +34,7 @@ import org.matsim.plans.algorithms.XY2Links;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
-import playground.balmermi.Scenario;
-import playground.balmermi.algos.PersonSetNearestFacCoord;
+import playground.jhackney.algorithms.*;
 
 public class MakeScenario {
 
@@ -112,7 +111,7 @@ public class MakeScenario {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running plans modules... ");
-		new PersonSetNearestFacCoord(facilities).run(plans);
+		new PersonSetNearestFacility(facilities).run(plans);
 		new XY2Links(network).run(plans);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
