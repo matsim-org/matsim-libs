@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
@@ -51,8 +52,10 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.NetworkWriter;
+import org.matsim.plans.Knowledge;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
@@ -491,7 +494,7 @@ public class SNReplanning  {
 			// reset random seed again before mobsim, as we do not know if strategy modules ran and if they used random numbers. 
 			Gbl.random.setSeed(Gbl.getConfig().global().getRandomSeed() + iteration);
 			Gbl.random.nextDouble(); // draw one because of strange "not-randomness" is the first draw...
-    
+
 			printNote("", "[" + iteration + "] mobsim starts");
 			System.out.println("## Test of initial demand generation with Euclidean plan length minimization, no MobSim is run");
 			runMobSim();
@@ -1042,10 +1045,22 @@ public class SNReplanning  {
 		}
 	}
 	void initializeKnowledge( Plans plans ){
-		// Map agents' knowledge to their experience in the plan
+
+		// Knowledge is already initialized in some plans files
+		// Map agents' knowledge (Activities) to their experience in the plans (Acts)
+
 		for( Person person : plans.getPersons().values() ){
-//			person.getKnowledge().map.setPlanActivities(person.getSelectedPlan());
-			person.getKnowledge().map.initialMatchActsActivities(person.getSelectedPlan());
+
+			Knowledge k = person.getKnowledge();
+			if(k ==null){
+				k = person.createKnowledge("created by " + this.getClass().getName());
+			}
+			// Initialize knowledge to the facilities that are in all initial plans
+			Iterator<Plan> piter=person.getPlans().iterator();
+			while (piter.hasNext()){
+				Plan plan = piter.next();
+				k.map.matchInitialActsToActivities(plan);
+			}
 		}
 	}
 

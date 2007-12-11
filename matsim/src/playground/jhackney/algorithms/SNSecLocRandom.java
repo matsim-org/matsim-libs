@@ -102,7 +102,7 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 		bestAct.setLink(fFromKnowledge.getLink());
 		Coord newCoord = (Coord) fFromKnowledge.getCenter();
 		bestAct.setCoord(newCoord);
-		k.map.updateMatchActsActivities(bestAct,fFromKnowledge.getActivity(type));
+		k.map.learnActsActivities(bestAct,fFromKnowledge.getActivity(type));
 	    }
 	}
     }

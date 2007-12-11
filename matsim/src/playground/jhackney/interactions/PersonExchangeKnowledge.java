@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
+import org.matsim.plans.Act;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 
@@ -58,14 +59,20 @@ public class PersonExchangeKnowledge {
 	//from Person 2's knowledge and add it to Person 1's
 	List<Activity> act2List = k2.getActivities(facType);
 	if(act2List.size()>=1){
-	    k1.addActivity(act2List.get(Gbl.random.nextInt( act2List.size())));
+		Activity activity2=act2List.get(Gbl.random.nextInt( act2List.size()));
+		Act act2 = k2.map.getAct(activity2);
+		k1.map.learnActsActivities(act2, activity2);
+	    //k1.addActivity(activity2);
 	}
 
-//	If person2 acknowledges knowing person1, let p1 share information with p2
+//	If person2 has an edge pointed toward person1, let p1 share information with p2
 	if(p2.getKnowledge().egoNet.knows(p1)){
 	    List<Activity> act1List = k1.getActivities(facType);
 	    if(act1List.size()>=1){
-		k2.addActivity(act1List.get(Gbl.random.nextInt( act1List.size())));
+	    	Activity activity1=act1List.get(Gbl.random.nextInt( act1List.size()));
+			Act act1 = k1.map.getAct(activity1);
+			k2.map.learnActsActivities(act1, activity1);
+		//k2.addActivity(act1List.get(Gbl.random.nextInt( act1List.size())));
 	    }
 	}
     }
