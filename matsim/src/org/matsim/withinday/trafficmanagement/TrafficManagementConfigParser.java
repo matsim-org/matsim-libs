@@ -30,10 +30,12 @@ import org.matsim.network.Node;
 import org.matsim.plans.Route;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplAll;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplDAccident;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplDistribution;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplSB;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplSBNoise;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplStaticAddition;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.NoControl;
@@ -98,6 +100,10 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	private static final String CONTROLINPUTDISTRIBUTION = "ControlInputImplDistribution";
 
 	private static final String CONTROLINPUTDACCIDENT = "ControlInputImplDAccident";
+
+	private static final String CONTROLINPUTALL = "ControlInputImplAll";
+	
+	private static final String CONTROLINPUTSTATICADDITION = "ControlInputImplStaticAddition";
 
 	private final static String CONTROLINPUT = "controlInput";
 
@@ -293,6 +299,16 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		}
 		else if (content.trim().compareTo(CONTROLINPUTDACCIDENT) == 0) {
 			ControlInputImplDAccident controlInput = new ControlInputImplDAccident();
+			this.events.addHandler(controlInput);
+			return controlInput;
+		}
+		else if (content.trim().compareTo(CONTROLINPUTALL) == 0) {
+			ControlInputImplAll controlInput = new ControlInputImplAll();
+			this.events.addHandler(controlInput);
+			return controlInput;
+		}
+		else if (content.trim().compareTo(CONTROLINPUTSTATICADDITION) == 0) {
+			ControlInputImplStaticAddition controlInput = new ControlInputImplStaticAddition();
 			this.events.addHandler(controlInput);
 			return controlInput;
 		}
