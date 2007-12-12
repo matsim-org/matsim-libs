@@ -45,6 +45,8 @@ public class MakeScenario {
 	public static void run() {
 
 		System.out.println("Make Scenario SAMPLE OF FACILITIES:");
+		
+		System.out.println("Uses output of a CUT. Samples 100x\"pct\"% of the facilities and moves Acts to take place at these");
 
 //		System.out.println("  reading world xml file... ");
 //		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
