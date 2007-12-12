@@ -79,9 +79,9 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	
 	private static final int NUMBEROFFLOWEVENTS = 20;
 
-	private static final double IGNOREDQUEUINGIME = 5;
+	private static final double IGNOREDQUEUINGIME = 15;
 	
-	private static final boolean DISTRIBUTIONCHECK = false;
+	private static final boolean DISTRIBUTIONCHECK = true;
 	
 	private static final Logger log = Logger.getLogger(ControlInputImplDAccident.class);
 
@@ -173,11 +173,11 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	@Override
 	public void handleEvent(final EventLinkLeave event) {
 		
-		if (this.ttMeasured.containsKey(event.linkId)) {
+		if (this.ttMeasured.containsKey(event.linkId) 
+				&& this.enterLinkEvents.get(event.agentId) != null) {
 			Double enterTime = this.enterLinkEvents.remove(event.agentId);
 			Double travelTime = event.time - enterTime;
 			this.ttMeasured.put(event.linkId, travelTime);
-
 		}
 		
 //		Stores [NUMBEROFFLOWEVENTS] last events and calculates flow
