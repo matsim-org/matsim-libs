@@ -20,6 +20,8 @@
 
 package org.matsim.withinday.trafficmanagement.controlinput;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,11 +75,11 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		
 		private static final int NUMBEROFFLOWEVENTS = 20;
 		
-		private static final double IGNOREDQUEUINGIME = 5;
+		private static final double IGNOREDQUEUINGIME = 15;
 
-	private static final boolean DISTURBANCECHECKACTIVATED = false;
+	private static final boolean DISTURBANCECHECKACTIVATED = true;
 	
-		private static final double FLOWUPDATETIME = 30;
+		private static final double FLOWUPDATETIME = 300;
 	
 	
 	private static final Logger log = Logger.getLogger(ControlInputImplAll.class);
@@ -124,6 +126,8 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
 	private Map<String, Integer> numbersPassedOnInAndOutLinks = new HashMap<String, Integer>();
 	
+	private double ttFreeSpeedBeforeBottleNeck = 0.0;
+
 
 
 	public ControlInputImplAll() {
@@ -272,11 +276,11 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	public void handleEvent(final EventLinkLeave event) {
 
 //		Must be done before super.handleEvent as that removes entries
-		if (this.ttMeasured.containsKey(event.linkId)) {
+		if (this.ttMeasured.containsKey(event.linkId) 
+				&& this.enterLinkEvents.get(event.agentId) != null) {
 			Double enterTime = this.enterLinkEvents.remove(event.agentId);
 			Double travelTime = event.time - enterTime;
 			this.ttMeasured.put(event.linkId, travelTime);
-
 		}
 		
 //		Stores [NUMBEROFFLOWEVENTS] last events and calculates flow
@@ -316,8 +320,47 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	
 
 	public void reset(final int iteration) {
+		BufferedWriter w1 = null;
+		BufferedWriter w2 = null;
+		try{
+			w1 = new BufferedWriter(new FileWriter("../studies/arvidDaniel/output/ttMeasuredMainRoute.txt"));
+			w2 = new BufferedWriter(new FileWriter("../studies/arvidDaniel/output/ttMeasuredAlternativeRoute.txt"));
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		
+		Iterator<Double> it1 = ttMeasuredMainRoute.iterator();
+		try{
+			while(it1.hasNext()){
+				double measuredTimeMainRoute = it1.next();
+				w1.write(Double.toString(measuredTimeMainRoute));
+				w1.write("\n");
+				w1.flush();
+			}	
+		}catch (IOException e){
+			e.printStackTrace();
+		}	
+			
+		Iterator<Double> it2 = ttMeasuredAlternativeRoute.iterator();
+		try{
+			while(it2.hasNext()){
+				double measuredTimeAlternativeRoute = it2.next();
+				w2.write(Double.toString(measuredTimeAlternativeRoute));
+				w2.write("\n");
+				w2.flush();
+			}
+		}catch (IOException e){
+				e.printStackTrace();
+		}			
+		try {
+			w1.close();
+			w2.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		this.writer.close();
 	}
+
 
 	@Override
 	public void handleEvent(final EventAgentDeparture event) {
@@ -373,7 +416,6 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		boolean queueOnRoute = false;
 		boolean bottleNeckCongested = false;
 		
-		double ttFreeSpeedBeforeBottleNeck = 0.0;
 		double ttFreeSpeedPart = 0.0;
 		int agentsToQueueAtBottleNeck = 0;
 		
@@ -440,7 +482,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 //		Link criticalCongestedLink = currentBottleNeck;
 //		int criticalCongestedLinkIndex = 0;
 		if (DISTRIBUTIONCHECKACTIVATED) {
-			
+	
 			for (int r = bottleNeckIndex; r >= 0; r--) {
 				Link link = routeLinks[r];
 				double linkAgents = this.numberOfAgents.get(link.getId().toString());
@@ -457,9 +499,10 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 					double freeSpeedUpToLink = 0;
 					for (int p = 0; p <= r; p++ ) {
 						agentsUpToLink += this.numberOfAgents.get(routeLinks[p].getId().toString());
-						freeSpeedUpToLink += this.ttFreeSpeeds.get(routeLinks[p].getId().toString());					
+						freeSpeedUpToLink += this.ttFreeSpeeds.get(routeLinks[p].getId().toString());
+						ttFreeSpeedBeforeBottleNeck = freeSpeedUpToLink;
 					}
-					if (DISTURBANCECHECKACTIVATED) {			
+					if (DISTURBANCECHECKACTIVATED) {	
 						agentsUpToLink += getAdditionalAgents(route, r);
 					}
 					if ( (agentsUpToLink / bottleNeckCapacity) >= freeSpeedUpToLink ) {
@@ -497,6 +540,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		else if (!DISTRIBUTIONCHECKACTIVATED){
 //			criticalCongestedLinkIndex = bottleNeckIndex;
 			// count agents on congested part of the route 
+			ttFreeSpeedBeforeBottleNeck = 0;
 			for (int i = 0; i <= bottleNeckIndex; i++) {
 				agentsToQueueAtBottleNeck += 
 					this.numberOfAgents.get(routeLinks[i].getId().toString());
@@ -538,10 +582,10 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		Link [] routeLinks = route.getLinkRoute();
 		distanceToBottleNeck = 
 			getDistanceFromFirstNode(routeLinks[lastCriticalLinkIndex].getToNode(), route);
-		for (int i = 0; i <= lastCriticalLinkIndex; i++) {
-			String linkId = routeLinks[lastCriticalLinkIndex].getId().toString();
-			ttToBottleNeck += this.ttFreeSpeeds.get(linkId);
-		}
+//		for (int i = 0; i <= lastCriticalLinkIndex; i++) {
+//			String linkId = routeLinks[lastCriticalLinkIndex].getId().toString();
+//			ttToBottleNeck += this.ttFreeSpeeds.get(linkId);
+//		}
 
 		//Sum up INFLOWS and weigh it corresponding to their distance to the start node.
 		Iterator<Link> itInlinks = this.getInlinks(route).iterator();
@@ -558,7 +602,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 				weightedInFlow = inFlow * this.inFlowDistances.get(inLink.getId().toString());				}
 			weightedNetFlow += weightedInFlow;
 		}
-
+		
 		//Sum up OUTFLOWS and weigh it corresponding to their distance to the start node.
 		Iterator<Link> itOutlinks = this.getOutlinks(route).iterator();
 		while(itOutlinks.hasNext()){
@@ -574,9 +618,11 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			}
 			weightedNetFlow -= weightedOutFlow;
 		}
+		
 		netFlow = weightedNetFlow / distanceToBottleNeck;
-
-		return (int)(ttToBottleNeck * netFlow);
+		
+//		return (int)(ttToBottleNeck * netFlow);
+		return (int)(ttFreeSpeedBeforeBottleNeck * netFlow);
 	}
 	
 	
