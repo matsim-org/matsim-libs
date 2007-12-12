@@ -34,6 +34,7 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.mobsim.QueueLink;
 import org.matsim.network.Link;
 import org.matsim.plans.Route;
 
@@ -84,7 +85,11 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 	protected List<Double> ttMeasuredMainRoute  = new ArrayList<Double>();
 	
 	protected List<Double> ttMeasuredAlternativeRoute = new ArrayList<Double>();
+	
+	protected double maximumQueingTimeAlternativeRoute; //for eliminating outliers
 
+	protected double maximumQueingTimeMainRoute; //for eliminating outliers
+	
 
 	public AbstractControlInputImpl() {
 		this.numberOfAgents = new HashMap<String, Integer>();
@@ -135,6 +140,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 
 	public void init() {
 		Link [] routeLinks;
+		double totalStorageCapacityAlternativeRoute = 0;
 		routeLinks = this.getAlternativeRoute().getLinkRoute();
 		this.firstLinkOnAlternativeRoute = routeLinks[0].getId().toString();
 		this.lastLinkOnAlternativeRoute = routeLinks[routeLinks.length-1].getId().toString();
@@ -142,7 +148,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (!this.numberOfAgents.containsKey(l.getId().toString()))  {
 				this.numberOfAgents.put(l.getId().toString(), Integer.valueOf(0));
 			}
-
+			totalStorageCapacityAlternativeRoute += ((QueueLink)l).getSpaceCap();
 			double tt = l.getLength()/l.getFreespeed();
 			this.ttFreeSpeeds.put(l.getId().toString(), tt );
 			this.ttFreeSpeedAltRoute += tt;
@@ -155,8 +161,9 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if ( altRouteLinks[i].getCapacity() <= this.altRouteNaturalBottleNeck.getCapacity() )
 				this.altRouteNaturalBottleNeck = altRouteLinks[i];
 		}
+		maximumQueingTimeAlternativeRoute = (double)totalStorageCapacityAlternativeRoute / this.altRouteNaturalBottleNeck.getFlowCapacity();
 
-
+		double totalStorageCapacityMainRoute = 0;
 		routeLinks = this.getMainRoute().getLinkRoute();
 		this.firstLinkOnMainRoute = routeLinks[0].getId().toString();
 		this.lastLinkOnMainRoute = routeLinks[routeLinks.length-1].getId().toString();
@@ -165,10 +172,11 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (!this.numberOfAgents.containsKey(l.getId().toString()))  {
 				this.numberOfAgents.put(l.getId().toString(), Integer.valueOf(0));
 			}
+			totalStorageCapacityMainRoute += ((QueueLink)l).getSpaceCap();
 			tt = l.getLength()/l.getFreespeed();
 			this.ttFreeSpeeds.put(l.getId().toString(), tt );
 			this.ttFreeSpeedMainRoute += tt;
-
+			
 		}
 
 //		find the natural bottleneck on the main route
@@ -178,6 +186,8 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if ( mainRouteLinks[i].getCapacity() < this.mainRouteNaturalBottleNeck.getCapacity() )
 				this.mainRouteNaturalBottleNeck = mainRouteLinks[i];
 		}
+		maximumQueingTimeMainRoute = (double)totalStorageCapacityMainRoute / this.mainRouteNaturalBottleNeck.getFlowCapacity();
+
 	}
 
 	// memorize linkEnterEvents on the first links of the two alternative routes:
@@ -217,7 +227,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			Double t1 = this.enterEvents1.remove(event.agentId);
 			if (t1 != null) {
 				double deltaT = event.time - t1;
-				if (deltaT >= 0) {
+				if (deltaT >= 0 && deltaT <= maximumQueingTimeMainRoute) {
 					this.lastTimeMainRoute = deltaT;
 					ttMeasuredMainRoute.add(deltaT);
 					timeDifferenceHasChanged = true;
@@ -231,7 +241,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			Double t1 = this.enterEvents2.remove(event.agentId);
 			if (t1 != null) {
 				double deltaT = event.time - t1;
-				if (deltaT >= 0) {
+				if (deltaT >= 0 && deltaT < maximumQueingTimeAlternativeRoute) {
 					this.lastTimeAlternativeRoute = deltaT;
 					ttMeasuredAlternativeRoute.add(deltaT);
 					timeDifferenceHasChanged = true;
