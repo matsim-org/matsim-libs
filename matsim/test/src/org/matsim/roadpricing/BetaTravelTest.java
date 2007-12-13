@@ -218,20 +218,20 @@ public class BetaTravelTest extends MatsimTestCase {
 				 */
 				if (beta_travel == -6.0) {
 					System.out.println("checking results for case `beta_travel = -6'...");
-					assertEquals(17403.0, this.la.firstCarEnter, 0.0);
-					assertEquals(23429.0, this.la.lastCarEnter, 0.0);
-					assertEquals(17583.0, this.la.firstCarLeave, 0.0);
-					assertEquals(23609.0, this.la.lastCarLeave, 0.0);
-					assertEquals(16, this.la.maxCarsOnLink);
-					assertEquals(20979.0, this.la.maxCarsOnLinkTime, 0.0);
+					assertEquals(19079.0, this.la.firstCarEnter, 0.0);
+					assertEquals(24006.0, this.la.lastCarEnter, 0.0);
+					assertEquals(19259.0, this.la.firstCarLeave, 0.0);
+					assertEquals(24186.0, this.la.lastCarLeave, 0.0);
+					assertEquals(30, this.la.maxCarsOnLink);
+					assertEquals(22131.0, this.la.maxCarsOnLinkTime, 0.0);
 					System.out.println("all checks passed!");
 				} else if (beta_travel == -66.0) {
 					System.out.println("checking results for case `beta_travel = -66'...");
-					assertEquals(17403.0, this.la.firstCarEnter, 0.0);
-					assertEquals(24041.0, this.la.lastCarEnter, 0.0);
-					assertEquals(17583.0, this.la.firstCarLeave, 0.0);
-					assertEquals(24221.0, this.la.lastCarLeave, 0.0);
-					assertEquals(9, this.la.maxCarsOnLink);
+					assertEquals(18917.0, this.la.firstCarEnter, 0.0);
+					assertEquals(23793.0, this.la.lastCarEnter, 0.0);
+					assertEquals(19097.0, this.la.firstCarLeave, 0.0);
+					assertEquals(23973.0, this.la.lastCarLeave, 0.0);
+					assertEquals(13, this.la.maxCarsOnLink);
 					assertEquals(20874.0, this.la.maxCarsOnLinkTime, 0.0);
 					System.out.println("all checks passed!");
 				}
