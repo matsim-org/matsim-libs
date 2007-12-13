@@ -31,6 +31,8 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 
+import playground.balmermi.algos.PersonSubTourAnalysis;
+
 public class PersonStreaming {
 
 	public static void run() {
@@ -58,6 +60,7 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
+		plans.addAlgorithm(new PersonSubTourAnalysis());
 //		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt");
 //		plans.addAlgorithm(pidst);
 //		plans.addAlgorithm(new PersonCalcTripDistances());
