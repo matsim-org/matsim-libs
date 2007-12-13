@@ -90,7 +90,7 @@ public class MakeScenario {
 //		CoordI max = new Coord(740000.0,310000.0);
 //
 		System.out.println("  running plans modules... ");
-		new PersonRemoveReferences().run(plans);
+//		new PersonRemoveReferences().run(plans);
 //		new PlansScenarioCut(min,max).run(plans);
 		System.out.println("  done.");
 
