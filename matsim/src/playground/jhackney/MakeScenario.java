@@ -125,8 +125,8 @@ public class MakeScenario {
 
 		System.out.println("  running plans modules... ");
 
-		//new PersonSetNearestFacility(facilities).run(plans);
-		//new XY2Links(network).run(plans);
+		new PersonSetActToLinkWithNonNullFacility(facilities).run(plans);
+//    	new XY2Links(network).run(plans);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
 		System.out.println("  done.");
