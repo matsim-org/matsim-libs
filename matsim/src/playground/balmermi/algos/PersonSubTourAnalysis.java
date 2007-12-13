@@ -48,7 +48,7 @@ public class PersonSubTourAnalysis extends PersonAlgorithm implements PlanAlgori
 	//////////////////////////////////////////////////////////////////////
 
 	private final void handleSubTour(Plan plan, int start, int i, int j, int end) {
-		System.out.println("pid=" + plan.getPerson().getId() + "[" + start + "," + i + "]&[" + j + "," + end + "]");
+		System.out.println("[" + start + "," + i + "]&[" + j + "," + end + "]");
 	}
 
 	private final void extractSubTours(Plan plan, int start, int end) {
@@ -96,6 +96,12 @@ public class PersonSubTourAnalysis extends PersonAlgorithm implements PlanAlgori
 	}
 
 	public void run(Plan plan) {
+		System.out.println("----------------------------------------");
+		System.out.println("pid=" + plan.getPerson().getId() + ":");
+		for (int i=0; i<plan.getActsLegs().size(); i=i+2) {
+			System.out.println("  " + i + ": " + ((Act)plan.getActsLegs().get(i)).getCoord());
+		}
 		this.extractSubTours(plan,0,plan.getActsLegs().size()-1);
+		System.out.println("----------------------------------------");
 	}
 }
