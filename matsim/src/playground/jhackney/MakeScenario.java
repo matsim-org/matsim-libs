@@ -84,20 +84,19 @@ public class MakeScenario {
 		// ch.cut.640000.200000.740000.310000.xml
 //		CoordI min = new Coord(640000.0,200000.0);
 //		CoordI max = new Coord(740000.0,310000.0);
-
-		System.out.println("  running plans modules... ");
-		new PersonRemoveReferences().run(plans);
-//		new PlansScenarioCut(min,max).run(plans);
-		System.out.println("  done.");
+//
+//		System.out.println("  running plans modules... ");
+//
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  running facilities modules... ");
-//		new FacilitiesSetCapacity().run(facilities);
-//		new FacilitiesScenarioCut(min,max).run(facilities);
-		double pct=0.01;
-		new FacilitiesMakeSample(pct).run(facilities);
-		System.out.println("  done.");
+//		System.out.println("  running facilities modules... ");
+////		new FacilitiesSetCapacity().run(facilities);
+////		new FacilitiesScenarioCut(min,max).run(facilities);
+//		double pct=0.01;
+//		new FacilitiesMakeSample(pct).run(facilities);
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -116,6 +115,9 @@ public class MakeScenario {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running plans modules... ");
+		
+		new PersonRemoveReferences().run(plans);
+//		new PlansScenarioCut(min,max).run(plans);
 		new PersonSetNearestFacility(facilities).run(plans);
 		new XY2Links(network).run(plans);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
