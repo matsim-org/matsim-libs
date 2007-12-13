@@ -57,7 +57,7 @@ public class PersonSubTourAnalysis extends PersonAlgorithm implements PlanAlgori
 			Act acti = (Act)plan.getActsLegs().get(i_act);
 			for (int j_act=end-2; j_act>i_act; j_act=j_act-2) {
 				Act actj = (Act)plan.getActsLegs().get(j_act);
-				if (acti.getCoord() == actj.getCoord()) {
+				if (acti.getCoord().equals(actj.getCoord())) {
 					// subtour found: start..i & j..end
 					is_leaf = false;
 					this.handleSubTour(plan,start,i_act,j_act,end);
@@ -67,7 +67,7 @@ public class PersonSubTourAnalysis extends PersonAlgorithm implements PlanAlgori
 					Act actii = acti;
 					for (int jj_act=i_act+2; jj_act<=jj_act; jj_act=jj_act+2) {
 						Act actjj = (Act)plan.getActsLegs().get(jj_act);
-						if (actii.getCoord() == actjj.getCoord()) {
+						if (actii.getCoord().equals(actjj.getCoord())) {
 							this.extractSubTours(plan,ii_act,jj_act);
 							ii_act = jj_act;
 							actii = (Act)plan.getActsLegs().get(ii_act);
