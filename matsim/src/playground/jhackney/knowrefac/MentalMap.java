@@ -76,7 +76,9 @@ public class MentalMap {
 			
 			Link myLink = myAct.getLink();
 			Activity myActivity = null;
+			// These Locations are facilities by the new convention
 			Collection<Location> locations = myLink.getUpMapping().values();
+			// These Objects are facilities by convention
 			Object[] facs =  locations.toArray();
 			for (int i = 0; i< facs.length;i++){
 				Facility f = (Facility) facs[i];
@@ -94,11 +96,11 @@ public class MentalMap {
 
 	public void learnActsActivities (Act myact, Activity myactivity){
 		if (!mapActivityAct.contains(myactivity)){
-			System.out.println("Update Act:       "+myact);
+			//System.out.println("Update Act:       "+myact);
 			mapActivityAct.put(myactivity,myact);
 		}
 		if( !mapActActivity.contains(myact)){
-			System.out.println("Update Activity:  "+myactivity);
+			//System.out.println("Update Activity:  "+myactivity);
 			mapActActivity.put(myact, myactivity);
 		}
 
