@@ -60,7 +60,8 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		plans.addAlgorithm(new PersonSubTourAnalysis());
+		PersonSubTourAnalysis psta = new PersonSubTourAnalysis();
+		plans.addAlgorithm(psta);
 //		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt");
 //		plans.addAlgorithm(pidst);
 //		plans.addAlgorithm(new PersonCalcTripDistances());
@@ -80,6 +81,10 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  finishing algorithms... ");
+		psta.writeSubtourTripCntVsModeCnt("output/TripsPerSubtourVsModeCnt.txt");
+		psta.writeSubtourDistVsModeCnt("output/SubtourDistVsModeCnt.txt");
+		psta.writeSubtourTripCntVsSubtourCnt("output/SubtourTripCntVsSubtourCnt.txt");
+		psta.writeSubtourDistVsModeDistSum("output/SubtourDistVsModeDistSum.txt");
 //		pidst.close();
 //		ptst.close();
 		System.out.println("  done.");
