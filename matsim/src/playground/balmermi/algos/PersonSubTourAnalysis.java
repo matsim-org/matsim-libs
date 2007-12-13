@@ -127,7 +127,7 @@ public class PersonSubTourAnalysis extends PersonAlgorithm implements PlanAlgori
 		// dist of SubTour vs sumdist per mode
 		Double[] mode_dist = this.dist_mode_sumdist.remove(dist);
 		if (mode_dist == null) { mode_dist = new Double[5]; for (int m=0; m<5; m++) { mode_dist[m] = 0.0; } }
-		mode_dist[idx] += dist;
+		mode_dist[idx] += d;
 		this.dist_mode_sumdist.put(dist,mode_dist);
 	}
 
