@@ -33,6 +33,9 @@ import org.matsim.plans.algorithms.PersonRemoveReferences;
 import org.matsim.plans.algorithms.XY2Links;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.plans.algorithms.PlansScenarioCut;
+import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 
 import playground.jhackney.algorithms.*;
 
@@ -92,7 +95,7 @@ public class MakeScenario {
 		System.out.println("  running facilities modules... ");
 //		new FacilitiesSetCapacity().run(facilities);
 //		new FacilitiesScenarioCut(min,max).run(facilities);
-		double pct=0.1;
+		double pct=0.01;
 		new FacilitiesMakeSample(pct).run(facilities);
 		System.out.println("  done.");
 
