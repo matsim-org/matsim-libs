@@ -25,6 +25,8 @@ import java.util.Iterator;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -32,7 +34,7 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.CoordI;
 
-public class PersonSetNearestFacility extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonSetActToLinkWithNonNullFacility extends PersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -55,7 +57,7 @@ public class PersonSetNearestFacility extends PersonAlgorithm implements PlanAlg
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonSetNearestFacility(final Facilities facilities) {
+	public PersonSetActToLinkWithNonNullFacility(final Facilities facilities) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -119,6 +121,7 @@ public class PersonSetNearestFacility extends PersonAlgorithm implements PlanAlg
 			}
 			act.setCoord(nearest_f.getCenter());
 			act.setLink(nearest_f.getLink());//JH
+			System.out.println("f link "+ nearest_f.getId()+" "+nearest_f.getLink().getId());
 			System.out.println("  p_id=" + plan.getPerson().getId() + ", act=" + act.getType() + ": nearest dist=" + nearest_dist);
 		}
 	}
