@@ -46,7 +46,7 @@ import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
 import edu.uci.ics.jung.io.PajekNetWriter;
 import edu.uci.ics.jung.utils.UserData;
 
-public class PajekNetWriterWrapper {
+public class JUNGPajekNetWriterWrapper {
 
     StringLabeller sl;
     EdgeWeightLabeller ewl;
@@ -59,7 +59,7 @@ public class PajekNetWriterWrapper {
     // to get the Person ID given a Vertex object
     TreeMap<IdI, Vertex> verticesPersons = new TreeMap<IdI, Vertex>();
 
-    public PajekNetWriterWrapper(String outputPath, SocialNetwork snet, Plans plans) {
+    public JUNGPajekNetWriterWrapper(String outputPath, SocialNetwork snet, Plans plans) {
 
 	this.plans=plans;
 	this.outputPath=outputPath;

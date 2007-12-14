@@ -74,6 +74,7 @@ public class MentalMap {
 			}else
 				type="education";
 			
+			myAct.setType(type);
 			Link myLink = myAct.getLink();
 			Activity myActivity = null;
 			// These Locations are facilities by the new convention

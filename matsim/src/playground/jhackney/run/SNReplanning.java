@@ -83,7 +83,7 @@ import playground.jhackney.interactions.NonSpatialInteractor;
 import playground.jhackney.interactions.SocializingOpportunity;
 import playground.jhackney.interactions.SpatialInteractor;
 import playground.jhackney.interactions.SpatialSocialOpportunityTracker;
-import playground.jhackney.io.PajekNetWriterWrapper;
+import playground.jhackney.io.JUNGPajekNetWriterWrapper;
 import playground.jhackney.io.PajekWriter1;
 import playground.jhackney.replanning.SNFacilitySwitcher;
 import playground.jhackney.scoring.SNScoringFunctionFactory01;
@@ -218,7 +218,7 @@ public class SNReplanning  {
 		printNote("M A T S I M - C O N T R O L E R", "exit");
 	}
 	private void snwrapup(){
-		PajekNetWriterWrapper pnww = new PajekNetWriterWrapper(outputPath,snet, population);
+		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(outputPath,snet, population);
 		pnww.write();
 
 		System.out.println(" Writing the statistics of the final social network to Output Directory...");
@@ -245,7 +245,7 @@ public class SNReplanning  {
 		// TODO Auto-generated method stub
 		System.out.println(" Instantiating the Pajek writer ...");
 
-		pjw = new PajekWriter1(SOCNET_OUT_DIR);
+		pjw = new PajekWriter1(SOCNET_OUT_DIR, facilities);
 		System.out.println("... done");
 
 		System.out.println(" Initializing the social network ...");

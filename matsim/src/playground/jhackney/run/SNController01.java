@@ -215,7 +215,7 @@ public class SNController01 {
     private void snsetup(final Plans plans) {
 	System.out.println(" Instantiating the Pajek writer ...");
 
-	this.pjw = new PajekWriter1(SOCNET_OUT_DIR);
+	this.pjw = new PajekWriter1(SOCNET_OUT_DIR, null);
 	System.out.println("... done");
 
 	System.out.println(" Setting up the social network algorithm ...");

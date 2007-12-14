@@ -89,7 +89,7 @@ public class SNConfig  {
 		Gbl.errorMsg("The iterations directory " + (outputPath + "/" + DIRECTORY_SN) + " could not be created.");
 	}
 	
-	pjw = new PajekWriter1(SOCNET_OUT_DIR);
+	pjw = new PajekWriter1(SOCNET_OUT_DIR, null);
 	System.out.println("... done");
 
 	System.out.println(" Initializing the social network ...");

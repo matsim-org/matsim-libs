@@ -52,7 +52,9 @@ public class SocializingOpportunity {
     }
 
     public void addAttendee(Person person) {
-	attendees.add( person );
+	if(!attendees.contains(person)){
+    	attendees.add( person );
+	}
 	Act myAct = person.getKnowledge().map.getAct(this.activity);
 	arrivalTimes.put(person,myAct.getStartTime());
 	departureTimes.put(person,myAct.getEndTime());
