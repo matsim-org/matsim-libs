@@ -86,12 +86,10 @@ public class PersonAssignLinkViaFacility extends PersonAlgorithm {
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(SHOP) != null) {
-				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-				if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
-			}
+			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
+			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
+			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
+			if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
 		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
