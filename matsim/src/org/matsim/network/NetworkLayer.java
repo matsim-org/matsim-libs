@@ -200,11 +200,42 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	 * such that the point lies on the right side of the directed link,
 	 * if such a link exists.<br />
 	 * It searches first for the nearest node, and then for the nearest link
-	 * originating or ending at that node and fullfilling the above constraint.
+	 * originating or ending at that node and fulfilling the above constraint.
+	 * <p>
+	 * <b>Special cases:</b> <tt>nodes:o ; links:<-- ; coord:x</tt><br/>
+	 * <i>No right entry link exists</i><br/>
+	 * <tt>
+	 * o<-1--o returning<br/>
+	 * | . . ^ nearest left<br/>
+	 * |2 . 4| entry link<br/>
+	 * v .x. | (link.id=3)<br/>
+	 * o--3->o<br/>
+	 * </tt>
+	 * <br/>
+	 * <i>No right entry link exists but more than one nearest left entry link exist</i><br/>
+	 * <tt>
+	 * o<-1--o returning<br/>
+	 * | . . ^ nearest left<br/>
+	 * |2 x 4| entry link with the<br/>
+	 * v . . | lowest link id<br/>
+	 * o--3->o (link.id=1)<br/>
+	 * </tt>
+	 * <br/>
+	 * <i>More than one nearest right entry link exist</i><br/>
+	 * <tt>
+	 * o--1->o returning<br/>
+	 * ^ . . | nearest right<br/>
+	 * |2 x 4| entry link with the<br/>
+	 * | . . v lowest link id<br/>
+	 * o<-3--o (link.id=1)<br/>
+	 * <br/>
+	 * o<----7&8--x->o (link.id=7)<br/>
+	 * </tt>
+	 * </p>
 	 *
 	 * @param coord
 	 *          the coordinate for which the closest link should be found
-	 * @return the link found closest to coord and orientated such that the
+	 * @return the link found closest to <code>coord</code> and oriented such that the
 	 * point lies on the right of the link.
 	 */
 	// TODO [balmermi] there should be only one 'getNearestLink' method
@@ -226,7 +257,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		double shortestOverallDistance = Double.MAX_VALUE; // reset the value
 		for (Link link : nearestNode.getIncidentLinks().values()) {
 			double dist = link.calcDistance(coord);
-			if (dist < shortestRightDistance) {
+			if (dist <= shortestRightDistance) {
 				// Generate a vector representing the link
 				double[] linkVector = new double[2];
 				linkVector[0] = link.getToNode().getCoord().getX()
@@ -239,13 +270,27 @@ public class NetworkLayer extends Layer implements BasicNetI {
 				// If coord lies to the right of the directed link, i.e. if the z component
 				// of the cross product is negative, set it as new nearest link
 				if (crossProductZ < 0) {
-					shortestRightDistance = dist;
-					nearestRightLink = link;
+					if (dist < shortestRightDistance) {
+						shortestRightDistance = dist;
+						nearestRightLink = link;
+					}
+					else { // dist == shortestRightDistance
+						if (link.getId().compareTo(nearestRightLink.getId()) < 0) {
+							shortestRightDistance = dist;
+							nearestRightLink = link;
+						}
+					}
 				}
 			}
 			if (dist < shortestOverallDistance) {
 				shortestOverallDistance = dist;
 				nearestOverallLink = link;
+			}
+			else if (dist == shortestOverallDistance) {
+				if (link.getId().compareTo(nearestOverallLink.getId()) < 0) {
+					shortestOverallDistance = dist;
+					nearestOverallLink = link;
+				}
 			}
 		}
 

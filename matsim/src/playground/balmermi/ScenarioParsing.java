@@ -35,11 +35,13 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.algorithms.PersonRemoveReferences;
 import org.matsim.plans.algorithms.PlansScenarioCut;
-import org.matsim.plans.algorithms.XY2Links;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+
+import playground.balmermi.algos.PersonAssignLinkViaFacility;
 
 public class ScenarioParsing {
 
@@ -113,8 +115,15 @@ public class ScenarioParsing {
 
 		//////////////////////////////////////////////////////////////////////
 
+		System.out.println("  running world modules... ");
+		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		System.out.println("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
 		System.out.println("  running plans modules... ");
-		new XY2Links(network).run(plans);
+		new PersonAssignLinkViaFacility(network,facilities).run(plans);
+//		new XY2Links(network).run(plans);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
 		System.out.println("  done.");
