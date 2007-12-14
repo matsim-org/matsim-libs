@@ -328,7 +328,7 @@ public class SNReplanning  {
 
 		System.out.println(" Replan every "+replan_interval+"th iteration of the social network.");
 
-		if (((snIter > 0) && (snIter % replan_interval == 0))||replan_interval==1) {
+		if (((snIter > 1) && (snIter % replan_interval == 0))||replan_interval==1) {
 			System.out.println("  Begin replanning snIter = "+snIter+" ...");
 			doReplanningIterations(snIter);
 			System.out.println("  Updating [Spatial] socializing opportunities to changed plans for iteration " + snIter + "...");
