@@ -37,6 +37,7 @@ import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.utils.vis.netvis.VisConfig;
 
 /**
  * RouterVis is a package for router visualization. It creates NetVis compatible
@@ -103,7 +104,10 @@ public class RouterVis {
 			buffers = Math.max(5, Math.min(50000/buffers, 100));
 		} else buffers = Integer.parseInt(buffString);
 
-		RouterNetStateWriter netStateWriter = new RouterNetStateWriter(network, config.network().getInputFile(), snapshotFile, 1, buffers);
+		VisConfig myVisConfig = VisConfig.newDefaultConfig();
+		myVisConfig.set(VisConfig.DELAY, "100");
+		
+		RouterNetStateWriter netStateWriter = new RouterNetStateWriter(network, config.network().getInputFile(), myVisConfig, snapshotFile, 1, buffers);
 		netStateWriter.open();
 		return netStateWriter;
 	}

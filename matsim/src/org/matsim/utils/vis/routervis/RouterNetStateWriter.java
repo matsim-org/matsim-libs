@@ -26,6 +26,7 @@ import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
+import org.matsim.utils.vis.netvis.VisConfig;
 
 /**
  * @author laemmel
@@ -35,8 +36,8 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
 	//holds the information of the links explored so far
 	private HashMap<IdI,LinkAttribute> linkStates;
 
-	public RouterNetStateWriter(BasicNetI network, String networkFileName, String filePrefix, int timeStepLength_s, int bufferSize) {
-		super(network, networkFileName, filePrefix, timeStepLength_s, bufferSize);
+	public RouterNetStateWriter(BasicNetI network, String networkFileName, VisConfig visConfig, String filePrefix, int timeStepLength_s, int bufferSize) {
+		super(network,networkFileName,visConfig,filePrefix,timeStepLength_s,bufferSize);
 
 		this.linkStates = new HashMap<IdI,LinkAttribute>();
 	}
