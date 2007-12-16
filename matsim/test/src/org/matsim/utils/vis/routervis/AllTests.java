@@ -18,22 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils;
+package org.matsim.utils.vis.routervis;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class AllTests {
+import org.matsim.utils.geometry.MGCTest;
 
+public class AllTests {
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils");
+		TestSuite suite = new TestSuite("Test for org.matsim.utils.vis.routervis");
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.utils.geometry.AllTests.suite());
-		suite.addTest(org.matsim.utils.misc.AllTests.suite());
-		suite.addTest(org.matsim.utils.vis.routervis.AllTests.suite());
-		suite.addTestSuite(WorldUtilsTest.class);
+		suite.addTestSuite(RouterVisTest.class);
 		//$JUnit-END$
 		return suite;
 	}
-
 }
