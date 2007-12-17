@@ -216,7 +216,8 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			Double t1 = this.enterEvents1.remove(event.agentId);
 			if (t1 != null) {
 				double deltaT = event.time - t1;
-				if (deltaT >= 0 && deltaT <= 2*this.lastTimeMainRoute) {
+				if (deltaT >= 0) {
+//					&& deltaT <= 2*this.lastTimeMainRoute
 					this.lastTimeMainRoute = deltaT;
 					ttMeasuredMainRoute.add(deltaT);
 					timeDifferenceHasChanged = true;
@@ -230,7 +231,8 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			Double t1 = this.enterEvents2.remove(event.agentId);
 			if (t1 != null) {
 				double deltaT = event.time - t1;
-				if (deltaT >= 0 && deltaT <= 2*this.lastTimeAlternativeRoute) {
+				if (deltaT >= 0) {
+//					 && deltaT <= 2*this.lastTimeAlternativeRoute
 					this.lastTimeAlternativeRoute = deltaT;
 					ttMeasuredAlternativeRoute.add(deltaT);
 					timeDifferenceHasChanged = true;
@@ -288,6 +290,17 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 		else
 			throw new IllegalArgumentException(
 			"This route object does not exist!");
+	}
+	
+	public Link getNaturalBottleNeck(final Route r){
+		Link naturalBottleNeck;
+		if(r == mainRoute){
+			naturalBottleNeck = mainRouteNaturalBottleNeck;
+		}
+		else{
+			naturalBottleNeck = altRouteNaturalBottleNeck;
+		}
+		return naturalBottleNeck;
 	}
 
 }
