@@ -20,7 +20,6 @@
 package playground.dgrether.visualization;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,13 +28,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
-import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.plans.filters.RouteLinkFilter;
 import org.matsim.plans.filters.SelectedPlanFilter;
@@ -47,8 +40,8 @@ import org.matsim.utils.vis.kml.KML;
 import org.matsim.utils.vis.kml.KMLWriter;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
-import org.matsim.world.MatsimWorldReader;
 
+import playground.dgrether.analysis.ScenarioLoader;
 import playground.dgrether.matsimkml.KmlPlansWriter;
 
 
@@ -60,8 +53,6 @@ public class KmlPlansVisualizer {
 
 	private static final Logger log = Logger.getLogger(KmlPlansVisualizer.class);
 
-	private NetworkLayer networkLayer;
-
 	private KML mainKml;
 
 	private Document mainDoc;
@@ -70,14 +61,12 @@ public class KmlPlansVisualizer {
 
 	private KMZWriter writer;
 
-	private Plans plans;
-
 	private List<Tuple<String, String>> linkTuples;
 
+	private ScenarioLoader scenario;
+
 	public KmlPlansVisualizer(final String config, final List<Tuple<String, String>> linkTuples) {
-		Gbl.createConfig(new String[] {config});
-		this.networkLayer = loadNetwork(Gbl.getConfig().network().getInputFile());
-		this.loadWorld();
+		this.scenario = new ScenarioLoader(config);
 		this.linkTuples = linkTuples;
 	}
 
@@ -92,7 +81,6 @@ public class KmlPlansVisualizer {
 		this.mainDoc.addFeature(this.mainFolder);
 		// the writer
 		this.writer = new KMZWriter(filename, KMLWriter.DEFAULT_XMLNS);
-		this.plans = loadPopulation();
 		Set<Plan> planSetBig = filterPlans();
 		log.info("Found " + planSetBig.size() + " relevant plans");
 		int i = 0;
@@ -104,12 +92,12 @@ public class KmlPlansVisualizer {
 			if (i > max)
 				break;
 		}
-		this.plans = null;
+		this.scenario.setPlans(null);
 		try {
 			// add the matsim logo to the kml
 			MatsimKMLLogo logo = new MatsimKMLLogo(this.writer);
 			this.mainFolder.addFeature(logo);
-			KmlPlansWriter plansWriter = new KmlPlansWriter(this.networkLayer,
+			KmlPlansWriter plansWriter = new KmlPlansWriter(this.scenario.getNetwork(),
 					TransformationFactory.getCoordinateTransformation(Gbl.getConfig().global().getCoordinateSystem(), TransformationFactory.WGS84), this.writer, this.mainDoc);
 			Folder plansFolder = plansWriter.getPlansFolder(planSet);
 			this.mainFolder.addFeature(plansFolder);
@@ -132,79 +120,8 @@ public class KmlPlansVisualizer {
 		}
 
 		SelectedPlanFilter selectedPlanFilter = new SelectedPlanFilter(linkFilter);
-		selectedPlanFilter.run(this.plans);
+		selectedPlanFilter.run(this.scenario.getPlans());
 		return collector.getPlans();
-	}
-
-	protected Plans loadPopulation() {
-		Plans population = new Plans(Plans.NO_STREAMING);
-		printNote("", "  reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		population.printPlansCount();
-		printNote("", "  done");
-
-		return population;
-	}
-
-	/**
-	 * load the network
-	 *
-	 * @return the network layer
-	 */
-	protected NetworkLayer loadNetwork(final String networkFile) {
-		// - read network: which buildertype??
-		printNote("", "  creating network layer... ");
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
-		printNote("", "  done");
-
-		printNote("", "  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(networkFile);
-		printNote("", "  done");
-
-		return network;
-	}
-
-	protected void loadWorld() {
-		if (Gbl.getConfig().world().getInputFile() != null) {
-			printNote("", "  reading world xml file... ");
-			final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-			worldReader.readFile(Gbl.getConfig().world().getInputFile());
-			printNote("", "  done");
-		} else {
-			printNote("","  No World input file given in config.xml!");
-		}
-	}
-
-
-	/**
-	 * an internal routine to generated some (nicely?) formatted output. This
-	 * helps that status output looks about the same every time output is written.
-	 *
-	 * @param header
-	 *          the header to print, e.g. a module-name or similar. If empty
-	 *          <code>""</code>, no header will be printed at all
-	 * @param action
-	 *          the status message, will be printed together with a timestamp
-	 */
-	private final void printNote(final String header, final String action) {
-		if (header != "") {
-			System.out.println();
-			System.out
-					.println("===============================================================");
-			System.out.println("== " + header);
-			System.out
-					.println("===============================================================");
-		}
-		if (action != "") {
-			System.out.println("== " + action + " at " + (new Date()));
-		}
-		if (header != "") {
-			System.out.println();
-		}
 	}
 
 	/**
