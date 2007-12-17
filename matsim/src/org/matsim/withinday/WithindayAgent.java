@@ -100,9 +100,9 @@ public class WithindayAgent {
 	public void replan() {
 		//check if replanning is allowed
 		if (SimulationTimer.getTime() >= (this.replanningInterval + this.lastReplaningTimeStep)) {
-			if (log.isTraceEnabled()) {
+			/*if (log.isTraceEnabled()) {
 				log.trace("Agent " + this.person.getId() + " requested to replan...");
-			}
+			}*/
 			//let the agent look out of his window if he is able to do this
 			this.revisePercepts();
 			double replanningNeed = this.getReplanningNeed();
@@ -117,9 +117,9 @@ public class WithindayAgent {
 					if (this.desireGenerationFunction.providesRoute(currentLink, subRoute)) {
 						this.reroute();
 					}
-					else if (log.isTraceEnabled()) {
+					/*else if (log.isTraceEnabled()) {
 						log.trace("...but his desireGenerationFunction doesn't generate an appropriate option.");
-					}
+					}*/
 				}
 			}
 			else if (log.isTraceEnabled()) {
