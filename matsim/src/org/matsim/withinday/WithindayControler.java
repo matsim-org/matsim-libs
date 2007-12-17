@@ -92,6 +92,7 @@ public class WithindayControler extends Controler {
 
 	@Override
 	protected void setupIteration(final int iteration) {
+		super.setupIteration(iteration);
 		this.factory = new WithindayAgentLogicFactory(this.network, this.config.charyparNagelScoring());
 		if (this.trafficManagementConfigurator != null) {
 			this.trafficManagement = this.trafficManagementConfigurator.getTrafficManagement();
