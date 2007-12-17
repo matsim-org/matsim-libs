@@ -165,6 +165,7 @@ public class WithindayControler extends Controler {
 
 	@Override
 	protected void finishIteration(final int iteration) {
+		super.finishIteration(iteration);
 		this.trafficManagement.finishIteration();
 	}
 
