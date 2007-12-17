@@ -57,6 +57,8 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  * @author abergsten and dzetterberg
  */
 
+//TODO: When the queuing check is done, the average measured tt for the last x cars should be considered instead of just the latest car.
+
 /* User parameters are:
  * DISTRIBUTIONCHECK	True means that model checks traffic distribution before bottle
  * 						neck.
@@ -77,9 +79,9 @@ implements EventHandlerLinkLeaveI, EventHandlerLinkEnterI,
 EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
 	
-	private static final int NUMBEROFFLOWEVENTS = 10;
+	private static final int NUMBEROFFLOWEVENTS = 20;
 
-	private static final double IGNOREDQUEUINGIME = 10;
+	private static final double IGNOREDQUEUINGIME = 20;
 	
 	private static final boolean DISTRIBUTIONCHECK = false;
 	
@@ -103,8 +105,13 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	
 	private Link currentBottleNeckMainRoute;
 	
+	private Double currentBNCapacityMainRoute;
+	
 	private Link currentBottleNeckAlternativeRoute;
+	
+	private Double currentBNCapacityAlternativeRoute;
 
+	
 
 	public ControlInputImplDAccident() {
 		super();
@@ -140,6 +147,8 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 				this.enterLinkEventTimes.put(l.getId().toString(), list );
 			}
 		}
+		currentBNCapacityMainRoute = getCapacity(mainRouteNaturalBottleNeck);
+
 		
 //		Alt Route
 		routeLinks = this.getAlternativeRoute().getLinkRoute();
@@ -162,7 +171,9 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 				List<Double> list = new LinkedList<Double>();
 				this.enterLinkEventTimes.put(l.getId().toString(), list );
 			}
-		}				
+		}
+		currentBNCapacityAlternativeRoute = getCapacity(altRouteNaturalBottleNeck);
+
 	}
 
 	@Override
@@ -288,64 +299,67 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			final Link bottleNeckLink) {
 		
 		Link currentBottleNeck;
+		Double currentBottleNeckCapacity;
 		Link[] routeLinks = route.getLinkRoute();
-		boolean isQueueOnRoute = false;
-		boolean bottleNeckCongested = false;
-		if(route == mainRoute){
-			currentBottleNeck = currentBottleNeckMainRoute;	
-		}
-		else{
-			currentBottleNeck = currentBottleNeckAlternativeRoute;
-		}
-		double currentBottleNeckCapacity = getCapacity(currentBottleNeck);
-		double currentBottleNeckFlow = getFlow(currentBottleNeck);		
+//		boolean isQueueOnRoute = false;
+//		boolean bottleNeckCongested = false;
+
+		currentBottleNeck = getCurrentBottleNeck(route);
+		currentBottleNeckCapacity = getCurrentBNCapacity(route);
+
+		//		double currentBottleNeckFlow = getFlow(currentBottleNeck);		
+		
+//		System.out.println();
+//		System.out.println("currentBN cap(flow): " +currentBottleNeckCapacity);
 //			if (getMeasuredRouteTravelTime(route) > getFreeSpeedRouteTravelTime(route)) {
 //			isQueueOnRoute = true;
 			
-			for ( int i = routeLinks.length - 1; i >= 0; i-- ) {
-				String linkId = routeLinks[i].getId().toString();
-
-//				The difference has to be at least [IGNOREDQUEUINGIME] seconds to avoid using incorrect flows 
-				if ( this.ttMeasured.get(linkId) > 2*this.ttFreeSpeeds.get(linkId))  {
-					bottleNeckCongested = true;
-					currentBottleNeck = routeLinks[i];
-					if(route == mainRoute){
-						currentBottleNeckMainRoute = currentBottleNeck;	
-					}
-					else{
-						currentBottleNeckAlternativeRoute = currentBottleNeck;
-					}
-					currentBottleNeckFlow = getFlow(currentBottleNeck);
-					
-//					System.out.println("");
-					log.debug("Current bottleneck capacity is " + currentBottleNeckCapacity + " and the measured link's flow is " + currentBottleNeckFlow);
-					
-//					If measured flow for some reason (inexact measuring) is higher than the links capacity, use the capacity 
-					if ( currentBottleNeckFlow	< currentBottleNeckCapacity) {
-						currentBottleNeckCapacity = currentBottleNeckFlow;
-					}
-					else{
-						currentBottleNeckCapacity = getCapacity(routeLinks[i]);
-					}
-					System.out.println();
-					System.out.println("currentBottleNeckCapacity is: " +currentBottleNeckCapacity);
-						//log.debug("Measured tt is longer than ttfreespeed, but measured flow is not reduced.");
-					
-
-//				do not check links before current bottleneck
-				break; 
-				}
-				else if(SimulationTimer.getTime()%60*1000 == 0){
-					currentBottleNeckMainRoute = mainRouteNaturalBottleNeck;
-					currentBottleNeckAlternativeRoute = altRouteNaturalBottleNeck;
-				}
-			}
+		for ( int i = routeLinks.length - 1; i >= 0; i-- ) {
+			String linkId = routeLinks[i].getId().toString();
+//			if(SimulationTimer.getTime()%60*100 == 0){
+//				currentBottleNeckMainRoute = mainRouteNaturalBottleNeck;
+//				currentBottleNeckAlternativeRoute = altRouteNaturalBottleNeck;
+//			}
 				
+//			The difference has to be at least [IGNOREDQUEUINGIME] seconds to avoid using incorrect flows 
+			if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId) +IGNOREDQUEUINGIME)  {
+				System.out.println("link som uppfyllde villkoret: " +routeLinks[i].getId().toString());
+//				bottleNeckCongested = true;
+				currentBottleNeck = routeLinks[i];
+				setCurrentBottleNeck(currentBottleNeck, route);
+				currentBottleNeckCapacity = getFlow(currentBottleNeck);
+				setCurrentBNCapacity(currentBottleNeckCapacity, route);
+//				currentBottleNeckFlow = getFlow(currentBottleNeck);
+//				currentBottleNeckCapacity = getCapacity(currentBottleNeck);
+				
+//				System.out.println("");
+//				log.debug("Current bottleneck capacity is " + currentBottleNeckCapacity + " and the measured link's flow is " + currentBottleNeckFlow);
+				
+//				If measured flow for some reason (inexact measuring) is higher than the links capacity, use the capacity 
+//				if ( currentBottleNeckFlow	<= currentBottleNeckCapacity) {
+//					currentBottleNeckCapacity = currentBottleNeckFlow;
+//				}
+				
+				System.out.println();
+				System.out.println("currentBottleNeckCapacity is: " +currentBottleNeckCapacity);
+					//log.debug("Measured tt is longer than ttfreespeed, but measured flow is not reduced.");
+				
+//				do not check links before current bottleneck
+			break; 
+			}
+			else if(SimulationTimer.getTime()%3600 == 0){
+				currentBNCapacityAlternativeRoute = getCapacity(altRouteNaturalBottleNeck);
+				currentBNCapacityMainRoute = getCapacity(mainRouteNaturalBottleNeck);
+				currentBottleNeckAlternativeRoute = altRouteNaturalBottleNeck;
+				currentBottleNeckMainRoute = mainRouteNaturalBottleNeck;
+			}
+		}
+						
 
-		if ( !isQueueOnRoute )
-			log.debug("No queue on route (no capacity reduction was found)");
-		else if (isQueueOnRoute != bottleNeckCongested)
-			log.debug("There is queue on the route, but not longer than one second on for any individual link");
+//		if ( !isQueueOnRoute )
+//			log.debug("No queue on route (no capacity reduction was found)");
+//		else if (isQueueOnRoute != bottleNeckCongested)
+//			log.debug("There is queue on the route, but not longer than one second on for any individual link");
 
 		
 		// get the array index of the bottleneck link
@@ -406,12 +420,12 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 					}
 				}
 			}
-			if (criticalCongestedLink != null) {
+//			if (criticalCongestedLink != null) {
 //				System.out.println("You will queue with agents ahead of you up to and including link " + arrayIndexCCL);
-			}
-			else {
+//			}
+//			else {
 //				System.out.println("You will not queue at the bottleneck. There was no critical congestend link.");
-			}				
+//			}				
 			
 			predictedTT = 
 				(agentsToQueueAtBottleNeck / currentBottleNeckCapacity) + ttFreeSpeedPart;
@@ -446,9 +460,36 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	}
 	
 
+	private void setCurrentBNCapacity(Double currentBottleNeckCapacity, Route route) {
+		if(route == mainRoute){
+			currentBNCapacityMainRoute = currentBottleNeckCapacity;
+		}
+		else{
+			currentBNCapacityAlternativeRoute = currentBottleNeckCapacity;
+		}
+	}
+
+	private Double getCurrentBNCapacity(Route route) {
+		double cap;
+		if(route == mainRoute){
+			cap = currentBNCapacityMainRoute;
+		}
+		else{
+			cap = currentBNCapacityAlternativeRoute;
+		}
+		return cap;
+	}
+
 	// ContolInputI interface methods:
 	public double getNashTime() {
 
+//		if(SimulationTimer.getTime()%(60*60) == 0){
+//			currentBNCapacityAlternativeRoute = getCapacity(altRouteNaturalBottleNeck);
+//			currentBNCapacityMainRoute = getCapacity(mainRouteNaturalBottleNeck);
+//			currentBottleNeckAlternativeRoute = altRouteNaturalBottleNeck;
+//			currentBottleNeckMainRoute = mainRouteNaturalBottleNeck;
+//		}
+		
 		try {
 			this.writer.writeAgentsOnLinks(this.numberOfAgents);
 			this.writer.writeTravelTimesMainRoute(this.lastTimeMainRoute,
@@ -471,4 +512,24 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		return capacity;
 	}
 
+	public Link getCurrentBottleNeck(final Route route){
+		Link l;
+		if(route == mainRoute){
+			l = currentBottleNeckMainRoute;
+		}
+		else{
+			l = currentBottleNeckAlternativeRoute;
+		}
+		return l;
+	}
+	
+	public void setCurrentBottleNeck(final Link link, final Route route){
+		if(route == mainRoute){
+			currentBottleNeckMainRoute = link;
+		}
+		else{
+			currentBottleNeckAlternativeRoute = link;
+		}
+	}
+	
 }
