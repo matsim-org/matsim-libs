@@ -45,6 +45,11 @@ public class VisConfig extends ConfigModule {
 
     public VisConfig(String fileName) {
         super(MODULE_NAME, fileName);
+        
+        //make sure that DELAY is set otherwise NetVis will crash
+        if (super.get(DELAY) == null){
+        	set(DELAY, "500");        	
+        }
     }
 
     public static VisConfig newDefaultConfig() {
@@ -74,7 +79,7 @@ public class VisConfig extends ConfigModule {
 
     private boolean showNodeLabels;
 
-    private boolean showLinkLabels;
+    private boolean showLinkLabels ;
 
     private boolean useAntiAliasing;
 
