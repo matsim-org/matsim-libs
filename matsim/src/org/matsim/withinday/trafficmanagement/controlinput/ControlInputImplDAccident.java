@@ -64,14 +64,11 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  * 						neck.
  * NUMBEROFFLOWEVENTS	The flow calculations are based on the last NUMBEROFFLOWEVENTS 
  * 						agents. A higher value means better predictions if congestion.
- * IGNOREDQUEUINGIME	Additional link travel times up to IGNOREDQUEUINGIME will not be 
- * 						considered a sign of temporary capacity reduction.
+ * IGNOREDQUEUINGIME	Additional link travel times up to [IGNOREDQUEUINGIME] percent will not be 
+ * 						considered a sign of temporary capacity reduction. Default is 20 percent.
  * 
  */
 
-/* TODO [abergsten] iterate approach to find several "charges" of traffic 
- * with distances between them.
- */
 
 
 public class ControlInputImplDAccident extends AbstractControlInputImpl
@@ -81,8 +78,8 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	
 	private static final int NUMBEROFFLOWEVENTS = 20;
 
-	private static final double IGNOREDQUEUINGIME = 20;
-	
+	private static final double IGNOREDQUEUINGTIME = 20; //percent
+
 	private static final boolean DISTRIBUTIONCHECK = false;
 	
 	private static final Logger log = Logger.getLogger(ControlInputImplDAccident.class);
@@ -309,11 +306,11 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
 		//		double currentBottleNeckFlow = getFlow(currentBottleNeck);		
 		
-//		System.out.println();
 //		System.out.println("currentBN cap(flow): " +currentBottleNeckCapacity);
 //			if (getMeasuredRouteTravelTime(route) > getFreeSpeedRouteTravelTime(route)) {
 //			isQueueOnRoute = true;
 			
+
 		for ( int i = routeLinks.length - 1; i >= 0; i-- ) {
 			String linkId = routeLinks[i].getId().toString();
 //			if(SimulationTimer.getTime()%60*100 == 0){
@@ -321,9 +318,8 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 //				currentBottleNeckAlternativeRoute = altRouteNaturalBottleNeck;
 //			}
 				
-//			The difference has to be at least [IGNOREDQUEUINGIME] seconds to avoid using incorrect flows 
-			if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId) +IGNOREDQUEUINGIME)  {
-				System.out.println("link som uppfyllde villkoret: " +routeLinks[i].getId().toString());
+//			The difference has to be at least [IGNOREDQUEUINGTIME] seconds to avoid using incorrect flows 
+			if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId) * (1 + IGNOREDQUEUINGTIME/100) )  {
 //				bottleNeckCongested = true;
 				currentBottleNeck = routeLinks[i];
 				setCurrentBottleNeck(currentBottleNeck, route);
@@ -340,8 +336,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 //					currentBottleNeckCapacity = currentBottleNeckFlow;
 //				}
 				
-				System.out.println();
-				System.out.println("currentBottleNeckCapacity is: " +currentBottleNeckCapacity);
+
 					//log.debug("Measured tt is longer than ttfreespeed, but measured flow is not reduced.");
 				
 //				do not check links before current bottleneck
@@ -440,8 +435,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		// count agents on congested part of the route 
 
 		for (int i = 0; i <= firstCongestedLink; i++) {
-			agentsToQueueAtBottleNeck += 
-				this.numberOfAgents.get(routeLinks[i].getId().toString());
+			agentsToQueueAtBottleNeck += this.numberOfAgents.get(routeLinks[i].getId().toString());
 			ttFreeSpeedBeforeBottleNeck += this.ttFreeSpeeds.get(routeLinks[i].getId().toString());
 		}
 		
