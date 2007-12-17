@@ -31,9 +31,6 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.identifiers.IdI;
 
-import playground.jhackney.socialnet.EgoNet;
-import playground.jhackney.knowrefac.MentalMap;
-
 public class Knowledge {
 
 	//////////////////////////////////////////////////////////////////////
@@ -212,6 +209,4 @@ public class Knowledge {
 	public final String toString() {
 		return "[desc=" + this.desc + "]" + "[nof_activities=" + this.activities.size() + "]";
 	}
-	public MentalMap map = new MentalMap(this);
-	public EgoNet egoNet = new EgoNet();
 }
