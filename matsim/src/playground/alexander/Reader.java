@@ -37,22 +37,41 @@ public class Reader {
 	private void parseLine(String line) {
 		String[] result = StringUtils.explode(line, '\t');
 		Double freesp = net.getLink("100").getFreespeed();
-		if(Integer.parseInt(result[1]) == 1){
-			Link link = net.getLink(result[0]);
-			net.removeLink(link);
-		}
-		if(Integer.parseInt(result[2]) == 1){
-			net.createLink(result[0], result[4], result[5], result[6], Double.toString(freesp) , result[3], "1", null, null);
-		}
-		else{
-			double cap = Double.valueOf(result[3]);
-			net.getLink(result[0]).setCapacity(cap);			
-		}
+		if(result.length != 0  ){	
+			try{
+				if(Integer.parseInt(result[1]) == 1){
+					String id = result[0];
+					if (net.getLink(id)!=null){
+						Link link = net.getLink(result[0]);
+						net.removeLink(link);
+					}			
+				}
+				if(Integer.parseInt(result[2]) == 1){
+					String id = result[0];			
+					if(net.getLink(id)==null){
+						net.createLink(result[0], result[4], result[5], result[6], Double.toString(freesp) , result[3], "1", null, null);
+					}
+				}
+				else{
+					double cap = Double.valueOf(result[3]);
+					String id = result[0]; 
+					if(net.getLink(id)!=null ){	
+						net.getLink(result[0]).setCapacity(cap);			
+				
+					}
+				}
+				System.out.println("link "+result[0]+" created");
+			}catch(Exception e){
+				System.out.println(e);
+			}
+		}	
+		
 	}
 	
 	private void parseNodeLine(String line){
 		String[] result = StringUtils.explode(line, '\t');
 		net.createNode(result[0], result[1], result[2], null);
+		System.out.println("node "+result[0]+" created" );
 	}
 	
 	

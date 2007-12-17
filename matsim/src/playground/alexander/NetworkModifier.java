@@ -1,23 +1,3 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * ShapeFileConverterDLR2KML_v2.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package playground.alexander;
 
 import org.matsim.config.Config;
@@ -45,19 +25,20 @@ public class NetworkModifier {
 		}
 		
 		else{
-			readFileNameNet = "./padang/padang_net_new_261207.xml";
-			writeFileNameNet = "./padang/padang_net_new_131207.xml";
+			readFileNameNet = "./padang/padang_net_new_261107.xml";
+			writeFileNameNet = "./padang/padang_net_new_171207.xml";
 			fileNameNodes = "./padang/padang_change_nodes.txt";
 			fileNameLinks = "./padang/padang_change_links.txt";
 		}
 		
 		World world = Gbl.createWorld();
-		Config config = Gbl.createConfig(new String[] {"./evacuationConf.xml"});
+		Config config = Gbl.createConfig(new String[] {"./padang/evacuationConf.xml"});
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(readFileNameNet);
 	
 		Reader reader = new Reader(network);
-		reader.readfile(fileNameNodes,"node");		
+		
+		reader.readfile(fileNameNodes, "node");
 		reader.readfile(fileNameLinks, "link");
 		
 		NetworkWriter nw = new NetworkWriter(network, writeFileNameNet);
