@@ -73,13 +73,13 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 //	User parameters:
 	private static final boolean DISTRIBUTIONCHECKACTIVATED = true;
 		
-		private static final int NUMBEROFFLOWEVENTS = 20;
+		private static final int NUMBEROFFLOWEVENTS = 10;
 		
-		private static final double IGNOREDQUEUINGIME = 15;
+		private static final double IGNOREDQUEUINGIME = 5;
 
 	private static final boolean DISTURBANCECHECKACTIVATED = true;
 	
-		private static final double FLOWUPDATETIME = 300;
+		private static final double FLOWUPDATETIME = 100;
 	
 	
 	private static final Logger log = Logger.getLogger(ControlInputImplAll.class);
