@@ -64,8 +64,8 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  * 						neck.
  * NUMBEROFFLOWEVENTS	The flow calculations are based on the last NUMBEROFFLOWEVENTS 
  * 						agents. A higher value means better predictions if congestion.
- * IGNOREDQUEUINGIME	Additional link travel times up to [IGNOREDQUEUINGIME] percent will not be 
- * 						considered a sign of temporary capacity reduction. Default is 20 percent.
+ * IGNOREDQUEUINGIME	Additional link travel times up to [IGNOREDQUEUINGIME] seconds will not be 
+ * 						considered a sign of temporary capacity reduction. Default is 20 seconds.
  * 
  */
 
@@ -78,7 +78,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	
 	private static final int NUMBEROFFLOWEVENTS = 20;
 
-	private static final double IGNOREDQUEUINGTIME = 20; //percent
+	private static final double IGNOREDQUEUINGTIME = 20; 
 
 	private static final boolean DISTRIBUTIONCHECK = false;
 	
@@ -327,7 +327,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 //			}
 				
 //			The difference has to be at least [IGNOREDQUEUINGTIME] seconds to avoid using incorrect flows 
-			if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId) * (1 + IGNOREDQUEUINGTIME/100) )  {
+			if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId) + IGNOREDQUEUINGTIME )  {
 //				bottleNeckCongested = true;
 				currentBottleNeck = routeLinks[i];
 				setCurrentBottleNeck(currentBottleNeck, route);
