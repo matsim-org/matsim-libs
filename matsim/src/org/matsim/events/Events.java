@@ -23,9 +23,12 @@ package org.matsim.events;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.events.handler.BasicEventHandlerI;
 import org.matsim.events.handler.EventHandlerActivityEndI;
 import org.matsim.events.handler.EventHandlerActivityStartI;
@@ -52,6 +55,8 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
  */
 public class Events {
 
+	private static final Logger log = Logger.getLogger(Events.class);
+
 	static private class HandlerData {
 
 		public Class<?> eventklass;
@@ -65,12 +70,12 @@ public class Events {
 			this.handlerList.remove(handler);
 		}
 	}
-	
+
 	static private class HandlerInfo {
 		public final Class<?> eventClass;
 		public final EventHandlerI eventHandler;
 		public final Method method;
-		
+
 		public HandlerInfo(final Class<?> eventClass, final EventHandlerI eventHandler, final Method method) {
 			this.eventClass = eventClass;
 			this.eventHandler = eventHandler;
@@ -81,15 +86,6 @@ public class Events {
 	private final List<HandlerData> handlerData = new ArrayList<HandlerData>();
 
 	private final Map<Class<?>, HandlerInfo[]> cacheHandlers = new HashMap<Class<?>, HandlerInfo[]>(15);
-	
-	private HandlerData findHandler(final Class<?> evklass) {
-		for (HandlerData handler : this.handlerData) {
-			if (handler.eventklass == evklass) {
-				return handler;
-			}
-		}
-		return null;
-	}
 
 	private long counter = 0;
 	private long nextCounterMsg = 1;
@@ -98,6 +94,15 @@ public class Events {
 	 * creates new Events-data structure
 	 */
 	public Events() {
+	}
+
+	private HandlerData findHandler(final Class<?> evklass) {
+		for (HandlerData handler : this.handlerData) {
+			if (handler.eventklass == evklass) {
+				return handler;
+			}
+		}
+		return null;
 	}
 
 	public final void processEvent(final BasicEvent event) {
@@ -110,17 +115,17 @@ public class Events {
 	}
 
 	public void printEventsCount() {
-		System.out.println(" event # " + this.counter);
+		Logger.getLogger(this.getClass()).info(" event # " + this.counter);
 	}
 
 	public void addHandler (final EventHandlerI handler) {
 		Map<Class<?>, Object> addedHandlers = new HashMap<Class<?>, Object>();
 		Class<?> test = handler.getClass();
-		System.out.println("adding Event-Handler: " + test.getName());
+		log.info("adding Event-Handler: " + test.getName());
 		while (test != Object.class) {
 			for (Class<?> theInterface: test.getInterfaces()) {
 				if (!handler.equals(addedHandlers.get(theInterface))) {
-					System.out.println("  " + theInterface.getName());
+					log.info("  " + theInterface.getName());
 					addHandlerInterfaces(handler, theInterface);
 					addedHandlers.put(theInterface, handler);
 				}
@@ -131,7 +136,7 @@ public class Events {
 	}
 
 	public final void removeHandler(final EventHandlerI handler) {
-		System.out.println("removing Event-Handler: " + handler.getClass().getName());
+		log.info("removing Event-Handler: " + handler.getClass().getName());
 		for (HandlerData handlerList : this.handlerData) {
 			handlerList.removeHandler(handler);
 		}
@@ -139,7 +144,7 @@ public class Events {
 	}
 
 	public final void clearHandlers() {
-		System.out.println("clearing Event-Handlers");
+		log.info("clearing Event-Handlers");
 		for (HandlerData handler : this.handlerData) {
 			handler.handlerList.clear();
 		}
@@ -149,9 +154,13 @@ public class Events {
 	public void resetHandlers(final int iteration) {
 		this.counter = 0;
 		this.nextCounterMsg = 1;
+		Set<EventHandlerI> resetHandlers = new HashSet<EventHandlerI>();
 		for (HandlerData handlerdata : this.handlerData) {
 			for (EventHandlerI handler : handlerdata.handlerList) {
-				handler.reset(iteration);
+				if (!resetHandlers.contains(handler)) {
+					handler.reset(iteration);
+					resetHandlers.add(handler);
+				}
 			}
 		}
 	}
@@ -191,14 +200,14 @@ public class Events {
 			}
 		}
 	}
-	
+
 	private HandlerInfo[] getHandlersForClass(final Class<?> eventClass) {
 		Class<?> klass = eventClass;
 		HandlerInfo[] cache = this.cacheHandlers.get(eventClass);
 		if (cache != null) {
 			return cache;
 		}
-		
+
 		ArrayList<HandlerInfo> info = new ArrayList<HandlerInfo>();
 		while (klass != Object.class) {
 			HandlerData dat = findHandler(klass);
@@ -209,7 +218,7 @@ public class Events {
 			}
 			klass = klass.getSuperclass();
 		}
-		
+
 		cache = info.toArray(new HandlerInfo[info.size()]);
 		this.cacheHandlers.put(eventClass, cache);
 		return cache;
@@ -253,11 +262,11 @@ public class Events {
 	}
 
 	public void printEventHandlers() {
-		System.out.println("currently registered event-handlers:");
+		log.info("currently registered event-handlers:");
 		for (HandlerData handlerType : this.handlerData) {
-			System.out.println("+ " + handlerType.eventklass.getName());
+			log.info("+ " + handlerType.eventklass.getName());
 			for (EventHandlerI handler : handlerType.handlerList) {
-				System.out.println("  - " + handler.getClass().getName());
+				log.info("  - " + handler.getClass().getName());
 			}
 		}
 	}
