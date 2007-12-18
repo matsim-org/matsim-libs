@@ -26,10 +26,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
-import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.filters.filter.EventFilterAlgorithm;
-import org.matsim.filters.filter.EventFilterPersonSpecific;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -39,6 +36,9 @@ import org.matsim.plans.filters.SelectedPlanFilter;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.utils.identifiers.IdI;
+
+import playground.dgrether.events.FilteredEvents;
+import playground.dgrether.events.filters.PersonEventFilter;
 
 
 
@@ -65,18 +65,16 @@ public class SubPopScorer {
 
   private void calculateScore(Set<IdI> idSet) {
   	String eventsFilePath = Gbl.getConfig().events().getInputFile();
-  	Events events = new Events();
+  	FilteredEvents events = new FilteredEvents();
   	MatsimEventsReader reader = new MatsimEventsReader(events);
-  	EventFilterPersonSpecific filter = new EventFilterPersonSpecific(idSet);
-  	EventFilterAlgorithm filterAlgo = new EventFilterAlgorithm();
-  	filterAlgo.setNextFilter(filter);
-  	events.addHandler(filterAlgo);
-
+  	//set the filter
+  	PersonEventFilter filter = new PersonEventFilter(idSet);
+  	events.addFilter(filter);
+  	//add the handler to score
   	EventsToScore scorer = new EventsToScore(this.scenario.getPlans(), new CharyparNagelScoringFunctionFactory());
   	events.addHandler(scorer);
 
   	reader.readFile(eventsFilePath);
-
   	scorer.finish();
   	log.info("Score of subpopulation: " + scorer.getAveragePlanPerformance());
 	}
