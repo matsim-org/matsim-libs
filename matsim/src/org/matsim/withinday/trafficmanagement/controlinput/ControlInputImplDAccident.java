@@ -221,6 +221,14 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	
 
 	public void reset(final int iteration) {
+		
+		try {
+			this.writer.writeTravelTimesPerAgent(ttMeasuredMainRoute, ttMeasuredAlternativeRoute);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			
 		BufferedWriter w1 = null;
 		BufferedWriter w2 = null;
 		try{
@@ -342,7 +350,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 //				do not check links before current bottleneck
 			break; 
 			}
-			else if(SimulationTimer.getTime()%3600 == 0){
+			else if(SimulationTimer.getTime()%1800 == 0){
 				currentBNCapacityAlternativeRoute = getCapacity(altRouteNaturalBottleNeck);
 				currentBNCapacityMainRoute = getCapacity(mainRouteNaturalBottleNeck);
 				currentBottleNeckAlternativeRoute = altRouteNaturalBottleNeck;
