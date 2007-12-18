@@ -97,6 +97,9 @@ public class SNReplanning  {
 	public static final String CONFIG_FIRST_ITERATION = "firstIteration";
 	public static final String CONFIG_LAST_ITERATION = "lastIteration";
 
+	/** The Config instance the Controler uses. */
+	protected Config config = null;
+	
 	public static final String FILENAME_EVENTS = "events.txt";
 	public static final String FILENAME_PLANS = "plans.xml";
 	public static final String FILENAME_LINKSTATS = "linkstats.att";
@@ -169,8 +172,8 @@ public class SNReplanning  {
 		running = true;
 
 		printNote("M A T S I M - C O N T R O L E R", "start");
-
-		if (Gbl.getConfig() == null) {
+		this.config = Gbl.getConfig();
+		if (this.config == null) {
 			if (args.length == 1) {
 				Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 			}	else {
@@ -181,12 +184,12 @@ public class SNReplanning  {
 		}
 
 		printNote("", "Complete config dump:...");
-		ConfigWriter configwriter = new ConfigWriter(Gbl.getConfig(), new PrintWriter(System.out));
+		ConfigWriter configwriter = new ConfigWriter(this.config, new PrintWriter(System.out));
 		configwriter.write();
 		printNote("", "Complete config dump: done...");
 
-		this.minIteration = Integer.parseInt(Gbl.getConfig().getParam(CONFIG_MODULE, CONFIG_FIRST_ITERATION));
-//		this.maxIterations = Integer.parseInt(Gbl.getConfig().getParam(CONFIG_MODULE, CONFIG_LAST_ITERATION));
+		this.minIteration = Integer.parseInt(this.config.getParam(CONFIG_MODULE, CONFIG_FIRST_ITERATION));
+//		this.maxIterations = Integer.parseInt(this.config.getParam(CONFIG_MODULE, CONFIG_LAST_ITERATION));
 		this.maxIterations = 10;
 
 
@@ -232,7 +235,7 @@ public class SNReplanning  {
 	}
 	private void snsetup() {
 
-		Config config = Gbl.getConfig();
+//		Config config = Gbl.getConfig();
 
 		max_sn_iter = Integer.parseInt(config.socnetmodule().getNumIterations());
 		replan_interval = Integer.parseInt(config.socnetmodule().getRPInt());
@@ -315,7 +318,7 @@ public class SNReplanning  {
 		}
 
 		// Exchange of knowledge about people
-		double fract_intro=Double.parseDouble(Gbl.getConfig().socnetmodule().getTriangles());
+		double fract_intro=Double.parseDouble(this.config.socnetmodule().getTriangles());
 		if (fract_intro > 0) {
 			System.out.println("  Knowledge about other people is being exchanged ...");
 			plansInteractorNS.exchangeSocialNetKnowledge(snIter);
@@ -359,7 +362,7 @@ public class SNReplanning  {
 	protected void runMobSim() {
 		SimulationTimer.setTime(0);
 
-		String externalMobsim = Gbl.getConfig().findParam("simulation", "externalExe");
+		String externalMobsim = this.config.findParam("simulation", "externalExe");
 		if (externalMobsim == null) {
 			System.out.println("Write a Simulation object that returns the unloaded network travel times");
 			// queue-sim david
@@ -473,7 +476,7 @@ public class SNReplanning  {
 			makeSNIterationPath(iteration, snIter);
 
 			// reset random seed every iteration so we can more easily resume runs
-			Gbl.random.setSeed(Gbl.getConfig().global().getRandomSeed() + iteration);
+			Gbl.random.setSeed(this.config.global().getRandomSeed() + iteration);
 			Gbl.random.nextDouble(); // draw one because of strange "not-randomness" is the first draw...
 
 			if (tollCalc != null) {		// roadPricing only
@@ -492,7 +495,7 @@ public class SNReplanning  {
 			setupIteration(iteration, snIter);
 
 			// reset random seed again before mobsim, as we do not know if strategy modules ran and if they used random numbers. 
-			Gbl.random.setSeed(Gbl.getConfig().global().getRandomSeed() + iteration);
+			Gbl.random.setSeed(this.config.global().getRandomSeed() + iteration);
 			Gbl.random.nextDouble(); // draw one because of strange "not-randomness" is the first draw...
 
 			printNote("", "[" + iteration + "] mobsim starts");
@@ -548,7 +551,7 @@ public class SNReplanning  {
 		// dump plans every 10th iteration
 		if (iteration % 10 == 0 || iteration < 3) {
 			printNote("", "dumping all agents' plans...");
-			String outversion = Gbl.getConfig().plans().getOutputVersion();
+			String outversion = this.config.plans().getOutputVersion();
 			PlansWriter plansWriter = new PlansWriter(population, getIterationFilename(FILENAME_PLANS, snIter), outversion);
 			plansWriter.setUseCompression(true);
 			plansWriter.write();
@@ -618,10 +621,10 @@ public class SNReplanning  {
 	}
 
 	protected void loadWorld() {
-		if (Gbl.getConfig().world().getInputFile() != null) {
+		if (this.config.world().getInputFile() != null) {
 			printNote("", "  reading world xml file... ");
 			final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-			worldReader.readFile(Gbl.getConfig().world().getInputFile());
+			worldReader.readFile(this.config.world().getInputFile());
 			printNote("", "  done");
 		} else {
 			printNote("","  No World input file given in config.xml!");
@@ -636,17 +639,17 @@ public class SNReplanning  {
 		printNote("", "  done");
 
 		printNote("", "  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 		printNote("", "  done");
 
 		return network;
 	}
 
 	protected Facilities loadFacilities() {
-		if (Gbl.getConfig().facilities().getInputFile() != null) {
+		if (this.config.facilities().getInputFile() != null) {
 			printNote("", "  reading facilities xml file... ");
 			facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-			new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+			new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 			printNote("", "  done");
 		} else {
 			printNote("","  No Facilities input file given in config.xml!");
@@ -659,7 +662,7 @@ public class SNReplanning  {
 
 		printNote("", "  reading plans xml file... ");
 		PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(this.config.plans().getInputFile());
 		population.printPlansCount();
 		printNote("", "  done");
 
@@ -672,7 +675,7 @@ public class SNReplanning  {
 			System.out.println("setting up road pricing support...");
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(network);
 			try {
-				rpReader.parse(Gbl.getConfig().getParam("roadpricing", "tollLinksFile"));
+				rpReader.parse(this.config.getParam("roadpricing", "tollLinksFile"));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -725,8 +728,84 @@ public class SNReplanning  {
 	 * @param unexpected indicates whether the shutdown was planned (<code>false</code>) or not (<code>true</code>) 
 	 */
 	protected final void shutdown(boolean unexpected) {
-		if (running) {
-			running = false;	// this will prevent any further iteration to start
+//		if (running) {
+//			running = false;	// this will prevent any further iteration to start
+//
+//			if (unexpected) {
+//				printNote("S H U T D O W N", "unexpected shutdown request");
+//			}
+//
+//			if (this.outputDirSetup) {
+//				printNote("S H U T D O W N", "start shutdown");
+//				printNote("", "writing and closing all files");
+//
+//				if (eventwriter != null) {
+//					printNote("", "  trying to close eventwriter...");
+//					eventwriter.closefile();
+//					printNote("", "  done.");
+//				}
+//
+//				printNote("", "  writing plans xml file... ");
+//				PlansWriter plansWriter = new PlansWriter(population);
+//				plansWriter.write();
+//				printNote("", "  done");
+//				try {
+//					printNote("", "  writing facilities xml file... ");
+//					if (this.config.facilities().getOutputFile() != null) {
+//						Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+//						new FacilitiesWriter(facilities).write();
+//						printNote("", "  done");
+//					} else printNote("", "  not done, no output file specified in config.xml!");
+//				}
+//				catch (Exception e) {
+//					printNote("", e.getMessage());
+//				}
+//
+//				try {
+//					printNote("", "  writing network xml file... ");
+//					if (this.config.network().getOutputFile() != null) {
+//						NetworkWriter network_writer = new NetworkWriter(network);
+//						network_writer.write();
+//						printNote("", "  done");
+//					} else printNote("", "  not done, no output file specified in config.xml!");
+//				}
+//				catch (Exception e) {
+//					printNote("", e.getMessage());
+//				}
+//
+//				try {
+//					printNote("", "  writing world xml file... ");
+//					if (this.config.world().getOutputFile() != null) {
+//						WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
+//						world_writer.write();
+//						printNote("", "  done");
+//					} else printNote("", "  not done, no output file specified in config.xml!");
+//				}
+//				catch (Exception e) {
+//					printNote("", e.getMessage());
+//				}
+//				try {
+//					printNote("", "  writing config xml file... ");
+//					if (this.config.config().getOutputFile() != null) {
+//						ConfigWriter config_writer = new ConfigWriter(this.config);
+//						config_writer.write();
+//						printNote("", "  done");
+//					} else printNote("", "  not done, no output file specified in config.xml!");
+//				}
+//				catch (Exception e) {
+//					printNote("", e.getMessage());
+//				}
+//			}
+//			if (unexpected) {
+//				printNote("S H U T D O W N", "unexpected shutdown request completed");
+//			} else {
+//				printNote("S H U T D O W N", "shutdown completed");
+//			}
+//		}
+		if (this.running) {
+			this.running = false;	// this will prevent any further iteration to start
+
+			//this.fireControlerShutdownEvent(unexpected);
 
 			if (unexpected) {
 				printNote("S H U T D O W N", "unexpected shutdown request");
@@ -736,23 +815,29 @@ public class SNReplanning  {
 				printNote("S H U T D O W N", "start shutdown");
 				printNote("", "writing and closing all files");
 
-				if (eventwriter != null) {
+				if (this.eventwriter != null) {
 					printNote("", "  trying to close eventwriter...");
-					eventwriter.closefile();
+					this.eventwriter.closefile();
 					printNote("", "  done.");
 				}
 
 				printNote("", "  writing plans xml file... ");
-				PlansWriter plansWriter = new PlansWriter(population);
+				// write the plans into the default output-directory
+				PlansWriter plansWriter = new PlansWriter(this.population, getOutputFilename("output_plans.xml.gz"),
+						this.config.plans().getOutputVersion());
 				plansWriter.write();
 				printNote("", "  done");
+
 				try {
 					printNote("", "  writing facilities xml file... ");
-					if (Gbl.getConfig().facilities().getOutputFile() != null) {
+					if (this.config.facilities().getOutputFile() != null) {
 						Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 						new FacilitiesWriter(facilities).write();
 						printNote("", "  done");
-					} else printNote("", "  not done, no output file specified in config.xml!");
+					}
+					else {
+						printNote("", "  not done, no output file specified in config.xml!");
+					}
 				}
 				catch (Exception e) {
 					printNote("", e.getMessage());
@@ -760,11 +845,14 @@ public class SNReplanning  {
 
 				try {
 					printNote("", "  writing network xml file... ");
-					if (Gbl.getConfig().network().getOutputFile() != null) {
-						NetworkWriter network_writer = new NetworkWriter(network);
+					if (this.config.network().getOutputFile() != null) {
+						NetworkWriter network_writer = new NetworkWriter(this.network, getOutputFilename("output_network.xml.gz"));
 						network_writer.write();
 						printNote("", "  done");
-					} else printNote("", "  not done, no output file specified in config.xml!");
+					}
+					else {
+						printNote("", "  not done, no output file specified in config.xml!");
+					}
 				}
 				catch (Exception e) {
 					printNote("", e.getMessage());
@@ -772,22 +860,29 @@ public class SNReplanning  {
 
 				try {
 					printNote("", "  writing world xml file... ");
-					if (Gbl.getConfig().world().getOutputFile() != null) {
+					if (this.config.world().getOutputFile() != null) {
 						WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
 						world_writer.write();
 						printNote("", "  done");
-					} else printNote("", "  not done, no output file specified in config.xml!");
+					}
+					else {
+						printNote("", "  not done, no output file specified in config.xml!");
+					}
 				}
 				catch (Exception e) {
 					printNote("", e.getMessage());
 				}
+
 				try {
 					printNote("", "  writing config xml file... ");
-					if (Gbl.getConfig().config().getOutputFile() != null) {
-						ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+					if (this.config.config().getOutputFile() != null) {
+						ConfigWriter config_writer = new ConfigWriter(this.config);
 						config_writer.write();
 						printNote("", "  done");
-					} else printNote("", "  not done, no output file specified in config.xml!");
+					}
+					else {
+						printNote("", "  not done, no output file specified in config.xml!");
+					}
 				}
 				catch (Exception e) {
 					printNote("", e.getMessage());
@@ -808,7 +903,7 @@ public class SNReplanning  {
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
 
-		String maxvalue = Gbl.getConfig().findParam("strategy", "maxAgentPlanMemorySize");
+		String maxvalue = this.config.findParam("strategy", "maxAgentPlanMemorySize");
 		manager.setMaxPlansPerAgent(Integer.parseInt(maxvalue));
 
 		// Best-scoring plan chosen each iteration
@@ -907,7 +1002,7 @@ public class SNReplanning  {
 	}
 
 	private final void setupOutputDir() {
-		outputPath = Gbl.getConfig().getParam(CONFIG_MODULE, CONFIG_OUTPUT_DIRECTORY);
+		outputPath = this.config.getParam(CONFIG_MODULE, CONFIG_OUTPUT_DIRECTORY);
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length()-1);
 		}
