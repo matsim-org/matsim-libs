@@ -31,6 +31,7 @@ import org.matsim.plans.Route;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplAll;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplAllNewFlow;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplDAccident;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplDistribution;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplSB;
@@ -102,6 +103,8 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	private static final String CONTROLINPUTDACCIDENT = "ControlInputImplDAccident";
 
 	private static final String CONTROLINPUTALL = "ControlInputImplAll";
+	
+	private static final String CONTROLINPUTALLNEWFLOW = "ControlInputImplAllNewFlow";
 	
 	private static final String CONTROLINPUTSTATICADDITION = "ControlInputImplStaticAddition";
 
@@ -304,6 +307,12 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		}
 		else if (content.trim().compareTo(CONTROLINPUTALL) == 0) {
 			ControlInputImplAll controlInput = new ControlInputImplAll();
+			this.events.addHandler(controlInput);
+			return controlInput;
+		}
+		else if (content.trim().compareTo(CONTROLINPUTALLNEWFLOW) == 0) {
+			ControlInputImplAllNewFlow controlInput = new ControlInputImplAllNewFlow();
+			controlInput.setAccidents(this.trafficManagement.getAccidents());
 			this.events.addHandler(controlInput);
 			return controlInput;
 		}
