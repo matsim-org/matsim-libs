@@ -604,7 +604,7 @@ public class SNReplanning  {
 	}
 
 	protected void loadData() {
-		loadWorld();
+//		loadWorld();
 		this.facilities = loadFacilities();
 		this.network = loadNetwork();
 		this.population = loadPopulation();
