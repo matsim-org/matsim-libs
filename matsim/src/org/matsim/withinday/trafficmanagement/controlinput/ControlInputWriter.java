@@ -23,6 +23,8 @@ package org.matsim.withinday.trafficmanagement.controlinput;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -51,12 +53,20 @@ public class ControlInputWriter {
 	private static final String traveltimesroute1File = "travelTimesRoute1.txt";
 
 	private static final String traveltimesroute2File = "travelTimesRoute2.txt";
+	
+	private static final String measuredPerAgentMainRouteFile = "measuredPerAgentMainRoute.txt";
+
+	private static final String measuredPerAgentAlternativeRouteFile = "measuredPerAgentAlternativeRoute.txt";
 
 	private BufferedWriter agentOnLinks = null;
 
 	private BufferedWriter travelTimesRoute1 = null;
 
 	private BufferedWriter travelTimesRoute2 = null;
+	
+	private BufferedWriter measuredPerAgentMainRoute = null;
+
+	private BufferedWriter measuredPerAgentAlternativeRoute = null;
 
 	private boolean writeAgentsOnLinksFirstRun = true;
 
@@ -68,6 +78,8 @@ public class ControlInputWriter {
 			this.agentOnLinks = new BufferedWriter(new FileWriter(outputDirectory + numberofAgentsFile));
 			this.travelTimesRoute1 = new BufferedWriter(new FileWriter(outputDirectory + traveltimesroute1File));
 			this.travelTimesRoute2 = new BufferedWriter(new FileWriter(outputDirectory + traveltimesroute2File));
+			this.measuredPerAgentMainRoute = new BufferedWriter(new FileWriter(outputDirectory + measuredPerAgentMainRouteFile));
+			this.measuredPerAgentAlternativeRoute = new BufferedWriter(new FileWriter(outputDirectory + measuredPerAgentAlternativeRouteFile));
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -109,12 +121,36 @@ public class ControlInputWriter {
 		this.travelTimesRoute2.write(NEWLINE);
 		this.travelTimesRoute2.flush();
 	}
+	
+	public void writeTravelTimesPerAgent(final List<Double> measuredAgentsMain, 
+			final List<Double> measuredAgentsAlt) throws IOException {
+		Iterator<Double> itMain = measuredAgentsMain.iterator();
+		Iterator<Double> itAlt = measuredAgentsAlt.iterator();
+
+		while (itMain.hasNext()) {
+			double ttMain = itMain.next();
+			this.measuredPerAgentMainRoute.write(Double.toString(ttMain));
+			this.measuredPerAgentMainRoute.write(NEWLINE);
+			this.measuredPerAgentMainRoute.flush();
+		}
+
+		while (itAlt.hasNext()) {
+			double ttAlt = itAlt.next();
+			this.measuredPerAgentAlternativeRoute.write(Double.toString(ttAlt));
+			this.measuredPerAgentAlternativeRoute.write(NEWLINE);
+			this.measuredPerAgentAlternativeRoute.flush();
+		}
+
+	}
 
 	public void close() {
+	
 		try {
 			this.agentOnLinks.close();
 			this.travelTimesRoute1.close();
 			this.travelTimesRoute2.close();
+			this.measuredPerAgentMainRoute.close();
+			this.measuredPerAgentAlternativeRoute.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
