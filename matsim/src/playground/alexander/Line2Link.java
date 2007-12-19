@@ -66,12 +66,10 @@ public class Line2Link {
 				Feature link = linksIterator.next();
 				MultiLineString linkGeo = (MultiLineString) link.getDefaultGeometry();
 				Coordinate [] linkCoord = linkGeo.getCoordinates();	
-				List polys = new ArrayList();
-				List widths = new ArrayList();
+				List<Geometry> polys = new ArrayList<Geometry>();
+				List<Double> widths = new ArrayList<Double>();
 				GeometryFactory geofac = new GeometryFactory();
-				
-				String id = link.getAttribute(1).toString();
-
+						
 				//Breiten �ber Linienpunkte (mit Identifizierung der relevanten Polygone)
 				
 				for(int i=0 ; i < linkCoord.length ; i++){												
@@ -87,7 +85,7 @@ public class Line2Link {
 						while(polygonIterator.hasNext()){
 							Feature polygon = polygonIterator.next();
 							Geometry polygonGeo = polygon.getDefaultGeometry();
-							if(polygonGeo.covers(point)){
+							if(polygonGeo.covers(point)||polygonGeo.crosses(linkGeo)){
 								
 								polys.add(polygonGeo);																
 								Coordinate coord1;
@@ -113,8 +111,11 @@ public class Line2Link {
 																
 								if(polygonGeo.intersects(orthoLine)){
 									Coordinate [] inter = polygonGeo.intersection(orthoLine).getCoordinates();
-									widths.add(getLength(subCoord(inter[0],inter[1])));
-								}																						
+									for(int iii = 0 ; iii < inter.length-1 ; iii++ ){
+										widths.add(getLength(subCoord(inter[iii],inter[iii+1])));																			
+									}
+											
+								}																				
 							}
 						}
 					}
@@ -125,7 +126,7 @@ public class Line2Link {
 				}
 				//Breiten �ber Polygonpunkte
 				
-				for(Iterator it = polys.iterator() ; it.hasNext() ; ){
+				for(Iterator<Geometry> it = polys.iterator() ; it.hasNext() ; ){
 					
 					Geometry polygonGeo = (Geometry)it.next();
 					Coordinate [] polyCoord = polygonGeo.getCoordinates();
@@ -154,8 +155,17 @@ public class Line2Link {
 							LineString line = new LineString(seqe, geofac);
 															
 							if(polygonGeo.intersects(orthoLine) && orthoLine.intersects(line)){
-								Coordinate [] inter = polygonGeo.intersection(orthoLine).getCoordinates();
-								if(inter.length == 2)widths.add(getLength(subCoord(inter[0],inter[1])));
+								try{
+									Coordinate [] inter = polygonGeo.intersection(orthoLine).getCoordinates();
+									for(int iii = 0 ; iii < inter.length-1 ; iii++ ){
+										widths.add(getLength(subCoord(inter[iii],inter[iii+1])));									
+									}
+								}catch(com.vividsolutions.jts.geom.TopologyException e1){
+									System.out.println("TopologyException [Geometry.intersection()]: link:" +link.getAttribute(1).toString());
+								}catch(Exception e1){
+									System.out.println(e1);
+								}
+								
 							}																					
 						}
 					}					
@@ -163,7 +173,7 @@ public class Line2Link {
 				
 				//Breite
 				double minWidth = 40;
-				for(Iterator it = widths.iterator() ; it.hasNext() ; ){					
+				for(Iterator<Double> it = widths.iterator() ; it.hasNext() ; ){					
 					Double tmpWidth = (Double) it.next();
 					double tmpWidthValue = tmpWidth.doubleValue();
 					if(tmpWidthValue < minWidth)minWidth = tmpWidthValue;

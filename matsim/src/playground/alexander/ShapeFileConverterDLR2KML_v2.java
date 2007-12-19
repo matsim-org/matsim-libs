@@ -41,13 +41,11 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class ShapeFileConverterDLR2KML_v2 {
 	
-    private Map<String,Vector<Geometry>> geometries;
-		
-	public FeatureCollection readDataFile(String fileName) throws Exception {
+    public FeatureCollection readDataFile(String fileName) throws Exception {
 		
 		File dataFile = new File(fileName);
 		
-		geometries = new HashMap<String,Vector<Geometry>>();
+		new HashMap<String,Vector<Geometry>>();
 	    Map connect = new HashMap();
 	    connect.put( "url", dataFile.toURL() );
 
@@ -76,7 +74,7 @@ public class ShapeFileConverterDLR2KML_v2 {
 		else{
 			
 		fileNamePolygon = "./padang/padang_streets.shp";
-		fileNameLinks = "./padang/vd10_streetnetwork_padang_v0.5_utm47s.shp";
+		fileNameLinks = "/padang/vd10_streetnetwork_padang_v0.5_utm47s.shp";
 		fileNameNet = "./padang/padang_net.xml";		
 				
 		}
@@ -99,10 +97,7 @@ public class ShapeFileConverterDLR2KML_v2 {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	    			
-		FeatureIterator linksIterator = linksCollection.features();
-		FeatureIterator polygonIterator = polygonCollection.features();
-		
+    			
 		Line2Link l2l = new Line2Link(polygonCollection, linksCollection, network);
 		l2l.writeWidth();		
 		
