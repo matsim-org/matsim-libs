@@ -46,6 +46,13 @@ public class Coord implements Serializable, CoordI {
 	}
 
 	public final double calcDistance(final CoordI other) {
+		//depending on the coordinate system that is used, determining the 
+		//distance based on the euclidean distance will lead to wrong results.
+		//however, if the distance is not to large (<1km) this will be a usable distance estimation.
+		//Another comfortable way to calculate correct distances would be, to use the distance functions
+		//provided by geotools lib. May be we need to discuss what part of GIS functionality we should implement 
+		//by our own and for what part we could use an existing GIS like geotools. We need to discuss this in terms
+		//of code robustness, performance and so on ... [gl]
 		double xDiff = other.getX()-this.x;
 		double yDiff = other.getY()-this.y;
 		return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
