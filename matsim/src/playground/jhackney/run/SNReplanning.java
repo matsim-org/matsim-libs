@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -175,12 +176,12 @@ public class SNReplanning  {
 		this.config = Gbl.getConfig();
 		if (this.config == null) {
 			if (args.length == 1) {
-				Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
+				this.config = Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 			}	else {
-				Gbl.createConfig(args);
+				this.config = Gbl.createConfig(args);
 			}
-		} else if (args != null && args.length != 0) {
-			Gbl.errorMsg("config exists already! Cannot create a 2nd global config from args: " + args);
+		} else if ((args != null) && (args.length != 0)) {
+			Gbl.errorMsg("config exists already! Cannot create a 2nd global config from args: " + Arrays.toString(args));
 		}
 
 		printNote("", "Complete config dump:...");
