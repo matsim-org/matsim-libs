@@ -59,8 +59,8 @@ public class ShapeFileConverterDLR2KML_v2 {
 	    return(collection);
 	}   
 	   	
-	public static void main( String[] args )
-	{				
+	public static void main( String[] args ) {
+		
 		String fileNamePolygon;
 		String fileNameLinks;
 		String fileNameNet;
