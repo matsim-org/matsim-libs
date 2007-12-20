@@ -37,7 +37,7 @@ public class DefaultAgentHandler extends OTFParamProviderA implements  OTFAgentH
 	
 	protected float x, y, color;
 	protected int state;
-	protected String id;
+	protected String id="not def.";
 	
 	public void readAgent(DataInputStream in) throws IOException {
 		id = in.readUTF();

@@ -21,12 +21,14 @@
 package playground.david.vis.interfaces;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 
-public interface OTFDataHandler<SrcData>  extends Serializable{
-	public void writeData(DataOutputStream out) throws IOException;
-	public void readData(DataInputStream in) throws IOException;
+import playground.david.vis.data.OTFData;
+
+public interface OTFDataReader {
+	public void readConstData(DataInputStream in) throws IOException;
+	public void readDynData(DataInputStream in) throws IOException;
+	public void connect(OTFData.Receiver receiver);
+	public void invalidate();
 }
 

@@ -20,6 +20,7 @@
 
 package org.matsim.utils.misc;
 
+import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,10 +39,15 @@ import java.util.Iterator;
  * @author mrieser
  * @param <T> The type of data to be stored in the QuadTree.
  */
-public class QuadTree<T> {
+public class QuadTree<T> implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/** The top node or root of the tree */
-	private Node top = null;
+	protected Node top = null;
 
   /** The number of entries in the tree */
   private transient int size = 0;
@@ -63,7 +69,7 @@ public class QuadTree<T> {
 	 * @param maxY The largest y coordinate expected
 	 */
 	public QuadTree(final double minX, final double minY, final double maxX, final double maxY) {
-		this.top = new Node(minX, minY, maxX, maxY);
+		setTopNode(minX, minY, maxX, maxY);
 	}
 
   /**
@@ -128,7 +134,24 @@ public class QuadTree<T> {
 		return this.top.get(x, y, distance, new ArrayList<T>());
 	}
 
-  /**
+	/**
+	 * Executes executor on all objects within a certain distance around x/y
+	 *
+	 * @param x left-right location, longitude
+	 * @param y up-down location, latitude
+	 * @param distance the maximal distance returned objects can be away from x/y
+	 * @param executor is executed on the fitting objects
+	 * @return the count of objects found within distance to x/y
+	 */
+	public int execute(Rect bounds, final Executor executor) {
+		if (bounds == null) bounds = this.top.getBounds();
+		return this.top.execute(bounds, executor);
+	}
+	public int execute(final double minX, final double minY, final double maxX, double maxY, final Executor executor) {
+		return this.top.execute(new Rect(minX, minY,maxX, maxY), executor);
+	}
+
+ /**
    * Returns the number of entries in this QuadTree.
    *
    * @return the number of entries in this QuadTree.
@@ -137,6 +160,17 @@ public class QuadTree<T> {
       return this.size;
   }
 
+  /**
+   * Sets a new top node in case the extremities from the c'tor are not 
+   * good anymore, it also clear the QuadTree
+   * @param minX The smallest x coordinate expected
+   * @param minY The smallest y coordinate expected
+   * @param maxX The largest x coordinate expected
+   * @param maxY The largest y coordinate expected
+  */
+  protected void setTopNode(final double minX, final double minY, final double maxX, final double maxY) {
+	  this.top = new Node(minX, minY, maxX, maxY); 
+  }
 
   /* Support for values() and an iterator over the values. */
   /* This is similar to TreeMap.java and AbstractMap.java */
@@ -259,7 +293,7 @@ public class QuadTree<T> {
 	}
 
 
-	private class Rect {
+	public class Rect  implements Serializable{
 		public final double minX;
 		public final double minY;
 		public final double maxX;
@@ -302,9 +336,54 @@ public class QuadTree<T> {
 
 			return Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 		}
+		   /**
+	    * Copied from Rectangle2D *
+	     * Tests if a specified coordinate is inside the boundary of this
+	     * <code>Rect</code>.
+	     * @param x,&nbsp;y the coordinates to test
+	     * @return <code>true</code> if the specified coordinates are
+	     * inside the boundary of this <code>Rect</code>;
+	     * <code>false</code> otherwise.
+	     * @since 1.2
+	     */
+	    public boolean contains(double x, double y) {
+		return (x >= minX &&
+			y >= minY &&
+			x < maxX &&
+			y < maxY);
+	    }
+
+	    /**
+	    * Copied from Rectangle2D *
+	     * Tests if the interior of this <code>Rect</code> 
+	     * intersects the interior of a specified set of rectangular 
+	     * coordinates.
+	     * @param x,&nbsp;y the coordinates of the upper left corner
+	     * of the specified set of rectangular coordinates
+	     * @param w the width of the specified set of rectangular
+	     * coordinates
+	     * @param h the height of the specified set of rectangular
+	     * coordinates
+	     * @return <code>true</code> if this <code>Rect</code>
+	     * intersects the interior of a specified set of rectangular
+	     * coordinates; <code>false</code> otherwise.
+	     * @since 1.2
+	     */
+	    public boolean intersects(Rect other) {
+		if ((maxX-minX) <= 0 || (maxY-minY) <= 0) {
+		    return false;
+		}
+		double x0 = minX;
+		double y0 = minY;
+		return (other.maxX > minX &&
+			other.maxY > minY &&
+			other.minX < maxX &&
+			other.minY < maxY);
+	    }
+
 	}
 
-	private class Leaf {
+	private class Leaf  implements Serializable{
 		final public double x;
 		final public double y;
 		final public ArrayList<T> values;
@@ -317,7 +396,7 @@ public class QuadTree<T> {
 		}
 	}
 
-	private class Node {
+	protected class Node  implements Serializable{
 
 		private Leaf leaf = null;
 
@@ -452,6 +531,58 @@ public class QuadTree<T> {
 			return values;
 		}
 
+		private Collection<T> get(final Rect bounds, final Collection<T> values) {
+			if (this.hasChilds) {
+				if (this.northwest.bounds.intersects(bounds)) {
+					this.northwest.get(bounds, values);
+				}
+				if (this.northeast.bounds.intersects(bounds)) {
+					this.northeast.get(bounds, values);
+				}
+				if (this.southeast.bounds.intersects(bounds)) {
+					this.southeast.get(bounds, values);
+				}
+				if (this.southwest.bounds.intersects(bounds)) {
+					this.southwest.get(bounds, values);
+				}
+				return values;
+			}
+			// no more childs, so we must contain the closest object
+			if (this.leaf != null && this.leaf.values.size() > 0) {
+				if (bounds.contains(this.leaf.x, this.leaf.y)) {
+					values.addAll(this.leaf.values);
+				}
+			}
+			return values;
+		}
+
+		private int execute(final Rect globalBounds, final Executor executor) {
+			int count = 0;
+			if (this.hasChilds) {
+				if (this.northwest.bounds.intersects(globalBounds)) {
+					count += this.northwest.execute(globalBounds, executor);
+				}
+				if (this.northeast.bounds.intersects(globalBounds)) {
+					count += this.northeast.execute(globalBounds, executor);
+				}
+				if (this.southeast.bounds.intersects(globalBounds)) {
+					count += this.southeast.execute(globalBounds, executor);
+				}
+				if (this.southwest.bounds.intersects(globalBounds)) {
+					count += this.southwest.execute(globalBounds, executor);
+				}
+				return count;
+			}
+			// no more childs, so we must contain the closest object
+			if (this.leaf != null && this.leaf.values.size() > 0) {
+				if (globalBounds.contains(this.leaf.x, this.leaf.y)) {
+					count += this.leaf.values.size();
+					for (T object : this.leaf.values) executor.execute(this.leaf.x, this.leaf.y, object);
+				}
+			}
+			return count;
+		}
+
 		private void split() {
 			this.northwest = new Node(this.bounds.minX, this.bounds.centerY, this.bounds.centerX, this.bounds.maxY);
 			this.northeast = new Node(this.bounds.centerX, this.bounds.centerY, this.bounds.maxX, this.bounds.maxY);
@@ -520,6 +651,13 @@ public class QuadTree<T> {
 			return nextLeaf.value;
 		}
 
+		public Rect getBounds() {
+			return bounds;
+		}
+
 	}
 
+	public abstract class Executor {
+		abstract public void execute(double x, double y, T object);
+	}
 }

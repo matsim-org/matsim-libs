@@ -45,6 +45,8 @@ import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.world.World;
 
+import playground.david.vis.data.OTFNetWriterFactory;
+import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.interfaces.OTFAgentHandler;
 import playground.david.vis.interfaces.OTFNetHandler;
 import playground.david.vis.interfaces.OTFServerRemote;
@@ -304,5 +306,21 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 		eventFile = "../../tmp/studies/berlin-wip/run125/200.events.txt.gz";
 		OTFNetEventFileHandler test = new OTFNetEventFileHandler(10, net,"output/ds_fromEvent.vis" );
 		test.run(eventFile);
+	}
+
+	public OTFServerQuad getQuad(OTFNetWriterFactory writers)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public byte[] getQuadConstStateBuffer() throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public byte[] getQuadDynStateBuffer() throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -28,6 +28,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
 import org.matsim.mobsim.QueueLink;
@@ -597,23 +599,105 @@ public class OTFVisNet implements Serializable, DisplayableNetI {
 			}
     }
 
+    /*
+     * Here i try using a bitmask. Takes 5ms to build for 27k net. 1ms to read. Is about 3.5K
+     * this is the best solution
+     */
+    BitSet actualMask =new BitSet(links.values().size());
+	BitSet newMask = new BitSet(links.values().size());
+    
+    public void buildWriteMask() {
+    	int count = 0;
+		Gbl.startMeasurement();
+
+		newMask.clear();
+		
+		for (OTFVisNet.Link link : links.values())
+			if (link != null) {
+				newMask.set(count++, link.getSrc().hasDrivingCars());
+			}
+		boolean test = false;
+		while (count > 0 ) 
+		{
+			test =	newMask.get(--count);
+		}
+		// if one links has been alive last Tick but is not alive now we need to trasfer the new "dead" state one time
+		// so for transfering we have to pimp the mask some more
+		BitSet xorMask = (BitSet)newMask.clone();
+		xorMask.xor(actualMask); // gives us a true for all states that have changed
+		xorMask.and(actualMask); // we want only changes from true to false
+		actualMask = (BitSet)newMask.clone(); // save actualMask without EXTRA links for next timestep
+		// Build mask that could be used for transfering things, i.e. add the true's from xorMask
+		newMask.or(xorMask);
+		
+		Gbl.printElapsedTime();
+
+		System.out.println("...for buildin bitfield with link count " + links.values().size() + " and mask size of " + newMask.size()/8);
+    }
+    
+    /* 
+     * this was a try to send "chunks" of enables and disabled links so
+     * for a disabled link-chunk i only have to send the number of disabled chunks and then I am finished
+     * unfortunately it turns out that on a 27K link network for morning peak I get roughly 8K chunks, which means
+     * i have to transfer at least one Status byte and 8K*4byte (for integer) of size information for every second
+     * That is 16k Byte, still less than 27K but not so much concerning the increased level of complexity
+     * I save for now sending one float (4byte) value per disabled link == 20K*4 =    
+     */
+    public void buildWriteMaskOLD() {
+		int count = 0;
+		int disabled = 0;
+		
+		Gbl.startMeasurement();
+
+		List<Boolean> statusList = new LinkedList<Boolean>();
+		List<Integer> countList = new LinkedList<Integer>();
+		
+		boolean stateActive = false; 
+		for (OTFVisNet.Link link : links.values())
+			if (link != null) {
+				if (count == 0) stateActive = link.getSrc().hasDrivingCars();
+				// Check if activity status has changed
+				if(link.getSrc().hasDrivingCars() != stateActive){
+//					System.out.println("Count activition cluster = " + count + " are " + stateActive);
+					statusList.add(stateActive);
+					countList.add(count);
+					count = 1;
+					stateActive = link.getSrc().hasDrivingCars();
+					if(stateActive == false) disabled++;
+				} else {
+					count++;
+					if(stateActive == false) disabled++;
+				}
+			}
+   
+		Gbl.printElapsedTime();
+
+		System.out.println("Count activition clusters = " + countList.size() + " link count " + links.values().size() +" numer of disabled " + disabled);
+}
+    
     public void writeMyself(OTFNetHandler newHandler, DataOutputStream out) throws IOException {
     	if (newHandler != null) this.handler = newHandler;
 
 		OTFNodeHandler<QueueNode> nodeHandler = handler.getNodeHandler();
 		OTFLinkHandler<QueueLink> linkHandler = handler.getLinkHandler();
 
-		if( nodeHandler != null)
-			for (OTFVisNet.Node node : nodes.values())
-			if (node != null) {
-				nodeHandler.writeNode(node.getSrc(), out);
+		if( nodeHandler != null) {
+			for (OTFVisNet.Node node : nodes.values()) {
+				if (node != null) {
+					nodeHandler.writeNode(node.getSrc(), out);
+				}
 			}
+		}
 
-		if( linkHandler != null)
-		for (OTFVisNet.Link link : links.values())
-			if (link != null) {
-				linkHandler.writeLink(link.getSrc(), out);
+		buildWriteMask();
+		
+		if( linkHandler != null) {
+			for (OTFVisNet.Link link : links.values()) {
+				if (link != null) {
+					linkHandler.writeLink(link.getSrc(), out);
+				}
 			}
+		}
 
 		writeAgents(out);
 

@@ -21,7 +21,6 @@
 package playground.david.vis;
 
 import java.io.IOException;
-import java.util.Date;
 
 import org.matsim.config.Config;
 import org.matsim.events.Events;
@@ -33,6 +32,8 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
+import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 
 /**
@@ -45,9 +46,9 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	
 	@Override
 	protected void prepareSim() {
-		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
-		if (otfwriter == null) otfwriter = new OTFNetFileHandler(10,network,"OTFNetfile.vis");
-		otfwriter.open();
+		//myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
+		//if (otfwriter == null) otfwriter = new OTFNetFileHandler(10,network,"output/OTFNetfileB2.mvi");
+		if(otfwriter != null) otfwriter.open();
 		
 		super.prepareSim();
 		
@@ -58,12 +59,12 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	
 	@Override
 	protected void cleanupSim() {
-		myOTFServer.cleanup();
+		if(myOTFServer != null) myOTFServer.cleanup();
 		myOTFServer = null;
 		super.cleanupSim();
 
 		try {
-				otfwriter.close();
+			if(otfwriter != null) otfwriter.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -76,12 +77,12 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		super.afterSimStep(time);
 		
 		try {
-			otfwriter.dump((int)time);
+			if(otfwriter != null) otfwriter.dump((int)time);
 		} catch (IOException e) {
 			Gbl.errorMsg("QueueSimulation.dumpWriters(): Unable to dump state.");
 		}
 		
-		int status = myOTFServer.getStatus(time);
+		//int status = myOTFServer.getStatus(time);
 		
 	}
 
@@ -92,27 +93,34 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 	
 	public static void main(String[] args) {		
-//		String netFileName = "..\\..\\tmp\\studies\\berlin-wip\\network\\wip_net.xml";
-//		String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\kutter010Jakob-Kaiser-RingONLY.plans.v4.xml";
-//		String popFileName = "../berlin-wip/kutter_population/kutter001car5.debug.router_wip.plans.xml";
 
-//		String netFileName = "../berlin-wip/network/wip_net.xml";
-//		String popFileName = "..\\..\\..\\vsp-cvs\\studies\\berlin-wip\\synpop-2006-04\\kutter_population\\kutter010car_bln.router_wip.plans.v4.xml";
-//		String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\kutter010car_bln.xy.plans.v4.xml";
+		String studiesRoot = "../";
+		String localDtdBase = "../matsimJ/dtd/";
 
-		
-//		String netFileName = "../../tmp/network.xml.gz";
-		
-		String netFileName = "../../tmp/studies/berlin-wip/network/wip_net.xml";
-		String popFileName = "../../tmp/studies/berlin-wip/kutter_population/kutter001car5.debug.router_wip.plans.xml";
-				
-		Gbl.createConfig(args);
-		Gbl.startMeasurement();
-		Config config = Gbl.getConfig();
-		config.setParam("global", "localDTDBase", "dtd/");
-		
-		World world = Gbl.getWorld();
-		
+
+		String netFileName = studiesRoot + "berlin-wip/network/wip_net.xml";
+		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter001car_hwh.routes_wip.plans.xml.gz"; // 15931 agents
+//		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml.gz"; // 160171 agents
+//		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car.routes_wip.plans.xml.gz";  // 299394 agents
+		String worldFileName = studiesRoot + "berlin-wip/synpop-2006-04/world_TVZ.xml";
+
+		Config config = Gbl.createConfig(args);
+
+		config.global().setLocalDtdBase(localDtdBase);
+
+		if(args.length >= 1) {
+			netFileName = config.network().getInputFile();
+			popFileName = config.plans().getInputFile();
+			worldFileName = config.world().getInputFile();
+		}
+
+		World world = Gbl.createWorld();
+
+		if (worldFileName != null) {
+			MatsimWorldReader world_parser = new MatsimWorldReader(Gbl.getWorld());
+			world_parser.readFile(worldFileName);
+		}
+
 		QueueNetworkLayer net = new QueueNetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
@@ -127,29 +135,26 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		world.setEvents(events);
 		
 		config.setParam(Simulation.SIMULATION, Simulation.STARTTIME, "00:00:00");
-		config.setParam(Simulation.SIMULATION, Simulation.ENDTIME, "10:02:00");
+		config.setParam(Simulation.SIMULATION, Simulation.ENDTIME, "07:02:00");
+		config.network().setInputFile(netFileName);
+
+		config.simulation().setSnapshotFormat("netvis");
+		config.simulation().setSnapshotPeriod(10);
+		config.simulation().setSnapshotFile("./output/remove_thisB");
+
 
 		OnTheFlyQueueSim sim = new OnTheFlyQueueSim(net, population, events);
+
 		
 		sim.run();
 		
 		Gbl.printElapsedTime();		
+
+		String[] visargs = {"./output/remove_thisB"};
+		NetVis.main(visargs);
+
 	}
 	
-	protected static final void printNote(String header, String action) {
-		if (header != "") {
-			System.out.println();
-			System.out.println("===============================================================");
-			System.out.println("== " + header);
-			System.out.println("===============================================================");
-		}
-		if (action != "") {
-			System.out.println("== " + action + " at " + (new Date()) );
-		}
-		if (header != "") {
-			System.out.println();
-		}
-	}
 
 	public void setOtfwriter(OTFNetFileHandler otfwriter) {
 		this.otfwriter = otfwriter;

@@ -22,9 +22,10 @@ package playground.david;
 
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.vis.netvis.NetVis;
 
 
-public class OneSimRunWithConfig extends Controler {
+public class OneSimRunWithConfig {
 
 	/**
 	 * @param args
@@ -32,26 +33,20 @@ public class OneSimRunWithConfig extends Controler {
 	public static void main(String[] args) {
 
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./test/dstrippgen/myconfig.xml"});
+			Gbl.createConfig(new String[] {"./examples/two-routes/config.xml"});
 		} else {
 			Gbl.createConfig(args) ;
 		}
 				
-		final Controler controler = new OneSimRunWithConfig();
+		final Controler controler = new Controler();
 		controler.setOverwriteFiles(true) ;
 		
-		// this comes directly from marcel's master controler
-		Runtime run = Runtime.getRuntime();
-		run.addShutdownHook( new Thread()
-				{
-					@Override
-					public void run()
-					{
-						controler.shutdown(true);
-					}
-				} );
 
 		controler.run(null);
+		
+		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
+		NetVis.main(visargs);
+
 		
 	}
 

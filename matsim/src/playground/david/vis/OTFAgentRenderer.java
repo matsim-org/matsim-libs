@@ -30,10 +30,6 @@ import java.util.List;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
-import org.matsim.utils.vis.netvis.VisConfig;
-import org.matsim.utils.vis.netvis.gui.ControlToolbar;
-import org.matsim.utils.vis.netvis.gui.NetJComponent;
-import org.matsim.utils.vis.netvis.renderers.RendererA;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 import org.matsim.utils.vis.netvis.visNet.DisplayLink;
 
@@ -55,28 +51,26 @@ class OTFAgentRenderer extends RendererA {
 
 	private Plan plan = null;
 
-	OTFAgentRenderer(final VisConfig visConfig, final OTFVisNet network) {
-		super(visConfig);
+	OTFAgentRenderer(OTFVisNet network) {
+		super();
 		this.network =  network;
-		this.laneWidth = DisplayLink.LANE_WIDTH * visConfig.getLinkWidthFactor();
+		this.laneWidth = DisplayLink.LANE_WIDTH ;
 	}
 
 	// -------------------- RENDERING --------------------
 	static int ii= 0;
 	@Override
-	synchronized public void myRendering(final Graphics2D display,
-			final AffineTransform boxTransform) {
-		String test = getVisConfig().get("ShowAgents");
-		boolean drawAgents = test == null || test.equals("true");
-		this.laneWidth = DisplayLink.LANE_WIDTH
-		* getVisConfig().getLinkWidthFactor();
+	synchronized public void myRendering(Graphics2D display,
+			AffineTransform boxTransform) {
+		boolean drawAgents = true;
+		this.laneWidth = DisplayLink.LANE_WIDTH;
 
 		NetJComponent comp = getNetJComponent();
 
 		AffineTransform originalTransform = display.getTransform();
-		 final double agentWidth = this.laneWidth *0.9;
+		 final double agentWidth = laneWidth *0.9;
 
-		display.setStroke(new BasicStroke(Math.round(0.5 * this.laneWidth)));
+		display.setStroke(new BasicStroke(Math.round(0.5 * laneWidth)));
 
 		AffineTransform myTransform = new AffineTransform(originalTransform);
 		myTransform.concatenate(boxTransform);
@@ -84,13 +78,13 @@ class OTFAgentRenderer extends RendererA {
 		AffineTransform myTextTransform = new AffineTransform(myTransform);
 		myTextTransform.scale(1,-1);
 
-		if (this.plan != null) {
-			List actslegs = this.plan.getActsLegs();
+		if (plan != null) {
+			List actslegs = plan.getActsLegs();
 			for (int i= 0; i< actslegs.size(); i++) {
 				if (i%2 == 0) {
 					// handle Act
 					Act act = (Act)actslegs.get(i);
-					OTFVisNet.Link link = this.network.getLink(act.getLinkId().toString());
+					OTFVisNet.Link link = network.getLink(act.getLinkId().toString());
 					display.setColor(Color.RED);
 					OTFVisNet.Node node = link.getFromNode();
 					OTFVisNet.Node lastNode = link.getToNode();
@@ -107,7 +101,7 @@ class OTFAgentRenderer extends RendererA {
 					OTFVisNet.Node lastNode = null;
 					for (int j = 1; j < route.size()-1; j++) {
 						String id = (String) route.get(j);
-						OTFVisNet.Node node = this.network.getNode(id);
+						OTFVisNet.Node node = network.getNode(id);
 						// Draw circle around node
 						display.setColor(Color.BLUE);
 						int circleWidth = (int)(2.* agentWidth);
@@ -125,17 +119,12 @@ class OTFAgentRenderer extends RendererA {
 	}
 
 
-	ControlToolbar toolbar = null;
-
-	public void setControlToolbar(final ControlToolbar toolbar) {
-		this.toolbar = toolbar;
-	}
 
 	public Plan getPlan() {
-		return this.plan;
+		return plan;
 	}
 
-	public void setPlan(final Plan plan) {
+	public void setPlan(Plan plan) {
 		this.plan = plan;
 	}
 

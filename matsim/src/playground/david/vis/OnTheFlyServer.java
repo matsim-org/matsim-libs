@@ -36,6 +36,8 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 
+import playground.david.vis.data.OTFNetWriterFactory;
+import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.interfaces.OTFNetHandler;
 import playground.david.vis.interfaces.OTFServerRemote;
 
@@ -57,6 +59,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 	private int localTime = 0;
 
 	private OTFVisNet net = null;
+	private OTFServerQuad quad = null;
+	
 	private OTFNetHandler handler = null;
 	private Plans pop = null;
 	public ByteArrayOutputStream out = null;
@@ -68,6 +72,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 		//setDaemon(true);
 		UserReadableName = ReadableName;
 		net = new OTFVisNet(network);
+		quad = new OTFServerQuad(network);
 		out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
 	}
@@ -228,5 +233,30 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 		if (id.length()==0)return null;
 		Plan plan = pop.getPerson(id).getSelectedPlan();
 		return plan;
+	}
+
+	public OTFServerQuad getQuad(OTFNetWriterFactory writers)
+			throws RemoteException {
+		quad.fillQuadTree(writers);
+		return quad;
+	}
+
+	public byte[] getQuadConstStateBuffer() throws RemoteException {
+		out.reset();
+		quad.writeConstData(new DataOutputStream(out));
+		byte [] result;
+		synchronized (out) {
+			result = out.toByteArray();
+		}
+		return result;
+	}	
+	public byte[] getQuadDynStateBuffer() throws RemoteException {
+		out.reset();
+		quad.writeDynData(new DataOutputStream(out));
+		byte [] result;
+		synchronized (out) {
+			result = out.toByteArray();
+		}
+		return result;
 	}
 }

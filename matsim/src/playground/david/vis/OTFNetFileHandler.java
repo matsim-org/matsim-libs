@@ -20,6 +20,8 @@
 
 package playground.david.vis;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -27,24 +29,31 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Plan;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
 
+import playground.david.vis.data.OTFNetWriterFactory;
+import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.interfaces.OTFNetHandler;
 import playground.david.vis.interfaces.OTFServerRemote;
 
 public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 
-	private FileOutputStream outStream = null;
+	private static final int BUFFERSIZE = 100000000;
+	private OutputStream outStream = null;
 	private DataOutputStream outFile;
-	private String fileName;
+	private final String fileName;
 
 	private OTFVisNet net = null;
 	public ByteArrayOutputStream out = null;
@@ -91,9 +100,16 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 	public void open() {
 		// open file
 		try {
-			outStream = new FileOutputStream(fileName);
+			if (fileName.endsWith(".gz")) {
+				outStream = new GZIPOutputStream (new FileOutputStream(fileName),BUFFERSIZE);
+			}else {
+				outStream = new BufferedOutputStream(new FileOutputStream(fileName),BUFFERSIZE);
+			}
 			outFile = new DataOutputStream(outStream);
 		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -112,15 +128,23 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 
 
 	// IN
-	private FileInputStream inStream = null;
+	private InputStream inStream = null;
 	private DataInputStream inFile;
 
 	public void readNet() {
 		// open file
 		try {
-			inStream = new FileInputStream(fileName);
+			if (fileName.endsWith(".gz")) {
+				GZIPInputStream gzInStream =  new GZIPInputStream(new BufferedInputStream(new FileInputStream(fileName), BUFFERSIZE));
+				inStream = gzInStream;
+			} else {
+				inStream = new FileInputStream(fileName);
+			}
 			inFile = new DataInputStream(inStream);
 		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -172,9 +196,16 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 			size = inFile.readInt();
 
 			result = new byte[size];
-			int read = inFile.read(result);
+			int offset = 0;
+			int remain = size;
+			int read = 0;
+			while ((remain > 0) && (read != -1)){
+				read = inFile.read(result,offset,remain);
+				remain -= read;
+				offset +=read;
+			}
 
-			if (read != size) throw new IOException("READ SIZE did not fit! File corrupted!");
+			if (offset != size) throw new IOException("READ SIZE did not fit! File corrupted!");
 			timeSteps.put(nextTime, filepos);
 			filepos += read;
 
@@ -195,6 +226,19 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 	}
 
 	public void step() throws RemoteException {
+	}
+
+	public OTFServerQuad getQuad(OTFNetWriterFactory writers)
+			throws RemoteException {
+		return null;
+	}
+
+	public byte[] getQuadConstStateBuffer() throws RemoteException {
+		return null;
+	}
+
+	public byte[] getQuadDynStateBuffer() throws RemoteException {
+		return null;
 	}
 
 }

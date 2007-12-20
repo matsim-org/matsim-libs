@@ -43,7 +43,7 @@ public class OnTheFlyClientFile extends Thread {
 	@Override
 	public void run() {
 		try {
-					OTFServerRemote host = new OTFNetFileHandler(10,null,"OTFNetfile.vis");
+					OTFServerRemote host = new OTFNetFileHandler(10,null,"OTFNetfile.vis.gz");
 					host.pause();
 					Gbl.startMeasurement();
 

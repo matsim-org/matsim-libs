@@ -55,11 +55,6 @@ import javax.swing.event.MouseInputAdapter;
 
 import org.matsim.plans.Plan;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.netvis.VisConfig;
-import org.matsim.utils.vis.netvis.gui.NetJComponent;
-import org.matsim.utils.vis.netvis.gui.NetVisScrollPane;
-import org.matsim.utils.vis.netvis.renderers.BackgroundRenderer;
-import org.matsim.utils.vis.netvis.renderers.RendererA;
 
 import playground.david.vis.interfaces.OTFServerRemote;
 
@@ -68,21 +63,34 @@ public class OTFGUI {
 
 	public static interface NetVisResizable {
 		public void scaleNetwork(float scale);
+		public float getScale();
 		public void repaint();
 	}
 
 	class myNetVisScrollPane extends NetVisScrollPane implements NetVisResizable {
 
+		private float scale = 1.f;
 		public myNetVisScrollPane(NetJComponent networkComponent) {
 			super(networkComponent);
 			// TODO Auto-generated constructor stub
 		}
 
+		@Override
+		public void scaleNetwork(float scale){
+			this.scale = scale;
+			super.scaleNetwork(scale);
+		}
+		
+		public float getScale() {
+			return scale;
+		}
+
 	}
 
-	private JFrame vizFrame;
-	private ControlToolbar buttonComponent;
-	private NetJComponent networkComponent;
+	
+	private final JFrame vizFrame;
+	private final ControlToolbar buttonComponent;
+	private final NetJComponent networkComponent;
 	private myNetVisScrollPane networkScrollPane = null;
 	OTFVisNet visnet = null;
 	OTFServerRemote host = null;
@@ -99,22 +107,20 @@ public class OTFGUI {
 
 		// ----- 2. create control bar -----
 
-		VisConfig visConfig = VisConfig.newDefaultConfig();
-		visConfig.set(VisConfig.LINK_WIDTH_FACTOR, "15");
 
-		RendererA backgroundRenderer = new BackgroundRenderer(visConfig);
+		RendererA backgroundRenderer = new BackgroundRenderer();
 //		LinkSetRendererVehiclesOnly linkSetRenderer = new LinkSetRendererVehiclesOnly<OTFVisNet>(visConfig, visnet);
-		LinkSetRendererVehiclesOnly<OTFVisNet> linkSetRenderer = new LinkSetRendererVehiclesOnly<OTFVisNet>(visConfig, visnet);
+		OTFLinkSetRendererVehiclesOnly linkSetRenderer = new OTFLinkSetRendererVehiclesOnly( visnet);
 		linkSetRenderer.setControlToolbar(null);
 		linkSetRenderer.append(backgroundRenderer);
-		agentRenderer = new OTFAgentRenderer(visConfig, visnet);
+		agentRenderer = new OTFAgentRenderer(visnet);
 		agentRenderer.append(linkSetRenderer);
 
-		networkComponent = new NetJComponent(visnet, agentRenderer, visConfig);
+		networkComponent = new NetJComponent(visnet, agentRenderer);
 		linkSetRenderer.setTargetComponent(networkComponent);
 		agentRenderer.setTargetComponent(networkComponent);
 		networkScrollPane = new myNetVisScrollPane(networkComponent);
-		buttonComponent = new ControlToolbar(host, visnet, networkScrollPane, visConfig);
+		buttonComponent = new ControlToolbar(host, visnet, networkScrollPane);
 		vizFrame.getContentPane().add(buttonComponent, BorderLayout.NORTH);
 		vizFrame.getContentPane().add(networkScrollPane, BorderLayout.CENTER);
 
@@ -161,9 +167,8 @@ public class OTFGUI {
 				updateSize(e);
 				if ((currentRect.getHeight() > 10)
 						&& (currentRect.getWidth() > 10)) {
-					float scale =  buttonComponent.getScale();
+					float scale =  networkScrollPane.getScale();
 					scale = networkScrollPane.scaleNetwork(currentRect,scale);
-					buttonComponent.setScale(scale);
 				} else {
 					// try to find agent under mouse
 					// calc mouse pos to component pos
@@ -220,11 +225,9 @@ public class OTFGUI {
 		// -------------------- MEMBER VARIABLES --------------------
 
 		//private DisplayableNetI network;
-		private MovieTimer movieTimer = new MovieTimer();
+		private final MovieTimer movieTimer = new MovieTimer();
 		private JButton playButton;
 		private JFormattedTextField timeField;
-		private float scale = 1;
-		private VisConfig visConfig;
 		private int simTime = 0;
 
 		private NetVisResizable networkScrollPane = null;
@@ -235,10 +238,9 @@ public class OTFGUI {
 		// -------------------- CONSTRUCTION --------------------
 
 		public ControlToolbar(OTFServerRemote host, OTFVisNet network,
-				NetVisResizable networkScrollPane, VisConfig visConfig) {
+				NetVisResizable networkScrollPane) {
 			super();
 			this.visnet = network;
-			this.visConfig = visConfig;
 			this.host = host;
 			this.networkScrollPane = networkScrollPane;
 
@@ -269,7 +271,7 @@ public class OTFGUI {
 			Integer min = new Integer(0);
 			Integer max = new Integer(200);
 			Integer step = new Integer(1);
-			SpinnerNumberModel model = new SpinnerNumberModel(new Integer(visConfig.getLinkWidthFactor()), min, max, step);
+			SpinnerNumberModel model = new SpinnerNumberModel(new Integer(155), min, max, step);
 			JSpinner spin = addLabeledSpinner(this, "Lanewidth", model);
 			spin.setMaximumSize(new Dimension(75,30));
 			spin.addChangeListener(this);
@@ -335,12 +337,12 @@ public class OTFGUI {
 		}
 
 		private void pressed_ZOOM_OUT() {
-			scale /= 1.42;
+			float scale = networkScrollPane.getScale() / 1.42f;
 			networkScrollPane.scaleNetwork(scale);
 		}
 
 		private void pressed_ZOOM_IN() {
-			scale *= 1.42;
+			float scale = networkScrollPane.getScale() * 1.42f;
 			networkScrollPane.scaleNetwork(scale);
 		}
 
@@ -390,20 +392,6 @@ public class OTFGUI {
 			networkScrollPane.repaint();
 		}
 
-		/**
-		 * @return Returns the scale.
-		 */
-		public float getScale() {
-			return scale;
-		}
-
-		/**
-		 * @param scale
-		 *            The scale to set.
-		 */
-		public void setScale(float scale) {
-			this.scale = scale;
-		}
 
 		protected JSpinner addLabeledSpinner(Container c,   String label,  SpinnerModel model)
 		{
@@ -423,7 +411,7 @@ public class OTFGUI {
 
 			JCheckBox linkLabelBox = new JCheckBox(TOGGLE_LINK_LABELS);
 			linkLabelBox.setMnemonic(KeyEvent.VK_L);
-			linkLabelBox.setSelected(visConfig.showLinkLabels());
+			linkLabelBox.setSelected(true);
 			linkLabelBox.addItemListener(this);
 			add(linkLabelBox);
 		}
@@ -432,15 +420,15 @@ public class OTFGUI {
 			if (source.getText().equals(TOGGLE_AGENTS)) {
 				// toggle Labels to
 				if (e.getStateChange() == ItemEvent.DESELECTED) {
-					visConfig.set("ShowAgents", "false");
+					//visConfig.set("ShowAgents", "false");
 				} else {
-					visConfig.set("ShowAgents", "true");
+					//visConfig.set("ShowAgents", "true");
 				}
 			} else if (source.getText().equals(TOGGLE_LINK_LABELS)) {
 				if (e.getStateChange() == ItemEvent.DESELECTED) {
-					visConfig.set(VisConfig.SHOW_LINK_LABELS, "false");
+					//visConfig.set(VisConfig.SHOW_LINK_LABELS, "false");
 				} else {
-					visConfig.set(VisConfig.SHOW_LINK_LABELS, "true");
+					//visConfig.set(VisConfig.SHOW_LINK_LABELS, "true");
 				}
 			}
 			repaint();
@@ -450,7 +438,8 @@ public class OTFGUI {
 		public void stateChanged(ChangeEvent e) {
 			JSpinner spinner = (JSpinner)e.getSource();
 			int i = ((SpinnerNumberModel)spinner.getModel()).getNumber().intValue();
-			visConfig.set(VisConfig.LINK_WIDTH_FACTOR, Integer.toString(i));
+			
+			//visConfig.set(VisConfig.LINK_WIDTH_FACTOR, Integer.toString(i));
 			repaint();
 			networkScrollPane.repaint();
 		}

@@ -53,6 +53,8 @@ public class OnTheFlyQueueSimSWISS {
 		net = new QueueNetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
+
+		Gbl.printElapsedTime();		
 		
 		population = new Plans();
 		world.setPopulation(population);
@@ -64,7 +66,7 @@ public class OnTheFlyQueueSimSWISS {
 		config.setParam(Simulation.SIMULATION, Simulation.ENDTIME, "00:00:01");
 
 		sim = new OnTheFlyQueueSim(net, population, events);
-		sim.setOtfwriter(new OTFNetFileHandler(10,net,"OTFNetfileSCHWEIZ.vis"));
+		sim.setOtfwriter(new OTFNetFileHandler(10,net,"OTFNetfileSCHWEIZ.vis.gz"));
 		
 
 		sim.run();
