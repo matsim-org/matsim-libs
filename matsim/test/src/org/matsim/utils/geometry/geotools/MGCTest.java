@@ -1,6 +1,8 @@
-package org.matsim.utils.geometry;
+package org.matsim.utils.geometry.geotools;
 
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.shared.Coord;
 
 import com.vividsolutions.jts.geom.Coordinate;

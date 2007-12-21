@@ -1,5 +1,7 @@
 package org.matsim.utils.geometry;
 
+
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -10,7 +12,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTest(org.matsim.utils.geometry.shared.AllTests.suite());
 		suite.addTest(org.matsim.utils.geometry.transformations.AllTests.suite());
-		suite.addTestSuite(MGCTest.class);
+		suite.addTest(org.matsim.utils.geometry.geotools.AllTests.suite());
 		//$JUnit-END$
 		return suite;
 	}
