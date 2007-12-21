@@ -148,7 +148,7 @@ public class Controler {
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
-	private static final String logProperties = "log4j.properties";
+	private static final String logProperties = "log4j.xml";
 
 	private boolean createLegHistogramPNG = true;
 
