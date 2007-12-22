@@ -158,6 +158,7 @@ compile:
 	@echo "------------------------------------------------------------"
 	-mkdir $(CLASSPATH)
 	cp $(SOURCEPATH)/log4j.properties $(CLASSPATH)/log4j.properties
+	cp $(SOURCEPATH)/log4j.xml $(CLASSPATH)/log4j.xml
 	$(JAVAC) $(SOURCEPATH)/$(MAINCLASS).java -d $(CLASSPATH)
 	@echo "------------------------------------------------------------"
 
