@@ -41,9 +41,6 @@ import java.util.Iterator;
  */
 public class QuadTree<T> implements Serializable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/** The top node or root of the tree */
@@ -135,11 +132,9 @@ public class QuadTree<T> implements Serializable{
 	}
 
 	/**
-	 * Executes executor on all objects within a certain distance around x/y
+	 * Executes executor on all objects within a certain boundary
 	 *
-	 * @param x left-right location, longitude
-	 * @param y up-down location, latitude
-	 * @param distance the maximal distance returned objects can be away from x/y
+	 * @param bounds The boundary in which the executor will be applied.
 	 * @param executor is executed on the fitting objects
 	 * @return the count of objects found within distance to x/y
 	 */
@@ -147,7 +142,18 @@ public class QuadTree<T> implements Serializable{
 		if (bounds == null) bounds = this.top.getBounds();
 		return this.top.execute(bounds, executor);
 	}
-	public int execute(final double minX, final double minY, final double maxX, double maxY, final Executor executor) {
+
+	/**
+	 * Executes executor on all objects within the rectangle (minX,minY):(maxX,maxY)
+	 *
+	 * @param minX The minimum left-right location, longitude
+	 * @param minY The minimum up-down location, latitude
+	 * @param maxX The maximum left-right location, longitude
+	 * @param maxY The maximum up-down location, latitude
+	 * @param executor is executed on the fitting objects
+	 * @return the count of objects found within distance to x/y
+	 */
+	public int execute(final double minX, final double minY, final double maxX, final double maxY, final Executor executor) {
 		return this.top.execute(new Rect(minX, minY,maxX, maxY), executor);
 	}
 
@@ -161,7 +167,7 @@ public class QuadTree<T> implements Serializable{
   }
 
   /**
-   * Sets a new top node in case the extremities from the c'tor are not 
+   * Sets a new top node in case the extremities from the c'tor are not
    * good anymore, it also clear the QuadTree
    * @param minX The smallest x coordinate expected
    * @param minY The smallest y coordinate expected
@@ -169,7 +175,7 @@ public class QuadTree<T> implements Serializable{
    * @param maxY The largest y coordinate expected
   */
   protected void setTopNode(final double minX, final double minY, final double maxX, final double maxY) {
-	  this.top = new Node(minX, minY, maxX, maxY); 
+	  this.top = new Node(minX, minY, maxX, maxY);
   }
 
   /* Support for values() and an iterator over the values. */
@@ -293,7 +299,7 @@ public class QuadTree<T> implements Serializable{
 	}
 
 
-	public class Rect  implements Serializable{
+	public class Rect implements Serializable {
 		public final double minX;
 		public final double minY;
 		public final double maxX;
@@ -336,54 +342,42 @@ public class QuadTree<T> implements Serializable{
 
 			return Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 		}
-		   /**
-	    * Copied from Rectangle2D *
-	     * Tests if a specified coordinate is inside the boundary of this
-	     * <code>Rect</code>.
-	     * @param x,&nbsp;y the coordinates to test
-	     * @return <code>true</code> if the specified coordinates are
-	     * inside the boundary of this <code>Rect</code>;
-	     * <code>false</code> otherwise.
-	     * @since 1.2
-	     */
-	    public boolean contains(double x, double y) {
-		return (x >= minX &&
-			y >= minY &&
-			x < maxX &&
-			y < maxY);
-	    }
 
-	    /**
-	    * Copied from Rectangle2D *
-	     * Tests if the interior of this <code>Rect</code> 
-	     * intersects the interior of a specified set of rectangular 
-	     * coordinates.
-	     * @param x,&nbsp;y the coordinates of the upper left corner
-	     * of the specified set of rectangular coordinates
-	     * @param w the width of the specified set of rectangular
-	     * coordinates
-	     * @param h the height of the specified set of rectangular
-	     * coordinates
-	     * @return <code>true</code> if this <code>Rect</code>
-	     * intersects the interior of a specified set of rectangular
-	     * coordinates; <code>false</code> otherwise.
-	     * @since 1.2
-	     */
-	    public boolean intersects(Rect other) {
-		if ((maxX-minX) <= 0 || (maxY-minY) <= 0) {
-		    return false;
+		/**
+		 * Tests if a specified coordinate is inside the boundary of this <code>Rect</code>.
+		 * @param x the x-coordinate to test
+		 * @param y the y-coordinate to test
+		 * @return <code>true</code> if the specified coordinates are
+		 * inside the boundary of this <code>Rect</code>;
+		 * <code>false</code> otherwise.
+		 */
+		public boolean contains(final double x, final double y) {
+			return (x >= this.minX &&
+					y >= this.minY &&
+					x < this.maxX &&
+					y < this.maxY);
 		}
-		double x0 = minX;
-		double y0 = minY;
-		return (other.maxX > minX &&
-			other.maxY > minY &&
-			other.minX < maxX &&
-			other.minY < maxY);
-	    }
+
+		/**
+		 * Tests if the interior of this <code>Rect</code>
+		 * intersects the interior of another <code>Rect</code>.
+		 * @param other The rectangle that should be tested for intersection.
+		 * @return <code>true</code> if this <code>Rect</code>
+		 * intersects the interior of the other <code>Rect</code>; <code>false</code> otherwise.
+		 */
+		public boolean intersects(final Rect other) {
+			if ((this.maxX-this.minX) <= 0 || (this.maxY-this.minY) <= 0) {
+				return false;
+			}
+			return (other.maxX > this.minX &&
+					other.maxY > this.minY &&
+					other.minX < this.maxX &&
+					other.minY < this.maxY);
+		}
 
 	}
 
-	private class Leaf  implements Serializable{
+	private class Leaf implements Serializable {
 		final public double x;
 		final public double y;
 		final public ArrayList<T> values;
@@ -396,7 +390,7 @@ public class QuadTree<T> implements Serializable{
 		}
 	}
 
-	protected class Node  implements Serializable{
+	protected class Node implements Serializable {
 
 		private Leaf leaf = null;
 
@@ -652,7 +646,7 @@ public class QuadTree<T> implements Serializable{
 		}
 
 		public Rect getBounds() {
-			return bounds;
+			return this.bounds;
 		}
 
 	}
