@@ -39,21 +39,28 @@ import java.util.Iterator;
  * @author mrieser
  * @param <T> The type of data to be stored in the QuadTree.
  */
-public class QuadTree<T> implements Serializable{
+public class QuadTree<T> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	/** The top node or root of the tree */
 	protected Node top = null;
 
-  /** The number of entries in the tree */
-  private transient int size = 0;
+	/** The number of entries in the tree */
+	private int size = 0;
 
-  /** The number of structural modifications to the tree. */
-  private transient int modCount = 0;
+	/** The number of structural modifications to the tree. */
+	private transient int modCount = 0;
 
-  private void incrementSize()   { this.modCount++; this.size++; }
-  private void decrementSize()   { this.modCount++; this.size--; }
+	/**
+	 * A cache to store all values of the QuadTree so it does not have to be
+	 * computed for every call to {@link #values()}. This is similar to
+	 * TreeMap.java and AbstractMap.java
+	 */
+	transient volatile Collection<T> values = null;
+
+	private void incrementSize() { this.modCount++; this.size++; this.values = null; }
+	private void decrementSize() { this.modCount++; this.size--; this.values = null; }
 
 	/**
 	 * Creates an empty QuadTree with the bounds minX/minY -- maxX/maxY. For
@@ -69,17 +76,17 @@ public class QuadTree<T> implements Serializable{
 		setTopNode(minX, minY, maxX, maxY);
 	}
 
-  /**
-   * Associates the specified value with the specified coordinates in this
-   * QuadTree.
-   *
-   * @param x x-coordinate where the specified value is to be associated.
-   * @param y y-coordinate where the specified value is to be associated.
-   * @param value value to be associated with the specified coordinates.
-   *
-   * @return true if insertion was successful and the data structure changed,
-   *         false otherwise.
-   */
+	/**
+	 * Associates the specified value with the specified coordinates in this
+	 * QuadTree.
+	 *
+	 * @param x x-coordinate where the specified value is to be associated.
+	 * @param y y-coordinate where the specified value is to be associated.
+	 * @param value value to be associated with the specified coordinates.
+	 *
+	 * @return true if insertion was successful and the data structure changed,
+	 *         false otherwise.
+	 */
 	public boolean put(final double x, final double y, final T value) {
 		if (this.top.put(x, y, value)) {
 			incrementSize();
@@ -88,17 +95,17 @@ public class QuadTree<T> implements Serializable{
 		return false;
 	}
 
-  /**
-   * Removes the specified object from the specified location.
-   *
-   * @param x x-coordinate from which the specified value should be removed
-   * @param y y-coordinate from which the specified value should be removed
-   * @param value the value to be removed from the specified coordinates
-   *
-   * @return true if the specified value was found at the specified coordinates
-   *         and was successfully removed (data structure changed), false
-   *         otherwise.
-   */
+	/**
+	 * Removes the specified object from the specified location.
+	 *
+	 * @param x x-coordinate from which the specified value should be removed
+	 * @param y y-coordinate from which the specified value should be removed
+	 * @param value the value to be removed from the specified coordinates
+	 *
+	 * @return true if the specified value was found at the specified coordinates
+	 *         and was successfully removed (data structure changed), false
+	 *         otherwise.
+	 */
 	public boolean remove(final double x, final double y, final T value) {
 		return this.top.remove(x, y, value);
 	}
@@ -154,33 +161,29 @@ public class QuadTree<T> implements Serializable{
 	 * @return the count of objects found within distance to x/y
 	 */
 	public int execute(final double minX, final double minY, final double maxX, final double maxY, final Executor executor) {
-		return this.top.execute(new Rect(minX, minY,maxX, maxY), executor);
+		return this.top.execute(new Rect(minX, minY, maxX, maxY), executor);
 	}
 
- /**
-   * Returns the number of entries in this QuadTree.
-   *
-   * @return the number of entries in this QuadTree.
-   */
-  public int size() {
-      return this.size;
-  }
+	/**
+	 * Returns the number of entries in this QuadTree.
+	 *
+	 * @return the number of entries in this QuadTree.
+	 */
+	public int size() {
+		return this.size;
+	}
 
-  /**
-   * Sets a new top node in case the extremities from the c'tor are not
-   * good anymore, it also clear the QuadTree
-   * @param minX The smallest x coordinate expected
-   * @param minY The smallest y coordinate expected
-   * @param maxX The largest x coordinate expected
-   * @param maxY The largest y coordinate expected
-  */
-  protected void setTopNode(final double minX, final double minY, final double maxX, final double maxY) {
-	  this.top = new Node(minX, minY, maxX, maxY);
-  }
-
-  /* Support for values() and an iterator over the values. */
-  /* This is similar to TreeMap.java and AbstractMap.java */
-	transient volatile Collection<T> values = null;
+	/**
+	 * Sets a new top node in case the extremities from the c'tor are not
+	 * good anymore, it also clear the QuadTree
+	 * @param minX The smallest x coordinate expected
+	 * @param minY The smallest y coordinate expected
+	 * @param maxX The largest x coordinate expected
+	 * @param maxY The largest y coordinate expected
+	 */
+	protected void setTopNode(final double minX, final double minY, final double maxX, final double maxY) {
+		this.top = new Node(minX, minY, maxX, maxY);
+	}
 
   /**
    * Returns a collection view of the values contained in this map.  The
@@ -233,7 +236,7 @@ public class QuadTree<T> implements Serializable{
 							while (searching) {
 								if (this.nextIndex < this.currentLeaf.values.size()) {
 									this.nextIndex++;
-									this.next = this.currentLeaf.values.get(this.nextIndex-1);
+									this.next = this.currentLeaf.values.get(this.nextIndex - 1);
 									searching = false;
 								} else {
 									this.currentLeaf = nextLeaf(this.currentLeaf);
@@ -264,13 +267,13 @@ public class QuadTree<T> implements Serializable{
 		return this.values;
 	}
 
-  private Leaf firstLeaf() {
-  	return this.top.firstLeaf();
-  }
+	private Leaf firstLeaf() {
+		return this.top.firstLeaf();
+	}
 
-  private Leaf nextLeaf(final Leaf currentLeaf) {
-  	return this.top.nextLeaf(currentLeaf);
-  }
+	private Leaf nextLeaf(final Leaf currentLeaf) {
+		return this.top.nextLeaf(currentLeaf);
+	}
 
 	/**
 	 * An internal class to hold variable parameters when calling methods.
@@ -297,7 +300,6 @@ public class QuadTree<T> implements Serializable{
 			this.value = value;
 		}
 	}
-
 
 	public class Rect implements Serializable {
 		public final double minX;
@@ -385,7 +387,7 @@ public class QuadTree<T> implements Serializable{
 		public Leaf(final double x, final double y, final T value) {
 			this.x = x;
 			this.y = y;
-			this.values = new ArrayList<T>();
+			this.values = new ArrayList<T>(1);
 			this.values.add(value);
 		}
 	}
@@ -415,7 +417,7 @@ public class QuadTree<T> implements Serializable{
 				boolean changed = false;
 				for (T value : leaf.values) {
 					if (!this.leaf.values.contains(value)) {
-						changed = changed || this.leaf.values.add(value);
+						changed = this.leaf.values.add(value) || changed;
 					}
 				}
 				return changed;
@@ -499,16 +501,16 @@ public class QuadTree<T> implements Serializable{
 
 		private Collection<T> get(final double x, final double y, final double maxDistance, final Collection<T> values) {
 			if (this.hasChilds) {
-				if (this.northwest.bounds.calcDistance(x, y) < maxDistance) {
+				if (this.northwest.bounds.calcDistance(x, y) <= maxDistance) {
 					this.northwest.get(x, y, maxDistance, values);
 				}
-				if (this.northeast.bounds.calcDistance(x, y) < maxDistance) {
+				if (this.northeast.bounds.calcDistance(x, y) <= maxDistance) {
 					this.northeast.get(x, y, maxDistance, values);
 				}
-				if (this.southeast.bounds.calcDistance(x, y) < maxDistance) {
+				if (this.southeast.bounds.calcDistance(x, y) <= maxDistance) {
 					this.southeast.get(x, y, maxDistance, values);
 				}
-				if (this.southwest.bounds.calcDistance(x, y) < maxDistance) {
+				if (this.southwest.bounds.calcDistance(x, y) <= maxDistance) {
 					this.southwest.get(x, y, maxDistance, values);
 				}
 				return values;
@@ -518,7 +520,7 @@ public class QuadTree<T> implements Serializable{
 				double distance = Math.sqrt(
 						(this.leaf.x - x) * (this.leaf.x - x)
 						+ (this.leaf.y - y) * (this.leaf.y - y));
-				if (distance < maxDistance) {
+				if (distance <= maxDistance) {
 					values.addAll(this.leaf.values);
 				}
 			}
