@@ -30,7 +30,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ArgumentParserTest.class);
 		suite.addTestSuite(StringUtilsTest.class);
-		suite.addTest(org.matsim.utils.geometry.shared.AllTests.suite());
+		suite.addTestSuite(QuadTreeTest.class);
 		//$JUnit-END$
 		return suite;
 	}
