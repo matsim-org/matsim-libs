@@ -107,7 +107,11 @@ public class QuadTree<T> implements Serializable {
 	 *         otherwise.
 	 */
 	public boolean remove(final double x, final double y, final T value) {
-		return this.top.remove(x, y, value);
+		if (this.top.remove(x, y, value)) {
+			decrementSize();
+			return true;
+		}
+		return false;
 	}
 
 	/** Clear the QuadTree. */
@@ -145,8 +149,10 @@ public class QuadTree<T> implements Serializable {
 	 * @param executor is executed on the fitting objects
 	 * @return the count of objects found within distance to x/y
 	 */
-	public int execute(Rect bounds, final Executor executor) {
-		if (bounds == null) bounds = this.top.getBounds();
+	public int execute(final Rect bounds, final Executor executor) {
+		if (bounds == null) {
+			return this.top.execute(this.top.getBounds(), executor);
+		}
 		return this.top.execute(bounds, executor);
 	}
 
@@ -437,7 +443,6 @@ public class QuadTree<T> implements Serializable {
 					if (this.leaf.values.size() == 0) {
 						this.leaf = null;
 					}
-					decrementSize();
 					return true;
 				}
 			}
@@ -464,7 +469,7 @@ public class QuadTree<T> implements Serializable {
 			}
 		}
 
-		private T get(final double x, final double y, final MutableDouble bestDistance) {
+		/* default */ T get(final double x, final double y, final MutableDouble bestDistance) {
 			if (this.hasChilds) {
 				T closest = null;
 				if (this.northwest.bounds.calcDistance(x, y) < bestDistance.value) {
@@ -499,7 +504,7 @@ public class QuadTree<T> implements Serializable {
 			return null;
 		}
 
-		private Collection<T> get(final double x, final double y, final double maxDistance, final Collection<T> values) {
+		/* default */ Collection<T> get(final double x, final double y, final double maxDistance, final Collection<T> values) {
 			if (this.hasChilds) {
 				if (this.northwest.bounds.calcDistance(x, y) <= maxDistance) {
 					this.northwest.get(x, y, maxDistance, values);
@@ -552,7 +557,7 @@ public class QuadTree<T> implements Serializable {
 			return values;
 		}
 
-		private int execute(final Rect globalBounds, final Executor executor) {
+		/* default */ int execute(final Rect globalBounds, final Executor executor) {
 			int count = 0;
 			if (this.hasChilds) {
 				if (this.northwest.bounds.intersects(globalBounds)) {
@@ -605,7 +610,7 @@ public class QuadTree<T> implements Serializable {
 			return null;
 		}
 
-		public Leaf firstLeaf() {
+		/* default */ Leaf firstLeaf() {
 			if (this.hasChilds) {
 				Leaf leaf = this.southwest.firstLeaf();
 				if (leaf == null) { leaf = this.northwest.firstLeaf(); }
@@ -616,7 +621,7 @@ public class QuadTree<T> implements Serializable {
 			return this.leaf;
 		}
 
-		public boolean nextLeaf(final Leaf currentLeaf, final MutableLeaf nextLeaf) {
+		/* default */ boolean nextLeaf(final Leaf currentLeaf, final MutableLeaf nextLeaf) {
 			if (this.hasChilds) {
 				boolean found = this.southwest.nextLeaf(currentLeaf, nextLeaf);
 				if (found) {
