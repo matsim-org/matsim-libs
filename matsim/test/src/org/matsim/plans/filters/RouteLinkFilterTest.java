@@ -35,6 +35,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class RouteLinkFilterTest extends MatsimTestCase {
 
 	public void testRouteLinkFilter() {
+		loadConfig(null); // used to set the default dtd-location
 		Plans population = getTestPopulation();
 
 		TestAlgorithm tester = new TestAlgorithm();
