@@ -41,14 +41,20 @@ public class MatsimTestCase extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
 		this.outputDirectory = "test/output/" + this.getClass().getCanonicalName().replace('.', '/') + "/" + getName() + "/";
 		this.inputDirectory = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/" + getName() + "/";
-		
+
 		createOutputDirectory();
 		Gbl.reset(); // make sure we start with a clean environment
 	}
 
+	/**
+	 * Loads a configuration from file (or the default config if <code>configfile</code> is <code>null</code>).
+	 *
+	 * @param configfile The path/filename of a configuration file, or null to load the default configuration.
+	 * @return The loaded configuration.
+	 */
 	public Config loadConfig(final String configfile) {
 		String [] args = {configfile};
 		Config config;
@@ -78,7 +84,7 @@ public class MatsimTestCase extends TestCase {
 	public String getOutputDirectory() {
 		return this.outputDirectory;
 	}
-	
+
 	/**
 	 * Returns the path to the input directory for this test including a trailing slash as directory delimiter.
 	 *
