@@ -20,6 +20,7 @@
 
 package org.matsim.scoring;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicPlan;
@@ -29,6 +30,8 @@ import org.matsim.events.EventAgentStuck;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
+import org.matsim.gbl.Gbl;
+import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.identifiers.IdI;
 
@@ -42,19 +45,24 @@ import org.matsim.utils.identifiers.IdI;
  *
  * @author mrieser
  */
-public class EventsToScore implements EventHandlerAgentArrivalI,
-		EventHandlerAgentDepartureI, EventHandlerAgentStuckI {
+public class EventsToScore implements EventHandlerAgentArrivalI, EventHandlerAgentDepartureI, EventHandlerAgentStuckI {
 
 	private Plans population = null;
 	private ScoringFunctionFactory sfFactory = null;
 	private final TreeMap<String, ScoringFunction> agentScorers = new TreeMap<String, ScoringFunction>();
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
+	private final double learningRate;
 
 	public EventsToScore(final Plans population, final ScoringFunctionFactory factory) {
+		this(population, factory, Gbl.getConfig().charyparNagelScoring().getLearningRate());
+	}
+
+	public EventsToScore(final Plans population, final ScoringFunctionFactory factory, final double learningRate) {
 		super();
 		this.population = population;
 		this.sfFactory = factory;
+		this.learningRate = learningRate;
 	}
 
 	/* (non-Javadoc)
@@ -86,9 +94,20 @@ public class EventsToScore implements EventHandlerAgentArrivalI,
 	 * to the plans.
 	 */
 	public void finish() {
-		for (ScoringFunction sf : this.agentScorers.values()) {
+		for (Map.Entry<String, ScoringFunction> entry : this.agentScorers.entrySet()) {
+			String agentId = entry.getKey();
+			ScoringFunction sf = entry.getValue();
 			sf.finish();
-			this.scoreSum += sf.getScore();
+			double score = sf.getScore();
+			Plan plan = this.population.getPerson(agentId).getSelectedPlan();
+			double oldScore = plan.getScore();
+			if (Double.isNaN(oldScore)) {
+				plan.setScore(score);
+			} else {
+				plan.setScore(this.learningRate * score + (1-this.learningRate) * oldScore);
+			}
+
+			this.scoreSum += score;
 			this.scoreCount++;
 		}
 	}

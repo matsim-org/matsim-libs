@@ -376,12 +376,6 @@ public class AppraisalScorer implements ScoringFunction {
 
 	public void finish() {
 		finishAgent();
-		double oldScore = this.plan.getScore();
-		if (Double.isNaN(oldScore)) {
-			this.plan.setScore(this.score);
-		} else {
-			this.plan.setScore(learningRate * this.score + (1-learningRate) * oldScore);
-		}
 	}
 
 	public double getScore() {

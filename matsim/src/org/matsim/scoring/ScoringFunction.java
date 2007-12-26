@@ -87,7 +87,8 @@ public interface ScoringFunction {
 
 	/**
 	 * Tells the scoring function that no more information will be given to it
-	 * and that the final score should be calculated.
+	 * and that the final score should be calculated.  But the score must <b>not</b>
+	 * be written to the plan!
 	 */
 	public void finish();
 
@@ -97,7 +98,7 @@ public interface ScoringFunction {
 	 * @return the score
 	 */
 	public double getScore();
-	
+
 	/**
 	 * May be used to reset scores and counters of implementations of scoring
 	 * functions in order to re-score the same plan object with different

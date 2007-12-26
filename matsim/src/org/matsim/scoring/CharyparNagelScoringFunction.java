@@ -163,19 +163,11 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		if (this.index == this.lastActIndex) {
 			handleAct(24*3600); // handle the last act
 		}
-
-		double oldScore = this.plan.getScore();
-		if (Double.isNaN(oldScore)) {
-			this.plan.setScore(this.score);
-		} else {
-			this.plan.setScore(learningRate * this.score + (1-learningRate) * oldScore);
-		}
 	}
 
 	public double getScore() {
 		return this.score;
 	}
-
 
 	/* At the moment, the following values are all static's. But in the longer run,
 	 * they should be agent-specific or facility-specific values...
@@ -200,8 +192,6 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	private static double marginalUtilityOfPerforming = Double.NaN;
 	private static double distanceCost = Double.NaN;
 	private static double abortedPlanScore = Double.NaN;
-	private static double learningRate = Double.NaN;
-
 
 	private static void init() {
 		if (initialized) return;
@@ -215,8 +205,6 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		marginalUtilityOfPerforming = params.getPerforming() / 3600.0;
 
 		distanceCost = params.getDistanceCost() / 1000.0;
-
-		learningRate = params.getLearningRate();
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),

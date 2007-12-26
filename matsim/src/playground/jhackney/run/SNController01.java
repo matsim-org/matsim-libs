@@ -560,7 +560,7 @@ public class SNController01 {
 	this.events.addHandler(this.eventwriter);
 	if (this.planScorer == null) {
 	    if (Gbl.useRoadPricing()) {
-		this.planScorer = new EventsToScore(this.population, new RoadPricingScoringFunctionFactory(this.tollCalc));
+		this.planScorer = new EventsToScore(this.population, new RoadPricingScoringFunctionFactory(this.tollCalc, new CharyparNagelScoringFunctionFactory()));
 	    } else {
 		this.planScorer = new EventsToScore(this.population, new CharyparNagelScoringFunctionFactory());
 	    }

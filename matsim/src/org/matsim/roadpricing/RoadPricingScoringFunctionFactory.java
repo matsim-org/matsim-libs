@@ -27,13 +27,15 @@ import org.matsim.scoring.ScoringFunctionFactory;
 public class RoadPricingScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CalcPaidToll paidToll;
+	private final ScoringFunctionFactory factory;
 
-	public RoadPricingScoringFunctionFactory(final CalcPaidToll paidToll) {
+	public RoadPricingScoringFunctionFactory(final CalcPaidToll paidToll, final ScoringFunctionFactory factory) {
 		this.paidToll = paidToll;
+		this.factory = factory;
 	}
 
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
-		return new RoadPricingScoringFunction(plan, this.paidToll);
+		return new RoadPricingScoringFunction(plan, this.paidToll, this.factory.getNewScoringFunction(plan));
 	}
 
 }

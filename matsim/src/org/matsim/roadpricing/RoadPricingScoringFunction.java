@@ -20,24 +20,56 @@
 
 package org.matsim.roadpricing;
 
+import org.matsim.plans.Act;
+import org.matsim.plans.Leg;
+import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
-import org.matsim.scoring.CharyparNagelScoringFunction;
+import org.matsim.scoring.ScoringFunction;
 
-public class RoadPricingScoringFunction extends CharyparNagelScoringFunction {
+public class RoadPricingScoringFunction implements ScoringFunction {
 
-	CalcPaidToll paidToll = null;
+	private final CalcPaidToll paidToll;
+	private final ScoringFunction scoringFunction;
+	private final Person person;
+	private double toll = 0.0;
 
-	public RoadPricingScoringFunction(final Plan plan, final CalcPaidToll paidToll) {
-		super(plan);
+	public RoadPricingScoringFunction(final Plan plan, final CalcPaidToll paidToll, final ScoringFunction scoringFunction) {
 		this.paidToll = paidToll;
+		this.scoringFunction = scoringFunction;
+		this.person = plan.getPerson();
 	}
 
-	@Override
 	public void finish() {
-		double toll = this.paidToll.getAgentToll(this.person.getId().toString());
-		this.score -= toll;
+		this.scoringFunction.finish();
+		this.toll = this.paidToll.getAgentToll(this.person.getId().toString());
+	}
 
-		super.finish();
+	public void agentStuck(final double time) {
+		this.scoringFunction.agentStuck(time);
+	}
+
+	public void endActivity(final double time) {
+		this.scoringFunction.endActivity(time);
+	}
+
+	public void endLeg(final double time) {
+		this.scoringFunction.endLeg(time);
+	}
+
+	public double getScore() {
+		return this.scoringFunction.getScore() - this.toll;
+	}
+
+	public void reset() {
+		this.scoringFunction.finish();
+	}
+
+	public void startActivity(final double time, final Act act) {
+		this.scoringFunction.startActivity(time, act);
+	}
+
+	public void startLeg(final double time, final Leg leg) {
+		this.scoringFunction.startLeg(time, leg);
 	}
 
 }

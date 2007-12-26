@@ -379,7 +379,7 @@ public class RoadPricingTest extends MatsimTestCase {
 			Events events = new Events();
 			CalcPaidToll paidToll = new CalcPaidToll(network, toll);
 			events.addHandler(paidToll);
-			EventsToScore scoring = new EventsToScore(population, new RoadPricingScoringFunctionFactory(paidToll));
+			EventsToScore scoring = new EventsToScore(population, new RoadPricingScoringFunctionFactory(paidToll, new CharyparNagelScoringFunctionFactory()));
 			events.addHandler(scoring);
 
 			QueueSimulation sim = new QueueSimulation(network, population, events);
