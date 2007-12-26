@@ -25,9 +25,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.collections.Tuple;
+import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Test for {@link org.matsim.utils.misc.QuadTree}.
@@ -50,6 +54,17 @@ public class QuadTreeTest extends MatsimTestCase {
 		qt.put(15.0, 15.0, "15.0, 15.0 B");
 
 		return qt;
+	}
+
+	/**
+	 * Test {@link org.matsim.utils.misc.QuadTree#QuadTree(double, double, double, double)}.
+	 */
+	public void testConstructor() {
+		QuadTree<String> qt = new QuadTree<String>(-50.0, -40.0, +30.0, +20.0);
+		assertEquals(-50.0, qt.getMinEasting(), 0.0);
+		assertEquals(-40.0, qt.getMinNorthing(), 0.0);
+		assertEquals(+30.0, qt.getMaxEasting(), 0.0);
+		assertEquals(+20.0, qt.getMaxNorthing(), 0.0);
 	}
 
 	/**
@@ -127,6 +142,20 @@ public class QuadTreeTest extends MatsimTestCase {
 
 		values = qt.get(90.0, 0.0, 11.0);
 		assertEquals("test with distance 11.0", 1, values.size());
+
+		// test "area"
+		values.clear();
+		qt.get(0.0, 0.0, 20.1, 20.1, values); // test with no object on the boundary
+		assertEquals(4, values.size());
+
+		values.clear();
+		qt.get(0.0, 0.0, 20.0, 20.0, values); // test with an object exactly on the boundary
+		assertEquals(3, values.size());
+
+		values.clear();
+		qt.get(0.0, 0.0, 19.9, 19.9, values); // test with no object on the boundary
+		assertEquals(3, values.size());
+
 	}
 
 	/**
@@ -163,6 +192,18 @@ public class QuadTreeTest extends MatsimTestCase {
 	}
 
 	/**
+	 * Test {@link org.matsim.utils.misc.QuadTree#clear()}.
+	 */
+	public void testClear() {
+		QuadTree<String> qt = getTestTree();
+		int size = qt.size();
+		assertTrue(size > 0); // it makes no sense to test clear() on an empty tree
+		qt.clear();
+		assertEquals(0, qt.size());
+		valuesTester(0, qt.values());
+	}
+
+	/**
 	 * Test {@link org.matsim.utils.misc.QuadTree#values()}.
 	 */
 	public void testValues() {
@@ -186,21 +227,43 @@ public class QuadTreeTest extends MatsimTestCase {
 		assertTrue(qt.remove(10.0, 10.0, "10.0, 10.0"));
 		assertEquals(size - 1, qt.size());
 		valuesTester(qt.size(), qt.values());
+
+		// test the iterator
+		Iterator<String> iter = qt.values().iterator();
+		iter.next();
+		boolean exception = false;
+		try {
+			iter.remove();
+		} catch (UnsupportedOperationException e) {
+			exception = true;
+		}
+		assertTrue("Expected UnsupportedOperationException when calling iter.remove()", exception);
 	}
 
 	/**
-	 * An internal helper method to do the real testing.
-	 *
-	 * @param treeSize
-	 * @param values
+	 * Test {@link org.matsim.utils.misc.QuadTree#execute(double, double, double, double, org.matsim.utils.misc.QuadTree.Executor)}.
 	 */
-	private void valuesTester(final int treeSize, final Collection<String> values) {
-		int counter = 0;
-		for (String value : values) {
-			counter++;
-		}
-		assertEquals(treeSize, counter);
-		assertEquals(treeSize, values.size());
+	public void testExecute() {
+		QuadTree<String> qt = getTestTree();
+		TestExecutor executor = new TestExecutor();
+		int count = qt.execute(0.0, 0.0, 20.1, 20.1, executor);
+		assertEquals(4, count);
+		assertEquals(4, executor.objects.size());
+
+		executor = new TestExecutor();
+		count = qt.execute(0.0, 0.0, 20.0, 20.0, executor);
+		assertEquals(3, count);
+		assertEquals(3, executor.objects.size());
+
+		executor = new TestExecutor();
+		count = qt.execute(0.0, 0.0, 19.9, 19.9, executor);
+		assertEquals(3, count);
+		assertEquals(3, executor.objects.size());
+
+		executor = new TestExecutor();
+		count = qt.execute(null, executor);
+		assertEquals(qt.size(), count);
+		assertEquals(qt.size(), executor.objects.size());
 	}
 
 	/**
@@ -230,10 +293,42 @@ public class QuadTreeTest extends MatsimTestCase {
 			QuadTree<String> qt2 = (QuadTree<String>)in.readObject();
 			in.close();
 			assertEquals(qt.size(), qt2.size());
+			valuesTester(qt2.size(), qt2.values());
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} catch (ClassNotFoundException ex) {
 			ex.printStackTrace();
 		}
 	}
+
+	/**
+	 * An internal helper method to do the real testing.
+	 *
+	 * @param treeSize
+	 * @param values
+	 */
+	private void valuesTester(final int treeSize, final Collection<String> values) {
+		int counter = 0;
+		for (String value : values) {
+			counter++;
+		}
+		assertEquals(treeSize, counter);
+		assertEquals(treeSize, values.size());
+	}
+
+	/**
+	 * An internal class to test the execute()-methods
+	 *
+	 */
+	static class TestExecutor extends QuadTree.Executor<String> {
+
+		public final Collection<Tuple<Coord, String>> objects = new ArrayList<Tuple<Coord, String>>();
+
+		@Override
+		public void execute(final double x, final double y, final String object) {
+			this.objects.add(new Tuple<Coord, String>(new Coord(x, y), object));
+		}
+
+	}
+
 }
