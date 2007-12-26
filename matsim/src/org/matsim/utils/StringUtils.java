@@ -31,25 +31,27 @@ public class StringUtils {
 	 * Splits a string at the specified delimiter into multiple substrings. This
 	 * method is similar to <code>String.split()</code>, but does only take a
 	 * single char as a delimiter and not a regular expression, making this
-	 * method a lot faster than <code>String.split()</code> if no regular 
+	 * method a lot faster than <code>String.split()</code> if no regular
 	 * expressions are required.
-	 * 
-	 * The <code>limit</code> parameter controls how many parts will be returned 
+	 *
+	 * The <code>limit</code> parameter controls how many parts will be returned
 	 * at most. If the limit is zero, no limit is used and the string is splitted
 	 * as many times as possible. Negative values for <code>limit</code> are not
 	 * supported. If there are more delimiters than <code>limit</code>, only the
 	 * first <em>limit-1</em> ones will be used for splitting the string, the
-	 * additional delimiters are contained in the last part returned.
+	 * additional delimiters are contained in the last part returned. Trailing
+	 * empty strings are not included in the resulting array.
 	 *
 	 * @param str The string to be splitted.
 	 * @param delimiter A single character where <code>str</code> should be splitted.
 	 * @param limit The maximum number of parts returned.
-	 * @return Returns an array of strings, each being a substring of 
-	 * 		<code>str</code>, that were connected by <code>delimiter</code> in the 
+	 * @return Returns an array of strings, each being a substring of
+	 * 		<code>str</code>, that were connected by <code>delimiter</code> in the
 	 * 		original string <code>str</code>.
+	 *
 	 * @author mrieser
 	 */
-	public static String[] explode(String str, char delimiter, int limit) {
+	public static String[] explode(final String str, final char delimiter, final int limit) {
 		int count = 0;
 		int len = str.length();
 		int maxPos = 0; // the position of the last non-delimiter char in the string
@@ -70,7 +72,7 @@ public class StringUtils {
 			parts[0] = str;
 			return parts;
 		}
-		
+
 		// create a big enough array to hold the result
 		String[] parts = new String[countAtMaxPos + 1];
 		int startPos = 0;
@@ -83,13 +85,13 @@ public class StringUtils {
 				count++;
 			}
 		}
-		if (startPos <= maxPos) {
-			/* add the final part ended by the string, not by a delimiter, to our
-			 * list, but only if there is not a delimiter at the last position.
-			 */
-			parts[count] = str.substring(startPos, maxPos+1);
-		}
-		
+		/* Add the final part ended by the string, not by a delimiter, to our list.
+		 * There is always a final part because of the way maxPos and countAtMaxPos
+		 * are derived: maxPos points to a non-delimiter. This means there is always
+		 * at least one character between the last delimiter and maxPos, and that's
+		 * the part we are still missing... so add it! */
+		parts[count] = str.substring(startPos, maxPos+1);
+
 		return parts;
 	}
 
@@ -97,17 +99,17 @@ public class StringUtils {
 	 * Splits a string at the specified delimiter into multiple substrings. This
 	 * method is similar to <code>String.split()</code>, but does only take a
 	 * single char as a delimiter and not a regular expression, making this
-	 * method a lot faster than <code>String.split()</code> if no regular 
+	 * method a lot faster than <code>String.split()</code> if no regular
 	 * expressions are required.
 	 *
 	 * @param str The string to be splitted.
 	 * @param delimiter A single character where <code>str</code> should be splitted.
-	 * @return Returns an array of strings, each being a substring of 
-	 * 		<code>str</code>, that were connected by <code>delimiter</code> in the 
+	 * @return Returns an array of strings, each being a substring of
+	 * 		<code>str</code>, that were connected by <code>delimiter</code> in the
 	 * 		original string <code>str</code>.
 	 * @author mrieser
 	 */
-	public static String[] explode(String str, char delimiter) {
+	public static String[] explode(final String str, final char delimiter) {
 		return explode(str, delimiter, 0);
 	}
 }
