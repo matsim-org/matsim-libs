@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * EventFilterI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.events.BasicEvent;
+import org.matsim.plans.filters.FilterI;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
+ * This interface extends interface:
+ * org.matsim.playground.filters.filter.FilterI, and offers some important
+ * functions for org.matsim.playground.filters.filter.EventFilter.
+ * 
  * @author ychen
- *
+ * 
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
+public interface EventFilterI extends FilterI {
 	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
+	 * judges whether the BasicEvent
+	 * (org.matsim.demandmodeling.events.BasicEvent) will be selected or not
+	 * 
+	 * @param event -
+	 *            which is being judged
+	 * @return true if the Person meets the criterion of the EventFilterA
 	 */
-	boolean judge(Person person);
+	boolean judge(BasicEvent event);
 
 	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
+	 * sends the person to the next EventFilterA
+	 * (org.matsim.playground.filters.filter.EventFilter) or other behavior
+	 * 
+	 * @param event -
+	 *            an event being handled
 	 */
-	void run(Person person);
+	void handleEvent(BasicEvent event);
 
+	/**
+	 * sets the next Filter, who will handle BasicEvent-object.
+	 * 
+	 * @param nextFilter -
+	 *            the next Filter, who will handle BasicEvent-object.
+	 */
+	void setNextFilter(EventFilterI nextFilter);
 }

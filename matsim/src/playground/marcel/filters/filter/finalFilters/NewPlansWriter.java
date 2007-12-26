@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * NewPlansWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter.finalFilters;
 
 import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.plans.Plans;
+import org.matsim.plans.PlansWriter;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
- * @author ychen
- *
+ * Write a new plans-file(.xml), while reading an old plans-file(.xml). eine neue "abgenommene" PlansDatei(.xml) schreiben.
+ * @author  ychen
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
+public class NewPlansWriter extends FinalPersonFilter {
 	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
+	 * The underlying PlansWriter of this NewPlansWriter.
 	 */
-	boolean judge(Person person);
+	private PlansWriter plansWriter;
+
+	// ------------------------CONSTRUCTOR----------------------
+	/**
+	 * initialize a NewPlansWriter: create a new PlansWriter; write the head of
+	 * a plans-file(.xml).
+	 *
+	 * @param plans -
+	 *            Parameter for constructor of PlansWriter.
+	 */
+	public NewPlansWriter(Plans plans) {
+		this.plansWriter = new PlansWriter(plans);
+		this.plansWriter.writeStartPlans();
+	}
 
 	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
+	 * Write person-block (Plan, Act, Leg, Route...) into plans-file(.xml).
 	 *
 	 * @param person -
-	 *            a person being run
+	 *            a Person-object transfered from another PersonFilter
 	 */
-	void run(Person person);
+	@Override
+	public void run(Person person) {
+		if (person != null)
+			this.plansWriter.writePerson(person);
+	}
 
+	/**
+	 * Writes end-block of a plans-file(.xml).
+	 */
+	public void writeEndPlans() {
+		this.plansWriter.writeEndPlans();
+	}
 }

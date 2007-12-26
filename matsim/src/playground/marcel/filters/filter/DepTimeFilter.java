@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * DepTimeFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter;
 
+import java.util.List;
+
+import org.matsim.gbl.Gbl;
+import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.plans.Plan;
 
-/**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
- * @author ychen
- *
- */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
-	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
-	 */
-	boolean judge(Person person);
+public class DepTimeFilter extends PersonFilterA {
+	private boolean result=false;
+	
+	private static double criterionMAX = Gbl.parseTime("09:00");
 
-	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
-	 */
-	void run(Person person);
+	private static double criterionMIN = Gbl.parseTime("06:40");
 
+	@Override
+	public boolean judge(Person person) {
+		for (Plan plan : person.getPlans()) {
+			List actsLegs = plan.getActsLegs();
+			for (int i = 1; i < actsLegs.size(); i += 2) {
+				Leg leg = (Leg) actsLegs.get(i);
+				result=((criterionMIN < leg.getDepTime())&& (leg.getDepTime() < criterionMAX));
+				if (result)return result;
+			}
+		}
+		return result;
+	}
 }

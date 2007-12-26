@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * Filter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.plans.filters.FilterI;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
  * @author ychen
- *
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
-	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
-	 */
-	boolean judge(Person person);
+public class Filter implements FilterI {
 
-	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
+	/* -------------------MEMBER VARIABLE----------- */
+	private int count = 0;
+
+	/*
+	 * -------------------NORMAL METHOD-------------
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.playground.filters.FilterI#count()
 	 */
-	void run(Person person);
+	/**
+	 * This function is called inside function: void
+	 * org.matsim.playground.filters.filter.EventFilter.handleEvent(BasicEvent
+	 * event) and void
+	 * org.matsim.playground.filters.filter.EventFilter.handleEvent(BasicEvent
+	 * event), if this Filter is not the last one.
+	 */
+	public void count() {
+		count++;
+	}
+
+	/* ----------------GETTER--------------------- */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.demandmodeling.filters.filter.FilterI#getCount()
+	 */
+	public int getCount() {
+		return count;
+	}
 
 }

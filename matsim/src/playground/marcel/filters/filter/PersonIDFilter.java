@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * PersonIDFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter;
 
 import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
+ * This class is an example to select a person with a special person-id
+ * 
  * @author ychen
- *
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
-	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
-	 */
-	boolean judge(Person person);
+public class PersonIDFilter extends PersonFilterA {
+	private int criterion;
 
-	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
+	@Override
+	public boolean judge(Person person) {
+		return (Integer.parseInt(person.getId().toString()) % criterion == 0);
+	}
+
+	/*-------------------------CONSTRUCTOR----------------------*/
+	/** 
+	 * @param criterion
 	 */
-	void run(Person person);
+	public PersonIDFilter(int criterion) {
+		this.criterion = criterion;
+	}
 
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * LinkAveCalEventTimeFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.events.BasicEvent;
+import org.matsim.events.EventLinkEnter;
+import org.matsim.events.EventLinkLeave;
+import org.matsim.gbl.Gbl;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
  * @author ychen
- *
+ * 
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
-	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
-	 */
-	boolean judge(Person person);
+public class LinkAveCalEventTimeFilter extends EventFilterA {
+	private static final double criterionMAX = Gbl.parseTime("08:00");
 
-	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
-	 */
-	void run(Person person);
+	private static final double criterionMIN = Gbl.parseTime("06:00");
 
+	private boolean judgeTime(double time) {
+		return (time < criterionMAX) && (time > criterionMIN);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.playground.filters.EventFilter#judge(int,
+	 *      org.matsim.demandmodeling.events.Event.EnterLinkEventData)
+	 */
+	@Override
+	public boolean judge(BasicEvent event) {
+		if ((event.getClass()==(EventLinkEnter.class))
+				|| (event.getClass()==(EventLinkLeave.class))) {
+			return judgeTime(event.time);
+		}
+		return isResult();
+	}
 }

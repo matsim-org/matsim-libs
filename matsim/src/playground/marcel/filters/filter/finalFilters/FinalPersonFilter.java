@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * FinalPersonFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter.finalFilters;
 
 import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+
+import playground.marcel.filters.filter.PersonFilterA;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
  * @author ychen
- *
+ * 
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
+public class FinalPersonFilter extends PersonFilterA {
 	/**
-	 * judges whether the Person will be selected or not
-	 *
+	 * does nothing
+	 * 
 	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
+	 *            a person transfered from another PersonFilter
 	 */
-	boolean judge(Person person);
-
-	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
-	 */
-	void run(Person person);
-
+	@Override
+	public boolean judge(Person person) {
+		return false;
+	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * ActTypeFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter;
 
+import java.util.List;
+
+import org.matsim.plans.Act;
 import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.plans.Plan;
 
-/**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
- * @author ychen
- *
- */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
-	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
-	 */
-	boolean judge(Person person);
+public class ActTypeFilter extends PersonFilterA {
+	private boolean result = false;
+	
+	private static String criterion = "s1";
 
-	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
-	 */
-	void run(Person person);
-
+	@Override
+	public boolean judge(Person person) {
+		for (Plan plan : person.getPlans()) {
+			List actsLegs = plan.getActsLegs();
+			for (int i = 0; i < actsLegs.size(); i += 2) {
+				Act act = (Act) actsLegs.get(i);
+				result=(act.getType().equals(criterion));
+				if (result) return result;
+			}
+		}
+		return result;
+	}
 }

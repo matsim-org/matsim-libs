@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * PersonFilterAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,59 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter;
 
 import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.plans.algorithms.PersonAlgorithm;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
- * @author ychen
- *
+ * @author yu
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
-	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
-	 */
-	boolean judge(Person person);
+public class PersonFilterAlgorithm extends PersonAlgorithm implements
+		PersonFilterI {
+	private PersonFilterI nextFilter = null;
+
+	private int count = 0;
 
 	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
+	 * @return the count.
+	 */
+	public int getCount() {
+		return this.count;
+	}
+
+	@Override
+	public void run(Person person) {
+		count();
+		this.nextFilter.run(person);
+	}
+
+	/**
+	 * it's a virtual judge-function, all persons shall be allowed to pass or
+	 * leave
 	 *
 	 * @param person -
-	 *            a person being run
+	 *            a person to be judge
+	 * @return true if the Person meets the criterion
 	 */
-	void run(Person person);
+	public boolean judge(Person person) {
+		return true;
+	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.matsim.demandmodeling.filters.filter.FilterI#count()
+	 */
+	public void count() {
+		this.count++;
+	}
+
+	/**
+	 * @param nextFilter -
+	 *            The nextFilter to set.
+	 */
+	public void setNextFilter(PersonFilterI nextFilter) {
+		this.nextFilter = nextFilter;
+	}
 }

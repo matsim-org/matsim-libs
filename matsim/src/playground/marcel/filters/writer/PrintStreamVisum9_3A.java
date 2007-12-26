@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * PrintStreamVisum9_3A.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.writer;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import playground.marcel.filters.filter.finalFilters.FinalEventFilterA;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
  * @author ychen
  *
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
+public abstract class PrintStreamVisum9_3A implements PrintStreamVisum9_3I {
 	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
+	 * out - an underly static DataOutputStream
 	 */
-	boolean judge(Person person);
+	protected DataOutputStream out;
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.matsim.playground.filters.writer.PrintStreamVisum9_3I#output(org.matsim.playground.filters.filter.finalFilters.FinalEventFilterI)
+	 */
+	public abstract void output(FinalEventFilterA fef);
 
 	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
+	 * @Specified by: close in interface Closeable
+	 * @throws IOException -
+	 *             if an I/O error occurs.
 	 */
-	void run(Person person);
-
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.io.Closeable#close()
+	 */
+	public void close() throws IOException {
+		this.out.close();
+	}
 }

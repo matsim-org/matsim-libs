@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * PrintStreamVisum9_3I.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.writer;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import java.io.Closeable;
+
+import playground.marcel.filters.filter.finalFilters.FinalEventFilterA;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
- * @author ychen
- *
+ * @author ychen A PrintStreamVisum9_3I is a source or destination of data that
+ *         can be printed,implements the interface Closeable and offers
+ *         output()-function for every writer-class in the package. and
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
+public interface PrintStreamVisum9_3I extends Closeable {
 	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
+	 * Extracts the last Filter and save the usefull information to print
+	 * 
+	 * @param fef -
+	 *            the last Filter to extract
 	 */
-	boolean judge(Person person);
-
-	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
-	 */
-	void run(Person person);
-
+	public void output(FinalEventFilterA fef);
 }

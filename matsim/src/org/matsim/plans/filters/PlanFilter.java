@@ -20,7 +20,6 @@
 
 package org.matsim.plans.filters;
 
-import org.matsim.filters.filter.FilterI;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 

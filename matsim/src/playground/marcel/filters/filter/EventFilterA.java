@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * EventFilterA.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,60 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.events.BasicEvent;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
  * @author ychen
- *
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
-	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
+public abstract class EventFilterA extends Filter implements EventFilterI {
+
+	/*
+	 * -------------------------MEMBER VARIABLES----------------
 	 */
-	boolean judge(Person person);
+	private EventFilterI nextFilter = null;
+
+	/*
+	 * ------------------------SETTER------------------------------
+	 */
 
 	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
+	 * sets the next EventFilterA-Object
 	 *
-	 * @param person -
-	 *            a person being run
+	 * @param nextFilter -
+	 *            The nextFilter to set.
 	 */
-	void run(Person person);
+	public void setNextFilter(EventFilterI nextFilter) {
+		this.nextFilter = nextFilter;
+	}
 
+	/*
+	 * ------------------------IMPLEMENTS METHODS-----------------------
+	 */
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.matsim.demandmodeling.filters.filter.EventFilterI#judge(org.matsim.demandmodeling.events.BasicEvent)
+	 */
+	public abstract boolean judge(BasicEvent event);
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.matsim.demandmodeling.filters.filter.EventFilterI#handleEvent(org.matsim.demandmodeling.events.BasicEvent)
+	 */
+	public void handleEvent(BasicEvent event) {
+		if (judge(event)) {
+			count();
+			this.nextFilter.handleEvent(event);
+		}
+	}
+
+	/**
+	 * @return Returns the result.
+	 */
+	protected boolean isResult() {
+		return false; // subclass may overwrite this to return true
+	}
 }

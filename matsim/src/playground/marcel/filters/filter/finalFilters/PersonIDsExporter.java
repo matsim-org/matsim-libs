@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * PersonIDsExporter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.filters;
+package playground.marcel.filters.filter.finalFilters;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.utils.identifiers.IdI;
+
+import playground.marcel.filters.filter.PersonFilterA;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
+ * A PersonIDsExporter exports a set of Person- IDs, these persons have passed
+ * all the PersonFilters. So a PersonIDsExporter should be used as the last
+ * PersonFilterA.
+ * 
  * @author ychen
- *
+ * 
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
-	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
-	 */
-	boolean judge(Person person);
+public class PersonIDsExporter extends PersonFilterA {
+	private static Set<IdI> idSet = new HashSet<IdI>();
 
 	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
+	 * only a virtual overriding, the function will never be used
 	 */
-	void run(Person person);
+	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	@Override
+	public boolean judge(Person person) {
+		return true;
+	}
 
+	/*--------------------------SETTER----------------------------*/
+	/**
+	 * Returns a set of Person-IDs
+	 * 
+	 * @return a Set of Person-IDs
+	 */
+	public Set<IdI> idSet() {
+		System.out.println("exporting " + idSet.size() + " person- IDs.");
+		return idSet;
+	}
+
+	/*--------------------------OVERRIDING METHOD-------------------*/
+	/**
+	 * When the function is called, the Person- ID of the person is being put
+	 * into the idSet.
+	 */
+	@Override
+	public void run(Person person) {
+		idSet.add(person.getId());
+	}
 }
