@@ -18,7 +18,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	private final double minNorthing;
 	private final double maxNorthing;
 
-	class CreateReceiverExecutor extends Executor {
+	static class CreateReceiverExecutor extends Executor<OTFDataReader> {
 		final OTFConnectionManager connect;
 
 		public CreateReceiverExecutor(OTFConnectionManager connect2) {
@@ -44,7 +44,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	class ReadDataExecutor extends Executor {
+	class ReadDataExecutor extends Executor<OTFDataReader> {
 		final DataInputStream in;
 		boolean readConst;
 
@@ -67,7 +67,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	class InvalidateExecutor extends Executor {
+	class InvalidateExecutor extends Executor<OTFDataReader> {
 		@Override
 		public void execute(double x, double y, OTFDataReader reader) {
 			reader.invalidate();
@@ -86,7 +86,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 		Gbl.startMeasurement();
 		int colls = this.execute(this.top.getBounds(),
-				this.new CreateReceiverExecutor(connect));
+				new CreateReceiverExecutor(connect));
 		System.out.println("CLIENT DRAWER execute  == " + colls
 				+ "objects time");
 		Gbl.printElapsedTime();

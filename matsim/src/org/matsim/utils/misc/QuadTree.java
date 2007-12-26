@@ -67,10 +67,10 @@ public class QuadTree<T> implements Serializable {
 	 * optimal performance, all points should be evenly distributed within this
 	 * rectangle.
 	 *
-	 * @param minX The smallest x coordinate expected
-	 * @param minY The smallest y coordinate expected
-	 * @param maxX The largest x coordinate expected
-	 * @param maxY The largest y coordinate expected
+	 * @param minX The smallest x coordinate (easting, longitude) expected
+	 * @param minY The smallest y coordinate (northing, latitude) expected
+	 * @param maxX The largest x coordinate (easting, longitude) expected
+	 * @param maxY The largest y coordinate (northing, latitude) expected
 	 */
 	public QuadTree(final double minX, final double minY, final double maxX, final double maxY) {
 		setTopNode(minX, minY, maxX, maxY);
@@ -117,13 +117,15 @@ public class QuadTree<T> implements Serializable {
 	/** Clear the QuadTree. */
 	public void clear() {
 		this.top.clear();
+		this.size = 0;
+		this.modCount++;
 	}
 
 	/**
 	 * Gets the object closest to x/y
 	 *
-	 * @param x left-right location, longitude
-	 * @param y up-down location, latitude
+	 * @param x easting, left-right location, longitude
+	 * @param y northing, up-down location, latitude
 	 * @return the object found closest to x/y
 	 */
 	public T get(final double x, final double y) {
@@ -143,13 +145,40 @@ public class QuadTree<T> implements Serializable {
 	}
 
 	/**
-	 * Executes executor on all objects within a certain boundary
+	 * Gets all objects inside the specified boundary. Objects on the border of the
+	 * boundary are not included.
+	 *
+	 * @param bounds The bounds of the area of interest.
+	 * @param values A collection to store the found objects in.
+	 * @return The objects found within the area.
+	 */
+	public Collection<T> get(final Rect bounds, final Collection<T> values) {
+		return this.top.get(bounds, values);
+	}
+
+	/**
+	 * Gets all objects inside the specified area. Objects on the border of
+	 * the area are not included.
+	 *
+	 * @param minX The minimum left-right location, longitude
+	 * @param minY The minimum up-down location, latitude
+	 * @param maxX The maximum left-right location, longitude
+	 * @param maxY The maximum up-down location, latitude
+	 * @param values A collection to store the found objects in.
+	 * @return The objects found within the area.
+	 */
+	public Collection<T> get(final double minX, final double minY, final double maxX, final double maxY, final Collection<T> values) {
+		return get(new Rect(minX, minY, maxX, maxY), values);
+	}
+
+	/**
+	 * Executes executor on all objects inside a certain boundary
 	 *
 	 * @param bounds The boundary in which the executor will be applied.
 	 * @param executor is executed on the fitting objects
-	 * @return the count of objects found within distance to x/y
+	 * @return the count of objects found within the bounds.
 	 */
-	public int execute(final Rect bounds, final Executor executor) {
+	public int execute(final Rect bounds, final Executor<T> executor) {
 		if (bounds == null) {
 			return this.top.execute(this.top.getBounds(), executor);
 		}
@@ -157,17 +186,17 @@ public class QuadTree<T> implements Serializable {
 	}
 
 	/**
-	 * Executes executor on all objects within the rectangle (minX,minY):(maxX,maxY)
+	 * Executes executor on all objects inside the rectangle (minX,minY):(maxX,maxY)
 	 *
 	 * @param minX The minimum left-right location, longitude
 	 * @param minY The minimum up-down location, latitude
 	 * @param maxX The maximum left-right location, longitude
 	 * @param maxY The maximum up-down location, latitude
 	 * @param executor is executed on the fitting objects
-	 * @return the count of objects found within distance to x/y
+	 * @return the count of objects found within the rectangle.
 	 */
-	public int execute(final double minX, final double minY, final double maxX, final double maxY, final Executor executor) {
-		return this.top.execute(new Rect(minX, minY, maxX, maxY), executor);
+	public int execute(final double minX, final double minY, final double maxX, final double maxY, final Executor<T> executor) {
+		return execute(new Rect(minX, minY, maxX, maxY), executor);
 	}
 
 	/**
@@ -189,6 +218,26 @@ public class QuadTree<T> implements Serializable {
 	 */
 	protected void setTopNode(final double minX, final double minY, final double maxX, final double maxY) {
 		this.top = new Node(minX, minY, maxX, maxY);
+	}
+
+	/** @return the minimum x coordinate (left-right, longitude, easting) of the bounds of the QuadTree. */
+	public double getMinEasting() {
+		return this.top.getBounds().minX;
+	}
+
+	/** @return the maximum x coordinate (left-right, longitude, easting) of the bounds of the QuadTree. */
+	public double getMaxEasting() {
+		return this.top.getBounds().maxX;
+	}
+
+	/** @return the minimum y coordinate (up-down, latitude, northing) of the bounds of the QuadTree. */
+	public double getMinNorthing() {
+		return this.top.getBounds().minY;
+	}
+
+	/** @return the minimum y coordinate (up-down, latitude, northing) of the bounds of the QuadTree. */
+	public double getMaxNorthing() {
+		return this.top.getBounds().maxY;
 	}
 
   /**
@@ -461,6 +510,7 @@ public class QuadTree<T> implements Serializable {
 				this.northeast = null;
 				this.southeast = null;
 				this.southwest = null;
+				this.hasChilds = false;
 			} else {
 				if (this.leaf != null) {
 					this.leaf.values.clear();
@@ -532,7 +582,7 @@ public class QuadTree<T> implements Serializable {
 			return values;
 		}
 
-		private Collection<T> get(final Rect bounds, final Collection<T> values) {
+		/* default */ Collection<T> get(final Rect bounds, final Collection<T> values) {
 			if (this.hasChilds) {
 				if (this.northwest.bounds.intersects(bounds)) {
 					this.northwest.get(bounds, values);
@@ -557,7 +607,7 @@ public class QuadTree<T> implements Serializable {
 			return values;
 		}
 
-		/* default */ int execute(final Rect globalBounds, final Executor executor) {
+		/* default */ int execute(final Rect globalBounds, final Executor<T> executor) {
 			int count = 0;
 			if (this.hasChilds) {
 				if (this.northwest.bounds.intersects(globalBounds)) {
@@ -658,7 +708,7 @@ public class QuadTree<T> implements Serializable {
 
 	}
 
-	public abstract class Executor {
+	public abstract static class Executor<T> {
 		abstract public void execute(double x, double y, T object);
 	}
 }
