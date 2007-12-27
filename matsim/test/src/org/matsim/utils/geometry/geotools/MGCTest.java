@@ -21,7 +21,7 @@ public class MGCTest extends MatsimTestCase {
 		double delta = 0.0000001;
 		CoordI coord1 = new Coord(x,y);
 		Coordinate coord2 = MGC.coord2Coordinate(coord1);
-		CoordI coord3 = MGC.Coordinate2Coord(coord2);
+		CoordI coord3 = MGC.coordinate2Coord(coord2);
 		double x1 = coord3.getX();
 		double y1 = coord3.getY();
 		junit.framework.Assert.assertEquals(x,x1,delta);

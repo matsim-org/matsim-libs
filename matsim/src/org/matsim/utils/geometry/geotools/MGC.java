@@ -26,54 +26,51 @@ import org.matsim.utils.geometry.shared.Coord;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
- * Converter factory for various conversion from Geotools to Matsim and
- * vice versa 
- * 
+ * Converter factory for various conversion from Geotools to MATSim and vice versa.
+ *
  * @author laemmel
  *
  */
 public class MGC {
-	
-	
+
 	public static final GeometryFactory geoFac = new GeometryFactory();
-	
+
 	/**
-	 * Converts a Matsim <code>CoordI</code> into a Geotools <code>Coordinate</code>
-	 * @param Matsim coordinate
+	 * Converts a MATSim {@link org.matsim.utils.geometry.CoordI} into a Geotools <code>Coordinate</code>
+	 * @param coord MATSim coordinate
 	 * @return Geotools coordinate
 	 */
-	public static final Coordinate coord2Coordinate(CoordI coord){
-		return new Coordinate(coord.getX(),coord.getY());
+	public static final Coordinate coord2Coordinate(final CoordI coord) {
+		return new Coordinate(coord.getX(), coord.getY());
 	}
 
 	/**
-	 * Converts a Geotools <code>Coordinate</code> into a Matsim <code>CoordI</code> 
-	 * @param Matsim coordinate
+	 * Converts a Geotools <code>Coordinate</code> into a MATSim {@link org.matsim.utils.geometry.CoordI}
+	 * @param coord MATSim coordinate
 	 * @return Geotools coordinate
 	 */
-	public static final CoordI Coordinate2Coord(Coordinate coord){
-		return new Coord(coord.x,coord.y);
+	public static final CoordI coordinate2Coord(final Coordinate coord) {
+		return new Coord(coord.x, coord.y);
 	}
 
 	/**
-	 * Converts a Matsim <code>CoordI</code> into a Geotools <code>Point</code> 
-	 * @param Matsim coordinate
+	 * Converts a MATSim {@link org.matsim.utils.geometry.CoordI} into a Geotools <code>Point</code>
+	 * @param coord MATSim coordinate
 	 * @return Geotools point
 	 */
-	public static final Point coord2Point(CoordI coord){
-		return new Point(new CoordinateArraySequence(new Coordinate [] {coord2Coordinate(coord)}), geoFac);
+	public static final Point coord2Point(final CoordI coord) {
+		return geoFac.createPoint(coord2Coordinate(coord));
 	}
-	
+
 	/**
-	 * Converts a Geotools <code>Point</code> into a Matsim <code>CoordI</code> 
-	 * @param Geotools point
-	 * @return Matsim coordinate
+	 * Converts a Geotools <code>Point</code> into a MATSim {@link org.matsim.utils.geometry.CoordI}
+	 * @param point Geotools point
+	 * @return MATSim coordinate
 	 */
-	public static final CoordI point2Coord(Point point){
-		return new Coord(point.getX(),point.getY());
+	public static final CoordI point2Coord(final Point point) {
+		return new Coord(point.getX(), point.getY());
 	}
-	
+
 }
