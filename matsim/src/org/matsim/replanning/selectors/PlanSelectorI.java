@@ -25,16 +25,16 @@ import org.matsim.plans.Plan;
 
 /**
  * select a plan of a person
- * 
+ *
  * @author mrieser
  */
 public interface PlanSelectorI {
-	
+
 	/**
-	 * Select and return a plan of a person. 
+	 * Select and return a plan of a person.
 	 *
 	 * @param person
-	 * @return selected plan
+	 * @return selected plan, or null if the person has no plans.
 	 */
 	public Plan selectPlan(Person person);
 
