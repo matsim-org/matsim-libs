@@ -27,8 +27,7 @@ import org.matsim.plans.Plan;
 
 /**
  * Selects one of the existing plans of the person based on the
- * weight = exp(beta*score). If there are unscored plans, a random one
- * of the unscored plans will be chosen (optimistic strategy).
+ * weight = exp(beta*score).
  *
  * @author mrieser
  */
@@ -42,16 +41,9 @@ public class ExpBetaPlanSelector implements PlanSelectorI {
 	}
 
 	/**
-	 * Selects a random plan from the person, random but according to its weight.
-	 * If there are plans with undefined score, one of those plans will
-	 * be selected.
+	 * @return Returns a random plan from the person, random but according to its weight.
 	 */
 	public Plan selectPlan(final Person person) {
-		// First check if there are any unscored plans
-		Plan selectedPlan = selectUnscoredPlan(person);
-		if (selectedPlan != null) return selectedPlan;
-
-		// Okay, no unscored plans...
 
 		// Build the weights of all plans
 		// - first find the max. score of all plans of this person
@@ -77,44 +69,17 @@ public class ExpBetaPlanSelector implements PlanSelectorI {
 		for (Plan plan : person.getPlans()) {
 			selnum -= weights[idx];
 			if (selnum <= 0.0) {
-				person.setSelectedPlan(plan);
 				return plan;
 			}
 			idx++;
 		}
 
-		// this case should never happen, except a person has no plans at all.
-		return null;
-	}
+		// hmm, no plan returned... either the person has no plans, or the plan(s) have no score.
+		if (person.getPlans().size() > 0) {
+			return person.getPlans().get(0);
+		}
 
-	/**
-	 * Returns a plan with undefined score, chosen randomly among all plans
-	 * of the person with undefined score.
-	 *
-	 * @param person
-	 * @return a random plan with undefined score, or null if none such plan exists.
-	 */
-	private Plan selectUnscoredPlan(final Person person) {
-		int cntUnscored = 0;
-		for (Plan plan : person.getPlans()) {
-			if (Plan.isUndefinedScore(plan.getScore())) {
-				cntUnscored++;
-			}
-		}
-		if (cntUnscored > 0) {
-			// select one of the unscored plans
-			int idxUnscored = Gbl.random.nextInt(cntUnscored);
-			cntUnscored = 0;
-			for (Plan plan : person.getPlans()) {
-				if (Plan.isUndefinedScore(plan.getScore())) {
-					if (cntUnscored == idxUnscored) {
-						person.setSelectedPlan(plan);
-						return plan;
-					}
-					cntUnscored++;
-				}
-			}
-		}
+		// this case should never happen, except a person has no plans at all.
 		return null;
 	}
 
