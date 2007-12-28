@@ -23,9 +23,8 @@ package org.matsim.replanning;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.PlanSelectorI;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
@@ -52,15 +51,15 @@ public class StrategyManagerTest extends MatsimTestCase {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 		// setup StrategyManager
 		StrategyManager manager = new StrategyManager();
-		TestStrategy strategy1 = new TestStrategy(new RandomPlanSelector());
-		TestStrategy strategy2 = new TestStrategy(new RandomPlanSelector());
-		TestStrategy strategy3 = new TestStrategy(new RandomPlanSelector());
-		TestStrategy strategy4 = new TestStrategy(new RandomPlanSelector());
+		StrategyCounter strategy1 = new StrategyCounter(new RandomPlanSelector());
+		StrategyCounter strategy2 = new StrategyCounter(new RandomPlanSelector());
+		StrategyCounter strategy3 = new StrategyCounter(new RandomPlanSelector());
+		StrategyCounter strategy4 = new StrategyCounter(new RandomPlanSelector());
 
 		manager.addStrategy(strategy1, 0.10);
 		manager.addStrategy(strategy2, 0.20);
@@ -123,16 +122,77 @@ public class StrategyManagerTest extends MatsimTestCase {
 	}
 
 	/**
+	 * This method tests that the StrategyManager uses a so-called "optimistic behavior"
+	 * when selecting plans for replanning/execution. Optimistic Behavior means that plans
+	 * with undefined score are chosen before any other plan with defined score.
+	 *
+	 * @author mrieser
+	 */
+	public void testOptimisticBehavior() {
+
+		Plans population = new Plans(Plans.NO_STREAMING);
+		Person person = null;
+		Plan[] plans = new Plan[10];
+		// create a person with 4 unscored plans
+		try {
+			person = new Person(new Id(1), "m", 40, null, null, null);
+			plans[0] = person.createPlan(null, "no");
+			plans[1] = person.createPlan("0.0", "no");
+			plans[2] = person.createPlan(null, "no");
+			plans[3] = person.createPlan("-50.0", "no");
+			plans[4] = person.createPlan("+50.0", "no");
+			plans[5] = person.createPlan("+50.0", "no");
+			plans[6] = person.createPlan("+60.0",  "no");
+			plans[7] = person.createPlan(null, "no");
+			plans[8] = person.createPlan("-10.0",  "no");
+			plans[9] = person.createPlan(null, "no");
+			population.addPerson(person);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		StrategyManager manager = new StrategyManager();
+		PlanStrategy strategy = new PlanStrategy(new TestPlanSelector());
+		manager.addStrategy(strategy, 1.0);
+
+		// in each "iteration", an unscored plans should be selected
+		for (int i = 0; i < 4; i++) {
+			try {
+				manager.run(population, i);
+			}
+			catch (UnsupportedOperationException e) {
+				throw new AssertionError("Did not expect UnsupportedOperationException in iteration " + i);
+			}
+			Plan plan = person.getSelectedPlan();
+			assertTrue("plan has not undefined score in iteration " + i, plan.hasUndefinedScore());
+			plan.setScore(i);
+		}
+
+		/* There are no more unscored plans now, so in the next "iteration" our
+		 * bad PlanSelector should be called. */
+		boolean gotException = false;
+		try {
+			manager.run(population, 5);
+		}
+		catch (UnsupportedOperationException e) {
+			gotException = true;
+		}
+		assertTrue("Expected: UnsupportedOperationException, but there was none...", gotException);
+
+	}
+
+	/**
 	 * A simple extension to the PlanStrategy which counts how often it was
 	 * called.
 	 *
 	 * @author mrieser
 	 */
-	static private class TestStrategy extends PlanStrategy {
+	static private class StrategyCounter extends PlanStrategy {
 
 		int counter = 0;
 
-		private TestStrategy(final PlanSelectorI selector) {
+		public StrategyCounter(final PlanSelectorI selector) {
 			super(selector);
 		}
 
@@ -149,6 +209,22 @@ public class StrategyManagerTest extends MatsimTestCase {
 		public void resetCounter() {
 			this.counter = 0;
 		}
+	}
+
+	/**
+	 * A simple PlanSelector that throws an UnsupportedOperationException whenever
+	 * it should select a plan.
+	 *
+	 * @author mrieser
+	 */
+	static private class TestPlanSelector implements PlanSelectorI {
+
+		public TestPlanSelector() {
+		}
+		public Plan selectPlan(final Person person) {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 
 }
