@@ -69,6 +69,8 @@ public abstract class Gbl {
 
 	public static final double UNDEFINED_TIME = TimeFormatter.UNDEFINED_TIME;
 
+	private static final long DEFAULT_RANDOM_SEED = 4711;
+
 	private static Config config = null;
 	private static World world = null;
 
@@ -78,7 +80,7 @@ public abstract class Gbl {
 
 	// the global random number generator
 	// the seed is set by the config package (see matsim.gbl.Config)
-	public static final Random random = new Random();
+	public static final Random random = new Random(DEFAULT_RANDOM_SEED);
 
 	private static TimeFormatter timeFormatter = new TimeFormatter();
 
@@ -149,6 +151,7 @@ public abstract class Gbl {
 		log.info("Gbl.reset() -- reset config, world");
 		Gbl.config = null;
 		Gbl.world = null;
+		Gbl.random.setSeed(DEFAULT_RANDOM_SEED);
 		SimulationTimer.reset();
 		Counts.reset();
 		CharyparNagelScoringFunction.initialized = false; // TODO [MR] see todo-comment in BasicScoringFunction.java
