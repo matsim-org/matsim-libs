@@ -269,14 +269,6 @@ public class Plan extends BasicPlan {
 		return this.person.getSelectedPlan() == this;
 	}
 
-	public final boolean hasUndefinedScore() {
-		return Plan.isUndefinedScore(this.getScore());
-	}
-
-	public static final boolean isUndefinedScore(final double score) {
-		return Double.isNaN(score);
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////

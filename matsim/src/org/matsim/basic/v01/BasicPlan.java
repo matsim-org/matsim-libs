@@ -57,6 +57,16 @@ public class BasicPlan implements Serializable {
 		}
 	}
 
+	/** @return true if the score of this plan is not defined */
+	public final boolean hasUndefinedScore() {
+		return isUndefinedScore(this.getScore());
+	}
+
+	/** @param score The score to test.
+	 * @return true if <code>score</code> has the meaning of "undefined score". */
+	public static final boolean isUndefinedScore(final double score) {
+		return Double.isNaN(score);
+	}
 
 	/**
 	 * Iterator that steps through all Activities ignoring the Legs
