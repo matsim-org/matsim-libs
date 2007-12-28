@@ -202,6 +202,35 @@ public class Person extends BasicPerson<Plan>{
 		return ret;
 	}
 
+	/**
+	 * Returns a plan with undefined score, chosen randomly among all plans
+	 * with undefined score.
+	 *
+	 * @return A random plan with undefined score, or <code>null</code> if none such plan exists.
+	 */
+	public Plan getRandomUnscoredPlan() {
+		int cntUnscored = 0;
+		for (Plan plan : this.plans) {
+			if (plan.hasUndefinedScore()) {
+				cntUnscored++;
+			}
+		}
+		if (cntUnscored > 0) {
+			// select one of the unscored plans
+			int idxUnscored = Gbl.random.nextInt(cntUnscored);
+			cntUnscored = 0;
+			for (Plan plan : this.plans) {
+				if (plan.hasUndefinedScore()) {
+					if (cntUnscored == idxUnscored) {
+						return plan;
+					}
+					cntUnscored++;
+				}
+			}
+		}
+		return null;
+	}
+
 	public void exchangeSelectedPlan(final Plan newPlan, final boolean appendPlan) {
 		newPlan.setPerson(this);
 		BasicPlan oldSelectedPlan = getSelectedPlan();
@@ -259,12 +288,12 @@ public class Person extends BasicPerson<Plan>{
 	 * Plans with undefined scores are treated as plans with very bad scores and thus removed
 	 * first. If there are several plans with the same bad score, it can not be predicted which
 	 * one of them will be removed.<br>
-	 * This method insures that if there are different types of plans (see 
+	 * This method insures that if there are different types of plans (see
 	 * {@link org.matsim.plans.Plan#getType()}),
 	 * at least one plan of each type remains. This could lead to the worst plan being kept if
 	 * it is the only one of it's type. Plans with type <code>null</code> are handled like any
 	 * other type, and are differentiated from plans with the type set to an empty String.<br>
-	 * 
+	 *
 	 * If there are more plan-types than <code>maxSize</code>, it is not possible to reduce the
 	 * number of plans to the requested size.
 	 *
