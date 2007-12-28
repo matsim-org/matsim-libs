@@ -198,16 +198,6 @@ public class Person extends BasicPerson<Plan>{
 		return this.type;
 	}
 
-	public Plan selectRandomPlan() {
-		if (this.plans.size() == 0) {
-			return null;
-		}
-		int index = (int)(Gbl.random.nextDouble()*this.plans.size());
-		Plan ret = this.plans.get(index);
-		setSelectedPlan(ret);
-		return ret;
-	}
-
 	/**
 	 * Returns a plan with undefined score, chosen randomly among all plans
 	 * with undefined score.
