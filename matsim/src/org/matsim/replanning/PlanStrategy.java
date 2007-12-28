@@ -28,7 +28,7 @@ import org.matsim.replanning.modules.StrategyModuleI;
 import org.matsim.replanning.selectors.PlanSelectorI;
 
 /**
- * A strategy defines how an agent will be modified during re-planning.
+ * A strategy defines how an agent can be modified during re-planning.
  *
  * @author mrieser
  * @see org.matsim.replanning
@@ -41,7 +41,7 @@ public class PlanStrategy {
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
 
 	/**
-	 * creates a new strategy using the specified planSelector
+	 * Creates a new strategy using the specified planSelector.
 	 *
 	 * @param planSelector
 	 */
@@ -50,7 +50,7 @@ public class PlanStrategy {
 	}
 
 	/**
-	 * adds a strategy module to this strategy
+	 * Adds a strategy module to this strategy.
 	 *
 	 * @param module
 	 */
@@ -65,13 +65,17 @@ public class PlanStrategy {
 	/**
 	 * Adds a person to this strategy to be handled. It is not required that
 	 * the person is immediately handled during this method-call (e.g. when using
-	 * multi-threaded strategy-modules).
+	 * multi-threaded strategy-modules).  This method ensures that an unscored
+	 * plan is selected if the person has such a plan ("optimistic behavior").
 	 *
 	 * @param person
 	 * @see #finish
 	 */
 	public void run(final Person person) {
-		Plan plan = this.planSelector.selectPlan(person);
+		Plan plan = person.getRandomUnscoredPlan();
+		if (plan == null) {
+			plan = this.planSelector.selectPlan(person);
+		}
 		person.setSelectedPlan(plan);
 		if (this.firstModule != null) {
 			plan = person.copySelectedPlan();
