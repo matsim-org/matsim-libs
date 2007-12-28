@@ -51,6 +51,13 @@ public class Plan extends BasicPlan {
 		this.person = person;
 	}
 
+	public Plan(final String score, final Person person) {
+		this.person = person;
+		if (score != null) { this.setScore(Double.parseDouble(score)); }
+	}
+
+	/** @deprecated parameter age is no longer used, use Plan(String score, Person person) */
+	@Deprecated
 	public Plan(final String score, final String age, final Person person) {
 		this.person = person;
 		if (score != null) { this.setScore(Double.parseDouble(score)); }
