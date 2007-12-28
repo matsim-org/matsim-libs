@@ -25,16 +25,16 @@ import org.matsim.plans.Plan;
 
 /**
  * Selects the plan with the best score from the existing plans of the person.
- * 
+ *
  * @author mrieser
  */
 public class BestPlanSelector implements PlanSelectorI {
-	
+
 	/**
 	 * selects the plan with the highest score from the person
 	 */
-	public Plan selectPlan(Person person) {
-		
+	public Plan selectPlan(final Person person) {
+
 		double maxScore = Double.NEGATIVE_INFINITY;
 		Plan bestPlan = null;
 
@@ -45,6 +45,10 @@ public class BestPlanSelector implements PlanSelectorI {
 			}
 		}
 
+		if (bestPlan == null && person.getPlans().size() > 0) {
+			// it seems none of the plans has a real score... so just return the first one (if there is one)
+			return person.getPlans().get(0);
+		}
 		return bestPlan;
 	}
 
