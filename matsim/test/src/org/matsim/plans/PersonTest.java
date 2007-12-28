@@ -20,8 +20,7 @@
 
 package org.matsim.plans;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
+import org.matsim.basic.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PersonTest extends MatsimTestCase {
@@ -35,11 +34,11 @@ public class PersonTest extends MatsimTestCase {
 	public void testRemoveWorstPlans_nullType() {
 		Person person = new Person("1", "m", "35", "yes", "yes", "yes");
 
-		Plan plan1 = new Plan("15.0", null, person);
-		Plan plan2 = new Plan("22.0", null, person);
-		Plan plan3 = new Plan(null, null, person);
-		Plan plan4 = new Plan("1.0", null, person);
-		Plan plan5 = new Plan("18.0", null, person);
+		Plan plan1 = new Plan("15.0", person);
+		Plan plan2 = new Plan("22.0", person);
+		Plan plan3 = new Plan(null, person);
+		Plan plan4 = new Plan("1.0", person);
+		Plan plan5 = new Plan("18.0", person);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
 		person.addPlan(plan3);
@@ -84,17 +83,17 @@ public class PersonTest extends MatsimTestCase {
 		 */
 		Person person = new Person("1", "m", "35", "yes", "yes", "yes");
 
-		Plan plan1 = new Plan("15.0", null, person);
+		Plan plan1 = new Plan("15.0", person);
 		plan1.setType("a");
-		Plan plan2 = new Plan("22.0", null, person);
+		Plan plan2 = new Plan("22.0", person);
 		plan2.setType("b");
-		Plan plan3 = new Plan(null, null, person);
+		Plan plan3 = new Plan(null, person);
 		plan3.setType("a");
-		Plan plan4 = new Plan("1.0", null, person);
+		Plan plan4 = new Plan("1.0", person);
 		plan4.setType("b");
-		Plan plan5 = new Plan("18.0", null, person);
+		Plan plan5 = new Plan("18.0", person);
 		plan5.setType("a");
-		Plan plan6 = new Plan("21.0", null, person);
+		Plan plan6 = new Plan("21.0", person);
 		plan6.setType("b");
 		person.addPlan(plan1);
 		person.addPlan(plan2);
@@ -120,6 +119,53 @@ public class PersonTest extends MatsimTestCase {
 		assertEquals("test that no plans were removed", 2, person.getPlans().size());
 		assertTrue("test that the plan with highest score of type a was not removed", person.getPlans().contains(plan5));
 		assertTrue("test that the plan with highest score of type b was not removed", person.getPlans().contains(plan2));
+	}
+
+	/**
+	 * Test {@link org.matsim.plans.Person#getRandomUnscoredPlan()} when the
+	 * @author mrieser
+	 */
+	public void testGetRandomUnscoredPlan() {
+		Plans population = new Plans(Plans.NO_STREAMING);
+		Person person = null;
+		Plan[] plans = new Plan[10];
+		// create a person with 4 unscored plans
+		try {
+			person = new Person(new Id(1), "m", 40, null, null, null);
+			plans[0] = person.createPlan(null, "no");
+			plans[1] = person.createPlan("0.0", "no");
+			plans[2] = person.createPlan(null, "no");
+			plans[3] = person.createPlan("-50.0", "no");
+			plans[4] = person.createPlan("+50.0", "no");
+			plans[5] = person.createPlan("+50.0", "no");
+			plans[6] = person.createPlan("+60.0",  "no");
+			plans[7] = person.createPlan(null, "no");
+			plans[8] = person.createPlan("-10.0",  "no");
+			plans[9] = person.createPlan(null, "no");
+			population.addPerson(person);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		// now test if we all for plans without score are returned
+		Plan plan = person.getRandomUnscoredPlan();
+		assertTrue(plan.hasUndefinedScore());
+		plan.setScore(1.0);
+		plan = person.getRandomUnscoredPlan();
+		assertTrue(plan.hasUndefinedScore());
+		plan.setScore(2.0);
+		plan = person.getRandomUnscoredPlan();
+		assertTrue(plan.hasUndefinedScore());
+		plan.setScore(3.0);
+		plan = person.getRandomUnscoredPlan();
+		assertTrue(plan.hasUndefinedScore());
+		plan.setScore(4.0);
+		plan = person.getRandomUnscoredPlan();
+		assertNull(plan);
+		for (int i = 0; i < plans.length; i++) {
+			assertFalse(plans[i].hasUndefinedScore());
+		}
 	}
 
 }
