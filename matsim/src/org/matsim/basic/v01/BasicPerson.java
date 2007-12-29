@@ -31,22 +31,22 @@ public class BasicPerson<T extends BasicPlan> {
 	protected T selectedPlan = null;
 	protected IdI id;
 
-	public BasicPerson(String id) {
+	public BasicPerson(final String id) {
 		this(new Id(id));
 	}
 
-	public BasicPerson(Id id) {
+	public BasicPerson(final Id id) {
 		this.id = id;
 	}
 
-	public void addPlan(T plan) {
-		plans.add(plan);
+	public void addPlan(final T plan) {
+		this.plans.add(plan);
 		// Make sure there is a selected plan if there is at least one plan
-		if (selectedPlan == null) selectedPlan = plan;
+		if (this.selectedPlan == null) this.selectedPlan = plan;
 	}
 
 	public T getSelectedPlan() {
-		return selectedPlan;
+		return this.selectedPlan;
 	}
 
 	/**
@@ -55,16 +55,14 @@ public class BasicPerson<T extends BasicPlan> {
 	 *
 	 * @param selectedPlan the plan to be the selected one of the person
 	 */
-	public void setSelectedPlan(T selectedPlan) {
+	public void setSelectedPlan(final T selectedPlan) {
 		if (this.plans.contains(selectedPlan)) {
 			this.selectedPlan = selectedPlan;
-		} else {
-			// Do nothing
 		}
 	}
 
 	public List<T> getPlans() {
-		return plans;
+		return this.plans;
 	}
 
 	public IdI getId() {
