@@ -73,7 +73,7 @@ public class EventWriterTXT implements BasicEventHandlerI {
 		closefile();
 	}
 
-	public void writeLine(final String line) {
+	private void writeLine(final String line) {
 		try {
 			this.out.write(line);
 			this.out.write("\n");
