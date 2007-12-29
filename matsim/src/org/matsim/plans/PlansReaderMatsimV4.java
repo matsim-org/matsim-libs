@@ -68,7 +68,7 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 	private Act curract = null;
 	private Leg currleg = null;
 	private Route currroute = null;
-	
+
 	private final static Logger log = Logger.getLogger(PlansReaderMatsimV4.class);
 
 	public PlansReaderMatsimV4(final Plans plans) {
@@ -221,7 +221,7 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	private void startPlan(final Attributes atts) {
-		this.currplan = this.currperson.createPlan(atts.getValue("score"), atts.getValue("age"), atts.getValue("selected"));
+		this.currplan = this.currperson.createPlan(atts.getValue("score"), atts.getValue("selected"));
 		if (atts.getValue("type") != null) {
 			this.currplan.setType(atts.getValue("type"));
 		}

@@ -109,7 +109,7 @@ public class PlansCreateTripsFromODMatrix extends PlansAlgorithm {
 						counter++;
 						sum--;
 						Person person = new Person(Integer.toString(counter), null/*sex*/, null/*age*/, null/*license*/, "yes"/*car_avail*/, "yes"/*employed*/);
-						Plan plan = person.createPlan(null, null, "yes");
+						Plan plan = person.createPlan(null, "yes");
 						Coord coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
 						int endTime = -1;
 

@@ -26,8 +26,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -63,7 +61,7 @@ public class QueueSimulatorTest extends MatsimTestCase {
 		try {
 			// add a first person with leg from link2 to link3
 			Person person = new Person(new Id(0), "m", 35, "yes", "yes", "yes");
-			Plan plan = person.createPlan(null, null, "yes");
+			Plan plan = person.createPlan(null, "yes");
 			plan.createAct("h", 199.0, 0.0, link2, 0, 7*3600-10, 7*3600-10, false);
 			Leg leg = plan.createLeg(1, "car", 7*3600-110, Gbl.UNDEFINED_TIME, Gbl.UNDEFINED_TIME);
 			Route route = new Route();
@@ -75,7 +73,7 @@ public class QueueSimulatorTest extends MatsimTestCase {
 			// add a lot of other persons with legs from link1 to link3
 			for (int i = 1; i < 7000; i++) {
 				person = new Person(new Id(i), "m", 35, "yes", "yes", "yes");
-				plan = person.createPlan(null, null, "yes");
+				plan = person.createPlan(null, "yes");
 				plan.createAct("h", 99.0, 0.0, link1, 0, 7*3600-110, 7*3600-110, false);
 				leg = plan.createLeg(1, "car", 7*3600-110, Gbl.UNDEFINED_TIME, Gbl.UNDEFINED_TIME);
 				route = new Route();

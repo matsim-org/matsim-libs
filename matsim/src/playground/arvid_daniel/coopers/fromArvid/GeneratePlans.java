@@ -60,7 +60,7 @@ public class GeneratePlans {
 
 			String ID = Integer.toString(Integer.MAX_VALUE - i);
 			Person person = new Person(ID, null, "33",null,"true","true");
-			Plan plan = new Plan("0","0",person);
+			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 3.*3600;
 			Link startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2;

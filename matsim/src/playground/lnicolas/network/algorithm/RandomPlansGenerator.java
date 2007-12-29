@@ -43,17 +43,17 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 
 	private double minX;
 	private double minY;
-	private double givenFromToDistance;
-	private int tripCount;
+	private final double givenFromToDistance;
+	private final int tripCount;
 	private Plans plans;
 
-	public RandomPlansGenerator(double avgFromToDistance,
-			int tripCount) {
+	public RandomPlansGenerator(final double avgFromToDistance,
+			final int tripCount) {
 		this.givenFromToDistance = avgFromToDistance;
 		this.tripCount = tripCount;
 	}
 
-	private ArrayList<Node>[][] initCells(NetworkLayer network) {
+	private ArrayList<Node>[][] initCells(final NetworkLayer network) {
 		this.minX = Double.MAX_VALUE;
 		this.minY = Double.MAX_VALUE;
 		double maxX = Double.MIN_VALUE;
@@ -63,19 +63,19 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 			if (n.getCoord().getX() > maxX) {
 				maxX = n.getCoord().getX();
 			}
-			if (n.getCoord().getX() < minX) {
-				minX = n.getCoord().getX();
+			if (n.getCoord().getX() < this.minX) {
+				this.minX = n.getCoord().getX();
 			}
 			if (n.getCoord().getY() > maxY) {
 				maxY = n.getCoord().getY();
 			}
-			if (n.getCoord().getY() < minY) {
-				minY = n.getCoord().getY();
+			if (n.getCoord().getY() < this.minY) {
+				this.minY = n.getCoord().getY();
 			}
 		}
 
-		int cellColumnCount = (int) Math.ceil((maxX - minX) / cellSize);
-		int cellRowCount = (int) Math.ceil((maxY - minY) / cellSize);
+		int cellColumnCount = (int) Math.ceil((maxX - this.minX) / this.cellSize);
+		int cellRowCount = (int) Math.ceil((maxY - this.minY) / this.cellSize);
 		ArrayList<Node>[][] cells
 			= new ArrayList[cellRowCount][cellColumnCount];
 		for (int i = 0; i < cellRowCount; i++) {
@@ -86,8 +86,8 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 
 		// Put each node in the appropriate cell
 		for (Node n : network.getNodes().values()) {
-			int row = (int)(n.getCoord().getY() - minY) / cellSize;
-			int column = (int)(n.getCoord().getX() - minX) / cellSize;
+			int row = (int)(n.getCoord().getY() - this.minY) / this.cellSize;
+			int column = (int)(n.getCoord().getX() - this.minX) / this.cellSize;
 			cells[row][column].add(n);
 		}
 
@@ -110,17 +110,17 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		return cells;
 	}
 
-	private void generateTrips(NetworkLayer network, ArrayList<Node>[][] cells) {
+	private void generateTrips(final NetworkLayer network, final ArrayList<Node>[][] cells) {
 
 		Gbl.random.nextDouble(); // draw one because of strange "not-randomness" in the first draw...
 
 		// Take a random cell and determine the cells that are givenFromToDistance
 		// away from it
 		Plans plans = new Plans();
-		for (int i = 0; i < tripCount; i++) {
+		for (int i = 0; i < this.tripCount; i++) {
 			if (addPlan(cells, plans, i) == false) {
 				Gbl.errorMsg("No from-to node pairs found for distance "
-					+ givenFromToDistance);
+					+ this.givenFromToDistance);
 			}
 		}
 
@@ -132,7 +132,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		this.plans = plans;
 	}
 
-	private void generateTrips(NetworkLayer network) {
+	private void generateTrips(final NetworkLayer network) {
 		List<Node> fromNodes = new ArrayList<Node>(network.getNodes().values());
 		List<Node> toNodes = new ArrayList<Node>(network.getNodes().values());
 		Iterator<Node> fromIt = fromNodes.iterator();
@@ -156,8 +156,8 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 				}
 				Node toNode2 = toIt.next();
 				double dist = toNode2.getCoord().calcDistance(fromNode.getCoord());
-				if (dist > (givenFromToDistance - distanceTolerance)
-						&& dist < (givenFromToDistance + distanceTolerance)) {
+				if (dist > (this.givenFromToDistance - this.distanceTolerance)
+						&& dist < (this.givenFromToDistance + this.distanceTolerance)) {
 					toNode = toNode2;
 					break;
 				}
@@ -181,7 +181,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		this.plans = plans;
 	}
 
-	private boolean addPlan(ArrayList<Node>[][] cells, Plans plans, int id) {
+	private boolean addPlan(final ArrayList<Node>[][] cells, final Plans plans, final int id) {
 		Node toNode = null;
 		Node fromNode = null;
 		int cnt = 0;
@@ -201,8 +201,8 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 
 			for (Node n : toNodes) {
 				double dist = n.getCoord().calcDistance(fromNode.getCoord());
-				if (dist > (givenFromToDistance - distanceTolerance)
-						&& dist < (givenFromToDistance + distanceTolerance)) {
+				if (dist > (this.givenFromToDistance - this.distanceTolerance)
+						&& dist < (this.givenFromToDistance + this.distanceTolerance)) {
 					toNode = n;
 					break;
 				}
@@ -211,16 +211,16 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		}
 		if (toNode == null) {
 			System.out.println("no from-to node pairs found for distance "
-					+ givenFromToDistance);
+					+ this.givenFromToDistance);
 			return false;
 		}
 
 		return addPlan(plans, id, toNode, fromNode);
 	}
 
-	private boolean addPlan(Plans plans, int id, Node toNode, Node fromNode) {
+	private boolean addPlan(final Plans plans, final int id, final Node toNode, final Node fromNode) {
 		Person person = new Person("" + id, "f", "26", "yes", "always", "yes");
-		Plan plan = person.createPlan(null, null, "yes");
+		Plan plan = person.createPlan(null, "yes");
 		try {
 			plans.addPerson(person);
 		} catch (Exception e) {
@@ -243,10 +243,10 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		return true;
 	}
 
-	private ArrayList<Node> getToNodes(int fromCellRow, int fromCellColumn, ArrayList<Node>[][] cells) {
+	private ArrayList<Node> getToNodes(final int fromCellRow, final int fromCellColumn, final ArrayList<Node>[][] cells) {
 		ArrayList<Node> toNodes = new ArrayList<Node>();
 		Coord fromCellCenter = getCellCenter(fromCellRow, fromCellColumn);
-		if (2*cellSize >= this.givenFromToDistance) {
+		if (2*this.cellSize >= this.givenFromToDistance) {
 			for (int i = Math.max(fromCellRow-1, 0); i < Math.min(fromCellRow+2, cells.length); i++) {
 				for (int j = Math.max(fromCellColumn-1, 0);
 					j < Math.min(fromCellColumn+2, cells[0].length); j++) {
@@ -260,8 +260,8 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 				for (int j = 0; j < cells[0].length; j++) {
 					Coord c = getCellCenter(j, i);
 					double dist = c.calcDistance(fromCellCenter);
-					if (dist > (givenFromToDistance - cellSize)
-							&& dist < (givenFromToDistance + cellSize)) {
+					if (dist > (this.givenFromToDistance - this.cellSize)
+							&& dist < (this.givenFromToDistance + this.cellSize)) {
 						toNodes.addAll(cells[i][j]);
 					}
 				}
@@ -270,19 +270,19 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		return toNodes;
 	}
 
-	private Coord getCellCenter(int fromCellRow, int fromCellColumn) {
-		return new Coord(minX + cellSize*(fromCellColumn+0.5),
-				minY + (fromCellRow+0.5));
+	private Coord getCellCenter(final int fromCellRow, final int fromCellColumn) {
+		return new Coord(this.minX + this.cellSize*(fromCellColumn+0.5),
+				this.minY + (fromCellRow+0.5));
 	}
 
 	@Override
-	public void run(NetworkLayer network) {
+	public void run(final NetworkLayer network) {
 		ArrayList<Node>[][] cells = initCells(network);
 		// Now generate the trips
 		generateTrips(network, cells);
 	}
 
-	public void runDumb(NetworkLayer network) {
+	public void runDumb(final NetworkLayer network) {
 		generateTrips(network);
 	}
 

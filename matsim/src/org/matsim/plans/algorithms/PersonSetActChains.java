@@ -201,7 +201,7 @@ public class PersonSetActChains extends PersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 
 		String group = null;
 		if ((person.getAge() >= 0) && (person.getAge() < 6)) {
@@ -249,7 +249,7 @@ public class PersonSetActChains extends PersonAlgorithm {
 		}
 
 		person.getPlans().clear();
-		Plan p = person.createPlan(null,null,"yes");
+		Plan p = person.createPlan(null, "yes");
 
 		String [] acttypes = chain.split("");
 		// note: by splitting, the string[0] is always = ""!
@@ -270,26 +270,26 @@ public class PersonSetActChains extends PersonAlgorithm {
 		}
 
 		int cnt = 0;
-		for (int i=0; i<work_chains.length; i++) {
-			if (chain.equals(work_chains[i])) {
+		for (int i=0; i<this.work_chains.length; i++) {
+			if (chain.equals(this.work_chains[i])) {
 				this.chain_cnt[cnt]++;
 			}
 			cnt++;
 		}
-		for (int i=0; i<educ_chains.length; i++) {
-			if (chain.equals(educ_chains[i])) {
+		for (int i=0; i<this.educ_chains.length; i++) {
+			if (chain.equals(this.educ_chains[i])) {
 				this.chain_cnt[cnt]++;
 			}
 			cnt++;
 		}
-		for (int i=0; i<shop_chains.length; i++) {
-			if (chain.equals(shop_chains[i])) {
+		for (int i=0; i<this.shop_chains.length; i++) {
+			if (chain.equals(this.shop_chains[i])) {
 				this.chain_cnt[cnt]++;
 			}
 			cnt++;
 		}
-		for (int i=0; i<leis_chains.length; i++) {
-			if (chain.equals(leis_chains[i])) {
+		for (int i=0; i<this.leis_chains.length; i++) {
+			if (chain.equals(this.leis_chains[i])) {
 				this.chain_cnt[cnt]++;
 			}
 			cnt++;
@@ -310,20 +310,20 @@ public class PersonSetActChains extends PersonAlgorithm {
 		System.out.println("----------------------------------------");
 		System.out.println(this.getClass().getName() + ":");
 		int cnt = 0;
-		for (int i=0; i<work_chains.length; i++) {
-			System.out.println(work_chains[i] + ":\t" + this.chain_cnt[cnt] + "\t--> " + formatter.format(this.chain_cnt[cnt]/sum));
+		for (int i=0; i<this.work_chains.length; i++) {
+			System.out.println(this.work_chains[i] + ":\t" + this.chain_cnt[cnt] + "\t--> " + formatter.format(this.chain_cnt[cnt]/sum));
 			cnt++;
 		}
-		for (int i=0; i<educ_chains.length; i++) {
-			System.out.println(educ_chains[i] + ":\t" + this.chain_cnt[cnt] + "\t--> " + formatter.format(this.chain_cnt[cnt]/sum));
+		for (int i=0; i<this.educ_chains.length; i++) {
+			System.out.println(this.educ_chains[i] + ":\t" + this.chain_cnt[cnt] + "\t--> " + formatter.format(this.chain_cnt[cnt]/sum));
 			cnt++;
 		}
-		for (int i=0; i<shop_chains.length; i++) {
-			System.out.println(shop_chains[i] + ":\t" + this.chain_cnt[cnt] + "\t--> " + formatter.format(this.chain_cnt[cnt]/sum));
+		for (int i=0; i<this.shop_chains.length; i++) {
+			System.out.println(this.shop_chains[i] + ":\t" + this.chain_cnt[cnt] + "\t--> " + formatter.format(this.chain_cnt[cnt]/sum));
 			cnt++;
 		}
-		for (int i=0; i<leis_chains.length; i++) {
-			System.out.println(leis_chains[i] + ":\t" + this.chain_cnt[cnt] + "\t--> " + formatter.format(this.chain_cnt[cnt]/sum));
+		for (int i=0; i<this.leis_chains.length; i++) {
+			System.out.println(this.leis_chains[i] + ":\t" + this.chain_cnt[cnt] + "\t--> " + formatter.format(this.chain_cnt[cnt]/sum));
 			cnt++;
 		}
 		System.out.println("----------------------------------------");

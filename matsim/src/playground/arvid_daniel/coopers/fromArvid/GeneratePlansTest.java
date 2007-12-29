@@ -66,7 +66,7 @@ public class GeneratePlansTest {
 
 			String ID = Integer.toString(i);
 			Person person = new Person(ID, null, "33",null, null,"yes");
-			Plan plan = new Plan("0","0",person);
+			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.0*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
 //			Link startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2;
@@ -99,7 +99,7 @@ public class GeneratePlansTest {
 
 			String ID = Integer.toString(i);
 			Person person = new Person(ID, null, "33",null, null,"yes");
-			Plan plan = new Plan("0","0",person);
+			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
 			Act actstart = new Act("h", 0,0, startLink1, 0, endTime, endTime, false);
@@ -131,7 +131,7 @@ public class GeneratePlansTest {
 
 			String ID = Integer.toString(i);
 			Person person = new Person(ID, null, "33",null, null,"yes");
-			Plan plan = new Plan("0","0",person);
+			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
 			Act actstart = new Act("h", 0,0, startLink2, 0, endTime, endTime, false);

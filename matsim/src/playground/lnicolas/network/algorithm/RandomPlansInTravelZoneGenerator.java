@@ -40,10 +40,10 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 	Rectangle.Double outerZone;
 	Rectangle.Double innerZone;
 	double nodeDist;
-	private int tripCount;
+	private final int tripCount;
 
-	public RandomPlansInTravelZoneGenerator(double xCenter, double yCenter, double nodeDist,
-			int tripCount) {
+	public RandomPlansInTravelZoneGenerator(final double xCenter, final double yCenter, final double nodeDist,
+			final int tripCount) {
 		double outerSideLength = nodeDist+5000;
 		this.outerZone = new Rectangle.Double(xCenter - (outerSideLength/2),
 				yCenter - (outerSideLength/2),	outerSideLength, outerSideLength);
@@ -55,7 +55,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 	}
 
 	@Override
-	public void run(NetworkLayer network) {
+	public void run(final NetworkLayer network) {
 
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Node> fromNodes = new ArrayList<Node>();
@@ -72,7 +72,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 
 		Plans plans = new Plans();
 		Person person = new Person("1", "f", "26", "yes", "always", "yes");
-		Plan plan = person.createPlan(null, null, "yes");
+		Plan plan = person.createPlan(null, "yes");
 		try {
 			plans.addPerson(person);
 		} catch (Exception e) {
@@ -118,14 +118,14 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 				+ Gbl.getConfig().plans().getOutputFile());
 	}
 
-	private void resetToNodes(ArrayList<Node> nodes, int roleIndex) {
+	private void resetToNodes(final ArrayList<Node> nodes, final int roleIndex) {
 		for (Node n : nodes) {
 			PlansGeneratorRole r = getRole(n, roleIndex);
 			r.resetToNodes();
 		}
 	}
 
-	private void addTrip(Plan plan, Link toLink, int id) {
+	private void addTrip(final Plan plan, final Link toLink, final int id) {
 		try {
 			if (id != 0) {
 				plan.createLeg(Integer.toString(id), "car", null, null, null);
@@ -142,7 +142,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 		}
 	}
 
-	private Node getToNode(Node n, ArrayList<Node> nodes, int roleIndex) {
+	private Node getToNode(final Node n, final ArrayList<Node> nodes, final int roleIndex) {
 		double minDist = this.nodeDist * 0.9;
 		double maxDist = this.nodeDist * 1.1;
 		for (Node toNode : nodes) {
@@ -166,7 +166,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 	 *            The Node for which to create a role.
 	 * @return The role for the given Node
 	 */
-	PlansGeneratorRole getRole(Node n, int roleIndex) {
+	PlansGeneratorRole getRole(final Node n, final int roleIndex) {
 		PlansGeneratorRole r = (PlansGeneratorRole) n.getRole(roleIndex);
 		if (null == r) {
 			r = new PlansGeneratorRole();
@@ -178,7 +178,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 	class PlansGeneratorRole {
 		TreeMap<IdI, Node> existingPlans = new TreeMap<IdI, Node>();
 
-		public boolean planExists(Node toNode) {
+		public boolean planExists(final Node toNode) {
 			return this.existingPlans.containsKey(toNode.getId());
 		}
 
@@ -186,7 +186,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 			this.existingPlans.clear();
 		}
 
-		public void addToNode(Node toNode) {
+		public void addToNode(final Node toNode) {
 			this.existingPlans.put(toNode.getId(), toNode);
 		}
 	}

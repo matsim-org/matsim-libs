@@ -29,10 +29,9 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
-import org.matsim.plans.filters.PersonIntersectAreaFilter;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.identifiers.IdI;
 
 /**
  * Some tests for org.matsim.plans.filters.PersonIntersectAreaFilter.
@@ -62,7 +61,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		// create a test person
 		Person person = new Person("1", "f", "30", "yes", "yes", "yes");
-		Plan plan = person.createPlan(null, null, "yes");
+		Plan plan = person.createPlan(null, "yes");
 		plan.createAct("h", (String)null, (String)null, "0", "00:00:00", "08:00:00", null, null);
 		Leg leg = plan.createLeg(null, "car", "08:00:00", "00:02:00", null);
 		plan.createAct("w", (String)null, (String)null, "5", null, null, null, null);

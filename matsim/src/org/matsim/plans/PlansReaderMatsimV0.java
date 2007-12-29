@@ -55,7 +55,7 @@ public class PlansReaderMatsimV0 extends MatsimXmlParser implements PlansReaderI
 	private Plan currplan = null;
 	private Leg currleg = null;
 	private Route currroute = null;
-	
+
 	private static final Logger log = Logger.getLogger(PlansReaderMatsimV0.class);
 
 	public PlansReaderMatsimV0(final Plans plans) {
@@ -130,7 +130,7 @@ public class PlansReaderMatsimV0 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	private void startPlan(final Attributes atts) {
-		this.currplan = this.currperson.createPlan(atts.getValue("score"),atts.getValue("age"),atts.getValue("selected"));
+		this.currplan = this.currperson.createPlan(atts.getValue("score"), atts.getValue("selected"));
 	}
 
 	private void startAct(final Attributes atts) {
@@ -138,8 +138,8 @@ public class PlansReaderMatsimV0 extends MatsimXmlParser implements PlansReaderI
 			log.info("The attribute 'zone' of <act> will be ignored");
 		}
 		try {
-			 this.currplan.createAct(atts.getValue("type"),atts.getValue("x100"),atts.getValue("y100"),atts.getValue("link"),
-																 atts.getValue("start_time"),atts.getValue("end_time"),atts.getValue("dur"),atts.getValue("primary"));
+			 this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"), atts.getValue("y100"), atts.getValue("link"),
+					 atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"), atts.getValue("primary"));
 		}
 		catch (Exception e) {
 			Gbl.errorMsg(e);

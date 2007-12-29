@@ -62,7 +62,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Route route;
 		try {
 			person = new Person("1", "m", "35", "yes", "yes", "yes");
-			plan = person.createPlan(null, null, "yes");
+			plan = person.createPlan(null, "yes");
 			plan.createAct("h", (String)null, null, "1", null, "07:00:00", null, null);
 			leg = plan.createLeg(null, "car", "07:00:00", null, null);
 			route = new Route();
@@ -72,7 +72,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 			population.addPerson(person);
 
 			person = new Person("2", "m", "35", "yes", "yes", "yes");
-			plan = person.createPlan(null, null, "yes");
+			plan = person.createPlan(null, "yes");
 			plan.createAct("h", (String)null, null, "1", null, "07:05:00", null, null);
 			leg = plan.createLeg(null, "car", "07:05:00", null, null);
 			route = new Route();
@@ -82,7 +82,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 			population.addPerson(person);
 
 			person = new Person("3", "m", "35", "yes", "yes", "yes");
-			plan = person.createPlan(null, null, "yes");
+			plan = person.createPlan(null, "yes");
 			plan.createAct("h", (String)null, null, "1", null, "07:10:00", null, null);
 			leg = plan.createLeg(null, "car", "07:10:00", null, null);
 			route = new Route();

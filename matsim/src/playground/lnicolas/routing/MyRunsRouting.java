@@ -71,7 +71,7 @@ import playground.lnicolas.routing.costcalculators.PeakTravTimeCalc;
 
 public class MyRunsRouting extends MyRuns {
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 //		readNetwork(); exportNetwork(args); System.exit(0);
 //		readNetwork(); generateRandomPlans(500); System.exit(0);
@@ -145,8 +145,8 @@ public class MyRunsRouting extends MyRuns {
 		//	analyzeLinkLengths();
 	}
 
-	private static void calcRouteWithPlansPreprocessing(String[] args,
-			Plans plans) {
+	private static void calcRouteWithPlansPreprocessing(final String[] args,
+			final Plans plans) {
 
 		// long now = System.currentTimeMillis();
 		FromToSummary sum = createPlansFromToSummary(plans, false);
@@ -384,7 +384,7 @@ public class MyRunsRouting extends MyRuns {
 		System.out.println("Detour index: " + totalEucDist/totalLength);
 	}
 
-	private static void printNetworkConvexHull(String[] args) {
+	private static void printNetworkConvexHull(final String[] args) {
 		Vector<Node> nodes = new Vector<Node>();
 		for (Node node : network.getNodes().values()) {
 			nodes.add(node);
@@ -437,7 +437,7 @@ public class MyRunsRouting extends MyRuns {
 				+ "%)");
 	}
 
-	private static void generateRandomPlansInTravelZone(double xCenter, double yCenter, double nodeDist, int tripCount) {
+	private static void generateRandomPlansInTravelZone(final double xCenter, final double yCenter, final double nodeDist, final int tripCount) {
 		RandomPlansInTravelZoneGenerator gen = new RandomPlansInTravelZoneGenerator(xCenter, yCenter, nodeDist, tripCount);
 
 		network.addAlgorithm(gen);
@@ -446,7 +446,7 @@ public class MyRunsRouting extends MyRuns {
 
 	}
 
-	private static void generateRandomPlans(double fromToDistance, int tripCount) {
+	private static void generateRandomPlans(final double fromToDistance, final int tripCount) {
 		RandomPlansGenerator gen
 			= new RandomPlansGenerator(fromToDistance, tripCount);
 
@@ -461,7 +461,7 @@ public class MyRunsRouting extends MyRuns {
 
 	}
 
-	private static Plans generateRandomPlans(int tripCount) {
+	private static Plans generateRandomPlans(final int tripCount) {
 
 		System.out.print("Generating " + tripCount + " random plans...");
 		System.out.flush();
@@ -475,7 +475,7 @@ public class MyRunsRouting extends MyRuns {
 
 			for (int j = 0; j < tripCount; j++) {
 				Person person = new Person(j + "", null, null, null, null, null);
-				Plan plan = person.createPlan(null, null, "yes");
+				Plan plan = person.createPlan(null, "yes");
 
 				int choice = (int) (Math.random() * links.size());
 				plan.createAct("h", (Double)null, null, links.get(choice).getId().toString(),
@@ -594,7 +594,7 @@ public class MyRunsRouting extends MyRuns {
 	// ////////////////////////////////////////////////////////////////////
 
 	public static FromToSummary createPlansFromToSummary(Plans plans,
-			boolean doPrintSummary) {
+			final boolean doPrintSummary) {
 		System.out.println("RUN: createPlansFromToSummary");
 
 		if (Gbl.getConfig().plans().switchOffPlansStreaming()) {
@@ -687,7 +687,7 @@ public class MyRunsRouting extends MyRuns {
 		}
 	}
 
-	public static void compareRoute(String[] args) {
+	public static void compareRoute(final String[] args) {
 		Plans plans = new Plans();
 
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
@@ -727,7 +727,7 @@ public class MyRunsRouting extends MyRuns {
 		routeCompare.printSummary();
 	}
 
-	public static void calcRoute(String[] args, Plans plans) {
+	public static void calcRoute(final String[] args, final Plans plans) {
 
 		System.out.println("RUN: calcRoute");
 
@@ -810,8 +810,8 @@ public class MyRunsRouting extends MyRuns {
 		System.out.println();
 	}
 
-	private static PreProcessDijkstra getPreProcessData(String[] args,
-			TravelMinCostI calculator) {
+	private static PreProcessDijkstra getPreProcessData(final String[] args,
+			final TravelMinCostI calculator) {
 		PreProcessDijkstra preProcessData = null;
 		final String dijkstraString = "dijkstra";
 		final String aStarString = "aStar";
@@ -867,9 +867,9 @@ public class MyRunsRouting extends MyRuns {
 //		}
 //	}
 
-	private static LeastCostPathCalculator getRoutingAlgo(String[] args,
-			PreProcessDijkstra preProcessData, TravelCostI costCalc,
-			TravelTimeI timeCalc) {
+	private static LeastCostPathCalculator getRoutingAlgo(final String[] args,
+			final PreProcessDijkstra preProcessData, final TravelCostI costCalc,
+			final TravelTimeI timeCalc) {
 		final String dijkstraOldString = "dijkstraOld";
 		final String dijkstraString = "dijkstra";
 		final String dijkstraPruneDeadEndsString = "dijkstraP";

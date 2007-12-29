@@ -47,7 +47,7 @@ public class PersonDistributeActChains extends PersonAlgorithm implements PlanAl
 	private static final int cols = 16;
 	private static final double[][] DISTR = new double[rows][cols];
 	private final ActChains actchains;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -195,7 +195,7 @@ public class PersonDistributeActChains extends PersonAlgorithm implements PlanAl
 		ArrayList<ArrayList<Integer>> chains = this.actchains.getChains(bitcode);
 		int index = Gbl.random.nextInt(chains.size());
 		ArrayList<Integer> chain = chains.get(index);
-		Plan plan =  p.createPlan(null,"0","yes");
+		Plan plan =  p.createPlan(null, "yes");
 		int time_sum = 0;
 		for (int i=0; i<chain.size(); i=i+2) {
 			int val = chain.get(i);
@@ -229,7 +229,7 @@ public class PersonDistributeActChains extends PersonAlgorithm implements PlanAl
 			}
 		}
 	}
-	
+
 	private final boolean isPrimary(int bitcode, int type) {
 		if (type == 8) { return true; } // work act
 		if ((type == 4) && (bitcode < 8)) { return true; } // educ act

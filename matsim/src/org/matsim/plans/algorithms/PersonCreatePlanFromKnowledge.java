@@ -52,7 +52,7 @@ public class PersonCreatePlanFromKnowledge extends PersonAlgorithm {
 
 	@Override
 	public void run(final Person person) {
-		Plan p = person.createPlan(null,null,"yes");
+		Plan p = person.createPlan(null, "yes");
 		Facility home_facility = person.getKnowledge().getActivities("home").get(0).getFacility();
 		ArrayList<Activity> acts = person.getKnowledge().getActivities();
 
@@ -76,7 +76,7 @@ public class PersonCreatePlanFromKnowledge extends PersonAlgorithm {
 				time += dur;
 				p.createLeg(i+1,"car",time,0.0,time);
 			}
-			
+
 			// last act (= home)
 			p.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),time,(24*3600),(24*3600-time),false);
 		}

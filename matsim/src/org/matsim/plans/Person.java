@@ -96,12 +96,6 @@ public class Person extends BasicPerson<Plan>{
 		return this.knowledge;
 	}
 
-	/** @deprecated parameter age is no longer used, replace method with createPlan(String score, String selected) */
-	@Deprecated
-	public final Plan createPlan(final String score, final String age, final String selected) {
-		return createPlan(score, selected);
-	}
-
 	public final Plan createPlan(final String score, final String selected) {
 		Plan p = new Plan(score, this);
 		this.plans.add(p);

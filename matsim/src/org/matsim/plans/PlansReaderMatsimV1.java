@@ -122,7 +122,7 @@ public class PlansReaderMatsimV1 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	private void startPlan(final Attributes atts) {
-		this.currplan = this.currperson.createPlan(atts.getValue("score"), atts.getValue("age"), atts.getValue("selected"));
+		this.currplan = this.currperson.createPlan(atts.getValue("score"), atts.getValue("selected"));
 	}
 
 	private void startAct(final Attributes atts) {

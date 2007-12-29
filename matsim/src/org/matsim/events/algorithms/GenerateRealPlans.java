@@ -262,7 +262,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		if (realperson == null) {
 			try {
 				realperson = new Person(person.getId(), person.getSex(), person.getAge(), person.getLicense(), person.getCarAvail(), person.getEmployed());
-				realperson.createPlan(null, null, "yes");
+				realperson.createPlan(null, "yes");
 				this.realplans.addPerson(realperson);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -276,7 +276,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		if (realperson == null) {
 			try {
 				realperson = new Person(personId, null, null, null, null, null);
-				realperson.createPlan(null, null, "yes");
+				realperson.createPlan(null, "yes");
 				this.realplans.addPerson(realperson);
 			} catch (Exception e) {
 				e.printStackTrace();

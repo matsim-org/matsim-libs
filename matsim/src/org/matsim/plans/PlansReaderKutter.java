@@ -25,10 +25,10 @@ import java.io.IOException;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.WorldUtils;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -233,7 +233,7 @@ public class PlansReaderKutter implements PlansReaderI {
 		}
 
 		private final void parsePlan(final String[] row) {
-			this.currPlan = this.currPerson.createPlan(null, null, "yes");
+			this.currPlan = this.currPerson.createPlan(null, "yes");
 
 			String homeCell = row[1];
 			Zone zone = (Zone)this.tvzLayer.getLocation(homeCell);
