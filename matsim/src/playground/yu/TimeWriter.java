@@ -20,42 +20,38 @@
 
 package playground.yu;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.events.BasicEvent;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.algorithms.EventWriterTXT;
+import org.matsim.events.handler.EventHandlerAgentArrivalI;
+import org.matsim.events.handler.EventHandlerAgentDepartureI;
+import org.matsim.utils.io.IOUtils;
 
 /**
  * prepare Departure time- arrival Time- Diagramm
  * @author ychen
- * 
  */
-public class TimeWriter extends EventWriterTXT {
+public class TimeWriter implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI {
+	private BufferedWriter out = null;
 	private HashMap<String, Double> agentDepTimes;
 
 	public TimeWriter(final String filename) {
-		super(filename);
-		
+		init(filename);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.demandmodeling.events.algorithms.EventWriterTXT#handleEvent(org.matsim.demandmodeling.events.BasicEvent)
-	 */
-	@Override
-	public void handleEvent(BasicEvent event) {
+	public void handleEvent(final EventAgentDeparture event) {
+		if (event.legId == 0) {
+			this.agentDepTimes.put(event.agentId, event.time);
+		}
+	}
+
+	public void handleEvent(final EventAgentArrival event) {
 		String agentId = event.agentId;
-		if (event instanceof EventAgentDeparture) {
-//			EventAgentDeparture ead = (EventAgentDeparture) event;
-			if (Integer.parseInt(event.getAttributes().getValue("leg")) == 0) {
-				agentDepTimes.put(agentId, event.time);
-			}
-		} else if (event instanceof EventAgentArrival
-				&& agentDepTimes.containsKey(agentId)) {
-			int depT=(int)agentDepTimes.remove(agentId).doubleValue();
+		if (this.agentDepTimes.containsKey(agentId)) {
+			int depT=(int)this.agentDepTimes.remove(agentId).doubleValue();
 			int depH=depT/3600;
 			int depMin=(depT-depH*3600)/60;
 			int depSec=depT-depH*3600-depMin*60;
@@ -67,16 +63,45 @@ public class TimeWriter extends EventWriterTXT {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.demandmodeling.events.algorithms.EventWriterTXT#init(java.lang.String)
-	 */
-	@Override
-	public void init(String outfilename) {
-		super.init(outfilename);
-		writeLine("agentId\tdepTime\tarrTime");
-		agentDepTimes = new HashMap<String, Double>();
+	public void init(final String outfilename) {
+		if (this.out != null) {
+			try {
+				this.out.close();
+				this.out = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			this.out = IOUtils.getBufferedWriter(outfilename);
+			writeLine("agentId\tdepTime\tarrTime");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.agentDepTimes = new HashMap<String, Double>();
 	}
 
+	private void writeLine(final String line) {
+		try {
+			this.out.write(line);
+			this.out.write("\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void reset(final int iteration) {
+		this.agentDepTimes.clear();
+	}
+
+	public void closefile() {
+		if (this.out != null) {
+			try {
+				this.out.close();
+				this.out = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }

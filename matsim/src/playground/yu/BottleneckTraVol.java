@@ -20,71 +20,91 @@
 
 package playground.yu;
 
-import org.matsim.events.BasicEvent;
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
-import org.matsim.events.algorithms.EventWriterTXT;
+import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.gbl.Gbl;
+import org.matsim.utils.io.IOUtils;
 
 /**
  * this Class offers a possibility, the traffic volume on a link with id "15",
  * which has a bottleneck, to measure und the result in a .txt-file to write.
- * 
+ *
  * @author ychen
- * 
+ *
  */
-public class BottleneckTraVol extends EventWriterTXT {
+public class BottleneckTraVol implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
+	private BufferedWriter out = null;
 	private int cnt;
 
 	/**
 	 * @param filename -
 	 * the filename of the .txt-file to write
 	 */
-	public BottleneckTraVol(String filename) {
-		super(filename);
+	public BottleneckTraVol(final String filename) {
+		init(filename);
 	}
 
 	/**
 	 * measures the amount of the agents on the link with bottleneck by every Event
-	 * */
-	@Override
-	public void handleEvent(BasicEvent event) {
-		if (event instanceof EventLinkEnter) {
-			EventLinkEnter ele = (EventLinkEnter) event;
-			int time = (int) ele.time;
-			if (ele.linkId.equals("15")) {
-				writeLine(time(time - 1) + "\t" + cnt);
-				writeLine(time(time) + "\t" + (++cnt));
-			}
-		} else if (event instanceof EventLinkLeave) {
-			EventLinkLeave ell = (EventLinkLeave) event;
-			int time = (int) ell.time;
-			if (ell.linkId.equals("15")) {
-				writeLine(time(time - 1) + "\t" + cnt);
-				writeLine(time(time) + "\t" + (--cnt));
-			}
+	 */
+	public void handleEvent(final EventLinkEnter event) {
+		if (event.linkId.equals("15")) {
+			writeLine(Gbl.writeTime(event.time - 1) + "\t" + this.cnt);
+			writeLine(Gbl.writeTime(event.time) + "\t" + (++this.cnt));
 		}
 	}
 
-	/**
-	 * writes file-head 
-	 * @see org.matsim.events.algorithms.EventWriterTXT#init(java.lang.String)
-	 */
-	@Override
-	public void init(String outfilename) {
-		super.init(outfilename);
-		cnt = 0;
-		writeLine("time\tvolume");
+	public void handleEvent(final EventLinkLeave event) {
+		if (event.linkId.equals("15")) {
+			writeLine(Gbl.writeTime(event.time - 1) + "\t" + this.cnt);
+			writeLine(Gbl.writeTime(event.time) + "\t" + (--this.cnt));
+		}
 	}
 
-	/**
-	 * changes the form of time from "ssss.." to "hh:mm:ss"
-	 * @param time - time in form "21600" (=6:00)
-	 * @return String of the time in form "hh:mm:ss" (e.g. "6:00:00")
-	 */
-	public String time(int time) {
-		int h = time / 3600;
-		int m = (time - h * 3600) / 60;
-		int s = time - h * 3600 - m * 60;
-		return h + ":" + m + ":" + s;
+	private void init(final String outfilename) {
+		if (this.out != null) {
+			try {
+				this.out.close();
+				this.out = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		this.cnt = 0;
+		try {
+			this.out = IOUtils.getBufferedWriter(outfilename);
+			writeLine("time\tvolume");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void writeLine(final String line) {
+		try {
+			this.out.write(line);
+			this.out.write("\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void reset(final int iteration) {
+		this.cnt = 0;
+	}
+
+	public void closefile() {
+		if (this.out != null) {
+			try {
+				this.out.close();
+				this.out = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
