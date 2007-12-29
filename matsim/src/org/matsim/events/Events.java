@@ -66,7 +66,7 @@ public class Events {
 			this.eventklass = eventklass;
 			this.method = method;
 		}
-		private void removeHandler(final EventHandlerI handler) {
+		public void removeHandler(final EventHandlerI handler) {
 			this.handlerList.remove(handler);
 		}
 	}
