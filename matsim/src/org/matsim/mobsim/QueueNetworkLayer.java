@@ -21,6 +21,7 @@
 package org.matsim.mobsim;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.ListIterator;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 	/** This is the collection of links that have to be moved in the simulation */
 	private final ArrayList<QueueLink> simLinksArray = new ArrayList<QueueLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
-	private final ArrayList<QueueNode> simNodesArray = new ArrayList<QueueNode>();
+	private QueueNode[] simNodesArrayCache = new QueueNode[0];
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
 	/** This is a queue of links and times, at which the links will have to be activated again. This queue is mostly used
@@ -75,8 +76,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 	}
 
 	public void beforeSim() {
-		this.simNodesArray.clear();
-		this.simNodesArray.addAll(getNodes().values());
+		this.simNodesArrayCache = getNodes().values().toArray(this.simNodesArrayCache);
 
 		this.simLinksArray.clear();
 		if (simulateAllLinks) {
@@ -94,7 +94,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 	 * @param time The current time in the simulation.
 	 */
 	public void simStep(final double time) {
-		for (QueueNode node : this.simNodesArray) {
+		for (QueueNode node : this.simNodesArrayCache) {
 			node.moveNode(time);
 		}
 		reactivateLinks(time);
@@ -165,7 +165,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 	 * @return Returns the simNodesArray.
 	 */
 	public Collection<QueueNode> getSimulatedNodes() {
-		return this.simNodesArray;
+		return Arrays.asList(this.simNodesArrayCache);
 	}
 
 	public void afterSim() {
@@ -218,7 +218,13 @@ public class QueueNetworkLayer extends NetworkLayer {
 
 	@Override
 	public boolean removeNode(final Node node) {
-		this.simNodesArray.remove(node);
+		/* Just invalidate simNodesArrayCache. It will be rebuilt in beforeMobsim().
+		 * During the MobSim, the network should not be changed. If somebody does that,
+		 * it will crash with a NullPointerException... I can live with that ;-)
+		 * TODO [MR] separate QueueNetworkLayer from NetworkLayer
+		 * In that moment, it won't be possible anymore to remove nodes during a simulation.
+		 */
+		this.simNodesArrayCache = null;
 		return super.removeNode(node);
 	}
 
