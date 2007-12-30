@@ -63,7 +63,7 @@ public class Plans extends BasicPopulation<Person> {
 
 	// algorithms over plans
 	private final ArrayList<PlansAlgorithm> plansalgos = new ArrayList<PlansAlgorithm>();
-	
+
 	private static final Logger log = Logger.getLogger(Plans.class);
 
 	//////////////////////////////////////////////////////////////////////
@@ -135,7 +135,7 @@ public class Plans extends BasicPopulation<Person> {
 					 * A possible solution: implement writers as algorithms. the algorithm handles then all the
 					 * open/close of files. the algorithms has something like a "finish" routine which closes the
 					 * file -- if it was ever opened, and only the algorithm knows that and can handle accordingly.
-					 * I like that last idea the most :-)                              
+					 * I like that last idea the most :-)
 					 */
 					this.planswriter.writeStartPlans();
 				}
@@ -262,7 +262,7 @@ public class Plans extends BasicPopulation<Person> {
 	}
 
 	public void printPlansCount() {
-		System.out.println(" person # " + this.counter + " (elapsed time: "
+		log.info(" person # " + this.counter + " (elapsed time: "
 				+ (System.currentTimeMillis() - this.startTime)/1000 + " sec)");
 	}
 

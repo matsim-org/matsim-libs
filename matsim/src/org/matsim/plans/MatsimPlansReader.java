@@ -25,6 +25,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -44,6 +45,8 @@ public class MatsimPlansReader extends MatsimXmlParser implements PlansReaderI {
 
 	private final Plans plans;
 	private MatsimXmlParser delegate = null;
+
+	private static final Logger log = Logger.getLogger(MatsimPlansReader.class);
 
 	/**
 	 * Creates a new reader for MATSim plans (population) files.
@@ -87,13 +90,13 @@ public class MatsimPlansReader extends MatsimXmlParser implements PlansReaderI {
 		super.setDoctype(doctype);
 		if (PLANS_V4.equals(doctype)) {
 			this.delegate = new PlansReaderMatsimV4(this.plans);
-			System.out.println("using plans_v4-reader.");
+			log.info("using plans_v4-reader.");
 		} else if (PLANS_V1.equals(doctype)) {
 			this.delegate = new PlansReaderMatsimV1(this.plans);
-			System.out.println("using plans_v1-reader.");
+			log.info("using plans_v1-reader.");
 		} else if (PLANS_V0.equals(doctype) || PLANS.equals(doctype)) {
 			this.delegate = new PlansReaderMatsimV0(this.plans);
-			System.out.println("using plans_v0-reader.");
+			log.info("using plans_v0-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}
