@@ -80,7 +80,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	/**
 	 * @param currentLink The currentLink to set.
 	 */
-	//public void setCurrentLink(MobsimLinkI currentLink) {
 	public void setCurrentLink(final QueueLink currentLink) {
 		this.currentLink = currentLink;
 	}
@@ -108,7 +107,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
 			if (link.getToNode() == destNode) {
 				this.cachedNextLink = (QueueLink)link; //save time in later calls, if link is congested
-				return (QueueLink)link;
+				return this.cachedNextLink;
 			}
 		}
 		return null;

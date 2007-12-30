@@ -72,13 +72,12 @@ public class QueueNode extends Node {
 	// Queue related movement code
 	//////////////////////////////////////////////////////////////////////
 	public boolean moveVehicleOverNode(final Vehicle veh, final double now) {
-		QueueLink currentLink = veh.getCurrentLink();
 		// veh has to move over node
 		QueueLink nextLink = veh.chooseNextLink();
 
 		if (nextLink != null) {
 			if (nextLink.hasSpace()) {
-				currentLink.popFirstFromBuffer();
+				veh.getCurrentLink().popFirstFromBuffer();
 				veh.incCurrentNode();
 				nextLink.add(veh);
 				return true;
@@ -92,12 +91,12 @@ public class QueueNode extends Node {
 				 * optionally we let them die here, we have a config setting for that!
 				 */
 				if (removeStuckVehicle()) {
-					currentLink.popFirstFromBuffer();
+					veh.getCurrentLink().popFirstFromBuffer();
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent (new EventAgentStuck(now, veh.getDriverID(), veh.getCurrentLegNumber(), veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 				} else {
-					currentLink.popFirstFromBuffer();
+					veh.getCurrentLink().popFirstFromBuffer();
 					veh.incCurrentNode();
 					nextLink.add(veh);
 					return true;
@@ -106,7 +105,8 @@ public class QueueNode extends Node {
 			return false;
 		}
 
-		currentLink.popFirstFromBuffer();
+		// --> nextLink == null
+		veh.getCurrentLink().popFirstFromBuffer();
 		Simulation.decLiving();
 		Simulation.incLost();
 		QueueSimulation.getEvents().processEvent (new EventAgentNoRoute(now, veh.getDriverID(), veh.getCurrentLegNumber(), veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));

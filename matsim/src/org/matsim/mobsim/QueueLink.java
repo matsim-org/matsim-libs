@@ -53,7 +53,7 @@ public class QueueLink extends Link {
 
 	final private static Logger log = Logger.getLogger(QueueLink.class);
 
-	private static int spaceCapWarningCount = 0 ;
+	private static int spaceCapWarningCount = 0;
 
 	// ////////////////////////////////////////////////////////////////////
 	// Queue Model specific stuff
@@ -199,8 +199,8 @@ public class QueueLink extends Link {
 	 * @param now the current time
 	 */
 	private void moveParkToWait(final double now) {
-		while (this.parkingList.peek() != null) {
-			Vehicle veh = this.parkingList.peek();
+		Vehicle veh;
+		while ((veh = this.parkingList.peek()) != null) {
 			if (veh.getDepartureTime_s() > now) {
 				break;
 			}
@@ -222,13 +222,10 @@ public class QueueLink extends Link {
 			 */
 			Leg actLeg = veh.getCurrentLeg();
 
-			boolean hasRoute = (actLeg.getRoute() != null) && (actLeg.getRoute().getRoute().size() != 0);
-			boolean unknownMode = !actLeg.getMode().equals("car");
-
-			if (unknownMode) {
+			if (!actLeg.getMode().equals("car")) {
 				QueueSimulation.handleUnknownLegMode(veh);
 			} else {
-				if (hasRoute) {
+				if (actLeg.getRoute().getRoute().size() != 0) {
 					this.waitingList.add(veh);
 				} else {
 					// this is the case where (hopefully) the next act happens at the same location as this act
@@ -245,24 +242,24 @@ public class QueueLink extends Link {
 		}
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// move as many waiting cars to link as is possible < cap
-	// ////////////////////////////////////////////////////////////////////
+	/**
+	 * Move as many waiting cars to the link as it is possible
+	 *
+	 * @param now the current time
+	 */
 	private void moveWaitToBuffer(final double now) {
-		if (!this.waitingList.isEmpty()) {
-			Vehicle veh;
-			while ((veh = this.waitingList.peek()) != null) {
-				if (!hasBufferSpace())
-					break;
+		Vehicle veh;
+		while ((veh = this.waitingList.peek()) != null) {
+			if (!hasBufferSpace())
+				break;
 
-				addToBuffer(veh, now);
+			addToBuffer(veh, now);
 
-				QueueSimulation.getEvents().processEvent(
-						new EventAgentWait2Link(now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(),
-								veh.getDriver(), veh.getCurrentLeg(), this));
+			QueueSimulation.getEvents().processEvent(
+					new EventAgentWait2Link(now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(),
+							veh.getDriver(), veh.getCurrentLeg(), this));
 
-				this.waitingList.poll(); // remove the just handled vehicle from waitingList
-			}
+			this.waitingList.poll(); // remove the just handled vehicle from waitingList
 		}
 	}
 
@@ -290,7 +287,7 @@ public class QueueLink extends Link {
 				continue;
 			}
 
-			// is there still room left in the buffer, or is he overcrowded from the last time steps?
+			// is there still room left in the buffer, or is it overcrowded from the last time steps?
 			if (!hasBufferSpace()) {
 				break;
 			}
@@ -329,7 +326,7 @@ public class QueueLink extends Link {
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		this.active = (this.buffercap_accumulate < 1.0) || ((this.vehQueue.size() + this.waitingList.size()) != 0);
+		this.active = (this.buffercap_accumulate < 1.0) || (this.vehQueue.size() != 0) || (this.waitingList.size() != 0);
 		return this.active;
 	}
 
@@ -716,8 +713,8 @@ public class QueueLink extends Link {
 
 	/*
 	 * The visualisation is interested in this status
-	 * 
-	 * It is NOT the same as the boolean "active", because we 
+	 *
+	 * It is NOT the same as the boolean "active", because we
 	 * DO NOT need to wait for buffer_cap to accumulate AND
 	 * we DO need to know if there are vehs in the buffer,
 	 * which is not important for active state, as they are used by node only
