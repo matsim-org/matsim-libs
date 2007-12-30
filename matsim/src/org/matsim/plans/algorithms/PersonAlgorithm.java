@@ -46,10 +46,13 @@ package org.matsim.plans.algorithms;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 
 public abstract class PersonAlgorithm extends PlansAlgorithm implements PersonAlgorithmI {
+
+	private final static Logger log = Logger.getLogger(PersonAlgorithm.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -63,8 +66,8 @@ public abstract class PersonAlgorithm extends PlansAlgorithm implements PersonAl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public final void run(Plans plans) {
-		System.out.println("    running " + this.getClass().getName() + " algorithm..." + (new Date()));
+	public final void run(final Plans plans) {
+		log.info("    running " + this.getClass().getName() + " algorithm..." + (new Date()));
 		long counter = 0;
 		long nextMsg = 1;
 
@@ -75,7 +78,7 @@ public abstract class PersonAlgorithm extends PlansAlgorithm implements PersonAl
 			counter++;
 			if (counter % nextMsg == 0) {
 				nextMsg *= 2;
-				System.out.println(" person # " + counter + " (elapsed time: "
+				log.info(" person # " + counter + " (elapsed time: "
 						+ (System.currentTimeMillis() - startTime)/1000 + " sec)");
 			}
 
@@ -83,10 +86,10 @@ public abstract class PersonAlgorithm extends PlansAlgorithm implements PersonAl
 			this.run(p);
 		}
 		if (counter % nextMsg != 0) {
-			System.out.println(" person # " + counter + " (elapsed time: "
+			log.info(" person # " + counter + " (elapsed time: "
 					+ (System.currentTimeMillis() - startTime)/1000 + " sec)");
 		}
-		System.out.println("    done running algorithm. " + (new Date()));
+		log.info("    done running algorithm. " + (new Date()));
 	}
 
 	public abstract void run(Person person);
