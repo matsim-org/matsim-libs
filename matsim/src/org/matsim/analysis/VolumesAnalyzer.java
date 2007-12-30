@@ -20,48 +20,43 @@
 
 package org.matsim.analysis;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.matsim.events.EventLinkLeave;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.network.NetworkLayer;
 
+/**
+ * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
+ *
+ * @author mrieser
+ */
 public class VolumesAnalyzer implements EventHandlerLinkLeaveI {
 
 	private final int timeBinSize;
 	private final int maxTime;
 	private final int maxSlotIndex;
-	private final TreeMap<String, int[]> links = new TreeMap<String, int[]>();
+	private final Map<String, int[]> links;
 
 	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final NetworkLayer network) {
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = (this.maxTime/this.timeBinSize) + 1;
+		this.links = new HashMap<String, int[]>((int) (network.getLinks().size() * 1.1), 0.95f);
 	}
-
-
-	//////////////////////////////////////////////////////////////////////
-	// Implementation of EventAlgorithmI
-	//////////////////////////////////////////////////////////////////////
 
 	public void handleEvent(final EventLinkLeave event) {
 		String linkid = event.linkId;
 		int[] volumes = this.links.get(linkid);
 		if (volumes == null) {
-			volumes = new int[this.maxSlotIndex + 1];
-			for (int i = 0; i <= this.maxSlotIndex; i++) {
-				volumes[i] = 0;
-			}
+			volumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs
 			this.links.put(linkid, volumes);
 		}
 		int timeslot = getTimeSlotIndex(event.time);
 		volumes[timeslot]++;
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// public / private methods
-	//////////////////////////////////////////////////////////////////////
 
 	private int getTimeSlotIndex(final double time) {
 		if (time > this.maxTime) {
@@ -70,10 +65,18 @@ public class VolumesAnalyzer implements EventHandlerLinkLeaveI {
 		return ((int)time / this.timeBinSize);
 	}
 
-	public int[] getVolumesForLink(final String linkid) {
-		return this.links.get(linkid);
+	/**
+	 * @param linkId
+	 * @return Array containing the number of vehicles leaving the link <code>linkId</code> per time bin,
+	 * 		starting with time bin 0 from 0 seconds to (timeBinSize-1)seconds.
+	 */
+	public int[] getVolumesForLink(final String linkId) {
+		return this.links.get(linkId);
 	}
 
+	/**
+	 * @return Set of Strings containing all link ids for which counting-values are available.
+	 */
 	public Set<String> getLinkIds() {
 		return this.links.keySet();
 	}
