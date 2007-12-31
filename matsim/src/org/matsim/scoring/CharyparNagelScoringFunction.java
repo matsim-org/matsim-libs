@@ -95,15 +95,13 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	protected double score;
 	private double lastTime;
 	private int index; // the current position in plan.actslegs
-	private String firstActType;
 	private double firstActTime;
 	private final int lastActIndex;
 
-	protected static final double INITIAL_LAST_TIME = 0.0;
-	protected static final int INITIAL_INDEX = 0;
-	protected static final String INITIAL_FIRST_ACT_TYPE = null;
-	protected static final double INITIAL_FIRST_ACT_TIME = Gbl.UNDEFINED_TIME;
-	protected static final double INITIAL_SCORE = 0.0;
+	private static final double INITIAL_LAST_TIME = 0.0;
+	private static final int INITIAL_INDEX = 0;
+	private static final double INITIAL_FIRST_ACT_TIME = Gbl.UNDEFINED_TIME;
+	private static final double INITIAL_SCORE = 0.0;
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
 	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
@@ -113,7 +111,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	public static boolean initialized = false;
 
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
-	public static boolean scoreActs = true;
+	private static boolean scoreActs = true;
 
 	private static final Logger log = Logger.getLogger(CharyparNagelScoringFunction.class);
 
@@ -127,11 +125,10 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	}
 
 	public void reset() {
-		this.lastTime = CharyparNagelScoringFunction.INITIAL_LAST_TIME;
-		this.index = CharyparNagelScoringFunction.INITIAL_INDEX;
-		this.firstActType = CharyparNagelScoringFunction.INITIAL_FIRST_ACT_TYPE;
-		this.firstActTime = CharyparNagelScoringFunction.INITIAL_FIRST_ACT_TIME;
-		this.score = CharyparNagelScoringFunction.INITIAL_SCORE;
+		this.lastTime = INITIAL_LAST_TIME;
+		this.index = INITIAL_INDEX;
+		this.firstActTime = INITIAL_FIRST_ACT_TIME;
+		this.score = INITIAL_SCORE;
 	}
 
 	public void startActivity(final double time, final Act act) {
@@ -391,10 +388,10 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		Act act = (Act)this.plan.getActsLegs().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
-			this.firstActType = act.getType();
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(this.firstActType)) {
+			if (lastActType.equals(((Act) this.plan.getActsLegs().get(0)).getType())) {
+				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 			} else {
 				if (scoreActs) {
