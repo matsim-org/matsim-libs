@@ -18,12 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans.algorithms;
+package playground.yu.bottleneck;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
+import org.matsim.plans.algorithms.PlanAlgorithmI;
 
 public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
 

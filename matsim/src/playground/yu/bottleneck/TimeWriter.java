@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu;
+package playground.yu.bottleneck;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

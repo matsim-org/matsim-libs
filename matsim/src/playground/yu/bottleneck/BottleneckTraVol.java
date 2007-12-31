@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu;
+package playground.yu.bottleneck;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -42,8 +42,8 @@ public class BottleneckTraVol implements EventHandlerLinkEnterI, EventHandlerLin
 	private int cnt;
 
 	/**
-	 * @param filename -
-	 * the filename of the .txt-file to write
+	 * @param filename
+	 * 				the filename of the .txt-file to write
 	 */
 	public BottleneckTraVol(final String filename) {
 		init(filename);

@@ -18,38 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.replanning.modules;
+package playground.yu.bottleneck;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.plans.algorithms.PlanMutateTimeAllocationBottleneck;
+import org.matsim.replanning.modules.MultithreadedModuleA;
+
 
 public class TimeAllocationMutatorBottleneck extends MultithreadedModuleA {
 
-	private int mutationRange = 1800;// TODO [MR] should be a config-option
-
-	public TimeAllocationMutatorBottleneck() {
-		String range = null;
-		try {
-			range = Gbl.getConfig().getParam("TimeAllocationMutatorBottleneck","mutationRange");
-//			                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-		}
-		catch (IllegalArgumentException e) {
-			Gbl.noteMsg(this.getClass(),"TimeAllocationMutatorBottleneck()","No mutation range defined in the config file. Using 1800 sec.");
-		}
-		if (range != null) {
-			this.mutationRange = Integer.parseInt(range);
-			Gbl.noteMsg(this.getClass(),"TimeAllocationMutatorBottleneck()","mutation range = " + this.mutationRange + ".");
-		}
-	}
-
-	public TimeAllocationMutatorBottleneck(final int muntation_range) {
-		this.mutationRange = muntation_range;
-	}
+	private final int mutationRange = 1800;
 
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
-		return new PlanMutateTimeAllocationBottleneck(mutationRange);
+		return new PlanMutateTimeAllocationBottleneck(this.mutationRange);
 	}
 
 }

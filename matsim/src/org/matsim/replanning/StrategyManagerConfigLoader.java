@@ -28,7 +28,6 @@ import org.matsim.replanning.modules.PlanomatExe;
 import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.replanning.modules.TimeAllocationMutator;
-import org.matsim.replanning.modules.TimeAllocationMutatorBottleneck;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.replanning.selectors.KeepSelected;
@@ -92,11 +91,6 @@ public class StrategyManagerConfigLoader {
 			} else if (classname.equals("TimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new TimeAllocationMutator());
-//				-------------------------------------------------------------------------------
-			} else if (classname.equals("TimeAllocationMutatorBottleneck") || classname.equals("threaded.TimeAllocationMutatorBottleneck")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
-				strategy.addStrategyModule(new TimeAllocationMutatorBottleneck());
-//				--------------------------------------------------------------------------------
 			}else if (classname.equals("TimeAllocationMutator7200_ReRouteLandmarks") || classname.equals("threaded.TimeAllocationMutator")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new TimeAllocationMutator(7200));
