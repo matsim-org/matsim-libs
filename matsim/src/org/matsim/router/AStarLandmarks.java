@@ -22,13 +22,13 @@ package org.matsim.router;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.PriorityQueue;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.PriorityQueueBucket;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 
@@ -127,12 +127,8 @@ public class AStarLandmarks extends AStarEuclidean {
 		return route;
 	}
 
-	/**
-	 * @see playground.lnicolas.ready2checkIn.router.RouterDijkstra#relaxNode(org.matsim.network.Node, org.matsim.network.Node, org.matsim.router.util.PriorityQueueBucket)
-	 */
 	@Override
-	void relaxNode(Node outNode, Node toNode,
-			PriorityQueueBucket<Node> pendingNodes) {
+	void relaxNode(final Node outNode, final Node toNode, final PriorityQueue<Node> pendingNodes) {
 		this.controlCounter++;
 		if (this.controlCounter == controlInterval) {
 			int newLandmarkIndex = checkToAddLandmark(outNode, toNode);
@@ -230,8 +226,8 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param toNode The target node of the route to be calculated.
 	 * @param pendingNodes The nodes visited so far.
 	 */
-	private void updatePendingNodes(int newLandmarkIndex,
-			Node toNode, PriorityQueueBucket<Node> pendingNodes) {
+	private void updatePendingNodes(final int newLandmarkIndex,
+			final Node toNode, final PriorityQueue<Node> pendingNodes) {
 		Iterator<Node> it = pendingNodes.iterator();
 		PreProcessLandmarks.LandmarksRole toRole = getPreProcessRole(toNode);
 		ArrayList<Double> newEstRemTravCosts = new ArrayList<Double>();
@@ -249,11 +245,9 @@ public class AStarLandmarks extends AStarEuclidean {
 				newEstRemTravCosts.add(newEstRemTravCost);
 			}
 		}
-		this.comparator.setCheckIDs(true);
 		for (Node node : nodesToBeUpdated) {
 			pendingNodes.remove(node);
 		}
-		this.comparator.setCheckIDs(false);
 		for (int i = 0; i < nodesToBeUpdated.size(); i++) {
 			Node node = nodesToBeUpdated.get(i);
 			AStarNodeData data = getData(node);

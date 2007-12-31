@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.PriorityQueue;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
@@ -32,7 +33,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.PriorityQueueBucket;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.identifiers.IdI;
@@ -123,8 +123,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
 
-		PriorityQueueBucket<NodeData> pendingNodes = new PriorityQueueBucket<NodeData>(
-				this.comparator);
+		PriorityQueue<NodeData> pendingNodes = new PriorityQueue<NodeData>(500, this.comparator);
 
 		double arrivalTime = 0;
 
@@ -246,8 +245,8 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	 * @param pendingNodes
 	 *            The pending nodes so far.
 	 */
-	void initFromNode(Node fromNode, Node toNode, double startTime,
-			PriorityQueueBucket<NodeData> pendingNodes) {
+	void initFromNode(final Node fromNode, final Node toNode, final double startTime,
+			final PriorityQueue<NodeData> pendingNodes) {
 		NodeData data = getData(fromNode);
 		data.resetVisited();
 		data.visitInitNode(startTime, getIterationID());
@@ -309,7 +308,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	void relaxNode(NodeData outNodeD,PriorityQueueBucket<NodeData> pendingNodes) {
+	void relaxNode(final NodeData outNodeD,final PriorityQueue<NodeData> pendingNodes) {
 
 
 		double currTime = outNodeD.getTime();
@@ -350,7 +349,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	 * @param fromNodeData
 	 *            The NodeData from which we came to n.
 	 */
-	private boolean addToPendingNodes(Link l, Node n, PriorityQueueBucket<NodeData> pendingNodes, double currTime, double currCost, NodeData fromNodeData) {
+	private boolean addToPendingNodes(final Link l, final Node n, final PriorityQueue<NodeData> pendingNodes, final double currTime, final double currCost, final NodeData fromNodeData) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
@@ -446,7 +445,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	 * @param fromNodeData
 	 *            The NodeData from which we came visiting toNodeData.
 	 */
-	private void visitNode(NodeData toNodeData, PriorityQueueBucket<NodeData> pendingNodes, double time, double cost, NodeData fromNodeData, double trace) {
+	private void visitNode(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace) {
 		toNodeData.visit(fromNodeData, cost, time, getIterationID(), trace);
 		pendingNodes.add(toNodeData);
 		this.visitNodeCount++;
@@ -467,7 +466,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	 * @param fromNodeData
 	 *            The NodeData from which we came visiting toNodeData.
 	 */
-	private boolean revisitNode(NodeData toNodeData, PriorityQueueBucket<NodeData> pendingNodes, double time, double cost, NodeData fromNodeData, double trace) {
+	private boolean revisitNode(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace) {
 
 		for (NodeData backNode : toNodeData.getBackNodesData()){
 			NodeData shadowNode = new NodeData(toNodeData.getMatsimNode(),this.tracer);
@@ -509,7 +508,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	 * @param fromNodeData
 	 *            The NodeData from which we came visiting toNodeData.
 	 */
-	private boolean trackPath(NodeData toNodeData, PriorityQueueBucket<NodeData> pendingNodes, double time, double cost, NodeData fromNodeData, double trace, double linkCost) {
+	private boolean trackPath(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace, final double linkCost) {
 
 
 		NodeData shadowNode = new NodeData(toNodeData.getMatsimNode(),this.tracer);
@@ -600,9 +599,8 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 		return format.format(dbl);
 	}
 //	TODO DEBUG
-	private void colorizeEfficientPaths(NodeData end, NodeData begin) {
-		PriorityQueueBucket<NodeData> efficientNodes = new PriorityQueueBucket<NodeData>(
-				this.comparator);
+	private void colorizeEfficientPaths(final NodeData end, final NodeData begin) {
+		PriorityQueue<NodeData> efficientNodes = new PriorityQueue<NodeData>(500, this.comparator);
 
 		System.out.println("colorize");
 		end.addNodeProb(1);

@@ -22,12 +22,12 @@ package org.matsim.router;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.router.util.PreProcessEuclidean;
-import org.matsim.router.util.PriorityQueueBucket;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.identifiers.IdI;
@@ -148,20 +148,19 @@ public class AStarEuclidean extends Dijkstra {
 	 *            The time we start routing.
 	 */
 	@Override
-	void initFromNode(Node fromNode, Node toNode, double startTime,
-			PriorityQueueBucket<Node> pendingNodes) {
+	void initFromNode(final Node fromNode, final Node toNode, final double startTime, final PriorityQueue<Node> pendingNodes) {
 		AStarNodeData data = getData(fromNode);
 		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 		data.setExpectedRemainingCost(estimateRemainingTravelCost(fromNode, toNode));
 	}
 
 	/**
-	 * @see org.matsim.router.Dijkstra#addToPendingNodes(org.matsim.network.Link, org.matsim.network.Node, org.matsim.router.util.PriorityQueueBucket, double, double, org.matsim.network.Node, org.matsim.network.Node)
+	 * @see org.matsim.router.Dijkstra#addToPendingNodes(org.matsim.network.Link, org.matsim.network.Node, org.matsim.router.util.PriorityQueue, double, double, org.matsim.network.Node, org.matsim.network.Node)
 	 */
 	@Override
 	protected
-	boolean addToPendingNodes(Link l, Node n, PriorityQueueBucket<Node> pendingNodes,
-			double currTime, double currCost, Node outNode, Node toNode) {
+	boolean addToPendingNodes(final Link l, final Node n, final PriorityQueue<Node> pendingNodes,
+			final double currTime, final double currCost, final Node outNode, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
@@ -192,9 +191,9 @@ public class AStarEuclidean extends Dijkstra {
 	 * traveling from n to the target node of the route.
 	 * @param outNode The node from which we came visiting n.
 	 */
-	private void visitNode(Node n, AStarNodeData data,
-			PriorityQueueBucket<Node> pendingNodes, double time, double cost,
-			double expectedRemainingCost, Node outNode) {
+	private void visitNode(final Node n, final AStarNodeData data,
+			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final double expectedRemainingCost, final Node outNode) {
 		data.setExpectedRemainingCost(expectedRemainingCost);
 		visitNode(n, data, pendingNodes, time, cost, outNode);
 	}
@@ -318,10 +317,10 @@ public class AStarEuclidean extends Dijkstra {
 		}
 
 		/**
-		 * @see org.matsim.router.Dijkstra.ComparatorDijkstraCost#getKey(org.matsim.network.Node)
+		 * @see org.matsim.router.Dijkstra.ComparatorDijkstraCost#getCost(org.matsim.network.Node)
 		 */
 		@Override
-		public double getKey(Node node) {
+		protected double getCost(final Node node) {
 			return ((AStarNodeData)this.nodeData.get(node.getId())).getExpectedCost();
 		}
 	}

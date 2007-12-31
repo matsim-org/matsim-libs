@@ -22,18 +22,18 @@ package org.matsim.router;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
-import org.matsim.router.util.KeyComparator;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
-import org.matsim.router.util.PriorityQueueBucket;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.identifiers.IdI;
@@ -77,6 +77,8 @@ import org.matsim.utils.identifiers.IdI;
  */
 public class Dijkstra implements LeastCostPathCalculator {
 
+	private final static Logger log = Logger.getLogger(Dijkstra.class);
+
 	/**
 	 * The network on which we find routes.
 	 */
@@ -117,7 +119,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * Determines whether we should mark nodes in dead ends during a
 	 * pre-processing step so they won't be expanded during routing.
 	 */
-	private boolean pruneDeadEnds;
+	private final boolean pruneDeadEnds;
 
 	/**
 	 * Comparator that defines how to order the nodes in the pending nodes queue
@@ -178,16 +180,17 @@ public class Dijkstra implements LeastCostPathCalculator {
 		this.nodeData = new HashMap<IdI, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.comparator = new ComparatorDijkstraCost(this.nodeData);
 
-		this.pruneDeadEnds = false;
 		if (preProcessData != null) {
 			if (preProcessData.containsData() == false) {
-				Gbl.errorMsg("The preprocessing data provided to router "
-						+ "class Dijkstra contains no data! Please execute "
-						+ "its run(...) method first!");
+				this.pruneDeadEnds = false;
+				log.warn("The preprocessing data provided to router class Dijkstra contains no data! Please execute its run(...) method first!");
+				log.warn("Running without dead-end pruning.");
 			} else {
 				this.pruneDeadEnds = true;
 				this.preProcRoleIndex = preProcessData.roleIndex();
 			}
+		} else {
+			this.pruneDeadEnds = false;
 		}
 	}
 
@@ -215,17 +218,14 @@ public class Dijkstra implements LeastCostPathCalculator {
 			this.deadEndEntryNode = getPreProcessRole(toNode).getDeadEndEntryNode();
 		}
 
-		PriorityQueueBucket<Node> pendingNodes = new PriorityQueueBucket<Node>(
-				this.comparator);
+		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, this.comparator);
 		initFromNode(fromNode, toNode, startTime, pendingNodes);
 
 		while (stillSearching) {
 			Node outNode = pendingNodes.poll();
 
 			if (outNode == null) {
-				Gbl.warningMsg(this.getClass(), "calcLeastCostPath()",
-						"No route was found from node " + fromNode.getId()
-								+ " to node " + toNode.getId());
+				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId());
 				return null;
 			}
 
@@ -264,7 +264,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	}
 
 	/**
-	 * Initialises the first node of a route.
+	 * Initializes the first node of a route.
 	 *
 	 * @param fromNode
 	 *            The Node to be initialized.
@@ -276,7 +276,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The pending nodes so far.
 	 */
 	void initFromNode(final Node fromNode, final Node toNode, final double startTime,
-			final PriorityQueueBucket<Node> pendingNodes) {
+			final PriorityQueue<Node> pendingNodes) {
 		DijkstraNodeData data = getData(fromNode);
 		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 	}
@@ -292,35 +292,32 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	void relaxNode(final Node outNode, final Node toNode, final PriorityQueueBucket<Node> pendingNodes) {
+	void relaxNode(final Node outNode, final Node toNode, final PriorityQueue<Node> pendingNodes) {
 
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
 		double currCost = outData.getCost();
 		PreProcessDijkstra.DeadEndRole ddOutData = null;
-		if (this.pruneDeadEnds == true) {
+		if (this.pruneDeadEnds) {
 			ddOutData = getPreProcessRole(outNode);
-		}
-		for (Link l : outNode.getOutLinks().values()) {
-			Node n = l.getToNode();
-			if (this.pruneDeadEnds == true) {
+			for (Link l : outNode.getOutLinks().values()) {
+				Node n = l.getToNode();
 				PreProcessDijkstra.DeadEndRole ddData = getPreProcessRole(n);
 
-				// IF the current node n is not in a dead end
-				// OR it is in the same dead end as the fromNode
-				// OR it is in the same dead end as the toNode
-				// THEN we add the current node to the pending nodes
+				/* IF the current node n is not in a dead end
+				 * OR it is in the same dead end as the fromNode
+				 * OR it is in the same dead end as the toNode
+				 * THEN we add the current node to the pending nodes */
 				if (ddData.getDeadEndEntryNode() == null
 						|| ddOutData.getDeadEndEntryNode() != null
-						|| (this.deadEndEntryNode != null && this.deadEndEntryNode
-								.getId() == ddData.getDeadEndEntryNode()
-								.getId())) {
-					addToPendingNodes(l, n, pendingNodes, currTime, currCost,
-							outNode, toNode);
+						|| (this.deadEndEntryNode != null
+								&& this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId())) {
+					addToPendingNodes(l, n, pendingNodes, currTime, currCost, outNode, toNode);
 				}
-			} else {
-				addToPendingNodes(l, n, pendingNodes, currTime, currCost,
-						outNode, toNode);
+			}
+		} else { // this.pruneDeadEnds == false
+			for (Link l : outNode.getOutLinks().values()) {
+				addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, outNode, toNode);
 			}
 		}
 	}
@@ -343,9 +340,11 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The Node from which we came to n.
 	 * @param toNode
 	 *            The target Node of the route.
+	 * @return true if the node was added to the pending nodes, false otherwise
+	 * 		(e.g. when the same node already has an earlier visiting time).
 	 */
 	protected boolean addToPendingNodes(final Link l, final Node n,
-			final PriorityQueueBucket<Node> pendingNodes, final double currTime,
+			final PriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node outNode, final Node toNode) {
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
@@ -382,16 +381,9 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The node from which we came visiting n.
 	 */
 	void revisitNode(final Node n, final DijkstraNodeData data,
-			final PriorityQueueBucket<Node> pendingNodes, final double time, final double cost,
+			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Node outNode) {
-		/* PriorityQueueBucket.remove() uses the comparator given at instantiating
-		 * to find the matching Object. This can lead to removing a wrong object
-		 * which happens to have the same key for comparison, but is a completely
-		 * different object... Thus we tell the comparator to check the IDs too if
-		 * two objects are considered "equal" */
-		this.comparator.setCheckIDs(true);
 		pendingNodes.remove(n);
-		this.comparator.setCheckIDs(false);
 
 		data.visit(outNode, cost, time, getIterationID());
 		pendingNodes.add(n);
@@ -416,7 +408,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The node from which we came visiting n.
 	 */
 	void visitNode(final Node n, final DijkstraNodeData data,
-			final PriorityQueueBucket<Node> pendingNodes, final double time, final double cost,
+			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Node outNode) {
 		data.visit(outNode, cost, time, getIterationID());
 		pendingNodes.add(n);
@@ -516,7 +508,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 
 		private Node prev = null;
 
-		private double cost = 0;
+		/*default */ double cost = 0;
 
 		private double time = 0;
 
@@ -552,11 +544,9 @@ public class Dijkstra implements LeastCostPathCalculator {
 		}
 	};
 
-	public static class ComparatorDijkstraCost implements KeyComparator<Node>, Serializable {
+	public static class ComparatorDijkstraCost implements Comparator<Node>, Serializable {
 
 		private static final long serialVersionUID = 1L;
-
-		private boolean checkIDs = false;
 
 		protected Map<IdI, ? extends DijkstraNodeData> nodeData;
 
@@ -565,8 +555,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 		}
 
 		public int compare(final Node n1, final Node n2) {
-			double c1 = getKey(n1);
-			double c2 = getKey(n2);
+			double c1 = getCost(n1);
+			double c2 = getCost(n2);
 
 			return compare(n1, c1, n2, c2);
 		}
@@ -574,14 +564,10 @@ public class Dijkstra implements LeastCostPathCalculator {
 		private int compare(final Node n1, final double c1, final Node n2, final double c2) {
 			if (c1 < c2) return -1;
 			if (c1 > c2) return +1;
-			return (this.checkIDs) ? n1.compareTo(n2) : 0;
+			return n1.compareTo(n2);
 		}
 
-		public void setCheckIDs(final boolean flag) {
-			this.checkIDs = flag;
-		}
-
-		public double getKey(final Node node) {
+		protected double getCost(final Node node) {
 			return this.nodeData.get(node.getId()).getCost();
 		}
 	}

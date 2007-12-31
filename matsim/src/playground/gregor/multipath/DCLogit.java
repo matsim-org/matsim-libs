@@ -23,9 +23,11 @@ package playground.gregor.multipath;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.config.Config;
@@ -34,9 +36,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
-import org.matsim.router.util.KeyComparator;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.PriorityQueueBucket;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.identifiers.IdI;
@@ -143,8 +143,7 @@ public class DCLogit implements LeastCostPathCalculator{
 
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
 
-		PriorityQueueBucket<Node> pendingNodes = new PriorityQueueBucket<Node>(
-				this.comparator);
+		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, this.comparator);
 
 		double arrivalTime = 0;
 
@@ -259,8 +258,7 @@ public class DCLogit implements LeastCostPathCalculator{
 
 	//TODO DEBUG
 	private void colorizeEfficientPaths(Node end, Node begin) {
-		PriorityQueueBucket<Node> efficientNodes = new PriorityQueueBucket<Node>(
-				this.comparator);
+		PriorityQueue<Node> efficientNodes = new PriorityQueue<Node>(500, this.comparator);
 		efficientNodes.add(end);
 
 		HashSet<Node> excluded = new HashSet<Node>();
@@ -317,7 +315,7 @@ public class DCLogit implements LeastCostPathCalculator{
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	void relaxNode(Node outNode, Node toNode, PriorityQueueBucket<Node> pendingNodes) {
+	void relaxNode(final Node outNode, final Node toNode, final PriorityQueue<Node> pendingNodes) {
 
 		DCLogitNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
@@ -348,9 +346,9 @@ public class DCLogit implements LeastCostPathCalculator{
 	 * @param toNode
 	 *            The target Node of the route.
 	 */
-	boolean addToPendingNodes(Link l, Node n,
-			PriorityQueueBucket<Node> pendingNodes, double currTime,
-			double currCost, Node outNode, Node toNode) {
+	boolean addToPendingNodes(final Link l, final Node n,
+			final PriorityQueue<Node> pendingNodes, final double currTime,
+			final double currCost, final Node outNode, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
@@ -442,9 +440,9 @@ public class DCLogit implements LeastCostPathCalculator{
 	 * @param outNode
 	 *            The node from which we came visiting n.
 	 */
-	void revisitNode(Node n, DCLogitNodeData data,
-			PriorityQueueBucket<Node> pendingNodes, double time, double cost,
-			Node outNode, double trace) {
+	void revisitNode(final Node n, final DCLogitNodeData data,
+			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final Node outNode, final double trace) {
 		/* PriorityQueueBucket.remove() uses the comparator given at instantiating
 		 * to find the matching Object. This can lead to removing a wrong object
 		 * which happens to have the same key for comparison, but is a completely
@@ -510,8 +508,8 @@ public class DCLogit implements LeastCostPathCalculator{
 	 * @param pendingNodes
 	 *            The pending nodes so far.
 	 */
-	void initFromNode(Node fromNode, Node toNode, double startTime,
-			PriorityQueueBucket<Node> pendingNodes) {
+	void initFromNode(final Node fromNode, final Node toNode, final double startTime,
+			final PriorityQueue<Node> pendingNodes) {
 		DCLogitNodeData data = getData(fromNode);
 		data.resetVisited();
 		data.visitInitNode(startTime, getIterationID());
@@ -537,17 +535,17 @@ public class DCLogit implements LeastCostPathCalculator{
 	 *            The node from which we came visiting n.
 	 * @param
 	 */
-	void visitNode(Node n, DCLogitNodeData data,
-			PriorityQueueBucket<Node> pendingNodes, double time, double cost,
-			Node outNode, double trace) {
+	void visitNode(final Node n, final DCLogitNodeData data,
+			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final Node outNode, final double trace) {
 		data.visit(outNode, cost, time, getIterationID(),this.getData(outNode), trace);
 		pendingNodes.add(n);
 		this.visitNodeCount++;
 	}
 
-	void touchNode(Node n, DCLogitNodeData data,
-			PriorityQueueBucket<Node> pendingNodes, double time, double cost,
-			Node outNode, double trace) {
+	void touchNode(final Node n, final DCLogitNodeData data,
+			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final Node outNode, final double trace) {
 		data.visit(outNode, cost, time, getIterationID(),this.getData(outNode), trace);
 	}
 
@@ -579,7 +577,7 @@ public class DCLogit implements LeastCostPathCalculator{
 
 
 
-	public static class ComparatorDCLogitCost implements KeyComparator<Node>, Serializable {
+	public static class ComparatorDCLogitCost implements Comparator<Node>, Serializable {
 
 		private static final long serialVersionUID = 1L;
 

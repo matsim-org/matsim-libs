@@ -21,12 +21,12 @@
 package playground.gregor.multipath;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.network.Node;
-import org.matsim.router.util.KeyComparator;
 import org.matsim.utils.identifiers.IdI;
 
 public class NodeData {
@@ -340,7 +340,7 @@ public void addNodeProb(double prob) {
 		double trace;
 	}
 
-	public static class ComparatorNodeData implements KeyComparator<NodeData>, Serializable {
+	public static class ComparatorNodeData implements Comparator<NodeData>, Serializable {
 
 		private static final long serialVersionUID = 1L;
 
