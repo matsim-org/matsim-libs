@@ -32,7 +32,7 @@ import org.matsim.utils.identifiers.IdI;
  * As the coordinates could be present in any coordinate systems (e.g.
  * spherical, like transverse mercator), that the area of the zone does not have
  * to be the area of the polygon.
- * 
+ *
  * @see Location
  * @author laemmel
  */
@@ -43,7 +43,7 @@ public class PolygonZone extends Location {
 	private CoordI[] shell = null;
 	private double area = Double.NaN;
 
-	private String name;
+	private final String name;
 
 	protected PolygonZone(final PolygonZoneLayer layer, final IdI id, final CoordI center, final CoordI[] shell,
 			final double area, final String name) {
@@ -54,12 +54,12 @@ public class PolygonZone extends Location {
 
 	}
 
-	private CoordI[] setShell(CoordI[] shell) {
+	private CoordI[] setShell(final CoordI[] shell) {
 		if (!shell[0].equals(shell[shell.length - 1])) {
 			log.warn("The first and the last coordinate of a polygon have to be equal! Automatically closing the polygon now.");
 			return closePolygon(shell);
 		}
-		return shell;
+		return shell.clone(); // never store the externally given array directly, but a copy of it.
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -75,9 +75,9 @@ public class PolygonZone extends Location {
 		c1 = this.shell[0];
 		for (int i = 1; i < this.shell.length; i++) {
 			c2 = this.shell[i];
-			if ((coord.getY() > Math.min(c1.getY(), c2.getY())) 
+			if ((coord.getY() > Math.min(c1.getY(), c2.getY()))
 					&& (coord.getY() <= Math.max(c1.getY(), c2.getY()))
-					&& (coord.getX() <= Math.max(c1.getX(), c2.getX())) 
+					&& (coord.getX() <= Math.max(c1.getX(), c2.getX()))
 					&& (c1.getY() != c2.getY())) {
 				xinters = (coord.getY() - c1.getY()) * (c2.getY() - c1.getX()) / (c2.getY() - c1.getY()) + c1.getX();
 				if (c1.getX() == c2.getX() || coord.getX() <= xinters)
@@ -97,16 +97,16 @@ public class PolygonZone extends Location {
 	}
 
 	public CoordI[] getShell() {
-		return this.shell;
+		return this.shell.clone();
 	}
 
 	@Override
-	public double calcDistance(CoordI coord) {
-		// TODO Auto-generated method stub
-		return 0;
+	public double calcDistance(final CoordI coord) {
+		// TODO [gl] Auto-generated method stub
+		throw new UnsupportedOperationException("Not yet implemented.");
 	}
 
-	private CoordI[] closePolygon(CoordI[] shell) {
+	private CoordI[] closePolygon(final CoordI[] shell) {
 		CoordI[] enlShell = new CoordI[shell.length + 1];
 		System.arraycopy(shell, 0, enlShell, 0, shell.length);
 		enlShell[shell.length] = shell[0];
