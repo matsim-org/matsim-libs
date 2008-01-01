@@ -32,7 +32,6 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
-import org.matsim.controler.IterationCleanup;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.TravelTimeCalculator;
@@ -118,9 +117,6 @@ public class SNController01 {
     private CalcLegTimes legTimes = null;
     private VolumesAnalyzer volumes = null;
 
-    private final IterationCleanup cleanup = new IterationCleanup();
-
-    private boolean enableCleanup = true;
     private boolean overwriteFiles = true;
     private int minIteration;
     private int maxIterations;
@@ -224,7 +220,7 @@ public class SNController01 {
 	System.out.println("... done");
 
 	System.out.println(" Setting up the CoolPlace table of Links <--> Facilities ...");
-	hackKnowledge( population );
+	hackKnowledge( this.population );
 	System.out.println("... done");
 
 	System.out.println(" Calculating the statistics of the initial social network)...");
@@ -537,10 +533,6 @@ public class SNController01 {
 	    printNote("", "[" + iteration + "] mobsim ends");
 
 	    finishIteration(iteration, snIter);
-
-	    if (this.enableCleanup) {
-		this.cleanup.iterationEnd(iteration);
-	    }
 
 	    printNote("", "[" + iteration + "] iteration ends");
 	    Gbl.printRoundTime();
@@ -991,29 +983,6 @@ public class SNController01 {
 //	if (!iterationOutFile.mkdir()) {
 //	Gbl.errorMsg("The output directory " + iterationOutFile + " could not be created. Does its parent directory exist?");
 //	}
-    }
-
-    /**
-     * Sets if at the end of an iteration no longer needed files should be zipped
-     * (e.g. event files) to prevent disc space.
-     *
-     * @param cleanup
-     *          true if event-files should be zipped after they're no longer used,
-     *          false if no file cleanup after the iterations should take place
-     */
-    public final void setIterationCleanup(final boolean cleanup) {
-	this.enableCleanup = cleanup;
-    }
-
-    /**
-     * returns the current settings whether a cleanup-process should be run at the
-     * end of each iteration.
-     *
-     * @return true if the cleaning up of no longer used files at the end of an
-     *         iteration is enabled, false otherwise.
-     */
-    public final boolean getIterationCleanup() {
-	return this.enableCleanup;
     }
 
     /**

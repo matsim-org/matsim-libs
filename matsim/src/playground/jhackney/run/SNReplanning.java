@@ -36,7 +36,6 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
-import org.matsim.controler.IterationCleanup;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.TravelTimeCalculator;
@@ -79,7 +78,6 @@ import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
-import playground.jhackney.algorithms.SNSecLocShortest;
 import playground.jhackney.interactions.NonSpatialInteractor;
 import playground.jhackney.interactions.SocializingOpportunity;
 import playground.jhackney.interactions.SpatialInteractor;
@@ -131,9 +129,6 @@ public class SNReplanning  {
 	private CalcLegTimes legTimes = null;
 	private VolumesAnalyzer volumes = null;
 
-	private IterationCleanup cleanup = new IterationCleanup();
-
-	private boolean enableCleanup = true;
 	private boolean overwriteFiles = true;
 	private int minIteration;
 	private int maxIterations;
@@ -505,10 +500,6 @@ public class SNReplanning  {
 			printNote("", "[" + iteration + "] mobsim ends");
 
 			finishIteration(iteration, snIter);
-
-			if (this.enableCleanup) {
-				cleanup.iterationEnd(iteration);
-			}
 
 			printNote("", "[" + iteration + "] iteration ends");
 			Gbl.printRoundTime();
@@ -1068,28 +1059,6 @@ public class SNReplanning  {
 //		}
 	}
 
-	/**
-	 * Sets if at the end of an iteration no longer needed files should be zipped
-	 * (e.g. event files) to prevent disc space.
-	 * 
-	 * @param cleanup
-	 *          true if event-files should be zipped after they're no longer used,
-	 *          false if no file cleanup after the iterations should take place
-	 */
-	public final void setIterationCleanup(boolean cleanup) {
-		this.enableCleanup = cleanup;
-	}
-
-	/**
-	 * returns the current settings whether a cleanup-process should be run at the
-	 * end of each iteration.
-	 * 
-	 * @return true if the cleaning up of no longer used files at the end of an
-	 *         iteration is enabled, false otherwise.
-	 */
-	public final boolean getIterationCleanup() {
-		return this.enableCleanup;
-	}
 
 	/**
 	 * Sets whether the Controler is allowed to overwrite files in the output

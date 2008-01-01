@@ -35,7 +35,6 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
-import org.matsim.controler.IterationCleanup;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.TravelTimeCalculator;
@@ -124,9 +123,6 @@ public class SNGenerateNetwork {
     private CalcLegTimes legTimes = null;
     private VolumesAnalyzer volumes = null;
 
-    private IterationCleanup cleanup = new IterationCleanup();
-
-    private boolean enableCleanup = true;
     private boolean overwriteFiles = true;
     private int minIteration;
     private int maxIterations;
@@ -526,11 +522,6 @@ public class SNGenerateNetwork {
 	    sim.run();}
 
 	finishIteration(iteration, snIter);
-
-
-	if (this.enableCleanup) {
-	    cleanup.iterationEnd(iteration);
-	}
 
 	printNote("", "[" + snIter + "] iteration ends");
 	Gbl.printRoundTime();
@@ -1013,29 +1004,6 @@ public class SNGenerateNetwork {
 //	if (!iterationOutFile.mkdir()) {
 //	Gbl.errorMsg("The output directory " + iterationOutFile + " could not be created. Does its parent directory exist?");
 //	}
-    }
-
-    /**
-     * Sets if at the end of an iteration no longer needed files should be zipped
-     * (e.g. event files) to prevent disc space.
-     * 
-     * @param cleanup
-     *          true if event-files should be zipped after they're no longer used,
-     *          false if no file cleanup after the iterations should take place
-     */
-    public final void setIterationCleanup(boolean cleanup) {
-	this.enableCleanup = cleanup;
-    }
-
-    /**
-     * returns the current settings whether a cleanup-process should be run at the
-     * end of each iteration.
-     * 
-     * @return true if the cleaning up of no longer used files at the end of an
-     *         iteration is enabled, false otherwise.
-     */
-    public final boolean getIterationCleanup() {
-	return this.enableCleanup;
     }
 
     /**

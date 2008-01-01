@@ -25,16 +25,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
-import org.matsim.controler.IterationCleanup;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.TravelTimeCalculator;
@@ -75,16 +72,8 @@ import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
-import playground.jhackney.algorithms.SNSecLocShortest;
-import playground.jhackney.interactions.NonSpatialInteractor;
-import playground.jhackney.interactions.SocializingOpportunity;
-import playground.jhackney.interactions.SpatialInteractor;
-import playground.jhackney.interactions.SpatialSocialOpportunityTracker;
-import playground.jhackney.io.PajekNetWriterWrapper;
-import playground.jhackney.io.PajekWriter1;
 import playground.jhackney.replanning.SNFacilitySwitcher;
 import playground.jhackney.scoring.SNScoringFunctionFactory01;
-import playground.jhackney.socialnet.SocialNetwork;
 import playground.jhackney.statistics.SocialNetworkStatistics;
 
 public class SNController02  {
@@ -124,9 +113,6 @@ public class SNController02  {
 	private CalcLegTimes legTimes = null;
 	private VolumesAnalyzer volumes = null;
 
-	private IterationCleanup cleanup = new IterationCleanup();
-
-	private boolean enableCleanup = true;
 	private boolean overwriteFiles = true;
 	private int minIteration;
 	private int maxIterations;
@@ -498,10 +484,6 @@ public class SNController02  {
 			printNote("", "[" + iteration + "] mobsim ends");
 
 			finishIteration(iteration, snIter);
-
-			if (this.enableCleanup) {
-				cleanup.iterationEnd(iteration);
-			}
 
 			printNote("", "[" + iteration + "] iteration ends");
 			Gbl.printRoundTime();
@@ -967,29 +949,6 @@ public class SNController02  {
 //		if (!iterationOutFile.mkdir()) {
 //		Gbl.errorMsg("The output directory " + iterationOutFile + " could not be created. Does its parent directory exist?");
 //		}
-	}
-
-	/**
-	 * Sets if at the end of an iteration no longer needed files should be zipped
-	 * (e.g. event files) to prevent disc space.
-	 * 
-	 * @param cleanup
-	 *          true if event-files should be zipped after they're no longer used,
-	 *          false if no file cleanup after the iterations should take place
-	 */
-	public final void setIterationCleanup(boolean cleanup) {
-		this.enableCleanup = cleanup;
-	}
-
-	/**
-	 * returns the current settings whether a cleanup-process should be run at the
-	 * end of each iteration.
-	 * 
-	 * @return true if the cleaning up of no longer used files at the end of an
-	 *         iteration is enabled, false otherwise.
-	 */
-	public final boolean getIterationCleanup() {
-		return this.enableCleanup;
 	}
 
 	/**
