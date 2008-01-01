@@ -52,7 +52,7 @@ public class TimeFormatter {
 	 *
 	 * @param timeformat The time format to use.
 	 */
-	public TimeFormatter(String timeformat) {
+	public TimeFormatter(final String timeformat) {
 		this.timeformat = timeformat;
 	}
 
@@ -117,9 +117,9 @@ public class TimeFormatter {
 		/* else */
 		double s = seconds;
 		long h = (long)(s / 3600);
-		s = s - h * 3600;
+		s = s % 3600;
 		int m = (int)(s / 60);
-		s = s - m * 60;
+		s = s % 60;
 
 		String str_h;
 		if (h < 10) { str_h = "0" + Long.toString(h); }
@@ -129,13 +129,12 @@ public class TimeFormatter {
 		if (m < 10) { str_m = "0" + Integer.toString(m); }
 		else { str_m = Integer.toString(m); }
 
-		String str_s;
-		if (s < 10) { str_s = "0" + Integer.toString((int)s); }
-		else { str_s = Integer.toString((int)s); }
-
 		if (this.timeformat.equals(TIMEFORMAT_HHMM)) {
 			return str_h + ":" + str_m;
 		} else if (this.timeformat.equals(TIMEFORMAT_HHMMSS)) {
+			String str_s;
+			if (s < 10) { str_s = "0" + Integer.toString((int)s); }
+			else { str_s = Integer.toString((int)s); }
 			return str_h + ":" + str_m + ":" + str_s;
 		}
 		/* else */

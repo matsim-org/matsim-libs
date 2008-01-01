@@ -115,7 +115,7 @@ public class TravelTimeCalculator implements EventHandlerLinkEnterI, EventHandle
 	public TravelTimeCalculator(final NetworkLayer network, final int timeslice, final int maxTime) {
 		this.network = network;
 		this.timeslice = timeslice;
-		this.numSlots = (maxTime / this.timeslice) + 1; // TODO hard-coded max-time
+		this.numSlots = (maxTime / this.timeslice) + 1;
 		this.roleIndex = network.requestLinkRole();
 		resetTravelTimes();
 	}
@@ -168,7 +168,7 @@ public class TravelTimeCalculator implements EventHandlerLinkEnterI, EventHandle
 		return r;
 	}
 
-	private int getTimeSlotIndex(final double time) {
+	/*default*/ int getTimeSlotIndex(final double time) {
 		int slice = ((int) time)/this.timeslice;
 		if (slice >= this.numSlots) slice = this.numSlots - 1;
 		return slice;

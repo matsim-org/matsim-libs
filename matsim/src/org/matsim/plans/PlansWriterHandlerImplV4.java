@@ -22,7 +22,6 @@ package org.matsim.plans;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
@@ -222,7 +221,7 @@ public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 
 	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
-		if (!Double.isNaN(plan.getScore()))
+		if (!plan.hasUndefinedScore())
 			out.write(" score=\"" + plan.getScore() + "\"");
 		if (plan.isSelected())
 			out.write(" selected=\"" + "yes" + "\"");
@@ -298,9 +297,7 @@ public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");
-		Iterator<Node> it = route.getRoute().iterator();
-		while (it.hasNext()) {
-			Node n = it.next();
+		for (Node n : route.getRoute()) {
 			out.write(n.getId() + " ");
 		}
 		out.write("\n");
