@@ -102,7 +102,9 @@ public class RouterVis {
 		String buffString = config.findParam("vis", "buffersize");
 		if (buffString == null) {
 			buffers = Math.max(5, Math.min(50000/buffers, 100));
-		} else buffers = Integer.parseInt(buffString);
+		} else {
+			buffers = Integer.parseInt(buffString);
+		}
 
 		VisConfig myVisConfig = VisConfig.newDefaultConfig();
 		myVisConfig.set(VisConfig.DELAY, "100");
