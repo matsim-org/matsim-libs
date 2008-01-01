@@ -57,7 +57,7 @@ public class GeotoolsTransformation implements CoordinateTransformationI {
 			this.transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
 		} catch (FactoryException e) {
 			e.printStackTrace();
-			System.exit(-1);	
+			throw new RuntimeException();
 		}
 	}
 
@@ -71,10 +71,10 @@ public class GeotoolsTransformation implements CoordinateTransformationI {
 			p = (Point) JTS.transform(MGC.coord2Point(coord),transform);
 		} catch (MismatchedDimensionException e) {
 			e.printStackTrace();
-			System.exit(-1);
+			throw new RuntimeException();
 		} catch (TransformException e) {
 			e.printStackTrace();
-			System.exit(-1);
+			throw new RuntimeException();
 		}
 		return MGC.point2Coord(p);
 	}
