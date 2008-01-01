@@ -88,7 +88,7 @@ public class LineChart extends ChartUtil {
 	 * @param title
 	 * @param values
 	 */
-	protected void addSeries(final String title, final double[] values) {
+	public void addSeries(final String title, final double[] values) {
 		int cnt = 1;
 		for (double value : values) {
 			String category = (cnt > this.categories.length ? Integer.toString(cnt) : this.categories[cnt-1]);

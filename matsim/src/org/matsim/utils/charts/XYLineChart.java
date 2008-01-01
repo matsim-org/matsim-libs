@@ -65,7 +65,7 @@ public class XYLineChart extends ChartUtil {
 	 * @param xs The x values.
 	 * @param ys The y values.
 	 */
-	protected void addSeries(final String title, final double[] xs, final double[] ys) {
+	public void addSeries(final String title, final double[] xs, final double[] ys) {
 		XYSeries series = new XYSeries(title, false, true);
 		for (int i = 0, n = Math.min(xs.length, ys.length); i < n; i++) {
 			series.add(xs[i], ys[i]);
