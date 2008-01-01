@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * BarChartTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,23 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils;
+package org.matsim.utils.charts;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.awt.Container;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Toolkit;
+import java.io.File;
 
-public class AllTests {
+import org.matsim.testcases.MatsimTestCase;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils");
-		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.utils.charts.AllTests.suite());
-		suite.addTest(org.matsim.utils.geometry.AllTests.suite());
-		suite.addTest(org.matsim.utils.misc.AllTests.suite());
-		suite.addTest(org.matsim.utils.vis.routervis.AllTests.suite());
-		suite.addTestSuite(WorldUtilsTest.class);
-		//$JUnit-END$
-		return suite;
+/**
+ * Test for {@link LineChart}
+ *
+ * @author mrieser
+ */
+public class LineChartTest extends MatsimTestCase {
+
+	/**
+	 * Test that a file was really generated, and that the image, when loaded, has the specified size.
+	 */
+	public void testLineChartDemo() {
+		String imagefile = getOutputDirectory() + "linechart.png";
+		Demo demo = new Demo();
+		demo.createLineChart(imagefile);
+
+		assertTrue(new File(imagefile).exists());
+
+		Image image = Toolkit.getDefaultToolkit().getImage(imagefile);
+		// make sure the image is really loaded.
+    MediaTracker mediaTracker = new MediaTracker(new Container());
+    mediaTracker.addImage(image, 0);
+    try {
+			mediaTracker.waitForID(0);
+			assertEquals(800, image.getWidth(null));
+			assertEquals(600, image.getHeight(null));
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
