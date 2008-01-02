@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * BestPlanSelectorTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,25 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.replanning;
+package org.matsim.replanning.selectors;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.v01.Id;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
 
-import org.matsim.testcases.TestDepth;
+/**
+ * Test for {@link KeepSelected}
+ *
+ * @author mrieser
+ */
+public class KeepSelectedTest extends AbstractPlanSelectorTest {
 
-public class AllTests {
+	@Override
+	protected PlanSelectorI getPlanSelector() {
+		return new KeepSelected();
+	}
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.replanning");
-		//$JUnit-BEGIN$
-		if (TestDepth.getDepth() == TestDepth.extended) {
-			suite.addTestSuite(ReRoutingTest.class);
-		}
-		suite.addTestSuite(StrategyManagerTest.class);
-		suite.addTest(org.matsim.replanning.selectors.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+	/**
+	 * Test that really the already selected plan is returned.
+	 *
+	 * @author mrieser
+	 */
+	public void testSelected() {
+		Person person = new Person(new Id(1), "m", 40, null, null, null);
+		Plan plan1 = person.createPlan(null, "no");
+		Plan plan2 = person.createPlan("10.0", "yes");
+		Plan plan3 = person.createPlan("-50.0", "no");
+
+		KeepSelected selector = new KeepSelected();
+
+		// test default selected plan
+		assertEquals(plan2, selector.selectPlan(person));
+
+		// test selected plan with negative score
+		person.setSelectedPlan(plan3);
+		assertEquals(plan3, selector.selectPlan(person));
+
+		// test selected plan with undefined score
+		person.setSelectedPlan(plan1);
+		assertEquals(plan1, selector.selectPlan(person));
 	}
 
 }

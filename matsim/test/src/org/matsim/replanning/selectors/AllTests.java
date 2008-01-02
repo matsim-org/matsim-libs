@@ -18,23 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.replanning;
+package org.matsim.replanning.selectors;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.matsim.testcases.TestDepth;
-
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.replanning");
+		TestSuite suite = new TestSuite("Test for org.matsim.replanning.selectors");
 		//$JUnit-BEGIN$
-		if (TestDepth.getDepth() == TestDepth.extended) {
-			suite.addTestSuite(ReRoutingTest.class);
-		}
-		suite.addTestSuite(StrategyManagerTest.class);
-		suite.addTest(org.matsim.replanning.selectors.AllTests.suite());
+		suite.addTestSuite(BestPlanSelectorTest.class);
+		suite.addTestSuite(ExpBetaPlanSelectorTest.class);
+		suite.addTestSuite(KeepSelectedTest.class);
+		suite.addTestSuite(RandomPlanSelectorTest.class);
 		//$JUnit-END$
 		return suite;
 	}
