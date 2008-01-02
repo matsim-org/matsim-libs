@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for org.matsim.utils");
 		//$JUnit-BEGIN$
 		suite.addTest(org.matsim.utils.charts.AllTests.suite());
+		suite.addTest(org.matsim.utils.collections.AllTests.suite());
 		suite.addTest(org.matsim.utils.geometry.AllTests.suite());
 		suite.addTest(org.matsim.utils.misc.AllTests.suite());
 		suite.addTest(org.matsim.utils.vis.routervis.AllTests.suite());

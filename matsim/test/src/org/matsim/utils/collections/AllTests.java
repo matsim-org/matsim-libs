@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.misc;
+package org.matsim.utils.collections;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,10 +26,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils.misc");
+		TestSuite suite = new TestSuite("Test for org.matsim.utils.collections");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(ArgumentParserTest.class);
-		suite.addTestSuite(StringUtilsTest.class);
+		suite.addTestSuite(QuadTreeTest.class);
 		//$JUnit-END$
 		return suite;
 	}
