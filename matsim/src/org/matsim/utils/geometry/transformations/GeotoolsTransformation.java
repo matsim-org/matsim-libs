@@ -94,7 +94,7 @@ public class GeotoolsTransformation implements CoordinateTransformationI {
 			crs =  CRS.parseWKT(wkt_CRS);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.exit(-1);
+			throw new RuntimeException();
 		}
 		return crs;
 	}
