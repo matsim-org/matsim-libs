@@ -49,11 +49,11 @@ import org.matsim.world.Location;
 
 /**
  * The "heart" of the planomat external strategy module:
- * Optimize a the departure times and activity durations 
+ * Optimize a the departure times and activity durations
  * of a given <code>Plan</code>
- * <ul> 
+ * <ul>
  * <li> according to a <code>ScoringFunction</code>
- * <li> with respect to time-of-day dependent travel costs as perceived 
+ * <li> with respect to time-of-day dependent travel costs as perceived
  *   by a <code>LegtravelTimeEstimator</code>.
  * </ul>
  * @author meisterk
@@ -63,14 +63,14 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 
 	private LegTravelTimeEstimator legTravelTimeEstimator = null;
 
-	public PlanOptimizeTimes(LegTravelTimeEstimator legTravelTimeEstimator) {
+	public PlanOptimizeTimes(final LegTravelTimeEstimator legTravelTimeEstimator) {
 
 		super();
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
 
 	}
 
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 
 		// distinguish for optimization tools
 		String optiToolboxName = PlanomatConfig.getOptimizationToolboxName();
@@ -79,18 +79,19 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 			Genotype initialGAPopulation = PlanOptimizeTimes.initJGAP(plan, this.legTravelTimeEstimator);
 			IChromosome fittest = PlanOptimizeTimes.evolveAndReturnFittest(initialGAPopulation);
 			PlanOptimizeTimes.writeChromosome2Plan(fittest, plan, this.legTravelTimeEstimator);
-			
-		} 
+
+		}
 
 	}
 
 	/**
 	 * Configure JGAP for our purposes and generate the initial GA population.
-	 * 
+	 *
 	 * @param plan The encoding depends on the number of activities, this is why we pass the plan to the configuration
-	 * @return the initial population of GA individuals ready for evolution 
+	 * @param estimator
+	 * @return the initial population of GA individuals ready for evolution
 	 */
-	private static Genotype initJGAP(Plan plan, LegTravelTimeEstimator estimator) {
+	private static Genotype initJGAP(final Plan plan, final LegTravelTimeEstimator estimator) {
 
 		Genotype jgapGAPopulation = null;
 
@@ -123,7 +124,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 			// the following settings are copied from org.jgap.DefaultCOnfiguration
 			// TODO configuration shouldnt be inited for every plan, but once
 			// but currently do not know how to deal with threads because cloning doesn't work because jgap.impl.configuration writes System.Properties
-			jgapConfiguration.reset();
+			Configuration.reset();
 			jgapConfiguration.setRandomGenerator(new StockRandomGenerator());
 			jgapConfiguration.setEventManager(new EventManager());
 			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(jgapConfiguration, 0.95d);
@@ -157,12 +158,11 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 			jgapConfiguration.setFitnessFunction( fitnessFunction );
 
 			// elitist selection (DeJong, 1975)
-			jgapConfiguration.setPreservFittestIndividual(Boolean.TRUE);
+			jgapConfiguration.setPreservFittestIndividual(true);
 			jgapConfiguration.setPopulationSize( popSize );
 			jgapGAPopulation = Genotype.randomInitialGenotype( jgapConfiguration );
 
 		} catch (InvalidConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -174,7 +174,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 	 * @param population the initial GA population that serves as breed for evolution
 	 * @return the fittest individual after evolution
 	 */
-	private static IChromosome evolveAndReturnFittest(Genotype population) {
+	private static IChromosome evolveAndReturnFittest(final Genotype population) {
 
 		double travelPenalty = Math.abs(Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling"))) / 3600;
 		double minDiff = travelPenalty * PlanomatConfig.getIndifference();
@@ -182,7 +182,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 
 		IChromosome fittest = null;
 		double avg = 0, max = 0, oldmax = 0;
-		boolean cancelEvolution = Boolean.FALSE;
+		boolean cancelEvolution = false;
 		int generation = 0;
 
 		int maxNumGenerations = PlanomatConfig.getJgapMaxGenerations();
@@ -206,7 +206,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 					cancelEvolution = true;
 				}
 				oldmax = max;
-			}		
+			}
 
 			generation++;
 			if (generation == maxNumGenerations) {
@@ -223,7 +223,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 		return fittest;
 	}
 
-	private static double getAverageFitness(Genotype population) {
+	private static double getAverageFitness(final Genotype population) {
 
 		double averageFitness = 0;
 
@@ -241,11 +241,11 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 
 	/**
 	 * Writes a JGAP chromosome back to matsim plan object.
-	 * 
+	 *
 	 * @param individual the GA individual (usually the fittest after evolution) whose values will be written back to a plan object
 	 * @param plan the plan that will be altered
 	 */
-	private static void writeChromosome2Plan(IChromosome individual, Plan plan, LegTravelTimeEstimator estimator) {
+	private static void writeChromosome2Plan(final IChromosome individual, final Plan plan, final LegTravelTimeEstimator estimator) {
 
 		Act activity = null;
 		Leg leg = null;
@@ -274,7 +274,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 					// move now pointer to activity end time
 					now += activity.getEndTime();
 
-					// handle middle activities	
+					// handle middle activities
 				} else if ((ii > 0) && (ii < (max - 1))) {
 
 					// assume that there will be no delay between arrival time and activity start time
@@ -308,9 +308,9 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 				Location destination = ((Act) plan.getActsLegs().get(ii + 1)).getLink();
 
 				double travelTimeEstimation = estimator.getLegTravelTimeEstimation(
-						plan.getPerson().getId(), 
-						0.0, 
-						origin, 
+						plan.getPerson().getId(),
+						0.0,
+						origin,
 						destination,
 						leg.getRoute(),
 				"car");
