@@ -110,15 +110,15 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 	}
 
-	public void getConstData(OTFServerRemote host) throws RemoteException {
+	synchronized public void getConstData(OTFServerRemote host) throws RemoteException {
 		getData(host, true);
 	}
 
-	public void getDynData(OTFServerRemote host) throws RemoteException {
+	synchronized public void getDynData(OTFServerRemote host) throws RemoteException {
 		getData(host, false);
 	}
 
-	public void invalidate(Rect rect) {
+	synchronized public void invalidate(Rect rect) {
 		if (rect == null) {
 			rect = this.top.getBounds();
 		}
@@ -130,18 +130,22 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 	}
 
+	@Override
 	public double getMinEasting() {
 		return minEasting;
 	}
 
+	@Override
 	public double getMaxEasting() {
 		return maxEasting;
 	}
 
+	@Override
 	public double getMinNorthing() {
 		return minNorthing;
 	}
 
+	@Override
 	public double getMaxNorthing() {
 		return maxNorthing;
 	}

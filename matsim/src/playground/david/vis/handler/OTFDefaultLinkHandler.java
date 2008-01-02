@@ -29,7 +29,7 @@ public class OTFDefaultLinkHandler implements OTFDataQuad.Provider, OTFDataReade
 
 		@Override
 		public void writeDynData(DataOutputStream out) throws IOException {
-			// TODO Auto-generated method stub
+			out.writeFloat((float)src.getDisplayableSpaceCapValue());
 			
 		}
 
@@ -39,7 +39,7 @@ public class OTFDefaultLinkHandler implements OTFDataQuad.Provider, OTFDataReade
 	}
 	
 	public void readDynData(DataInputStream in) throws IOException {
-		// TODO Auto-generated method stub
+		quadReceiver.setColor(in.readFloat());
 
 	}
 
