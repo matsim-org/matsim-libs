@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeCalculator.java
+ * TravelTimeCalculatorImpl2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,29 +18,124 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.events.algorithms;
+package org.matsim.trafficmonitoring;
 
 import java.util.HashMap;
 
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.TravelTimeI;
 
-public class TravelTimeCalculator implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArrivalI, TravelTimeI {
-
+public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
+	
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
+	
 	private NetworkLayer network = null;
 	final int roleIndex;
 	private final int timeslice;
-	private final int numSlots;
+	private final int expectNumSlots;
+	
+	private static Integer [] cache; //enlarged cache for Integers - java.lang.Integer only caches 256 values (from -128 to 127) - used as keys for HashMap in TravelTimeRole 
+	
+	public TravelTimeCalculatorHashMap(final NetworkLayer network){
+		this(network,15*60,30*3600); // default timeslot-duration: 15 minutes
+	}
+	
 
+	public TravelTimeCalculatorHashMap(final NetworkLayer network, final int timeslice) {
+		this(network, timeslice, 30*3600); // default: 30 hours at most
+	}
+	
+	//compatibility constructor ...
+	public TravelTimeCalculatorHashMap(final NetworkLayer network, final int timeslice, final int maxTime) {
+		this.network  = network;
+		this.timeslice = timeslice;
+		this.expectNumSlots = (int) ( (maxTime / this.timeslice) + 1);
+		this.roleIndex = network.requestLinkRole();
+		generateCache();
+	}
+	
+	public void resetTravelTimes() {
+		for (Link link : this.network.getLinks().values()) {
+			TravelTimeRole r = getTravelTimeRole(link);
+			r.resetTravelTimes();
+		}
+		this.enterEvents.clear();
+	}
+	
+
+	public void reset(final int iteration) {
+		resetTravelTimes();
+	}
+
+	private void generateCache() {
+		cache = new Integer[this.expectNumSlots];
+		for (int i=0; i < this.expectNumSlots; i++){
+			cache[i] = Integer.valueOf(i);
+		}
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+	// Implementation of EventAlgorithmI
+	//////////////////////////////////////////////////////////////////////
+	public void handleEvent(EventLinkEnter event) {
+		EnterEvent e = new EnterEvent(event.linkId, event.time);
+		this.enterEvents.put(event.agentId, e);
+	}
+
+	public void handleEvent(EventLinkLeave event) {
+		EnterEvent e = this.enterEvents.remove(event.agentId);
+		if (e != null && e.linkId.equals(event.linkId)) {
+			double timediff = event.time - e.time;
+			if (event.link == null) event.link = (Link)this.network.getLocation(event.linkId);
+			if (event.link != null) {
+				getTravelTimeRole(event.link).addTravelTime(e.time, timediff);
+			}
+		}
+	}
+
+	public void handleEvent(EventAgentArrival event) {
+		// remove EnterEvents from list when an agent arrives.
+		// otherwise, the activity duration would counted as travel time, when the
+		// agent departs again and leaves the link!
+		this.enterEvents.remove(event.agentId);
+
+	}
+
+	private TravelTimeRole getTravelTimeRole(final Link link) {
+		TravelTimeRole r = (TravelTimeRole) link.getRole(this.roleIndex);
+		if (null == r) {
+			r = new TravelTimeRole(link);
+			link.setRole(this.roleIndex, r);
+		}
+		return r;
+	}
+	
+	private int getTimeSlotIndex(final double time) {
+		int slice = ((int) time)/this.timeslice;
+		return slice;
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////////
+	// Implementation of TravelTimeI
+	//////////////////////////////////////////////////////////////////////
+
+	/* (non-Javadoc)
+	 * @see org.matsim.network.TravelCostI#getLinkTravelTime(org.matsim.network.Link, int)
+	 */
+	public double getLinkTravelTime(final Link link, final double time) {
+		return getTravelTimeRole(link).getTravelTime(time);
+	}
+
+	
+	//////////////////////////////////////////////////////////////////////
+	// inner classes
+	//////////////////////////////////////////////////////////////////////
+	
 	static private class EnterEvent {
 
 		public final String linkId;
@@ -54,143 +149,99 @@ public class TravelTimeCalculator implements EventHandlerLinkEnterI, EventHandle
 	};
 
 	private class TravelTimeRole {
-		private final double[] timeSum;
-		private final int[] timeCnt;
-		private final double[] travelTimes;
+	
+		private HashMap<Integer,TimeStruct> travelTimes;
 		private final double freetraveltime;
+		private int currIdx;
+		private int currCnt;
+		private double currTimeSum;
+		
 
-		public TravelTimeRole(final Link link, final int numSlots) {
-			this.timeSum = new double[numSlots];
-			this.timeCnt = new int[numSlots];
-			this.travelTimes = new double[numSlots];
+		public TravelTimeRole(final Link link) {
+
+//			this.travelTimes =  new HashMap<Integer,TimeStruct>(numSlots,(float) 0.5);
+			this.travelTimes =  new HashMap<Integer,TimeStruct>(); 
 			this.freetraveltime = link.getLength() / link.getFreespeed();
 			resetTravelTimes();
+			
+
+		}
+	
+		private Integer getInteger(int i){
+			if (i < cache.length){
+				return cache[i];
+			}
+			return Integer.valueOf(i);
 		}
 
 		public void resetTravelTimes() {
-			for (int i = 0; i < this.timeSum.length; i++) {
-				this.timeSum[i] = 0.0;
-				this.timeCnt[i] = 0;
-				this.travelTimes[i] = -1.0;
-			}
+			this.currCnt = 0;
+			this.currIdx = 0;
+			this.currTimeSum = 0;
+			this.travelTimes.clear();
 		}
 
 		public void addTravelTime(final double now, final double traveltime) {
 			int index = getTimeSlotIndex(now);
-			double sum = this.timeSum[index];
-			int cnt = this.timeCnt[index];
-			sum += traveltime;
-			cnt++;
-			this.timeSum[index] = sum;
-			this.timeCnt[index] = cnt;
-			this.travelTimes[index] = -1.0; // initialize with negative value
+			if (index != this.currIdx){
+				changeCurrent(index);
+				
+			}
+			this.currCnt++;
+			this.currTimeSum += traveltime;
+		}
+
+		private void changeCurrent(int index) {
+			TimeStruct curr = this.travelTimes.get(getInteger(this.currIdx));
+			// save old
+			if (curr != null ){
+				curr.cnt += this.currCnt;
+				curr.timeSum += this.currTimeSum;
+			} else if (this.currCnt > 0){
+				this.travelTimes.put(getInteger(this.currIdx), new TimeStruct(this.currTimeSum,this.currCnt));
+			}
+			
+			// set new
+			this.currIdx = index;
+			curr = this.travelTimes.get(getInteger(this.currIdx));
+			if (curr == null){
+				this.currCnt = 0;
+				this.currTimeSum = 0;				
+			} else {
+				this.currCnt = curr.cnt;
+				this.currTimeSum = curr.timeSum;				
+			}
+			
 		}
 
 		public double getTravelTime(final double now) {
 			int index = getTimeSlotIndex(now);
-			double ttime = this.travelTimes[index];
-			if (ttime >= 0.0) return ttime; // negative values are invalid.
-
-			int cnt = this.timeCnt[index];
-			if (cnt == 0) {
-				this.travelTimes[index] = this.freetraveltime;
+			
+			if (index == this.currIdx) {
+				return this.currTimeSum / this.currCnt;
+			}
+	
+			TimeStruct ts = this.travelTimes.get(getInteger(index));
+			if (ts == null){
 				return this.freetraveltime;
 			}
-
-			double sum = this.timeSum[index];
-			this.travelTimes[index] = sum / cnt;
-			return this.travelTimes[index];
+			
+			return ts.timeSum / ts.cnt;
+			
 		}
+		
+
+		private  class TimeStruct{
+			public double timeSum;
+			public int cnt;
+			public TimeStruct(double timeSum, int cnt){
+				this.cnt = cnt;
+				this.timeSum = timeSum;
+			}
+		};
 
 	};
+	
 
-	public TravelTimeCalculator(final NetworkLayer network) {
-		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
-	}
-
-	public TravelTimeCalculator(final NetworkLayer network, final int timeslice) {
-		this(network, timeslice, 30*3600); // default: 30 hours at most
-	}
-
-	public TravelTimeCalculator(final NetworkLayer network, final int timeslice, final int maxTime) {
-		this.network = network;
-		this.timeslice = timeslice;
-		this.numSlots = (maxTime / this.timeslice) + 1;
-		this.roleIndex = network.requestLinkRole();
-		resetTravelTimes();
-	}
-
-	public void resetTravelTimes() {
-		for (Link link : this.network.getLinks().values()) {
-			TravelTimeRole r = getTravelTimeRole(link);
-			r.resetTravelTimes();
-		}
-		this.enterEvents.clear();
-	}
-
-	public void reset(final int iteration) {
-		resetTravelTimes();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// Implementation of EventAlgorithmI
-	//////////////////////////////////////////////////////////////////////
-
-	public void handleEvent(final EventLinkEnter event) {
-		EnterEvent e = new EnterEvent(event.linkId, event.time);
-		this.enterEvents.put(event.agentId, e);
-	}
-
-	public void handleEvent(final EventLinkLeave event) {
-		EnterEvent e = this.enterEvents.remove(event.agentId);
-		if (e != null && e.linkId.equals(event.linkId)) {
-			double timediff = event.time - e.time;
-			if (event.link == null) event.link = (Link)this.network.getLocation(event.linkId);
-			if (event.link != null) {
-				getTravelTimeRole(event.link).addTravelTime(e.time, timediff);
-			}
-		}
-	}
-
-	public void handleEvent(final EventAgentArrival event) {
-		// remove EnterEvents from list when an agent arrives.
-		// otherwise, the activity duration would counted as travel time, when the
-		// agent departs again and leaves the link!
-		this.enterEvents.remove(event.agentId);
-	}
-
-	private TravelTimeRole getTravelTimeRole(final Link link) {
-		TravelTimeRole r = (TravelTimeRole) link.getRole(this.roleIndex);
-		if (null == r) {
-			r = new TravelTimeRole(link, this.numSlots);
-			link.setRole(this.roleIndex, r);
-		}
-		return r;
-	}
-
-	/*default*/ int getTimeSlotIndex(final double time) {
-		int slice = ((int) time)/this.timeslice;
-		if (slice >= this.numSlots) slice = this.numSlots - 1;
-		return slice;
-	}
-
-
-	//////////////////////////////////////////////////////////////////////
-	// Implementation of TravelTimeI
-	//////////////////////////////////////////////////////////////////////
-
-	/* (non-Javadoc)
-	 * @see org.matsim.network.TravelCostI#getLinkTravelTime(org.matsim.network.Link, int)
-	 */
-	public double getLinkTravelTime(final Link link, final double time) {
-		return getTravelTimeRole(link).getTravelTime(time);
-	}
-
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return this.getClass().getSimpleName();
-	}
-
-
+	
 }

@@ -41,7 +41,6 @@ import org.matsim.basic.v01.BasicPlan.LegIterator;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.algorithms.TravelTimeCalculator;
 import org.matsim.events.handler.EventHandlerI;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -78,6 +77,7 @@ import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -904,7 +904,7 @@ public class MyRuns {
 
 		String travelTimeIName = Gbl.getConfig().getParam(PlanomatConfig.PLANOMAT, PlanomatConfig.PLANOMAT_LINK_TRAVEL_TIME_ESTIMATOR);
 		if (travelTimeIName.equalsIgnoreCase("org.matsim.demandmodeling.events.algorithms.TravelTimeCalculator")) {
-			linkTravelTimeEstimator = new TravelTimeCalculator(network);
+			linkTravelTimeEstimator = new TravelTimeCalculatorArray(network);
 		} else if (travelTimeIName.equalsIgnoreCase("org.matsim.playground.meisterk.planomat.LinearInterpolatingTTCalculator")) {
 			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
 		} else {
@@ -991,7 +991,7 @@ public class MyRuns {
 		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Plans.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
-		TravelTimeI tTravelCalc = new TravelTimeCalculator(network);
+		TravelTimeI tTravelCalc = new TravelTimeCalculatorArray(network);
 		LegTravelTimeEstimator ltte = MyRuns.createLegTravelTimeEstimator(events, network, tTravelCalc);
 		events.printEventHandlers();
 		MyRuns.readEvents(events, network);

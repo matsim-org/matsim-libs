@@ -56,7 +56,7 @@ import org.matsim.controler.listener.LegHistogramListener;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.events.algorithms.TravelTimeCalculator;
+import org.matsim.events.handler.EventHandlerI;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -90,9 +90,19 @@ import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.stats.PlanStatsManager;
+import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
+
+//import playground.gregor.travaletimecalc.TravelTimeCalculatorImpl2;
+
+
+
+
+
+
 
 public class Controler {
 
@@ -114,7 +124,7 @@ public class Controler {
 	private boolean running = false;
 	protected StrategyManager strategyManager = null;
 	protected NetworkLayer network = null;
-	protected TravelTimeI travelTimeCalculator = null;
+	protected AbstractTravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCostI travelCostCalculator = null;
 	private static String outputPath = null;
 	private static int iteration = -1;
@@ -144,7 +154,6 @@ public class Controler {
 	protected Config config = null;
 
 	protected IterationStopWatch stopwatch = new IterationStopWatch();
-	private int traveltimeBinSize = 15*60; // use a default of 15min time-bins for analyzing the travel times
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
@@ -321,7 +330,7 @@ public class Controler {
 	protected void setupIteration(final int iteration) {
 		this.fireControlerSetupIterationEvent(iteration);
 		// TODO [MR] use events.resetHandlers();
-		((TravelTimeCalculator)this.travelTimeCalculator).resetTravelTimes();	// reset, so we can collect the new events and build new travel times for the next iteration
+		this.travelTimeCalculator.resetTravelTimes();	// reset, so we can collect the new events and build new travel times for the next iteration
 
 		this.eventwriter = new EventWriterTXT(getIterationFilename(Controler.FILENAME_EVENTS));
 		this.events.addHandler(this.eventwriter);
@@ -508,10 +517,10 @@ public class Controler {
 			this.events.addHandler(this.tollCalc);
 			printNote("", "done.");
 		}
-
-		int endTime = (this.config.simulation().getEndTime() > 0) ? (int)this.config.simulation().getEndTime() : 30*3600; // if no end-time is set, assume 30hours
-		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculator(this.network, this.traveltimeBinSize, endTime);
-		this.events.addHandler(travelTimeCalculator);
+		
+		AbstractTravelTimeCalculator travelTimeCalculator = this.config.simulation().getTravelTimeCalculator(this.network);
+		
+		this.events.addHandler((EventHandlerI) travelTimeCalculator);
 		this.travelTimeCalculator = travelTimeCalculator;
 
 		if (Gbl.useRoadPricing()) {
@@ -811,26 +820,6 @@ public class Controler {
 	 */
 	public final boolean getOverwriteFiles() {
 		return this.overwriteFiles;
-	}
-
-	/**
-	 * Sets the size of the time-window over which the travel times are accumulated and averaged.
-	 * Changes to this parameter have no effect after {@link #run(String[])} is called. <br>
-	 * Note that smaller values for the binSize increase memory consumption to store the travel times.
-	 *
-	 * @param binSize The size of the time-window in seconds.
-	 */
-	public final void setTraveltimeBinSize(final int binSize) {
-		this.traveltimeBinSize = binSize;
-	}
-
-	/**
-	 * Returns the size of the time-window used to accumulate and average travel times.
-	 *
-	 * @return The size of the time-window in seconds.
-	 */
-	public final int getTraveltimeBinSize() {
-		return this.traveltimeBinSize;
 	}
 
 	/** Specifies whether the leg histogram should also be generated as a PNG graphics. The creation uses

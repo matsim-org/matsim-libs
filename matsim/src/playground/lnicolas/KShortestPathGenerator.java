@@ -26,7 +26,6 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.matsim.events.algorithms.TravelTimeCalculator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -37,6 +36,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.utils.identifiers.IdI;
 
 /**
@@ -101,7 +101,7 @@ public class KShortestPathGenerator {
 	 * @see #KShortestPathGenerator(NetworkLayer, TravelCostI, TravelTimeI)
 	 */
 	public KShortestPathGenerator(NetworkLayer network) {
-		this(network, new FreespeedTravelTimeCost(), new TravelTimeCalculator(network));
+		this(network, new FreespeedTravelTimeCost(), new TravelTimeCalculatorArray(network));
 	}
 
 	/**

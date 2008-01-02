@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.GZIPOutputStream;
 
-import org.matsim.events.algorithms.TravelTimeCalculator;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -48,6 +47,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessEuclidean;
 import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
@@ -151,7 +151,7 @@ public class MyRunsLoechl extends MyRuns {
 				new FreespeedTravelTimeCost());
 		preRouter.run(network);
 		LeastCostPathCalculator router = new AStarLandmarks(network, preRouter,
-				new TravelTimeCalculator(network));
+				new TravelTimeCalculatorArray(network));
 
 		String filename = outputPath
 				+ (new File(Gbl.getConfig().facilities().getInputFile())).getName() + "_" + arg
@@ -231,7 +231,7 @@ public class MyRunsLoechl extends MyRuns {
 		PreProcessLandmarks preRouter = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		preRouter.run(network);
 		LeastCostPathCalculator router = new AStarLandmarks(network,
-				preRouter, new TravelTimeCalculator(network));
+				preRouter, new TravelTimeCalculatorArray(network));
 
 		BufferedWriter out;
 		String filename = outputPath
@@ -331,7 +331,7 @@ public class MyRunsLoechl extends MyRuns {
 			this.ptStop = ptStop;
 			this.railstation = railstation;
 			this.cityCenter = cityCenter;
-			this.router = new AStarEuclidean(network, preRouter, new TravelTimeCalculator(network));
+			this.router = new AStarEuclidean(network, preRouter, new TravelTimeCalculatorArray(network));
 			this.id = id;
 			this.type = type;
 		}

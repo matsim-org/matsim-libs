@@ -34,7 +34,6 @@ import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.events.algorithms.TravelTimeCalculator;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -69,6 +68,7 @@ import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 
@@ -546,7 +546,7 @@ public class SNController01 {
     protected void setupIteration(final int iteration, final int snIter) {
 
 	// TODO [MR] use events.resetHandlers();
-	((TravelTimeCalculator)this.travelTimeCalculator).resetTravelTimes();	// reset, so we can collect the new events and build new travel times for the next iteration
+	((TravelTimeCalculatorArray)this.travelTimeCalculator).resetTravelTimes();	// reset, so we can collect the new events and build new travel times for the next iteration
 
 	this.eventwriter = new EventWriterTXT(getIterationFilename(FILENAME_EVENTS, snIter));
 	this.events.addHandler(this.eventwriter);
@@ -710,7 +710,7 @@ public class SNController01 {
 	    System.out.println("done.");
 	}
 
-	TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculator(this.network, 15*60); // 15min bins
+	TravelTimeCalculatorArray travelTimeCalculator = new TravelTimeCalculatorArray(this.network, 15*60); // 15min bins
 	this.events.addHandler(travelTimeCalculator);
 	this.travelTimeCalculator = travelTimeCalculator;
 

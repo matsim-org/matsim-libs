@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * AbstractTravelTimeCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,21 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.events.algorithms;
+/**
+ * 
+ */
+package org.matsim.trafficmonitoring;
+
+import org.matsim.events.handler.EventHandlerAgentArrivalI;
+import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.router.util.TravelTimeI;
 
 
+/**
+ * @author laemmel
+ *
+ */
+public abstract class AbstractTravelTimeCalculator implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArrivalI, TravelTimeI{
+	
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+	public AbstractTravelTimeCalculator() {
+		
+	}
+	
+	/**
+	 * Resets the travel times information on all links
+	 */
+	public abstract void resetTravelTimes();
 
-public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.events.algorithms");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(CalcLegNumberTest.class);
-		//$JUnit-END$
-		return suite;
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return this.getClass().getSimpleName();
 	}
 
 }

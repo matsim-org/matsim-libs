@@ -24,6 +24,10 @@ import java.util.TreeMap;
 
 import org.matsim.config.Module;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
+import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorHashMap;
 
 public class SimulationConfigGroup extends Module {
 
@@ -41,6 +45,8 @@ public class SimulationConfigGroup extends Module {
 	private static final String EVACUATION_TIME = "evacuationTime";
 	private static final String EXTERNAL_EXE = "externalExe";
 	private static final String TIMEOUT = "timeout";
+	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
+	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
 
 	private static final String SHELLTYPE = "shellType"; // TODO [MR,DS] should be moved to its own config group
 	private static final String JAVACLASSPATH = "classPath"; // _TODO dito...
@@ -62,6 +68,8 @@ public class SimulationConfigGroup extends Module {
 	private boolean removeStuckVehicles = true;
 	private String externalExe = null;
 	private int timeOut = 3600;
+	private String travelTimeCalculator = "TravelTimeCalculatorArray";
+	private int traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
 
 	public SimulationConfigGroup() {
 		super(GROUP_NAME);
@@ -93,7 +101,11 @@ public class SimulationConfigGroup extends Module {
 			setExternalExe(value);
 		} else if (TIMEOUT.equals(key)) {
 			setExternalTimeOut(Integer.parseInt(value));
-		} else if (SHELLTYPE.equals(key) || JAVACLASSPATH.equals(key) || JVMOPTIONS.equals(key)
+		} else if (TRAVEL_TIME_CALCULATOR.equals(key)) {
+			setTravelTimeCalculatorType(value);
+		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
+			setTraveltimeBinSize(Integer.parseInt(value));
+		}else if (SHELLTYPE.equals(key) || JAVACLASSPATH.equals(key) || JVMOPTIONS.equals(key)
 				|| CLIENTLIST.equals(key) || LOCALCONFIG.equals(key) || LOCALCONFIGDTD.equals(key) || EXE_PATH.equals(key)) {
 			System.err.println("WARNING: The config options for the parallel mobsim are no longer supported.");
 		} else {
@@ -128,7 +140,11 @@ public class SimulationConfigGroup extends Module {
 			return getExternalExe();
 		} else if (TIMEOUT.equals(key)) {
 			return Integer.toString(getExternalTimeOut());
-		} else {
+		} else if (TRAVEL_TIME_CALCULATOR.equals(key)) {
+			return getTravelTimeCalculatorType();
+		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
+			return Integer.toString(getTraveltimeBinSize());
+		}  else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -150,6 +166,8 @@ public class SimulationConfigGroup extends Module {
 			map.put(EXTERNAL_EXE, getValue(EXTERNAL_EXE));
 		}
 		map.put(TIMEOUT, getValue(TIMEOUT));
+		map.put(TRAVEL_TIME_CALCULATOR, getValue(TRAVEL_TIME_CALCULATOR));
+		map.put(TRAVEL_TIME_BIN_SIZE, getValue(TRAVEL_TIME_BIN_SIZE));
 		return map;
 	}
 
@@ -252,5 +270,43 @@ public class SimulationConfigGroup extends Module {
 		return this.timeOut;
 	}
 
+	public void setTravelTimeCalculatorType(final String travelTimeCalculator){
+		this.travelTimeCalculator = travelTimeCalculator;
+	}
 
+	public String getTravelTimeCalculatorType(){
+		return this.travelTimeCalculator;
+	}
+	
+	public AbstractTravelTimeCalculator getTravelTimeCalculator(NetworkLayer network){
+		int endTime = (int) ((this.endTime > 0) ? this.endTime : 30*3600); // if no end-time is set, assume 30hours
+		if ("TravelTimeCalculatorArray".equals(this.travelTimeCalculator)){
+			return new TravelTimeCalculatorArray(network, this.traveltimeBinSize, endTime);
+		} else if ("TravelTimeCalculatorHashMap".equals(this.travelTimeCalculator)){
+			return new TravelTimeCalculatorHashMap(network, this.traveltimeBinSize, endTime);
+		} else {
+			throw new RuntimeException(this.travelTimeCalculator + " is unknown!");
+		}
+		
+	}
+	
+	/**
+	 * Sets the size of the time-window over which the travel times are accumulated and averaged.
+	 * Changes to this parameter have no effect after {@link #run(String[])} is called. <br>
+	 * Note that smaller values for the binSize increase memory consumption to store the travel times.
+	 *
+	 * @param binSize The size of the time-window in seconds.
+	 */
+	public final void setTraveltimeBinSize(final int binSize) {
+		this.traveltimeBinSize = binSize;
+	}
+
+	/**
+	 * Returns the size of the time-window used to accumulate and average travel times.
+	 *
+	 * @return The size of the time-window in seconds.
+	 */
+	public final int getTraveltimeBinSize() {
+		return this.traveltimeBinSize;
+	}
 }

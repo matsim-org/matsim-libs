@@ -23,7 +23,6 @@ package tutorial;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.events.algorithms.TravelTimeCalculator;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
@@ -40,6 +39,7 @@ import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 
@@ -79,7 +79,7 @@ public class MyControler5 {
 		strategyManager.addStrategy(strategy1, 0.9);
 		strategyManager.addStrategy(strategy2, 0.1);
 
-		TravelTimeCalculator ttimeCalc = new TravelTimeCalculator(network);
+		TravelTimeCalculatorArray ttimeCalc = new TravelTimeCalculatorArray(network);
 		TravelTimeDistanceCostCalculator costCalc = new TravelTimeDistanceCostCalculator(ttimeCalc);
 		strategy2.addStrategyModule(new ReRoute(network, costCalc, ttimeCalc));
 		events.addHandler(ttimeCalc);

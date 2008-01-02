@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import org.matsim.events.algorithms.TravelTimeCalculator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -59,6 +58,7 @@ import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelMinCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 
 import playground.lnicolas.MyRuns;
 import playground.lnicolas.convexhull.GrahamScan;
@@ -632,7 +632,7 @@ public class MyRunsRouting extends MyRuns {
 
 		for (speedUpFactor = 0.95; speedUpFactor >= 0.1; speedUpFactor -= 0.05) {
 			routingAlgo = new AStarEuclidean(network, pp,
-					new TravelTimeCalculator(network), speedUpFactor);
+					new TravelTimeCalculatorArray(network), speedUpFactor);
 
 			System.out.println("  setting up plans objects...");
 			Plans plans = new Plans();

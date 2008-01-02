@@ -30,6 +30,8 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for org.matsim.trafficmonitoring");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LinkSensorManagerTest.class);
+		suite.addTestSuite(TravelTimeCalculatorArrayTest.class);
+		suite.addTestSuite(TravelTimeCalculatorHashMapTest.class);
 		//$JUnit-END$
 		return suite;
 	}

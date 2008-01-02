@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.events.algorithms;
+package org.matsim.trafficmonitoring;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,18 +28,18 @@ import java.io.IOException;
 
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.algorithms.TravelTimeCalculator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 
 /**
  * @author mrieser
  */
-public class TravelTimeCalculatorTest extends MatsimTestCase {
+public class TravelTimeCalculatorArrayTest extends MatsimTestCase {
 
 	private static final boolean generateNewCompareData = false;
 		// set generateNewComparedata to true to generate new comparison data
@@ -69,7 +69,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
 
 		// setup traveltime calculator
-		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize);
+		TravelTimeCalculatorArray ttcalc = new TravelTimeCalculatorArray(network, timeBinSize);
 		events.addHandler(ttcalc);
 
 		// read events

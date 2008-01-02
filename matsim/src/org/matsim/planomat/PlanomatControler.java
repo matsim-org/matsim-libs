@@ -21,7 +21,6 @@
 package org.matsim.planomat;
 
 import org.matsim.controler.Controler;
-import org.matsim.events.algorithms.TravelTimeCalculator;
 import org.matsim.events.handler.EventHandlerI;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
@@ -33,6 +32,7 @@ import org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator;
 import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 
 public class PlanomatControler extends Controler {
 
@@ -98,7 +98,7 @@ public class PlanomatControler extends Controler {
 		String travelTimeIName = PlanomatConfig.getLinkTravelTimeEstimatorName();
 		
 		if (travelTimeIName.equalsIgnoreCase("org.matsim.demandmodeling.events.algorithms.TravelTimeCalculator")) {
-			linkTravelTimeEstimator = new TravelTimeCalculator(network);
+			linkTravelTimeEstimator = new TravelTimeCalculatorArray(network);
 		} else if (travelTimeIName.equalsIgnoreCase("org.matsim.playground.meisterk.planomat.LinearInterpolatingTTCalculator")) {
 			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
 		} else {
