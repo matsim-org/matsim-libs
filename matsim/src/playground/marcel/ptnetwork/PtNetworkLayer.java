@@ -36,8 +36,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.misc.QuadTree;
 import org.matsim.utils.geometry.shared.Coord;
 
 public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalculator{

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.misc;
+package org.matsim.utils.collections;
 
 import java.io.Serializable;
 import java.util.AbstractCollection;

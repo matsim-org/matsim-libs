@@ -22,7 +22,7 @@ package playground.marcel;
 
 import java.util.Iterator;
 
-import org.matsim.utils.misc.QuadTree;
+import org.matsim.utils.collections.QuadTree;
 
 public class QuadTreeTest {
 

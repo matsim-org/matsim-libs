@@ -10,7 +10,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
-import org.matsim.utils.misc.QuadTree;
+import org.matsim.utils.collections.QuadTree;
 
 import playground.david.vis.interfaces.OTFDataReader;
 

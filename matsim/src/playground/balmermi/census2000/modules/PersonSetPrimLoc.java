@@ -36,7 +36,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.utils.misc.QuadTree;
+import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;

@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.misc.QuadTree;
+import org.matsim.utils.collections.QuadTree;
 
 import playground.david.vis.interfaces.OTFDataReader;
 import playground.david.vis.interfaces.OTFServerRemote;

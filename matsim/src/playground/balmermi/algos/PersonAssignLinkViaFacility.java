@@ -32,8 +32,8 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.misc.QuadTree;
 
 
 public class PersonAssignLinkViaFacility extends PersonAlgorithm {
