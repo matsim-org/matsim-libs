@@ -433,7 +433,8 @@ public class Controler {
 
 		ScoreStats scoreStats = null;
 		try {
-			scoreStats = new ScoreStats(this.population, getOutputFilename("scorestats.txt"));
+			// TODO [MR] I "abuse" createLegHistogramPNG here for ScoreStats... create an own flag for this one.
+			scoreStats = new ScoreStats(this.population, getOutputFilename("scorestats.txt"), this.createLegHistogramPNG);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -935,10 +936,17 @@ public class Controler {
 	}
 
 	/**
-	 * @return the minimum iteration field of the controler
+	 * @return the minimum iteration of the controler
 	 */
 	public int getMinimumIteration() {
 		return this.minIteration;
+	}
+
+	/**
+	 * @return the maximum iteration of the controler
+	 */
+	public int getMaximumIteration() {
+		return this.maxIterations;
 	}
 
 	/**

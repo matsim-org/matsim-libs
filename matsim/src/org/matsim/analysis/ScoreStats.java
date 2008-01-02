@@ -24,13 +24,18 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+import org.matsim.controler.Controler;
 import org.matsim.controler.events.ControlerFinishIterationEvent;
 import org.matsim.controler.events.ControlerShutdownEvent;
+import org.matsim.controler.events.ControlerStartupEvent;
 import org.matsim.controler.listener.ControlerFinishIterationListener;
 import org.matsim.controler.listener.ControlerShutdownListener;
+import org.matsim.controler.listener.ControlerStartupListener;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -47,19 +52,50 @@ import org.matsim.utils.io.IOUtils;
  *
  * @author mrieser
  */
-public class ScoreStats implements ControlerFinishIterationListener, ControlerShutdownListener {
+public class ScoreStats implements ControlerStartupListener, ControlerFinishIterationListener, ControlerShutdownListener {
+
+	final private static int INDEX_WORST = 0;
+	final private static int INDEX_BEST = 1;
+	final private static int INDEX_AVERAGE = 2;
+	final private static int INDEX_EXECUTED = 3;
 
 	final private Plans population;
 	final private BufferedWriter out;
 
-	public ScoreStats(final Plans population, final String filename) throws FileNotFoundException, IOException {
+	private final boolean createPNG;
+	private double[][] history = null;
+	private int minIteration = 0;
+
+	private final static Logger log = Logger.getLogger(ScoreStats.class);
+
+	/**
+	 * Creates a new ScoreStats instance.
+	 *
+	 * @param population
+	 * @param filename
+	 * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public ScoreStats(final Plans population, final String filename, final boolean createPNG) throws FileNotFoundException, IOException {
 		this.population = population;
+		this.createPNG = createPNG;
 		this.out = IOUtils.getBufferedWriter(filename);
 		this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
 	}
 
-	public void notifyIterationFinished(final ControlerFinishIterationEvent event) {
+	public void notifyStartup(final ControlerStartupEvent event) {
+		if (this.createPNG) {
+			Controler controler = event.getControler();
+			this.minIteration = controler.getMinimumIteration();
+			int maxIter = controler.getMaximumIteration();
+			int iterations = maxIter - this.minIteration;
+			if (iterations > 10000) iterations = 1000; // limit the history size
+			this.history = new double[4][iterations+1];
+		}
+	}
 
+	public void notifyIterationFinished(final ControlerFinishIterationEvent event) {
 		double sumScoreWorst = 0.0;
 		double sumScoreBest = 0.0;
 		double sumAvgScores = 0.0;
@@ -118,10 +154,10 @@ public class ScoreStats implements ControlerFinishIterationListener, ControlerSh
 				nofAvgScores++;
 			}
 		}
-		System.out.println("-- avg. score of the executed plan of each agent: " + (sumExecutedScores / nofExecutedScores));
-		System.out.println("-- avg. score of the worst plan of each agent: " + (sumScoreWorst / nofScoreWorst));
-		System.out.println("-- avg. of the avg. plan score per agent: " + (sumAvgScores / nofAvgScores));
-		System.out.println("-- avg. score of the best plan of each agent: " + (sumScoreBest / nofScoreBest));
+		log.info("-- avg. score of the executed plan of each agent: " + (sumExecutedScores / nofExecutedScores));
+		log.info("-- avg. score of the worst plan of each agent: " + (sumScoreWorst / nofScoreWorst));
+		log.info("-- avg. of the avg. plan score per agent: " + (sumAvgScores / nofAvgScores));
+		log.info("-- avg. score of the best plan of each agent: " + (sumScoreBest / nofScoreBest));
 
 		try {
 			this.out.write(event.getIteration() + "\t" + (sumExecutedScores / nofExecutedScores) + "\t" +
@@ -129,6 +165,38 @@ public class ScoreStats implements ControlerFinishIterationListener, ControlerSh
 			this.out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+
+		if (this.history != null) {
+			int index = event.getIteration() - this.minIteration;
+			this.history[INDEX_WORST][index] = (sumScoreWorst / nofScoreWorst);
+			this.history[INDEX_BEST][index] = (sumScoreBest / nofScoreBest);
+			this.history[INDEX_AVERAGE][index] = (sumAvgScores / nofAvgScores);
+			this.history[INDEX_EXECUTED][index] = (sumExecutedScores / nofExecutedScores);
+
+			if (event.getIteration() != this.minIteration) {
+				// create chart when data of more than one iteration is available.
+				XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
+				double[] iterations = new double[index + 1];
+				for (int i = 0; i <= index; i++) {
+					iterations[i] = i + this.minIteration;
+				}
+				double[] values = new double[index + 1];
+				System.arraycopy(this.history[INDEX_WORST], 0, values, 0, index + 1);
+				chart.addSeries("avg. worst score", iterations, values);
+				System.arraycopy(this.history[INDEX_BEST], 0, values, 0, index + 1);
+				chart.addSeries("avg. best score", iterations, values);
+				System.arraycopy(this.history[INDEX_AVERAGE], 0, values, 0, index + 1);
+				chart.addSeries("avg. of plans' average score", iterations, values);
+				System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
+				chart.addSeries("avg. executed score", iterations, values);
+				chart.addMatsimLogo();
+				chart.saveAsPng(Controler.getOutputFilename("scorestats.png"), 800, 600);
+			}
+			if (index == this.history[0].length) {
+				// we cannot store more information, so disable the graph feature.
+				this.history = null;
+			}
 		}
 	}
 
