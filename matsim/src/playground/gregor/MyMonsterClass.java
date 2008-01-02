@@ -792,6 +792,33 @@ public class MyMonsterClass {
 		nw.write();
 	}
 
+	public static void plansReduction(){
+		String configFile = "./configs/evacuationConf.xml";
+
+		Config config = Gbl.createConfig(new String[] {configFile});
+
+//		System.out.println("  reading world xml file... ");
+//		final WorldParser world_parser = new WorldParser(Gbl.getWorld());
+//		world_parser.parse();
+//		System.out.println("  done.");
+
+		System.out.println("  reading the network...");
+		NetworkLayer network = null;
+		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
+		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		System.out.println("  done.");
+
+		Plans population = new Plans(Plans.NO_STREAMING);
+
+		System.out.println("reading plans xml file... ");
+		PlansReaderI plansReader = new MatsimPlansReader(population);
+		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		population.printPlansCount();
+		
+		PlansWriter writer = new PlansWriter(population,"./networks/padang_plans10p.xml","v4");
+		writer.write();
+	}
 
 	public static void main(String[] args){
 
@@ -816,7 +843,9 @@ public class MyMonsterClass {
 
 //		networkClipperTest();
 
-		asciiNetParser();
+//		asciiNetParser();
+		
+		plansReduction();
 	}
 
 

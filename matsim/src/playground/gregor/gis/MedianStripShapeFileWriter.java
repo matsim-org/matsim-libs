@@ -49,7 +49,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
-import org.matsim.utils.geometry.MGC;
+import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
