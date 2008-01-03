@@ -38,7 +38,9 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 	private final int timeslice;
 	private final int expectNumSlots;
 	
-	private static Integer [] cache; //enlarged cache for Integers - java.lang.Integer only caches 256 values (from -128 to 127) - used as keys for HashMap in TravelTimeRole 
+	//enlarged cache for Integers - java.lang.Integer only caches 256 values (from -128 to 127) - used as keys for HashMap in TravelTimeRole
+	//TODO [GL] may be we want one global Integer cache for MatSim ... need to investigate if an enlarged cache is useful for other classes too
+	private Integer [] cache;  
 	
 	public TravelTimeCalculatorHashMap(final NetworkLayer network){
 		this(network,15*60,30*3600); // default timeslot-duration: 15 minutes
