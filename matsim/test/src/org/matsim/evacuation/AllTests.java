@@ -28,7 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.matsim.evacuation");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(EvacuationPlansGeneratorTest.class);
+		suite.addTestSuite(EvacuationQSimTest.class);
 		//$JUnit-END$
 		return suite;
 	}

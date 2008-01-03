@@ -224,7 +224,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 		 * TODO [MR] separate QueueNetworkLayer from NetworkLayer
 		 * In that moment, it won't be possible anymore to remove nodes during a simulation.
 		 */
-		this.simNodesArrayCache = null;
+		this.simNodesArrayCache = new QueueNode[0];
 		return super.removeNode(node);
 	}
 
