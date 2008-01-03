@@ -81,7 +81,7 @@ public class ControlInputImplAllNewFlow extends AbstractControlInputImpl
 		
 		private static final double IGNOREDQUEUINGTIME = 20; // seconds
 
-	private static final boolean DISTURBANCECHECKACTIVATED = true;
+	private static final boolean BACKGROUNDNOISECOMPENSATIONACTIVATED = true;
 	
 		private static final int NUMBEROFEVENTSINOUTFLOW = 20;
 
@@ -192,9 +192,10 @@ public class ControlInputImplAllNewFlow extends AbstractControlInputImpl
 		currentBottleNeckMainRoute = mainRouteNaturalBottleNeck;
 		currentBNCapacityMainRoute = getCapacity(mainRouteNaturalBottleNeck);
 		List<Link> linksMainRouteList = Arrays.asList(linksMainRoute);
+		nodesMainRoute = mainRoute.getRoute();
 		for (int i = 1; i < nodesMainRoute.size() -1; i++ ) {
 			Node n = nodesMainRoute.get(i);
-				for (Link inLink : n.getInLinks().values()) {
+			for (Link inLink : n.getInLinks().values()) {
 				String linkId = inLink.getId().toString();
 				if(!linksMainRouteList.contains(inLink)){
 					double tt = sumUpTTFreeSpeed(n, this.mainRoute);
@@ -538,7 +539,7 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 						ttFreeSpeedBeforeBottleNeck = freeSpeedUpToLink;
 					}
 					
-					if (DISTURBANCECHECKACTIVATED) {	
+					if (BACKGROUNDNOISECOMPENSATIONACTIVATED) {
 						agentsUpToLink += getAdditionalAgents(route, r);
 					}
 					
@@ -574,7 +575,7 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 				agentsToQueueAtBottleNeck += this.numberOfAgents.get(routeLinks[i].getId().toString());
 				ttFreeSpeedBeforeBottleNeck += this.ttFreeSpeeds.get(routeLinks[i].getId().toString());
 			}
-			if (DISTURBANCECHECKACTIVATED) {
+			if (BACKGROUNDNOISECOMPENSATIONACTIVATED) {
 				agentsToQueueAtBottleNeck += getAdditionalAgents(route, bottleNeckIndex);
 			}
 			log.debug("Distribution check inactivated: " + agentsToQueueAtBottleNeck + " agents before bottle neck link " + currentBottleNeck.getId().toString());
@@ -621,6 +622,7 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 			}
 			else {
 				weightedFlow = flow * this.ttFreeSpeedUpToAndIncludingLink.get(linkId);
+				System.out.println("wheghted = " + flow + " * " + this.ttFreeSpeedUpToAndIncludingLink.get(linkId) );
 			}
 			weightedNetFlow += weightedFlow;
 		}
@@ -658,8 +660,8 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 			weightedNetFlow -= weightedOutFlow;
 		}
 		*/
-		
 		netFlow = weightedNetFlow / ttToLink;
+		System.out.println("Net flow = " + weightedNetFlow + " / " + ttToLink + " = " + netFlow);
 		return (int)(ttToLink * netFlow);
 	}
 	
