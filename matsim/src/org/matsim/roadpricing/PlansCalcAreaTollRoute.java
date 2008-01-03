@@ -22,7 +22,6 @@ package org.matsim.roadpricing;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -35,6 +34,7 @@ import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 
 /**
  * A special router for complete plans that assigns the best routes to a plan
@@ -148,15 +148,15 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				double endTime = toAct.getEndTime();
 				double dur = toAct.getDur();
 
-				if (endTime != Gbl.UNDEFINED_TIME && dur != Gbl.UNDEFINED_TIME) {
+				if (endTime != Time.UNDEFINED_TIME && dur != Time.UNDEFINED_TIME) {
 					double min = Math.min(endTime, depTimes[TOLL_INDEX][routeIndex] + dur);
 					if (depTimes[TOLL_INDEX][routeIndex] < min) depTimes[TOLL_INDEX][routeIndex] = min;
 					min = Math.min(endTime, depTimes[NOTOLL_INDEX][routeIndex] + dur);
 					if (depTimes[NOTOLL_INDEX][routeIndex] < min) depTimes[NOTOLL_INDEX][routeIndex] = min;
-				} else if (endTime != Gbl.UNDEFINED_TIME) {
+				} else if (endTime != Time.UNDEFINED_TIME) {
 					if (depTimes[TOLL_INDEX][routeIndex] < endTime) depTimes[TOLL_INDEX][routeIndex] = endTime;
 					if (depTimes[NOTOLL_INDEX][routeIndex] < endTime) depTimes[NOTOLL_INDEX][routeIndex] = endTime;
-				} else if (dur != Gbl.UNDEFINED_TIME) {
+				} else if (dur != Time.UNDEFINED_TIME) {
 					depTimes[TOLL_INDEX][routeIndex] += dur;
 					depTimes[NOTOLL_INDEX][routeIndex] += dur;
 				} else if ((i+1) != actslegs.size()) {
@@ -211,8 +211,10 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * to <code>endLink<code>, started at <code>depTime</code>, will likely lead
 	 * over tolled links.
 	 *
-	 * @param startLink the link on which the agent starts
+	 * @param startLink The link on which the agent starts.
 	 * @param route The route to test.
+	 * @param endLink The link on which the agent arrives.
+	 * @param depTime The time at which the agent departs.
 	 * @return true if the route leads into an active tolling area and an agent
 	 * taking this route will likely have to pay the toll, false otherwise.
 	 */

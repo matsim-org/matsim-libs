@@ -30,18 +30,15 @@ import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
+ * Reads the disaster area links from XML and puts them into a HashMap.
+ * 
  * @author glaemmel
- *
  */
-
-//////////////////////////////////////////////////////////////////////
-//EvacuationNetFileReader reads the desaster area links from xml and
-//put them into a HashMap
-//////////////////////////////////////////////////////////////////////
 public class EvacuationNetFileReader extends MatsimXmlParser {
 
 	public static final String XML_ROOT = "desasterarea";
@@ -77,7 +74,7 @@ public class EvacuationNetFileReader extends MatsimXmlParser {
 	}
 
 	private void handleLink(String id, String deadline){
-		EvacuationAreaLink link = new EvacuationAreaLink(id,Gbl.parseTime(deadline));
+		EvacuationAreaLink link = new EvacuationAreaLink(id, Time.parseTime(deadline));
 		links.put(new Id(id),link);
 
 	}

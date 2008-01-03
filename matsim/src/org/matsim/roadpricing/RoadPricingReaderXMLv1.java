@@ -22,9 +22,9 @@ package org.matsim.roadpricing;
 
 import java.util.Stack;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 
 public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
@@ -66,8 +66,8 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 		} else if (TAG_LINK.equals(name)) {
 			this.scheme.addLink(atts.getValue(ATTR_ID));
 		} else if (TAG_COST.equals(name)) {
-			this.scheme.addCost(Gbl.parseTime(atts.getValue(ATTR_START_TIME)), 
-					Gbl.parseTime(atts.getValue(ATTR_END_TIME)), Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
+			this.scheme.addCost(Time.parseTime(atts.getValue(ATTR_START_TIME)), 
+					Time.parseTime(atts.getValue(ATTR_END_TIME)), Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
 		}
 	}
 	

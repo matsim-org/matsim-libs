@@ -20,11 +20,11 @@
 
 package org.matsim.network.algorithms;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.misc.Time;
 
 public class NetworkSummary extends NetworkAlgorithm {
 
@@ -89,7 +89,7 @@ public class NetworkSummary extends NetworkAlgorithm {
 		System.out.println("      network summary:");
 		System.out.println("        name             = " + network.getName());
 		System.out.println("        type             = " + network.getType());
-		System.out.println("        capperiod        = " + Gbl.writeTime(network.getCapacityPeriod()));
+		System.out.println("        capperiod        = " + Time.writeTime(network.getCapacityPeriod()));
 		System.out.println("        network_capacity = " + this.network_capacity + " cells");
 		System.out.println("      nodes summary:");
 		System.out.println("        number of nodes = " + node_cnt);

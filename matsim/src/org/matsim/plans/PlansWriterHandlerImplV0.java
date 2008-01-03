@@ -27,8 +27,8 @@ import java.util.Iterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Node;
+import org.matsim.utils.misc.Time;
 
 public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 
@@ -184,11 +184,11 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 		if (act.getLink() != null)
 			out.write(" link=\"" + act.getLink().getId() + "\"");
 		if (act.getStartTime() != Integer.MIN_VALUE)
-			out.write(" start_time=\"" + Gbl.writeTime(act.getStartTime()) + "\"");
+			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
 		if (act.getDur() != Integer.MIN_VALUE)
-			out.write(" dur=\"" + Gbl.writeTime(act.getDur()) + "\"");
+			out.write(" dur=\"" + Time.writeTime(act.getDur()) + "\"");
 		if (act.getEndTime() != Integer.MIN_VALUE)
-			out.write(" end_time=\"" + Gbl.writeTime(act.getEndTime()) + "\"");
+			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
 		if (act.isPrimary())
 			out.write(" primary=\"" + "true" + "\"");
 		out.write(" />\n");
@@ -208,11 +208,11 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 			out.write(" num=\"" + leg.getNum() + "\"");
 		out.write(" mode=\"" + leg.getMode() + "\"");
 		if (leg.getDepTime() != Integer.MIN_VALUE)
-			out.write(" dep_time=\"" + Gbl.writeTime(leg.getDepTime()) + "\"");
+			out.write(" dep_time=\"" + Time.writeTime(leg.getDepTime()) + "\"");
 		if (leg.getTravTime() != Integer.MIN_VALUE)
-			out.write(" trav_time=\"" + Gbl.writeTime(leg.getTravTime()) + "\"");
+			out.write(" trav_time=\"" + Time.writeTime(leg.getTravTime()) + "\"");
 		if (leg.getArrTime() != Integer.MIN_VALUE)
-			out.write(" arr_time=\"" + Gbl.writeTime(leg.getArrTime()) + "\"");
+			out.write(" arr_time=\"" + Time.writeTime(leg.getArrTime()) + "\"");
 		out.write(">\n");
 	}
 

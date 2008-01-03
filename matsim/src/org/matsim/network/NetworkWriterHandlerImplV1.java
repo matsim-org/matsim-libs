@@ -23,7 +23,7 @@ package org.matsim.network;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 
@@ -42,10 +42,6 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 		if (network.getName() != null) {
 			out.write(" name=\"" + network.getName() + "\"");
 		}
-		// [balmermi] type is deprecated
-//		if (network.getType() != null) {
-//			out.write(" type=\"" + network.getType() + "\"");
-//		}
 		out.write(">\n\n");
 	}
 
@@ -73,7 +69,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	public void startLinks(final NetworkLayer network, final BufferedWriter out) throws IOException {
 		out.write("\t<links");
 		if (network.getCapacityPeriod() != Integer.MIN_VALUE) {
-			out.write(" capperiod=\"" + Gbl.writeTime(network.getCapacityPeriod()) + "\"");
+			out.write(" capperiod=\"" + Time.writeTime(network.getCapacityPeriod()) + "\"");
 		}
 		out.write(">\n");
 	}

@@ -32,6 +32,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.misc.Time;
 
 public class Act extends BasicAct implements Serializable {
 
@@ -45,8 +46,8 @@ public class Act extends BasicAct implements Serializable {
 	private CoordI coord = null;
 	private boolean isPrimary = false;
 
-	protected double startTime = Gbl.UNDEFINED_TIME;
-	protected double dur = Gbl.UNDEFINED_TIME;
+	protected double startTime = Time.UNDEFINED_TIME;
+	protected double dur = Time.UNDEFINED_TIME;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -68,13 +69,13 @@ public class Act extends BasicAct implements Serializable {
 		}
 
 		if (startTime != null) {
-			this.startTime = Gbl.parseTime(startTime);
+			this.startTime = Time.parseTime(startTime);
 		}
 		if (endTime != null) {
-			this.endTime = Gbl.parseTime(endTime);
+			this.endTime = Time.parseTime(endTime);
 		}
 		if (dur != null) {
-			this.dur = Gbl.parseTime(dur);
+			this.dur = Time.parseTime(dur);
 		}
 		if (isPrimary != null) {
 			this.isPrimary = true;
@@ -163,9 +164,9 @@ public class Act extends BasicAct implements Serializable {
 		return "[type=" + this.type + "]" +
 				"[coord=" + this.coord + "]" +
 				"[link=" + this.link + "]" +
-				"[startTime=" + Gbl.writeTime(this.startTime) + "]" +
-				"[endTime=" + Gbl.writeTime(this.endTime) + "]" +
-				"[dur=" + Gbl.writeTime(this.dur) + "]" +
+				"[startTime=" + Time.writeTime(this.startTime) + "]" +
+				"[endTime=" + Time.writeTime(this.endTime) + "]" +
+				"[dur=" + Time.writeTime(this.dur) + "]" +
 				"[isPrimary=" + this.isPrimary + "]";
 	}
 

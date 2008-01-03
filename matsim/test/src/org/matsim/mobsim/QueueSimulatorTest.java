@@ -33,6 +33,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.Route;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
 public class QueueSimulatorTest extends MatsimTestCase {
@@ -63,11 +64,11 @@ public class QueueSimulatorTest extends MatsimTestCase {
 			Person person = new Person(new Id(0), "m", 35, "yes", "yes", "yes");
 			Plan plan = person.createPlan(null, "yes");
 			plan.createAct("h", 199.0, 0.0, link2, 0, 7*3600-10, 7*3600-10, false);
-			Leg leg = plan.createLeg(1, "car", 7*3600-110, Gbl.UNDEFINED_TIME, Gbl.UNDEFINED_TIME);
+			Leg leg = plan.createLeg(1, "car", 7*3600-110, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 			Route route = new Route();
 			route.setRoute("3");
 			leg.setRoute(route);
-			plan.createAct("w", 99.0, 0.0, link3, 7*3600+10, 24*36000, Gbl.UNDEFINED_TIME, true);
+			plan.createAct("w", 99.0, 0.0, link3, 7*3600+10, 24*36000, Time.UNDEFINED_TIME, true);
 			plans.addPerson(person);
 
 			// add a lot of other persons with legs from link1 to link3
@@ -75,11 +76,11 @@ public class QueueSimulatorTest extends MatsimTestCase {
 				person = new Person(new Id(i), "m", 35, "yes", "yes", "yes");
 				plan = person.createPlan(null, "yes");
 				plan.createAct("h", 99.0, 0.0, link1, 0, 7*3600-110, 7*3600-110, false);
-				leg = plan.createLeg(1, "car", 7*3600-110, Gbl.UNDEFINED_TIME, Gbl.UNDEFINED_TIME);
+				leg = plan.createLeg(1, "car", 7*3600-110, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 				route = new Route();
 				route.setRoute("2 3");
 				leg.setRoute(route);
-				plan.createAct("w", 99.0, 0.0, link3, 7*3600+10, 24*36000, Gbl.UNDEFINED_TIME, true);
+				plan.createAct("w", 99.0, 0.0, link3, 7*3600+10, 24*36000, Time.UNDEFINED_TIME, true);
 				plans.addPerson(person);
 			}
 		} catch (Exception e) {

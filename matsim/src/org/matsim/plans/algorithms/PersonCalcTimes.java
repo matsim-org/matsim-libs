@@ -23,11 +23,11 @@ package org.matsim.plans.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.utils.misc.Time;
 
 /**
  * Calculates all time informations in all plans of a person<br/>
@@ -59,9 +59,9 @@ public class PersonCalcTimes extends PersonAlgorithm {
 
   @Override
 	public void run(Person person) {
-		List plans = person.getPlans();
+		List<Plan> plans = person.getPlans();
 		for (int i=0; i<plans.size(); i++) {
-			Plan plan = (Plan)plans.get(i);
+			Plan plan = plans.get(i);
 
 			ArrayList acts_legs = plan.getActsLegs();
 			Act act = null;
@@ -93,7 +93,7 @@ public class PersonCalcTimes extends PersonAlgorithm {
 
 					leg.setDepTime(act.getEndTime());
 					double ttime = leg.getTravTime();
-					if (ttime == Gbl.UNDEFINED_TIME) {
+					if (ttime == Time.UNDEFINED_TIME) {
 						ttime = 0;
 					}
 					leg.setArrTime(leg.getDepTime() + ttime);

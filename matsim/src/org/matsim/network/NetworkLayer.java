@@ -32,6 +32,7 @@ import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -145,7 +146,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		if (this.capperiod != Integer.MIN_VALUE) {
 			Gbl.warningMsg(this.getClass(), "setCapperiod(...)", this + "[capperiod=" + capperiod + " already set capperiod will be overwritten]");
 		}
-		this.capperiod = (int)Gbl.parseTime(capperiod);
+		this.capperiod = (int)Time.parseTime(capperiod);
 	}
 
 	// ////////////////////////////////////////////////////////////////////

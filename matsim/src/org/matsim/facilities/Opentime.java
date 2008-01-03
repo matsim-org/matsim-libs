@@ -44,6 +44,7 @@
 package org.matsim.facilities;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 public class Opentime implements Comparable<Opentime> {
 
@@ -61,8 +62,8 @@ public class Opentime implements Comparable<Opentime> {
 
 	public Opentime(final String day, final String start_time, final String end_time) {
 		this.day = day;
-		this.startTime = Gbl.parseTime(start_time);
-		this.endTime = Gbl.parseTime(end_time);
+		this.startTime = Time.parseTime(start_time);
+		this.endTime = Time.parseTime(end_time);
 		this.acceptTimes();
 	}
 

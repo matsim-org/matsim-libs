@@ -28,7 +28,7 @@ import java.io.Serializable;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicNode;
 import org.matsim.basic.v01.BasicRoute;
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 public class Leg extends BasicLeg implements Serializable{
 
@@ -38,9 +38,9 @@ public class Leg extends BasicLeg implements Serializable{
 
 	private static final long serialVersionUID = 5123937717277263980L;
 
-	private double depTime = Gbl.UNDEFINED_TIME;
-	private double travTime = Gbl.UNDEFINED_TIME;
-	private double arrTime = Gbl.UNDEFINED_TIME;
+	private double depTime = Time.UNDEFINED_TIME;
+	private double travTime = Time.UNDEFINED_TIME;
+	private double arrTime = Time.UNDEFINED_TIME;
 
 	public Leg(final String num, final String mode, final String depTime, final String travTime, final String arrTime) {
 		if (num != null) {
@@ -51,13 +51,13 @@ public class Leg extends BasicLeg implements Serializable{
 		}
 		this.mode = mode.intern();
 		if (depTime != null) {
-			this.depTime = Gbl.parseTime(depTime);
+			this.depTime = Time.parseTime(depTime);
 		}
 		if (travTime != null) {
-			this.travTime = Gbl.parseTime(travTime);
+			this.travTime = Time.parseTime(travTime);
 		}
 		if (arrTime != null) {
-			this.arrTime = Gbl.parseTime(arrTime);
+			this.arrTime = Time.parseTime(arrTime);
 		}
 	}
 
@@ -152,9 +152,9 @@ public class Leg extends BasicLeg implements Serializable{
 	public final String toString() {
 		return "[num=" + this.num + "]" +
 				"[mode=" + this.mode + "]" +
-				"[depTime=" + Gbl.writeTime(this.depTime) + "]" +
-				"[travTime=" + Gbl.writeTime(this.travTime) + "]" +
-				"[arrTime=" + Gbl.writeTime(this.arrTime) + "]" +
+				"[depTime=" + Time.writeTime(this.depTime) + "]" +
+				"[travTime=" + Time.writeTime(this.travTime) + "]" +
+				"[arrTime=" + Time.writeTime(this.arrTime) + "]" +
 				"[route=" + this.route + "]";
 	}
 

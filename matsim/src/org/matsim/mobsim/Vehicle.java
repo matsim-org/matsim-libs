@@ -34,6 +34,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Route;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 
 public class Vehicle implements Serializable, DrawableAgentI {
@@ -154,9 +155,9 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		/* WELL, THAT'S IMPORTANT:
 		 * The person leaves the activity either 'actDur' later or
 		 * when the end is defined of the activity, whatever comes first. */
-		if (act.getDur() == Gbl.UNDEFINED_TIME) {
+		if (act.getDur() == Time.UNDEFINED_TIME) {
 			departure = act.getEndTime();
-		} else if (act.getEndTime() == Gbl.UNDEFINED_TIME) {
+		} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
 			departure = now + act.getDur();
 		} else {
 			departure = Math.min(act.getEndTime(), now + act.getDur());

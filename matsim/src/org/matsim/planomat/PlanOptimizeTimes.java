@@ -45,6 +45,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
 
 /**
@@ -108,11 +109,11 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 		for (Object o : plan.getActsLegs()) {
 
 			if (o.getClass().equals(Act.class)) {
-				((Act) o).setDur(Gbl.UNDEFINED_TIME);
-				((Act) o).setEndTime(Gbl.UNDEFINED_TIME);
+				((Act) o).setDur(Time.UNDEFINED_TIME);
+				((Act) o).setEndTime(Time.UNDEFINED_TIME);
 				numActs++;
 			} else if (o.getClass().equals(Leg.class)) {
-				((Leg) o).setTravTime(Gbl.UNDEFINED_TIME);
+				((Leg) o).setTravTime(Time.UNDEFINED_TIME);
 			}
 
 		}
@@ -292,8 +293,8 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 					// assume that there will be no delay between arrival time and activity start time
 					activity.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					activity.setDur(Gbl.UNDEFINED_TIME);
-					activity.setEndTime(Gbl.UNDEFINED_TIME);
+					activity.setDur(Time.UNDEFINED_TIME);
+					activity.setEndTime(Time.UNDEFINED_TIME);
 
 				}
 

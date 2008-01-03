@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Module;
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 public class CharyparNagelScoringConfigGroup extends Module {
 
@@ -107,22 +107,22 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			return Double.toString(actParams.getPriority());
 		} else if (key != null && key.startsWith(ACTIVITY_TYPICAL_DURATION)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPICAL_DURATION.length()), false);
-			return Gbl.writeTime(actParams.getTypicalDuration());
+			return Time.writeTime(actParams.getTypicalDuration());
 		} else if (key != null && key.startsWith(ACTIVITY_MINIMAL_DURATION)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_MINIMAL_DURATION.length()), false);
-			return Gbl.writeTime(actParams.getMinimalDuration());
+			return Time.writeTime(actParams.getMinimalDuration());
 		} else if (key != null && key.startsWith(ACTIVITY_OPENING_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_OPENING_TIME.length()), false);
-			return Gbl.writeTime(actParams.getOpeningTime());
+			return Time.writeTime(actParams.getOpeningTime());
 		} else if (key != null && key.startsWith(ACTIVITY_LATEST_START_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_LATEST_START_TIME.length()), false);
-			return Gbl.writeTime(actParams.getLatestStartTime());
+			return Time.writeTime(actParams.getLatestStartTime());
 		} else if (key != null && key.startsWith(ACTIVITY_EARLIEST_END_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_EARLIEST_END_TIME.length()), false);
-			return Gbl.writeTime(actParams.getEarliestEndTime());
+			return Time.writeTime(actParams.getEarliestEndTime());
 		} else if (key != null && key.startsWith(ACTIVITY_CLOSING_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_CLOSING_TIME.length()), false);
-			return Gbl.writeTime(actParams.getClosingTime());
+			return Time.writeTime(actParams.getClosingTime());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -162,22 +162,22 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			actParams.setPriority(Double.parseDouble(value));
 		} else if (key != null && key.startsWith(ACTIVITY_TYPICAL_DURATION)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPICAL_DURATION.length()), true);
-			actParams.setTypicalDuration(Gbl.parseTime(value));
+			actParams.setTypicalDuration(Time.parseTime(value));
 		} else if (key != null && key.startsWith(ACTIVITY_MINIMAL_DURATION)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_MINIMAL_DURATION.length()), true);
-			actParams.setMinimalDuration(Gbl.parseTime(value));
+			actParams.setMinimalDuration(Time.parseTime(value));
 		} else if (key != null && key.startsWith(ACTIVITY_OPENING_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_OPENING_TIME.length()), true);
-			actParams.setOpeningTime(Gbl.parseTime(value));
+			actParams.setOpeningTime(Time.parseTime(value));
 		} else if (key != null && key.startsWith(ACTIVITY_LATEST_START_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_LATEST_START_TIME.length()), true);
-			actParams.setLatestStartTime(Gbl.parseTime(value));
+			actParams.setLatestStartTime(Time.parseTime(value));
 		} else if (key != null && key.startsWith(ACTIVITY_EARLIEST_END_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_EARLIEST_END_TIME.length()), true);
-			actParams.setEarliestEndTime(Gbl.parseTime(value));
+			actParams.setEarliestEndTime(Time.parseTime(value));
 		} else if (key != null && key.startsWith(ACTIVITY_CLOSING_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_CLOSING_TIME.length()), true);
-			actParams.setClosingTime(Gbl.parseTime(value));
+			actParams.setClosingTime(Time.parseTime(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -311,12 +311,12 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	public static class ActivityParams {
 		private String type;
 		private double priority;
-		private double typicalDuration = Gbl.UNDEFINED_TIME;
-		private double minimalDuration = Gbl.UNDEFINED_TIME;
-		private double openingTime = Gbl.UNDEFINED_TIME;
-		private double latestStartTime = Gbl.UNDEFINED_TIME;
-		private double earliestEndTime = Gbl.UNDEFINED_TIME;
-		private double closingTime = Gbl.UNDEFINED_TIME;
+		private double typicalDuration = Time.UNDEFINED_TIME;
+		private double minimalDuration = Time.UNDEFINED_TIME;
+		private double openingTime = Time.UNDEFINED_TIME;
+		private double latestStartTime = Time.UNDEFINED_TIME;
+		private double earliestEndTime = Time.UNDEFINED_TIME;
+		private double closingTime = Time.UNDEFINED_TIME;
 
 		public ActivityParams(final String type) {
 			this.type = type;

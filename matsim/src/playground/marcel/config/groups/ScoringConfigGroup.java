@@ -26,7 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 import playground.marcel.config.ConfigGroupI;
 import playground.marcel.config.ConfigListI;
@@ -196,18 +196,18 @@ public class ScoringConfigGroup implements ConfigGroupI {
 
 	public class ActivitySettings implements ConfigGroupI {
 		private double priority = 1.0;
-		private double typicalDuration = Gbl.UNDEFINED_TIME;
-		private double minimumDuration = Gbl.UNDEFINED_TIME;
-		private double openingTime = Gbl.UNDEFINED_TIME;
-		private double closingTime = Gbl.UNDEFINED_TIME;
-		private double latestStartTime = Gbl.UNDEFINED_TIME;
-		private double earliestEndTime = Gbl.UNDEFINED_TIME;
+		private double typicalDuration = Time.UNDEFINED_TIME;
+		private double minimumDuration = Time.UNDEFINED_TIME;
+		private double openingTime = Time.UNDEFINED_TIME;
+		private double closingTime = Time.UNDEFINED_TIME;
+		private double latestStartTime = Time.UNDEFINED_TIME;
+		private double earliestEndTime = Time.UNDEFINED_TIME;
 
 		private final String name;
 		private final Set<String> keySet = new LinkedHashSet<String>();
 		// TODO [MR] keyset could be static, but the initialization is more complicated in the static case...
 
-		private ActivitySettings(final String name) {
+		/*default*/ ActivitySettings(final String name) {
 			this.name = name;
 			this.keySet.add(PRIORITY);
 			this.keySet.add(TYPICAL_DURATION);
@@ -226,17 +226,17 @@ public class ScoringConfigGroup implements ConfigGroupI {
 			if (PRIORITY.equals(key)) {
 				return Double.toString(getPriority());
 			} else if (TYPICAL_DURATION.equals(key)) {
-				return Gbl.writeTime(getTypicalDuration());
+				return Time.writeTime(getTypicalDuration());
 			} else if (MINIMUM_DURATION.equals(key)) {
-				return Gbl.writeTime(getMinimumDuration());
+				return Time.writeTime(getMinimumDuration());
 			} else if (OPENING_TIME.equals(key)) {
-				return Gbl.writeTime(getOpeningTime());
+				return Time.writeTime(getOpeningTime());
 			} else if (CLOSING_TIME.equals(key)) {
-				return Gbl.writeTime(getClosingTime());
+				return Time.writeTime(getClosingTime());
 			} else if (LATEST_START_TIME.equals(key)) {
-				return Gbl.writeTime(getLatestStartTime());
+				return Time.writeTime(getLatestStartTime());
 			} else if (EARLIEST_END_TIME.equals(key)) {
-				return Gbl.writeTime(getEarliestEndTime());
+				return Time.writeTime(getEarliestEndTime());
 			} else {
 				throw new IllegalArgumentException(key);
 			}
@@ -246,17 +246,17 @@ public class ScoringConfigGroup implements ConfigGroupI {
 			if (PRIORITY.equals(key)) {
 				setPriority(Double.parseDouble(value));
 			} else if (TYPICAL_DURATION.equals(key)) {
-				setTypicalDuration(Gbl.parseTime(value));
+				setTypicalDuration(Time.parseTime(value));
 			} else if (MINIMUM_DURATION.equals(key)) {
-				setMinimumDuration(Gbl.parseTime(value));
+				setMinimumDuration(Time.parseTime(value));
 			} else if (OPENING_TIME.equals(key)) {
-				setOpeningTime(Gbl.parseTime(value));
+				setOpeningTime(Time.parseTime(value));
 			} else if (CLOSING_TIME.equals(key)) {
-				setClosingTime(Gbl.parseTime(value));
+				setClosingTime(Time.parseTime(value));
 			} else if (LATEST_START_TIME.equals(key)) {
-				setLatestStartTime(Gbl.parseTime(value));
+				setLatestStartTime(Time.parseTime(value));
 			} else if (EARLIEST_END_TIME.equals(key)) {
-				setEarliestEndTime(Gbl.parseTime(value));
+				setEarliestEndTime(Time.parseTime(value));
 			} else {
 				throw new IllegalArgumentException(key);
 			}
@@ -327,7 +327,7 @@ public class ScoringConfigGroup implements ConfigGroupI {
 
 	}
 
-	private class ActivitiesList implements ConfigListI {
+	/*default*/ class ActivitiesList implements ConfigListI {
 
 		private final Map<String, ActivitySettings> entries = new LinkedHashMap<String, ActivitySettings>();
 

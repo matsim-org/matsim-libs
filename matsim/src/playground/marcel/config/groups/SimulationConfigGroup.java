@@ -23,7 +23,7 @@ package playground.marcel.config.groups;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 import playground.marcel.config.ConfigGroupI;
 import playground.marcel.config.ConfigListI;
@@ -41,8 +41,8 @@ public class SimulationConfigGroup implements ConfigGroupI {
 	private static final String STUCK_TIME = "stuckTime";
 	private static final String REMOVE_STUCK_VEHICLES = "removeStuckVehicles";
 
-	private double startTime = Gbl.UNDEFINED_TIME;
-	private double endTime = Gbl.UNDEFINED_TIME;
+	private double startTime = Time.UNDEFINED_TIME;
+	private double endTime = Time.UNDEFINED_TIME;
 	private double snapshotPeriod = 60*60; // 1 hour
 	private String snapshotFormat = "netvis";
 	private double flowCapFactor = 1.0;
@@ -70,11 +70,11 @@ public class SimulationConfigGroup implements ConfigGroupI {
 
 	public String getValue(final String key) {
 		if (START_TIME.equals(key)) {
-			return Gbl.writeTime(getStartTime());
+			return Time.writeTime(getStartTime());
 		} else if (END_TIME.equals(key)) {
-			return Gbl.writeTime(getEndTime());
+			return Time.writeTime(getEndTime());
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
-			return Gbl.writeTime(getSnapshotPeriod());
+			return Time.writeTime(getSnapshotPeriod());
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
 			return getSnapshotFormat();
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
@@ -92,11 +92,11 @@ public class SimulationConfigGroup implements ConfigGroupI {
 
 	public void setValue(final String key, final String value) {
 		if (START_TIME.equals(key)) {
-			setStartTime(Gbl.parseTime(value));
+			setStartTime(Time.parseTime(value));
 		} else if (END_TIME.equals(key)) {
-			setEndTime(Gbl.parseTime(value));
+			setEndTime(Time.parseTime(value));
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
-			setSnapshotPeriod(Gbl.parseTime(value));
+			setSnapshotPeriod(Time.parseTime(value));
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
 			setSnapshotFormat(value);
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {

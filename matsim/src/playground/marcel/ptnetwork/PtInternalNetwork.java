@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.misc.Time;
 
 import playground.marcel.ptnetwork.tempelements.TempFZP;
 import playground.marcel.ptnetwork.tempelements.TempFZPPkt;
@@ -293,8 +294,8 @@ public class PtInternalNetwork {
 							ttime += fzp.pkte.get(i).ttime;
 							out.write(tmpline.getName() + ";" + route.id + ";" + route.direct + ";"
 									+ fzp.id + ";" + (i + 1) + ";1;1;"
-									+ Gbl.writeTime(ttime, Gbl.TIMEFORMAT_HHMMSS) + ";"
-									+ Gbl.writeTime(fzp.pkte.get(i).wtime + ttime, Gbl.TIMEFORMAT_HHMMSS)
+									+ Time.writeTime(ttime, Time.TIMEFORMAT_HHMMSS) + ";"
+									+ Time.writeTime(fzp.pkte.get(i).wtime + ttime, Time.TIMEFORMAT_HHMMSS)
 									+ ";" + (i + 1) + ";0\n");
 							ttime += fzp.pkte.get(i).wtime;
 						}
@@ -302,14 +303,14 @@ public class PtInternalNetwork {
 						if (fzp.pkte.size() == 1) {
 							out.write(tmpline.getName() + ";" + route.id + ";" + route.direct + ";"
 									+ fzp.id + ";2;1;0;"
-									+ Gbl.writeTime(ttime, Gbl.TIMEFORMAT_HHMMSS) + ";"
-									+ Gbl.writeTime(fzp.pkte.get(fzp.pkte.size() - 1).wtime + ttime, Gbl.TIMEFORMAT_HHMMSS) + ";"
+									+ Time.writeTime(ttime, Time.TIMEFORMAT_HHMMSS) + ";"
+									+ Time.writeTime(fzp.pkte.get(fzp.pkte.size() - 1).wtime + ttime, Time.TIMEFORMAT_HHMMSS) + ";"
 									+ (fzp.pkte.size()) + ";0\n");
 						} else {
 							out.write(tmpline.getName() + ";" + route.id + ";" + route.direct + ";"
 									+ fzp.id + ";" + fzp.pkte.size() + ";1;0;"
-									+ Gbl.writeTime(ttime, Gbl.TIMEFORMAT_HHMMSS) + ";"
-									+ Gbl.writeTime(fzp.pkte.get(fzp.pkte.size() - 1).wtime + ttime, Gbl.TIMEFORMAT_HHMMSS) + ";"
+									+ Time.writeTime(ttime, Time.TIMEFORMAT_HHMMSS) + ";"
+									+ Time.writeTime(fzp.pkte.get(fzp.pkte.size() - 1).wtime + ttime, Time.TIMEFORMAT_HHMMSS) + ";"
 									+ (fzp.pkte.size()) + ";0\n");
 						}
 					}
@@ -324,9 +325,9 @@ public class PtInternalNetwork {
 					for (TempTrip trip : route.trips) {
 						if (trip.fzp != null) {
 							if(trip.fzp.pkte.size()==1){
-								out.write(tripcnt+";;"+Gbl.writeTime(trip.deptime, Gbl.TIMEFORMAT_HHMMSS)+";"+tmpline.getName()+";"+route.id+";"+route.direct+";"+trip.fzp.id+";0;1;2;1;0;0;0\n");
+								out.write(tripcnt+";;"+Time.writeTime(trip.deptime, Time.TIMEFORMAT_HHMMSS)+";"+tmpline.getName()+";"+route.id+";"+route.direct+";"+trip.fzp.id+";0;1;2;1;0;0;0\n");
 							}else{
-								out.write(tripcnt+";;"+Gbl.writeTime(trip.deptime, Gbl.TIMEFORMAT_HHMMSS)+";"+tmpline.getName()+";"+route.id+";"+route.direct+";"+trip.fzp.id+";0;1;"+trip.fzp.pkte.size()+";1;0;0;0\n");
+								out.write(tripcnt+";;"+Time.writeTime(trip.deptime, Time.TIMEFORMAT_HHMMSS)+";"+tmpline.getName()+";"+route.id+";"+route.direct+";"+trip.fzp.id+";0;1;"+trip.fzp.pkte.size()+";1;0;0;0\n");
 							}
 							trip.id=tripcnt;
 							tripcnt++;
@@ -516,8 +517,8 @@ public class PtInternalNetwork {
 					while (!("".equals(tmp=rdr.readLine()))) {
 
 						String[] data = tmp.split(";");
-						int data7time = (int)Gbl.parseTime(data[7]);
-						int data8time = (int)Gbl.parseTime(data[8]);
+						int data7time = (int)Time.parseTime(data[7]);
+						int data8time = (int)Time.parseTime(data[8]);
 
 						TempLine line;
 						TempRoute route;
@@ -568,7 +569,7 @@ public class PtInternalNetwork {
 						for (TempRoute route : line.routes) {
 							if ((route.id.equals(data[4]))
 									&& (route.direct==Integer.parseInt(data[5]))) {
-								TempTrip trip = new TempTrip(Long.parseLong(data[0]), (int)Gbl.parseTime(data[2]),data[6]);
+								TempTrip trip = new TempTrip(Long.parseLong(data[0]), (int)Time.parseTime(data[2]),data[6]);
 								route.trips.add(trip);
 								trip.fzp=route.getTempFZP(trip.fzpid);
 							}
@@ -934,8 +935,8 @@ public class PtInternalNetwork {
 
 
 						int dir = Integer.parseInt(data[coldir]);
-						int arrivaltime = (int)Gbl.parseTime(data[7]);
-						int departuretime = (int)Gbl.parseTime(data[8]);
+						int arrivaltime = (int)Time.parseTime(data[7]);
+						int departuretime = (int)Time.parseTime(data[8]);
 						int data9 = Integer.parseInt(data[9]);
 						TempLine line = this.lines.get(data[0]);
 						for (TempRoute route : line.routes) {
@@ -986,7 +987,7 @@ public class PtInternalNetwork {
 						TempLine line = this.lines.get(data[3]);
 						for (TempRoute route : line.routes) {
 							if ((route.id.equals(data[4])) && (route.direct==Integer.parseInt(data[5]))) {
-								TempTrip trip = new TempTrip(Long.parseLong(data[0]), (int)Gbl.parseTime(data[2]), data[6]);
+								TempTrip trip = new TempTrip(Long.parseLong(data[0]), (int)Time.parseTime(data[2]), data[6]);
 								route.trips.add(trip);
 								int tempdtime=trip.deptime;
 								for (TempFZP fzp : route.fzps) {

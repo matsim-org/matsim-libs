@@ -46,6 +46,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.VisConfig;
 
@@ -206,8 +207,8 @@ public class QueueSimulation extends Simulation {
 		double startTime = this.config.simulation().getStartTime();
 		this.stopTime = this.config.simulation().getEndTime();
 
-		if (startTime == Gbl.UNDEFINED_TIME) startTime = 0.0;
-		if (this.stopTime == Gbl.UNDEFINED_TIME || this.stopTime == 0) this.stopTime = Double.MAX_VALUE;
+		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
+		if (this.stopTime == Time.UNDEFINED_TIME || this.stopTime == 0) this.stopTime = Double.MAX_VALUE;
 
 		SimulationTimer.setSimStartTime(24*3600);
 		SimulationTimer.setTime(startTime);
@@ -267,7 +268,7 @@ public class QueueSimulation extends Simulation {
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
 			double diffsim  = time - SimulationTimer.getSimStartTime();
 			int nofActiveLinks = this.network.getSimulatedLinks().size();
-			log.info("SIMULATION AT " + Gbl.writeTime(time) + ": #Veh=" + getLiving() + " lost=" + getLost() + " #links=" + nofActiveLinks
+			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + getLiving() + " lost=" + getLost() + " #links=" + nofActiveLinks
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 			Gbl.printMemoryUsage();
 		}

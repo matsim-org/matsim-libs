@@ -28,6 +28,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Node;
+import org.matsim.utils.misc.Time;
 
 public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 
@@ -207,8 +208,8 @@ public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 	public void startOpentime(final Opentime opentime, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t\t<opentime");
 		out.write(" day=\"" + opentime.getDay() + "\"");
-		out.write(" start_time=\"" + Gbl.writeTime(opentime.getStartTime()) + "\"");
-		out.write(" end_time=\"" + Gbl.writeTime(opentime.getEndTime()) + "\"");
+		out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");
+		out.write(" end_time=\"" + Time.writeTime(opentime.getEndTime()) + "\"");
 		out.write(" />\n");
 	}
 
@@ -248,12 +249,12 @@ public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 		if (act.getCoord() != null) {
 			out.write(" x=\"" + act.getCoord().getX() + "\" y=\"" + act.getCoord().getY() + "\"");
 		}
-		if (act.getStartTime() != Gbl.UNDEFINED_TIME)
-			out.write(" start_time=\"" + Gbl.writeTime(act.getStartTime()) + "\"");
-		if (act.getDur() != Gbl.UNDEFINED_TIME)
-			out.write(" dur=\"" + Gbl.writeTime(act.getDur()) + "\"");
-		if (act.getEndTime() != Gbl.UNDEFINED_TIME)
-			out.write(" end_time=\"" + Gbl.writeTime(act.getEndTime()) + "\"");
+		if (act.getStartTime() != Time.UNDEFINED_TIME)
+			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
+		if (act.getDur() != Time.UNDEFINED_TIME)
+			out.write(" dur=\"" + Time.writeTime(act.getDur()) + "\"");
+		if (act.getEndTime() != Time.UNDEFINED_TIME)
+			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
 		if (act.getRefId() != Integer.MIN_VALUE)
 			out.write(" ref_id=\"" + act.getRefId() + "\"");
 		out.write(" />\n");
@@ -271,12 +272,12 @@ public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 		if (leg.getNum() != Integer.MIN_VALUE)
 			out.write(" num=\"" + leg.getNum() + "\"");
 		out.write(" mode=\"" + leg.getMode() + "\"");
-		if (leg.getDepTime() != Gbl.UNDEFINED_TIME)
-			out.write(" dep_time=\"" + Gbl.writeTime(leg.getDepTime()) + "\"");
-		if (leg.getTravTime() != Gbl.UNDEFINED_TIME)
-			out.write(" trav_time=\"" + Gbl.writeTime(leg.getTravTime()) + "\"");
-		if (leg.getArrTime() != Gbl.UNDEFINED_TIME)
-			out.write(" arr_time=\"" + Gbl.writeTime(leg.getArrTime()) + "\"");
+		if (leg.getDepTime() != Time.UNDEFINED_TIME)
+			out.write(" dep_time=\"" + Time.writeTime(leg.getDepTime()) + "\"");
+		if (leg.getTravTime() != Time.UNDEFINED_TIME)
+			out.write(" trav_time=\"" + Time.writeTime(leg.getTravTime()) + "\"");
+		if (leg.getArrTime() != Time.UNDEFINED_TIME)
+			out.write(" arr_time=\"" + Time.writeTime(leg.getArrTime()) + "\"");
 		out.write(">\n");
 	}
 
@@ -292,8 +293,8 @@ public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 		out.write("\t\t\t\t<route");
 		if (!Double.isNaN(route.getDist()))
 			out.write(" dist=\"" + route.getDist() + "\"");
-		if (route.getTravTime() != Gbl.UNDEFINED_TIME)
-			out.write(" trav_time=\"" + Gbl.writeTime(route.getTravTime()) + "\"");
+		if (route.getTravTime() != Time.UNDEFINED_TIME)
+			out.write(" trav_time=\"" + Time.writeTime(route.getTravTime()) + "\"");
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");

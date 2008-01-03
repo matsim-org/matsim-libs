@@ -27,6 +27,7 @@ import org.matsim.basic.v01.BasicPlan;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.stats.algorithms.PlanStatsI;
+import org.matsim.utils.misc.Time;
 
 
 public class Plan extends BasicPlan {
@@ -77,7 +78,7 @@ public class Plan extends BasicPlan {
 
 	public final Act createAct(final String type, final double x, final double y, final Link link, final double startTime,
 			final double endTime, final double dur, final boolean isPrimary) throws Exception {
-		if (endTime == Gbl.UNDEFINED_TIME) {
+		if (endTime == Time.UNDEFINED_TIME) {
 			verifyCreateAct(null);
 		} else {
 			verifyCreateAct(Double.toString(endTime));
@@ -159,9 +160,9 @@ public class Plan extends BasicPlan {
 				// remove an in-between act
 				Leg prev_leg = (Leg)this.actsLegs.get(index-1); // prev leg
 				prev_leg.setNum(Integer.MIN_VALUE);
-				prev_leg.setDepTime(Gbl.UNDEFINED_TIME);
-				prev_leg.setTravTime(Gbl.UNDEFINED_TIME);
-				prev_leg.setArrTime(Gbl.UNDEFINED_TIME);
+				prev_leg.setDepTime(Time.UNDEFINED_TIME);
+				prev_leg.setTravTime(Time.UNDEFINED_TIME);
+				prev_leg.setArrTime(Time.UNDEFINED_TIME);
 				prev_leg.removeRoute();
 
 				this.actsLegs.remove(index+1); // following leg
@@ -182,9 +183,9 @@ public class Plan extends BasicPlan {
 				// not the last leg
 				Leg next_leg = (Leg)this.actsLegs.get(index+2);
 				next_leg.setNum(Integer.MIN_VALUE);
-				next_leg.setDepTime(Gbl.UNDEFINED_TIME);
-				next_leg.setTravTime(Gbl.UNDEFINED_TIME);
-				next_leg.setArrTime(Gbl.UNDEFINED_TIME);
+				next_leg.setDepTime(Time.UNDEFINED_TIME);
+				next_leg.setTravTime(Time.UNDEFINED_TIME);
+				next_leg.setArrTime(Time.UNDEFINED_TIME);
 				next_leg.removeRoute();
 			}
 			this.actsLegs.remove(index+1); // following act
@@ -225,7 +226,7 @@ public class Plan extends BasicPlan {
 		Act act2 = null;
 
 		// the end time of act1 must be defined by definition, so take it as given
-		if (act1.getStartTime() == Gbl.UNDEFINED_TIME) {
+		if (act1.getStartTime() == Time.UNDEFINED_TIME) {
 			act1.setStartTime(0);
 			act1.setDur(act1.getEndTime());
 		} else {
@@ -242,9 +243,9 @@ public class Plan extends BasicPlan {
 		}
 
 		double endTime = act1.getEndTime();
-		if ((endTime == Gbl.UNDEFINED_TIME) || (endTime < act1.getStartTime())) {
+		if ((endTime == Time.UNDEFINED_TIME) || (endTime < act1.getStartTime())) {
 			double duration = act1.getDur();
-			if (duration == Gbl.UNDEFINED_TIME) {
+			if (duration == Time.UNDEFINED_TIME) {
 				// there was no planned duration
 				if (act1.getStartTime() < 24*3600) {	// TODO replace `24' with something like sim-duration
 					duration = 24*3600 - act1.getStartTime();	// the last act lasts until midnight

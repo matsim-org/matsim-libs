@@ -56,7 +56,6 @@ import org.matsim.controler.listener.LegHistogramListener;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.events.handler.EventHandlerI;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -86,23 +85,14 @@ import org.matsim.roadpricing.TollTravelCostCalculator;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.stats.PlanStatsManager;
 import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
-
-//import playground.gregor.travaletimecalc.TravelTimeCalculatorImpl2;
-
-
-
-
-
-
 
 public class Controler {
 
@@ -414,7 +404,7 @@ public class Controler {
 		// - print average in log
 		printNote("", "[" + iteration + "] average trip duration is: "
 				+ (int)this.legTimes.getAverageTripDuration() + " seconds = "
-				+ Gbl.writeTime((int)this.legTimes.getAverageTripDuration(), Gbl.TIMEFORMAT_HHMMSS));
+				+ Time.writeTime(this.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
 		this.legTimes.reset(iteration);
 
 		if (this.statsManager != null){
@@ -517,10 +507,9 @@ public class Controler {
 			this.events.addHandler(this.tollCalc);
 			printNote("", "done.");
 		}
-		
+
 		AbstractTravelTimeCalculator travelTimeCalculator = this.config.simulation().getTravelTimeCalculator(this.network);
-		
-		this.events.addHandler((EventHandlerI) travelTimeCalculator);
+		this.events.addHandler(travelTimeCalculator);
 		this.travelTimeCalculator = travelTimeCalculator;
 
 		if (Gbl.useRoadPricing()) {

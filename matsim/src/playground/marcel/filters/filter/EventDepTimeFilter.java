@@ -22,16 +22,16 @@ package playground.marcel.filters.filter;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.EventAgentDeparture;
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 /**
  * @author ychen
  * 
  */
 public class EventDepTimeFilter extends EventFilterA {
-	private static double criterionMAX = Gbl.parseTime("08:00");
+	private static double criterionMAX = Time.parseTime("08:00");
 
-	private static double criterionMIN = Gbl.parseTime("06:00");
+	private static double criterionMIN = Time.parseTime("06:00");
 
 	/* (non-Javadoc)
 	 * @see org.matsim.playground.filters.filter.EventFilter#judge(org.matsim.demandmodeling.events.BasicEvent)

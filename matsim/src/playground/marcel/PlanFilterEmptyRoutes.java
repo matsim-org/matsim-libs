@@ -24,13 +24,13 @@ package playground.marcel;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.utils.misc.Time;
 
 /**
  * This algorithm filters empty routes from plans. If two activities happen on the same link
@@ -77,12 +77,12 @@ public class PlanFilterEmptyRoutes extends PersonAlgorithm implements PlanAlgori
 //				int end1 = act1.getEndTime();
 				double end2 = act2.getEndTime();
 				
-				if (end2 != Gbl.UNDEFINED_TIME) {
+				if (end2 != Time.UNDEFINED_TIME) {
 					act1.setEndTime(end2);
-					if (start1 != Gbl.UNDEFINED_TIME) {
+					if (start1 != Time.UNDEFINED_TIME) {
 						act1.setDur(end2 - start1);
 					}
-				} else if (dur2 != Gbl.UNDEFINED_TIME && dur1 != Gbl.UNDEFINED_TIME) {
+				} else if (dur2 != Time.UNDEFINED_TIME && dur1 != Time.UNDEFINED_TIME) {
 					act1.setDur(dur1 + dur2);
 				}
 

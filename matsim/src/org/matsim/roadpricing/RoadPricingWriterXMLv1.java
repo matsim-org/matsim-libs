@@ -22,8 +22,8 @@ package org.matsim.roadpricing;
 
 import java.io.IOException;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
+import org.matsim.utils.misc.Time;
 import org.matsim.writer.MatsimXmlWriter;
 
 public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
@@ -66,11 +66,11 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 		
 		for (RoadPricingScheme.Cost cost : this.scheme.getCosts()) {
 			this.writer.write("\t<cost ");
-			if (cost.startTime != Gbl.UNDEFINED_TIME) {				
-				this.writer.write("start_time=\"" + Gbl.writeTime(cost.startTime) + "\" ");
+			if (cost.startTime != Time.UNDEFINED_TIME) {				
+				this.writer.write("start_time=\"" + Time.writeTime(cost.startTime) + "\" ");
 			}
-			if (cost.endTime != Gbl.UNDEFINED_TIME) {
-				this.writer.write("end_time=\"" + Gbl.writeTime(cost.endTime) + "\" ");
+			if (cost.endTime != Time.UNDEFINED_TIME) {
+				this.writer.write("end_time=\"" + Time.writeTime(cost.endTime) + "\" ");
 			}
 			this.writer.write("amount=\"" + cost.amount + "\" />\n");
 		}

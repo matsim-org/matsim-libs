@@ -29,6 +29,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.utils.misc.Time;
 
 public class PersonVaryTimes extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -76,8 +77,8 @@ public class PersonVaryTimes extends PersonAlgorithm implements PlanAlgorithmI {
 				}
 				else if (i == acts_legs.size()-1) { // last act
 					act.setStartTime(act.getStartTime()+bias);
-					act.setDur(Gbl.UNDEFINED_TIME);
-					act.setEndTime(Gbl.UNDEFINED_TIME);
+					act.setDur(Time.UNDEFINED_TIME);
+					act.setEndTime(Time.UNDEFINED_TIME);
 				}
 				else { // in between acts
 					act.setStartTime(act.getStartTime()+bias);

@@ -21,6 +21,7 @@
 package playground.marcel.config;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 import playground.marcel.config.groups.GenericConfigGroup;
 
@@ -70,7 +71,7 @@ public class ConfigTest {
 		// how to access complex config settings with specialized groups, e.g. scoring-settings
 		System.out.println(config.scoring().getBrainExpBeta());
 		System.out.println(config.scoring().getActivity("work").getClosingTime());
-		System.out.println(Gbl.writeTime(config.scoring().getActivity("work").getClosingTime()));
+		System.out.println(Time.writeTime(config.scoring().getActivity("work").getClosingTime()));
 		System.out.println(config.scoring().getActivity("inexistant") == null ? "activity 'inexistant' does not exist, correct!" : "error, activity 'inexistant' should not exist, but it seems it does.");
 
 

@@ -47,6 +47,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.Route;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.misc.Time;
 
 // "GeneratePlansFromEvents" would be more appropriate as class name...
 /**
@@ -131,7 +132,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 					acttype = act.getType();
 					linkId = act.getLink().getId();
 				}
-				plan.createAct(acttype, (String)null, (String)null, linkId.toString(), Gbl.writeTime(starttime), Gbl.writeTime(endtime), Gbl.writeTime(endtime - starttime), "no");
+				plan.createAct(acttype, (String)null, (String)null, linkId.toString(), Time.writeTime(starttime), Time.writeTime(endtime), Time.writeTime(endtime - starttime), "no");
 			}
 
 			Leg leg;
@@ -174,7 +175,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 			} else {
 				linkId = event.link.getId();
 			}
-			plan.createAct("stuck", (String)null, (String)null, linkId.toString(), Gbl.writeTime(time), Gbl.writeTime(time), null, "no");
+			plan.createAct("stuck", (String)null, (String)null, linkId.toString(), Time.writeTime(time), Time.writeTime(time), null, "no");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -189,9 +190,9 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		}
 		try {
 			if (event.act == null) {
-				plan.createAct("unknown", (String)null, (String)null, event.linkId, Gbl.writeTime(event.time), Gbl.writeTime(event.time), null, "no");
+				plan.createAct("unknown", (String)null, (String)null, event.linkId, Time.writeTime(event.time), Time.writeTime(event.time), null, "no");
 			} else {
-				plan.createAct(event.act.getType(), (String)null, (String)null, event.act.getLink().getId().toString(), Gbl.writeTime(event.time), Gbl.writeTime(event.time), null, "no");
+				plan.createAct(event.act.getType(), (String)null, (String)null, event.act.getLink().getId().toString(), Time.writeTime(event.time), Time.writeTime(event.time), null, "no");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -212,11 +213,11 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 				if (event.act == null) {
 					plan.createAct("unknown", (String)null, (String)null,
 							event.linkId, "00:00",
-							Gbl.writeTime(event.time), Gbl.writeTime(event.time), "no");
+							Time.writeTime(event.time), Time.writeTime(event.time), "no");
 				} else {
 					plan.createAct(event.act.getType(), (String)null, (String)null,
 							event.act.getLink().getId().toString(), "00:00",
-							Gbl.writeTime(event.time), Gbl.writeTime(event.time), "no");
+							Time.writeTime(event.time), Time.writeTime(event.time), "no");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -315,14 +316,14 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 					Leg leg = (Leg)plan.getActsLegs().get(plan.getActsLegs().size() - 1);
 					double startTime = leg.getArrTime();
 					double endTime = 24*3600;
-					if (startTime == Gbl.UNDEFINED_TIME) {
+					if (startTime == Time.UNDEFINED_TIME) {
 						// maybe the agent never arrived on time?
 						startTime = leg.getDepTime() + 15*60; // just assume some traveltime, e.g. 15 minutes.
 					}
 					if (endTime < startTime) {
 						endTime = startTime + 900; // startTime+15min
 					}
-					plan.createAct(act.getType(), (String)null, (String)null, act.getLink().getId().toString(), Gbl.writeTime(startTime), Gbl.writeTime(endTime), Gbl.writeTime(endTime - startTime), "no");
+					plan.createAct(act.getType(), (String)null, (String)null, act.getLink().getId().toString(), Time.writeTime(startTime), Time.writeTime(endTime), Time.writeTime(endTime - startTime), "no");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -46,7 +46,7 @@ package org.matsim.plans;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 abstract class PlansWriterHandlerImplV20 implements PlansWriterHandler {
 
@@ -227,11 +227,11 @@ abstract class PlansWriterHandlerImplV20 implements PlansWriterHandler {
 		if (act.getLink() != null)
 			out.write(" link=\"" + act.getLink().getId() + "\"");
 		if (act.getStartTime() != Integer.MIN_VALUE)
-			out.write(" start_time=\"" + Gbl.writeTime(act.getStartTime()) + "\"");
+			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
 		if (act.getEndTime() != Integer.MIN_VALUE)
-			out.write(" end_time=\"" + Gbl.writeTime(act.getEndTime()) + "\"");
+			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
 		if (act.getDur() != Integer.MIN_VALUE)
-			out.write(" dur=\"" + Gbl.writeTime(act.getDur()) +	"\"");
+			out.write(" dur=\"" + Time.writeTime(act.getDur()) +	"\"");
 		out.write(">\n");
 	}
 
@@ -249,11 +249,11 @@ abstract class PlansWriterHandlerImplV20 implements PlansWriterHandler {
 			out.write(" num=\"" + leg.getNum() + "\"");
 		out.write(" mode=\"" + leg.getMode() + "\"");
 		if (leg.getDepTime() != Integer.MIN_VALUE)
-			out.write(" dep_time=\"" + Gbl.writeTime(leg.getDepTime()) + "\"");
+			out.write(" dep_time=\"" + Time.writeTime(leg.getDepTime()) + "\"");
 		if (leg.getTravTime() != Integer.MIN_VALUE)
-			out.write(" trav_time=\"" + Gbl.writeTime(leg.getTravTime()) + "\"");
+			out.write(" trav_time=\"" + Time.writeTime(leg.getTravTime()) + "\"");
 		if (leg.getArrTime() != Integer.MIN_VALUE)
-			out.write(" arr_time=\"" + Gbl.writeTime(leg.getArrTime()) + "\"");
+			out.write(" arr_time=\"" + Time.writeTime(leg.getArrTime()) + "\"");
 		out.write(">\n");
 	}
 

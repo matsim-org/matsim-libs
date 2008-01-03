@@ -24,10 +24,10 @@ import java.util.ArrayList;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicRoute;
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 public class Leg extends BasicLeg {
-	private double duration = Gbl.UNDEFINED_TIME;
+	private double duration = Time.UNDEFINED_TIME;
 	
 	public Leg(String mode) {
 		this.mode = mode;

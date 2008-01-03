@@ -27,8 +27,8 @@ import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
-import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.misc.Time;
 
 /**
  * this Class offers a possibility, the traffic volume on a link with id "15",
@@ -54,15 +54,15 @@ public class BottleneckTraVol implements EventHandlerLinkEnterI, EventHandlerLin
 	 */
 	public void handleEvent(final EventLinkEnter event) {
 		if (event.linkId.equals("15")) {
-			writeLine(Gbl.writeTime(event.time - 1) + "\t" + this.cnt);
-			writeLine(Gbl.writeTime(event.time) + "\t" + (++this.cnt));
+			writeLine(Time.writeTime(event.time - 1) + "\t" + this.cnt);
+			writeLine(Time.writeTime(event.time) + "\t" + (++this.cnt));
 		}
 	}
 
 	public void handleEvent(final EventLinkLeave event) {
 		if (event.linkId.equals("15")) {
-			writeLine(Gbl.writeTime(event.time - 1) + "\t" + this.cnt);
-			writeLine(Gbl.writeTime(event.time) + "\t" + (--this.cnt));
+			writeLine(Time.writeTime(event.time - 1) + "\t" + this.cnt);
+			writeLine(Time.writeTime(event.time) + "\t" + (--this.cnt));
 		}
 	}
 

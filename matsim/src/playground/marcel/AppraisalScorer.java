@@ -34,6 +34,7 @@ import org.matsim.plans.Route;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.scoring.ScoringFunction;
+import org.matsim.utils.misc.Time;
 
 public class AppraisalScorer implements ScoringFunction {
 
@@ -45,7 +46,7 @@ public class AppraisalScorer implements ScoringFunction {
 	protected double score = 0.0;
 	protected int index = 0; // the current position in plan.actslegs
 	protected String firstActType = null;
-	protected double firstActTime = Gbl.UNDEFINED_TIME;
+	protected double firstActTime = Time.UNDEFINED_TIME;
 	protected final int lastActIndex;
 
 	public final int persontype;
@@ -142,7 +143,7 @@ public class AppraisalScorer implements ScoringFunction {
 
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
-			Gbl.errorMsg("Could not find utility param for " + act.getType());
+			throw new RuntimeException("Could not find utility param for " + act.getType());
 		}
 
 		double score = 0.0;
@@ -308,7 +309,7 @@ public class AppraisalScorer implements ScoringFunction {
 			if (type == null) break;
 			int priority = Integer.parseInt(config.getParam("planCalcScore", "activityPriority_" + i));
 			String typDuration = config.getParam("planCalcScore", "activityTypicalDuration_" + i);
-			int typDurationSecs = (int)Gbl.parseTime(typDuration); // TODO [MR] switch to double for times
+			int typDurationSecs = (int)Time.parseTime(typDuration); // TODO [MR] switch to double for times
 			ActUtilityParameters params = new ActUtilityParameters(type, priority, typDurationSecs);
 
 			String paramValue;
@@ -316,27 +317,27 @@ public class AppraisalScorer implements ScoringFunction {
 
 			paramValue = config.findParam("planCalcScore", "activityMinimalDuration_" + i);
 			if (paramValue != null && !paramValue.equals("")) {
-				paramValueSecs = (int)Gbl.parseTime(paramValue); // TODO [MR] switch to double for times, and below too!
+				paramValueSecs = (int)Time.parseTime(paramValue); // TODO [MR] switch to double for times, and below too!
 				params.setMinimalDuration(paramValueSecs);
 			}
 			paramValue = config.findParam("planCalcScore", "activityOpeningTime_" + i);
 			if (paramValue != null && !paramValue.equals("")) {
-				paramValueSecs = (int)Gbl.parseTime(paramValue);
+				paramValueSecs = (int)Time.parseTime(paramValue);
 				params.setOpeningTime(paramValueSecs);
 			}
 			paramValue = config.findParam("planCalcScore", "activityLatestStartTime_" + i);
 			if (paramValue != null && !paramValue.equals("")) {
-				paramValueSecs = (int)Gbl.parseTime(paramValue);
+				paramValueSecs = (int)Time.parseTime(paramValue);
 				params.setLatestStartTime(paramValueSecs);
 			}
 			paramValue = config.findParam("planCalcScore", "activityEarliestEndTime_" + i);
 			if (paramValue != null && !paramValue.equals("")) {
-				paramValueSecs = (int)Gbl.parseTime(paramValue);
+				paramValueSecs = (int)Time.parseTime(paramValue);
 				params.setEarliestEndTime(paramValueSecs);
 			}
 			paramValue = config.findParam("planCalcScore", "activityClosingTime_" + i);
 			if (paramValue != null && !paramValue.equals("")) {
-				paramValueSecs = (int)Gbl.parseTime(paramValue);
+				paramValueSecs = (int)Time.parseTime(paramValue);
 				params.setClosingTime(paramValueSecs);
 			}
 

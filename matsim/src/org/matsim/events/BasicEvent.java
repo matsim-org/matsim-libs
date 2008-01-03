@@ -22,10 +22,10 @@ package org.matsim.events;
 
 import java.io.Serializable;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
+import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 
 public abstract class BasicEvent implements Serializable{
@@ -35,7 +35,7 @@ public abstract class BasicEvent implements Serializable{
 	public transient Person agent;
 
 	private static String timeString = null;
-	private static double timeCache = Gbl.UNDEFINED_TIME;
+	private static double timeCache = Time.UNDEFINED_TIME;
 	
 	// supply one c'tor with reference to person and one without
 	BasicEvent(double time, String agentId, Person agent) {this.time = time; this.agentId = agentId; this.agent = agent;}

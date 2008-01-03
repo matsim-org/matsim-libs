@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 
 /**
  * Implements the A* router algorithm for a given NetworkLayer
@@ -160,7 +160,7 @@ public class AStarLandmarks extends AStarEuclidean {
 		double[] estTravelTimes = new double[actLandmarkCount];
 		this.activeLandmarkIndexes = new int[actLandmarkCount];
 		for (int i = 0; i < estTravelTimes.length; i++) {
-			estTravelTimes[i] = Gbl.UNDEFINED_TIME;
+			estTravelTimes[i] = Time.UNDEFINED_TIME;
 		}
 		double tmpTravTime;
 		for (int i = 0; i < this.landmarks.length; i++) {

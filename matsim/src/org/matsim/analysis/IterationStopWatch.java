@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 /**
  * This class provides a mechanism similar to a stop watch, allowing to measure the duration of operations and
@@ -197,7 +197,7 @@ public class IterationStopWatch {
 				stream.print('\t');
 				if (startTime != null && endTime != null) {
 					double diff = (endTime.longValue() - startTime.longValue()) / 1000.0;
-					stream.print(Gbl.writeTime(diff));
+					stream.print(Time.writeTime(diff));
 				}
 			}
 

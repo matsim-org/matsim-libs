@@ -23,12 +23,12 @@ package playground.meisterk.heureka2008;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.utils.misc.Time;
 
 public class PlansAnalyseTimes extends PersonAlgorithm {
 
@@ -98,7 +98,7 @@ public class PlansAnalyseTimes extends PersonAlgorithm {
 			Act act = (Act) actIter.next();
 			String actType = act.getType().substring(0, 1);
 			double depTime = act.getEndTime();
-			if (depTime != Gbl.UNDEFINED_TIME) {
+			if (depTime != Time.UNDEFINED_TIME) {
 
 				int actIndex = Activities.valueOf(actType).getPosition();
 

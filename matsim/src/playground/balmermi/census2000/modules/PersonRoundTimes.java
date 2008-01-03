@@ -31,6 +31,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.utils.misc.Time;
 
 public class PersonRoundTimes extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -136,8 +137,8 @@ public class PersonRoundTimes extends PersonAlgorithm implements PlanAlgorithmI 
 		
 		Act last_act = (Act)acts_legs.get(acts_legs.size()-1);
 		last_act.setStartTime(plan_dur);
-		last_act.setDur(Gbl.UNDEFINED_TIME);
-		last_act.setEndTime(Gbl.UNDEFINED_TIME);
+		last_act.setDur(Time.UNDEFINED_TIME);
+		last_act.setEndTime(Time.UNDEFINED_TIME);
 		last_act.setType(((Act)acts_legs.get(0)).getType());
 	}
 

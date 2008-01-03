@@ -40,6 +40,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.misc.Time;
 
 public class MicroCensus2005ActChainGenerator {
 
@@ -119,7 +120,7 @@ public class MicroCensus2005ActChainGenerator {
 					if (i > 0 && currentAct.getType().equals(lastAct.getType())) {
 						// Remove currentAct
 						double dur = lastAct.getDur();
-						if (currentAct.getDur() != Gbl.UNDEFINED_TIME) {
+						if (currentAct.getDur() != Time.UNDEFINED_TIME) {
 							dur += currentAct.getDur();
 						}
 						lastAct.setDur(dur);

@@ -52,6 +52,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.Plans;
+import org.matsim.utils.misc.Time;
 
 public class DistributedQueueSimulation extends QueueSimulation implements DistributedSimulationRemoteI {
 
@@ -199,7 +200,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - starttime.getTime())/1000;
 			double diffsim = time - SimulationTimer.getSimStartTime();
-			System.out.println(Gbl.writeTime(time) + ": # act. Veh= " + living + " lost: " + getLost() + " + delta: simTime: " + diffsim + "s took realTime: " + (diffreal) + "s; ratio(s/r): " + (diffsim/(diffreal+0.0000001)));
+			System.out.println(Time.writeTime(time) + ": # act. Veh= " + living + " lost: " + getLost() + " + delta: simTime: " + diffsim + "s took realTime: " + (diffreal) + "s; ratio(s/r): " + (diffsim/(diffreal+0.0000001)));
 		}
 
 		return living != 0 ;
@@ -352,7 +353,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 		Date endtime = new Date();
 		System.out.println("simulation Time: " + ((endtime.getTime() - testRMI.starttime.getTime()) / 1000));
 		System.out.println("simulation Time: "
-				+ Gbl.writeTime((int) ((endtime.getTime() - testRMI.starttime.getTime()) / 1000)));
+				+ Time.writeTime(((int) ((endtime.getTime() - testRMI.starttime.getTime()) / 1000))));
 
 		for (Object s : DistributedQueueSimulation.partSims.values()) {
 			PartialSimulationRemoteI proc = (PartialSimulationRemoteI) s;

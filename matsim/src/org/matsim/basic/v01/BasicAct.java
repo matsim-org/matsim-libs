@@ -20,12 +20,12 @@
 
 package org.matsim.basic.v01;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 public class BasicAct {
 
 	// TODO: should be private but needs refactoring in derived classes
-	protected double endTime = Gbl.UNDEFINED_TIME;
+	protected double endTime = Time.UNDEFINED_TIME;
 	protected String type;
 	protected BasicLink link = null;
 

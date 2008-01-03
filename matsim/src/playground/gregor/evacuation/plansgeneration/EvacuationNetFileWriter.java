@@ -25,24 +25,18 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.misc.Time;
 
 import playground.gregor.evacuation.EvacuationAreaLink;
 
 
-
 /**
+ * Writes the disaster area links to XML.
+ * 
  * @author glaemmel
- *
  */
-
-//////////////////////////////////////////////////////////////////////
-//EvacuationNetFileWriter writes the desaster area links to xml
-//////////////////////////////////////////////////////////////////////
 public class EvacuationNetFileWriter extends MatsimXmlWriter {
-
-
 
 
 	HashMap<IdI, EvacuationAreaLink> links;
@@ -85,11 +79,11 @@ public class EvacuationNetFileWriter extends MatsimXmlWriter {
 	}
 
 	private void writeBody(String indent) throws IOException {
-		Iterator it = links.values().iterator();
+		Iterator<EvacuationAreaLink> it = links.values().iterator();
 		while (it.hasNext()){
-			EvacuationAreaLink link = (EvacuationAreaLink) it.next();
+			EvacuationAreaLink link = it.next();
 			this.writer.write(indent +"<link id=\"" + link.getId() + "\" deadline=\""
-					+ Gbl.writeTime(link.getDeadline()) + "\" />\n");
+					+ Time.writeTime(link.getDeadline()) + "\" />\n");
 		}
 
 	}

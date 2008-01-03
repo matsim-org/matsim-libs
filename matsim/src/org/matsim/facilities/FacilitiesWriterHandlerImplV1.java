@@ -23,7 +23,7 @@ package org.matsim.facilities;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 
@@ -106,8 +106,8 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 	public void startOpentime(final Opentime opentime, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<opentime");
 		out.write(" day=\"" + opentime.getDay() + "\"");
-		out.write(" start_time=\"" + Gbl.writeTime(opentime.getStartTime()) + "\"");
-		out.write(" end_time=\"" + Gbl.writeTime(opentime.getEndTime()) + "\"");
+		out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");
+		out.write(" end_time=\"" + Time.writeTime(opentime.getEndTime()) + "\"");
 		out.write(" />\n");
 	}
 

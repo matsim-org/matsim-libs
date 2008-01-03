@@ -32,6 +32,7 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
+import org.matsim.utils.misc.Time;
 
 /**
  * This is the default scoring function for MATSim, referring to:
@@ -100,7 +101,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 	private static final double INITIAL_LAST_TIME = 0.0;
 	private static final int INITIAL_INDEX = 0;
-	private static final double INITIAL_FIRST_ACT_TIME = Gbl.UNDEFINED_TIME;
+	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state

@@ -25,6 +25,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.utils.misc.Time;
 
 public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
 
@@ -50,7 +51,7 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
 			if (i % 2 == 0) {
 				Act act = (Act)(plan.getActsLegs().get(i));
 				// invalidate previous activity times because durations will change
-				act.setStartTime(Gbl.UNDEFINED_TIME);
+				act.setStartTime(Time.UNDEFINED_TIME);
 
 				// handle first activity
 				if (i == 0) {
@@ -73,7 +74,7 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
 //					           ^^^^
 					now += act.getDur();
 					// set end time accordingly
-					act.setEndTime(Gbl.UNDEFINED_TIME);
+					act.setEndTime(Time.UNDEFINED_TIME);
 //					  			   ^^^^^^^^^^^^^^^^^^
 				// handle last activity
 				} else if (i == (max - 1)) {
@@ -81,8 +82,8 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					act.setDur(Gbl.UNDEFINED_TIME);
-					act.setEndTime(Gbl.UNDEFINED_TIME);
+					act.setDur(Time.UNDEFINED_TIME);
+					act.setEndTime(Time.UNDEFINED_TIME);
 				}
 				
 			} else {
@@ -92,7 +93,7 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepTime(now);
 				// let duration untouched. if defined add it to now
-				if (leg.getTravTime() != Gbl.UNDEFINED_TIME) {
+				if (leg.getTravTime() != Time.UNDEFINED_TIME) {
 					now += leg.getTravTime();
 				}
 				// set planned arrival time accordingly
@@ -104,7 +105,7 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
 
 	private double mutateTime(final double time) {
 		double t = time;
-		if (t != Gbl.UNDEFINED_TIME) {		
+		if (t != Time.UNDEFINED_TIME) {		
 			t = t + (int)((Gbl.random.nextDouble() * 2.0 - 1.0) * mutationRange);
 			if (t < 0) t = 0;
 			if (t > 24*3600) t = 24*3600;

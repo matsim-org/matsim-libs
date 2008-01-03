@@ -30,7 +30,7 @@ import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 /**
  * Counts the number of vehicles on a link. It can output a list of times and
@@ -123,7 +123,7 @@ public class LinkQueueStats implements EventHandlerLinkEnterI, EventHandlerLinkL
 	}
 
 	private void dumpLine(Writer out, double time, int count) throws IOException {
-		out.write(Gbl.writeTime(time, Gbl.TIMEFORMAT_HHMMSS) + "\t" + time + "\t" + count + "\n");
+		out.write(Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + "\t" + time + "\t" + count + "\n");
 	}
 
 }

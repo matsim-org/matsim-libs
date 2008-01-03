@@ -39,6 +39,7 @@ import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.misc.Time;
 
 public class PlansCalcRandomViaRoute extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -104,16 +105,16 @@ public class PlansCalcRandomViaRoute extends PersonAlgorithm implements PlanAlgo
 
 			double endTime = toAct.getEndTime();
 			double dur = toAct.getDur();
-			if (endTime != Gbl.UNDEFINED_TIME && dur != Gbl.UNDEFINED_TIME) {
+			if (endTime != Time.UNDEFINED_TIME && dur != Time.UNDEFINED_TIME) {
 				double min = Math.min(endTime, now + dur);
 				if (now < min) {
 					now = min;
 				}
-			} else if (endTime != Gbl.UNDEFINED_TIME) {
+			} else if (endTime != Time.UNDEFINED_TIME) {
 				if (now < endTime) {
 					now = endTime;
 				}
-			} else if (dur != Gbl.UNDEFINED_TIME) {
+			} else if (dur != Time.UNDEFINED_TIME) {
 				now += dur;
 			} else if ((j+1) != actslegs.size()) {
 				// if it's the last act on the plan, we don't care, otherwise exception
@@ -128,8 +129,8 @@ public class PlansCalcRandomViaRoute extends PersonAlgorithm implements PlanAlgo
 			}
 			else {
 				// balmermi: remove durations and endtimes for the last act
-				toAct.setDur(Gbl.UNDEFINED_TIME);
-				toAct.setEndTime(Gbl.UNDEFINED_TIME);
+				toAct.setDur(Time.UNDEFINED_TIME);
+				toAct.setEndTime(Time.UNDEFINED_TIME);
 			}
 			
 			fromAct = toAct;

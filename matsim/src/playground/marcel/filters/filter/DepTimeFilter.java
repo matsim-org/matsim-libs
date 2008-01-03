@@ -22,17 +22,17 @@ package playground.marcel.filters.filter;
 
 import java.util.List;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.utils.misc.Time;
 
 public class DepTimeFilter extends PersonFilterA {
 	private boolean result=false;
 	
-	private static double criterionMAX = Gbl.parseTime("09:00");
+	private static double criterionMAX = Time.parseTime("09:00");
 
-	private static double criterionMIN = Gbl.parseTime("06:40");
+	private static double criterionMIN = Time.parseTime("06:40");
 
 	@Override
 	public boolean judge(Person person) {

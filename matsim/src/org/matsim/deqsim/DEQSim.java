@@ -45,6 +45,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.Route;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.misc.Time;
 
 public class DEQSim extends ExternalMobsim {
 
@@ -163,13 +164,13 @@ public class DEQSim extends ExternalMobsim {
 
 			// TODO [MR] this is functionality that's regularly used, maybe generalize it?
 			// also see below
-			if (act.getEndTime() != Gbl.UNDEFINED_TIME && act.getDur() != Gbl.UNDEFINED_TIME) {
+			if (act.getEndTime() != Time.UNDEFINED_TIME && act.getDur() != Time.UNDEFINED_TIME) {
 				// use min (endtime, time + dur)
 				time = Math.min(act.getEndTime(), time + act.getDur());
-			} else if (act.getEndTime() != Gbl.UNDEFINED_TIME) {
+			} else if (act.getEndTime() != Time.UNDEFINED_TIME) {
 				// use endtime
 				time = act.getEndTime();
-			} else if (act.getDur() != Gbl.UNDEFINED_TIME) {
+			} else if (act.getDur() != Time.UNDEFINED_TIME) {
 				// use duration
 				time += act.getDur();
 			} else {
@@ -195,7 +196,7 @@ public class DEQSim extends ExternalMobsim {
 			out.writeInt(Integer.parseInt(nextAct.getLink().getId().toString()));
 
 			// TODO [MR] see above
-			if (leg.getTravTime() != Gbl.UNDEFINED_TIME) {
+			if (leg.getTravTime() != Time.UNDEFINED_TIME) {
 				time += leg.getTravTime();
 			}
 

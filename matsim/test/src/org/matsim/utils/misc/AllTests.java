@@ -30,6 +30,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ArgumentParserTest.class);
 		suite.addTestSuite(StringUtilsTest.class);
+		suite.addTestSuite(TimeTest.class);
 		//$JUnit-END$
 		return suite;
 	}

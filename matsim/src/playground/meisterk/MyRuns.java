@@ -82,6 +82,7 @@ import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Feature;
@@ -445,13 +446,13 @@ public class MyRuns {
 				}
 
 				actEndTime = act.getEndTime();
-				if (actEndTime == Gbl.UNDEFINED_TIME) {
+				if (actEndTime == Time.UNDEFINED_TIME) {
 					actEndTime = 24.0 * 60 * 60;
 				}
 
 				pl = new Placemark(
 						fullActName,
-						Gbl.writeTime(act.getStartTime()) + " - " + Gbl.writeTime(actEndTime),
+						Time.writeTime(act.getStartTime()) + " - " + Time.writeTime(actEndTime),
 						fullActName + " activity",
 						Feature.DEFAULT_ADDRESS,
 						Feature.DEFAULT_LOOK_AT,
@@ -1022,11 +1023,11 @@ public class MyRuns {
 			for (Object o : plan.getActsLegs()) {
 
 				if (o.getClass().equals(Act.class)) {
-					((Act) o).setDur(Gbl.UNDEFINED_TIME);
-					((Act) o).setEndTime(Gbl.UNDEFINED_TIME);
+					((Act) o).setDur(Time.UNDEFINED_TIME);
+					((Act) o).setEndTime(Time.UNDEFINED_TIME);
 					numActs++;
 				} else if (o.getClass().equals(Leg.class)) {
-					((Leg) o).setTravTime(Gbl.UNDEFINED_TIME);
+					((Leg) o).setTravTime(Time.UNDEFINED_TIME);
 				}
 
 			}
@@ -1167,8 +1168,8 @@ public class MyRuns {
 					// assume that there will be no delay between arrival time and activity start time
 					activity.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					activity.setDur(Gbl.UNDEFINED_TIME);
-					activity.setEndTime(Gbl.UNDEFINED_TIME);
+					activity.setDur(Time.UNDEFINED_TIME);
+					activity.setEndTime(Time.UNDEFINED_TIME);
 
 				}
 

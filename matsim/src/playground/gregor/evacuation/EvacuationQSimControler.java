@@ -44,11 +44,10 @@ import org.xml.sax.SAXException;
 public class EvacuationQSimControler extends Controler {
 
 
-
 	@Override
 	protected Plans loadPopulation() {
 		String plansFile = Gbl.getConfig().findParam("plans", "inputEvacuationPlansPrefix")
-		+ Time.strFromSec((int)Gbl.parseTime(Gbl.getConfig().findParam("simulation", "evacuationTime")))
+		+ Time.writeTime(Time.parseTime(Gbl.getConfig().findParam("simulation", "evacuationTime")), '-')
 		+ "." + Gbl.getConfig().findParam("plans", "inputEvacuationPlansSuffix");
 
 		Plans population = new Plans(Plans.NO_STREAMING);

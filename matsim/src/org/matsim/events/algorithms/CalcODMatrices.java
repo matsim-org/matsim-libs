@@ -38,6 +38,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
 import org.matsim.world.ZoneLayer;
 
@@ -49,7 +50,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 	private final TreeMap<String, Location> agents = new TreeMap<String, Location>(); // <AgentID, StartLoc>
 	private final TreeMap<String, Double> agentstime = new TreeMap<String, Double>();
 	private final Matrix<Integer> matrix;
-	private double minTime = Gbl.UNDEFINED_TIME; //Integer.MIN_VALUE;
+	private double minTime = Time.UNDEFINED_TIME; //Integer.MIN_VALUE;
 	private double maxTime = Double.POSITIVE_INFINITY;//Integer.MAX_VALUE;
 	public int counter = 0;
 

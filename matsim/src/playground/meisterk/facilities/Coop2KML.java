@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.matsim.utils.misc.TimeFormatter;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Feature;
 import org.matsim.utils.vis.kml.Folder;
@@ -39,31 +39,31 @@ public class Coop2KML {
 	private static Document myKMLDocument;
 	private static String inputFilename = "/Users/meisterk/Documents/workspace/matsimJ/input/coopzh.txt";
 	private static String kmlFilename = "/Users/meisterk/Documents/workspace/matsimJ/input/coopzh.kmz";
-	
+
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-	
+	public static void main(final String[] args) {
+
 		setUp();
 		generateFacilities();
 		write();
-		
+
 	}
 
 	private static void setUp() {
-		
+
 		myKML = new KML();
 		myKMLDocument = new Document("the root document");
 		myKML.setFeature(myKMLDocument);
-		
+
 	}
-	
+
 	private static void generateFacilities() {
 
 		List<String> lines = null;
 		String[] tokens = null;
-		
+
 		try {
 			lines = FileUtils.readLines(new File(inputFilename), "UTF-8");
 		} catch (IOException e) {
@@ -83,19 +83,18 @@ public class Coop2KML {
 				Feature.DEFAULT_TIME_PRIMITIVE);
 
 		myKMLDocument.addFeature(wednesdayFolder);
-		
+
 		tokens = lines.get(0).split("\t");
 		System.out.println(tokens[7] + "\t" + tokens[9] + "\t" + tokens[10] + "\t" + tokens[11]);
 
 		String wedOpen1 = tokens[22];
-		TimeFormatter tf = new TimeFormatter(TimeFormatter.TIMEFORMAT_HHMM);
-		System.out.println(tf.parseTime(wedOpen1) / 3600);
-		
-		
+		System.out.println(Time.parseTime(wedOpen1) / 3600);
+
+
 		String wedOpen2 = tokens[23];
 		String wedOpen3 = tokens[24];
 		String wedOpen4 = tokens[25];
-		
+
 		Placemark aCoop = new Placemark(
 				tokens[7] + " " + tokens[9] + ", " + tokens[10] + " " + tokens[11],
 				tokens[7] + " " + tokens[9] + ", " + tokens[10] + " " + tokens[11],
@@ -106,33 +105,33 @@ public class Coop2KML {
 				Feature.DEFAULT_VISIBILITY,
 				Feature.DEFAULT_REGION,
 				Feature.DEFAULT_TIME_PRIMITIVE);
-		
-		
-		
+
+
+
 		wednesdayFolder.addFeature(aCoop);
-		
-		
-		
+
+
+
 //		for (String str : lines) {
-//			
+//
 //			tokens = str.split("\t");
 //			System.out.println(tokens[7] + "\t" + tokens[9] + "\t" + tokens[10] + "\t" + tokens[11]);
-//			
+//
 //		}
-		
+
 	}
-	
+
 	private static void write() {
-		
+
 		System.out.println("    writing KML files out...");
 
 		KMZWriter writer;
 		writer = new KMZWriter(kmlFilename);
 		writer.writeMainKml(myKML);
 		writer.close();
-		
+
 		System.out.println("    done.");
 
 	}
-	
+
 }

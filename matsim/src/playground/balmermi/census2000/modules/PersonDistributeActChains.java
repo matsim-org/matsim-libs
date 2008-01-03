@@ -27,6 +27,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.utils.misc.Time;
 
 import playground.balmermi.census2000.data.ActChains;
 
@@ -212,7 +213,7 @@ public class PersonDistributeActChains extends PersonAlgorithm implements PlanAl
 			if (i == chain.size()-1) {
 				int start_time = time_sum;
 				try {
-					plan.createAct(type,0.0,0.0,null,start_time,Gbl.UNDEFINED_TIME,Gbl.UNDEFINED_TIME,primary);
+					plan.createAct(type,0.0,0.0,null,start_time,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,primary);
 				}
 				catch (Exception e) { Gbl.errorMsg(e); }
 			}

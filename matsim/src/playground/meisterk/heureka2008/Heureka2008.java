@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
@@ -138,7 +137,7 @@ public class Heureka2008 {
 
 				timesAvailable = false;
 				
-				out.write(Time.strFromSec(timeIndex * TIME_BIN_SIZE, ':') + "\t");
+				out.write(Time.writeTime(timeIndex * TIME_BIN_SIZE) + "\t");
 				for (int aa=0; aa < anArray.length; aa++) {
 
 //					if (numDeps[aa][timeIndex] != null) {

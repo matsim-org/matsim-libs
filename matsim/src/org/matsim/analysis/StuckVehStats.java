@@ -29,9 +29,9 @@ import org.matsim.events.EventAgentWait2Link;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.misc.Time;
 
 public class StuckVehStats implements EventHandlerAgentDepartureI, EventHandlerAgentStuckI, EventHandlerAgentWait2LinkI {
 
@@ -114,22 +114,22 @@ public class StuckVehStats implements EventHandlerAgentDepartureI, EventHandlerA
 		System.out.println("===   S T U C K   V E H I C L E S   ===");
 		System.out.println("number of stuck vehicles / time of day");
 		for (int i = 0; i < stuckTimes.length; i++) {
-			System.out.println((i*900) + "\t" + Gbl.writeTime(i*900) + "\t" + stuckTimes[i]);
+			System.out.println((i*900) + "\t" + Time.writeTime(i*900) + "\t" + stuckTimes[i]);
 		}
 		System.out.println();
 		System.out.println("number of stuck vehicles / time after wait2link");
 		for (int i = 0; i < driveTimes.length; i++) {
-			System.out.println((i*60) + "\t" + Gbl.writeTime(i*60) + "\t" + driveTimes[i]);
+			System.out.println((i*60) + "\t" + Time.writeTime(i*60) + "\t" + driveTimes[i]);
 		}
 		System.out.println();
 		System.out.println("number of stuck vehicles / time after departure (incl. wait2link-time)");
 		for (int i = 0; i < travelTimes.length; i++) {
-			System.out.println((i*60) + "\t" + Gbl.writeTime(i*60) + "\t" + travelTimes[i]);
+			System.out.println((i*60) + "\t" + Time.writeTime(i*60) + "\t" + travelTimes[i]);
 		}
 		System.out.println();
 		System.out.println("wait2link time distribution");
 		for (int i = 0; i < waitTimes.length; i++) {
-			System.out.println((i*60) + "\t" + Gbl.writeTime(i*60) + "\t" + waitTimes[i]);
+			System.out.println((i*60) + "\t" + Time.writeTime(i*60) + "\t" + waitTimes[i]);
 		}
 		System.out.println();
 		System.out.println("Links on which vehicles get stuck");

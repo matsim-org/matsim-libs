@@ -30,9 +30,9 @@ import java.util.TreeMap;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
+import org.matsim.utils.misc.Time;
 
 import playground.marcel.filters.writer.UserDefAtt;
 
@@ -243,8 +243,8 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 		if (this.udas.size() > 0)
 			return this.udas;
 		for (long i = this.timeBinMinimum; i < this.timeBinMaximum + 1; i++) {
-			String an = attName + Gbl.writeTime(i * 900) + "-"
-					+ Gbl.writeTime((i + 1) * 900 - 60);
+			String an = attName + Time.writeTime(i * 900) + "-"
+					+ Time.writeTime((i + 1) * 900 - 60);
 			UserDefAtt uda = new UserDefAtt("LINK", i + attID, an, an,
 					UserDefAtt.DatenTyp.Double, 2, UserDefAtt.SparseDocu.duenn);
 			this.udas.add(uda);

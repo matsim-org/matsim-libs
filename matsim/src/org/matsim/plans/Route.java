@@ -33,6 +33,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.utils.misc.Time;
 
 public class Route extends BasicRoute<Node> implements  Serializable{
 
@@ -43,7 +44,7 @@ public class Route extends BasicRoute<Node> implements  Serializable{
 	//////////////////////////////////////////////////////////////////////
 
 	private double dist = Double.NaN;
-	private double travTime = Gbl.UNDEFINED_TIME;
+	private double travTime = Time.UNDEFINED_TIME;
 	private double cost = Double.NaN;
 	private static NodeBuilder nodeBuilder = new NodeBuilder();
 
@@ -60,7 +61,7 @@ public class Route extends BasicRoute<Node> implements  Serializable{
 			this.dist = Double.parseDouble(dist);
 		}
 		if (travTime != null) {
-			this.travTime = Gbl.parseTime(travTime);
+			this.travTime = Time.parseTime(travTime);
 		}
 	}
 
@@ -285,7 +286,7 @@ public class Route extends BasicRoute<Node> implements  Serializable{
 	@Override
 	public final String toString() {
 		return "[dist=" + this.dist + "]" +
-				"[trav_time=" + Gbl.writeTime(this.travTime) + "]" +
+				"[trav_time=" + Time.writeTime(this.travTime) + "]" +
 				"[nof_nodes=" + this.route.size() + "]";
 	}
 }

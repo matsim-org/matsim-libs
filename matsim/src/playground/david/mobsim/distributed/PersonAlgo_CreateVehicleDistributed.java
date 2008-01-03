@@ -23,13 +23,13 @@ package playground.david.mobsim.distributed;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.PersonAlgo_CreateVehicle;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.utils.misc.Time;
 
 public class PersonAlgo_CreateVehicleDistributed extends PersonAlgo_CreateVehicle{
 
@@ -59,8 +59,8 @@ public class PersonAlgo_CreateVehicleDistributed extends PersonAlgo_CreateVehicl
 				// when the end is defined of the activity,
 				// Whatever comes first.
 				// Check for UNDEF == MIN_VALUE first, otherwiese the Math.min will not calc correct
-				if (act.getDur() == Gbl.UNDEFINED_TIME) departure = act.getEndTime();
-				else if (act.getEndTime() == Gbl.UNDEFINED_TIME)departure = now + act.getDur();
+				if (act.getDur() == Time.UNDEFINED_TIME) departure = act.getEndTime();
+				else if (act.getEndTime() == Time.UNDEFINED_TIME)departure = now + act.getDur();
 				else departure = Math.min(act.getEndTime(), now + act.getDur());
 			}
 			

@@ -67,6 +67,7 @@ import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
+import org.matsim.utils.misc.Time;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
@@ -577,7 +578,7 @@ public class SNController02  {
 		// - print average in log
 		printNote("", "[" + iteration + "] average trip duration is: "
 				+ (int)this.legTimes.getAverageTripDuration() + " seconds = "
-				+ Gbl.writeTime((int)this.legTimes.getAverageTripDuration(), Gbl.TIMEFORMAT_HHMMSS));
+				+ Time.writeTime(this.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
 		this.legTimes.reset(iteration);
 
 	}

@@ -22,7 +22,6 @@ package org.matsim.router;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -37,6 +36,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 
 public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -112,13 +112,13 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 			double endTime = fromAct.getEndTime();
 			double startTime = fromAct.getStartTime();
 			double dur = fromAct.getDur();
-			if (endTime != Gbl.UNDEFINED_TIME) {
+			if (endTime != Time.UNDEFINED_TIME) {
 				// use fromAct.endTime as time for routing
 				now = endTime;
-			} else if (startTime != Gbl.UNDEFINED_TIME && dur != Gbl.UNDEFINED_TIME) {
+			} else if (startTime != Time.UNDEFINED_TIME && dur != Time.UNDEFINED_TIME) {
 				// use fromAct.startTime + fromAct.duration as time for routing
 				now = startTime + dur;
-			} else if (dur != Gbl.UNDEFINED_TIME) {
+			} else if (dur != Time.UNDEFINED_TIME) {
 				// use last used time + fromAct.duration as time for routing
 				now += dur;
 			} else {
@@ -175,10 +175,10 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 			} else {
 				route = leg.getRoute();
 				travTime = leg.getTravTime();
-				if (travTime == Gbl.UNDEFINED_TIME) {
+				if (travTime == Time.UNDEFINED_TIME) {
 					travTime = route.getTravTime();
 				}
-				if (travTime == Gbl.UNDEFINED_TIME) {
+				if (travTime == Time.UNDEFINED_TIME) {
 					travTime = 0;
 				}
 			}
@@ -227,10 +227,10 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 			} else {
 				route = leg.getRoute();
 				travTime = leg.getTravTime();
-				if (travTime == Gbl.UNDEFINED_TIME) {
+				if (travTime == Time.UNDEFINED_TIME) {
 					travTime = route.getTravTime();
 				}
-				if (travTime == Gbl.UNDEFINED_TIME) {
+				if (travTime == Time.UNDEFINED_TIME) {
 					travTime = 0;
 				}
 			}

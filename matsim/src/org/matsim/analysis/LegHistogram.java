@@ -41,7 +41,7 @@ import org.matsim.events.EventAgentStuck;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 /**
  * @author mrieser
@@ -124,7 +124,7 @@ public class LegHistogram implements EventHandlerAgentDepartureI, EventHandlerAg
 		int onRoute = 0;
 		for (int i = 0; i < this.countsDep.length; i++) {
 			onRoute = onRoute + this.countsDep[i] - this.countsArr[i] - this.countsStuck[i];
-			stream.print(Gbl.writeTime(i*this.binSize) + "\t" + i*this.binSize);
+			stream.print(Time.writeTime(i*this.binSize) + "\t" + i*this.binSize);
 			stream.println("\t" + this.countsDep[i] + "\t" + this.countsArr[i] + "\t" + this.countsStuck[i] + "\t" + onRoute);
 		}
 	}

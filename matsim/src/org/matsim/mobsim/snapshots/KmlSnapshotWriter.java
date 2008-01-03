@@ -28,7 +28,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.misc.TimeFormatter;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;
@@ -67,9 +67,7 @@ public class KmlSnapshotWriter implements SnapshotWriterI {
 
 	private final TreeMap<Double, NetworkLink> timeLinks = new TreeMap<Double, NetworkLink>();
 
-	private double time = TimeFormatter.UNDEFINED_TIME;
-
-	private final TimeFormatter timeFormatter = new TimeFormatter(TimeFormatter.TIMEFORMAT_HHMMSS);
+	private double time = Time.UNDEFINED_TIME;
 
 	public KmlSnapshotWriter(final String filename, final CoordinateTransformationI coordTransform) {
 		this.coordTransform = coordTransform;
@@ -110,7 +108,7 @@ public class KmlSnapshotWriter implements SnapshotWriterI {
 
 	public void beginSnapshot(final double time) {
 		this.time = time;
-		String timeStr = this.timeFormatter.writeTime(time);
+		String timeStr = Time.writeTime(time, Time.TIMEFORMAT_HHMMSS, ':');
 		this.timeKml = new KML();
 		this.timeDoc = new Document(timeStr);
 		this.timeKml.setFeature(this.timeDoc);

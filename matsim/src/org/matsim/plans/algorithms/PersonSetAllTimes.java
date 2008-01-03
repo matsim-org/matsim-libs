@@ -25,6 +25,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.utils.misc.Time;
 
 public class PersonSetAllTimes extends PersonAlgorithm {
 
@@ -76,15 +77,15 @@ public class PersonSetAllTimes extends PersonAlgorithm {
 												Gbl.random.nextInt(LATEST_ENDTIME -
 																					 EARLIEST_ENDTIME + 1);
 					act.setEndTime(endtime);
-					act.setStartTime(Gbl.UNDEFINED_TIME);
-					act.setDur(Gbl.UNDEFINED_TIME);
+					act.setStartTime(Time.UNDEFINED_TIME);
+					act.setDur(Time.UNDEFINED_TIME);
 
 					prev_endtime = act.getEndTime();
 				}
 				else if (j == plan.getActsLegs().size()-1) {
-					act.setStartTime(Gbl.UNDEFINED_TIME);
-					act.setDur(Gbl.UNDEFINED_TIME);
-					act.setEndTime(Gbl.UNDEFINED_TIME);
+					act.setStartTime(Time.UNDEFINED_TIME);
+					act.setDur(Time.UNDEFINED_TIME);
+					act.setEndTime(Time.UNDEFINED_TIME);
 				}
 				else {
 					a_cnt++;
@@ -92,8 +93,8 @@ public class PersonSetAllTimes extends PersonAlgorithm {
 					if (act.getType().equals("e")) { e_cnt++; }
 					if (act.getType().equals("l")) { l_cnt++; }
 					if (act.getType().equals("s")) { s_cnt++; }
-					act.setStartTime(Gbl.UNDEFINED_TIME);
-					act.setEndTime(Gbl.UNDEFINED_TIME);
+					act.setStartTime(Time.UNDEFINED_TIME);
+					act.setEndTime(Time.UNDEFINED_TIME);
 				}
 			}
 

@@ -30,7 +30,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.misc.TimeFormatter;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;
@@ -73,11 +73,10 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 
 	private final TreeMap<Double, NetworkLink> timeLinks = new TreeMap<Double, NetworkLink>();
 
-	private double time = TimeFormatter.UNDEFINED_TIME;
+	private double time = Time.UNDEFINED_TIME;
 
 	private NetworkLayer network;
-
-	private final TimeFormatter timeFormatter = new TimeFormatter(TimeFormatter.TIMEFORMAT_HHMMSS);
+	
 	/**
 	 * Initializes the main kml document and kmz-file. Writes the MATSim logo and car icon to the file.
 	 * @param filename
@@ -138,7 +137,7 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 
 	public void beginSnapshot(final double time) {
 		this.time = time;
-		String timeStr = this.timeFormatter.writeTime(time);
+		String timeStr = Time.writeTime(time, Time.TIMEFORMAT_HHMMSS, ':');
 		this.timeKml = new KML();
 		this.timeDoc = new Document(timeStr);
 		this.timeDoc.setName(timeStr);

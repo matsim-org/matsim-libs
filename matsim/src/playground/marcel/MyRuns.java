@@ -51,8 +51,9 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.algorithms.AnalyzeLegTimes;
+import org.matsim.events.algorithms.CalcLegNumber;
 import org.matsim.events.algorithms.CalcODMatrices;
-import org.matsim.events.algorithms.EventWriterXML;
+import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.GenerateRealPlans;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -114,10 +115,12 @@ import org.matsim.scoring.EventsToScore;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.geometry.shared.CoordWGS84;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Feature;
@@ -138,7 +141,6 @@ import org.matsim.visum.VisumAnbindungstabelleWriter;
 import org.matsim.visum.VisumMatrixReader;
 import org.matsim.visum.VisumMatrixWriter;
 import org.matsim.visum.VisumWriteRoutes;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Location;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -2132,7 +2134,7 @@ public class MyRuns {
 		}
 		System.out.println();
 		for (int j = 0; j < countsDep[0].length; j++) {
-			System.out.print(j*binSize + "\t" + Gbl.writeTime(j*binSize));
+			System.out.print(j*binSize + "\t" + Time.writeTime(j*binSize));
 			for (int i = 0; i < countsDep.length; i++) {
 				System.out.print("\t" + countsDep[i][j] + "\t" + countsArr[i][j] + "\t" + countsStuck[i][j]);
 			}
@@ -2890,7 +2892,7 @@ public class MyRuns {
 				System.out.println("    # legs: " + nofLegs);
 				for (int l = 0; l < nofLegs; l++) {
 					final double time = in.readDouble();
-					System.out.print("      " + Gbl.writeTime(time));
+					System.out.print("      " + Time.writeTime(time));
 					final int nofLinks = in.readInt();
 					for (int n = 0; n < nofLinks; n++) {
 						System.out.print(" " + in.readInt());
@@ -2980,9 +2982,14 @@ public class MyRuns {
 //			System.out.println("did not create directories");
 //		}
 
-		Config config = Gbl.createConfig(args);
+		Id id1 = new Id(1);
+		Id id2 = new Id(2);
+		IdI id = id1;
 
-		System.out.println(config.charyparNagelScoring().getActivityParams("e1").getTypicalDuration());
+		System.out.println(id1.compareTo(id2));
+		System.out.println(id1.compareTo(id));
+		System.out.println(id.compareTo(id2));
+		System.out.println(id.compareTo(id));
 
 	}
 
@@ -3026,26 +3033,13 @@ public class MyRuns {
 
 	public static void readEvents(final String[] args) {
 		System.out.println("RUN: readEvents");
-		final Config config = Gbl.createConfig(args);
 
-//		System.out.println("  reading the network...");
-//		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
-//		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, "false", null);
-//		NetworkParser network_parser = new NetworkParser(network);
-//		network_parser.parse();
-//		System.out.println("  done.");
-
-		// events
-		System.out.println("  reading events...");
 		final Events events = new Events();
-
-		EventWriterXML writer = new EventWriterXML("../MatsimJ-Testing/testdata/tests/events/events.xml");
+		events.addHandler(new CalcLegNumber());
+		EventWriterTXT writer = new EventWriterTXT("/Volumes/Data/VSP/cvs/vsp-cvs/runs/run212/events_fixed.txt.gz");
 		events.addHandler(writer);
-		new MatsimEventsReader(events).readFile("../MatsimJ-Testing/testdata/tests/events/events.txt");
-//		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		events.printEventsCount();
+		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/cvs/vsp-cvs/runs/run212/events.txt");
 		writer.closefile();
-		System.out.println("  done.");
 
 		System.out.println("RUN: readEvents finished.");
 		System.out.println();

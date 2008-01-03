@@ -28,11 +28,11 @@ import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.utils.misc.Time;
 
 /**
  * @author mrieser
@@ -138,7 +138,7 @@ public class CalcLegTimes implements EventHandlerAgentDepartureI, EventHandlerAg
 		} else {
 			out.write("average trip duration: "
 					+ (this.sumTripDurations / this.sumTrips) + " seconds = "
-					+ Gbl.writeTime((int)(this.sumTripDurations / this.sumTrips)));
+					+ Time.writeTime(((int)(this.sumTripDurations / this.sumTrips))));
 		}
 		out.write("\n");
 		out.flush();

@@ -56,7 +56,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriterI {
 
 	public void beginSnapshot(double time) {
 		this.plans = new Plans(Plans.NO_STREAMING);
-		this.filename = this.filePrefix + Time.strFromSec((int)time) + "." + this.fileSuffix;
+		this.filename = this.filePrefix + Time.writeTime(time, "-") + "." + this.fileSuffix;
 		this.currenttime = time;
 	}
 

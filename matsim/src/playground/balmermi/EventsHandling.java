@@ -24,6 +24,7 @@ import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.algorithms.AnalyzeLegTimes;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 public class EventsHandling {
 
@@ -52,7 +53,7 @@ public class EventsHandling {
 		}
 		System.out.println();
 		for (int j = 0; j < countsDep[0].length; j++) {
-			System.out.print(j*binSize + "\t" + Gbl.writeTime(j*binSize));
+			System.out.print(j*binSize + "\t" + Time.writeTime(j*binSize));
 			for (int i = 0; i < countsDep.length; i++) {
 				System.out.print("\t" + countsDep[i][j] + "\t" + countsArr[i][j] + "\t" + countsStuck[i][j]);
 			}

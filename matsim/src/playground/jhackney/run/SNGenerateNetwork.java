@@ -68,6 +68,7 @@ import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.ScoringFunction;
+import org.matsim.utils.misc.Time;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
@@ -632,7 +633,7 @@ public class SNGenerateNetwork {
 	// - print average in log
 	printNote("", "[" + iteration + "] average trip duration is: "
 		+ (int)this.legTimes.getAverageTripDuration() + " seconds = "
-		+ Gbl.writeTime((int)this.legTimes.getAverageTripDuration(), Gbl.TIMEFORMAT_HHMMSS));
+		+ Time.writeTime(this.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
 	this.legTimes.reset(iteration);
 
     }

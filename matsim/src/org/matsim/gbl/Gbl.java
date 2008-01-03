@@ -28,7 +28,7 @@ import org.matsim.config.ConfigReaderMatsimV1;
 import org.matsim.counts.Counts;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.scoring.CharyparNagelScoringFunction;
-import org.matsim.utils.misc.TimeFormatter;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
 /* some ideas about this class... [MR, dec06]
@@ -63,12 +63,6 @@ import org.matsim.world.World;
 
 public abstract class Gbl {
 
-	public static final String TIMEFORMAT_HHMM = TimeFormatter.TIMEFORMAT_HHMM;
-	public static final String TIMEFORMAT_HHMMSS = TimeFormatter.TIMEFORMAT_HHMMSS;
-	public static final String TIMEFORMAT_SSSS = TimeFormatter.TIMEFORMAT_SSSS;
-
-	public static final double UNDEFINED_TIME = TimeFormatter.UNDEFINED_TIME;
-
 	private static final long DEFAULT_RANDOM_SEED = 4711;
 
 	private static Config config = null;
@@ -81,8 +75,6 @@ public abstract class Gbl {
 	// the global random number generator
 	// the seed is set by the config package (see matsim.gbl.Config)
 	public static final Random random = new Random(DEFAULT_RANDOM_SEED);
-
-	private static TimeFormatter timeFormatter = new TimeFormatter();
 
 	private static final Logger log = Logger.getLogger(Gbl.class);
 
@@ -110,7 +102,7 @@ public abstract class Gbl {
 		}
 
 		Gbl.random.setSeed(Gbl.config.global().getRandomSeed());
-		Gbl.timeFormatter = new TimeFormatter(Gbl.config.global().getOutputTimeFormat());
+		Time.setDefaultTimeFormat(Gbl.config.global().getOutputTimeFormat());
 
 		return Gbl.config;
 	}
@@ -243,23 +235,5 @@ public abstract class Gbl {
 	public static final void printRoundTime() {
 		log.info("### round time: " + Gbl.printTime());
 		Gbl.startMeasurement();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// handle time formats (internal only seconds after midnight)
-	//////////////////////////////////////////////////////////////////////
-
-	public static final double parseTime(final String time) {
-		return Gbl.timeFormatter.parseTime(time);
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	public static final String writeTime(final double seconds) {
-		return Gbl.timeFormatter.writeTime(seconds);
-	}
-
-	public static final String writeTime(final double seconds, final String format) {
-		return new TimeFormatter(format).writeTime(seconds);
 	}
 }

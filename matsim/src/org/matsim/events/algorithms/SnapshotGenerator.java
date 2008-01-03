@@ -47,6 +47,7 @@ import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.mobsim.snapshots.SnapshotWriterI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.VisConfig;
@@ -141,7 +142,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 	}
 
 	private void doSnapshot(final double time) {
-		System.out.println("create snapshot at " + Gbl.writeTime(time));
+		System.out.println("create snapshot at " + Time.writeTime(time));
 		if (!this.snapshotWriters.isEmpty()) {
 			Collection<PositionInfo> positions = getVehiclePositions(time);
 			for (SnapshotWriterI writer : this.snapshotWriters) {

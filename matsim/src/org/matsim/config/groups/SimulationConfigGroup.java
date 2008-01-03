@@ -23,11 +23,11 @@ package org.matsim.config.groups;
 import java.util.TreeMap;
 
 import org.matsim.config.Module;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorHashMap;
+import org.matsim.utils.misc.Time;
 
 public class SimulationConfigGroup extends Module {
 
@@ -56,8 +56,8 @@ public class SimulationConfigGroup extends Module {
 	private static final String LOCALCONFIGDTD = "localConfigDTD";
 	private static final String EXE_PATH = "exePath";
 
-	private double startTime = Gbl.UNDEFINED_TIME;
-	private double endTime = Gbl.UNDEFINED_TIME;
+	private double startTime = Time.UNDEFINED_TIME;
+	private double endTime = Time.UNDEFINED_TIME;
 	private double snapshotPeriod = 0; // off, no snapshots
 	private String snapshotFormat = "";
 	private String snapshotFile = "Snapshot";
@@ -78,11 +78,11 @@ public class SimulationConfigGroup extends Module {
 	@Override
 	public final void addParam(final String key, final String value) {
 		if (START_TIME.equals(key)) {
-			setStartTime(Gbl.parseTime(value));
+			setStartTime(Time.parseTime(value));
 		} else if (END_TIME.equals(key)) {
-			setEndTime(Gbl.parseTime(value));
+			setEndTime(Time.parseTime(value));
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
-			setSnapshotPeriod(Gbl.parseTime(value));
+			setSnapshotPeriod(Time.parseTime(value));
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
 			setSnapshotFormat(value);
 		} else if (SNAPSHOT_FILE.equals(key)) {
@@ -96,7 +96,7 @@ public class SimulationConfigGroup extends Module {
 		} else if (REMOVE_STUCK_VEHICLES.equals(key)) {
 			removeStuckVehicles("true".equals(value) || "yes".equals(value));
 		} else if (EVACUATION_TIME.equals(key)) {
-			setEvacuationTime(Gbl.parseTime(value));
+			setEvacuationTime(Time.parseTime(value));
 		} else if (EXTERNAL_EXE.equals(key)) {
 			setExternalExe(value);
 		} else if (TIMEOUT.equals(key)) {
@@ -105,7 +105,7 @@ public class SimulationConfigGroup extends Module {
 			setTravelTimeCalculatorType(value);
 		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
 			setTraveltimeBinSize(Integer.parseInt(value));
-		}else if (SHELLTYPE.equals(key) || JAVACLASSPATH.equals(key) || JVMOPTIONS.equals(key)
+		} else if (SHELLTYPE.equals(key) || JAVACLASSPATH.equals(key) || JVMOPTIONS.equals(key)
 				|| CLIENTLIST.equals(key) || LOCALCONFIG.equals(key) || LOCALCONFIGDTD.equals(key) || EXE_PATH.equals(key)) {
 			System.err.println("WARNING: The config options for the parallel mobsim are no longer supported.");
 		} else {
@@ -117,11 +117,11 @@ public class SimulationConfigGroup extends Module {
 	@Override
 	public final String getValue(final String key) {
 		if (START_TIME.equals(key)) {
-			return Gbl.writeTime(getStartTime());
+			return Time.writeTime(getStartTime());
 		} else if (END_TIME.equals(key)) {
-			return Gbl.writeTime(getEndTime());
+			return Time.writeTime(getEndTime());
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
-			return Gbl.writeTime(getSnapshotPeriod());
+			return Time.writeTime(getSnapshotPeriod());
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
 			return getSnapshotFormat();
 		} else if (SNAPSHOT_FILE.equals(key)) {
@@ -144,7 +144,7 @@ public class SimulationConfigGroup extends Module {
 			return getTravelTimeCalculatorType();
 		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
 			return Integer.toString(getTraveltimeBinSize());
-		}  else {
+		} else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -289,10 +289,9 @@ public class SimulationConfigGroup extends Module {
 		}
 		
 	}
-	
+
 	/**
-	 * Sets the size of the time-window over which the travel times are accumulated and averaged.
-	 * Changes to this parameter have no effect after {@link #run(String[])} is called. <br>
+	 * Sets the size of the time-window over which the travel times are accumulated and averaged.<br>
 	 * Note that smaller values for the binSize increase memory consumption to store the travel times.
 	 *
 	 * @param binSize The size of the time-window in seconds.
