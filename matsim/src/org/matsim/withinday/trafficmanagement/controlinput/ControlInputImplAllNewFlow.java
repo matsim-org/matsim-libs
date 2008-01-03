@@ -87,7 +87,7 @@ public class ControlInputImplAllNewFlow extends AbstractControlInputImpl
 
 	private static final boolean INCIDENTDETECTIONACTIVATED = false;
 
-	private double RESETBOTTLENECKINTERVALL = 1800;
+	private static final double RESETBOTTLENECKINTERVALL = 1800;
 
 	
 	private static final Logger log = Logger.getLogger(ControlInputImplAllNewFlow.class);
@@ -259,7 +259,7 @@ public class ControlInputImplAllNewFlow extends AbstractControlInputImpl
 			for (Link inLink : n.getInLinks().values()) {
 				String linkId = inLink.getId().toString();
 				if(!linksAlternativeRouteList.contains(inLink)){
-					double tt = sumUpTTFreeSpeed(n, this.mainRoute);
+					double tt = sumUpTTFreeSpeed(n, this.alternativeRoute);
 					this.ttFreeSpeedUpToAndIncludingLink.put(linkId, tt);
 					inLinksAlternativeRoute.add(inLink);
 					this.outFlows.put(inLink.getId().toString(), 0.0);
@@ -274,7 +274,7 @@ public class ControlInputImplAllNewFlow extends AbstractControlInputImpl
 			for (Link outLink : n.getOutLinks().values()) {
 				String linkId = outLink.getId().toString();
 				if(!linksAlternativeRouteList.contains(outLink)){
-					double tt = sumUpTTFreeSpeed(n, this.mainRoute);
+					double tt = sumUpTTFreeSpeed(n, this.alternativeRoute);
 					this.ttFreeSpeedUpToAndIncludingLink.put(linkId, tt);
 					outLinksAlternativeRoute.add(outLink);
 					this.outFlows.put(outLink.getId().toString(), 0.0);
@@ -295,10 +295,10 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 		Link [] routeLinks = route.getLinkRoute();
 		for (int i = 0; i < routeLinks.length; i++) {
 			Link l = routeLinks[i];
+			ttFS += this.ttFreeSpeeds.get(l.getId().toString());
 			if ( l.getToNode() == node ) {
 				break;
 			}
-			ttFS += this.ttFreeSpeeds.get(l.getId().toString());
 		}
 		return ttFS;
 	}
@@ -594,7 +594,7 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 	
 	
 	private int getAdditionalAgents(final Route route, final int linkIndex){
-		double weightedNetFlow = 0.0;
+		double totalExtraAgents = 0.0;
 		double netFlow = 0.0;
 //		double distanceToBottleNeck = 0.0;
 
@@ -615,16 +615,16 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 		while (it.hasNext()) {
 			Link link = it.next();
 			String linkId = link.getId().toString();
-			double weightedFlow = 0.0;
+			double extraAgents = 0.0;
 			double flow = getInOutFlow(link, route);
 			if ( this.ttFreeSpeedUpToAndIncludingLink.get(linkId) > ttToLink || this.ttFreeSpeedUpToAndIncludingLink == null) {
-				weightedFlow = 0.0;
+				extraAgents = 0.0;
 			}
 			else {
-				weightedFlow = flow * this.ttFreeSpeedUpToAndIncludingLink.get(linkId);
-				System.out.println("wheghted = " + flow + " * " + this.ttFreeSpeedUpToAndIncludingLink.get(linkId) );
+				extraAgents = flow * this.ttFreeSpeedUpToAndIncludingLink.get(linkId);
+				System.out.println("Extra agents = " + flow + " * " + this.ttFreeSpeedUpToAndIncludingLink.get(linkId) + " (link" + linkId + " )." );
 			}
-			weightedNetFlow += weightedFlow;
+			totalExtraAgents += extraAgents;
 		}
 		
 		/*
@@ -660,9 +660,9 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 			weightedNetFlow -= weightedOutFlow;
 		}
 		*/
-		netFlow = weightedNetFlow / ttToLink;
-		System.out.println("Net flow = " + weightedNetFlow + " / " + ttToLink + " = " + netFlow);
-		return (int)(ttToLink * netFlow);
+//		netFlow = weightedNetFlow / ttToLink;
+//		System.out.println("Net flow = " + weightedNetFlow + " / " + ttToLink + " = " + netFlow);
+		return (int)(totalExtraAgents);
 	}
 	
 	
