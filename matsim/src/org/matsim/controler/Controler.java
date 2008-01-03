@@ -779,7 +779,7 @@ public class Controler {
 
 	private final void makeIterationPath(final int iteration) {
 		if (!(new File(getIterationPath(iteration)).mkdir())) {
-			log.warn("Could not create iteration directory " + getIterationPath(iteration) + ".");
+			log.warn("Could not create iteration directory " + getIterationPath(iteration) + ". (Directory may already exist.)");
 		}
 	}
 
