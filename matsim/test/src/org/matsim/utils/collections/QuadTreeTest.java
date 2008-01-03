@@ -30,18 +30,17 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.geometry.shared.Coord;
 
 /**
- * Test for {@link org.matsim.utils.misc.QuadTree}.
+ * Test for {@link QuadTree}.
  *
  * @author mrieser
  */
 public class QuadTreeTest extends MatsimTestCase {
 
 	/**
-	 * @return A simple QuadTree with 6 entires for tests.
+	 * @return A simple QuadTree with 6 entries for tests.
 	 */
 	private QuadTree<String> getTestTree() {
 		QuadTree<String> qt = new QuadTree<String>(-50.0, -50.0, +150.0, +150.0);
@@ -57,7 +56,7 @@ public class QuadTreeTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Test {@link org.matsim.utils.misc.QuadTree#QuadTree(double, double, double, double)}.
+	 * Test {@link QuadTree#QuadTree(double, double, double, double)}.
 	 */
 	public void testConstructor() {
 		QuadTree<String> qt = new QuadTree<String>(-50.0, -40.0, +30.0, +20.0);
@@ -68,7 +67,7 @@ public class QuadTreeTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Test putting values into a QuadTree using {@link org.matsim.utils.misc.QuadTree#put(double, double, Object)}.
+	 * Test putting values into a QuadTree using {@link QuadTree#put(double, double, Object)}.
 	 */
 	public void testPut() {
 		QuadTree<String> qt = new QuadTree<String>(-50.0, -50.0, +150.0, +150.0);
@@ -90,8 +89,8 @@ public class QuadTreeTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Test getting values from a QuadTree using {@link org.matsim.utils.misc.QuadTree#get(double, double)}
-	 * and {@link org.matsim.utils.misc.QuadTree#get(double, double, double)}.
+	 * Test getting values from a QuadTree using {@link QuadTree#get(double, double)}
+	 * and {@link QuadTree#get(double, double, double)}.
 	 */
 	public void testGet() {
 		QuadTree<String> qt = getTestTree();
@@ -159,7 +158,7 @@ public class QuadTreeTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Test removing values from a QuadTree using {@link org.matsim.utils.misc.QuadTree#remove(double, double, Object)}.
+	 * Test removing values from a QuadTree using {@link QuadTree#remove(double, double, Object)}.
 	 */
 	public void testRemove() {
 		QuadTree<String> qt = getTestTree();
@@ -192,7 +191,7 @@ public class QuadTreeTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Test {@link org.matsim.utils.misc.QuadTree#clear()}.
+	 * Test {@link QuadTree#clear()}.
 	 */
 	public void testClear() {
 		QuadTree<String> qt = getTestTree();
@@ -204,7 +203,7 @@ public class QuadTreeTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Test {@link org.matsim.utils.misc.QuadTree#values()}.
+	 * Test {@link QuadTree#values()}.
 	 */
 	public void testValues() {
 		QuadTree<String> qt = getTestTree();
@@ -231,17 +230,14 @@ public class QuadTreeTest extends MatsimTestCase {
 		// test the iterator
 		Iterator<String> iter = qt.values().iterator();
 		iter.next();
-		boolean exception = false;
 		try {
 			iter.remove();
-		} catch (UnsupportedOperationException e) {
-			exception = true;
-		}
-		assertTrue("Expected UnsupportedOperationException when calling iter.remove()", exception);
+			fail("expected UnsupportedOperationException, got none.");
+		} catch (UnsupportedOperationException expected) {}
 	}
 
 	/**
-	 * Test {@link org.matsim.utils.misc.QuadTree#execute(double, double, double, double, org.matsim.utils.misc.QuadTree.Executor)}.
+	 * Test {@link QuadTree#execute(double, double, double, double, QuadTree.Executor)}.
 	 */
 	public void testExecute() {
 		QuadTree<String> qt = getTestTree();
@@ -282,7 +278,7 @@ public class QuadTreeTest extends MatsimTestCase {
 			out.writeObject(qt);
 			out.close();
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			throw new RuntimeException(ex);
 		}
 
 		FileInputStream fis = null;
@@ -295,9 +291,9 @@ public class QuadTreeTest extends MatsimTestCase {
 			assertEquals(qt.size(), qt2.size());
 			valuesTester(qt2.size(), qt2.values());
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			throw new RuntimeException(ex);
 		} catch (ClassNotFoundException ex) {
-			ex.printStackTrace();
+			throw new RuntimeException(ex);
 		}
 	}
 
