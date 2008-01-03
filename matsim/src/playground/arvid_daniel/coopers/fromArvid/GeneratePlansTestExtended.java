@@ -1,0 +1,222 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * GeneratePlansTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.arvid_daniel.coopers.fromArvid;
+
+import java.util.Random;
+
+import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Act;
+import org.matsim.plans.Leg;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
+import org.matsim.plans.PlansWriter;
+import org.matsim.plans.Route;
+import org.matsim.router.Dijkstra;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+
+public class GeneratePlansTestExtended {
+
+	/**
+	 * Generating an extra stream of traffic in a certain area of the Berlin network
+	 *
+	 * @param plans2
+	 * @param net
+	 */
+
+	public static void createCOOPERSSpecificVehicles(Plans plans2, NetworkLayer net) {
+		// Erzeuge einen strom von vehicles, die die autobahn runter wollen
+//		Link startLink1 = net.getLinks().get("7829");
+//		Link startLink2 = net.getLinks().get("8453");
+//		Link destLink = net.getLinks().get("8380");
+//		Link startLink1 = net.getLinks().get("0");
+		Link startLink1 = net.getLink("0");
+//		Link startLink2 = net.getLinks().get("2");
+//		Link startLink8 = net.getLinks().get("8");
+//		Link destLink = net.getLinks().get("2");
+		Link destLink = net.getLink("2");
+		Random rnd = new Random(4711);
+		String routeNodesMain = "1 2 10 11 12 13 14 3 4";
+		String routeNodesAlt = "1 2 20 21 3 4";
+
+		Gbl.getConfig().setParam("planCalcScore", "traveling", "-3600");
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		final Dijkstra dijkstra = new Dijkstra(net, timeCostCalc, timeCostCalc);
+
+
+		for (int i = 0; i< 1999; i++) {
+			double earliestStartTime = 7*3600;
+
+			String ID = Integer.toString(i);
+			Person person = new Person(ID, null, "33",null, null,"yes");
+			Plan plan = new Plan("0","0",person);
+			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.0*3600);
+			double arrivalTime = earliestStartTime + 7.*3600;
+//			Link startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2;
+			Act actstart = new Act("h", 0,0, startLink1, 0, endTime, endTime, false);
+			Act actEnd = new Act("w", 0,0, destLink, arrivalTime + i, arrivalTime + i + 3*3600, 3*3600, false);
+
+			Leg leg = new Leg(0, "car", endTime, 1.0, (arrivalTime + i));
+//			org.matsim.demandmodeling.plans.Route route = dijkstra.calcLeastCostPath(startLink1.getToNode(), destLink.getFromNode(), endTime);
+//			if (route == null) throw new RuntimeException("No route found from start node to end node");
+
+			Route route = new Route();
+			route.setRoute(routeNodesMain);
+			leg.setRoute(route);
+			plan.addAct(actstart);
+			plan.addLeg(leg);
+			plan.addAct(actEnd);
+			person.addPlan(plan);
+			person.setSelectedPlan(plan);
+
+			try {
+				plans2.addPerson(person);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		//creating agents on route 2
+		for (int i = 2000; i< 3999; i++) {
+			double earliestStartTime = 7*3600;
+
+			String ID = Integer.toString(i);
+			Person person = new Person(ID, null, "33",null, null,"yes");
+			Plan plan = new Plan("0","0",person);
+			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
+			double arrivalTime = earliestStartTime + 7.*3600;
+			Act actstart = new Act("h", 0,0, startLink1, 0, endTime, endTime, false);
+			Act actEnd = new Act("w", 0,0, destLink, arrivalTime + i, arrivalTime + i + 3*3600, 3*3600, false);
+			Leg leg = new Leg(0, "car", endTime, 1.0, (arrivalTime + i));
+
+			Route route = new Route();
+			route.setRoute(routeNodesAlt);
+			leg.setRoute(route);
+			plan.addAct(actstart);
+			plan.addLeg(leg);
+			plan.addAct(actEnd);
+
+
+			person.addPlan(plan);
+			person.setSelectedPlan(plan);
+
+			try {
+				plans2.addPerson(person);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		//creating agents on route 1, unevenly
+		for (int i = 4000; i< 5999; i++) {
+			double earliestStartTime = 7*3600;
+
+			String ID = Integer.toString(i);
+			Person person = new Person(ID, null, "33",null, null,"yes");
+			Plan plan = new Plan("0","0",person);
+			
+			int charge = rnd.nextInt(11);
+			double endTime = earliestStartTime + (charge + 1) * 10 * 60 + (int)(rnd.nextDouble() * 5 * 60);
+
+			double arrivalTime = earliestStartTime + 7.*3600;
+			Act actstart = new Act("h", 0,0, startLink1, 0, endTime, endTime, false);
+			Act actEnd = new Act("w", 0,0, destLink, arrivalTime + i, arrivalTime + i + 3*3600, 3*3600, false);
+			Leg leg = new Leg(0, "car", endTime, 1.0, (arrivalTime + i));
+
+			Route route = new Route();
+			route.setRoute(routeNodesMain);
+			leg.setRoute(route);
+			plan.addAct(actstart);
+			plan.addLeg(leg);
+			plan.addAct(actEnd);
+
+
+			person.addPlan(plan);
+			person.setSelectedPlan(plan);
+
+			try {
+				plans2.addPerson(person);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		//creating agents on route 2, unevenly
+		for (int i = 6000; i< 7999; i++) {
+			double earliestStartTime = 7*3600;
+
+			String ID = Integer.toString(i);
+			Person person = new Person(ID, null, "33",null, null,"yes");
+			Plan plan = new Plan("0","0",person);
+			
+			int charge = rnd.nextInt(1);
+			double endTime = earliestStartTime + 5 *60  + (charge + 1) * 10 *60 + (int)(rnd.nextDouble() * 5 *60);
+			
+			double arrivalTime = earliestStartTime + 7.*3600;
+			Act actstart = new Act("h", 0,0, startLink1, 0, endTime, endTime, false);
+			Act actEnd = new Act("w", 0,0, destLink, arrivalTime + i, arrivalTime + i + 3*3600, 3*3600, false);
+			Leg leg = new Leg(0, "car", endTime, 1.0, (arrivalTime + i));
+
+			Route route = new Route();
+			route.setRoute(routeNodesAlt);
+			leg.setRoute(route);
+			plan.addAct(actstart);
+			plan.addLeg(leg);
+			plan.addAct(actEnd);
+
+
+			person.addPlan(plan);
+			person.setSelectedPlan(plan);
+
+			try {
+				plans2.addPerson(person);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		PlansWriter plansWriter = new PlansWriter(plans2, "../studies/arvidDaniel/input/testExtended/plansDistribution.xml", "v4");
+//		plansWriter.setUseCompression(true);
+		plansWriter.write();
+	}
+
+	public static void main(String [] args)  {
+		String networkFile = "../studies/arvidDaniel/input/testExtended/testNetExtended2.xml";
+		String plansFile =   "../studies/arvidDaniel/input/testExtended/plansDistribution.xml";
+		Gbl.createConfig(null);
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(networkFile);
+		Gbl.getWorld().setNetworkLayer(network);
+
+		Plans population = new Plans(Plans.NO_STREAMING);
+		// new MatsimPlansReader(population).readFile(plansFile);
+
+		GeneratePlansTestExtended.createCOOPERSSpecificVehicles(population, network);
+	}
+
+
+}
