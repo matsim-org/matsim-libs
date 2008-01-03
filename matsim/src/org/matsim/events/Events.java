@@ -105,7 +105,7 @@ public class Events {
 		return null;
 	}
 
-	public final void processEvent(final BasicEvent event) {
+	public void processEvent(final BasicEvent event) {
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
 			this.nextCounterMsg *= 2;
@@ -188,7 +188,7 @@ public class Events {
 		}
 	}
 
-	public void computeEvent(final BasicEvent event) {
+	private void computeEvent(final BasicEvent event) {
 		for (HandlerInfo info : getHandlersForClass(event.getClass())) {
 			if (callHandlerFast(info.eventClass, event, info.eventHandler)) {
 				continue;
