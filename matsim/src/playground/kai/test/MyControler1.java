@@ -46,6 +46,7 @@ package playground.kai.test;
 
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.vis.netvis.NetVis;
 
 
 public class MyControler1 extends Controler {
@@ -54,7 +55,8 @@ public class MyControler1 extends Controler {
 
 		if ( args.length==0 ) {
 //			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});
-			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
+//			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
+			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
 		} else {
 			Gbl.createConfig(args) ;
 		}
@@ -64,9 +66,9 @@ public class MyControler1 extends Controler {
 
 		controler.run(null);
 
-//		// Visualize
-//		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
-//		NetVis.main(visargs);
+		// Visualize
+		String[] visargs = {"./output/equil/ITERS/it.100/Snapshot"};
+		NetVis.main(visargs);
 
 	}
 
