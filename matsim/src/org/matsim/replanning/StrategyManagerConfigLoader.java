@@ -29,6 +29,7 @@ import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.replanning.modules.TimeAllocationMutator;
 import org.matsim.replanning.selectors.BestPlanSelector;
+import org.matsim.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.replanning.selectors.KeepSelected;
 import org.matsim.replanning.selectors.PathSizeLogitSelector;
@@ -115,6 +116,8 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new BestPlanSelector());
 			} else if (classname.equals("SelectExpBeta")) {
 				strategy = new PlanStrategy(new ExpBetaPlanSelector());
+			} else if (classname.equals("ChangeExpBeta")) {
+				strategy = new PlanStrategy(new ExpBetaPlanChanger());
 			} else if (classname.equals("SelectRandom")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 			} else if (classname.equals("SelectPathSizeLogit")) {
