@@ -154,7 +154,7 @@ public class QueueLink extends Link {
 		 */
 		if (this.storageCapacity < this.freeTravelDuration * this.simulatedFlowCapacity) {
 			if ( spaceCapWarningCount <=10 ) {
-				log.warn("Link " + this.id + " too small: enlarge spaceCap");
+				log.warn("Link " + this.id + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
 				if ( spaceCapWarningCount == 10 ) {
 					log.warn("Additional warnings of this type are suppressed.");
 				}
