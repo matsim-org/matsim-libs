@@ -76,6 +76,12 @@ public class QueueNetworkLayer extends NetworkLayer {
 	}
 
 	public void beforeSim() {
+		
+		// if simNodesArrayCache was invalidated before, it needs to be reinitialized 
+		if (this.simNodesArrayCache == null) {
+			this.simNodesArrayCache = new QueueNode[0];
+		}
+		
 		this.simNodesArrayCache = getNodes().values().toArray(this.simNodesArrayCache);
 
 		this.simLinksArray.clear();
@@ -224,7 +230,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 		 * TODO [MR] separate QueueNetworkLayer from NetworkLayer
 		 * In that moment, it won't be possible anymore to remove nodes during a simulation.
 		 */
-		this.simNodesArrayCache = new QueueNode[0];
+		this.simNodesArrayCache = null;
 		return super.removeNode(node);
 	}
 
