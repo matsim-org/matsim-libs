@@ -33,7 +33,7 @@ import org.matsim.plans.Plan;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 import org.matsim.utils.vis.netvis.visNet.DisplayLink;
 
-class OTFAgentRenderer extends RendererA {
+public class OTFAgentRenderer extends RendererA {
 
 	private final boolean RANDOMIZE_LANES = true;
 
@@ -51,7 +51,7 @@ class OTFAgentRenderer extends RendererA {
 
 	private Plan plan = null;
 
-	OTFAgentRenderer(OTFVisNet network) {
+	public OTFAgentRenderer(OTFVisNet network) {
 		super();
 		this.network =  network;
 		this.laneWidth = DisplayLink.LANE_WIDTH ;

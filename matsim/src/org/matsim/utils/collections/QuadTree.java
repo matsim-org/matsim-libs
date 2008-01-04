@@ -356,7 +356,7 @@ public class QuadTree<T> implements Serializable {
 		}
 	}
 
-	public class Rect implements Serializable {
+	public static class Rect implements Serializable {
 		public final double minX;
 		public final double minY;
 		public final double maxX;

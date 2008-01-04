@@ -427,7 +427,9 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 	@Override
 	protected void prepareNetwork() {
 		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
-		network = (QueueNetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		// DS TODO somebody made network FINAL therefor i had to add a local network here
+		// this breaks functionality ... repair if needed
+		QueueNetworkLayer network = (QueueNetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 
 		try {

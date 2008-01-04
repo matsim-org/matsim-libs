@@ -41,6 +41,7 @@ import java.util.zip.GZIPOutputStream;
 
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Plan;
+import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
 
 import playground.david.vis.data.OTFNetWriterFactory;
@@ -228,17 +229,26 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 	public void step() throws RemoteException {
 	}
 
-	public OTFServerQuad getQuad(OTFNetWriterFactory writers)
+	@Override
+	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers)
 			throws RemoteException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public byte[] getQuadConstStateBuffer() throws RemoteException {
+	@Override
+	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public byte[] getQuadDynStateBuffer() throws RemoteException {
+	@Override
+	public byte[] getQuadDynStateBuffer(String id, Rect bounds)
+			throws RemoteException {
+		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 
 }

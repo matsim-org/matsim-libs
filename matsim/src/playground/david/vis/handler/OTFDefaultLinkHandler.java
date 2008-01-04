@@ -29,7 +29,7 @@ public class OTFDefaultLinkHandler implements OTFDataQuad.Provider, OTFDataReade
 
 		@Override
 		public void writeDynData(DataOutputStream out) throws IOException {
-			out.writeFloat((float)src.getDisplayableSpaceCapValue());
+			out.writeFloat((float)src.getDisplayableTimeCapValue());
 			
 		}
 

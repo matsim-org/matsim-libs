@@ -45,7 +45,7 @@ import org.matsim.plans.Route;
 import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
-import sun.rmi.runtime.GetThreadPoolAction;
+//import sun.rmi.runtime.GetThreadPoolAction;
 
 /**
  * Just like ControlInputSB, this model checks if the agents before 

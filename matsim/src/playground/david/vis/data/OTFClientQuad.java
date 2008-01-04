@@ -17,6 +17,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	private final double maxEasting;
 	private final double minNorthing;
 	private final double maxNorthing;
+	private final String id;
 
 	static class CreateReceiverExecutor extends Executor<OTFDataReader> {
 		final OTFConnectionManager connect;
@@ -74,12 +75,13 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	public OTFClientQuad(double minX, double minY, double maxX, double maxY) {
+	public OTFClientQuad(String id, double minX, double minY, double maxX, double maxY) {
 		super(minX, minY, maxX, maxY);
 		this.minEasting = minX;
 		this.maxEasting = maxX;
 		this.minNorthing = minY;
 		this.maxNorthing = maxY;
+		this.id = id;
 	}
 
 	public void createReceiver(final OTFConnectionManager connect) {
@@ -96,7 +98,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	public void getData(OTFServerRemote host, boolean readConst)
 			throws RemoteException {
 		Gbl.startMeasurement();
-		byte[] bbyte = readConst ? host.getQuadConstStateBuffer():host.getQuadDynStateBuffer();
+		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, null);
 		System.out.println("get state time");
 		Gbl.printElapsedTime();
 

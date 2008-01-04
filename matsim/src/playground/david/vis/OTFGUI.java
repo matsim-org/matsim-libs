@@ -67,7 +67,7 @@ public class OTFGUI {
 		public void repaint();
 	}
 
-	class myNetVisScrollPane extends NetVisScrollPane implements NetVisResizable {
+	public static class myNetVisScrollPane extends NetVisScrollPane implements NetVisResizable {
 
 		private float scale = 1.f;
 		public myNetVisScrollPane(NetJComponent networkComponent) {

@@ -142,8 +142,8 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 		System.out.println("SERVER execute  == " + " = links sum " + (net.getLinks().values().size()) +"objects time");
 	}
 
-	public OTFClientQuad convertToClient(final OTFConnectionManager connect) {
-		final OTFClientQuad client = new OTFClientQuad(0.,0.,maxEasting - minEasting, maxNorthing - minNorthing);
+	public OTFClientQuad convertToClient(String id, final OTFConnectionManager connect) {
+		final OTFClientQuad client = new OTFClientQuad(id, 0.,0.,maxEasting - minEasting, maxNorthing - minNorthing);
 
 		Gbl.startMeasurement();
 		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
@@ -176,10 +176,9 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 
 	}
 
-	public void writeDynData(DataOutputStream out) {
+	public void writeDynData(QuadTree.Rect bounds, DataOutputStream out) {
 		Gbl.startMeasurement();
-		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
-				this.new WriteDataExecutor(out,false));
+		int colls = this.execute(bounds, this.new WriteDataExecutor(out,false));
 		System.out.println("execute half  == " + colls + " objects time");
 		Gbl.printElapsedTime();
 	}

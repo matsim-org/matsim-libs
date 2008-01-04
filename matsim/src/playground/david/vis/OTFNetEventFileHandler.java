@@ -42,6 +42,7 @@ import org.matsim.mobsim.snapshots.SnapshotWriterI;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.Plan;
 import org.matsim.run.Events2Snapshot;
+import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.world.World;
 
@@ -308,19 +309,25 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 		test.run(eventFile);
 	}
 
-	public OTFServerQuad getQuad(OTFNetWriterFactory writers)
+	@Override
+	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers)
 			throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public byte[] getQuadConstStateBuffer() throws RemoteException {
+	@Override
+	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public byte[] getQuadDynStateBuffer() throws RemoteException {
+	@Override
+	public byte[] getQuadDynStateBuffer(String id, Rect bounds)
+			throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 }
