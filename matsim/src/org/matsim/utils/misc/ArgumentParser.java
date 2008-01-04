@@ -64,7 +64,7 @@ public class ArgumentParser implements Iterable<String> {
 	 *
 	 * @param args The arguments to parse.
 	 */
-	public ArgumentParser(String[] args) {
+	public ArgumentParser(final String[] args) {
 		this(args, false);
 	}
 
@@ -76,7 +76,7 @@ public class ArgumentParser implements Iterable<String> {
 	 * @param enableShortOptions whether options with a single hyphen should be
 	 * 		treated as short options (only one character long) or not.
 	 */
-	public ArgumentParser(String[] args, boolean enableShortOptions) {
+	public ArgumentParser(final String[] args, final boolean enableShortOptions) {
 		this.args = new ArrayList<String>();
 		this.enableShortOptions = enableShortOptions;
 		parse(args);
@@ -91,7 +91,7 @@ public class ArgumentParser implements Iterable<String> {
 	}
 
 
-	private void parse(String[] args) {
+	private void parse(final String[] args) {
 		if (this.enableShortOptions) {
 			for (String arg : args) {
 				if (arg.startsWith("--")) {
@@ -105,7 +105,7 @@ public class ArgumentParser implements Iterable<String> {
 		} else {
 			for (String arg : args) {
 				if (arg.startsWith("-")) {
-					parseArgument(arg);
+					parseOption(arg);
 				} else {
 					this.args.add(arg);
 				}
@@ -113,7 +113,7 @@ public class ArgumentParser implements Iterable<String> {
 		}
 	}
 
-	private void parseShortOption(String arg) {
+	private void parseShortOption(final String arg) {
 		if (arg.length() == 0) {
 			this.args.add("-");
 			return;
@@ -139,7 +139,7 @@ public class ArgumentParser implements Iterable<String> {
 		}
 	}
 
-	private void parseLongOption(String arg) {
+	private void parseLongOption(final String arg) {
 		StringBuilder argname = new StringBuilder("--");
 		for (int i = 0; i < arg.length(); i++) {
 			char ch = arg.charAt(i);
@@ -164,34 +164,29 @@ public class ArgumentParser implements Iterable<String> {
 		this.args.add(argname.toString());
 	}
 
-	private void parseArgument(String arg) {
+	private void parseOption(final String arg) {
 		StringBuilder argname = new StringBuilder();
-		for (int i = 0; i < arg.length(); i++) {
+		argname.append('-');  // every option starts with '-'
+		for (int i = 1; i < arg.length(); i++) { // options always start with '-', so we can start at char 1
 			char ch = arg.charAt(i);
 			if (ch == '=') {
-				if ((i == 0) && (arg.length() == 1)) {
-					// '=' is the only char
-					this.args.add("=");
-					return;
-				} else if (i == 0) {
-					// arg is a string in the form of '=*', interpret it as a string argument
-					this.args.add(arg);
-					return;
-				} else if (argname.toString().equals("-")) {
+				if (argname.toString().equals("-")) {
 					// arg is a string in the form of '-=*', interpret it as a strig argument
 					this.args.add(arg);
-				} else if (argname.toString().equals("--")) {
-					// arg is a string in the form of '--=*', interpret it as a strig argument
-					this.args.add(arg);
-				} else {
-					// it seems there are already some real characters before '=' that make a correct argument
-					this.args.add(argname.toString());
-					this.args.add(arg.substring(i + 1));
 					return;
 				}
-			} else {
-				argname.append(ch);
+				if (argname.toString().equals("--")) {
+					// arg is a string in the form of '--=*', interpret it as a strig argument
+					this.args.add(arg);
+					return;
+				}
+				// it seems there are already some real characters before '=' that make a correct argument
+				this.args.add(argname.toString());
+				this.args.add(arg.substring(i + 1));
+				return;
 			}
+			// else...
+			argname.append(ch);
 		}
 		this.args.add(argname.toString());
 	}

@@ -53,7 +53,7 @@ public class ArgumentParserTest extends MatsimTestCase {
 	 */
 	public void testShortOptions() {
 		ArgumentParser parser = new ArgumentParser(
-				new String[] {"-a", "-b", "-cd", "-efg", "-h=j", "-kl=m", "-nop=qrs", "-tu=vw xyz", "-", "-=", "-1", "-2=", "-=3", "-=4=5"}, true);
+				new String[] {"-a", "-b", "-cd", "-efg", "-h=j", "-kl=m", "-nop=qrs", "-tu=vw xyz", "=", "-", "-=", "-1", "-2=", "-=3", "-=4=5"}, true);
 		Iterator<String> iter = parser.iterator();
 		assertEquals("-a", iter.next());
 		assertEquals("-b", iter.next());
@@ -74,6 +74,7 @@ public class ArgumentParserTest extends MatsimTestCase {
 		assertEquals("-t", iter.next());
 		assertEquals("-u", iter.next());
 		assertEquals("vw xyz", iter.next());
+		assertEquals("=", iter.next());
 		assertEquals("-", iter.next());
 		assertEquals("-=", iter.next());
 		assertEquals("-1", iter.next());
@@ -90,7 +91,7 @@ public class ArgumentParserTest extends MatsimTestCase {
 	 */
 	public void testLongOptions() {
 		ArgumentParser parser = new ArgumentParser(
-				new String[] {"--a", "--bc", "--def=ghj", "--kl=mn op", "--qr=", "--=", "--=st", "--=uv=wxy z"}, true);
+				new String[] {"--a", "--bc", "--def=ghj", "--kl=mn op", "=", "--qr=", "--=", "--=st", "--=uv=wxy z"}, true);
 		Iterator<String> iter = parser.iterator();
 		assertEquals("--a", iter.next());
 		assertEquals("--bc", iter.next());
@@ -98,6 +99,7 @@ public class ArgumentParserTest extends MatsimTestCase {
 		assertEquals("ghj", iter.next());
 		assertEquals("--kl", iter.next());
 		assertEquals("mn op", iter.next());
+		assertEquals("=", iter.next());
 		assertEquals("--qr", iter.next());
 		assertEquals("", iter.next()); // empty argument after '--qr='
 		assertEquals("--=", iter.next());
@@ -132,6 +134,21 @@ public class ArgumentParserTest extends MatsimTestCase {
 		assertEquals("file1", iter.next());
 		assertEquals("file2", iter.next());
 		assertEquals("--verbose", iter.next());
+		assertIteratorAtEnd(iter);
+
+		// test special cases
+		parser = new ArgumentParser(new String[] {"-xcf", "=", "=a", "=ab", "-=", "-=a", "--=", "--=a", "--a=b"}, false);
+		iter = parser.iterator();
+		assertEquals("-xcf", iter.next());
+		assertEquals("=", iter.next());
+		assertEquals("=a", iter.next());
+		assertEquals("=ab", iter.next());
+		assertEquals("-=", iter.next());
+		assertEquals("-=a", iter.next());
+		assertEquals("--=", iter.next());
+		assertEquals("--=a", iter.next());
+		assertEquals("--a", iter.next());
+		assertEquals("b", iter.next());
 		assertIteratorAtEnd(iter);
 	}
 
