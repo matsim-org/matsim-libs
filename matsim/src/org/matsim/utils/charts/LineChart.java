@@ -22,7 +22,6 @@ package org.matsim.utils.charts;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -35,9 +34,8 @@ import org.jfree.data.category.DefaultCategoryDataset;
  */
 public class LineChart extends ChartUtil {
 
-	final String[] categories;
-	final DefaultCategoryDataset dataset;
-	final Plot plot;
+	private final String[] categories;
+	private final DefaultCategoryDataset dataset;
 
 	/**
 	 * Creates a new BarChart with default category-labels (numbered from 1 to the number of categories).
@@ -63,7 +61,6 @@ public class LineChart extends ChartUtil {
 		super(title, xAxisLabel, yAxisLabel);
 		this.dataset = new DefaultCategoryDataset();
 		this.chart = createChart(title, xAxisLabel, yAxisLabel, this.dataset);
-		this.plot = this.chart.getCategoryPlot();
 		this.categories = categories.clone();
 		addDefaultFormatting();
 	}

@@ -33,7 +33,7 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class XYLineChart extends ChartUtil {
 
-	final XYSeriesCollection dataset;
+	private final XYSeriesCollection dataset;
 
 	public XYLineChart(final String title, final String xAxisLabel, final String yAxisLabel) {
 		super(title, xAxisLabel, yAxisLabel);
