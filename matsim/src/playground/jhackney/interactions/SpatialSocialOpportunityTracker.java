@@ -42,10 +42,14 @@ public class SpatialSocialOpportunityTracker implements SocializingOpportunityGe
     // WHO was there and WHEN and WHERE it was.
     // This object is called a socializing opportunity
     // Associate the activity (-->facility) with the 
-    // socializing opportunity
+    //  socializing opportunity.
+    // Agents need to be able to find the socializing opportunity associated
+    //  with each of their Acts: person.map.dates gives the socializingopp's;
     
-    public Collection<SocializingOpportunity>generate(Plans plans) {
+    public Collection<SocializingOpportunity> generate(Plans plans) {
 	HashMap<Activity, SocializingOpportunity> events = new HashMap<Activity, SocializingOpportunity>();
+	SocializingOpportunity event = null;
+	
 	for( Person person : plans.getPersons().values() ){
 	    Plan plan = person.getSelectedPlan();
 	    ActIterator it = plan.getIteratorAct();
@@ -57,15 +61,15 @@ public class SpatialSocialOpportunityTracker implements SocializingOpportunityGe
 		if( myActivity == null ){
 //		    System.out.println(" Act"+act.getLinkId()+" "+act.getType()+" no activity");
 		    continue;}
-		SocializingOpportunity event = events.get(myActivity);
+		event = events.get(myActivity);
 		if( event == null ){
 		    event = new SocializingOpportunity( myActivity );
 		    events.put( myActivity,	event );
 		}
 		event.addAttendee(person);
-
 	    }
-	}	
+	    person.getKnowledge().map.addDate(event);
+	}
 	return events.values();
     }
 }
