@@ -23,6 +23,7 @@ package playground.jhackney.knowrefac;
 
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.ArrayList;
 
 import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.facilities.Activity;
@@ -33,6 +34,8 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Plan;
 import org.matsim.world.Location;
+
+import playground.jhackney.interactions.SocializingOpportunity;
 /**
  *
  * @author fmarchal, jhackney
@@ -48,6 +51,7 @@ public class MentalMap {
 
 	private Hashtable<Act,Activity> mapActActivity = new Hashtable<Act,Activity>();
 	private Hashtable<Activity,Act> mapActivityAct = new Hashtable<Activity,Act>();
+	private ArrayList<SocializingOpportunity> dates = new ArrayList<SocializingOpportunity>();
 
 	private Knowledge knowledge = null;
 
@@ -71,8 +75,10 @@ public class MentalMap {
 				type="leisure";
 			}else if(typechar=='s'){
 				type="shop";
-			}else
+			}else if(typechar=='e'){
 				type="education";
+			}else
+				Gbl.errorMsg("Activity type "+ typechar +" not known");
 			
 			myAct.setType(type);
 			Link myLink = myAct.getLink();
@@ -126,12 +132,17 @@ public class MentalMap {
 		return this.mapActivityAct.get(myActivity);
 	}
 	public Activity getActivity (Act myAct){
-
-//		System.out.println("Map Act:       "+myAct);
-//		System.out.println("Map Activity:  "+this.mapActActivity.get(myAct));
 		return this.mapActActivity.get(myAct);
 	}
 
+	public void addDate(SocializingOpportunity date){
+		dates.add(date);
+	}
+	
+	public void dropDate(SocializingOpportunity date){
+		dates.remove(date);
+	}
+	
 	public int getNumKnownFacilities(){
 		return knowledge.getActivities().size();
 	}
