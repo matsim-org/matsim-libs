@@ -193,6 +193,19 @@ public class Person extends BasicPerson<Plan>{
 	}
 
 	/**
+	 * Returns a random plan from the list of all plans this agent has.
+	 *
+	 * @return A random plan, or <code>null</code> if none such plan exists
+	 */
+	public Plan getRandomPlan() {
+		if (this.plans.size() == 0) {
+			return null;
+		}
+		int index = (int)(Gbl.random.nextDouble()*this.plans.size());
+		return this.plans.get(index);
+	}
+
+	/**
 	 * Returns a plan with undefined score, chosen randomly among all plans
 	 * with undefined score.
 	 *
