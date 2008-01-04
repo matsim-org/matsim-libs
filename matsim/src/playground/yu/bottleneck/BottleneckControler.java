@@ -23,24 +23,28 @@ package playground.yu.bottleneck;
 import org.matsim.controler.Controler;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.selectors.BestPlanSelector;
+import org.matsim.replanning.StrategyManagerConfigLoader;
+import org.matsim.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
-
 
 /**
  * Test of TimeWriter and BottleneckTravol
- *
+ * 
  * @author ychen
  */
 public class BottleneckControler extends Controler {
 
-	private final TimeWriter timeWriter;
-	private final BottleneckTraVol bTV;
+	private// final
+	TimeWriter timeWriter;
+	private// final
+	BottleneckTraVol bTV;
 
 	public BottleneckControler() {
 		super();
-		this.timeWriter = new TimeWriter(getOutputFilename("bottleneckTime.txt"));
-		this.bTV = new BottleneckTraVol(getOutputFilename("bottleneckTraVol.txt"));
+		this.timeWriter = new TimeWriter(
+				"./test/yu/Bottleneck/outputbottleneckTime.txt");
+		this.bTV = new BottleneckTraVol(
+				"./test/yu/Bottleneck/outputbottleneckTraVol.txt");
 	}
 
 	@Override
@@ -58,15 +62,18 @@ public class BottleneckControler extends Controler {
 		}
 	}
 
-	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
-		PlanStrategy strategy1 = new PlanStrategy(new RandomPlanSelector());
-		strategy1.addStrategyModule(new TimeAllocationMutatorBottleneck());
-		manager.addStrategy(strategy1, 0.10);
-		PlanStrategy strategy2 = new PlanStrategy(new BestPlanSelector());
-		manager.addStrategy(strategy2, 0.90);
+		manager.setMaxPlansPerAgent(5);
+		//		
+		PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanSelector());
+		manager.addStrategy(strategy1, 0.95);
 
+		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+		strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck());
+		manager.addStrategy(strategy2, 0.05);
+		// instead of StrategyManagerConfigLoader.load(this.config, manager,
+		// this.network, this.travelCostCalculator, this.travelTimeCalculator);
 		return manager;
 	}
 
