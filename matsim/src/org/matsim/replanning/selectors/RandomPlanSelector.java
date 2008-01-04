@@ -20,9 +20,6 @@
 
 package org.matsim.replanning.selectors;
 
-import java.util.List;
-
-import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 
@@ -38,11 +35,6 @@ public class RandomPlanSelector implements PlanSelectorI {
 	 * @return The newly selected plan for this person; <code>null</code> if the person has no plans.
 	 */
 	public Plan selectPlan(final Person person) {
-		List<Plan> plans = person.getPlans();
-		if (plans.size() == 0) {
-			return null;
-		}
-		int index = (int)(Gbl.random.nextDouble()*plans.size());
-		return plans.get(index);
+		return person.getRandomPlan();
 	}
 }
