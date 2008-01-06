@@ -21,6 +21,7 @@
 package playground.gregor.multipath;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -101,6 +102,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 
 
 	//TODO DEBUGGING STUFF
+	private  boolean debug = false;
 	protected DisplayNetStateWriter netStateWriter = null;
 	private int time;
 
@@ -114,8 +116,11 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 		this.comparator = new ComparatorNodeData(this.nodeData);
 
 		//TODO DEBUGGING STUFF
-		initSnapShotWriter();
-		this.time = 0;
+		if (debug){
+			initSnapShotWriter();
+			this.time = 0;			
+		}
+
 
 	}
 
@@ -181,32 +186,55 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 
 
 		//TODO DEBUG
-		try {
-			this.netStateWriter.dump(time++);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		((LinkPainter)this.netStateWriter).reset();
-		colorizeEfficientPaths(getData(toNode),getData(fromNode));
+		if (debug){
 			try {
 				this.netStateWriter.dump(time++);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			((LinkPainter)this.netStateWriter).reset();
+			colorizeEfficientPaths(getData(toNode),getData(fromNode));
+				try {
+					this.netStateWriter.dump(time++);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-		// TODO DEBUG
-	    try {
-	        this.netStateWriter.close();
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-	    this.netStateWriter = null;
+			// TODO DEBUG
+		    try {
+		        this.netStateWriter.close();
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		    }
+		    this.netStateWriter = null;
+			
+		}
 
 
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Node> routeNodes = new ArrayList<Node>();
+		NodeData tmpNode = getData(toNode);
+		double cost  = 0;
+		while (tmpNode.getId() != fromNode.getId()) {
+			routeNodes.add(0, tmpNode.getMatsimNode());
+			tmpNode = tmpNode.drawNode();
+
+		}
+		routeNodes.add(0, tmpNode.getMatsimNode()); // add the fromNode at the beginning of the list
+		
+		Route route = new Route();
+		route.setRoute(routeNodes, (int) (arrivalTime - startTime), cost);
+
+		if (this.doGatherInformation) {
+			this.avgTravelTime = (this.routeCnt * this.avgTravelTime + route
+					.getTravTime()) / (this.routeCnt + 1);
+			this.avgRouteLength = (this.routeCnt * this.avgRouteLength + route
+					.getDist()) / (this.routeCnt + 1);
+			this.routeCnt++;
+		}
+		return route;
+
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -248,7 +276,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	void initFromNode(final Node fromNode, final Node toNode, final double startTime,
 			final PriorityQueue<NodeData> pendingNodes) {
 		NodeData data = getData(fromNode);
-		data.resetVisited();
+		data.resetVisited(this.tracer);
 		data.visitInitNode(startTime, getIterationID());
 		pendingNodes.add(data);
 		this.visitNodeCount++;
@@ -275,7 +303,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	private void resetNetworkVisited() {
 		for (Node node : this.network.getNodes().values()) {
 			NodeData data = getData(node);
-			data.resetVisited();
+			data.resetVisited(this.tracer);
 		}
 	}
 
@@ -362,13 +390,16 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 		if (!toNodeData.isVisited(getIterationID())){
 
 
-			toNodeData.resetVisited();
+			toNodeData.resetVisited(this.tracer);
 			visitNode(toNodeData, pendingNodes, currTime + travelTime, currCost
 					+ travelCost, fromNodeData,trace);
 
 			//TODO DEBUG
-			((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.3);
-			((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+			if (debug){
+				((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.3);
+				((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));				
+			}
+
 
 			return true;
 		}
@@ -380,13 +411,17 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 					+ travelCost, fromNodeData,trace)) {
 
 			//TODO DEBUG
-			((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.5);
-			((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+			if (debug) {
+				((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.5);
+				((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+			}
 			} else {
 				//TODO DEBUG
-				System.err.println("doch passiert?");
-				((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.99);
-				((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+				if (debug){
+					System.err.println("doch passiert?");
+					((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.99);
+					((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+				}
 			}
 			return true;
 		}
@@ -395,12 +430,16 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 			//TODO do somthing ....
 			if (trackPath(toNodeData, pendingNodes, currTime + travelTime, currCost + travelCost, fromNodeData, trace, travelCost)){
 				//TODO DEBUG
-				((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.80);
-				((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getCurrShadow().getTrace()));
+				if (debug){
+					((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.80);
+					((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getCurrShadow().getTrace()));
+				}
 			} else {
 				//TODO DEBUG
-				((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.10);
-				((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()));
+				if (debug){
+					((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.10);
+					((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()));
+				}
 		}
 
 		}

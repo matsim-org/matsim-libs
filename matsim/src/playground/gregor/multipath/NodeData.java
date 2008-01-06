@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.network.Node;
 import org.matsim.utils.identifiers.IdI;
 
@@ -63,7 +64,7 @@ public class NodeData {
 
 	private double nodeProbDiff = 0;
 
-	public static BeelineDifferenceTracer tracer;
+	private BeelineDifferenceTracer tracer;
 
 	public NodeData(Node n, BeelineDifferenceTracer t) {
 		this.matSimNode = n;
@@ -141,16 +142,22 @@ public class NodeData {
 
 
 
-	public void resetVisited() {
-		this.iterationID = Integer.MIN_VALUE;
+	public void resetVisited(BeelineDifferenceTracer tracer) {
+		this.fromMatSimNodes.clear();
+		this.backwardNodes.clear();
+		this.shadowNodes.clear();
+		this.backLinks.clear();
+		this.forwardLinks.clear();
 		this.inPaths = 0;
 		this.backLinkWeightsSum = 0;
-//		prevNodes.clear();
+		this.tracer = tracer;
+		
+		
+		this.iterationID = Integer.MIN_VALUE;
 
 		this.cost = Double.MAX_VALUE;
-		// TODO Auto-generated method stub
-	}
 
+	}
 
 //	public void addForwardNodeData(NodeData node){
 //		this.forwardNodes.add(node);
@@ -261,9 +268,9 @@ public void addNodeProb(double prob) {
 			backLink.cost = cost;
 			backLink.linkCost = cost - fromNodeData.getCost();
 			backLink.fromNode = fromNodeData;
-			backLink.toNode = this;
+//			backLink.toNode = this;
 			backLink.trace = trace;
-			backLink.linkTime = time - fromNodeData.getTime();
+//			backLink.linkTime = time - fromNodeData.getTime();
 			fromNodeData.forwardLinks.add(backLink);
 			return false;
 		}
@@ -289,9 +296,9 @@ public void addNodeProb(double prob) {
 		backLink.cost = cost;
 		backLink.linkCost = cost - fromNodeData.getCost();
 		backLink.fromNode = fromNodeData;
-		backLink.toNode = this;
+//		backLink.toNode = this;
 		backLink.trace = trace;
-		backLink.linkTime = time - fromNodeData.getTime();
+//		backLink.linkTime = time - fromNodeData.getTime();
 		backLink.linkWeight = 0;
 		calcBackLinkProbs(backLink);
 		this.backLinks.add(backLink);
@@ -304,15 +311,28 @@ public void addNodeProb(double prob) {
 
 
 
-	public void createForwardLinks(NodeData toNodeData, double linkCost, double linkTime, double trace){
-		NodeDataLink forwardLink = new NodeDataLink();
-		forwardLink.linkCost = linkCost;
-		forwardLink.toNode = toNodeData;
-		forwardLink.linkTime = linkTime;
-		forwardLink.trace = trace;
-		this.forwardLinks.add(forwardLink);
-
-	}
+//	public void createForwardLinks(NodeData toNodeData, double linkCost, double linkTime, double trace){
+//		NodeDataLink forwardLink = new NodeDataLink();
+//		forwardLink.linkCost = linkCost;
+//		forwardLink.toNode = toNodeData;
+//		forwardLink.linkTime = linkTime;
+//		forwardLink.trace = trace;
+//		this.forwardLinks.add(forwardLink);
+//
+//	}
+	
+	
+	public NodeData drawNode(){
+		double selnum = this.backLinkWeightsSum * Gbl.random.nextDouble();
+		for (NodeDataLink link : this.backLinks){
+			selnum -= link.linkWeight;
+			if (selnum <= 0) {
+//				cost += link.linkCost;
+				return link.fromNode;
+			}
+		}
+		return null;
+	}	
 
 	private boolean checkTrace(double trace, double cost) {
 		for (NodeDataLink link : this.backLinks){
