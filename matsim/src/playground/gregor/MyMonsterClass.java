@@ -22,7 +22,11 @@ package playground.gregor;
 
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -610,6 +614,72 @@ public class MyMonsterClass {
 
 	}
 
+	public static void planMinMax(){
+		String plans = "/home/laemmel/workspace/runs/run301/run/output/ITERS/it.100/100.plans.xml.gz";
+		
+		String configFile = "./configs/evacuationConf.xml";
+		String net = "./networks/padang_net_evac.xml";
+		World world = Gbl.getWorld();
+		Config config = Gbl.createConfig(new String[] {configFile});
+
+
+		System.out.println("reading old network xml file... ");
+		QueueNetworkLayer network = new QueueNetworkLayer();
+		new MatsimNetworkReader(network).readFile(net);
+		world.setNetworkLayer(network);
+		System.out.println("done. ");
+
+
+		Plans population = new Plans(Plans.NO_STREAMING);
+
+		System.out.println("reading plans xml file... ");
+		PlansReaderI plansReader = new MatsimPlansReader(population);
+		plansReader.readFile(plans);
+		population.printPlansCount();
+
+		world.setPopulation(population);
+	
+		System.out.println("done. ");
+		
+		Writer wr = null;
+		try {
+			wr = new FileWriter(new File("scores.txt"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		BufferedWriter out = new BufferedWriter(wr);
+		
+		
+
+		
+		
+		
+		for (Person pers : population.getPersons().values()){
+			double min = Double.POSITIVE_INFINITY;
+			double max = Double.NEGATIVE_INFINITY;
+			
+			for (Plan plan : pers.getPlans()){
+				if (plan.getScore() < min) min = plan.getScore();
+				if (plan.getScore() > max) max = plan.getScore();
+			}
+			try {
+				out.write(min + " " + max + "\n");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}
+		try {
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// maps agents from one network to an other - based on their
 	// rondomized xy coords
@@ -845,7 +915,8 @@ public class MyMonsterClass {
 
 //		asciiNetParser();
 		
-		plansReduction();
+//		plansReduction();
+		planMinMax();
 	}
 
 
