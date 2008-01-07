@@ -257,19 +257,17 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
 
-		if (openingTime >= 0 && closingTime >= 0) {
-			if ((openingTime > departureTime) || (closingTime < arrivalTime)) {
-				// agent could not perform action
-				activityStart = departureTime;
-				activityEnd = departureTime;
-			}
-		} else {
-			if (openingTime >=  0 && arrivalTime < openingTime) {
-				activityStart = openingTime;
-			}
-			if (closingTime >= 0 && closingTime < departureTime) {
-				activityEnd = closingTime;
-			}
+		if (openingTime >=  0 && arrivalTime < openingTime) {
+			activityStart = openingTime;
+		}
+		if (closingTime >= 0 && closingTime < departureTime) {
+			activityEnd = closingTime;
+		}
+		if (openingTime >= 0 && closingTime >= 0
+				&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
+			// agent could not perform action
+			activityStart = departureTime;
+			activityEnd = departureTime;
 		}
 		double duration = activityEnd - activityStart;
 
