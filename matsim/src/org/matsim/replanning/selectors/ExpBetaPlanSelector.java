@@ -92,7 +92,7 @@ public class ExpBetaPlanSelector implements PlanSelectorI {
 	 */
 	private double calcPlanWeight(final Plan plan, final double maxScore) {
 		double weight = Math.exp(this.beta * (plan.getScore() - maxScore));
-		if (weight <= 0.0) weight = MIN_WEIGHT;
+		if (weight < MIN_WEIGHT) weight = MIN_WEIGHT;
 		return weight;
 	}
 }
