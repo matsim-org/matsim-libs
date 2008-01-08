@@ -58,9 +58,8 @@ public class PathSizeLogitSelector implements PlanSelectorI {
 	public Plan selectPlan(final Person person) {
 
 		// First check if there are any unscored plans
-		Plan selectedPlan = selectUnscoredPlan(person);
+		Plan selectedPlan = person.getRandomUnscoredPlan();
 		if (selectedPlan != null) return selectedPlan;
-
 		// Okay, no unscored plans...
 
 		// Build the weights of all plans
@@ -82,37 +81,6 @@ public class PathSizeLogitSelector implements PlanSelectorI {
 		}
 
 		// this case should never happen, except a person has no plans at all.
-		return null;
-	}
-
-	/**
-	 * Returns a plan with undefined score, chosen randomly among all plans
-	 * of the person with undefined score.
-	 *
-	 * @param person
-	 * @return a random plan with undefined score, or null if none such plan exists.
-	 */
-	private Plan selectUnscoredPlan(final Person person) {
-		int cntUnscored = 0;
-		for (Plan plan : person.getPlans()) {
-			if (Plan.isUndefinedScore(plan.getScore())) {
-				cntUnscored++;
-			}
-		}
-		if (cntUnscored > 0) {
-			// select one of the unscored plans
-			int idxUnscored = Gbl.random.nextInt(cntUnscored);
-			cntUnscored = 0;
-			for (Plan plan : person.getPlans()) {
-				if (Plan.isUndefinedScore(plan.getScore())) {
-					if (cntUnscored == idxUnscored) {
-						person.setSelectedPlan(plan);
-						return plan;
-					}
-					cntUnscored++;
-				}
-			}
-		}
 		return null;
 	}
 
