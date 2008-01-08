@@ -111,6 +111,11 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 		person.createPlan("-50.0", "no");
 		person.createPlan("+20.0", "no");
 		assertNotNull(selector.selectPlan(person));
+
+		// test with only one plan, but with NEGATIVE_INFINITY...
+		person = new Person(new Id(1), "m", 40, null, null, null);
+		person.createPlan(Double.toString(Double.NEGATIVE_INFINITY), "no");
+		assertNotNull(selector.selectPlan(person));
 	}
 
 	/**
