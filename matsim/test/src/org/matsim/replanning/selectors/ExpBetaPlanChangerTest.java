@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * BestPlanSelectorTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,21 +20,30 @@
 
 package org.matsim.replanning.selectors;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.apache.log4j.Logger;
+import org.matsim.config.Config;
 
-public class AllTests {
+/**
+ * Tests for {@link ExpBetaPlanSelector}.
+ *
+ * @author mrieser
+ */
+public class ExpBetaPlanChangerTest extends AbstractPlanSelectorTest {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.replanning.selectors");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(BestPlanSelectorTest.class);
-		suite.addTestSuite(ExpBetaPlanChangerTest.class);
-		suite.addTestSuite(ExpBetaPlanSelectorTest.class);
-		suite.addTestSuite(KeepSelectedTest.class);
-		suite.addTestSuite(RandomPlanSelectorTest.class);
-		//$JUnit-END$
-		return suite;
+	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
+	private Config config = null;
+
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
 	}
+
+	@Override
+	protected PlanSelectorI getPlanSelector() {
+		return new ExpBetaPlanChanger();
+	}
+
+	// TODO write specific tests for ExpBetaPlanChanger, see ExpBetaPlanSelectorTest for examples
 
 }
