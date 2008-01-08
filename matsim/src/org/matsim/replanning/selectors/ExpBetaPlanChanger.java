@@ -46,6 +46,11 @@ public class ExpBetaPlanChanger implements PlanSelectorI {
 		Plan currentPlan = person.getSelectedPlan();
 		Plan otherPlan = person.getRandomPlan();
 
+		if (currentPlan == null) {
+			// this case should only happen when the agent has no plans at all
+			return null;
+		}
+
 		double currentScore = currentPlan.getScore();
 		double otherScore = otherPlan.getScore();
 
