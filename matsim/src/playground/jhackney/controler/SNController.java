@@ -28,6 +28,7 @@ import java.util.Iterator;
 import org.matsim.controler.Controler;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
+import org.matsim.planomat.PlanomatControler;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -45,6 +46,7 @@ import playground.jhackney.interactions.NonSpatialInteractor;
 import playground.jhackney.interactions.SocializingOpportunity;
 import playground.jhackney.interactions.SpatialInteractor;
 import playground.jhackney.interactions.SpatialSocialOpportunityTracker;
+import playground.jhackney.io.JUNGPajekNetWriterWrapper;
 import playground.jhackney.io.PajekWriter1;
 import playground.jhackney.replanning.SNFacilitySwitcher;
 import playground.jhackney.scoring.SNScoringFunctionFactory01;
@@ -53,7 +55,9 @@ import playground.jhackney.statistics.SocialNetworkStatistics;
 
 public class SNController extends Controler {
 
+	protected boolean overwriteFiles = true;
 	private boolean SNFLAG = true;
+	private static final String DIRECTORY_SN = "socialnets";
 	public static String SOCNET_OUT_DIR = null;
 
 	SocialNetwork snet;
@@ -68,19 +72,18 @@ public class SNController extends Controler {
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
 	Collection<SocializingOpportunity> socialEvents=null;
 
-	boolean hackSocNets = true;
-
 //	Variables for allocating the spatial meetings among different types of activities
 	double fractionS[];
 	HashMap<String,Double> rndEncounterProbs= new HashMap<String,Double>();
 //	New variables for replanning
 	int replan_interval;
 
+	
 	@Override
 	protected void loadData() {
-
+System.out.println("what the fuck is this stupid yellow arrow!?!");
 //		loadWorld();
-		this.facilities = loadFacilities();
+		loadFacilities();
 		this.network = loadNetwork();
 		this.population = loadPopulation();
 		// Stitch together the world
@@ -144,7 +147,26 @@ public class SNController extends Controler {
 		System.out.println(" Writing out social network for iteration " + snIter + " ...");
 		pjw.write(snet.getLinks(), population, snIter);
 		System.out.println(" ... done");	
+	
+		if(iteration == maxIterations){
+		System.out.println("----------Closing social network statistic files and wrapping up ---------------");
+		snetstat.closeFiles();
+		snwrapup();
+		}
 	}
+	private void snwrapup(){
+		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(outputPath,snet, population);
+		pnww.write();
+
+		System.out.println(" Writing the statistics of the final social network to Output Directory...");
+
+		SocialNetworkStatistics snetstatFinal=new SocialNetworkStatistics();
+		snetstatFinal.openFiles(outputPath);
+		snetstatFinal.calculate(max_sn_iter, snet, population);
+
+		System.out.println(" ... done");
+		snetstatFinal.closeFiles();	
+	}		
 
 	@Override
 	protected void setupIteration(final int iteration) {
@@ -268,6 +290,13 @@ public class SNController extends Controler {
 
 //		Config config = Gbl.getConfig();
 
+		SOCNET_OUT_DIR = outputPath + "/"+DIRECTORY_SN;
+		File snDir = new File(SOCNET_OUT_DIR);
+		if (!snDir.mkdir() && !snDir.exists()) {
+			Gbl.errorMsg("The iterations directory " + (outputPath + "/" + DIRECTORY_SN) + " could not be created.");
+		}
+
+		
 		max_sn_iter = Integer.parseInt(config.socnetmodule().getNumIterations());
 		replan_interval = Integer.parseInt(config.socnetmodule().getRPInt());
 		String rndEncounterProbString = config.socnetmodule().getFacWt();
@@ -432,5 +461,12 @@ public class SNController extends Controler {
 	 */
 	public final static String getSNIterationPath(int iteration, int sn_iter) {
 		return outputPath + "/" + DIRECTORY_ITERS + "/"+sn_iter + "/it." + iteration;
+	}
+	
+	public static void main(String[] args) {
+		final Controler controler = new SNController();
+
+		controler.run(args);
+		System.exit(0);
 	}
 }
