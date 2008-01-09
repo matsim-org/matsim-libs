@@ -33,27 +33,25 @@ import org.matsim.utils.io.IOUtils;
  */
 public class VDSSignOutput {
 
-	private static final String fileSep = System.getProperty("file.separator");
-
 	private String spreadsheetFileName;
-	private double systemTime;
-	private double measuredTTMainRoute;
-	private double measuredTTAltRoute;
-	private double nashTime;
+//	private double systemTime;
+//	private double measuredTTMainRoute;
+//	private double measuredTTAltRoute;
+//	private double nashTime;
 
 	private VDSSignSpreadSheetWriter spreadSheetWriter;
 
-	public void setSpreadsheetFile(String filename) {
+	public void setSpreadsheetFile(final String filename) {
 		this.spreadsheetFileName = filename;
 	}
 
 
-	public void addMeasurement(double time, double measuredTTMainRoute,
-			double measuredTTAltRoute, double nashTime) {
-		this.systemTime = time;
-		this.measuredTTMainRoute = measuredTTMainRoute;
-		this.measuredTTAltRoute = measuredTTAltRoute;
-		this.nashTime = nashTime;
+	public void addMeasurement(final double time, final double measuredTTMainRoute,
+			final double measuredTTAltRoute, final double nashTime) {
+//		this.systemTime = time;
+//		this.measuredTTMainRoute = measuredTTMainRoute;
+//		this.measuredTTAltRoute = measuredTTAltRoute;
+//		this.nashTime = nashTime;
 		try {
 			this.spreadSheetWriter.writeLine(time, measuredTTMainRoute, measuredTTAltRoute, nashTime);
 		} catch (IOException e) {
@@ -76,7 +74,6 @@ public class VDSSignOutput {
 		this.spreadSheetWriter = new VDSSignSpreadSheetWriter(spreadFileWriter);
 		this.spreadSheetWriter.writeHeader();
 	}
-
 
 
 	public void close() {
