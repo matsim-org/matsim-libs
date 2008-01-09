@@ -134,10 +134,16 @@ public class Plan extends BasicPlan {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
-	// for in-between acts: removes the specified act, emptying the previous leg
-	//                      and removes the following leg.
-	// for first act: removes the act and the following leg
-	// for last act: removes the act and the previous leg
+	/**
+	 * Removes the specified act from the plan as well as a leg according to the following rule:
+	 * <ul>
+	 * <li>first act: removes the act and the following leg</li>
+	 * <li>last act: removes the act and the previous leg</li>
+	 * <li>in-between act: removes the act, removes the previous leg's route, and removes the following leg.
+	 * </ul>
+	 *
+	 * @param index
+	 */
 	public final void removeAct(final int index) {
 		if ((index % 2 != 0) || (index < 0) || (index > this.actsLegs.size()-1)) {
 			Gbl.warningMsg(this.getClass(),"removeAct(...)",this + "[index=" + index +" is wrong. nothing removed]");
@@ -171,9 +177,12 @@ public class Plan extends BasicPlan {
 		}
 	}
 
-	// removes the specified leg AND the following act, too!
-	// if the following act is not the last one, the following leg will be emptied
-	// to keep consistency (i.e. for the route)
+	/**
+	 * Removes the specified leg <b>and</b> the following act, too! If the following act is not the last one,
+	 * the following leg will be emptied to keep consistency (i.e. for the route)
+	 *
+	 * @param index
+	 */
 	public final void removeLeg(final int index) {
 		if ((index % 2 == 0) || (index < 1) || (index >= this.actsLegs.size()-1)) {
 			Gbl.warningMsg(this.getClass(),"removeLeg(...)",this + "[index=" + index +" is wrong. nothing removed]");
