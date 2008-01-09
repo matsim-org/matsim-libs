@@ -42,12 +42,12 @@ import org.matsim.world.World;
  */
 public class OnTheFlyQueueSim extends QueueSimulation{
 	protected OnTheFlyServer myOTFServer = null;
-	protected OTFNetFileHandler otfwriter  = null;
+	protected OTFQuadFileHandler otfwriter  = null;
 	
 	@Override
 	protected void prepareSim() {
-		//myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
-		//if (otfwriter == null) otfwriter = new OTFNetFileHandler(10,network,"output/OTFNetfileB2.mvi");
+		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
+		if (otfwriter == null) otfwriter = new OTFQuadFileHandler(10,network,"output/OTFQuadfile.mvi");
 		if(otfwriter != null) otfwriter.open();
 		
 		super.prepareSim();
@@ -82,7 +82,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 			Gbl.errorMsg("QueueSimulation.dumpWriters(): Unable to dump state.");
 		}
 		
-		//int status = myOTFServer.getStatus(time);
+		int status = myOTFServer.getStatus(time);
 		
 	}
 
@@ -135,10 +135,10 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		world.setEvents(events);
 		
 		config.setParam(Simulation.SIMULATION, Simulation.STARTTIME, "00:00:00");
-		config.setParam(Simulation.SIMULATION, Simulation.ENDTIME, "07:02:00");
+		config.setParam(Simulation.SIMULATION, Simulation.ENDTIME, "17:02:00");
 		config.network().setInputFile(netFileName);
 
-		config.simulation().setSnapshotFormat("netvis");
+		config.simulation().setSnapshotFormat("none");
 		config.simulation().setSnapshotPeriod(10);
 		config.simulation().setSnapshotFile("./output/remove_thisB");
 
@@ -156,7 +156,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	}
 	
 
-	public void setOtfwriter(OTFNetFileHandler otfwriter) {
+	public void setOtfwriter(OTFQuadFileHandler otfwriter) {
 		this.otfwriter = otfwriter;
 	}
 

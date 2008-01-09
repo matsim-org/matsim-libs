@@ -309,20 +309,21 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 		test.run(eventFile);
 	}
 
-	@Override
+	public boolean isLive() {
+		return false;
+	}
+
 	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers)
 			throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public byte[] getQuadDynStateBuffer(String id, Rect bounds)
 			throws RemoteException {
 		// TODO Auto-generated method stub

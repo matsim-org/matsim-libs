@@ -42,5 +42,6 @@ public interface OTFServerRemote extends Remote {
 	public Plan getAgentPlan(String id) throws RemoteException;
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException;
 	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException;
+	public boolean isLive() throws RemoteException;
 }
 

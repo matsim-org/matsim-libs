@@ -2,14 +2,14 @@ package playground.david.vis.data;
 
 import java.io.Serializable;
 
-import playground.david.vis.handler.OTFDefaultLinkHandler;
 import playground.david.vis.handler.OTFDefaultNodeHandler;
+import playground.david.vis.handler.OTFLinkAgentsHandler;
 
 public class OTFDefaultNetWriterFactoryImpl implements Serializable, OTFNetWriterFactory {
 
 	private  OTFWriterFactory agentWriterFac = null;
 	private  OTFWriterFactory nodeWriterFac = new OTFDefaultNodeHandler.Writer();
-	private  OTFWriterFactory linkWriterFac = new OTFDefaultLinkHandler.Writer();
+	private  OTFWriterFactory linkWriterFac = new OTFLinkAgentsHandler.Writer();
 	
 	public OTFDataWriter getAgentWriter() {
 		if(agentWriterFac != null) return agentWriterFac.getWriter();

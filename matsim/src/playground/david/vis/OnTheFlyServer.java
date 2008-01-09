@@ -62,7 +62,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 	private int localTime = 0;
 
 	private OTFVisNet net = null;
-	private Map<String, OTFServerQuad> quads = new HashMap<String, OTFServerQuad>();
+	private final Map<String, OTFServerQuad> quads = new HashMap<String, OTFServerQuad>();
 	
 	private OTFNetHandler handler = null;
 	private Plans pop = null;
@@ -231,6 +231,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 	public int getLocalTime() throws RemoteException {
 		return localTime;
+	}
+
+	public boolean isLive() {
+		return true;
 	}
 
 	public Plan getAgentPlan(String id) throws RemoteException {

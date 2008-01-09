@@ -98,7 +98,8 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	public void getData(OTFServerRemote host, boolean readConst)
 			throws RemoteException {
 		Gbl.startMeasurement();
-		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, null);
+		QuadTree.Rect bound = host.isLive() ? null : null;
+		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, bound);
 		System.out.println("get state time");
 		Gbl.printElapsedTime();
 
