@@ -20,17 +20,18 @@
 
 package playground.david;
 
+import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
-import org.matsim.mobsim.Simulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 
@@ -41,7 +42,7 @@ public class StandaloneSimTest {
 		String popFileName = "test/simple/equil_plans.xml";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(args);
+		final Config config = Gbl.createConfig(args);
 
 		World world = Gbl.getWorld();
 
@@ -59,12 +60,12 @@ public class StandaloneSimTest {
 		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
 		world.setEvents(events);
 
-		Gbl.getConfig().setParam(Simulation.SIMULATION, Simulation.STARTTIME, "05:55:00");
-		Gbl.getConfig().setParam(Simulation.SIMULATION, Simulation.ENDTIME, "08:00:00");
+		config.simulation().setStartTime(Time.parseTime("05:55:00"));
+		config.simulation().setEndTime(Time.parseTime("08:00:00"));
 
-		Gbl.getConfig().simulation().setStuckTime(10);
-		Gbl.getConfig().simulation().removeStuckVehicles(false);
-		Gbl.getConfig().simulation().removeStuckVehicles(true);
+		config.simulation().setStuckTime(10);
+		config.simulation().removeStuckVehicles(false);
+		config.simulation().removeStuckVehicles(true);
 
 //		QueueLink link = (QueueLink)network.getLinks().get("15");
 //		link.setCapacity()

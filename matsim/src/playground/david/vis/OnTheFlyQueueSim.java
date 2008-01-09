@@ -27,11 +27,11 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
-import org.matsim.mobsim.Simulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -43,20 +43,20 @@ import org.matsim.world.World;
 public class OnTheFlyQueueSim extends QueueSimulation{
 	protected OnTheFlyServer myOTFServer = null;
 	protected OTFQuadFileHandler otfwriter  = null;
-	
+
 	@Override
 	protected void prepareSim() {
 		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
 		if (otfwriter == null) otfwriter = new OTFQuadFileHandler(10,network,"output/OTFQuadfile.mvi");
 		if(otfwriter != null) otfwriter.open();
-		
+
 		super.prepareSim();
-		
+
 		// FOR TESTING ONLY!
 		//OnTheFlyClient client = new OnTheFlyClient();
 		//client.start();
 	}
-	
+
 	@Override
 	protected void cleanupSim() {
 		if(myOTFServer != null) myOTFServer.cleanup();
@@ -69,21 +69,21 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 	}
 
 	@Override
 	public void afterSimStep(double time) {
 		super.afterSimStep(time);
-		
+
 		try {
 			if(otfwriter != null) otfwriter.dump((int)time);
 		} catch (IOException e) {
 			Gbl.errorMsg("QueueSimulation.dumpWriters(): Unable to dump state.");
 		}
-		
+
 		int status = myOTFServer.getStatus(time);
-		
+
 	}
 
 	public OnTheFlyQueueSim(QueueNetworkLayer net, Plans plans, Events events) {
@@ -91,8 +91,8 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		// TODO Auto-generated constructor stub
 	}
 
-	
-	public static void main(String[] args) {		
+
+	public static void main(String[] args) {
 
 		String studiesRoot = "../";
 		String localDtdBase = "../matsimJ/dtd/";
@@ -124,7 +124,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		QueueNetworkLayer net = new QueueNetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
-		
+
 		Plans population = new Plans();
 		// Read plans file with special Reader Implementation
 		PlansReaderI plansReader = new MatsimPlansReader(population);
@@ -133,9 +133,9 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 		Events events = new Events() ;
 		world.setEvents(events);
-		
-		config.setParam(Simulation.SIMULATION, Simulation.STARTTIME, "00:00:00");
-		config.setParam(Simulation.SIMULATION, Simulation.ENDTIME, "17:02:00");
+
+		config.simulation().setStartTime(Time.parseTime("00:00:00"));
+		config.simulation().setEndTime(Time.parseTime("17:02:00"));
 		config.network().setInputFile(netFileName);
 
 		config.simulation().setSnapshotFormat("none");
@@ -145,20 +145,19 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 		OnTheFlyQueueSim sim = new OnTheFlyQueueSim(net, population, events);
 
-		
+
 		sim.run();
-		
-		Gbl.printElapsedTime();		
+
+		Gbl.printElapsedTime();
 
 		String[] visargs = {"./output/remove_thisB"};
 		NetVis.main(visargs);
 
 	}
-	
 
 	public void setOtfwriter(OTFQuadFileHandler otfwriter) {
 		this.otfwriter = otfwriter;
 	}
 
-	
+
 }

@@ -56,8 +56,16 @@ import org.matsim.utils.misc.Time;
 
 public class DistributedQueueSimulation extends QueueSimulation implements DistributedSimulationRemoteI {
 
-	private Object simStepStart = new Object();
-	private Object simStepDone = new Object();
+	private static final String SIMULATION = "simulation";
+	private static final String SHELLTYPE = "shellType";
+	private static final String JAVACLASSPATH = "classPath";
+	private static final String JVMOPTIONS = "JVMOptions";
+	private static final String CLIENTLIST = "clientList";
+	private static final String LOCALCONFIG = "localConfig";
+	private static final String LOCALCONFIGDTD = "localConfigDTD";
+
+	private final Object simStepStart = new Object();
+	private final Object simStepDone = new Object();
 	private int count = 0, accu = 0;
 	private static Map<Integer, Remote> partSims = new TreeMap<Integer, Remote>();
 	private static Map<Integer, String> partSimsIP = new TreeMap<Integer, String>();

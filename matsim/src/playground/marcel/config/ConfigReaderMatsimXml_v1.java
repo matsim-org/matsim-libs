@@ -26,7 +26,6 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.Simulation;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
@@ -262,9 +261,9 @@ public class ConfigReaderMatsimXml_v1 extends MatsimXmlParser {
 
 	private void handleSimulationParam(final String paramName, final String value) {
 		SimulationConfigGroup group = this.config.simulation();
-		if (Simulation.STARTTIME.equals(paramName)) {
+		if ("startTime".equals(paramName)) {
 			group.setStartTime(Time.parseTime(value));
-		} else if (Simulation.ENDTIME.equals(paramName)) {
+		} else if ("endTime".equals(paramName)) {
 			group.setEndTime(Time.parseTime(value));
 		} else if ("snapshotperiod".equals(paramName)) {
 			group.setSnapshotPeriod(Time.parseTime(value));

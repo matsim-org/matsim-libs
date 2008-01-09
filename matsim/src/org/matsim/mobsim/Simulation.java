@@ -28,32 +28,6 @@ import org.matsim.gbl.Gbl;
 // leaving only most rudimentary functionality in Simulator itself
 public class Simulation {
 
-	/* I started implementing the new config-classes. Instead of
-	 * <code>Gbl.getConfig().getParam(SIMULATION, ENDTIME);</code>
-	 * one can now access the elements directly with
-	 * <code>Gbl.getConfig().simulation().getEndTime();</code>.
-	 * This prevents the repeated conversation of the strings to
-	 * int/double/boolean etc. I commented out those constants that
-	 * are currently no longer used in the code, the others will
-	 * follow hopefully soon.   // mrieser, 03sept07
-	 */
-	public static final String SIMULATION = "simulation";
-	public static final String SNAPSHOTFORMAT = "snapshotFormat";
-	public static final String STARTTIME = "startTime";
-	public static final String ENDTIME = "endTime";
-//	public static final String SNAPSHOTPERIOD = "snapshotperiod";
-//	public static final String OUTFILE = "outputLanduseFile";
-	public static final String SHELLTYPE = "shellType";
-	public static final String JAVACLASSPATH = "classPath";
-	public static final String JVMOPTIONS = "JVMOptions";
-	public static final String CLIENTLIST = "clientList";
-	public static final String LOCALCONFIG = "localConfig";
-	public static final String LOCALCONFIGDTD = "localConfigDTD";
-//	public static final String FLOWCAPACITYFACTOR = "flowCapacityFactor";
-//	public static final String STORAGECAPACITYFACTOR = "storageCapacityFactor";
-//	public static final String STORAGECAPACITYCOMPENSATIONFACTOR = "storageCapacityCompensationFactor";
-//	public static final String STUCKTIME = "stuckTime";
-
 	protected Date starttime = new Date();
 
 	private static int living = 0;

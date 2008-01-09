@@ -24,9 +24,9 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.mobsim.Simulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.Plans;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
 /**
@@ -62,8 +62,8 @@ public class OnTheFlyQueueSimSWISS {
 		events = new Events() ;
 		world.setEvents(events);
 		
-		config.setParam(Simulation.SIMULATION, Simulation.STARTTIME, "00:00:00");
-		config.setParam(Simulation.SIMULATION, Simulation.ENDTIME, "00:00:01");
+		config.simulation().setStartTime(Time.parseTime("00:00:00"));
+		config.simulation().setEndTime(Time.parseTime("00:00:01"));
 
 		sim = new OnTheFlyQueueSim(net, population, events);
 		sim.setOtfwriter(new OTFQuadFileHandler(10,net,"OTFQuadfileSCHWEIZ2.vis.gz"));
