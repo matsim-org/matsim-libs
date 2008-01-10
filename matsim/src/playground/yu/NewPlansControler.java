@@ -62,12 +62,12 @@ import org.matsim.world.World;
 public class NewPlansControler {
 
 	public static void main(final String[] args) {
-		final String netFilename = "./input/equil/equil_net.xml";
-		final String plansFilename = "./input/equil/equil_plans.xml";
+		final String netFilename = "./test/yu/schweiz/input/ch.xml";
+		final String plansFilename = "./test/yu/schweiz/input/0.plans-hwh_with_routes_cleanedup.10pct.xml";
 
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(new String[] {"./test/yu/multipleIterations.xml"});
+		Config config = Gbl.createConfig(new String[] {"./test/yu/schweiz/multipleIterations.xml"});
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

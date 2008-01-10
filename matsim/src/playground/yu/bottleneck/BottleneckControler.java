@@ -23,7 +23,6 @@ package playground.yu.bottleneck;
 import org.matsim.controler.Controler;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.StrategyManagerConfigLoader;
 import org.matsim.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 
@@ -34,10 +33,8 @@ import org.matsim.replanning.selectors.RandomPlanSelector;
  */
 public class BottleneckControler extends Controler {
 
-	private// final
-	TimeWriter timeWriter;
-	private// final
-	BottleneckTraVol bTV;
+	private final TimeWriter timeWriter;
+	private final BottleneckTraVol bTV;
 
 	public BottleneckControler() {
 		super();

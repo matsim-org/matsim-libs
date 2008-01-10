@@ -53,8 +53,8 @@ public class PtCheck extends PersonAlgorithm {
 	public PtCheck(String fileName) throws IOException {
 		out = new DataOutputStream(new BufferedOutputStream(
 				new FileOutputStream(new File(fileName))));
-		System.out.println("  begins to write txt-file");
-		out.writeBytes("Iter\tPtRate[%]\tPtUser\n");
+		System.out.println("  begins to write txt-file about pt-rate");
+		out.writeBytes("Iter\tPtRate\tPtUser\n");
 		personCnt = 0;
 		ptUserCnt = 0;
 	}

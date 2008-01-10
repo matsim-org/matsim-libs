@@ -20,54 +20,46 @@
 
 package playground.yu;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.controler.Controler;
-import org.matsim.plans.Plans;
 
 /**
  * test of PtCheck
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewPtcheckControler extends Controler {
-	private PtCheck check;
 
-	/**
-	 * @throws IOException
-	 * 
+	/*
+	 * @Override // protected void finishIteration(final int iteration) { //
+	 * super.finishIteration(iteration); // try { // if (iteration ==
+	 * super.getMaximumIteration()) { // check.resetCnt(); //
+	 * check.run(population); // check.write(iteration); // check.writeEnd(); // } // }
+	 * catch (IOException e) { // e.printStackTrace(); // } // // }
 	 */
-	public NewPtcheckControler(String fileName) throws IOException {
-		super();
-		check = new PtCheck(fileName);
-	}
 
 	@Override
-	protected void finishIteration(final int iteration) {
-		super.finishIteration(iteration);
-		Plans population = this.population;
-		check.resetCnt();
-		check.run(population);
+	protected void loadData() {
+		super.loadData();
 		try {
-			if (iteration == 100) {
-				check.write(iteration);
-				check.writeEnd();
-			}
+			addControlerListener(new PtRate(population, Controler
+					.getOutputFilename("PtRate.txt"), getMaximumIteration(),
+					config.getParam("planCalcScore", "traveling"), config
+							.getParam("planCalcScore", "travelingPt")));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public static void main(final String[] args) {
 		final NewPtcheckControler controler;
-		try {
-			controler = new NewPtcheckControler(
-					"./test/yu/200PtRateCap100MU_Pt-4.txt");
-			controler.run(args);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		controler = new NewPtcheckControler();
+		controler.run(args);
 		System.exit(0);
 	}
 }
