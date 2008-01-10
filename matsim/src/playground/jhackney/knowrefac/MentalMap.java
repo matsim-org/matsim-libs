@@ -64,7 +64,7 @@ public class MentalMap {
 		ActIterator planActIter = myPlan.getIteratorAct();
 		while(planActIter.hasNext()){
 			Act myAct = (Act) planActIter.next();
-			
+
 			String type="none";
 			char typechar=myAct.getType().charAt(0);
 			if(typechar=='h'){
@@ -79,7 +79,7 @@ public class MentalMap {
 				type="education";
 			}else
 				Gbl.errorMsg("Activity type "+ typechar +" not known");
-			
+
 			myAct.setType(type);
 			Link myLink = myAct.getLink();
 			Activity myActivity = null;
@@ -87,29 +87,38 @@ public class MentalMap {
 			Collection<Location> locations = myLink.getUpMapping().values();
 			// These Objects are facilities by convention
 			Object[] facs =  locations.toArray();
-			for (int i = 0; i< facs.length;i++){
-				Facility f = (Facility) facs[i];
+
+			int i=0;
+			
+			// Assign a random activity (a facility) on the link to the act
+			// thus giving it in effect a street address
+			while(i < facs.length){
+				int k = Gbl.random.nextInt(facs.length);
+				Facility f = (Facility) facs[k];
 				myActivity = f.getActivity(type);
 				if(myActivity!=null){
 					learnActsActivities(myAct,myActivity);
-					break;// only assign the first matching Activity/Facility to the Act
 				}
-			}
-			if(myActivity==null){
-				Gbl.errorMsg("stop, no activity found for act "+myAct.getType()+" at "+myAct.getLink().getId());
+				if(myActivity==null){
+					//Gbl.errorMsg("stop, no activity found for act "+myAct.getType()+" at "+myAct.getLink().getId());
+					continue;
+				}
+				i++;
 			}
 		}
 	}
 
 	public void learnActsActivities (Act myact, Activity myactivity){
-		if (!mapActivityAct.contains(myactivity)){
-			//System.out.println("Update Act:       "+myact);
+//		if (!(mapActivityAct.containsKey(myactivity) || mapActivityAct.containsValue(myact))){
+		//if (!mapActivityAct.containsKey(myactivity)){
+			System.out.println("Update mapActivityAct:       "+myactivity.getFacility().getId()+" on link "+myact.getLinkId()+" with Act "+myact.getType());
 			mapActivityAct.put(myactivity,myact);
-		}
-		if( !mapActActivity.contains(myact)){
-			//System.out.println("Update Activity:  "+myactivity);
+		//}
+//		if( !(mapActActivity.containsKey(myact) || mapActActivity.containsValue(myactivity))){
+		//if( !mapActActivity.containsKey(myact)){
+			System.out.println("Update mapActActivity:       "+myact.getType()+" with Activity key: "+myactivity.getFacility().getId()+" on link "+myact.getLinkId());
 			mapActActivity.put(myact, myactivity);
-		}
+		//}
 
 		knowledge.addActivity(myactivity);
 
@@ -132,17 +141,28 @@ public class MentalMap {
 		return this.mapActivityAct.get(myActivity);
 	}
 	public Activity getActivity (Act myAct){
+		if(!this.mapActActivity.containsKey(myAct)){
+			System.out.println("MM "+myAct.getType()+" on link "+myAct.getLinkId()+" is not in the map");
+		}
+		System.out.println(this.mapActActivity.size());
+		Activity myActivity= (Activity) this.mapActActivity.get(myAct);
+		System.out.println("MM "+myAct.getType()+" on link "+myAct.getLinkId()+"\n"+myActivity);
 		return this.mapActActivity.get(myAct);
 	}
 
 	public void addDate(SocializingOpportunity date){
 		dates.add(date);
 	}
-	
+
 	public void dropDate(SocializingOpportunity date){
 		dates.remove(date);
 	}
-	
+
+	public void clearDates(){
+		dates.clear();
+	}
+
+
 	public int getNumKnownFacilities(){
 		return knowledge.getActivities().size();
 	}

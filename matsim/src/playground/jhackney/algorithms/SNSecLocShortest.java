@@ -87,7 +87,7 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 
 //		Figure out if the agent has knowledge about other facilities of this kind
 		Knowledge k = person.getKnowledge();
-
+System.out.println("SNSLS Person "+person.getId()+" ");
 //		Find all instances of this facility type in the plan
 		int max = plan.getActsLegs().size();
 		for (int i = 0; i < max; i += 2) {
@@ -100,10 +100,10 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 
 //				Pick a random ACTIVITY of this type from knowledge
 
-				List<Activity> actList = k.getActivities(type);
-				Facility fFromKnowledge = actList.get(Gbl.random.nextInt( actList.size())).getFacility();
+				List<Activity> activityList = k.getActivities(type);
+				Facility fFromKnowledge = activityList.get(Gbl.random.nextInt( activityList.size())).getFacility();
 
-//				And replace the activity in the chain with it (only changes the facility)
+//				And replace the act in the chain with it (only changes the facility)
 
 				bestAct.setLink(fFromKnowledge.getLink());
 				Coord newCoord = (Coord) fFromKnowledge.getCenter();
@@ -114,8 +114,8 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 				double planLength = getPlanLength(plan);
 
 				if(bestPlanLength < planLength){
-					//then copyPlan is the selected plan AND the
-					// better plan
+					//then copyPlan is the selected plan AND the better plan
+					// associate this act with the facility in agent's mental map
 					k.map.learnActsActivities(bestAct,fFromKnowledge.getActivity(type));
 				}else{
 					//copyPlan is the selected plan BUT it is worse:

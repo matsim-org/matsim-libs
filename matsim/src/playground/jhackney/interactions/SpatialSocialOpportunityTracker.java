@@ -34,42 +34,45 @@ import org.matsim.plans.Plans;
 
 public class SpatialSocialOpportunityTracker implements SocializingOpportunityGeneratorI {
 
-    public SpatialSocialOpportunityTracker(){
+	public SpatialSocialOpportunityTracker(){
 
-    }
-
-    // For each ACT in a PLAN we need to hang other attributes on it, like
-    // WHO was there and WHEN and WHERE it was.
-    // This object is called a socializing opportunity
-    // Associate the activity (-->facility) with the 
-    //  socializing opportunity.
-    // Agents need to be able to find the socializing opportunity associated
-    //  with each of their Acts: person.map.dates gives the socializingopp's;
-    
-    public Collection<SocializingOpportunity> generate(Plans plans) {
-	HashMap<Activity, SocializingOpportunity> events = new HashMap<Activity, SocializingOpportunity>();
-	SocializingOpportunity event = null;
-	
-	for( Person person : plans.getPersons().values() ){
-	    Plan plan = person.getSelectedPlan();
-	    ActIterator it = plan.getIteratorAct();
-	    while( it.hasNext() ){
-
-		Act act = (Act) it.next();
-		Activity myActivity = person.getKnowledge().map.getActivity(act);
-
-		if( myActivity == null ){
-//		    System.out.println(" Act"+act.getLinkId()+" "+act.getType()+" no activity");
-		    continue;}
-		event = events.get(myActivity);
-		if( event == null ){
-		    event = new SocializingOpportunity( myActivity );
-		    events.put( myActivity,	event );
-		}
-		event.addAttendee(person);
-	    }
-	    person.getKnowledge().map.addDate(event);
 	}
-	return events.values();
-    }
+
+	// For each ACT in a PLAN we need to hang other attributes on it, like
+	// WHO was there and WHEN and WHERE it was.
+	// This object is called a socializing opportunity
+	// Associate the activity (-->facility) with the 
+	//  socializing opportunity.
+	// Agents need to be able to find the socializing opportunity associated
+	//  with each of their Acts: person.map.dates gives the socializingopp's;
+
+	public Collection<SocializingOpportunity> generate(Plans plans) {
+		HashMap<Activity, SocializingOpportunity> events = new HashMap<Activity, SocializingOpportunity>();
+		SocializingOpportunity event = null;
+
+		for( Person person : plans.getPersons().values() ){
+			person.getKnowledge().map.clearDates();
+
+			Plan plan = person.getSelectedPlan();
+			ActIterator it = plan.getIteratorAct();
+			while( it.hasNext() ){
+
+				Act act = (Act) it.next();
+				System.out.println("SSOgen Person "+person.getId()+" ");
+				Activity myActivity = person.getKnowledge().map.getActivity(act);
+
+				if( myActivity == null ){
+					System.out.println(" Act "+act.getLinkId()+" "+act.getType()+" no activity");
+					continue;}
+				event = events.get(myActivity);
+				if( event == null ){
+					event = new SocializingOpportunity( myActivity );
+					events.put( myActivity,	event );
+				}
+				event.addAttendee(person);
+			}
+			person.getKnowledge().map.addDate(event);
+		}
+		return events.values();
+	}
 }

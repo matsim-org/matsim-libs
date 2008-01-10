@@ -28,7 +28,6 @@ import java.util.Iterator;
 import org.matsim.controler.Controler;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
-import org.matsim.planomat.PlanomatControler;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -36,6 +35,7 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
+import org.matsim.replanning.modules.TimeAllocationMutator;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.roadpricing.RoadPricingScoringFunctionFactory;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
@@ -70,7 +70,7 @@ public class SNController extends Controler {
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
-	Collection<SocializingOpportunity> socialEvents=null;
+	Collection<SocializingOpportunity> socialPlans=null;
 
 //	Variables for allocating the spatial meetings among different types of activities
 	double fractionS[];
@@ -78,30 +78,37 @@ public class SNController extends Controler {
 //	New variables for replanning
 	int replan_interval;
 
-	
+
 	@Override
 	protected void loadData() {
-System.out.println("what the fuck is this stupid yellow arrow!?!");
-//		loadWorld();
+		// this.world
+		loadWorld();
+		// this.facilities
 		loadFacilities();
 		this.network = loadNetwork();
 		this.population = loadPopulation();
-		// Stitch together the world
-		//Gbl.getWorld().complete();
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 
-		System.out.println(" Initializing agent knowledge ...");
+		// Stitch together the world
+		if (this.config.world().getInputFile() == null) {
+			new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		}
+
+		//loadSocialNetwork();
+		// if (this.config.socialnet().getInputFile() == null) {
+		System.out.println("Loading initial social network");
+		// also initializes knowledge.map.egonet
+		//}
+
+		System.out.println(" Initializing agent knowledge about geography ...");
 		initializeKnowledge(population);
 		System.out.println("... done");
-		System.out.println("Load social network here");
+
 	}
 
 	@Override
 	protected void startup() {
 		super.startup();
 
-		System.out.println("First spatial interactions of social network here");
-		System.out.println("Initialize the output directory for social networks (?)");
 		System.out.println("----------Initialization of social network -------------------------------------");
 		snsetup();
 	}
@@ -117,7 +124,7 @@ System.out.println("what the fuck is this stupid yellow arrow!?!");
 
 		String maxvalue = this.config.findParam("strategy", "maxAgentPlanMemorySize");
 		manager.setMaxPlansPerAgent(Integer.parseInt(maxvalue));
-
+	
 		// Best-scoring plan chosen each iteration
 		PlanStrategy strategy1 = new PlanStrategy(new BestPlanSelector());
 
@@ -125,21 +132,49 @@ System.out.println("what the fuck is this stupid yellow arrow!?!");
 		System.out.println("### NOTE THAT FACILITY SWITCHER IS HARD-CODED TO RANDOM SWITCHING OF FACILITIES FROM KNOWLEDGE");
 		System.out.println("### NOTE THAT YOU SHOULD EXCHANGE KNOWLEDGE BASED ON ITS VALUE");
 		strategy1.addStrategyModule(new SNFacilitySwitcher());
+//		strategy1.addStrategyModule(new TimeAllocationMutator());
 
 
 		// Social Network Facility Exchange for all agents
 		manager.addStrategy(strategy1, 1.0);
 		return manager;
 	}
-	
-	
+
+
 	@Override
 	protected void finishIteration(final int iteration){
 		super.finishIteration(iteration);
 
-		System.out.println("finishIteration: Note setting snIter = iteration for now");
-		int snIter = iteration;
-		
+		System.out.println("finishIteration: Note setting snIter = iteration +1 for now");
+		int snIter = iteration+1;
+
+		if(total_spatial_fraction(fractionS)>0){ // only generate the map if spatial meeting is important in this experiment
+			System.out.println("MAKE A MAP OF SOCIAL EVENTS THAT ACTUALLY OCCURRED IN THE MOBSIM");
+			System.out.println("  AND CALCULATE SOCIAL UTILITY FROM THIS");
+			System.out.println("  AND/OR USE IT TO COMPARE WITH PLANNED INTERACTIONS");
+			System.out.println("  AND USE THIS TO REINFORCE OR DEGRADE LINK STRENGTHS");
+			System.out.println("  NEEDS AN EVENT HANDLER");
+
+			System.out.println("  Generating planned [Spatial] socializing opportunities ...");
+			System.out.println("   Mapping which agents did what, where, and when");
+//			socialEvents = gen2.generate(population);
+			System.out.println("...finished.");
+
+			//}// end if
+
+			// Agents' actual interactions
+			System.out.println("  Agents' actual interactions at the social opportunities ...");
+//			plansInteractorS.interact(socialEvents, rndEncounterProbs, snIter);
+
+		}else{
+			System.out.println("     (none)");
+		}
+		System.out.println(" ... Spatial interactions done\n");
+
+		System.out.println(" Removing social links ...");
+		snet.removeLinks(snIter);
+		System.out.println(" ... done");
+
 		System.out.println(" Calculating and reporting network statistics ...");
 		snetstat.calculate(snIter, snet, population);
 		System.out.println(" ... done");
@@ -147,11 +182,11 @@ System.out.println("what the fuck is this stupid yellow arrow!?!");
 		System.out.println(" Writing out social network for iteration " + snIter + " ...");
 		pjw.write(snet.getLinks(), population, snIter);
 		System.out.println(" ... done");	
-	
+
 		if(iteration == maxIterations){
-		System.out.println("----------Closing social network statistic files and wrapping up ---------------");
-		snetstat.closeFiles();
-		snwrapup();
+			System.out.println("----------Closing social network statistic files and wrapping up ---------------");
+			snetstat.closeFiles();
+			snwrapup();
 		}
 	}
 	private void snwrapup(){
@@ -172,7 +207,7 @@ System.out.println("what the fuck is this stupid yellow arrow!?!");
 	protected void setupIteration(final int iteration) {
 		System.out.println("setupIteration: Note setting snIter = iteration for now");
 		int snIter = iteration;
-		
+
 		this.fireControlerSetupIterationEvent(iteration);
 		// TODO [MR] use events.resetHandlers();
 		this.travelTimeCalculator.resetTravelTimes();	// reset, so we can collect the new events and build new travel times for the next iteration
@@ -213,30 +248,27 @@ System.out.println("what the fuck is this stupid yellow arrow!?!");
 			printNote("", "done dumping plans.");
 		}
 
-		if(total_spatial_fraction(fractionS)>0){
+		if(total_spatial_fraction(fractionS)>0){ // only generate the map if spatial meeting is important in this experiment
 
-			//if(iteration == 1 or WHATEVER)
-			System.out.println("  Generating [Spatial] socializing opportunities ...");
-			System.out.println("   Mapping which agents were doing what, where, and when");
-			// Create the social opportunities from plans (updated each time plans change)
-			// OK to initialize from plans but do this from events if events != null!
-			socialEvents = gen2.generate(population);
+			//if(Events have just changed or if no events are yet available and if there is an interest in the planned interactions)
+			System.out.println("  Generating planned [Spatial] socializing opportunities ...");
+			System.out.println("   Mapping which agents want to do what, where, and when");
+			System.out.println("   Note that there is only one structure for each person containing SOCIAL DATES");
+			System.out.println("   and that it is cleared before new F2F windows are generated");
+			socialPlans = gen2.generate(population);
 			System.out.println("...finished.");
 
-			//}// end if iteration == WHATEVER
+			//}// end if
 
-			// Agents interact at the social opportunities
-			System.out.println("  Agents interact at the social opportunities ...");
-			plansInteractorS.interact(socialEvents, rndEncounterProbs, snIter);
+			// Agents' planned interactions
+			System.out.println("  Agents planned social interactions ...");
+			System.out.println("  Agents' relationships are updated to reflect these interactions! ...");
+			plansInteractorS.interact(socialPlans, rndEncounterProbs, snIter);
 
 		}else{
 			System.out.println("     (none)");
 		}
 		System.out.println(" ... Spatial interactions done\n");
-
-		System.out.println(" Removing social links ...");
-		snet.removeLinks(snIter);
-		System.out.println(" ... done");
 
 		System.out.println(" Non-Spatial interactions ...");
 		for (int ii = 0; ii < infoToExchange.length; ii++) {
@@ -296,14 +328,14 @@ System.out.println("what the fuck is this stupid yellow arrow!?!");
 			Gbl.errorMsg("The iterations directory " + (outputPath + "/" + DIRECTORY_SN) + " could not be created.");
 		}
 
-		
+
 		max_sn_iter = Integer.parseInt(config.socnetmodule().getNumIterations());
 		replan_interval = Integer.parseInt(config.socnetmodule().getRPInt());
 		String rndEncounterProbString = config.socnetmodule().getFacWt();
-		String interactorNSFacTypesString = config.socnetmodule().getXchange();
-		infoToExchange = getFacTypes(interactorNSFacTypesString);
-		fractionS = getActivityTypeAllocation(rndEncounterProbString);
-		rndEncounterProbs = getActivityTypeAllocationMap(activityTypesForEncounters, rndEncounterProbString);
+		String xchangeInfoString = config.socnetmodule().getXchange();
+		infoToExchange = getFacTypes(xchangeInfoString);
+		fractionS = toNumber(rndEncounterProbString);
+		rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		System.out.println(" Instantiating the Pajek writer ...");
 
@@ -378,7 +410,7 @@ System.out.println("what the fuck is this stupid yellow arrow!?!");
 		return s;
 	}
 
-	private double[] getActivityTypeAllocation(String longString) {
+	private double[] toNumber(String longString) {
 		String patternStr = ",";
 		String[] s;
 		s = longString.split(patternStr);
@@ -399,7 +431,7 @@ System.out.println("what the fuck is this stupid yellow arrow!?!");
 		}
 		return w;
 	}
-	private HashMap<String,Double> getActivityTypeAllocationMap(String[] types, String longString) {
+	private HashMap<String,Double> mapActivityWeights(String[] types, String longString) {
 		String patternStr = ",";
 		String[] s;
 		HashMap<String,Double> map = new HashMap<String,Double>();
@@ -462,7 +494,7 @@ System.out.println("what the fuck is this stupid yellow arrow!?!");
 	public final static String getSNIterationPath(int iteration, int sn_iter) {
 		return outputPath + "/" + DIRECTORY_ITERS + "/"+sn_iter + "/it." + iteration;
 	}
-	
+
 	public static void main(String[] args) {
 		final Controler controler = new SNController();
 

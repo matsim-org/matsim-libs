@@ -53,7 +53,7 @@ public class NonSpatialInteractor{
 	}
 
 	public void exchangeGeographicKnowledge(String facType, int iteration) {
-		System.out.println("  |Exchanging knowledge about "+facType+" factivity");
+		System.out.println("  |Exchanging knowledge about "+facType+" activity");
 
 
 		java.util.Collections.shuffle(net.getLinks());
