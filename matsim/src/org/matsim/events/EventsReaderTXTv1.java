@@ -71,9 +71,6 @@ public class EventsReaderTXTv1 {
 			case 3:
 				data = new EventAgentStuck(time, agentId, legNumber, linkId);
 				break;
-			case 1024:
-				data = new EventAgentNoRoute(time, agentId, legNumber, linkId);
-				break;
 			case 4:
 				data = new EventAgentWait2Link(time, agentId, legNumber, linkId);
 				break;

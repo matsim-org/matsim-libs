@@ -28,14 +28,12 @@ import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentNoRoute;
 import org.matsim.events.EventAgentStuck;
 import org.matsim.events.EventAgentWait2Link;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentNoRouteI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -48,7 +46,7 @@ import org.matsim.utils.identifiers.IdI;
  * @author mrieser
  */
 public class CalcLegNumber implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, EventHandlerAgentWait2LinkI,
-		EventHandlerAgentStuckI, EventHandlerAgentNoRouteI, EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
+		EventHandlerAgentStuckI, EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
 
 	/**
 	 * Map containing <agent-id, legCount>.
@@ -81,10 +79,6 @@ public class CalcLegNumber implements EventHandlerAgentDepartureI, EventHandlerA
 	}
 
 	public void handleEvent(final EventAgentStuck event) {
-		setLegNumber(event);
-	}
-
-	public void handleEvent(final EventAgentNoRoute event) {
 		setLegNumber(event);
 	}
 

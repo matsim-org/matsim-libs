@@ -20,7 +20,7 @@
 
 package org.matsim.mobsim;
 
-import org.matsim.events.EventAgentNoRoute;
+import org.apache.log4j.Logger;
 import org.matsim.events.EventAgentStuck;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
@@ -40,7 +40,7 @@ public class QueueNode extends Node {
 
 	private boolean active = false;
 
-	/* Get/Set partitionID generated be MetisExeWrapper
+	/* Get/Set partitionId generated be MetisExeWrapper
 	 * only used when doing DistributedSimulation,
 	 * but I did not want to inherit for just this info */
 	private int partitionId = 0;
@@ -109,7 +109,10 @@ public class QueueNode extends Node {
 		veh.getCurrentLink().popFirstFromBuffer();
 		Simulation.decLiving();
 		Simulation.incLost();
-		QueueSimulation.getEvents().processEvent (new EventAgentNoRoute(now, veh.getDriverID(), veh.getCurrentLegNumber(), veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
+		Logger.getLogger(QueueNode.class).error("Agent has no or wrong route! agentId=" + veh.getDriverID() 
+				+ " currentLegNumber=" + veh.getCurrentLegNumber() 
+				+ " currentLink=" + veh.getCurrentLink().getId().toString()
+				+ "The agent is removed from the simulation.");
 		return true;
 	}
 

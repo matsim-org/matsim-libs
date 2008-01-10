@@ -34,7 +34,6 @@ import org.matsim.events.handler.EventHandlerActivityEndI;
 import org.matsim.events.handler.EventHandlerActivityStartI;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentNoRouteI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.events.handler.EventHandlerI;
@@ -247,9 +246,6 @@ public class Events {
 			return true;
 		} else if (klass == EventAgentDeparture.class) {
 			((EventHandlerAgentDepartureI)handler).handleEvent((EventAgentDeparture)ev);
-			return true;
-		} else if (klass == EventAgentNoRoute.class) {
-			((EventHandlerAgentNoRouteI)handler).handleEvent((EventAgentNoRoute)ev);
 			return true;
 		} else if (klass == EventAgentStuck.class) {
 			((EventHandlerAgentStuckI)handler).handleEvent((EventAgentStuck)ev);
