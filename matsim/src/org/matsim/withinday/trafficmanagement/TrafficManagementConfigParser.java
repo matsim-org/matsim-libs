@@ -34,6 +34,7 @@ import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplAll;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplAllNewFlow;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplDAccident;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplDistribution;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplMB;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplSB;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplSBNoise;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplStaticAddition;
@@ -93,7 +94,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 //	private static final String PIDCONTROLER = "PIDControler";
 
 	private static final String CONTROLINPUTSB = "ControlInputImplSB";
-
+	
 	private static final String CONTROLINPUT1 = "ControlInputImpl1";
 
 	private static final String CONTROLINPUTSBNOISE = "ControlInputImplSBNoise";
@@ -107,6 +108,8 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	private static final String CONTROLINPUTALLNEWFLOW = "ControlInputImplAllNewFlow";
 	
 	private static final String CONTROLINPUTSTATICADDITION = "ControlInputImplStaticAddition";
+
+	private static final String CONTROLINPUTMB = "ControlInputImplMB";
 
 	private final static String CONTROLINPUT = "controlInput";
 
@@ -318,6 +321,12 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		}
 		else if (content.trim().compareTo(CONTROLINPUTSTATICADDITION) == 0) {
 			ControlInputImplStaticAddition controlInput = new ControlInputImplStaticAddition();
+			this.events.addHandler(controlInput);
+			return controlInput;
+		}
+		else if (content.trim().compareTo(CONTROLINPUTMB) == 0) {
+			ControlInputImplMB controlInput = new ControlInputImplMB();
+			controlInput.setAccidents(this.trafficManagement.getAccidents());
 			this.events.addHandler(controlInput);
 			return controlInput;
 		}
