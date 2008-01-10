@@ -76,6 +76,7 @@ public class SubPopScorer {
 
   	reader.readFile(eventsFilePath);
   	scorer.finish();
+  	log.info("Size of subpopulation: " + idSet.size());
   	log.info("Score of subpopulation: " + scorer.getAveragePlanPerformance());
 	}
 
@@ -97,7 +98,8 @@ public class SubPopScorer {
 
 
 	public static void main(String[] args) {
-		String config = "/Volumes/data/work/cvsRep/vsp-cvs/studies/arvidDaniel/input/testBasic/config.xml";
+//		String config = "/Volumes/data/work/cvsRep/vsp-cvs/studies/arvidDaniel/input/testBasic/config.xml";
+		String config = "./input/schwedenSubPopScoring/config.xml";
 		String id = "20";
 		List<String> linkids = new ArrayList<String>();
 		linkids.add(id);
