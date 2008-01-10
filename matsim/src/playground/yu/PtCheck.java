@@ -61,7 +61,6 @@ public class PtCheck extends PersonAlgorithm {
 
 	@Override
 	public void run(Person person) {
-		// TODO Auto-generated method stub
 		personCnt++;
 		if (person.getSelectedPlan().getType().equals("oev"))
 			ptUserCnt++;

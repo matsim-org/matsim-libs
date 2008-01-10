@@ -63,7 +63,6 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 
 	@Override
 	public void run(Person person) {
-		// TODO change and add plan, leg and route
 		List<Plan> copyPlans = new ArrayList<Plan>();
 		// plans: the copy of the plans.
 		for (Plan pl : person.getPlans()) {
