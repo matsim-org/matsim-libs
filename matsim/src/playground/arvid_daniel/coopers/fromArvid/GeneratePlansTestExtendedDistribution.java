@@ -33,10 +33,10 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
 import org.matsim.plans.Route;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+//import org.matsim.router.Dijkstra;
+//import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
-public class GeneratePlansTestExtended {
+public class GeneratePlansTestExtendedDistribution {
 
 	/**
 	 * Generating an extra stream of traffic in a certain area of the Berlin network
@@ -61,8 +61,8 @@ public class GeneratePlansTestExtended {
 		String routeNodesAlt = "1 2 20 21 3 4";
 
 		Gbl.getConfig().setParam("planCalcScore", "traveling", "-3600");
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		final Dijkstra dijkstra = new Dijkstra(net, timeCostCalc, timeCostCalc);
+//		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+//		final Dijkstra dijkstra = new Dijkstra(net, timeCostCalc, timeCostCalc);
 
 
 		for (int i = 0; i< 1999; i++) {
@@ -70,7 +70,7 @@ public class GeneratePlansTestExtended {
 
 			String ID = Integer.toString(i);
 			Person person = new Person(ID, null, "33",null, null,"yes");
-			Plan plan = new Plan("0","0",person);
+			Plan plan = new Plan("0",person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.0*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
 //			Link startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2;
@@ -103,7 +103,7 @@ public class GeneratePlansTestExtended {
 
 			String ID = Integer.toString(i);
 			Person person = new Person(ID, null, "33",null, null,"yes");
-			Plan plan = new Plan("0","0",person);
+			Plan plan = new Plan("0",person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
 			Act actstart = new Act("h", 0,0, startLink1, 0, endTime, endTime, false);
@@ -129,17 +129,17 @@ public class GeneratePlansTestExtended {
 			}
 		}
 
-		//creating agents on route 1, unevenly
+		//creating agents on route 1, unevenly distributed
 		for (int i = 4000; i< 5999; i++) {
 			double earliestStartTime = 7*3600;
 
 			String ID = Integer.toString(i);
 			Person person = new Person(ID, null, "33",null, null,"yes");
-			Plan plan = new Plan("0","0",person);
+			Plan plan = new Plan("0",person);
 			
 			int charge = rnd.nextInt(11);
-			double endTime = earliestStartTime + (charge + 1) * 10 * 60 + (int)(rnd.nextDouble() * 5 * 60);
-
+			double endTime = earliestStartTime + (charge + 0) * 10 * 60 + (int)(rnd.nextDouble() * 5 * 60);
+//								7h				0, 10, ... ,100 minutes  		 	{0, 5} min
 			double arrivalTime = earliestStartTime + 7.*3600;
 			Act actstart = new Act("h", 0,0, startLink1, 0, endTime, endTime, false);
 			Act actEnd = new Act("w", 0,0, destLink, arrivalTime + i, arrivalTime + i + 3*3600, 3*3600, false);
@@ -170,7 +170,7 @@ public class GeneratePlansTestExtended {
 
 			String ID = Integer.toString(i);
 			Person person = new Person(ID, null, "33",null, null,"yes");
-			Plan plan = new Plan("0","0",person);
+			Plan plan = new Plan("0",person);
 			
 			int charge = rnd.nextInt(1);
 			double endTime = earliestStartTime + 5 *60  + (charge + 1) * 10 *60 + (int)(rnd.nextDouble() * 5 *60);
@@ -215,7 +215,9 @@ public class GeneratePlansTestExtended {
 		Plans population = new Plans(Plans.NO_STREAMING);
 		// new MatsimPlansReader(population).readFile(plansFile);
 
-		GeneratePlansTestExtended.createCOOPERSSpecificVehicles(population, network);
+		GeneratePlansTestExtendedDistribution.createCOOPERSSpecificVehicles(population, network);
+		System.out.println("Population with uneven traffic distribution created");
+		
 	}
 
 
