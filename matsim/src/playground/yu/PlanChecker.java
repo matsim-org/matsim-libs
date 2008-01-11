@@ -59,7 +59,7 @@ public class PlanChecker extends PersonAlgorithm {
 			out.writeBytes("ratio\tamount\n");
 			out14 = new DataOutputStream(new BufferedOutputStream(
 					new FileOutputStream(new File(fileName + "_14.txt"))));
-			String head = "agend-ID\t" + "distance1\ttraveltime1\t"
+			String head = "agend-ID\t" +"type\t"+ "distance1\ttraveltime1\t"
 					+ "distance2\ttraveltime2\n";
 			out14.writeBytes(head);
 			out41 = new DataOutputStream(new BufferedOutputStream(
@@ -109,7 +109,7 @@ public class PlanChecker extends PersonAlgorithm {
 
 	public void run_(Person person, DataOutputStream out) {
 		for (Plan pl : person.getPlans()) {
-			if (pl.getType().equals("oev")) {
+//			if (pl.getType().equals("oev")) {
 				String text = "\t";
 				for (Iterator<Leg> it = pl.getIteratorLeg(); it.hasNext();) {
 					Leg l = it.next();
@@ -117,11 +117,11 @@ public class PlanChecker extends PersonAlgorithm {
 					text += r.getDist() + "\t" + r.getTravTime() + "\t";
 				}
 				try {
-					out.writeBytes(person.getId().toString() + text + "\n");
+					out.writeBytes(person.getId().toString() +"\t"+pl.getType()+ text + "\n");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			}
+//			}
 		}
 	}
 
