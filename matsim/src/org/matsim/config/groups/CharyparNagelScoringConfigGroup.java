@@ -76,7 +76,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
 
 	private static final Logger log = Logger.getLogger(CharyparNagelScoringConfigGroup.class);
-	
+
 	@Override
 	public String getValue(final String key) {
 		if (LEARNING_RATE.equals(key)) {
@@ -182,11 +182,11 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			throw new IllegalArgumentException(key);
 		}
 	}
-	
+
 	@Override
 	protected TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		
+
 		map.put(LEARNING_RATE, getValue(LEARNING_RATE));
 		map.put(BRAIN_EXP_BETA, getValue(BRAIN_EXP_BETA));
 		map.put(PATH_SIZE_LOGIT_BETA, getValue(PATH_SIZE_LOGIT_BETA));
@@ -246,10 +246,10 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	public void setBrainExpBeta(final double beta) {
 		this.brainExpBeta = beta;
 	}
-	
+
 	public double getPathSizeLogitBeta() {
 		return this.pathSizeLogitBeta;
-	}	
+	}
 	public void setPathSizeLogitBeta(final double beta) {
 		this.pathSizeLogitBeta = beta;
 	}
@@ -306,11 +306,15 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		return this.activityTypes.get(actType);
 	}
 
+	public void addActivityParams(final ActivityParams params) {
+		this.activityTypes.put(params.getType(), params);
+	}
+
 	/* complex classes */
 
 	public static class ActivityParams {
 		private String type;
-		private double priority;
+		private double priority = 1.0;
 		private double typicalDuration = Time.UNDEFINED_TIME;
 		private double minimalDuration = Time.UNDEFINED_TIME;
 		private double openingTime = Time.UNDEFINED_TIME;
