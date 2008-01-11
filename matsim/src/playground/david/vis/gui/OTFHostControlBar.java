@@ -122,8 +122,12 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	
 	private void invalidateHandlers() {
 		for (OTFEventHandler handler : handlers.values()) {
-			// DS TODO How to get the rect over to the drawer??!!
-			handler.invalidate(null);
+			try {
+				handler.invalidate();
+			} catch (RemoteException e) {
+				// Possibly lost contact to host DS TODO Handle this!
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -345,15 +349,14 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 			while (!terminate) {
 				try {
-					sleep(100);
-					
+					sleep(30);
 					if (isActive && synchronizedPlay) host.step();
 					
 					actTime = host.getLocalTime();
 					if (simTime != actTime) {
 						updateTimeLabel();
 						repaint();
-						if (isActive) invalidateHandlers();
+						if (isActive)  invalidateHandlers();
 					}
 					simTime = actTime;
 				} catch (Exception e) {
@@ -361,5 +364,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				}
 			}
 		}
+	}
+
+	public OTFServerRemote getHost() {
+		return host;
 	}
 }

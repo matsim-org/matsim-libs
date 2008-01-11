@@ -267,6 +267,7 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 
 	public byte[] getQuadDynStateBuffer(String id, Rect bounds)	throws RemoteException {
 		// DS TODO bounds is ignored, maybe throw exception if bounds != null??
+		if (actBuffer == null) step();
 		return actBuffer;
 	}
 

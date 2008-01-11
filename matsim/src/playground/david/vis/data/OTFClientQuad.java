@@ -86,39 +86,26 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 	public void createReceiver(final OTFConnectionManager connect) {
 
-		Gbl.startMeasurement();
 		int colls = this.execute(this.top.getBounds(),
 				new CreateReceiverExecutor(connect));
-		System.out.println("CLIENT DRAWER execute  == " + colls
-				+ "objects time");
-		Gbl.printElapsedTime();
-
 	}
 
-	public void getData(OTFServerRemote host, boolean readConst)
+	private void getData(OTFServerRemote host, QuadTree.Rect bound, boolean readConst)
 			throws RemoteException {
 		Gbl.startMeasurement();
-		QuadTree.Rect bound = host.isLive() ? null : null;
+		bound = host.isLive() ? bound : this.top.getBounds();
 		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, bound);
-		System.out.println("get state time");
-		Gbl.printElapsedTime();
-
 		DataInputStream in = new DataInputStream(new ByteArrayInputStream(
 				bbyte, 0, bbyte.length));
-		Gbl.startMeasurement();
-		int colls = this.execute(this.top.getBounds(),
-				this.new ReadDataExecutor(in, readConst));
-		System.out.println("execute half  == " + colls + " objects time");
-		Gbl.printElapsedTime();
-
+		int colls = this.execute(bound, this.new ReadDataExecutor(in, readConst));
 	}
 
 	synchronized public void getConstData(OTFServerRemote host) throws RemoteException {
-		getData(host, true);
+		getData(host, null, true);
 	}
 
-	synchronized public void getDynData(OTFServerRemote host) throws RemoteException {
-		getData(host, false);
+	synchronized public void getDynData(OTFServerRemote host, QuadTree.Rect bound) throws RemoteException {
+		getData(host, bound, false);
 	}
 
 	synchronized public void invalidate(Rect rect) {
@@ -126,11 +113,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 			rect = this.top.getBounds();
 		}
 
-		Gbl.startMeasurement();
 		int colls = this.execute(rect, this.new InvalidateExecutor());
-		System.out.println("INVALIDATEexecute   == " + colls + " objects time");
-		Gbl.printElapsedTime();
-
 	}
 
 	@Override

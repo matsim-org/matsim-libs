@@ -1,12 +1,11 @@
 package playground.david.vis.gui;
 
 import java.awt.geom.Point2D;
-
-import org.matsim.utils.collections.QuadTree.Rect;
+import java.rmi.RemoteException;
 
 public interface OTFEventHandler {
 
-	public void invalidate(Rect rect);
+	public void invalidate() throws RemoteException;
 	public void redraw();
 	public void handleClick(Point2D.Double point);
 }

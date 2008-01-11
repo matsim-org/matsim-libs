@@ -22,14 +22,15 @@ package playground.david.vis;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
@@ -38,6 +39,7 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.utils.collections.QuadTree.Rect;
 
 import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
@@ -45,6 +47,18 @@ import playground.david.vis.interfaces.OTFNetHandler;
 import playground.david.vis.interfaces.OTFServerRemote;
 
 public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemote{
+	static class QuadStorage {
+		public String id;
+		public OTFServerQuad quad;
+		public QuadTree.Rect rect;
+		public byte [] buffer;
+		public QuadStorage(String id, OTFServerQuad quad, Rect rect, byte[] buffer) {
+			this.id = id;
+			this.quad = quad;
+			this.rect = rect;
+			this.buffer = buffer;
+		}
+	}
 
 	public static final int UNCONNECTED = 0;
 	public static final int PAUSE = 1;
@@ -62,8 +76,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 	private int localTime = 0;
 
 	private OTFVisNet net = null;
-	private final Map<String, OTFServerQuad> quads = new HashMap<String, OTFServerQuad>();
-	
+
+	private final Map<String, QuadStorage> quads = new HashMap<String, QuadStorage>();
+	public Set<String> updateThis = new HashSet<String>();
+
 	private OTFNetHandler handler = null;
 	private Plans pop = null;
 	public ByteArrayOutputStream out = null;
@@ -72,7 +88,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population) throws RemoteException {
 		super(4020,new SslRMIClientSocketFactory(),
-			      new SslRMIServerSocketFactory());
+				new SslRMIServerSocketFactory());
 		//setDaemon(true);
 		UserReadableName = ReadableName;
 		net = new OTFVisNet(network);
@@ -90,22 +106,22 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 		// Register with RMI to be seen from client
 		try {
-		    // Create SSL-based registry
-		    registry = LocateRegistry.createRegistry(4019,
-			new SslRMIClientSocketFactory(),
-			new SslRMIServerSocketFactory());
+			// Create SSL-based registry
+			registry = LocateRegistry.createRegistry(4019,
+					new SslRMIClientSocketFactory(),
+					new SslRMIServerSocketFactory());
 
-		    result = new OnTheFlyServer(ReadableName, network, population);
+			result = new OnTheFlyServer(ReadableName, network, population);
 
-		    // Bind this object instance to the name "HelloServer"
-		    registry.bind("DSOTFServer_" + ReadableName, result);
+			// Bind this object instance to the name "HelloServer"
+			registry.bind("DSOTFServer_" + ReadableName, result);
 
-		    System.out.println("OTFServer bound in registry");
+			System.out.println("OTFServer bound in registry");
 		} catch (Exception e) {
-		    System.out.println("OTFServer err: " + e.getMessage());
-		    e.printStackTrace();
+			System.out.println("OTFServer err: " + e.getMessage());
+			e.printStackTrace();
 		}
-	return 	result;
+		return 	result;
 	}
 
 	public void cleanup() {
@@ -128,26 +144,22 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 	}
 	private double lastTime = -1.0;
 	public void updateOut(double time) {
-		if (lastTime != time) {
-	try {
-			out.reset();
-			net.writeMyself(handler, new DataOutputStream(out));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		}
+			for(String id : updateThis) {
+				out.reset();
+				QuadStorage act = quads.get(id);
+				act.quad.writeDynData(act.rect, new DataOutputStream(out));
+				act.buffer = out.toByteArray();
+			}
+			updateThis.clear();
 		lastTime = time;
 	};
 
 	public int getStatus(double time){
 		localTime = (int)time;
 
-		if (updateState) {
-			synchronized (out) {
-				updateOut(time);
-			}
+		if (updateThis.size() != 0) {
 			synchronized (updateFinished) {
+				updateOut(time);
 				updateState = false;
 				updateFinished.notifyAll();
 			}
@@ -175,11 +187,11 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 	public void step()  throws RemoteException{
 		// leave Status on pause but let one step run (if one is waiting)
-			synchronized(paused) {
-				status = STEP;
-				paused.notifyAll();
-			}
-			synchronized (stepDone) {
+		synchronized(paused) {
+			status = STEP;
+			paused.notifyAll();
+		}
+		synchronized (stepDone) {
 			if (status == PAUSE) return;
 			try {
 				stepDone.wait();
@@ -245,18 +257,18 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException {
 
-		if (quads.containsKey(id)) return quads.get(id);
-		
+		if (quads.containsKey(id)) return quads.get(id).quad;
+
 		OTFServerQuad quad = new OTFServerQuad(network);
-		quads.put(id, quad);
-		
+		quads.put(id, new QuadStorage(id, quad, null, null));
+
 		quad.fillQuadTree(writers);
 		return quad;
 	}
 
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
 		out.reset();
-		quads.get(id).writeConstData(new DataOutputStream(out));
+		quads.get(id).quad.writeConstData(new DataOutputStream(out));
 		byte [] result;
 		synchronized (out) {
 			result = out.toByteArray();
@@ -264,12 +276,28 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 		return result;
 	}	
 	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException {
-		out.reset();
-		quads.get(id).writeDynData(bounds, new DataOutputStream(out));
 		byte [] result;
-		synchronized (out) {
-			result = out.toByteArray();
+		QuadStorage updateQuad = quads.get(id);
+		updateQuad.rect = bounds;
+
+		if (status == PAUSE) {
+			synchronized (out) {
+				out.reset();
+				updateQuad.quad.writeDynData(bounds, new DataOutputStream(out));
+				return out.toByteArray();
+			}
 		}
-		return result;
+		// otherwise == PLAY, we need to sort this into the array of demanding quads and then they will be fillesd next in getStatus is called
+		try {
+			synchronized (updateFinished) {
+				updateThis.add(id);
+				updateFinished.wait();
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return updateQuad.buffer;
 	}
 }

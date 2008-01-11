@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
@@ -139,17 +138,13 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
     		if (writer != null) writer.setSrc(link);
     		put(middleEast, middleNorth, writer);
     	}
-		System.out.println("SERVER execute  == " + " = links sum " + (net.getLinks().values().size()) +"objects time");
 	}
 
 	public OTFClientQuad convertToClient(String id, final OTFConnectionManager connect) {
 		final OTFClientQuad client = new OTFClientQuad(id, 0.,0.,maxEasting - minEasting, maxNorthing - minNorthing);
 
-		Gbl.startMeasurement();
 		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
 				this.new ConvertToClientExecutor(connect,client));
-		System.out.println("SERVER execute  == " + colls  +"objects time");
-		Gbl.printElapsedTime();
 
 		return client;
 	}
@@ -157,30 +152,19 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 	public OTFServerQuad convertToServer() {
 		final OTFServerQuad newServer = new OTFServerQuad(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing);
 
-		Gbl.startMeasurement();
 		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
 				this.new ConvertToServerExecutor(newServer));
-		System.out.println("SERVER execute  == " + colls  +"objects time");
-		Gbl.printElapsedTime();
 
 		return newServer;
 	}
 
 	public void writeConstData(DataOutputStream out) {
-		Gbl.startMeasurement();
 		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
 				this.new WriteDataExecutor(out,true));
-		System.out.println("execute half  == " + colls + " objects time");
-		Gbl.printElapsedTime();
-
-
 	}
 
 	public void writeDynData(QuadTree.Rect bounds, DataOutputStream out) {
-		Gbl.startMeasurement();
 		int colls = this.execute(bounds, this.new WriteDataExecutor(out,false));
-		System.out.println("execute half  == " + colls + " objects time");
-		Gbl.printElapsedTime();
 	}
 
 }
