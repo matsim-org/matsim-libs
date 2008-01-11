@@ -67,7 +67,6 @@ import org.matsim.mobsim.Simulation;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.NetworkWriter;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
@@ -456,10 +455,9 @@ public class Controler {
 	}
 
 	protected NetworkLayer loadNetwork() {
-		// - read network: which buildertype??
 		printNote("", "  creating network layer... ");
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		QueueNetworkLayer network = new QueueNetworkLayer();
+		Gbl.getWorld().setNetworkLayer(network);
 		printNote("", "  done");
 
 		printNote("", "  reading network xml file... ");
