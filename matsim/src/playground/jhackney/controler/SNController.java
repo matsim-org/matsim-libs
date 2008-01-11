@@ -132,7 +132,7 @@ public class SNController extends Controler {
 		System.out.println("### NOTE THAT FACILITY SWITCHER IS HARD-CODED TO RANDOM SWITCHING OF FACILITIES FROM KNOWLEDGE");
 		System.out.println("### NOTE THAT YOU SHOULD EXCHANGE KNOWLEDGE BASED ON ITS VALUE");
 		strategy1.addStrategyModule(new SNFacilitySwitcher());
-//		strategy1.addStrategyModule(new TimeAllocationMutator());
+		//strategy1.addStrategyModule(new TimeAllocationMutator());
 
 
 		// Social Network Facility Exchange for all agents
@@ -197,7 +197,7 @@ public class SNController extends Controler {
 
 		SocialNetworkStatistics snetstatFinal=new SocialNetworkStatistics();
 		snetstatFinal.openFiles(outputPath);
-		snetstatFinal.calculate(max_sn_iter, snet, population);
+		snetstatFinal.calculate(maxIterations, snet, population);
 
 		System.out.println(" ... done");
 		snetstatFinal.closeFiles();	

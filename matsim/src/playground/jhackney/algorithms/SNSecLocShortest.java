@@ -62,6 +62,11 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 		//	Pick one of the facilities in knowledge to replace the one in the plan
 		//	Repeat until the shortest path plan has been made
 		//
+		
+		if(!(total(cum_p_factype)>0)){
+			return;
+		}
+		
 		String factype=null;// facility type to switch out
 		Person person = plan.getPerson();
 //		double oldPlanLength=getPlanLength(plan);
@@ -87,15 +92,14 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 
 //		Figure out if the agent has knowledge about other facilities of this kind
 		Knowledge k = person.getKnowledge();
-System.out.println("SNSLS Person "+person.getId()+" ");
-//		Find all instances of this facility type in the plan
+//		System.out.println("SNSLS Person "+person.getId()+" ");
+//		Find all instances of this facility type in the plan and replace facility
 		int max = plan.getActsLegs().size();
 		for (int i = 0; i < max; i += 2) {
 
 			Act bestAct = (Act)(bestPlan.getActsLegs().get(i));	    
 			String type=bestAct.getType();
 
-			// Replace with plan.getRandomActivity(type)
 			if(factype.equals(type)){
 
 //				Pick a random ACTIVITY of this type from knowledge
@@ -108,6 +112,10 @@ System.out.println("SNSLS Person "+person.getId()+" ");
 				bestAct.setLink(fFromKnowledge.getLink());
 				Coord newCoord = (Coord) fFromKnowledge.getCenter();
 				bestAct.setCoord(newCoord);
+				//? set a new RefId here to avoid having this Act,Activity pairing written over
+				// in knowledge. Else leave the RefId as it is and let the Activity for with the original
+				// Act be forgotten. Note that both Act-Activity pairs will be retained in mapActActivity but
+				// only the latest pairing will be in mapActIdActivityId.
 
 				// IF CHAIN LENGTH ON THIS COPIED PLAN IS SHORTER THEN PUT THE CHANGE IN THE PLAN
 				double bestPlanLength = getPlanLength(bestPlan);
@@ -128,6 +136,15 @@ System.out.println("SNSLS Person "+person.getId()+" ");
 		}
 	}
 
+	private double total(double[] w) {
+		// calculate sum of probabilities of changing each facility type
+		double sum=0;
+		for (int i=0; i<w.length;i++){
+			sum=sum+w[i];
+		}
+		return sum;
+	}
+
 	private double[] getCumFacWeights(String longString) {
 		String patternStr = ",";
 		String[] s;
@@ -144,7 +161,7 @@ System.out.println("SNSLS Person "+person.getId()+" ");
 
 				w[i] = w[i] / sum;
 			}
-		} else if (sum < 0) {
+		}else if (sum < 0) {
 			Gbl
 			.errorMsg("At least one weight for the type of information exchange or meeting place must be > 0, check config file.");
 		}

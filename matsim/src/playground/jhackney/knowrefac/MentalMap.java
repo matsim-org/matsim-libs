@@ -24,6 +24,9 @@ package playground.jhackney.knowrefac;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.facilities.Activity;
@@ -33,6 +36,7 @@ import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Plan;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 import playground.jhackney.interactions.SocializingOpportunity;
@@ -51,6 +55,9 @@ public class MentalMap {
 
 	private Hashtable<Act,Activity> mapActActivity = new Hashtable<Act,Activity>();
 	private Hashtable<Activity,Act> mapActivityAct = new Hashtable<Activity,Act>();
+//	private Hashtable<IdI,Integer> mapActivityIdActId = new Hashtable<IdI,Integer>();
+	private Hashtable<Integer,IdI> mapActIdActivityId = new Hashtable<Integer,IdI>();
+	
 	private ArrayList<SocializingOpportunity> dates = new ArrayList<SocializingOpportunity>();
 
 	private Knowledge knowledge = null;
@@ -62,9 +69,11 @@ public class MentalMap {
 	public void matchActsToActivities (Plan myPlan){
 		// Associate each act in the plan with a random facility on the link
 		ActIterator planActIter = myPlan.getIteratorAct();
+		int actId = 0;
 		while(planActIter.hasNext()){
 			Act myAct = (Act) planActIter.next();
-
+			
+// Tidy the acts up so they correspond to the expectations of the social net module
 			String type="none";
 			char typechar=myAct.getType().charAt(0);
 			if(typechar=='h'){
@@ -79,8 +88,13 @@ public class MentalMap {
 				type="education";
 			}else
 				Gbl.errorMsg("Activity type "+ typechar +" not known");
-
 			myAct.setType(type);
+			
+			if(myAct.getRefId()==Integer.MIN_VALUE){
+				myAct.setRefId(actId);
+				actId++;
+			}
+			
 			Link myLink = myAct.getLink();
 			Activity myActivity = null;
 			// These Locations are facilities by the new convention
@@ -88,51 +102,43 @@ public class MentalMap {
 			// These Objects are facilities by convention
 			Object[] facs =  locations.toArray();
 
-			int i=0;
-			
 			// Assign a random activity (a facility) on the link to the act
 			// thus giving it in effect a street address
-			while(i < facs.length){
+			while(myActivity==null){
 				int k = Gbl.random.nextInt(facs.length);
 				Facility f = (Facility) facs[k];
 				myActivity = f.getActivity(type);
 				if(myActivity!=null){
 					learnActsActivities(myAct,myActivity);
 				}
-				if(myActivity==null){
-					//Gbl.errorMsg("stop, no activity found for act "+myAct.getType()+" at "+myAct.getLink().getId());
-					continue;
-				}
-				i++;
 			}
 		}
 	}
 
 	public void learnActsActivities (Act myact, Activity myactivity){
-//		if (!(mapActivityAct.containsKey(myactivity) || mapActivityAct.containsValue(myact))){
-		//if (!mapActivityAct.containsKey(myactivity)){
-			System.out.println("Update mapActivityAct:       "+myactivity.getFacility().getId()+" on link "+myact.getLinkId()+" with Act "+myact.getType());
-			mapActivityAct.put(myactivity,myact);
-		//}
-//		if( !(mapActActivity.containsKey(myact) || mapActActivity.containsValue(myactivity))){
-		//if( !mapActActivity.containsKey(myact)){
-			System.out.println("Update mapActActivity:       "+myact.getType()+" with Activity key: "+myactivity.getFacility().getId()+" on link "+myact.getLinkId());
-			mapActActivity.put(myact, myactivity);
-		//}
+
+//		System.out.println("Update mapActivityAct:       "+myactivity.getFacility().getId()+" on link "+myact.getLinkId()+" with Act "+myact.getType());
+		mapActivityAct.put(myactivity,myact);
+		
+//		System.out.println("Update mapActActivity:       "+myact.getType()+" with Activity key: "+myactivity.getFacility().getId()+" on link "+myact.getLinkId());
+		mapActActivity.put(myact, myactivity);
+		mapActIdActivityId.put(myact.getRefId(),myactivity.getFacility().getId());
 
 		knowledge.addActivity(myactivity);
-
 	}
 
 	public void forgetActsActivities (Act myact, Activity myactivity){
-		if (mapActivityAct.contains(myactivity)){
+		if (mapActivityAct.containsKey(myactivity)){
 //			System.out.println("Update Act:       "+myact);
 			mapActivityAct.remove(myactivity);
 		}
-		if( mapActActivity.contains(myact)){
+		if( mapActActivity.containsKey(myact)){
 
 //			System.out.println("Update Activity:  "+myactivity);
 			mapActActivity.remove(myact);
+			// NOTE could crash here if myact is in mapActActivity but was overwritten in mapActIdActivityId,
+			// which is less specific about the details of the Act saved in it
+			mapActIdActivityId.remove(myact.getRefId());
 		}
 		knowledge.removeActivity(myactivity);
 	}
@@ -141,13 +147,14 @@ public class MentalMap {
 		return this.mapActivityAct.get(myActivity);
 	}
 	public Activity getActivity (Act myAct){
-		if(!this.mapActActivity.containsKey(myAct)){
-			System.out.println("MM "+myAct.getType()+" on link "+myAct.getLinkId()+" is not in the map");
-		}
-		System.out.println(this.mapActActivity.size());
-		Activity myActivity= (Activity) this.mapActActivity.get(myAct);
-		System.out.println("MM "+myAct.getType()+" on link "+myAct.getLinkId()+"\n"+myActivity);
-		return this.mapActActivity.get(myAct);
+		
+		IdI myActivityId= this.mapActIdActivityId.get(myAct.getRefId());
+		TreeMap<IdI,Facility> facilities=this.knowledge.getFacilities();
+		Facility myFacility=facilities.get(myActivityId);
+		Activity myActivity=myFacility.getActivity(myAct.getType());
+		
+//		System.out.println("MM "+myAct.getType()+" on link "+myAct.getLinkId()+"\n"+myActivity);
+		return myActivity;
 	}
 
 	public void addDate(SocializingOpportunity date){

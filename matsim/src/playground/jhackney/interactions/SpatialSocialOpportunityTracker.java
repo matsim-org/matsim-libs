@@ -51,6 +51,8 @@ public class SpatialSocialOpportunityTracker implements SocializingOpportunityGe
 		SocializingOpportunity event = null;
 
 		for( Person person : plans.getPersons().values() ){
+//			System.out.println("SSOgen Person "+person.getId()+" ");
+			
 			person.getKnowledge().map.clearDates();
 
 			Plan plan = person.getSelectedPlan();
@@ -58,7 +60,6 @@ public class SpatialSocialOpportunityTracker implements SocializingOpportunityGe
 			while( it.hasNext() ){
 
 				Act act = (Act) it.next();
-				System.out.println("SSOgen Person "+person.getId()+" ");
 				Activity myActivity = person.getKnowledge().map.getActivity(act);
 
 				if( myActivity == null ){
