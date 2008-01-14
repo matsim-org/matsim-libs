@@ -35,6 +35,7 @@ import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.plans.Route;
 
@@ -216,14 +217,18 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			Double t1 = this.enterEvents1.remove(event.agentId);
 			if (t1 != null) {
 				double deltaT = event.time - t1;
-				if (deltaT >= 0) {
-//					&& deltaT <= 2*this.lastTimeMainRoute
-					this.lastTimeMainRoute = deltaT;
-					ttMeasuredMainRoute.add(deltaT);
-					timeDifferenceHasChanged = true;
-				}
-				else {
-					System.err.println("not sure why this could ever happen 2vnowskljdf");
+				if(deltaT <= 10*this.lastTimeMainRoute){
+//					if(SimulationTimer.getTime() >= 55200 && SimulationTimer.getTime() <= 64000){
+						ttMeasuredMainRoute.add(deltaT);					
+//					}
+					if (deltaT >= 0) {
+						this.lastTimeMainRoute = deltaT;
+						timeDifferenceHasChanged = true;
+					}
+
+					else {
+//						System.err.println("not sure why this could ever happen 2vnowskljdf");
+					}
 				}
 			}
 		}
@@ -231,15 +236,17 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			Double t1 = this.enterEvents2.remove(event.agentId);
 			if (t1 != null) {
 				double deltaT = event.time - t1;
-				if (deltaT >= 0) {
-//					 && deltaT <= 2*this.lastTimeAlternativeRoute
-					this.lastTimeAlternativeRoute = deltaT;
-					ttMeasuredAlternativeRoute.add(deltaT);
-					timeDifferenceHasChanged = true;
-				}
-				else {
-					System.err
-							.println("not sure why this could ever happen 2vnowfskljdf");
+				if(deltaT <= 10*this.lastTimeMainRoute){
+//					if(SimulationTimer.getTime() >= 55200 && SimulationTimer.getTime() <= 64000){
+						ttMeasuredAlternativeRoute.add(deltaT);					
+//					}
+					if (deltaT >= 0) {
+						this.lastTimeAlternativeRoute = deltaT;
+						timeDifferenceHasChanged = true;
+					}
+					else {
+//						System.err.println("not sure why this could ever happen 2vnowfskljdf");
+					}
 				}
 			}
 		}
