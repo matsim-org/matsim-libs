@@ -30,14 +30,14 @@ import org.matsim.network.Node;
 import org.matsim.plans.Route;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
-import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplMB;
-import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplSB;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputMB;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputSB;
 import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplAll;
 import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplDAccident;
 import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplDistribution;
+import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplSB;
 import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplSBNoise;
 import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplStaticAddition;
-import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputSB;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.NoControl;
@@ -325,7 +325,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			return controlInput;
 		}
 		else if (content.trim().compareTo(CONTROLINPUTMB) == 0) {
-			ControlInputImplMB controlInput = new ControlInputImplMB();
+			ControlInputMB controlInput = new ControlInputMB();
 			controlInput.setAccidents(this.trafficManagement.getAccidents());
 			this.events.addHandler(controlInput);
 			return controlInput;

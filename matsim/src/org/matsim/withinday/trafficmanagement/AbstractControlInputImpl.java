@@ -218,9 +218,9 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (t1 != null) {
 				double deltaT = event.time - t1;
 				if(deltaT <= 10*this.lastTimeMainRoute){
-//					if(SimulationTimer.getTime() >= 55200 && SimulationTimer.getTime() <= 64000){
+					if(SimulationTimer.getTime() >= 55200 && SimulationTimer.getTime() <= 64000){
 						ttMeasuredMainRoute.add(deltaT);					
-//					}
+					}
 					if (deltaT >= 0) {
 						this.lastTimeMainRoute = deltaT;
 						timeDifferenceHasChanged = true;
@@ -237,9 +237,9 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (t1 != null) {
 				double deltaT = event.time - t1;
 				if(deltaT <= 10*this.lastTimeMainRoute){
-//					if(SimulationTimer.getTime() >= 55200 && SimulationTimer.getTime() <= 64000){
+					if(SimulationTimer.getTime() >= 55200 && SimulationTimer.getTime() <= 64000){
 						ttMeasuredAlternativeRoute.add(deltaT);					
-//					}
+					}
 					if (deltaT >= 0) {
 						this.lastTimeAlternativeRoute = deltaT;
 						timeDifferenceHasChanged = true;
