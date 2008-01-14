@@ -35,19 +35,26 @@ import org.matsim.utils.io.IOUtils;
  * @author ychen
  */
 public class TimeWriter implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI {
+//	-------------------------MEMBER VARIABLES---------------------------------
 	private BufferedWriter out = null;
 	private HashMap<String, Double> agentDepTimes;
-
+//--------------------------CONSTRUCTOR-------------------------------------
 	public TimeWriter(final String filename) {
 		init(filename);
 	}
 
+	/**
+	 * If an agent departures, will the information be saved in a hashmap (agentDepTimes). 
+	 */
 	public void handleEvent(final EventAgentDeparture event) {
 		if (event.legId == 0) {
 			this.agentDepTimes.put(event.agentId, event.time);
 		}
 	}
 
+	/**
+	 * If an agent arrives, will the "agent-ID", "depTime" and "arrTime" be written in a .txt-file
+	 */
 	public void handleEvent(final EventAgentArrival event) {
 		String agentId = event.agentId;
 		if (this.agentDepTimes.containsKey(agentId)) {

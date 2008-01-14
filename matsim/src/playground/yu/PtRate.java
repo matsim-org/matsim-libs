@@ -26,7 +26,6 @@ package playground.yu;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.ControlerFinishIterationEvent;
 import org.matsim.controler.listener.ControlerFinishIterationListener;
@@ -34,24 +33,43 @@ import org.matsim.plans.Plans;
 import org.matsim.utils.charts.XYLineChart;
 
 /**
+ * An implementing of ContorlerListener, in order to output some information
+ * about use of public transit through .txt-file and .png-picture
+ * 
  * @author yu
  * 
  */
 public class PtRate implements ControlerFinishIterationListener {
-
+	// -----------------------------MEMBER VARIABLES-----------------------
 	private final Plans population;
 	private final PtCheck check;
 	private final int maxIters;
 	private final String BetaTraveling;
 	private final String BetaTravelingPt;
-	private double[] yPtRate = null;
-	private double[] yPtUser = null;
-	private double[] yPersons = null;
+	private double[] yPtRate = null;// an array, in which the fraction of
+	// persons, who use public transit, will be
+	// saved.
+	private double[] yPtUser = null;// an array, in which the amount of persons,
+	// who use public transit, will be saved.
+	private double[] yPersons = null;// an array, in which the amount of all
 
+	// persons in the simulation will be
+	// saved.
+
+	// -------------------------------CONSTRUCTOR---------------------------
 	/**
-	 * @throws IOException
+	 * @param population -
+	 *            the object of Plans in the simulation
+	 * @param filename -
+	 *            filename of .txt-file
+	 * @param maxIters -
+	 *            maximum number of iterations
+	 * @param BetaTraveling -
+	 *            parameter of marginal Utility of Traveling
+	 * @param BetaTravelingPt -
+	 *            parameter of marginal Utility of Traveling with public transit
 	 * @throws FileNotFoundException
-	 * 
+	 * @throws IOException
 	 */
 	public PtRate(final Plans population, final String filename, int maxIters,
 			String BetaTraveling, String BetaTravelingPt)
@@ -66,6 +84,9 @@ public class PtRate implements ControlerFinishIterationListener {
 		yPersons = new double[maxIters + 1];
 	}
 
+	/**
+	 * writes .txt-file and paints 2 .png-picture
+	 */
 	public void notifyIterationFinished(ControlerFinishIterationEvent event) {
 		check.resetCnt();
 		check.run(population);
@@ -111,7 +132,6 @@ public class PtRate implements ControlerFinishIterationListener {
 			try {
 				check.writeEnd();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

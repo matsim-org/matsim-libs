@@ -30,18 +30,20 @@ import org.matsim.plans.Person;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 
 /**
- * outputs the amount of public traffic user into a .txt-file
+ * outputs the amount of public transit user or its fraction into .txt-files
+ * 
  * @author ychen
- *
+ * 
  */
 public class PtCheck extends PersonAlgorithm {
+	// ----------------------MEMBER VARIABLES----------------------------
 	/**
 	 * Counter of all read persons
 	 */
 	private int personCnt;
 
 	/**
-	 * Count of all persons, who use public transport
+	 * Counter of all persons, who use public transport
 	 */
 	private int ptUserCnt;
 
@@ -50,6 +52,13 @@ public class PtCheck extends PersonAlgorithm {
 	 */
 	private DataOutputStream out;
 
+	// -----------------------CONSTRUCTOR--------------------------------
+	/**
+	 * @param fileName -
+	 *            the filename of the .txt-file, in which the public transit
+	 *            user amount and fraction will be saved.
+	 * @throws IOException
+	 */
 	public PtCheck(String fileName) throws IOException {
 		out = new DataOutputStream(new BufferedOutputStream(
 				new FileOutputStream(new File(fileName))));
@@ -66,6 +75,7 @@ public class PtCheck extends PersonAlgorithm {
 			ptUserCnt++;
 	}
 
+	// ---------------------------GETTER------------------------------------
 	public double getPtRate() {
 		if (personCnt > 0)
 			return (double) ptUserCnt / (double) personCnt;
@@ -74,19 +84,20 @@ public class PtCheck extends PersonAlgorithm {
 	}
 
 	/**
-	 * @return Returns the personCnt.
+	 * @return the personCnt.
 	 */
 	public int getPersonCnt() {
 		return personCnt;
 	}
 
 	/**
-	 * @return Returns the ptUserCnt.
+	 * @return the ptUserCnt.
 	 */
 	public int getPtUserCnt() {
 		return ptUserCnt;
 	}
 
+	// ----------------------------SETTER---------------------------------
 	/**
 	 * @param personCnt
 	 *            The personCnt to set.
@@ -96,26 +107,37 @@ public class PtCheck extends PersonAlgorithm {
 	}
 
 	/**
-	 * @param ptUserCnt
+	 * @param ptUserCnt -
 	 *            The ptUserCnt to set.
 	 */
 	public void setPtUserCnt(int ptUserCnt) {
 		this.ptUserCnt = ptUserCnt;
 	}
 
+	/**
+	 * writes public transit user amount and fraction into .txt-file.
+	 * 
+	 * @param Iter -
+	 *            number of iteration
+	 * @throws IOException
+	 */
 	public void write(int Iter) throws IOException {
 		double ptRate = getPtRate();
 		double ptUserCnt = getPtUserCnt();
 		out.writeBytes(Iter + "\t" + ptRate + "\t" + ptUserCnt + "\n");
-		System.out.println("There are " + ptRate * 100
-				+ "% persons who use Public Transportation! " + ptUserCnt + "/"
-				+ getPersonCnt());
+//		System.out.println("There are " + ptRate * 100
+//				+ "% persons who use Public Transportation! " + ptUserCnt + "/"
+//				+ getPersonCnt());
 	}
 
 	public void writeEnd() throws IOException {
 		out.close();
 	}
-	public void resetCnt(){
+
+	/**
+	 * resets number of all persons and persons, who use public transit
+	 */
+	public void resetCnt() {
 		setPersonCnt(0);
 		setPtUserCnt(0);
 	}

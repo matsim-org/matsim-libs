@@ -27,14 +27,20 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.misc.Time;
 
+/**
+ * it's a modified copy of org.matsim.plans.algorithms.PlanMutateTimeAllocation
+ * @author yu
+ *
+ */
 public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
-
+	//------------------------------MEMBER VARIABLE---------------------------
 	private final int mutationRange;
 
+	//---------------------------------CONSTRUCTOR----------------------------
 	public PlanMutateTimeAllocationBottleneck(int mutationRange) {
 		this.mutationRange = mutationRange;
 	}
-	
+
 	public void run(Plan plan) {
 		mutatePlan(plan);
 	}
@@ -42,14 +48,14 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
 	private void mutatePlan(Plan plan) {
 
 		int max = plan.getActsLegs().size();
-		
+
 		int now = 0;
-		
+
 		// apply mutation to all activities except the last home activity
-		for (int i = 0; i < max; i++ ) {
+		for (int i = 0; i < max; i++) {
 
 			if (i % 2 == 0) {
-				Act act = (Act)(plan.getActsLegs().get(i));
+				Act act = (Act) (plan.getActsLegs().get(i));
 				// invalidate previous activity times because durations will change
 				act.setStartTime(Time.UNDEFINED_TIME);
 
@@ -63,33 +69,33 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
 					act.setDur(act.getEndTime() - act.getStartTime());
 					// move now pointer
 					now += act.getEndTime();
-					
-				// handle middle activities	
+
+					// handle middle activities	
 				} else if ((i > 0) && (i < (max - 1))) {
-					
+
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
 					// mutate the durations of all 'middle' activities
 					act.setDur(7200);
-//					           ^^^^
+					//		   ^^^^
 					now += act.getDur();
 					// set end time accordingly
 					act.setEndTime(Time.UNDEFINED_TIME);
-//					  			   ^^^^^^^^^^^^^^^^^^
-				// handle last activity
+					//					^^^^^^^^^^^^^^^^^^
+					// handle last activity
 				} else if (i == (max - 1)) {
-					
+
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
 					act.setDur(Time.UNDEFINED_TIME);
 					act.setEndTime(Time.UNDEFINED_TIME);
 				}
-				
+
 			} else {
-				
-				Leg leg = (Leg)(plan.getActsLegs().get(i));
-				
+
+				Leg leg = (Leg) (plan.getActsLegs().get(i));
+
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepTime(now);
 				// let duration untouched. if defined add it to now
@@ -98,21 +104,23 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
 				}
 				// set planned arrival time accordingly
 				leg.setArrTime(now);
-				
+
 			}
 		}
 	}
 
 	private double mutateTime(final double time) {
 		double t = time;
-		if (t != Time.UNDEFINED_TIME) {		
-			t = t + (int)((Gbl.random.nextDouble() * 2.0 - 1.0) * mutationRange);
-			if (t < 0) t = 0;
-			if (t > 24*3600) t = 24*3600;
+		if (t != Time.UNDEFINED_TIME) {
+			t = t
+					+ (int) ((Gbl.random.nextDouble() * 2.0 - 1.0) * mutationRange);
+			if (t < 0)
+				t = 0;
+			if (t > 24 * 3600)
+				t = 24 * 3600;
 		} else {
-			t = Gbl.random.nextInt(24*3600);
+			t = Gbl.random.nextInt(24 * 3600);
 		}
 		return t;
 	}
-
 }

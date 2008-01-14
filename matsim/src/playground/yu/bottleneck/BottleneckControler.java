@@ -32,10 +32,11 @@ import org.matsim.replanning.selectors.RandomPlanSelector;
  * @author ychen
  */
 public class BottleneckControler extends Controler {
-
+	// --------------------------MENBER VARIABLES---------------
 	private final TimeWriter timeWriter;
 	private final BottleneckTraVol bTV;
 
+	// --------------------------CONSTRUCTOR---------------------
 	public BottleneckControler() {
 		super();
 		this.timeWriter = new TimeWriter(
@@ -74,6 +75,7 @@ public class BottleneckControler extends Controler {
 		return manager;
 	}
 
+	// -------------------------MAIN FUNCTION-------------------
 	public static void main(final String[] args) {
 		final BottleneckControler ctl = new BottleneckControler();
 		System.out.println(args);

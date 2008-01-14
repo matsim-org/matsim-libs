@@ -33,15 +33,15 @@ import java.util.Map.Entry;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.writer.MatsimXmlWriter;
 
 /**
  * analyses MATSim networkfile
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class Subsequent extends MatsimXmlWriter {
 
@@ -54,15 +54,15 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * The important intermediate result.
-	 *
-	 * (arg0) - ssLinkId: the "default next" linkId of the "current" Link
-	 * (arg1) - linkId: the "current" Link
+	 * 
+	 * (arg0) - ssLinkId: the "default next" linkId of the "current" Link (arg1) -
+	 * linkId: the "current" Link
 	 */
 	private TreeMap<String, String> ssLinks = new TreeMap<String, String>();
 
 	/**
 	 * Constructor transfers the links of network to local links
-	 *
+	 * 
 	 * @param network
 	 */
 	public Subsequent(NetworkLayer network) {
@@ -102,13 +102,18 @@ public class Subsequent extends MatsimXmlWriter {
 					double xTo = cTo.getX();
 					double yTo = cTo.getY();
 					Coord cOut = out.getCoord();
-					double deltaTheta = Math.atan2(cOut.getY() - yTo, cOut.getX() - xTo)
-							- Math.atan2(yTo - cFrom.getY(), xTo- cFrom.getX());
+					double deltaTheta = Math.atan2(cOut.getY() - yTo, cOut
+							.getX()
+							- xTo)
+							- Math
+									.atan2(yTo - cFrom.getY(), xTo
+											- cFrom.getX());
 					while (deltaTheta < -Math.PI)
 						deltaTheta += 2.0 * Math.PI;
 					while (deltaTheta > Math.PI)
 						deltaTheta -= 2.0 * Math.PI;
-					absDeltaThetas.put(out.getId().toString(), Math.abs(deltaTheta));
+					absDeltaThetas.put(out.getId().toString(), Math
+							.abs(deltaTheta));
 				}
 				ssLinks.put(computeSubsequentLink(l, absDeltaThetas), l.getId()
 						.toString());
@@ -126,7 +131,7 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * Calculates the "default next" linkId intermediately
-	 *
+	 * 
 	 * @param thetas
 	 * @return
 	 */
@@ -140,9 +145,9 @@ public class Subsequent extends MatsimXmlWriter {
 		while (outLinkId.equals("")) {
 			minThetaOutNodeIds.clear();
 			double absMin = Collections.min(thetas.values());
-			for (Iterator kVPairs = thetas.entrySet().iterator(); kVPairs
-					.hasNext();) {
-				Map.Entry entry = (Map.Entry) kVPairs.next();
+			for (Iterator<Entry<String, Double>> kVPairs = thetas.entrySet()
+					.iterator(); kVPairs.hasNext();) {
+				Map.Entry<String, Double> entry = kVPairs.next();
 				if (absMin == ((Double) entry.getValue()).doubleValue())
 					minThetaOutNodeIds.add((String) entry.getKey());
 			}
@@ -176,7 +181,7 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * gets the link, who has suitable fromNode(Id) and toNode(Id)
-	 *
+	 * 
 	 * @param outNodeId -
 	 *            one of outNodeIds of a toNode
 	 * @param l -
@@ -188,13 +193,14 @@ public class Subsequent extends MatsimXmlWriter {
 			if (outL.getToNode().getId().toString().equals(outNodeId))
 				return outL;
 		}
-		System.err.println("[WARNING]The link you are looking for doesn'/t exist in the network!");
+		System.err
+				.println("[WARNING]The link you are looking for doesn'/t exist in the network!");
 		return null;
 	}
 
 	/**
 	 * writes linkId and the "default next" linkId into a .xml-file
-	 *
+	 * 
 	 * @param filename
 	 * @throws IOException
 	 */
@@ -208,14 +214,15 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * writes contents (ssLinkId-linkId-pair) into the writer.
-	 *
+	 * 
 	 * @throws IOException
 	 */
 	private void write() throws IOException {
 		writer.write("<subsequent>\n");
 		// links
 		writer.write("\t<links>\n");
-		for (Iterator it = ssLinks.entrySet().iterator(); it.hasNext();) {
+		for (Iterator<Entry<String, String>> it = ssLinks.entrySet().iterator(); it
+				.hasNext();) {
 			Entry<String, String> next = (Entry<String, String>) it.next();
 			writer.write("\t\t<link id=\"" + next.getValue()
 					+ "\" subsequentLinkId=\"" + next.getKey() + "\" />\n");

@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicPlan.LegIterator;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;

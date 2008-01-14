@@ -20,36 +20,28 @@
 
 package playground.yu.bottleneck;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
-
 public class TimeAllocationMutatorBottleneck extends MultithreadedModuleA {
+//-----------------------------MEMBER VARIABLE------------------------------
+	private final int mutationRange = 1800;
 
-	private
-	final 
-	int mutationRange = 1800;
-///////////////////////////
-//	public TimeAllocationMutatorBottleneck() {
-//		String range = null;
-//		try {
-//			range = Gbl.getConfig().getParam("TimeAllocationMutatorBottleneck","mutationRange");
-////			                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//		}
-//		catch (IllegalArgumentException e) {
-//			Gbl.noteMsg(this.getClass(),"TimeAllocationMutatorBottleneck()","No mutation range defined in the config file. Using 1800 sec.");
-//		}
-//		if (range != null) {
-//			this.mutationRange = Integer.parseInt(range);
-//			Gbl.noteMsg(this.getClass(),"TimeAllocationMutatorBottleneck()","mutation range = " + this.mutationRange + ".");
-//		}
-//	}
-//
-//	public TimeAllocationMutatorBottleneck(final int muntation_range) {
-//		this.mutationRange = muntation_range;
-//	}
-//////////////////////////////////////////////////
+	/*
+	 * ////////////////////////// // public TimeAllocationMutatorBottleneck() { //
+	 * String range = null; // try { // range =
+	 * Gbl.getConfig().getParam("TimeAllocationMutatorBottleneck","mutationRange");
+	 * //// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ // } // catch
+	 * (IllegalArgumentException e) { //
+	 * Gbl.noteMsg(this.getClass(),"TimeAllocationMutatorBottleneck()","No
+	 * mutation range defined in the config file. Using 1800 sec."); // } // if
+	 * (range != null) { // this.mutationRange = Integer.parseInt(range); //
+	 * Gbl.noteMsg(this.getClass(),"TimeAllocationMutatorBottleneck()","mutation
+	 * range = " + this.mutationRange + "."); // } // } // // public
+	 * TimeAllocationMutatorBottleneck(final int muntation_range) { //
+	 * this.mutationRange = muntation_range; // }
+	 * /////////////////////////////////////////////////
+	 */
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
 		return new PlanMutateTimeAllocationBottleneck(this.mutationRange);
