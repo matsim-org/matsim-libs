@@ -208,4 +208,11 @@ public class ScoreStats implements ControlerStartupListener, ControlerFinishIter
 		}
 
 	}
+
+	/**
+	 * @return the history of scores in last iterations
+	 */
+	public double[][] getHistory() {
+		return history;
+	}
 }
