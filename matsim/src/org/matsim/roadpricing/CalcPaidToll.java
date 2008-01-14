@@ -35,10 +35,11 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  * Calculates the toll agents pay during a simulation by analyzing events. To
  * fully function, add an instance of this class as EventHandler to your Events
  * object.
- *
+ * 
  * @author mrieser
  */
-public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWait2LinkI {
+public class CalcPaidToll implements EventHandlerLinkEnterI,
+		EventHandlerAgentWait2LinkI {
 
 	static class AgentInfo {
 		public double toll = 0.0;
@@ -51,20 +52,26 @@ public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWa
 
 	private TollBehaviourI handler = null;
 
-	public CalcPaidToll(final NetworkLayer network, final RoadPricingScheme scheme) {
+	public CalcPaidToll(final NetworkLayer network,
+			final RoadPricingScheme scheme) {
 		super();
 		this.network = network;
 		this.scheme = scheme;
-		if ("distance".equals(scheme.getType())) this.handler = new DistanceTollBehaviour();
-		else if ("area".equals(scheme.getType())) this.handler = new AreaTollBehaviour();
-		else if ("cordon".equals(scheme.getType())) this.handler = new CordonTollBehaviour();
-		else throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
+		if ("distance".equals(scheme.getType()))
+			this.handler = new DistanceTollBehaviour();
+		else if ("area".equals(scheme.getType()))
+			this.handler = new AreaTollBehaviour();
+		else if ("cordon".equals(scheme.getType()))
+			this.handler = new CordonTollBehaviour();
+		else
+			throw new IllegalArgumentException("RoadPricingScheme of type \""
+					+ scheme.getType() + "\" is not supported.");
 	}
 
 	public void handleEvent(final EventLinkEnter event) {
 		Link link = event.link;
 		if (link == null) {
-			link = (Link)this.network.getLocation(event.linkId);
+			link = (Link) this.network.getLocation(event.linkId);
 		}
 		this.handler.handleEvent(event, link);
 	}
@@ -72,7 +79,7 @@ public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWa
 	public void handleEvent(final EventAgentWait2Link event) {
 		Link link = event.link;
 		if (link == null) {
-			link = (Link)this.network.getLocation(event.linkId);
+			link = (Link) this.network.getLocation(event.linkId);
 		}
 		this.handler.handleEvent(event, link);
 	}
@@ -82,8 +89,9 @@ public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWa
 	}
 
 	/**
-	 * Returns the toll the specified agent has paid in the course of the simulation so far.
-	 *
+	 * Returns the toll the specified agent has paid in the course of the
+	 * simulation so far.
+	 * 
 	 * @param agentId
 	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
 	 */
@@ -96,6 +104,17 @@ public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWa
 	}
 
 	/**
+	 * @return The toll paid by all the agents.
+	 */
+	public double getAllAgentsToll() {
+		double tolls = 0;
+		for (AgentInfo ai : agents.values()) {
+			tolls += (ai == null) ? 0.0 : ai.toll;
+		}
+		return tolls;
+	}
+
+	/**
 	 * A simple interface to implement different toll schemes.
 	 */
 	private interface TollBehaviourI {
@@ -104,7 +123,8 @@ public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWa
 
 	class DistanceTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final BasicEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.time);
+			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(),
+					event.time);
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
 				AgentInfo info = CalcPaidToll.this.agents.get(event.agentId);
@@ -119,7 +139,8 @@ public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWa
 
 	class AreaTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final BasicEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.time);
+			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(),
+					event.time);
 			if (cost != null) {
 				AgentInfo info = CalcPaidToll.this.agents.get(event.agentId);
 				if (info == null) {
@@ -133,7 +154,8 @@ public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWa
 
 	class CordonTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final BasicEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.time);
+			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(),
+					event.time);
 			if (cost != null) {
 				AgentInfo info = CalcPaidToll.this.agents.get(event.agentId);
 				if (info == null) {
