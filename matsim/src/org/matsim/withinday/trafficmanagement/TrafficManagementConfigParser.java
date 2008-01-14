@@ -31,7 +31,7 @@ import org.matsim.plans.Route;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplAll;
-import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplAllNewFlow;
+import org.matsim.withinday.trafficmanagement.controlinput.ControlInputSB;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplDAccident;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplDistribution;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImplMB;
@@ -93,7 +93,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 //	private static final String PIDCONTROLER = "PIDControler";
 
-	private static final String CONTROLINPUTSB = "ControlInputImplSB";
+	private static final String CONTROLINPUTSIMPLESB = "ControlInputImplSB";
 	
 	private static final String CONTROLINPUT1 = "ControlInputImpl1";
 
@@ -105,7 +105,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private static final String CONTROLINPUTALL = "ControlInputImplAll";
 	
-	private static final String CONTROLINPUTALLNEWFLOW = "ControlInputImplAllNewFlow";
+	private static final String CONTROLINPUTSB = "ControlInputSB";
 	
 	private static final String CONTROLINPUTSTATICADDITION = "ControlInputImplStaticAddition";
 
@@ -280,7 +280,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	}
 
 	private ControlInput createControlInput(final String content) {
-		if (content.trim().compareTo(CONTROLINPUTSB) == 0) {
+		if (content.trim().compareTo(CONTROLINPUTSIMPLESB) == 0) {
 			ControlInputImplSB controlInput = new ControlInputImplSB();
 			controlInput.setAccidents(this.trafficManagement.getAccidents());
 			this.events.addHandler(controlInput);
@@ -313,8 +313,8 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 			this.events.addHandler(controlInput);
 			return controlInput;
 		}
-		else if (content.trim().compareTo(CONTROLINPUTALLNEWFLOW) == 0) {
-			ControlInputImplAllNewFlow controlInput = new ControlInputImplAllNewFlow();
+		else if (content.trim().compareTo(CONTROLINPUTSB) == 0) {
+			ControlInputSB controlInput = new ControlInputSB();
 			controlInput.setAccidents(this.trafficManagement.getAccidents());
 			this.events.addHandler(controlInput);
 			return controlInput;
