@@ -87,7 +87,7 @@ public class ControlInputImplAllNewFlow extends AbstractControlInputImpl
 
 	private static final boolean INCIDENTDETECTIONACTIVATED = false;
 
-	private static final double RESETBOTTLENECKINTERVALL = 1800;
+	private static final double RESETBOTTLENECKINTERVALL = 60;
 
 	
 	private static final Logger log = Logger.getLogger(ControlInputImplAllNewFlow.class);
@@ -302,18 +302,6 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 		}
 		return ttFS;
 	}
-
-//	private double getDistanceFromFirstNode(Node node, Route route) {
-//		Link[] routeLinks = route.getLinkRoute();
-//		double distance = 0;
-//		int i=0;
-//		while(!routeLinks[i].getToNode().equals(node)){
-//			distance += routeLinks[i].getLength();
-//			i++;
-//		}
-//		distance += routeLinks[i].getLength();
-//		return distance;
-//	}
 
 	@Override
 	public void handleEvent(final EventLinkEnter event) {
@@ -595,18 +583,11 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 	
 	private int getAdditionalAgents(final Route route, final int linkIndex){
 		double totalExtraAgents = 0.0;
-		double netFlow = 0.0;
-//		double distanceToBottleNeck = 0.0;
 
 		//check distance and free speed travel time from start node to bottleneck
 		Link [] routeLinks = route.getLinkRoute();
 		String linkId1 = routeLinks[linkIndex].getId().toString();
 		double ttToLink = ttFreeSpeedUpToAndIncludingLink.get(linkId1);
-//		for (int i = 0; i <= linkIndex; i++) {
-//			String linkId = routeLinks[linkIndex].getId().toString();
-//			ttToLink += this.ttFreeSpeeds.get(linkId);
-//		}
-		
 		
 		List<Link> inAndOutLinks = new ArrayList<Link>();
 		inAndOutLinks.addAll(this.getOutlinks(route));
@@ -622,89 +603,12 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 			}
 			else {
 				extraAgents = flow * this.ttFreeSpeedUpToAndIncludingLink.get(linkId);
-				System.out.println("Extra agents = " + flow + " * " + this.ttFreeSpeedUpToAndIncludingLink.get(linkId) + " (link" + linkId + " )." );
+//				System.out.println("Extra agents = " + flow + " * " + this.ttFreeSpeedUpToAndIncludingLink.get(linkId) + " (link" + linkId + " )." );
 			}
 			totalExtraAgents += extraAgents;
 		}
-		
-		/*
-		//Sum up INFLOWS and weigh it corresponding to their distance to the start node.
-		Iterator<Link> itInlinks = this.getInlinks(route).iterator();
-		while(itInlinks.hasNext()){
-			Link inLink = itInlinks.next();
-			double inFlow = getInOutFlow(inLink, route);
-			double weightedInFlow = 0;
-			//don't include Links after the bottleNeck. Also takes care of null-case
-			if(this.inFlowDistances.get(inLink.getId().toString()) == null
-					|| this.inFlowDistances.get(inLink.getId().toString()) > distanceToBottleNeck){
-				weightedInFlow = 0;
-			}
-			else{
-				weightedInFlow = inFlow * this.inFlowDistances.get(inLink.getId().toString());				}
-			weightedNetFlow += weightedInFlow;
-		}
-		
-		//Sum up OUTFLOWS and weigh it corresponding to their distance to the start node.
-		Iterator<Link> itOutlinks = this.getOutlinks(route).iterator();
-		while(itOutlinks.hasNext()){
-			Link outLink = itOutlinks.next();
-			double outFlow = getOutFlow(outLink, route);
-			double weightedOutFlow = 0;
-			if( this.outFlowDistances.get(outLink.getId().toString()) == null
-					|| this.outFlowDistances.get(outLink.getId().toString()) > distanceToBottleNeck){
-				weightedOutFlow = 0;
-			}
-			else{
-				weightedOutFlow = outFlow * this.outFlowDistances.get(outLink.getId().toString());
-			}
-			weightedNetFlow -= weightedOutFlow;
-		}
-		*/
-//		netFlow = weightedNetFlow / ttToLink;
-//		System.out.println("Net flow = " + weightedNetFlow + " / " + ttToLink + " = " + netFlow);
 		return (int)(totalExtraAgents);
 	}
-	
-	
-	/*
-	//set new in and outflows and reset numbersPassedOnInAndOutLinks every [FLOWUPDATETIME]
-	private void calculateInAndOutFlows() {
-		//inLinksMainRoute
-		Iterator<Link> itInlinksMain = inLinksMainRoute.iterator();
-		while(itInlinksMain.hasNext()){
-			Link inLink = itInlinksMain.next();
-			double flow = (double)numbersPassedOnInAndOutLinks.get(inLink.getId().toString())/FLOWUPDATETIME;
-			this.inFlows.put(inLink.getId().toString(), flow);
-			numbersPassedOnInAndOutLinks.put(inLink.getId().toString(), 0);
-		}
-
-		//outLinksMainRoute
-		Iterator<Link> itOutlinksMain = outLinksMainRoute.iterator();
-		while(itOutlinksMain.hasNext()){
-			Link outLink = itOutlinksMain.next();
-			double flow = (double)numbersPassedOnInAndOutLinks.get(outLink.getId().toString())/FLOWUPDATETIME;
-			this.outFlows.put(outLink.getId().toString(), flow);
-			numbersPassedOnInAndOutLinks.put(outLink.getId().toString(), 0);
-		}
-		//inLinksAlternativeRoute
-		Iterator<Link> itInlinksAlt = inLinksAlternativeRoute.iterator();
-		while(itInlinksAlt.hasNext()){
-			Link inLink = itInlinksAlt.next();
-			double flow = (double)numbersPassedOnInAndOutLinks.get(inLink.getId().toString())/FLOWUPDATETIME;
-			this.inFlows.put(inLink.getId().toString(), flow);
-			numbersPassedOnInAndOutLinks.put(inLink.getId().toString(), 0);
-		}
-
-		//outLinksAlternativeRoute
-		Iterator<Link> itOutlinksAlt = outLinksAlternativeRoute.iterator();
-		while(itOutlinksAlt.hasNext()){
-			Link outLink = itOutlinksAlt.next();
-			double flow = (double)numbersPassedOnInAndOutLinks.get(outLink.getId().toString())/FLOWUPDATETIME;
-			this.outFlows.put(outLink.getId().toString(), flow);
-			numbersPassedOnInAndOutLinks.put(outLink.getId().toString(), 0);
-		}		
-	}
-	*/
 	
 	
 	private List<Link> getOutlinks(Route route) {
@@ -724,23 +628,6 @@ private double sumUpTTFreeSpeed(Node node, Route route) {
 			return this.inLinksAlternativeRoute;
 		}
 	}
-
-/*
-	private double getOutFlow(Link outLink, Route route) {
-		double flow;
-		if(route == this.mainRoute){
-			flow = this.outFlows.get(outLink.getId().toString());
-		}
-		else if(route == this.alternativeRoute){
-			flow = this.outFlows.get(outLink.getId().toString());
-		}
-		else{
-			flow = 0;
-			System.err.println("Something is wrong, this shouldn't happen!");
-		}
-		return flow;
-	}
-*/
 
 	private double getInOutFlow(Link inLink, Route route) {
 		double flow;
