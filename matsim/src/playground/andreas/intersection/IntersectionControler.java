@@ -26,11 +26,17 @@ package playground.andreas.intersection;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.SimulationTimer;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.netvis.NetVis;
 
@@ -40,12 +46,14 @@ import playground.andreas.intersection.sim.QSim;
 
 public class IntersectionControler extends Controler {
 	
+	final private static Logger log = Logger.getLogger(QueueLink.class);
+	
 	protected void runMobSim() {
 		
 		SimulationTimer.setTime(0);
 				
 		/* remove eventswriter, as the external mobsim has to write the events */
-		this.events.removeHandler(this.eventwriter);
+//		this.events.removeHandler(this.eventwriter);
 		QSim sim = new QSim(this.events, this.population, (QNetworkLayer) this.network);
 		sim.run();
 		
@@ -65,6 +73,44 @@ public class IntersectionControler extends Controler {
 		return network;
 	}
 
+	// Override or not
+	@Override
+	protected Plans loadPopulation() {
+
+		Plans pop = new Plans(Plans.NO_STREAMING);
+
+		log.info("  generating plans... ");
+				
+		int ii = 1;
+		Link destLink = network.getLink("1");
+		Link sourceLink = network.getLink("20");
+					
+		for (int jj = 1; jj <= 6; jj++) {					
+			generatePerson(ii, sourceLink, destLink, pop);
+			ii++;					
+		}		
+		
+		return pop;
+		
+	}
+	
+	private void generatePerson(int ii, Link sourceLink, Link destLink, Plans population){
+		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
+		Plan plan = new Plan(p);
+		try {
+			plan.createAct("h", 100., 100., sourceLink, 0., 0*60*60., 0., true);
+			plan.createLeg("1", "car", null, null, null);
+			plan.createAct("h", 200., 200., destLink, 8*60*60, 0., 0., true);
+			
+			p.addPlan(plan);
+			population.addPerson(p);			
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+	
+	
 	/**
 	 * Conversion of events -> snapshots
 	 *
