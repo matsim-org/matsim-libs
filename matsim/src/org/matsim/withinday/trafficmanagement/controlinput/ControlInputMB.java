@@ -75,11 +75,13 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
 //	User parameters:
 
-	private static final int NUMBEROFEVENTSDETECTION = 20;
+	private static final int NUMBEROFEVENTSDETECTION = 10;
 
-	private static final double IGNOREDQUEUINGTIME = 20; // seconds
+	private static final double IGNOREDQUEUINGTIME = 30; // seconds
+	
+	private double UPDATETIMEINOUTFLOW = 300;
 
-	private static final int NUMBEROFEVENTSINOUTFLOW = 20;
+//	private static final int NUMBEROFEVENTSINOUTFLOW = 20;
 
 	private static final double RESETBOTTLENECKINTERVALL = 1;
 
@@ -282,6 +284,8 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 			}
 		}
 //		this.bottleNecksAlt = null;
+		this.UPDATETIMEINOUTFLOW = getFreeSpeedRouteTravelTime(this.alternativeRoute);
+
 	}
 
 	private double sumUpTTFreeSpeed(Node node, Route route) {
@@ -337,7 +341,9 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		}
 		if ( this.inLinksAlternativeRoute.contains(event.link) || this.outLinksAlternativeRoute.contains(event.link) ||
 				this.inLinksMainRoute.contains(event.link) || this.outLinksMainRoute.contains(event.link) ) {
-			updateFlow(NUMBEROFEVENTSINOUTFLOW, event);
+//			updateFlow(NUMBEROFEVENTSINOUTFLOW, event);
+			updateFlow(UPDATETIMEINOUTFLOW, event);
+
 		}
 
 		super.handleEvent(event);
@@ -360,6 +366,43 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		else {
 			System.err.println("Error: number of enter event times stored exceeds numberofflowevents!");
 		}
+
+//		Flow = agents / seconds:
+		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
+
+		if (this.intraFlows.containsKey(event.linkId)) {
+			this.intraFlows.put(event.linkId, flow);
+		}
+		if ( this.inLinksMainRoute.contains(event.link) ) {
+			double inFlow = flow;
+			this.extraFlowsMainRoute.put(event.linkId,inFlow);
+		}
+		if ( this.outLinksMainRoute.contains(event.link) ) {
+			double outFlow = -flow;
+			this.extraFlowsMainRoute.put(event.linkId, outFlow);
+		}
+		if ( this.inLinksAlternativeRoute.contains(event.link) ) {
+			double inFlow = flow;
+			this.extraFlowsAlternativeRoute.put(event.linkId, inFlow);
+		}
+		if (this.outLinksAlternativeRoute.contains(event.link) ) {
+			double outFlow = -flow;
+			this.extraFlowsAlternativeRoute.put(event.linkId, outFlow);
+		}
+	}
+	
+
+	private void updateFlow(double flowUpdateTime, EventLinkLeave event) {
+
+		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes.get(event.linkId);
+//		Remove times older than flowUpdateTime
+		if (!list.isEmpty()) {
+			while ( ( list.getFirst() + flowUpdateTime) < event.time ) {
+				list.removeFirst();
+			}
+		}
+//		Add new values
+		list.addLast(event.time);
 
 //		Flow = agents / seconds:
 		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());

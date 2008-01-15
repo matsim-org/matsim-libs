@@ -77,7 +77,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 //	User parameters:
 	private static final boolean DISTRIBUTIONCHECKACTIVATED = false;
 
-	private static final boolean BACKGROUNDNOISECOMPENSATIONACTIVATED = true;
+	private static final boolean BACKGROUNDNOISECOMPENSATIONACTIVATED = false;
 
 //	private static final int NUMBEROFEVENTSINOUTFLOW = 20;
 
