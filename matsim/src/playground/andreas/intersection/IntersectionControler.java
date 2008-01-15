@@ -1,4 +1,5 @@
 package playground.andreas.intersection;
+
 /*
  * $Id: MyControler1.java,v 1.3 2007/11/20 15:31:20 fboffo Exp $
  */
@@ -43,22 +44,23 @@ import org.matsim.utils.vis.netvis.NetVis;
 import playground.andreas.intersection.sim.QNetworkLayer;
 import playground.andreas.intersection.sim.QSim;
 
-
 public class IntersectionControler extends Controler {
-	
+
 	final private static Logger log = Logger.getLogger(QueueLink.class);
-	
+
 	protected void runMobSim() {
-		
+
 		SimulationTimer.setTime(0);
-				
-		/* remove eventswriter, as the external mobsim has to write the events */
-//		this.events.removeHandler(this.eventwriter);
+
+		// TODO [an] Is needed ? or
+		// remove eventswriter, as the external mobsim has to write the events */
+		// this.events.removeHandler(this.eventwriter);
 		QSim sim = new QSim(this.events, this.population, (QNetworkLayer) this.network);
 		sim.run();
-		
+
 	}
-	
+
+	/** Needed to specify a QNetworkLayer as taget */
 	@Override
 	protected NetworkLayer loadNetwork() {
 		printNote("", "  creating network layer... ");
@@ -73,91 +75,87 @@ public class IntersectionControler extends Controler {
 		return network;
 	}
 
-	// Override or not
+	/** Should be overwritten in case of artifical population */
 	@Override
 	protected Plans loadPopulation() {
 
 		Plans pop = new Plans(Plans.NO_STREAMING);
 
 		log.info("  generating plans... ");
-				
+
 		int ii = 1;
 		Link destLink = network.getLink("1");
 		Link sourceLink = network.getLink("20");
-					
-		for (int jj = 1; jj <= 6; jj++) {					
+
+		for (int jj = 1; jj <= 6; jj++) {
 			generatePerson(ii, sourceLink, destLink, pop);
-			ii++;					
-		}		
-		
+			ii++;
+		}
+
 		return pop;
-		
+
 	}
-	
-	private void generatePerson(int ii, Link sourceLink, Link destLink, Plans population){
+
+	/** Generates one Person a time */
+	private void generatePerson(int ii, Link sourceLink, Link destLink, Plans population) {
 		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
 		Plan plan = new Plan(p);
 		try {
-			plan.createAct("h", 100., 100., sourceLink, 0., 0*60*60., 0., true);
+			plan.createAct("h", 100., 100., sourceLink, 0., 0 * 60 * 60., 0., true);
 			plan.createLeg("1", "car", null, null, null);
-			plan.createAct("h", 200., 200., destLink, 8*60*60, 0., 0., true);
-			
+			plan.createAct("h", 200., 200., destLink, 8 * 60 * 60, 0., 0., true);
+
 			p.addPlan(plan);
-			population.addPerson(p);			
+			population.addPerson(p);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
-	
-	
-	/**
-	 * Conversion of events -> snapshots
-	 *
-	 */
-	protected void makeVis(){
-		
-		File driversLog = new File("./drivers.txt");		
+
+	/** Conversion of events -> snapshots */
+	protected void makeVis() {
+
+		File driversLog = new File("./drivers.txt");
 		File visDir = new File("./output/vis");
 		File eventsFile = new File("./output/vis/events.txt");
-				
-		if (driversLog.exists()){
+
+		if (driversLog.exists()) {
 			visDir.mkdir();
 			driversLog.renameTo(eventsFile);
-			
+
 			Events2Snapshot events2Snapshot = new org.matsim.run.Events2Snapshot();
-			events2Snapshot.run(eventsFile, Gbl.getConfig(), network);			
-			
+			events2Snapshot.run(eventsFile, Gbl.getConfig(), network);
+
 			// Run NetVis if possible
-			if (Gbl.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
-				String[] visargs = {"./output/vis/Snapshot"};						
+			if (Gbl.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")) {
+				String[] visargs = { "./output/vis/Snapshot" };
 				NetVis.main(visargs);
-			}			
-			
+			}
+
 		} else {
 			System.err.println("Couldn't find " + driversLog);
 			System.exit(0);
-		}		
-		
-		String[] visargs = {"./output/ITERS/it.0/Snapshot"};						
+		}
+
+		String[] visargs = { "./output/ITERS/it.0/Snapshot" };
 		NetVis.main(visargs);
 	}
-	
-		
+
 	public static void main(final String[] args) {
-		
-		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./test/shared/itsumo-sesam-scenario/config.xml"});	
+
+		if (args.length == 0) {
+			Gbl.createConfig(new String[] { "./test/shared/itsumo-sesam-scenario/config.xml" });
 		} else {
-			Gbl.createConfig(args) ;
+			Gbl.createConfig(args);
 		}
-				
+
 		final IntersectionControler controler = new IntersectionControler();
-		controler.setOverwriteFiles(true) ;
-		
+		controler.setOverwriteFiles(true);
+
 		controler.run(null);
-		
-//		controler.makeVis();
-	}	
+
+		// controler.makeVis();
+	}
 
 }

@@ -9,6 +9,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 
+/** Copied from org.matsim.mobsim.PersonAlgo_CreateVehicle */
 public class QCreateVehicle extends PersonAlgorithm {
 
 	// ////////////////////////////////////////////////////////////////////

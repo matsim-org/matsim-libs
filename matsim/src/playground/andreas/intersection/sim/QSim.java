@@ -39,15 +39,9 @@ public class QSim extends Simulation {
 	protected static final int INFO_PERIOD = 3600;
 
 	private static Events events = null;
-
 	private Plans plans;
-
 	private QNetworkLayer network;
-
 	private Config config;
-
-	// final private static Logger log =
-	// Logger.getLogger(QueueSimulation.class);
 
 	public QSim(Events events, Plans population, QNetworkLayer network) {
 		super();
@@ -58,76 +52,77 @@ public class QSim extends Simulation {
 	}
 
 	protected void prepareSim() {
-		System.out.println("Preparing Sim");
-		
+		log.info("Preparing Sim");
+
 		double startTime = this.config.simulation().getStartTime();
 		this.stopTime = this.config.simulation().getEndTime();
 
-		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
-		if (this.stopTime == Time.UNDEFINED_TIME || this.stopTime == 0) this.stopTime = Double.MAX_VALUE;
-
-		SimulationTimer.setSimStartTime(24*3600);
-		SimulationTimer.setTime(startTime);
-		
-		if (this.plans == null) {
-			throw new RuntimeException(
-					"No valid Population found (plans == null)");
+		if (startTime == Time.UNDEFINED_TIME) {
+			startTime = 0.0;
 		}
 
+		if (this.stopTime == Time.UNDEFINED_TIME || this.stopTime == 0) {
+			this.stopTime = Double.MAX_VALUE;
+		}
+
+		SimulationTimer.setSimStartTime(24 * 3600);
+		SimulationTimer.setTime(startTime);
+
+		if (this.plans == null) {
+			throw new RuntimeException("No valid Population found (plans == null)");
+		}
+
+		// Put agents in vehicle
 		this.plans.addAlgorithm(new QCreateVehicle());
 		this.plans.runAlgorithms();
 		this.plans.clearAlgorithms();
-		
-		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
-		SimulationTimer.setSimStartTime(Math.max(startTime,SimulationTimer.getSimStartTime()));
-		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
 
+		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
+		SimulationTimer.setSimStartTime(Math.max(startTime, SimulationTimer.getSimStartTime()));
+		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
 	}
 
 	protected void cleanupSim() {
-		System.out.println("cleanup");
-
+		log.info("cleanup");
 	}
 
 	public void beforeSimStep(final double time) {
-//		System.out.println("before sim step");
+		// log.info("before sim step");
 	}
 
-	/**
-	 * Do one step of the simulation run.
-	 *
-	 * @return true if the simulation needs to continue
-	 */
+	/** Do one step of the simulation run. 
+	 * @return true if the simulation needs to continue */
 	@Override
 	public boolean doSimStep(final double time) {
-		
+
 		this.network.moveLinks(time);
 		this.network.moveNodes(time);
-
+		
+		// Output from David
 		if (time % INFO_PERIOD == 0) {
 			Date endtime = new Date();
-			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
-			double diffsim  = time - SimulationTimer.getSimStartTime();
-			
+			long diffreal = (endtime.getTime() - this.starttime.getTime()) / 1000;
+			double diffsim = time - SimulationTimer.getSimStartTime();
+
 			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + getLiving() + " lost=" + getLost()
-					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
+					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): "
+					+ (diffsim / (diffreal + Double.MIN_VALUE)));
 			Gbl.printMemoryUsage();
 		}
-//		System.out.println(isLiving());
 
 		return isLiving() && (this.stopTime >= time);
 	}
 
 	public void afterSimStep(final double time) {
-//		System.out.println("after sim step");
-
+		// log.info("after sim step");
 	}
 
+	/** Need a static call */
 	public static Events getEvents() {
-		// TODO Auto-generated method stub
 		return events;
 	}
 
+	/** Needs to be set in a static way */
 	private static final void setEvents(final Events events) {
 		QSim.events = events;
 	}

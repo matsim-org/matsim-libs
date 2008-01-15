@@ -19,77 +19,79 @@ import org.matsim.plans.Route;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 
+/** This is a copy of org.matsim.mobsim.Vehicle with QLink instead of QueueLink. 
+ *  Shouldn't be nescessary if currentLink, cachedNextLink and destinationLink
+ *  would refer to Link.
+ *  Nothing else is changed since the study focuses on the mobsim and it works. */
 public class QVehicle implements Serializable, DrawableAgentI {
 
 	private static final long serialVersionUID = 1L;
 
 	static private int globalID = 0;
-	public double lastMoveTime = 0;
+	private final int id = globalID++; // TODO change to IdI instead of int
 	protected String driverId;
+	private transient Person driver = null;
+
+	public double lastMoveTime = 0;
+	private double lastMovedTime = 0;
 	private int currentNode;
 	private int nextActivity = 0;
+
 	private double speed = 0.0;
 	private double currentDepartureTime = 0;
-	private double lastMovedTime = 0;
 
 	protected List<Object> actslegs = new ArrayList<Object>();
 	protected transient QLink cachedNextLink = null;
 	private transient QLink destinationLink = null;
-	private transient Person driver = null;
 	protected transient QLink currentLink = null;
-	protected transient BasicLeg currentLeg = null;
+	protected transient BasicLeg currentLeg = null;		
 
-	private final int id = globalID++; // TODO change to IdI instead of int
-
-	// return zero based leg number
+	/** return zero based leg number */
 	public int getCurrentLegNumber() {
-		return ((this.nextActivity - 2)/ 2);
-	};
+		return ((this.nextActivity - 2) / 2);
+	}
 
 	public double getDepartureTime_s() {
 		return this.currentDepartureTime;
 	}
+
 	public void setDepartureTime_s(final double i) {
 		this.currentDepartureTime = i;
 	}
 
-	/**
-	 * @return Returns the currentLink.
-	 */
+	/** @return Returns the currentLink. */
 	public QLink getCurrentLink() {
 		return this.currentLink;
 	}
 
-	/**
-	 * @param currentLink The currentLink to set.
-	 */
+	/** @param currentLink The currentLink to set. */
 	public void setCurrentLink(final QLink currentLink) {
 		this.currentLink = currentLink;
 	}
 
 	public void incCurrentNode() {
 		this.currentNode++;
-		this.cachedNextLink = null; //reset cached nextLink
+		this.cachedNextLink = null; // reset cached nextLink
 	}
 
 	// has the main functionality of chooseNextLink, but other vehicles might
-	// not want an error issued, when no link is found, but do something more elaborate!
-	// so they can now easily override chooseNextLink...
+	// not want an error issued, when no link is found, but do something more
+	// elaborate! so they can now easily override chooseNextLink...
 	protected QLink findNextLink() {
 		if (this.cachedNextLink != null) {
 			return this.cachedNextLink;
 		}
 		ArrayList<?> route = this.currentLeg.getRoute().getRoute();
 
-		if (this.currentNode >= route.size() ) {
+		if (this.currentNode >= route.size()) {
 			return this.destinationLink;
 		}
 
-		Node destNode = (Node)route.get(this.currentNode);
+		Node destNode = (Node) route.get(this.currentNode);
 
-		for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
+		for (Link link : this.currentLink.getToNode().getOutLinks().values()) {
 			if (link.getToNode() == destNode) {
-				this.cachedNextLink = (QLink)link; //save time in later calls, if link is congested
+				this.cachedNextLink = (QLink) link; // save time in later calls, if link is congested
 				return this.cachedNextLink;
 			}
 		}
@@ -107,10 +109,10 @@ public class QVehicle implements Serializable, DrawableAgentI {
 	}
 
 	public Route getCurrentRoute() {
-		return (Route)this.currentLeg.getRoute();
+		return (Route) this.currentLeg.getRoute();
 	}
 
-	//public MobsimLinkI getDestinationLink() {
+	// public MobsimLinkI getDestinationLink() {
 	public QLink getDestinationLink() {
 		return this.destinationLink;
 	}
@@ -118,25 +120,28 @@ public class QVehicle implements Serializable, DrawableAgentI {
 	private boolean initNextLeg() {
 
 		double now = SimulationTimer.getTime();
-		Act act = (Act)this.actslegs.get(this.nextActivity);
+		Act act = (Act) this.actslegs.get(this.nextActivity);
 
 		this.currentLink = (QLink) act.getLink();
 
-		if ( this.nextActivity > 0 ) {
+		if (this.nextActivity > 0) {
 			// no actStartEvent for first act.
-			QSim.getEvents().processEvent( new EventActivityStart(now, this.driverId, this.driver, this.currentLink, act));
+			QSim.getEvents().processEvent(
+					new EventActivityStart(now, this.driverId, this.driver, this.currentLink, act));
 		}
 
-		if (this.nextActivity == this.actslegs.size()-1) {
+		if (this.nextActivity == this.actslegs.size() - 1) {
 			// if this is the last activity, then stop vehicle
 			return false;
 		}
 
 		double departure = 0;
 
-		/* WELL, THAT'S IMPORTANT:
-		 * The person leaves the activity either 'actDur' later or
-		 * when the end is defined of the activity, whatever comes first. */
+		/*
+		 * WELL, THAT'S IMPORTANT: The person leaves the activity either
+		 * 'actDur' later or when the end is defined of the activity, whatever
+		 * comes first.
+		 */
 		if (act.getDur() == Time.UNDEFINED_TIME) {
 			departure = act.getEndTime();
 		} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
@@ -145,16 +150,18 @@ public class QVehicle implements Serializable, DrawableAgentI {
 			departure = Math.min(act.getEndTime(), now + act.getDur());
 		}
 		if (departure < now) {
-			// we cannot depart before we arrived, thus change the time so the timestamp in events will be right
+			// we cannot depart before we arrived, thus change the time so the
+			// timestamp in events will be right
 			departure = now;
-			// actually, we will depart in (now+1) because we already missed the departing in this time step
+			// actually, we will depart in (now+1) because we already missed the
+			// departing in this time step
 		}
 		setDepartureTime_s(departure);
 
-		this.destinationLink = (QLink)((Act)this.actslegs.get(this.nextActivity +2)).getLink();
+		this.destinationLink = (QLink) ((Act) this.actslegs.get(this.nextActivity + 2)).getLink();
 
 		// set the route according to the next leg
-		Leg leg = (Leg) this.actslegs.get(this.nextActivity+1);
+		Leg leg = (Leg) this.actslegs.get(this.nextActivity + 1);
 		this.currentLeg = leg;
 		this.currentNode = 1;
 		this.cachedNextLink = null;
@@ -163,14 +170,15 @@ public class QVehicle implements Serializable, DrawableAgentI {
 		// this is the starting point for our vehicle, so put it in the queue
 		transferToMobsim();
 
-		QSim.getEvents().processEvent( new EventActivityEnd(departure, this.driverId, this.driver, this.currentLink, act));
+		QSim.getEvents().processEvent(
+				new EventActivityEnd(departure, this.driverId, this.driver, this.currentLink, act));
 
 		return true;
 	}
 
 	public void initVeh() {
 		this.nextActivity = 0;
-		SimulationTimer.updateSimStartTime(((Act)this.actslegs.get(0)).getEndTime());
+		SimulationTimer.updateSimStartTime(((Act) this.actslegs.get(0)).getEndTime());
 
 		if (initNextLeg()) {
 			Simulation.incLiving();
@@ -179,14 +187,16 @@ public class QVehicle implements Serializable, DrawableAgentI {
 
 	public void rebuildVeh(final QLink link) {
 		this.currentLink = link;
-		this.destinationLink = (QLink)((Act)this.actslegs.get(this.nextActivity)).getLink();
-		Leg actleg = (Leg) this.actslegs.get(this.nextActivity-1);
+		this.destinationLink = (QLink) ((Act) this.actslegs.get(this.nextActivity)).getLink();
+		Leg actleg = (Leg) this.actslegs.get(this.nextActivity - 1);
 		this.currentLeg = actleg;
 		this.cachedNextLink = null;
 	}
 
-	// this second variant is only used for "teleportation" aka QueueLink,line206
-	// because otherwise ActivityStartEvent would be before ArrivalEvent in timeline
+	// this second variant is only used for "teleportation" aka
+	// QueueLink,line206
+	// because otherwise ActivityStartEvent would be before ArrivalEvent in
+	// timeline
 	private void reinitVeh() {
 		if (!initNextLeg()) {
 			Simulation.decLiving();
@@ -194,68 +204,52 @@ public class QVehicle implements Serializable, DrawableAgentI {
 	}
 
 	public Leg getCurrentLeg() {
-		return (Leg) this.actslegs.get(this.nextActivity-1);
+		return (Leg) this.actslegs.get(this.nextActivity - 1);
 	}
 
-	/**
-	 * @param actLegs The actLegs to set.
-	 */
+	/** @param actLegs The actLegs to set. */
 	public void setActLegs(final List<Object> actLegs) {
 		this.actslegs = actLegs;
 	}
 
-	/**
-	 * @param driverId The driverId to set.
-	 */
+	/** @param driverId The driverId to set. */
 	public void setDriverID(final String driverId) {
 		this.driverId = driverId;
 	}
 
-	/**
-	 * @return Returns the iD.
-	 */
+	/** @return Returns the iD. */
 	public int getID() {
 		return this.id;
 	}
 
 	@Override
 	public String toString() {
-		return "Vehicle Id " + getID() + ", driven by (personId) " + this.driverId
-				+ ", on link " + this.currentLink.getId() + ", routeindex: " + this.currentNode
-				+ ", next activity#: " + this.nextActivity;
+		return "Vehicle Id " + getID() + ", driven by (personId) " + this.driverId + ", on link "
+				+ this.currentLink.getId() + ", routeindex: " + this.currentNode + ", next activity#: "
+				+ this.nextActivity;
 	}
 
-	/**
-	 * @return Returns the speed.
-	 */
+	/** @return Returns the speed. */
 	public double getSpeed() {
 		return this.speed;
 	}
 
-	/**
-	 * @param speed The speed to set.
-	 */
+	/** @param speed The speed to set. */
 	public void setSpeed(final double speed) {
 		this.speed = speed;
 	}
 
-	/**
-	 * @return Returns the driverID.
-	 */
+	/** @return Returns the driverID. */
 	public String getDriverID() {
 		return this.driverId;
 	}
 
-	/**
-	 * @return Returns the driver.
-	 */
+	/** @return Returns the driver. */
 	public Person getDriver() {
 		return this.driver;
 	}
 
-	/**
-	 * @param driver The driver to set.
-	 */
+	/** @param driver The driver to set. */
 	public void setDriver(final Person driver) {
 		this.driver = driver;
 		if (null != driver) {
@@ -264,13 +258,13 @@ public class QVehicle implements Serializable, DrawableAgentI {
 	}
 
 	public double getPosInLink_m() {
-		double dur = this.currentLink.getFreeTravelDuration();
+		double dur = this.currentLink.getFreeLinkTT();
 		double mytime = getDepartureTime_s() - SimulationTimer.getTime();
-		if (mytime<0) {
+		if (mytime < 0) {
 			mytime = 0.;
 		}
-		mytime/= dur;
-		mytime = (1.-mytime)*this.currentLink.getLength();
+		mytime /= dur;
+		mytime = (1. - mytime) * this.currentLink.getLength();
 		return mytime;
 	}
 
@@ -278,16 +272,12 @@ public class QVehicle implements Serializable, DrawableAgentI {
 		return 1;
 	}
 
-	/**
-	 * @return Returns the time the vehicle moved last.
-	 */
+	/** @return Returns the time the vehicle moved last. */
 	public double getLastMovedTime() {
 		return this.lastMovedTime;
 	}
 
-	/**
-	 * @param lastMovedTime The lastMovedTime to set.
-	 */
+	/** @param lastMovedTime The lastMovedTime to set. */
 	public void setLastMovedTime(final double lastMovedTime) {
 		this.lastMovedTime = lastMovedTime;
 	}
@@ -295,24 +285,19 @@ public class QVehicle implements Serializable, DrawableAgentI {
 	// The next two methods were taken from MobsimAgentI that
 	// I cannot fully implement right now, but will maybe later on
 
-	/**
-	 * Notifies the agent that it leaves its current activity location (and
-	 * accordingly starts moving on its current route).
-	 */
+	/** Notifies the agent that it leaves its current activity location (and accordingly starts 
+	 * moving on its current route). */
 	public void leaveActivity() {
 	}
 
-	/**
-	 * Notifies the agent that it reaches its aspired activity location.
-	 */
+	/** Notifies the agent that it reaches its aspired activity location. */
 	public void reachActivity() {
-		// 	 this is the starting point for our vehicle, so put it in the queue
+		// this is the starting point for our vehicle, so put it in the queue
 		reinitVeh();
 	}
 
 	protected void transferToMobsim() {
 		this.currentLink.addVehicle2ParkingQueue(this);
 	}
-
 
 }

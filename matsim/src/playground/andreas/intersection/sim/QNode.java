@@ -9,22 +9,24 @@ import org.matsim.mobsim.Simulation;
 import org.matsim.network.Node;
 
 public class QNode extends Node{
-	
-//	private Node node;
+		
 	private QLink tempLinks[];
 	private QLink auxLinks[];
+	/** Needs to be set to true if tempLinks[] and auxLinks[] were not initialized. */
 	private boolean cacheIsInvalid;
 	
 	public QNode(String id, String x, String y, String type) {
 		super(id, x, y, type);		
 	}
 	
+	/** Is overwritten, cause of setting the cache */
 	@Override
 	public boolean addInLink(final BasicLinkI inlink) {
 		this.cacheIsInvalid = true;
 		return super.addInLink(inlink);
 	}
 	
+	/** Initializes tempLinks[] and auxLinks[] */
 	private void buildCache() {
 		this.tempLinks = new QLink[this.inlinks.size()];
 		this.auxLinks = new QLink[this.inlinks.size()];

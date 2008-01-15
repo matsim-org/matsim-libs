@@ -24,10 +24,10 @@ public class QLink extends Link {
 	
 	final private static Logger log = Logger.getLogger(QLink.class);
 	private static int spaceCapWarningCount = 0;
-	
-//	private Link link;
-	private double freeFlowTravelTime;
-	/** The number of vehicles able to leave the buffer in one time step (usually 1s). */
+
+	/** FreeLinkTravelTime */
+	private double freeLinkTT;
+	/** The number of vehicles able to leave the buffer in one time step (usually 1 sec). */
 	private double simulatedFlowCapacity;
 	
 	private int timeCapCeil; // optimization, cache Math.ceil(timeCap)
@@ -39,7 +39,7 @@ public class QLink extends Link {
 	/** parking list includes all vehicle that do not have yet reached their
 	 * start time, but will start at this link at some time */
 	private final PriorityQueue<QVehicle> parkingQueue = new PriorityQueue<QVehicle>(30,
-			new VehicleDepartureTimeComparator());
+			new QVehicleDepartureTimeComparator());
 
 	/** All vehicles from parkingQueue move to the waitingList as soon as their time
 	 * has come. They are then filled into the vehQueue, depending on free space
@@ -50,35 +50,25 @@ public class QLink extends Link {
 	 * to the free travel speed of the link */
 	private final Queue<QVehicle> vehQueue = new LinkedList<QVehicle>();
 
-	/**
-	 * buffer is holding all vehicles that are ready to cross the outgoing
-	 * intersection
-	 */
+	/** buffer is holding all vehicles that are ready to cross the outgoing intersection */
 	private final Queue<QVehicle> buffer = new LinkedList<QVehicle>();
-
-	
-	
-	
 		
 	public QLink(NetworkLayer network, String id, Node from, Node to, String length, String freespeed, String capacity, String permlanes, String origid, String type) {
-		super(network, id, from, to, length, freespeed, capacity, permlanes, origid,
-				type);
+		super(network, id, from, to, length, freespeed, capacity, permlanes, origid, type);
 		
-		this.freeFlowTravelTime = this.getLength() / this.getFreespeed();
+		this.freeLinkTT = this.getLength() / this.getFreespeed();
 			
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor 
 		double flowCapFactor = Gbl.getConfig().simulation().getFlowCapFactor();
 		// multiplying capacity from file by simTickCapFactor **and** flowCapFactor:
 		this.simulatedFlowCapacity = this.getFlowCapacity() * SimulationTimer.getSimTickTime() * flowCapFactor;
 			
-		recalcCapacity();
-		
+		recalcCapacity();		
 	}
 
 	/** Copied from David's Queuelink */
 	private void recalcCapacity() {
-		/* network.capperiod is in hours, we need it per sim-tick and multiplied
-		 * with flowCapFactor                */
+		/* network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor */
 		//TODO [an] What is storage cap factor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
@@ -91,15 +81,13 @@ public class QLink extends Link {
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.getLength() * this.getLanes()) / NetworkLayer.CELL_LENGTH * storageCapFactor;
 
-		/* storage capacity needs to be at least enough to handle the
-		 * cap_per_time_step:                  */
+		/* storage capacity needs to be at least enough to handle the cap_per_time_step: */
 		this.storageCapacity = Math.max(this.storageCapacity, this.timeCapCeil);
 
 		/* If speed on link is relatively slow, then we need MORE cells than the above spaceCap to handle the flowCap. Example:
-		 * Assume freeSpeedTravelTime (aka freeFlowTravelTime) is 2 seconds. Than I need the spaceCap TWO times the flowCap to
-		 * handle the flowCap.
-		 */
-		if (this.storageCapacity < this.freeFlowTravelTime * this.simulatedFlowCapacity) {
+		 * Assume freeSpeedTravelTime (aka freeLinkTT) is 2 seconds. Than I need the spaceCap TWO times the flowCap to
+		 * handle the flowCap. */
+		if (this.storageCapacity < this.freeLinkTT * this.simulatedFlowCapacity) {
 			if ( spaceCapWarningCount <=10 ) {
 				log.warn("Link " + this.getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
 				if ( spaceCapWarningCount == 10 ) {
@@ -107,20 +95,20 @@ public class QLink extends Link {
 				}
 				spaceCapWarningCount++ ;
 			}
-			this.storageCapacity = this.freeFlowTravelTime * this.simulatedFlowCapacity;
+			this.storageCapacity = this.freeLinkTT * this.simulatedFlowCapacity;
 		}
 	}
 	
+	/** Adds a vehicle to the parkingQueue */
 	public void addVehicle2ParkingQueue(QVehicle veh) {
 		parkingQueue.add(veh);
-//		System.err.println("VEH ADDED in link " + this.getId());
-		
 	}
 
-	public double getFreeTravelDuration() {
-		return freeFlowTravelTime;
+	public double getFreeLinkTT() {
+		return freeLinkTT;
 	}
 	
+	/** Called by QNetworkLayer */
 	boolean moveLink(final double now) {
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
@@ -132,12 +120,9 @@ public class QLink extends Link {
 		return true ;
 	}
 
-	/**
-	 * Moves those vehicles, whose departure time has come, from the parking
-	 * list to the wait list, from where they can later enter the link.
-	 *
-	 * @param now the current time
-	 */
+	/** Moves those vehicles, whose departure time has come, from the parking list to the wait list, 
+	 *  from where they can later enter the link.
+	 * @param now the current time */
 	private void moveParkToWait(final double now) {
 		QVehicle veh;
 		while ((veh = this.parkingQueue.peek()) != null) {
@@ -149,9 +134,8 @@ public class QLink extends Link {
 			veh.leaveActivity();
 
 			// Generate departure event
-			QSim.getEvents().processEvent(
-				new EventAgentDeparture(now, veh.getDriverID(), veh.getCurrentLegNumber(),
-						getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this));
+			QSim.getEvents().processEvent(new EventAgentDeparture(now, veh.getDriverID(),
+					veh.getCurrentLegNumber(), getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this));
 			
 			Leg actLeg = veh.getCurrentLeg();
 
@@ -163,50 +147,42 @@ public class QLink extends Link {
 			 * Do that as the last step to guarantee that the link is ACTIVE all the time
 			 * because veh.reinitVeh() calls addParking which might come to the false conclusion,
 			 * that this link needs to be activated, as parkingQueue is empty */
-
 			this.parkingQueue.poll();
 		}
 	}
 
-	/**
-	 * Move as many waiting cars to the link as it is possible
-	 *
-	 * @param now the current time
-	 */
+	/** Move as many waiting cars to the link as it is possible
+	 * @param now the current time */
 	private void moveWaitToBuffer(final double now) {
 		QVehicle veh;
+		
 		while ((veh = this.waitingList.peek()) != null) {
-			if (!hasBufferSpace())
+			
+			if (!hasBufferSpace()) {
 				break;
+			}	
 						
 			addToBuffer(veh, now);
 
-			QSim.getEvents().processEvent(
-					new EventAgentWait2Link(now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(),
-							veh.getDriver(), veh.getCurrentLeg(), this));
+			QSim.getEvents().processEvent(new EventAgentWait2Link(now, veh.getDriverID(), 
+					veh.getCurrentLegNumber(), getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this));
 
 			this.waitingList.poll(); // remove the just handled vehicle from waitingList
 		}
 	}
 	
-	/**
-	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
-	 */
+	/** @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil */
 	private boolean hasBufferSpace() {
 		return (this.buffer.size() < this.timeCapCeil);
 	}
 	
 	private void addToBuffer(final QVehicle veh, final double now) {
 		this.buffer.add(veh);
-		veh.setLastMovedTime(now);
-		
+		veh.setLastMovedTime(now);		
 	}
 
-	/**
-	 * Move vehicles from link to buffer, according to buffer capacity and departure time of vehicle.
-	 *
-	 * @param now The current time.
-	 */
+	/** Move vehicles from link to buffer, according to buffer capacity and departure time of vehicle.
+	 *  @param now The current time. */
 	private void moveLinkToBuffer(final double now) {
 		// move items if possible
 		double max_buffercap = this.simulatedFlowCapacity;
@@ -260,9 +236,8 @@ public class QLink extends Link {
 	}
 	
 	private void processVehicleArrival(final double now, final QVehicle veh ) {
-		QSim.getEvents().processEvent(
-				new EventAgentArrival(now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(),
-						veh.getDriver(), veh.getCurrentLeg(), this));
+		QSim.getEvents().processEvent(new EventAgentArrival(now, veh.getDriverID(),
+				veh.getCurrentLegNumber(), getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this));
 		// Need to inform the veh that it now reached its destination.
 		veh.reachActivity();
 	}
@@ -271,23 +246,15 @@ public class QLink extends Link {
 		return this.buffer.isEmpty();
 	}
 	
-	
-
-
-	/**
-	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (= the whole link),
-	 * than there is space for vehicles.
-	 */
+	/** @return <code>true</code> if there are less vehicles in buffer + vehQueue (= the whole link),
+	 * than there is space for vehicles. */
 	public boolean hasSpace() {
-		if (this.vehQueue.size() < getSpaceCap())
+		if (this.vehQueue.size() < getSpaceCap()) {
 			return true;
-		return false;
+		} else return false;
 	}
 
-
-	/**
-	 * @return Returns the maxCap.
-	 */
+	/** @return Returns the maxCap. */
 	public double getSpaceCap() {
 		return this.storageCapacity;
 	}
@@ -314,28 +281,21 @@ public class QLink extends Link {
 			v2.setLastMovedTime(now);
 		}
 
-		QSim.getEvents().processEvent(
-				new EventLinkLeave(now, veh.getDriverID(), veh.getCurrentLegNumber(),
+		QSim.getEvents().processEvent(new EventLinkLeave(now, veh.getDriverID(), veh.getCurrentLegNumber(),
 						this.getId().toString(), veh.getDriver(), this));
 
 		return veh;
 	}
 	 
-	 /**
-		 * Adds a vehicle to the link, called by
-		 * {@link QueueNode#moveVehicleOverNode(Vehicle, double)}.
-		 *
-		 * @param veh the vehicle
-		 */
-		public void add(final QVehicle veh) {
-			double now = SimulationTimer.getTime();
+	 /** Adds a vehicle to the link, called by {@link QueueNode#moveVehicleOverNode(Vehicle, double)}.
+	 * @param veh the vehicle */
+	public void add(final QVehicle veh) {
+		double now = SimulationTimer.getTime();
 
-			
-			veh.setCurrentLink(this);
-			this.vehQueue.add(veh);
-			veh.setDepartureTime_s((int) (now + this.freeFlowTravelTime));
-			QSim.getEvents().processEvent(
-					new EventLinkEnter(now, veh.getDriverID(), veh.getCurrentLegNumber(),
-							this.getId().toString(), veh.getDriver(), this));
-		}
+		veh.setCurrentLink(this);
+		this.vehQueue.add(veh);
+		veh.setDepartureTime_s((int) (now + this.freeLinkTT));
+		QSim.getEvents().processEvent(new EventLinkEnter(now, veh.getDriverID(),
+				veh.getCurrentLegNumber(), this.getId().toString(), veh.getDriver(), this));
+	}
 }
