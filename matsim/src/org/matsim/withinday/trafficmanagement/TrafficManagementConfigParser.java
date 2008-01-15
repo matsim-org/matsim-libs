@@ -109,7 +109,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	
 	private static final String CONTROLINPUTSTATICADDITION = "ControlInputImplStaticAddition";
 
-	private static final String CONTROLINPUTMB = "ControlInputImplMB";
+	private static final String CONTROLINPUTMB = "ControlInputMB";
 
 	private final static String CONTROLINPUT = "controlInput";
 
