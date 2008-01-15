@@ -29,6 +29,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
+import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.SimulationTimer;
@@ -47,14 +48,17 @@ import playground.andreas.intersection.sim.QSim;
 public class IntersectionControler extends Controler {
 
 	final private static Logger log = Logger.getLogger(QueueLink.class);
-
+	
 	protected void runMobSim() {
 
 		SimulationTimer.setTime(0);
 
 		// TODO [an] Is needed ? or
 		// remove eventswriter, as the external mobsim has to write the events */
-		// this.events.removeHandler(this.eventwriter);
+		this.events.removeHandler(this.eventwriter);	
+		this.eventwriter = new EventWriterTXT(getIterationFilename(Controler.FILENAME_EVENTS.replaceAll(".gz", "")));
+		this.events.addHandler(this.eventwriter);
+		
 		QSim sim = new QSim(this.events, this.population, (QNetworkLayer) this.network);
 		sim.run();
 
@@ -116,7 +120,7 @@ public class IntersectionControler extends Controler {
 	/** Conversion of events -> snapshots */
 	protected void makeVis() {
 
-		File driversLog = new File("./drivers.txt");
+		File driversLog = new File("./output/ITERS/it.0/0.events.txt");
 		File visDir = new File("./output/vis");
 		File eventsFile = new File("./output/vis/events.txt");
 
@@ -155,7 +159,7 @@ public class IntersectionControler extends Controler {
 
 		controler.run(null);
 
-		// controler.makeVis();
+		controler.makeVis();
 	}
 
 }
