@@ -125,7 +125,9 @@ public class QLink extends Link {
 	 * @param now the current time */
 	private void moveParkToWait(final double now) {
 		QVehicle veh;
+		
 		while ((veh = this.parkingQueue.peek()) != null) {
+			
 			if (veh.getDepartureTime_s() > now) {
 				break;
 			}
@@ -212,11 +214,7 @@ public class QLink extends Link {
 				addToBuffer(veh, now);
 				this.vehQueue.poll();
 				continue;
-
-			/* using the following line instead should, I think, be an easy way to make the mobsim
-			 * stochastic. not tested. kai   */
-//			} else if ( Gbl.random.nextDouble() < this.buffercap_accumulate ) {
-
+			
 			} else if (this.buffercap_accumulate >= 1.0) {
 				this.buffercap_accumulate--;
 				addToBuffer(veh, now);
@@ -259,27 +257,17 @@ public class QLink extends Link {
 		return this.storageCapacity;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.util.List#get(int)
-	 */
 	QVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.util.List#get(int)
-	 */
-	 QVehicle popFirstFromBuffer() {
+	QVehicle pollFirstFromBuffer() {
 		double now = SimulationTimer.getTime();
 		QVehicle veh = this.buffer.poll();
-		QVehicle v2 = this.buffer.peek();
-		if (v2 != null) {
-			v2.setLastMovedTime(now);
-		}
+//		QVehicle v2 = this.buffer.peek();
+//		if (v2 != null) {
+//			v2.setLastMovedTime(now);
+//		}
 
 		QSim.getEvents().processEvent(new EventLinkLeave(now, veh.getDriverID(), veh.getCurrentLegNumber(),
 						this.getId().toString(), veh.getDriver(), this));

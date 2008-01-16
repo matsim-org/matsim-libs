@@ -45,7 +45,7 @@ import org.matsim.utils.vis.netvis.NetVis;
 import playground.andreas.intersection.sim.QNetworkLayer;
 import playground.andreas.intersection.sim.QSim;
 
-public class IntersectionControler extends Controler {
+public class QControler extends Controler {
 
 	final private static Logger log = Logger.getLogger(QueueLink.class);
 	
@@ -87,13 +87,11 @@ public class IntersectionControler extends Controler {
 
 		log.info("  generating plans... ");
 
-		int ii = 1;
-		Link destLink = network.getLink("1");
-		Link sourceLink = network.getLink("20");
-
 		for (int jj = 1; jj <= 6; jj++) {
-			generatePerson(ii, sourceLink, destLink, pop);
-			ii++;
+			
+			Link destLink = network.getLink("12");
+			Link sourceLink = network.getLink(String.valueOf(jj));
+			generatePerson(jj, sourceLink, destLink, pop);
 		}
 
 		return pop;
@@ -105,7 +103,7 @@ public class IntersectionControler extends Controler {
 		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
 		Plan plan = new Plan(p);
 		try {
-			plan.createAct("h", 100., 100., sourceLink, 0., 0 * 60 * 60., 0., true);
+			plan.createAct("h", 100., 100., sourceLink, 0., 3 * 60 * 60. + ii * 60, 0., true);
 			plan.createLeg("1", "car", null, null, null);
 			plan.createAct("h", 200., 200., destLink, 8 * 60 * 60, 0., 0., true);
 
@@ -154,7 +152,7 @@ public class IntersectionControler extends Controler {
 			Gbl.createConfig(args);
 		}
 
-		final IntersectionControler controler = new IntersectionControler();
+		final QControler controler = new QControler();
 		controler.setOverwriteFiles(true);
 
 		controler.run(null);
