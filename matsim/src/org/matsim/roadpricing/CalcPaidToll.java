@@ -115,6 +115,19 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 	}
 
 	/**
+	 * @return The Number of all the Drawees.
+	 */
+	public int getDraweesNr() {
+		int dwCnt = 0;
+		for (AgentInfo ai : agents.values()) {
+			if (ai != null)
+				if (ai.toll > 0.0)
+					dwCnt++;
+		}
+		return dwCnt;
+	}
+
+	/**
 	 * A simple interface to implement different toll schemes.
 	 */
 	private interface TollBehaviourI {
