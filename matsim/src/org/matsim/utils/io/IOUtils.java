@@ -53,6 +53,9 @@ public class IOUtils {
 	 */
 	public static BufferedReader getBufferedReader(final String filename) throws FileNotFoundException, IOException {
 		BufferedReader infile = null;
+		if (filename == null) {
+			throw new FileNotFoundException("No filename given (filename == null)");
+		}
 		if (new File(filename).exists()) {
 			if (filename.endsWith(".gz")) {
 				infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename))));
@@ -84,6 +87,9 @@ public class IOUtils {
 	 * @throws IOException
 	 */
 	public static BufferedWriter getBufferedWriter(final String filename, boolean useCompression) throws FileNotFoundException, IOException {
+		if (filename == null) {
+			throw new FileNotFoundException("No filename given (filename == null)");
+		}
 		if (useCompression && !filename.endsWith(".gz")) {
 			return getBufferedWriter(filename + ".gz");
 		} else if (!useCompression && filename.endsWith(".gz")) {
@@ -104,6 +110,9 @@ public class IOUtils {
 	 * @throws IOException
 	 */
 	public static BufferedWriter getBufferedWriter(final String filename) throws FileNotFoundException, IOException {
+		if (filename == null) {
+			throw new FileNotFoundException("No filename given (filename == null)");
+		}
 		if (filename.endsWith(".gz")) {
 			return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filename))));
 		}
