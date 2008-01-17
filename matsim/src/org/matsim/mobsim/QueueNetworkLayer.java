@@ -61,7 +61,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 	private final PriorityQueue<LinkActivation> activationQueue = new PriorityQueue<LinkActivation>();
 
 	// set to true to move vehicles from waitingList before vehQueue
-	final static boolean moveWaitFirst = false;
+	private boolean moveWaitFirst = false;
 
 	@Override
 	protected Node newNode(final String id, final String x, final String y, final String type) {
@@ -212,6 +212,12 @@ public class QueueNetworkLayer extends NetworkLayer {
 		if (!simulateAllLinks) {
 			this.activationQueue.add(new LinkActivation(time, link));
 		}
+	}
+	
+	public void moveWaitFirst(final boolean moveWaitFirst){
+		//TODO [GL] may be we should invalidate simNodesArrayCache to make sure
+		// that nobody changes this during the MobSim ...
+		this.moveWaitFirst = moveWaitFirst;
 	}
 
 	@Override

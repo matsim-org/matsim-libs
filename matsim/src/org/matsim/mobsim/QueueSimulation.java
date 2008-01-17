@@ -127,6 +127,7 @@ public class QueueSimulation extends Simulation {
 	}
 
 	protected void prepareNetwork() {
+		this.network.moveWaitFirst(config.simulation().moveWaitFirst());
 		this.network.beforeSim();
 	}
 
