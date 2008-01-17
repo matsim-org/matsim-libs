@@ -18,10 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu;
+package playground.yu.newPlan;
 
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
+
 
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old

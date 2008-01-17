@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.yu;
+package playground.yu.diagram3d;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

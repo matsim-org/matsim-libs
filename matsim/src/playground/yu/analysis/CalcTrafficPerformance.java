@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BarChartUtil.java
+ * CalcTrafficPerformence.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,32 +18,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.yu.graphUtils;
+package playground.yu.analysis;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
+import org.matsim.events.EventLinkEnter;
+import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 
 /**
- * @author yu
+ * Calculates the traffic performance [Per.km]
+ * 
+ * @author ychen
  * 
  */
-public class BarChartUtil extends ChartUtil {
-	public BarChartUtil(String title, String categoryAxisLabel,
-			String valueAxisLabel) {
-		super(title, categoryAxisLabel, valueAxisLabel);
+public class CalcTrafficPerformance implements EventHandlerLinkEnterI {
+	private double lengthSum = 0;
+	private NetworkLayer network = null;
+
+	public CalcTrafficPerformance(final NetworkLayer network) {
+		this.network = network;
 	}
 
-	protected JFreeChart createChart(String title, String xAxisLabel,
-			String yAxisLabel) {
-		chart_ = ChartFactory.createBarChart(title, xAxisLabel, yAxisLabel,
-				dataset0, PlotOrientation.VERTICAL, true, // legend?
-				true, // tooltips?
-				false // URLs?
-				);
-		return chart_;
+	public void handleEvent(EventLinkEnter event) {
+		Link l = event.link;
+		if (l == null)
+			l = network.getLink(event.linkId);
+		if (l != null)
+			lengthSum += l.getLength() / 1000.0;
+	}
+
+	public void reset(int iteration) {
+		lengthSum = 0;
+	}
+
+	/**
+	 * @return Traffic performance [Per.km]
+	 */
+	public double getTrafficPerformance() {
+		return lengthSum;
 	}
 }

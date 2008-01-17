@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DoublePtPlanControler.java
+ * TravVolCnterControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,47 +18,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu;
+ package playground.yu.volCount;
+/*
+ * $Id: TravVolCnterControler.java,v 1.4 2007/11/23 13:04:04 ychen Exp $
+ */
 
 import org.matsim.config.Config;
+import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.world.World;
 
+
 /**
- * test of DoublePtPlan
+ * test for TraVolCnter
  * @author ychen
  *
  */
-public class DoublePtPlanControler {
+public class TravVolCnterControler {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		final String netFilename = "./input/equil/equil_net.xml";
-		final String plansFilename = "./input/equil/equil_plans.xml";
-
+		final String netFilename = "./equil/equil_net.xml";
+		final String plansFilename = "./equil/equil_plans.xml";
+		
 		World world = Gbl.getWorld();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(new String[] {"./test/yu/config/tutorial/multipleIterations.xml"});
-
+		Config config = Gbl.createConfig(null);
+		
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
-		DoublePtPlan nap=new DoublePtPlan(population);
-		population.addAlgorithm(nap);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
 		world.setPopulation(population);
-		population.runAlgorithms();
-		nap.writeEndPlans();
+
+		Events events = new Events();
+
+		TraVolCnter traVolCounter = new TraVolCnter();
+		events.addHandler(traVolCounter);
+		
+		QueueSimulation sim = new QueueSimulation(network, population, events);
+		sim.run();
 	}
 
 }

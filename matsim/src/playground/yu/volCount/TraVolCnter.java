@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu;
+package playground.yu.volCount;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -70,7 +70,6 @@ public class TraVolCnter implements EventHandlerLinkEnterI,
 	 * @see org.matsim.demandmodeling.events.handler.EventHandlerLinkLeaveI#handleEvent(org.matsim.demandmodeling.events.EventLinkLeave)
 	 */
 	public void handleEvent(EventLinkLeave event) {
-		// TODO save Cnt into netVols
 		String agentId = event.agentId;
 		if (agentTimer.containsKey(agentId)) {
 			for (int tbIdx = agentTimer.remove(agentId).intValue(); tbIdx <= event.time; tbIdx++) {
@@ -83,7 +82,6 @@ public class TraVolCnter implements EventHandlerLinkEnterI,
 	}
 
 	public void reset(int iteration) {
-		// TODO 2 maps clear
 		agentTimer.clear();
 		netVols.clear();
 	}
@@ -99,7 +97,6 @@ public class TraVolCnter implements EventHandlerLinkEnterI,
 						+ netVols.get(tbIdx).toString());
 			out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu;
+package playground.yu.compressRoute;
 
 import java.io.IOException;
 
@@ -31,6 +31,7 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.world.MatsimWorldReader;
+
 
 /**
  * Controler to run MATSim in order to get compression ratio of the sparely new network with sparely linkroute. 

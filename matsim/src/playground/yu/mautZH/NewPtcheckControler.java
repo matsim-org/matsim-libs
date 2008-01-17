@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu;
+package playground.yu.mautZH;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -27,8 +27,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.matsim.analysis.CalcAverageTolledTripLength;
+import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.controler.Controler;
+import org.matsim.gbl.Gbl;
+
+import playground.yu.analysis.CalcAvgSpeed;
+import playground.yu.analysis.CalcTrafficPerformance;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
@@ -42,6 +48,10 @@ public class NewPtcheckControler extends Controler {
 	 */
 	private DataOutputStream out;
 	private ScoreStats scoreStats = null;
+	private CalcAverageTolledTripLength cattl = null;
+	private CalcAverageTripLength catl = null;
+	private CalcTrafficPerformance ctpf = null;
+	private CalcAvgSpeed cas = null;
 
 	/**
 	 * adds a ControlerListener to Controler - PtRate
@@ -65,7 +75,10 @@ public class NewPtcheckControler extends Controler {
 					new FileOutputStream(new File(
 							getOutputFilename("tollPaid.txt")))));
 			out
-					.writeBytes("Iter\tBetaTraveling\tBetaTravelingPt\ttoll_amount[€/m]\tavg. executed score\ttoll_paid[€]\n");
+					.writeBytes("Iter\tBetaTraveling\tBetaTravelingPt\ttoll_amount[€/m]"
+							+ "\ttoll_paid[€]\tavg. executed score\tNumber of Drawees"
+							+ "\tavg. triplength\tavg. tolled triplength"
+							+ "\ttraffic persformance\tavg. travel speed\n");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -77,17 +90,56 @@ public class NewPtcheckControler extends Controler {
 	}
 
 	@Override
+	protected void setupIteration(int iteration) {
+		super.setupIteration(iteration);
+		cas.reset(iteration);
+		cattl.reset(iteration);
+		ctpf.reset(iteration);
+	}
+
+	@Override
 	protected void finishIteration(int iteration) {
 		super.finishIteration(iteration);
+		catl = new CalcAverageTripLength();
+		catl.run(population);
 		try {
-			out.writeBytes(iteration + "\t"
-					+ config.getParam("planCalcScore", "traveling") + "\t"
-					+ config.getParam("planCalcScore", "travelingPt") + "\t"
-					+ toll.getCostArray()[0].amount+"\t" + scoreStats.getHistory()[3][iteration]
-					+ ((tollCalc != null) ? tollCalc.getAllAgentsToll() : 0.0)+"\n");
+			out.writeBytes(iteration
+					+ "\t"
+					+ config.getParam("planCalcScore", "traveling")
+					+ "\t"
+					+ config.getParam("planCalcScore", "travelingPt")
+					+ "\t"
+					+ ((Gbl.useRoadPricing()) ? toll.getCostArray()[0].amount
+							: 0)
+					+ "\t"
+					+ ((tollCalc != null) ? tollCalc.getAllAgentsToll() : 0.0)
+					+ "\t"
+					+ scoreStats.getHistory()[3][iteration]
+					+ "\t"
+					+ ((tollCalc != null) ? tollCalc.getDraweesNr() : 0)
+					+ "\t"
+					+ catl.getAverageTripLength()
+					+ "\t"
+					+ ((((tollCalc != null) && (cattl != null))) ? cattl
+							.getAverageTripLength() : 0.0) + "\t"
+					+ ctpf.getTrafficPerformance() + "\t" + cas.getAvgSpeed()
+					+ "\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	protected void startup() {
+		super.startup();
+		if (Gbl.useRoadPricing()) {
+			cattl = new CalcAverageTolledTripLength(network, toll);
+			events.addHandler(cattl);
+		}
+		ctpf = new CalcTrafficPerformance(network);
+		cas = new CalcAvgSpeed(network);
+		events.addHandler(ctpf);
+		events.addHandler(cas);
 	}
 
 	// -------------------------MAIN FUNCTION--------------------

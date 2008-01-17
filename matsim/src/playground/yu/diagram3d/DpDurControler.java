@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * barCharUtilTest.java
+ * DpDurControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,39 +20,35 @@
 /**
  * 
  */
-package playground.yu.graphUtils;
+package playground.yu.diagram3d;
 
+import org.matsim.config.Config;
+import org.matsim.events.Events;
+import org.matsim.events.MatsimEventsReader;
+import org.matsim.gbl.Gbl;
 
 /**
+ * controler for creating a matrix (departureTime, Duration, volume)
  * @author ychen
  *
  */
-public class LineChartUtilTest {
+public class DpDurControler {
 
 	/**
-	 * @param args
+	 * @param args - config-file
 	 */
 	public static void main(String[] args) {
-		LineChartUtil lcu=new LineChartUtil("Ueberschrift","x-Achse","yAchse");
-//        lcu.addValue(25.0, "A", "1");
-//		lcu.addValue(28.0, "A", "2");
-//		lcu.addValue(15.0, "A", "3");
-//		lcu.addValue(35.0, "B", "1");
-//		lcu.addValue(19.0, "B", "2");
-//		lcu.addValue(26.0, "B", "3");
-//		lcu.addValue(21.0, "A", "4");
-//		lcu.addValue(22.0, "B", "4");
-		for(int i=0;i<100;i++){
-			lcu.addValue(Math.random(),"0",Integer.toString(i));
-		}
-        lcu.saveAsPng("T:/Temp/line1.png", 800, 600);
-		System.out.println("1@done.");
+		Config config = Gbl.createConfig(args);
+		DpDurWriter ddw = new DpDurWriter(config.events().getOutputFile());
 		
-		lcu=new LineChartUtil("Ueberschrift","x-Achse","yAchse");
-		for(int i=0;i<100;i++){
-			lcu.addValue(Math.random(),Integer.toString(i));
-		}
-		lcu.saveAsPng("T:/Temp/line2.png",800,600);
-		System.out.println("2@done.");
+		Events events = new Events();
+		events.addHandler(ddw);// TODO...
+
+		System.out.println("@reading the eventsfile (TXTv1) ...");
+		new MatsimEventsReader(events).readFile(config.events().getInputFile());//Man can also use readFile("..../...txt") hier
+		System.out.println("@done.");
+
+		ddw.writeMatrix();
+		ddw.closefile();
 	}
 }

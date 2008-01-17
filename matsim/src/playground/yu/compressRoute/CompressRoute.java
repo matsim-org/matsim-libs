@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu;
+package playground.yu.compressRoute;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
