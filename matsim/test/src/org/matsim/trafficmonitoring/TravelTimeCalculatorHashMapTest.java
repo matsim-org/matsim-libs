@@ -49,9 +49,10 @@ public class TravelTimeCalculatorHashMapTest extends MatsimTestCase {
 	// to ensure this option isn't enabled for real tests!
 
 public final void testLinkTravelTime() throws Exception {
-	String networkFile = getInputDirectory() + "link10_network.xml";
-	String eventsFile = getInputDirectory() + "link10_events.txt";
-	String compareFile = getInputDirectory() + "link10_ttimes.txt";
+	String  inputDir = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/../TravelTimeCalculator/";
+	String networkFile = inputDir + "link10_network.xml";
+	String eventsFile = inputDir + "link10_events.txt";
+	String compareFile = inputDir + "link10_ttimes.txt";
 
 	int timeBinSize = 15*60;
 
