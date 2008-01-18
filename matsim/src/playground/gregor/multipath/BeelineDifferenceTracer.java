@@ -42,6 +42,9 @@ public class BeelineDifferenceTracer {
 	
 	private final double TRACE_WEIGHT;
 	
+	private double crit = 0.99;
+	private final double coef = 0.95;
+	
 	public BeelineDifferenceTracer(Coord orig, Coord dest){
 		
 		TRACE_WEIGHT = 1;
@@ -53,6 +56,15 @@ public class BeelineDifferenceTracer {
 		this.sqrDistOD = Math.pow(this.distOD,2);
 		
 	}
+	
+	public void increaseCrit(){
+		this.crit = Math.min(1.1, this.crit * (1/coef));
+		System.out.println("new sim crit: " + this.crit);
+	}
+	public void decreaseCrit(){
+		this.crit *= coef;
+		System.out.println("new sim crit: " + this.crit);
+	}
 
 	//	TODO find a better criterion ...  
 	public boolean tracesDiffer(double a, double b){
@@ -61,7 +73,7 @@ public class BeelineDifferenceTracer {
 	
 		if (Math.abs(a-b) < this.sqrDistOD * 0.01)
 			return false;
-		return Math.min(a, b) /Math.max(a, b) < 0.85;
+		return Math.min(a, b) /Math.max(a, b) < this.crit;
 	}
 	
 	//TODO take old deviance into account to make the trace function smoother ...

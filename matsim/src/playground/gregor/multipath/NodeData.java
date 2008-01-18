@@ -207,7 +207,7 @@ public class NodeData {
 	}
 
 	public void setSortCost(double sortCost){
-		this.sortCost = sortCost;
+		this.sortCost = Math.max(this.sortCost,sortCost);
 	}
 
 public void addNodeProb(double prob) {

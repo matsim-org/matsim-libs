@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ProbabilsticShortestPath.java
+ * HCLogit.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -42,17 +42,25 @@ import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import playground.gregor.multipath.NodeData.ComparatorNodeData;
 import playground.gregor.vis.LinkPainter;
 
+
 /**
+ * HCLogit is a C-Logit based router with  heuristical choice set generation algorithm.
+ * HCLogit works like DCLogit (Russo, F. and Vitetta A.: An assignment model with modified Logit, 
+ * which obviates enumeration and overlapping problems, Transportation 30: 177-205, 2003) but with a
+ * different choice set generation procedure. HCLogit explores the graph like Dijkstra's algorithm but, contrary
+ * to Dijkstra, HCLogit excepts a node repeatedly if and only if:
+ * The more expensive path to that node is not too expensive AND The more expensive path is dissimilar 
+ * to the less expensive one. The similarity is calculated by the (geometric) trace of a path.  
+ * 
  * @author laemmel
  *
  */
-public class ProbabilsticShortestPath implements LeastCostPathCalculator{
-
+public class HCLogit implements LeastCostPathCalculator {
 
 	/**
 	 * The limit a path could be more expensive then the shortest path
 	 */
-	final static double OUTPRICED_CRITERION = 3;
+	final static double OUTPRICED_CRITERION = 1.2;
 
 	/**
 	 * The network on which we find routes.
@@ -99,121 +107,89 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	int visitNodeCount = 0;
 
 	private BeelineDifferenceTracer tracer;
-
-
+	
+	
 	//TODO DEBUGGING STUFF
 	private  boolean debug = false;
 	protected DisplayNetStateWriter netStateWriter = null;
 	private int time;
-
-
-	public ProbabilsticShortestPath(NetworkLayer network, TravelCostI costFunction, TravelTimeI timeFunction){
+	int snapShotSlowDown = 50;
+	
+	
+	public HCLogit(NetworkLayer network, TravelCostI costFunction, TravelTimeI timeFunction){
 		this.network = network;
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
 
 		this.nodeData = new HashMap<IdI, NodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.comparator = new ComparatorNodeData(this.nodeData);
-
+		
 		//TODO DEBUGGING STUFF
 		if (debug){
 			initSnapShotWriter();
 			this.time = 0;			
 		}
-
-
 	}
 
 
-
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
-
 		PriorityQueue<NodeData> pendingNodes = new PriorityQueue<NodeData>(500, this.comparator);
 
-		double minCost = Double.MAX_VALUE;
-		
 		double arrivalTime = 0;
 
 		this.tracer = new BeelineDifferenceTracer(fromNode.getCoord(), toNode.getCoord());
 
 		// The forward path - spans the Dijkstra like shortest path tree
 
-		boolean notCali = true;
+		boolean stillSearching = true;
+
+		augmentIterationID();
+
+		initFromNode(fromNode, toNode, startTime, pendingNodes);
+
+	
+		int count = 0;
 		
+		while (stillSearching) {
+			NodeData outNodeD = pendingNodes.poll();
 
-		while (notCali) {
-
-			boolean foundRoute = false;
-			boolean stillSearching = true;
-
-			augmentIterationID();
-
-			initFromNode(fromNode, toNode, startTime, pendingNodes);
-
-			int snapShotSlowDown = 50;
-			int count = 0;
-
-			while (stillSearching) {
-
-				//			//TODO DEBUG
-//				if (count++ >= snapShotSlowDown) {
-//				try {
-//				count = 0;
-//				this.netStateWriter.dump(time++);
-////				if (time > 600){
-////				try {
-////				this.netStateWriter.close();
-////				} catch (IOException e) {
-////				e.printStackTrace();
-////				}
-////				this.netStateWriter = null;
-////				}
-//				} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				}
-//				}
-
-				NodeData outNodeD = pendingNodes.poll();
-
-
-				if (outNodeD == null) {
-					if (foundRoute){
-						break;
-					}
-					Gbl.warningMsg(this.getClass(), "calcLeastCostPath()",
-							"No route was found from node " + fromNode.getId()
-							+ " to node " + toNode.getId());
-					return null;
+			//TODO DEBUG
+			if (count++ >= snapShotSlowDown) {
+				try {
+					count = 0;
+					this.netStateWriter.dump(time++);
+//					if (time > 600){
+//			            try {
+//			                this.netStateWriter.close();
+//			            } catch (IOException e) {
+//			                e.printStackTrace();
+//			            }
+//			            this.netStateWriter = null;
+//					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-
-				if (outNodeD.getId() == toNode.getId()){
-					foundRoute = true;
-					minCost = Math.min(minCost, outNodeD.getSortCost());
-					if (outNodeD.getSortCost()/minCost >= OUTPRICED_CRITERION) {
-						stillSearching = false;
-					} else {
-						continue;
-					}
-				} else {
-					relaxNode(outNodeD,pendingNodes);
-				}
-
 			}
 			
-			if (getData(toNode).getInPaths() >= 50){
-				System.out.println("to many routes found:" + getData(toNode).getInPaths() + " decreasing sim crit ..." );
-				
-				this.tracer.decreaseCrit();
-			} else if (getData(toNode).getInPaths() == 1) {
-				System.out.println("no enough routes found:" + getData(toNode).getInPaths() + " increasing sim crit ..." );
-				this.tracer.increaseCrit();				
-				
+			
+
+			if (outNodeD == null) {
+				Gbl.warningMsg(this.getClass(), "calcLeastCostPath()",
+						"No route was found from node " + fromNode.getId()
+								+ " to node " + toNode.getId());
+				return null;
+			}
+
+			if (outNodeD.getId() == toNode.getId()){
+				stillSearching = false;
 			} else {
-				notCali = false;
+				relaxNode(outNodeD,pendingNodes);
 			}
 
 		}
+		
+
 		//TODO DEBUG
 		if (debug){
 			try {
@@ -224,24 +200,23 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 			}
 			((LinkPainter)this.netStateWriter).reset();
 			colorizeEfficientPaths(getData(toNode),getData(fromNode));
-			try {
-				this.netStateWriter.dump(time++);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+				try {
+					this.netStateWriter.dump(time++);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 			// TODO DEBUG
-			try {
-				this.netStateWriter.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			this.netStateWriter = null;
-
+		    try {
+		        this.netStateWriter.close();
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		    }
+		    this.netStateWriter = null;
+			
 		}
-
-
+		
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		NodeData tmpNode = getData(toNode);
 		double cost  = 0;
@@ -251,7 +226,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 
 		}
 		routeNodes.add(0, tmpNode.getMatsimNode()); // add the fromNode at the beginning of the list
-
+		
 		Route route = new Route();
 		route.setRoute(routeNodes, (int) (arrivalTime - startTime), cost);
 
@@ -263,9 +238,8 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 			this.routeCnt++;
 		}
 		return route;
-
 	}
-
+	
 	//////////////////////////////////////////////////////////////////////
 	// all the init stuff and helper methods starts here
 	//////////////////////////////////////////////////////////////////////
@@ -383,7 +357,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 
 
 			addToPendingNodes(l, n, pendingNodes, currTime, currCost,
-					outNodeD);
+						outNodeD);
 		}
 	}
 
@@ -439,11 +413,11 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 			if(revisitNode(toNodeData, pendingNodes, currTime + travelTime, currCost
 					+ travelCost, fromNodeData,trace)) {
 
-				//TODO DEBUG
-				if (debug) {
-					((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.5);
-					((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
-				}
+			//TODO DEBUG
+			if (debug) {
+				((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.5);
+				((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+			}
 			} else {
 				//TODO DEBUG
 				if (debug){
@@ -469,7 +443,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 					((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.10);
 					((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()));
 				}
-			}
+		}
 
 		}
 
@@ -478,23 +452,23 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 	}
 
 //	/**
-//	* Generates the forwardLinks in fromNodeData if an u-turn was detected. These links are
-//	* needed for trackPath
-//	*
-//	* @param l
-//	*            The link from which we came to this Node.
-//	* @param n
-//	*            The Node to add to the pending nodes.
-//	* @param currTime
-//	*            The time at which we started to traverse l.
-//	* @param fromNodeData
-//	*            The NodeData from which we came to n.
-//	*/
+//	 * Generates the forwardLinks in fromNodeData if an u-turn was detected. These links are
+//	 * needed for trackPath
+//	 *
+//	 * @param l
+//	 *            The link from which we came to this Node.
+//	 * @param n
+//	 *            The Node to add to the pending nodes.
+//	 * @param currTime
+//	 *            The time at which we started to traverse l.
+//	 * @param fromNodeData
+//	 *            The NodeData from which we came to n.
+//	 */
 //	private void handleUTurn(Link l, Node n, double currTime, NodeData fromNodeData)  {
-//	double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
-//	double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
-//	double trace = this.tracer.getTrace(fromNodeData.getTrace(),fromNodeData.getMatSimNode().getCoord(), travelCost, n.getCoord());
-//	fromNodeData.createForwardLinks(getData(n), travelCost, travelTime, trace);
+//		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
+//		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
+//		double trace = this.tracer.getTrace(fromNodeData.getTrace(),fromNodeData.getMatSimNode().getCoord(), travelCost, n.getCoord());
+//		fromNodeData.createForwardLinks(getData(n), travelCost, travelTime, trace);
 //	}
 
 
@@ -614,12 +588,11 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 
 
 //		if ((shadowNode.getCost() / toNodeData.getCost()) >= OUTPRICED_CRITERION)
-//		return false;
+//			return false;
 
 		if (toNodeData.isHead()){
 
 			toNodeData.visit(shadowNode.getBackNodesData().peek(), shadowNode.getCost(), shadowNode.getTime(), this.iterationID, shadowNode.getTrace());
-			toNodeData.setSortCost(shadowNode.getCost());
 			return false;
 		}
 
@@ -641,7 +614,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 		}
 		return true;
 	}
-
+	
 	//	TODO DEBUGGING STUFF
 	private void initSnapShotWriter() {
 
@@ -715,7 +688,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 			for (Link l : from.getInLinks().values()) {
 				Node tmp = l.getFromNode();
 //				if (((LinkPainter)this.netStateWriter).linkAttribExist(l.getId()))
-//				excluded.add(tmp);
+//					excluded.add(tmp);
 
 				if (backNodes.contains(tmp)) {
 					((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.1);
@@ -726,5 +699,4 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator{
 			}
 		}
 	}
-
 }

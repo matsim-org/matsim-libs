@@ -32,9 +32,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
+import org.matsim.evacuation.EvacuationAreaFileWriter;
+import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -62,9 +66,20 @@ import org.matsim.plans.algorithms.PlansFilterActInArea;
 import org.matsim.plans.algorithms.XY2Links;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.World;
 import org.matsim.writer.MatsimWriter;
+
+
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 //import com.vividsolutions.jts.geom.Coordinate;
 //import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -235,6 +250,30 @@ public class MyMonsterClass {
 
 	}
 
+	//////////////////////////////////////////////////////////////////////
+	// networkReadWrite
+	//////////////////////////////////////////////////////////////////////
+	// reads and writes networ
+	public static void networkReadWrite(){
+		String configFile = "./configs/evacuationConf.xml";
+
+		Config config = Gbl.createConfig(new String[] {configFile});
+
+//		System.out.println("  reading world xml file... ");
+//		final WorldParser world_parser = new WorldParser(Gbl.getWorld());
+//		world_parser.parse();
+//		System.out.println("  done.");
+
+		System.out.println("  reading the network...");
+		NetworkLayer network = null;
+		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
+		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		System.out.println("  done.");
+		NetworkWriter nw = new NetworkWriter(network,"./networks/padang_net_evac_2.xml");
+		nw.write();
+
+	}
 
 
 	//////////////////////////////////////////////////////////////////////
@@ -303,7 +342,7 @@ public class MyMonsterClass {
 	//////////////////////////////////////////////////////////////////////
 	// reads and writes plans, without running any algorithms
 
-	public static void convertPlans(final String[] args) {
+//	public static void convertPlans(final String[] args) {
 
 
 
@@ -352,147 +391,142 @@ public class MyMonsterClass {
 //		System.out.println();
 //	}
 //
-//	//////////////////////////////////////////////////////////////////////
-//	// cuts out a subset from network that is within the specified
-//	// polygon ... saves set network and the evacuation area as well
-//	//////////////////////////////////////////////////////////////////////
-//	public static void networkClipping(String[] args){
-//		//for now hardcoded
-//		World world = Gbl.createWorld();
-//		Config config = Gbl.createConfig(new String[] {"./configs/evacuationConf.xml"});
-//
-//
-//
-//		QueueNetworkLayer network = new QueueNetworkLayer();
-//		NetworkReaderI netReader = new NetworkParser(new NetworkReaderHandlerImplV1(network));
-//		netReader.readfile("networks/navteq_network_zurich.xml");
-//
-//
-//
-//		ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
-//
-//		coords.add(coord2Coordinate(network.getNode("101489910").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101489913").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101463848").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101464213").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101455893").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101453477").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101453987").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101457923").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101500181").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101490852").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101458204").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101457358").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101499942").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101452753").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101452198").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101452171").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101463394").getCoord()));
-//		coords.add(coord2Coordinate(network.getNode("101489910").getCoord()));
-//		Coordinate[] c = new Coordinate[coords.size()];
-//		for (int i = 0; i < coords.size(); i++)
-//			c[i] = coords.get(i);
-//
-//
-//		GeometryFactory geofac = new GeometryFactory();
-//		CoordinateSequence seq = new CoordinateArraySequence(c);
-//		LinearRing ring = new LinearRing(seq,geofac);
-//		Polygon poly = new Polygon( ring, null, geofac);
-//
-//
-//
-//		int one = 0, two = 0;
-//
-//		ConcurrentLinkedQueue<Node> n = new ConcurrentLinkedQueue<Node>();
-//		ConcurrentLinkedQueue<Link> l = new ConcurrentLinkedQueue<Link>();
-//		ConcurrentLinkedQueue<Link> oneWay = new ConcurrentLinkedQueue<Link>();
-//		HashMap<Id,EvacuationAreaLink> links = new HashMap<Id,EvacuationAreaLink>();
-//		Iterator it = network.getLinks().iterator();
-//		while (it.hasNext()) {
-//			QueueLink link = (QueueLink) it.next();
-//			Node a = link.getFromNode();
-//			Node b = link.getToNode();
-//			CoordinateSequence seqA = new CoordinateArraySequence(new Coordinate[]{coord2Coordinate(a.getCoord())});
-//			Point pointA = new Point(seqA,geofac);
-//			CoordinateSequence seqB = new CoordinateArraySequence(new Coordinate[]{coord2Coordinate(b.getCoord())});
-//			Point pointB = new Point(seqB,geofac);
-//
-//			if (!poly.contains(pointA) && !poly.contains(pointB) && !poly.touches(pointA) && !poly.touches(pointB)) {
-//				l.add(link);
-//				n.add(a);
-//				n.add(b);
-//				continue;
-//			} else {
-//				Iterator outIt = b.getOutLinks().iterator();
-//				QueueLink oneWayLink = link;
-//				while(outIt.hasNext()){
-//
-//					Node temp = ((QueueLink)outIt.next()).getToNode();
-//					if (temp == a){
-//						oneWayLink = null;
-//						break;
-//					}
-//				}
-//				if (oneWayLink != null) {
-//					oneWay.add(oneWayLink);
-//					one++;
-//				}else {
-//					link.setCapacity(link.getCapacity()*2);
-//					two++;
-//				}
-//				EvacuationAreaLink el = new EvacuationAreaLink(link.getId(),3600.0 * 11 + 85*60);
-//				links.put(el.getId(),el);
-//			}
-//
-//
-//
-//
-//
-//
-//		}
-//
-//
-//
-//int three=0;
-//		System.out.println(oneWay.size() + " " +  one + " " + two + " " + network.getLocations().size());
-//		Link oneWayLink = oneWay.poll();
-//		while (oneWayLink != null){
-//			Node toNode = oneWayLink.getFromNode();
-//			Node fromNode = oneWayLink.getToNode();
-//			Link testlink = network.createLink(oneWayLink.getId().toString() + "666", fromNode.getId().toString(), toNode.getId().toString(),((Double) oneWayLink.getLength()).toString(), ((Double)oneWayLink.getFreespeed()).toString(),((Double)oneWayLink.getCapacity()).toString(), ((Integer)oneWayLink.getLanes()).toString(), oneWayLink.getOrigId() + "666",oneWayLink.getType());
-//
-//			EvacuationAreaLink el = new EvacuationAreaLink(testlink.getId(),3600.0 * 11 + 85*60);
-//			links.put(el.getId(),el);
-//			oneWayLink = oneWay.poll();
-//			three++;
-//		}
-//		System.out.println(oneWay.size() + " " +  one + " " + two + " " + three + " " + network.getLocations().size());
-//		EvacuationNetFileWriter enfw = new EvacuationNetFileWriter(links);
-//		enfw.writeFile("./networks/evacuationarea_zurich_navteq.xml");
-//
-//		NetworkWriter nw = new NetworkWriter(network,"./networks/navteq_network_zurich.xml");
-//		nw.write();
-//		Link link = l.poll();
-//		while (link != null){
-//			network.removeLink(link);
-//			link = l.poll();
-//		}
-//
-//		Node node = n.poll();
-//		while (node != null) {
-//			network.removeNode(node);
-//			node = n.poll();
-//		}
-//
-//
-//
-//
-//		network.createLink("666","101489910","101489913","20","20", "2000", "3", null, null);
-//		network.createLink("667","101489913","101489910","20","20", "2000", "3", null, null);
-//		new NetworkCleaner().run(network);
-//
-//		nw = new NetworkWriter(network,"./networks/evacuationnet_zurich_navteq.xml");
-//		nw.write();
+	//////////////////////////////////////////////////////////////////////
+	// cuts out a subset from network that is within the specified
+	// polygon ... saves set network and the evacuation area as well
+	//////////////////////////////////////////////////////////////////////
+	public static void networkClipping(String[] args){
+		//for now hardcoded
+		World world = Gbl.createWorld();
+		Config config = Gbl.createConfig(new String[] {"./configs/evacuationConf.xml"});
+		String networkFile = config.network().getInputFile();
+
+
+		System.out.println("reading network xml file... ");
+		QueueNetworkLayer network = new QueueNetworkLayer();
+		new MatsimNetworkReader(network).readFile(networkFile);
+		world.setNetworkLayer(network);
+		System.out.println("done. ");
+
+
+
+		ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
+
+		coords.add(MGC.coord2Coordinate(network.getNode("5425").getCoord()));
+		coords.add(MGC.coord2Coordinate(network.getNode("5411").getCoord()));
+		coords.add(MGC.coord2Coordinate(network.getNode("5313").getCoord()));
+//		coords.add(MGC.coord2Coordinate(network.getNode("5952").getCoord()));
+		coords.add(MGC.coord2Coordinate(network.getNode("5411").getCoord()));
+		coords.add(MGC.coord2Coordinate(network.getNode("5002").getCoord()));
+		
+		
+		Coordinate[] c = new Coordinate[coords.size()];
+		for (int i = 0; i < coords.size(); i++)
+			c[i] = coords.get(i);
+
+
+		GeometryFactory geofac = new GeometryFactory();
+		CoordinateSequence seq = new CoordinateArraySequence(c);
+		LinearRing ring = new LinearRing(seq,geofac);
+		Polygon poly = new Polygon( ring, null, geofac);
+
+
+
+		int one = 0, two = 0;
+
+		ConcurrentLinkedQueue<Node> n = new ConcurrentLinkedQueue<Node>();
+		ConcurrentLinkedQueue<Link> l = new ConcurrentLinkedQueue<Link>();
+		ConcurrentLinkedQueue<Link> oneWay = new ConcurrentLinkedQueue<Link>();
+		HashMap<IdI,EvacuationAreaLink> links = new HashMap<IdI,EvacuationAreaLink>();
+		Iterator it = network.getLinks().values().iterator();
+		
+		while (it.hasNext()) {
+			QueueLink link = (QueueLink) it.next();
+			Node a = link.getFromNode();
+			Node b = link.getToNode();
+			CoordinateSequence seqA = new CoordinateArraySequence(new Coordinate[]{MGC.coord2Coordinate(a.getCoord())});
+			Point pointA = new Point(seqA,geofac);
+			CoordinateSequence seqB = new CoordinateArraySequence(new Coordinate[]{MGC.coord2Coordinate(b.getCoord())});
+			Point pointB = new Point(seqB,geofac);
+
+			if (!poly.contains(pointA) && !poly.contains(pointB) && !poly.touches(pointA) && !poly.touches(pointB)) {
+				l.add(link);
+				n.add(a);
+				n.add(b);
+				continue;
+			} else {
+				Iterator outIt = b.getOutLinks().values().iterator();
+				QueueLink oneWayLink = link;
+				while(outIt.hasNext()){
+
+					Node temp = ((QueueLink)outIt.next()).getToNode();
+					if (temp == a){
+						oneWayLink = null;
+						break;
+					}
+				}
+				if (oneWayLink != null) {
+					oneWay.add(oneWayLink);
+					one++;
+				}else {
+					link.setCapacity(link.getCapacity()*2);
+					two++;
+				}
+				EvacuationAreaLink el = new EvacuationAreaLink((Id) link.getId(),3600.0 * 11 + 85*60);
+				links.put(el.getId(),el);
+			}
+
+
+
+
+
+
+		}
+
+
+
+int three=0;
+		System.out.println(oneWay.size() + " " +  one + " " + two + " " + network.getLocations().size());
+		Link oneWayLink = oneWay.poll();
+		while (oneWayLink != null){
+			Node toNode = oneWayLink.getFromNode();
+			Node fromNode = oneWayLink.getToNode();
+			Link testlink = network.createLink(oneWayLink.getId().toString() + "666", fromNode.getId().toString(), toNode.getId().toString(),((Double) oneWayLink.getLength()).toString(), ((Double)oneWayLink.getFreespeed()).toString(),((Double)oneWayLink.getCapacity()).toString(), ((Integer)oneWayLink.getLanes()).toString(), oneWayLink.getOrigId() + "666",oneWayLink.getType());
+
+			EvacuationAreaLink el = new EvacuationAreaLink((Id) testlink.getId(),3600.0 * 11 + 85*60);
+			links.put(el.getId(),el);
+			oneWayLink = oneWay.poll();
+			three++;
+		}
+		System.out.println(oneWay.size() + " " +  one + " " + two + " " + three + " " + network.getLocations().size());
+		EvacuationAreaFileWriter enfw = new EvacuationAreaFileWriter(links);
+		try {
+			enfw.writeFile("./output/evacuationarea_padang_cutout.xml.gz");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		Link link = l.poll();
+		while (link != null){
+			network.removeLink(link);
+			link = l.poll();
+		}
+
+		Node node = n.poll();
+		while (node != null) {
+			network.removeNode(node);
+			node = n.poll();
+		}
+
+
+
+
+		new NetworkCleaner().run(network);
+
+		NetworkWriter nw = new NetworkWriter(network,"./output/padang_net_cutout.xml.gz");
+		nw.write();
 
 
 
@@ -746,7 +780,7 @@ public class MyMonsterClass {
 
 	public static void networkCutter(){
 		String netfile = "./networks/navteq_network.xml.gz";
-		String configFile = "./configs/evacuationConf.xml";
+		String configFile = "./configs/routerTest.xml";
 
 
 		World world = Gbl.getWorld();
@@ -761,8 +795,8 @@ public class MyMonsterClass {
 		network.beforeSim();
 
 		System.out.println("extracting links ... ");
-		Coord A = network.getNode("101938131").getCoord();
-		Coord B = network.getNode("101718038").getCoord();
+		Coord A = network.getNode("101472392").getCoord();
+		Coord B = network.getNode("101465289").getCoord();
 		double maxX = Math.max(A.getX(),B.getX());
 		double maxY = Math.max(A.getY(),B.getY());
 		double minX = Math.min(A.getX(),B.getX());
@@ -899,7 +933,7 @@ public class MyMonsterClass {
 
 //		networkCutter();
 
-//		networkClipping(args);
+		networkClipping(args);
 
 //		positionExtractor();
 
@@ -916,7 +950,9 @@ public class MyMonsterClass {
 //		asciiNetParser();
 		
 //		plansReduction();
-		planMinMax();
+//		planMinMax();
+		
+//		networkReadWrite();
 	}
 
 
@@ -999,4 +1035,5 @@ public class MyMonsterClass {
 	}
 
 }
+
 
