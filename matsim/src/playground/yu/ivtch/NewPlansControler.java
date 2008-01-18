@@ -29,28 +29,31 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.world.World;
 
+import playground.marcel.MyRuns;
 
 /**
  * test of NewAgentPtPlan
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewPlansControler {
 
 	public static void main(final String[] args) {
-		final String netFilename = "./test/yu/Bottleneck/input/network.xml";
-		final String plansFilename = "./test/yu/Bottleneck/input/equil_plans1k.xml";
+		final String netFilename = "./examples/equil/network.xml";
+		final String plansFilename = "./examples/equil/plans100.xml";
 
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(new String[] {"./test/yu/Bottleneck/config.xml"});
+		Config config = Gbl
+				.createConfig(new String[] { "./examples/equil/config.xml" });
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
-		NewAgentPtPlan nap=new NewAgentPtPlan(population);
+		NewAgentPtPlan nap = new NewAgentPtPlan(population);
 		population.addAlgorithm(nap);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
