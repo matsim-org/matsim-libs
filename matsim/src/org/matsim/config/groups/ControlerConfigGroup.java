@@ -23,6 +23,10 @@ package org.matsim.config.groups;
 import java.util.TreeMap;
 
 import org.matsim.config.Module;
+import org.matsim.network.NetworkLayer;
+import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorHashMap;
 
 public class ControlerConfigGroup extends Module {
 	public static final String GROUP_NAME = "controler";
@@ -30,11 +34,15 @@ public class ControlerConfigGroup extends Module {
 	private static final String OUTPUT_DIRECTORY = "outputDirectory";
 	private static final String FIRST_ITERATION = "firstIteration";
 	private static final String LAST_ITERATION = "lastIteration";
+	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
+	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
 
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
 	private int lastIteration = 1000;
-
+	private String travelTimeCalculator = "TravelTimeCalculatorArray";
+	private int traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
+	
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -47,6 +55,10 @@ public class ControlerConfigGroup extends Module {
 			return Integer.toString(getFirstIteration());
 		} else if (LAST_ITERATION.equals(key)) {
 			return Integer.toString(getLastIteration());
+		}  else if (TRAVEL_TIME_CALCULATOR.equals(key)) {
+			return getTravelTimeCalculatorType();
+		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
+			return Integer.toString(getTraveltimeBinSize());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -60,7 +72,11 @@ public class ControlerConfigGroup extends Module {
 			setFirstIteration(Integer.parseInt(value));
 		} else if (LAST_ITERATION.equals(key)) {
 			setLastIteration(Integer.parseInt(value));
-		} else {
+		}else if (TRAVEL_TIME_CALCULATOR.equals(key)) {
+			setTravelTimeCalculatorType(value);
+		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
+			setTraveltimeBinSize(Integer.parseInt(value));
+		}  else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -71,6 +87,8 @@ public class ControlerConfigGroup extends Module {
 		map.put(OUTPUT_DIRECTORY, getValue(OUTPUT_DIRECTORY));
 		map.put(FIRST_ITERATION, getValue(FIRST_ITERATION));
 		map.put(LAST_ITERATION, getValue(LAST_ITERATION));
+		map.put(TRAVEL_TIME_CALCULATOR, getValue(TRAVEL_TIME_CALCULATOR));
+		map.put(TRAVEL_TIME_BIN_SIZE, getValue(TRAVEL_TIME_BIN_SIZE));		
 		return map;
 	}
 
@@ -100,5 +118,42 @@ public class ControlerConfigGroup extends Module {
 	public int getLastIteration() {
 		return this.lastIteration;
 	}
+	
+	public void setTravelTimeCalculatorType(final String travelTimeCalculator){
+		this.travelTimeCalculator = travelTimeCalculator;
+	}
 
+	public String getTravelTimeCalculatorType(){
+		return this.travelTimeCalculator;
+	}
+
+	/**
+	 * Sets the size of the time-window over which the travel times are accumulated and averaged.<br>
+	 * Note that smaller values for the binSize increase memory consumption to store the travel times.
+	 *
+	 * @param binSize The size of the time-window in seconds.
+	 */
+	public final void setTraveltimeBinSize(final int binSize) {
+		this.traveltimeBinSize = binSize;
+	}
+
+	/**
+	 * Returns the size of the time-window used to accumulate and average travel times.
+	 *
+	 * @return The size of the time-window in seconds.
+	 */
+	public final int getTraveltimeBinSize() {
+		return this.traveltimeBinSize;
+	}
+	
+	public AbstractTravelTimeCalculator getTravelTimeCalculator(NetworkLayer network, int endTime) {
+		if ("TravelTimeCalculatorArray".equals(this.travelTimeCalculator)){
+			return new TravelTimeCalculatorArray(network, this.traveltimeBinSize, endTime);
+		} else if ("TravelTimeCalculatorHashMap".equals(this.travelTimeCalculator)){
+			return new TravelTimeCalculatorHashMap(network, this.traveltimeBinSize, endTime);
+		} else {
+			throw new RuntimeException(this.travelTimeCalculator + " is unknown!");
+		}
+}
+	
 }

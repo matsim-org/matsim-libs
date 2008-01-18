@@ -88,6 +88,8 @@ import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.stats.PlanStatsManager;
 import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.trafficmonitoring.TravelTimeCalculatorHashMap;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.MatsimWorldReader;
@@ -506,9 +508,10 @@ public class Controler {
 			printNote("", "done.");
 		}
 
-		AbstractTravelTimeCalculator travelTimeCalculator = this.config.simulation().getTravelTimeCalculator(this.network);
-		this.events.addHandler(travelTimeCalculator);
-		this.travelTimeCalculator = travelTimeCalculator;
+		int endTime = (int) (this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30 * 3600); //if no end time is given assume 30 hours  
+		this.travelTimeCalculator = this.config.controler().getTravelTimeCalculator(this.network, endTime);
+		this.events.addHandler(this.travelTimeCalculator);
+		 
 
 		if (Gbl.useRoadPricing()) {
 			if ((this.toll.getType().equals("distance")) || (this.toll.getType().equals("cordon"))) {
@@ -547,6 +550,7 @@ public class Controler {
 		this.fireControlerStartupEvent();
 
 	}
+
 
 	/**
 	 * writes necessary information to files and ensures that all files get properly closed
