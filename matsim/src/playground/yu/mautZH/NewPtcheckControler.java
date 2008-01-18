@@ -93,7 +93,8 @@ public class NewPtcheckControler extends Controler {
 	protected void setupIteration(int iteration) {
 		super.setupIteration(iteration);
 		cas.reset(iteration);
-		cattl.reset(iteration);
+		if (cattl != null)
+			cattl.reset(iteration);
 		ctpf.reset(iteration);
 	}
 
