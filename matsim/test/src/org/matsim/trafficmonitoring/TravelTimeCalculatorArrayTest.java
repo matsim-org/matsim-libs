@@ -47,7 +47,9 @@ public class TravelTimeCalculatorArrayTest extends MatsimTestCase {
 		// to ensure this option isn't enabled for real tests!
 
 	public final void testLinkTravelTime() throws Exception {
-		String  inputDir = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/../TravelTimeCalculator/";
+		
+		String className =  "/" + this.getClass().getSimpleName();
+		String  inputDir = "test/input/" + (this.getClass().getCanonicalName().replace('.', '/')).replace(className, "")	+ "/TravelTimeCalculator/";
 		String networkFile = inputDir + "link10_network.xml";
 		String eventsFile = inputDir + "link10_events.txt";
 		String compareFile = inputDir + "link10_ttimes.txt";
