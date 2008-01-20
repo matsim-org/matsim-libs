@@ -132,14 +132,6 @@ public class CalcLinkStats {
 		for (BasicLinkI link : this.network.getLinks().values()) {
 			String linkId = link.getId().toString();
 			LinkData data = new LinkData(new int[NOF_STATS][this.nofHours + 1], new double[NOF_STATS][this.nofHours]);
-			for (int i = 0; i < data.volumes.length; i++) {
-				for (int j = 0; j < data.volumes[i].length; j++) {
-					data.volumes[i][j] = 0;
-				}
-				for (int j = 0; j < data.ttimes[i].length; j++) {
-					data.ttimes[i][j] = 0.0;
-				}
-			}
 			this.linkData.put(linkId, data);
 		}
 
