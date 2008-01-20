@@ -29,37 +29,38 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
 public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
-	
+
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
-	
+
 	private NetworkLayer network = null;
 	final int roleIndex;
 	private final int timeslice;
 	private final int expectNumSlots;
-	
+
 	//enlarged cache for Integers - java.lang.Integer only caches 256 values (from -128 to 127) - used as keys for HashMap in TravelTimeRole
 	//TODO [GL] may be we want one global Integer cache for MatSim ... need to investigate if an enlarged cache is useful for other classes too
-	private Integer [] cache;  
-	
+	private Integer [] cache;
+
 	public TravelTimeCalculatorHashMap(final NetworkLayer network){
 		this(network,15*60,30*3600); // default timeslot-duration: 15 minutes
 	}
-	
+
 
 	public TravelTimeCalculatorHashMap(final NetworkLayer network, final int timeslice) {
 		this(network, timeslice, 30*3600); // default: 30 hours at most
 	}
-	
+
 	//compatibility constructor ...
 	public TravelTimeCalculatorHashMap(final NetworkLayer network, final int timeslice, final int maxTime) {
 		this.network  = network;
 		this.timeslice = timeslice;
-		this.expectNumSlots = (int) ( (maxTime / this.timeslice) + 1);
+		this.expectNumSlots = (maxTime / this.timeslice) + 1;
 		this.roleIndex = network.requestLinkRole();
 		generateCache();
 	}
-	
+
+	@Override
 	public void resetTravelTimes() {
 		for (Link link : this.network.getLinks().values()) {
 			TravelTimeRole r = getTravelTimeRole(link);
@@ -67,28 +68,33 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 		}
 		this.enterEvents.clear();
 	}
-	
+
 
 	public void reset(final int iteration) {
-		resetTravelTimes();
+		/* DO NOT CALL resetTravelTimes here!
+		 * reset(iteration) is called at the beginning of an iteration, but we still
+		 * need the travel times from the last iteration for the replanning!
+		 * That's why there is a separat method resetTravelTimes() which can
+		 * be called after the replanning.      -marcel/20jan2008
+		 */
 	}
 
 	private void generateCache() {
-		cache = new Integer[this.expectNumSlots];
+		this.cache = new Integer[this.expectNumSlots];
 		for (int i=0; i < this.expectNumSlots; i++){
-			cache[i] = Integer.valueOf(i);
+			this.cache[i] = Integer.valueOf(i);
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// Implementation of EventAlgorithmI
 	//////////////////////////////////////////////////////////////////////
-	public void handleEvent(EventLinkEnter event) {
+	public void handleEvent(final EventLinkEnter event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.time);
 		this.enterEvents.put(event.agentId, e);
 	}
 
-	public void handleEvent(EventLinkLeave event) {
+	public void handleEvent(final EventLinkLeave event) {
 		EnterEvent e = this.enterEvents.remove(event.agentId);
 		if (e != null && e.linkId.equals(event.linkId)) {
 			double timediff = event.time - e.time;
@@ -99,7 +105,7 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 		}
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(final EventAgentArrival event) {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!
@@ -115,13 +121,13 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 		}
 		return r;
 	}
-	
+
 	private int getTimeSlotIndex(final double time) {
 		int slice = ((int) time)/this.timeslice;
 		return slice;
 	}
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////
 	// Implementation of TravelTimeI
 	//////////////////////////////////////////////////////////////////////
@@ -133,11 +139,11 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 		return getTravelTimeRole(link).getTravelTime(time);
 	}
 
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// inner classes
 	//////////////////////////////////////////////////////////////////////
-	
+
 	static private class EnterEvent {
 
 		public final String linkId;
@@ -151,27 +157,27 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 	};
 
 	private class TravelTimeRole {
-	
-		private HashMap<Integer,TimeStruct> travelTimes;
+
+		private final HashMap<Integer,TimeStruct> travelTimes;
 		private final double freetraveltime;
 		private int currIdx;
 		private int currCnt;
 		private double currTimeSum;
-		
+
 
 		public TravelTimeRole(final Link link) {
 
 //			this.travelTimes =  new HashMap<Integer,TimeStruct>(numSlots,(float) 0.5);
-			this.travelTimes =  new HashMap<Integer,TimeStruct>(); 
+			this.travelTimes =  new HashMap<Integer,TimeStruct>();
 			this.freetraveltime = link.getLength() / link.getFreespeed();
 			resetTravelTimes();
-			
+
 
 		}
-	
-		private Integer getInteger(int i){
-			if (i < cache.length){
-				return cache[i];
+
+		private Integer getInteger(final int i){
+			if (i < TravelTimeCalculatorHashMap.this.cache.length) {
+				return TravelTimeCalculatorHashMap.this.cache[i];
 			}
 			return Integer.valueOf(i);
 		}
@@ -187,13 +193,13 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 			int index = getTimeSlotIndex(now);
 			if (index != this.currIdx){
 				changeCurrent(index);
-				
+
 			}
 			this.currCnt++;
 			this.currTimeSum += traveltime;
 		}
 
-		private void changeCurrent(int index) {
+		private void changeCurrent(final int index) {
 			TimeStruct curr = this.travelTimes.get(getInteger(this.currIdx));
 			// save old
 			if (curr != null ){
@@ -202,48 +208,48 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 			} else if (this.currCnt > 0){
 				this.travelTimes.put(getInteger(this.currIdx), new TimeStruct(this.currTimeSum,this.currCnt));
 			}
-			
+
 			// set new
 			this.currIdx = index;
 			curr = this.travelTimes.get(getInteger(this.currIdx));
 			if (curr == null){
 				this.currCnt = 0;
-				this.currTimeSum = 0;				
+				this.currTimeSum = 0;
 			} else {
 				this.currCnt = curr.cnt;
-				this.currTimeSum = curr.timeSum;				
+				this.currTimeSum = curr.timeSum;
 			}
-			
+
 		}
 
 		public double getTravelTime(final double now) {
 			int index = getTimeSlotIndex(now);
-			
+
 			if (index == this.currIdx) {
 				return this.currTimeSum / this.currCnt;
 			}
-	
+
 			TimeStruct ts = this.travelTimes.get(getInteger(index));
 			if (ts == null){
 				return this.freetraveltime;
 			}
-			
+
 			return ts.timeSum / ts.cnt;
-			
+
 		}
-		
+
 
 		private  class TimeStruct{
 			public double timeSum;
 			public int cnt;
-			public TimeStruct(double timeSum, int cnt){
+			public TimeStruct(final double timeSum, final int cnt){
 				this.cnt = cnt;
 				this.timeSum = timeSum;
 			}
 		};
 
 	};
-	
 
-	
+
+
 }

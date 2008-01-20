@@ -36,8 +36,8 @@ public class TravelTimeCalculatorArray extends AbstractTravelTimeCalculator {
 	final int roleIndex;
 	private final int timeslice;
 	private final int numSlots;
-	
-	
+
+
 	public TravelTimeCalculatorArray(final NetworkLayer network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
@@ -54,11 +54,7 @@ public class TravelTimeCalculatorArray extends AbstractTravelTimeCalculator {
 		resetTravelTimes();
 	}
 
-
-
-	
-
-
+	@Override
 	public void resetTravelTimes() {
 		for (Link link : this.network.getLinks().values()) {
 			TravelTimeRole r = getTravelTimeRole(link);
@@ -68,7 +64,12 @@ public class TravelTimeCalculatorArray extends AbstractTravelTimeCalculator {
 	}
 
 	public void reset(final int iteration) {
-		resetTravelTimes();
+		/* DO NOT CALL resetTravelTimes here!
+		 * reset(iteration) is called at the beginning of an iteration, but we still
+		 * need the travel times from the last iteration for the replanning!
+		 * That's why there is a separat method resetTravelTimes() which can
+		 * be called after the replanning.      -marcel/20jan2008
+		 */
 	}
 
 	//////////////////////////////////////////////////////////////////////
