@@ -103,7 +103,7 @@ public class MatsimConfigReader extends MatsimXmlParser {
 		// Currently the only config-type is v1
 		if (CONFIG_V1.equals(doctype)) {
 			this.delegate = new ConfigReaderMatsimV1(this.config);
-			System.out.println("using config_v1-reader.");
+			Logger.getLogger(MatsimConfigReader.class).info("using config_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}
@@ -116,7 +116,7 @@ public class MatsimConfigReader extends MatsimXmlParser {
 		if (is == null && this.localDtd != null) {
 			File dtdFile = new File(this.localDtd);
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				Logger.getLogger(this.getClass()).info("Using the local DTD " + this.localDtd);
+				Logger.getLogger(MatsimConfigReader.class).info("Using the local DTD " + this.localDtd);
 				return new InputSource(this.localDtd);
 			}
 			return null;
