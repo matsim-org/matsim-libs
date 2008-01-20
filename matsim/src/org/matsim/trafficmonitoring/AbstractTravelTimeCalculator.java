@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.trafficmonitoring;
 
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
@@ -31,15 +28,14 @@ import org.matsim.router.util.TravelTimeI;
 
 /**
  * @author laemmel
- *
  */
-public abstract class AbstractTravelTimeCalculator implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArrivalI, TravelTimeI{
-	
+public abstract class AbstractTravelTimeCalculator implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, 
+		EventHandlerAgentArrivalI, TravelTimeI {
+
 
 	public AbstractTravelTimeCalculator() {
-		
 	}
-	
+
 	/**
 	 * Resets the travel times information on all links
 	 */
@@ -48,8 +44,6 @@ public abstract class AbstractTravelTimeCalculator implements EventHandlerLinkEn
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return this.getClass().getSimpleName();
 	}
-
 }
