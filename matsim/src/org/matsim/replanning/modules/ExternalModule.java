@@ -50,13 +50,13 @@ import org.matsim.utils.misc.ExeRunner;
  * Basic wrapper for any call to external "planstoplans" modules. As basic handling of
  * such modules is alike for every module:
  * 1.) Write a plans header
- * 2.) dump every person including just selected plan or all plans
+ * 2.) dump every person with the selected plan only
  * 3.) close plans file and write a config file based on a config template file
  * 4.) Exe-cute the external program with this config file
  * 5.) Re-read plans and exchange selected plan by a new one or append new plan
  *
- * @author david
- * @author marcel
+ * @author dstrippgen
+ * @author mrieser
  */
 public class ExternalModule implements StrategyModuleI {
 
