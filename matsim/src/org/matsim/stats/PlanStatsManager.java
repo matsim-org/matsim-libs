@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -35,11 +34,14 @@ import org.matsim.stats.algorithms.PlanStatsI;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.writer.MatsimWriter;
 
-
 /**
  * @author laemmel
  */
 public class PlanStatsManager  {
+
+	public static final String STATS_MODULE = "stats";
+	public static final String STATS_FILE= "statsOutFile";
+	public static final String STATS_MANAGER_ACTIVE = "generateStats";
 
 	public int minIteration;
 	public int maxIteration;
@@ -87,7 +89,7 @@ public class PlanStatsManager  {
 	public void writeStats(final Plans population){
 
 		StatsWriter wrt = new StatsWriter();
-		wrt.openFile(Gbl.getConfig().getParam(Controler.STATS_MODULE, Controler.STATS_FILE));
+		wrt.openFile(Gbl.getConfig().getParam(STATS_MODULE, STATS_FILE));
 		for (Person pers : population.getPersons().values()) {
 			IdI persId = pers.getId();
 			for (PlanStatsI plan : this.stats.get(persId)){
