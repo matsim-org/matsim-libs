@@ -1,7 +1,8 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "./dtd/config_v1.dtd"
 	[
-		<!ENTITY INPUTBASE    "./examples/equil">
+<!--		<!ENTITY INPUTBASE    "./examples/equil">-->
+		<!ENTITY INPUTBASE    "./src/playground/andreas/intersection">
 		<!ENTITY OUTPUTBASE   "./output">
 	]
 >
@@ -9,7 +10,7 @@
 <config>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml" />
+		<param name="inputNetworkFile" value="&INPUTBASE;/q_net.xml" />
 		<param name="outputNetworkFile" value="&OUTPUTBASE;/network.xml" />
 	</module>
 
@@ -73,7 +74,7 @@
 	<module name="vis">
 		<param name="logo"		value = "(c) 2008 TUB-VSP"/>
 		<param name="delay"		value = "50"/>
-		<param name="linkwidthfactor"	value = "50"/>
+		<param name="linkwidthfactor"	value = "5"/>
 		<param name="shownodelabels"	value = "false"/>
 		<param name="showlinklabels"  	value = "false"/>
 	</module>

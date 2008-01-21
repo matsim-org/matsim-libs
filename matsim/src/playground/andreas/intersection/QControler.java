@@ -88,10 +88,10 @@ public class QControler extends Controler {
 
 		log.info("  generating plans... ");
 
-		for (int jj = 1; jj <= 6; jj++) {
+		for (int jj = 1; jj <= 10; jj++) {
 			
-			Link destLink = network.getLink("12");
-			Link sourceLink = network.getLink(String.valueOf(jj));
+			Link destLink = network.getLink("10");
+			Link sourceLink = network.getLink("60");
 			generatePerson(jj, sourceLink, destLink, pop);
 		}
 
@@ -104,7 +104,7 @@ public class QControler extends Controler {
 		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
 		Plan plan = new Plan(p);
 		try {
-			plan.createAct("h", 100., 100., sourceLink, 0., 3 * 60 * 60. + ii * 60, Time.UNDEFINED_TIME, true);
+			plan.createAct("h", 100., 100., sourceLink, 0., 3 * 60 * 60., Time.UNDEFINED_TIME, true);
 			plan.createLeg("1", "car", null, null, null);
 			plan.createAct("h", 200., 200., destLink, 8 * 60 * 60, 0., 0., true);
 
