@@ -27,10 +27,9 @@ public class FilterPlansWithRouteInArea {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// filterPlansWithRouteInArea
 		MyRuns
 				.filterPlansWithRouteInArea(
-						new String[] { "./examples/equil/config1.xml" }, 300,
-						600, 200.0);
+						new String[] { "./test/yu/ivtch/config_for_makeZuerich_plans.xml" },
+						683518.0, 246836.0, 30000.0);
 	}
 }

@@ -40,13 +40,13 @@ import playground.marcel.MyRuns;
 public class NewPlansControler {
 
 	public static void main(final String[] args) {
-		final String netFilename = "./examples/equil/network.xml";
-		final String plansFilename = "./examples/equil/plans100.xml";
+		final String netFilename = "./test/yu/ivtch/input/network.xml";
+		final String plansFilename = "./test/yu/ivtch/input/all_plans.xml.gz";
 
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")
 		Config config = Gbl
-				.createConfig(new String[] { "./examples/equil/config.xml" });
+				.createConfig(new String[] { "./test/yu/ivtch/config_for_make10pctSample.xml" });
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

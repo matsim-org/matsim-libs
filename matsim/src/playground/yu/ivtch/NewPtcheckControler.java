@@ -35,7 +35,6 @@ import org.matsim.gbl.Gbl;
 
 import playground.yu.analysis.CalcAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
-import playground.yu.mautZH.PtRate;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
