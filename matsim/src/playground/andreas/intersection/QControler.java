@@ -40,6 +40,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.run.Events2Snapshot;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.NetVis;
 
 import playground.andreas.intersection.sim.QNetworkLayer;
@@ -103,7 +104,7 @@ public class QControler extends Controler {
 		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
 		Plan plan = new Plan(p);
 		try {
-			plan.createAct("h", 100., 100., sourceLink, 0., 3 * 60 * 60. + ii * 60, 0., true);
+			plan.createAct("h", 100., 100., sourceLink, 0., 3 * 60 * 60. + ii * 60, Time.UNDEFINED_TIME, true);
 			plan.createLeg("1", "car", null, null, null);
 			plan.createAct("h", 200., 200., destLink, 8 * 60 * 60, 0., 0., true);
 
