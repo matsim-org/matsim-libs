@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KnowledgeV4.java
+ * Knowledge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -60,7 +60,7 @@ import org.matsim.utils.identifiers.IdI;
 import playground.jhackney.socialnet.EgoNet;
 import playground.jhackney.knowrefac.MentalMap;
 
-public class KnowledgeV4 {
+public class Knowledge {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -76,7 +76,7 @@ public class KnowledgeV4 {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected KnowledgeV4(final String desc) {
+	protected Knowledge(final String desc) {
 		this.desc = desc;
 	}
 
@@ -231,6 +231,6 @@ public class KnowledgeV4 {
 	//////////////////////////////////////////////////////////////////////
 
 	//public KnowledgeHacks hacks = new KnowledgeHacks( this );
-	//public MentalMap map = new MentalMap(this);
+	public MentalMap map = new MentalMap(this);
 	public EgoNet egoNet = new EgoNet();
 }
