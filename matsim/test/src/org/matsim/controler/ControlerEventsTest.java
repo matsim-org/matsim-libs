@@ -24,11 +24,10 @@ import java.io.File;
 import java.util.List;
 
 import org.matsim.config.Config;
-import org.matsim.controler.Controler;
-import org.matsim.controler.events.ControlerFinishIterationEvent;
-import org.matsim.controler.events.ControlerSetupIterationEvent;
-import org.matsim.controler.events.ControlerShutdownEvent;
-import org.matsim.controler.events.ControlerStartupEvent;
+import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.events.ShutdownEvent;
+import org.matsim.controler.events.StartupEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.io.IOUtils;
@@ -49,38 +48,45 @@ public class ControlerEventsTest extends MatsimTestCase {
 	}
 
 	public void testEvents() {
-		Controler controler = new Controler();
+		Controler controler = new Controler(this.config);
 		ControlerEventsTestListener listener = new ControlerEventsTestListener();
 		controler.addControlerListener(listener);
-		controler.run(null);
+		controler.run();
 		//test for startup events
-		ControlerStartupEvent startup = listener.getStartupEvent();
+		StartupEvent startup = listener.getStartupEvent();
 		assertNotNull("No ControlerStartupEvent fired!", startup);
 		assertEquals(controler, startup.getControler());
 		//test for shutdown
-		ControlerShutdownEvent shutdown = listener.getShutdownEvent();
+		ShutdownEvent shutdown = listener.getShutdownEvent();
 		assertNotNull("No ControlerShutdownEvent fired!", shutdown);
 		assertEquals(controler, shutdown.getControler());
 		//test for iterations
 		//setup
-		List<ControlerSetupIterationEvent> setupIt = listener.getSetupIterationEvents();
+		List<IterationStartsEvent> setupIt = listener.getIterationStartsEvents();
 		assertEquals(1, setupIt.size());
 		assertEquals(0, setupIt.get(0).getIteration());
 		//shutdown
-		List<ControlerFinishIterationEvent> finishIt = listener.getFinishIterationEvents();
+		List<IterationEndsEvent> finishIt = listener.getIterationEndsEvents();
 		assertEquals(1, finishIt.size());
 		assertEquals(0, finishIt.get(0).getIteration());
 
-		//test remove
+		// prepare remove test
+		Gbl.reset();
+		controler = new Controler(this.config);
+		listener = new ControlerEventsTestListener();
+		// we know from the code above, that "add" works
+		controler.addControlerListener(listener);
+		// now remove the listener
 		controler.removeControlerListener(listener);
-		listener.reset();
+
+		// clear directory to run with same config again...
 		String outPath = this.config.controler().getOutputDirectory();
 		File outDir = new File(outPath);
 		IOUtils.deleteDirectory(outDir);
 
-		Gbl.reset();
-		loadConfig(this.configfile);
-		controler.run(null);
+		// now run
+		controler.run();
+
 		//test for startup events
 		startup = listener.getStartupEvent();
 		assertNull("ControlerStartupEvent fired!", startup);
@@ -89,10 +95,10 @@ public class ControlerEventsTest extends MatsimTestCase {
 		assertNull("ControlerShutdownEvent fired!", shutdown);
 		//test for iterations
 		//setup
-		setupIt = listener.getSetupIterationEvents();
+		setupIt = listener.getIterationStartsEvents();
 		assertEquals(0, setupIt.size());
 		//shutdown
-		finishIt = listener.getFinishIterationEvents();
+		finishIt = listener.getIterationEndsEvents();
 		assertEquals(0, finishIt.size());
 	}
 

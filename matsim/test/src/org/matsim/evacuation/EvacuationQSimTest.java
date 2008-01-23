@@ -20,7 +20,6 @@
 
 package org.matsim.evacuation;
 
-import org.matsim.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
@@ -31,33 +30,31 @@ public class EvacuationQSimTest extends MatsimTestCase {
 		String referenceNetFile = getInputDirectory() + "/evacuation_net.xml";
 		String referenceEventsFile = getInputDirectory() + "/events.txt.gz";
 		String referencePlansFile = getInputDirectory() + "/plans.xml.gz";
-		
+
 		String netFile = getOutputDirectory() + "/evacuation_net.xml";
 		String eventsFile = getOutputDirectory() + "/ITERS/it.10/10.events.txt.gz";
 		String plansFile = getOutputDirectory() + "/output_plans.xml.gz";
-		
-		EvacuationQSimControler controler = new EvacuationQSimControler();
-		controler.run(new String [] {config});
-		
+
+		EvacuationQSimControler controler = new EvacuationQSimControler(new String[] {config});
+		controler.run();
+
 		System.out.println("checking network file ...");
 		long checksum1 = CRCChecksum.getCRCFromFile(referenceNetFile);
 		long checksum2 = CRCChecksum.getCRCFromFile(netFile);
 		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals(checksum1, checksum2);
-		
+
 		System.out.println("checking events file ...");
 		checksum1 = CRCChecksum.getCRCFromGZFile(referenceEventsFile);
 		checksum2 = CRCChecksum.getCRCFromGZFile(eventsFile);
 		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals(checksum1, checksum2);
-		
-		System.out.println("checking events file ...");
+
+		System.out.println("checking plans file ...");
 		checksum1 = CRCChecksum.getCRCFromGZFile(referencePlansFile);
 		checksum2 = CRCChecksum.getCRCFromGZFile(plansFile);
 		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals(checksum1, checksum2);
-		
 	}
-	
 
 }

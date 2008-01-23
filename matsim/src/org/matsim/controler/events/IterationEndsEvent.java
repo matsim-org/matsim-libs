@@ -22,28 +22,23 @@ package org.matsim.controler.events;
 
 import org.matsim.controler.Controler;
 
-
 /**
  * Event class to notify observers that a iteration is finished
- * @author dgrether
  *
+ * @author dgrether
  */
-public class ControlerFinishIterationEvent extends ControlerEvent {
+public class IterationEndsEvent extends ControlerEvent {
+
 	/**
 	 * The iteration number
 	 */
-	private int iteration;
-	/**
-	 * 
-	 * @param c
-	 * @param iteration
-	 */
-	public ControlerFinishIterationEvent(Controler c, int iteration) {
-		super(c);
+	private final int iteration;
+
+	public IterationEndsEvent(final Controler controler, final int iteration) {
+		super(controler);
 		this.iteration = iteration;
 	}
 	/**
-	 * 
 	 * @return the number of the finished iteration
 	 */
 	public int getIteration() {

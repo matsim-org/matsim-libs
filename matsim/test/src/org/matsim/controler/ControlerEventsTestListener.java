@@ -23,80 +23,80 @@ package org.matsim.controler;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.controler.events.ControlerFinishIterationEvent;
-import org.matsim.controler.events.ControlerSetupIterationEvent;
-import org.matsim.controler.events.ControlerShutdownEvent;
-import org.matsim.controler.events.ControlerStartupEvent;
-import org.matsim.controler.listener.ControlerFinishIterationListener;
-import org.matsim.controler.listener.ControlerSetupIterationListener;
-import org.matsim.controler.listener.ControlerShutdownListener;
-import org.matsim.controler.listener.ControlerStartupListener;
+import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.events.ShutdownEvent;
+import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.IterationStartsListener;
+import org.matsim.controler.listener.ShutdownListener;
+import org.matsim.controler.listener.StartupListener;
 
 
 public class ControlerEventsTestListener implements
-		ControlerFinishIterationListener, ControlerSetupIterationListener, ControlerStartupListener, ControlerShutdownListener {
+		IterationStartsListener, IterationEndsListener, StartupListener, ShutdownListener {
 
-	
-	private ControlerStartupEvent startupEvent;
-	private ControlerShutdownEvent shutdownEvent;
-  private List<ControlerFinishIterationEvent> finishIterationEvents = new Vector<ControlerFinishIterationEvent>();
-  private List<ControlerSetupIterationEvent> setupIterationEvents = new Vector<ControlerSetupIterationEvent>();
-	
-	
-	public void notifyStartup(final ControlerStartupEvent controlerStartupEvent) {
+
+	private StartupEvent startupEvent;
+	private ShutdownEvent shutdownEvent;
+  private final List<IterationStartsEvent> startIterationEvents = new Vector<IterationStartsEvent>();
+  private final List<IterationEndsEvent> endIterationEvents = new Vector<IterationEndsEvent>();
+
+
+	public void notifyStartup(final StartupEvent controlerStartupEvent) {
 		this.startupEvent = controlerStartupEvent;
 	}
 
-	public void notifyShutdown(final ControlerShutdownEvent controlerShudownEvent) {
+	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 		this.shutdownEvent = controlerShudownEvent;
 	}
 
-	
-	public void notifyIterationFinished(final ControlerFinishIterationEvent event) {
-		System.out.println("iteration finished");
-		this.finishIterationEvents.add(event);
+
+	public void notifyIterationEnds(final IterationEndsEvent event) {
+		System.out.println("iteration ends");
+		this.endIterationEvents.add(event);
 	}
 
-	public void notifyIterationSetup(final ControlerSetupIterationEvent event) {
-		System.out.println("iteration setup");
-		this.setupIterationEvents.add(event);
+	public void notifyIterationStarts(final IterationStartsEvent event) {
+		System.out.println("iteration starts");
+		this.startIterationEvents.add(event);
 	}
 
-	
+
 	/**
 	 * @return the startupEvent
 	 */
-	public ControlerStartupEvent getStartupEvent() {
+	public StartupEvent getStartupEvent() {
 		return this.startupEvent;
 	}
 
-	
+
 	/**
 	 * @return the shutdownEvent
 	 */
-	public ControlerShutdownEvent getShutdownEvent() {
+	public ShutdownEvent getShutdownEvent() {
 		return this.shutdownEvent;
 	}
 
-	
+
 	/**
 	 * @return the finishIterationEvents
 	 */
-	public List<ControlerFinishIterationEvent> getFinishIterationEvents() {
-		return this.finishIterationEvents;
+	public List<IterationEndsEvent> getIterationEndsEvents() {
+		return this.endIterationEvents;
 	}
 
-	
+
 	/**
 	 * @return the setupIterationEvents
 	 */
-	public List<ControlerSetupIterationEvent> getSetupIterationEvents() {
-		return this.setupIterationEvents;
+	public List<IterationStartsEvent> getIterationStartsEvents() {
+		return this.startIterationEvents;
 	}
 
 	public void reset() {
-		this.finishIterationEvents.clear();
-		this.setupIterationEvents.clear();
+		this.startIterationEvents.clear();
+		this.endIterationEvents.clear();
 		this.shutdownEvent = null;
 		this.startupEvent = null;
 	}

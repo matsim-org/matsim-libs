@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerEvent.java
+ * ControlerFinishIterationListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,30 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.controler.events;
+package org.matsim.controler.listener;
 
-import org.matsim.controler.Controler;
+import org.matsim.controler.events.ReplanningEvent;
 
 /**
- * Basic event class for all Events fired by the Controler
- *
  * @author dgrether
  */
-public abstract class ControlerEvent {
-	/**
-	 * The Controler instance which fired this event
-	 */
-	private final Controler controler;
-
-	public ControlerEvent(final Controler controler) {
-		this.controler = controler;
-	}
+public interface ReplanningListener extends ControlerListener {
 
 	/**
-	 * @return the Controler instance which fired the event
+	 * Notifies all observers of the Controler that it is time to do the replanning.
+	 *
+	 * @param event
 	 */
-	public Controler getControler() {
-		return this.controler;
-	}
+	public void notifyReplanning(ReplanningEvent event);
 
 }

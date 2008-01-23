@@ -27,6 +27,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.trafficmonitoring.LinkTravelTimeCounter;
@@ -40,7 +44,6 @@ import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
- *
  */
 public class WithindayControler extends Controler {
 
@@ -60,15 +63,16 @@ public class WithindayControler extends Controler {
 
 //	private int numberOfReplaningAgents;
 
-	public WithindayControler() {
+	public WithindayControler(final String[] args) {
+		super(args);
 	}
 
 	/**
-	 * @see org.matsim.controler.Controler#startup()
+	 * @see org.matsim.controler.Controler#setup()
 	 */
 	@Override
-	protected void startup() {
-		super.startup();
+	protected void setup() {
+		super.setup();
 		LinkTravelTimeCounter.init(this.events, this.network.getLinks().size());
 	//initialize the traffic management
 		String trafficManagementConfig = this.config.withinday().getTrafficManagementConfiguration();
@@ -91,21 +95,10 @@ public class WithindayControler extends Controler {
 	}
 
 	@Override
-	protected void setupIteration(final int iteration) {
-		super.setupIteration(iteration);
-		this.factory = new WithindayAgentLogicFactory(this.network, this.config.charyparNagelScoring());
-		if (this.trafficManagementConfigurator != null) {
-			this.trafficManagement = this.trafficManagementConfigurator.getTrafficManagement();
-			this.trafficManagement.setupIteration(iteration);
-		}
-	}
-
-
-	@Override
 	protected void runMobSim() {
 		List<Integer> withindayIterations = this.config.withinday().getWithindayIterations();
 		//check if withinday replanning should be enabled
-		if (withindayIterations.contains(Controler.getIteration())) {
+		if (withindayIterations.contains(getIteration())) {
 			log.info("Starting withinday replanning iteration...");
 			//prepare everything to create the agents
 			WithindayCreateVehiclePersonAlgorithm vehicleAlgo = new WithindayCreateVehiclePersonAlgorithm(this);
@@ -126,6 +119,7 @@ public class WithindayControler extends Controler {
 			super.runMobSim();
 		}
 	}
+
 	/**
 	 * Is currently used to create the WithindayAgent objects with the default belief and desire (intentions are still fixed by
 	 * the game theory plans) modules.
@@ -141,11 +135,9 @@ public class WithindayControler extends Controler {
 		agent.setReplanningThreshold(this.config.withinday().getContentmentThreshold());
 	}
 
-
 	public void simulationPrepared() {
 		this.trafficManagement.simulationPrepared();
 	}
-
 
 	/**
 	 * This is delegated from the WithindayQueueSimulation
@@ -163,18 +155,31 @@ public class WithindayControler extends Controler {
 
 	}
 
-	@Override
-	protected void finishIteration(final int iteration) {
-		super.finishIteration(iteration);
-		this.trafficManagement.finishIteration();
+	public class WithindayControlerListener implements IterationStartsListener, IterationEndsListener {
+
+		public void notifyIterationStarts(final IterationStartsEvent event) {
+			/* TODO [DG] This code was previously in a method called "setupIteration()", but I don't think
+			 * it makes really sense to create a new factory in each and every iteration. Maybe this line could
+			 * be moved to the general "setup()"-method? Than it's only executed once.
+			 * Also, the assignment of trafficManagement would possibly be enough to do it only once.
+			 * This would leave only the setupIteration(int) call here, what would be more clear, also
+			 * in respect to the notifyIterationEnds() method.   -marcel/18jan2008
+			 */
+			WithindayControler.this.factory = new WithindayAgentLogicFactory(WithindayControler.this.network, WithindayControler.this.config.charyparNagelScoring());
+			if (WithindayControler.this.trafficManagementConfigurator != null) {
+				WithindayControler.this.trafficManagement = WithindayControler.this.trafficManagementConfigurator.getTrafficManagement();
+				WithindayControler.this.trafficManagement.setupIteration(event.getIteration());
+			}
+		}
+
+		public void notifyIterationEnds(final IterationEndsEvent event) {
+			WithindayControler.this.trafficManagement.finishIteration();
+		}
+
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
-		new WithindayControler().run(args);
+		new WithindayControler(args).run();
 	}
-
 
 }

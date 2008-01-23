@@ -26,7 +26,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.apache.log4j.Logger;
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.events.algorithms.LinkQueueStats;
@@ -42,19 +48,19 @@ public class BetaTravelTest extends MatsimTestCase {
 	}
 
 	public void testBetaTravel_6() {
-		loadConfig(getInputDirectory() + "config.xml");
-		TestControler controler = new TestControler();
-		controler.setOverwriteFiles(true);
-		controler.setCreateLegHistogramPNG(false);
-		controler.run(null);
+		Config config = loadConfig(getInputDirectory() + "config.xml");
+		TestControler controler = new TestControler(config);
+		controler.addControlerListener(new TestControlerListener());
+		controler.setCreateGraphs(false);
+		controler.run();
 	}
 
 	public void testBetaTravel_66() {
-		loadConfig(getInputDirectory() + "config.xml");
-		TestControler controler = new TestControler();
-		controler.setOverwriteFiles(true);
-		controler.setCreateLegHistogramPNG(false);
-		controler.run(null);
+		Config config = loadConfig(getInputDirectory() + "config.xml");
+		TestControler controler = new TestControler(config);
+		controler.addControlerListener(new TestControlerListener());
+		controler.setCreateGraphs(false);
+		controler.run();
 	}
 
 	public static class LinkAnalyzer implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
@@ -65,9 +71,12 @@ public class BetaTravelTest extends MatsimTestCase {
 		public double lastCarLeave = Double.NEGATIVE_INFINITY;
 		public int maxCarsOnLink = Integer.MIN_VALUE;
 		public double maxCarsOnLinkTime = Double.NEGATIVE_INFINITY;
+		private int iteration = -1;
 
 		private final ArrayList<Double> enterTimes = new ArrayList<Double>(100);
 		private final ArrayList<Double> leaveTimes = new ArrayList<Double>(100);
+
+		private static final Logger log = Logger.getLogger(TestControlerListener.class);
 
 		public LinkAnalyzer(final String linkId) {
 			this.linkId = linkId;
@@ -75,6 +84,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 
 		public void reset(final int iteration) {
+			this.iteration = iteration;
 			this.firstCarEnter = Double.POSITIVE_INFINITY;
 			this.lastCarEnter = Double.NEGATIVE_INFINITY;
 			this.firstCarLeave = Double.POSITIVE_INFINITY;
@@ -139,58 +149,69 @@ public class BetaTravelTest extends MatsimTestCase {
 				}
 			}
 		}
+
+		public void printInfo() {
+			log.info("Statistics for link " + this.linkId + " in iteration " + this.iteration);
+			log.info("  first car entered: " + this.firstCarEnter);
+			log.info("   last car entered: " + this.lastCarEnter);
+			log.info("     first car left: " + this.firstCarLeave);
+			log.info("      last car left: " + this.lastCarLeave);
+			log.info(" max # cars on link: " + this.maxCarsOnLink);
+			log.info(" max # cars at time: " + this.maxCarsOnLinkTime);
+		}
 	}
 
 	public static class TestControler extends Controler {
 
+		public TestControler(final Config config) {
+			super(config);
+		}
+
+		@Override
+		protected void setup() {
+			super.setup();
+
+			// do some test to ensure the scenario is correct
+			double beta_travel = this.config.charyparNagelScoring().getTraveling();
+			if ((beta_travel != -6.0) && (beta_travel != -66.0)) {
+				throw new IllegalArgumentException("Unexpected value for beta_travel. Expected -6.0 or -66.0, actual value is " + beta_travel);
+			}
+
+			int lastIter = this.config.controler().getLastIteration();
+			if (lastIter < 100) {
+				throw new IllegalArgumentException("Controler.lastIteration must be at least 100. Current value is " + lastIter);
+			}
+			if (lastIter > 100) {
+				System.err.println("Controler.lastIteration is currently set to " + lastIter + ". Only the first 100 iterations will be analyzed.");
+			}
+		}
+	}
+
+	/*default*/ class TestControlerListener implements IterationStartsListener, IterationEndsListener {
+
 		private final LinkAnalyzer la = new LinkAnalyzer("15");
 		private final LinkQueueStats queueStats = new LinkQueueStats("15");
 
-		@Override
-		protected void setupIteration(final int iteration) {
-			if (iteration == 0) {
-				// do some test to ensure the scenario is correct
-				double beta_travel = Double.parseDouble(Gbl.getConfig().getParam(CharyparNagelScoringFunction.CONFIG_MODULE, CharyparNagelScoringFunction.CONFIG_TRAVELING));
-				if ((beta_travel != -6.0) && (beta_travel != -66.0)) {
-					throw new IllegalArgumentException("Unexpected value for beta_travel. Expected -6.0 or -66.0, actual value is " + beta_travel);
-				}
-
-				int lastIter = Gbl.getConfig().controler().getLastIteration();
-				if (lastIter < 100) {
-					throw new IllegalArgumentException("Controler.lastIteration must be at least 150. Current value is " + lastIter);
-				}
-				if (lastIter > 100) {
-					System.err.println("Controler.lastIteration is currently set to " + lastIter + ". Only the first 100 iterations will be analyzed.");
-				}
-			}
-
-			super.setupIteration(iteration);
-
+		public void notifyIterationStarts(final IterationStartsEvent event) {
+			int iteration = event.getIteration();
 			if (iteration % 10 == 0) {
 				this.la.reset(iteration);
-				this.events.addHandler(this.la);
+				event.getControler().getEvents().addHandler(this.la);
 			}
 
 			if (iteration == 0) {
-				this.events.addHandler(this.queueStats);
+				event.getControler().getEvents().addHandler(this.queueStats);
 			} else {
 				this.queueStats.reset(iteration);
 			}
 		}
 
-		@Override
-		protected void finishIteration(final int iteration) {
+		public void notifyIterationEnds(final IterationEndsEvent event) {
+			int iteration = event.getIteration();
 			if (iteration % 10 == 0) {
-				this.events.removeHandler(this.la);
+				event.getControler().getEvents().removeHandler(this.la);
 				this.la.calcMaxCars();
-				this.printNote("Statistics for link " + this.la.linkId + " in iteration " + iteration, "");
-				this.printNote("", "  first car entered: " + this.la.firstCarEnter);
-				this.printNote("", "   last car entered: " + this.la.lastCarEnter);
-				this.printNote("", "     first car left: " + this.la.firstCarLeave);
-				this.printNote("", "      last car left: " + this.la.lastCarLeave);
-				this.printNote("", " max # cars on link: " + this.la.maxCarsOnLink);
-				this.printNote("", " max # cars at time: " + this.la.maxCarsOnLinkTime);
-				System.out.println();
+				this.la.printInfo();
 			}
 			BufferedWriter out = null;
 			try {
@@ -236,7 +257,6 @@ public class BetaTravelTest extends MatsimTestCase {
 					System.out.println("all checks passed!");
 				}
 			}
-			super.finishIteration(iteration);
 		}
 	}
 }

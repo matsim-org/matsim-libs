@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerStartupEvent.java
+ * ControlerScoringEvent.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,19 +22,26 @@ package org.matsim.controler.events;
 
 import org.matsim.controler.Controler;
 
-
 /**
- * ControlerEvent to notify all observers of the controler that the controler instance is setup
- * @author dgrether
+ * Event class to notify observers that the mobility simulation just ended.
  *
+ * @author mrieser
  */
-public class ControlerStartupEvent extends ControlerEvent {
-	/**
-	 * @param c
-	 */
-	public ControlerStartupEvent(Controler c) {
-		super(c);
+public class AfterMobsimEvent extends ControlerEvent {
+
+	/** The iteration number */
+	private final int iteration;
+
+	public AfterMobsimEvent(final Controler controler, final int iteration) {
+		super(controler);
+		this.iteration = iteration;
 	}
-	
-	
+
+	/**
+	 * @return the number of the current iteration
+	 */
+	public int getIteration() {
+		return this.iteration;
+	}
+
 }

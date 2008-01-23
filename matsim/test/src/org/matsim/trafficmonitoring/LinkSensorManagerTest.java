@@ -20,22 +20,22 @@
 
 package org.matsim.trafficmonitoring;
 
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
-import org.matsim.controler.events.ControlerFinishIterationEvent;
-import org.matsim.controler.events.ControlerSetupIterationEvent;
-import org.matsim.controler.listener.ControlerFinishIterationListener;
-import org.matsim.controler.listener.ControlerSetupIterationListener;
+import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.trafficmonitoring.LinkSensorManager;
-
 
 /**
  * @author dgrether
  */
-public class LinkSensorManagerTest extends MatsimTestCase implements ControlerFinishIterationListener, ControlerSetupIterationListener {
+public class LinkSensorManagerTest extends MatsimTestCase implements IterationStartsListener, IterationEndsListener {
 
 	private LinkSensorManager manager = null;
+	private Config config = null;
 
 	/**
 	 * @see junit.framework.TestCase#setUp()
@@ -43,25 +43,25 @@ public class LinkSensorManagerTest extends MatsimTestCase implements ControlerFi
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		loadConfig(getInputDirectory() + "config.xml");
+		this.config = loadConfig(getInputDirectory() + "config.xml");
 	}
 
 	public void testSensorManagement() {
-		Controler controler = new Controler();
+		Controler controler = new Controler(this.config);
 		controler.setOverwriteFiles(true);
 		controler.addControlerListener(this);
 		this.manager = new LinkSensorManager();
 		this.manager.addLinkSensor("1");
-		controler.run(null);
+		controler.run();
 	}
 
-	public void notifyIterationFinished(final ControlerFinishIterationEvent event) {
+	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (event.getIteration() > 0)  {
 			assertEquals(100, this.manager.getLinkTraffic("1"));
 		}
 	}
 
-	public void notifyIterationSetup(final ControlerSetupIterationEvent event) {
+	public void notifyIterationStarts(final IterationStartsEvent event) {
 		if (event.getIteration() == 1) {
 			QueueSimulation.getEvents().addHandler(this.manager);
 		}

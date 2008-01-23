@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerStartupListener.java
+ * ControlerFinishIterationListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,18 +20,17 @@
 
 package org.matsim.controler.listener;
 
-import org.matsim.controler.events.ControlerStartupEvent;
-
+import org.matsim.controler.events.ScoringEvent;
 
 /**
  * @author dgrether
- *
  */
-public interface ControlerStartupListener extends ControlerListener {
-	/**
-	 * Notifies all observers that the controler is initialized and they should do the same
-	 * @param controlerStartupEvent
-	 */
-	public void notifyStartup(ControlerStartupEvent controlerStartupEvent);
+public interface ScoringListener extends ControlerListener {
 
+	/**
+	 * Notifies all observers of the Controler that it is time to do the scoring.
+	 *
+	 * @param event
+	 */
+	public void notifyScoring(final ScoringEvent event);
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerShutdownEvent.java
+ * ControlerScoringEvent.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,32 +22,26 @@ package org.matsim.controler.events;
 
 import org.matsim.controler.Controler;
 
-
 /**
- * ControlerEvent class to notify all observers of the Controler that it is shutdown
- * @author dgrether
+ * Event class to notify observers that the mobility simulation will start next.
  *
+ * @author mrieser
  */
-public class ControlerShutdownEvent extends ControlerEvent {
-	/**
-	 * Flag to indicate if the controler was shutdown unexpected
-	 */
-	private boolean unexpected;
-	/**
-	 * 
-	 * @param c
-	 * @param unexpected
-	 */
-	public ControlerShutdownEvent(Controler c, boolean unexpected) {
-		super(c);
-		this.unexpected = unexpected;
+public class BeforeMobsimEvent extends ControlerEvent {
+
+	/** The iteration number */
+	private final int iteration;
+
+	public BeforeMobsimEvent(final Controler controler, final int iteration) {
+		super(controler);
+		this.iteration = iteration;
 	}
+
 	/**
-	 * 
-	 * @return true if the  controler was shutdown unexpected, false if a normal shutdown occured
+	 * @return the number of the current iteration
 	 */
-	public boolean isUnexpected() {
-		return this.unexpected;
+	public int getIteration() {
+		return this.iteration;
 	}
-	
+
 }

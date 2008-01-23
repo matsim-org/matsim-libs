@@ -23,10 +23,13 @@ package org.matsim.replanning;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.replanning.modules.ExternalModule;
 import org.matsim.replanning.modules.PlanomatExe;
+import org.matsim.replanning.modules.PlanomatOptimizeTimes;
 import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.ReRouteLandmarks;
+import org.matsim.replanning.modules.StrategyModuleI;
 import org.matsim.replanning.modules.TimeAllocationMutator;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.ExpBetaPlanChanger;
@@ -56,8 +59,10 @@ public class StrategyManagerConfigLoader {
 	 * @param network the network strategy modules can use
 	 * @param travelCostCalc the travel cost calculator strategy modules can make use of
 	 * @param travelTimeCalc the travel time calculator strategy modules can make use of
+	 * @param legTravelTimeEstimator an estimator for travel times between two locations
 	 */
-	public static void load(final Config config, final StrategyManager manager, final NetworkLayer network, final TravelCostI travelCostCalc, final TravelTimeI travelTimeCalc) {
+	public static void load(final Config config, final StrategyManager manager, final NetworkLayer network,
+			final TravelCostI travelCostCalc, final TravelTimeI travelTimeCalc, final LegTravelTimeEstimator legTravelTimeEstimator) {
 
 		String maxvalue = config.findParam("strategy", "maxAgentPlanMemorySize");
 		if (maxvalue != null){
@@ -92,7 +97,7 @@ public class StrategyManagerConfigLoader {
 			} else if (classname.equals("TimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new TimeAllocationMutator());
-			}else if (classname.equals("TimeAllocationMutator7200_ReRouteLandmarks") || classname.equals("threaded.TimeAllocationMutator")) {
+			} else if (classname.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new TimeAllocationMutator(7200));
 				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
@@ -112,6 +117,19 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = config.getParam("strategy", "ModuleExePath_" + i);
 				strategy.addStrategyModule(new PlanomatExe(exePath));
+			} else if (classname.equals("Planomat")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				strategy.addStrategyModule(planomatStrategyModule);
+				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
+			} else if (classname.equals("PlanomatReRoute")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				strategy.addStrategyModule(planomatStrategyModule);
+				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+				preProcessRoutingData.run(network);
+				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
 			} else if (classname.equals("BestScore")) {
 				strategy = new PlanStrategy(new BestPlanSelector());
 			} else if (classname.equals("SelectExpBeta")) {
@@ -123,7 +141,6 @@ public class StrategyManagerConfigLoader {
 			} else if (classname.equals("SelectPathSizeLogit")) {
 				strategy = new PlanStrategy(new PathSizeLogitSelector());
 			}
-
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -145,6 +162,52 @@ public class StrategyManagerConfigLoader {
 					manager.changeStrategy(strategy, 0.0);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Adds several changeRequests to the StrategyManager such that the given PlanStrategy will be
+	 * chosen with decaying probability over the iterations.
+	 *
+	 * @param manager
+	 * @param strategy
+	 * @param iterationStartDecay
+	 * @param pReplanInit
+	 *
+	 * @author kmeister
+	 * @author mrieser
+	 */
+	private static void setDecayingModuleProbability(final StrategyManager manager, final PlanStrategy strategy, final int iterationStartDecay, final double pReplanInit) {
+		// Originally from PlanomatStrategyManagerConfigLoader
+//		double pReplan = 0.0;
+
+		// everything hard wired...
+
+		double pReplanFinal = 0.0;
+		int iterOffset = 0;
+		double slope = 1.0;
+
+		int controlerFirstIteration = Gbl.getConfig().controler().getFirstIteration();
+		int controlerLastIteration = Gbl.getConfig().controler().getLastIteration();
+		for (int iter = controlerFirstIteration; iter <= controlerLastIteration; iter++) {
+
+//			old code:
+//		// at first, use the typical replanning share from the config file
+//			if (iter <= iterationStartDecay) {
+//				pReplan = 0.1; // I think that should be pReplanInit. /marcel,18jan2008
+//			} else {
+//				// then use the decaying replanning share
+//				pReplan = Math.min(pReplanInit, slope / (iter - iterationStartDecay + iterOffset) + pReplanFinal);
+//			}
+//
+//			manager.addChangeRequest(iter, strategy, pReplan);
+
+//			new code: TODO [KM] please check that this does the same as the old code above. /marcel,18jan2008
+			if (iter > iterationStartDecay) {
+				double pReplan = Math.min(pReplanInit, slope / (iter - iterationStartDecay + iterOffset) + pReplanFinal);
+				manager.addChangeRequest(iter, strategy, pReplan);
+			}
+
 		}
 	}
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerEvent.java
+ * ControlerFinishIterationListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,30 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.controler.events;
+package org.matsim.controler.listener;
 
-import org.matsim.controler.Controler;
+import org.matsim.controler.events.BeforeMobsimEvent;
 
 /**
- * Basic event class for all Events fired by the Controler
- *
  * @author dgrether
  */
-public abstract class ControlerEvent {
+public interface BeforeMobsimListener extends ControlerListener {
 	/**
-	 * The Controler instance which fired this event
+	 * Notifies all observers of the Controler that the mobility simulation will start next.
+	 * @param event
 	 */
-	private final Controler controler;
-
-	public ControlerEvent(final Controler controler) {
-		this.controler = controler;
-	}
-
-	/**
-	 * @return the Controler instance which fired the event
-	 */
-	public Controler getControler() {
-		return this.controler;
-	}
-
+	public void notifyBeforeMobsim(BeforeMobsimEvent event);
 }

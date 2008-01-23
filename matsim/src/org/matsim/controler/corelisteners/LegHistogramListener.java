@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerEvent.java
+ * LegHistogramListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,30 +18,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.controler.events;
+package org.matsim.controler.corelisteners;
 
+import org.matsim.analysis.LegHistogram;
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.IterationStartsListener;
+import org.matsim.events.Events;
 
 /**
- * Basic event class for all Events fired by the Controler
+ * Integrates the {@link org.matsim.analysis.LegHistogram} into the
+ * {@link org.matsim.controler.Controler}, so the leg histogram is
+ * automatically created every iteration.
  *
- * @author dgrether
+ * @author mrieser
  */
-public abstract class ControlerEvent {
-	/**
-	 * The Controler instance which fired this event
-	 */
-	private final Controler controler;
+public class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
 
-	public ControlerEvent(final Controler controler) {
-		this.controler = controler;
+	final private Events events;
+	final LegHistogram histogram;
+	final boolean outputGraph;
+
+	public LegHistogramListener(final Events events, final boolean outputGraph) {
+		this.events = events;
+		this.histogram = new LegHistogram(300);
+		this.outputGraph = outputGraph;
+		this.events.addHandler(this.histogram);
 	}
 
-	/**
-	 * @return the Controler instance which fired the event
-	 */
-	public Controler getControler() {
-		return this.controler;
+	public void notifyIterationStarts(final IterationStartsEvent event) {
+		this.histogram.reset(event.getIteration());
+	}
+
+	public void notifyIterationEnds(final IterationEndsEvent event) {
+		this.histogram.write(Controler.getIterationFilename("legHistogram.txt"));
+		if (this.outputGraph) {
+			this.histogram.writeGraphic(Controler.getIterationFilename("legHistogram.png"));
+		}
 	}
 
 }

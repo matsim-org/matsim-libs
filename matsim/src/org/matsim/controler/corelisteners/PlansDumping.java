@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerEvent.java
+ * DumpPlans.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,30 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.controler.events;
+package org.matsim.controler.corelisteners;
 
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.BeforeMobsimEvent;
+import org.matsim.controler.listener.BeforeMobsimListener;
+import org.matsim.plans.PlansWriter;
 
 /**
- * Basic event class for all Events fired by the Controler
+ * {@link org.matsim.controler.listener.ControlerListener} that dumps the
+ * complete plans every 10th iteration as well as in the first iteration,
+ * just in case someone might check that the replanning worked correctly in
+ * the first iteration.
  *
- * @author dgrether
+ * @author mrieser
  */
-public abstract class ControlerEvent {
-	/**
-	 * The Controler instance which fired this event
-	 */
-	private final Controler controler;
+public class PlansDumping implements BeforeMobsimListener {
 
-	public ControlerEvent(final Controler controler) {
-		this.controler = controler;
-	}
-
-	/**
-	 * @return the Controler instance which fired the event
-	 */
-	public Controler getControler() {
-		return this.controler;
+	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
+		Controler controler = event.getControler();
+		if (event.getIteration() % 10 == 0 || event.getIteration() == (controler.getFirstIteration() + 1)) {
+			controler.stopwatch.beginOperation("dump all plans");
+			String outversion = controler.getConfig().plans().getOutputVersion();
+			PlansWriter plansWriter = new PlansWriter(controler.getPopulation(), Controler.getIterationFilename("plans.xml.gz"), outversion);
+			plansWriter.setUseCompression(true);
+			plansWriter.write();
+			controler.stopwatch.endOperation("dump all plans");
+		}
 	}
 
 }

@@ -23,39 +23,44 @@ package org.matsim.withinday.coopers;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.withinday.WithindayControler;
 
-
 /**
  * @author dgrether
- *
  */
 public class CoopersControler extends WithindayControler {
 
-	@Override
-	protected void setupIteration(final int iteration) {
-		super.setupIteration(iteration);
-		this.factory = new CoopersAgentLogicFactory(this.network, this.config.charyparNagelScoring(), this.trafficManagement.getVDSSigns());
+	public CoopersControler(final String[] args) {
+		super(args);
 	}
 
-
-
+	/* TODO [DG] please verify: In the original code, this method was called "setupIteration(int)".
+	 * But I don't see the reason, why there is a need for a new factory in every iteration, thus
+	 * I renamed it to "setup()". Iff it should be called every iteration, a custom ControlerListener
+	 * has to be implemented that implements ControlerIterationStratsListener. -marcel/18jan2008
+	 */
+	@Override
+	protected void setup() {
+		super.setup();
+		this.factory = new CoopersAgentLogicFactory(this.network, this.config.charyparNagelScoring(), this.trafficManagement.getVDSSigns());
+	}
 
 	@Override
 	public void afterSimStep(final double time) {
 		super.afterSimStep(time);
 	}
 
-	@Override
-	protected void finishIteration(final int iteration) {
-		super.finishIteration(iteration);
-		this.events.resetHandlers(iteration);
-	}
-	/**
-	 * @param args
-	 */
+/* TODO [DG] pleaes verify: The new Controler calls events.resetHandlers(int) at the *start*
+ * of each iteration. Thus I assume that the following code is no longer required. Please
+ * verify and remove it afterwards if so.   -marce/18.jan2008 */
+//	@Override
+//	protected void finishIteration(final int iteration) {
+//		super.finishIteration(iteration);
+//		this.events.resetHandlers(iteration);
+//	}
+
 	public static void main(final String[] args) {
-		CoopersControler c = new CoopersControler();
+		CoopersControler c = new CoopersControler(args);
 		c.setOverwriteFiles(true);
-		c.run(args);
+		c.run();
 
 		// Visulize
 		String[] visargs = {"./output/ITERS/it.0/Snapshot"};

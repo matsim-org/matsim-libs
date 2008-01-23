@@ -20,14 +20,19 @@
 
 package org.matsim.deqsim;
 
+
 import org.matsim.controler.Controler;
 
 public class DEQSimControler extends Controler {
 
+	public DEQSimControler(final String[] args) {
+		super(args);
+	}
+
 	@Override
 	protected void runMobSim() {
 		/* remove eventswriter, as the deqsim writes the (binary) events */
-		this.events.removeHandler(this.eventwriter);
+		setWriteEvents(false);
 
 		DEQSim sim = new DEQSim(this.population, this.events);
 		sim.setIterationStopWatch(this.stopwatch);
@@ -35,8 +40,9 @@ public class DEQSimControler extends Controler {
 	}
 
 	public static void main(final String[] args) {
-		final Controler controler = new DEQSimControler();
-		controler.run(args);
+		final Controler controler = new DEQSimControler(args);
+		controler.addControlerListener(new DEQSimControlerListener());
+		controler.run();
 		System.exit(0);
 	}
 

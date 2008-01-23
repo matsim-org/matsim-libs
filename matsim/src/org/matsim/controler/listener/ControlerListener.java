@@ -23,10 +23,10 @@ package org.matsim.controler.listener;
 import java.util.EventListener;
 
 /**
- * This is an empty marker interface which must be implemented by all Interfaces 
- * providing methods to listen for ControlerEvents
- * @author dgrether
+ * This is an empty marker interface which must be implemented by all Interfaces
+ * providing methods to listen for ControlerEvents.
  *
+ * @author dgrether
  */
 public interface ControlerListener extends EventListener {
 

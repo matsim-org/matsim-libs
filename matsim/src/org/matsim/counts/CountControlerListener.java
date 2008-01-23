@@ -24,10 +24,10 @@ import java.util.Locale;
 
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
-import org.matsim.controler.events.ControlerFinishIterationEvent;
-import org.matsim.controler.events.ControlerStartupEvent;
-import org.matsim.controler.listener.ControlerFinishIterationListener;
-import org.matsim.controler.listener.ControlerStartupListener;
+import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.StartupListener;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
@@ -40,8 +40,8 @@ import org.matsim.utils.geometry.transformations.TransformationFactory;
 /**
  * @author dgrether
  */
-public class CountControlerListener implements ControlerStartupListener,
-		ControlerFinishIterationListener {
+public class CountControlerListener implements StartupListener,
+		IterationEndsListener {
 
 	private final Config config;
 
@@ -49,20 +49,16 @@ public class CountControlerListener implements ControlerStartupListener,
 		this.config = config;
 	}
 
-	/**
-	 * @see org.matsim.controler.listener.ControlerStartupListener#notifyStartup(org.matsim.controler.events.ControlerStartupEvent)
-	 */
-	public void notifyStartup(final ControlerStartupEvent controlerStartupEvent) {
+	public void notifyStartup(final StartupEvent controlerStartupEvent) {
 		MatsimCountsReader counts_parser = new MatsimCountsReader(Counts.getSingleton());
 		counts_parser.readFile(this.config.counts().getCountsFileName());
 	}
 
-	/**
-	 * @see org.matsim.controler.listener.ControlerFinishIterationListener#notifyIterationFinished(org.matsim.controler.events.ControlerFinishIterationEvent)
-	 */
-	public void notifyIterationFinished(final ControlerFinishIterationEvent event) {
-		if ((event.getIteration() % 10 == 0) && (event.getIteration() > event.getControler().getMinimumIteration())) {
-			CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(event.getControler().getCalcLinkStats(), Counts.getSingleton(), event.getControler().getNetwork());
+	public void notifyIterationEnds(final IterationEndsEvent event) {
+		Controler controler = event.getControler();
+		if ((event.getIteration() % 10 == 0) && (event.getIteration() > controler.getFirstIteration())) {
+			controler.stopwatch.beginOperation("compare with counts");
+			CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(controler.getLinkStats(), Counts.getSingleton(), controler.getNetwork());
 			if ((this.config.counts().getDistanceFilter() != null) && (this.config.counts().getDistanceFilterCenterNode() != null)) {
 				cca.setDistanceFilter(this.config.counts().getDistanceFilter(), this.config.counts().getDistanceFilterCenterNode());
 			}
@@ -87,7 +83,7 @@ public class CountControlerListener implements ControlerStartupListener,
 					this.config.counts().getOutputFormat().contains("all")) {
 				String filename = Controler.getIterationFilename("countscompare.kmz");
 				CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-						cca.getComparison(), event.getControler().getNetwork(), TransformationFactory.getCoordinateTransformation(this.config.global().getCoordinateSystem(), TransformationFactory.WGS84 ));
+						cca.getComparison(), controler.getNetwork(), TransformationFactory.getCoordinateTransformation(this.config.global().getCoordinateSystem(), TransformationFactory.WGS84 ));
 				kmlWriter.setIterationNumber(event.getIteration());
 				kmlWriter.write(filename);
 			}
@@ -97,6 +93,7 @@ public class CountControlerListener implements ControlerStartupListener,
 				CountSimComparisonTableWriter ctw=new CountSimComparisonTableWriter(cca.getComparison(),Locale.ENGLISH);
 				ctw.write(filename);
 			}
+			controler.stopwatch.endOperation("compare with counts");
 		}
 	}
 }

@@ -42,18 +42,22 @@ import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 
+/**
+ * @deprecated the planomat-stuff is now integrated into the regular StrategyManagerConfigLoader
+ */
+@Deprecated
 public class PlanomatStrategyManagerConfigLoader {
 
 	public static void load(
-			Config config,
-			StrategyManager manager,
-			NetworkLayer network,
-			TravelCostI travelCostCalc,
-			TravelTimeI travelTimeCalc,
-			LegTravelTimeEstimator legTravelTimeEstimator) {
+			final Config config,
+			final StrategyManager manager,
+			final NetworkLayer network,
+			final TravelCostI travelCostCalc,
+			final TravelTimeI travelTimeCalc,
+			final LegTravelTimeEstimator legTravelTimeEstimator) {
 
 		String maxvalue = Gbl.getConfig().findParam("strategy", "maxAgentPlanMemorySize");
-		if (maxvalue != null){
+		if (maxvalue != null) {
 			manager.setMaxPlansPerAgent(Integer.parseInt(maxvalue));
 		}
 
@@ -170,7 +174,7 @@ public class PlanomatStrategyManagerConfigLoader {
 	}
 
 	// HIER WEITER!!!
-	public static double getDecayingModuleProbability(int iteration, int iterationStartDecay, double pReplanInit) {
+	public static double getDecayingModuleProbability(final int iteration, final int iterationStartDecay, final double pReplanInit) {
 
 		double pReplan = 0.0;
 

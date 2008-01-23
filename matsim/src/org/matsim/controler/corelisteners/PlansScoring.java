@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerShutdownListener.java
+ * PlansScoring.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.controler.listener;
+package org.matsim.controler.corelisteners;
 
-import org.matsim.controler.events.ControlerShutdownEvent;
-
+import org.matsim.controler.Controler;
+import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.events.ScoringEvent;
+import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.IterationStartsListener;
+import org.matsim.controler.listener.ScoringListener;
+import org.matsim.controler.listener.StartupListener;
+import org.matsim.scoring.EventsToScore;
 
 /**
- * @author dgrether
+ * A {@link org.matsim.controler.listener.ControlerListener} that manages the
+ * scoring of plans in every iteration. Basically it integrates the
+ * {@link org.matsim.scoring.EventsToScore} with the
+ * {@link org.matsim.controler.Controler}.
  *
+ * @author mrieser
  */
-public interface ControlerShutdownListener extends ControlerListener {
-	/**
-	 * Notifies all observer of the Controler that the controler is terminated and they should do the same
-	 * @param controlerShudownEvent
-	 */
-	public void notifyShutdown(ControlerShutdownEvent controlerShudownEvent);
+public class PlansScoring implements StartupListener, ScoringListener, IterationStartsListener {
+
+	private EventsToScore planScorer;
+
+	public void notifyStartup(final StartupEvent event) {
+		Controler controler = event.getControler();
+		this.planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory());
+		event.getControler().getEvents().addHandler(this.planScorer);
+	}
+
+	public void notifyIterationStarts(final IterationStartsEvent event) {
+		this.planScorer.reset(event.getIteration());
+	}
+
+	public void notifyScoring(final ScoringEvent event) {
+		this.planScorer.finish();
+	}
 
 }

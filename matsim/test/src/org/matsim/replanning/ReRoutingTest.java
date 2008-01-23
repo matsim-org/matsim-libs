@@ -20,6 +20,7 @@
 
 package org.matsim.replanning;
 
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.SimulationTimer;
@@ -29,12 +30,12 @@ import org.matsim.utils.CRCChecksum;
 public class ReRoutingTest extends MatsimTestCase {
 
 	public void testReRouting() {
-		loadConfig(getInputDirectory() + "config.xml");
+		Config config = loadConfig(getInputDirectory() + "config.xml");
 
 		SimulationTimer.reset(10);
 
-		TestControler controler = new TestControler();
-		controler.run(null);
+		TestControler controler = new TestControler(config);
+		controler.run();
 
 		System.out.println("calculating checksums...");
 		long checksum1 = CRCChecksum.getCRCFromGZFile(getInputDirectory() + "plans.xml.gz");
@@ -46,20 +47,22 @@ public class ReRoutingTest extends MatsimTestCase {
 
 	static public class TestControler extends Controler {
 
-		@Override
-		protected void setupIteration(final int iteration) {
-			if (iteration == 0) {
-				// do some test to ensure the scenario is correct
+		public TestControler(final Config config) {
+			super(config);
+		}
 
-				int lastIter = Gbl.getConfig().controler().getLastIteration();
-				if (lastIter < 1) {
-					throw new IllegalArgumentException("Controler.lastIteration must be at least 1. Current value is " + lastIter);
-				}
-				if (lastIter > 1) {
-					System.err.println("Controler.lastIteration is currently set to " + lastIter + ". Only the first iteration will be analyzed.");
-				}
+		@Override
+		protected void setup() {
+			super.setup();
+
+			// do some test to ensure the scenario is correct
+			int lastIter = Gbl.getConfig().controler().getLastIteration();
+			if (lastIter < 1) {
+				throw new IllegalArgumentException("Controler.lastIteration must be at least 1. Current value is " + lastIter);
 			}
-			super.setupIteration(iteration);
+			if (lastIter > 1) {
+				System.err.println("Controler.lastIteration is currently set to " + lastIter + ". Only the first iteration will be analyzed.");
+			}
 		}
 
 		@Override

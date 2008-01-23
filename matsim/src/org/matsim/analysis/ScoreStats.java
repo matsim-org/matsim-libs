@@ -26,12 +26,12 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.controler.events.ControlerFinishIterationEvent;
-import org.matsim.controler.events.ControlerShutdownEvent;
-import org.matsim.controler.events.ControlerStartupEvent;
-import org.matsim.controler.listener.ControlerFinishIterationListener;
-import org.matsim.controler.listener.ControlerShutdownListener;
-import org.matsim.controler.listener.ControlerStartupListener;
+import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.ShutdownEvent;
+import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.ShutdownListener;
+import org.matsim.controler.listener.StartupListener;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -52,7 +52,7 @@ import org.matsim.utils.io.IOUtils;
  *
  * @author mrieser
  */
-public class ScoreStats implements ControlerStartupListener, ControlerFinishIterationListener, ControlerShutdownListener {
+public class ScoreStats implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	final private static int INDEX_WORST = 0;
 	final private static int INDEX_BEST = 1;
@@ -84,18 +84,18 @@ public class ScoreStats implements ControlerStartupListener, ControlerFinishIter
 		this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
 	}
 
-	public void notifyStartup(final ControlerStartupEvent event) {
+	public void notifyStartup(final StartupEvent event) {
 		if (this.createPNG) {
 			Controler controler = event.getControler();
-			this.minIteration = controler.getMinimumIteration();
-			int maxIter = controler.getMaximumIteration();
+			this.minIteration = controler.getFirstIteration();
+			int maxIter = controler.getLastIteration();
 			int iterations = maxIter - this.minIteration;
 			if (iterations > 10000) iterations = 1000; // limit the history size
 			this.history = new double[4][iterations+1];
 		}
 	}
 
-	public void notifyIterationFinished(final ControlerFinishIterationEvent event) {
+	public void notifyIterationEnds(final IterationEndsEvent event) {
 		double sumScoreWorst = 0.0;
 		double sumScoreBest = 0.0;
 		double sumAvgScores = 0.0;
@@ -200,7 +200,7 @@ public class ScoreStats implements ControlerStartupListener, ControlerFinishIter
 		}
 	}
 
-	public void notifyShutdown(final ControlerShutdownEvent controlerShudownEvent) {
+	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 		try {
 			this.out.close();
 		} catch (IOException e) {
@@ -213,6 +213,6 @@ public class ScoreStats implements ControlerStartupListener, ControlerFinishIter
 	 * @return the history of scores in last iterations
 	 */
 	public double[][] getHistory() {
-		return history;
+		return this.history;
 	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerEvent.java
+ * ControlerStartupEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,25 +23,14 @@ package org.matsim.controler.events;
 import org.matsim.controler.Controler;
 
 /**
- * Basic event class for all Events fired by the Controler
+ * ControlerEvent to notify all observers of the controler that the controler instance is setup
  *
  * @author dgrether
  */
-public abstract class ControlerEvent {
-	/**
-	 * The Controler instance which fired this event
-	 */
-	private final Controler controler;
+public class StartupEvent extends ControlerEvent {
 
-	public ControlerEvent(final Controler controler) {
-		this.controler = controler;
-	}
-
-	/**
-	 * @return the Controler instance which fired the event
-	 */
-	public Controler getControler() {
-		return this.controler;
+	public StartupEvent(final Controler controler) {
+		super(controler);
 	}
 
 }

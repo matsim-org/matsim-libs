@@ -20,19 +20,19 @@
 
 package org.matsim.controler.listener;
 
-import org.matsim.controler.events.ControlerSetupIterationEvent;
+import org.matsim.controler.events.IterationStartsEvent;
 
 /**
  * @author dgrether
- * 
+ *
  */
-public interface ControlerSetupIterationListener  extends ControlerListener {
+public interface IterationStartsListener extends ControlerListener {
 
 	/**
 	 * Notifies all observers of the Controler that a iteration is setup
-	 * 
+	 *
 	 * @param event
 	 */
-	public void notifyIterationSetup(ControlerSetupIterationEvent event);
+	public void notifyIterationStarts(IterationStartsEvent event);
 
 }

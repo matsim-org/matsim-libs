@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerSetupIterationEvent.java
+ * ControlerFinishIterationListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,37 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.controler.events;
+package org.matsim.controler.listener;
 
-import org.matsim.controler.Controler;
-
+import org.matsim.controler.events.IterationEndsEvent;
 
 /**
- * ControlerEvent class to notify all observers interested in the preparation of an iteration
  * @author dgrether
  *
  */
-public class ControlerSetupIterationEvent extends ControlerEvent {
+public interface IterationEndsListener extends ControlerListener {
 	/**
-	 * the number of the iteration
+	 * Notifies all observers of the Controler that a iteration is finished
+	 * @param event
 	 */
-	private int iteration;
-	/**
-	 * 
-	 * @param c
-	 * @param iteration
-	 */
-	public ControlerSetupIterationEvent(Controler c, int iteration) {
-		super(c);
-		this.iteration = iteration;
-	}
-
-	/**
-	 * 
-	 * @return the number of the iteration to setup
-	 */
-	public int getIteration() {
-		return this.iteration;
-	}
-	
+	public void notifyIterationEnds(IterationEndsEvent event);
 }

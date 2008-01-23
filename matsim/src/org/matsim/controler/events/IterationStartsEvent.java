@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerEvent.java
+ * ControlerSetupIterationEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,26 +22,30 @@ package org.matsim.controler.events;
 
 import org.matsim.controler.Controler;
 
+
 /**
- * Basic event class for all Events fired by the Controler
+ * ControlerEvent class to notify all observers interested in the preparation of an iteration
  *
  * @author dgrether
  */
-public abstract class ControlerEvent {
-	/**
-	 * The Controler instance which fired this event
-	 */
-	private final Controler controler;
+public class IterationStartsEvent extends ControlerEvent {
 
-	public ControlerEvent(final Controler controler) {
-		this.controler = controler;
+	/**
+	 * the number of the iteration
+	 */
+	private final int iteration;
+
+	public IterationStartsEvent(final Controler controler, final int iteration) {
+		super(controler);
+		this.iteration = iteration;
 	}
 
 	/**
-	 * @return the Controler instance which fired the event
+	 *
+	 * @return the number of the iteration to setup
 	 */
-	public Controler getControler() {
-		return this.controler;
+	public int getIteration() {
+		return this.iteration;
 	}
 
 }

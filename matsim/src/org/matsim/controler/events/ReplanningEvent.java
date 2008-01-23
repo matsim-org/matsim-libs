@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerFinishIterationListener.java
+ * ControlerScoringEvent.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,17 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.controler.listener;
+package org.matsim.controler.events;
 
-import org.matsim.controler.events.ControlerFinishIterationEvent;
+import org.matsim.controler.Controler;
+
 /**
- * @author dgrether
+ * Event class to notify observers that replanning should happen
  *
+ * @author mrieser
  */
-public interface ControlerFinishIterationListener extends ControlerListener {
+public class ReplanningEvent extends ControlerEvent {
+
 	/**
-	 * Notifies all observers of the Controler that a iteration is finished
-	 * @param event
+	 * The iteration number
 	 */
-	public void notifyIterationFinished(ControlerFinishIterationEvent event);
+	private final int iteration;
+
+	public ReplanningEvent(final Controler controler, final int iteration) {
+		super(controler);
+		this.iteration = iteration;
+	}
+
+	/**
+	 * @return the number of the current iteration
+	 */
+	public int getIteration() {
+		return this.iteration;
+	}
+
 }

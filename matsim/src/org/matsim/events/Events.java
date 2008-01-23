@@ -164,7 +164,10 @@ public class Events {
 		}
 	}
 
-	public void resetCounters(final int iteration) {
+	/**
+	 * Resets the event counter to zero.
+	 */
+	public void resetCounter() {
 		this.counter = 0;
 		this.nextCounterMsg = 1;
 	}

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerEvent.java
+ * ControlerScoringEvent.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,25 +23,27 @@ package org.matsim.controler.events;
 import org.matsim.controler.Controler;
 
 /**
- * Basic event class for all Events fired by the Controler
+ * Event class to notify observers that scoring should happen
  *
- * @author dgrether
+ * @author mrieser
  */
-public abstract class ControlerEvent {
-	/**
-	 * The Controler instance which fired this event
-	 */
-	private final Controler controler;
+public class ScoringEvent extends ControlerEvent {
 
-	public ControlerEvent(final Controler controler) {
-		this.controler = controler;
+	/**
+	 * The iteration number
+	 */
+	private final int iteration;
+
+	public ScoringEvent(final Controler controler, final int iteration) {
+		super(controler);
+		this.iteration = iteration;
 	}
 
 	/**
-	 * @return the Controler instance which fired the event
+	 * @return the number of the current iteration
 	 */
-	public Controler getControler() {
-		return this.controler;
+	public int getIteration() {
+		return this.iteration;
 	}
 
 }

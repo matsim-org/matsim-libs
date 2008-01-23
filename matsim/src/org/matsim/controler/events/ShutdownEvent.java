@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LegHistogramListener.java
+ * ControlerShutdownEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.controler.listener;
+package org.matsim.controler.events;
 
-import org.matsim.analysis.LegHistogram;
 import org.matsim.controler.Controler;
-import org.matsim.controler.events.ControlerFinishIterationEvent;
-import org.matsim.controler.events.ControlerSetupIterationEvent;
-import org.matsim.events.Events;
 
-public class LegHistogramListener implements ControlerFinishIterationListener, ControlerSetupIterationListener {
+/**
+ * ControlerEvent class to notify all observers of the Controler that it is shutdown
+ *
+ * @author dgrether
+ */
+public class ShutdownEvent extends ControlerEvent {
 
-	final private Events events;
-	final LegHistogram histogram;
-	final boolean outputGraph;
+	/**
+	 * Flag to indicate if the controler was shutdown unexpected
+	 */
+	private final boolean unexpected;
 
-	public LegHistogramListener(final Events events, final boolean outputGraph) {
-		this.events = events;
-		this.histogram = new LegHistogram(300);
-		this.outputGraph = outputGraph;
-		this.events.addHandler(this.histogram);
+	public ShutdownEvent(final Controler controler, final boolean unexpected) {
+		super(controler);
+		this.unexpected = unexpected;
 	}
 
-	public void notifyIterationSetup(final ControlerSetupIterationEvent event) {
-		this.histogram.reset(event.getIteration());
-	}
-
-	public void notifyIterationFinished(final ControlerFinishIterationEvent event) {
-		this.histogram.write(Controler.getIterationFilename("legHistogram.txt"));
-		if (this.outputGraph) {
-			this.histogram.writeGraphic(Controler.getIterationFilename("legHistogram.png"));
-		}
+	/**
+	 * @return true if the  controler was shutdown unexpected, false if a normal shutdown occured
+	 */
+	public boolean isUnexpected() {
+		return this.unexpected;
 	}
 
 }
