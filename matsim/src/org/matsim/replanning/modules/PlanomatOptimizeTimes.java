@@ -26,34 +26,27 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 
 /**
- * This class is just a multithreading wrapper for instances of the 
+ * This class is just a multithreading wrapper for instances of the
  * optimizing plan algorithm which is usually called "planomat".
- * 
- * @author meisterk
  *
+ * @author meisterk
  */
 public class PlanomatOptimizeTimes extends MultithreadedModuleA {
 
 	private LegTravelTimeEstimator estimator = null;
 
-	public PlanomatOptimizeTimes(LegTravelTimeEstimator estimator) {
-
-		super();
+	public PlanomatOptimizeTimes(final LegTravelTimeEstimator estimator) {
 		this.estimator = estimator;
-
 		PlanomatConfig.init();
-
 	}
 
-
 	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {		
+	public PlanAlgorithmI getPlanAlgoInstance() {
 
 		PlanAlgorithmI planomatAlgorithm = null;
-		planomatAlgorithm =  new PlanOptimizeTimes( this.estimator);
+		planomatAlgorithm =  new PlanOptimizeTimes(this.estimator);
 
 		return planomatAlgorithm;
-
 	}
 
 }
