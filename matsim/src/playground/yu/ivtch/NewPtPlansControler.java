@@ -29,24 +29,22 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.world.World;
 
-import playground.marcel.MyRuns;
-
 /**
  * test of NewAgentPtPlan
  * 
  * @author ychen
  * 
  */
-public class NewPlansControler {
+public class NewPtPlansControler {
 
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/ivtch/input/network.xml";
-		final String plansFilename = "./test/yu/ivtch/input/all_plans.xml.gz";
+		final String plansFilename = "./test/yu/ivtch/input/allplansZuerichHwh.xml.gz";
 
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")
 		Config config = Gbl
-				.createConfig(new String[] { "./test/yu/ivtch/config_for_make10pctSample.xml" });
+				.createConfig(new String[] { "./test/yu/ivtch/configZuerichPlansCarPt.xml" });
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
