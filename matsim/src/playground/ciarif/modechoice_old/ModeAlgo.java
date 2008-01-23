@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ciarif.algos ;
+package playground.ciarif.modechoice_old ;
 
 
 

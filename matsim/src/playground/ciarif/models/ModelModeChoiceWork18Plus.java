@@ -55,7 +55,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 	static final double B5_DIST_TOUR = -1.4060959e-003;
 	static final double B5_DIST_W_E = -5.7056861e-002;
 	static final double B5_MALE = -6.2407099e-001;
-
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////

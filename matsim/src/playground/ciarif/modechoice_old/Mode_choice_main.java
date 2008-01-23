@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ciarif;
+package playground.ciarif.modechoice_old;
 
 
 
@@ -40,8 +40,6 @@ import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldValidation;
 
-import playground.ciarif.algos.TicketAlgo;
-import playground.ciarif.modechoice.ModeChoiceAlgorithm;
 
 
 

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ciarif.modechoice;
+package playground.ciarif.modechoice_old;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

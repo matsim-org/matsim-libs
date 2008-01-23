@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ciarif;
+package playground.ciarif.modechoice_old;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -27,8 +27,6 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 
-import playground.ciarif.modechoice.ModeChoiceAlgorithm;
-import playground.ciarif.modechoice.ModeChoiceAnalyzer;
 
 
 
