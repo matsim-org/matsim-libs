@@ -37,51 +37,57 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
 /**
  * @author mrieser
- *
+ * 
  * Removes all non-work and non-edu/non-uni activities and ensures that at most
  * one work or edu activity exists in a plan, and removes all plans from a
  * person not having one work or edu activity. This could lead to person having
  * no plans at all, they should be removed in a later step. All resulting plans
  * have exactly three activities, home-{work|edu}-work. The first activity
- * (home) ends at a random time between 6am and 9am, the second activity
- * (work or edu) has a duration of exactly 8 hours, and the final activity goes
- * on until midnight.
+ * (home) ends at a random time between 6am and 9am, the second activity (work
+ * or edu) has a duration of exactly 8 hours, and the final activity goes on
+ * until midnight.
  */
 public class PlanSimplifyForDebug extends PersonAlgorithm {
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// member variables
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
-	Set<String> workActs = null;
-	Set<String> eduActs = null;
-	PlansCalcRoute router = null;
+	protected Set<String> homeActs = null;
+	protected Set<String> workActs = null;
+	protected Set<String> eduActs = null;
+	protected PlansCalcRoute router = null;
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// constructors
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	public PlanSimplifyForDebug(final NetworkLayer network) {
-		this.workActs = new HashSet<String>(3);
-		this.workActs.add("work1");
-		this.workActs.add("work2");
-		this.workActs.add("work3");
+		this.homeActs = new HashSet<String>();
+		// this.homeActs.add("h0.5");
 
-		this.eduActs = new HashSet<String>(2);
-		this.eduActs.add("edu");
-		this.eduActs.add("uni");
+		// this.workActs = new HashSet<String>(3);
+		this.workActs = new HashSet<String>();
+		// this.workActs.add("w0.5");
+		// this.workActs.add("work2");
+		// this.workActs.add("work3");
+
+		// this.eduActs = new HashSet<String>(2);
+		this.eduActs = new HashSet<String>();
+		// this.eduActs.add("e0.5");
+		// this.eduActs.add("uni");
 
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		this.router = new PlansCalcRoute(network, timeCostCalc, timeCostCalc);
 	}
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// run methods
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	@Override
 	public void run(final Person person) {
-		for (Iterator<Plan> iter = person.getPlans().iterator(); iter.hasNext(); ) {
+		for (Iterator<Plan> iter = person.getPlans().iterator(); iter.hasNext();) {
 			Plan plan = iter.next();
 			run(plan);
 			if (plan.getActsLegs().size() != 5) {
@@ -98,23 +104,23 @@ public class PlanSimplifyForDebug extends PersonAlgorithm {
 	}
 
 	/**
-	 * removes all activities with an unwanted type. "unwanted" means the type is
-	 * not listed in this.workActs or this.eduActs and is not "home". In the same
-	 * step, all activities listed in workActs are renamed "work", while all acts
-	 * listed in eduActs are renamed "edu".
-	 *
+	 * removes all activities with an unwanted type. "unwanted" means the type
+	 * is not listed in this.workActs or this.eduActs and is not "home". In the
+	 * same step, all activities listed in workActs are renamed "work", while
+	 * all acts listed in eduActs are renamed "edu".
+	 * 
 	 * @param plan
 	 */
 	private void removeUnwantedActs(final Plan plan) {
 		List<?> actsLegs = plan.getActsLegs();
-		for (int i = 0, max = actsLegs.size(); i < max; i += 2) {
+		for (int i = 0; i < actsLegs.size(); i += 2) {
 			Act act = (Act) actsLegs.get(i);
-			if (act.getType().equals("home")) {
-				// everything okay
+			if (this.homeActs.contains(act.getType())) {
+				act.setType("h");
 			} else if (this.workActs.contains(act.getType())) {
-				act.setType("work");
+				act.setType("w");
 			} else if (this.eduActs.contains(act.getType())) {
-				act.setType("edu");
+				act.setType("e");
 			} else {
 				// nothing we're interested in, remove
 				plan.removeAct(i);
@@ -124,9 +130,9 @@ public class PlanSimplifyForDebug extends PersonAlgorithm {
 	}
 
 	/**
-	 * deletes all activities of a plan except the first, the second and the last
-	 * activity, so the plan should only consist of h-X-h activities.
-	 *
+	 * deletes all activities of a plan except the first, the second and the
+	 * last activity, so the plan should only consist of h-X-h activities.
+	 * 
 	 * @param plan
 	 */
 	private void shortenPlan(final Plan plan) {
@@ -138,25 +144,42 @@ public class PlanSimplifyForDebug extends PersonAlgorithm {
 
 	private void setTimes(final Plan plan) {
 		// we assume we get simple h-X-h-Plans at this stage
-		if (plan.getActsLegs().size() != 5) return;
+		if (plan.getActsLegs().size() != 5)
+			return;
 
-		Act act = (Act)plan.getActsLegs().get(0);
-		int time = 6*3600 + (int)(Gbl.random.nextDouble()*3600*3); // random time between 6am and 9am
-		act.setStartTime(0); act.setEndTime(time); act.setDur(time);
+		Act act = (Act) plan.getActsLegs().get(0);
+		int time = 6 * 3600 + (int) (Gbl.random.nextDouble() * 3600 * 3); // random
+																			// time
+																			// between
+																			// 6am
+																			// and
+																			// 9am
+		act.setStartTime(0);
+		act.setEndTime(time);
+		act.setDur(time);
 
-		Leg leg = (Leg)plan.getActsLegs().get(1);
-		leg.setDepTime(time); leg.setArrTime(time); leg.setTravTime(0);
+		Leg leg = (Leg) plan.getActsLegs().get(1);
+		leg.setDepTime(time);
+		leg.setArrTime(time);
+		leg.setTravTime(0);
 
-		act = (Act)plan.getActsLegs().get(2);
-		act.setStartTime(time); act.setEndTime(24*3600); act.setDur(8*3600);
-		// set endTime to 24h, not time+8h, so agents are not forced to leave work
+		act = (Act) plan.getActsLegs().get(2);
+		act.setStartTime(time);
+		act.setEndTime(24 * 3600);
+		act.setDur(8 * 3600);
+		// set endTime to 24h, not time+8h, so agents are not forced to leave
+		// work
 		// before duration is over when they arrived late
 
-		leg = (Leg)plan.getActsLegs().get(3);
-		leg.setDepTime(time + 8*3600); leg.setArrTime(time + 8*3600); leg.setTravTime(0);
+		leg = (Leg) plan.getActsLegs().get(3);
+		leg.setDepTime(time + 8 * 3600);
+		leg.setArrTime(time + 8 * 3600);
+		leg.setTravTime(0);
 
-		act = (Act)plan.getActsLegs().get(4);
-		act.setStartTime(time + 8*3600); act.setEndTime(24*3600); act.setDur(16*3600 - time);
+		act = (Act) plan.getActsLegs().get(4);
+		act.setStartTime(time + 8 * 3600);
+		act.setEndTime(24 * 3600);
+		act.setDur(16 * 3600 - time);
 	}
 
 	private void restoreRoutes(final Plan plan) {
