@@ -19,42 +19,37 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.ivtch;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
-import org.matsim.controler.events.ControlerFinishIterationEvent;
-import org.matsim.controler.listener.ControlerFinishIterationListener;
+import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.plans.Plans;
 import org.matsim.utils.charts.XYLineChart;
 
 /**
  * An implementing of ContorlerListener, in order to output some information
  * about use of public transit through .txt-file and .png-picture
- * 
+ *
  * @author yu
- * 
+ *
  */
-public class PtRate implements ControlerFinishIterationListener {
+public class PtRate implements IterationEndsListener {
 	// -----------------------------MEMBER VARIABLES-----------------------
 	private final Plans population;
 	private final PtCheck check;
-	private final int maxIters;
-	private final String BetaTraveling;
-	private final String BetaTravelingPt;
-	private double[] yPtRate = null;// an array, in which the fraction of
-	// persons, who use public transit, will be
-	// saved.
-	private double[] yPtUser = null;// an array, in which the amount of persons,
-	// who use public transit, will be saved.
-	private double[] yPersons = null;// an array, in which the amount of all
-
-	// persons in the simulation will be
-	// saved.
+	/** an array, in which the fraction of persons, who use public transit, will be saved. */
+	private double[] yPtRate = null;
+	/** an array, in which the amount of persons, who use public transit, will be saved. */
+	private double[] yPtUser = null;
+	/** an array, in which the amount of all persons in the simulation, will be saved. */
+	private double[] yPersons = null;
 
 	// -------------------------------CONSTRUCTOR---------------------------
 	/**
@@ -62,75 +57,63 @@ public class PtRate implements ControlerFinishIterationListener {
 	 *            the object of Plans in the simulation
 	 * @param filename -
 	 *            filename of .txt-file
-	 * @param maxIters -
-	 *            maximum number of iterations
-	 * @param BetaTraveling -
-	 *            parameter of marginal Utility of Traveling
-	 * @param BetaTravelingPt -
-	 *            parameter of marginal Utility of Traveling with public transit
+	 * @param controler -
+	 *            the controler to which this instance is attached to
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public PtRate(final Plans population, final String filename, int maxIters,
-			String BetaTraveling, String BetaTravelingPt)
-			throws FileNotFoundException, IOException {
+	public PtRate(final Plans population, final String filename, final Controler controler)
+			throws IOException {
 		this.population = population;
-		this.maxIters = maxIters;
-		this.BetaTraveling = BetaTraveling;
-		this.BetaTravelingPt = BetaTravelingPt;
-		check = new PtCheck(filename);
-		yPtRate = new double[maxIters + 1];
-		yPtUser = new double[maxIters + 1];
-		yPersons = new double[maxIters + 1];
+		this.check = new PtCheck(filename);
+		int maxIters = controler.getLastIteration();
+		this.yPtRate = new double[maxIters + 1];
+		this.yPtUser = new double[maxIters + 1];
+		this.yPersons = new double[maxIters + 1];
 	}
 
 	/**
 	 * writes .txt-file and paints 2 .png-picture
 	 */
-	public void notifyIterationFinished(ControlerFinishIterationEvent event) {
-		check.resetCnt();
-		check.run(population);
-		int idx = event.getIteration();
-		yPtRate[idx] = check.getPtRate();
-		yPtUser[idx] = check.getPtUserCnt();
-		yPersons[idx] = check.getPersonCnt();
+	public void notifyIterationEnds(final IterationEndsEvent event) {
+		Config config = event.getControler().getConfig();
+		this.check.resetCnt();
+		this.check.run(this.population);
+		int iteration = event.getIteration();
+		this.yPtRate[iteration] = this.check.getPtRate();
+		this.yPtUser[iteration] = this.check.getPtUserCnt();
+		this.yPersons[iteration] = this.check.getPersonCnt();
 		try {
-			check.write(idx);
+			this.check.write(iteration);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (idx == maxIters) {
-			double[] x = new double[maxIters + 1];
-			for (int i = 0; i < maxIters + 1; i++) {
+		if (iteration == event.getControler().getLastIteration()) {
+			double[] x = new double[iteration + 1];
+			for (int i = 0; i <= iteration; i++) {
 				x[i] = i;
 			}
 			XYLineChart ptRateChart = new XYLineChart(
 					"Schweiz: PtRate, "
-							+ maxIters
-							+ "ITERs, BetaTraveling="
-							+ BetaTraveling
-							+ ", BetaTravelingPt="
-							+ BetaTravelingPt
+							+ iteration
+							+ "ITERs, BetaTraveling=" + config.charyparNagelScoring().getTraveling()
+							+ ", BetaTravelingPt=" + config.charyparNagelScoring().getTravelingPt()
 							+ ", BetaPerforming=6, flowCapacityFactor=0.1, storageCapacityFactor=0.3, 10%-ReRoute_Landmarks, 10%-TimeAllocationMutator, 80%-SelectExpBeta",
 					"Iterations", "Pt-Rate");
-			ptRateChart.addSeries("PtRate", x, yPtRate);
-			ptRateChart.saveAsPng(Controler.getOutputFilename("PtRate.png"),
-					800, 600);
+			ptRateChart.addSeries("PtRate", x, this.yPtRate);
+			ptRateChart.saveAsPng(Controler.getOutputFilename("PtRate.png"), 800, 600);
 			XYLineChart personsChart = new XYLineChart(
 					"Schweiz: PtUser/Persons, "
-							+ maxIters
-							+ "ITERs, BetaTravelling="
-							+ BetaTraveling
-							+ ", BetaTravelingPt="
-							+ BetaTravelingPt
+							+ iteration
+							+ "ITERs, BetaTraveling=" + config.charyparNagelScoring().getTraveling()
+							+ ", BetaTravelingPt=" + config.charyparNagelScoring().getTravelingPt()
 							+ ", BetaPerforming=6, flowCapacityFactor=0.1, storageCapacityFactor=0.3, 10%-ReRoute_Landmarks, 10%-TimeAllocationMutator, 80%-SelectExpBeta",
 					"Iterations", "PtUser/Persons");
-			personsChart.addSeries("PtUser", x, yPtUser);
-			personsChart.addSeries("Persons", x, yPersons);
-			personsChart.saveAsPng(Controler.getOutputFilename("Persons.png"),
-					800, 600);
+			personsChart.addSeries("PtUser", x, this.yPtUser);
+			personsChart.addSeries("Persons", x, this.yPersons);
+			personsChart.saveAsPng(Controler.getOutputFilename("Persons.png"), 800, 600);
 			try {
-				check.writeEnd();
+				this.check.writeEnd();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

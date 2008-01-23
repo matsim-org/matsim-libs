@@ -20,6 +20,7 @@
 
 package playground.david;
 
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.netvis.NetVis;
@@ -30,24 +31,23 @@ public class OneSimRunWithConfig {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
+		Config config;
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./examples/two-routes/config.xml"});
+			config = Gbl.createConfig(new String[] {"./examples/two-routes/config.xml"});
 		} else {
-			Gbl.createConfig(args) ;
+			config = Gbl.createConfig(args) ;
 		}
-				
-		final Controler controler = new Controler();
-		controler.setOverwriteFiles(true) ;
-		
 
-		controler.run(null);
-		
+		final Controler controler = new Controler(config);
+		controler.setOverwriteFiles(true);
+		controler.run();
+
 		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
 		NetVis.main(visargs);
 
-		
+
 	}
 
 }

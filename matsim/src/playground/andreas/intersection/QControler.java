@@ -1,18 +1,11 @@
-package playground.andreas.intersection;
-
-/*
- * $Id: MyControler1.java,v 1.3 2007/11/20 15:31:20 fboffo Exp $
- */
-
 /* *********************************************************************** *
+ * project: org.matsim.*
+ * QControler.java
  *                                                                         *
+ * *********************************************************************** *
  *                                                                         *
- *                          ---------------------                          *
- * copyright       : (C) 2007 by Michael Balmer, Marcel Rieser,            *
- *                   David Strippgen, Gunnar Flötteröd, Konrad Meister,    *
- *                   Kai Nagel, Kay W. Axhausen                            *
- *                   Technische Universitaet Berlin (TU-Berlin) and        *
- *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
  * *********************************************************************** *
@@ -25,13 +18,14 @@ package playground.andreas.intersection;
  *                                                                         *
  * *********************************************************************** */
 
+package playground.andreas.intersection;
+
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
-import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -48,39 +42,41 @@ import playground.andreas.intersection.sim.QSim;
 
 public class QControler extends Controler {
 
-	final private static Logger log = Logger.getLogger(QueueLink.class);
-	
+	final private static Logger log = Logger.getLogger(QControler.class);
+
+	public QControler(final Config config) {
+		super(config);
+	}
+
+	@Override
 	protected void runMobSim() {
 
 		SimulationTimer.setTime(0);
 
 		// TODO [an] Is needed ? or
 		// remove eventswriter, as the external mobsim has to write the events */
-		this.events.removeHandler(this.eventwriter);	
-		this.eventwriter = new EventWriterTXT(getIterationFilename(Controler.FILENAME_EVENTS.replaceAll(".gz", "")));
-		this.events.addHandler(this.eventwriter);
-		
+//		this.events.removeHandler(this.eventwriter);
+//		this.eventwriter = new EventWriterTXT(getIterationFilename(Controler.FILENAME_EVENTS.replaceAll(".gz", "")));
+//		this.events.addHandler(this.eventwriter);
+		// I don't think this is really needed. -marcel/21jan2008
+
 		QSim sim = new QSim(this.events, this.population, (QNetworkLayer) this.network);
 		sim.run();
 
 	}
 
-	/** Needed to specify a QNetworkLayer as taget */
+	/** Needed to specify a QNetworkLayer as target */
 	@Override
 	protected NetworkLayer loadNetwork() {
-		printNote("", "  creating network layer... ");
 		QNetworkLayer network = new QNetworkLayer();
 		Gbl.getWorld().setNetworkLayer(network);
-		printNote("", "  done");
 
-		printNote("", "  reading network xml file... ");
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-		printNote("", "  done");
 
 		return network;
 	}
 
-	/** Should be overwritten in case of artifical population */
+	/** Should be overwritten in case of artificial population */
 	@Override
 	protected Plans loadPopulation() {
 
@@ -89,7 +85,7 @@ public class QControler extends Controler {
 		log.info("  generating plans... ");
 
 		for (int jj = 1; jj <= 10; jj++) {
-			
+
 			Link destLink = network.getLink("10");
 			Link sourceLink = network.getLink("60");
 			generatePerson(jj, sourceLink, destLink, pop);
@@ -100,7 +96,7 @@ public class QControler extends Controler {
 	}
 
 	/** Generates one Person a time */
-	private void generatePerson(int ii, Link sourceLink, Link destLink, Plans population) {
+	private void generatePerson(final int ii, final Link sourceLink, final Link destLink, final Plans population) {
 		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
 		Plan plan = new Plan(p);
 		try {
@@ -128,7 +124,7 @@ public class QControler extends Controler {
 			driversLog.renameTo(eventsFile);
 
 			Events2Snapshot events2Snapshot = new org.matsim.run.Events2Snapshot();
-			events2Snapshot.run(eventsFile, Gbl.getConfig(), network);
+			events2Snapshot.run(eventsFile, Gbl.getConfig(), this.network);
 
 			// Run NetVis if possible
 			if (Gbl.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")) {
@@ -147,16 +143,18 @@ public class QControler extends Controler {
 
 	public static void main(final String[] args) {
 
+		Config config;
+
 		if (args.length == 0) {
-			Gbl.createConfig(new String[] { "./test/shared/itsumo-sesam-scenario/config.xml" });
+			config = Gbl.createConfig(new String[] { "./test/shared/itsumo-sesam-scenario/config.xml" });
 		} else {
-			Gbl.createConfig(args);
+			config = Gbl.createConfig(args);
 		}
 
-		final QControler controler = new QControler();
+		final QControler controler = new QControler(config);
 		controler.setOverwriteFiles(true);
 
-		controler.run(null);
+		controler.run();
 
 		controler.makeVis();
 	}

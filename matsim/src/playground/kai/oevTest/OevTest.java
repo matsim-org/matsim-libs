@@ -18,11 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-// lskdjf
-
-/**
- * 
- */
 package playground.kai.oevTest;
 
 import org.matsim.controler.Controler;
@@ -32,11 +27,8 @@ import org.matsim.gbl.Gbl;
  * @author nagel
  *
  */
-public class OevTest extends Controler {
+public class OevTest {
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
 
 		if ( args.length==0 ) {
@@ -44,11 +36,11 @@ public class OevTest extends Controler {
 		} else {
 			Gbl.createConfig(args) ;
 		}
-				
-		final Controler controler = new OevTest();
+
+		final Controler controler = new Controler(Gbl.getConfig());
 		controler.setOverwriteFiles(true) ;
-		controler.run(args);
-		
+		controler.run();
+
 	}
 
 }

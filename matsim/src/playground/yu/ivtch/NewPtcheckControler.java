@@ -30,53 +30,48 @@ import java.io.IOException;
 import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.ScoreStats;
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.StartupListener;
+import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
 
 import playground.yu.analysis.CalcAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewPtcheckControler extends Controler {
 	/**
 	 * internal outputStream
 	 */
 	private DataOutputStream out;
-	private ScoreStats scoreStats = null;
-	private CalcAverageTolledTripLength cattl = null;
-	private CalcAverageTripLength catl = null;
-	private CalcTrafficPerformance ctpf = null;
-	private CalcAvgSpeed cas = null;
+
+	public NewPtcheckControler(final String[] args) {
+		super(args);
+	}
 
 	/**
 	 * adds a ControlerListener to Controler - PtRate
 	 */
 	@Override
-	protected void loadData() {
-		loadWorld();
-		this.network = loadNetwork();
-		loadFacilities();
-		this.population = loadPopulation();
+	protected void setup() {
+		super.setup();
 		try {
-			// TODO [MR] I "abuse" createLegHistogramPNG here for ScoreStats...
-			// create an own flag for this one.
-			scoreStats = new ScoreStats(this.population,
-					getOutputFilename("scorestats.txt"), true);
-			addControlerListener(new PtRate(population,
-					getOutputFilename("PtRate.txt"), getMaximumIteration(),
-					config.getParam("planCalcScore", "traveling"), config
-							.getParam("planCalcScore", "travelingPt")));
-			out = new DataOutputStream(new BufferedOutputStream(
+			this.out = new DataOutputStream(new BufferedOutputStream(
 					new FileOutputStream(new File(
 							getOutputFilename("tollPaid.txt")))));
-			out
-					.writeBytes("Iter\tBetaTraveling\tBetaTravelingPt\ttoll_amount[€/m]"
-							+ "\ttoll_paid[€]\tavg. executed score\tNumber of Drawees"
+			this.out
+					.writeBytes("Iter\tBetaTraveling\tBetaTravelingPt\ttoll_amount[EUR/m]"
+							+ "\ttoll_paid[EUR]\tavg. executed score\tNumber of Drawees"
 							+ "\tavg. triplength\tavg. tolled triplength"
 							+ "\ttraffic persformance\tavg. travel speed\n");
 		} catch (FileNotFoundException e) {
@@ -84,63 +79,66 @@ public class NewPtcheckControler extends Controler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (scoreStats != null) {
-			this.addControlerListener(scoreStats);
-		}
 	}
 
-	@Override
-	protected void setupIteration(int iteration) {
-		super.setupIteration(iteration);
-		cas.reset(iteration);
-		if (cattl != null)
-			cattl.reset(iteration);
-		ctpf.reset(iteration);
-	}
+	public static class PtCheckListener implements StartupListener, IterationEndsListener {
+		private DataOutputStream out;
+		private final ScoreStats scoreStats = null;
+		private CalcAverageTolledTripLength cattl = null;
+		private CalcAverageTripLength catl = null;
+		private CalcTrafficPerformance ctpf = null;
+		private CalcAvgSpeed cas = null;
 
-	@Override
-	protected void finishIteration(int iteration) {
-		super.finishIteration(iteration);
-		catl = new CalcAverageTripLength();
-		catl.run(population);
-		try {
-			out.writeBytes(iteration
-					+ "\t"
-					+ config.getParam("planCalcScore", "traveling")
-					+ "\t"
-					+ config.getParam("planCalcScore", "travelingPt")
-					+ "\t"
-					+ ((Gbl.useRoadPricing()) ? toll.getCostArray()[0].amount
-							: 0)
-					+ "\t"
-					+ ((tollCalc != null) ? tollCalc.getAllAgentsToll() : 0.0)
-					+ "\t"
-					+ scoreStats.getHistory()[3][iteration]
-					+ "\t"
-					+ ((tollCalc != null) ? tollCalc.getDraweesNr() : 0)
-					+ "\t"
-					+ catl.getAverageTripLength()
-					+ "\t"
-					+ ((((tollCalc != null) && (cattl != null))) ? cattl
-							.getAverageTripLength() : 0.0) + "\t"
-					+ ctpf.getTrafficPerformance() + "\t" + cas.getAvgSpeed()
-					+ "\n");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+		public void notifyStartup(final StartupEvent event) {
+			Controler controler = event.getControler();
+			Events events = controler.getEvents();
+			NetworkLayer network = event.getControler().getNetwork();
+			if (event.getControler().getConfig().roadpricing().getTollLinksFile() != null) {
+				this.cattl = new CalcAverageTolledTripLength(network, toll);
+				events.addHandler(this.cattl);
+			}
+			this.ctpf = new CalcTrafficPerformance(network);
+			this.cas = new CalcAvgSpeed(network);
+			events.addHandler(this.ctpf);
+			events.addHandler(this.cas);
 
-	@Override
-	protected void startup() {
-		super.startup();
-		if (Gbl.useRoadPricing()) {
-			cattl = new CalcAverageTolledTripLength(network, toll);
-			events.addHandler(cattl);
+			controler.addControlerListener(new PtRate(controler.getPopulation(),
+					getOutputFilename("PtRate.txt"), controler));
+
 		}
-		ctpf = new CalcTrafficPerformance(network);
-		cas = new CalcAvgSpeed(network);
-		events.addHandler(ctpf);
-		events.addHandler(cas);
+
+		public void notifyIterationEnds(final IterationEndsEvent event) {
+			int iteration = event.getIteration();
+			Config config = event.getControler().getConfig();
+			this.catl = new CalcAverageTripLength();
+			this.catl.run(event.getControler().getPopulation());
+			try {
+				this.out.writeBytes(iteration
+						+ "\t"
+						+ config.getParam("planCalcScore", "traveling")
+						+ "\t"
+						+ config.getParam("planCalcScore", "travelingPt")
+						+ "\t"
+						+ ((Gbl.useRoadPricing()) ? toll.getCostArray()[0].amount
+								: 0)
+						+ "\t"
+						+ ((tollCalc != null) ? tollCalc.getAllAgentsToll() : 0.0)
+						+ "\t"
+						+ this.scoreStats.getHistory()[3][iteration]
+						+ "\t"
+						+ ((tollCalc != null) ? tollCalc.getDraweesNr() : 0)
+						+ "\t"
+						+ this.catl.getAverageTripLength()
+						+ "\t"
+						+ ((((tollCalc != null) && (this.cattl != null))) ? this.cattl
+								.getAverageTripLength() : 0.0) + "\t"
+						+ this.ctpf.getTrafficPerformance() + "\t" + this.cas.getAvgSpeed()
+						+ "\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	// -------------------------MAIN FUNCTION--------------------
@@ -149,9 +147,8 @@ public class NewPtcheckControler extends Controler {
 	 *            the path of config-file
 	 */
 	public static void main(final String[] args) {
-		final NewPtcheckControler controler;
-		controler = new NewPtcheckControler();
-		controler.run(args);
+		final NewPtcheckControler controler = new NewPtcheckControler(args);
+		controler.run();
 		try {
 			controler.out.close();
 		} catch (IOException e) {

@@ -20,6 +20,9 @@
 
 package playground.jhackney.controler;
 
+import static org.matsim.controler.Controler.DIRECTORY_ITERS;
+import static org.matsim.controler.Controler.outputPath;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,7 +38,6 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.modules.TimeAllocationMutator;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.roadpricing.RoadPricingScoringFunctionFactory;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
@@ -56,7 +58,7 @@ import playground.jhackney.statistics.SocialNetworkStatistics;
 public class SNController extends Controler {
 
 	protected boolean overwriteFiles = true;
-	private boolean SNFLAG = true;
+	private final boolean SNFLAG = true;
 	private static final String DIRECTORY_SN = "socialnets";
 	public static String SOCNET_OUT_DIR = null;
 
@@ -66,7 +68,7 @@ public class SNController extends Controler {
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
 	SpatialInteractor plansInteractorS;//spatial (face to face)
 	int max_sn_iter;
-	String [] infoToExchange;//type of info for non-spatial exchange is read in 
+	String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
@@ -78,6 +80,9 @@ public class SNController extends Controler {
 //	New variables for replanning
 	int replan_interval;
 
+	public SNController(final String[] args) {
+		super(args);
+	}
 
 	@Override
 	protected void loadData() {
@@ -100,7 +105,7 @@ public class SNController extends Controler {
 		//}
 
 		System.out.println(" Initializing agent knowledge about geography ...");
-		initializeKnowledge(population);
+		initializeKnowledge(this.population);
 		System.out.println("... done");
 
 	}
@@ -124,7 +129,7 @@ public class SNController extends Controler {
 
 		String maxvalue = this.config.findParam("strategy", "maxAgentPlanMemorySize");
 		manager.setMaxPlansPerAgent(Integer.parseInt(maxvalue));
-	
+
 		// Best-scoring plan chosen each iteration
 		PlanStrategy strategy1 = new PlanStrategy(new BestPlanSelector());
 
@@ -148,7 +153,7 @@ public class SNController extends Controler {
 		System.out.println("finishIteration: Note setting snIter = iteration +1 for now");
 		int snIter = iteration+1;
 
-		if(total_spatial_fraction(fractionS)>0){ // only generate the map if spatial meeting is important in this experiment
+		if(total_spatial_fraction(this.fractionS)>0){ // only generate the map if spatial meeting is important in this experiment
 			System.out.println("MAKE A MAP OF SOCIAL EVENTS THAT ACTUALLY OCCURRED IN THE MOBSIM");
 			System.out.println("  AND CALCULATE SOCIAL UTILITY FROM THIS");
 			System.out.println("  AND/OR USE IT TO COMPARE WITH PLANNED INTERACTIONS");
@@ -172,36 +177,36 @@ public class SNController extends Controler {
 		System.out.println(" ... Spatial interactions done\n");
 
 		System.out.println(" Removing social links ...");
-		snet.removeLinks(snIter);
+		this.snet.removeLinks(snIter);
 		System.out.println(" ... done");
 
 		System.out.println(" Calculating and reporting network statistics ...");
-		snetstat.calculate(snIter, snet, population);
+		this.snetstat.calculate(snIter, this.snet, this.population);
 		System.out.println(" ... done");
 
 		System.out.println(" Writing out social network for iteration " + snIter + " ...");
-		pjw.write(snet.getLinks(), population, snIter);
-		System.out.println(" ... done");	
+		this.pjw.write(this.snet.getLinks(), this.population, snIter);
+		System.out.println(" ... done");
 
 		if(iteration == maxIterations){
 			System.out.println("----------Closing social network statistic files and wrapping up ---------------");
-			snetstat.closeFiles();
+			this.snetstat.closeFiles();
 			snwrapup();
 		}
 	}
 	private void snwrapup(){
-		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(outputPath,snet, population);
+		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(outputPath,this.snet, this.population);
 		pnww.write();
 
 		System.out.println(" Writing the statistics of the final social network to Output Directory...");
 
 		SocialNetworkStatistics snetstatFinal=new SocialNetworkStatistics();
 		snetstatFinal.openFiles(outputPath);
-		snetstatFinal.calculate(maxIterations, snet, population);
+		snetstatFinal.calculate(maxIterations, this.snet, this.population);
 
 		System.out.println(" ... done");
-		snetstatFinal.closeFiles();	
-	}		
+		snetstatFinal.closeFiles();
+	}
 
 	@Override
 	protected void setupIteration(final int iteration) {
@@ -217,7 +222,7 @@ public class SNController extends Controler {
 		if (this.planScorer == null) {
 			if (Gbl.useRoadPricing()) {
 				this.planScorer = new EventsToScore(this.population, new RoadPricingScoringFunctionFactory(this.tollCalc, new CharyparNagelScoringFunctionFactory()));
-			}else if (SNFLAG){
+			}else if (this.SNFLAG){
 				this.planScorer = new EventsToScore(this.population, new SNScoringFunctionFactory01());
 			} else {
 				this.planScorer = new EventsToScore(this.population, new CharyparNagelScoringFunctionFactory());
@@ -248,14 +253,14 @@ public class SNController extends Controler {
 			printNote("", "done dumping plans.");
 		}
 
-		if(total_spatial_fraction(fractionS)>0){ // only generate the map if spatial meeting is important in this experiment
+		if(total_spatial_fraction(this.fractionS)>0){ // only generate the map if spatial meeting is important in this experiment
 
 			//if(Events have just changed or if no events are yet available and if there is an interest in the planned interactions)
 			System.out.println("  Generating planned [Spatial] socializing opportunities ...");
 			System.out.println("   Mapping which agents want to do what, where, and when");
 			System.out.println("   Note that there is only one structure for each person containing SOCIAL DATES");
 			System.out.println("   and that it is cleared before new F2F windows are generated");
-			socialPlans = gen2.generate(population);
+			this.socialPlans = this.gen2.generate(this.population);
 			System.out.println("...finished.");
 
 			//}// end if
@@ -263,7 +268,7 @@ public class SNController extends Controler {
 			// Agents' planned interactions
 			System.out.println("  Agents planned social interactions ...");
 			System.out.println("  Agents' relationships are updated to reflect these interactions! ...");
-			plansInteractorS.interact(socialPlans, rndEncounterProbs, snIter);
+			this.plansInteractorS.interact(this.socialPlans, this.rndEncounterProbs, snIter);
 
 		}else{
 			System.out.println("     (none)");
@@ -271,13 +276,13 @@ public class SNController extends Controler {
 		System.out.println(" ... Spatial interactions done\n");
 
 		System.out.println(" Non-Spatial interactions ...");
-		for (int ii = 0; ii < infoToExchange.length; ii++) {
-			String facTypeNS = infoToExchange[ii];
+		for (int ii = 0; ii < this.infoToExchange.length; ii++) {
+			String facTypeNS = this.infoToExchange[ii];
 
 			//	Geographic Knowledge about all types of places is exchanged
 			if (!facTypeNS.equals("none")) {
 				System.out.println("  Geographic Knowledge about all types of places is being exchanged ...");
-				plansInteractorNS.exchangeGeographicKnowledge(facTypeNS, snIter);
+				this.plansInteractorNS.exchangeGeographicKnowledge(facTypeNS, snIter);
 			}
 		}
 
@@ -285,7 +290,7 @@ public class SNController extends Controler {
 		double fract_intro=Double.parseDouble(this.config.socnetmodule().getTriangles());
 		if (fract_intro > 0) {
 			System.out.println("  Knowledge about other people is being exchanged ...");
-			plansInteractorNS.exchangeSocialNetKnowledge(snIter);
+			this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
 		}
 
 		System.out.println("  ... done");
@@ -298,7 +303,7 @@ public class SNController extends Controler {
 	}
 
 
-	void initializeKnowledge( Plans plans ){
+	void initializeKnowledge( final Plans plans ){
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)
@@ -329,39 +334,39 @@ public class SNController extends Controler {
 		}
 
 
-		max_sn_iter = Integer.parseInt(config.socnetmodule().getNumIterations());
-		replan_interval = Integer.parseInt(config.socnetmodule().getRPInt());
-		String rndEncounterProbString = config.socnetmodule().getFacWt();
-		String xchangeInfoString = config.socnetmodule().getXchange();
-		infoToExchange = getFacTypes(xchangeInfoString);
-		fractionS = toNumber(rndEncounterProbString);
-		rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
+		this.max_sn_iter = Integer.parseInt(this.config.socnetmodule().getNumIterations());
+		this.replan_interval = Integer.parseInt(this.config.socnetmodule().getRPInt());
+		String rndEncounterProbString = this.config.socnetmodule().getFacWt();
+		String xchangeInfoString = this.config.socnetmodule().getXchange();
+		this.infoToExchange = getFacTypes(xchangeInfoString);
+		this.fractionS = toNumber(rndEncounterProbString);
+		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		System.out.println(" Instantiating the Pajek writer ...");
 
-		pjw = new PajekWriter1(SOCNET_OUT_DIR, facilities);
+		this.pjw = new PajekWriter1(SOCNET_OUT_DIR, facilities);
 		System.out.println("... done");
 
 		System.out.println(" Initializing the social network ...");
-		snet = new SocialNetwork(population);
+		this.snet = new SocialNetwork(this.population);
 		System.out.println("... done");
 
 		System.out.println(" Calculating the statistics of the initial social network)...");
-		snetstat=new SocialNetworkStatistics();
-		snetstat.openFiles();
-		snetstat.calculate(0, snet, population);
+		this.snetstat=new SocialNetworkStatistics();
+		this.snetstat.openFiles();
+		this.snetstat.calculate(0, this.snet, this.population);
 		System.out.println(" ... done");
 
 		System.out.println(" Writing out the initial social network ...");
-		pjw.write(snet.getLinks(), population, 0);
+		this.pjw.write(this.snet.getLinks(), this.population, 0);
 		System.out.println("... done");
 
 		System.out.println(" Setting up the NonSpatial interactor ...");
-		plansInteractorNS=new NonSpatialInteractor(snet);
+		this.plansInteractorNS=new NonSpatialInteractor(this.snet);
 		System.out.println("... done");
 
 		System.out.println(" Setting up the Spatial interactor ...");
-		plansInteractorS=new SpatialInteractor(snet);
+		this.plansInteractorS=new SpatialInteractor(this.snet);
 		System.out.println("... done");
 	}
 
@@ -370,11 +375,11 @@ public class SNController extends Controler {
 	 * reader. Replace eventually with a routine that runs all of the
 	 * facTypes but uses a probability for each one, summing to 1.0. Change
 	 * the interactors accordingly.
-	 * 
+	 *
 	 * @param longString
 	 * @return
 	 */
-	private String[] getFacTypes(String longString) {
+	private String[] getFacTypes(final String longString) {
 		// TODO Auto-generated method stub
 		String patternStr = ",";
 		String[] s;
@@ -410,7 +415,7 @@ public class SNController extends Controler {
 		return s;
 	}
 
-	private double[] toNumber(String longString) {
+	private double[] toNumber(final String longString) {
 		String patternStr = ",";
 		String[] s;
 		s = longString.split(patternStr);
@@ -431,7 +436,7 @@ public class SNController extends Controler {
 		}
 		return w;
 	}
-	private HashMap<String,Double> mapActivityWeights(String[] types, String longString) {
+	private HashMap<String,Double> mapActivityWeights(final String[] types, final String longString) {
 		String patternStr = ",";
 		String[] s;
 		HashMap<String,Double> map = new HashMap<String,Double>();
@@ -453,9 +458,9 @@ public class SNController extends Controler {
 			Gbl.errorMsg("At least one weight for the type of information exchange or meeting place must be > 0, check config file.");
 		}
 		return map;
-	}    
+	}
 
-	private double total_spatial_fraction(double[] fractionS2) {
+	private double total_spatial_fraction(final double[] fractionS2) {
 //		See if we use spatial interaction at all: sum of these must > 0 or else no spatial
 //		interactions take place
 		double total_spatial_fraction=0;
@@ -465,10 +470,10 @@ public class SNController extends Controler {
 		return total_spatial_fraction;
 	}
 
-	private final void makeSNIterationPath(int iteration) {
+	private final void makeSNIterationPath(final int iteration) {
 		new File(getSNIterationPath(iteration)).mkdir();
 	}
-	private final void makeSNIterationPath(int iteration, int snIter) {
+	private final void makeSNIterationPath(final int iteration, final int snIter) {
 		System.out.println(getSNIterationPath(iteration, snIter));
 		File iterationOutFile= new File(getSNIterationPath(iteration, snIter));
 		iterationOutFile.mkdir();
@@ -482,7 +487,7 @@ public class SNController extends Controler {
 	 * @param iteration the iteration the path to should be returned
 	 * @return path to the specified iteration directory
 	 */
-	public final static String getSNIterationPath(int snIter) {
+	public final static String getSNIterationPath(final int snIter) {
 		return outputPath + "/" + DIRECTORY_ITERS + "/"+snIter;
 	}
 	/**
@@ -491,14 +496,14 @@ public class SNController extends Controler {
 	 * @param iteration the iteration the path to should be returned
 	 * @return path to the specified iteration directory
 	 */
-	public final static String getSNIterationPath(int iteration, int sn_iter) {
+	public final static String getSNIterationPath(final int iteration, final int sn_iter) {
 		return outputPath + "/" + DIRECTORY_ITERS + "/"+sn_iter + "/it." + iteration;
 	}
 
-	public static void main(String[] args) {
-		final Controler controler = new SNController();
-
-		controler.run(args);
+	public static void main(final String[] args) {
+		final Controler controler = new SNController(args);
+		controler.addControlerListener(new SNControlerListener());
+		controler.run();
 		System.exit(0);
 	}
 }

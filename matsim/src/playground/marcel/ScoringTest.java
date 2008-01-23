@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PtControler.java
+ * ScoringTest.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,46 +20,39 @@
 
 package playground.marcel;
 
-import org.apache.log4j.Logger;
-import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkWriter;
+import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.plans.MatsimPlansReader;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
+import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.scoring.PlanScorer;
 
-import playground.marcel.ptnetwork.PtNetworkLayer;
+public class ScoringTest {
 
-public class PtControler extends Controler {
+	private void test1() {
 
-	private static final Logger log = Logger.getLogger(PtControler.class);
+		PlanScorer scorer = new PlanScorer(new CharyparNagelScoringFunctionFactory());
 
-	PtNetworkLayer ptNetwork = null;
+		Gbl.createConfig(new String[] {"../mystudies/scoringtest/config.xml"});
+		QueueNetworkLayer network = new QueueNetworkLayer();
+		new MatsimNetworkReader(network).readFile("examples/equil/network.xml");
+		Gbl.getWorld().setNetworkLayer(network);
+		Plans population = new Plans(Plans.NO_STREAMING);
+		new MatsimPlansReader(population).readFile("../mystudies/scoringtest/plans.xml");
 
-	public PtControler(final String[] args) {
-		super(args);
-	}
-
-	@Override
-	protected void loadData() {
-		super.loadData();
-
-		// load Pt Network
-		log.info("  reading pt network... ");
-		PtNetworkLayer ptNetwork = new PtNetworkLayer();
-		ptNetwork.buildfromBERTA(Gbl.getConfig().getParam("network", "inputBvgDataDir"),
-				Gbl.getConfig().getParam("network", "inputBvgDataCoords"), true, null);
-		log.info("  done");
-
-		String filename = Gbl.getConfig().findParam("network", "outputPtNetworkFile");
-		log.info("  writing network xml file to " + filename + "... ");
-		if (filename != null) {
-			NetworkWriter network_writer = new NetworkWriter(ptNetwork, filename);
-			network_writer.write();
+		for (Person person : population.getPersons().values()) {
+			Plan plan = person.getPlans().get(0);
+			System.out.println(scorer.getScore(plan));
 		}
-		log.info("  done");
+
 	}
 
-	// main-routine, where it all starts...
 	public static void main(final String[] args) {
-		final PtControler controler = new PtControler(args);
-		controler.run();
+		ScoringTest tester = new ScoringTest();
+		tester.test1();
 	}
+
 }

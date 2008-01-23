@@ -64,14 +64,12 @@ import org.matsim.plans.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.plans.algorithms.PlansFilterActInArea;
 import org.matsim.plans.algorithms.XY2Links;
-import org.matsim.utils.identifiers.IdI;
-import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 import org.matsim.writer.MatsimWriter;
-
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -205,7 +203,7 @@ public class MyMonsterClass {
 			writer.close();
 //			evacTime[i] = etc.getLastEventTime() - 11*3600;
 //			etc.reset(i);
-			events.resetCounters(i);
+			events.resetCounter();
 			System.out.println("done");
 
 		}
@@ -395,7 +393,7 @@ public class MyMonsterClass {
 	// cuts out a subset from network that is within the specified
 	// polygon ... saves set network and the evacuation area as well
 	//////////////////////////////////////////////////////////////////////
-	public static void networkClipping(String[] args){
+	public static void networkClipping(final String[] args){
 		//for now hardcoded
 		World world = Gbl.createWorld();
 		Config config = Gbl.createConfig(new String[] {"./configs/evacuationConf.xml"});
@@ -418,8 +416,8 @@ public class MyMonsterClass {
 //		coords.add(MGC.coord2Coordinate(network.getNode("5952").getCoord()));
 		coords.add(MGC.coord2Coordinate(network.getNode("5411").getCoord()));
 		coords.add(MGC.coord2Coordinate(network.getNode("5002").getCoord()));
-		
-		
+
+
 		Coordinate[] c = new Coordinate[coords.size()];
 		for (int i = 0; i < coords.size(); i++)
 			c[i] = coords.get(i);
@@ -439,7 +437,7 @@ public class MyMonsterClass {
 		ConcurrentLinkedQueue<Link> oneWay = new ConcurrentLinkedQueue<Link>();
 		HashMap<IdI,EvacuationAreaLink> links = new HashMap<IdI,EvacuationAreaLink>();
 		Iterator it = network.getLinks().values().iterator();
-		
+
 		while (it.hasNext()) {
 			QueueLink link = (QueueLink) it.next();
 			Node a = link.getFromNode();
@@ -538,7 +536,7 @@ int three=0;
 	// if it is the case the correspondig Person will be dumped
 	// to a plansfile
 	//////////////////////////////////////////////////////////////////////
-	public static void routeTransitionCheck(String[] args){
+	public static void routeTransitionCheck(final String[] args){
 		System.out.println("RUN: routeTransitionCheck");
 		//for now hardcoded
 		String networkFile = "./networks/wip_net.xml";
@@ -650,7 +648,7 @@ int three=0;
 
 	public static void planMinMax(){
 		String plans = "/home/laemmel/workspace/runs/run301/run/output/ITERS/it.100/100.plans.xml.gz";
-		
+
 		String configFile = "./configs/evacuationConf.xml";
 		String net = "./networks/padang_net_evac.xml";
 		World world = Gbl.getWorld();
@@ -672,9 +670,9 @@ int three=0;
 		population.printPlansCount();
 
 		world.setPopulation(population);
-	
+
 		System.out.println("done. ");
-		
+
 		Writer wr = null;
 		try {
 			wr = new FileWriter(new File("scores.txt"));
@@ -683,16 +681,16 @@ int three=0;
 			e.printStackTrace();
 		}
 		BufferedWriter out = new BufferedWriter(wr);
-		
-		
 
-		
-		
-		
+
+
+
+
+
 		for (Person pers : population.getPersons().values()){
 			double min = Double.POSITIVE_INFINITY;
 			double max = Double.NEGATIVE_INFINITY;
-			
+
 			for (Plan plan : pers.getPlans()){
 				if (plan.getScore() < min) min = plan.getScore();
 				if (plan.getScore() > max) max = plan.getScore();
@@ -703,8 +701,8 @@ int three=0;
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
+
+
 		}
 		try {
 			out.close();
@@ -713,7 +711,7 @@ int three=0;
 			e.printStackTrace();
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// maps agents from one network to an other - based on their
 	// rondomized xy coords
@@ -919,12 +917,12 @@ int three=0;
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
-		
+
 		PlansWriter writer = new PlansWriter(population,"./networks/padang_plans10p.xml","v4");
 		writer.write();
 	}
 
-	public static void main(String[] args){
+	public static void main(final String[] args){
 
 		//PlansAlgorihtm
 //		routeTransitionCheck(args);
@@ -948,10 +946,10 @@ int three=0;
 //		networkClipperTest();
 
 //		asciiNetParser();
-		
+
 //		plansReduction();
 //		planMinMax();
-		
+
 //		networkReadWrite();
 	}
 
@@ -964,7 +962,7 @@ int three=0;
 //
 //	}
 
-	private static void parseNode(String line, NetworkLayer network) {
+	private static void parseNode(final String line, final NetworkLayer network) {
 
 		//// Sioux Falls
 //		String[] result = line.split("\t", 4);
@@ -974,7 +972,7 @@ int three=0;
 		double y = Double.parseDouble(result[2]) * 1000;
 		network.createNode(result[0], Double.toString(x), Double.toString(y), null);
 	}
-	private static void parseLink(String line, NetworkLayer network, String id) {
+	private static void parseLink(final String line, final NetworkLayer network, final String id) {
 
 
 		//// Sioux Falls

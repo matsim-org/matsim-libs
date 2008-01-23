@@ -23,21 +23,16 @@ package playground.arvid_daniel.coopers.fromArvid;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.withinday.coopers.CoopersControler;
 
-public class MyControler2 extends CoopersControler {
+public class MyControler2 {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		String[] conf = {"../studies/arvidDaniel/input/testExtended/config.xml"};
-		MyControler2 controler = new MyControler2();
+		CoopersControler controler = new CoopersControler(conf);
 		controler.setOverwriteFiles(true);
-		controler.run(conf);	
+		controler.run();
 
-		
 		// Visulize
 		String[] visargs = {"../studies/arvidDaniel/output/ITERS/it.0/Snapshot"};
-		
 		NetVis.main(visargs);
 	}
 

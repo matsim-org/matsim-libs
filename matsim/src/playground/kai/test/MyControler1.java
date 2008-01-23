@@ -49,7 +49,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.netvis.NetVis;
 
 
-public class MyControler1 extends Controler {
+public class MyControler1 {
 
 	public static void main(final String[] args) {
 
@@ -61,10 +61,9 @@ public class MyControler1 extends Controler {
 			Gbl.createConfig(args) ;
 		}
 
-		final MyControler1 controler = new MyControler1();
-		controler.setOverwriteFiles(true) ;
-
-		controler.run(null);
+		final Controler controler = new Controler(Gbl.getConfig());
+		controler.setOverwriteFiles(true);
+		controler.run();
 
 		// Visualize
 		String[] visargs = {"./output/equil/ITERS/it.100/Snapshot"};
