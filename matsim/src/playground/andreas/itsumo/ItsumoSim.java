@@ -87,7 +87,7 @@ public class ItsumoSim extends ExternalMobsim {
 			out.write(" <steps>3600</steps>"); out.newLine();
 			out.write(" <default_deceleration>0</default_deceleration>"); out.newLine();
 			out.write(" <sensor_interval>1</sensor_interval>"); out.newLine();
-			out.write(" <agent_interval>600</agent_interval>"); out.newLine();
+			out.write(" <agent_interval>40</agent_interval>"); out.newLine();
 			out.write(" <car_max_speed>3</car_max_speed>"); out.newLine();
 			out.write(" <cell_size>5</cell_size>"); out.newLine();
 			out.write(" <iteration_length>1</iteration_length>"); out.newLine();
@@ -155,13 +155,13 @@ public class ItsumoSim extends ExternalMobsim {
 			out.write("  <sensor>"); out.newLine();
 			out.write("   <name>total_stopped_cars_in_network</name>"); out.newLine();
 			out.write("   <file>" + Controler.getIterationPath() + "/" + Controler.getIteration() + ".itsumo.total_stopped_cars_in_network.log</file>"); out.newLine();
-			out.write("   <state>ON</state>"); out.newLine(); 
+			out.write("   <state>OFF</state>"); out.newLine(); 
 			out.write("  </sensor>"); out.newLine();   
 
 			out.write("  <sensor>"); out.newLine();
 			out.write("   <name>stopped_cars_in_lanesets</name>"); out.newLine();
 			out.write("   <file>" + Controler.getIterationPath() + "/" + Controler.getIteration() + ".itsumo.stopped_cars_in_lanesets.log</file>"); out.newLine();
-			out.write("   <state>ON</state>"); out.newLine(); 
+			out.write("   <state>OFF</state>"); out.newLine(); 
 			out.write("  </sensor>"); out.newLine();
 
 			out.write(" </sensors>"); out.newLine();		
