@@ -85,6 +85,8 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
+import org.matsim.replanning.StrategyManager;
+import org.matsim.replanning.StrategyManagerConfigLoader;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
@@ -132,6 +134,7 @@ public class Controler {
 	protected TravelCostI travelCostCalculator = null;
 	protected LegTravelTimeEstimator legTravelTimeEstimator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
+	protected StrategyManager strategyManager = null;
 
 	/*default*/ EventWriterTXT eventWriter = null;
 	/*default*/ boolean writeEvents = true;
@@ -176,7 +179,7 @@ public class Controler {
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
 	 *
-	 * @param args The arguments to initialize the controler with. <code>args[0]</code> is exptected to
+	 * @param args The arguments to initialize the controler with. <code>args[0]</code> is expected to
 	 * 		contain the path to a configuration file, <code>args[1]</code>, if set, is expected to contain
 	 * 		the path to a local copy of the DTD file used in the configuration file.
 	 */
@@ -355,6 +358,8 @@ public class Controler {
 		this.writeEvents = this.externalMobsim == null; // do not write events when using an external mobsim
 
 		this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
+
+		this.strategyManager = loadStrategyManager();
 	}
 
 	/* ===================================================================
@@ -489,7 +494,16 @@ public class Controler {
 		return this.scenarioData.getPopulation();
 	}
 
-	/** Loads a default set of {@link org.matsim.controler.listener ControlerListener} to privide basic functionality.
+	/**
+	 * @return A fully initialized StrategyManager for the plans replanning.
+	 */
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
+		StrategyManagerConfigLoader.load(this.config, manager, this.network, this.travelCostCalculator, this.travelTimeCalculator, this.legTravelTimeEstimator);
+		return manager;
+	}
+
+	/** Loads a default set of {@link org.matsim.controler.listener ControlerListener} to provide basic functionality.
 	 * <b>Note:</b> Be very careful if you overwrite this method! The order how the listeners are added is very important.
 	 * Check the comments in the source file before overwriting this method!
 	 */
@@ -498,24 +512,27 @@ public class Controler {
 		/* The order how the listeners are added is very important!
 		 * As dependencies between different listeners exist or listeners
 		 * may read and write to common variables, the order is important.
-		 * Example: The RoadPricing-Listener modifies the travelTimeCostCalculator,
-		 * which in turn is used by the PlansReplanning-Listener.
+		 * Example: The RoadPricing-Listener modifies the scoringFunctionFactory,
+		 * which in turn is used by the PlansScoring-Listener.
 		 */
 
 		this.addControlerListener(new CoreControlerListener());
 
-		this.addControlerListener(new PlansScoring());
 
 		// load road pricing, if requested
 		if (this.config.roadpricing().getTollLinksFile() != null) {
 			this.addControlerListener(new RoadPricing());
 		}
 
-		this.addControlerListener(new PlansReplanning(this.population, this.travelCostCalculator, this.travelTimeCalculator, this.legTravelTimeEstimator));
+		// the default handling of plans
+		this.addControlerListener(new PlansScoring());
+		this.addControlerListener(new PlansReplanning());
 		this.addControlerListener(new PlansDumping());
+
+		// optional: LegHistogram
 		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
 
-		// load score stats
+		// optional: score stats
 		try {
 			ScoreStats scoreStats = new ScoreStats(this.population, getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
 			this.addControlerListener(scoreStats);
@@ -839,6 +856,13 @@ public class Controler {
 	 */
 	public final ScoringFunctionFactory getScoringFunctionFactory() {
 		return this.scoringFunctionFactory;
+	}
+
+	/**
+	 * @return Returns the {@link org.matsim.replanning.StrategyManager} used for the replanning of plans.
+	 */
+	public final StrategyManager getStrategyManager() {
+		return this.strategyManager;
 	}
 
 	/* ===================================================================

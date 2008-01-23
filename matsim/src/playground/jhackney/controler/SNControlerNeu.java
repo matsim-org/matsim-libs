@@ -21,11 +21,43 @@
 package playground.jhackney.controler;
 
 import org.matsim.controler.Controler;
+import org.matsim.replanning.PlanStrategy;
+import org.matsim.replanning.StrategyManager;
+import org.matsim.replanning.selectors.BestPlanSelector;
+
+import playground.jhackney.replanning.SNFacilitySwitcher;
 
 public class SNControlerNeu extends Controler {
 
 	public SNControlerNeu(final String[] args) {
 		super(args);
+	}
+
+	@Override
+	/**
+	 * This is a test StrategyManager to see if the replanning works within the social network iterations.
+	 * @author jhackney
+	 * @return
+	 */
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
+
+		String maxvalue = this.config.findParam("strategy", "maxAgentPlanMemorySize");
+		manager.setMaxPlansPerAgent(Integer.parseInt(maxvalue));
+
+		// Best-scoring plan chosen each iteration
+		PlanStrategy strategy1 = new PlanStrategy(new BestPlanSelector());
+
+		// Social Network Facility Exchange test
+		System.out.println("### NOTE THAT FACILITY SWITCHER IS HARD-CODED TO RANDOM SWITCHING OF FACILITIES FROM KNOWLEDGE");
+		System.out.println("### NOTE THAT YOU SHOULD EXCHANGE KNOWLEDGE BASED ON ITS VALUE");
+		strategy1.addStrategyModule(new SNFacilitySwitcher());
+		//strategy1.addStrategyModule(new TimeAllocationMutator());
+
+
+		// Social Network Facility Exchange for all agents
+		manager.addStrategy(strategy1, 1.0);
+		return manager;
 	}
 
 	public static void main(final String[] args) {

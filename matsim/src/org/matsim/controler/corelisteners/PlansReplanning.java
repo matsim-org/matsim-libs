@@ -22,15 +22,7 @@ package org.matsim.controler.corelisteners;
 
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.ReplanningEvent;
-import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.ReplanningListener;
-import org.matsim.controler.listener.StartupListener;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.plans.Plans;
-import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.StrategyManagerConfigLoader;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
 
 /**
  * A {@link org.matsim.controler.listener.ControlerListener} that manages the
@@ -40,31 +32,11 @@ import org.matsim.router.util.TravelTimeI;
  *
  * @author mrieser
  */
-public class PlansReplanning implements StartupListener, ReplanningListener {
-
-	private final Plans population;
-	private StrategyManager strategyManager;
-	private final TravelCostI costFunction;
-	private final TravelTimeI timeFunction;
-	private final LegTravelTimeEstimator legEstimator;
-
-	public PlansReplanning(final Plans population, final TravelCostI costFunction,
-			final TravelTimeI timeFunction, final LegTravelTimeEstimator legEstimator) {
-		this.population = population;
-		this.costFunction = costFunction;
-		this.timeFunction = timeFunction;
-		this.legEstimator = legEstimator;
-	}
-
-	public void notifyStartup(final StartupEvent event) {
-		this.strategyManager = new StrategyManager();
-		Controler controler = event.getControler();
-		StrategyManagerConfigLoader.load(controler.getConfig(), this.strategyManager, controler.getNetwork(),
-				this.costFunction, this.timeFunction, this.legEstimator);
-	}
+public class PlansReplanning implements ReplanningListener {
 
 	public void notifyReplanning(final ReplanningEvent event) {
-		this.strategyManager.run(this.population, event.getIteration());
+		Controler controler = event.getControler();
+		controler.getStrategyManager().run(controler.getPopulation(), event.getIteration());
 	}
 
 }
