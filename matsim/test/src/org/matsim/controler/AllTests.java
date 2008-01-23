@@ -30,6 +30,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for org.matsim.controler");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(ControlerEventsTest.class);
+		suite.addTestSuite(ControlerTest.class);
 		//$JUnit-END$
 		return suite;
 	}
