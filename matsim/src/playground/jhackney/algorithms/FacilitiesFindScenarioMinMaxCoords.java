@@ -70,7 +70,7 @@ public class FacilitiesFindScenarioMinMaxCoords extends FacilitiesAlgorithm {
 			if(c.getX()>=max_x){
 				max_x=c.getX();
 			}
-			if(c.getX()>=max_y){
+			if(c.getY()>=max_y){
 				max_y=c.getY();
 			}
 		}
