@@ -26,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
@@ -35,6 +36,8 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.identifiers.IdI;
+
 
 import playground.jhackney.algorithms.FacilitiesFindScenarioMinMaxCoords;
 import playground.jhackney.socialnet.SocialNetEdge;
@@ -43,6 +46,7 @@ public class PajekWriter1 {
 
 	private CoordI minCoord;
 	private CoordI maxCoord;
+	private TreeMap<IdI, Integer> pajekIndex= new TreeMap<IdI, Integer>();
 	
 	public PajekWriter1(String dir, Facilities facilities){
 
@@ -56,6 +60,10 @@ public class PajekWriter1 {
 		fff.run(facilities);
 		minCoord = fff.getMinCoord();
 		maxCoord = fff.getMaxCoord();
+		System.out.println(" PW X_Max ="+maxCoord.getX());
+		System.out.println(" PW Y_Max ="+maxCoord.getY());
+		System.out.println(" PW X_Min ="+minCoord.getX());
+		System.out.println(" PW Y_Min ="+minCoord.getY());
 		
 	}
 
@@ -91,11 +99,12 @@ public class PajekWriter1 {
 					Gbl.errorMsg("Knowledge is not defined!");
 				}
 				Coord xy = (Coord) ((Act) p.getSelectedPlan().getActsLegs().get(0)).getCoord();
-				double x=xy.getX()/(maxCoord.getX()-minCoord.getX());
-				double y=xy.getY()/(maxCoord.getY()-minCoord.getY());
-				pjout.write(iperson + " " + p.getId() + " ["+x +" "+y+"]");
+				double x=(xy.getX()-minCoord.getX())/(maxCoord.getX()-minCoord.getX());
+				double y=(xy.getY()-minCoord.getY())/(maxCoord.getY()-minCoord.getY());
+				pjout.write(iperson + " \"" + p.getId() + "\" "+x +" "+y);
 				pjout.newLine();
 //				System.out.print(iperson + " " + p.getId() + " ["+xy.getX() +" "+xy.getY()+"]\n");
+				pajekIndex.put(p.getId(),iperson);
 				iperson++;
 
 			}
@@ -108,8 +117,8 @@ public class PajekWriter1 {
 				Person printPerson1 = printLink.person1;
 				Person printPerson2 = printLink.person2;
 
-				pjout.write(" " + printPerson1.getId() + " "
-						+ printPerson2.getId());
+				pjout.write(" " + pajekIndex.get(printPerson1.getId()) + " "+ pajekIndex.get(printPerson2.getId()));
+//				pjout.write(" " + printPerson1.getId() + " "+ printPerson2.getId());
 				pjout.newLine();
 //				System.out.print(" " +iter+" "+printLink.getLinkId()+" "+ printPerson1.getId() + " "
 //				+ printPerson2.getId() + " "
