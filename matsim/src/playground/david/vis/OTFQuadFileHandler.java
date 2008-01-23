@@ -153,10 +153,10 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 		// open file
 		try {
 			if (fileName.endsWith(".gz")) {
-				GZIPInputStream gzInStream =  new GZIPInputStream(new BufferedInputStream(new FileInputStream(fileName), BUFFERSIZE));
+				InputStream gzInStream =  new BufferedInputStream(new GZIPInputStream(new FileInputStream(fileName), BUFFERSIZE), BUFFERSIZE);
 				inStream = gzInStream;
 			} else {
-				inStream = new FileInputStream(fileName);
+				inStream = new BufferedInputStream(new FileInputStream(fileName), BUFFERSIZE);
 			}
 			inFile = new DataInputStream(inStream);
 		} catch (FileNotFoundException e) {
@@ -220,6 +220,7 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 				read = inFile.read(result,offset,remain);
 				remain -= read;
 				offset +=read;
+				//System.out.print(" " + read);
 			}
 
 			if (offset != size) throw new IOException("READ SIZE did not fit! File corrupted!");

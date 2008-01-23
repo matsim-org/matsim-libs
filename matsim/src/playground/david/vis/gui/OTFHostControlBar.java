@@ -57,7 +57,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private JButton playButton;
 	private JFormattedTextField timeField;
 	private int simTime = 0;
-	private boolean synchronizedPlay = false;
+	private boolean synchronizedPlay = true;
 
 	String address;
 	private OTFServerRemote host = null;
@@ -349,7 +349,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 			while (!terminate) {
 				try {
-					sleep(30);
+					//sleep(30);
 					if (isActive && synchronizedPlay) host.step();
 					
 					actTime = host.getLocalTime();

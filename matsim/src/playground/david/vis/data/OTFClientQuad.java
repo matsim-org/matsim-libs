@@ -9,6 +9,7 @@ import java.util.Collection;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
 
+import playground.david.vis.gui.PoolFactory;
 import playground.david.vis.interfaces.OTFDataReader;
 import playground.david.vis.interfaces.OTFServerRemote;
 
@@ -92,12 +93,15 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 	private void getData(OTFServerRemote host, QuadTree.Rect bound, boolean readConst)
 			throws RemoteException {
-		Gbl.startMeasurement();
 		bound = host.isLive() ? bound : this.top.getBounds();
 		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, bound);
-		DataInputStream in = new DataInputStream(new ByteArrayInputStream(
-				bbyte, 0, bbyte.length));
+		DataInputStream in = new DataInputStream(new ByteArrayInputStream(bbyte, 0, bbyte.length));
+		Gbl.startMeasurement();
 		int colls = this.execute(bound, this.new ReadDataExecutor(in, readConst));
+
+		PoolFactory.resetAll();
+		
+		System.out.print("getData: "); Gbl.printElapsedTime();
 	}
 
 	synchronized public void getConstData(OTFServerRemote host) throws RemoteException {

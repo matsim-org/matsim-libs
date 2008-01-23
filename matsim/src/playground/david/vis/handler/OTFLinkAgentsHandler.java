@@ -18,9 +18,12 @@ import playground.david.vis.data.OTFDataWriter;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.data.OTFWriterFactory;
 import playground.david.vis.data.OTFData.Receiver;
+import playground.david.vis.gui.PoolFactory;
 
 public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	static Class agentReceiverClass = null;
+	static PoolFactory<OTFDataSimpleAgent.Receiver> factoryAgent;
+	
 	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	
 	static public class Writer extends  OTFDefaultLinkHandler.Writer implements Serializable, OTFWriterFactory<QueueLink>{
@@ -72,18 +75,9 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		// Convert to km/h 
 		float color = in.readFloat()*3.6f;
 
-		try {
-			OTFDataSimpleAgent.Receiver drawer = (OTFDataSimpleAgent.Receiver) agentReceiverClass.newInstance();
+			OTFDataSimpleAgent.Receiver drawer =  factoryAgent.getOne();
 			drawer.setAgent(id, x, y, state, color);
 			agents.add(drawer);
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			System.out.println("WARNING: Agent receiver class not set!");
-			e.printStackTrace();
-			System.exit(1);
-		}
 
  	}
 	
@@ -111,6 +105,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		//connect agent receivers
 		if (receiver  instanceof OTFDataSimpleAgent.Receiver) {
 			this.agentReceiverClass = receiver.getClass();
+			this.factoryAgent = PoolFactory.get(this.agentReceiverClass);
 		}
 
 	}
