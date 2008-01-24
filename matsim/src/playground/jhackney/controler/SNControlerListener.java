@@ -47,12 +47,14 @@ import playground.jhackney.interactions.SpatialInteractor;
 import playground.jhackney.interactions.SpatialSocialOpportunityTracker;
 import playground.jhackney.io.JUNGPajekNetWriterWrapper;
 import playground.jhackney.io.PajekWriter1;
+import playground.jhackney.scoring.SNScoringFunctionFactory03;
 import playground.jhackney.socialnet.SocialNetwork;
 import playground.jhackney.statistics.SocialNetworkStatistics;
 
 public class SNControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 
 	protected boolean overwriteFiles = true;
+	private boolean CALCSTATS = true;
 	private static final String DIRECTORY_SN = "socialnets";
 	public static String SOCNET_OUT_DIR = null;
 	private String outputPath;
@@ -137,17 +139,21 @@ public class SNControlerListener implements StartupListener, IterationStartsList
 		this.snet.removeLinks(snIter);
 		this.log.info(" ... done");
 
+		if(CALCSTATS){
 		this.log.info(" Calculating and reporting network statistics ...");
 		this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
 		this.log.info(" ... done");
-
+		}
+		
 		this.log.info(" Writing out social network for iteration " + snIter + " ...");
 		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
 		this.log.info(" ... done");
 
 		if (event.getIteration() == this.controler.getLastIteration()) {
+			if(CALCSTATS){
 			this.log.info("----------Closing social network statistic files and wrapping up ---------------");
 			this.snetstat.closeFiles();
+			}
 			snwrapup();
 		}
 	}
@@ -160,7 +166,7 @@ public class SNControlerListener implements StartupListener, IterationStartsList
 
 		// add the socNet-score to the existing scoring function
 		controler.setScoringFunctionFactory(
-				new SNScoringFunctionFactory(controler.getScoringFunctionFactory()));
+				new SNScoringFunctionFactory03(controler.getScoringFunctionFactory()));
 
 		if (total_spatial_fraction(this.fractionS) > 0) { // only generate the map if spatial meeting is important in this experiment
 
@@ -262,12 +268,14 @@ public class SNControlerListener implements StartupListener, IterationStartsList
 		this.snet = new SocialNetwork(this.controler.getPopulation());
 		this.log.info("... done");
 
+		if(CALCSTATS){
 		this.log.info(" Calculating the statistics of the initial social network)...");
 		this.snetstat=new SocialNetworkStatistics();
 		this.snetstat.openFiles();
 		this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
 		this.log.info(" ... done");
-
+		}
+		
 		this.log.info(" Writing out the initial social network ...");
 		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), 0);
 		this.log.info("... done");
@@ -285,6 +293,7 @@ public class SNControlerListener implements StartupListener, IterationStartsList
 		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(this.outputPath, this.snet, this.controler.getPopulation());
 		pnww.write();
 
+		if(CALCSTATS){
 		this.log.info(" Writing the statistics of the final social network to Output Directory...");
 
 		SocialNetworkStatistics snetstatFinal=new SocialNetworkStatistics();
@@ -293,6 +302,7 @@ public class SNControlerListener implements StartupListener, IterationStartsList
 
 		this.log.info(" ... done");
 		snetstatFinal.closeFiles();
+		}
 	}
 
 	/**
