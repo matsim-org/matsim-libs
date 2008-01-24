@@ -78,6 +78,8 @@ public class CreateTransimsNetwork {
 			if (network.getNode("999999") == null) {
 				network.getNode("0").setId("999999");
 				System.err.println("Changed node 0 to node 999999.");
+				// since links use toNode.getId() etc., this should also adjust the corresponding nodeIds for the links
+				// correctly.
 			}
 		}
 		if (network.getLink(new Id(0)) != null) {
