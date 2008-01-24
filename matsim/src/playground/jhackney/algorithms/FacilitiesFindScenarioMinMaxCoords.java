@@ -52,6 +52,7 @@ public class FacilitiesFindScenarioMinMaxCoords extends FacilitiesAlgorithm {
 	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
+		System.out.println("  NOTE you could get these limits from world");
 
 		double min_x = Double.MAX_VALUE;
 		double min_y = Double.MAX_VALUE;
