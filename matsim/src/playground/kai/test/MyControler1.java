@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyControler1.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,27 +22,6 @@ package playground.kai.test;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
-/* *********************************************************************** *
- *                                                                         *
- *                                                                         *
- *                          ---------------------                          *
- * copyright       : (C) 2007 by Michael Balmer, Marcel Rieser,            *
- *                   David Strippgen, Gunnar Flötteröd, Konrad Meister,    *
- *                   Kai Nagel, Kay W. Axhausen                            *
- *                   Technische Universitaet Berlin (TU-Berlin) and        *
- *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.netvis.NetVis;
@@ -55,8 +33,9 @@ public class MyControler1 {
 
 		if ( args.length==0 ) {
 //			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});
-//			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
-			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
+			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
+//			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
+//			Gbl.createConfig(new String[] {"../padang/dlr-network/pconfig.xml"});
 		} else {
 			Gbl.createConfig(args) ;
 		}
@@ -66,7 +45,7 @@ public class MyControler1 {
 		controler.run();
 
 		// Visualize
-		String[] visargs = {"./output/equil/ITERS/it.100/Snapshot"};
+		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
 		NetVis.main(visargs);
 
 	}
