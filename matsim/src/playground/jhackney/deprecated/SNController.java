@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.controler;
+package playground.jhackney.deprecated;
 
 import static org.matsim.controler.Controler.DIRECTORY_ITERS;
 import static org.matsim.controler.Controler.outputPath;
@@ -44,6 +44,7 @@ import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
+import playground.jhackney.controler.SNControlerListener;
 import playground.jhackney.interactions.NonSpatialInteractor;
 import playground.jhackney.interactions.SocializingOpportunity;
 import playground.jhackney.interactions.SpatialInteractor;
@@ -59,6 +60,7 @@ public class SNController extends Controler {
 
 	protected boolean overwriteFiles = true;
 	private final boolean SNFLAG = true;
+	private boolean CALCSTATS = true;
 	private static final String DIRECTORY_SN = "socialnets";
 	public static String SOCNET_OUT_DIR = null;
 
@@ -180,17 +182,32 @@ public class SNController extends Controler {
 		this.snet.removeLinks(snIter);
 		System.out.println(" ... done");
 
+<<<<<<< .mine
+		if(CALCSTATS){
+			System.out.println(" Calculating and reporting network statistics ...");
+			snetstat.calculate(snIter, snet, population);
+			System.out.println(" ... done");
+		}
+=======
 		System.out.println(" Calculating and reporting network statistics ...");
 		this.snetstat.calculate(snIter, this.snet, this.population);
 		System.out.println(" ... done");
+>>>>>>> .r469
 
 		System.out.println(" Writing out social network for iteration " + snIter + " ...");
 		this.pjw.write(this.snet.getLinks(), this.population, snIter);
 		System.out.println(" ... done");
 
 		if(iteration == maxIterations){
+<<<<<<< .mine
+			if(CALCSTATS){
+				System.out.println("----------Closing social network statistic files and wrapping up ---------------");
+				snetstat.closeFiles();
+			}
+=======
 			System.out.println("----------Closing social network statistic files and wrapping up ---------------");
 			this.snetstat.closeFiles();
+>>>>>>> .r469
 			snwrapup();
 		}
 	}
@@ -198,15 +215,29 @@ public class SNController extends Controler {
 		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(outputPath,this.snet, this.population);
 		pnww.write();
 
-		System.out.println(" Writing the statistics of the final social network to Output Directory...");
+		if(CALCSTATS){
+			System.out.println(" Writing the statistics of the final social network to Output Directory...");
 
+<<<<<<< .mine
+			SocialNetworkStatistics snetstatFinal=new SocialNetworkStatistics();
+			snetstatFinal.openFiles(outputPath);
+			snetstatFinal.calculate(maxIterations, snet, population);
+=======
 		SocialNetworkStatistics snetstatFinal=new SocialNetworkStatistics();
 		snetstatFinal.openFiles(outputPath);
 		snetstatFinal.calculate(maxIterations, this.snet, this.population);
+>>>>>>> .r469
 
+<<<<<<< .mine
+			System.out.println(" ... done");
+			snetstatFinal.closeFiles();
+		}
+	}		
+=======
 		System.out.println(" ... done");
 		snetstatFinal.closeFiles();
 	}
+>>>>>>> .r469
 
 	@Override
 	protected void setupIteration(final int iteration) {
@@ -351,11 +382,21 @@ public class SNController extends Controler {
 		this.snet = new SocialNetwork(this.population);
 		System.out.println("... done");
 
+<<<<<<< .mine
+		if(CALCSTATS){
+			System.out.println(" Calculating the statistics of the initial social network)...");
+			snetstat=new SocialNetworkStatistics();
+			snetstat.openFiles();
+			snetstat.calculate(0, snet, population);
+			System.out.println(" ... done");
+		}
+=======
 		System.out.println(" Calculating the statistics of the initial social network)...");
 		this.snetstat=new SocialNetworkStatistics();
 		this.snetstat.openFiles();
 		this.snetstat.calculate(0, this.snet, this.population);
 		System.out.println(" ... done");
+>>>>>>> .r469
 
 		System.out.println(" Writing out the initial social network ...");
 		this.pjw.write(this.snet.getLinks(), this.population, 0);
