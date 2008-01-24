@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonModeChoiceModel.java
+ * ModelMobilityTools.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -101,6 +101,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			}
 
 			prev_act = act;
+		}	
 			double distance = 0.0;
 			if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
 			if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
@@ -153,7 +154,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 				Leg leg = leg_it.next();
 				leg.setMode(mode);
 			}
-		}
+		
 	}
 
 	public void run(Plan plan) {
