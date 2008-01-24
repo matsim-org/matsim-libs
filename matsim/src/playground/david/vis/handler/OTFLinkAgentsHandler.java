@@ -1,9 +1,8 @@
 package playground.david.vis.handler;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -20,32 +19,35 @@ import playground.david.vis.data.OTFWriterFactory;
 import playground.david.vis.data.OTFData.Receiver;
 import playground.david.vis.gui.PoolFactory;
 
-public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
+public class OTFLinkAgentsHandler extends OTFNoDynLinkHandler {
 	static Class agentReceiverClass = null;
 	static PoolFactory<OTFDataSimpleAgent.Receiver> factoryAgent;
 	
 	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	
-	static public class Writer extends  OTFDefaultLinkHandler.Writer implements Serializable, OTFWriterFactory<QueueLink>{
+	static public class Writer extends  OTFNoDynLinkHandler.Writer implements Serializable, OTFWriterFactory<QueueLink>{
 
 		static transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 
 		@Override
-		public void writeConstData(DataOutputStream out) throws IOException {
+		public void writeConstData(ByteBuffer out) throws IOException {
 			super.writeConstData(out);
 		}
 
 
-		public void writeAgent(PositionInfo pos, DataOutputStream out) throws IOException {
-			out.writeUTF(pos.getAgentId().toString());
-			out.writeFloat((float)(pos.getEasting() - OTFServerQuad.offsetEast));
-			out.writeFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
-			out.writeInt(pos.getVehicleState()== VehicleState.Parking ? 1:0);
-			out.writeFloat((float)pos.getSpeed());
+		public void writeAgent(PositionInfo pos, ByteBuffer out) throws IOException {
+			String id = pos.getAgentId().toString();
+			out.putInt(id.length());
+			for (int i=0; i<id.length(); i++) out.putChar(id.charAt(i));
+			out.asCharBuffer().put(pos.getAgentId().toString());
+			out.putFloat((float)(pos.getEasting() - OTFServerQuad.offsetEast));
+			out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
+			out.putInt(pos.getVehicleState()== VehicleState.Parking ? 1:0);
+			out.putFloat((float)pos.getSpeed());
 		}
 		
 		@Override
-		public void writeDynData(DataOutputStream out) throws IOException {
+		public void writeDynData(ByteBuffer out) throws IOException {
 			super.writeDynData(out);
 			// Write additional agent data
 	        /*
@@ -53,7 +55,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	         */
 	        positions.clear();
 			src.getVehiclePositions(positions);
-			out.writeInt(positions.size());
+			out.putInt(positions.size());
 
 			for (PositionInfo pos : positions) {
 				writeAgent(pos, out);
@@ -67,33 +69,46 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 	}
 	
-	public void readAgent(DataInputStream in) throws IOException {
-		String id = in.readUTF();
-		float x = in.readFloat();
-		float y = in.readFloat();
-		int state = in.readInt();
+	static char[] idBuffer = new char[100];
+	
+	public void readAgent(ByteBuffer in) throws IOException {
+		int length = in.getInt();
+		idBuffer = new char[length];
+		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
+		float x = in.getFloat();
+		float y = in.getFloat();
+		int state = in.getInt();
 		// Convert to km/h 
-		float color = in.readFloat()*3.6f;
+		float color = in.getFloat()*3.6f;
 
-			OTFDataSimpleAgent.Receiver drawer =  factoryAgent.getOne();
-			drawer.setAgent(id, x, y, state, color);
+			OTFDataSimpleAgent.Receiver drawer = null;
+			try {
+				drawer = (playground.david.vis.data.OTFDataSimpleAgent.Receiver) agentReceiverClass.newInstance();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} //factoryAgent.getOne();
+			drawer.setAgent(idBuffer, x, y, state, color);
 			agents.add(drawer);
 
  	}
 	
 	@Override
-	public void readDynData(DataInputStream in) throws IOException {
+	public void readDynData(ByteBuffer in) throws IOException {
 		super.readDynData(in);
 		// read additional agent data
 		agents.clear();
 		
-		int count = in.readInt();
+		int count = in.getInt();
 		for(int i= 0; i< count; i++) readAgent(in);
 	}
 
 
 	@Override
-	public void readConstData(DataInputStream in) throws IOException {
+	public void readConstData(ByteBuffer in) throws IOException {
 		super.readConstData(in);
 	}
 

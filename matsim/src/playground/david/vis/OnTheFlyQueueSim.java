@@ -32,7 +32,6 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 
@@ -47,7 +46,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	@Override
 	protected void prepareSim() {
 		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
-		if (otfwriter == null) otfwriter = new OTFQuadFileHandler(10,network,"output/OTFQuadfile.mvi");
+		if (otfwriter == null) otfwriter = new OTFQuadFileHandler(600,network,"output/OTFQuadfileNoParking10p_wip.mvi.gz");
 		if(otfwriter != null) otfwriter.open();
 
 		super.prepareSim();
@@ -99,9 +98,9 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 
 		String netFileName = studiesRoot + "berlin-wip/network/wip_net.xml";
-		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter001car_hwh.routes_wip.plans.xml.gz"; // 15931 agents
+//		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter001car_hwh.routes_wip.plans.xml.gz"; // 15931 agents
 //		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml.gz"; // 160171 agents
-//		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car.routes_wip.plans.xml.gz";  // 299394 agents
+		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car.routes_wip.plans.xml.gz";  // 299394 agents
 		String worldFileName = studiesRoot + "berlin-wip/synpop-2006-04/world_TVZ.xml";
 
 		Config config = Gbl.createConfig(args);
@@ -135,7 +134,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		world.setEvents(events);
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
-		config.simulation().setEndTime(Time.parseTime("17:02:00"));
+		config.simulation().setEndTime(Time.parseTime("12:02:00"));
 		config.network().setInputFile(netFileName);
 
 		config.simulation().setSnapshotFormat("none");
@@ -150,9 +149,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 		Gbl.printElapsedTime();
 
-		String[] visargs = {"./output/remove_thisB"};
-		NetVis.main(visargs);
-
+	
 	}
 
 	public void setOtfwriter(OTFQuadFileHandler otfwriter) {

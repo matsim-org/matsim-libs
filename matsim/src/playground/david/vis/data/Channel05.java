@@ -20,8 +20,7 @@ class Channel05{
     // object with data of mixed types
 	  ByteArrayOutputStream  out = new ByteArrayOutputStream(20000000);
 	  DataOutputStream data = new DataOutputStream(out);
-    ByteBuffer buf =
-               ByteBuffer.allocate(16+4*600000);
+    ByteBuffer buf = ByteBuffer.allocate(16+4*600000);
     Object test = new Object();
     byte [] src = out.toByteArray();
 

@@ -21,7 +21,7 @@
 package playground.david.vis;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import java.nio.ByteBuffer;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -145,10 +145,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 	private double lastTime = -1.0;
 	public void updateOut(double time) {
 			for(String id : updateThis) {
-				out.reset();
+				buf.position(0);
 				QuadStorage act = quads.get(id);
-				act.quad.writeDynData(act.rect, new DataOutputStream(out));
-				act.buffer = out.toByteArray();
+				act.quad.writeDynData(act.rect, buf);
+				act.buffer = buf.array();
 			}
 			updateThis.clear();
 		lastTime = time;
@@ -267,24 +267,28 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 	}
 
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
-		out.reset();
-		quads.get(id).quad.writeConstData(new DataOutputStream(out));
+		buf.position(0);
+		quads.get(id).quad.writeConstData(buf);
 		byte [] result;
-		synchronized (out) {
-			result = out.toByteArray();
+		synchronized (buf) {
+			result = buf.array();
 		}
 		return result;
 	}	
+
+	
+	ByteBuffer buf = ByteBuffer.allocate(20000000);
+
 	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException {
 		byte [] result;
 		QuadStorage updateQuad = quads.get(id);
 		updateQuad.rect = bounds;
 
 		if (status == PAUSE) {
-			synchronized (out) {
-				out.reset();
-				updateQuad.quad.writeDynData(bounds, new DataOutputStream(out));
-				return out.toByteArray();
+			synchronized (buf) {
+				buf.position(0);
+				updateQuad.quad.writeDynData(bounds, buf);
+				return buf.array();
 			}
 		}
 		// otherwise == PLAY, we need to sort this into the array of demanding quads and then they will be fillesd next in getStatus is called

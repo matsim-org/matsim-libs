@@ -22,7 +22,6 @@ package playground.david.vis;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
@@ -33,12 +32,14 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Plan;
 import org.matsim.utils.collections.QuadTree.Rect;
@@ -62,14 +63,14 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 	private final String id = null;
 	private byte[] actBuffer = null;
 	
-	public ByteArrayOutputStream out = null;
+	//public ByteArrayOutputStream out = null;
 	double nextTime = -1;
 	double intervall_s = 1;
 	Map<Double,Long> timeSteps = new HashMap<Double,Long>();
 
 	public OTFQuadFileHandler(double intervall_s, QueueNetworkLayer network, String fileName) {
 		if (network != null) net = network;
-		out = new ByteArrayOutputStream(500000);
+		//out = new ByteArrayOutputStream(500000);
 		this.intervall_s = intervall_s;
 		this.fileName = fileName;
 	}
@@ -84,24 +85,27 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 		}
 	}
 
+	ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
+	
 	public void dumpConstData() throws IOException {
+		buf.position(0);
 		outFile.writeDouble(-1.);
-		out.reset();
-		quad.writeConstData(new DataOutputStream(out));
-		outFile.writeInt(out.size());
-		out.writeTo(outFile);
+		quad.writeConstData(buf);
+		
+		outFile.writeInt(buf.position());
+		outFile.write(buf.array(), 0, buf.position());
 	}
 	
 	public boolean dump(int time_s) throws IOException {
 		if (time_s >= nextTime) {
 			// dump time
+			buf.position(0);
 			outFile.writeDouble(time_s);
 			// get State
 			//Gbl.startMeasurement();
-			out.reset();
-			quad.writeDynData(null, new DataOutputStream(out));
-			outFile.writeInt(out.size());
-			out.writeTo(outFile);
+			quad.writeDynData(null, buf);
+			outFile.writeInt(buf.position());
+			outFile.write(buf.array(), 0, buf.position());
 			// dump State
 			//Gbl.printElapsedTime();
 
@@ -115,7 +119,7 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 		// open file
 		try {
 			if (fileName.endsWith(".gz")) {
-				outStream = new GZIPOutputStream (new FileOutputStream(fileName),BUFFERSIZE);
+				outStream = new BufferedOutputStream(new GZIPOutputStream (new FileOutputStream(fileName),BUFFERSIZE),BUFFERSIZE);
 			}else {
 				outStream = new BufferedOutputStream(new FileOutputStream(fileName),BUFFERSIZE);
 			}
@@ -132,10 +136,17 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 		try {
 			outFile.writeDouble(intervall_s);
 			//outFile.writeUTF("fromFile");
+			Gbl.startMeasurement();
 			quad = new OTFServerQuad(net);
+			System.out.print("build Quad on Server: "); Gbl.printElapsedTime();
+
+			Gbl.startMeasurement();
 			quad.fillQuadTree(new OTFDefaultNetWriterFactoryImpl());
+			System.out.print("fill writer Quad on Server: "); Gbl.printElapsedTime();
+			Gbl.startMeasurement();
 			new ObjectOutputStream(outStream).writeObject(quad);
 			dumpConstData();
+			System.out.print("write to file  Quad on Server: "); Gbl.printElapsedTime();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -204,15 +215,17 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 	}
 
 	long filepos = 0;
+	byte [] result = result = new byte[BUFFERSIZE];
+	
 	public byte[] getStateBuffer() throws RemoteException {
 		int size =  0 ;
-		byte [] result = null;
+		Gbl.startMeasurement();
 
 		try {
 			nextTime = inFile.readDouble();
 			size = inFile.readInt();
 
-			result = new byte[size];
+			
 			int offset = 0;
 			int remain = size;
 			int read = 0;
@@ -220,7 +233,7 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 				read = inFile.read(result,offset,remain);
 				remain -= read;
 				offset +=read;
-				//System.out.print(" " + read);
+				System.out.print(" " + read);
 			}
 
 			if (offset != size) throw new IOException("READ SIZE did not fit! File corrupted!");
@@ -230,6 +243,7 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 		} catch (IOException e) {
 			System.out.println(e.toString());
 		}
+		System.out.print("getStateBuffer: "); Gbl.printElapsedTime();
 
 		return result;
 	}

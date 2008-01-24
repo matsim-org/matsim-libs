@@ -161,7 +161,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 //		spin.setMaximumSize(new Dimension(75,30));
 //		spin.addChangeListener(this);
 
-		movieTimer.start();
+		//movieTimer.start();
 
 	}
 
@@ -184,8 +184,10 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private void stopMovie() {
 		if (movieTimer != null) {
+			movieTimer.stop();
 			movieTimer.setActive(false);
 			playButton.setText("PLAY");
+			playButton.setSelected(false);
 		}
 	}
 
@@ -194,29 +196,29 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void pressed_PAUSE() throws IOException {
-		movieTimer.setActive(false);
-		playButton.setSelected(false);
+		stopMovie();
 		host.pause();
 	}
 
 	private void pressed_PLAY() throws RemoteException {
+		movieTimer.start();
 		movieTimer.setActive(true);
 		playButton.setSelected(true);
 	}
 
 	private void pressed_STEP_F() throws IOException {
-		playButton.setSelected(false);
-		movieTimer.setActive(false);
+		stopMovie();
 		host.step();
+		simTime = host.getLocalTime();
 		invalidateHandlers();
 	}
 
 	private void pressed_STEP_FF() throws IOException {
-		host.step();
+		pressed_STEP_F();
 	}
 
 	private void pressed_STOP() throws IOException {
-		//host.stop()
+		pressed_PAUSE();
 	}
 
 	private void changed_SET_TIME(ActionEvent event) throws IOException {
@@ -349,10 +351,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 			while (!terminate) {
 				try {
-					//sleep(30);
+					sleep(30);
 					if (isActive && synchronizedPlay) host.step();
 					
-					actTime = host.getLocalTime();
+					actTime = simTime;
+					simTime = host.getLocalTime();
 					if (simTime != actTime) {
 						updateTimeLabel();
 						repaint();

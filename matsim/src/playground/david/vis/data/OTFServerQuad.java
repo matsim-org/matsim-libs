@@ -1,8 +1,8 @@
 package playground.david.vis.data;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -53,10 +53,10 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 	}
 
 	class WriteDataExecutor extends Executor<OTFDataWriter> {
-		final DataOutputStream out;
+		final ByteBuffer out;
 		boolean writeConst;
 
-		public WriteDataExecutor(DataOutputStream out, boolean writeConst) {
+		public WriteDataExecutor(ByteBuffer out, boolean writeConst) {
 			this.out = out;
 			this.writeConst = writeConst;
 		}
@@ -158,12 +158,12 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 		return newServer;
 	}
 
-	public void writeConstData(DataOutputStream out) {
+	public void writeConstData(ByteBuffer out) {
 		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
 				this.new WriteDataExecutor(out,true));
 	}
 
-	public void writeDynData(QuadTree.Rect bounds, DataOutputStream out) {
+	public void writeDynData(QuadTree.Rect bounds, ByteBuffer out) {
 		int colls = this.execute(bounds, this.new WriteDataExecutor(out,false));
 	}
 

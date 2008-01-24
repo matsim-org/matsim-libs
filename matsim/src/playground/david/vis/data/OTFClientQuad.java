@@ -1,8 +1,7 @@
 package playground.david.vis.data;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
@@ -47,10 +46,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	}
 
 	class ReadDataExecutor extends Executor<OTFDataReader> {
-		final DataInputStream in;
+		final ByteBuffer in;
 		boolean readConst;
 
-		public ReadDataExecutor(DataInputStream in, boolean readConst) {
+		public ReadDataExecutor(ByteBuffer in, boolean readConst) {
 			this.in = in;
 			this.readConst = readConst;
 		}
@@ -95,13 +94,13 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 			throws RemoteException {
 		bound = host.isLive() ? bound : this.top.getBounds();
 		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, bound);
-		DataInputStream in = new DataInputStream(new ByteArrayInputStream(bbyte, 0, bbyte.length));
+		ByteBuffer in = ByteBuffer.wrap(bbyte);
 		Gbl.startMeasurement();
 		int colls = this.execute(bound, this.new ReadDataExecutor(in, readConst));
+		System.out.print("readData: "); Gbl.printElapsedTime();
 
 		PoolFactory.resetAll();
 		
-		System.out.print("getData: "); Gbl.printElapsedTime();
 	}
 
 	synchronized public void getConstData(OTFServerRemote host) throws RemoteException {

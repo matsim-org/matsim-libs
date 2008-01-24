@@ -13,7 +13,7 @@ import playground.david.vis.data.OTFWriterFactory;
 import playground.david.vis.data.OTFData.Receiver;
 import playground.david.vis.interfaces.OTFDataReader;
 
-public class OTFDefaultLinkHandler implements OTFDataQuad.Provider, OTFDataReader{
+public class OTFNoDynLinkHandler implements OTFDataQuad.Provider, OTFDataReader{
 	private OTFDataQuad.Receiver quadReceiver = null;
 
 	static public class Writer extends  OTFDataWriter<QueueLink> implements Serializable, OTFWriterFactory<QueueLink> {
@@ -28,8 +28,6 @@ public class OTFDefaultLinkHandler implements OTFDataQuad.Provider, OTFDataReade
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			out.putFloat((float)src.getDisplayableTimeCapValue());
-			
 		}
 
 		public OTFDataWriter<QueueLink> getWriter() {
@@ -38,8 +36,6 @@ public class OTFDefaultLinkHandler implements OTFDataQuad.Provider, OTFDataReade
 	}
 	
 	public void readDynData(ByteBuffer in) throws IOException {
-		quadReceiver.setColor(in.getFloat());
-
 	}
 
 

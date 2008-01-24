@@ -1,9 +1,8 @@
 package playground.david.vis.handler;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 
 import org.matsim.mobsim.QueueNode;
 
@@ -20,13 +19,13 @@ public class OTFDefaultNodeHandler implements OTFDataReader,  OTFDataXYCoord.Pro
 	static public class Writer extends  OTFDataWriter<QueueNode> implements Serializable,OTFWriterFactory<QueueNode> {
 
 		@Override
-		public void writeConstData(DataOutputStream out) throws IOException {
-			out.writeFloat((float)(src.getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
-			out.writeFloat((float)(src.getCoord().getY() - OTFServerQuad.offsetNorth));
+		public void writeConstData(ByteBuffer out) throws IOException {
+			out.putFloat((float)(src.getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
+			out.putFloat((float)(src.getCoord().getY() - OTFServerQuad.offsetNorth));
 		}
 
 		@Override
-		public void writeDynData(DataOutputStream out) throws IOException {
+		public void writeDynData(ByteBuffer out) throws IOException {
 		}
 		
 		public OTFDataWriter<QueueNode> getWriter() {
@@ -36,12 +35,12 @@ public class OTFDefaultNodeHandler implements OTFDataReader,  OTFDataXYCoord.Pro
 }
 
 	
-	public void readConstData(DataInputStream in) throws IOException {
-		if (xyReceiver != null) xyReceiver.setXYCoord(in.readFloat(), in.readFloat());
-		else {in.readFloat();in.readFloat();};
+	public void readConstData(ByteBuffer in) throws IOException {
+		if (xyReceiver != null) xyReceiver.setXYCoord(in.getFloat(), in.getFloat());
+		else {in.getFloat();in.getFloat();};
 	}
 
-	public void readDynData(DataInputStream in) throws IOException {
+	public void readDynData(ByteBuffer in) throws IOException {
 	}
 
 

@@ -20,14 +20,14 @@
 
 package playground.david.vis.interfaces;
 
-import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import playground.david.vis.data.OTFData;
 
 public interface OTFDataReader {
-	public void readConstData(DataInputStream in) throws IOException;
-	public void readDynData(DataInputStream in) throws IOException;
+	public void readConstData(ByteBuffer in) throws IOException;
+	public void readDynData(ByteBuffer in) throws IOException;
 	public void connect(OTFData.Receiver receiver);
 	public void invalidate();
 }

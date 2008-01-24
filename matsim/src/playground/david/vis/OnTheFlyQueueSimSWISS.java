@@ -66,7 +66,7 @@ public class OnTheFlyQueueSimSWISS {
 		config.simulation().setEndTime(Time.parseTime("00:00:01"));
 
 		sim = new OnTheFlyQueueSim(net, population, events);
-		sim.setOtfwriter(new OTFQuadFileHandler(10,net,"OTFQuadfileSCHWEIZ2.vis.gz"));
+		sim.setOtfwriter(new OTFQuadFileHandler(10,net,"output/OTFQuadfileSCHWEIZ2.vis.gz"));
 		
 
 		sim.run();
