@@ -40,6 +40,7 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
  */
 public class NewAgentCarPlan extends PersonAlgorithm implements
 		PersonAlgorithmI {
+	private boolean haveCar;
 	/**
 	 * internal writer, which can be used by object of subclass.
 	 */
@@ -62,18 +63,31 @@ public class NewAgentCarPlan extends PersonAlgorithm implements
 
 	@Override
 	public void run(Person person) {
-		// copyPlans: the copy of the plans.
+		haveCar = false;
 		for (Plan pl : person.getPlans()) {
-			pl.setType("car");
+			// pl.setType("car");
 			List actsLegs = pl.getActsLegs();
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
 				if (i % 2 != 0) {
-					((Leg) o).setMode("car");
+					if (((Leg) o).getMode().equals("car")) {
+						haveCar = true;
+						pl.setType("car");
+						break;
+					}
+				}
+			}
+			if (haveCar) {
+				for (int i = 0; i < actsLegs.size(); i++) {
+					Object o = actsLegs.get(i);
+					if (i % 2 != 0) {
+						((Leg) o).setMode("car");
+					}
 				}
 			}
 		}
-		pw.writePerson(person);
+		if (haveCar) {
+			pw.writePerson(person);
+		}
 	}
-
 }
