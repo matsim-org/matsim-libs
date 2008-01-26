@@ -20,6 +20,7 @@
 
 package playground.yu.ivtch;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.plans.Leg;
@@ -65,7 +66,6 @@ public class NewAgentCarPlan extends PersonAlgorithm implements
 	public void run(Person person) {
 		haveCar = false;
 		for (Plan pl : person.getPlans()) {
-			// pl.setType("car");
 			List actsLegs = pl.getActsLegs();
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
@@ -73,7 +73,6 @@ public class NewAgentCarPlan extends PersonAlgorithm implements
 					if (((Leg) o).getMode().equals("car")) {
 						haveCar = true;
 						pl.setType("car");
-						break;
 					}
 				}
 			}

@@ -71,7 +71,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 	@Override
 	public void run(Person person) {
 		super.run(person);
-		if (person.getPlans().size() != 0) {
+		if (person.getPlans().size() > 0) {
 			pw.writePerson(person);
 		}
 	}
