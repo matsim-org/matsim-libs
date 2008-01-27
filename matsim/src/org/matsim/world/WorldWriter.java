@@ -40,11 +40,25 @@ public class WorldWriter extends Writer {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Creates a new WorldWriter with the output-file-location from the current configuration.
+	 *
+	 * @param world The world to be written to file.
+	 */
 	public WorldWriter(final World world) {
+		this(world, Gbl.getConfig().world().getOutputFile());
+	}
+
+	/**
+	 * Creates a new WorldWriter to write the specified world to the specified file.
+	 *
+	 * @param world
+	 * @param filename
+	 */
+	public WorldWriter(final World world, final String filename) {
 		super();
 		this.world = world;
-		this.outfile = Gbl.getConfig().world().getOutputFile();
-		this.version = null;
+		this.outfile = filename;
 		// always write out latest version, currently v2
 		this.dtd = "http://www.matsim.org/files/dtd/world_v2.dtd";
 		this.writerhandler = new WorldWriterHandlerImplV2();
@@ -54,7 +68,7 @@ public class WorldWriter extends Writer {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void writeLayer(Layer l) {
+	private final void writeLayer(final Layer l) {
 		if (l instanceof ZoneLayer) {
 			try {
 				this.writerhandler.startLayer((ZoneLayer)l, this.out);
@@ -77,7 +91,7 @@ public class WorldWriter extends Writer {
 		}
 	}
 
-	private final void writeRule(MappingRule m) {
+	private final void writeRule(final MappingRule m) {
 		if ((m.getDownLayer() instanceof ZoneLayer)) {
 			try {
 				this.writerhandler.startMapping(m, this.out);

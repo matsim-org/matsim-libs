@@ -42,11 +42,26 @@ public class FacilitiesWriter extends Writer {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Creates a new FacilitiesWriter to write the specified facilities to the file
+	 * specified as output-file in the current configuration.
+	 *
+	 * @param facilities
+	 */
 	public FacilitiesWriter(final Facilities facilities) {
+		this(facilities, Gbl.getConfig().facilities().getOutputFile());
+	}
+
+	/**
+	 * Creates a new FacilitiesWriter to write the specified facilities to the specified file.
+	 *
+	 * @param facilities
+	 * @param filename
+	 */
+	public FacilitiesWriter(final Facilities facilities, final String filename) {
 		super();
 		this.facilities = facilities;
-		this.outfile = Gbl.getConfig().facilities().getOutputFile();
-		this.version = null;
+		this.outfile = filename;
 		// always use newest version, currently v1
 		this.dtd = "http://www.matsim.org/files/dtd/facilities_v1.dtd";
 		this.handler = new FacilitiesWriterHandlerImplV1();

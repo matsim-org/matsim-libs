@@ -44,19 +44,21 @@ public class ConfigWriter extends Writer {
 	//////////////////////////////////////////////////////////////////////
 
 	public ConfigWriter(final Config config) {
-		super();
-		this.config = config;
-		this.outfile = config.config().getOutputFile();
-		this.version = null;
-		// always write the latest version, currently v1
-		this.dtd = "http://www.matsim.org/files/dtd/config_v1.dtd";
-		this.handler = new ConfigWriterHandlerImplV1();
+		this(config, config.config().getOutputFile());
 	}
 
-	public ConfigWriter(final Config config, java.io.Writer writer ) {
+	public ConfigWriter(final Config config, final java.io.Writer writer) {
 		super();
 		this.config = config;
 		this.outstream = writer;
+		this.handler = new ConfigWriterHandlerImplV1();
+	}
+
+	public ConfigWriter(final Config config, final String filename) {
+		this.config = config;
+		this.outfile = filename;
+		// always write the latest version, currently v1
+		this.dtd = "http://www.matsim.org/files/dtd/config_v1.dtd";
 		this.handler = new ConfigWriterHandlerImplV1();
 	}
 

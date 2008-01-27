@@ -53,36 +53,31 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 		Config config = Gbl.getConfig();
 		this.population = plans;
 		this.outfile = config.plans().getOutputFile();
-		this.version = config.plans().getOutputVersion();
 		this.write_person_percentage = config.plans().getOutputSample();
-		createHandler();
+		createHandler(config.plans().getOutputVersion());
 	}
 
-	public PlansWriter(final Plans plans, final String outfilename, final String outversion) {
+	public PlansWriter(final Plans plans, final String outfilename, final String version) {
 		super();
 		this.population = plans;
-		this.outfile = outfilename;;
-		this.version = outversion;
+		this.outfile = outfilename;
 		this.write_person_percentage = Gbl.getConfig().plans().getOutputSample();
-		createHandler();
+		createHandler(version);
 	}
 
 	// Just a helper method with code that was needed from both c'tors
-	private void createHandler() {
-		if (this.version.equals("v0")) {
+	private void createHandler(final String version) {
+		if (version.equals("v0")) {
 			this.dtd = "http://www.matsim.org/files/dtd/plans_v0.dtd";
 			this.handler = new PlansWriterHandlerImplV0();
-		}
-		else if (this.version.equals("v4")) {
+		} else if (version.equals("v4")) {
 			this.dtd = "http://www.matsim.org/files/dtd/plans_v4.dtd";
 			this.handler = new PlansWriterHandlerImplV4();
-		}
-		else if (this.version.equals("NULL")) {
+		} else if (version.equals("NULL")) {
 			this.dtd = "";
 			this.handler = new PlansWriterHandlerImplNIL();
-		}
-		else {
-			Gbl.errorMsg(this + "[output version not known]");
+		} else {
+			throw new IllegalArgumentException("output version \"" + version + "\" not known.");
 		}
 	}
 

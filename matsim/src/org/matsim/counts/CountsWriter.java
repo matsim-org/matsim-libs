@@ -41,7 +41,6 @@ public class CountsWriter extends Writer {
 		this.counts = counts;
 		this.outfile = filename;
 		this.dtd = null;
-		this.version = null;
 
 		// use the newest writer-version by default
 		this.handler = new CountsWriterHandlerImplV1();

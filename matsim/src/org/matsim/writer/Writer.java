@@ -56,7 +56,6 @@ public abstract class Writer {
 
 	protected String outfile;
 	protected String dtd;
-	protected String version;
 	protected BufferedWriter out = null;
 
 	//////////////////////////////////////////////////////////////////////
@@ -98,7 +97,6 @@ public abstract class Writer {
 	public String toString() {
 		return "[outfile=" + this.outfile + "]" +
 				"[dtd=" + this.dtd + "]" +
-				"[out=" + this.out + "]" +
-				"[version=" + this.version + "]";
+				"[out=" + this.out + "]";
 	}
 }

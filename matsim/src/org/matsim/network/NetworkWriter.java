@@ -48,7 +48,6 @@ public class NetworkWriter extends Writer {
 		super();
 		this.network = network;
 		this.outfile = filename;
-		this.version = null;
 		// always write out in newest version, currently v1
 		this.dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
 		this.handler = new NetworkWriterHandlerImplV1();

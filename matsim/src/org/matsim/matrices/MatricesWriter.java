@@ -68,7 +68,6 @@ public class MatricesWriter extends Writer {
 		super();
 		this.matrices = matrices;
 		this.outfile = Gbl.getConfig().matrices().getOutputFile();
-		this.version = null;
 		// always write out in newest version, currently v1
 		this.dtd = "http://matsim.org/files/dtd/matrices_v1.dtd";
 		this.handler = new MatricesWriterHandlerImplV1();
