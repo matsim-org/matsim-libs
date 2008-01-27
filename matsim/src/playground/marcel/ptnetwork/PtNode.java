@@ -22,15 +22,14 @@ package playground.marcel.ptnetwork;
 import org.matsim.network.Node;
 
 public class PtNode extends Node{
-	
+
 	protected PtNode(final String id, final String x, final String y, final String type) {
 		super(id, x, y, type);
 	}
-	
+
 	protected int actTime = Integer.MAX_VALUE;
 	protected int actCost = Integer.MAX_VALUE;
 	protected PtLink shortestPath = null;
 	protected long dijkstraCounter = Long.MIN_VALUE;
 
-	 // TODO [TT] getter and setter methods :)
 }

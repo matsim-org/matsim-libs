@@ -71,7 +71,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 		return this.lineName;
 	}
 
-	public void setLineName(String name){
+	public void setLineName(final String name){
 		this.lineName=name;
 	}
 
@@ -79,7 +79,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 		return this.vType;
 	}
 
-	public void setVType(String vType){
+	public void setVType(final String vType){
 		this.vType=vType;
 	}
 
@@ -91,7 +91,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 		return this.idCnt;
 	}
 
-	public void read (String filename, int idCnt) {
+	public void read (final String filename, final int idCnt) {
 		this.idCnt=idCnt;
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -113,8 +113,8 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 	}
 
 	@Override
-	public void startElement(String namespaceURI,String sName,
-			String qName,Attributes attrs) {
+	public void startElement(final String namespaceURI,final String sName,
+			final String qName,final Attributes attrs) {
 		/*
 		 * creating buffer for character()
 		 * creating temp objects
@@ -147,8 +147,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 	}
 
 	@Override
-	public void endElement(String uri, String localName, String qName) {
-//		TODO [TT] vSys letter
+	public void endElement(final String uri, final String localName, final String qName) {
 
 		/* ****************************
 		 * copy buffer to tmp
@@ -380,7 +379,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 	}
 
 	@Override
-	public void characters (char[] ch, int start, int length){
+	public void characters (final char[] ch, final int start, final int length){
 
 		this.buffer.append(new String(ch,start,length));
 		/*
@@ -470,7 +469,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 		this.hps=deleteDoubleHps(this.hps);
 	}
 
-	public TempHP getHP (String ID) {
+	public TempHP getHP (final String ID) {
 		for (TempHP temphp : this.hps) {
 			if (temphp.getHp_Id().equals(ID)){
 				return temphp;
@@ -479,7 +478,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 		return null;
 	}
 
-	public TempHP getHPbyOldID (String Id, int direct){
+	public TempHP getHPbyOldID (final String Id, final int direct){
 		if((direct!=1)&&(direct!=2)){
 			System.out.println("READER: undefined direction tag: "+direct);
 			return null;
@@ -494,7 +493,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 		return null;
 	}
 
-	public TempHP getHPbyOldID (String Id){
+	public TempHP getHPbyOldID (final String Id){
 		for (TempHP temphp : this.hps) {
 			for (String tmpId : temphp.oldIDs) {
 				if (tmpId.equals(Id)){
@@ -505,7 +504,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 		return null;
 	}
 
-	public TempFZP getFZP (String ID){
+	public TempFZP getFZP (final String ID){
 		for (TempFZP tempfzp : this.tmproute.fzps) {
 			if (tempfzp.id.equals(ID)){
 				return tempfzp;
@@ -514,12 +513,12 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 		return null;
 	}
 
-	public TempLink getLink(String fromNodeID, String toNodeID){
+	public TempLink getLink(final String fromNodeID, final String toNodeID){
 		TempHP fromNode = getHP(fromNodeID);
 		TempHP toNode = getHP(toNodeID);
 		return getLink(fromNode, toNode);
 	}
-	public TempLink getLink(TempHP fromNode, TempHP toNode){
+	public TempLink getLink(final TempHP fromNode, final TempHP toNode){
 		for (TempLink link : fromNode.outLinks) {
 			if (link.toNode.equals(toNode)) {
 				return link;
@@ -528,7 +527,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 		return null;
 	}
 
-	public ArrayList<TempHP> cloneHps(ArrayList<TempHP> hpList){
+	public ArrayList<TempHP> cloneHps(final ArrayList<TempHP> hpList){
 		ArrayList<TempHP> hpList2 = new ArrayList<TempHP>();
 		for (TempHP hp : hpList) {
 			TempHP hp2 = new TempHP(hp,true);
@@ -540,7 +539,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 		return hpList2;
 	}
 
-	public ArrayList<TempHP> deleteDoubleHps(ArrayList<TempHP> hpList){
+	public ArrayList<TempHP> deleteDoubleHps(final ArrayList<TempHP> hpList){
 		ArrayList<TempHP> hpList2 = new ArrayList<TempHP>();
 		for (TempHP hp : hpList) {
 			if((hp.inLinks.isEmpty()==false)||(hp.outLinks.isEmpty()==false)) {
@@ -554,7 +553,7 @@ public class PtNetworkReader extends org.xml.sax.helpers.DefaultHandler{
 	 * helper / debug methods
 	 */
 
-	public static void say(String say){
+	public static void say(final String say){
 		System.out.println(say);
 	}
 
