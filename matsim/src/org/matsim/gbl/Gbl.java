@@ -20,7 +20,10 @@
 
 package org.matsim.gbl;
 
+import java.io.IOException;
 import java.util.Random;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
@@ -30,6 +33,7 @@ import org.matsim.mobsim.SimulationTimer;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
+import org.xml.sax.SAXException;
 
 /* some ideas about this class... [MR, dec06]
  * Currently, there are the following methods:
@@ -93,7 +97,15 @@ public abstract class Gbl {
 		if ((args != null) && (args.length == 1)) {
 			log.info("Input config file: " + args[0]);
 			ConfigReaderMatsimV1 reader = new ConfigReaderMatsimV1(Gbl.config);
-			reader.readFile(args[0]);
+			try {
+				reader.parse(args[0]);
+			} catch (SAXException e) {
+				throw new RuntimeException(e);
+			} catch (ParserConfigurationException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		} else if ((args != null) && (args.length >= 1)) {
 			log.info("Input config file: " + args[0]);
 			log.info("Input local config dtd: " + args[1]);
