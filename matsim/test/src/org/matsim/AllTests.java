@@ -53,6 +53,7 @@ public class AllTests {
 		suite.addTest(org.matsim.roadpricing.AllTests.suite());
 		suite.addTest(org.matsim.router.AllTests.suite());
 		suite.addTest(org.matsim.scoring.AllTests.suite());
+		suite.addTest(org.matsim.trafficlights.AllTests.suite());
 		suite.addTest(org.matsim.trafficmonitoring.AllTests.suite());
 		suite.addTest(org.matsim.utils.AllTests.suite());
 		suite.addTest(org.matsim.world.AllTests.suite());
