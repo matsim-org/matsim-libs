@@ -38,12 +38,12 @@ import org.matsim.world.World;
 public class NewSmallPlansControler {
 
 	public static void main(final String[] args) {
-		final String netFilename = "./test/wm/network.xml";
-		final String plansFilename = "./test/wm/Plans10pct_forZuerich_with_pt.xml";
+		final String netFilename = "./test/yu/ivtch/input/network.xml";
+		final String plansFilename = "./test/yu/ivtch/input/Plans10pct_forZuerich_with_pt.xml.gz";
 
 		World world = Gbl.getWorld();
 		Config config = Gbl
-				.createConfig(new String[] { "./test/wm/myConfig.xml" });
+				.createConfig(new String[] { "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml" });
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

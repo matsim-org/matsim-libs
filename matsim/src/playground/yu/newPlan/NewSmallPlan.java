@@ -63,10 +63,9 @@ public class NewSmallPlan extends PersonAlgorithm implements PersonAlgorithmI {
 
 	@Override
 	public void run(Person person) {
-		if (Math.random() < 0.12) {
+//		if (Math.random() < 0.12) {
 			pw.writePerson(person);
-			System.out.println("writing person with id : " + person.getId());
-		}
+//		}
 	}
 
 }
