@@ -304,11 +304,17 @@ public class Controler {
 			// dump plans
 			new PlansWriter(this.population, getOutputFilename("output_plans.xml.gz"),
 					this.config.plans().getOutputVersion()).write();
+			//dump network
 			new NetworkWriter(this.network, getOutputFilename("output_network.xml.gz")).write();
+			// dump world
 			new WorldWriter(Gbl.getWorld(), getOutputFilename("output_world.xml.gz")).write();
-			new FacilitiesWriter((Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE),
-					getOutputFilename("output_facilities.xml.gz")).write();
+			// dump config
 			new ConfigWriter(this.config, getOutputFilename("output_config.xml.gz")).write();
+			// dump facilities
+			Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+			if (facilities != null) {
+				new FacilitiesWriter(facilities, getOutputFilename("output_facilities.xml.gz")).write();
+			}
 
 			if (unexpected) {
 				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
