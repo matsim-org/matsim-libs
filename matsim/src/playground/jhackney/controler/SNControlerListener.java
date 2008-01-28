@@ -54,7 +54,7 @@ import playground.jhackney.statistics.SocialNetworkStatistics;
 public class SNControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 
 	protected boolean overwriteFiles = true;
-	private boolean CALCSTATS = true;
+	private boolean CALCSTATS = false;
 	private static final String DIRECTORY_SN = "socialnets";
 	public static String SOCNET_OUT_DIR = null;
 	private String outputPath;
@@ -260,7 +260,6 @@ public class SNControlerListener implements StartupListener, IterationStartsList
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		this.log.info(" Instantiating the Pajek writer ...");
-
 		this.pjw = new PajekWriter1(SOCNET_OUT_DIR, (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
 		this.log.info("... done");
 
@@ -290,9 +289,17 @@ public class SNControlerListener implements StartupListener, IterationStartsList
 	}
 
 	private void snwrapup() {
-		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(this.outputPath, this.snet, this.controler.getPopulation());
-		pnww.write();
+//		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(this.outputPath, this.snet, this.controler.getPopulation());
+//		pnww.write();
 
+		this.log.info(" Instantiating the Pajek writer for final output ...");
+		PajekWriter1 pjwWrapup = new PajekWriter1(this.outputPath, (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
+		this.log.info("... done");
+		
+		this.log.info(" Writing out final social network ...");
+		pjwWrapup.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getLastIteration());
+		this.log.info(" ... done");
+		
 		if(CALCSTATS){
 		this.log.info(" Writing the statistics of the final social network to Output Directory...");
 

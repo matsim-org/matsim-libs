@@ -114,10 +114,15 @@ public class PajekWriter1 {
 			Iterator itLink = links.iterator();
 			while (itLink.hasNext()) {
 				SocialNetEdge printLink = (SocialNetEdge) itLink.next();
+				int age = iter-printLink.getTimeLastUsed();
 				Person printPerson1 = printLink.person1;
 				Person printPerson2 = printLink.person2;
-
-				pjout.write(" " + pajekIndex.get(printPerson1.getId()) + " "+ pajekIndex.get(printPerson2.getId()));
+				
+				Coord xy1 = (Coord) ((Act) printPerson1.getSelectedPlan().getActsLegs().get(0)).getCoord();
+				Coord xy2 = (Coord) ((Act) printPerson2.getSelectedPlan().getActsLegs().get(0)).getCoord();
+				double dist = xy1.calcDistance(xy2);
+				
+				pjout.write(" " + pajekIndex.get(printPerson1.getId()) + " "+ pajekIndex.get(printPerson2.getId())+" "+dist+" "+age);
 //				pjout.write(" " + printPerson1.getId() + " "+ printPerson2.getId());
 				pjout.newLine();
 //				System.out.print(" " +iter+" "+printLink.getLinkId()+" "+ printPerson1.getId() + " "

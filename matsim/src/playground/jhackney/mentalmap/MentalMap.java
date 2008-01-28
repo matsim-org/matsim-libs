@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.knowrefac;
+package playground.jhackney.mentalmap;
 
 
 import java.util.Collection;

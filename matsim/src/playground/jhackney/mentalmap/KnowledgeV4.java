@@ -41,7 +41,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.knowrefac;
+package playground.jhackney.mentalmap;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -58,7 +58,7 @@ import org.matsim.plans.ActivitySpaceSuperEllipse;
 import org.matsim.utils.identifiers.IdI;
 
 import playground.jhackney.socialnet.EgoNet;
-import playground.jhackney.knowrefac.MentalMap;
+import playground.jhackney.mentalmap.MentalMap;
 
 public class Knowledge {
 
