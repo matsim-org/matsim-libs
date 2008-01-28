@@ -315,7 +315,7 @@ public class QueueSimulation extends Simulation {
 	}
 
 	public static final void handleUnknownLegMode(final Vehicle veh) {
-		veh.setDepartureTime_s(SimulationTimer.getTime() + veh.getCurrentRoute().getTravTime());
+		veh.setDepartureTime_s(SimulationTimer.getTime() + veh.getCurrentLeg().getTravTime());
 		veh.setCurrentLink(veh.getDestinationLink());
 		teleportationList.add(veh);
 	}
