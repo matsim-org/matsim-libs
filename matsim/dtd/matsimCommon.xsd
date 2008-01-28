@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://www.matsim.org/files/dtd"
+xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
+xml:lang="en">
+<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+<!-- This xml schema contains xml definitions used in the MATSim framework  -->
+
+<xs:complexType name="matsimObjectType" >
+  <xs:annotation>
+    <xs:documentation>This is the base type for all matsim objects which have an type-wide unique id.</xs:documentation>
+  </xs:annotation>
+  <xs:attribute name="id" type="xs:string" use="required" />
+</xs:complexType>
+
+
+<xs:complexType name="linkRefType">
+  <xs:attribute name="id" type="xs:string" use="required" />
+</xs:complexType>
+
+<xs:element name="linkRef" type="linkRefType" />
+
+<xs:complexType name="signalGroupRefType">
+  <xs:attribute name="id" type="xs:string" use="required" />
+</xs:complexType>
+
+<xs:element name="signalGroupRef" type="signalGroupRefType" />
+
+
+<!-- <xs:complexType name="routeType">
+  <xs:sequence>
+    <xs:element name="node" minOccurs="2" maxOccurs="unbounded">
+      <xs:complexType>
+        <xs:attribute name="id" type="xsd:positiveInteger" use="required"/>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>  -->
+
+</xs:schema>
