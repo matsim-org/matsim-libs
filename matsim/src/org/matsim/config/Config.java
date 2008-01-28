@@ -158,7 +158,7 @@ public class Config {
 		return this.modules;
 	}
 
-	protected final Module getModule(final String modulename) {
+	public final Module getModule(final String modulename) {
 		return this.modules.get(modulename);
 	}
 
