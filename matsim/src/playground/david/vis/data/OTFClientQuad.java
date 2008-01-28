@@ -18,6 +18,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	private final double minNorthing;
 	private final double maxNorthing;
 	private final String id;
+	private final OTFServerRemote host;
 
 	static class CreateReceiverExecutor extends Executor<OTFDataReader> {
 		final OTFConnectionManager connect;
@@ -75,13 +76,14 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	public OTFClientQuad(String id, double minX, double minY, double maxX, double maxY) {
+	public OTFClientQuad(String id, OTFServerRemote host, double minX, double minY, double maxX, double maxY) {
 		super(minX, minY, maxX, maxY);
 		this.minEasting = minX;
 		this.maxEasting = maxX;
 		this.minNorthing = minY;
 		this.maxNorthing = maxY;
 		this.id = id;
+		this.host = host;
 	}
 
 	public void createReceiver(final OTFConnectionManager connect) {
@@ -90,7 +92,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 				new CreateReceiverExecutor(connect));
 	}
 
-	private void getData(OTFServerRemote host, QuadTree.Rect bound, boolean readConst)
+	private void getData(QuadTree.Rect bound, boolean readConst)
 			throws RemoteException {
 		bound = host.isLive() ? bound : this.top.getBounds();
 		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, bound);
@@ -103,12 +105,12 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		
 	}
 
-	synchronized public void getConstData(OTFServerRemote host) throws RemoteException {
-		getData(host, null, true);
+	synchronized public void getConstData() throws RemoteException {
+		getData(null, true);
 	}
 
-	synchronized public void getDynData(OTFServerRemote host, QuadTree.Rect bound) throws RemoteException {
-		getData(host, bound, false);
+	synchronized public void getDynData(QuadTree.Rect bound) throws RemoteException {
+		getData(bound, false);
 	}
 
 	synchronized public void invalidate(Rect rect) {

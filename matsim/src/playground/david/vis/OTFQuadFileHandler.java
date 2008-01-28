@@ -34,8 +34,10 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -66,7 +68,7 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 	//public ByteArrayOutputStream out = null;
 	double nextTime = -1;
 	double intervall_s = 1;
-	Map<Double,Long> timeSteps = new HashMap<Double,Long>();
+	SortedMap<Double,Long> timeSteps = new TreeMap<Double,Long>();
 
 	public OTFQuadFileHandler(double intervall_s, QueueNetworkLayer network, String fileName) {
 		if (network != null) net = network;
@@ -195,7 +197,8 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 	}
 
 	public void hasNextTimeStep() {
-
+//		if (nextTime < timeSteps.lastKey()) return true
+//		return false;
 	}
 
 	public void getNextTimeStep() {
@@ -265,6 +268,37 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 	public boolean isLive() {
 		return false;
 	}
+	
+
+	private final List<Double> timeStepIndex = new ArrayList<Double>();
+	
+	private boolean readNextTimeStep() {
+		double time = 0;
+		try {
+			time = inFile.readDouble();
+			int size = inFile.readInt();
+			timeStepIndex.add(time);
+			inFile.skip(size);
+			timeSteps.put(time, filepos);
+			filepos += size;
+
+		} catch (IOException e) {
+			System.out.println(e.toString());
+			return false;
+		}
+		return true;
+	}
+	
+	private void buildIndex(){
+		inFile.mark(-1);
+		while (readNextTimeStep());
+		try {
+			inFile.reset();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException {
 		if (writers != null) throw new RemoteException("writers need to be NULL, when reading from file");
@@ -277,6 +311,10 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
 		byte [] buffer = getStateBuffer();
 		if( nextTime != -1)  throw new RemoteException("CONST data needs to be read FIRST");
+		// Now we have read the QUAD and the CONST data, we can build the time index for the rest of
+		// the file and set a mark to this place
+		buildIndex();
+		
 		return buffer;
 	}
 

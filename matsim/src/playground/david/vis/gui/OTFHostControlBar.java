@@ -33,6 +33,10 @@ import javax.swing.event.ChangeListener;
 import org.matsim.utils.misc.Time;
 
 import playground.david.vis.OTFQuadFileHandler;
+import playground.david.vis.data.OTFClientQuad;
+import playground.david.vis.data.OTFConnectionManager;
+import playground.david.vis.data.OTFNetWriterFactory;
+import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.interfaces.OTFServerRemote;
 
 public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener {
@@ -106,10 +110,27 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		return host;
 	}
 	
+	private void buildIndex() {
+		// Read through the whole file to find the indexes for the time steps...
+		
+	}
 	private OTFServerRemote openFile( String fileName) throws RemoteException {
 		OTFServerRemote host = new OTFQuadFileHandler(0,null,fileName);
 		host.pause();
 		return host;
+	}
+	
+	public OTFClientQuad createNewView(String id, OTFNetWriterFactory factory, OTFConnectionManager connect) throws RemoteException {
+		System.out.println("Getting Quad");
+		OTFServerQuad servQ = host.getQuad(id, factory);
+		System.out.println("Converting Quad");
+		OTFClientQuad clientQ = servQ.convertToClient(id, host, connect);
+		System.out.println("Creating receivers");
+		clientQ.createReceiver(connect); 
+		clientQ.getConstData();
+		// if this is a recorded session, build random access index
+		if (!host.isLive() ) buildIndex();
+		return clientQ;
 	}
 	
 	public void addHandler(String id, OTFEventHandler handler) {
@@ -369,7 +390,5 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
-	public OTFServerRemote getHost() {
-		return host;
-	}
+
 }

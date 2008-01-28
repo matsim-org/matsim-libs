@@ -46,7 +46,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	@Override
 	protected void prepareSim() {
 		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
-		if (otfwriter == null) otfwriter = new OTFQuadFileHandler(600,network,"output/OTFQuadfileNoParking10p_wip.mvi.gz");
+		if (otfwriter == null) otfwriter = new OTFQuadFileHandler(300,network,"output/OTFQuadfileNoParking10p_wip.mvi.gz");
 		if(otfwriter != null) otfwriter.open();
 
 		super.prepareSim();
@@ -134,7 +134,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		world.setEvents(events);
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
-		config.simulation().setEndTime(Time.parseTime("12:02:00"));
+		//config.simulation().setEndTime(Time.parseTime("12:02:00"));
 		config.network().setInputFile(netFileName);
 
 		config.simulation().setSnapshotFormat("none");

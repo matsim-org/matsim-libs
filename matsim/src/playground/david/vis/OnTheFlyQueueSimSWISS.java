@@ -63,10 +63,10 @@ public class OnTheFlyQueueSimSWISS {
 		world.setEvents(events);
 		
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
-		config.simulation().setEndTime(Time.parseTime("00:00:01"));
+		config.simulation().setEndTime(Time.parseTime("00:00:11"));
 
 		sim = new OnTheFlyQueueSim(net, population, events);
-		sim.setOtfwriter(new OTFQuadFileHandler(10,net,"output/OTFQuadfileSCHWEIZ2.vis.gz"));
+		sim.setOtfwriter(new OTFQuadFileHandler(10,net,"output/OTFQuadfileSCHWEIZ2.mvi.gz"));
 		
 
 		sim.run();

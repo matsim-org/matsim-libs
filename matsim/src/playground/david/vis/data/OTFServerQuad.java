@@ -12,6 +12,7 @@ import org.matsim.mobsim.QueueNode;
 import org.matsim.utils.collections.QuadTree;
 
 import playground.david.vis.interfaces.OTFDataReader;
+import playground.david.vis.interfaces.OTFServerRemote;
 
 
 public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializable {
@@ -24,6 +25,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 			this.connect = connect2;
 			this.client = client;
 		}
+		@SuppressWarnings("unchecked")
 		@Override
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Collection<Class> readerClasses = connect.getEntries(writer.getClass());
@@ -140,8 +142,8 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
     	}
 	}
 
-	public OTFClientQuad convertToClient(String id, final OTFConnectionManager connect) {
-		final OTFClientQuad client = new OTFClientQuad(id, 0.,0.,maxEasting - minEasting, maxNorthing - minNorthing);
+	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect) {
+		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0.,maxEasting - minEasting, maxNorthing - minNorthing);
 
 		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
 				this.new ConvertToClientExecutor(connect,client));
