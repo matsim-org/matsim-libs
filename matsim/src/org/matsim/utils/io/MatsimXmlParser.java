@@ -169,7 +169,6 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 
 	@Override
 	public InputSource resolveEntity(final String publicId, final String systemId) {
-
 		// extract the last part of the systemId
 		int index = systemId.replace('\\', '/').lastIndexOf("/");
 		String shortSystemId = systemId.substring(index + 1);
