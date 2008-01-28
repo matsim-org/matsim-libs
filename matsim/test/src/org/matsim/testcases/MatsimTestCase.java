@@ -38,12 +38,19 @@ public class MatsimTestCase extends TestCase {
 	 * Includes the trailing '/' to denote a directory. */
 	private String inputDirectory = null;
 
+	/**
+	 * The input directory one level above the default input directory. If files are
+	 * used by several test methods of a testcase they have to be stored in this directory.
+	 */
+	private String classInputDirectory;
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
 		this.outputDirectory = "test/output/" + this.getClass().getCanonicalName().replace('.', '/') + "/" + getName() + "/";
-		this.inputDirectory = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/" + getName() + "/";
+		this.classInputDirectory = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/";
+		this.inputDirectory = this.classInputDirectory + getName() + "/";
 
 		createOutputDirectory();
 		Gbl.reset(); // make sure we start with a clean environment
@@ -92,6 +99,10 @@ public class MatsimTestCase extends TestCase {
 	 */
 	public String getInputDirectory() {
 		return this.inputDirectory;
+	}
+
+	public String getClassInputDirectory() {
+		return this.classInputDirectory;
 	}
 
 }

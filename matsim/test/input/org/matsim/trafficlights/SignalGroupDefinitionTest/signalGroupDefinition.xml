@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<signalGroups
+  xmlns="http://www.matsim.org/files/dtd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalGroupDefinition.xsd">
+
+  <signalGroup id="123">
+    <fromLink id="23" />
+    <toLink id="24" />
+    <toLink id="25" />
+    <turnIfRed>false</turnIfRed>
+    <passingClearingTime>2</passingClearingTime>
+  </signalGroup>
+
+  <signalGroup id="124">
+    <fromLink id="26" />
+    <toLink id="27" />
+    <toLink id="28" />
+    <turnIfRed>true</turnIfRed>
+    <passingClearingTime>15</passingClearingTime>
+  </signalGroup>
+
+</signalGroups>
+
