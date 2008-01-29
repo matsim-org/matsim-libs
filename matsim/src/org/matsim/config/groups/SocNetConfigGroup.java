@@ -68,7 +68,7 @@ public class SocNetConfigGroup extends Module {
     private String pctsinteract=null; // double [0,1]
     private String sweights=null; // own config module (strategy)
     private String pfriend=null; // double
-    private String outdir="output/socialnets/";
+    private String outdir="socialnets/";
     private String degsat=null; // double
     private String interval=null;
 
