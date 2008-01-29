@@ -88,9 +88,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		/* code previously in loadData() */
 
 		// Stitch together the world
-		if (this.controler.getConfig().world().getInputFile() == null) {
-			new WorldBottom2TopCompletion().run(Gbl.getWorld());
-		}
+		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 
 		//loadSocialNetwork();
 		// if (this.config.socialnet().getInputFile() == null) {
