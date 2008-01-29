@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
@@ -17,6 +19,8 @@ import playground.david.vis.interfaces.OTFServerRemote;
 
 public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializable {
 
+	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
+	
 	class ConvertToClientExecutor extends Executor<OTFDataWriter> {
 		final OTFConnectionManager connect;
 		final OTFClientQuad client;
@@ -41,18 +45,6 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 		}
 	}
 
-	class ConvertToServerExecutor extends Executor<OTFDataWriter> {
-		final OTFServerQuad newServer;
-
-		public ConvertToServerExecutor(OTFServerQuad server) {
-			this.newServer = server;
-		}
-
-		@Override
-		public void execute(double x, double y, OTFDataWriter writer)  {
-				newServer.put(x, y, writer);
-		}
-	}
 
 	class WriteDataExecutor extends Executor<OTFDataWriter> {
 		final ByteBuffer out;
@@ -141,6 +133,10 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
     		put(middleEast, middleNorth, writer);
     	}
 	}
+	
+	public void addAdditionalElement(OTFDataWriter element) {
+		additionalElements.add(element);
+	}
 
 	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect) {
 		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0.,maxEasting - minEasting, maxNorthing - minNorthing);
@@ -148,25 +144,45 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
 				this.new ConvertToClientExecutor(connect,client));
 
+		for(OTFDataWriter element : additionalElements) {
+			Collection<Class> readerClasses = connect.getEntries(element.getClass());
+			for (Class readerClass : readerClasses) {
+				try {
+					Object reader = readerClass.newInstance();
+					client.addAdditionalElement((OTFDataReader)reader);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+			}
+			
+		}
 		return client;
-	}
-
-	public OTFServerQuad convertToServer() {
-		final OTFServerQuad newServer = new OTFServerQuad(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing);
-
-		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
-				this.new ConvertToServerExecutor(newServer));
-
-		return newServer;
 	}
 
 	public void writeConstData(ByteBuffer out) {
 		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
 				this.new WriteDataExecutor(out,true));
+		
+		for(OTFDataWriter element : additionalElements) {
+			try {
+				element.writeConstData(out);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void writeDynData(QuadTree.Rect bounds, ByteBuffer out) {
 		int colls = this.execute(bounds, this.new WriteDataExecutor(out,false));
+
+		for(OTFDataWriter element : additionalElements) {
+			try {
+				element.writeDynData(out);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

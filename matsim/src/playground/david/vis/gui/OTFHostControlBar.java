@@ -32,7 +32,7 @@ import javax.swing.event.ChangeListener;
 
 import org.matsim.utils.misc.Time;
 
-import playground.david.vis.OTFQuadFileHandler;
+import playground.david.vis.OTFQuadFileHandlerZIP;
 import playground.david.vis.data.OTFClientQuad;
 import playground.david.vis.data.OTFConnectionManager;
 import playground.david.vis.data.OTFNetWriterFactory;
@@ -57,7 +57,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	// -------------------- MEMBER VARIABLES --------------------
 
 	//private DisplayableNetI network;
-	private final MovieTimer movieTimer = new MovieTimer();
+	private MovieTimer movieTimer = null;
 	private JButton playButton;
 	private JFormattedTextField timeField;
 	private int simTime = 0;
@@ -115,7 +115,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		
 	}
 	private OTFServerRemote openFile( String fileName) throws RemoteException {
-		OTFServerRemote host = new OTFQuadFileHandler(0,null,fileName);
+		OTFServerRemote host = new OTFQuadFileHandlerZIP(0,null,fileName);
 		host.pause();
 		return host;
 	}
@@ -141,7 +141,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		return handlers.get(id);
 	}
 	
-	private void invalidateHandlers() {
+	public void invalidateHandlers() {
 		for (OTFEventHandler handler : handlers.values()) {
 			try {
 				handler.invalidate();
@@ -181,9 +181,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 //		JSpinner spin = addLabeledSpinner(this, "Lanewidth", model);
 //		spin.setMaximumSize(new Dimension(75,30));
 //		spin.addChangeListener(this);
-
-		//movieTimer.start();
-
 	}
 
 	private JButton createButton(String display, String actionCommand) {
@@ -205,8 +202,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private void stopMovie() {
 		if (movieTimer != null) {
-			movieTimer.stop();
+			movieTimer.terminate();
 			movieTimer.setActive(false);
+			movieTimer = null;
 			playButton.setText("PLAY");
 			playButton.setSelected(false);
 		}
@@ -222,7 +220,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void pressed_PLAY() throws RemoteException {
-		movieTimer.start();
+ 	    if (movieTimer == null) movieTimer = new MovieTimer();
+ 	    movieTimer.start();
 		movieTimer.setActive(true);
 		playButton.setSelected(true);
 	}
@@ -311,7 +310,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals(TOGGLE_SYNCH)) {
 			synchronizedPlay = e.getStateChange() != ItemEvent.DESELECTED; 
-			movieTimer.updateSyncPlay();
+			if (movieTimer != null) movieTimer.updateSyncPlay();
 		} else if (source.getText().equals(TOGGLE_LINK_LABELS)) {
 			if (e.getStateChange() == ItemEvent.DESELECTED) {
 				//visConfig.set(VisConfig.SHOW_LINK_LABELS, "false");
@@ -344,7 +343,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			return isActive;
 		}
 
-		private void updateSyncPlay() {
+		private synchronized void updateSyncPlay() {
 			if (!isActive) return;
 			
 			try {

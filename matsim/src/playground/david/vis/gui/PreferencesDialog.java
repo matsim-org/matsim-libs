@@ -1,21 +1,21 @@
 package playground.david.vis.gui;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BoundedRangeModel;
 import javax.swing.ComboBoxModel;
+import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -54,6 +54,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	private JComboBox leftMFunc;
 	private JLabel jLabel3;
 	private JLabel jLabel1;
+	private OTFHostControlBar host = null;
 
 	/**
 	* Auto-generated main method to display this JDialog
@@ -62,15 +63,16 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				JFrame frame = new JFrame();
-				PreferencesDialog inst = new PreferencesDialog(frame, new OTFVisConfig());
+				PreferencesDialog inst = new PreferencesDialog(frame, new OTFVisConfig(), null);
 				inst.setVisible(true);
 			}
 		});
 	}
 	
-	public PreferencesDialog(JFrame frame, OTFVisConfig config) {
+	public PreferencesDialog(JFrame frame, OTFVisConfig config, OTFHostControlBar mother) {
 		super(frame);
 		cfg = config;
+		this.host = mother;
 		initGUI();
 	}
 	
@@ -134,35 +136,63 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				jLabel4.setBounds(0, 45, 103, 31);
 			}
 
-			SpinnerNumberModel model = new SpinnerNumberModel(cfg.getAgentSize(), 10, 500, 10); 
-			JSpinner spin = addLabeledSpinner(getContentPane(), "agentSize", model);
-			spin.setMaximumSize(new Dimension(75,30));
-			spin.addChangeListener(this);
-			spin.setBounds(50, 120, 92, 27);
+//			SpinnerNumberModel model = new SpinnerNumberModel(cfg.getAgentSize(), 10, 500, 10); 
+//			JSpinner spin = addLabeledSpinner(getContentPane(), "agentSize", model);
+//			spin.setMaximumSize(new Dimension(75,30));
+//			spin.addChangeListener(this);
+//			spin.setBounds(50, 120, 92, 27);
 
+			jLabel4 = new JLabel();
+			getContentPane().add(jLabel4);
+			jLabel4.setText("AgentSize");
+			jLabel4.setBounds(0, 145, 103, 31);
+			JSlider slider = new JSlider();
+			BoundedRangeModel model = new DefaultBoundedRangeModel(100,0,10,300);
+			slider.setModel(model);
+			Dictionary labels = new Hashtable();
+	
 
+			slider.setLabelTable(slider.createStandardLabels(100, 100));
+			slider.setPaintLabels(true);
+			slider.setBounds(0, 175, 153, 61);
+			slider.addChangeListener(this);
+			getContentPane().add(jLabel4);
+			getContentPane().add(slider);
+
+			
 			setSize(400, 300);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	static protected JSpinner addLabeledSpinner(Container c,   String label,  SpinnerModel model) 
-	{
-		JLabel l = new JLabel(label);
-		c.add(l);
-		JSpinner spinner = new JSpinner(model);
-		l.setLabelFor(spinner);
-		c.add(spinner);
-		return spinner;
-	}
+
 	public void stateChanged(ChangeEvent e) {
-		JSpinner spinner = (JSpinner)e.getSource();
-		int i = ((SpinnerNumberModel)spinner.getModel()).getNumber().intValue();
-		cfg.addParam(OTFVisConfig.AGENT_SIZE, Float.toString(i));
-		repaint();
-		//networkScrollPane.repaint();
-	}
+		if(e.getSource().getClass() == JSlider.class) {
+			JSlider slider = (JSlider)e.getSource();
+			cfg.addParam(OTFVisConfig.AGENT_SIZE, Float.toString(slider.getValue()));
+			if (host != null) host.invalidateHandlers();
+			System.out.println("val: "+ slider.getValue());
+		}
+		
+	}	
+	
+//	static protected JSpinner addLabeledSpinner(Container c,   String label,  SpinnerModel model) 
+//	{
+//		JLabel l = new JLabel(label);
+//		c.add(l);
+//		JSpinner spinner = new JSpinner(model);
+//		l.setLabelFor(spinner);
+//		c.add(spinner);
+//		return spinner;
+//	}
+//
+//	public void stateChanged(ChangeEvent e) {
+//		JSpinner spinner = (JSpinner)e.getSource();
+//		int i = ((SpinnerNumberModel)spinner.getModel()).getNumber().intValue();
+//		cfg.addParam(OTFVisConfig.AGENT_SIZE, Float.toString(i));
+//		repaint();
+//		//networkScrollPane.repaint();
+//	}
 
 	public JComboBox getLeftMFunc() {
 		return leftMFunc;
@@ -176,8 +206,8 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		return middleMFunc;
 	}
 
-    public static PreferencesDialog buildMenu(final JFrame frame, OTFVisConfig config) {
-    	final PreferencesDialog preferencesDialog = new PreferencesDialog(frame, config);
+    public static PreferencesDialog buildMenu(final JFrame frame, OTFVisConfig config, OTFHostControlBar host) {
+    	final PreferencesDialog preferencesDialog = new PreferencesDialog(frame, config,host);
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu( "File" );
         fileMenu.add("Open...");

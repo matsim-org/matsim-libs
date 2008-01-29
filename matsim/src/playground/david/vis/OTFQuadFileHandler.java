@@ -164,6 +164,7 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 
 	public void readQuad() {
 		// open file
+	
 		try {
 			if (fileName.endsWith(".gz")) {
 				InputStream gzInStream =  new BufferedInputStream(new GZIPInputStream(new FileInputStream(fileName), BUFFERSIZE), BUFFERSIZE);
@@ -313,7 +314,7 @@ public class OTFQuadFileHandler implements SimStateWriterI, OTFServerRemote{
 		if( nextTime != -1)  throw new RemoteException("CONST data needs to be read FIRST");
 		// Now we have read the QUAD and the CONST data, we can build the time index for the rest of
 		// the file and set a mark to this place
-		buildIndex();
+		//buildIndex();
 		
 		return buffer;
 	}

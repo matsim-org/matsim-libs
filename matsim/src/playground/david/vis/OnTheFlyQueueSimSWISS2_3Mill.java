@@ -25,7 +25,9 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
+import org.matsim.plans.PlansReaderI;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
@@ -33,7 +35,7 @@ import org.matsim.world.World;
  * @author DS
  *
  */
-public class OnTheFlyQueueSimSWISS {
+public class OnTheFlyQueueSimSWISS2_3Mill {
 	
 	public static void main(String[] args) {		
 		OnTheFlyQueueSim sim;
@@ -41,8 +43,11 @@ public class OnTheFlyQueueSimSWISS {
 		Plans population;
 		Events events;
 		
-		String netFileName = "../../tmp/network.xml.gz";
+		String netFileName = "../../tmp/studies/ivtch/network.xml";
+//		String popFileName = "../../tmp/studies/ivtch/plans_10pct_miv_zrh.xml.gz";
+		String popFileName = "../../tmp/studies/ivtch/all_plans.xml.gz";
 				
+		args = new String [] {"../../tmp/studies/ivtch/config.xml"};
 		Gbl.createConfig(args);
 		Gbl.startMeasurement();
 		Config config = Gbl.getConfig();
@@ -57,16 +62,18 @@ public class OnTheFlyQueueSimSWISS {
 		Gbl.printElapsedTime();		
 		
 		population = new Plans();
+		PlansReaderI plansReader = new MatsimPlansReader(population);
+		plansReader.readFile(popFileName);
 		world.setPopulation(population);
 
 		events = new Events() ;
 		world.setEvents(events);
 		
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
-		config.simulation().setEndTime(Time.parseTime("00:00:11"));
+		config.simulation().setEndTime(Time.parseTime("12:00:11"));
 
 		sim = new OnTheFlyQueueSim(net, population, events);
-		sim.setOtfwriter(new OTFQuadFileHandler(600,net,"output/OTFQuadfileSCHWEIZ2.mvi.gz"));
+		sim.setOtfwriter(new OTFQuadFileHandler(600,net,"output/OTFQuadfileSCHWEIZ2.3.mvi.gz"));
 		
 
 		sim.run();

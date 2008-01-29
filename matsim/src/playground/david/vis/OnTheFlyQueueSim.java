@@ -22,6 +22,7 @@ package playground.david.vis;
 
 import java.io.IOException;
 
+import org.matsim.analysis.LegHistogram;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -41,15 +42,19 @@ import org.matsim.world.World;
  */
 public class OnTheFlyQueueSim extends QueueSimulation{
 	protected OnTheFlyServer myOTFServer = null;
-	protected OTFQuadFileHandler otfwriter  = null;
+	protected OTFQuadFileHandlerZIP otfwriter  = null;
+	protected LegHistogram hist = null;
 
 	@Override
 	protected void prepareSim() {
 		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
-		if (otfwriter == null) otfwriter = new OTFQuadFileHandler(300,network,"output/OTFQuadfileNoParking10p_wip.mvi.gz");
+		if (otfwriter == null) otfwriter = new OTFQuadFileHandlerZIP(600,network,"output/OTFQuadfileNoParking10p_wip.mvi.gz");
 		if(otfwriter != null) otfwriter.open();
 
 		super.prepareSim();
+		
+		hist = new LegHistogram(300);
+		events.addHandler(hist);
 
 		// FOR TESTING ONLY!
 		//OnTheFlyClient client = new OnTheFlyClient();
@@ -68,6 +73,8 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			hist.writeGraphic("output/OTFQuadfileNoParking10p_wip.leghist.png");
 
 	}
 
@@ -106,6 +113,8 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		Config config = Gbl.createConfig(args);
 
 		config.global().setLocalDtdBase(localDtdBase);
+		config.simulation().setFlowCapFactor(0.5);
+		config.simulation().setStorageCapFactor(0.5);
 
 		if(args.length >= 1) {
 			netFileName = config.network().getInputFile();
@@ -153,7 +162,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	}
 
 	public void setOtfwriter(OTFQuadFileHandler otfwriter) {
-		this.otfwriter = otfwriter;
+		//this.otfwriter = otfwriter;
 	}
 
 

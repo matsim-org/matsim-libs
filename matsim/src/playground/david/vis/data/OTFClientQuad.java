@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
@@ -19,6 +21,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	private final double maxNorthing;
 	private final String id;
 	private final OTFServerRemote host;
+	private final List<OTFDataReader> additionalElements= new LinkedList<OTFDataReader>();
 
 	static class CreateReceiverExecutor extends Executor<OTFDataReader> {
 		final OTFConnectionManager connect;
@@ -86,12 +89,43 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		this.host = host;
 	}
 
+	public void addAdditionalElement(OTFDataReader element) {
+		additionalElements.add(element);
+	}
+
 	public void createReceiver(final OTFConnectionManager connect) {
 
 		int colls = this.execute(this.top.getBounds(),
 				new CreateReceiverExecutor(connect));
+		for(OTFDataReader element : additionalElements) {
+			Collection<Class> drawerClasses = connect.getEntries(element.getClass());
+			for (Class drawerClass : drawerClasses) {
+				try {
+					if (drawerClass != null) {
+						Object drawer = drawerClass.newInstance();
+						element.connect((OTFData.Receiver) drawer);
+
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+
+			}
+		}
 	}
 
+	private void getAdditionalData(ByteBuffer in, boolean readConst) {
+		for(OTFDataReader element : additionalElements) {
+			try {
+				if (readConst) element.readConstData(in);
+				else element.readDynData(in);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
 	private void getData(QuadTree.Rect bound, boolean readConst)
 			throws RemoteException {
 		bound = host.isLive() ? bound : this.top.getBounds();
@@ -99,6 +133,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		ByteBuffer in = ByteBuffer.wrap(bbyte);
 		Gbl.startMeasurement();
 		int colls = this.execute(bound, this.new ReadDataExecutor(in, readConst));
+		getAdditionalData(in, readConst);
 		System.out.print("readData: "); Gbl.printElapsedTime();
 
 		PoolFactory.resetAll();
@@ -119,6 +154,9 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 
 		int colls = this.execute(rect, this.new InvalidateExecutor());
+		for(OTFDataReader element : additionalElements) {
+			element.invalidate();
+		}
 	}
 
 	@Override

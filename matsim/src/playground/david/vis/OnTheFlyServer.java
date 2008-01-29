@@ -92,6 +92,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 		//setDaemon(true);
 		UserReadableName = ReadableName;
 		net = new OTFVisNet(network);
+		net.buildWriteMask();
 		this.network = network;
 		out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
