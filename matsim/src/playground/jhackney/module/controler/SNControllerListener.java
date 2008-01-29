@@ -41,7 +41,6 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
-import playground.jhackney.io.JUNGPajekNetWriterWrapper;
 import playground.jhackney.module.interactions.NonSpatialInteractor;
 import playground.jhackney.module.interactions.SocializingOpportunity;
 import playground.jhackney.module.interactions.SpatialInteractor;
