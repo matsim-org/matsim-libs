@@ -102,6 +102,7 @@ public class ScenarioData {
 			this.network = new QueueNetworkLayer();
 			this.world.setNetworkLayer(this.network);
 			new MatsimNetworkReader(this.network).readFile(this.networkFileName);
+			this.world.complete();
 			this.networkLoaded = true;
 		}
 		return this.network;
@@ -117,6 +118,7 @@ public class ScenarioData {
 			} else {
 				this.facilities = (Facilities)this.world.createLayer(Facilities.LAYER_TYPE, null);
 			}
+			this.world.complete();
 			this.facilitiesLoaded = true;
 		}
 		return this.facilities;
