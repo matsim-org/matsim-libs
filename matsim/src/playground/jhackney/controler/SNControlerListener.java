@@ -54,8 +54,8 @@ import playground.jhackney.statistics.SocialNetworkStatistics;
 public class SNControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 
 	protected boolean overwriteFiles = true;
-	private boolean CALCSTATS = false;
-	private static final String DIRECTORY_SN = "socialnets";
+	private boolean CALCSTATS = true;
+	private static final String DIRECTORY_SN = "socialnets/";
 	public static String SOCNET_OUT_DIR = null;
 	private String outputPath;
 
@@ -269,7 +269,7 @@ public class SNControlerListener implements StartupListener, IterationStartsList
 
 		if(CALCSTATS){
 		this.log.info(" Calculating the statistics of the initial social network)...");
-		this.snetstat=new SocialNetworkStatistics();
+		this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
 		this.snetstat.openFiles();
 		this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
 		this.log.info(" ... done");
@@ -292,24 +292,25 @@ public class SNControlerListener implements StartupListener, IterationStartsList
 //		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(this.outputPath, this.snet, this.controler.getPopulation());
 //		pnww.write();
 
-		this.log.info(" Instantiating the Pajek writer for final output ...");
-		PajekWriter1 pjwWrapup = new PajekWriter1(this.outputPath, (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
-		this.log.info("... done");
+//		this.log.info(" Instantiating the Pajek writer for final output ...");
+//		String finalPath = this.outputPath;
+//		PajekWriter1 pjwWrapup = new PajekWriter1(finalPath, (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
+//		this.log.info("... done");
+//		
+//		this.log.info(" Writing out final social network ...");
+//		pjwWrapup.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getLastIteration()+1);
+//		this.log.info(" ... done");
 		
-		this.log.info(" Writing out final social network ...");
-		pjwWrapup.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getLastIteration());
-		this.log.info(" ... done");
-		
-		if(CALCSTATS){
-		this.log.info(" Writing the statistics of the final social network to Output Directory...");
-
-		SocialNetworkStatistics snetstatFinal=new SocialNetworkStatistics();
-		snetstatFinal.openFiles(this.outputPath);
-		snetstatFinal.calculate(this.controler.getLastIteration(), this.snet, this.controler.getPopulation());
-
-		this.log.info(" ... done");
-		snetstatFinal.closeFiles();
-		}
+//		if(CALCSTATS){
+//		this.log.info(" Writing the statistics of the final social network to Output Directory...");
+//
+//		SocialNetworkStatistics snetstatFinal=new SocialNetworkStatistics(this.outputPath);
+//		snetstatFinal.openFiles(this.outputPath);
+//		snetstatFinal.calculate(this.controler.getLastIteration(), this.snet, this.controler.getPopulation());
+//
+//		this.log.info(" ... done");
+//		snetstatFinal.closeFiles();
+//		}
 	}
 
 	/**

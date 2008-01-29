@@ -47,11 +47,13 @@ public class PajekWriter1 {
 	private CoordI minCoord;
 	private CoordI maxCoord;
 	private TreeMap<IdI, Integer> pajekIndex= new TreeMap<IdI, Integer>();
+	String dir;
 	
 	public PajekWriter1(String dir, Facilities facilities){
-
+this.dir=dir;
 		//String pjoutdir = Gbl.getConfig().findParam(Gbl.getConfig().SOCNET, Gbl.getConfig().SOCNET_OUT_DIR);
 		File pjDir=new File(dir+"/pajek/");
+		System.out.println("PajekWriter1 make dir "+dir + "/pajek/");
 		if(!(pjDir.mkdir())&& !pjDir.exists()){
 			Gbl.errorMsg("Cannot create directory "+dir+"/pajek/");
 		}
@@ -71,9 +73,9 @@ public class PajekWriter1 {
 		BufferedWriter pjout = null;
 
 		// from config
-		String pjoutdir = Gbl.getConfig().socnetmodule().getOutDir();
-		String pjoutfile = pjoutdir+"pajek/test"+iter+".net";
 
+		String pjoutfile = dir+"/pajek/test"+iter+".net";
+System.out.println("PajekWriter1 filename "+pjoutfile);
 
 		try {
 

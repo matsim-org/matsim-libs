@@ -71,7 +71,7 @@ import edu.uci.ics.jung.utils.UserData;
  */
 public class SocialNetworkStatistics {
 
-    static String statsoutdir = Gbl.getConfig().socnetmodule().getOutDir()+"stats/";
+    static String statsoutdir;
     static BufferedWriter aout = null;
 //    static String aoutfile = statsoutdir+"agent.txt";
     static BufferedWriter eout = null;
@@ -85,7 +85,11 @@ public class SocialNetworkStatistics {
     // to get the Person ID given a Vertex object
     TreeMap<IdI, Vertex> verticesPersons = new TreeMap<IdI, Vertex>();
 
-    public SocialNetworkStatistics(){
+    public SocialNetworkStatistics(String dir){
+    	
+//    	statsoutdir = Gbl.getConfig().socnetmodule().getOutDir()+"stats/";
+    	statsoutdir =dir+"stats/";
+    	
 //	File snDir =new File(statsoutdir);
 //	if(!snDir.mkdir() && !snDir.exists()){
 //	    Gbl.errorMsg("Cannot make directory "+statsoutdir);
