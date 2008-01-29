@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.algorithms;
+package playground.jhackney.module.algorithms;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;

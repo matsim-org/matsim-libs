@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.algorithms;
+package playground.jhackney.module.algorithms;
 
 import java.util.ArrayList;
 import java.util.Iterator;

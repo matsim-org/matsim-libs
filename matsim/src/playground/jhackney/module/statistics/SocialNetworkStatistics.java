@@ -39,8 +39,8 @@ import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 
-import playground.jhackney.algorithms.PersonCalculateActivitySpaces;
-import playground.jhackney.algorithms.PlanEuclideanLength;
+import playground.jhackney.module.algorithms.PersonCalculateActivitySpaces;
+import playground.jhackney.module.algorithms.PlanEuclideanLength;
 import playground.jhackney.module.socialnet.SocialNetEdge;
 import playground.jhackney.module.socialnet.SocialNetwork;
 import cern.colt.list.DoubleArrayList;

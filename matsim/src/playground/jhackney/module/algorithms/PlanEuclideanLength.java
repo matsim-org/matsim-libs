@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.algorithms;
+package playground.jhackney.module.algorithms;
 
 import org.matsim.plans.Act;
 import org.matsim.plans.Plan;

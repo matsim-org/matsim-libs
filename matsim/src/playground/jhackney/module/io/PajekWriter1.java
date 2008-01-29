@@ -39,7 +39,7 @@ import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 
 
-import playground.jhackney.algorithms.FacilitiesFindScenarioMinMaxCoords;
+import playground.jhackney.module.algorithms.FacilitiesFindScenarioMinMaxCoords;
 import playground.jhackney.module.socialnet.SocialNetEdge;
 
 public class PajekWriter1 {
