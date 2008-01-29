@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialNetEdge.java
+ * SocializingOpportunityGeneratorI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,58 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.socialnet;
+package playground.jhackney.module.interactions;
 
-import org.matsim.plans.Person;
+import java.util.Collection;
 
-public class SocialNetEdge {
+import org.matsim.plans.Plans;
 
-    public Person person1, person2;
-    public int timeMade;
-    public int timeLastUsed;
-    public int timesMet=1;
-    double strength=1.0;
-    public String type;
+public interface SocializingOpportunityGeneratorI {
 
-    public SocialNetEdge(Person a1, Person a2){
-
-	person1 = a1;
-	person2 = a2;
-    }
-    public Person getPersonFrom(){
-	return person1;
-    }
-    public Person getPersonTo(){
-	return person2;
-    }
-    public void setTimeMade(int i){
-	this.timeMade=i;
-    }
-    public int getTimeMade(){
-	return this.timeMade;
-    }
-    public void setTimeLastUsed(int i){
-	this.timeLastUsed=i;
-    }
-    public int getTimeLastUsed(){
-	return this.timeLastUsed;
-    }
-    public double getStrength() {
-	return strength;
-    }
-    public void setStrength(double strength) {
-	this.strength = strength;
-    }
-    public void setType(String type){
-	this.type=type;
-    }
-    public String getType(){
-	return type;
-    }
-    public void incrementNumberOfTimesMet(){
-	timesMet++;
-    }
-    public int getTimesMet(){
-	return timesMet;
-    }
+	// A SocializingOpportunityGenerator generates SocializingOpportunity based on
+	// the persons and their plans (or knowledge, i.e. memories)
+	
+	Collection<SocializingOpportunity> generate( Plans plans );
 }

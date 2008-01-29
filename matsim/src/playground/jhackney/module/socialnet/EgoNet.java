@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.socialnet;
+package playground.jhackney.module.socialnet;
 
 /*
  * The purpose of the EgoNet class is to avoid extending the Person class.

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.algorithms;
+package playground.jhackney.module.replanning;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.shared.Coord;
 
-import playground.jhackney.controler.SNControlerListener;
+import playground.jhackney.module.controler.SNControllerListener;
 
 public class SNSecLocRandom  implements PlanAlgorithmI{
     private final String weights;
@@ -68,15 +68,15 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 	double rand = Gbl.random.nextDouble();
 
 	if (rand < cum_p_factype[0]) {
-	    factype = SNControlerListener.activityTypesForEncounters[0];
+	    factype = SNControllerListener.activityTypesForEncounters[0];
 	}else if (cum_p_factype[0] <= rand && rand < cum_p_factype[1]) {
-	    factype = SNControlerListener.activityTypesForEncounters[1];
+	    factype = SNControllerListener.activityTypesForEncounters[1];
 	}else if (cum_p_factype[1] <= rand && rand < cum_p_factype[2]) {
-	    factype = SNControlerListener.activityTypesForEncounters[2];
+	    factype = SNControllerListener.activityTypesForEncounters[2];
 	}else if (cum_p_factype[2] <= rand && rand < cum_p_factype[3]) {
-	    factype = SNControlerListener.activityTypesForEncounters[3];
+	    factype = SNControllerListener.activityTypesForEncounters[3];
 	}else {
-	    factype = SNControlerListener.activityTypesForEncounters[4];
+	    factype = SNControllerListener.activityTypesForEncounters[4];
 	}
 
 //	Figure out if the agent has knowledge about other facilities of this kind

@@ -29,7 +29,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
 
-import playground.jhackney.socialnet.EgoNet;
+import playground.jhackney.module.socialnet.EgoNet;
 
 public class PersonCalculateActivitySpaces {
 

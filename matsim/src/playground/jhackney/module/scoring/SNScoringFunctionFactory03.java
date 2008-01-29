@@ -1,4 +1,4 @@
-package playground.jhackney.scoring;
+package playground.jhackney.module.scoring;
 
 import org.matsim.plans.Plan;
 import org.matsim.scoring.ScoringFunction;

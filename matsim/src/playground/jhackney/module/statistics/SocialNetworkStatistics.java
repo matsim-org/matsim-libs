@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.statistics;
+package playground.jhackney.module.statistics;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,8 +41,8 @@ import org.matsim.utils.identifiers.IdI;
 
 import playground.jhackney.algorithms.PersonCalculateActivitySpaces;
 import playground.jhackney.algorithms.PlanEuclideanLength;
-import playground.jhackney.socialnet.SocialNetEdge;
-import playground.jhackney.socialnet.SocialNetwork;
+import playground.jhackney.module.socialnet.SocialNetEdge;
+import playground.jhackney.module.socialnet.SocialNetwork;
 import cern.colt.list.DoubleArrayList;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;

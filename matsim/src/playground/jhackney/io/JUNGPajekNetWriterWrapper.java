@@ -29,8 +29,8 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.utils.identifiers.IdI;
 
-import playground.jhackney.socialnet.SocialNetEdge;
-import playground.jhackney.socialnet.SocialNetwork;
+import playground.jhackney.module.socialnet.SocialNetEdge;
+import playground.jhackney.module.socialnet.SocialNetwork;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;

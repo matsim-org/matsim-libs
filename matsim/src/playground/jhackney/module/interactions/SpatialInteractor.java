@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.interactions;
+package playground.jhackney.module.interactions;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import java.util.Vector;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 
-import playground.jhackney.socialnet.SocialNetwork;
+import playground.jhackney.module.socialnet.SocialNetwork;
 
 public class SpatialInteractor {
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SNControlerNeu.java
+ * SNController.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,18 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.controler;
+package playground.jhackney.module.controler;
 
 import org.matsim.controler.Controler;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.BestPlanSelector;
 
-import playground.jhackney.replanning.SNFacilitySwitcher;
+import playground.jhackney.module.replanning.SNFacilitySwitcher;
 
-public class SNControlerNeu extends Controler {
+public class SNController extends Controler {
 
-	public SNControlerNeu(final String[] args) {
+	public SNController(final String[] args) {
 		super(args);
 	}
 
@@ -61,8 +61,8 @@ public class SNControlerNeu extends Controler {
 	}
 
 	public static void main(final String[] args) {
-		final Controler controler = new SNControlerNeu(args);
-		controler.addControlerListener(new SNControlerListener());
+		final Controler controler = new SNController(args);
+		controler.addControlerListener(new SNControllerListener());
 		controler.run();
 		System.exit(0);
 	}

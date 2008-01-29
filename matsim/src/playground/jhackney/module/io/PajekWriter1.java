@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.io;
+package playground.jhackney.module.io;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,7 +40,7 @@ import org.matsim.utils.identifiers.IdI;
 
 
 import playground.jhackney.algorithms.FacilitiesFindScenarioMinMaxCoords;
-import playground.jhackney.socialnet.SocialNetEdge;
+import playground.jhackney.module.socialnet.SocialNetEdge;
 
 public class PajekWriter1 {
 

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.interactions;
+package playground.jhackney.module.interactions;
 
 import java.util.List;
 
@@ -28,8 +28,8 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 
-import playground.jhackney.socialnet.SocialNetEdge;
-import playground.jhackney.socialnet.SocialNetwork;
+import playground.jhackney.module.socialnet.SocialNetEdge;
+import playground.jhackney.module.socialnet.SocialNetwork;
 
 public class PersonExchangeKnowledge {
     SocialNetwork net;

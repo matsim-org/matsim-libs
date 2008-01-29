@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.socialnet;
+package playground.jhackney.module.socialnet;
 
 import java.util.ArrayList;
 import java.util.Iterator;

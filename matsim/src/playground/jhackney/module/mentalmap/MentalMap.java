@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.mentalmap;
+package playground.jhackney.module.mentalmap;
 
 
 import java.util.Collection;
@@ -39,7 +39,7 @@ import org.matsim.plans.Plan;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
-import playground.jhackney.interactions.SocializingOpportunity;
+import playground.jhackney.module.interactions.SocializingOpportunity;
 /**
  *
  * @author fmarchal, jhackney

@@ -18,12 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.interactions;
+package playground.jhackney.module.interactions;
 
 import org.matsim.gbl.Gbl;
 
-import playground.jhackney.socialnet.SocialNetEdge;
-import playground.jhackney.socialnet.SocialNetwork;
+import playground.jhackney.module.socialnet.SocialNetEdge;
+import playground.jhackney.module.socialnet.SocialNetwork;
 
 /**
  * This Interactor lets agents exchange knowledge.

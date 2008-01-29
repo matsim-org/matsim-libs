@@ -18,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.replanning;
+package playground.jhackney.module.replanning;
 
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
-import playground.jhackney.algorithms.SNSecLocShortest;
 
 public class SNFacilitySwitcher extends MultithreadedModuleA {
 

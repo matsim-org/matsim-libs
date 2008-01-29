@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.controler;
+package playground.jhackney.module.controler;
 
 import java.io.File;
 import java.util.Collection;
@@ -41,17 +41,17 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
-import playground.jhackney.interactions.NonSpatialInteractor;
-import playground.jhackney.interactions.SocializingOpportunity;
-import playground.jhackney.interactions.SpatialInteractor;
-import playground.jhackney.interactions.SpatialSocialOpportunityTracker;
 import playground.jhackney.io.JUNGPajekNetWriterWrapper;
-import playground.jhackney.io.PajekWriter1;
-import playground.jhackney.scoring.SNScoringFunctionFactory03;
-import playground.jhackney.socialnet.SocialNetwork;
-import playground.jhackney.statistics.SocialNetworkStatistics;
+import playground.jhackney.module.interactions.NonSpatialInteractor;
+import playground.jhackney.module.interactions.SocializingOpportunity;
+import playground.jhackney.module.interactions.SpatialInteractor;
+import playground.jhackney.module.interactions.SpatialSocialOpportunityTracker;
+import playground.jhackney.module.io.PajekWriter1;
+import playground.jhackney.module.scoring.SNScoringFunctionFactory03;
+import playground.jhackney.module.socialnet.SocialNetwork;
+import playground.jhackney.module.statistics.SocialNetworkStatistics;
 
-public class SNControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
+public class SNControllerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 
 	protected boolean overwriteFiles = true;
 	private boolean CALCSTATS = true;
@@ -71,7 +71,7 @@ public class SNControlerListener implements StartupListener, IterationStartsList
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
 	Collection<SocializingOpportunity> socialPlans=null;
 
-	private final Logger log = Logger.getLogger(SNControlerListener.class);
+	private final Logger log = Logger.getLogger(SNControllerListener.class);
 
 //	Variables for allocating the spatial meetings among different types of activities
 	double fractionS[];

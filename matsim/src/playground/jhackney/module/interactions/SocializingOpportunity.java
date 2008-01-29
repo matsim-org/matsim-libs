@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.interactions;
+package playground.jhackney.module.interactions;
 
 import java.util.HashMap;
 import java.util.Vector;

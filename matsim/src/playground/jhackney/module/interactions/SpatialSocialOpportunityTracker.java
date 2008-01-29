@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.interactions;
+package playground.jhackney.module.interactions;
 /**
  * @author jhackney
  */
