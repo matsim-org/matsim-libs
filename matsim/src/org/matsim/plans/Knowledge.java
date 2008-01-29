@@ -29,7 +29,10 @@ import java.util.TreeSet;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.socialnetworks.mentalmap.MentalMap;
+import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.utils.identifiers.IdI;
+
 
 public class Knowledge {
 
@@ -209,4 +212,6 @@ public class Knowledge {
 	public final String toString() {
 		return "[desc=" + this.desc + "]" + "[nof_activities=" + this.activities.size() + "]";
 	}
+	public MentalMap map = new MentalMap(this);
+	public EgoNet egoNet = new EgoNet();
 }
