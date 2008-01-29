@@ -50,26 +50,29 @@ import org.matsim.utils.vis.kml.Style;
  */
 public class ShopsOf2005ToFacilities {
 
-	private static String pickPayOpenTimesFilename = "/Users/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/pickpay_opentimes.txt";
-	private static String pickPayAdressesFilename = "/Users/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/pickpay_addresses_ge_ready.csv";
-	private static String coopZHFilename = "/Users/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/coop-zh.csv";
-	private static String coopTGFilename = "/Users/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/coop-tg.csv";
-	private static String migrosZHFilename = "/Users/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/migros-zh.csv";
-	private static String migrosOstschweizFilename = "/Users/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/migros-ostschweiz-filialen.csv";
-	private static String dennerTGZHFilename = "/Users/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/denner-tg-zh.csv";
+	private static final String HOME_DIR = System.getenv("HOME");
+	private static final String SEP = System.getProperty("file.separator");
+
+	private static final String SANDBOX_NAME = "sandbox00";
+	private static final String SHOPS_CVS_MODULE = "ivt/studies/switzerland/facilities/shopsOf2005";
+	private static final String SHOPS_PATH = HOME_DIR + SEP + SANDBOX_NAME + SEP + SHOPS_CVS_MODULE + SEP;
+	
+	private static String pickPayOpenTimesFilename = SHOPS_PATH + "pickpay_opentimes.txt";
+	private static String pickPayAdressesFilename = SHOPS_PATH + "pickpay_addresses_ge_ready.csv";
+	private static String coopZHFilename = SHOPS_PATH + "coop-zh.csv";
+	private static String coopTGFilename = SHOPS_PATH + "coop-tg.csv";
+	private static String migrosZHFilename = SHOPS_PATH + "migros-zh.csv";
+	private static String migrosOstschweizFilename = SHOPS_PATH + "migros-ostschweiz-filialen.csv";
+	private static String dennerTGZHFilename = SHOPS_PATH + "denner-tg-zh.csv";
 
 	private static KML myKML = null;
 	private static Document myKMLDocument = null;
-	private static String kmlFilename = "/Users/meisterk/Documents/workspace/MATSim/output/shopsOf2005.kmz";
+	private static String kmlFilename = "output" + SEP + "shopsOf2005.kmz";
 
-	private static Style openCoopStyle = null;
-	private static Style closedCoopStyle = null;
-	private static Style openPickpayStyle = null;
-	private static Style closedPickpayStyle = null;
-	private static Style openMigrosStyle = null;
-	private static Style closedMigrosStyle = null;
-	private static Style openDennerStyle = null;
-	private static Style closedDennerStyle = null;
+	private static Style coopStyle = null;
+	private static Style pickpayStyle = null;
+	private static Style migrosStyle = null;
+	private static Style dennerStyle = null;
 
 	private static void setUp() {
 
@@ -81,47 +84,36 @@ public class ShopsOf2005ToFacilities {
 
 	private static void setupStyles() {
 
-		openCoopStyle = new Style("openCoopStyle");
-		myKMLDocument.addStyle(openCoopStyle);
-		openCoopStyle.setIconStyle(
-				new IconStyle(new Icon("/Users/meisterk/Documents/workspace/MATSim/src/playground/meisterk/facilities/res/coop_dhtml.jpg")));
-		closedCoopStyle = new Style("closedCoopStyle");
-		myKMLDocument.addStyle(closedCoopStyle);
-		closedCoopStyle.setIconStyle(
-				new IconStyle(new Icon("/Users/meisterk/Documents/workspace/MATSim/src/playground/meisterk/facilities/res/coop_dhtml_invert.jpg")));
+		System.out.print("Setting up KML styles...");
+		
+		coopStyle = new Style("coopStyle");
+		myKMLDocument.addStyle(coopStyle);
+		coopStyle.setIconStyle(
+				new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/C.png")));
 
-		openPickpayStyle = new Style("openPickpayStyle");
-		myKMLDocument.addStyle(openPickpayStyle);
-		openPickpayStyle.setIconStyle(
-				new IconStyle(new Icon("/Applications/Google Earth.app/Contents/Resources/paddle/p.png")));
-		closedPickpayStyle = new Style("closedPickpayStyle");
-		myKMLDocument.addStyle(closedPickpayStyle);
-		closedPickpayStyle.setIconStyle(
-				new IconStyle(new Icon("/Applications/Google Earth.app/Contents/Resources/paddle/p.png")));
+		pickpayStyle = new Style("pickpayStyle");
+		myKMLDocument.addStyle(pickpayStyle);
+		pickpayStyle.setIconStyle(
+				new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/P.png")));
 
-		openMigrosStyle = new Style("openMigrosStyle");
-		myKMLDocument.addStyle(openMigrosStyle);
-		openMigrosStyle.setIconStyle(
-				new IconStyle(new Icon("/Users/meisterk/Documents/workspace/MATSim/src/playground/meisterk/facilities/res/logo_head_migros.gif")));
-		closedMigrosStyle = new Style("closedMigrosStyle");
-		myKMLDocument.addStyle(closedMigrosStyle);
-		closedMigrosStyle.setIconStyle(
-				new IconStyle(new Icon("/Users/meisterk/Documents/workspace/MATSim/src/playground/meisterk/facilities/res/logo_head_migros.gif")));
+		migrosStyle = new Style("migrosStyle");
+		myKMLDocument.addStyle(migrosStyle);
+		migrosStyle.setIconStyle(
+				new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/M.png")));
 
-		openDennerStyle = new Style("openDennerStyle");
-		myKMLDocument.addStyle(openDennerStyle);
-		openDennerStyle.setIconStyle(
-				new IconStyle(new Icon("/Users/meisterk/Documents/workspace/MATSim/src/playground/meisterk/facilities/res/denner.jpeg")));
-		closedDennerStyle = new Style("closedDennerStyle");
-		myKMLDocument.addStyle(closedDennerStyle);
-		closedDennerStyle.setIconStyle(
-				new IconStyle(new Icon("/Users/meisterk/Documents/workspace/MATSim/src/playground/meisterk/facilities/res/denner.jpeg")));
+		dennerStyle = new Style("dennerStyle");
+		myKMLDocument.addStyle(dennerStyle);
+		dennerStyle.setIconStyle(
+				new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/D.png")));
 
-
+		System.out.println("done.");
+		
 	}
 
 	private static void dennerTGZHAddressesToKML() {
 		
+		System.out.print("Setting up Denner shops...");
+
 		Folder aFolder = null;
 		Placemark aShop = null;
 
@@ -149,23 +141,60 @@ public class ShopsOf2005ToFacilities {
 			e.printStackTrace();
 		}
 	
-		String beginsWith3Digits = "^[F]*";
-
+		// Java regex has to match ENTIRE string rather than "quick match" in most libraries
+		// for a discussion see
+		// http://www.regular-expressions.info/java.html
+		String beginsWith3Digits = "^[0-9]{3}.*$";
+		boolean nextLineIsTheAddressLine = false;
+		String city = null;
+		String street = null;
+		String id = null;
+		
 		for (String line : lines) {
 
-			if (Pattern.matches("[0-9]{3}", line)) {
-
-				System.out.println(line);
+			if (nextLineIsTheAddressLine) {
 				
+				nextLineIsTheAddressLine = false;
+
+				//System.out.println(line);
+				tokens = line.split(",");
+				street = tokens[9];
+
+				aShop = new Placemark(
+						"denner_" + id,
+						"Denner " + city + " " + street,
+						Feature.DEFAULT_DESCRIPTION,
+						street + ", " + city + ", Schweiz",
+						Feature.DEFAULT_LOOK_AT,
+						dennerStyle.getStyleUrl(),
+						Feature.DEFAULT_VISIBILITY,
+						Feature.DEFAULT_REGION,
+						Feature.DEFAULT_TIME_PRIMITIVE);
+
+				aFolder.addFeature(aShop);
+
+			}
+
+			if (Pattern.matches(beginsWith3Digits, line)) {
+
+				nextLineIsTheAddressLine = true;
+				
+				//System.out.println(line);
+				tokens = line.split(",");
+				id = tokens[0];
+				city = tokens[9];
+
 			}
 			
-//			tokens = line.split(",");
-			
 		}
-		
+
+		System.out.println("done.");
+
 	}	
 	
 	private static void coopZHAddressesToKML() {
+
+		System.out.print("Setting up Coop Züri shops...");
 
 		Folder coopFolder = null;
 		Placemark aCoop = null;
@@ -213,7 +242,7 @@ public class ShopsOf2005ToFacilities {
 						Feature.DEFAULT_DESCRIPTION,
 						tokens[9] + ", " + tokens[11] + ", Schweiz",
 						Feature.DEFAULT_LOOK_AT,
-						openCoopStyle.getStyleUrl(),
+						coopStyle.getStyleUrl(),
 						Feature.DEFAULT_VISIBILITY,
 						Feature.DEFAULT_REGION,
 						Feature.DEFAULT_TIME_PRIMITIVE);
@@ -223,9 +252,14 @@ public class ShopsOf2005ToFacilities {
 			}
 
 		}
+		
+		System.out.println("done.");
+
 	}
 
 	private static void coopTGAddressesToKML() {
+
+		System.out.print("Setting up Coop Thurgau shops...");
 
 		Folder coopFolder = null;
 		Placemark aCoop = null;
@@ -256,7 +290,7 @@ public class ShopsOf2005ToFacilities {
 
 		for (String line : lines) {
 
-			System.out.println(line);
+			//System.out.println(line);
 			tokens = line.split(",");
 
 			aCoop = new Placemark(
@@ -265,7 +299,7 @@ public class ShopsOf2005ToFacilities {
 					Feature.DEFAULT_DESCRIPTION,
 					tokens[1] + ", " + tokens[2] + ", Schweiz",
 					Feature.DEFAULT_LOOK_AT,
-					openCoopStyle.getStyleUrl(),
+					coopStyle.getStyleUrl(),
 					Feature.DEFAULT_VISIBILITY,
 					Feature.DEFAULT_REGION,
 					Feature.DEFAULT_TIME_PRIMITIVE);
@@ -273,6 +307,9 @@ public class ShopsOf2005ToFacilities {
 			coopFolder.addFeature(aCoop);
 
 		}
+		
+		System.out.println("done.");
+
 	}
 
 	private static void pickPayAddressesToKML() {
@@ -315,7 +352,7 @@ public class ShopsOf2005ToFacilities {
 					Feature.DEFAULT_DESCRIPTION,
 					tokens[2] + ", " + tokens[5] + ", Schweiz",
 					Feature.DEFAULT_LOOK_AT,
-					openPickpayStyle.getStyleUrl(),
+					pickpayStyle.getStyleUrl(),
 					Feature.DEFAULT_VISIBILITY,
 					Feature.DEFAULT_REGION,
 					Feature.DEFAULT_TIME_PRIMITIVE);
@@ -324,10 +361,14 @@ public class ShopsOf2005ToFacilities {
 
 		}
 
+		System.out.println("done.");
+
 	}
 
 	private static void migrosZHAdressesToKML() {
 		
+		System.out.print("Setting up Migros ZH shops...");
+
 		Folder migrosZHFolder = null;
 		Placemark aMigrosZH = null;
 
@@ -357,7 +398,7 @@ public class ShopsOf2005ToFacilities {
 
 		for (String line : lines) {
 
-			System.out.println(line);
+			//System.out.println(line);
 			tokens = line.split(",");
 
 			aMigrosZH = new Placemark(
@@ -366,7 +407,7 @@ public class ShopsOf2005ToFacilities {
 					Feature.DEFAULT_DESCRIPTION,
 					tokens[2] + ", " + tokens[3] + ", Schweiz",
 					Feature.DEFAULT_LOOK_AT,
-					openMigrosStyle.getStyleUrl(),
+					migrosStyle.getStyleUrl(),
 					Feature.DEFAULT_VISIBILITY,
 					Feature.DEFAULT_REGION,
 					Feature.DEFAULT_TIME_PRIMITIVE);
@@ -375,11 +416,14 @@ public class ShopsOf2005ToFacilities {
 
 		}
 
-		
+		System.out.println("done.");
+
 	}
 	
 	private static void migrosOstschweizAdressesToKML() {
 		
+		System.out.print("Setting up Migros Ostschweiz shops...");
+
 		Folder migrosOstschweizFolder = null;
 		Placemark aMigrosOstschweiz = null;
 
@@ -409,7 +453,7 @@ public class ShopsOf2005ToFacilities {
 
 		for (String line : lines) {
 
-			System.out.println(line);
+			//System.out.println(line);
 			tokens = line.split(",");
 
 			aMigrosOstschweiz = new Placemark(
@@ -418,7 +462,7 @@ public class ShopsOf2005ToFacilities {
 					Feature.DEFAULT_DESCRIPTION,
 					tokens[5] + ", " + tokens[6] + ", Schweiz",
 					Feature.DEFAULT_LOOK_AT,
-					openMigrosStyle.getStyleUrl(),
+					migrosStyle.getStyleUrl(),
 					Feature.DEFAULT_VISIBILITY,
 					Feature.DEFAULT_REGION,
 					Feature.DEFAULT_TIME_PRIMITIVE);
@@ -427,12 +471,13 @@ public class ShopsOf2005ToFacilities {
 
 		}
 
+		System.out.println("done.");
+
 		
 	}
 
 	private static void readPickPayOpenTimes() {
 
-		// TODO Auto-generated method stub
 		boolean nextLineIsACloseLine = false;
 
 		List<String> lines = null;
@@ -481,35 +526,43 @@ public class ShopsOf2005ToFacilities {
 
 		}
 
+		System.out.println("done.");
+
 	}
 
 	private static void write() {
 
-		System.out.println("    writing KML files out...");
+		System.out.print("Writing KML files out...");
 
 		KMZWriter writer;
 		writer = new KMZWriter(kmlFilename);
 		writer.writeMainKml(myKML);
 		writer.close();
 
-		System.out.println("    done.");
+		System.out.println("done.");
 
 	}
 
+	private static void prepareRawDataForGeocoding() {
+		
+		ShopsOf2005ToFacilities.setUp();
+		ShopsOf2005ToFacilities.setupStyles();
+		ShopsOf2005ToFacilities.dennerTGZHAddressesToKML();
+		ShopsOf2005ToFacilities.pickPayAddressesToKML();
+		ShopsOf2005ToFacilities.coopZHAddressesToKML();
+		ShopsOf2005ToFacilities.coopTGAddressesToKML();
+		ShopsOf2005ToFacilities.migrosZHAdressesToKML();
+		ShopsOf2005ToFacilities.migrosOstschweizAdressesToKML();
+		ShopsOf2005ToFacilities.write();		
+		
+	}
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 
-		ShopsOf2005ToFacilities.setUp();
-		ShopsOf2005ToFacilities.setupStyles();
-		ShopsOf2005ToFacilities.dennerTGZHAddressesToKML();
-//		ShopsOf2005ToFacilities.pickPayAddressesToKML();
-//		ShopsOf2005ToFacilities.coopZHAddressesToKML();
-//		ShopsOf2005ToFacilities.coopTGAddressesToKML();
-//		ShopsOf2005ToFacilities.migrosZHAdressesToKML();
-//		ShopsOf2005ToFacilities.migrosOstschweizAdressesToKML();
-		ShopsOf2005ToFacilities.write();
+		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
 
 //		ShopsOf2005ToFacilities.readPickPayOpenTimes();
 
