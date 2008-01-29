@@ -91,67 +91,72 @@ public class NewPtcheckControler extends Controler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-
-		public void notifyIterationEnds(IterationEndsEvent event) {
-			int it = event.getIteration();
-			Controler ctl = event.getControler();
-			Config cf = ctl.getConfig();
-			RoadPricing rp = ctl.getRoadPricing();
-			CalcPaidToll tollCalc =null;
-			if (rp != null) {
-				tollCalc = rp.getPaidTolls();
-			}
-			CalcAverageTripLength catl = new CalcAverageTripLength();
-			catl.run(ctl.getPopulation());
-			try {
-				out.writeBytes(it
-						+ "\t"
-						+ cf.getParam("planCalcScore", "traveling")
-						+ "\t"
-						+ cf.getParam("planCalcScore", "travelingPt")
-						+ "\t"
-						+ ((Gbl.useRoadPricing()) ? rp.getRoadPricingScheme()
-								.getCostArray()[0].amount : 0)
-						+ "\t"
-						+ ((tollCalc != null) ? tollCalc.getAllAgentsToll()
-								: 0.0)
-						+ "\t"
-						+ ctl.getScoreStats().getHistory()[3][it]
-						+ "\t"
-						+ ((tollCalc != null) ? tollCalc.getDraweesNr() : 0)
-						+ "\t"
-						+ catl.getAverageTripLength()
-						+ "\t"
-						+ ((((tollCalc != null) && (cattl != null))) ? cattl
-								.getAverageTripLength() : 0.0) + "\t"
-						+ ctpf.getTrafficPerformance() + "\t"
-						+ cas.getAvgSpeed() + "\n");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		public void notifyIterationStarts(IterationStartsEvent event) {
-			int it = event.getIteration();
-			Controler ctl = event.getControler();
-			Events events = ctl.getEvents();
 			NetworkLayer network = ctl.getNetwork();
 			cas = new CalcAvgSpeed(network);
-			cas.reset(it);
-			if (cattl != null) {
-				cattl.reset(it);
-			}
 			ctpf = new CalcTrafficPerformance(network);
-			ctpf.reset(it);
+			Events events = ctl.getEvents();
+			events.addHandler(cas);
+			events.addHandler(ctpf);
 			if (Gbl.useRoadPricing()) {
 				cattl = new CalcAverageTolledTripLength(network, ctl
 						.getRoadPricing().getRoadPricingScheme());
 				events.addHandler(cattl);
 			}
+		}
 
-			events.addHandler(ctpf);
-			events.addHandler(cas);
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			int it = event.getIteration();
+			if (it % 10 == 0) {
+				Controler ctl = event.getControler();
+				Config cf = ctl.getConfig();
+				RoadPricing rp = ctl.getRoadPricing();
+				CalcPaidToll tollCalc = null;
+				if (rp != null) {
+					tollCalc = rp.getPaidTolls();
+				}
+				CalcAverageTripLength catl = new CalcAverageTripLength();
+				catl.run(ctl.getPopulation());
+				try {
+					out
+							.writeBytes(it
+									+ "\t"
+									+ cf.getParam("planCalcScore", "traveling")
+									+ "\t"
+									+ cf.getParam("planCalcScore",
+											"travelingPt")
+									+ "\t"
+									+ ((Gbl.useRoadPricing()) ? rp
+											.getRoadPricingScheme()
+											.getCostArray()[0].amount : 0)
+									+ "\t"
+									+ ((tollCalc != null) ? tollCalc
+											.getAllAgentsToll() : 0.0)
+									+ "\t"
+									+ ctl.getScoreStats().getHistory()[3][it]
+									+ "\t"
+									+ ((tollCalc != null) ? tollCalc
+											.getDraweesNr() : 0)
+									+ "\t"
+									+ catl.getAverageTripLength()
+									+ "\t"
+									+ ((((tollCalc != null) && (cattl != null))) ? cattl
+											.getAverageTripLength()
+											: 0.0) + "\t"
+									+ ctpf.getTrafficPerformance() + "\t"
+									+ cas.getAvgSpeed() + "\n");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		public void notifyIterationStarts(IterationStartsEvent event) {
+			int it = event.getIteration();
+			cas.reset(it);
+			ctpf.reset(it);
+			if (Gbl.useRoadPricing()) {
+				cattl.reset(it);
+			}
 		}
 
 		public void notifyShutdown(ShutdownEvent event) {
@@ -161,7 +166,6 @@ public class NewPtcheckControler extends Controler {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	// -------------------------MAIN FUNCTION--------------------

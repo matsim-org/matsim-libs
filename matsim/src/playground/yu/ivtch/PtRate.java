@@ -88,70 +88,84 @@ public class PtRate implements IterationEndsListener {
 	 * writes .txt-file and paints 2 .png-picture
 	 */
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		Config cf = event.getControler().getConfig();
-		check.resetCnt();
-		check.run(population);
 		int idx = event.getIteration();
-		yPtRate[idx] = check.getPtRate();
-		yPtUser[idx] = check.getPtUserCnt();
-		yPersons[idx] = check.getPersonCnt();
-		try {
-			check.write(idx);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if (idx == maxIters) {
-			double[] x = new double[maxIters + 1];
-			for (int i = 0; i < maxIters + 1; i++) {
-				x[i] = i;
-			}
-			XYLineChart ptRateChart = new XYLineChart("Schweiz: PtRate, "
-					+ maxIters + "ITERs, BetaTraveling=" + BetaTraveling
-					+ ", BetaTravelingPt=" + BetaTravelingPt
-					+ ", BetaPerforming="
-					+ cf.getParam("planCalcScore", "performing")
-					+ ", flowCapacityFactor="
-					+ cf.getParam("simulation", "flowCapacityFactor")
-					+ ", storageCapacityFactor="
-					+ cf.getParam("simulation", "storageCapacityFactor") + ", "
-					+ cf.getParam("strategy", "ModuleProbability_2")
-					+ "-ReRoute_Landmarks, "
-					+ cf.getParam("strategy", "ModuleProbability_3")
-					+ "-TimeAllocationMutator, "
-					+ cf.getParam("strategy", "ModuleProbability_1")
-					+ "-SelectExpBeta", "Iterations", "Pt-Rate");
-			ptRateChart.addSeries("PtRate", x, yPtRate);
-			ptRateChart.saveAsPng(Controler.getOutputFilename("PtRate.png"),
-					800, 600);
-			XYLineChart personsChart = new XYLineChart(
-					"Schweiz: PtUser/Persons, "
-							+ maxIters
-							+ "ITERs, BetaTraveling="
-							+ BetaTraveling
-							+ ", BetaTravelingPt="
-							+ BetaTravelingPt
-							+ ", BetaPerforming="
-							+ cf.getParam("planCalcScore", "performing")
-							+ ", flowCapacityFactor="
-							+ cf.getParam("simulation", "flowCapacityFactor")
-							+ ", storageCapacityFactor="
-							+ cf
-									.getParam("simulation",
-											"storageCapacityFactor") + ", "
-							+ cf.getParam("strategy", "ModuleProbability_2")
-							+ "-ReRoute_Landmarks, "
-							+ cf.getParam("strategy", "ModuleProbability_3")
-							+ "-TimeAllocationMutator, "
-							+ cf.getParam("strategy", "ModuleProbability_1")
-							+ "-SelectExpBeta", "Iterations", "PtUser/Persons");
-			personsChart.addSeries("PtUser", x, yPtUser);
-			personsChart.addSeries("Persons", x, yPersons);
-			personsChart.saveAsPng(Controler.getOutputFilename("Persons.png"),
-					800, 600);
+		if (idx % 10 == 0) {
+			Config cf = event.getControler().getConfig();
+			check.resetCnt();
+			check.run(population);
+			yPtRate[idx] = check.getPtRate();
+			yPtUser[idx] = check.getPtUserCnt();
+			yPersons[idx] = check.getPersonCnt();
 			try {
-				check.writeEnd();
+				check.write(idx);
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+			if (idx == maxIters) {
+				double[] x = new double[maxIters + 1];
+				for (int i = 0; i < maxIters + 1; i++) {
+					x[i] = i;
+				}
+				XYLineChart ptRateChart = new XYLineChart("Schweiz: PtRate, "
+						+ maxIters + "ITERs, BetaTraveling=" + BetaTraveling
+						+ ", BetaTravelingPt=" + BetaTravelingPt
+						+ ", BetaPerforming="
+						+ cf.getParam("planCalcScore", "performing")
+						+ ", flowCapacityFactor="
+						+ cf.getParam("simulation", "flowCapacityFactor")
+						+ ", storageCapacityFactor="
+						+ cf.getParam("simulation", "storageCapacityFactor")
+						+ ", " + cf.getParam("strategy", "ModuleProbability_2")
+						+ "-ReRoute_Landmarks, "
+						+ cf.getParam("strategy", "ModuleProbability_3")
+						+ "-TimeAllocationMutator, "
+						+ cf.getParam("strategy", "ModuleProbability_1")
+						+ "-SelectExpBeta", "Iterations", "Pt-Rate");
+				ptRateChart.addSeries("PtRate", x, yPtRate);
+				ptRateChart.saveAsPng(
+						Controler.getOutputFilename("PtRate.png"), 800, 600);
+				XYLineChart personsChart = new XYLineChart(
+						"Schweiz: PtUser/Persons, "
+								+ maxIters
+								+ "ITERs, BetaTraveling="
+								+ BetaTraveling
+								+ ", BetaTravelingPt="
+								+ BetaTravelingPt
+								+ ", BetaPerforming="
+								+ cf.getParam("planCalcScore", "performing")
+								+ ", flowCapacityFactor="
+								+ cf.getParam("simulation",
+										"flowCapacityFactor")
+								+ ", storageCapacityFactor="
+								+ cf.getParam("simulation",
+										"storageCapacityFactor")
+								+ ", "
+								+ cf
+										.getParam("strategy",
+												"ModuleProbability_2")
+								+ "-"
+								+ cf.getParam("strategy", "Module_2")
+								+ ", "
+								+ cf
+										.getParam("strategy",
+												"ModuleProbability_3")
+								+ "-"
+								+ cf.getParam("strategy", "Module_3")
+								+ ", "
+								+ cf
+										.getParam("strategy",
+												"ModuleProbability_1") + "-"
+								+ cf.getParam("strategy", "Module_1"),
+						"Iterations", "PtUser/Persons");
+				personsChart.addSeries("PtUser", x, yPtUser);
+				personsChart.addSeries("Persons", x, yPersons);
+				personsChart.saveAsPng(Controler
+						.getOutputFilename("Persons.png"), 800, 600);
+				try {
+					check.writeEnd();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
