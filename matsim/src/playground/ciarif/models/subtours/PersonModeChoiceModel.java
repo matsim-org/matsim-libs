@@ -21,6 +21,7 @@
 package playground.ciarif.models.subtours;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.gbl.Gbl;
@@ -32,6 +33,7 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.world.Location;
 
 import playground.balmermi.census2000.data.Persons;
 
@@ -53,7 +55,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final Coord ZERO = new Coord(0.0,0.0);
 	private final Persons persons;
 	private ModelModeChoice model;
-		
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -68,9 +70,9 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void handleSubTour(final Plan plan, final int start, final int i, final int j, final int end) {
+	private final void handleSubTour(final Plan plan, final int start, final int i, final int j, final int end, int prev_mode) {
 	
-		// calculate the SubTour distance (in 1 km bins)
+		// calculate the SubTour distance (in 1bins)
 		int mainpurpose =  3; //mainpurpose:  0 := work; 1 := edu; 2 := shop 3:=leisure
 		double d = 0.0;
 		CoordI prev = ((Act)plan.getActsLegs().get(start)).getCoord();
@@ -114,12 +116,15 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		d = d/1000.0;
 		
 		// Defining urban degree for the starting point of the subtour
-		
+		//CoordI coord_start = ((Act)plan.getActsLegs().get(start)).getCoord();
+		//Location l = Gbl.getWorld().//getLayer(MUNICIPALITY).getLocation(m_id);
+		//int prev_mode = 0;
 		
 		// setting subtour parameters
 		// Deve essere rifatto!!!!!model.setUrbanDegree(p.getHousehold().getMunicipality().getRegType());
 		model.setMainPurpose(mainpurpose);
 		model.setDistanceTour(d); // model needs meters!
+		model.setPrevMode(prev_mode);
 		
 		// choose mode choice model based on main purpose
 		if (model.age >=18)
@@ -135,19 +140,30 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		// getting the chosen mode
 		int modechoice = model.calcModeChoice();
 		String mode = null;
-		if (modechoice == 0) { mode = WALK; }
-		else if (modechoice == 1) { mode = BIKE; }
-		else if (modechoice == 2) { mode = CAR; }
-		else if (modechoice == 3) { mode = PT; }
-		else if (modechoice == 4) { mode = RIDE; }
+		if (modechoice == 0) { mode = CAR; }
+		else if (modechoice == 1) { mode = PT; }
+		else if (modechoice == 2) { mode = RIDE; }
+		else if (modechoice == 3) { mode = BIKE; }
+		else if (modechoice == 4) { mode = WALK; }
 		else { Gbl.errorMsg("Mode choice returns undefined value!"); }
 		
+		prev_mode = modechoice;
 		for (int k=start+1;k<=i-1;k=k+2){
 			((Act)plan.getActsLegs().get(k)).setType(mode);
 		}
 	}
-
+	private final void registerSubTours (final Plan plan, final int start, final int i, final int j, final int end) {
+		int prev_mode = 0;
+		int subtour_nr = 0;
+		List<Integer> subToursRegister = null;
+		
+		for (int k=0; k < subToursRegister.size(); k= k+1){
+		this.handleSubTour(plan,start,i,j,end, prev_mode);
+		}
+	}
+	
 	private final void extractSubTours(Plan plan, int start, int end) {
+		
 		boolean is_leaf = true;
 		for (int i=start+2; i<end-1; i=i+2) {
 			Act acti = (Act)plan.getActsLegs().get(i);
@@ -157,8 +173,8 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 				    (acti.getCoord().getY() == actj.getCoord().getY())) {
 					// subtour found: start..i & j..end
 					is_leaf = false;
-					this.handleSubTour(plan,start,i,j,end);
-
+					this.registerSubTours(plan,start,i,j,end);
+					
 					// next recursive step
 					int ii = i;
 					Act actii = acti;
@@ -177,7 +193,8 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		}
 		if (is_leaf) {
 			// leaf-sub-tour: start..end
-			this.handleSubTour(plan,start,end,end,end);
+			this.registerSubTours(plan,start,end,end,end);
+			//this.handleSubTour(plan,start,end,end,end,prev_mode);
 		}
 	}
 	
@@ -220,7 +237,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			model.setTickets(person.getTravelcards());
 			model.setLicenseOwnership(p.hasLicense());
 			model.setBike(has_bike);
-			
+			model.setMale (p.getSex());
 			this.extractSubTours(plan,0,plan.getActsLegs().size()-1);
 		
 		}				

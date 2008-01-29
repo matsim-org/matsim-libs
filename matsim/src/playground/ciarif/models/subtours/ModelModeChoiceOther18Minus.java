@@ -4,28 +4,23 @@ import org.matsim.gbl.Gbl;
 
 public class ModelModeChoiceOther18Minus extends ModelModeChoice {
 	
-
-	//è ancora da cambiare!!!!!!!!
-	
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	static final double B1_CONST = +3.1101510e+000;		
-	static final double B1_T2 = +2.8586344e-001;
-	static final double B1_T3 = -1.8126991e-001;
-	static final double B1_T4 = -1.7790913e-001;		
-	static final double B1_T5 = -2.4615782e-001;		
-	static final double B2_CONST = +2.1548612e+000;
-	static final double B2_T2 = +5.2616644e-002;
-	static final double B2_T3 = +8.1434652e-003;
-	static final double B2_T4 = -8.2933460e-001;		
-	static final double B2_T5 = -7.1255186e-003;
-	static final double B4_AGE = +7.6872568e-003;
-	static final double B4_SEASON = +8.8220087e-001;
-	static final double B5_6_12 = +5.7192709e-001;
-	static final double B5_CONST = +2.4527356e+000;
-	
+	static final double B2_Dist = +3.8443530e-004;
+	static final double B2_Season = +1.2177049e+000;
+	static final double B2_T2 = -1.0764101e+000;
+	static final double B2_T3 = -7.0101782e-001;
+	static final double B2_T4 = -1.3145273e+000;
+	static final double B2_T5 = -1.4777988e+000;
+	static final double B3_6_12 = +1.5479209e+000;
+	static final double B3_CONST = +1.0497098e-001;
+	static final double B4_CONST = +5.1439056e-001;
+	static final double B4_Dist = -1.3065237e-001;
+	static final double B5_6_12 = +8.7437010e-001;
+	static final double B5_CONST = +7.2182640e-001;
+	static final double B5_Dist = -1.3787648e-001;
 
 	/////////////////////////////////////////////////////////////////////
 	// constructors
@@ -38,6 +33,10 @@ public class ModelModeChoiceOther18Minus extends ModelModeChoice {
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
+	//4	Bike	one	B4_CONST * one + B4_Dist * DISTANCE
+	//3	Car_Passenger	one	B3_CONST * one + B3_6_12 * AGE_6_12
+	//2	PT	one	B2_Season * TICKETS + B2_Dist * DISTANCE + B2_T2 * T2 + B2_T3 * T3 + B2_T4 * T4 + B2_T5 * T5
+	//5	Walk	one	B5_CONST * one + B5_Dist * DISTANCE + B5_6_12 * AGE_6_12
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -48,13 +47,9 @@ public class ModelModeChoiceOther18Minus extends ModelModeChoice {
 		// if (one)
 		// B_Const_w* 1 + B_Dist_w * T_DIST
 		double util = 0.0;
-		util += B1_CONST * 1.0;
-		if (udeg == 1) { /* reference type */ }
-		else if (udeg == 2) { util += B1_T2 * 1.0; }
-		else if (udeg == 3) { util += B1_T3 * 1.0; }
-		else if (udeg == 4) { util += B1_T4 * 1.0; }
-		else if (udeg == 5) { util += B1_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		util += B5_CONST * 1.0;
+		util += B5_Dist * dist_subtour;
+		if (age <= 12 & age >= 6 ) { util += B5_6_12 * 1.0; } 
 		return util;
 	}
 
@@ -62,13 +57,8 @@ public class ModelModeChoiceOther18Minus extends ModelModeChoice {
 	protected final double calcBikeUtil() {
 		if (!bike) { return Double.NEGATIVE_INFINITY; }
 		double util = 0.0;
-		util += B2_CONST * 1.0;
-		if (udeg == 1) { /* reference type */ }
-		else if (udeg == 2) { util += B2_T2 * 1.0; }
-		else if (udeg == 3) { util += B2_T3 * 1.0; }
-		else if (udeg == 4) { util += B2_T4 * 1.0; }
-		else if (udeg == 5) { util += B2_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		util += B4_CONST * 1.0;
+		util += B4_Dist * dist_subtour;
 		return util;
 	}
 	
@@ -81,16 +71,22 @@ public class ModelModeChoiceOther18Minus extends ModelModeChoice {
 	@Override
 	protected final double calcPublicUtil() {
 		double util = 0.0;
-		util += B4_SEASON * tickets ;
-		util += B4_AGE * (age * age);
+		util += B2_Season * tickets ;
+		util += B2_Dist * dist_subtour;
+		if (udeg == 1) { /* reference type */ }
+		else if (udeg == 2) { util += B2_T2 * 1.0; }
+		else if (udeg == 3) { util += B2_T3 * 1.0; }
+		else if (udeg == 4) { util += B2_T4 * 1.0; }
+		else if (udeg == 5) { util += B2_T5 * 1.0; }
+		else { Gbl.errorMsg("This should never happen!"); }
 		return util;
 	}
 
 	@Override
 	protected final double calcCarRideUtil() {
 		double util = 0.0;
-		util += B5_CONST * 1.0;
-		if (age <= 12 & age >= 6 ) { util += B5_6_12 * 1.0; }
+		util += B3_CONST * 1.0;
+		if (age <= 12 & age >= 6 ) { util += B3_6_12 * 1.0; }
 		return util;
 	}
 }

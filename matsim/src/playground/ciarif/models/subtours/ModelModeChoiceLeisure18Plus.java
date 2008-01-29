@@ -4,35 +4,33 @@ import org.matsim.gbl.Gbl;
 
 public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 	
-	//è ancora da cambiare!!!!!!!!
-	
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-
-	static final double B1_CONST = +4.3948182e+000;		
-	static final double B1_DIST_TOUR = -8.0750733e-001;
-	static final double B2_CONST = +1.2650584e+000;
-	static final double B2_DIST_TOUR = -1.5385983e-001;		
-	static final double B3_CONST = +5.1757033e-001;
-	static final double B3_CAR_ALWAYS = +2.0663115e+000;
-	static final double B3_DIST_TOUR = -2.3085511e-003;
-	static final double B3_T2 = +3.2437481e-001;
-	static final double B3_T3 = +1.5080347e-001;
-	static final double B3_T4 = +3.2894202e-001;		
-	static final double B3_T5 = +4.4949286e-001;
-	static final double B4_AGE = +1.2270216e-004;
-	static final double B4_CAR_NEVER = +7.2009050e-001;
-	static final double B4_SEASON = +1.4862080e+000;
-	static final double B4_T2 = -8.3248311e-001;
-	static final double B4_T3 = -6.4843826e-001;
-	static final double B4_T4 = -1.2727468e+000;
-	static final double B4_T5 = -1.4736010e+000;
-	static final double B5_18_30 = +5.0732109e-001;
-	static final double B5_70 = +1.4776279e+000;
-	static final double B5_CONST = -6.5312469e-001;
-	static final double B5_DIST_TOUR = -2.9312571e-003;
-	static final double B5_MALE = -1.0336419e+000;
+	static final double B1_CONST = +9.7135851e-001;
+	static final double B1_Car_Always = +1.7863477e+000;
+	static final double B1_Dist = -8.0133764e-004;
+	static final double B1_Prev = +3.8342053e+000;
+	static final double B1_T2 = +4.8196222e-001;
+	static final double B1_T3 = +3.9743825e-001;
+	static final double B1_T4 = +5.7954086e-001;
+	static final double B1_T5 = +6.8172148e-001;
+	static final double B2_60 = +4.2002117e-001;
+	static final double B2_Car_Never = +8.3618328e-001;
+	static final double B2_Season = +1.4526892e+000;
+	static final double B2_T2 = -6.5672879e-001;
+	static final double B2_T3 = -3.4072912e-001;
+	static final double B2_T4 = -8.4616918e-001;
+	static final double B2_T5 = -1.1763996e+000;
+	static final double B3_18_30 = +7.1519671e-001;
+	static final double B3_60 = +1.4935628e+000;
+	static final double B3_CONST = -9.3709542e-001;
+	static final double B3_Dist = -1.5869066e-003;
+	static final double B4_CONST = +5.0186587e-001;
+	static final double B4_Dist = -1.6833622e-002;
+	static final double B5_CONST = +3.2303337e+000;
+	static final double B5_Dist = -4.1487873e-001;
+	static final double B5_Prev = -3.8047074e+000;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -45,6 +43,12 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
+	
+	//4	Bike	one	B4_CONST * one + B4_Dist * DISTANCE
+	//1	Car	one	B1_CONST * one + B1_Dist * DISTANCE + B1_Car_Always * CAR_ALWAYS + B1_Prev * PREV_CAR + B1_T2 * T2 + B1_T3 * T3 + B1_T4 * T4 + B1_T5 * T5
+	//3	Car_Passenger	one	B3_CONST * one + B3_Dist * DISTANCE + B3_18_30 * AGE_18_30 + B3_60 * AGE_60
+	//2	PT	one	B2_Season * TICKETS + B2_Car_Never * CAR_NEVER + B2_60 * AGE_60 + B2_T2 * T2 + B2_T3 * T3 + B2_T4 * T4 + B2_T5 * T5
+	//5	Walk	one	B5_CONST * one + B5_Dist * DISTANCE + B5_Prev * PREV_P_P_W
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -55,8 +59,9 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 		// if (one)
 		// B_Const_w* 1 + B_Dist_w * T_DIST
 		double util = 0.0;
-		util += B1_CONST * 1.0;
-		util += B1_DIST_TOUR * dist_subtour;
+		util += B5_CONST * 1.0;
+		util += B5_Dist * dist_subtour;
+		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 5)) {util += B5_Prev * 1.0;}
 		return util;
 	}
 
@@ -64,22 +69,23 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 	protected final double calcBikeUtil() {
 		if (!bike) { return Double.NEGATIVE_INFINITY; }
 		double util = 0.0;
-		util += B2_CONST * 1.0;
-		util += B2_DIST_TOUR * dist_subtour;
+		util += B4_CONST * 1.0;
+		util += B4_Dist * dist_subtour;
 		return util;
 	}
 	
 	@Override
 	protected final double calcCarUtil() {
 		double util = 0.0;
-		util += B3_CONST * 1.0;
-		util += B3_DIST_TOUR * dist_subtour;
-		if (car == "always") { util += B3_CAR_ALWAYS * 1.0; }
+		util += B1_CONST * 1.0;
+		util += B1_Dist * dist_subtour;
+		if (prev_mode == 1) {util += B1_Prev * 1.0;}
+		if (car == "always") { util += B1_Car_Always * 1.0; }
 		if (udeg == 1) { /* reference type */ }
-		else if (udeg == 2) { util += B3_T2 * 1.0; }
-		else if (udeg == 3) { util += B3_T3 * 1.0; }
-		else if (udeg == 4) { util += B3_T4 * 1.0; }
-		else if (udeg == 5) { util += B3_T5 * 1.0; }
+		else if (udeg == 2) { util += B1_T2 * 1.0; }
+		else if (udeg == 3) { util += B1_T3 * 1.0; }
+		else if (udeg == 4) { util += B1_T4 * 1.0; }
+		else if (udeg == 5) { util += B1_T5 * 1.0; }
 		else { Gbl.errorMsg("This should never happen!"); }
 		return util;
 	}
@@ -87,14 +93,14 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 	@Override
 	protected final double calcPublicUtil() {
 		double util = 0.0;
-		util += B4_SEASON * tickets ;
-		if (car == "never") {util += B4_CAR_NEVER * 1.0;}
-		util += B4_AGE * (age * age);
+		util += B2_Season * tickets ;
+		if (car == "never") { util += B2_Car_Never *  1.0; }
 		if (udeg == 1) { /* reference type */ }
-		else if (udeg == 2) { util += B4_T2 * 1.0; }
-		else if (udeg == 3) { util += B4_T3 * 1.0; }
-		else if (udeg == 4) { util += B4_T4 * 1.0; }
-		else if (udeg == 5) { util += B4_T5 * 1.0; }
+		if (age >= 60 ) { util += B2_60 * 1.0; }
+		else if (udeg == 2) { util += B2_T2 * 1.0; }
+		else if (udeg == 3) { util += B2_T3 * 1.0; }
+		else if (udeg == 4) { util += B2_T4 * 1.0; }
+		else if (udeg == 5) { util += B2_T5 * 1.0; }
 		else { Gbl.errorMsg("This should never happen!"); }
 		return util;
 	}
@@ -102,12 +108,9 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 	@Override
 	protected final double calcCarRideUtil() {
 		double util = 0.0;
-		util += B5_CONST * 1.0;
-		util += B5_DIST_TOUR * dist_subtour;
-		util += B5_MALE * 1.0;
-		if (age <= 30 ) { util += B5_18_30 * 1.0; }
-		if (age >= 70 ) { util += B5_70 * 1.0; }
+		util += B3_CONST * 1.0;
+		if (age >= 18 & age < 30) {util += B3_18_30 * 1.0;}
+		if (age >= 60 ) { util += B3_60 * 1.0; }
 		return util;
 	}
-
 }

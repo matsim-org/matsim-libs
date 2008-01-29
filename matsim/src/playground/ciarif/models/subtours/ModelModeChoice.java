@@ -39,6 +39,7 @@ public abstract class ModelModeChoice {
 	protected double tickets; // holds some kind of season tickets 
 	protected int purpose; // main purpose of the tour (Work = 1, Education = 2, Shop=3)
 	protected String car; // av. of car (Always, Sometimes, Never)
+	protected String male; // 0-[unlimited]
 	protected boolean bike; // bike ownership
 	protected double prev_mode; // 1= car; 2= Pt; 3= Car passenger; 4= Bike; 5= Walk;
 	
@@ -49,7 +50,7 @@ public abstract class ModelModeChoice {
 	public ModelModeChoice() {
 		this.age = -1.0;
 		this.nump = -1.0;
-		this.udeg = -1.0;
+		//this.udeg = -1.0;
 		this.license = -1.0;
 		this.dist_subtour = -1.0;
 		this.dist_w_e = -1.0;
@@ -113,6 +114,12 @@ public abstract class ModelModeChoice {
 		return true;
 	}
 	
+	public final boolean setMale(String male) {
+		if (male == null) {return false; }
+		this.male = male;
+		return true;
+	}
+	
 	public final boolean setTickets(TreeSet<String> tickets) {
 		if (tickets.isEmpty()) { this.tickets = 0.0; }
 		else { this.tickets = 1.0; }
@@ -135,8 +142,7 @@ public abstract class ModelModeChoice {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Calculates the combination of car_avail and public transport ticket
-	 * ownership.
+	 * Calculates the modal choice of the agent
 	 * 
 	 * @return values between 0 and 4.<BR>
 	 * 
