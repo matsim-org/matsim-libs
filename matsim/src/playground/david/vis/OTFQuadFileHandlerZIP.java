@@ -33,6 +33,7 @@ import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -375,12 +376,14 @@ public class OTFQuadFileHandlerZIP implements SimStateWriterI, OTFServerRemote{
 	}
 
 	public byte[] getStateBuffer() throws RemoteException {
-		if (nextTime > timesteps.lastKey()) {
-			nextTime = timesteps.firstKey();
-		}
-		
 		byte [] buffer = timesteps.get((int)nextTime);
-		nextTime += intervall_s;
+		int time = 0;
+		Iterator<Integer> it =  timesteps.keySet().iterator();
+		while(it.hasNext() && time <= nextTime) time = it.next();
+		if (time == nextTime) {
+			time = timesteps.firstKey();
+		}
+		nextTime = time;
 		return buffer;
 	}
 

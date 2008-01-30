@@ -94,6 +94,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandlerZIP{
 		if (time != this.lastTime) {
 			this.cntTimesteps++;
 
+			if (time % 600 == 0 ) System.out.println("Parsing T = " + time + " secs");
 			// the time changes
 				// this is a dumpable timestep
 				try {
@@ -105,10 +106,11 @@ public class OTFTVeh2MVI extends OTFQuadFileHandlerZIP{
 				}
 			this.lastTime = time;
 		}			
-
-		if (time == nextTime) {
+// I do not realyy know which second will be written, as it might be any second AFTER nextTime, when NOTHING has happened on "nextTime", as the if-clause will be executed only then
+// still I can collect all vehicles, as to every time change it will get erased...
+//		if (time == nextTime) {
 			writer.positions.add(position);
-		}
+//		}
 	}
 	
 	List<PositionInfo> listAgents = new LinkedList<PositionInfo>();
@@ -126,9 +128,12 @@ public class OTFTVeh2MVI extends OTFQuadFileHandlerZIP{
 	
 	public static void main(String[] args) {
 
-		String netFileName = "../studies/schweiz/2network/ch.xml"; 
-		String vehFileName = "../runs/run168/run168.it210.T.veh"; 
-		String outFileName = "output/testSWI1.mvi.gz";
+//		String netFileName = "../studies/schweiz/2network/ch.xml"; 
+//		String vehFileName = "../runs/run168/run168.it210.T.veh"; 
+		String netFileName = "../../tmp/studies/ivtch/network.xml"; 
+		String vehFileName = "../../tmp/studies/ivtch/T.veh"; 
+		String outFileName = "output/testSWI2.mvi.gz";
+		int intervall_s = 60;
 		
 		Gbl.createConfig(null);
 		Gbl.startMeasurement();
@@ -139,7 +144,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandlerZIP{
 		world.setNetworkLayer(net);
 
 		
-		OTFTVeh2MVI test  = new OTFTVeh2MVI(net, vehFileName, outFileName, 0, 300);
+		OTFTVeh2MVI test  = new OTFTVeh2MVI(net, vehFileName, outFileName, 0, intervall_s);
 		test.convert();
 	}
 
