@@ -79,9 +79,9 @@ public class PtRate implements IterationEndsListener {
 		this.BetaTraveling = BetaTraveling;
 		this.BetaTravelingPt = BetaTravelingPt;
 		check = new PtCheck(filename);
-		yPtRate = new double[maxIters + 1];
-		yPtUser = new double[maxIters + 1];
-		yPersons = new double[maxIters + 1];
+		yPtRate = new double[maxIters/10 + 1];
+		yPtUser = new double[maxIters/10 + 1];
+		yPersons = new double[maxIters/10 + 1];
 	}
 
 	/**
@@ -93,9 +93,9 @@ public class PtRate implements IterationEndsListener {
 			Config cf = event.getControler().getConfig();
 			check.resetCnt();
 			check.run(population);
-			yPtRate[idx] = check.getPtRate();
-			yPtUser[idx] = check.getPtUserCnt();
-			yPersons[idx] = check.getPersonCnt();
+			yPtRate[idx/10] = check.getPtRate();
+			yPtUser[idx/10] = check.getPtUserCnt();
+			yPersons[idx/10] = check.getPersonCnt();
 			try {
 				check.write(idx);
 			} catch (IOException e) {
@@ -103,8 +103,8 @@ public class PtRate implements IterationEndsListener {
 			}
 			if (idx == maxIters) {
 				double[] x = new double[maxIters + 1];
-				for (int i = 0; i < maxIters + 1; i++) {
-					x[i] = i;
+				for (int i = 0; i < maxIters/10 + 1; i++) {
+					x[i] = i*10;
 				}
 				XYLineChart ptRateChart = new XYLineChart("Schweiz: PtRate, "
 						+ maxIters + "ITERs, BetaTraveling=" + BetaTraveling
