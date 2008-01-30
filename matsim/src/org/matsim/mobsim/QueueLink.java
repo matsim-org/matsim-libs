@@ -143,7 +143,8 @@ public class QueueLink extends Link {
 
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * this.permlanes) / NetworkLayer.CELL_LENGTH * storageCapFactor;
-
+		
+		
 		/* storage capacity needs to be at least enough to handle the
 		 * cap_per_time_step:                  */
 		this.storageCapacity = Math.max(this.storageCapacity, this.timeCapCeil);
@@ -552,7 +553,7 @@ public class QueueLink extends Link {
 
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
 					this, distanceFromFromNode + NetworkLayer.CELL_LENGTH,
-					lane, speed, PositionInfo.VehicleState.Driving);
+					lane, speed, PositionInfo.VehicleState.Driving,veh.getDriver().getVisualizerData());
 			positions.add(position);
 		}
 		queueLen += this.buffer.size() * vehLen;
@@ -587,7 +588,7 @@ public class QueueLink extends Link {
 			int lane = 1 + (veh.getID() % getLanes());
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
 					this, distanceOnLink + NetworkLayer.CELL_LENGTH,
-					lane, speed, PositionInfo.VehicleState.Driving);
+					lane, speed, PositionInfo.VehicleState.Driving,veh.getDriver().getVisualizerData());
 			positions.add(position);
 			lastDistance = distanceOnLink;
 		}
@@ -598,7 +599,7 @@ public class QueueLink extends Link {
 		int lane = getLanes() + 1; // place them next to the link
 		for (Vehicle veh : this.waitingList) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
-					this, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking);
+					this, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking,veh.getDriver().getVisualizerData());
 			positions.add(position);
 		}
 
@@ -608,7 +609,7 @@ public class QueueLink extends Link {
 		lane = getLanes() + 2; // place them next to the link
 		for (Vehicle veh : this.parkingList) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
-					this, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking);
+					this, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking,veh.getDriver().getVisualizerData());
 			positions.add(position);
 		}
 

@@ -44,11 +44,14 @@ public class PositionInfo {
 	final private double elevation;
 	final private double azimuth;
 	final private double distanceOnLink;
-
+	final private String visualizerData;
+	
 	final private double speed;
 
 	final private VehicleState vehicleState;
 	final private Link link;
+	
+	
 
 	// the constructor does all the work:
 	/**
@@ -62,7 +65,7 @@ public class PositionInfo {
 	 * @param speed The speed the agent is travelling with.
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
 	 */
-	public PositionInfo(final IdI agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState) {
+	public PositionInfo(final IdI agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
 		this.agentId = agentId;
 		this.link = link;
 		this.speed = speed;
@@ -89,6 +92,7 @@ public class PositionInfo {
 		this.elevation = 0.0;
 		this.azimuth = theta / (TWO_PI) * 360;
 		this.vehicleState = vehicleState;
+		this.visualizerData = visualizerData;
 	}
 
 	/**
@@ -102,7 +106,7 @@ public class PositionInfo {
 	 * @param speed
 	 * @param vehicleState The state of the vehicle (Parking, Driving)
 	 */
-	public PositionInfo(final IdI driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final VehicleState vehicleState) {
+	public PositionInfo(final IdI driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final VehicleState vehicleState, final String visualizerData) {
 		this.agentId = driverId;
 		this.link = null;
 		this.easting = easting;
@@ -112,6 +116,7 @@ public class PositionInfo {
 		this.speed = speed;
 		this.vehicleState = vehicleState;
 		this.distanceOnLink = 0.0; // is unknown
+		this.visualizerData = visualizerData;
 	}
 
 	public IdI getAgentId() {
@@ -148,6 +153,10 @@ public class PositionInfo {
 
 	public double getDistanceOnLink() {
 		return this.distanceOnLink;
+	}
+
+	public String getVisualizerData() {
+		return this.visualizerData;
 	}
 
 }

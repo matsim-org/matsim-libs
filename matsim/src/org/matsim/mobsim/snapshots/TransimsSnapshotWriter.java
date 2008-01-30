@@ -65,6 +65,11 @@ public class TransimsSnapshotWriter implements SnapshotWriterI {
 		//drop all parking vehicles 
 		if (position.getVehicleState() == PositionInfo.VehicleState.Parking) return;
 		
+		String visualizerData = 	position.getVisualizerData();
+		if (visualizerData == null){
+			visualizerData = "0";
+		}
+		
 		String buffer = position.getAgentId().toString()
 					    			+ "\t" + (int)this.currentTime
 		                + "\t0\t0\t1\t0\t" + position.getSpeed() // link(0), from node(0), lane(1), dist(0), speed
@@ -73,7 +78,7 @@ public class TransimsSnapshotWriter implements SnapshotWriterI {
 		                + "\t" + position.getNorthing() 
 		                + "\t" + position.getElevation()
 		                + "\t" + position.getAzimuth()
-		                + "\t0\n"; // user(0)
+		                + "\t"+ visualizerData + "\n"; // user(0)
 		try {
 			out.write(buffer);
 		} catch (IOException e) {

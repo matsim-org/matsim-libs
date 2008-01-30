@@ -263,7 +263,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, distanceFromFromNode/* + NetworkLayer.CELL_LENGTH*/,
-						lane, speed, PositionInfo.VehicleState.Driving);
+						lane, speed, PositionInfo.VehicleState.Driving,null);
 				agent.linkPosition = distanceFromFromNode * this.radioLengthToEuklideanDist;
 				positions.add(position);
 			}
@@ -309,7 +309,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 				int lane = 1 + (agent.intId % this.link.getLanes());
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/,
-						lane, speed, PositionInfo.VehicleState.Driving);
+						lane, speed, PositionInfo.VehicleState.Driving,null);
 				positions.add(position);
 				agent.linkPosition = distanceOnLink * this.radioLengthToEuklideanDist;
 				lastDistance = distanceOnLink;
@@ -321,7 +321,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			int lane = this.link.getLanes() + 1; // place them next to the link
 			for (EventAgent agent : this.waitingQueue) {
 				PositionInfo position = new PositionInfo(agent.id,
-						this.link, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking);
+						this.link, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking,null);
 				positions.add(position);
 			}
 
@@ -331,7 +331,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			lane = this.link.getLanes() + 2; // place them next to the link
 			for (EventAgent agent : this.parkingQueue) {
 				PositionInfo position = new PositionInfo(agent.id,
-						this.link, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking);
+						this.link, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking,null);
 				positions.add(position);
 			}
 		}

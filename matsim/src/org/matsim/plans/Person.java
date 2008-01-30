@@ -44,6 +44,7 @@ public class Person extends BasicPerson<Plan>{
 
 	private final TreeSet<String> travelcards = new TreeSet<String>();
 	private Knowledge knowledge = null;
+	private String visualizerData = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -352,6 +353,21 @@ public class Person extends BasicPerson<Plan>{
 				return; // should only happen if we have more different plan-types than maxSize
 			}
 		}
+	}
+
+	/**
+	 * @param visualizerData sets the optional user data for visualizer
+	 */
+	public void setVisulizerData(String visualizerData){
+		this.visualizerData = visualizerData;
+	}
+	
+	/**
+	 * 
+	 * @return Returns the visualizer data
+	 */
+	public String getVisualizerData() {
+		return this.visualizerData ;
 	}
 
 }
