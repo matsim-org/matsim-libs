@@ -75,9 +75,6 @@ public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 
 	public void writeModule(final Module module, final BufferedWriter out) throws IOException {
 		TreeMap<String, String> params = module.getParams();
-		if (params.size() == 0) {
-			return;
-		}
 
 		out.write("\t<module");
 		out.write(" name=\"" + module.getName() + "\" >\n");
