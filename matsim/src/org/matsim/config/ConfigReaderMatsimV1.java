@@ -107,7 +107,11 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startParam(final Attributes meta) {
-		this.currmodule.addParam(meta.getValue("name"),meta.getValue("value"));
+		String value = meta.getValue("value");
+		if (!"null".equalsIgnoreCase(value)) {
+			// only set the param if it is not "null"
+			this.currmodule.addParam(meta.getValue("name"),meta.getValue("value"));
+		}
 	}
 
 	/**
