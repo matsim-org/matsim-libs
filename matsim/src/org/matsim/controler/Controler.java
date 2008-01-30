@@ -23,6 +23,8 @@ package org.matsim.controler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 
 import javax.swing.event.EventListenerList;
@@ -404,6 +406,12 @@ public class Controler {
 		if (this.configFileName != null) {
 			new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
 		}
+		log.info("Complete config dump:");
+		StringWriter writer = new StringWriter();
+		ConfigWriter configwriter = new ConfigWriter(this.config, new PrintWriter(writer));
+		configwriter.write();
+		log.info("\n\n" + writer.getBuffer().toString());
+		log.info("Complete config dump done.");
 	}
 
 	private final void setupOutputDir() {
