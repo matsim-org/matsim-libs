@@ -358,12 +358,12 @@ public class Person extends BasicPerson<Plan>{
 	/**
 	 * @param visualizerData sets the optional user data for visualizer
 	 */
-	public void setVisulizerData(String visualizerData){
+	public void setVisualizerData(final String visualizerData) {
 		this.visualizerData = visualizerData;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return Returns the visualizer data
 	 */
 	public String getVisualizerData() {

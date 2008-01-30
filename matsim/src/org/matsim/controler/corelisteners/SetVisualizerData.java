@@ -64,7 +64,7 @@ public class SetVisualizerData implements BeforeMobsimListener {
 					if (this.actType.equals(act.getType())){
 						Node node = leg.getRoute().getRoute().get(leg.getRoute().getRoute().size()-2);
 						IdI destNode = node.getId();
-						p.setVisulizerData(getVisualizerData(destNode));
+						p.setVisualizerData(getVisualizerData(destNode));
 						break;
 					}
 				}
