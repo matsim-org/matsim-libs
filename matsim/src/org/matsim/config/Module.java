@@ -82,18 +82,23 @@ public class Module {
 		}
 		this.params.put(param_name,new_value);
 	}
-	
+
 	/**
-	 * Little helper for subclasses (i.e. the ConfigGroups). This method adds a parameter
+	 * Little helper for subclasses (i.e. the ConfigGroups). This method adds the value of the parameter
 	 * to the given map only if the getValue() method of this Module doesn't return
 	 * null (Java null-type) or the String representation of null, i.e. "null" or "NULL".
+	 * If the value is null, the string "null" is added to the map to document the parameter.
+	 *
 	 * @param map
 	 * @param paramName
 	 */
 	protected void addNotNullParameterToMap(final Map<String, String> map, final String paramName) {
+		// TODO should be renamed to something like "addParameterToMap()"
 		String value = this.getValue(paramName);
 		if (!((value == null) || value.equalsIgnoreCase("null"))) {
 			map.put(paramName, value);
+		} else {
+			map.put(paramName, "null");
 		}
 	}
 
