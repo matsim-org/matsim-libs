@@ -20,11 +20,8 @@
 
 package playground.yu.ivtch;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.matsim.analysis.CalcAverageTolledTripLength;
@@ -44,6 +41,7 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.CalcPaidToll;
+import org.matsim.utils.io.IOUtils;
 
 import playground.yu.analysis.CalcAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
@@ -65,9 +63,9 @@ public class NewPtcheckControler extends Controler {
 		private CalcAvgSpeed cas = null;
 		private CalcAverageTolledTripLength cattl = null;
 		/**
-		 * internal outputStream
+		 * internal bufferedWriter
 		 */
-		private DataOutputStream out;
+		private BufferedWriter out;
 
 		public void notifyStartup(StartupEvent event) {
 			Controler ctl = event.getControler();
@@ -78,14 +76,14 @@ public class NewPtcheckControler extends Controler {
 						ctl.getLastIteration(), cf.getParam("planCalcScore",
 								"traveling"), cf.getParam("planCalcScore",
 								"travelingPt")));
-				out = new DataOutputStream(new BufferedOutputStream(
-						new FileOutputStream(new File(
-								getOutputFilename("tollPaid.txt")))));
+				out = IOUtils
+						.getBufferedWriter(getOutputFilename("tollPaid.txt"));
 				out
-						.writeBytes("Iter\tBetaTraveling\tBetaTravelingPt\ttoll_amount[€/m]"
+						.write("Iter\tBetaTraveling\tBetaTravelingPt\ttoll_amount[€/m]"
 								+ "\ttoll_paid[€]\tavg. executed score\tNumber of Drawees"
 								+ "\tavg. triplength\tavg. tolled triplength"
 								+ "\ttraffic persformance\tavg. travel speed\n");
+				out.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -118,7 +116,7 @@ public class NewPtcheckControler extends Controler {
 				catl.run(ctl.getPopulation());
 				try {
 					out
-							.writeBytes(it
+							.write(it
 									+ "\t"
 									+ cf.getParam("planCalcScore", "traveling")
 									+ "\t"
@@ -144,6 +142,7 @@ public class NewPtcheckControler extends Controler {
 											: 0.0) + "\t"
 									+ ctpf.getTrafficPerformance() + "\t"
 									+ cas.getAvgSpeed() + "\n");
+					out.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

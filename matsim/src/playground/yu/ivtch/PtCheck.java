@@ -20,14 +20,12 @@
 
 package playground.yu.ivtch;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.plans.Person;
 import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.utils.io.IOUtils;
 
 /**
  * outputs the amount of public transit user or its fraction into .txt-files
@@ -50,7 +48,7 @@ public class PtCheck extends PersonAlgorithm {
 	/**
 	 * internal outputStream
 	 */
-	private DataOutputStream out;
+	private BufferedWriter out;
 
 	// -----------------------CONSTRUCTOR--------------------------------
 	/**
@@ -60,10 +58,10 @@ public class PtCheck extends PersonAlgorithm {
 	 * @throws IOException
 	 */
 	public PtCheck(String fileName) throws IOException {
-		out = new DataOutputStream(new BufferedOutputStream(
-				new FileOutputStream(new File(fileName))));
+		out = IOUtils.getBufferedWriter(fileName);
 		System.out.println("  begins to write txt-file about pt-rate");
-		out.writeBytes("Iter\tPtRate\tPtUser\n");
+		out.write("Iter\tPtRate\tPtUser\n");
+		out.flush();
 		personCnt = 0;
 		ptUserCnt = 0;
 	}
@@ -128,10 +126,11 @@ public class PtCheck extends PersonAlgorithm {
 	public void write(int Iter) throws IOException {
 		double ptRate = getPtRate();
 		double ptUserCnt = getPtUserCnt();
-		out.writeBytes(Iter + "\t" + ptRate + "\t" + ptUserCnt + "\n");
+		out.write(Iter + "\t" + ptRate + "\t" + ptUserCnt + "\n");
 		// System.out.println("There are " + ptRate * 100
 		// + "% persons who use Public Transportation! " + ptUserCnt + "/"
 		// + getPersonCnt());
+		out.flush();
 	}
 
 	public void writeEnd() throws IOException {

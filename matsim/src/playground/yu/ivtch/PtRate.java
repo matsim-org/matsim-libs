@@ -29,7 +29,9 @@ import java.io.IOException;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.plans.Plans;
 import org.matsim.utils.charts.XYLineChart;
 
@@ -40,7 +42,7 @@ import org.matsim.utils.charts.XYLineChart;
  * @author yu
  * 
  */
-public class PtRate implements IterationEndsListener {
+public class PtRate implements IterationEndsListener, ShutdownListener {
 	// -----------------------------MEMBER VARIABLES-----------------------
 	private final Plans population;
 	private final PtCheck check;
@@ -79,9 +81,9 @@ public class PtRate implements IterationEndsListener {
 		this.BetaTraveling = BetaTraveling;
 		this.BetaTravelingPt = BetaTravelingPt;
 		check = new PtCheck(filename);
-		yPtRate = new double[maxIters/10 + 1];
-		yPtUser = new double[maxIters/10 + 1];
-		yPersons = new double[maxIters/10 + 1];
+		yPtRate = new double[maxIters / 10 + 1];
+		yPtUser = new double[maxIters / 10 + 1];
+		yPersons = new double[maxIters / 10 + 1];
 	}
 
 	/**
@@ -93,9 +95,9 @@ public class PtRate implements IterationEndsListener {
 			Config cf = event.getControler().getConfig();
 			check.resetCnt();
 			check.run(population);
-			yPtRate[idx/10] = check.getPtRate();
-			yPtUser[idx/10] = check.getPtUserCnt();
-			yPersons[idx/10] = check.getPersonCnt();
+			yPtRate[idx / 10] = check.getPtRate();
+			yPtUser[idx / 10] = check.getPtUserCnt();
+			yPersons[idx / 10] = check.getPersonCnt();
 			try {
 				check.write(idx);
 			} catch (IOException e) {
@@ -103,8 +105,8 @@ public class PtRate implements IterationEndsListener {
 			}
 			if (idx == maxIters) {
 				double[] x = new double[maxIters + 1];
-				for (int i = 0; i < maxIters/10 + 1; i++) {
-					x[i] = i*10;
+				for (int i = 0; i < maxIters / 10 + 1; i++) {
+					x[i] = i * 10;
 				}
 				XYLineChart ptRateChart = new XYLineChart("Schweiz: PtRate, "
 						+ maxIters + "ITERs, BetaTraveling=" + BetaTraveling
@@ -161,12 +163,16 @@ public class PtRate implements IterationEndsListener {
 				personsChart.addSeries("Persons", x, yPersons);
 				personsChart.saveAsPng(Controler
 						.getOutputFilename("Persons.png"), 800, 600);
-				try {
-					check.writeEnd();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+
 			}
+		}
+	}
+
+	public void notifyShutdown(ShutdownEvent event) {
+		try {
+			check.writeEnd();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }
