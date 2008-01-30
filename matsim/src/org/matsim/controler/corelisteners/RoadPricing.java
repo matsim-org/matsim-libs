@@ -31,7 +31,6 @@ import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -95,6 +94,7 @@ public class RoadPricing implements StartupListener, IterationEndsListener, Iter
 		// TODO [MR] I think that the Area-Router is not yet loaded (never was, neither in this nor in the old controler)
 
 	}
+	
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int it = event.getIteration();
 		cas.reset(it);
