@@ -29,14 +29,13 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 
 
 public class MyControler3 {
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final String netFilename = "./examples/equil/network.xml";
 		final String plansFilename = "./examples/equil/plans100.xml";
 
@@ -50,8 +49,7 @@ public class MyControler3 {
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(plansFilename);
+		new MatsimPlansReader(population).readFile(plansFilename);
 		world.setPopulation(population);
 
 		Events events = new Events();

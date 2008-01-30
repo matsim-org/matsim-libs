@@ -29,7 +29,6 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.algorithms.PlanAverageScore;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
@@ -60,8 +59,7 @@ public class MyControler5 {
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(plansFilename);
+		new MatsimPlansReader(population).readFile(plansFilename);
 		world.setPopulation(population);
 
 		Events events = new Events();
