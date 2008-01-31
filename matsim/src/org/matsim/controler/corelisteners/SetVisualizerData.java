@@ -52,24 +52,21 @@ public class SetVisualizerData implements BeforeMobsimListener {
 
 		for (IdI pid : plans.getPersons().keySet()) {
 			Person p = plans.getPerson(pid);
-		
-			for (int i=p.getPlans().size()-1; i>=0; i--) {
-				Plan plan = p.getPlans().get(i);
-			
-				ArrayList<Object> actLegs = plan.getActsLegs();
-				
-				for (int j = 1; j < actLegs.size(); j+=2){
-					Leg leg = (Leg) actLegs.get(j);
-					Act act = (Act) actLegs.get(j+1);
-					if (this.actType.equals(act.getType())){
-						Node node = leg.getRoute().getRoute().get(leg.getRoute().getRoute().size()-2);
-						IdI destNode = node.getId();
-						p.setVisualizerData(getVisualizerData(destNode));
-						break;
-					}
+			Plan plan = p.getSelectedPlan();
+
+			ArrayList<Object> actLegs = plan.getActsLegs();
+
+			for (int j = 1; j < actLegs.size(); j+=2){
+				Leg leg = (Leg) actLegs.get(j);
+				Act act = (Act) actLegs.get(j+1);
+				if (this.actType.equals(act.getType())){
+					Node node = leg.getRoute().getRoute().get(leg.getRoute().getRoute().size()-2);
+					IdI destNode = node.getId();
+					p.setVisualizerData(getVisualizerData(destNode));
+					break;
 				}
-			
 			}
+
 		}
 		controler.stopwatch.endOperation("set visualizer data for all person");
 	}
