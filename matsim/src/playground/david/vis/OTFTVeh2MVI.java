@@ -72,7 +72,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandlerZIP{
 						String elevation = result[13];
 						String azimuth = result[14];
 						PositionInfo position = new PositionInfo(new Id(agent), easting, northing,
-								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving);
+								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, null);
 						addVehicle(Double.parseDouble(time), position);
 					}
 				}
@@ -130,9 +130,13 @@ public class OTFTVeh2MVI extends OTFQuadFileHandlerZIP{
 
 //		String netFileName = "../studies/schweiz/2network/ch.xml"; 
 //		String vehFileName = "../runs/run168/run168.it210.T.veh"; 
-		String netFileName = "../../tmp/studies/ivtch/network.xml"; 
-		String vehFileName = "../../tmp/studies/ivtch/T.veh"; 
-		String outFileName = "output/testSWI2.mvi.gz";
+//		String netFileName = "../../tmp/studies/ivtch/network.xml"; 
+//		String vehFileName = "../../tmp/studies/ivtch/T.veh"; 
+//		String outFileName = "output/testSWI2.mvi.gz";
+
+		String netFileName = "../../tmp/studies/padang/padang_net.xml"; 
+		String vehFileName = "../../tmp/studies/padang/run301.it100.colorized.T.veh.gz"; 
+		String outFileName = "output/testPadabang.mvi.gz";
 		int intervall_s = 60;
 		
 		Gbl.createConfig(null);

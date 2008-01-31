@@ -5,8 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
@@ -18,7 +18,7 @@ import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
-import playground.david.vis.OnTheFlyServer.QuadStorage;
+import playground.david.vis.data.OTFDefaultNetWriterFactoryImpl;
 import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.handler.OTFAgentsListHandler;
@@ -28,21 +28,26 @@ import playground.david.vis.interfaces.OTFServerRemote;
 public class OTFTVehServer implements OTFServerRemote{
 	private final   String netFileName = "";
 	private  String vehFileName = "";
-	private  String outFileName = "";
+	private final  String outFileName = "";
 	private static final int BUFFERSIZE = 100000000;
 	BufferedReader reader = null;
 	private double nextTime = -1;
+	private boolean bufferedReading = false;
+	TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
+	private byte[] actBuffer = null;
+
 
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
-	private ByteArrayOutputStream out;
+	private final ByteArrayOutputStream out;
 	private QueueNetworkLayer net;
 	public OTFServerQuad quad;
 	
 	public OTFTVehServer(String netFileName, String vehFileName) {
 		this.vehFileName = vehFileName;
 		
-		Gbl.createConfig(null);
+		if (Gbl.getConfig() == null) Gbl.createConfig(null);
+
 		Gbl.startMeasurement();
 		World world = Gbl.createWorld();
 
@@ -52,14 +57,32 @@ public class OTFTVehServer implements OTFServerRemote{
 
 		out = new ByteArrayOutputStream(20000000);
 		quad = new OTFServerQuad(net);
+		quad.fillQuadTree(new OTFDefaultNetWriterFactoryImpl());
 		quad.addAdditionalElement(writer);
 		open();
+		if (bufferedReading) {
+			bufferedReading = false; // now temporarily do the real reading
+			double time = nextTime;
+			step();
+			while (time != nextTime) {
+				//DS TODO unsafe, entry could get bigger than int 
+				byte [] buffer = new byte[buf.position()+1];
+				System.arraycopy(actBuffer, 0, buffer, 0, buffer.length);
+				timesteps.put((int)nextTime, buffer); 
+				System.out.println("read timestep: " + nextTime);
+				time = nextTime;
+				step();
+			}
+			finish();
+			nextTime = -1.;
+			bufferedReading = true;
+		}
 	}
 
 	ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
-	private int cntPositions=0;
-	private double lastTime=-1;
-	private int cntTimesteps=0;
+	private final int cntPositions=0;
+	private final double lastTime=-1;
+	private final int cntTimesteps=0;
 	private PositionInfo readVehicle = null;
 	private double time;
 	
@@ -74,7 +97,7 @@ public class OTFTVehServer implements OTFServerRemote{
 			e.printStackTrace();
 		}
 		
-		if ( !lineFound && line != null) {
+		while ( !lineFound && line != null) {
 			String[] result = line.split("\t");
 			if (result.length == 16) {
 				double easting = Double.parseDouble(result[11]);
@@ -89,16 +112,28 @@ public class OTFTVehServer implements OTFServerRemote{
 					lineFound = true;
 					this.time = Double.parseDouble(time);
 					this.readVehicle = new PositionInfo(new Id(agent), easting, northing,
-							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving);
+							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving,null);
+					return true;
 				}
 			}
-			return true;
-		} else return false;
+			try {
+				line = reader.readLine();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} 
+		return false;
 	}
 	
 	private boolean finishedReading = false;
 	
 	public void step() {
+		if (bufferedReading) {
+			actBuffer = nextStateBuffer();
+			return;
+		}
 		if ( finishedReading) return;
 		
 		double actTime = time;
@@ -122,6 +157,7 @@ public class OTFTVehServer implements OTFServerRemote{
 		nextTime = actTime;
 		buf.position(0);
 		quad.writeDynData(null, buf);
+		actBuffer = buf.array();
 		
 	}
 
@@ -129,6 +165,7 @@ public class OTFTVehServer implements OTFServerRemote{
 		
 		try {
 			reader = IOUtils.getBufferedReader(this.vehFileName);
+			reader.readLine(); // Read the commentary line
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -174,11 +211,27 @@ public class OTFTVehServer implements OTFServerRemote{
 
 	public byte[] getQuadDynStateBuffer(String id, Rect bounds)
 			throws RemoteException {
+		if (nextTime == -1) {
+			step();
+		}
 		return buf.array();
 	}
 
+	public byte[] nextStateBuffer() {
+		if (nextTime == -1. && bufferedReading)nextTime = timesteps.firstKey();
+		
+		byte [] buffer = timesteps.get((int)nextTime);
+		int time = 0;
+		Iterator<Integer> it =  timesteps.keySet().iterator();
+		while(it.hasNext() && time <= nextTime) time = it.next();
+		if (time == nextTime) {
+			time = timesteps.firstKey();
+		}
+		nextTime = time;
+		return buffer;
+	}
 	public byte[] getStateBuffer() throws RemoteException {
-		throw new RemoteException("getNet not implemented for OTFTVehServer");
+		throw new RemoteException("getStateBuffer not implemented for OTFTVehServer");
 	}
 
 	public boolean isLive() throws RemoteException {
@@ -197,10 +250,10 @@ public class OTFTVehServer implements OTFServerRemote{
 
 	public static void main(String[] args) {
 
-//		String netFileName = "../studies/schweiz/2network/ch.xml"; 
-//		String vehFileName = "../runs/run168/run168.it210.T.veh"; 
-		String netFileName = "../../tmp/studies/ivtch/network.xml"; 
-		String vehFileName = "../../tmp/studies/ivtch/T.veh"; 
+		String netFileName = "../studies/schweiz/2network/ch.xml"; 
+		String vehFileName = "../runs/run168/run168.it210.T.veh"; 
+//		String netFileName = "../../tmp/studies/ivtch/network.xml"; 
+//		String vehFileName = "../../tmp/studies/ivtch/T.veh"; 
 		
 		OTFTVehServer test  = new OTFTVehServer(netFileName, vehFileName);
 		try {

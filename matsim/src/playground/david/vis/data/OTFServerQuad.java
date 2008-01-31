@@ -185,4 +185,37 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 		}
 	}
 
+	// Internally we hold the coordinates from 0,0 to max -min .. to optimize use of float in visualizer
+	/* (non-Javadoc)
+	 * @see org.matsim.utils.collections.QuadTree#getMaxEasting()
+	 */
+	@Override
+	public double getMaxEasting() {
+		return maxEasting;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.utils.collections.QuadTree#getMaxNorthing()
+	 */
+	@Override
+	public double getMaxNorthing() {
+		return maxNorthing;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.utils.collections.QuadTree#getMinEasting()
+	 */
+	@Override
+	public double getMinEasting() {
+		return minEasting;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.utils.collections.QuadTree#getMinNorthing()
+	 */
+	@Override
+	public double getMinNorthing() {
+		return minNorthing;
+	}
+
 }

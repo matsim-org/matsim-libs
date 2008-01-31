@@ -33,6 +33,7 @@ import javax.swing.event.ChangeListener;
 import org.matsim.utils.misc.Time;
 
 import playground.david.vis.OTFQuadFileHandlerZIP;
+import playground.david.vis.OTFTVehServer;
 import playground.david.vis.data.OTFClientQuad;
 import playground.david.vis.data.OTFConnectionManager;
 import playground.david.vis.data.OTFNetWriterFactory;
@@ -71,22 +72,30 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	public OTFHostControlBar(String address) throws RemoteException, InterruptedException, NotBoundException {
 		// try to open/connect to host if given a string of form
-		// connection type (rmi or file) filename/ip  [: port]
-		// e.g. "file:../MatsimJ/otfvis.mvi" or "rmi:127.0.0.1:4019"
+		// connection type (rmi or file or tveh) 
+		// rmi:ip  [: port]
+		// file:mvi-filename
+		// tveh:T.veh-filename @ netfilename
+		// e.g. "file:../MatsimJ/otfvis.mvi" or "rmi:127.0.0.1:4019" or "tveh:../MatsimJ/output/T.veh@../../studies/wip/network.xml"
 		if(address == null) address = "rmi:127.0.0.1:4019";
 
 		this.address = address;
-		
-		String[] connection = address.split(":");
-		if (connection[0].equals("rmi")) {
+		String type = address.substring(0,address.indexOf(':'));
+		String connection = address.substring(address.indexOf(':')+1, address.length());
+		if (type.equals("rmi")) {
 			int port = 4019;
-			if (connection.length > 2 ) port = Integer.parseInt(connection[2]);
-			this.host = openSSL(connection[1], port);
+			String [] connparse = connection.split(":");
+			if (connparse.length > 1 ) port = Integer.parseInt(connparse[1]);
+			this.host = openSSL(connparse[1], port);
+
+		} else if (type.equals("file")) {
+			this.host = openFile(connection);
 			
-		} else if (connection[0].equals("file")) {
-			this.host = openFile(connection[1]);
+		} else if (type.equals("tveh")) {
+			String [] connparse = connection.split("@");
+			this.host = openTVehFile(connparse[1], connparse[0]);
 			
-		} else throw new UnsupportedOperationException("Connctiontype " + connection[0] + " not known");
+		} else throw new UnsupportedOperationException("Connctiontype " + type + " not known");
 		
 		addButtons();
 	}
@@ -120,6 +129,12 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		return host;
 	}
 	
+	private OTFServerRemote openTVehFile(String netname, String vehname) throws RemoteException {
+		OTFServerRemote host = new OTFTVehServer(netname,vehname);
+		host.pause();
+		return host;
+	}
+
 	public OTFClientQuad createNewView(String id, OTFNetWriterFactory factory, OTFConnectionManager connect) throws RemoteException {
 		System.out.println("Getting Quad");
 		OTFServerQuad servQ = host.getQuad(id, factory);
