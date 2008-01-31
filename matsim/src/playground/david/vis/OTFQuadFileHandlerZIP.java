@@ -56,6 +56,12 @@ import playground.david.vis.interfaces.OTFServerRemote;
 public class OTFQuadFileHandlerZIP implements SimStateWriterI, OTFServerRemote{
 
 	private static final int BUFFERSIZE = 100000000;
+	
+	// the version number should be increased to imply a compatibility break
+	private static final int VERSION = 1;
+	// minor version increase does not break compatibility
+	private static final int MINORVERSION = 1;
+	
 	private ZipOutputStream zos = null;
 	private DataOutputStream outFile;
 	private final String fileName;
@@ -101,6 +107,9 @@ public class OTFQuadFileHandlerZIP implements SimStateWriterI, OTFServerRemote{
 		// Add ZIP entry to output stream.
 		zos.putNextEntry(new ZipEntry("info.bin"));	
 		outFile = new DataOutputStream(zos);
+		outFile.writeInt(VERSION);
+		outFile.writeInt(MINORVERSION);
+		
 		outFile.writeDouble(intervall_s);
 		//outFile.writeUTF("fromFile");
 		zos.closeEntry();
@@ -258,6 +267,8 @@ public class OTFQuadFileHandlerZIP implements SimStateWriterI, OTFServerRemote{
 		try {
 			ZipEntry infoEntry = zipFile.getEntry("info.bin");
 			inFile = new DataInputStream(zipFile.getInputStream(infoEntry));
+			int version = inFile.readInt();
+			int minorversion = inFile.readInt();
 			intervall_s = inFile.readDouble();
 
 			ZipEntry quadEntry = zipFile.getEntry("quad.bin");
