@@ -37,9 +37,10 @@ import org.matsim.utils.identifiers.IdI;
 
 public class SetVisualizerData implements BeforeMobsimListener {
 
+	private final static int NUM_OF_COLOR_SLOTS = 256;
 	
 	private static HashMap<IdI,String> destNodeMapping = new HashMap<IdI,String>();
-	private static int mappings = 0;
+	
 	
 	private final String actType = "h";
 	
@@ -79,7 +80,8 @@ public class SetVisualizerData implements BeforeMobsimListener {
 	}
 
 	private synchronized void addMapping(IdI id) {
-		destNodeMapping.put(id, ""+mappings++);		
+		int mapping = Integer.parseInt(id.toString()) % NUM_OF_COLOR_SLOTS; 
+		destNodeMapping.put(id,  Integer.toString(mapping));
 	}
 
 }
