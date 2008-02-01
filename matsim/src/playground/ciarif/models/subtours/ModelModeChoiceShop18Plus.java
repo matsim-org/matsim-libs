@@ -66,26 +66,32 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 	@Override
 	protected final double calcBikeUtil() {
 		if (!bike) { return Double.NEGATIVE_INFINITY; }
-		double util = 0.0;
-		util += B4_CONST * 1.0;
-		util += B4_Dist * dist_subtour;
-		return util;
+		if ((prev_mode == 4)||(prev_mode == 0)){
+			double util = 0.0;
+			util += B4_CONST * 1.0;
+			util += B4_Dist * dist_subtour;
+			return util;
+		}
+		else {return Double.NEGATIVE_INFINITY;}
 	}
 	
 	@Override
 	protected final double calcCarUtil() {
-		double util = 0.0;
-		util += B1_CONST * 1.0;
-		util += B1_Dist * dist_subtour;
-		if (prev_mode == 1) {util += B1_Prev * 1.0;}
-		if (car == "always") { util += B1_Car_Always * 1.0; }
-		if (udeg == 1) { /* reference type */ }
-		else if (udeg == 2) { util += B1_T2 * 1.0; }
-		else if (udeg == 3) { util += B1_T3 * 1.0; }
-		else if (udeg == 4) { util += B1_T4 * 1.0; }
-		else if (udeg == 5) { util += B1_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
-		return util;
+		if ((prev_mode == 3)||(prev_mode == 0)) {
+			double util = 0.0;
+			util += B1_CONST * 1.0;
+			util += B1_Dist * dist_subtour;
+			if (prev_mode == 1) {util += B1_Prev * 1.0;}
+			if (car == "always") { util += B1_Car_Always * 1.0; }
+			if (udeg == 1) { /* reference type */ }
+			else if (udeg == 2) { util += B1_T2 * 1.0; }
+			else if (udeg == 3) { util += B1_T3 * 1.0; }
+			else if (udeg == 4) { util += B1_T4 * 1.0; }
+			else if (udeg == 5) { util += B1_T5 * 1.0; }
+			else { Gbl.errorMsg("This should never happen!"); }
+			return util;
+		}
+		else {return Double.NEGATIVE_INFINITY;}
 	}
 	 
 	@Override
