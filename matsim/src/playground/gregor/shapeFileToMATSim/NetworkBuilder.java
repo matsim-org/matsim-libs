@@ -69,28 +69,28 @@ public class NetworkBuilder {
 	private static final Logger log = Logger.getLogger(NetworkBuilder.class);
 
 	private static final double CATCH_RADIUS = 0.5;
-	
+
 	private NetworkLayer network = null;
 	private final FeatureSource featureSource;
-	
+
 	private HashSet<LineString> lineStrings;
 	ConcurrentLinkedQueue<LineString> lineStringsQueue;
 	private QuadTree tree;
-	
+
 	private GeometryFactory geofac;
-	
+
 	//DEBUG
 	ShapefileDataStore ds = null;
-	
+
 	public NetworkBuilder(FeatureSource featureSource){
 		PrecisionModel pm = new PrecisionModel(10);
 		this.geofac = new GeometryFactory();
 		this.network = new NetworkLayer();
 		this.featureSource = featureSource;
-		
-		
+
+
 	}
-	
+
 	public  NetworkLayer createNetwork() throws Exception {
 		parseFeatures();
 		equalizeFeatures();
@@ -100,167 +100,206 @@ public class NetworkBuilder {
 
 	private void equalizeFeatures() {
 		Iterator it =  this.lineStrings.iterator();
-		 this.lineStringsQueue = new ConcurrentLinkedQueue<LineString>();
+		this.lineStringsQueue = new ConcurrentLinkedQueue<LineString>();
 		while (it.hasNext()){
 			this.lineStringsQueue.add((LineString) it.next());
 		}
-		
+
 		while (this.lineStringsQueue.peek() != null) {
-			int size = this.lineStringsQueue.size();
-//			ArrayList<LineStringStruct> tempRemoved = new ArrayList<LineStringStruct>();
 			LineString ls = this.lineStringsQueue.poll();
-			if (!this.lineStrings.contains(ls) || ls.isEmpty()){
-				continue;
-			}
-			double startX = ls.getStartPoint().getX();
-			double startY = ls.getStartPoint().getY();
-			double endX = ls.getEndPoint().getX();
-			double endY = ls.getEndPoint().getY();
-			
-//			LineString neighbor = this.tree.get(ls.getStartPoint().getX(), y, distance)
-			Collection<LineString> neighbors = this.tree.get(startX, startY, CATCH_RADIUS);
-			for (LineString neighbor : neighbors){
-				if (!this.lineStrings.contains(neighbor)) {
-					continue;
-				}
-				if (needToSplit(neighbor,ls.getStartPoint())) {
-					split(neighbor,ls.getStartPoint());				
+//			if (!this.lineStrings.contains(ls) || ls.isEmpty()){
+//			continue;
+//			}
+//			while (it.hasNext()){
+//			LineString ls = (LineString) it.next();
+			Vector<Point> splitPoints = new Vector<Point>();
+			for (int i = 1; i < ls.getNumPoints()-1; i++){
+				//TODO add  public boolean valueExistsAt(x,y,CATCH_RADIUS) to QuadTree
+				Collection<LineString> tmp = this.tree.get(ls.getCoordinateN(i).x, ls.getCoordinateN(i).y, CATCH_RADIUS);
+				if (!tmp.isEmpty()){
+					splitPoints.add(ls.getPointN(i));
 				}
 			}
-			neighbors = this.tree.get(endX, endY, CATCH_RADIUS);
-			for (LineString neighbor : neighbors){
-				if (!this.lineStrings.contains(neighbor)) {
-					continue;
-				}
-				if (needToSplit(neighbor,ls.getEndPoint())) {
-					split(neighbor,ls.getEndPoint());				
-				}
+			if (splitPoints.size() > 0) {
+				splitLineString(ls,splitPoints);
 			}
-   
+//			double startX = ls.getStartPoint().getX();
+//			double startY = ls.getStartPoint().getY();
+//			double endX = ls.getEndPoint().getX();
+//			double endY = ls.getEndPoint().getY();
+
+////			LineString neighbor = this.tree.get(ls.getStartPoint().getX(), y, distance)
+//			Collection<LineString> neighbors = this.tree.get(startX, startY, CATCH_RADIUS);
+//			for (LineString neighbor : neighbors){
+//			if (!this.lineStrings.contains(neighbor)) {
+//			continue;
+//			}
+//			if (needToSplit(neighbor,ls.getStartPoint())) {
+//			split(neighbor,ls.getStartPoint());				
+//			}
+//			}
+//			neighbors = this.tree.get(endX, endY, CATCH_RADIUS);
+//			for (LineString neighbor : neighbors){
+//			if (!this.lineStrings.contains(neighbor)) {
+//			continue;
+//			}
+//			if (needToSplit(neighbor,ls.getEndPoint())) {
+//			split(neighbor,ls.getEndPoint());				
+//			}
+//			}
+
 		}
-		
+
 	}
 
-	private void split(LineString ls, Point splitPoint){
-		
+	private void splitLineString(LineString ls, Vector<Point> splitPoints) {
 		this.lineStrings.remove(ls);
-		Vector<Coordinate> seg1 = new Vector<Coordinate>();
-		Vector<Coordinate> seg2 = new Vector<Coordinate>();
-		boolean isFirstSeg = true;
-		for (int i = 0; i < ls.getNumPoints(); i++){
-			Point p = ls.getPointN(i);
-			if (isFirstSeg) {
-				seg1.add(p.getCoordinate());
-				if (splitPoint.equalsExact(p, CATCH_RADIUS)){
-					isFirstSeg = false;
-				}
+		splitPoints.add(ls.getEndPoint());
+		Point tmp = ls.getStartPoint();
+		Vector<Coordinate> segment = new Vector<Coordinate>();
+		int count = 0;
+		for (Point splitPoint : splitPoints){
+			while (!tmp.equals(splitPoint)){
+				segment.add(tmp.getCoordinate());
+				tmp = ls.getPointN(count++);
 			}
-			if (!isFirstSeg){
-				seg2.add(p.getCoordinate());
-			}
-		}
-		Coordinate [] coords1 = new Coordinate[seg1.size()]; 
-		for (int m=0; m < seg1.size(); m++ ) {
-			coords1[m] = seg1.elementAt(m);
-		}
-		Coordinate [] coords2 = new Coordinate[seg2.size()]; 
-		for (int m=0; m < seg2.size(); m++ ) {
-			coords2[m] = seg2.elementAt(m);
+			segment.add(tmp.getCoordinate());
+			Coordinate [] coords = new Coordinate[segment.size()]; 
+			for (int j=0; j < segment.size(); j++ ) {
+				coords[j] = segment.elementAt(j);
+			}			
+			LineString subLs = this.geofac.createLineString(coords);
+			this.lineStrings.add(subLs);
+			segment.clear();
 		}
 		
-		LineString ls1 = this.geofac.createLineString(coords1);
-		LineString ls2 = this.geofac.createLineString(coords2);
-		this.lineStrings.add(ls1);
-		this.lineStrings.add(ls2);
-		this.lineStringsQueue.add(ls1);
-		this.lineStringsQueue.add(ls2);
-		for (int j = 0; j < ls1.getNumPoints(); j++){
-			this.tree.put(ls1.getCoordinateN(j).x, ls1.getCoordinateN(j).y, ls1);
-		}
-		for (int j = 0; j < ls2.getNumPoints(); j++){
-			this.tree.put(ls2.getCoordinateN(j).x, ls2.getCoordinateN(j).y, ls2);
-		}
+
 	}
-	
-	private boolean needToSplit(LineString neighbor, Point p) {
-		if (p.equalsExact(neighbor.getStartPoint(), CATCH_RADIUS)){
-			return false;
-		}
-		if (p.equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
-			return false;
-		}		
-		return true;
-	}
+
+//	private void split(LineString ls, Point splitPoint){
+
+//	this.lineStrings.remove(ls);
+//	Vector<Coordinate> seg1 = new Vector<Coordinate>();
+//	Vector<Coordinate> seg2 = new Vector<Coordinate>();
+//	boolean isFirstSeg = true;
+//	for (int i = 0; i < ls.getNumPoints(); i++){
+//	Point p = ls.getPointN(i);
+//	if (isFirstSeg) {
+//	seg1.add(p.getCoordinate());
+//	if (splitPoint.equalsExact(p, CATCH_RADIUS)){
+//	isFirstSeg = false;
+//	}
+//	}
+//	if (!isFirstSeg){
+//	seg2.add(p.getCoordinate());
+//	}
+//	}
+//	Coordinate [] coords1 = new Coordinate[seg1.size()]; 
+//	for (int m=0; m < seg1.size(); m++ ) {
+//	coords1[m] = seg1.elementAt(m);
+//	}
+//	Coordinate [] coords2 = new Coordinate[seg2.size()]; 
+//	for (int m=0; m < seg2.size(); m++ ) {
+//	coords2[m] = seg2.elementAt(m);
+//	}
+
+//	LineString ls1 = this.geofac.createLineString(coords1);
+//	LineString ls2 = this.geofac.createLineString(coords2);
+//	this.lineStrings.add(ls1);
+//	this.lineStrings.add(ls2);
+//	this.lineStringsQueue.add(ls1);
+//	this.lineStringsQueue.add(ls2);
+//	for (int j = 0; j < ls1.getNumPoints(); j++){
+//	this.tree.put(ls1.getCoordinateN(j).x, ls1.getCoordinateN(j).y, ls1);
+//	}
+//	for (int j = 0; j < ls2.getNumPoints(); j++){
+//	this.tree.put(ls2.getCoordinateN(j).x, ls2.getCoordinateN(j).y, ls2);
+//	}
+//	}
+
+//	private boolean needToSplit(LineString neighbor, Point p) {
+//	if (p.equalsExact(neighbor.getStartPoint(), CATCH_RADIUS)){
+//	return false;
+//	}
+//	if (p.equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
+//	return false;
+//	}		
+//	return true;
+//	}
 
 
 	private void parseFeatures() throws IOException {
-		
+
 		log.info("parsing features and building up QuadTree ...");
-		 FeatureCollection collection = this.featureSource.getFeatures();
-		 Envelope o = this.featureSource.getBounds();
-		 this.lineStrings = new HashSet<LineString>();
-		 this.tree = new QuadTree(o.getMinX(),o.getMinY(),o.getMaxX(),o.getMaxY());
-		 
-		 FeatureIterator it = collection.features();
+		FeatureCollection collection = this.featureSource.getFeatures();
+		Envelope o = this.featureSource.getBounds();
+		this.lineStrings = new HashSet<LineString>();
+		this.tree = new QuadTree(o.getMinX(),o.getMinY(),o.getMaxX(),o.getMaxY());
+
+		FeatureIterator it = collection.features();
 		while (it.hasNext()){
 			Feature feature = it.next();
 			MultiLineString multiLineString = (MultiLineString) feature.getDefaultGeometry();
 			for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
 				LineString lineString = (LineString) multiLineString.getGeometryN(i);
-				
-				for (int j = 0; j < lineString.getNumPoints(); j++){
-					double x = lineString.getCoordinateN(j).x;
-					double y = lineString.getCoordinateN(j).y;
-					tree.put(x, y, lineString);
-				}
-				
+				Coordinate from = lineString.getStartPoint().getCoordinate();
+				this.tree.put(from.x, from.y, lineString);
+				Coordinate to = lineString.getEndPoint().getCoordinate();
+				this.tree.put(to.x, to.y, lineString);
+
+//				for (int j = 0; j < lineString.getNumPoints(); j++){
+//				double x = lineString.getCoordinateN(j).x;
+//				double y = lineString.getCoordinateN(j).y;
+//				tree.put(x, y, lineString);
+//				}
+
 				this.lineStrings.add(lineString);
 			}
-			
+
 		}
 		log.info("done.");
-		
+
 	}
 
-	
+
 	//DEBUG
 	private void writeGeometries() throws Exception {
 		File inFile = new File("./padang/debug.shp");
 		ds = new ShapefileDataStore(inFile.toURL());
 		FeatureType ft = this.featureSource.getSchema();
 		File out = new File("./padang/debug_out.shp");
-	     
+
 		String name = ds.getTypeNames()[0];
-		
+
 		ShapefileDataStore outStore = new ShapefileDataStore(out.toURL());
-        outStore.createSchema(this.featureSource.getSchema());
-        FeatureSource newFeatureSource = outStore.getFeatureSource(name);
-        FeatureStore newFeatureStore = (FeatureStore)newFeatureSource;
-        
-        // accquire a transaction to create the shapefile from FeatureStore
-        Transaction t = newFeatureStore.getTransaction();
-        
-        FeatureCollection collect = new PFeatureCollection(ft);
-        
-        Iterator it = this.lineStrings.iterator();
-	      while (it.hasNext()){
-	    	  LineString ls = (LineString) it.next();
-	    	  MultiLineString mls =  new MultiLineString(new LineString[]{ls},geofac);
-	    	Feature feature = ft.create(null);
-	    	feature.setDefaultGeometry(mls);
-	    	collect.add(feature);
-	    	  
-	      }
-	      newFeatureStore.addFeatures(collect);
-	      
-	      t.commit();
-	      t.close();
-	      
-		
+		outStore.createSchema(this.featureSource.getSchema());
+		FeatureSource newFeatureSource = outStore.getFeatureSource(name);
+		FeatureStore newFeatureStore = (FeatureStore)newFeatureSource;
+
+		// accquire a transaction to create the shapefile from FeatureStore
+		Transaction t = newFeatureStore.getTransaction();
+
+		FeatureCollection collect = new PFeatureCollection(ft);
+
+		Iterator it = this.lineStrings.iterator();
+		while (it.hasNext()){
+			LineString ls = (LineString) it.next();
+			MultiLineString mls =  new MultiLineString(new LineString[]{ls},geofac);
+			Feature feature = ft.create(null);
+			feature.setDefaultGeometry(mls);
+			collect.add(feature);
+
+		}
+		newFeatureStore.addFeatures(collect);
+
+		t.commit();
+		t.close();
+
+
 	}
-	  public static class PFeatureCollection extends DefaultFeatureCollection {
-		    public PFeatureCollection(FeatureType ft) {
-		      super("error",ft );
-		    }
-		  }
+	public static class PFeatureCollection extends DefaultFeatureCollection {
+		public PFeatureCollection(FeatureType ft) {
+			super("error",ft );
+		}
+	}
 }
