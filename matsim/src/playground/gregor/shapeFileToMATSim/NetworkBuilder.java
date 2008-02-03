@@ -93,7 +93,7 @@ public class NetworkBuilder {
 		parseLineStrings();
 		cleanUpLineStrings();
 		splitAtIntersections();
-//		simplifyNetwork();
+		simplifyNetwork();
 
 
 		writeGeometries();
@@ -150,7 +150,7 @@ public class NetworkBuilder {
 			LineString ls = lineStringsQueue.poll();
 			Collection<LineString> tmp = this.tree.get(ls.getStartPoint().getX(), ls.getStartPoint().getY(), CATCH_RADIUS);
 			if (tmp.size() != 2){
-				tmp = this.tree.get(ls.getStartPoint().getX(), ls.getStartPoint().getY(), CATCH_RADIUS);
+				tmp = this.tree.get(ls.getEndPoint().getX(), ls.getEndPoint().getY(), CATCH_RADIUS);
 			}
 			if (tmp.size() == 2) {
 				int ii=0; ii++;
@@ -159,20 +159,61 @@ public class NetworkBuilder {
 					if (neighbor.equals(ls)) {
 						continue;
 					}
+					
 
+					
 					this.lineStrings.remove(ls);
+					this.tree.remove(ls.getStartPoint().getX(), ls.getStartPoint().getY(), ls);
+					this.tree.remove(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
 					this.lineStrings.remove(neighbor);
+					this.tree.remove(neighbor.getStartPoint().getX(), neighbor.getStartPoint().getY(), neighbor);
+					this.tree.remove(neighbor.getEndPoint().getX(), neighbor.getEndPoint().getY(), neighbor);
+					
 
 					Coordinate [] carray = new Coordinate [ls.getNumPoints() + neighbor.getNumPoints() -1];
-					for (int i = 0; i < ls.getNumPoints(); i ++){
-						carray[i] = ls.getCoordinateN(i);
+
+					boolean reverseLs = false;
+					boolean reverseNeighbor = false;
+					if (ls.getStartPoint().equalsExact(neighbor.getStartPoint(), CATCH_RADIUS) || ls.getStartPoint().equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
+						reverseLs = true;
+						if (ls.getStartPoint().equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
+							reverseNeighbor = true;
+						}
+					} else {
+						if (ls.getEndPoint().equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
+							reverseNeighbor = true;
+						}	
 					}
-					int offset = ls.getNumPoints()-1;
-					for (int i = 1; i< neighbor.getNumPoints(); i++){
-						carray[i+offset] = neighbor.getCoordinateN(i);
+					
+					
+					
+					if (reverseLs) {
+						int j = 0;
+						for (int i = ls.getNumPoints()-1; i >= 0; i --){
+							carray[j++] = ls.getCoordinateN(i);
+						}
+					} else {
+						for (int i = 0; i < ls.getNumPoints(); i ++){
+							carray[i] = ls.getCoordinateN(i);
+						}
 					}
+						
+					int offset = ls.getNumPoints() - 1;
+					if (reverseNeighbor) {
+						int j = offset + 1;
+						for (int i = neighbor.getNumPoints() -2 ; i >= 0; i--){
+							carray[j++] = neighbor.getCoordinateN(i);
+						} 
+					} else {
+						for (int i = 1; i< neighbor.getNumPoints(); i++){
+							carray[i+offset] = neighbor.getCoordinateN(i);
+						}						
+					}
+
 					LineString union = this.geofac.createLineString(carray);				
 					this.lineStrings.add(union);
+					this.tree.put(union.getStartPoint().getX(), union.getStartPoint().getY(), union);
+					this.tree.put(union.getEndPoint().getX(), union.getEndPoint().getY(), union);					
 					lineStringsQueue.add(union);
 					break;
 				}
@@ -238,6 +279,7 @@ public class NetworkBuilder {
 
 	private void parseLineStrings() throws IOException {
 
+
 		log.info("parsing features and building up QuadTree ...");
 		FeatureCollection collection = this.featureSource.getFeatures();
 		Envelope o = this.featureSource.getBounds();
@@ -247,10 +289,11 @@ public class NetworkBuilder {
 		FeatureIterator it = collection.features();
 		while (it.hasNext()){
 			Feature feature = it.next();
+			Integer ii = (Integer) feature.getAttribute(1);
 			MultiLineString multiLineString = (MultiLineString) feature.getDefaultGeometry();
 			for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
 				LineString lineString = (LineString) multiLineString.getGeometryN(i);
-
+				lineString.setSRID(ii);
 				Coordinate from = lineString.getStartPoint().getCoordinate();
 				this.tree.put(from.x, from.y, lineString);
 				Coordinate to = lineString.getEndPoint().getCoordinate();
