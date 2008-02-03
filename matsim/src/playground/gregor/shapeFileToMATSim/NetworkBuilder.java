@@ -38,11 +38,13 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.Filter;
 import org.matsim.controler.Controler;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.collections.QuadTree;
@@ -74,12 +76,14 @@ public class NetworkBuilder {
 	private final FeatureSource featureSource;
 
 	private HashSet<LineString> lineStrings;
-	private QuadTree tree;
+	private QuadTree<LineString> tree;
 
 	private GeometryFactory geofac;
 
 	//DEBUG
 	ShapefileDataStore ds = null;
+
+	private String outfile = "./padang/debug_out.shp";
 
 	public NetworkBuilder(FeatureSource featureSource){
 		this.geofac = new GeometryFactory();
@@ -94,9 +98,9 @@ public class NetworkBuilder {
 		cleanUpLineStrings();
 		splitAtIntersections();
 		simplifyNetwork();
-
-
-		writeGeometries();
+		if (this.outfile  != null) {
+			writeGeometries();
+		}
 		return null;
 	}
 
@@ -124,18 +128,13 @@ public class NetworkBuilder {
 				p = tmp;
 			}
 			if (coords.size() < ls.getNumPoints()){
-				this.lineStrings.remove(ls);
-				this.tree.remove(ls.getStartPoint().getX(), ls.getStartPoint().getY(), ls);
-				this.tree.remove(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
+				remove(ls);
 				Coordinate [] carray = new Coordinate [coords.size()];
 				for (int i = 0; i < coords.size(); i++){
 					carray[i] = coords.elementAt(i);
 				}
 				LineString cleanLs = this.geofac.createLineString(carray);
-				this.lineStrings.add(cleanLs);
-				this.tree.put(cleanLs.getStartPoint().getX(), cleanLs.getStartPoint().getY(), cleanLs);
-				this.tree.put(cleanLs.getEndPoint().getX(), cleanLs.getEndPoint().getY(), cleanLs);
-				
+				add(cleanLs);
 			}
 		}
 	}
@@ -148,78 +147,83 @@ public class NetworkBuilder {
 		}
 		while (lineStringsQueue.peek() != null) {
 			LineString ls = lineStringsQueue.poll();
+			int size = lineStringsQueue.size();
 			Collection<LineString> tmp = this.tree.get(ls.getStartPoint().getX(), ls.getStartPoint().getY(), CATCH_RADIUS);
 			if (tmp.size() != 2){
 				tmp = this.tree.get(ls.getEndPoint().getX(), ls.getEndPoint().getY(), CATCH_RADIUS);
 			}
 			if (tmp.size() == 2) {
-				int ii=0; ii++;
 				for (LineString neighbor : tmp){
-
-					if (neighbor.equals(ls)) {
+					if (neighbor.equals(ls)){
 						continue;
 					}
-					
-
-					
-					this.lineStrings.remove(ls);
-					this.tree.remove(ls.getStartPoint().getX(), ls.getStartPoint().getY(), ls);
-					this.tree.remove(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
-					this.lineStrings.remove(neighbor);
-					this.tree.remove(neighbor.getStartPoint().getX(), neighbor.getStartPoint().getY(), neighbor);
-					this.tree.remove(neighbor.getEndPoint().getX(), neighbor.getEndPoint().getY(), neighbor);
-					
-
-					Coordinate [] carray = new Coordinate [ls.getNumPoints() + neighbor.getNumPoints() -1];
-
-					boolean reverseLs = false;
-					boolean reverseNeighbor = false;
-					if (ls.getStartPoint().equalsExact(neighbor.getStartPoint(), CATCH_RADIUS) || ls.getStartPoint().equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
-						reverseLs = true;
-						if (ls.getStartPoint().equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
-							reverseNeighbor = true;
-						}
-					} else {
-						if (ls.getEndPoint().equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
-							reverseNeighbor = true;
-						}	
-					}
-					
-					
-					
-					if (reverseLs) {
-						int j = 0;
-						for (int i = ls.getNumPoints()-1; i >= 0; i --){
-							carray[j++] = ls.getCoordinateN(i);
-						}
-					} else {
-						for (int i = 0; i < ls.getNumPoints(); i ++){
-							carray[i] = ls.getCoordinateN(i);
-						}
-					}
-						
-					int offset = ls.getNumPoints() - 1;
-					if (reverseNeighbor) {
-						int j = offset + 1;
-						for (int i = neighbor.getNumPoints() -2 ; i >= 0; i--){
-							carray[j++] = neighbor.getCoordinateN(i);
-						} 
-					} else {
-						for (int i = 1; i< neighbor.getNumPoints(); i++){
-							carray[i+offset] = neighbor.getCoordinateN(i);
-						}						
-					}
-
-					LineString union = this.geofac.createLineString(carray);				
-					this.lineStrings.add(union);
-					this.tree.put(union.getStartPoint().getX(), union.getStartPoint().getY(), union);
-					this.tree.put(union.getEndPoint().getX(), union.getEndPoint().getY(), union);					
-					lineStringsQueue.add(union);
+					union(ls,neighbor,lineStringsQueue);
 					break;
 				}
+
+
+			}
+
+
+		}
+
+	}
+
+	private void union(LineString ls,LineString neighbor, ConcurrentLinkedQueue<LineString> lineStringsQueue){
+		remove(ls);
+		remove(neighbor);
+		Coordinate [] carray = new Coordinate [ls.getNumPoints() + neighbor.getNumPoints() -1];
+		boolean reverseLs = false;
+		boolean reverseNeighbor = false;
+		if (ls.getStartPoint().equalsExact(neighbor.getStartPoint(), CATCH_RADIUS) || ls.getStartPoint().equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
+			reverseLs = true;
+			if (ls.getStartPoint().equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
+				reverseNeighbor = true;
+			}
+		} else {
+			if (ls.getEndPoint().equalsExact(neighbor.getEndPoint(), CATCH_RADIUS)){
+				reverseNeighbor = true;
+			}	
+		}
+
+		if (reverseLs) {
+			int j = 0;
+			for (int i = ls.getNumPoints()-1; i >= 0; i --){
+				carray[j++] = ls.getCoordinateN(i);
+			}
+		} else {
+			for (int i = 0; i < ls.getNumPoints(); i ++){
+				carray[i] = ls.getCoordinateN(i);
 			}
 		}
 
+		int offset = ls.getNumPoints() - 1;
+		if (reverseNeighbor) {
+			int j = offset + 1;
+			for (int i = neighbor.getNumPoints() -2 ; i >= 0; i--){
+				carray[j++] = neighbor.getCoordinateN(i);
+			} 
+		} else {
+			for (int i = 1; i< neighbor.getNumPoints(); i++){
+				carray[i+offset] = neighbor.getCoordinateN(i);
+			}						
+		}
+
+		LineString union = this.geofac.createLineString(carray);
+		add(union);
+		lineStringsQueue.add(union);
+	}
+
+	private void add(LineString ls) {
+		this.lineStrings.add(ls);
+		this.tree.put(ls.getStartPoint().getX(), ls.getStartPoint().getY(), ls);
+		this.tree.put(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);		
+	}
+
+	private void remove(LineString ls) {
+		this.lineStrings.remove(ls);
+		this.tree.remove(ls.getStartPoint().getX(), ls.getStartPoint().getY(), ls);
+		this.tree.remove(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
 	}
 
 	private void splitAtIntersections() {
@@ -249,9 +253,7 @@ public class NetworkBuilder {
 	}
 
 	private void splitLineString(LineString ls, Vector<Point> splitPoints) {
-		this.lineStrings.remove(ls);
-		this.tree.remove(ls.getStartPoint().getX(), ls.getStartPoint().getY(), ls);
-		this.tree.remove(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
+		remove(ls);
 		splitPoints.add(ls.getEndPoint());
 		Point tmp = ls.getStartPoint();
 		Vector<Coordinate> segment = new Vector<Coordinate>();
@@ -267,9 +269,7 @@ public class NetworkBuilder {
 				coords[j] = segment.elementAt(j);
 			}			
 			LineString subLs = this.geofac.createLineString(coords);
-			this.lineStrings.add(subLs);
-			this.tree.put(subLs.getStartPoint().getX(), subLs.getStartPoint().getY(), subLs);
-			this.tree.put(subLs.getEndPoint().getX(), subLs.getEndPoint().getY(), subLs);
+			add(subLs);
 			segment.clear();
 		}
 
@@ -284,22 +284,15 @@ public class NetworkBuilder {
 		FeatureCollection collection = this.featureSource.getFeatures();
 		Envelope o = this.featureSource.getBounds();
 		this.lineStrings = new HashSet<LineString>();
-		this.tree = new QuadTree(o.getMinX(),o.getMinY(),o.getMaxX(),o.getMaxY());
+		this.tree = new QuadTree<LineString>(o.getMinX(),o.getMinY(),o.getMaxX(),o.getMaxY());
 
 		FeatureIterator it = collection.features();
 		while (it.hasNext()){
 			Feature feature = it.next();
-			Integer ii = (Integer) feature.getAttribute(1);
 			MultiLineString multiLineString = (MultiLineString) feature.getDefaultGeometry();
 			for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
 				LineString lineString = (LineString) multiLineString.getGeometryN(i);
-				lineString.setSRID(ii);
-				Coordinate from = lineString.getStartPoint().getCoordinate();
-				this.tree.put(from.x, from.y, lineString);
-				Coordinate to = lineString.getEndPoint().getCoordinate();
-				this.tree.put(to.x, to.y, lineString);
-
-				this.lineStrings.add(lineString);
+				add(lineString);
 			}
 
 		}
@@ -313,15 +306,17 @@ public class NetworkBuilder {
 		File inFile = new File("./padang/debug.shp");
 		ds = new ShapefileDataStore(inFile.toURL());
 		FeatureType ft = this.featureSource.getSchema();
-		File out = new File("./padang/debug_out.shp");
-
+		File out = new File(this.outfile);
+//
 		String name = ds.getTypeNames()[0];
-
+//
+//		ShapefileDataStoreFactory dsf = new ShapefileDataStoreFactory();
+//		dsf.createDataStore()
 		ShapefileDataStore outStore = new ShapefileDataStore(out.toURL());
 		outStore.createSchema(this.featureSource.getSchema());
-		FeatureSource newFeatureSource = outStore.getFeatureSource(name);
+		FeatureSource newFeatureSource = outStore.getFeatureSource(this.featureSource.getDataStore().getTypeNames()[0]);
 		FeatureStore newFeatureStore = (FeatureStore)newFeatureSource;
-
+//		newFeatureStore.removeFeatures(Filter.NONE);
 		// accquire a transaction to create the shapefile from FeatureStore
 		Transaction t = newFeatureStore.getTransaction();
 
@@ -336,6 +331,7 @@ public class NetworkBuilder {
 			collect.add(feature);
 
 		}
+		
 		newFeatureStore.addFeatures(collect);
 
 		t.commit();
