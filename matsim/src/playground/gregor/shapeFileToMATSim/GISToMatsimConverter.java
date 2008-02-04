@@ -27,6 +27,10 @@ import java.util.HashMap;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkWriter;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Converter class for street network shape files as provided by DLR in Last Mile project 
@@ -41,6 +45,7 @@ public class GISToMatsimConverter {
 	
 	FeatureSource polygons = null;
 	FeatureSource linestrings = null;
+	private Envelope envelope;
 	static final double CATCH_RADIUS = 0.5;
 	
 	public GISToMatsimConverter(){
@@ -72,14 +77,19 @@ public class GISToMatsimConverter {
 	
 	private void processData() throws Exception {
 		GraphGenerator netBuild = new GraphGenerator(features.get(linestringFile));
-		Collection graph =  netBuild.createNetwork();
+		Collection<Feature> graph =  netBuild.createNetwork();
 		ShapeFileWriter.writeGeometries(graph, "./padang/pdg_debug_out.shp");
-//		NetworkLayer network = 
+		 NetworkGenerator ng = new NetworkGenerator(graph,this.envelope);
+		NetworkLayer network = ng.generateFromGraph();
+		NetworkWriter nw = new NetworkWriter(network,"./padang/debug_net.xml");
+		nw.write();
+		int i=0; i++;
 	}
 
 	private void readData() throws Exception{
 //		if (polygonFile != null){
 			features.put(polygonFile, ShapeFileReader.readDataFile(polygonFile));			
+			this.envelope = features.get(polygonFile).getBounds();
 //		}
 //		if (linestringFile != null){
 			features.put(linestringFile, ShapeFileReader.readDataFile(linestringFile));			

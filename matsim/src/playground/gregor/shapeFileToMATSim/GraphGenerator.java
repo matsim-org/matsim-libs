@@ -33,9 +33,12 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
+import org.geotools.data.DataStore;
+import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
+import org.geotools.data.collection.CollectionDataStore;
 import org.geotools.data.memory.MemoryFeatureCollection;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
@@ -50,13 +53,17 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+
 import org.geotools.referencing.CRS;
 import org.matsim.counts.AttributeFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.collections.QuadTree;
 
+import playground.gregor.gis.MedianStripShapeFileWriter.PFeatureCollection;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -90,14 +97,12 @@ public class GraphGenerator {
 
 	}
 
-	public Collection createNetwork() throws Exception {
+	public Collection<Feature> createNetwork() throws Exception {
 		parseLineStrings();
 		cleanUpLineStrings();
 		checkForIntersectionsToSplit();
 		simplifyNetwork();
-//		if (this.outfile != null) {
-//			writeGeometries();
-//		}
+
 		return genFeatureCollection();
 	}
 
@@ -309,11 +314,11 @@ public class GraphGenerator {
 	}
 
 
-	private Collection genFeatureCollection() throws FactoryRegistryException, SchemaException, IllegalAttributeException{
+	private Collection<Feature> genFeatureCollection() throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
+		
+		
 		Collection<Feature> features = new ArrayList<Feature>();
 		
-//		FeatureCollection features = new MemoryFeatureCollection(this.featureSource.getSchema());
-		FeatureType ftr = this.featureSource.getSchema();
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiLineString",MultiLineString.class, true, null, null, this.featureSource.getSchema().getDefaultGeometry().getCoordinateSystem());
 		AttributeType id = AttributeTypeFactory.newAttributeType(
 				"ID", Integer.class);
@@ -323,12 +328,14 @@ public class GraphGenerator {
 				"toID", Integer.class);		
 		FeatureType ftRoad = FeatureTypeFactory.newFeatureType(
 				new AttributeType[] { geom, id, fromNode, toNode }, "link");
+		
 		for (LineString ls : this.lineStrings){
 			Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},this.geofac) , -1, -1,-1},"network");
 			features.add(ft);
-			
-			
+				
 		}
+
+
 		return features;
 	}
 
