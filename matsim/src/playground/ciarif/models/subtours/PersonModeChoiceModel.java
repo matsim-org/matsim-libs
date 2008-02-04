@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicAct;
+import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -34,12 +36,17 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
 import playground.balmermi.census2000.data.Household;
+import playground.balmermi.census2000.data.Households;
 import playground.balmermi.census2000.data.Persons;
+import playground.balmermi.census2000.data.Municipality;
+import playground.balmermi.census2000.data.Municipalities;
 
 public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -59,8 +66,8 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final Coord ZERO = new Coord(0.0,0.0);
 	private final Persons persons;
 	private ModelModeChoice model;
-	ArrayList<Object> subToursRegister = null;
-	List<Integer> modeSubTours = null;
+	private ArrayList<List<Integer>> subToursRegister = null;
+	private List<Integer> modeSubTours = null;
 	 
 		
 	//////////////////////////////////////////////////////////////////////
@@ -81,17 +88,18 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	
 		int prev_mode = 0;
 		subToursRegister.add(subtour);
-		for (int i=0;i<=subToursRegister.size();i=i+1) {
-			if (subToursRegister.get(i).equals(subtour.get(0))) {
+		for (int i=0;i<subToursRegister.size();i=i+1) {
+			if (subToursRegister.get(i).contains(subtour.get(0))) {
 				prev_mode = modeSubTours.get(i); break;
 			}
 		}
 		// calculate the SubTour distance (in 1 Km bins)
 		int mainpurpose =  3; //mainpurpose:  0 := work; 1 := edu; 2 := shop 3:=leisure
 		double d = 0.0;
-		CoordI prev = ((Act)plan.getActsLegs().get(subtour.get(0))).getCoord();
+		CoordI start = ((Act)plan.getActsLegs().get(subtour.get(0))).getCoord();
+		CoordI prev = start;
 		String type = null;
-			for (int k=0; k<=subtour.size(); k=k+1) { //Verificare da dove deve partire!!!!!!!!
+			for (int k=0; k<=subtour.size(); k=k+1) { // TODO Verificare da dove deve partire!!!!!!!!
 				type = ((Act)plan.getActsLegs().get(subtour.get(k))).getType();
 				if (mainpurpose == 1){
 					if (type == W) { mainpurpose = 0; break; }
@@ -113,14 +121,12 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		d = d/1000.0;
 		
 		// Defining urban degree for the starting point of the subtour
-		//CoordI coord_start = ((Act)plan.getActsLegs().get(start)).getCoord();
-		//Location l = Gbl.getWorld().//getLayer(MUNICIPALITY).getLocation(m_id);
-		
-		
+		 
+		int udeg = 0; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
 		// setting subtour parameters
-		
+		model.setUrbanDegree(udeg);
 		model.setMainPurpose(mainpurpose);
-		model.setDistanceTour(d); // model needs meters!
+		model.setDistanceTour(d); // model needs meters! TODO check dimensions of distances!!!!
 		model.setPrevMode(prev_mode);
 		
 		// choose mode choice model based on main purpose
@@ -153,7 +159,9 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private final void registerSubTours (Plan plan,List<Integer> subtours) {
 		
 		List<Integer> subtour = null;
-		// TODO check if it is an homebased tour { Gbl.errorMsg("This should never happen!");
+		// TODO check if it is an homebased tour { Gbl.errorMsg("This should never happen!"); 
+		// check also if in the tour the person is passing again from home. 
+		//In that case the agent is allowed to use any of the modes.
 		for (int i=0; i<=subtours.size();i=i+2) {
 			// TODO check if the subtour variable must be cleared or not, at the moment IT IS CLEARED!!!
 			subtour.clear();
@@ -175,6 +183,46 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			handleSubTour (plan,subtour);
 		}
 	}
+	private final void extractSubTours2(Plan plan, int start, int end, int subtour_idx, TreeMap<Integer,Integer> subtours) {
+		boolean is_leaf = true;
+		for (int i=start+2; i<end-1; i=i+2) {
+			Act acti = (Act)plan.getActsLegs().get(i);
+			for (int j=end-2; j>i; j=j-2) {
+				Act actj = (Act)plan.getActsLegs().get(j);
+				if ((acti.getCoord().getX() == actj.getCoord().getX()) &&
+				    (acti.getCoord().getY() == actj.getCoord().getY())) {
+					// subtour found: start..i & j..end
+					// mark the legs of the subtour found
+					for (int iii=start+1;iii<i; iii=iii+2) { subtours.put(iii,subtour_idx); }
+					for (int iii=j+1;iii<end; iii=iii+2) { subtours.put(iii,subtour_idx); }
+					subtour_idx++;
+					is_leaf = false;
+					// DO NOT HANDLE ANY SUBTOUR YET!!!
+					// next recursive step
+					int ii = i;
+					Act actii = acti;
+					for (int jj=i+2; jj<=j; jj=jj+2) {
+						Act actjj = (Act)plan.getActsLegs().get(jj);
+						if ((actii.getCoord().getX() == actjj.getCoord().getX()) &&
+						    (actii.getCoord().getY() == actjj.getCoord().getY())) {
+							this.extractSubTours(plan,ii,jj);
+							ii = jj;
+							actii = (Act)plan.getActsLegs().get(ii);
+						}
+					}
+					return;
+				}
+			}
+		}
+		if (is_leaf) {
+			// mark the legs of the subtour found
+			for (int iii=start+1;iii<end; iii=iii+2) { subtours.put(iii,subtour_idx); }
+			subtour_idx++;
+			// DO NOT HANDLE ANY SUBTOUR YET!!!
+		}
+		
+	}
+	
 	
 	private final void extractSubTours(Plan plan, int start, int end) {
 		

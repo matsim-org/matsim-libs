@@ -29,7 +29,7 @@ public abstract class ModelModeChoice {
 //////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-	
+	//TODO Modify explanations according to new features!!!!!
 	protected double age; // 0-[unlimited]
 	protected double nump; // number of persons of the household
 	protected double udeg; // degree of urbanization [2-5] (1=urbanized=reference)

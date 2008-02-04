@@ -88,6 +88,8 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 	}
 	
 	@Override
+	// TODO Warning! The fact that a person has a driving license isn't taken into account yet!!!!!!
+	// If a person doesn't own a driving license shouldn't be allowed to have car as option!!!!!
 	protected final double calcCarUtil() {
 		if ((prev_mode == 3)||(prev_mode == 0) ){
 			double util = 0.0;
