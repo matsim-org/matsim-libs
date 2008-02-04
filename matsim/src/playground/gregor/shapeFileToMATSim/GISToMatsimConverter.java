@@ -26,7 +26,7 @@ import java.util.HashMap;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.network.NetworkLayer;
+import org.geotools.feature.FeatureCollection;
 
 /**
  * Converter class for street network shape files as provided by DLR in Last Mile project 
@@ -41,6 +41,7 @@ public class GISToMatsimConverter {
 	
 	FeatureSource polygons = null;
 	FeatureSource linestrings = null;
+	static final double CATCH_RADIUS = 0.5;
 	
 	public GISToMatsimConverter(){
 //		this("./padang/padang_streets.shp","./padang/vd10_streetnetwork_padang_v0.5_utm47s.shp");
@@ -70,10 +71,10 @@ public class GISToMatsimConverter {
 	}
 	
 	private void processData() throws Exception {
-		NetworkBuilder netBuild = new NetworkBuilder(features.get(linestringFile));
-		Collection<Feature> network =  netBuild.createNetwork();
-		int i = 0;
-		i++;
+		GraphGenerator netBuild = new GraphGenerator(features.get(linestringFile));
+		Collection graph =  netBuild.createNetwork();
+		ShapeFileWriter.writeGeometries(graph, "./padang/pdg_debug_out.shp");
+//		NetworkLayer network = 
 	}
 
 	private void readData() throws Exception{

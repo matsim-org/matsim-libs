@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.PriorityQueue;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -37,11 +36,12 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
+import org.geotools.data.memory.MemoryFeatureCollection;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -50,31 +50,25 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
-import org.matsim.controler.Controler;
+import org.geotools.referencing.CRS;
+import org.matsim.counts.AttributeFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.collections.QuadTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * @author laemmel
  * 
  */
-public class NetworkBuilder {
+public class GraphGenerator {
 
-	private static final Logger log = Logger.getLogger(NetworkBuilder.class);
-
-	private static final double CATCH_RADIUS = 0.5;
+	private static final Logger log = Logger.getLogger(GraphGenerator.class);
 
 	private NetworkLayer network = null;
 	private final FeatureSource featureSource;
@@ -89,21 +83,21 @@ public class NetworkBuilder {
 
 	private String outfile = "./padang/debug_out.shp";
 
-	public NetworkBuilder(FeatureSource featureSource) {
+	public GraphGenerator(FeatureSource featureSource) {
 		this.geofac = new GeometryFactory();
 		this.network = new NetworkLayer();
 		this.featureSource = featureSource;
 
 	}
 
-	public Collection<Feature> createNetwork() throws Exception {
+	public Collection createNetwork() throws Exception {
 		parseLineStrings();
 		cleanUpLineStrings();
 		checkForIntersectionsToSplit();
 		simplifyNetwork();
-		if (this.outfile != null) {
-			writeGeometries();
-		}
+//		if (this.outfile != null) {
+//			writeGeometries();
+//		}
 		return genFeatureCollection();
 	}
 
@@ -120,7 +114,7 @@ public class NetworkBuilder {
 			coords.add(p.getCoordinate());
 			for (int i = 1; i < ls.getNumPoints(); i++) {
 				Point tmp = ls.getPointN(i);
-				if (p.distance(ls.getPointN(i)) <= CATCH_RADIUS) {
+				if (p.distance(ls.getPointN(i)) <= GISToMatsimConverter.CATCH_RADIUS) {
 					if (tmp.equals(ls.getEndPoint())) {
 						coords.remove(coords.lastElement());
 						coords.add(tmp.getCoordinate());
@@ -151,10 +145,10 @@ public class NetworkBuilder {
 		while (lineStringsQueue.peek() != null) {
 			LineString ls = lineStringsQueue.poll();
 			Collection<LineString> tmp = this.tree.get(ls.getStartPoint()
-					.getX(), ls.getStartPoint().getY(), CATCH_RADIUS);
+					.getX(), ls.getStartPoint().getY(), GISToMatsimConverter.CATCH_RADIUS);
 			if (tmp.size() != 2) {
 				tmp = this.tree.get(ls.getEndPoint().getX(), ls.getEndPoint()
-						.getY(), CATCH_RADIUS);
+						.getY(), GISToMatsimConverter.CATCH_RADIUS);
 			}
 			if (tmp.size() == 2) {
 				for (LineString neighbor : tmp) {
@@ -180,17 +174,17 @@ public class NetworkBuilder {
 		boolean reverseLs = false;
 		boolean reverseNeighbor = false;
 		if (ls.getStartPoint().equalsExact(neighbor.getStartPoint(),
-				CATCH_RADIUS)
+				GISToMatsimConverter.CATCH_RADIUS)
 				|| ls.getStartPoint().equalsExact(neighbor.getEndPoint(),
-						CATCH_RADIUS)) {
+						GISToMatsimConverter.CATCH_RADIUS)) {
 			reverseLs = true;
 			if (ls.getStartPoint().equalsExact(neighbor.getEndPoint(),
-					CATCH_RADIUS)) {
+					GISToMatsimConverter.CATCH_RADIUS)) {
 				reverseNeighbor = true;
 			}
 		} else {
 			if (ls.getEndPoint().equalsExact(neighbor.getEndPoint(),
-					CATCH_RADIUS)) {
+					GISToMatsimConverter.CATCH_RADIUS)) {
 				reverseNeighbor = true;
 			}
 		}
@@ -240,7 +234,7 @@ public class NetworkBuilder {
 				// QuadTree
 				Collection<LineString> tmp = this.tree.get(
 						ls.getCoordinateN(i).x, ls.getCoordinateN(i).y,
-						CATCH_RADIUS);
+						GISToMatsimConverter.CATCH_RADIUS);
 				if (!tmp.isEmpty()) {
 					splitPoints.add(ls.getPointN(i));
 				}
@@ -315,69 +309,27 @@ public class NetworkBuilder {
 	}
 
 
-	private Collection<Feature> genFeatureCollection() throws FactoryRegistryException, SchemaException, IllegalAttributeException{
+	private Collection genFeatureCollection() throws FactoryRegistryException, SchemaException, IllegalAttributeException{
 		Collection<Feature> features = new ArrayList<Feature>();
-		AttributeType geom = AttributeTypeFactory.newAttributeType("LineString",
-				LineString.class);
+		
+//		FeatureCollection features = new MemoryFeatureCollection(this.featureSource.getSchema());
+		FeatureType ftr = this.featureSource.getSchema();
+		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiLineString",MultiLineString.class, true, null, null, this.featureSource.getSchema().getDefaultGeometry().getCoordinateSystem());
+		AttributeType id = AttributeTypeFactory.newAttributeType(
+				"ID", Integer.class);
 		AttributeType fromNode = AttributeTypeFactory.newAttributeType(
 				"fromID", Integer.class);
 		AttributeType toNode = AttributeTypeFactory.newAttributeType(
 				"toID", Integer.class);		
 		FeatureType ftRoad = FeatureTypeFactory.newFeatureType(
-				new AttributeType[] { geom, fromNode, toNode }, "link");
-		
+				new AttributeType[] { geom, id, fromNode, toNode }, "link");
 		for (LineString ls : this.lineStrings){
-			Feature ft = ftRoad.create(new Object [] {ls, -1, -1},"network");
+			Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},this.geofac) , -1, -1,-1},"network");
 			features.add(ft);
+			
+			
 		}
 		return features;
 	}
-	
-	
-	// DEBUG
-	private void writeGeometries() throws Exception {
-		File inFile = new File("./padang/debug.shp");
-		ds = new ShapefileDataStore(inFile.toURL());
-		FeatureType ft = this.featureSource.getSchema();
-		File out = new File(this.outfile);
-		//
-		String name = ds.getTypeNames()[0];
-		//
-		// ShapefileDataStoreFactory dsf = new ShapefileDataStoreFactory();
-		// dsf.createDataStore()
-		ShapefileDataStore outStore = new ShapefileDataStore(out.toURL());
-		outStore.createSchema(this.featureSource.getSchema());
-		FeatureSource newFeatureSource = outStore
-				.getFeatureSource(this.featureSource.getDataStore()
-						.getTypeNames()[0]);
-		FeatureStore newFeatureStore = (FeatureStore) newFeatureSource;
-		// newFeatureStore.removeFeatures(Filter.NONE);
-		// accquire a transaction to create the shapefile from FeatureStore
-		Transaction t = newFeatureStore.getTransaction();
 
-		FeatureCollection collect = new PFeatureCollection(ft);
-
-		Iterator<LineString> it = this.lineStrings.iterator();
-		while (it.hasNext()) {
-			LineString ls = (LineString) it.next();
-			MultiLineString mls = new MultiLineString(new LineString[] { ls },
-					geofac);
-			Feature feature = ft.create(null);
-			feature.setDefaultGeometry(mls);
-			collect.add(feature);
-
-		}
-
-		newFeatureStore.addFeatures(collect);
-
-		t.commit();
-		t.close();
-
-	}
-
-	public static class PFeatureCollection extends DefaultFeatureCollection {
-		public PFeatureCollection(FeatureType ft) {
-			super("error", ft);
-		}
-	}
 }
