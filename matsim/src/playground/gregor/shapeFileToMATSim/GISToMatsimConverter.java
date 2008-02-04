@@ -21,9 +21,11 @@
 package playground.gregor.shapeFileToMATSim;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.geotools.data.FeatureSource;
+import org.geotools.feature.Feature;
 import org.matsim.network.NetworkLayer;
 
 /**
@@ -69,8 +71,9 @@ public class GISToMatsimConverter {
 	
 	private void processData() throws Exception {
 		NetworkBuilder netBuild = new NetworkBuilder(features.get(linestringFile));
-		NetworkLayer network = netBuild.createNetwork();
-		
+		Collection<Feature> network =  netBuild.createNetwork();
+		int i = 0;
+		i++;
 	}
 
 	private void readData() throws Exception{
