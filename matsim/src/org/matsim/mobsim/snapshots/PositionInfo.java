@@ -45,13 +45,13 @@ public class PositionInfo {
 	final private double azimuth;
 	final private double distanceOnLink;
 	final private String visualizerData;
-	
+
 	final private double speed;
 
 	final private VehicleState vehicleState;
 	final private Link link;
-	
-	
+
+
 
 	// the constructor does all the work:
 	/**
@@ -62,8 +62,9 @@ public class PositionInfo {
 	 * @param distanceOnLink The distance of the agent from the fromNode of the link.
 	 * @param lane The number of the lane the agent is on.
 	 * 		Lanes are counted from the middle of a bi-directional link, beginning with 1.
-	 * @param speed The speed the agent is travelling with.
+	 * @param speed The speed the agent is traveling with.
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
+	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
 	public PositionInfo(final IdI agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
 		this.agentId = agentId;
@@ -105,6 +106,7 @@ public class PositionInfo {
 	 * @param azimuth
 	 * @param speed
 	 * @param vehicleState The state of the vehicle (Parking, Driving)
+	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
 	public PositionInfo(final IdI driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final VehicleState vehicleState, final String visualizerData) {
 		this.agentId = driverId;
