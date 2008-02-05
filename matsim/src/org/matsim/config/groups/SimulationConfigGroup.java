@@ -123,6 +123,8 @@ public class SimulationConfigGroup extends Module {
 			return getSnapshotFormat();
 		} else if (SNAPSHOT_FILE.equals(key)) {
 			return getSnapshotFile();
+		} else if (SNAPSHOT_STYLE.equals(key)) {
+			return getSnapshotStyle();
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
 			return Double.toString(getFlowCapFactor());
 		} else if (STORAGE_CAPACITY_FACTOR.equals(key)) {
@@ -152,6 +154,7 @@ public class SimulationConfigGroup extends Module {
 		map.put(SNAPSHOT_PERIOD, getValue(SNAPSHOT_PERIOD));
 		map.put(SNAPSHOT_FORMAT, getValue(SNAPSHOT_FORMAT));
 		map.put(SNAPSHOT_FILE, getValue(SNAPSHOT_FILE));
+		map.put(SNAPSHOT_STYLE, getValue(SNAPSHOT_STYLE));
 		map.put(FLOW_CAPACITY_FACTOR, getValue(FLOW_CAPACITY_FACTOR));
 		map.put(STORAGE_CAPACITY_FACTOR, getValue(STORAGE_CAPACITY_FACTOR));
 		map.put(STUCK_TIME, getValue(STUCK_TIME));
