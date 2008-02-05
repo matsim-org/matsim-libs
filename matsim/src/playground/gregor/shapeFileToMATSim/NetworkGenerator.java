@@ -30,6 +30,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.identifiers.IdI;
 
@@ -44,9 +45,12 @@ public class NetworkGenerator {
 	private static final Logger log = Logger.getLogger(NetworkGenerator.class);
 	private Collection<Feature> features;
 	private Envelope envelope;
-	private QuadTree<LineString> tree;
+//	private QuadTree<LineString> tree;
 	private QuadTree<Node> nodes;
-	private HashSet<LineString> lineStrings;
+//	private HashSet<LineString> lineStrings;
+	private NetworkLayer network;
+	private int nodeId;
+	private int linkId;
 	
 	public NetworkGenerator(Collection<Feature> features, Envelope envelope){
 		this.features = features;
@@ -54,87 +58,103 @@ public class NetworkGenerator {
 	}
 	
 	
-	public NetworkLayer generateFromGraph() throws Exception {
-		parseLineStrings();
-		return processParsed();
+//	public NetworkLayer generateFromGraph() throws Exception {
+//		parseLineStrings();
+//		return processParsed();
+//		
+//	}
+//	private NetworkLayer processParsed() {
+//		NetworkLayer network = new NetworkLayer();
+//		this.nodes = new QuadTree<Node>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());
+//		int nodeId = 0;
+//		int linkId = 0;
+//		for (LineString ls : this.lineStrings){
+//			Collection<Node> tmp = this.nodes.get(ls.getStartPoint().getX(), ls.getStartPoint().getY(), GISToMatsimConverter.CATCH_RADIUS);
+//			String from;
+//			String to;
+//			if (tmp.size() > 1) {
+//				throw new RuntimeException("two different nodes on the same location is not allowd!");
+//			} 
+//			if (tmp.size() == 0) {
+//				Node n = network.createNode(Integer.toString(nodeId++), Double.toString(ls.getStartPoint().getX()), Double.toString(ls.getStartPoint().getY()), "");
+//				addNode(n);
+//				from = n.getId().toString();
+//			} else {
+//				from = tmp.iterator().next().getId().toString();
+//			}
+//			
+//			tmp = this.nodes.get(ls.getEndPoint().getX(), ls.getEndPoint().getY(), GISToMatsimConverter.CATCH_RADIUS);
+//			if (tmp.size() > 1) {
+//				throw new RuntimeException("two different nodes on the same location is not allowd!");
+//			} 
+//			if (tmp.size() == 0) {
+//				Node n = network.createNode(Integer.toString(nodeId++), Double.toString(ls.getEndPoint().getX()), Double.toString(ls.getEndPoint().getY()), "");
+//				addNode(n);
+//				to = n.getId().toString();
+//			}	else {
+//				to = tmp.iterator().next().getId().toString();
+//			}
+//			network.createLink(Integer.toString(linkId++), from, to, Double.toString(ls.getLength()), "1.66", "1.33", "1", "0", null);
+//		}
+//		
+//		return network;
+//	}
+
+
+	public NetworkLayer generateFromGraph() throws IOException {
+
+		log.info("parsing features, building up NetworkLayer and running  NetworkCleaner as well ...");
+		this.network = new NetworkLayer();
+		this.nodes = new QuadTree<Node>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());		
+		this.nodeId = 0;
+		this.linkId = 0;
 		
-	}
-	private NetworkLayer processParsed() {
-		NetworkLayer network = new NetworkLayer();
-		this.nodes = new QuadTree<Node>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());
-		int nodeId = 0;
-		int linkId = 0;
-		for (LineString ls : this.lineStrings){
-			Collection<Node> tmp = this.nodes.get(ls.getStartPoint().getX(), ls.getStartPoint().getY(), GISToMatsimConverter.CATCH_RADIUS);
-			String from;
-			String to;
-			if (tmp.size() > 1) {
-				throw new RuntimeException("two different nodes on the same location is not allowd!");
-			} 
-			if (tmp.size() == 0) {
-				Node n = network.createNode(Integer.toString(nodeId++), Double.toString(ls.getStartPoint().getX()), Double.toString(ls.getStartPoint().getY()), "");
-				addNode(n);
-				from = n.getId().toString();
-			} else {
-				from = tmp.iterator().next().getId().toString();
-			}
-			
-			tmp = this.nodes.get(ls.getEndPoint().getX(), ls.getEndPoint().getY(), GISToMatsimConverter.CATCH_RADIUS);
-			if (tmp.size() > 1) {
-				throw new RuntimeException("two different nodes on the same location is not allowd!");
-			} 
-			if (tmp.size() == 0) {
-				Node n = network.createNode(Integer.toString(nodeId++), Double.toString(ls.getEndPoint().getX()), Double.toString(ls.getEndPoint().getY()), "");
-				addNode(n);
-				to = n.getId().toString();
-			}	else {
-				to = tmp.iterator().next().getId().toString();
-			}
-			network.createLink(Integer.toString(linkId++), from, to, Double.toString(ls.getLength()), "1.66", "1.33", "1", "0", null);
-		}
-		
-		return network;
-	}
-
-
-	private void parseLineStrings() throws IOException {
-
-		log.info("parsing features and building up QuadTree ...");
-
-		
-		this.lineStrings = new HashSet<LineString>();
-		this.tree = new QuadTree<LineString>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());
-
+//		this.lineStrings = new HashSet<LineString>();
+//		this.tree = new QuadTree<LineString>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());
 		
 		for (Feature feature : this.features) {
-			MultiLineString multiLineString = (MultiLineString) feature
-					.getDefaultGeometry();
+			MultiLineString multiLineString = (MultiLineString) feature.getDefaultGeometry();
 			for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
-				LineString lineString = (LineString) multiLineString
-						.getGeometryN(i);
-				add(lineString);
+				LineString ls = (LineString) multiLineString.getGeometryN(i);
+				processLineString(ls);
 			}
 
 		}
+		
+		NetworkCleaner nw = new NetworkCleaner();
+		nw.run(this.network);
 		log.info("done.");
-
+		return this.network;
 	}
 	
+	private void processLineString(LineString ls){
+		
+		String from = getNode(ls.getStartPoint());
+		String to  = getNode(ls.getEndPoint());
+		this.network.createLink(Integer.toString(this.linkId++), from, to, Double.toString(ls.getLength()), "1.66", "1.33", "1", "0", null);
+		this.network.createLink(Integer.toString(this.linkId++), to, from, Double.toString(ls.getLength()), "1.66", "1.33", "1", "0", null);
+	}
+	
+	
+	private String getNode(Point p) {
+		Collection<Node> tmp = this.nodes.get(p.getX(), p.getY(), GISToMatsimConverter.CATCH_RADIUS);
+		if (tmp.size() > 1) {
+			throw new RuntimeException("two different nodes on the same location is not allowd!");
+		} 
+		if (tmp.size() == 0) {
+			Node n = network.createNode(Integer.toString(this.nodeId++), Double.toString(p.getX()), Double.toString(p.getY()), "");
+			addNode(n);
+			return n.getId().toString();
+		} else {
+			return tmp.iterator().next().getId().toString();
+		}
+	}
+
+
 	private void addNode(Node n){
 		this.nodes.put(n.getCoord().getX(),n.getCoord().getY(),n);
 	}
 	
-	private void add(LineString ls) {
-		this.lineStrings.add(ls);
-		this.tree.put(ls.getStartPoint().getX(), ls.getStartPoint().getY(), ls);
-		this.tree.put(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
-	}
 
-	private void remove(LineString ls) {
-		this.lineStrings.remove(ls);
-		this.tree.remove(ls.getStartPoint().getX(), ls.getStartPoint().getY(),
-				ls);
-		this.tree.remove(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
-	}
 
 }

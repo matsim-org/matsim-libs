@@ -27,8 +27,10 @@ import java.util.HashMap;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.referencing.CRS;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -46,6 +48,7 @@ public class GISToMatsimConverter {
 	FeatureSource polygons = null;
 	FeatureSource linestrings = null;
 	private Envelope envelope;
+	private CoordinateReferenceSystem crs;
 	static final double CATCH_RADIUS = 0.5;
 	
 	public GISToMatsimConverter(){
@@ -78,18 +81,21 @@ public class GISToMatsimConverter {
 	private void processData() throws Exception {
 		GraphGenerator netBuild = new GraphGenerator(features.get(linestringFile));
 		Collection<Feature> graph =  netBuild.createNetwork();
-		ShapeFileWriter.writeGeometries(graph, "./padang/pdg_debug_out.shp");
-		 NetworkGenerator ng = new NetworkGenerator(graph,this.envelope);
+		ShapeFileWriter.writeGeometries(graph, "./padang/debug_graph.shp");
+		NetworkGenerator ng = new NetworkGenerator(graph,this.envelope);
 		NetworkLayer network = ng.generateFromGraph();
 		NetworkWriter nw = new NetworkWriter(network,"./padang/debug_net.xml");
 		nw.write();
-		int i=0; i++;
+		NetworkToGraph ntg = new NetworkToGraph(network,this.crs);
+		Collection<Feature> netGraph = ntg.generateFromNet();
+		ShapeFileWriter.writeGeometries(netGraph, "./padang/debug_net.shp");
 	}
 
 	private void readData() throws Exception{
 //		if (polygonFile != null){
 			features.put(polygonFile, ShapeFileReader.readDataFile(polygonFile));			
 			this.envelope = features.get(polygonFile).getBounds();
+			this.crs = features.get(polygonFile).getSchema().getDefaultGeometry().getCoordinateSystem();
 //		}
 //		if (linestringFile != null){
 			features.put(linestringFile, ShapeFileReader.readDataFile(linestringFile));			

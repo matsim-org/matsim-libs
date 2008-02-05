@@ -77,7 +77,7 @@ public class GraphGenerator {
 
 	private static final Logger log = Logger.getLogger(GraphGenerator.class);
 
-	private NetworkLayer network = null;
+//	private NetworkLayer network = null;
 	private final FeatureSource featureSource;
 
 	private HashSet<LineString> lineStrings;
@@ -92,7 +92,7 @@ public class GraphGenerator {
 
 	public GraphGenerator(FeatureSource featureSource) {
 		this.geofac = new GeometryFactory();
-		this.network = new NetworkLayer();
+//		this.network = new NetworkLayer();
 		this.featureSource = featureSource;
 
 	}
@@ -107,6 +107,7 @@ public class GraphGenerator {
 	}
 
 	private void cleanUpLineStrings() {
+		log.info("removing redundant points ...");
 		Iterator<LineString> it = this.lineStrings.iterator();
 		ConcurrentLinkedQueue<LineString> lineStringsQueue = new ConcurrentLinkedQueue<LineString>();
 		while (it.hasNext()) {
@@ -139,9 +140,11 @@ public class GraphGenerator {
 				add(cleanLs);
 			}
 		}
+		log.info("done.");
 	}
 
 	private void simplifyNetwork() {
+		log.info("unifying fragmented links...");
 		Iterator<LineString> it = this.lineStrings.iterator();
 		ConcurrentLinkedQueue<LineString> lineStringsQueue = new ConcurrentLinkedQueue<LineString>();
 		while (it.hasNext()) {
@@ -167,7 +170,7 @@ public class GraphGenerator {
 			}
 
 		}
-
+		log.info("done.");
 	}
 
 	private void union(LineString ls, LineString neighbor,
@@ -223,8 +226,7 @@ public class GraphGenerator {
 	}
 
 	private void checkForIntersectionsToSplit() {
-		log
-				.info("check if some LineStrings have to be splitted at intersections ...");
+		log.info("check if some LineStrings have to be splitted at intersections ...");
 		Iterator<LineString> it = this.lineStrings.iterator();
 		ConcurrentLinkedQueue<LineString> lineStringsQueue = new ConcurrentLinkedQueue<LineString>();
 		while (it.hasNext()) {
