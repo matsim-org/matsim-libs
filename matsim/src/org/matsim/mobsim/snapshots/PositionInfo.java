@@ -59,7 +59,7 @@ public class PositionInfo {
 	 *
 	 * @param agentId The id of the agent.
 	 * @param link The link the vehicle is currently driving or parking on.
-	 * @param distanceOnLink The distance of the agent from the fromNode of the link.
+	 * @param distanceOnLink The distance of the agent from the fromNode of the link (measured on the link's real length, not its euklidean length)
 	 * @param lane The number of the lane the agent is on.
 	 * 		Lanes are counted from the middle of a bi-directional link, beginning with 1.
 	 * @param speed The speed the agent is traveling with.

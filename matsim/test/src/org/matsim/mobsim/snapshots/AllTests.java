@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim;
+package org.matsim.mobsim.snapshots;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,10 +26,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.mobsim");
+		TestSuite suite = new TestSuite("Test for org.matsim.mobsim.snapshots");
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.mobsim.snapshots.AllTests.suite());
-		suite.addTestSuite(QueueSimulatorTest.class);
+		suite.addTestSuite(PositionInfoTest.class);
 		//$JUnit-END$
 		return suite;
 	}
