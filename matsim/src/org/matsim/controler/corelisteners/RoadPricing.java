@@ -22,37 +22,27 @@ package org.matsim.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTolledTripLength;
-import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
-import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
-import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.events.Events;
-import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingScoringFunctionFactory;
 import org.matsim.roadpricing.TollTravelCostCalculator;
 
-import playground.yu.analysis.CalcAvgSpeed;
-import playground.yu.analysis.CalcTrafficPerformance;
-
 /**
  * Integrates the RoadPricing functionality into the MATSim Controler.
  *
  * @author mrieser
  */
-public class RoadPricing implements StartupListener, IterationEndsListener, IterationStartsListener {
+public class RoadPricing implements StartupListener, IterationEndsListener{
 
 	private RoadPricingScheme scheme = null;
 	private CalcPaidToll tollCalc = null;
 	private CalcAverageTolledTripLength cattl = null;
-	private CalcTrafficPerformance ctpf = null;
-	private CalcAvgSpeed cas = null;
 	
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
 
@@ -80,27 +70,19 @@ public class RoadPricing implements StartupListener, IterationEndsListener, Iter
 			controler.setTravelCostCalculator(new TollTravelCostCalculator(controler.getTravelCostCalculator(), this.scheme));
 		}
 		
-		NetworkLayer network = controler.getNetwork();
-		
-		cas = new CalcAvgSpeed(network);
-		ctpf = new CalcTrafficPerformance(network);
-		Events events = controler.getEvents();
-		events.addHandler(cas);
-		events.addHandler(ctpf);
-		cattl = new CalcAverageTolledTripLength(network, controler
-				.getRoadPricing().getRoadPricingScheme());
-		events.addHandler(cattl);
+		cattl = new CalcAverageTolledTripLength(controler.getNetwork(), scheme);
+		controler.getEvents().addHandler(cattl);
 		
 		// TODO [MR] I think that the Area-Router is not yet loaded (never was, neither in this nor in the old controler)
 
 	}
 	
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		int it = event.getIteration();
-		cas.reset(it);
-		ctpf.reset(it);
-		cattl.reset(it);
-	}
+/*/	public void notifyIterationStarts(IterationStartsEvent event) {
+//		int it = event.getIteration();
+//		cas.reset(it);
+//		ctpf.reset(it);
+//		cattl.reset(it);
+//	}*/
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int it = event.getIteration();
@@ -109,16 +91,8 @@ public class RoadPricing implements StartupListener, IterationEndsListener, Iter
 					+ tollCalc.getAllAgentsToll() + " €.");
 			log.info("The number of people, who paid toll : "
 					+ tollCalc.getDraweesNr());
-			CalcAverageTripLength catl = new CalcAverageTripLength();
-			catl.run(event.getControler().getPopulation());
-			log.info("The average trip length : " + catl.getAverageTripLength()
-					+ " m.");
 			log.info("The average paid trip length : "
 					+ cattl.getAverageTripLength() + " m.");
-			log.info("The traffic performance of the whole network : "
-					+ ctpf.getTrafficPerformance() + " Pkm.");
-			log.info("The average travel speed : " + cas.getAvgSpeed()
-					+ " km/h.");
 		}
 	}
 
@@ -130,4 +104,13 @@ public class RoadPricing implements StartupListener, IterationEndsListener, Iter
 		return this.tollCalc;
 	}
 
+	public double getAllAgentsToll(){
+		return tollCalc.getAllAgentsToll();
+	}
+	public int getDraweesNr(){
+		return tollCalc.getDraweesNr();
+	}
+	public double getAvgPaidTripLength(){
+		return cattl.getAverageTripLength();
+	}
 }
