@@ -22,11 +22,8 @@ package org.matsim.config.groups;
 
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Module;
-import org.matsim.network.NetworkLayer;
-import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorHashMap;
 import org.matsim.utils.misc.Time;
 
 public class SimulationConfigGroup extends Module {
@@ -38,6 +35,7 @@ public class SimulationConfigGroup extends Module {
 	private static final String SNAPSHOT_PERIOD = "snapshotperiod";
 	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String SNAPSHOT_FILE = "snapshotfile";
+	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 	private static final String STUCK_TIME = "stuckTime";
@@ -60,6 +58,7 @@ public class SimulationConfigGroup extends Module {
 	private double snapshotPeriod = 0; // off, no snapshots
 	private String snapshotFormat = "";
 	private String snapshotFile = "Snapshot";
+	private String snapshotStyle = "queue"; // currently supported: queue, equil
 	private double flowCapFactor = 1.0;
 	private double stroageCapFactor = 1.0;
 	private double stuckTime = 100;
@@ -85,6 +84,8 @@ public class SimulationConfigGroup extends Module {
 			setSnapshotFormat(value);
 		} else if (SNAPSHOT_FILE.equals(key)) {
 			setSnapshotFile(value);
+		} else if (SNAPSHOT_STYLE.equals(key)) {
+			setSnapshotStyle(value);
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
 			setFlowCapFactor(Double.parseDouble(value));
 		} else if (STORAGE_CAPACITY_FACTOR.equals(key)) {
@@ -270,6 +271,22 @@ public class SimulationConfigGroup extends Module {
 
 	public boolean moveWaitFirst() {
 		return this.moveWaitFirst;
-	}	
+	}
+
+	/** Sets the way the vehicles should be positioned on the links. Currently known and supported styles are
+	 * <code>queue</code> (the default) and <code>equil</code>.
+	 *
+	 * @param style
+	 */
+	public void setSnapshotStyle(final String style) {
+		this.snapshotStyle = style.intern();
+		if (this.snapshotStyle != "equil" && this.snapshotStyle != "queue") {
+			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + style + "\" is not one of the known ones (queue, equil).");
+		}
+	}
+
+	public String getSnapshotStyle() {
+		return this.snapshotStyle;
+	}
 
 }
