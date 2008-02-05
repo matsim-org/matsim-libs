@@ -10,7 +10,7 @@
 <config>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="&INPUTBASE;/q_net.xml" />
+		<param name="inputNetworkFile" value="&INPUTBASE;/4armig.xml" />
 		<param name="outputNetworkFile" value="&OUTPUTBASE;/network.xml" />
 	</module>
 

@@ -86,7 +86,7 @@ public class QControler extends Controler {
 
 		for (int jj = 1; jj <= 10; jj++) {
 
-			Link destLink = network.getLink("10");
+			Link destLink = network.getLink("20");
 			Link sourceLink = network.getLink("60");
 			generatePerson(jj, sourceLink, destLink, pop);
 		}
