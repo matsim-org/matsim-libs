@@ -18,13 +18,11 @@ xml:lang="en">
   <xs:attribute name="id" type="xs:string" use="required" />
 </xs:complexType>
 
-<xs:element name="linkRef" type="linkRefType" />
-
 <xs:complexType name="signalGroupRefType">
   <xs:attribute name="id" type="xs:string" use="required" />
 </xs:complexType>
 
-<xs:element name="signalGroupRef" type="signalGroupRefType" />
+
 
 
 <!-- <xs:complexType name="routeType">
