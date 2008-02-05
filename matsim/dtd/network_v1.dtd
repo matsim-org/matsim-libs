@@ -170,7 +170,7 @@
 
 <!-- ATTRIBUTE permlanes:
      Defines the number of lanes of this link.
-     format := unsigned integer
+     format := double 
      units  := N/A -->
 
 <!-- ATTRIBUTE oneway:

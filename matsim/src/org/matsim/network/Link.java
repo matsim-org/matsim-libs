@@ -55,7 +55,7 @@ public class Link extends BasicLink {
 		this.length = Double.parseDouble(length);
 		this.freespeed = Double.parseDouble(freespeed);
 		this.capacity = Double.parseDouble(capacity);
-		this.permlanes = Integer.parseInt(permlanes);
+		this.permlanes = Double.parseDouble(permlanes);
 		this.origid = origid;
 		this.type = type;
 		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());

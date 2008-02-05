@@ -39,7 +39,7 @@ implements BasicLinkI
 	protected double length = Double.NaN;
 	protected double freespeed = Double.NaN;
 	protected double capacity = Double.NaN;
-	protected int permlanes = Integer.MIN_VALUE;
+	protected double permlanes = Double.NaN;
 
 	// TODO [balmermi] A link exists only iff a to- and a from node is defined.
 	// Furthermore: Since a BasicLink is a location, and a location is a geographic
@@ -121,7 +121,7 @@ implements BasicLinkI
 	}
 
 	public int getLanes() {
-		return this.permlanes;
+		return Math.round((float)Math.max(this.permlanes,1.0d));
 	}
 
 	public void setLanes(int lanes) {
