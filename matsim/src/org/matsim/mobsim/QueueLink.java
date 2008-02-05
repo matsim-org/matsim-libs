@@ -143,8 +143,8 @@ public class QueueLink extends Link {
 
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * this.permlanes) / NetworkLayer.CELL_LENGTH * storageCapFactor;
-		
-		
+
+
 		/* storage capacity needs to be at least enough to handle the
 		 * cap_per_time_step:                  */
 		this.storageCapacity = Math.max(this.storageCapacity, this.timeCapCeil);
@@ -525,6 +525,25 @@ public class QueueLink extends Link {
 	}
 
 	public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
+		String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
+		if ("queue".equals(snapshotStyle)) {
+			getVehiclePositionsQueue(positions);
+		} else if ("equil".equals(snapshotStyle)) {
+			getVehiclePositionsEquil(positions);
+		} else {
+			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
+		}
+		return positions;
+	}
+
+	/**
+	 * Calculates the positions of all vehicles on this link according to the queue-logic: Vehicles are placed on the link
+	 * according to the ratio between the free-travel time and the time the vehicles are already on the link. If they could
+	 * have left the link already (based on the time), the vehicles start to build a traffic-jam (queue) at the end of the link.
+	 *
+	 * @param positions A collection where the calculated positions can be stored.
+	 */
+	public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
 		double now = SimulationTimer.getTime();
 		int cnt = 0;
 		double queueLen = 0.0; // the length of the queue jammed vehicles build at the end of the link
@@ -536,16 +555,12 @@ public class QueueLink extends Link {
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.buffer) {
 			cnt++;
-			// distance from fromNode:
+
 			double distanceFromFromNode = this.length - cnt * vehLen;
-
-			// lane:
 			int lane = 1 + (veh.getID() % getLanes());
-
-			// speed:
 			double speed = getFreespeed();
-			int cmp = (int) (veh.getDepartureTime_s() + 1.0 / this.simulatedFlowCapacity + 2.0);
 
+			int cmp = (int) (veh.getDepartureTime_s() + 1.0 / this.simulatedFlowCapacity + 2.0);
 			if (now > cmp) {
 				speed = 0.0;
 			}
@@ -612,18 +627,80 @@ public class QueueLink extends Link {
 					this, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking,veh.getDriver().getVisualizerData());
 			positions.add(position);
 		}
+	}
 
-		return positions;
+	/**
+	 * Calculates the positions of all vehicles on this link so that there is always the same distance between following cars.
+	 * A single vehicle will be placed at the middle (0.5) of the link, two cars will be placed at positions 0.25 and 0.75,
+	 * three cars at positions 0.16, 0.50, 0.83, and so on.
+	 *
+	 * @param positions A collection where the calculated positions can be stored.
+	 */
+	public void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
+		double time = SimulationTimer.getTime();
+		int cnt = this.buffer.size() + this.vehQueue.size();
+		int nLanes = getLanes();
+		if (cnt > 0) {
+			double cellSize = this.length / cnt;
+			double distFromFromNode = this.length - cellSize / 2.0;
+			double freespeed = getFreespeed();
+
+			// the cars in the buffer
+			for (Vehicle veh : this.buffer) {
+				int lane = 1 + veh.getID() % nLanes;
+				int cmp = (int) (veh.getDepartureTime_s() + 1.0 / this.simulatedFlowCapacity + 2.0);
+				double speed = (time > cmp ? 0.0 : freespeed);
+				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this, distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
+				positions.add(position);
+				distFromFromNode -= cellSize;
+			}
+
+			// the cars in the drivingQueue
+			for (Vehicle veh : this.vehQueue) {
+				int lane = 1 + veh.getID() % nLanes;
+				int cmp = (int) (veh.getDepartureTime_s() + 1.0 / this.simulatedFlowCapacity + 2.0);
+				double speed = (time > cmp ? 0.0 : freespeed);
+				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this, distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
+				positions.add(position);
+				distFromFromNode -= cellSize;
+			}
+		}
+
+		// the cars in the waitingQueue
+		// the actual position doesn't matter, so they're just placed next to the link at the end
+		cnt = this.waitingList.size();
+		if (cnt > 0) {
+			int lane = nLanes + 2;
+			double cellSize = Math.min(7.5, this.length / cnt);
+			double distFromFromNode = this.length - cellSize / 2.0;
+			for (Vehicle veh : this.waitingList) {
+				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this, distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+				positions.add(position);
+				distFromFromNode -= cellSize;
+			}
+		}
+
+		// the cars in the parkingQueue
+		// the actual position  doesn't matter, so they're distributed next to the link
+		cnt = this.parkingList.size();
+		if (cnt > 0) {
+			int lane = nLanes + 4;
+			double cellSize = this.length / cnt;
+			double distFromFromNode = this.length - cellSize / 2.0;
+			for (Vehicle veh : this.parkingList) {
+				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this, distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+				positions.add(position);
+				distFromFromNode -= cellSize;
+			}
+		}
 	}
 
 	void clearVehicles() {
 		double now = SimulationTimer.getTime();
 
 		for (Vehicle veh : this.parkingList) {
-			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriverID(), veh
-							.getCurrentLegNumber(), getId().toString(), veh.getDriver(),
-							veh.getCurrentLeg(), veh.getCurrentLink()));
+			QueueSimulation.getEvents().processEvent(new EventAgentStuck(
+					now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.parkingList.size());
 		Simulation.incLost(this.parkingList.size());
@@ -631,30 +708,24 @@ public class QueueLink extends Link {
 
 
 		for (Vehicle veh : this.waitingList) {
-			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriverID(), veh
-							.getCurrentLegNumber(), getId().toString(), veh.getDriver(),
-							veh.getCurrentLeg(), veh.getCurrentLink()));
+			QueueSimulation.getEvents().processEvent(new EventAgentStuck(
+					now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.waitingList.size());
 		Simulation.incLost(this.waitingList.size());
 		this.waitingList.clear();
 
 		for (Vehicle veh : this.vehQueue) {
-			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriverID(), veh
-							.getCurrentLegNumber(), getId().toString(), veh.getDriver(),
-							veh.getCurrentLeg(), veh.getCurrentLink()));
+			QueueSimulation.getEvents().processEvent(new EventAgentStuck(
+					now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.vehQueue.size());
 		Simulation.incLost(this.vehQueue.size());
 		this.vehQueue.clear();
 
 		for (Vehicle veh : this.buffer) {
-			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriverID(), veh
-							.getCurrentLegNumber(), getId().toString(), veh.getDriver(),
-							veh.getCurrentLeg(), veh.getCurrentLink()));
+			QueueSimulation.getEvents().processEvent(new EventAgentStuck(
+					now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.buffer.size());
 		Simulation.incLost(this.buffer.size());
@@ -679,16 +750,16 @@ public class QueueLink extends Link {
 	}
 
 	public Collection<AgentOnLink> getDrawableCollection() {
-
-
 		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 		getVehiclePositions(positions);
 
 		List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
 		for (PositionInfo pos : positions) {
-			AgentOnLink veh = new AgentOnLink();
-			veh.posInLink_m = pos.getDistanceOnLink();
-			vehs.add(veh);
+			if (pos.getVehicleState() == PositionInfo.VehicleState.Driving) {
+				AgentOnLink veh = new AgentOnLink();
+				veh.posInLink_m = pos.getDistanceOnLink();
+				vehs.add(veh);
+			}
 		}
 
 		return vehs;
@@ -713,7 +784,7 @@ public class QueueLink extends Link {
 	}
 
 	/*
-	 * The visualisation is interested in this status
+	 * The visualization is interested in this status
 	 *
 	 * It is NOT the same as the boolean "active", because we
 	 * DO NOT need to wait for buffer_cap to accumulate AND
