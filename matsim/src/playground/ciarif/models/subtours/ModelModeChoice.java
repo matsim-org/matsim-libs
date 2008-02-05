@@ -23,6 +23,7 @@ package playground.ciarif.models.subtours;
 import java.util.TreeSet;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.geometry.CoordI;
 
 public abstract class ModelModeChoice {
 	
@@ -42,6 +43,7 @@ public abstract class ModelModeChoice {
 	protected String male; // 0-[unlimited]
 	protected boolean bike; // bike ownership
 	protected double prev_mode; // 1= car; 2= Pt; 3= Car passenger; 4= Bike; 5= Walk;
+	protected CoordI home_coord; //Coordinates of the home facility of the agent
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -50,7 +52,7 @@ public abstract class ModelModeChoice {
 	public ModelModeChoice() {
 		this.age = -1.0;
 		this.nump = -1.0;
-		//this.udeg = -1.0;
+		this.udeg = -1.0;
 		this.license = -1.0;
 		this.dist_subtour = -1.0;
 		this.dist_w_e = -1.0;
@@ -59,6 +61,8 @@ public abstract class ModelModeChoice {
 		this.purpose = -1;
 		this.bike = false;
 		this.prev_mode = -1.0;
+		this.home_coord.setX(-1.0);
+		this.home_coord.setY(-1.0);
 		Gbl.random.nextDouble();
 	}
 
@@ -134,6 +138,12 @@ public abstract class ModelModeChoice {
 	public final boolean setPrevMode(int prev_mode) {
 		if ((prev_mode < 1) || (5 < prev_mode)) { return false; }
 		this.prev_mode = prev_mode;
+		return true;
+	}
+	
+	public final boolean setHomeCoord(CoordI home_coord) {
+		if (home_coord.getX()<0 && home_coord.getY()<0) { return false; }
+		this.home_coord = home_coord;
 		return true;
 	}
 	

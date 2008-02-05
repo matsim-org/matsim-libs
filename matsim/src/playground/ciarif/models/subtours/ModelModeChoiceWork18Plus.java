@@ -65,8 +65,6 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 	protected final double calcWalkUtil() {
 		// Computes for this person the utility of choosing walk as transportation mode 
 		// when the tour (plan) has work as main purpose
-		// if (one)
-		// B_Const_w* 1 + B_Dist_w * T_DIST
 		double util = 0.0;
 		util += B5_CONST * 1.0;
 		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 5)) {util += B5_Prev * 1.0;}
@@ -91,7 +89,8 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 	// TODO Warning! The fact that a person has a driving license isn't taken into account yet!!!!!!
 	// If a person doesn't own a driving license shouldn't be allowed to have car as option!!!!!
 	protected final double calcCarUtil() {
-		if ((prev_mode == 3)||(prev_mode == 0) ){
+		
+		if (((prev_mode == 3)||(prev_mode == 0)&& license == 1)){
 			double util = 0.0;
 			util += B1_CONST * 1.0;
 			util += B1_Dist * dist_subtour;

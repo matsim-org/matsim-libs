@@ -55,7 +55,7 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 	@Override
 	protected final double calcWalkUtil() {
 		// Computes for this person the utility of choosing walk as transportation mode 
-		// when the tour (plan) has work as main purpose
+		// when the tour (plan) has Leisure as main purpose
 		// if (one)
 		// B_Const_w* 1 + B_Dist_w * T_DIST
 		double util = 0.0;
@@ -79,6 +79,7 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 	
 	@Override
 	protected final double calcCarUtil() {
+		if (license==0)  {return Double.NEGATIVE_INFINITY;}
 		if ((prev_mode == 3)||(prev_mode == 0)) {
 			double util = 0.0;
 			util += B1_CONST * 1.0;

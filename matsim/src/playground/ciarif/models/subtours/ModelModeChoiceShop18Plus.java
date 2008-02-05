@@ -53,9 +53,7 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 	@Override
 	protected final double calcWalkUtil() {
 		// Computes for this person the utility of choosing walk as transportation mode 
-		// when the tour (plan) has work as main purpose
-		// if (one)
-		// B_Const_w* 1 + B_Dist_w * T_DIST
+		// when the tour (plan) has shop as main purpose
 		double util = 0.0;
 		util += B5_CONST * 1.0;
 		util += B5_Dist * dist_subtour;
@@ -77,7 +75,7 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 	
 	@Override
 	protected final double calcCarUtil() {
-		if ((prev_mode == 3)||(prev_mode == 0)) {
+		if (((prev_mode == 3)||(prev_mode == 0)&& license == 1)) {
 			double util = 0.0;
 			util += B1_CONST * 1.0;
 			util += B1_Dist * dist_subtour;

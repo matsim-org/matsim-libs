@@ -20,33 +20,21 @@
 
 package playground.ciarif.models.subtours;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
-
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.world.Layer;
-import org.matsim.world.Location;
 
-import playground.balmermi.census2000.data.Household;
-import playground.balmermi.census2000.data.Households;
 import playground.balmermi.census2000.data.Persons;
-import playground.balmermi.census2000.data.Municipality;
-import playground.balmermi.census2000.data.Municipalities;
+
 
 public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -66,8 +54,8 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final Coord ZERO = new Coord(0.0,0.0);
 	private final Persons persons;
 	private ModelModeChoice model;
-	private ArrayList<List<Integer>> subToursRegister = null;
-	private List<Integer> modeSubTours = null;
+	//ArrayList<List<Integer>> subToursRegister = new 
+	//private List<Integer> modeSubTours = null;
 	 
 		
 	//////////////////////////////////////////////////////////////////////
@@ -84,23 +72,20 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void handleSubTour(final Plan plan, final List<Integer> subtour) {
-	
-		int prev_mode = 0;
-		subToursRegister.add(subtour);
-		for (int i=0;i<subToursRegister.size();i=i+1) {
-			if (subToursRegister.get(i).contains(subtour.get(0))) {
-				prev_mode = modeSubTours.get(i); break;
-			}
-		}
+	private final void handleSubTours(final Plan plan, final TreeMap<Integer,List<Integer>> registerSubTours) {
+		
+		CoordI home = plan.getFirstActivity().getCoord();
+		// TODO check if it is an homebased tour { Gbl.errorMsg("This should never happen!"); 
 		// calculate the SubTour distance (in 1 Km bins)
-		int mainpurpose =  3; //mainpurpose:  0 := work; 1 := edu; 2 := shop 3:=leisure
-		double d = 0.0;
-		CoordI start = ((Act)plan.getActsLegs().get(subtour.get(0))).getCoord();
-		CoordI prev = start;
-		String type = null;
+		for (int i=0; i<=registerSubTours.size(); i=i+1) {
+			List<Integer> subtour = registerSubTours.get(i);
+			int mainpurpose =  3; //mainpurpose:  0 := work; 1 := edu; 2 := shop 3:=leisure
+			double d = 0.0;
+			CoordI start = ((Act)plan.getActsLegs().get(subtour.get(0))).getCoord();
+			CoordI prev = start;
+			String type = null;
 			for (int k=0; k<=subtour.size(); k=k+1) { // TODO Verificare da dove deve partire!!!!!!!!
-				type = ((Act)plan.getActsLegs().get(subtour.get(k))).getType();
+				type = ((Act)plan.getActsLegs().get(subtour.get(0))).getType();
 				if (mainpurpose == 1){
 					if (type == W) { mainpurpose = 0; break; }
 				}
@@ -117,73 +102,79 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 				d = d + curr.calcDistance(prev);
 				prev = curr;
 			}
-		
-		d = d/1000.0;
-		
-		// Defining urban degree for the starting point of the subtour
-		 
-		int udeg = 0; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
-		// setting subtour parameters
-		model.setUrbanDegree(udeg);
-		model.setMainPurpose(mainpurpose);
-		model.setDistanceTour(d); // model needs meters! TODO check dimensions of distances!!!!
-		model.setPrevMode(prev_mode);
-		
-		// choose mode choice model based on main purpose
-		if (model.age >=18)
-			if (mainpurpose == 0) {model = new ModelModeChoiceWork18Plus();}
-			else if (mainpurpose == 1) {model = new ModelModeChoiceEducation18Plus();}
-			else if (mainpurpose == 2) {model = new ModelModeChoiceShop18Plus();}
-			else if (mainpurpose == 3) {model = new ModelModeChoiceLeisure18Plus();}
-			else { Gbl.errorMsg("This should never happen!"); }
-		else
-			if (mainpurpose == 1) {model = new ModelModeChoiceEducation18Minus ();}
-			else {model = new ModelModeChoiceOther18Minus ();}
-
-		// getting the chosen mode
-		int modechoice = model.calcModeChoice();
-		String mode = null;
-		if (modechoice == 0) { mode = CAR; }
-		else if (modechoice == 1) { mode = PT; }
-		else if (modechoice == 2) { mode = RIDE; }
-		else if (modechoice == 3) { mode = BIKE; }
-		else if (modechoice == 4) { mode = WALK; }
-		else { Gbl.errorMsg("Mode choice returns undefined value!"); }
-		
-		modeSubTours.add(modechoice);
-		for (int k=0; k<=subtour.size(); k=k+1){
-			((Act)plan.getActsLegs().get(subtour.get(k))).setType(mode);
-		}
-}
-	
-	private final void registerSubTours (Plan plan,List<Integer> subtours) {
-		
-		List<Integer> subtour = null;
-		// TODO check if it is an homebased tour { Gbl.errorMsg("This should never happen!"); 
-		// check also if in the tour the person is passing again from home. 
-		//In that case the agent is allowed to use any of the modes.
-		for (int i=0; i<=subtours.size();i=i+2) {
-			// TODO check if the subtour variable must be cleared or not, at the moment IT IS CLEARED!!!
-			subtour.clear();
-			int starti = subtours.get(i);
-			int endi = subtours.get(i+1);
-			subtour.add(0,starti); // all tours start at home
-			int j = starti+2;
-			while (j<endi) {
-				if (subtours.contains(j)){
-					subtour.add(j);
-					j=subtours.get(subtours.indexOf(j)+1)+2;
+			d = d/1000.0;
+			
+			// Defining urban degree for the starting point of the subtour
+			int udeg = 0; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
+			
+			// Defining previous mode
+			
+			// TODO check also if in the tour the person is passing again from home. 
+			//In that case the agent is allowed to use any of the modes.
+			TreeMap<Integer, Integer> modeSubTours = new TreeMap<Integer, Integer>();
+			int prev_mode = 0;
+			if (start == home) {}
+			else {
+				for (int j=0; j<=registerSubTours.size(); j=j+1) {
+					if (registerSubTours.get(j).contains(start)) {
+						prev_mode = modeSubTours.get(j); break;
 					}
-				else {
-					subtour.add(j);
-					j=j+2;
 				}
 			}
-			subtour.add(endi);
-			handleSubTour (plan,subtour);
+			// setting subtour parameters
+			model.setUrbanDegree(udeg);
+			model.setMainPurpose(mainpurpose);
+			model.setDistanceTour(d); // model needs meters! TODO check dimensions of distances!!!!
+			model.setPrevMode(prev_mode); //TODO rivedere il posizionamento del'inizializzazione del prev_mode
+			model.setHomeCoord(home);
+			// choose mode choice model based on main purpose
+			if (model.age >=18) {
+				if (mainpurpose == 0) {model = new ModelModeChoiceWork18Plus();}
+				else if (mainpurpose == 1) {model = new ModelModeChoiceEducation18Plus();}
+				else if (mainpurpose == 2) {model = new ModelModeChoiceShop18Plus();}
+				else if (mainpurpose == 3) {model = new ModelModeChoiceLeisure18Plus();}
+				else { Gbl.errorMsg("This should never happen!"); }
+			}
+			else {
+				if (mainpurpose == 1) {model = new ModelModeChoiceEducation18Minus ();}
+				else {model = new ModelModeChoiceOther18Minus ();}
+			}
+			
+
+			// getting the chosen mode
+			int modechoice = model.calcModeChoice();
+			String mode = null;
+			if (modechoice == 0) { mode = CAR; }
+			else if (modechoice == 1) { mode = PT; }
+			else if (modechoice == 2) { mode = RIDE; }
+			else if (modechoice == 3) { mode = BIKE; }
+			else if (modechoice == 4) { mode = WALK; }
+			else { Gbl.errorMsg("Mode choice returns undefined value!"); }
+			
+			modeSubTours.put(i,modechoice);
+			for (int k=0; k<=subtour.size(); k=k+1){
+				((Act)plan.getActsLegs().get(subtour.get(k))).setType(mode);
+			}
 		}
 	}
-	private final void extractSubTours2(Plan plan, int start, int end, int subtour_idx, TreeMap<Integer,Integer> subtours) {
+	
+	private final void registerSubTours (Plan plan, TreeMap<Integer, Integer> subtours, int subtour_idx) {
+		
+		TreeMap<Integer,List<Integer>> registerSubTours = new TreeMap<Integer,List<Integer>>();
+		List<Integer> subtour = null; // TODO Si azzera ogni volta, controllare se va bene o no!!!!
+		for (int i=0; i<=subtour_idx; i=i+1){
+			for (int j=1; j<=subtours.lastKey(); j=j+2) {
+				if (subtours.get(j) == i) {
+					subtour.add(j-1);
+					subtour.add(j+1);
+				}
+			}
+			registerSubTours.put(i,subtour);
+		}
+		handleSubTours (plan,registerSubTours);
+	}
+	
+	private final void extractSubTours(Plan plan, int start, int end, int subtour_idx, TreeMap<Integer,Integer> subtours) {
 		boolean is_leaf = true;
 		for (int i=start+2; i<end-1; i=i+2) {
 			Act acti = (Act)plan.getActsLegs().get(i);
@@ -205,7 +196,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 						Act actjj = (Act)plan.getActsLegs().get(jj);
 						if ((actii.getCoord().getX() == actjj.getCoord().getX()) &&
 						    (actii.getCoord().getY() == actjj.getCoord().getY())) {
-							this.extractSubTours(plan,ii,jj);
+							this.extractSubTours(plan,ii,jj,subtour_idx,subtours);
 							ii = jj;
 							actii = (Act)plan.getActsLegs().get(ii);
 						}
@@ -220,59 +211,9 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			subtour_idx++;
 			// DO NOT HANDLE ANY SUBTOUR YET!!!
 		}
-		
+		this.registerSubTours(plan, subtours,subtour_idx);
 	}
-	
-	
-	private final void extractSubTours(Plan plan, int start, int end) {
-		
-		boolean is_leaf = true;
-		List<Integer> subtours= null;
-		subtours.add(0,start);
-		subtours.add(1,end);
-		int k=2;
-		for (int i=start+2; i<end-1; i=i+2) {
-			Act acti = (Act)plan.getActsLegs().get(i);
-			for (int j=end-2; j>i; j=j-2) {
-				Act actj = (Act)plan.getActsLegs().get(j);
-				if ((acti.getCoord().getX() == actj.getCoord().getX()) &&
-				    (acti.getCoord().getY() == actj.getCoord().getY())) {
-					// subtour found: start..i & j..end
-					is_leaf = false;
-					subtours.add(k,i);
-					subtours.add(k+1,j);
-					k=k+1;
-					this.registerSubTours(plan,subtours);
-					
-					// next recursive step
-					int ii = i;
-					Act actii = acti;
-					for (int jj=i+2; jj<=j; jj=jj+2) {
-						Act actjj = (Act)plan.getActsLegs().get(jj);
-						if ((actii.getCoord().getX() == actjj.getCoord().getX()) &&
-						    (actii.getCoord().getY() == actjj.getCoord().getY())) {
-							subtours.add(k,ii);
-							subtours.add(k+1,jj);
-							k=k+1;
-							this.extractSubTours(plan,ii,jj);
-							ii = jj;
-							actii = (Act)plan.getActsLegs().get(ii);
-						}
-					}
-					return;
-				}
-			}
-		}
-		if (is_leaf) {
-			// leaf-sub-tour: start..end
-			subtours.add(k,start);
-			subtours.add(k,end);
-			k=k+1;
-			this.registerSubTours(plan,subtours);
-			
-		}
-	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
@@ -292,32 +233,31 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			if (H.equals(act.getType())) { home_coord = act.getCoord(); }
 			else if (W.equals(act.getType())) { work_coord = act.getCoord(); }
 		}
-			double dist_h_w = 0.0;
-			if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
-			if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
-			if (work_coord != null) {
-			dist_h_w = work_coord.calcDistance(home_coord);
+		double dist_h_w = 0.0;
+		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
+		if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
+		if (work_coord != null) {
+		dist_h_w = work_coord.calcDistance(home_coord);
+		}		
+		// generating a random bike ownership (see STRC2007 paper Ciari for more details)
+		boolean has_bike = true;
+		if (Gbl.random.nextDouble() < 0.44) { has_bike = false; }	
+		TreeMap<Integer,Integer> subtours = new TreeMap<Integer,Integer>();
+		// setting person parameters
+		model.setDistanceHome2Work(dist_h_w);
+		model.setAge(p.getAge());
+		model.setHHDimension(p.getHousehold().getPersonCount());
+		model.setLicenseOwnership(person.hasLicense());
+		model.setCar(p.getCarAvail());
+		model.setTickets(person.getTravelcards());
+		model.setLicenseOwnership(p.hasLicense());
+		model.setBike(has_bike);
+		model.setMale (p.getSex());
+		this.extractSubTours(plan,0,plan.getActsLegs().size()-1,0,subtours);
 		
-			// generating a random bike ownership (see STRC2007 paper Ciari for more details)
-			boolean has_bike = true;
-			if (Gbl.random.nextDouble() < 0.44) { has_bike = false; }	
-			
-			// setting person parameters
-			model.setDistanceHome2Work(dist_h_w);
-			model.setAge(p.getAge());
-			model.setHHDimension(p.getHousehold().getPersonCount());
-			model.setLicenseOwnership(person.hasLicense());
-			model.setCar(p.getCarAvail());
-			model.setTickets(person.getTravelcards());
-			model.setLicenseOwnership(p.hasLicense());
-			model.setBike(has_bike);
-			model.setMale (p.getSex());
-			this.extractSubTours(plan,0,plan.getActsLegs().size()-1);
-		
-		}				
-	}	
-	public void run(Plan plan) {
-	}
+	}				
 	
+	public void run(Plan plan){
+	}
 }
 
