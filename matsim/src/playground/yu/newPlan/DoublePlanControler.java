@@ -34,25 +34,25 @@ import org.matsim.world.World;
  * @author ychen
  *
  */
-public class DoublePtPlanControler {
+public class DoublePlanControler {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String netFilename = "./input/equil/equil_net.xml";
-		final String plansFilename = "./input/equil/equil_plans.xml";
+		final String netFilename = "./test/yu/newPlans/equil_net.xml";
+		final String plansFilename = "./test/yu/newPlans/equil_plans1k_w_pt.xml";
 
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(new String[] {"./test/yu/config/tutorial/multipleIterations.xml"});
+		Config config = Gbl.createConfig(new String[] {"./test/yu/newPlans/config.xml"});
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
-		DoublePtPlan nap=new DoublePtPlan(population);
+		DoublePlan nap=new DoublePlan(population);
 		population.addAlgorithm(nap);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);

@@ -24,23 +24,18 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.corelisteners.RoadPricing;
 import org.matsim.controler.events.IterationEndsEvent;
-import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
-import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.utils.io.IOUtils;
 
 import playground.yu.analysis.CalcAvgSpeed;
@@ -52,20 +47,22 @@ import playground.yu.analysis.CalcTrafficPerformance;
  * @author ychen
  * 
  */
-public class NewPtcheckControler extends Controler {
-	public NewPtcheckControler(String[] configFileName) {
+public class PtcheckControler extends Controler {
+
+	public PtcheckControler(String[] configFileName) {
 		super(configFileName);
 	}
 
 	public static class PtCheckListener implements StartupListener,
-			IterationEndsListener, IterationStartsListener, ShutdownListener {
-		private CalcTrafficPerformance ctpf = null;
-		private CalcAvgSpeed cas = null;
-		private CalcAverageTolledTripLength cattl = null;
+			IterationEndsListener, ShutdownListener {
 		/**
 		 * internal bufferedWriter
 		 */
 		private BufferedWriter out;
+		private CalcAverageTripLength catl = null;
+		private CalcAvgSpeed cas = null;
+		private CalcTrafficPerformance ctpf = null;
+		private RoadPricing rp = null;
 
 		public void notifyStartup(StartupEvent event) {
 			Controler ctl = event.getControler();
@@ -79,10 +76,7 @@ public class NewPtcheckControler extends Controler {
 				out = IOUtils
 						.getBufferedWriter(getOutputFilename("tollPaid.txt"));
 				out
-						.write("Iter\tBetaTraveling\tBetaTravelingPt\ttoll_amount[€/m]"
-								+ "\ttoll_paid[€]\tavg. executed score\tNumber of Drawees"
-								+ "\tavg. triplength\tavg. tolled triplength"
-								+ "\ttraffic persformance\tavg. travel speed\n");
+						.write("Iter\tBetaTraveling\tBetaTravelingPt\tavg. executed score\tavg. triplength\ttraffic persformance\tavg. travel speed\ttoll_amount[€/m]\ttoll_paid[€]\tNumber of Drawees\tavg. tolled triplength\n");
 				out.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -95,11 +89,6 @@ public class NewPtcheckControler extends Controler {
 			Events events = ctl.getEvents();
 			events.addHandler(cas);
 			events.addHandler(ctpf);
-			if (Gbl.useRoadPricing()) {
-				cattl = new CalcAverageTolledTripLength(network, ctl
-						.getRoadPricing().getRoadPricingScheme());
-				events.addHandler(cattl);
-			}
 		}
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
@@ -107,13 +96,9 @@ public class NewPtcheckControler extends Controler {
 			if (it % 10 == 0) {
 				Controler ctl = event.getControler();
 				Config cf = ctl.getConfig();
-				RoadPricing rp = ctl.getRoadPricing();
-				CalcPaidToll tollCalc = null;
-				if (rp != null) {
-					tollCalc = rp.getPaidTolls();
-				}
-				CalcAverageTripLength catl = new CalcAverageTripLength();
-				catl.run(ctl.getPopulation());
+				rp = ctl.getRoadPricing();
+				catl = new CalcAverageTripLength();
+				catl.run(event.getControler().getPopulation());
 				try {
 					out
 							.write(it
@@ -123,25 +108,25 @@ public class NewPtcheckControler extends Controler {
 									+ cf.getParam("planCalcScore",
 											"travelingPt")
 									+ "\t"
-									+ ((Gbl.useRoadPricing()) ? rp
-											.getRoadPricingScheme()
-											.getCostArray()[0].amount : 0)
-									+ "\t"
-									+ ((tollCalc != null) ? tollCalc
-											.getAllAgentsToll() : 0.0)
-									+ "\t"
 									+ ctl.getScoreStats().getHistory()[3][it]
-									+ "\t"
-									+ ((tollCalc != null) ? tollCalc
-											.getDraweesNr() : 0)
 									+ "\t"
 									+ catl.getAverageTripLength()
 									+ "\t"
-									+ ((((tollCalc != null) && (cattl != null))) ? cattl
-											.getAverageTripLength()
-											: 0.0) + "\t"
-									+ ctpf.getTrafficPerformance() + "\t"
-									+ cas.getAvgSpeed() + "\n");
+									+ ctpf.getTrafficPerformance()
+									+ "\t"
+									+ cas.getAvgSpeed()
+									+ "\t"
+									+ (((rp != null) && (rp
+											.getRoadPricingScheme() != null)) ? rp
+											.getRoadPricingScheme()
+											.getCostArray()[0].amount
+											+ "\t"
+											+ rp.getAllAgentsToll()
+											+ "\t"
+											+ rp.getDraweesNr()
+											+ "\t"
+											+ rp.getAvgPaidTripLength()
+											: "0.0\t0.0\t0\t0.0") + "\n");
 					out.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -149,14 +134,11 @@ public class NewPtcheckControler extends Controler {
 			}
 		}
 
-		public void notifyIterationStarts(IterationStartsEvent event) {
-			int it = event.getIteration();
-			cas.reset(it);
-			ctpf.reset(it);
-			if (Gbl.useRoadPricing()) {
-				cattl.reset(it);
-			}
-		}
+		/*
+		 * public void notifyIterationStarts(IterationStartsEvent event) { //
+		 * int it = event.getIteration(); // cas.reset(it); // ctpf.reset(it); //
+		 * if (Gbl.useRoadPricing()) { // cattl.reset(it); // } // }
+		 */
 
 		public void notifyShutdown(ShutdownEvent event) {
 			try {
@@ -173,8 +155,8 @@ public class NewPtcheckControler extends Controler {
 	 *            the path of config-file
 	 */
 	public static void main(final String[] args) {
-		final NewPtcheckControler controler;
-		controler = new NewPtcheckControler(args);
+		final PtcheckControler controler;
+		controler = new PtcheckControler(args);
 		controler.addControlerListener(new PtCheckListener());
 		controler.run();
 		System.exit(0);

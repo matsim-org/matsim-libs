@@ -66,9 +66,9 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 		List<Plan> copyPlans = new ArrayList<Plan>();
 		// plans: the copy of the plans.
 		for (Plan pl : person.getPlans()) {
-			pl.setType("iv");
+			pl.setType("car");
 			Plan copyPlan = new Plan(person);
-			copyPlan.setType("oev");
+			copyPlan.setType("pt");
 			List actsLegs = pl.getActsLegs();
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);

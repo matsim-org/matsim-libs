@@ -31,16 +31,16 @@ import org.matsim.plans.Plans;
  * @author ychen
  * 
  */
-public class DoublePtPlan extends NewAgentPtPlan {
+public class DoublePlan extends NewAgentPtPlan {
+	private int newPersonId;
 	/**
 	 * Construcktor
 	 * 
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
-	public DoublePtPlan(Plans plans) {
+	public DoublePlan(Plans plans) {
 		super(plans);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -52,8 +52,8 @@ public class DoublePtPlan extends NewAgentPtPlan {
 	public void run(Person person) {
 		pw.writePerson(person);
 		// produce new Person with bigger Id
-		for (int i = 1; i <= 9; i++) {
-			int newPersonId = Integer.parseInt(person.getId().toString()) + 100;
+		for (int i = 1; i <= 99; i++) {
+			newPersonId = Integer.parseInt(person.getId().toString()) + 1000;
 			person.setId(Integer.toString(newPersonId));
 			pw.writePerson(person);
 		}
