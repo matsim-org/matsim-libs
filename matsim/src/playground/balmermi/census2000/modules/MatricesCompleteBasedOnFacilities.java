@@ -92,7 +92,7 @@ public class MatricesCompleteBasedOnFacilities extends MatricesAlgorithm {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public MatricesCompleteBasedOnFacilities(Facilities facilities, ZoneLayer layer) {
+	public MatricesCompleteBasedOnFacilities(final Facilities facilities, final ZoneLayer layer) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -114,7 +114,7 @@ public class MatricesCompleteBasedOnFacilities extends MatricesAlgorithm {
 	private final void initMaps() {
 		System.out.println("      init fac<=>zone mapping...");
 		int f_cnt = 0;
-		for (Facility f : facilities.getFacilities().values()) {
+		for (Facility f : this.facilities.getFacilities().values()) {
 			ArrayList<Zone> zones = new ArrayList<Zone>();
 			Iterator<? extends Location> z_it = this.layer.getLocations().values().iterator();
 			while (z_it.hasNext()) {
@@ -172,7 +172,7 @@ public class MatricesCompleteBasedOnFacilities extends MatricesAlgorithm {
 	 * @return The zone of the <code>zones</code> list with the lowest number
 	 * of facilities.
 	 */
-	private final Zone selectZone(ArrayList<Zone> zones) {
+	private final Zone selectZone(final ArrayList<Zone> zones) {
 		int[] f_cnt = new int[zones.size()];
 		for (int i=0; i<zones.size(); i++) {
 			Zone z = zones.get(i);
@@ -268,11 +268,11 @@ public class MatricesCompleteBasedOnFacilities extends MatricesAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Matrices matrices) {
+	public void run(final Matrices matrices) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
-		Matrix<String> work_m = matrices.getMatrix(WORK);
-		Matrix<String> educ_m = matrices.getMatrix(EDUCATION);
+		Matrix work_m = matrices.getMatrix(WORK);
+		Matrix educ_m = matrices.getMatrix(EDUCATION);
 
 		// removing entries ending at zone z
 		Iterator<? extends Location> z_it = this.layer.getLocations().values().iterator();
@@ -312,13 +312,13 @@ public class MatricesCompleteBasedOnFacilities extends MatricesAlgorithm {
 			if (!work_m.getFromLocations().containsKey(z.getId())) {
 				Facility f = this.workFacQuadTree.get(z.getCenter().getX(),z.getCenter().getY());
 				Zone to_zone = this.fac_zone_map.get(f.getId());
-				work_m.setEntry(z,to_zone,"1");
+				work_m.setEntry(z,to_zone, 1);
 				System.out.println("      zone id=" + z.getId() + ": added a WORK entry to zone id=" + to_zone.getId() + " (fac id=" + f.getId() + ").");
 			}
 			if (!educ_m.getFromLocations().containsKey(z.getId())) {
 				Facility f = this.educFacQuadTree.get(z.getCenter().getX(),z.getCenter().getY());
 				Zone to_zone = this.fac_zone_map.get(f.getId());
-				educ_m.setEntry(z,to_zone,"1");
+				educ_m.setEntry(z,to_zone, 1);
 				System.out.println("      zone id=" + z.getId() + ": added a EDUC entry to zone id=" + to_zone.getId() + " (fac id=" + f.getId() + ").");
 			}
 		}

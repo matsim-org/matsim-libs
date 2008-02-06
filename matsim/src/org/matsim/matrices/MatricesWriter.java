@@ -18,29 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
-/* *********************************************************************** *
- *                   org.matsim.demandmodeling.matrices                    *
- *                           MatricesWriter.java                           *
- *                          ---------------------                          *
- * copyright       : (C) 2006 by                                           *
- *                   Michael Balmer, Konrad Meister, Marcel Rieser,        *
- *                   David Strippgen, Kai Nagel, Kay W. Axhausen,          *
- *                   Technische Universitaet Berlin (TU-Berlin) and        *
- *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
- * email           : balmermi at gmail dot com                             *
- *                 : rieser at gmail dot com                               *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package org.matsim.matrices;
 
 import java.io.IOException;
@@ -87,14 +64,14 @@ public class MatricesWriter extends Writer {
 			this.handler.writeSeparator(this.out);
 			Iterator<Matrix> m_it = this.matrices.getMatrices().values().iterator();
 			while (m_it.hasNext()) {
-				Matrix<?> m = m_it.next();
+				Matrix m = m_it.next();
 				this.handler.startMatrix(m, this.out);
 				Iterator<?> eal_it = m.getFromLocations().values().iterator();
 				while (eal_it.hasNext()) {
-					ArrayList<Entry<?>> eal = (ArrayList<Entry<?>>) eal_it.next();
-					Iterator<Entry<?>> e_it = eal.iterator();
+					ArrayList<Entry> eal = (ArrayList<Entry>) eal_it.next();
+					Iterator<Entry> e_it = eal.iterator();
 					while (e_it.hasNext()) {
-						Entry<?> e = e_it.next();
+						Entry e = e_it.next();
 						this.handler.startEntry(e, this.out);
 						this.handler.endEntry(this.out);
 					}

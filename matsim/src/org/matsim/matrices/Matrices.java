@@ -85,7 +85,7 @@ public class Matrices {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final <T> Matrix<T> createMatrix(final String id, final String world_layer, final String desc) {
+	public final Matrix createMatrix(final String id, final String world_layer, final String desc) {
 		// check id string for uniqueness
 		if (this.matrices.containsKey(id)) {
 			Gbl.errorMsg("[id="+id+" already exists.]");
@@ -96,7 +96,7 @@ public class Matrices {
 			Gbl.errorMsg("[world_layer="+world_layer+" not found]");
 		}
 		// create the matrix
-		Matrix<T> m = new Matrix<T>(id,layer,desc);
+		Matrix m = new Matrix(id,layer,desc);
 		this.matrices.put(id,m);
 		return m;
 	}
@@ -117,7 +117,7 @@ public class Matrices {
 		return this.name;
 	}
 
-	public final TreeMap<String,Matrix> getMatrices() {
+	public final TreeMap<String, Matrix> getMatrices() {
 		return this.matrices;
 	}
 

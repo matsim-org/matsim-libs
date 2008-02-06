@@ -39,11 +39,11 @@ import org.matsim.world.Zone;
  */
 public class CommuterInformationRevisor {
 
-	private Facilities facilities;
-	private ArrayList<Zone> zones;
+	private final Facilities facilities;
+	private final ArrayList<Zone> zones;
 
-	public CommuterInformationRevisor(ArrayList<Zone> zones,
-			Facilities facilities) {
+	public CommuterInformationRevisor(final ArrayList<Zone> zones,
+			final Facilities facilities) {
 		this.facilities = facilities;
 		this.zones = zones;
 	}
@@ -57,8 +57,8 @@ public class CommuterInformationRevisor {
 	 * @param workCommuterMatrix
 	 * @param educationCommuterMatrix
 	 */
-	public void run(Matrix<String> workCommuterMatrix,
-			Matrix<String> educationCommuterMatrix) {
+	public void run(final Matrix workCommuterMatrix,
+			final Matrix educationCommuterMatrix) {
 		removeCommuterEntriesWithZeroToCapacity(workCommuterMatrix,
 				GroupFacilitiesPerZone.workActType);
 		addMissingCommuterEntries(workCommuterMatrix,
@@ -77,16 +77,16 @@ public class CommuterInformationRevisor {
 	 * @param commuterMatrix
 	 * @param actType
 	 */
-	private void addMissingCommuterEntries(Matrix<String> commuterMatrix, String actType) {
-		for (Zone zone : zones) {
-			if (CommuterInformationGenerator.getCapacity(facilities,
+	private void addMissingCommuterEntries(final Matrix commuterMatrix, final String actType) {
+		for (Zone zone : this.zones) {
+			if (CommuterInformationGenerator.getCapacity(this.facilities,
 					CommuterInformationGenerator.homeActType, zone) > 0) {
-				ArrayList<Entry<String>> fromZoneDistr =
+				ArrayList<Entry> fromZoneDistr =
 					commuterMatrix.getFromLocEntries(zone);
 				if (fromZoneDistr == null ||
 						CommuterInformationGenerator.getRandomToZone(fromZoneDistr) == null) {
 					Zone toZone = getNearestZone(zone, actType);
-					commuterMatrix.setEntry(zone, toZone, "1");
+					commuterMatrix.setEntry(zone, toZone, 1.0);
 					System.out.println(actType + " from zone " + zone.getName() + " (" + zone.getId()
 							+ ") is now done in zone " + toZone.getName() + " (" + toZone.getId() +
 							"). Distance is " +
@@ -96,10 +96,10 @@ public class CommuterInformationRevisor {
 		}
 	}
 
-	private Zone getNearestZone(Zone zone, String actType) {
+	private Zone getNearestZone(final Zone zone, final String actType) {
 		double nearestDist = Double.POSITIVE_INFINITY;
 		Zone nearestZone = null;
-		for (Zone zone2 : zones) {
+		for (Zone zone2 : this.zones) {
 			if (containsActivityFacility(zone2, actType)) {
 				double dist = zone.getCenter().calcDistance(zone2.getCenter());
 				if (dist < nearestDist) {
@@ -118,11 +118,10 @@ public class CommuterInformationRevisor {
 	 * @param commuterMatrix
 	 * @param actType
 	 */
-	private void removeCommuterEntriesWithZeroToCapacity(
-			Matrix<String> commuterMatrix, String actType) {
-		for (Zone zone : zones) {
+	private void removeCommuterEntriesWithZeroToCapacity(final Matrix commuterMatrix, final String actType) {
+		for (Zone zone : this.zones) {
 			int capacityCount =
-				CommuterInformationGenerator.getCapacity(facilities,
+				CommuterInformationGenerator.getCapacity(this.facilities,
 						actType, zone);
 			if (capacityCount == 0) {
 				commuterMatrix.removeToLocEntries(zone);
@@ -130,10 +129,10 @@ public class CommuterInformationRevisor {
 		}
 	}
 
-	private boolean containsActivityFacility(Location location, String activityType) {
+	private boolean containsActivityFacility(final Location location, final String activityType) {
 		Set<IdI> facilityIds = location.getDownMapping().keySet();
 		for (IdI facilityId : facilityIds) {
-			Facility facility = (Facility)facilities.getLocation(facilityId);
+			Facility facility = (Facility)this.facilities.getLocation(facilityId);
 			Activity activity = facility.getActivity(activityType);
 			if (activity != null && activity.getCapacity() > 0) {
 				return true;

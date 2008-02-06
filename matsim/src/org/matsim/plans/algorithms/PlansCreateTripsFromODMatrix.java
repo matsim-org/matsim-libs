@@ -18,29 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
-/* *********************************************************************** *
- *               org.matsim.demandmodeling.plans.algorithms                *
- *                    PlansCreateTripsFromODMatrix.java                    *
- *                          ---------------------                          *
- * copyright       : (C) 2006 by                                           *
- *                   Michael Balmer, Konrad Meister, Marcel Rieser,        *
- *                   David Strippgen, Kai Nagel, Kay W. Axhausen,          *
- *                   Technische Universitaet Berlin (TU-Berlin) and        *
- *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
- * email           : balmermi at gmail dot com                             *
- *                 : rieser at gmail dot com                               *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package org.matsim.plans.algorithms;
 
 import java.util.ArrayList;
@@ -62,7 +39,7 @@ public class PlansCreateTripsFromODMatrix extends PlansAlgorithm {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	Matrix<String> matrix = null;
+	Matrix matrix = null;
 	ArrayList<Double> timeDistribution = null;
 	int timeBinSize;
 
@@ -70,7 +47,7 @@ public class PlansCreateTripsFromODMatrix extends PlansAlgorithm {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansCreateTripsFromODMatrix(final Matrix<String> matrix, final ArrayList<Double> timeDistribution) {
+	public PlansCreateTripsFromODMatrix(final Matrix matrix, final ArrayList<Double> timeDistribution) {
 		super();
 		this.matrix = matrix;
 		this.timeDistribution = new ArrayList<Double>(timeDistribution.size());
@@ -102,9 +79,9 @@ public class PlansCreateTripsFromODMatrix extends PlansAlgorithm {
 		try {
 			int counter = 0;
 			double sum = 0.0;
-			for (ArrayList<Entry<String>> entries : this.matrix.getFromLocations().values()) {
-				for (Entry<String> entry : entries) {
-					sum += Double.parseDouble(entry.getValue());
+			for (ArrayList<Entry> entries : this.matrix.getFromLocations().values()) {
+				for (Entry entry : entries) {
+					sum += entry.getValue();
 					while (sum >= 1.0) {
 						counter++;
 						sum--;

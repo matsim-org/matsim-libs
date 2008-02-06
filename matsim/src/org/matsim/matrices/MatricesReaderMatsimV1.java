@@ -43,7 +43,7 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 	private final static String ENTRY = "entry";
 
 	private Matrices matrices;
-	private Matrix<String> currMatrix = null;
+	private Matrix currMatrix = null;
 
 	public MatricesReaderMatsimV1(final Matrices matrices) {
 		this.matrices = matrices;
@@ -100,7 +100,7 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startEntry(final Attributes  atts) {
-		this.currMatrix.createEntry(atts.getValue("from_id"), atts.getValue("to_id"), atts.getValue("value"));
+		this.currMatrix.createEntry(atts.getValue("from_id"), atts.getValue("to_id"), Double.parseDouble(atts.getValue("value")));
 	}
 
 }

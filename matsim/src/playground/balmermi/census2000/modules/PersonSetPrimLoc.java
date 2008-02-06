@@ -35,9 +35,9 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -166,16 +166,16 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 
 			Zone z = zones.get(Gbl.random.nextInt(zones.size()));
 			if (f.getActivity(WORK) != null) {
-				ArrayList<Facility> facs = zone_work_fac_mapping.get(z.getId());
+				ArrayList<Facility> facs = this.zone_work_fac_mapping.get(z.getId());
 				if (facs == null) { facs = new ArrayList<Facility>(); }
 				facs.add(f);
-				zone_work_fac_mapping.put(z.getId(),facs);
+				this.zone_work_fac_mapping.put(z.getId(),facs);
 			}
 			if (f.getActivity(EDUCATION) != null) {
-				ArrayList<Facility> facs = zone_educ_fac_mapping.get(z.getId());
+				ArrayList<Facility> facs = this.zone_educ_fac_mapping.get(z.getId());
 				if (facs == null) { facs = new ArrayList<Facility>(); }
 				facs.add(f);
-				zone_educ_fac_mapping.put(z.getId(),facs);
+				this.zone_educ_fac_mapping.put(z.getId(),facs);
 			}
 		}
 
@@ -199,14 +199,14 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final Zone getPrimActZone(final ArrayList<Entry<String>> from_loc_entries) {
+	private final Zone getPrimActZone(final ArrayList<Entry> from_loc_entries) {
 		if (from_loc_entries.isEmpty()) { Gbl.errorMsg("From Loc Entries are empty! This should not happen!"); }
 
 		int[] dist_sum = new int[from_loc_entries.size()];
-		dist_sum[0] = Integer.parseInt(from_loc_entries.get(0).getValue());
+		dist_sum[0] = (int) from_loc_entries.get(0).getValue();
 		int n = from_loc_entries.size();
 		for (int i=1; i<n; i++) {
-			int val = Integer.parseInt(from_loc_entries.get(i).getValue());
+			int val = (int) from_loc_entries.get(i).getValue();
 			dist_sum[i] = dist_sum[i-1] + val;
 		}
 		int r = Gbl.random.nextInt(dist_sum[n-1]);
@@ -219,7 +219,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		return null;
 	}
 
-	private final Facility getPrimActFacility(ArrayList<Facility> facs, String act_type) {
+	private final Facility getPrimActFacility(final ArrayList<Facility> facs, final String act_type) {
 		if (facs.isEmpty()) { Gbl.errorMsg("facs are empty! This should not happen!"); }
 
 		int[] dist_sum = new int[facs.size()];
@@ -252,7 +252,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		ArrayList<Act> work_list = new ArrayList<Act>();
 		ArrayList<Act> educ_list = new ArrayList<Act>();
 		Iterator<?> act_it = person.getSelectedPlan().getIteratorAct();
@@ -267,14 +267,14 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		}
 
 		if (!work_list.isEmpty()) {
-			Integer p_id = Integer.parseInt(person.getId().toString());
-			Zone home_zone = persons.getPerson(p_id).getHousehold().getMunicipality().getZone();
+			Integer p_id = Integer.valueOf(person.getId().toString());
+			Zone home_zone = this.persons.getPerson(p_id).getHousehold().getMunicipality().getZone();
 			Zone to_zone = this.getPrimActZone(this.matrices.getMatrix(WORK).getFromLocEntries(home_zone));
 			ArrayList<Facility> to_facs = this.zone_work_fac_mapping.get(to_zone.getId());
 			Facility to_fac = null;
 			if (to_facs == null) {
 				System.out.println("      Person id=" + person.getId() + ": no work fac in to_zone id=" +
-				                   to_zone.getId() + ". Gettting a close one...");
+				                   to_zone.getId() + ". Getting a close one...");
 				to_fac = this.workFacQuadTree.get(to_zone.getCenter().getX(),to_zone.getCenter().getY());
 				System.out.println("      done. (to_fac id=" + to_fac.getId() + ")");
 			}
@@ -288,15 +288,15 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 			}
 		}
 		else if (!educ_list.isEmpty()) {
-			Integer p_id = Integer.parseInt(person.getId().toString());
-			Zone home_zone = persons.getPerson(p_id).getHousehold().getMunicipality().getZone();
+			Integer p_id = Integer.valueOf(person.getId().toString());
+			Zone home_zone = this.persons.getPerson(p_id).getHousehold().getMunicipality().getZone();
 			Zone to_zone = this.getPrimActZone(this.matrices.getMatrix(EDUCATION).getFromLocEntries(home_zone));
 			ArrayList<Facility> to_facs = this.zone_educ_fac_mapping.get(to_zone.getId());
 
 			Facility to_fac = null;
 			if (to_facs == null) {
 				System.out.println("      Person id=" + person.getId() + ": no educ fac in to_zone id=" +
-				                   to_zone.getId() + ". Gettting a close one...");
+				                   to_zone.getId() + ". Getting a close one...");
 				to_fac = this.educFacQuadTree.get(to_zone.getCenter().getX(),to_zone.getCenter().getY());
 				System.out.println("      done. (to_fac id=" + to_fac.getId() + ")");
 			}
@@ -315,7 +315,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 	}
 }
 

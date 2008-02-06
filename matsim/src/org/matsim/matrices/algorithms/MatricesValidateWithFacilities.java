@@ -131,7 +131,7 @@ public class MatricesValidateWithFacilities extends MatricesAlgorithm {
 				while (to_loc_it.hasNext()) {
 					Location to_loc = to_loc_it.next();
 
-					Entry<String> e = m.getEntry(from_loc,to_loc);
+					Entry e = m.getEntry(from_loc,to_loc);
 					if (e != null) {
 						if (!this.hasFacility(from_loc,"home") || !this.hasFacility(to_loc,act_type)) {
 							m.removeEntry(e);
@@ -148,7 +148,7 @@ public class MatricesValidateWithFacilities extends MatricesAlgorithm {
 				if (this.hasFacility(from_loc,"home")) {
 					if (m.getFromLocEntries(from_loc) == null) {
 						Location to_loc = this.findNearestLocation(from_loc,act_type);
-						Entry<String> e = m.setEntry(from_loc,to_loc,"1");
+						Entry e = m.setEntry(from_loc,to_loc, 1);
 						System.out.println("          create entry: " + e.toString());
 					}
 				}

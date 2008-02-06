@@ -65,11 +65,11 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 	 * the zone in {@code zones} at index {@code i}
 	 * @param facilities The facilities grouped by zones.
 	 */
-	public CommuterInformationGenerator(ArrayList<Person> population,
-			ArrayList<Zone> homeZones, GroupFacilitiesPerZone facilities) {
+	public CommuterInformationGenerator(final ArrayList<Person> population,
+			final ArrayList<Zone> homeZones, final GroupFacilitiesPerZone facilities) {
 		super(population, homeZones, facilities);
 		for (int i = 0; i < population.size(); i++) {
-			primaryActLocations.add(null);
+			this.primaryActLocations.add(null);
 		}
 	}
 
@@ -80,9 +80,9 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 	 * @param workCommuterMatrix
 	 * @param educationCommuterMatrix
 	 */
-	public void run(Matrix<String> workCommuterMatrix,
-			Matrix<String> educationCommuterMatrix) {
-		System.out.println(statusString);
+	public void run(final Matrix workCommuterMatrix,
+			final Matrix educationCommuterMatrix) {
+		System.out.println(this.statusString);
 
 		setWorkFacilities(workCommuterMatrix);
 		setEducationFacilities(educationCommuterMatrix);
@@ -90,42 +90,41 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 		System.out.println();
 	}
 
-	private void setWorkFacilities(Matrix<String> workCommuterMatrix) {
-		for (int i = 0; i < population.size(); i++) {
-			Person person = population.get(i);
+	private void setWorkFacilities(final Matrix workCommuterMatrix) {
+		for (int i = 0; i < this.population.size(); i++) {
+			Person person = this.population.get(i);
 			Plan plan = person.getPlans().get(0);
 			if (planContainsType(plan, PlansGenerator.workActType)) {
 				setWorkFacility(i, workCommuterMatrix);
 			}
 
-			if (i % (population.size() * 2 / statusString.length()) == 0) {
+			if (i % (this.population.size() * 2 / this.statusString.length()) == 0) {
 				System.out.print(".");
 				System.out.flush();
 			}
 		}
 	}
 
-	private void setEducationFacilities(Matrix<String> educationCommuterMatrix) {
-		for (int i = 0; i < population.size(); i++) {
-			Person person = population.get(i);
+	private void setEducationFacilities(final Matrix educationCommuterMatrix) {
+		for (int i = 0; i < this.population.size(); i++) {
+			Person person = this.population.get(i);
 			Plan plan = person.getPlans().get(0);
 			if (planContainsType(plan, PlansGenerator.workActType) == false
 					&& planContainsType(plan, PlansGenerator.eduActType)) {
 				setEducationFacility(i, educationCommuterMatrix);
 			}
 
-			if (i % (population.size() * 2 / statusString.length()) == 0) {
+			if (i % (this.population.size() * 2 / this.statusString.length()) == 0) {
 				System.out.print(".");
 				System.out.flush();
 			}
 		}
 	}
 
-	private void setWorkFacility(int index,
-			Matrix<String> workCommuterMatrix) {
-		Person person = population.get(index);
-		Zone homeZone = zones.get(index);
-		ArrayList<Entry<String>> workZoneDistr
+	private void setWorkFacility(final int index, final Matrix workCommuterMatrix) {
+		Person person = this.population.get(index);
+		Zone homeZone = this.zones.get(index);
+		ArrayList<Entry> workZoneDistr
 			= workCommuterMatrix.getFromLocEntries(homeZone);
 		if (workZoneDistr == null) {
 			Gbl.errorMsg("There are no work fromLocEntries for zone " + homeZone.getName() + " ("
@@ -136,7 +135,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 			Gbl.errorMsg("There exists no to work zone in the commuter" +
 					" matrix for zone " + homeZone.getName() + " (" + homeZone.getId() + ")");
 		}
-		Facility workFacility = facilities.getRandomFacility(
+		Facility workFacility = this.facilities.getRandomFacility(
 				workLocation.getId(),
 				PlansGenerator.workActType);
 //		if (workFacility == null) {
@@ -148,7 +147,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 //			}
 //		}
 
-		primaryActLocations.set(index, workLocation);
+		this.primaryActLocations.set(index, workLocation);
 //		Knowledge knowledge =
 //			person.createKnowledge("Created based on enterprise census of 2000");
 //		knowledge.setDesc(knowledge.getDesc() + ";" + workLocation.getId());
@@ -158,11 +157,11 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 		PersonToHomeFacilityMapper.setActCoord(person, workFacility.getCenter(), PlansGenerator.workActType);
 	}
 
-	private void setEducationFacility(int index,
-			Matrix<String> educationCommuterMatrix) {
-		Person person = population.get(index);
-		Zone homeZone = zones.get(index);
-		ArrayList<Entry<String>> eduZoneDistr = educationCommuterMatrix.getFromLocEntries(homeZone);
+	private void setEducationFacility(final int index,
+			final Matrix educationCommuterMatrix) {
+		Person person = this.population.get(index);
+		Zone homeZone = this.zones.get(index);
+		ArrayList<Entry> eduZoneDistr = educationCommuterMatrix.getFromLocEntries(homeZone);
 		if (eduZoneDistr == null) {
 			Gbl.errorMsg("There are no education fromLocEntries for zone " + homeZone.getName() + " ("
 					+ homeZone.getId() + ")");
@@ -172,7 +171,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 			Gbl.errorMsg("There exists no to education zone for in the commuter" +
 					" matrix for zone " + homeZone.getName() + " (" + homeZone.getId() + ")");
 		}
-		Facility eduFacility = facilities.getRandomFacility(eduLocation.getId(),
+		Facility eduFacility = this.facilities.getRandomFacility(eduLocation.getId(),
 				PlansGenerator.eduActType);
 //		if (eduFacility == null) {
 //			Zone z = facilities.getNearestZone(eduLocation.getId(), PlansGenerator.eduActType);
@@ -183,7 +182,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 //			}
 //		}
 
-		primaryActLocations.set(index, eduLocation);
+		this.primaryActLocations.set(index, eduLocation);
 //		Knowledge knowledge =
 //			person.createKnowledge("Created based on enterprise census of 2000");
 //		knowledge.setDesc(knowledge.getDesc() + ";" + eduLocation.getId());
@@ -225,22 +224,21 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 //		return null;
 //	}
 
-	public static Location getRandomToZone(
-			ArrayList<Entry<String>> toZoneDistr) {
+	public static Location getRandomToZone(final ArrayList<Entry> toZoneDistr) {
 		if (toZoneDistr == null) {
 			return null;
 		}
 		int entrySum = 0;
-		for (Entry<String> entry : toZoneDistr) {
-			entrySum += Integer.parseInt(entry.getValue());
+		for (Entry entry : toZoneDistr) {
+			entrySum += entry.getValue();
 		}
 		if (entrySum == 0) {
 			return null;
 		}
 		int toEntryIndex = Gbl.random.nextInt(entrySum);
 		entrySum = 0;
-		for (Entry<String> entry : toZoneDistr) {
-			entrySum += Integer.parseInt(entry.getValue());
+		for (Entry entry : toZoneDistr) {
+			entrySum += entry.getValue();
 			if (toEntryIndex < entrySum) {
 				return entry.getToLocation();
 			}
@@ -249,7 +247,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 		return null;
 	}
 
-	private boolean planContainsType(Plan plan, String actType) {
+	private boolean planContainsType(final Plan plan, final String actType) {
 		BasicPlan.ActIterator it = plan.getIteratorAct();
 		while (it.hasNext()) {
 			BasicAct act = it.next();
@@ -260,8 +258,8 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 		return false;
 	}
 
-	static public void writeCommuterDistribution(String filename,
-			ArrayList<Zone> zones, Facilities facilities, Matrix commuterMatrix, String actType) {
+	static public void writeCommuterDistribution(final String filename,
+			final ArrayList<Zone> zones, final Facilities facilities, final Matrix commuterMatrix, final String actType) {
 		BufferedWriter out;
 
 		String statusString = "|----------+-----------|";
@@ -272,11 +270,11 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 			out = new BufferedWriter(new FileWriter(filename));
 			out.write("GemNr\tcomCnt\tcapCnt\n");
 			for (Zone zone : zones) {
-				ArrayList zoneDistr = commuterMatrix.getToLocEntries(zone);
+				ArrayList<Entry> zoneDistr = commuterMatrix.getToLocEntries(zone);
 				int commuterCount = 0;
 				if (zoneDistr != null) {
-					for (Object entry : zoneDistr) {
-						commuterCount += Integer.parseInt((String)((Entry)entry).getValue());
+					for (Entry entry : zoneDistr) {
+						commuterCount += entry.getValue();
 					}
 				}
 
@@ -299,7 +297,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 		System.out.println("Commuter distribution written to " + filename);
 	}
 
-	public static int getCapacity(Facilities facilities, String actType, Zone zone) {
+	public static int getCapacity(final Facilities facilities, final String actType, final Zone zone) {
 		Set<IdI> facilityIds = zone.getDownMapping().keySet();
 		int capacityCount = 0;
 		for (IdI facilityId : facilityIds) {
@@ -319,6 +317,6 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 	}
 
 	public ArrayList<Location> getPrimaryActLocations() {
-		return primaryActLocations;
+		return this.primaryActLocations;
 	}
 }

@@ -39,13 +39,13 @@ import org.matsim.world.ZoneLayer;
 public class ODMatrixBezirke extends PersonAlgorithm implements PlanAlgorithmI {
 
 	private final ZoneLayer tvzLayer;
-	private final Matrix<Integer> matrix;
+	private final Matrix matrix;
 	private final World world;
 
 	public ODMatrixBezirke(final String matrixId) {
 		this.world = Gbl.getWorld();
 		this.tvzLayer = (ZoneLayer)this.world.getLayer("tvz");
-		this.matrix = Matrices.getSingleton().<Integer>createMatrix(matrixId, this.world.getLayer("bezirke").getType().toString(), "od for miv, 0-24h, 23 bezirke in berlin, 123 outside berlin");
+		this.matrix = Matrices.getSingleton().createMatrix(matrixId, this.world.getLayer("bezirke").getType().toString(), "od for miv, 0-24h, 23 bezirke in berlin, 123 outside berlin");
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class ODMatrixBezirke extends PersonAlgorithm implements PlanAlgorithmI {
 			toLoc = mapLocation(this.tvzLayer.getLocation(tmpAct.getRefId()));
 
 			if (fromLoc != null && toLoc != null) {
-				Entry<Integer> entry = this.matrix.getEntry(fromLoc, toLoc);
+				Entry entry = this.matrix.getEntry(fromLoc, toLoc);
 				if (entry == null) {
 					this.matrix.setEntry(fromLoc, toLoc, 1);
 				} else {
@@ -86,7 +86,7 @@ public class ODMatrixBezirke extends PersonAlgorithm implements PlanAlgorithmI {
 		return null;
 	}
 
-	public Matrix<Integer> getMatrix() {
+	public Matrix getMatrix() {
 		return this.matrix;
 	}
 

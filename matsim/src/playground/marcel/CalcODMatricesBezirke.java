@@ -48,7 +48,7 @@ public class CalcODMatricesBezirke implements EventHandlerAgentArrivalI, EventHa
 	private final Plans population;
 	private final TreeMap<String, Location> agents = new TreeMap<String, Location>(); // <AgentID, StartLoc>
 	private final TreeMap<String, Double> agentstime = new TreeMap<String, Double>();
-	private final Matrix<Integer> matrix;
+	private final Matrix matrix;
 	private int minTime = Integer.MIN_VALUE;
 	private int maxTime = Integer.MAX_VALUE;
 	public int counter = 0;
@@ -57,7 +57,7 @@ public class CalcODMatricesBezirke implements EventHandlerAgentArrivalI, EventHa
 		this.network = network;
 		this.tvzLayer = tvzLayer;
 		this.population = population;
-		this.matrix = Matrices.getSingleton().<Integer>createMatrix(id, tvzLayer.getType().toString(), "od for miv");
+		this.matrix = Matrices.getSingleton().createMatrix(id, tvzLayer.getType().toString(), "od for miv");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -91,12 +91,12 @@ public class CalcODMatricesBezirke implements EventHandlerAgentArrivalI, EventHa
 		if (toLoc != null) {
 			toLoc = mapLocation(toLoc);
 			this.agents.remove(event.agentId);
-			Entry<Integer> entry = this.matrix.getEntry(fromLoc, toLoc);
+			Entry entry = this.matrix.getEntry(fromLoc, toLoc);
 			this.counter++;
 			if (entry == null) {
-				this.matrix.setEntry(fromLoc, toLoc, Integer.valueOf(1));
+				this.matrix.setEntry(fromLoc, toLoc, 1.0);
 			} else {
-				this.matrix.setEntry(fromLoc, toLoc, Integer.valueOf(entry.getValue().intValue() + 1));
+				this.matrix.setEntry(fromLoc, toLoc, entry.getValue() + 1);
 			}
 		}
 	}
@@ -113,7 +113,7 @@ public class CalcODMatricesBezirke implements EventHandlerAgentArrivalI, EventHa
 		this.maxTime = maxTime;
 	}
 
-	public Matrix<Integer> getMatrix() {
+	public Matrix getMatrix() {
 		return this.matrix;
 	}
 

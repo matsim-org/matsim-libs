@@ -33,17 +33,15 @@ import org.matsim.utils.identifiers.IdI;
 /**
  * @author mrieser
  *
- * @param <T> Element type of the matrix
- *
  * Writes a single matrix in a VISUM-compatible format to file.
  * Can be used e.g. for OD-matrices.
  */
-public class VisumMatrixWriter<T> {
+public class VisumMatrixWriter {
 
-	Matrix<T> matrix;
+	Matrix matrix;
 	Set<IdI> ids;
 
-	public VisumMatrixWriter(Matrix<T> matrix) {
+	public VisumMatrixWriter(final Matrix matrix) {
 		super();
 		this.matrix = matrix;
 		this.ids = new TreeSet<IdI>();
@@ -60,11 +58,11 @@ public class VisumMatrixWriter<T> {
 	 * contain values, but should still be written out in the matrix containing
 	 * only zeros.
 	 */
-	public void setIds(Set<IdI> ids) {
+	public void setIds(final Set<IdI> ids) {
 		this.ids = ids;
 	}
 
-	public void writeFile(String filename) {
+	public void writeFile(final String filename) {
 		BufferedWriter out = null;
 
 		try {
@@ -91,14 +89,14 @@ public class VisumMatrixWriter<T> {
 				cnt = 0;
 				for (IdI to : this.ids) {
 					cnt++;
-					Entry<T> e = this.matrix.getEntry(from, to);
+					Entry e = this.matrix.getEntry(from, to);
 					if (cnt > 1) {
 						out.write("\t");
 					}
 					if (e == null) {
 						out.write("0");
 					} else {
-						out.write(e.getValue().toString());
+						out.write(Double.toString(e.getValue()));
 					}
 				}
 				out.write("\n");

@@ -74,7 +74,7 @@ public class MyRunsKTI extends MyRuns {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		runPlansAlgorithms(); System.exit(0);
 //		fixPlans(); System.exit(0);
@@ -294,9 +294,9 @@ public class MyRunsKTI extends MyRuns {
 			 * Get the commuter matrices in order to assign commuter information to the population
 			 */
 			Matrices commuterMatrices = readMatrices();
-			Matrix<String> workCommuterMatrix =
+			Matrix workCommuterMatrix =
 				commuterMatrices.getMatrix("work");
-			Matrix<String> educationCommuterMatrix =
+			Matrix educationCommuterMatrix =
 				commuterMatrices.getMatrix("education");
 			/**
 			 * "Clean up" the commuter matrices, i.e. remove entries pointing to zones
@@ -449,7 +449,7 @@ public class MyRunsKTI extends MyRuns {
 
 	}
 
-	private static void runMultiThreadedPlansAlgo(Plans plans, MultithreadedModuleA algo) {
+	private static void runMultiThreadedPlansAlgo(final Plans plans, final MultithreadedModuleA algo) {
 		Iterator<Person> pIt = plans.getPersons().values().iterator();
 
 		algo.init();
@@ -466,8 +466,8 @@ public class MyRunsKTI extends MyRuns {
 		algo.finish();
 	}
 
-	private static void runMultiThreadedPlansAlgo(int startIndex, Plans plans,
-			MultithreadedModuleA algo) {
+	private static void runMultiThreadedPlansAlgo(final int startIndex, final Plans plans,
+			final MultithreadedModuleA algo) {
 		Iterator<Person> pIt = plans.getPersons().values().iterator();
 		int chunkCount = 30;
 		int chunkSize = (plans.getPersons().size()) / chunkCount;
@@ -637,7 +637,7 @@ public class MyRunsKTI extends MyRuns {
 	 * @param postfix The postfix common to all input plan file chunks
 	 * @return The merged plans
 	 */
-	private static Plans mergePlans(String prefix, String postfix) {
+	private static Plans mergePlans(final String prefix, final String postfix) {
 		/*
 		 *  Sample call:
 		 * 		readNetwork();
@@ -659,7 +659,7 @@ public class MyRunsKTI extends MyRuns {
 	 * @param prefix The prefix common to all output plan file chunks
 	 * @param postfix The postfix common to all output plan file chunks
 	 */
-	private static void splitPlans(Plans plans, String prefix, String postfix) {
+	private static void splitPlans(final Plans plans, final String prefix, final String postfix) {
 		/*
 		 *  Sample call:
 		 * 		readNetwork();
@@ -705,7 +705,7 @@ public class MyRunsKTI extends MyRuns {
 	 * @param plans Input plans
 	 * @param filename The output file
 	 */
-	private static void writeHomeFacilities(Plans plans, String filename) {
+	private static void writeHomeFacilities(final Plans plans, final String filename) {
 		TreeMap<String, Integer> facilities = new TreeMap<String, Integer>();
 		CoordI homeCoord = null;
 		int personCnt = 0;
@@ -779,8 +779,8 @@ public class MyRunsKTI extends MyRuns {
 	}
 
 
-	private static int addPlansToMZDistr(Plan[] plans2000, TreeMap<String, int[]> actChainDistr,
-			int index) {
+	private static int addPlansToMZDistr(final Plan[] plans2000, final TreeMap<String, int[]> actChainDistr,
+			final int index) {
 		int cnt = 0;
 		for (Plan p : plans2000) {
 			String actChain = "";
@@ -811,9 +811,9 @@ public class MyRunsKTI extends MyRuns {
 	 * @param world
 	 * @param incomeInfo Additional information for each zone
 	 */
-	private static void addCensusIncomeInformationToPopulation(ArrayList<Person> population,
-			ArrayList<HouseholdI> households, ArrayList<Zone> zones, World world,
-			TreeMap<IdI, MunicipalityInformation> incomeInfo) {
+	private static void addCensusIncomeInformationToPopulation(final ArrayList<Person> population,
+			final ArrayList<HouseholdI> households, final ArrayList<Zone> zones, final World world,
+			final TreeMap<IdI, MunicipalityInformation> incomeInfo) {
 		System.out.println("Adding municipality income information to population...");
 
 		Income2000Generator incInfGen = new Income2000Generator(world, incomeInfo);
@@ -844,9 +844,9 @@ public class MyRunsKTI extends MyRuns {
 	 * @param world
 	 * @param incomeInfo Additional information for each zone
 	 */
-	private static void addMobilityInformationToPopulation(ArrayList<Person> population,
-			ArrayList<HouseholdI> households, ArrayList<Zone> zones, World world,
-			TreeMap<IdI, MunicipalityInformation> municipalityInfo) {
+	private static void addMobilityInformationToPopulation(final ArrayList<Person> population,
+			final ArrayList<HouseholdI> households, final ArrayList<Zone> zones, final World world,
+			final TreeMap<IdI, MunicipalityInformation> municipalityInfo) {
 		System.out.println("Adding license and mobility information to population...");
 		LicenseOwnershipGenerator licInfGen =
 			new LicenseOwnershipGenerator(world, municipalityInfo);
@@ -874,7 +874,7 @@ public class MyRunsKTI extends MyRuns {
 	 * @param plans
 	 * @param suffix
 	 */
-	private static void analyzePopulation(Plans plans, String suffix) {
+	private static void analyzePopulation(final Plans plans, final String suffix) {
 		System.out.println("analyzing population...");
 		for (int i = 0; i <= 7; i++) {
 			writePopulationAgeDistribution(plans, suffix, i);
@@ -889,8 +889,8 @@ public class MyRunsKTI extends MyRuns {
 	 * @param plans
 	 * @param suffix
 	 */
-	private static void analyzePopulation(ArrayList<Person> population,
-			ArrayList<Zone> zones, String suffix, Collection<Zone> referenceZones) {
+	private static void analyzePopulation(final ArrayList<Person> population,
+			final ArrayList<Zone> zones, final String suffix, final Collection<Zone> referenceZones) {
 		System.out.println("analyzing population with respect to municipalities...");
 		for (int i = 0; i <= 7; i++) {
 			writePopulationDistribution(population, zones, suffix, referenceZones, i);
@@ -899,8 +899,8 @@ public class MyRunsKTI extends MyRuns {
 		writePopulationAgeDistribution(population, zones, suffix + "_age", referenceZones);
 	}
 
-	private static void writePopulationAgeDistribution(ArrayList<Person> population,
-			ArrayList<Zone> zones, String suffix, Collection<Zone> referenceZones) {
+	private static void writePopulationAgeDistribution(final ArrayList<Person> population,
+			final ArrayList<Zone> zones, final String suffix, final Collection<Zone> referenceZones) {
 		TreeMap<IdI, ArrayList<Integer> > personsPerZone = new TreeMap<IdI, ArrayList<Integer>>();
 		ArrayList<Integer> nullAges = new ArrayList<Integer>();
 		for (int j = 0; j < 126; j++) {
@@ -951,8 +951,8 @@ public class MyRunsKTI extends MyRuns {
 		System.out.println("Zone distribution written to " + filename);
 	}
 
-	private static void writePopulationIncomeDistribution(ArrayList<Person> population,
-			ArrayList<Zone> zones, String suffix, Collection<Zone> referenceZones) {
+	private static void writePopulationIncomeDistribution(final ArrayList<Person> population,
+			final ArrayList<Zone> zones, final String suffix, final Collection<Zone> referenceZones) {
 		TreeMap<IdI, Integer> personsPerZone = new TreeMap<IdI, Integer>();
 		TreeMap<IdI, Double> incomePerZone = new TreeMap<IdI, Double>();
 		for (int i = 0; i < zones.size(); i++) {
@@ -989,9 +989,9 @@ public class MyRunsKTI extends MyRuns {
 		System.out.println("Zone distribution written to " + filename);
 	}
 
-	private static void writePopulationDistribution(ArrayList<Person> population,
-			ArrayList<Zone> zones, String suffix, Collection<Zone> referenceZones,
-			int differenceTypeIndex) {
+	private static void writePopulationDistribution(final ArrayList<Person> population,
+			final ArrayList<Zone> zones, String suffix, final Collection<Zone> referenceZones,
+			final int differenceTypeIndex) {
 
 		TreeMap<IdI, Integer> yesPersonsPerZone = new TreeMap<IdI, Integer>();
 		TreeMap<IdI, Integer> noPersonsPerZone = new TreeMap<IdI, Integer>();
@@ -1080,8 +1080,8 @@ public class MyRunsKTI extends MyRuns {
 		System.out.println("Zone distribution written to " + filename);
 	}
 
-	private static void writePersonCountPerZoneDistribution(ArrayList<Person> population,
-			ArrayList<Zone> zones, String suffix) {
+	private static void writePersonCountPerZoneDistribution(final ArrayList<Person> population,
+			final ArrayList<Zone> zones, final String suffix) {
 		TreeMap<IdI, Integer> personsPerZone = new TreeMap<IdI, Integer>();
 		TreeMap<IdI, Zone> zoneByID = new TreeMap<IdI, Zone>();
 		for (Zone z : zones) {
@@ -1109,7 +1109,7 @@ public class MyRunsKTI extends MyRuns {
 		System.out.println("Zone person count distribution written to " + filename);
 	}
 
-	private static void writePopulationHHKidCountDistribution(Plans plans, String suffix) {
+	private static void writePopulationHHKidCountDistribution(final Plans plans, final String suffix) {
 		double avgHHKidCount = 0;
 		int maxHHKidCount = 0;
 		int personCount = 0;
@@ -1173,8 +1173,8 @@ public class MyRunsKTI extends MyRuns {
 		System.out.println("KidCount distribution written to " + filename);
 	}
 
-	private static void writePopulationAgeDistribution(Plans plans, String suffix,
-			int differenceTypeIndex) {
+	private static void writePopulationAgeDistribution(final Plans plans, String suffix,
+			final int differenceTypeIndex) {
 		double avgAge = 0;
 		int maxAge = 0;
 		int personCount = 0;
@@ -1319,7 +1319,7 @@ public class MyRunsKTI extends MyRuns {
 		System.out.println("Age distribution written to " + filename);
 	}
 
-	private static void writePopulationIncomeDistribution(Plans plans, String suffix) {
+	private static void writePopulationIncomeDistribution(final Plans plans, final String suffix) {
 		double avgIncome = 0;
 		double maxIncome = 0;
 		int personCount = 0;
@@ -1383,7 +1383,7 @@ public class MyRunsKTI extends MyRuns {
 		System.out.println("Income distribution written to " + filename);
 	}
 
-	private static void writePopulationHHSizeDistribution(Plans plans, String suffix) {
+	private static void writePopulationHHSizeDistribution(final Plans plans, final String suffix) {
 		double avgHHSize = 0;
 		int maxHHSize = 0;
 		int personCount = 0;
@@ -1473,7 +1473,7 @@ public class MyRunsKTI extends MyRuns {
 	 * used in other networks than the one the persons were mapped to.
 	 * @param plans
 	 */
-	private static void removeLinksFromActs(Plans plans) {
+	private static void removeLinksFromActs(final Plans plans) {
 		PlansWriter plansWriter = new PlansWriter(plans);
 		plans.setPlansWriter(plansWriter);
 
@@ -1501,7 +1501,7 @@ public class MyRunsKTI extends MyRuns {
 	 * @param fromToCount
 	 * @return
 	 */
-	private static Plans reducePlans(Plans plans, int fromToCount) {
+	private static Plans reducePlans(final Plans plans, final int fromToCount) {
 		Gbl.random.nextDouble(); // draw one because of strange "not-randomness" in the first draw...
 
 		// Build array of persons

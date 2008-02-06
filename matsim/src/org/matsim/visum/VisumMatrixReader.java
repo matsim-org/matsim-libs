@@ -22,12 +22,15 @@ package org.matsim.visum;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.Layer;
+import org.matsim.world.Location;
 
 /**
  * @author marcel
@@ -35,17 +38,21 @@ import org.matsim.world.Layer;
  */
 public class VisumMatrixReader {
 
-	private Layer layer = null;
+	/*default*/ Layer layer = null;
 	private String id = null;
+
+	/*default*/ static final Logger log = Logger.getLogger(VisumMatrixReader.class);
+
+	private final ArrayList<String> knownMissingLocations = new ArrayList<String>();
 
 	public VisumMatrixReader(final String id, final Layer layer) {
 		this.id = id;
 		this.layer = layer;
 	}
 
-	public Matrix<String> readFile(final String filename) {
-		Matrix<String> matrix = null;
-		matrix = Matrices.getSingleton().<String>createMatrix(this.id, this.layer.getType().toString(), "");
+	public Matrix readFile(final String filename) {
+		Matrix matrix = null;
+		matrix = Matrices.getSingleton().createMatrix(this.id, this.layer.getType().toString(), "");
 		BufferedReader infile = null;
 		try {
 			infile = IOUtils.getBufferedReader(filename);
@@ -59,8 +66,8 @@ public class VisumMatrixReader {
 			if (header != null) {
 				if (header.equals("$VN;Y5")) {
 					new DenseMatrixReader(this.layer).read(infile, matrix);
-				} else if (header.equals("$OM;D2")) {
-					new SparseMatrixReader(this.layer).read(infile, matrix);
+				} else if (header.startsWith("$O")) {
+					new SparseMatrixReader().read(infile, matrix);
 				} else {
 					Gbl.errorMsg("Visum file format '" + header +"' is not supported.");
 				}
@@ -95,13 +102,13 @@ public class VisumMatrixReader {
 		private int zoneCounter = 0;
 		private int lineCounter = 0;
 		private int nofZones = 0;
-		private Matrix<String> matrix = null;
+		private Matrix matrix = null;
 
 		public DenseMatrixReader(final Layer layer) {
 			this.layer = layer;
 		}
 
-		public void read(final BufferedReader in, final Matrix<String> matrix) throws IOException {
+		public void read(final BufferedReader in, final Matrix matrix) throws IOException {
 			String line = null;
 			this.matrix = matrix;
 			while ( (line = in.readLine()) != null) {
@@ -119,12 +126,11 @@ public class VisumMatrixReader {
 				String[] data = line.split("\t");
 				if (data.length != this.nofZones) {
 					Gbl.errorMsg("Expected " + this.nofZones + " data items, but found " + data.length +
-					" in line " + this.lineCounter + "."
-					);
+					" in line " + this.lineCounter + ".");
 				}
 				for (int i = 0; i < this.nofZones; i++) {
 					this.matrix.setEntry(this.layer.getLocation(this.zoneNames[this.zoneCounter]),
-							this.layer.getLocation(this.zoneNames[i]), data[i]);
+							this.layer.getLocation(this.zoneNames[i]), Double.parseDouble(data[i]));
 				}
 				this.zoneCounter++;
 				if (this.zoneCounter == this.nofZones) {
@@ -160,7 +166,7 @@ public class VisumMatrixReader {
 
 	}
 
-	private static class SparseMatrixReader {
+	/*default*/ class SparseMatrixReader {
 		/* I call the format, where each entry of the matrix is written on its
 		 * own line together with a from- and to-cell-id, a "sparse matrix" format,
 		 * as it is most effective for storing sparse matrices.   */
@@ -170,16 +176,11 @@ public class VisumMatrixReader {
 		private final static int STATE_FAKTOR = 3;
 		private final static int STATE_DATA = 4;
 
-		private final Layer layer;
 		private int state = STATE_HEADER;
 		private int lineCounter = 0;
-		private Matrix<String> matrix = null;
+		private Matrix matrix = null;
 
-		public SparseMatrixReader(final Layer layer) {
-			this.layer = layer;
-		}
-
-		public void read(final BufferedReader in, final Matrix<String> matrix) throws IOException {
+		public void read(final BufferedReader in, final Matrix matrix) throws IOException {
 			String line = null;
 			this.matrix = matrix;
 			while ( (line = in.readLine()) != null) {
@@ -201,10 +202,18 @@ public class VisumMatrixReader {
 					);
 				}
 
-				int from = Integer.parseInt(data[0]);
-				int to = Integer.parseInt(data[1]);
+				Location from = VisumMatrixReader.this.layer.getLocation(data[0]);
+				Location to = VisumMatrixReader.this.layer.getLocation(data[1]);
 
-				this.matrix.setEntry(this.layer.getLocation(from), this.layer.getLocation(to), data[2]);
+				if (from == null) {
+					warnMissingLocation(data[0]);
+					return;
+				}
+				if (to == null) {
+					warnMissingLocation(data[1]);
+					return;
+				}
+				this.matrix.createEntry(from, to, Double.parseDouble(data[2]));
 
 			} else if (this.state == STATE_HEADER) {
 
@@ -231,6 +240,13 @@ public class VisumMatrixReader {
 			}
 		}
 
+	}
+
+	/*default*/ void warnMissingLocation(final String locName) {
+		if (!this.knownMissingLocations.contains(locName)) {
+			this.knownMissingLocations.add(locName);
+			log.warn("Location " + locName + " does not exist in world.");
+		}
 	}
 
 }

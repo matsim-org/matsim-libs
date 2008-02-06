@@ -18,35 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-
-/* *********************************************************************** *
- *                   org.matsim.demandmodeling.matrices                    *
- *                                Entry.java                               *
- *                          ---------------------                          *
- * copyright       : (C) 2006 by                                           *
- *                   Michael Balmer, Konrad Meister, Marcel Rieser,        *
- *                   David Strippgen, Kai Nagel, Kay W. Axhausen,          *
- *                   Technische Universitaet Berlin (TU-Berlin) and        *
- *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
- * email           : balmermi at gmail dot com                             *
- *                 : rieser at gmail dot com                               *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package org.matsim.matrices;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.world.Location;
 
-public class Entry<T> {
+public class Entry {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -54,13 +31,13 @@ public class Entry<T> {
 
 	private final Location f_loc;
 	private final Location t_loc;
-	private T value;
+	private double value;
 
 	//////////////////////////////////////////////////////////////////////
 	// Constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected Entry(final Location f_loc, final Location t_loc, final T value) {
+	protected Entry(final Location f_loc, final Location t_loc, final double value) {
 		if ((f_loc == null)||(t_loc == null)) {
 			Gbl.errorMsg("[f_loc="+f_loc+",t_loc="+t_loc+", 'null' is not allowed!]");
 		}
@@ -80,10 +57,10 @@ public class Entry<T> {
 	//////////////////////////////////////////////////////////////////////
 	// set/add methods
 	//////////////////////////////////////////////////////////////////////
-	public final void setValue(T value) {
+	public final void setValue(final double value) {
 		this.value = value;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
@@ -96,7 +73,7 @@ public class Entry<T> {
 		return this.t_loc;
 	}
 
-	public final T getValue() {
+	public final double getValue() {
 		return this.value;
 	}
 
@@ -106,6 +83,6 @@ public class Entry<T> {
 
 	@Override
 	public final String toString() {
-		return "[" + this.f_loc.getId() + "===" + this.value.toString() + "==>" + this.t_loc.getId() + "]";
+		return "[" + this.f_loc.getId() + "===" + this.value + "==>" + this.t_loc.getId() + "]";
 	}
 }

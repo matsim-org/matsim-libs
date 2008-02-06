@@ -218,7 +218,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices file... ");
-		final Matrix<String> matrix = new VisumMatrixReader("test", world.getLayer(new Id("tvz"))).readFile(config.matrices().getInputFile());
+		final Matrix matrix = new VisumMatrixReader("test", world.getLayer(new Id("tvz"))).readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 
 		final ArrayList<Double> timeDistro = new TimeDistributionReader().readFile(config.getParam("plans", "timeDistributionInputFile"));
@@ -1780,11 +1780,11 @@ public class MyRuns {
 		System.out.println("  writing VISUM file... ");
 		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new Id("tvz"));
 		final Set<IdI> ids = new TreeSet<IdI>();
-		for (final Iterator iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
-			final Location loc = (Location)iter.next();
+		for (final Iterator<? extends Location> iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
+			final Location loc = iter.next();
 			ids.add(loc.getId());
 		}
-		final VisumMatrixWriter<Integer> writer = new VisumMatrixWriter<Integer>(calcOD.getMatrix());
+		final VisumMatrixWriter writer = new VisumMatrixWriter(calcOD.getMatrix());
 		writer.setIds(ids);
 		writer.writeFile(calcOD.getMatrix().getId() + ".fma");
 		System.out.println("  done.");
@@ -1850,8 +1850,8 @@ public class MyRuns {
 		final MatricesWriter matrices_writer = new MatricesWriter(Matrices.getSingleton());
 		matrices_writer.write();
 		final Set<IdI> ids = new TreeSet<IdI>();
-		for (final Iterator iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
-			final Location loc = (Location)iter.next();
+		for (final Iterator<? extends Location> iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
+			final Location loc = iter.next();
 			if (Integer.parseInt(loc.getId().toString()) < 24) {
 				ids.add(loc.getId());
 			}
@@ -1859,7 +1859,7 @@ public class MyRuns {
 		for (final CalcODMatrices odcalc : odcalcs) {
 			final String filename = odcalc.getMatrix().getId() + ".fma";
 			System.out.println("    writing file: " + filename + "   (" + odcalc.counter + ")");
-			final VisumMatrixWriter<Integer> writer = new VisumMatrixWriter<Integer>(odcalc.getMatrix());
+			final VisumMatrixWriter writer = new VisumMatrixWriter(odcalc.getMatrix());
 			writer.setIds(ids);
 			writer.writeFile(filename);
 		}
@@ -1919,7 +1919,7 @@ public class MyRuns {
 				ids.add(loc.getId());
 			}
 		}
-		final VisumMatrixWriter<Integer> writer = new VisumMatrixWriter<Integer>(calcOD.getMatrix());
+		final VisumMatrixWriter writer = new VisumMatrixWriter(calcOD.getMatrix());
 		writer.setIds(ids);
 		writer.writeFile(calcOD.getMatrix().getId() + ".fma");
 		System.out.println("  done.");
@@ -1995,7 +1995,7 @@ public class MyRuns {
 		for (final CalcODMatricesBezirke odcalc : odcalcs) {
 			final String filename = odcalc.getMatrix().getId() + ".fma";
 			System.out.println("    writing file: " + filename + "   (" + odcalc.counter + ")");
-			final VisumMatrixWriter<Integer> writer = new VisumMatrixWriter<Integer>(odcalc.getMatrix());
+			final VisumMatrixWriter writer = new VisumMatrixWriter(odcalc.getMatrix());
 			writer.setIds(ids);
 			writer.writeFile(filename);
 		}
@@ -2037,7 +2037,7 @@ public class MyRuns {
 		}
 		for (final String name : Matrices.getSingleton().getMatrices().keySet()) {
 			final Matrix matrix = Matrices.getSingleton().getMatrices().get(name);
-			final VisumMatrixWriter<Object> writer = new VisumMatrixWriter<Object>(matrix);
+			final VisumMatrixWriter writer = new VisumMatrixWriter(matrix);
 			writer.setIds(ids);
 			writer.writeFile(name + ".fma");
 		}
@@ -2641,13 +2641,13 @@ public class MyRuns {
 		Runtime.getRuntime().gc();
 		Gbl.printMemoryUsage();
 		System.out.println("  reading matrices file... " + (new Date()));
-		final Matrix<String> matrix = new VisumMatrixReader("test", world.getLayer(new Id("tvz"))).readFile(config.matrices().getInputFile());
+		new VisumMatrixReader("oev_reisezeiten", world.getLayer(new Id("municipality"))).readFile(config.matrices().getInputFile());
 		System.out.println("  done." + (new Date()));
 
 		Runtime.getRuntime().gc();
 		Gbl.printMemoryUsage();
 		System.out.println("  writing matrices file... " + (new Date()));
-		new VisumMatrixWriter<String>(matrix).writeFile(config.matrices().getOutputFile());
+		new MatricesWriter(Matrices.getSingleton()).writeFile(config.matrices().getOutputFile());
 		System.out.println("  done." + (new Date()));
 
 		Runtime.getRuntime().gc();
@@ -3060,7 +3060,7 @@ public class MyRuns {
 //		createKutterPlans(args);
 //		fmaToTrips(args);
 
-		convertPlans(args);
+//		convertPlans(args);
 //		readPlans(args);
 //		removeLinkAndRoute(args);
 //		fixJTimes(args);
@@ -3109,7 +3109,7 @@ public class MyRuns {
 //		falsifyNetwork(args);
 
 /* ***   M A T R I C E S   *** */
-//		visumMatrixTest(args);
+		visumMatrixTest(args);
 //		convertMatrices(args);
 
 
