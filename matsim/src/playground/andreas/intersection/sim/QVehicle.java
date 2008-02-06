@@ -258,7 +258,7 @@ public class QVehicle implements Serializable, DrawableAgentI {
 	}
 
 	public double getPosInLink_m() {
-		double dur = this.currentLink.getFreeLinkTT();
+		double dur = this.currentLink.getFreeSpeedTT();
 		double mytime = getDepartureTime_s() - SimulationTimer.getTime();
 		if (mytime < 0) {
 			mytime = 0.;

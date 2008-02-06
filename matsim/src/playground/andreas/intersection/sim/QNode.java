@@ -17,7 +17,7 @@ public class QNode extends Node{
 		for (Iterator iter = this.inlinks.values().iterator(); iter.hasNext();) {
 			QLink link = (QLink) iter.next();
 				
-			while (!link.bufferIsEmpty()) {
+			while (!link.flowQueueIsEmpty()) {
 				QVehicle veh = link.getFirstFromBuffer();
 				if (!moveVehicleOverNode(veh, now)) {
 					break;
