@@ -16,24 +16,30 @@ public class QNode extends Node{
 				
 		for (Iterator iter = this.inlinks.values().iterator(); iter.hasNext();) {
 			QLink link = (QLink) iter.next();
-				
-			while (!link.flowQueueIsEmpty()) {
-				QVehicle veh = link.getFirstFromBuffer();
-				if (!moveVehicleOverNode(veh, now)) {
-					break;
+			
+			for (PseudoLink pseudoLink : link.getNodePseudoLinks()) {
+				while (!pseudoLink.flowQueueIsEmpty()) {
+					QVehicle veh = pseudoLink.getFirstFromBuffer();
+					if (!moveVehicleOverNode(veh, now, pseudoLink)) {
+						break;
+					}
 				}
 			}
+			
+				
+			
 		}
 	}
 	
-	/** Simple moveNode, Complex one can be found in {@link QueueLink} */
-	public boolean moveVehicleOverNode(final QVehicle veh, final double now) {
+	/** Simple moveNode, Complex one can be found in {@link QueueLink} 
+	 * @param pseudoLink */
+	public boolean moveVehicleOverNode(final QVehicle veh, final double now, PseudoLink pseudoLink) {
 		// veh has to move over node
 		QLink nextLink = veh.chooseNextLink();
 
 		if (nextLink != null) {
 			if (nextLink.hasSpace()) {
-				veh.getCurrentLink().pollFirstFromBuffer();
+				pseudoLink.pollFirstFromBuffer();
 				veh.incCurrentNode();
 				nextLink.add(veh);
 				return true;

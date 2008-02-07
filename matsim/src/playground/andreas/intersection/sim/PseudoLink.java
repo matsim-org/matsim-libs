@@ -9,11 +9,11 @@ import org.apache.log4j.Logger;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventAgentWait2Link;
+import org.matsim.events.EventLinkLeave;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.SimulationTimer;
+import org.matsim.network.Link;
 import org.matsim.plans.Leg;
-
-import playground.andreas.intersection.QControler;
 
 public class PseudoLink {
 	
@@ -22,9 +22,10 @@ public class PseudoLink {
 	
 	/** Id of the real link, null if this is not the first/original <code>PseudoLink</code> */
 	private QLink realLink = null;
+	private boolean amIOriginalLink = false;
 	
 	/** Hält alle echten Ziellinks, die von diesem Link erreichbar sind, meist 1-3 */
-	private List<QLink> destLinks = new LinkedList<QLink>();
+	private List<Link> destLinks = new LinkedList<Link>();
 	
 	/** Next PseudoLink upstream, null if first link */
 	private PseudoLink fromLink = null;
@@ -33,7 +34,7 @@ public class PseudoLink {
 	private List<PseudoLink> toLinks = new LinkedList<PseudoLink>();
 	
 	/** Meter counted from the end of the real link */
-	private int meterFromLinkEnd = -1;
+	private double meterFromLinkEnd = -1;
 	
 	/** The list of <code>QVehicles</code> that have not yet reached the end of the link according
 	 * to the <code>freeSpeedTravelTime</code> of the <code>PseudoLink</code> */
@@ -69,15 +70,18 @@ public class PseudoLink {
 	private double flowCapacityFractionalRest = 1.0;
 	
 	
-	public PseudoLink(QLink originalLink) {
+	public PseudoLink(QLink originalLink, boolean amIOriginalLink) {
 		this.realLink = originalLink;
+		this.amIOriginalLink = amIOriginalLink;
 	}
 
-	public boolean recalculatePseudoLinkProperties(double length_m, int numberOfLanes, double freeSpeed_m_s, double flowCapacityOfOriginalLink){
+	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double length_m, int numberOfLanes, double freeSpeed_m_s, double flowCapacityFromNetFile_Veh_h){
+
+		this.meterFromLinkEnd = meterFromLinkEnd_m;
 		
 		this.freeSpeedTravelTime = length_m / freeSpeed_m_s;
 
-		this.flowCapacity = flowCapacityOfOriginalLink * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();	
+		this.flowCapacity = flowCapacityFromNetFile_Veh_h * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();	
 
 		this.flowCapacityCeil = (int) Math.ceil(this.flowCapacity);
 		this.flowCapacityFraction = this.flowCapacity - (int) this.flowCapacity;
@@ -96,23 +100,14 @@ public class PseudoLink {
 	
 	public void movePseudoLink(final double now){
 		
-		if (realLink != null){
-			moveParkingQueueToParkToLinkQueue(now);
-		}
-		
+		if (amIOriginalLink){ moveParkingQueueToParkToLinkQueue(now); }
 		moveFlowQueueToNextPseudoLink();
-		
 		moveStorageQueueToFlowQueue(now);
-		
-		if (realLink != null){
-			moveParkToLinkQueueToFlowQueue(now);
-		}
+		if (amIOriginalLink){ moveParkToLinkQueueToFlowQueue(now); }
 		
 	}
 	
-	private void moveStorageQueueToFlowQueue(final double now) {
-		
-		
+	private void moveStorageQueueToFlowQueue(final double now) {		
 
 		double maximumFlowCapacity = this.flowCapacity;
 		
@@ -177,11 +172,11 @@ public class PseudoLink {
 		
 		while(!flowQueue.isEmpty()){
 			QVehicle veh = this.flowQueue.peek();
-			QLink nextLink = veh.chooseNextLink();
+			Link nextLink = veh.chooseNextLink();
 			
 			if (nextLink != null) {
 				for (PseudoLink toLink : toLinks) {
-					for (QLink qLink : toLink.getDestLinks()) {
+					for (Link qLink : toLink.getDestLinks()) {
 						if (qLink.equals(nextLink)){
 							if (toLink.hasSpace()) {
 								this.flowQueue.poll();
@@ -194,11 +189,11 @@ public class PseudoLink {
 		}
 	}
 
-	public List<QLink> getDestLinks() {
+	public List<Link> getDestLinks() {
 		return destLinks;
 	}
 
-	public void addDestLink(QLink destLink) {
+	public void addDestLink(Link destLink) {
 		this.destLinks.add(destLink);
 	}
 	
@@ -258,5 +253,44 @@ public class PseudoLink {
 	public Queue<QVehicle> getFlowQueue(){
 		return flowQueue;
 	}
+
+	public double getMeterFromLinkEnd() {
+		return meterFromLinkEnd;
+	}
+
+	public PseudoLink getFromLink() {
+		return fromLink;
+	}
+
+	public void setFromLink(PseudoLink fromLink) {
+		this.fromLink = fromLink;
+	}
+
+	public List<PseudoLink> getToLinks() {
+		return toLinks;
+	}
+
+	public void setToLinks(List<PseudoLink> toLinks) {
+		this.toLinks = toLinks;
+	}
 		
+	boolean flowQueueIsEmpty() {
+		return this.flowQueue.isEmpty();
+	}
+	
+	QVehicle getFirstFromBuffer() {
+		return this.flowQueue.peek();
+	}
+	
+	QVehicle pollFirstFromBuffer() {
+		double now = SimulationTimer.getTime();
+		QVehicle veh = this.flowQueue.poll();
+
+		QSim.getEvents().processEvent(new EventLinkLeave(now, veh.getDriverID(), veh.getCurrentLegNumber(),
+						realLink.getId().toString(), veh.getDriver(), realLink));
+
+		return veh;
+	}
+	
+	
 }
