@@ -236,14 +236,15 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		double dist_h_w = 0.0;
 		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
 		if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
-		if (work_coord != null) {
-		dist_h_w = work_coord.calcDistance(home_coord);
-		}		
+		if (work_coord != null) { dist_h_w = work_coord.calcDistance(home_coord); }		
+
 		// generating a random bike ownership (see STRC2007 paper Ciari for more details)
 		boolean has_bike = true;
 		if (Gbl.random.nextDouble() < 0.44) { has_bike = false; }	
 		TreeMap<Integer,Integer> subtours = new TreeMap<Integer,Integer>();
 		// setting person parameters
+		System.out.println(dist_h_w);
+		System.out.println(model);
 		model.setDistanceHome2Work(dist_h_w);
 		model.setAge(p.getAge());
 		model.setHHDimension(p.getHousehold().getPersonCount());
@@ -254,7 +255,8 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		model.setBike(has_bike);
 		model.setMale (p.getSex());
 		this.extractSubTours(plan,0,plan.getActsLegs().size()-1,0,subtours);
-		
+		// register subtours
+		// handle subtours
 	}				
 	
 	public void run(Plan plan){
