@@ -55,7 +55,7 @@ public class PersonCalculateActivitySpaces {
 	    return aSd;
     }
     public double getPersonASD2(Plan plan) {
-	// Returns the average distance to all alters.
+	// Returns the average straight-line distance from agent's home to all of its activities.
 	// A radius of a disk-shaped activity space
 
 	double aSd=0.;

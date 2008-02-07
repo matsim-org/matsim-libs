@@ -24,9 +24,9 @@ import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
 
-public class SNFacilitySwitcher extends MultithreadedModuleA {
+public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
 
-    public SNFacilitySwitcher() {
+    public SNRandomFacilitySwitcher() {
     }
 
     @Override

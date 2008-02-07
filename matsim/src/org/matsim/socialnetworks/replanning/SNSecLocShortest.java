@@ -112,10 +112,6 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 				bestAct.setLink(fFromKnowledge.getLink());
 				Coord newCoord = (Coord) fFromKnowledge.getCenter();
 				bestAct.setCoord(newCoord);
-				//? set a new RefId here to avoid having this Act,Activity pairing written over
-				// in knowledge. Else leave the RefId as it is and let the Activity for with the original
-				// Act be forgotten. Note that both Act-Activity pairs will be retained in mapActActivity but
-				// only the latest pairing will be in mapActIdActivityId.
 
 				// IF CHAIN LENGTH ON THIS COPIED PLAN IS SHORTER THEN PUT THE CHANGE IN THE PLAN
 				double bestPlanLength = getPlanLength(bestPlan);

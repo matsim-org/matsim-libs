@@ -60,6 +60,7 @@ public class MentalMap {
 	
 	private ArrayList<SocializingOpportunity> dates = new ArrayList<SocializingOpportunity>();
 
+	private int max_act_memory = 50;
 	private Knowledge knowledge = null;
 
 	public MentalMap(Knowledge knowledge){
@@ -143,6 +144,16 @@ public class MentalMap {
 		knowledge.removeActivity(myactivity);
 	}
 
+	public void manageMemory(int max){
+		//First sort the activities
+		
+		// Then remove the least useful ones
+		for(int i=0;i<this.knowledge.getActivities().size()-max;i++){
+//		if(this.knowledge.getActivities().size()>max){
+			// Remove one act at a time until size < max
+			
+		}
+	}
 	public Act getAct (Activity myActivity){
 		return this.mapActivityAct.get(myActivity);
 	}

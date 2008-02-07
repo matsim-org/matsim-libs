@@ -24,7 +24,7 @@ import org.matsim.controler.Controler;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.BestPlanSelector;
-import org.matsim.socialnetworks.replanning.SNFacilitySwitcher;
+import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcher;
 
 
 public class SNController extends Controler {
@@ -49,9 +49,8 @@ public class SNController extends Controler {
 		PlanStrategy strategy1 = new PlanStrategy(new BestPlanSelector());
 
 		// Social Network Facility Exchange test
-		System.out.println("### NOTE THAT FACILITY SWITCHER IS HARD-CODED TO RANDOM SWITCHING OF FACILITIES FROM KNOWLEDGE");
 		System.out.println("### NOTE THAT YOU SHOULD EXCHANGE KNOWLEDGE BASED ON ITS VALUE");
-		strategy1.addStrategyModule(new SNFacilitySwitcher());
+		strategy1.addStrategyModule(new SNRandomFacilitySwitcher());
 		//strategy1.addStrategyModule(new TimeAllocationMutator());
 
 
