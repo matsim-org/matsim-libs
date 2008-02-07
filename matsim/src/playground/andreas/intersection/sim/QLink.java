@@ -1,8 +1,5 @@
 package playground.andreas.intersection.sim;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 import org.apache.log4j.Logger;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
@@ -16,6 +13,8 @@ public class QLink extends Link {
 	final private static Logger log = Logger.getLogger(QLink.class);
 	private static int spaceCapWarningCount = 0;
 	
+	private NetworkLayer net = null;
+	
 	private PseudoLink originalLink = null;
 
 	/** FreeLinkTravelTime */
@@ -24,11 +23,10 @@ public class QLink extends Link {
 	protected double storageCapacity;
 	protected double flowCapacityFractionalRest = 1.0;
 	
-	private final Queue<QVehicle> flowQueue = new LinkedList<QVehicle>();
-	
-	// checked okay
 	public QLink(NetworkLayer network, String id, Node from, Node to, String length, String freespeed, String capacity, String permlanes, String origid, String type) {
 		super(network, id, from, to, length, freespeed, capacity, permlanes, origid, type);
+		
+		this.net = network;
 		
 		this.originalLink = new PseudoLink(this);
 		
@@ -48,7 +46,7 @@ public class QLink extends Link {
 	
 	/** Adds a vehicle to the parkingQueue */
 	public void addVehicle2ParkingQueue(QVehicle veh) {
-		originalLink.addVehicle2ParkingQueue(veh);
+		originalLink.addVehicle2ParkingQueue(veh);	
 	}
 
 	public double getFreeSpeedTT() {
@@ -57,6 +55,10 @@ public class QLink extends Link {
 	
 	/** Called by QNetworkLayer */
 	boolean moveLink(final double now) {
+		
+		if (this.equals(net.getLink("60"))){
+			System.out.println("here");
+		}
 				
 		originalLink.movePseudoLink(now);
 		return true ;
@@ -65,7 +67,7 @@ public class QLink extends Link {
 	boolean flowQueueIsEmpty() {
 		// TODO [an] Hier muss zwischen den einzelnen 0m-Links unterschieden werden
 		// also flowQueueIsEmpty(destLink) liefert yes/no;
-		return this.flowQueue.isEmpty();
+		return this.originalLink.getFlowQueue().isEmpty();
 	}
 	
 	public boolean hasSpace() {
@@ -75,14 +77,14 @@ public class QLink extends Link {
 	QVehicle getFirstFromBuffer() {
 		// TODO [an] Hier muss zwischen den einzelnen 0m-Links unterschieden werden
 		// also getFirstFromBuffer(destLink) liefert veh von destLink-PseudoLink;
-		return this.flowQueue.peek();
+		return this.originalLink.getFlowQueue().peek();
 	}
 	
 	QVehicle pollFirstFromBuffer() {
 		// TODO [an] Hier muss zwischen den einzelnen 0m-Links unterschieden werden
 		// also pollFirstFromBuffer(destLink) liefert veh von destLink-PseudoLink;
 		double now = SimulationTimer.getTime();
-		QVehicle veh = this.flowQueue.poll();
+		QVehicle veh = this.originalLink.getFlowQueue().poll();
 //		QVehicle v2 = this.buffer.peek();
 //		if (v2 != null) {
 //			v2.setLastMovedTime(now);

@@ -13,6 +13,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.plans.Leg;
 
+import playground.andreas.intersection.QControler;
+
 public class PseudoLink {
 	
 	/** Logger */
@@ -109,6 +111,8 @@ public class PseudoLink {
 	}
 	
 	private void moveStorageQueueToFlowQueue(final double now) {
+		
+		
 
 		double maximumFlowCapacity = this.flowCapacity;
 		
@@ -249,6 +253,10 @@ public class PseudoLink {
 	
 	public void addVehicle2ParkingQueue(QVehicle veh) {
 		parkingQueue.add(veh);
+	}
+	
+	public Queue<QVehicle> getFlowQueue(){
+		return flowQueue;
 	}
 		
 }
