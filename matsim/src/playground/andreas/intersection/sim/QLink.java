@@ -23,16 +23,14 @@ public class QLink extends Link {
 	/** FreeLinkTravelTime */
 	private double freeSpeedTT;
 	
-	protected double storageCapacity;
-	protected double flowCapacityFractionalRest = 1.0;
-	
 	public QLink(NetworkLayer network, String id, Node from, Node to, String length, String freespeed, String capacity, String permlanes, String origid, String type) {
 		super(network, id, from, to, length, freespeed, capacity, permlanes, origid, type);
 		
+		this.freeSpeedTT = this.getLength() / this.getFreespeed();
 		// Original LinkErstellen
 		this.originalLink = new PseudoLink(this, true);
 		// Configurieren
-		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLength(), this.getLanes(), this.getFreespeed(), this.getCapacity())) {
+		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLength(), this.getLanes(), this.getFreespeed(), this.getFlowCapacity())) {
 			
 			if ( spaceCapWarningCount <=10 ) {
 				log.warn("Link " + this.getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
@@ -52,7 +50,7 @@ public class QLink extends Link {
 			double lengthOfNodeLinks_m = 45.0;
 			int numberOfLanes_ = 1;
 			double freeSpeed_m_s = this.getFreespeed();
-			double flowCapacity_Veh_h = 2000.0;
+			double flowCapacity_Veh_h = 2000.0 / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
 			
 			PseudoLink newNodePseudoLink;			
 			
@@ -67,7 +65,7 @@ public class QLink extends Link {
 				originalLink.addDestLink(link);			
 				
 				newNodePseudoLink.recalculatePseudoLinkProperties(0, lengthOfNodeLinks_m, numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h);
-				this.originalLink.recalculatePseudoLinkProperties(lengthOfNodeLinks_m, this.getLength() - lengthOfNodeLinks_m, this.getLanes(), this.getFreespeed(), this.getCapacity());
+				this.originalLink.recalculatePseudoLinkProperties(lengthOfNodeLinks_m, this.getLength() - lengthOfNodeLinks_m, this.getLanes(), this.getFreespeed(), this.getFlowCapacity());
 			
 				pseudoLinksList.add(newNodePseudoLink);
 				firstNodeLinkInitialized = true;
