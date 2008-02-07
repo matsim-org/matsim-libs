@@ -28,16 +28,16 @@ public class Person implements Comparable<Person> {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	protected final Integer p_id;
-	protected final Household hh;
-	protected int age;
-	protected boolean male;
-	protected boolean swiss;
-	protected boolean employed;
-	protected String car_avail;
-	protected boolean license;
-	protected int curr_educ;
-	protected int passed_educ;
+	public final Integer p_id;
+	public final Household hh;
+	public int age;
+	public boolean male;
+	public boolean swiss;
+	public boolean employed;
+	public String car_avail;
+	public boolean license;
+	public int curr_educ;
+	public int passed_educ;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors

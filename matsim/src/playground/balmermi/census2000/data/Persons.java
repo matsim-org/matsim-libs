@@ -41,8 +41,8 @@ public class Persons {
 	private static final String ALWAYS = "always";
 	private static final String SOMETIMES = "sometimes";
 
-	private final HashMap<Integer,Person> persons = new HashMap<Integer,Person>();
-	private final Households households;
+	public final HashMap<Integer,Person> persons = new HashMap<Integer,Person>();
+	public Households households;
 	private final String inputfile;
 
 	private Random random = new Random(101);

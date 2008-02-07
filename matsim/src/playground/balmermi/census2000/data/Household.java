@@ -32,10 +32,10 @@ public class Household implements Comparable<Household>  {
 	//////////////////////////////////////////////////////////////////////
 
 	private final Municipality municipality;
-	protected Integer hh_id;
-	protected Coord coord;
-	protected int hh_cat;
-	private HashSet<Person> persons = new HashSet<Person>();
+	public Integer hh_id;
+	public Coord coord;
+	public int hh_cat;
+	public HashSet<Person> persons = new HashSet<Person>();
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
