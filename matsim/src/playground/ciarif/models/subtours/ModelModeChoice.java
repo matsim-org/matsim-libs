@@ -24,6 +24,7 @@ import java.util.TreeSet;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 
 public abstract class ModelModeChoice {
 	
@@ -61,8 +62,7 @@ public abstract class ModelModeChoice {
 		this.purpose = -1;
 		this.bike = false;
 		this.prev_mode = -1.0;
-		this.home_coord.setX(-1.0);
-		this.home_coord.setY(-1.0);
+		//this.home_coord.setXY(-1.0,-1.0);
 		Gbl.random.nextDouble();
 	}
 
