@@ -29,6 +29,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.referencing.CRS;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkReaderMatsimV1;
 import org.matsim.network.NetworkWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -50,6 +51,7 @@ public class GISToMatsimConverter {
 	private Envelope envelope;
 	private CoordinateReferenceSystem crs;
 	static final double CATCH_RADIUS = 0.5;
+	public static final double CAPACITY_COEF = 1.33;
 	
 	public GISToMatsimConverter(){
 //		this("./padang/padang_streets.shp","./padang/vd10_streetnetwork_padang_v0.5_utm47s.shp");
@@ -79,16 +81,20 @@ public class GISToMatsimConverter {
 	}
 	
 	private void processData() throws Exception {
-		GraphGenerator netBuild = new GraphGenerator(features.get(linestringFile));
-		Collection<Feature> graph =  netBuild.createNetwork();
+		GraphGenerator gg = new GraphGenerator(features.get(linestringFile));
+		Collection<Feature> graph =  gg.createGraph();
 		ShapeFileWriter.writeGeometries(graph, "./padang/debug_graph.shp");
 		NetworkGenerator ng = new NetworkGenerator(graph,this.envelope);
 		NetworkLayer network = ng.generateFromGraph();
+		network = new NetworkLayer();
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(network);
+		nr.readFile("./networks/padang_net.xml");
 		NetworkWriter nw = new NetworkWriter(network,"./padang/debug_net.xml");
-		nw.write();
+//		nw.write();
 		NetworkToGraph ntg = new NetworkToGraph(network,this.crs);
 		Collection<Feature> netGraph = ntg.generateFromNet();
 		ShapeFileWriter.writeGeometries(netGraph, "./padang/debug_net.shp");
+
 	}
 
 	private void readData() throws Exception{

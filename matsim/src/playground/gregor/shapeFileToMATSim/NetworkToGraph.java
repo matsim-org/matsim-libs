@@ -39,9 +39,13 @@ import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class NetworkToGraph {
@@ -60,7 +64,7 @@ public class NetworkToGraph {
 		
 		Collection<Feature> features = new ArrayList<Feature>();
 		
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiLineString",MultiLineString.class, true, null, null, this.crs);
+		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, this.crs);
 		AttributeType id = AttributeTypeFactory.newAttributeType(
 				"ID", String.class);
 		AttributeType fromNode = AttributeTypeFactory.newAttributeType(
@@ -78,11 +82,48 @@ public class NetworkToGraph {
 		
 
 		for (Link link : this.network.getLinks().values()){
+			LinearRing lr = getLinearRing(link);
+			Polygon p = new Polygon(lr, null, this.geofac);
+			MultiPolygon mp = new MultiPolygon(new Polygon[] {p},this.geofac);
 			LineString ls = new LineString(new CoordinateArraySequence(new Coordinate [] {MGC.coord2Coordinate(link.getFromNode().getCoord()),MGC.coord2Coordinate(link.getToNode().getCoord())}),this.geofac);
-			Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},this.geofac) , link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(),"",""},"network");
+			
+			Feature ft = ftRoad.create(new Object [] {mp , link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(),"",""},"network");
 			features.add(ft);
 		}
 		return features;
+	}
+
+	private LinearRing getLinearRing(Link link) {
+		double minWidth = link.getCapacity() / GISToMatsimConverter.CAPACITY_COEF;
+//		minWidth = 10;
+		Coordinate zero = new Coordinate(0,0);
+		Coordinate  from = new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()) ;
+
+		Coordinate  to = new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY()) ;
+
+		double xdiff = to.x - from.x;
+		double ydiff = to.y - from.y;
+
+		double distA = from.distance(zero);
+		double distB = to.distance(zero);
+		
+		double ogradient = Double.MAX_VALUE;
+		if (ydiff != 0)
+			ogradient = -xdiff / ydiff;
+		double csq = Math.pow(minWidth,2);
+//		double csq = Math.pow(4,2);
+		double xwidth = Math.sqrt(csq/(1+Math.pow(ogradient,2)));
+		double ywidth = xwidth*ogradient;
+
+		Coordinate fromB = new Coordinate(from.x+xwidth,from.y+ywidth,0);
+		Coordinate toB = new Coordinate(to.x+xwidth,to.y+ywidth,0);
+		
+		CoordinateSequence coords = new CoordinateArraySequence(new Coordinate [] {from, to, toB, fromB, from});
+		
+		return new LinearRing(coords,this.geofac);
+		
+		
+		
 	}
 
 }

@@ -23,7 +23,6 @@
  */
 package playground.gregor.shapeFileToMATSim;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,19 +32,11 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.DataStore;
-import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.Transaction;
-import org.geotools.data.collection.CollectionDataStore;
-import org.geotools.data.memory.MemoryFeatureCollection;
-import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -53,17 +44,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-
-import org.geotools.referencing.CRS;
-import org.matsim.counts.AttributeFactory;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.collections.QuadTree;
-
-import playground.gregor.gis.MedianStripShapeFileWriter.PFeatureCollection;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -77,7 +61,6 @@ public class GraphGenerator {
 
 	private static final Logger log = Logger.getLogger(GraphGenerator.class);
 
-//	private NetworkLayer network = null;
 	private final FeatureSource featureSource;
 
 	private HashSet<LineString> lineStrings;
@@ -85,19 +68,13 @@ public class GraphGenerator {
 
 	private GeometryFactory geofac;
 
-	// DEBUG
-	ShapefileDataStore ds = null;
-
-	private String outfile = "./padang/debug_out.shp";
-
 	public GraphGenerator(FeatureSource featureSource) {
 		this.geofac = new GeometryFactory();
-//		this.network = new NetworkLayer();
 		this.featureSource = featureSource;
 
 	}
 
-	public Collection<Feature> createNetwork() throws Exception {
+	public Collection<Feature> createGraph() throws Exception {
 		parseLineStrings();
 		cleanUpLineStrings();
 		checkForIntersectionsToSplit();
@@ -163,7 +140,11 @@ public class GraphGenerator {
 					if (neighbor.equals(ls)) {
 						continue;
 					}
-					union(ls, neighbor, lineStringsQueue);
+					remove(ls);
+					remove(neighbor);
+					LineString union = catAtTouchPoint(ls, neighbor);
+					add(union);
+					lineStringsQueue.add(union);
 					break;
 				}
 
@@ -173,57 +154,7 @@ public class GraphGenerator {
 		log.info("done.");
 	}
 
-	private void union(LineString ls, LineString neighbor,
-			ConcurrentLinkedQueue<LineString> lineStringsQueue) {
-		remove(ls);
-		remove(neighbor);
-		Coordinate[] carray = new Coordinate[ls.getNumPoints()
-				+ neighbor.getNumPoints() - 1];
-		boolean reverseLs = false;
-		boolean reverseNeighbor = false;
-		if (ls.getStartPoint().equalsExact(neighbor.getStartPoint(),
-				GISToMatsimConverter.CATCH_RADIUS)
-				|| ls.getStartPoint().equalsExact(neighbor.getEndPoint(),
-						GISToMatsimConverter.CATCH_RADIUS)) {
-			reverseLs = true;
-			if (ls.getStartPoint().equalsExact(neighbor.getEndPoint(),
-					GISToMatsimConverter.CATCH_RADIUS)) {
-				reverseNeighbor = true;
-			}
-		} else {
-			if (ls.getEndPoint().equalsExact(neighbor.getEndPoint(),
-					GISToMatsimConverter.CATCH_RADIUS)) {
-				reverseNeighbor = true;
-			}
-		}
 
-		if (reverseLs) {
-			int j = 0;
-			for (int i = ls.getNumPoints() - 1; i >= 0; i--) {
-				carray[j++] = ls.getCoordinateN(i);
-			}
-		} else {
-			for (int i = 0; i < ls.getNumPoints(); i++) {
-				carray[i] = ls.getCoordinateN(i);
-			}
-		}
-
-		int offset = ls.getNumPoints() - 1;
-		if (reverseNeighbor) {
-			int j = offset + 1;
-			for (int i = neighbor.getNumPoints() - 2; i >= 0; i--) {
-				carray[j++] = neighbor.getCoordinateN(i);
-			}
-		} else {
-			for (int i = 1; i < neighbor.getNumPoints(); i++) {
-				carray[i + offset] = neighbor.getCoordinateN(i);
-			}
-		}
-
-		LineString union = this.geofac.createLineString(carray);
-		add(union);
-		lineStringsQueue.add(union);
-	}
 
 	private void checkForIntersectionsToSplit() {
 		log.info("check if some LineStrings have to be splitted at intersections ...");
@@ -247,6 +178,7 @@ public class GraphGenerator {
 				}
 			}
 			if (splitPoints.size() > 0) {
+				remove(ls);
 				splitLineString(ls, splitPoints);
 			}
 		}
@@ -254,28 +186,7 @@ public class GraphGenerator {
 
 	}
 
-	private void splitLineString(LineString ls, Vector<Point> splitPoints) {
-		remove(ls);
-		splitPoints.add(ls.getEndPoint());
-		Point tmp = ls.getStartPoint();
-		Vector<Coordinate> segment = new Vector<Coordinate>();
-		int count = 0;
-		for (Point splitPoint : splitPoints) {
-			while (!tmp.equals(splitPoint)) {
-				segment.add(tmp.getCoordinate());
-				tmp = ls.getPointN(count++);
-			}
-			segment.add(tmp.getCoordinate());
-			Coordinate[] coords = new Coordinate[segment.size()];
-			for (int j = 0; j < segment.size(); j++) {
-				coords[j] = segment.elementAt(j);
-			}
-			LineString subLs = this.geofac.createLineString(coords);
-			add(subLs);
-			segment.clear();
-		}
 
-	}
 
 	private void parseLineStrings() throws IOException {
 
@@ -302,18 +213,6 @@ public class GraphGenerator {
 
 	}
 
-	private void add(LineString ls) {
-		this.lineStrings.add(ls);
-		this.tree.put(ls.getStartPoint().getX(), ls.getStartPoint().getY(), ls);
-		this.tree.put(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
-	}
-
-	private void remove(LineString ls) {
-		this.lineStrings.remove(ls);
-		this.tree.remove(ls.getStartPoint().getX(), ls.getStartPoint().getY(),
-				ls);
-		this.tree.remove(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
-	}
 
 
 	private Collection<Feature> genFeatureCollection() throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
@@ -341,4 +240,89 @@ public class GraphGenerator {
 		return features;
 	}
 
+	private void add(LineString ls) {
+		this.lineStrings.add(ls);
+		this.tree.put(ls.getStartPoint().getX(), ls.getStartPoint().getY(), ls);
+		this.tree.put(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
+	}
+
+	private void remove(LineString ls) {
+		this.lineStrings.remove(ls);
+		this.tree.remove(ls.getStartPoint().getX(), ls.getStartPoint().getY(),
+				ls);
+		this.tree.remove(ls.getEndPoint().getX(), ls.getEndPoint().getY(), ls);
+	}
+
+	
+	private LineString catAtTouchPoint(LineString ls1, LineString ls2) {
+
+		Coordinate[] carray = new Coordinate[ls1.getNumPoints() + ls2.getNumPoints() - 1];
+		boolean reverseLs = false;
+		boolean reverseNeighbor = false;
+		if (ls1.getStartPoint().equalsExact(ls2.getStartPoint(),
+				GISToMatsimConverter.CATCH_RADIUS)
+				|| ls1.getStartPoint().equalsExact(ls2.getEndPoint(),
+						GISToMatsimConverter.CATCH_RADIUS)) {
+			reverseLs = true;
+			if (ls1.getStartPoint().equalsExact(ls2.getEndPoint(),
+					GISToMatsimConverter.CATCH_RADIUS)) {
+				reverseNeighbor = true;
+			}
+		} else {
+			if (ls1.getEndPoint().equalsExact(ls2.getEndPoint(),
+					GISToMatsimConverter.CATCH_RADIUS)) {
+				reverseNeighbor = true;
+			}
+		}
+		
+		if (reverseLs) {
+			int j = 0;
+			for (int i = ls1.getNumPoints() - 1; i >= 0; i--) {
+				carray[j++] = ls1.getCoordinateN(i);
+			}
+		} else {
+			for (int i = 0; i < ls1.getNumPoints(); i++) {
+				carray[i] = ls1.getCoordinateN(i);
+			}
+		}
+
+		int offset = ls1.getNumPoints() - 1;
+		if (reverseNeighbor) {
+			int j = offset + 1;
+			for (int i = ls2.getNumPoints() - 2; i >= 0; i--) {
+				carray[j++] = ls2.getCoordinateN(i);
+			}
+		} else {
+			for (int i = 1; i < ls2.getNumPoints(); i++) {
+				carray[i + offset] = ls2.getCoordinateN(i);
+			}
+		}
+
+		return this.geofac.createLineString(carray);
+
+	}
+
+	private void splitLineString(LineString ls, Vector<Point> splitPoints) {
+		
+		splitPoints.add(ls.getEndPoint());
+		Point tmp = ls.getStartPoint();
+		Vector<Coordinate> segment = new Vector<Coordinate>();
+		int count = 0;
+		for (Point splitPoint : splitPoints) {
+			while (!tmp.equals(splitPoint)) {
+				segment.add(tmp.getCoordinate());
+				tmp = ls.getPointN(count++);
+			}
+			segment.add(tmp.getCoordinate());
+			Coordinate[] coords = new Coordinate[segment.size()];
+			for (int j = 0; j < segment.size(); j++) {
+				coords[j] = segment.elementAt(j);
+			}
+			LineString subLs = this.geofac.createLineString(coords);
+			add(subLs);
+			segment.clear();
+		}
+
+	}
+	
 }
