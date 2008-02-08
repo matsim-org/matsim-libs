@@ -28,6 +28,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventAgentStuck;
@@ -84,16 +85,20 @@ public class QueueLink extends Link {
 	 */
 	private final Queue<Vehicle> buffer = new LinkedList<Vehicle>();
 
-	protected double freeTravelDuration;
+	private final double freeTravelDuration;
 
-	protected double storageCapacity;
+	private double storageCapacity;
 
 	/** The number of vehicles able to leave the buffer in one time step (usually 1s). */
 	private double simulatedFlowCapacity; // previously called timeCap
 	private int timeCapCeil; // optimization, cache Math.ceil(timeCap)
 	private double timeCapFraction; // optimization, cache timeCap - (int)timeCap
 
-	protected double buffercap_accumulate = 1.0;
+	/** The (flow) capacity available in one time step to move vehicles into the buffer.
+	 * This value is updated each time step by a call to {@link #updateBufferCapacity(double)}. */
+	private double bufferCap = 0.0;
+	/** Stores the accumulated fractional parts of the flow capacity. See also timeCapFraction.*/
+	private double buffercap_accumulate = 1.0;
 
 	private boolean active = false;
 
@@ -120,19 +125,16 @@ public class QueueLink extends Link {
 	}
 
 	private void initFlowCapacity() {
-		/* network.capperiod is in hours, we need it per sim-tick and multiplied
-		 * with flowCapFactor                */
+		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double flowCapFactor = Gbl.getConfig().simulation().getFlowCapFactor();
 
-		/* multiplying capacity from file by simTickCapFactor **and**
-		 * flowCapFactor:                     */
+		// multiplying capacity from file by simTickCapFactor **and** flowCapFactor:
 		this.simulatedFlowCapacity = this.getFlowCapacity() * SimulationTimer.getSimTickTime() * flowCapFactor;
 	}
 
 
 	private void recalcCapacity() {
-		/* network.capperiod is in hours, we need it per sim-tick and multiplied
-		 * with flowCapFactor                */
+		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
 		// also computing the ceiling of the capacity:
@@ -145,8 +147,7 @@ public class QueueLink extends Link {
 		this.storageCapacity = (this.length * this.permlanes) / NetworkLayer.CELL_LENGTH * storageCapFactor;
 
 
-		/* storage capacity needs to be at least enough to handle the
-		 * cap_per_time_step:                  */
+		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.timeCapCeil);
 
 		/* If speed on link is relatively slow, then we need MORE cells than the above spaceCap to handle the flowCap. Example:
@@ -181,7 +182,7 @@ public class QueueLink extends Link {
 	// Is called after link has been read completely
 	// ////////////////////////////////////////////////////////////////////
 	public void finishInit() {
-	  this.buffercap_accumulate = 1.0;
+	  this.buffercap_accumulate = (this.timeCapFraction == 0.0 ? 0.0 : 1.0);
 	  this.active = false;
 	}
 
@@ -254,6 +255,9 @@ public class QueueLink extends Link {
 			if (!hasBufferSpace())
 				break;
 
+			if (veh.getDriver().getId().equals(new Id("9"))) {
+				System.out.println("breakpoint");
+			}
 			addToBuffer(veh, now);
 
 			QueueSimulation.getEvents().processEvent(
@@ -261,6 +265,7 @@ public class QueueLink extends Link {
 							veh.getDriver(), veh.getCurrentLeg(), this));
 
 			this.waitingList.poll(); // remove the just handled vehicle from waitingList
+
 		}
 	}
 
@@ -270,8 +275,6 @@ public class QueueLink extends Link {
 	 * @param now The current time.
 	 */
 	private void moveLinkToBuffer(final double now) {
-		// move items if possible
-		double max_buffercap = this.simulatedFlowCapacity;
 
 		Vehicle veh;
 		while ((veh = this.vehQueue.peek()) != null) {
@@ -288,37 +291,19 @@ public class QueueLink extends Link {
 				continue;
 			}
 
+			/* using the following line instead should, I think, be an easy way to make the mobsim
+			 * stochastic. not tested. kai   */
+//			if ( Gbl.random.nextDouble() < this.buffercap_accumulate ) {
+
 			// is there still room left in the buffer, or is it overcrowded from the last time steps?
 			if (!hasBufferSpace()) {
 				break;
 			}
 
-			if (max_buffercap >= 1.0) {
-				max_buffercap--;
-				addToBuffer(veh, now);
-				this.vehQueue.poll();
-				continue;
-
-			/* using the following line instead should, I think, be an easy way to make the mobsim
-			 * stochastic. not tested. kai   */
-//			} else if ( Gbl.random.nextDouble() < this.buffercap_accumulate ) {
-
-			} else if (this.buffercap_accumulate >= 1.0) {
-				this.buffercap_accumulate--;
-				addToBuffer(veh, now);
-				this.vehQueue.poll();
-				break;
-			} else {
-				break;
-			}
+			addToBuffer(veh, now);
+			this.vehQueue.poll();
 		}
 
-		/* if there is an fractional piece of bufferCapacity left over
-		 * leave it for the next iteration so it might accumulate to a whole agent.
-		 */
-		if (this.buffercap_accumulate < 1.0) {
-			this.buffercap_accumulate += this.timeCapFraction;
-		}
 	}
 
 	private boolean updateActiveStatus() {
@@ -341,7 +326,8 @@ public class QueueLink extends Link {
 	// ////////////////////////////////////////////////////////////////////
 	// called from framework, do everything related to link movement here
 	// ////////////////////////////////////////////////////////////////////
-	boolean moveLink(final double now) {
+	/*default*/ boolean moveLink(final double now) {
+		updateBufferCapacity(now);
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
 		// move vehicles from link to buffer
@@ -352,7 +338,8 @@ public class QueueLink extends Link {
 		return updateActiveStatus();
 	}
 
-	boolean moveLinkWaitFirst(final double now) {
+	/*default*/ boolean moveLinkWaitFirst(final double now) {
+		updateBufferCapacity(now);
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
 		// move vehicles from waitingQueue into buffer if possible
@@ -363,7 +350,14 @@ public class QueueLink extends Link {
 		return updateActiveStatus();
 	}
 
-	void addParking(final Vehicle veh) {
+	private void updateBufferCapacity(final double time) {
+		this.bufferCap = this.simulatedFlowCapacity;
+		if (this.buffercap_accumulate < 1.0) {
+			this.buffercap_accumulate += this.timeCapFraction;
+		}
+	}
+
+	/*default*/ void addParking(final Vehicle veh) {
 		this.parkingList.add(veh);
 		((QueueNetworkLayer) this.layer).setLinkActivation(veh.getDepartureTime_s(), this);
 	}
@@ -409,11 +403,6 @@ public class QueueLink extends Link {
 		return this.freeTravelDuration;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.util.List#get(int)
-	 */
 	 Vehicle popFirstFromBuffer() {
 		double now = SimulationTimer.getTime();
 		Vehicle veh = this.buffer.poll();
@@ -430,25 +419,22 @@ public class QueueLink extends Link {
 	}
 
 	private void addToBuffer(final Vehicle veh, final double now) {
+		if (this.bufferCap >= 1.0) {
+			this.bufferCap--;
+		} else if (this.buffercap_accumulate >= 1.0) {
+			this.buffercap_accumulate--;
+		} else {
+			throw new RuntimeException("Buffer of link " + this.id.toString() + " has no space left!");
+		}
 		this.buffer.add(veh);
 		veh.setLastMovedTime(now);
 		((QueueNode) this.getToNode()).activateNode();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.util.List#get(int)
-	 */
 	Vehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.util.List#isEmpty()
-	 */
 	boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
 	}
@@ -471,7 +457,7 @@ public class QueueLink extends Link {
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
 	private boolean hasBufferSpace() {
-		return (this.buffer.size() < this.timeCapCeil);
+		return (this.bufferCap >= 1.0 || this.buffercap_accumulate >= 1.0);
 	}
 
 	/**
@@ -503,7 +489,7 @@ public class QueueLink extends Link {
 	}
 
 	/**
-	 * @return Returns the maxCap.
+	 * @return Returns the maximum number of vehicles that can be placed on the link at a time.
 	 */
 	public double getSpaceCap() {
 		return this.storageCapacity;
@@ -512,7 +498,7 @@ public class QueueLink extends Link {
 	/**
 	 * @return Returns a collection of all vehicles (driving, parking, in buffer, ...) on the link.
 	 */
-	public Collection<Vehicle> getAllVehicles(){
+	public Collection<Vehicle> getAllVehicles() {
 
 		Collection<Vehicle> vehicles = new ArrayList<Vehicle>();
 
@@ -763,10 +749,6 @@ public class QueueLink extends Link {
 		}
 
 		return vehs;
-	}
-
-	public double getMaxFlow_veh_s() {
-		return this.simulatedFlowCapacity;
 	}
 
 	// search for vehicleId..
