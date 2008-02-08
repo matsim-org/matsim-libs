@@ -26,12 +26,12 @@ the simulation -->
   <xs:complexContent>
 		<xs:extension base="matsimObjectType">
 		<xs:sequence>
-			<xs:element name="fromLink" type="linkRefType" minOccurs="1" maxOccurs="1" />
-			<xs:element name="toLink" type="linkRefType" minOccurs="1" maxOccurs="unbounded">
+			<xs:element name="fromLink" type="idRefType" minOccurs="1" maxOccurs="1" />
+			<xs:element name="toLink" type="idRefType" minOccurs="1" maxOccurs="unbounded">
 			</xs:element>
 			<!-- optional elements -->
 			<xs:element name="turnIfRed" type="xs:boolean" default="false" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="passingClearingTime" type="xs:integer" default="0" minOccurs="0" maxOccurs="1">
+			<xs:element name="passingClearingTime" type="xs:nonNegativeInteger" default="0" minOccurs="0" maxOccurs="1">
 			<xs:annotation>
 			  <xs:documentation>This value is the sum of two values: 1. In German "Überfahrzeit" which expresses the
 			  time cars are entering the node when the dropping already has occured. 2. In German "Räumzeit" which
@@ -39,7 +39,7 @@ the simulation -->
 			  signalGroup the interim time can be computed as (Überfahrzeit + Räumzeit) - Einfahrzeit</xs:documentation>
 			</xs:annotation>
 			</xs:element>
-			<xs:element name="enteringTime" type="xs:integer" default="0" minOccurs="0" maxOccurs="1" >
+			<xs:element name="enteringTime" type="xs:nonNegativeInteger" default="0" minOccurs="0" maxOccurs="1" >
 				<xs:annotation>
 				  <xs:documentation>See documentation of element passingClearingTime.</xs:documentation>
 				</xs:annotation>

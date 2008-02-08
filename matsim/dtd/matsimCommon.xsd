@@ -6,33 +6,35 @@ xml:lang="en">
 <!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
 <!-- This xml schema contains xml definitions used in the MATSim framework  -->
 
+<xs:simpleType name="matsimIdType">
+	<xs:annotation>
+		<xs:documentation>A Id in the MATSim framework is a string with no leading and trailing white
+		spaces, no carriage returns, line feeds, tabs and spaces. These items will be replaced
+		by the parser automatically, for further information see documentation of the
+		xs:collapse restriction.</xs:documentation>
+	</xs:annotation>
+	<xs:restriction base="xs:string">
+  	<xs:whiteSpace value="collapse"/>
+  </xs:restriction>
+</xs:simpleType>
+
 <xs:complexType name="matsimObjectType" >
   <xs:annotation>
-    <xs:documentation>This is the base type for all matsim objects which have an type-wide unique id.</xs:documentation>
+    <xs:documentation>This is the base type for all matsim objects which have an type-wide unique id.
+    Be aware of the idRefType which has to be used in all cases where an Id is only referenced.
+    </xs:documentation>
   </xs:annotation>
-  <xs:attribute name="id" type="xs:string" use="required" />
+  <xs:attribute name="id" type="matsimIdType" use="required" />
 </xs:complexType>
 
-
-<xs:complexType name="linkRefType">
-  <xs:attribute name="id" type="xs:string" use="required" />
+<xs:complexType name="idRefType">
+	<xs:annotation>
+		<xs:documentation>This type can be used for all references to elements of type
+		matsimObjectType. In contrast to the matsimObjectType this type has to be used
+		for elements referencing an Id of an object defined elsewhere in the xml documents.
+		</xs:documentation>
+	</xs:annotation>
+  <xs:attribute name="refId" type="matsimIdType" use="required" />
 </xs:complexType>
-
-<xs:complexType name="signalGroupRefType">
-  <xs:attribute name="id" type="xs:string" use="required" />
-</xs:complexType>
-
-
-
-
-<!-- <xs:complexType name="routeType">
-  <xs:sequence>
-    <xs:element name="node" minOccurs="2" maxOccurs="unbounded">
-      <xs:complexType>
-        <xs:attribute name="id" type="xsd:positiveInteger" use="required"/>
-      </xs:complexType>
-    </xs:element>
-  </xs:sequence>
-</xs:complexType>  -->
 
 </xs:schema>

@@ -35,13 +35,6 @@ the simulation -->
   <xs:complexContent>
     <xs:extension base="matsimObjectType">
 		<xs:sequence>
-			<xs:element name="signalGroup" type="signalGroupRefType" minOccurs="1" maxOccurs="unbounded">
-				<xs:annotation>
-				  <xs:documentation>As a signal system can be operated by an adaptive controler the
-				  signal groups of the system must be stated explicitly, even they are given implicitly when using
-				  a plan based control.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
 			<xs:element name="signalSystemControler" type="signalSystemControlerType" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
 				 	<xs:documentation>Each system may have a different control strategy. See also comments for the type
@@ -53,30 +46,96 @@ the simulation -->
   </xs:complexContent>
 </xs:complexType>
 
-<xs:complexType name="signalSystemControlerType">
+<xs:complexType name="signalSystemControlerType" abstract="true">
   <xs:annotation>
     <xs:documentation>
-    This type defines how a signal group system is controlled. Control can be adaptive, plan based or both.
-    In the first version implemented in MATSim only plan based control is possible.
+    This type or more precisely its subtypes define how a signal group system is controlled. Control can be adaptive, plan based or both.
+    The attribute controlStrategy reflects the subtype choosen and is required for simplicity of parsing the
+    xml-files.
     </xs:documentation>
   </xs:annotation>
+  <xs:attribute name="controlStrategy" type="controlStrategyType" use="required />
   <xs:sequence>
-		<xs:element name="adaptiveControler" type="xs:string" minOccurs="0" maxOccurs="1">
-			<xs:annotation>
-			  <xs:documentation>If there is an adaptive control mechanism implemented its id or name
-			  can be set in this element. As there are also plan based adaptive control strategies
-			  one or more plans can be added as well.</xs:documentation>
-			</xs:annotation>
-		</xs:element>
-		<xs:element name="signalSystemPlan" type="signalSystemPlanType" minOccurs="0" maxOccurs="unbounded">
-			<xs:annotation>
-				<xs:documentation>A signal system's plan based control is given by one or more plans per
-				signal group. The system can switch to a new plan by time of day or by adaptive control
-				mechanisms.</xs:documentation>
-			</xs:annotation>
-		</xs:element>
   </xs:sequence>
 </xs:complexType>
+
+<xs:simpleType name="controlStrategyType">
+	<xs:restriction base="xs:string">
+		<xs:enumeration value="planbased" />
+		<xs:enumeration value="adaptive" />
+		<xs:enumeration value="mixed" />
+	</xs:restriction>
+</xs:simpleType>
+
+
+
+<xs:complexType name="planbasedSignalSystemControlerType">
+  <xs:complexContent>
+		<xs:extension base="signalSystemControlerType">
+			<xs:sequence>
+				<xs:element name="signalSystemPlan" type="signalSystemPlanType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>A signal system's plan based control is given by one or more plans per
+						signal group. Which signal groups are controled by a plan based system can be determined
+						by examining the plans.
+						The system can switch to a new plan by time of day or by adaptive control
+						mechanisms.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+
+<xs:complexType name="adaptiveSignalSystemControlerType">
+	<xs:annotation>
+		<xs:documentation>If there is an adaptive control mechanism implemented its id or name
+		can be set in the element of this type.</xs:documentation>
+	</xs:annotation>
+  <xs:complexContent>
+		<xs:extension base="signalSystemControlerType">
+			<xs:sequence>
+				<xs:element name="adaptiveControler" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="signalGroup" type="idRefType" minOccurs="1" maxOccurs="unbounded">
+					<xs:annotation>
+					  <xs:documentation>When a signal system is operated by an adaptive controler the
+				  	signal groups of the system must be stated explicitly, even they are given implicitly when using
+				  	an adaptive plan based control.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+
+
+
+<xs:complexType name="adaptivePlanbasedSignalSystemControlerType">
+	<xs:annotation>
+		<xs:documentation>If there is an adaptive control mechanism implemented its id or name
+		can be set in the element of this type. For plan based adaptive control strategies
+		one or more plans can be added as well.</xs:documentation>
+	</xs:annotation>
+  <xs:complexContent>
+		<xs:extension base="adaptiveSignalSystemControlerType">
+			<xs:sequence>
+				<xs:element name="signalSystemPlan" type="signalSystemPlanType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>An adaptive control can use signal plans to control the system. How this
+						plans are used depends on the adaptive control strategy choosen.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+
+
+
 
 <xs:complexType name="signalSystemPlanType">
   <xs:annotation>
