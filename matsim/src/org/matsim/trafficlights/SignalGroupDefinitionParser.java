@@ -48,6 +48,8 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 
 	private static final String ID = "id";
 
+	private static final String REFID = "refId";
+
 	private List<SignalGroupDefinition> signalGroups;
 
 	private SignalGroupDefinition currentSignalGroup;
@@ -86,10 +88,10 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 			this.currentSignalGroup = new SignalGroupDefinition(new Id(atts.getValue(ID)));
 		}
 		else if (FROMLINK.equalsIgnoreCase(name)) {
-			this.currentSignalGroup.setFromLink(new Id(atts.getValue(ID)));
+			this.currentSignalGroup.setFromLink(new Id(atts.getValue(REFID)));
 		}
 		else if (TOLINK.equalsIgnoreCase(name)) {
-			this.currentSignalGroup.addToLink(new Id(atts.getValue(ID)));
+			this.currentSignalGroup.addToLink(new Id(atts.getValue(REFID)));
 		}
 
 
