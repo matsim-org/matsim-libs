@@ -114,7 +114,7 @@ public class Events {
 	}
 
 	public void printEventsCount() {
-		Logger.getLogger(this.getClass()).info(" event # " + this.counter);
+		log.info(" event # " + this.counter);
 	}
 
 	public void addHandler (final EventHandlerI handler) {
@@ -151,12 +151,14 @@ public class Events {
 	}
 
 	public void resetHandlers(final int iteration) {
+		log.info("resetting Event-Handlers");
 		this.counter = 0;
 		this.nextCounterMsg = 1;
 		Set<EventHandlerI> resetHandlers = new HashSet<EventHandlerI>();
 		for (HandlerData handlerdata : this.handlerData) {
 			for (EventHandlerI handler : handlerdata.handlerList) {
 				if (!resetHandlers.contains(handler)) {
+					log.info("  " + handler.getClass().getName());
 					handler.reset(iteration);
 					resetHandlers.add(handler);
 				}
