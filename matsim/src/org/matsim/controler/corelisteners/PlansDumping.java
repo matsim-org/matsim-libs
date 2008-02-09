@@ -20,6 +20,7 @@
 
 package org.matsim.controler.corelisteners;
 
+import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.BeforeMobsimEvent;
 import org.matsim.controler.listener.BeforeMobsimListener;
@@ -35,14 +36,18 @@ import org.matsim.plans.PlansWriter;
  */
 public class PlansDumping implements BeforeMobsimListener {
 
+	static final private Logger log = Logger.getLogger(PlansDumping.class);
+
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		if (event.getIteration() % 10 == 0 || event.getIteration() == (controler.getFirstIteration() + 1)) {
 			controler.stopwatch.beginOperation("dump all plans");
+			log.info("dumping plans...");
 			String outversion = controler.getConfig().plans().getOutputVersion();
 			PlansWriter plansWriter = new PlansWriter(controler.getPopulation(), Controler.getIterationFilename("plans.xml.gz"), outversion);
 			plansWriter.setUseCompression(true);
 			plansWriter.write();
+			log.info("finished plans dump.");
 			controler.stopwatch.endOperation("dump all plans");
 		}
 	}
