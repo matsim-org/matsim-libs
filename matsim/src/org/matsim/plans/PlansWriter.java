@@ -98,10 +98,8 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 			}
 			this.fileOpened = true;
 			this.writeHeader("plans");
-			this.out.flush();
 			this.handler.startPlans(this.population, this.out);
 			this.handler.writeSeparator(this.out);
-			this.out.flush();
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -174,7 +172,6 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 						Act act = (Act)plan.getActsLegs().get(jj);
 						this.handler.startAct(act, this.out);
 						this.handler.endAct(this.out);
-						this.out.flush();
 					}
 					else {
 						Leg leg = (Leg)plan.getActsLegs().get(jj);
@@ -184,17 +181,15 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 							Route r = leg.getRoute();
 							this.handler.startRoute(r, this.out);
 							this.handler.endRoute(this.out);
-							this.out.flush();
 						}
 						this.handler.endLeg(this.out);
-						this.out.flush();
 					}
 				}
 				this.handler.endPlan(this.out);
-				this.out.flush();
 			}
 			this.handler.endPerson(this.out);
 			this.handler.writeSeparator(this.out);
+			this.out.flush();
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
