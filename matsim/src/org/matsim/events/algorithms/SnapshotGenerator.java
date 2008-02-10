@@ -164,7 +164,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			for (EventLink link : this.eventLinks.values()) {
 				link.getVehiclePositionsQueue(positions, time);
 			}
-		} else if ("equil".equals(this.snapshotStyle)) {
+		} else if ("equiDist".equals(this.snapshotStyle)) {
 			for (EventLink link : this.eventLinks.values()) {
 				link.getVehiclePositionsEquil(positions, time);
 			}

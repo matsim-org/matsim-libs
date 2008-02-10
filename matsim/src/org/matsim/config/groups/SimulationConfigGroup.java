@@ -58,7 +58,7 @@ public class SimulationConfigGroup extends Module {
 	private double snapshotPeriod = 0; // off, no snapshots
 	private String snapshotFormat = "";
 	private String snapshotFile = "Snapshot";
-	private String snapshotStyle = "queue"; // currently supported: queue, equil
+	private String snapshotStyle = "equiDist"; // currently supported: queue, equiDist
 	private double flowCapFactor = 1.0;
 	private double stroageCapFactor = 1.0;
 	private double stuckTime = 100;
@@ -283,8 +283,12 @@ public class SimulationConfigGroup extends Module {
 	 */
 	public void setSnapshotStyle(final String style) {
 		this.snapshotStyle = style.intern();
-		if (this.snapshotStyle != "equil" && this.snapshotStyle != "queue") {
-			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + style + "\" is not one of the known ones (queue, equil).");
+		if (this.snapshotStyle != "equil" && this.snapshotStyle != "equiDist" && this.snapshotStyle != "queue") {
+			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + style + "\" is not one of the known ones (queue, equiDist).");
+		}
+		if (style.equals("equil")) {
+			Logger.getLogger(this.getClass()).info("Please use 'equiDist' instead of 'equil' for snapshotFormat.");
+			this.snapshotStyle = "equiDist";
 		}
 	}
 

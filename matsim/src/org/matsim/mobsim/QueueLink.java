@@ -514,7 +514,7 @@ public class QueueLink extends Link {
 		String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
 		if ("queue".equals(snapshotStyle)) {
 			getVehiclePositionsQueue(positions);
-		} else if ("equil".equals(snapshotStyle)) {
+		} else if ("equiDist".equals(snapshotStyle)) {
 			getVehiclePositionsEquil(positions);
 		} else {
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
