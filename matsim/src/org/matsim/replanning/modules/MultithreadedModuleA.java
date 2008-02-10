@@ -20,10 +20,10 @@
 
 package org.matsim.replanning.modules;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
@@ -54,6 +54,8 @@ abstract public class MultithreadedModuleA implements StrategyModuleI {
 
 	private int counter = 0;
 	private int nextCounter = 1;
+
+	static final private Logger log = Logger.getLogger(MultithreadedModuleA.class);
 
 	abstract public PlanAlgorithmI getPlanAlgoInstance();
 
@@ -86,8 +88,7 @@ abstract public class MultithreadedModuleA implements StrategyModuleI {
 	public void finish() {
 		if (this.directAlgo == null) {
 			// only try to start threads if we did not directly work on all the plans
-			System.out.println("#### starting threads for " + this.name + "... " + (new Date()));
-			System.out.println("     total of " + this.counter + " plans need to be handled.");
+			log.info("[" + this.name + "] starting threads, handling " + this.counter + " plans");
 			this.counter = 0;
 
 			// start threads
@@ -103,6 +104,7 @@ abstract public class MultithreadedModuleA implements StrategyModuleI {
 			} catch (InterruptedException e) {
 				Gbl.errorMsg(e);
 			}
+			log.info("[" + this.name + "] all threads finished.");
 		}
 		// reset
 		this.algothreads = null;
@@ -132,10 +134,10 @@ abstract public class MultithreadedModuleA implements StrategyModuleI {
 		}
 	}
 
-	synchronized private void incCounter() {
+	synchronized /*package*/ void incCounter() {
 		this.counter++;
 		if (this.counter == this.nextCounter) {
-			System.out.println(" handled plan # " + this.counter);
+			log.info("[" + this.name + "] handled plan # " + this.counter);
 			this.nextCounter *= 2;
 		}
 	}
