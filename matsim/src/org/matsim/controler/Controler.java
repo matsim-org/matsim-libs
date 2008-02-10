@@ -1021,6 +1021,7 @@ public class Controler {
 			}
 
 			if (event.getIteration() % 10 == 6) {
+				Controler.this.volumes.reset(event.getIteration());
 				Controler.this.events.addHandler(Controler.this.volumes);
 			}
 		}
