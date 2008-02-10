@@ -59,8 +59,6 @@ public class Plans extends BasicPopulation<Person> {
 	private long nextMsg = 1;
 	private boolean isStreaming;
 
-	private long startTime = -1;
-
 	// algorithms over plans
 	private final ArrayList<PlansAlgorithm> plansalgos = new ArrayList<PlansAlgorithm>();
 
@@ -89,9 +87,6 @@ public class Plans extends BasicPopulation<Person> {
 			throw new Exception("Person with id = " + p.getId() + " already exists.");
 		}
 
-		if (this.startTime == -1) {
-			this.startTime = System.currentTimeMillis();
-		}
 		// show counter
 		this.counter++;
 		if (this.counter % this.nextMsg == 0) {
@@ -262,8 +257,7 @@ public class Plans extends BasicPopulation<Person> {
 	}
 
 	public void printPlansCount() {
-		log.info(" person # " + this.counter + " (elapsed time: "
-				+ (System.currentTimeMillis() - this.startTime)/1000 + " sec)");
+		log.info(" person # " + this.counter);
 	}
 
 }
