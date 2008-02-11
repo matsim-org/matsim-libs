@@ -51,14 +51,15 @@ import org.matsim.utils.vis.kml.Style;
 public class ShopsOf2005ToFacilities {
 
 	private static final String HOME_DIR = System.getenv("HOME");
-	private static final String SEP = System.getProperty("file.separator");
+	private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+	private static final String FIELD_DELIM = ";";
 
 	private static final String SANDBOX_NAME = "sandbox00";
 	private static final String SHOPS_CVS_MODULE = "ivt/studies/switzerland/facilities/shopsOf2005";
-	private static final String SHOPS_PATH = HOME_DIR + SEP + SANDBOX_NAME + SEP + SHOPS_CVS_MODULE + SEP;
+	private static final String SHOPS_PATH = HOME_DIR + FILE_SEPARATOR + SANDBOX_NAME + FILE_SEPARATOR + SHOPS_CVS_MODULE + FILE_SEPARATOR;
 	
 	private static String pickPayOpenTimesFilename = SHOPS_PATH + "pickpay_opentimes.txt";
-	private static String pickPayAdressesFilename = SHOPS_PATH + "pickpay_addresses_ge_ready.csv";
+	private static String pickPayAdressesFilename = SHOPS_PATH + "pickpay_addresses.csv";
 	private static String coopZHFilename = SHOPS_PATH + "coop-zh.csv";
 	private static String coopTGFilename = SHOPS_PATH + "coop-tg.csv";
 	private static String migrosZHFilename = SHOPS_PATH + "migros-zh.csv";
@@ -67,7 +68,9 @@ public class ShopsOf2005ToFacilities {
 
 	private static KML myKML = null;
 	private static Document myKMLDocument = null;
-	private static String kmlFilename = "output" + SEP + "shopsOf2005.kmz";
+	private static Folder mainKMLFolder = null;
+	
+	private static String kmlFilename = "output" + FILE_SEPARATOR + "shopsOf2005.kmz";
 
 	private static Style coopStyle = null;
 	private static Style pickpayStyle = null;
@@ -79,6 +82,17 @@ public class ShopsOf2005ToFacilities {
 		myKML = new KML();
 		myKMLDocument = new Document("the root document");
 		myKML.setFeature(myKMLDocument);
+		mainKMLFolder = new Folder(
+				"main shops KML folder", 
+				"Shops of 2005", 
+				"All revealed shops of 2005.", 
+				Feature.DEFAULT_ADDRESS, 
+				Feature.DEFAULT_LOOK_AT, 
+				Feature.DEFAULT_STYLE_URL, 
+				Feature.DEFAULT_VISIBILITY, 
+				Feature.DEFAULT_REGION, 
+				Feature.DEFAULT_TIME_PRIMITIVE);
+		myKMLDocument.addFeature(mainKMLFolder);
 
 	}
 
@@ -128,14 +142,14 @@ public class ShopsOf2005ToFacilities {
 				Feature.DEFAULT_REGION,
 				Feature.DEFAULT_TIME_PRIMITIVE);
 
-		myKMLDocument.addFeature(aFolder);	
+		mainKMLFolder.addFeature(aFolder);	
 		
 		List<String> lines = null;
 		String[] tokens = null;
 
 		try {
 
-			lines = FileUtils.readLines(new File(dennerTGZHFilename), null);
+			lines = FileUtils.readLines(new File(dennerTGZHFilename), "UTF-8");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -157,14 +171,14 @@ public class ShopsOf2005ToFacilities {
 				nextLineIsTheAddressLine = false;
 
 				//System.out.println(line);
-				tokens = line.split(",");
+				tokens = line.split(FIELD_DELIM);
 				street = tokens[9];
 
 				aShop = new Placemark(
-						"denner_" + id,
-						"Denner " + city + " " + street,
-						Feature.DEFAULT_DESCRIPTION,
-						street + ", " + city + ", Schweiz",
+						buildDennerId(city, street),
+						buildDennerId(city, street),
+						buildDennerDescription(city, street),
+						buildAddress(street, "", city),
 						Feature.DEFAULT_LOOK_AT,
 						dennerStyle.getStyleUrl(),
 						Feature.DEFAULT_VISIBILITY,
@@ -180,7 +194,7 @@ public class ShopsOf2005ToFacilities {
 				nextLineIsTheAddressLine = true;
 				
 				//System.out.println(line);
-				tokens = line.split(",");
+				tokens = line.split(FIELD_DELIM);
 				id = tokens[0];
 				city = tokens[9];
 
@@ -191,6 +205,18 @@ public class ShopsOf2005ToFacilities {
 		System.out.println("done.");
 
 	}	
+	
+	private static String buildDennerId(String city, String street) {
+		return "Denner_" + city + "_" + street;
+	}
+	
+	private static String buildDennerDescription(String city, String street) {
+		return "Denner " + city + " " + street;
+	}
+	
+	private static String buildAddress(String street, String postcode, String city) {
+		return street + ", " + postcode + " " + city + ", Schweiz";
+	}
 	
 	private static void coopZHAddressesToKML() {
 
@@ -210,7 +236,7 @@ public class ShopsOf2005ToFacilities {
 				Feature.DEFAULT_REGION,
 				Feature.DEFAULT_TIME_PRIMITIVE);
 
-		myKMLDocument.addFeature(coopFolder);	
+		mainKMLFolder.addFeature(coopFolder);	
 
 		List<String> lines = null;
 		String[] tokens = null;
@@ -218,7 +244,7 @@ public class ShopsOf2005ToFacilities {
 
 		try {
 
-			lines = FileUtils.readLines(new File(coopZHFilename), null);
+			lines = FileUtils.readLines(new File(coopZHFilename), "UTF-8");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -227,8 +253,13 @@ public class ShopsOf2005ToFacilities {
 		for (String line : lines) {
 
 			//System.out.println(line);
-			tokens = line.split(",");
+			tokens = line.split(FIELD_DELIM);
 
+			// ignore header line
+			if (tokens[0].equals("OB")) {
+				continue;
+			}
+			
 			VSTTyp = tokens[7];
 			if (
 					VSTTyp.equals("CC") || 
@@ -237,10 +268,10 @@ public class ShopsOf2005ToFacilities {
 					VSTTyp.equals("M")) {
 
 				aCoop = new Placemark(
-						"coop_" + VSTTyp + "_" + tokens[8],
-						"Coop " + VSTTyp + " " + tokens[8],
-						Feature.DEFAULT_DESCRIPTION,
-						tokens[9] + ", " + tokens[11] + ", Schweiz",
+						buildCoopZHId(tokens),
+						buildCoopZHId(tokens),
+						buildCoopZHDescription(tokens),
+						buildAddress(tokens[42], tokens[43], tokens[44]),
 						Feature.DEFAULT_LOOK_AT,
 						coopStyle.getStyleUrl(),
 						Feature.DEFAULT_VISIBILITY,
@@ -257,6 +288,20 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
+	private static String buildCoopZHId(String[] tokens) {
+		String VSTTyp = tokens[7];
+		String name = tokens[8];
+		
+		return "coop_" + VSTTyp + "_" + name;
+	}
+	
+	private static String buildCoopZHDescription(String[] tokens) {
+		String VSTTyp = tokens[7];
+		String name = tokens[8];
+		
+		return "Coop " + VSTTyp + " " + name;
+	}
+	
 	private static void coopTGAddressesToKML() {
 
 		System.out.print("Setting up Coop Thurgau shops...");
@@ -275,14 +320,14 @@ public class ShopsOf2005ToFacilities {
 				Feature.DEFAULT_REGION,
 				Feature.DEFAULT_TIME_PRIMITIVE);
 
-		myKMLDocument.addFeature(coopFolder);	
+		mainKMLFolder.addFeature(coopFolder);	
 
 		List<String> lines = null;
 		String[] tokens = null;
 
 		try {
 
-			lines = FileUtils.readLines(new File(coopTGFilename), null);
+			lines = FileUtils.readLines(new File(coopTGFilename), "UTF-8");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -291,13 +336,18 @@ public class ShopsOf2005ToFacilities {
 		for (String line : lines) {
 
 			//System.out.println(line);
-			tokens = line.split(",");
+			tokens = line.split(FIELD_DELIM);
 
+			// ignore header line
+			if (tokens[0].equals("Verkaufsstelle")) {
+				continue;
+			}
+			
 			aCoop = new Placemark(
-					"coop_" + tokens[0],
-					"Coop " + tokens[0],
-					Feature.DEFAULT_DESCRIPTION,
-					tokens[1] + ", " + tokens[2] + ", Schweiz",
+					buildCoopTGId(tokens),
+					buildCoopTGId(tokens),
+					buildCoopTGDescription(tokens),
+					buildAddress(tokens[1], "", tokens[2]),
 					Feature.DEFAULT_LOOK_AT,
 					coopStyle.getStyleUrl(),
 					Feature.DEFAULT_VISIBILITY,
@@ -312,6 +362,19 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
+	private static String buildCoopTGId(String[] tokens) {
+		String name = tokens[0];
+		
+		return "coop_" + name;
+	}
+	
+	private static String buildCoopTGDescription(String[] tokens) {
+		String name = tokens[0];
+		
+		return "Coop " + name;
+	}
+	
+	
 	private static void pickPayAddressesToKML() {
 
 		Folder pickpayFolder = null;
@@ -328,14 +391,14 @@ public class ShopsOf2005ToFacilities {
 				Feature.DEFAULT_REGION,
 				Feature.DEFAULT_TIME_PRIMITIVE);
 
-		myKMLDocument.addFeature(pickpayFolder);
+		mainKMLFolder.addFeature(pickpayFolder);
 
 		List<String> lines = null;
 		String[] tokens = null;
 
 		try {
 
-			lines = FileUtils.readLines(new File(pickPayAdressesFilename), null);
+			lines = FileUtils.readLines(new File(pickPayAdressesFilename), "UTF-8");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -344,13 +407,18 @@ public class ShopsOf2005ToFacilities {
 		for (String line : lines) {
 
 //			System.out.println(line);
-			tokens = line.split(",");
+			tokens = line.split(FIELD_DELIM);
 
+			// ignore header line
+			if (tokens[0].equals("Filialnummer")) {
+				continue;
+			}
+			
 			aPickpay = new Placemark(
-					"pickpay_" + tokens[0],
-					"Pickpay " + tokens[1],
-					Feature.DEFAULT_DESCRIPTION,
-					tokens[2] + ", " + tokens[5] + ", Schweiz",
+					buildPickpayId(tokens),
+					buildPickpayId(tokens),
+					buildPickpayDescription(tokens),
+					buildAddress(tokens[2], tokens[4], tokens[5]),
 					Feature.DEFAULT_LOOK_AT,
 					pickpayStyle.getStyleUrl(),
 					Feature.DEFAULT_VISIBILITY,
@@ -365,6 +433,18 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
+	private static String buildPickpayId(String[] tokens) {
+		String number = tokens[0];
+		
+		return "pickpay_" + number;
+	}
+	
+	private static String buildPickpayDescription(String[] tokens) {
+		String name = tokens[1];
+		
+		return "Pickpay " + name;
+	}
+	
 	private static void migrosZHAdressesToKML() {
 		
 		System.out.print("Setting up Migros ZH shops...");
@@ -383,14 +463,14 @@ public class ShopsOf2005ToFacilities {
 				Feature.DEFAULT_REGION,
 				Feature.DEFAULT_TIME_PRIMITIVE);
 
-		myKMLDocument.addFeature(migrosZHFolder);
+		mainKMLFolder.addFeature(migrosZHFolder);
 
 		List<String> lines = null;
 		String[] tokens = null;
 
 		try {
 
-			lines = FileUtils.readLines(new File(migrosZHFilename), null);
+			lines = FileUtils.readLines(new File(migrosZHFilename), "UTF-8");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -399,13 +479,18 @@ public class ShopsOf2005ToFacilities {
 		for (String line : lines) {
 
 			//System.out.println(line);
-			tokens = line.split(",");
+			tokens = line.split(FIELD_DELIM);
 
+			// ignore header line
+			if (tokens[0].equals("KST")) {
+				continue;
+			}
+			
 			aMigrosZH = new Placemark(
-					"migrosZH_" + tokens[1],
-					"Migros " + tokens[1],
-					Feature.DEFAULT_DESCRIPTION,
-					tokens[2] + ", " + tokens[3] + ", Schweiz",
+					buildMigrosZHId(tokens),
+					buildMigrosZHId(tokens),
+					buildMigrosZHDescription(tokens),
+					buildAddress(tokens[2], "", tokens[3]),
 					Feature.DEFAULT_LOOK_AT,
 					migrosStyle.getStyleUrl(),
 					Feature.DEFAULT_VISIBILITY,
@@ -418,6 +503,18 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("done.");
 
+	}
+	
+	private static String buildMigrosZHId(String[] tokens) {
+		String name = tokens[1];
+		
+		return "migrosZH_" + name;
+	}
+	
+	private static String buildMigrosZHDescription(String[] tokens) {
+		String name = tokens[1];
+		
+		return "Migros (ZH) " + name;
 	}
 	
 	private static void migrosOstschweizAdressesToKML() {
@@ -438,14 +535,14 @@ public class ShopsOf2005ToFacilities {
 				Feature.DEFAULT_REGION,
 				Feature.DEFAULT_TIME_PRIMITIVE);
 
-		myKMLDocument.addFeature(migrosOstschweizFolder);
+		mainKMLFolder.addFeature(migrosOstschweizFolder);
 
 		List<String> lines = null;
 		String[] tokens = null;
 
 		try {
 
-			lines = FileUtils.readLines(new File(migrosOstschweizFilename), null);
+			lines = FileUtils.readLines(new File(migrosOstschweizFilename), "UTF-8");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -454,13 +551,18 @@ public class ShopsOf2005ToFacilities {
 		for (String line : lines) {
 
 			//System.out.println(line);
-			tokens = line.split(",");
+			tokens = line.split(FIELD_DELIM);
 
+			// ignore header line
+			if (tokens[0].equals("VST-Typ")) {
+				continue;
+			}
+			
 			aMigrosOstschweiz = new Placemark(
-					"migrosOstschweiz_" + tokens[1],
-					tokens[0] + " " + tokens[1],
-					Feature.DEFAULT_DESCRIPTION,
-					tokens[5] + ", " + tokens[6] + ", Schweiz",
+					buildMigrosOstschweizId(tokens),
+					buildMigrosOstschweizId(tokens),
+					buildMigrosOstschweizDescription(tokens),
+					buildAddress(tokens[7].trim(), "", tokens[8].trim()),
 					Feature.DEFAULT_LOOK_AT,
 					migrosStyle.getStyleUrl(),
 					Feature.DEFAULT_VISIBILITY,
@@ -476,6 +578,18 @@ public class ShopsOf2005ToFacilities {
 		
 	}
 
+	private static String buildMigrosOstschweizId(String[] tokens) {
+		String name = tokens[1].trim();
+		
+		return "migrosOstschweiz_" + name;
+	}
+	
+	private static String buildMigrosOstschweizDescription(String[] tokens) {
+		String name = tokens[1].trim();
+		
+		return "Migros (Ostschweiz) " + name;
+	}
+	
 	private static void readPickPayOpenTimes() {
 
 		boolean nextLineIsACloseLine = false;
@@ -545,6 +659,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void prepareRawDataForGeocoding() {
 		
+
 		ShopsOf2005ToFacilities.setUp();
 		ShopsOf2005ToFacilities.setupStyles();
 		ShopsOf2005ToFacilities.dennerTGZHAddressesToKML();
