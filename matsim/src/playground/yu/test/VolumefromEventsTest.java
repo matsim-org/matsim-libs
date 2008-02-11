@@ -43,7 +43,7 @@ public class VolumefromEventsTest {
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		// final String plansFilename = "./examples/equil/plans100.xml";
-		final String eventsFilename = "./test/yu/test/input/17.events.txt.gz";
+		final String eventsFilename = "./test/yu/test/input/20.events.txt.gz";
 		@SuppressWarnings("unused")
 		Config config = Gbl
 				.createConfig(new String[] { "./test/yu/test/configTest.xml" });
@@ -77,7 +77,7 @@ public class VolumefromEventsTest {
 		Map<IdI, QueueLink> links = (Map<IdI, QueueLink>) network.getLinks();
 		try {
 			BufferedWriter out = IOUtils
-					.getBufferedWriter("./test/yu/test/output/17.volumeTest.txt.gz");
+					.getBufferedWriter("./test/yu/test/output/20.volumeTest.txt.gz");
 			out
 					.write("linkId\tCapacity\tSimulationFlowCapacity\tH6-7\tH7-8\tH8-9\n");
 			out.flush();
