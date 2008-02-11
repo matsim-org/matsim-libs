@@ -39,7 +39,7 @@ public class PtCheck extends PersonAlgorithm {
 	 * Counter of all read persons
 	 */
 	private int personCnt;
-
+	private int carUserCnt;
 	/**
 	 * Counter of all persons, who use public transport
 	 */
@@ -60,10 +60,11 @@ public class PtCheck extends PersonAlgorithm {
 	public PtCheck(String fileName) throws IOException {
 		out = IOUtils.getBufferedWriter(fileName);
 		System.out.println("  begins to write txt-file about pt-rate");
-		out.write("Iter\tPtRate\tPtUser\n");
+		out.write("Iter\tPersons\tPtRate\tPtUser\tCarUser\n");
 		out.flush();
 		personCnt = 0;
 		ptUserCnt = 0;
+		carUserCnt=0;
 	}
 
 	@Override
@@ -73,6 +74,8 @@ public class PtCheck extends PersonAlgorithm {
 		if (planType != null) {
 			if (planType.equals("pt")) {
 				ptUserCnt++;
+			}else if(planType.equals("car")){
+				carUserCnt++;
 			}
 		}
 	}
@@ -124,9 +127,7 @@ public class PtCheck extends PersonAlgorithm {
 	 * @throws IOException
 	 */
 	public void write(int Iter) throws IOException {
-		double ptRate = getPtRate();
-		double ptUserCnt = getPtUserCnt();
-		out.write(Iter + "\t" + ptRate + "\t" + ptUserCnt + "\n");
+		out.write(Iter + "\t" +personCnt+"\t"+ getPtRate() + "\t" + getPtUserCnt() + "\t"+carUserCnt+"\n");
 		// System.out.println("There are " + ptRate * 100
 		// + "% persons who use Public Transportation! " + ptUserCnt + "/"
 		// + getPersonCnt());

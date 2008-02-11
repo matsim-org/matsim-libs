@@ -43,7 +43,7 @@ public class VolumefromEventsTest {
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		// final String plansFilename = "./examples/equil/plans100.xml";
-		final String eventsFilename = "./test/yu/test/input/20.events.txt.gz";
+		final String eventsFilename = "./test/yu/test/input/100.eventsZuerich10pctCarPt.txt.gz";
 		@SuppressWarnings("unused")
 		Config config = Gbl
 				.createConfig(new String[] { "./test/yu/test/configTest.xml" });
@@ -77,20 +77,32 @@ public class VolumefromEventsTest {
 		Map<IdI, QueueLink> links = (Map<IdI, QueueLink>) network.getLinks();
 		try {
 			BufferedWriter out = IOUtils
-					.getBufferedWriter("./test/yu/test/output/20.volumeTest.txt.gz");
-			out
-					.write("linkId\tCapacity\tSimulationFlowCapacity\tH6-7\tH7-8\tH8-9\n");
+					.getBufferedWriter("./test/yu/test/output/100.eventsZuerich10pctCarPtVolumeTest.txt.gz");
+			StringBuffer head = new StringBuffer(
+					"linkId\tCapacity\tSimulationFlowCapacity");
+			for (int i = 0; i < 24; i++) {
+				head.append("\tH" + Integer.toString(i) + "-"
+						+ Integer.toString(i + 1));
+			}
+			head.append("\n");
+			out.write(head.toString());
 			out.flush();
 			for (QueueLink ql : links.values()) {
 				int[] v = volumes.getVolumesForLink(ql.getId().toString());
-				out.write(ql.getId().toString()
-						+ "\t"
-						+ ql.getCapacity()
-						+ "\t"
-						+ ql.getSimulatedFlowCapacity()
-						+ "\t"
-						+ ((v != null) ? (v[6] + "\t" + v[7] + "\t" + v[8])
-								: ("-1\t-1\t-1")) + "\n");
+				StringBuffer line = new StringBuffer(ql.getId().toString()
+						+ "\t" + ql.getCapacity() + "\t"
+						+ ql.getSimulatedFlowCapacity());
+				if (v != null) {
+					for (int j = 0; j < 24; j++) {
+						line.append("\t" + v[j]);
+					}
+				} else {
+					for (int k = 0; k < 24; k++) {
+						line.append("\t" + 0);
+					}
+				}
+				line.append("\n");
+				out.write(line.toString());
 				out.flush();
 			}
 			out.close();
