@@ -20,15 +20,20 @@
 
 package playground.gregor.postprocess;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.world.World;
+
+import playground.gregor.postprocess.processors.PostProcessorI;
+import playground.gregor.postprocess.processors.TimeDependentColorizer;
 
 
 public class TransimsSnapshotFilePostProcessor {
@@ -41,7 +46,7 @@ public class TransimsSnapshotFilePostProcessor {
 
 	private Plans plans;
 	
-	
+	private List<PostProcessorI> processors;
 	
 	public TransimsSnapshotFilePostProcessor(Plans plans, final String tVehFile){
 		this.plans = plans;
@@ -50,6 +55,9 @@ public class TransimsSnapshotFilePostProcessor {
 		String outfile = "./output/colorizedT.veh.txt"; 
 		this.writer = new TransimsSnapshotFileWriter(outfile);
 		
+		this.processors = new ArrayList<PostProcessorI>();
+		addProcessor(new TimeDependentColorizer(this.plans));
+		
 	}
 	
 	public void run(){
@@ -57,7 +65,12 @@ public class TransimsSnapshotFilePostProcessor {
 		this.writer.writeLine(this.reader.readLine()); // first line should be the header
 		String [] line = this.reader.readLine();
 		while (line != null){
-			line = processLine(line);
+			
+			for (PostProcessorI processor : this.processors){
+				line = processor.processEvent(line);
+			}
+			
+			
 			this.writer.writeLine(line);
 			line = this.reader.readLine();
 		}
@@ -66,13 +79,12 @@ public class TransimsSnapshotFilePostProcessor {
 		
 	}
 
-	private String[] processLine(String[] line) {
-		String id = line[0];
-		int time =  (int) (-60 * this.plans.getPerson(id).getSelectedPlan().getScore() / 6);
-		line[7] = Integer.toString(time);
-		return line;
-	}
 
+	public void addProcessor(PostProcessorI processor){
+		this.processors.add(processor);
+	}
+	
+	
 	public static void main(String [] args){
 		
 
