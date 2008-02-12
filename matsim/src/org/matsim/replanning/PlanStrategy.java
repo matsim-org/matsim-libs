@@ -22,6 +22,7 @@ package org.matsim.replanning;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.replanning.modules.StrategyModuleI;
@@ -39,6 +40,8 @@ public class PlanStrategy {
 	private StrategyModuleI firstModule = null;
 	private final ArrayList<StrategyModuleI> modules = new ArrayList<StrategyModuleI>();
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
+	private long counter = 0;
+	private final static Logger log = Logger.getLogger(PlanStrategy.class);
 
 	/**
 	 * Creates a new strategy using the specified planSelector.
@@ -69,9 +72,10 @@ public class PlanStrategy {
 	 * plan is selected if the person has such a plan ("optimistic behavior").
 	 *
 	 * @param person
-	 * @see #finish
+	 * @see #finish()
 	 */
 	public void run(final Person person) {
+		this.counter++;
 		Plan plan = person.getRandomUnscoredPlan();
 		if (plan == null) {
 			plan = this.planSelector.selectPlan(person);
@@ -99,7 +103,7 @@ public class PlanStrategy {
 	 * Indicates that no additional persons will be handed to this module and
 	 * waits until this strategy has finished handling all persons.
 	 *
-	 * @see #run
+	 * @see #run()
 	 */
 	public void finish() {
 		if (this.firstModule != null) {
@@ -115,6 +119,28 @@ public class PlanStrategy {
 			}
 		}
 		this.plans.clear();
+		log.info("Plan-Strategy finished, " + this.counter + " plans handled. Strategy: " + this.toString());
+		this.counter = 0;
+	}
+
+	/** Returns a descriptive name for this strategy, based on the class names on the used
+	 * {@link PlanSelectorI plan selector} and {@link StrategyModuleI strategy modules}.
+	 *
+	 * @return An automatically generated name for this strategy.
+	 */
+	@Override
+	public String toString() {
+		StringBuffer name = new StringBuffer(20);
+		name.append(this.planSelector.getClass().getSimpleName());
+		if (this.firstModule != null) {
+			name.append('_');
+			name.append(this.firstModule.getClass().getSimpleName());
+			for (StrategyModuleI module : this.modules) {
+				name.append('_');
+				name.append(module.getClass().getSimpleName());
+			}
+		}
+		return name.toString();
 	}
 
 }
