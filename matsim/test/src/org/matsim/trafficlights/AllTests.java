@@ -33,8 +33,7 @@ public class AllTests {
 
 		TestSuite suite = new TestSuite("Test for org.matsim.trafficlights");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(SignalGroupDefinitionTest.class);
-
+		suite.addTest(org.matsim.trafficlights.data.AllTests.suite());
 		//$JUnit-END$
 		return suite;
 	}
