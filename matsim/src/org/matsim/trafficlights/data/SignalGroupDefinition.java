@@ -17,11 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.trafficlights;
+package org.matsim.trafficlights.data;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
+import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.identifiers.IdI;
 
 
@@ -34,23 +36,23 @@ import org.matsim.utils.identifiers.IdI;
 public class SignalGroupDefinition {
 
 	private IdI id;
-	private IdI fromLinkId;
-	private List<IdI> toLinkIds;
+	private Tuple<IdI, Integer> fromLinkId;
+	private Map<IdI, Integer> toLinkIdLanesMap;
 	private int passingClearingTime;
 	private boolean turnIfRed;
 
 
 	public SignalGroupDefinition(IdI id) {
 		this.id = id;
-		this.toLinkIds = new LinkedList<IdI>();
+		this.toLinkIdLanesMap = new HashMap<IdI, Integer>();
 	}
 
-	public void setFromLink(IdI id) {
-		this.fromLinkId = id;
+	public void setFromLink(IdI id, Integer lanes) {
+		this.fromLinkId = new Tuple<IdI, Integer>(id, lanes);
 	}
 
-	public void addToLink(IdI id) {
-		this.toLinkIds.add(id);
+	public void addToLink(IdI id, Integer lanes) {
+		this.toLinkIdLanesMap.put(id, lanes);
 	}
 
 	public void setPassingClearingTime(int timeSec) {
@@ -74,15 +76,23 @@ public class SignalGroupDefinition {
 	 * @return the fromLinkId
 	 */
 	public IdI getFromLinkId() {
-		return this.fromLinkId;
+		return this.fromLinkId.getFirst();
+	}
+
+	public Integer getFromLinkLaneNumber() {
+		return this.fromLinkId.getSecond();
 	}
 
 
 	/**
 	 * @return the toLinkIds
 	 */
-	public List<IdI> getToLinkIds() {
-		return this.toLinkIds;
+	public Set<IdI> getToLinkIds() {
+		return this.toLinkIdLanesMap.keySet();
+	}
+
+	public Integer getToLinkLaneNumber(IdI toLinkId) {
+		return this.toLinkIdLanesMap.get(toLinkId);
 	}
 
 

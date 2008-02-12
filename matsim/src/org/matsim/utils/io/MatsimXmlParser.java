@@ -58,6 +58,11 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	private boolean isNamespaceAware = true;
 
 	private String doctype = null;
+	/**
+	 * As the mechanism implemented in InputSource is not really working for error handling
+	 * the source to be parsed is stored here for error handling.
+	 */
+	private String source;
 
 	/**
 	 * Creates a validating XML-parser.
@@ -123,10 +128,12 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 * @throws IOException
 	 */
 	public void parse(final String filename) throws SAXException, ParserConfigurationException, IOException {
+		this.source = filename;
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));
 	}
 
 	public void parse(final URL url) throws SAXException, ParserConfigurationException, IOException {
+		this.source = url.toString();
 		parse(new InputSource(url.toExternalForm()));
 	}
 
@@ -237,22 +244,33 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		if (this.context.isEmpty()) {
 			System.err.println("Missing DOCTYPE.");
 		}
-		System.err.println("XML-ERROR: " + ex.getSystemId() + ", line " + ex.getLineNumber() + ", column " + ex.getColumnNumber() + ":");
+		System.err.println("XML-ERROR: " + getInputSource(ex) + ", line " + ex.getLineNumber() + ", column " + ex.getColumnNumber() + ":");
 		System.err.println(ex.toString());
 		throw ex;
 	}
 
 	@Override
 	public void fatalError(final SAXParseException ex) throws SAXException {
-		System.err.println("XML-FATAL: " + ex.getSystemId() + ", line " + ex.getLineNumber() + ", column " + ex.getColumnNumber() + ":");
+		System.err.println("XML-FATAL: " + getInputSource(ex) + ", line " + ex.getLineNumber() + ", column " + ex.getColumnNumber() + ":");
 		System.err.println(ex.toString());
 		throw ex;
 	}
 
 	@Override
 	public void warning(final SAXParseException ex) throws SAXException {
-		System.err.println("XML-WARNING: " + ex.getSystemId() + ", line " + ex.getLineNumber() + ", column " + ex.getColumnNumber() + ":");
+		System.err.println("XML-WARNING: " + getInputSource(ex) + ", line " + ex.getLineNumber() + ", column " + ex.getColumnNumber() + ":");
 		System.err.println(ex.getMessage());
+	}
+
+	private String getInputSource(SAXParseException ex) {
+		if (ex.getSystemId() != null) {
+			return ex.getSystemId();
+		}
+		else if (ex.getPublicId() != null) {
+			return ex.getPublicId();
+		}
+		//try to use the locally stored inputSource
+		return this.source;
 	}
 
 }

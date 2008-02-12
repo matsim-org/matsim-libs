@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.trafficlights;
+package org.matsim.trafficlights.data;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -27,6 +27,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.trafficlights.data.SignalGroupDefinition;
+import org.matsim.trafficlights.data.SignalGroupDefinitionParser;
+import org.matsim.utils.identifiers.IdI;
 import org.xml.sax.SAXException;
 
 
@@ -37,7 +40,7 @@ import org.xml.sax.SAXException;
  */
 public class SignalGroupDefinitionTest extends MatsimTestCase {
 
-  private static final String TESTXML  = "signalGroupDefinition.xml";
+  private static final String TESTXML  = "testSignalGroupDefinition.xml";
 
 	/**
 	 * @see junit.framework.TestCase#setUp()
@@ -52,23 +55,31 @@ public class SignalGroupDefinitionTest extends MatsimTestCase {
 		List<SignalGroupDefinition> signalGroups = new LinkedList<SignalGroupDefinition>();
 		SignalGroupDefinitionParser parser = new SignalGroupDefinitionParser(signalGroups);
 		try {
-			parser.parse(this.getClassInputDirectory() + TESTXML);
+			parser.parse(this.getPackageInputDirectory() + TESTXML);
 			assertEquals(2, signalGroups.size());
 			SignalGroupDefinition current = signalGroups.get(0);
 			assertEquals(0, current.getId().compareTo(new Id("123")));
 			assertEquals(0, current.getFromLinkId().compareTo(new Id("23")));
+			assertEquals(Integer.valueOf(3), current.getFromLinkLaneNumber());
 			assertEquals(2, current.getToLinkIds().size());
-			assertEquals(0, current.getToLinkIds().get(1).compareTo(new Id("25")));
+			assertTrue(current.getToLinkIds().contains(new Id("25")));
 			assertEquals(false, current.isTurnIfRed());
 			assertEquals(2, current.getPassingClearingTime());
+			assertEquals(Integer.valueOf(2), current.getToLinkLaneNumber(new Id("24")));
+			assertEquals(Integer.valueOf(1), current.getToLinkLaneNumber(new Id("25")));
+
 
 			current = signalGroups.get(1);
 			assertEquals(0, current.getId().compareTo(new Id("124")));
 			assertEquals(0, current.getFromLinkId().compareTo(new Id("26")));
 			assertEquals(2, current.getToLinkIds().size());
-			assertEquals(0, current.getToLinkIds().get(0).compareTo(new Id("27")));
+			assertTrue(current.getToLinkIds().contains(new Id("27")));
 			assertEquals(true, current.isTurnIfRed());
 			assertEquals(15, current.getPassingClearingTime());
+			assertEquals(Integer.valueOf(1), current.getFromLinkLaneNumber());
+			for (IdI i : current.getToLinkIds()) {
+				assertEquals(new Integer(1), current.getToLinkLaneNumber(i));
+			}
 
 		} catch (SAXException e) {
 			e.printStackTrace();

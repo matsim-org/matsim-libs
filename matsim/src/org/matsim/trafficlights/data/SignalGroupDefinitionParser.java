@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.trafficlights;
+package org.matsim.trafficlights.data;
 
 import java.util.List;
 import java.util.Stack;
@@ -49,6 +49,8 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 	private static final String ID = "id";
 
 	private static final String REFID = "refId";
+
+	private static final String LANES = "lanes";
 
 	private List<SignalGroupDefinition> signalGroups;
 
@@ -88,10 +90,10 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 			this.currentSignalGroup = new SignalGroupDefinition(new Id(atts.getValue(ID)));
 		}
 		else if (FROMLINK.equalsIgnoreCase(name)) {
-			this.currentSignalGroup.setFromLink(new Id(atts.getValue(REFID)));
+			this.currentSignalGroup.setFromLink(new Id(atts.getValue(REFID)), Integer.parseInt(atts.getValue(LANES)));
 		}
 		else if (TOLINK.equalsIgnoreCase(name)) {
-			this.currentSignalGroup.addToLink(new Id(atts.getValue(REFID)));
+			this.currentSignalGroup.addToLink(new Id(atts.getValue(REFID)), Integer.parseInt(atts.getValue(LANES)));
 		}
 
 

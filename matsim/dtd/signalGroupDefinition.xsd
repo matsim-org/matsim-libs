@@ -26,9 +26,8 @@ the simulation -->
   <xs:complexContent>
 		<xs:extension base="matsimObjectType">
 		<xs:sequence>
-			<xs:element name="fromLink" type="idRefType" minOccurs="1" maxOccurs="1" />
-			<xs:element name="toLink" type="idRefType" minOccurs="1" maxOccurs="unbounded">
-			</xs:element>
+			<xs:element name="fromLink" type="signalLinkType" minOccurs="1" maxOccurs="1" />
+			<xs:element name="toLink" type="signalLinkType" minOccurs="1" maxOccurs="unbounded" />
 			<!-- optional elements -->
 			<xs:element name="turnIfRed" type="xs:boolean" default="false" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="passingClearingTime" type="xs:nonNegativeInteger" default="0" minOccurs="0" maxOccurs="1">
@@ -49,7 +48,16 @@ the simulation -->
   </xs:complexContent>
 </xs:complexType>
 
-
-
+<xs:complexType name="signalLinkType">
+	<xs:annotation>
+		<xs:documentation>Type extending an id reference to a Link by an attribute
+		specifying the number of lanes.</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+		<xs:extension base="idRefType">
+		<xs:attribute name="lanes" type="xs:positiveInteger" default="1" />
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
 
 </xs:schema>

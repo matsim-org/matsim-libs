@@ -11,7 +11,7 @@ the simulation -->
 
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 
-<xs:element name="signalSystemConfiguration">
+<xs:element name="signalSystemConfig">
   <xs:complexType>
     <xs:annotation>
       <xs:documentation>
@@ -19,12 +19,12 @@ the simulation -->
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
- 		  <xs:element name="signalSystem" type="signalSystemType" minOccurs="0" maxOccurs="unbounded" />
+ 		  <xs:element name="signalSystemConfiguration" type="signalSystemConfigurationType" minOccurs="0" maxOccurs="unbounded" />
  		</xs:sequence>
   </xs:complexType>
 </xs:element>
 
-<xs:complexType name="signalSystemType">
+<xs:complexType name="signalSystemConfigurationType">
   <xs:annotation>
     <xs:documentation>
     This type is used to configure the signal groups, i.e. which signal groups are controlled together. Furthermore
@@ -35,7 +35,7 @@ the simulation -->
   <xs:complexContent>
     <xs:extension base="matsimObjectType">
 		<xs:sequence>
-			<xs:element name="signalSystemControler" type="signalSystemControlerType" minOccurs="1" maxOccurs="1">
+			<xs:element name="signalSystemControlInfo" type="signalSystemControlInfoType" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
 				 	<xs:documentation>Each system may have a different control strategy. See also comments for the type
 				 	definition.</xs:documentation>
@@ -46,7 +46,7 @@ the simulation -->
   </xs:complexContent>
 </xs:complexType>
 
-<xs:complexType name="signalSystemControlerType" abstract="true">
+<xs:complexType name="signalSystemControlInfoType" abstract="true">
   <xs:annotation>
     <xs:documentation>
     This type or more precisely its subtypes define how a signal group system is controlled. Control can be adaptive, plan based or both.
@@ -54,24 +54,13 @@ the simulation -->
     xml-files.
     </xs:documentation>
   </xs:annotation>
-  <xs:attribute name="controlStrategy" type="controlStrategyType" use="required />
-  <xs:sequence>
-  </xs:sequence>
 </xs:complexType>
 
-<xs:simpleType name="controlStrategyType">
-	<xs:restriction base="xs:string">
-		<xs:enumeration value="planbased" />
-		<xs:enumeration value="adaptive" />
-		<xs:enumeration value="mixed" />
-	</xs:restriction>
-</xs:simpleType>
 
 
-
-<xs:complexType name="planbasedSignalSystemControlerType">
+<xs:complexType name="planbasedSignalSystemControlInfoType">
   <xs:complexContent>
-		<xs:extension base="signalSystemControlerType">
+		<xs:extension base="signalSystemControlInfoType">
 			<xs:sequence>
 				<xs:element name="signalSystemPlan" type="signalSystemPlanType" minOccurs="0" maxOccurs="unbounded">
 					<xs:annotation>
@@ -88,13 +77,13 @@ the simulation -->
 </xs:complexType>
 
 
-<xs:complexType name="adaptiveSignalSystemControlerType">
+<xs:complexType name="adaptiveSignalSystemControlInfoType">
 	<xs:annotation>
 		<xs:documentation>If there is an adaptive control mechanism implemented its id or name
 		can be set in the element of this type.</xs:documentation>
 	</xs:annotation>
   <xs:complexContent>
-		<xs:extension base="signalSystemControlerType">
+		<xs:extension base="signalSystemControlInfoType">
 			<xs:sequence>
 				<xs:element name="adaptiveControler" type="xs:string" minOccurs="0" maxOccurs="1"/>
 				<xs:element name="signalGroup" type="idRefType" minOccurs="1" maxOccurs="unbounded">
@@ -112,14 +101,14 @@ the simulation -->
 
 
 
-<xs:complexType name="adaptivePlanbasedSignalSystemControlerType">
+<xs:complexType name="adaptivePlanbasedSignalSystemControlInfoType">
 	<xs:annotation>
 		<xs:documentation>If there is an adaptive control mechanism implemented its id or name
 		can be set in the element of this type. For plan based adaptive control strategies
 		one or more plans can be added as well.</xs:documentation>
 	</xs:annotation>
   <xs:complexContent>
-		<xs:extension base="adaptiveSignalSystemControlerType">
+		<xs:extension base="adaptiveSignalSystemControlInfoType">
 			<xs:sequence>
 				<xs:element name="signalSystemPlan" type="signalSystemPlanType" minOccurs="0" maxOccurs="unbounded">
 					<xs:annotation>
@@ -208,7 +197,7 @@ the simulation -->
 
 <xs:complexType name="signalGroupSettingsType">
 	<xs:complexContent>
-		<xs:extension base="matsimObjectType" >
+		<xs:extension base="idRefType" >
 			<xs:sequence>
 				<xs:element name="roughcast" minOccurs="1" maxOccurs="1" >
 					<xs:annotation>

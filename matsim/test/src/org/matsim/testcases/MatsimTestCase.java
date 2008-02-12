@@ -43,13 +43,20 @@ public class MatsimTestCase extends TestCase {
 	 * used by several test methods of a testcase they have to be stored in this directory.
 	 */
 	private String classInputDirectory;
+	/**
+	 * The input directory two levels above the default input directory. If files are used
+	 * by several test classes of a package they have to be stored in this directory.
+	 */
+	private String packageInputDirectory;
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
 		this.outputDirectory = "test/output/" + this.getClass().getCanonicalName().replace('.', '/') + "/" + getName() + "/";
-		this.classInputDirectory = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/";
+		this.classInputDirectory = "test/input/" + this.getClass().getCanonicalName().replace('.', '/');
+		this.packageInputDirectory = this.classInputDirectory.substring(0, this.classInputDirectory.lastIndexOf("/") + 1);
+		this.classInputDirectory = this.classInputDirectory + "/";
 		this.inputDirectory = this.classInputDirectory + getName() + "/";
 
 		createOutputDirectory();
@@ -100,9 +107,21 @@ public class MatsimTestCase extends TestCase {
 	public String getInputDirectory() {
 		return this.inputDirectory;
 	}
-
+	/**
+	 * Returns the path to the input directory one level above the default input directory for this test including a trailing slash as directory delimiter.
+	 *
+	 * @return path to the input directory for this test
+	 */
 	public String getClassInputDirectory() {
 		return this.classInputDirectory;
+	}
+	/**
+	 * Returns the path to the input directory two levels above the default input directory for this test including a trailing slash as directory delimiter.
+	 *
+	 * @return path to the input directory for this test
+	 */
+	public String getPackageInputDirectory() {
+		return this.packageInputDirectory;
 	}
 
 }
