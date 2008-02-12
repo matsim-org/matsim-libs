@@ -22,6 +22,8 @@ package playground.balmermi;
 
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsWriter;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
@@ -78,6 +80,9 @@ public abstract class Scenario {
 		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
+		
+		config.counts().setCountsFileName(input_directory + "counts.xml");
+		config.counts().setOutputFile(output_directory + "output_plans.xml.gz");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -116,6 +121,13 @@ public abstract class Scenario {
 		System.out.println("  writing network xml file... ");
 		NetworkWriter network_writer = new NetworkWriter(network);
 		network_writer.write();
+		System.out.println("  done.");
+	}
+	
+	public static final void writeCounts() {
+		System.out.println("  writing counts xml file... ");
+		CountsWriter counts_writer = new CountsWriter(Counts.getSingleton());
+		counts_writer.write();
 		System.out.println("  done.");
 	}
 
