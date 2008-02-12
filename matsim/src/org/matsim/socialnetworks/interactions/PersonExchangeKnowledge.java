@@ -61,7 +61,8 @@ public class PersonExchangeKnowledge {
 	if(act2List.size()>=1){
 		Activity activity2=act2List.get(Gbl.random.nextInt( act2List.size()));
 		Act act2 = k2.map.getAct(activity2);
-		k1.map.learnActsActivities(act2, activity2);
+//		k1.map.learnActsActivities(act2, activity2);
+		k1.map.addActivity(activity2);
 	    //k1.addActivity(activity2);
 	}
 
@@ -71,7 +72,8 @@ public class PersonExchangeKnowledge {
 	    if(act1List.size()>=1){
 	    	Activity activity1=act1List.get(Gbl.random.nextInt( act1List.size()));
 			Act act1 = k1.map.getAct(activity1);
-			k2.map.learnActsActivities(act1, activity1);
+//			k2.map.learnActsActivities(act1, activity1);
+			k2.map.addActivity(activity1);
 		//k2.addActivity(act1List.get(Gbl.random.nextInt( act1List.size())));
 	    }
 	}

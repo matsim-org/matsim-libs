@@ -32,6 +32,7 @@ import org.matsim.plans.Person;
  * SocializingOpportunity is an object encapsulating an activity type, a
  * particular facility (building), a group of people attending or frequenting,
  * and the timing of the opportunity.
+ * Note that it has attributes of acts and activities
  * @author jhackney, fmarchal
  *
  */
