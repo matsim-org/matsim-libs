@@ -16,7 +16,7 @@ import org.matsim.world.World;
 
 import playground.david.vis.handler.OTFAgentsListHandler;
 
-public class OTFTVeh2MVI extends OTFQuadFileHandlerZIP{
+public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 	private final   String netFileName = "";
 	private  String vehFileName = "";
 	private  String outFileName = "";
@@ -72,7 +72,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandlerZIP{
 						String elevation = result[13];
 						String azimuth = result[14];
 						PositionInfo position = new PositionInfo(new Id(agent), easting, northing,
-								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, null);
+								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, result[15]);
 						addVehicle(Double.parseDouble(time), position);
 					}
 				}
@@ -135,7 +135,8 @@ public class OTFTVeh2MVI extends OTFQuadFileHandlerZIP{
 //		String outFileName = "output/testSWI2.mvi.gz";
 
 		String netFileName = "../../tmp/studies/padang/padang_net.xml"; 
-		String vehFileName = "../../tmp/studies/padang/run301.it100.colorized.T.veh.gz"; 
+//		String vehFileName = "../../tmp/studies/padang/run301.it100.colorized.T.veh.gz"; 
+		String vehFileName = "../runs/run301/output/ITERS/it.100/T.veh.gz"; 
 		String outFileName = "output/testPadabang.mvi.gz";
 		int intervall_s = 60;
 		

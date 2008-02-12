@@ -112,7 +112,7 @@ public class OTFTVehServer implements OTFServerRemote{
 					lineFound = true;
 					this.time = Double.parseDouble(time);
 					this.readVehicle = new PositionInfo(new Id(agent), easting, northing,
-							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving,null);
+							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, result[15]);
 					return true;
 				}
 			}
@@ -268,6 +268,11 @@ public class OTFTVehServer implements OTFServerRemote{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

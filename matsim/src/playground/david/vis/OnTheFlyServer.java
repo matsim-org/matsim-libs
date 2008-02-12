@@ -87,9 +87,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 
 	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population) throws RemoteException {
-		super(4020,new SslRMIClientSocketFactory(),
-				new SslRMIServerSocketFactory());
-		//setDaemon(true);
+		super(4019,new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
 		UserReadableName = ReadableName;
 		net = new OTFVisNet(network);
 		net.buildWriteMask();
@@ -98,25 +96,51 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 		this.pop = population;
 	}
 
+	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, boolean noSSL) throws RemoteException {
+		super(4019);
+		UserReadableName = ReadableName;
+		net = new OTFVisNet(network);
+		net.buildWriteMask();
+		this.network = network;
+		out = new ByteArrayOutputStream(20000000);
+		this.pop = population;
+	}
+
+	public static boolean useSSL = true;
+	
 	public static OnTheFlyServer createInstance(String ReadableName, QueueNetworkLayer network, Plans population) {
 		OnTheFlyServer result = null;
-		System.setProperty("javax.net.ssl.keyStore", "input/keystore");
-		System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
-		System.setProperty("javax.net.ssl.trustStore", "input/truststore");
-		System.setProperty("javax.net.ssl.trustStorePassword", "vspVSP");
-
+		if (useSSL) {
+			System.setProperty("javax.net.ssl.keyStore", "input/keystore");
+			System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
+			System.setProperty("javax.net.ssl.trustStore", "input/truststore");
+			System.setProperty("javax.net.ssl.trustStorePassword", "vspVSP");
+			try {
+				registry = LocateRegistry.createRegistry(4019,
+						new SslRMIClientSocketFactory(),
+						new SslRMIServerSocketFactory());
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				registry = LocateRegistry.createRegistry(4019);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		// Register with RMI to be seen from client
 		try {
 			// Create SSL-based registry
-			registry = LocateRegistry.createRegistry(4019,
-					new SslRMIClientSocketFactory(),
-					new SslRMIServerSocketFactory());
-
-			result = new OnTheFlyServer(ReadableName, network, population);
+			if (useSSL) result = new OnTheFlyServer(ReadableName, network, population);
+			else result  = new OnTheFlyServer(ReadableName, network, population, true);
 
 			// Bind this object instance to the name "HelloServer"
 			registry.bind("DSOTFServer_" + ReadableName, result);
 
+			String[] liste = registry.list();
 			System.out.println("OTFServer bound in registry");
 		} catch (Exception e) {
 			System.out.println("OTFServer err: " + e.getMessage());
@@ -167,10 +191,13 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 		}
 
 		if (status == STEP) {
-			synchronized (stepDone) {
-				stepDone.notifyAll();
-				status = PAUSE;
-			}
+			stepToTime--;
+//			if( stepToTime <= 0) {
+				synchronized (stepDone) {
+					stepDone.notifyAll();
+					status = PAUSE;
+				}
+//			}
 		}
 
 		if (status == PAUSE) {
@@ -186,6 +213,25 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 		return status;
 	}
 
+	public void doStep(int stepcounter){
+		// leave Status on pause but let one step run (if one is waiting)
+		synchronized(paused) {
+			stepToTime = stepcounter;
+			status = STEP;
+			paused.notifyAll();
+		}
+		synchronized (stepDone) {
+			if (status == PAUSE) return;
+			try {
+				stepDone.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	double stepToTime = 0;
+	
 	public void step()  throws RemoteException{
 		// leave Status on pause but let one step run (if one is waiting)
 		synchronized(paused) {
@@ -200,6 +246,15 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
+		// if requested time lies in the past, sorry we cannot do that right now
+		if (time < localTime) return false;
+		if (time == localTime) return true;
+		
+		doStep(time - localTime);
+		return true;
 	}
 
 	public void play()  throws RemoteException{

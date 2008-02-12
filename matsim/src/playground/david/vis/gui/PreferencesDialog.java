@@ -40,7 +40,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	{
 		//Set Look & Feel
 		try {
-			//javax.swing.UIManager.setLookAndFeel("apple.laf.AquaLookAndFeel");
+			javax.swing.UIManager.setLookAndFeel("apple.laf.AquaLookAndFeel");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

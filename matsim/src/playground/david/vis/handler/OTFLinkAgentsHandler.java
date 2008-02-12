@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.mobsim.snapshots.PositionInfo.VehicleState;
@@ -18,15 +19,25 @@ import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.data.OTFWriterFactory;
 import playground.david.vis.data.OTFData.Receiver;
 import playground.david.vis.gui.PoolFactory;
+import playground.david.vis.interfaces.OTFDataReader;
 
-public class OTFLinkAgentsHandler extends OTFNoDynLinkHandler {
-	static Class agentReceiverClass = null;
+public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
+	
+	static boolean prevV1_1 = OTFDataReader.setPreviousVersion(OTFLinkAgentsHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
+	
+	private final Logger log = Logger.getLogger(OTFLinkAgentsHandler.class);
+
+	private Class agentReceiverClass = null;
 	static PoolFactory<OTFDataSimpleAgent.Receiver> factoryAgent;
 	
 	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	
-	static public class Writer extends  OTFNoDynLinkHandler.Writer implements Serializable, OTFWriterFactory<QueueLink>{
+	static public class Writer extends  OTFDefaultLinkHandler.Writer implements Serializable, OTFWriterFactory<QueueLink>{
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7916541567386865404L;
 		protected static transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 
 		@Override
@@ -46,9 +57,7 @@ public class OTFLinkAgentsHandler extends OTFNoDynLinkHandler {
 			out.putFloat((float)pos.getSpeed());
 		}
 		
-		@Override
-		public void writeDynData(ByteBuffer out) throws IOException {
-			super.writeDynData(out);
+		protected void writeAllAgents(ByteBuffer out) throws IOException {
 			// Write additional agent data
 	        /*
 	         * (4) write agents
@@ -60,6 +69,13 @@ public class OTFLinkAgentsHandler extends OTFNoDynLinkHandler {
 			for (PositionInfo pos : positions) {
 				writeAgent(pos, out);
 			}
+		}
+		
+		@Override
+		public void writeDynData(ByteBuffer out) throws IOException {
+			super.writeDynData(out);
+			
+			writeAllAgents(out);
 		}
 
 		@Override
@@ -80,19 +96,21 @@ public class OTFLinkAgentsHandler extends OTFNoDynLinkHandler {
 		int state = in.getInt();
 		// Convert to km/h 
 		float color = in.getFloat()*3.6f;
+		
+		// No agent receiver given, then we are finished
+		if (agentReceiverClass == null) return;
 
 			OTFDataSimpleAgent.Receiver drawer = null;
 			try {
 				drawer = (playground.david.vis.data.OTFDataSimpleAgent.Receiver) agentReceiverClass.newInstance();
+				drawer.setAgent(idBuffer, x, y, state, color);
+				agents.add(drawer);
 			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.warn("Agent drawer could not be instanciated");
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} //factoryAgent.getOne();
-			drawer.setAgent(idBuffer, x, y, state, color);
-			agents.add(drawer);
 
  	}
 	
@@ -132,5 +150,14 @@ public class OTFLinkAgentsHandler extends OTFNoDynLinkHandler {
 		for(OTFDataSimpleAgent.Receiver agent : agents) agent.invalidate();
 	}
 
-
+	
+	public static final class ReaderV1_1 extends OTFLinkAgentsHandler {
+		@Override
+		public void readDynData(ByteBuffer in) throws IOException {
+			agents.clear();
+			
+			int count = in.getInt();
+			for(int i= 0; i< count; i++) readAgent(in);
+		}
+	}
 }

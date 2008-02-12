@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 
 public interface OTFEventHandler {
 
-	public void invalidate() throws RemoteException;
+	public void invalidate(int time) throws RemoteException;
 	public void redraw();
 	public void handleClick(Point2D.Double point);
 }

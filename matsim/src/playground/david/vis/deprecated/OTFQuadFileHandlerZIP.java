@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.vis;
+package playground.david.vis.deprecated;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -47,9 +47,11 @@ import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
 
+import playground.david.vis.OTFVisNet;
 import playground.david.vis.data.OTFDefaultNetWriterFactoryImpl;
 import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
+import playground.david.vis.gui.OTFVisConfig;
 import playground.david.vis.interfaces.OTFNetHandler;
 import playground.david.vis.interfaces.OTFServerRemote;
 
@@ -58,9 +60,9 @@ public class OTFQuadFileHandlerZIP implements SimStateWriterI, OTFServerRemote{
 	private static final int BUFFERSIZE = 100000000;
 	
 	// the version number should be increased to imply a compatibility break
-	private static final int VERSION = 1;
+	public static final int VERSION = 1;
 	// minor version increase does not break compatibility
-	private static final int MINORVERSION = 1;
+	public static final int MINORVERSION = 2;
 	
 	private ZipOutputStream zos = null;
 	private DataOutputStream outFile;
@@ -168,7 +170,7 @@ public class OTFQuadFileHandlerZIP implements SimStateWriterI, OTFServerRemote{
 		//
 
 		try {
-			zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName + ".zip"),BUFFERSIZE));
+			zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName),BUFFERSIZE));
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -252,7 +254,7 @@ public class OTFQuadFileHandlerZIP implements SimStateWriterI, OTFServerRemote{
 	public void readQuad() {
 		// open file
 		try {
-			File sourceZipFile = new File(fileName + ".zip");
+			File sourceZipFile = new File(fileName);
 			// Open Zip file for reading
 			zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
 			scanZIPFile();
@@ -270,7 +272,11 @@ public class OTFQuadFileHandlerZIP implements SimStateWriterI, OTFServerRemote{
 			int version = inFile.readInt();
 			int minorversion = inFile.readInt();
 			intervall_s = inFile.readDouble();
+			OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 
+			config.setFileVersion(version);
+			config.setFileMinorVersion(minorversion);
+			
 			ZipEntry quadEntry = zipFile.getEntry("quad.bin");
 			BufferedInputStream is =  new BufferedInputStream(zipFile.getInputStream(quadEntry));
 			try {
@@ -397,6 +403,13 @@ public class OTFQuadFileHandlerZIP implements SimStateWriterI, OTFServerRemote{
 		nextTime = time;
 		return buffer;
 	}
+
+	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
 
 
 

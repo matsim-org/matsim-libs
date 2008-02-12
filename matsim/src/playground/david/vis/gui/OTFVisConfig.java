@@ -6,6 +6,8 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Module;
 import org.matsim.config.groups.GlobalConfigGroup;
 
+import playground.david.vis.OTFQuadFileHandler;
+
 public class OTFVisConfig extends Module {
 	public static final String GROUP_NAME = "otfvis";
 
@@ -17,11 +19,17 @@ public class OTFVisConfig extends Module {
 	public static final String MIDDLE_MOUSE_FUNC = "middleMouseFunc";
 	public static final String LEFT_MOUSE_FUNC = "leftMouseFunc";
 	public static final String RIGHT_MOUSE_FUNC = "rightMouseFunc";
+	
+	public static final String FILE_VERSION = "fileVersion";
+	public static final String FILE_MINOR_VERSION = "fileMinorVersion";
 
 	private  float agentSize = 100.f;
 	private  String middleMouseFunc = "Pan";
 	private  String leftMouseFunc = "Zoom";
 	private  String rightMouseFunc = "Menu";
+	private int fileVersion = OTFQuadFileHandler.VERSION;
+	private int fileMinorVersion = OTFQuadFileHandler.MINORVERSION;
+	
 
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
@@ -97,6 +105,34 @@ public class OTFVisConfig extends Module {
 
 	public void setRightMouseFunc(String rightMouseFunc) {
 		this.rightMouseFunc = rightMouseFunc;
+	}
+
+	/**
+	 * @return the fileVersion
+	 */
+	public int getFileVersion() {
+		return fileVersion;
+	}
+
+	/**
+	 * @param fileVersion the fileVersion to set
+	 */
+	public void setFileVersion(int fileVersion) {
+		this.fileVersion = fileVersion;
+	}
+
+	/**
+	 * @return the fileMinorVersion
+	 */
+	public int getFileMinorVersion() {
+		return fileMinorVersion;
+	}
+
+	/**
+	 * @param fileMinorVersion the fileMinorVersion to set
+	 */
+	public void setFileMinorVersion(int fileMinorVersion) {
+		this.fileMinorVersion = fileMinorVersion;
 	}
 
 	

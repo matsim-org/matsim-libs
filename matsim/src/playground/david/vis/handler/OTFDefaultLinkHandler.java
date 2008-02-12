@@ -13,10 +13,17 @@ import playground.david.vis.data.OTFWriterFactory;
 import playground.david.vis.data.OTFData.Receiver;
 import playground.david.vis.interfaces.OTFDataReader;
 
-public class OTFDefaultLinkHandler implements OTFDataQuad.Provider, OTFDataReader{
+public class OTFDefaultLinkHandler extends OTFDataReader implements OTFDataQuad.Provider {
+	static boolean prevV1_1 = OTFDataReader.setPreviousVersion(OTFDefaultLinkHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
+	
 	private OTFDataQuad.Receiver quadReceiver = null;
 
 	static public class Writer extends  OTFDataWriter<QueueLink> implements Serializable, OTFWriterFactory<QueueLink> {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 2827811927720044709L;
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
@@ -37,12 +44,14 @@ public class OTFDefaultLinkHandler implements OTFDataQuad.Provider, OTFDataReade
 		}
 	}
 	
+	@Override
 	public void readDynData(ByteBuffer in) throws IOException {
 		quadReceiver.setColor(in.getFloat());
 
 	}
 
 
+	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat());
 	}
@@ -50,6 +59,7 @@ public class OTFDefaultLinkHandler implements OTFDataQuad.Provider, OTFDataReade
 
 
 
+	@Override
 	public void connect(Receiver receiver) {
 		if (receiver  instanceof OTFDataQuad.Receiver) {
 			this.quadReceiver = (OTFDataQuad.Receiver)receiver;
@@ -57,10 +67,21 @@ public class OTFDefaultLinkHandler implements OTFDataQuad.Provider, OTFDataReade
 
 	}
 
+	@Override
 	public void invalidate() {
 		this.quadReceiver.invalidate();
 	}
 
 
+	// Prevoius version of the reader
+	
 
+	public static final class ReaderV1_1 extends OTFDefaultLinkHandler {
+		@Override
+		public void readDynData(ByteBuffer in) throws IOException {
+		}
+
+		
+	}
 }
+

@@ -31,10 +31,12 @@ import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
 
 public interface OTFServerRemote extends Remote {
+	public enum TimePreference{EARLIER, LATER};
 	public void setStatus(int status) throws RemoteException;;
 	public void step() throws RemoteException;;
 	public void play() throws RemoteException;;
 	public void pause() throws RemoteException;
+	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException;
 	public byte[] getStateBuffer() throws RemoteException;
 	public OTFVisNet getNet(OTFNetHandler handler) throws RemoteException;
 	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException;

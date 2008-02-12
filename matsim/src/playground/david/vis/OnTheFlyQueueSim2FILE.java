@@ -42,12 +42,12 @@ import org.matsim.world.World;
  */
 public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 	protected OnTheFlyServer myOTFServer = null;
-	protected OTFQuadFileHandler otfwriter  = null;
+	protected OTFQuadFileHandler.Writer  otfwriter  = null;
 
 	@Override
 	protected void prepareSim() {
 		//myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
-		if (otfwriter == null) otfwriter = new OTFQuadFileHandler(60,network,"output/OTFQuadfile10p.mvi.gz");
+		if (otfwriter == null) otfwriter = new OTFQuadFileHandler.Writer (60,network,"output/OTFQuadfile10p.mvi.gz");
 		if(otfwriter != null) otfwriter.open();
 
 		super.prepareSim();
@@ -155,7 +155,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 
 	}
 
-	public void setOtfwriter(OTFQuadFileHandler otfwriter) {
+	public void setOtfwriter(OTFQuadFileHandler.Writer  otfwriter) {
 		this.otfwriter = otfwriter;
 	}
 

@@ -5,23 +5,18 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.matsim.mobsim.snapshots.PositionInfo;
 
-import playground.david.vis.data.OTFDataSimpleAgent;
+import playground.david.vis.data.OTFDataSimpleAgentArray;
 import playground.david.vis.data.OTFDataWriter;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.data.OTFData.Receiver;
-import playground.david.vis.gui.PoolFactory;
 import playground.david.vis.interfaces.OTFDataReader;
 
-public class OTFAgentsListHandler extends OTFDataReader {
-	static Class agentReceiverClass = null;
-	static PoolFactory<OTFDataSimpleAgent.Receiver> factoryAgent;
+public class OTFAgentsListArrayHandler extends OTFDataReader {
+	private OTFDataSimpleAgentArray.Receiver receiver = null;
 	
-	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	
 	static public class Writer extends  OTFDataWriter implements Serializable {
 
@@ -71,28 +66,27 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		// Convert to km/h 
 		float color = in.getFloat()*3.6f;
 
-			OTFDataSimpleAgent.Receiver drawer = null;
-			try {
-				drawer = (playground.david.vis.data.OTFDataSimpleAgent.Receiver) agentReceiverClass.newInstance();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} //factoryAgent.getOne();
-			drawer.setAgent(idBuffer, x, y, state, color);
-			agents.add(drawer);
+		if(receiver != null)receiver.addAgent(idBuffer, x, y, state, color);
 
  	}
 	
 
 	@Override
 	public void readDynData(ByteBuffer in) throws IOException {
-		// read additional agent data
-		agents.clear();
-		
 		int count = in.getInt();
+		
+		if (this.receiver != null)
+			try {
+				this.receiver = this.receiver.getClass().newInstance();
+				receiver.setMaxSize(count);
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		for(int i= 0; i< count; i++) readAgent(in);
 	}
 
@@ -108,9 +102,8 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	@Override
 	public void connect(Receiver receiver) {
 		//connect agent receivers
-		if (receiver  instanceof OTFDataSimpleAgent.Receiver) {
-			this.agentReceiverClass = receiver.getClass();
-			this.factoryAgent = PoolFactory.get(this.agentReceiverClass);
+		if (receiver  instanceof OTFDataSimpleAgentArray.Receiver) {
+			this.receiver = (OTFDataSimpleAgentArray.Receiver)receiver;
 		}
 
 	}
@@ -118,8 +111,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	
 	@Override
 	public void invalidate() {
-		// invalidate agent receivers
-		for(OTFDataSimpleAgent.Receiver agent : agents) agent.invalidate();
+		if(receiver != null)receiver.invalidate();
 	}
 
 

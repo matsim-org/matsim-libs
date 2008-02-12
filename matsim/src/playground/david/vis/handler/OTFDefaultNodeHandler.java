@@ -13,7 +13,7 @@ import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.data.OTFWriterFactory;
 import playground.david.vis.interfaces.OTFDataReader;
 
-public class OTFDefaultNodeHandler implements OTFDataReader,  OTFDataXYCoord.Provider  {
+public class OTFDefaultNodeHandler extends OTFDataReader implements  OTFDataXYCoord.Provider  {
 	private OTFDataXYCoord.Receiver xyReceiver = null;
 
 	static public class Writer extends  OTFDataWriter<QueueNode> implements Serializable,OTFWriterFactory<QueueNode> {
@@ -35,15 +35,18 @@ public class OTFDefaultNodeHandler implements OTFDataReader,  OTFDataXYCoord.Pro
 }
 
 	
+	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		if (xyReceiver != null) xyReceiver.setXYCoord(in.getFloat(), in.getFloat());
 		else {in.getFloat();in.getFloat();};
 	}
 
+	@Override
 	public void readDynData(ByteBuffer in) throws IOException {
 	}
 
 
+	@Override
 	public void connect(OTFData.Receiver receiver) {
 		if (receiver instanceof OTFDataXYCoord.Receiver) {
 			this.xyReceiver = (OTFDataXYCoord.Receiver) receiver;
@@ -51,6 +54,7 @@ public class OTFDefaultNodeHandler implements OTFDataReader,  OTFDataXYCoord.Pro
 		}
 	}
 
+	@Override
 	public void invalidate() {
 		if (xyReceiver != null) this.xyReceiver.invalidate();
 	}

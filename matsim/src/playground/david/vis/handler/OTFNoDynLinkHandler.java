@@ -13,7 +13,7 @@ import playground.david.vis.data.OTFWriterFactory;
 import playground.david.vis.data.OTFData.Receiver;
 import playground.david.vis.interfaces.OTFDataReader;
 
-public class OTFNoDynLinkHandler implements OTFDataQuad.Provider, OTFDataReader{
+public class OTFNoDynLinkHandler extends OTFDataReader implements OTFDataQuad.Provider{
 	private OTFDataQuad.Receiver quadReceiver = null;
 
 	static public class Writer extends  OTFDataWriter<QueueLink> implements Serializable, OTFWriterFactory<QueueLink> {
@@ -35,10 +35,12 @@ public class OTFNoDynLinkHandler implements OTFDataQuad.Provider, OTFDataReader{
 		}
 	}
 	
+	@Override
 	public void readDynData(ByteBuffer in) throws IOException {
 	}
 
 
+	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat());
 	}
@@ -46,6 +48,7 @@ public class OTFNoDynLinkHandler implements OTFDataQuad.Provider, OTFDataReader{
 
 
 
+	@Override
 	public void connect(Receiver receiver) {
 		if (receiver  instanceof OTFDataQuad.Receiver) {
 			this.quadReceiver = (OTFDataQuad.Receiver)receiver;
@@ -53,6 +56,7 @@ public class OTFNoDynLinkHandler implements OTFDataQuad.Provider, OTFDataReader{
 
 	}
 
+	@Override
 	public void invalidate() {
 		this.quadReceiver.invalidate();
 	}

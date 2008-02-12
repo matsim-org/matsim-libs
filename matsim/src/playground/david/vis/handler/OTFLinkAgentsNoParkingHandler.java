@@ -12,10 +12,15 @@ import playground.david.vis.data.OTFDataWriter;
 import playground.david.vis.data.OTFWriterFactory;
 
 public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
+	
 	static public class Writer extends  OTFLinkAgentsHandler.Writer implements Serializable, OTFWriterFactory<QueueLink>{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6541770536927233851L;
+
 		@Override
-		public void writeDynData(ByteBuffer out) throws IOException {
-			// do not call this! IT writes all agents super.writeDynData(out);
+		protected void writeAllAgents(ByteBuffer out) throws IOException {
 			// Write additional agent data
 	        /*
 	         * (4) write agents

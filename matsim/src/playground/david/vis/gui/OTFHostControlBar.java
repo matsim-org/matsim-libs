@@ -3,12 +3,15 @@ package playground.david.vis.gui;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -18,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.rmi.ssl.SslRMIClientSocketFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
@@ -30,14 +34,16 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.utils.misc.Time;
 
-import playground.david.vis.OTFQuadFileHandlerZIP;
+import playground.david.vis.OTFQuadFileHandler;
 import playground.david.vis.OTFTVehServer;
 import playground.david.vis.data.OTFClientQuad;
 import playground.david.vis.data.OTFConnectionManager;
 import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
+import playground.david.vis.interfaces.OTFDataReader;
 import playground.david.vis.interfaces.OTFServerRemote;
 
 public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener {
@@ -52,6 +58,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private static final String SET_TIME = "set_time";
 	private static final String TOGGLE_SYNCH = "Synch";
 	private static final String TOGGLE_LINK_LABELS = "Link Labels";
+	private static final String STEP_BB = "step_bb";
+	private static final String STEP_B = "step_b";
 
 	private static final int SKIP = 30;
 
@@ -67,10 +75,22 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	String address;
 	private OTFServerRemote host = null;
 	private final Map <String,OTFEventHandler> handlers = new HashMap<String,OTFEventHandler>(); 
+	private Class resourceHandler = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
+	public OTFHostControlBar(String address, Class res) throws RemoteException, InterruptedException, NotBoundException {
+		openAddress(address);
+		this.resourceHandler = res;
+		addButtons();
+	}
+	
 	public OTFHostControlBar(String address) throws RemoteException, InterruptedException, NotBoundException {
+		openAddress(address);
+		addButtons();
+	}
+	
+	private void openAddress(String address) throws RemoteException, InterruptedException, NotBoundException {
 		// try to open/connect to host if given a string of form
 		// connection type (rmi or file or tveh) 
 		// rmi:ip  [: port]
@@ -86,8 +106,14 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			int port = 4019;
 			String [] connparse = connection.split(":");
 			if (connparse.length > 1 ) port = Integer.parseInt(connparse[1]);
-			this.host = openSSL(connparse[1], port);
+			this.host = openRMI(connparse[0], port);
 
+		} else if (type.equals("ssl")) {
+			int port = 4019;
+			String [] connparse = connection.split(":");
+			if (connparse.length > 1 ) port = Integer.parseInt(connparse[1]);
+			this.host = openSSL(connparse[0], port);
+			
 		} else if (type.equals("file")) {
 			this.host = openFile(connection);
 			
@@ -97,7 +123,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			
 		} else throw new UnsupportedOperationException("Connctiontype " + type + " not known");
 		
-		addButtons();
 	}
 	
 	private OTFServerRemote openSSL(String hostname, int port) throws InterruptedException, RemoteException, NotBoundException {
@@ -118,14 +143,31 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 		return host;
 	}
+
+	private OTFServerRemote openRMI(String hostname, int port) throws InterruptedException, RemoteException, NotBoundException {
+		Thread.sleep(1000);
+		Registry registry = LocateRegistry.getRegistry(hostname, port);
+		
+		String[] liste = registry.list();
+		for (String name : liste) {
+			if (name.indexOf("DSOTFServer_") != -1){
+				this.host = (OTFServerRemote)registry.lookup(name);
+				host.pause();
+			}
+		}
+		return host;
+	}
 	
 	private void buildIndex() {
 		// Read through the whole file to find the indexes for the time steps...
 		
 	}
 	private OTFServerRemote openFile( String fileName) throws RemoteException {
-		OTFServerRemote host = new OTFQuadFileHandlerZIP(0,null,fileName);
+		OTFServerRemote host = new OTFQuadFileHandler.Reader(fileName);
 		host.pause();
+		Gbl.printMemoryUsage();
+		long freeMem = Runtime.getRuntime().freeMemory();
+
 		return host;
 	}
 	
@@ -136,6 +178,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	public OTFClientQuad createNewView(String id, OTFNetWriterFactory factory, OTFConnectionManager connect) throws RemoteException {
+		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+
+		if(config.getFileVersion() < OTFQuadFileHandler.VERSION || config.getFileMinorVersion() < OTFQuadFileHandler.MINORVERSION) {
+			// go through every reader class and look for the appropriate Reader Version for this fileformat
+			connect.adoptFileFormat(OTFDataReader.getVersionString(config.getFileVersion(), config.getFileMinorVersion()));
+		}
+		
 		System.out.println("Getting Quad");
 		OTFServerQuad servQ = host.getQuad(id, factory);
 		System.out.println("Converting Quad");
@@ -159,7 +208,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	public void invalidateHandlers() {
 		for (OTFEventHandler handler : handlers.values()) {
 			try {
-				handler.invalidate();
+				handler.invalidate(simTime);
 			} catch (RemoteException e) {
 				// Possibly lost contact to host DS TODO Handle this!
 				e.printStackTrace();
@@ -168,13 +217,17 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void addButtons() {
-		add(createButton(address,CONNECT));
-		add(createButton("Pause", PAUSE));
-		playButton = createButton("PLAY", PLAY);
+		add(createButton("Restart", STOP, "buttonRestart", "restart the server/simulation"));
+		add(createButton(address,CONNECT, null, "Server connection established"));
+		add(createButton("Pause", PAUSE, "buttonPause", "Press to pause server"));
+		add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
+		add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
+		add(createButton("Pause", PAUSE, "buttonPause", "Press to pause server"));
+		playButton = createButton("PLAY", PLAY, "buttonPlay", "press to play simulation continuously");
+		playButton.setText("Play");
 		add(playButton);
-		add(createButton(">", STEP_F));
-		add(createButton(">>", STEP_FF));
-		add(createButton("STOP", STOP));
+		add(createButton(">", STEP_F, "buttonStepF", "go one timestep forward"));
+		add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
 
 		timeField = new JFormattedTextField( new MessageFormat("{0,number,00}-{1,number,00}-{2,number,00}"));
 		timeField.setMaximumSize(new Dimension(75,30));
@@ -198,13 +251,30 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 //		spin.addChangeListener(this);
 	}
 
-	private JButton createButton(String display, String actionCommand) {
+	private JButton createButton(String altText, String actionCommand, String imageName, String toolTipText) {
 		JButton button;
 
+	    //Create and initialize the button.
 		button = new JButton();
+		button.putClientProperty("JButton.buttonType","icon");
 		button.setActionCommand(actionCommand);
 		button.addActionListener(this);
-		button.setText(display);
+	    button.setToolTipText(toolTipText);
+
+		//Look for the image.
+	    String imgLocation = "images/"
+	                         + imageName
+	                         + ".png";
+	    URL imageURL = resourceHandler != null ? resourceHandler.getResource(imgLocation) : null;
+		Image image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage(imgLocation);
+		
+	    if (imageName != null ) {                      //image found
+	    	ImageIcon icon =new ImageIcon(image, altText);
+	        button.setIcon(icon);
+	    } else {                                     //no image found
+	        button.setText(altText);
+	        System.err.println("Resource not found: " + imgLocation);
+	    }
 
 		return button;
 	}
@@ -220,7 +290,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			movieTimer.terminate();
 			movieTimer.setActive(false);
 			movieTimer = null;
-			playButton.setText("PLAY");
 			playButton.setSelected(false);
 		}
 	}
@@ -249,6 +318,17 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void pressed_STEP_FF() throws IOException {
+		pressed_STEP_F();
+	}
+
+	private void pressed_STEP_B() throws IOException {
+		stopMovie();
+		host.step();
+		simTime = host.getLocalTime();
+		invalidateHandlers();
+	}
+
+	private void pressed_STEP_BB() throws IOException {
 		pressed_STEP_F();
 	}
 
@@ -282,6 +362,10 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			else if (STEP_F.equals(command))
 				pressed_STEP_F();
 			else if (STEP_FF.equals(command))
+				pressed_STEP_FF();
+			else if (STEP_B.equals(command))
+				pressed_STEP_F();
+			else if (STEP_BB.equals(command))
 				pressed_STEP_FF();
 			else if (STOP.equals(command))
 				pressed_STOP();

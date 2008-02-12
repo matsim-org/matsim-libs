@@ -330,5 +330,10 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 		return null;
 	}
 
+	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 }

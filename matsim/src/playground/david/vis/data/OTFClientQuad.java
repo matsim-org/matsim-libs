@@ -79,6 +79,24 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 
+	public class ClassCountExecutor extends Executor<OTFDataReader> {
+		private final Class targetClass;
+		private int count = 0;
+		
+		public ClassCountExecutor(Class clazz) {
+			targetClass = clazz;
+		}
+		
+		public int getCount() {
+			return count;
+		}
+		
+		@Override
+		public void execute(double x, double y, OTFDataReader reader) {
+			if (targetClass.isAssignableFrom(reader.getClass())) count++;
+		}
+	}
+
 	public OTFClientQuad(String id, OTFServerRemote host, double minX, double minY, double maxX, double maxY) {
 		super(minX, minY, maxX, maxY);
 		this.minEasting = minX;

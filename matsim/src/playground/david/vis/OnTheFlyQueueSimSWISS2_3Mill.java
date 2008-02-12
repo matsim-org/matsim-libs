@@ -31,6 +31,7 @@ import org.matsim.plans.PlansReaderI;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
+
 /**
  * @author DS
  *
@@ -73,7 +74,7 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 		config.simulation().setEndTime(Time.parseTime("12:00:11"));
 
 		sim = new OnTheFlyQueueSim(net, population, events);
-		sim.setOtfwriter(new OTFQuadFileHandler(600,net,"output/OTFQuadfileSCHWEIZ2.3.mvi.gz"));
+		sim.setOtfwriter(new OTFQuadFileHandler.Writer (600,net,"output/OTFQuadfileSCHWEIZ2.3.mvi.gz"));
 		
 
 		sim.run();
