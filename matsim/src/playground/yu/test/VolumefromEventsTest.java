@@ -41,12 +41,13 @@ public class VolumefromEventsTest {
 
 	@SuppressWarnings("unchecked")
 	public static void main(final String[] args) {
-		final String netFilename = "./test/yu/test/input/equil_net.xml";
+		final String netFilename = "./test/yu/test/input/network.xml";
 		// final String plansFilename = "./examples/equil/plans100.xml";
-		final String eventsFilename = "./test/yu/test/input/car1kWB100.events.txt.gz";
+		final String eventsFilename = "./test/yu/test/input/carNewPlans100.events.txt.gz";
 		@SuppressWarnings("unused")
-		Config config = Gbl
-				.createConfig(new String[] { "./test/yu/test/configTest.xml" });
+		Config config = Gbl.createConfig(null
+		//					new String[] { "./test/yu/test/configTest.xml" }
+				);
 
 		World world = Gbl.getWorld();
 
@@ -77,7 +78,7 @@ public class VolumefromEventsTest {
 		Map<IdI, QueueLink> links = (Map<IdI, QueueLink>) network.getLinks();
 		try {
 			BufferedWriter out = IOUtils
-					.getBufferedWriter("./test/yu/test/output/car1kWB100.eventsVolumeTest.txt.gz");
+					.getBufferedWriter("./test/yu/test/output/carNewPlans100.eventsVolumeTest.txt.gz");
 			StringBuffer head = new StringBuffer(
 					"linkId\tCapacity\tSimulationFlowCapacity");
 			for (int i = 0; i < 24; i++) {
