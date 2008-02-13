@@ -24,9 +24,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkLayerBuilder;
-import org.matsim.network.algorithms.NetworkSummary;
-import org.matsim.network.algorithms.NetworkTransform;
-import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.network.algorithms.NetworkCalcTopoType;
 
 public class CleanNetwork {
 
@@ -49,7 +47,19 @@ public class CleanNetwork {
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		System.out.println("  done.");
 
+//		System.out.println("  reading the counts...");
+//		new MatsimCountsReader(Counts.getSingleton()).readFile(Gbl.getConfig().counts().getCountsFileName());
+//		System.out.println("  done.");
+
 		System.out.println("  running Network Validation and cleaning algorithms... ");
+//		new NetworkSetDefaultCapacities().run(network);
+//		NetworkWriteETwithCounts nwetwc = new NetworkWriteETwithCounts(Counts.getSingleton());
+//		nwetwc.run(network);
+//		nwetwc.close();
+//		new NetworkSummary().run(network);
+//		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
+//		nwat.run(network);
+//		nwat.close();
 //		network.addAlgorithm(new NetworkSummary());
 //		network.addAlgorithm(new NetworkAdaptCHNavtec());
 //		network.addAlgorithm(new NetworkSummary());
@@ -57,17 +67,17 @@ public class CleanNetwork {
 //		network.addAlgorithm(new NetworkSummary());
 //		network.addAlgorithm(new NetworkMergeDoubleLinks());
 //		network.addAlgorithm(new NetworkSummary());
-//		network.addAlgorithm(new NetworkCalcTopoType());
+		network.addAlgorithm(new NetworkCalcTopoType());
 //		network.addAlgorithm(new NetworkSummary());
 //		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
 //		network.addAlgorithm(nwat);
 //		network.addAlgorithm(new NetworkSummary());
-//		network.runAlgorithms();
+		network.runAlgorithms();
 //		nwat.close();
 
-		new NetworkSummary().run(network);
-		new NetworkTransform(new CH1903LV03toWGS84()).run(network);
-		new NetworkSummary().run(network);
+//		new NetworkSummary().run(network);
+//		new NetworkTransform(new CH1903LV03toWGS84()).run(network);
+//		new NetworkSummary().run(network);
 		System.out.println("  done.");
 
 //		System.out.println("  writing the network...");
