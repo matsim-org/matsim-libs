@@ -22,48 +22,44 @@ package org.matsim.plans.algorithms;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 
+/**
+ * Performs several checks that persons are ready for a mobility simulation.
+ * It is intended to run only once after the initial plans are read from file,
+ * as we expect the {@link org.matsim.controler.Controler} not to "damage" any
+ * plans during the iterations.<br/>
+ * Currently, this only checks that all plans have valid routes, calculating
+ * missing routes if required. Additionally, it will output a warning to the
+ * log if a person has no plans at all.
+ *
+ * @author mrieser
+ */
 public class PersonPrepareForSim extends PersonAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
 
 	private final PlanAlgorithmI router;
 
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 
 	public PersonPrepareForSim(final PlanAlgorithmI router) {
 		super();
 		this.router = router;
 	}
 
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
 	@Override
 	public void run(final Person person) {
 		// first make sure we have a selected plan
 		Plan selectedPlan = person.getSelectedPlan();
 		if (selectedPlan == null) {
-			// no selected plan was found, select the first one as a default
-			if (person.getPlans().size() > 0) {
-				selectedPlan = person.getPlans().get(0);
-				person.setSelectedPlan(selectedPlan);
-			} else {
-				Gbl.warningMsg(this.getClass(), "run()", "Person " + person.getId() + " has no plans!");
-			}
+			// the only way no plan can be selected should be when the person has no plans at all
+			log.warn("Person " + person.getId() + " has no plans!");
+			return;
 		}
 
-		// next make sure all the plans have valid routes
+		// make sure all the plans have valid routes
 		for (Plan plan : person.getPlans()) {
 			boolean hasRoute = true;
 			ArrayList<Object> actslegs = plan.getActsLegs();
