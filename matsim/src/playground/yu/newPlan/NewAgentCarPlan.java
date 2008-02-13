@@ -18,12 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.ivtch;
+package playground.yu.newPlan;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -36,11 +34,13 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- *
+ * 
  * @author ychen
- *
+ * 
  */
-public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI {
+public class NewAgentCarPlan extends PersonAlgorithm implements
+		PersonAlgorithmI {
+	private boolean haveCar;
 	/**
 	 * internal writer, which can be used by object of subclass.
 	 */
@@ -48,53 +48,48 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 
 	/**
 	 * Constructor, writes file-head
-	 *
+	 * 
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentPtPlan(Plans plans) {
+	public NewAgentCarPlan(Plans plans) {
 		pw = new PlansWriter(plans);
 		pw.writeStartPlans();
 	}
 
 	public void writeEndPlans() {
 		pw.writeEndPlans();
+		System.out.println("-->Done!!");
 	}
 
 	@Override
 	public void run(Person person) {
-		List<Plan> copyPlans = new ArrayList<Plan>();
-		// copyPlans: the copy of the plans.
+		haveCar = false;
 		for (Plan pl : person.getPlans()) {
-			pl.setType("car");
-
-			Plan copyPlan = new Plan(person);
-			copyPlan.setType("pt");
-
 			List actsLegs = pl.getActsLegs();
-			for (int i = 0; i < actsLegs.size(); i++) {
-				Object o = actsLegs.get(i);
-				if (i % 2 == 0) {
-					copyPlan.addAct((Act) o);
-				} else {
-					((Leg)o).setMode("car");
-					
-					Leg copyLeg = new Leg((Leg) o);
-					copyLeg.setMode("pt");
-					// -----------------------------------------------
-					// WITHOUT routeSetting!! traveltime of PT can be calculated
-					// automaticly!!
-					// -----------------------------------------------
-					copyLeg.setRoute(null);
-					copyPlan.addLeg(copyLeg);
+			a: {
+				for (int i = 0; i < actsLegs.size(); i++) {
+					Object o = actsLegs.get(i);
+					if (i % 2 != 0) {
+						if (((Leg) o).getMode().equals("car")) {
+							haveCar = true;
+							pl.setType("car");
+							break a;
+						}
+					}
 				}
 			}
-			copyPlans.add(copyPlan);
+			if (haveCar) {
+				for (int j = 0; j < actsLegs.size(); j++) {
+					Object o = actsLegs.get(j);
+					if (j % 2 != 0) {
+						((Leg) o).setMode("car");
+					}
+				}
+			}
 		}
-		for (Plan copyPlan : copyPlans) {
-			person.addPlan(copyPlan);
+		if (haveCar) {
+			pw.writePerson(person);
 		}
-		pw.writePerson(person);
 	}
-
 }

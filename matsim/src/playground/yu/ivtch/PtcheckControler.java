@@ -134,12 +134,6 @@ public class PtcheckControler extends Controler {
 			}
 		}
 
-		/*
-		 * public void notifyIterationStarts(IterationStartsEvent event) { //
-		 * int it = event.getIteration(); // cas.reset(it); // ctpf.reset(it); //
-		 * if (Gbl.useRoadPricing()) { // cattl.reset(it); // } // }
-		 */
-
 		public void notifyShutdown(ShutdownEvent event) {
 			try {
 				out.close();

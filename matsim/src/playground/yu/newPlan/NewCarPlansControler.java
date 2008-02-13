@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.ivtch;
+package playground.yu.newPlan;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
@@ -35,28 +35,27 @@ import org.matsim.world.World;
  * @author ychen
  * 
  */
-public class NewPtPlansControler {
+public class NewCarPlansControler {
 
 	public static void main(final String[] args) {
-		final String netFilename = "./test/yu/ivtch/input/network.xml";
-		final String plansFilename = "./test/yu/ivtch/input/allplansZuerichHwh.xml.gz";
+		final String netFilename = "./test/yu/newPlans/input/network.xml";
+		final String plansFilename = "./test/yu/newPlans/input/10pctZrhPlans.xml.gz";
 
 		World world = Gbl.getWorld();
-		@SuppressWarnings("unused")
 		Config config = Gbl
-				.createConfig(new String[] { "./test/yu/ivtch/configZuerichPlansCarPt.xml" });
+				.createConfig(new String[] { "./test/yu/newPlans/configMake10pctZrhCarPlans.xml" });
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
-		NewAgentPtPlan nap = new NewAgentPtPlan(population);
-		population.addAlgorithm(nap);
+		NewAgentCarPlan nac = new NewAgentCarPlan(population);
+		population.addAlgorithm(nac);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
 		world.setPopulation(population);
 		population.runAlgorithms();
-		nap.writeEndPlans();
+		nac.writeEndPlans();
 	}
 }

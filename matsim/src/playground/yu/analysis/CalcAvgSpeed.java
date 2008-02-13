@@ -60,11 +60,13 @@ public class CalcAvgSpeed implements EventHandlerLinkEnterI,
 	public CalcAvgSpeed(final NetworkLayer network) {
 		this.network = network;
 		enterTimes = new TreeMap<String, Double>();
-		
+
 	}
 
 	public void handleEvent(EventLinkEnter enter) {
-		enterTimes.put(enter.agentId, enter.time);
+//		if (enter.agent.getSelectedPlan().getType().equals("car")) {
+			enterTimes.put(enter.agentId, enter.time);
+//		}
 	}
 
 	public void reset(int iteration) {

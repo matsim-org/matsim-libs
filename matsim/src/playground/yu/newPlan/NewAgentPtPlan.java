@@ -64,25 +64,29 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 	@Override
 	public void run(Person person) {
 		List<Plan> copyPlans = new ArrayList<Plan>();
-		// plans: the copy of the plans.
+		// copyPlans: the copy of the plans.
 		for (Plan pl : person.getPlans()) {
 			pl.setType("car");
+
 			Plan copyPlan = new Plan(person);
 			copyPlan.setType("pt");
+
 			List actsLegs = pl.getActsLegs();
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
-				if (i % 2 == 0)
+				if (i % 2 == 0) {
 					copyPlan.addAct((Act) o);
-				else {
-					Leg l = new Leg((Leg) o);
-					l.setMode("pt");
+				} else {
+					((Leg)o).setMode("car");
+					
+					Leg copyLeg = new Leg((Leg) o);
+					copyLeg.setMode("pt");
 					// -----------------------------------------------
 					// WITHOUT routeSetting!! traveltime of PT can be calculated
 					// automaticly!!
 					// -----------------------------------------------
-					l.setRoute(null);
-					copyPlan.addLeg(l);
+					copyLeg.setRoute(null);
+					copyPlan.addLeg(copyLeg);
 				}
 			}
 			copyPlans.add(copyPlan);

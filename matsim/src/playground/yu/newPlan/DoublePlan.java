@@ -23,7 +23,6 @@ package playground.yu.newPlan;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 
-
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old
  * agents in the file and change only the Ids.
@@ -33,6 +32,7 @@ import org.matsim.plans.Plans;
  */
 public class DoublePlan extends NewAgentPtPlan {
 	private int newPersonId;
+
 	/**
 	 * Construcktor
 	 * 
@@ -52,7 +52,7 @@ public class DoublePlan extends NewAgentPtPlan {
 	public void run(Person person) {
 		pw.writePerson(person);
 		// produce new Person with bigger Id
-		for (int i = 1; i <= 99; i++) {
+		for (int i = 0; i < 2; i++) {
 			newPersonId = Integer.parseInt(person.getId().toString()) + 1000;
 			person.setId(Integer.toString(newPersonId));
 			pw.writePerson(person);
