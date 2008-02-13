@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY OUTPUTBASE   "/data/matsim/balmermi/sandbox00/output/run225">
+		<!ENTITY OUTPUTBASE   "/data/matsim/balmermi/sandbox00/output/run228">
 		<!ENTITY INPUTBASE    "/data/matsim/balmermi/sandbox00/input">
 		<!ENTITY STUDYBASE    "/data/matsim/balmermi/sandbox00/input">
 		<!ENTITY HOMEPAGEBASE "http://www.matsim.org/files/dtd">
@@ -42,12 +42,12 @@
 	<module name="deqsim">
 	<!--	<param name="executable" value="/home/balmermi/deqsim/build/microsim/microsim" />-->
 	<!--	<param name="executable" value="/usr/bin/mpirun -n 8 /home/balmermi/deqsimP/build/microsim/microsim" /> -->
-		<param name="executable" value="/usr/bin/mpirun -n 8 /home/balmermi/old_versions_allsim/deqsimP/build/microsim/microsim" /> 
+		<param name="executable" value="/usr/bin/mpirun -n 4 /home/balmermi/old_versions_allsim/deqsimP/build/microsim/microsim" /> 
 	<!--	<param name="executable" value="/usr/bin/mpirun -n 8 /home/balmermi/allsim_binaries/deqsim_P" /> -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="600:00:00" />
 		<param name="flowCapacityFactor" value="1.00" />
-		<param name="storageCapacityFactor" value="20.00" />
+		<param name="storageCapacityFactor" value="10.00" />
 		<param name="squeezeTime" value="00:01:00" />
 		<param name="carSize" value="7.5" />
 		<param name="gapTravelSpeed" value="15.0" />
@@ -74,7 +74,7 @@
 		<param name="outputTimeFormat" value="HH:mm:ss" />
 		<param name="randomSeed" value="4711" />
 		<param name="useRoadPricing" value="no" />
-		<param name="numberOfThreads" value="8" />
+		<param name="numberOfThreads" value="4" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -126,12 +126,12 @@
 	<!--	<param name="Module_1" value="TimeAllocationMutator7200_ReRouteLandmarks" /> -->
 	<!--	<param name="ModuleProbability_1" value="0.10" /> -->
 	<!--	<param name="Module_1" value="TimeAllocationMutator7200_ReRouteLandmarks" /> -->
-	<!--	<param name="ModuleProbability_1" value="0.10" /> -->
-	<!--	<param name="Module_1" value="TimeAllocationMutator" /> -->
 		<param name="ModuleProbability_1" value="0.10" /> 
-		<param name="Module_1" value="ReRoute_Landmarks" /> 
-		<param name="ModuleProbability_2" value="0.90" />
-		<param name="Module_2" value="SelectExpBeta" />
+		<param name="Module_1" value="TimeAllocationMutator" /> 
+		<param name="ModuleProbability_2" value="0.10" /> 
+		<param name="Module_2" value="ReRoute_Landmarks" /> 
+		<param name="ModuleProbability_3" value="0.80" />
+		<param name="Module_3" value="SelectExpBeta" />
 	</module>
 
 <!-- ====================================================================== -->
