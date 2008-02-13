@@ -22,6 +22,7 @@ package org.matsim.counts;
 
 import java.util.HashMap;
 
+import org.matsim.network.Link;
 import org.matsim.utils.identifiers.IdI;
 
 public class Count {
@@ -56,7 +57,15 @@ public class Count {
 		return this.csId;
 	}
 
-
+	public final Volume getMaxVolume() {
+		Volume v_max = null;
+		double max = -1.0;
+		for (Volume v : this.volumes_.values()) {
+			if (v.getValue() > max) { max = v.getValue(); v_max = v; }
+		}
+		return v_max;
+	}
+	
 	public final Volume getVolume(final int h) {
 		return this.volumes_.get(Integer.valueOf(h));
 	}
