@@ -28,5 +28,5 @@ import org.matsim.network.Link;
  */
 public abstract class SignalSystemControler {
 
-	public abstract Link[] getGreenInLinks();
+	public abstract Link[] getGreenInLinks(double time);
 }
