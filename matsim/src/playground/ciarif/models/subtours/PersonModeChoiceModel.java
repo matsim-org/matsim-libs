@@ -194,108 +194,46 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		}
 	}
 	
-	private final void registerSubTours (Plan plan, TreeMap<Integer, Integer> subtours, int subtour_idx) {
-		
-		TreeMap<Integer,ArrayList<Integer>> registerSubTours = new TreeMap<Integer,ArrayList<Integer>>();
-		ArrayList<Integer> subtour = new ArrayList<Integer>(); // TODO Si azzera ogni volta, controllare se va bene o no!!!!
-		for (int i=0; i<=subtour_idx; i=i+1){
-			for (int j=1; j<=subtours.lastKey(); j=j+2) {
-				if (subtours.get(j) == i) {
-					subtour.add(j-1);
-					subtour.add(j+1);
-				}
-			}
-			registerSubTours.put(i,subtour);
+	private final void removeSubTour (Plan plan, TreeMap<Integer, List<Integer>> subtours, int start, int end,int subtour_idx) {
+		for (int i=start+2; i<=end; i=i+2){
+			plan.removeAct(i);
+			//Cambiare!!!! Così non funziona sicuramente perchè 
+			//non tornanon piü i numeri di act_leg, la soluzione
+			// migliore probabilmente è creare un'altro oggetto
+			// fin dall'inizio e non usare i plan
 		}
-		handleSubTours (plan,registerSubTours);
+		
+		extractSubTours3(plan, 0, plan.getActsLegs().size()-1, subtour_idx, subtours);
 	}
-	
-	private final void extractSubTours(Plan plan, int start, int end, int subtour_idx, TreeMap<Integer,Integer> subtours) {
+	private final void registerSubTour2 (Plan plan, TreeMap<Integer, List<Integer>> subtours, int start, int end,int subtour_idx) {
+		List<Integer> l = null;
+		for (int i=start; i<=end; i=i+2){
+			 l.add(i);
+		}
+		subtours.put(subtour_idx,l);
+		removeSubTour(plan, subtours,start, end, subtour_idx);
+	}
+		
+	private	final void extractSubTours3(Plan plan,int start, int end,int subtour_idx, TreeMap<Integer,List<Integer>> subtours) {
 		boolean is_leaf = true;
-		System.out.println(start + " = start");
-		System.out.println(end + " = end");
-		for (int i=start+2; i<end-1; i=i+2) {
-			System.out.println(i + "= i");
-			System.out.println(end);
+		for (int i=start;i<end;i=i+2){
 			Act acti = (Act)plan.getActsLegs().get(i);
-			for (int j=end-2; j>i; j=j-2) {
-				System.out.println(j + "= j");
+			for (int j=start+2;j<end;j=j+2){
 				Act actj = (Act)plan.getActsLegs().get(j);
 				if ((acti.getCoord().getX() == actj.getCoord().getX()) &&
-				    (acti.getCoord().getY() == actj.getCoord().getY())) {
+					    (acti.getCoord().getY() == actj.getCoord().getY())) {
 					is_leaf = false;
-					System.out.println(start);
-					System.out.println(i);
-					System.out.println(j);
-					System.out.println(end);
-					// subtour found: start..i & j..end
-					// mark the legs of the subtour found
-					for (int iii=start+1;iii<i; iii=iii+2) { subtours.put(iii,subtour_idx); }
-					for (int iii=j+1;iii<end; iii=iii+2) { subtours.put(iii,subtour_idx); }
+					// subtour found: start=i & end=j
 					subtour_idx++;
-					// DO NOT HANDLE ANY SUBTOUR YET!!!
-					// next recursive step
-					int ii = i;
-					Act actii = acti;
-					for (int jj=i+2; jj<=j; jj=jj+2) {
-						Act actjj = (Act)plan.getActsLegs().get(jj);
-						if ((actii.getCoord().getX() == actjj.getCoord().getX()) &&
-						    (actii.getCoord().getY() == actjj.getCoord().getY())) {
-							this.extractSubTours(plan,ii,jj,subtour_idx,subtours);
-							ii = jj;
-							actii = (Act)plan.getActsLegs().get(ii);
-						}
-					}
-					return;
-				}	
+					extractSubTours3(plan, i, j, subtour_idx, subtours);
+				}
 			}
 		}
 		if (is_leaf) {
-			// mark the legs of the subtour found
-			System.out.println(start + " = start leaf");
-			System.out.println(end + " = end leaf");
-			for (int iii=start+1;iii<end; iii=iii+2) { subtours.put(iii,subtour_idx); }
-			subtour_idx++;
-			// DO NOT HANDLE ANY SUBTOUR YET!!!
+			registerSubTour2(plan, subtours, start,end, subtour_idx);
 		}
-		//this.registerSubTours(plan, subtours,subtour_idx);
-		System.out.println(subtours);
 	}
 	
-//	private final void extractSubTours(Plan plan, int start, int end) {
-//		boolean is_leaf = true;
-//		for (int i=start+2; i<end-1; i=i+2) {
-//			Act acti = (Act)plan.getActsLegs().get(i);
-//			for (int j=end-2; j>i; j=j-2) {
-//				Act actj = (Act)plan.getActsLegs().get(j);
-//				if ((acti.getCoord().getX() == actj.getCoord().getX()) &&
-//				    (acti.getCoord().getY() == actj.getCoord().getY())) {
-//					// subtour found: start..i & j..end
-//					is_leaf = false;
-//					this.handleSubTour(plan,start,i,j,end);
-//
-//					// next recursive step
-//					int ii = i;
-//					Act actii = acti;
-//					for (int jj=i+2; jj<=j; jj=jj+2) {
-//						Act actjj = (Act)plan.getActsLegs().get(jj);
-//						if ((actii.getCoord().getX() == actjj.getCoord().getX()) &&
-//						    (actii.getCoord().getY() == actjj.getCoord().getY())) {
-//							this.extractSubTours(plan,ii,jj);
-//							ii = jj;
-//							actii = (Act)plan.getActsLegs().get(ii);
-//						}
-//					}
-//					return;
-//				}
-//			}
-//		}
-//		if (is_leaf) {
-//			// leaf-sub-tour: start..end
-//			this.handleSubTour(plan,start,end,end,end);
-//			// TODO balmermi: check if this is all right
-//		}
-//	}
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
@@ -305,9 +243,12 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		//playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
 		
 		Plan plan = person.getSelectedPlan();
-		
-		TreeMap<Integer,Integer> subtours = new TreeMap<Integer,Integer>();
-		this.extractSubTours(plan,0,plan.getActsLegs().size()-1,0,subtours);
+		int subtour_idx =0;
+		int sub_order =0;
+		TreeMap<Integer, List<Integer>> subtours = new TreeMap<Integer,List<Integer>>();
+		//this.extractSubTours2(plan,0,plan.getActsLegs().size()-1, subtour_idx);
+		this.extractSubTours3(plan,0,plan.getActsLegs().size()-1,subtour_idx,subtours);
+		//this.extractSubTours(plan,0,plan.getActsLegs().size()-1,0,subtours);
 		
 		
 		// register subtours
