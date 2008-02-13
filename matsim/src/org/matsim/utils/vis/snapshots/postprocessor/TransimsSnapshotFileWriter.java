@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.snapshots.colorizer;
+package org.matsim.utils.vis.snapshots.postprocessor;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

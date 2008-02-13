@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DestinationDependentColorizer.java
+ * PostProcessorI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,45 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.snapshots.colorizer.processors;
+package org.matsim.utils.vis.snapshots.postprocessor.processors;
 
-import java.util.HashMap;
+public interface PostProcessorI {
 
-import org.matsim.basic.v01.Id;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
-
-public class DestinationDependentColorizer implements PostProcessorI {
-
-	private final static int NUM_OF_COLOR_SLOTS = 256;
-	
-	private static HashMap<IdI,String> destNodeMapping = new HashMap<IdI,String>();
-
-	private Plans plans;
-	
-	public DestinationDependentColorizer(Plans plans){
-		this.plans = plans;
-	}
-	
-	public String[] processEvent(String[] event) {
-		IdI id = new Id(event[0]);
-		String color = getColor(id);
-		event[15] = color;
-		return event;
-	}
-
-	private String getColor(IdI id) {
-		if(!destNodeMapping.containsKey(id)){
-			addMapping(id);
-		}
-		return destNodeMapping.get(id);
-	}
-
-	private synchronized void addMapping(IdI id) {
-		Leg leg = ((Leg)this.plans.getPerson(id).getSelectedPlan().getActsLegs().get(1)); 
-		IdI nodeId = leg.getRoute().getRoute().get(leg.getRoute().getRoute().size()-2).getId();
-		int mapping = Integer.parseInt(nodeId.toString()) % NUM_OF_COLOR_SLOTS; 
-		destNodeMapping.put(id,  Integer.toString(mapping));
-	}
+	public String[] processEvent(String [] event);
 }

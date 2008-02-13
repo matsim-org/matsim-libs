@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.snapshots.colorizer;
+package org.matsim.utils.vis.snapshots.postprocessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +30,9 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
-import org.matsim.utils.vis.snapshots.colorizer.processors.DestinationDependentColorizer;
-import org.matsim.utils.vis.snapshots.colorizer.processors.PostProcessorI;
-import org.matsim.utils.vis.snapshots.colorizer.processors.TimeDependentColorizer;
+import org.matsim.utils.vis.snapshots.postprocessor.processors.DestinationDependentColorizer;
+import org.matsim.utils.vis.snapshots.postprocessor.processors.PostProcessorI;
+import org.matsim.utils.vis.snapshots.postprocessor.processors.TimeDependentColorizer;
 import org.matsim.world.World;
 
 
