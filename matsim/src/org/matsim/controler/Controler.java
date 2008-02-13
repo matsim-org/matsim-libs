@@ -87,8 +87,10 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
+import org.matsim.plans.algorithms.PersonPrepareForSim;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
+import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
@@ -851,6 +853,10 @@ public class Controler {
 		return this.travelCostCalculator;
 	}
 
+	public final TravelTimeI getTravelTimeCalculator() {
+		return this.travelTimeCalculator;
+	}
+
 	/**
 	 * Sets a new {@link org.matsim.scoring.ScoringFunctionFactory} to use. <strong>Note:</strong> This will
 	 * reset all scores calculated so far! Only call this before any events are generated in an iteration.
@@ -1001,7 +1007,13 @@ public class Controler {
 	 * implemented as a ControlerListener, to keep the structure of the
 	 * Controler as simple as possible.
 	 */
-	/*default*/ class CoreControlerListener implements IterationStartsListener, BeforeMobsimListener, AfterMobsimListener {
+	/*default*/ class CoreControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, AfterMobsimListener {
+
+		public void notifyStartup(final StartupEvent event) {
+			Controler c = event.getControler();
+			// make sure all routes are calculated.
+			new PersonPrepareForSim(new PlansCalcRoute(c.getNetwork(), c.getTravelCostCalculator(), c.getTravelTimeCalculator())).run(c.getPopulation());
+		}
 
 		public void notifyIterationStarts(final IterationStartsEvent event) {
 			Controler.this.events.resetHandlers(event.getIteration());
