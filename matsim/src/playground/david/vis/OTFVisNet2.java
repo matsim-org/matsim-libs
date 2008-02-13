@@ -43,12 +43,12 @@ import org.matsim.interfaces.networks.basicNet.BasicNodeI;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
-import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.plans.Plan;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.vis.netvis.DisplayableNetI;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 import playground.david.vis.OTFTestHandler.Writer;
 import playground.david.vis.handler.DefaultAgentHandler;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim.snapshots;
+package org.matsim.utils.vis.snapshots.writers;
 
 import java.io.IOException;
 import java.util.GregorianCalendar;

@@ -36,11 +36,6 @@ import org.matsim.events.EventAgentStuck;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.snapshots.KmlSnapshotWriter;
-import org.matsim.mobsim.snapshots.PlansFileSnapshotWriter;
-import org.matsim.mobsim.snapshots.PositionInfo;
-import org.matsim.mobsim.snapshots.SnapshotWriterI;
-import org.matsim.mobsim.snapshots.TransimsSnapshotWriter;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -49,6 +44,11 @@ import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.VisConfig;
+import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
+import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
+import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
 
 class PersonAlgo_CheckSelected extends PersonAlgorithm {
 

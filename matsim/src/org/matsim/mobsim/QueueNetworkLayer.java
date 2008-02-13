@@ -27,11 +27,11 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 /**
  * @author david

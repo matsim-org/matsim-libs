@@ -18,13 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim.snapshots;
+package org.matsim.utils.vis.snapshots;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 public class PositionInfoTest extends MatsimTestCase {
 

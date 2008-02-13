@@ -24,8 +24,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.matsim.mobsim.snapshots.PositionInfo;
-import org.matsim.mobsim.snapshots.PositionInfo.VehicleState;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 
 import playground.david.vis.OTFParamProviderA;
 import playground.david.vis.OTFVisNet;

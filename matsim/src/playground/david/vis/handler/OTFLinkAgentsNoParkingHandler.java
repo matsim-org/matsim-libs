@@ -5,8 +5,8 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.snapshots.PositionInfo;
-import org.matsim.mobsim.snapshots.PositionInfo.VehicleState;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 
 import playground.david.vis.data.OTFDataWriter;
 import playground.david.vis.data.OTFWriterFactory;

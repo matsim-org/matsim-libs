@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnapshotWriterI.java
+ * transimsSnapshotFileReader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,43 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim.snapshots;
+package org.matsim.utils.vis.snapshots.colorizer;
 
-/**
- * Interface to implement custom snapshot writers. A snapshot contains information
- * about agents (location, speed) at a specific moment in time. Depending on the
- * format, multiple snapshts can be stored in one file. A snapshot writer should
- * implement a custom constructor to initialize it. For each snapshot, first the
- * method <code>beginSnapshot()</code> will be called, followed by several calls
- * to <code>addAgent()</code> and a final call to <code>endSnapshot()</code>. When
- * no more snapshots will have to be written, <code>finish()</code> is called.
- *
- * @author mrieser
- */
-public interface SnapshotWriterI {
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
-		/**
-		 * Tells the snapshot writer that a new snapshot begins at the specified time.
-		 *
-		 * @param time The time of the snapshot.
-		 */
-		public void beginSnapshot(double time);
+import org.matsim.utils.StringUtils;
+import org.matsim.utils.io.IOUtils;
 
-		/**
-		 * Tells the snapshot writer that no more vehicles will be added to the current snapshot.
-		 */
-		public void endSnapshot();
+public class TransimsSnapshotFileReader {
+
+	private BufferedReader infile = null;
+	public TransimsSnapshotFileReader(final String filename){
+		try {
+			this.infile = IOUtils.getBufferedReader(filename);
+		} catch (FileNotFoundException e) {
+
+			e.printStackTrace();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}		
+	}
+	
+	public String [] readLine() {
+		String [] tokline = null;
+		try {
+			String line = this.infile.readLine();
+			if (line == null){
+				this.infile.close();
+			} else {
+				tokline = StringUtils.explode(line, '\t', 16);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		/**
-		 * Adds an agent to the current snapshot.
-		 *
-		 * @param position The position, id, and speed of the agent.
-		 */
-		public void addAgent(PositionInfo position);
-		
-		/**
-		 * Tells the snapshot writer that no more snapshots will be added ("destructor").
-		 */
-		public void finish();
-
+		return tokline;
+	}
 }
+
+

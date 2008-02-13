@@ -9,9 +9,9 @@ import java.util.List;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
 
 import playground.david.vis.handler.OTFAgentsListHandler;

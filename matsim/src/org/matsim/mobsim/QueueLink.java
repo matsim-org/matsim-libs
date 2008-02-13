@@ -37,13 +37,13 @@ import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
-import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Leg;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 /**
  * @author david

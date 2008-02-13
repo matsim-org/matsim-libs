@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * TimeDependentColorizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,19 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim;
+package org.matsim.utils.vis.snapshots.colorizer.processors;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.plans.Plans;
 
-public class AllTests {
+public class TimeDependentColorizer implements PostProcessorI{
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.mobsim");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(QueueSimulatorTest.class);
-		//$JUnit-END$
-		return suite;
+	private Plans plans;
+
+	public TimeDependentColorizer(Plans plans) {
+		this.plans = plans;
 	}
 
+	public String[] processEvent(String[] event){
+		String id = event[0];
+		int time =  (int) (-60 * this.plans.getPerson(id).getSelectedPlan().getScore() / 6);
+		event[7] = Integer.toString(time);
+		return event;
+	}
+	
+	
 }

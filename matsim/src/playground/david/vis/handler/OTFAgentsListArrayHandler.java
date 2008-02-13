@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.mobsim.snapshots.PositionInfo;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 import playground.david.vis.data.OTFDataSimpleAgentArray;
 import playground.david.vis.data.OTFDataWriter;

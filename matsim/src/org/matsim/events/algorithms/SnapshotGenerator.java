@@ -44,14 +44,14 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.mobsim.snapshots.PositionInfo;
-import org.matsim.mobsim.snapshots.SnapshotWriterI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.VisConfig;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
 
 public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, EventHandlerLinkEnterI,
 		EventHandlerLinkLeaveI, EventHandlerAgentWait2LinkI, EventHandlerAgentStuckI {

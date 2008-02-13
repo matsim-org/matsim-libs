@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PostProcessorI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,19 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim;
+package org.matsim.utils.vis.snapshots.colorizer.processors;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+public interface PostProcessorI {
 
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.mobsim");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(QueueSimulatorTest.class);
-		//$JUnit-END$
-		return suite;
-	}
-
+	public String[] processEvent(String [] event);
 }

@@ -25,14 +25,14 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.mobsim.snapshots.KmlSnapshotWriter;
-import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.ArgumentParser;
+import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 /**
  * Converts a TRANSIMS vehicle file into a google earth file.

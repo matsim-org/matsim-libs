@@ -11,11 +11,11 @@ import java.util.TreeMap;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.Plan;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
 
 import playground.david.vis.data.OTFDefaultNetWriterFactoryImpl;

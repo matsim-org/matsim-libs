@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.snapshots.PositionInfo;
-import org.matsim.mobsim.snapshots.PositionInfo.VehicleState;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 
 import playground.david.vis.data.OTFDataSimpleAgent;
 import playground.david.vis.data.OTFDataWriter;

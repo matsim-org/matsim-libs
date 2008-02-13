@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.mobsim.snapshots.PositionInfo;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 import playground.david.vis.data.OTFDataSimpleAgent;
 import playground.david.vis.data.OTFDataWriter;

@@ -28,16 +28,16 @@ import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.algorithms.SnapshotGenerator;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.snapshots.KmlSnapshotWriter;
-import org.matsim.mobsim.snapshots.PlansFileSnapshotWriter;
-import org.matsim.mobsim.snapshots.SnapshotWriterI;
-import org.matsim.mobsim.snapshots.TransimsSnapshotWriter;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.ArgumentParser;
 import org.matsim.utils.vis.netvis.VisConfig;
+import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
+import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
+import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
+import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
 
 /**
  * Converts  an events file to a snapshot file.

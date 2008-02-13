@@ -37,13 +37,13 @@ import java.util.Map;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.mobsim.snapshots.PositionInfo;
-import org.matsim.mobsim.snapshots.SnapshotWriterI;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.Plan;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
 import org.matsim.world.World;
 
 import playground.david.vis.data.OTFNetWriterFactory;

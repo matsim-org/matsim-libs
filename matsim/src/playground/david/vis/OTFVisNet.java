@@ -44,10 +44,10 @@ import org.matsim.interfaces.networks.basicNet.BasicNodeI;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
-import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.plans.Plan;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.vis.netvis.DisplayableNetI;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 import playground.david.vis.handler.DefaultAgentHandler;
 import playground.david.vis.handler.DefaultLinkHandler;

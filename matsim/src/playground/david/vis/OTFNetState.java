@@ -29,8 +29,8 @@ import java.util.List;
 
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNode;
-import org.matsim.mobsim.snapshots.PositionInfo;
 import org.matsim.utils.vis.netvis.visNet.DisplayAgent;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 public class OTFNetState {
 	
