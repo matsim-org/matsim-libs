@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY OUTPUTBASE   "/data/matsim-t/scratch/balmermi/sandbox00/output/run219">
-		<!ENTITY INPUTBASE    "/data/matsim-t/scratch/balmermi/sandbox00/input">
-		<!ENTITY STUDYBASE    "/data/matsim-t/scratch/balmermi/sandbox00/input">
+		<!ENTITY OUTPUTBASE   "/data/matsim/balmermi/sandbox00/output/run225">
+		<!ENTITY INPUTBASE    "/data/matsim/balmermi/sandbox00/input">
+		<!ENTITY STUDYBASE    "/data/matsim/balmermi/sandbox00/input">
 		<!ENTITY HOMEPAGEBASE "http://www.matsim.org/files/dtd">
-		<!ENTITY LOCALDTDBASE "/data/matsim-t/scratch/balmermi/sandbox00/dtd">
+		<!ENTITY LOCALDTDBASE "/data/matsim/balmermi/sandbox00/dtd">
 	]
 >
 
@@ -21,7 +21,7 @@
 
 	<module name="controler" >
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="50" />
+		<param name="lastIteration" value="200" />
 		<param name="outputDirectory" value="&OUTPUTBASE;" />
 	</module>
 
@@ -41,11 +41,13 @@
 
 	<module name="deqsim">
 	<!--	<param name="executable" value="/home/balmermi/deqsim/build/microsim/microsim" />-->
-		<param name="executable" value="/usr/bin/mpirun -n 8 /home/balmermi/deqsimP/build/microsim/microsim" />
+	<!--	<param name="executable" value="/usr/bin/mpirun -n 8 /home/balmermi/deqsimP/build/microsim/microsim" /> -->
+		<param name="executable" value="/usr/bin/mpirun -n 8 /home/balmermi/old_versions_allsim/deqsimP/build/microsim/microsim" /> 
+	<!--	<param name="executable" value="/usr/bin/mpirun -n 8 /home/balmermi/allsim_binaries/deqsim_P" /> -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="600:00:00" />
 		<param name="flowCapacityFactor" value="1.00" />
-		<param name="storageCapacityFactor" value="1.00" />
+		<param name="storageCapacityFactor" value="20.00" />
 		<param name="squeezeTime" value="00:01:00" />
 		<param name="carSize" value="7.5" />
 		<param name="gapTravelSpeed" value="15.0" />
@@ -80,8 +82,8 @@
 <!-- ====================================================================== -->
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml.gz" />
-		<param name="outputNetworkFile" value="&OUTPUTBASE;/output_network.xml.gz" />
+		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml" />
+		<param name="outputNetworkFile" value="&OUTPUTBASE;/output_network.xml" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -124,12 +126,12 @@
 	<!--	<param name="Module_1" value="TimeAllocationMutator7200_ReRouteLandmarks" /> -->
 	<!--	<param name="ModuleProbability_1" value="0.10" /> -->
 	<!--	<param name="Module_1" value="TimeAllocationMutator7200_ReRouteLandmarks" /> -->
-		<param name="ModuleProbability_1" value="0.10" />
-		<param name="Module_1" value="TimeAllocationMutator" />
-		<param name="ModuleProbability_2" value="0.10" /> 
-		<param name="Module_2" value="ReRoute_Landmarks" /> 
-		<param name="ModuleProbability_3" value="0.80" />
-		<param name="Module_3" value="SelectExpBeta" />
+	<!--	<param name="ModuleProbability_1" value="0.10" /> -->
+	<!--	<param name="Module_1" value="TimeAllocationMutator" /> -->
+		<param name="ModuleProbability_1" value="0.10" /> 
+		<param name="Module_1" value="ReRoute_Landmarks" /> 
+		<param name="ModuleProbability_2" value="0.90" />
+		<param name="Module_2" value="SelectExpBeta" />
 	</module>
 
 <!-- ====================================================================== -->
