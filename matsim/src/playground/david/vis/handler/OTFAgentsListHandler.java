@@ -23,8 +23,15 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	
 	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	
+	@SuppressWarnings("unchecked")
 	static public class Writer extends  OTFDataWriter implements Serializable {
 
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6368752578878835954L;
+		
 		public transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 
 		@Override
