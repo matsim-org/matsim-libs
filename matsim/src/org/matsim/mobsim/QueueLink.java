@@ -28,7 +28,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventAgentStuck;
@@ -255,9 +254,6 @@ public class QueueLink extends Link {
 			if (!hasBufferSpace())
 				break;
 
-			if (veh.getDriver().getId().equals(new Id("9"))) {
-				System.out.println("breakpoint");
-			}
 			addToBuffer(veh, now);
 
 			QueueSimulation.getEvents().processEvent(
