@@ -20,7 +20,14 @@
 
 package playground.andreas.intersection.sim;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
@@ -30,7 +37,15 @@ import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.Simulation;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.plans.Plans;
+import org.matsim.trafficlights.data.SignalGroupDefinition;
+import org.matsim.trafficlights.data.SignalGroupDefinitionParser;
+import org.matsim.trafficlights.data.SignalSystemConfiguration;
+import org.matsim.trafficlights.data.SignalSystemConfigurationParser;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
+import org.xml.sax.SAXException;
+
+import playground.andreas.intersection.tl.SignalSystemControlerImpl;
 
 public class QSim extends Simulation {
 
@@ -49,6 +64,49 @@ public class QSim extends Simulation {
 		this.plans = population;
 		this.network = network;
 		this.config = Gbl.getConfig();
+	}
+	
+	private void readSignalSystemControler(){
+		
+		Map<IdI, SignalSystemConfiguration> signalSystemConfigurations = null;
+				
+		final String signalSystems = "./src/playground/andreas/intersection/signalSystemConfig.xml";
+		final String groupDefinitions = "./src/playground/andreas/intersection/signalGroupDefinition.xml";
+				
+		try {
+			List<SignalGroupDefinition> signalGroups = new LinkedList<SignalGroupDefinition>();
+			
+			SignalGroupDefinitionParser groupParser = new SignalGroupDefinitionParser(signalGroups);
+			groupParser.parse(groupDefinitions);
+			SignalSystemConfigurationParser signalParser = new SignalSystemConfigurationParser(signalGroups);
+			signalParser.parse(signalSystems);
+		
+			signalSystemConfigurations = signalParser.getSignalSystemConfigurations();
+		
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		for (Iterator iter = network.getNodes().values().iterator(); iter.hasNext();) {
+			QNode node = (QNode) iter.next();
+		
+			
+			
+			if (node.getId().toString().equals("99")){
+				SignalSystemControlerImpl nodeControler = new SignalSystemControlerImpl(signalSystemConfigurations.get(node.getId()));
+				node.setSignalSystemControler(nodeControler);
+			}
+			
+						
+		}
+		
 	}
 
 	protected void prepareSim() {
@@ -80,6 +138,8 @@ public class QSim extends Simulation {
 		// set sim start time to config-value ONLY if this is LATER than the first plans starttime
 		SimulationTimer.setSimStartTime(Math.max(startTime, SimulationTimer.getSimStartTime()));
 		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
+		
+		readSignalSystemControler();
 	}
 
 	protected void cleanupSim() {

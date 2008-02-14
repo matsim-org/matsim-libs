@@ -5,10 +5,18 @@ import java.util.Iterator;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.network.Node;
 
+import playground.andreas.intersection.tl.SignalSystemControlerImpl;
+
 public class QNode extends Node{
+	
+	private SignalSystemControlerImpl myNodeTrafficLightControler;
 	
 	public QNode(String id, String x, String y, String type) {
 		super(id, x, y, type);		
+	}
+	
+	public void setSignalSystemControler(SignalSystemControlerImpl nodeControler){
+		this.myNodeTrafficLightControler = nodeControler;
 	}
 
 	/** Simple moveNode, Complex one can be found in {@link QueueLink} */
