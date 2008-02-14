@@ -38,7 +38,7 @@ import org.matsim.events.Events;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.IOUtils;
 
-import playground.yu.analysis.CalcAvgSpeed;
+import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
 
 /**
@@ -60,7 +60,7 @@ public class PtcheckControler extends Controler {
 		 */
 		private BufferedWriter out;
 		private CalcAverageTripLength catl = null;
-		private CalcAvgSpeed cas = null;
+		private CalcNetAvgSpeed cas = null;
 		private CalcTrafficPerformance ctpf = null;
 		private RoadPricing rp = null;
 
@@ -84,7 +84,7 @@ public class PtcheckControler extends Controler {
 				e.printStackTrace();
 			}
 			NetworkLayer network = ctl.getNetwork();
-			cas = new CalcAvgSpeed(network);
+			cas = new CalcNetAvgSpeed(network);
 			ctpf = new CalcTrafficPerformance(network);
 			Events events = ctl.getEvents();
 			events.addHandler(cas);

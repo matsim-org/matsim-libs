@@ -102,7 +102,7 @@ public class AnalysisTest {
 		}
 
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network);
-		CalcAvgSpeed cas = new CalcAvgSpeed(network);
+		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network);
 
 		events.addHandler(ctpf);
 		events.addHandler(cas);

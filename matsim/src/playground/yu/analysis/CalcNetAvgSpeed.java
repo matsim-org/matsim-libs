@@ -40,14 +40,16 @@ import org.matsim.network.NetworkLayer;
  * @author ychen
  * 
  */
-public class CalcAvgSpeed implements EventHandlerLinkEnterI,
+public class CalcNetAvgSpeed implements EventHandlerLinkEnterI,
 		EventHandlerLinkLeaveI, EventHandlerAgentArrivalI {
-	/*
-	 * lengthSum: the sum of all the covered distance [km] timeSum: the sum of
-	 * all the drivingtime [h]
+	/**
+	 * @param lengthSum -
+	 *            the sum of all the covered distance [km].
+	 * @param timeSum -
+	 *            the sum of all the drivingtime [h]
 	 */
 	private double lengthSum, timeSum;
-	private NetworkLayer network = null;
+	protected NetworkLayer network = null;
 	/*
 	 * enterTimes<String agentId, Double enteringtime>
 	 */
@@ -57,16 +59,15 @@ public class CalcAvgSpeed implements EventHandlerLinkEnterI,
 	/**
 	 * 
 	 */
-	public CalcAvgSpeed(final NetworkLayer network) {
+	public CalcNetAvgSpeed(final NetworkLayer network) {
 		this.network = network;
 		enterTimes = new TreeMap<String, Double>();
-
 	}
 
 	public void handleEvent(EventLinkEnter enter) {
-//		if (enter.agent.getSelectedPlan().getType().equals("car")) {
-			enterTimes.put(enter.agentId, enter.time);
-//		}
+		// if (enter.agent.getSelectedPlan().getType().equals("car")) {
+		enterTimes.put(enter.agentId, enter.time);
+		// }
 	}
 
 	public void reset(int iteration) {

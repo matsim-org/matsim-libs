@@ -43,7 +43,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.utils.io.IOUtils;
 
-import playground.yu.analysis.CalcAvgSpeed;
+import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
 
 /**
@@ -60,7 +60,7 @@ public class NewPtcheckControler extends Controler {
 	public static class PtCheckListener implements StartupListener,
 			IterationEndsListener, IterationStartsListener, ShutdownListener {
 		private CalcTrafficPerformance ctpf = null;
-		private CalcAvgSpeed cas = null;
+		private CalcNetAvgSpeed cas = null;
 		private CalcAverageTolledTripLength cattl = null;
 		/**
 		 * internal bufferedWriter
@@ -90,7 +90,7 @@ public class NewPtcheckControler extends Controler {
 				e.printStackTrace();
 			}
 			NetworkLayer network = ctl.getNetwork();
-			cas = new CalcAvgSpeed(network);
+			cas = new CalcNetAvgSpeed(network);
 			ctpf = new CalcTrafficPerformance(network);
 			Events events = ctl.getEvents();
 			events.addHandler(cas);
