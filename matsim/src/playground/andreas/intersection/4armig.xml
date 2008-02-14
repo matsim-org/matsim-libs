@@ -29,13 +29,13 @@
       <link id="400" from="7" to="99" length="300.00" capacity="2000" freespeed="13.88" permlanes="1"  />
       <link id="401" from="99" to="8" length="300.00" capacity="2000" freespeed="13.88" permlanes="1"  />
 	   
-      <link id="10" from="1020" to="1" length="700.00" capacity="36000" freespeed="13.88" permlanes="1"  />
-      <link id="20" from="2" to="1020" length="700.00" capacity="36000" freespeed="13.88" permlanes="1"  />
-      <link id="30" from="3040" to="3" length="700.00" capacity="36000" freespeed="13.88" permlanes="1"  />
-      <link id="40" from="4" to="3040" length="700.00" capacity="36000" freespeed="13.88" permlanes="1"  />
-      <link id="50" from="5060" to="5" length="700.00" capacity="36000" freespeed="13.88" permlanes="1"  />
-      <link id="60" from="6" to="5060" length="700.00" capacity="36000" freespeed="13.88" permlanes="1"  />
-      <link id="70" from="7080" to="7" length="700.00" capacity="36000" freespeed="13.88" permlanes="1"  />
-      <link id="80" from="8" to="7080" length="700.00" capacity="36000" freespeed="13.88" permlanes="1"  />
+      <link id="10" from="1020" to="1" length="700.00" capacity="3600" freespeed="13.88" permlanes="1"  />
+      <link id="20" from="2" to="1020" length="700.00" capacity="3600" freespeed="13.88" permlanes="1"  />
+      <link id="30" from="3040" to="3" length="700.00" capacity="3600" freespeed="13.88" permlanes="1"  />
+      <link id="40" from="4" to="3040" length="700.00" capacity="3600" freespeed="13.88" permlanes="1"  />
+      <link id="50" from="5060" to="5" length="700.00" capacity="3600" freespeed="13.88" permlanes="1"  />
+      <link id="60" from="6" to="5060" length="700.00" capacity="3600" freespeed="13.88" permlanes="1"  />
+      <link id="70" from="7080" to="7" length="700.00" capacity="3600" freespeed="13.88" permlanes="1"  />
+      <link id="80" from="8" to="7080" length="700.00" capacity="3600" freespeed="13.88" permlanes="1"  />
    </links>
 </network>
