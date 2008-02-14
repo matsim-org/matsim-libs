@@ -5,6 +5,7 @@ import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
 import org.matsim.network.Link;
 import org.matsim.router.util.TravelCostI;
+import org.matsim.router.util.TravelTimeI;
 
 /**
  * 
@@ -12,7 +13,7 @@ import org.matsim.router.util.TravelCostI;
  * @author illenberger
  * 
  */
-public class LinkCost1 extends TimevariantCostMapBased implements TravelCostI {
+public class LinkCost1 extends TimevariantCostMapBased implements TravelCostI, TravelTimeI {
 	
 	private static Logger logger = Logger.getLogger(LinkCost1.class);
 
@@ -112,4 +113,8 @@ public class LinkCost1 extends TimevariantCostMapBased implements TravelCostI {
         }
 
     }
+
+	public double getLinkTravelTime(Link link, double time) {
+		return getLinkTravelCost(link, time);
+	}
 }

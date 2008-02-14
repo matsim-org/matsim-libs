@@ -63,16 +63,9 @@ public class EUTRouter implements LeastCostPathCalculator {
 		double leastcost = Double.MAX_VALUE;
 		
 		for(Route route : routes) {
-			double totalcosts = 0;
-			for(int state = 0; state < ttProvider.size(); state++) {
-				TravelTimeI traveltimes = ttProvider.requestLinkCost(state);
-				double totaltt = 0;
-				for(Link link : route.getLinkRoute()) {
-					totaltt += traveltimes.getLinkTravelTime(link, starttime + totaltt); 
-				}
-				totalcosts += utilFunc.evaluate(totaltt);
-			}
-			double avrcosts = totalcosts / (double)ttProvider.size();
+			double aggregatedcosts = calcCosts(ttProvider.requestAggregatedState(), route, starttime);
+			double currentcosts = calcCosts(ttProvider.requestCurrentState(), route, starttime);
+			double avrcosts = 0.9*aggregatedcosts + 0.1*currentcosts;
 			if(avrcosts < leastcost) {
 				leastcost = avrcosts;
 				bestroute = route;
@@ -80,5 +73,13 @@ public class EUTRouter implements LeastCostPathCalculator {
 		}
 		
 		return bestroute;
+	}
+	
+	private double calcCosts(TravelTimeI traveltimes, Route route, double starttime) {
+		double totaltt = 0;
+		for(Link link : route.getLinkRoute()) {
+				totaltt += traveltimes.getLinkTravelTime(link, starttime + totaltt); 
+		}
+		return utilFunc.evaluate(totaltt);
 	}
 }

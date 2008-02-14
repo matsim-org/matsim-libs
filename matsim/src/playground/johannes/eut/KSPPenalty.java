@@ -153,7 +153,7 @@ public class KSPPenalty {
 			Route path = algorithm.calcLeastCostPath(departure, destination, time);
 			if (path != null) {
 				/*
-				 * (2a) Inrease the impedance on the links in the identified
+				 * (2a) Increase the impedance on the links in the identified
 				 * path.
 				 */
 				penalizeLinks(path);
@@ -161,8 +161,17 @@ public class KSPPenalty {
 				 * (2b) If we have not identified this path before, added to the
 				 * list of different paths.
 				 */
-				if (!paths.contains(path))
+				boolean found = false;
+				if (paths.isEmpty())
 					paths.add(path);
+				else {
+					for (Route foundpaths : paths) {
+						if (foundpaths.getRoute().equals(path.getRoute()))
+							found = true;
+					}
+					if (!found)
+						paths.add(path);
+				}
 			}
 			runcount++;
 		} while (paths.size() < count && runcount < maxruns);

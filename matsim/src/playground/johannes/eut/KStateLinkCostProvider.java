@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
 
@@ -20,11 +21,26 @@ public class KStateLinkCostProvider {
 
 	private static final Logger log = Logger.getLogger(KStateLinkCostProvider.class);
 	
-	private LinkedList<TravelTimeI> providers = new LinkedList<TravelTimeI>();
+//	private ArrayList<TravelTimeI> providers = new ArrayList<TravelTimeI>(2);
 	
-	public int size() {
-		return providers.size();
+	private TravelTimeI currentlinkcost;
+	
+	private LinkCost1 aggreatedlinkcost;
+	
+	private NetworkLayer network;
+	
+	private double learningrate = 0.1;
+	
+	private boolean firstrun = true;
+	
+	public KStateLinkCostProvider(int binsize, int start, int end, NetworkLayer network) {
+		aggreatedlinkcost = new LinkCost1(start, end, binsize);
+		this.network = network;
 	}
+	
+//	public int size() {
+//		return providers.size();
+//	}
 	
 //	public EvaluatedLinkCostI requestEvaluatedLinkCost() {
 //		MeanLinkCost linkcost = (MeanLinkCost) requestLinkCost();
@@ -35,31 +51,62 @@ public class KStateLinkCostProvider {
 //	}
 
 	public void appendTTSet(AbstractTravelTimeCalculator ttcalulator) {
-		providers.add(ttcalulator);
-		if(providers.size() > 2)
-			providers.remove();
+		if(firstrun) {
+			initlinkcost(ttcalulator);
+			firstrun = false;
+		} else {
+			aggregate(currentlinkcost);
+		}
+		currentlinkcost = ttcalulator;
+	}
+	
+	private void initlinkcost(TravelTimeI traveltimes) {
+		for(Link link : network.getLinks().values()) {
+			for(int t=aggreatedlinkcost.getStartTime_s(); t < aggreatedlinkcost.getEndTime_s(); t+=aggreatedlinkcost.getBinSize_s()) {
+				aggreatedlinkcost.setCost(link, traveltimes.getLinkTravelTime(link, t), t);
+			}
+		}
+	}
+	
+	private void aggregate(TravelTimeI traveltimes) {
+		for(Link link : network.getLinks().values()) {
+			for(int t=aggreatedlinkcost.getStartTime_s(); t < aggreatedlinkcost.getEndTime_s(); t+=aggreatedlinkcost.getBinSize_s()) {
+				double oldval = aggreatedlinkcost.getCost(link, t);
+				aggreatedlinkcost.setCost(link, (1-learningrate)*oldval + learningrate*traveltimes.getLinkTravelTime(link, t), t);
+			}
+		}
 	}
 	
 	public TravelTimeI requestLinkCost() {
-		List<TravelTimeI> linkcosts = new ArrayList<TravelTimeI>(providers.size());
-		for(TravelTimeI provider : providers) {
-			linkcosts.add(provider);
-		}
+//		List<TravelTimeI> linkcosts = new ArrayList<TravelTimeI>(2);
+//		linkcosts.add(agg)
+//		for(TravelTimeI provider : providers) {
+//			linkcosts.add(provider);
+//		}
 	
-		if(!linkcosts.isEmpty())
-			return new MeanLinkCost(linkcosts);
-		else
-			return null;
+//		if(!linkcosts.isEmpty())
+//			return new MeanLinkCost(linkcosts);
+//		else
+//			return null;
+		return aggreatedlinkcost; // TODO: check this!!!
 	}
 	
-	public TravelTimeI requestLinkCost(int state) {
-		if(state < providers.size())
-			return providers.get(state);
-		else {
-			log.warn(String.format("State %1$s is out of bounds (%2$s, arg1)!", state, providers.size()));
-			return null;
-		}
+	public TravelTimeI requestCurrentState() {
+		return currentlinkcost;
 	}
+	
+	public TravelTimeI requestAggregatedState() {
+		return aggreatedlinkcost;
+	}
+	
+//	public TravelTimeI requestLinkCost(int state) {
+//		if(state < providers.size())
+//			return providers.get(state);
+//		else {
+//			log.warn(String.format("State %1$s is out of bounds (%2$s, arg1)!", state, providers.size()));
+//			return null;
+//		}
+//	}
 
 //	public TurningMoveCostI requestTurningMoveCost() {
 //		return null;
