@@ -130,9 +130,9 @@ public class PersonStreaming {
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
-
+		System.out.println("Funziona?");
 		run();
-
+		System.out.println("Funziona!!!!");
 		Gbl.printElapsedTime();
 	}
 }
