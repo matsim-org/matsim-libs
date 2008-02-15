@@ -103,7 +103,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			OTFDataSimpleAgent.Receiver drawer = null;
 			try {
 				drawer = (playground.david.vis.data.OTFDataSimpleAgent.Receiver) agentReceiverClass.newInstance();
-				drawer.setAgent(idBuffer, x, y, state, color);
+				drawer.setAgent(idBuffer, x, y, 0, state, color);
 				agents.add(drawer);
 			} catch (InstantiationException e) {
 				log.warn("Agent drawer could not be instanciated");
@@ -151,6 +151,12 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	}
 
 	
+	/***
+	 * PREVIOUS VERSION of the reader
+	 * @author dstrippgen
+	 *
+	 */
+
 	public static final class ReaderV1_1 extends OTFLinkAgentsHandler {
 		@Override
 		public void readDynData(ByteBuffer in) throws IOException {

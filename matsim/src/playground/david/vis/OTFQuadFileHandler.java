@@ -60,7 +60,7 @@ public class OTFQuadFileHandler {
 	// the version number should be increased to imply a compatibility break
 	public static final int VERSION = 1;
 	// minor version increase does not break compatibility
-	public static final int MINORVERSION = 2;
+	public static final int MINORVERSION = 3;
 	
 	public static class Writer {
 		protected QueueNetworkLayer net = null;
@@ -206,7 +206,7 @@ public class OTFQuadFileHandler {
 		//public ByteArrayOutputStream out = null;
 		protected double intervall_s = -1, nextTime = -1;
 		
-		TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
+		TreeMap<Integer, Long> timesteps = new TreeMap<Integer, Long>();
 
 		public void scanZIPFile() throws IOException {
 			nextTime = -1;
@@ -229,14 +229,23 @@ public class OTFQuadFileHandler {
 
 					int time_s = Integer.parseInt(spliti[1]);
 					if (nextTime == -1) nextTime = time_s;
-					timesteps.put(time_s, new byte[(int) entry.getSize()]); //DS TODO unsafe, entry could get bigger than int 
+					timesteps.put(time_s,  entry.getSize());  
 				}
 			}
 			Gbl.printElapsedTime();
 			Gbl.printMemoryUsage();
 		}
 
-		public void readZIPFile() throws IOException {
+		public byte [] readTimeStep(int time_s) throws IOException {
+			ZipEntry entry = zipFile.getEntry("step." + time_s + ".bin");
+			byte [] buffer = new byte [(int)timesteps.get(time_s).longValue()]; //DS TODO Might be bigger than int??
+			
+			inFile = new DataInputStream(new BufferedInputStream(zipFile.getInputStream(entry)));
+			readStateBuffer(buffer);
+			return buffer;
+		}
+		
+		public void readZIPFile2() throws IOException {
 			// Create an enumeration of the entries in the zip file
 			Enumeration zipFileEntries = zipFile.entries();
 
@@ -253,9 +262,9 @@ public class OTFQuadFileHandler {
 					String [] spliti = StringUtils.explode(currentEntry, '.', 10);
 
 					int time_s = Integer.parseInt(spliti[1]);
-					byte [] buffer = timesteps.get(time_s);
-					inFile = new DataInputStream(new BufferedInputStream(zipFile.getInputStream(entry)));
-					readStateBuffer(buffer);
+					//byte [] buffer = timesteps.get(time_s);
+					//inFile = new DataInputStream(new BufferedInputStream(zipFile.getInputStream(entry)));
+					//readStateBuffer(buffer);
 				}
 			}
 		}
@@ -285,7 +294,7 @@ public class OTFQuadFileHandler {
 		public void readQuad() {
 			try {
 				scanZIPFile();
-				readZIPFile();
+				// we do not chache anymore ...readZIPFile();
 				ZipEntry quadEntry = zipFile.getEntry("quad.bin");
 				BufferedInputStream is =  new BufferedInputStream(zipFile.getInputStream(quadEntry));
 				try {
@@ -402,7 +411,13 @@ public class OTFQuadFileHandler {
 		}
 
 		public byte[] getStateBuffer() throws RemoteException {
-			byte [] buffer = timesteps.get((int)nextTime);
+			byte[] buffer = null;
+			try {
+				buffer = readTimeStep((int)nextTime);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			int time = 0;
 			Iterator<Integer> it =  timesteps.keySet().iterator();
 			while(it.hasNext() && time <= nextTime) time = it.next();
@@ -414,8 +429,27 @@ public class OTFQuadFileHandler {
 		}
 
 		public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
-			// TODO Auto-generated method stub
-			return false;
+			int lastTime = -1;
+			int foundTime = -1;
+			for(Integer timestep : timesteps.keySet()) {
+				if (searchDirection == TimePreference.EARLIER){
+					if(time >= timestep) {
+						foundTime = lastTime;
+						break;
+					}
+				} else {
+					if(time >= timestep) {
+						foundTime = timestep;
+						break;
+					}
+				}
+				lastTime = timestep;
+			}
+			if (foundTime == -1) return false;
+			
+			nextTime = foundTime;
+			actBuffer = null;
+			return true;
 		}
 
 	}

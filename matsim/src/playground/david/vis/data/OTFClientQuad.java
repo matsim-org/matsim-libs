@@ -19,6 +19,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	private final double maxEasting;
 	private final double minNorthing;
 	private final double maxNorthing;
+	
+	public double offsetEast;
+	public double offsetNorth;
+
 	private final String id;
 	private final OTFServerRemote host;
 	private final List<OTFDataReader> additionalElements= new LinkedList<OTFDataReader>();

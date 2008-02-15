@@ -3,18 +3,18 @@ package playground.david.vis;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
 
 import playground.david.vis.handler.OTFAgentsListHandler;
+import playground.david.vis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 
 public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 	private final   String netFileName = "";
@@ -36,6 +36,34 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 	protected void onAdditionalQuadData() {
 		quad.addAdditionalElement(writer);
 	}
+	
+//	public static double myParseDouble(String rep) {
+//		double result = 0;
+//		int exp = 1;
+//		double factor = 1;
+//		double before= 0;
+//		double after = 0;
+//		String [] parts = StringUtils.explode(rep, 'E');
+//		if(parts.length == 2) {
+//			exp = Integer.parseInt(parts[1]);
+//			while (exp-- >0) factor *=10.;
+//		} else {
+//			
+//		}
+//		parts = StringUtils.explode(parts[0], '.');
+//		before = Long.parseLong(parts[0]);
+//		if(parts.length == 2) {
+//			after = Long.parseLong(parts[1]);
+//			double divider = 1;
+//			int stellen = parts[1].length();
+//			while (stellen-- >0) divider *=10.;
+//			after /= divider;
+//		} else {
+//			
+//		}
+//		result = (before + after)* factor;
+//		return result;
+//	}
 
 	ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
 	private int cntPositions=0;
@@ -60,10 +88,12 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 			String line = null;
 			while ( (line = reader.readLine()) != null) {
 	
-				String[] result = line.split("\t");
+				
+				String[] result = StringUtils.explode(line, '\t', 16);//line.split("\t");
 				if (result.length == 16) {
 					double easting = Double.parseDouble(result[11]);
 					double northing = Double.parseDouble(result[12]);
+					
 					if (easting >= quad.getMinEasting() && easting <= quad.getMaxEasting() && northing >= quad.getMinNorthing() && northing <= quad.getMaxNorthing()) {
 						String agent = result[0];
 						String time = result[1];
@@ -71,8 +101,9 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 						String speed = result[6];
 						String elevation = result[13];
 						String azimuth = result[14];
-						PositionInfo position = new PositionInfo(new Id(agent), easting, northing,
-								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, result[15]);
+						String type = result[7];
+						ExtendedPositionInfo position = new ExtendedPositionInfo(new Id(agent), easting, northing,
+								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 						addVehicle(Double.parseDouble(time), position);
 					}
 				}
@@ -85,7 +116,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		finish();
 	}
 
-	private void addVehicle(double time, PositionInfo position) {
+	private void addVehicle(double time, ExtendedPositionInfo position) {
 		this.cntPositions++;
 
 		// Init lastTime with first occurence of time!
@@ -94,7 +125,11 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		if (time != this.lastTime) {
 			this.cntTimesteps++;
 
-			if (time % 600 == 0 ) System.out.println("Parsing T = " + time + " secs");
+			if (time % 600 == 0 ) {
+				System.out.println("Parsing T = " + time + " secs");
+				Gbl.printElapsedTime();
+				Gbl.startMeasurement();
+			}
 			// the time changes
 				// this is a dumpable timestep
 				try {
@@ -113,7 +148,6 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 //		}
 	}
 	
-	List<PositionInfo> listAgents = new LinkedList<PositionInfo>();
 	
 
 	private void finish() {
@@ -136,8 +170,8 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 
 		String netFileName = "../../tmp/studies/padang/padang_net.xml"; 
 //		String vehFileName = "../../tmp/studies/padang/run301.it100.colorized.T.veh.gz"; 
-		String vehFileName = "../runs/run301/output/ITERS/it.100/T.veh.gz"; 
-		String outFileName = "output/testPadabang.mvi";
+		String vehFileName = "../runs/run301/output/100.T.veh.gz"; 
+		String outFileName = "../OnTheFlyVis/test/testPadabang1.3.mvi";
 		int intervall_s = 60;
 		
 		Gbl.createConfig(null);

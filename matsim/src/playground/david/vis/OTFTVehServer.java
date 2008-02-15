@@ -83,7 +83,7 @@ public class OTFTVehServer implements OTFServerRemote{
 	private final int cntPositions=0;
 	private final double lastTime=-1;
 	private final int cntTimesteps=0;
-	private PositionInfo readVehicle = null;
+	private OTFAgentsListHandler.ExtendedPositionInfo readVehicle = null;
 	private double time;
 	
 	public boolean readOneLine(){
@@ -111,8 +111,8 @@ public class OTFTVehServer implements OTFServerRemote{
 
 					lineFound = true;
 					this.time = Double.parseDouble(time);
-					this.readVehicle = new PositionInfo(new Id(agent), easting, northing,
-							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, result[15]);
+					this.readVehicle = new OTFAgentsListHandler.ExtendedPositionInfo(new Id(agent), easting, northing,
+							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 					return true;
 				}
 			}

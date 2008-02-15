@@ -323,9 +323,24 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private void pressed_STEP_B() throws IOException {
 		stopMovie();
-		host.step();
-		simTime = host.getLocalTime();
-		invalidateHandlers();
+
+		if(isCachedTime(simTime-1)){
+			simTime -= 1;
+			invalidateHandlers();
+		} else if (host.requestNewTime(simTime-1, OTFServerRemote.TimePreference.EARLIER)) {
+			simTime = host.getLocalTime();
+			invalidateHandlers();
+		} else {
+			System.out.println("No prevoius timestep found");
+		}
+	}
+
+	private boolean isCachedTime(int time) {
+		boolean result = true;
+		for (OTFEventHandler handler : handlers.values()) {
+			result &= handler.isCached(time);
+		}
+		return result;
 	}
 
 	private void pressed_STEP_BB() throws IOException {
@@ -364,7 +379,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			else if (STEP_FF.equals(command))
 				pressed_STEP_FF();
 			else if (STEP_B.equals(command))
-				pressed_STEP_F();
+				pressed_STEP_B();
 			else if (STEP_BB.equals(command))
 				pressed_STEP_FF();
 			else if (STOP.equals(command))

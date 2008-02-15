@@ -140,6 +140,8 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 
 	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect) {
 		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0.,maxEasting - minEasting, maxNorthing - minNorthing);
+		client.offsetEast = this.minEasting;
+		client.offsetNorth = this.minNorthing;
 
 		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
 				this.new ConvertToClientExecutor(connect,client));
