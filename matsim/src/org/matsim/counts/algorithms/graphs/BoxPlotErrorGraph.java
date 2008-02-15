@@ -43,32 +43,33 @@ public class BoxPlotErrorGraph extends CountsGraph {
 		super(ccl, iteration, filename, chartTitle);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public JFreeChart createChart(final int nbr) {
 
 		DefaultBoxAndWhiskerCategoryDataset dataset0 = new DefaultBoxAndWhiskerCategoryDataset();
 		DefaultBoxAndWhiskerCategoryDataset dataset1 = new DefaultBoxAndWhiskerCategoryDataset();
 
-		final ArrayList<ArrayList<Double>> listRel = new ArrayList<ArrayList<Double>>();
-		final ArrayList<ArrayList<Double>> listAbs = new ArrayList<ArrayList<Double>>();
+		final ArrayList<Double>[] listRel = new ArrayList[24];
+		final ArrayList<Double>[] listAbs = new ArrayList[24];
 
 		// init
 		for (int i = 0; i < 24; i++) {
-			listRel.add(new ArrayList<Double>());
-			listAbs.add(new ArrayList<Double>());
+			listRel[i] = new ArrayList<Double>();
+			listAbs[i] = new ArrayList<Double>();
 		}
 
 		// add the values of all counting stations to each hour
 		for (CountSimComparison cc : this.ccl_) {
 			int hour = cc.getHour() - 1;
-			listRel.get(hour).add(cc.calculateRelativeError());
-			listAbs.get(hour).add(cc.getSimulationValue() - cc.getCountValue());
+			listRel[hour].add(cc.calculateRelativeError());
+			listAbs[hour].add(cc.getSimulationValue() - cc.getCountValue());
 		}
 
 		// add the collected values to the graph / dataset
 		for (int i = 0; i < 24; i++) {
-			dataset0.add(listRel.get(i), "Rel Error", Integer.toString(i + 1));
-			dataset1.add(listAbs.get(i), "Abs Error", Integer.toString(i + 1));
+			dataset0.add(listRel[i], "Rel Error", Integer.toString(i + 1));
+			dataset1.add(listAbs[i], "Abs Error", Integer.toString(i + 1));
 		}
 
 		String title = "Iteration: " + this.iteration_;
