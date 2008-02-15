@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.matsim.counts.CountSimComparison;
@@ -61,10 +62,8 @@ import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 import org.matsim.utils.vis.matsimkml.NetworkFeatureFactory;
 /**
  * @author dgrether
- *
  */
-public class CountSimComparisonKMLWriter extends
-CountSimComparisonWriter {
+public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * constant for the name of the links
 	 */
@@ -72,7 +71,7 @@ CountSimComparisonWriter {
 	/**
 	 * constant for the link description
 	 */
-	private static final String ASTRAVALUE = "Astra Value: ";
+	private static final String COUNTVALUE = "Count Value: ";
 	/**
 	 * constant for the link description
 	 */
@@ -197,6 +196,10 @@ CountSimComparisonWriter {
 	 * maps linkids to filenames in the kmz
 	 */
 	private Map<String, String> countsLoadCurveGraphMap;
+
+	/** The logging object for this class. */
+	private static final Logger log = Logger.getLogger(CountSimComparisonKMLWriter.class);
+
 	/**
 	 * Sets the data to the fields of this class
 	 * @param countSimCompList
@@ -290,10 +293,11 @@ CountSimComparisonWriter {
 		ScreenOverlay errorGraph = createBiasErrorGraph();
 		errorGraph.setVisibility(true);
 		this.mainFolder.addFeature(errorGraph);
-		// TODO [balmermi] Do not use that at the moment. It does not work --> please fix it somewhen.
 		errorGraph = createBoxPlotErrorGraph();
-		errorGraph.setVisibility(false);
-		this.mainFolder.addFeature(errorGraph);
+		if (errorGraph != null) {
+			errorGraph.setVisibility(false);
+			this.mainFolder.addFeature(errorGraph);
+		}
 
 		// link graphs
 		this.createCountsLoadCurveGraphs();
@@ -363,6 +367,7 @@ CountSimComparisonWriter {
 	 * @param linkid
 	 * @param csc
 	 * @param relativeError
+	 * @param timestep
 	 * @return the Placemark instance with description and name set
 	 */
 	private Placemark createPlacemark(final String linkid, final CountSimComparison csc, final double relativeError, final int timestep) {
@@ -445,6 +450,7 @@ CountSimComparisonWriter {
 	 * @param linkid
 	 * @param csc
 	 * @param relativeError
+	 * @param timestep
 	 * @return A String containing the description for each placemark
 	 */
 	private String createPlacemarkDescription(final String linkid, final CountSimComparison csc, final double relativeError, final int timestep) {
@@ -474,7 +480,7 @@ CountSimComparisonWriter {
 		buffer.append(OCLOCK);
 		buffer.append(NetworkFeatureFactory.ENDH3);
 		buffer.append(NetworkFeatureFactory.STARTP);
-		buffer.append(ASTRAVALUE);
+		buffer.append(COUNTVALUE);
 		buffer.append(csc.getCountValue());
 		buffer.append(NetworkFeatureFactory.ENDP);
 		buffer.append(NetworkFeatureFactory.STARTP);
@@ -582,8 +588,14 @@ CountSimComparisonWriter {
 	 */
 	private ScreenOverlay createBoxPlotErrorGraph() {
 
-		CountsGraph ep = new BoxPlotErrorGraph(this.countComparisonFilter.getCountsForHour(this.timeFilter), this.iterationNumber, null, "error graph");
-		ep.createChart(0);
+		CountsGraph ep;
+		try {
+			ep = new BoxPlotErrorGraph(this.countComparisonFilter.getCountsForHour(this.timeFilter), this.iterationNumber, null, "error graph");
+			ep.createChart(0);
+		} catch (IllegalArgumentException e) {
+			log.error("Could not create BoxPlot-ErrorGraph.", e);
+			return null;
+		}
 
 		String filename = "errorGraphBoxPlot.png";
 		try {
