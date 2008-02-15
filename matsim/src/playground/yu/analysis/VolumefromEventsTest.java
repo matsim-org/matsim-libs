@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.test;
+package playground.yu.analysis;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
