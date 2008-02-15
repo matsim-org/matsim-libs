@@ -64,7 +64,10 @@ public class CountSimComparisonImpl implements CountSimComparison {
 		if (count > 0) {
 			return Math.min(100 * (sim - count) / count, 1000d);
 		}
-		return 1000d;
+		if (sim > 0) {
+			return 1000d;
+		}
+		return 0;
 	}
 
 	/**
