@@ -41,16 +41,17 @@ public class MatsimKMLLogo extends ScreenOverlay {
 	 */
 	public MatsimKMLLogo(final KMZWriter writer) throws IOException {
 		super("matsimlogo");
-		writer.addNonKMLFile("res/matsim_logo_transparent_small.png", "matsimLogo.png");
+		writer.addNonKMLFile("res/matsim_logo_transparent.png", "matsimLogo.png");
 		Icon icon = new Icon("./matsimLogo.png");
-// Icon("http://code.google.com/apis/kml/documentation/top_left.jpg");
     this.setIcon(icon);
     this.setName("Matsim Logo");
     // place the image bottom left
-    Vec2Type overlayXY = new Vec2Type(1.0d, 0.0d, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
-    Vec2Type screenXY = new Vec2Type(0.85d, 0.05d, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
+    Vec2Type overlayXY = new Vec2Type(1.0, -0.9, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
+    Vec2Type screenXY = new Vec2Type(0.85, 0.01, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
+    Vec2Type sizeXY = new Vec2Type(0.14, 0.00, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
     this.setOverlayXY(overlayXY);
     this.setScreenXY(screenXY);
+    this.setSize(sizeXY);
     this.setDrawOrder(Integer.MAX_VALUE);
 	}
 
