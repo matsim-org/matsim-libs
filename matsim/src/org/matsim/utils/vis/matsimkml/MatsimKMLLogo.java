@@ -46,8 +46,8 @@ public class MatsimKMLLogo extends ScreenOverlay {
     this.setIcon(icon);
     this.setName("Matsim Logo");
     // place the image bottom left
-    Vec2Type overlayXY = new Vec2Type(1.0, -0.9, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
-    Vec2Type screenXY = new Vec2Type(0.85, 0.01, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
+    Vec2Type overlayXY = new Vec2Type(1.0, -0.7, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
+    Vec2Type screenXY = new Vec2Type(0.85, 25, Vec2Type.Units.fraction, Vec2Type.Units.pixels);
     Vec2Type sizeXY = new Vec2Type(0.14, 0.00, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
     this.setOverlayXY(overlayXY);
     this.setScreenXY(screenXY);
