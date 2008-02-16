@@ -303,11 +303,15 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		host.pause();
 	}
 
-	private void pressed_PLAY() throws RemoteException {
- 	    if (movieTimer == null) movieTimer = new MovieTimer();
- 	    movieTimer.start();
-		movieTimer.setActive(true);
-		playButton.setSelected(true);
+	private void pressed_PLAY() throws IOException {
+ 	    if (movieTimer == null) {
+ 	    	movieTimer = new MovieTimer();
+ 	 	    movieTimer.start();
+ 			movieTimer.setActive(true);
+ 			playButton.setSelected(true);
+ 	    } else {
+ 	    	pressed_PAUSE();
+ 	    }
 	}
 
 	private void pressed_STEP_F() throws IOException {
@@ -324,10 +328,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private void pressed_STEP_B() throws IOException {
 		stopMovie();
 
-		if(isCachedTime(simTime-1)){
-			simTime -= 1;
-			invalidateHandlers();
-		} else if (host.requestNewTime(simTime-1, OTFServerRemote.TimePreference.EARLIER)) {
+		if (host.requestNewTime(simTime-1, OTFServerRemote.TimePreference.EARLIER)) {
 			simTime = host.getLocalTime();
 			invalidateHandlers();
 		} else {
@@ -495,7 +496,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 						repaint();
 						if (isActive)  invalidateHandlers();
 					}
-					simTime = actTime;
+					//simTime = actTime;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

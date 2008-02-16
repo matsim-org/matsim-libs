@@ -433,13 +433,14 @@ public class OTFQuadFileHandler {
 			int foundTime = -1;
 			for(Integer timestep : timesteps.keySet()) {
 				if (searchDirection == TimePreference.EARLIER){
-					if(time >= timestep) {
+					if(timestep >= time) {
+						// take next lesser time than requested, if not exacty the same
 						foundTime = lastTime;
 						break;
 					}
 				} else {
-					if(time >= timestep) {
-						foundTime = timestep;
+					if(timestep >= time) {
+						foundTime = timestep; //the exact time or one biggers
 						break;
 					}
 				}
