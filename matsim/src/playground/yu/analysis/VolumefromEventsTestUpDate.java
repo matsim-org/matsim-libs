@@ -44,10 +44,10 @@ public class VolumefromEventsTestUpDate {
 		// final String chartFilename = "./test/yu/test/output/3kChart.png";
 		// final String legFilename = "./test/yu/test/output/3kLeg.txt.gz";
 		final String netFilename = "../data/ivtch/input/network.xml";
-		final String plansFilename = "../data/ivtch/input/all_zrh30km_10pct-3.100.plans.xml.gz";
-		final String eventsFilename = "../data/ivtch/input/all_zrh30km_10pct-3100.events.txt.gz";
-		final String chartFilename = "../data/ivtch/analysis/all_zrh30km_10pct-3Chart.png";
-		final String legFilename = "../data/ivtch/analysis/all_zrh30km_10pct-3Leg.txt.gz";
+		final String plansFilename = "../data/ivtch/input/all_zrh30km_10pctActTime100.plans.xml.gz";
+		final String eventsFilename = "../data/ivtch/input/all_zrh30km_10pctActTime100.events.txt.gz";
+		final String chartFilename = "../data/ivtch/analysis/all_zrh30km_10pctActTimeChart.png";
+		final String legFilename = "../data/ivtch/analysis/all_zrh30km_10pctActTimeLeg.txt.gz";
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(null
 		// new String[] { "./test/yu/test/configTest.xml" }
