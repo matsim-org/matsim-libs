@@ -19,85 +19,32 @@
  * *********************************************************************** */
 package org.matsim.trafficlights.data;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.utils.identifiers.IdI;
 
 
 /**
- * This data class holds all information needed for the definition of
- * a traffic light's signal group.
  * @author dgrether
  *
  */
-public class SignalGroupDefinition {
+public class SignalLane {
 
 	private IdI id;
+
 	private IdI linkId;
-	private SignalLane fromLane;
-	private Map<IdI, SignalLane> toLanesIdLanesMap;
-	private int passingClearingTime;
-	private boolean turnIfRed;
 
+	private double length = Double.NaN;
 
-	public SignalGroupDefinition(IdI id) {
-		this.id = id;
-		this.toLanesIdLanesMap = new HashMap<IdI, SignalLane>();
+	public SignalLane(IdI laneId, IdI linkId) {
+		this.id = laneId;
+		this.linkId = linkId;
 	}
 
-	public void setLink(IdI id) {
-		this.linkId = id;
-	}
-
-	public void setFromLane(SignalLane lane) {
-		this.fromLane = lane;
-	}
-
-	public void addToLane(SignalLane lane) {
-		this.toLanesIdLanesMap.put(lane.getId(), lane);
-	}
-
-	public void setPassingClearingTime(int timeSec) {
-		this.passingClearingTime = timeSec;
-	}
-
-	public void setTurnIfRed(boolean turnIfRed) {
-		this.turnIfRed = turnIfRed;
-	}
-
-
-	/**
-	 * @return the id
-	 */
 	public IdI getId() {
 		return this.id;
 	}
 
-
-	/**
-	 * @return the fromLinkId
-	 */
-	public IdI getLinkId() {
-		return this.linkId;
-	}
-
-
-
-	/**
-	 * @return the time needed for all vehicles to pass the signal and clear the node. this
-	 * is needed to determine the interimtime between to phases.
-	 */
-	public int getPassingClearingTime() {
-		return this.passingClearingTime;
-	}
-
-
-	/**
-	 * @return the turnIfRed
-	 */
-	public boolean isTurnIfRed() {
-		return this.turnIfRed;
+	public void setLength(double l) {
+		this.length = l;
 	}
 
 

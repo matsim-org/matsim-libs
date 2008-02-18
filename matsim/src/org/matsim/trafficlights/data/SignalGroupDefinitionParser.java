@@ -19,11 +19,15 @@
  * *********************************************************************** */
 package org.matsim.trafficlights.data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.utils.collections.Tuple;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -38,11 +42,13 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 
 	private static final String SIGNALGROUP = "signalGroup";
 
-	private static final String  FROMLINK = "fromLink";
+	private static final String  FROMLANE = "fromLane";
 
-	private static final String TOLINK = "toLink";
+	private static final String TOLANE = "toLane";
 
 	private static final String TURNIFRED = "turnIfRed";
+
+	private static final String LINK = "link";
 
 	private static final String PASSINGCLEARINGTIME = "passingClearingTime";
 
@@ -52,9 +58,23 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 
 	private static final String LANES = "lanes";
 
+	private static final String LENGTH = "length";
+
 	private List<SignalGroupDefinition> signalGroups;
 
 	private SignalGroupDefinition currentSignalGroup;
+
+	private IdI currentLaneId;
+
+	private double currentLaneLength;
+
+	private SignalLane currentLane;
+
+	/**
+	 * This a bit sophisticated map has as key value a tuple consisting of the link id and the id of the SignalLane
+	 * respectively.
+	 */
+	private Map<Tuple<IdI, IdI>, SignalLane> linkLaneMap = new HashMap<Tuple<IdI, IdI>, SignalLane>();
 
 	/**
 	 *
@@ -78,6 +98,12 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 		else if (SIGNALGROUP.equalsIgnoreCase(name)) {
 			this.signalGroups.add(this.currentSignalGroup);
 		}
+		else if (TOLANE.equalsIgnoreCase(name)) {
+			this.currentSignalGroup.addToLane(this.currentLane);
+		}
+		else if (FROMLANE.equalsIgnoreCase(name)) {
+			this.currentSignalGroup.setFromLane(this.currentLane);
+		}
 
 	}
 
@@ -89,13 +115,26 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 		if (SIGNALGROUP.equalsIgnoreCase(name)) {
 			this.currentSignalGroup = new SignalGroupDefinition(new Id(atts.getValue(ID)));
 		}
-		else if (FROMLINK.equalsIgnoreCase(name)) {
-			this.currentSignalGroup.setFromLink(new Id(atts.getValue(REFID)), Integer.parseInt(atts.getValue(LANES)));
+		else if (FROMLANE.equalsIgnoreCase(name) || TOLANE.equalsIgnoreCase(name)) {
+			this.currentLaneId = new Id(atts.getValue(ID));
+			String length = atts.getValue(LENGTH);
+			if (length != null)
+				this.currentLaneLength = Double.parseDouble(length);
+			else
+				this.currentLaneLength = Double.NaN;
 		}
-		else if (TOLINK.equalsIgnoreCase(name)) {
-			this.currentSignalGroup.addToLink(new Id(atts.getValue(REFID)), Integer.parseInt(atts.getValue(LANES)));
-		}
+		else if (LINK.equalsIgnoreCase(name)) {
+			IdI id = new Id(atts.getValue(REFID));
+			Tuple<IdI, IdI> key = new Tuple<IdI, IdI>(id, this.currentLaneId);
+			this.currentLane = this.linkLaneMap.get(key);
+			if (this.currentLane == null) {
+				this.currentLane = new SignalLane(this.currentLaneId, id);
+				this.currentLane.setLength(this.currentLaneLength);
+				this.linkLaneMap.put(key, this.currentLane);
+			}
 
+
+		}
 
 	}
 

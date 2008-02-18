@@ -50,11 +50,48 @@ public class Tuple<A extends Object, B extends Object> {
 	}
 
 	public A getFirst() {
-		return first;
+		return this.first;
 	}
 
 	public B getSecond() {
-		return second;
+		return this.second;
 	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) return false;
+		else if (!(other instanceof Tuple)) return false;
+		else if (other == this) return true;
+		return this.first.equals(((Tuple<A, B>)other).first) && this.second.equals(((Tuple<A, B>)other).second);
+	}
+
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return this.first.hashCode() + this.second.hashCode();
+	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("[Tuple: [First: " );
+		buffer.append(this.first.toString());
+		buffer.append("], [Second: ");
+		buffer.append(this.second.toString());
+		buffer.append("]]");
+		return buffer.toString();
+	}
+
+
 
 }
