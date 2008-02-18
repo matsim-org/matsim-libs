@@ -54,7 +54,7 @@ import org.matsim.utils.misc.Time;
  * Counts the number of vehicles departed, arrived or got stuck per time bin
  * based on events.
  */
-public class MyLegHistogram implements EventHandlerAgentDepartureI,
+public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 		EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
 
 	private int iteration = 0;
@@ -80,7 +80,7 @@ public class MyLegHistogram implements EventHandlerAgentDepartureI,
 	 * @param nofBins
 	 *            The number of time bins for this analysis.
 	 */
-	public MyLegHistogram(final int binSize, final int nofBins,
+	public OnRouteModalSplit(final int binSize, final int nofBins,
 			NetworkLayer network, Plans plans) {
 		super();
 		this.binSize = binSize;
@@ -108,7 +108,8 @@ public class MyLegHistogram implements EventHandlerAgentDepartureI,
 	 * @param binSize
 	 *            The size of a time bin in seconds.
 	 */
-	public MyLegHistogram(final int binSize, NetworkLayer network, Plans plans) {
+	public OnRouteModalSplit(final int binSize, NetworkLayer network,
+			Plans plans) {
 		this(binSize, 30 * 3600 / binSize + 1, network, plans);
 	}
 
@@ -132,11 +133,15 @@ public class MyLegHistogram implements EventHandlerAgentDepartureI,
 		allCount[binIdx]++;
 		ae.rebuild(plans, network);
 		String planType = ae.agent.getSelectedPlan().getType();
-		if (planType.equals("car")) {
+		if (planType == null) {
 			carCount[binIdx]++;
-		} else if (planType.equals("pt")) {
-			if (ptCount != null) {
-				ptCount[binIdx]++;
+		} else {
+			if (planType.equals("car")) {
+				carCount[binIdx]++;
+			} else if (planType.equals("pt")) {
+				if (ptCount != null) {
+					ptCount[binIdx]++;
+				}
 			}
 		}
 	}
@@ -285,6 +290,6 @@ public class MyLegHistogram implements EventHandlerAgentDepartureI,
 		onRouteChart.addSeries("drivers on route", category, carOnRoute);
 		onRouteChart.addSeries("public transit users on route", category,
 				ptOnRoute);
-		onRouteChart.saveAsPng(filename, 800, 600);
+		onRouteChart.saveAsPng(filename, 1024, 768);
 	}
 }

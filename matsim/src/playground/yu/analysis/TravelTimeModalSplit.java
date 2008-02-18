@@ -45,7 +45,7 @@ import org.matsim.utils.misc.Time;
  * @author ychen
  * 
  */
-public class TravelTimeTest implements EventHandlerAgentDepartureI,
+public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 		EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
 	private final NetworkLayer network;
 
@@ -68,16 +68,21 @@ public class TravelTimeTest implements EventHandlerAgentDepartureI,
 	/**
 	 * 
 	 */
-	public TravelTimeTest(final int binSize, final int nofBins,
+	public TravelTimeModalSplit(final int binSize, final int nofBins,
 			NetworkLayer network, Plans plans) {
 		this.network = network;
 		this.plans = plans;
 		this.binSize = binSize;
 		travelTimes = new double[nofBins + 1];
 		arrCount = new int[nofBins + 1];
+		carTravelTimes = new double[nofBins + 1];
+		ptTravelTimes = new double[nofBins + 1];
+		carArrCount = new int[nofBins + 1];
+		ptArrCount = new int[nofBins + 1];
 	}
 
-	public TravelTimeTest(final int binSize, NetworkLayer network, Plans plans) {
+	public TravelTimeModalSplit(final int binSize, NetworkLayer network,
+			Plans plans) {
 		this(binSize, 30 * 3600 / binSize + 1, network, plans);
 	}
 
@@ -109,12 +114,17 @@ public class TravelTimeTest implements EventHandlerAgentDepartureI,
 			tmpDptTimes.remove(agentId);
 			ae.rebuild(plans, network);
 			String planType = ae.agent.getSelectedPlan().getType();
-			if (planType.equals("car")) {
+			if (planType != null) {
+				if (planType.equals("car")) {
+					carTravelTimes[binIdx] += travelTime;
+					carArrCount[binIdx]++;
+				} else if (planType.equals("pt")) {
+					ptTravelTimes[binIdx] += travelTime;
+					ptArrCount[binIdx]++;
+				}
+			} else {
 				carTravelTimes[binIdx] += travelTime;
 				carArrCount[binIdx]++;
-			} else if (planType.equals("pt")) {
-				ptTravelTimes[binIdx] += travelTime;
-				ptArrCount[binIdx]++;
 			}
 		}
 	}
@@ -197,19 +207,22 @@ public class TravelTimeTest implements EventHandlerAgentDepartureI,
 		for (int i = 0; i < xsLength; i++) {
 			xs[i] = ((double) i) * (double) binSize / 3600.0;
 		}
-		XYLineChart travelTimeSumChart = new XYLineChart("LegTravelTime",
-				"time", "sum of TravelTimes [s]");
+		XYLineChart travelTimeSumChart = new XYLineChart("TravelTimes", "time",
+				"sum of TravelTimes [s]");
 		travelTimeSumChart.addSeries("sum of traveltimes of all agents", xs,
 				travelTimes);
 		travelTimeSumChart.addSeries("sum of traveltimes of drivers", xs,
 				carTravelTimes);
 		travelTimeSumChart.addSeries(
 				"sum of traveltime of public transit users", xs, ptTravelTimes);
-		travelTimeSumChart.saveAsPng(filename + "sum.png", 800, 600);
-		for (int i = 0; i < xsLength; i++) {
-			travelTimes[i] /= (double) arrCount[i];
-			carTravelTimes[i] /= (double) carArrCount[i];
-			ptTravelTimes[i] /= (double) ptArrCount[i];
+		travelTimeSumChart.saveAsPng(filename + "sum.png", 1024, 768);
+		for (int j = 0; j < xsLength - 1; j++) {
+			travelTimes[j] = (arrCount[j] == 0) ? -1 : travelTimes[j]
+					/ (double) arrCount[j];
+			carTravelTimes[j] = (carArrCount[j] == 0) ? -1 : carTravelTimes[j]
+					/ (double) carArrCount[j];
+			ptTravelTimes[j] = (ptArrCount[j] == 0) ? -1 : ptTravelTimes[j]
+					/ (double) ptArrCount[j];
 		}
 		XYLineChart avgTravelTimeChart = new XYLineChart(
 				"average LegTravelTime", "time", "average TravelTimes [s]");
@@ -220,14 +233,6 @@ public class TravelTimeTest implements EventHandlerAgentDepartureI,
 		avgTravelTimeChart
 				.addSeries("average traveltime of public transit Users", xs,
 						ptTravelTimes);
+		avgTravelTimeChart.saveAsPng(filename + "avg.png", 1024, 768);
 	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

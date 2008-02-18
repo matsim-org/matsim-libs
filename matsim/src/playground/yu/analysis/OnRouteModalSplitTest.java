@@ -30,7 +30,7 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.world.World;
 
-public class VolumefromEventsTestUpDate {
+public class OnRouteModalSplitTest {
 
 	@SuppressWarnings("unchecked")
 	public static void main(final String[] args) {
@@ -44,14 +44,14 @@ public class VolumefromEventsTestUpDate {
 		// final String chartFilename = "./test/yu/test/output/3kChart.png";
 		// final String legFilename = "./test/yu/test/output/3kLeg.txt.gz";
 		final String netFilename = "../data/ivtch/input/network.xml";
-		final String plansFilename = "../data/ivtch/input/all_zrh30km_10pctActTime100.plans.xml.gz";
-		final String eventsFilename = "../data/ivtch/input/all_zrh30km_10pctActTime100.events.txt.gz";
-		final String chartFilename = "../data/ivtch/analysis/all_zrh30km_10pctActTimeChart.png";
-		final String legFilename = "../data/ivtch/analysis/all_zrh30km_10pctActTimeLeg.txt.gz";
+		final String plansFilename = "../data/ivtch/input/analysis/carActTime100.plans.xml.gz";
+		final String eventsFilename = "../data/ivtch/input/analysis/carActTime100.events.txt.gz";
+		final String chartFilename = "../data/ivtch/analysis/carActTimeChart.png";
+		final String legFilename = "../data/ivtch/analysis/carActTimeLeg.txt.gz";
+
+		Gbl.startMeasurement();
 		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null
-		// new String[] { "./test/yu/test/configTest.xml" }
-				);
+		Config config = Gbl.createConfig(null);
 
 		World world = Gbl.getWorld();
 
@@ -65,7 +65,7 @@ public class VolumefromEventsTestUpDate {
 
 		Events events = new Events();
 
-		MyLegHistogram mlh = new MyLegHistogram(300, network, population);
+		OnRouteModalSplit mlh = new OnRouteModalSplit(300, network, population);
 		events.addHandler(mlh);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);
@@ -73,7 +73,8 @@ public class VolumefromEventsTestUpDate {
 		mlh.write(legFilename);
 		mlh.writeCharts(chartFilename);
 
-		System.out.println("-> Done!");
+		System.out.println("--> Done!");
+		Gbl.printElapsedTime();
 		System.exit(0);
 	}
 }
