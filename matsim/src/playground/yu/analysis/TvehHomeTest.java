@@ -20,11 +20,12 @@
 
 package playground.yu.analysis;
 
-import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.vis.snapshots.postprocessor.TransimsSnapshotFileReader;
 
 public class TvehHomeTest {
 
@@ -32,17 +33,37 @@ public class TvehHomeTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String origTvehFilename = "../runs/run263/T.veh.gz";
-		final String homeTvehFilename = "../runs/run263/homeT.veh.gz";
-		BufferedReader br;
+		// final String origTvehFilename = "../runs/run263/T.veh.gz";
+		// final String homeTvehFilename = "../runs/run263/homeT.veh.gz";
+		final String origTvehFilename = "./test/T.veh.gz";
+		final String homeTvehFilename = "./output/homeT.veh.gz";
+
+		TransimsSnapshotFileReader reader = new TransimsSnapshotFileReader(
+				origTvehFilename);
+		String[] heads = reader.readLine();
+		StringBuffer head = new StringBuffer();
+		for (int i = 0; i < heads.length; i++) {
+			head.append(heads[i] + "\t");
+		}
+		String s1_8 = "\t0\t0\t0\t1\t0\t0\t1\t0\t";
+		String s10 = "\t0\t";
+		String s13_15 = "\t0\t0\t0";
 		try {
-			br = IOUtils.getBufferedReader(origTvehFilename);
-			br.
+			BufferedWriter writer = IOUtils.getBufferedWriter(homeTvehFilename);
+			writer.write(head + "\n");
+			String[] line = null;
+			do {
+				line = reader.readLine();
+				if (line != null) {
+					writer.write(line[0] + s1_8 + line[9] + s10 + line[11]
+							+ "\t" + line[12] + s13_15 + "\n");
+				}
+			} while (line != null);
+			writer.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
 }
