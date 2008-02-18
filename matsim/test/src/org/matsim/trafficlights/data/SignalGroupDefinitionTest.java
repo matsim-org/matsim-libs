@@ -56,29 +56,29 @@ public class SignalGroupDefinitionTest extends MatsimTestCase {
 			assertEquals(2, signalGroups.size());
 			SignalGroupDefinition current = signalGroups.get(0);
 			assertEquals(0, current.getId().compareTo(new Id("123")));
-
-			/*assertEquals(0, current.getFrom().compareTo(new Id("23")));
-			assertEquals(Integer.valueOf(3), current.getFromLinkLaneNumber());
-			assertEquals(2, current.getToLinkIds().size());
-			assertTrue(current.getToLinkIds().contains(new Id("25")));
+			assertEquals(2, current.getFromLanes().size());
+			for (SignalLane s : current.getFromLanes()) {
+				assertTrue(s.getId().equals(new Id("1")) || s.getId().equals(new Id("2")));
+				assertEquals(new Id("23"), s.getLinkId());
+			}
+			assertEquals(2, current.getToLanes().size());
+			for (SignalLane s : current.getFromLanes()) {
+				assertTrue(s.getId().equals(new Id("1")) || s.getId().equals(new Id("2")));
+				assertEquals(new Id("23"), s.getLinkId());
+			}
 			assertEquals(false, current.isTurnIfRed());
 			assertEquals(2, current.getPassingClearingTime());
-			assertEquals(Integer.valueOf(2), current.getToLinkLaneNumber(new Id("24")));
-			assertEquals(Integer.valueOf(1), current.getToLinkLaneNumber(new Id("25")));
-			*/
+
+			assertTrue(current.getFromSignalLane(new Id("1")).isMixedLane());
+			assertEquals(45.0d, current.getFromSignalLane(new Id("1")).getLength());
 
 			current = signalGroups.get(1);
 			assertEquals(0, current.getId().compareTo(new Id("124")));
 
-			/*assertEquals(0, current.getFromLinkId().compareTo(new Id("26")));
-			assertEquals(2, current.getToLinkIds().size());
-			assertTrue(current.getToLinkIds().contains(new Id("27")));
+			assertEquals(23.3d, current.getToSignalLane(new Id("3")).getLength());
 			assertEquals(true, current.isTurnIfRed());
 			assertEquals(15, current.getPassingClearingTime());
-			assertEquals(Integer.valueOf(1), current.getFromLinkLaneNumber());
-			for (IdI i : current.getToLinkIds()) {
-				assertEquals(new Integer(1), current.getToLinkLaneNumber(i));
-			}*/
+
 
 		} catch (SAXException e) {
 			e.printStackTrace();

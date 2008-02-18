@@ -5,6 +5,9 @@
   xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalGroupDefinition.xsd">
 
   <signalGroup id="123">
+    <fromLane id="1" >
+    	<link refId="23" />
+    </fromLane>
     <fromLane id="2" >
     	<link refId="23" />
     </fromLane>
@@ -18,13 +21,13 @@
     <passingClearingTime>2</passingClearingTime>
   </signalGroup>
   <signalGroup id="124">
-    <fromLane id="2" length="23.3" >
-    	<link refId="26" />
+    <fromLane id="1" >
+    	<link refId="23" />
     </fromLane>
     <toLane id="2" >
     	<link refId="27" />
     </toLane>
-    <toLane id="3" >
+    <toLane id="3" length="23.3" >
     	<link refId="27" />
     </toLane>
     <turnIfRed>true</turnIfRed>

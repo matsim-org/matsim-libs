@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.trafficlights.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class SignalGroupDefinition {
 
 	private IdI id;
 	private IdI linkId;
-	private SignalLane fromLane;
+	private Map<IdI, SignalLane> fromLanesIdMap;
 	private Map<IdI, SignalLane> toLanesIdLanesMap;
 	private int passingClearingTime;
 	private boolean turnIfRed;
@@ -44,14 +45,15 @@ public class SignalGroupDefinition {
 	public SignalGroupDefinition(IdI id) {
 		this.id = id;
 		this.toLanesIdLanesMap = new HashMap<IdI, SignalLane>();
+		this.fromLanesIdMap = new HashMap<IdI, SignalLane>();
 	}
 
 	public void setLink(IdI id) {
 		this.linkId = id;
 	}
 
-	public void setFromLane(SignalLane lane) {
-		this.fromLane = lane;
+	public void addFromLane(SignalLane lane) {
+		this.fromLanesIdMap.put(lane.getId(), lane);
 	}
 
 	public void addToLane(SignalLane lane) {
@@ -82,7 +84,21 @@ public class SignalGroupDefinition {
 		return this.linkId;
 	}
 
+	public Collection<SignalLane> getFromLanes() {
+		return this.fromLanesIdMap.values();
+	}
 
+	public Collection<SignalLane> getToLanes() {
+		return this.toLanesIdLanesMap.values();
+	}
+
+	public  SignalLane getFromSignalLane(IdI id) {
+		return this.fromLanesIdMap.get(id);
+	}
+
+	public SignalLane getToSignalLane(IdI id) {
+		return this.toLanesIdLanesMap.get(id);
+	}
 
 	/**
 	 * @return the time needed for all vehicles to pass the signal and clear the node. this

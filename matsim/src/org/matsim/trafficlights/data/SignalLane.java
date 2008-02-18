@@ -34,6 +34,8 @@ public class SignalLane {
 
 	private double length = Double.NaN;
 
+	private boolean isMixedLane;
+
 	public SignalLane(IdI laneId, IdI linkId) {
 		this.id = laneId;
 		this.linkId = linkId;
@@ -43,10 +45,24 @@ public class SignalLane {
 		return this.id;
 	}
 
+	public IdI getLinkId() {
+		return this.linkId;
+	}
+
+	public double getLength() {
+		return this.length;
+	}
+
 	public void setLength(double l) {
 		this.length = l;
 	}
 
+	public void setMixedLane(boolean mixed) {
+		this.isMixedLane = mixed;
+	}
 
+	public boolean isMixedLane() {
+		return this.isMixedLane;
+	}
 
 }

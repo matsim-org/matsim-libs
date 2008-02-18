@@ -102,7 +102,7 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 			this.currentSignalGroup.addToLane(this.currentLane);
 		}
 		else if (FROMLANE.equalsIgnoreCase(name)) {
-			this.currentSignalGroup.setFromLane(this.currentLane);
+			this.currentSignalGroup.addFromLane(this.currentLane);
 		}
 
 	}
@@ -117,11 +117,7 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 		}
 		else if (FROMLANE.equalsIgnoreCase(name) || TOLANE.equalsIgnoreCase(name)) {
 			this.currentLaneId = new Id(atts.getValue(ID));
-			String length = atts.getValue(LENGTH);
-			if (length != null)
-				this.currentLaneLength = Double.parseDouble(length);
-			else
-				this.currentLaneLength = Double.NaN;
+			this.currentLaneLength = Double.parseDouble(atts.getValue(LENGTH));
 		}
 		else if (LINK.equalsIgnoreCase(name)) {
 			IdI id = new Id(atts.getValue(REFID));
@@ -132,8 +128,14 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 				this.currentLane.setLength(this.currentLaneLength);
 				this.linkLaneMap.put(key, this.currentLane);
 			}
-
-
+			else {
+				//if the lane for the link already exists it was added to another signalgroup. this
+				// implies it must be a mixed lane
+				this.currentLane.setMixedLane(true);
+				if (this.currentLaneLength != this.currentLane.getLength()) {
+					throw new IllegalArgumentException("Data is corrupt: Lane is defined in two or more SignalGroups with different length!");
+				}
+			}
 		}
 
 	}

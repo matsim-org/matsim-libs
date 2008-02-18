@@ -26,7 +26,7 @@ the simulation -->
   <xs:complexContent>
 		<xs:extension base="matsimObjectType">
 		<xs:sequence>
-			<xs:element name="fromLane" type="signalLaneType" minOccurs="1" maxOccurs="1" />
+			<xs:element name="fromLane" type="signalLaneType" minOccurs="1" maxOccurs="unbounded" />
 			<xs:element name="toLane" type="signalLaneType" minOccurs="1" maxOccurs="unbounded" />
 			<!-- optional elements -->
 			<xs:element name="turnIfRed" type="xs:boolean" default="false" minOccurs="0" maxOccurs="1"/>
@@ -58,7 +58,7 @@ the simulation -->
 			<xs:sequence>
 				<xs:element name="link" type="idRefType" minOccurs="1" maxOccurs="1" />
 			</xs:sequence>
-		  <xs:attribute name="length" type="xs:decimal">
+		  <xs:attribute name="length" type="xs:decimal" default="45.0">
 				<xs:annotation>
 					<xs:documentation>Optional argument capturing the length of this lane in meter.</xs:documentation>
 				</xs:annotation>
