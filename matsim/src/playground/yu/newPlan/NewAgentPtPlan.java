@@ -52,17 +52,17 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentPtPlan(Plans plans) {
-		pw = new PlansWriter(plans);
-		pw.writeStartPlans();
+	public NewAgentPtPlan(final Plans plans) {
+		this.pw = new PlansWriter(plans);
+		this.pw.writeStartPlans();
 	}
 
 	public void writeEndPlans() {
-		pw.writeEndPlans();
+		this.pw.writeEndPlans();
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		List<Plan> copyPlans = new ArrayList<Plan>();
 		// copyPlans: the copy of the plans.
 		for (Plan pl : person.getPlans()) {
@@ -77,8 +77,12 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 				if (i % 2 == 0) {
 					copyPlan.addAct((Act) o);
 				} else {
-					((Leg)o).setMode("car");
-					
+					Leg leg = (Leg)o;
+					if (!leg.getMode().equals("car")) {
+						leg.setRoute(null);
+						leg.setMode("car");
+					}
+
 					Leg copyLeg = new Leg((Leg) o);
 					copyLeg.setMode("pt");
 					// -----------------------------------------------
@@ -94,7 +98,7 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 		for (Plan copyPlan : copyPlans) {
 			person.addPlan(copyPlan);
 		}
-		pw.writePerson(person);
+		this.pw.writePerson(person);
 	}
 
 }
