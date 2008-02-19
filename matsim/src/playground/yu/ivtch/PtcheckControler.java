@@ -29,17 +29,23 @@ import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.corelisteners.RoadPricing;
 import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.Events;
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Plans;
 import org.matsim.utils.io.IOUtils;
 
 import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
+import playground.yu.analysis.LegDistance;
+import playground.yu.analysis.OnRouteModalSplit;
+import playground.yu.analysis.TravelTimeModalSplit;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
@@ -54,15 +60,18 @@ public class PtcheckControler extends Controler {
 	}
 
 	public static class PtCheckListener implements StartupListener,
-			IterationEndsListener, ShutdownListener {
+			IterationEndsListener, ShutdownListener, IterationStartsListener {
 		/**
 		 * internal bufferedWriter
 		 */
-		private BufferedWriter out;
+		private BufferedWriter ptRateWriter;
 		private CalcAverageTripLength catl = null;
 		private CalcNetAvgSpeed cas = null;
 		private CalcTrafficPerformance ctpf = null;
 		private RoadPricing rp = null;
+		private OnRouteModalSplit orms = null;
+		private TravelTimeModalSplit ttms = null;
+		private LegDistance ld = null;
 
 		public void notifyStartup(StartupEvent event) {
 			Controler ctl = event.getControler();
@@ -73,11 +82,11 @@ public class PtcheckControler extends Controler {
 						ctl.getLastIteration(), cf.getParam("planCalcScore",
 								"traveling"), cf.getParam("planCalcScore",
 								"travelingPt")));
-				out = IOUtils
+				ptRateWriter = IOUtils
 						.getBufferedWriter(getOutputFilename("tollPaid.txt"));
-				out
+				ptRateWriter
 						.write("Iter\tBetaTraveling\tBetaTravelingPt\tavg. executed score\tavg. triplength\ttraffic persformance\tavg. travel speed\ttoll_amount[€/m]\ttoll_paid[€]\tNumber of Drawees\tavg. tolled triplength\n");
-				out.flush();
+				ptRateWriter.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -93,14 +102,14 @@ public class PtcheckControler extends Controler {
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			int it = event.getIteration();
+			Controler ctl = event.getControler();
 			if (it % 10 == 0) {
-				Controler ctl = event.getControler();
 				Config cf = ctl.getConfig();
 				rp = ctl.getRoadPricing();
 				catl = new CalcAverageTripLength();
 				catl.run(event.getControler().getPopulation());
 				try {
-					out
+					ptRateWriter
 							.write(it
 									+ "\t"
 									+ cf.getParam("planCalcScore", "traveling")
@@ -127,18 +136,43 @@ public class PtcheckControler extends Controler {
 											+ "\t"
 											+ rp.getAvgPaidTripLength()
 											: "0.0\t0.0\t0\t0.0") + "\n");
-					out.flush();
+					ptRateWriter.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
+				}
+			}
+			if (it == ctl.getLastIteration()) {
+				if (orms != null) {
+					orms.write(getOutputFilename("onRoute.txt.gz"));
+					orms.writeCharts(getOutputFilename("onRoute.png"));
+					ttms.write(getOutputFilename("traveltimes.txt.gz"));
+					ttms.writeCharts(getOutputFilename("traveltimes.png"));
+					ld.write(getOutputFilename("legDistances.txt.gz"));
+					ld.writeCharts(getOutputFilename("legDistances.png"));
 				}
 			}
 		}
 
 		public void notifyShutdown(ShutdownEvent event) {
 			try {
-				out.close();
+				ptRateWriter.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+		}
+
+		public void notifyIterationStarts(IterationStartsEvent event) {
+			Controler c = event.getControler();
+			Events es = c.getEvents();
+			NetworkLayer nl = c.getNetwork();
+			Plans ps = c.getPopulation();
+			if (event.getIteration() == c.getLastIteration()) {
+				orms = new OnRouteModalSplit(300, nl, ps);
+				es.addHandler(orms);
+				ttms = new TravelTimeModalSplit(300, nl, ps);
+				es.addHandler(ttms);
+				ld = new LegDistance(300, nl);
+				es.addHandler(ld);
 			}
 		}
 	}

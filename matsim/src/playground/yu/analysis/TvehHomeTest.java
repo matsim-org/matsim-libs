@@ -33,10 +33,10 @@ public class TvehHomeTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// final String origTvehFilename = "../runs/run263/T.veh.gz";
-		// final String homeTvehFilename = "../runs/run263/homeT.veh.gz";
-		final String origTvehFilename = "./test/T.veh.gz";
-		final String homeTvehFilename = "./output/homeT.veh.gz";
+		final String origTvehFilename = "../runs/run264/T.veh.gz";
+		final String homeTvehFilename = "../runs/run264/homeT.veh.gz";
+		// final String origTvehFilename = "./test/T.veh.gz";
+		// final String homeTvehFilename = "./output/homeT.veh.gz";
 
 		TransimsSnapshotFileReader reader = new TransimsSnapshotFileReader(
 				origTvehFilename);
@@ -60,6 +60,7 @@ public class TvehHomeTest {
 				}
 			} while (line != null);
 			writer.close();
+			System.out.println("--> Done!");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
