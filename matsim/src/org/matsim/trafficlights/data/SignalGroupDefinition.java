@@ -54,6 +54,8 @@ public class SignalGroupDefinition {
 
 	public void addFromLane(SignalLane lane) {
 		this.fromLanesIdMap.put(lane.getId(), lane);
+		// TODO [an] linkId wasn't set, so I decided to take the from lane's linkId instead
+		this.linkId = lane.getLinkId();
 	}
 
 	public void addToLane(SignalLane lane) {
@@ -114,6 +116,28 @@ public class SignalGroupDefinition {
 	 */
 	public boolean isTurnIfRed() {
 		return this.turnIfRed;
+	}
+	
+	/**
+	 * @return Its Id and the Id's of the from and to links
+	 */
+	public String toString(){
+		
+		StringBuffer str = new StringBuffer();
+		
+		str.append("SignalGroup " + this.id + " From: ");
+		
+		for (SignalLane lane : fromLanesIdMap.values()) {
+			str.append(lane.getLinkId() + ", ");
+		}
+		
+		str.append(" To: ");
+		
+		for (SignalLane lane : toLanesIdLanesMap.values()) {
+			str.append(lane.getLinkId() + ", ");
+		}
+		
+		return str.toString();		
 	}
 
 

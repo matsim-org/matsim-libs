@@ -5,18 +5,70 @@
   xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalGroupDefinition.xsd">
 
   <signalGroup id="100">
-    <fromLink refId="100" lanes="3" />
-    <toLink refId="201" lanes="2" />
-    <toLink refId="301" lanes="1" />
+	<fromLane id="100" >
+    	<link refId="100" />
+    </fromLane>
+    <toLane id="1">
+    	<link refId="201" />
+    </toLane>
+    <toLane id="2" >
+    	<link refId="301" />
+    </toLane>
+    <toLane id="3" >
+    	<link refId="401" />
+    </toLane>
     <turnIfRed>false</turnIfRed>
     <passingClearingTime>2</passingClearingTime>
   </signalGroup>
+	
   <signalGroup id="200">
-    <fromLink refId="200" />
-    <toLink refId="101" />
-    <toLink refId="301" />
-    <turnIfRed>true</turnIfRed>
-    <passingClearingTime>15</passingClearingTime>
+	<fromLane id="200" >
+    	<link refId="200" />
+    </fromLane>
+    <toLane id="1">
+    	<link refId="101" />
+    </toLane>
+    <toLane id="2" >
+    	<link refId="301" />
+    </toLane>
+    <toLane id="3" >
+    	<link refId="401" />
+    </toLane>
+    <turnIfRed>false</turnIfRed>
+    <passingClearingTime>2</passingClearingTime>
+  </signalGroup>
+  <signalGroup id="300">
+	<fromLane id="300" >
+    	<link refId="300" />
+    </fromLane>
+    <toLane id="1">
+    	<link refId="101" />
+    </toLane>
+    <toLane id="2" >
+    	<link refId="201" />
+    </toLane>
+    <toLane id="3" >
+    	<link refId="401" />
+    </toLane>
+    <turnIfRed>false</turnIfRed>
+    <passingClearingTime>2</passingClearingTime>
+  </signalGroup>
+	
+  <signalGroup id="400">
+	<fromLane id="400" >
+    	<link refId="400" />
+    </fromLane>
+    <toLane id="1">
+    	<link refId="101" />
+    </toLane>
+    <toLane id="2" >
+    	<link refId="201" />
+    </toLane>
+    <toLane id="3" >
+    	<link refId="301" />
+    </toLane>
+    <turnIfRed>false</turnIfRed>
+    <passingClearingTime>2</passingClearingTime>
   </signalGroup>
 </signalGroups>
 

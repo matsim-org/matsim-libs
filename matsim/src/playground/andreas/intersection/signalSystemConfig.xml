@@ -15,13 +15,25 @@
 				<powerOffTime sec="50" />
 				<signalGroupSettings refId="100">
 					<roughcast sec="0" />
-					<dropping sec="45" />
+					<dropping sec="12" />
 					<interimTimeRoughcast sec="2" />
 					<interimTimeDropping sec="3" />
 				</signalGroupSettings>
 				<signalGroupSettings refId="200">
-					<roughcast sec="0" />
-					<dropping sec="15" />
+					<roughcast sec="15" />
+					<dropping sec="27" />
+					<interimTimeRoughcast sec="2" />
+					<interimTimeDropping sec="3" />
+				</signalGroupSettings>
+				<signalGroupSettings refId="300">
+					<roughcast sec="30" />
+					<dropping sec="42" />
+					<interimTimeRoughcast sec="2" />
+					<interimTimeDropping sec="3" />
+				</signalGroupSettings>
+				<signalGroupSettings refId="400">
+					<roughcast sec="45" />
+					<dropping sec="57" />
 					<interimTimeRoughcast sec="2" />
 					<interimTimeDropping sec="3" />
 				</signalGroupSettings>

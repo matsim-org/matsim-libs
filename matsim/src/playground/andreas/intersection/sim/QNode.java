@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import org.matsim.mobsim.QueueLink;
 import org.matsim.network.Node;
+import org.matsim.trafficlights.data.SignalGroupSettings;
 
 import playground.andreas.intersection.tl.SignalSystemControlerImpl;
 
@@ -21,22 +22,53 @@ public class QNode extends Node{
 
 	/** Simple moveNode, Complex one can be found in {@link QueueLink} */
 	public void moveNode(final double now) {
-				
-		for (Iterator iter = this.inlinks.values().iterator(); iter.hasNext();) {
-			QLink link = (QLink) iter.next();
+		
+		if(myNodeTrafficLightControler != null){
 			
-			for (PseudoLink pseudoLink : link.getNodePseudoLinks()) {
-				while (!pseudoLink.flowQueueIsEmpty()) {
-					QVehicle veh = pseudoLink.getFirstFromBuffer();
-					if (!moveVehicleOverNode(veh, now, pseudoLink)) {
-						break;
+			// Node is traffic light controlled
+			
+			SignalGroupSettings[] greenSignalGroups = myNodeTrafficLightControler.getGreenInLinks(now);
+			
+			if (greenSignalGroups.length != 0){
+				
+				for (int i = 0; i < greenSignalGroups.length; i++) {
+					SignalGroupSettings signalGroupSetting = greenSignalGroups[i];
+					
+					QLink link = (QLink) this.inlinks.get((signalGroupSetting.getSignalGroupDefinition().getLinkId()));
+					
+					for (PseudoLink pseudoLink : link.getNodePseudoLinks()) {
+						while (!pseudoLink.flowQueueIsEmpty()) {
+							QVehicle veh = pseudoLink.getFirstFromBuffer();
+							if (!moveVehicleOverNode(veh, now, pseudoLink)) {
+								break;
+							}
+						}
+					}
+				}
+				
+			}
+						
+			
+			
+		} else {
+			
+			//Node is NOT traffic light controlled
+			
+			for (Iterator iter = this.inlinks.values().iterator(); iter.hasNext();) {
+				QLink link = (QLink) iter.next();
+				
+				for (PseudoLink pseudoLink : link.getNodePseudoLinks()) {
+					while (!pseudoLink.flowQueueIsEmpty()) {
+						QVehicle veh = pseudoLink.getFirstFromBuffer();
+						if (!moveVehicleOverNode(veh, now, pseudoLink)) {
+							break;
+						}
 					}
 				}
 			}
 			
-				
-			
-		}
+		}				
+		
 	}
 	
 	/** Simple moveNode, Complex one can be found in {@link QueueLink} 
