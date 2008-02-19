@@ -231,6 +231,23 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		return this.activityTypes.values();
 	}
 
+	/** Checks whether all the settings make sense or if there are some problems with the parameters
+	 * currently set. Currently, this checks that for at least one activity type opening AND closing
+	 * times are defined. */
+	@Override
+	public void checkConsistency() {
+		boolean hasOpeningAndClosingTime = false;
+
+		for (ActivityParams actType : this.activityTypes.values()) {
+			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
+				hasOpeningAndClosingTime = true;
+			}
+		}
+		if (!hasOpeningAndClosingTime) {
+			log.error("NO OPENING OR CLOSING TIMES DEFINED!\n\n\nThere is no activity type that has an opening *and* closing time defined.\nThis usually means that the activity chains can be shifted by an arbitrary\nnumber of hours without having an effect on the score of the plans, and thus\nresulting in wrong results / traffic patterns.\n\n\n");
+		}
+	}
+
 	/* direct access */
 
 	public double getLearningRate() {
