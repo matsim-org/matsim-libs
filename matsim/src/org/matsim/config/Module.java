@@ -57,18 +57,10 @@ public class Module {
 	private final String name;
 	private final TreeMap<String,String> params;
 
-	//////////////////////////////////////////////////////////////////////
-	// constructor
-	//////////////////////////////////////////////////////////////////////
-
 	public Module(final String name) {
 		this.name = name;
 		this.params = new TreeMap<String,String>();
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// add / set methods
-	//////////////////////////////////////////////////////////////////////
 
 	public void addParam(final String param_name, final String value) {
 		if (this.params.containsKey(param_name)) {
@@ -102,9 +94,13 @@ public class Module {
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
+	/** Check if the set values go well together. This method is usually called after reading the
+	 * configuration from a file. If an inconsistency is found, a warning or error should be issued
+	 * and (optionally) a RuntimeException being thrown.
+	 */
+	protected void checkConsistency() {
+		/* nothing to do in default */
+	}
 
 	public String getValue(final String param_name) {
 		return this.params.get(param_name);
@@ -117,10 +113,6 @@ public class Module {
 	protected TreeMap<String, String> getParams() {
 		return this.params;
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public final String toString() {

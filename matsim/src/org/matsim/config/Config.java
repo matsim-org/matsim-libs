@@ -121,13 +121,21 @@ public class Config {
 
 		this.roadpricing = new RoadPricingConfigGroup();
 		this.modules.put(RoadPricingConfigGroup.GROUP_NAME, this.roadpricing);
-		
+
 		this.evacuation = new EvacuationConfigGroup();
 		this.modules.put(EvacuationConfigGroup.GROUP_NAME, this.evacuation);
-		
+
 //		 SN TEST (not a default module)
 		this.socnetmodule = new SocNetConfigGroup();
 		this.modules.put(SocNetConfigGroup.GROUP_NAME, this.socnetmodule);
+	}
+
+	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
+	 * in their combination. */
+	public void checkConsistency() {
+		for (Module m : this.modules.values()) {
+			m.checkConsistency();
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -283,7 +291,7 @@ public class Config {
 	public final RoadPricingConfigGroup roadpricing() {
 		return this.roadpricing;
 	}
-	
+
 	public final EvacuationConfigGroup evacuation(){
 		return this.evacuation;
 	}

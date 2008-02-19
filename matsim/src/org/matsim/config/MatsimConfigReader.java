@@ -66,6 +66,12 @@ public class MatsimConfigReader extends MatsimXmlParser {
 		this.delegate.endTag(name, content, context);
 	}
 
+	@Override
+	public void parse(final String filename) throws SAXException, ParserConfigurationException, IOException {
+		super.parse(filename);
+		this.config.checkConsistency();
+	}
+
 	/**
 	 * Parses the specified config file. This method calls {@link #parse(String)}, but handles all
 	 * possible exceptions on its own.
