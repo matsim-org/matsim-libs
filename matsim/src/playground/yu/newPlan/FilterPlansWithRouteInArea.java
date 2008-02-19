@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.ivtch;
+package playground.yu.newPlan;
 
 import playground.marcel.MyRuns;
 

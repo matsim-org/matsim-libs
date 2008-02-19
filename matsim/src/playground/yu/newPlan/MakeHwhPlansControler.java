@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.ivtch;
+package playground.yu.newPlan;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;

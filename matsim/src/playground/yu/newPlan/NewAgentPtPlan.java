@@ -36,9 +36,9 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI {
 	/**
@@ -48,7 +48,7 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 
 	/**
 	 * Constructor, writes file-head
-	 *
+	 * 
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
@@ -77,20 +77,19 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 				if (i % 2 == 0) {
 					copyPlan.addAct((Act) o);
 				} else {
-					Leg leg = (Leg)o;
-					if (!leg.getMode().equals("car")) {
-						leg.setRoute(null);
-						leg.setMode("car");
-					}
-
-					Leg copyLeg = new Leg((Leg) o);
+					Leg leg = (Leg) o;
+					Leg copyLeg = new Leg(leg);
 					copyLeg.setMode("pt");
+					copyLeg.setRoute(null);
 					// -----------------------------------------------
 					// WITHOUT routeSetting!! traveltime of PT can be calculated
 					// automaticly!!
 					// -----------------------------------------------
-					copyLeg.setRoute(null);
 					copyPlan.addLeg(copyLeg);
+					if (!leg.getMode().equals("car")) {
+						leg.setRoute(null);
+						leg.setMode("car");
+					}
 				}
 			}
 			copyPlans.add(copyPlan);

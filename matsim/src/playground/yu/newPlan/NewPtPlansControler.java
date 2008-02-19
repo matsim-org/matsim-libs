@@ -52,11 +52,15 @@ public class NewPtPlansControler {
 
 		Plans population = new Plans();
 		NewAgentPtPlan nap = new NewAgentPtPlan(population);
+
 		population.addAlgorithm(nap);
+
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
 		world.setPopulation(population);
+
 		population.runAlgorithms();
+
 		nap.writeEndPlans();
 	}
 }
