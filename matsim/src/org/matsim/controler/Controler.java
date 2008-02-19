@@ -406,7 +406,12 @@ public class Controler {
 	 */
 	private void loadConfig() {
 		if (this.configFileName != null) {
-			new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
+			try {
+				new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
+			} catch (IOException e) {
+				log.error("Problem loading the configuration file from " + this.configFileName);
+				throw new RuntimeException(e);
+			}
 		}
 		log.info("Complete config dump:");
 		StringWriter writer = new StringWriter();

@@ -90,10 +90,17 @@ public class MatsimConfigReader extends MatsimXmlParser {
 	 *
 	 * @param filename The name of the file to parse.
 	 * @param dtdFilename The name of a (local) dtd-file to be used for validating the config file.
+	 * @throws IOException e.g. if the file cannot be found
 	 */
-	public void readFile(final String filename, final String dtdFilename) {
+	public void readFile(final String filename, final String dtdFilename) throws IOException {
 		this.localDtd = dtdFilename;
-		readFile(filename);
+		try {
+			parse(filename);
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
 		this.localDtd = null;
 	}
 
