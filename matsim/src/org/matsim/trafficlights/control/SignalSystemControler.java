@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.trafficlights.control;
 
-import org.matsim.network.Link;
+import org.matsim.trafficlights.data.SignalGroupSettings;
 
 
 /**
@@ -28,5 +28,5 @@ import org.matsim.network.Link;
  */
 public abstract class SignalSystemControler {
 
-	public abstract Link[] getGreenInLinks(double time);
+	public abstract SignalGroupSettings[] getGreenInLinks(double time);
 }
