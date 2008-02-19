@@ -170,7 +170,9 @@ public class PseudoLink {
 	
 	private void moveFlowQueueToNextPseudoLink(){
 		
-		while(!flowQueue.isEmpty()){
+		Boolean moveOn = true;
+		
+		while(moveOn && !flowQueue.isEmpty() && toLinks.size() != 0){
 			QVehicle veh = this.flowQueue.peek();
 			Link nextLink = veh.chooseNextLink();
 			
@@ -181,7 +183,7 @@ public class PseudoLink {
 							if (toLink.hasSpace()) {
 								this.flowQueue.poll();
 								toLink.addVehicle(veh);
-							}	
+							}else moveOn = false;	
 						}
 					}
 				}
