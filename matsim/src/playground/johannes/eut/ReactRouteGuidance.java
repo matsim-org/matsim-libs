@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EUTReRoute.java
+ * ReactRouteGuidance.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,33 +23,58 @@
  */
 package playground.johannes.eut;
 
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.router.PlansCalcRoute;
+import org.matsim.plans.Route;
+import org.matsim.router.Dijkstra;
+import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.router.util.TravelCostI;
+import org.matsim.router.util.TravelTimeI;
+import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
  * @author illenberger
  *
  */
-public class EUTReRoute extends MultithreadedModuleA {
+public class ReactRouteGuidance implements RouteProvider {
 
-	private NetworkLayer network;
 	
-	private TravelTimeMemory provider;
+	private LeastCostPathCalculator algorithm;
 	
-	/**
-	 * 
-	 */
-	public EUTReRoute(NetworkLayer network, TravelTimeMemory provider) {
-		this.network = network;
-		this.provider = provider;
+	public ReactRouteGuidance(NetworkLayer network, TravelTimeI traveltimes) {
+		RoutableLinkCost linkcost = new RoutableLinkCost();
+		linkcost.traveltimes = traveltimes;
+		algorithm = new Dijkstra(network, linkcost, linkcost);
+	}
+	
+	public int getPriority() {
+		return 10;
 	}
 
-	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
-		EUTRouter router = new EUTRouter(network, provider, new CARAFunction(10));
-		return new PlansCalcRoute(null, null, null, false, router, router);
+	public boolean providesRoute(Link currentLink, Route subRoute) {
+		return true;
 	}
 
+	public synchronized Route requestRoute(Link departureLink, Link destinationLink,
+			double time) {
+		return algorithm.calcLeastCostPath(departureLink.getToNode(), destinationLink.getFromNode(), time);
+	}
+
+	public void setPriority(int p) {
+
+	}
+
+	private class RoutableLinkCost implements TravelTimeI, TravelCostI {
+
+		private TravelTimeI traveltimes;
+		
+		public double getLinkTravelTime(Link link, double time) {
+			return traveltimes.getLinkTravelTime(link, time);
+		}
+
+		public double getLinkTravelCost(Link link, double time) {
+			return traveltimes.getLinkTravelTime(link, time);
+		}
+		
+	}
 }

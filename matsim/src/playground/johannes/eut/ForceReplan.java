@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EUTReRoute.java
+ * ForceReplan.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,33 +23,27 @@
  */
 package playground.johannes.eut;
 
-import org.matsim.network.NetworkLayer;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.router.PlansCalcRoute;
+import org.matsim.withinday.contentment.AgentContentmentI;
 
 /**
  * @author illenberger
  *
  */
-public class EUTReRoute extends MultithreadedModuleA {
+public class ForceReplan implements AgentContentmentI {
 
-	private NetworkLayer network;
-	
-	private TravelTimeMemory provider;
-	
-	/**
-	 * 
+	/* (non-Javadoc)
+	 * @see org.matsim.withinday.contentment.AgentContentmentI#didReplan(boolean)
 	 */
-	public EUTReRoute(NetworkLayer network, TravelTimeMemory provider) {
-		this.network = network;
-		this.provider = provider;
+	public void didReplan(boolean modified) {
+		// TODO Auto-generated method stub
+
 	}
 
-	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
-		EUTRouter router = new EUTRouter(network, provider, new CARAFunction(10));
-		return new PlansCalcRoute(null, null, null, false, router, router);
+	/* (non-Javadoc)
+	 * @see org.matsim.withinday.contentment.AgentContentmentI#getContentment()
+	 */
+	public double getContentment() {
+		return -1;
 	}
 
 }

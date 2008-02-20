@@ -23,12 +23,14 @@
  */
 package playground.johannes.eut;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelTimeI;
 
@@ -38,16 +40,26 @@ import org.matsim.router.util.TravelTimeI;
  */
 public class EUTRouter implements LeastCostPathCalculator {
 
+	public static int riskCount = 0;
+	
 	private KSPPenalty kspPenalty;
 	
-	private KStateLinkCostProvider ttProvider;
+	private TravelTimeMemory ttProvider;
 	
 	private ArrowPrattRiskAversionI utilFunc;
 	
-	public EUTRouter(NetworkLayer network, KStateLinkCostProvider provider, ArrowPrattRiskAversionI utilFunc) {
+	private FreespeedTravelTimeCost freeTravTimes = new FreespeedTravelTimeCost();
+	
+	public EUTRouter(NetworkLayer network, TravelTimeMemory provider, ArrowPrattRiskAversionI utilFunc) {
 		ttProvider = provider;
 		this.utilFunc = utilFunc;
 		kspPenalty = new KSPPenalty(network);
+		
+		safeRoute = new Route();
+		safeRoute.setRoute("2 3 6 9");
+		riskyRoute = new Route();
+		riskyRoute.setRoute("2 4 7 9");
+		
 	}
 	
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double starttime) {
@@ -55,31 +67,83 @@ public class EUTRouter implements LeastCostPathCalculator {
 	}
 
 	protected List<Route> generateChoiceSet(Node departure, Node destination, double time) {
-		return kspPenalty.getPaths(departure, destination, time, 3, ttProvider.requestLinkCost());
+		return kspPenalty.getPaths(departure, destination, time, 2, freeTravTimes);
+//		return kspPenalty.getPaths(departure, destination, time, 3, ttProvider.requestLinkCost());
 	}
 	
 	protected Route selectChoice(List<Route> routes, double starttime) {
 		Route bestroute = null;
+		Route shortestroute = null;
 		double leastcost = Double.MAX_VALUE;
+		double shortesttravtime = Double.MAX_VALUE;
 		
 		for(Route route : routes) {
-			double aggregatedcosts = calcCosts(ttProvider.requestAggregatedState(), route, starttime);
-			double currentcosts = calcCosts(ttProvider.requestCurrentState(), route, starttime);
-			double avrcosts = 0.9*aggregatedcosts + 0.1*currentcosts;
+			double totaltraveltime = 0;
+			double totaltravelcosts = 0;
+			
+			for(TravelTimeI traveltimes : ttProvider.getTravelTimes()) {
+				double traveltime = calcTravTime(traveltimes, route, starttime);
+				double travelcosts = utilFunc.evaluate(traveltime);
+				totaltraveltime += traveltime;
+				totaltravelcosts += travelcosts;
+			}
+			
+			double avrcosts = totaltravelcosts / (double)ttProvider.getTravelTimes().size();
+			double avrtravtime  = totaltraveltime / (double)ttProvider.getTravelTimes().size();
+			
 			if(avrcosts < leastcost) {
 				leastcost = avrcosts;
 				bestroute = route;
 			}
+			
+			
+			if(avrtravtime < shortesttravtime) {
+				shortesttravtime = avrtravtime;
+				shortestroute = route;
+			}
+			
+			logcosts(route, avrcosts, avrtravtime, utilFunc.getTravelTime(avrcosts));
 		}
+		
+		if(!shortestroute.getRoute().equals(bestroute.getRoute()))
+			riskCount++;
 		
 		return bestroute;
 	}
 	
-	private double calcCosts(TravelTimeI traveltimes, Route route, double starttime) {
+	private double calcTravTime(TravelTimeI traveltimes, Route route, double starttime) {
 		double totaltt = 0;
 		for(Link link : route.getLinkRoute()) {
 				totaltt += traveltimes.getLinkTravelTime(link, starttime + totaltt); 
 		}
-		return utilFunc.evaluate(totaltt);
+		return totaltt;
+	}
+	
+	private static Route safeRoute;
+	
+	private static Route riskyRoute;
+	
+	public static List<Double> safeCostsAvr = new LinkedList<Double>();
+	
+	public static List<Double> riskyCostsAvr = new LinkedList<Double>();
+	
+	public static List<Double> riskyTravTimeAvr = new LinkedList<Double>();
+	
+	public static List<Double> safeTravTimeAvr = new LinkedList<Double>();
+	
+	public static List<Double> safeCE = new LinkedList<Double>();
+	
+	public static List<Double> riskyCE = new LinkedList<Double>();
+	
+	synchronized static private void logcosts(Route route, double avrcost, double avrtt, double ce) { 
+		if(route.getRoute().equals(safeRoute.getRoute())) {
+			safeCostsAvr.add(avrcost);
+			safeTravTimeAvr.add(avrtt);
+			safeCE.add(ce);
+		} else if(route.getRoute().equals(riskyRoute.getRoute())) {
+			riskyCostsAvr.add(avrcost);
+			riskyTravTimeAvr.add(avrtt);
+			riskyCE.add(ce);
+		}
 	}
 }

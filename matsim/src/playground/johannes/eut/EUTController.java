@@ -28,42 +28,39 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
-import org.matsim.analysis.CalcLegTimes;
-import org.matsim.config.Config;
-import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
+import org.matsim.events.EventAgentWait2Link;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
+import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.selectors.KeepSelected;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.replanning.selectors.BestPlanSelector;
+import org.matsim.withinday.WithindayControler;
 
 /**
  * @author illenberger
  *
  */
-public class EUTController extends Controler {
+public class EUTController extends WithindayControler {
 	
-	private KStateLinkCostProvider provider;
+	private TravelTimeMemory provider;
 
-	private CalcLegTimes legDurationWriter;
+	public final static double incidentProba = 0.1;
+	
 	/**
 	 * @param args
 	 */
@@ -72,60 +69,60 @@ public class EUTController extends Controler {
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @param configFileName
-	 */
-	public EUTController(String configFileName) {
-		super(configFileName);
-		setOverwriteFiles(true);
-		
-		// TODO Auto-generated constructor stub
-	}
+//	/**
+//	 * @param configFileName
+//	 */
+//	public EUTController(String configFileName) {
+//		super(configFileName);
+//		setOverwriteFiles(true);
+//		
+//		// TODO Auto-generated constructor stub
+//	}
 
-	/**
-	 * @param configFileName
-	 * @param dtdFileName
-	 */
-	public EUTController(String configFileName, String dtdFileName) {
-		super(configFileName, dtdFileName);
-		// TODO Auto-generated constructor stub
-	}
+//	/**
+//	 * @param configFileName
+//	 * @param dtdFileName
+//	 */
+//	public EUTController(String configFileName, String dtdFileName) {
+//		super(configFileName, dtdFileName);
+//		// TODO Auto-generated constructor stub
+//	}
 
-	/**
-	 * @param config
-	 */
-	public EUTController(Config config) {
-		super(config);
-		// TODO Auto-generated constructor stub
-	}
+//	/**
+//	 * @param config
+//	 */
+//	public EUTController(Config config) {
+//		super(config);
+//		// TODO Auto-generated constructor stub
+//	}
 
-	/**
-	 * @param config
-	 * @param network
-	 * @param population
-	 */
-	public EUTController(Config config, QueueNetworkLayer network,
-			Plans population) {
-		super(config, network, population);
-		// TODO Auto-generated constructor stub
-	}
+//	/**
+//	 * @param config
+//	 * @param network
+//	 * @param population
+//	 */
+//	public EUTController(Config config, QueueNetworkLayer network,
+//			Plans population) {
+//		super(config, network, population);
+//		// TODO Auto-generated constructor stub
+//	}
 
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		setTraveltimeBinSize(60);
-		provider = new KStateLinkCostProvider(getTraveltimeBinSize(), 0, 86400, getNetwork());
-//		StrategyManager manager = new StrategyManager();
-//		manager.setMaxPlansPerAgent(1);
-//		
-//		PlanStrategy strategy = new PlanStrategy(new KeepSelected());
-//		strategy.addStrategyModule(new EUTReRoute(getNetwork(), provider));
-//		manager.addStrategy(strategy, 0.02);
-//		
-//		strategy = new PlanStrategy(new KeepSelected());
-//		manager.addStrategy(strategy, 0.98);
-//		
-//		return manager;
-		return super.loadStrategyManager();
+		provider = new TravelTimeMemory();
+		StrategyManager manager = new StrategyManager();
+		manager.setMaxPlansPerAgent(1);
+		
+		PlanStrategy strategy = new PlanStrategy(new BestPlanSelector());
+		strategy.addStrategyModule(new EUTReRoute(getNetwork(), provider));
+		manager.addStrategy(strategy, 0.05);
+		
+		strategy = new PlanStrategy(new BestPlanSelector());
+		manager.addStrategy(strategy, 0.95);
+		
+		return manager;
+////		return super.loadStrategyManager();
 	}
 
 	@Override
@@ -134,30 +131,32 @@ public class EUTController extends Controler {
 		super.setup();		
 		
 		addControlerListener(new TTCalculatorController());
-		addControlerListener(new NetworkModifier());
+//		addControlerListener(new NetworkModifier());
 		addControlerListener(new TripDurationWriter());
 		addControlerListener(new RouteDistribution());
+		addControlerListener(new RouteCosts());
 //		setScoringFunctionFactory(new EUTScoringFunctionFactory());
 		
 //		legDurationWriter = new CalcLegTimes(population); 
 //		events.addHandler(legDurationWriter);
-		
+		factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), getTravelTimeCalculator());
 		
 	}
 
 	private class TTCalculatorController implements IterationStartsListener, IterationEndsListener {
 
-		private TravelTimeCalculatorArray myttcalc;
-		
+//		private TravelTimeCalculatorArray myttcalc;
+//		
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			myttcalc = new TravelTimeCalculatorArray(EUTController.this.getNetwork());
-			EUTController.this.events.addHandler(myttcalc);
+//			myttcalc = new TravelTimeCalculatorArray(EUTController.this.getNetwork());
+//			EUTController.this.events.addHandler(myttcalc);
 		}
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			EUTController.this.events.removeHandler(myttcalc);
-			provider.appendTTSet(myttcalc);
-		
+//			EUTController.this.events.removeHandler(myttcalc);
+//			provider.appendTTSet(myttcalc);
+			
+			provider.appendNewStorage(provider.makeTTStorage(getTravelTimeCalculator(), network, getTraveltimeBinSize(), 0, 86400));
 		}
 		
 	}
@@ -183,7 +182,7 @@ public class EUTController extends Controler {
 			QueueLink link = (QueueLink) EUTController.this.getNetwork().getLink("9");
 
 			Gbl.random.nextDouble();
-			if(Gbl.random.nextDouble() < 0.1 && event.getIteration() > 10) {
+			if(Gbl.random.nextDouble() < incidentProba && event.getIteration() > 50) {
 				link.changeSimulatedFlowCapacity(0.5);
 				changedcap = true;
 				try {
@@ -204,7 +203,7 @@ public class EUTController extends Controler {
 
 	}
 	
-	private class TripDurationWriter implements IterationEndsListener, EventHandlerAgentDepartureI, EventHandlerAgentArrivalI {
+	private class TripDurationWriter implements IterationEndsListener, EventHandlerAgentWait2LinkI, EventHandlerAgentArrivalI {
 		
 		private BufferedWriter writer;
 		
@@ -262,6 +261,7 @@ public class EUTController extends Controler {
 		}
 
 		public void handleEvent(EventAgentArrival event) {
+			if(event.linkId.equals("11")) {
 			Double deptime = tripdurs.get(event.agent);
 			if(deptime != null) {
 				Leg leg = (Leg) event.agent.getSelectedPlan().getActsLegs().get(1); 
@@ -272,10 +272,10 @@ public class EUTController extends Controler {
 				}
 				tripdurs.remove(event.agent);
 			}
-			
+			}
 		}
 
-		public void handleEvent(EventAgentDeparture event) {
+		public void handleEvent(EventAgentWait2Link event) {
 			tripdurs.put(event.agent, event.time);
 		}
 	
@@ -291,7 +291,7 @@ public class EUTController extends Controler {
 		public RouteDistribution() {
 			try {
 				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("routefrac.txt")));
-				writer.write("Iteration\tn_safe\tn_risky");
+				writer.write("Iteration\tn_safe\tn_risky\tn_riskaverse");
 				writer.newLine();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -304,6 +304,7 @@ public class EUTController extends Controler {
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			try {
 				writer.write(event.getIteration()+"\t"+safeRouteCnt+"\t"+riskyRouteCnt);
+				writer.write("\t"+EUTRouter.riskCount);
 				writer.newLine();
 				writer.flush();
 			} catch (Exception e) {
@@ -321,13 +322,68 @@ public class EUTController extends Controler {
 		public void reset(int iteration) {
 			riskyRouteCnt = 0;
 			safeRouteCnt = 0;
+			EUTRouter.riskCount = 0;
 			
 		}
 		
 	}
 	
+	private class RouteCosts implements IterationEndsListener {
+
+		private BufferedWriter writer;
+		
+		public RouteCosts() {
+			try {
+				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("routecosts.txt")));
+				writer.write("Iteration\tcosts_safe_avr\tcosts_risky_avr\triskytt_avr\tsafett_avr\tsafe_ce\trisky_ce");
+				writer.newLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			try {
+				writer.write(String.valueOf(event.getIteration()));
+				writer.write("\t");
+				writer.write(String.valueOf(calcAvr(EUTRouter.safeCostsAvr)));
+				writer.write("\t");
+				writer.write(String.valueOf(calcAvr(EUTRouter.riskyCostsAvr)));
+				writer.write("\t");
+				writer.write(String.valueOf(calcAvr(EUTRouter.riskyTravTimeAvr)));
+				writer.write("\t");
+				writer.write(String.valueOf(calcAvr(EUTRouter.safeTravTimeAvr)));
+				writer.write("\t");
+				writer.write(String.valueOf(calcAvr(EUTRouter.safeCE)));
+				writer.write("\t");
+				writer.write(String.valueOf(calcAvr(EUTRouter.riskyCE)));
+				writer.newLine();
+				writer.flush();
+				
+				EUTRouter.safeCostsAvr = new LinkedList<Double>();
+				EUTRouter.riskyCostsAvr = new LinkedList<Double>();
+				EUTRouter.riskyTravTimeAvr = new LinkedList<Double>();
+				EUTRouter.safeTravTimeAvr = new LinkedList<Double>();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		private double calcAvr(List<Double> vals) {
+			double sum = 0;
+			for(Double val : vals) {
+//				try {
+				sum += val;
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+			}
+			
+			return sum/(double)vals.size();
+		}
+	}
+	
 	public static void main(String args[]) {
-		EUTController controller = new EUTController("/Users/fearonni/vsp-work/eut/twoway/config/config.xml");
+		EUTController controller = new EUTController(new String[]{"/Users/fearonni/vsp-work/eut/twoway/config/config.xml"});
 		controller.run();
 	}
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EUTReRoute.java
+ * GuidedAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,33 +23,50 @@
  */
 package playground.johannes.eut;
 
+import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.util.TravelTimeI;
+import org.matsim.withinday.WithindayAgent;
+import org.matsim.withinday.WithindayAgentLogicFactory;
+import org.matsim.withinday.contentment.AgentContentmentI;
+import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
  * @author illenberger
  *
  */
-public class EUTReRoute extends MultithreadedModuleA {
+public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 
-	private NetworkLayer network;
+	private double equipmentFraction = 0.1;
 	
-	private TravelTimeMemory provider;
+	private ForceReplan forceReplan = new ForceReplan();
 	
+	private PreventReplan preventReplan = new PreventReplan();
+	
+	private ReactRouteGuidance router;
 	/**
-	 * 
+	 * @param network
+	 * @param scoringConfig
 	 */
-	public EUTReRoute(NetworkLayer network, TravelTimeMemory provider) {
-		this.network = network;
-		this.provider = provider;
+	public GuidedAgentFactory(NetworkLayer network,
+			CharyparNagelScoringConfigGroup scoringConfig, TravelTimeI reactTTs) {
+		super(network, scoringConfig);
+		router = new ReactRouteGuidance(network, reactTTs);
 	}
 
 	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
-		EUTRouter router = new EUTRouter(network, provider, new CARAFunction(10));
-		return new PlansCalcRoute(null, null, null, false, router, router);
+	public AgentContentmentI createAgentContentment(WithindayAgent agent) {
+		Gbl.random.nextDouble();
+		if(Gbl.random.nextDouble() < equipmentFraction)
+			return forceReplan;
+		else
+			return preventReplan;
+	}
+
+	@Override
+	public RouteProvider createRouteProvider() {
+		return router;
 	}
 
 }
