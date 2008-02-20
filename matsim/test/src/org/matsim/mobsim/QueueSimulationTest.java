@@ -36,7 +36,7 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
-public class QueueSimulatorTest extends MatsimTestCase {
+public class QueueSimulationTest extends MatsimTestCase {
 
 	/**
 	 * Tests that the flow capacity can be reached (but not exceeded) by
