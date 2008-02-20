@@ -19,6 +19,10 @@ public class QNode extends Node{
 	public void setSignalSystemControler(SignalSystemControlerImpl nodeControler){
 		this.myNodeTrafficLightControler = nodeControler;
 	}
+	
+	public SignalSystemControlerImpl getMyNodeTrafficLightControler() {
+		return myNodeTrafficLightControler;
+	}
 
 	/** Simple moveNode, Complex one can be found in {@link QueueLink} */
 	public void moveNode(final double now) {

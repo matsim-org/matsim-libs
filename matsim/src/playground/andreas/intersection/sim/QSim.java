@@ -102,11 +102,15 @@ public class QSim extends Simulation {
 			if (node.getId().toString().equals("99")){
 				SignalSystemControlerImpl nodeControler = new SignalSystemControlerImpl(signalSystemConfigurations.get(node.getId()));
 				node.setSignalSystemControler(nodeControler);
+				
+				for (Iterator iterator = node.getInLinks().values().iterator(); iterator.hasNext();) {
+					QLink qLink = (QLink) iterator.next();
+					qLink.reconfigure(signalSystemConfigurations.get(node.getId()).getSignalGroupDefinitions());
+				}
 			}
 			
 						
-		}
-		
+		}		
 	}
 
 	protected void prepareSim() {
@@ -140,6 +144,7 @@ public class QSim extends Simulation {
 		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
 		
 		readSignalSystemControler();
+
 	}
 
 	protected void cleanupSim() {
