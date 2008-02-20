@@ -20,6 +20,12 @@ public class CountsTransform implements TabularFileHandlerI{
 	HashMap<Integer, Coord> xYCoords = new HashMap<Integer, Coord>();
 
 	/**
+	 * coordFile has to be structered as follows:<br>
+	 *  - row 0: LinkID<br>
+	 *  - row 1: x-Coord<br>
+	 *  - row 2: y-Coord<br>
+	 * each row separated by semicolon
+	 * 
 	 * @param args 0: countsInFile, 1: coordFile, 2: countsOutFile
 	 */
 	public static void main(String[] args) {
