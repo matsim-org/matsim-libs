@@ -116,7 +116,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 	public void reset(final int iteration) {
 		this.eventLinks.clear();
 		for (Link link : this.network.getLinks().values()) {
-			this.eventLinks.put(link.getId().toString(), new EventLink(link, this.capCorrectionFactor));
+			this.eventLinks.put(link.getId().toString(), new EventLink(link, this.capCorrectionFactor, this.network.getEffectiveCellSize()));
 		}
 		this.eventAgents.clear();
 		this.lastSnapshotIndex = -1;
@@ -193,8 +193,9 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 		private final double timeCap;
 
 		protected final double radioLengthToEuklideanDist; // ratio of link.length / euklideanDist
+		private final double effectiveCellSize;
 
-		public EventLink(final Link link, final double capCorrectionFactor) {
+		public EventLink(final Link link, final double capCorrectionFactor, final double effectiveCellSize) {
 			this.link = link;
 			this.drivingQueue = new ArrayList<EventAgent>();
 			this.parkingQueue = new ArrayList<EventAgent>();
@@ -204,7 +205,8 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			this.radioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
 			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed();
 			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
-			this.spaceCap = (this.link.getLength() * this.link.getLanes()) / NetworkLayer.CELL_LENGTH * Gbl.getConfig().simulation().getStorageCapFactor();
+			this.effectiveCellSize = effectiveCellSize;
+			this.spaceCap = (this.link.getLength() * this.link.getLanes()) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
 		}
 
 		public void enter(final EventAgent agent) {
@@ -261,7 +263,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 			double vehLen = Math.min(	// the length of a vehicle in visualization
 					this.euklideanDist / this.spaceCap, // all vehicles must have place on the link
-					NetworkLayer.CELL_LENGTH / storageCapFactor); // a vehicle should not be larger than it's actual size
+					this.effectiveCellSize / storageCapFactor); // a vehicle should not be larger than it's actual size
 
 			// put all cars in the buffer one after the other
 			for (EventAgent agent : this.buffer) {
@@ -341,7 +343,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			int lane = this.link.getLanes() + 1; // place them next to the link
 			for (EventAgent agent : this.waitingQueue) {
 				PositionInfo position = new PositionInfo(agent.id,
-						this.link, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking,null);
+						this.link, this.effectiveCellSize, lane, 0.0, PositionInfo.VehicleState.Parking,null);
 				positions.add(position);
 			}
 
@@ -351,7 +353,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			lane = this.link.getLanes() + 2; // place them next to the link
 			for (EventAgent agent : this.parkingQueue) {
 				PositionInfo position = new PositionInfo(agent.id,
-						this.link, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking,null);
+						this.link, this.effectiveCellSize, lane, 0.0, PositionInfo.VehicleState.Parking,null);
 				positions.add(position);
 			}
 		}
@@ -408,7 +410,8 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			cnt = this.waitingQueue.size();
 			if (cnt > 0) {
 				int lane = nLanes + 2;
-				double cellSize = Math.min(7.5, this.link.getLength() / cnt);
+				double cellSize = Math.min(7.5, this.link.getLength() / cnt); // TODO it seems to be that the magic number "7.5" corresponds to cell size 
+				//if so it should be changed to this.effectiveCellSize but I'm not sure about it [GL]
 				double distFromFromNode = this.link.getLength() - cellSize / 2.0;
 				for (EventAgent agent : this.waitingQueue) {
 					agent.lane = lane;

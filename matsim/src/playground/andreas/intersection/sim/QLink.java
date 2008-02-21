@@ -26,15 +26,18 @@ public class QLink extends Link {
 	
 	/** FreeLinkTravelTime */
 	private double freeSpeedTT;
+	private double effectiveCelleSize;
 	
 	public QLink(NetworkLayer network, String id, Node from, Node to, String length, String freespeed, String capacity, String permlanes, String origid, String type) {
 		super(network, id, from, to, length, freespeed, capacity, permlanes, origid, type);
+		
+		this.effectiveCelleSize = network.getEffectiveCellSize();
 		
 		this.freeSpeedTT = this.getLength() / this.getFreespeed();
 		// Original LinkErstellen
 		this.originalLink = new PseudoLink(this, true);
 		// Configurieren
-		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLength(), this.getLanes(), this.getFreespeed(), this.getFlowCapacity())) {
+		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLength(), this.getLanes(), this.getFreespeed(), this.getFlowCapacity(),this.effectiveCelleSize)) {
 			
 			if ( spaceCapWarningCount <=10 ) {
 				log.warn("Link " + this.getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
@@ -116,8 +119,8 @@ public class QLink extends Link {
 						originalLink.getToLinks().add(newNodePseudoLink);
 						originalLink.addDestLink(this.getToNode().getOutLinks().get(signalLane.getLinkId()));			
 							
-						newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h);
-						this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLength() - signalLane.getLength(), this.getLanes(), this.getFreespeed(), this.getFlowCapacity());
+						newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h,this.effectiveCelleSize);
+						this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLength() - signalLane.getLength(), this.getLanes(), this.getFreespeed(), this.getFlowCapacity(),this.effectiveCelleSize);
 						
 						pseudoLinksList.add(newNodePseudoLink);
 						firstNodeLinkInitialized = true;
@@ -152,7 +155,7 @@ public class QLink extends Link {
 							originalLink.addDestLink(this.getToNode().getOutLinks().get(signalLane.getLinkId()));
 							
 							// Only need to fix properties of new link. Original link hasn't changed
-							newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h);
+							newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h,this.effectiveCelleSize);
 							
 							pseudoLinksList.add(newNodePseudoLink);
 								

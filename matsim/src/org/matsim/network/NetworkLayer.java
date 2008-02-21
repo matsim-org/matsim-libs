@@ -44,7 +44,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	// ////////////////////////////////////////////////////////////////////
 
 	public static final IdI LAYER_TYPE = new Id("link");
-	public static final double CELL_LENGTH = 7.5;
+//	public static final double CELL_LENGTH = 7.5;
 
 	protected int capperiod = Integer.MIN_VALUE ;
 
@@ -58,6 +58,9 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	private final ArrayList<Integer> linkRoles = new ArrayList<Integer>(5);
 	private int maxNodeRoleIndex = 4;
 	private int maxLinkRoleIndex = 4;
+	private double effectivecellsize;
+	
+	public final static double CELL_LENGTH = 0;
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
@@ -149,6 +152,14 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		this.capperiod = (int)Time.parseTime(capperiod);
 	}
 
+	public final void setEffectivecellsize(final String effectivecellsize) {
+		if (this.effectivecellsize != Double.NaN) {
+			Gbl.warningMsg(this.getClass(), "setEffectivecellsize(...)", this + "[effectivecellsize=" + effectivecellsize + " already set effectivecellsize will be overwritten]");
+		}
+		this.effectivecellsize = Double.parseDouble(effectivecellsize);
+	}
+	
+	
 	// ////////////////////////////////////////////////////////////////////
 	// get methods
 	// ////////////////////////////////////////////////////////////////////
@@ -157,6 +168,10 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		return this.capperiod;
 	}
 
+	public final double getEffectiveCellSize() {
+		return this.effectivecellsize;
+	}
+	
 	public Map<IdI, ? extends Node> getNodes() {
 		return this.nodes;
 	}

@@ -23,6 +23,7 @@
 
 <!ELEMENT links (link)*>
 <!ATTLIST links capperiod  CDATA #IMPLIED
+				effectivecellsize CDATA #IMPLIED
                 capPeriod  CDATA #IMPLIED
                 capDivider CDATA #IMPLIED
                 capdivider CDATA #IMPLIED>
@@ -96,6 +97,10 @@
                the capacity of the given links has been measured.
      NOTE:     It should be = "01:00:00" per default, but at the
                moment, Matsim defines the default as "12:00:00" -->
+
+<!-- ATTRIBUTE effectivecellsize:
+     format := double
+     meaning:  It defines the effective length of the cells in meters. The MATSim default is 7.5 -->
 
 <!-- ATTRIBUTE capDivider, capdivider and capPeriod:
      DEPRECATED!!!

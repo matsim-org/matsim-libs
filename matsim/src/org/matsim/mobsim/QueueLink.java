@@ -101,6 +101,7 @@ public class QueueLink extends Link {
 
 	private boolean active = false;
 
+	
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
@@ -114,6 +115,7 @@ public class QueueLink extends Link {
 		// yy: I am really not so happy about these indirect constructors with
 		// long argument lists. But be it if other people
 		// like them. kai, nov06
+
 
 		this.freeTravelDuration = getLength() / getFreespeed();
 
@@ -143,7 +145,8 @@ public class QueueLink extends Link {
 		this.timeCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
-		this.storageCapacity = (this.length * this.permlanes) / NetworkLayer.CELL_LENGTH * storageCapFactor;
+		double aa = ((NetworkLayer)this.layer).getEffectiveCellSize();
+		this.storageCapacity = (this.length * this.permlanes) / ((NetworkLayer)this.layer).getEffectiveCellSize() * storageCapFactor;
 
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
@@ -532,7 +535,7 @@ public class QueueLink extends Link {
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 		double vehLen = Math.min(	// the length of a vehicle in visualization
 				this.length / this.storageCapacity, // all vehicles must have place on the link
-				NetworkLayer.CELL_LENGTH / storageCapFactor); // a vehicle should not be larger than it's actual size
+				((NetworkLayer)this.layer).getEffectiveCellSize() / storageCapFactor); // a vehicle should not be larger than it's actual size
 
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.buffer) {
@@ -549,7 +552,7 @@ public class QueueLink extends Link {
 			veh.setSpeed(speed);
 
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
-					this, distanceFromFromNode + NetworkLayer.CELL_LENGTH,
+					this, distanceFromFromNode + ((NetworkLayer)this.layer).getEffectiveCellSize(),
 					lane, speed, PositionInfo.VehicleState.Driving,veh.getDriver().getVisualizerData());
 			positions.add(position);
 		}
@@ -584,7 +587,7 @@ public class QueueLink extends Link {
 			veh.setSpeed(speed);
 			int lane = 1 + (veh.getID() % getLanes());
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
-					this, distanceOnLink + NetworkLayer.CELL_LENGTH,
+					this, distanceOnLink + ((NetworkLayer)this.layer).getEffectiveCellSize(),
 					lane, speed, PositionInfo.VehicleState.Driving,veh.getDriver().getVisualizerData());
 			positions.add(position);
 			lastDistance = distanceOnLink;
@@ -596,7 +599,7 @@ public class QueueLink extends Link {
 		int lane = getLanes() + 1; // place them next to the link
 		for (Vehicle veh : this.waitingList) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
-					this, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking,veh.getDriver().getVisualizerData());
+					this, ((NetworkLayer)this.layer).getEffectiveCellSize(), lane, 0.0, PositionInfo.VehicleState.Parking,veh.getDriver().getVisualizerData());
 			positions.add(position);
 		}
 
@@ -606,7 +609,7 @@ public class QueueLink extends Link {
 		lane = getLanes() + 2; // place them next to the link
 		for (Vehicle veh : this.parkingList) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
-					this, NetworkLayer.CELL_LENGTH, lane, 0.0, PositionInfo.VehicleState.Parking,veh.getDriver().getVisualizerData());
+					this, ((NetworkLayer)this.layer).getEffectiveCellSize(), lane, 0.0, PositionInfo.VehicleState.Parking,veh.getDriver().getVisualizerData());
 			positions.add(position);
 		}
 	}

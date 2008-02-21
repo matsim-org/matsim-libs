@@ -127,6 +127,13 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 			log.warn("capperiod was not defined. Using default value of 12:00:00.");
 		}
 		this.network.setCapacityPeriod(capperiod);
+		
+		String effectivecellsize = atts.getValue("effectivecellsize");
+		if (effectivecellsize == null){
+			effectivecellsize = "7.5"; // per default a cell size of 7.5 meters is defined
+		}
+		this.network.setEffectivecellsize(effectivecellsize);
+		
 		if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
 			log.warn("capPeriod, capDivider and/or capdivider are set in the network file. They will be ignored.");
 		}

@@ -79,7 +79,7 @@ public class DSOnePercentBerlin10sTest{
 
 		double sum = 0.0;
 		for (QueueLink link : network.getLinks().values()) {
-			sum+= link.getSpaceCap()*NetworkLayer.CELL_LENGTH;
+			sum+= link.getSpaceCap()*network.getEffectiveCellSize();
 		}
 		System.out.println("Overall network length = " + sum);
 

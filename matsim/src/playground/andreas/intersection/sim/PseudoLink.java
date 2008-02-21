@@ -75,7 +75,7 @@ public class PseudoLink {
 		this.amIOriginalLink = amIOriginalLink;
 	}
 
-	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double length_m, int numberOfLanes, double freeSpeed_m_s, double flowCapacityFromNetFile_Veh_h){
+	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double length_m, int numberOfLanes, double freeSpeed_m_s, double flowCapacityFromNetFile_Veh_h, double effectiveCellSize){
 
 		this.meterFromLinkEnd = meterFromLinkEnd_m;
 		
@@ -86,7 +86,7 @@ public class PseudoLink {
 		this.flowCapacityCeil = (int) Math.ceil(this.flowCapacity);
 		this.flowCapacityFraction = this.flowCapacity - (int) this.flowCapacity;
 
-		this.storageCapacity = (length_m * numberOfLanes) / QNetworkLayer.CELL_LENGTH * Gbl.getConfig().simulation().getStorageCapFactor();
+		this.storageCapacity = (length_m * numberOfLanes) / effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
 
 		this.storageCapacity = Math.max(this.storageCapacity, this.flowCapacityCeil);
 

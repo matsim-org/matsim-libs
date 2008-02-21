@@ -83,7 +83,7 @@ public class NetworkSummary extends NetworkAlgorithm {
 			int link_getID = Integer.parseInt(link.getId().toString());
 			if (min_link_id > link_getID) { min_link_id = link_getID; }
 			if (max_link_id < link_getID) { max_link_id = link_getID; }
-			this.network_capacity += Math.ceil(link.getLength()/NetworkLayer.CELL_LENGTH);
+			this.network_capacity += Math.ceil(link.getLength()/network.getEffectiveCellSize());
 		}
 
 		System.out.println("      network summary:");
