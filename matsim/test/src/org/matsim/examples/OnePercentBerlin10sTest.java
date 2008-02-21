@@ -54,7 +54,7 @@ class StuckAndAbortCounter implements EventHandlerAgentStuckI {
 public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 	public void testOnePercent10s() {
-		Config config = loadConfig(null);//getInputDirectory() + "testdata/config.xml"); // TODO [MR,DS] should be moved to another place and make it test-specific
+		Config config = loadConfig(null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		String eventsFileName = getOutputDirectory() + "events.txt";
