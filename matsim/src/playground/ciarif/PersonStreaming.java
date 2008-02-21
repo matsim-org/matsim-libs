@@ -33,6 +33,7 @@ import playground.balmermi.census2000.data.Households;
 import playground.balmermi.census2000.data.Person;
 import playground.balmermi.census2000.data.Persons;
 import playground.ciarif.models.subtours.PersonModeChoiceModel;
+import playground.ciarif.models.subtours.PersonModeChoiceModel1;
 
 public class PersonStreaming {
 
@@ -130,9 +131,7 @@ public class PersonStreaming {
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
-		System.out.println("Funziona?");
 		run();
-		System.out.println("Funziona!!!!");
 		Gbl.printElapsedTime();
 	}
 }
