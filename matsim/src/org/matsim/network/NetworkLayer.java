@@ -25,8 +25,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
-import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.collections.QuadTree;
@@ -60,7 +60,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	private int maxLinkRoleIndex = 4;
 	private double effectiveCellSize;
 
-
+	private final static Logger log = Logger.getLogger(NetworkLayer.class);
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
@@ -87,7 +87,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 	public final Node createNode(final String id, final String x, final String y, final String type) {
 		IdI i = new Id(id);
-		if (this.nodes.containsKey(i)) { Gbl.errorMsg(this + "[id=" + id + " already exists]"); }
+		if (this.nodes.containsKey(i)) { throw new IllegalArgumentException(this + "[id=" + id + " already exists]"); }
 		Node n = newNode(id, x, y, type);
 		this.nodes.put(i, n);
 		if (this.nodeQuadTree != null) {
@@ -103,14 +103,13 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	                             final String origid, final String type) {
 		Id f = new Id(from);
 		Node from_node = this.nodes.get(f);
-		if (from_node == null) { Gbl.errorMsg(this+"[from="+from+" does not exist]"); }
+		if (from_node == null) { throw new IllegalArgumentException(this+"[from="+from+" does not exist]"); }
 
 		Id t = new Id(to);
 		Node to_node = this.nodes.get(t);
-		if (to_node == null) { Gbl.errorMsg(this+"[to="+to+" does not exist]"); }
+		if (to_node == null) { throw new IllegalArgumentException(this+"[to="+to+" does not exist]"); }
 
-		Id l = new Id(id);
-		if (this.locations.containsKey(l)) { Gbl.errorMsg("Link id=" + id + " already exists in 'locations'!"); }
+		if (this.locations.containsKey(new Id(id))) { throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!"); }
 		Link link = newLink(this,id,from_node,to_node,length,freespeed,capacity,permlanes,origid,type);
 		from_node.addOutLink(link);
 		to_node.addInLink(link);
@@ -147,14 +146,14 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 	public final void setCapacityPeriod(final String capperiod) {
 		if (this.capperiod != Integer.MIN_VALUE) {
-			Gbl.warningMsg(this.getClass(), "setCapperiod(...)", this + "[capperiod=" + capperiod + " already set capperiod will be overwritten]");
+			log.warn(this + "[capperiod=" + capperiod + " already set. capperiod will be overwritten]");
 		}
 		this.capperiod = (int)Time.parseTime(capperiod);
 	}
 
 	public final void setEffectiveCellSize(final String effectiveCellSize) {
 		if (this.effectiveCellSize != Double.NaN) {
-			Gbl.warningMsg(this.getClass(), "setEffectiveCellSize(...)", this + "[effectivecellsize=" + effectiveCellSize + " already set effectivecellsize will be overwritten]");
+			log.warn(this + "[effectiveCellSize=" + effectiveCellSize + " already set. effectiveCellSize will be overwritten]");
 		}
 		this.effectiveCellSize = Double.parseDouble(effectiveCellSize);
 	}
@@ -350,22 +349,24 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	 * incident nodes and then removes it from the link set of the network.
 	 *
 	 * @param link Link to be removed.
-     * @return <tt>true</tt> if the specified link is part of the network and
-     * is successfully removed.
+	 * @return <tt>true</tt> if the specified link is part of the network and
+	 * is successfully removed.
 	 */
 	public boolean removeLink(final Link link) {
 		IdI id = link.getId();
 		Link l = (Link)this.locations.get(id);
 
-		if (l == null) { return false; }
+		if (l == null || link != l) {
+			// there is no link with the specified id, or there is another link than the requested one.
+			return false;
+		}
 
-		Node from = l.getFromNode();
-		from.removeOutLink(l);
-		Node to = l.getToNode();
-		to.removeInLink(l);
+		Node from = link.getFromNode();
+		from.removeOutLink(link);
+		Node to = link.getToNode();
+		to.removeInLink(link);
 
-		if (this.locations.remove(l.getId()) == null) { Gbl.errorMsg("Link id=" + l.getId() + " not found in 'locations' even it was found in 'links'"); }
-		return true;
+		return this.locations.remove(id) != null;
 	}
 
 	/**
@@ -391,7 +392,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 		for (Link l : n.getIncidentLinks().values()) {
 			if (!this.removeLink(l)) {
-				Gbl.errorMsg("Link id=" + l.getId() + " could not be removed while removing Node id=" + n.getId());
+				throw new RuntimeException("Link id=" + l.getId() + " could not be removed while removing Node id=" + n.getId());
 			}
 		}
 		if (this.nodeQuadTree != null) {
@@ -418,7 +419,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	}
 
 	private void buildQuadTree() {
-		Gbl.startMeasurement();
+		double startTime = System.currentTimeMillis();
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -433,12 +434,12 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		miny -= 1.0;
 		maxx += 1.0;
 		maxy += 1.0;
-		System.out.println("building quad tree: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.nodeQuadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
 		for (Node n : this.nodes.values()) {
 			this.nodeQuadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
 		}
-		Gbl.printRoundTime();
+		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
 	}
 
 	@SuppressWarnings("unchecked")
