@@ -51,6 +51,16 @@ public class AttributeFactory {
 		return meta;
 	}
 
+	public AttributesImpl createCountAttributesWithCoords() {
+		AttributesImpl meta=createCountAttributes();
+
+		//String uri, String localName, String qName, String type, String value
+		meta.addAttribute("", "", "x", "xsd:double", "123.456");
+		meta.addAttribute("", "", "y", "xsd:double", "987.654");
+
+		return meta;
+	}
+
 	public AttributesImpl createVolumeAttributes() {
 		AttributesImpl meta=new AttributesImpl();
 
