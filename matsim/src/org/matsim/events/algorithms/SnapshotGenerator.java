@@ -410,8 +410,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			cnt = this.waitingQueue.size();
 			if (cnt > 0) {
 				int lane = nLanes + 2;
-				double cellSize = Math.min(7.5, this.link.getLength() / cnt); // TODO it seems to be that the magic number "7.5" corresponds to cell size 
-				//if so it should be changed to this.effectiveCellSize but I'm not sure about it [GL]
+				double cellSize = Math.min(this.effectiveCellSize, this.link.getLength() / cnt);
 				double distFromFromNode = this.link.getLength() - cellSize / 2.0;
 				for (EventAgent agent : this.waitingQueue) {
 					agent.lane = lane;
