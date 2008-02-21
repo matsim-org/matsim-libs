@@ -31,9 +31,9 @@ import org.matsim.interfaces.networks.basicNet.BasicNetI;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
@@ -58,9 +58,9 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	private final ArrayList<Integer> linkRoles = new ArrayList<Integer>(5);
 	private int maxNodeRoleIndex = 4;
 	private int maxLinkRoleIndex = 4;
-	private double effectivecellsize;
-	
-	
+	private double effectiveCellSize;
+
+
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
@@ -152,14 +152,14 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		this.capperiod = (int)Time.parseTime(capperiod);
 	}
 
-	public final void setEffectivecellsize(final String effectivecellsize) {
-		if (this.effectivecellsize != Double.NaN) {
-			Gbl.warningMsg(this.getClass(), "setEffectivecellsize(...)", this + "[effectivecellsize=" + effectivecellsize + " already set effectivecellsize will be overwritten]");
+	public final void setEffectiveCellSize(final String effectiveCellSize) {
+		if (this.effectiveCellSize != Double.NaN) {
+			Gbl.warningMsg(this.getClass(), "setEffectiveCellSize(...)", this + "[effectivecellsize=" + effectiveCellSize + " already set effectivecellsize will be overwritten]");
 		}
-		this.effectivecellsize = Double.parseDouble(effectivecellsize);
+		this.effectiveCellSize = Double.parseDouble(effectiveCellSize);
 	}
-	
-	
+
+
 	// ////////////////////////////////////////////////////////////////////
 	// get methods
 	// ////////////////////////////////////////////////////////////////////
@@ -169,9 +169,9 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	}
 
 	public final double getEffectiveCellSize() {
-		return this.effectivecellsize;
+		return this.effectiveCellSize;
 	}
-	
+
 	public Map<IdI, ? extends Node> getNodes() {
 		return this.nodes;
 	}
