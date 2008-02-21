@@ -31,6 +31,7 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.utils.vis.snapshots.postprocessor.processors.DestinationDependentColorizer;
+import org.matsim.utils.vis.snapshots.postprocessor.processors.EvacuationLinksTeleporter;
 import org.matsim.utils.vis.snapshots.postprocessor.processors.PostProcessorI;
 import org.matsim.utils.vis.snapshots.postprocessor.processors.TimeDependentColorizer;
 import org.matsim.world.World;
@@ -59,6 +60,7 @@ public class TransimsSnapshotFilePostProcessor {
 		this.processors = new ArrayList<PostProcessorI>();
 		addProcessor(new TimeDependentColorizer(this.plans));
 		addProcessor(new DestinationDependentColorizer(this.plans));
+		addProcessor(new EvacuationLinksTeleporter());
 
 	}
 
