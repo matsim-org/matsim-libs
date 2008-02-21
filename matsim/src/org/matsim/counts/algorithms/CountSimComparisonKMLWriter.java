@@ -383,8 +383,6 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * This method writes all the data for each of the links/counts to the kml
 	 * document
-	 * @param visible true if the link data should be visible false if not
-	 *
 	 */
 	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final Folder folder) {
 		IdI linkid;
@@ -396,6 +394,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		for (CountSimComparison csc : countSimComparisonList) {
 			linkid = csc.getId();
 			link = this.network.getLink(linkid);
+
 			coord = this.coordTransform.transform(calculatePlacemarkPosition(link));
 			relativeError = csc.calculateRelativeError();
 			// build placemark
