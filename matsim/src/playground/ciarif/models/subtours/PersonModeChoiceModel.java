@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.vecmath.Vector2d;
+
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
@@ -39,6 +41,7 @@ import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 
 import playground.balmermi.census2000.data.Persons;
+import sun.misc.Cleaner;
 
 
 public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgorithmI {
@@ -52,16 +55,14 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final String CAR = "car";
 	private static final String BIKE = "bike";
 	private static final String WALK = "walk";
-	private static final String E = "education";
-	private static final String W = "work";
-	private static final String S = "shop";
-	private static final String H = "home";
-	private static final String L = "leisure";
+	private static final String E = "e";
+	private static final String W = "w";
+	private static final String S = "s";
+	private static final String H = "h";
+	//private static final String L = "leisure";
 	private static final Coord ZERO = new Coord(0.0,0.0);
 	private final Persons persons;
 	private ModelModeChoice model;
-	//ArrayList<List<Integer>> subToursRegister = new 
-	//private List<Integer> modeSubTours = null;
 	 
 		
 	//////////////////////////////////////////////////////////////////////
@@ -85,34 +86,29 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		Iterator<BasicAct> act_it = plan.getIteratorAct();
 		CoordI home_coord = null;
 		CoordI work_coord = null;
-		//act_it.hasNext(); // first act is always 'home'
+		//act_it.hasNext();
+		double dist_h_w = 0.0;
 		while (act_it.hasNext()) {
 			Act act = (Act)act_it.next();
+			System.out.println("Type = " + act.getType());
 			if (H.equals(act.getType())) { home_coord = act.getCoord();}
 			else if (W.equals(act.getType())) { work_coord = act.getCoord(); }
+			System.out.println("home = " + home_coord);
 		}
-		double dist_h_w = 0.0;
-		System.out.println("Home = " + home_coord);
-		
 		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
 		if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
 		if (work_coord != null) { dist_h_w = work_coord.calcDistance(home_coord); }
-		System.out.println("dist home Work = " + dist_h_w);
 		TreeMap<Integer, Integer> modeSubTours = new TreeMap<Integer, Integer>();
-		for (int i=subtour_idx-1; i>0; i=i-1) {
-			 //subtour = new ArrayList<Integer> (100);
-			 ArrayList<Integer> subtour = subtours.get(i);
-			
+		
+		for (int i=subtour_idx-1; i>=0; i=i-1) {
+			ArrayList<Integer> subtour = subtours.get(i);
 			int mainpurpose = 3; //mainpurpose:  0 := work; 1 := edu; 2 := shop 3:=leisure
 			double d = 0.0;
 			CoordI start = ((Act)plan.getActsLegs().get(subtour.get(0))).getCoord();
 			CoordI prev = start;
 			String type = null;
-			System.out.println("subtour = " + subtour);
-			
-			for (int k=1; k<subtour.size()-1; k=k+1) { // TODO Verificare da dove deve partire!!!!!!!!
+			for (int k=1; k<subtour.size()-1; k=k+1) { 
 				type = ((Act)plan.getActsLegs().get(subtour.get(k))).getType();
-				System.out.println("Type = " + type);
 				if (mainpurpose == 1){
 					if (type == W) { mainpurpose = 0; break; }
 				}
@@ -121,7 +117,6 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 					else if (type == E) { mainpurpose = 1; }
 				}
 				else if (mainpurpose == 3) {
-					//System.out.println("Type = " + type);
 					if (type == W) {mainpurpose = 0; break; }
 					else if (type == E) {mainpurpose = 1; break;}
 					else if (type == S) {mainpurpose = 2;}
@@ -132,23 +127,17 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			}
 			d = d/1000.0;
 			
-			// Defining urban degree for the starting point of the subtour
-			
-			
 			// Defining previous mode
-			
-			// TODO check also if in the tour the person is passing again from home. 
-			//In that case the agent is allowed to use any of the modes.
-			
 			int prev_mode = 0;
-			System.out.println("subtour = " + subtour);
+			//System.out.println("subtour = " + subtour);
 			System.out.println("subtour start =" + subtour.get(0));
 			System.out.println("mode sub tours = " + modeSubTours);
 			if (subtour.get(0) != 0) {
-				for (int j=subtours.size()-1; j>0; j=j-1) {
+				for (int j=subtours.size()-1; j>=0; j=j-1) {
 				System.out.println("subtour per prev_mode =" + subtours.get(j));
 					if (subtours.get(j).contains(subtour.get(0))) {
 						System.out.println("j = " + j);
+						//System.out.println("i = " + i);
 						System.out.println("prev_mode = " + modeSubTours.get(j));
 						prev_mode = modeSubTours.get(j); break; //Questo è sbagliato, va visto qual'è quello giusto!!!
 					}
@@ -201,70 +190,94 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			else { Gbl.errorMsg("Mode choice returns undefined value!"); }
 			
 			modeSubTours.put(i,modechoice);
-			System.out.println("mode sub tours = " + modeSubTours);
-			System.out.println("i = " + i);
+			System.out.println("mode sub tour = " + modeSubTours);
 			System.out.println("prev_mode = " + prev_mode);
-			System.out.println("modechoice = " + modechoice);
+			System.out.println("modechoice " +  i + " = " + modechoice);
 			System.out.println("subtour= " + subtour);
-			for (int k=0; k<subtour.size()-1; k=k+1){
-				((Leg)plan.getActsLegs().get(subtour.get(k)+1)).setMode(mode);
+			
+			for (int k=1; k<subtour.size(); k=k+1){
+				System.out.println("k= " + k);
+				((Leg)plan.getActsLegs().get(subtour.get(k)-1)).setMode(mode);
+				System.out.println("k_sub= " + (subtour.get(k)-1));
+				System.out.println("leg = " + ((Leg)plan.getActsLegs().get(subtour.get(k)-1)));
 			}
 		}
+		System.out.println("dist_h_w = " + dist_h_w);
+	}
+	 private final boolean checkLeafs () {
+		 boolean last_leaf = false;
+			return last_leaf;
+	 }
+	private final void removeSubTour () {
+		
+	
 	}
 	
-	private final void removeSubTour (Plan plan, TreeMap<Integer, ArrayList<Integer>> subtours, int start, int end,int subtour_idx, ArrayList<Integer> tour) {
-		for (int i=0; i<(end-start); i=i+1){
-			tour.remove(start+1);
-			System.out.println("tour " + tour);
-		}
-		
-		extractSubTours(plan, 0, tour.size()-1, subtour_idx, subtours,tour);
-	}
-	private final void registerSubTour (Plan plan, TreeMap<Integer, ArrayList<Integer>> subtours, int start, int end, int subtour_idx, ArrayList<Integer> tour) {
-		
+	private final TreeMap<Integer, ArrayList<Integer>> registerSubTour (Plan plan, ArrayList<Integer> start_end, ArrayList<Integer> tour, int subtour_idx){
+		TreeMap<Integer, ArrayList<Integer>> subtours = new TreeMap<Integer,ArrayList<Integer>>();
 		ArrayList<Integer> subtour = new ArrayList<Integer>();
+		int start = start_end.get(0);
+		int end = start_end.get(1);
 		for (int i=start; i<=end; i=i+1){
 			 subtour.add(tour.get(i));
 		}
 		subtours.put(subtour_idx,subtour);
-		subtour_idx=subtour_idx+1;
-		if (tour.get(end) == plan.getActsLegs().size()-1){
-			System.out.println("subtours =" + subtours);
-			this.handleSubTours(plan,subtours,subtour_idx);
-		}
+		return subtours;
+	}
+	
+	private final boolean actIsEqual (Act first_act,Act second_act) {
+		if (first_act.getCoord().getX() == second_act.getCoord().getX() &&
+				first_act.getCoord().getY() == second_act.getCoord().getY() &&
+				first_act.getType() == second_act.getType()) {		
+			return true;
+		}	
 		else {
-			removeSubTour(plan,subtours, start, end, subtour_idx, tour);
+			return false;
 		}
 	}
-
-	private final void extractSubTours(Plan plan,int start, int end,int subtour_idx, TreeMap<Integer, ArrayList<Integer>> subtours, ArrayList<Integer> tour) {
+	
+////	private final boolean (TreeMap<Integer,Object> tm, Object obj) {
+////		for (int i=0;i= )
+//		
+//		return true;
+//	}
+	
+		//for (int i=tour.get(start);i<tour.size()-1;) {
+//		for (int j=0;j=tour.get(i);j=j-1) {
+//		Act acti = ((Act)plan.getActsLegs().get(tour.get(i)));
+//		
+//	}
+	private final void extractSubTours(Plan plan, int start, int end, ArrayList<Integer> tour) {
 		boolean is_leaf = false;
-		Act act_start = ((Act)plan.getActsLegs().get(tour.get(start)));
-		Act act_end = ((Act)plan.getActsLegs().get(tour.get(end)));
-		if ((act_start.getCoord().getX() == act_end.getCoord().getX()) &&
-			    (act_start.getCoord().getY() == act_end.getCoord().getY())){
-			is_leaf = true;
-		}
-		else {
-			Gbl.errorMsg("The plan is not Home-based!");
-		}
-		for (int i=start;i<end;i=i+1){ 
-			Act acti = (Act)plan.getActsLegs().get(tour.get(i));
-			for (int j=i+1;j<end;j=j+1){
+		int i=0;
+		int leaf_start = start;
+		int leaf_end = end;
+		TreeMap<Integer,Act> acts = new	TreeMap<Integer,Act>();
+		Act act0 = ((Act)plan.getActsLegs().get(tour.get(start)));
+		acts.put(0,act0);
+		while (is_leaf == false && i<=tour.size()-2){
+			i=i+1;
+			Act acti = ((Act)plan.getActsLegs().get(tour.get(i)));
+			for (int j=i-1;j>=tour.get(start);j=j-1){
 				Act actj = (Act)plan.getActsLegs().get(tour.get(j));
 				if ((acti.getCoord().getX() == actj.getCoord().getX()) &&
-					    (acti.getCoord().getY() == actj.getCoord().getY())) {
-					is_leaf = false;
-					// subtour found: start=i & end=j
-					//subtour_idx=subtour_idx+1;
-					extractSubTours(plan, i, j, subtour_idx, subtours,tour);
+					    (acti.getCoord().getY() == actj.getCoord().getY())){
+					is_leaf=true;
+					leaf_start = j;
+					leaf_end = i; 	
+					break;
+					
 				}
 			}
-		}
-		if (is_leaf) {
-			registerSubTour(plan, subtours, start, end, subtour_idx,tour);
+			acts.put(i, acti);
+			System.out.println("is leaf = " + is_leaf);
+			System.out.println("acts = " + acts.toString());
+			System.out.println("sub_start = " + leaf_start);
+			System.out.println("sub_end = " + leaf_end);
 		}
 	}
+		
+
 	
 	private final void registerPlan (Plan plan, ArrayList<Integer> tour) {
 		for (int i=0; i<=plan.getActsLegs().size()-1;i=i+2) {
@@ -282,15 +295,24 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		Plan plan = person.getSelectedPlan();
 		int subtour_idx =0;
 		ArrayList<Integer> tour = new ArrayList<Integer>();
+		ArrayList<Integer> start_end = new ArrayList<Integer>();
 		this.registerPlan (plan,tour);
-				
+		boolean all_leafs = false;		
 		TreeMap<Integer, ArrayList<Integer>> subtours = new TreeMap<Integer,ArrayList<Integer>>();
-		System.out.println(subtours);
-		this.extractSubTours(plan,0,tour.size()-1,subtour_idx,subtours,tour);
-		//this.registerSubTour(plan, subtours,start,end,subtour_idx,tour);
-//		this.removeSubTour(plan,subtours,start,end,subtour_idx,tour);
-//		this.handleSubTours(plan,subtours );
-		System.out.println("Funziona?");
+		//System.out.println(subtours);
+		while (all_leafs == false){
+			this.extractSubTours(plan,0, tour.size()-1,tour);
+			System.out.println("start_end = " + start_end);
+			subtours = this.registerSubTour(plan,start_end,tour,subtour_idx);
+			subtour_idx = subtour_idx+1;
+			System.out.println("subtours = " + subtours);
+			this.removeSubTour();
+			all_leafs = this.checkLeafs();
+			if (subtour_idx==5){
+				all_leafs =true;
+			}
+		}
+		//this.handleSubTours(plan,subtours,subtour_idx);	
 	}
 	
 	public void run(Plan plan){
