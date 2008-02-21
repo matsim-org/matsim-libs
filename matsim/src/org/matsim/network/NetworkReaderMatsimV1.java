@@ -109,11 +109,11 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	private void startNetwork(final Attributes atts) {
 		this.network.setName(atts.getValue("name"));
 		if (atts.getValue("type") != null) {
-			log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which" +
+			this.log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which" +
 									" transportation mode is allowed to use it (for the future)]");
 		}
 		if (atts.getValue("capDivider") != null) {
-			log.warn("[capDivider defined. it will be used but should be gone somewhen]");
+			this.log.warn("[capDivider defined. it will be used but should be gone somewhen]");
 			String capperiod = atts.getValue("capDivider") + ":00:00";
 			this.network.setCapacityPeriod(capperiod);
 		}
@@ -124,18 +124,18 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		if (capperiod == null) {
 			// TODO [balmermi] sometime we should define the default by 1 hour!!!
 			capperiod = "12:00:00";
-			log.warn("capperiod was not defined. Using default value of 12:00:00.");
+			this.log.warn("capperiod was not defined. Using default value of 12:00:00.");
 		}
 		this.network.setCapacityPeriod(capperiod);
-		
+
 		String effectivecellsize = atts.getValue("effectivecellsize");
 		if (effectivecellsize == null){
 			effectivecellsize = "7.5"; // per default a cell size of 7.5 meters is defined
 		}
-		this.network.setEffectivecellsize(effectivecellsize);
-		
+		this.network.setEffectiveCellSize(effectivecellsize);
+
 		if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
-			log.warn("capPeriod, capDivider and/or capdivider are set in the network file. They will be ignored.");
+			this.log.warn("capPeriod, capDivider and/or capdivider are set in the network file. They will be ignored.");
 		}
 	}
 
@@ -151,13 +151,13 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 														atts.getValue("freespeed"), atts.getValue("capacity"), atts.getValue("permlanes"),
 														atts.getValue("origid"), atts.getValue("type"));
 		if (atts.getValue("volume") != null) {
-			log.info("Attribute volume for element link is deprecated.");
+			this.log.info("Attribute volume for element link is deprecated.");
 		}
 		if (atts.getValue("nt_category") != null) {
-			log.info("Attribute nt_category for element link is deprecated.");
+			this.log.info("Attribute nt_category for element link is deprecated.");
 		}
 		if (atts.getValue("nt_type") != null) {
-			log.info("Attribute nt_type for element link is deprecated.");
+			this.log.info("Attribute nt_type for element link is deprecated.");
 		}
 	}
 
