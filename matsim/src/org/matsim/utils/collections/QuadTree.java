@@ -357,6 +357,10 @@ public class QuadTree<T> implements Serializable {
 	}
 
 	public static class Rect implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -837712701959689133L;
 		public final double minX;
 		public final double minY;
 		public final double maxX;
@@ -413,6 +417,21 @@ public class QuadTree<T> implements Serializable {
 					y >= this.minY &&
 					x < this.maxX &&
 					y < this.maxY);
+		}
+
+		/**
+		 * Tests if a specified rect is inside or on the boundary of this <code>Rect</code>.
+		 * @param rect the rect to test
+		 * @param y the y-coordinate to test
+		 * @return <code>true</code> if the specified coordinates are
+		 * inside the boundary of this <code>Rect</code>;
+		 * <code>false</code> otherwise.
+		 */
+		public boolean containsOrEquals(final Rect rect) {
+			return (rect.minX >= this.minX &&
+					rect.minY >= this.minY &&
+					rect.maxX <= this.maxX &&
+					rect.maxY <= this.maxY);
 		}
 
 		/**
