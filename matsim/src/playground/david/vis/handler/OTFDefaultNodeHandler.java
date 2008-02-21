@@ -11,6 +11,7 @@ import playground.david.vis.data.OTFDataWriter;
 import playground.david.vis.data.OTFDataXYCoord;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.data.OTFWriterFactory;
+import playground.david.vis.data.SceneGraph;
 import playground.david.vis.interfaces.OTFDataReader;
 
 public class OTFDefaultNodeHandler extends OTFDataReader implements  OTFDataXYCoord.Provider  {
@@ -42,7 +43,7 @@ public class OTFDefaultNodeHandler extends OTFDataReader implements  OTFDataXYCo
 	}
 
 	@Override
-	public void readDynData(ByteBuffer in) throws IOException {
+	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 	}
 
 
@@ -55,8 +56,8 @@ public class OTFDefaultNodeHandler extends OTFDataReader implements  OTFDataXYCo
 	}
 
 	@Override
-	public void invalidate() {
-		if (xyReceiver != null) this.xyReceiver.invalidate();
+	public void invalidate(SceneGraph graph) {
+		if (xyReceiver != null) this.xyReceiver.invalidate(graph);
 	}
 
 

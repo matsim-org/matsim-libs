@@ -75,7 +75,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	String address;
 	private OTFServerRemote host = null;
 	private final Map <String,OTFEventHandler> handlers = new HashMap<String,OTFEventHandler>(); 
-	private Class resourceHandler = null;
+	private static Class resourceHandler = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -194,6 +194,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		clientQ.getConstData();
 		// if this is a recorded session, build random access index
 		if (!host.isLive() ) buildIndex();
+		simTime = host.getLocalTime();
+		updateTimeLabel();
 		return clientQ;
 	}
 	
@@ -261,19 +263,18 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		button.addActionListener(this);
 	    button.setToolTipText(toolTipText);
 
-		//Look for the image.
-	    String imgLocation = "images/"
-	                         + imageName
-	                         + ".png";
-	    URL imageURL = resourceHandler != null ? resourceHandler.getResource(imgLocation) : null;
-		Image image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage(imgLocation);
-		
 	    if (imageName != null ) {                      //image found
+			//Look for the image.
+		    String imgLocation = "images/"
+		                         + imageName
+		                         + ".png";
+			
+		    URL imageURL = resourceHandler != null ? resourceHandler.getResource(imgLocation) : null;
+			Image image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage(imgLocation);
 	    	ImageIcon icon =new ImageIcon(image, altText);
 	        button.setIcon(icon);
 	    } else {                                     //no image found
 	        button.setText(altText);
-	        System.err.println("Resource not found: " + imgLocation);
 	    }
 
 		return button;
@@ -314,49 +315,60 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
  	    }
 	}
 
-	private void pressed_STEP_F() throws IOException {
+	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
 		stopMovie();
-		host.step();
-		simTime = host.getLocalTime();
-		invalidateHandlers();
+		if (host.requestNewTime(newTime, prefTime)) {
+			simTime = host.getLocalTime();
+			invalidateHandlers();
+			return true;
+		} else {
+			if ( prefTime == OTFServerRemote.TimePreference.EARLIER) System.out.println("No previous timestep found");
+			else System.out.println("No succeeding timestep found");
+			return false;
+		}
+	}
+	
+	private void pressed_STEP_F() throws IOException {
+		requestTimeStep(simTime+1, OTFServerRemote.TimePreference.LATER);
 	}
 
 	private void pressed_STEP_FF() throws IOException {
-		pressed_STEP_F();
+		int bigStep = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getBigTimeStep();
+		requestTimeStep(simTime+bigStep, OTFServerRemote.TimePreference.LATER);
 	}
 
 	private void pressed_STEP_B() throws IOException {
-		stopMovie();
-
-		if (host.requestNewTime(simTime-1, OTFServerRemote.TimePreference.EARLIER)) {
-			simTime = host.getLocalTime();
-			invalidateHandlers();
-		} else {
-			System.out.println("No prevoius timestep found");
-		}
-	}
-
-	private boolean isCachedTime(int time) {
-		boolean result = true;
-		for (OTFEventHandler handler : handlers.values()) {
-			result &= handler.isCached(time);
-		}
-		return result;
+		requestTimeStep(simTime-1, OTFServerRemote.TimePreference.EARLIER);
 	}
 
 	private void pressed_STEP_BB() throws IOException {
-		pressed_STEP_F();
-	}
+		int bigStep = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getBigTimeStep();
+		requestTimeStep(simTime-bigStep, OTFServerRemote.TimePreference.EARLIER);
+}
 
 	private void pressed_STOP() throws IOException {
 		pressed_PAUSE();
 	}
 
+	int gotoTime = 0;
+	public void gotoTime() {
+		try {
+			requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER);
+			updateTimeLabel();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+	
 	private void changed_SET_TIME(ActionEvent event) throws IOException {
 		String newTime = ((JFormattedTextField)event.getSource()).getText();
 		int newTime_s = Time.secFromStr(newTime);
 		stopMovie();
-		//reader.toTimeStep(newTime_s);
+		new OTFAbortGoto(host, newTime_s).start();
+		gotoTime = newTime_s;
+		new Thread (){@Override
+		public void run() {gotoTime();}}.start();
 	}
 
 	@Override
@@ -382,7 +394,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			else if (STEP_B.equals(command))
 				pressed_STEP_B();
 			else if (STEP_BB.equals(command))
-				pressed_STEP_FF();
+				pressed_STEP_BB();
 			else if (STOP.equals(command))
 				pressed_STOP();
 			else if (command.equals(SET_TIME))
@@ -487,7 +499,10 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			while (!terminate) {
 				try {
 					sleep(30);
-					if (isActive && synchronizedPlay) host.step();
+					if (isActive && synchronizedPlay) {
+						if(!host.requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))
+							host.requestNewTime(0, OTFServerRemote.TimePreference.LATER);
+					}
 					
 					actTime = simTime;
 					simTime = host.getLocalTime();
@@ -498,7 +513,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 					}
 					//simTime = actTime;
 				} catch (Exception e) {
-					e.printStackTrace();
+					stopMovie();
 				}
 			}
 		}

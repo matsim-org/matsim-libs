@@ -23,12 +23,16 @@ public class OTFVisConfig extends Module {
 	public static final String FILE_VERSION = "fileVersion";
 	public static final String FILE_MINOR_VERSION = "fileMinorVersion";
 
+	public static final String BIG_TIME_STEP = "60";
+
 	private  float agentSize = 100.f;
 	private  String middleMouseFunc = "Pan";
 	private  String leftMouseFunc = "Zoom";
 	private  String rightMouseFunc = "Menu";
 	private int fileVersion = OTFQuadFileHandler.VERSION;
 	private int fileMinorVersion = OTFQuadFileHandler.MINORVERSION;
+
+	private int bigTimeStep = 600;
 	
 
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
@@ -133,6 +137,20 @@ public class OTFVisConfig extends Module {
 	 */
 	public void setFileMinorVersion(int fileMinorVersion) {
 		this.fileMinorVersion = fileMinorVersion;
+	}
+
+	/**
+	 * @return the bigTimeStep
+	 */
+	public int getBigTimeStep() {
+		return bigTimeStep;
+	}
+
+	/**
+	 * @param bigTimeStep the bigTimeStep to set
+	 */
+	public void setBigTimeStep(int bigTimeStep) {
+		this.bigTimeStep = bigTimeStep;
 	}
 
 	

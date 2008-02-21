@@ -10,6 +10,7 @@ import playground.david.vis.data.OTFDataQuad;
 import playground.david.vis.data.OTFDataWriter;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.data.OTFWriterFactory;
+import playground.david.vis.data.SceneGraph;
 import playground.david.vis.data.OTFData.Receiver;
 import playground.david.vis.interfaces.OTFDataReader;
 
@@ -36,7 +37,7 @@ public class OTFNoDynLinkHandler extends OTFDataReader implements OTFDataQuad.Pr
 	}
 	
 	@Override
-	public void readDynData(ByteBuffer in) throws IOException {
+	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 	}
 
 
@@ -57,8 +58,8 @@ public class OTFNoDynLinkHandler extends OTFDataReader implements OTFDataQuad.Pr
 	}
 
 	@Override
-	public void invalidate() {
-		this.quadReceiver.invalidate();
+	public void invalidate(SceneGraph graph) {
+		this.quadReceiver.invalidate(graph);
 	}
 
 

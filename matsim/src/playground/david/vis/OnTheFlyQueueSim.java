@@ -47,7 +47,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 	@Override
 	protected void prepareSim() {
-		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
+		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans, true);
 		if (otfwriter == null) otfwriter = new OTFQuadFileHandler.Writer(600,network,"output/OTFQuadfileNoParking10p_wip.mvi");
 		if(otfwriter != null) otfwriter.open();
 

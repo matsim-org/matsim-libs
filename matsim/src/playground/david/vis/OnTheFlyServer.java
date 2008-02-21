@@ -108,8 +108,11 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 	public static boolean useSSL = true;
 	
-	public static OnTheFlyServer createInstance(String ReadableName, QueueNetworkLayer network, Plans population) {
+	public static OnTheFlyServer createInstance(String ReadableName, QueueNetworkLayer network, Plans population, boolean useSSL) {
 		OnTheFlyServer result = null;
+		
+		OnTheFlyServer.useSSL = useSSL;
+		
 		if (useSSL) {
 			System.setProperty("javax.net.ssl.keyStore", "input/keystore");
 			System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
@@ -192,12 +195,12 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 		if (status == STEP) {
 			stepToTime--;
-//			if( stepToTime <= 0) {
+			if( stepToTime <= 0) {
 				synchronized (stepDone) {
 					stepDone.notifyAll();
 					status = PAUSE;
 				}
-//			}
+			}
 		}
 
 		if (status == PAUSE) {
@@ -250,9 +253,15 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
 		// if requested time lies in the past, sorry we cannot do that right now
-		if (time < localTime) return false;
+		if (time < localTime) {
+			time = localTime;
+			stepToTime = 0;
+			// if forward search is OK, then the actual timestep is the BEST fit
+			if (searchDirection == TimePreference.EARLIER) return false;
+			else return true; 
+		}
 		if (time == localTime) return true;
-		
+
 		doStep(time - localTime);
 		return true;
 	}

@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 public interface OTFEventHandler {
 
 	public void invalidate(int time) throws RemoteException;
-	public boolean isCached(int time);
 	public void redraw();
 	public void handleClick(Point2D.Double point);
 }

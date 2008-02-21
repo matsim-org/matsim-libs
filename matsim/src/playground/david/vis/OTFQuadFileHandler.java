@@ -336,7 +336,6 @@ public class OTFQuadFileHandler {
 
 		public void readStateBuffer(byte[] result) throws RemoteException {
 			int size =  0 ;
-			Gbl.startMeasurement();
 
 			try {
 				double timenextTime = inFile.readDouble();
@@ -350,7 +349,6 @@ public class OTFQuadFileHandler {
 					read = inFile.read(result,offset,remain);
 					remain -= read;
 					offset +=read;
-					System.out.print(" " + read);
 				}
 
 				if (offset != size) {
@@ -360,7 +358,6 @@ public class OTFQuadFileHandler {
 			} catch (IOException e) {
 				System.out.println(e.toString());
 			}
-			System.out.print("getStateBuffer: "); Gbl.printElapsedTime();
 		}
 
 		public void pause() throws RemoteException {
@@ -374,7 +371,7 @@ public class OTFQuadFileHandler {
 
 		public void step() throws RemoteException {
 			// retrieve latest buffer and set appropriate time
-			actBuffer = getStateBuffer();
+			actBuffer = null;
 		}
 
 		public boolean isLive() {
@@ -406,7 +403,7 @@ public class OTFQuadFileHandler {
 
 		public byte[] getQuadDynStateBuffer(String id, Rect bounds)	throws RemoteException {
 			// DS TODO bounds is ignored, maybe throw exception if bounds != null??
-			if (actBuffer == null) step();
+			if (actBuffer == null) actBuffer = getStateBuffer();
 			return actBuffer;
 		}
 

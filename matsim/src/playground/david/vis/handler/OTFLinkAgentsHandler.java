@@ -17,8 +17,8 @@ import playground.david.vis.data.OTFDataSimpleAgent;
 import playground.david.vis.data.OTFDataWriter;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.data.OTFWriterFactory;
+import playground.david.vis.data.SceneGraph;
 import playground.david.vis.data.OTFData.Receiver;
-import playground.david.vis.gui.PoolFactory;
 import playground.david.vis.interfaces.OTFDataReader;
 
 public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
@@ -28,7 +28,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	private final Logger log = Logger.getLogger(OTFLinkAgentsHandler.class);
 
 	private Class agentReceiverClass = null;
-	static PoolFactory<OTFDataSimpleAgent.Receiver> factoryAgent;
 	
 	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	
@@ -87,7 +86,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	
 	static char[] idBuffer = new char[100];
 	
-	public void readAgent(ByteBuffer in) throws IOException {
+	public void readAgent(ByteBuffer in, SceneGraph graph) throws IOException {
 		int length = in.getInt();
 		idBuffer = new char[length];
 		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
@@ -102,7 +101,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 			OTFDataSimpleAgent.Receiver drawer = null;
 			try {
-				drawer = (playground.david.vis.data.OTFDataSimpleAgent.Receiver) agentReceiverClass.newInstance();
+				drawer = (playground.david.vis.data.OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
 				drawer.setAgent(idBuffer, x, y, 0, state, color);
 				agents.add(drawer);
 			} catch (InstantiationException e) {
@@ -115,13 +114,13 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
  	}
 	
 	@Override
-	public void readDynData(ByteBuffer in) throws IOException {
-		super.readDynData(in);
+	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+		super.readDynData(in, graph);
 		// read additional agent data
 		agents.clear();
 		
 		int count = in.getInt();
-		for(int i= 0; i< count; i++) readAgent(in);
+		for(int i= 0; i< count; i++) readAgent(in, graph);
 	}
 
 
@@ -138,16 +137,15 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		//connect agent receivers
 		if (receiver  instanceof OTFDataSimpleAgent.Receiver) {
 			this.agentReceiverClass = receiver.getClass();
-			this.factoryAgent = PoolFactory.get(this.agentReceiverClass);
 		}
 
 	}
 
 	@Override
-	public void invalidate() {
-		super.invalidate();
+	public void invalidate(SceneGraph graph) {
+		super.invalidate(graph);
 		// invalidate agent receivers
-		for(OTFDataSimpleAgent.Receiver agent : agents) agent.invalidate();
+		for(OTFDataSimpleAgent.Receiver agent : agents) agent.invalidate(graph);
 	}
 
 	
@@ -159,11 +157,11 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 	public static final class ReaderV1_1 extends OTFLinkAgentsHandler {
 		@Override
-		public void readDynData(ByteBuffer in) throws IOException {
+		public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 			agents.clear();
 			
 			int count = in.getInt();
-			for(int i= 0; i< count; i++) readAgent(in);
+			for(int i= 0; i< count; i++) readAgent(in, graph);
 		}
 	}
 }

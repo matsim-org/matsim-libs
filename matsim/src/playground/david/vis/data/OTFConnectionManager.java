@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import playground.david.vis.interfaces.OTFDataReader;
 
@@ -53,13 +54,30 @@ public class OTFConnectionManager {
 	}
 
 	public Collection<Class> getEntries(Class srcClass) {
-		List classList = new LinkedList<Class>();
+		List<Class> classList = new LinkedList<Class>();
 		for(Entry entry : connections) {
 			if (entry.from.equals(srcClass)) classList.add(entry.to);
 		}
 		return classList;
 	}
 
+	public Collection<OTFData.Receiver> getReceivers(Class srcClass, SceneGraph graph) {
+		Collection<Class> classList = getEntries(srcClass);
+		List<OTFData.Receiver> receiverList = new LinkedList<OTFData.Receiver>();
+		
+		for(Class entry : classList) {
+			try {
+				receiverList.add((OTFData.Receiver)(graph.newInstance(entry)));
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return receiverList;
+	}
 	private Class handleClassAdoption(Class entryClass, String fileFormat) {
 		Class newReader = null;
 		
@@ -98,5 +116,22 @@ public class OTFConnectionManager {
 		System.out.println(OTFDataReader.previousVersions);
 		System.out.println(connections);
 
+	}
+
+	public void fillLayerMap(Map<Class, SceneLayer> layers) {
+		Iterator<Entry> iter = connections.iterator();
+		while(iter.hasNext()) {
+			Entry entry = iter.next();
+			if (SceneLayer.class.isAssignableFrom(entry.to))
+				try {
+					layers.put(entry.from, (SceneLayer)(entry.to.newInstance()));
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
 	}
 }

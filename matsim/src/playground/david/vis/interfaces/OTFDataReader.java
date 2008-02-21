@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import playground.david.vis.data.OTFData;
+import playground.david.vis.data.SceneGraph;
 
 public abstract class  OTFDataReader {
 	public static Map<String, Class> previousVersions = new HashMap<String, Class>();
@@ -42,8 +43,8 @@ public abstract class  OTFDataReader {
 		return "V" + major + "." + minor;
 	}
 	public abstract void readConstData(ByteBuffer in) throws IOException;
-	public abstract void readDynData(ByteBuffer in) throws IOException;
+	public abstract void readDynData(ByteBuffer in, SceneGraph graph) throws IOException;
 	public abstract void connect(OTFData.Receiver receiver);
-	public abstract void invalidate();
+	public abstract void invalidate(SceneGraph graph);
 }
 

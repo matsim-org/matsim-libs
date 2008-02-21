@@ -4,14 +4,17 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
 
 import playground.david.vis.gui.PoolFactory;
 import playground.david.vis.interfaces.OTFDataReader;
+import playground.david.vis.interfaces.OTFDrawer;
 import playground.david.vis.interfaces.OTFServerRemote;
 
 public class OTFClientQuad extends QuadTree<OTFDataReader> {
@@ -25,41 +28,35 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 	private final String id;
 	private final OTFServerRemote host;
+	private OTFConnectionManager connect;
+	
 	private final List<OTFDataReader> additionalElements= new LinkedList<OTFDataReader>();
 
 	static class CreateReceiverExecutor extends Executor<OTFDataReader> {
 		final OTFConnectionManager connect;
+		final SceneGraph graph;
 
-		public CreateReceiverExecutor(OTFConnectionManager connect2) {
+		public CreateReceiverExecutor(OTFConnectionManager connect2, SceneGraph graph) {
 			this.connect = connect2;
+			this.graph = graph;
 		}
 
 		@Override
 		public void execute(double x, double y, OTFDataReader reader) {
-			Collection<Class> drawerClasses = connect.getEntries(reader.getClass());
-			for (Class drawerClass : drawerClasses) {
-				try {
-					if (drawerClass != null) {
-						Object drawer = drawerClass.newInstance();
-						reader.connect((OTFData.Receiver) drawer);
-
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-
-			}
+			Collection<OTFData.Receiver> drawers = connect.getReceivers(reader.getClass(), graph);
+			for (OTFData.Receiver drawer : drawers) reader.connect(drawer);
 		}
 	}
 
 	class ReadDataExecutor extends Executor<OTFDataReader> {
 		final ByteBuffer in;
 		boolean readConst;
+		SceneGraph graph;
 
-		public ReadDataExecutor(ByteBuffer in, boolean readConst) {
+		public ReadDataExecutor(ByteBuffer in, boolean readConst, SceneGraph graph) {
 			this.in = in;
 			this.readConst = readConst;
+			this.graph = graph;
 		}
 
 		@Override
@@ -68,7 +65,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 				if (readConst)
 					reader.readConstData(in);
 				else
-					reader.readDynData(in);
+					reader.readDynData(in, graph);
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -77,9 +74,14 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	}
 
 	class InvalidateExecutor extends Executor<OTFDataReader> {
+		private final SceneGraph result;
+		public InvalidateExecutor(SceneGraph result) {
+			this.result = result;
+		}
+ 
 		@Override
 		public void execute(double x, double y, OTFDataReader reader) {
-			reader.invalidate();
+			reader.invalidate(result);
 		}
 	}
 
@@ -117,45 +119,36 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 	public void createReceiver(final OTFConnectionManager connect) {
 
+		this.connect = connect;
+
+		SceneGraph graph = new SceneGraph(null, connect, null);
 		int colls = this.execute(this.top.getBounds(),
-				new CreateReceiverExecutor(connect));
+				new CreateReceiverExecutor(connect, graph));
 		for(OTFDataReader element : additionalElements) {
-			Collection<Class> drawerClasses = connect.getEntries(element.getClass());
-			for (Class drawerClass : drawerClasses) {
-				try {
-					if (drawerClass != null) {
-						Object drawer = drawerClass.newInstance();
-						element.connect((OTFData.Receiver) drawer);
-
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-
-			}
+			Collection<OTFData.Receiver> drawers = connect.getReceivers(element.getClass(), graph);
+			for (OTFData.Receiver drawer : drawers) element.connect(drawer);
 		}
 	}
 
-	private void getAdditionalData(ByteBuffer in, boolean readConst) {
+	private void getAdditionalData(ByteBuffer in, boolean readConst, SceneGraph graph) {
 		for(OTFDataReader element : additionalElements) {
 			try {
 				if (readConst) element.readConstData(in);
-				else element.readDynData(in);
+				else element.readDynData(in,graph);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
 	}
-	private void getData(QuadTree.Rect bound, boolean readConst)
+	private void getData(QuadTree.Rect bound, boolean readConst, SceneGraph result)
 			throws RemoteException {
 		bound = host.isLive() ? bound : this.top.getBounds();
 		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, bound);
 		ByteBuffer in = ByteBuffer.wrap(bbyte);
 		Gbl.startMeasurement();
-		int colls = this.execute(bound, this.new ReadDataExecutor(in, readConst));
-		getAdditionalData(in, readConst);
+		int colls = this.execute(bound, this.new ReadDataExecutor(in, readConst, result));
+		getAdditionalData(in, readConst, result);
 		System.out.print("readData: "); Gbl.printElapsedTime();
 
 		PoolFactory.resetAll();
@@ -163,21 +156,58 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	}
 
 	synchronized public void getConstData() throws RemoteException {
-		getData(null, true);
+		getData(null, true, null);
 	}
 
-	synchronized public void getDynData(QuadTree.Rect bound) throws RemoteException {
-		getData(bound, false);
+	synchronized public void getDynData(QuadTree.Rect bound, SceneGraph result) throws RemoteException {
+		getData(bound, false, result);
 	}
+	 
+	private final Map<Integer,SceneGraph> cachedTimes = new HashMap<Integer,SceneGraph>();
 
-	synchronized public void invalidate(Rect rect) {
+	/*
+	 * new getScenegraph(time, rect) called from either OGLDrawer or (for caching) from builderThread
+	 * if cahchedversion is in rect and time -> OK
+	 * else 
+	 * build scnegraph wth new layers set according to connect
+	 * new scenegraph(rect);
+	 * invalidate quad and additional elements
+	 * in invalidate of elements :
+	 *  scenegraph.add2layer(this);
+	 *  
+	 *  store scenegraph according to time
+	 *  
+	 */
+	public synchronized SceneGraph getSceneGraph(int time, Rect rect, OTFDrawer drawer) throws RemoteException {
+		if (time == -1) time = host.getLocalTime();
+		
+		SceneGraph result = cachedTimes.get(time);
+		if ( result != null && 
+				(rect == result.getRect() || 
+				 result.getRect() == null ||
+				 result.getRect().containsOrEquals(rect))) {
+			return result;
+		}
+		// otherwise this Scenegraph is not useful, so we create a new one
+		if(host.isLive() == false) rect = null;
+		result = new SceneGraph(rect, connect, drawer);
+		getDynData(rect, result);
+		
+		// fill with elements
+		invalidate(rect, result);
+		result.finish();
+		cachedTimes.put(time, result);
+		return result;
+	}
+	
+	synchronized private void invalidate(Rect rect, SceneGraph result) {
 		if (rect == null) {
 			rect = this.top.getBounds();
 		}
 
-		int colls = this.execute(rect, this.new InvalidateExecutor());
+		int colls = this.execute(rect, this.new InvalidateExecutor(result));
 		for(OTFDataReader element : additionalElements) {
-			element.invalidate();
+			element.invalidate(result);
 		}
 	}
 
