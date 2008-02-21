@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.ivtch;
+package playground.yu.utils;
 
 import java.io.IOException;
 
