@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulatorTest.java
+ * QueueSimulationTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,10 +21,16 @@
 package org.matsim.mobsim;
 
 
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
+import org.matsim.events.EventLinkEnter;
 import org.matsim.events.Events;
+import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.plans.Leg;
@@ -286,5 +292,175 @@ public class QueueSimulationTest extends MatsimTestCase {
 		assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
 		assertEquals(6000, volume[7]); // we should have maximum flow in this hour
 		assertEquals(1000, volume[8]); // all the rest
+	}
+
+	/**
+	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
+	 * does not lead to the destination link.
+	 */
+	public void testConsistentRoutes_WrongRoute() {
+		new LogCounter();
+		Events events = new Events();
+		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
+		events.addHandler(counter);
+		QueueSimulation sim = prepareConsistentRoutesTest("2 3", events); // route should continue on 4, 5
+		LogCounter logger = new LogCounter();
+		Logger.getRootLogger().addAppender(logger);
+		sim.run();
+		Logger.getRootLogger().removeAppender(logger);
+		assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
+		assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
+	}
+
+	/**
+	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
+	 * does not specify all nodes, so it is unclear at one node or another how to
+	 * continue.
+	 */
+	public void testConsistentRoutes_ImpossibleRoute() {
+		Events events = new Events();
+		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
+		events.addHandler(counter);
+		QueueSimulation sim = prepareConsistentRoutesTest("2 3 5", events); // node 4 is missing
+		LogCounter logger = new LogCounter();
+		Logger.getRootLogger().addAppender(logger);
+		sim.run();
+		Logger.getRootLogger().removeAppender(logger);
+		assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
+		assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
+	}
+
+	/**
+	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
+	 * is not specified, even that the destination link is different from the departure link.
+	 */
+	public void testConsistentRoutes_MissingRoute() {
+		Events events = new Events();
+		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
+		events.addHandler(counter);
+		QueueSimulation sim = prepareConsistentRoutesTest("", events); // no nodes at all
+		LogCounter logger = new LogCounter();
+		Logger.getRootLogger().addAppender(logger);
+		sim.run();
+		Logger.getRootLogger().removeAppender(logger);
+		assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
+		assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
+	}
+
+	/** Prepares miscellaneous data for the testConsistentRoutes() tests:
+	 * Creates a network of 6 links, and a population of one person driving from
+	 * link 1 to link 5, and then from link 5 to link 6.
+	 *
+	 * @param nodes a list of node ids the agent should travel along for the first leg.
+	 * @param events the Events object to be used by the simulation.
+	 * @return A QueueSimulation which can be started immediately.
+	 *
+	 * @author mrieser
+	 **/
+	private QueueSimulation prepareConsistentRoutesTest(final String nodes, final Events events) {
+		Config config = Gbl.createConfig(null);
+		config.simulation().setFlowCapFactor(1.0);
+		config.simulation().setStorageCapFactor(1.0);
+		World world = Gbl.getWorld();
+
+		/* build network */
+		QueueNetworkLayer network = new QueueNetworkLayer();
+		world.setNetworkLayer(network);
+		network.setCapacityPeriod("1:00:00");
+		network.createNode("1", "0", "0", null);
+		network.createNode("2", "100", "0", null);
+		network.createNode("3", "1100", "0", null);
+		network.createNode("4", "2100", "0", null);
+		network.createNode("5", "3100", "0", null);
+		network.createNode("6", "3200", "0", null);
+		network.createNode("7", "3300", "0", null);
+		Link link1 = network.createLink("1", "1", "2", "100", "10", "60000", "9", null, null);
+		network.createLink("2", "2", "3", "1000", "10", "6000", "2", null, null);
+		network.createLink("3", "3", "4", "1000", "10", "6000", "2", null, null);
+		network.createLink("4", "4", "5", "1000", "10", "6000", "2", null, null);
+		Link link5 = network.createLink("5", "5", "6", "100", "10", "60000", "9", null, null);
+		Link link6 = network.createLink("6", "6", "7", "100", "10", "60000", "9", null, null);
+
+		/* build plans */
+		Plans plans = new Plans(Plans.NO_STREAMING);
+
+		try {
+			// create a person with a car-leg from link1 to link5, but an incomplete route
+			Person person = new Person(new Id(0), "m", 35, "yes", "yes", "yes");
+			Plan plan = person.createPlan(null, "yes");
+			plan.createAct("h", 199.0, 0.0, link1, 0, 8*3600, 8*3600, false);
+			Leg leg = plan.createLeg(0, "car", 8*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Route route = new Route();
+			route.setRoute(nodes);
+			leg.setRoute(route);
+			plan.createAct("w", 99.0, 0.0, link5, 8*3600, 9*3600, Time.UNDEFINED_TIME, true);
+			leg = plan.createLeg(1, "car", 9*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			route = new Route();
+			route.setRoute("6");
+			leg.setRoute(route);
+			plan.createAct("h", 3299.0, 0.0, link6, 9*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+			plans.addPerson(person);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		/* build sim */
+		return new QueueSimulation(network, plans, events);
+	}
+
+	/**
+	 * A simple events handler that counts the number of enter link events on one specific link.
+	 * Used by some tests in the class.
+	 *
+	 * @author mrieser
+	 */
+	private final static class EnterLinkEventCounter implements EventHandlerLinkEnterI {
+		private final String linkId;
+		private int counter = 0;
+		public EnterLinkEventCounter(final String linkId) {
+			this.linkId = linkId;
+		}
+
+		public void handleEvent(final EventLinkEnter event) {
+			if (event.linkId.equals(this.linkId)) this.counter++;
+		}
+
+		public void reset(final int iteration) {
+			this.counter = 0;
+		}
+
+		public int getCounter() {
+			return this.counter;
+		}
+	}
+
+	private final static class LogCounter extends AppenderSkeleton {
+		private int cntWARN = 0;
+		private int cntERROR = 0;
+
+		public LogCounter() {
+			this.setThreshold(Level.WARN);
+		}
+
+		@Override
+		protected void append(final LoggingEvent event) {
+			if (event.getLevel() == Level.WARN) this.cntWARN++;
+			if (event.getLevel() == Level.ERROR) this.cntERROR++;
+		}
+
+		public void close() {
+		}
+
+		public boolean requiresLayout() {
+			return false;
+		}
+
+		public int getWarnCount() {
+			return this.cntWARN;
+		}
+
+		public int getErrorCount() {
+			return this.cntERROR;
+		}
 	}
 }

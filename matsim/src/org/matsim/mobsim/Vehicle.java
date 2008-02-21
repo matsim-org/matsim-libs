@@ -24,10 +24,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.EventActivityEnd;
 import org.matsim.events.EventActivityStart;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
@@ -44,7 +44,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	static private int globalID = 0;
 	public double lastMoveTime = 0;
 	protected String driverId;
-	private int currentNode;
+	private int currentNodeIndex;
 	private int nextActivity = 0;
 	private double speed = 0.0;
 	private double currentDepartureTime = 0;
@@ -57,9 +57,13 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	protected transient QueueLink currentLink = null;
 	protected transient BasicLeg currentLeg = null;
 
+	private final static Logger log = Logger.getLogger(Vehicle.class);
+
 	private final int id = globalID++; // TODO change to IdI instead of int
 
-	// return zero based leg number
+	/**
+	 * @return zero-based leg number.
+	 */
 	public int getCurrentLegNumber() {
 		return ((this.nextActivity - 2)/ 2);
 	};
@@ -67,8 +71,8 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	public double getDepartureTime_s() {
 		return this.currentDepartureTime;
 	}
-	public void setDepartureTime_s(final double i) {
-		this.currentDepartureTime = i;
+	public void setDepartureTime_s(final double time) {
+		this.currentDepartureTime = time;
 	}
 
 	/**
@@ -86,24 +90,34 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	}
 
 	public void incCurrentNode() {
-		this.currentNode++;
+		this.currentNodeIndex++;
 		this.cachedNextLink = null; //reset cached nextLink
 	}
 
-	// has the main functionality of chooseNextLink, but other vehicles might
-	// not want an error issued, when no link is found, but do something more elaborate!
-	// so they can now easily override chooseNextLink...
-	protected QueueLink findNextLink() {
+	/**
+	 * Returns the next link the vehicle will drive along.
+	 *
+	 * @return The next link the vehicle will drive on, or null if an error has happened.
+	 */
+	public QueueLink chooseNextLink() {
 		if (this.cachedNextLink != null) {
 			return this.cachedNextLink;
 		}
 		ArrayList<?> route = this.currentLeg.getRoute().getRoute();
 
-		if (this.currentNode >= route.size() ) {
-			return this.destinationLink;
+		if (this.currentNodeIndex >= route.size() ) {
+			// we have no more information for the route, so we should have arrived at the destination link
+			if (this.currentLink.getToNode().equals(this.destinationLink.getFromNode())) {
+				this.cachedNextLink = this.destinationLink;
+				return this.cachedNextLink;
+			}
+			// there must be something wrong. Maybe the route is too short, or something else, we don't know...
+			log.error("The vehicle with driver " + this.driverId + ", currently on link " + this.currentLink.getId().toString()
+				+ ", is at the end of its route, but has not yet reached its destination link " + this.destinationLink.getId().toString());
+			return null;
 		}
 
-		Node destNode = (Node)route.get(this.currentNode);
+		Node destNode = (Node)route.get(this.currentNodeIndex);
 
 		for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
 			if (link.getToNode() == destNode) {
@@ -111,24 +125,14 @@ public class Vehicle implements Serializable, DrawableAgentI {
 				return this.cachedNextLink;
 			}
 		}
+		log.warn(this + " [no link to next routenode found: routeindex= " + this.currentNodeIndex + " ]");
 		return null;
-	}
-
-	public QueueLink chooseNextLink() {
-		QueueLink result = findNextLink();
-		if (result == null) {
-			Gbl.warningMsg(this.getClass(), "chooseNextLink(...)", this
-					+ " [no link to next routenode found: routeeindex= " + this.currentNode + " ]");
-		}
-
-		return result;
 	}
 
 	public Route getCurrentRoute() {
 		return (Route)this.currentLeg.getRoute();
 	}
 
-	//public MobsimLinkI getDestinationLink() {
 	public QueueLink getDestinationLink() {
 		return this.destinationLink;
 	}
@@ -138,11 +142,16 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		double now = SimulationTimer.getTime();
 		Act act = (Act)this.actslegs.get(this.nextActivity);
 
+		if (act.getLink() != this.currentLink) {
+			log.error("The vehicle with driver " + this.driverId + " should be on link " + act.getLink().getId().toString()
+					+ ", but is on link " + this.currentLink.getId().toString() + ". Removing the agent from the simulation.");
+			return false;
+		}
 		this.currentLink = (QueueLink) act.getLink();
 
-		if ( this.nextActivity > 0 ) {
+		if (this.nextActivity > 0) {
 			// no actStartEvent for first act.
-			QueueSimulation.getEvents().processEvent( new EventActivityStart(now, this.driverId, this.driver, this.currentLink, act));
+			QueueSimulation.getEvents().processEvent(new EventActivityStart(now, this.driverId, this.driver, this.currentLink, act));
 		}
 
 		if (this.nextActivity == this.actslegs.size()-1) {
@@ -174,21 +183,23 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		// set the route according to the next leg
 		Leg leg = (Leg) this.actslegs.get(this.nextActivity+1);
 		this.currentLeg = leg;
-		this.currentNode = 1;
+		this.currentNodeIndex = 1;
 		this.cachedNextLink = null;
 		this.nextActivity += 2;
 
 		// this is the starting point for our vehicle, so put it in the queue
 		transferToMobsim();
 
-		QueueSimulation.getEvents().processEvent( new EventActivityEnd(departure, this.driverId, this.driver, this.currentLink, act));
+		QueueSimulation.getEvents().processEvent(new EventActivityEnd(departure, this.driverId, this.driver, this.currentLink, act));
 
 		return true;
 	}
 
 	public void initVeh() {
 		this.nextActivity = 0;
-		SimulationTimer.updateSimStartTime(((Act)this.actslegs.get(0)).getEndTime());
+		Act firstAct = (Act) this.actslegs.get(0);
+		SimulationTimer.updateSimStartTime(firstAct.getEndTime());
+		setCurrentLink((QueueLink)firstAct.getLink());
 
 		if (initNextLeg()) {
 			Simulation.incLiving();
@@ -203,8 +214,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		this.cachedNextLink = null;
 	}
 
-	// this second variant is only used for "teleportation" aka QueueLink,line206
-	// because otherwise ActivityStartEvent would be before ArrivalEvent in timeline
 	private void reinitVeh() {
 		if (!initNextLeg()) {
 			Simulation.decLiving();
@@ -239,7 +248,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	@Override
 	public String toString() {
 		return "Vehicle Id " + getID() + ", driven by (personId) " + this.driverId
-				+ ", on link " + this.currentLink.getId() + ", routeindex: " + this.currentNode
+				+ ", on link " + this.currentLink.getId() + ", routeindex: " + this.currentNodeIndex
 				+ ", next activity#: " + this.nextActivity;
 	}
 
@@ -292,6 +301,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		return mytime;
 	}
 
+	/** @return Always returns the value 1. */
 	public int getLane() {
 		return 1;
 	}
@@ -309,9 +319,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	public void setLastMovedTime(final double lastMovedTime) {
 		this.lastMovedTime = lastMovedTime;
 	}
-
-	// The next two methods were taken from MobsimAgentI that
-	// I cannot fully implement right now, but will maybe later on
 
 	/**
 	 * Notifies the agent that it leaves its current activity location (and
@@ -331,6 +338,5 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	protected void transferToMobsim() {
 		this.currentLink.addParking(this);
 	}
-
 
 }

@@ -35,16 +35,16 @@ import org.matsim.withinday.mobsim.OccupiedVehicle;
  *
  */
 public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
-	
-	private Link destinationLink;
-	
+
+	private final Link destinationLink;
+
 	public WithindayAgentTestOccupiedVehicle(final Leg currentLeg, final QueueLink currentLink, final QueueLink destinationLink, final ArrayList<Object> arrayList) {
 		this.currentLeg = currentLeg;
 		this.currentLink = currentLink;
 		this.destinationLink = destinationLink;
 		this.actslegs = arrayList;
 	}
-	
+
 	/**
 	 * @see org.matsim.mobsim.Vehicle#getCurrentLeg()
 	 */
@@ -68,12 +68,12 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	public void exchangeActsLegs(final ArrayList<Object> actslegs) {
 		super.exchangeActsLegs(actslegs);
 	}
-	
+
 	@Override
 	public Node getCurrentNode() {
 		return super.getCurrentNode();
 	}
-	
+
 	/**
 	 * @see org.matsim.mobsim.Vehicle#getDepartureTime_s()
 	 */
@@ -85,17 +85,10 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 
 	//############################################################
 	//for security reasons overwritten but not implemented methods
-	
+
 	@Override
 	public QueueLink chooseNextLink() {
 		throw new UnsupportedOperationException("This method should not be used for this test!");
-	}
-	/**
-	 * @see org.matsim.mobsim.Vehicle#findNextLink()
-	 */
-	@Override
-	protected QueueLink findNextLink() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
 	}
 
 	/**
@@ -103,7 +96,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public int getCurrentLegNumber() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -111,7 +104,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public Person getDriver() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -119,7 +112,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public String getDriverID() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -127,7 +120,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public int getID() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -135,7 +128,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public int getLane() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -143,7 +136,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public double getLastMovedTime() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -151,7 +144,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public double getPosInLink_m() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -159,7 +152,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public double getSpeed() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -167,7 +160,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public void incCurrentNode() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -175,7 +168,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public void initVeh() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -183,7 +176,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public void leaveActivity() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -191,7 +184,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public void reachActivity() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -199,7 +192,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public void rebuildVeh(final QueueLink link) {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
 	/**
@@ -207,6 +200,6 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	protected void transferToMobsim() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");	
+		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 }
