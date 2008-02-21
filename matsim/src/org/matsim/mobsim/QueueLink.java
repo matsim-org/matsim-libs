@@ -101,7 +101,7 @@ public class QueueLink extends Link {
 
 	private boolean active = false;
 
-	
+
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
@@ -145,9 +145,7 @@ public class QueueLink extends Link {
 		this.timeCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
-		double aa = ((NetworkLayer)this.layer).getEffectiveCellSize();
 		this.storageCapacity = (this.length * this.permlanes) / ((NetworkLayer)this.layer).getEffectiveCellSize() * storageCapFactor;
-
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.timeCapCeil);
