@@ -90,7 +90,7 @@ public class CalcNetAvgSpeed implements EventHandlerLinkEnterI,
 		}
 	}
 
-	public double getAvgSpeed() {
+	public double getNetAvgSpeed() {
 		return ((timeSum != 0.0) ? lengthSum / timeSum : 0.0);
 	}
 

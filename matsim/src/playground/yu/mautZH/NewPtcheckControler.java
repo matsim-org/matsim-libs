@@ -141,7 +141,7 @@ public class NewPtcheckControler extends Controler {
 											.getAverageTripLength()
 											: 0.0) + "\t"
 									+ ctpf.getTrafficPerformance() + "\t"
-									+ cas.getAvgSpeed() + "\n");
+									+ cas.getNetAvgSpeed() + "\n");
 					out.flush();
 				} catch (IOException e) {
 					e.printStackTrace();

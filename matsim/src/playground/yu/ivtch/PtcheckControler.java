@@ -123,7 +123,7 @@ public class PtcheckControler extends Controler {
 									+ "\t"
 									+ ctpf.getTrafficPerformance()
 									+ "\t"
-									+ cas.getAvgSpeed()
+									+ cas.getNetAvgSpeed()
 									+ "\t"
 									+ (((rp != null) && (rp
 											.getRoadPricingScheme() != null)) ? rp

@@ -122,7 +122,7 @@ public class AnalysisTest {
 			out.write("traffic performance:\t" + ctpf.getTrafficPerformance()
 					+ "\t[Pkm]\n");
 			out
-					.write("avg. travel Speed:\t" + cas.getAvgSpeed()
+					.write("avg. travel Speed:\t" + cas.getNetAvgSpeed()
 							+ "\t[km/h]\n");
 			out.close();
 		} catch (FileNotFoundException e) {

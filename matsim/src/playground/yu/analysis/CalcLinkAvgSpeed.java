@@ -27,9 +27,8 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.config.Config;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventLinkEnter;
@@ -37,7 +36,6 @@ import org.matsim.events.EventLinkLeave;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -58,12 +56,32 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	 *            a SpeedCounter
 	 */
 	private HashMap<String, SpeedCounter> speedCounters = new HashMap<String, SpeedCounter>();
+	private Set<Link> interestLinks = null;
+	private final int binSize, nofBins;
 
 	/**
 	 * @param network
+	 * @param binSize -
+	 *            size of a timeBin e.g. (300s, 3600s)
+	 * @param nofBins -
+	 *            number of bins
 	 */
-	public CalcLinkAvgSpeed(NetworkLayer network) {
+	public CalcLinkAvgSpeed(NetworkLayer network, final int binSize,
+			final int nofBins) {
 		super(network);
+		this.binSize = binSize;
+		this.nofBins = nofBins;
+	}
+
+	public CalcLinkAvgSpeed(NetworkLayer network, final int binSize) {
+		this(network, binSize, 30 * 3600 / binSize + 1);
+	}
+
+	public CalcLinkAvgSpeed(NetworkLayer network, double x, double y,
+			double radius) {
+		this(network, 3600);
+		interestLinks = new NetworkLinksInCircle(network)
+				.getLinks(x, y, radius);
 	}
 
 	public static class SpeedCounter {
@@ -77,15 +95,17 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		 */
 		private HashMap<String, Double> enterTimes = new HashMap<String, Double>();
 
-		public SpeedCounter() {
-			for (int i = 0; i < 24; i++) {
-				lengthSum[i] = 0.0;
-				timeSum[i] = 0.0;
-			}
+		/**
+		 * @param nofBins -
+		 *            number of bins.
+		 */
+		public SpeedCounter(final int nofBins) {
+			lengthSum = new double[nofBins];
+			timeSum = new double[nofBins];
 		}
 
-		public void lengSumAppend(int timeBin, double leng) {
-			lengthSum[timeBin] += leng;
+		public void lengthSumAppend(int timeBin, double length) {
+			lengthSum[timeBin] += length;
 		}
 
 		public void timeSumAppend(int timeBin, double time) {
@@ -93,7 +113,8 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		}
 
 		public double getSpeed(int timeBin) {
-			return lengthSum[timeBin] / timeSum[timeBin] * 3.6;
+			return (timeSum[timeBin] != 0.0) ? lengthSum[timeBin]
+					/ timeSum[timeBin] * 3.6 : 0.0;
 		}
 
 		public void setTmpEnterTime(String agentId, double tmpEnterTime) {
@@ -109,8 +130,9 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		}
 	}
 
-	public double getAvgSpeed(IdI linkId) {
-		return speedCounters.get(linkId).getSpeed();
+	public double getAvgSpeed(IdI linkId, double time) {
+		SpeedCounter sc = speedCounters.get(linkId.toString());
+		return (sc != null) ? sc.getSpeed(getBinIdx(time)) : 0.0;
 	}
 
 	public void handleEvent(EventAgentArrival arrival) {
@@ -124,13 +146,15 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		String linkId = enter.linkId;
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc == null) {
-			sc = new SpeedCounter();
+			sc = new SpeedCounter(nofBins);
 		}
 		sc.setTmpEnterTime(enter.agentId, enter.time);
 		speedCounters.put(linkId, sc);
 	}
 
 	public void handleEvent(EventLinkLeave leave) {
+		double time = leave.time;
+		int timeBin = getBinIdx(time);
 		String linkId = leave.linkId;
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc != null) {
@@ -138,14 +162,22 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 			if (enterTime != null) {
 				Link l = leave.link;
 				if (l == null) {
-					l = network.getLink(leave.linkId);
+					l = network.getLink(linkId);
 				}
 				if (l != null) {
-					sc.lengSumAppend(leave.link.getLength());
-					sc.timeSumAppend(leave.time - enterTime);
+					sc.lengthSumAppend(timeBin, l.getLength());
+					sc.timeSumAppend(timeBin, time - enterTime);
 				}
 			}
 		}
+	}
+
+	private int getBinIdx(final double time) {
+		int bin = (int) (time / this.binSize);
+		if (bin >= nofBins) {
+			return nofBins - 1;
+		}
+		return bin;
 	}
 
 	public void reset(int iteration) {
@@ -153,16 +185,57 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	/**
+	 * @param filename
+	 *            outputfilename (.../*.txt)
+	 */
+	@SuppressWarnings("unchecked")
+	public void write(String filename) {
+		try {
+			BufferedWriter out = IOUtils.getBufferedWriter(filename);
+			StringBuffer head = new StringBuffer(
+					"avg. Speed\nlinkId\tCapacity\tSimulationFlowCapacity");
+			for (int i = 0; i < 30; i++) {
+				head.append("\tH" + Integer.toString(i) + "-"
+						+ Integer.toString(i + 1));
+			}
+			head.append("\n");
+			out.write(head.toString());
+			out.flush();
+
+			for (Link l : ((interestLinks == null) ? (network.getLinks())
+					.values() : interestLinks)) {
+				IdI linkId = l.getId();
+				StringBuffer line = new StringBuffer(linkId.toString() + "\t"
+						+ l.getCapacity());
+				for (int j = 0; j < 30; j++) {
+					line.append("\t" + getAvgSpeed(linkId, (double) j * 3600));
+				}
+				line.append("\n");
+				out.write(line.toString());
+				out.flush();
+			}
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * @param args
 	 */
+	@SuppressWarnings( { "unchecked", "unchecked" })
 	public static void main(String[] args) {
-		final String netFilename = "./test/yu/test/input/network.xml";
-		final String eventsFilename = "./test/yu/test/input/carNewPlans100.events.txt.gz";
+		Gbl.startMeasurement();
 
-		Config config = Gbl.createConfig(null
-		// new String[] { "./test/yu/test/configTest.xml" }
-				);
+		final String netFilename = "./test/yu/ivtch/input/network.xml";
+//		final String eventsFilename = "./test/yu/test/input/run265opt100.events.txt.gz";
+		final String eventsFilename = "../runs/run263/100.events.txt.gz";		
+		final String outputFilename = "./test/yu/test/output/run263AvgSpeed.txt.gz";
 
+		@SuppressWarnings("unused")
+		Config config = Gbl.createConfig(null);
 		World world = Gbl.getWorld();
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
@@ -170,52 +243,17 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		world.setNetworkLayer(network);
 
 		Events events = new Events();
-		VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1,
-				network);
-		events.addHandler(volumes);
-		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(network);
+
+		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(network, 682845.0,
+				247388.0, 2000.0);
 		events.addHandler(clas);
+
 		new MatsimEventsReader(events).readFile(eventsFilename);
-		Map<IdI, QueueLink> links = (Map<IdI, QueueLink>) network.getLinks();
-		try {
-			BufferedWriter out = IOUtils
-					.getBufferedWriter("./test/yu/test/output/carNewPlans100.eventsVolumeTest.txt.gz");
-			StringBuffer head = new StringBuffer(
-					"linkId\tCapacity\tSimulationFlowCapacity");
-			for (int i = 0; i < 24; i++) {
-				head.append("\tH" + Integer.toString(i) + "-"
-						+ Integer.toString(i + 1));
-			}
-			head.append("\n");
-			out.write(head.toString());
-			out.flush();
-			for (QueueLink ql : links.values()) {
-				int[] v = volumes.getVolumesForLink(ql.getId().toString());
-				StringBuffer line = new StringBuffer(ql.getId().toString()
-						+ "\t" + ql.getCapacity() + "\t"
-						+ ql.getSimulatedFlowCapacity());
-				if (v != null) {
-					for (int j = 0; j < 24; j++) {
-						line.append("\t" + v[j]);
-					}
-				} else {
-					for (int k = 0; k < 24; k++) {
-						line.append("\t" + 0);
-					}
-				}
-				line.append("\n");
-				out.write(line.toString());
-				out.flush();
-			}
-			out.close();
-			out = IOUtils
-					.getBufferedWriter("./test/yu/test/output/carNewPlans100.eventsAvgSpeedTest.txt.gz");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		clas.write(outputFilename);
+
 		System.out.println("-> Done!");
+		Gbl.printElapsedTime();
 		System.exit(0);
 	}
 
