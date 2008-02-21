@@ -58,7 +58,8 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	private final ArrayList<Integer> linkRoles = new ArrayList<Integer>(5);
 	private int maxNodeRoleIndex = 4;
 	private int maxLinkRoleIndex = 4;
-	private double effectiveCellSize;
+	private double effectiveCellSize = 7.5; //TODO I've set this to 7.5 because - If one creates a network from scratch (means not using NetworkReader
+	// then effectiveCellSize will never be set  - might be this is just a workaround and we should look for a better solution?? [GL] feb 2008 
 
 	private final static Logger log = Logger.getLogger(NetworkLayer.class);
 
@@ -152,7 +153,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	}
 
 	public final void setEffectiveCellSize(final String effectiveCellSize) {
-		if (this.effectiveCellSize != Double.NaN) {
+		if (!Double.isNaN(this.effectiveCellSize)) {
 			log.warn(this + "[effectiveCellSize=" + effectiveCellSize + " already set. effectiveCellSize will be overwritten]");
 		}
 		this.effectiveCellSize = Double.parseDouble(effectiveCellSize);
