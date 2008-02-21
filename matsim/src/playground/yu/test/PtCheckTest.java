@@ -30,7 +30,7 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.world.World;
 
-import playground.yu.ivtch.PtCheck;
+import playground.yu.analysis.PtCheck;
 
 public class PtCheckTest {
 
