@@ -22,7 +22,7 @@ package org.matsim.counts;
 
 import java.util.HashMap;
 
-import org.matsim.network.Link;
+import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
 
 public class Count {
@@ -30,7 +30,8 @@ public class Count {
 	private final IdI locId;
 	private String csId;
 
-	private HashMap<Integer,Volume> volumes_=new HashMap<Integer, Volume>();
+	private final HashMap<Integer,Volume> volumes = new HashMap<Integer, Volume>();
+	private CoordI coord;
 
 
 	protected Count(final IdI locId, final String csId) {
@@ -41,7 +42,7 @@ public class Count {
 	public final Volume createVolume(final int h, final double val) {
 		// overkill?
 		Volume v = new Volume(h,val);
-		this.volumes_.put(Integer.valueOf(h), v);
+		this.volumes.put(Integer.valueOf(h), v);
 		return v;
 	}
 
@@ -60,24 +61,36 @@ public class Count {
 	public final Volume getMaxVolume() {
 		Volume v_max = null;
 		double max = -1.0;
-		for (Volume v : this.volumes_.values()) {
+		for (Volume v : this.volumes.values()) {
 			if (v.getValue() > max) { max = v.getValue(); v_max = v; }
 		}
 		return v_max;
 	}
-	
+
 	public final Volume getVolume(final int h) {
-		return this.volumes_.get(Integer.valueOf(h));
+		return this.volumes.get(Integer.valueOf(h));
 	}
 
 	public final HashMap<Integer,Volume> getVolumes() {
-		return this.volumes_;
+		return this.volumes;
+	}
+
+	public void setCoord(final CoordI coord) {
+		this.coord = coord;
+	}
+
+	/** @return Returns the exact coordinate, where this counting station is
+	 * located, or null if no exact location is available.
+	 **/
+	public CoordI getCoord() {
+		return this.coord;
 	}
 
 	@Override
 	public final String toString() {
 		return "[Loc_id=" + this.locId + "]" +
-				"[cs_id=" + this.csId + "]" +
-				"[nof_volumes=" + this.volumes_.size() + "]";
+		"[cs_id=" + this.csId + "]" +
+		"[nof_volumes=" + this.volumes.size() + "]";
 	}
+
 }

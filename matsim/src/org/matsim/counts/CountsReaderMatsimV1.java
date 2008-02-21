@@ -50,6 +50,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -101,8 +102,14 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 		int locId = Integer.parseInt(meta.getValue("loc_id"));
 		this.currcount = this.counts.createCount(new Id(locId), meta.getValue("cs_id"));
 		if (this.currcount == null) {
-			log.info("There is already a counts object for location " + locId +
+			log.warn("There is already a counts object for location " + locId +
 					". The counts for loc_id=" + locId + ", cs_id=" + meta.getValue("cs_id") + " will be ignored.");
+			return;
+		}
+		String x = meta.getValue("x");
+		String y = meta.getValue("y");
+		if (x != null && y != null) {
+			this.currcount.setCoord(new Coord(Double.parseDouble(x), Double.parseDouble(y)));
 		}
 	}
 

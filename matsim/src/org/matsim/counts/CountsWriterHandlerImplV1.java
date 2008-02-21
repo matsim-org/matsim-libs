@@ -53,6 +53,10 @@ public class CountsWriterHandlerImplV1 implements CountsWriterHandler {
 		out.write("\t<count");
 		out.write(" loc_id=\"" + count.getLocId() + "\"");
 		out.write(" cs_id=\"" + count.getCsId() + "\"");
+		if (count.getCoord() != null) {
+			out.write(" x=\"" + count.getCoord().getX() + "\"");
+			out.write(" y=\"" + count.getCoord().getY() + "\"");
+		}
 		out.write(">\n");
 	}
 	public void endCount(final BufferedWriter out) throws IOException {
