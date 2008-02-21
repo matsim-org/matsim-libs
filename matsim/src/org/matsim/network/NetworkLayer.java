@@ -44,7 +44,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	// ////////////////////////////////////////////////////////////////////
 
 	public static final IdI LAYER_TYPE = new Id("link");
-//	public static final double CELL_LENGTH = 7.5;
+
 
 	protected int capperiod = Integer.MIN_VALUE ;
 
@@ -60,7 +60,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	private int maxLinkRoleIndex = 4;
 	private double effectivecellsize;
 	
-	public final static double CELL_LENGTH = 0;
+	
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
