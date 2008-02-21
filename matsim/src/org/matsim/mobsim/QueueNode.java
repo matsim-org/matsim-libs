@@ -109,10 +109,10 @@ public class QueueNode extends Node {
 		veh.getCurrentLink().popFirstFromBuffer();
 		Simulation.decLiving();
 		Simulation.incLost();
-		Logger.getLogger(QueueNode.class).error("Agent has no or wrong route! agentId=" + veh.getDriverID() 
-				+ " currentLegNumber=" + veh.getCurrentLegNumber() 
+		Logger.getLogger(QueueNode.class).error("Agent has no or wrong route! agentId=" + veh.getDriverID()
+				+ " currentLegNumber=" + veh.getCurrentLegNumber()
 				+ " currentLink=" + veh.getCurrentLink().getId().toString()
-				+ "The agent is removed from the simulation.");
+				+ ". The agent is removed from the simulation.");
 		return true;
 	}
 
