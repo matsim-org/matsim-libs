@@ -1,0 +1,22 @@
+\frametitle {Creating a custom controler}
+\framesubtitle{Analyse results}
+\begin{columns}[T]
+
+\column{7cm}
+
+\begin{itemize}
+  \item Controler generates some analysis
+  \begin{itemize}
+    \item Score statistics
+    \item Plans (per 10th iteration)
+    \item Snapshots (per 10th iteration)
+   \item Leg histograms (per iteration)
+  \end{itemize}
+  \item Customized charts via Event handler / listener
+  \item Useful tool: \verb|org.matsim.utils.charts|
+\end{itemize}
+
+\column{5cm}
+\includegraphics[width=4cm]{../graphics/overviewMatsimAnalysis.png}
+
+\end{columns}

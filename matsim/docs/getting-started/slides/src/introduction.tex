@@ -1,0 +1,82 @@
+\section{Introduction}
+\begin{frame}
+\frametitle{Introduction}
+%\framesubtitle{}
+\begin{columns}[T]
+
+\column{7cm}
+
+\begin{itemize}
+  \item MATSim toolbox for large--scale agent--based transport simulations
+  \item Several modules
+  \begin{itemize}
+  	\item Demand modeling
+  	\item Mobility--simulation
+  	\item Re--planning
+  	\item Controler for simulation runs
+  	\item Analysis tools
+  \end{itemize}
+  \item Modules can be replaced by own implementations
+\end{itemize}
+
+\column{5cm}
+\includegraphics[width=4cm]{../graphics/overviewMatsim.png}
+\end{columns}
+
+
+\end{frame}
+
+
+\subsection{What you'll learn}
+
+\begin{frame}
+\frametitle{Introduction}
+\framesubtitle{What you'll learn}
+\begin{itemize}
+  \item How to run and simulate the provided sample scenario
+  \item To understand the configuration settings so you can change them correspondingly for your own scenarios
+  \item How to integrate an external, custom mobility simulation
+  \item How to integrate a custom, external re-planning module
+  \item How to analyse simulation results
+\end{itemize}
+\end{frame}
+
+\subsection{Requirements}
+
+\begin{frame}
+\frametitle{Introduction}
+\framesubtitle{Requirements}
+
+\begin{itemize}
+  \item Java 5 or higher -- Java Development Kit, JDK, Java SE (http://java.sun.com/javase/downloads)
+  \item A subversion client (http://subversion.tigris.org/)
+  \item An IDE, Eclispe recommended (http://eclipse.org)
+  \item A subversion plugin -- depends on IDE
+  \item For Eclipse: Subclipse (http://subclipse.tigris.org/) or use Eclipse update site: http://subclipse.tigris.org/update\_1.0.x
+\end{itemize}
+\end{frame}
+
+
+\subsection{Checking out}
+
+\begin{frame}[fragile]
+\frametitle{Introduction}
+\framesubtitle{Checking out}
+\begin{itemize}
+  \item Command line:
+\begin{itemize}
+  \item \verb|svn co https://matsim.svn.sourceforge.net| \\ \verb|/svnroot/matsim matsim|
+\end{itemize}
+  \item Eclipse:
+  \begin{itemize}
+    \item File $\rightarrow$ New Project
+    \item Category SVN $\rightarrow$ Checkout Projects from SVN
+    \item URL: \verb|https://matsim.svn.sourceforge.net/svnroot/matsim|
+    \item Folder: \verb|matsim/trunk|
+    \item Configure project using wizard
+    \item In wizard select ``new java project''
+  \end{itemize}
+\end{itemize}
+
+
+\end{frame}
