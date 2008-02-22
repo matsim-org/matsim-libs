@@ -59,7 +59,6 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final String W = "work";
 	private static final String S = "shop";
 	private static final String H = "home";
-	//private static final String L = "leisure";
 	private static final Coord ZERO = new Coord(0.0,0.0);
 	private final Persons persons;
 	private ModelModeChoice model;
