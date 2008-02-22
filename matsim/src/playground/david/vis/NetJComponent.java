@@ -32,6 +32,8 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
@@ -46,7 +48,7 @@ import javax.swing.event.MouseInputAdapter;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 
-import playground.david.vis.OTFGUI.myNetVisScrollPane;
+import playground.david.vis.OTFGUI.NetVisResizable;
 import playground.david.vis.data.OTFClientQuad;
 import playground.david.vis.data.OTFData;
 import playground.david.vis.data.OTFDataQuad;
@@ -76,6 +78,34 @@ abstract class OTFSwingDrawable implements OTFDrawable, OTFData.Receiver{
 
 public class NetJComponent extends JComponent  implements OTFDrawer {
 
+	public static class myNetVisScrollPane extends NetVisScrollPane implements NetVisResizable {
+
+		private float scale = 1.f;
+		public myNetVisScrollPane(NetJComponent networkComponent) {
+			super(networkComponent);
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public void scaleNetwork(float scale){
+			this.scale = scale;
+			super.scaleNetwork(scale);
+		}
+		
+		public float getScale() {
+			return scale;
+		}
+
+		/* (non-Javadoc)
+		 * @see playground.david.vis.NetVisScrollPane#scaleNetwork(java.awt.Rectangle, float)
+		 */
+		@Override
+		public float scaleNetwork(Rectangle destrect, float factor) {
+			this.scale = factor;
+			return super.scaleNetwork(destrect, factor);
+		}
+
+	}
 	private static final Color netColor = new Color(128,128,255,128);
 	private static final long serialVersionUID = 1L;
 
@@ -166,7 +196,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		networkScrollPane.addMouseListener(handi);
 		networkScrollPane.getViewport().addChangeListener(handi);
 		mouseMan = handi;
-        
+		networkScrollPane.addMouseWheelListener(mouseMan);
 
         // linkWidth = 5;
         // nodeRadius = 5;
@@ -280,11 +310,17 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 		AffineTransform originalTransform = g2.getTransform();
 
+		OTFSwingDrawable.boxTransform = getBoxTransform();
+		OTFSwingDrawable.g2d = g2;
+
 		g2.setStroke(new BasicStroke(Math.round(0.05 * linkWidth)));
 	
-        OTFSwingDrawable.boxTransform = getBoxTransform();
-		OTFSwingDrawable.g2d = g2;
+		AffineTransform linkTransform = new AffineTransform(originalTransform);
+		linkTransform.concatenate(getBoxTransform());
+		g2.setTransform(linkTransform);
+
 		sceneGraph.draw();
+		g2.setTransform(originalTransform);
     }
 
 	public Component getComponent() {
@@ -303,10 +339,12 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	public void invalidate(int time) throws RemoteException {
 		Rect rect = null;
 		this.sceneGraph = quad.getSceneGraph(time, rect, this);
+		redraw();
 	}
 
 	public void redraw() {
-		super.invalidate();
+		networkScrollPane.invalidate();
+		networkScrollPane.repaint();
 	}
 	
 	
@@ -336,7 +374,6 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			final Point2D.Float ortho = calcOrtho(this.quad[0], this.quad[1]);
 			this.quad[2] = new Point2D.Float(startX + ortho.x, startY + ortho.y);
 			this.quad[3] = new Point2D.Float(endX + ortho.x, endY + ortho.y);
-			//invalidate();
 		}
 
 		public void setColor(float coloridx) {
@@ -345,12 +382,6 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 		@Override
 		public void onDraw(Graphics2D display) {
-			//if( Math.random() > 0.1) return ;
-			AffineTransform originalTransform = display.getTransform();
-			AffineTransform linkTransform = new AffineTransform(originalTransform);
-			linkTransform.concatenate(boxTransform);
-
-			display.setTransform(linkTransform);
 			Polygon poly = new Polygon();
 
 			poly.addPoint((int)(quad[0].x), (int)(quad[0].y));
@@ -361,7 +392,6 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			//display.fill(poly);
 			display.setColor(Color.BLUE);
 			display.draw(poly);
-			display.setTransform(originalTransform);
 		}
 	}
 	
@@ -429,7 +459,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	/***
 	 * VizGuiHandler handles mouse input etc
 	 */
-	class vizGuiHandler extends MouseInputAdapter implements ChangeListener {
+	class vizGuiHandler extends MouseInputAdapter implements ChangeListener,MouseWheelListener {
 		public Point start = null;
 
 		public Rectangle currentRect = null;
@@ -500,5 +530,24 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		public void stateChanged(ChangeEvent e) {
 			networkScrollPane.updateViewClipRect();
 		}
+
+		private void pressed_ZOOM_OUT() {
+			float scale = networkScrollPane.getScale() / 1.42f;
+			networkScrollPane.scaleNetwork(scale);
+		}
+
+		private void pressed_ZOOM_IN() {
+			float scale = networkScrollPane.getScale() * 1.42f;
+			networkScrollPane.scaleNetwork(scale);
+		}
+		
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			int i = e.getWheelRotation();
+			if(i>0)pressed_ZOOM_OUT();
+			else if ( i<0) pressed_ZOOM_IN();
+		}
+
 	}
+	
+
 }
