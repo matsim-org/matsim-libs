@@ -116,7 +116,7 @@ public class OTFGUI {
 		agentRenderer = new OTFAgentRenderer(visnet);
 		agentRenderer.append(linkSetRenderer);
 
-		networkComponent = new NetJComponent(visnet, agentRenderer);
+		networkComponent = null; //DS TODO this does not work anymore thow away! new NetJComponent(visnet, agentRenderer);
 		linkSetRenderer.setTargetComponent(networkComponent);
 		agentRenderer.setTargetComponent(networkComponent);
 		networkScrollPane = new myNetVisScrollPane(networkComponent);

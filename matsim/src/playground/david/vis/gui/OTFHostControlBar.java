@@ -44,6 +44,7 @@ import playground.david.vis.data.OTFConnectionManager;
 import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.interfaces.OTFDataReader;
+import playground.david.vis.interfaces.OTFDrawer;
 import playground.david.vis.interfaces.OTFServerRemote;
 
 public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener {
@@ -74,7 +75,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	String address;
 	private OTFServerRemote host = null;
-	private final Map <String,OTFEventHandler> handlers = new HashMap<String,OTFEventHandler>(); 
+	private final Map <String,OTFDrawer> handlers = new HashMap<String,OTFDrawer>(); 
 	private static Class resourceHandler = null;
 
 	// -------------------- CONSTRUCTION --------------------
@@ -199,16 +200,16 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		return clientQ;
 	}
 	
-	public void addHandler(String id, OTFEventHandler handler) {
+	public void addHandler(String id, OTFDrawer handler) {
 		handlers.put(id, handler);
 	}
 	
-	public OTFEventHandler getHandler( String id) {
+	public OTFDrawer getHandler( String id) {
 		return handlers.get(id);
 	}
 	
 	public void invalidateHandlers() {
-		for (OTFEventHandler handler : handlers.values()) {
+		for (OTFDrawer handler : handlers.values()) {
 			try {
 				handler.invalidate(simTime);
 			} catch (RemoteException e) {

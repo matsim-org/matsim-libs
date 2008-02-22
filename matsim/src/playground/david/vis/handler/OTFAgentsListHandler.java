@@ -22,7 +22,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	static boolean prevV1_1 = OTFDataReader.setPreviousVersion(OTFAgentsListHandler.class.getCanonicalName() + "V1.1", ReaderV1_2.class);
 	static boolean prevV1_2 = OTFDataReader.setPreviousVersion(OTFAgentsListHandler.class.getCanonicalName() + "V1.2", ReaderV1_2.class);
 	
-	static Class agentReceiverClass = null;
+	protected Class agentReceiverClass = null;
 	
 	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	public static class ExtendedPositionInfo extends PositionInfo {
