@@ -98,7 +98,7 @@ public class CarLicense extends PersonAlgorithm {
 		// cl.end();
 
 		System.out.println("--> Done!\n-->There is " + cl.getCount()
-				+ "illeagel drivers!");
+				+ " illeagel drivers!");
 		Gbl.printElapsedTime();
 		System.exit(0);
 	}
