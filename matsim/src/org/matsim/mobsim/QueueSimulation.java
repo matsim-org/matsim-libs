@@ -127,7 +127,7 @@ public class QueueSimulation extends Simulation {
 	}
 
 	protected void prepareNetwork() {
-		this.network.moveWaitFirst(config.simulation().moveWaitFirst());
+		this.network.moveWaitFirst(this.config.simulation().moveWaitFirst());
 		this.network.beforeSim();
 	}
 
@@ -328,7 +328,7 @@ public class QueueSimulation extends Simulation {
 
 				getEvents().processEvent(new EventAgentArrival(now, veh.getDriverID(), veh.getCurrentLegNumber(),
 						veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
-	  			veh.reachActivity();
+	  			veh.reachActivity(now);
 
 	  		} else break;
   		}

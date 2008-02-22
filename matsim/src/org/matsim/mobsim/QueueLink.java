@@ -191,7 +191,7 @@ public class QueueLink extends Link {
 				new EventAgentArrival(now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(),
 						veh.getDriver(), veh.getCurrentLeg(), this));
 		// Need to inform the veh that it now reached its destination.
-		veh.reachActivity();
+		veh.reachActivity(now);
 	}
 
 	/**
@@ -208,7 +208,7 @@ public class QueueLink extends Link {
 			}
 
 			// Need to inform the veh that it now leaves its activity.
-			veh.leaveActivity();
+			veh.leaveActivity(now);
 
 			// Generate departure event
 			QueueSimulation.getEvents().processEvent(

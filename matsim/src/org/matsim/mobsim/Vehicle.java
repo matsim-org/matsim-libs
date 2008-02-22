@@ -149,11 +149,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		}
 		this.currentLink = (QueueLink) act.getLink();
 
-		if (this.nextActivity > 0) {
-			// no actStartEvent for first act.
-			QueueSimulation.getEvents().processEvent(new EventActivityStart(now, this.driverId, this.driver, this.currentLink, act));
-		}
-
 		if (this.nextActivity == this.actslegs.size()-1) {
 			// if this is the last activity, then stop vehicle
 			return false;
@@ -189,8 +184,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 
 		// this is the starting point for our vehicle, so put it in the queue
 		transferToMobsim();
-
-		QueueSimulation.getEvents().processEvent(new EventActivityEnd(departure, this.driverId, this.driver, this.currentLink, act));
 
 		return true;
 	}
@@ -323,14 +316,23 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	/**
 	 * Notifies the agent that it leaves its current activity location (and
 	 * accordingly starts moving on its current route).
+	 *
+	 * @param now the current time
 	 */
-	public void leaveActivity() {
+	public void leaveActivity(final double now) {
+		Act act = (Act)this.actslegs.get(this.nextActivity - 2);
+		QueueSimulation.getEvents().processEvent(new EventActivityEnd(now, this.driverId, this.driver, this.currentLink, act));
 	}
 
 	/**
 	 * Notifies the agent that it reaches its aspired activity location.
+	 *
+	 * @param now the current time
 	 */
-	public void reachActivity() {
+	public void reachActivity(final double now) {
+		Act act = (Act)this.actslegs.get(this.nextActivity);
+		// no actStartEvent for first act.
+		QueueSimulation.getEvents().processEvent(new EventActivityStart(now, this.driverId, this.driver, this.currentLink, act));
 		// 	 this is the starting point for our vehicle, so put it in the queue
 		reinitVeh();
 	}
