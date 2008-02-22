@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeModalSplitTest.java
+ * CarLicense.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,98 +23,37 @@
  */
 package playground.yu.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import org.matsim.basic.v01.BasicPlan.LegIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonAlgorithm;
-import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
 /**
  * @author ychen
  * 
  */
-public class LegCountTest {
-	public static class LegCount extends PersonAlgorithm {
-		private BufferedWriter writer;
-		// private BasicLeg tmpLeg;
-		// private boolean actsAtSameLink;
-		private int carUserCount = 0, carLegCount = 0, ptUserCount = 0,
-				ptLegCount = 0;
+public class CarLicense extends PersonAlgorithm {
+	private int count = 0;
+	private String planType = null;
 
-		public LegCount(String filename) {
-			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("personId\tLegNumber\n");
-				writer.flush();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+	/**
+	 * 
+	 */
+	public CarLicense() {
+	}
 
-		public void end() {
-			try {
-				writer.write("------------------------------------\ncarUser:\t"
-						+ carUserCount + ";\tcarLegs:\t" + carLegCount + ";\t"
-						+ (double) carLegCount / (double) carUserCount
-						+ "\tLegs pro carUser." + "\nptUser:\t" + ptUserCount
-						+ ";\tptLegs:\t" + ptLegCount + ";\t"
-						+ (double) ptLegCount / (double) ptUserCount
-						+ "\tLegs pro ptUser.");
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		public static int getLegsNumber(Plan selectedPlan) {
-			int i = 0;
-			for (LegIterator li = selectedPlan.getIteratorLeg(); li.hasNext();) {
-				i = li.next().getNum();
-			}
-			i++;
-			return i;
-		}
-
-		private void carAppend(int legsNumber) {
-			carUserCount++;
-			carLegCount += legsNumber;
-		}
-
-		@Override
-		public void run(Person person) {
-			Plan p = person.getSelectedPlan();
-			if (p != null) {
-				int nLegs = getLegsNumber(p);
-				try {
-					writer.write(person.getId() + "\t" + nLegs + "\n");
-					writer.flush();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				String planType = p.getType();
-				if (planType != null) {
-					if (planType.equals("car")) {
-						carAppend(nLegs);
-					} else if (planType.equals("pt")) {
-						ptUserCount++;
-						ptLegCount += nLegs;
-					}
-				} else {
-					carAppend(nLegs);
+	@Override
+	public void run(Person person) {
+		if (person != null) {
+			planType = person.getSelectedPlan().getType();
+			if (!((planType != null) && (planType != "car"))) {
+				if ((person.getAge() < 18) || person.getLicense().equals("no")) {
+					count++;
 				}
 			}
 		}
@@ -132,22 +71,23 @@ public class LegCountTest {
 		// final String plansFilename =
 		// "./test/yu/equil_test/output/100.plans.xml.gz";
 		// final String outFilename = "./output/legsCount.txt.gz";
-		final String outFilename = "../data/ivtch/carPt_opt_run266/legsCount.txt";
+		// final String outFilename =
+		// "../data/ivtch/carPt_opt_run266/legsCount.txt";
 
 		Gbl.startMeasurement();
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(null);
-
+		//
 		World world = Gbl.getWorld();
-
+		//
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
 
-		LegCount lc = new LegCount(outFilename);
-		population.addAlgorithm(lc);
+		CarLicense cl = new CarLicense();
+		population.addAlgorithm(cl);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPlansReader(population).readFile(plansFilename);
@@ -155,10 +95,19 @@ public class LegCountTest {
 
 		population.runAlgorithms();
 
-		lc.end();
+		// cl.end();
 
-		System.out.println("--> Done!");
+		System.out.println("--> Done!\n-->There is " + cl.getCount()
+				+ "illeagel drivers!");
 		Gbl.printElapsedTime();
 		System.exit(0);
 	}
+
+	/**
+	 * @return the count
+	 */
+	public int getCount() {
+		return count;
+	}
+
 }

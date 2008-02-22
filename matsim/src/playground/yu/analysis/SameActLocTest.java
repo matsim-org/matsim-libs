@@ -117,15 +117,15 @@ public class SameActLocTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// final String netFilename = "./test/yu/ivtch/input/network.xml";
+		//		final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/ivtch/input/network.xml";
 		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
-		// final String plansFilename = "../runs/run263/100.plans.xml.gz";
-		final String plansFilename = "../data/ivtch/carPtSimActTime_run264/ITERS/it.100/100.plans.xml.gz";
+		//		final String plansFilename = "../runs/run266/100.plans.xml.gz";
+		final String plansFilename = "../data/ivtch/carPt_opt_run266/ITERS/it.100/100.plans.xml.gz";
 		// final String plansFilename =
 		// "./test/yu/equil_test/output/100.plans.xml.gz";
 		// final String outFilename = "./output/actLoc.txt.gz";
-		final String outFilename = "../data/ivtch/analysis/run264actLoc.txt.gz";
+		final String outFilename = "../data/ivtch/carPt_opt_run266/actLoc.txt";
 
 		Gbl.startMeasurement();
 		@SuppressWarnings("unused")

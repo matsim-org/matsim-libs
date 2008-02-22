@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeModalSplitTest.java
+ * TvehHomeTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,43 +18,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.yu.analysis;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.config.Config;
+import org.matsim.events.EventAgentWait2Link;
+import org.matsim.events.Events;
+import org.matsim.events.MatsimEventsReader;
+import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
-/**
- * @author ychen
- * 
- */
-public class Wait2LinkCheckTest {
-	public static class Wait2LinkCheck extends PersonAlgorithm {
-		private BufferedWriter writer;
+public class EventsWait2LinkTest {
+	public static class EventsWait2Link implements EventHandlerAgentWait2LinkI {
+		private BufferedWriter writer = null;
 
-		public Wait2LinkCheck(String filename) {
+		public EventsWait2Link(String outputFilename) {
 			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("personId\tlinkId\tactIdx\n");
+				writer = IOUtils.getBufferedWriter(outputFilename);
+				writer.write("personId\tlinkId\n");
 				writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		public void handleEvent(EventAgentWait2Link event) {
+			try {
+				writer.write(event.agentId + "\t" + event.linkId + "\n");
+				writer.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -68,30 +68,8 @@ public class Wait2LinkCheckTest {
 			}
 		}
 
-		@Override
-		public void run(Person person) {
-			String tmpLinkId = null;
-			String nextTmpLinkId = null;
-			if (person != null) {
-				Plan p = person.getSelectedPlan();
-				if (p != null) {
-					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
-						nextTmpLinkId = ai.next().getLink().getId().toString();
-						if (tmpLinkId != null && nextTmpLinkId != null) {
-							if (!tmpLinkId.equals(nextTmpLinkId)) {
-								try {
-									writer.write(person.getId().toString()
-											+ "\t" + tmpLinkId + "\n");
-									writer.flush();
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-							}
-						}
-						tmpLinkId = nextTmpLinkId;
-					}
-				}
-			}
+		public void reset(int iteration) {
+			writer = null;
 		}
 	}
 
@@ -99,40 +77,32 @@ public class Wait2LinkCheckTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// final String netFilename = "./test/yu/ivtch/input/network.xml";
-		final String netFilename = "../data/ivtch/input/network.xml";
-		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
-		// final String plansFilename = "../runs/run263/100.plans.xml.gz";
-		final String plansFilename = "../data/ivtch/carPt_opt_run266/ITERS/it.100/100.plans.xml.gz";
-		// final String plansFilename =
-		// "./test/yu/equil_test/output/100.plans.xml.gz";
-		// final String outFilename = "./output/actLoc.txt.gz";
-		final String outFilename = "../data/ivtch/carPt_opt_run266/wait2linkTest.txt.gz";
-
 		Gbl.startMeasurement();
+
+		final String netFilename = "./test/yu/ivtch/input/network.xml";
+		// final String eventsFilename =
+		// "./test/yu/test/input/run265opt100.events.txt.gz";
+		final String eventsFilename = "../runs/run266/100.events.txt.gz";
+		final String outputFilename = "../runs/run266/Wait2Link.events.txt.gz";
+
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(null);
-
 		World world = Gbl.getWorld();
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
-		Plans population = new Plans();
+		Events events = new Events();
 
-		Wait2LinkCheck alt = new Wait2LinkCheck(outFilename);
-		population.addAlgorithm(alt);
+		EventsWait2Link ew2l = new EventsWait2Link(outputFilename);
+		events.addHandler(ew2l);
 
-		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPlansReader(population).readFile(plansFilename);
-		world.setPopulation(population);
+		new MatsimEventsReader(events).readFile(eventsFilename);
 
-		population.runAlgorithms();
+		ew2l.end();
 
-		alt.end();
-
-		System.out.println("--> Done!");
+		System.out.println("-> Done!");
 		Gbl.printElapsedTime();
 		System.exit(0);
 	}
