@@ -56,9 +56,9 @@ public class EUTRouter implements LeastCostPathCalculator {
 		kspPenalty = new KSPPenalty(network);
 		
 		safeRoute = new Route();
-		safeRoute.setRoute("2 3 6 9");
+		safeRoute.setRoute("2 3 5");
 		riskyRoute = new Route();
-		riskyRoute.setRoute("2 4 7 9");
+		riskyRoute.setRoute("2 4 5");
 		
 	}
 	

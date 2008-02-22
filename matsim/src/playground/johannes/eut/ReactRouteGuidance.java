@@ -38,13 +38,25 @@ import org.matsim.withinday.routeprovider.RouteProvider;
  */
 public class ReactRouteGuidance implements RouteProvider {
 
+	private static Route safeRoute;
+	
+	private static Route riskyRoute;
+	
+	public static int safeRouteCnt;
+	
+	public static int riskyRouteCnt;
 	
 	private LeastCostPathCalculator algorithm;
-	
+
 	public ReactRouteGuidance(NetworkLayer network, TravelTimeI traveltimes) {
 		RoutableLinkCost linkcost = new RoutableLinkCost();
 		linkcost.traveltimes = traveltimes;
 		algorithm = new Dijkstra(network, linkcost, linkcost);
+		
+		safeRoute = new Route();
+		safeRoute.setRoute("2 3 4");
+		riskyRoute = new Route();
+		riskyRoute.setRoute("2 4 5");
 	}
 	
 	public int getPriority() {
@@ -57,7 +69,14 @@ public class ReactRouteGuidance implements RouteProvider {
 
 	public synchronized Route requestRoute(Link departureLink, Link destinationLink,
 			double time) {
-		return algorithm.calcLeastCostPath(departureLink.getToNode(), destinationLink.getFromNode(), time);
+		Route route = algorithm.calcLeastCostPath(departureLink.getToNode(), destinationLink.getFromNode(), time);
+		
+		if(route.getRoute().equals(safeRoute.getRoute()))
+			safeRouteCnt++;
+		else if(route.getRoute().equals(riskyRoute.getRoute()))
+			riskyRouteCnt++;
+		
+		return route;
 	}
 
 	public void setPriority(int p) {

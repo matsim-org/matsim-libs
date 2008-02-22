@@ -48,7 +48,7 @@ public class EUTReRoute extends MultithreadedModuleA {
 
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
-		EUTRouter router = new EUTRouter(network, provider, new CARAFunction(10));
+		EUTRouter router = new EUTRouter(network, provider, new CARAFunction(0));
 		return new PlansCalcRoute(null, null, null, false, router, router);
 	}
 

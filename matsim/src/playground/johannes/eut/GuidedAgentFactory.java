@@ -23,6 +23,9 @@
  */
 package playground.johannes.eut;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
@@ -37,8 +40,10 @@ import org.matsim.withinday.routeprovider.RouteProvider;
  *
  */
 public class GuidedAgentFactory extends WithindayAgentLogicFactory {
+	
+	public static List<String> guidedAgents = new LinkedList<String>();
 
-	private double equipmentFraction = 0.1;
+	private double equipmentFraction = 0.01;
 	
 	private ForceReplan forceReplan = new ForceReplan();
 	
@@ -58,9 +63,10 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	@Override
 	public AgentContentmentI createAgentContentment(WithindayAgent agent) {
 		Gbl.random.nextDouble();
-		if(Gbl.random.nextDouble() < equipmentFraction)
+		if(Gbl.random.nextDouble() < equipmentFraction) {
+			guidedAgents.add(agent.getPerson().getId().toString());
 			return forceReplan;
-		else
+		} else
 			return preventReplan;
 	}
 

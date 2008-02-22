@@ -18,9 +18,9 @@ public class TravelTimeMemory {
 	
 	private LinkedList<TimevariantTTStorage> storageList = new LinkedList<TimevariantTTStorage>();
 	
-	private int maxMemomry = 5;
+	private int maxMemomry = 11;
 	
-	public static final double learningrate = 0.5;
+	public static final double learningrate = 0.1;
 
 	public TimevariantTTStorage makeTTStorage(TravelTimeI ttcalc, NetworkLayer network, int binsize, int starttime, int endtime) {
 		TimevariantTTStorage storage = new TimevariantTTStorage(network, starttime, endtime, binsize);

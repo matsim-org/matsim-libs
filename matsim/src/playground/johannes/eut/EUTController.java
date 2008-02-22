@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.config.groups.WithindayConfigGroup;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationEndsListener;
@@ -43,13 +44,19 @@ import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.BestPlanSelector;
+import org.matsim.utils.collections.Tuple;
 import org.matsim.withinday.WithindayControler;
+import org.matsim.withinday.WithindayCreateVehiclePersonAlgorithm;
+import org.matsim.withinday.mobsim.WithindayQueueSimulation;
+import org.matsim.withinday.trafficmanagement.Accident;
+import org.matsim.withinday.trafficmanagement.TrafficManagement;
 
 /**
  * @author illenberger
@@ -66,6 +73,7 @@ public class EUTController extends WithindayControler {
 	 */
 	public EUTController(String[] args) {
 		super(args);
+		setOverwriteFiles(true);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -109,7 +117,7 @@ public class EUTController extends WithindayControler {
 
 	@Override
 	protected StrategyManager loadStrategyManager() {
-		setTraveltimeBinSize(60);
+		setTraveltimeBinSize(10);
 		provider = new TravelTimeMemory();
 		StrategyManager manager = new StrategyManager();
 		manager.setMaxPlansPerAgent(1);
@@ -122,7 +130,7 @@ public class EUTController extends WithindayControler {
 		manager.addStrategy(strategy, 0.95);
 		
 		return manager;
-////		return super.loadStrategyManager();
+//		return super.loadStrategyManager();
 	}
 
 	@Override
@@ -132,15 +140,32 @@ public class EUTController extends WithindayControler {
 		
 		addControlerListener(new TTCalculatorController());
 //		addControlerListener(new NetworkModifier());
-		addControlerListener(new TripDurationWriter());
+		
 		addControlerListener(new RouteDistribution());
 		addControlerListener(new RouteCosts());
+		addControlerListener(new GuidedAgentsWriter());
+		addControlerListener(new TripDurationWriter());
+		addControlerListener(new GuidanceWriter());
 //		setScoringFunctionFactory(new EUTScoringFunctionFactory());
 		
 //		legDurationWriter = new CalcLegTimes(population); 
 //		events.addHandler(legDurationWriter);
-		factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), getTravelTimeCalculator());
 		
+		
+	}
+
+	@Override
+	protected void runMobSim() {
+		factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), getTravelTimeCalculator());
+		config.withinday().addParam("contentThreshold", "1");
+		WithindayCreateVehiclePersonAlgorithm vehicleAlgo = new WithindayCreateVehiclePersonAlgorithm(this);
+
+		//build the queuesim
+		WithindayQueueSimulation sim = new WithindayQueueSimulation((QueueNetworkLayer)this.network, this.population, this.events, this);
+		sim.setVehicleCreateAlgo(vehicleAlgo);
+		trafficManagement = new TrafficManagement();
+		//run the simulation
+		sim.run();
 	}
 
 	private class TTCalculatorController implements IterationStartsListener, IterationEndsListener {
@@ -179,7 +204,7 @@ public class EUTController extends WithindayControler {
 			/*
 			 * Reduce capacity here...
 			 */
-			QueueLink link = (QueueLink) EUTController.this.getNetwork().getLink("9");
+			QueueLink link = (QueueLink) EUTController.this.getNetwork().getLink("5");
 
 			Gbl.random.nextDouble();
 			if(Gbl.random.nextDouble() < incidentProba && event.getIteration() > 50) {
@@ -209,9 +234,9 @@ public class EUTController extends WithindayControler {
 		
 		private Map<Person, Double> tripdurs = new HashMap<Person, Double>();
 		
-		private java.util.List<Double> safeRouteDurs = new LinkedList<Double>();
+		private List<Tuple<Double, String>> safeRouteDurs = new LinkedList<Tuple<Double, String>>();
 		
-		private java.util.List<Double> riskyRouteDurs = new LinkedList<Double>();
+		private List<Tuple<Double, String>> riskyRouteDurs = new LinkedList<Tuple<Double, String>>();
 		
 		private QueueNode safeNode;
 		
@@ -219,11 +244,11 @@ public class EUTController extends WithindayControler {
 		
 		public TripDurationWriter() {
 			EUTController.this.events.addHandler(this);
-			safeNode = (QueueNode) EUTController.this.getNetwork().getNode("6");
-			riskyNode = (QueueNode) EUTController.this.getNetwork().getNode("7");
+			safeNode = (QueueNode) EUTController.this.getNetwork().getNode("3");
+			riskyNode = (QueueNode) EUTController.this.getNetwork().getNode("4");
 			try {
 				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("tripstats.txt")));
-				writer.write("Iteration\tdur_safe\tdur_risky");
+				writer.write("Iteration\tdur_safe\tdur_risky\tguided_avr\tguided_safe\tguided_risky\tunguided_avr\tunguided_safe\tunguided_risky");
 				writer.newLine();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -231,14 +256,60 @@ public class EUTController extends WithindayControler {
 		}
 		
 		public void notifyIterationEnds(IterationEndsEvent event) {
+			List<Tuple<Double, String>> guidedAvr = new LinkedList<Tuple<Double,String>>();
+			List<Tuple<Double, String>> unguidedAvr = new LinkedList<Tuple<Double,String>>();
+			List<Tuple<Double, String>> guidedSafe = new LinkedList<Tuple<Double,String>>();
+			List<Tuple<Double, String>> unguidedSafe = new LinkedList<Tuple<Double,String>>();
+			List<Tuple<Double, String>> guidedRisky = new LinkedList<Tuple<Double,String>>();
+			List<Tuple<Double, String>> unguidedRisky = new LinkedList<Tuple<Double,String>>();
+			
+			for(Tuple<Double, String> t : safeRouteDurs) {
+				if(GuidedAgentFactory.guidedAgents.contains(t.getSecond())) {
+					guidedAvr.add(t);
+					guidedSafe.add(t);
+				} else {
+					unguidedAvr.add(t);
+					unguidedSafe.add(t);
+				}
+			}
+			
+			for(Tuple<Double, String> t : riskyRouteDurs) {
+				if(GuidedAgentFactory.guidedAgents.contains(t.getSecond())) {
+					guidedAvr.add(t);
+					guidedRisky.add(t);
+				} else {
+					unguidedAvr.add(t);
+					unguidedRisky.add(t);
+				}
+			}
+			
 			int safedur = calcAvr(safeRouteDurs);
 			int riskydur = calcAvr(riskyRouteDurs);
+			int guidedAvrDur = calcAvr(guidedAvr);
+			int guidedSafeDur = calcAvr(guidedSafe);
+			int guidedRiskyDur = calcAvr(guidedRisky);
+			int unguidedAvrDur = calcAvr(unguidedAvr);
+			int unguidedSafeDur = calcAvr(unguidedSafe);
+			int unguidedRiskyDur = calcAvr(unguidedRisky);
+			
 			try {
 				writer.write(String.valueOf(event.getIteration()));
 				writer.write("\t");
 				writer.write(String.valueOf(safedur));
 				writer.write("\t");
 				writer.write(String.valueOf(riskydur));
+				writer.write("\t");
+				writer.write(String.valueOf(guidedAvrDur));
+				writer.write("\t");
+				writer.write(String.valueOf(guidedSafeDur));
+				writer.write("\t");
+				writer.write(String.valueOf(guidedRiskyDur));
+				writer.write("\t");
+				writer.write(String.valueOf(unguidedAvrDur));
+				writer.write("\t");
+				writer.write(String.valueOf(unguidedSafeDur));
+				writer.write("\t");
+				writer.write(String.valueOf(unguidedRiskyDur));
 				writer.newLine();
 				writer.flush();
 			} catch (Exception e) {
@@ -246,33 +317,33 @@ public class EUTController extends WithindayControler {
 			}
 		}
 		
-		private int calcAvr(java.util.List<Double> vals) {
+		private int calcAvr(List<Tuple<Double, String>> vals) {
 			double sum = 0;
-			for(Double d : vals)
-				sum += d;
+			for(Tuple<Double, String> d : vals)
+				sum += d.getFirst();
 			
 			return (int) (sum/vals.size());
 		}
 
 		public void reset(int iteration) {
 			tripdurs = new HashMap<Person, Double>();
-			safeRouteDurs = new LinkedList<Double>();
-			riskyRouteDurs = new LinkedList<Double>();
+			safeRouteDurs = new LinkedList<Tuple<Double, String>>();
+			riskyRouteDurs = new LinkedList<Tuple<Double, String>>();
 		}
 
 		public void handleEvent(EventAgentArrival event) {
-			if(event.linkId.equals("11")) {
+//			if(event.linkId.equals("11")) {
 			Double deptime = tripdurs.get(event.agent);
 			if(deptime != null) {
 				Leg leg = (Leg) event.agent.getSelectedPlan().getActsLegs().get(1); 
 				if(leg.getRoute().getRoute().contains(safeNode)) {
-					safeRouteDurs.add(event.time - deptime);
+					safeRouteDurs.add(new Tuple<Double, String>(event.time - deptime, event.agent.getId().toString()));
 				} else if(leg.getRoute().getRoute().contains(riskyNode)) {
-					riskyRouteDurs.add(event.time - deptime);
+					riskyRouteDurs.add(new Tuple<Double, String>(event.time - deptime, event.agent.getId().toString()));
 				}
 				tripdurs.remove(event.agent);
 			}
-			}
+//			}
 		}
 
 		public void handleEvent(EventAgentWait2Link event) {
@@ -313,9 +384,9 @@ public class EUTController extends WithindayControler {
 			
 		}
 		public void handleEvent(EventLinkEnter event) {
-			if(event.link.getId().toString().equals("9"))
+			if(event.link.getId().toString().equals("5"))
 				riskyRouteCnt++;
-			else if(event.link.getId().toString().equals("8"))
+			else if(event.link.getId().toString().equals("4"))
 				safeRouteCnt++;
 			
 		}
@@ -380,6 +451,75 @@ public class EUTController extends WithindayControler {
 			
 			return sum/(double)vals.size();
 		}
+	}
+	
+	private class GuidedAgentsWriter implements IterationEndsListener {
+
+		private BufferedWriter writer;
+		
+		public GuidedAgentsWriter() {
+			try {
+				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("guidedagents.txt")));
+				writer.write("Iteration\tcount\tagent_ids");
+				writer.newLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			try {
+				writer.write(String.valueOf(event.getIteration()));
+				writer.write("\t");
+				writer.write(String.valueOf(GuidedAgentFactory.guidedAgents.size()));
+				
+				for(String id : GuidedAgentFactory.guidedAgents) {
+					writer.write("\t");
+					writer.write(id);
+				}
+				writer.newLine();
+				writer.flush();
+				
+				GuidedAgentFactory.guidedAgents = new LinkedList<String>();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+	}
+	
+	private class GuidanceWriter implements IterationEndsListener {
+
+		private BufferedWriter writer;
+		
+		public GuidanceWriter() {
+			try {
+				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("recommendations.txt")));
+				writer.write("Iteration\tsafe_cnt\trisky_cnt");
+				writer.newLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			try {
+				writer.write(String.valueOf(event.getIteration()));
+				writer.write("\t");
+				writer.write(String.valueOf(ReactRouteGuidance.safeRouteCnt));
+				writer.write("\t");
+				writer.write(String.valueOf(ReactRouteGuidance.riskyRouteCnt));
+				writer.newLine();
+				writer.flush();
+				
+				ReactRouteGuidance.safeRouteCnt = 0;
+				ReactRouteGuidance.riskyRouteCnt = 0;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
 	
 	public static void main(String args[]) {
