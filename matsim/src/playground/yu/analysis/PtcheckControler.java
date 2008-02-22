@@ -140,10 +140,16 @@ public class PtcheckControler extends Controler {
 				if (orms != null) {
 					orms.write(getOutputFilename("onRoute.txt.gz"));
 					orms.writeCharts(getOutputFilename("onRoute.png"));
+				}
+				if (ttms != null) {
 					ttms.write(getOutputFilename("traveltimes.txt.gz"));
 					ttms.writeCharts(getOutputFilename("traveltimes.png"));
+				}
+				if (ld != null) {
 					ld.write(getOutputFilename("legDistances.txt.gz"));
 					ld.writeCharts(getOutputFilename("legDistances.png"));
+				}
+				if (clas != null) {
 					clas.write(getOutputFilename("avgSpeed.txt.gz"));
 				}
 			}
