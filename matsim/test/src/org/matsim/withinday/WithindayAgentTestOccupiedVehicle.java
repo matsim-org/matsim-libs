@@ -175,7 +175,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 * @see org.matsim.mobsim.Vehicle#leaveActivity()
 	 */
 	@Override
-	public void leaveActivity() {
+	public void leaveActivity(final double now) {
 		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
@@ -183,7 +183,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 * @see org.matsim.mobsim.Vehicle#reachActivity()
 	 */
 	@Override
-	public void reachActivity() {
+	public void reachActivity(final double now) {
 		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
