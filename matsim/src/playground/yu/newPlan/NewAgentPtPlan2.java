@@ -70,7 +70,7 @@ public class NewAgentPtPlan2 extends PersonAlgorithm implements
 		if (person.getLicense().equals("yes")) {
 			// copyPlans: the copy of the plans.
 			for (Plan pl : person.getPlans()) {
-				Leg firstLeg = (Leg) pl.getActsLegs().get(2);
+				Leg firstLeg = (Leg) pl.getActsLegs().get(1);
 				String legMode = firstLeg.getMode();
 				pl.setType(legMode);
 
