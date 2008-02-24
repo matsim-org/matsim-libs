@@ -38,8 +38,8 @@ import org.matsim.world.World;
 public class NewPtPlansControler {
 
 	public static void main(final String[] args) {
-		final String netFilename = "./test/yu/newPlans/input/network.xml";
-		final String plansFilename = "./test/yu/newPlans/input/10pctZrhPlans.xml.gz";
+		final String netFilename = "../data/ivtch/input/network.xml";
+		final String plansFilename = "../data/ivtch/newPlans/all10pctZrh_plans.xml.gz";
 
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")

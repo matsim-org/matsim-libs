@@ -29,7 +29,7 @@ public class FilterPlansWithRouteInArea {
 	public static void main(String[] args) {
 		MyRuns
 				.filterPlansWithRouteInArea(
-						new String[] { "./test/yu/newPlans/configMake10pctZrhPlans.xml" },
+						new String[] { "../data/ivtch/cfgNewPlans.xml" },
 						683518.0, 246836.0, 30000.0);
 	}
 }
