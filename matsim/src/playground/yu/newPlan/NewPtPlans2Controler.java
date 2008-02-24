@@ -44,7 +44,7 @@ public class NewPtPlans2Controler {
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")
 		Config config = Gbl
-				.createConfig(new String[] { "./test/yu/newPlans/configMake10pctZrhCarPtPlans.xml" });
+				.createConfig(new String[] { "../data/ivtch/cfgNewPlansCarPtLicense.xml" });
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
