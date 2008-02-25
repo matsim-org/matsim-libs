@@ -49,12 +49,26 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 	private final int maxIters;
 	private final String BetaTraveling;
 	private final String BetaTravelingPt;
-	private double[] yPtRate = null;// an array, in which the fraction of
-	// persons, who use public transit, will be
-	// saved.
-	private double[] yPtUser = null;// an array, in which the amount of persons,
-	// who use public transit, will be saved.
-	private double[] yPersons = null;// an array, in which the amount of all
+	/**
+	 * @param yLicensedPtRate -
+	 *            an array, in which the fraction of persons, who use public
+	 *            transit, will be saved.
+	 */
+	private double[] yLicensedPtRate = null;
+	private double[] yLicensedCarRate = null;
+	/**
+	 * @param yLicensedPtUser -
+	 *            an array, in which the amount of persons, who use public
+	 *            transit, will be saved.
+	 */
+	private double[] yLicensedPtUser = null;
+	private double[] yLicensedCarUser = null;
+	/**
+	 * @param yPersons -
+	 *            an array, in which the amount of all
+	 */
+	private double[] yPersons = null;
+	private double[] yLicensed = null;
 
 	// persons in the simulation will be
 	// saved.
@@ -81,9 +95,12 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 		this.BetaTraveling = BetaTraveling;
 		this.BetaTravelingPt = BetaTravelingPt;
 		check = new PtCheck(filename);
-		yPtRate = new double[maxIters / 10 + 1];
-		yPtUser = new double[maxIters / 10 + 1];
+		yLicensedPtRate = new double[maxIters / 10 + 1];
+		yLicensedCarRate = new double[maxIters / 10 + 1];
+		yLicensedPtUser = new double[maxIters / 10 + 1];
+		yLicensedCarUser = new double[maxIters / 10 + 1];
 		yPersons = new double[maxIters / 10 + 1];
+		yLicensed = new double[maxIters / 10 + 1];
 	}
 
 	/**
@@ -95,9 +112,12 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 			Config cf = event.getControler().getConfig();
 			check.resetCnt();
 			check.run(population);
-			yPtRate[idx / 10] = check.getPtRate();
-			yPtUser[idx / 10] = check.getPtUserCnt();
+			yLicensedPtRate[idx / 10] = check.getLicensedPtRate();
+			yLicensedCarRate[idx / 10] = check.getLicensedCarRate();
+			yLicensedPtUser[idx / 10] = check.getLicensedPtUserCnt();
+			yLicensedCarUser[idx / 10] = check.getLicensedCarUserCnt();
 			yPersons[idx / 10] = check.getPersonCnt();
+			yLicensed[idx / 10] = check.getLicensedCnt();
 			try {
 				check.write(idx);
 			} catch (IOException e) {
@@ -123,9 +143,10 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 						+ "-TimeAllocationMutator, "
 						+ cf.getParam("strategy", "ModuleProbability_1")
 						+ "-SelectExpBeta", "Iterations", "Pt-Rate");
-				ptRateChart.addSeries("PtRate", x, yPtRate);
+				ptRateChart.addSeries("licensedPtRate", x, yLicensedPtRate);
+				ptRateChart.addSeries("licensedCarRate", x, yLicensedCarRate);
 				ptRateChart.saveAsPng(
-						Controler.getOutputFilename("PtRate.png"), 800, 600);
+						Controler.getOutputFilename("PtRate.png"), 1024, 768);
 				XYLineChart personsChart = new XYLineChart(
 						"Schweiz: PtUser/Persons, "
 								+ maxIters
@@ -158,11 +179,13 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 										.getParam("strategy",
 												"ModuleProbability_1") + "-"
 								+ cf.getParam("strategy", "Module_1"),
-						"Iterations", "PtUser/Persons");
-				personsChart.addSeries("PtUser", x, yPtUser);
+						"Iterations", "Persons");
+				personsChart.addSeries("licensedPtUser", x, yLicensedPtUser);
+				personsChart.addSeries("licensedCarUser", x, yLicensedCarUser);
+				personsChart.addSeries("licensedPersons", x, yLicensed);
 				personsChart.addSeries("Persons", x, yPersons);
 				personsChart.saveAsPng(Controler
-						.getOutputFilename("Persons.png"), 800, 600);
+						.getOutputFilename("Persons.png"), 1024, 768);
 
 			}
 		}

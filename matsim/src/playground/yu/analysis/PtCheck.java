@@ -39,14 +39,16 @@ public class PtCheck extends PersonAlgorithm {
 	 * Counter of all read persons
 	 */
 	private int personCnt;
-	private int carUserCnt;
+	private int licensedCnt;
+	private int licensedCarUserCnt;
 	/**
-	 * Counter of all persons, who use public transport
+	 * @param licensedPtUserCnt - Counter of all persons, who use public transport
 	 */
-	private int ptUserCnt;
+	private int licensedPtUserCnt;
 
 	/**
-	 * internal outputStream
+	 * @param out -
+	 *            internal outputStream
 	 */
 	private BufferedWriter out;
 
@@ -60,32 +62,51 @@ public class PtCheck extends PersonAlgorithm {
 	public PtCheck(String fileName) throws IOException {
 		out = IOUtils.getBufferedWriter(fileName);
 		System.out.println("-->begins to write txt-file about pt-rate");
-		out.write("Iter\tPersons\tPtRate\tPtUser\tCarUser\n");
+		out
+				.write("Iter\tPersons\tlicensed\tPtUser\tpt in licensed\tCarUser\tcar in licensed\n");
 		out.flush();
 		personCnt = 0;
-		ptUserCnt = 0;
-		carUserCnt = 0;
+		licensedCnt = 0;
+		licensedPtUserCnt = 0;
+		licensedCarUserCnt = 0;
 	}
 
 	@Override
 	public void run(Person person) {
 		personCnt++;
-		String planType = person.getSelectedPlan().getType();
-		if (planType != null) {
-			if (planType.equals("pt")) {
-				ptUserCnt++;
-			} else if (planType.equals("car")) {
-				carUserCnt++;
+		if (person.getLicense().equals("yes")) {
+			licensedCnt++;
+			String planType = person.getSelectedPlan().getType();
+			if (planType != null) {
+				if (planType.equals("pt")) {
+					licensedPtUserCnt++;
+				} else if (planType.equals("car")) {
+					licensedCarUserCnt++;
+				}
 			}
 		}
 	}
 
 	// ---------------------------GETTER------------------------------------
-	public double getPtRate() {
-		if (personCnt > 0)
-			return (double) ptUserCnt / (double) personCnt;
-		System.err.println("there is no persons gecheckt!!");
+	public double getLicensedPtRate() {
+		if (licensedCnt > 0)
+			return (double) licensedPtUserCnt / (double) licensedCnt;
+		System.err.println("there is no persons licensed gecheckt!!");
 		return -1.0;
+	}
+
+	public double getLicensedCarRate() {
+		if (licensedCnt > 0)
+			return (double) licensedCarUserCnt / (double) licensedCnt;
+		System.err.println("there is no persons licensed gecheckt!!");
+		return -1.0;
+	}
+
+	/**
+	 * @return the licensedCarUserCnt
+	 */
+	public int getLicensedCarUserCnt() {
+		return licensedCarUserCnt;
 	}
 
 	/**
@@ -98,8 +119,8 @@ public class PtCheck extends PersonAlgorithm {
 	/**
 	 * @return the ptUserCnt.
 	 */
-	public int getPtUserCnt() {
-		return ptUserCnt;
+	public int getLicensedPtUserCnt() {
+		return licensedPtUserCnt;
 	}
 
 	// ----------------------------SETTER---------------------------------
@@ -116,7 +137,7 @@ public class PtCheck extends PersonAlgorithm {
 	 *            The ptUserCnt to set.
 	 */
 	public void setPtUserCnt(int ptUserCnt) {
-		this.ptUserCnt = ptUserCnt;
+		this.licensedPtUserCnt = ptUserCnt;
 	}
 
 	/**
@@ -127,11 +148,9 @@ public class PtCheck extends PersonAlgorithm {
 	 * @throws IOException
 	 */
 	public void write(int Iter) throws IOException {
-		out.write(Iter + "\t" + personCnt + "\t" + getPtRate() + "\t"
-				+ getPtUserCnt() + "\t" + carUserCnt + "\n");
-		// System.out.println("There are " + ptRate * 100
-		// + "% persons who use Public Transportation! " + ptUserCnt + "/"
-		// + getPersonCnt());
+		out.write(Iter + "\t" + personCnt + "\t" + licensedCnt + "\t"
+				+ licensedPtUserCnt + "\t" + getLicensedPtRate() + "\t"
+				+ licensedCarUserCnt + "\t" + "\n");
 		out.flush();
 	}
 
@@ -145,6 +164,13 @@ public class PtCheck extends PersonAlgorithm {
 	public void resetCnt() {
 		setPersonCnt(0);
 		setPtUserCnt(0);
-		carUserCnt = 0;
+		licensedCarUserCnt = 0;
+	}
+
+	/**
+	 * @return the licensedCnt
+	 */
+	public int getLicensedCnt() {
+		return licensedCnt;
 	}
 }

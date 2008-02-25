@@ -192,8 +192,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	public void write(String filename) {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);
-			StringBuffer head = new StringBuffer(
-					"avg. Speed\nlinkId\tCapacity\tSimulationFlowCapacity");
+			StringBuffer head = new StringBuffer("avg. Speed\nlinkId\tCapacity");
 			for (int i = 0; i < 30; i++) {
 				head.append("\tH" + Integer.toString(i) + "-"
 						+ Integer.toString(i + 1));
@@ -230,8 +229,8 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		Gbl.startMeasurement();
 
 		final String netFilename = "./test/yu/ivtch/input/network.xml";
-//		final String eventsFilename = "./test/yu/test/input/run265opt100.events.txt.gz";
-		final String eventsFilename = "../runs/run263/100.events.txt.gz";		
+		//		final String eventsFilename = "./test/yu/test/input/run265opt100.events.txt.gz";
+		final String eventsFilename = "../runs/run263/100.events.txt.gz";
 		final String outputFilename = "./test/yu/test/output/run263AvgSpeed.txt.gz";
 
 		@SuppressWarnings("unused")

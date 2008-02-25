@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ * checks how many people drive car illegally (under 18 years old or without license)
  */
 package playground.yu.analysis;
 
@@ -37,14 +37,13 @@ import org.matsim.world.World;
  * @author ychen
  * 
  */
-public class CarLicense extends PersonAlgorithm {
+public class CarIllegal extends PersonAlgorithm {
 	private int count = 0;
 	private String planType = null;
 
 	/**
-	 * 
 	 */
-	public CarLicense() {
+	public CarIllegal() {
 	}
 
 	@Override
@@ -59,6 +58,12 @@ public class CarLicense extends PersonAlgorithm {
 		}
 	}
 
+	/**
+	 * @return the count
+	 */
+	public int getCount() {
+		return count;
+	}
 	/**
 	 * @param args
 	 */
@@ -77,16 +82,15 @@ public class CarLicense extends PersonAlgorithm {
 		Gbl.startMeasurement();
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(null);
-		//
 		World world = Gbl.getWorld();
-		//
+
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
 
-		CarLicense cl = new CarLicense();
+		CarIllegal cl = new CarIllegal();
 		population.addAlgorithm(cl);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
@@ -95,19 +99,9 @@ public class CarLicense extends PersonAlgorithm {
 
 		population.runAlgorithms();
 
-		// cl.end();
-
 		System.out.println("--> Done!\n-->There is " + cl.getCount()
 				+ " illeagel drivers!");
 		Gbl.printElapsedTime();
 		System.exit(0);
 	}
-
-	/**
-	 * @return the count
-	 */
-	public int getCount() {
-		return count;
-	}
-
 }
