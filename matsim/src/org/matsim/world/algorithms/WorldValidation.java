@@ -49,7 +49,7 @@ public class WorldValidation extends WorldAlgorithm {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final boolean isValid(MappingRule m) {
+	private final boolean isValid(final MappingRule m) {
 		Layer down_layer = m.getDownLayer();
 		Layer up_layer = m.getUpLayer();
 
@@ -122,7 +122,7 @@ public class WorldValidation extends WorldAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(World world) {
+	public void run(final World world) {
 		log.info("    running " + this.getClass().getName() + " algorithm...");
 
 		int nof_layers = world.getLayers().size();
@@ -133,7 +133,7 @@ public class WorldValidation extends WorldAlgorithm {
 			while (layer.getUpRule() != null) {
 				MappingRule m = layer.getUpRule();
 				if (!this.isValid(m)) {
-					Gbl.errorMsg("[rule=" + m.toString() + "]" + "Validation failed!");
+					throw new RuntimeException("[rule=" + m.toString() + "]" + "Validation failed!");
 				}
 				layer = layer.getUpRule().getUpLayer();
 			}
