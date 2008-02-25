@@ -97,6 +97,7 @@ import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.WorldWriter;
 
 /**
@@ -140,14 +141,14 @@ public class Controler {
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
 
-	/*default*/ EventWriterTXT eventWriter = null;
-	/*default*/ boolean writeEvents = true;
+	/*package*/ EventWriterTXT eventWriter = null;
+	/*package*/ boolean writeEvents = true;
 	private boolean eventWriterAdded = false;
 
 	/* default analyses */
-	/*default*/ CalcLinkStats linkStats = null;
-	/*default*/ CalcLegTimes legTimes = null;
-	/*default*/ VolumesAnalyzer volumes = null;
+	/*package*/ CalcLinkStats linkStats = null;
+	/*package*/ CalcLegTimes legTimes = null;
+	/*package*/ VolumesAnalyzer volumes = null;
 
 	private boolean createGraphs = true;
 
@@ -158,7 +159,7 @@ public class Controler {
 	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
 
-	private static final Logger log = Logger.getLogger(Controler.class);
+	/*package*/ static final Logger log = Logger.getLogger(Controler.class);
 
 	/** initializes Log4J */
 	static {
@@ -1044,17 +1045,26 @@ public class Controler {
 		}
 
 		public void notifyAfterMobsim(final AfterMobsimEvent event) {
+			int iteration = event.getIteration();
 			if (Controler.this.eventWriter != null) {
 				Controler.this.eventWriter.closefile();
 			}
 
-			if ((event.getIteration() % 10 == 0 && event.getIteration() > event.getControler().getFirstIteration()) || (event.getIteration() % 10 >= 6)) {
+			if ((iteration % 10 == 0 && iteration > event.getControler().getFirstIteration()) || (iteration % 10 >= 6)) {
 				Controler.this.linkStats.addData(Controler.this.volumes, Controler.this.travelTimeCalculator);
 			}
 
-			if (event.getIteration() % 10 == 0 && event.getIteration() > event.getControler().getFirstIteration()) {
+			if (iteration % 10 == 0 && iteration > event.getControler().getFirstIteration()) {
 				Controler.this.events.removeHandler(Controler.this.volumes);
 				Controler.this.linkStats.writeFile(getIterationFilename(FILENAME_LINKSTATS));
+			}
+
+			if (Controler.this.legTimes != null) {
+				Controler.this.legTimes.writeStats(getIterationFilename("tripdurations.txt"));
+				// - print average in log
+				log.info("[" + iteration + "] average trip duration is: "
+						+ (int)Controler.this.legTimes.getAverageTripDuration() + " seconds = "
+						+ Time.writeTime(Controler.this.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
 			}
 		}
 
