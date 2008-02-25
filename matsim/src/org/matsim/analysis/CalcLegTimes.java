@@ -20,6 +20,7 @@
 
 package org.matsim.analysis;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 
@@ -32,6 +33,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -48,8 +50,6 @@ public class CalcLegTimes implements EventHandlerAgentDepartureI, EventHandlerAg
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
 
 	private Plans population = null;
-//	private final TObjectDoubleHashMap<String> agentDepartures = new TObjectDoubleHashMap<String>();
-//	private final TObjectIntHashMap<String> agentLegs = new TObjectIntHashMap<String>();
 	private final TreeMap<String, Double> agentDepartures = new TreeMap<String, Double>();
 	private final TreeMap<String, Integer> agentLegs = new TreeMap<String, Integer>();
 	private final TreeMap<String, int[]> legStats = new TreeMap<String, int[]>();
@@ -112,6 +112,23 @@ public class CalcLegTimes implements EventHandlerAgentDepartureI, EventHandlerAg
 
 	public double getAverageTripDuration() {
 		return (this.sumTripDurations / this.sumTrips);
+	}
+
+	public void writeStats(final String filename) {
+		BufferedWriter legStatsFile = null;
+		try {
+			legStatsFile = IOUtils.getBufferedWriter(filename);
+			writeStats(legStatsFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			if (legStatsFile != null) {
+				legStatsFile.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void writeStats(final java.io.Writer out) throws IOException {
