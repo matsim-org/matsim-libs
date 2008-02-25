@@ -41,7 +41,7 @@ import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Plan;
-import org.matsim.socialnetworks.algorithms.SortTreeMapByValue;
+//import org.matsim.socialnetworks.algorithms.SortTreeMapByValue;
 import org.matsim.socialnetworks.interactions.SocializingOpportunity;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;

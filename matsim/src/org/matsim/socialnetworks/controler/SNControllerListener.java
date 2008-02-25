@@ -143,7 +143,8 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		}
 		
 		this.log.info(" Writing out social network for iteration " + snIter + " ...");
-		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
+//		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
+		this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
 		this.log.info(" ... done");
 
 		if (event.getIteration() == this.controler.getLastIteration()) {
