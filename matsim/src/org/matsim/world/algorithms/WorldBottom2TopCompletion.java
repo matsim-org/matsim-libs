@@ -31,6 +31,7 @@ import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappingRule;
 import org.matsim.world.World;
+import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
 public class WorldBottom2TopCompletion extends WorldAlgorithm {
@@ -70,7 +71,27 @@ public class WorldBottom2TopCompletion extends WorldAlgorithm {
 	}
 
 	private final boolean completeFacZoneMapping(final MappingRule m) {
-		Gbl.warningMsg(this.getClass(),"completeFacZoneMapping(final MappingRule m)","TODO: No mapping will be created for rule=" + m);
+		// Iterates through ALL zones and ALL facilities. JH
+		Facilities down_facilities = (Facilities)m.getDownLayer();
+		ZoneLayer up_zones = (ZoneLayer)m.getUpLayer();
+		Iterator<? extends Location> f_it = down_facilities.getLocations().values().iterator();
+		while (f_it.hasNext()) {
+			Facility down_f = (Facility)f_it.next();
+			int dummy = 0;
+			Iterator<? extends Location> z_it = up_zones.getLocations().values().iterator();
+			while(z_it.hasNext()){
+				Zone up_zone = (Zone)z_it.next();
+				if(up_zone.contains(down_f.getCenter())){
+					down_f.addUpMapping(up_zone);
+					up_zone.addDownMapping(down_f);
+					dummy=1;
+				}
+			}
+			if(dummy==0){
+				Gbl.warningMsg(this.getClass(),"completeFacZoneMapping "," No Zone found for "+ down_f);
+			}
+		}
+		//Gbl.warningMsg(this.getClass(),"completeFacZoneMapping(final MappingRule m)","TODO: No mapping will be created for rule=" + m);
 		return true;
 	}
 
