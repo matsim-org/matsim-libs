@@ -165,22 +165,22 @@ public class PlansCreateFromMZ extends PlansAlgorithm {
 		System.out.println("      done.");
 		System.out.println("      => # Persons: " + plans.getPersons().size());
 
-		System.out.println("      identifying single trip day plans...");
-		person_err.clear();
-		for (Person p : plans.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
-			if (plan.getActsLegs().size() < 4) { person_err.put(p.getId(),p); }
-		}
-		System.out.println("      done.");
-		System.out.println("      => # Persons: " + plans.getPersons().size());
-
-		System.out.println("      removing " + person_err.size() + " persons with single trip day plans...");
-		for (Person p : person_err.values()) {
-			plans.getPersons().remove(p.getId());
-			System.out.println("        pid=" + p.getId() + " removed.");
-		}
-		System.out.println("      done.");
-		System.out.println("      => # Persons: " + plans.getPersons().size());
+//		System.out.println("      identifying single trip day plans...");
+//		person_err.clear();
+//		for (Person p : plans.getPersons().values()) {
+//			Plan plan = p.getSelectedPlan();
+//			if (plan.getActsLegs().size() < 4) { person_err.put(p.getId(),p); }
+//		}
+//		System.out.println("      done.");
+//		System.out.println("      => # Persons: " + plans.getPersons().size());
+//
+//		System.out.println("      removing " + person_err.size() + " persons with single trip day plans...");
+//		for (Person p : person_err.values()) {
+//			plans.getPersons().remove(p.getId());
+//			System.out.println("        pid=" + p.getId() + " removed.");
+//		}
+//		System.out.println("      done.");
+//		System.out.println("      => # Persons: " + plans.getPersons().size());
 
 		System.out.println("      identifying non-home-based day plans...");
 		person_err.clear();
@@ -200,27 +200,27 @@ public class PlansCreateFromMZ extends PlansAlgorithm {
 		System.out.println("      done.");
 		System.out.println("      => # Persons: " + plans.getPersons().size());
 
-		System.out.println("      identifying day plans with type 'o'...");
-		person_err.clear();
-		for (Person p : plans.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
-			Iterator<?> act_it = plan.getIteratorAct();
-			while (act_it.hasNext()) {
-				Act act = (Act)act_it.next();
-				if (act.getType().equals("o")) { person_err.put(p.getId(),p); }
-			}
-		}
-		System.out.println("      done.");
-		System.out.println("      => # Persons: " + plans.getPersons().size());
-
-		System.out.println("      removing " + person_err.size() + " persons with day plans with type 'o's...");
-		for (Person p : person_err.values()) {
-			plans.getPersons().remove(p.getId());
-			System.out.println("        pid=" + p.getId() + " removed.");
-		}
-		System.out.println("      done.");
-		System.out.println("      => # Persons: " + plans.getPersons().size());
-
-		System.out.println("    done.");
+//		System.out.println("      identifying day plans with type 'o'...");
+//		person_err.clear();
+//		for (Person p : plans.getPersons().values()) {
+//			Plan plan = p.getSelectedPlan();
+//			Iterator<?> act_it = plan.getIteratorAct();
+//			while (act_it.hasNext()) {
+//				Act act = (Act)act_it.next();
+//				if (act.getType().equals("o")) { person_err.put(p.getId(),p); }
+//			}
+//		}
+//		System.out.println("      done.");
+//		System.out.println("      => # Persons: " + plans.getPersons().size());
+//
+//		System.out.println("      removing " + person_err.size() + " persons with day plans with type 'o's...");
+//		for (Person p : person_err.values()) {
+//			plans.getPersons().remove(p.getId());
+//			System.out.println("        pid=" + p.getId() + " removed.");
+//		}
+//		System.out.println("      done.");
+//		System.out.println("      => # Persons: " + plans.getPersons().size());
+//
+//		System.out.println("    done.");
 	}
 }
