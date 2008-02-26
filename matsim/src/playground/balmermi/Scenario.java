@@ -37,7 +37,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -85,12 +84,12 @@ public abstract class Scenario {
 		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
 		config.plans().setInputFile(input_directory + "plans.xml");
-		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
+		config.plans().setOutputFile(output_directory + "output_plans.xml");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
 		
 		config.counts().setCountsFileName(input_directory + "counts.xml");
-		config.counts().setOutputFile(output_directory + "output_plans.xml.gz");
+		config.counts().setOutputFile(output_directory + "output_counts.xml.gz");
 	}
 
 	//////////////////////////////////////////////////////////////////////

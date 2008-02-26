@@ -39,7 +39,11 @@ import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldCreateRasterLayer;
+import org.matsim.world.algorithms.WorldValidation;
 
 import playground.balmermi.algos.PersonAssignLinkViaFacility;
 
@@ -53,80 +57,88 @@ public class ScenarioParsing {
 
 		System.out.println("TEST RUN 01:");
 
+		Scenario.setUpScenarioConfig();
+
+		Scenario.readWorld();
+		
 //		System.out.println("  reading world xml file... ");
 //		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
 //		worldReader.readFile(Gbl.getConfig().world().getInputFile());
 //		System.out.println("  done.");
 
-		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		System.out.println("  done.");
+//		System.out.println("  reading facilities xml file... ");
+//		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+//		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+//		System.out.println("  done.");
 
-		System.out.println("  reading the network xml file...");
-//		NetworkLayer network = null;
-//		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		System.out.println("  done.");
+//		System.out.println("  reading the network xml file...");
+////		NetworkLayer network = null;
+////		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
+//		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+//		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+//		System.out.println("  done.");
 
 		//		System.out.println("  reading matrices xml file... ");
 //		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton());
 //		reader.readFile(Gbl.getConfig().matrices().getInputFile());
 //		System.out.println("  done.");
 
-		System.out.println("  reding plans xml file... ");
-		Plans plans = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		System.out.println("  done.");
+//		System.out.println("  reding plans xml file... ");
+//		Plans plans = new Plans();
+//		PlansReaderI plansReader = new MatsimPlansReader(plans);
+//		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		// ch.cut.640000.200000.740000.310000.xml
-		CoordI min = new Coord(640000.0,200000.0);
-		CoordI max = new Coord(740000.0,310000.0);
+//		// ch.cut.640000.200000.740000.310000.xml
+//		CoordI min = new Coord(640000.0,200000.0);
+//		CoordI max = new Coord(740000.0,310000.0);
 
-		System.out.println("  running plans modules... ");
-		new PersonRemoveReferences().run(plans);
-		new PlansScenarioCut(min,max).run(plans);
-		System.out.println("  done.");
-
-		//////////////////////////////////////////////////////////////////////
-
-		System.out.println("  running facilities modules... ");
-//		new FacilitiesSetCapacity().run(facilities);
-		new FacilitiesScenarioCut(min,max).run(facilities);
-		System.out.println("  done.");
+//		System.out.println("  running plans modules... ");
+//		new PersonRemoveReferences().run(plans);
+//		new PlansScenarioCut(min,max).run(plans);
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  running network modules... ");
-		network.addAlgorithm(new NetworkSummary());
-		new NetworkScenarioCut(min,max).run(network);
-		network.addAlgorithm(new NetworkSummary());
-		network.addAlgorithm(new NetworkCleaner(false));
-		network.addAlgorithm(new NetworkSummary());
-		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
-		network.addAlgorithm(nwat);
-		network.runAlgorithms();
-		nwat.close();
-		System.out.println("  done.");
+//		System.out.println("  running facilities modules... ");
+////		new FacilitiesSetCapacity().run(facilities);
+//		new FacilitiesScenarioCut(min,max).run(facilities);
+//		System.out.println("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+//		System.out.println("  running network modules... ");
+//		network.addAlgorithm(new NetworkSummary());
+//		new NetworkScenarioCut(min,max).run(network);
+//		network.addAlgorithm(new NetworkSummary());
+//		network.addAlgorithm(new NetworkCleaner(false));
+//		network.addAlgorithm(new NetworkSummary());
+//		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
+//		network.addAlgorithm(nwat);
+//		network.runAlgorithms();
+//		nwat.close();
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running world modules... ");
+		new WorldCreateRasterLayer(1000).run(Gbl.getWorld());
+		new WorldCheck().run(Gbl.getWorld());
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		new WorldValidation().run(Gbl.getWorld());
+		new WorldCheck().run(Gbl.getWorld());
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  running plans modules... ");
-		new PersonAssignLinkViaFacility(network,facilities).run(plans);
-//		new XY2Links(network).run(plans);
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
-		System.out.println("  done.");
+//		System.out.println("  running plans modules... ");
+//		new PersonAssignLinkViaFacility(network,facilities).run(plans);
+////		new XY2Links(network).run(plans);
+//		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+//		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -136,9 +148,10 @@ public class ScenarioParsing {
 
 		//////////////////////////////////////////////////////////////////////
 
-		Scenario.writePlans(plans);
-		Scenario.writeNetwork(network);
-		Scenario.writeFacilities(facilities);
+//		Scenario.writePlans(plans);
+//		Scenario.writeNetwork(network);
+//		Scenario.writeFacilities(facilities);
+		Scenario.writeWorld(Gbl.getWorld());
 		Scenario.writeConfig();
 
 		System.out.println("TEST SUCCEEDED.");
@@ -152,9 +165,6 @@ public class ScenarioParsing {
 	public static void main(final String[] args) {
 
 		Gbl.startMeasurement();
-
-		Gbl.createConfig(args);
-		Gbl.createWorld();
 
 		run();
 
