@@ -110,6 +110,7 @@ public class WorldValidation extends WorldAlgorithm {
 				up_layer.getType().toString();
 		log.info("      mapping rule='" + m + "'");
 		log.info("      current rule='" + curr_rule + "'");
+		if (m.getDownCardinality() == 'm') { return true; }
 		if (!curr_rule.equals(m.toString())) {
 			log.info("      ==> NOT VALID: mapping does not respect the rule!");
 			return false;

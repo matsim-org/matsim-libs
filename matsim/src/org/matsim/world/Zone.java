@@ -61,7 +61,7 @@ public class Zone extends Location {
 		this.setName(null);
 	}
 
-	protected Zone(final ZoneLayer layer, final IdI id, final CoordI center,
+	public Zone(final ZoneLayer layer, final IdI id, final CoordI center,
 	               final CoordI min, final CoordI max, final double area, final String name) {
 		super(layer,id,center);
 		this.setMin(min);

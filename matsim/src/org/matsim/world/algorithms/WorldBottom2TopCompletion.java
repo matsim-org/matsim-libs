@@ -20,6 +20,7 @@
 
 package org.matsim.world.algorithms;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.facilities.Facilities;
@@ -77,21 +78,23 @@ public class WorldBottom2TopCompletion extends WorldAlgorithm {
 		Iterator<? extends Location> f_it = down_facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility down_f = (Facility)f_it.next();
-			int dummy = 0;
+			ArrayList<Zone> zones = new ArrayList<Zone>();
 			Iterator<? extends Location> z_it = up_zones.getLocations().values().iterator();
 			while(z_it.hasNext()){
 				Zone up_zone = (Zone)z_it.next();
 				if(up_zone.contains(down_f.getCenter())){
-					down_f.addUpMapping(up_zone);
-					up_zone.addDownMapping(down_f);
-					dummy=1;
+					zones.add(up_zone);
 				}
 			}
-			if(dummy==0){
+			if(zones.isEmpty()){
 				Gbl.warningMsg(this.getClass(),"completeFacZoneMapping "," No Zone found for "+ down_f);
 			}
+			else {
+				Zone zone = zones.get(Gbl.random.nextInt(zones.size()));
+				down_f.addUpMapping(zone);
+				zone.addDownMapping(down_f);
+			}
 		}
-		//Gbl.warningMsg(this.getClass(),"completeFacZoneMapping(final MappingRule m)","TODO: No mapping will be created for rule=" + m);
 		return true;
 	}
 
