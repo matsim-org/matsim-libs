@@ -20,6 +20,7 @@
 
 package org.matsim.world.algorithms;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
 
@@ -119,14 +120,35 @@ public class WorldCreateRasterLayer extends WorldAlgorithm {
 		
 		System.out.println("      setting up and down mappings...");
 		for (Location upper : zonelayer.getLocations().values()) {
-			System.out.println("        upper zone id: " + upper.getId());
+			ArrayList<Location> lowers = new ArrayList<Location>();
+			boolean found = false;
 			for (Location lower : layer.getLocations().values()) {
 				if (upper.calcDistance(lower.getCenter()) == 0.0) {
+					lowers.add(lower);
 					if (lower.getUpMapping().isEmpty()) {
 						lower.addUpMapping(upper);
 						upper.addDownMapping(lower);
+						found = true;
 					}
 				}
+			}
+			if (!found) {
+				System.out.println("        upper zone id: " + upper.getId() + " no down_zone found yet. Try to steal from another up_zone...");
+				for (Location lower : lowers) {
+					Location other_upper = lower.getUpMapping().firstEntry().getValue();
+					if (other_upper.getDownMapping().size() > 1) {
+						other_upper.getDownMapping().remove(lower.getId());
+						lower.getUpMapping().remove(other_upper.getId());
+						lower.addUpMapping(upper);
+						upper.addDownMapping(lower);
+						System.out.println("        stole down_zone id=" + lower.getId() + " from up_zone id=" + other_upper.getId());
+						found = true;
+						break;
+					}
+				}
+			}
+			if (!found) {
+				System.out.println("        Nothing to steal!");
 			}
 		}
 		System.out.println("      done.");
