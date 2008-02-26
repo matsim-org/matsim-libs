@@ -72,6 +72,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private JFormattedTextField timeField;
 	private int simTime = 0;
 	private boolean synchronizedPlay = true;
+	private boolean liveHost = false;
 
 	String address;
 	private OTFServerRemote host = null;
@@ -124,6 +125,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			
 		} else throw new UnsupportedOperationException("Connctiontype " + type + " not known");
 		
+		if (host != null) liveHost = host.isLive();
 	}
 	
 	private OTFServerRemote openSSL(String hostname, int port) throws InterruptedException, RemoteException, NotBoundException {
@@ -194,7 +196,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		clientQ.createReceiver(connect); 
 		clientQ.getConstData();
 		// if this is a recorded session, build random access index
-		if (!host.isLive() ) buildIndex();
+		if (!liveHost ) buildIndex();
 		simTime = host.getLocalTime();
 		updateTimeLabel();
 		return clientQ;
@@ -221,7 +223,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private void addButtons() {
 		add(createButton("Restart", STOP, "buttonRestart", "restart the server/simulation"));
-		add(createButton(address,CONNECT, null, "Server connection established"));
 		add(createButton("Pause", PAUSE, "buttonPause", "Press to pause server"));
 		add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
 		add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
@@ -233,7 +234,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
 
 		timeField = new JFormattedTextField( new MessageFormat("{0,number,00}-{1,number,00}-{2,number,00}"));
-		timeField.setMaximumSize(new Dimension(75,30));
+		timeField.setMaximumSize(new Dimension(100,30));
+		timeField.setMinimumSize(new Dimension(80,30));
 		timeField.setActionCommand(SET_TIME);
 		timeField.setHorizontalAlignment(JTextField.CENTER);
 		add( timeField );
@@ -252,6 +254,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 //		JSpinner spin = addLabeledSpinner(this, "Lanewidth", model);
 //		spin.setMaximumSize(new Dimension(75,30));
 //		spin.addChangeListener(this);
+		JButton button = createButton(address,CONNECT, null, "Server connection established");
+		add(button);
 	}
 
 	private JButton createButton(String altText, String actionCommand, String imageName, String toolTipText) {
@@ -352,9 +356,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	int gotoTime = 0;
+	private OTFAbortGoto progressBar = null;
 	public void gotoTime() {
 		try {
-			requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER);
+			if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER))
+				requestTimeStep(gotoTime, OTFServerRemote.TimePreference.LATER);
+			progressBar.terminate = true;
+			simTime = host.getLocalTime();
 			updateTimeLabel();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -366,7 +374,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		String newTime = ((JFormattedTextField)event.getSource()).getText();
 		int newTime_s = Time.secFromStr(newTime);
 		stopMovie();
-		new OTFAbortGoto(host, newTime_s).start();
+		progressBar  = new OTFAbortGoto(host, newTime_s);
+		progressBar.start();
 		gotoTime = newTime_s;
 		new Thread (){@Override
 		public void run() {gotoTime();}}.start();
@@ -422,11 +431,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		return spinner;
 	}
 	private void createCheckBoxes() {
-		JCheckBox SynchBox = new JCheckBox(TOGGLE_SYNCH);
-		SynchBox.setMnemonic(KeyEvent.VK_V);
-		SynchBox.setSelected(synchronizedPlay);
-		SynchBox.addItemListener(this);
-		add(SynchBox);
+		if ( liveHost) {
+			JCheckBox SynchBox = new JCheckBox(TOGGLE_SYNCH);
+			SynchBox.setMnemonic(KeyEvent.VK_V);
+			SynchBox.setSelected(synchronizedPlay);
+			SynchBox.addItemListener(this);
+			add(SynchBox);
+		}
 
 //		JCheckBox linkLabelBox = new JCheckBox(TOGGLE_LINK_LABELS);
 //		linkLabelBox.setMnemonic(KeyEvent.VK_L);

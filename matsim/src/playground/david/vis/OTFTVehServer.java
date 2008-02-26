@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
@@ -32,7 +31,6 @@ public class OTFTVehServer implements OTFServerRemote{
 	private static final int BUFFERSIZE = 100000000;
 	BufferedReader reader = null;
 	private double nextTime = -1;
-	private boolean bufferedReading = false;
 	TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
 	private byte[] actBuffer = null;
 
@@ -60,23 +58,7 @@ public class OTFTVehServer implements OTFServerRemote{
 		quad.fillQuadTree(new OTFDefaultNetWriterFactoryImpl());
 		quad.addAdditionalElement(writer);
 		open();
-		if (bufferedReading) {
-			bufferedReading = false; // now temporarily do the real reading
-			double time = nextTime;
-			step();
-			while (time != nextTime) {
-				//DS TODO unsafe, entry could get bigger than int 
-				byte [] buffer = new byte[buf.position()+1];
-				System.arraycopy(actBuffer, 0, buffer, 0, buffer.length);
-				timesteps.put((int)nextTime, buffer); 
-				System.out.println("read timestep: " + nextTime);
-				time = nextTime;
-				step();
-			}
-			finish();
-			nextTime = -1.;
-			bufferedReading = true;
-		}
+		readOneStep();
 	}
 
 	ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
@@ -129,11 +111,12 @@ public class OTFTVehServer implements OTFServerRemote{
 	
 	private boolean finishedReading = false;
 	
-	public void step() {
-		if (bufferedReading) {
-			actBuffer = nextStateBuffer();
-			return;
-		}
+	private int newTime;
+	synchronized private void preCacheTime() {
+		while (this.time <= newTime && !finishedReading)readOneStep();
+	}
+	
+	synchronized public void readOneStep() {
 		if ( finishedReading) return;
 		
 		double actTime = time;
@@ -153,18 +136,30 @@ public class OTFTVehServer implements OTFServerRemote{
 		// check if file is read to end
 		if(time == actTime)finishedReading = true;
 
-		// now write this into stream
-		nextTime = actTime;
-		buf.position(0);
-		quad.writeDynData(null, buf);
-		actBuffer = buf.array();
+		synchronized (buf) {
+			// now write this into stream
+			nextTime = actTime;
+			buf.position(0);
+			quad.writeDynData(null, buf);
+			
+			byte [] buffer = new byte[buf.position()+1];
+			System.arraycopy(buf.array(), 0, buffer, 0, buffer.length);
+			timesteps.put((int)nextTime, buffer);
+			actBuffer = buffer;
+		}
 		
+	}
+	
+	public void step() throws RemoteException {
+		requestNewTime((int)(nextTime+1), TimePreference.LATER);
 	}
 
 	public void open() {
-		
+		Gbl.startMeasurement();
 		try {
 			reader = IOUtils.getBufferedReader(this.vehFileName);
+//			reader = new BufferedReader(new FileReader(this.vehFileName),500000);
+//			reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(this.vehFileName),50000000))));
 			reader.readLine(); // Read the commentary line
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -178,6 +173,7 @@ public class OTFTVehServer implements OTFServerRemote{
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
+	Gbl.printElapsedTime();
 	}
 	
 	
@@ -212,24 +208,12 @@ public class OTFTVehServer implements OTFServerRemote{
 	public byte[] getQuadDynStateBuffer(String id, Rect bounds)
 			throws RemoteException {
 		if (nextTime == -1) {
-			step();
+			throw new RemoteException("nextTime == -1 in OTFTVehServer");
 		}
-		return buf.array();
+		return timesteps.get((int)nextTime);
 	}
 
-	public byte[] nextStateBuffer() {
-		if (nextTime == -1. && bufferedReading)nextTime = timesteps.firstKey();
-		
-		byte [] buffer = timesteps.get((int)nextTime);
-		int time = 0;
-		Iterator<Integer> it =  timesteps.keySet().iterator();
-		while(it.hasNext() && time <= nextTime) time = it.next();
-		if (time == nextTime) {
-			time = timesteps.firstKey();
-		}
-		nextTime = time;
-		return buffer;
-	}
+
 	public byte[] getStateBuffer() throws RemoteException {
 		throw new RemoteException("getStateBuffer not implemented for OTFTVehServer");
 	}
@@ -271,8 +255,40 @@ public class OTFTVehServer implements OTFServerRemote{
 	}
 
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		int lastTime = -1;
+		int foundTime = -1;
+		newTime = time;
+		
+		if (timesteps.lastKey() < time && searchDirection == TimePreference.LATER) {
+			if(finishedReading ) return false;
+			else newTime = (int)this.time;
+		}
+
+		preCacheTime();
+
+		// C else search in buffered timesteps
+		for(Integer timestep : timesteps.keySet()) {
+			if (searchDirection == TimePreference.EARLIER){
+				if(timestep >= newTime) {
+					// take next lesser time than requested, if not exacty the same
+					foundTime = lastTime;
+					break;
+				}
+			} else {
+				if(timestep >= newTime) {
+					foundTime = timestep; //the exact time or one biggers
+					break;
+				}
+			}
+			lastTime = timestep;
+		}
+		if (foundTime == -1) return false;
+		
+		nextTime = foundTime;
+		actBuffer = null;
+		return true;
 	}
 
 }
+
+

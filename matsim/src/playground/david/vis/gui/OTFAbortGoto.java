@@ -10,7 +10,7 @@ import playground.david.vis.interfaces.OTFServerRemote;
 import playground.david.vis.interfaces.OTFServerRemote.TimePreference;
 
 public class OTFAbortGoto extends Thread  {
-	boolean terminate = false;
+	public boolean terminate = false;
 	private final OTFServerRemote host;
 	private final int toTime;
 	private ProgressMonitor progressMonitor;
@@ -46,7 +46,7 @@ public class OTFAbortGoto extends Thread  {
 				if ( actTime >= toTime || progressMonitor.isCanceled()) terminate = true;
 				//System.out.println("Loc time " + actTime);
 				if (host.getLocalTime() < toTime && terminate == true) {
-					host.requestNewTime(actTime, TimePreference.LATER);
+					host.requestNewTime(actTime, TimePreference.EARLIER);
 				}
 			} catch (Exception e) {
 				terminate = true;;

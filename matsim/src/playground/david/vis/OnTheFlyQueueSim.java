@@ -143,7 +143,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		world.setEvents(events);
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
-		config.simulation().setEndTime(Time.parseTime("07:02:00"));
+		//config.simulation().setEndTime(Time.parseTime("07:02:00"));
 		config.network().setInputFile(netFileName);
 
 		config.simulation().setSnapshotFormat("none");
