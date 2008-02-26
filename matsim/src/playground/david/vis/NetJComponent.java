@@ -89,6 +89,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		@Override
 		public void scaleNetwork(float scale){
 			this.scale = scale;
+			System.out.println("Scalee " + this.scale);
 			super.scaleNetwork(scale);
 		}
 		
@@ -101,12 +102,13 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		 */
 		@Override
 		public float scaleNetwork(Rectangle destrect, float factor) {
-			this.scale = factor;
-			return super.scaleNetwork(destrect, factor);
+			this.scale = super.scaleNetwork(destrect, factor);
+			System.out.println("Scalee " + this.scale);
+			return this.scale;
 		}
 
 	}
-	private static final Color netColor = new Color(128,128,255,128);
+	private static final Color netColor = new Color(180,180,210,128);
 	private static final long serialVersionUID = 1L;
 
 	private static final double BORDER_FACTOR = 0.0;
@@ -300,7 +302,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		public void paint(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
 
-        boolean useAntiAliasing = false;
+        boolean useAntiAliasing = true;
         
 		if (useAntiAliasing ) {
         	g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
@@ -320,8 +322,10 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		g2.setTransform(linkTransform);
 
 		sceneGraph.draw();
+		g2.setTransform(new AffineTransform());
+		mouseMan.drawElements(g2);
 		g2.setTransform(originalTransform);
-    }
+   }
 
 	public Component getComponent() {
 		return networkScrollPane;
@@ -388,10 +392,10 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			poly.addPoint((int)(quad[1].x), (int)(quad[1].y));
 			poly.addPoint((int)(quad[3].x), (int)(quad[3].y));
 			poly.addPoint((int)(quad[2].x), (int)(quad[2].y));
-			display.setColor(Color.WHITE);
-			//display.fill(poly);
-			display.setColor(Color.BLUE);
-			display.draw(poly);
+			display.setColor(netColor);
+			display.fill(poly);
+			//display.setColor(Color.BLUE);
+			//display.draw(poly);
 		}
 	}
 	
@@ -466,6 +470,16 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 		public int button = 0;
 
+		public void drawElements(Graphics2D g2) {
+			if (currentRect != null) {
+				g2.setColor(Color.GREEN);
+				g2.drawRect(currentRect.x,
+						currentRect.y, currentRect.width, currentRect.height);
+				}
+				
+			
+		}
+		
 		@Override
 		public void mousePressed(MouseEvent e) {
 			int x = e.getX();
@@ -522,8 +536,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		void updateSize(MouseEvent e) {
 			currentRect = new Rectangle(start);
 			currentRect.add(e.getX(), e.getY());
-			networkScrollPane.getGraphics().drawRect(currentRect.x,
-					currentRect.y, currentRect.width, currentRect.height);
+			networkScrollPane.invalidate();
 			networkScrollPane.repaint();
 		}
 
@@ -533,12 +546,12 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 		private void pressed_ZOOM_OUT() {
 			float scale = networkScrollPane.getScale() / 1.42f;
-			networkScrollPane.scaleNetwork(scale);
+			if (scale > 0.02) networkScrollPane.scaleNetwork(scale);
 		}
 
 		private void pressed_ZOOM_IN() {
 			float scale = networkScrollPane.getScale() * 1.42f;
-			networkScrollPane.scaleNetwork(scale);
+			if ( scale < 100) networkScrollPane.scaleNetwork(scale);
 		}
 		
 		public void mouseWheelMoved(MouseWheelEvent e) {
