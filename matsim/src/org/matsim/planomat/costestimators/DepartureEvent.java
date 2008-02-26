@@ -24,17 +24,18 @@ import org.matsim.basic.v01.Id;
 
 public class DepartureEvent {
 
-	private Id agentId;
+	private final Id agentId;
 	//private String legId;
 
-	public DepartureEvent(Id agentId, String legId) {
+	public DepartureEvent(final Id agentId, final String legId) {
 		super();
 		this.agentId = agentId;
 		//this.legId = legId;
 	}
 
 	@Override
-	public boolean equals(Object arg0) {
+	public boolean equals(final Object arg0) {
+		if (!(arg0 instanceof DepartureEvent)) return false;
 
 		DepartureEvent event = (DepartureEvent)arg0;
 //		return (this.agentId.equals(event.agentId) && this.legId.equals(event.legId));
@@ -44,12 +45,12 @@ public class DepartureEvent {
 	@Override
 	public String toString() {
 //		return "[[agentId = " + agentId + "][legId = " + legId + "]]";
-		return "[[agentId = " + agentId + "]";
+		return "[[agentId = " + this.agentId + "]";
 	}
 
 	@Override
 	public int hashCode() {
-		return agentId.hashCode();
+		return this.agentId.hashCode();
 	}
-	
+
 }

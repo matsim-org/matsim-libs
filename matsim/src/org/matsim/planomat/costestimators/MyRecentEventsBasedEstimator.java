@@ -40,17 +40,17 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 		super();
 	}
 
-	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
-	private HashMap<DepartureEvent, IdI> departureEventsLinkIDs = new HashMap<DepartureEvent, IdI>();
+	private final HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
+	private final HashMap<DepartureEvent, IdI> departureEventsLinkIDs = new HashMap<DepartureEvent, IdI>();
 
-	private class LegTravelTimeEntry {
+	private static class LegTravelTimeEntry {
 
-		private IdI agentId;
-		private IdI originLocationId;
-		private IdI destinationLocationId;
-		private String mode;
+		private final IdI agentId;
+		private final IdI originLocationId;
+		private final IdI destinationLocationId;
+		private final String mode;
 
-		public LegTravelTimeEntry(IdI agentId, IdI originLocationId, IdI destinationLocationId, String mode) {
+		public LegTravelTimeEntry(final IdI agentId, final IdI originLocationId, final IdI destinationLocationId, final String mode) {
 			super();
 			this.agentId = agentId;
 			this.originLocationId = originLocationId;
@@ -59,7 +59,8 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 		}
 
 		@Override
-		public boolean equals(Object arg0) {
+		public boolean equals(final Object arg0) {
+			if (!(arg0 instanceof LegTravelTimeEntry)) return false;
 
 			LegTravelTimeEntry entry = (LegTravelTimeEntry)arg0;
 
@@ -73,56 +74,57 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 		@Override
 		public int hashCode() {
 
-			// I'm sure the computation of this is very expensive (string concatenation), and should be replaced.
+			// TODO [KM] I'm sure the computation of this is very expensive (string concatenation), and should be replaced.
+
+			// Well, as all the members are final, why not calculate the hashCode once and cache it? -marcel/26feb08
 
 			return (this.agentId.toString() + this.originLocationId.toString() + this.destinationLocationId + this.mode).hashCode();
 		}
 
 		@Override
 		public String toString() {
-			return new String(
-					"[ agentId = " + this.agentId +
+			return "[ agentId = " + this.agentId +
 					" ][ " + this.originLocationId +
 					" ][ " + this.destinationLocationId +
-					" ][ " + this.mode + " ]");
+					" ][ " + this.mode + " ]";
 		}
 
 	}
 
-	private HashMap<LegTravelTimeEntry, Double> legTravelTimeEstimations = new HashMap<LegTravelTimeEntry, Double>();
+	private final HashMap<LegTravelTimeEntry, Double> legTravelTimeEstimations = new HashMap<LegTravelTimeEntry, Double>();
 
-	public void reset(int iteration) {
+	public void reset(final int iteration) {
 	}
 
 	public double getLegTravelTimeEstimation(
-			IdI personId,
-			double departureTime,
-			Location origin,
-			Location destination,
-			Route route,
-			String mode) {
-		return legTravelTimeEstimations.get(new LegTravelTimeEntry(personId, origin.getId(), destination.getId(), "car"));
+			final IdI personId,
+			final double departureTime,
+			final Location origin,
+			final Location destination,
+			final Route route,
+			final String mode) {
+		return this.legTravelTimeEstimations.get(new LegTravelTimeEntry(personId, origin.getId(), destination.getId(), "car"));
 	}
 
-	public void handleEvent(EventAgentDeparture event) {
+	public void handleEvent(final EventAgentDeparture event) {
 
 		DepartureEvent depEvent = new DepartureEvent(
 				new Id(event.agentId),
 				event.getAttributes().getValue("leg"));
 
-		departureEventsTimes.put(depEvent, event.time);
-		departureEventsLinkIDs.put(depEvent, new Id(event.linkId));
+		this.departureEventsTimes.put(depEvent, event.time);
+		this.departureEventsLinkIDs.put(depEvent, new Id(event.linkId));
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(final EventAgentArrival event) {
 
 		Id agentId = new Id(event.agentId);
 		String legId = event.getAttributes().getValue("leg");
 
 		DepartureEvent removeMe = new DepartureEvent(agentId, legId);
 
-		Double departureTime = departureEventsTimes.remove(removeMe);
-		IdI departureLinkId = departureEventsLinkIDs.remove(removeMe);
+		Double departureTime = this.departureEventsTimes.remove(removeMe);
+		IdI departureLinkId = this.departureEventsLinkIDs.remove(removeMe);
 
 		Double travelTime = event.time - departureTime;
 
@@ -130,8 +132,8 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 		this.legTravelTimeEstimations.put(newLtte, travelTime);
 	}
 
-	public void handleEvent(EventAgentStuck event) {
-		// TODO Auto-generated method stub
+	public void handleEvent(final EventAgentStuck event) {
+		// TODO [KM] Auto-generated method stub
 
 	}
 
