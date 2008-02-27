@@ -45,6 +45,7 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Plan;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree.Rect;
+import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
 
 import playground.david.vis.data.OTFDefaultNetWriterFactoryImpl;
 import playground.david.vis.data.OTFNetWriterFactory;
@@ -62,7 +63,7 @@ public class OTFQuadFileHandler {
 	// minor version increase does not break compatibility
 	public static final int MINORVERSION = 3;
 	
-	public static class Writer {
+	public static class Writer implements SimStateWriterI{
 		protected QueueNetworkLayer net = null;
 		protected OTFServerQuad quad = null;
 		private final String fileName;
