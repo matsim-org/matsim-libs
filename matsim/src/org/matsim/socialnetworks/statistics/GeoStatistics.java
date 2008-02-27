@@ -56,7 +56,7 @@ public class GeoStatistics {
 			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			if(locVertex.containsKey(aLoc)){
 				v=locVertex.get(aLoc);
-				System.out.println("  ### GEOSTAT: Graph contains vertex "+ v+" "+aLoc.getId());
+//				System.out.println("  ### GEOSTAT: Graph contains vertex "+ v+" "+aLoc.getId());
 			}else{
 				v = new UndirectedSparseVertex();
 				System.out.println("   ### GEOSTAT: Making new vertex "+v+" "+aLoc.getId());
