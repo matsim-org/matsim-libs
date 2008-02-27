@@ -48,9 +48,9 @@ import org.matsim.utils.io.IOUtils;
  * @author ychen
  * 
  */
-public class PtcheckControler extends Controler {
+public class PtcheckControler2 extends Controler {
 
-	public PtcheckControler(String[] configFileName) {
+	public PtcheckControler2(String[] configFileName) {
 		super(configFileName);
 	}
 
@@ -73,7 +73,7 @@ public class PtcheckControler extends Controler {
 			Controler ctl = event.getControler();
 			Config cf = ctl.getConfig();
 			try {
-				ctl.addControlerListener(new PtRate(ctl.getPopulation(),
+				ctl.addControlerListener(new PtRate2(ctl.getPopulation(),
 						getOutputFilename("PtRate.txt"),
 						ctl.getLastIteration(), cf.getParam("planCalcScore",
 								"traveling"), cf.getParam("planCalcScore",
@@ -188,8 +188,8 @@ public class PtcheckControler extends Controler {
 	 *            the path of config-file
 	 */
 	public static void main(final String[] args) {
-		final PtcheckControler controler;
-		controler = new PtcheckControler(args);
+		final PtcheckControler2 controler;
+		controler = new PtcheckControler2(args);
 		controler.addControlerListener(new PtCheckListener());
 		controler.run();
 		System.exit(0);

@@ -25,23 +25,50 @@ package playground.yu.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.config.Config;
 import org.matsim.events.EventAgentWait2Link;
+import org.matsim.events.Events;
+import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
+import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.plans.Act;
+import org.matsim.plans.Leg;
+import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.utils.io.IOUtils;
+import org.matsim.world.World;
 
 /**
  * @author ychen
  * 
  */
 public class Wait2Link_2Acts1LinkTest {
-	public static class SameActLoc extends PersonAlgorithm {
+	public static class AgentLinkPair {
+		private String agentId;
+		private String linkId;
+		private int legNr;
 
+		public AgentLinkPair(String agentId, String linkId, int legNr) {
+			this.agentId = agentId;
+			this.linkId = linkId;
+			this.legNr = legNr;
+		}
+
+		public String toString() {
+			return legNr + "\t" + agentId + "\t" + linkId + "\n";
+		}
+	}
+
+	public static class SameActLoc extends PersonAlgorithm {
 		private boolean actsAtSameLink;
 		private int actLocCount = 0, personCount = 0;
 		/**
@@ -51,31 +78,35 @@ public class Wait2Link_2Acts1LinkTest {
 		 *            linkId, which indicates a link, where 2 following
 		 *            activities happened.
 		 */
-		private Map<String, String> agentLinks = new HashMap<String, String>();
+		private Set<AgentLinkPair> agentLinks = new HashSet<AgentLinkPair>();
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void run(Person person) {
 			actsAtSameLink = false;
 			String tmpLinkId = null;
 			String nextTmpLinkId = null;
-			int i = 0;
 			if (person != null) {
 				Plan p = person.getSelectedPlan();
-				// System.out.println("person id: " + person.getId());
 				if (p != null) {
-					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
-						nextTmpLinkId = ai.next().getLink().getId().toString();
-						if (tmpLinkId != null && nextTmpLinkId != null) {
-							if (tmpLinkId.equals(nextTmpLinkId)) {
-								actLocCount++;
-								actsAtSameLink = true;
-								agentLinks.put(person.getId().toString(),
-										tmpLinkId);
+					List actsLegs = p.getActsLegs();
+					int max = actsLegs.size();
+					for (int i = 0; i < max; i++) {
+						if (i % 2 == 0) {
+							Act a = (Act) actsLegs.get(i);
+							nextTmpLinkId = a.getLink().getId().toString();
+							if (tmpLinkId != null && nextTmpLinkId != null) {
+								if (tmpLinkId.equals(nextTmpLinkId)) {
+									actLocCount++;
+									actsAtSameLink = true;
+									agentLinks.add(new AgentLinkPair(person
+											.getId().toString(), tmpLinkId,
+											((Leg) actsLegs.get(i - 1))
+													.getNum()));
+								}
 							}
+							tmpLinkId = nextTmpLinkId;
 						}
-						tmpLinkId = nextTmpLinkId;
-						// System.out.println(tmpLinkId);
-						i++;
 					}
 					if (actsAtSameLink) {
 						personCount++;
@@ -87,13 +118,27 @@ public class Wait2Link_2Acts1LinkTest {
 		/**
 		 * @return the agentLinks
 		 */
-		public Map<String, String> getAgentLinks() {
+		public Set<AgentLinkPair> getAgentLinks() {
 			return agentLinks;
+		}
+
+		/**
+		 * @return the actLocCount
+		 */
+		public int getActLocCount() {
+			return actLocCount;
+		}
+
+		/**
+		 * @return the personCount
+		 */
+		public int getPersonCount() {
+			return personCount;
 		}
 	}
 
 	public static class Wait2Link implements EventHandlerAgentWait2LinkI {
-		private Map<String, String> linksMap;
+		private Set<AgentLinkPair> agentLinksPairs;
 		private BufferedWriter writer;
 		private int overlapCount;
 
@@ -102,11 +147,12 @@ public class Wait2Link_2Acts1LinkTest {
 		 *            a map<String agentId,String linkId> of the agentId-linkId
 		 *            pair from SameActLoc
 		 */
-		public Wait2Link(Map<String, String> linkIds, BufferedWriter writer) {
-			linksMap = linkIds;
-			this.writer = writer;
+		public Wait2Link(Set<AgentLinkPair> agentLinkPairs,
+				String outputFilename) {
+			agentLinksPairs = agentLinkPairs;
 			try {
-				writer.write("agentId\tLinkId\n");
+				writer = IOUtils.getBufferedWriter(outputFilename);
+				writer.write("time\tagentId\tLinkId\n");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -114,20 +160,31 @@ public class Wait2Link_2Acts1LinkTest {
 		}
 
 		public void handleEvent(EventAgentWait2Link event) {
-			String agentId = event.agentId;
-			String linkId = linksMap.get(agentId);
-			if (linkId != null) {
-				try {
-					writer.write(agentId + "\t" + linkId + "\n");
+			for (AgentLinkPair alp : agentLinksPairs) {
+				if (alp.agentId.equals(event.agentId)
+						&& alp.linkId.equals(event.linkId)
+						&& alp.legNr == event.legId) {
+					try {
+						writer.write(alp.toString());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 					overlapCount++;
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
 			}
 		}
 
 		public void reset(int iteration) {
-			linksMap.clear();
+			agentLinksPairs.clear();
+		}
+
+		public void end() {
+			try {
+				writer.write("-->overlapCount = " + overlapCount);
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -142,6 +199,48 @@ public class Wait2Link_2Acts1LinkTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO ... System.out.println("overlapCount = "+overlapCount++);
+		Gbl.startMeasurement();
+
+		final String netFilename = "../data/ivtch/input/network.xml";
+		final String plansFilename = "../data/ivtch/carPt_opt_run266/ITERS/it.100/100.plans.xml.gz";
+		final String eventsFilename = "../data/ivtch/carPt_opt_run266/ITERS/it.100/100.events.txt.gz";
+		final String outputFilename = "../data/ivtch/Wait2Links_2Acts1Link.txt.gz";
+
+		@SuppressWarnings("unused")
+		Config config = Gbl.createConfig(null);
+		World world = Gbl.getWorld();
+
+		QueueNetworkLayer network = new QueueNetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+		world.setNetworkLayer(network);
+		Plans population = new Plans();
+
+		SameActLoc sal = new SameActLoc();
+		population.addAlgorithm(sal);
+
+		System.out.println("-->reading plansfile: " + plansFilename);
+		new MatsimPlansReader(population).readFile(plansFilename);
+		world.setPopulation(population);
+
+		population.runAlgorithms();
+
+		System.out.println("there is " + sal.getPersonCount() + " persons, "
+				+ sal.getActLocCount() + " 2Acts1Link-s!");
+
+		Events events = new Events();
+
+		Wait2Link w2l = new Wait2Link(sal.getAgentLinks(), outputFilename);
+		events.addHandler(w2l);
+
+		System.out.println("-> reading eventsfile: " + eventsFilename);
+		new MatsimEventsReader(events).readFile(eventsFilename);
+
+		w2l.end();
+
+		System.out.println("-> overlapCount = " + w2l.overlapCount);
+		System.out.println("-> Done!");
+
+		Gbl.printElapsedTime();
+		System.exit(0);
 	}
 }

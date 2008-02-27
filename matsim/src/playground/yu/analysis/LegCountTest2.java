@@ -44,13 +44,15 @@ import org.matsim.world.World;
  * @author ychen
  * 
  */
-public class LegCountTest {
+public class LegCountTest2 {
 	public static class LegCount extends PersonAlgorithm {
 		private BufferedWriter writer;
 		// private BasicLeg tmpLeg;
 		// private boolean actsAtSameLink;
 		private int carUserCount = 0, carLegCount = 0, ptUserCount = 0,
-				ptLegCount = 0;
+				ptLegCount = 0, licensedCarUserCount = 0,
+				licensedPtUserCount = 0, licensedCarLegCount = 0,
+				licensedPtLegCount = 0;
 
 		public LegCount(String filename) {
 			try {
@@ -67,12 +69,27 @@ public class LegCountTest {
 		public void end() {
 			try {
 				writer.write("------------------------------------\ncarUser:\t"
-						+ carUserCount + ";\tcarLegs:\t" + carLegCount + ";\t"
+						+ carUserCount
+						+ ";\tcarLegs:\t"
+						+ carLegCount
+						+ ";\t"
 						+ (double) carLegCount / (double) carUserCount
-						+ "\tLegs pro carUser." + "\nptUser:\t" + ptUserCount
-						+ ";\tptLegs:\t" + ptLegCount + ";\t"
+						+ "\tLegs pro carUser;\tlicensedCarUser:\t"
+						+ licensedCarUserCount
+						+ ";\tlicensedCarLegs:\t"
+						+ licensedCarLegCount
+						+ ";\t"
+						+ (double) licensedCarLegCount
+								/ (double) licensedCarUserCount
+						+ "\tLegs pro licensedCarUser;\n" + "\nptUser:\t"
+						+ ptUserCount + ";\tptLegs:\t" + ptLegCount + ";\t"
 						+ (double) ptLegCount / (double) ptUserCount
-						+ "\tLegs pro ptUser.");
+						+ "\tLegs pro ptUser;\tlicensedPtUser:\t"
+						+ licensedPtUserCount + ";\tlicensedPtLegs:\t"
+						+ licensedPtLegCount + ";\t"
+						+ (double) licensedPtLegCount
+						/ (double) licensedPtUserCount
+						+ "\tLegs pro licensedPtUser.");
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
@@ -94,6 +111,11 @@ public class LegCountTest {
 			carLegCount += legsNumber;
 		}
 
+		private void carLicensedAppend(int legsNumber) {
+			licensedCarUserCount++;
+			licensedCarLegCount += legsNumber;
+		}
+
 		@Override
 		public void run(Person person) {
 			Plan p = person.getSelectedPlan();
@@ -109,13 +131,21 @@ public class LegCountTest {
 				if (planType != null) {
 					if (planType.equals("car")) {
 						carAppend(nLegs);
+						if (person.getLicense().equals("yes")) {
+							carLicensedAppend(nLegs);
+						}
 					} else if (planType.equals("pt")) {
 						ptUserCount++;
 						ptLegCount += nLegs;
+						if (person.getLicense().equals("yes")) {
+							licensedPtUserCount++;
+							licensedPtLegCount += nLegs;
+						}
 					}
-				} else {
-					carAppend(nLegs);
 				}
+				// else {
+				// carAppend(nLegs);
+				// }
 			}
 		}
 	}
@@ -128,11 +158,11 @@ public class LegCountTest {
 		final String netFilename = "../data/ivtch/input/network.xml";
 		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
 		// final String plansFilename = "../runs/run264/100.plans.xml.gz";
-		final String plansFilename = "../data/ivtch/run264optChg_run269/ITERS/it.100/100.plans.xml.gz";
+		final String plansFilename = "../data/ivtch/run271/ITERS/it.100/100.plans.xml.gz";
 		// final String plansFilename =
 		// "./test/yu/equil_test/output/100.plans.xml.gz";
 		// final String outFilename = "./output/legsCount.txt.gz";
-		final String outFilename = "../data/ivtch/run264optChg_run269/legsCount.txt";
+		final String outFilename = "../data/ivtch/run271/legsCount.txt";
 
 		Gbl.startMeasurement();
 		@SuppressWarnings("unused")

@@ -48,7 +48,8 @@ public class SameActLocTest {
 	public static class SameActLoc extends PersonAlgorithm {
 		private BufferedWriter writer;
 		private boolean actsAtSameLink;
-		private int actLocCount = 0, personCount = 0;
+		private int actLocCount = 0, personCount = 0, carActLocCount = 0,
+				ptActLocCount = 0;
 
 		public SameActLoc(String filename) {
 			try {
@@ -67,6 +68,11 @@ public class SameActLocTest {
 				writer
 						.write("------------------------------------\nacts at same link: "
 								+ actLocCount
+								+ "\namong them "
+								+ carActLocCount
+								+ " car-legs and "
+								+ ptActLocCount
+								+ " pt-legs;"
 								+ "\npersons, who has such acts: "
 								+ personCount);
 				writer.close();
@@ -83,13 +89,20 @@ public class SameActLocTest {
 			int i = 0;
 			if (person != null) {
 				Plan p = person.getSelectedPlan();
-				// System.out.println("person id: " + person.getId());
 				if (p != null) {
+					String planType = p.getType();
 					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
 						nextTmpLinkId = ai.next().getLink().getId().toString();
 						if (tmpLinkId != null && nextTmpLinkId != null) {
 							if (tmpLinkId.equals(nextTmpLinkId)) {
 								actLocCount++;
+								if (planType != null) {
+									if (planType.equals("car")) {
+										carActLocCount++;
+									} else if (planType.equals("pt")) {
+										ptActLocCount++;
+									}
+								}
 								actsAtSameLink = true;
 								try {
 									writer.write(person.getId().toString()
@@ -102,7 +115,6 @@ public class SameActLocTest {
 							}
 						}
 						tmpLinkId = nextTmpLinkId;
-						// System.out.println(tmpLinkId);
 						i++;
 					}
 					if (actsAtSameLink) {
@@ -117,10 +129,10 @@ public class SameActLocTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		//		final String netFilename = "./test/yu/ivtch/input/network.xml";
+		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/ivtch/input/network.xml";
 		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
-		//		final String plansFilename = "../runs/run266/100.plans.xml.gz";
+		// final String plansFilename = "../runs/run266/100.plans.xml.gz";
 		final String plansFilename = "../data/ivtch/carPt_opt_run266/ITERS/it.100/100.plans.xml.gz";
 		// final String plansFilename =
 		// "./test/yu/equil_test/output/100.plans.xml.gz";

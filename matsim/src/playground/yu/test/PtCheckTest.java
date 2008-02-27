@@ -30,7 +30,7 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.world.World;
 
-import playground.yu.analysis.PtCheck;
+import playground.yu.analysis.PtCheck2;
 
 public class PtCheckTest {
 
@@ -51,7 +51,7 @@ public class PtCheckTest {
 
 		Plans population = new Plans();
 		try {
-			PtCheck pc = new PtCheck(ptcheckFilename);
+			PtCheck2 pc = new PtCheck2(ptcheckFilename);
 
 			population.addAlgorithm(pc);
 			new MatsimPlansReader(population).readFile(plansFilename);

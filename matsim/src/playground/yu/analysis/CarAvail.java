@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeModalSplitTest.java
+ * CarAvail.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,14 +27,12 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicPlan.LegIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
@@ -44,77 +42,71 @@ import org.matsim.world.World;
  * @author ychen
  * 
  */
-public class LegCountTest {
-	public static class LegCount extends PersonAlgorithm {
-		private BufferedWriter writer;
-		// private BasicLeg tmpLeg;
-		// private boolean actsAtSameLink;
-		private int carUserCount = 0, carLegCount = 0, ptUserCount = 0,
-				ptLegCount = 0;
+public class CarAvail extends PersonAlgorithm {
+	private int never_hasCar, always_hasCar, sometimes_hasCar,
+			never_but_car_plan, never_but_pt_plan, always_but_car_plan,
+			always_but_pt_plan, sometimes_but_car_plan, sometimes_but_pt_plan;
 
-		public LegCount(String filename) {
-			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("personId\tLegNumber\n");
-				writer.flush();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	/**
+	 * 
+	 */
+	public CarAvail() {
+		never_but_car_plan = 0;
+		never_but_pt_plan = 0;
+		never_hasCar = 0;
+		always_but_car_plan = 0;
+		always_but_pt_plan = 0;
+		always_hasCar = 0;
+		sometimes_but_car_plan = 0;
+		sometimes_but_pt_plan = 0;
+		sometimes_hasCar = 0;
+	}
+
+	public void write(String outputFilename) {
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(outputFilename);
+			writer.write("\tpersons\tcar-plans\tpt-plans\nnever\t"
+					+ never_hasCar + "\t" + never_but_car_plan + "\t"
+					+ never_but_pt_plan + "\nalways\t" + always_hasCar + "\t"
+					+ always_but_car_plan + "\t" + always_but_pt_plan
+					+ "\nsometimes\t" + sometimes_hasCar + "\t"
+					+ sometimes_but_car_plan + "\t" + sometimes_but_pt_plan
+					+ "\n");
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+	}
 
-		public void end() {
-			try {
-				writer.write("------------------------------------\ncarUser:\t"
-						+ carUserCount + ";\tcarLegs:\t" + carLegCount + ";\t"
-						+ (double) carLegCount / (double) carUserCount
-						+ "\tLegs pro carUser." + "\nptUser:\t" + ptUserCount
-						+ ";\tptLegs:\t" + ptLegCount + ";\t"
-						+ (double) ptLegCount / (double) ptUserCount
-						+ "\tLegs pro ptUser.");
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		public static int getLegsNumber(Plan selectedPlan) {
-			int i = 0;
-			for (LegIterator li = selectedPlan.getIteratorLeg(); li.hasNext();) {
-				i = li.next().getNum();
-			}
-			i++;
-			return i;
-		}
-
-		private void carAppend(int legsNumber) {
-			carUserCount++;
-			carLegCount += legsNumber;
-		}
-
-		@Override
-		public void run(Person person) {
-			Plan p = person.getSelectedPlan();
-			if (p != null) {
-				int nLegs = getLegsNumber(p);
-				try {
-					writer.write(person.getId() + "\t" + nLegs + "\n");
-					writer.flush();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				String planType = p.getType();
-				if (planType != null) {
+	@Override
+	public void run(Person person) {
+		String carAvail = person.getCarAvail();
+		if (carAvail != null) {
+			String planType = person.getSelectedPlan().getType();
+			if (planType != null) {
+				if (carAvail.equals("never")) {
+					never_hasCar++;
 					if (planType.equals("car")) {
-						carAppend(nLegs);
+						never_but_car_plan++;
 					} else if (planType.equals("pt")) {
-						ptUserCount++;
-						ptLegCount += nLegs;
+						never_but_pt_plan++;
 					}
-				} else {
-					carAppend(nLegs);
+				} else if (carAvail.equals("always")) {
+					always_hasCar++;
+					if (planType.equals("pt")) {
+						always_but_pt_plan++;
+					} else if (planType.equals("car")) {
+						always_but_car_plan++;
+					}
+				} else if (carAvail.equals("sometimes")) {
+					sometimes_hasCar++;
+					if (planType.equals("pt")) {
+						sometimes_but_pt_plan++;
+					} else if (planType.equals("car")) {
+						sometimes_but_car_plan++;
+					}
 				}
 			}
 		}
@@ -124,17 +116,12 @@ public class LegCountTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// final String netFilename = "./test/yu/ivtch/input/network.xml";
-		final String netFilename = "../data/ivtch/input/network.xml";
-		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
-		// final String plansFilename = "../runs/run264/100.plans.xml.gz";
-		final String plansFilename = "../data/ivtch/run264optChg_run269/ITERS/it.100/100.plans.xml.gz";
-		// final String plansFilename =
-		// "./test/yu/equil_test/output/100.plans.xml.gz";
-		// final String outFilename = "./output/legsCount.txt.gz";
-		final String outFilename = "../data/ivtch/run264optChg_run269/legsCount.txt";
-
 		Gbl.startMeasurement();
+
+		final String netFilename = "../data/ivtch/input/network.xml";
+		final String plansFilename = "../data/ivtch/run271/ITERS/it.100/100.plans.xml.gz";
+		final String outputFilename = "../data/ivtch/run271/CarAvail.txt";
+
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(null);
 
@@ -146,8 +133,8 @@ public class LegCountTest {
 
 		Plans population = new Plans();
 
-		LegCount lc = new LegCount(outFilename);
-		population.addAlgorithm(lc);
+		CarAvail ca = new CarAvail();
+		population.addAlgorithm(ca);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPlansReader(population).readFile(plansFilename);
@@ -155,10 +142,11 @@ public class LegCountTest {
 
 		population.runAlgorithms();
 
-		lc.end();
+		ca.write(outputFilename);
 
 		System.out.println("--> Done!");
 		Gbl.printElapsedTime();
 		System.exit(0);
 	}
+
 }
