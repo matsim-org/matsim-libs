@@ -30,7 +30,6 @@ import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
-import org.matsim.world.MappingRule;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -63,16 +62,16 @@ public class WorldCreateRasterLayer extends WorldAlgorithm {
 
 	@Override
 	public void run(final World world) {
-		System.out.println("    running " + this.getClass().getName() + " module with cell size = " + cellsize + " x " + cellsize + " meters...");
+		System.out.println("    running " + this.getClass().getName() + " module with cell size = " + this.cellsize + " x " + this.cellsize + " meters...");
 
 		int nof_layers = world.getLayers().size();
 		if (nof_layers == 0) { Gbl.errorMsg("      At least one zone layer must already exist."); }
 		if (!(world.getBottomLayer() instanceof ZoneLayer)) { Gbl.errorMsg("      Bottom layer must be a zone layer."); }
 
 		for (IdI lid : world.getLayers().keySet()) {
-			if (lid.toString().equals(layerid.toString())) { Gbl.errorMsg("      A layer with type " + layerid + " already exists."); }
+			if (lid.toString().equals(this.layerid.toString())) { Gbl.errorMsg("      A layer with type " + this.layerid + " already exists."); }
 		}
-		
+
 		System.out.println("      calculate extent...");
 		CoordI min = new Coord(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		CoordI max = new Coord(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
@@ -88,36 +87,36 @@ public class WorldCreateRasterLayer extends WorldAlgorithm {
 		System.out.println("        extent from min=" + min + " to max=" + max);
 		System.out.println("      done.");
 
-		int x_remain = ((int)Math.ceil(max.getX()-min.getX())) % cellsize;
-		int m = ((int)Math.ceil(max.getX()-min.getX())) / cellsize;
+		int x_remain = ((int)Math.ceil(max.getX()-min.getX())) % this.cellsize;
+		int m = ((int)Math.ceil(max.getX()-min.getX())) / this.cellsize;
 		if (x_remain > 0) { m++; }
 
-		int y_remain = ((int)Math.ceil(max.getY()-min.getY())) % cellsize;
-		int n = ((int)Math.ceil(max.getY()-min.getY())) / cellsize;
+		int y_remain = ((int)Math.ceil(max.getY()-min.getY())) % this.cellsize;
+		int n = ((int)Math.ceil(max.getY()-min.getY())) / this.cellsize;
 		if (y_remain > 0) { n++; }
 
-		System.out.println("      creating " + layerid + " layer...");
-		ZoneLayer layer = (ZoneLayer)world.createLayer(layerid,"created by '" + this.getClass() + "'");
+		System.out.println("      creating " + this.layerid + " layer...");
+		ZoneLayer layer = (ZoneLayer)world.createLayer(this.layerid,"created by '" + this.getClass() + "'");
 		System.out.println("      done.");
 
 		System.out.println("      creating " + n + " x " + m + " cells...");
 		TreeMap<IdI,Zone> zones = (TreeMap<IdI,Zone>)layer.getLocations();
 		for (int i=0; i<n ; i++) {
 			for (int j=0; j<m; j++) {
-				CoordI z_min = new Coord(min.getX()+j*cellsize,min.getY()+i*cellsize);
-				CoordI z_max = new Coord(min.getX()+(j+1)*cellsize,min.getY()+(i+1)*cellsize);
+				CoordI z_min = new Coord(min.getX()+j*this.cellsize,min.getY()+i*this.cellsize);
+				CoordI z_max = new Coord(min.getX()+(j+1)*this.cellsize,min.getY()+(i+1)*this.cellsize);
 				CoordI z_center = new Coord((z_min.getX()+z_max.getX())/2.0,(z_min.getY()+z_max.getY())/2.0);
-				Zone zone = new Zone(layer,new Id(j+i*m),z_center,z_min,z_max,cellsize*cellsize,"raster("+i+","+j+")");
+				Zone zone = new Zone(layer,new Id(j+i*m),z_center,z_min,z_max,this.cellsize*this.cellsize,"raster("+i+","+j+")");
 				zones.put(zone.getId(),zone);
 			}
 		}
 		System.out.println("      done.");
 
 		System.out.println("      creating mapping rule...");
-		MappingRule mappingrule = world.createMappingRule(layer.getType() + "[*]-[?]" + zonelayer.getType());
+		/*MappingRule mappingrule = */world.createMappingRule(layer.getType() + "[*]-[?]" + zonelayer.getType());
 		world.complete();
 		System.out.println("      done.");
-		
+
 		System.out.println("      setting up and down mappings...");
 		for (Location upper : zonelayer.getLocations().values()) {
 			ArrayList<Location> lowers = new ArrayList<Location>();
@@ -135,7 +134,7 @@ public class WorldCreateRasterLayer extends WorldAlgorithm {
 			if (!found) {
 				System.out.println("        upper zone id: " + upper.getId() + " no down_zone found yet. Try to steal from another up_zone...");
 				for (Location lower : lowers) {
-					Location other_upper = lower.getUpMapping().firstEntry().getValue();
+					Location other_upper = lower.getUpMapping().get(lower.getUpMapping().firstKey());
 					if (other_upper.getDownMapping().size() > 1) {
 						other_upper.getDownMapping().remove(lower.getId());
 						lower.getUpMapping().remove(other_upper.getId());
