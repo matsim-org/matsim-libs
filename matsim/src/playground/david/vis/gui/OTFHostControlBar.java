@@ -277,7 +277,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		    URL imageURL = resourceHandler != null ? resourceHandler.getResource(imgLocation) : null;
 			Image image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage(imgLocation);
 	    	ImageIcon icon =new ImageIcon(image, altText);
-	        button.setIcon(icon);
+	        if(icon.getIconHeight() != -1) button.setIcon(icon);
+	        else button.setText(altText);
 	    } else {                                     //no image found
 	        button.setText(altText);
 	    }
