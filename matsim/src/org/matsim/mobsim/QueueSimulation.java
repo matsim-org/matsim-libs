@@ -42,8 +42,8 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.VisConfig;
+import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
@@ -89,7 +89,7 @@ public class QueueSimulation extends Simulation {
 	protected EventWriterTXT myeventwriter = null;
 
 	protected static Events events = null; // TODO [MR] instead of making this static and Links/Nodes using QueueSimulation.getEvents(), Gbl should hold a global events-object
-	protected DisplayNetStateWriter netStateWriter = null;
+	protected  SimStateWriterI netStateWriter = null;
 
 	private final List<SnapshotWriterI> snapshotWriters = new ArrayList<SnapshotWriterI>();
 
