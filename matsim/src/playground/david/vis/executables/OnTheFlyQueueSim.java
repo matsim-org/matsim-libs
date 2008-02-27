@@ -18,9 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.vis;
-
-import java.io.IOException;
+package playground.david.vis.executables;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.config.Config;
@@ -36,20 +34,32 @@ import org.matsim.utils.misc.Time;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 
+import playground.david.vis.OTFQuadFileHandler;
+import playground.david.vis.OnTheFlyServer;
+import playground.david.vis.OTFQuadFileHandler.Writer;
+
 /**
  * @author DS
  *
  */
 public class OnTheFlyQueueSim extends QueueSimulation{
 	protected OnTheFlyServer myOTFServer = null;
-	protected OTFQuadFileHandler.Writer otfwriter  = null;
 	protected LegHistogram hist = null;
 
+	public static void runnIt() {
+		String [] args = {};
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		OnTheFlyClientQuadSwing.main(new String []{"rmi:127.0.0.1:4019"});		
+	}
+	
 	@Override
 	protected void prepareSim() {
-		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans, true);
-		if (otfwriter == null) otfwriter = new OTFQuadFileHandler.Writer(600,network,"output/OTFQuadfileNoParking10p_wip.mvi");
-		if(otfwriter != null) otfwriter.open();
+		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans, false);
 
 		super.prepareSim();
 		
@@ -57,36 +67,20 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		events.addHandler(hist);
 
 		// FOR TESTING ONLY!
-		//OnTheFlyClient client = new OnTheFlyClient();
-		//client.start();
+		new Thread(){@Override
+		public void run(){runnIt();}}.start();
 	}
 
 	@Override
 	protected void cleanupSim() {
-		if(myOTFServer != null) myOTFServer.cleanup();
-		myOTFServer = null;
+	
+		myOTFServer.cleanup();
 		super.cleanupSim();
-
-		try {
-			if(otfwriter != null) otfwriter.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			hist.writeGraphic("output/OTFQuadfileNoParking10p_wip.leghist.png");
-
 	}
 
 	@Override
 	public void afterSimStep(double time) {
 		super.afterSimStep(time);
-
-		try {
-			if(otfwriter != null) otfwriter.dump((int)time);
-		} catch (IOException e) {
-			Gbl.errorMsg("QueueSimulation.dumpWriters(): Unable to dump state.");
-		}
 
 		int status = myOTFServer.getStatus(time);
 

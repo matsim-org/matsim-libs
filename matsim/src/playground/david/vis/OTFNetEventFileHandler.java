@@ -305,7 +305,7 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 		String eventFile = Gbl.getConfig().getParam("events","outputFile");
 		eventFile = "output/current/ITERS/it.0/0.events.txt.gz";
 		eventFile = "../../tmp/studies/berlin-wip/run125/200.events.txt.gz";
-		OTFNetEventFileHandler test = new OTFNetEventFileHandler(10, net,"output/ds_fromEvent.vis" );
+		OTFNetEventFileHandler test = new OTFNetEventFileHandler(10, net,"output/ds_fromEvent.mvi" );
 		test.run(eventFile);
 	}
 

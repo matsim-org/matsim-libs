@@ -1,4 +1,4 @@
-package playground.david.vis;
+package playground.david.vis.executables;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +13,8 @@ import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
 
+import playground.david.vis.OTFQuadFileHandler;
+import playground.david.vis.OTFQuadFileHandler.Writer;
 import playground.david.vis.handler.OTFAgentsListHandler;
 import playground.david.vis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 

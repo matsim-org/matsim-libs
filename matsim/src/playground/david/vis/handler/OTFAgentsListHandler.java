@@ -35,6 +35,11 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			this.type = type;
 			this.user = userdata;
 		}
+		public ExtendedPositionInfo(PositionInfo i, int type, int userdata) {
+			super(i.getAgentId(), i.getEasting(), i.getNorthing(), i.getElevation(), i.getAzimuth(), i.getSpeed(), i.getVehicleState(), "");
+			this.type = type;
+			this.user = userdata;
+		}
 		
 	}
 	
