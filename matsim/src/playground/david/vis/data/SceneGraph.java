@@ -75,8 +75,10 @@ public class SceneGraph {
 		for (SceneLayer layer : drawingLayers) layer.finish();
 	}
 	
-	public List<OTFDrawable> getAllItemsKILLTHIS() {
-		return ((SimpleSceneLayer)layers.get(Object.class)).getAllItemsKILLTHIS();
+	public SceneLayer getLayer(Class clazz) {
+		SceneLayer layer = layers.get(clazz);
+		if (layer == null)layer = layers.get(Object.class); //DS must exist: default handling
+		return layer;
 	}
 	
 	public void draw() {

@@ -1,5 +1,7 @@
 package playground.david.vis.data;
 
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
@@ -182,12 +184,12 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		if (time == -1) time = host.getLocalTime();
 		
 		SceneGraph result = cachedTimes.get(time);
-		if ( result != null && 
-				(rect == result.getRect() || 
-				 result.getRect() == null ||
-				 result.getRect().containsOrEquals(rect))) {
-			return result;
-		}
+//		if ( result != null && 
+//				(rect == result.getRect() || 
+//				 result.getRect() == null ||
+//				 result.getRect().containsOrEquals(rect))) {
+//			return result;
+//		}
 		// otherwise this Scenegraph is not useful, so we create a new one
 		if(host.isLive() == false) rect = null;
 		result = new SceneGraph(rect, connect, drawer);
@@ -230,5 +232,4 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	public double getMaxNorthing() {
 		return maxNorthing;
 	}
-
 }

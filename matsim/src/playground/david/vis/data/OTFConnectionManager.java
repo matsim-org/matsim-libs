@@ -29,6 +29,16 @@ public class OTFConnectionManager {
 	
 	private final List<Entry> connections = new LinkedList<Entry>();
 	
+	public OTFConnectionManager clone() {
+		OTFConnectionManager clone = new OTFConnectionManager();
+		Iterator<Entry> iter = connections.iterator();
+		while(iter.hasNext()) {
+			Entry entry = iter.next();
+			clone.add(entry.from, entry.to);
+		}
+		return clone;
+	}
+
 	public void add(Entry entry) {
 		connections.add(entry);
 	}

@@ -19,10 +19,6 @@ public class SimpleSceneLayer extends DefaultSceneLayer {
 		for(OTFDrawable item : items) item.draw();
 	}
 	
-	public List<OTFDrawable> getAllItemsKILLTHIS() {
-		return items;
-	}
-
 	@Override
 	public void finish() {
 	}
