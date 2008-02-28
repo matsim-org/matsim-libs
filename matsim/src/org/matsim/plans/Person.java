@@ -299,7 +299,9 @@ public class Person extends BasicPerson<Plan>{
 	 * other type, and are differentiated from plans with the type set to an empty String.<br>
 	 *
 	 * If there are more plan-types than <code>maxSize</code>, it is not possible to reduce the
-	 * number of plans to the requested size.
+	 * number of plans to the requested size.<br>
+	 * 
+	 * If the selected plan is on of the deleted ones, a randomly chosen plan will be selected. 
 	 *
 	 * @param maxSize The number of plans that should be left.
 	 */
@@ -342,6 +344,9 @@ public class Person extends BasicPerson<Plan>{
 			}
 			if (worst != null) {
 				this.plans.remove(worst);
+				if (worst.isSelected()) {
+					this.setSelectedPlan(this.getRandomPlan());
+				}
 				// reduce the number of plans of this type
 				String type = worst.getType();
 				if (type == null) {

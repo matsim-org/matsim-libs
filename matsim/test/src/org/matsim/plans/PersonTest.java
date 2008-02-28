@@ -120,6 +120,50 @@ public class PersonTest extends MatsimTestCase {
 		assertTrue("test that the plan with highest score of type a was not removed", person.getPlans().contains(plan5));
 		assertTrue("test that the plan with highest score of type b was not removed", person.getPlans().contains(plan2));
 	}
+	
+	/**
+	 * Tests that after a call to {@link org.matsim.plans.Person#removeWorstPlans(int)} 
+	 * the person still has a selected plan, even when the previously selected plan was
+	 * the one with the worst score.
+	 * 
+	 * @author mrieser
+	 */
+	public void testRemoveWorstPlans_selectedPlan() {
+		Person person = new Person("1", "m", "35", "yes", "yes", "yes");
+
+		Plan plan1 = new Plan("15.0", person);
+		Plan plan2 = new Plan("22.0", person);
+		Plan plan3 = new Plan(null, person);
+		Plan plan4 = new Plan("1.0", person);
+		Plan plan5 = new Plan("18.0", person);
+		Plan plan6 = new Plan("21.0", person);
+		person.addPlan(plan1);
+		person.addPlan(plan2);
+		person.addPlan(plan3);
+		person.addPlan(plan4);
+		person.addPlan(plan5);
+		person.addPlan(plan6);
+		person.setSelectedPlan(plan1);
+		
+		// test we have the expected selected plan
+		assertEquals(plan1, person.getSelectedPlan());
+		// remove one plan, that is not selected
+		person.removeWorstPlans(5);
+		// the selected plan shouldn't have changed
+		assertEquals(plan1, person.getSelectedPlan());
+		// remove more plans, now with the selected plan being removed
+		person.removeWorstPlans(3);
+		// test that the previously selected plan is no longer selected
+		assertFalse("plan should no longer be selected!", plan1.isSelected());
+		assertNotSame("plan1 should no longer be the selected plan!", plan1, person.getSelectedPlan());
+		// test that we have a selected plan again!
+		assertNotNull("person has no selected plan!", person.getSelectedPlan());
+		// test that the selected plan is one of the remaining plans
+		assertTrue(person.getSelectedPlan() == plan2 || person.getSelectedPlan() == plan5 || person.getSelectedPlan() == plan6);
+		// now furter remove plans, until there is only one left
+		person.removeWorstPlans(1);
+		assertEquals(plan2, person.getSelectedPlan());
+	}
 
 	/**
 	 * Test {@link org.matsim.plans.Person#getRandomUnscoredPlan()} when the
