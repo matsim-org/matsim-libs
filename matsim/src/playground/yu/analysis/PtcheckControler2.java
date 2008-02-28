@@ -37,10 +37,10 @@ import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.Events;
+import org.matsim.events.algorithms.SnapshotGenerator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
 import org.matsim.utils.io.IOUtils;
-
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
@@ -68,6 +68,7 @@ public class PtcheckControler2 extends Controler {
 		private TravelTimeModalSplit ttms = null;
 		private LegDistance ld = null;
 		private CalcLinkAvgSpeed clas = null;
+		private SnapshotGenerator visualizer = null;
 
 		public void notifyStartup(StartupEvent event) {
 			Controler ctl = event.getControler();
@@ -178,6 +179,11 @@ public class PtcheckControler2 extends Controler {
 				es.addHandler(ld);
 				clas = new CalcLinkAvgSpeed(nl, 682845.0, 247388.0, 2000.0);
 				es.addHandler(clas);
+				c.getConfig().simulation().setSnapshotPeriod(300);
+			} else if (event.getIteration() == c.getFirstIteration()) {
+				c.getConfig().simulation().setSnapshotPeriod(300);
+			} else {
+				c.getConfig().simulation().setSnapshotPeriod(0);
 			}
 		}
 	}

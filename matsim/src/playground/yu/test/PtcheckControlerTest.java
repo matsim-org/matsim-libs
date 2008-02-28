@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.analysis;
+package playground.yu.test;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -41,15 +41,23 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
 import org.matsim.utils.io.IOUtils;
 
+import playground.yu.analysis.CalcLinkAvgSpeed;
+import playground.yu.analysis.CalcNetAvgSpeed;
+import playground.yu.analysis.CalcTrafficPerformance;
+import playground.yu.analysis.LegDistance;
+import playground.yu.analysis.OnRouteModalSplit;
+import playground.yu.analysis.PtRate;
+import playground.yu.analysis.TravelTimeModalSplit;
+
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
  * 
  * @author ychen
  * 
  */
-public class PtcheckControler extends Controler {
+public class PtcheckControlerTest extends Controler {
 
-	public PtcheckControler(String[] configFileName) {
+	public PtcheckControlerTest(String[] configFileName) {
 		super(configFileName);
 	}
 
@@ -98,8 +106,8 @@ public class PtcheckControler extends Controler {
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			int it = event.getIteration();
 			Controler ctl = event.getControler();
+			Config cf = ctl.getConfig();
 			if (it % 10 == 0) {
-				Config cf = ctl.getConfig();
 				rp = ctl.getRoadPricing();
 				catl = new CalcAverageTripLength();
 				catl.run(event.getControler().getPopulation());
@@ -192,8 +200,8 @@ public class PtcheckControler extends Controler {
 	 *            the path of config-file
 	 */
 	public static void main(final String[] args) {
-		final PtcheckControler controler;
-		controler = new PtcheckControler(args);
+		final PtcheckControlerTest controler;
+		controler = new PtcheckControlerTest(args);
 		controler.addControlerListener(new PtCheckListener());
 		controler.run();
 		System.exit(0);
