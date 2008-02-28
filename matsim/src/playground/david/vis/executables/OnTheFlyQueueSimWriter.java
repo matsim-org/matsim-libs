@@ -20,6 +20,8 @@
 
 package playground.david.vis.executables;
 
+import java.io.IOException;
+
 import org.matsim.analysis.LegHistogram;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
@@ -57,7 +59,12 @@ public class OnTheFlyQueueSimWriter extends QueueSimulation{
 
 	@Override
 	protected void cleanupSim() {
-			
+		try {
+			netStateWriter.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 			hist.writeGraphic("output/OTFQuadfileNoParking10p_wip.leghist.png");
 
 	}
@@ -84,8 +91,8 @@ public class OnTheFlyQueueSimWriter extends QueueSimulation{
 		Config config = Gbl.createConfig(args);
 
 		config.global().setLocalDtdBase(localDtdBase);
-		config.simulation().setFlowCapFactor(0.5);
-		config.simulation().setStorageCapFactor(0.5);
+		config.simulation().setFlowCapFactor(0.1);
+		config.simulation().setStorageCapFactor(0.2);
 
 		if(args.length >= 1) {
 			netFileName = config.network().getInputFile();
@@ -114,11 +121,11 @@ public class OnTheFlyQueueSimWriter extends QueueSimulation{
 		world.setEvents(events);
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
-		//config.simulation().setEndTime(Time.parseTime("07:02:00"));
+		config.simulation().setEndTime(Time.parseTime("24:00:00"));
 		config.network().setInputFile(netFileName);
 
 		config.simulation().setSnapshotFormat("none");
-		config.simulation().setSnapshotPeriod(10);
+		config.simulation().setSnapshotPeriod(600);
 		config.simulation().setSnapshotFile("./output/remove_thisB");
 
 
