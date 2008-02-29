@@ -26,19 +26,12 @@
 	<module name="simulation">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
-		<param name = "flowCapacityFactor"	value = "0.10"/>
+		<param name = "flowCapacityFactor"	value = "0.20"/>
 		<param name = "storageCapacityFactor"	value = "1.00"/>
 	</module>
 
 	<module name="strategy">
-		<param name="maxAgentPlanMemorySize" value="4" />
-
-		<param name="Module_1" value="BestScore" />
-		<param name="ModuleProbability_1" value="0.9" />
-
-		<param name="Module_2" value="TimeAllocationMutator" />
-		<param name="ModuleProbability_2" value="0.1" />
-		<param name="ModuleDisableAfterIteration_2" value="95" />
+		<!-- the test configures its own strategy manager in the code. -->
 	</module>
 
 	<module name="planCalcScore">
@@ -57,10 +50,10 @@
 
 		<param name="activityType_1"            value="w" />
 		<param name="activityPriority_1"        value="1" />
-		<param name="activityTypicalDuration_1" value="01:00:00" />
+		<param name="activityTypicalDuration_1" value="06:00:00" />
 		<param name="activityMinimalDuration_1" value="00:10:00" />
-		<param name="activityOpeningTime_1"     value="06:00:00" />
-		<param name="activityLatestStartTime_1" value="06:00:00" />
+		<param name="activityOpeningTime_1"     value="05:45:00" />
+		<param name="activityLatestStartTime_1" value="05:45:00" />
 	</module>
 
 </config>

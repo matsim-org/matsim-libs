@@ -20,33 +20,94 @@
 
 package org.matsim.roadpricing;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
+import org.matsim.controler.listener.StartupListener;
+import org.matsim.events.EventAgentArrival;
+import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
-import org.matsim.events.algorithms.LinkQueueStats;
+import org.matsim.events.handler.EventHandlerAgentArrivalI;
+import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.gbl.Gbl;
+import org.matsim.plans.Act;
+import org.matsim.plans.Leg;
+import org.matsim.plans.Plan;
+import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.replanning.PlanStrategy;
+import org.matsim.replanning.StrategyManager;
+import org.matsim.replanning.modules.MultithreadedModuleA;
+import org.matsim.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.charts.XYScatterChart;
+import org.matsim.utils.misc.Time;
 
+/**
+ * This TestCase should ensure the correct behavior of agents when different
+ * values for beta_travel-parameters are used, it does so by basically
+ * implementing Vickrey's bottleneck model (see "Economics of a bottleneck" by
+ * Arnott, De Palma and Lindsey, 1987). The agents drive on the equil-net, but
+ * can only do departure-time adaptation, no rerouting. This leads to all
+ * agents driving through the one bottleneck in the network. A special
+ * time-adaption module is used (TimeAllocationMutatorBottleneck, inside this
+ * class), that only mutates the endtime of the very first activity, but not 
+ * the duration of other activities. This is to ensure that the duration of the
+ * activities do not have any influence on the score, but only the travel-time 
+ * (and with that, eventually shortened activity durations) has.
+ *
+ * @author mrieser
+ */
 public class BetaTravelTest extends MatsimTestCase {
 
-	public BetaTravelTest() {
-	}
+	/* This TestCase uses a custom Controler, named TestControler, to load
+	 * specific strategies. The strategies make use of a test-specific
+	 * TimeAllocationMutator, the TimeAllocationMutatorBottleneck.
+	 * LinkAnalyzer, an event handler, collects some statistics on the 
+	 * "bottleneck-link". The BottleneckTravelTimeAnalyzer, an event handler
+	 * as well, creates the graphs used to manually verify the correctness
+	 * of this TestCase -- it generates a plot similar to the ones from
+	 * Vickrey's model.
+	 * A custom TestControlerListener is responsible for integrating all these
+	 * event handlers into the TestControler.
+	 * 
+	 * **************************************************************************
+	 * 
+	 *                WHAT TO DO IF THESE TESTS FAIL?
+	 * 
+	 * In the output directories for iteration 100, there should be a file
+	 * "100.bottleneck_times.png". Open the files for the two test cases. In the
+	 * case of beta_travel = -66, the red dots in the graph should form a (more
+	 * or less) straight line with slope 1. In the case of beta_travel = -6, the
+	 * straight line can only be seen outside of the range [5.20, 5.60]. Within 
+	 * this range first a higher slope should be seen until about 5.35, and then
+	 * a lower slope, leading to a "triangle" form on the straight line.
+	 * If this triangle form can still be seen clearly, update the values in
+	 * TestControlerListener.notifyIterationEnds() that are used to automatically
+	 * verify the tests. The actual values can be found in the output (log-file) 
+	 * of these tests. They still should be similar to the current values.
+	 * 
+	 * **************************************************************************
+	 */
 
+	/**
+	 * Runs the test with a value of -6 for beta_travel.
+	 *
+	 *  @author mrieser
+	 */
 	public void testBetaTravel_6() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
 		TestControler controler = new TestControler(config);
@@ -55,6 +116,11 @@ public class BetaTravelTest extends MatsimTestCase {
 		controler.run();
 	}
 
+	/**
+	 * Runs the test with a value of -66 for beta_travel.
+	 *
+	 * @author mrieser
+	 */
 	public void testBetaTravel_66() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
 		TestControler controler = new TestControler(config);
@@ -63,7 +129,13 @@ public class BetaTravelTest extends MatsimTestCase {
 		controler.run();
 	}
 
-	public static class LinkAnalyzer implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
+	/**
+	 * Collects some statistics on a specific link. Used to automatically verify
+	 * the TestCase still works as intended.
+	 * 
+	 * @author mrieser
+	 */
+	private static class LinkAnalyzer implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
 		public final String linkId;
 		public double firstCarEnter = Double.POSITIVE_INFINITY;
 		public double lastCarEnter = Double.NEGATIVE_INFINITY;
@@ -161,7 +233,14 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 	}
 
-	public static class TestControler extends Controler {
+	/**
+	 * A custom Controler for this TestCase that loads special strategies and 
+	 * verifies that the loaded settings from the configuration files are 
+	 * suitable to test what we want.
+	 *
+	 * @author mrieser
+	 */
+	private static class TestControler extends Controler {
 
 		public TestControler(final Config config) {
 			super(config);
@@ -185,12 +264,46 @@ public class BetaTravelTest extends MatsimTestCase {
 				System.err.println("Controler.lastIteration is currently set to " + lastIter + ". Only the first 100 iterations will be analyzed.");
 			}
 		}
+
+		@Override
+		protected StrategyManager loadStrategyManager() {
+			StrategyManager manager = new StrategyManager();
+			manager.setMaxPlansPerAgent(5);
+
+			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanSelector());
+			manager.addStrategy(strategy1, 0.80);
+
+			PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck());
+			manager.addStrategy(strategy2, 0.80);
+
+			// reduce the replanning probabilities over the iterations
+			manager.addChangeRequest(50, strategy2, 0.30);
+			manager.addChangeRequest(75, strategy2, 0.10);
+			manager.addChangeRequest(95, strategy2, 0.00);
+
+			return manager;
+		}
 	}
 
-	/*default*/ class TestControlerListener implements IterationStartsListener, IterationEndsListener {
+	/**
+	 * Responsible for the verification of the tests. It adds a few event 
+	 * handlers and checks their result in a specific iteration. 
+	 *
+	 * @author mrieser
+	 */
+	private class TestControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 
 		private final LinkAnalyzer la = new LinkAnalyzer("15");
-		private final LinkQueueStats queueStats = new LinkQueueStats("15");
+		private BottleneckTravelTimeAnalyzer ttAnalyzer = null;
+
+		public TestControlerListener() {
+			// empty public constructor for private class
+		}
+		
+		public void notifyStartup(final StartupEvent event) {
+			this.ttAnalyzer = new BottleneckTravelTimeAnalyzer(event.getControler().getPopulation().getPersons().size());
+		}
 
 		public void notifyIterationStarts(final IterationStartsEvent event) {
 			int iteration = event.getIteration();
@@ -199,10 +312,9 @@ public class BetaTravelTest extends MatsimTestCase {
 				event.getControler().getEvents().addHandler(this.la);
 			}
 
-			if (iteration == 0) {
-				event.getControler().getEvents().addHandler(this.queueStats);
-			} else {
-				this.queueStats.reset(iteration);
+			if (iteration % 50 == 0) {
+				this.ttAnalyzer.reset(iteration);
+				event.getControler().getEvents().addHandler(this.ttAnalyzer);
 			}
 		}
 
@@ -213,50 +325,182 @@ public class BetaTravelTest extends MatsimTestCase {
 				this.la.calcMaxCars();
 				this.la.printInfo();
 			}
-			BufferedWriter out = null;
-			try {
-				out = new BufferedWriter(new FileWriter(Controler.getIterationFilename("queueStats.txt")));
-				this.queueStats.dumpStats(out);
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				if (out != null) {
-					try {
-						out.close();
-					}
-					catch (IOException ignored) {}
-				}
+
+			if (iteration % 50 == 0) {
+				this.ttAnalyzer.plot(Controler.getIterationFilename("bottleneck_times.png"));
+				event.getControler().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {
 				double beta_travel = Double.parseDouble(Gbl.getConfig().getParam(CharyparNagelScoringFunction.CONFIG_MODULE, CharyparNagelScoringFunction.CONFIG_TRAVELING));
-				/* explanation to the results:
+				/* ***************************************************************
+				 * AUTOMATIC VERIFICATION OF THE TESTS:
+				 * 
+				 * Explanation to the results:
 				 * the triangle spawned by (firstCarEnter,0) - (maxCarsOnLinkTime,maxCarsOnLink) - (lastCarLeave,0)
 				 * should have different forms between the two runs. For beta_travel = -6, the peak at
 				 * maxCarsOnLinkTime should be higher. Thus, beta_travel = -66 should appear a bit wider spread.
 				 * In theory, firstCarEnter and lastCarLeave should be equal or similar. In practice (in our case)
 				 * they are likely to differ slightly.<br>
 				 * See the paper "Economics of a bottleneck" by Arnott, De Palma and Lindsey, 1987.
+				 * 
+				 * Change the values below to make the test pass, if they are consistent with the desired output.
 				 */
 				if (beta_travel == -6.0) {
 					System.out.println("checking results for case `beta_travel = -6'...");
-					assertEquals(19079.0, this.la.firstCarEnter, 0.0);
-					assertEquals(24006.0, this.la.lastCarEnter, 0.0);
-					assertEquals(19259.0, this.la.firstCarLeave, 0.0);
-					assertEquals(24186.0, this.la.lastCarLeave, 0.0);
-					assertEquals(30, this.la.maxCarsOnLink);
-					assertEquals(22131.0, this.la.maxCarsOnLinkTime, 0.0);
+					assertEquals(18710.0, this.la.firstCarEnter, 0.0);
+					assertEquals(21961.0, this.la.lastCarEnter, 0.0);
+					assertEquals(18890.0, this.la.firstCarLeave, 0.0);
+					assertEquals(22141.0, this.la.lastCarLeave, 0.0);
+					assertEquals(59, this.la.maxCarsOnLink);
+					assertEquals(19589.0, this.la.maxCarsOnLinkTime, 0.0);
 					System.out.println("all checks passed!");
 				} else if (beta_travel == -66.0) {
 					System.out.println("checking results for case `beta_travel = -66'...");
-					assertEquals(18917.0, this.la.firstCarEnter, 0.0);
-					assertEquals(23793.0, this.la.lastCarEnter, 0.0);
-					assertEquals(19097.0, this.la.firstCarLeave, 0.0);
-					assertEquals(23973.0, this.la.lastCarLeave, 0.0);
-					assertEquals(13, this.la.maxCarsOnLink);
-					assertEquals(20874.0, this.la.maxCarsOnLinkTime, 0.0);
+					assertEquals(13590.0, this.la.firstCarEnter, 0.0);
+					assertEquals(21961.0, this.la.lastCarEnter, 0.0);
+					assertEquals(13770.0, this.la.firstCarLeave, 0.0);
+					assertEquals(22141.0, this.la.lastCarLeave, 0.0);
+					assertEquals(8, this.la.maxCarsOnLink);
+					assertEquals(15904.0, this.la.maxCarsOnLinkTime, 0.0);
 					System.out.println("all checks passed!");
 				}
+				/* *************************************************************** */
 			}
 		}
 	}
+
+	/** A special variant of the TimeAllocationMutator, suitable for the Bottleneck Analysis */
+	private static class TimeAllocationMutatorBottleneck extends MultithreadedModuleA {
+		public TimeAllocationMutatorBottleneck() {
+			// empty public constructor for private class
+		}
+		
+		@Override
+		public PlanAlgorithmI getPlanAlgoInstance() {
+			return new PlanMutateTimeAllocationBottleneck(1800);
+		}
+	}
+
+	/** A special variant of the TimeAllocationMutator, suitable for the Bottleneck Analysis */
+	private static class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
+
+		private final int mutationRange;
+
+		public PlanMutateTimeAllocationBottleneck(final int mutationRange) {
+			this.mutationRange = mutationRange;
+		}
+
+		public void run(final Plan plan) {
+			mutatePlan(plan);
+		}
+
+		private void mutatePlan(final Plan plan) {
+			int max = plan.getActsLegs().size();
+			int now = 0;
+
+			// apply mutation to all activities except the last home activity
+			for (int i = 0; i < max; i++ ) {
+
+				if (i % 2 == 0) {
+					Act act = (Act)(plan.getActsLegs().get(i));
+					// invalidate previous activity times because durations will change
+					act.setStartTime(Time.UNDEFINED_TIME);
+
+					// handle first activity
+					if (i == 0) {
+						act.setStartTime(now); // set start to midnight
+						act.setEndTime(mutateTime(act.getEndTime())); // mutate the end time of the first activity
+						act.setDur(act.getEndTime() - act.getStartTime()); // calculate resulting duration
+						now += act.getEndTime(); // move now pointer
+					} else if (i < (max - 1)) {
+						// handle middle activities
+						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
+						act.setDur(6*3600); // <-- This line differs from the original PlanMutateTimeAllocation, use a fix time to minimize effect of act-duration on score
+						act.setEndTime(Time.UNDEFINED_TIME); // <-- This line differs from the original PlanMutateTimeAllocation
+						now += act.getDur();
+					} else {
+						// handle last activity
+						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
+						// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
+						act.setDur(Time.UNDEFINED_TIME);
+						act.setEndTime(Time.UNDEFINED_TIME);
+					}
+
+				} else {
+
+					Leg leg = (Leg)(plan.getActsLegs().get(i));
+
+					// assume that there will be no delay between end time of previous activity and departure time
+					leg.setDepTime(now);
+					// let duration untouched. if defined add it to now
+					if (leg.getTravTime() != Time.UNDEFINED_TIME) {
+						now += leg.getTravTime();
+					}
+					// set planned arrival time accordingly
+					leg.setArrTime(now);
+
+				}
+			}
+		}
+
+		private double mutateTime(final double time) {
+			double t = time;
+			if (t != Time.UNDEFINED_TIME) {
+				t = t + (int)((Gbl.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
+				if (t < 0) t = 0;
+				if (t > 24*3600) t = 24*3600;
+			} else {
+				t = Gbl.random.nextInt(24*3600);
+			}
+			return t;
+		}
+	}
+
+	/**
+	 * Collects the departure and arrival times of the first leg of each agent, 
+	 * and plots them in XY-Scatter-Plot for manual verification in case this
+	 * test case fails.
+	 *
+	 * @author mrieser
+	 */
+	private static class BottleneckTravelTimeAnalyzer implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI {
+
+		private final HashMap<String, Double> agentDepTimes = new HashMap<String, Double>(); // <AgentId, Time>
+		private int agentCounter = 0;
+		private final double[] depTimes;
+		private final double[] arrTimes;
+
+		public BottleneckTravelTimeAnalyzer(final int popSize) {
+			this.depTimes = new double[popSize];
+			this.arrTimes = new double[popSize];
+		}
+
+		public void handleEvent(final EventAgentDeparture event) {
+			if (event.legId == 0) {
+				this.agentDepTimes.put(event.agentId, Double.valueOf(event.time));
+			}
+		}
+
+		public void handleEvent(final EventAgentArrival event) {
+			String agentId = event.agentId;
+			Double depTime = this.agentDepTimes.remove(agentId);
+			if (depTime != null) {
+				this.depTimes[this.agentCounter] = depTime.doubleValue() / 3600.0;
+				this.arrTimes[this.agentCounter] = event.time / 3600.0;
+				this.agentCounter++;
+			}
+		}
+
+		public void reset(final int iteration) {
+			this.agentDepTimes.clear();
+			this.agentCounter = 0;
+		}
+
+		public void plot(final String filename) {
+			XYScatterChart graph = new XYScatterChart("Bottleneck Analysis", "departure time", "arrival time");
+			graph.addSeries("", this.depTimes, this.arrTimes);
+			graph.saveAsPng(filename, 800, 600);
+		}
+	}
+
 }
