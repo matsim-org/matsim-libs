@@ -76,25 +76,29 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	String address;
 	private OTFServerRemote host = null;
-	private final Map <String,OTFDrawer> handlers = new HashMap<String,OTFDrawer>(); 
+	private final Map <String,OTFDrawer> handlers = new HashMap<String,OTFDrawer>();
 	private static Class resourceHandler = null;
+
+	private ImageIcon playIcon = null;
+	private ImageIcon pauseIcon = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public OTFHostControlBar(String address, Class res) throws RemoteException, InterruptedException, NotBoundException {
 		openAddress(address);
 		this.resourceHandler = res;
+
 		addButtons();
 	}
-	
+
 	public OTFHostControlBar(String address) throws RemoteException, InterruptedException, NotBoundException {
 		openAddress(address);
 		addButtons();
 	}
-	
+
 	private void openAddress(String address) throws RemoteException, InterruptedException, NotBoundException {
 		// try to open/connect to host if given a string of form
-		// connection type (rmi or file or tveh) 
+		// connection type (rmi or file or tveh)
 		// rmi:ip  [: port]
 		// file:mvi-filename
 		// tveh:T.veh-filename @ netfilename
@@ -115,19 +119,19 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			String [] connparse = connection.split(":");
 			if (connparse.length > 1 ) port = Integer.parseInt(connparse[1]);
 			this.host = openSSL(connparse[0], port);
-			
+
 		} else if (type.equals("file")) {
 			this.host = openFile(connection);
-			
+
 		} else if (type.equals("tveh")) {
 			String [] connparse = connection.split("@");
 			this.host = openTVehFile(connparse[1], connparse[0]);
-			
+
 		} else throw new UnsupportedOperationException("Connctiontype " + type + " not known");
-		
+
 		if (host != null) liveHost = host.isLive();
 	}
-	
+
 	private OTFServerRemote openSSL(String hostname, int port) throws InterruptedException, RemoteException, NotBoundException {
 		System.setProperty("javax.net.ssl.keyStore", "input/keystore");
 		System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
@@ -136,7 +140,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		Thread.sleep(1000);
 		Registry registry = LocateRegistry.getRegistry(hostname, port, new SslRMIClientSocketFactory());
-		
+
 		String[] liste = registry.list();
 		for (String name : liste) {
 			if (name.indexOf("DSOTFServer_") != -1){
@@ -150,7 +154,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private OTFServerRemote openRMI(String hostname, int port) throws InterruptedException, RemoteException, NotBoundException {
 		Thread.sleep(1000);
 		Registry registry = LocateRegistry.getRegistry(hostname, port);
-		
+
 		String[] liste = registry.list();
 		for (String name : liste) {
 			if (name.indexOf("DSOTFServer_") != -1){
@@ -160,10 +164,10 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 		return host;
 	}
-	
+
 	private void buildIndex() {
 		// Read through the whole file to find the indexes for the time steps...
-		
+
 	}
 	private OTFServerRemote openFile( String fileName) throws RemoteException {
 		OTFServerRemote host = new OTFQuadFileHandler.Reader(fileName);
@@ -173,7 +177,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		return host;
 	}
-	
+
 	private OTFServerRemote openTVehFile(String netname, String vehname) throws RemoteException {
 		OTFServerRemote host = new OTFTVehServer(netname,vehname);
 		host.pause();
@@ -187,13 +191,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			// go through every reader class and look for the appropriate Reader Version for this fileformat
 			connect.adoptFileFormat(OTFDataReader.getVersionString(config.getFileVersion(), config.getFileMinorVersion()));
 		}
-		
+
 		System.out.println("Getting Quad");
 		OTFServerQuad servQ = host.getQuad(id, factory);
 		System.out.println("Converting Quad");
 		OTFClientQuad clientQ = servQ.convertToClient(id, host, connect);
 		System.out.println("Creating receivers");
-		clientQ.createReceiver(connect); 
+		clientQ.createReceiver(connect);
 		clientQ.getConstData();
 		// if this is a recorded session, build random access index
 		if (!liveHost ) buildIndex();
@@ -201,15 +205,15 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		updateTimeLabel();
 		return clientQ;
 	}
-	
+
 	public void addHandler(String id, OTFDrawer handler) {
 		handlers.put(id, handler);
 	}
-	
+
 	public OTFDrawer getHandler( String id) {
 		return handlers.get(id);
 	}
-	
+
 	public void invalidateHandlers() {
 		for (OTFDrawer handler : handlers.values()) {
 			try {
@@ -222,13 +226,22 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void addButtons() {
+
+		URL imageURL = resourceHandler != null ? resourceHandler.getResource("images/buttonPlay.png") : null;
+		Image image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage("images/buttonPlay.png");
+    playIcon = new ImageIcon(image, "Play");
+    imageURL = resourceHandler != null ? resourceHandler.getResource("images/buttonPause.png") : null;
+    image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage("images/buttonPause.png");
+    pauseIcon = new ImageIcon(image, "Pause");
+
 		add(createButton("Restart", STOP, "buttonRestart", "restart the server/simulation"));
-		add(createButton("Pause", PAUSE, "buttonPause", "Press to pause server"));
 		add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
 		add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
-		add(createButton("Pause", PAUSE, "buttonPause", "Press to pause server"));
 		playButton = createButton("PLAY", PLAY, "buttonPlay", "press to play simulation continuously");
 		playButton.setText("Play");
+		playButton.setMinimumSize(new Dimension(120, 60));
+		playButton.setMaximumSize(new Dimension(120, 60));
+		playButton.setPreferredSize(new Dimension(120, 60));
 		add(playButton);
 		add(createButton(">", STEP_F, "buttonStepF", "go one timestep forward"));
 		add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
@@ -254,8 +267,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 //		JSpinner spin = addLabeledSpinner(this, "Lanewidth", model);
 //		spin.setMaximumSize(new Dimension(75,30));
 //		spin.addChangeListener(this);
-		JButton button = createButton(address,CONNECT, null, "Server connection established");
-		add(button);
+//		JButton button = createButton(address,CONNECT, null, "Server connection established");
+//		add(button);
+		add(new JLabel(address));
 	}
 
 	private JButton createButton(String altText, String actionCommand, String imageName, String toolTipText) {
@@ -273,7 +287,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		    String imgLocation = "images/"
 		                         + imageName
 		                         + ".png";
-			
+
 		    URL imageURL = resourceHandler != null ? resourceHandler.getResource(imgLocation) : null;
 			Image image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage(imgLocation);
 	    	ImageIcon icon =new ImageIcon(image, altText);
@@ -308,17 +322,21 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private void pressed_PAUSE() throws IOException {
 		stopMovie();
 		host.pause();
+		playButton.setText("Play");
+		playButton.setIcon(playIcon);
 	}
 
 	private void pressed_PLAY() throws IOException {
- 	    if (movieTimer == null) {
- 	    	movieTimer = new MovieTimer();
- 	 	    movieTimer.start();
+		if (movieTimer == null) {
+ 	  	movieTimer = new MovieTimer();
+ 	 	  movieTimer.start();
  			movieTimer.setActive(true);
- 			playButton.setSelected(true);
- 	    } else {
- 	    	pressed_PAUSE();
- 	    }
+ 			playButton.setText("Pause");
+ 			playButton.setIcon(pauseIcon);
+// 			playButton.setSelected(true);
+ 	  } else {
+ 	   	pressed_PAUSE();
+ 	  }
 	}
 
 	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
@@ -333,7 +351,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			return false;
 		}
 	}
-	
+
 	private void pressed_STEP_F() throws IOException {
 		requestTimeStep(simTime+1, OTFServerRemote.TimePreference.LATER);
 	}
@@ -368,9 +386,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
 	}
-	
+
 	private void changed_SET_TIME(ActionEvent event) throws IOException {
 		String newTime = ((JFormattedTextField)event.getSource()).getText();
 		int newTime_s = Time.secFromStr(newTime);
@@ -449,7 +467,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals(TOGGLE_SYNCH)) {
-			synchronizedPlay = e.getStateChange() != ItemEvent.DESELECTED; 
+			synchronizedPlay = e.getStateChange() != ItemEvent.DESELECTED;
 			if (movieTimer != null) movieTimer.updateSyncPlay();
 		} else if (source.getText().equals(TOGGLE_LINK_LABELS)) {
 			if (e.getStateChange() == ItemEvent.DESELECTED) {
@@ -465,7 +483,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	public void stateChanged(ChangeEvent e) {
 		JSpinner spinner = (JSpinner)e.getSource();
 		int i = ((SpinnerNumberModel)spinner.getModel()).getNumber().intValue();
-		
+
 		//visConfig.set(VisConfig.LINK_WIDTH_FACTOR, Integer.toString(i));
 		repaint();
 		//networkScrollPane.repaint();
@@ -485,7 +503,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		private synchronized void updateSyncPlay() {
 			if (!isActive) return;
-			
+
 			try {
 				if (synchronizedPlay) host.pause();
 				else host.play();
@@ -496,7 +514,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		public synchronized void setActive(boolean isActive) {
 			this.isActive = isActive;
-			
+
 			updateSyncPlay();
 		}
 
@@ -516,7 +534,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 						if(!host.requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))
 							host.requestNewTime(0, OTFServerRemote.TimePreference.LATER);
 					}
-					
+
 					actTime = simTime;
 					simTime = host.getLocalTime();
 					if (simTime != actTime) {
