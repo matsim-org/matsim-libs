@@ -153,19 +153,29 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		}
 		this.capperiod = (int)Time.parseTime(capperiod);
 	}
+	
+	/**
+	 * @param capPeriod the capacity-period in seconds
+	 */
+	public final void setCapacityPeriod(final double capPeriod) {
+		if (this.capperiod != Integer.MIN_VALUE) {
+			log.warn(this + "[capperiod=" + capperiod + " already set. capperiod will be overwritten]");
+		}
+		this.capperiod = (int) capPeriod;
+	}
 
-	public final void setEffectiveCellSize(final String effectiveCellSize) {
+	public final void setEffectiveCellSize(final double effectiveCellSize) {
 		if (!Double.isNaN(this.effectiveCellSize)) {
 			log.warn(this + "[effectiveCellSize=" + effectiveCellSize + " already set. effectiveCellSize will be overwritten]");
 		}
-		this.effectiveCellSize = Double.parseDouble(effectiveCellSize);
+		this.effectiveCellSize = effectiveCellSize;
 	}
 	
-	public final void setEffectiveLaneWidth(final String effectiveLaneWidth) {
+	public final void setEffectiveLaneWidth(final double effectiveLaneWidth) {
 		if (!Double.isNaN(this.effectiveLaneWidth)) {
 			log.warn(this + "[effectiveLaneWidth=" + effectiveLaneWidth + " already set. effectiveLaneWidth will be overwritten]");
 		}
-		this.effectiveLaneWidth = Double.parseDouble(effectiveLaneWidth);
+		this.effectiveLaneWidth = effectiveLaneWidth;
 	}
 
 
@@ -181,7 +191,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		return this.effectiveCellSize;
 	}
 
-	public final double getLaneWidth() {
+	public final double getEffectiveLaneWidth() {
 		return this.effectiveLaneWidth;
 	}
 	
