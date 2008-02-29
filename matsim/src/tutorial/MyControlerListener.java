@@ -5,8 +5,10 @@ import java.util.Map;
 
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.ShutdownEvent;
+import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
+import org.matsim.controler.listener.StartupListener;
 import org.matsim.utils.charts.XYLineChart;
 
 /**
@@ -16,16 +18,19 @@ import org.matsim.utils.charts.XYLineChart;
  * @author dgrether
  *
  */
-public class MyControlerListener implements IterationEndsListener, ShutdownListener {
+public class MyControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private MyEventHandler eventHandler;
 
 	private Map<Integer, Double> timePerIterationMap = new HashMap<Integer, Double>();
 
 
-	public MyControlerListener(MyEventHandler eventHandler) {
-		this.eventHandler = eventHandler;
+	public void notifyStartup(StartupEvent event) {
+		// after the controler is started create and add the event handler for events of the mobility simulation
+		this.eventHandler = new MyEventHandler(event.getControler().getPopulation().getPersons().size());
+		event.getControler().getEvents().addHandler(this.eventHandler);
 	}
+
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		this.timePerIterationMap.put(event.getIteration(), this.eventHandler.getAverageTravelTime());
