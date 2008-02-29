@@ -31,7 +31,7 @@ import junit.framework.TestSuite;
 	public class AllTests {
 
 		public static Test suite() {
-			TestSuite suite = new TestSuite("Test for org.matsim.withinday.trafficmanagement");
+			TestSuite suite = new TestSuite("Test for org.matsim.withinday");
 			//$JUnit-BEGIN$
 			suite.addTestSuite(WithindayAgentTest.class);
 			suite.addTest(org.matsim.withinday.trafficmanagement.AllTests.suite());
