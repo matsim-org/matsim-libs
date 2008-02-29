@@ -123,7 +123,13 @@ public class Controler {
 	private boolean overwriteFiles = false;
 	private static int iteration = -1;
 
-	/** The swing event listener list to manage ControlerListeners efficiently. */
+	/** The swing event listener list to manage ControlerListeners efficiently. First list manages core listeners
+	 * which are called first when a ControlerEvent is thrown. I.e. this list contains the listeners that are
+	 * always running in a predefined order to ensure correctness.
+	 * The second list manages the other listeners, which can be added by calling addControlerListener(...).
+	 * A normal ControlerListener must not depend on the execution of other ControlerListeners.
+	 * */
+	private final EventListenerList coreListenerList = new EventListenerList();
 	private final EventListenerList listenerList = new EventListenerList();
 
 	/** The Config instance the Controler uses. */
@@ -256,6 +262,7 @@ public class Controler {
 		loadData();
 		setup();
 		loadCoreListeners();
+		loadControlerListeners();
 		fireControlerStartupEvent();
 	}
 
@@ -264,7 +271,7 @@ public class Controler {
 		int lastIteration = this.config.controler().getLastIteration();
 		this.state = ControlerState.Running;
 
-		for (iteration = firstIteration; iteration <= lastIteration && this.state == ControlerState.Running; iteration++) {
+		for (iteration = firstIteration; (iteration <= lastIteration) && (this.state == ControlerState.Running); iteration++) {
 			log.info("ITERATION " + iteration + " BEGINS");
 			this.stopwatch.setCurrentIteration(Controler.iteration);
 			this.stopwatch.beginOperation("iteration");
@@ -527,20 +534,26 @@ public class Controler {
 		 * which in turn is used by the PlansScoring-Listener.
 		 */
 
-		this.addControlerListener(new CoreControlerListener());
+		this.addCoreControlerListener(new CoreControlerListener());
 
 
 		// load road pricing, if requested
 		if (this.config.roadpricing().getTollLinksFile() != null) {
 			this.roadPricing = new RoadPricing();
-			this.addControlerListener(this.roadPricing);
+			this.addCoreControlerListener(this.roadPricing);
 		}
 
 		// the default handling of plans
-		this.addControlerListener(new PlansScoring());
-		this.addControlerListener(new PlansReplanning());
-		this.addControlerListener(new PlansDumping());
-
+		this.addCoreControlerListener(new PlansScoring());
+		this.addCoreControlerListener(new PlansReplanning());
+		this.addCoreControlerListener(new PlansDumping());
+	}
+	/**
+	 * Loads the default set of {@link org.matsim.controler.listener ControlerListener} to provide some more basic functionality.
+	 * Unlike the core ControlerListeners the order in which the listeners of this method are added must not affect
+	 * the correctness of the code.
+	 */
+	protected void loadControlerListeners() {
 		// optional: LegHistogram
 		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
 
@@ -558,7 +571,6 @@ public class Controler {
 		if (this.config.counts().getCountsFileName() != null) {
 			this.addControlerListener(new CountControlerListener(this.config));
 		}
-
 	}
 
 	/**
@@ -583,7 +595,7 @@ public class Controler {
 	}
 
 	/*default*/ void enableEventsWriter() {
-		if (this.eventWriter != null && !this.eventWriterAdded) {
+		if ((this.eventWriter != null) && !this.eventWriterAdded) {
 			this.events.addHandler(this.eventWriter);
 			this.eventWriterAdded = true;
 		}
@@ -611,6 +623,41 @@ public class Controler {
 			sim.run();
 		}
 	}
+
+	/* ===================================================================
+	 * methods for core ControlerListeners
+	 * =================================================================== */
+
+	/**
+	 * Add a core ControlerListener to the Controler instance
+	 *
+	 * @param l
+	 */
+	@SuppressWarnings("unchecked")
+	protected final void addCoreControlerListener(final ControlerListener l) {
+		Class[] interfaces = l.getClass().getInterfaces();
+		for (int i = 0; i < interfaces.length; i++) {
+			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
+				this.coreListenerList.add(interfaces[i], l);
+			}
+		}
+	}
+
+	/**
+	 * Removes a core ControlerListener from the Controler instance
+	 *
+	 * @param l
+	 */
+	@SuppressWarnings("unchecked")
+	protected final void removeCoreControlerListener(final ControlerListener l) {
+		Class[] interfaces = l.getClass().getInterfaces();
+		for (int i = 0; i < interfaces.length; i++) {
+			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
+				this.coreListenerList.remove(interfaces[i], l);
+			}
+		}
+	}
+
 
 	/* ===================================================================
 	 * methods for ControlerListeners
@@ -651,7 +698,11 @@ public class Controler {
 	 */
 	private void fireControlerStartupEvent() {
 		StartupEvent event = new StartupEvent(this);
-    StartupListener[] listener = this.listenerList.getListeners(StartupListener.class);
+		StartupListener[] listener = this.coreListenerList.getListeners(StartupListener.class);
+    for (int i = 0; i < listener.length; i++) {
+    	listener[i].notifyStartup(event);
+    }
+    listener = this.listenerList.getListeners(StartupListener.class);
     for (int i = 0; i < listener.length; i++) {
     	listener[i].notifyStartup(event);
     }
@@ -663,7 +714,11 @@ public class Controler {
 	 */
 	private void fireControlerShutdownEvent(final boolean unexpected) {
 		ShutdownEvent event = new ShutdownEvent(this, unexpected);
-    ShutdownListener[] listener = this.listenerList.getListeners(ShutdownListener.class);
+    ShutdownListener[] listener = this.coreListenerList.getListeners(ShutdownListener.class);
+    for (int i = 0; i < listener.length; i++) {
+    	listener[i].notifyShutdown(event);
+    }
+    listener = this.listenerList.getListeners(ShutdownListener.class);
     for (int i = 0; i < listener.length; i++) {
     	listener[i].notifyShutdown(event);
     }
@@ -675,7 +730,11 @@ public class Controler {
 	 */
 	private void fireControlerIterationStartsEvent(final int iteration) {
 		IterationStartsEvent event = new IterationStartsEvent(this, iteration);
-		IterationStartsListener[] listener = this.listenerList.getListeners(IterationStartsListener.class);
+		IterationStartsListener[] listener = this.coreListenerList.getListeners(IterationStartsListener.class);
+		for (int i = 0; i < listener.length; i++) {
+    	listener[i].notifyIterationStarts(event);
+    }
+		listener = this.listenerList.getListeners(IterationStartsListener.class);
 		for (int i = 0; i < listener.length; i++) {
     	listener[i].notifyIterationStarts(event);
     }
@@ -688,7 +747,11 @@ public class Controler {
 	 */
 	private void fireControlerIterationEndsEvent(final int iteration) {
 		IterationEndsEvent event = new IterationEndsEvent(this, iteration);
-		IterationEndsListener[] listener = this.listenerList.getListeners(IterationEndsListener.class);
+		IterationEndsListener[] listener = this.coreListenerList.getListeners(IterationEndsListener.class);
+		for (int i = 0; i < listener.length; i++) {
+			listener[i].notifyIterationEnds(event);
+		}
+		listener = this.listenerList.getListeners(IterationEndsListener.class);
 		for (int i = 0; i < listener.length; i++) {
 			listener[i].notifyIterationEnds(event);
 		}
@@ -701,7 +764,11 @@ public class Controler {
 	 */
 	private void fireControlerScoringEvent(final int iteration) {
 		ScoringEvent event = new ScoringEvent(this, iteration);
-		ScoringListener[] listener = this.listenerList.getListeners(ScoringListener.class);
+		ScoringListener[] listener = this.coreListenerList.getListeners(ScoringListener.class);
+		for (int i = 0; i < listener.length; i++) {
+			listener[i].notifyScoring(event);
+		}
+		listener = this.listenerList.getListeners(ScoringListener.class);
 		for (int i = 0; i < listener.length; i++) {
 			listener[i].notifyScoring(event);
 		}
@@ -714,7 +781,11 @@ public class Controler {
 	 */
 	private void fireControlerReplanningEvent(final int iteration) {
 		ReplanningEvent event = new ReplanningEvent(this, iteration);
-		ReplanningListener[] listener = this.listenerList.getListeners(ReplanningListener.class);
+		ReplanningListener[] listener = this.coreListenerList.getListeners(ReplanningListener.class);
+		for (int i = 0; i < listener.length; i++) {
+			listener[i].notifyReplanning(event);
+		}
+		listener = this.listenerList.getListeners(ReplanningListener.class);
 		for (int i = 0; i < listener.length; i++) {
 			listener[i].notifyReplanning(event);
 		}
@@ -727,7 +798,11 @@ public class Controler {
 	 */
 	private void fireControlerBeforeMobsimEvent(final int iteration) {
 		BeforeMobsimEvent event = new BeforeMobsimEvent(this, iteration);
-		BeforeMobsimListener[] listener = this.listenerList.getListeners(BeforeMobsimListener.class);
+		BeforeMobsimListener[] listener = this.coreListenerList.getListeners(BeforeMobsimListener.class);
+		for (int i = 0; i < listener.length; i++) {
+			listener[i].notifyBeforeMobsim(event);
+		}
+		listener = this.listenerList.getListeners(BeforeMobsimListener.class);
 		for (int i = 0; i < listener.length; i++) {
 			listener[i].notifyBeforeMobsim(event);
 		}
@@ -740,7 +815,11 @@ public class Controler {
 	 */
 	private void fireControlerAfterMobsimEvent(final int iteration) {
 		AfterMobsimEvent event = new AfterMobsimEvent(this, iteration);
-		AfterMobsimListener[] listener = this.listenerList.getListeners(AfterMobsimListener.class);
+		AfterMobsimListener[] listener = this.coreListenerList.getListeners(AfterMobsimListener.class);
+		for (int i = 0; i < listener.length; i++) {
+			listener[i].notifyAfterMobsim(event);
+		}
+		listener = this.listenerList.getListeners(AfterMobsimListener.class);
 		for (int i = 0; i < listener.length; i++) {
 			listener[i].notifyAfterMobsim(event);
 		}
@@ -1050,11 +1129,11 @@ public class Controler {
 				Controler.this.eventWriter.closefile();
 			}
 
-			if ((iteration % 10 == 0 && iteration > event.getControler().getFirstIteration()) || (iteration % 10 >= 6)) {
+			if (((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) || (iteration % 10 >= 6)) {
 				Controler.this.linkStats.addData(Controler.this.volumes, Controler.this.travelTimeCalculator);
 			}
 
-			if (iteration % 10 == 0 && iteration > event.getControler().getFirstIteration()) {
+			if ((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) {
 				Controler.this.events.removeHandler(Controler.this.volumes);
 				Controler.this.linkStats.writeFile(getIterationFilename(FILENAME_LINKSTATS));
 			}
@@ -1075,7 +1154,7 @@ public class Controler {
 	 * =================================================================== */
 
 	public static void main(final String[] args) {
-		if (args == null || args.length == 0) {
+		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
