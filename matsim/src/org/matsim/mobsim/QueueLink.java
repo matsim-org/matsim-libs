@@ -90,6 +90,7 @@ public class QueueLink extends Link {
 
 	/** The number of vehicles able to leave the buffer in one time step (usually 1s). */
 	private double simulatedFlowCapacity; // previously called timeCap
+	private double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
 	private int timeCapCeil; // optimization, cache Math.ceil(timeCap)
 	private double timeCapFraction; // optimization, cache timeCap - (int)timeCap
 
@@ -138,10 +139,8 @@ public class QueueLink extends Link {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
-		// also computing the ceiling of the capacity:
+		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.timeCapCeil = (int) Math.ceil(this.simulatedFlowCapacity);
-
-		// ... and also the fractional part of timeCap
 		this.timeCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
@@ -529,7 +528,7 @@ public class QueueLink extends Link {
 	public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
 		double now = SimulationTimer.getTime();
 		int cnt = 0;
-		double queueLen = 0.0; // the length of the queue jammed vehicles build at the end of the link
+		double queueEnd = this.length; // the length of the queue jammed vehicles build at the end of the link
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 		double vehLen = Math.min(	// the length of a vehicle in visualization
 				this.length / this.storageCapacity, // all vehicles must have place on the link
@@ -537,24 +536,20 @@ public class QueueLink extends Link {
 
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.buffer) {
-			cnt++;
 
-			double distanceFromFromNode = this.length - cnt * vehLen;
 			int lane = 1 + (veh.getID() % getLanes());
-			double speed = getFreespeed();
 
-			int cmp = (int) (veh.getDepartureTime_s() + 1.0 / this.simulatedFlowCapacity + 2.0);
-			if (now > cmp) {
-				speed = 0.0;
-			}
+			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
+			double speed = (now > cmp) ? 0.0 : getFreespeed();
 			veh.setSpeed(speed);
 
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
-					this, distanceFromFromNode + ((NetworkLayer)this.layer).getEffectiveCellSize(),
+					this, queueEnd,// + ((NetworkLayer)this.layer).getEffectiveCellSize(),
 					lane, speed, PositionInfo.VehicleState.Driving,veh.getDriver().getVisualizerData());
 			positions.add(position);
+			cnt++;
+			queueEnd -= vehLen;
 		}
-		queueLen += this.buffer.size() * vehLen;
 
 		/* place other driving cars according the following rule:
 		 * - calculate the time how long the vehicle is on the link already
@@ -564,13 +559,11 @@ public class QueueLink extends Link {
 		 */
 		double lastDistance = Integer.MAX_VALUE;
 		for (Vehicle veh : this.vehQueue) {
-			double speed = getFreespeed();
 			double travelTime = now - (veh.getDepartureTime_s() - this.freeTravelDuration);
 			double distanceOnLink = (this.freeTravelDuration == 0.0 ? 0.0 : ((travelTime / this.freeTravelDuration) * this.length));
-			if (distanceOnLink > this.length - queueLen) { // vehicle is already in queue
-				queueLen += vehLen;
-				distanceOnLink = this.length - queueLen;
-				speed = 0.0;
+			if (distanceOnLink > queueEnd) { // vehicle is already in queue
+				distanceOnLink = queueEnd;
+				queueEnd -= vehLen;
 			}
 			if (distanceOnLink >= lastDistance) {
 				/* we have a queue, so it should not be possible that one vehicles overtakes another.
@@ -582,10 +575,12 @@ public class QueueLink extends Link {
 				distanceOnLink = lastDistance - vehLen;
 				if (distanceOnLink < 0) distanceOnLink = 0.0;
 			}
+			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
+			double speed = (now > cmp) ? 0.0 : getFreespeed();
 			veh.setSpeed(speed);
 			int lane = 1 + (veh.getID() % getLanes());
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
-					this, distanceOnLink + ((NetworkLayer)this.layer).getEffectiveCellSize(),
+					this, distanceOnLink,// + ((NetworkLayer)this.layer).getEffectiveCellSize(),
 					lane, speed, PositionInfo.VehicleState.Driving,veh.getDriver().getVisualizerData());
 			positions.add(position);
 			lastDistance = distanceOnLink;
@@ -631,7 +626,7 @@ public class QueueLink extends Link {
 			// the cars in the buffer
 			for (Vehicle veh : this.buffer) {
 				int lane = 1 + veh.getID() % nLanes;
-				int cmp = (int) (veh.getDepartureTime_s() + 1.0 / this.simulatedFlowCapacity + 2.0);
+				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
 				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this, distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
@@ -641,7 +636,7 @@ public class QueueLink extends Link {
 			// the cars in the drivingQueue
 			for (Vehicle veh : this.vehQueue) {
 				int lane = 1 + veh.getID() % nLanes;
-				int cmp = (int) (veh.getDepartureTime_s() + 1.0 / this.simulatedFlowCapacity + 2.0);
+				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
 				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this, distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);

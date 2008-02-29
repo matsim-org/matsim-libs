@@ -191,6 +191,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 		private final double freespeedTravelTime;
 		protected final double spaceCap;
 		private final double timeCap;
+		private final double inverseTimeCap;
 
 		protected final double radioLengthToEuklideanDist; // ratio of link.length / euklideanDist
 		private final double effectiveCellSize;
@@ -205,6 +206,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			this.radioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
 			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed();
 			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
+			this.inverseTimeCap = 1.0 / this.timeCap;
 			this.effectiveCellSize = effectiveCellSize;
 			this.spaceCap = (this.link.getLength() * this.link.getLanes()) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
 		}
@@ -259,7 +261,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 		 */
 		public void getVehiclePositionsQueue(final Collection<PositionInfo> positions, final double time) {
 			int cnt = 0;
-			double queueLen = 0.0; // the length of the queue jammed vehicles build at the end of the link
+			double queueEnd = this.link.getLength(); // the length of the queue jammed vehicles build at the end of the link
 			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 			double vehLen = Math.min(	// the length of a vehicle in visualization
 					this.euklideanDist / this.spaceCap, // all vehicles must have place on the link
@@ -267,29 +269,21 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 
 			// put all cars in the buffer one after the other
 			for (EventAgent agent : this.buffer) {
-				cnt++;
-				// distance from fnode:
-				double distanceFromFromNode = this.euklideanDist - cnt * vehLen;
 
-				// lane:
 				int lane = 1 + (agent.intId % this.link.getLanes());
 
-				// speed:
-				double speed = this.link.getFreespeed();
-				int cmp = (int) (agent.time + this.freespeedTravelTime + 1.0 / this.timeCap + 2.0);
-
-				if (time > cmp) {
-					speed = 0.0;
-				}
+				int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
+				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed();
 				agent.speed = speed;
 
 				PositionInfo position = new PositionInfo(agent.id,
-						this.link, distanceFromFromNode/* + NetworkLayer.CELL_LENGTH*/,
+						this.link, queueEnd/* + NetworkLayer.CELL_LENGTH*/,
 						lane, speed, PositionInfo.VehicleState.Driving,null);
-				agent.linkPosition = distanceFromFromNode * this.radioLengthToEuklideanDist;
+				agent.linkPosition = queueEnd * this.radioLengthToEuklideanDist;
 				positions.add(position);
+				cnt++;
+				queueEnd -= vehLen;
 			}
-			queueLen += this.buffer.size() * vehLen;
 
 			/* place other driving cars according the following rule:
 			 * - calculate the time how long the vehicle is on the link already
@@ -299,23 +293,11 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			 */
 			double lastDistance = Integer.MAX_VALUE;
 			for (EventAgent agent : this.drivingQueue) {
-				double speed = this.link.getFreespeed();
 				double travelTime = time - agent.time;
-				double distanceOnLink;
-				if (travelTime > this.freespeedTravelTime) {
-					// veh could be in buffer now
-					distanceOnLink = (this.freespeedTravelTime == 0.0 ? 0.0 : this.euklideanDist);
-					int cmp = (int) (agent.time + this.freespeedTravelTime + 1.0 / this.timeCap + 2.0);
-					if (time > cmp) {
-						speed = 0.0;
-					}
-				} else {
-					distanceOnLink = (this.freespeedTravelTime == 0.0 ? 0.0 : ((travelTime / this.freespeedTravelTime) * this.euklideanDist));
-					if (distanceOnLink > this.euklideanDist - queueLen) { // vehicle is already in queue
-						queueLen += vehLen;
-						distanceOnLink = this.euklideanDist - queueLen;
-						speed = 0.0;
-					}
+				double distanceOnLink = (this.freespeedTravelTime == 0.0 ? 0.0 : ((travelTime / this.freespeedTravelTime) * this.euklideanDist));
+				if (distanceOnLink > queueEnd) { // vehicle is already in queue
+					distanceOnLink = queueEnd;
+					queueEnd -= vehLen;
 				}
 				if (distanceOnLink >= lastDistance) {
 					/* we have a queue, so it should not be possible that one vehicles overtakes another.
@@ -327,6 +309,8 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 					distanceOnLink = lastDistance - vehLen;
 					if (distanceOnLink < 0) distanceOnLink = 0.0;
 				}
+				int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
+				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed();
 				agent.speed = speed;
 				int lane = 1 + (agent.intId % this.link.getLanes());
 				PositionInfo position = new PositionInfo(agent.id,
@@ -378,7 +362,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 				for (EventAgent agent : this.buffer) {
 					agent.lane = 1 + agent.intId % nLanes;
 					agent.linkPosition = distFromFromNode;
-					int cmp = (int) (agent.time + this.freespeedTravelTime + 1.0 / this.timeCap + 2.0);
+					int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 					if (time > cmp) {
 						agent.speed = 0.0;
 					} else {
@@ -393,7 +377,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 				for (EventAgent agent : this.drivingQueue) {
 					agent.lane = 1 + agent.intId % nLanes;
 					agent.linkPosition = distFromFromNode;
-					int cmp = (int) (agent.time + this.freespeedTravelTime + 1.0 / this.timeCap + 2.0);
+					int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 					if (time > cmp) {
 						agent.speed = 0.0;
 					} else {
