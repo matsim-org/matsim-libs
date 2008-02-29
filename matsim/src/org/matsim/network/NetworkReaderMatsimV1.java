@@ -133,6 +133,12 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 			effectivecellsize = "7.5"; // per default a cell size of 7.5 meters is defined
 		}
 		this.network.setEffectiveCellSize(effectivecellsize);
+		
+		String effectivelanewidth = atts.getValue("effectivelanewidth");
+		if (effectivelanewidth == null){
+			effectivelanewidth = "3.75"; // per default lane width is 3.75
+		}
+		this.network.setEffectiveLaneWidth(effectivelanewidth);
 
 		if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
 			this.log.warn("capPeriod, capDivider and/or capdivider are set in the network file. They will be ignored.");

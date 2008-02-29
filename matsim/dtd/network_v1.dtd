@@ -23,7 +23,8 @@
 
 <!ELEMENT links (link)*>
 <!ATTLIST links capperiod  CDATA #IMPLIED
-				effectivecellsize CDATA #IMPLIED
+				effectivecellsize CDATA "7.5"
+				effectivelanewidth CDATA "3.75"
                 capPeriod  CDATA #IMPLIED
                 capDivider CDATA #IMPLIED
                 capdivider CDATA #IMPLIED>
@@ -100,7 +101,11 @@
 
 <!-- ATTRIBUTE effectivecellsize:
      format := double
-     meaning:  It defines the effective length of the cells in meters. The MATSim default is 7.5 -->
+     meaning:  It defines the effective length of the cells in meters. The default value is 7.5 -->
+     
+<!-- ATTRIBUTE effectivelanewidth:
+     format := double
+     meaning:  It defines the effective width of a lane in meters. The default value is 3.75 -->     
 
 <!-- ATTRIBUTE capDivider, capdivider and capPeriod:
      DEPRECATED!!!
