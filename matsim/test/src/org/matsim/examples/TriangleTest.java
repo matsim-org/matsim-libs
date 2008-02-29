@@ -77,14 +77,14 @@ public class TriangleTest extends MatsimTestCase {
 		System.out.println("  comparing input and output world file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(Gbl.getConfig().world().getInputFile());
 		long checksum_run = CRCChecksum.getCRCFromFile(Gbl.getConfig().world().getOutputFile());
-		assertEquals(checksum_ref, checksum_run);
+		assertEquals("different world files", checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
 
 	private final void checkEnrichedOutputFacilities() {
 		System.out.println("  checksum check of enriched output facilities... ");
 		long checksum_facilities = CRCChecksum.getCRCFromFile(Gbl.getConfig().facilities().getOutputFile());
-		assertEquals(TriangleScenario.CHECKSUM_FACILITIES_ENRICHED,checksum_facilities);
+		assertEquals("different facilities files", TriangleScenario.CHECKSUM_FACILITIES_ENRICHED,checksum_facilities);
 		System.out.println("  done.");
 	}
 
@@ -92,7 +92,7 @@ public class TriangleTest extends MatsimTestCase {
 		System.out.println("  comparing input and output network file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(Gbl.getConfig().network().getInputFile());
 		long checksum_run = CRCChecksum.getCRCFromFile(Gbl.getConfig().network().getOutputFile());
-		assertEquals(checksum_ref, checksum_run);
+		assertEquals("different network files", checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
 
@@ -100,7 +100,7 @@ public class TriangleTest extends MatsimTestCase {
 		System.out.println("  comparing reference and output plans file... ");
 		long checksum_ref = CRCChecksum.getCRCFromGZFile(getInputDirectory() + "plans.xml.gz");
 		long checksum_run = CRCChecksum.getCRCFromGZFile(Gbl.getConfig().plans().getOutputFile());
-		assertEquals(checksum_ref, checksum_run);
+		assertEquals("different plans files", checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
 
