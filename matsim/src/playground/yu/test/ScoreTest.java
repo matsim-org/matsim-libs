@@ -138,10 +138,11 @@ public class ScoreTest extends PersonAlgorithm {
 		// final String plansFilename =
 		// "../data/ivtch/input/_10pctZrhCarPtPlans_opt.xml.gz";
 		// final String plansFilename = "test/yu/equil_test/100.plans.xml.gz";
-		final String plansFilename = "test/yu/equil_test/output_plans.xml.gz";
+//		final String plansFilename = "test/yu/equil_test/equil269/output_plans.xml.gz";
+		final String plansFilename = "test/yu/equil_test/equil269/ITERS/it.90/90.plans.xml.gz";
 		// final String outputFilename =
 		// "../data/ivtch/run265optChg_run270/scoreTest_input.txt";
-		final String outputFilename = "test/yu/equil_test/output/output_scoreTest.xml";
+		final String outputFilename = "test/yu/equil_test/equil269/90.scoreTest.txt";
 
 		Gbl.startMeasurement();
 		@SuppressWarnings("unused")
