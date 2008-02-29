@@ -1,7 +1,5 @@
 package playground.david.vis.data;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
@@ -17,6 +15,8 @@ import org.matsim.utils.collections.QuadTree;
 import playground.david.vis.gui.PoolFactory;
 import playground.david.vis.interfaces.OTFDataReader;
 import playground.david.vis.interfaces.OTFDrawer;
+import playground.david.vis.interfaces.OTFLiveServerRemote;
+import playground.david.vis.interfaces.OTFQuery;
 import playground.david.vis.interfaces.OTFServerRemote;
 
 public class OTFClientQuad extends QuadTree<OTFDataReader> {
@@ -151,7 +151,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		Gbl.startMeasurement();
 		int colls = this.execute(bound, this.new ReadDataExecutor(in, readConst, result));
 		getAdditionalData(in, readConst, result);
-		System.out.print("readData: "); Gbl.printElapsedTime();
+		//System.out.print("readData: "); Gbl.printElapsedTime();
 
 		PoolFactory.resetAll();
 		
@@ -231,5 +231,17 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	@Override
 	public double getMaxNorthing() {
 		return maxNorthing;
+	}
+	public OTFQuery doQuery(OTFQuery query) {
+		OTFQuery result = null;
+		try {
+			if(host.isLive()) {
+				result = ((OTFLiveServerRemote)host).answerQuery(query);
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 	}
 }

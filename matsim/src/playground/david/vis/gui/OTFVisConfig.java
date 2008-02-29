@@ -23,7 +23,8 @@ public class OTFVisConfig extends Module {
 	public static final String FILE_VERSION = "fileVersion";
 	public static final String FILE_MINOR_VERSION = "fileMinorVersion";
 
-	public static final String BIG_TIME_STEP = "60";
+	public static final String BIG_TIME_STEP = "bigTimeStep";
+	public static final String TIME_STEP = "timeStep";
 
 	private  float agentSize = 100.f;
 	private  String middleMouseFunc = "Pan";
@@ -33,6 +34,7 @@ public class OTFVisConfig extends Module {
 	private int fileMinorVersion = OTFQuadFileHandler.MINORVERSION;
 
 	private int bigTimeStep = 600;
+	private final int timeStep = 1;
 	
 
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);

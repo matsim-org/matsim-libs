@@ -35,6 +35,7 @@ import java.util.Set;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
+import org.matsim.events.Events;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -43,10 +44,12 @@ import org.matsim.utils.collections.QuadTree.Rect;
 
 import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
+import playground.david.vis.interfaces.OTFLiveServerRemote;
 import playground.david.vis.interfaces.OTFNetHandler;
-import playground.david.vis.interfaces.OTFServerRemote;
+import playground.david.vis.interfaces.OTFQuery;
+import playground.david.vis.interfaces.OTFServerRemote.TimePreference;
 
-public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemote{
+public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServerRemote{
 	static class QuadStorage {
 		public String id;
 		public OTFServerQuad quad;
@@ -84,9 +87,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 	private Plans pop = null;
 	public ByteArrayOutputStream out = null;
 	private QueueNetworkLayer network = null;
+	private Events events;
 
 
-	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population) throws RemoteException {
+	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, Events events) throws RemoteException {
 		super(4019,new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
 		UserReadableName = ReadableName;
 		net = new OTFVisNet(network);
@@ -94,6 +98,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 		this.network = network;
 		out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
+		this.events = events;
 	}
 
 	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, boolean noSSL) throws RemoteException {
@@ -108,7 +113,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 
 	public static boolean useSSL = true;
 	
-	public static OnTheFlyServer createInstance(String ReadableName, QueueNetworkLayer network, Plans population, boolean useSSL) {
+	public static OnTheFlyServer createInstance(String ReadableName, QueueNetworkLayer network, Plans population, Events events, boolean useSSL) {
 		OnTheFlyServer result = null;
 		
 		OnTheFlyServer.useSSL = useSSL;
@@ -137,7 +142,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 		// Register with RMI to be seen from client
 		try {
 			// Create SSL-based registry
-			if (useSSL) result = new OnTheFlyServer(ReadableName, network, population);
+			if (useSSL) result = new OnTheFlyServer(ReadableName, network, population,events);
 			else result  = new OnTheFlyServer(ReadableName, network, population, true);
 
 			// Bind this object instance to the name "HelloServer"
@@ -309,6 +314,13 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFServerRemo
 	public int getLocalTime() throws RemoteException {
 		return localTime;
 	}
+	
+
+	public OTFQuery answerQuery(playground.david.vis.interfaces.OTFQuery query) throws RemoteException {
+		query.query(network, pop, events);
+		return query;
+	}
+	
 
 	public boolean isLive() {
 		return true;

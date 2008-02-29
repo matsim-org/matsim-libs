@@ -36,7 +36,6 @@ import org.matsim.world.World;
 
 import playground.david.vis.OTFQuadFileHandler;
 import playground.david.vis.OnTheFlyServer;
-import playground.david.vis.OTFQuadFileHandler.Writer;
 
 /**
  * @author DS
@@ -59,7 +58,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	
 	@Override
 	protected void prepareSim() {
-		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans, false);
+		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans, events, false);
 
 		super.prepareSim();
 		
