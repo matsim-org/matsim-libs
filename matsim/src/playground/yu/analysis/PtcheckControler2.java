@@ -37,13 +37,13 @@ import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.Events;
-import org.matsim.events.algorithms.SnapshotGenerator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
 import org.matsim.utils.io.IOUtils;
 
 /**
- * test of PtCheck and PtRate, outputs Public-Transit user fraction
+ * test of PtCheck and PtRate, outputs Public-Transit user fraction for
+ * Plansfile with Car_License
  * 
  * @author ychen
  * 
@@ -60,15 +60,22 @@ public class PtcheckControler2 extends Controler {
 		 * internal bufferedWriter
 		 */
 		private BufferedWriter ptRateWriter;
+
 		private CalcAverageTripLength catl = null;
+
 		private CalcNetAvgSpeed cas = null;
+
 		private CalcTrafficPerformance ctpf = null;
+
 		private RoadPricing rp = null;
+
 		private OnRouteModalSplit orms = null;
+
 		private TravelTimeModalSplit ttms = null;
+
 		private LegDistance ld = null;
+
 		private CalcLinkAvgSpeed clas = null;
-		private SnapshotGenerator visualizer = null;
 
 		public void notifyStartup(StartupEvent event) {
 			Controler ctl = event.getControler();

@@ -39,13 +39,18 @@ public class PtCheck2 extends PersonAlgorithm {
 	 * Counter of all read persons
 	 */
 	private int personCnt;
+
 	private int licensedCnt;
+
 	private int licensedCarUserCnt;
+
 	/**
 	 * @param licensedPtUserCnt -
 	 *            Counter of all persons, who use public transport
 	 */
 	private int licensedPtUserCnt;
+
+	private int licensedOtherModalCnt;
 
 	/**
 	 * @param out -
@@ -70,6 +75,7 @@ public class PtCheck2 extends PersonAlgorithm {
 		licensedCnt = 0;
 		licensedPtUserCnt = 0;
 		licensedCarUserCnt = 0;
+		licensedOtherModalCnt = 0;
 	}
 
 	@Override
@@ -83,6 +89,8 @@ public class PtCheck2 extends PersonAlgorithm {
 					licensedPtUserCnt++;
 				} else if (planType.equals("car")) {
 					licensedCarUserCnt++;
+				} else {
+					licensedOtherModalCnt++;
 				}
 			}
 		}
@@ -99,6 +107,13 @@ public class PtCheck2 extends PersonAlgorithm {
 	public double getLicensedCarRate() {
 		if (licensedCnt > 0)
 			return (double) licensedCarUserCnt / (double) licensedCnt;
+		System.err.println("there is no persons licensed gecheckt!!");
+		return -1.0;
+	}
+
+	public double getLicensedOtherModalRate() {
+		if (licensedCnt > 0)
+			return (double) licensedOtherModalCnt / (double) licensedCnt;
 		System.err.println("there is no persons licensed gecheckt!!");
 		return -1.0;
 	}
@@ -137,7 +152,7 @@ public class PtCheck2 extends PersonAlgorithm {
 	 * @param ptUserCnt -
 	 *            The ptUserCnt to set.
 	 */
-	public void setPtUserCnt(int ptUserCnt) {
+	public void setLicensedPtUserCnt(int ptUserCnt) {
 		this.licensedPtUserCnt = ptUserCnt;
 	}
 
@@ -151,7 +166,9 @@ public class PtCheck2 extends PersonAlgorithm {
 	public void write(int Iter) throws IOException {
 		out.write(Iter + "\t" + personCnt + "\t" + licensedCnt + "\t"
 				+ licensedPtUserCnt + "\t" + getLicensedPtRate() + "\t"
-				+ licensedCarUserCnt + "\t" + getLicensedCarRate() + "\n");
+				+ licensedCarUserCnt + "\t" + getLicensedCarRate() + "\t"
+				+ licensedOtherModalCnt + "\t" + getLicensedOtherModalRate()
+				+ "\n");
 		out.flush();
 	}
 
@@ -164,8 +181,10 @@ public class PtCheck2 extends PersonAlgorithm {
 	 */
 	public void resetCnt() {
 		setPersonCnt(0);
-		setPtUserCnt(0);
+		setLicensedPtUserCnt(0);
 		licensedCarUserCnt = 0;
+		licensedCnt = 0;
+		licensedOtherModalCnt = 0;
 	}
 
 	/**
