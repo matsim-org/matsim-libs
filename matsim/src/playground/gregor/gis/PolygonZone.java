@@ -18,11 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.world;
+package playground.gregor.gis;
 
 import org.apache.log4j.Logger;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.world.Location;
 
 /**
  * A geographical object in MATSim. It describes a zone as a polygon. The

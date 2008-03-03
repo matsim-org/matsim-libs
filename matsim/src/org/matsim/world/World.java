@@ -34,6 +34,7 @@ import org.matsim.plans.Plans;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.algorithms.WorldAlgorithm;
 
+
 public class World {
 
 	//////////////////////////////////////////////////////////////////////
@@ -200,7 +201,6 @@ public class World {
 		if (this.layers.containsKey(type)) { Gbl.errorMsg("Layer type=" + type + " already exixts."); }
 		if (type.equals(Facilities.LAYER_TYPE)) { return this.createFacilityLayer(); }
 		if (type.equals(NetworkLayer.LAYER_TYPE)) { return this.createNetworkLayer(); }
-		if (type.equals(PolygonZoneLayer.LAYER_TYPE)) { return this.createPolygonZoneLayer(type,name); }
 		return this.createZoneLayer(type,name);
 	}
 
@@ -216,12 +216,6 @@ public class World {
 
 	private final ZoneLayer createZoneLayer(final IdI type,final String name) {
 		ZoneLayer l = new ZoneLayer(type,name);
-		this.layers.put(l.getType(),l);
-		return l;
-	}
-
-	private final PolygonZoneLayer createPolygonZoneLayer(final IdI type,final String name) {
-		PolygonZoneLayer l = new PolygonZoneLayer(type,name);
 		this.layers.put(l.getType(),l);
 		return l;
 	}

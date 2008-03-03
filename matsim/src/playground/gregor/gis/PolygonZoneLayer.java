@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.world;
+package playground.gregor.gis;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
@@ -26,6 +26,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.world.Layer;
 
 /**
  * The collection of polygon zone objects in MATSim.
