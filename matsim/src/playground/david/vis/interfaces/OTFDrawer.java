@@ -9,7 +9,7 @@ import playground.david.vis.data.OTFClientQuad;
 public interface OTFDrawer {
 	public void invalidate(int time) throws RemoteException;
 	public void redraw();
-	public void handleClick(Point2D.Double point);
+	public void handleClick(Point2D.Double point, int mouseButton);
 	public OTFClientQuad getQuad();
 	public Component getComponent();
 }

@@ -49,7 +49,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			String id = pos.getAgentId().toString();
 			out.putInt(id.length());
 			for (int i=0; i<id.length(); i++) out.putChar(id.charAt(i));
-			out.asCharBuffer().put(pos.getAgentId().toString());
 			out.putFloat((float)(pos.getEasting() - OTFServerQuad.offsetEast));
 			out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
 			out.putInt(pos.getVehicleState()== VehicleState.Parking ? 1:0);

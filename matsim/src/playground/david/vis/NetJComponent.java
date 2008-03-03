@@ -335,7 +335,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		return quad;
 	}
 
-	public void handleClick(Double point) {
+	public void handleClick(Double point, int mouseButton) {
 		// TODO Auto-generated method stub
 		
 	}
