@@ -111,7 +111,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 
 
 			// choose mode choice model based on main purpose
-			if (p.getAge()>=18)
+			if (person.getAge()>=18)
 				if (mainpurpose == 0) {model = new ModelModeChoiceWork18Plus();}
 				else if (mainpurpose == 1) {model = new ModelModeChoiceEducation18Plus();}
 				else if (mainpurpose == 2) {model = new ModelModeChoiceShop18Plus();}
@@ -126,7 +126,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			if (Gbl.random.nextDouble() < 0.44) { has_bike = false; }
 
 			// setting parameters
-			model.setAge(p.getAge());
+			model.setAge(person.getAge());
 			model.setDistanceHome2Work(distance);
 			model.setHHDimension(p.getHousehold().getPersonCount());
 			model.setLicenseOwnership(person.hasLicense());

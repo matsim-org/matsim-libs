@@ -21,15 +21,15 @@
 package playground.ciarif.models.subtours;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
 
-import javax.vecmath.Vector2d;
 
 import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -39,9 +39,10 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.identifiers.IdI;
 
 import playground.balmermi.census2000.data.Persons;
-import sun.misc.Cleaner;
+
 
 
 public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgorithmI {
@@ -55,13 +56,14 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final String CAR = "car";
 	private static final String BIKE = "bike";
 	private static final String WALK = "walk";
-	private static final String E = "education";
-	private static final String W = "work";
-	private static final String S = "shop";
-	private static final String H = "home";
+	private static final String E = "e";
+	private static final String W = "w";
+	private static final String S = "s";
+	private static final String H = "h";
 	private static final Coord ZERO = new Coord(0.0,0.0);
 	private final Persons persons;
 	private ModelModeChoice model;
+	private  List<PersonSubtour> personSubtours;
 	 
 		
 	//////////////////////////////////////////////////////////////////////
@@ -72,12 +74,23 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.persons = persons;
 		System.out.println("    done.");
+		this.personSubtours = new Vector<PersonSubtour>();
+	}
+	
+	public List<PersonSubtour> getPersonSubtours() {
+		return personSubtours;
+	}
+
+
+	public void setPersonSubtours(List<PersonSubtour> personSubtours) {
+		this.personSubtours = personSubtours;
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
+
 	private final void handleSubTours(final Plan plan, final TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
 		
 		// setting subtour parameters
@@ -191,70 +204,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			}
 		}
 	}
-	 private final boolean checkLeafs (Plan plan,TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
-		boolean last_leaf = false;
-		ArrayList<Integer> last_subtour = new ArrayList<Integer>();
-		last_subtour = subtours.get(subtour_idx);
-		if (last_subtour.contains(plan.getActsLegs().size()-1) && last_subtour.contains(0)){
-			last_leaf = true;
-		}
-		return last_leaf;
-	}
-	 
-	 private final ArrayList<Integer> removeSubTour (int start, int end,ArrayList<Integer> tour) {
-			for (int i=0; i<(end-start); i=i+1){
-				tour.remove(start+1);
-				System.out.println("tour " + tour);
-			}
-			return tour;
-	 }
-	
-	private final TreeMap<Integer, ArrayList<Integer>> registerSubTour (Plan plan, ArrayList<Integer> start_end, ArrayList<Integer> tour, int subtour_idx, TreeMap<Integer, ArrayList<Integer>> subtours){
-		ArrayList<Integer> subtour = new ArrayList<Integer>();
-		int start = start_end.get(0);
-		int end = start_end.get(1);
-		for (int i=start; i<=end; i=i+1){
-			 subtour.add(tour.get(i));
-		}
-		subtours.put(subtour_idx,subtour);
-		return subtours;
-	}
-	
-	private final ArrayList<Integer> extractSubTours(Plan plan, int start, int end, ArrayList<Integer> tour) {
-		boolean is_leaf = false;
-		int i=0;
-		int leaf_start = start;
-		int leaf_end = end;
-		TreeMap<Integer,Act> acts = new	TreeMap<Integer,Act>();
-		Act act0 = ((Act)plan.getActsLegs().get(tour.get(start)));
-		acts.put(0,act0);
-		while (is_leaf == false && i<=tour.size()-2){
-			i=i+1;
-			Act acti = ((Act)plan.getActsLegs().get(tour.get(i)));
-			for (int j=i-1;j>=tour.get(start);j=j-1){
-				Act actj = (Act)plan.getActsLegs().get(tour.get(j));
-				if ((acti.getCoord().getX() == actj.getCoord().getX()) &&
-					    (acti.getCoord().getY() == actj.getCoord().getY())){
-					is_leaf=true;
-					leaf_start = j;
-					leaf_end = i; 	
-					break;
-				}
-			}
-			acts.put(i, acti);
-		}
-		ArrayList<Integer> start_end = new ArrayList<Integer>();
-		start_end.add(0,leaf_start);
-		start_end.add(1,leaf_end);
-		return start_end;
-	}
-		
-	private final void registerPlan (Plan plan, ArrayList<Integer> tour) {
-		for (int i=0; i<=plan.getActsLegs().size()-1;i=i+2) {
-			tour.add(i);
-		}
-	}
-		
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
@@ -264,24 +214,40 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 				
 		Plan plan = person.getSelectedPlan();
 		int subtour_idx =0;
-		ArrayList<Integer> tour = new ArrayList<Integer>();
-		ArrayList<Integer> start_end = new ArrayList<Integer>();
-		boolean all_leafs = false;		
 		TreeMap<Integer, ArrayList<Integer>> subtours = new TreeMap<Integer,ArrayList<Integer>>();
-		this.registerPlan (plan,tour);
+		PersonSubTourExtractor pste = new PersonSubTourExtractor(persons);
+		pste.run(person);
+		subtours = pste.getSubtours();
+		subtour_idx = pste.getSubtourIdx();
+		System.out.println("subtours != " + subtours );
+		System.out.println("subtour_idx != " + subtour_idx );
+		this.handleSubTours(plan,subtours,subtour_idx);
 		
-		while (all_leafs == false){
-			start_end = this.extractSubTours(plan,0, tour.size()-1,tour);
-			subtours = this.registerSubTour(plan,start_end,tour,subtour_idx,subtours);
-			all_leafs = this.checkLeafs(plan, subtours,subtour_idx);
-			subtour_idx = subtour_idx+1;
-			this.removeSubTour(start_end.get(0),start_end.get(1), tour);
+		PersonSubtour personSubtour = new PersonSubtour();
+		personSubtour.setPerson_id(person.getId());
+		
+		
+		Iterator i= subtours.entrySet().iterator();
+		while (i.hasNext()) {
+			Map.Entry e = (Map.Entry)i.next();
+			Integer key=(Integer)e.getKey();
+			ArrayList<Integer> values=(ArrayList<Integer>)e.getValue();
+			Subtour subtour =new Subtour();
+			subtour.setId(key);
+			subtour.setPurpose("l");
+			
+			Iterator<Integer> j = values.iterator();
+			while (j.hasNext()) {
+				subtour.setNode(new Id(j.next()));
+			}
+			personSubtour.setSubtour(subtour);			
 		}
-		System.out.println("subtours fine = " + subtours);
-		this.handleSubTours(plan,subtours,subtour_idx);	
+		this.personSubtours.add(personSubtour);		
 	}
 	
+	
+	
 	public void run(Plan plan){
-		}
+	}
 }
 

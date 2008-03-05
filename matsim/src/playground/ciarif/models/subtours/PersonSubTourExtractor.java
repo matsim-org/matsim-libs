@@ -1,17 +1,23 @@
 package playground.ciarif.models.subtours;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.utils.identifiers.IdI;
+
 
 import playground.balmermi.census2000.data.Persons;
 
@@ -22,7 +28,8 @@ public class PersonSubTourExtractor extends PersonAlgorithm implements PlanAlgor
 	//////////////////////////////////////////////////////////////////////
 
 	private final Persons persons;
-	
+	private TreeMap<Integer, ArrayList<Integer>> subtours = new TreeMap<Integer,ArrayList<Integer>>();
+	private int subtour_idx;;
 	 
 		
 	//////////////////////////////////////////////////////////////////////
@@ -103,7 +110,9 @@ public class PersonSubTourExtractor extends PersonAlgorithm implements PlanAlgor
 			tour.add(i);
 		}
 	}
-		
+	//TODO@ !!!!!  Così probabilmente non basta, va fatto ancora qualcosa perchè funzioni bene anche per estrarre i subtour
+	// quando non si vuole stimare il mode choice
+	
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
@@ -112,11 +121,11 @@ public class PersonSubTourExtractor extends PersonAlgorithm implements PlanAlgor
 	public void run(Person person) {
 				
 		Plan plan = person.getSelectedPlan();
-		int subtour_idx =0;
+		//int subtour_idx =0;
 		ArrayList<Integer> tour = new ArrayList<Integer>();
 		ArrayList<Integer> start_end = new ArrayList<Integer>();
 		boolean all_leafs = false;		
-		TreeMap<Integer, ArrayList<Integer>> subtours = new TreeMap<Integer,ArrayList<Integer>>();
+		//TreeMap<Integer, ArrayList<Integer>> subtours = new TreeMap<Integer,ArrayList<Integer>>();
 		this.registerPlan (plan,tour);
 		
 		while (all_leafs == false){
@@ -126,11 +135,43 @@ public class PersonSubTourExtractor extends PersonAlgorithm implements PlanAlgor
 			subtour_idx = subtour_idx+1;
 			this.removeSubTour(start_end.get(0),start_end.get(1), tour);
 		}
-		System.out.println("subtours end = " + subtours);	
+		//chiamare qui un metodo che faccia le seguenti cose: riordini i subtours, definisca chi è il precedente di chi,
+		//dia un id ragionevole ai subtours
+		System.out.println("subtours end = " + subtours);
+		//writeSubTours ("output/output_persons_subtours.txt"); 
 	}
 	
 	public void run(Plan plan){
 		}
+	
+	//////////////////////////////////////////////////////////////////////
+	// Get methods
+	//////////////////////////////////////////////////////////////////////
+	
+	public TreeMap<Integer,ArrayList<Integer>> getSubtours() {
+		return this.subtours;
+	}
+	
+	public int getSubtourIdx() {
+		return this.subtour_idx;
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+	// Write methods
+	//////////////////////////////////////////////////////////////////////
+
+	public void writeSubTours (String outfile) {
+	
+		try {
+			FileWriter fw = new FileWriter(outfile);
+			BufferedWriter out = new BufferedWriter(fw);
+			
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}	
+	}
 }
 
 
