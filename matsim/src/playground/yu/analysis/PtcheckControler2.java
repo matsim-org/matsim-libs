@@ -152,14 +152,15 @@ public class PtcheckControler2 extends Controler {
 				}
 				if (ttms != null) {
 					ttms.write(getOutputFilename("traveltimes.txt.gz"));
-					ttms.writeCharts(getOutputFilename("traveltimes.png"));
+					ttms.writeCharts(getOutputFilename("traveltimes"));
 				}
 				if (ld != null) {
 					ld.write(getOutputFilename("legDistances.txt.gz"));
-					ld.writeCharts(getOutputFilename("legDistances.png"));
+					ld.writeCharts(getOutputFilename("legDistances"));
 				}
 				if (clas != null) {
 					clas.write(getOutputFilename("avgSpeed.txt.gz"));
+					clas.writeChart(getOutputFilename("avgSpeedCityArea.png"));
 				}
 			}
 		}

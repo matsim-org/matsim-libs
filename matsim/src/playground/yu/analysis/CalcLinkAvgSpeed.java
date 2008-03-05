@@ -40,6 +40,7 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
@@ -51,13 +52,15 @@ import org.matsim.world.World;
 public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	/**
 	 * @param arg0 -
-	 *            linkId
+	 *            a String linkId
 	 * @param arg1 -
-	 *            a SpeedCounter
+	 *            a SpeedCounter object
 	 */
 	private HashMap<String, SpeedCounter> speedCounters = new HashMap<String, SpeedCounter>();
 	private Set<Link> interestLinks = null;
 	private final int binSize, nofBins;
+	private double[] speeds;
+	private int[] speedsCount;
 
 	/**
 	 * @param network
@@ -71,12 +74,25 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		super(network);
 		this.binSize = binSize;
 		this.nofBins = nofBins;
+		speeds = new double[nofBins - 1];
+		speedsCount = new int[nofBins - 1];
 	}
 
 	public CalcLinkAvgSpeed(NetworkLayer network, final int binSize) {
 		this(network, binSize, 30 * 3600 / binSize + 1);
 	}
 
+	/**
+	 * support the speed calculation only for the links in a circle area
+	 * 
+	 * @param network
+	 * @param x-abscissa
+	 *            of the center of the circle area
+	 * @param y-vertical
+	 *            coordinates of the center of the circle area
+	 * @param radius-radius
+	 *            of the circle
+	 */
 	public CalcLinkAvgSpeed(NetworkLayer network, double x, double y,
 			double radius) {
 		this(network, 3600);
@@ -193,7 +209,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);
 			StringBuffer head = new StringBuffer("avg. Speed\nlinkId\tCapacity");
-			for (int i = 0; i < 30; i++) {
+			for (int i = 0; i < nofBins - 1; i++) {
 				head.append("\tH" + Integer.toString(i) + "-"
 						+ Integer.toString(i + 1));
 			}
@@ -206,8 +222,13 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 				IdI linkId = l.getId();
 				StringBuffer line = new StringBuffer(linkId.toString() + "\t"
 						+ l.getCapacity());
-				for (int j = 0; j < 30; j++) {
-					line.append("\t" + getAvgSpeed(linkId, (double) j * 3600));
+				for (int j = 0; j < nofBins - 1; j++) {
+					double speed = getAvgSpeed(linkId, (double) j * 3600);
+					line.append("\t" + speed);
+					if (speed > 0) {
+						speeds[j] += speed;
+						speedsCount[j]++;
+					}
 				}
 				line.append("\n");
 				out.write(line.toString());
@@ -221,6 +242,25 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		}
 	}
 
+	public void writeChart(String chartFilename) {
+		int xsLength =nofBins-1;
+		double[] xs = new double[xsLength];
+		for (int i = 0; i < xsLength; i++) {
+			xs[i] = ((double) i) * (double) binSize / 3600.0;
+		}
+		double[] ySpeed = new double[xsLength];
+		for (int i = 0; i <xsLength; i++) {
+			if (speedsCount[i] > 0) {
+				ySpeed[i] = speeds[i] / (double) speedsCount[i];
+			}
+		}
+		XYLineChart avgSpeedChart = new XYLineChart("avg. speed in cityarea",
+				"time", "avg. speed [km/h]");
+		avgSpeedChart
+				.addSeries("sum of legDistances of all agents", xs, ySpeed);
+		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);
+	}
+
 	/**
 	 * @param args
 	 */
@@ -229,9 +269,11 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		Gbl.startMeasurement();
 
 		final String netFilename = "./test/yu/ivtch/input/network.xml";
-		//		final String eventsFilename = "./test/yu/test/input/run265opt100.events.txt.gz";
-		final String eventsFilename = "../runs/run263/100.events.txt.gz";
-		final String outputFilename = "./test/yu/test/output/run263AvgSpeed.txt.gz";
+		// final String eventsFilename =
+		// "./test/yu/test/input/run265opt100.events.txt.gz";
+		final String eventsFilename = "../runs/run275/100.events.txt.gz";
+		final String outputFilename = "./test/yu/test/output/run275AvgSpeed.txt.gz";
+		final String chartFilename = "./test/yu/test/output/run275avgSpeed.png";
 
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(null);
@@ -250,6 +292,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
 		clas.write(outputFilename);
+		clas.writeChart(chartFilename);
 
 		System.out.println("-> Done!");
 		Gbl.printElapsedTime();

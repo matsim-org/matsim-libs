@@ -174,7 +174,7 @@ public class LegDistance implements EventHandlerLinkEnterI,
 				"time", "sum of legDistances [m]");
 		legDistanceSumChart.addSeries("sum of legDistances of all agents", xs,
 				legDistances);
-		legDistanceSumChart.saveAsPng(filename + "sum.png", 1024, 768);
+		legDistanceSumChart.saveAsPng(filename + "Sum.png", 1024, 768);
 		for (int i = 0; i < xsLength - 1; i++) {
 			legDistances[i] = (legCount[i] == 0) ? 0.0 : legDistances[i]
 					/ (double) legCount[i];
@@ -183,6 +183,6 @@ public class LegDistance implements EventHandlerLinkEnterI,
 				"average LegDistance", "time", "average legDistances [m]");
 		avgLegDistanceChart.addSeries("average legDistance of all agents", xs,
 				legDistances);
-		avgLegDistanceChart.saveAsPng(filename + "avg.png", 1024, 768);
+		avgLegDistanceChart.saveAsPng(filename + "Avg.png", 1024, 768);
 	}
 }

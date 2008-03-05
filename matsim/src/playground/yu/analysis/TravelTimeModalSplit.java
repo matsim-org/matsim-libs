@@ -215,7 +215,7 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 				carTravelTimes);
 		travelTimeSumChart.addSeries(
 				"sum of traveltime of public transit users", xs, ptTravelTimes);
-		travelTimeSumChart.saveAsPng(filename + "sum.png", 1024, 768);
+		travelTimeSumChart.saveAsPng(filename + "Sum.png", 1024, 768);
 		for (int j = 0; j < xsLength - 1; j++) {
 			travelTimes[j] = (arrCount[j] == 0) ? -1 : travelTimes[j]
 					/ (double) arrCount[j];
@@ -233,6 +233,6 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 		avgTravelTimeChart
 				.addSeries("average traveltime of public transit Users", xs,
 						ptTravelTimes);
-		avgTravelTimeChart.saveAsPng(filename + "avg.png", 1024, 768);
+		avgTravelTimeChart.saveAsPng(filename + "Avg.png", 1024, 768);
 	}
 }
