@@ -159,6 +159,7 @@ public class PtcheckControlerTest extends Controler {
 				}
 				if (clas != null) {
 					clas.write(getOutputFilename("avgSpeed.txt.gz"));
+					clas.writeChart(getOutputFilename("avgSpeedCityArea.png"));
 				}
 			}
 		}
