@@ -451,6 +451,52 @@ public class QuadTree<T> implements Serializable {
 					other.minY < this.maxY);
 		}
 
+		   /**
+	     * Computes the intersection of this <code>Rect</code> with the 
+	     * specified <code>Rect</code>. Returns a new <code>Rect</code> 
+	     * that represents the intersection of the two rectangles.
+	     * If the two rectangles do not intersect, the result will be
+	     * null.
+	     *
+	     * @param     r   the specified <code>Rectangle</code>
+	     * @return    the largest <code>Rectangle</code> contained in both the 
+	     *            specified <code>Rectangle</code> and in 
+	     *		  this <code>Rectangle</code>; or if the rectangles
+	     *            do not intersect, an empty rectangle.
+	     */
+	    public Rect intersection(Rect r) {
+		double tx1 = this.minX;
+		double ty1 = this.minY;
+		double tx2 = this.maxX;
+		double ty2 = this.maxY;
+		if (this.minX < r.minX) tx1 = r.minX;
+		if (this.minY < r.minY) ty1 = r.minY;
+		if (tx2 > r.maxX) tx2 = r.maxX;
+		if (ty2 > r.maxY) ty2 = r.maxY;
+		// did they intersect at all?
+		if(tx2-tx1 <=0.f || ty2-ty1 <= 0.f) return null;
+		
+		return new Rect(tx1, ty1, tx2, ty2);
+	    }
+	    
+	    /**
+	     * Adds a <code>Rect</code> to this <code>Rect</code>. 
+	     * The resulting <code>Rect</code> is the union of the two
+	     * rectangles. 
+	     * @param  r the specified <code>Rect</code>
+	     */
+	    public Rect union(Rect r) {
+			return new Rect( Math.min(minX, r.minX),
+					Math.min(minY, r.minY),
+					Math.max(maxX, r.maxX),
+					Math.max(maxY, r.maxY));
+		    }
+	    
+	    public Rect scale(double scaleX, double scaleY) {
+	    	scaleY *= centerY - minY;
+	    	scaleX *= centerX - minX;
+			return new Rect(minX - scaleX, minY-scaleY, maxX + scaleX, maxY + scaleY);
+		    }
 	}
 
 	private class Leaf implements Serializable {

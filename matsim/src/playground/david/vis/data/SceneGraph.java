@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.matsim.utils.collections.QuadTree.Rect;
 
-import playground.david.vis.gui.OTFDrawable;
 import playground.david.vis.interfaces.OTFDrawer;
 
 
@@ -25,7 +24,7 @@ class LayerDrawingOrderComparator implements Comparator<SceneLayer> {
 
 
 public class SceneGraph {
-	private final Rect rect;
+	private Rect rect;
 	private final Map<Class, SceneLayer> layers = new LinkedHashMap<Class, SceneLayer>();
 	private final List<SceneLayer> drawingLayers = new LinkedList<SceneLayer>();
 
@@ -50,6 +49,10 @@ public class SceneGraph {
 	
 	public Rect getRect() {
 		return this.rect;
+	}
+	
+	public void setRect(Rect rec) {
+		this.rect = rec;
 	}
 
 	public OTFDrawer getDrawer() {

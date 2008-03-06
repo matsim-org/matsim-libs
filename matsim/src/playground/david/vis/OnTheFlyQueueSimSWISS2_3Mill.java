@@ -73,10 +73,10 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 		world.setEvents(events);
 		
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
-		config.simulation().setEndTime(Time.parseTime("12:00:11"));
+		//config.simulation().setEndTime(Time.parseTime("12:00:11"));
 
 		sim = new OnTheFlyQueueSim(net, population, events);
-		sim.setOtfwriter(new OTFQuadFileHandler.Writer (600,net,"output/OTFQuadfileSCHWEIZ2.3.mvi.gz"));
+		sim.setOtfwriter(new OTFQuadFileHandler.Writer (600,net,"output/OTFQuadfileSCHWEIZ2.3.mvi"));
 		
 
 		sim.run();

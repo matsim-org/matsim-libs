@@ -138,12 +138,12 @@ public class OTFTVehServer implements OTFServerRemote{
 
 		synchronized (buf) {
 			// now write this into stream
-			nextTime = actTime;
 			buf.position(0);
 			quad.writeDynData(null, buf);
 			
 			byte [] buffer = new byte[buf.position()+1];
 			System.arraycopy(buf.array(), 0, buffer, 0, buffer.length);
+			nextTime = actTime;
 			timesteps.put((int)nextTime, buffer);
 			actBuffer = buffer;
 		}

@@ -183,20 +183,62 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	public synchronized SceneGraph getSceneGraph(int time, Rect rect, OTFDrawer drawer) throws RemoteException {
 		if (time == -1) time = host.getLocalTime();
 		
-		SceneGraph result = cachedTimes.get(time);
-		if ( result != null && 
-				(rect == result.getRect() || 
-				 result.getRect() == null ||
-				 result.getRect().containsOrEquals(rect))) {
-			return result;
-		}
-		// otherwise this Scenegraph is not useful, so we create a new one
-		if(host.isLive() == false) rect = null;
-		result = new SceneGraph(rect, connect, drawer);
-		getDynData(rect, result);
+		List<Rect> rects = new LinkedList<Rect>();		
 		
-		// fill with elements
-		invalidate(rect, result);
+		SceneGraph cachedResult = cachedTimes.get(time);
+		if(cachedResult != null) {
+			Rect cachedRect = cachedResult.getRect();
+			if(cachedRect == null || cachedRect.containsOrEquals(rect)) return cachedResult;
+			
+			Rect intersec = rect.intersection(cachedRect);
+			if(intersec == null) {
+				// we need to get the whole rect
+				rects.add(rect);
+				cachedResult = null;
+			} else {
+				// As we can only store ONE rect with our cached Drawing, we cannot simply
+				// add the new portion to the old rect but have to use a rect where both
+				// old and new rect fit into aka the union of both
+				rect = rect.union(cachedRect);
+				// Check the four possible rects, that need filling, possible rect follow this scheme
+				//   1133333344
+				//   11iiiiii44
+				//   11iiiiii44
+				//   1122222244
+				double r1w = cachedRect.minX - rect.minX;
+				double r2h = cachedRect.minY - rect.minY;
+				double r3h = rect.maxY -cachedRect.maxY;
+				double r4w = rect.maxX -cachedRect.maxX;
+				if (r1w > 0) rects.add(new Rect(rect.minX,rect.minY,cachedRect.minX,rect.maxY));
+				if (r4w > 0) rects.add(new Rect(cachedRect.maxX,rect.minY, rect.maxX,rect.maxY));
+				if (r2h > 0) rects.add(new Rect(cachedRect.minX,rect.minY,cachedRect.maxX,cachedRect.minY));
+				if (r3h > 0) rects.add(new Rect(cachedRect.minX,cachedRect.maxY,cachedRect.maxX,rect.maxY));
+			}
+		} else {
+			rects.add(rect);
+		}
+		
+		// otherwise this Scenegraph is not useful, so we create a new one
+		if(host.isLive() == false) {
+			rects.clear();
+			rects.add( null);
+			rect = null;
+		}
+		
+		SceneGraph result;
+		if ( cachedResult == null) {
+			result = new SceneGraph(rect, connect, drawer);
+		} else {
+			result = cachedResult;
+			result.setRect(rect);
+		}
+
+		for(Rect rectPart : rects) {
+			getDynData(rectPart, result);
+			// fill with elements
+			invalidate(rectPart, result);
+		}
+
 		result.finish();
 		cachedTimes.put(time, result);
 		return result;
