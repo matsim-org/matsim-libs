@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
@@ -47,8 +48,12 @@ import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.scoring.SNScoringFunctionFactory03;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldCreateRasterLayer;
 
+import edu.uci.ics.jung.graph.Edge;
+import edu.uci.ics.jung.graph.Vertex;
 
 public class SNControllerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 
@@ -87,9 +92,22 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 		/* code previously in loadData() */
 
-		// Stitch together the world
+		// Make a new zone layer (Raster)
+//		if(!(this.controler.getConfig().socnetmodule().getGridSpace().equals(null))){
+//		int gridSpacing = Integer.valueOf(this.controler.getConfig().socnetmodule().getGridSpace());
+//		if(Gbl.getWorld().getLayers().size()>2){
+//		System.out.println("World already contains a zone layer");
+//		new WorldCreateRasterLayer(gridSpacing).run(Gbl.getWorld());
+//		}else{
+//		new WorldCreateRasterLayer2(gridSpacing).run(Gbl.getWorld());
+////		new WorldCreateRasterLayer(3000).run(Gbl.getWorld());
+//		}
+//		// Stitch together the world
+//		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+//		}
+//		int gridSpacing = Integer.valueOf(this.controler.getConfig().socnetmodule().getGridSpace());
+//		new WorldCreateRasterLayer2(gridSpacing).run(Gbl.getWorld());
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
-
 		//loadSocialNetwork();
 		// if (this.config.socialnet().getInputFile() == null) {
 		this.log.info("Loading initial social network");
@@ -109,50 +127,52 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("finishIteration: Note setting snIter = iteration +1 for now");
 		int snIter = event.getIteration() + 1;
 
-		if (total_spatial_fraction(this.fractionS) > 0) { // only generate the map if spatial meeting is important in this experiment
-			this.log.info("MAKE A MAP OF SOCIAL EVENTS THAT ACTUALLY OCCURRED IN THE MOBSIM");
-			this.log.info("  AND CALCULATE SOCIAL UTILITY FROM THIS");
-			this.log.info("  AND/OR USE IT TO COMPARE WITH PLANNED INTERACTIONS");
-			this.log.info("  AND USE THIS TO REINFORCE OR DEGRADE LINK STRENGTHS");
-			this.log.info("  NEEDS AN EVENT HANDLER");
+//		if (total_spatial_fraction(this.fractionS) > 0) { // only generate the map if spatial meeting is important in this experiment
+//			this.log.info("MAKE A MAP OF SOCIAL EVENTS THAT ACTUALLY OCCURRED IN THE MOBSIM");
+//			this.log.info("  AND CALCULATE SOCIAL UTILITY FROM THIS");
+//			this.log.info("  AND/OR USE IT TO COMPARE WITH PLANNED INTERACTIONS");
+//			this.log.info("  AND USE THIS TO REINFORCE OR DEGRADE LINK STRENGTHS");
+//			this.log.info("  NEEDS AN EVENT HANDLER");
 
-			this.log.info("  Generating planned [Spatial] socializing opportunities ...");
-			this.log.info("   Mapping which agents did what, where, and when");
+//			this.log.info("  Generating planned [Spatial] socializing opportunities ...");
+//			this.log.info("   Mapping which agents did what, where, and when");
 //			socialEvents = gen2.generate(population);
-			this.log.info("...finished.");
+//			this.log.info("...finished.");
 
 			//}// end if
 
 			// Agents' actual interactions
-			this.log.info("  Agents' actual interactions at the social opportunities ...");
+//			this.log.info("  Agents' actual interactions at the social opportunities ...");
 //			plansInteractorS.interact(socialEvents, rndEncounterProbs, snIter);
-
-		} else {
-			this.log.info("     (none)");
-		}
-		this.log.info(" ... Spatial interactions done\n");
+//
+//		} else {
+//			this.log.info("     (none)");
+//		}
+//		this.log.info(" ... Spatial interactions done\n");
 
 		this.log.info(" Removing social links ...");
 		this.snet.removeLinks(snIter);
 		this.log.info(" ... done");
 
-		if(CALCSTATS){
-		this.log.info(" Calculating and reporting network statistics ...");
-		this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
-		this.log.info(" ... done");
-		}
+// Else forget activities here, after the replanning and assignment
 		
+		if(CALCSTATS){
+			this.log.info(" Calculating and reporting network statistics ...");
+			this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
+			this.log.info(" ... done");
+		}
+
 		this.log.info(" Writing out social network for iteration " + snIter + " ...");
-//		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
+		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
 		this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
 		this.log.info(" ... done");
 
 		if (event.getIteration() == this.controler.getLastIteration()) {
 			if(CALCSTATS){
-			this.log.info("----------Closing social network statistic files and wrapping up ---------------");
-			this.snetstat.closeFiles();
+				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
+				this.snetstat.closeFiles();
 			}
-			snwrapup();
+//			snwrapup();
 		}
 	}
 
@@ -207,7 +227,18 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		}
 
 		this.log.info("  ... done");
-
+		
+		this.log.info(" Forgetting excess activities (locations) OR SHOULD THIS HAPPEN EACH TIME AN ACTIVITY IS LEARNED ...");
+		Collection<Person> personList = this.controler.getPopulation().getPersons().values();
+		Iterator<Person> iperson = personList.iterator();
+		while (iperson.hasNext()) {
+			Person p = (Person) iperson.next();
+			int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()*1.5);
+			p.getKnowledge().map.manageMemory(max_memory, p.getSelectedPlan());		
+		}
+		this.log.info(" ... done");
+		
+		
 		if (event.getIteration() == this.controler.getLastIteration()) {
 			makeSNIterationPath(snIter);
 			makeSNIterationPath(event.getIteration(), snIter);
@@ -231,11 +262,12 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				k = person.createKnowledge("created by " + this.getClass().getName());
 			}
 			// Initialize knowledge to the facilities that are in all initial plans
-			Iterator<Plan> piter=person.getPlans().iterator();
-			while (piter.hasNext()){
-				Plan plan = piter.next();
-				k.map.matchActsToActivities(plan);
-			}
+//			Iterator<Plan> piter=person.getPlans().iterator();
+//			while (piter.hasNext()){
+//				Plan plan = piter.next();
+			Plan plan = person.getSelectedPlan();
+				k.map.initializeActActivityMap(plan);
+//			}
 		}
 	}
 
@@ -266,13 +298,13 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("... done");
 
 		if(CALCSTATS){
-		this.log.info(" Calculating the statistics of the initial social network)...");
-		this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
-		this.snetstat.openFiles();
-		this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
-		this.log.info(" ... done");
+			this.log.info(" Calculating the statistics of the initial social network)...");
+			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
+			this.snetstat.openFiles();
+			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
+			this.log.info(" ... done");
 		}
-		
+
 		this.log.info(" Writing out the initial social network ...");
 		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), 0);
 		this.log.info("... done");
@@ -284,31 +316,6 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info(" Setting up the Spatial interactor ...");
 		this.plansInteractorS=new SpatialInteractor(this.snet);
 		this.log.info("... done");
-	}
-
-	private void snwrapup() {
-//		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(this.outputPath, this.snet, this.controler.getPopulation());
-//		pnww.write();
-
-//		this.log.info(" Instantiating the Pajek writer for final output ...");
-//		String finalPath = this.outputPath;
-//		PajekWriter1 pjwWrapup = new PajekWriter1(finalPath, (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
-//		this.log.info("... done");
-//		
-//		this.log.info(" Writing out final social network ...");
-//		pjwWrapup.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getLastIteration()+1);
-//		this.log.info(" ... done");
-		
-//		if(CALCSTATS){
-//		this.log.info(" Writing the statistics of the final social network to Output Directory...");
-//
-//		SocialNetworkStatistics snetstatFinal=new SocialNetworkStatistics(this.outputPath);
-//		snetstatFinal.openFiles(this.outputPath);
-//		snetstatFinal.calculate(this.controler.getLastIteration(), this.snet, this.controler.getPopulation());
-//
-//		this.log.info(" ... done");
-//		snetstatFinal.closeFiles();
-//		}
 	}
 
 	/**
