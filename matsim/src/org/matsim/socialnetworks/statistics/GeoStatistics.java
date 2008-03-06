@@ -59,7 +59,7 @@ public class GeoStatistics {
 //				System.out.println("  ### GEOSTAT: Graph contains vertex "+ v+" "+aLoc.getId());
 			}else{
 				v = new UndirectedSparseVertex();
-				System.out.println("   ### GEOSTAT: Making new vertex "+v+" "+aLoc.getId());
+//				System.out.println("   ### GEOSTAT: Making new vertex "+v+" "+aLoc.getId());
 				locVertex.put(aLoc, v);
 				vertexLoc.put(v,aLoc);
 				// Add the Person ID to the user data container for the vertex
