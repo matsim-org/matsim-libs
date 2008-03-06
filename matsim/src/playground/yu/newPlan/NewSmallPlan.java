@@ -20,13 +20,7 @@
 
 package playground.yu.newPlan;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
 import org.matsim.plans.algorithms.PersonAlgorithm;
@@ -63,9 +57,9 @@ public class NewSmallPlan extends PersonAlgorithm implements PersonAlgorithmI {
 
 	@Override
 	public void run(Person person) {
-//		if (Math.random() < 0.12) {
-			pw.writePerson(person);
-//		}
+		// if (Math.random() < 0.12) {
+		pw.writePerson(person);
+		// }
 	}
 
 }
