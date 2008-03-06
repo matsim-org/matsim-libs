@@ -120,11 +120,11 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 				if(bestPlanLength < planLength){
 					//then copyPlan is the selected plan AND the better plan
 					// associate this act with the facility in agent's mental map
-					k.map.learnActsActivities(bestAct,fFromKnowledge.getActivity(type));
+					k.map.learnActsActivities(bestAct.getRefId(),fFromKnowledge.getActivity(type));
 				}else{
 					//copyPlan is the selected plan BUT it is worse:
 					// unselect it and restore original plan as the selected one
-//					person.setSelectedPlan(plan);
+
 					bestPlan=person.copySelectedPlan();
 					person.setSelectedPlan(bestPlan);
 				}
