@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GuidedAgentFactory.java
+ * TTDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,61 +23,44 @@
  */
 package playground.johannes.eut;
 
-import java.util.Random;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.network.NetworkLayer;
+import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.network.Link;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.withinday.WithindayAgent;
-import org.matsim.withinday.WithindayAgentLogicFactory;
-import org.matsim.withinday.contentment.AgentContentmentI;
-import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
  * @author illenberger
  *
  */
-public class GuidedAgentFactory extends WithindayAgentLogicFactory {
+public class TTDecorator implements TravelTimeI {
 
-	private static double equipmentFraction = 0.05;
+	private TravelTimeI meantts;
 	
-	private static final ForceReplan forceReplan = new ForceReplan();
+	private List<BasicLinkI> accidantLinks = new LinkedList<BasicLinkI>();
 	
-	private static final PreventReplan preventReplan = new PreventReplan();
+//	public TTDecorator(TravelTimeI traveltimes) {
+//		this.meantts = traveltimes;
+//	}
 	
-	public final ReactRouteGuidance router;
-	
-	public Random random;
-	
-	private EUTRouterAnalyzer analyzer;
-	
-	/**
-	 * @param network
-	 * @param scoringConfig
-	 */
-	public GuidedAgentFactory(NetworkLayer network,
-			CharyparNagelScoringConfigGroup scoringConfig, TravelTimeI reactTTs) {
-		super(network, scoringConfig);
-		router = new ReactRouteGuidance(network, reactTTs);
-	}
-
-	public void setRouteAnalyzer(EUTRouterAnalyzer analyzer) {
-		this.analyzer = analyzer;
+	public void setMeanTravelTimes(TravelTimeI meantts) {
+		this.meantts = meantts;
 	}
 	
-	@Override
-	public AgentContentmentI createAgentContentment(WithindayAgent agent) {
-		random.nextDouble();
-		if(random.nextDouble() < equipmentFraction) {
-			analyzer.addGuidedPerson(agent.getPerson());
-			return forceReplan;
+	public void addAccidantLink(BasicLinkI link) {
+		accidantLinks.add(link);
+	}
+	
+	public void removeAccidantLink(BasicLinkI link) {
+		accidantLinks.remove(link);
+	}
+	
+	public double getLinkTravelTime(Link link, double time) {
+		if(accidantLinks.contains(link)) {
+			return Double.MAX_VALUE;
 		} else
-			return preventReplan;
-	}
-
-	@Override
-	public RouteProvider createRouteProvider() {
-		return router;
+			return meantts.getLinkTravelTime(link, time);
 	}
 
 }

@@ -24,14 +24,16 @@
 package playground.johannes.eut;
 
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
-import org.matsim.config.groups.WithindayConfigGroup;
+import org.apache.log4j.Logger;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationEndsListener;
@@ -45,17 +47,17 @@ import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.mobsim.QueueNode;
-import org.matsim.plans.Leg;
+import org.matsim.network.Link;
 import org.matsim.plans.Person;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.BestPlanSelector;
+import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.collections.Tuple;
+import org.matsim.utils.io.IOUtils;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.WithindayCreateVehiclePersonAlgorithm;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
-import org.matsim.withinday.trafficmanagement.Accident;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 
 /**
@@ -64,9 +66,18 @@ import org.matsim.withinday.trafficmanagement.TrafficManagement;
  */
 public class EUTController extends WithindayControler {
 	
-	private TravelTimeMemory provider;
+	private static final Logger log = Logger.getLogger(EUTController.class);
+	
+	private TravelTimeMemory ttmemory;
+	
+//	private TTDecorator guidedTTs;
+	
+	private TravelTimeI ttcalc;
+//	private EventBasedTTProvider ttcalc;
 
 	public final static double incidentProba = 0.1;
+	
+	private EUTRouterAnalyzer routerAnalyzer;
 	
 	/**
 	 * @param args
@@ -74,56 +85,23 @@ public class EUTController extends WithindayControler {
 	public EUTController(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
-		// TODO Auto-generated constructor stub
+		
 	}
-
-//	/**
-//	 * @param configFileName
-//	 */
-//	public EUTController(String configFileName) {
-//		super(configFileName);
-//		setOverwriteFiles(true);
-//		
-//		// TODO Auto-generated constructor stub
-//	}
-
-//	/**
-//	 * @param configFileName
-//	 * @param dtdFileName
-//	 */
-//	public EUTController(String configFileName, String dtdFileName) {
-//		super(configFileName, dtdFileName);
-//		// TODO Auto-generated constructor stub
-//	}
-
-//	/**
-//	 * @param config
-//	 */
-//	public EUTController(Config config) {
-//		super(config);
-//		// TODO Auto-generated constructor stub
-//	}
-
-//	/**
-//	 * @param config
-//	 * @param network
-//	 * @param population
-//	 */
-//	public EUTController(Config config, QueueNetworkLayer network,
-//			Plans population) {
-//		super(config, network, population);
-//		// TODO Auto-generated constructor stub
-//	}
 
 	@Override
 	protected StrategyManager loadStrategyManager() {
-		setTraveltimeBinSize(10);
-		provider = new TravelTimeMemory();
+		ttmemory = new TravelTimeMemory();
+		TimevariantTTStorage storage = ttmemory.makeTTStorage(getTravelTimeCalculator(), network, getTraveltimeBinSize(), 0, 86400);
+		ttmemory.appendNewStorage(storage);
+		
 		StrategyManager manager = new StrategyManager();
 		manager.setMaxPlansPerAgent(1);
 		
 		PlanStrategy strategy = new PlanStrategy(new BestPlanSelector());
-		strategy.addStrategyModule(new EUTReRoute(getNetwork(), provider));
+		EUTReRoute eutReRoute = new EUTReRoute(getNetwork(), ttmemory);
+		routerAnalyzer = new EUTRouterAnalyzer(eutReRoute.getUtilFunction());
+		eutReRoute.setRouterAnalyzer(routerAnalyzer);
+		strategy.addStrategyModule(eutReRoute);
 		manager.addStrategy(strategy, 0.05);
 		
 		strategy = new PlanStrategy(new BestPlanSelector());
@@ -135,29 +113,49 @@ public class EUTController extends WithindayControler {
 
 	@Override
 	protected void setup() {
+		setTraveltimeBinSize(60);
+		super.setup();
 		
-		super.setup();		
+		addControlerListener(routerAnalyzer);
 		
+		
+		ttcalc = new EstimReactiveLinkTT();
+		events.addHandler((EstimReactiveLinkTT)ttcalc);
 		addControlerListener(new TTCalculatorController());
-//		addControlerListener(new NetworkModifier());
+		addControlerListener(new NetworkModifier());
 		
-		addControlerListener(new RouteDistribution());
-		addControlerListener(new RouteCosts());
-		addControlerListener(new GuidedAgentsWriter());
+//		addControlerListener(new RouteDistribution());
+//		addControlerListener(new RouteCosts());
+//		addControlerListener(new GuidedAgentsWriter());
 		addControlerListener(new TripDurationWriter());
-		addControlerListener(new GuidanceWriter());
+//		addControlerListener(new GuidanceWriter());
+//		addControlerListener(new ScoreStats());
+//		LinkTTObserver obs = new LinkTTObserver();
+//		addControlerListener(obs);
+//		events.addHandler(obs);
 //		setScoringFunctionFactory(new EUTScoringFunctionFactory());
 		
 //		legDurationWriter = new CalcLegTimes(population); 
 //		events.addHandler(legDurationWriter);
+		factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), ttcalc);
+		((GuidedAgentFactory)factory).setRouteAnalyzer(routerAnalyzer);
+		this.addControlerListener(((GuidedAgentFactory)factory).router);
 		
+//		LinkCounter counter = new LinkCounter();
+//		this.events.addHandler(counter);
+//		addControlerListener(counter);
 		
+	
 	}
 
 	@Override
 	protected void runMobSim() {
-		factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), getTravelTimeCalculator());
+//		factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), getTravelTimeCalculator());
+		((GuidedAgentFactory)factory).random = new Random(1);
+//		guidedTTs.setMeanTravelTimes(ttmemory.getMeanTravelTimes());
+		
 		config.withinday().addParam("contentThreshold", "1");
+		config.withinday().addParam("replanningInterval", "1");
 		WithindayCreateVehiclePersonAlgorithm vehicleAlgo = new WithindayCreateVehiclePersonAlgorithm(this);
 
 		//build the queuesim
@@ -165,7 +163,9 @@ public class EUTController extends WithindayControler {
 		sim.setVehicleCreateAlgo(vehicleAlgo);
 		trafficManagement = new TrafficManagement();
 		//run the simulation
+		long time = System.currentTimeMillis();
 		sim.run();
+		System.err.println("Mobsim took " + (System.currentTimeMillis() - time) +" ms.");
 	}
 
 	private class TTCalculatorController implements IterationStartsListener, IterationEndsListener {
@@ -173,6 +173,7 @@ public class EUTController extends WithindayControler {
 //		private TravelTimeCalculatorArray myttcalc;
 //		
 		public void notifyIterationStarts(IterationStartsEvent event) {
+//			ttcalc.resetTravelTimes();
 //			myttcalc = new TravelTimeCalculatorArray(EUTController.this.getNetwork());
 //			EUTController.this.events.addHandler(myttcalc);
 		}
@@ -180,19 +181,28 @@ public class EUTController extends WithindayControler {
 		public void notifyIterationEnds(IterationEndsEvent event) {
 //			EUTController.this.events.removeHandler(myttcalc);
 //			provider.appendTTSet(myttcalc);
+			TimevariantTTStorage storage = ttmemory.makeTTStorage(getTravelTimeCalculator(), network, getTraveltimeBinSize(), 0, 86400);
+//			log.info(storage.toString());
+			ttmemory.appendNewStorage(storage);
 			
-			provider.appendNewStorage(provider.makeTTStorage(getTravelTimeCalculator(), network, getTraveltimeBinSize(), 0, 86400));
 		}
 		
 	}
 	
-	private class NetworkModifier implements IterationStartsListener {
+	private class NetworkModifier implements IterationStartsListener, IterationEndsListener {
 		
-		private boolean changedcap = false;
+//		private boolean changedcap = false;
+		
+		private List<QueueLink> changedCaps = new LinkedList<QueueLink>();
 		
 		private BufferedWriter writer;
 		
+		private List<QueueLink> links = new LinkedList<QueueLink>();
 		public NetworkModifier() {
+			
+			links.add((QueueLink) EUTController.this.getNetwork().getLink("800"));
+			links.add((QueueLink) EUTController.this.getNetwork().getLink("1100"));
+			links.add((QueueLink) EUTController.this.getNetwork().getLink("1400"));
 			try {
 				writer = new BufferedWriter(new FileWriter(getOutputFilename("incidents.txt")));
 			} catch (Exception e) {
@@ -204,23 +214,41 @@ public class EUTController extends WithindayControler {
 			/*
 			 * Reduce capacity here...
 			 */
-			QueueLink link = (QueueLink) EUTController.this.getNetwork().getLink("5");
+			try {
+				
+				writer.write(String.valueOf(event.getIteration()));
+				writer.write("\t");
 
-			Gbl.random.nextDouble();
-			if(Gbl.random.nextDouble() < incidentProba && event.getIteration() > 50) {
-				link.changeSimulatedFlowCapacity(0.5);
-				changedcap = true;
-				try {
-					writer.write(String.valueOf(event.getIteration()));
-					writer.newLine();
-					writer.flush();
-				} catch (Exception e) {
-					e.printStackTrace();
+				for (QueueLink link : links) {
+					Gbl.random.nextDouble();
+					if (Gbl.random.nextDouble() < incidentProba
+							&& event.getIteration() > 9) {
+						
+						link.changeSimulatedFlowCapacity(0.5);
+						changedCaps.add(link);
+
+//						guidedTTs.addAccidantLink(link);
+						
+						writer.write("\t");
+						writer.write(link.getId().toString());
+					}
+
 				}
-			} else {
-				if(changedcap) {
-					link.changeSimulatedFlowCapacity(1.0/0.5);
-					changedcap = false;
+				
+				writer.newLine();
+				writer.flush();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			for (QueueLink link : links) {
+				if (changedCaps.contains(link)) {
+					link.changeSimulatedFlowCapacity(1.0 / 0.5);
+					changedCaps.remove(link);
+					
+//					guidedTTs.removeAccidantLink(link);
 				}
 			}
 
@@ -232,23 +260,15 @@ public class EUTController extends WithindayControler {
 		
 		private BufferedWriter writer;
 		
+		private List<Tuple<Double, String>> tripDursSum = new LinkedList<Tuple<Double, String>>();
+		
 		private Map<Person, Double> tripdurs = new HashMap<Person, Double>();
-		
-		private List<Tuple<Double, String>> safeRouteDurs = new LinkedList<Tuple<Double, String>>();
-		
-		private List<Tuple<Double, String>> riskyRouteDurs = new LinkedList<Tuple<Double, String>>();
-		
-		private QueueNode safeNode;
-		
-		private QueueNode riskyNode;
-		
+				
 		public TripDurationWriter() {
 			EUTController.this.events.addHandler(this);
-			safeNode = (QueueNode) EUTController.this.getNetwork().getNode("3");
-			riskyNode = (QueueNode) EUTController.this.getNetwork().getNode("4");
 			try {
 				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("tripstats.txt")));
-				writer.write("Iteration\tdur_safe\tdur_risky\tguided_avr\tguided_safe\tguided_risky\tunguided_avr\tunguided_safe\tunguided_risky");
+				writer.write("Iteration\tavr\tguided\tunguided");
 				writer.newLine();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -258,58 +278,27 @@ public class EUTController extends WithindayControler {
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			List<Tuple<Double, String>> guidedAvr = new LinkedList<Tuple<Double,String>>();
 			List<Tuple<Double, String>> unguidedAvr = new LinkedList<Tuple<Double,String>>();
-			List<Tuple<Double, String>> guidedSafe = new LinkedList<Tuple<Double,String>>();
-			List<Tuple<Double, String>> unguidedSafe = new LinkedList<Tuple<Double,String>>();
-			List<Tuple<Double, String>> guidedRisky = new LinkedList<Tuple<Double,String>>();
-			List<Tuple<Double, String>> unguidedRisky = new LinkedList<Tuple<Double,String>>();
-			
-			for(Tuple<Double, String> t : safeRouteDurs) {
-				if(GuidedAgentFactory.guidedAgents.contains(t.getSecond())) {
+
+			for(Tuple<Double, String> t : tripDursSum) {
+				if(routerAnalyzer.getGuidedPersons().contains(t.getSecond())) {
 					guidedAvr.add(t);
-					guidedSafe.add(t);
 				} else {
 					unguidedAvr.add(t);
-					unguidedSafe.add(t);
 				}
 			}
-			
-			for(Tuple<Double, String> t : riskyRouteDurs) {
-				if(GuidedAgentFactory.guidedAgents.contains(t.getSecond())) {
-					guidedAvr.add(t);
-					guidedRisky.add(t);
-				} else {
-					unguidedAvr.add(t);
-					unguidedRisky.add(t);
-				}
-			}
-			
-			int safedur = calcAvr(safeRouteDurs);
-			int riskydur = calcAvr(riskyRouteDurs);
+						
+			int avr = calcAvr(tripDursSum);
 			int guidedAvrDur = calcAvr(guidedAvr);
-			int guidedSafeDur = calcAvr(guidedSafe);
-			int guidedRiskyDur = calcAvr(guidedRisky);
-			int unguidedAvrDur = calcAvr(unguidedAvr);
-			int unguidedSafeDur = calcAvr(unguidedSafe);
-			int unguidedRiskyDur = calcAvr(unguidedRisky);
-			
+			int unguidedAvrDur = calcAvr(unguidedAvr);	
+				
 			try {
 				writer.write(String.valueOf(event.getIteration()));
 				writer.write("\t");
-				writer.write(String.valueOf(safedur));
-				writer.write("\t");
-				writer.write(String.valueOf(riskydur));
+				writer.write(String.valueOf(avr));
 				writer.write("\t");
 				writer.write(String.valueOf(guidedAvrDur));
 				writer.write("\t");
-				writer.write(String.valueOf(guidedSafeDur));
-				writer.write("\t");
-				writer.write(String.valueOf(guidedRiskyDur));
-				writer.write("\t");
 				writer.write(String.valueOf(unguidedAvrDur));
-				writer.write("\t");
-				writer.write(String.valueOf(unguidedSafeDur));
-				writer.write("\t");
-				writer.write(String.valueOf(unguidedRiskyDur));
 				writer.newLine();
 				writer.flush();
 			} catch (Exception e) {
@@ -327,23 +316,16 @@ public class EUTController extends WithindayControler {
 
 		public void reset(int iteration) {
 			tripdurs = new HashMap<Person, Double>();
-			safeRouteDurs = new LinkedList<Tuple<Double, String>>();
-			riskyRouteDurs = new LinkedList<Tuple<Double, String>>();
+			tripDursSum = new LinkedList<Tuple<Double, String>>();
+//			GuidedAgentFactory.guidedAgents = new LinkedList<String>();
 		}
 
 		public void handleEvent(EventAgentArrival event) {
-//			if(event.linkId.equals("11")) {
 			Double deptime = tripdurs.get(event.agent);
 			if(deptime != null) {
-				Leg leg = (Leg) event.agent.getSelectedPlan().getActsLegs().get(1); 
-				if(leg.getRoute().getRoute().contains(safeNode)) {
-					safeRouteDurs.add(new Tuple<Double, String>(event.time - deptime, event.agent.getId().toString()));
-				} else if(leg.getRoute().getRoute().contains(riskyNode)) {
-					riskyRouteDurs.add(new Tuple<Double, String>(event.time - deptime, event.agent.getId().toString()));
-				}
+				tripDursSum.add(new Tuple<Double, String>(event.time - deptime, event.agent.getId().toString()));
 				tripdurs.remove(event.agent);
 			}
-//			}
 		}
 
 		public void handleEvent(EventAgentWait2Link event) {
@@ -352,178 +334,436 @@ public class EUTController extends WithindayControler {
 	
 	}
 	
-	private class RouteDistribution implements IterationEndsListener, EventHandlerLinkEnterI {
-
-		private int safeRouteCnt = 0;
-		private int riskyRouteCnt = 0;
+//	private class RouteDistribution implements IterationEndsListener, EventHandlerLinkEnterI {
+//
+//		private int safeRouteCnt = 0;
+//		private int riskyRouteCnt = 0;
+//		
+//		private BufferedWriter writer;
+//		
+//		public RouteDistribution() {
+//			try {
+//				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("routefrac.txt")));
+//				writer.write("Iteration\tn_safe\tn_risky\tn_riskaverse");
+//				writer.newLine();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//			events.addHandler(this);
+//		}
+//		
+//		public void notifyIterationEnds(IterationEndsEvent event) {
+//			try {
+//				writer.write(event.getIteration()+"\t"+safeRouteCnt+"\t"+riskyRouteCnt);
+//				writer.write("\t"+EUTRouter.riskCount);
+//				writer.newLine();
+//				writer.flush();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			
+//		}
+//		public void handleEvent(EventLinkEnter event) {
+//			if(event.link.getId().toString().equals("5"))
+//				riskyRouteCnt++;
+//			else if(event.link.getId().toString().equals("4"))
+//				safeRouteCnt++;
+//			
+//		}
+//		public void reset(int iteration) {
+//			riskyRouteCnt = 0;
+//			safeRouteCnt = 0;
+//			EUTRouter.riskCount = 0;
+//			
+//		}
+//		
+//	}
+	
+//	private class RouteCosts implements IterationEndsListener {
+//
+//		private BufferedWriter writer;
+//		
+//		public RouteCosts() {
+//			try {
+//				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("routecosts.txt")));
+//				writer.write("Iteration\tcosts_safe_avr\tcosts_risky_avr\triskytt_avr\tsafett_avr\tsafe_ce\trisky_ce");
+//				writer.newLine();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		public void notifyIterationEnds(IterationEndsEvent event) {
+//			try {
+//				writer.write(String.valueOf(event.getIteration()));
+//				writer.write("\t");
+//				writer.write(String.valueOf(calcAvr(EUTRouter.safeCostsAvr)));
+//				writer.write("\t");
+//				writer.write(String.valueOf(calcAvr(EUTRouter.riskyCostsAvr)));
+//				writer.write("\t");
+//				writer.write(String.valueOf(calcAvr(EUTRouter.riskyTravTimeAvr)));
+//				writer.write("\t");
+//				writer.write(String.valueOf(calcAvr(EUTRouter.safeTravTimeAvr)));
+//				writer.write("\t");
+//				writer.write(String.valueOf(calcAvr(EUTRouter.safeCE)));
+//				writer.write("\t");
+//				writer.write(String.valueOf(calcAvr(EUTRouter.riskyCE)));
+//				writer.newLine();
+//				writer.flush();
+//				
+//				EUTRouter.safeCostsAvr = new LinkedList<Double>();
+//				EUTRouter.riskyCostsAvr = new LinkedList<Double>();
+//				EUTRouter.riskyTravTimeAvr = new LinkedList<Double>();
+//				EUTRouter.safeTravTimeAvr = new LinkedList<Double>();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		private double calcAvr(List<Double> vals) {
+//			double sum = 0;
+//			for(Double val : vals) {
+////				try {
+//				sum += val;
+////				} catch (Exception e) {
+////					e.printStackTrace();
+////				}
+//			}
+//			
+//			return sum/(double)vals.size();
+//		}
+//	}
+	
+//	private class GuidedAgentsWriter implements IterationEndsListener {
+//
+//		private BufferedWriter writer;
+//		
+//		public GuidedAgentsWriter() {
+//			try {
+//				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("guidedagents.txt")));
+//				writer.write("Iteration\tcount\tagent_ids");
+//				writer.newLine();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		public void notifyIterationEnds(IterationEndsEvent event) {
+//			try {
+//				writer.write(String.valueOf(event.getIteration()));
+//				writer.write("\t");
+//				writer.write(String.valueOf(GuidedAgentFactory.guidedAgents.size()));
+//				
+//				for(String id : GuidedAgentFactory.guidedAgents) {
+//					writer.write("\t");
+//					writer.write(id);
+//				}
+//				writer.newLine();
+//				writer.flush();
+//				
+//				GuidedAgentFactory.guidedAgents = new LinkedList<String>();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			
+//		}
+		
+//	}
+	
+//	private class ScoreStats implements IterationStartsListener, IterationEndsListener, ShutdownListener {
+//
+//		private List<Double> scoresReplanned = new LinkedList<Double>();
+//		
+//		private List<Double> scores = new LinkedList<Double>();
+//		
+//		public void notifyIterationEnds(IterationEndsEvent event) {
+//			double sumScoreWorst = 0.0;
+//			double sumScoreBest = 0.0;
+//			double sumAvgScores = 0.0;
+//			double sumAvgScoresReplanned = 0.0;
+//			double sumExecutedScores = 0.0;
+//			int nofScoreWorst = 0;
+//			int nofScoreBest = 0;
+//			int nofAvgScores = 0;
+//			int nofAvgScoresReplanned = 0;
+//			int nofExecutedScores = 0;
+//
+//			for (Person person : EUTController.this.population.getPersons().values()) {
+//				Plan worstPlan = null;
+//				Plan bestPlan = null;
+//				double sumScores = 0.0;
+//				double cntScores = 0;
+//				for (Plan plan : person.getPlans()) {
+//
+//					if (Plan.isUndefinedScore(plan.getScore())) {
+//						continue;
+//					}
+//
+//					// worst plan
+//					if (worstPlan == null) {
+//						worstPlan = plan;
+//					} else if (plan.getScore() < worstPlan.getScore()) {
+//						worstPlan = plan;
+//					}
+//
+//					// best plan
+//					if (bestPlan == null) {
+//						bestPlan = plan;
+//					} else if (plan.getScore() > bestPlan.getScore()) {
+//						bestPlan = plan;
+//					}
+//
+//					// avg. score
+//					sumScores += plan.getScore();
+//					cntScores++;
+//
+//					// executed plan?
+//					if (plan.isSelected()) {
+//						sumExecutedScores += plan.getScore();
+//						nofExecutedScores++;
+//					}
+//				}
+//
+//				if (worstPlan != null) {
+//					nofScoreWorst++;
+//					sumScoreWorst += worstPlan.getScore();
+//				}
+//				if (bestPlan != null) {
+//					nofScoreBest++;
+//					sumScoreBest += bestPlan.getScore();
+//				}
+//				if (cntScores > 0) {
+//					sumAvgScores += (sumScores / cntScores);
+//					nofAvgScores++;
+//				}
+//				
+//				if(EUTReRoute.replanedPersons.contains(person.getId().toString())) {
+//					if (cntScores > 0) {
+//					sumAvgScoresReplanned += (sumScores / cntScores);
+//					nofAvgScoresReplanned++;
+//					}
+//				}
+//			}
+//			if(nofAvgScoresReplanned > 0)
+//				scoresReplanned.add(sumAvgScoresReplanned/nofAvgScoresReplanned);
+//			
+//			scores.add(sumAvgScores/nofAvgScores);
+//			
+//			
+//		}
+//
+//		public void notifyShutdown(ShutdownEvent event) {
+//			double sum = 0;
+//			for(Double d : scores)
+//				sum += d;
+//			
+//			log.info("Avr score is " + sum/scores.size());
+//			
+//			sum = 0;
+//			for(Double d : scoresReplanned)
+//				sum += d;
+//			
+//			log.info("Avr score of replanned persons is " + sum/scoresReplanned.size());
+//		}
+//
+//		public void notifyIterationStarts(IterationStartsEvent event) {
+//			EUTReRoute.replanedPersons = new LinkedList<String>();
+//			
+//		}
+//		
+//	}
+	
+	private class LinkTTObserver implements EventHandlerAgentArrivalI, IterationStartsListener, IterationEndsListener {
+		
+		private double lastcall;
+		
+//		private Link link;
 		
 		private BufferedWriter writer;
 		
-		public RouteDistribution() {
+		private BufferedWriter linkStatWriter;
+		
+		private Map<Link, Double> maxTTs;
+		
+		public LinkTTObserver() {
+			
+		}
+
+		public void handleEvent(EventAgentArrival event) {
+//			if(getIteration() == 10) {
+			if(event.time > lastcall) {
+				lastcall = event.time;
+//				((EventBasedTTProvider)ttcalc).requestLinkCost();
+				
+				for(Link link : network.getLinks().values()) {
+					double tt = ttcalc.getLinkTravelTime(link, event.time);
+					double maxtt = maxTTs.get(link);
+					if(tt > maxtt)
+						maxTTs.put(link, tt);
+					
+					if(link.getId().toString().equals("1100")) {
+						try {
+							linkStatWriter.write(String.valueOf(event.time));
+							linkStatWriter.write("\t");
+							linkStatWriter.write(String.valueOf(tt));
+							linkStatWriter.newLine();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}			
+		}
+
+		public void reset(int iteration) {
+			// TODO Auto-generated method stub
+			lastcall = 0;
+		}
+
+		public void notifyIterationStarts(IterationStartsEvent event) {
 			try {
-				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("routefrac.txt")));
-				writer.write("Iteration\tn_safe\tn_risky\tn_riskaverse");
+				if (writer != null)
+					writer.close();
+
+				if (linkStatWriter != null)
+					writer.close();
+
+				maxTTs = new HashMap<Link, Double>();
+				for (Link link : network.getLinks().values()) {
+					maxTTs.put(link, 0.0);
+				}
+				// link = network.getLink("900");
+				writer = IOUtils.getBufferedWriter(EUTController
+						.getOutputFilename(getIteration() + ".linktts.txt"));
+				writer.write("link\ttravtime");
 				writer.newLine();
+
+				linkStatWriter = IOUtils
+						.getBufferedWriter(EUTController
+								.getOutputFilename(getIteration()
+										+ ".1100.linktts.txt"));
+				linkStatWriter.write("time\ttravtime");
+				linkStatWriter.newLine();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			events.addHandler(this);
 		}
-		
+
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			try {
-				writer.write(event.getIteration()+"\t"+safeRouteCnt+"\t"+riskyRouteCnt);
-				writer.write("\t"+EUTRouter.riskCount);
-				writer.newLine();
-				writer.flush();
+				for (Link link : network.getLinks().values()) {
+					writer.write(link.getId().toString());
+					writer.write("\t");
+					writer.write(String.valueOf(maxTTs.get(link)));
+					writer.newLine();
+				}
+				writer.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+		}
+	}
+	
+	private class LinkCounter implements EventHandlerLinkEnterI, IterationEndsListener, IterationStartsListener {
+
+		private int count;
+		
+		private List<EventLinkEnter> events;
+		
+		private BufferedWriter writer;
+		
+		private BufferedWriter countswriter;
+		
+		private int firstEvent = 0;
+		
+		private int lastEvent = 0;
+		
+		public LinkCounter() {
+			try {
+				writer = IOUtils.getBufferedWriter(EUTController.getOutputFilename("1100.linkcounts.txt"));
+				writer.write("iteration\tcounts");
+				writer.newLine();
+				
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		public void handleEvent(EventLinkEnter event) {
-			if(event.link.getId().toString().equals("5"))
-				riskyRouteCnt++;
-			else if(event.link.getId().toString().equals("4"))
-				safeRouteCnt++;
+			if(firstEvent == 0)
+				firstEvent = (int) event.time;
 			
+			lastEvent = (int)event.time;
+			if(event.link.getId().toString().equals("1100")) {
+				events.add(event);
+				count++;
+			}
 		}
+
 		public void reset(int iteration) {
-			riskyRouteCnt = 0;
-			safeRouteCnt = 0;
-			EUTRouter.riskCount = 0;
-			
-		}
-		
-	}
-	
-	private class RouteCosts implements IterationEndsListener {
-
-		private BufferedWriter writer;
-		
-		public RouteCosts() {
-			try {
-				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("routecosts.txt")));
-				writer.write("Iteration\tcosts_safe_avr\tcosts_risky_avr\triskytt_avr\tsafett_avr\tsafe_ce\trisky_ce");
-				writer.newLine();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		public void notifyIterationEnds(IterationEndsEvent event) {
-			try {
-				writer.write(String.valueOf(event.getIteration()));
-				writer.write("\t");
-				writer.write(String.valueOf(calcAvr(EUTRouter.safeCostsAvr)));
-				writer.write("\t");
-				writer.write(String.valueOf(calcAvr(EUTRouter.riskyCostsAvr)));
-				writer.write("\t");
-				writer.write(String.valueOf(calcAvr(EUTRouter.riskyTravTimeAvr)));
-				writer.write("\t");
-				writer.write(String.valueOf(calcAvr(EUTRouter.safeTravTimeAvr)));
-				writer.write("\t");
-				writer.write(String.valueOf(calcAvr(EUTRouter.safeCE)));
-				writer.write("\t");
-				writer.write(String.valueOf(calcAvr(EUTRouter.riskyCE)));
-				writer.newLine();
-				writer.flush();
-				
-				EUTRouter.safeCostsAvr = new LinkedList<Double>();
-				EUTRouter.riskyCostsAvr = new LinkedList<Double>();
-				EUTRouter.riskyTravTimeAvr = new LinkedList<Double>();
-				EUTRouter.safeTravTimeAvr = new LinkedList<Double>();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		private double calcAvr(List<Double> vals) {
-			double sum = 0;
-			for(Double val : vals) {
-//				try {
-				sum += val;
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-			}
-			
-			return sum/(double)vals.size();
-		}
-	}
-	
-	private class GuidedAgentsWriter implements IterationEndsListener {
-
-		private BufferedWriter writer;
-		
-		public GuidedAgentsWriter() {
-			try {
-				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("guidedagents.txt")));
-				writer.write("Iteration\tcount\tagent_ids");
-				writer.newLine();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			events = new LinkedList<EventLinkEnter>();
+			firstEvent = 0;
+			lastEvent = 0;
 		}
 		
 		public void notifyIterationEnds(IterationEndsEvent event) {
+			int binsize = 60;
+			int bincount = (lastEvent-firstEvent)/binsize;
+			int[] bins = new int[bincount];
+			for(EventLinkEnter e : events) {
+				int idx = ((int)e.time - firstEvent)/binsize;
+				bins[idx]++;
+			}
+			
 			try {
-				writer.write(String.valueOf(event.getIteration()));
-				writer.write("\t");
-				writer.write(String.valueOf(GuidedAgentFactory.guidedAgents.size()));
-				
-				for(String id : GuidedAgentFactory.guidedAgents) {
-					writer.write("\t");
-					writer.write(id);
+				for(int i = 0; i < bins.length; i++) {
+					countswriter.write(String.valueOf(i*binsize+firstEvent));
+					countswriter.write("\t");
+					countswriter.write(String.valueOf(bins[i]));
+					countswriter.newLine();
 				}
+				countswriter.close();
+				
+				writer.write(String.valueOf(EUTController.getIteration()));
+				writer.write("\t");
+				writer.write(String.valueOf(count));
 				writer.newLine();
 				writer.flush();
-				
-				GuidedAgentFactory.guidedAgents = new LinkedList<String>();
-			} catch (Exception e) {
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			count = 0;
+		}
+		public void notifyIterationStarts(IterationStartsEvent event) {
+			try {
+				countswriter = IOUtils.getBufferedWriter(EUTController
+						.getOutputFilename(EUTController.getIteration()
+								+ ".1100.linkcounts.txt"));
+				countswriter.write("time\tcounts");
+				countswriter.newLine();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+
 			
 		}
-		
-	}
-	
-	private class GuidanceWriter implements IterationEndsListener {
-
-		private BufferedWriter writer;
-		
-		public GuidanceWriter() {
-			try {
-				writer = new BufferedWriter(new FileWriter(EUTController.getOutputFilename("recommendations.txt")));
-				writer.write("Iteration\tsafe_cnt\trisky_cnt");
-				writer.newLine();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		public void notifyIterationEnds(IterationEndsEvent event) {
-			try {
-				writer.write(String.valueOf(event.getIteration()));
-				writer.write("\t");
-				writer.write(String.valueOf(ReactRouteGuidance.safeRouteCnt));
-				writer.write("\t");
-				writer.write(String.valueOf(ReactRouteGuidance.riskyRouteCnt));
-				writer.newLine();
-				writer.flush();
-				
-				ReactRouteGuidance.safeRouteCnt = 0;
-				ReactRouteGuidance.riskyRouteCnt = 0;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
 	}
 	
 	public static void main(String args[]) {
-		EUTController controller = new EUTController(new String[]{"/Users/fearonni/vsp-work/eut/twoway/config/config.xml"});
+		EUTController controller = new EUTController(new String[]{"/Users/fearonni/vsp-work/eut/corridor/config/config.xml"});
 		controller.run();
 	}
 

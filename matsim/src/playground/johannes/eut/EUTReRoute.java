@@ -24,6 +24,7 @@
 package playground.johannes.eut;
 
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.PlansCalcRoute;
@@ -33,23 +34,59 @@ import org.matsim.router.PlansCalcRoute;
  *
  */
 public class EUTReRoute extends MultithreadedModuleA {
-
+	
+	private static final int rho = 0;
+	
+	private final ArrowPrattRiskAversionI utilFunction;
+	
+	private EUTRouterAnalyzer analyzer;
+	
 	private NetworkLayer network;
 	
 	private TravelTimeMemory provider;
 	
-	/**
-	 * 
-	 */
+	
 	public EUTReRoute(NetworkLayer network, TravelTimeMemory provider) {
+		super(1);
+		utilFunction = new CARAFunction(rho);
 		this.network = network;
 		this.provider = provider;
 	}
 
-	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
-		EUTRouter router = new EUTRouter(network, provider, new CARAFunction(0));
-		return new PlansCalcRoute(null, null, null, false, router, router);
+	public ArrowPrattRiskAversionI getUtilFunction() {
+		return utilFunction;
 	}
 
+	public void setRouterAnalyzer(EUTRouterAnalyzer analyzer) {
+		this.analyzer = analyzer;
+	}
+	
+	@Override
+	public PlanAlgorithmI getPlanAlgoInstance() {
+		EUTRouter router = new EUTRouter(network, provider, utilFunction);
+		router.setAnalyzer(analyzer);
+		return new PlanAlgorithmDecorator(new PlansCalcRoute(null, null, null,
+				false, router, router));
+	}
+
+//	@Override
+//	public void handlePlan(Plan plan) {
+//		analyzer.setNextPerson(plan.getPerson());
+//		super.handlePlan(plan);
+//	}
+
+	private class PlanAlgorithmDecorator implements PlanAlgorithmI {
+
+		private PlanAlgorithmI algo;
+		
+		public PlanAlgorithmDecorator(PlanAlgorithmI algo) {
+			this.algo = algo;
+		}
+		
+		public void run(Plan plan) {
+			analyzer.setNextPerson(plan.getPerson());
+			algo.run(plan);
+		}
+		
+	}
 }

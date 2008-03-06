@@ -21,7 +21,7 @@ public class CARAFunction implements ArrowPrattRiskAversionI {
 	public void setRiskAversionIndex(double rho) {
 		if(rho == 0) {
 //			Gbl.getLogger().warning("Zero is not allowed for rho in the CARA-Function. Changed to 0.0001.");
-			this.rho = 0.0001;
+			this.rho = 0.0000001;
 		} else
 			this.rho = rho;
 	}

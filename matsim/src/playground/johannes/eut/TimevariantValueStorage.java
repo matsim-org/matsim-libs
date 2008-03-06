@@ -137,12 +137,17 @@ public class TimevariantValueStorage {
     }
 
     public String toString() {
-        StringBuffer result = new StringBuffer(getClass().getName() + ":\n");
-        result.append("\tstartTime_s = " + startTime + "\n");
-        result.append("\tendTime_s   = " + endTime + "\n");
-        result.append("\tbinSize_s   = " + binSize + "\n");
-        result.append("\tbinCnt      = " + binCnt + "\n");
-        return result.toString();
+    	StringBuilder builder = new StringBuilder();
+        for(BasicLinkI link : valueMap.keySet()) {
+        	double[] values = valueMap.get(link);
+        	builder.append(link.getId().toString());
+        	for(int i = 420; i < 450; i++) {
+        		builder.append("\t");
+        		builder.append(String.valueOf(values[i]));
+        	}
+        	builder.append("\n");
+        }
+        
+        return builder.toString();
     }
-
 }

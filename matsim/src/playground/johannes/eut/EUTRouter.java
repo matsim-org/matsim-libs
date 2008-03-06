@@ -23,127 +23,102 @@
  */
 package playground.johannes.eut;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelTimeI;
 
 /**
  * @author illenberger
- *
+ * 
  */
 public class EUTRouter implements LeastCostPathCalculator {
 
-	public static int riskCount = 0;
-	
+	private static final int searchPaths = 3;
+
+	private EUTRouterAnalyzer analyzer;
+
 	private KSPPenalty kspPenalty;
-	
-	private TravelTimeMemory ttProvider;
-	
+
+	private TravelTimeMemory ttKnowledge;
+
 	private ArrowPrattRiskAversionI utilFunc;
-	
-	private FreespeedTravelTimeCost freeTravTimes = new FreespeedTravelTimeCost();
-	
-	public EUTRouter(NetworkLayer network, TravelTimeMemory provider, ArrowPrattRiskAversionI utilFunc) {
-		ttProvider = provider;
+
+	public EUTRouter(NetworkLayer network, TravelTimeMemory ttKnowledge,
+			ArrowPrattRiskAversionI utilFunc) {
+		this.ttKnowledge = ttKnowledge;
 		this.utilFunc = utilFunc;
 		kspPenalty = new KSPPenalty(network);
-		
-		safeRoute = new Route();
-		safeRoute.setRoute("2 3 5");
-		riskyRoute = new Route();
-		riskyRoute.setRoute("2 4 5");
-		
+
+	}
+
+	public void setAnalyzer(EUTRouterAnalyzer analyzer) {
+		this.analyzer = analyzer;
 	}
 	
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double starttime) {
-		return selectChoice(generateChoiceSet(fromNode, toNode, starttime), starttime);
+		return selectChoice(generateChoiceSet(fromNode, toNode, starttime),
+				starttime);
 	}
 
-	protected List<Route> generateChoiceSet(Node departure, Node destination, double time) {
-		return kspPenalty.getPaths(departure, destination, time, 2, freeTravTimes);
-//		return kspPenalty.getPaths(departure, destination, time, 3, ttProvider.requestLinkCost());
+	protected List<Route> generateChoiceSet(Node departure, Node destination,
+			double time) {
+		return kspPenalty.getPaths(departure, destination, time, searchPaths,
+				ttKnowledge.getMeanTravelTimes());
 	}
-	
+
 	protected Route selectChoice(List<Route> routes, double starttime) {
-		Route bestroute = null;
-		Route shortestroute = null;
+		Route bestRoute = null;
+		Route indiffRoute = null;
 		double leastcost = Double.MAX_VALUE;
-		double shortesttravtime = Double.MAX_VALUE;
-		
-		for(Route route : routes) {
-			double totaltraveltime = 0;
+		double leasttime = Double.MAX_VALUE;
+//		/*
+//		 * We can expect the first route in the list to be the real best path.
+//		 */
+//		indiffRoute = routes.get(0);
+		for (Route route : routes) {
 			double totaltravelcosts = 0;
+			double totalTravelTime = 0;
 			
-			for(TravelTimeI traveltimes : ttProvider.getTravelTimes()) {
+			for (TravelTimeI traveltimes : ttKnowledge.getTravelTimes()) {
 				double traveltime = calcTravTime(traveltimes, route, starttime);
 				double travelcosts = utilFunc.evaluate(traveltime);
-				totaltraveltime += traveltime;
 				totaltravelcosts += travelcosts;
+				totalTravelTime += traveltime;
 			}
-			
-			double avrcosts = totaltravelcosts / (double)ttProvider.getTravelTimes().size();
-			double avrtravtime  = totaltraveltime / (double)ttProvider.getTravelTimes().size();
-			
-			if(avrcosts < leastcost) {
+
+			double avrcosts = totaltravelcosts
+					/ (double) ttKnowledge.getTravelTimes().size();
+
+			if (avrcosts < leastcost) {
 				leastcost = avrcosts;
-				bestroute = route;
+				bestRoute = route;
 			}
 			
+			double avrtime = totalTravelTime/(double) ttKnowledge.getTravelTimes().size();
 			
-			if(avrtravtime < shortesttravtime) {
-				shortesttravtime = avrtravtime;
-				shortestroute = route;
+			if(avrtime < leasttime) {
+				leasttime = avrtime;
+				indiffRoute = route;
 			}
-			
-			logcosts(route, avrcosts, avrtravtime, utilFunc.getTravelTime(avrcosts));
 		}
+
+		if(analyzer != null)
+			analyzer.appendSnapshot(bestRoute, leastcost, indiffRoute);
 		
-		if(!shortestroute.getRoute().equals(bestroute.getRoute()))
-			riskCount++;
-		
-		return bestroute;
+		return bestRoute;
 	}
-	
-	private double calcTravTime(TravelTimeI traveltimes, Route route, double starttime) {
+
+	private double calcTravTime(TravelTimeI traveltimes, Route route,
+			double starttime) {
 		double totaltt = 0;
-		for(Link link : route.getLinkRoute()) {
-				totaltt += traveltimes.getLinkTravelTime(link, starttime + totaltt); 
+		for (Link link : route.getLinkRoute()) {
+			totaltt += traveltimes.getLinkTravelTime(link, starttime + totaltt);
 		}
 		return totaltt;
-	}
-	
-	private static Route safeRoute;
-	
-	private static Route riskyRoute;
-	
-	public static List<Double> safeCostsAvr = new LinkedList<Double>();
-	
-	public static List<Double> riskyCostsAvr = new LinkedList<Double>();
-	
-	public static List<Double> riskyTravTimeAvr = new LinkedList<Double>();
-	
-	public static List<Double> safeTravTimeAvr = new LinkedList<Double>();
-	
-	public static List<Double> safeCE = new LinkedList<Double>();
-	
-	public static List<Double> riskyCE = new LinkedList<Double>();
-	
-	synchronized static private void logcosts(Route route, double avrcost, double avrtt, double ce) { 
-		if(route.getRoute().equals(safeRoute.getRoute())) {
-			safeCostsAvr.add(avrcost);
-			safeTravTimeAvr.add(avrtt);
-			safeCE.add(ce);
-		} else if(route.getRoute().equals(riskyRoute.getRoute())) {
-			riskyCostsAvr.add(avrcost);
-			riskyTravTimeAvr.add(avrtt);
-			riskyCE.add(ce);
-		}
 	}
 }

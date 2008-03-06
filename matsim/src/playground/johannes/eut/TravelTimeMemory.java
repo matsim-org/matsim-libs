@@ -50,21 +50,25 @@ public class TravelTimeMemory {
 		return storageList;
 	}
 	
+	public TravelTimeI getMeanTravelTimes() {
+		return new MeanLinkCost(storageList);
+		
+	}
 	
 	private class MeanLinkCost implements TravelTimeI {
 
-		private List<TravelTimeI> linkcosts;
+		private List<TimevariantTTStorage> linkcosts;
 		
-		public MeanLinkCost(List<TravelTimeI> linkcosts) {
+		public MeanLinkCost(List<TimevariantTTStorage> linkcosts) {
 			this.linkcosts = linkcosts;
 		}
 
 		public double getLinkTravelTime(Link link, double time) {
-			int sum = 0;
+			double sum = 0;
 			for(TravelTimeI linkcost : linkcosts)
 				sum += linkcost.getLinkTravelTime(link, time);
 			
-			return sum/linkcosts.size();
+			return sum/(double)linkcosts.size();
 		}
 		
 	}
