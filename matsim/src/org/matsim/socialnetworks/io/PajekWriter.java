@@ -64,10 +64,10 @@ public class PajekWriter {
 	public PajekWriter(String dir, Facilities facilities){
 		this.dir=dir;
 		//String pjoutdir = Gbl.getConfig().findParam(Gbl.getConfig().SOCNET, Gbl.getConfig().SOCNET_OUT_DIR);
-		File pjDir=new File(dir+"/pajek/");
-		System.out.println("PajekWriter1 make dir "+dir + "/pajek/");
+		File pjDir=new File(dir+"pajek/");
+		System.out.println("PajekWriter1 make dir "+dir + "pajek/");
 		if(!(pjDir.mkdir())&& !pjDir.exists()){
-			Gbl.errorMsg("Cannot create directory "+dir+"/pajek/");
+			Gbl.errorMsg("Cannot create directory "+dir+"pajek/");
 		}
 		Gbl.noteMsg(this.getClass(),"","is a dumb writer for UNDIRECTED nets. Replace it with something that iterates through Persons and call it from SocialNetworksTest.");
 		FacilitiesFindScenarioMinMaxCoords fff= new FacilitiesFindScenarioMinMaxCoords();
@@ -86,7 +86,7 @@ public class PajekWriter {
 
 		// from config
 
-		String pjoutfile = dir+"/pajek/test"+iter+".net";
+		String pjoutfile = dir+"pajek/test"+iter+".net";
 		System.out.println("PajekWriter1 filename "+pjoutfile);
 
 		try {
@@ -163,7 +163,7 @@ public class PajekWriter {
 
 		// from config
 
-		String pjoutfile = dir+"/pajek/testGeo"+iter+".net";
+		String pjoutfile = dir+"pajek/testGeo"+iter+".net";
 		System.out.println("PajekWriter1 Geofilename "+pjoutfile);
 
 		try {
