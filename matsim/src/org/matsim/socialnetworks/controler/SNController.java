@@ -49,7 +49,7 @@ public class SNController extends Controler {
 		PlanStrategy strategy1 = new PlanStrategy(new BestPlanSelector());
 
 		// Social Network Facility Exchange test
-		System.out.println("### NOTE THAT YOU SHOULD EXCHANGE KNOWLEDGE BASED ON ITS VALUE");
+		System.out.println(this.getClass()+": adding StrategyModule. NOTE THAT YOU SHOULD EXCHANGE KNOWLEDGE BASED ON ITS VALUE");
 		strategy1.addStrategyModule(new SNRandomFacilitySwitcher());
 		//strategy1.addStrategyModule(new TimeAllocationMutator());
 
