@@ -1,5 +1,6 @@
 package playground.ciarif.models.subtours;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -7,19 +8,22 @@ import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 
 public class Subtour {
-	
+		
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 	
 	private int id;
-	private List<IdI> nodes;
-	private String purpose;
+	private ArrayList<Integer> nodes;
+	private int purpose; // 0 := work; 1 := edu; 2 := shop 3:=leisure
+	private int mode;
 	private Coord start_coord;
+	private int prev_subtour;
 	
+
 	public Subtour() {
 		super();
-		this.nodes=new Vector<IdI>();
+		this.nodes=new ArrayList<Integer>();
 	}
 
 	
@@ -35,16 +39,25 @@ public class Subtour {
 		this.id = id;
 	}
 	
-	public void setNodes(List<IdI> nodes) {
+	public void setNodes(ArrayList<Integer> nodes) {
 		this.nodes = nodes;
 	}
 	
-	public void setPurpose(String purpose) {
+	public void setPurpose(int purpose) {
 		this.purpose = purpose;
 	}
 	
-	public void setNode (IdI node) {
+	public void setNode (Integer node) {
 		this.nodes.add(node);
+	}
+	
+	public void setPrev_subtour(int prev_subtour) {
+		this.prev_subtour = prev_subtour;
+	}
+
+
+	public void setMode(int mode) {
+		this.mode = mode;
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -59,12 +72,21 @@ public class Subtour {
 		return id;
 	}
 	
-	public List<IdI> getNodes() {
+	public ArrayList<Integer> getNodes() {
 		return nodes;
 	}
 	
-	public String getPurpose() {
+	public int getPurpose() {
 		return purpose;
 	}
+	
+	public int getPrev_subtour() {
+		return prev_subtour;
+	}
+
+	public int getMode() {
+		return mode;
+	}
+
 			
 }

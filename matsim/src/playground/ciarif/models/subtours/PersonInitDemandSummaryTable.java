@@ -59,7 +59,7 @@ public class PersonInitDemandSummaryTable {
 		try {
 			fw = new FileWriter(outfile);
 			out = new BufferedWriter(fw);
-			out.write("pid \t subtour_id \t start_x \t start_y \t purpose\n");
+			out.write("pid \t subtour_id \t start_x \t start_y \t purpose\t prev_tour\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -97,7 +97,8 @@ public class PersonInitDemandSummaryTable {
 					Subtour subtour = subtour_it.next();
 					out.write(personSubtour.getPerson_id().toString()+"\t");
 					out.write(subtour.getId()+ "\t");
-					out.write(subtour.getPurpose()+"\n");
+					out.write(subtour.getPurpose()+"\t");
+					out.write(subtour.getPrev_subtour()+"\n");
 					
 					System.out.println("Anzahl"+subtour.getPurpose());
 					

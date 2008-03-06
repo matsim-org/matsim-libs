@@ -109,7 +109,6 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
 		if (work_coord != null) { dist_h_w = work_coord.calcDistance(home_coord); }
 		TreeMap<Integer, Integer> modeSubTours = new TreeMap<Integer, Integer>();
-		
 		for (int i=subtour_idx-1; i>=0; i=i-1) {
 			ArrayList<Integer> subtour = subtours.get(i);
 			int mainpurpose = 3; //mainpurpose:  0 := work; 1 := edu; 2 := shop 3:=leisure
@@ -219,29 +218,30 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		pste.run(person);
 		subtours = pste.getSubtours();
 		subtour_idx = pste.getSubtourIdx();
-		System.out.println("subtours != " + subtours );
 		System.out.println("subtour_idx != " + subtour_idx );
-		this.handleSubTours(plan,subtours,subtour_idx);
-		
+		//this.handleSubTours(plan,subtours,subtour_idx);
+		PersonSubtourHandler psh = new PersonSubtourHandler ();
 		PersonSubtour personSubtour = new PersonSubtour();
+		psh.run (plan,subtours,subtour_idx);
+		personSubtour = psh.getPers_sub();
 		personSubtour.setPerson_id(person.getId());
 		
-		
-		Iterator i= subtours.entrySet().iterator();
-		while (i.hasNext()) {
-			Map.Entry e = (Map.Entry)i.next();
-			Integer key=(Integer)e.getKey();
-			ArrayList<Integer> values=(ArrayList<Integer>)e.getValue();
-			Subtour subtour =new Subtour();
-			subtour.setId(key);
-			subtour.setPurpose("l");
-			
-			Iterator<Integer> j = values.iterator();
-			while (j.hasNext()) {
-				subtour.setNode(new Id(j.next()));
-			}
-			personSubtour.setSubtour(subtour);			
-		}
+//		System.out.println("subtours != " + subtours );
+//		Iterator i= subtours.entrySet().iterator();
+//		while (i.hasNext()) {
+//			Map.Entry e = (Map.Entry)i.next();
+//			Integer key=(Integer)e.getKey();
+//			ArrayList<Integer> values =(ArrayList<Integer>)e.getValue();
+//			Subtour subtour =new Subtour();
+//			//subtour.setId(key);
+//			//subtour.setPurpose(1);
+//			
+//			Iterator<Integer> j = values.iterator();
+//			while (j.hasNext()) {
+//				subtour.setNode(new Integer(j.next()));
+//			}
+//			personSubtour.setSubtour(subtour);			
+//		}
 		this.personSubtours.add(personSubtour);		
 	}
 	
