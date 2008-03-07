@@ -26,6 +26,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
@@ -154,6 +155,9 @@ public class WithindayAgentTest extends TestCase {
 		signs.add(createSign());
 		//... the scoring function
 		CharyparNagelScoringConfigGroup scoringFunctionConfig = Gbl.getConfig().charyparNagelScoring();
+		scoringFunctionConfig.addParam("activityType_0", "h");
+		scoringFunctionConfig.addParam("activityPriority_0", "1");
+		scoringFunctionConfig.addParam("activityTypicalDuration_0", "01:00");
 		scoringFunctionConfig.addParam("activityType_1", "work");
 		scoringFunctionConfig.addParam("activityPriority_1", "1");
 		scoringFunctionConfig.addParam("activityTypicalDuration_1", "01:00");
@@ -224,7 +228,7 @@ public class WithindayAgentTest extends TestCase {
 		assertTrue("the agent's new route should have the same size as the old one", newLegsRoute.size() == this.agentRoute.getRoute().size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newLegsRoute.get(2));
 		assertEquals("check the last node of rerouting!", this.network.getNode("5"), newLegsRoute.get(newLegsRoute.size()-1));
-
+		Logger.getLogger(WithindayAgentTest.class).info("WithindayAgentTest ran successfully.");
 	}
 
 }
