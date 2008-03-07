@@ -41,10 +41,18 @@ public class ControlerEventsTestListener implements
 	private ShutdownEvent shutdownEvent;
   private final List<IterationStartsEvent> startIterationEvents = new Vector<IterationStartsEvent>();
   private final List<IterationEndsEvent> endIterationEvents = new Vector<IterationEndsEvent>();
+	private int number;
 
+	private ControlerEventsTest testClass;
+
+	public ControlerEventsTestListener(int i, ControlerEventsTest test) {
+		this.number = i;
+		this.testClass = test;
+	}
 
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
 		this.startupEvent = controlerStartupEvent;
+		this.testClass.addCalledStartupListenerNumber(this.number);
 	}
 
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
@@ -53,15 +61,12 @@ public class ControlerEventsTestListener implements
 
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		System.out.println("iteration ends");
 		this.endIterationEvents.add(event);
 	}
 
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		System.out.println("iteration starts");
 		this.startIterationEvents.add(event);
 	}
-
 
 	/**
 	 * @return the startupEvent
@@ -69,7 +74,6 @@ public class ControlerEventsTestListener implements
 	public StartupEvent getStartupEvent() {
 		return this.startupEvent;
 	}
-
 
 	/**
 	 * @return the shutdownEvent

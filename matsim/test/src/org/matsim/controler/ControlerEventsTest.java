@@ -21,6 +21,7 @@
 package org.matsim.controler;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.config.Config;
@@ -40,16 +41,39 @@ public class ControlerEventsTest extends MatsimTestCase {
 	private String configfile = null;
 	private Config config = null;
 
+	private List<Integer> calledStartupListener = new ArrayList<Integer>(3);
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.configfile = getInputDirectory() + "config.xml";
+		this.configfile = getClassInputDirectory() + "config.xml";
 		this.config = loadConfig(this.configfile);
 	}
 
+	void addCalledStartupListenerNumber(int i) {
+		this.calledStartupListener.add(i);
+	}
+
+
+	public void testCoreListenerExecutionOrder() {
+		Controler controler = new Controler(this.config);
+		ControlerEventsTestListener firstListener = new ControlerEventsTestListener(1, this);
+		ControlerEventsTestListener secondListener = new ControlerEventsTestListener(2, this);
+		ControlerEventsTestListener thirdListener = new ControlerEventsTestListener(3, this);
+
+		controler.addCoreControlerListener(firstListener);
+		controler.addCoreControlerListener(secondListener);
+		controler.addCoreControlerListener(thirdListener);
+		controler.run();
+		assertEquals(Integer.valueOf(3), this.calledStartupListener.get(0));
+		assertEquals(Integer.valueOf(2), this.calledStartupListener.get(1));
+		assertEquals(Integer.valueOf(1), this.calledStartupListener.get(2));
+	}
+
+
 	public void testEvents() {
 		Controler controler = new Controler(this.config);
-		ControlerEventsTestListener listener = new ControlerEventsTestListener();
+		ControlerEventsTestListener listener = new ControlerEventsTestListener(1, this);
 		controler.addControlerListener(listener);
 		controler.run();
 		//test for startup events
@@ -73,7 +97,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 		// prepare remove test
 		Gbl.reset();
 		controler = new Controler(this.config);
-		listener = new ControlerEventsTestListener();
+		listener = new ControlerEventsTestListener(1, this);
 		// we know from the code above, that "add" works
 		controler.addControlerListener(listener);
 		// now remove the listener
