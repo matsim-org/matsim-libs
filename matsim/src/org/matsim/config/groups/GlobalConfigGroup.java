@@ -80,7 +80,7 @@ public class GlobalConfigGroup extends Module {
 		} else if (LOCAL_DTD_BASE.equals(key)) {
 			setLocalDtdBase(value);
 		} else if (USE_ROAD_PRICING.equals(key)) {
-			useRoadPricing("yes".equals(value) || "true".equals(value));
+			setRoadPricing("yes".equals(value) || "true".equals(value));
 		} else if (NUMBER_OF_THREADS.equals(key)) {
 			setNumberOfThreads(Integer.parseInt(value));
 		} else if (COORDINATE_SYSTEM.equals(key)) {
@@ -128,7 +128,7 @@ public class GlobalConfigGroup extends Module {
 	public boolean useRoadPricing() {
 		return this.useRoadPricing;
 	}
-	public void useRoadPricing(final boolean useRoadPricing) {
+	public void setRoadPricing(final boolean useRoadPricing) {
 		this.useRoadPricing = useRoadPricing;
 	}
 
