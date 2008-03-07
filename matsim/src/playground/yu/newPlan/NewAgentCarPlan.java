@@ -34,9 +34,9 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewAgentCarPlan extends PersonAlgorithm implements
 		PersonAlgorithmI {
@@ -48,23 +48,23 @@ public class NewAgentCarPlan extends PersonAlgorithm implements
 
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewAgentCarPlan(Plans plans) {
-		pw = new PlansWriter(plans);
-		pw.writeStartPlans();
+		this.pw = new PlansWriter(plans);
+		this.pw.writeStartPlans();
 	}
 
 	public void writeEndPlans() {
-		pw.writeEndPlans();
+		this.pw.writeEndPlans();
 		System.out.println("-->Done!!");
 	}
 
 	@Override
 	public void run(Person person) {
-		haveCar = false;
+		this.haveCar = false;
 		for (Plan pl : person.getPlans()) {
 			List actsLegs = pl.getActsLegs();
 			a: {
@@ -72,14 +72,14 @@ public class NewAgentCarPlan extends PersonAlgorithm implements
 					Object o = actsLegs.get(i);
 					if (i % 2 != 0) {
 						if (((Leg) o).getMode().equals("car")) {
-							haveCar = true;
-							pl.setType("car");
+							this.haveCar = true;
+							pl.setType(Plan.Type.CAR);
 							break a;
 						}
 					}
 				}
 			}
-			if (haveCar) {
+			if (this.haveCar) {
 				for (int j = 0; j < actsLegs.size(); j++) {
 					Object o = actsLegs.get(j);
 					if (j % 2 != 0) {
@@ -88,8 +88,8 @@ public class NewAgentCarPlan extends PersonAlgorithm implements
 				}
 			}
 		}
-		if (haveCar) {
-			pw.writePerson(person);
+		if (this.haveCar) {
+			this.pw.writePerson(person);
 		}
 	}
 }

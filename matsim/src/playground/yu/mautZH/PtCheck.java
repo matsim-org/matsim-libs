@@ -24,14 +24,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * outputs the amount of public transit user or its fraction into .txt-files
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class PtCheck extends PersonAlgorithm {
 	// ----------------------MEMBER VARIABLES----------------------------
@@ -58,29 +59,29 @@ public class PtCheck extends PersonAlgorithm {
 	 * @throws IOException
 	 */
 	public PtCheck(String fileName) throws IOException {
-		out = IOUtils.getBufferedWriter(fileName);
+		this.out = IOUtils.getBufferedWriter(fileName);
 		System.out.println("  begins to write txt-file about pt-rate");
-		out.write("Iter\tPtRate\tPtUser\n");
-		out.flush();
-		personCnt = 0;
-		ptUserCnt = 0;
+		this.out.write("Iter\tPtRate\tPtUser\n");
+		this.out.flush();
+		this.personCnt = 0;
+		this.ptUserCnt = 0;
 	}
 
 	@Override
 	public void run(Person person) {
-		personCnt++;
-		String planType = person.getSelectedPlan().getType();
-		if (planType != null) {
-			if (planType.equals("pt")) {
-				ptUserCnt++;
+		this.personCnt++;
+		Plan.Type planType = person.getSelectedPlan().getType();
+		if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
+			if (planType.equals(Plan.Type.PT)) {
+				this.ptUserCnt++;
 			}
 		}
 	}
 
 	// ---------------------------GETTER------------------------------------
 	public double getPtRate() {
-		if (personCnt > 0)
-			return (double) ptUserCnt / (double) personCnt;
+		if (this.personCnt > 0)
+			return (double) this.ptUserCnt / (double) this.personCnt;
 		System.err.println("there is no persons gecheckt!!");
 		return -1.0;
 	}
@@ -89,14 +90,14 @@ public class PtCheck extends PersonAlgorithm {
 	 * @return the personCnt.
 	 */
 	public int getPersonCnt() {
-		return personCnt;
+		return this.personCnt;
 	}
 
 	/**
 	 * @return the ptUserCnt.
 	 */
 	public int getPtUserCnt() {
-		return ptUserCnt;
+		return this.ptUserCnt;
 	}
 
 	// ----------------------------SETTER---------------------------------
@@ -118,7 +119,7 @@ public class PtCheck extends PersonAlgorithm {
 
 	/**
 	 * writes public transit user amount and fraction into .txt-file.
-	 * 
+	 *
 	 * @param Iter -
 	 *            number of iteration
 	 * @throws IOException
@@ -126,15 +127,15 @@ public class PtCheck extends PersonAlgorithm {
 	public void write(int Iter) throws IOException {
 		double ptRate = getPtRate();
 		double ptUserCnt = getPtUserCnt();
-		out.write(Iter + "\t" + ptRate + "\t" + ptUserCnt + "\n");
+		this.out.write(Iter + "\t" + ptRate + "\t" + ptUserCnt + "\n");
 		// System.out.println("There are " + ptRate * 100
 		// + "% persons who use Public Transportation! " + ptUserCnt + "/"
 		// + getPersonCnt());
-		out.flush();
+		this.out.flush();
 	}
 
 	public void writeEnd() throws IOException {
-		out.close();
+		this.out.close();
 	}
 
 	/**

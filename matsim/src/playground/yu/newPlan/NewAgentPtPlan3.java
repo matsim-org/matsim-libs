@@ -36,9 +36,9 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewAgentPtPlan3 extends PersonAlgorithm implements
 		PersonAlgorithmI {
@@ -51,12 +51,12 @@ public class NewAgentPtPlan3 extends PersonAlgorithm implements
 
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewAgentPtPlan3(final Plans plans) {
-		copyPlans.clear();
+		this.copyPlans.clear();
 		this.pw = new PlansWriter(plans);
 		this.pw.writeStartPlans();
 	}
@@ -77,18 +77,18 @@ public class NewAgentPtPlan3 extends PersonAlgorithm implements
 			if (!legMode.equals("car")) {
 				if (person.getLicense().equals("yes")) {
 					Plan copyPlan = new Plan(person);
-					copyPlan.setType("car");
-					copyPlans.add(copyPlan);
+					copyPlan.setType(Plan.Type.CAR);
+					this.copyPlans.add(copyPlan);
 				}
 			} else if (!legMode.equals("pt")) {
 				Plan copyPlan = new Plan(person);
-				copyPlan.setType("pt");
-				copyPlans.add(copyPlan);
+				copyPlan.setType(Plan.Type.PT);
+				this.copyPlans.add(copyPlan);
 			}
 
 			List actsLegs = pl.getActsLegs();
 			int actsLegsSize = actsLegs.size();
-			for (Plan copyPlan : copyPlans) {
+			for (Plan copyPlan : this.copyPlans) {
 				for (int i = 0; i < actsLegsSize; i++) {
 					Object o = actsLegs.get(i);
 					if (i % 2 == 0) {
@@ -108,10 +108,10 @@ public class NewAgentPtPlan3 extends PersonAlgorithm implements
 			}
 		}
 
-		for (Plan copyPlan : copyPlans) {
+		for (Plan copyPlan : this.copyPlans) {
 			person.addPlan(copyPlan);
 		}
-		copyPlans.clear();
+		this.copyPlans.clear();
 
 		// }
 		if (person.getLicense().equals("no")) {
@@ -123,6 +123,6 @@ public class NewAgentPtPlan3 extends PersonAlgorithm implements
 			}
 		}
 
-		pw.writePerson(person);
+		this.pw.writePerson(person);
 	}
 }

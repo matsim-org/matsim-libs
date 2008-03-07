@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -42,7 +42,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class SameActLocTest {
 	public static class SameActLoc extends PersonAlgorithm {
@@ -53,9 +53,9 @@ public class SameActLocTest {
 
 		public SameActLoc(String filename) {
 			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("personId\tlinkId\tactIdx\n");
-				writer.flush();
+				this.writer = IOUtils.getBufferedWriter(filename);
+				this.writer.write("personId\tlinkId\tactIdx\n");
+				this.writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -65,17 +65,17 @@ public class SameActLocTest {
 
 		public void end() {
 			try {
-				writer
+				this.writer
 						.write("------------------------------------\nacts at same link: "
-								+ actLocCount
+								+ this.actLocCount
 								+ "\namong them "
-								+ carActLocCount
+								+ this.carActLocCount
 								+ " car-legs and "
-								+ ptActLocCount
+								+ this.ptActLocCount
 								+ " pt-legs;"
 								+ "\npersons, who has such acts: "
-								+ personCount);
-				writer.close();
+								+ this.personCount);
+				this.writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -83,32 +83,32 @@ public class SameActLocTest {
 
 		@Override
 		public void run(Person person) {
-			actsAtSameLink = false;
+			this.actsAtSameLink = false;
 			String tmpLinkId = null;
 			String nextTmpLinkId = null;
 			int i = 0;
 			if (person != null) {
 				Plan p = person.getSelectedPlan();
 				if (p != null) {
-					String planType = p.getType();
+					Plan.Type planType = p.getType();
 					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
 						nextTmpLinkId = ai.next().getLink().getId().toString();
-						if (tmpLinkId != null && nextTmpLinkId != null) {
+						if ((tmpLinkId != null) && (nextTmpLinkId != null)) {
 							if (tmpLinkId.equals(nextTmpLinkId)) {
-								actLocCount++;
-								if (planType != null) {
-									if (planType.equals("car")) {
-										carActLocCount++;
-									} else if (planType.equals("pt")) {
-										ptActLocCount++;
+								this.actLocCount++;
+								if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
+									if (planType.equals(Plan.Type.CAR)) {
+										this.carActLocCount++;
+									} else if (planType.equals(Plan.Type.PT)) {
+										this.ptActLocCount++;
 									}
 								}
-								actsAtSameLink = true;
+								this.actsAtSameLink = true;
 								try {
-									writer.write(person.getId().toString()
+									this.writer.write(person.getId().toString()
 											+ "\t" + tmpLinkId + "\t" + i
 											+ "\n");
-									writer.flush();
+									this.writer.flush();
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -117,8 +117,8 @@ public class SameActLocTest {
 						tmpLinkId = nextTmpLinkId;
 						i++;
 					}
-					if (actsAtSameLink) {
-						personCount++;
+					if (this.actsAtSameLink) {
+						this.personCount++;
 					}
 				}
 			}

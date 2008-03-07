@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -36,6 +36,7 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
@@ -43,7 +44,7 @@ import org.matsim.utils.misc.Time;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 		EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
@@ -66,19 +67,19 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 	private HashMap<String, Double> tmpDptTimes = new HashMap<String, Double>();
 
 	/**
-	 * 
+	 *
 	 */
 	public TravelTimeModalSplit(final int binSize, final int nofBins,
 			NetworkLayer network, Plans plans) {
 		this.network = network;
 		this.plans = plans;
 		this.binSize = binSize;
-		travelTimes = new double[nofBins + 1];
-		arrCount = new int[nofBins + 1];
-		carTravelTimes = new double[nofBins + 1];
-		ptTravelTimes = new double[nofBins + 1];
-		carArrCount = new int[nofBins + 1];
-		ptArrCount = new int[nofBins + 1];
+		this.travelTimes = new double[nofBins + 1];
+		this.arrCount = new int[nofBins + 1];
+		this.carTravelTimes = new double[nofBins + 1];
+		this.ptTravelTimes = new double[nofBins + 1];
+		this.carArrCount = new int[nofBins + 1];
+		this.ptArrCount = new int[nofBins + 1];
 	}
 
 	public TravelTimeModalSplit(final int binSize, NetworkLayer network,
@@ -87,11 +88,11 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 	}
 
 	public void handleEvent(EventAgentDeparture event) {
-		tmpDptTimes.put(event.agentId, event.time);
+		this.tmpDptTimes.put(event.agentId, event.time);
 	}
 
 	public void reset(int iteration) {
-		tmpDptTimes.clear();
+		this.tmpDptTimes.clear();
 	}
 
 	public void handleEvent(EventAgentArrival event) {
@@ -105,34 +106,34 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 	private void handleEventIntern(AgentEvent ae) {
 		double time = ae.time;
 		String agentId = ae.agentId;
-		Double dptTime = tmpDptTimes.get(agentId);
+		Double dptTime = this.tmpDptTimes.get(agentId);
 		if (dptTime != null) {
 			int binIdx = getBinIndex(time);
 			double travelTime = time - dptTime;
-			travelTimes[binIdx] += travelTime;
-			arrCount[binIdx]++;
-			tmpDptTimes.remove(agentId);
-			ae.rebuild(plans, network);
-			String planType = ae.agent.getSelectedPlan().getType();
-			if (planType != null) {
-				if (planType.equals("car")) {
-					carTravelTimes[binIdx] += travelTime;
-					carArrCount[binIdx]++;
-				} else if (planType.equals("pt")) {
-					ptTravelTimes[binIdx] += travelTime;
-					ptArrCount[binIdx]++;
+			this.travelTimes[binIdx] += travelTime;
+			this.arrCount[binIdx]++;
+			this.tmpDptTimes.remove(agentId);
+			ae.rebuild(this.plans, this.network);
+			Plan.Type planType = ae.agent.getSelectedPlan().getType();
+			if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
+				if (planType.equals(Plan.Type.CAR)) {
+					this.carTravelTimes[binIdx] += travelTime;
+					this.carArrCount[binIdx]++;
+				} else if (planType.equals(Plan.Type.PT)) {
+					this.ptTravelTimes[binIdx] += travelTime;
+					this.ptArrCount[binIdx]++;
 				}
 			} else {
-				carTravelTimes[binIdx] += travelTime;
-				carArrCount[binIdx]++;
+				this.carTravelTimes[binIdx] += travelTime;
+				this.carArrCount[binIdx]++;
 			}
 		}
 	}
 
 	private int getBinIndex(final double time) {
 		int bin = (int) (time / this.binSize);
-		if (bin >= travelTimes.length) {
-			return travelTimes.length - 1;
+		if (bin >= this.travelTimes.length) {
+			return this.travelTimes.length - 1;
 		}
 		return bin;
 	}
@@ -158,25 +159,25 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 							+ "\tall_traveltimes [s]\tn._arrivals/stucks\tavg. traveltimes [s]"
 							+ "\tcar_traveltimes [s]\tcar_n._arrivals/stucks\tcar_avg. traveltimes [s]"
 							+ "\tpt_traveltimes [s]\tpt_n._arrivals/stucks\tpt_avg. traveltimes [s]\n");
-			for (int i = 0; i < travelTimes.length; i++) {
-				bw.write(Time.writeTime(i * binSize) + "\t" + i * this.binSize
-						+ "\t" + travelTimes[i] + "\t" + arrCount[i] + "\t"
-						+ travelTimes[i] / (double) arrCount[i] + "\t"
-						+ carTravelTimes[i] + "\t" + carArrCount[i] + "\t"
-						+ carTravelTimes[i] / (double) carArrCount[i] + "\t"
-						+ ptTravelTimes[i] + "\t" + ptArrCount[i] + "\t"
-						+ ptTravelTimes[i] / (double) ptArrCount[i] + "\n");
+			for (int i = 0; i < this.travelTimes.length; i++) {
+				bw.write(Time.writeTime(i * this.binSize) + "\t" + i * this.binSize
+						+ "\t" + this.travelTimes[i] + "\t" + this.arrCount[i] + "\t"
+						+ this.travelTimes[i] / this.arrCount[i] + "\t"
+						+ this.carTravelTimes[i] + "\t" + this.carArrCount[i] + "\t"
+						+ this.carTravelTimes[i] / this.carArrCount[i] + "\t"
+						+ this.ptTravelTimes[i] + "\t" + this.ptArrCount[i] + "\t"
+						+ this.ptTravelTimes[i] / this.ptArrCount[i] + "\n");
 			}
 			bw.write("----------------------------------------\n");
 			double ttSum = 0.0, carTtSum = 0.0, ptTtSum = 0.0;
 			int nTrips = 0, nCarTrips = 0, nPtTrips = 0;
-			for (int i = 0; i < travelTimes.length; i++) {
-				ttSum += travelTimes[i];
-				carTtSum += carTravelTimes[i];
-				ptTtSum += ptTravelTimes[i];
-				nTrips += arrCount[i];
-				nCarTrips += carArrCount[i];
-				nPtTrips += ptArrCount[i];
+			for (int i = 0; i < this.travelTimes.length; i++) {
+				ttSum += this.travelTimes[i];
+				carTtSum += this.carTravelTimes[i];
+				ptTtSum += this.ptTravelTimes[i];
+				nTrips += this.arrCount[i];
+				nCarTrips += this.carArrCount[i];
+				nPtTrips += this.ptArrCount[i];
 			}
 
 			bw
@@ -202,37 +203,37 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 	}
 
 	public void writeCharts(final String filename) {
-		int xsLength = travelTimes.length + 1;
+		int xsLength = this.travelTimes.length + 1;
 		double[] xs = new double[xsLength];
 		for (int i = 0; i < xsLength; i++) {
-			xs[i] = ((double) i) * (double) binSize / 3600.0;
+			xs[i] = ((double) i) * (double) this.binSize / 3600.0;
 		}
 		XYLineChart travelTimeSumChart = new XYLineChart("TravelTimes", "time",
 				"sum of TravelTimes [s]");
 		travelTimeSumChart.addSeries("sum of traveltimes of all agents", xs,
-				travelTimes);
+				this.travelTimes);
 		travelTimeSumChart.addSeries("sum of traveltimes of drivers", xs,
-				carTravelTimes);
+				this.carTravelTimes);
 		travelTimeSumChart.addSeries(
-				"sum of traveltime of public transit users", xs, ptTravelTimes);
+				"sum of traveltime of public transit users", xs, this.ptTravelTimes);
 		travelTimeSumChart.saveAsPng(filename + "Sum.png", 1024, 768);
 		for (int j = 0; j < xsLength - 1; j++) {
-			travelTimes[j] = (arrCount[j] == 0) ? -1 : travelTimes[j]
-					/ (double) arrCount[j];
-			carTravelTimes[j] = (carArrCount[j] == 0) ? -1 : carTravelTimes[j]
-					/ (double) carArrCount[j];
-			ptTravelTimes[j] = (ptArrCount[j] == 0) ? -1 : ptTravelTimes[j]
-					/ (double) ptArrCount[j];
+			this.travelTimes[j] = (this.arrCount[j] == 0) ? -1 : this.travelTimes[j]
+					/ this.arrCount[j];
+			this.carTravelTimes[j] = (this.carArrCount[j] == 0) ? -1 : this.carTravelTimes[j]
+					/ this.carArrCount[j];
+			this.ptTravelTimes[j] = (this.ptArrCount[j] == 0) ? -1 : this.ptTravelTimes[j]
+					/ this.ptArrCount[j];
 		}
 		XYLineChart avgTravelTimeChart = new XYLineChart(
 				"average LegTravelTime", "time", "average TravelTimes [s]");
 		avgTravelTimeChart.addSeries("average traveltime of all agents", xs,
-				travelTimes);
+				this.travelTimes);
 		avgTravelTimeChart.addSeries("average traveltime of drivers", xs,
-				carTravelTimes);
+				this.carTravelTimes);
 		avgTravelTimeChart
 				.addSeries("average traveltime of public transit Users", xs,
-						ptTravelTimes);
+						this.ptTravelTimes);
 		avgTravelTimeChart.saveAsPng(filename + "Avg.png", 1024, 768);
 	}
 }

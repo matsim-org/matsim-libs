@@ -29,17 +29,18 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.world.World;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class CarIllegal extends PersonAlgorithm {
 	private int count = 0;
-	private String planType = null;
+	private Plan.Type planType = null;
 
 	/**
 	 */
@@ -49,10 +50,10 @@ public class CarIllegal extends PersonAlgorithm {
 	@Override
 	public void run(Person person) {
 		if (person != null) {
-			planType = person.getSelectedPlan().getType();
-			if (!((planType != null) && (planType != "car"))) {
+			this.planType = person.getSelectedPlan().getType();
+			if (!((this.planType != null) && (this.planType != Plan.Type.CAR))) {
 				if ((person.getAge() < 18) || person.getLicense().equals("no")) {
-					count++;
+					this.count++;
 				}
 			}
 		}
@@ -62,7 +63,7 @@ public class CarIllegal extends PersonAlgorithm {
 	 * @return the count
 	 */
 	public int getCount() {
-		return count;
+		return this.count;
 	}
 	/**
 	 * @param args

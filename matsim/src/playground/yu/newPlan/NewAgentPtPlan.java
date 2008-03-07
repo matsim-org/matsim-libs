@@ -36,9 +36,9 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI {
 	/**
@@ -48,7 +48,7 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 
 	/**
 	 * Constructor, writes file-head
-	 * 
+	 *
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
@@ -66,10 +66,10 @@ public class NewAgentPtPlan extends PersonAlgorithm implements PersonAlgorithmI 
 		List<Plan> copyPlans = new ArrayList<Plan>();
 		// copyPlans: the copy of the plans.
 		for (Plan pl : person.getPlans()) {
-			pl.setType("car");
+			pl.setType(Plan.Type.CAR);
 
 			Plan copyPlan = new Plan(person);
-			copyPlan.setType("pt");
+			copyPlan.setType(Plan.Type.PT);
 
 			List actsLegs = pl.getActsLegs();
 			for (int i = 0; i < actsLegs.size(); i++) {

@@ -31,7 +31,7 @@ import org.matsim.utils.misc.Time;
 
 /**
  * Collects different statistical values on plans, activities and legs.
- * 
+ *
  * @author mrieser
  */
 public class PlanSummary extends PersonAlgorithm implements PlanAlgorithmI {
@@ -45,13 +45,13 @@ public class PlanSummary extends PersonAlgorithm implements PlanAlgorithmI {
 	private int actCnt = 0;
 	private final int nActTypes;
 	private final int nLegModes;
-	
+
 	private final String[] actTypes;
 	private final int[] actTypeCnt;
 	private final double[] actTypeDurations;
 	private final String[] legModes;
 	private final int[] legModeCnt;
-	private HashMap<String, Integer> planTypes = new HashMap<String, Integer>();
+	private HashMap<Plan.Type, Integer> planTypes = new HashMap<Plan.Type, Integer>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -59,50 +59,50 @@ public class PlanSummary extends PersonAlgorithm implements PlanAlgorithmI {
 
 	public PlanSummary(final String[] activities, final String[] legmodes) {
 		super();
-		nActTypes = activities.length;
-		nLegModes = legmodes.length;
-		actTypes = new String[nActTypes];
-		actTypeCnt = new int[nActTypes];
-		actTypeDurations = new double[nActTypes];
-		legModes = new String[nLegModes];
-		legModeCnt = new int[nLegModes];
-		
+		this.nActTypes = activities.length;
+		this.nLegModes = legmodes.length;
+		this.actTypes = new String[this.nActTypes];
+		this.actTypeCnt = new int[this.nActTypes];
+		this.actTypeDurations = new double[this.nActTypes];
+		this.legModes = new String[this.nLegModes];
+		this.legModeCnt = new int[this.nLegModes];
+
 		init(activities, legmodes);
 	}
 
 	private final void init(final String[] activities, final String[] legmodes) {
-		for (int i = 0; i < nActTypes; i++) {
-			actTypeCnt[i] = 0;
-			actTypeDurations[i] = 0;
-			actTypes[i] = null;
+		for (int i = 0; i < this.nActTypes; i++) {
+			this.actTypeCnt[i] = 0;
+			this.actTypeDurations[i] = 0;
+			this.actTypes[i] = null;
 		}
-		for (int i = 0; i < nLegModes; i++) {
-			legModeCnt[i] = 0;
-			legModes[i] = null;
+		for (int i = 0; i < this.nLegModes; i++) {
+			this.legModeCnt[i] = 0;
+			this.legModes[i] = null;
 		}
 
 		int max;
 		// copy activities with unknown array-length into our own array
-		if (activities.length < nActTypes) {
+		if (activities.length < this.nActTypes) {
 			max = activities.length;
 		} else {
-			max = nActTypes;
+			max = this.nActTypes;
 		}
 		for (int i = 0; i < max; i++) {
-			actTypes[i] = activities[i];
+			this.actTypes[i] = activities[i];
 		}
 		// copy legmodes with unknown array-length into our own array
-		if (legmodes.length < nLegModes) {
+		if (legmodes.length < this.nLegModes) {
 			max = legmodes.length;
 		} else {
-			max = nLegModes;
+			max = this.nLegModes;
 		}
 		for (int i = 0; i < max; i++) {
-			legModes[i] = legmodes[i];
+			this.legModes[i] = legmodes[i];
 		}
-		planTypes.clear();
+		this.planTypes.clear();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
@@ -115,60 +115,59 @@ public class PlanSummary extends PersonAlgorithm implements PlanAlgorithmI {
 		}
 	}
 
-	public void run(Plan plan) {		
+	public void run(Plan plan) {
 		int acts = 0;
 		ArrayList<Object> actsLegs = plan.getActsLegs();
 		for (int j=0; j<actsLegs.size(); j=j+2) {
 			acts++;
-			actCnt++;
+			this.actCnt++;
 			Act act = (Act)actsLegs.get(j);
 			String actType = act.getType();
 			double dur = act.getDur();
 			int idx = getActTypeIndex(actType);
-			if (idx >= 0 && dur >= 0) {
-				actTypeCnt[idx]++;
-				actTypeDurations[idx] = actTypeDurations[idx] + dur;
+			if ((idx >= 0) && (dur >= 0)) {
+				this.actTypeCnt[idx]++;
+				this.actTypeDurations[idx] = this.actTypeDurations[idx] + dur;
 			}
 			if (j > 0) {
 				Leg leg = (Leg)actsLegs.get(j-1);
 				String legMode = leg.getMode();
 				idx = getLegModeIndex(legMode);
-				if (idx >= 0 && dur >= 0) {
-					legModeCnt[idx]++;
+				if ((idx >= 0) && (dur >= 0)) {
+					this.legModeCnt[idx]++;
 				}
 			}
 		}
-		
-		String type = plan.getType();
-		Integer count = planTypes.get(type);
+
+		Integer count = this.planTypes.get(plan.getType());
 		if (count == null) count = 0;
-		planTypes.put(type, count + 1);
-		
-		planCnt++;
+		this.planTypes.put(plan.getType(), count + 1);
+
+		this.planCnt++;
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private final int getActTypeIndex(String actType) {
-		for (int i = 0; i < nActTypes; i++) {
-			if (actType.equals(actTypes[i])) {
+		for (int i = 0; i < this.nActTypes; i++) {
+			if (actType.equals(this.actTypes[i])) {
 				return i;
 			}
 		}
 		return -1;
 	}
-	
+
 	private final int getLegModeIndex(String legMode) {
-		for (int i = 0; i < nLegModes; i++) {
-			if (legMode.equals(legModes[i])) {
+		for (int i = 0; i < this.nLegModes; i++) {
+			if (legMode.equals(this.legModes[i])) {
 				return i;
 			}
 		}
 		return -1;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
@@ -176,15 +175,15 @@ public class PlanSummary extends PersonAlgorithm implements PlanAlgorithmI {
 	public final void print() {
 		System.out.println("----------------------------------------");
 		System.out.println(this.getClass().getName() + ":");
-		System.out.println("number of plans:       " + planCnt);
-		System.out.println("number of activities:  " + actCnt);
-		System.out.println("average # of act/plan: " + ((double)actCnt/(double)planCnt));
+		System.out.println("number of plans:       " + this.planCnt);
+		System.out.println("number of activities:  " + this.actCnt);
+		System.out.println("average # of act/plan: " + ((double)this.actCnt/(double)this.planCnt));
 		// act summary
-		for (int i = 0; i < nActTypes; i++) {
-			String actType = actTypes[i];
+		for (int i = 0; i < this.nActTypes; i++) {
+			String actType = this.actTypes[i];
 			if (actType != null) {
-				int count = actTypeCnt[i];
-				double sum = actTypeDurations[i];
+				int count = this.actTypeCnt[i];
+				double sum = this.actTypeDurations[i];
 				if (count == 0) {
 					System.out.println("activity '" + actType + "': no data available.");
 				} else {
@@ -197,10 +196,10 @@ public class PlanSummary extends PersonAlgorithm implements PlanAlgorithmI {
 
 		// leg summary
 		System.out.println();
-		for (int i = 0; i < nLegModes; i++) {
-			String legMode = legModes[i];
+		for (int i = 0; i < this.nLegModes; i++) {
+			String legMode = this.legModes[i];
 			if (legMode != null) {
-				int count = legModeCnt[i];
+				int count = this.legModeCnt[i];
 				if (count == 0) {
 					System.out.println("leg mode '" + legMode + "': no data available.");
 				} else {
@@ -211,8 +210,8 @@ public class PlanSummary extends PersonAlgorithm implements PlanAlgorithmI {
 		}
 		// plan types summary
 		System.out.println("\nplan types:");
-		for (String type : planTypes.keySet()) {
-			System.out.println(type + " : " + planTypes.get(type));
+		for (Plan.Type type : this.planTypes.keySet()) {
+			System.out.println(type + " : " + this.planTypes.get(type));
 		}
 		System.out.println("----------------------------------------");
 	}

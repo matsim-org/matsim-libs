@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -42,7 +42,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class LegCountTest2 {
 	public static class LegCount extends PersonAlgorithm {
@@ -56,9 +56,9 @@ public class LegCountTest2 {
 
 		public LegCount(String filename) {
 			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("personId\tLegNumber\n");
-				writer.flush();
+				this.writer = IOUtils.getBufferedWriter(filename);
+				this.writer.write("personId\tLegNumber\n");
+				this.writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -68,30 +68,30 @@ public class LegCountTest2 {
 
 		public void end() {
 			try {
-				writer.write("------------------------------------\ncarUser:\t"
-						+ carUserCount
+				this.writer.write("------------------------------------\ncarUser:\t"
+						+ this.carUserCount
 						+ ";\tcarLegs:\t"
-						+ carLegCount
+						+ this.carLegCount
 						+ ";\t"
-						+ (double) carLegCount / (double) carUserCount
+						+ (double) this.carLegCount / (double) this.carUserCount
 						+ "\tLegs pro carUser;\tlicensedCarUser:\t"
-						+ licensedCarUserCount
+						+ this.licensedCarUserCount
 						+ ";\tlicensedCarLegs:\t"
-						+ licensedCarLegCount
+						+ this.licensedCarLegCount
 						+ ";\t"
-						+ (double) licensedCarLegCount
-								/ (double) licensedCarUserCount
+						+ (double) this.licensedCarLegCount
+								/ (double) this.licensedCarUserCount
 						+ "\tLegs pro licensedCarUser;\n" + "\nptUser:\t"
-						+ ptUserCount + ";\tptLegs:\t" + ptLegCount + ";\t"
-						+ (double) ptLegCount / (double) ptUserCount
+						+ this.ptUserCount + ";\tptLegs:\t" + this.ptLegCount + ";\t"
+						+ (double) this.ptLegCount / (double) this.ptUserCount
 						+ "\tLegs pro ptUser;\tlicensedPtUser:\t"
-						+ licensedPtUserCount + ";\tlicensedPtLegs:\t"
-						+ licensedPtLegCount + ";\t"
-						+ (double) licensedPtLegCount
-						/ (double) licensedPtUserCount
+						+ this.licensedPtUserCount + ";\tlicensedPtLegs:\t"
+						+ this.licensedPtLegCount + ";\t"
+						+ (double) this.licensedPtLegCount
+						/ (double) this.licensedPtUserCount
 						+ "\tLegs pro licensedPtUser.");
-				writer.flush();
-				writer.close();
+				this.writer.flush();
+				this.writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -107,13 +107,13 @@ public class LegCountTest2 {
 		}
 
 		private void carAppend(int legsNumber) {
-			carUserCount++;
-			carLegCount += legsNumber;
+			this.carUserCount++;
+			this.carLegCount += legsNumber;
 		}
 
 		private void carLicensedAppend(int legsNumber) {
-			licensedCarUserCount++;
-			licensedCarLegCount += legsNumber;
+			this.licensedCarUserCount++;
+			this.licensedCarLegCount += legsNumber;
 		}
 
 		@Override
@@ -122,24 +122,24 @@ public class LegCountTest2 {
 			if (p != null) {
 				int nLegs = getLegsNumber(p);
 				try {
-					writer.write(person.getId() + "\t" + nLegs + "\n");
-					writer.flush();
+					this.writer.write(person.getId() + "\t" + nLegs + "\n");
+					this.writer.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				String planType = p.getType();
-				if (planType != null) {
-					if (planType.equals("car")) {
+				Plan.Type planType = p.getType();
+				if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
+					if (planType.equals(Plan.Type.CAR)) {
 						carAppend(nLegs);
 						if (person.getLicense().equals("yes")) {
 							carLicensedAppend(nLegs);
 						}
-					} else if (planType.equals("pt")) {
-						ptUserCount++;
-						ptLegCount += nLegs;
+					} else if (planType.equals(Plan.Type.PT)) {
+						this.ptUserCount++;
+						this.ptLegCount += nLegs;
 						if (person.getLicense().equals("yes")) {
-							licensedPtUserCount++;
-							licensedPtLegCount += nLegs;
+							this.licensedPtUserCount++;
+							this.licensedPtLegCount += nLegs;
 						}
 					}
 				}

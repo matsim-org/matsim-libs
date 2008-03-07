@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -42,7 +42,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class LegCountTest {
 	public static class LegCount extends PersonAlgorithm {
@@ -54,9 +54,9 @@ public class LegCountTest {
 
 		public LegCount(String filename) {
 			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("personId\tLegNumber\n");
-				writer.flush();
+				this.writer = IOUtils.getBufferedWriter(filename);
+				this.writer.write("personId\tLegNumber\n");
+				this.writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -66,15 +66,15 @@ public class LegCountTest {
 
 		public void end() {
 			try {
-				writer.write("------------------------------------\ncarUser:\t"
-						+ carUserCount + ";\tcarLegs:\t" + carLegCount + ";\t"
-						+ (double) carLegCount / (double) carUserCount
-						+ "\tLegs pro carUser." + "\nptUser:\t" + ptUserCount
-						+ ";\tptLegs:\t" + ptLegCount + ";\t"
-						+ (double) ptLegCount / (double) ptUserCount
+				this.writer.write("------------------------------------\ncarUser:\t"
+						+ this.carUserCount + ";\tcarLegs:\t" + this.carLegCount + ";\t"
+						+ (double) this.carLegCount / (double) this.carUserCount
+						+ "\tLegs pro carUser." + "\nptUser:\t" + this.ptUserCount
+						+ ";\tptLegs:\t" + this.ptLegCount + ";\t"
+						+ (double) this.ptLegCount / (double) this.ptUserCount
 						+ "\tLegs pro ptUser.");
-				writer.flush();
-				writer.close();
+				this.writer.flush();
+				this.writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -90,8 +90,8 @@ public class LegCountTest {
 		}
 
 		private void carAppend(int legsNumber) {
-			carUserCount++;
-			carLegCount += legsNumber;
+			this.carUserCount++;
+			this.carLegCount += legsNumber;
 		}
 
 		@Override
@@ -100,18 +100,18 @@ public class LegCountTest {
 			if (p != null) {
 				int nLegs = getLegsNumber(p);
 				try {
-					writer.write(person.getId() + "\t" + nLegs + "\n");
-					writer.flush();
+					this.writer.write(person.getId() + "\t" + nLegs + "\n");
+					this.writer.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				String planType = p.getType();
-				if (planType != null) {
-					if (planType.equals("car")) {
+				Plan.Type planType = p.getType();
+				if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
+					if (planType.equals(Plan.Type.CAR)) {
 						carAppend(nLegs);
-					} else if (planType.equals("pt")) {
-						ptUserCount++;
-						ptLegCount += nLegs;
+					} else if (planType.equals(Plan.Type.PT)) {
+						this.ptUserCount++;
+						this.ptLegCount += nLegs;
 					}
 				} else {
 					carAppend(nLegs);

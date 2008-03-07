@@ -202,7 +202,7 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 		String freq = atts.getValue("freq");
 		if (type != null) { log.info("Attribute type in <location> is deprecated!"); }
 		if (id == null) { Gbl.errorMsg("NEW: location must have an id!"); }
-		if (x != null || y != null) { log.info("NEW: coords in <location> will be ignored!"); }
+		if ((x != null) || (y != null)) { log.info("NEW: coords in <location> will be ignored!"); }
 		if (freq != null) { log.info("NEW: Attribute freq in <location> is not supported at the moment!"); }
 
 		this.currfacility = (Facility)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE).getLocation(id);
@@ -222,8 +222,15 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 
 	private void startPlan(final Attributes atts) {
 		this.currplan = this.currperson.createPlan(atts.getValue("score"), atts.getValue("selected"));
-		if (atts.getValue("type") != null) {
-			this.currplan.setType(atts.getValue("type"));
+		if ("iv".equalsIgnoreCase(atts.getValue("type"))) {
+				this.currplan.setType(Plan.Type.CAR);
+		}
+		else if ("oev".equalsIgnoreCase(atts.getValue("type"))) {
+			this.currplan.setType(Plan.Type.PT);
+		}
+		else {
+			log.warn("Type " + atts.getValue("type") + " of plan not known! Setting plan to type undefined!");
+			this.currplan.setType(Plan.Type.UNDEFINED);
 		}
 	}
 

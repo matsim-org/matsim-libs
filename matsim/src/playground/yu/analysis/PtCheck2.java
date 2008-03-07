@@ -24,14 +24,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * outputs the amount of public transit user or its fraction into .txt-files
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class PtCheck2 extends PersonAlgorithm {
 	// ----------------------MEMBER VARIABLES----------------------------
@@ -66,31 +67,31 @@ public class PtCheck2 extends PersonAlgorithm {
 	 * @throws IOException
 	 */
 	public PtCheck2(String fileName) throws IOException {
-		out = IOUtils.getBufferedWriter(fileName);
+		this.out = IOUtils.getBufferedWriter(fileName);
 		System.out.println("-->begins to write txt-file about pt-rate");
-		out
+		this.out
 				.write("Iter\tPersons\tlicensed\tlicensedPtUser\tptRate in licensed\tlicensedCarUser\tcarRate in licensed\totherModals\totherModalsRate in licensed\n");
-		out.flush();
-		personCnt = 0;
-		licensedCnt = 0;
-		licensedPtUserCnt = 0;
-		licensedCarUserCnt = 0;
-		licensedOtherModalCnt = 0;
+		this.out.flush();
+		this.personCnt = 0;
+		this.licensedCnt = 0;
+		this.licensedPtUserCnt = 0;
+		this.licensedCarUserCnt = 0;
+		this.licensedOtherModalCnt = 0;
 	}
 
 	@Override
 	public void run(Person person) {
-		personCnt++;
+		this.personCnt++;
 		if (person.getLicense().equals("yes")) {
-			licensedCnt++;
-			String planType = person.getSelectedPlan().getType();
-			if (planType != null) {
-				if (planType.equals("pt")) {
-					licensedPtUserCnt++;
-				} else if (planType.equals("car")) {
-					licensedCarUserCnt++;
+			this.licensedCnt++;
+			Plan.Type planType = person.getSelectedPlan().getType();
+			if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
+				if (planType.equals(Plan.Type.PT)) {
+					this.licensedPtUserCnt++;
+				} else if (planType.equals(Plan.Type.CAR)) {
+					this.licensedCarUserCnt++;
 				} else {
-					licensedOtherModalCnt++;
+					this.licensedOtherModalCnt++;
 				}
 			}
 		}
@@ -98,22 +99,22 @@ public class PtCheck2 extends PersonAlgorithm {
 
 	// ---------------------------GETTER------------------------------------
 	public double getLicensedPtRate() {
-		if (licensedCnt > 0)
-			return (double) licensedPtUserCnt / (double) licensedCnt;
+		if (this.licensedCnt > 0)
+			return (double) this.licensedPtUserCnt / (double) this.licensedCnt;
 		System.err.println("there is no persons licensed gecheckt!!");
 		return -1.0;
 	}
 
 	public double getLicensedCarRate() {
-		if (licensedCnt > 0)
-			return (double) licensedCarUserCnt / (double) licensedCnt;
+		if (this.licensedCnt > 0)
+			return (double) this.licensedCarUserCnt / (double) this.licensedCnt;
 		System.err.println("there is no persons licensed gecheckt!!");
 		return -1.0;
 	}
 
 	public double getLicensedOtherModalRate() {
-		if (licensedCnt > 0)
-			return (double) licensedOtherModalCnt / (double) licensedCnt;
+		if (this.licensedCnt > 0)
+			return (double) this.licensedOtherModalCnt / (double) this.licensedCnt;
 		System.err.println("there is no persons licensed gecheckt!!");
 		return -1.0;
 	}
@@ -122,21 +123,21 @@ public class PtCheck2 extends PersonAlgorithm {
 	 * @return the licensedCarUserCnt
 	 */
 	public int getLicensedCarUserCnt() {
-		return licensedCarUserCnt;
+		return this.licensedCarUserCnt;
 	}
 
 	/**
 	 * @return the personCnt.
 	 */
 	public int getPersonCnt() {
-		return personCnt;
+		return this.personCnt;
 	}
 
 	/**
 	 * @return the ptUserCnt.
 	 */
 	public int getLicensedPtUserCnt() {
-		return licensedPtUserCnt;
+		return this.licensedPtUserCnt;
 	}
 
 	// ----------------------------SETTER---------------------------------
@@ -158,22 +159,22 @@ public class PtCheck2 extends PersonAlgorithm {
 
 	/**
 	 * writes public transit user amount and fraction into .txt-file.
-	 * 
+	 *
 	 * @param Iter -
 	 *            number of iteration
 	 * @throws IOException
 	 */
 	public void write(int Iter) throws IOException {
-		out.write(Iter + "\t" + personCnt + "\t" + licensedCnt + "\t"
-				+ licensedPtUserCnt + "\t" + getLicensedPtRate() + "\t"
-				+ licensedCarUserCnt + "\t" + getLicensedCarRate() + "\t"
-				+ licensedOtherModalCnt + "\t" + getLicensedOtherModalRate()
+		this.out.write(Iter + "\t" + this.personCnt + "\t" + this.licensedCnt + "\t"
+				+ this.licensedPtUserCnt + "\t" + getLicensedPtRate() + "\t"
+				+ this.licensedCarUserCnt + "\t" + getLicensedCarRate() + "\t"
+				+ this.licensedOtherModalCnt + "\t" + getLicensedOtherModalRate()
 				+ "\n");
-		out.flush();
+		this.out.flush();
 	}
 
 	public void writeEnd() throws IOException {
-		out.close();
+		this.out.close();
 	}
 
 	/**
@@ -182,15 +183,15 @@ public class PtCheck2 extends PersonAlgorithm {
 	public void resetCnt() {
 		setPersonCnt(0);
 		setLicensedPtUserCnt(0);
-		licensedCarUserCnt = 0;
-		licensedCnt = 0;
-		licensedOtherModalCnt = 0;
+		this.licensedCarUserCnt = 0;
+		this.licensedCnt = 0;
+		this.licensedOtherModalCnt = 0;
 	}
 
 	/**
 	 * @return the licensedCnt
 	 */
 	public int getLicensedCnt() {
-		return licensedCnt;
+		return this.licensedCnt;
 	}
 }

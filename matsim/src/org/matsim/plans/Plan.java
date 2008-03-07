@@ -38,11 +38,15 @@ public class Plan extends BasicPlan {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private String type = null;
+//	private String type = null;
 
 	private transient Person person = null;
 
 	public PlanStatsI firstPlanStatsAlgorithm = null;
+
+	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED};
+
+	private Type type = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -210,7 +214,7 @@ public class Plan extends BasicPlan {
 		return this.actsLegs;
 	}
 
-	public final String getType() {
+	public final Type getType() {
 		return this.type;
 	}
 
@@ -222,8 +226,8 @@ public class Plan extends BasicPlan {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void setType(final String type) {
-		this.type = (type == null) ? null : type.intern();
+	public final void setType(Type type) {
+		this.type = type;
 	}
 
 	/**

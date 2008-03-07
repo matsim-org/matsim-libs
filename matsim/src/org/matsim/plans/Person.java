@@ -78,7 +78,7 @@ public class Person extends BasicPerson<Plan>{
 		}
 		this.sex = (sex == null) ? null : sex.intern(); // (m,f,null)
 		this.age = age;
-		if (this.age < 0 && this.age != Integer.MIN_VALUE) {
+		if ((this.age < 0) && (this.age != Integer.MIN_VALUE)) {
 				throw new NumberFormatException("A person's age has to be an integer >= 0.");
 			}
 		this.license = (license == null) ? null : license.intern(); // (yes,no,null)
@@ -300,8 +300,8 @@ public class Person extends BasicPerson<Plan>{
 	 *
 	 * If there are more plan-types than <code>maxSize</code>, it is not possible to reduce the
 	 * number of plans to the requested size.<br>
-	 * 
-	 * If the selected plan is on of the deleted ones, a randomly chosen plan will be selected. 
+	 *
+	 * If the selected plan is on of the deleted ones, a randomly chosen plan will be selected.
 	 *
 	 * @param maxSize The number of plans that should be left.
 	 */
@@ -309,29 +309,21 @@ public class Person extends BasicPerson<Plan>{
 		if (this.plans.size() <= maxSize) {
 			return;
 		}
-		HashMap<String, Integer> typeCounts = new HashMap<String, Integer>();
+		HashMap<Plan.Type, Integer> typeCounts = new HashMap<Plan.Type, Integer>();
 		// initialize list of types
 		for (Plan plan : this.plans) {
-			String type = plan.getType();
-			if (type == null) {
-				type = "{[null]}";
-			}
-			Integer cnt = typeCounts.get(type);
+			Integer cnt = typeCounts.get(plan.getType());
 			if (cnt == null) {
-				typeCounts.put(type, Integer.valueOf(1));
+				typeCounts.put(plan.getType(), Integer.valueOf(1));
 			} else {
-				typeCounts.put(type, Integer.valueOf(cnt.intValue() + 1));
+				typeCounts.put(plan.getType(), Integer.valueOf(cnt.intValue() + 1));
 			}
 		}
 		while (this.plans.size() > maxSize) {
 			Plan worst = null;
 			double worstScore = Double.POSITIVE_INFINITY;
 			for (Plan plan : this.plans) {
-				String type = plan.getType();
-				if (type == null) {
-					type = "{[null]}";
-				}
-				if (typeCounts.get(type).intValue() > 1) {
+				if (typeCounts.get(plan.getType()).intValue() > 1) {
 					if (Plan.isUndefinedScore(plan.getScore())) {
 						worst = plan;
 						// make sure no other score could be less than this
@@ -348,12 +340,8 @@ public class Person extends BasicPerson<Plan>{
 					this.setSelectedPlan(this.getRandomPlan());
 				}
 				// reduce the number of plans of this type
-				String type = worst.getType();
-				if (type == null) {
-					type = "{[null]}";
-				}
-				Integer cnt = typeCounts.get(type);
-				typeCounts.put(type, Integer.valueOf(cnt.intValue() - 1));
+				Integer cnt = typeCounts.get(worst.getType());
+				typeCounts.put(worst.getType(), Integer.valueOf(cnt.intValue() - 1));
 			} else {
 				return; // should only happen if we have more different plan-types than maxSize
 			}

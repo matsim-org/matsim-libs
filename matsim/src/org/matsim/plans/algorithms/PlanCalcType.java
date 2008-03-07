@@ -39,7 +39,7 @@ public class PlanCalcType extends PersonAlgorithm implements PlanAlgorithmI {
 		boolean hasRide = false;
 		boolean hasWalk = false;
 		boolean hasBike = false;
-		
+
 		for (int i = 1, max = plan.getActsLegs().size(); i < max; i += 2) {
 			Leg leg = (Leg)plan.getActsLegs().get(i);
 			if (leg.getMode().equals("car")) hasCar = true;
@@ -48,12 +48,12 @@ public class PlanCalcType extends PersonAlgorithm implements PlanAlgorithmI {
 			else if (leg.getMode().equals("bike")) hasBike = true;
 			else if (leg.getMode().equals("walk")) hasWalk = true;
 		}
-		
-		if (hasCar) plan.setType("car");
-		else if (hasPt) plan.setType("pt");
-		else if (hasRide) plan.setType("ride");
-		else if (hasBike) plan.setType("bike");
-		else if (hasWalk) plan.setType("walk");
+
+		if (hasCar) plan.setType(Plan.Type.CAR);
+		else if (hasPt) plan.setType(Plan.Type.PT);
+		else if (hasRide) plan.setType(Plan.Type.RIDE);
+		else if (hasBike) plan.setType(Plan.Type.BIKE);
+		else if (hasWalk) plan.setType(Plan.Type.WALK);
 		else plan.setType(null);
 	}
 }

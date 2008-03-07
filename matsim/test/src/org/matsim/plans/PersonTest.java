@@ -84,17 +84,17 @@ public class PersonTest extends MatsimTestCase {
 		Person person = new Person("1", "m", "35", "yes", "yes", "yes");
 
 		Plan plan1 = new Plan("15.0", person);
-		plan1.setType("a");
+		plan1.setType(Plan.Type.CAR);
 		Plan plan2 = new Plan("22.0", person);
-		plan2.setType("b");
+		plan2.setType(Plan.Type.PT);
 		Plan plan3 = new Plan(null, person);
-		plan3.setType("a");
+		plan3.setType(Plan.Type.CAR);
 		Plan plan4 = new Plan("1.0", person);
-		plan4.setType("b");
+		plan4.setType(Plan.Type.PT);
 		Plan plan5 = new Plan("18.0", person);
-		plan5.setType("a");
+		plan5.setType(Plan.Type.CAR);
 		Plan plan6 = new Plan("21.0", person);
-		plan6.setType("b");
+		plan6.setType(Plan.Type.PT);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
 		person.addPlan(plan3);
@@ -120,12 +120,12 @@ public class PersonTest extends MatsimTestCase {
 		assertTrue("test that the plan with highest score of type a was not removed", person.getPlans().contains(plan5));
 		assertTrue("test that the plan with highest score of type b was not removed", person.getPlans().contains(plan2));
 	}
-	
+
 	/**
-	 * Tests that after a call to {@link org.matsim.plans.Person#removeWorstPlans(int)} 
+	 * Tests that after a call to {@link org.matsim.plans.Person#removeWorstPlans(int)}
 	 * the person still has a selected plan, even when the previously selected plan was
 	 * the one with the worst score.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_selectedPlan() {
@@ -144,7 +144,7 @@ public class PersonTest extends MatsimTestCase {
 		person.addPlan(plan5);
 		person.addPlan(plan6);
 		person.setSelectedPlan(plan1);
-		
+
 		// test we have the expected selected plan
 		assertEquals(plan1, person.getSelectedPlan());
 		// remove one plan, that is not selected
@@ -159,7 +159,7 @@ public class PersonTest extends MatsimTestCase {
 		// test that we have a selected plan again!
 		assertNotNull("person has no selected plan!", person.getSelectedPlan());
 		// test that the selected plan is one of the remaining plans
-		assertTrue(person.getSelectedPlan() == plan2 || person.getSelectedPlan() == plan5 || person.getSelectedPlan() == plan6);
+		assertTrue((person.getSelectedPlan() == plan2) || (person.getSelectedPlan() == plan5) || (person.getSelectedPlan() == plan6));
 		// now furter remove plans, until there is only one left
 		person.removeWorstPlans(1);
 		assertEquals(plan2, person.getSelectedPlan());

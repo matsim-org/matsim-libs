@@ -228,7 +228,7 @@ public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 			out.write(" selected=\"" + "yes" + "\"");
 		else
 			out.write(" selected=\"" + "no" + "\"");
-		if (plan.getType() != null)
+		if ((plan.getType() != null) && (plan.getType() != Plan.Type.UNDEFINED))
 			out.write(" type=\"" + plan.getType() + "\"");
 		out.write(">\n");
 	}
