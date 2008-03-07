@@ -58,7 +58,11 @@ public class KmlNetworkVisualizer {
 		Gbl.createConfig(null);
 		this.networkLayer = loadNetwork(networkFile);
 		this.write(outputPath);
+	}
 
+	public KmlNetworkVisualizer(final NetworkLayer network, final String outputPath) {
+		this.networkLayer = network;
+		this.write(outputPath);
 	}
 
 	private void write(final String filename) {
