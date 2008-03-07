@@ -222,11 +222,20 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 
 	private void startPlan(final Attributes atts) {
 		this.currplan = this.currperson.createPlan(atts.getValue("score"), atts.getValue("selected"));
-		if ("iv".equalsIgnoreCase(atts.getValue("type"))) {
+		if ("car".equalsIgnoreCase(atts.getValue("type"))) {
 				this.currplan.setType(Plan.Type.CAR);
 		}
-		else if ("oev".equalsIgnoreCase(atts.getValue("type"))) {
+		else if ("pt".equalsIgnoreCase(atts.getValue("type"))) {
 			this.currplan.setType(Plan.Type.PT);
+		}
+		else if ("ride".equalsIgnoreCase(atts.getValue("type"))) {
+			this.currplan.setType(Plan.Type.RIDE);
+		}
+		else if ("bike".equalsIgnoreCase(atts.getValue("type"))) {
+			this.currplan.setType(Plan.Type.BIKE);
+		}
+		else if ("WALK".equalsIgnoreCase(atts.getValue("type"))) {
+			this.currplan.setType(Plan.Type.WALK);
 		}
 		else {
 			log.warn("Type " + atts.getValue("type") + " of plan not known! Setting plan to type undefined!");
