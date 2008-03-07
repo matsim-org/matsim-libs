@@ -35,7 +35,7 @@ import org.matsim.router.PlansCalcRoute;
  */
 public class EUTReRoute extends MultithreadedModuleA {
 	
-	private static final int rho = 0;
+	private static final int rho = 10;
 	
 	private final ArrowPrattRiskAversionI utilFunction;
 	

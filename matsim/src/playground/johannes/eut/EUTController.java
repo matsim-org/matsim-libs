@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationEndsListener;
@@ -51,7 +50,8 @@ import org.matsim.network.Link;
 import org.matsim.plans.Person;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.selectors.BestPlanSelector;
+import org.matsim.replanning.selectors.KeepSelected;
+import org.matsim.replanning.selectors.PlanSelectorI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.io.IOUtils;
@@ -66,7 +66,7 @@ import org.matsim.withinday.trafficmanagement.TrafficManagement;
  */
 public class EUTController extends WithindayControler {
 	
-	private static final Logger log = Logger.getLogger(EUTController.class);
+//	private static final Logger log = Logger.getLogger(EUTController.class);
 	
 	private TravelTimeMemory ttmemory;
 	
@@ -97,14 +97,15 @@ public class EUTController extends WithindayControler {
 		StrategyManager manager = new StrategyManager();
 		manager.setMaxPlansPerAgent(1);
 		
-		PlanStrategy strategy = new PlanStrategy(new BestPlanSelector());
+		PlanSelectorI selector = new KeepSelected();
+		PlanStrategy strategy = new PlanStrategy(selector);
 		EUTReRoute eutReRoute = new EUTReRoute(getNetwork(), ttmemory);
 		routerAnalyzer = new EUTRouterAnalyzer(eutReRoute.getUtilFunction());
 		eutReRoute.setRouterAnalyzer(routerAnalyzer);
 		strategy.addStrategyModule(eutReRoute);
 		manager.addStrategy(strategy, 0.05);
 		
-		strategy = new PlanStrategy(new BestPlanSelector());
+		strategy = new PlanStrategy(selector);
 		manager.addStrategy(strategy, 0.95);
 		
 		return manager;
@@ -116,43 +117,29 @@ public class EUTController extends WithindayControler {
 		setTraveltimeBinSize(60);
 		super.setup();
 		
-		addControlerListener(routerAnalyzer);
-		
-		
 		ttcalc = new EstimReactiveLinkTT();
 		events.addHandler((EstimReactiveLinkTT)ttcalc);
 		addControlerListener(new TTCalculatorController());
 		addControlerListener(new NetworkModifier());
 		
-//		addControlerListener(new RouteDistribution());
-//		addControlerListener(new RouteCosts());
-//		addControlerListener(new GuidedAgentsWriter());
-		addControlerListener(new TripDurationWriter());
-//		addControlerListener(new GuidanceWriter());
-//		addControlerListener(new ScoreStats());
-//		LinkTTObserver obs = new LinkTTObserver();
-//		addControlerListener(obs);
-//		events.addHandler(obs);
-//		setScoringFunctionFactory(new EUTScoringFunctionFactory());
+		addControlerListener(routerAnalyzer);
 		
-//		legDurationWriter = new CalcLegTimes(population); 
-//		events.addHandler(legDurationWriter);
+		TripAndScoreStats stats = new TripAndScoreStats(routerAnalyzer); 
+		addControlerListener(stats);
+		events.addHandler(stats);
+
 		factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), ttcalc);
 		((GuidedAgentFactory)factory).setRouteAnalyzer(routerAnalyzer);
 		this.addControlerListener(((GuidedAgentFactory)factory).router);
 		
-//		LinkCounter counter = new LinkCounter();
-//		this.events.addHandler(counter);
-//		addControlerListener(counter);
-		
-	
+		LinkTTVarianceStats linkStats = new LinkTTVarianceStats(getTravelTimeCalculator(), 25200, 32400, 60);
+		addControlerListener(linkStats);
 	}
 
 	@Override
 	protected void runMobSim() {
 //		factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), getTravelTimeCalculator());
 		((GuidedAgentFactory)factory).random = new Random(1);
-//		guidedTTs.setMeanTravelTimes(ttmemory.getMeanTravelTimes());
 		
 		config.withinday().addParam("contentThreshold", "1");
 		config.withinday().addParam("replanningInterval", "1");
@@ -164,6 +151,7 @@ public class EUTController extends WithindayControler {
 		trafficManagement = new TrafficManagement();
 		//run the simulation
 		long time = System.currentTimeMillis();
+//		QueueSimulation sim = new QueueSimulation((QueueNetworkLayer)this.network, this.population, this.events);
 		sim.run();
 		System.err.println("Mobsim took " + (System.currentTimeMillis() - time) +" ms.");
 	}

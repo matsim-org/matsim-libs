@@ -59,24 +59,32 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 	
 	private Collection<Person> guidedPersons;
 	
+	private Collection<Person> replannedPersons;
+	
+	private Collection<Person> riskAversePersons;
+	
 	private BufferedWriter summaryWriter;
 	
 	public EUTRouterAnalyzer(ArrowPrattRiskAversionI utilFunction) {
 		this.utilFunction = utilFunction;
+		replannedPersons = new HashSet<Person>();
+		riskAversePersons = new HashSet<Person>();
 	}
 	
 	public void appendSnapshot(Route bestRoute, double bestRouteCosts, Route indiffRoute) {
 		Snapshot s = new Snapshot();
 		s.ce = utilFunction.getTravelTime(bestRouteCosts);
-		if(!bestRoute.getRoute().equals(indiffRoute.getRoute()))
+		if(!bestRoute.getRoute().equals(indiffRoute.getRoute())) {
 			s.routesDiffer = true;
-		
+			riskAversePersons.add(person);
+		}
 		s.person = person;
 		snaphots.add(s);
 	}
 	
 	public void setNextPerson(Person person) {
 		this.person = person;
+		replannedPersons.add(person);
 	}
 
 	public void addGuidedPerson(Person person) {
@@ -85,6 +93,14 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 	
 	public Collection<Person> getGuidedPersons() {
 		return guidedPersons;
+	}
+	
+	public Collection<Person> getReplanedPersons() {
+		return replannedPersons;
+	}
+	
+	public Collection<Person> getRiskAversePersons() {
+		return riskAversePersons;
 	}
 	
 	public void notifyIterationStarts(IterationStartsEvent event) {
@@ -128,7 +144,13 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 			summaryWriter.write(TAB);
 			summaryWriter.write(String.valueOf(replannedTwice));
 			summaryWriter.newLine();
-			summaryWriter.flush();			
+			summaryWriter.flush();
+			/*
+			 * We need to do this here, since re-planning happens in
+			 * iteration-start event.
+			 */
+			replannedPersons = new HashSet<Person>();
+			riskAversePersons = new HashSet<Person>();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
