@@ -35,7 +35,7 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  * Calculates the toll agents pay during a simulation by analyzing events. To
  * fully function, add an instance of this class as EventHandler to your Events
  * object.
- * 
+ *
  * @author mrieser
  */
 public class CalcPaidToll implements EventHandlerLinkEnterI,
@@ -81,7 +81,7 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 		if (link == null) {
 			link = (Link) this.network.getLocation(event.linkId);
 		}
-		this.handler.handleEvent(event, link);
+//		this.handler.handleEvent(event, link);
 	}
 
 	public void reset(final int iteration) {
@@ -91,7 +91,7 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 	/**
 	 * Returns the toll the specified agent has paid in the course of the
 	 * simulation so far.
-	 * 
+	 *
 	 * @param agentId
 	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
 	 */
@@ -108,7 +108,7 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 	 */
 	public double getAllAgentsToll() {
 		double tolls = 0;
-		for (AgentInfo ai : agents.values()) {
+		for (AgentInfo ai : this.agents.values()) {
 			tolls += (ai == null) ? 0.0 : ai.toll;
 		}
 		return tolls;
@@ -119,7 +119,7 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 	 */
 	public int getDraweesNr() {
 		int dwCnt = 0;
-		for (AgentInfo ai : agents.values()) {
+		for (AgentInfo ai : this.agents.values()) {
 			if (ai != null)
 				if (ai.toll > 0.0)
 					dwCnt++;
@@ -146,6 +146,9 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 					CalcPaidToll.this.agents.put(event.agentId, info);
 				}
 				info.toll += newToll;
+//				System.out.println();
+//				System.out.println("Toll for link: " + link.getId() + " is " + newToll);
+//				System.out.println();
 			}
 		}
 	}
