@@ -45,6 +45,8 @@ public class PersonSubtourHandler {
 		for (int i=subtour_idx-1; i>=0; i=i-1) {
 			Subtour sub = new Subtour();
 			sub.setNodes(subtours.get(i));
+			Act start_act = (Act)plan.getActsLegs().get(sub.getNodes().get(0));
+			sub.setStart_coord(start_act.getCoord());
 			sub.setId(i);
 			System.out.println("sub nodes" + sub.getNodes());
 			ArrayList<Integer> subtour = subtours.get(i);
