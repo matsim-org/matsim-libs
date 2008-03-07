@@ -532,19 +532,22 @@ public class Controler {
 		 * may read and write to common variables, the order is important.
 		 * Example: The RoadPricing-Listener modifies the scoringFunctionFactory,
 		 * which in turn is used by the PlansScoring-Listener.
+		 * Note that the execution order is contrary to the order the listeners are called
 		 */
 
 		this.addCoreControlerListener(new CoreControlerListener());
 
+		// the default handling of plans
+		this.addCoreControlerListener(new PlansScoring());
+
 
 		// load road pricing, if requested
+		//TODO this condition should be config.global.useRoadPricing() is there a reason (dg_ma_08)
 		if (this.config.roadpricing().getTollLinksFile() != null) {
 			this.roadPricing = new RoadPricing();
 			this.addCoreControlerListener(this.roadPricing);
 		}
 
-		// the default handling of plans
-		this.addCoreControlerListener(new PlansScoring());
 		this.addCoreControlerListener(new PlansReplanning());
 		this.addCoreControlerListener(new PlansDumping());
 	}
