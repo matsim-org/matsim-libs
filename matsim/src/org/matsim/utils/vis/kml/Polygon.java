@@ -40,7 +40,7 @@ public class Polygon extends Geometry {
 	/**
 	 * A Polygon has always zero or one Outer-
 	 */
-	private LinearRing outerBoundaries;
+	private LinearRing outerBoundarie;
 	/**
 	 * and zero to many InnerBoundaries.
 	 */
@@ -51,9 +51,9 @@ public class Polygon extends Geometry {
 	 */
 	public Polygon() {
 		super();
-		innerBoundaries = null;
-		outerBoundaries = null;
-		
+		this.innerBoundaries = null;
+		this.outerBoundarie = null;
+
 	}
 	/**
 	 * Creates a Polygon without Geometries but with the given flags
@@ -73,51 +73,55 @@ public class Polygon extends Geometry {
 	 */
 	public Polygon(boolean extrude, boolean tessellate, AltitudeMode altitudeMode, LinearRing outerBoundaries) {
 		super(extrude, tessellate, altitudeMode);
-		this.outerBoundaries = outerBoundaries;
-		innerBoundaries = null;
+		this.outerBoundarie = outerBoundaries;
+		this.innerBoundaries = null;
 	}
-	
+
+	public void setBoundary(LinearRing boundary) {
+		this.outerBoundarie = boundary;
+	}
+
 	/**
 	 * Adds a LinearRing object to the innerBoundaries of this Polygon
 	 * @param boundary
 	 */
 	public void addInnerBoudary(LinearRing boundary) {
-		if (this.innerBoundaries == null) 
+		if (this.innerBoundaries == null)
 			this.innerBoundaries = new Vector<LinearRing>();
-		
+
 		this.innerBoundaries.add(boundary);
 	}
-	
+
 	@Override
 	protected void writeObject(BufferedWriter out, XMLNS version, int offset, String offsetString) throws IOException {
-		
+
 		out.write(Object.getOffset(offset, offsetString));
-		if (this.getId() != null && this.getId().length() != 0) {
-			out.write("<Polygon id=" + this.getId() + ">");	
+		if ((this.getId() != null) && (this.getId().length() != 0)) {
+			out.write("<Polygon id=" + this.getId() + ">");
 		}
 		else {
-			out.write("<Polygon>");	
+			out.write("<Polygon>");
 		}
 		out.newLine();
-		
+
 		super.writeObject(out, version, offset + 1, offsetString);
-			
-		if (this.outerBoundaries != null) {
+
+		if (this.outerBoundarie != null) {
 			out.write(Object.getOffset(offset + 1, offsetString));
 			out.write("<outerBoundaryIs>");
 			out.newLine();
-			this.outerBoundaries.writeObject(out, version, offset + 2, offsetString);
+			this.outerBoundarie.writeObject(out, version, offset + 2, offsetString);
 			out.write(Object.getOffset(offset + 1, offsetString));
 			out.write("</outerBoundaryIs>");
 			out.newLine();
 		}
-		
+
 		if (this.innerBoundaries != null) {
 			out.write(Object.getOffset(offset + 1, offsetString));
 			out.write("<innerBoundaryIs>");
 			out.newLine();
-			for (LinearRing lr : innerBoundaries) {
-				lr.writeObject(out, version, offset + 2, offsetString);	
+			for (LinearRing lr : this.innerBoundaries) {
+				lr.writeObject(out, version, offset + 2, offsetString);
 			}
 			out.write(Object.getOffset(offset + 1, offsetString));
 			out.write("</innerBoundaryIs>");
