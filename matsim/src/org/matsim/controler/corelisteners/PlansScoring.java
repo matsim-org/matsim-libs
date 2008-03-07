@@ -20,6 +20,7 @@
 
 package org.matsim.controler.corelisteners;
 
+import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.ScoringEvent;
@@ -44,6 +45,7 @@ public class PlansScoring implements StartupListener, ScoringListener, Iteration
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
 		this.planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory());
+		Logger.getLogger(PlansScoring.class).debug("PlanScoring loaded ScoringFunctionFactory");
 		event.getControler().getEvents().addHandler(this.planScorer);
 	}
 

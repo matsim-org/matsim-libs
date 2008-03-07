@@ -43,7 +43,7 @@ public class RoadPricing implements StartupListener, IterationEndsListener{
 	private RoadPricingScheme scheme = null;
 	private CalcPaidToll tollCalc = null;
 	private CalcAverageTolledTripLength cattl = null;
-	
+
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
 
 	public void notifyStartup(final StartupEvent event) {
@@ -64,19 +64,19 @@ public class RoadPricing implements StartupListener, IterationEndsListener{
 		// add the toll-score to the existing scoring function
 		controler.setScoringFunctionFactory(
 				new RoadPricingScoringFunctionFactory(this.tollCalc, controler.getScoringFunctionFactory()));
-
+		log.debug("Loaded RoadPricingScoringFunctionFactory and set in controler");
 		// replace the travelCostCalculator with a toll-dependent one if required
 		if ("distance".equals(this.scheme.getType()) || "cordon".equals(this.scheme.getType())) {
 			controler.setTravelCostCalculator(new TollTravelCostCalculator(controler.getTravelCostCalculator(), this.scheme));
 		}
-		
-		cattl = new CalcAverageTolledTripLength(controler.getNetwork(), scheme);
-		controler.getEvents().addHandler(cattl);
-		
+
+		this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);
+		controler.getEvents().addHandler(this.cattl);
+
 		// TODO [MR] I think that the Area-Router is not yet loaded (never was, neither in this nor in the old controler)
 
 	}
-	
+
 /*/	public void notifyIterationStarts(IterationStartsEvent event) {
 //		int it = event.getIteration();
 //		cas.reset(it);
@@ -86,13 +86,13 @@ public class RoadPricing implements StartupListener, IterationEndsListener{
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int it = event.getIteration();
-		if (it % 10 == 0) {
+		if (it % 1 == 0) {
 			log.info("The sum of all paid tolls : "
-					+ tollCalc.getAllAgentsToll() + " €.");
+					+ this.tollCalc.getAllAgentsToll() + " Euro.");
 			log.info("The number of people, who paid toll : "
-					+ tollCalc.getDraweesNr());
+					+ this.tollCalc.getDraweesNr());
 			log.info("The average paid trip length : "
-					+ cattl.getAverageTripLength() + " m.");
+					+ this.cattl.getAverageTripLength() + " m.");
 		}
 	}
 
@@ -105,12 +105,12 @@ public class RoadPricing implements StartupListener, IterationEndsListener{
 	}
 
 	public double getAllAgentsToll(){
-		return tollCalc.getAllAgentsToll();
+		return this.tollCalc.getAllAgentsToll();
 	}
 	public int getDraweesNr(){
-		return tollCalc.getDraweesNr();
+		return this.tollCalc.getDraweesNr();
 	}
 	public double getAvgPaidTripLength(){
-		return cattl.getAverageTripLength();
+		return this.cattl.getAverageTripLength();
 	}
 }
