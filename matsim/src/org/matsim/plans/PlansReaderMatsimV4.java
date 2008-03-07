@@ -71,6 +71,8 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 
 	private final static Logger log = Logger.getLogger(PlansReaderMatsimV4.class);
 
+	private int warnPlanTypeCount = 0;
+
 	public PlansReaderMatsimV4(final Plans plans) {
 		this.plans = plans;
 	}
@@ -238,7 +240,10 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 			this.currplan.setType(Plan.Type.WALK);
 		}
 		else {
-			log.warn("Type " + atts.getValue("type") + " of plan not known! Setting plan to type undefined!");
+			if (this.warnPlanTypeCount < 10 ) {
+				log.warn("Type " + atts.getValue("type") + " of plan not known! Setting plan to type undefined!");
+				this.warnPlanTypeCount++;
+			}
 			this.currplan.setType(Plan.Type.UNDEFINED);
 		}
 	}
