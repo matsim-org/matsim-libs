@@ -23,12 +23,14 @@ package playground.yu.newPlan;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
+import org.matsim.plans.Plan.Type;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PersonAlgorithmI;
 
@@ -72,7 +74,7 @@ public class NewAgentPtPlan2 extends PersonAlgorithm implements
 			for (Plan pl : person.getPlans()) {
 				Leg firstLeg = (Leg) pl.getActsLegs().get(1);
 				String legMode = firstLeg.getMode();
-				pl.setType(legMode);
+				pl.setType(getPlanType(legMode));
 
 				if (!legMode.equals("car")) {
 					Plan copyPlan = new Plan(person);
@@ -95,7 +97,7 @@ public class NewAgentPtPlan2 extends PersonAlgorithm implements
 							Leg leg = (Leg) o;
 							Leg copyLeg = new Leg(leg);
 							copyLeg.setRoute(null);
-							copyLeg.setMode(copyPlan.getType());
+							copyLeg.setMode(copyPlan.getType().toString());
 							// -----------------------------------------------
 							// WITHOUT routeSetting!! traveltime of "pt" or
 							// "car"can be calculated automaticly!!
@@ -111,5 +113,27 @@ public class NewAgentPtPlan2 extends PersonAlgorithm implements
 			this.copyPlans.clear();
 		}
 		this.pw.writePerson(person);
+	}
+
+	static Type getPlanType(String mode) {
+		if (BasicLeg.MIVMODE.equalsIgnoreCase(mode))
+			return Plan.Type.CAR;
+		else if (BasicLeg.CARMODE.equalsIgnoreCase(mode))
+			return Plan.Type.CAR;
+		else if (BasicLeg.RIDEMODE.equalsIgnoreCase(mode))
+			return Plan.Type.UNDEFINED;
+		else if (BasicLeg.MOTORBIKEMODE.equalsIgnoreCase(mode))
+			return Plan.Type.UNDEFINED;
+		else if (BasicLeg.PTMODE.equalsIgnoreCase(mode))
+			return Plan.Type.PT;
+		else if (BasicLeg.TRAINMODE.equalsIgnoreCase(mode))
+			return Plan.Type.UNDEFINED;
+		else if (BasicLeg.BIKEMODE.equalsIgnoreCase(mode))
+			return Plan.Type.BIKE;
+		else if (BasicLeg.WALKMODE.equalsIgnoreCase(mode))
+			return Plan.Type.WALK;
+		else {
+			return Plan.Type.UNDEFINED;
+		}
 	}
 }

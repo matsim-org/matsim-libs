@@ -72,7 +72,7 @@ public class NewAgentPtPlan3 extends PersonAlgorithm implements
 		for (Plan pl : person.getPlans()) {
 			Leg firstLeg = (Leg) pl.getActsLegs().get(1);
 			String legMode = firstLeg.getMode();
-			pl.setType(legMode);
+			pl.setType(NewAgentPtPlan2.getPlanType(legMode));
 
 			if (!legMode.equals("car")) {
 				if (person.getLicense().equals("yes")) {
@@ -97,7 +97,7 @@ public class NewAgentPtPlan3 extends PersonAlgorithm implements
 						Leg leg = (Leg) o;
 						Leg copyLeg = new Leg(leg);
 						copyLeg.setRoute(null);
-						copyLeg.setMode(copyPlan.getType());
+						copyLeg.setMode(copyPlan.getType().toString());
 						// -----------------------------------------------
 						// WITHOUT routeSetting!! traveltime of "pt" or
 						// "car"can be calculated automaticly!!

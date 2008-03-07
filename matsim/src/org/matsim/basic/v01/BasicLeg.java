@@ -20,7 +20,21 @@
 
 package org.matsim.basic.v01;
 
+import org.apache.log4j.Logger;
+
 public class BasicLeg {
+
+	public static final String MIVMODE = "miv";
+	public static final String CARMODE = "car";
+	public static final String RIDEMODE = "ride";
+	public static final String MOTORBIKEMODE = "motorbike";
+	public static final String PTMODE = "pt";
+	public static final String TRAINMODE = "train";
+	public static final String BUSMODE = "bus";
+	public static final String TRAMMODE = "tram";
+	public static final String BIKEMODE = "bike";
+	public static final String WALKMODE = "walk";
+	public static final String UNDEFINED = "undef";
 
 	protected int num = Integer.MIN_VALUE;
 	protected String mode;
@@ -38,7 +52,7 @@ public class BasicLeg {
 		return this.mode;
 	}
 
-	// could be overwritten in higher classes for providing  BasicRoute derived 
+	// could be overwritten in higher classes for providing  BasicRoute derived
 	// return values
 	public BasicRoute getRoute() {
 		return this.route;
@@ -53,7 +67,26 @@ public class BasicLeg {
 	}
 
 	public final void setMode(String mode) {
-		this.mode = mode.intern();
+		if (MIVMODE.equalsIgnoreCase(mode))
+			this.mode = MIVMODE;
+		else if (CARMODE.equalsIgnoreCase(mode))
+			this.mode = CARMODE;
+		else if (RIDEMODE.equalsIgnoreCase(mode))
+			this.mode = RIDEMODE;
+		else if (MOTORBIKEMODE.equalsIgnoreCase(mode))
+			this.mode = MOTORBIKEMODE;
+		else if (PTMODE.equalsIgnoreCase(mode))
+			this.mode = PTMODE;
+		else if (TRAINMODE.equalsIgnoreCase(mode))
+			this.mode = TRAINMODE;
+		else if (BIKEMODE.equalsIgnoreCase(mode))
+			this.mode = BIKEMODE;
+		else if (WALKMODE.equalsIgnoreCase(mode))
+			this.mode = WALKMODE;
+		else {
+			Logger.getLogger(BasicLeg.class).warn("Unknown Leg mode: " + mode);
+			this.mode = mode.intern();
+		}
 	}
 
 	public final void setRoute(BasicRoute route) {
