@@ -41,7 +41,7 @@ import playground.yu.analysis.TravelTimeModalSplit;
  * 
  */
 public class TravelTimeRoadPricingControler extends Controler {
-	
+
 	private static class TTRPlistener implements IterationEndsListener,
 			IterationStartsListener, ShutdownListener {
 		private final PtCheck pc;
@@ -104,7 +104,7 @@ public class TravelTimeRoadPricingControler extends Controler {
 				args);
 		try {
 			c.addControlerListener(new TTRPlistener(
-					"test/yu/travelTimeRoadPricing/100-15-3.ptRate.txt"));
+					"test/yu/travelTimeRoadPricing/test.ptRate.txt"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
