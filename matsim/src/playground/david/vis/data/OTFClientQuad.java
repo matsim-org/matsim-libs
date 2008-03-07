@@ -143,26 +143,26 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 
 	}
-	private void getData(QuadTree.Rect bound, boolean readConst, SceneGraph result)
+	private void getData(QuadTree.Rect bound, boolean readConst, SceneGraph result, boolean readAdd)
 			throws RemoteException {
 		bound = host.isLive() ? bound : this.top.getBounds();
 		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, bound);
 		ByteBuffer in = ByteBuffer.wrap(bbyte);
 		Gbl.startMeasurement();
 		int colls = this.execute(bound, this.new ReadDataExecutor(in, readConst, result));
-		getAdditionalData(in, readConst, result);
+		if (readAdd) getAdditionalData(in, readConst, result);
 		//System.out.print("readData: "); Gbl.printElapsedTime();
 
 		PoolFactory.resetAll();
 		
 	}
 
-	synchronized public void getConstData() throws RemoteException {
-		getData(null, true, null);
+	public synchronized void getConstData() throws RemoteException {
+		getData(null, true, null, true);
 	}
 
-	synchronized public void getDynData(QuadTree.Rect bound, SceneGraph result) throws RemoteException {
-		getData(bound, false, result);
+	synchronized protected void getDynData(QuadTree.Rect bound, SceneGraph result, boolean readAdd) throws RemoteException {
+		getData(bound, false, result, readAdd);
 	}
 	 
 	private final Map<Integer,SceneGraph> cachedTimes = new HashMap<Integer,SceneGraph>();
@@ -193,7 +193,6 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 			Rect intersec = rect.intersection(cachedRect);
 			if(intersec == null) {
 				// we need to get the whole rect
-				rects.add(rect);
 				cachedResult = null;
 			} else {
 				// As we can only store ONE rect with our cached Drawing, we cannot simply
@@ -214,30 +213,30 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 				if (r2h > 0) rects.add(new Rect(cachedRect.minX,rect.minY,cachedRect.maxX,cachedRect.minY));
 				if (r3h > 0) rects.add(new Rect(cachedRect.minX,cachedRect.maxY,cachedRect.maxX,rect.maxY));
 			}
-		} else {
-			rects.add(rect);
-		}
+		} 
 		
 		// otherwise this Scenegraph is not useful, so we create a new one
 		if(host.isLive() == false) {
-			rects.clear();
-			rects.add( null);
 			rect = null;
+			cachedResult = null;
 		}
 		
 		SceneGraph result;
 		if ( cachedResult == null) {
 			result = new SceneGraph(rect, connect, drawer);
+			getDynData(rect, result, true);
+			// fill with elements
+			invalidate(rect, result);
 		} else {
 			result = cachedResult;
 			result.setRect(rect);
+			for(Rect rectPart : rects) {
+				getDynData(rectPart, result, false);
+				// fill with elements
+				invalidate(rectPart, result);
+			}
 		}
 
-		for(Rect rectPart : rects) {
-			getDynData(rectPart, result);
-			// fill with elements
-			invalidate(rectPart, result);
-		}
 
 		result.finish();
 		cachedTimes.put(time, result);
