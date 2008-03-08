@@ -82,7 +82,7 @@ public class AnalysisTest {
 
 		RoadPricingScheme toll = new RoadPricingScheme(network);
 		CalcAverageTolledTripLength cattl = null;
-		if (Gbl.useRoadPricing()) {
+		if (rpFilename != null) {
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(
 					network);
 			try {

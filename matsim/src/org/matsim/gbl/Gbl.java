@@ -161,11 +161,6 @@ public abstract class Gbl {
 		CharyparNagelScoringFunction.initialized = false; // TODO [MR] see todo-comment in BasicScoringFunction.java
 	}
 
-	// TODO [MR] this really shouldn't be here, but it had to be done quick :-(
-	public static final boolean useRoadPricing() {
-		return Gbl.config.global().useRoadPricing();
-	}
-
 	public static final void printMemoryUsage() {
 		long totalMem = Runtime.getRuntime().totalMemory();
 		long freeMem = Runtime.getRuntime().freeMemory();

@@ -37,14 +37,13 @@ public class GlobalConfigGroup extends Module {
 	private static final String OUTPUT_TIME_FORMAT = "outputTimeFormat";
 	private static final String GLOBAL_DTD_BASE = "globalDTDBase";
 	private static final String LOCAL_DTD_BASE = "localDTDBase";
-	private static final String USE_ROAD_PRICING = "useRoadPricing";
+	private static final String USE_ROAD_PRICING = "useRoadPricing"; // usage deprecated
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String COORDINATE_SYSTEM = "coordinateSystem";
 
 	private long randomSeed = 4711L;
 	private String outputTimeFormat = "HH:mm:ss";
 	private String localDtdBase = "dtd/";
-	private boolean useRoadPricing = false;
 	private int numberOfThreads = 2;
 	private String coordinateSystem = "Atlantis";
 
@@ -58,8 +57,6 @@ public class GlobalConfigGroup extends Module {
 			return getOutputTimeFormat();
 		} else if (LOCAL_DTD_BASE.equals(key)) {
 			return getLocalDtdBase();
-		} else if (USE_ROAD_PRICING.equals(key)) {
-			return (useRoadPricing() ? "yes" : " no");
 		} else if (NUMBER_OF_THREADS.equals(key)) {
 			return Integer.toString(getNumberOfThreads());
 		} else if (COORDINATE_SYSTEM.equals(key)) {
@@ -79,12 +76,12 @@ public class GlobalConfigGroup extends Module {
 			log.info("The parameter " + GLOBAL_DTD_BASE + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else if (LOCAL_DTD_BASE.equals(key)) {
 			setLocalDtdBase(value);
-		} else if (USE_ROAD_PRICING.equals(key)) {
-			setRoadPricing("yes".equals(value) || "true".equals(value));
 		} else if (NUMBER_OF_THREADS.equals(key)) {
 			setNumberOfThreads(Integer.parseInt(value));
 		} else if (COORDINATE_SYSTEM.equals(key)) {
 			setCoordinateSystem(value);
+		} else if (USE_ROAD_PRICING.equals(key)) {
+			log.info("The parameter " + USE_ROAD_PRICING + " in module " + GROUP_NAME + " is no longer supported and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -94,7 +91,6 @@ public class GlobalConfigGroup extends Module {
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(RANDOM_SEED, getValue(RANDOM_SEED));
-		map.put(USE_ROAD_PRICING, getValue(USE_ROAD_PRICING));
 		addNotNullParameterToMap(map, OUTPUT_TIME_FORMAT);
 		addNotNullParameterToMap(map, LOCAL_DTD_BASE);
 		addNotNullParameterToMap(map, COORDINATE_SYSTEM);
@@ -123,13 +119,6 @@ public class GlobalConfigGroup extends Module {
 	}
 	public void setLocalDtdBase(final String localDtdBase) {
 		this.localDtdBase = localDtdBase;
-	}
-
-	public boolean useRoadPricing() {
-		return this.useRoadPricing;
-	}
-	public void setRoadPricing(final boolean useRoadPricing) {
-		this.useRoadPricing = useRoadPricing;
 	}
 
 	public int getNumberOfThreads() {
