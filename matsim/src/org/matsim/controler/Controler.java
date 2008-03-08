@@ -532,7 +532,7 @@ public class Controler {
 		 * may read and write to common variables, the order is important.
 		 * Example: The RoadPricing-Listener modifies the scoringFunctionFactory,
 		 * which in turn is used by the PlansScoring-Listener.
-		 * Note that the execution order is contrary to the order the listeners are called
+		 * Note that the execution order is contrary to the order the listeners are added to the list.
 		 */
 
 		this.addCoreControlerListener(new CoreControlerListener());
