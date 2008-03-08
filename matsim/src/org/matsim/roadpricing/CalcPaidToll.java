@@ -81,7 +81,7 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 		if (link == null) {
 			link = (Link) this.network.getLocation(event.linkId);
 		}
-//		this.handler.handleEvent(event, link);
+		this.handler.handleEvent(event, link);
 	}
 
 	public void reset(final int iteration) {
@@ -134,8 +134,20 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 		public void handleEvent(BasicEvent event, Link link);
 	}
 
+	/**
+	 * Handles the calculation of the distance toll. If an agent enters a link at
+	 * a time the toll has to be paid, the toll amount is added to the agent. The
+	 * agent does not have to pay the toll for a link if it starts on the link, 
+	 * as it may have paid already when arriving on the link.
+	 */
 	class DistanceTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final BasicEvent event, final Link link) {
+			if (event instanceof EventAgentWait2Link) {
+				/* we do not handle wait2link-events for distance toll, because the agent
+				 * must not pay twice for this link, and he (likely) paid already when 
+				 * arriving at this link.  */
+				return;
+			}
 			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(),
 					event.time);
 			if (cost != null) {
@@ -146,17 +158,15 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 					CalcPaidToll.this.agents.put(event.agentId, info);
 				}
 				info.toll += newToll;
-//				System.out.println();
-//				System.out.println("Toll for link: " + link.getId() + " is " + newToll);
-//				System.out.println();
 			}
 		}
 	}
 
+	/** Handles the calculation of the area toll. Whenever the agent is seen on
+	 * one of the tolled link, the constant toll amount has to be paid once. */
 	class AreaTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final BasicEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(),
-					event.time);
+			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.time);
 			if (cost != null) {
 				AgentInfo info = CalcPaidToll.this.agents.get(event.agentId);
 				if (info == null) {
@@ -168,21 +178,28 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 		}
 	}
 
+	/** 
+	 * Handles the calculation of the cordon toll. An agent has only to pay if he
+	 * crosses the cordon from the outside to the inside.
+	 */
 	class CordonTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final BasicEvent event, final Link link) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(),
-					event.time);
+			Cost cost = CalcPaidToll.this.scheme.getLinkCost(link.getId(), event.time);
 			if (cost != null) {
+				// this is a link inside the toll area.
 				AgentInfo info = CalcPaidToll.this.agents.get(event.agentId);
 				if (info == null) {
+					// no information about this agent, so it did not yet pay the toll
 					info = new AgentInfo();
 					CalcPaidToll.this.agents.put(event.agentId, info);
 					info.toll = 0.0; // we start in the area, do not toll
 				} else if (!info.insideCordonArea) {
+					// agent was outside before, now inside the toll area --> agent has to pay
 					info.insideCordonArea = true;
 					info.toll += cost.amount;
 				}
 			} else {
+				// this is a link outside the toll area.
 				AgentInfo info = CalcPaidToll.this.agents.get(event.agentId);
 				if (info == null) {
 					info = new AgentInfo();

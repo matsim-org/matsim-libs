@@ -268,6 +268,10 @@ public class RoadPricingTest extends MatsimTestCase {
 				referencePopulation.getPerson("4").getPlans().get(0).getScore(),
 				population.getPerson("4").getPlans().get(0).getScore(),
 				100 * 0.00020 + 200 * 0.00010);
+		compareScores(
+				referencePopulation.getPerson("5").getPlans().get(0).getScore(),
+				population.getPerson("5").getPlans().get(0).getScore(),
+				200 * 0.00020); // agent departs on a tolled link which must NOT be paid.
 	}
 
 	public void testAreaToll() {
