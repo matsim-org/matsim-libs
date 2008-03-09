@@ -33,6 +33,8 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		System.out.println("Average travel time in iteration " + event.getIteration() + " is: "
+				+ this.eventHandler.getAverageTravelTime());
 		this.timePerIterationMap.put(event.getIteration(), this.eventHandler.getAverageTravelTime());
 	}
 

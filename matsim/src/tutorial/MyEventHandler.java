@@ -32,10 +32,6 @@ public class MyEventHandler implements EventHandlerLinkEnterI,
 	}
 
 	public void reset(int iteration) {
-		System.out.println();
-		System.out.println("Average travel time in iteration " + iteration + " is: "
-				+ getAverageTravelTime());
-		System.out.println();
 		this.travelTime = 0.0;
 	}
 
