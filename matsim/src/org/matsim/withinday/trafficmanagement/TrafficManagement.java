@@ -49,7 +49,7 @@ public class TrafficManagement {
 		return this.signs;
 	}
 
-	public void updateBeforeSimStrep(final double time) {
+	public void updateBeforeSimStep(final double time) {
 		for (VDSSign s : this.signs) {
 			s.calculateOutput(time);
 		}
@@ -83,7 +83,7 @@ public class TrafficManagement {
 
 	public void finishIteration() {
 		for (VDSSign s : this.signs) {
-			s.finishInteration();
+			s.finishIteration();
 		}
 	}
 

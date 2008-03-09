@@ -44,4 +44,6 @@ public interface ControlInput {
 
 	public double getMeasuredRouteTravelTime(Route route);
 
+	public void finishIteration();
+
 }

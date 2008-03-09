@@ -20,7 +20,11 @@
 
 package org.matsim.withinday;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,14 +33,16 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
+import org.matsim.controler.listener.StartupListener;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.trafficmonitoring.LinkTravelTimeCounter;
+import org.matsim.utils.io.IOUtils;
 import org.matsim.withinday.mobsim.OccupiedVehicle;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
-import org.matsim.withinday.trafficmanagement.Accident;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 import org.matsim.withinday.trafficmanagement.TrafficManagementConfigParser;
 import org.xml.sax.SAXException;
@@ -48,8 +54,6 @@ import org.xml.sax.SAXException;
 public class WithindayControler extends Controler {
 
 	private static final Logger log = Logger.getLogger(WithindayControler.class);
-
-//	private List<WithindayAgent> agents;
 
 	private TrafficManagementConfigParser trafficManagementConfigurator;
 
@@ -65,15 +69,10 @@ public class WithindayControler extends Controler {
 
 	public WithindayControler(final String[] args) {
 		super(args);
+		this.addCoreControlerListener(new WithindayControlerListener());
 	}
 
-	/**
-	 * @see org.matsim.controler.Controler#setup()
-	 */
-	@Override
-	protected void setup() {
-		super.setup();
-		LinkTravelTimeCounter.init(this.events, this.network.getLinks().size());
+	private void loadTrafficManagement() {
 	//initialize the traffic management
 		String trafficManagementConfig = this.config.withinday().getTrafficManagementConfiguration();
 		if (trafficManagementConfig != null) {
@@ -90,8 +89,24 @@ public class WithindayControler extends Controler {
 				log.error("An error occured while parsing the trafficmanagement configuration, the traffic management will not be used!");
 				e.printStackTrace();
 			}
+			try {
+				BufferedReader reader = IOUtils.getBufferedReader(trafficManagementConfig);
+				String line = reader.readLine();
+				StringWriter file = new StringWriter();
+				PrintWriter writer = new PrintWriter(file);
+				while (line != null) {
+					writer.println(line);
+					line = reader.readLine();
+				}
+				log.info("Dumping trafficmanagement configuration: " );
+				log.info("\n\n" + file);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			this.trafficManagement  = this.trafficManagementConfigurator.getTrafficManagement();
 		}
-
 	}
 
 	@Override
@@ -106,11 +121,8 @@ public class WithindayControler extends Controler {
 			//build the queuesim
 			WithindayQueueSimulation sim = new WithindayQueueSimulation((QueueNetworkLayer)this.network, this.population, this.events, this);
 			sim.setVehicleCreateAlgo(vehicleAlgo);
-			//set accidents
-			if ((this.trafficManagement != null) && !this.trafficManagement.getAccidents().isEmpty())  {
-				for (Accident a : this.trafficManagement.getAccidents()) {
-					sim.setAccident(a);
-				}
+			if (this.trafficManagement != null) {
+				sim.setTrafficManagement(this.trafficManagement);
 			}
 			//run the simulation
 			sim.run();
@@ -135,39 +147,21 @@ public class WithindayControler extends Controler {
 		agent.setReplanningThreshold(this.config.withinday().getContentmentThreshold());
 	}
 
-	public void simulationPrepared() {
-		this.trafficManagement.simulationPrepared();
-	}
+	public class WithindayControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 
-	/**
-	 * This is delegated from the WithindayQueueSimulation
-	 * @param time the current timestep of the QueueSimulation
-	 */
-	public void beforeSimStep(final double time) {
-		this.trafficManagement.updateBeforeSimStrep(time);
-	}
+		public WithindayControlerListener(){
 
-	/**
-	 * This is delegated from the WithindayQueueSimulation
-	 * @param time the current timestep of the QueueSimulation
-	 */
-	public void afterSimStep(final double time) {
+		}
 
-	}
+		public void notifyStartup(StartupEvent event) {
+			LinkTravelTimeCounter.init(WithindayControler.this.events, WithindayControler.this.network.getLinks().size());
+			loadTrafficManagement();
+			WithindayControler.this.factory = new WithindayAgentLogicFactory(WithindayControler.this.network, WithindayControler.this.config.charyparNagelScoring());
+		}
 
-	public class WithindayControlerListener implements IterationStartsListener, IterationEndsListener {
 
 		public void notifyIterationStarts(final IterationStartsEvent event) {
-			/* TODO [DG] This code was previously in a method called "setupIteration()", but I don't think
-			 * it makes really sense to create a new factory in each and every iteration. Maybe this line could
-			 * be moved to the general "setup()"-method? Than it's only executed once.
-			 * Also, the assignment of trafficManagement would possibly be enough to do it only once.
-			 * This would leave only the setupIteration(int) call here, what would be more clear, also
-			 * in respect to the notifyIterationEnds() method.   -marcel/18jan2008
-			 */
-			WithindayControler.this.factory = new WithindayAgentLogicFactory(WithindayControler.this.network, WithindayControler.this.config.charyparNagelScoring());
-			if (WithindayControler.this.trafficManagementConfigurator != null) {
-				WithindayControler.this.trafficManagement = WithindayControler.this.trafficManagementConfigurator.getTrafficManagement();
+			if (WithindayControler.this.trafficManagement != null) {
 				WithindayControler.this.trafficManagement.setupIteration(event.getIteration());
 			}
 		}
@@ -175,6 +169,7 @@ public class WithindayControler extends Controler {
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 			WithindayControler.this.trafficManagement.finishIteration();
 		}
+
 
 	}
 

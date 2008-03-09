@@ -94,8 +94,11 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
 			super.handleEvent(event);
 	}
 
+	public void reset(int iteration) {
+		//nothing need to be done here anymore cause everything is done in the finishIteration().
+	}
 
-	public void reset(final int iteration) {
+	public void finishIteration() {
 		BufferedWriter w1 = null;
 		BufferedWriter w2 = null;
 		try{
@@ -104,20 +107,20 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-		
-		Iterator<Double> it1 = ttMeasuredMainRoute.iterator();
+
+		Iterator<Double> it1 = this.ttMeasuredMainRoute.iterator();
 		try{
 			while(it1.hasNext()){
 				double measuredTimeMainRoute = it1.next();
 				w1.write(Double.toString(measuredTimeMainRoute));
 				w1.write("\n");
 				w1.flush();
-			}	
+			}
 		}catch (IOException e){
 			e.printStackTrace();
-		}	
-			
-		Iterator<Double> it2 = ttMeasuredAlternativeRoute.iterator();
+		}
+
+		Iterator<Double> it2 = this.ttMeasuredAlternativeRoute.iterator();
 		try{
 			while(it2.hasNext()){
 				double measuredTimeAlternativeRoute = it2.next();
@@ -127,7 +130,7 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
 			}
 		}catch (IOException e){
 				e.printStackTrace();
-		}			
+		}
 		try {
 			w1.close();
 			w2.close();

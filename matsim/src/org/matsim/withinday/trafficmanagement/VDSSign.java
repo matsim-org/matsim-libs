@@ -440,7 +440,10 @@ public class VDSSign {
 		this.signOutput = vdsSignOutput;
 	}
 
-	public void finishInteration() {
+	public void finishIteration() {
+		if (this.controlInput != null) {
+			this.controlInput.finishIteration();
+		}
 		if (this.signOutput != null) {
 			this.signOutput.close();
 		}

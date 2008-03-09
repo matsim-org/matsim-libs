@@ -29,6 +29,7 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.plans.Plans;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.trafficmanagement.Accident;
+import org.matsim.withinday.trafficmanagement.TrafficManagement;
 
 /**
  * This extension of the QueueSimulation is used for withinday replanning. It contains functionality
@@ -44,6 +45,8 @@ public class WithindayQueueSimulation extends QueueSimulation {
 
 	private PriorityQueue<CapacityChangeEvent> capacityEvents = new PriorityQueue<CapacityChangeEvent>();
 
+	private TrafficManagement trafficManagement;
+
 	public WithindayQueueSimulation(final QueueNetworkLayer net,
 			final Plans plans, final Events events, final WithindayControler controler) {
 		super(net, plans, events);
@@ -53,7 +56,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	@Override
 	protected void prepareSim() {
 	  super.prepareSim();
-	  this.controler.simulationPrepared();
+		this.trafficManagement.simulationPrepared();
 	}
 
 	@Override
@@ -61,19 +64,15 @@ public class WithindayQueueSimulation extends QueueSimulation {
 		super.afterSimStep(time);
   	//check capacity change whishes for pending items
 		doCapacityChanges(time);
-		//this will trigger the agents to replan
-		this.controler.beforeSimStep(time);
+		this.trafficManagement.updateBeforeSimStep(time);
 	}
 
 
-
-	/**
-	 * @see org.matsim.mobsim.QueueSimulation#afterSimStep(double)
-	 */
-	@Override
-	public void afterSimStep(final double time) {
-		super.afterSimStep(time);
-		this.controler.afterSimStep(time);
+	public void setTrafficManagement(TrafficManagement trafficManagement) {
+		this.trafficManagement = trafficManagement;
+		for (Accident a : this.trafficManagement.getAccidents()) {
+			setAccident(a);
+		}
 	}
 
 	/**
@@ -94,6 +93,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 			event.getLink().changeSimulatedFlowCapacity(event.getCapacityScaleFactor());
 		}
 	}
+
 
 
 

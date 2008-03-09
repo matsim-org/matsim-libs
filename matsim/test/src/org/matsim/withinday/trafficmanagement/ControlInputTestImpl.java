@@ -20,7 +20,6 @@
 
 package org.matsim.withinday.trafficmanagement;
 
-import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
 
 
 /**
@@ -41,6 +40,9 @@ public class ControlInputTestImpl extends AbstractControlInputImpl {
 	 */
 	public void reset(final int iteration) {
 
+	}
+
+	public void finishIteration() {
 	}
 
 }

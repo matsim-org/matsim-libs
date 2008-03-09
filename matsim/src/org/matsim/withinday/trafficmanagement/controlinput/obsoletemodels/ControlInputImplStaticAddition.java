@@ -46,42 +46,43 @@ import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputWriter;
 
-//import sun.rmi.runtime.GetThreadPoolAction;
+// import sun.rmi.runtime.GetThreadPoolAction;
 
 /**
- * Just like ControlInputSB, this model checks if the agents before 
- * the bottleneck will cause a queue or not, and based on that predicts
- * the time difference between two alternative routes.
- * 
- *  This model automatically and continuosly detects bottlenecks and 
- *  therefore does not use information about the accident.
- * 
- * 
+ * Just like ControlInputSB, this model checks if the agents before the
+ * bottleneck will cause a queue or not, and based on that predicts the time
+ * difference between two alternative routes.
+ *
+ * This model automatically and continuosly detects bottlenecks and therefore
+ * does not use information about the accident.
+ *
+ *
  * @author abergsten and dzetterberg
  */
 
-/* User parameters are:
-
- * NUMBEROFFLOWEVENTS	The flow calculations are based on the last NUMBEROFFLOWEVENTS 
- * 						agents. A higher value means better predictions if congestion.
- * IGNOREDQUEUINGIME	Additional link travel times up to IGNOREDQUEUINGIME will not be 
- * 						considered a sign of temporary capacity reduction.
- * 
+/*
+ * User parameters are:
+ *
+ * NUMBEROFFLOWEVENTS The flow calculations are based on the last
+ * NUMBEROFFLOWEVENTS agents. A higher value means better predictions if
+ * congestion. IGNOREDQUEUINGIME Additional link travel times up to
+ * IGNOREDQUEUINGIME will not be considered a sign of temporary capacity
+ * reduction.
+ *
  */
 
-
 public class ControlInputImplStaticAddition extends AbstractControlInputImpl
-implements EventHandlerLinkLeaveI, EventHandlerLinkEnterI, 
-EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
+		implements EventHandlerLinkLeaveI, EventHandlerLinkEnterI,
+		EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
-	
 	private static final int NUMBEROFFLOWEVENTS = 20;
 
 	private static final double IGNOREDQUEUINGIME = 5;
-	
-//	private static final boolean DISTRIBUTIONCHECK = false;
-	
-	private static final Logger log = Logger.getLogger(ControlInputImplStaticAddition.class);
+
+	// private static final boolean DISTRIBUTIONCHECK = false;
+
+	private static final Logger log = Logger
+			.getLogger(ControlInputImplStaticAddition.class);
 
 	double predTTRoute1;
 
@@ -89,154 +90,164 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 
 	private ControlInputWriter writer;
 
-	private Map<String, Double> ttMeasured = new HashMap<String, Double> ();
-	
-	private Map<String, Double> enterLinkEvents = new HashMap<String, Double>();
-	
-	private Map <String, Double> linkFlows = new HashMap<String, Double>();
-	
-	private Map <String, List<Double>> enterLinkEventTimes = new HashMap<String, List<Double>>();
-	
-	private Map<String, Double> capacities = new HashMap<String, Double> ();
+	private Map<String, Double> ttMeasured = new HashMap<String, Double>();
 
+	private Map<String, Double> enterLinkEvents = new HashMap<String, Double>();
+
+	private Map<String, Double> linkFlows = new HashMap<String, Double>();
+
+	private Map<String, List<Double>> enterLinkEventTimes = new HashMap<String, List<Double>>();
+
+	private Map<String, Double> capacities = new HashMap<String, Double>();
 
 	public ControlInputImplStaticAddition() {
 		super();
 		this.writer = new ControlInputWriter();
 	}
-	
+
 	@Override
 	public void init() {
 		super.init();
 		this.writer.open();
-		
-		
-//		Initialize ttMeasured with ttFreeSpeeds and linkFlows with zero.
-//		Main route
+
+		// Initialize ttMeasured with ttFreeSpeeds and linkFlows with zero.
+		// Main route
 		Link[] routeLinks = this.getMainRoute().getLinkRoute();
 		for (Link l : routeLinks) {
-			if (!this.linkFlows.containsKey(l.getId().toString()))  {
+			if (!this.linkFlows.containsKey(l.getId().toString())) {
 				this.linkFlows.put(l.getId().toString(), 0.0);
 			}
-			
-			if (!this.ttMeasured.containsKey(l.getId().toString()))  {
-				this.ttMeasured.put(l.getId().toString(), 
-						this.ttFreeSpeeds.get(l.getId().toString()));
+
+			if (!this.ttMeasured.containsKey(l.getId().toString())) {
+				this.ttMeasured.put(l.getId().toString(), this.ttFreeSpeeds.get(l
+						.getId().toString()));
 			}
-			
-			if (!this.capacities.containsKey(l.getId().toString()))  {
-				this.capacities.put(l.getId().toString(), ((QueueLink)l).getSimulatedFlowCapacity()/SimulationTimer.getSimTickTime());
+
+			if (!this.capacities.containsKey(l.getId().toString())) {
+				this.capacities.put(l.getId().toString(), ((QueueLink) l)
+						.getSimulatedFlowCapacity()
+						/ SimulationTimer.getSimTickTime());
 			}
-			
-			if (!this.enterLinkEventTimes.containsKey(l.getId().toString()))  {
+
+			if (!this.enterLinkEventTimes.containsKey(l.getId().toString())) {
 				List<Double> list = new LinkedList<Double>();
-				this.enterLinkEventTimes.put(l.getId().toString(), list );
+				this.enterLinkEventTimes.put(l.getId().toString(), list);
 			}
 		}
-		
-//		Alt Route
+
+		// Alt Route
 		routeLinks = this.getAlternativeRoute().getLinkRoute();
 		for (Link l : routeLinks) {
-			if (!this.linkFlows.containsKey(l.getId().toString()))  {
+			if (!this.linkFlows.containsKey(l.getId().toString())) {
 				this.linkFlows.put(l.getId().toString(), 0.0);
 			}
-			
-			if (!this.ttMeasured.containsKey(l.getId().toString()))  {
-				this.ttMeasured.put(l.getId().toString(), 
-						this.ttFreeSpeeds.get(l.getId().toString()));
+
+			if (!this.ttMeasured.containsKey(l.getId().toString())) {
+				this.ttMeasured.put(l.getId().toString(), this.ttFreeSpeeds.get(l
+						.getId().toString()));
 			}
-			
-			if (!this.capacities.containsKey(l.getId().toString()))  {
-				this.capacities.put(l.getId().toString(), ((QueueLink)l).getSimulatedFlowCapacity()/SimulationTimer.getSimTickTime());
+
+			if (!this.capacities.containsKey(l.getId().toString())) {
+				this.capacities.put(l.getId().toString(), ((QueueLink) l)
+						.getSimulatedFlowCapacity()
+						/ SimulationTimer.getSimTickTime());
 			}
-			
-			if (!this.enterLinkEventTimes.containsKey(l.getId().toString()))  {
+
+			if (!this.enterLinkEventTimes.containsKey(l.getId().toString())) {
 				List<Double> list = new LinkedList<Double>();
-				this.enterLinkEventTimes.put(l.getId().toString(), list );
+				this.enterLinkEventTimes.put(l.getId().toString(), list);
 			}
-		}				
+		}
 	}
 
 	@Override
 	public void handleEvent(final EventLinkEnter event) {
-		
-		if ( this.ttMeasured.containsKey(event.linkId) ) {
+
+		if (this.ttMeasured.containsKey(event.linkId)) {
 			this.enterLinkEvents.put(event.agentId, event.time);
 		}
-		
-		super.handleEvent(event);	
+
+		super.handleEvent(event);
 	}
-	
 
 	@Override
 	public void handleEvent(final EventLinkLeave event) {
-		
+
 		if (this.ttMeasured.containsKey(event.linkId)) {
 			Double enterTime = this.enterLinkEvents.remove(event.agentId);
 			Double travelTime = event.time - enterTime;
 			this.ttMeasured.put(event.linkId, travelTime);
 
 		}
-		
-//		Stores [NUMBEROFFLOWEVENTS] last events and calculates flow
+
+		// Stores [NUMBEROFFLOWEVENTS] last events and calculates flow
 		if (this.linkFlows.containsKey(event.linkId)) {
-			LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes.get(event.linkId);
-			if ( list.size() == NUMBEROFFLOWEVENTS ) {
-			list.removeFirst();
-			list.add(event.time);
-			}
-			else if (1 < list.size() || list.size() < NUMBEROFFLOWEVENTS) {
+			LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
+					.get(event.linkId);
+			if (list.size() == NUMBEROFFLOWEVENTS) {
+				list.removeFirst();
 				list.add(event.time);
-			} else if ( list.size() == 0 ) {
+			}
+			else if ((1 < list.size()) || (list.size() < NUMBEROFFLOWEVENTS)) {
+				list.add(event.time);
+			}
+			else if (list.size() == 0) {
 				list.add(event.time - 1);
 				list.add(event.time);
 			}
 			else {
-				System.err.println("Error: number of enter event times stored exceeds numberofflowevents!");
+				System.err
+						.println("Error: number of enter event times stored exceeds numberofflowevents!");
 			}
-			
-//			Flow = agents / seconds:
+
+			// Flow = agents / seconds:
 			double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
 			this.linkFlows.put(event.linkId, flow);
 		}
-		
+
 		super.handleEvent(event);
 	}
-	
 
-	public void reset(final int iteration) {
+	public void reset(int iteration) {
+		// nothing need to be done here anymore cause everything is done in the
+		// finishIteration().
+	}
+
+	public void finishIteration() {
 		BufferedWriter w1 = null;
 		BufferedWriter w2 = null;
-		try{
-			w1 = new BufferedWriter(new FileWriter("../studies/arvidDaniel/output/ttMeasuredMainRoute.txt"));
-			w2 = new BufferedWriter(new FileWriter("../studies/arvidDaniel/output/ttMeasuredAlternativeRoute.txt"));
-		}catch(IOException e){
+		try {
+			w1 = new BufferedWriter(new FileWriter(
+					"../studies/arvidDaniel/output/ttMeasuredMainRoute.txt"));
+			w2 = new BufferedWriter(new FileWriter(
+					"../studies/arvidDaniel/output/ttMeasuredAlternativeRoute.txt"));
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		Iterator<Double> it1 = ttMeasuredMainRoute.iterator();
-		try{
-			while(it1.hasNext()){
+
+		Iterator<Double> it1 = this.ttMeasuredMainRoute.iterator();
+		try {
+			while (it1.hasNext()) {
 				double measuredTimeMainRoute = it1.next();
 				w1.write(Double.toString(measuredTimeMainRoute));
 				w1.write("\n");
 				w1.flush();
-			}	
-		}catch (IOException e){
+			}
+		} catch (IOException e) {
 			e.printStackTrace();
-		}	
-			
-		Iterator<Double> it2 = ttMeasuredAlternativeRoute.iterator();
-		try{
-			while(it2.hasNext()){
+		}
+
+		Iterator<Double> it2 = this.ttMeasuredAlternativeRoute.iterator();
+		try {
+			while (it2.hasNext()) {
 				double measuredTimeAlternativeRoute = it2.next();
 				w2.write(Double.toString(measuredTimeAlternativeRoute));
 				w2.write("\n");
 				w2.flush();
 			}
-		}catch (IOException e){
-				e.printStackTrace();
-		}			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		try {
 			w1.close();
 			w2.close();
@@ -255,23 +266,21 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 	public void handleEvent(final EventAgentArrival event) {
 		super.handleEvent(event);
 	}
-	
-	
+
 	public double getNashTime() {
 
 		try {
 			this.writer.writeAgentsOnLinks(this.numberOfAgents);
 			this.writer.writeTravelTimesMainRoute(this.lastTimeMainRoute,
 					this.predTTRoute1);
-			this.writer.writeTravelTimesAlternativeRoute(this.lastTimeAlternativeRoute,
-					this.predTTRoute2);
+			this.writer.writeTravelTimesAlternativeRoute(
+					this.lastTimeAlternativeRoute, this.predTTRoute2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return getPredictedNashTime();
 	}
-	
-	
+
 	// calculates the predictive NashTime with a single-bottle-neck-model.
 	public double getPredictedNashTime() {
 
@@ -282,33 +291,34 @@ EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
 		return this.predTTRoute1 - this.predTTRoute2;
 	}
 
-	
 	private double getPredictedTravelTime(final Route route,
 			final Link bottleNeckLink) {
-		
+
 		Link[] routeLinks = route.getLinkRoute();
 		double predictedTT = 0;
 
-			for ( int i = routeLinks.length - 1; i >= 0; i-- ) {
-				Link link = routeLinks[i];
-				String linkId = link.getId().toString();
-				double linkTT;
-				
-				if ( this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId) + IGNOREDQUEUINGIME)  {
+		for (int i = routeLinks.length - 1; i >= 0; i--) {
+			Link link = routeLinks[i];
+			String linkId = link.getId().toString();
+			double linkTT;
 
-					if ( linkFlows.get(linkId) < ttFreeSpeeds.get(linkId)) {
-						linkTT = numberOfAgents.get(linkId) / linkFlows.get(linkId); 
-					}
-					else {
-						linkTT = numberOfAgents.get(linkId) / capacities.get(linkId);
-					}
-				}				
-				else {
-					linkTT = ttFreeSpeeds.get(linkId);
+			if (this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId)
+					+ IGNOREDQUEUINGIME) {
+
+				if (this.linkFlows.get(linkId) < this.ttFreeSpeeds.get(linkId)) {
+					linkTT = this.numberOfAgents.get(linkId) / this.linkFlows.get(linkId);
 				}
-				predictedTT += linkTT;
+				else {
+					linkTT = this.numberOfAgents.get(linkId)
+							/ this.capacities.get(linkId);
+				}
 			}
-			return predictedTT;
-			
+			else {
+				linkTT = this.ttFreeSpeeds.get(linkId);
+			}
+			predictedTT += linkTT;
+		}
+		return predictedTT;
+
 	}
 }

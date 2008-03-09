@@ -20,7 +20,6 @@
 
 package org.matsim.withinday.trafficmanagement;
 
-import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
 
 
 /**
@@ -30,9 +29,9 @@ import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
 public class EmptyControlInputImpl extends AbstractControlInputImpl {
 
 	private double nashTime;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public EmptyControlInputImpl() {
 	}
@@ -53,5 +52,8 @@ public class EmptyControlInputImpl extends AbstractControlInputImpl {
 	public void setNashTime(final double t) {
 		this.nashTime = t;
 	}
-	
+
+	public void finishIteration() {
+	}
+
 }
