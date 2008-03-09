@@ -738,6 +738,7 @@ public class QuadTree<T> implements Serializable {
 
 		/* default */ boolean nextLeaf(final Leaf currentLeaf, final MutableLeaf nextLeaf) {
 			if (this.hasChilds) {
+				if (!this.bounds.contains(currentLeaf.x, currentLeaf.y)) return false;
 				boolean found = this.southwest.nextLeaf(currentLeaf, nextLeaf);
 				if (found) {
 					if (nextLeaf.value == null) { nextLeaf.value = this.northwest.firstLeaf(); }
