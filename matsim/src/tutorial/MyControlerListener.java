@@ -48,8 +48,8 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 		double[] times = new double[this.timePerIterationMap.size()];
 		//unfortunately we have to do this as...
 		for (Integer k : this.timePerIterationMap.keySet()) {
-			iters[k] = k;
-			times[k] = this.timePerIterationMap.get(k);
+			iters[k-1] = k;
+			times[k-1] = this.timePerIterationMap.get(k);
 		}
 		//write the chart
 		chart.addSeries("tt", iters, times);
