@@ -56,6 +56,7 @@ public class MatsimEventsReader {
 	public void readFile(final String filename) {
 		if (filename.endsWith(".txt") || filename.endsWith(".txt.gz")) {
 			new EventsReaderTXTv1(this.events).readFile(filename);
+			this.events.printEventsCount();
 		} else if (filename.endsWith(".xml") || filename.endsWith(".xml.gz")) {
 			new XmlEventsReader(this.events).readFile(filename);
 		} else {
