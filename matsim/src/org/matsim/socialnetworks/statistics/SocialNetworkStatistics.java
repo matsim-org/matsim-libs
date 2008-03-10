@@ -330,27 +330,13 @@ public class SocialNetworkStatistics {
 				Iterator a_it = thisPlan.getIteratorAct();
 				while (a_it.hasNext()) {
 					Act nextAct = (Act) a_it.next();
-					// dg 07.03.2008
-					// planType was of type String but has changed now to Plan.Type
-					// the usage in the line commented below is not really good in respect
-					// to our goal to produce bugfree software as a plan's type is part
-					// of a xml grammar definition which should clearly define which
-					// values
-					// are allowed for the type.
-					// as the line below is only used for analysis it is handled by a
-					// internal HashMap of this
-					// class which results in the same behaviour without using an
-					// attribute with
-					// not defined values.
-					// there is no unit test for this class so I'm not able to check
-					// correctness of the modifications completely, sorry!.
-					// planType= planType +nextAct.getType().charAt(0);
 						planTypeString = planTypeString + nextAct.getType().charAt(0);
 				}
-				//dg 07.03.2008
-				//the next line was commented because it can only make sense if a side effect is existent however
-				//as Plan.getType() is never called in the social network framework
-				//we preclude this. Please check this
+				// 10.03.07 JH If Plan.getType() is to be called in social nets in the future, for example
+//				to compare some statistics across plan types, remove this comment. However this
+//				could lead to setting the type to undefined values because the type string that is
+//				constructed above is not checked vs the DTD and might result in nonsense plan types
+//				for other users
 //				thisPlan.setType(planType);
 			}
 			else {
