@@ -166,10 +166,26 @@ public class Config {
 		return this.modules;
 	}
 
-	public final Module getModule(final String modulename) {
-		return this.modules.get(modulename);
+	/** 
+	 * Returns the requested module, or <code>null</code> if the module does not exist.
+	 *  
+	 * @param moduleName name of the requested module
+	 * @return requested module
+	 */
+	public final Module getModule(final String moduleName) {
+		return this.modules.get(moduleName);
 	}
 
+	/** Returns the requested parameter. If the module or parameter is not known, an
+	 * error is logged and an IllegalArgumentException is thrown.
+	 * 
+	 * @param moduleName
+	 * @param paramName
+	 * @return the requested parameter
+	 * 
+	 * @throws IllegalArgumentException if the module or parameter does not exist
+	 * @see #findParam(String, String)
+	 */
 	public final String getParam(final String moduleName, final String paramName) {
 		Module m = this.modules.get(moduleName);
 		if (m == null) {
@@ -185,12 +201,13 @@ public class Config {
 	}
 
 	/**
-	 * similar to getParam. Returns the value of the specified parameter if it exists,
-	 * and returns <code>null</code> otherwise.
+	 * Returns the value of the specified parameter if it exists, or <code>null</code> otherwise.
 	 *
 	 * @param moduleName name of the config-module
 	 * @param paramName name of parameter in the specified module
 	 * @return value of the parameter if it exists, <code>null</code> otherwise
+	 * 
+	 * @see #getParam(String, String)
 	 */
 	public final String findParam(final String moduleName, final String paramName) {
 		Module m = this.modules.get(moduleName);
