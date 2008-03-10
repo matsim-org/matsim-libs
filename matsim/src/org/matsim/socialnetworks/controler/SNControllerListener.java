@@ -107,10 +107,12 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //		}
 //		int gridSpacing = Integer.valueOf(this.controler.getConfig().socnetmodule().getGridSpace());
 //		new WorldCreateRasterLayer2(gridSpacing).run(Gbl.getWorld());
+		
+		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 		//loadSocialNetwork();
 		// if (this.config.socialnet().getInputFile() == null) {
-		this.log.info("Loading initial social network");
+		//this.log.info("Loading initial social network");
 		// also initializes knowledge.map.egonet
 		//}
 
@@ -125,36 +127,14 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		/* code previously in finishIteration() */
 		this.log.info("finishIteration: Note setting snIter = iteration +1 for now");
-		int snIter = event.getIteration() + 1;
+		int snIter = event.getIteration();
 
-//		if (total_spatial_fraction(this.fractionS) > 0) { // only generate the map if spatial meeting is important in this experiment
-//			this.log.info("MAKE A MAP OF SOCIAL EVENTS THAT ACTUALLY OCCURRED IN THE MOBSIM");
-//			this.log.info("  AND CALCULATE SOCIAL UTILITY FROM THIS");
-//			this.log.info("  AND/OR USE IT TO COMPARE WITH PLANNED INTERACTIONS");
-//			this.log.info("  AND USE THIS TO REINFORCE OR DEGRADE LINK STRENGTHS");
-//			this.log.info("  NEEDS AN EVENT HANDLER");
-
-//			this.log.info("  Generating planned [Spatial] socializing opportunities ...");
-//			this.log.info("   Mapping which agents did what, where, and when");
-//			socialEvents = gen2.generate(population);
-//			this.log.info("...finished.");
-
-			//}// end if
-
-			// Agents' actual interactions
-//			this.log.info("  Agents' actual interactions at the social opportunities ...");
-//			plansInteractorS.interact(socialEvents, rndEncounterProbs, snIter);
-//
-//		} else {
-//			this.log.info("     (none)");
-//		}
-//		this.log.info(" ... Spatial interactions done\n");
-
+		// Removing the social links here rather than before the replanning and assignment lets you use the actual encounters in a social score
 		this.log.info(" Removing social links ...");
 		this.snet.removeLinks(snIter);
 		this.log.info(" ... done");
 
-// Else forget activities here, after the replanning and assignment
+// You could forget activities here, after the replanning and assignment
 		
 		if(CALCSTATS){
 			this.log.info(" Calculating and reporting network statistics ...");
@@ -172,7 +152,6 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
 				this.snetstat.closeFiles();
 			}
-//			snwrapup();
 		}
 	}
 
@@ -190,9 +169,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 			//if(Events have just changed or if no events are yet available and if there is an interest in the planned interactions)
 			this.log.info("  Generating planned [Spatial] socializing opportunities ...");
-			this.log.info("   Mapping which agents want to do what, where, and when");
-			this.log.info("   Note that there is only one structure for each person containing SOCIAL DATES");
-			this.log.info("   and that it is cleared before new F2F windows are generated");
+			this.log.info("   Makes a map of time/place windows for all planned encounters between the agents");
 			this.socialPlans = this.gen2.generate(this.controler.getPopulation());
 			this.log.info("...finished.");
 
@@ -229,6 +206,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("  ... done");
 		
 		this.log.info(" Forgetting excess activities (locations) OR SHOULD THIS HAPPEN EACH TIME AN ACTIVITY IS LEARNED ...");
+		this.log.info("  Should be an algorithm");
 		Collection<Person> personList = this.controler.getPopulation().getPersons().values();
 		Iterator<Person> iperson = personList.iterator();
 		while (iperson.hasNext()) {
@@ -239,10 +217,10 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info(" ... done");
 		
 		
-		if (event.getIteration() == this.controler.getLastIteration()) {
-			makeSNIterationPath(snIter);
-			makeSNIterationPath(event.getIteration(), snIter);
-		}
+//		if (event.getIteration() == this.controler.getLastIteration()) {
+//			makeSNIterationPath(snIter);
+//			makeSNIterationPath(event.getIteration(), snIter);
+//		}
 
 	}
 
@@ -306,7 +284,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		}
 
 		this.log.info(" Writing out the initial social network ...");
-		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), 0);
+		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getFirstIteration()-1);
 		this.log.info("... done");
 
 		this.log.info(" Setting up the NonSpatial interactor ...");
@@ -416,17 +394,17 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		return total_spatial_fraction;
 	}
 
-	private final void makeSNIterationPath(final int iteration) {
-		new File(getSNIterationPath(iteration)).mkdir();
-	}
-	private final void makeSNIterationPath(final int iteration, final int snIter) {
-		this.log.info(getSNIterationPath(iteration, snIter));
-		File iterationOutFile= new File(getSNIterationPath(iteration, snIter));
-		iterationOutFile.mkdir();
-//		if (!iterationOutFile.mkdir()) {
-//		Gbl.errorMsg("The output directory " + iterationOutFile + " could not be created. Does its parent directory exist?");
-//		}
-	}
+//	private final void makeSNIterationPath(final int iteration) {
+//		new File(getSNIterationPath(iteration)).mkdir();
+//	}
+//	private final void makeSNIterationPath(final int iteration, final int snIter) {
+//		this.log.info(getSNIterationPath(iteration, snIter));
+//		File iterationOutFile= new File(getSNIterationPath(iteration, snIter));
+//		iterationOutFile.mkdir();
+////		if (!iterationOutFile.mkdir()) {
+////		Gbl.errorMsg("The output directory " + iterationOutFile + " could not be created. Does its parent directory exist?");
+////		}
+//	}
 
 	/**
 	 * returns the path to the specified social network iteration directory. The directory path does not include the trailing '/'

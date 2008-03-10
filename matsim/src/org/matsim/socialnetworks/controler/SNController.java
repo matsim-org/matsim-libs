@@ -65,5 +65,4 @@ public class SNController extends Controler {
 		controler.run();
 		System.exit(0);
 	}
-
 }
