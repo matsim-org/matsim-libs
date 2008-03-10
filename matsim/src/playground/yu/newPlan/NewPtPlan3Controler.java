@@ -39,12 +39,12 @@ public class NewPtPlan3Controler {
 
 	public static void main(final String[] args) {
 		final String netFilename = "../data/ivtch/input/network.xml";
-		final String plansFilename = "../data/ivtch/newPlans/all10pctZrh_plans.xml.gz";
+		final String plansFilename = "../data/ivtch/input/10pctZrhPlans.xml.gz";
 
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")
 		Config config = Gbl
-				.createConfig(new String[] { "../data/ivtch/cfgNewPlansCarPtLicense.xml" });
+				.createConfig(new String[] { "../data/ivtch/newAllPlansWithLicense.xml" });
 
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

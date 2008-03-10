@@ -104,7 +104,7 @@ public class TravelTimeRoadPricingControler extends Controler {
 				args);
 		try {
 			c.addControlerListener(new TTRPlistener(
-					"test/yu/travelTimeRoadPricing/test.ptRate.txt"));
+					"test/yu/travelTimeRoadPricing/100-0.00015.txt"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
