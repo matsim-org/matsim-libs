@@ -46,7 +46,7 @@ public class SpatialInteractor {
 
 	public void interact(Collection<SocializingOpportunity> events, HashMap<String, Double> rndEncounterProb, int iteration) {
 
-		System.out.println(" Looking through social events and letting Persons interact "+iteration);
+		System.out.println(" "+ this.getClass()+" Looking through social events and letting Persons interact "+iteration);
 		for (SocializingOpportunity event : events) {
 
 			if (event.getAttendees().size() > 1) {
