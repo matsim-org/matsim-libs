@@ -31,8 +31,8 @@ public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
 
     @Override
     public PlanAlgorithmI getPlanAlgoInstance() {
-	return new SNSecLocShortest();
-//	return new SNSecLocRandom();
+//	return new SNSecLocShortest();
+	return new SNSecLocRandom();
     }
 
 
