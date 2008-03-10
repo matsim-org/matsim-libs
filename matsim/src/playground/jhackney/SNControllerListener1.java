@@ -176,7 +176,6 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		Controler controler = event.getControler();
 
-		snIter = this.controler.getFirstIteration();
 		/* code previously in setupIteration() */
 //		int snIter = event.getIteration();
 		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
@@ -240,13 +239,11 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 			Iterator<Person> it = this.controler.getPopulation().getPersons().values().iterator();
 			while (it.hasNext()) {
 				Plan p = (Plan) it.next().getSelectedPlan();
-				new SNSecLocRandom().run(p);		
+				new SNSecLocRandom().run(p);	
+				this.log.info(" Getting new routes for person "+p.getPerson().getId()+" for new locations");
+				this.log.info(" ... done");
 			}
-			
-			this.log.info(" Getting new routes for new locations");
-			new PersonPrepareForSim(new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator())).run(controler.getPopulation());
-			this.log.info(" ... done");
-			
+			new PersonPrepareForSim(new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator())).run(controler.getPopulation());					
 			snIter++;
 		}
 	}
@@ -321,6 +318,8 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 		this.log.info(" Setting up the Spatial interactor ...");
 		this.plansInteractorS=new SpatialInteractor(this.snet);
 		this.log.info("... done");
+		
+		this.snIter = this.controler.getFirstIteration();
 	}
 
 	/**
