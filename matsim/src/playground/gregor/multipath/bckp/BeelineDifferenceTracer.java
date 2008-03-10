@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.multipath;
+package playground.gregor.multipath.bckp;
 
 import org.matsim.utils.geometry.shared.Coord;
 
@@ -42,7 +42,7 @@ public class BeelineDifferenceTracer {
 	
 	private final double TRACE_WEIGHT;
 	
-	private double crit =  0.7660431281249999;
+	private double crit = 0.99;
 	private final double coef = 0.95;
 	
 	public BeelineDifferenceTracer(Coord orig, Coord dest){
