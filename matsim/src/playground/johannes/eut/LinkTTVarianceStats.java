@@ -79,13 +79,20 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 
 	public void notifyShutdown(ShutdownEvent event) {
 		Map<BasicLinkI, Double> variances = new HashMap<BasicLinkI, Double>();
+		Map<BasicLinkI, Double> maxTTs = new HashMap<BasicLinkI, Double>();
+		Map<BasicLinkI, Double> minTTs = new HashMap<BasicLinkI, Double>();
+		
 		double varianceSum = 0;
 		for(BasicLinkI link : linkSamples.keySet()) {
 			List<Double> samples = linkSamples.get(link);
 			
 			double avr = 0;
+			double max = Double.MIN_VALUE;
+			double min = Double.MAX_VALUE;
 			for(Double sample : samples) {
 				avr += sample;
+				max = Math.max(sample, max);
+				min = Math.min(sample, min);
 			}
 			avr = avr/(double)samples.size();
 			
@@ -97,19 +104,26 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 			double variance = Math.sqrt((1.0 / (double)(samples.size() - 1)) * squaresum);
 			varianceSum += variance;
 			variances.put(link, variance);
+			
+			maxTTs.put(link, max);
+			minTTs.put(link, min);
 		}
 		
 		double varianceAvr = varianceSum / (double)linkSamples.size();
 		
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(Controler.getOutputFilename("linkvariances.txt"));
-			writer.write("link\tvariance");
+			writer.write("link\tvariance\tmin\tmax");
 			writer.newLine();
 			
 			for(BasicLinkI link : variances.keySet()) {
 				writer.write(link.getId().toString());
 				writer.write("\t");
 				writer.write(variances.get(link).toString());
+				writer.write("\t");
+				writer.write(minTTs.get(link).toString());
+				writer.write("\t");
+				writer.write(maxTTs.get(link).toString());
 				writer.newLine();
 			}
 			writer.write("avr\t");

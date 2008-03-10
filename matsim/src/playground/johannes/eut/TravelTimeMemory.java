@@ -20,7 +20,7 @@ public class TravelTimeMemory {
 	
 	private int maxMemomry = 11;
 	
-	public static final double learningrate = 0.1;
+	private double learningrate = 0.1;
 
 	public TimevariantTTStorage makeTTStorage(TravelTimeI ttcalc, NetworkLayer network, int binsize, int starttime, int endtime) {
 		TimevariantTTStorage storage = new TimevariantTTStorage(network, starttime, endtime, binsize);
@@ -32,6 +32,14 @@ public class TravelTimeMemory {
 		}
 		
 		return storage;
+	}
+	
+	public void setMaxMemorySlots(int slots) {
+		maxMemomry = slots;
+	}
+	
+	public void setLearningRate(double rate) {
+		learningrate = rate;
 	}
 	
 	public void appendNewStorage(TimevariantTTStorage storage) {

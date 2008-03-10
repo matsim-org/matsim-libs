@@ -23,12 +23,6 @@
  */
 package playground.johannes.eut;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Route;
@@ -42,24 +36,16 @@ import org.matsim.withinday.routeprovider.RouteProvider;
  * @author illenberger
  *
  */
-public class ReactRouteGuidance implements RouteProvider, IterationStartsListener {
+public class ReactRouteGuidance implements RouteProvider {
 	
 	private LeastCostPathCalculator algorithm;
 	
-	private double requesttime;
-	
-	static private BufferedWriter writer;
-	
-	static private boolean doLog = false;
-
 	private RoutableLinkCost linkcost;
 	
 	public ReactRouteGuidance(NetworkLayer network, TravelTimeI traveltimes) {
 		linkcost = new RoutableLinkCost();
 		linkcost.traveltimes = traveltimes;
-		algorithm = new Dijkstra(network, linkcost, linkcost);
-		
-		
+		algorithm = new Dijkstra(network, linkcost, linkcost);	
 	}
 	
 	public int getPriority() {
@@ -72,35 +58,8 @@ public class ReactRouteGuidance implements RouteProvider, IterationStartsListene
 
 	public synchronized Route requestRoute(Link departureLink, Link destinationLink,
 			double time) {
-		 
-//		((EventBasedTTProvider)linkcost.traveltimes).requestLinkCost();
-		Route route = null;	
-		this.requesttime = time;
-		route = algorithm.calcLeastCostPath(departureLink.getToNode(),
+		return algorithm.calcLeastCostPath(departureLink.getToNode(),
 					destinationLink.getFromNode(), time);
-	
-		try {
-			if (doLog) {
-				writer.write("Requested route at ");
-				writer.write(String.valueOf(requesttime));
-				writer.write(" is ");
-				writer.write(String.valueOf((int)route.getTravTime()));
-				writer.write(" (");
-				for(Link link : route.getLinkRoute()) {
-					writer.write(link.getId().toString());
-					writer.write(" ");
-					writer.write(String.valueOf((int)linkcost.getLinkTravelTime(link, requesttime)));
-					writer.write(" s; ");
-				}
-				writer.write(")");
-				writer.newLine();
-				writer.flush();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return route;
 	}
 
 	public void setPriority(int p) {
@@ -112,24 +71,12 @@ public class ReactRouteGuidance implements RouteProvider, IterationStartsListene
 		private TravelTimeI traveltimes;
 		
 		public double getLinkTravelTime(Link link, double time) {
-			return traveltimes.getLinkTravelTime(link, requesttime);
+			return traveltimes.getLinkTravelTime(link, time);
 		}
 
 		public double getLinkTravelCost(Link link, double time) {
-			return traveltimes.getLinkTravelTime(link, requesttime);
+			return traveltimes.getLinkTravelTime(link, time);
 		}
 		
-	}
-
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		if(doLog) {
-			try {
-				writer = new BufferedWriter(new FileWriter(EUTController
-						.getOutputFilename(EUTController.getIteration()
-								+ ".routes.txt")));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 }

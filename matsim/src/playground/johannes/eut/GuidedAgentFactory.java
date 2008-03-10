@@ -26,6 +26,8 @@ package playground.johannes.eut;
 import java.util.Random;
 
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.withinday.WithindayAgent;
@@ -37,17 +39,17 @@ import org.matsim.withinday.routeprovider.RouteProvider;
  * @author illenberger
  *
  */
-public class GuidedAgentFactory extends WithindayAgentLogicFactory {
+public class GuidedAgentFactory extends WithindayAgentLogicFactory implements IterationStartsListener {
 
-	private static double equipmentFraction = 0.05;
+	private final double equipmentFraction;
 	
 	private static final ForceReplan forceReplan = new ForceReplan();
 	
 	private static final PreventReplan preventReplan = new PreventReplan();
 	
-	public final ReactRouteGuidance router;
+	private final ReactRouteGuidance router;
 	
-	public Random random;
+	private Random random;
 	
 	private EUTRouterAnalyzer analyzer;
 	
@@ -56,9 +58,10 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	 * @param scoringConfig
 	 */
 	public GuidedAgentFactory(NetworkLayer network,
-			CharyparNagelScoringConfigGroup scoringConfig, TravelTimeI reactTTs) {
+			CharyparNagelScoringConfigGroup scoringConfig, TravelTimeI reactTTs, double fraction) {
 		super(network, scoringConfig);
 		router = new ReactRouteGuidance(network, reactTTs);
+		equipmentFraction = fraction;
 	}
 
 	public void setRouteAnalyzer(EUTRouterAnalyzer analyzer) {
@@ -78,6 +81,10 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	@Override
 	public RouteProvider createRouteProvider() {
 		return router;
+	}
+
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		random = new Random(1);
 	}
 
 }

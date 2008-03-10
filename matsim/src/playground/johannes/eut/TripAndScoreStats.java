@@ -65,6 +65,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		this.analyzer = analyzer;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		try {
 			writer.write(String.valueOf(event.getIteration()));

@@ -38,6 +38,7 @@ import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.plans.Person;
 import org.matsim.router.util.TravelTimeI;
@@ -57,7 +58,7 @@ public class EstimReactiveLinkTT implements
 	
 	private BasicLinkI lastQueriedLink;
 	
-	private double lastQueryTime;
+//	private double lastQueryTime;
 	
 	private double lastTravelTime;
 	
@@ -96,20 +97,24 @@ public class EstimReactiveLinkTT implements
 	}
 
 	public double getLinkTravelTime(Link link, double time) {
-		if (time == lastQueryTime && link == lastQueriedLink)
-			return lastTravelTime;
-		else {
-			lastQueryTime = time;
+//		if (time == lastQueryTime && link == lastQueriedLink)
+//		if (link == lastQueriedLink)
+//			return lastTravelTime;
+//		else {
+//			lastQueryTime = time;
 			lastQueriedLink = link;
 			
 			LinkTTCalculator f = linkTTCalculators.get(link);
 			if (f == null)
 				lastTravelTime = link.getFreespeed();
 			else
-				lastTravelTime = f.getLinkTravelTime(time);
+				/*
+				 * TODO: This is ugly!
+				 */
+				lastTravelTime = f.getLinkTravelTime(SimulationTimer.getTime());
 			
 			return lastTravelTime;
-		}
+//		}
 	}
 	
 	private class LinkTTCalculator {
