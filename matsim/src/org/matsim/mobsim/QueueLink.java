@@ -203,9 +203,9 @@ public class QueueLink extends Link {
 		Vehicle veh;
 		while ((veh = this.parkingList.peek()) != null) {
 			if (veh.getDepartureTime_s() > now) {
-				break;
+				return;
 			}
-
+			
 			// Need to inform the veh that it now leaves its activity.
 			veh.leaveActivity(now);
 
@@ -221,12 +221,12 @@ public class QueueLink extends Link {
 			 * C.) route known AND mode == "car" -> regular case, put veh in
 			 * waitingList
 			 */
-			Leg actLeg = veh.getCurrentLeg();
+			Leg leg = veh.getCurrentLeg();
 
-			if (!actLeg.getMode().equals("car")) {
+			if (!leg.getMode().equals("car")) {
 				QueueSimulation.handleUnknownLegMode(veh);
 			} else {
-				if (actLeg.getRoute().getRoute().size() != 0) {
+				if (leg.getRoute().getRoute().size() != 0) {
 					this.waitingList.add(veh);
 				} else {
 					// this is the case where (hopefully) the next act happens at the same location as this act
@@ -249,19 +249,15 @@ public class QueueLink extends Link {
 	 * @param now the current time
 	 */
 	private void moveWaitToBuffer(final double now) {
-		Vehicle veh;
-		while ((veh = this.waitingList.peek()) != null) {
-			if (!hasBufferSpace())
-				break;
-
+		while (hasBufferSpace()) {
+			Vehicle veh = this.waitingList.poll();
+			if (veh == null) {
+				return;
+			}
 			addToBuffer(veh, now);
-
 			QueueSimulation.getEvents().processEvent(
 					new EventAgentWait2Link(now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(),
-							veh.getDriver(), veh.getCurrentLeg(), this));
-
-			this.waitingList.poll(); // remove the just handled vehicle from waitingList
-
+							veh.getDriver(), veh.getCurrentLeg(), this));			
 		}
 	}
 
@@ -275,7 +271,7 @@ public class QueueLink extends Link {
 		Vehicle veh;
 		while ((veh = this.vehQueue.peek()) != null) {
 			if (veh.getDepartureTime_s() > now) {
-				break;
+				return;
 			}
 
 			// Check if veh has reached destination:
@@ -293,7 +289,7 @@ public class QueueLink extends Link {
 
 			// is there still room left in the buffer, or is it overcrowded from the last time steps?
 			if (!hasBufferSpace()) {
-				break;
+				return;
 			}
 
 			addToBuffer(veh, now);
