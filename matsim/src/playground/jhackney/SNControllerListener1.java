@@ -182,8 +182,8 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 		/* code previously in setupIteration() */
 //		int snIter = event.getIteration();
 		
-//		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
-			if( event.getIteration()%replan_interval==0){
+		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
+//			if( event.getIteration()%replan_interval==0){
 
 //			// add the socNet-score to the existing scoring function
 //			controler.setScoringFunctionFactory(
