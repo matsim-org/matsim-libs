@@ -108,9 +108,7 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 
 	public void handleEvent(final EventAgentDeparture event) {
 
-		DepartureEvent depEvent = new DepartureEvent(
-				new Id(event.agentId),
-				event.getAttributes().getValue("leg"));
+		DepartureEvent depEvent = new DepartureEvent(new Id(event.agentId), event.legId);
 
 		this.departureEventsTimes.put(depEvent, event.time);
 		this.departureEventsLinkIDs.put(depEvent, new Id(event.linkId));
@@ -119,9 +117,8 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 	public void handleEvent(final EventAgentArrival event) {
 
 		Id agentId = new Id(event.agentId);
-		String legId = event.getAttributes().getValue("leg");
 
-		DepartureEvent removeMe = new DepartureEvent(agentId, legId);
+		DepartureEvent removeMe = new DepartureEvent(agentId, event.legId);
 
 		Double departureTime = this.departureEventsTimes.remove(removeMe);
 		IdI departureLinkId = this.departureEventsLinkIDs.remove(removeMe);
