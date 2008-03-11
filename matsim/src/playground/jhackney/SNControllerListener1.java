@@ -225,7 +225,7 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 			Iterator<Person> iperson = personList.iterator();
 			while (iperson.hasNext()) {
 				Person p = (Person) iperson.next();
-				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()*1.5);
+				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*1.5);
 				p.getKnowledge().map.manageMemory(max_memory, p.getSelectedPlan());		
 			}
 			this.log.info(" ... done");
