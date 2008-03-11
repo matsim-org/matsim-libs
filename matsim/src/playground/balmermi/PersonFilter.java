@@ -32,7 +32,10 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
+import org.matsim.plans.algorithms.XY2Links;
 import org.matsim.plans.filters.PersonIntersectAreaFilter;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 
@@ -80,6 +83,11 @@ public class PersonFilter {
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.writeStartPlans();
+		
+		plans.addAlgorithm(new XY2Links(network));
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		plans.addAlgorithm(new PlansCalcRoute(network, timeCostCalc, timeCostCalc));
+		
 		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter, areaOfInterest);
 		filter.setAlternativeAOI(center, radius);
 		plans.addAlgorithm(filter);

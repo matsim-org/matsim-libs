@@ -38,15 +38,18 @@ public class PersonStreaming {
 	public static void run() {
 
 		System.out.println("person streaming...");
+		
+		Scenario.setUpScenarioConfig();
+		NetworkLayer network = Scenario.readNetwork();
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  reading network xml file...");
-		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		System.out.println("  done.");
+//		System.out.println("  reading network xml file...");
+//		NetworkLayer network = null;
+//		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
+//		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+//		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -59,15 +62,15 @@ public class PersonStreaming {
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  adding person modules... ");
-		PersonSubTourAnalysis psta = new PersonSubTourAnalysis();
-		plans.addAlgorithm(psta);
+//		System.out.println("  adding person modules... ");
+//		PersonSubTourAnalysis psta = new PersonSubTourAnalysis();
+//		plans.addAlgorithm(psta);
 //		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt");
 //		plans.addAlgorithm(pidst);
 //		plans.addAlgorithm(new PersonCalcTripDistances());
 //		PersonTripSummaryTable ptst = new PersonTripSummaryTable("output/output_trip-summary-table.txt");
 //		plans.addAlgorithm(ptst);
-		System.out.println("  done.");
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -80,21 +83,21 @@ public class PersonStreaming {
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  finishing algorithms... ");
-		psta.writeSubtourTripCntVsModeCnt("output/TripsPerSubtourVsModeCnt.txt");
-		psta.writeSubtourDistVsModeCnt("output/SubtourDistVsModeCnt.txt");
-		psta.writeSubtourTripCntVsSubtourCnt("output/SubtourTripCntVsSubtourCnt.txt");
-		psta.writeSubtourDistVsModeDistSum("output/SubtourDistVsModeDistSum.txt");
+//		System.out.println("  finishing algorithms... ");
+//		psta.writeSubtourTripCntVsModeCnt("output/TripsPerSubtourVsModeCnt.txt");
+//		psta.writeSubtourDistVsModeCnt("output/SubtourDistVsModeCnt.txt");
+//		psta.writeSubtourTripCntVsSubtourCnt("output/SubtourTripCntVsSubtourCnt.txt");
+//		psta.writeSubtourDistVsModeDistSum("output/SubtourDistVsModeDistSum.txt");
 //		pidst.close();
 //		ptst.close();
-		System.out.println("  done.");
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  writing network xml file... ");
-		NetworkWriter net_writer = new NetworkWriter(network);
-		net_writer.write();
-		System.out.println("  done.");
+//		System.out.println("  writing network xml file... ");
+//		NetworkWriter net_writer = new NetworkWriter(network);
+//		net_writer.write();
+//		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
 		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
@@ -111,8 +114,6 @@ public class PersonStreaming {
 
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
-
-		Gbl.createConfig(args);
 
 		run();
 
