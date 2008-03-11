@@ -41,6 +41,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonPrepareForSim;
+import org.matsim.plans.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocializingOpportunity;
@@ -54,6 +55,8 @@ import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCreateRasterLayer;
+
+import playground.jhackney.algorithms.PersonSNSecLocRandomReRoute;
 
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Vertex;
@@ -178,7 +181,9 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 
 		/* code previously in setupIteration() */
 //		int snIter = event.getIteration();
-		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
+		
+//		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
+			if( event.getIteration()%replan_interval==0){
 
 //			// add the socNet-score to the existing scoring function
 //			controler.setScoringFunctionFactory(
@@ -235,15 +240,24 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 			}
 			this.log.info(" ... done");
 
-			this.log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE");
-			Iterator<Person> it = this.controler.getPopulation().getPersons().values().iterator();
-			while (it.hasNext()) {
-				Plan p = (Plan) it.next().getSelectedPlan();
-				new SNSecLocRandom().run(p);	
-				this.log.info(" Getting new routes for person "+p.getPerson().getId()+" for new locations");
-				this.log.info(" ... done");
+			this.log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE. Make this a person algorithm");
+			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
+			while (itreplan.hasNext()) {
+				Plan p = (Plan) itreplan.next().getSelectedPlan();
+				new PersonSNSecLocRandomReRoute().run(p);
+//				new SNSecLocRandom().run(p);
+//				new PersonRemoveLinkAndRoute().run(p.getPerson());
+				
 			}
-			new PersonPrepareForSim(new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator())).run(controler.getPopulation());					
+			this.log.info(" ... done");
+			this.log.info(" ### HERE REROUTE THE NEW PLANS. add this to sec loc person algorithm");
+			Iterator<Person> itroute = this.controler.getPopulation().getPersons().values().iterator();
+			while (itroute.hasNext()) {
+				Plan p = (Plan) itroute.next().getSelectedPlan();
+				Person pp = (Person) p.getPerson();
+				new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
+			}
+			this.log.info(" ... done");
 			snIter++;
 		}
 	}
@@ -318,7 +332,7 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 		this.log.info(" Setting up the Spatial interactor ...");
 		this.plansInteractorS=new SpatialInteractor(this.snet);
 		this.log.info("... done");
-		
+
 		this.snIter = this.controler.getFirstIteration();
 	}
 
