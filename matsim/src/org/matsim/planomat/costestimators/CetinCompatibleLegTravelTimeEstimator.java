@@ -30,7 +30,7 @@ import org.matsim.world.Location;
  * This class estimates travel times from events produced by the
  * deterministic time-step-driven queue-based agent traffic simulation (DQSim).
  * <p>
- *  In constrast to <code>CharyparEtAlCompatibleLegTravelTimeEstimator</code>,
+ * In contrast to {@link CharyparEtAlCompatibleLegTravelTimeEstimator},
  * <ul>
  * <li> the link of the origin activity is not simulated,
  *   and thus not included in this leg travel time estimation.
@@ -38,14 +38,14 @@ import org.matsim.world.Location;
  *   and thus has to be included in this leg travel time estimation.
  * </ul>
  * <p>
+ * 
  * @see "Cetin, N. (2005) Large-scale parallel graph-based simulations, Ph.D. Thesis, ETH Zurich, Zurich.)"
  * @author meisterk
- *
-*/
+ * 
+ */
 public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTimeEstimator {
 
-	public CetinCompatibleLegTravelTimeEstimator(
-			TravelTimeI linkTravelTimeEstimator,
+	public CetinCompatibleLegTravelTimeEstimator(TravelTimeI linkTravelTimeEstimator,
 			DepartureDelayAverageCalculator depDelayCalc) {
 
 		super(linkTravelTimeEstimator, depDelayCalc);

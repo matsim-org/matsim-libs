@@ -35,39 +35,34 @@ import org.matsim.world.Location;
  * paper presented at the 86th Annual Meeting of the Transportation Research
  * Board, Washington, D.C., January 2007.)
  * <p>
- * In constrast to <code>CetinCompatibleLegTravelTimeEstimator</code>,
+ * In contrast to {@link CetinCompatibleLegTravelTimeEstimator},
  * <ul>
  * <li> the link of the origin activity is simulated, 
  *   and thus has to be included in this leg travel time estimation
  * <li> the link of the destination activity is not simulated, 
  *   and thus not included in this leg travel time estimation.
  * </ul>
+ * 
  * @author meisterk
- *
  */
-public class CharyparEtAlCompatibleLegTravelTimeEstimator extends
-		FixedRouteLegTravelTimeEstimator {
+public class CharyparEtAlCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTimeEstimator {
 
-	public CharyparEtAlCompatibleLegTravelTimeEstimator(
-			TravelTimeI linkTravelTimeEstimator,
+	public CharyparEtAlCompatibleLegTravelTimeEstimator(TravelTimeI linkTravelTimeEstimator,
 			DepartureDelayAverageCalculator depDelayCalc) {
 		super(linkTravelTimeEstimator, depDelayCalc);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public double getLegTravelTimeEstimation(IdI personId,
-			double departureTime, Location origin, Location destination,
-			Route route, String mode) {
+	public double getLegTravelTimeEstimation(IdI personId, double departureTime, Location origin,
+			Location destination, Route route, String mode) {
 
 		double now = departureTime;
-		
+
 		now = this.processDeparture((Link) origin, now);
 		now = this.processLink((Link) origin, now);
 		now = this.processRouteTravelTime(route, now);
-		
-		return (now - departureTime);	
-		
+
+		return (now - departureTime);
 	}
 
 }
