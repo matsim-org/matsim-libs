@@ -29,10 +29,19 @@ public class SceneGraph {
 	private final List<SceneLayer> drawingLayers = new LinkedList<SceneLayer>();
 
 	private final OTFDrawer drawer;
+	private final double time;
 	
-	public SceneGraph(Rect rect, OTFConnectionManager connect, OTFDrawer drawer) {
+	/**
+	 * @return the time
+	 */
+	public double getTime() {
+		return time;
+	}
+
+	public SceneGraph(Rect rect, double time, OTFConnectionManager connect, OTFDrawer drawer) {
 		this.rect = rect;
 		this.drawer = drawer;
+		this.time = time;
 		
 		// default layer, might be overridden from connect!
 		layers.put(Object.class, new SimpleSceneLayer());

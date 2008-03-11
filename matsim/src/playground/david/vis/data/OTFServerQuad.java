@@ -88,10 +88,12 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 
 	public OTFServerQuad(double minX, double minY, double maxX, double maxY) {
 		super(minX, minY, maxX, maxY);
+		// make sure, the bounding box is bigger than the biggest element, otherwise
+		// requests with null == use biggest bounding box will fail on the leftmost elements
 		this.minEasting = minX;
-		this.maxEasting = maxX;
+		this.maxEasting = maxX+1;
 		this.minNorthing = minY;
-		this.maxNorthing = maxY;
+		this.maxNorthing = maxY+1;
 	}
 
 	public void updateBoundingBox(QueueNetworkLayer net){
@@ -107,6 +109,10 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 			minNorthing = Math.min(minNorthing, node.getCoord().getY());
 			maxNorthing = Math.max(maxNorthing, node.getCoord().getY());
 		}
+		// make sure, the bounding box is bigger than the biggest element, otherwise
+		// requests with null == use biggest bounding box will fail on the leftmost elements
+		maxEasting +=1;
+		maxNorthing +=1;
 
 		this.net = net;
 		offsetEast = minEasting;
@@ -118,12 +124,15 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 		final double northing = maxNorthing - minNorthing;
 		// set top node
 		setTopNode(0, 0, easting, northing);
+//		System.out.println("server bounds: " +  " coords 0,0-" + easting + "," + northing );   
 
     	for (QueueNode node : net.getNodes().values()) {
     		OTFDataWriter<QueueNode> writer = writers.getNodeWriter();
     		if (writer != null) writer.setSrc(node);
     		put(node.getCoord().getX() - minEasting, node.getCoord().getY() - minNorthing, writer);
     	}
+//		System.out.print("server links/nodes count: " + (net.getLinks().values().size()+net.getNodes().values().size()) );   
+
     	for (QueueLink link : net.getLinks().values()) {
     		double middleEast = (link.getToNode().getCoord().getX() + link.getFromNode().getCoord().getX())*0.5 - minEasting;
     		double middleNorth = (link.getToNode().getCoord().getY() + link.getFromNode().getCoord().getY())*0.5 - minNorthing;
@@ -131,7 +140,8 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
     		// null means take the default handler
     		if (writer != null) writer.setSrc(link);
     		put(middleEast, middleNorth, writer);
-    	}
+//    		System.out.println("server link: " + link.getId().toString() + " coords " + middleEast + "," + middleNorth );   
+   	}
 	}
 	
 	public void addAdditionalElement(OTFDataWriter element) {
@@ -145,6 +155,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 
 		int colls = this.execute(0.,0.,maxEasting - minEasting,maxNorthing - minNorthing,
 				this.new ConvertToClientExecutor(connect,client));
+//		System.out.print("server executor count: " +colls );   
 
 		for(OTFDataWriter element : additionalElements) {
 			Collection<Class> readerClasses = connect.getEntries(element.getClass());

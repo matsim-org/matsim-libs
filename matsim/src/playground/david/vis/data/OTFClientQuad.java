@@ -123,7 +123,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 		this.connect = connect;
 
-		SceneGraph graph = new SceneGraph(null, connect, null);
+		SceneGraph graph = new SceneGraph(null, -1, connect, null);
 		int colls = this.execute(this.top.getBounds(),
 				new CreateReceiverExecutor(connect, graph));
 		for(OTFDataReader element : additionalElements) {
@@ -223,7 +223,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		
 		SceneGraph result;
 		if ( cachedResult == null) {
-			result = new SceneGraph(rect, connect, drawer);
+			result = new SceneGraph(rect, time, connect, drawer);
 			getDynData(rect, result, true);
 			// fill with elements
 			invalidate(rect, result);
