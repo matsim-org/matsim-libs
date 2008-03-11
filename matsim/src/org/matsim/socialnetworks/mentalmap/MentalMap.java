@@ -169,8 +169,8 @@ public class MentalMap {
 
 	public void manageMemory(int max, Plan myPlan){
 
-		if(myPlan.getActsLegs().size()>max){
-			Gbl.errorMsg(this.getClass()+" Number of activites an agent has to remember is greater than his memory! MAX = "+max+" "+myPlan.getActsLegs().size()+this.knowledge.getActivities().size());
+		if(myPlan.getActsLegs().size()/2 >max){
+			Gbl.errorMsg(this.getClass()+" Number of activites an agent has to remember is greater than his memory! MAX = "+max+" "+myPlan.getActsLegs().size()/2+" "+this.knowledge.getActivities().size());
 		}
 		if(knowledge.getActivities().size()>max){
 			// Mark the activities associated with the current plan
