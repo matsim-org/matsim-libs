@@ -244,8 +244,8 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
 			while (itreplan.hasNext()) {
 				Plan p = (Plan) itreplan.next().getSelectedPlan();
-				new PersonSNSecLocRandomReRoute().run(p);
-//				new SNSecLocRandom().run(p);
+//				new PersonSNSecLocRandomReRoute().run(p);
+				new SNSecLocRandom().run(p);
 //				new PersonRemoveLinkAndRoute().run(p.getPerson());
 				
 			}
