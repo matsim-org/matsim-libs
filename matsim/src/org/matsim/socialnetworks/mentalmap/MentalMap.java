@@ -92,6 +92,7 @@ public class MentalMap {
 			Act myAct = (Act) planActIter.next();
 
 //			Tidy the acts up so they correspond to the expectations of the social net module
+			// Actually to the facility types, too
 			String type="none";
 			char typechar=myAct.getType().charAt(0);
 			if(typechar=='h'){
@@ -190,11 +191,13 @@ public class MentalMap {
 			int numToForget= activityScore.values().size()-max;
 
 			// Avoid concurrent modification errors
+			// Add to the "forgetlist" the correct number of activities to forget
+			// Since these activities are sorted by score, just take the first ones
 			ArrayList<Activity> forgetList=new ArrayList<Activity>();
 			int counter=0;
-			for (Enumeration<Activity> e = activityScore.keys() ; e.hasMoreElements() ;) {
+			for (Enumeration<Activity> e = sortedScores.keys() ; e.hasMoreElements() ;) {
 				Activity myactivity=(Activity) e.nextElement();
-				double score=(Double) activityScore.get(myactivity);
+				double score=(Double) sortedScores.get(myactivity);
 				// note which activity to forget
 				if(counter<=numToForget){
 					forgetList.add(myactivity);
