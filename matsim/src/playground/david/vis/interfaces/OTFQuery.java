@@ -9,5 +9,6 @@ import org.matsim.plans.Plans;
 public interface OTFQuery extends Serializable{
 
 	public void query(QueueNetworkLayer net, Plans plans, Events events) ;
-	public void draw();
+	public void remove();
+	public void draw(OTFDrawer drawer);
 }

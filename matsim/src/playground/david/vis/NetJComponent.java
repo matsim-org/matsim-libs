@@ -56,6 +56,7 @@ import playground.david.vis.data.OTFDataSimpleAgent;
 import playground.david.vis.data.SceneGraph;
 import playground.david.vis.gui.OTFDrawable;
 import playground.david.vis.interfaces.OTFDrawer;
+import playground.david.vis.interfaces.OTFQuery;
 
 /**
  * @author david
@@ -560,6 +561,17 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			else if ( i<0) pressed_ZOOM_IN();
 		}
 
+	}
+
+
+	public void addQuery(OTFQuery query) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void removeQueries() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

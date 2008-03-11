@@ -550,5 +550,12 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
+	/**
+	 * @return the liveHost
+	 */
+	public boolean isLiveHost() {
+		return liveHost;
+	}
+
 
 }

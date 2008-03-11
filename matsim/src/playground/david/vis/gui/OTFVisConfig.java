@@ -35,6 +35,8 @@ public class OTFVisConfig extends Module {
 
 	private int bigTimeStep = 600;
 	private final int timeStep = 1;
+	private String queryType = "Agent";
+	private boolean multipleSelect = true;
 	
 
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
@@ -153,6 +155,34 @@ public class OTFVisConfig extends Module {
 	 */
 	public void setBigTimeStep(int bigTimeStep) {
 		this.bigTimeStep = bigTimeStep;
+	}
+
+	/**
+	 * @return the queryType
+	 */
+	public String getQueryType() {
+		return queryType;
+	}
+
+	/**
+	 * @param queryType the queryType to set
+	 */
+	public void setQueryType(String queryType) {
+		this.queryType = queryType;
+	}
+
+	/**
+	 * @return the multipleSelect
+	 */
+	public boolean isMultipleSelect() {
+		return multipleSelect;
+	}
+
+	/**
+	 * @param multipleSelect the multipleSelect to set
+	 */
+	public void setMultipleSelect(boolean multipleSelect) {
+		this.multipleSelect = multipleSelect;
 	}
 
 	
