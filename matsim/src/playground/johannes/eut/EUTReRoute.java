@@ -35,7 +35,7 @@ import org.matsim.router.PlansCalcRoute;
  */
 public class EUTReRoute extends MultithreadedModuleA {
 	
-	private static final int rho = 10;
+//	private static final int rho = 0;
 	
 	private final ArrowPrattRiskAversionI utilFunction;
 	
@@ -46,7 +46,7 @@ public class EUTReRoute extends MultithreadedModuleA {
 	private TravelTimeMemory provider;
 	
 	
-	public EUTReRoute(NetworkLayer network, TravelTimeMemory provider) {
+	public EUTReRoute(NetworkLayer network, TravelTimeMemory provider, double rho) {
 		super(1);
 		utilFunction = new CARAFunction(rho);
 		this.network = network;

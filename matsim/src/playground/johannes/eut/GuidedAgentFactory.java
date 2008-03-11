@@ -26,8 +26,6 @@ package playground.johannes.eut;
 import java.util.Random;
 
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.withinday.WithindayAgent;
@@ -39,7 +37,7 @@ import org.matsim.withinday.routeprovider.RouteProvider;
  * @author illenberger
  *
  */
-public class GuidedAgentFactory extends WithindayAgentLogicFactory implements IterationStartsListener {
+public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 
 	private final double equipmentFraction;
 	
@@ -72,7 +70,8 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 	public AgentContentmentI createAgentContentment(WithindayAgent agent) {
 		random.nextDouble();
 		if(random.nextDouble() < equipmentFraction) {
-			analyzer.addGuidedPerson(agent.getPerson());
+			if(analyzer != null)
+				analyzer.addGuidedPerson(agent.getPerson());
 			return forceReplan;
 		} else
 			return preventReplan;
@@ -83,7 +82,7 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 		return router;
 	}
 
-	public void notifyIterationStarts(IterationStartsEvent event) {
+	public void reset() {
 		random = new Random(1);
 	}
 

@@ -58,7 +58,7 @@ public class EstimReactiveLinkTT implements
 	
 	private BasicLinkI lastQueriedLink;
 	
-//	private double lastQueryTime;
+	private double lastQueryTime;
 	
 	private double lastTravelTime;
 	
@@ -97,11 +97,11 @@ public class EstimReactiveLinkTT implements
 	}
 
 	public double getLinkTravelTime(Link link, double time) {
-//		if (time == lastQueryTime && link == lastQueriedLink)
-//		if (link == lastQueriedLink)
-//			return lastTravelTime;
-//		else {
-//			lastQueryTime = time;
+		double simtime = SimulationTimer.getTime();
+		if (simtime == lastQueryTime && link == lastQueriedLink)
+			return lastTravelTime;
+		else {
+			lastQueryTime = simtime;
 			lastQueriedLink = link;
 			
 			LinkTTCalculator f = linkTTCalculators.get(link);
@@ -111,10 +111,10 @@ public class EstimReactiveLinkTT implements
 				/*
 				 * TODO: This is ugly!
 				 */
-				lastTravelTime = f.getLinkTravelTime(SimulationTimer.getTime());
+				lastTravelTime = f.getLinkTravelTime(simtime);
 			
 			return lastTravelTime;
-//		}
+		}
 	}
 	
 	private class LinkTTCalculator {
