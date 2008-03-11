@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
@@ -40,8 +39,6 @@ import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PersonPrepareForSim;
-import org.matsim.plans.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocializingOpportunity;
@@ -49,17 +46,10 @@ import org.matsim.socialnetworks.interactions.SpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.replanning.SNSecLocRandom;
-import org.matsim.socialnetworks.scoring.SNScoringFunctionFactory03;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
-import org.matsim.world.algorithms.WorldCreateRasterLayer;
 
-import playground.jhackney.algorithms.PersonSNSecLocRandomReRoute;
-
-import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Vertex;
 /**
  * This controler initializes a social network. Initialization can use the initial plans and/or
  * other algorithms to generate a social network. The social network allows agents to exchange
