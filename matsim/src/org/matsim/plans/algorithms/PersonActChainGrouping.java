@@ -82,12 +82,13 @@ public class PersonActChainGrouping extends PersonAlgorithm {
 		}
 
 		Plan plan = person.getPlans().get(0);
-		String chain = new String();
+		StringBuilder chainBuilder = new StringBuilder((plan.getActsLegs().size() + 1) / 2);
 		for (int j = 0; j < plan.getActsLegs().size(); j = j + 2) {
 			Act act = (Act)plan.getActsLegs().get(j);
-			chain = chain.concat(act.getType().substring(0, 1));
+			chainBuilder = chainBuilder.append(act.getType().substring(0, 1));
 		}
 
+		String chain = chainBuilder.toString();
 		if (!this.chaingroups.containsKey(chain)) {
 			this.chaingroups.put(chain, new TreeSet<IdI>());
 		}
