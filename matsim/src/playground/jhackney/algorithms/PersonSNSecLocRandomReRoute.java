@@ -163,7 +163,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 					firstAct.setCoord(newCoord);
 				}
 				// Change the activity
-				System.out.println("  ##### Act "+newAct.getRefId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
+//				System.out.println("  ##### Act "+newAct.getRefId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
 				newAct.setLink(fFromKnowledge.getLink());
 				Coord newCoord = (Coord) fFromKnowledge.getCenter();
 				newAct.setCoord(newCoord);
@@ -187,7 +187,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 				// Remove previous plan
 //				person.getPlans().remove(plan);
 			}else{
-				System.out.println("   ### newPlan same as old plan");
+//				System.out.println("   ### newPlan same as old plan");
 //				person.getPlans().remove(newPlan);
 //				person.setSelectedPlan(plan);
 			}
