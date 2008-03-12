@@ -1,5 +1,8 @@
 package tutorial;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +13,7 @@ import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.utils.charts.XYLineChart;
+import org.matsim.utils.io.IOUtils;
 
 /**
  * This class collects the average travel time per agent measured by the
@@ -43,6 +47,7 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 		XYLineChart chart = new XYLineChart("Average travel times per iteration",
 				"Iterations", "ttimes");
 		chart.addMatsimLogo();
+		StringBuffer buffer = new StringBuffer();
 		//create the arrays needed for chart creation
 		double[] iters = new double[this.timePerIterationMap.size()];
 		double[] times = new double[this.timePerIterationMap.size()];
@@ -50,10 +55,23 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 		for (Integer k : this.timePerIterationMap.keySet()) {
 			iters[k-1] = k;
 			times[k-1] = this.timePerIterationMap.get(k);
+			buffer.append(iters[k-1]);
+			buffer.append("\t");
+			buffer.append(times[k-1]);
+			buffer.append("\n");
 		}
 		//write the chart
 		chart.addSeries("tt", iters, times);
 		chart.saveAsPng("./output/travelTimes.png", 800, 600);
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter("./output/travelTimes.txt");
+			writer.write(buffer.toString());
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 
