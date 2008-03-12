@@ -33,7 +33,6 @@ import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.socialnetworks.controler.SNControllerListener;
 import org.matsim.utils.geometry.shared.Coord;
 
-
 public class SNSecLocRandom  implements PlanAlgorithmI{
 	private final String weights;
 
@@ -57,7 +56,7 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 		//  activities in the plan)
 		//	Pick one of the facilities in knowledge to replace the one in the plan
 		//
-		//The changed plan will be kept only if the score is better (depends on scoring strategy)
+		//
 		//
 		String factype=null;// facility type to switch out
 		Person person = plan.getPerson();
