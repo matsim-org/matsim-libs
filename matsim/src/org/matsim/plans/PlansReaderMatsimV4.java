@@ -224,24 +224,28 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 
 	private void startPlan(final Attributes atts) {
 		this.currplan = this.currperson.createPlan(atts.getValue("score"), atts.getValue("selected"));
-		if ("car".equalsIgnoreCase(atts.getValue("type"))) {
+		String type = atts.getValue("type");
+		if (type == null) {
+			this.currplan.setType(Plan.Type.UNDEFINED);
+		}
+		else if ("car".equalsIgnoreCase(type)) {
 				this.currplan.setType(Plan.Type.CAR);
 		}
-		else if ("pt".equalsIgnoreCase(atts.getValue("type"))) {
+		else if ("pt".equalsIgnoreCase(type)) {
 			this.currplan.setType(Plan.Type.PT);
 		}
-		else if ("ride".equalsIgnoreCase(atts.getValue("type"))) {
+		else if ("ride".equalsIgnoreCase(type)) {
 			this.currplan.setType(Plan.Type.RIDE);
 		}
-		else if ("bike".equalsIgnoreCase(atts.getValue("type"))) {
+		else if ("bike".equalsIgnoreCase(type)) {
 			this.currplan.setType(Plan.Type.BIKE);
 		}
-		else if ("WALK".equalsIgnoreCase(atts.getValue("type"))) {
+		else if ("walk".equalsIgnoreCase(type)) {
 			this.currplan.setType(Plan.Type.WALK);
 		}
 		else {
 			if (this.warnPlanTypeCount < 10 ) {
-				log.warn("Type " + atts.getValue("type") + " of plan not known! Setting plan to type undefined!");
+				log.warn("Type " + type + " of plan not known! Setting plan to type undefined!");
 				this.warnPlanTypeCount++;
 			}
 			this.currplan.setType(Plan.Type.UNDEFINED);
