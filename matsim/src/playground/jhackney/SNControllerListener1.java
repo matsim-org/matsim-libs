@@ -238,7 +238,7 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 				Plan p = (Plan) itreplan.next().getSelectedPlan();
 //				Plan p=itreplan.next().copySelectedPlan();
 				new PersonSNSecLocRandomReRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
-				System.out.println( "SNControler1 Number of plans for person "+p.getPerson().getId()+" "+p.getPerson().getPlans().size());
+//				System.out.println( "SNControler1 Number of plans for person "+p.getPerson().getId()+" "+p.getPerson().getPlans().size());
 			}
 			this.log.info(" ... done");
 			snIter++;
