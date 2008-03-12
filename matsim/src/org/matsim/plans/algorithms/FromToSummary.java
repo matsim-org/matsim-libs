@@ -21,6 +21,7 @@
 package org.matsim.plans.algorithms;
 
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -208,17 +209,22 @@ public class FromToSummary extends PersonAlgorithm implements PlanAlgorithmI {
 		}
 
 		/**
-		 * Compares \a this with \a other.
+		 * Compares two NodePairs
 		 * @param other
-		 * @return true if the Nodes in \a other are the same is in \a this
-		 * (and appear in the same order)
+		 * @return true if the Nodes in other are the same as in this and appear in the same order
 		 */
-		public boolean equals(NodePair other) {
-			if (getFirst().getId() == other.getFirst().getId()
-					&& getSecond().getId() == other.getSecond().getId()) {
-				return true;
+		public boolean equals(Object other) {
+			if (other instanceof NodePair) {
+				if (getFirst().equals(((NodePair)other).getFirst())
+						&& getSecond().equals(((NodePair)other).getSecond())) {
+					return true;
+				}
 			}
 			return false;
+		}
+		
+		public int hashCode() {
+			return getFirst().hashCode() & getSecond().hashCode();
 		}
 	}
 
@@ -272,7 +278,9 @@ public class FromToSummary extends PersonAlgorithm implements PlanAlgorithmI {
  * @author lnicolas
  * Compares two NodePairs.
  */
-class NodePairComparator implements Comparator<FromToSummary.NodePair> {
+class NodePairComparator implements Comparator<FromToSummary.NodePair>, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public int compare(FromToSummary.NodePair n1, FromToSummary.NodePair n2) {
 		Node n1First = n1.getFirst();
