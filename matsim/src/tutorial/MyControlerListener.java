@@ -47,7 +47,6 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 		XYLineChart chart = new XYLineChart("Average travel times per iteration",
 				"Iterations", "ttimes");
 		chart.addMatsimLogo();
-		StringBuffer buffer = new StringBuffer();
 		//create the arrays needed for chart creation
 		double[] iters = new double[this.timePerIterationMap.size()];
 		double[] times = new double[this.timePerIterationMap.size()];
@@ -55,9 +54,14 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 		for (Integer k : this.timePerIterationMap.keySet()) {
 			iters[k-1] = k;
 			times[k-1] = this.timePerIterationMap.get(k);
-			buffer.append(iters[k-1]);
+		}
+		//write to file doing this not in the loop above is cause we
+		//would like to have a sorted output.
+		StringBuffer buffer = new StringBuffer();
+		for (int i = 0; i < iters.length; i++) {
+			buffer.append(iters[i]);
 			buffer.append("\t");
-			buffer.append(times[k-1]);
+			buffer.append(times[i]);
 			buffer.append("\n");
 		}
 		//write the chart
