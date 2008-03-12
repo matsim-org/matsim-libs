@@ -50,6 +50,8 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
+import playground.jhackney.algorithms.PersonSNSecLocRandomReRoute;
+
 /**
  * This controler initializes a social network. Initialization can use the initial plans and/or
  * other algorithms to generate a social network. The social network allows agents to exchange
@@ -219,33 +221,24 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 
 			this.log.info("  ... done");
 
-			this.log.info(" Forgetting excess activities (locations) OR SHOULD THIS HAPPEN EACH TIME AN ACTIVITY IS LEARNED ...");
-			this.log.info("  Should be an algorithm");
-			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
-			Iterator<Person> iperson = personList.iterator();
-			while (iperson.hasNext()) {
-				Person p = (Person) iperson.next();
-				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*1.5);
-				p.getKnowledge().map.manageMemory(max_memory, p.getSelectedPlan());		
-			}
-			this.log.info(" ... done");
+//			this.log.info(" Forgetting excess activities (locations) OR SHOULD THIS HAPPEN EACH TIME AN ACTIVITY IS LEARNED ...");
+//			this.log.info("  Should be an algorithm");
+//			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
+//			Iterator<Person> iperson = personList.iterator();
+//			while (iperson.hasNext()) {
+//				Person p = (Person) iperson.next();
+//				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*1.5);
+//				p.getKnowledge().map.manageMemory(max_memory, p.getSelectedPlan());		
+//			}
+//			this.log.info(" ... done");
 
 			this.log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE. Make this a person algorithm");
 			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
 			while (itreplan.hasNext()) {
 				Plan p = (Plan) itreplan.next().getSelectedPlan();
-//				new PersonSNSecLocRandomReRoute().run(p);
-				new SNSecLocRandom().run(p);
-//				new PersonRemoveLinkAndRoute().run(p.getPerson());
-				
-			}
-			this.log.info(" ... done");
-			this.log.info(" ### HERE REROUTE THE NEW PLANS. add this to sec loc person algorithm");
-			Iterator<Person> itroute = this.controler.getPopulation().getPersons().values().iterator();
-			while (itroute.hasNext()) {
-				Plan p = (Plan) itroute.next().getSelectedPlan();
-				Person pp = (Person) p.getPerson();
-				new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
+//				Plan p=itreplan.next().copySelectedPlan();
+				new PersonSNSecLocRandomReRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
+				System.out.println( "SNControler1 Number of plans for person "+p.getPerson().getId()+" "+p.getPerson().getPlans().size());
 			}
 			this.log.info(" ... done");
 			snIter++;
