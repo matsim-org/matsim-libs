@@ -38,6 +38,8 @@ import org.matsim.world.Location;
  */
 public class BeeLine implements LegTravelTimeEstimator {
 	
+	final static double SPEED = 20.0 / 3.6; // 20km/h --> m/s
+	
 	public double getLegTravelTimeEstimation(
 			IdI personId, 
 			double departureTime, 
@@ -45,25 +47,23 @@ public class BeeLine implements LegTravelTimeEstimator {
 			Location destination,
 			Route route,
 			String mode) {
-
 		
 		Node originFromNode = ((Link)origin).getFromNode();
 		Node destinationFromNode = ((Link)destination).getFromNode();
-		
-		double s = 
-			originFromNode.getCoord().calcDistance(destinationFromNode.getCoord());
-		
-		double v = 20 / 3.6;	// km/h -> m/s
+		/* why (unsafely) casting to Link to get a node? Why not just using
+		 * Location.getCenter() as coordinate? In that case, that would be:
+		 *   double d = origin.getCenter().calcDistance(destination.getCenter());
+		 * After all, it's just a bee-line estimation, and if that's from a node
+		 * or from another point nearby....    -marcel/12mar2008
+		 */
+		double d = originFromNode.getCoord().calcDistance(destinationFromNode.getCoord());
 				
-		double t = s/v;
-		
-		return t;
+		return d / SPEED;
 	}
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return new String("BeeLine implementation of LegTravelTimeEstimator");
+		return "BeeLine implementation of LegTravelTimeEstimator";
 	}
 
 }
