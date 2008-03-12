@@ -50,10 +50,14 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 		//create the arrays needed for chart creation
 		double[] iters = new double[this.timePerIterationMap.size()];
 		double[] times = new double[this.timePerIterationMap.size()];
+		int decrement = 1;
+		if (this.timePerIterationMap.containsKey(Integer.valueOf(0))) {
+			decrement = 0;
+		}
 		//unfortunately we have to do this as...
 		for (Integer k : this.timePerIterationMap.keySet()) {
-			iters[k-1] = k;
-			times[k-1] = this.timePerIterationMap.get(k);
+			iters[k - decrement] = k;
+			times[k - decrement] = this.timePerIterationMap.get(k);
 		}
 		//write to file doing this not in the loop above is cause we
 		//would like to have a sorted output.
