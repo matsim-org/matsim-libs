@@ -42,12 +42,12 @@ import org.matsim.plans.Plans;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Rect;
 
+import playground.david.vis.data.OTFDataWriter;
 import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.interfaces.OTFLiveServerRemote;
 import playground.david.vis.interfaces.OTFNetHandler;
 import playground.david.vis.interfaces.OTFQuery;
-import playground.david.vis.interfaces.OTFServerRemote.TimePreference;
 
 public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServerRemote{
 	static class QuadStorage {
@@ -86,8 +86,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private OTFNetHandler handler = null;
 	private Plans pop = null;
 	public ByteArrayOutputStream out = null;
-	private QueueNetworkLayer network = null;
-	private Events events;
+	public QueueNetworkLayer network = null;
+	public Events events;
 
 
 	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, Events events) throws RemoteException {
@@ -99,9 +99,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
 		this.events = events;
+		OTFDataWriter.server = this;
 	}
 
-	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, boolean noSSL) throws RemoteException {
+	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, Events events, boolean noSSL) throws RemoteException {
 		super(4019);
 		UserReadableName = ReadableName;
 		net = new OTFVisNet(network);
@@ -109,6 +110,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		this.network = network;
 		out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
+		this.events = events;
 	}
 
 	public static boolean useSSL = true;
@@ -143,7 +145,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		try {
 			// Create SSL-based registry
 			if (useSSL) result = new OnTheFlyServer(ReadableName, network, population,events);
-			else result  = new OnTheFlyServer(ReadableName, network, population, true);
+			else result  = new OnTheFlyServer(ReadableName, network, population, events, true);
 
 			// Bind this object instance to the name "HelloServer"
 			registry.bind("DSOTFServer_" + ReadableName, result);
@@ -339,6 +341,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		OTFServerQuad quad = new OTFServerQuad(network);
 		quads.put(id, new QuadStorage(id, quad, null, null));
 
+		OTFDataWriter.server = this;
+		
 		quad.fillQuadTree(writers);
 		return quad;
 	}
