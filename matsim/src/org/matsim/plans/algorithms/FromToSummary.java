@@ -75,8 +75,14 @@ public class FromToSummary extends PersonAlgorithm implements PlanAlgorithmI {
 			StartTimeOccurrence occ = me.getValue();
 			NodePair np = me.getKey();
 			int count = occ.getOccurrenceCnt();
-			String out = "Trips from " + np.getFirst().getId() + " to "
-					+ np.getSecond().getId() + ": " + count + " (";
+			StringBuilder out = new StringBuilder();
+			out.append("Trips from ");
+			out.append(np.getFirst().getId().toString());
+			out.append(" to ");
+			out.append(np.getSecond().getId().toString());
+			out.append(": ");
+			out.append(count);
+			out.append(" (");
 			double dist = np.getFirst().getCoord().calcDistance(
 					np.getSecond().getCoord());
 			avgDistance = (avgDistance * cnt + dist) / (cnt + 1);
@@ -86,24 +92,26 @@ public class FromToSummary extends PersonAlgorithm implements PlanAlgorithmI {
 				Map.Entry<Double, Integer> sMe = sIt.next();
 				int sOcc = sMe.getValue().intValue();
 				double sTime = sMe.getKey().doubleValue();
-				out += sOcc + "x" + sTime;
+				out.append(sOcc);
+				out.append("x");
+				out.append(sTime);
 				if (sIt.hasNext()) {
-					out += ", ";
+					out.append(", ");
 				}
 			}
-			out += ")";
+			out.append(")");
 
 			boolean inserted = false;
 			for (int i = 0; i < countArray.size() && inserted == false; i++) {
 				if (countArray.get(i).intValue() >= count) {
 					countArray.add(i, count);
-					stringArray.add(i, out);
+					stringArray.add(i, out.toString());
 					inserted = true;
 				}
 			}
 			if (inserted == false) {
 				countArray.add(count);
-				stringArray.add(out);
+				stringArray.add(out.toString());
 			}
 		}
 		for (String out : stringArray) {

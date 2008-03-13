@@ -68,39 +68,42 @@ public class VisumWriteRoutes extends PersonAlgorithm implements PlanAlgorithmI 
 	public void run(Plan plan) {
 		for (int i = 1; i < plan.getActsLegs().size(); i += 2) {
 			Leg leg = (Leg)plan.getActsLegs().get(i);
-			String visum = "";
+			StringBuilder visum = new StringBuilder();
 			ArrayList<Node> route = leg.getRoute().getRoute();
 			
 			if (route.size() > 0) {
 				ArrayList<Location> locs = tvzLayer.getNearestLocations(route.get(0).getCoord(), null);
 				// from bezirk
 				if (locs.size() > 0) {
-					visum += locs.get(0).getId() + ";";
+					visum.append(locs.get(0).getId());
+					visum.append(";");
 				} else {
-					visum += "00;";
+					visum.append("00;");
 				}
 				// to bezirk
 				locs = tvzLayer.getNearestLocations(route.get(route.size() - 1).getCoord(), null);
 				if (locs.size() > 0) {
-					visum += locs.get(0).getId() + ";";
+					visum.append(locs.get(0).getId());
+					visum.append(";");
 				} else {
-					visum += "00;";
+					visum.append("00;");
 				}
 				// anzahl
-				visum += "1.0;";
+				visum.append("1.0;");
 				// knoten
 				for (Node node : route) {
-					visum += node.getId() + ";";
+					visum.append(node.getId());
+					visum.append(";");
 				}
 				// abschluss
-				visum += "-1\n";
+				visum.append("-1\n");
 				try {
-					out.write(visum);
+					out.write(visum.toString());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			} else {
-				visum += "00;00;";
+//				visum.append("00;00;");
 			}
 		}
 

@@ -25,27 +25,27 @@ import org.matsim.gbl.Gbl;
 /**
  * An implementation of a multidimensional point. The dimension can be freely 
  * chosen when instantiating an object, but cannot be altered afterwards.
- * Divison is not supplied, use multiply with factor `1 / divisor' instead ;-)
+ * Division is not supplied, use multiply with factor `1 / divisor' instead ;-)
  */
 public class ParamPoint {
-	final private int dimension_;
-	final private double[] values_;
+	final private int dimension;
+	final private double[] values;
 	
 	public ParamPoint(int dimension) {
-		dimension_ = dimension;
-		values_ = new double[dimension_];
+		this.dimension = dimension;
+		this.values = new double[dimension];
 	}
 	
 	public int getDimension() {
-		return dimension_;
+		return this.dimension;
 	}
 	
 	public void setValue(int idx, double value) {
-		values_[idx] = value;
+		this.values[idx] = value;
 	}
 
 	public double getValue(int idx) {
-		return values_[idx];
+		return this.values[idx];
 	}
 
 	public static ParamPoint add(ParamPoint p1, ParamPoint p2) {
@@ -86,12 +86,17 @@ public class ParamPoint {
 	
 	@Override
 	public String toString() {
-		String result = "[dimension="+dimension_+"][values={"+values_[0];
-		for (int i = 1; i < dimension_; i++) {
-			result = result + "," + values_[i];
+		StringBuilder result = new StringBuilder();
+		result.append("[dimension=");
+		result.append(dimension);
+		result.append("][values={");
+		result.append(values[0]);
+		for (int i = 1; i < dimension; i++) {
+			result.append(",");
+			result.append(values[i]);
 		}
-		result = result + "}]";
-		return result;
+		result.append("}]");
+		return result.toString();
 	}
 
 }
