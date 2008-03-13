@@ -96,7 +96,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 		Person person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
-//		Plan newPlan = person.copySelectedPlan();
+		Plan newPlan = person.copySelectedPlan();
 		
 		// Note that it is not changed, yet
 		boolean changed = false;
@@ -149,15 +149,15 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 			if(newAct.getLinkId()!=fFromKnowledge.getLink().getId()){
 				// If the first activity was chosen, make sure the last activity is also changed
 				if(newAct.equals(plan.getFirstActivity())){
-//					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
-					Act lastAct = (Act) plan.getActsLegs().get(plan.getActsLegs().size()-1);
+					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
+//					Act lastAct = (Act) plan.getActsLegs().get(plan.getActsLegs().size()-1);
 					lastAct.setLink(fFromKnowledge.getLink());
 					Coord newCoord = (Coord) fFromKnowledge.getCenter();
 					lastAct.setCoord(newCoord);
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if(newAct.equals(plan.getActsLegs().get(plan.getActsLegs().size()-1))){
-					Act firstAct = (Act) plan.getFirstActivity();
+					Act firstAct = (Act) newPlan.getFirstActivity();
 					firstAct.setLink(fFromKnowledge.getLink());
 					Coord newCoord = (Coord) fFromKnowledge.getCenter();
 					firstAct.setCoord(newCoord);
@@ -172,24 +172,27 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 
 			if(changed == true){
 				//		 loop over all <leg>s, remove route-information
-//				ArrayList<?> bestactslegs = newPlan.getActsLegs();
-				ArrayList<?> bestactslegs = plan.getActsLegs();
+				ArrayList<?> bestactslegs = newPlan.getActsLegs();
+//				ArrayList<?> bestactslegs = plan.getActsLegs();
 				for (int j = 1; j < bestactslegs.size(); j=j+2) {
 					Leg leg = (Leg)bestactslegs.get(j);
 					leg.setRoute(null);
 				}
-//				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
-				new PlansCalcRoute(network, tcost, ttime).run(plan);
-				plan.setScore(-9999);
+//				Reset the score to -9999. Helps to see if the plan was really changed
+				newPlan.setScore(-9999);
+				
+				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
+//				new PlansCalcRoute(network, tcost, ttime).run(plan);
+
 				k.map.learnActsActivities(newAct.getRefId(),fFromKnowledge.getActivity(factype));
-//				person.setSelectedPlan(newPlan);
-				person.setSelectedPlan(plan);
+				person.setSelectedPlan(newPlan);
+//				person.setSelectedPlan(plan);
 				// Remove previous plan
 //				person.getPlans().remove(plan);
 			}else{
 //				System.out.println("   ### newPlan same as old plan");
-//				person.getPlans().remove(newPlan);
-//				person.setSelectedPlan(plan);
+				person.getPlans().remove(newPlan);
+				person.setSelectedPlan(plan);
 			}
 		}
 	}
