@@ -235,8 +235,10 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
     pauseIcon = new ImageIcon(image, "Pause");
 
 		add(createButton("Restart", STOP, "buttonRestart", "restart the server/simulation"));
-		add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
-		add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
+		if (!this.liveHost) {
+			add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
+			add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
+		}
 		playButton = createButton("PLAY", PLAY, "buttonPlay", "press to play simulation continuously");
 		playButton.setText("Play");
 		playButton.setMinimumSize(new Dimension(120, 60));
@@ -245,8 +247,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		add(playButton);
 		add(createButton(">", STEP_F, "buttonStepF", "go one timestep forward"));
 		add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
-
-		timeField = new JFormattedTextField( new MessageFormat("{0,number,00}-{1,number,00}-{2,number,00}"));
+		timeField = new JFormattedTextField( new MessageFormat("{0,number,00}:{1,number,00}:{2,number,00}"));
 		timeField.setMaximumSize(new Dimension(100,30));
 		timeField.setMinimumSize(new Dimension(80,30));
 		timeField.setActionCommand(SET_TIME);
@@ -301,7 +302,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	public void updateTimeLabel() {
-		timeField.setText(Time.strFromSec(simTime));
+		timeField.setText(Time.writeTime(simTime));
 	}
 
 	// ---------- IMPLEMENTATION OF ActionListener INTERFACE ----------
@@ -391,7 +392,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private void changed_SET_TIME(ActionEvent event) throws IOException {
 		String newTime = ((JFormattedTextField)event.getSource()).getText();
-		int newTime_s = Time.secFromStr(newTime);
+		int newTime_s = (int)Time.parseTime(newTime);
 		stopMovie();
 		progressBar  = new OTFAbortGoto(host, newTime_s);
 		progressBar.start();
