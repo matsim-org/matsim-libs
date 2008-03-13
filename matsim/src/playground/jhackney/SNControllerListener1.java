@@ -221,16 +221,16 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 
 			this.log.info("  ... done");
 
-//			this.log.info(" Forgetting excess activities (locations) OR SHOULD THIS HAPPEN EACH TIME AN ACTIVITY IS LEARNED ...");
-//			this.log.info("  Should be an algorithm");
-//			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
-//			Iterator<Person> iperson = personList.iterator();
-//			while (iperson.hasNext()) {
-//				Person p = (Person) iperson.next();
-//				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*1.5);
-//				p.getKnowledge().map.manageMemory(max_memory, p.getSelectedPlan());		
-//			}
-//			this.log.info(" ... done");
+			this.log.info(" Forgetting excess activities (locations) OR SHOULD THIS HAPPEN EACH TIME AN ACTIVITY IS LEARNED ...");
+			this.log.info("  Should be an algorithm");
+			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
+			Iterator<Person> iperson = personList.iterator();
+			while (iperson.hasNext()) {
+				Person p = (Person) iperson.next();
+				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*1.5);
+				p.getKnowledge().map.manageMemory(max_memory, p.getSelectedPlan());		
+			}
+			this.log.info(" ... done");
 
 			this.log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE. Make this a person algorithm");
 			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
