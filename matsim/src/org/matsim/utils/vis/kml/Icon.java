@@ -62,44 +62,7 @@ public class Icon extends Object {
 		this.x = Icon.DEFAULT_X;
 		this.y = Icon.DEFAULT_Y;
 		this.w = Icon.DEFAULT_W;
-		this.h = Icon.DEFAULT_H;
-	
-	}
-
-	/**
-	 * Constructs an icon with all attributes.
-	 * 
-	 * @param href
-	 * the <a href="http://earth.google.com/kml/kml_tags.html#href">
-	 * href</a> attribute of the new icon
-	 * @param x
-	 * the <a href="http://earth.google.com/kml/kml_tags.html#x">
-	 * x</a> attribute of the new icon
-	 * @param y
-	 * the <a href="http://earth.google.com/kml/kml_tags.html#y">
-	 * y</a> attribute of the new icon
-	 * @param w
-	 * the <a href="http://earth.google.com/kml/kml_tags.html#w">
-	 * w</a> attribute of the new icon
-	 * @param h
-	 * the <a href="http://earth.google.com/kml/kml_tags.html#h">
-	 * h</a> attribute of the new icon
-	 * 
-	 * @deprecated since KML version 2.1
-	 */
-	@Deprecated
-	public Icon(String href, int x, int y, int w, int h) {
-		
-		super("");
-		if (href == null) {
-			Gbl.errorMsg("href must not be null.");
-		}
-		this.href = href;
-		this.x = x;
-		this.y = y;
-		this.w = w;
-		this.h = h;
-		
+		this.h = Icon.DEFAULT_H;	
 	}
 
 	@Override
@@ -138,8 +101,6 @@ public class Icon extends Object {
 		out.write(Object.getOffset(offset, offsetString));
 		out.write("</Icon>");
 		out.newLine();
-
 	}
-	
 	
 }
