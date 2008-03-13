@@ -187,4 +187,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		
 	}
 
+	public Map<Person, Double> getTripDurations() {
+		return tripDurations;
+	}
 }

@@ -51,6 +51,8 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	
 	private EUTRouterAnalyzer analyzer;
 	
+	private BenefitAnalyzer benefitAnalyzer;
+	
 	/**
 	 * @param network
 	 * @param scoringConfig
@@ -66,12 +68,18 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 		this.analyzer = analyzer;
 	}
 	
+	public void setBenefitAnalyzer(BenefitAnalyzer benefitAnalyzer) {
+		this.benefitAnalyzer = benefitAnalyzer;
+	}
+	
 	@Override
 	public AgentContentmentI createAgentContentment(WithindayAgent agent) {
 		random.nextDouble();
 		if(random.nextDouble() < equipmentFraction) {
 			if(analyzer != null)
 				analyzer.addGuidedPerson(agent.getPerson());
+			if(benefitAnalyzer != null)
+				benefitAnalyzer.addGuidedPerson(agent.getPerson());
 			return forceReplan;
 		} else
 			return preventReplan;

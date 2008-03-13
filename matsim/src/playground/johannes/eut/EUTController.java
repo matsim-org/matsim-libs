@@ -73,6 +73,10 @@ public class EUTController extends WithindayControler {
 	
 	private IterationStartsListener incidentSimulator;
 	
+	private EUTReRoute eutReRoute;
+	
+	private BenefitAnalyzer bAnalyzer;
+	
 	/**
 	 * @param args
 	 */
@@ -110,7 +114,7 @@ public class EUTController extends WithindayControler {
 		 * Add one EUTRouter and one empty module.
 		 */
 		PlanStrategy strategy = new PlanStrategy(selector);
-		EUTReRoute eutReRoute = new EUTReRoute(getNetwork(), ttmemory, rho);
+		eutReRoute = new EUTReRoute(getNetwork(), ttmemory, rho);
 		strategy.addStrategyModule(eutReRoute);
 		manager.addStrategy(strategy, replanningFraction);
 		
@@ -179,6 +183,11 @@ public class EUTController extends WithindayControler {
 		riskyLinks.add(getNetwork().getLink("1100"));
 		riskyLinks.add(getNetwork().getLink("1400"));
 		addControlerListener(new TraversedRiskyLink(getPopulation(), riskyLinks));
+		/*
+		 * 
+		 */
+		bAnalyzer = new BenefitAnalyzer(stats, routerAnalyzer, ttmemory, eutReRoute.getUtilFunction());
+		addControlerListener(bAnalyzer);
 	}
 
 	@Override
@@ -215,6 +224,7 @@ public class EUTController extends WithindayControler {
 		public void notifyStartup(StartupEvent event) {
 			EUTController.this.factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), reactTTs, equipmentFraction);
 			((GuidedAgentFactory)factory).setRouteAnalyzer(routerAnalyzer);
+			((GuidedAgentFactory)factory).setBenefitAnalyzer(bAnalyzer);
 		
 		}
 

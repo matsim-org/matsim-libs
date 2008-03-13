@@ -29,7 +29,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
@@ -114,6 +116,7 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 		try {
 			int totalRouteDiffers = 0;
 			int replannedTwice = 0;
+			Set<Person> riskyPersons = new HashSet<Person>();
 			/*
 			 * Dump iteration analysis...
 			 */
@@ -126,6 +129,7 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 				writer.newLine();
 				
 				if(s.routesDiffer) {
+					riskyPersons.add(s.person);
 					totalRouteDiffers++;
 					if(guidedPersons.contains(s.person))
 						replannedTwice++;
@@ -133,6 +137,10 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 			}
 			writer.close();
 			
+			/*
+			 * Get agents that are risk averse and guided...
+			 */
+			Collection riskyAndGuided = CollectionUtils.intersection(riskyPersons, guidedPersons);
 			/*
 			 * Dump summary...
 			 */
@@ -143,6 +151,8 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 			summaryWriter.write(String.valueOf(guidedPersons.size()));
 			summaryWriter.write(TAB);
 			summaryWriter.write(String.valueOf(replannedTwice));
+			summaryWriter.write(TAB);
+			summaryWriter.write(String.valueOf(riskyAndGuided.size()));
 			summaryWriter.newLine();
 			summaryWriter.flush();
 			/*
@@ -161,7 +171,7 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 		String filename = Controler.getOutputFilename("replanAnalysis.txt");
 		try {
 			summaryWriter = IOUtils.getBufferedWriter(filename);
-			summaryWriter.write("Iteration\trouteDiffers\tn_guided\treplannedTwice");
+			summaryWriter.write("Iteration\trouteDiffers\tn_guided\treplannedTwice\triskyAndGuided");
 			summaryWriter.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
