@@ -20,11 +20,10 @@
 
 package playground.balmermi;
 
+import org.matsim.analysis.LegHistogram;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.algorithms.AnalyzeLegTimes;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.misc.Time;
 
 public class EventsHandling {
 
@@ -38,30 +37,12 @@ public class EventsHandling {
 
 		System.out.println("  reading events and analyzing departure times... ");
 		final Events events = new Events();
-		final AnalyzeLegTimes analysis = new AnalyzeLegTimes(binSize,null);
+		final LegHistogram analysis = new LegHistogram(binSize);
 		events.addHandler(analysis);
 		new MatsimEventsReader(events).readFile(Gbl.getConfig().events().getInputFile());
 		System.out.println("  done.");
 
-		final int[][] countsDep = analysis.getLegDepCounts();
-		final int[][] countsArr = analysis.getLegArrCounts();
-		final int[][] countsStuck = analysis.getStuckCounts();
-
-		System.out.print("RESULTS:\n time\ttime");
-		for (int i = 0; i < countsDep.length; i++) {
-			System.out.print("\tdepartures_" + i + "\tarrivals_" + i + "\tstuck_" + i);
-		}
-		System.out.println();
-		for (int j = 0; j < countsDep[0].length; j++) {
-			System.out.print(j*binSize + "\t" + Time.writeTime(j*binSize));
-			for (int i = 0; i < countsDep.length; i++) {
-				System.out.print("\t" + countsDep[i][j] + "\t" + countsArr[i][j] + "\t" + countsStuck[i][j]);
-			}
-			System.out.println();
-		}
-		System.out.println();
-
-		System.out.println("done.");
+		analysis.write(System.out);
 	}
 
 	//////////////////////////////////////////////////////////////////////

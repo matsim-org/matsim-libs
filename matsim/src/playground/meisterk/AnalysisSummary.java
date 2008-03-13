@@ -26,9 +26,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.analysis.CalcLegTimes;
+import org.matsim.analysis.LegHistogram;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.algorithms.AnalyzeLegTimes;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -169,9 +169,8 @@ public class AnalysisSummary {
 //				events.addHandler(lqs);
 				// - activity departure/arrival statistics
 				int binSize = 300;
-//				AnalyzeLegTimes alt = new AnalyzeLegTimes(binSize, population);
-				AnalyzeLegTimes alt = new AnalyzeLegTimes(binSize);
-				events.addHandler(alt);
+				LegHistogram histogram = new LegHistogram(binSize);
+				events.addHandler(histogram);
 
 				// read events from an iteration
 				String eventsFilename =
@@ -212,16 +211,17 @@ public class AnalysisSummary {
 
 				// departure time distributions of first leg (home -> work)
 				String altFilename = analysisDirName + System.getProperty("file.separator") + ii + ".depTimes.txt";
-				BufferedWriter analyzeLegTimesFile = new BufferedWriter(new FileWriter(altFilename));
-				int[][] depCounts = alt.getLegDepCounts();
-
-				analyzeLegTimesFile.write("#bin\tt_dep");
-				analyzeLegTimesFile.newLine();
-				for (int dc=0; dc < depCounts[0].length; dc++) {
-					analyzeLegTimesFile.write(new Integer(dc * binSize) + "\t" + depCounts[0][dc]);
-					analyzeLegTimesFile.newLine();
-				}
-				analyzeLegTimesFile.close();
+//				BufferedWriter analyzeLegTimesFile = new BufferedWriter(new FileWriter(altFilename));
+//				int[][] depCounts = alt.getLegDepCounts();
+//
+//				analyzeLegTimesFile.write("#bin\tt_dep");
+//				analyzeLegTimesFile.newLine();
+//				for (int dc=0; dc < depCounts[0].length; dc++) {
+//					analyzeLegTimesFile.write(new Integer(dc * binSize) + "\t" + depCounts[0][dc]);
+//					analyzeLegTimesFile.newLine();
+//				}
+//				analyzeLegTimesFile.close();
+				histogram.write(altFilename);
 
 				// reset event handlers after analysis of an iteration
 				events.resetHandlers(ii);

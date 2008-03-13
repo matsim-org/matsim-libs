@@ -42,6 +42,7 @@ import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.StuckVehStats;
 import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
@@ -50,7 +51,6 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.algorithms.AnalyzeLegTimes;
 import org.matsim.events.algorithms.CalcLegNumber;
 import org.matsim.events.algorithms.CalcODMatrices;
 import org.matsim.events.algorithms.EventWriterTXT;
@@ -2120,28 +2120,11 @@ public class MyRuns {
 */
 		System.out.println("  reading events and analyzing departure times... ");
 		final Events events = new Events();
-		final AnalyzeLegTimes analysis = new AnalyzeLegTimes(binSize, /*plans*/null);
+		final LegHistogram analysis = new LegHistogram(binSize);
 		events.addHandler(analysis);
 		new MatsimEventsReader(events).readFile(config.events().getInputFile());
 		System.out.println("  done.");
-
-		final int[][] countsDep = analysis.getLegDepCounts();
-		final int[][] countsArr = analysis.getLegArrCounts();
-		final int[][] countsStuck = analysis.getStuckCounts();
-		System.out.print("RESULTS:\n time\ttime");
-		for (int i = 0; i < countsDep.length; i++) {
-			System.out.print("\tdepartures_" + i + "\tarrivals_" + i + "\tstuck_" + i);
-		}
-		System.out.println();
-		for (int j = 0; j < countsDep[0].length; j++) {
-			System.out.print(j*binSize + "\t" + Time.writeTime(j*binSize));
-			for (int i = 0; i < countsDep.length; i++) {
-				System.out.print("\t" + countsDep[i][j] + "\t" + countsArr[i][j] + "\t" + countsStuck[i][j]);
-			}
-			System.out.println();
-		}
-		System.out.println();
-
+		analysis.write(System.out);
 		System.out.println("RUN: analyzeLegTimes finished.");
 	}
 
