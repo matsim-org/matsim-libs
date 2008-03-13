@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -70,15 +71,15 @@ import edu.uci.ics.jung.utils.UserData;
  */
 public class SocialNetworkStatistics {
 
-	static String statsoutdir;
+	private String statsoutdir;
 
-	static BufferedWriter aout = null;
+	private BufferedWriter aout = null;
 
 	// static String aoutfile = statsoutdir+"agent.txt";
-	static BufferedWriter eout = null;
+	private BufferedWriter eout = null;
 
 	// static String eoutfile = statsoutdir+"edge.txt";
-	static BufferedWriter gout = null;
+	private BufferedWriter gout = null;
 
 	// static String goutfile = statsoutdir+"graph.txt";
 	Graph g;
@@ -134,8 +135,7 @@ public class SocialNetworkStatistics {
 			// lastactivity rseed var\n");
 			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype numknown\n");
 			gout = new BufferedWriter(new FileWriter(goutfile));
-			gout
-					.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age meet_freq\n");
+			gout.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age meet_freq\n");
 		} catch (IOException ex) {
 		}
 	}
@@ -161,8 +161,7 @@ public class SocialNetworkStatistics {
 			// lastactivity rseed var\n");
 			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype numknown\n");
 			gout = new BufferedWriter(new FileWriter(goutfile));
-			gout
-					.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age meet_freq\n");
+			gout.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age meet_freq\n");
 		} catch (IOException ex) {
 		}
 	}
@@ -269,7 +268,6 @@ public class SocialNetworkStatistics {
 	}
 
 	private void makeDegreeHistogram(int iteration) {
-		// TODO Auto-generated method stub
 		DoubleArrayList degvals = DegreeDistributions.getDegreeValues(this.g
 				.getVertices());
 		int maxval = max(degvals);
@@ -280,14 +278,12 @@ public class SocialNetworkStatistics {
 	}
 
 	private int max(DoubleArrayList degvals) {
-		// TODO Auto-generated method stub
 		degvals.quickSort();
 		System.out.println("   max degree " + degvals.get(degvals.size() - 1));
 		return (int) degvals.get(degvals.size() - 1);
 	}
 
 	private double getGraphAvgDeg(Graph g) {
-		// TODO Auto-generated method stub
 		return 2. * g.numEdges() / g.numVertices();
 	}
 
@@ -305,7 +301,7 @@ public class SocialNetworkStatistics {
 
 		Set vertices = this.g.getVertices();
 		Iterator ivert = vertices.iterator();
-		String planTypeString;
+		StringBuilder planTypeString;
 		while (ivert.hasNext()) {
 
 			Vertex myVert = (Vertex) ivert.next();
@@ -326,11 +322,11 @@ public class SocialNetworkStatistics {
 			Plan thisPlan = myPerson.getSelectedPlan();
 			Plan.Type planType = thisPlan.getType();
 			if ((planType == null) || (planType == Plan.Type.UNDEFINED)) {
-				planTypeString = new String();
-				Iterator a_it = thisPlan.getIteratorAct();
+				planTypeString = new StringBuilder();
+				ActIterator a_it = thisPlan.getIteratorAct();
 				while (a_it.hasNext()) {
 					Act nextAct = (Act) a_it.next();
-						planTypeString = planTypeString + nextAct.getType().charAt(0);
+						planTypeString.append(nextAct.getType().charAt(0));
 				}
 				// 10.03.07 JH If Plan.getType() is to be called in social nets in the future, for example
 //				to compare some statistics across plan types, remove this comment. However this
@@ -340,7 +336,7 @@ public class SocialNetworkStatistics {
 //				thisPlan.setType(planType);
 			}
 			else {
-				planTypeString = planType.toString();
+				planTypeString = new StringBuilder(planType.toString());
 			}
 			// Agent's degree
 			int deg = myVert.degree();
@@ -359,7 +355,7 @@ public class SocialNetworkStatistics {
 			// }
 			try {
 				aout.write(iter + " " + id + " " + homeId + " " + deg + " " + aSd1
-						+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString
+						+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
 						+ " " + myPerson.getKnowledge().map.getNumKnownFacilities());
 				aout.newLine();
 			} catch (IOException e) {
@@ -419,9 +415,9 @@ public class SocialNetworkStatistics {
 		Collection<Person> personList = plans.getPersons().values();
 		Vertex v;
 		Edge e;
-		Iterator iperson = personList.iterator();
+		Iterator<Person> iperson = personList.iterator();
 		while (iperson.hasNext()) {
-			Person p = (Person) iperson.next();
+			Person p = iperson.next();
 			if (snet.UNDIRECTED) {
 				v = new UndirectedSparseVertex();
 			}
@@ -434,9 +430,9 @@ public class SocialNetworkStatistics {
 			// Add the vertex to the graph
 			g.addVertex(v);
 		}
-		Iterator ilinks = snet.getLinks().iterator();
+		Iterator<SocialNetEdge> ilinks = snet.getLinks().iterator();
 		while (ilinks.hasNext()) {
-			SocialNetEdge myLink = (SocialNetEdge) ilinks.next();
+			SocialNetEdge myLink = ilinks.next();
 			Vertex egoVertex = this.verticesPersons.get(myLink.getPersonFrom()
 					.getId());
 			Vertex alterVertex = this.verticesPersons.get(myLink.getPersonTo()
