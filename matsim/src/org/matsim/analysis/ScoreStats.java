@@ -228,6 +228,6 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	 * @return the history of scores in last iterations
 	 */
 	public double[][] getHistory() {
-		return this.history;
+		return this.history.clone();
 	}
 }

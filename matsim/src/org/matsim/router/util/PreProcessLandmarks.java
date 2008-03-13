@@ -144,11 +144,6 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		}
 	}
 
-	/**
-	 * @param landmarkIndex
-	 * @param nodes
-	 * @param outlinks
-	 */
 	private void expandLinks(final int landmarkIndex, final PriorityQueue<Node> nodes,
 			final Collection<? extends Link> links, final double travTime, final boolean expandFromLandmark) {
 		LandmarksRole role;
@@ -179,8 +174,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	}
 
 	public Node[] getLandmarks() {
-
-		return this.landmarks;
+		return this.landmarks.clone();
 	}
 
 	@Override
@@ -281,11 +275,11 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 
 			if (c1 < c2) {
 				return -1;
-			} else if (c1 == c2) {
-				return n1.compareTo(n2);
-			} else {
+			}
+			if (c1 > c2) {
 				return +1;
 			}
+			return n1.compareTo(n2);
 		}
 	}
 
