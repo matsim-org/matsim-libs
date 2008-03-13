@@ -30,7 +30,7 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 
 	static final double B1_CONST = +2.8347054e+000;		
 	static final double B1_DIST_TOUR = -2.3377491e-001;
-	static final double B2_CONST = +1.1253337e+000;
+	static final double B2_CONST = +1.1253337e+000;//prova
 	static final double B2_DIST_TOUR = -1.547889e-001;		
 	static final double B3_CONST = -1.6728674e-001;
 	static final double B3_CAR_ALWAYS = +2.3961644e+000;
