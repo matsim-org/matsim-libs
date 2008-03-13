@@ -19,8 +19,6 @@ public class OTFAbortGoto extends Thread  {
 		this.toTime = toTime;
 		this.host = host;
 	}
-		
-
 
 	@Override
 	public void run() {
@@ -32,7 +30,7 @@ public class OTFAbortGoto extends Thread  {
 			e1.printStackTrace();
 		}
 		progressMonitor = new ProgressMonitor(null,
-                "Running Simulation forward to " + Time.strFromSec(toTime),
+                "Running Simulation forward to " + Time.writeTime(toTime),
                 "hat", actTime, toTime);
 
 		while (!terminate) {
@@ -40,7 +38,7 @@ public class OTFAbortGoto extends Thread  {
 				sleep(500);
 
 				actTime = host.getLocalTime();
-				String message = String.format("Completed to Time: "+ Time.strFromSec(actTime));
+				String message = String.format("Completed to Time: "+ Time.writeTime(actTime));
 				progressMonitor.setNote(message);
 				progressMonitor.setProgress(actTime);
 				if ( actTime >= toTime || progressMonitor.isCanceled()) terminate = true;
@@ -55,7 +53,4 @@ public class OTFAbortGoto extends Thread  {
 		progressMonitor.close();
 	}
 
-
 }
-
-
