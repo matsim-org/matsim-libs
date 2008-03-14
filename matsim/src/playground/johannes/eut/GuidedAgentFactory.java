@@ -91,7 +91,7 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	}
 
 	public void reset() {
-		random = new Random(1);
+		random = new Random(10);
 	}
 
 }

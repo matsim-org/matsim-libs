@@ -63,7 +63,11 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 	
 	private Map<Person, Double> ceMap;
 	
-	private List<Double> samples;
+	private Map<Person, Double> expTTMap;
+	
+	private List<Double> samplesCE;
+	
+	private List<Double> samplesExpTT;
 	
 	private BufferedWriter writer;
 	
@@ -82,48 +86,62 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 		
 			Plan plan = p.getSelectedPlan();
 			double cesum = 0;
+			double expTTSum = 0;
 			int tripcounts = 0;
 			for(Iterator it = plan.getIteratorLeg(); it.hasNext();) {
 				tripcounts++;
 				Leg leg = ((Leg)it.next());
 				Route route = leg.getRoute();
 				double totaltravelcosts = 0;
+				double totaltraveltime = 0;
 				
 				for (TravelTimeI traveltimes : ttKnowledge.getTravelTimes()) {
 					double traveltime = calcTravTime(traveltimes, route, leg.getDepTime());
+					totaltraveltime += traveltime;
 					double travelcosts = utilFunc.evaluate(traveltime);
 					totaltravelcosts += travelcosts;
 				}
 
 				double avrcosts = totaltravelcosts
 						/ (double) ttKnowledge.getTravelTimes().size();
-
+				double avttime = totaltraveltime/ (double) ttKnowledge.getTravelTimes().size();
+				
 				cesum += utilFunc.getTravelTime(avrcosts);
+				expTTSum += avttime;
 			}
 			
 			double ceavr = cesum/(double)tripcounts;
 			ceMap.put(p, ceavr);
+			
+			expTTMap.put(p, expTTSum/(double)tripcounts);
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		/*
 		 * Get the experienced trip duration from the tripstats
 		 */
-		double benefitsum = 0;
+		double benefitsumExpTT = 0;
+		double benefitsumCE = 0;
 		for(Person p : ceMap.keySet()) {
 			Double triptime = tripStats.getTripDurations().get(p);
 			if (triptime != null) { // unfortunately this can happen -> withinday bug
 				double ce = ceMap.get(p);
-				double benefit = ce - triptime;
-				benefitsum += benefit;
-				samples.add(benefit);
+				double expTT = expTTMap.get(p);
+				double benefitCE = ce - triptime + 72; //TODO f***ing node based routes!!!
+				double benefitExpTT = ce - expTT;
+				benefitsumCE += benefitCE;
+				benefitsumExpTT += benefitExpTT;
+				samplesCE.add(benefitCE);
+				samplesExpTT.add(benefitExpTT);
 			}
 		}
 
 		try {
 			writer.write(String.valueOf(event.getIteration()));
 			writer.write("\t");
-			writer.write(String.valueOf(benefitsum/(double)ceMap.size()));
+			writer.write(String.valueOf(benefitsumCE/(double)ceMap.size()));
+			writer.write("\t");
+			writer.write(String.valueOf(benefitsumExpTT/(double)expTTMap.size()));
 			writer.newLine();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -133,10 +151,15 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 	public void notifyShutdown(ShutdownEvent event) {
 		try {
 			writer.write("avr\t");
-			double sum = 0;
-			for(Double d : samples)
-				sum += d;
-			writer.write(String.valueOf(sum/(double)samples.size()));
+			double sumCE = 0;
+			double sumExpTT = 0;
+			for(Double d : samplesCE)
+				sumCE += d;
+			for(Double d : samplesExpTT)
+				sumExpTT += d;
+			writer.write(String.valueOf(sumCE/(double)samplesCE.size()));
+			writer.write("\t");
+			writer.write(String.valueOf(sumExpTT/(double)samplesExpTT.size()));
 			writer.newLine();
 			writer.close();
 		} catch (Exception e) {
@@ -156,18 +179,20 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		ceMap = new HashMap<Person, Double>();
+		expTTMap = new HashMap<Person, Double>();
 	}
 
 	public void notifyStartup(StartupEvent event) {
 		try {
 			writer = IOUtils.getBufferedWriter(Controler.getOutputFilename("benefits.txt"));
-			writer.write("Iteration\tbenefits");
+			writer.write("Iteration\tbenefitsCE\tbenefitsExpTT");
 			writer.newLine();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		samples = new LinkedList<Double>();
+		samplesCE = new LinkedList<Double>();
+		samplesExpTT = new LinkedList<Double>();
 	}
 
 }

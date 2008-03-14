@@ -76,6 +76,7 @@ public class EUTRouter implements LeastCostPathCalculator {
 		Route indiffRoute = null;
 		double leastcost = Double.MAX_VALUE;
 		double leasttime = Double.MAX_VALUE;
+		double avrtime = 0;
 //		/*
 //		 * We can expect the first route in the list to be the real best path.
 //		 */
@@ -99,7 +100,7 @@ public class EUTRouter implements LeastCostPathCalculator {
 				bestRoute = route;
 			}
 			
-			double avrtime = totalTravelTime/(double) ttKnowledge.getTravelTimes().size();
+			avrtime = totalTravelTime/(double) ttKnowledge.getTravelTimes().size();
 			
 			if(avrtime < leasttime) {
 				leasttime = avrtime;
