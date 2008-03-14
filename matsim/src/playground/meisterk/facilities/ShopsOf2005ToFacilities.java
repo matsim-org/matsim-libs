@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ProcessPickPayOpenTimes.java
+ * ShopsOf2005ToFacilities.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,11 +21,25 @@
 package playground.meisterk.facilities;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+
 import org.apache.commons.io.FileUtils;
+import org.matsim.basic.v01.Id;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Feature;
 import org.matsim.utils.vis.kml.Folder;
@@ -35,6 +49,15 @@ import org.matsim.utils.vis.kml.KML;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.kml.Placemark;
 import org.matsim.utils.vis.kml.Style;
+
+import com.google.earth.kml._2.AbstractContainerType;
+import com.google.earth.kml._2.AbstractFeatureType;
+import com.google.earth.kml._2.AbstractGeometryType;
+import com.google.earth.kml._2.DocumentType;
+import com.google.earth.kml._2.FolderType;
+import com.google.earth.kml._2.KmlType;
+import com.google.earth.kml._2.PlacemarkType;
+import com.google.earth.kml._2.PointType;
 
 /**
  * In April 2005, I collected information on shop facilities of the major
@@ -57,7 +80,7 @@ public class ShopsOf2005ToFacilities {
 	private static final String SANDBOX_NAME = "sandbox00";
 	private static final String SHOPS_CVS_MODULE = "ivt/studies/switzerland/facilities/shopsOf2005";
 	private static final String SHOPS_PATH = HOME_DIR + FILE_SEPARATOR + SANDBOX_NAME + FILE_SEPARATOR + SHOPS_CVS_MODULE + FILE_SEPARATOR;
-	
+
 	private static String pickPayOpenTimesFilename = SHOPS_PATH + "pickpay_opentimes.txt";
 	private static String pickPayAdressesFilename = SHOPS_PATH + "pickpay_addresses.csv";
 	private static String coopZHFilename = SHOPS_PATH + "coop-zh.csv";
@@ -69,7 +92,7 @@ public class ShopsOf2005ToFacilities {
 	private static KML myKML = null;
 	private static Document myKMLDocument = null;
 	private static Folder mainKMLFolder = null;
-	
+
 	private static String kmlFilename = "output" + FILE_SEPARATOR + "shopsOf2005.kmz";
 
 	private static Style coopStyle = null;
@@ -99,7 +122,7 @@ public class ShopsOf2005ToFacilities {
 	private static void setupStyles() {
 
 		System.out.print("Setting up KML styles...");
-		
+
 		coopStyle = new Style("coopStyle");
 		myKMLDocument.addStyle(coopStyle);
 		coopStyle.setIconStyle(
@@ -121,11 +144,11 @@ public class ShopsOf2005ToFacilities {
 				new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/D.png")));
 
 		System.out.println("done.");
-		
+
 	}
 
 	private static void dennerTGZHAddressesToKML() {
-		
+
 		System.out.print("Setting up Denner shops...");
 
 		Folder aFolder = null;
@@ -143,7 +166,7 @@ public class ShopsOf2005ToFacilities {
 				Feature.DEFAULT_TIME_PRIMITIVE);
 
 		mainKMLFolder.addFeature(aFolder);	
-		
+
 		List<String> lines = null;
 		String[] tokens = null;
 
@@ -154,7 +177,7 @@ public class ShopsOf2005ToFacilities {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	
+
 		// Java regex has to match ENTIRE string rather than "quick match" in most libraries
 		// for a discussion see
 		// http://www.regular-expressions.info/java.html
@@ -163,11 +186,11 @@ public class ShopsOf2005ToFacilities {
 		String city = null;
 		String street = null;
 		String id = null;
-		
+
 		for (String line : lines) {
 
 			if (nextLineIsTheAddressLine) {
-				
+
 				nextLineIsTheAddressLine = false;
 
 				//System.out.println(line);
@@ -192,32 +215,32 @@ public class ShopsOf2005ToFacilities {
 			if (Pattern.matches(beginsWith3Digits, line)) {
 
 				nextLineIsTheAddressLine = true;
-				
+
 				//System.out.println(line);
 				tokens = line.split(FIELD_DELIM);
 				id = tokens[0];
 				city = tokens[9];
 
 			}
-			
+
 		}
 
 		System.out.println("done.");
 
 	}	
-	
+
 	private static String buildDennerId(String city, String street) {
 		return "Denner_" + city + "_" + street;
 	}
-	
+
 	private static String buildDennerDescription(String city, String street) {
 		return "Denner " + city + " " + street;
 	}
-	
+
 	private static String buildAddress(String street, String postcode, String city) {
 		return street + ", " + postcode + " " + city + ", Schweiz";
 	}
-	
+
 	private static void coopZHAddressesToKML() {
 
 		System.out.print("Setting up Coop Züri shops...");
@@ -259,7 +282,7 @@ public class ShopsOf2005ToFacilities {
 			if (tokens[0].equals("OB")) {
 				continue;
 			}
-			
+
 			VSTTyp = tokens[7];
 			if (
 					VSTTyp.equals("CC") || 
@@ -283,7 +306,7 @@ public class ShopsOf2005ToFacilities {
 			}
 
 		}
-		
+
 		System.out.println("done.");
 
 	}
@@ -291,17 +314,17 @@ public class ShopsOf2005ToFacilities {
 	private static String buildCoopZHId(String[] tokens) {
 		String VSTTyp = tokens[7];
 		String name = tokens[8];
-		
+
 		return "coop_" + VSTTyp + "_" + name;
 	}
-	
+
 	private static String buildCoopZHDescription(String[] tokens) {
 		String VSTTyp = tokens[7];
 		String name = tokens[8];
-		
+
 		return "Coop " + VSTTyp + " " + name;
 	}
-	
+
 	private static void coopTGAddressesToKML() {
 
 		System.out.print("Setting up Coop Thurgau shops...");
@@ -342,7 +365,7 @@ public class ShopsOf2005ToFacilities {
 			if (tokens[0].equals("Verkaufsstelle")) {
 				continue;
 			}
-			
+
 			aCoop = new Placemark(
 					buildCoopTGId(tokens),
 					buildCoopTGId(tokens),
@@ -357,24 +380,24 @@ public class ShopsOf2005ToFacilities {
 			coopFolder.addFeature(aCoop);
 
 		}
-		
+
 		System.out.println("done.");
 
 	}
 
 	private static String buildCoopTGId(String[] tokens) {
 		String name = tokens[0];
-		
+
 		return "coop_" + name;
 	}
-	
+
 	private static String buildCoopTGDescription(String[] tokens) {
 		String name = tokens[0];
-		
+
 		return "Coop " + name;
 	}
-	
-	
+
+
 	private static void pickPayAddressesToKML() {
 
 		Folder pickpayFolder = null;
@@ -413,7 +436,7 @@ public class ShopsOf2005ToFacilities {
 			if (tokens[0].equals("Filialnummer")) {
 				continue;
 			}
-			
+
 			aPickpay = new Placemark(
 					buildPickpayId(tokens),
 					buildPickpayId(tokens),
@@ -435,18 +458,18 @@ public class ShopsOf2005ToFacilities {
 
 	private static String buildPickpayId(String[] tokens) {
 		String number = tokens[0];
-		
+
 		return "pickpay_" + number;
 	}
-	
+
 	private static String buildPickpayDescription(String[] tokens) {
 		String name = tokens[1];
-		
+
 		return "Pickpay " + name;
 	}
-	
+
 	private static void migrosZHAdressesToKML() {
-		
+
 		System.out.print("Setting up Migros ZH shops...");
 
 		Folder migrosZHFolder = null;
@@ -485,7 +508,7 @@ public class ShopsOf2005ToFacilities {
 			if (tokens[0].equals("KST")) {
 				continue;
 			}
-			
+
 			aMigrosZH = new Placemark(
 					buildMigrosZHId(tokens),
 					buildMigrosZHId(tokens),
@@ -504,21 +527,21 @@ public class ShopsOf2005ToFacilities {
 		System.out.println("done.");
 
 	}
-	
+
 	private static String buildMigrosZHId(String[] tokens) {
 		String name = tokens[1];
-		
+
 		return "migrosZH_" + name;
 	}
-	
+
 	private static String buildMigrosZHDescription(String[] tokens) {
 		String name = tokens[1];
-		
+
 		return "Migros (ZH) " + name;
 	}
-	
+
 	private static void migrosOstschweizAdressesToKML() {
-		
+
 		System.out.print("Setting up Migros Ostschweiz shops...");
 
 		Folder migrosOstschweizFolder = null;
@@ -557,7 +580,7 @@ public class ShopsOf2005ToFacilities {
 			if (tokens[0].equals("VST-Typ")) {
 				continue;
 			}
-			
+
 			aMigrosOstschweiz = new Placemark(
 					buildMigrosOstschweizId(tokens),
 					buildMigrosOstschweizId(tokens),
@@ -575,21 +598,21 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("done.");
 
-		
+
 	}
 
 	private static String buildMigrosOstschweizId(String[] tokens) {
 		String name = tokens[1].trim();
-		
+
 		return "migrosOstschweiz_" + name;
 	}
-	
+
 	private static String buildMigrosOstschweizDescription(String[] tokens) {
 		String name = tokens[1].trim();
-		
+
 		return "Migros (Ostschweiz) " + name;
 	}
-	
+
 	private static void readPickPayOpenTimes() {
 
 		boolean nextLineIsACloseLine = false;
@@ -658,7 +681,7 @@ public class ShopsOf2005ToFacilities {
 	}
 
 	private static void prepareRawDataForGeocoding() {
-		
+
 
 		ShopsOf2005ToFacilities.setUp();
 		ShopsOf2005ToFacilities.setupStyles();
@@ -669,16 +692,97 @@ public class ShopsOf2005ToFacilities {
 		ShopsOf2005ToFacilities.migrosZHAdressesToKML();
 		ShopsOf2005ToFacilities.migrosOstschweizAdressesToKML();
 		ShopsOf2005ToFacilities.write();		
-		
+
 	}
-	
+
+	private static void transformGeocodedKMLToFacilities() {
+
+		
+		
+		Facilities shopsOf2005 = new Facilities("shopsOf2005");
+
+		try {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
+			Unmarshaller unMarshaller = jaxbContext.createUnmarshaller();
+			JAXBElement<KmlType> kmlElement = (JAXBElement<KmlType>) unMarshaller.unmarshal(new FileInputStream("/home/konrad/workspace/MATSim/input/shopsOf2005_geocoded.kml"));
+
+			KmlType kml = kmlElement.getValue();
+			DocumentType document = (DocumentType) kml.getAbstractFeatureGroup().getValue();
+			System.out.println(document.getName());
+
+			// recursively search the KML for placemarks, transform it into a matsim facility 
+			// and place it in the list of facilities or in the quadtree, respectively
+
+			List<JAXBElement<? extends AbstractFeatureType>> featureGroup = document.getAbstractFeatureGroup();
+			Iterator<JAXBElement<? extends AbstractFeatureType>> it = featureGroup.iterator();
+			while (it.hasNext()) {
+				JAXBElement<AbstractFeatureType> feature = (JAXBElement<AbstractFeatureType>) (it.next());
+				if (feature.getValue().getClass().equals(FolderType.class)) {
+					System.out.println("Going into folder...");
+					ShopsOf2005ToFacilities.extractPlacemarks((FolderType) feature.getValue(), shopsOf2005);
+				} else if (feature.getValue().getClass().equals(PlacemarkType.class)) {
+					System.out.println("There is a placemark!");
+				}
+
+			}
+
+			System.out.println("Writing facilities xml file... ");
+			FacilitiesWriter facilities_writer = new FacilitiesWriter(shopsOf2005);
+			facilities_writer.write();
+			System.out.println("Writing facilities xml file...done.");
+
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void extractPlacemarks(FolderType folderType, Facilities facilities) {
+
+		List<JAXBElement<? extends AbstractFeatureType>> featureGroup = folderType.getAbstractFeatureGroup();
+		Iterator it = featureGroup.iterator();
+		while (it.hasNext()) {
+			JAXBElement<AbstractFeatureType> feature = (JAXBElement<AbstractFeatureType>) (it.next());
+			if (feature.getValue().getClass().equals(FolderType.class)) {
+				System.out.println("Going into folder...");
+				ShopsOf2005ToFacilities.extractPlacemarks((FolderType) feature.getValue(), facilities);
+			} else if (feature.getValue().getClass().equals(PlacemarkType.class)) {
+				System.out.println("There is a placemark!");
+
+				PlacemarkType placemark = (PlacemarkType) feature.getValue();
+				JAXBElement<? extends AbstractGeometryType> geometry = placemark.getAbstractGeometryGroup();
+				// only process if coordinates exist
+				if (geometry != null) {
+					PointType point = (PointType) geometry.getValue();
+					String name = placemark.getName();
+
+					// transform coordinates
+					System.out.println(point.getCoordinates().get(0));
+//					CoordI wgs84Coords = new Coord(point.getCoordinates().get(0), point.getCoordinates().get(1));
+//					WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
+//					CoordI ch1903Coordinates = trafo.transform(wgs84Coords);
+
+//					// create facility
+//					facilities.createFacility(new Id(name), ch1903Coordinates);
+				}
+			}
+
+		}
+
+	}
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 
-		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
-
+//		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
+		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
 //		ShopsOf2005ToFacilities.readPickPayOpenTimes();
 
 	}
