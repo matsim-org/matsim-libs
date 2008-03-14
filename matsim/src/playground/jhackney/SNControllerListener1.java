@@ -158,12 +158,11 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 			this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
 			this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
 			this.log.info(" ... done");
-
-			if (event.getIteration() == this.controler.getLastIteration()) {
-				if(CALCSTATS){
-					this.log.info("----------Closing social network statistic files and wrapping up ---------------");
-					this.snetstat.closeFiles();
-				}
+		}
+		if (event.getIteration() == this.controler.getLastIteration()) {
+			if(CALCSTATS){
+				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
+				this.snetstat.closeFiles();
 			}
 		}
 	}
@@ -173,7 +172,7 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 
 		/* code previously in setupIteration() */
 //		int snIter = event.getIteration();
-		
+
 		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
 //			if( event.getIteration()%replan_interval==0){
 
