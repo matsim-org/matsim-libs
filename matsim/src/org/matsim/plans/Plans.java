@@ -21,6 +21,7 @@
 package org.matsim.plans;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -43,7 +44,7 @@ import org.matsim.world.Layer;
  *   (i.e. PlansHandlerImplXXX to PopulationHandlerImplXXX, and so on).
  *   Therefore everybody must agree with that!
  */
-public class Plans extends BasicPopulation<Person> {
+public class Plans extends BasicPopulation<Person> implements Iterable<Person> {
 
 	public static final boolean USE_STREAMING = true;
 	public static final boolean NO_STREAMING = false;
@@ -258,6 +259,10 @@ public class Plans extends BasicPopulation<Person> {
 
 	public void printPlansCount() {
 		log.info(" person # " + this.counter);
+	}
+
+	public Iterator<Person> iterator() {
+		return this.persons.values().iterator();
 	}
 
 }
