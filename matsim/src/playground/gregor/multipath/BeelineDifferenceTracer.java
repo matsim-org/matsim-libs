@@ -42,7 +42,7 @@ public class BeelineDifferenceTracer {
 	
 	private final double TRACE_WEIGHT;
 	
-	private double crit =  0.7660431281249999;
+	private double crit = 0.99;
 	private final double coef = 0.95;
 	
 	public BeelineDifferenceTracer(Coord orig, Coord dest){
@@ -134,6 +134,7 @@ public class BeelineDifferenceTracer {
 	}
 
 		
+	
 	//debug
 	public static void main(String [] args){
 		Coord A = new Coord(0,0);
