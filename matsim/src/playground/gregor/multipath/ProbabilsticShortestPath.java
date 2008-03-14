@@ -54,7 +54,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 	/**
 	 * The limit a path could be more expensive then the shortest path
 	 */
-	final static double OUTPRICED_CRITERION = 1.3;
+	final static double OUTPRICED_CRITERION = 3;
 
 	/**
 	 * The network on which we find routes.
@@ -152,29 +152,8 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 
 			initFromNode(fromNode, toNode, startTime, pendingNodes);
 
-			int snapShotSlowDown = 50;
-			int count = 0;
 
 			while (stillSearching) {
-
-				//			//TODO DEBUG
-//				if (count++ >= snapShotSlowDown) {
-//				try {
-//				count = 0;
-//				this.netStateWriter.dump(time++);
-////				if (time > 600){
-////				try {
-////				this.netStateWriter.close();
-////				} catch (IOException e) {
-////				e.printStackTrace();
-////				}
-////				this.netStateWriter = null;
-////				}
-//				} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				}
-//				}
 
 				NodeData outNodeD = pendingNodes.poll();
 
@@ -203,7 +182,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 
 			}
 			
-			if (getData(toNode).getInPaths() >= 50){
+			if (getData(toNode).getInPaths() >= 5){
 				System.out.println("to many routes found:" + getData(toNode).getInPaths() + " decreasing sim crit ..." );
 				
 				this.tracer.decreaseCrit();
@@ -426,8 +405,9 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 		if (travelCost + currCost < nCost) {
 
 			//TODO DEBUG ... make revisit node void ...
-			if(revisitNode(toNodeData, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, fromNodeData,trace)) {
+//			if(revisitNode(toNodeData, pendingNodes, currTime + travelTime, currCost
+//					+ travelCost, fromNodeData,trace)) {
+			if (trackPath(toNodeData, pendingNodes, currTime + travelTime, currCost + travelCost, fromNodeData, trace, travelCost)){
 
 				//TODO DEBUG
 				if (debug) {
