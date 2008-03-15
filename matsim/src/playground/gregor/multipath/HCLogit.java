@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -56,7 +57,7 @@ import playground.gregor.vis.LinkPainter;
  *
  */
 public class HCLogit implements LeastCostPathCalculator {
-
+	private final static Logger log = Logger.getLogger(HCLogit.class);
 	/**
 	 * The limit a path could be more expensive then the shortest path
 	 */
@@ -175,8 +176,7 @@ public class HCLogit implements LeastCostPathCalculator {
 			
 
 			if (outNodeD == null) {
-				Gbl.warningMsg(this.getClass(), "calcLeastCostPath()",
-						"No route was found from node " + fromNode.getId()
+				log.warn("No route was found from node " + fromNode.getId()
 								+ " to node " + toNode.getId());
 				return null;
 			}

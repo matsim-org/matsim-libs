@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -49,6 +49,8 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 	double avgTravelTime = 0;
 	int routeCnt = 0;
 
+	private final static Logger log = Logger.getLogger(NetworkDijkstra.class);
+	
 	/**
 	 * A constant for the export to GDF (Guess file format) of the route.
 	 */
@@ -95,7 +97,7 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 		while (stillSearching) {
 			Node outNode = pendingNodes.poll();
 			if (outNode == null) {
-			Gbl.warningMsg(this.getClass(), "calcCheapestRoute_PQ()", "No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + " .");
+			log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + " .");
 				return null;
 			}
 
@@ -177,7 +179,7 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 			Node outNode = pendingNodes.remove(pendingNodes.firstKey());
 			DijkstraRole outRole = getDijkstraRole(outNode);
 			if (outNode == null) {
-				Gbl.warningMsg(this.getClass(), "calcCheapestRoute_MM()", "No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + " .");
+				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + " .");
 				return null;
 			}
 			if (!outRole.isHandled) {

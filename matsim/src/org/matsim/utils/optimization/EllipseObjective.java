@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 
@@ -81,6 +82,8 @@ public class EllipseObjective implements ObjectiveI {
 
 	private ParamPoint[] initPPoints;
 
+	private final static Logger log = Logger.getLogger(EllipseObjective.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
@@ -196,7 +199,7 @@ public class EllipseObjective implements ObjectiveI {
 
 	public final ParamPoint getInitialParamPoint(final int index) {
 		if (index > DIMENSION) {
-			Gbl.warningMsg(this.getClass(), "getInitialParamPoint", "Initial paramPoint " + index + " was requested, but we only have 4 Dimensions. Returning Initial paramPoint 0.");
+			log.warn("Initial paramPoint " + index + " was requested, but we only have 4 Dimensions. Returning initial paramPoint 0.");
 			return this.initPPoints[0];
 		}
 		return this.initPPoints[index];

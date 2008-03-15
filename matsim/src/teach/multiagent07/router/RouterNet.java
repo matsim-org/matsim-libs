@@ -26,7 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 
 import teach.multiagent07.net.CALink;
@@ -35,6 +35,8 @@ import teach.multiagent07.net.CANode;
 
 public class RouterNet extends CANetwork {
 
+	private final static Logger log = Logger.getLogger(RouterNet.class);
+	
 	@Override
 	public CALink newLink(String label) {
 		RouterLink link = new RouterLink(label);
@@ -69,7 +71,7 @@ public class RouterNet extends CANetwork {
 		while (stillSearching) {
 			RouterNode outNode = pendingNodes.poll();
 			if (outNode == null) {
-			Gbl.warningMsg(this.getClass(), "calcCheapestRoute_PQ()", "No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + " .");
+			log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + " .");
 				return null;
 			}
 

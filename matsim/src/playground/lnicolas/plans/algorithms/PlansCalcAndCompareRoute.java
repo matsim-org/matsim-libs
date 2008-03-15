@@ -22,7 +22,7 @@ package playground.lnicolas.plans.algorithms;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
@@ -58,7 +58,8 @@ public class PlansCalcAndCompareRoute extends PersonAlgorithm implements PlanAlg
 
 	private int compareCount = 0;
 
-
+	private final static Logger log = Logger.getLogger(PlansCalcAndCompareRoute.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -81,8 +82,7 @@ public class PlansCalcAndCompareRoute extends PersonAlgorithm implements PlanAlg
 			try {
 				handlePlan(plan);
 			} catch (Exception e) {
-				Gbl.warningMsg(this.getClass(), "run(Person)",
-						"Skipping plan id="+planId + " of person id="
+				log.warn("Skipping plan id="+planId + " of person id="
 						+ person.getId() + " because of: " + e.getMessage());
 				e.printStackTrace();
 			}
@@ -93,8 +93,7 @@ public class PlansCalcAndCompareRoute extends PersonAlgorithm implements PlanAlg
 		try {
 			handlePlan(plan);
 		} catch (Exception e) {
-			Gbl.warningMsg(this.getClass(), "run(Person)",
-					"Skipping plan id=unknown of person id=unknown because of: "
+			log.warn("Skipping plan id=unknown of person id=unknown because of: "
 					+ e.getMessage());
 		}
 	}

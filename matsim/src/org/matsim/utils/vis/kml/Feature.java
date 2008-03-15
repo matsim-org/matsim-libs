@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 
@@ -53,6 +54,8 @@ public abstract class Feature extends Object {
 	public static final boolean DEFAULT_VISIBILITY = true;
 	public static final Region DEFAULT_REGION = null;
 	public static final TimePrimitive DEFAULT_TIME_PRIMITIVE = null;
+	
+	private final static Logger log = Logger.getLogger(Feature.class);
 
 	/**
 	 * Constructs the feature with default values of its attributes.
@@ -204,20 +207,14 @@ public abstract class Feature extends Object {
 	public void addStyle(final Style style) {
 
 		if (this.styles.containsKey(style.getId())) {
-			Gbl.warningMsg(
-					this.getClass(),
-					"addStyle(...)",
-					"A style with the id \"" + style.getId() +
-					"\" already exists. It is replaced by the new one.");
+			log.warn("A style with the id \"" + style.getId() + "\" already exists. It is replaced by the new one.");
 		}
 		this.styles.put(style.getId(), style);
 
 	}
 
 	public boolean containsStyle(final String id) {
-
 		return this.styles.containsKey(id);
-
 	}
 
 	/**

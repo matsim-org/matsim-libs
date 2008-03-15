@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.TreeMap;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
@@ -77,6 +77,8 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 
 	private NetworkLayer network;
 	
+	private final static Logger log = Logger.getLogger(KmlRegionSnapshotWriter.class);
+	
 	/**
 	 * Initializes the main kml document and kmz-file. Writes the MATSim logo and car icon to the file.
 	 * @param filename
@@ -102,7 +104,7 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 			//TODO think about that  and check comments in catch
 			this.writer.addNonKMLFile(MatsimKmlStyleFactory.DEFAULTNODEICONLOCATION, MatsimKmlStyleFactory.DEFAULTNODEICON);
 		} catch (IOException e1) {
-			Gbl.warningMsg(KmlSnapshotWriter.class, "KmlSnapshotWriter(..)", "cannot write car icon to kmz, trying to use icon from http://maps.google.com/mapfiles/kml/pal4/icon15.png");
+			log.warn("Cannot write car icon to kmz, trying to use icon from http://maps.google.com/mapfiles/kml/pal4/icon15.png");
 			icon = new Icon("http://maps.google.com/mapfiles/kml/pal4/icon15.png");
 			e1.printStackTrace();
 		}
@@ -121,15 +123,13 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 			e1.printStackTrace();
 		}
 
-
-
 		//set logo
 		try {
 			MatsimKMLLogo logo;
 			logo = new MatsimKMLLogo(this.writer);
 			this.mainFolder.addFeature(logo);
 		} catch (IOException e) {
-			Gbl.warningMsg(KmlSnapshotWriter.class, "KmlSnapshotWriter(...)", "Cannot read matsim logo file! The logo will not be added to the kmz");
+			log.warn("Cannot read matsim logo file! The logo will not be added to the kmz");
 			e.printStackTrace();
 		}
 
@@ -196,8 +196,5 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 		this.writer.writeMainKml(this.mainKml);
 		this.writer.close();
 	}
-
-
-
 
 }

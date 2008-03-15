@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.facilities.Facilities;
@@ -51,6 +52,8 @@ public class World {
 
 	private final ArrayList<WorldAlgorithm> algorithms = new ArrayList<WorldAlgorithm>();
 
+	private final static Logger log = Logger.getLogger(World.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -274,7 +277,7 @@ public class World {
 			zone1.addDownMapping(zone2);
 			zone2.addUpMapping(zone1);
 		} else {
-			Gbl.warningMsg(this.getClass(), "addMapping(...)", Gbl.getWorld().toString() + "[zone1=" + zone1 + ",zone2=" + zone2 + " mapping rule not found]");
+			log.warn(this.toString() + "[zone1=" + zone1 + ",zone2=" + zone2 + " mapping rule not found]");
 		}
 	}
 
@@ -282,10 +285,10 @@ public class World {
 		Zone down_zone = (Zone)mapping_rule.getDownLayer().getLocation(down_zone_id);
 		Zone up_zone   = (Zone)mapping_rule.getUpLayer().getLocation(up_zone_id);
 		if (down_zone == null) {
-			Gbl.errorMsg(Gbl.getWorld().toString() + "[mapping_rule=" + mapping_rule + ",down_zone_id=" + down_zone_id + " down_zone does not exist]");
+			Gbl.errorMsg(this.toString() + "[mapping_rule=" + mapping_rule + ",down_zone_id=" + down_zone_id + " down_zone does not exist]");
 		}
 		if (up_zone == null) {
-			Gbl.errorMsg(Gbl.getWorld().toString() + "[mapping_rule=" + mapping_rule + ",up_zone_id=" + up_zone_id + " down_zone does not exist]");
+			Gbl.errorMsg(this.toString() + "[mapping_rule=" + mapping_rule + ",up_zone_id=" + up_zone_id + " down_zone does not exist]");
 		}
 		down_zone.addUpMapping(up_zone);
 		up_zone.addDownMapping(down_zone);

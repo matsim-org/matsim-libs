@@ -27,8 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -37,12 +36,10 @@ import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.routervis.RouterNetStateWriter;
 import org.matsim.utils.vis.routervis.VisLeastCostPathCalculator;
 
 import playground.gregor.multipath.bckp.NodeData.ComparatorNodeData;
-import playground.gregor.vis.LinkPainter;
 
 /**
  * @author laemmel
@@ -50,7 +47,7 @@ import playground.gregor.vis.LinkPainter;
  */
 public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLeastCostPathCalculator{
 
-
+	private final static Logger log = Logger.getLogger(ProbabilsticShortestPath.class);
 	/**
 	 * The limit a path could be more expensive then the shortest path
 	 */
@@ -185,8 +182,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 					if (foundRoute){
 						break;
 					}
-					Gbl.warningMsg(this.getClass(), "calcLeastCostPath()",
-							"No route was found from node " + fromNode.getId()
+					log.warn("No route was found from node " + fromNode.getId()
 							+ " to node " + toNode.getId());
 					return null;
 				}

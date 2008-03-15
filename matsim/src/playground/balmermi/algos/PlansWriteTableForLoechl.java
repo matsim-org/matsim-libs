@@ -48,7 +48,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -64,6 +64,8 @@ public class PlansWriteTableForLoechl extends PersonAlgorithm implements PlanAlg
 
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
+	
+	private final static Logger log = Logger.getLogger(PlansWriteTableForLoechl.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -118,7 +120,7 @@ public class PlansWriteTableForLoechl extends PersonAlgorithm implements PlanAlg
 			try {
 				handlePlan(plan);
 			} catch (Exception e) {
-				Gbl.warningMsg(this.getClass(), "run(Person)", "Skipping plan id="+planId + " of person id=" + person.getId() + " because of: " + e.getMessage());
+				log.warn("Skipping plan id="+planId + " of person id=" + person.getId() + " because of: " + e.getMessage());
 			}
 		}
 	}
@@ -127,7 +129,7 @@ public class PlansWriteTableForLoechl extends PersonAlgorithm implements PlanAlg
 		try {
 			handlePlan(plan);
 		} catch (Exception e) {
-			Gbl.warningMsg(this.getClass(), "run(Person)", "Skipping plan id=unknown of person id=unknown because of: " + e.getMessage());
+			log.warn("Skipping plan id=unknown of person id=unknown because of: " + e.getMessage());
 		}
 	}
 

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
@@ -40,11 +41,11 @@ import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-import Jama.Matrix;
-
 public class PrimlocDriver  extends PlansAlgorithm {
 
 	final static String module_name = "primary location choice";
+	
+	private final static Logger log = Logger.getLogger(PrimlocDriver.class);
 
 	PrimlocEngine core = new PrimlocEngine();
 	Zone[] zones;
@@ -77,7 +78,7 @@ public class PrimlocDriver  extends PlansAlgorithm {
 			Facility facility = actfac.getFacilities().get(actfac.getFacilities().firstKey());
 			Zone homezone = (Zone) zonelayer.getNearestLocations( facility.getLocation().getCenter(), null).get(0);
 			if( homezone == null )
-				Gbl.warningMsg( this.getClass(), "setup", "Homeless employed person (poor guy)" );
+				log.warn("Homeless employed person (poor guy)" );
 			else{
 				int homeZoneID = zoneids.get(homezone);
 				double epsilon = Math.random();
@@ -142,7 +143,7 @@ public class PrimlocDriver  extends PlansAlgorithm {
 		// Fetch parameters from the config file
 		Double mu = Double.parseDouble( cfg.getParam(module_name, "mu") );
 		if( cfg.getParam( module_name, "calibration matrix" ) != null ){
-			Gbl.warningMsg( getClass(), "getZonesAndParams", "Matrix importation unsupported - calibration matrix ignored");
+			log.warn("Matrix importation unsupported - calibration matrix ignored");
 			// core.calibration = true
 		}
 
@@ -209,7 +210,7 @@ public class PrimlocDriver  extends PlansAlgorithm {
 			ArrayList<Location> list = zonelayer.getNearestLocations( facility.getLocation().getCenter(), null);
 			Zone homezone = (Zone) list.get(0);
 			if( homezone == null )
-				Gbl.warningMsg( this.getClass(), "setup", "Homeless employed person (poor guy)" );
+				log.warn("Homeless employed person (poor guy)" );
 			else
 				core.P[ zoneids.get(homezone) ]++;
 		}

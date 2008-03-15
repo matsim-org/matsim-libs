@@ -23,6 +23,7 @@ package org.matsim.world.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -41,6 +42,8 @@ public class WorldBottom2TopCompletion extends WorldAlgorithm {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private final static Logger log = Logger.getLogger(WorldBottom2TopCompletion.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -67,7 +70,7 @@ public class WorldBottom2TopCompletion extends WorldAlgorithm {
 	}
 
 	private final boolean completeNetZoneMapping(final MappingRule m) {
-		Gbl.warningMsg(this.getClass(),"completeNetZoneMapping(final MappingRule m)","TODO: No mapping will be created for rule=" + m);
+		log.warn("[completeNetZoneMapping()] TODO: No mapping will be created for rule=" + m);
 		return true;
 	}
 
@@ -87,7 +90,7 @@ public class WorldBottom2TopCompletion extends WorldAlgorithm {
 				}
 			}
 			if(zones.isEmpty()){
-				Gbl.warningMsg(this.getClass(),"completeFacZoneMapping "," No Zone found for "+ down_f);
+				log.warn("[completeFacZoneMapping()] No Zone found for "+ down_f);
 			}
 			else {
 				Zone zone = zones.get(Gbl.random.nextInt(zones.size()));
@@ -134,13 +137,13 @@ public class WorldBottom2TopCompletion extends WorldAlgorithm {
 
 	@Override
 	public void run(World world) {
-		System.out.println("    running " + this.getClass().getName() + " module...");
+		log.info("    running " + this.getClass().getName() + " module...");
 
 		world.complete();
 
 		int nof_layers = world.getLayers().size();
-		if (nof_layers == 0) { System.out.println("      nof_layers=0: Nothing to do."); }
-		else if (nof_layers == 1) { System.out.println("      nof_layers=1: Nothing to do."); }
+		if (nof_layers == 0) { log.info("      nof_layers=0: Nothing to do."); }
+		else if (nof_layers == 1) { log.info("      nof_layers=1: Nothing to do."); }
 		else {
 			Layer l = world.getBottomLayer();
 			while (l.getUpRule() != null) {
@@ -151,6 +154,6 @@ public class WorldBottom2TopCompletion extends WorldAlgorithm {
 			}
 		}
 
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 }

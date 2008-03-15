@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 
@@ -81,6 +82,8 @@ public class CassiniObjective implements ObjectiveI {
 
 	private ParamPoint[] initPPoints;
 
+	private final static Logger log = Logger.getLogger(CassiniObjective.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
@@ -105,8 +108,7 @@ public class CassiniObjective implements ObjectiveI {
 		double a = getBestA(p);
 		double baratio = p.getValue(RATIO_idx);
 		if(baratio < 1) {
-			System.out.println("Ratio b/a is smaller than 1 ...Terminating");
-			System.exit(0);
+			throw new RuntimeException("Ratio b/a is smaller than 1");
 		}
 
 		double b = baratio*a;
@@ -231,7 +233,7 @@ public class CassiniObjective implements ObjectiveI {
 
 	public final ParamPoint getInitialParamPoint(final int index) {
 		if (index > DIMENSION) {
-			Gbl.warningMsg(this.getClass(), "getInitialParamPoint", "Initial paramPoint " + index + " was requested, but we only have 4 Dimensions. Returning Initial paramPoint 0.");
+			log.warn("Initial paramPoint " + index + " was requested, but we only have 4 Dimensions. Returning initial paramPoint 0.");
 			return this.initPPoints[0];
 		}
 

@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.EventActivityEnd;
 import org.matsim.events.EventActivityStart;
-import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.Simulation;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
@@ -46,7 +46,9 @@ public class QVehicle implements Serializable, DrawableAgentI {
 	protected transient QLink currentLink = null;
 	protected transient BasicLeg currentLeg = null;		
 
-	/** return zero based leg number */
+	private final static Logger log = Logger.getLogger(QVehicle.class);
+	
+	/** @return zero based leg number */
 	public int getCurrentLegNumber() {
 		return ((this.nextActivity - 2) / 2);
 	}
@@ -101,8 +103,7 @@ public class QVehicle implements Serializable, DrawableAgentI {
 	public QLink chooseNextLink() {
 		QLink result = findNextLink();
 		if (result == null) {
-			Gbl.warningMsg(this.getClass(), "chooseNextLink(...)", this
-					+ " [no link to next routenode found: routeeindex= " + this.currentNode + " ]");
+			log.warn(this	+ " [no link to next routenode found: routeeindex= " + this.currentNode + " ]");
 		}
 
 		return result;

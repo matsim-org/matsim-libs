@@ -45,6 +45,7 @@ package org.matsim.plans.algorithms;
 
 import java.text.DecimalFormat;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -85,6 +86,8 @@ public class PersonSetActChains extends PersonAlgorithm {
 	private final double [] age65_99_probs  = new double[2];
 
 	private final int [] chain_cnt = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	
+	private final static Logger log = Logger.getLogger(PersonSetActChains.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -186,7 +189,7 @@ public class PersonSetActChains extends PersonAlgorithm {
 		}
 		if (index >= probsum.length) {
 			index = probsum.length - 1;
-			Gbl.warningMsg(this.getClass(),"getChain(...)","[index was running over the end of the array! Doublecheck what was going on]");
+			log.warn("[index was running over the end of the array! Doublecheck what was going on]");
 		}
 
 		return chains[index];
@@ -220,11 +223,7 @@ public class PersonSetActChains extends PersonAlgorithm {
 			group = this.getGroup(this.age65_99_groups,this.age65_99_probs);
 		}
 		else {
-			System.err.println("ERROR: in " + this.getClass().getName() +
-												 " in run(Person person):" +
-												 " the age of person id=" + person.getId() +
-												 " is out of range [0,99]");
-			System.exit(-1);
+			throw new RuntimeException("The age of person id=" + person.getId() + " is out of range [0,99]");
 		}
 
 		String chain = null;
@@ -241,11 +240,7 @@ public class PersonSetActChains extends PersonAlgorithm {
 			chain = this.getChain(this.leis_chains,this.leis_probs);
 		}
 		else {
-			System.err.println("ERROR: in " + this.getClass().getName() +
-												 " in run(Person person):" +
-												 " for some reason the group is wrong (" +
-												 " group=" + group + ")");
-			System.exit(-1);
+			throw new RuntimeException("For some reason the group is wrong (group=" + group + ")");
 		}
 
 		person.getPlans().clear();
@@ -260,8 +255,7 @@ public class PersonSetActChains extends PersonAlgorithm {
 					p.createLeg(Integer.toString(leg_cnt),"car",null,null,null);
 					leg_cnt++;
 				}
-				p.createAct(acttypes[j],"-1","-1",null,"00:00:00",
-										"00:00:00","00:00:00",null);
+				p.createAct(acttypes[j],"-1","-1",null,"00:00:00", "00:00:00", "00:00:00", null);
 			}
 			catch (Exception e) {
 				e.printStackTrace();

@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.TreeMap;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -68,6 +68,8 @@ public class KmlSnapshotWriter implements SnapshotWriterI {
 	private final TreeMap<Double, NetworkLink> timeLinks = new TreeMap<Double, NetworkLink>();
 
 	private double time = Time.UNDEFINED_TIME;
+	
+	private final static Logger log = Logger.getLogger(KmlSnapshotWriter.class);
 
 	public KmlSnapshotWriter(final String filename, final CoordinateTransformationI coordTransform) {
 		this.coordTransform = coordTransform;
@@ -84,7 +86,7 @@ public class KmlSnapshotWriter implements SnapshotWriterI {
 			this.writer.addNonKMLFile("res/car.png", "data/car.png");
 			icon = new Icon("./car.png");
 		} catch (IOException e1) {
-			Gbl.warningMsg(KmlSnapshotWriter.class, "KmlSnapshotWriter(..)", "cannot write car icon to kmz, trying to use icon from http://maps.google.com/mapfiles/kml/pal4/icon15.png");
+			log.warn("Cannot write car icon to kmz, trying to use icon from http://maps.google.com/mapfiles/kml/pal4/icon15.png");
 			icon = new Icon("http://maps.google.com/mapfiles/kml/pal4/icon15.png");
 			e1.printStackTrace();
 		}
@@ -100,7 +102,7 @@ public class KmlSnapshotWriter implements SnapshotWriterI {
 			logo = new MatsimKMLLogo(this.writer);
 			this.mainFolder.addFeature(logo);
 		} catch (IOException e) {
-			Gbl.warningMsg(KmlSnapshotWriter.class, "KmlSnapshotWriter(...)", "Cannot read matsim logo file! The logo will not be added to the kmz");
+			log.warn("Cannot read matsim logo file! The logo will not be added to the kmz");
 			e.printStackTrace();
 		}
 

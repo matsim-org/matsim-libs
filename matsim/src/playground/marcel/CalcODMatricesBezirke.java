@@ -23,11 +23,11 @@ package playground.marcel;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.gbl.Gbl;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
@@ -53,6 +53,8 @@ public class CalcODMatricesBezirke implements EventHandlerAgentArrivalI, EventHa
 	private int maxTime = Integer.MAX_VALUE;
 	public int counter = 0;
 
+	private final static Logger log = Logger.getLogger(CalcODMatricesBezirke.class);
+	
 	public CalcODMatricesBezirke(final NetworkLayer network, final ZoneLayer tvzLayer, final Plans population, final String id) {
 		this.network = network;
 		this.tvzLayer = tvzLayer;
@@ -136,7 +138,7 @@ public class CalcODMatricesBezirke implements EventHandlerAgentArrivalI, EventHa
 					}
 				}
 			}
-			Gbl.warningMsg(this.getClass(), "getLocation", "No tvz-cell found for link " + linkId + " and agent " + agentId);
+			log.warn("No tvz-cell found for link " + linkId + " and agent " + agentId);
 		}
 		// okay, we did not find the cell from the plans, so just get the nearest one.
 		ArrayList<Location> locs = this.tvzLayer.getNearestLocations(link.getCenter(), null);

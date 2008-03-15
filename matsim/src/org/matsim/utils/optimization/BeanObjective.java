@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 
@@ -70,6 +71,8 @@ public class BeanObjective implements ObjectiveI {
 	public static final String B_name = "b";
 	public static final String COVER_name = "cover";
 
+	private final static Logger log = Logger.getLogger(BeanObjective.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -212,7 +215,7 @@ public class BeanObjective implements ObjectiveI {
 
 	public final ParamPoint getInitialParamPoint(final int index) {
 		if (index > DIMENSION) {
-			Gbl.warningMsg(this.getClass(), "getInitialParamPoint", "Initial paramPoint " + index + " was requested, but we only have 4 Dimensions. Returning Initial paramPoint 0.");
+			log.warn("Initial paramPoint " + index + " was requested, but we only have 4 Dimensions. Returning Initial paramPoint 0.");
 			return this.initPPoints[0];
 	  }
 		return this.initPPoints[index];

@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -56,7 +57,7 @@ import playground.gregor.vis.LinkPainter;
 @Deprecated
 public class DCLogit implements LeastCostPathCalculator{
 
-
+	private final static Logger log = Logger.getLogger(DCLogit.class);
 	/**
 	 * The network on which we find routes.
 	 */
@@ -189,8 +190,7 @@ public class DCLogit implements LeastCostPathCalculator{
 			if (!getData(outNode).hasOpenLinks())
 				continue;
 			if (outNode == null) {
-				Gbl.warningMsg(this.getClass(), "calcLeastCostPath()",
-						"No route was found from node " + fromNode.getId()
+				log.warn("No route was found from node " + fromNode.getId()
 								+ " to node " + toNode.getId());
 				return null;
 			}

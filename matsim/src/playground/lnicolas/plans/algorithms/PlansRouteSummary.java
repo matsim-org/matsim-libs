@@ -22,7 +22,7 @@ package playground.lnicolas.plans.algorithms;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -39,6 +39,8 @@ public class PlansRouteSummary extends PersonAlgorithm implements PlanAlgorithmI
 	private Route routeMaxDist = null;
 	private double avgRouteTravTime = 0;
 	private Route routeMaxTravTime = null;
+
+	private final static Logger log = Logger.getLogger(PlansRouteSummary.class);
 	
 	public PlansRouteSummary() {
 		super();
@@ -53,8 +55,7 @@ public class PlansRouteSummary extends PersonAlgorithm implements PlanAlgorithmI
 			try {
 				handlePlan(plan);
 			} catch (Exception e) {
-				Gbl.warningMsg(this.getClass(),
-						"run(Person)", "Skipping plan id="+planId + " of person id="
+				log.warn("Skipping plan id="+planId + " of person id="
 						+ person.getId() + " because of: " + e.getMessage());
 			}
 		}
@@ -64,8 +65,7 @@ public class PlansRouteSummary extends PersonAlgorithm implements PlanAlgorithmI
 		try {
 			handlePlan(plan);
 		} catch (Exception e) {
-			Gbl.warningMsg(this.getClass(), "run(Person)",
-					"Skipping plan id=unknown of person id=unknown because of: "
+			log.warn("Skipping plan id=unknown of person id=unknown because of: "
 					+ e.getMessage());
 		}
 	}

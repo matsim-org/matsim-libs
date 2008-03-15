@@ -23,6 +23,7 @@ package org.matsim.plans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -48,6 +49,8 @@ public class Plan extends BasicPlan {
 
 	private Type type = null;
 
+	private final static Logger log = Logger.getLogger(Plan.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -150,10 +153,10 @@ public class Plan extends BasicPlan {
 	 */
 	public final void removeAct(final int index) {
 		if ((index % 2 != 0) || (index < 0) || (index > this.actsLegs.size()-1)) {
-			Gbl.warningMsg(this.getClass(),"removeAct(...)",this + "[index=" + index +" is wrong. nothing removed]");
+			log.warn(this + "[index=" + index +" is wrong. nothing removed]");
 		}
 		else if (this.actsLegs.size() == 1) {
-			Gbl.warningMsg(this.getClass(),"removeAct(...)",this + "[index=" + index +" only one act. nothing removed]");
+			log.warn(this + "[index=" + index +" only one act. nothing removed]");
 		}
 		else {
 			if (index == 0) {
@@ -189,7 +192,7 @@ public class Plan extends BasicPlan {
 	 */
 	public final void removeLeg(final int index) {
 		if ((index % 2 == 0) || (index < 1) || (index >= this.actsLegs.size()-1)) {
-			Gbl.warningMsg(this.getClass(),"removeLeg(...)",this + "[index=" + index +" is wrong. nothing removed]");
+			log.warn(this + "[index=" + index +" is wrong. nothing removed]");
 		}
 		else {
 			if (index != this.actsLegs.size()-2) {
@@ -387,7 +390,7 @@ public class Plan extends BasicPlan {
 			}
 			return -1;
 		}
-		throw new IllegalArgumentException("Method calls only valid with a Leg or Act instance as parameter!");
+		throw new IllegalArgumentException("Method call only valid with a Leg or Act instance as parameter!");
 	}
 
 	public Act getFirstActivity() {

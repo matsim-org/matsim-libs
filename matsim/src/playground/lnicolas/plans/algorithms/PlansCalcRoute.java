@@ -22,7 +22,7 @@ package playground.lnicolas.plans.algorithms;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
@@ -44,6 +44,8 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 	private final LeastCostPathCalculator ptRouter_m;
 	private final boolean calcMissingOnly_m;
 
+	private final static Logger log = Logger.getLogger(PlansCalcRoute.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -77,8 +79,7 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 			try {
 				handlePlan(plan);
 			} catch (Exception e) {
-				Gbl.warningMsg(this.getClass(), "run(Person)",
-						"Skipping plan id="+planId + " of person id="
+				log.warn("Skipping plan id="+planId + " of person id="
 						+ person.getId() + " because of: " + e.getMessage());
 				e.printStackTrace();
 			}
@@ -89,8 +90,7 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		try {
 			handlePlan(plan);
 		} catch (Exception e) {
-			Gbl.warningMsg(this.getClass(), "run(Person)",
-					"Skipping plan id=unknown of person id=unknown because of: "
+			log.warn("Skipping plan id=unknown of person id=unknown because of: "
 					+ e.getMessage());
 		}
 	}
