@@ -22,7 +22,7 @@ package org.matsim.plans.algorithms;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
@@ -37,13 +37,15 @@ public class PlansCalcTravelDistance extends PersonAlgorithm implements PlanAlgo
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private final static Logger log = Logger.getLogger(PlansCalcTravelDistance.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public PlansCalcTravelDistance() {
 		super();
-		Gbl.noteMsg(this.getClass(),"PlansCalcTravelDistance(...)","This algo does not care about the mode! It calculates the distance including the start link and excluding the target link.");
+		log.info("This algo does not care about the mode! It calculates the distance including the start link and excluding the target link.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -59,7 +61,7 @@ public class PlansCalcTravelDistance extends PersonAlgorithm implements PlanAlgo
 			try {
 				handlePlan(plan);
 			} catch (Exception e) {
-				Gbl.warningMsg(this.getClass(), "run(Person)", "Skipping plan id="+planId + " of person id=" + person.getId() + " because of: " + e.getMessage());
+				log.warn("Skipping plan id="+planId + " of person id=" + person.getId() + " because of: " + e.getMessage());
 			}
 		}
 	}
@@ -68,7 +70,7 @@ public class PlansCalcTravelDistance extends PersonAlgorithm implements PlanAlgo
 		try {
 			handlePlan(plan);
 		} catch (Exception e) {
-			Gbl.warningMsg(this.getClass(), "run(Person)", "Skipping plan id=unknown of person id=unknown because of: " + e.getMessage());
+			log.warn("Skipping plan id=unknown of person id=unknown because of: " + e.getMessage());
 		}
 	}
 

@@ -23,6 +23,7 @@ package playground.fabrice.secondloc.socialnet;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
@@ -32,6 +33,8 @@ public class SocialNetz {
 	
 	LinkedList<SocialNetEdge> links = new LinkedList<SocialNetEdge>();
 	boolean isDirected;
+
+	private final static Logger log = Logger.getLogger(SocialNetz.class);
 	
 	public SocialNetz( Plans plans ) {
 
@@ -48,23 +51,19 @@ public class SocialNetz {
 		String sNAlgorithmName_ = Gbl.getConfig().socnetmodule().getSocNetAlgo();
 
 		if (sNAlgorithmName_.equals("random")) {
-			System.out.println("Setting up the " + sNAlgorithmName_
-					+ " algorithm.");
+			log.info("Setting up the " + sNAlgorithmName_ + " algorithm.");
 			initRandomSocialNetwork(plans);
 			
 		} else if (sNAlgorithmName_.equals("wattssmallworld")) {
-			System.out.println("Setting up the " + sNAlgorithmName_
-					+ " algorithm.");
+			log.info("Setting up the " + sNAlgorithmName_ + " algorithm.");
 			initWattsSocialNetwork(plans);
 			
 		} else if (sNAlgorithmName_.equals("jingirnew")) {
-			System.out.println("Setting up the " + sNAlgorithmName_
-					+ " algorithm.");
+			log.info("Setting up the " + sNAlgorithmName_ + " algorithm.");
 			initJGNSocialNetwork(plans);
 			
 		} else if (sNAlgorithmName_.equals("empty")) {
-			System.out.println("Setting up the " + sNAlgorithmName_
-					+ " algorithm.");
+			log.info("Setting up the " + sNAlgorithmName_ + " algorithm.");
 			initEmptySocialNetwork(plans);
 			
 		} else {
@@ -79,7 +78,7 @@ public class SocialNetz {
 	
 	void initRandomSocialNetwork( Plans plans ){
 		int kbar = Integer.parseInt(Gbl.getConfig().socnetmodule().getSocNetKbar());
-		System.out.println("Links the Persons together in UNDIRECTED Erdos/Renyi random graph. Dorogovtsev and Mendes 2003.");
+		log.info("Links the Persons together in UNDIRECTED Erdos/Renyi random graph. Dorogovtsev and Mendes 2003.");
 		Person[] personList = new Person[1];
 		personList = plans.getPersons().values().toArray( personList );
 		
@@ -93,11 +92,15 @@ public class SocialNetz {
 	}
 	
 	void initWattsSocialNetwork( Plans plans ){
-		Gbl.noteMsg(getClass(), "initWattsSocialNetwork", "Unsupported");
+		log.warn("Unsupported");
+		// may be better:
+//		throw new UnsupportedOperationException();
 	}
 
 	void initJGNSocialNetwork(Plans plans) {
-		Gbl.noteMsg(getClass(), "initJGNSocialNetwork", "Unsupported");
+		log.warn("Unsupported");
+		// may be better:
+//		throw new UnsupportedOperationException();
 	}
 	
 	void initEmptySocialNetwork( Plans plans) {

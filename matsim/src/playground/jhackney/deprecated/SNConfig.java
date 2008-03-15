@@ -23,17 +23,15 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Plans;
-
-import playground.jhackney.interactions.NonSpatialInteractor;
-import playground.jhackney.interactions.SocializingOpportunity;
-import playground.jhackney.interactions.SpatialInteractor;
-import playground.jhackney.interactions.SpatialSocialOpportunityTracker;
-import playground.jhackney.io.PajekWriter1;
-import playground.jhackney.socialnet.SocialNetwork;
-import playground.jhackney.statistics.SocialNetworkStatistics;
+import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
+import org.matsim.socialnetworks.interactions.SocializingOpportunity;
+import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
+import org.matsim.socialnetworks.socialnet.SocialNetwork;
+import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 
 public class SNConfig  {
 
@@ -58,6 +56,8 @@ public class SNConfig  {
 	static HashMap<String,Double> rndEncounterProbs= new HashMap<String,Double>();
 //	New variables for replanning
 	static int replan_interval;
+	
+	private final static Logger log = Logger.getLogger(SNConfig.class);
 
 //	-------------------- end social network variables --------------------//    
 	
@@ -127,8 +127,7 @@ public class SNConfig  {
 		// TODO Auto-generated method stub
 		String patternStr = ",";
 		String[] s;
-		Gbl.noteMsg(SNConfig.class, "getFacTypes",
-		"!!add keyword\"any\" and a new interact method to exchange info of any factility types (compatible with probabilities)");
+		log.info("!!add keyword\"any\" and a new interact method to exchange info of any factility types (compatible with probabilities)");
 		if (longString.equals("all-p")) {
 			s = new String[5];
 			s[0] = "home";

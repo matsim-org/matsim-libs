@@ -39,13 +39,11 @@ import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocializingOpportunity;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
 import org.matsim.socialnetworks.io.PajekWriter;
-import org.matsim.socialnetworks.replanning.SNSecLocRandom;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
@@ -86,7 +84,7 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
 	Collection<SocializingOpportunity> socialPlans=null;
 
-	private final Logger log = Logger.getLogger(SNControllerListener1.class);
+	private static final Logger log = Logger.getLogger(SNControllerListener1.class);
 
 //	Variables for allocating the spatial meetings among different types of activities
 	double fractionS[];
@@ -107,7 +105,7 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 //		if(!(this.controler.getConfig().socnetmodule().getGridSpace().equals(null))){
 //		int gridSpacing = Integer.valueOf(this.controler.getConfig().socnetmodule().getGridSpace());
 //		if(Gbl.getWorld().getLayers().size()>2){
-//		System.out.println("World already contains a zone layer");
+//		log.info("World already contains a zone layer");
 //		new WorldCreateRasterLayer(gridSpacing).run(Gbl.getWorld());
 //		}else{
 //		new WorldCreateRasterLayer2(gridSpacing).run(Gbl.getWorld());
@@ -123,13 +121,13 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 		//loadSocialNetwork();
 		// if (this.config.socialnet().getInputFile() == null) {
-		//this.log.info("Loading initial social network");
+		//log.info("Loading initial social network");
 		// also initializes knowledge.map.egonet
 		//}
 
-		this.log.info(" Initializing agent knowledge about geography ...");
+		log.info(" Initializing agent knowledge about geography ...");
 		initializeKnowledge(this.controler.getPopulation());
-		this.log.info("... done");
+		log.info("... done");
 
 		/* code previously in startup() */
 		snsetup();
@@ -137,31 +135,31 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		/* code previously in finishIteration() */
-		this.log.info("finishIteration ... ");
+		log.info("finishIteration ... ");
 //		snIter = event.getIteration();
 
 		if( event.getIteration()%replan_interval==0){
 			// Removing the social links here rather than before the replanning and assignment lets you use the actual encounters in a social score
-			this.log.info(" Removing social links ...");
+			log.info(" Removing social links ...");
 			this.snet.removeLinks(snIter);
-			this.log.info(" ... done");
+			log.info(" ... done");
 
 //			You could forget activities here, after the replanning and assignment
 
 			if(CALCSTATS){
-				this.log.info(" Calculating and reporting network statistics ...");
+				log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
-				this.log.info(" ... done");
+				log.info(" ... done");
 			}
 
-			this.log.info(" Writing out social network for iteration " + snIter + " ...");
+			log.info(" Writing out social network for iteration " + snIter + " ...");
 			this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
 			this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
-			this.log.info(" ... done");
+			log.info(" ... done");
 		}
 		if (event.getIteration() == this.controler.getLastIteration()) {
 			if(CALCSTATS){
-				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
+				log.info("----------Closing social network statistic files and wrapping up ---------------");
 				this.snetstat.closeFiles();
 			}
 		}
@@ -172,7 +170,7 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 
 		/* code previously in setupIteration() */
 //		int snIter = event.getIteration();
-
+		
 		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
 //			if( event.getIteration()%replan_interval==0){
 
@@ -183,30 +181,30 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 			if (total_spatial_fraction(this.fractionS) > 0) { // only generate the map if spatial meeting is important in this experiment
 
 				//if(Events have just changed or if no events are yet available and if there is an interest in the planned interactions)
-				this.log.info("  Generating planned [Spatial] socializing opportunities ...");
-				this.log.info("   Makes a map of time/place windows for all planned encounters between the agents");
+				log.info("  Generating planned [Spatial] socializing opportunities ...");
+				log.info("   Makes a map of time/place windows for all planned encounters between the agents");
 				this.socialPlans = this.gen2.generate(this.controler.getPopulation());
-				this.log.info("...finished.");
+				log.info("...finished.");
 
 				//}// end if
 
 				// Agents' planned interactions
-				this.log.info("  Agents planned social interactions ...");
-				this.log.info("  Agents' relationships are updated to reflect these interactions! ...");
+				log.info("  Agents planned social interactions ...");
+				log.info("  Agents' relationships are updated to reflect these interactions! ...");
 				this.plansInteractorS.interact(this.socialPlans, this.rndEncounterProbs, snIter);
 
 			}else{
-				this.log.info("     (none)");
+				log.info("     (none)");
 			}
-			this.log.info(" ... Spatial interactions done\n");
+			log.info(" ... Spatial interactions done\n");
 
-			this.log.info(" Non-Spatial interactions ...");
+			log.info(" Non-Spatial interactions ...");
 			for (int ii = 0; ii < this.infoToExchange.length; ii++) {
 				String facTypeNS = this.infoToExchange[ii];
 
 				//	Geographic Knowledge about all types of places is exchanged
 				if (!facTypeNS.equals("none")) {
-					this.log.info("  Geographic Knowledge about all types of places is being exchanged ...");
+					log.info("  Geographic Knowledge about all types of places is being exchanged ...");
 					this.plansInteractorNS.exchangeGeographicKnowledge(facTypeNS, snIter);
 				}
 			}
@@ -214,32 +212,32 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 			// Exchange of knowledge about people
 			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangles());
 			if (fract_intro > 0) {
-				this.log.info("  Knowledge about other people is being exchanged ...");
+				log.info("  Knowledge about other people is being exchanged ...");
 				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
 			}
 
-			this.log.info("  ... done");
+			log.info("  ... done");
 
-			this.log.info(" Forgetting excess activities (locations) OR SHOULD THIS HAPPEN EACH TIME AN ACTIVITY IS LEARNED ...");
-			this.log.info("  Should be an algorithm");
+			log.info(" Forgetting excess activities (locations) OR SHOULD THIS HAPPEN EACH TIME AN ACTIVITY IS LEARNED ...");
+			log.info("  Should be an algorithm");
 			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
 			Iterator<Person> iperson = personList.iterator();
 			while (iperson.hasNext()) {
-				Person p = (Person) iperson.next();
+				Person p = iperson.next();
 				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*1.5);
 				p.getKnowledge().map.manageMemory(max_memory, p.getSelectedPlan());		
 			}
-			this.log.info(" ... done");
+			log.info(" ... done");
 
-			this.log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE. Make this a person algorithm");
+			log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE. Make this a person algorithm");
 			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
 			while (itreplan.hasNext()) {
-				Plan p = (Plan) itreplan.next().getSelectedPlan();
+				Plan p = itreplan.next().getSelectedPlan();
 //				Plan p=itreplan.next().copySelectedPlan();
 				new PersonSNSecLocRandomReRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
-//				System.out.println( "SNControler1 Number of plans for person "+p.getPerson().getId()+" "+p.getPerson().getPlans().size());
+//				log.info( "SNControler1 Number of plans for person "+p.getPerson().getId()+" "+p.getPerson().getPlans().size());
 			}
-			this.log.info(" ... done");
+			log.info(" ... done");
 			snIter++;
 		}
 	}
@@ -287,33 +285,33 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 		this.fractionS = toNumber(rndEncounterProbString);
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
-		this.log.info(" Instantiating the Pajek writer ...");
+		log.info(" Instantiating the Pajek writer ...");
 		this.pjw = new PajekWriter(SOCNET_OUT_DIR, (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
-		this.log.info("... done");
+		log.info("... done");
 
-		this.log.info(" Initializing the social network ...");
+		log.info(" Initializing the social network ...");
 		this.snet = new SocialNetwork(this.controler.getPopulation());
-		this.log.info("... done");
+		log.info("... done");
 
 		if(CALCSTATS){
-			this.log.info(" Calculating the statistics of the initial social network)...");
+			log.info(" Calculating the statistics of the initial social network)...");
 			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
 			this.snetstat.openFiles();
 			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
-			this.log.info(" ... done");
+			log.info(" ... done");
 		}
 
-		this.log.info(" Writing out the initial social network ...");
+		log.info(" Writing out the initial social network ...");
 		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getFirstIteration());
-		this.log.info("... done");
+		log.info("... done");
 
-		this.log.info(" Setting up the NonSpatial interactor ...");
+		log.info(" Setting up the NonSpatial interactor ...");
 		this.plansInteractorNS=new NonSpatialInteractor(this.snet);
-		this.log.info("... done");
+		log.info("... done");
 
-		this.log.info(" Setting up the Spatial interactor ...");
+		log.info(" Setting up the Spatial interactor ...");
 		this.plansInteractorS=new SpatialInteractor(this.snet);
-		this.log.info("... done");
+		log.info("... done");
 
 		this.snIter = this.controler.getFirstIteration();
 	}
@@ -330,8 +328,7 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 	private String[] getFacTypes(final String longString) {
 		String patternStr = ",";
 		String[] s;
-		Gbl.noteMsg(this.getClass(), "getFacTypes",
-		"!!add keyword\"any\" and a new interact method to exchange info of any factility types (compatible with probabilities)");
+		log.info("!!add keyword\"any\" and a new interact method to exchange info of any factility types (compatible with probabilities)");
 		if (longString.equals("all-p")) {
 			s = new String[5];
 			s[0] = "home";
@@ -354,7 +351,7 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 			// if(s[i]!="home"&&s[i]!="work"&&s[i]!="education"&&s[i]!="leisure"&&s[i]!="shop"&&s[i]!="person"&&s[i]!="none"){
 			if (!s[i].equals("home") && !s[i].equals("work") && !s[i].equals("education") && !s[i].equals("leisure")
 					&& !s[i].equals("shop") && !s[i].equals("person") && !s[i].equals("none")) {
-				this.log.info(this.getClass() + ":" + s[i]);
+				log.info(this.getClass() + ":" + s[i]);
 				Gbl.errorMsg("Error on type of info to exchange. Check config file. Use commas with no spaces");
 			}
 		}
@@ -420,7 +417,7 @@ public class SNControllerListener1 implements StartupListener, IterationStartsLi
 //	new File(getSNIterationPath(iteration)).mkdir();
 //	}
 //	private final void makeSNIterationPath(final int iteration, final int snIter) {
-//	this.log.info(getSNIterationPath(iteration, snIter));
+//	log.info(getSNIterationPath(iteration, snIter));
 //	File iterationOutFile= new File(getSNIterationPath(iteration, snIter));
 //	iterationOutFile.mkdir();
 ////	if (!iterationOutFile.mkdir()) {

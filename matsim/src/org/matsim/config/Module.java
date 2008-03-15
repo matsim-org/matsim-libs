@@ -46,7 +46,7 @@ package org.matsim.config;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 
 public class Module {
 
@@ -56,6 +56,8 @@ public class Module {
 
 	private final String name;
 	private final TreeMap<String,String> params;
+	
+	private final static Logger log = Logger.getLogger(Module.class);
 
 	public Module(final String name) {
 		this.name = name;
@@ -64,13 +66,13 @@ public class Module {
 
 	public void addParam(final String param_name, final String value) {
 		if (this.params.containsKey(param_name)) {
-			Gbl.noteMsg(this.getClass(),"addParam(...)",this.toString() + "[param_name=" + param_name + ",old_value=" + this.params.get(param_name) + ",value=" + value + " value replaced]");
+			log.info(this.toString() + "[param_name=" + param_name + ",old_value=" + this.params.get(param_name) + ",value=" + value + " value replaced]");
 		}
 
 		// changing windows path backslashes into unix path slashes
 		String new_value = value.replace('\\','/');
 		if (!new_value.equals(value)) {
-			Gbl.noteMsg(this.getClass(),"addParam(...)",this.toString() + "[value=" + value + ",new_value=" + new_value + " replaced backslashes with slashes]");
+			log.info(this.toString() + "[value=" + value + ",new_value=" + new_value + " replaced backslashes with slashes]");
 		}
 		this.params.put(param_name,new_value);
 	}

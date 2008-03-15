@@ -23,6 +23,7 @@ package org.matsim.plans;
 import java.util.HashMap;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPerson;
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.gbl.Gbl;
@@ -45,6 +46,8 @@ public class Person extends BasicPerson<Plan>{
 	private final TreeSet<String> travelcards = new TreeSet<String>();
 	private Knowledge knowledge = null;
 	private String visualizerData = null;
+	
+	private final static Logger log = Logger.getLogger(Person.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -115,7 +118,7 @@ public class Person extends BasicPerson<Plan>{
 
 	public final void addTravelcard(final String type) {
 		if (this.travelcards.contains(type)) {
-			Gbl.noteMsg(this.getClass(),"createTravelCard(...)",this + "[type=" + type + " already exists]");
+			log.info(this + "[type=" + type + " already exists]");
 		} else {
 			this.travelcards.add(type.intern());
 		}
@@ -264,8 +267,7 @@ public class Person extends BasicPerson<Plan>{
 			this.plans.add(newPlan);
 			this.setSelectedPlan(newPlan);
 		} catch (Exception e) {
-			e.printStackTrace();
-			Gbl.warningMsg(this.getClass(), "copySelectedPlan() of " + this.toString(), "plan# " + i +" went wrong for above reason!");
+			log.warn("plan# " + i +" went wrong:", e);
 			newPlan = oldPlan; // give old plan back??
 		}
 		return newPlan;

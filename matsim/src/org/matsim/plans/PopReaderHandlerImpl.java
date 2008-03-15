@@ -43,6 +43,7 @@
 
 package org.matsim.plans;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.xml.sax.Attributes;
 
@@ -65,6 +66,8 @@ public class PopReaderHandlerImpl	implements PopReaderHandler {
 	// 'official' matsim xml version....
 //	private int local_id = 1000000000;
 
+	private final static Logger log = Logger.getLogger(PopReaderHandlerImpl.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -320,7 +323,7 @@ public class PopReaderHandlerImpl	implements PopReaderHandler {
 
 	public void startIncome(final Attributes meta) {
 		if (this.income_message) {
-			Gbl.noteMsg(this.getClass(),"startIncome(...)","not handled at the moment.");
+			log.info("not handled at the moment.");
 			this.income_message = false;
 		}
 	}

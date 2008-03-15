@@ -20,6 +20,7 @@
 
 package org.matsim.planomat;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 
@@ -55,6 +56,8 @@ public class PlanomatConfig {
 	private static final String PLANOMAT_BE_VERBOSE = "beVerbose";
 	private static boolean beVerbose;
 	
+	private final static Logger log = Logger.getLogger(PlanomatConfig.class);
+	
 	public static void init() {
 		
 		Config config = Gbl.getConfig();
@@ -67,7 +70,7 @@ public class PlanomatConfig {
 		
 		if (PlanomatConfig.optimizationToolboxName.equals(PlanomatConfig.PLANOMAT_OPTIMIZATION_TOOLBOX_JGAP)) {
 			
-			Gbl.noteMsg(PlanomatConfig.class, "init()", "Using JGAP optimization toolbox.");
+			log.info("Using JGAP optimization toolbox.");
 			
 		} else {
 			Gbl.errorMsg(

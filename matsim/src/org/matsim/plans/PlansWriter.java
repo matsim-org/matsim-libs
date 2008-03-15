@@ -23,6 +23,7 @@ package org.matsim.plans;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
@@ -43,6 +44,8 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 
 	private PlansWriterHandler handler = null;
 	private final Plans population;
+	
+	private final static Logger log = Logger.getLogger(PlansWriter.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -152,10 +155,10 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 					while (a_it.hasNext()) {
 						Facility f = a_it.next().getFacility();
 						this.handler.startLocation(f,this.out);
-						// TODO [balmermi] Here, usually capacity and opentimes
-						// are also written. But since it is now already defined by the facilities
-						// there is no need to write it. the act type and the facilitiy id
-						// is enough. (well... i think)
+						/* TODO [balmermi] Here, usually capacity and opentimes
+						 * are also written. But since it is now already defined by the facilities
+						 * there is no need to write it. the act type and the facilitiy id
+						 * is enough. (well... i think) */
 						this.handler.endLocation(this.out);
 					}
 					this.handler.endActivity(this.out);
@@ -210,7 +213,6 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 				this.handler.endPlans(this.out);
 				this.out.flush();
 				this.out.close();
-				//fw.close();	// should be close automatically by out.close(), so not needed here
 			}
 			catch (IOException e) {
 				Gbl.errorMsg(e);
@@ -226,7 +228,7 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 			this.writeEndPlans();
 		}
 		else {
-			Gbl.noteMsg(this.getClass(),"write()",this + "[PlansStreaming is on -- plans already written, just closing file if it's open.]");
+			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");
 			if (this.fileOpened) {
 				writeEndPlans();
 			}

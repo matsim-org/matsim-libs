@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
@@ -82,6 +83,8 @@ public class SNController extends Controler {
 //	New variables for replanning
 	int replan_interval;
 
+	private final static Logger log = Logger.getLogger(SNController.class);
+	
 	public SNController(final String[] args) {
 		super(args);
 	}
@@ -424,9 +427,7 @@ public class SNController extends Controler {
 		// TODO Auto-generated method stub
 		String patternStr = ",";
 		String[] s;
-		Gbl
-		.noteMsg(this.getClass(), "getFacTypes",
-		"!!add keyword\"any\" and a new interact method to exchange info of any factility types (compatible with probabilities)");
+		log.info("!!add keyword\"any\" and a new interact method to exchange info of any factility types (compatible with probabilities)");
 		if (longString.equals("all-p")) {
 			s = new String[5];
 			s[0] = "home";

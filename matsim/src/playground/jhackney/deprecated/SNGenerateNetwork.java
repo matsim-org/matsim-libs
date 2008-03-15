@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -68,23 +69,19 @@ import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.ScoringFunction;
-import org.matsim.utils.misc.Time;
+import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
+import org.matsim.socialnetworks.interactions.SocializingOpportunity;
+import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
+import org.matsim.socialnetworks.replanning.SNSecLocShortest;
+import org.matsim.socialnetworks.socialnet.SocialNetwork;
+import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
-import playground.jhackney.algorithms.SNSecLocShortest;
-import playground.jhackney.interactions.NonSpatialInteractor;
-import playground.jhackney.interactions.SocializingOpportunity;
-import playground.jhackney.interactions.SpatialInteractor;
-import playground.jhackney.interactions.SpatialSocialOpportunityTracker;
-import playground.jhackney.io.JUNGPajekNetWriterWrapper;
-import playground.jhackney.io.PajekWriter1;
-import playground.jhackney.replanning.SNFacilitySwitcher;
 import playground.jhackney.scoring.SNScoringFunctionFactory01;
-import playground.jhackney.socialnet.SocialNetwork;
-import playground.jhackney.statistics.SocialNetworkStatistics;
 
 public class SNGenerateNetwork {
 
@@ -151,6 +148,8 @@ public class SNGenerateNetwork {
 
 //  -------------------- end social network variables --------------------//    
 
+    private final static Logger log = Logger.getLogger(SNGenerateNetwork.class);
+    
     /** Describes whether the output directory is correctly set up and can be used. */
     private boolean outputDirSetup = false;
 
@@ -418,9 +417,7 @@ public class SNGenerateNetwork {
 	// TODO Auto-generated method stub
 	String patternStr = ",";
 	String[] s;
-	Gbl
-	.noteMsg(this.getClass(), "getFacTypes",
-	"!!add keyword\"any\" and a new interact method to exchange info of any factility types (compatible with probabilities)");
+	log.info("!!add keyword\"any\" and a new interact method to exchange info of any factility types (compatible with probabilities)");
 	if (longString.equals("all-p")) {
 	    s = new String[5];
 	    s[0] = "home";

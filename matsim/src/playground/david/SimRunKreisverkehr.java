@@ -59,7 +59,7 @@ public class SimRunKreisverkehr {
 			double length = link.getLength()*link.getLanes();
 			cellcount += Math.min(1,(int)(length/7.5));
 		}
-		Gbl.noteMsg(Object.class, "CellCounter", " Summarized Cell count is " + cellcount);
+		System.out.println("Summarized Cell count is " + cellcount);
 		System.exit(0);
 
 //		BasicLinkSetI links = network.getLinks();

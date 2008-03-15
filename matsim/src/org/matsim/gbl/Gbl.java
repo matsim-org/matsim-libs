@@ -169,15 +169,6 @@ public abstract class Gbl {
 				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB");
 	}
 
-	/** This method will soon be deprecated. Please start using Logger.info() for informational output.
-	 * @param c
-	 * @param method
-	 * @param msg */
-	public static final void noteMsg(final Class<?> c, final String method, final String msg) {
-		System.out.println("NOTE: In " + c.getName() + "." + method + ": " + msg);
-		System.out.flush();
-	}
-
 	/** This method will soon be deprecated. Please start using Logger.warn() for informational output.
 	 * @param c
 	 * @param method

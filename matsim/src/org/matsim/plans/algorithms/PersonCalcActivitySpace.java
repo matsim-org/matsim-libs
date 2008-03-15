@@ -23,6 +23,7 @@ package org.matsim.plans.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.ActivitySpace;
@@ -53,6 +54,8 @@ public class PersonCalcActivitySpace extends PersonAlgorithm {
 //	private static final int shape = 1;
 	// 0.0 < coverage <= 1.0
 	private static final double coverage = 0.95;
+	
+	private final static Logger log = Logger.getLogger(PersonCalcActivitySpace.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -82,7 +85,7 @@ public class PersonCalcActivitySpace extends PersonAlgorithm {
 		
 		final Knowledge know = person.getKnowledge();
 		if (know == null) {
-			Gbl.errorMsg("Knowledge is not defined!");
+			throw new RuntimeException("Knowledge is not defined!");
 		}
 
 		Iterator<Activity> a_it = null;
@@ -98,9 +101,7 @@ public class PersonCalcActivitySpace extends PersonAlgorithm {
 		System.out.println("Number of locations = " + coords.size());
 
 		if (coords.size() < 1) {
-			Gbl.noteMsg(this.getClass(),"run()","There are less then 1 locations for act_type = "
-					+ this.activity_type +
-					". Therefore, no shape will be calculated.");
+			log.info("There are less then 1 locations for act_type = " + this.activity_type + ". Therefore, no shape will be calculated.");
 		}
 		else {
 			// Calculating the center and the distance of the given coorinates
@@ -276,7 +277,7 @@ public class PersonCalcActivitySpace extends PersonAlgorithm {
 				
 				}	
 				else {
-					Gbl.errorMsg("Activity space type unknown!");
+					throw new RuntimeException("Activity space type unknown!");
 				}
 
 				
@@ -303,7 +304,7 @@ public class PersonCalcActivitySpace extends PersonAlgorithm {
 						((BeanObjective)objFunc).setTheta(curr_theta);
 					}
 					else {
-						Gbl.errorMsg("Something is wrong!");
+						throw new RuntimeException("Something is wrong!");
 					}
 					ParamPoint curr_best = SimplexOptimization.getBestParams(objFunc);
 					if (best_param_point == null) {
@@ -333,7 +334,7 @@ public class PersonCalcActivitySpace extends PersonAlgorithm {
 					((BeanObjective)objFunc).setTheta(best_theta);
 				}
 				else {
-					Gbl.errorMsg("Something is wrong!");
+					throw new RuntimeException("Something is wrong!");
 				}
 
 				// Write the result on the STDOUT

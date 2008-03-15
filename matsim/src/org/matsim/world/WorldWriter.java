@@ -23,6 +23,7 @@ package org.matsim.world;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
@@ -35,6 +36,8 @@ public class WorldWriter extends Writer {
 
 	private WorldWriterHandler writerhandler = null;
 	private final World world;
+	
+	private final static Logger log = Logger.getLogger(WorldWriter.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -87,7 +90,7 @@ public class WorldWriter extends Writer {
 			}
 		}
 		else {
-			Gbl.noteMsg(this.getClass(),"writeLayer(...)","[layer_type=" + l.getType() + ": Layer must be explicitly written to a seperate xml file]");
+			log.info("layer_type=" + l.getType() + ": Layer must be explicitly written to a seperate xml file");
 		}
 	}
 
@@ -115,7 +118,7 @@ public class WorldWriter extends Writer {
 			}
 		}
 		else {
-			Gbl.noteMsg(this.getClass(),"writeRule(...)","[m=" + m + "," + "downLayer_type=" + m.getDownLayer().getType() + ": Layer not written. Therefore, rule is not written]");
+			log.info("[m=" + m + "," + "downLayer_type=" + m.getDownLayer().getType() + ": Layer not written. Therefore, rule is not written]");
 		}
 	}
 
