@@ -147,6 +147,7 @@ import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
 import org.xml.sax.SAXException;
 
+import playground.andreas.itsumo.ITSUMONetworkReader;
 import playground.marcel.ptnetwork.PtNetworkLayer;
 import playground.marcel.ptnetwork.PtNode;
 
