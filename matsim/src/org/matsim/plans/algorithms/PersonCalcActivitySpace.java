@@ -36,6 +36,7 @@ import org.matsim.utils.optimization.EllipseObjective;
 import org.matsim.utils.optimization.ObjectiveI;
 import org.matsim.utils.optimization.ParamPoint;
 import org.matsim.utils.optimization.SimplexOptimization;
+import org.matsim.utils.optimization.SuperEllipseObjective;
 
 public class PersonCalcActivitySpace extends PersonAlgorithm {
 

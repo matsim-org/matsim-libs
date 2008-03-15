@@ -39,6 +39,7 @@ import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.optimization.BeanObjective;
 import org.matsim.utils.optimization.CassiniObjective;
 import org.matsim.utils.optimization.EllipseObjective;
+import org.matsim.utils.optimization.SuperEllipseObjective;
 
 public class PersonWriteActivitySpaceTable extends PersonAlgorithm {
 
