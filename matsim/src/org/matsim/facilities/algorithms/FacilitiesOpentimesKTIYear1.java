@@ -24,15 +24,17 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
-import org.matsim.gbl.Gbl;
 
 public class FacilitiesOpentimesKTIYear1 extends FacilitiesAlgorithm {
 
 	private TreeMap<String, Opentime> openingTimes = new TreeMap<String, Opentime>();
+	
+	private final static Logger log = Logger.getLogger(FacilitiesOpentimesKTIYear1.class);
 
 	public FacilitiesOpentimesKTIYear1() {
 		super();
@@ -63,10 +65,7 @@ public class FacilitiesOpentimesKTIYear1 extends FacilitiesAlgorithm {
 				}
 				else {
 
-					Gbl.warningMsg(
-							this.getClass(),
-							"run(...)",
-							"For activity type " + actType + " no opening time is defined");
+					log.warn("For activity type " + actType + " no opening time is defined");
 
 				}
 			}

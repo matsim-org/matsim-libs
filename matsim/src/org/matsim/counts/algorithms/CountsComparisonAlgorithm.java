@@ -23,6 +23,7 @@ package org.matsim.counts.algorithms;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
@@ -64,6 +65,8 @@ public class CountsComparisonAlgorithm extends CountsAlgorithm {
 
 	private double countsScaleFactor;
 
+	private final static Logger log = Logger.getLogger(CountsComparisonAlgorithm.class);
+	
 	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final NetworkLayer network) {
 		this.linkStats = linkStats;
 		this.counts = counts;
@@ -85,7 +88,7 @@ public class CountsComparisonAlgorithm extends CountsAlgorithm {
 			}
 			double[] volumes = this.linkStats.getAvgLinkVolumes(count.getLocId().toString());
 			if (volumes== null) {
-				Gbl.warningMsg(CountsComparisonAlgorithm.class, "compare()", "No volumes for link: " + count.getLocId().toString());
+				log.warn("No volumes for link: " + count.getLocId().toString());
 				continue;
 			}
 			for (int hour = 1; hour <= 24; hour++) {
@@ -106,7 +109,7 @@ public class CountsComparisonAlgorithm extends CountsAlgorithm {
 	/**
 	 *
 	 * @param linkid
-	 * @return true if the Link with the given Id is not farther away than the
+	 * @return <code>true</true> if the Link with the given Id is not farther away than the
 	 * distance specified by the distance filter from the center node of the filter.
 	 */
 	private boolean isInRange(final IdI linkid) {
@@ -115,7 +118,7 @@ public class CountsComparisonAlgorithm extends CountsAlgorithm {
 		}
 		Link l = this.network.getLink(linkid);
 		if (l == null) {
-			Gbl.warningMsg(this.getClass(), "isInRange", "Cannot find requested link: " + linkid.toString());
+			log.warn("Cannot find requested link: " + linkid.toString());
 			return false;
 		}
 		double dist = l.getCenter().calcDistance(this.distanceFilterNode.getCoord());

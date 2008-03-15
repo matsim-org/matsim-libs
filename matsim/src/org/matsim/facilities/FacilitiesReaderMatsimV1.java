@@ -26,7 +26,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -80,7 +80,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	private void startFacilities(final Attributes atts) {
 		this.facilities.setName(atts.getValue("name"));
 		if (atts.getValue("aggregation_layer") != null) {
-			Gbl.warningMsg(this.getClass(),"startFacilities(...)","aggregation_layer is deprecated.");
+			Logger.getLogger(FacilitiesReaderMatsimV1.class).warn("aggregation_layer is deprecated.");
 		}
 	}
 	

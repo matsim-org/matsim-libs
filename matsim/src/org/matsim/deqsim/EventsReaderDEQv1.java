@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
@@ -38,11 +39,12 @@ import org.matsim.events.EventAgentWait2Link;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
 
 public class EventsReaderDEQv1 {
 
 	private final Events events;
+	
+	/*package*/ final static Logger log = Logger.getLogger(EventsReaderDEQv1.class);
 
 	public EventsReaderDEQv1(final Events events) {
 		this.events = events;
@@ -83,7 +85,7 @@ public class EventsReaderDEQv1 {
 				}
 			} catch (EOFException e) {
 				if (!eventComplete) {
-					Gbl.warningMsg(this.getClass(), "readEvents", "EOF while reading an event");
+					log.info("EOF while reading an event");
 				}
 			}
 		} finally {
@@ -189,7 +191,7 @@ public class EventsReaderDEQv1 {
 			}
 			catch (IOException e) {
 				this.next = null;
-				Gbl.warningMsg(this.getClass(), "Constructor", e.getMessage());
+				log.warn(e.getMessage());
 			}
 		}
 
@@ -211,7 +213,7 @@ public class EventsReaderDEQv1 {
 			} catch (EOFException e) {
 				this.next = null;
 				if (!eventComplete) {
-					Gbl.warningMsg(this.getClass(), "readEvents", "EOF while reading an event from " + this.filename);
+					log.warn("EOF while reading an event from " + this.filename);
 				}
 				this.in.close();
 			}

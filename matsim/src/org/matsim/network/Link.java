@@ -61,7 +61,7 @@ public class Link extends BasicLink {
 		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
 		calcFlowCapacity();
 		// do some semantic checks
-		if (this.from.equals(this.to)) { Gbl.warningMsg(this.getClass(), "Link(...)", this+"[from=to="+this.to+" link is a loop]"); }
+		if (this.from.equals(this.to)) { log.warn(this + "[from=to=" + this.to + " link is a loop]"); }
 		if (this.freespeed <= 0.0) { Gbl.errorMsg(this+"[freespeed="+freespeed+" not allowed]"); }
 		if (this.capacity <= 0.0) { Gbl.errorMsg(this+"[capacity="+capacity+" not allowed]"); }
 		if (this.permlanes < 1) { Gbl.errorMsg(this+"[permlanes="+permlanes+" not allowed]"); }

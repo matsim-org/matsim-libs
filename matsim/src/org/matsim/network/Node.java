@@ -25,12 +25,13 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicNode;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.ResizableArray;
-import org.matsim.utils.geometry.shared.Coord;
 
 public class Node extends BasicNode implements Comparable<Node> {
 
@@ -61,8 +62,9 @@ public class Node extends BasicNode implements Comparable<Node> {
 	 * inheritance would make more sense. topo_type is calculated by
 	 * org.matsim.network.algorithms.NetworkCalcTopoType */
 	private int topoType = Integer.MIN_VALUE;
-
 	private final ResizableArray<Object> roles = new ResizableArray<Object>(5);
+
+	private final static Logger log = Logger.getLogger(Node.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -106,7 +108,7 @@ public class Node extends BasicNode implements Comparable<Node> {
 			Gbl.errorMsg(this + "[inlink_id=" + inlink.getId() + " already exists]");
 		}
 		if (this.outlinks.containsKey(linkid)) {
-			Gbl.warningMsg(this.getClass(),"addInLink(...)",this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
+			log.warn(this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
 		}
 		this.inlinks.put(linkid, inlink);
 		return true;
@@ -120,7 +122,7 @@ public class Node extends BasicNode implements Comparable<Node> {
 			Gbl.errorMsg(this + "[inlink_id=" + outlink.getId() + " already exists]");
 		}
 		if (this.inlinks.containsKey(linkid)) {
-			Gbl.warningMsg(this.getClass(),"addOutLink(...)",this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
+			log.warn(this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
 		}
 		this.outlinks.put(linkid, outlink);
 		return true;

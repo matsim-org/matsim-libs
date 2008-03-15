@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -44,6 +44,8 @@ public class BasicPlan implements Serializable {
 	public static final double UNDEF_SCORE = Double.NaN;
 
 	private double score = UNDEF_SCORE;
+	
+	private final static Logger log = Logger.getLogger(BasicPlan.class);
 
 	public final double getScore() {
 		return this.score;
@@ -51,7 +53,7 @@ public class BasicPlan implements Serializable {
 
 	public final void setScore(final double score) {
 		if (Double.isInfinite(score)) {
-			Gbl.warningMsg(this.getClass(), "setScore()", "infinite score is not supported! Score is not changed");
+			log.warn("Infinite score is not supported! Score is not changed");
 		} else {
 			this.score = score;
 		}
@@ -166,53 +168,4 @@ public class BasicPlan implements Serializable {
 		this.actsLegs.add(act);
 	}
 
-	/*
-	 * I disabled this main method as I see absolutely no reason for
-	 * BasicPlan having a main-method...   -marcel,21sept2007
-	 *
-	 *
-	public static void main (final String[] args) {
-		BasicPlan p1 = new BasicPlan ();
-		p1.addAct(new BasicAct());
-		p1.addLeg(new BasicLeg());
-		p1.addAct(new BasicAct());
-		p1.addLeg(new BasicLeg());
-		p1.addAct(new BasicAct());
-		p1.addLeg(new BasicLeg());
-		p1.addAct(new BasicAct());
-
-		int i = 0;
-		LegIterator leg1 = p1.getIteratorLeg();
-		while(leg1.hasNext()) {
-			BasicLeg leg = leg1.next();
-			leg.toString();
-			i++;
-		}
-		System.out.println("leg count = " + i);
-
-		i = 0;
-		iteratorAct act1 = p1.getIteratorAct();
-		while(act1.hasNext()) {
-			BasicAct act = act1.next();
-			act.toString();
-			i++;
-		}
-		System.out.println("act count = " + i);
-
-		i = 0;
-		iterator it1 = p1.getIterator();
-		while(it1.hasNextLeg()) {
-			BasicAct act = it1.nextAct();
-			act.toString();
-			i++;
-			BasicLeg leg = it1.nextLeg();
-			leg.toString();
-			i++;
-		}
-		BasicAct a = it1.nextAct();
-		a.toString();
-		i++;
-		System.out.println("act+leg count = " + i);
-	}
-	*/
 }
