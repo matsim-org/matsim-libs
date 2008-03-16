@@ -87,6 +87,8 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
+import org.matsim.plans.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PersonPrepareForSim;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
@@ -222,6 +224,7 @@ public class Controler {
 
 	private Controler(final String configFileName, final String dtdFileName, final Config config) {
 		super();
+		Gbl.printSystemInfo();
 		this.configFileName = configFileName;
 		this.dtdFileName = dtdFileName;
 		if (configFileName == null) {
@@ -1098,9 +1101,13 @@ public class Controler {
 	/*default*/ class CoreControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, AfterMobsimListener {
 
 		public void notifyStartup(final StartupEvent event) {
-			Controler c = event.getControler();
+			final Controler c = event.getControler();
 			// make sure all routes are calculated.
-			new PersonPrepareForSim(new PlansCalcRoute(c.getNetwork(), c.getTravelCostCalculator(), c.getTravelTimeCalculator())).run(c.getPopulation());
+			ParallelPersonAlgorithmRunner.run(c.getPopulation(), c.config.global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+				public PersonAlgorithm getPersonAlgorithm() {
+					return new PersonPrepareForSim(new PlansCalcRoute(c.getNetwork(), c.getTravelCostCalculator(), c.getTravelTimeCalculator()));
+				}
+			});
 		}
 
 		public void notifyIterationStarts(final IterationStartsEvent event) {
