@@ -111,11 +111,11 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * the icons
 	 */
-	private static final String CROSSICON = "http://www.matsim.org/files/icons/plus.png";
+	private static final String CROSSICON = "icons/plus.png";
 	/**
 	 * the icons
 	 */
-	private static final String MINUSICON = "http://www.matsim.org/files/icons/minus.png";
+	private static final String MINUSICON = "icons/minus.png";
 	/**
 	 * the scale for the icons
 	 */
@@ -282,6 +282,14 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		} catch (IOException e) {
 			Gbl.errorMsg("Cannot create legend or logo cause: " + e.getMessage());
 			e.printStackTrace();
+		}
+		
+		// copy required icons to the kmz
+		try {
+			this.writer.addNonKMLFile("res/icons/plus.png", CROSSICON);
+			this.writer.addNonKMLFile("res/icons/minus.png", MINUSICON);
+		} catch (IOException e) {
+			log.error("Could not copy copy plus-/minus-icons to the KMZ.", e);
 		}
 
 		// prepare folders for simRealPerHour-Graphs (top-left, xy-plots)
