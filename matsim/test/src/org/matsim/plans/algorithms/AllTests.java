@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.plans;
+package org.matsim.plans.algorithms;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,12 +26,8 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.plans");
-
-		suite.addTestSuite(PersonTest.class);
-		suite.addTest(org.matsim.plans.algorithms.AllTests.suite());
-		suite.addTest(org.matsim.plans.filters.AllTests.suite());
-
+		TestSuite suite = new TestSuite("Tests for org.matsim.plans.algorithms");
+		suite.addTestSuite(ParallelPersonAlgorithmRunnerTest.class);
 		return suite;
 	}
 
