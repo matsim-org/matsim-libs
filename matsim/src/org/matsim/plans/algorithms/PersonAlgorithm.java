@@ -18,29 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
-/* *********************************************************************** *
- *               org.matsim.demandmodeling.plans.algorithms                *
- *                          PersonAlgorithm.java                           *
- *                          ---------------------                          *
- * copyright       : (C) 2006 by                                           *
- *                   Michael Balmer, Konrad Meister, Marcel Rieser,        *
- *                   David Strippgen, Kai Nagel, Kay W. Axhausen,          *
- *                   Technische Universitaet Berlin (TU-Berlin) and        *
- *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
- * email           : balmermi at gmail dot com                             *
- *                 : rieser at gmail dot com                               *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package org.matsim.plans.algorithms;
 
 import java.util.Date;
@@ -49,46 +26,24 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
+import org.matsim.utils.misc.Counter;
 
 public abstract class PersonAlgorithm extends PlansAlgorithm implements PersonAlgorithmI {
 
 	private final static Logger log = Logger.getLogger(PersonAlgorithm.class);
 
-	//////////////////////////////////////////////////////////////////////
-	// constructor
-	//////////////////////////////////////////////////////////////////////
-
-	public PersonAlgorithm() {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// abstract methods
-	//////////////////////////////////////////////////////////////////////
-
 	@Override
 	public final void run(final Plans plans) {
 		log.info("    running " + this.getClass().getName() + " algorithm..." + (new Date()));
-		long counter = 0;
-		long nextMsg = 1;
+		Counter counter = new Counter(" person # ");
 
 		Iterator<Person> it = plans.getPersons().values().iterator();
-		long startTime = System.currentTimeMillis();
 		while (it.hasNext()) {
-
-			counter++;
-			if (counter % nextMsg == 0) {
-				nextMsg *= 2;
-				log.info(" person # " + counter + " (elapsed time: "
-						+ (System.currentTimeMillis() - startTime)/1000 + " sec)");
-			}
-
+			counter.incCounter();
 			Person p = it.next();
 			this.run(p);
 		}
-		if (counter % nextMsg != 0) {
-			log.info(" person # " + counter + " (elapsed time: "
-					+ (System.currentTimeMillis() - startTime)/1000 + " sec)");
-		}
+		counter.printCounter();
 		log.info("    done running algorithm. " + (new Date()));
 	}
 
