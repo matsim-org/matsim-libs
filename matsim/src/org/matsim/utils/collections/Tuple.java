@@ -20,11 +20,12 @@
 
 package org.matsim.utils.collections;
 
-
 /**
+ * A Tuple stores two values (a "pair") and respects their order.
  * This generic class implements a commonly used data structure which is not present in
  * the current collection framework. Although it could be simulated with a List containing
  * two Objects, this implementation offers type safety and maximizes convenience for programmers.
+ * 
  * @author dgrether
  *
  * @param <A>
@@ -63,12 +64,9 @@ public class Tuple<A extends Object, B extends Object> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object other) {
-		if (other == null) return false;
-		else if (!(other instanceof Tuple)) return false;
-		else if (other == this) return true;
-		return this.first.equals(((Tuple<A, B>)other).first) && this.second.equals(((Tuple<A, B>)other).second);
+		if (!(other instanceof Tuple)) return false;
+		return this.first.equals(((Tuple)other).first) && this.second.equals(((Tuple)other).second);
 	}
-
 
 	/**
 	 * @see java.lang.Object#hashCode()
@@ -91,7 +89,5 @@ public class Tuple<A extends Object, B extends Object> {
 		buffer.append("]]");
 		return buffer.toString();
 	}
-
-
 
 }
