@@ -24,6 +24,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 
+import playground.andreas.itsumo.ITSUMONetworkReader;
+
 public class ConvertITSUMONetwork {
 
 	public static void run(String[] args) {
