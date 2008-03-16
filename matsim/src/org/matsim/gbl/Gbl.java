@@ -168,6 +168,18 @@ public abstract class Gbl {
 		log.info("used RAM: " + usedMem + "B = " + (usedMem/1024) + "kB = " + (usedMem/1024/1024) + "MB" +
 				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB");
 	}
+	
+	public static final void printSystemInfo() {
+		log.info("JVM: " + System.getProperty("java.vm.version") + "; " 
+				+ System.getProperty("java.vm.vendor") + "; " 
+				+ System.getProperty("java.vm.info") + "; "
+				+ System.getProperty("sun.arch.data.model") + "-bit");
+		log.info("OS: " + System.getProperty("os.name") + "; "
+				+ System.getProperty("os.version") + "; "
+				+ System.getProperty("os.arch"));
+		log.info("CPU cores: " + Runtime.getRuntime().availableProcessors());
+		log.info("max. Memory: " + Runtime.getRuntime().maxMemory() / 1024.0 / 1024.0 + "MB (" + Runtime.getRuntime().maxMemory() + "B)");
+	}
 
 	public static final void errorMsg(final Exception e) {
 		e.printStackTrace();
