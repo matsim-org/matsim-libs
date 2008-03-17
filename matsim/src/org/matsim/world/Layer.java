@@ -22,6 +22,7 @@ package org.matsim.world;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
@@ -153,7 +154,12 @@ public abstract class Layer {
 		return this.getLocation(new Id(location_id));
 	}
 
-	public final ArrayList<Location> getLocations(final CoordI center) {
+	/**
+	 * @param center the center coordinate of the to-be-returned locations.
+	 * @return all locations whose center coordinate equals <code>center</code>
+	 */
+	public final List<Location> getLocations(final CoordI center) {
+		/* Hmm, shouldn't there be at most one location with equal center? -marcel/17mar2008 */
 		ArrayList<Location> locs = new ArrayList<Location>();
 		Iterator<Location> loc_it = this.locations.values().iterator();
 		while (loc_it.hasNext()) {
@@ -163,6 +169,24 @@ public abstract class Layer {
 		return locs;
 	}
 
+	/**
+	 * @param coord A coordinate to which the nearest location should be returned.
+	 *
+	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
+	 * the same minimal distance, all of them are returned.
+	 */
+	public final ArrayList<Location> getNearestLocations(final CoordI coord) {
+		return getNearestLocations(coord, null);
+	}
+
+	/**
+	 * @param coord A coordinate to which the nearest location should be returned.
+	 * @param excludeLocation A location that should be ignored when finding the nearest location. Useful to
+	 * find the nearest neighbor of the excluded location.
+	 *
+	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
+	 * the same minimal distance, all of them are returned.
+	 */
 	public final ArrayList<Location> getNearestLocations(final CoordI coord, final Location excludeLocation) {
 		ArrayList<Location> locs = new ArrayList<Location>();
 		double shortestDistance = Double.MAX_VALUE;
