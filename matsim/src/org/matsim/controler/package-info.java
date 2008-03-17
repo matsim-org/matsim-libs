@@ -24,11 +24,11 @@
  * [The iteration loop of the Controler]
  *
  * +-----------+                +----------------+         +-----------+            +------------+
- * |Startup (1)|--->(2)-->(3)-->|Execution/MobSim|-->(4)-->|Scoring (5)|-->(6)--+-->|Shutdown (8)|
- * +-----------+  ^             +----------------+         +-----------+        |   +------------+
- *                |                                                             v
- *                 \                         +--------------+                  /
- *                   --------------------<---|Replanning (7)|<----------(2)<---
+ * |Startup (1)|-->(2)--->(3)-->|Execution/MobSim|-->(4)-->|Scoring (5)|-->(6)--+-->|Shutdown (8)|
+ * +-----------+       ^        +----------------+         +-----------+        |   +------------+
+ *                     |                                                        v
+ *                      \                    +--------------+                  /
+ *                        ---------------<---|Replanning (7)|<----------(2)<---
  *                                           +--------------+
  * </pre>
  * <ul>
@@ -49,7 +49,7 @@
  * <h3>Best Practices</h3>
  * <h4>Using custom functionality</h4>
  * If you plan to write your own ControlerListener to provide additional functionality to MATSim, use the following
- * class as a starting point:
+ * class as a starting point for integrating your ControlerListener into the Controler:
  * <pre>
  * import org.matsim.controler.Controler;
  * import org.matsim.myfunctionality.MyFunctionality;
