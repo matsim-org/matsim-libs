@@ -20,6 +20,7 @@ public class Subtour {
 	private int mode;
 	private CoordI start_coord;
 	private int prev_subtour;
+	private double distance; 
 	
 
 	public Subtour() {
@@ -31,6 +32,10 @@ public class Subtour {
 	//////////////////////////////////////////////////////////////////////
 	// Setters methods
 	//////////////////////////////////////////////////////////////////////
+	
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
 	
 	public void setStart_coord(CoordI start_coord) {
 		this.start_coord = start_coord;
@@ -65,6 +70,10 @@ public class Subtour {
 	// Getters methods
 	//////////////////////////////////////////////////////////////////////
 	
+	public double getDistance() {
+		return distance;
+	}
+
 	public CoordI getStart_coord() {
 		return start_coord;
 	}
