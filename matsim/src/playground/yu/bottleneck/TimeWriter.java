@@ -22,12 +22,17 @@ package playground.yu.bottleneck;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
+import org.matsim.utils.charts.XYLineChart;
+import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -38,6 +43,8 @@ public class TimeWriter implements EventHandlerAgentDepartureI, EventHandlerAgen
 //	-------------------------MEMBER VARIABLES---------------------------------
 	private BufferedWriter out = null;
 	private HashMap<String, Double> agentDepTimes;
+	private List<Integer> depTimes=new ArrayList<Integer>();
+	private List<Integer> arrTimes=new ArrayList<Integer>();
 //--------------------------CONSTRUCTOR-------------------------------------
 	public TimeWriter(final String filename) {
 		init(filename);
@@ -59,10 +66,12 @@ public class TimeWriter implements EventHandlerAgentDepartureI, EventHandlerAgen
 		String agentId = event.agentId;
 		if (this.agentDepTimes.containsKey(agentId)) {
 			int depT=(int)this.agentDepTimes.remove(agentId).doubleValue();
+			depTimes.add(depT);
 			int depH=depT/3600;
 			int depMin=(depT-depH*3600)/60;
 			int depSec=depT-depH*3600-depMin*60;
 			int time=(int)event.time;
+			arrTimes.add(time);
 			int h=time/3600;
 			int min=(time-h*3600)/60;
 			int sec=time-h*3600-min*60;
@@ -96,7 +105,15 @@ public class TimeWriter implements EventHandlerAgentDepartureI, EventHandlerAgen
 			e.printStackTrace();
 		}
 	}
-
+	public void writeChart(String chartFilename) {
+		XYScatterChart chart = new XYScatterChart("departure and arrival Time", "departureTime", "arrivalTime");
+		
+		for(int i;i<depTimes.size();i++){
+			depTimes.toArray().
+		}
+		chart.addSeries("depTime/arrTime",, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
+		chart.saveAsPng(chartFilename, 800, 600);
+	}
 	public void reset(final int iteration) {
 		this.agentDepTimes.clear();
 	}

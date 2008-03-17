@@ -128,11 +128,11 @@ public class LegCountTest {
 		final String netFilename = "../data/ivtch/input/network.xml";
 		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
 		// final String plansFilename = "../runs/run264/100.plans.xml.gz";
-		final String plansFilename = "../data/ivtch/run264optChg_run269/ITERS/it.100/100.plans.xml.gz";
+		final String plansFilename = "../data/ivtch/legCount/263.100.plans.xml.gz";
 		// final String plansFilename =
 		// "./test/yu/equil_test/output/100.plans.xml.gz";
 		// final String outFilename = "./output/legsCount.txt.gz";
-		final String outFilename = "../data/ivtch/run264optChg_run269/legsCount.txt";
+		final String outFilename = "../data/ivtch/legCount/263.legsCount.txt";
 
 		Gbl.startMeasurement();
 		@SuppressWarnings("unused")

@@ -40,7 +40,7 @@ public class NewSmallPlansControler {
 	public static void main(final String[] args) {
 		//		final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/ivtch/input/network.xml";
-		final String plansFilename = "../data/ivtch/input/plans_all_License_zrh30km_10pct.xml.gz";
+		final String plansFilename = "../data/ivtch/input/plans_10pct_miv_zrh.xml.gz";
 
 		World world = Gbl.getWorld();
 		Config config = Gbl.createConfig(new String[] {
