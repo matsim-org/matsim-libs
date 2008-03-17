@@ -33,31 +33,31 @@ public class SNController extends Controler {
 		super(args);
 	}
 
-	@Override
-	/**
-	 * This is a test StrategyManager to see if the replanning works within the social network iterations.
-	 * @author jhackney
-	 * @return
-	 */
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-
-		String maxvalue = this.config.findParam("strategy", "maxAgentPlanMemorySize");
-		manager.setMaxPlansPerAgent(Integer.parseInt(maxvalue));
-
-		// Best-scoring plan chosen each iteration
-		PlanStrategy strategy1 = new PlanStrategy(new BestPlanSelector());
-
-		// Social Network Facility Exchange test
-		System.out.println(this.getClass()+": adding StrategyModule. NOTE THAT YOU SHOULD EXCHANGE KNOWLEDGE BASED ON ITS VALUE");
-		strategy1.addStrategyModule(new SNRandomFacilitySwitcher());
-		//strategy1.addStrategyModule(new TimeAllocationMutator());
-
-
-		// Social Network Facility Exchange for all agents
-		manager.addStrategy(strategy1, 1.0);
-		return manager;
-	}
+//	@Override
+//	/**
+//	 * This is a test StrategyManager to see if the replanning works within the social network iterations.
+//	 * @author jhackney
+//	 * @return
+//	 */
+//	protected StrategyManager loadStrategyManager() {
+//		StrategyManager manager = new StrategyManager();
+//
+//		String maxvalue = this.config.findParam("strategy", "maxAgentPlanMemorySize");
+//		manager.setMaxPlansPerAgent(Integer.parseInt(maxvalue));
+//
+//		// Best-scoring plan chosen each iteration
+//		PlanStrategy strategy1 = new PlanStrategy(new BestPlanSelector());
+//
+//		// Social Network Facility Exchange test
+//		System.out.println(this.getClass()+": adding StrategyModule. NOTE THAT YOU SHOULD EXCHANGE KNOWLEDGE BASED ON ITS VALUE");
+//		strategy1.addStrategyModule(new SNRandomFacilitySwitcher());
+//		//strategy1.addStrategyModule(new TimeAllocationMutator());
+//
+//
+//		// Social Network Facility Exchange for all agents
+//		manager.addStrategy(strategy1, 1.0);
+//		return manager;
+//	}
 
 	public static void main(final String[] args) {
 		final Controler controler = new SNController(args);
