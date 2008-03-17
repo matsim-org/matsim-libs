@@ -89,6 +89,9 @@ public class PolygonGeneratorII {
 		log.info("cutting polygons ...");
 		LineString ls = lineStrings.get(0);
 		
+		
+		Point currPoint = ls.getStartPoint();
+		Coordinate currPointCoor = currPoint.getCoordinate();
 		Feature [] la = new Feature[0];
 		Feature [] lineArr = lineTree.get(ls.getStartPoint().getX(), ls.getStartPoint().getY(), CATCH_RADIUS).toArray(la);	
 		Geometry [] nodePolys = new Geometry[lineArr.length];
@@ -100,9 +103,21 @@ public class PolygonGeneratorII {
 		
 		GeometryCollection geoColl = new GeometryCollection(nodePolys,geofac);
 		Polygon poly = (Polygon) geoColl.buffer(0.0);
+		Coordinate [] coor = poly.getCoordinates();
 		
-		for (int i = 0 ; i < lineArr.length ; i++ ){
+		Envelope o = poly.getEnvelopeInternal();
+		QuadTree<Coordinate> polyCoor = new QuadTree<Coordinate>(o.getMinX(), o.getMinY(), o.getMaxX(), o.getMaxY());
+		
+		for(int i = 0 ; i < coor.length ; i++ ){
+			polyCoor.put(coor[i].x, coor[i].y, coor[i]);
+		}
 					
+		List<Point> points = new LinkedList<Point>();				
+				
+		for (int i = 0 ; i < lineArr.length ; i++ ){
+			
+			
+			////Überarbeiten
 			Feature ftI = lineArr[i];
 			LineString lineI = (LineString) ftI.getAttribute(0);
 			boolean startI = lineI.getStartPoint().equalsExact(ls.getStartPoint(), CATCH_RADIUS);
@@ -118,33 +133,77 @@ public class PolygonGeneratorII {
 			
 			LineString vecI = separateLine(lineI, startI);
 			LineString vecII = separateLine(lineII, startII);
-			 
+			//////
 			
+			boolean found = false;
+			List<Coordinate> cList = new ArrayList<Coordinate>();
 			
-			////bisecting line
-			
-			double angle = getAngle(vecI, vecII) / 2;
-			LineString bisector = getBisectingLine(vecI,angle);
-			Geometry intersection = bisector.intersection(poly);
-			double dist = DEFAULT_DISTANCE;
-			Point point = null;
-			
-			
-			Coordinate [] co = intersection.getCoordinates
-			for (int ii = 0 ; ii < intersection)
-			
-			////Fraglich
-			for (int ii = 0 ; ii < intersection.getNumGeometries() ; ii++) {
+			while(!found){
 				
-				if (dist < intersection.getGeometryN(ii).distance(vecI.getStartPoint())){
-					dist = intersection.getGeometryN(ii).distance(vecI.getStartPoint());
-					point = (Point) intersection.getGeometryN(ii);
+				Coordinate pp = polyCoor.get(currPointCoor.x, currPointCoor.y);
+				
+				Coordinate [] cc = new Coordinate[]{currPointCoor, pp};
+				CoordinateSequence seq = new CoordinateArraySequence(cc);
+				LineString line = new LineString(seq, geofac);
+			
+				if(!line.intersects(vecI)&&!line.intersects(vecII)){
+					
+					Coordinate [] p = new Coordinate[]{pp};
+					CoordinateSequence seqII = new CoordinateArraySequence(p);
+					Point po = new Point(seqII, geofac);
+					points.add(po);
+					
+					for(Coordinate c : cList ){
+						polyCoor.put(c.x, c.y, c);
+					}
+					found = true;
+				}else{
+					cList.add(pp);
+					polyCoor.remove(pp.x, pp.y, pp);
 				}
-			}
-			
-			
+			}	
 			
 		}
+		
+		
+			List<Coordinate> newPoly = new ArrayList<Coordinate>();
+			List<Coordinate> restPoly = new ArrayList<Coordinate>();
+			
+			int countPoints = 0;
+			for (int i = 0 ; i < coor.length ; i++){
+				if (countPoints == 0 || countPoints == points.size()-1){ ////???????: -1
+					newPoly.add(coor[i]);				
+					for (Iterator it = points.iterator() ; it.hasNext() ; ){
+						Point p1 = (Point) it.next();
+						if (coor[i] == p1.getCoordinate()){
+							restPoly.add(coor[i]);						
+							countPoints++;
+							break;
+						}
+					}
+				}else{
+					restPoly.add(coor[i]);
+					for (Iterator it = points.iterator() ; it.hasNext() ; ){
+						Point p1 = (Point) it.next();
+						
+						if (coor[i] == p1.getCoordinate() && countPoints == points.size()-2){ //////????????: -2
+							newPoly.add(coor[i]);
+							countPoints++;
+							break;
+						}
+						if (coor[i] == p1.getCoordinate()){
+							countPoints++;
+						}
+						
+					}
+				}
+			}
+			if (newPoly.get(0) != newPoly.get(newPoly.size())){
+				newPoly.add(newPoly.get(0));
+			}
+			if (restPoly.get(0) != restPoly.get(restPoly.size())){
+				restPoly.add(restPoly.get(0));
+			}
 	
 		log.info("done.");
 	}
@@ -506,5 +565,11 @@ public class PolygonGeneratorII {
 		LineString rl = new LineString(seqLine,geofac);
 		return rl;
 	}
+	
+//	private Polygon addPointsToPolygon(List a){
+//		
+//		
+//	}
+	
 	
 }
