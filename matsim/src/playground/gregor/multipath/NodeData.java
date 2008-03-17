@@ -26,12 +26,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Node;
 import org.matsim.utils.identifiers.IdI;
 
 public class NodeData {
 
+	private static final Logger log = Logger.getLogger(NodeData.class);
+	
 	private final static double BETA = 4;
 	private final static double THETA = 1;
 
@@ -53,14 +56,14 @@ public class NodeData {
 
 	private ConcurrentLinkedQueue<NodeData> shadowNodes;
 
-	private ConcurrentLinkedQueue<NodeDataLink> forwardLinks;
+//	private ConcurrentLinkedQueue<NodeDataLink> forwardLinks;
 	private ConcurrentLinkedQueue<NodeDataLink> backLinks;
 	private NodeData currentShadow = null;
 	private boolean isHead;
 
 	private double nodeProb = 0;
 
-	private double backLinkWeightsSum;
+//	private double backLinkWeightsSum;
 
 	private double nodeProbDiff = 0;
 
@@ -73,9 +76,9 @@ public class NodeData {
 		this.backwardNodes = new ConcurrentLinkedQueue<NodeData>();
 		this.shadowNodes = new ConcurrentLinkedQueue<NodeData>();
 		this.backLinks = new ConcurrentLinkedQueue<NodeDataLink>();
-		this.forwardLinks = new ConcurrentLinkedQueue<NodeDataLink>();
+//		this.forwardLinks = new ConcurrentLinkedQueue<NodeDataLink>();
 		this.inPaths = 0;
-		this.backLinkWeightsSum = 0;
+//		this.backLinkWeightsSum = 0;
 		tracer = t;
 
 	}
@@ -148,9 +151,9 @@ public class NodeData {
 		this.backwardNodes.clear();
 		this.shadowNodes.clear();
 		this.backLinks.clear();
-		this.forwardLinks.clear();
+//		this.forwardLinks.clear();
 		this.inPaths = 0;
-		this.backLinkWeightsSum = 0;
+//		this.backLinkWeightsSum = 0;
 		this.tracer = tracer;
 		
 		
@@ -164,9 +167,9 @@ public class NodeData {
 //		this.forwardNodes.add(node);
 //	}
 
-	public ConcurrentLinkedQueue<NodeDataLink> getForwardLinks(){
-		return this.forwardLinks;
-	}
+//	public ConcurrentLinkedQueue<NodeDataLink> getForwardLinks(){
+//		return this.forwardLinks;
+//	}
 
 
 	public void visitInitNode(double startTime, int iterationID) {
@@ -177,38 +180,39 @@ public class NodeData {
 			this.iterationID = iterationID;
 			this.inPaths = 1;
 			NodeDataLink blink = new NodeDataLink();
-			blink.linkWeight = 1;
+//			blink.linkWeight = 1;
 			backLinks.add(blink);
 
 	}
 
-	private void calcBackLinkProbs(NodeDataLink link){
-
-		double overlap = getOverlap(link.paths,link.fromNode.getCost(),link.linkCost);
-		double linkLikelihood = Math.exp(- THETA * (link.linkCost + overlap));
-		double tmp = 0;
-		for (NodeDataLink bl : link.fromNode.backLinks){
-			tmp += bl.linkWeight;
-		}
-		link.linkWeight = linkLikelihood * tmp;
-		this.backLinkWeightsSum += link.linkWeight;
-
-	}
-
-	private double getOverlap(int inPaths, double prevCost, double linkCost) {
-		return BETA * Math.log(inPaths) * linkCost / (linkCost + prevCost);
-	}
-
-	public void computeProbs() {
-
-		for (NodeDataLink link : this.backLinks){
-				link.fromNode.addNodeProb((link.linkWeight / this.backLinkWeightsSum) * this.nodeProb);
-			}
-
-	}
+//	private void calcBackLinkProbs(NodeDataLink link){
+//
+//		double overlap = getOverlap(link.paths,link.fromNode.getCost(),link.linkCost);
+//		double linkLikelihood = Math.exp(- THETA * (link.linkCost + overlap));
+//		double tmp = 0;
+//		for (NodeDataLink bl : link.fromNode.backLinks){
+//			tmp += bl.linkWeight;
+//		}
+//		link.linkWeight = linkLikelihood * tmp;
+//		this.backLinkWeightsSum += link.linkWeight;
+//
+//	}
+//
+//	private double getOverlap(int inPaths, double prevCost, double linkCost) {
+//		return BETA * Math.log(inPaths) * linkCost / (linkCost + prevCost);
+//	}
+//
+//	public void computeProbs() {
+//
+//		for (NodeDataLink link : this.backLinks){
+//				link.fromNode.addNodeProb((link.linkWeight / this.backLinkWeightsSum) * this.nodeProb);
+//			}
+//
+//	}
 
 	public void setSortCost(double sortCost){
-		this.sortCost = Math.max(this.sortCost,sortCost);
+//		this.sortCost = Math.max(this.sortCost,sortCost);
+		this.sortCost = sortCost;
 	}
 
 public void addNodeProb(double prob) {
@@ -254,7 +258,7 @@ public void addNodeProb(double prob) {
 	}
 
 	private void decoupleLink(NodeDataLink link){
-		this.backLinkWeightsSum -= link.linkWeight;
+//		this.backLinkWeightsSum -= link.linkWeight;
 		this.inPaths -= link.paths;
 		this.backwardNodes.remove(link.fromNode);
 		this.backLinks.remove(link);
@@ -272,7 +276,7 @@ public void addNodeProb(double prob) {
 //			backLink.toNode = this;
 			backLink.trace = trace;
 //			backLink.linkTime = time - fromNodeData.getTime();
-			fromNodeData.forwardLinks.add(backLink);
+//			fromNodeData.forwardLinks.add(backLink);
 			return false;
 		}
 		fromNodeData.setHead(false);
@@ -300,10 +304,10 @@ public void addNodeProb(double prob) {
 //		backLink.toNode = this;
 		backLink.trace = trace;
 //		backLink.linkTime = time - fromNodeData.getTime();
-		backLink.linkWeight = 0;
-		calcBackLinkProbs(backLink);
+//		backLink.linkWeight = 0;
+//		calcBackLinkProbs(backLink);
 		this.backLinks.add(backLink);
-		fromNodeData.forwardLinks.add(backLink);
+//		fromNodeData.forwardLinks.add(backLink);
 
 		this.sortCost = this.cost;
 
@@ -324,15 +328,17 @@ public void addNodeProb(double prob) {
 	
 	
 	public NodeData drawNode(){
-		double selnum = this.backLinkWeightsSum * Gbl.random.nextDouble();
-		for (NodeDataLink link : this.backLinks){
-			selnum -= link.linkWeight;
-			if (selnum <= 0) {
-//				cost += link.linkCost;
-				return link.fromNode;
-			}
-		}
-		return null;
+//		double selnum = this.backLinkWeightsSum * Gbl.random.nextDouble();
+//		for (NodeDataLink link : this.backLinks){
+//			selnum -= link.linkWeight;
+//			if (selnum <= 0) {
+////				cost += link.linkCost;
+//				return link.fromNode;
+//			}
+//		}
+		log.fatal("drawNode() not implemended yet!");
+		return this.backLinks.peek().fromNode;
+		
 	}	
 
 	private boolean checkTrace(double trace, double cost) {
@@ -351,7 +357,7 @@ public void addNodeProb(double prob) {
 	}
 
 	class NodeDataLink{
-		public double linkWeight;
+//		public double linkWeight;
 		NodeData toNode;
 		NodeData fromNode;
 		int paths;
@@ -400,6 +406,10 @@ public void addNodeProb(double prob) {
 		public double getKey(NodeData node) {
 			return node.getSortCost();
 		}
+	}
+
+	public boolean hasShadowNodes() {
+		return this.shadowNodes.size() > 0;
 	}
 
 

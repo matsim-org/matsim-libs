@@ -42,8 +42,8 @@ public class BeelineDifferenceTracer {
 	
 	private final double TRACE_WEIGHT;
 	
-	private double crit = 0.99;
-	private final double coef = 0.95;
+	private double crit = 1;
+	private final double coef = 0.99;
 	
 	public BeelineDifferenceTracer(Coord orig, Coord dest){
 		
@@ -92,7 +92,7 @@ public class BeelineDifferenceTracer {
 		double tmp = newDiff - oldDiff;
 		
 //		double extSign = tmp > 0 ? 1 : -1;
-		double ext = Math.sqrt(Math.pow(linkLength, 2) - Math.pow(tmp, 2)) * tmp;
+		double ext = Math.sqrt(Math.abs(Math.pow(linkLength, 2) - Math.pow(tmp, 2))) * tmp;
 		
 		double deviance = directionSign * (base + ext);
 //		double deviance = (linkLength * (newDiff+oldDiff)/2);

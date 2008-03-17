@@ -26,8 +26,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -47,11 +48,11 @@ import playground.gregor.multipath.NodeData.ComparatorNodeData;
  */
 public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLeastCostPathCalculator{
 
-	private final static Logger log = Logger.getLogger(ProbabilsticShortestPath.class);
+
 	/**
 	 * The limit a path could be more expensive then the shortest path
 	 */
-	final static double OUTPRICED_CRITERION = 3;
+	final static double OUTPRICED_CRITERION = 1.5;
 
 	/**
 	 * The network on which we find routes.
@@ -139,6 +140,8 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 
 		boolean notCali = true;
 		
+		int slowdown = 50000;
+		int count = 0;
 
 		while (notCali) {
 
@@ -159,11 +162,21 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 					if (foundRoute){
 						break;
 					}
-					log.warn("No route was found from node " + fromNode.getId()
+					Gbl.warningMsg(this.getClass(), "calcLeastCostPath()",
+							"No route was found from node " + fromNode.getId()
 							+ " to node " + toNode.getId());
 					return null;
 				}
 
+				
+
+				paintNode(outNodeD.getMatsimNode(),getString(outNodeD.getCost()) + " - " + getString(outNodeD.getSortCost()));
+				if (count++ >= slowdown){
+					count = 0;
+					doSnapshot();
+					this.netStateWriter.resetNodes();
+				}
+				
 				if (outNodeD.getId() == toNode.getId()){
 					foundRoute = true;
 					minCost = Math.min(minCost, outNodeD.getSortCost());
@@ -180,9 +193,10 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 			
 			if (getData(toNode).getInPaths() >= 5){
 				System.out.println("to many routes found:" + getData(toNode).getInPaths() + " decreasing sim crit ..." );
-				
+				this.netStateWriter.reset();
 				this.tracer.decreaseCrit();
-			} else if (getData(toNode).getInPaths() == 0) {
+			} else if (getData(toNode).getInPaths() <= 0) {
+				this.netStateWriter.reset();
 				System.out.println("no enough routes found:" + getData(toNode).getInPaths() + " increasing sim crit ..." );
 				this.tracer.increaseCrit();				
 				
@@ -191,6 +205,10 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 			}
 
 		}
+		
+		
+		builtChoiceSet(getData(toNode),getData(fromNode));
+		
 		//TODO DEBUG
 		if (debug){
 			doSnapshot();
@@ -230,6 +248,27 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 		return route;
 
 	}
+
+	private void builtChoiceSet(NodeData toNode, NodeData fromNode) {
+		
+		//shortest path cost
+		double g = toNode.getCost();
+		ConcurrentLinkedQueue<NodeData> nodes = new ConcurrentLinkedQueue<NodeData>();
+		nodes.add(fromNode);
+		
+		NodeData current;
+		
+		while ((current = nodes.poll()) != null){
+			if (current.hasShadowNodes()){
+//				current.mergeShadows
+			}
+		}
+		
+		
+		
+	}
+
+
 
 	//////////////////////////////////////////////////////////////////////
 	// all the init stuff and helper methods starts here
@@ -391,7 +430,9 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 			//TODO DEBUG
 			if (debug){
 	
-				paintLink(l, 0.3,  getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+//				paintLink(l, 0.1,  getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+				paintLink(l, 0.1,  getString(travelCost+currCost));
+//				paintLink(l, 0.1,  "0.1");
 			}
 
 
@@ -407,12 +448,15 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 
 				//TODO DEBUG
 				if (debug) {
-					paintLink(l, 0.5,  getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+//					paintLink(l, 0.99,  getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+					paintLink(l, 0.3,  getString(travelCost+currCost));
 				}
 			} else {
 				//TODO DEBUG
 				if (debug){
-					paintLink(l, 0.99,  getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+//					paintLink(l, 0.3,  getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+					paintLink(l, 0.99,  getString(travelCost+currCost));
+//					paintLink(l, 0.3,  "0.3");
 				}
 			}
 			return true;
@@ -423,17 +467,22 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 			if (trackPath(toNodeData, pendingNodes, currTime + travelTime, currCost + travelCost, fromNodeData, trace, travelCost)){
 				//TODO DEBUG
 				if (debug){
-					paintLink(l, 0.8, getString(toNodeData.getCurrShadow().getTrace()));
+//					paintLink(l, 0.6,  getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+					paintLink(l, 0.6,  getString(travelCost+currCost));
+//					paintLink(l, 0.6,  "0.6");
 				}
 			} else {
 				//TODO DEBUG
 				if (debug){
-					paintLink(l, 0.1, getString(toNodeData.getTrace()));
+//					paintLink(l, 0.8,  getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
+					paintLink(l, 0.8,  getString(travelCost+currCost));
+//					paintLink(l, 0.8,  "0.8");
 				}
 			}
-
+			return true;
 		}
 
+		paintLink(l, 0.99,  "0.99");
 		//TODO
 		return false;
 	}
@@ -522,7 +571,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 	}
 
 
-
+	
 	/**
 	 * Track the path to the exploration head and create pseudo nodes for the new feasible path.
 	 *
@@ -543,7 +592,8 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 		NodeData shadowNode = new NodeData(toNodeData.getMatsimNode(),this.tracer);
 
 		shadowNode.visit(fromNodeData, cost, time, iterationID, trace);
-		shadowNode.setSortCost(toNodeData.getCost());
+//		shadowNode.setSortCost(toNodeData.getCost());
+		shadowNode.setSortCost(0);
 		if (!testShadowNode(shadowNode,toNodeData)) return false;
 		toNodeData.addShadowNode(shadowNode);
 		/* PriorityQueueBucket.remove() uses the comparator given at instantiating
@@ -580,7 +630,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 		if (toNodeData.isHead()){
 
 			toNodeData.visit(shadowNode.getBackNodesData().peek(), shadowNode.getCost(), shadowNode.getTime(), this.iterationID, shadowNode.getTrace());
-			toNodeData.setSortCost(shadowNode.getCost());
+//			toNodeData.setSortCost(shadowNode.getCost());
 			return false;
 		}
 
@@ -652,7 +702,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 			Node from = current.getMatsimNode();
 			
 			paintNode(from, getString(current.getCost()));
-			current.computeProbs();
+//			current.computeProbs();
 
 			for (Link l : from.getInLinks().values()) {
 				Node tmp = l.getFromNode();
