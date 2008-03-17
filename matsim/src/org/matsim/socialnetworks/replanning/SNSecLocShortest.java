@@ -20,16 +20,23 @@
 
 package org.matsim.socialnetworks.replanning;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Knowledge;
+import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.util.TravelCostI;
+import org.matsim.router.util.TravelTimeI;
 import org.matsim.socialnetworks.controler.SNControllerListener;
 import org.matsim.utils.geometry.shared.Coord;
 
@@ -39,6 +46,10 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 	private final String weights;
 
 	private double[] cum_p_factype;
+
+	private NetworkLayer network;
+	private TravelCostI tcost;
+	private TravelTimeI ttime;
 
 	public SNSecLocShortest() {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
@@ -62,20 +73,17 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 		//	Pick one of the facilities in knowledge to replace the one in the plan
 		//	Repeat until the shortest path plan has been made
 		//
-		
-		if(!(total(cum_p_factype)>0)){
-			return;
-		}
-		
+
 		String factype=null;// facility type to switch out
 		Person person = plan.getPerson();
-//		double oldPlanLength=getPlanLength(plan);
-//		plan.setScore(oldPlanLength);
-		//COPY THE SELECTED PLAN and select it		    
-		Plan bestPlan = person.copySelectedPlan();
-		person.setSelectedPlan(bestPlan);
 
-//		Figure out which type of facility to replace in this plan
+		//COPY THE SELECTED PLAN		    
+		Plan newPlan = person.copySelectedPlan();
+
+		// Note that it is not changed, yet
+		boolean changed = false;
+
+//		Pick a type of facility to replace in this plan according to config settings
 		double rand = Gbl.random.nextDouble();
 
 		if (rand < cum_p_factype[0]) {
@@ -90,44 +98,88 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 			factype = SNControllerListener.activityTypesForEncounters[4];
 		}
 
-//		Figure out if the agent has knowledge about other facilities of this kind
-		Knowledge k = person.getKnowledge();
-//		System.out.println("SNSLS Person "+person.getId()+" ");
-//		Find all instances of this facility type in the plan and replace facility
-		int max = plan.getActsLegs().size();
-		for (int i = 0; i < max; i += 2) {
+//		Get all instances of this facility type in the plan
 
-			Act bestAct = (Act)(bestPlan.getActsLegs().get(i));	    
-			String type=bestAct.getType();
+		ActIterator planIter= plan.getIteratorAct();
+		ArrayList<Act> actsOfFacType= new ArrayList<Act>();
+		while(planIter.hasNext()){
+			Act nextAct=(Act) planIter.next();
+			if(nextAct.getType()== factype){
+				actsOfFacType.add(nextAct);
+			}
+		}
 
-			if(factype.equals(type)){
+		// Choose a random act from this list. Return the plan unchanged if there are none.
+		if(actsOfFacType.size()<1){
+			person.setSelectedPlan(plan);
+			return;
+		}else{
+			Act newAct = (Act)(actsOfFacType.get(Gbl.random.nextInt(actsOfFacType.size())));
 
-//				Pick a random ACTIVITY of this type from knowledge
+//			Get agent's knowledge
+			Knowledge k = person.getKnowledge();
 
-				List<Activity> activityList = k.getActivities(type);
-				Facility fFromKnowledge = activityList.get(Gbl.random.nextInt( activityList.size())).getFacility();
+			// Replace with plan.getRandomActivity(type)
 
-//				And replace the act in the chain with it (only changes the facility)
+//			Pick a random ACTIVITY of this type from knowledge
 
-				bestAct.setLink(fFromKnowledge.getLink());
-				Coord newCoord = (Coord) fFromKnowledge.getCenter();
-				bestAct.setCoord(newCoord);
+			List<Activity> actList = k.getActivities(factype);
+			Facility fFromKnowledge = actList.get(Gbl.random.nextInt( actList.size())).getFacility();
 
-				// IF CHAIN LENGTH ON THIS COPIED PLAN IS SHORTER THEN PUT THE CHANGE IN THE PLAN
-				double bestPlanLength = getPlanLength(bestPlan);
-				double planLength = getPlanLength(plan);
+//			And replace the activity in the chain with it (only changes the facility)
 
-				if(bestPlanLength < planLength){
-					//then copyPlan is the selected plan AND the better plan
-					// associate this act with the facility in agent's mental map
-					k.map.learnActsActivities(bestAct.getRefId(),fFromKnowledge.getActivity(type));
-				}else{
-					//copyPlan is the selected plan BUT it is worse:
-					// unselect it and restore original plan as the selected one
-
-					bestPlan=person.copySelectedPlan();
-					person.setSelectedPlan(bestPlan);
+			if(newAct.getLinkId()!=fFromKnowledge.getLink().getId()){
+				// If the first activity was chosen, make sure the last activity is also changed
+				if(newAct.equals(plan.getFirstActivity())){
+					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
+//					Act lastAct = (Act) plan.getActsLegs().get(plan.getActsLegs().size()-1);
+					lastAct.setLink(fFromKnowledge.getLink());
+					Coord newCoord = (Coord) fFromKnowledge.getCenter();
+					lastAct.setCoord(newCoord);
 				}
+				// If the last activity was chosen, make sure the first activity is also changed
+				if(newAct.equals(plan.getActsLegs().get(plan.getActsLegs().size()-1))){
+					Act firstAct = (Act) newPlan.getFirstActivity();
+					firstAct.setLink(fFromKnowledge.getLink());
+					Coord newCoord = (Coord) fFromKnowledge.getCenter();
+					firstAct.setCoord(newCoord);
+				}
+				// Change the activity
+//				System.out.println("  ##### Act "+newAct.getRefId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
+				newAct.setLink(fFromKnowledge.getLink());
+				Coord newCoord = (Coord) fFromKnowledge.getCenter();
+				newAct.setCoord(newCoord);
+
+				//if new plan shorter than unchanged plan set true
+				if(getPlanLength(newPlan)<getPlanLength(plan)){
+
+					changed = true;
+				}
+			}
+
+			if(changed == true){
+				//		 loop over all <leg>s, remove route-information
+				ArrayList<?> bestactslegs = newPlan.getActsLegs();
+//				ArrayList<?> bestactslegs = plan.getActsLegs();
+				for (int j = 1; j < bestactslegs.size(); j=j+2) {
+					Leg leg = (Leg)bestactslegs.get(j);
+					leg.setRoute(null);
+				}
+//				Reset the score to -9999. Helps to see if the plan was really changed
+				newPlan.setScore(-9999);
+
+				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
+//				new PlansCalcRoute(network, tcost, ttime).run(plan);
+
+				k.map.learnActsActivities(newAct.getRefId(),fFromKnowledge.getActivity(factype));
+				person.setSelectedPlan(newPlan);
+//				person.setSelectedPlan(plan);
+				// Remove previous plan
+//				person.getPlans().remove(plan);
+			}else{
+//				System.out.println("   ### newPlan same as old plan");
+				person.getPlans().remove(newPlan);
+				person.setSelectedPlan(plan);
 			}
 		}
 	}
