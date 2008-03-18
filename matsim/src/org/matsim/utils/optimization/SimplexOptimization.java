@@ -20,22 +20,22 @@
 
 package org.matsim.utils.optimization;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-
 /**
- *  Implementation of the Simplex Optimization Algorithm. Works in N-dimensional 
+ *  Implementation of the Simplex Optimization Algorithm. Works in N-dimensional
  *  parameter spaces with a convex objective function.
- *  
+ *
  *  http://mathworld.wolfram.com/SimplexMethod.html
  */
 public final class SimplexOptimization {
 
 	private static final double EPSILON = 0.1;
-	
-	public static final ParamPoint getBestParams(ObjectiveI objective) {
+
+	public static final ParamPoint getBestParams(final ObjectiveI objective) {
 		// prepare simplex algorithm
 		int dimension = objective.getNewParamPoint().getDimension();
 		ArrayList<ParamPoint> points = new ArrayList<ParamPoint>(dimension + 1);
@@ -44,11 +44,11 @@ public final class SimplexOptimization {
 			ParamPoint p = objective.getInitialParamPoint(i);
 			points.add(p);
 		}
-		
+
 
 		// run simplex algorithm
 		Comparator<ParamPoint> comparator = new ResponseComparator(objective);
-		
+
 		double improvement = EPSILON + 1;	// just something bigger then EPSILON
 
 		// START ITERATION
@@ -61,7 +61,7 @@ public final class SimplexOptimization {
 		double rB = objective.getResponse(best);
 		ParamPoint worst = points.get(points.size()-1);
 		double rW = objective.getResponse(worst);
-		
+
 		int cnt = 0;
 		while (improvement > EPSILON || cnt < 100) {
 			cnt++;
@@ -71,7 +71,7 @@ public final class SimplexOptimization {
 			for (int i = 1; i < dimension; i++) {
 				centroid = ParamPoint.add(centroid, ParamPoint.multiply(points.get(i), factor));
 			}
-	
+
 			ParamPoint diff = ParamPoint.subtract(centroid, worst);
 
 			ParamPoint r = ParamPoint.add(centroid, diff);	// reflected point R
@@ -120,9 +120,9 @@ public final class SimplexOptimization {
 			worst = points.get(points.size()-1);
 			double rWnew = objective.getResponse(worst);
 			improvement = rW - rWnew;
-			if (improvement < 0) {
+//			if (improvement < 0) {
 //				System.out.println("Neg. Imrovements!");
-			}
+//			}
 			rW = rWnew;
 //			System.out.println("Iteration: " + cnt + ": Improvement: " + improvement);
 		}
@@ -133,19 +133,20 @@ public final class SimplexOptimization {
 		return best;
 	}
 
-	
+
 	/**
 	 * A Comparator based on response-values of an objective function. Note that lower responses
 	 * are considered better, so after sorting an array the best parameter point is at index 0.
 	 */
-	public static class ResponseComparator implements Comparator<ParamPoint> {
-		
+	public static class ResponseComparator implements Comparator<ParamPoint>, Serializable {
+
+		private static final long serialVersionUID = 1L;
 		private final ObjectiveI objective;
-		
+
 		protected ResponseComparator(final ObjectiveI objective) {
 			this.objective = objective;
 		}
-		
+
 		public int compare(final ParamPoint p1, final ParamPoint p2) {
 			double r1 = this.objective.getResponse(p1);
 			double r2 = this.objective.getResponse(p2);
