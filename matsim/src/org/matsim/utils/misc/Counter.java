@@ -32,15 +32,15 @@ public class Counter {
 	private final String prefix;
 	private int counter = 0;
 	private int nextCounter = 1;
-	private final Logger log = Logger.getLogger(Counter.class);
-	
+	private static final Logger log = Logger.getLogger(Counter.class);
+
 	/**
 	 * @param prefix Some text that is output just before the counter-value.
 	 */
 	public Counter(final String prefix) {
 		this.prefix = prefix;
 	}
-	
+
 	synchronized public void incCounter() {
 		this.counter++;
 		if (this.counter == this.nextCounter) {
@@ -48,16 +48,16 @@ public class Counter {
 			this.nextCounter *= 2;
 		}
 	}
-	
-	public void printCounter() {
-		log.info(prefix + this.counter);
+
+	synchronized public void printCounter() {
+		log.info(this.prefix + this.counter);
 	}
-	
-	public int getCounter() {
+
+	synchronized public int getCounter() {
 		return this.counter;
 	}
-	
-	public void reset() {
+
+	synchronized public void reset() {
 		this.counter = 0;
 		this.nextCounter = 1;
 	}
