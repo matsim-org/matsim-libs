@@ -37,7 +37,6 @@ package org.matsim.socialnetworks.algorithms;
  * @author jhackney
  */
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicPlan.ActIterator;
@@ -54,11 +53,7 @@ import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.socialnetworks.controler.SNControllerListener;
-//import org.matsim.socialnetworks.controler.SNControllerListener;
 import org.matsim.utils.geometry.shared.Coord;
-
-
 
 
 public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{

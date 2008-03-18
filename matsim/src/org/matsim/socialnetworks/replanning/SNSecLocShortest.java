@@ -37,9 +37,7 @@ import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.socialnetworks.controler.SNControllerListener;
 import org.matsim.utils.geometry.shared.Coord;
-
 
 public class SNSecLocShortest implements PlanAlgorithmI {
 
