@@ -68,8 +68,9 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 	private NetworkLayer network;
 	private TravelCostI tcost;
 	private TravelTimeI ttime;
+	private String[] factypes;
 
-	public PersonSNSecLocRandomReRoute(NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
+	public PersonSNSecLocRandomReRoute(String[] factypes, NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
@@ -105,15 +106,15 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 		double rand = Gbl.random.nextDouble();
 
 		if (rand < cum_p_factype[0]) {
-			factype = SNControllerListener.activityTypesForEncounters[0];
+			factype = factypes[0];
 		}else if (cum_p_factype[0] <= rand && rand < cum_p_factype[1]) {
-			factype = SNControllerListener.activityTypesForEncounters[1];
+			factype = factypes[1];
 		}else if (cum_p_factype[1] <= rand && rand < cum_p_factype[2]) {
-			factype = SNControllerListener.activityTypesForEncounters[2];
+			factype = factypes[2];
 		}else if (cum_p_factype[2] <= rand && rand < cum_p_factype[3]) {
-			factype = SNControllerListener.activityTypesForEncounters[3];
+			factype = factypes[3];
 		}else {
-			factype = SNControllerListener.activityTypesForEncounters[4];
+			factype = factypes[4];
 		}
 
 //		Get all instances of this facility type in the plan
