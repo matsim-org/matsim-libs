@@ -25,42 +25,42 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 
 /**
- * @author marcel
- * 
  * Replaces the leg modes in a single plan or in all plans of a person.
  * One can replace one or more leg modes at a time.
+ *
+ * @author mrieser
  */
 public class PlanReplaceLegModes extends PersonAlgorithm implements PlanAlgorithmI {
 
-	private String[] fromMode;
-	private String[] toMode;
-	
-	public PlanReplaceLegModes(String from, String to) {
-		fromMode = new String[1];
-		fromMode[0] = from;
-		toMode = new String[1];
-		toMode[0] = to;
+	private final String[] fromMode;
+	private final String[] toMode;
+
+	public PlanReplaceLegModes(final String from, final String to) {
+		this.fromMode = new String[1];
+		this.fromMode[0] = from;
+		this.toMode = new String[1];
+		this.toMode[0] = to;
 	}
-	
-	public PlanReplaceLegModes(String[] from, String to[]) {
-		fromMode = from;
-		toMode = to;
+
+	public PlanReplaceLegModes(final String[] from, final String to[]) {
+		this.fromMode = from.clone();
+		this.toMode = to.clone();
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		for (Plan plan : person.getPlans()) {
 			run(plan);
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 		for (int i = 1, max = plan.getActsLegs().size(); i < max; i += 2) {
 			Leg leg = (Leg)plan.getActsLegs().get(i);
 			String mode = leg.getMode();
-			for (int idx = 1; idx < fromMode.length; idx++) {
-				if (fromMode[idx].equals(mode)) {
-					leg.setMode(toMode[idx]);
+			for (int idx = 1; idx < this.fromMode.length; idx++) {
+				if (this.fromMode[idx].equals(mode)) {
+					leg.setMode(this.toMode[idx]);
 				}
 			}
 		}
