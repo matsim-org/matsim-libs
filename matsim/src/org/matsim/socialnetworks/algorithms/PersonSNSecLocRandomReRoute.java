@@ -178,8 +178,8 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 					Leg leg = (Leg)bestactslegs.get(j);
 					leg.setRoute(null);
 				}
-//				Reset the score to -9999. Helps to see if the plan was really changed
-				newPlan.setScore(-9999);
+//				Reset the score to Undefined. Helps to see if the plan was really changed
+				newPlan.setScore(Double.NaN);
 				
 				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 //				new PlansCalcRoute(network, tcost, ttime).run(plan);
