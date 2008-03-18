@@ -39,6 +39,8 @@ import org.matsim.router.util.TravelTimeI;
 public class EUTRouter implements LeastCostPathCalculator {
 
 	private static final int searchPaths = 3;
+	
+	private static final CARAFunction indiffFunc = new CARAFunction(0);
 
 	private EUTRouterAnalyzer analyzer;
 
@@ -75,21 +77,21 @@ public class EUTRouter implements LeastCostPathCalculator {
 		Route bestRoute = null;
 		Route indiffRoute = null;
 		double leastcost = Double.MAX_VALUE;
-		double leasttime = Double.MAX_VALUE;
-		double avrtime = 0;
+		double leastIndiffCost = Double.MAX_VALUE;
+		
 //		/*
 //		 * We can expect the first route in the list to be the real best path.
 //		 */
 //		indiffRoute = routes.get(0);
 		for (Route route : routes) {
 			double totaltravelcosts = 0;
-			double totalTravelTime = 0;
+			double totalIndiffCosts = 0;
 			
 			for (TravelTimeI traveltimes : ttKnowledge.getTravelTimes()) {
 				double traveltime = calcTravTime(traveltimes, route, starttime);
 				double travelcosts = utilFunc.evaluate(traveltime);
 				totaltravelcosts += travelcosts;
-				totalTravelTime += traveltime;
+				totalIndiffCosts += indiffFunc.evaluate(traveltime);
 			}
 
 			double avrcosts = totaltravelcosts
@@ -100,10 +102,10 @@ public class EUTRouter implements LeastCostPathCalculator {
 				bestRoute = route;
 			}
 			
-			avrtime = totalTravelTime/(double) ttKnowledge.getTravelTimes().size();
+			double avrIndiffCost = totalIndiffCosts/(double) ttKnowledge.getTravelTimes().size();
 			
-			if(avrtime < leasttime) {
-				leasttime = avrtime;
+			if(avrIndiffCost < leastIndiffCost) {
+				leastIndiffCost = avrIndiffCost;
 				indiffRoute = route;
 			}
 		}

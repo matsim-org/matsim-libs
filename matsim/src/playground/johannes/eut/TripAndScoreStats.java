@@ -27,6 +27,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -61,6 +63,16 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 	
 	private BufferedWriter writer;
 	
+	private List<Double> samplesAll = new LinkedList<Double>();
+	
+	private List<Double> samplesGuided = new LinkedList<Double>();
+	
+	private List<Double> samplesUnguided = new LinkedList<Double>();
+	
+	private List<Double> samplesRiskAverse = new LinkedList<Double>();
+	
+	private List<Double> samplesReplanned = new LinkedList<Double>();
+	
 	public TripAndScoreStats(EUTRouterAnalyzer analyzer) {
 		this.analyzer = analyzer;
 	}
@@ -74,32 +86,32 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 			 * Total average
 			 */
 			Collection<Person> population = event.getControler().getPopulation().getPersons().values();
-			double avrTripDur = avrTripDuration(population);
+			double avrTripDur = avrTripDuration(population, samplesAll);
 			double avrScore = avrSelectedScore(population);
 			dump(avrTripDur, avrScore);
 			/*
 			 * Guided agents
 			 */
-			avrTripDur = avrTripDuration(analyzer.getGuidedPersons());
+			avrTripDur = avrTripDuration(analyzer.getGuidedPersons(), samplesGuided);
 			avrScore = avrSelectedScore(analyzer.getGuidedPersons());
 			dump(avrTripDur, avrScore);
 			/*
 			 * Unguided agents
 			 */
 			Collection<Person> unguided = CollectionUtils.subtract(population, analyzer.getGuidedPersons());
-			avrTripDur = avrTripDuration(unguided);
+			avrTripDur = avrTripDuration(unguided, samplesUnguided);
 			avrScore = avrSelectedScore(unguided);
 			dump(avrTripDur, avrScore);
 			/*
 			 * Re-planed agents
 			 */
-			avrTripDur = avrTripDuration(analyzer.getReplanedPersons());
+			avrTripDur = avrTripDuration(analyzer.getReplanedPersons(), samplesReplanned);
 			avrScore = avrSelectedScore(analyzer.getReplanedPersons());
 			dump(avrTripDur, avrScore);
 			/*
 			 * Risk-averse persons
 			 */
-			avrTripDur = avrTripDuration(analyzer.getRiskAversePersons());
+			avrTripDur = avrTripDuration(analyzer.getRiskAversePersons(), samplesRiskAverse);
 			avrScore = avrSelectedScore(analyzer.getRiskAversePersons());
 			dump(avrTripDur, avrScore);
 			
@@ -118,15 +130,17 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		
 	}
 
-	private double avrTripDuration(Collection<Person> persons) {
+	private double avrTripDuration(Collection<Person> persons, List<Double> samples) {
 		if(persons.isEmpty())
 			return 0;
 		
 		double sum = 0;
 		for(Person p : persons) {
 			Double d = tripDurations.get(p);
-			if(d != null)// unfortunately this can happen -> within-day bug!
+			if(d != null) {// unfortunately this can happen -> within-day bug!
 				sum += d;
+				samples.add(d);
+			}
 		}
 		
 		return sum/(double)persons.size();
@@ -180,11 +194,34 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 
 	public void notifyShutdown(ShutdownEvent event) {
 		try {
+			writer.write("avr\t");
+			writer.write(String.valueOf(calcAvr(samplesAll)));
+			writer.write("\t");
+			writer.write("\t");
+			writer.write(String.valueOf(calcAvr(samplesGuided)));
+			writer.write("\t");
+			writer.write("\t");
+			writer.write(String.valueOf(calcAvr(samplesUnguided)));
+			writer.write("\t");
+			writer.write("\t");
+			writer.write(String.valueOf(calcAvr(samplesReplanned)));
+			writer.write("\t");
+			writer.write("\t");
+			writer.write(String.valueOf(calcAvr(samplesRiskAverse)));
+			writer.newLine();
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	private double calcAvr(List<Double> samples) {
+		double sum = 0;
+		for(Double d : samples)
+			sum += d;
+		
+		return sum/(double)samples.size();
 	}
 
 	public Map<Person, Double> getTripDurations() {

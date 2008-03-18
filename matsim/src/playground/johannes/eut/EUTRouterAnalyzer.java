@@ -65,6 +65,8 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 	
 	private Collection<Person> riskAversePersons;
 	
+	private List<Integer> sampelsRiskAverse = new LinkedList<Integer>();
+	
 	private BufferedWriter summaryWriter;
 	
 	public EUTRouterAnalyzer(ArrowPrattRiskAversionI utilFunction) {
@@ -135,6 +137,7 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 						replannedTwice++;
 				}
 			}
+			sampelsRiskAverse.add(totalRouteDiffers);
 			writer.close();
 			
 			/*
@@ -181,6 +184,13 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 
 	public void notifyShutdown(ShutdownEvent event) {
 		try {
+			int sum = 0;
+			for(Integer i : sampelsRiskAverse) {
+				sum += i;
+			}
+			summaryWriter.write("avr\t");
+			summaryWriter.write(String.valueOf(sum/(double)sampelsRiskAverse.size()));
+			summaryWriter.newLine();
 			summaryWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -28,6 +28,7 @@ public class TimevariantValueStorage {
     private final int binCnt;
     
     private final Map<BasicLinkI, double[]> valueMap = new LinkedHashMap<BasicLinkI, double[]>();
+//    private final Map<BasicLinkI, double[]> valueMap = new THashMap<BasicLinkI, double[]>();
 
     // -------------------- CONSTRUCTION --------------------
 

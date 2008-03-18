@@ -10,7 +10,7 @@ package playground.johannes.eut;
  */
 public class CARAFunction implements ArrowPrattRiskAversionI {
 
-	private static final double timescale = 600.0;
+	private static final double timescale = 1.0;
 
 	private double rho;
 
@@ -21,7 +21,7 @@ public class CARAFunction implements ArrowPrattRiskAversionI {
 	public void setRiskAversionIndex(double rho) {
 		if(rho == 0) {
 //			Gbl.getLogger().warning("Zero is not allowed for rho in the CARA-Function. Changed to 0.0001.");
-			this.rho = 0.0000001;
+			this.rho = Math.pow(10, -15);
 		} else
 			this.rho = rho;
 	}

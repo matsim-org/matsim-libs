@@ -117,7 +117,17 @@ public class EUTController extends WithindayControler {
 		eutReRoute = new EUTReRoute(getNetwork(), ttmemory, rho);
 		strategy.addStrategyModule(eutReRoute);
 		manager.addStrategy(strategy, replanningFraction);
-		
+		/*
+		 * Departure time mutator.
+		 */
+//		strategy = new PlanStrategy(selector);
+//		DepTimeMutator mutator = new DepTimeMutator(eutReRoute.getUtilFunction(), ttmemory);
+//		TimeAllocationMutator mutator = new TimeAllocationMutator();
+//		strategy.addStrategyModule(mutator);
+//		manager.addStrategy(strategy, replanningFraction/2.0);
+		/*
+		 * Do nothing...
+		 */
 		strategy = new PlanStrategy(selector);
 		manager.addStrategy(strategy, 1 - replanningFraction);
 		/*
@@ -237,7 +247,9 @@ public class EUTController extends WithindayControler {
 	public static void main(String args[]) {
 //		EUTController controller = new EUTController(new String[]{"/Users/fearonni/vsp-work/eut/corridor/config/config.xml"});
 		EUTController controller = new EUTController(args);
+		long time = System.currentTimeMillis();
 		controller.run();
+		System.out.println("Controller took " + (System.currentTimeMillis() - time) +" ms.");
 	}
 
 	private double string2Double(String str) {
