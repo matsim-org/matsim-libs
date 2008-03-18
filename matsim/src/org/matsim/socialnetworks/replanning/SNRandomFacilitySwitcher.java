@@ -31,15 +31,16 @@ public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
 	private NetworkLayer network;
 	private TravelCostI tcost;
 	private TravelTimeI ttime;
+	private String[] factypes;
 	
-    public SNRandomFacilitySwitcher(NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
+    public SNRandomFacilitySwitcher(String[] factypes, NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
     	
     }
 
     @Override
     public PlanAlgorithmI getPlanAlgoInstance() {
-//	return new SNSecLocShortest();
-	return new SNSecLocRandom(network, tcost, ttime);
+//	return new SNSecLocShortest(factypes, network, tcost, ttime);
+	return new SNSecLocRandom(factypes, network, tcost, ttime);
     }
 
 
