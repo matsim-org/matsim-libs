@@ -95,26 +95,6 @@ public class SocialNetworkStatistics {
 
 		// statsoutdir = Gbl.getConfig().socnetmodule().getOutDir()+"stats/";
 		statsoutdir = dir + "stats/";
-
-		// File snDir =new File(statsoutdir);
-		// if(!snDir.mkdir() && !snDir.exists()){
-		// Gbl.errorMsg("Cannot make directory "+statsoutdir);
-		// }
-		//
-		// try {
-		// eout = new BufferedWriter(new FileWriter(eoutfile));
-		// eout.write("iter tlast tfirst dist egoid alterid purpose timesmet\n");
-		// aout = new BufferedWriter(new FileWriter(aoutfile));
-		// //aout.write("tstep egoid egozone egodeg egoasd egoclust egoaccess
-		// lastactivity rseed var\n");
-		// aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype
-		// numknown\n");
-		// gout = new BufferedWriter(new FileWriter(goutfile));
-		// gout.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age
-		// meet_freq\n");
-		// }
-		// catch (IOException ex) {
-		// }
 	}
 
 	public void openFiles() {
@@ -328,7 +308,7 @@ public class SocialNetworkStatistics {
 					Act nextAct = (Act) a_it.next();
 						planTypeString.append(nextAct.getType().charAt(0));
 				}
-				// 10.03.07 JH If Plan.getType() is to be called in social nets in the future, for example
+				// 10.03.08 JH If Plan.getType() is to be called in social nets in the future, for example
 //				to compare some statistics across plan types, remove this comment. However this
 //				could lead to setting the type to undefined values because the type string that is
 //				constructed above is not checked vs the DTD and might result in nonsense plan types

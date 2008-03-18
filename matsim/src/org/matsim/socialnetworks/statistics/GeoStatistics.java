@@ -23,7 +23,8 @@ import edu.uci.ics.jung.utils.UserData;
 public class GeoStatistics {
 	/**
 	 * Glues MatSim egonets together to make a JUNG graph object for further
-	 * analysis with JUNG statistical package.
+	 * analysis with JUNG statistical package. Aggregates the network to a
+	 * geographic Layer.
 	 *
 	 * @author jhackney
 	 */
