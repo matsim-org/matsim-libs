@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xml:lang="en">
+
+<xsd:element name="retailers" type="retailersType"/>
+	
+<xsd:complexType name="retailersType">	
+	<xsd:sequence>
+		<xsd:element name="retailer" type="retailerType" minOccurs="1" maxOccurs="unbounded"/>
+	</xsd:sequence>
+	<xsd:attribute name="desc" type="xsd:string" use="optional"/>
+	<xsd:attribute name="aggregation_layer" type="xsd:string" use="optional"/>
+</xsd:complexType>
+
+<xsd:complexType name="retailerType">
+	<xsd:sequence>
+		<xsd:element name="facility" type="facilityType" minOccurs="1" maxOccurs="unbounded"/>
+	</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:positiveInteger" use="required"/>
+		<xsd:attribute name="cust_sqm" type="xsd:double" use="required"/>
+	</xsd:complexType>
+
+<xsd:complexType name="facilityType">
+	<xsd:sequence>
+		<xsd:element name="activity" type="activityType"/>
+		<xsd:element name="capacity" type="capacityType"/>
+		<xsd:element name="opentimes" type="opentimesType"/>
+	</xsd:sequence>
+	<xsd:attribute name="id" type="xsd:positiveInteger" use="required"/>
+	<xsd:attribute name="x" type="xsd:double" use="required"/>
+	<xsd:attribute name="y" type="xsd:double" use="required"/>
+	<xsd:attribute name="min_cust_sqm" type="xsd:double" use="required"/>
+</xsd:complexType>
+
+<xsd:complexType name="activityType">
+		<xsd:attribute name="type" type="xsd:string" use="required"/>
+</xsd:complexType>
+
+<xsd:complexType name="capacityType">
+			<xsd:attribute name="value" type="xsd:positiveInteger" use="required"/>
+</xsd:complexType>
+
+<xsd:complexType name="opentimesType">
+	<xsd:sequence>
+		<xsd:element name="opentime" type="opentimeType" minOccurs="1" maxOccurs="unbounded"/>
+	</xsd:sequence>
+	<xsd:attribute name="day" type="xsd:string" use="optional" default="wkday"/>
+</xsd:complexType>
+
+<xsd:complexType name="opentimeType">
+	<xsd:attribute name="start_time" type="xsd:time" use="optional" default="09:00:00"/>
+	<xsd:attribute name="end_time" type="xsd:time" use="optional" default="17:00:00"/>
+</xsd:complexType>
+
+</xsd:schema>
