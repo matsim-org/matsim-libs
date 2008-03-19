@@ -53,6 +53,10 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 	public SNSecLocShortest(String[] factypes, NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
+		this.network=network;
+		this.tcost=tcost;
+		this.ttime=ttime;
+		this.factypes=factypes;
 	}
 
 	public void run(Plan plan) {

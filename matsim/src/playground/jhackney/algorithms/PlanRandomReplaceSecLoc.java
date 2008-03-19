@@ -73,6 +73,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 		this.network=network;
 		this.tcost=tcost;
 		this.ttime=ttime;
+		this.factypes=factypes;
 	}
 
 	public void run(Plan plan) {
