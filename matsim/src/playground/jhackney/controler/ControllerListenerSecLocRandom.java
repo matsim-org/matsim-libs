@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SNControlerListener.java
+ * ControlerListenerSecLocRandom.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -51,21 +51,29 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
+import playground.jhackney.algorithms.PlanRandomReplaceSecLoc;
+
 
 /**
- * This controler initializes a social network. Initialization can use the initial plans and/or
- * other algorithms to generate a social network. The social network allows agents to exchange
- * information about locations and other agents (introduce friends). Plans are assigned
- * to the transportation network using a standard MatSim toolbox "strategy", or evolutionary
- * optimization algorithm. A stopping point for these iterations is chosen. Then the social
- * network is adjusted for the optimized (improved) plans according to another algorithm. The
- * agents interact again in their social network to exchange information. The plans are changed
- * according to the new knowledge of the agents, and the plans are again optimized.
+ * This controler implements a plan algorithm in which the locations of
+ * secondary activities are changed randomly, assuming the agents know
+ * something about the world. The plans are changed
+ * according to this assumption. Each time the plans are changed, the replanning
+ * algorithm is called and the plans are again optimized.
+ * 
+ * The difference between this controller and the SNControllerSecLoc is the call
+ * to the PlanRandomReplaceSecLoc instead of to PersonSNSecLocRandomReRoute algorithm.
+ * The former replaces the facility from the facilities layer while the latter
+ * replaces it from the agent's knowledge. Thus in this conroller the information
+ * exchange between agents does not matter in replanning.
+ * 
+ * The intent is to be able to compare a random secondary location choice
+ * algorithm with one that uses social network exchanges of information
  *  
  * @author jhackney
  *
  */
-public class SNControllerListenerSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener {
+public class ControllerListenerSecLocRandom implements StartupListener, IterationStartsListener, IterationEndsListener {
 
 	private boolean CALCSTATS = true;
 	private static final String DIRECTORY_SN = "socialnets/";
@@ -85,7 +93,7 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
 	Collection<SocializingOpportunity> socialPlans=null;
 
-	private final Logger log = Logger.getLogger(SNControllerListenerSecLoc.class);
+	private final Logger log = Logger.getLogger(ControllerListenerSecLocRandom.class);
 
 //	Variables for allocating the spatial meetings among different types of activities
 	double fractionS[];
@@ -235,7 +243,8 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
 			while (itreplan.hasNext()) {
 				Plan p = (Plan) itreplan.next().getSelectedPlan();
-				new PersonSNSecLocRandomReRoute(activityTypesForEncounters, controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
+//				new PersonSNSecLocRandomReRoute(activityTypesForEncounters, controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
+				new PlanRandomReplaceSecLoc(activityTypesForEncounters, controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
 //				System.out.println( "SNControler1 Number of plans for person "+p.getPerson().getId()+" "+p.getPerson().getPlans().size());
 			}
 			this.log.info(" ... done");
@@ -447,3 +456,4 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 	}
 
 }
+
