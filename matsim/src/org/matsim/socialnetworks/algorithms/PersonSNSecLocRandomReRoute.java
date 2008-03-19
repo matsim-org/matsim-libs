@@ -71,6 +71,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 		this.network=network;
 		this.tcost=tcost;
 		this.ttime=ttime;
+		this.factypes=factypes;
 	}
 
 	public void run(Plan plan) {
@@ -176,6 +177,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 				}
 //				Reset the score to Undefined. Helps to see if the plan was really changed
 				newPlan.setScore(Double.NaN);
+//				newPlan.setScore(-9999);
 				
 				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 //				new PlansCalcRoute(network, tcost, ttime).run(plan);
