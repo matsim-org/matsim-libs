@@ -23,6 +23,7 @@ package playground.ciarif.retailers;
 import java.util.TreeMap;
 
 
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -38,10 +39,12 @@ public class Facility extends Location {
 
 	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
 	private int min_cust_sqm = 0;
-
+	private int capacity = 0;
+	private IdI id;
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
+
 
 	public Facility(final Facilities layer, final IdI id, final CoordI center) {
 		super(layer,id,center);
@@ -78,14 +81,28 @@ public class Facility extends Location {
 		this.min_cust_sqm=min_cust_sqm;
 	}
 	
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+	}
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
+
+	
+
+	public IdI getLocId() {
+		return id;
+	}
+	
 	public int getMin_cust_sqm() {
 		return min_cust_sqm;
 	}
 	
+	public int getCapacity() {
+		return capacity;
+	}
+
 	public final TreeMap<String,Activity> getActivities() {
 		return this.activities;
 	}

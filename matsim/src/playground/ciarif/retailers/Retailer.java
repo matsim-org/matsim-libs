@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
+//import org.matsim.facilities.Facility;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
@@ -15,7 +16,17 @@ public class Retailer {
 	private final HashMap<Integer,Facility> facilities = new HashMap<Integer, Facility>();
 	private CoordI coord;
 
-
+/*	<retailer id="3" cust_sqm="100">
+	
+	<facility id="1" x="60.0" y="105.0" min_cust_sqm = "100">
+		<activity type="shop"/>
+		<capacity value="50"/>
+		<opentimes day="wkday">
+			<opentime start_time="08:00:00" end_time="12:00:00"></opentime>
+			<opentime start_time="15:00:00" end_time="19:00:00"></opentime>
+		</opentimes>
+	</facility>*/
+	
 	protected Retailer(final IdI locId, final int cust_sqm) {
 		this.locId = locId;
 		this.cust_sqm = cust_sqm;
@@ -30,10 +41,6 @@ public class Retailer {
 		return v;
 	}
 	
-//	public final Facility createFacility(final String id, final String x, final String y) {
-//		return this.createFacility(new Id(id),new Coord(x,y));
-//	}
-
 	public final void setCust_sqm(final int cust_sqm) {
 		this.cust_sqm = cust_sqm;
 	}
