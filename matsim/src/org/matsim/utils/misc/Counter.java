@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  *
  * @author mrieser
  */
-public class Counter {
+public final class Counter {
 	private final String prefix;
 	private int counter = 0;
 	private int nextCounter = 1;
