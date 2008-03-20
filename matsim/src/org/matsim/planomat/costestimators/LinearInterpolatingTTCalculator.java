@@ -46,17 +46,17 @@ public class LinearInterpolatingTTCalculator
 implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArrivalI, TravelTimeI {
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
-	private HashMap<EnterEvent, Double> enterEvents = new HashMap<EnterEvent, Double>();
+	private final HashMap<EnterEvent, Double> enterEvents = new HashMap<EnterEvent, Double>();
 	private NetworkLayer network = null;
-	private int roleIndex;
-	private int timeslice;
+	private final int roleIndex;
+	private final int timeslice;
 
 	static private class EnterEvent /*implements Comparable<EnterEvent>*/ {
 
-		private String linkId;
-		private String vehId;
+		private final String linkId;
+		private final String vehId;
 
-		public EnterEvent(String linkId, String vehId) {
+		public EnterEvent(final String linkId, final String vehId) {
 			this.linkId = linkId;
 			this.vehId = vehId;
 		}
@@ -73,15 +73,15 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 			 * only be once or at most twice (in some rare cases where enter-link events
 			 * are written before leave-link events, e.g. in distributed/parallel
 			 * computations) at the same time in the hashmap. Thus the number of collisions
-			 * is rather low by using vehID as the hashcode.
+			 * is rather low by using vehId as the hashcode.
 			 *
-			 * variant: use (10*vehID_) + (int)floor(Math.random()*10) to further decrease possible collisions
+			 * variant: use (10*vehId) + (int)floor(Gbl.random.nextDouble()*10) to further decrease possible collisions
 			 */
 			return this.vehId.hashCode();
 		}
 
 		@Override
-		public boolean equals(Object o) {
+		public boolean equals(final Object o) {
 			if (o == null) return false;
 			try {
 				EnterEvent event = (EnterEvent)o;
@@ -108,14 +108,14 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 	private class LinearInterpolatingTravelTimeRole {
 		private HashMap<Integer, Double> timeSum = null;	// map<timeslot-index, sum-of-travel-times>
 		private HashMap<Integer, Integer> timeCnt = null;		// map<timeslot-index, count-of-travel-times>
-		private Link link;
+		private final Link link;
 
-		public LinearInterpolatingTravelTimeRole(Link link) {
+		public LinearInterpolatingTravelTimeRole(final Link link) {
 			this.link = link;
 			this.timeSum = new HashMap<Integer, Double>();
 		}
 
-		private int getTimeSlotIndex(double time) {
+		private int getTimeSlotIndex(final double time) {
 			int slice = (int)(time/LinearInterpolatingTTCalculator.this.timeslice);
 			return slice;
 		}
@@ -126,7 +126,7 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 			this.timeCnt = new HashMap<Integer, Integer>(nofSlots);
 		}
 
-		public void addTravelTime(double now, double traveltime) {
+		public void addTravelTime(final double now, final double traveltime) {
 			Integer index = Integer.valueOf(getTimeSlotIndex(now));
 			Double sum = this.timeSum.get(index);
 			Integer cnt = this.timeCnt.get(index);
@@ -141,7 +141,7 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 			this.timeCnt.put(index, cnt);
 		}
 
-		public double getTravelTime(double now) {
+		public double getTravelTime(final double now) {
 
 			double tTravelEstimation = 0.0;
 			Double sumA, sumB;
@@ -184,7 +184,7 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 
 	};
 
-	public LinearInterpolatingTTCalculator(NetworkLayer network, int timeslice) {
+	public LinearInterpolatingTTCalculator(final NetworkLayer network, final int timeslice) {
 		super();
 		this.network = network;
 		this.timeslice = timeslice;
@@ -192,7 +192,7 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 		resetTravelTimes();
 	}
 
-	public LinearInterpolatingTTCalculator(NetworkLayer network) {
+	public LinearInterpolatingTTCalculator(final NetworkLayer network) {
 		this(network, 15*60);
 	}
 
@@ -207,16 +207,16 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 	// Implementation of EventAlgorithmI
 	//////////////////////////////////////////////////////////////////////
 
-	public void reset(int iteration) {
+	public void reset(final int iteration) {
 		resetTravelTimes();
 	}
 
-	public void handleEvent(EventLinkEnter event) {
+	public void handleEvent(final EventLinkEnter event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
 		this.enterEvents.put(e, event.time);
 	}
 
-	public void handleEvent(EventLinkLeave event) {
+	public void handleEvent(final EventLinkLeave event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
 		Double starttime = this.enterEvents.remove(e);
 		if (starttime != null) {
@@ -232,7 +232,7 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 		}
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(final EventAgentArrival event) {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!
@@ -241,11 +241,11 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 	}
 
 
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(final Link link, final double time) {
 		return getTravelTimeRole(link).getTravelTime(time);
 	}
 
-	private LinearInterpolatingTravelTimeRole getTravelTimeRole(Link l) {
+	private LinearInterpolatingTravelTimeRole getTravelTimeRole(final Link l) {
 		LinearInterpolatingTravelTimeRole r = (LinearInterpolatingTravelTimeRole)l.getRole(this.roleIndex);
 		if (null == r) {
 			r = new LinearInterpolatingTravelTimeRole(l);
@@ -254,7 +254,7 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 		return r;
 	}
 
-	private double getLinkMinimumTravelTime(Link link) {
+	private double getLinkMinimumTravelTime(final Link link) {
 		return (link.getLength() / link.getFreespeed());
 	}
 
