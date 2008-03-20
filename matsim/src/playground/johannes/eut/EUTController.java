@@ -53,7 +53,8 @@ public class EUTController extends WithindayControler {
 	
 //	private static final Logger log = Logger.getLogger(EUTController.class);
 	
-	private TravelTimeMemory ttmemory;
+//	private TravelTimeMemory ttmemory;
+	private TwoStateTTKnowledge ttmemory;
 	
 	private EstimReactiveLinkTT reactTTs;
 	
@@ -73,9 +74,12 @@ public class EUTController extends WithindayControler {
 	
 	private IterationStartsListener incidentSimulator;
 	
-	private EUTReRoute eutReRoute;
+//	private EUTReRoute eutReRoute;
+	private EUTReRoute2 eutReRoute;
 	
 	private BenefitAnalyzer bAnalyzer;
+	
+	private SummaryWriter summaryWriter;
 	
 	/**
 	 * @param args
@@ -99,11 +103,12 @@ public class EUTController extends WithindayControler {
 		/*
 		 * Initialize the travel time memory for day2day re-planning.
 		 */
-		ttmemory = new TravelTimeMemory();
+//		ttmemory = new TravelTimeMemory();
+		ttmemory = new TwoStateTTKnowledge();
 		ttmemory.setLearningRate(ttLearningRate);
 		ttmemory.setMaxMemorySlots(maxMemorySlots);
-		TimevariantTTStorage storage = ttmemory.makeTTStorage(getTravelTimeCalculator(), network, getTraveltimeBinSize(), 0, 86400);
-		ttmemory.appendNewStorage(storage);
+//		TimevariantTTStorage storage = ttmemory.makeTTStorage(getTravelTimeCalculator(), network, getTraveltimeBinSize(), 0, 86400);
+//		ttmemory.appendNewStorage(storage);
 		/*
 		 * Load the strategy manager.
 		 */
@@ -114,7 +119,8 @@ public class EUTController extends WithindayControler {
 		 * Add one EUTRouter and one empty module.
 		 */
 		PlanStrategy strategy = new PlanStrategy(selector);
-		eutReRoute = new EUTReRoute(getNetwork(), ttmemory, rho);
+//		eutReRoute = new EUTReRoute(getNetwork(), ttmemory, rho);
+		eutReRoute = new EUTReRoute2(getNetwork(), ttmemory, rho);
 		strategy.addStrategyModule(eutReRoute);
 		manager.addStrategy(strategy, replanningFraction);
 		/*
@@ -133,7 +139,7 @@ public class EUTController extends WithindayControler {
 		/*
 		 * Create a router analyzer...
 		 */
-		routerAnalyzer = new EUTRouterAnalyzer(eutReRoute.getUtilFunction());
+		routerAnalyzer = new EUTRouterAnalyzer(eutReRoute.getUtilFunction(), summaryWriter);
 		eutReRoute.setRouterAnalyzer(routerAnalyzer);
 		addControlerListener(routerAnalyzer);
 		
@@ -155,6 +161,8 @@ public class EUTController extends WithindayControler {
 		 */
 		setTraveltimeBinSize(60);
 		
+		summaryWriter = new SummaryWriter(getConfig().findParam(CONFIG_MODULE_NAME, "summaryFile"));
+		addControlerListener(summaryWriter);
 		super.setup();
 		/*
 		 * Initialize the reactive travel times.
@@ -172,13 +180,13 @@ public class EUTController extends WithindayControler {
 		/*
 		 * Trip stats...
 		 */
-		TripAndScoreStats stats = new TripAndScoreStats(routerAnalyzer); 
+		TripAndScoreStats stats = new TripAndScoreStats(routerAnalyzer, summaryWriter); 
 		addControlerListener(stats);
 		events.addHandler(stats);
 		/*
 		 * Link stats...
 		 */
-		LinkTTVarianceStats linkStats = new LinkTTVarianceStats(getTravelTimeCalculator(), 25200, 32400, 60);
+		LinkTTVarianceStats linkStats = new LinkTTVarianceStats(getTravelTimeCalculator(), 25200, 32400, 60, summaryWriter);
 		addControlerListener(linkStats);
 		/*
 		 * Create incident simulator...
@@ -192,12 +200,21 @@ public class EUTController extends WithindayControler {
 		riskyLinks.add(getNetwork().getLink("800"));
 		riskyLinks.add(getNetwork().getLink("1100"));
 		riskyLinks.add(getNetwork().getLink("1400"));
-		addControlerListener(new TraversedRiskyLink(getPopulation(), riskyLinks));
+		addControlerListener(new TraversedRiskyLink(getPopulation(), riskyLinks, summaryWriter));
+		/*
+		 * Analyze benefits...
+		 */
+		bAnalyzer = new BenefitAnalyzer(stats, routerAnalyzer, ttmemory, eutReRoute.getUtilFunction(), summaryWriter);
+		addControlerListener(bAnalyzer);
 		/*
 		 * 
 		 */
-		bAnalyzer = new BenefitAnalyzer(stats, routerAnalyzer, ttmemory, eutReRoute.getUtilFunction());
-		addControlerListener(bAnalyzer);
+		String personsFile = getConfig().findParam(CONFIG_MODULE_NAME, "guidedPersons");
+		addControlerListener(new CEAnalyzer(personsFile, population, stats, eutReRoute.getUtilFunction()));
+		/*
+		 * 
+		 */
+		
 	}
 
 	@Override

@@ -62,7 +62,10 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 	
 	private List<Integer> samples = new LinkedList<Integer>();
 	
-	public TraversedRiskyLink(Plans population, List<BasicLinkI> riskyLinks) {
+	private SummaryWriter summaryWriter;
+	
+	public TraversedRiskyLink(Plans population, List<BasicLinkI> riskyLinks, SummaryWriter summaryWriter) {
+		this.summaryWriter = summaryWriter;
 		this.population = population;
 		
 		if (!riskyLinks.isEmpty()) {
@@ -156,7 +159,9 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 			for(Integer i : samples)
 				sum += i;
 			writer.write("avr\t");
-			writer.write(String.valueOf(sum/(double)samples.size()));
+			double avr = sum/(double)samples.size();
+			summaryWriter.setN_traversedRiskyLink(avr);
+			writer.write(String.valueOf(avr));
 			writer.newLine();
 			writer.close();
 		} catch (IOException e) {

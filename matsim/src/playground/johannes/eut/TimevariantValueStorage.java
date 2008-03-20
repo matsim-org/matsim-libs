@@ -131,6 +131,23 @@ public class TimevariantValueStorage {
     		logger.warn("Incompatibel storage objects!");
     	}
     }
+    
+    public double getAverage() {
+    	double sum = 0;
+    	for(BasicLinkI link : valueMap.keySet()) {
+    		sum += getLinkAverage(link);
+    	}
+    	return sum/(double)valueMap.size();
+    }
+    
+    public double getLinkAverage(BasicLinkI link) {
+    	double[] values = valueMap.get(link);
+    	double sum = 0;
+    	for(double d : values)
+    		sum += d;
+    	return sum/(double)values.length;
+    }
+    
     public boolean isCompatibleWith(TimevariantValueStorage other) {
         return (this.startTime == other.startTime
                 && this.endTime == other.endTime
@@ -142,7 +159,7 @@ public class TimevariantValueStorage {
         for(BasicLinkI link : valueMap.keySet()) {
         	double[] values = valueMap.get(link);
         	builder.append(link.getId().toString());
-        	for(int i = 420; i < 450; i++) {
+        	for(int i = 0; i < binCnt; i++) {
         		builder.append("\t");
         		builder.append(String.valueOf(values[i]));
         	}

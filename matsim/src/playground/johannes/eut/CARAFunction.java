@@ -10,7 +10,7 @@ package playground.johannes.eut;
  */
 public class CARAFunction implements ArrowPrattRiskAversionI {
 
-	private static final double timescale = 1.0;
+	private static final double timescale = 600.0;
 
 	private double rho;
 

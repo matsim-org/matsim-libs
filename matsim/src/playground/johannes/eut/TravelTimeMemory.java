@@ -34,12 +34,24 @@ public class TravelTimeMemory {
 		return storage;
 	}
 	
+	protected LinkedList<TimevariantTTStorage> getStorageList() {
+		return storageList;
+	}
+	
 	public void setMaxMemorySlots(int slots) {
 		maxMemomry = slots;
 	}
 	
+	public int getMaxMemorySlots() {
+		return maxMemomry;
+	}
+	
 	public void setLearningRate(double rate) {
 		learningrate = rate;
+	}
+	
+	public double getLearningRate() {
+		return learningrate;
 	}
 	
 	public void appendNewStorage(TimevariantTTStorage storage) {

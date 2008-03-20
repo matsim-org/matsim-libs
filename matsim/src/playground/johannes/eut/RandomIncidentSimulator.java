@@ -47,7 +47,7 @@ public class RandomIncidentSimulator implements IterationStartsListener, Iterati
 
 	private double capReduction = 0.5;
 	
-	private int startIteration = 10;
+	private int startIteration = 0;
 	
 //	private final QueueNetworkLayer network;
 	

@@ -23,11 +23,14 @@
  */
 package playground.johannes.eut;
 
+import java.io.BufferedWriter;
 import java.util.Random;
 
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.controler.Controler;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.io.IOUtils;
 import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.WithindayAgentLogicFactory;
 import org.matsim.withinday.contentment.AgentContentmentI;
@@ -52,6 +55,8 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	private EUTRouterAnalyzer analyzer;
 	
 	private BenefitAnalyzer benefitAnalyzer;
+	
+	private BufferedWriter writer;
 	
 	/**
 	 * @param network
@@ -80,6 +85,12 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 				analyzer.addGuidedPerson(agent.getPerson());
 			if(benefitAnalyzer != null)
 				benefitAnalyzer.addGuidedPerson(agent.getPerson());
+			try {
+				writer.write(agent.getPerson().getId().toString());
+				writer.newLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			return forceReplan;
 		} else
 			return preventReplan;
@@ -91,6 +102,16 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	}
 
 	public void reset() {
+		try {
+			if (writer != null)
+				writer.close();
+
+			writer = IOUtils.getBufferedWriter(Controler
+					.getIterationFilename("guidedPersons.txt"));
+			writer.newLine();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		random = new Random(10);
 	}
 

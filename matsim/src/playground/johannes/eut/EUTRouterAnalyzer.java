@@ -67,10 +67,13 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 	
 	private List<Integer> sampelsRiskAverse = new LinkedList<Integer>();
 	
-	private BufferedWriter summaryWriter;
+	private BufferedWriter runWriter;
 	
-	public EUTRouterAnalyzer(ArrowPrattRiskAversionI utilFunction) {
+	private SummaryWriter summaryWriter;
+	
+	public EUTRouterAnalyzer(ArrowPrattRiskAversionI utilFunction, SummaryWriter summaryWriter) {
 		this.utilFunction = utilFunction;
+		this.summaryWriter = summaryWriter;
 		replannedPersons = new HashSet<Person>();
 		riskAversePersons = new HashSet<Person>();
 	}
@@ -147,17 +150,17 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 			/*
 			 * Dump summary...
 			 */
-			summaryWriter.write(String.valueOf(event.getIteration()));
-			summaryWriter.write(TAB);
-			summaryWriter.write(String.valueOf(totalRouteDiffers));
-			summaryWriter.write(TAB);
-			summaryWriter.write(String.valueOf(guidedPersons.size()));
-			summaryWriter.write(TAB);
-			summaryWriter.write(String.valueOf(replannedTwice));
-			summaryWriter.write(TAB);
-			summaryWriter.write(String.valueOf(riskyAndGuided.size()));
-			summaryWriter.newLine();
-			summaryWriter.flush();
+			runWriter.write(String.valueOf(event.getIteration()));
+			runWriter.write(TAB);
+			runWriter.write(String.valueOf(totalRouteDiffers));
+			runWriter.write(TAB);
+			runWriter.write(String.valueOf(guidedPersons.size()));
+			runWriter.write(TAB);
+			runWriter.write(String.valueOf(replannedTwice));
+			runWriter.write(TAB);
+			runWriter.write(String.valueOf(riskyAndGuided.size()));
+			runWriter.newLine();
+			runWriter.flush();
 			/*
 			 * We need to do this here, since re-planning happens in
 			 * iteration-start event.
@@ -173,9 +176,9 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 	public void notifyStartup(StartupEvent event) {
 		String filename = Controler.getOutputFilename("replanAnalysis.txt");
 		try {
-			summaryWriter = IOUtils.getBufferedWriter(filename);
-			summaryWriter.write("Iteration\trouteDiffers\tn_guided\treplannedTwice\triskyAndGuided");
-			summaryWriter.newLine();
+			runWriter = IOUtils.getBufferedWriter(filename);
+			runWriter.write("Iteration\trouteDiffers\tn_guided\treplannedTwice\triskyAndGuided");
+			runWriter.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -188,10 +191,12 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 			for(Integer i : sampelsRiskAverse) {
 				sum += i;
 			}
-			summaryWriter.write("avr\t");
-			summaryWriter.write(String.valueOf(sum/(double)sampelsRiskAverse.size()));
-			summaryWriter.newLine();
-			summaryWriter.close();
+			runWriter.write("avr\t");
+			double n_avr = sum/(double)sampelsRiskAverse.size();
+			summaryWriter.setN_riskaverse(n_avr);
+			runWriter.write(String.valueOf(n_avr));
+			runWriter.newLine();
+			runWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

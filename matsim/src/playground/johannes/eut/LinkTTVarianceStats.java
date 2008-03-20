@@ -55,7 +55,10 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 	
 	private int binsize;
 	
-	public LinkTTVarianceStats(TravelTimeI travelTimes, int start, int end, int binsize) {
+	private SummaryWriter summaryWriter;
+	
+	public LinkTTVarianceStats(TravelTimeI travelTimes, int start, int end, int binsize, SummaryWriter summaryWriter) {
+		this.summaryWriter = summaryWriter;
 		this.travelTimes = travelTimes;
 		this.startTime = start;
 		this.endTime = end;
@@ -127,6 +130,7 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 				writer.newLine();
 			}
 			writer.write("avr\t");
+			summaryWriter.setAvrTTVariance(varianceAvr);
 			writer.write(String.valueOf(varianceAvr));
 			writer.newLine();
 			writer.close();

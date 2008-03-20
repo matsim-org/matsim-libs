@@ -73,8 +73,11 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 	
 	private List<Double> samplesReplanned = new LinkedList<Double>();
 	
-	public TripAndScoreStats(EUTRouterAnalyzer analyzer) {
+	private SummaryWriter summaryWriter;
+	
+	public TripAndScoreStats(EUTRouterAnalyzer analyzer, SummaryWriter summaryWriter) {
 		this.analyzer = analyzer;
+		this.summaryWriter = summaryWriter;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -171,7 +174,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		Double time = departures.get(event.agent);
 		if(time != null) {
 			double deltaT = event.time - time;
-			tripDurations.put(event.agent, deltaT);
+			tripDurations.put(event.agent, deltaT); // TODO: Does not work with round trips!
 			departures.remove(event.agent);
 		}
 		
@@ -195,19 +198,29 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 	public void notifyShutdown(ShutdownEvent event) {
 		try {
 			writer.write("avr\t");
-			writer.write(String.valueOf(calcAvr(samplesAll)));
+			double avr = calcAvr(samplesAll);
+			summaryWriter.setTt_avr(avr);
+			writer.write(String.valueOf(avr));
 			writer.write("\t");
 			writer.write("\t");
-			writer.write(String.valueOf(calcAvr(samplesGuided)));
+			avr = calcAvr(samplesGuided);
+			summaryWriter.setTt_guided(avr);
+			writer.write(String.valueOf(avr));
 			writer.write("\t");
 			writer.write("\t");
-			writer.write(String.valueOf(calcAvr(samplesUnguided)));
+			avr = calcAvr(samplesUnguided);
+			summaryWriter.setTt_unguided(avr);
+			writer.write(String.valueOf(avr));
 			writer.write("\t");
 			writer.write("\t");
-			writer.write(String.valueOf(calcAvr(samplesReplanned)));
+			avr = calcAvr(samplesReplanned);
+			summaryWriter.setTt_replaned(avr);
+			writer.write(String.valueOf(avr));
 			writer.write("\t");
 			writer.write("\t");
-			writer.write(String.valueOf(calcAvr(samplesRiskAverse)));
+			avr = calcAvr(samplesRiskAverse);
+			summaryWriter.setTt_riskaverse(avr);
+			writer.write(String.valueOf(avr));
 			writer.newLine();
 			writer.close();
 		} catch (IOException e) {

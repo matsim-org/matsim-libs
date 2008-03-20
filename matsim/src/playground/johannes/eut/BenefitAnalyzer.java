@@ -57,7 +57,8 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 	
 //	private EUTRouterAnalyzer routerAnalyzer;
 	
-	private TravelTimeMemory ttKnowledge;
+//	private TravelTimeMemory ttKnowledge;
+	private TwoStateTTKnowledge ttKnowledge;
 	
 	private ArrowPrattRiskAversionI utilFunc;
 	
@@ -71,12 +72,15 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 	
 	private BufferedWriter writer;
 	
+	private SummaryWriter summaryWriter;
+	
 
-	public BenefitAnalyzer(TripAndScoreStats tripStats, EUTRouterAnalyzer routerAnalyzer, TravelTimeMemory ttKnowledge, ArrowPrattRiskAversionI utilFunc) {
+	public BenefitAnalyzer(TripAndScoreStats tripStats, EUTRouterAnalyzer routerAnalyzer, TwoStateTTKnowledge ttKnowledge, ArrowPrattRiskAversionI utilFunc, SummaryWriter summaryWriter) {
 		this.tripStats = tripStats;
 //		this.routerAnalyzer = routerAnalyzer;
 		this.ttKnowledge = ttKnowledge;
 		this.utilFunc = utilFunc;
+		this.summaryWriter = summaryWriter;
 	}
 	/*
 	 * This is ugly, but there is no event between initialization and actual run
@@ -95,16 +99,23 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 				double totaltravelcosts = 0;
 				double totaltraveltime = 0;
 				
-				for (TravelTimeI traveltimes : ttKnowledge.getTravelTimes()) {
-					double traveltime = calcTravTime(traveltimes, route, leg.getDepTime());
-					totaltraveltime += traveltime;
+//				for (TravelTimeI traveltimes : ttKnowledge.getTravelTimes()) {
+//					double traveltime = calcTravTime(traveltimes, route, leg.getDepTime());
+//					totaltraveltime += traveltime;
+//					double travelcosts = utilFunc.evaluate(traveltime);
+//					totaltravelcosts += travelcosts;
+//				}
+				for (int i = 0; i < ttKnowledge.getTravelTimes().size(); i++) {
+					double traveltime = calcTravTime(ttKnowledge.getTravelTimes(i), route, leg.getDepTime());
 					double travelcosts = utilFunc.evaluate(traveltime);
-					totaltravelcosts += travelcosts;
+					totaltravelcosts += travelcosts * ttKnowledge.getWeigth(i);
+					totaltraveltime += traveltime * ttKnowledge.getWeigth(i);
 				}
-
-				double avrcosts = totaltravelcosts
-						/ (double) ttKnowledge.getTravelTimes().size();
-				double avttime = totaltraveltime/ (double) ttKnowledge.getTravelTimes().size();
+				double avrcosts =totaltravelcosts;
+//				double avrcosts = totaltravelcosts
+//						/ (double) ttKnowledge.getTravelTimes().size();
+//				double avttime = totaltraveltime/ (double) ttKnowledge.getTravelTimes().size();
+				double avttime = totaltraveltime;
 				
 				cesum += utilFunc.getTravelTime(avrcosts);
 				expTTSum += avttime;
@@ -157,7 +168,10 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 				sumCE += d;
 			for(Double d : samplesExpTT)
 				sumExpTT += d;
-			writer.write(String.valueOf(sumCE/(double)samplesCE.size()));
+			
+			double avrCE = sumCE/(double)samplesCE.size();
+			summaryWriter.setTt_benefitPerIter(avrCE);
+			writer.write(String.valueOf(avrCE));
 			writer.write("\t");
 			writer.write(String.valueOf(sumExpTT/(double)samplesExpTT.size()));
 			writer.newLine();
