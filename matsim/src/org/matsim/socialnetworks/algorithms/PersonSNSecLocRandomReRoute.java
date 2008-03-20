@@ -39,7 +39,9 @@ package org.matsim.socialnetworks.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.basic.v01.BasicPlan.LegIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -49,6 +51,7 @@ import org.matsim.plans.Knowledge;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.plans.algorithms.PersonPrepareForSim;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCostI;
@@ -94,7 +97,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 
 		//COPY THE SELECTED PLAN		    
 		Plan newPlan = person.copySelectedPlan();
-		
+
 		// Note that it is not changed, yet
 		boolean changed = false;
 
@@ -147,7 +150,6 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 				// If the first activity was chosen, make sure the last activity is also changed
 				if(newAct.equals(plan.getFirstActivity())){
 					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
-//					Act lastAct = (Act) plan.getActsLegs().get(plan.getActsLegs().size()-1);
 					lastAct.setLink(fFromKnowledge.getLink());
 					Coord newCoord = (Coord) fFromKnowledge.getCenter();
 					lastAct.setCoord(newCoord);
@@ -165,28 +167,38 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 				Coord newCoord = (Coord) fFromKnowledge.getCenter();
 				newAct.setCoord(newCoord);
 				changed = true;
+				if (newPlan.getPerson().getId().equals(new Id("1153489"))) {
+					System.out.println("breakpoint");
+				}
 			}
 
-			if(changed == true){
+			if(changed){
 				//		 loop over all <leg>s, remove route-information
 				ArrayList<?> bestactslegs = newPlan.getActsLegs();
-//				ArrayList<?> bestactslegs = plan.getActsLegs();
 				for (int j = 1; j < bestactslegs.size(); j=j+2) {
 					Leg leg = (Leg)bestactslegs.get(j);
 					leg.setRoute(null);
 				}
 //				Reset the score to Undefined. Helps to see if the plan was really changed
-				newPlan.setScore(Double.NaN);
-//				newPlan.setScore(-9999);
-				
-				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
-//				new PlansCalcRoute(network, tcost, ttime).run(plan);
+				newPlan.setScore(Plan.UNDEF_SCORE);
 
+				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime)).run(newPlan.getPerson());
+//				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
+
+//				DEBUG 1 check for null routes
+				LegIterator testlegit = newPlan.getIteratorLeg();
+				while(testlegit.hasNext()){
+					if(((Leg)testlegit.next()).getRoute() == null){
+						System.out.println("####### DEBUG PersonSNSecLocRandomReRoute null route replanned");
+					}
+				}
+//				DEBUG 2 check route of this person
+				if(Integer.parseInt(person.getId().toString())==3356172){
+					System.out.println("#### OUTPLAN: "+newPlan);
+				}
 				k.map.learnActsActivities(newAct.getRefId(),fFromKnowledge.getActivity(factype));
 				person.setSelectedPlan(newPlan);
-//				person.setSelectedPlan(plan);
-				// Remove previous plan
-//				person.getPlans().remove(plan);
+
 			}else{
 //				System.out.println("   ### newPlan same as old plan");
 				person.getPlans().remove(newPlan);
