@@ -103,8 +103,7 @@ public class PajekWriter {
 
 		try {
 //			System.out.print(" *Vertices " + numPersons + " \n");
-			pjout.write("*Vertices " + numPersons);
-			pjout.newLine();
+			pjout.write("*Vertices " + numPersons+"\r\n");
 
 			Iterator<Person> itPerson = plans.getPersons().values().iterator();
 			int iperson = 1;
@@ -117,15 +116,15 @@ public class PajekWriter {
 				Coord xy = (Coord) ((Act) p.getSelectedPlan().getActsLegs().get(0)).getCoord();
 				double x=(xy.getX()-minCoord.getX())/(maxCoord.getX()-minCoord.getX());
 				double y=(xy.getY()-minCoord.getY())/(maxCoord.getY()-minCoord.getY());
-				pjout.write(iperson + " \"" + p.getId() + "\" "+x +" "+y);
-				pjout.newLine();
+				pjout.write(iperson + " \"" + p.getId() + "\" "+x +" "+y+"\r\n");
+
 //				log.info(iperson + " " + p.getId() + " ["+xy.getX() +" "+xy.getY()+"]\n");
 				pajekIndex.put(p.getId(),iperson);
 				iperson++;
 
 			}
-			pjout.write("*Edges");
-			pjout.newLine();
+			pjout.write("*Edges\r\n");
+			
 //			log.info("*Edges\n");
 			Iterator<SocialNetEdge> itLink = links.iterator();
 			while (itLink.hasNext()) {
@@ -138,9 +137,9 @@ public class PajekWriter {
 				Coord xy2 = (Coord) ((Act) printPerson2.getSelectedPlan().getActsLegs().get(0)).getCoord();
 				double dist = xy1.calcDistance(xy2);
 
-				pjout.write(" " + pajekIndex.get(printPerson1.getId()) + " "+ pajekIndex.get(printPerson2.getId())+" "+dist+" "+age);
+				pjout.write(" " + pajekIndex.get(printPerson1.getId()) + " "+ pajekIndex.get(printPerson2.getId())+" "+dist+" "+age+"\r\n");
 //				pjout.write(" " + printPerson1.getId() + " "+ printPerson2.getId());
-				pjout.newLine();
+
 //				System.out.print(" " +iter+" "+printLink.getLinkId()+" "+ printPerson1.getId() + " "
 //				+ printPerson2.getId() + " "
 //				+ printLink.getTimeLastUsed()+"\n");
@@ -185,8 +184,7 @@ public class PajekWriter {
 		try {
 			log.info("##### Write Geoaggregated Social Network Output");
 			log.info(" *Vertices " + numVertices + " \n");
-			pjout.write("*Vertices " + numVertices);
-			pjout.newLine();
+			pjout.write("*Vertices " + numVertices+"\r\n");
 
 			Iterator<Vertex> iVert = g.getVertices().iterator();
 			HashMap<Vertex,Location> vertLoc = gstat.getVertexLoc();
@@ -199,15 +197,15 @@ public class PajekWriter {
 				Coord xy = (Coord) zone.getCenter();
 				double x=(xy.getX()-minCoord.getX())/(maxCoord.getX()-minCoord.getX());
 				double y=(xy.getY()-minCoord.getY())/(maxCoord.getY()-minCoord.getY());
-				pjout.write(vertexcounter + " \"" + zone.getId() + "\" "+x +" "+y);
-				pjout.newLine();
+				pjout.write(vertexcounter + " \"" + zone.getId() + "\" "+x +" "+y+"\r\n");
+
 //				System.out.print(iperson + " " + p.getId() + " ["+xy.getX() +" "+xy.getY()+"]\n");
 				pajekIndex.put(zone.getId(),vertexcounter);
 				vertexcounter++;
 
 			}
-			pjout.write("*Edges");
-			pjout.newLine();
+			pjout.write("*Edges\r\n");
+			
 //			System.out.print("*Edges\n");
 			Iterator<Edge> itLink = g.getEdges().iterator();
 			while (itLink.hasNext()) {
@@ -220,8 +218,7 @@ public class PajekWriter {
 //				double dist = xy1.calcDistance(xy2);
 				double strength = (Double)printLink.getUserDatum("strength");
 //				double strength = gstat.getEdgeStrength().get(printLink);
-				pjout.write(" " + pajekIndex.get(aLoc.getId()) + " "+ pajekIndex.get(bLoc.getId())+" "+strength);
-				pjout.newLine();
+				pjout.write(" " + pajekIndex.get(aLoc.getId()) + " "+ pajekIndex.get(bLoc.getId())+" "+strength+"\r\n");
 
 			}
 
