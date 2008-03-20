@@ -54,7 +54,7 @@ public class SpatialInteractor {
 //				Shuffle the list of attendees at the socializing opportunity
 //				and let a percentage of them interact
 				List<Person> people = java.util.Collections.list(java.util.Collections.enumeration(event.getAttendees()));
-				java.util.Collections.shuffle(people);
+				java.util.Collections.shuffle(people, Gbl.random);
 				Object personList[] = people.toArray();
 				int numPersons = personList.length;
 
@@ -100,9 +100,9 @@ public class SpatialInteractor {
 					} else {
 						// If the two do not already know each other,
 
-						
+
 							net.makeSocialContact(p1,p2,iteration,"new"+event.activity.getType());
-						
+
 					}
 				}
 			}

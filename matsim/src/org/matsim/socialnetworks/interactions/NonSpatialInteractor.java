@@ -56,14 +56,13 @@ public class NonSpatialInteractor{
 		System.out.println("  |Exchanging knowledge about "+facType+" activity");
 
 
-		java.util.Collections.shuffle(net.getLinks());
+		java.util.Collections.shuffle(net.getLinks(), Gbl.random);
 		links = net.getLinks().toArray();
 		int numPicks = (int) (proportionOfLinksToActivate * links.length);
 
 //		Pick a random link
 		for(int i=0;i<numPicks;i++){
-			int rndInt1 = Gbl.random.nextInt(Integer.MAX_VALUE);
-			int linkno = rndInt1 % links.length;
+			int linkno = Gbl.random.nextInt(this.links.length);
 			SocialNetEdge mySocialLink = (SocialNetEdge) links[linkno];
 
 //			Interact numInteractions times if chosen link is to be activated
@@ -95,7 +94,7 @@ public class NonSpatialInteractor{
 	 */
 	public void exchangeSocialNetKnowledge(int iteration) {
 
-		java.util.Collections.shuffle(net.getLinks());
+		java.util.Collections.shuffle(net.getLinks(), Gbl.random);
 		links = net.getLinks().toArray();
 		int numPicks = (int) (fract_intro * links.length);
 
