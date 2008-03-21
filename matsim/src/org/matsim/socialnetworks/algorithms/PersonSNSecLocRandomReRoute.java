@@ -78,7 +78,6 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 	}
 
 	public void run(Plan plan) {
-		// TODO Auto-generated method stub
 		replaceRandomFacility(plan);
 	}
 
@@ -118,7 +117,11 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 
 //		Get all instances of this facility type in the plan
 
-		ActIterator planIter= plan.getIteratorAct();
+// BUGFIX by mrieser:
+// OLD CODE:
+//		ActIterator planIter= plan.getIteratorAct();
+// NEW CODE:
+		ActIterator planIter= newPlan.getIteratorAct();
 		ArrayList<Act> actsOfFacType= new ArrayList<Act>();
 		while(planIter.hasNext()){
 			Act nextAct=(Act) planIter.next();
@@ -130,6 +133,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 		// Choose a random act from this list. Return the plan unchanged if there are none.
 		if(actsOfFacType.size()<1){
 			person.setSelectedPlan(plan);
+			// TODO [JH] shouldn't in this case the newPlan be deleted as well? -marcel/21mar2008 
 			return;
 		}else{
 			Act newAct = (Act)(actsOfFacType.get(Gbl.random.nextInt(actsOfFacType.size())));
