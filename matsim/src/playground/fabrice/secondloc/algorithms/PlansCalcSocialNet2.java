@@ -94,8 +94,9 @@ public class PlansCalcSocialNet2 extends PlansAlgorithm {
 		
 		// this lookup table Link <-> Facility will disappear when Facility will be a Location
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+		Facilities facilities = (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 		
-		for( Facility facility : Facilities.getSingleton().getFacilities().values() ){			
+		for( Facility facility : facilities.getFacilities().values() ){			
 			Link link  = (Link) network.getNearestLocations( facility.getCenter(),	null ).get(0);
 			
 			TreeMap<String, Activity> tree = facility.getActivities();

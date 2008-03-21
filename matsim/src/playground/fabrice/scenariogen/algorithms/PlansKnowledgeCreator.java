@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -38,7 +39,6 @@ import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
 public class PlansKnowledgeCreator extends PlansAlgorithm {
@@ -63,8 +63,9 @@ public class PlansKnowledgeCreator extends PlansAlgorithm {
 				String act_type = act.getType();
 				Coord center = (Coord)((Link)act.getLink()).getCenter();
 				Facility facility = quadtrees.get( act.getType() ).get( center.getX(), center.getY());
-				ActivityFacilities actfac = know.createActivityFacility( act_type );
-				actfac.addFacility(facility);
+				know.addActivity(new Activity(act_type, facility));
+//				ActivityFacilities actfac = know.createActivityFacility( act_type );
+//				actfac.addFacility(facility);
 				numact++;
 			}
 			numagent++;
@@ -79,10 +80,7 @@ public class PlansKnowledgeCreator extends PlansAlgorithm {
 		System.out.println("  computing the bounding box");
 		Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 
-		Layer facLayer = Gbl.getWorld().getLayer( "facility" );
-		if( facLayer == null )
-			facLayer = facilities.getAggregationLayer();
-		GetLayerBoundingBox glbb = new GetLayerBoundingBox( facLayer );
+		GetLayerBoundingBox glbb = new GetLayerBoundingBox( facilities );
 		Gbl.getWorld().addAlgorithm(glbb);
 		Gbl.getWorld().runAlgorithms();
 		Rectangle2D.Double bbox = (Double) glbb.getBoundingBox();
@@ -105,10 +103,6 @@ public class PlansKnowledgeCreator extends PlansAlgorithm {
 				}
 				quad.put( coord.getX(), coord.getY(), facility );
 			}
-			// Give the facilities a damn location!
-			if( facility.getLocation() == null )
-				facility.setLocation( aggLayer.getNearestLocations(coord, null).get(0) );
-			//fac.setLocation(fac_layer.getLocation(fac.getId))
 		}
 		System.out.println("  done.");
 

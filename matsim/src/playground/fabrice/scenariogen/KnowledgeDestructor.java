@@ -20,8 +20,6 @@
 
 package playground.fabrice.scenariogen;
 
-import java.util.TreeMap;
-
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
@@ -112,8 +110,7 @@ public class KnowledgeDestructor {
 		@Override
 		public void run(Plans plans) {
 			for( Person person : plans.getPersons().values() ){
-				TreeMap<String, ActivityFacilities> actfacs = person.getKnowledge().getActivityFacilities();
-				actfacs.clear();
+				person.getKnowledge().removeAllFacilities();
 			}
 		}
 
