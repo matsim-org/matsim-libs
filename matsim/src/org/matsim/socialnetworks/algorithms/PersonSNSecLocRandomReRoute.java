@@ -133,7 +133,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 		// Choose a random act from this list. Return the plan unchanged if there are none.
 		if(actsOfFacType.size()<1){
 			person.setSelectedPlan(plan);
-			// TODO [JH] shouldn't in this case the newPlan be deleted as well? -marcel/21mar2008 
+			person.getPlans().remove(newPlan);
 			return;
 		}else{
 			Act newAct = (Act)(actsOfFacType.get(Gbl.random.nextInt(actsOfFacType.size())));
@@ -152,14 +152,14 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 
 			if(newAct.getLinkId()!=fFromKnowledge.getLink().getId()){
 				// If the first activity was chosen, make sure the last activity is also changed
-				if(newAct.equals(plan.getFirstActivity())){
+				if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
 					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
 					lastAct.setLink(fFromKnowledge.getLink());
 					Coord newCoord = (Coord) fFromKnowledge.getCenter();
 					lastAct.setCoord(newCoord);
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
-				if(newAct.equals(plan.getActsLegs().get(plan.getActsLegs().size()-1))){
+				if(newAct.getType() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getType() && newAct.getLink() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getLink()){
 					Act firstAct = (Act) newPlan.getFirstActivity();
 					firstAct.setLink(fFromKnowledge.getLink());
 					Coord newCoord = (Coord) fFromKnowledge.getCenter();
@@ -171,9 +171,6 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 				Coord newCoord = (Coord) fFromKnowledge.getCenter();
 				newAct.setCoord(newCoord);
 				changed = true;
-				if (newPlan.getPerson().getId().equals(new Id("1153489"))) {
-					System.out.println("breakpoint");
-				}
 			}
 
 			if(changed){
