@@ -59,7 +59,6 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 	}
 
 	public void run(Plan plan) {
-		// TODO Auto-generated method stub
 		replaceRandomFacility(plan);
 	}
 
@@ -99,6 +98,10 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 
 //		Get all instances of this facility type in the plan
 
+		
+		/* TODO [JH] Shouldn't this be: ActIterator planIter = NEWPLAN.getIteratorAct(); ?
+		 * If so, one should also change the tests for firstAct/lastAct below.  -marcel/21mar2008
+		 */
 		ActIterator planIter= plan.getIteratorAct();
 		ArrayList<Act> actsOfFacType= new ArrayList<Act>();
 		while(planIter.hasNext()){
@@ -111,6 +114,7 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 		// Choose a random act from this list. Return the plan unchanged if there are none.
 		if(actsOfFacType.size()<1){
 			person.setSelectedPlan(plan);
+			// TODO [JH] shouldn't in this case the newPlan be deleted as well? -marcel/21mar2008
 			return;
 		}else{
 			Act newAct = (Act)(actsOfFacType.get(Gbl.random.nextInt(actsOfFacType.size())));
@@ -151,7 +155,7 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 				changed = true;
 			}
 
-			if(changed == true){
+			if(changed){
 				//		 loop over all <leg>s, remove route-information
 				ArrayList<?> bestactslegs = newPlan.getActsLegs();
 //				ArrayList<?> bestactslegs = plan.getActsLegs();
@@ -182,11 +186,11 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 		String[] s;
 		s = longString.split(patternStr);
 		double[] w = new double[s.length];
-		w[0]=Double.valueOf(s[0]).doubleValue();
+		w[0]=Double.parseDouble(s[0]);
 		double sum = w[0];	
 		for (int i = 1; i < s.length; i++) {
-			w[i] = Double.valueOf(s[i]).doubleValue()+w[i-1];
-			sum=sum+Double.valueOf(s[i]).doubleValue();
+			w[i] = Double.parseDouble(s[i])+w[i-1];
+			sum=sum+Double.parseDouble(s[i]);
 		}
 		if (sum > 0) {
 			for (int i = 0; i < s.length; i++) {
@@ -194,8 +198,7 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 				w[i] = w[i] / sum;
 			}
 		} else if (sum < 0) {
-			Gbl
-			.errorMsg("At least one weight for the type of information exchange or meeting place must be > 0, check config file.");
+			Gbl.errorMsg("At least one weight for the type of information exchange or meeting place must be > 0, check config file.");
 		}
 		return w;
 	}

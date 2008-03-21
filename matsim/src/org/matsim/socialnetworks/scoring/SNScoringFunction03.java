@@ -53,7 +53,7 @@ public class SNScoringFunction03 implements ScoringFunction {
 			Act act1 = (Act)(plan.getActsLegs().get(i));
 			Act act2 = (Act)(plan.getActsLegs().get(i+2));
 
-			if (act2 != null || act1 != null) {
+			if (act2 != null && act1 != null) {
 				double dist = act1.getCoord().calcDistance(act2.getCoord());
 				length += dist;
 			}

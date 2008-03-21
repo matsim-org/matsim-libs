@@ -24,19 +24,20 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Plan;
 
 public class PlanEuclideanLength {
-    
-    public double getPlanLength(Plan plan){
 
-	double length=0.;
-	for (int i = 0, max= plan.getActsLegs().size(); i < max-2; i += 2) {
-		Act act1 = (Act)(plan.getActsLegs().get(i));
-		Act act2 = (Act)(plan.getActsLegs().get(i+2));
+	public double getPlanLength(Plan plan) {
 
-		if (act2 != null || act1 != null) {
-			double dist = act1.getCoord().calcDistance(act2.getCoord());
-			length += dist;
+		double length = 0.;
+		Act fromAct = (Act) plan.getActsLegs().get(0);
+		for (int i = 2, max = plan.getActsLegs().size(); i < max; i += 2) {
+			Act toAct = (Act) (plan.getActsLegs().get(i));
+
+			if (fromAct != null && toAct != null) {
+				double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
+				length += dist;
+			}
+			fromAct = toAct;
 		}
+		return length;
 	}
-	return length;
-    }
 }

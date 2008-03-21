@@ -20,6 +20,12 @@
 
 package org.matsim.socialnetworks.socialnet;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.matsim.gbl.Gbl;
+import org.matsim.plans.Person;
+
 /*
  * The purpose of the EgoNet class is to avoid extending the Person class.
  * An EgoNet consists of an ArrayList of SocialNetEdges that connect to Persons.
@@ -27,18 +33,10 @@ package org.matsim.socialnetworks.socialnet;
  * The EgoNets are mapped in EgoNetMap, which is a TreeMap<Integer, EgoNet>
  * in which the integer is the Person.getId() that the EgoNet corresponds to.
  */
-
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
-
-
 public class EgoNet {
-    public int id;
+    private int id;
 
-    public ArrayList<SocialNetEdge> egoLinks;
+    private ArrayList<SocialNetEdge> egoLinks;
 
     public EgoNet(int id) {
 	this.id = id;
@@ -58,9 +56,9 @@ public class EgoNet {
 
     public SocialNetEdge getEgoLink(Person p2) {
 	SocialNetEdge myEdge = null;
-	Iterator linkIter = egoLinks.iterator();
+	Iterator<SocialNetEdge> linkIter = egoLinks.iterator();
 	while (linkIter.hasNext()) {
-	    myEdge = (SocialNetEdge) linkIter.next();
+	    myEdge = linkIter.next();
 	    if (myEdge.getPersonTo().equals(p2)) {
 		break;
 	    }
@@ -68,8 +66,11 @@ public class EgoNet {
 	return myEdge;
     }
 
-    public boolean knows( Person person ){
-	// return true if person is already part of our social context
+    /**
+     * @param person
+     * @return <code>true</code> if person is already part of our social context
+     */
+    public boolean knows( Person person ) {
 	for( SocialNetEdge edge : egoLinks ){
 	    if( edge.getPersonFrom().equals(person) )
 		return true;
@@ -97,16 +98,13 @@ public class EgoNet {
 	return this.egoLinks;
     }
 
-    public Integer getId() {
+    public int getId() {
 	return id;
     }
-//
 
     public ArrayList<Person> getAlters() {
 	ArrayList<Person> alterList= new ArrayList<Person>();
-	Iterator meit=egoLinks.iterator();
-	while(meit.hasNext()){
-	    SocialNetEdge myEdge = (SocialNetEdge) meit.next();
+	for (SocialNetEdge myEdge : egoLinks) {
 	    Person me = myEdge.getPersonTo();
 	    alterList.add(me);
 	}

@@ -3,17 +3,17 @@ package org.matsim.socialnetworks.algorithms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 public class SortHashtableByValue {
-	/**
-	 * test sortMap
-	 */
-	public Hashtable makeSortedMap (Hashtable m) {
+	
+	private SortHashtableByValue() {
+		// make this a static class, which cannot be instantiated
+	}
+
+	public static Hashtable makeSortedMap (Hashtable m) {
 		Hashtable sortedMap=new Hashtable();
 		ArrayList outputList = sortMap(m);
 //		int count = 0;
@@ -36,10 +36,10 @@ public class SortHashtableByValue {
 	 * @param map
 	 * @return outputList of Map.Entries
 	 */
-	public ArrayList sortMap(Map map) {
-		ArrayList outputList = null;
+	public static ArrayList<Map.Entry> sortMap(Map map) {
+		ArrayList<Map.Entry> outputList = null;
 		int count = 0;
-		Set set = null;
+		Set<Map.Entry> set = null;
 		Map.Entry[] entries = null;
 		// Logic:
 		// get a set from Map
@@ -47,28 +47,20 @@ public class SortHashtableByValue {
 		// Sort the list using Arrays.sort
 		// Add the sorted Map.Entries into arrayList and return
 
-		set = (Set) map.entrySet();
-		Iterator iterator = set.iterator();
-		entries = new Map.Entry[set.size()];
-		while(iterator.hasNext()) {
-			entries[count++] = (Map.Entry) iterator.next();
-		}
+		set = map.entrySet();
+		entries = set.toArray(new Map.Entry[set.size()]);
 
 		// Sort the entries with your own comparator for the values:
-		Arrays.sort(entries, new Comparator() {
-			public int compareTo(Object lhs, Object rhs) {
-				Map.Entry le = (Map.Entry)lhs;
-				Map.Entry re = (Map.Entry)rhs;
-				return ((Comparable)le.getValue()).compareTo((Comparable)re.getValue());
+		Arrays.sort(entries, new Comparator<Map.Entry>() {
+			public int compareTo(Map.Entry lhs, Map.Entry rhs) {
+				return ((Comparable)lhs.getValue()).compareTo((Comparable)rhs.getValue());
 			}
 
-			public int compare(Object lhs, Object rhs) {
-				Map.Entry le = (Map.Entry)lhs;
-				Map.Entry re = (Map.Entry)rhs;
-				return ((Comparable)le.getValue()).compareTo((Comparable)re.getValue());
+			public int compare(Map.Entry lhs, Map.Entry rhs) {
+				return ((Comparable)lhs.getValue()).compareTo((Comparable)rhs.getValue());
 			}
 		});
-		outputList = new ArrayList();
+		outputList = new ArrayList<Map.Entry>();
 		for(int i = 0; i < entries.length; i++) {
 			outputList.add(entries[i]);
 		}

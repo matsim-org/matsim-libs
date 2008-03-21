@@ -61,16 +61,15 @@ import org.matsim.world.algorithms.WorldBottom2TopCompletion;
  * network is adjusted for the optimized (improved) plans according to another algorithm. The
  * agents interact again in their social network to exchange information. The plans are changed
  * according to the new knowledge of the agents, and the plans are again optimized.
- *  
+ *
  * @author jhackney
  *
  */
 public class SNControllerListenerSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener {
 
-	private boolean CALCSTATS = true;
+	private static final boolean CALCSTATS = true;
 	private static final String DIRECTORY_SN = "socialnets/";
 	public static String SOCNET_OUT_DIR = null;
-	private boolean createGraphs = true;
 
 	SocialNetwork snet;
 	SocialNetworkStatistics snetstat;
@@ -128,9 +127,6 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 		initializeKnowledge(this.controler.getPopulation());
 		this.log.info("... done");
 
-		this.log.info(" Setting boolean to create graphical output");
-		this.controler.setCreateGraphs(createGraphs);
-		this.log.info("... done");
 		/* code previously in startup() */
 		snsetup();
 	}
@@ -172,7 +168,6 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 
 		/* code previously in setupIteration() */
 //		int snIter = event.getIteration();
-
 		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
 //			if( event.getIteration()%replan_interval==0){
 
@@ -187,15 +182,13 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 				this.log.info("   Makes a map of time/place windows for all planned encounters between the agents");
 				this.socialPlans = this.gen2.generate(this.controler.getPopulation());
 				this.log.info("...finished.");
-
 				//}// end if
 
 				// Agents' planned interactions
 				this.log.info("  Agents planned social interactions ...");
 				this.log.info("  Agents' relationships are updated to reflect these interactions! ...");
 				this.plansInteractorS.interact(this.socialPlans, this.rndEncounterProbs, snIter);
-
-			}else{
+			} else {
 				this.log.info("     (none)");
 			}
 			this.log.info(" ... Spatial interactions done\n");
@@ -225,16 +218,16 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
 			Iterator<Person> iperson = personList.iterator();
 			while (iperson.hasNext()) {
-				Person p = (Person) iperson.next();
+				Person p = iperson.next();
 				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*1.5);
-				p.getKnowledge().map.manageMemory(max_memory, p.getSelectedPlan());		
+				p.getKnowledge().map.manageMemory(max_memory, p.getSelectedPlan());
 			}
 			this.log.info(" ... done");
 
 			this.log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE. Make this a person algorithm");
 			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
 			while (itreplan.hasNext()) {
-				Plan p = (Plan) itreplan.next().getSelectedPlan();
+				Plan p = itreplan.next().getSelectedPlan();
 				new PersonSNSecLocRandomReRoute(activityTypesForEncounters, controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
 //				System.out.println( "SNControler1 Number of plans for person "+p.getPerson().getId()+" "+p.getPerson().getPlans().size());
 			}

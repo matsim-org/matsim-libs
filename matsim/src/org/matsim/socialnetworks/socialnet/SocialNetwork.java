@@ -42,7 +42,7 @@ public class SocialNetwork {
     // a Collection of all the Links in the network
     public ArrayList<SocialNetEdge> linksList = new ArrayList<SocialNetEdge>();
 
-    public int setupIter=0;
+//    public int setupIter=0;
     // public ArrayList<SocialNetNode> nodes;
     
     private final static Logger log = Logger.getLogger(SocialNetwork.class);
@@ -113,7 +113,7 @@ public class SocialNetwork {
     }
 
     void initEmptySocialNetwork( Plans plans) {
-	setupIter=1;
+//	setupIter=1;
 
 	// TODO [JH] The following two lines don't do anything useful... please check.  -marcel/15mar2008
 	Person [] personList = new Person[plans.getPersons().size()];
@@ -310,15 +310,11 @@ public class SocialNetwork {
 	// Pajek (consider also time-dependent Pajek format),
 	// Something readable in R (flat file easiest), i.e. same as SNModel
 	// Just a test
-	Iterator<SocialNetEdge> itLink = linksList.iterator();
-	int ii = 0;
-	while (itLink.hasNext()) {
-	    SocialNetEdge printLink = itLink.next();
-	    Person printPerson1 = printLink.person1;
-	    Person printPerson2 = printLink.person2;
-	    log.info(ii + " " + printPerson1.getId() + " " + printPerson2.getId());
-	    ii++;
-	}
+    	int ii = 0;
+    	for (SocialNetEdge link : linksList) {
+    		log.info(ii + " " + link.person1.getId() + " " + link.person2.getId());
+    		ii++;
+    	}
     }
 
 }

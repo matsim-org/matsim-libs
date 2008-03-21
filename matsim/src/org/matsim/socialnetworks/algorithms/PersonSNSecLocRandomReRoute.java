@@ -215,11 +215,11 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 		String[] s;
 		s = longString.split(patternStr);
 		double[] w = new double[s.length];
-		w[0]=Double.valueOf(s[0]).doubleValue();
+		w[0]=Double.parseDouble(s[0]);
 		double sum = w[0];	
 		for (int i = 1; i < s.length; i++) {
-			w[i] = Double.valueOf(s[i]).doubleValue()+w[i-1];
-			sum=sum+Double.valueOf(s[i]).doubleValue();
+			w[i] = Double.parseDouble(s[i])+w[i-1];
+			sum=sum+Double.parseDouble(s[i]);
 		}
 		if (sum > 0) {
 			for (int i = 0; i < s.length; i++) {
@@ -227,8 +227,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 				w[i] = w[i] / sum;
 			}
 		} else if (sum < 0) {
-			Gbl
-			.errorMsg("At least one weight for the type of information exchange or meeting place must be > 0, check config file.");
+			Gbl.errorMsg("At least one weight for the type of information exchange or meeting place must be > 0, check config file.");
 		}
 		return w;
 	}

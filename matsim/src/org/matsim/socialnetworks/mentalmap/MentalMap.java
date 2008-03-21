@@ -21,13 +21,11 @@
 package org.matsim.socialnetworks.mentalmap;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicPlan.ActIterator;
@@ -184,7 +182,7 @@ public class MentalMap {
 
 //			Sort the activities by score so that they can be managed
 
-			Hashtable sortedScores = new SortHashtableByValue().makeSortedMap(activityScore);
+			Hashtable sortedScores = SortHashtableByValue.makeSortedMap(activityScore);
 
 			// Remove activities if there are too many, but keep one activity
 			// for each act type in the current plan. Iterator goes by score.
