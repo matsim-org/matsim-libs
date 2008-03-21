@@ -43,7 +43,7 @@ public class Activity {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected Activity(final String type, final Facility facility) {
+	public Activity(final String type, final Facility facility) {
 		this.type = type;
 		this.facility = facility;
 		if (this.facility == null) { Gbl.errorMsg("facility=null not allowed!"); }
