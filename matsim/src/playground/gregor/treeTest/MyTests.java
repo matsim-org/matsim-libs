@@ -31,12 +31,12 @@ public class MyTests {
 	
 	
 	
-	private final static Integer LOOKUPS = 1000000;
+	private final static Integer LOOKUPS = 1000;
 	
 	private static final Logger log = Logger.getLogger(MyTests.class);
 	
 	
-	private static void baseLineTest() {
+	private static long baseLineTest() {
 		log.info("starting BaseLine test");
 		double dummy = 0.;
 		long start = Long.valueOf(System.currentTimeMillis());
@@ -55,11 +55,13 @@ public class MyTests {
 		}
 		System.out.println("... it took:" + time + " ms");
 		System.out.println("dummy " + dummy);
+		
+		return time;
 	}
 	
 	
 	
-	public static void testTreeMap() {
+	public static long testTreeMap() {
 	
 		Double dummy = 0.;
 		
@@ -90,16 +92,20 @@ public class MyTests {
 		}
 		System.out.println("... it took:" + time + " ms");
 		System.out.println("dummy " + dummy);
+		
+		return time;
 	}
 	
 	public static void main(String [] args) {
 		
-		
-		
-		baseLineTest();
-		testTreeMap();
-		
+		long base = 0;
+		long tree = 0;
+		for (int i = 0; i < 1000; i++) {
+			base += baseLineTest();
+			tree += testTreeMap();
+		}
 
+		System.out.println("base: " + base + "ms   tree: "  + tree + "ms.");
 		
 		
 		
