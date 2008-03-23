@@ -44,11 +44,15 @@ import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.StuckVehStats;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
+import org.matsim.controler.ScenarioData;
 import org.matsim.counts.Counts;
+import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.deqsim.EventsReaderDEQv1;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.algorithms.CalcLegNumber;
@@ -128,6 +132,7 @@ import org.matsim.utils.vis.kml.Folder;
 import org.matsim.utils.vis.kml.Geometry;
 import org.matsim.utils.vis.kml.KML;
 import org.matsim.utils.vis.kml.KMLWriter;
+import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.kml.LineString;
 import org.matsim.utils.vis.kml.LineStyle;
 import org.matsim.utils.vis.kml.MultiGeometry;
@@ -137,6 +142,7 @@ import org.matsim.utils.vis.kml.PolyStyle;
 import org.matsim.utils.vis.kml.Style;
 import org.matsim.utils.vis.kml.TimeSpan;
 import org.matsim.utils.vis.kml.fields.Color;
+import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 import org.matsim.visum.VisumAnbindungstabelleWriter;
 import org.matsim.visum.VisumMatrixReader;
 import org.matsim.visum.VisumMatrixWriter;
@@ -922,50 +928,6 @@ public class MyRuns {
 		plans.runAlgorithms();
 		plansWriter.write();
 		System.out.println("  done." + (new Date()));
-
-		System.out.println("RUN: xy2links finished.");
-		System.out.println();
-	}
-
-	public static void xy2links(final String[] args, final double maxDistance_m, final double minLength_m) {
-
-		System.out.println("RUN: xy2links with limits set");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.getWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final Plans plans = new Plans(Plans.NO_STREAMING);
-		final PlansReaderI plansReader = new MatsimPlansReader(plans);
-		System.out.println("  done.");
-
-		System.out.println("  reading plans...");
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
-		System.out.println("  done.");
-
-		System.out.println("  running plans algorithms... ");
-		plans.addAlgorithm(new XY2Links(network, maxDistance_m, minLength_m));
-		plans.addAlgorithm(new PlansFilterPersonHasPlans());
-		plans.runAlgorithms();
-		System.out.println("  done.");
-
-		System.out.println("  writing plans... ");
-		final PlansWriter plansWriter = new PlansWriter(plans);
-		plansWriter.write();
-		System.out.println("  done.");
 
 		System.out.println("RUN: xy2links finished.");
 		System.out.println();
@@ -2909,6 +2871,16 @@ public class MyRuns {
 		}
 	}
 
+	public static void speedEventsDat(final String[] args) {
+		Gbl.createConfig(args);
+		Events events = new Events();
+		Gbl.startMeasurement();
+		new EventsReaderDEQv1(events).readFile("../mystudies/deqsimtest/10.deq_events.dat");
+		events.printEventsCount();
+		Gbl.printElapsedTime();
+	}
+
+
 	public static void readMatrices(final String[] args) {
 		/* only used for performance testing */
 		System.out.println("RUN: readMatrices");
@@ -2955,26 +2927,61 @@ public class MyRuns {
 	}
 
 	public static void someTests(final String[] args) {
-//		File dir = new File("test2/output/org/matsim/MyTest/testOne/");
-//		if (dir.exists()) {
-//			IOUtils.deleteDirectory(dir);
-//		}
-//		boolean success = dir.mkdirs();
-//		if (success) {
-//			System.out.println("created directories");
-//		} else {
-//			System.out.println("did not create directories");
-//		}
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/networks/ivtch/network_r1.1.xml");
+		Events events = new Events();
+		TravelTimeCalculatorArray ttimeCalc = new TravelTimeCalculatorArray(network, 15*60, 30*3600);
+		VolumesAnalyzer vol = new VolumesAnalyzer(3600, 30*3600, network);
+		CalcLinkStats linkStats = new CalcLinkStats(network);
+		int[] volumes;
+		events.addHandler(ttimeCalc);
+		events.addHandler(vol);
 
-		Id id1 = new Id(1);
-		Id id2 = new Id(2);
-		IdI id = id1;
+		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/runs/run252e/16.events.txt.gz");
+		events.printEventsCount();
+		linkStats.addData(vol, ttimeCalc);
+		volumes = vol.getVolumesForLink("101885");
+		if (volumes != null) {
+			System.out.println("16 volume 7-8: " + volumes[7]);
+		}
 
-		System.out.println(id1.compareTo(id2));
-		System.out.println(id1.compareTo(id));
-		System.out.println(id.compareTo(id2));
-		System.out.println(id.compareTo(id));
+		events.resetHandlers(17);
+		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/runs/run252e/17.events.txt.gz");
+		events.printEventsCount();
+		linkStats.addData(vol, ttimeCalc);
+		volumes = vol.getVolumesForLink("101885");
+		if (volumes != null) {
+			System.out.println("17 volume 7-8: " + volumes[7]);
+		}
 
+		events.resetHandlers(18);
+		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/runs/run252e/18.events.txt.gz");
+		events.printEventsCount();
+		linkStats.addData(vol, ttimeCalc);
+		volumes = vol.getVolumesForLink("101885");
+		if (volumes != null) {
+			System.out.println("18 volume 7-8: " + volumes[7]);
+		}
+
+		events.resetHandlers(19);
+		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/runs/run252e/19.events.txt.gz");
+		events.printEventsCount();
+		linkStats.addData(vol, ttimeCalc);
+		volumes = vol.getVolumesForLink("101885");
+		if (volumes != null) {
+			System.out.println("19 volume 7-8: " + volumes[7]);
+		}
+
+		events.resetHandlers(20);
+		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/runs/run252e/20.events.txt.gz");
+		events.printEventsCount();
+		linkStats.addData(vol, ttimeCalc);
+		volumes = vol.getVolumesForLink("101885");
+		if (volumes != null) {
+			System.out.println("20 volume 7-8: " + volumes[7]);
+		}
+
+		linkStats.writeFile("./output/testStats.txt");
 	}
 
 	public static void randomWalk(final int steps) {
@@ -3011,6 +3018,8 @@ public class MyRuns {
 
 		new MatsimCountsReader(Counts.getSingleton()).readFile(config.counts().getCountsFileName());
 
+		new CountsWriter(Counts.getSingleton()).writeFile("test_counts.xml");
+
 		System.out.println("RUN: readCounts finished.");
 		System.out.println();
 	}
@@ -3029,6 +3038,72 @@ public class MyRuns {
 		System.out.println();
 	}
 
+	public static void writeKml() {
+		KML mainKml = new KML();
+		Document mainDoc = new Document("test.kmz");
+		mainKml.setFeature(mainDoc);
+
+		KMZWriter writer = new KMZWriter("test.kmz", KMLWriter.DEFAULT_XMLNS);
+
+		MatsimKMLLogo logo;
+		try {
+			logo = new MatsimKMLLogo(writer);
+			mainDoc.addFeature(logo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		writer.writeMainKml(mainKml);
+		writer.close();
+	}
+
+	public static void createQVDiagramm(final String[] args) {
+
+		String[] links = { "101207", "101208", "105683", "105684", "105651", "106505", "106506", "106427", "106428", "110579", "110580", "111609" };
+//		String[] links = { "106505" };
+		QVDiagramm qvds[] = new QVDiagramm[links.length];
+
+		Config config = Gbl.createConfig(args);
+		ScenarioData data = new ScenarioData(config);
+
+		Events events = new Events();
+		NetworkLayer network = data.getNetwork();
+		for (int i = 0; i < links.length; i++) {
+			qvds[i] = new QVDiagramm(network, links[i]);
+			events.addHandler(qvds[i]);
+		}
+
+		new MatsimEventsReader(events).readFile(config.events().getInputFile());
+
+		for (int i = 0; i < links.length; i++) {
+			qvds[i].writeGraph("link" + links[i] + "_qv.png");
+		}
+	}
+
+	public static void someTest(final String[] args) {
+		final int nofLoops = 3600;
+		Integer[] array = new Integer[100000];
+		for (int i = 0; i < array.length; i++) {
+			array[i] = Integer.valueOf(i);
+		}
+		Gbl.startMeasurement();
+		for (int loop = 0; loop < nofLoops; loop++) {
+			long sum = 0;
+			for (Integer ii : array) {
+				sum += ii.intValue();
+			}
+//			System.out.println(sum);
+		}
+		Gbl.printElapsedTime();
+		Gbl.startMeasurement();
+		for (int loop = 0; loop < nofLoops; loop++) {
+			long sum = 0;
+			for (int i = 0; i < array.length; i++) {
+				sum += array[i].intValue();
+			}
+//			System.out.println(sum);
+		}
+		Gbl.printElapsedTime();
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// main
@@ -3044,7 +3119,7 @@ public class MyRuns {
 //		createKutterPlans(args);
 //		fmaToTrips(args);
 
-//		convertPlans(args);
+		convertPlans(args);
 //		readPlans(args);
 //		removeLinkAndRoute(args);
 //		fixJTimes(args);
@@ -3064,7 +3139,6 @@ public class MyRuns {
 //		filterWorkEdu(args);
 //		createDebugPlans(args);
 //		xy2links(args);
-//		xy2links(args, 1000, 100);
 //		calcRoute(args);
 //		calcRouteMTwithTimes(args); // multithreaded, use traveltimes from events
 //		calcRoutePt(args);  // public transport
@@ -3093,7 +3167,7 @@ public class MyRuns {
 //		falsifyNetwork(args);
 
 /* ***   M A T R I C E S   *** */
-		visumMatrixTest(args);
+//		visumMatrixTest(args);
 //		convertMatrices(args);
 
 
@@ -3145,12 +3219,17 @@ public class MyRuns {
 //		testCoordinateTransform(args);
 //		readPlansDat(args);
 //		readEventsDat(args);
+//		speedEventsDat(args);
 //		readMatrices(args);
 //		readWriteLinkStats(args);
 //		randomWalk(10000);
 //		readConfig(args);
 //		readCounts(args);
-//		someTests(args);
+//		writeKml();
+//		createQVDiagramm(args);
+//		someTest(args);
+
+//		Gbl.printSystemInfo();
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();

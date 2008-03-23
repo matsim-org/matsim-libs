@@ -23,6 +23,8 @@ package org.matsim.plans.algorithms;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -30,10 +32,11 @@ import org.matsim.plans.Plan;
 /**
  * Performs several checks that persons are ready for a mobility simulation.
  * It is intended to run only once after the initial plans are read from file,
- * as we expect the {@link org.matsim.controler.Controler} not to "damage" any
- * plans during the iterations.<br/>
- * Currently, this only checks that all plans have valid routes, calculating
- * missing routes if required. Additionally, it will output a warning to the
+ * as we expect that no "damage" happens to the plans during the iterations.
+ * <br/>
+ * Currently, this only checks that in all plans the act's have a link assigned
+ * and that all plans have valid routes, calculating missing links and
+ * routes if required. Additionally, it will output a warning to the
  * log if a person has no plans at all.
  *
  * @author mrieser
@@ -41,12 +44,14 @@ import org.matsim.plans.Plan;
 public class PersonPrepareForSim extends PersonAlgorithm {
 
 	private final PlanAlgorithmI router;
+	private final XY2Links xy2links;
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 
-	public PersonPrepareForSim(final PlanAlgorithmI router) {
+	public PersonPrepareForSim(final PlanAlgorithmI router, final NetworkLayer network) {
 		super();
 		this.router = router;
+		this.xy2links = new XY2Links(network);
 	}
 
 	@Override
@@ -58,18 +63,31 @@ public class PersonPrepareForSim extends PersonAlgorithm {
 			log.warn("Person " + person.getId() + " has no plans!");
 			return;
 		}
-
-		// make sure all the plans have valid routes
+		
+		// make sure all the plans have valid act-locations and valid routes
 		for (Plan plan : person.getPlans()) {
-			boolean hasRoute = true;
+			boolean needsXY2Links = false;
+			boolean needsReRoute = false;
 			ArrayList<Object> actslegs = plan.getActsLegs();
-			for (int i = 1; i < actslegs.size(); i = i+2) {
-				Leg leg = (Leg)actslegs.get(i);
-				if (leg.getRoute() == null) {
-					hasRoute = false;
+			for (int i = 0; i < actslegs.size(); i++) {
+				if (i % 2 == 0) {
+					Act act = (Act)actslegs.get(i);
+					if (act.getLink() == null) {
+						needsXY2Links = true;
+						needsReRoute = true;
+						break;
+					}
+				} else {
+					Leg leg = (Leg)actslegs.get(i);
+					if (leg.getRoute() == null) {
+						needsReRoute = true;
+					}
 				}
 			}
-			if (!hasRoute) {
+			if (needsXY2Links) {
+				this.xy2links.run(plan);
+			}
+			if (needsReRoute) {
 				this.router.run(plan);
 			}
 		}

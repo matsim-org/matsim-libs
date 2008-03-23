@@ -744,7 +744,7 @@ public class SNGenerateNetwork {
 	 * - make sure the selected plan was routed
 	 */
 	printNote("", "  preparing plans for simulation...");
-	new PersonPrepareForSim(new PlansCalcRoute(network, this.travelCostCalculator, this.travelTimeCalculator)).run(population);
+	new PersonPrepareForSim(new PlansCalcRoute(network, this.travelCostCalculator, this.travelTimeCalculator), this.network).run(population);
 	printNote("", "  done");
 
 	this.strategyManager = loadStrategyManager();

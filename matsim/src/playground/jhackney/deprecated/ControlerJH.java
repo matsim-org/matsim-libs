@@ -43,16 +43,8 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
-import org.matsim.controler.events.ControlerFinishIterationEvent;
-import org.matsim.controler.events.ControlerSetupIterationEvent;
-import org.matsim.controler.events.ControlerShutdownEvent;
-import org.matsim.controler.events.ControlerStartupEvent;
-import org.matsim.controler.listener.ControlerFinishIterationListener;
+import org.matsim.controler.corelisteners.LegHistogramListener;
 import org.matsim.controler.listener.ControlerListener;
-import org.matsim.controler.listener.ControlerSetupIterationListener;
-import org.matsim.controler.listener.ControlerShutdownListener;
-import org.matsim.controler.listener.ControlerStartupListener;
-import org.matsim.controler.listener.LegHistogramListener;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
@@ -88,8 +80,6 @@ import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.stats.PlanStatsManager;
 import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorHashMap;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.MatsimWorldReader;
@@ -551,7 +541,7 @@ public class Controler {
 		 * - make sure the selected plan was routed
 		 */
 		printNote("", "  preparing plans for simulation...");
-		new PersonPrepareForSim(new PlansCalcRoute(this.network, this.travelCostCalculator, this.travelTimeCalculator)).run(this.population);
+		new PersonPrepareForSim(new PlansCalcRoute(this.network, this.travelCostCalculator, this.travelTimeCalculator), this.network).run(this.population);
 		printNote("", "  done");
 
 		this.strategyManager = loadStrategyManager();

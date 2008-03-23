@@ -39,7 +39,6 @@ package org.matsim.socialnetworks.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.basic.v01.BasicPlan.LegIterator;
 import org.matsim.facilities.Activity;
@@ -183,7 +182,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 //				Reset the score to Undefined. Helps to see if the plan was really changed
 				newPlan.setScore(Plan.UNDEF_SCORE);
 
-				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime)).run(newPlan.getPerson());
+				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 
 //				DEBUG 1 check for null routes

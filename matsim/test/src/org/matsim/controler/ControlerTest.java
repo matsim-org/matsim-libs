@@ -27,6 +27,7 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
+import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -205,4 +206,91 @@ public class ControlerTest extends MatsimTestCase {
 		assertNotNull(leg1.getRoute());
 		assertNotNull(leg2.getRoute());
 	}
+
+	/**
+	 * Tests that plans with missing act locations are completed (=xy2links and routed) before the mobsim starts.
+	 */
+	public void testCalcMissingActLinks() {
+		Config config = loadConfig(null);
+
+		/* Create a simple network with 4 nodes and 3 links:
+		 *
+		 * (1)---1---(2)-----------2-------------(3)---3---(4)
+		 *
+		 * Link 2 has a capacity of 1veh/100secs, links 1 and 3 of 2veh/1sec.
+		 * This way, 2 vehicles can start at the same time on link 2, of which
+		 * one can leave link 2 without waiting, while the other one has to
+		 * wait an additional 100sec. Given a free speed travel time of 100sec,
+		 * the average travel time on that link should be 150sec for the two cars
+		 * (one having 100secs, the other having 200secs to cross the link).
+		 */
+		QueueNetworkLayer network = new QueueNetworkLayer();
+		Gbl.getWorld().setNetworkLayer(network);
+		network.setCapacityPeriod("01:00:00");
+		network.createNode("1",  "-100.0", "0.0", null);
+		network.createNode("2",     "0.0", "0.0", null);
+		network.createNode("3", "+1000.0", "0.0", null);
+		network.createNode("4", "+1100.0", "0.0", null);
+		Link link1 = network.createLink("1", "1", "2",  "100", "10", "7200", "1", null, null);
+		network.createLink("2", "2", "3", "1000", "10",  "36", "1", null, null);
+		Link link3 = network.createLink("3", "3", "4",  "100", "10", "7200", "1", null, null);
+
+		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
+		Plans population = new Plans(Plans.NO_STREAMING);
+		Gbl.getWorld().setPopulation(population);
+		Person person1 = null;
+		Act act1a = null;
+		Act act1b = null;
+		Act act2a = null;
+		Act act2b = null;
+		Leg leg1 = null;
+		Leg leg2 = null;
+		try {
+			person1 = new Person(new Id(1), "m", 35, "yes", "yes", "yes");
+			// --- plan 1 ---
+			Plan plan1 = person1.createPlan(null, "yes");
+			act1a = plan1.createAct("h", "-50.0", "10.0", null, "00:00:00", "07:00:00", "07:00:00", "no");
+			leg1 = plan1.createLeg("0", "car", "07:00:00", "00:00:00", null);
+			// DO NOT CREATE A ROUTE FOR THE LEG!!!
+			act1b = plan1.createAct("h", "1075.0", "-10.0", null, "07:00:00", null, null, "no");
+			// --- plan 2 ---
+			Plan plan2 = person1.createPlan(null, "yes");
+			act2a = plan2.createAct("h", "-50.0", "-10.0", null, "00:00:00", "07:00:00", "07:00:00", "no");
+			leg2 = plan2.createLeg("0", "car", "07:00:00", "00:00:00", null);
+			// DO NOT CREATE A ROUTE FOR THE LEG!!!
+			act2b = plan2.createAct("h", "1111.1", "10.0", null, "07:00:00", null, null, "no");
+			population.addPerson(person1);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		// Complete the configuration for our test case
+		// - set scoring parameters
+		ActivityParams actParams = new ActivityParams("h");
+		actParams.setTypicalDuration(8*3600);
+		actParams.setPriority(1.0);
+		config.charyparNagelScoring().addActivityParams(actParams);
+		// - define iterations
+		config.controler().setLastIteration(0);
+		// - make sure we don't use threads, as they are not deterministic
+		config.global().setNumberOfThreads(1);
+
+		// Now run the simulation
+		Controler controler = new Controler(config, network, population);
+		controler.setCreateGraphs(false);
+		controler.run();
+		/* if something goes wrong, there will be an exception we don't catch and the test fails,
+		 * otherwise, everything is fine. */
+
+		// check that BOTH plans have their act-locations calculated
+		assertEquals(link1, act1a.getLink());
+		assertEquals(link3, act1b.getLink());
+		assertEquals(link1, act2a.getLink());
+		assertEquals(link3, act2b.getLink());
+		
+		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
+		assertNotNull(leg1.getRoute());
+		assertNotNull(leg2.getRoute());
+	}
+
 }

@@ -1105,7 +1105,7 @@ public class Controler {
 			// make sure all routes are calculated.
 			ParallelPersonAlgorithmRunner.run(c.getPopulation(), c.config.global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 				public PersonAlgorithm getPersonAlgorithm() {
-					return new PersonPrepareForSim(new PlansCalcRoute(c.getNetwork(), c.getTravelCostCalculator(), c.getTravelTimeCalculator()));
+					return new PersonPrepareForSim(new PlansCalcRoute(c.getNetwork(), c.getTravelCostCalculator(), c.getTravelTimeCalculator()), c.getNetwork());
 				}
 			});
 		}
