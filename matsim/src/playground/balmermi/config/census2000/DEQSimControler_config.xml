@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY OUTPUTBASE   "/data/matsim/balmermi/sandbox00/output/run228">
-		<!ENTITY INPUTBASE    "/data/matsim/balmermi/sandbox00/input">
-		<!ENTITY STUDYBASE    "/data/matsim/balmermi/sandbox00/input">
+		<!ENTITY OUTPUTBASE   "/data/matsim/balmermi/sandbox10/output/run232">
+		<!ENTITY INPUTBASE    "/data/matsim/balmermi/sandbox10/input">
+		<!ENTITY STUDYBASE    "/data/matsim/balmermi/sandbox10/input">
 		<!ENTITY HOMEPAGEBASE "http://www.matsim.org/files/dtd">
-		<!ENTITY LOCALDTDBASE "/data/matsim/balmermi/sandbox00/dtd">
+		<!ENTITY LOCALDTDBASE "/data/matsim/balmermi/sandbox10/dtd">
 	]
 >
 
@@ -33,8 +33,12 @@
 		<param name="iterationNumber" value="111" />
 		<param name="outputCountsFile" value="countscompare.kmz" />
 		<param name="outputformat" value="kml" />
-		<param name="visibleTimeStep" value="8" />
 		<param name="countsScaleFactor" value="1.0" />
+		<param name="distanceFilter" value="30000.0" />
+		<param name="distanceFilterCenterNode" value="2531" />
+		<param name="iterationNumber" value="null" />
+		<param name="linkattributes" value="null" />
+		<param name="visibleTimeStep" value="null" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -47,7 +51,7 @@
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="600:00:00" />
 		<param name="flowCapacityFactor" value="1.00" />
-		<param name="storageCapacityFactor" value="10.00" />
+		<param name="storageCapacityFactor" value="10" />
 		<param name="squeezeTime" value="00:01:00" />
 		<param name="carSize" value="7.5" />
 		<param name="gapTravelSpeed" value="15.0" />
