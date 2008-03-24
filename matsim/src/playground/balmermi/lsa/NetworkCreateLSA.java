@@ -43,6 +43,8 @@ public class NetworkCreateLSA {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private final String inputfolder = "../../input/";
+	private final String outputfolder = "../../output/";
 	private final NetworkLayer network;
 	private final HashMap<Integer,Intersection> intersections = new HashMap<Integer, Intersection>();
 	private final HashMap<IdI,HashSet<LSA>> lsalinklist = new HashMap<IdI, HashSet<LSA>>();
@@ -53,14 +55,14 @@ public class NetworkCreateLSA {
 
 	public NetworkCreateLSA(NetworkLayer network) {
 		this.network = network;
-		this.readIntersections("input/Knoten.txt");
-		this.readLSAs("input/LSAs.txt");
-		this.readLanes("input/Spuren.txt");
-		this.readLaneLaneMapping("input/Spur-Spur-Mapping.txt");
-		this.readLSALaneMapping("input/LSA-Spur-Mapping.txt");
-		this.readLaneLinkMapping("input/Spur-Link-Mapping.txt",5);
-		this.readLSAGreentimes("input/gruen_10_15_09.txt");
-		this.writeData("output/greetimes.xml");
+		this.readIntersections(inputfolder+"Knoten.txt");
+		this.readLSAs(inputfolder+"LSAs.txt");
+		this.readLanes(inputfolder+"Spuren.txt");
+		this.readLaneLaneMapping(inputfolder+"Spur-Spur-Mapping.txt");
+		this.readLSALaneMapping(inputfolder+"LSA-Spur-Mapping.txt");
+		this.readLaneLinkMapping(inputfolder+"Spur-Link-Mapping.txt",5);
+		this.readLSAGreentimes(inputfolder+"gruen_10_15_09.txt");
+		this.writeData(outputfolder+"greetimes.xml");
 	}
 
 	//////////////////////////////////////////////////////////////////////

@@ -93,7 +93,7 @@ public class LSA implements Comparable<LSA> {
 
 	@Override
 	public final String toString() {
-		String str = "[nr=" + this.nr + "]" + "[intersec_id=" + this.intersection.id + "]" + "[intersec_id=" + this.lanes.size() + "]\n";
+		String str = "[nr=" + this.nr + "]" + "[intersec_id=" + this.intersection.id + "]" + "[#lanes=" + this.lanes.size() + "]\n";
 
 		str = str + "  lane_nrs:  \t";
 		Iterator<Lane> lane_it = this.lanes.values().iterator();

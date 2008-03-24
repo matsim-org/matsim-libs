@@ -36,10 +36,8 @@ public class LSAGeneration {
 
 		System.out.println("run...");
 
-		System.out.println("  reading the network xml file...");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		System.out.println("  done.");
+		Scenario.setUpScenarioConfig();
+		NetworkLayer network = Scenario.readNetwork();
 
 		//////////////////////////////////////////////////////////////////////
 		
@@ -47,6 +45,8 @@ public class LSAGeneration {
 
 		//////////////////////////////////////////////////////////////////////
 
+		Scenario.writeNetwork(network);
+		
 		System.out.println("done.");
 		System.out.println();
 	}
@@ -58,8 +58,6 @@ public class LSAGeneration {
 	public static void main(final String[] args) {
 
 		Gbl.startMeasurement();
-
-		Scenario.setUpScenarioConfig();
 
 		run();
 

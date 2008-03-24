@@ -21,10 +21,11 @@
 package playground.balmermi;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
-import org.matsim.network.algorithms.NetworkCalcTopoType;
+import org.matsim.network.algorithms.NetworkWriteAsTable;
+
+import playground.balmermi.modules.ivtch.NetworkParseETNet;
+import playground.balmermi.modules.ivtch.NetworkSimplifyAttributes;
 
 public class CleanNetwork {
 
@@ -37,27 +38,18 @@ public class CleanNetwork {
 		System.out.println("RUN: cleanNetwork");
 
 		Scenario.setUpScenarioConfig();
-
-//		Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		System.out.println("  done.");
-
-//		System.out.println("  reading the counts...");
-//		new MatsimCountsReader(Counts.getSingleton()).readFile(Gbl.getConfig().counts().getCountsFileName());
-//		System.out.println("  done.");
+		NetworkLayer network = Scenario.readNetwork();
+//		NetworkLayer network = new NetworkLayer();
 
 		System.out.println("  running Network Validation and cleaning algorithms... ");
+//		new NetworkParseETNet("../../input/nodes.txt","../../input/linksET.txt").run(network);
 //		new NetworkSetDefaultCapacities().run(network);
 //		NetworkWriteETwithCounts nwetwc = new NetworkWriteETwithCounts(Counts.getSingleton());
 //		nwetwc.run(network);
 //		nwetwc.close();
 //		new NetworkSummary().run(network);
-//		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
+//		new NetworkSimplifyAttributes().run(network);
+//		NetworkWriteAsTable nwat = new NetworkWriteAsTable(Scenario.output_directory);
 //		nwat.run(network);
 //		nwat.close();
 //		network.addAlgorithm(new NetworkSummary());
@@ -67,12 +59,12 @@ public class CleanNetwork {
 //		network.addAlgorithm(new NetworkSummary());
 //		network.addAlgorithm(new NetworkMergeDoubleLinks());
 //		network.addAlgorithm(new NetworkSummary());
-		network.addAlgorithm(new NetworkCalcTopoType());
+//		network.addAlgorithm(new NetworkCalcTopoType());
 //		network.addAlgorithm(new NetworkSummary());
 //		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
 //		network.addAlgorithm(nwat);
 //		network.addAlgorithm(new NetworkSummary());
-		network.runAlgorithms();
+//		network.runAlgorithms();
 //		nwat.close();
 
 //		new NetworkSummary().run(network);
