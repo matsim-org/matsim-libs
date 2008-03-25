@@ -53,7 +53,7 @@ public class Activity {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	protected final void createOpentime(final String day, final String start_time, final String end_time) {
+	public final void createOpentime(final String day, final String start_time, final String end_time) {
 		Opentime o = new Opentime(day,start_time,end_time);
 		this.addOpentime(o);
 	}
