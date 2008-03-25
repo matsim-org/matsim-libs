@@ -32,6 +32,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.misc.Time;
 
 public class PersonScenarioBoxCut extends PersonAlgorithm {
 
@@ -152,7 +153,7 @@ public class PersonScenarioBoxCut extends PersonAlgorithm {
 					fromNode.getId().toString(),
 					toNode.getId().toString(),
 					Double.toString(link.getLength()),
-					Double.toString(link.getFreespeed()),
+					Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)),
 					Double.toString(link.getCapacity()),
 					Integer.toString(link.getLanes()),
 					link.getOrigId(),

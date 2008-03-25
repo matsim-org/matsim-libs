@@ -144,13 +144,13 @@ public class TravelTimeCalculatorArray extends AbstractTravelTimeCalculator {
 		private final double[] timeSum;
 		private final int[] timeCnt;
 		private final double[] travelTimes;
-		private final double freetraveltime;
+		private final Link link;
 
 		public TravelTimeRole(final Link link, final int numSlots) {
 			this.timeSum = new double[numSlots];
 			this.timeCnt = new int[numSlots];
 			this.travelTimes = new double[numSlots];
-			this.freetraveltime = link.getLength() / link.getFreespeed();
+			this.link = link;
 			resetTravelTimes();
 		}
 
@@ -180,8 +180,8 @@ public class TravelTimeCalculatorArray extends AbstractTravelTimeCalculator {
 
 			int cnt = this.timeCnt[index];
 			if (cnt == 0) {
-				this.travelTimes[index] = this.freetraveltime;
-				return this.freetraveltime;
+				this.travelTimes[index] = this.link.getLength() / this.link.getFreespeed(now);
+				return this.travelTimes[index];
 			}
 
 			double sum = this.timeSum[index];

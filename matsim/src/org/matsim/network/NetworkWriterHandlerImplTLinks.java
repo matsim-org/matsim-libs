@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.misc.Time;
 
 public class NetworkWriterHandlerImplTLinks {
 
@@ -83,7 +84,7 @@ public class NetworkWriterHandlerImplTLinks {
 	}
 
 	private void writeLink(final Link link) throws IOException {
-
+		
 		this.out.write(link.getId() + "\t");			// ID
 		this.out.write("[UNKNOWN]\t");					// NAME
 		this.out.write(link.getFromNode().getId() + "\t");		// NODEA
@@ -102,9 +103,9 @@ public class NetworkWriterHandlerImplTLinks {
 		this.out.write("0\t");						// CAPACITYA
 		this.out.write((int)link.getCapacity() + "\t");	// CAPACITYB
 		this.out.write("0\t");						// SPEEDLMTA
-		this.out.write(link.getFreespeed() + "\t");	// SPEEDLMTB
+		this.out.write(link.getFreespeed(Time.UNDEFINED_TIME) + "\t");	// SPEEDLMTB
 		this.out.write("0\t");						// FREESPDA
-		this.out.write(link.getFreespeed() + "\t");	// FREESPDB
+		this.out.write(link.getFreespeed(Time.UNDEFINED_TIME) + "\t");	// FREESPDB
 		this.out.write("LOCAL\t");					// FUNCTCLASS
 		this.out.write("0\t");						// THRUA
 		this.out.write("0\t");						// THRUB

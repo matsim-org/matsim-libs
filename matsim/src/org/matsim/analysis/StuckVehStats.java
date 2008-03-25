@@ -137,7 +137,7 @@ public class StuckVehStats implements EventHandlerAgentDepartureI, EventHandlerA
 		for (String linkId : stuckLinkTimes.keySet()) {
 			ArrayList<Double> times = stuckLinkTimes.get(linkId);
 			LinkImpl link = (LinkImpl)network.getLocation(linkId);
-			System.out.print(linkId + "\t" + link.getCapacity() + "\t" + link.getFreespeed() + "\t" + link.getLength() + "\t" + times.size() + "\t");
+			System.out.print(linkId + "\t" + link.getCapacity() + "\t" + link.getFreespeed(Time.UNDEFINED_TIME) + "\t" + link.getLength() + "\t" + times.size() + "\t");
 			for (Double time : times) System.out.print(time + " ");
 			System.out.println();
 		}

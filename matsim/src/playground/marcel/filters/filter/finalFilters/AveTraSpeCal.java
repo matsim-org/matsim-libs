@@ -26,6 +26,7 @@ import org.matsim.events.EventLinkEnter;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
+import org.matsim.utils.misc.Time;
 
 import playground.marcel.filters.writer.UserDefAtt;
 
@@ -114,7 +115,7 @@ public class AveTraSpeCal extends LinkAveCalA {
 	@Override
 	public double atxCal(final String linkID, final String timeBin) {
 		double ats = getLinkTraSpeed(linkID, Integer.parseInt(timeBin) * 900);
-		ats = (ats != 0) ? ats : ((LinkImpl) this.network.getLocation(linkID)).getFreespeed();
+		ats = (ats != 0) ? ats : ((LinkImpl) this.network.getLocation(linkID)).getFreespeed(Time.UNDEFINED_TIME);
 		return ats;
 	}
 }

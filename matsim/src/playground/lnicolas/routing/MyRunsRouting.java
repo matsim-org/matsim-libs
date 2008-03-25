@@ -59,6 +59,7 @@ import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelMinCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.utils.misc.Time;
 
 import playground.lnicolas.MyRuns;
 import playground.lnicolas.convexhull.GrahamScan;
@@ -372,7 +373,7 @@ public class MyRunsRouting extends MyRuns {
 		double totalEucDist = 0;
 		for (Link l : network.getLinks().values()) {
 			avgLinkLength = (i*avgLinkLength + l.getLength()) / (i+1);
-			avgLinkFreespeed = (i*avgLinkFreespeed + l.getFreespeed()) / (i+1);
+			avgLinkFreespeed = (i*avgLinkFreespeed + l.getFreespeed(Time.UNDEFINED_TIME)) / (i+1);
 			totalLength += l.getLength();
 			totalEucDist += l.getFromNode().getCoord().calcDistance(l.getToNode().getCoord());
 			i++;

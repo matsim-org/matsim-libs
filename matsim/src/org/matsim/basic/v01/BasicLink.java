@@ -104,7 +104,7 @@ implements BasicLinkI
 		this.capacity = capacity;
 	}
 
-	public double getFreespeed() {
+	public double getFreespeed(final double time) {
 		return this.freespeed;
 	}
 

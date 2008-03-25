@@ -22,6 +22,8 @@ package teach.multiagent07.router;
 
 import java.util.HashMap;
 
+import org.matsim.utils.misc.Time;
+
 import teach.multiagent07.net.CALink;
 
 public class RouterLink extends CALink {
@@ -73,7 +75,7 @@ public class RouterLink extends CALink {
 		if (null == sum) {
 			// we do not yet have any information about the speed at this time
 			// assume free speed
-			return getLength() / getFreespeed();
+			return getLength() / getFreespeed(Time.UNDEFINED_TIME);
 		} else {
 			Integer cnt = timeCnt_.get(index);
 			return sum.longValue() / cnt.intValue();

@@ -68,6 +68,7 @@ import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.writer.MatsimWriter;
@@ -490,7 +491,7 @@ int three=0;
 		while (oneWayLink != null){
 			Node toNode = oneWayLink.getFromNode();
 			Node fromNode = oneWayLink.getToNode();
-			Link testlink = network.createLink(oneWayLink.getId().toString() + "666", fromNode.getId().toString(), toNode.getId().toString(),((Double) oneWayLink.getLength()).toString(), ((Double)oneWayLink.getFreespeed()).toString(),((Double)oneWayLink.getCapacity()).toString(), ((Integer)oneWayLink.getLanes()).toString(), oneWayLink.getOrigId() + "666",oneWayLink.getType());
+			Link testlink = network.createLink(oneWayLink.getId().toString() + "666", fromNode.getId().toString(), toNode.getId().toString(),((Double) oneWayLink.getLength()).toString(), ((Double)oneWayLink.getFreespeed(Time.UNDEFINED_TIME)).toString(),((Double)oneWayLink.getCapacity()).toString(), ((Integer)oneWayLink.getLanes()).toString(), oneWayLink.getOrigId() + "666",oneWayLink.getType());
 
 			EvacuationAreaLink el = new EvacuationAreaLink((Id) testlink.getId(),3600.0 * 11 + 85*60);
 			links.put(el.getId(),el);
@@ -822,7 +823,7 @@ int three=0;
 									link.getFromNode().getId().toString(), link
 											.getToNode().getId().toString(),
 									Double.toString(link.getLength()),
-									Double.toString(link.getFreespeed()),
+									Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)),
 									Double.toString(link.getCapacity()),
 									Integer.toString(link.getLanes()),
 									link.getOrigId(), link.getType());

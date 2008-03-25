@@ -30,6 +30,7 @@ import org.matsim.mobsim.Simulation;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.utils.misc.Time;
 
 public class QueueRemoteLink extends QueueLink implements RemoteLinkI {
 
@@ -41,7 +42,7 @@ public class QueueRemoteLink extends QueueLink implements RemoteLinkI {
 
 	public QueueRemoteLink(final QueueLink link, final NetworkLayer network) {
 		super(network, link.getId().toString(), link.getFromNode(), link.getToNode(),
-			Double.toString(link.getLength()), Double.toString(link.getFreespeed()),
+			Double.toString(link.getLength()), Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)),
 			Double.toString(link.getCapacity()), Integer.toString(link.getLanes()),
 			link.getOrigId(), link.getType());
 

@@ -82,7 +82,7 @@ public interface BasicLinkI {
 
     public int getLanes();
 
-    public double getFreespeed();
+    public double getFreespeed(final double time);
 
     /**
   	 * This method returns the capacity as set in the xml defining the network. Be aware

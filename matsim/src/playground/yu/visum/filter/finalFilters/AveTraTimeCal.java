@@ -6,6 +6,7 @@ import org.matsim.events.EventLinkEnter;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
+import org.matsim.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;
 
@@ -96,7 +97,7 @@ public class AveTraTimeCal extends LinkAveCalA {
 		LinkImpl l = (LinkImpl) network.getLocation(linkID);
 		if (l == null)
 			return 0.0;
-		att = (att != 0) ? att : l.getLength() / l.getFreespeed();
+		att = (att != 0) ? att : l.getLength() / l.getFreespeed(Time.UNDEFINED_TIME);
 		return att;
 	}
 }

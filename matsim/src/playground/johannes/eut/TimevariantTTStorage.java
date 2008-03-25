@@ -28,6 +28,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 
 /**
  * @author illenberger
@@ -48,7 +49,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 		 * Initialize all bins with free flow travel time.
 		 */
 		for (Link link : network.getLinks().values()) {
-			double freeTT = link.getLength() / link.getFreespeed();
+			double freeTT = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 			for (int i = 0; i < getBinCnt(); i++) {
 				setBinValue(link, i, freeTT);
 			}
@@ -62,7 +63,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 			logger.warn(String.format(
 				"Trying to access travel time out of bounds (time=%1$d, starttime=%2$d, endtime=%3$d). Returning free flow travel time.",
 				time, getStartTime(), getEndTime()), e);
-			return link.getLength() / link.getFreespeed();
+			return link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 		}
 	}
 

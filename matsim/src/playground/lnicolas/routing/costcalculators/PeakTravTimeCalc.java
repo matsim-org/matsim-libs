@@ -26,6 +26,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelMinCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 
 public class PeakTravTimeCalc implements TravelCostI, TravelTimeI, TravelMinCostI {
 	private int[] travTimeDelta;
@@ -132,6 +133,6 @@ public class PeakTravTimeCalc implements TravelCostI, TravelTimeI, TravelMinCost
 	}
 
 	public double getLinkMinimumTravelCost(Link link) {
-		return (link.getLength() / link.getFreespeed());
+		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME));
 	}
 }

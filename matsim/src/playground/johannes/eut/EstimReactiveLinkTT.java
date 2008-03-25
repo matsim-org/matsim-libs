@@ -42,6 +42,7 @@ import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.plans.Person;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 
 /**
  * @author illenberger
@@ -106,7 +107,7 @@ public class EstimReactiveLinkTT implements
 
 			LinkTTCalculator f = this.linkTTCalculators.get(link);
 			if (f == null)
-				this.lastTravelTime = link.getFreespeed();
+				this.lastTravelTime = link.getFreespeed(Time.UNDEFINED_TIME);
 			else
 				/*
 				 * TODO: This is ugly!
@@ -186,7 +187,7 @@ public class EstimReactiveLinkTT implements
 				this.lastCall = time;
 
 				if (this.samples.isEmpty())
-					this.currentTravelTime = this.link.getFreespeed();
+					this.currentTravelTime = this.link.getFreespeed(Time.UNDEFINED_TIME);
 				else {
 					double tt = this.samples.size() / this.feasibleOutFlow;
 					this.currentTravelTime = Math.max(this.freeFlowTravTime, tt);

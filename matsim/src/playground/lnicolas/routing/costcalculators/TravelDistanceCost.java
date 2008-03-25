@@ -22,6 +22,7 @@ package playground.lnicolas.routing.costcalculators;
 
 import org.matsim.network.Link;
 import org.matsim.router.util.TravelMinCostI;
+import org.matsim.utils.misc.Time;
 
 /**
  * @author niclefeb
@@ -44,7 +45,7 @@ public class TravelDistanceCost implements TravelMinCostI {
 	 * @see org.matsim.network.TravelCostI#getLinkTravelTime(org.matsim.network.Link, int)
 	 */
 	public double getLinkTravelTime(Link link, double time) {
-		return (link.getLength() / link.getFreespeed());
+		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME));
 	}
 
 	public double getLinkMinimumTravelCost(Link link) {

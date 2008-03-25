@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 
 import org.matsim.mobsim.QueueLink;
 import org.matsim.trafficmonitoring.LinkTravelTimeCounter;
+import org.matsim.utils.misc.Time;
 
 import playground.david.vis.data.OTFDataWriter;
 
@@ -18,7 +19,7 @@ public class OTFLinkTravelTimesHandler extends OTFDefaultLinkHandler {
 		public void writeDynData(ByteBuffer out) throws IOException {
 			Double erg = count.getLastLinkTravelTime(src.getId().toString());
 			if (erg != null) out.putFloat((float)(src.getLength()/erg.doubleValue()));
-			else out.putFloat((float)src.getFreespeed());
+			else out.putFloat((float)src.getFreespeed(Time.UNDEFINED_TIME));
 			
 		}
 

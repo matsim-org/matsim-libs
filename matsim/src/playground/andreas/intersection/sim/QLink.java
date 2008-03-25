@@ -14,6 +14,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.trafficlights.data.SignalGroupDefinition;
 import org.matsim.trafficlights.data.SignalLane;
+import org.matsim.utils.misc.Time;
 
 public class QLink extends LinkImpl {
 	
@@ -33,11 +34,11 @@ public class QLink extends LinkImpl {
 		
 		this.effectiveCelleSize = network.getEffectiveCellSize();
 		
-		this.freeSpeedTT = this.getLength() / this.getFreespeed();
+		this.freeSpeedTT = this.getLength() / this.getFreespeed(Time.UNDEFINED_TIME);
 		// Original LinkErstellen
 		this.originalLink = new PseudoLink(this, true);
 		// Configurieren
-		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLength(), this.getLanes(), this.getFreespeed(), this.getFlowCapacity(),this.effectiveCelleSize)) {
+		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLength(), this.getLanes(), this.getFreespeed(Time.UNDEFINED_TIME), this.getFlowCapacity(),this.effectiveCelleSize)) {
 			
 			if ( spaceCapWarningCount <=10 ) {
 				log.warn("Link " + this.getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
@@ -102,7 +103,7 @@ public class QLink extends LinkImpl {
 			if(signalGroupDefinition.getLinkId().equals(this.id)){
 
 				int numberOfLanes_ = 1;
-				double freeSpeed_m_s = this.getFreespeed();
+				double freeSpeed_m_s = this.getFreespeed(Time.UNDEFINED_TIME);
 				double flowCapacity_Veh_h = 2000.0 / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
 					
 				PseudoLink newNodePseudoLink;
@@ -120,7 +121,7 @@ public class QLink extends LinkImpl {
 						originalLink.addDestLink(this.getToNode().getOutLinks().get(signalLane.getLinkId()));			
 							
 						newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h,this.effectiveCelleSize);
-						this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLength() - signalLane.getLength(), this.getLanes(), this.getFreespeed(), this.getFlowCapacity(),this.effectiveCelleSize);
+						this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLength() - signalLane.getLength(), this.getLanes(), this.getFreespeed(Time.UNDEFINED_TIME), this.getFlowCapacity(),this.effectiveCelleSize);
 						
 						pseudoLinksList.add(newNodePseudoLink);
 						firstNodeLinkInitialized = true;

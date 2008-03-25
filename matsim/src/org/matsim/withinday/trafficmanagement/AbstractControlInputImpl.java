@@ -37,6 +37,7 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.plans.Route;
+import org.matsim.utils.misc.Time;
 
 
 
@@ -142,7 +143,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (!this.numberOfAgents.containsKey(l.getId().toString()))  {
 				this.numberOfAgents.put(l.getId().toString(), Integer.valueOf(0));
 			}
-			double tt = l.getLength()/l.getFreespeed();
+			double tt = l.getLength()/l.getFreespeed(Time.UNDEFINED_TIME);
 			this.ttFreeSpeeds.put(l.getId().toString(), tt );
 			this.ttFreeSpeedAltRoute += tt;
 		}
@@ -164,7 +165,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (!this.numberOfAgents.containsKey(l.getId().toString()))  {
 				this.numberOfAgents.put(l.getId().toString(), Integer.valueOf(0));
 			}
-			tt = l.getLength()/l.getFreespeed();
+			tt = l.getLength()/l.getFreespeed(Time.UNDEFINED_TIME);
 			this.ttFreeSpeeds.put(l.getId().toString(), tt );
 			this.ttFreeSpeedMainRoute += tt;
 		}

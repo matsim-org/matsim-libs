@@ -41,6 +41,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Leg;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
@@ -118,7 +119,7 @@ public class QueueLink extends LinkImpl {
 		// like them. kai, nov06
 
 
-		this.freeTravelDuration = getLength() / getFreespeed();
+		this.freeTravelDuration = getLength() / getFreespeed(Time.UNDEFINED_TIME);
 
 		/* moved capacity calculation to two methods, to be able to call it from outside
 		 * e.g. for reducing cap in case of an incident             */
@@ -536,7 +537,7 @@ public class QueueLink extends LinkImpl {
 			int lane = 1 + (veh.getID() % getLanes());
 
 			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
-			double speed = (now > cmp) ? 0.0 : getFreespeed();
+			double speed = (now > cmp) ? 0.0 : getFreespeed(Time.UNDEFINED_TIME);
 			veh.setSpeed(speed);
 
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
@@ -572,7 +573,7 @@ public class QueueLink extends LinkImpl {
 				if (distanceOnLink < 0) distanceOnLink = 0.0;
 			}
 			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
-			double speed = (now > cmp) ? 0.0 : getFreespeed();
+			double speed = (now > cmp) ? 0.0 : getFreespeed(Time.UNDEFINED_TIME);
 			veh.setSpeed(speed);
 			int lane = 1 + (veh.getID() % getLanes());
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(),
@@ -617,7 +618,7 @@ public class QueueLink extends LinkImpl {
 		if (cnt > 0) {
 			double cellSize = this.length / cnt;
 			double distFromFromNode = this.length - cellSize / 2.0;
-			double freespeed = getFreespeed();
+			double freespeed = getFreespeed(Time.UNDEFINED_TIME);
 
 			// the cars in the buffer
 			for (Vehicle veh : this.buffer) {

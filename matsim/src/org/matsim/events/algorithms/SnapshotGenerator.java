@@ -204,7 +204,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			this.buffer = new ArrayList<EventAgent>();
 			this.euklideanDist = link2.getFromNode().getCoord().calcDistance(link2.getToNode().getCoord());
 			this.radioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
-			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed();
+			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed(Time.UNDEFINED_TIME);
 			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
 			this.effectiveCellSize = effectiveCellSize;
@@ -273,7 +273,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 				int lane = 1 + (agent.intId % this.link.getLanes());
 
 				int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
-				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed();
+				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
 				agent.speed = speed;
 
 				PositionInfo position = new PositionInfo(agent.id,
@@ -310,7 +310,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 					if (distanceOnLink < 0) distanceOnLink = 0.0;
 				}
 				int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
-				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed();
+				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
 				agent.speed = speed;
 				int lane = 1 + (agent.intId % this.link.getLanes());
 				PositionInfo position = new PositionInfo(agent.id,
@@ -356,7 +356,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			if (cnt > 0) {
 				double cellSize = this.link.getLength() / cnt;
 				double distFromFromNode = this.link.getLength() - cellSize / 2.0;
-				double freespeed = this.link.getFreespeed();
+				double freespeed = this.link.getFreespeed(time);
 
 				// the cars in the buffer
 				for (EventAgent agent : this.buffer) {

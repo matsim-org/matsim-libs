@@ -160,17 +160,18 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 	private class TravelTimeRole {
 
 		private final HashMap<Integer,TimeStruct> travelTimes;
-		private final double freetraveltime;
+		
 		private int currIdx;
 		private int currCnt;
 		private double currTimeSum;
+		private final Link link;
 
 
 		public TravelTimeRole(final Link link) {
 
 //			this.travelTimes =  new HashMap<Integer,TimeStruct>(numSlots,(float) 0.5);
 			this.travelTimes =  new HashMap<Integer,TimeStruct>();
-			this.freetraveltime = link.getLength() / link.getFreespeed();
+			this.link = link;
 			resetTravelTimes();
 
 
@@ -232,7 +233,7 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 
 			TimeStruct ts = this.travelTimes.get(getInteger(index));
 			if (ts == null){
-				return this.freetraveltime;
+				return this.link.getLength() / this.link.getFreespeed(now);
 			}
 
 			return ts.timeSum / ts.cnt;

@@ -24,6 +24,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.router.util.TravelMinCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 
 /**
  * A simple cost calculator which only respects time and distance to calculate generalized costs
@@ -54,6 +55,6 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCostI {
 	}
 
 	public double getLinkMinimumTravelCost(final Link link) {
-		return (link.getLength() / link.getFreespeed()) * this.travelCostFactor;
+		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME)) * this.travelCostFactor;
 	}
 }

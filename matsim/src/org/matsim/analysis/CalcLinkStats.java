@@ -33,6 +33,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.misc.Time;
 
 /**
  * Calculates the average link volumes and travel times over any number of iterations.
@@ -173,7 +174,7 @@ public class CalcLinkStats {
 				out.write("\t" + link.getFromNode().getId().toString());
 				out.write("\t" + link.getToNode().getId().toString());
 				out.write("\t" + Double.toString(link.getLength()));
-				out.write("\t" + Double.toString(link.getFreespeed()));
+				out.write("\t" + Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)));
 				out.write("\t" + Double.toString(link.getCapacity()));
 
 				// HRS0-1, HRS1-2, ... HRS23-24

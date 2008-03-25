@@ -24,6 +24,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.router.util.TravelMinCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 
 /**
  * CostCalculator and TravelTimeCalculator for Links based on freespeed on links
@@ -47,15 +48,15 @@ public class FreespeedTravelTimeCost implements TravelMinCostI, TravelTimeI {
 	}
 
 	public double getLinkTravelCost(Link link, double time) {
-		return (link.getLength() / link.getFreespeed()) * this.travelCostFactor;
+		return (link.getLength() / link.getFreespeed(time)) * this.travelCostFactor;
 	}
 
 	public double getLinkTravelTime(Link link, double time) {
-		return link.getLength() / link.getFreespeed();
+		return link.getLength() / link.getFreespeed(time);
 	}
 
 	public double getLinkMinimumTravelCost(Link link) {
-		return (link.getLength() / link.getFreespeed()) * this.travelCostFactor;
+		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME)) * this.travelCostFactor;
 	}
 
 }

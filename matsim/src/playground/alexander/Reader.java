@@ -7,6 +7,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.misc.Time;
 
 public class Reader {
 
@@ -36,7 +37,7 @@ public class Reader {
 
 	private void parseLine(String line) {
 		String[] result = StringUtils.explode(line, '\t');
-		Double freesp = this.net.getLink("100").getFreespeed();
+		Double freesp = this.net.getLink("100").getFreespeed(Time.UNDEFINED_TIME);
 		if(result.length != 0  ){
 			try{
 				if(Integer.parseInt(result[1]) == 1){

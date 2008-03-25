@@ -27,6 +27,7 @@ import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkAlgorithm;
+import org.matsim.utils.misc.Time;
 
 public class NetworkSimplifyAttributes extends NetworkAlgorithm {
 
@@ -59,7 +60,7 @@ public class NetworkSimplifyAttributes extends NetworkAlgorithm {
 		ArrayList<LinkImpl> link90 = new ArrayList<LinkImpl>();
 
 		for (Link l : network.getLinks().values()) {
-			double speed = l.getFreespeed()*3.6;
+			double speed = l.getFreespeed(Time.UNDEFINED_TIME)*3.6;
 			if (speed <= 0.0) { Gbl.errorMsg("speed = " + speed + " not allowed!"); }
 			else if (speed <= 21.0) { l.setFreespeed(10.0/3.6); }
 			else if (speed <= 36.0) { l.setFreespeed(30.0/3.6); }

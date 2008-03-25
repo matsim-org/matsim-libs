@@ -26,6 +26,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.utils.misc.Time;
 
 public class NetworkMergeDoubleLinks extends NetworkAlgorithm {
 
@@ -58,7 +59,7 @@ public class NetworkMergeDoubleLinks extends NetworkAlgorithm {
 		else if (mergetype == 1) {
 			System.out.println("        Link id=" + link2.getId() + " merged (additive) into Link id=" + link1.getId());
 			double cap = link1.getCapacity() + link2.getCapacity();
-			double fs = Math.max(link1.getFreespeed(),link2.getFreespeed());
+			double fs = Math.max(link1.getFreespeed(Time.UNDEFINED_TIME),link2.getFreespeed(Time.UNDEFINED_TIME));
 			int lanes = link1.getLanes() + link2.getLanes();
 			double length = Math.max(link1.getLength(),link2.getLength());
 			String origid = "add-merge(" + link1.getId() + "," + link2.getId() + ")";
@@ -72,7 +73,7 @@ public class NetworkMergeDoubleLinks extends NetworkAlgorithm {
 		else if (mergetype == 2) {
 			System.out.println("        Link id=" + link2.getId() + " merged (maximum) into Link id=" + link1.getId());
 			double cap = Math.max(link1.getCapacity(),link2.getCapacity());
-			double fs = Math.max(link1.getFreespeed(),link2.getFreespeed());
+			double fs = Math.max(link1.getFreespeed(Time.UNDEFINED_TIME),link2.getFreespeed(Time.UNDEFINED_TIME));
 			int lanes = Math.max(link1.getLanes(),link2.getLanes());
 			double length = Math.max(link1.getLength(),link2.getLength());
 			String origid = "max-merge(" + link1.getId() + "," + link2.getId() + ")";

@@ -28,6 +28,7 @@ import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 import org.matsim.withinday.WithindayAgent;
 
 public class AgentLinkcostPercpetion implements TravelTimeI {
@@ -120,7 +121,7 @@ public class AgentLinkcostPercpetion implements TravelTimeI {
 	}
 
 	private double applyBoundary(final double c, final Link link) {
-		double c_0 = link.getLength() / link.getFreespeed();
+		double c_0 = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 		c_0 = 0.9 * c_0;
 		return Math.max(c_0, c);
 	}

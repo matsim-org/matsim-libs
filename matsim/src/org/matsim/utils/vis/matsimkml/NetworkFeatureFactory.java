@@ -27,6 +27,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.Feature;
 import org.matsim.utils.vis.kml.Folder;
 import org.matsim.utils.vis.kml.LineString;
@@ -187,7 +188,7 @@ public class NetworkFeatureFactory {
 		buffer.append(STARTUL);
 		buffer.append(STARTLI);
 		buffer.append("Freespeed: ");
-		buffer.append(l.getFreespeed());
+		buffer.append(l.getFreespeed(Time.UNDEFINED_TIME));
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Capacity: ");

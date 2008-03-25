@@ -28,6 +28,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.utils.misc.Time;
 
 public class NetworkWriteAsTable extends NetworkAlgorithm {
 
@@ -123,11 +124,11 @@ public class NetworkWriteAsTable extends NetworkAlgorithm {
 				Node t = l.getToNode();
 				this.out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				this.out_l.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\t" + l.getLength() + "\t");
-				this.out_l.write(l.getFreespeed() + "\t" + (l.getCapacity()/capperiod) + "\t" + l.getLanes() + "\t1\n");
+				this.out_l.write(l.getFreespeed(Time.UNDEFINED_TIME) + "\t" + (l.getCapacity()/capperiod) + "\t" + l.getLanes() + "\t1\n");
 				this.out_l.flush();
 
 				this.out_et.write(l.getId() + "\t" + l.getFromNode().getId() + "\t" + l.getToNode().getId() + "\t");
-				this.out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed()*3.6) + "\t");
+				this.out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed(Time.UNDEFINED_TIME)*3.6) + "\t");
 				this.out_et.write(Math.round(l.getCapacity()/capperiod) + "\t" + l.getLanes() + "\t");
 				this.out_et.write(l.getOrigId() + "\t" + l.getType() + "\t");
 				this.out_et.write(f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");

@@ -168,7 +168,7 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 
-	public double getFreespeed() {
+	public double getFreespeed(final double time) {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 

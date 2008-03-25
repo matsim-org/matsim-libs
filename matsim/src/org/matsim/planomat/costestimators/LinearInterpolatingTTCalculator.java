@@ -32,6 +32,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 
 /**
  * A link travel time calculator which returns a travel time that comes
@@ -255,7 +256,7 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 	}
 
 	private double getLinkMinimumTravelTime(final Link link) {
-		return (link.getLength() / link.getFreespeed());
+		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME));
 	}
 
 	@Override

@@ -32,6 +32,7 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.misc.Time;
 
 
 public class TravelTimeCalculatorImpl3 implements EventHandlerLinkEnterI,
@@ -167,7 +168,7 @@ public TravelTimeRole(final Link link, final int numSlots) {
 
 //	this.travelTimes =  new HashMap<Integer,TimeStruct>(numSlots,(float) 0.5);
 	this.travelTimes =  new Vector<TimeStruct>();
-	this.freetraveltime = link.getLength() / link.getFreespeed();
+	this.freetraveltime = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 	resetTravelTimes();
 }
 

@@ -28,6 +28,7 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.utils.misc.Time;
 
 import teach.multiagent07.net.CALink;
 import teach.multiagent07.net.CANetwork;
@@ -86,7 +87,7 @@ public class RouterNet extends CANetwork {
 				RouterLink link = (RouterLink) l;
 				RouterNode node = (RouterNode)link.getToNode();
 				double travelTime = link.getTravelTime(currTime);
-				double travelCost = link.getLength() / link.getFreespeed();
+				double travelCost = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 
 				double nCost = node.getCost();
 				if (!node.isVisited()) {

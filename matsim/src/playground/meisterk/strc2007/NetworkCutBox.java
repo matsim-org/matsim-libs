@@ -24,6 +24,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
+import org.matsim.utils.misc.Time;
 
 public class NetworkCutBox extends NetworkAlgorithm {
 
@@ -103,7 +104,7 @@ public class NetworkCutBox extends NetworkAlgorithm {
 						fromNode.getId().toString(),
 						toNode.getId().toString(),
 						Double.toString(link.getLength()),
-						Double.toString(link.getFreespeed()),
+						Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)),
 						Double.toString(link.getCapacity()),
 						Integer.toString(link.getLanes()),
 						link.getOrigId(),
