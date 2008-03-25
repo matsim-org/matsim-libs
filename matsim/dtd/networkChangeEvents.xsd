@@ -24,9 +24,9 @@
 <xs:complexType name="networkChangeEventType">
   <xs:sequence>
     <xs:element name="link" type="idRefType" minOccurs="1" maxOccurs="unbounded"/>
-    <xs:element name="flowCapacity" type="changeType" minOccurs="1" maxOccurs="1"/>
-		<xs:element name="freespeed" type="changeType" minOccurs="1" maxOccurs="1"/>
-		<xs:element name="lanes" type="changeType" minOccurs="1" maxOccurs="1"/>
+    <xs:element name="flowCapacity" type="changeType" minOccurs="0" maxOccurs="1"/>
+		<xs:element name="freespeed" type="changeType" minOccurs="0" maxOccurs="1"/>
+		<xs:element name="lanes" type="changeType" minOccurs="0" maxOccurs="1"/>
   </xs:sequence>
   <xs:attribute name="startTime" type="xs:time" use="required"/>
   <xs:attribute name="endTime" type="xs:time"/>
