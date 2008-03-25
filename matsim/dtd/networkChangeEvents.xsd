@@ -27,8 +27,8 @@
   <xs:sequence>
     <xs:element name="link" type="idRefType" />
     <xs:element name="flowCapacity" type="networkChangeType" />
-		<xs:element name="freespeed" type="networkChangeType"/ >
-		<xs:element name="lanes" type="networkChangeType"/ >
+		<xs:element name="freespeed" type="networkChangeType"/>
+		<xs:element name="lanes" type="networkChangeType"/>
   </xs:sequence>
 </xs:complexType>
 
