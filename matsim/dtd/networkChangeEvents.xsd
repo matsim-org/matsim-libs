@@ -36,7 +36,7 @@
 	<xs:attribute name="changeType">
 		<xs:simpleType>
 	  	<xs:restriction base="xs:string">
-		    <xs:enumeration value="absolut" />
+		    <xs:enumeration value="absolute" />
 			  <xs:enumeration value="scaleFactor" />
 			</xs:restriction>
 		</xs:simpleType>
