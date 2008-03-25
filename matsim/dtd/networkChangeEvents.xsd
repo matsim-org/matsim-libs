@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
+					 xmlns="http://www.matsim.org/files/dtd"
+					 elementFormDefault="qualified"
+					 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+					 xml:lang="en">
+
+<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+<!-- Network format of MATSim -->
+
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+
+<xs:element name="networkChangeEvents">
+	<xs:annotation>
+	<xs:documentation>Just a wrapper for the NetworkChangeEvents</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="networkChangeEvent" type="networkChangeEventType" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:complexType name="networkChangeEventType">
+  <xs:attribute name="startTime" type="xs:time" use="required"/>
+  <xs:attribute name="endTime" type="xs:time" />
+  <xs:sequence>
+    <xs:element name="link" type="idRefType" />
+    <xs:element name="flowCapacity" type="networkChangeType" />
+		<xs:element name="freespeed" type="networkChangeType"/ >
+		<xs:element name="lanes" type="networkChangeType"/ >
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="networkChangeType">
+	<xs:attribute name="changeType">
+		<xs:simpleType>
+	  	<xs:restriction base="xs:string">
+		    <xs:enumeration value="absolut" />
+			  <xs:enumeration value="factor" />
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+	<xs:simpleContent>
+	  <xs:restriction base="xs:decimal">
+			<xs:minExclusive value="0.0"/>
+	  </xs:restriction>
+  </xs:simpleContent>
+</xs:complexType>
+
+</xs:schema>
