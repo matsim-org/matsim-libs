@@ -56,12 +56,12 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 	}
 
 	public void setDisplValueCnt(int cnt) {
-		if (displayValue.length != cnt)
-			displayValue = new double[cnt];
+		if (this.displayValue.length != cnt)
+			this.displayValue = new double[cnt];
 	}
 
 	public void setDisplayValue(double value, int index) {
-		displayValue[index] = value;
+		this.displayValue[index] = value;
 	}
 
 	public void setDisplayLabel(String label) {
@@ -74,7 +74,7 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 		final double deltaEasting = getEndEasting() - getStartEasting();
 		double result = deltaNorthing * deltaNorthing;
 		result += deltaEasting * deltaEasting;
-		nodeDist = Math.sqrt(result);
+		this.nodeDist = Math.sqrt(result);
 
 		double offset_m = DisplayNode.RADIUS_M;
 		double length_m = this.getNodeDist() - 2.0 * offset_m;
@@ -82,7 +82,7 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 			length_m = this.getNodeDist() / 2.0;
 			offset_m = (this.getNodeDist() - length_m) / 2.0;
 		}
-		linear2PlaneTransform = newLinear2PlaneTransform(offset_m, length_m);
+		this.linear2PlaneTransform = newLinear2PlaneTransform(offset_m, length_m);
 	}
 
 	// -------------------- INTERNALS --------------------
@@ -137,11 +137,11 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 	}
 
 	public double getNodeDist() {
-		return nodeDist;
+		return this.nodeDist;
 	}
 
 	public AffineTransform getLinear2PlaneTransform() {
-		return linear2PlaneTransform;
+		return this.linear2PlaneTransform;
 	}
 
 	// -------------------- IMPLEMENTATION OF BasicLinkI --------------------
@@ -157,12 +157,37 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 	}
 
 	public BasicNodeI getFromNode() {
-		return fromNode;
+		return this.fromNode;
 	}
 
 	public BasicNodeI getToNode() {
-		return toNode;
+		return this.toNode;
 	}
+
+	public double getCapacity() {
+		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
+	}
+
+	public double getFreespeed() {
+		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
+	}
+
+	public double getLength() {
+		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
+	}
+
+	public void setFreespeed(double freespeed) {
+		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
+	}
+
+	public void setLength(double length) {
+		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
+	}
+
+	public void setCapacity(double capacity) {
+		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
+	}
+
 
 	// -------------------- IMPLEMENTATION OF TrafficLinkI --------------------
 
@@ -175,29 +200,29 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 	}
 
 	public double getLength_m() {
-		return length_m;
+		return this.length_m;
 	}
 
 	public int getLanes() {
-		return lanes;
+		return this.lanes;
 	}
 
 	// ---------- IMPLEMENTATION OF DrawableLinkI ----------
 
 	public int getDisplayValueCount() {
-		return displayValue.length;
+		return this.displayValue.length;
 	}
 
 	public double getDisplayValue(int index) {
-		return displayValue[index];
+		return this.displayValue[index];
 	}
 
 	public String getDisplayText() {
-		return displayLabel;
+		return this.displayLabel;
 	}
 
 	public Collection<DrawableAgentI> getMovingAgents() {
-		return agents;
+		return this.agents;
 	}
 
 	public void setMovingAgents(List<DrawableAgentI> newAgents) {
@@ -208,5 +233,6 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 	public IdI getId() {
 		return this.id;
 	}
+
 
 }

@@ -20,7 +20,7 @@
 
 package teach.multiagent07.util;
 
-import org.matsim.basic.v01.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.utils.identifiers.IdI;
 
 public class Event {
@@ -34,18 +34,18 @@ public class Event {
 
 	public int time = 0;
 	public int type = UNKNOWN;
-	public BasicLink link;
+	public BasicLinkI link;
 	public IdI agentId;
 	public int legNumber = -1;
 
-	public Event( int time, int type, BasicLink link, IdI agentId) {
+	public Event( int time, int type, BasicLinkI link, IdI agentId) {
 		this.time = time;
 		this.type = type;
 		this.link = link;
 		this.agentId = agentId;
 	}
 
-	public Event( int time, int type, BasicLink link, IdI agentId, int legNumber) {
+	public Event( int time, int type, BasicLinkI link, IdI agentId, int legNumber) {
 		this(time, type, link, agentId);
 		this.legNumber = legNumber;
 	}
@@ -53,7 +53,7 @@ public class Event {
 	@Override
 	public String toString() {
 		String typstring = "UNKNOWN";
-		switch (type) {
+		switch (this.type) {
 		case 1:
 			typstring = "ENTER LINK";
 			break;
@@ -67,6 +67,6 @@ public class Event {
 			typstring = "ACTIVITY ARRIVAL";
 			break;
 		}
-		return "Event at " + time + " sec : " +typstring + "on Link " + link.toString() + " with agent " + agentId;
+		return "Event at " + this.time + " sec : " +typstring + "on Link " + this.link.toString() + " with agent " + this.agentId;
 	}
 }

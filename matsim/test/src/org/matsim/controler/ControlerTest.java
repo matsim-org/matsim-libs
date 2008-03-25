@@ -287,7 +287,7 @@ public class ControlerTest extends MatsimTestCase {
 		assertEquals(link3, act1b.getLink());
 		assertEquals(link1, act2a.getLink());
 		assertEquals(link3, act2b.getLink());
-		
+
 		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
 		assertNotNull(leg1.getRoute());
 		assertNotNull(leg2.getRoute());

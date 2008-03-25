@@ -32,7 +32,7 @@ public interface RouteProvider {
 	/**
 	 * Requests the provider for a route from <tt>departureLink</tt> to <tt>destinationLink</tt>
 	 * starting at time <tt>time</tt>.
-	 * 
+	 *
 	 * @param departureLink
 	 *            the departure link.
 	 * @param destinationLink
@@ -44,21 +44,21 @@ public interface RouteProvider {
 	 *         the request.
 	 */
 	public Route requestRoute(Link departureLink, Link destinationLink, double time);
-	
+
 	/**
 	 * Each RouteProvider instance has a priority which should be a value in 0 .. 10, where
-	 * 0 is the lowest priority, 10 the highest. Based on the Priority the route providers 
+	 * 0 is the lowest priority, 10 the highest. Based on the Priority the route providers
 	 * are chosen in the HierarchicalRouteProvider implementation.
 	 * @return a priority in 0..10
 	 */
 	public int getPriority();
 	/**
-	 * Sets the priority of this route provider which should be a value between 0..10	
+	 * Sets the priority of this route provider which should be a value between 0..10
 	 * @param p int in 0..10
 	 */
 	public void setPriority(int p);
 
 	public boolean providesRoute(Link currentLink, Route subRoute);
-	
-	
+
+
 }

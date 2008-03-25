@@ -45,12 +45,12 @@ public class VisumWriteRoutes extends PersonAlgorithm implements PlanAlgorithmI 
 
 	private BufferedWriter out = null;
 	private ZoneLayer tvzLayer = null;
-	
+
 	public VisumWriteRoutes(String filename, ZoneLayer tvzLayer) {
 		this.tvzLayer = tvzLayer;
 		try {
-			out = new BufferedWriter(new FileWriter(filename));
-			out.write("$VISION\n$ROUTENIMPORT\n$VERSION 1\n");
+			this.out = new BufferedWriter(new FileWriter(filename));
+			this.out.write("$VISION\n$ROUTENIMPORT\n$VERSION 1\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -70,9 +70,9 @@ public class VisumWriteRoutes extends PersonAlgorithm implements PlanAlgorithmI 
 			Leg leg = (Leg)plan.getActsLegs().get(i);
 			StringBuilder visum = new StringBuilder();
 			ArrayList<Node> route = leg.getRoute().getRoute();
-			
+
 			if (route.size() > 0) {
-				ArrayList<Location> locs = tvzLayer.getNearestLocations(route.get(0).getCoord(), null);
+				ArrayList<Location> locs = this.tvzLayer.getNearestLocations(route.get(0).getCoord(), null);
 				// from bezirk
 				if (locs.size() > 0) {
 					visum.append(locs.get(0).getId());
@@ -81,7 +81,7 @@ public class VisumWriteRoutes extends PersonAlgorithm implements PlanAlgorithmI 
 					visum.append("00;");
 				}
 				// to bezirk
-				locs = tvzLayer.getNearestLocations(route.get(route.size() - 1).getCoord(), null);
+				locs = this.tvzLayer.getNearestLocations(route.get(route.size() - 1).getCoord(), null);
 				if (locs.size() > 0) {
 					visum.append(locs.get(0).getId());
 					visum.append(";");
@@ -98,7 +98,7 @@ public class VisumWriteRoutes extends PersonAlgorithm implements PlanAlgorithmI 
 				// abschluss
 				visum.append("-1\n");
 				try {
-					out.write(visum.toString());
+					this.out.write(visum.toString());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -108,10 +108,10 @@ public class VisumWriteRoutes extends PersonAlgorithm implements PlanAlgorithmI 
 		}
 
 	}
-	
+
 	public void close() {
 		try {
-			out.close();
+			this.out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

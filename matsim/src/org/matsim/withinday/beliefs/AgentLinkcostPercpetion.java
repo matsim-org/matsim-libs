@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.withinday.WithindayAgent;
 
@@ -93,7 +94,7 @@ public class AgentLinkcostPercpetion implements TravelTimeI {
 	private void init() {
 		double time_s = SimulationTimer.getTime();
 
-		Link link = this.agent.getVehicle().getCurrentLink();
+		LinkImpl link = this.agent.getVehicle().getCurrentLink();
 
 		int t_star = t_star(link, time_s, this.phi_1, this.phi_2);
 

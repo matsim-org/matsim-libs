@@ -44,7 +44,7 @@ public class NetworkWriterHandlerImplTLinks {
 			for (Link l : this.network.getLinks().values()) {
 				writeLink(l);
 			}
-			out.close();
+			this.out.close();
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -52,65 +52,65 @@ public class NetworkWriterHandlerImplTLinks {
 	}
 
 	private void startLinks() throws IOException {
-		out.write("ID\t");
-		out.write("NAME\t");
-		out.write("NODEA\t");
-		out.write("NODEB\t");
-		out.write("PERMLANESA\t");
-		out.write("PERMLANESB\t");
-		out.write("LEFTPCKTSA\t");
-		out.write("LEFTPCKTSB\t");
-		out.write("RGHTPCKTSA\t");
-		out.write("RGHTPCKTSB\t");
-		out.write("TWOWAYTURN\t");
-		out.write("LENGTH\t");
-		out.write("GRADE\t");
-		out.write("SETBACKA\t");
-		out.write("SETBACKB\t");
-		out.write("CAPACITYA\t");
-		out.write("CAPACITYB\t");
-		out.write("SPEEDLMTA\t");
-		out.write("SPEEDLMTB\t");
-		out.write("FREESPDA\t");
-		out.write("FREESPDB\t");
-		out.write("FUNCTCLASS\t");
-		out.write("THRUA\t");
-		out.write("THRUB\t");
-		out.write("COLOR\t");
-		out.write("VEHICLE\t");
-		out.write("NOTES\n");
+		this.out.write("ID\t");
+		this.out.write("NAME\t");
+		this.out.write("NODEA\t");
+		this.out.write("NODEB\t");
+		this.out.write("PERMLANESA\t");
+		this.out.write("PERMLANESB\t");
+		this.out.write("LEFTPCKTSA\t");
+		this.out.write("LEFTPCKTSB\t");
+		this.out.write("RGHTPCKTSA\t");
+		this.out.write("RGHTPCKTSB\t");
+		this.out.write("TWOWAYTURN\t");
+		this.out.write("LENGTH\t");
+		this.out.write("GRADE\t");
+		this.out.write("SETBACKA\t");
+		this.out.write("SETBACKB\t");
+		this.out.write("CAPACITYA\t");
+		this.out.write("CAPACITYB\t");
+		this.out.write("SPEEDLMTA\t");
+		this.out.write("SPEEDLMTB\t");
+		this.out.write("FREESPDA\t");
+		this.out.write("FREESPDB\t");
+		this.out.write("FUNCTCLASS\t");
+		this.out.write("THRUA\t");
+		this.out.write("THRUB\t");
+		this.out.write("COLOR\t");
+		this.out.write("VEHICLE\t");
+		this.out.write("NOTES\n");
 
 	}
 
 	private void writeLink(final Link link) throws IOException {
 
-		out.write(link.getId() + "\t");			// ID
-		out.write("[UNKNOWN]\t");					// NAME
-		out.write(link.getFromNode().getId() + "\t");		// NODEA
-		out.write(link.getToNode().getId() + "\t");		// NODEB
-		out.write("0\t");						// PERMLANESA
-		out.write(link.getLanes() + "\t");	// PERMLANESB
-		out.write("0\t");						// LEFTPCKTSA
-		out.write("0\t");						// LEFTPCKTSB
-		out.write("0\t");						// RGHTPCKTSA
-		out.write("0\t");						// RGHTPCKTSB
-		out.write("0\t");						// TWOWAYTURN
-		out.write(Math.max(1, (int)link.getLength()) + "\t");		// LENGTH
-		out.write("0\t");						// GRADE
-		out.write("0\t");						// SETBACKA
-		out.write("0\t");						// SETBACKB
-		out.write("0\t");						// CAPACITYA
-		out.write((int)link.getCapacity() + "\t");	// CAPACITYB
-		out.write("0\t");						// SPEEDLMTA
-		out.write(link.getFreespeed() + "\t");	// SPEEDLMTB
-		out.write("0\t");						// FREESPDA
-		out.write(link.getFreespeed() + "\t");	// FREESPDB
-		out.write("LOCAL\t");					// FUNCTCLASS
-		out.write("0\t");						// THRUA
-		out.write("0\t");						// THRUB
-		out.write("1\t");						// COLOR
-		out.write("AUTO\t");						// VEHICLE
-		out.write("\n");							// NOTES
+		this.out.write(link.getId() + "\t");			// ID
+		this.out.write("[UNKNOWN]\t");					// NAME
+		this.out.write(link.getFromNode().getId() + "\t");		// NODEA
+		this.out.write(link.getToNode().getId() + "\t");		// NODEB
+		this.out.write("0\t");						// PERMLANESA
+		this.out.write(link.getLanes() + "\t");	// PERMLANESB
+		this.out.write("0\t");						// LEFTPCKTSA
+		this.out.write("0\t");						// LEFTPCKTSB
+		this.out.write("0\t");						// RGHTPCKTSA
+		this.out.write("0\t");						// RGHTPCKTSB
+		this.out.write("0\t");						// TWOWAYTURN
+		this.out.write(Math.max(1, (int)link.getLength()) + "\t");		// LENGTH
+		this.out.write("0\t");						// GRADE
+		this.out.write("0\t");						// SETBACKA
+		this.out.write("0\t");						// SETBACKB
+		this.out.write("0\t");						// CAPACITYA
+		this.out.write((int)link.getCapacity() + "\t");	// CAPACITYB
+		this.out.write("0\t");						// SPEEDLMTA
+		this.out.write(link.getFreespeed() + "\t");	// SPEEDLMTB
+		this.out.write("0\t");						// FREESPDA
+		this.out.write(link.getFreespeed() + "\t");	// FREESPDB
+		this.out.write("LOCAL\t");					// FUNCTCLASS
+		this.out.write("0\t");						// THRUA
+		this.out.write("0\t");						// THRUB
+		this.out.write("1\t");						// COLOR
+		this.out.write("AUTO\t");						// VEHICLE
+		this.out.write("\n");							// NOTES
 	}
 
 }

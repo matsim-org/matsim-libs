@@ -29,9 +29,9 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 
 /**
- * 
+ *
  * @author dgrether
- * 
+ *
  */
 public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 
@@ -46,7 +46,7 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 	public AStarLandmarksRouteProvider(final NetworkLayer network) {
 		this(network, 0);
 	}
-	
+
 	public AStarLandmarksRouteProvider(final NetworkLayer network, final int priority) {
 		this.freespeedTravelCost = new FreespeedTravelTimeCost();
 		PreProcessLandmarks preProcess = new PreProcessLandmarks(

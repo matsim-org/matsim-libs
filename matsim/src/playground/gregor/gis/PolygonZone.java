@@ -23,7 +23,7 @@ package playground.gregor.gis;
 import org.apache.log4j.Logger;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Location;
+import org.matsim.world.AbstractLocation;
 
 /**
  * A geographical object in MATSim. It describes a zone as a polygon. The
@@ -34,10 +34,10 @@ import org.matsim.world.Location;
  * spherical, like transverse mercator), that the area of the zone does not have
  * to be the area of the polygon.
  *
- * @see Location
+ * @see AbstractLocation
  * @author laemmel
  */
-public class PolygonZone extends Location {
+public class PolygonZone extends AbstractLocation {
 
 	private static final Logger log = Logger.getLogger(PolygonZone.class);
 

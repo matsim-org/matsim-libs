@@ -20,7 +20,7 @@
 
 package org.matsim.events;
 
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -32,7 +32,7 @@ public class EventActivityStart extends ActEvent {
 
 	private static final long serialVersionUID = -7687869105781741116L;
 
-	public EventActivityStart(double time, String agentId, Person agent, Link link, Act act) {
+	public EventActivityStart(double time, String agentId, Person agent, LinkImpl link, Act act) {
 		super(time, agentId, agent, link, act);
 	}
 

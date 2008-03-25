@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 
@@ -138,10 +138,10 @@ public class SpatialInteractor {
 	int numIter = persons.length;
 	for (int i = 0; i < numIter; i++) {
 	    Person p1 = (Person) persons[i];
-	    ArrayList<Link> allf1 = pff.personGetVisitedLocations(p1, facType);
+	    ArrayList<LinkImpl> allf1 = pff.personGetVisitedLocations(p1, facType);
 	    Iterator f1Iter = allf1.iterator();
 	    while (f1Iter.hasNext()) {
-		Link p1VisitedLocation = (Link) f1Iter.next();
+		LinkImpl p1VisitedLocation = (LinkImpl) f1Iter.next();
 		int myLocationId = Integer.parseInt(p1VisitedLocation.getId().toString());
 		if (locationVisitTable.get(myLocationId) != null) {
 

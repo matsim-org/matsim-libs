@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -37,17 +37,17 @@ import org.matsim.withinday.routeprovider.RouteProvider;
  *
  */
 public class ReactRouteGuidance implements RouteProvider {
-	
+
 	private LeastCostPathCalculator algorithm;
-	
+
 	private RoutableLinkCost linkcost;
-	
+
 	public ReactRouteGuidance(NetworkLayer network, TravelTimeI traveltimes) {
-		linkcost = new RoutableLinkCost();
-		linkcost.traveltimes = traveltimes;
-		algorithm = new Dijkstra(network, linkcost, linkcost);	
+		this.linkcost = new RoutableLinkCost();
+		this.linkcost.traveltimes = traveltimes;
+		this.algorithm = new Dijkstra(network, this.linkcost, this.linkcost);
 	}
-	
+
 	public int getPriority() {
 		return 10;
 	}
@@ -58,7 +58,7 @@ public class ReactRouteGuidance implements RouteProvider {
 
 	public synchronized Route requestRoute(Link departureLink, Link destinationLink,
 			double time) {
-		return algorithm.calcLeastCostPath(departureLink.getToNode(),
+		return this.algorithm.calcLeastCostPath(departureLink.getToNode(),
 					destinationLink.getFromNode(), time);
 	}
 
@@ -69,14 +69,14 @@ public class ReactRouteGuidance implements RouteProvider {
 	private class RoutableLinkCost implements TravelTimeI, TravelCostI {
 
 		private TravelTimeI traveltimes;
-		
+
 		public double getLinkTravelTime(Link link, double time) {
-			return traveltimes.getLinkTravelTime(link, time);
+			return this.traveltimes.getLinkTravelTime(link, time);
 		}
 
 		public double getLinkTravelCost(Link link, double time) {
-			return traveltimes.getLinkTravelTime(link, time);
+			return this.traveltimes.getLinkTravelTime(link, time);
 		}
-		
+
 	}
 }

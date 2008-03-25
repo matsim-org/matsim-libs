@@ -66,7 +66,7 @@ public class CountsComparisonAlgorithm extends CountsAlgorithm {
 	private double countsScaleFactor;
 
 	private final static Logger log = Logger.getLogger(CountsComparisonAlgorithm.class);
-	
+
 	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final NetworkLayer network) {
 		this.linkStats = linkStats;
 		this.counts = counts;
@@ -113,7 +113,7 @@ public class CountsComparisonAlgorithm extends CountsAlgorithm {
 	 * distance specified by the distance filter from the center node of the filter.
 	 */
 	private boolean isInRange(final IdI linkid) {
-		if (this.distanceFilterNode == null || this.distanceFilter == null) {
+		if ((this.distanceFilterNode == null) || (this.distanceFilter == null)) {
 			return true;
 		}
 		Link l = this.network.getLink(linkid);

@@ -51,26 +51,26 @@ public class PeakTravTimeCalc implements TravelCostI, TravelTimeI, TravelMinCost
 		int maxId = Integer.MIN_VALUE;
 		for (Link link : network.getLinks().values()) {
 			int linkId = Integer.parseInt(link.getId().toString());
-			if (linkId < minLinkId) {
-				minLinkId = linkId;
+			if (linkId < this.minLinkId) {
+				this.minLinkId = linkId;
 			}
 			if (linkId > maxId) {
 				maxId = linkId;
 			}
 		}
-		travTimeDelta = new int[maxId - minLinkId + 2];
-		amplFactor = new double[maxId - minLinkId + 2];
-		travTimeFactor = new double[maxId - minLinkId + 2];
+		this.travTimeDelta = new int[maxId - this.minLinkId + 2];
+		this.amplFactor = new double[maxId - this.minLinkId + 2];
+		this.travTimeFactor = new double[maxId - this.minLinkId + 2];
 
 		Gbl.random.nextDouble(); // draw one because of strange "not-randomness" in the first draw...
 
 		// add some small random value to each link delta
 		for (Link link : network.getLinks().values()) {
-			int index = Integer.parseInt(link.getId().toString()) - minLinkId;
+			int index = Integer.parseInt(link.getId().toString()) - this.minLinkId;
 
-			amplFactor[index] = (Gbl.random.nextDouble() * 0.1) + 1;
-			travTimeDelta[index] = (int)(Gbl.random.nextDouble() * 5);
-			travTimeFactor[index] = Gbl.random.nextDouble() + 1;
+			this.amplFactor[index] = (Gbl.random.nextDouble() * 0.1) + 1;
+			this.travTimeDelta[index] = (int)(Gbl.random.nextDouble() * 5);
+			this.travTimeFactor[index] = Gbl.random.nextDouble() + 1;
 		}
 
 		// Init trafficLoad
@@ -91,19 +91,19 @@ public class PeakTravTimeCalc implements TravelCostI, TravelTimeI, TravelMinCost
 	}
 
 	private void initTrafficLoad(int peakCount, double peakFactor) {
-		trafficLoad = new double[60*60*24/timeslice];
-		int interval = trafficLoad.length / (peakCount*2);
+		this.trafficLoad = new double[60*60*24/this.timeslice];
+		int interval = this.trafficLoad.length / (peakCount*2);
 		double delta = peakFactor / interval;
 		int sign = 1;
 
-		trafficLoad[0] = 1;
-		for (int i = 1; i < trafficLoad.length; i++) {
-			double nextValue = trafficLoad[i-1] + (delta*sign);
-			if (nextValue < 1 || nextValue > peakFactor + 1) {
+		this.trafficLoad[0] = 1;
+		for (int i = 1; i < this.trafficLoad.length; i++) {
+			double nextValue = this.trafficLoad[i-1] + (delta*sign);
+			if ((nextValue < 1) || (nextValue > peakFactor + 1)) {
 				sign *= -1;
-				nextValue = trafficLoad[i-1] + (delta*sign);
+				nextValue = this.trafficLoad[i-1] + (delta*sign);
 			}
-			trafficLoad[i] = trafficLoad[i-1] + (delta*sign);
+			this.trafficLoad[i] = this.trafficLoad[i-1] + (delta*sign);
 		}
 	}
 
@@ -112,11 +112,11 @@ public class PeakTravTimeCalc implements TravelCostI, TravelTimeI, TravelMinCost
 	 */
 	public double getLinkTravelCost(Link link, double time) {
 		int linkId = Integer.parseInt(link.getId().toString());
-		int timeSlice = ((int) (time / timeslice)
-				+ travTimeDelta[linkId - minLinkId])
-				% trafficLoad.length;
-		return getLinkMinimumTravelCost(link) * trafficLoad[timeSlice]
-				* amplFactor[linkId - minLinkId];
+		int timeSlice = ((int) (time / this.timeslice)
+				+ this.travTimeDelta[linkId - this.minLinkId])
+				% this.trafficLoad.length;
+		return getLinkMinimumTravelCost(link) * this.trafficLoad[timeSlice]
+				* this.amplFactor[linkId - this.minLinkId];
 	}
 
 	/*
@@ -128,7 +128,7 @@ public class PeakTravTimeCalc implements TravelCostI, TravelTimeI, TravelMinCost
 	public double getLinkTravelTime(Link link, double time) {
 		int linkId = Integer.parseInt(link.getId().toString());
 		return getLinkMinimumTravelCost(link)
-			* travTimeFactor[linkId- minLinkId];
+			* this.travTimeFactor[linkId- this.minLinkId];
 	}
 
 	public double getLinkMinimumTravelCost(Link link) {

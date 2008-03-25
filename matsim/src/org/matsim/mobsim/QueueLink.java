@@ -36,7 +36,7 @@ import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Leg;
@@ -49,7 +49,7 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
  *
  * Queue Model Link implementation
  */
-public class QueueLink extends Link {
+public class QueueLink extends LinkImpl {
 
 	final private static Logger log = Logger.getLogger(QueueLink.class);
 
@@ -205,7 +205,7 @@ public class QueueLink extends Link {
 			if (veh.getDepartureTime_s() > now) {
 				return;
 			}
-			
+
 			// Need to inform the veh that it now leaves its activity.
 			veh.leaveActivity(now);
 
@@ -257,7 +257,7 @@ public class QueueLink extends Link {
 			addToBuffer(veh, now);
 			QueueSimulation.getEvents().processEvent(
 					new EventAgentWait2Link(now, veh.getDriverID(), veh.getCurrentLegNumber(), getId().toString(),
-							veh.getDriver(), veh.getCurrentLeg(), this));			
+							veh.getDriver(), veh.getCurrentLeg(), this));
 		}
 	}
 
@@ -449,7 +449,7 @@ public class QueueLink extends Link {
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
 	private boolean hasBufferSpace() {
-		return (this.bufferCap >= 1.0 || this.buffercap_accumulate >= 1.0);
+		return ((this.bufferCap >= 1.0) || (this.buffercap_accumulate >= 1.0));
 	}
 
 	/**

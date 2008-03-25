@@ -60,7 +60,7 @@ public class PajekWriter {
 	String dir;
 
 	private final static Logger log = Logger.getLogger(PajekWriter.class);
-	
+
 	public PajekWriter(String dir, Facilities facilities){
 		this.dir=dir;
 		//String pjoutdir = Gbl.getConfig().findParam(Gbl.getConfig().SOCNET, Gbl.getConfig().SOCNET_OUT_DIR);
@@ -72,12 +72,12 @@ public class PajekWriter {
 		log.info("is a dumb writer for UNDIRECTED nets. Replace it with something that iterates through Persons and call it from SocialNetworksTest.");
 		FacilitiesFindScenarioMinMaxCoords fff= new FacilitiesFindScenarioMinMaxCoords();
 		fff.run(facilities);
-		minCoord = fff.getMinCoord();
-		maxCoord = fff.getMaxCoord();
-		System.out.println(" PW X_Max ="+maxCoord.getX());
-		System.out.println(" PW Y_Max ="+maxCoord.getY());
-		System.out.println(" PW X_Min ="+minCoord.getX());
-		System.out.println(" PW Y_Min ="+minCoord.getY());
+		this.minCoord = fff.getMinCoord();
+		this.maxCoord = fff.getMaxCoord();
+		System.out.println(" PW X_Max ="+this.maxCoord.getX());
+		System.out.println(" PW Y_Max ="+this.maxCoord.getY());
+		System.out.println(" PW X_Min ="+this.minCoord.getX());
+		System.out.println(" PW Y_Min ="+this.minCoord.getY());
 
 	}
 
@@ -86,7 +86,7 @@ public class PajekWriter {
 
 		// from config
 
-		String pjoutfile = dir+"pajek/test"+iter+".net";
+		String pjoutfile = this.dir+"pajek/test"+iter+".net";
 		log.info("PajekWriter1 filename "+pjoutfile);
 
 		try {
@@ -114,17 +114,17 @@ public class PajekWriter {
 					Gbl.errorMsg("Knowledge is not defined!");
 				}
 				Coord xy = (Coord) ((Act) p.getSelectedPlan().getActsLegs().get(0)).getCoord();
-				double x=(xy.getX()-minCoord.getX())/(maxCoord.getX()-minCoord.getX());
-				double y=(xy.getY()-minCoord.getY())/(maxCoord.getY()-minCoord.getY());
+				double x=(xy.getX()-this.minCoord.getX())/(this.maxCoord.getX()-this.minCoord.getX());
+				double y=(xy.getY()-this.minCoord.getY())/(this.maxCoord.getY()-this.minCoord.getY());
 				pjout.write(iperson + " \"" + p.getId() + "\" "+x +" "+y+"\r\n");
 
 //				log.info(iperson + " " + p.getId() + " ["+xy.getX() +" "+xy.getY()+"]\n");
-				pajekIndex.put(p.getId(),iperson);
+				this.pajekIndex.put(p.getId(),iperson);
 				iperson++;
 
 			}
 			pjout.write("*Edges\r\n");
-			
+
 //			log.info("*Edges\n");
 			Iterator<SocialNetEdge> itLink = links.iterator();
 			while (itLink.hasNext()) {
@@ -137,7 +137,7 @@ public class PajekWriter {
 				Coord xy2 = (Coord) ((Act) printPerson2.getSelectedPlan().getActsLegs().get(0)).getCoord();
 				double dist = xy1.calcDistance(xy2);
 
-				pjout.write(" " + pajekIndex.get(printPerson1.getId()) + " "+ pajekIndex.get(printPerson2.getId())+" "+dist+" "+age+"\r\n");
+				pjout.write(" " + this.pajekIndex.get(printPerson1.getId()) + " "+ this.pajekIndex.get(printPerson2.getId())+" "+dist+" "+age+"\r\n");
 //				pjout.write(" " + printPerson1.getId() + " "+ printPerson2.getId());
 
 //				System.out.print(" " +iter+" "+printLink.getLinkId()+" "+ printPerson1.getId() + " "
@@ -166,7 +166,7 @@ public class PajekWriter {
 
 		// from config
 
-		String pjoutfile = dir+"pajek/testGeo"+iter+".net";
+		String pjoutfile = this.dir+"pajek/testGeo"+iter+".net";
 		log.info("PajekWriter1 Geofilename "+pjoutfile);
 
 		try {
@@ -195,17 +195,17 @@ public class PajekWriter {
 				Zone zone = (Zone) vertLoc.get(v);
 
 				Coord xy = (Coord) zone.getCenter();
-				double x=(xy.getX()-minCoord.getX())/(maxCoord.getX()-minCoord.getX());
-				double y=(xy.getY()-minCoord.getY())/(maxCoord.getY()-minCoord.getY());
+				double x=(xy.getX()-this.minCoord.getX())/(this.maxCoord.getX()-this.minCoord.getX());
+				double y=(xy.getY()-this.minCoord.getY())/(this.maxCoord.getY()-this.minCoord.getY());
 				pjout.write(vertexcounter + " \"" + zone.getId() + "\" "+x +" "+y+"\r\n");
 
 //				System.out.print(iperson + " " + p.getId() + " ["+xy.getX() +" "+xy.getY()+"]\n");
-				pajekIndex.put(zone.getId(),vertexcounter);
+				this.pajekIndex.put(zone.getId(),vertexcounter);
 				vertexcounter++;
 
 			}
 			pjout.write("*Edges\r\n");
-			
+
 //			System.out.print("*Edges\n");
 			Iterator<Edge> itLink = g.getEdges().iterator();
 			while (itLink.hasNext()) {
@@ -218,7 +218,7 @@ public class PajekWriter {
 //				double dist = xy1.calcDistance(xy2);
 				double strength = (Double)printLink.getUserDatum("strength");
 //				double strength = gstat.getEdgeStrength().get(printLink);
-				pjout.write(" " + pajekIndex.get(aLoc.getId()) + " "+ pajekIndex.get(bLoc.getId())+" "+strength+"\r\n");
+				pjout.write(" " + this.pajekIndex.get(aLoc.getId()) + " "+ this.pajekIndex.get(bLoc.getId())+" "+strength+"\r\n");
 
 			}
 

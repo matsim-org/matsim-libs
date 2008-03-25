@@ -30,7 +30,7 @@ import org.matsim.router.util.TravelMinCostI;
 public class TravelDistanceCost implements TravelMinCostI {
 
 	public TravelDistanceCost() {
-		
+
 	}
 
 	/* (non-Javadoc)

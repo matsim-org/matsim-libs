@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -53,19 +53,19 @@ public class EstimReactiveLinkTT implements
 		EventHandlerAgentArrivalI,
 		EventHandlerAgentWait2LinkI,
 		TravelTimeI {
-	
+
 	private Map<BasicLinkI, LinkTTCalculator> linkTTCalculators;
-	
+
 	private BasicLinkI lastQueriedLink;
-	
+
 	private double lastQueryTime;
-	
+
 	private double lastTravelTime;
-	
+
 	public void reset(int iteration) {
-		linkTTCalculators = new LinkedHashMap<BasicLinkI, LinkTTCalculator>();
+		this.linkTTCalculators = new LinkedHashMap<BasicLinkI, LinkTTCalculator>();
 	}
-	
+
 	public void handleEvent(EventLinkEnter event) {
 		increaseCount((QueueLink) event.link, event.agent, event.time);
 	}
@@ -81,128 +81,128 @@ public class EstimReactiveLinkTT implements
 	public void handleEvent(EventAgentWait2Link event) {
 		increaseCount((QueueLink) event.link, event.agent, event.time);
 	}
-	
+
 	private void increaseCount(QueueLink link, Person person, double time) {
-		LinkTTCalculator f = linkTTCalculators.get(link);
+		LinkTTCalculator f = this.linkTTCalculators.get(link);
 		if(f == null) {
 			f = new LinkTTCalculator(link);
-			linkTTCalculators.put(link, f);
+			this.linkTTCalculators.put(link, f);
 		}
 		f.enterLink(person, time);
 	}
-	
+
 	private void decreaseCount(QueueLink link, Person person, double time) {
-		LinkTTCalculator f = linkTTCalculators.get(link);
+		LinkTTCalculator f = this.linkTTCalculators.get(link);
 		f.leaveLink(person, time);
 	}
 
 	public double getLinkTravelTime(Link link, double time) {
 		double simtime = SimulationTimer.getTime();
-		if (simtime == lastQueryTime && link == lastQueriedLink)
-			return lastTravelTime;
+		if ((simtime == this.lastQueryTime) && (link == this.lastQueriedLink))
+			return this.lastTravelTime;
 		else {
-			lastQueryTime = simtime;
-			lastQueriedLink = link;
-			
-			LinkTTCalculator f = linkTTCalculators.get(link);
+			this.lastQueryTime = simtime;
+			this.lastQueriedLink = link;
+
+			LinkTTCalculator f = this.linkTTCalculators.get(link);
 			if (f == null)
-				lastTravelTime = link.getFreespeed();
+				this.lastTravelTime = link.getFreespeed();
 			else
 				/*
 				 * TODO: This is ugly!
 				 */
-				lastTravelTime = f.getLinkTravelTime(simtime);
-			
-			return lastTravelTime;
+				this.lastTravelTime = f.getLinkTravelTime(simtime);
+
+			return this.lastTravelTime;
 		}
 	}
-	
+
 	private class LinkTTCalculator {
-		
+
 		private final QueueLink link;
-		
+
 		private final double freeFlowTravTime;
-		
+
 		private int outCount = 0;
-		
+
 		private double lastEvent = 0;
-		
+
 		private double lastCall = 0;
-		
+
 		private double currentTravelTime;
-		
+
 		private double currentOutFlow;
-		
+
 		private double feasibleOutFlow;
-		
+
 		private SortedSet<Sample> samples;
-		
+
 		public LinkTTCalculator(QueueLink link) {
-			samples = new TreeSet<Sample>();
+			this.samples = new TreeSet<Sample>();
 			this.link = link;
-			freeFlowTravTime = link.getFreeTravelDuration();
-			currentTravelTime = freeFlowTravTime;
-			feasibleOutFlow = link.getSimulatedFlowCapacity();
-			currentOutFlow = feasibleOutFlow;
+			this.freeFlowTravTime = link.getFreeTravelDuration();
+			this.currentTravelTime = this.freeFlowTravTime;
+			this.feasibleOutFlow = link.getSimulatedFlowCapacity();
+			this.currentOutFlow = this.feasibleOutFlow;
 		}
-		
+
 		public void enterLink(Person person, double time) {
-			samples.add(new Sample(person, time + freeFlowTravTime));
+			this.samples.add(new Sample(person, time + this.freeFlowTravTime));
 		}
-		
+
 		public void leaveLink(Person person, double time) {
-			outCount++;
-			
+			this.outCount++;
+
 			Sample sample = null;
 			/*
 			 * Since we can expect that the person is near the head of the set,
 			 * this should not be that expensive...
 			 */
-			for(Sample s : samples) {
+			for(Sample s : this.samples) {
 				if(s.person.equals(person)) {
 					sample = s;
 					break;
 				}
 			}
-			samples.remove(sample);
-			
-			double deltaT = time - lastEvent;
+			this.samples.remove(sample);
+
+			double deltaT = time - this.lastEvent;
 			if(deltaT > 0) {
-				currentOutFlow = outCount/deltaT;
-				lastEvent = time;
-				outCount = 0;
-				
-				if(samples.isEmpty())
-					feasibleOutFlow = link.getSimulatedFlowCapacity();
-				else if(samples.first().linkLeaveTime > time)
-					feasibleOutFlow = link.getSimulatedFlowCapacity();
+				this.currentOutFlow = this.outCount/deltaT;
+				this.lastEvent = time;
+				this.outCount = 0;
+
+				if(this.samples.isEmpty())
+					this.feasibleOutFlow = this.link.getSimulatedFlowCapacity();
+				else if(this.samples.first().linkLeaveTime > time)
+					this.feasibleOutFlow = this.link.getSimulatedFlowCapacity();
 				else
-					feasibleOutFlow = currentOutFlow;
+					this.feasibleOutFlow = this.currentOutFlow;
 			}
 		}
-		
+
 		public double getLinkTravelTime(double time) {
-			if (time > lastCall) {
-				lastCall = time;
-				
-				if (samples.isEmpty())
-					currentTravelTime = link.getFreespeed();
+			if (time > this.lastCall) {
+				this.lastCall = time;
+
+				if (this.samples.isEmpty())
+					this.currentTravelTime = this.link.getFreespeed();
 				else {
-					double tt = samples.size() / feasibleOutFlow;
-					currentTravelTime = Math.max(freeFlowTravTime, tt);
+					double tt = this.samples.size() / this.feasibleOutFlow;
+					this.currentTravelTime = Math.max(this.freeFlowTravTime, tt);
 				}
 			}
-			
-			return currentTravelTime;
+
+			return this.currentTravelTime;
 		}
 	}
-	
+
 	private class Sample implements Comparable<Sample> {
 
 		public Person person;
-		
+
 		public double linkLeaveTime;
-		
+
 		public Sample(Person person, double linkLeaveTime) {
 			this.person = person;
 			this.linkLeaveTime = linkLeaveTime;
@@ -212,17 +212,17 @@ public class EstimReactiveLinkTT implements
 			if(o == null)
 				return 1;
 			else {
-				int result = Double.compare(linkLeaveTime, o.linkLeaveTime);
+				int result = Double.compare(this.linkLeaveTime, o.linkLeaveTime);
 				if(result == 0)
-					result = person.getId().compareTo(o.person.getId());
-				
-				return result;	
+					result = this.person.getId().compareTo(o.person.getId());
+
+				return result;
 			}
 		}
-		
-		
+
+
 	}
-	
+
 //	private class TupleComparator implements Comparator<Tuple<Person, Double>> {
 //
 //		public int compare(Tuple<Person, Double> o1, Tuple<Person, Double> o2) {
@@ -233,6 +233,6 @@ public class EstimReactiveLinkTT implements
 //			else
 //				return o1.getSecond().compareTo(o2.getSecond());
 //		}
-//		
+//
 //	}
 }

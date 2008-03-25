@@ -74,15 +74,15 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 	 * Number of timesteps used
 	 */
 	public static final int TIMESTEPS = 24;
-	
+
 	private NetworkLayer network = null;
 
 //	private Collection<Link> hundekopf = null;
 
 //	private Collection<Link> gemarkung = null;
-	
+
 	private Set<IdI> hundekopfLinkIds;
-	
+
 	private Set<IdI> gemarkungLinkIds;
 
 	private double [] distHundekopf = new double[TIMESTEPS];
@@ -115,7 +115,7 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 	}
 
 	/**
-   * 
+   *
    * @param seconds
    * @return The hour of the day corresponding to the given seconds. 0 for 0-1
    *         am, 1 for 1-2 am...
@@ -131,13 +131,13 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 			link = this.network.getLink(event.linkId);
 		}
 		if (this.hundekopfLinkIds.contains(link.getId())) {
-			distHundekopf[hour] += link.getLength();
+			this.distHundekopf[hour] += link.getLength();
 		}
 		else if (this.gemarkungLinkIds.contains(link.getId())) {
-			distGemarkung[hour] += link.getLength();
+			this.distGemarkung[hour] += link.getLength();
 		}
 		else {
-			distRest[hour] += link.getLength();
+			this.distRest[hour] += link.getLength();
 		}
 
 		this.depTimes.put(event.agentId, Double.valueOf(event.time));
@@ -156,13 +156,13 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 			link = this.network.getLink(event.linkId);
 		}
 		if (this.hundekopfLinkIds.contains(link.getId())) {
-			timeHundekopf[hour] += (event.time - depTime.doubleValue());
+			this.timeHundekopf[hour] += (event.time - depTime.doubleValue());
 		}
 		else if (this.gemarkungLinkIds.contains(link.getId())) {
-			timeGemarkung[hour] += (event.time - depTime.doubleValue());
+			this.timeGemarkung[hour] += (event.time - depTime.doubleValue());
 		}
 		else {
-			timeRest[hour] += (event.time - depTime.doubleValue());
+			this.timeRest[hour] += (event.time - depTime.doubleValue());
 		}
 	}
 
@@ -179,13 +179,13 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 			link = this.network.getLink(event.linkId);
 		}
 		if (this.hundekopfLinkIds.contains(link.getId())) {
-			timeHundekopf[hour] += (event.time - depTime.doubleValue());
+			this.timeHundekopf[hour] += (event.time - depTime.doubleValue());
 		}
 		else if (this.gemarkungLinkIds.contains(link.getId())) {
-			timeGemarkung[hour] += (event.time - depTime.doubleValue());
+			this.timeGemarkung[hour] += (event.time - depTime.doubleValue());
 		}
 		else {
-			timeRest[hour] += (event.time - depTime.doubleValue());
+			this.timeRest[hour] += (event.time - depTime.doubleValue());
 		}
 	}
 
@@ -196,13 +196,13 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 			link = this.network.getLink(event.linkId);
 		}
 		if (this.hundekopfLinkIds.contains(link.getId())) {
-			tripsHundekopf[hour]++;
+			this.tripsHundekopf[hour]++;
 		}
 		else if (this.gemarkungLinkIds.contains(link.getId())) {
-			tripsGemarkung[hour]++;
+			this.tripsGemarkung[hour]++;
 		}
 		else  {
-			tripsRest[hour]++;
+			this.tripsRest[hour]++;
 		}
 	}
 
@@ -217,33 +217,33 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 		this.tripsHundekopf = new int[TIMESTEPS];
 		this.tripsRest = new int[TIMESTEPS];
 	}
-	
+
 	public double getDistHundekopf(int timestep) {
-		return distHundekopf[timestep];
+		return this.distHundekopf[timestep];
 	}
 	public double getDistGemarkung(int timestep) {
-		return distGemarkung[timestep];
+		return this.distGemarkung[timestep];
 	}
 	public double getDistRest(int timestep) {
-		return distRest[timestep];
+		return this.distRest[timestep];
 	}
 	public double getTimeHundekopf(int timestep) {
-		return timeHundekopf[timestep];
+		return this.timeHundekopf[timestep];
 	}
 	public double getTimeGemarkung(int timestep) {
-		return timeGemarkung[timestep];
+		return this.timeGemarkung[timestep];
 	}
 	public double getTimeRest(int timestep) {
-		return timeRest[timestep];
+		return this.timeRest[timestep];
 	}
 	public int getTripsHundekopf(int timestep) {
-		return tripsHundekopf[timestep];
+		return this.tripsHundekopf[timestep];
 	}
 	public int getTripsGemarkung(int timestep) {
-		return tripsGemarkung[timestep];
+		return this.tripsGemarkung[timestep];
 	}
 	public int getTripsRest(int timestep) {
-		return tripsRest[timestep];
+		return this.tripsRest[timestep];
 	}
 
 }

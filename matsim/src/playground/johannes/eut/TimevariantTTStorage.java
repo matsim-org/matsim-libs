@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -36,7 +36,7 @@ import org.matsim.router.util.TravelTimeI;
 public class TimevariantTTStorage extends TimevariantValueStorage implements TravelTimeI, TravelCostI {
 
 	private static final Logger logger = Logger.getLogger(TimevariantTTStorage.class);
-	
+
 	/**
 	 * @param startTime
 	 * @param endTime
@@ -54,7 +54,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 			}
 		}
 	}
-	
+
 	public double getLinkTravelTime(Link link, double time) {
 		try {
 			return getValue(link, (int) time);
@@ -69,7 +69,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 	public void setLinkTravelTime(Link link, double time, double value) {
 		if(value <= 0)
 			throw new IllegalArgumentException("Travel time values must be greater than zero!");
-		
+
 		try {
 			setValue(link, (int)time, value);
 		} catch (IndexOutOfBoundsException e) {

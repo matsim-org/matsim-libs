@@ -36,21 +36,21 @@ import org.matsim.router.util.TravelTimeI;
 public class AgentBeliefsImpl implements AgentBeliefs {
 
 	private List<TravelTimeI> travelTimePerceptions;
-	
+
 	private List<TravelCostI> travelCostPerceptions;
-	
+
 	private FreespeedTravelTimeCost freespeedTimeCost;
-	
-	
+
+
 	public AgentBeliefsImpl() {
 		this.travelTimePerceptions = new LinkedList<TravelTimeI>();
 		this.freespeedTimeCost = new FreespeedTravelTimeCost();
-	  this.travelCostPerceptions = new LinkedList<TravelCostI>();	
+	  this.travelCostPerceptions = new LinkedList<TravelCostI>();
 	}
-		
+
 	/**
-	 * 
-	 * @see org.matsim.router.util.TravelTimeI#getLinkTravelTime(org.matsim.network.Link, double)
+	 *
+	 * @see org.matsim.router.util.TravelTimeI#getLinkTravelTime(org.matsim.network.LinkImpl, double)
 	 */
 	public double getLinkTravelTime(final Link link, final double time) {
 		double ttime = 0.0;
@@ -63,9 +63,9 @@ public class AgentBeliefsImpl implements AgentBeliefs {
 		return this.freespeedTimeCost.getLinkTravelTime(link, time);
 	}
 
-	
+
 	/**
-	 * @see org.matsim.router.util.TravelCostI#getLinkTravelCost(org.matsim.network.Link, double)
+	 * @see org.matsim.router.util.TravelCostI#getLinkTravelCost(org.matsim.network.LinkImpl, double)
 	 */
 	public double getLinkTravelCost(final Link link, final double time) {
 		double tcost = 0.0;

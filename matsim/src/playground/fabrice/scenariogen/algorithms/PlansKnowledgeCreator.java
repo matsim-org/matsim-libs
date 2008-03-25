@@ -62,7 +62,7 @@ public class PlansKnowledgeCreator extends PlansAlgorithm {
 				BasicAct act = it.next();
 				String act_type = act.getType();
 				Coord center = (Coord)((Link)act.getLink()).getCenter();
-				Facility facility = quadtrees.get( act.getType() ).get( center.getX(), center.getY());
+				Facility facility = this.quadtrees.get( act.getType() ).get( center.getX(), center.getY());
 				know.addActivity(new Activity(act_type, facility));
 //				ActivityFacilities actfac = know.createActivityFacility( act_type );
 //				actfac.addFacility(facility);
@@ -96,18 +96,18 @@ public class PlansKnowledgeCreator extends PlansAlgorithm {
 			Facility facility = (Facility) location;
 			CoordI coord = facility.getCenter();
 			for( String act_type : facility.getActivities().keySet() ){
-				QuadTree<Facility> quad = quadtrees.get( act_type );
+				QuadTree<Facility> quad = this.quadtrees.get( act_type );
 				if( quad == null ){
 					quad = new QuadTree<Facility>( bbox.x, bbox.y, bbox.x+bbox.width, bbox.y+bbox.height);
-					quadtrees.put( act_type, quad );
+					this.quadtrees.put( act_type, quad );
 				}
 				quad.put( coord.getX(), coord.getY(), facility );
 			}
 		}
 		System.out.println("  done.");
 
-		for( String act_type : quadtrees.keySet() )
-			System.out.println("Quad of act "+ act_type + "\tsize:" + quadtrees.get(act_type).size() );
+		for( String act_type : this.quadtrees.keySet() )
+			System.out.println("Quad of act "+ act_type + "\tsize:" + this.quadtrees.get(act_type).size() );
 	}
 
 	void testingQuadtree( QuadTree<Facility> quad, Rectangle2D.Double bbox ){

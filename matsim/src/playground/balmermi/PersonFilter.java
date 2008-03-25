@@ -48,7 +48,7 @@ public class PersonFilter {
 	public static void dilZhFilter() {
 
 		System.out.println("running dilZhFilter... " + (new Date()));
-		
+
 		Scenario.setUpScenarioConfig();
 //		World world = Scenario.readWorld();
 //		Facilities facilities = Scenario.readFacilities();
@@ -77,17 +77,17 @@ public class PersonFilter {
 		System.out.println("  => aoi contains: " + areaOfInterest.size() + " links.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		System.out.println("  reading, filtering and writing population... " + (new Date()));
 		Plans plans = new Plans(Plans.USE_STREAMING);
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.writeStartPlans();
-		
+
 		plans.addAlgorithm(new XY2Links(network));
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		plans.addAlgorithm(new PlansCalcRoute(network, timeCostCalc, timeCostCalc));
-		
+
 		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter, areaOfInterest);
 		filter.setAlternativeAOI(center, radius);
 		plans.addAlgorithm(filter);

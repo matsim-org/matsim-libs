@@ -20,7 +20,7 @@
 
 package org.matsim.events;
 
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -35,10 +35,10 @@ public abstract class AgentEvent extends BasicEvent {
 	public transient Leg leg;
 
 	public String linkId;
-	public transient Link link;
+	public transient LinkImpl link;
 
 
-	AgentEvent(final double time, final String agentId, final int legId,  final String linkId, final Person agent, final Leg leg, final Link link) {
+	AgentEvent(final double time, final String agentId, final int legId,  final String linkId, final Person agent, final Leg leg, final LinkImpl link) {
 		super(time, agentId, agent);
 		this.legId = legId;
 		this.leg = leg;

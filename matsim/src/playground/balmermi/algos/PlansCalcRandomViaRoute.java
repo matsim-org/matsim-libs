@@ -23,7 +23,7 @@ package playground.balmermi.algos;
 import java.util.ArrayList;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
@@ -162,8 +162,8 @@ public class PlansCalcRandomViaRoute extends PersonAlgorithm implements PlanAlgo
 
 	private double handleCarLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
 		double travTime = 0;
-		Link fromLink = fromAct.getLink();
-		Link toLink = toAct.getLink();
+		LinkImpl fromLink = fromAct.getLink();
+		LinkImpl toLink = toAct.getLink();
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 

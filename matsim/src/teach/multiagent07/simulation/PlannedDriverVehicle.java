@@ -40,7 +40,7 @@ public class PlannedDriverVehicle extends Vehicle {
 	private BasicPlan plan;
 
 	private BasicLeg currentLeg = null;
-	private BasicLink currentlink;
+	private BasicLinkI currentlink;
 	private BasicRoute currentRoute;
 	private Activity lastAct = null;
 	private Activity nextAct = null;
@@ -54,44 +54,44 @@ public class PlannedDriverVehicle extends Vehicle {
 
 		this.plan = agent.getSelectedPlan();
 
-		this.iter = plan.getIterator();
-		lastAct = (Activity)iter.nextAct();
-		currentlink = lastAct.getLink();
-		departuretime = lastAct.getEndTime();
+		this.iter = this.plan.getIterator();
+		this.lastAct = (Activity)this.iter.nextAct();
+		this.currentlink = this.lastAct.getLink();
+		this.departuretime = this.lastAct.getEndTime();
 
-		currentLeg = iter.nextLeg();
-		currentRoute = currentLeg.getRoute();
+		this.currentLeg = this.iter.nextLeg();
+		this.currentRoute = this.currentLeg.getRoute();
 
-		nextAct = (Activity)iter.nextAct();
+		this.nextAct = (Activity)this.iter.nextAct();
 	}
 
 	@Override
 	public CALink getDestinationLink() {
-		return (CALink)nextAct.getLink();
+		return (CALink)this.nextAct.getLink();
 	}
 
 	@Override
-	public BasicLink getDepartureLink() {
-		return currentlink;
+	public BasicLinkI getDepartureLink() {
+		return this.currentlink;
 	}
 
 	@Override
 	public double getDepartureTime() {
-		return departuretime;
+		return this.departuretime;
 	}
 
 	@Override
 	public void setCurrentLink(BasicLink link)  {
-		currentlink = link;
-		routeidx++;
+		this.currentlink = link;
+		this.routeidx++;
 	}
 
 	@Override
 	public CALink getNextLink(Collection<? extends BasicLinkI> nextLinks) {
 
-		if (routeidx >= currentRoute.getRoute().size() ) return getDestinationLink();
+		if (this.routeidx >= this.currentRoute.getRoute().size() ) return getDestinationLink();
 
-		CANode destNode = (CANode)currentRoute.getRoute().get(routeidx);
+		CANode destNode = (CANode)this.currentRoute.getRoute().get(this.routeidx);
 
 		for (BasicLinkI link : nextLinks) {
 			if (link.getToNode() == destNode) {
@@ -107,7 +107,7 @@ public class PlannedDriverVehicle extends Vehicle {
 	@Override
 	public void leaveActivity() {
 		Event event = new Event(CAMobSim.getCurrentTime(), Event.ACT_DEPARTURE,
-				                currentlink, this.getId(), legnumber);
+				                this.currentlink, this.getId(), this.legnumber);
 		CAMobSim.getEventManager().addEvent(event);
 	}
 
@@ -115,28 +115,28 @@ public class PlannedDriverVehicle extends Vehicle {
 	public void reachActivity(){
 		if (initNextLeg()) {
 			// re-put myself into simulation
-			((CALink)currentlink).addParking(this);
+			((CALink)this.currentlink).addParking(this);
 
 			Event event = new Event(CAMobSim.getCurrentTime(), Event.ACT_ARRIVAL,
-	                currentlink, this.getId(), legnumber);
+	                this.currentlink, this.getId(), this.legnumber);
 			CAMobSim.getEventManager().addEvent(event);
 		}
 	}
 
 	public boolean initNextLeg() {
 		// now point to next activity
-		if ( iter.hasNextLeg()) {
+		if ( this.iter.hasNextLeg()) {
 			// actlegidx points to current act == departurelink
-			lastAct = nextAct;
-			currentLeg = iter.nextLeg();
-			legnumber++;
+			this.lastAct = this.nextAct;
+			this.currentLeg = this.iter.nextLeg();
+			this.legnumber++;
 
-			nextAct = (Activity)iter.nextAct();
+			this.nextAct = (Activity)this.iter.nextAct();
 
-			departuretime = lastAct.getEndTime();
+			this.departuretime = this.lastAct.getEndTime();
 
-			routeidx = 0;
-			currentRoute = currentLeg.getRoute();
+			this.routeidx = 0;
+			this.currentRoute = this.currentLeg.getRoute();
 			return true;
 		}
 		return false;

@@ -50,7 +50,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider implements 
 	}
 
 	/**
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#requestRoute(org.matsim.network.Link, org.matsim.network.Link, double)
+	 * @see org.matsim.withinday.routeprovider.RouteProvider#requestRoute(org.matsim.network.LinkImpl, org.matsim.network.LinkImpl, double)
 	 */
 	@Override
 	public Route requestRoute(Link departureLink, final Link destinationLink, final double time) {
@@ -114,7 +114,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider implements 
 
 	/**
 	 * As this implementation is backed by a AStarRouter the class provides Routes from everywhere to everywhere
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.network.Link, org.matsim.plans.Route)
+	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.network.LinkImpl, org.matsim.plans.Route)
 	 */
 	public boolean providesRoute(final Link currentLink, final Route subRoute) {
 		return true;

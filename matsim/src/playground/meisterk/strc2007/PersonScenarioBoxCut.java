@@ -62,7 +62,7 @@ public class PersonScenarioBoxCut extends PersonAlgorithm {
 	}
 
 	public Plans getPlansInTheHomeBox() {
-		return plansCut;
+		return this.plansCut;
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class PersonScenarioBoxCut extends PersonAlgorithm {
 	}
 
 	public NetworkLayer getTouchedNetwork() {
-		return networkTouched;
+		return this.networkTouched;
 	}
 
 	private void addLinkToCutNetwork(Link link) {

@@ -49,7 +49,7 @@ public class PtNetworkAggregator {
 	}
 
 	public IdI lookupNewLinkId(IdI oldLinkId) {
-		return linkMatching.get(oldLinkId);
+		return this.linkMatching.get(oldLinkId);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -83,7 +83,7 @@ public class PtNetworkAggregator {
 						Double.toString(fromHb.getCoord().calcDistance(toHb.getCoord())),
 						"2", "1000", "1", null, null);
 			}
-			linkMatching.put(ptLink.getId(), link.getId());
+			this.linkMatching.put(ptLink.getId(), link.getId());
 		}
 	}
 

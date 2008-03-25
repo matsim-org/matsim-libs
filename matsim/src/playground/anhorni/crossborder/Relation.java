@@ -2,6 +2,7 @@ package playground.anhorni.crossborder;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;

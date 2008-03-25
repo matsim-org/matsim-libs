@@ -2,7 +2,7 @@ package playground.andreas.intersection.sim;
 
 import java.util.Iterator;
 
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
@@ -14,7 +14,7 @@ public class QNetworkLayer extends NetworkLayer {
 	}
 
 	@Override
-	protected Link newLink(final NetworkLayer network, final String id, final Node from, final Node to,
+	protected LinkImpl newLink(final NetworkLayer network, final String id, final Node from, final Node to,
 			final String length, final String freespeed, final String capacity, final String permlanes,
 			final String origid, final String type) {
 		return new QLink(this, id, from, to, length, freespeed, capacity, permlanes, origid, type);

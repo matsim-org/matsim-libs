@@ -41,7 +41,7 @@ public class CountsFilter {
 	public static void dilZhFilter() {
 
 		System.out.println("running dilZhFilter... " + (new Date()));
-		
+
 		Scenario.setUpScenarioConfig();
 //		World world = Scenario.readWorld();
 //		Facilities facilities = Scenario.readFacilities();
@@ -70,7 +70,7 @@ public class CountsFilter {
 		System.out.println("  => aoi contains: " + areaOfInterest.size() + " links.");
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 		System.out.println("  filtering counts... " + (new Date()));
 		TreeSet<IdI> counts2remove = new TreeSet<IdI>();
 		for (IdI locid : counts.getCounts().keySet()) {
@@ -83,7 +83,7 @@ public class CountsFilter {
 		System.out.println("  done. " + (new Date()));
 
 		//////////////////////////////////////////////////////////////////////
-		
+
 //		Scenario.writePlans(plans);
 //		Scenario.writeMatrices(matrices);
 		Scenario.writeCounts(counts);

@@ -32,7 +32,7 @@ import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -55,7 +55,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 	public int counter = 0;
 
 	private final static Logger log = Logger.getLogger(CalcODMatrices.class);
-	
+
 	public CalcODMatrices(final NetworkLayer network, final ZoneLayer tvzLayer, final Plans population, final String id) {
 		this.network = network;
 		this.tvzLayer = tvzLayer;
@@ -69,7 +69,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 
 	public void handleEvent(final EventAgentDeparture event) {
 		double time = event.time;
-		if (time < this.minTime || time >= this.maxTime) {
+		if ((time < this.minTime) || (time >= this.maxTime)) {
 			return;
 		}
 		Location fromLoc = getLocation(event.agentId, event.linkId);
@@ -125,7 +125,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 
 
 	private Location getLocation(final String agentId, final String linkId) {
-		Link link = (Link)this.network.getLocation(linkId);
+		LinkImpl link = (LinkImpl)this.network.getLocation(linkId);
 
 		if (this.population != null) {
 			// let's try to find the cell from the plans
@@ -134,7 +134,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 				Plan plan = person.getSelectedPlan();
 				for (int i = 0, max = plan.getActsLegs().size(); i < max; i += 2) {
 					Act act = (Act)plan.getActsLegs().get(i);
-					if (act.getLink().getId().equals(new Id(linkId)) && act.getRefId() != Integer.MIN_VALUE) {
+					if (act.getLink().getId().equals(new Id(linkId)) && (act.getRefId() != Integer.MIN_VALUE)) {
 						return this.tvzLayer.getLocation(act.getRefId());
 					}
 				}

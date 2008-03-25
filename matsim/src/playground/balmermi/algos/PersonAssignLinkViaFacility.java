@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -144,7 +144,7 @@ public class PersonAssignLinkViaFacility extends PersonAlgorithm {
 				else { Gbl.errorMsg("Something is wrong!"); }
 				if (f == null) { Gbl.errorMsg("Something is wrong!"); }
 
-				Link link = f.getLink();
+				LinkImpl link = f.getLink();
 				if (link == null) { Gbl.errorMsg("Something is wrong!"); }
 
 				a.setLink(link);

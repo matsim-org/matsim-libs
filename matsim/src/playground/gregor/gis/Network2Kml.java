@@ -5,7 +5,7 @@ import java.util.Iterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
@@ -80,7 +80,7 @@ public class Network2Kml {
 			
 			Iterator it = network.getLinks().values().iterator();
 			while (it.hasNext()){
-				Link link = (Link) it.next();
+				LinkImpl link = (LinkImpl) it.next();
 				CoordI from = transform.transform(link.getFromNode().getCoord());
 				CoordI to = transform.transform(link.getToNode().getCoord());
 				

@@ -2677,7 +2677,7 @@ public class MyRuns {
 							if (route == null) return;
 
 							final int hour = (int)time / 3600;
-							if (hour > 30 || hour < 0) return;
+							if ((hour > 30) || (hour < 0)) return;
 
 							for (final Link link : route.getLinkRoute()) {
 								final IdI id = link.getId();

@@ -34,7 +34,6 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
-import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.plans.Route;
@@ -82,11 +81,11 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 	protected double ttFreeSpeedAltRoute;
 
 	protected double ttFreeSpeedMainRoute;
-	
+
 	protected List<Double> ttMeasuredMainRoute  = new ArrayList<Double>();
-	
+
 	protected List<Double> ttMeasuredAlternativeRoute = new ArrayList<Double>();
-	
+
 	public AbstractControlInputImpl() {
 		this.numberOfAgents = new HashMap<String, Integer>();
 		this.enterEvents1 = new HashMap<String, Double>();
@@ -218,8 +217,8 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (t1 != null) {
 				double deltaT = event.time - t1;
 				if(deltaT <= 10*this.lastTimeMainRoute){
-					if(SimulationTimer.getTime() >= 55200 && SimulationTimer.getTime() <= 64000){
-						ttMeasuredMainRoute.add(deltaT);					
+					if((SimulationTimer.getTime() >= 55200) && (SimulationTimer.getTime() <= 64000)){
+						this.ttMeasuredMainRoute.add(deltaT);
 					}
 					if (deltaT >= 0) {
 						this.lastTimeMainRoute = deltaT;
@@ -237,8 +236,8 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			if (t1 != null) {
 				double deltaT = event.time - t1;
 				if(deltaT <= 10*this.lastTimeMainRoute){
-					if(SimulationTimer.getTime() >= 55200 && SimulationTimer.getTime() <= 64000){
-						ttMeasuredAlternativeRoute.add(deltaT);					
+					if((SimulationTimer.getTime() >= 55200) && (SimulationTimer.getTime() <= 64000)){
+						this.ttMeasuredAlternativeRoute.add(deltaT);
 					}
 					if (deltaT >= 0) {
 						this.lastTimeAlternativeRoute = deltaT;
@@ -298,14 +297,14 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 			throw new IllegalArgumentException(
 			"This route object does not exist!");
 	}
-	
+
 	public Link getNaturalBottleNeck(final Route r){
 		Link naturalBottleNeck;
-		if(r == mainRoute){
-			naturalBottleNeck = mainRouteNaturalBottleNeck;
+		if(r == this.mainRoute){
+			naturalBottleNeck = this.mainRouteNaturalBottleNeck;
 		}
 		else{
-			naturalBottleNeck = altRouteNaturalBottleNeck;
+			naturalBottleNeck = this.altRouteNaturalBottleNeck;
 		}
 		return naturalBottleNeck;
 	}

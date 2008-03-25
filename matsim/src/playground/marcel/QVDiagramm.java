@@ -38,7 +38,7 @@ import org.matsim.utils.charts.XYScatterChart;
  * Generates a "Q-V-Diagramm" (traffic flow versus speed) for one link, based
  * on data from the simulation. The average speed of vehicles within a certain
  * time bin (default: 5min) and the average flow rate within the same time bin
- * are plotted into a XY Scatter Chart. 
+ * are plotted into a XY Scatter Chart.
  *
  * @author mrieser
  */
@@ -46,36 +46,36 @@ public class QVDiagramm implements EventHandlerLinkEnterI, EventHandlerLinkLeave
 
 	/** The id of the link we're interesetd in. */
 	private final String linkId;
-	
+
 	/** The length of the link. */
 	private final double linkLength;
-	
+
 	/** Stores the times agents entered the link (TreeMap<AgentId, EnterTime>). */
 	private final TreeMap<String, Double> agents = new TreeMap<String, Double>(); // agentId, enterTime
-	
+
 	/** Stores the traffic flow values to be plotted. */
 	private final ArrayList<Double> qValues = new ArrayList<Double>();
-	
+
 	/** Stores the speed values to be plotted. */
 	private final ArrayList<Double> vValues = new ArrayList<Double>();
-	
+
 	/** The size of the time window over which we aggregate data. For each time bin, there will be one point in the chart. */
 	private int binSize = 300;
 
 	/** The number of vehicles leaving the link in the current time bin, used to calculate the traffic flow. */
 	private int flowCount = 0;
-	
+
 	/** The index of the current time bin. Used to recognize when a new time bin starts, so we can plot the "old" data. */
 	private int timeBinIndex = 0;
-	
-	/** The number of vehicles in this time bin whose speed we know. This may be different from {@link #flowCount} 
-	 * because we may not know the speed of all vehicles leaving the link -- it is missing for example for vehicles 
+
+	/** The number of vehicles in this time bin whose speed we know. This may be different from {@link #flowCount}
+	 * because we may not know the speed of all vehicles leaving the link -- it is missing for example for vehicles
 	 * starting at this link. */
 	private int speedCnt = 0;
-	
+
 	/** The sum of all speeds of vehicles in this time bin. Used to calculate the average speed in this time bin. */
 	private double speedSum = 0;
-	
+
 	public QVDiagramm(final NetworkLayer network, final String linkId) {
 		this.linkId = linkId;
 		Link link = network.getLink(new Id(linkId));
@@ -84,20 +84,20 @@ public class QVDiagramm implements EventHandlerLinkEnterI, EventHandlerLinkLeave
 
 	public void handleEvent(final EventLinkEnter event) {
 		// Store the enter time of this agent if it's on the link we're interested in.
-		if (linkId.equals(event.linkId)) {
+		if (this.linkId.equals(event.linkId)) {
 			this.agents.put(event.agentId, Double.valueOf(event.time));
 		}
 	}
-	
+
 	public void handleEvent(final EventAgentArrival event) {
 		// delete the enter time, because the agent won't leave this link for a while now...
-		if (linkId.equals(event.linkId)) {
+		if (this.linkId.equals(event.linkId)) {
 			this.agents.remove(event.agentId);
 		}
 	}
 
 	public void handleEvent(final EventLinkLeave event) {
-		if (linkId.equals(event.linkId)) {
+		if (this.linkId.equals(event.linkId)) {
 			if ((int)event.time / this.binSize != this.timeBinIndex) {
 				// the event is from a new time bin, finish the old one.
 				this.updateGraphValues();
@@ -124,7 +124,7 @@ public class QVDiagramm implements EventHandlerLinkEnterI, EventHandlerLinkLeave
 		this.speedSum = 0.0;
 		this.timeBinIndex = 0;
 	}
-	
+
 	private void updateGraphValues() {
 		if (this.speedCnt > 0) {
 //			System.out.println("timebin: " + this.timeBinIndex);
@@ -139,7 +139,7 @@ public class QVDiagramm implements EventHandlerLinkEnterI, EventHandlerLinkLeave
 		}
 		this.timeBinIndex++;
 	}
-	
+
 	public void writeGraph(final String filename) {
 		double[] speeds = new double[this.vValues.size()];
 		double[] flows = new double[this.qValues.size()];
@@ -154,5 +154,5 @@ public class QVDiagramm implements EventHandlerLinkEnterI, EventHandlerLinkLeave
 		chart.addSeries("boundaries", flows, speeds);
 		chart.saveAsPng(filename, 800, 600);
 	}
-	
+
 }

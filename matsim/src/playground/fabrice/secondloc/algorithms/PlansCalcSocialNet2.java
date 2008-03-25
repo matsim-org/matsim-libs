@@ -44,13 +44,13 @@ public class PlansCalcSocialNet2 extends PlansAlgorithm {
 	SocialNetz netz;
 	HashMap<Link,CoolPlace> link2cool = new HashMap<Link,CoolPlace>();
 	HashMap<Activity,CoolPlace> activ2cool = new HashMap<Activity,CoolPlace>();
-	
+
 	final int max_sn_iter;
 
 	public PlansCalcSocialNet2() {
 
 		super();
-		max_sn_iter = Integer.parseInt(Gbl.getConfig().socnetmodule().getNumIterations());
+		this.max_sn_iter = Integer.parseInt(Gbl.getConfig().socnetmodule().getNumIterations());
 
 	}
 
@@ -62,57 +62,57 @@ public class PlansCalcSocialNet2 extends PlansAlgorithm {
 		SocialNetz netz = new SocialNetz(plans);
 		System.out.println("...done");
 		System.out.println("Initial Number of social connections:\t"+netz.getLinks().size());
-			
+
 		hackKnowledge( plans );
 
 		Interactions interactions = new Interactions( netz );
-		
-		for (int iteration = 0; iteration < max_sn_iter; iteration++) {
 
-			
+		for (int iteration = 0; iteration < this.max_sn_iter; iteration++) {
+
+
 			interactions.exchangeDualSpatialInformation( 1.0 );
-			
+
 			interactions.makeFriendOfFriend( plans, 0.1 );
-			
+
 			System.out.println(" * Number of social connections:\t"+netz.getLinks().size());
-			
+
 			SimpleSocEventGenerator gen = new SimpleSocEventGenerator( "work" );
 			interactions.makeFriendAtSocialEvent( gen.generate(plans), 0.1);
-			
-			SocEveGenerator_ActualPlans gen2 = new SocEveGenerator_ActualPlans( link2cool );
+
+			SocEveGenerator_ActualPlans gen2 = new SocEveGenerator_ActualPlans( this.link2cool );
 			interactions.makeFriendAtSocialEvent( gen2.generate(plans), 0.1 );
-			
+
 			System.out.println(" ** Number of social connections:\t"+netz.getLinks().size());
 		}
 
-	
+
 	}
 
 
-	
+
 	void hackKnowledge( Plans plans ){
-		
+
 		// this lookup table Link <-> Facility will disappear when Facility will be a Location
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		Facilities facilities = (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
-		
-		for( Facility facility : facilities.getFacilities().values() ){			
+
+		for( Facility facility : facilities.getFacilities().values() ){
 			Link link  = (Link) network.getNearestLocations( facility.getCenter(),	null ).get(0);
-			
+
 			TreeMap<String, Activity> tree = facility.getActivities();
 			for( String actType : tree.keySet() ){
 				Activity activity = tree.get(actType);
 				CoolPlace coolplace = new CoolPlace();
 				coolplace.facility = facility;
 				coolplace.activity = activity;
-				link2cool.put( link, coolplace);
-				activ2cool.put( activity, coolplace);
+				this.link2cool.put( link, coolplace);
+				this.activ2cool.put( activity, coolplace);
 			}
 		}
-	
+
 		// set up the knowledge parts, will be refactored
 		for( Person person : plans.getPersons().values() ){
-			person.getKnowledge().hacks.init( activ2cool );
+			person.getKnowledge().hacks.init( this.activ2cool );
 		}
 	}
 

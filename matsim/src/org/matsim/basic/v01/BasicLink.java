@@ -26,11 +26,11 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Location;
+import org.matsim.world.AbstractLocation;
 
 public class BasicLink
 // <L extends BasicLinkI, N extends BasicNodeI > // and then change all BasicLink/BasicNode below into L and N
-extends Location
+extends AbstractLocation
 implements BasicLinkI
 {
 	protected BasicNodeI from = null;
@@ -127,5 +127,4 @@ implements BasicLinkI
 	public void setLanes(int lanes) {
 		this.permlanes = lanes;
 	}
-
 }

@@ -31,7 +31,7 @@ import org.matsim.socialnetworks.algorithms.FacilitiesFindScenarioMinMaxCoords;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Location;
+import org.matsim.world.AbstractLocation;
 import org.matsim.world.MappingRule;
 import org.matsim.world.World;
 import org.matsim.world.Zone;

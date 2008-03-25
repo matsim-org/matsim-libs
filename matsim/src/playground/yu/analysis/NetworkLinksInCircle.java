@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -36,9 +36,9 @@ import org.matsim.utils.geometry.shared.Coord;
  * this class is based on
  * playground.marcel.MyRuns.filterPlansWithRouteInArea(String[] args, double x,
  * double y, double radius)
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class NetworkLinksInCircle {
 	final private HashSet<Link> areaOfInterest = new HashSet<Link>();
@@ -53,18 +53,18 @@ public class NetworkLinksInCircle {
 		Coord center = new Coord(x, y);
 		System.out.println("--> extracting area of interest... at "
 				+ (new Date()));
-		for (Link link : network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
 			if ((from.getCoord().calcDistance(center) <= radius)
 					|| (to.getCoord().calcDistance(center) <= radius)) {
 				System.out.println("    link " + link.getId().toString());
-				areaOfInterest.add(link);
+				this.areaOfInterest.add(link);
 			}
 		}
 		System.out.println("--> area of interest contains: "
-				+ areaOfInterest.size() + " links.");
+				+ this.areaOfInterest.size() + " links.");
 		System.out.println("--> extractiong ... done. ");
-		return areaOfInterest;
+		return this.areaOfInterest;
 	}
 }

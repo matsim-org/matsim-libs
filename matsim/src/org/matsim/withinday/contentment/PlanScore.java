@@ -23,6 +23,7 @@ package org.matsim.withinday.contentment;
 import org.apache.log4j.Logger;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
@@ -33,7 +34,7 @@ import org.matsim.withinday.WithindayAgent;
 /**
  * @author fearonni
  * @author dgrether
- * 
+ *
  */
 public class PlanScore implements AgentContentmentI {
 
@@ -128,7 +129,7 @@ public class PlanScore implements AgentContentmentI {
 		 * Determine how the remaining distance and traveltime to the
 		 * destination.
 		 */
-		Link currentLink = this.agent.getVehicle().getCurrentLink();
+		LinkImpl currentLink = this.agent.getVehicle().getCurrentLink();
 		int duration = 0;
 		double distance = 0;
 		double totalDistance = 0;
@@ -174,7 +175,7 @@ public class PlanScore implements AgentContentmentI {
 			log.debug("next act null of leg: " + leg);
 		}
 		double nextActDuration = (nextAct.getEndTime() - nextAct.getStartTime());
-		
+
 		double score = calcPlanScore(time + duration, leg.getArrTime(), nextActDuration, this.zeroUtilDuration[planIdx]);
 		if (this.referenceScore[planIdx] == 0) {
 			this.planDeviation = 0;
@@ -192,7 +193,7 @@ public class PlanScore implements AgentContentmentI {
 		return this.planDeviation * this.distanceFactor;
 	}
 
-	
+
 	private double calcPlanScore(final double predArrvTime, final double schedArrvTime,
 			double actDuration, final double zeroUtilDur) {
 		double V = 0;
@@ -238,7 +239,7 @@ public class PlanScore implements AgentContentmentI {
 
 				this.referenceScore[index] = calcPlanScore(endTime, endTime, actDur,
 						this.zeroUtilDuration[index]);
-				this.referenceScore[index + 1] = this.referenceScore[index];				
+				this.referenceScore[index + 1] = this.referenceScore[index];
 			}
 			index++;
 		}

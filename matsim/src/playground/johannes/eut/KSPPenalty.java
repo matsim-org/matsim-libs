@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -21,32 +21,32 @@ import org.matsim.router.util.TravelTimeI;
 
 /**
  * @author illenberger
- * 
+ *
  * K-Shortest Path algorithm that uses the link penalty approach.
  */
 public class KSPPenalty {
-	
+
 	public static final double DEFAULT_ALPHA_1 = 0.05;
-	
+
 	public static final double DEFAULT_ALPHA_2 = 0.03;
-	
+
 	public static final double DEFAULT_BETA = 5;
-	
+
 	// ===========================================================================
     // private fields
     // ===========================================================================
-	
+
 //	private final NetworkDecorator decoratedNet;
 
 	private final LeastCostPathCalculator algorithm;
-	
+
 	private final PenaltyLinkcost penaltyLinkcost;
-	
+
 //	private Set<LinkDecorator> penalizedLinks;
-	private java.util.Map<BasicLink, Double> linkPenalties;
-	
+	private java.util.Map<BasicLinkI, Double> linkPenalties;
+
 //	private static boolean logging = true;
-//	
+//
 	private static PrintWriter logWriter;
 
 	// ===========================================================================
@@ -65,9 +65,9 @@ public class KSPPenalty {
 
 	public KSPPenalty(NetworkLayer network) {
 //		decoratedNet = new NetworkDecorator(network);
-		penaltyLinkcost = new PenaltyLinkcost();
-		algorithm = newAlgorithm(network, penaltyLinkcost);
-		
+		this.penaltyLinkcost = new PenaltyLinkcost();
+		this.algorithm = newAlgorithm(network, this.penaltyLinkcost);
+
 		try {
 			if(logWriter == null)
 				logWriter = new PrintWriter(EUTController.getOutputFilename("ksp.log"));
@@ -75,16 +75,16 @@ public class KSPPenalty {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 //	public KSPPenalty(NetworkLayer network, double alpha_1, double alpha_2, double beta) {
 //		this(network);
 //		this.alpha_1 = alpha_1;
 //		this.alpha_2 = alpha_2;
 //		this.beta = beta;
 //	}
-	
+
 	// ===========================================================================
     // instance methods
     // ===========================================================================
@@ -97,12 +97,12 @@ public class KSPPenalty {
 	protected LeastCostPathCalculator newAlgorithm(NetworkLayer network, PenaltyLinkcost pLinkcost) {
 		return new Dijkstra(network, pLinkcost, pLinkcost);
 	}
-	
+
 	/**
 	 * Enables logging. Logs the number of iterations and the number of
 	 * identified paths on each run. The log file will be written to the default
 	 * output directory {@link Gbl#getOuputDirectory()}.
-	 * 
+	 *
 	 * @param flag
 	 *            <tt>true</tt> to enable loggin, <tt>false</tt> otherwise.
 	 */
@@ -128,7 +128,7 @@ public class KSPPenalty {
 	 * Returns a list of paths identified by the K-Shortest Path algorithm. It
 	 * is tried to identify <tt>count</tt> different paths, but with a maximum
 	 * number of iterations of <tt>count</tt>*2.
-	 * 
+	 *
 	 * @param departure
 	 *            the departure link.
 	 * @param destination
@@ -149,8 +149,8 @@ public class KSPPenalty {
 		 * object for the bestpath algo.
 		 */
 		//penalizedLinks = new LinkedHashSet<LinkDecorator>();
-		linkPenalties = new HashMap<BasicLink, Double>();
-		penaltyLinkcost.linkcost = travelTimes;
+		this.linkPenalties = new HashMap<BasicLinkI, Double>();
+		this.penaltyLinkcost.linkcost = travelTimes;
 		//algorithm.setLinkCost(penaltyLinkcost);
 		/*
 		 * (2) Iterate until we found the required number of different paths or
@@ -160,7 +160,7 @@ public class KSPPenalty {
 		int maxruns = count * 2;
 		int runcount = 0;
 		do {
-			Route path = algorithm.calcLeastCostPath(departure, destination, time);
+			Route path = this.algorithm.calcLeastCostPath(departure, destination, time);
 			if (path != null) {
 				/*
 				 * (2a) Increase the impedance on the links in the identified
@@ -184,7 +184,7 @@ public class KSPPenalty {
 				}
 			}
 			runcount++;
-		} while (paths.size() < count && runcount < maxruns);
+		} while ((paths.size() < count) && (runcount < maxruns));
 		/*
 		 * (3) Do some logging...
 		 */
@@ -205,7 +205,7 @@ public class KSPPenalty {
 		 */
 //		for(LinkDecorator link : penalizedLinks)
 //			link.setImpedance(0);
-//		
+//
 		return paths;
 	}
 
@@ -217,7 +217,7 @@ public class KSPPenalty {
 //		}
 //		return plainPath;
 //	}
-	
+
 	private void penalizeLinks(Route path) {
 		/*
 		 * (1) Convert the path to a list of links.
@@ -231,27 +231,27 @@ public class KSPPenalty {
 			length += link.getLength();
 		/*
 		 * (3) Calculate the new impedance for each link in the route.
-		 * 
+		 *
 		 * (3a) Calculate all values that are not dependent on the distance.
 		 */
-		double gradient = (alpha_1 - alpha_2) / (length - (0.5 * length));
+		double gradient = (this.alpha_1 - this.alpha_2) / (length - (0.5 * length));
 		double shift_x = 0.5 * length;
-		double length_factor = (1 + (1 / length)) * beta;
+		double length_factor = (1 + (1 / length)) * this.beta;
 		/*
 		 * (3b) Loop through all links and calculate the impedance increment.
 		 */
 		double s = 0;
 		for (Link link : links) {
 			s += link.getLength();
-			double increment = (alpha_1 - Math.abs(gradient * (shift_x - s)))
+			double increment = (this.alpha_1 - Math.abs(gradient * (shift_x - s)))
 					* length_factor;
 
-			Double impedance = linkPenalties.get(link);
+			Double impedance = this.linkPenalties.get(link);
 			if(impedance != null)
-				linkPenalties.put(link, impedance + increment);
+				this.linkPenalties.put(link, impedance + increment);
 			else
-				linkPenalties.put(link, increment);
-				
+				this.linkPenalties.put(link, increment);
+
 //			link.setImpedance(link.getImpedance() + increment);
 //			penalizedLinks.add(link);
 		}
@@ -266,11 +266,11 @@ public class KSPPenalty {
 		private TravelTimeI linkcost;
 
 		public double getLinkTravelTime(Link link, double time) {
-			Double impedance = linkPenalties.get(link);
+			Double impedance = KSPPenalty.this.linkPenalties.get(link);
 			if(impedance != null)
-				return linkcost.getLinkTravelTime(link, time) * (1+impedance);
+				return this.linkcost.getLinkTravelTime(link, time) * (1+impedance);
 			else
-				return linkcost.getLinkTravelTime(link, time);
+				return this.linkcost.getLinkTravelTime(link, time);
 		}
 
 		public double getLinkTravelCost(Link link, double time) {
@@ -278,7 +278,7 @@ public class KSPPenalty {
 		}
 
 	}
-	
+
 //	/**
 //	 * Decorator class...
 //	 */
@@ -287,32 +287,32 @@ public class KSPPenalty {
 //		public NetworkDecorator(BasicNetI network) {
 //			super(network);
 //		}
-//		
+//
 //		@Override
 //		protected BasicLinkDecorator<N, L> newLinkDecorator(L link, LabelId id) {
 //			return new LinkDecorator(link, id, this);
 //		}
-//		
+//
 //	}
-//	
+//
 //	/**
 //	 * Decorator class, adds an imedance field for each link.
 //	 */
 //	private class LinkDecorator extends BasicLinkDecorator<N, L> {
 //
 //		private double impedance = 0;
-//		
+//
 //		protected LinkDecorator(L link, LabelId id, BasicNet network) {
 //			super(link, id, network);
 //		}
-//		
+//
 //		public void setImpedance(double impedance) {
 //			this.impedance = impedance;
 //		}
-//		
+//
 //		public double getImpedance() {
 //			return impedance;
 //		}
-//		
+//
 //	}
 }

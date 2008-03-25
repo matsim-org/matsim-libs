@@ -141,7 +141,7 @@ public class WorldUtils {
 		double lineDX = lineTo.getX() - lineFrom.getX();
 		double lineDY = lineTo.getY() - lineFrom.getY();
 
-		if (lineDX == 0.0 && lineDY == 0.0) {
+		if ((lineDX == 0.0) && (lineDY == 0.0)) {
 			// the line segment is a point without dimension
 			return lineFrom.calcDistance(point);
 		}

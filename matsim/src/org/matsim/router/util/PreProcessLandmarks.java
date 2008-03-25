@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 
 import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
@@ -149,7 +150,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		LandmarksRole role;
 		Iterator<?> iter = links.iterator();
 		while (iter.hasNext()) {
-			Link l = (Link) iter.next();
+			LinkImpl l = (LinkImpl) iter.next();
 			Node n;
 			if (expandFromLandmark == true) {
 				n = l.getToNode();

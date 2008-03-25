@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,7 +34,6 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.evacuation.EvacuationAreaFileReader;
-import org.matsim.evacuation.EvacuationAreaFileWriter;
 import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
@@ -46,15 +43,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
@@ -64,16 +53,16 @@ import org.xml.sax.SAXException;
 public class ExitCountsCreator {
 
 	private final static Logger log = Logger.getLogger(ExitCountsCreator.class);
-	
+
 	//evacuation Nodes an Link
 	private final static String saveLinkId = "el1";
 	private final static String saveNodeAId = "en1";
 	private final static String saveNodeBId = "en2";
 
 	//	the positions of the evacuation nodes - for now hard coded
-	// Since the real positions of this nodes not really matters 
-	// and for the moment we are going to evacuate Padang only, 
-	// the save nodes are located east of the city.  
+	// Since the real positions of this nodes not really matters
+	// and for the moment we are going to evacuate Padang only,
+	// the save nodes are located east of the city.
 	// Doing so, the visualization of the resulting evacuation network is much clearer in respect of coinciding links.
 	private final static String saveAX = "662433";
 	private final static String saveAY = "9898853";
@@ -84,11 +73,11 @@ public class ExitCountsCreator {
 	private final HashSet<Node> saveNodes = new HashSet<Node>();
 	private final HashSet<Node> redundantNodes = new HashSet<Node>();
 	private ArrayList<Link> countLink;
-	
-	
+
+
 	private final NetworkLayer network;
-	
-	
+
+
 	public ExitCountsCreator(NetworkLayer network, final HashMap<IdI, EvacuationAreaLink> evacuationAreaLinks) {
 		this.network = network;
 		this.evacuationAreaLinks = evacuationAreaLinks;
@@ -102,9 +91,9 @@ public class ExitCountsCreator {
 	 */
 	private void addExitCounts() {
 
-		network.createNode(saveNodeAId, saveAX, saveAY, null);
-		network.createNode(saveNodeBId, saveBX, saveBY, null);
-		for (Node node : network.getNodes().values()) {
+		this.network.createNode(saveNodeAId, saveAX, saveAY, null);
+		this.network.createNode(saveNodeBId, saveBX, saveBY, null);
+		for (Node node : this.network.getNodes().values()) {
 			String nodeId =  node.getId().toString();
 			if (isSaveNode(node) && !nodeId.equals(saveNodeAId) && !nodeId.equals(saveNodeBId)){
 				for (Link l : node.getInLinks().values()){
@@ -132,10 +121,10 @@ public class ExitCountsCreator {
 		this.countLink.add(this.network.getLink("15242"));
 		this.countLink.add(this.network.getLink("114745"));
 		this.countLink.add(this.network.getLink("14745"));
-		
+
 	}
-	
-	
+
+
 	/**
 	 * @param node
 	 * @return true if <code>node</node> is outside the evacuation area
@@ -158,7 +147,7 @@ public class ExitCountsCreator {
 
 	public void run() {
 
-		
+
 		log.info(" * classifing nodes");
 		classifyNodes();
 		log.info(" * cleaning up the network");
@@ -185,11 +174,11 @@ public class ExitCountsCreator {
 		 * 2: save nodes, can be reached from evacuation area
 		 * 3: "normal" nodes within the evacuation area
 		 */
-		for (Node node : network.getNodes().values()) {
+		for (Node node : this.network.getNodes().values()) {
 			int inCat = 0;
 			for (Link link : node.getInLinks().values()) {
 				if (this.evacuationAreaLinks.containsKey(link.getId())) {
-					if (inCat == 0 || inCat == 3) {
+					if ((inCat == 0) || (inCat == 3)) {
 						inCat = 3;
 					}	else {
 						inCat = 2;
@@ -228,7 +217,7 @@ public class ExitCountsCreator {
 	private void cleanUpNetwork() {
 
 		ConcurrentLinkedQueue<Link> l = new ConcurrentLinkedQueue<Link>();
-		for (Link link : network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			if (!this.evacuationAreaLinks.containsKey(link.getId())) {
 				l.add(link);
 			}
@@ -236,12 +225,12 @@ public class ExitCountsCreator {
 
 		Link link = l.poll();
 		while (link != null){
-			network.removeLink(link);
+			this.network.removeLink(link);
 			link = l.poll();
 		}
 
 		ConcurrentLinkedQueue<Node> n = new ConcurrentLinkedQueue<Node>();
-		for (Node node : network.getNodes().values()) {
+		for (Node node : this.network.getNodes().values()) {
 			if (isRedundantNode(node)) {
 				n.add(node);
 			}
@@ -249,10 +238,10 @@ public class ExitCountsCreator {
 
 		Node node = n.poll();
 		while (node != null) {
-			network.removeNode(node);
+			this.network.removeNode(node);
 			node = n.poll();
 		}
-		new NetworkCleaner().run(network);
+		new NetworkCleaner().run(this.network);
 	}
 
 	public void createCounts() {
@@ -266,9 +255,9 @@ public class ExitCountsCreator {
 		for (Link l : this.countLink) {
 			ql = (QueueLink) l;
 			System.out.println(ql);
-			
+
 			c = counts.createCount(l.getId(), l.getId().toString());
-			if (c == null) { 
+			if (c == null) {
 				System.out.println(ql);
 				continue;
 			}
@@ -281,13 +270,13 @@ public class ExitCountsCreator {
 		cw.write();
 		log.info("counts written successfully to: ./output/counts.xml");
 	}
-	
+
 	public static void main(String [] args) {
 		String configFile = "./configs/evacuationConf.xml";
 
 		Config config = Gbl.createConfig(new String[] {configFile});
 		World world = Gbl.createWorld();
-		
+
 		System.out.println("reading network xml file... ");
 		QueueNetworkLayer network = new QueueNetworkLayer();
 		new MatsimNetworkReader(network).readFile("./networks/padang_net.xml");

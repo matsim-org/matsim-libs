@@ -357,7 +357,7 @@ public class MyRunsRouting extends MyRuns {
 		int oneWayNodeCount = 0;
 		for (Node n : network.getNodes().values()) {
 			avgNodeDegree = (i*avgNodeDegree + n.getIncidentLinks().size()) / (i+1);
-			if (n.getOutLinks().size() == 1 && n.getInLinks().size() == 1) {
+			if ((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) {
 				oneWayNodeCount++;
 			}
 			i++;
@@ -796,7 +796,7 @@ public class MyRunsRouting extends MyRuns {
 						+ (int) (now % 1000) + " msecs; " + "(" + now
 						+ " msecs in total)");
 
-		if (routingAlgo != null && routingAlgo instanceof Dijkstra) {
+		if ((routingAlgo != null) && (routingAlgo instanceof Dijkstra)) {
 			((Dijkstra) routingAlgo).printInformation();
 		}
 

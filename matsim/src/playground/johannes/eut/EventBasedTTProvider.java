@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -27,9 +27,9 @@ import org.matsim.utils.identifiers.IdI;
  * Travel times are calculated as the difference between a link enter and link
  * leave event of the same vehicle. The retrieved travel times are averaged over
  * a floating time bin.
- * 
+ *
  * @author illenberger
- * 
+ *
  */
 public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI, EventHandlerLinkLeaveI,
 		EventHandlerAgentArrivalI {
@@ -50,9 +50,9 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 	private LinkedList<TTElement> ttimes = new LinkedList<TTElement>();
 
 	private Map<BasicLinkI, Averager> averagedTTimes = new HashMap<BasicLinkI, Averager>();
-	
+
 //	private SimTimeI simTime;
-	
+
 	private int lastCall = -1;
 
 	// =====================================================================
@@ -71,19 +71,19 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 	public void handleEvent(EventLinkEnter event) {
 		Key2d<String, String> key = new Key2d<String, String>(event.linkId,
 				event.agentId);
-		enterEvents.put(key, event.time);
+		this.enterEvents.put(key, event.time);
 
 	}
 
 	public void handleEvent(EventLinkLeave event) {
 		Key2d<String, String> key = new Key2d<String, String>(event.linkId,
 				event.agentId);
-		Double t1 = enterEvents.remove(key);
+		Double t1 = this.enterEvents.remove(key);
 
 		if (t1 != null) {
 			double deltaT = event.time - t1;
 			if (deltaT >= 0) {
-				ttimes.add(new TTElement(event.link, (int) event.time,
+				this.ttimes.add(new TTElement(event.link, (int) event.time,
 						(int) deltaT));
 //				eventsAvailable = true;
 			}
@@ -96,29 +96,29 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 		 */
 		Key2d<String, String> key = new Key2d<String, String>(event.linkId,
 				event.agentId);
-		enterEvents.remove(key);
+		this.enterEvents.remove(key);
 	}
 
 	public void reset(int iteration) {
-		enterEvents.clear();
-		ttimes.clear();
-		lastCall = -1;
+		this.enterEvents.clear();
+		this.ttimes.clear();
+		this.lastCall = -1;
 	}
 
 	public TravelTimeI requestLinkCost() {
 		/*
 		 * Average the travel times only if there are new events available.
 		 */
-		if ((SimulationTimer.getTime() - lastCall) > 0) {
-			lastCall = (int) SimulationTimer.getTime();
+		if ((SimulationTimer.getTime() - this.lastCall) > 0) {
+			this.lastCall = (int) SimulationTimer.getTime();
 //			eventsAvailable = false;
 
 			/*
 			 * Remove all events that are older than the current time minus
 			 * the binsize.
 			 */
-			int lowerbound = (int) (SimulationTimer.getTime() - binsize);
-			for (ListIterator<TTElement> it = ttimes.listIterator(); it
+			int lowerbound = (int) (SimulationTimer.getTime() - this.binsize);
+			for (ListIterator<TTElement> it = this.ttimes.listIterator(); it
 					.hasNext();) {
 				TTElement e = it.next();
 				if (e.getTimeStamp() < lowerbound)
@@ -133,12 +133,12 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 			/*
 			 * Average the remaining travel time elements...
 			 */
-			averagedTTimes = new HashMap<BasicLinkI, Averager>();
-			for (TTElement e : ttimes) {
-				Averager a = averagedTTimes.get(e.getLink());
+			this.averagedTTimes = new HashMap<BasicLinkI, Averager>();
+			for (TTElement e : this.ttimes) {
+				Averager a = this.averagedTTimes.get(e.getLink());
 				if (a == null) {
 					a = new Averager();
-					averagedTTimes.put(e.getLink(), a);
+					this.averagedTTimes.put(e.getLink(), a);
 				}
 				a.add(e.getTtime());
 			}
@@ -150,7 +150,7 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 	}
 
 	public int getLinkTravelTime_s(BasicLinkI link, int time_s) {
-		Averager a = averagedTTimes.get(link);
+		Averager a = this.averagedTTimes.get(link);
 		if (a == null) {
 			/*
 			 * TODO: Replace this with a free travel time provider!
@@ -192,15 +192,15 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 		}
 
 		public BasicLinkI getLink() {
-			return link;
+			return this.link;
 		}
 
 		public int getTimeStamp() {
-			return timeStamp;
+			return this.timeStamp;
 		}
 
 		public int getTtime() {
-			return ttime;
+			return this.ttime;
 		}
 	}
 

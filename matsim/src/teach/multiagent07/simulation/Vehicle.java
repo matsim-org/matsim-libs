@@ -35,7 +35,7 @@ public class Vehicle {
 	public static int Idcounter = 0;
 	protected IdI id  = new Id(Idcounter++);
 
-	public IdI getId() {return id;};
+	public IdI getId() {return this.id;};
 
 
 	// new Methods for moving planed vehicles
@@ -44,11 +44,11 @@ public class Vehicle {
 		return 0;
 	}
 
-	public BasicLink getDepartureLink() {
+	public BasicLinkI getDepartureLink() {
 		return null;
 	}
 
-	public BasicLink getDestinationLink() {
+	public BasicLinkI getDestinationLink() {
 		return null;
 	}
 
@@ -74,12 +74,12 @@ public class Vehicle {
 		CALink erg = null;
 
 		for (BasicLinkI link : outlinks) {
-			if (link.getId().equals(hauptstrasseId)) {
+			if (link.getId().equals(this.hauptstrasseId)) {
 				erg = (CALink) link;
 			}
 		}
 
-		if (erg != null && Math.random() < 0.8) {
+		if ((erg != null) && (Math.random() < 0.8)) {
 			return erg;
 		}
 		return getNextLinkNormal(outlinks);

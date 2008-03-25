@@ -3,7 +3,6 @@ package org.matsim.socialnetworks.statistics;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.TreeMap;
 
 import org.matsim.facilities.Facility;
 import org.matsim.plans.Person;
@@ -47,7 +46,7 @@ public class GeoStatistics {
 	public Graph makeJungGraph() {
 		// TODO fix
 		Graph g = new UndirectedSparseGraph();
-		Iterator<Person> iperson = plans.getPersons().values().iterator();
+		Iterator<Person> iperson = this.plans.getPersons().values().iterator();
 		while (iperson.hasNext()) {
 			Vertex v;
 			Person aPerson = iperson.next();
@@ -55,23 +54,23 @@ public class GeoStatistics {
 			Facility aHome= aPerson.getKnowledge().getFacilities("home").get(aPerson.getKnowledge().getFacilities("home").firstKey());
 //			Each facility should only have one location but UpMapping is a TreeMap so pick the first entry
 			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
-			if(locVertex.containsKey(aLoc)){
-				v=locVertex.get(aLoc);
+			if(this.locVertex.containsKey(aLoc)){
+				v=this.locVertex.get(aLoc);
 //				System.out.println("  ### GEOSTAT: Graph contains vertex "+ v+" "+aLoc.getId());
 			}else{
 				v = new UndirectedSparseVertex();
 //				System.out.println("   ### GEOSTAT: Making new vertex "+v+" "+aLoc.getId());
-				locVertex.put(aLoc, v);
-				vertexLoc.put(v,aLoc);
+				this.locVertex.put(aLoc, v);
+				this.vertexLoc.put(v,aLoc);
 				// Add the Person ID to the user data container for the vertex
 				v.addUserDatum("locationId", aLoc.getId(), UserData.SHARED);
 				// Add the vertex to the graph
 				g.addVertex(v);
 			}
 		}
-		Iterator<SocialNetEdge> ilinks = snet.getLinks().iterator();
+		Iterator<SocialNetEdge> ilinks = this.snet.getLinks().iterator();
 		while (ilinks.hasNext()) {
-			SocialNetEdge link = (SocialNetEdge) ilinks.next();
+			SocialNetEdge link = ilinks.next();
 
 			Person personA = link.getPersonFrom();
 			Person personB = link.getPersonTo();
@@ -82,8 +81,8 @@ public class GeoStatistics {
 			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			Location bLoc = bHome.getUpMapping().get(bHome.getUpMapping().firstKey());
 
-			Vertex aVertex = locVertex.get(aLoc);
-			Vertex bVertex = locVertex.get(bLoc);
+			Vertex aVertex = this.locVertex.get(aLoc);
+			Vertex bVertex = this.locVertex.get(bLoc);
 
 			if(aVertex.getNeighbors().contains(bVertex)){
 				//this edge exists already in the graph

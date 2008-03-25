@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 
@@ -55,7 +56,7 @@ public class NetworkSimplifyAttributes extends NetworkAlgorithm {
 	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		ArrayList<Link> link90 = new ArrayList<Link>();
+		ArrayList<LinkImpl> link90 = new ArrayList<LinkImpl>();
 
 		for (Link l : network.getLinks().values()) {
 			double speed = l.getFreespeed()*3.6;

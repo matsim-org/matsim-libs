@@ -24,11 +24,11 @@ package playground.marcel.ptnetwork;
 import java.util.Arrays;
 import java.util.TreeMap;
 
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
-public class PtLink extends Link{
+public class PtLink extends LinkImpl{
 
 	private TreeMap<Integer, Integer> departures = new TreeMap<Integer, Integer>();
 	private int[] depTimes = null;

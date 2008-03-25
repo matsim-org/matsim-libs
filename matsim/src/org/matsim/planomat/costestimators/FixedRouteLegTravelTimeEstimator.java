@@ -27,9 +27,9 @@ import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 /**
- * Abstract class for <code>LegTravelTimeEstimator</code>s 
+ * Abstract class for <code>LegTravelTimeEstimator</code>s
  * that estimate the travel time of a fixed route.
- * 
+ *
  * @author meisterk
  *
  */
@@ -45,7 +45,7 @@ public abstract class FixedRouteLegTravelTimeEstimator implements
 
 		this.linkTravelTimeEstimator = linkTravelTimeEstimator;
 		this.tDepDelayCalc = depDelayCalc;
-	
+
 	}
 
 	public abstract double getLegTravelTimeEstimation(IdI personId,
@@ -53,30 +53,30 @@ public abstract class FixedRouteLegTravelTimeEstimator implements
 			Route route, String mode);
 
 	protected double processDeparture(final Link link, final double start) {
-		
+
 		double departureDelayEnd = start + this.tDepDelayCalc.getLinkDepartureDelay(link, start);
 		return departureDelayEnd;
-		
+
 	}
-	
+
 	protected double processRouteTravelTime(final Route route, final double start) {
-		
+
 		double now = start;
 		Link[] links = route.getLinkRoute();
 		for (Link link : links) {
 			now = this.processLink(link, now);
 		}
 		return now;
-		
+
 	}
 
 	protected double processLink(final Link link, final double start) {
 
-		double linkEnd = start + linkTravelTimeEstimator.getLinkTravelTime(link, start);
+		double linkEnd = start + this.linkTravelTimeEstimator.getLinkTravelTime(link, start);
 		return linkEnd;
-		
+
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName();

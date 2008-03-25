@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -47,7 +47,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	/**
@@ -74,8 +74,8 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		super(network);
 		this.binSize = binSize;
 		this.nofBins = nofBins;
-		speeds = new double[nofBins - 1];
-		speedsCount = new int[nofBins - 1];
+		this.speeds = new double[nofBins - 1];
+		this.speedsCount = new int[nofBins - 1];
 	}
 
 	public CalcLinkAvgSpeed(NetworkLayer network, final int binSize) {
@@ -84,7 +84,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 
 	/**
 	 * support the speed calculation only for the links in a circle area
-	 * 
+	 *
 	 * @param network
 	 * @param x-abscissa
 	 *            of the center of the circle area
@@ -96,7 +96,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	public CalcLinkAvgSpeed(NetworkLayer network, double x, double y,
 			double radius) {
 		this(network, 3600);
-		interestLinks = new NetworkLinksInCircle(network)
+		this.interestLinks = new NetworkLinksInCircle(network)
 				.getLinks(x, y, radius);
 	}
 
@@ -116,69 +116,72 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		 *            number of bins.
 		 */
 		public SpeedCounter(final int nofBins) {
-			lengthSum = new double[nofBins];
-			timeSum = new double[nofBins];
+			this.lengthSum = new double[nofBins];
+			this.timeSum = new double[nofBins];
 		}
 
 		public void lengthSumAppend(int timeBin, double length) {
-			lengthSum[timeBin] += length;
+			this.lengthSum[timeBin] += length;
 		}
 
 		public void timeSumAppend(int timeBin, double time) {
-			timeSum[timeBin] += time;
+			this.timeSum[timeBin] += time;
 		}
 
 		public double getSpeed(int timeBin) {
-			return (timeSum[timeBin] != 0.0) ? lengthSum[timeBin]
-					/ timeSum[timeBin] * 3.6 : 0.0;
+			return (this.timeSum[timeBin] != 0.0) ? this.lengthSum[timeBin]
+					/ this.timeSum[timeBin] * 3.6 : 0.0;
 		}
 
 		public void setTmpEnterTime(String agentId, double tmpEnterTime) {
-			enterTimes.put(agentId, tmpEnterTime);
+			this.enterTimes.put(agentId, tmpEnterTime);
 		}
 
 		public Double removeTmpEnterTime(String agentId) {
-			return enterTimes.remove(agentId);
+			return this.enterTimes.remove(agentId);
 		}
 
 		public boolean containsTmpEnterTime(String agentId) {
-			return enterTimes.containsKey(agentId);
+			return this.enterTimes.containsKey(agentId);
 		}
 	}
 
 	public double getAvgSpeed(IdI linkId, double time) {
-		SpeedCounter sc = speedCounters.get(linkId.toString());
+		SpeedCounter sc = this.speedCounters.get(linkId.toString());
 		return (sc != null) ? sc.getSpeed(getBinIdx(time)) : 0.0;
 	}
 
+	@Override
 	public void handleEvent(EventAgentArrival arrival) {
-		SpeedCounter sc = speedCounters.get(arrival.linkId);
+		SpeedCounter sc = this.speedCounters.get(arrival.linkId);
 		if (sc != null) {
 			sc.removeTmpEnterTime(arrival.agentId);
 		}
 	}
 
+	@Override
 	public void handleEvent(EventLinkEnter enter) {
 		String linkId = enter.linkId;
-		SpeedCounter sc = speedCounters.get(linkId);
+		SpeedCounter sc = this.speedCounters.get(linkId);
 		if (sc == null) {
-			sc = new SpeedCounter(nofBins);
+			sc = new SpeedCounter(this.nofBins);
 		}
 		sc.setTmpEnterTime(enter.agentId, enter.time);
-		speedCounters.put(linkId, sc);
+		this.speedCounters.put(linkId, sc);
 	}
 
+	@Override
 	public void handleEvent(EventLinkLeave leave) {
 		double time = leave.time;
 		int timeBin = getBinIdx(time);
 		String linkId = leave.linkId;
-		SpeedCounter sc = speedCounters.get(linkId);
+		SpeedCounter sc = this.speedCounters.get(linkId);
 		if (sc != null) {
 			Double enterTime = sc.removeTmpEnterTime(leave.agentId);
 			if (enterTime != null) {
 				Link l = leave.link;
 				if (l == null) {
-					l = network.getLink(linkId);
+					l = this.network.getLink(linkId);
 				}
 				if (l != null) {
 					sc.lengthSumAppend(timeBin, l.getLength());
@@ -190,14 +193,15 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 
 	private int getBinIdx(final double time) {
 		int bin = (int) (time / this.binSize);
-		if (bin >= nofBins) {
-			return nofBins - 1;
+		if (bin >= this.nofBins) {
+			return this.nofBins - 1;
 		}
 		return bin;
 	}
 
+	@Override
 	public void reset(int iteration) {
-		speedCounters.clear();
+		this.speedCounters.clear();
 	}
 
 	/**
@@ -209,7 +213,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);
 			StringBuffer head = new StringBuffer("avg. Speed\nlinkId\tCapacity");
-			for (int i = 0; i < nofBins - 1; i++) {
+			for (int i = 0; i < this.nofBins - 1; i++) {
 				head.append("\tH" + Integer.toString(i) + "-"
 						+ Integer.toString(i + 1));
 			}
@@ -217,17 +221,17 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 			out.write(head.toString());
 			out.flush();
 
-			for (Link l : ((interestLinks == null) ? (network.getLinks())
-					.values() : interestLinks)) {
+			for (Link l : ((this.interestLinks == null) ? (this.network.getLinks())
+					.values() : this.interestLinks)) {
 				IdI linkId = l.getId();
 				StringBuffer line = new StringBuffer(linkId.toString() + "\t"
 						+ l.getCapacity());
-				for (int j = 0; j < nofBins - 1; j++) {
+				for (int j = 0; j < this.nofBins - 1; j++) {
 					double speed = getAvgSpeed(linkId, (double) j * 3600);
 					line.append("\t" + speed);
 					if (speed > 0) {
-						speeds[j] += speed;
-						speedsCount[j]++;
+						this.speeds[j] += speed;
+						this.speedsCount[j]++;
 					}
 				}
 				line.append("\n");
@@ -243,15 +247,15 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	public void writeChart(String chartFilename) {
-		int xsLength =nofBins-1;
+		int xsLength =this.nofBins-1;
 		double[] xs = new double[xsLength];
 		for (int i = 0; i < xsLength; i++) {
-			xs[i] = ((double) i) * (double) binSize / 3600.0;
+			xs[i] = ((double) i) * (double) this.binSize / 3600.0;
 		}
 		double[] ySpeed = new double[xsLength];
 		for (int i = 0; i <xsLength; i++) {
-			if (speedsCount[i] > 0) {
-				ySpeed[i] = speeds[i] / (double) speedsCount[i];
+			if (this.speedsCount[i] > 0) {
+				ySpeed[i] = this.speeds[i] / this.speedsCount[i];
 			}
 		}
 		XYLineChart avgSpeedChart = new XYLineChart("avg. speed in cityarea",

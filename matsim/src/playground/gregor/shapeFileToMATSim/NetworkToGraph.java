@@ -32,7 +32,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.referencing.CRS;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.geotools.MGC;
@@ -43,7 +42,6 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
@@ -61,32 +59,32 @@ public class NetworkToGraph {
 	}
 
 	public Collection<Feature> generateFromNet() throws FactoryRegistryException, SchemaException, IllegalAttributeException {
-		
+
 		Collection<Feature> features = new ArrayList<Feature>();
-		
+
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, this.crs);
 		AttributeType id = AttributeTypeFactory.newAttributeType(
 				"ID", String.class);
 		AttributeType fromNode = AttributeTypeFactory.newAttributeType(
 				"fromID", String.class);
 		AttributeType toNode = AttributeTypeFactory.newAttributeType(
-				"toID", String.class);		
+				"toID", String.class);
 		AttributeType length = AttributeTypeFactory.newAttributeType(
 				"length", Double.class);
 		AttributeType minWidth = AttributeTypeFactory.newAttributeType(
 				"minWidth", Double.class);
 		AttributeType effectiveWidth = AttributeTypeFactory.newAttributeType(
-				"effWidth", Double.class);		
+				"effWidth", Double.class);
 		FeatureType ftRoad = FeatureTypeFactory.newFeatureType(
 				new AttributeType[] { geom, id, fromNode, toNode, length, minWidth, effectiveWidth }, "link");
-		
+
 
 		for (Link link : this.network.getLinks().values()){
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] {p},this.geofac);
 			LineString ls = new LineString(new CoordinateArraySequence(new Coordinate [] {MGC.coord2Coordinate(link.getFromNode().getCoord()),MGC.coord2Coordinate(link.getToNode().getCoord())}),this.geofac);
-			
+
 			Feature ft = ftRoad.create(new Object [] {mp , link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(),"",""},"network");
 			features.add(ft);
 		}
@@ -106,7 +104,7 @@ public class NetworkToGraph {
 
 		double distA = from.distance(zero);
 		double distB = to.distance(zero);
-		
+
 		double ogradient = Double.MAX_VALUE;
 		if (ydiff != 0)
 			ogradient = -xdiff / ydiff;
@@ -117,13 +115,13 @@ public class NetworkToGraph {
 
 		Coordinate fromB = new Coordinate(from.x+xwidth,from.y+ywidth,0);
 		Coordinate toB = new Coordinate(to.x+xwidth,to.y+ywidth,0);
-		
+
 		CoordinateSequence coords = new CoordinateArraySequence(new Coordinate [] {from, to, toB, fromB, from});
-		
+
 		return new LinearRing(coords,this.geofac);
-		
-		
-		
+
+
+
 	}
 
 }

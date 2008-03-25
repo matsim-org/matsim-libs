@@ -164,7 +164,7 @@ public class KShortestPathGenerator {
 		pendingRoutes.add(route);
 		i++;
 		ArrayList<Link> removedLinks = new ArrayList<Link>();
-		while (i < routeCount && pendingRoutes.isEmpty() == false) {
+		while ((i < routeCount) && (pendingRoutes.isEmpty() == false)) {
 			route = pendingRoutes.poll();
 			LinkedList<Link> pendingLinks = getLinksOrdered(route);
 			Iterator<Link> it = pendingLinks.iterator();
@@ -176,12 +176,12 @@ public class KShortestPathGenerator {
 					processedLinks.add(l.getId());
 				}
 			}
-			while (i < routeCount && pendingLinks.isEmpty() == false) {
+			while ((i < routeCount) && (pendingLinks.isEmpty() == false)) {
 				Link link = pendingLinks.poll();
 				removeLinkFromNetwork(link);
 				removedLinks.add(link);
 				it = pendingLinks.iterator();
-				while (i < routeCount && it.hasNext()) {
+				while ((i < routeCount) && it.hasNext()) {
 					link = it.next();
 
 					removeLinkFromNetwork(link);
@@ -232,7 +232,7 @@ public class KShortestPathGenerator {
 			Link[] ls = this.linkRoutes.get(i);
 			if (ls.length == links.length) {
 				int j = 0;
-				while (j < links.length
+				while ((j < links.length)
 						&& links[j].getId().equals(ls[j].getId())) {
 					j++;
 				}

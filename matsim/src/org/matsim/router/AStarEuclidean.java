@@ -155,7 +155,7 @@ public class AStarEuclidean extends Dijkstra {
 	}
 
 	/**
-	 * @see org.matsim.router.Dijkstra#addToPendingNodes(org.matsim.network.Link, org.matsim.network.Node, org.matsim.router.util.PriorityQueue, double, double, org.matsim.network.Node, org.matsim.network.Node)
+	 * @see org.matsim.router.Dijkstra#addToPendingNodes(org.matsim.network.LinkImpl, org.matsim.network.Node, org.matsim.router.util.PriorityQueue, double, double, org.matsim.network.Node, org.matsim.network.Node)
 	 */
 	@Override
 	protected

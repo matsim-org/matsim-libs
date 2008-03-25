@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -110,7 +110,7 @@ public class PersonSubTourExtractor extends PersonAlgorithm implements PlanAlgor
 			tour.add(i);
 		}
 	}
-	//TODO@ !!!!!  Così probabilmente non basta, va fatto ancora qualcosa perchè funzioni bene anche per estrarre i subtour
+	//TODO@ !!!!!  Cosï¿½ probabilmente non basta, va fatto ancora qualcosa perchï¿½ funzioni bene anche per estrarre i subtour
 	// quando non si vuole stimare il mode choice
 	
 	//////////////////////////////////////////////////////////////////////
@@ -135,7 +135,7 @@ public class PersonSubTourExtractor extends PersonAlgorithm implements PlanAlgor
 			subtour_idx = subtour_idx+1;
 			this.removeSubTour(start_end.get(0),start_end.get(1), tour);
 		}
-		//chiamare qui un metodo che faccia le seguenti cose: riordini i subtours, definisca chi è il precedente di chi,
+		//chiamare qui un metodo che faccia le seguenti cose: riordini i subtours, definisca chi ï¿½ il precedente di chi,
 		//dia un id ragionevole ai subtours
 		System.out.println("subtours end = " + subtours);
 		//writeSubTours ("output/output_persons_subtours.txt"); 

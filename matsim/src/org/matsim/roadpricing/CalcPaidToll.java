@@ -137,14 +137,14 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 	/**
 	 * Handles the calculation of the distance toll. If an agent enters a link at
 	 * a time the toll has to be paid, the toll amount is added to the agent. The
-	 * agent does not have to pay the toll for a link if it starts on the link, 
+	 * agent does not have to pay the toll for a link if it starts on the link,
 	 * as it may have paid already when arriving on the link.
 	 */
 	class DistanceTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final BasicEvent event, final Link link) {
 			if (event instanceof EventAgentWait2Link) {
 				/* we do not handle wait2link-events for distance toll, because the agent
-				 * must not pay twice for this link, and he (likely) paid already when 
+				 * must not pay twice for this link, and he (likely) paid already when
 				 * arriving at this link.  */
 				return;
 			}
@@ -178,7 +178,7 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 		}
 	}
 
-	/** 
+	/**
 	 * Handles the calculation of the cordon toll. An agent has only to pay if he
 	 * crosses the cordon from the outside to the inside.
 	 */

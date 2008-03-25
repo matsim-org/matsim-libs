@@ -59,8 +59,8 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	private int maxNodeRoleIndex = 4;
 	private int maxLinkRoleIndex = 4;
 	private double effectiveCellSize = 7.5; //TODO I've set this to 7.5 because - If one creates a network from scratch (means not using NetworkReader
-	// then effectiveCellSize will never be set  - might be this is just a workaround and we should look for a better solution?? [GL] feb 2008 
-	
+	// then effectiveCellSize will never be set  - might be this is just a workaround and we should look for a better solution?? [GL] feb 2008
+
 	private double effectiveLaneWidth = Double.NaN;
 
 	private final static Logger log = Logger.getLogger(NetworkLayer.class);
@@ -85,7 +85,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	protected Link newLink(final NetworkLayer network, final String id, final Node from, final Node to,
 	                       final String length, final String freespeed, final String capacity, final String permlanes,
 	                       final String origid, final String type) {
-		return new Link(this,id,from,to,length,freespeed,capacity,permlanes,origid,type);
+		return new LinkImpl(this,id,from,to,length,freespeed,capacity,permlanes,origid,type);
 	}
 
 	public final Node createNode(final String id, final String x, final String y, final String type) {
@@ -153,13 +153,13 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		}
 		this.capperiod = (int)Time.parseTime(capperiod);
 	}
-	
+
 	/**
 	 * @param capPeriod the capacity-period in seconds
 	 */
 	public final void setCapacityPeriod(final double capPeriod) {
 		if (this.capperiod != Integer.MIN_VALUE) {
-			log.warn(this + "[capperiod=" + capperiod + " already set. capperiod will be overwritten]");
+			log.warn(this + "[capperiod=" + this.capperiod + " already set. capperiod will be overwritten]");
 		}
 		this.capperiod = (int) capPeriod;
 	}
@@ -170,7 +170,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		}
 		this.effectiveCellSize = effectiveCellSize;
 	}
-	
+
 	public final void setEffectiveLaneWidth(final double effectiveLaneWidth) {
 		if (!Double.isNaN(this.effectiveLaneWidth)) {
 			log.warn(this + "[effectiveLaneWidth=" + effectiveLaneWidth + " already set. effectiveLaneWidth will be overwritten]");
@@ -194,7 +194,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	public final double getEffectiveLaneWidth() {
 		return this.effectiveLaneWidth;
 	}
-	
+
 	public Map<IdI, ? extends Node> getNodes() {
 		return this.nodes;
 	}
@@ -380,7 +380,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		IdI id = link.getId();
 		Link l = (Link)this.locations.get(id);
 
-		if (l == null || link != l) {
+		if ((l == null) || (link != l)) {
 			// there is no link with the specified id, or there is another link than the requested one.
 			return false;
 		}

@@ -196,13 +196,13 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 		protected final double radioLengthToEuklideanDist; // ratio of link.length / euklideanDist
 		private final double effectiveCellSize;
 
-		public EventLink(final Link link, final double capCorrectionFactor, final double effectiveCellSize) {
-			this.link = link;
+		public EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize) {
+			this.link = link2;
 			this.drivingQueue = new ArrayList<EventAgent>();
 			this.parkingQueue = new ArrayList<EventAgent>();
 			this.waitingQueue = new ArrayList<EventAgent>();
 			this.buffer = new ArrayList<EventAgent>();
-			this.euklideanDist = link.getFromNode().getCoord().calcDistance(link.getToNode().getCoord());
+			this.euklideanDist = link2.getFromNode().getCoord().calcDistance(link2.getToNode().getCoord());
 			this.radioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
 			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed();
 			this.timeCap = this.link.getCapacity() * capCorrectionFactor;

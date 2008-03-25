@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -36,19 +36,19 @@ import org.matsim.router.util.TravelTimeI;
 public class TwoStateTTKnowledge extends TravelTimeMemory {
 
 	private List<Integer> n_samples = new ArrayList<Integer>();
-	
+
 	private int sampleSum;
-	
+
 	public TwoStateTTKnowledge() {
 		setMaxMemorySlots(2);
 	}
-	
+
 	@Override
 	public void appendNewStorage(TimevariantTTStorage storage) {
-		sampleSum++;
+		this.sampleSum++;
 		if(getStorageList().size() < getMaxMemorySlots()) {
 			getStorageList().add(storage);
-			n_samples.add(1);
+			this.n_samples.add(1);
 		} else {
 			double avr = storage.getAverage();
 			double min_diff = Double.MAX_VALUE;
@@ -61,14 +61,14 @@ public class TwoStateTTKnowledge extends TravelTimeMemory {
 				}
 			}
 			getStorageList().get(slotIdx).accumulate(storage, getLearningRate());
-			n_samples.set(slotIdx, n_samples.get(slotIdx) + 1);
+			this.n_samples.set(slotIdx, this.n_samples.get(slotIdx) + 1);
 		}
 	}
 
 	public double getWeigth(int state) {
-		return n_samples.get(state)/(double)sampleSum;
+		return this.n_samples.get(state)/(double)this.sampleSum;
 	}
-	
+
 	@Override
 	public TravelTimeI getMeanTravelTimes() {
 		return new MeanLinkCost(getStorageList());
@@ -77,18 +77,18 @@ public class TwoStateTTKnowledge extends TravelTimeMemory {
 	private class MeanLinkCost implements TravelTimeI {
 
 		private List<TimevariantTTStorage> linkcosts;
-		
+
 		public MeanLinkCost(List<TimevariantTTStorage> linkcosts) {
 			this.linkcosts = linkcosts;
 		}
 
 		public double getLinkTravelTime(Link link, double time) {
 			double sum = 0;
-			for(int i = 0; i < linkcosts.size(); i++)
-				sum += linkcosts.get(i).getLinkTravelTime(link, time) * getWeigth(i);
-			
+			for(int i = 0; i < this.linkcosts.size(); i++)
+				sum += this.linkcosts.get(i).getLinkTravelTime(link, time) * getWeigth(i);
+
 			return sum;
 		}
-		
+
 	}
 }

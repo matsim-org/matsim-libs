@@ -36,7 +36,7 @@ public class WorldWriter extends Writer {
 
 	private WorldWriterHandler writerhandler = null;
 	private final World world;
-	
+
 	private final static Logger log = Logger.getLogger(WorldWriter.class);
 
 	//////////////////////////////////////////////////////////////////////

@@ -60,7 +60,7 @@ this(network, timeslice, 30*3600); // default: 30 hours at most
 public TravelTimeCalculatorImpl3(final NetworkLayer network, final int timeslice, final int maxTime) {
 this.network  = network;
 this.timeslice = timeslice;
-this.expectNumSlots = (int) ( (maxTime / this.timeslice) + 1); // TODO hard-coded max-time
+this.expectNumSlots = ( (maxTime / this.timeslice) + 1); // TODO hard-coded max-time
 this.roleIndex = network.requestLinkRole();
 }
 
@@ -88,7 +88,7 @@ this.enterEvents.put(event.agentId, e);
 
 public void handleEvent(EventLinkLeave event) {
 EnterEvent e = this.enterEvents.remove(event.agentId);
-if (e != null && e.linkId.equals(event.linkId)) {
+if ((e != null) && e.linkId.equals(event.linkId)) {
 	double timediff = event.time - e.time;
 	if (event.link == null) event.link = (Link)this.network.getLocation(event.linkId);
 	if (event.link != null) {
@@ -164,9 +164,9 @@ private double currTimeSum;
 private int offset = 0;
 
 public TravelTimeRole(final Link link, final int numSlots) {
-	
+
 //	this.travelTimes =  new HashMap<Integer,TimeStruct>(numSlots,(float) 0.5);
-	this.travelTimes =  new Vector<TimeStruct>(); 
+	this.travelTimes =  new Vector<TimeStruct>();
 	this.freetraveltime = link.getLength() / link.getFreespeed();
 	resetTravelTimes();
 }
@@ -182,20 +182,20 @@ public void addTravelTime(final double now, final double traveltime) {
 	int index = getTimeSlotIndex(now);
 	if (index != this.currIdx){
 		changeCurrent(index);
-		
+
 	}
 	this.currCnt++;
 	this.currTimeSum += traveltime;
 }
 
 private void changeCurrent(int index) {
-	
+
 	if (this.travelTimes.size() == 0){
 		this.offset = index;
 	}
 
 	// save old
-	if (this.currIdx - this.offset < this.travelTimes.size() && this.currIdx >= this.offset) {
+	if ((this.currIdx - this.offset < this.travelTimes.size()) && (this.currIdx >= this.offset)) {
 		TimeStruct curr = this.travelTimes.get(this.currIdx - this.offset);
 		curr.cnt += this.currCnt;
 		curr.timeSum += this.currTimeSum;
@@ -203,38 +203,38 @@ private void changeCurrent(int index) {
 		this.travelTimes.add(this.currIdx - this.offset, new TimeStruct(this.currTimeSum,this.currCnt));
 	}
 
-	
+
 	// set new
 	this.currIdx = index;
 	if (this.currIdx - this.offset >= this.travelTimes.size()) {
 		this.currCnt = 0;
-		this.currTimeSum = 0;				
+		this.currTimeSum = 0;
 	} else {
 		TimeStruct curr = this.travelTimes.get(this.currIdx - this.offset);
 		this.currCnt = curr.cnt;
-		this.currTimeSum = curr.timeSum;				
+		this.currTimeSum = curr.timeSum;
 	}
-	
+
 }
 
 public double getTravelTime(final double now) {
 	int index = getTimeSlotIndex(now);
-	
+
 	if (index == this.currIdx) {
 		return this.currTimeSum / this.currCnt;
 	}
 
-	if (index - offset >= this.travelTimes.size()){
+	if (index - this.offset >= this.travelTimes.size()){
 		return this.freetraveltime;
 	}
-	
+
 	TimeStruct ts = this.travelTimes.get(index);
 	if (ts == null){
 		return this.freetraveltime;
 	}
-	
+
 	return ts.timeSum / ts.cnt;
-	
+
 }
 
 

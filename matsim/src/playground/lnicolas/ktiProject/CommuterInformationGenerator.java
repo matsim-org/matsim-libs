@@ -109,7 +109,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 		for (int i = 0; i < this.population.size(); i++) {
 			Person person = this.population.get(i);
 			Plan plan = person.getPlans().get(0);
-			if (planContainsType(plan, PlansGenerator.workActType) == false
+			if ((planContainsType(plan, PlansGenerator.workActType) == false)
 					&& planContainsType(plan, PlansGenerator.eduActType)) {
 				setEducationFacility(i, educationCommuterMatrix);
 			}

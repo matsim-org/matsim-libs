@@ -14,7 +14,7 @@ public class Reader {
 
 	NetworkLayer net;
 	String freespeed = "1";
-	
+
 	public Reader(NetworkLayer network) {
 		this.net = network;
 	}
@@ -25,7 +25,7 @@ public class Reader {
 			String line = this.infile.readLine();
 			while ( (line = this.infile.readLine()) != null) {
 				if(type.equals("node")) parseNodeLine(line);
-				if(type.equals("link"))	parseLine(line);								
+				if(type.equals("link"))	parseLine(line);
 			}
 			this.infile.close();
 
@@ -36,46 +36,46 @@ public class Reader {
 
 	private void parseLine(String line) {
 		String[] result = StringUtils.explode(line, '\t');
-		Double freesp = net.getLink("100").getFreespeed();
-		if(result.length != 0  ){	
+		Double freesp = this.net.getLink("100").getFreespeed();
+		if(result.length != 0  ){
 			try{
 				if(Integer.parseInt(result[1]) == 1){
 					String id = result[0];
-					if (net.getLink(id)!=null){
-						Link link = net.getLink(result[0]);
-						net.removeLink(link);
-					}			
+					if (this.net.getLink(id)!=null){
+						Link link = this.net.getLink(result[0]);
+						this.net.removeLink(link);
+					}
 				}
 				if(Integer.parseInt(result[2]) == 1){
-					String id = result[0];			
-					if(net.getLink(id)==null){
-						net.createLink(result[0], result[4], result[5], result[6], Double.toString(freesp) , result[3], "1", null, null);
+					String id = result[0];
+					if(this.net.getLink(id)==null){
+						this.net.createLink(result[0], result[4], result[5], result[6], Double.toString(freesp) , result[3], "1", null, null);
 					}
 				}
 				else{
 					double cap = Double.valueOf(result[3]);
-					String id = result[0]; 
-					if(net.getLink(id)!=null ){	
-						net.getLink(result[0]).setCapacity(cap);			
-				
+					String id = result[0];
+					if(this.net.getLink(id)!=null ){
+						this.net.getLink(result[0]).setCapacity(cap);
+
 					}
 				}
 				System.out.println("link "+result[0]+" created");
 			}catch(Exception e){
 				System.out.println(e);
 			}
-		}	
-		
+		}
+
 	}
-	
+
 	private void parseNodeLine(String line){
 		String[] result = StringUtils.explode(line, '\t');
-		net.createNode(result[0], result[1], result[2], null);
+		this.net.createNode(result[0], result[1], result[2], null);
 		System.out.println("node "+result[0]+" created" );
 	}
-	
-	
+
+
 }
-	
-	
+
+
 

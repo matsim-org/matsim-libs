@@ -66,7 +66,7 @@ public class ODMatrixBezirke extends PersonAlgorithm implements PlanAlgorithmI {
 			tmpAct = (Act)plan.getActsLegs().get(i);
 			toLoc = mapLocation(this.tvzLayer.getLocation(tmpAct.getRefId()));
 
-			if (fromLoc != null && toLoc != null) {
+			if ((fromLoc != null) && (toLoc != null)) {
 				Entry entry = this.matrix.getEntry(fromLoc, toLoc);
 				if (entry == null) {
 					this.matrix.setEntry(fromLoc, toLoc, 1);

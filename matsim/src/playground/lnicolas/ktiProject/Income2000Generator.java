@@ -60,7 +60,7 @@ public class Income2000Generator {
 			Entry<IdI, MunicipalityInformation> entry = it.next();
 			if (entry.getValue().getAvgIncome2000() >= 0) {
 				this.municipalityInfo.put(entry.getKey(), entry.getValue());
-				municipalities.add((Zone) locations.get(entry.getKey()));
+				this.municipalities.add((Zone) locations.get(entry.getKey()));
 			}
 		}
 		Gbl.random.nextInt();
@@ -100,12 +100,12 @@ public class Income2000Generator {
 	}
 
 	public double getIncome2000(Person person, Zone zone) {
-		MunicipalityInformation mInfo = municipalityInfo.get(zone.getId());
+		MunicipalityInformation mInfo = this.municipalityInfo.get(zone.getId());
 		return mInfo.getAvgIncome2000();
 	}
 
 	public double getIncome2000(Zone zone) {
-		return municipalityInfo.get(zone.getId()).getAvgIncome2000();
+		return this.municipalityInfo.get(zone.getId()).getAvgIncome2000();
 	}
 
 	protected Zone getHomeZone(Person person) {
@@ -125,9 +125,9 @@ public class Income2000Generator {
 	private Zone getNearestZone(CoordI homeCoord) {
 		Zone nearestZone = null;
 		double shortestDist = Double.POSITIVE_INFINITY;
-		for (Zone zone : municipalities) {
+		for (Zone zone : this.municipalities) {
 			double dist = zone.getCenter().calcDistance(homeCoord);
-			if (dist > 0 && dist < shortestDist) {
+			if ((dist > 0) && (dist < shortestDist)) {
 				nearestZone = zone;
 				shortestDist = dist;
 			}
@@ -137,7 +137,7 @@ public class Income2000Generator {
 
 	protected ArrayList<Zone> getContainingZones(CoordI homeCoord) {
 		ArrayList<Zone> zones = new ArrayList<Zone>();
-		for (Zone zone : municipalities) {
+		for (Zone zone : this.municipalities) {
 			double dist = zone.calcDistance(homeCoord);
 			if (dist == 0.0) {
 				zones.add(zone);
@@ -225,7 +225,7 @@ public class Income2000Generator {
 		double shortestDist = Double.POSITIVE_INFINITY;
 		for (Zone zone : zones) {
 			double dist = zone.calcDistance(homeCoord);
-			if (dist > 0 && dist < shortestDist) {
+			if ((dist > 0) && (dist < shortestDist)) {
 				nearestZone = zone;
 				shortestDist = dist;
 			}

@@ -9,13 +9,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.mobsim.SimulationTimer;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.trafficlights.data.SignalGroupDefinition;
 import org.matsim.trafficlights.data.SignalLane;
 
-public class QLink extends Link {
+public class QLink extends LinkImpl {
 	
 	final private static Logger log = Logger.getLogger(QLink.class);
 	private static int spaceCapWarningCount = 0;

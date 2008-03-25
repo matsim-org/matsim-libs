@@ -31,6 +31,7 @@ import java.util.List;
 import org.matsim.basic.v01.BasicRoute;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
@@ -166,15 +167,15 @@ public class Route extends BasicRoute<Node> implements  Serializable{
 		 * This function is a first step for this as it helps to create the
 		 * list of links the route leads through */
 		if (this.route == null) {
-			return new Link[0];
+			return new LinkImpl[0];
 		}
 		if (this.route.size() == 0) {
-			return new Link[0];
+			return new LinkImpl[0];
 		}
 
 		boolean notfirst = false;
 		Node prevNode = null;
-		Link[] links = new Link[this.route.size() - 1];
+		Link[] links = new LinkImpl[this.route.size() - 1];
 		int idx = 0;
 		for (Node node : this.route) {
 			if (notfirst) {

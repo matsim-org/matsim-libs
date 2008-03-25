@@ -42,28 +42,28 @@ import playground.balmermi.algos.RouteSetGenerator;
 public class CalcRouteSets {
 
 	private static RouteSetGenerator gen;
-	
+
 	private static FileWriter fw;;
 	private static BufferedWriter out;
 
 	//////////////////////////////////////////////////////////////////////
-	// 
+	//
 	//////////////////////////////////////////////////////////////////////
 
 	public static void runRouteSetAlgo(Integer id,Integer orig,Integer dest) {
-		
+
 		System.out.println("RUN: runRouteSetAlgo...");
 
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-		
+
 		Node o = network.getNode("" + orig);
 		Node d = network.getNode("" + dest);
 		int time = 0;
 		int nof_routes = 20;
 		int var_factor = 3;
-		
+
 		if (o.getId().equals(d.getId())) { return; }
-		
+
 		System.out.println("  create route set...");
 		LinkedList<Route> routes = gen.calcRouteSet(o,d,nof_routes,time,var_factor);
 		System.out.println("  done.");
@@ -76,13 +76,13 @@ public class CalcRouteSets {
 		System.out.println("RUN: runRouteSetAlgo finished.");
 		System.out.println();
 	}
-	
+
 	public static void parseODPairs(final String inputfile) {
 
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		ArrayList<Integer> origs = new ArrayList<Integer>();
 		ArrayList<Integer> dests = new ArrayList<Integer>();
-		
+
 		int line_cnt = 0;
 		try {
 			FileReader file_reader = new FileReader(inputfile);
@@ -98,7 +98,7 @@ public class CalcRouteSets {
 				Integer id = Integer.parseInt(entries[0].trim());
 				Integer orig = Integer.parseInt(entries[1].trim());
 				Integer dest = Integer.parseInt(entries[2].trim());
-				
+
 				ids.add(id);
 				origs.add(orig);
 				dests.add(dest);
@@ -108,7 +108,7 @@ public class CalcRouteSets {
 					System.out.println("    Line " + line_cnt);
 				}
 				line_cnt++;
-			}	
+			}
 			buffered_reader.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -117,7 +117,7 @@ public class CalcRouteSets {
 		System.out.println("    # ids = " + ids.size());
 		System.out.println("    # origs = " + origs.size());
 		System.out.println("    # dests = " + dests.size());
-		
+
 		for (int i=0; i< ids.size(); i++) {
 			runRouteSetAlgo(ids.get(i),origs.get(i),dests.get(i));
 		}
@@ -135,7 +135,7 @@ public class CalcRouteSets {
 			System.out.print("\n");
 		}
 	}
-	
+
 	public static void writeRouteSetFile(Integer id, Node o, Node d, LinkedList<Route> routes) {
 		try {
 			out.flush();
@@ -161,7 +161,7 @@ public class CalcRouteSets {
 			System.exit(-1);
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
@@ -169,7 +169,7 @@ public class CalcRouteSets {
 	public static void main(String[] args) throws Exception {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
-		
+
 		Scenario.setUpScenarioConfig();
 
 		System.out.println("reading the network...");

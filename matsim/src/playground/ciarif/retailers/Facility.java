@@ -29,9 +29,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Location;
+import org.matsim.world.AbstractLocation;
 
-public class Facility extends Location {
+public class Facility extends AbstractLocation {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

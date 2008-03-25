@@ -283,7 +283,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			Gbl.errorMsg("Cannot create legend or logo cause: " + e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 		// copy required icons to the kmz
 		try {
 			this.writer.addNonKMLFile("res/icons/plus.png", CROSSICON);

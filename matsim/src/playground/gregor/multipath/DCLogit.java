@@ -119,7 +119,7 @@ public class DCLogit implements LeastCostPathCalculator{
 
 		//TODO DEBUG
 		initSnapShotWriter();
-		time = 0;
+		this.time = 0;
 
 	}
 
@@ -168,8 +168,8 @@ public class DCLogit implements LeastCostPathCalculator{
 			if (count++ >= snapShotSlowDown) {
 				try {
 					count = 0;
-					this.netStateWriter.dump(time++);
-					if (time > 240){
+					this.netStateWriter.dump(this.time++);
+					if (this.time > 240){
 			            try {
 			                this.netStateWriter.close();
 			            } catch (IOException e) {
@@ -236,9 +236,9 @@ public class DCLogit implements LeastCostPathCalculator{
 		((LinkPainter)this.netStateWriter).reset();
 		colorizeEfficientPaths(toNode,fromNode);
 			try {
-				this.netStateWriter.dump(time++);
-				this.netStateWriter.dump(time++);
-				this.netStateWriter.dump(time++);this.netStateWriter.dump(time++);this.netStateWriter.dump(time++);
+				this.netStateWriter.dump(this.time++);
+				this.netStateWriter.dump(this.time++);
+				this.netStateWriter.dump(this.time++);this.netStateWriter.dump(this.time++);this.netStateWriter.dump(this.time++);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -279,12 +279,12 @@ public class DCLogit implements LeastCostPathCalculator{
 			ArrayList<DCLogitNodeData> tmps = data.getBackNodesData();
 			HashSet<Node> backNodes = new HashSet<Node>();
 			for (DCLogitNodeData tmp : tmps){
-				Node back = network.getNode(tmp.id.toString());
+				Node back = this.network.getNode(tmp.id.toString());
 				efficientNodes.add(back);
 				backNodes.add(back);
 
 			}
-			Node from = network.getNode(data.id.toString());
+			Node from = this.network.getNode(data.id.toString());
 			for (Link l : from.getInLinks().values()) {
 				Node tmp = l.getFromNode();
 				if (((LinkPainter)this.netStateWriter).linkAttribExist(l.getId()))
@@ -358,7 +358,7 @@ public class DCLogit implements LeastCostPathCalculator{
 		DCLogitNodeData fromNodeData = getData(outNode);
 
 		//prevent u-turns ... just a HACK ... thats wrong ... u-turns has to be handled in backLinks!!!
-		if (fromNodeData.getBackNodes().size() == 1 && fromNodeData.getBackNodes().contains(n))
+		if ((fromNodeData.getBackNodes().size() == 1) && fromNodeData.getBackNodes().contains(n))
 			return false;
 
 
@@ -406,7 +406,7 @@ public class DCLogit implements LeastCostPathCalculator{
 //		}
 
 		//allow detour if not more then 10% longer - just a HACK
-		if (Math.abs(nCost  - (travelCost + currCost)) <= 0.2 * nCost &&  Math.abs(data.getTrace() - trace) > 30){
+		if ((Math.abs(nCost  - (travelCost + currCost)) <= 0.2 * nCost) &&  (Math.abs(data.getTrace() - trace) > 30)){
 			touchNode(n, data, pendingNodes, currTime + travelTime, currCost
 					+ travelCost, outNode,trace);
 //			TODO DEBUG
@@ -658,7 +658,7 @@ public class DCLogit implements LeastCostPathCalculator{
 
 		public ArrayList<DCLogitNodeData> getBackNodesData(){
 			ArrayList<DCLogitNodeData> links = new ArrayList<DCLogitNodeData>();
-			for (BackLink back : backLinks){
+			for (BackLink back : this.backLinks){
 				links.add(back.fromNodeData);
 			}
 			return links;
@@ -666,7 +666,7 @@ public class DCLogit implements LeastCostPathCalculator{
 
 		public HashSet<Node> getBackNodes(){
 			HashSet<Node> nodes = new HashSet<Node>();
-			for (BackLink back : backLinks){
+			for (BackLink back : this.backLinks){
 				nodes.add(back.fromNode);
 			}
 			return nodes;
@@ -675,10 +675,10 @@ public class DCLogit implements LeastCostPathCalculator{
 
 		public int getInPaths(IdI id){
 			int inPaths = 0;
-			if (backLinks.size() == 0)
+			if (this.backLinks.size() == 0)
 				return 0;
 
-			for (BackLink link : backLinks){
+			for (BackLink link : this.backLinks){
 				if (link.fromNode.getId().equals(id))
 					continue;
 				inPaths += link.inPaths;
@@ -689,8 +689,8 @@ public class DCLogit implements LeastCostPathCalculator{
 		public Node drawNode() {
 
 			// choose a random number over interval [0,sumWeights[
-			double selnum = backLinkWeightsSum*Gbl.random.nextDouble();
-			for (BackLink link : backLinks){
+			double selnum = this.backLinkWeightsSum*Gbl.random.nextDouble();
+			for (BackLink link : this.backLinks){
 				selnum -= link.linkWeight;
 				if (selnum <= 0) {
 					return link.fromNode;
@@ -704,11 +704,11 @@ public class DCLogit implements LeastCostPathCalculator{
 		}
 
 		public Node getPrevNode() {
-			return shortestPrev;
+			return this.shortestPrev;
 		}
 
 		public void setInPaths(int i){
-			inPaths = i;
+			this.inPaths = i;
 		}
 
 		public boolean isVisited(int iterID) {
@@ -728,10 +728,10 @@ public class DCLogit implements LeastCostPathCalculator{
 			this.shortestPrev = null;
 			this.iterationID = Integer.MIN_VALUE;
 //			prevNodes.clear();
-			backLinks.clear();
+			this.backLinks.clear();
 			this.cost = Double.MAX_VALUE;
 			this.inPaths = 0;
-			backLinkWeightsSum = 0;
+			this.backLinkWeightsSum = 0;
 		}
 
 		public void visitInitNode(double time, int iterationID) {
@@ -752,14 +752,14 @@ public class DCLogit implements LeastCostPathCalculator{
 //			System.out.println(" new " + this.trace);
 
 			if (cost < this.cost) {
-				for (BackLink link : backLinks) {
+				for (BackLink link : this.backLinks) {
 					if (Math.abs(link.trace - trace) <= 0.5 * trace){
-						backLinks.remove();
+						this.backLinks.remove();
 						break; //TODO test the other links too
 					}
 				}
 				this.openLinks--;
-				shortestPrev = outNode;
+				this.shortestPrev = outNode;
 				this.cost = cost;
 				this.time = time;
 				this.iterationID = iterationID;
@@ -783,7 +783,7 @@ public class DCLogit implements LeastCostPathCalculator{
 			blink.fromNode = outNode;
 			blink.linkCost = linkCost;
 			blink.inPaths = fromNodeData.getInPaths(this.id);
-			backLinks.add(blink);
+			this.backLinks.add(blink);
 		}
 
 

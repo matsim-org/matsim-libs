@@ -16,43 +16,43 @@ import org.matsim.network.Link;
 import org.matsim.plans.Leg;
 
 public class PseudoLink {
-	
+
 	/** Logger */
 	final private static Logger log = Logger.getLogger(QLink.class);
-	
+
 	/** Id of the real link, null if this is not the first/original <code>PseudoLink</code> */
 	private QLink realLink = null;
 	private boolean amIOriginalLink = false;
-	
+
 	/** Hält alle echten Ziellinks, die von diesem Link erreichbar sind, meist 1-3 */
 	private List<Link> destLinks = new LinkedList<Link>();
-	
+
 	/** Next PseudoLink upstream, null if first link */
 	private PseudoLink fromLink = null;
-	
+
 	/** Contains next PseudoLinks downstream, null if last link */
 	private List<PseudoLink> toLinks = new LinkedList<PseudoLink>();
-	
+
 	/** Meter counted from the end of the real link */
 	private double meterFromLinkEnd = -1;
-	
+
 	/** The list of <code>QVehicles</code> that have not yet reached the end of the link according
 	 * to the <code>freeSpeedTravelTime</code> of the <code>PseudoLink</code> */
 	private Queue<QVehicle> storageQueue = new LinkedList<QVehicle>();
 
 	/** Maximum number of vehicle to be stored on the link simultanously **/
 	private double storageCapacity = Double.NaN;
-	
+
 	/** Buffer responsible for limiting the flow capacity, flowQueue is holding all vehicles
 	 *  that are ready to cross the outgoing intersection **/
 	private Queue<QVehicle> flowQueue = new LinkedList<QVehicle>();
-	
+
 	/** The number of vehicles able to leave the flowQueue in one time step (usually 1 sec). */
 	private double flowCapacity = Double.NaN;
-	
+
 	/** Time needed to pass the link if empty */
 	private double freeSpeedTravelTime = Double.NaN;
-	
+
 	/** parking queue includes all vehicles that do not have yet reached their
 	 * start time, but will start at this link at some time */
 	private final PriorityQueue<QVehicle> parkingQueue = new PriorityQueue<QVehicle>(30,
@@ -62,14 +62,14 @@ public class PseudoLink {
 	 * has come. They are then filled into the storageQueue, depending on free space
 	 * in the storageQueue */
 	private final Queue<QVehicle> parkToLinkQueue = new LinkedList<QVehicle>();
-	
+
 	// Helper
 	private double flowCapacityCeil = Double.NaN;
 	private double flowCapacityFraction = Double.NaN;
-	
+
 	private double flowCapacityFractionalRest = 1.0;
-	
-	
+
+
 	public PseudoLink(QLink originalLink, boolean amIOriginalLink) {
 		this.realLink = originalLink;
 		this.amIOriginalLink = amIOriginalLink;
@@ -78,10 +78,10 @@ public class PseudoLink {
 	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double length_m, int numberOfLanes, double freeSpeed_m_s, double flowCapacityFromNetFile_Veh_h, double effectiveCellSize){
 
 		this.meterFromLinkEnd = meterFromLinkEnd_m;
-		
+
 		this.freeSpeedTravelTime = length_m / freeSpeed_m_s;
 
-		this.flowCapacity = flowCapacityFromNetFile_Veh_h * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();	
+		this.flowCapacity = flowCapacityFromNetFile_Veh_h * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
 
 		this.flowCapacityCeil = (int) Math.ceil(this.flowCapacity);
 		this.flowCapacityFraction = this.flowCapacity - (int) this.flowCapacity;
@@ -93,24 +93,24 @@ public class PseudoLink {
 		if (this.storageCapacity < this.freeSpeedTravelTime * this.flowCapacity) {
 			this.storageCapacity = this.freeSpeedTravelTime * this.flowCapacity;
 			return false;
-			
+
 		} else return true;
-		
+
 	}
-	
+
 	public void movePseudoLink(final double now){
-		
-		if (amIOriginalLink){ moveParkingQueueToParkToLinkQueue(now); }
+
+		if (this.amIOriginalLink){ moveParkingQueueToParkToLinkQueue(now); }
 		moveFlowQueueToNextPseudoLink();
 		moveStorageQueueToFlowQueue(now);
-		if (amIOriginalLink){ moveParkToLinkQueueToFlowQueue(now); }
-		
+		if (this.amIOriginalLink){ moveParkToLinkQueueToFlowQueue(now); }
+
 	}
-	
-	private void moveStorageQueueToFlowQueue(final double now) {		
+
+	private void moveStorageQueueToFlowQueue(final double now) {
 
 		double maximumFlowCapacity = this.flowCapacity;
-		
+
 		QVehicle veh;
 		while ((veh = this.storageQueue.peek()) != null) {
 			if (veh.getDepartureTime_s() > now) {
@@ -118,10 +118,10 @@ public class PseudoLink {
 			}
 
 			if (veh.getDestinationLink().getId() == this.realLink.getId()) {
-				
+
 				QSim.getEvents().processEvent(new EventAgentArrival(now, veh.getDriverID(),
 						veh.getCurrentLegNumber(), this.realLink.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink));
-				veh.reachActivity();				
+				veh.reachActivity();
 				this.storageQueue.poll();
 				continue;
 			}
@@ -135,7 +135,7 @@ public class PseudoLink {
 				addToFlowQueue(veh, now);
 				this.storageQueue.poll();
 				continue;
-			
+
 			} else if (this.flowCapacityFractionalRest >= 1.0) {
 				this.flowCapacityFractionalRest--;
 				addToFlowQueue(veh, now);
@@ -149,41 +149,41 @@ public class PseudoLink {
 		if (this.flowCapacityFractionalRest < 1.0) {
 			this.flowCapacityFractionalRest += this.flowCapacityFraction;
 		}
-		
+
 	}
 
 	private boolean hasFlowQueueSpace() {
 		return (this.flowQueue.size() < this.flowCapacityCeil);
 	}
-	
+
 	private void addToFlowQueue(final QVehicle veh, final double now) {
 		this.flowQueue.add(veh);
-		veh.setLastMovedTime(now);		
+		veh.setLastMovedTime(now);
 	}
-	
+
 	// TODO [an] Berücksichtigt lediglich die StorageQueue nicht aber die Fahrzeuge in der FlowQueue - Fehler bei David?
 	public boolean hasSpace() {
 		if (this.storageQueue.size() < this.storageCapacity) {
 			return true;
 		} else return false;
 	}
-	
+
 	private void moveFlowQueueToNextPseudoLink(){
-		
+
 		Boolean moveOn = true;
-		
-		while(moveOn && !flowQueue.isEmpty() && toLinks.size() != 0){
+
+		while(moveOn && !this.flowQueue.isEmpty() && (this.toLinks.size() != 0)){
 			QVehicle veh = this.flowQueue.peek();
 			Link nextLink = veh.chooseNextLink();
-			
+
 			if (nextLink != null) {
-				for (PseudoLink toLink : toLinks) {
+				for (PseudoLink toLink : this.toLinks) {
 					for (Link qLink : toLink.getDestLinks()) {
 						if (qLink.equals(nextLink)){
 							if (toLink.hasSpace()) {
 								this.flowQueue.poll();
 								toLink.addVehicle(veh);
-							}else moveOn = false;	
+							}else moveOn = false;
 						}
 					}
 				}
@@ -192,23 +192,23 @@ public class PseudoLink {
 	}
 
 	public List<Link> getDestLinks() {
-		return destLinks;
+		return this.destLinks;
 	}
 
 	public void addDestLink(Link destLink) {
 		this.destLinks.add(destLink);
 	}
-	
+
 	public void addVehicle(QVehicle vehicle){
 		this.storageQueue.add(vehicle);
 		vehicle.setDepartureTime_s((int) (SimulationTimer.getTime() + this.freeSpeedTravelTime));
-	}	
-	
+	}
+
 	private void moveParkingQueueToParkToLinkQueue(final double now) {
 		QVehicle veh;
-		
+
 		while ((veh = this.parkingQueue.peek()) != null) {
-			
+
 			if (veh.getDepartureTime_s() > now) {
 				break;
 			}
@@ -217,51 +217,51 @@ public class PseudoLink {
 
 			QSim.getEvents().processEvent(new EventAgentDeparture(now, veh.getDriverID(),
 					veh.getCurrentLegNumber(), this.realLink.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink));
-			
+
 			Leg actLeg = veh.getCurrentLeg();
 
 			if (actLeg.getRoute().getRoute().size() != 0) {
-					this.parkToLinkQueue.add(veh);			
+					this.parkToLinkQueue.add(veh);
 			}
 
 			this.parkingQueue.poll();
 		}
 	}
-	
+
 	/** Move as many waiting cars to the link as it is possible
 	 * @param now the current time */
 	private void moveParkToLinkQueueToFlowQueue(final double now) {
 		QVehicle veh;
-		
+
 		while ((veh = this.parkToLinkQueue.peek()) != null) {
-			
+
 			if (!hasFlowQueueSpace()) {
 				break;
-			}	
-						
+			}
+
 			addToFlowQueue(veh, now);
 
-			QSim.getEvents().processEvent(new EventAgentWait2Link(now, veh.getDriverID(), 
+			QSim.getEvents().processEvent(new EventAgentWait2Link(now, veh.getDriverID(),
 					veh.getCurrentLegNumber(), this.realLink.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink));
 
 			this.parkToLinkQueue.poll(); // remove the just handled vehicle from parkToLinkQueue
 		}
 	}
-	
+
 	public void addVehicle2ParkingQueue(QVehicle veh) {
-		parkingQueue.add(veh);
+		this.parkingQueue.add(veh);
 	}
-	
+
 	public Queue<QVehicle> getFlowQueue(){
-		return flowQueue;
+		return this.flowQueue;
 	}
 
 	public double getMeterFromLinkEnd() {
-		return meterFromLinkEnd;
+		return this.meterFromLinkEnd;
 	}
 
 	public PseudoLink getFromLink() {
-		return fromLink;
+		return this.fromLink;
 	}
 
 	public void setFromLink(PseudoLink fromLink) {
@@ -269,30 +269,30 @@ public class PseudoLink {
 	}
 
 	public List<PseudoLink> getToLinks() {
-		return toLinks;
+		return this.toLinks;
 	}
 
 	public void setToLinks(List<PseudoLink> toLinks) {
 		this.toLinks = toLinks;
 	}
-		
+
 	boolean flowQueueIsEmpty() {
 		return this.flowQueue.isEmpty();
 	}
-	
+
 	QVehicle getFirstFromBuffer() {
 		return this.flowQueue.peek();
 	}
-	
+
 	QVehicle pollFirstFromBuffer() {
 		double now = SimulationTimer.getTime();
 		QVehicle veh = this.flowQueue.poll();
 
 		QSim.getEvents().processEvent(new EventLinkLeave(now, veh.getDriverID(), veh.getCurrentLegNumber(),
-						realLink.getId().toString(), veh.getDriver(), realLink));
+						this.realLink.getId().toString(), veh.getDriver(), this.realLink));
 
 		return veh;
 	}
-	
-	
+
+
 }

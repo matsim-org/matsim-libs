@@ -27,9 +27,9 @@ import org.matsim.network.NetworkLayer;
 
 /**
  * Calculates the traffic performance [Per.km] and works in current modell of MATSim only for private transport
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class CalcTrafficPerformance implements EventHandlerLinkEnterI {
 	private double lengthSum = 0;
@@ -42,21 +42,21 @@ public class CalcTrafficPerformance implements EventHandlerLinkEnterI {
 	public void handleEvent(EventLinkEnter event) {
 		Link l = event.link;
 		if (l == null) {
-			l = network.getLink(event.linkId);
+			l = this.network.getLink(event.linkId);
 		}
 		if (l != null) {
-			lengthSum += l.getLength() / 1000.0;
+			this.lengthSum += l.getLength() / 1000.0;
 		}
 	}
 
 	public void reset(int iteration) {
-		lengthSum = 0;
+		this.lengthSum = 0;
 	}
 
 	/**
 	 * @return Traffic performance [Per*km]
 	 */
 	public double getTrafficPerformance() {
-		return lengthSum;
+		return this.lengthSum;
 	}
 }

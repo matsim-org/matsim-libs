@@ -25,7 +25,6 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -42,21 +41,21 @@ public class RoutesForGianluca {
 	//////////////////////////////////////////////////////////////////////
 
 	private final NetworkLayer network;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public RoutesForGianluca() {
 		System.out.println("  reading the network xml file...");
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(this.network).readFile(Gbl.getConfig().network().getInputFile());
 		System.out.println("  done.");
 
 		this.readRoutes("input/gewaehlte_routen.txt");
 //		this.writeData("output/greetimes.xml");
-		
-		Scenario.writeNetwork(network);
+
+		Scenario.writeNetwork(this.network);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -126,11 +125,11 @@ public class RoutesForGianluca {
 			Gbl.errorMsg(e);
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final void writeData(String outfile) {
 		try {
 			FileWriter fw = new FileWriter(outfile);

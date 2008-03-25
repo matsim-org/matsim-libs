@@ -49,7 +49,7 @@ public class NextLinkTravelTimePerception implements TravelTimeI, AgentPercepts 
 	}
 
 	/**
-	 * @see org.matsim.router.util.TravelTimeI#getLinkTravelTime(org.matsim.network.Link, double)
+	 * @see org.matsim.router.util.TravelTimeI#getLinkTravelTime(org.matsim.network.LinkImpl, double)
 	 */
 	public double getLinkTravelTime(final Link link, final double time) {
 		Double travelTime = this.linkMap.get(link);

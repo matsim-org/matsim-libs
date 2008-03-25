@@ -43,10 +43,10 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private static final NumberFormat formatter = new DecimalFormat("0.000000");
 
-	
+
 	private static final int LAENGE = 0;
 	private static final int VWEG = 1;
 	private static final int VWEGEM = 2;
@@ -62,7 +62,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 	// idx:       0       1     2       3      4      5        6       7       8
 	private final TreeMap<IdI,Double[]> link_atts = new TreeMap<IdI, Double[]>();
 	private final TreeMap<IdI,ArrayList<Node>> routes = new TreeMap<IdI, ArrayList<Node>>();
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 				// head:    Node_ID  Hoehe
 				// example: 10001    404.60
 				// index:   0        1
-				
+
 				IdI nodeid = new Id(entries[0].trim());
 				if (!network.getNodes().containsKey(nodeid)) { Gbl.errorMsg("Node id=" + nodeid + " does not exist in the network!"); }
 				Double height = new Double(entries[1].trim());
@@ -100,7 +100,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		System.out.println("      => # nodes  : " + network.getNodes().size());
 		System.out.println("      => # heights: " + this.node_heights.size());
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private final void readLinkAtts(String inputfile, NetworkLayer network) {
@@ -132,7 +132,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		System.out.println("      => # links  : " + network.getLinks().size());
 		System.out.println("      => # Atts   : " + this.link_atts.size());
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private final void readRoutes(String inputfile, NetworkLayer network) {
@@ -161,7 +161,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 				Node last = network.getNode(entries[2].trim());
 				if (last == null) { Gbl.errorMsg("Node id=" + entries[1].trim() + " does not exist!"); }
 				if (!last.getId().equals(node_routes.get(node_routes.size()-1).getId())) {
-					Gbl.errorMsg("Last node does not fit!"); 
+					Gbl.errorMsg("Last node does not fit!");
 				}
 				IdI routeid = new Id(entries[0].trim());
 				if (this.routes.put(routeid,node_routes) != null) { Gbl.errorMsg("Route id=" + routeid + " already exists!"); }
@@ -173,7 +173,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		}
 		System.out.println("      => # routes: " + this.routes.size());
 	}
-	
+
 	private final void analysis(IdI routeid, ArrayList<Node> route) {
 		double length = 0.0;
 		double rise_av = 0.0;
@@ -207,11 +207,11 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 			Link link = null;
 			for (Link l : from.getOutLinks().values()) { if (l.getToNode().getId().equals(to.getId())) { link = l; } }
 			if (link == null) { Gbl.errorMsg("Something is wrong!"); }
-			Double[] atts = link_atts.get(link.getId());
+			Double[] atts = this.link_atts.get(link.getId());
 
 			length += atts[LAENGE];
-			
-			double gradient = node_heights.get(to.getId())-node_heights.get(from.getId());
+
+			double gradient = this.node_heights.get(to.getId())-this.node_heights.get(from.getId());
 			if (gradient > 0.0) {
 				rise_av += gradient;
 				if (gradient/atts[LAENGE] > rise_max) { rise_max = gradient/atts[LAENGE]; }
@@ -225,18 +225,18 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 				if (gradient/atts[LAENGE] < fall_min) { fall_min = gradient/atts[LAENGE]; }
 				deepness += gradient;
 			}
-			
+
 			dtvkat_av += atts[DTVKAT]*atts[LAENGE];
 			if (atts[DTVKAT] > dtvkat_max) { dtvkat_max = atts[DTVKAT]; }
 			if (atts[DTVKAT] < dtvkat_min) { dtvkat_min = atts[DTVKAT]; }
-			
+
 			if (atts[DTVKAT] == 1.0) { dtvkat1_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 2.0) { dtvkat2_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 3.0) { dtvkat3_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 4.0) { dtvkat4_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 5.0) { dtvkat5_frac += atts[LAENGE]; }
 			else { Gbl.errorMsg("dtvkat=" + atts[DTVKAT] + " not allowed!"); }
-			
+
 			natbel_av += atts[NATBEL]* atts[LAENGE];
 			vweg_av += atts[VWEG]* atts[LAENGE];
 			vwegem_av += atts[VWEGEM]* atts[LAENGE];
@@ -259,14 +259,14 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		dtvkat3_frac /= length;
 		dtvkat4_frac /= length;
 		dtvkat5_frac /= length;
-		
+
 		natbel_av /= length;
 		vweg_av /= length;
 		vwegem_av /= length;
 		parkw_av /= length;
 		bridge_av /= length;
 		tunnel_av /= length;
-		
+
 		System.out.print(routeid + "\t");
 		System.out.print(formatter.format(length) + "\t");
 		System.out.print(formatter.format(rise_av) + "\t");
@@ -297,7 +297,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		System.out.print(formatter.format(tunnel_nofl) + "\t");
 		System.out.print(formatter.format(ampel_nofl) + "\n");
 	}
-	
+
 	private final void analysis(NetworkLayer network) {
 		double length = 0.0;
 		double rise_av = 0.0;
@@ -328,9 +328,9 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		for (Link link : network.getLinks().values()) {
 			Node from = link.getFromNode();
 			Node to = link.getToNode();
-			Double[] atts = link_atts.get(link.getId());
+			Double[] atts = this.link_atts.get(link.getId());
 			length += atts[LAENGE];
-			double gradient = node_heights.get(to.getId())-node_heights.get(from.getId());
+			double gradient = this.node_heights.get(to.getId())-this.node_heights.get(from.getId());
 			if (gradient > 0.0) {
 				rise_av += gradient;
 				if (gradient/atts[LAENGE] > rise_max) { rise_max = gradient/atts[LAENGE]; }
@@ -347,14 +347,14 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 			dtvkat_av += atts[DTVKAT]*atts[LAENGE];
 			if (atts[DTVKAT] > dtvkat_max) { dtvkat_max = atts[DTVKAT]; }
 			if (atts[DTVKAT] < dtvkat_min) { dtvkat_min = atts[DTVKAT]; }
-			
+
 			if (atts[DTVKAT] == 1.0) { dtvkat1_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 2.0) { dtvkat2_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 3.0) { dtvkat3_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 4.0) { dtvkat4_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 5.0) { dtvkat5_frac += atts[LAENGE]; }
 			else { Gbl.errorMsg("dtvkat=" + atts[DTVKAT] + " not allowed!"); }
-			
+
 			natbel_av += atts[NATBEL]* atts[LAENGE];
 			vweg_av += atts[VWEG]* atts[LAENGE];
 			vwegem_av += atts[VWEGEM]* atts[LAENGE];
@@ -377,14 +377,14 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		dtvkat3_frac /= length;
 		dtvkat4_frac /= length;
 		dtvkat5_frac /= length;
-		
+
 		natbel_av /= length;
 		vweg_av /= length;
 		vwegem_av /= length;
 		parkw_av /= length;
 		bridge_av /= length;
 		tunnel_av /= length;
-		
+
 		System.out.print(formatter.format(length) + "\t");
 		System.out.print(formatter.format(rise_av) + "\t");
 		System.out.print(formatter.format(rise_min) + "\t");
@@ -414,11 +414,11 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		System.out.print(formatter.format(tunnel_nofl) + "\t");
 		System.out.print(formatter.format(ampel_nofl) + "\n");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final void writeData(String outfile) {
 		try {
 			FileWriter fw = new FileWriter(outfile);
@@ -444,15 +444,15 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		System.out.println("      reading in heights of the nodes...");
 		this.readNodeHeight("input/strassenknoten_mit_hoehe.txt",network);
 		System.out.println("      done.");
-		
+
 		System.out.println("      reading in atts of the links...");
 		this.readLinkAtts("input/strassennetz.txt",network);
 		System.out.println("      done.");
-		
+
 		System.out.println("      reading in route sets...");
 		this.readRoutes("input/routeset.txt",network);
 		System.out.println("      done.");
-		
+
 		System.out.println("      analysing routes...");
 		System.out.print("route_id\t");
 		System.out.print("length\t");

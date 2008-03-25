@@ -39,7 +39,7 @@ public class NetworkReducer extends NetworkAlgorithm {
 	int nOfLinks = -1;
 
 	public NetworkReducer(double xCenter, double yCenter, int nOfLinks) {
-		startCoord = new Coord(xCenter, yCenter);
+		this.startCoord = new Coord(xCenter, yCenter);
 		this.nOfLinks = nOfLinks;
 	}
 
@@ -47,7 +47,7 @@ public class NetworkReducer extends NetworkAlgorithm {
 		double dist = Double.MAX_VALUE;
 		Node startNode = null;
 		for (Node n : network.getNodes().values()) {
-			double d = n.getCoord().calcDistance(startCoord);
+			double d = n.getCoord().calcDistance(this.startCoord);
 			if (d < dist) {
 				dist = d;
 				startNode = n;
@@ -85,7 +85,7 @@ public class NetworkReducer extends NetworkAlgorithm {
 
 		int linkCount = 0;
 
-		while (pendingNodes.isEmpty() == false && linkCount < nOfLinks) {
+		while ((pendingNodes.isEmpty() == false) && (linkCount < this.nOfLinks)) {
 			Node node = pendingNodes.remove(0);
 			linkCount = processLinks(node.getOutLinks().values(), roleIndex, linkCount, pendingNodes);
 			linkCount = processLinks(node.getInLinks().values(), roleIndex, linkCount, pendingNodes);
@@ -94,7 +94,7 @@ public class NetworkReducer extends NetworkAlgorithm {
 
 	private int processLinks(Collection<? extends Link> links, int roleIndex, int linkCount, ArrayList<Node> pendingNodes) {
 		Iterator<? extends Link> iter = links.iterator();
-		while (iter.hasNext() && linkCount < nOfLinks) {
+		while (iter.hasNext() && (linkCount < this.nOfLinks)) {
 			Link l = iter.next();
 			Node n = l.getToNode();
 			NetworkReducerRole r = getRole(n, roleIndex);
@@ -161,7 +161,7 @@ public class NetworkReducer extends NetworkAlgorithm {
 		 * @return the isInResultingNetwork
 		 */
 		public boolean isInResultingNetwork() {
-			return isInResultingNetwork;
+			return this.isInResultingNetwork;
 		}
 
 		/**

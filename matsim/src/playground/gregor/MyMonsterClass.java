@@ -68,6 +68,7 @@ import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.writer.MatsimWriter;
 
@@ -113,7 +114,7 @@ public class MyMonsterClass {
 		try {
 			BufferedReader file = IOUtils.getBufferedReader(asciiNode);
 			String line = file.readLine();
-			if (line.charAt(0) >= '0' && line.charAt(0) <= '9') {
+			if ((line.charAt(0) >= '0') && (line.charAt(0) <= '9')) {
 				/* The line starts with a number, so assume it's an event and parse it.
 				 * Otherwise it is likely the header.  */
 				parseNode(line,network);
@@ -134,7 +135,7 @@ public class MyMonsterClass {
 		try {
 			BufferedReader file = IOUtils.getBufferedReader(asciiNet);
 			String line = file.readLine();
-			if (line.charAt(0) >= '0' && line.charAt(0) <= '9') {
+			if ((line.charAt(0) >= '0') && (line.charAt(0) <= '9')) {
 				/* The line starts with a number, so assume it's an event and parse it.
 				 * Otherwise it is likely the header.  */
 				parseLink(line,network,id);
@@ -319,7 +320,7 @@ public class MyMonsterClass {
 			}
 
 
-			BasicAct nact = new Act("w",act.getLink().getCenter().getX(),act.getLink().getCenter().getY(),(Link)(act.getLink()),0,39600,39600,true);
+			BasicAct nact = new Act("w",((Location)act.getLink()).getCenter().getX(),((Location)act.getLink()).getCenter().getY(),(Link)(act.getLink()),0,39600,39600,true);
 			Plan plan = new Plan(nperson);
 			plan.addAct(nact);
 			nperson.addPlan(plan);
@@ -803,8 +804,8 @@ int three=0;
 		QueueNetworkLayer new_network = new QueueNetworkLayer();
 
 		for (QueueNode node : network.getNodes().values()) {
-			if (node.getCoord().getX() <= maxX && node.getCoord().getX() >= minX )
-				if (node.getCoord().getY() <= maxY && node.getCoord().getY() >= minY )
+			if ((node.getCoord().getX() <= maxX) && (node.getCoord().getX() >= minX) )
+				if ((node.getCoord().getY() <= maxY) && (node.getCoord().getY() >= minY) )
 					new_network.createNode(node.getId().toString(), Double.toString(node.getCoord().getX()), Double.toString(node.getCoord().getY()), node.getType());
 		}
 
@@ -812,10 +813,10 @@ int three=0;
 		for (QueueLink link : network.getLinks().values()) {
 			Coord from = link.getFromNode().getCoord();
 			Coord to = link.getToNode().getCoord();
-			if (from.getX() <= maxX && (from.getX() >= minX)) {
-				if (from.getY() <= maxY && (from.getY() >= minY)) {
-					if (to.getX() <= maxX && (to.getX() >= minX)) {
-						if (to.getY() <= maxY && (to.getY() >= minY)) {
+			if ((from.getX() <= maxX) && (from.getX() >= minX)) {
+				if ((from.getY() <= maxY) && (from.getY() >= minY)) {
+					if ((to.getX() <= maxX) && (to.getX() >= minX)) {
+						if ((to.getY() <= maxY) && (to.getY() >= minY)) {
 
 							new_network.createLink(link.getId().toString(),
 									link.getFromNode().getId().toString(), link

@@ -291,8 +291,8 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 				PtNode node = (PtNode) link.getToNode();
 				int linktime = link.getDynTTime(actNode.actTime);
 
-				if (node.dijkstraCounter != this.dijkstraCounter
-						|| node.actCost > (actNode.actCost + linktime + (link.cost* this.CHANGE_COST_MULTIPLIER))) {
+				if ((node.dijkstraCounter != this.dijkstraCounter)
+						|| (node.actCost > (actNode.actCost + linktime + (link.cost* this.CHANGE_COST_MULTIPLIER)))) {
 					/* If the node has a different dijkstraCounter, that means we did not
 					 * yet expand this node in this call to dijkstra, so expand it.
 					 * Otherwise, if the counters are the same, then compare the actCost
@@ -323,8 +323,8 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 				PtNode node = (PtNode) link.getToNode();
 				int linktime = link.getDynTTime(actNode.actTime);
 
-				if (node.dijkstraCounter != this.dijkstraCounter
-						|| node.actCost > (actNode.actCost + linktime + (link.cost* this.CHANGE_COST_MULTIPLIER))) {
+				if ((node.dijkstraCounter != this.dijkstraCounter)
+						|| (node.actCost > (actNode.actCost + linktime + (link.cost* this.CHANGE_COST_MULTIPLIER)))) {
 					/* If the node has a different dijkstraCounter, that means we did not
 					 * yet expand this node in this call to dijkstra, so expand it.
 					 * Otherwise, if the counters are the same, then compare the actCost
@@ -483,7 +483,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 			ArrayList<Node> routeNodes = route.getRoute();
 			for(int i=0; i<(routeNodes.size()-1);i++){
 				for(Iterator<? extends Link> it = routeNodes.get(i).getOutLinks().values().iterator();it.hasNext();){
-					Link link = (Link)it.next();
+					Link link = it.next();
 					if(link.getToNode().equals(routeNodes.get(i+1))){
 						link.setLanes(5);
 					}
@@ -551,7 +551,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 
 	private static class PtNodeCostComparator implements Comparator<PtNode>, Serializable {
 		private static final long serialVersionUID = 1L;
-		
+
 		public PtNodeCostComparator() {
 		}
 

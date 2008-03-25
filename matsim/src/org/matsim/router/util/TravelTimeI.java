@@ -25,18 +25,18 @@ import org.matsim.network.Link;
 
 /**
  * A simple interface to retrieve the travel time on links.
- * 
+ *
  * @author mrieser
  */
 public interface TravelTimeI {
 
 	/**
 	 * Returns the travel time for the specified link at the specified time.
-	 * 
+	 *
 	 * @param link The link for which the travel time is calculated.
-	 * @param time The departure time (in seconds since 00:00) at the beginning 
+	 * @param time The departure time (in seconds since 00:00) at the beginning
 	 * 		of the link for which the travel time is calculated.
-	 * @return The time (in seconds) needed to travel over the link 
+	 * @return The time (in seconds) needed to travel over the link
 	 * 		<code>link</code>, departing at time <code>time</code>.
 	 */
 	public double getLinkTravelTime(Link link, double time);

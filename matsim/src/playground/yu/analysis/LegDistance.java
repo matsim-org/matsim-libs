@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -43,7 +43,7 @@ import org.matsim.utils.misc.Time;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class LegDistance implements EventHandlerLinkEnterI,
 		EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
@@ -62,18 +62,18 @@ public class LegDistance implements EventHandlerLinkEnterI,
 
 	private int getBinIndex(final double time) {
 		int bin = (int) (time / this.binSize);
-		if (bin >= legDistances.length) {
-			return legDistances.length - 1;
+		if (bin >= this.legDistances.length) {
+			return this.legDistances.length - 1;
 		}
 		return bin;
 	}
 
 	protected void handleEventIntern(AgentEvent ae) {
 		int binIdx = getBinIndex(ae.time);
-		Double distance = distances.remove(ae.agentId);
+		Double distance = this.distances.remove(ae.agentId);
 		if (distance != null) {
-			legDistances[binIdx] += distance;
-			legCount[binIdx]++;
+			this.legDistances[binIdx] += distance;
+			this.legCount[binIdx]++;
 		}
 	}
 
@@ -89,8 +89,8 @@ public class LegDistance implements EventHandlerLinkEnterI,
 			NetworkLayer network) {
 		this.network = network;
 		this.binSize = binSize;
-		legDistances = new double[nofBins + 1];
-		legCount = new int[nofBins + 1];
+		this.legDistances = new double[nofBins + 1];
+		this.legCount = new int[nofBins + 1];
 	}
 
 	public LegDistance(final int binSize, NetworkLayer network) {
@@ -99,9 +99,9 @@ public class LegDistance implements EventHandlerLinkEnterI,
 
 	public void handleEvent(EventLinkEnter event) {
 		String linkId = event.linkId;
-		Link l = network.getLink(linkId);
+		Link l = this.network.getLink(linkId);
 		String agentId = event.agentId;
-		Double distance = distances.get(agentId);
+		Double distance = this.distances.get(agentId);
 		if (distance == null) {
 			distance = new Double(0.0);
 		}
@@ -111,7 +111,7 @@ public class LegDistance implements EventHandlerLinkEnterI,
 			System.err.println("link with ID: \"" + linkId
 					+ "\" doesn't exist in this network!");
 		}
-		distances.put(agentId, distance);
+		this.distances.put(agentId, distance);
 	}
 
 	public void handleEvent(EventAgentArrival event) {
@@ -141,17 +141,17 @@ public class LegDistance implements EventHandlerLinkEnterI,
 			bw
 					.write("time\ttimeBin\tlegistances [m]\tn._Legs\tavg. legDistance [m]\n");
 
-			for (int i = 0; i < legDistances.length; i++) {
-				bw.write(Time.writeTime(i * binSize) + "\t" + i * this.binSize
-						+ "\t" + legDistances[i] + "\t" + legCount[i] + "\t"
-						+ legDistances[i] / (double) legCount[i] + "\n");
+			for (int i = 0; i < this.legDistances.length; i++) {
+				bw.write(Time.writeTime(i * this.binSize) + "\t" + i * this.binSize
+						+ "\t" + this.legDistances[i] + "\t" + this.legCount[i] + "\t"
+						+ this.legDistances[i] / this.legCount[i] + "\n");
 			}
 			bw.write("----------------------------------------\n");
 			double legDistSum = 0.0;
 			int nLegs = 0;
-			for (int i = 0; i < legDistances.length; i++) {
-				legDistSum += legDistances[i];
-				nLegs += legCount[i];
+			for (int i = 0; i < this.legDistances.length; i++) {
+				legDistSum += this.legDistances[i];
+				nLegs += this.legCount[i];
 			}
 			bw.write("the sum of all the legDistances [m]: " + legDistSum
 					+ "\n" + "the number of all the Legs: " + nLegs + "\n");
@@ -161,28 +161,28 @@ public class LegDistance implements EventHandlerLinkEnterI,
 	}
 
 	public void reset(int iteration) {
-		distances.clear();
+		this.distances.clear();
 	}
 
 	public void writeCharts(final String filename) {
-		int xsLength = legDistances.length + 1;
+		int xsLength = this.legDistances.length + 1;
 		double[] xs = new double[xsLength];
 		for (int i = 0; i < xsLength; i++) {
-			xs[i] = ((double) i) * (double) binSize / 3600.0;
+			xs[i] = ((double) i) * (double) this.binSize / 3600.0;
 		}
 		XYLineChart legDistanceSumChart = new XYLineChart("legDistances",
 				"time", "sum of legDistances [m]");
 		legDistanceSumChart.addSeries("sum of legDistances of all agents", xs,
-				legDistances);
+				this.legDistances);
 		legDistanceSumChart.saveAsPng(filename + "Sum.png", 1024, 768);
 		for (int i = 0; i < xsLength - 1; i++) {
-			legDistances[i] = (legCount[i] == 0) ? 0.0 : legDistances[i]
-					/ (double) legCount[i];
+			this.legDistances[i] = (this.legCount[i] == 0) ? 0.0 : this.legDistances[i]
+					/ this.legCount[i];
 		}
 		XYLineChart avgLegDistanceChart = new XYLineChart(
 				"average LegDistance", "time", "average legDistances [m]");
 		avgLegDistanceChart.addSeries("average legDistance of all agents", xs,
-				legDistances);
+				this.legDistances);
 		avgLegDistanceChart.saveAsPng(filename + "Avg.png", 1024, 768);
 	}
 }

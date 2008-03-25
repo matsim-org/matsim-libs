@@ -308,10 +308,10 @@ public class Dijkstra implements LeastCostPathCalculator {
 				 * OR it is in the same dead end as the fromNode
 				 * OR it is in the same dead end as the toNode
 				 * THEN we add the current node to the pending nodes */
-				if (ddData.getDeadEndEntryNode() == null
-						|| ddOutData.getDeadEndEntryNode() != null
-						|| (this.deadEndEntryNode != null
-								&& this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId())) {
+				if ((ddData.getDeadEndEntryNode() == null)
+						|| (ddOutData.getDeadEndEntryNode() != null)
+						|| ((this.deadEndEntryNode != null)
+								&& (this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId()))) {
 					addToPendingNodes(l, n, pendingNodes, currTime, currCost, outNode, toNode);
 				}
 			}

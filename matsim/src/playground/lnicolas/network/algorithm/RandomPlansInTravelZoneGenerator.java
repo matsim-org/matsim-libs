@@ -147,9 +147,9 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 		double maxDist = this.nodeDist * 1.1;
 		for (Node toNode : nodes) {
 			double dist = n.getCoord().calcDistance(toNode.getCoord());
-			if (dist >= minDist && dist <= maxDist) {
+			if ((dist >= minDist) && (dist <= maxDist)) {
 				PlansGeneratorRole r = getRole(n, roleIndex);
-				if (r.planExists(toNode) == false && toNode.getInLinks().size() > 0) {
+				if ((r.planExists(toNode) == false) && (toNode.getInLinks().size() > 0)) {
 					r.addToNode(toNode);
 					return toNode;
 				}

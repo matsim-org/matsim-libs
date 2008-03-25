@@ -54,7 +54,7 @@ public class ItsumoSim extends ExternalMobsim {
 	public void run() {
 		// ONLY reason why this needs to be overridden is because of the different events file name !!
 		// Since it new exists, writeItsumoConfig is different from writeConfig.
-		
+
 		String iterationPlansFile = Controler.getIterationFilename(this.plansFileName);
 //		String iterationEventsFile = Controler.getIterationFilename(this.eventsFileName);
 		String iterationEventsFile = "./drivers.txt" ;
@@ -73,7 +73,7 @@ public class ItsumoSim extends ExternalMobsim {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void writeItsumoConfig(String outFileName ) throws FileNotFoundException, IOException {
 		System.out.println("writing config AND plans into config file for itsumo mobsim at " + (new Date()));
 
@@ -81,7 +81,7 @@ public class ItsumoSim extends ExternalMobsim {
 		try {
 			out = IOUtils.getBufferedWriter( outFileName ) ;
 
-			// aneumann				
+			// aneumann
 			out.write("<config>"); out.newLine();
 			out.write(" <file>" + Gbl.getConfig().getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile") + "</file>"); out.newLine();
 			out.write(" <steps>3600</steps>"); out.newLine();
@@ -112,7 +112,7 @@ public class ItsumoSim extends ExternalMobsim {
 				Plan plan = person.getSelectedPlan();
 				if ( plan==null ) {
 					continue ;
-				}		    
+				}
 
 				out.write("   <routes>"); out.newLine();
 
@@ -141,7 +141,7 @@ public class ItsumoSim extends ExternalMobsim {
 							out.write("    <route>"); out.newLine();
 							out.write("     <laneset>" + links[ii].getId() + "</laneset>"); out.newLine();
 							out.write("    </route>"); out.newLine();
-						}					
+						}
 					}
 				}
 				out.write("   </routes>"); out.newLine();
@@ -151,20 +151,20 @@ public class ItsumoSim extends ExternalMobsim {
 			out.write(" </drivers>"); out.newLine();
 
 			out.write(" <sensors>"); out.newLine();
-			
+
 			out.write("  <sensor>"); out.newLine();
 			out.write("   <name>total_stopped_cars_in_network</name>"); out.newLine();
 			out.write("   <file>" + Controler.getIterationPath() + "/" + Controler.getIteration() + ".itsumo.total_stopped_cars_in_network.log</file>"); out.newLine();
-			out.write("   <state>OFF</state>"); out.newLine(); 
-			out.write("  </sensor>"); out.newLine();   
+			out.write("   <state>OFF</state>"); out.newLine();
+			out.write("  </sensor>"); out.newLine();
 
 			out.write("  <sensor>"); out.newLine();
 			out.write("   <name>stopped_cars_in_lanesets</name>"); out.newLine();
 			out.write("   <file>" + Controler.getIterationPath() + "/" + Controler.getIteration() + ".itsumo.stopped_cars_in_lanesets.log</file>"); out.newLine();
-			out.write("   <state>OFF</state>"); out.newLine(); 
+			out.write("   <state>OFF</state>"); out.newLine();
 			out.write("  </sensor>"); out.newLine();
 
-			out.write(" </sensors>"); out.newLine();		
+			out.write(" </sensors>"); out.newLine();
 
 			out.write("</config>"); out.newLine();
 			out.flush();

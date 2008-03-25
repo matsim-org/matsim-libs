@@ -35,10 +35,10 @@ import org.matsim.utils.identifiers.IdI;
  * the center coordinate.<br>
  * Note, that the area of the zone does not have to be the area of the rectangle. It just need
  * to be greater or equal than zero.
- * @see Location
+ * @see AbstractLocation
  * @author Michael Balmer
  */
-public class Zone extends Location {
+public class Zone extends AbstractLocation {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -104,7 +104,7 @@ public class Zone extends Location {
 	 * </p>
 	 *
 	 * @param coord
-	 * @see org.matsim.world.Location#calcDistance(org.matsim.utils.geometry.CoordI)
+	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.utils.geometry.CoordI)
 	 * @return distance to that zone
 	 */
 	@Override

@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 
 import playground.marcel.filters.filter.finalFilters.FinalEventFilterA;
@@ -55,7 +55,7 @@ public class PrintStreamLinkATT extends PrintStreamATTA {
 	@Override
 	public void printRow(String linkID) throws IOException {
 		try {
-			Link link = (Link) network.getLocation(linkID);
+			LinkImpl link = (LinkImpl) network.getLocation(linkID);
 			if (link == null)
 				return;
 			out.writeBytes(link.getOrigId() + SPRT + link.getFromNode().getId()

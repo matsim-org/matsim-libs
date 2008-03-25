@@ -41,7 +41,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 
 	/**
 	 * Tests that the default value is respected.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	public void testMutationRangeDefault() {
@@ -52,46 +52,46 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 
 	/**
 	 * Tests that the mutation range set in the configuration file is respected.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	public void testMutationRangeConfig() {
 		Config config = loadConfig(null);
 		config.global().setNumberOfThreads(0);
-		
+
 		// test smaller value than default
 		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "900");
 		runMutationRangeTest(new TimeAllocationMutator(), 900);
-		
+
 		// test bigger value than default
 		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
 		runMutationRangeTest(new TimeAllocationMutator(), 2700);
 	}
-	
+
 	/**
 	 * Tests that the mutation range given in the constructor is respected.
-	 * 
+	 *
 	 * @author mrieser
 	 */
 	public void testMutationRangeParam() {
 		Config config = loadConfig(null);
 		config.global().setNumberOfThreads(0);
-		
+
 		// test smaller value than default
 		runMutationRangeTest(new TimeAllocationMutator(750), 750);
-		
+
 		// test bigger value than default
 		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
 		runMutationRangeTest(new TimeAllocationMutator(7200), 7200);
 	}
-	
+
 	/**
 	 * Internal helper method to run the real test, but with different setups.
 	 * Basically, it creates one plan and calls the given TimeAllocationMutator
 	 * several times with this plans, each time measuring how much the activity
 	 * durations have changed and thus ensuring, the differences are within the
 	 * expected range.
-	 * 
+	 *
 	 * @param mutator A preset TimeAllocationMutator to be used for the tests.
 	 * @param expectedMutationRange The expected range for mutation.
 	 */
@@ -107,13 +107,13 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		network.createLink("1", "2", "3", "100", "5", "100", "1", null, null);
 		network.createLink("2", "3", "4", "100", "5", "100", "1", null, null);
 		Gbl.getWorld().setNetworkLayer(network);
-		
+
 		// setup person
 		Plan plan;
 		Act act1, act2;
 		try {
 			/* The chosen times for the activity durations are such that it is likely
-			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00). 
+			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
 			Person person = new Person("1", "m", "45", "yes", "yes", "yes");
 			plan = person.createPlan(null, "yes");
@@ -125,7 +125,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		// setup mutator
 		mutator.init();
 
@@ -161,7 +161,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		assertValueInRange("mutation range out of range (maxDiff2).", maxDiff1, expectedMutationRange*0.95, expectedMutationRange);
 		assertValueInRange("mutation range out of range (minDiff2).", minDiff2, -expectedMutationRange, -expectedMutationRange*0.95);
 	}
-	
+
 	private static void assertValueInRange(final String message, final double actual, final double lowerLimit, final double upperLimit) {
 		assertTrue(message + " actual: " + actual + ", range: " + lowerLimit + "..." + upperLimit, (lowerLimit <= actual) && (actual <= upperLimit));
 	}

@@ -25,14 +25,14 @@ import org.matsim.network.Link;
 
 /**
  * A simple interface to retrieve the generalized costs to travel on links.
- * 
+ *
  * @author mrieser
  */
 public interface TravelCostI {
 
 	/**
 	 * Returns the generalized cost to travel on the specified link at the specified time.
-	 * 
+	 *
 	 * @param link The link for which the travel cost is calculated.
 	 * @param time The departure time (in seconds since 00:00) at the beginning of the link for which the cost is calculated.
 	 * @return The costs to travel over the link <code>link</code>, departing at time <code>time</code>.

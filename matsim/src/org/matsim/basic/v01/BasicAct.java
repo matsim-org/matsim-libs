@@ -20,6 +20,7 @@
 
 package org.matsim.basic.v01;
 
+import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.utils.misc.Time;
 
 public class BasicAct {
@@ -27,7 +28,7 @@ public class BasicAct {
 	// TODO: should be private but needs refactoring in derived classes
 	protected double endTime = Time.UNDEFINED_TIME;
 	protected String type;
-	protected BasicLink link = null;
+	protected BasicLinkI link = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// getter methods
@@ -41,7 +42,7 @@ public class BasicAct {
 		return this.type;
 	}
 
-	public BasicLink getLink() {
+	public BasicLinkI getLink() {
 		return this.link;
 	}
 
@@ -57,7 +58,7 @@ public class BasicAct {
 		this.type = type.intern();
 	}
 
-	public final void setLink(final BasicLink link) {
+	public final void setLink(final BasicLinkI link) {
 		this.link = link;
 	}
 

@@ -23,12 +23,12 @@ package org.matsim.facilities;
 import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.world.Location;
+import org.matsim.world.AbstractLocation;
 
-public class Facility extends Location {
+public class Facility extends AbstractLocation {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -83,10 +83,10 @@ public class Facility extends Location {
 		return this.activities.get(type);
 	}
 
-	public final Link getLink() {
+	public final LinkImpl getLink() {
 		if (this.down_mapping.isEmpty()) { return null; }
 		if (this.down_mapping.size() > 1) { Gbl.errorMsg("Something is wrong!!! A facility contains at most one Link (as specified for the moment)!"); }
-		return (Link)this.getDownMapping().get(this.down_mapping.firstKey());
+		return (LinkImpl)this.getDownMapping().get(this.down_mapping.firstKey());
 	}
 	
 	//////////////////////////////////////////////////////////////////////

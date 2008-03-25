@@ -25,7 +25,6 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -48,21 +47,21 @@ public class NetworkCreateLSA {
 	private final NetworkLayer network;
 	private final HashMap<Integer,Intersection> intersections = new HashMap<Integer, Intersection>();
 	private final HashMap<IdI,HashSet<LSA>> lsalinklist = new HashMap<IdI, HashSet<LSA>>();
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public NetworkCreateLSA(NetworkLayer network) {
 		this.network = network;
-		this.readIntersections(inputfolder+"Knoten.txt");
-		this.readLSAs(inputfolder+"LSAs.txt");
-		this.readLanes(inputfolder+"Spuren.txt");
-		this.readLaneLaneMapping(inputfolder+"Spur-Spur-Mapping.txt");
-		this.readLSALaneMapping(inputfolder+"LSA-Spur-Mapping.txt");
-		this.readLaneLinkMapping(inputfolder+"Spur-Link-Mapping.txt",5);
-		this.readLSAGreentimes(inputfolder+"gruen_10_15_09.txt");
-		this.writeData(outputfolder+"greetimes.xml");
+		this.readIntersections(this.inputfolder+"Knoten.txt");
+		this.readLSAs(this.inputfolder+"LSAs.txt");
+		this.readLanes(this.inputfolder+"Spuren.txt");
+		this.readLaneLaneMapping(this.inputfolder+"Spur-Spur-Mapping.txt");
+		this.readLSALaneMapping(this.inputfolder+"LSA-Spur-Mapping.txt");
+		this.readLaneLinkMapping(this.inputfolder+"Spur-Link-Mapping.txt",5);
+		this.readLSAGreentimes(this.inputfolder+"gruen_10_15_09.txt");
+		this.writeData(this.outputfolder+"greetimes.xml");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -95,7 +94,7 @@ public class NetworkCreateLSA {
 		}
 		System.out.println("  " + this.intersections.size() + " intersections read and stored.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	public final void readLSAs(String inputfile) {
@@ -127,7 +126,7 @@ public class NetworkCreateLSA {
 		}
 		System.out.println("  " + lsa_cnt + " LSA's read and assigned to the intersections.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	public final void readLanes(String inputfile) {
@@ -159,7 +158,7 @@ public class NetworkCreateLSA {
 		}
 		System.out.println("  " + l_cnt + " Lanes read and assigned to the intersections.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	public final void readLaneLaneMapping(String inputfile) {
@@ -195,7 +194,7 @@ public class NetworkCreateLSA {
 		}
 		System.out.println("  " + map_cnt + " fromlane-tolane mappings read and assigned to the fromlane.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	public final void readLSALaneMapping(String inputfile) {
@@ -232,7 +231,7 @@ public class NetworkCreateLSA {
 		}
 		System.out.println("  " + map_cnt + " LSA-lane mappings read and assigned to the LSA and to the lane.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	public final void readLaneLinkMapping(String inputfile, int net_idx) {
@@ -269,7 +268,7 @@ public class NetworkCreateLSA {
 					}
 					HashSet<LSA> lsas = this.lsalinklist.get(linkid);
 					lsas.addAll(l.lsas.values());
-					
+
 					map_cnt++;
 				}
 				else {
@@ -283,7 +282,7 @@ public class NetworkCreateLSA {
 		}
 		System.out.println("  " + map_cnt + " lane-link mappings read and assigned to the lane. (" + ignored + " entries ignored)");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	public final void readLSAGreentimes(String inputfile) {
@@ -304,7 +303,7 @@ public class NetworkCreateLSA {
 				// example:   S1 1 0        -1       0     0     0    -1 31.08.07 22:00:40     0     0     0     0     0     0     0     0     0          0          0          0
 				// example:   S2 1 0        -1       0     0     2    -1 01.09.07 00:02:08   460    80   590   550   130   680  1010   340    80     211599      40200     810500
 				// index:   0 1  2 3         4       5     6     7    8  9        10         11     12   13    14    15    16   17     18     19     20          21        22
-				
+
 				if (entries[0].trim().equals("")) {
 					// data line
 					int valid = Integer.parseInt(entries[4].trim());
@@ -340,11 +339,11 @@ public class NetworkCreateLSA {
 			Gbl.errorMsg(e);
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public final void writeData(String outfile) {
 		try {
 			FileWriter fw = new FileWriter(outfile);

@@ -51,7 +51,7 @@ public abstract class Layer {
 	protected MappingRule up_rule = null; // to aggregate
 	protected MappingRule down_rule = null; // to disaggregate
 
-	protected final TreeMap<IdI,Location> locations = new TreeMap<IdI,Location>();
+	protected final TreeMap<IdI, Location> locations = new TreeMap<IdI,Location>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors

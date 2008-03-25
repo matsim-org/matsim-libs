@@ -34,13 +34,13 @@ import playground.fabrice.secondloc.CoolPlace;
 public class SocEveGenerator_ActualPlans implements SocialEventGeneratorI {
 
 	HashMap<Link,CoolPlace> link2cool;
-	
+
 	public SocEveGenerator_ActualPlans( HashMap<Link,CoolPlace> link2cool ){
-			
+
 		this.link2cool = link2cool;
 
 	}
-	
+
 	public Collection<SocialEvent> generate(Plans plans) {
 		// This generator generates SocialEvents *only*
 		// based on the actual Plans of individuals
@@ -52,10 +52,10 @@ public class SocEveGenerator_ActualPlans implements SocialEventGeneratorI {
 			Plan plan = person.getSelectedPlan();
 			ActIterator it = plan.getIteratorAct();
 			while( it.hasNext() ){
-				
+
 				Link link = (Link) it.next().getLink();
-				CoolPlace place = link2cool.get( link );
-		
+				CoolPlace place = this.link2cool.get( link );
+
 				if( place == null )
 					continue;
 				SocialEvent event = events.get(place);
@@ -64,7 +64,7 @@ public class SocEveGenerator_ActualPlans implements SocialEventGeneratorI {
 					events.put( place,	event );
 				}
 				event.addAttendee(person);
-			
+
 			}
 		}
 		return events.values();

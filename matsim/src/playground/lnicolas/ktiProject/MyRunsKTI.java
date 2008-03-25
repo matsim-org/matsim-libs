@@ -57,6 +57,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.world.AbstractLocation;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
@@ -331,7 +332,7 @@ public class MyRunsKTI extends MyRuns {
 			 * we do not have to perform this costly computation again after having read in the
 			 * population.
 			 */
-			ArrayList<Location> primActLocs =
+			ArrayList<AbstractLocation> primActLocs =
 				commuterGen.getPrimaryActLocations();
 			for (int i = 0; i < primActLocs.size(); i++) {
 				if (primActLocs.get(i) != null) {

@@ -94,7 +94,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 //	private static final String PIDCONTROLER = "PIDControler";
 
 	private static final String CONTROLINPUTSIMPLESB = "ControlInputImplSB";
-	
+
 	private static final String CONTROLINPUT1 = "ControlInputImpl1";
 
 	private static final String CONTROLINPUTSBNOISE = "ControlInputImplSBNoise";
@@ -104,9 +104,9 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	private static final String CONTROLINPUTDACCIDENT = "ControlInputImplDAccident";
 
 	private static final String CONTROLINPUTALL = "ControlInputImplAll";
-	
+
 	private static final String CONTROLINPUTSB = "ControlInputSB";
-	
+
 	private static final String CONTROLINPUTSTATICADDITION = "ControlInputImplStaticAddition";
 
 	private static final String CONTROLINPUTMB = "ControlInputMB";

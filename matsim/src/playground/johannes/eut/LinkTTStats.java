@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.router.util.TravelTimeI;
 
 /**
@@ -61,7 +61,7 @@ public class LinkTTStats {
 				 * I think, there is no reason why TravelTimeI should not work
 				 * with BasicLinkI!
 				 */
-				double tt = travelTimes.getLinkTravelTime((Link) link, t);
+				double tt = travelTimes.getLinkTravelTime((LinkImpl) link, t);
 				sum += tt;
 				min = Math.min(tt, min);
 				max = Math.max(tt, max);
@@ -70,7 +70,7 @@ public class LinkTTStats {
 			double avr = sum/(double)samples;
 			sum = 0;
 			for(int t = start; t < end; t += binsize) {
-				double tt = travelTimes.getLinkTravelTime((Link) link, t);
+				double tt = travelTimes.getLinkTravelTime((LinkImpl) link, t);
 				sum += Math.pow(tt - avr, 2);
 			}
 

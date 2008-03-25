@@ -46,13 +46,13 @@ import playground.gregor.vis.LinkPainter;
 
 /**
  * HCLogit is a C-Logit based router with  heuristical choice set generation algorithm.
- * HCLogit works like DCLogit (Russo, F. and Vitetta A.: An assignment model with modified Logit, 
+ * HCLogit works like DCLogit (Russo, F. and Vitetta A.: An assignment model with modified Logit,
  * which obviates enumeration and overlapping problems, Transportation 30: 177-205, 2003) but with a
  * different choice set generation procedure. HCLogit explores the graph like Dijkstra's algorithm but, contrary
  * to Dijkstra, HCLogit excepts a node repeatedly if and only if:
- * The more expensive path to that node is not too expensive AND The more expensive path is dissimilar 
- * to the less expensive one. The similarity is calculated by the (geometric) trace of a path.  
- * 
+ * The more expensive path to that node is not too expensive AND The more expensive path is dissimilar
+ * to the less expensive one. The similarity is calculated by the (geometric) trace of a path.
+ *
  * @author laemmel
  *
  */
@@ -108,15 +108,15 @@ public class HCLogit implements LeastCostPathCalculator {
 	int visitNodeCount = 0;
 
 	private BeelineDifferenceTracer tracer;
-	
-	
+
+
 	//TODO DEBUGGING STUFF
 	private  boolean debug = false;
 	protected DisplayNetStateWriter netStateWriter = null;
 	private int time;
 	int snapShotSlowDown = 50;
-	
-	
+
+
 	public HCLogit(NetworkLayer network, TravelCostI costFunction, TravelTimeI timeFunction){
 		this.network = network;
 		this.costFunction = costFunction;
@@ -124,11 +124,11 @@ public class HCLogit implements LeastCostPathCalculator {
 
 		this.nodeData = new HashMap<IdI, NodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.comparator = new ComparatorNodeData(this.nodeData);
-		
+
 		//TODO DEBUGGING STUFF
-		if (debug){
+		if (this.debug){
 			initSnapShotWriter();
-			this.time = 0;			
+			this.time = 0;
 		}
 	}
 
@@ -148,17 +148,17 @@ public class HCLogit implements LeastCostPathCalculator {
 
 		initFromNode(fromNode, toNode, startTime, pendingNodes);
 
-	
+
 		int count = 0;
-		
+
 		while (stillSearching) {
 			NodeData outNodeD = pendingNodes.poll();
 
 			//TODO DEBUG
-			if (count++ >= snapShotSlowDown) {
+			if (count++ >= this.snapShotSlowDown) {
 				try {
 					count = 0;
-					this.netStateWriter.dump(time++);
+					this.netStateWriter.dump(this.time++);
 //					if (time > 600){
 //			            try {
 //			                this.netStateWriter.close();
@@ -172,8 +172,8 @@ public class HCLogit implements LeastCostPathCalculator {
 					e.printStackTrace();
 				}
 			}
-			
-			
+
+
 
 			if (outNodeD == null) {
 				log.warn("No route was found from node " + fromNode.getId()
@@ -188,12 +188,12 @@ public class HCLogit implements LeastCostPathCalculator {
 			}
 
 		}
-		
+
 
 		//TODO DEBUG
-		if (debug){
+		if (this.debug){
 			try {
-				this.netStateWriter.dump(time++);
+				this.netStateWriter.dump(this.time++);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -201,7 +201,7 @@ public class HCLogit implements LeastCostPathCalculator {
 			((LinkPainter)this.netStateWriter).reset();
 			colorizeEfficientPaths(getData(toNode),getData(fromNode));
 				try {
-					this.netStateWriter.dump(time++);
+					this.netStateWriter.dump(this.time++);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -214,9 +214,9 @@ public class HCLogit implements LeastCostPathCalculator {
 		        e.printStackTrace();
 		    }
 		    this.netStateWriter = null;
-			
+
 		}
-		
+
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		NodeData tmpNode = getData(toNode);
 		double cost  = 0;
@@ -226,7 +226,7 @@ public class HCLogit implements LeastCostPathCalculator {
 
 		}
 		routeNodes.add(0, tmpNode.getMatsimNode()); // add the fromNode at the beginning of the list
-		
+
 		Route route = new Route();
 		route.setRoute(routeNodes, (int) (arrivalTime - startTime), cost);
 
@@ -239,7 +239,7 @@ public class HCLogit implements LeastCostPathCalculator {
 		}
 		return route;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// all the init stuff and helper methods starts here
 	//////////////////////////////////////////////////////////////////////
@@ -398,9 +398,9 @@ public class HCLogit implements LeastCostPathCalculator {
 					+ travelCost, fromNodeData,trace);
 
 			//TODO DEBUG
-			if (debug){
+			if (this.debug){
 				((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.3);
-				((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));				
+				((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
 			}
 
 
@@ -414,13 +414,13 @@ public class HCLogit implements LeastCostPathCalculator {
 					+ travelCost, fromNodeData,trace)) {
 
 			//TODO DEBUG
-			if (debug) {
+			if (this.debug) {
 				((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.5);
 				((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
 			}
 			} else {
 				//TODO DEBUG
-				if (debug){
+				if (this.debug){
 					System.err.println("doch passiert?");
 					((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.99);
 					((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()) + "  -  " + getString(travelCost+currCost));
@@ -433,13 +433,13 @@ public class HCLogit implements LeastCostPathCalculator {
 			//TODO do somthing ....
 			if (trackPath(toNodeData, pendingNodes, currTime + travelTime, currCost + travelCost, fromNodeData, trace, travelCost)){
 				//TODO DEBUG
-				if (debug){
+				if (this.debug){
 					((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.80);
 					((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getCurrShadow().getTrace()));
 				}
 			} else {
 				//TODO DEBUG
-				if (debug){
+				if (this.debug){
 					((LinkPainter)this.netStateWriter).setLinkColor(l.getId(), 0.10);
 					((LinkPainter)this.netStateWriter).setLinkMsg(l.getId(), getString(toNodeData.getTrace()));
 				}
@@ -512,7 +512,7 @@ public class HCLogit implements LeastCostPathCalculator {
 
 		for (NodeData backNode : toNodeData.getBackNodesData()){
 			NodeData shadowNode = new NodeData(toNodeData.getMatsimNode(),this.tracer);
-			shadowNode.visit(backNode, toNodeData.getCost(), toNodeData.getTime(), iterationID, toNodeData.getTrace());
+			shadowNode.visit(backNode, toNodeData.getCost(), toNodeData.getTime(), this.iterationID, toNodeData.getTrace());
 			toNodeData.decoupleNode(backNode);
 			pendingNodes.add(shadowNode);
 		}
@@ -555,7 +555,7 @@ public class HCLogit implements LeastCostPathCalculator {
 
 		NodeData shadowNode = new NodeData(toNodeData.getMatsimNode(),this.tracer);
 
-		shadowNode.visit(fromNodeData, cost, time, iterationID, trace);
+		shadowNode.visit(fromNodeData, cost, time, this.iterationID, trace);
 		shadowNode.setSortCost(toNodeData.getCost());
 		if (!testShadowNode(shadowNode,toNodeData)) return false;
 		toNodeData.addShadowNode(shadowNode);
@@ -614,7 +614,7 @@ public class HCLogit implements LeastCostPathCalculator {
 		}
 		return true;
 	}
-	
+
 	//	TODO DEBUGGING STUFF
 	private void initSnapShotWriter() {
 

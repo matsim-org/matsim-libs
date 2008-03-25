@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -36,9 +36,9 @@ import org.matsim.network.NetworkLayer;
 
 /**
  * Calculates the average travel speed
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class CalcNetAvgSpeed implements EventHandlerLinkEnterI,
 		EventHandlerLinkLeaveI, EventHandlerAgentArrivalI {
@@ -57,47 +57,47 @@ public class CalcNetAvgSpeed implements EventHandlerLinkEnterI,
 
 	// --------------------------CONSTRUCTOR------------------
 	/**
-	 * 
+	 *
 	 */
 	public CalcNetAvgSpeed(final NetworkLayer network) {
 		this.network = network;
-		enterTimes = new TreeMap<String, Double>();
+		this.enterTimes = new TreeMap<String, Double>();
 	}
 
 	public void handleEvent(EventLinkEnter enter) {
 		// if (enter.agent.getSelectedPlan().getType().equals("car")) {
-		enterTimes.put(enter.agentId, enter.time);
+		this.enterTimes.put(enter.agentId, enter.time);
 		// }
 	}
 
 	public void reset(int iteration) {
-		enterTimes.clear();
-		lengthSum = 0;
-		timeSum = 0;
+		this.enterTimes.clear();
+		this.lengthSum = 0;
+		this.timeSum = 0;
 	}
 
 	public void handleEvent(EventLinkLeave leave) {
-		Double enterTime = enterTimes.get(leave.agentId);
+		Double enterTime = this.enterTimes.get(leave.agentId);
 		if (enterTime != null) {
 			Link l = leave.link;
 			if (l == null) {
-				l = network.getLink(leave.linkId);
+				l = this.network.getLink(leave.linkId);
 			}
 			if (l != null) {
-				lengthSum += l.getLength() / 1000.0;
-				timeSum += (leave.time - enterTime.doubleValue()) / 3600.0;
+				this.lengthSum += l.getLength() / 1000.0;
+				this.timeSum += (leave.time - enterTime.doubleValue()) / 3600.0;
 			}
 		}
 	}
 
 	public double getNetAvgSpeed() {
-		return ((timeSum != 0.0) ? lengthSum / timeSum : 0.0);
+		return ((this.timeSum != 0.0) ? this.lengthSum / this.timeSum : 0.0);
 	}
 
 	public void handleEvent(EventAgentArrival arrival) {
 		String id = arrival.agentId;
-		if (enterTimes.containsKey(id)) {
-			enterTimes.remove(id);
+		if (this.enterTimes.containsKey(id)) {
+			this.enterTimes.remove(id);
 		}
 	}
 }

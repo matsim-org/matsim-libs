@@ -32,7 +32,7 @@ import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Plan;
@@ -74,7 +74,7 @@ public class MentalMap {
 //	The activity score
 	private Hashtable<Activity, Double> activityScore = new Hashtable<Activity, Double>();
 
-//	Total maximum number of activities (locations + action) an agent can remember 
+//	Total maximum number of activities (locations + action) an agent can remember
 
 	private Knowledge knowledge = null;
 
@@ -109,7 +109,7 @@ public class MentalMap {
 
 			if(myAct.getRefId()==Integer.MIN_VALUE){
 				myAct.setRefId(actId);
-				actIdAct.put(actId,myAct);
+				this.actIdAct.put(actId,myAct);
 				actId++;
 			}
 			Activity myActivity = null;
@@ -120,7 +120,7 @@ public class MentalMap {
 			}
 
 			// Else the activity is null and we choose an activity to assign to the act
-			Link myLink = myAct.getLink();
+			LinkImpl myLink = myAct.getLink();
 			// These Locations are facilities by the new convention
 			Collection<Location> locations = myLink.getUpMapping().values();
 			// These Objects are facilities by convention
@@ -141,28 +141,28 @@ public class MentalMap {
 
 	public void learnActsActivities (Integer myactId, Activity myactivity){
 
-		mapActivityActId.put(myactivity,myactId);
-		mapActIdActivityId.put(myactId,myactivity.getFacility().getId());
+		this.mapActivityActId.put(myactivity,myactId);
+		this.mapActIdActivityId.put(myactId,myactivity.getFacility().getId());
 
 		setActivityScore(myactivity);
 
-		knowledge.addActivity(myactivity);
+		this.knowledge.addActivity(myactivity);
 	}
 
 	public void forgetActsActivities (Integer myactId, Activity myactivity){
 
-		if (mapActivityActId.containsKey(myactivity)){
-			mapActivityActId.remove(myactivity);
+		if (this.mapActivityActId.containsKey(myactivity)){
+			this.mapActivityActId.remove(myactivity);
 		}
 
-		if( mapActIdActivityId.containsKey(myactId)){
+		if( this.mapActIdActivityId.containsKey(myactId)){
 
-			mapActIdActivityId.remove(myactId);
+			this.mapActIdActivityId.remove(myactId);
 		}
-		if(activityScore.containsKey(myactivity)){
-			activityScore.remove(myactivity);
+		if(this.activityScore.containsKey(myactivity)){
+			this.activityScore.remove(myactivity);
 		}
-		knowledge.removeActivity(myactivity);
+		this.knowledge.removeActivity(myactivity);
 	}
 
 	public void manageMemory(int max, Plan myPlan){
@@ -170,7 +170,7 @@ public class MentalMap {
 		if(myPlan.getActsLegs().size()/2 >max){
 			Gbl.errorMsg(this.getClass()+" Number of activites an agent has to remember is greater than his memory! MAX = "+max+" "+myPlan.getActsLegs().size()/2+" "+this.knowledge.getActivities().size());
 		}
-		if(knowledge.getActivities().size()>max){
+		if(this.knowledge.getActivities().size()>max){
 			// Mark the activities associated with the current plan
 			// so that they won't be deleted
 			ArrayList<Integer> currentActs = new ArrayList<Integer>();
@@ -182,11 +182,11 @@ public class MentalMap {
 
 //			Sort the activities by score so that they can be managed
 
-			Hashtable sortedScores = SortHashtableByValue.makeSortedMap(activityScore);
+			Hashtable sortedScores = SortHashtableByValue.makeSortedMap(this.activityScore);
 
 			// Remove activities if there are too many, but keep one activity
 			// for each act type in the current plan. Iterator goes by score.
-			int numToForget= activityScore.values().size()-max;
+			int numToForget= this.activityScore.values().size()-max;
 
 			// Avoid concurrent modification errors
 			// Add to the "forgetlist" the correct number of activities to forget
@@ -194,7 +194,7 @@ public class MentalMap {
 			ArrayList<Activity> forgetList=new ArrayList<Activity>();
 			int counter=0;
 			for (Enumeration<Activity> e = sortedScores.keys() ; e.hasMoreElements() ;) {
-				Activity myactivity=(Activity) e.nextElement();
+				Activity myactivity=e.nextElement();
 				double score=(Double) sortedScores.get(myactivity);
 				// note which activity to forget
 				if(counter<=numToForget){
@@ -218,7 +218,7 @@ public class MentalMap {
 						}
 					}
 				}else{//If the activity is not assigned to an act, forget it
-					knowledge.removeActivity(myactivity);
+					this.knowledge.removeActivity(myactivity);
 				}
 			}
 //			}
@@ -229,7 +229,7 @@ public class MentalMap {
 		boolean remapped = false;
 		// Associate one act with a random facility on the link
 		Activity newActivity = null;
-		Link myLink = myAct.getLink();
+		LinkImpl myLink = myAct.getLink();
 		// These Locations are facilities by the new convention
 		Collection<Location> locations = myLink.getUpMapping().values();
 		// These Objects are facilities by convention
@@ -238,11 +238,11 @@ public class MentalMap {
 		if(facs.length>1){
 			int k = Gbl.random.nextInt(facs.length);
 			int i=0;
-			while(i<facs.length && remapped==false){
+			while((i<facs.length) && (remapped==false)){
 				Facility f = (Facility) facs[(k+i)%facs.length];
 				newActivity = f.getActivity(myAct.getType());
 				// If a new facility of the correct type is found, remap the act to it
-				if(newActivity!=null && newActivity!=oldActivity){
+				if((newActivity!=null) && (newActivity!=oldActivity)){
 					forgetActsActivities(myAct.getRefId(),newActivity);
 					learnActsActivities(myAct.getRefId(),newActivity);
 					remapped= true;
@@ -255,7 +255,7 @@ public class MentalMap {
 
 	public void addActivity(Activity myActivity){
 		// Adds unmapped activity to mental map without associating it with an act
-		knowledge.addActivity(myActivity);
+		this.knowledge.addActivity(myActivity);
 		setActivityScore(myActivity);
 	}
 
@@ -265,18 +265,18 @@ public class MentalMap {
 //		Supposed to simulate how frequently it is thought of by agent.
 
 		double x=0;
-		if(!(activityScore.containsKey(myActivity))){
-			activityScore.put(myActivity,x);
+		if(!(this.activityScore.containsKey(myActivity))){
+			this.activityScore.put(myActivity,x);
 		}else
-			if(activityScore.containsKey(myActivity)){
-				x=activityScore.get(myActivity)+1;
-				activityScore.remove(myActivity);
-				activityScore.put(myActivity,x);
+			if(this.activityScore.containsKey(myActivity)){
+				x=this.activityScore.get(myActivity)+1;
+				this.activityScore.remove(myActivity);
+				this.activityScore.put(myActivity,x);
 			}
 	}
 
 	public Act getActUsingId (Activity myActivity){
-		Integer myActId =  mapActivityActId.get(myActivity);
+		Integer myActId =  this.mapActivityActId.get(myActivity);
 		if(myActId==null){
 			return null;
 		}else{
@@ -301,20 +301,20 @@ public class MentalMap {
 	}
 
 	public void addDate(SocializingOpportunity date){
-		socializingOpportunities.add(date);
+		this.socializingOpportunities.add(date);
 	}
 
 	public void dropDate(SocializingOpportunity date){
-		socializingOpportunities.remove(date);
+		this.socializingOpportunities.remove(date);
 	}
 
 	public void clearDates(){
-		socializingOpportunities.clear();
+		this.socializingOpportunities.clear();
 	}
 
 
 	public int getNumKnownFacilities(){
-		return knowledge.getActivities().size();
+		return this.knowledge.getActivities().size();
 	}
 }
 

@@ -124,16 +124,16 @@ public class MyRunsLoechl extends MyRuns {
 		for (Location loc : facs) {
 			Facility fac = (Facility)loc;
 			int facId = Integer.parseInt(fac.getId().toString());
-			if (facId > CalcDistanceToDrivewayThread.highwayDriveUpOffset
+			if ((facId > CalcDistanceToDrivewayThread.highwayDriveUpOffset)
 					&& fac.getId().toString().startsWith("8888")) {
 				highwayDriveUp.add(fac);
-			} else if (facId > CalcDistanceToDrivewayThread.ptStopOffset
+			} else if ((facId > CalcDistanceToDrivewayThread.ptStopOffset)
 					&& fac.getId().toString().startsWith("99")) {
 				ptStop.add(fac);
-			} else if (facId > CalcDistanceToDrivewayThread.railstationOffset
+			} else if ((facId > CalcDistanceToDrivewayThread.railstationOffset)
 					&& fac.getId().toString().startsWith("777")) {
 				railstation.add(fac);
-			} else if (facId == 1 || facId == 2) {
+			} else if ((facId == 1) || (facId == 2)) {
 				cityCenter.add(fac);
 			} else {
 				facilities.add(fac);
@@ -248,8 +248,8 @@ public class MyRunsLoechl extends MyRuns {
     		int i = 0;
 	    	for (Location fac1 : facs) {
 				for (Location fac2 : facs) {
-					if (fac1.getId() != fac2.getId()
-							&& fac1.getCenter().calcDistance(fac2.getCenter()) <= 5000) {
+					if ((fac1.getId() != fac2.getId())
+							&& (fac1.getCenter().calcDistance(fac2.getCenter()) <= 5000)) {
 						double[] routeData = getShortestPathDistanceAndHopCount(fac1, fac2,
 								nearestLinks, router);
 						double routeDist = routeData[0];
@@ -405,8 +405,8 @@ public class MyRunsLoechl extends MyRuns {
 				}
 
 				i++;
-				if (this.id == 0
-						&& i % (this.facilities.size() / statusString.length()) == 0) {
+				if ((this.id == 0)
+						&& (i % (this.facilities.size() / statusString.length()) == 0)) {
 					System.out.print(".");
 					System.out.flush();
 				}
@@ -489,11 +489,11 @@ class CalcFacilitiesInVicinityThread extends Thread {
 			+ "HOPCOUNT" + "\n";
 			gzos.write(line.getBytes(), 0, line.length());
 			for (Location fac1 : facilities) {
-				if (i >= startIndex && i < endIndex) {
+				if ((i >= startIndex) && (i < endIndex)) {
 					for (Location fac2 : facilities) {
-						if (fac1.getId() != fac2.getId()
-								&& fac1.getCenter()
-								.calcDistance(fac2.getCenter()) <= CalcFacilitiesInVicinityThread.vicinityRadius) {
+						if ((fac1.getId() != fac2.getId())
+								&& (fac1.getCenter()
+								.calcDistance(fac2.getCenter()) <= CalcFacilitiesInVicinityThread.vicinityRadius)) {
 							double routeDist = MyRunsLoechl.getShortestPathDistanceAndHopCount(fac1,
 									fac2, this.nearestLinks, router)[0];
 
@@ -503,8 +503,8 @@ class CalcFacilitiesInVicinityThread extends Thread {
 						}
 					}
 					facCnt++;
-					if (this.id == 0
-							&& facCnt % (chunkSize / statusString.length()) == 0) {
+					if ((this.id == 0)
+							&& (facCnt % (chunkSize / statusString.length()) == 0)) {
 						System.out.print(".");
 						System.out.flush();
 					}

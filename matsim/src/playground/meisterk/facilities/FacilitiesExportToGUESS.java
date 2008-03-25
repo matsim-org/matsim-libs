@@ -85,13 +85,13 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 	public void run(Facilities facilities) {
 
 		// initialize from config
-		baseDirectory = Gbl.getConfig().getParam(KML21_MODULE, CONFIG_OUTPUT_KML_BASE_DIRECTORY);
-		masterFilename = Gbl.getConfig().getParam(KML21_MODULE, CONFIG_OUTPUT_KML_MASTER_FILE);
+		this.baseDirectory = Gbl.getConfig().getParam(KML21_MODULE, CONFIG_OUTPUT_KML_BASE_DIRECTORY);
+		this.masterFilename = Gbl.getConfig().getParam(KML21_MODULE, CONFIG_OUTPUT_KML_MASTER_FILE);
 
 		if (Gbl.getConfig().getParam(KML21_MODULE, CONFIG_USE_COMPRESSION).equals("true")) {
-			useCompression = Boolean.TRUE;
+			this.useCompression = Boolean.TRUE;
 		} else if(Gbl.getConfig().getParam(KML21_MODULE, CONFIG_USE_COMPRESSION).equals("false")) {
-			useCompression = Boolean.FALSE;
+			this.useCompression = Boolean.FALSE;
 		} else {
 			Gbl.errorMsg(
 					"Invalid value for config parameter " + CONFIG_USE_COMPRESSION +
@@ -100,9 +100,9 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 		}
 
 		if (Gbl.getConfig().getParam(KML21_MODULE, CONFIG_USE_KMZ_WRITER).equals("true")) {
-			useKMZWriter = Boolean.TRUE;
+			this.useKMZWriter = Boolean.TRUE;
 		} else if(Gbl.getConfig().getParam(KML21_MODULE, CONFIG_USE_KMZ_WRITER).equals("false")) {
-			useKMZWriter = Boolean.FALSE;
+			this.useKMZWriter = Boolean.FALSE;
 		} else {
 			Gbl.errorMsg(
 					"Invalid value for config parameter " + CONFIG_USE_KMZ_WRITER +
@@ -110,37 +110,37 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 					": \"" + Gbl.getConfig().getParam(KML21_MODULE, CONFIG_USE_KMZ_WRITER) + "\"");
 		}
 
-		lowestSizeClass = Integer.parseInt(Gbl.getConfig().getParam(KML21_MODULE, CONFIG_OUTPUT_KML_LOWEST_SIZE_CLASS));
+		this.lowestSizeClass = Integer.parseInt(Gbl.getConfig().getParam(KML21_MODULE, CONFIG_OUTPUT_KML_LOWEST_SIZE_CLASS));
 
 		// use the web references to stay platform independent
-		iconHREFs.put("work", "http://maps.google.com/mapfiles/kml/paddle/W.png");
-		iconHREFs.put("education", "http://maps.google.com/mapfiles/kml/paddle/E.png");
-		iconHREFs.put("shop", "http://maps.google.com/mapfiles/kml/paddle/S.png");
-		iconHREFs.put("leisure", "http://maps.google.com/mapfiles/kml/paddle/L.png");
+		this.iconHREFs.put("work", "http://maps.google.com/mapfiles/kml/paddle/W.png");
+		this.iconHREFs.put("education", "http://maps.google.com/mapfiles/kml/paddle/E.png");
+		this.iconHREFs.put("shop", "http://maps.google.com/mapfiles/kml/paddle/S.png");
+		this.iconHREFs.put("leisure", "http://maps.google.com/mapfiles/kml/paddle/L.png");
 
-		sizeClasses.put(1, 0);
-		sizeClasses.put(2, 10);
-		sizeClasses.put(3, 50);
-		sizeClasses.put(4, 250);
-		sizeClasses.put(5, Integer.MAX_VALUE);
+		this.sizeClasses.put(1, 0);
+		this.sizeClasses.put(2, 10);
+		this.sizeClasses.put(3, 50);
+		this.sizeClasses.put(4, 250);
+		this.sizeClasses.put(5, Integer.MAX_VALUE);
 
-		iconScales.put(1, Math.sqrt(1.0));
-		iconScales.put(2, Math.sqrt(2.0));
-		iconScales.put(3, Math.sqrt(3.0));
-		iconScales.put(4, Math.sqrt(4.0));
+		this.iconScales.put(1, Math.sqrt(1.0));
+		this.iconScales.put(2, Math.sqrt(2.0));
+		this.iconScales.put(3, Math.sqrt(3.0));
+		this.iconScales.put(4, Math.sqrt(4.0));
 
-		regionSizes.put(1, 250.0);
-		regionSizes.put(2, 500.0);
-		regionSizes.put(3, 1000.0);
-		regionSizes.put(4, 2000.0);
+		this.regionSizes.put(1, 250.0);
+		this.regionSizes.put(2, 500.0);
+		this.regionSizes.put(3, 1000.0);
+		this.regionSizes.put(4, 2000.0);
 
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		try {
 
-			masterKML = new KML();
-			masterDocument = new Document("master document");
-			masterKML.setFeature(masterDocument);
+			this.masterKML = new KML();
+			this.masterDocument = new Document("master document");
+			this.masterKML.setFeature(this.masterDocument);
 
 			writeKMLStyles();
 			//doFacilities(facilities);
@@ -162,24 +162,24 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 		Integer sizeClass;
 
 		// KML facilities styles
-		Iterator<String> activityIt = iconHREFs.keySet().iterator();
+		Iterator<String> activityIt = this.iconHREFs.keySet().iterator();
 		while (activityIt.hasNext()) {
 
 			activity = activityIt.next();
 
-			Iterator<Integer> scaleIt = iconScales.keySet().iterator();
+			Iterator<Integer> scaleIt = this.iconScales.keySet().iterator();
 			while (scaleIt.hasNext()) {
 
 				sizeClass = scaleIt.next();
 
 
-				Style aStyle = new Style(new String(activity + sizeClasses.get(sizeClass) + "Style"));
-				masterDocument.addStyle(aStyle);
+				Style aStyle = new Style(new String(activity + this.sizeClasses.get(sizeClass) + "Style"));
+				this.masterDocument.addStyle(aStyle);
 				IconStyle anIconStyle = new IconStyle(
-						new Icon(new String(iconHREFs.get(activity))),
+						new Icon(new String(this.iconHREFs.get(activity))),
 						Color.DEFAULT_COLOR,
 						IconStyle.DEFAULT_COLOR_MODE,
-						iconScales.get(sizeClass)
+						this.iconScales.get(sizeClass)
 						);
 				aStyle.setIconStyle(anIconStyle);
 
@@ -189,8 +189,8 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 
 		// KML network link style
 		this.networkStyle = new Style("networkLinkStyle");
-		masterDocument.addStyle(networkStyle);
-		networkStyle.setLineStyle(new LineStyle(new Color("7f", "ff", "00", "00"), LineStyle.DEFAULT_COLOR_MODE, 5));
+		this.masterDocument.addStyle(this.networkStyle);
+		this.networkStyle.setLineStyle(new LineStyle(new Color("7f", "ff", "00", "00"), LineStyle.DEFAULT_COLOR_MODE, 5));
 
 	}
 
@@ -218,7 +218,7 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 			workCapacity = f.getActivity("work").getCapacity();
 
 			sizeClass = 1;
-			while (sizeClasses.get(sizeClass + 1) < workCapacity) {
+			while (this.sizeClasses.get(sizeClass + 1) < workCapacity) {
 				sizeClass++;
 			}
 
@@ -233,15 +233,15 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 				}
 			}
 
-			if (sizeClass >= lowestSizeClass) {
+			if (sizeClass >= this.lowestSizeClass) {
 
 				KML theKML = this.createFacilitiesKML(chCoord, sizeClass);
 				Document theDocument = (Document) theKML.getFeature();
 
 				// copy the style from the master KML document to this "child" KML document
-				String styleId = new String(actType + sizeClasses.get(sizeClass) + "Style");
+				String styleId = new String(actType + this.sizeClasses.get(sizeClass) + "Style");
 				if (!theDocument.containsStyle(styleId)) {
-					theDocument.addStyle(masterKML.getFeature().getStyle(styleId));
+					theDocument.addStyle(this.masterKML.getFeature().getStyle(styleId));
 				}
 
 				// put the placemark in it (including the region)
@@ -251,7 +251,7 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 						"Object id: " + f.getId().toString() + SEP + "Number of employees: " + workCapacity,
 						Feature.DEFAULT_ADDRESS,
 						Placemark.DEFAULT_LOOK_AT,
-						masterDocument.getStyle(styleId).getStyleUrl(),
+						this.masterDocument.getStyle(styleId).getStyleUrl(),
 						Placemark.DEFAULT_VISIBILITY,
 						Placemark.DEFAULT_REGION,
 						Feature.DEFAULT_TIME_PRIMITIVE);
@@ -277,29 +277,29 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 
 	public void writeFacilities() {
 
-		File masterDir = new File(baseDirectory);
+		File masterDir = new File(this.baseDirectory);
 		if (!masterDir.exists()) {
 			if (!masterDir.mkdirs()) {
 				Gbl.errorMsg("Error creating dir: " + masterDir.toString());
 			}
 		}
 
-		if (useKMZWriter) {
+		if (this.useKMZWriter) {
 
 			System.out.println("Writing out the KMLs...");
-			KMZWriter myKMZWriter = new KMZWriter(baseDirectory + SEP + "allSwissFacilitiesInOneKMZFile");
+			KMZWriter myKMZWriter = new KMZWriter(this.baseDirectory + SEP + "allSwissFacilitiesInOneKMZFile");
 
 			System.out.println("  Writing the master file...");
-			myKMZWriter.writeMainKml(masterKML);
+			myKMZWriter.writeMainKml(this.masterKML);
 			System.out.println("  Writing the master file...DONE.");
 
 			System.out.println("  Writing the linked files...");
-			Iterator<String> kmlId_it = kmls.keySet().iterator();
+			Iterator<String> kmlId_it = this.kmls.keySet().iterator();
 
 			while (kmlId_it.hasNext()) {
 
 				String filename = kmlId_it.next();
-				KML writeKML = kmls.get(filename);
+				KML writeKML = this.kmls.get(filename);
 
 				myKMZWriter.writeLinkedKml(filename, writeKML);
 
@@ -317,20 +317,20 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 
 			System.out.println("  Writing the master file...");
 			myKMLWriter = new KMLWriter(
-					masterKML,
-					baseDirectory + SEP + masterFilename,
+					this.masterKML,
+					this.baseDirectory + SEP + this.masterFilename,
 					XMLNS.V_21,
 					this.useCompression);
 			myKMLWriter.write();
 			System.out.println("  Writing the master file...DONE.");
 
-			Iterator<String> kmlId_it = kmls.keySet().iterator();
+			Iterator<String> kmlId_it = this.kmls.keySet().iterator();
 
 			System.out.println("  Writing the other files...");
 			while (kmlId_it.hasNext()) {
 
 				String filename = kmlId_it.next();
-				KML writeKML = kmls.get(filename);
+				KML writeKML = this.kmls.get(filename);
 
 				myKMLWriter = new KMLWriter(
 						writeKML,
@@ -520,11 +520,11 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 
 		// construct the KML index, which is at the same time the relative filename with directory structure
 
-		String kmlFilename = new String(baseDirectory);
+		String kmlFilename = new String(this.baseDirectory);
 
 		for (int ii=4; ii >= sizeClass; ii--) {
 
-			regionSize = regionSizes.get(ii);
+			regionSize = this.regionSizes.get(ii);
 			kmlX = (new Double(chCoord.getXCH1903()).intValue() / new Double(regionSize).intValue()) * new Double(regionSize).intValue();
 			kmlY = (new Double(chCoord.getYCH1903()).intValue() / new Double(regionSize).intValue()) * new Double(regionSize).intValue();
 
@@ -532,7 +532,7 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 
 		}
 
-		if (!useKMZWriter) {
+		if (!this.useKMZWriter) {
 			makeDir = new File(kmlFilename);
 			if (!makeDir.exists()) {
 				if (!makeDir.mkdirs()) {
@@ -541,26 +541,26 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 			}
 		}
 
-		kmlFilename = kmlFilename.concat(SEP + "facilities_" + kmlX + "_" + kmlY + "_" + sizeClasses.get(sizeClass));
+		kmlFilename = kmlFilename.concat(SEP + "facilities_" + kmlX + "_" + kmlY + "_" + this.sizeClasses.get(sizeClass));
 		if (this.useCompression) {
 			kmlFilename = kmlFilename.concat(".kmz");
 		} else {
 			kmlFilename = kmlFilename.concat(".kml");
 		}
 
-		if (useKMZWriter) {
+		if (this.useKMZWriter) {
 			kmlFilename = kmlFilename.substring(kmlFilename.lastIndexOf(SEP) + 1, kmlFilename.length());
 		}
 
 		// if KML doesn't exist, create it
-		if (!kmls.containsKey(kmlFilename)) {
+		if (!this.kmls.containsKey(kmlFilename)) {
 
 			// create and store the KML
 			KML newKML = new KML();
 			newKML.setFeature(new Document(
 					kmlFilename,
 					kmlFilename,
-					"Contains all facilities with number of employees > " + sizeClasses.get(sizeClass) +
+					"Contains all facilities with number of employees > " + this.sizeClasses.get(sizeClass) +
 					" of square (" + kmlX + ";" + kmlY + ") - ("+ new Double(kmlX + regionSize) + ";" + new Double(kmlY + regionSize) + ")",
 					Feature.DEFAULT_ADDRESS,
 					Feature.DEFAULT_LOOK_AT,
@@ -583,7 +583,7 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 					512,
 					Region.DEFAULT_MAX_LOD_PIXELS);
 
-			kmls.put(kmlFilename, newKML);
+			this.kmls.put(kmlFilename, newKML);
 
 			KML parentKML;
 			if (sizeClass == 4) {
@@ -619,7 +619,7 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 
 		}
 
-		return kmls.get(kmlFilename);
+		return this.kmls.get(kmlFilename);
 
 	}
 

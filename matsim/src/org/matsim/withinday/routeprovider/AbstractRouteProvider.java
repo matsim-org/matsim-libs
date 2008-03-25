@@ -32,13 +32,13 @@ import org.matsim.plans.Route;
 public abstract class AbstractRouteProvider implements RouteProvider {
 
 	private int priority;
-	
+
 	/**
 	 * Throws an IllegalArgumentException if the value is not in 0..10
 	 * @see org.matsim.withinday.routeprovider.RouteProvider#setPriority(int)
 	 */
 	public void setPriority(int p) {
-		if (0 <= p && p <= 10) {
+		if ((0 <= p) && (p <= 10)) {
 			this.priority = p;
 		}
 		else {
@@ -53,14 +53,14 @@ public abstract class AbstractRouteProvider implements RouteProvider {
 	}
 
 	/**
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#requestRoute(org.matsim.network.Link, org.matsim.network.Link, double)
+	 * @see org.matsim.withinday.routeprovider.RouteProvider#requestRoute(org.matsim.network.LinkImpl, org.matsim.network.LinkImpl, double)
 	 */
 	public Route requestRoute(Link departureLink, Link destinationLink, double time) {
 		return requestRoute(departureLink.getToNode(), destinationLink.getFromNode(), time);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param departureNode
 	 * @param destinationNode
 	 * @param time

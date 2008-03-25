@@ -39,9 +39,9 @@ import org.matsim.writer.MatsimXmlWriter;
 
 /**
  * analyses MATSim networkfile
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class Subsequent extends MatsimXmlWriter {
 
@@ -54,7 +54,7 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * The important intermediate result.
-	 * 
+	 *
 	 * (arg0) - ssLinkId: the "default next" linkId of the "current" Link (arg1) -
 	 * linkId: the "current" Link
 	 */
@@ -62,18 +62,18 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * Constructor transfers the links of network to local links
-	 * 
+	 *
 	 * @param network
 	 */
 	public Subsequent(NetworkLayer network) {
-		links = network.getLinks();
+		this.links = network.getLinks();
 	}
 
 	/**
 	 * @return Returns the ssLinks.
 	 */
 	public TreeMap<String, String> getSsLinks() {
-		return ssLinks;
+		return this.ssLinks;
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class Subsequent extends MatsimXmlWriter {
 		 *            |deltaTheta of outLink-link|
 		 */
 		Map<String, Double> absDeltaThetas = new TreeMap<String, Double>();
-		for (Link l : links.values()) {
+		for (Link l : this.links.values()) {
 			Node from = l.getFromNode();
 			Node to = l.getToNode();
 			Collection<? extends Node> outNodes = to.getOutNodes().values();
@@ -115,14 +115,14 @@ public class Subsequent extends MatsimXmlWriter {
 					absDeltaThetas.put(out.getId().toString(), Math
 							.abs(deltaTheta));
 				}
-				ssLinks.put(computeSubsequentLink(l, absDeltaThetas), l.getId()
+				this.ssLinks.put(computeSubsequentLink(l, absDeltaThetas), l.getId()
 						.toString());
 
 			} else if (outNodes.size() == 1) {
 				// Node[] outNodesArray = (Node[]) outNodes.toArray();----bad
 				// code. throws ClassCastException
 				// findOutLink(((Node)outNodesArray[0]).getId().toString(), l);
-				ssLinks.put(findOutLink(
+				this.ssLinks.put(findOutLink(
 						((Node) outNodes.iterator().next()).getId().toString(),
 						l).getId().toString(), l.getId().toString());
 			}
@@ -131,7 +131,7 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * Calculates the "default next" linkId intermediately
-	 * 
+	 *
 	 * @param thetas
 	 * @return
 	 */
@@ -148,8 +148,8 @@ public class Subsequent extends MatsimXmlWriter {
 			for (Iterator<Entry<String, Double>> kVPairs = thetas.entrySet()
 					.iterator(); kVPairs.hasNext();) {
 				Map.Entry<String, Double> entry = kVPairs.next();
-				if (absMin == ((Double) entry.getValue()).doubleValue())
-					minThetaOutNodeIds.add((String) entry.getKey());
+				if (absMin == (entry.getValue()).doubleValue())
+					minThetaOutNodeIds.add(entry.getKey());
 			}
 			if (minThetaOutNodeIds.size() == 1) {
 				String outNodeId = minThetaOutNodeIds.get(0);
@@ -181,7 +181,7 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * gets the link, who has suitable fromNode(Id) and toNode(Id)
-	 * 
+	 *
 	 * @param outNodeId -
 	 *            one of outNodeIds of a toNode
 	 * @param l -
@@ -200,7 +200,7 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * writes linkId and the "default next" linkId into a .xml-file
-	 * 
+	 *
 	 * @param filename
 	 * @throws IOException
 	 */
@@ -214,20 +214,20 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * writes contents (ssLinkId-linkId-pair) into the writer.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	private void write() throws IOException {
-		writer.write("<subsequent>\n");
+		this.writer.write("<subsequent>\n");
 		// links
-		writer.write("\t<links>\n");
-		for (Iterator<Entry<String, String>> it = ssLinks.entrySet().iterator(); it
+		this.writer.write("\t<links>\n");
+		for (Iterator<Entry<String, String>> it = this.ssLinks.entrySet().iterator(); it
 				.hasNext();) {
-			Entry<String, String> next = (Entry<String, String>) it.next();
-			writer.write("\t\t<link id=\"" + next.getValue()
+			Entry<String, String> next = it.next();
+			this.writer.write("\t\t<link id=\"" + next.getValue()
 					+ "\" subsequentLinkId=\"" + next.getKey() + "\" />\n");
 		}
-		writer.write("\t</links>\n" + "</subsequent>");
+		this.writer.write("\t</links>\n" + "</subsequent>");
 		System.out.println("@write done.");
 	}
 }

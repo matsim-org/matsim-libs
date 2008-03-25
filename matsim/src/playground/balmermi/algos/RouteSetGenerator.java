@@ -87,7 +87,7 @@ public class RouteSetGenerator {
 		}
 		return false;
 	}
-	
+
 	private final void calcRouteOnSubNet(final Node o, final Node d, final int k, final int time, final LinkedList<Link[]> links, final LinkedList<Route> routes) {
 
 		// the list to handle for the next level (level d+1) of the tree
@@ -99,7 +99,7 @@ public class RouteSetGenerator {
 		// go through all given lists at this level (level d) of the tree
 		while (!links.isEmpty()) {
 			Link[] ls = links.poll();
-			
+
 			// remove the links of the current link set and calc the least cost path
 			for (int i=0; i<ls.length; i++) { this.removeLinkFromNetwork(ls[i]); }
 //			System.out.println("    ---");
@@ -124,18 +124,18 @@ public class RouteSetGenerator {
 				}
 //				System.out.println("    -> links.size = " + links.size() + ", routes.size = " + routes.size() + ", new_links.size = " + new_links.size());
 			}
-			
+
 			// restore the full network
 			for (int i=0; i<ls.length; i++) { this.addLinkToNetwork(ls[i]); }
 //			System.out.println("    restored " + ls.length + " links from the net");
 //			System.out.println("    ---");
 		}
-		
+
 		System.out.println("---  end a level of the tree  ---");
 		// go to the next level (d+1) of the tree, if not already enough routes are found
 		if ((routes.size() < k) && !new_links.isEmpty()) { this.calcRouteOnSubNet(o,d,k,time,new_links,routes); }
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ public class RouteSetGenerator {
 		Route route = this.router.calcLeastCostPath(o,d,time);
 		if (route == null) { Gbl.errorMsg("There is no route from " + o.getId() + " to " + d.getId() + "!"); }
 //		routes.add(route);
-		
+
 		Link[] ls = route.getLinkRoute();
 		for (int i=0; i<ls.length; i++) {
 			Link[] lls = new Link[1];
@@ -158,7 +158,7 @@ public class RouteSetGenerator {
 		}
 		// creating a route set with the minimum of k*var_factor routes
 		this.calcRouteOnSubNet(o,d,k*var_factor,time,links,routes);
-		
+
 		System.out.println("--- Number of created routes = " + routes.size() + " ---");
 		System.out.println("--- Randomly removing routes until " + k + " routes left... ---");
 		// Remove randomly some routes until it contains k-1 elements

@@ -156,8 +156,8 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 				}
 				Node toNode2 = toIt.next();
 				double dist = toNode2.getCoord().calcDistance(fromNode.getCoord());
-				if (dist > (this.givenFromToDistance - this.distanceTolerance)
-						&& dist < (this.givenFromToDistance + this.distanceTolerance)) {
+				if ((dist > (this.givenFromToDistance - this.distanceTolerance))
+						&& (dist < (this.givenFromToDistance + this.distanceTolerance))) {
 					toNode = toNode2;
 					break;
 				}
@@ -185,7 +185,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		Node toNode = null;
 		Node fromNode = null;
 		int cnt = 0;
-		while (toNode == null && cnt < 1000) {
+		while ((toNode == null) && (cnt < 1000)) {
 			ArrayList<Node> fromNodes = new ArrayList<Node>();
 			int fromCellRow = 0;
 			int fromCellColumn = 0;
@@ -201,8 +201,8 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 
 			for (Node n : toNodes) {
 				double dist = n.getCoord().calcDistance(fromNode.getCoord());
-				if (dist > (this.givenFromToDistance - this.distanceTolerance)
-						&& dist < (this.givenFromToDistance + this.distanceTolerance)) {
+				if ((dist > (this.givenFromToDistance - this.distanceTolerance))
+						&& (dist < (this.givenFromToDistance + this.distanceTolerance))) {
 					toNode = n;
 					break;
 				}
@@ -250,7 +250,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 			for (int i = Math.max(fromCellRow-1, 0); i < Math.min(fromCellRow+2, cells.length); i++) {
 				for (int j = Math.max(fromCellColumn-1, 0);
 					j < Math.min(fromCellColumn+2, cells[0].length); j++) {
-					if (!(i == fromCellRow && j == fromCellColumn)) {
+					if (!((i == fromCellRow) && (j == fromCellColumn))) {
 						toNodes.addAll(cells[i][j]);
 					}
 				}
@@ -260,8 +260,8 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 				for (int j = 0; j < cells[0].length; j++) {
 					Coord c = getCellCenter(j, i);
 					double dist = c.calcDistance(fromCellCenter);
-					if (dist > (this.givenFromToDistance - this.cellSize)
-							&& dist < (this.givenFromToDistance + this.cellSize)) {
+					if ((dist > (this.givenFromToDistance - this.cellSize))
+							&& (dist < (this.givenFromToDistance + this.cellSize))) {
 						toNodes.addAll(cells[i][j]);
 					}
 				}

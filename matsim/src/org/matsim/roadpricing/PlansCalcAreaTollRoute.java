@@ -23,6 +23,7 @@ package org.matsim.roadpricing;
 import java.util.ArrayList;
 
 import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
@@ -89,8 +90,8 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 
 			Act toAct = (Act)actslegs.get(i);
 
-			Link fromLink = fromAct.getLink();
-			Link toLink = toAct.getLink();
+			LinkImpl fromLink = fromAct.getLink();
+			LinkImpl toLink = toAct.getLink();
 			if (fromLink == null) throw new RuntimeException("fromLink missing.");
 			if (toLink == null) throw new RuntimeException("toLink missing.");
 
@@ -148,7 +149,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				double endTime = toAct.getEndTime();
 				double dur = toAct.getDur();
 
-				if (endTime != Time.UNDEFINED_TIME && dur != Time.UNDEFINED_TIME) {
+				if ((endTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
 					double min = Math.min(endTime, depTimes[TOLL_INDEX][routeIndex] + dur);
 					if (depTimes[TOLL_INDEX][routeIndex] < min) depTimes[TOLL_INDEX][routeIndex] = min;
 					min = Math.min(endTime, depTimes[NOTOLL_INDEX][routeIndex] + dur);
@@ -218,7 +219,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @return true if the route leads into an active tolling area and an agent
 	 * taking this route will likely have to pay the toll, false otherwise.
 	 */
-	private boolean routeOverlapsTollLinks(final Link startLink, final Route route, final Link endLink, final double depTime) {
+	private boolean routeOverlapsTollLinks(final Link startLink, final Route route, final LinkImpl endLink, final double depTime) {
 		double time = depTime;
 
 		// handle first link

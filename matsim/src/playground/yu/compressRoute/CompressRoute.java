@@ -63,12 +63,12 @@ public class CompressRoute extends PersonAlgorithm {
 	public CompressRoute(Map<String, String> ssLinks, Plans plans, String fileName)
 			throws IOException {
 		this.ssLinks = ssLinks;
-		out = new DataOutputStream(new BufferedOutputStream(
+		this.out = new DataOutputStream(new BufferedOutputStream(
 				new FileOutputStream(new File(fileName))));
 		System.out.println("  begins to write txt-file");
-		out.writeBytes("oldLinkRoute\tnewLinkRoute\n");
-		oldLinksNr = 0;
-		newLinksNr = 0;
+		this.out.writeBytes("oldLinkRoute\tnewLinkRoute\n");
+		this.oldLinksNr = 0;
+		this.newLinksNr = 0;
 	}
 
 	/**
@@ -89,22 +89,22 @@ public class CompressRoute extends PersonAlgorithm {
 				Leg leg = (Leg) actsLegs.get(legId);
 				Link[] links = leg.getRoute().getLinkRoute();
 				int linksLength = links.length;
-				oldLinksNr += linksLength;
+				this.oldLinksNr += linksLength;
 				try {
-					out.writeBytes("[");
+					this.out.writeBytes("[");
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 				for (int i = 0; i < linksLength; i++)
 					try {
-						out.writeBytes(links[i].getId().toString());
+						this.out.writeBytes(links[i].getId().toString());
 						if (i < linksLength - 1)
-							out.writeBytes("-");
+							this.out.writeBytes("-");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 				try {
-					out.writeBytes("]");
+					this.out.writeBytes("]");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -112,9 +112,9 @@ public class CompressRoute extends PersonAlgorithm {
 				for (int i = linksLength - 1; i > 0; i--) {
 					Link ssl = links[i];
 					String sslId = ssl.getId().toString();
-					if (ssLinks.containsKey(sslId)) {
+					if (this.ssLinks.containsKey(sslId)) {
 						if (!links[i - 1].getId().toString().equals(
-								ssLinks.get(sslId))) {
+								this.ssLinks.get(sslId))) {
 							newLinks.push(ssl);
 						}
 					} else {
@@ -122,28 +122,28 @@ public class CompressRoute extends PersonAlgorithm {
 					}
 				}
 				try {
-					out.writeBytes("-->[");
+					this.out.writeBytes("-->[");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				newLinksNr += newLinks.size();
+				this.newLinksNr += newLinks.size();
 				while (!newLinks.empty()) {
 					try {
-						out.writeBytes(((newLinks.pop())).getId()
+						this.out.writeBytes(((newLinks.pop())).getId()
 								.toString());
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 					if (!newLinks.empty()) {
 						try {
-							out.writeBytes("-");
+							this.out.writeBytes("-");
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
 					}
 				}
 				try {
-					out.writeBytes("]\n--------------------\n");
+					this.out.writeBytes("]\n--------------------\n");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -157,8 +157,8 @@ public class CompressRoute extends PersonAlgorithm {
 	 * @throws IOException
 	 */
 	public void writeEnd() throws IOException {
-		out.writeBytes("old links : " + oldLinksNr + ";\nnew links : "
-				+ newLinksNr + ";");
-		out.close();
+		this.out.writeBytes("old links : " + this.oldLinksNr + ";\nnew links : "
+				+ this.newLinksNr + ";");
+		this.out.close();
 	}
 }

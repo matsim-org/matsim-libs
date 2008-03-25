@@ -23,7 +23,7 @@ package playground.lnicolas.plans.algorithms;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -138,8 +138,8 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 	}
 
 	private double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) throws Exception {
-		Link fromLink = fromAct.getLink();
-		Link toLink = toAct.getLink();
+		LinkImpl fromLink = fromAct.getLink();
+		LinkImpl toLink = toAct.getLink();
 		if (fromLink == null) throw new Exception("fromLink missing.");
 		if (toLink == null) throw new Exception("toLink missing.");
 
@@ -182,8 +182,8 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		// later: use special pt-router
 
 		double travTime = 0;
-		Link fromLink = fromAct.getLink();
-		Link toLink = toAct.getLink();
+		LinkImpl fromLink = fromAct.getLink();
+		LinkImpl toLink = toAct.getLink();
 		if (fromLink == null) throw new Exception("fromLink missing.");
 		if (toLink == null) throw new Exception("toLink missing.");
 

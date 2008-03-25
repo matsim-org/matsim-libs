@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.NetworkWriter;
@@ -47,7 +47,7 @@ public class MyControler1 extends Controler {
 		super(config);
 	}
 
-	protected int[] generateDistribution(final Link[] netLinks, final int popSize, final Link[] givenLinks, final double[] probs) {
+	protected int[] generateDistribution(final LinkImpl[] netLinks, final int popSize, final LinkImpl[] givenLinks, final double[] probs) {
 
 		int[] quant = new int[netLinks.length];
 		boolean[] aux = new boolean[netLinks.length];
@@ -306,7 +306,7 @@ public class MyControler1 extends Controler {
 		}
 	}
 
-	private void generatePerson(final int ii, final Link sourceLink, final Link destLink, final Plans population){
+	private void generatePerson(final int ii, final LinkImpl sourceLink, final LinkImpl destLink, final Plans population){
 		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
 		Plan plan = new Plan(p);
 		try {

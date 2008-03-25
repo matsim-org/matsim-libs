@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -37,30 +37,30 @@ import org.matsim.router.util.TravelTimeI;
 public class TTDecorator implements TravelTimeI {
 
 	private TravelTimeI meantts;
-	
+
 	private List<BasicLinkI> accidantLinks = new LinkedList<BasicLinkI>();
-	
+
 //	public TTDecorator(TravelTimeI traveltimes) {
 //		this.meantts = traveltimes;
 //	}
-	
+
 	public void setMeanTravelTimes(TravelTimeI meantts) {
 		this.meantts = meantts;
 	}
-	
+
 	public void addAccidantLink(BasicLinkI link) {
-		accidantLinks.add(link);
+		this.accidantLinks.add(link);
 	}
-	
+
 	public void removeAccidantLink(BasicLinkI link) {
-		accidantLinks.remove(link);
+		this.accidantLinks.remove(link);
 	}
-	
+
 	public double getLinkTravelTime(Link link, double time) {
-		if(accidantLinks.contains(link)) {
+		if(this.accidantLinks.contains(link)) {
 			return Double.MAX_VALUE;
 		} else
-			return meantts.getLinkTravelTime(link, time);
+			return this.meantts.getLinkTravelTime(link, time);
 	}
 
 }

@@ -119,12 +119,12 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 
 	private final void open() {
 		try {
-			fw = new FileWriter(outfile);
-			out = new BufferedWriter(fw);
-			out.write(this.heads[0]);
-			for (int i=1; i<heads.length; i++) { out.write("\t" + this.heads[i]); }
-			out.write("\n");
-			out.flush();
+			this.fw = new FileWriter(this.outfile);
+			this.out = new BufferedWriter(this.fw);
+			this.out.write(this.heads[0]);
+			for (int i=1; i<this.heads.length; i++) { this.out.write("\t" + this.heads[i]); }
+			this.out.write("\n");
+			this.out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -141,13 +141,13 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 			while (id_it.hasNext()) {
 				IdI id = id_it.next();
 				int[] vals = this.zones.get(id);
-				for (int i=0; i<vals.length; i++) { out.write(vals[i] + "\t"); }
-				out.write(id + "\n");
-				out.flush();
+				for (int i=0; i<vals.length; i++) { this.out.write(vals[i] + "\t"); }
+				this.out.write(id + "\n");
+				this.out.flush();
 			}
-			out.flush();
-			out.close();
-			fw.close();
+			this.out.flush();
+			this.out.close();
+			this.fw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);

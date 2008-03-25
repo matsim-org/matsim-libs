@@ -61,7 +61,7 @@ public class PersonCalcTripDistances extends PersonAlgorithm implements PlanAlgo
 			Act prev = (Act)plan.getActsLegs().get(i-1);
 			Leg leg = (Leg)plan.getActsLegs().get(i);
 			Act next = (Act)plan.getActsLegs().get(i+1);
-			
+
 			if (prev.getLinkId().equals(next.getLinkId())) {
 				if (!leg.getRoute().getRoute().isEmpty()) { Gbl.errorMsg("Person id=" + person.getId() + ", leg nr=" + leg.getNum() + ": route should be empty!"); }
 				else { leg.getRoute().setDist(0.0); }

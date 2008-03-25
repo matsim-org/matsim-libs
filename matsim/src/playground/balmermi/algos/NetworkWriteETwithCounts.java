@@ -46,7 +46,7 @@ public class NetworkWriteETwithCounts extends NetworkAlgorithm {
 	private BufferedWriter out_l = null;
 	private FileWriter fw_et = null;
 	private BufferedWriter out_et = null;
-	
+
 	private final Counts counts;
 
 	//////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ public class NetworkWriteETwithCounts extends NetworkAlgorithm {
 		}
 		return -1.0;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////

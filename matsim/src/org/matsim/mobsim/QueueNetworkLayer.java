@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.identifiers.IdI;
@@ -69,19 +70,19 @@ public class QueueNetworkLayer extends NetworkLayer {
 	}
 
 	@Override
-	protected Link newLink(final NetworkLayer network, final String id, final Node from, final Node to, final String length,
+	protected LinkImpl newLink(final NetworkLayer network, final String id, final Node from, final Node to, final String length,
 			 final String freespeed, final String capacity, final String permlanes,
 			 final String origid, final String type) {
 		return new QueueLink(this,id,from,to,length,freespeed,capacity,permlanes,origid,type);
 	}
 
 	public void beforeSim() {
-		
-		// if simNodesArrayCache was invalidated before, it needs to be reinitialized 
+
+		// if simNodesArrayCache was invalidated before, it needs to be reinitialized
 		if (this.simNodesArrayCache == null) {
 			this.simNodesArrayCache = new QueueNode[0];
 		}
-		
+
 		this.simNodesArrayCache = getNodes().values().toArray(this.simNodesArrayCache);
 
 		this.simLinksArray.clear();
@@ -125,7 +126,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 		/* well, we just moved the if (moveWaitFirst) outside of the while-loop,
 		 * so we have the if only once and not for every link. marcel, dez07 */
 
-		if (moveWaitFirst) {
+		if (this.moveWaitFirst) {
 
 			while (links.hasNext()) {
 				link = links.next();
@@ -195,7 +196,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 		if (!simulateAllLinks) {
 			// links being activated because somebody's leaving on that link
 			LinkActivation activation = this.activationQueue.peek();
-			while (activation != null && activation.time <= now) {
+			while ((activation != null) && (activation.time <= now)) {
 				activation = this.activationQueue.poll();
 				activation.link.activateLink();
 				activation = this.activationQueue.peek();
@@ -213,7 +214,7 @@ public class QueueNetworkLayer extends NetworkLayer {
 			this.activationQueue.add(new LinkActivation(time, link));
 		}
 	}
-	
+
 	public void moveWaitFirst(final boolean moveWaitFirst){
 		//TODO [GL] may be we should invalidate simNodesArrayCache to make sure
 		// that nobody changes this during the MobSim ...

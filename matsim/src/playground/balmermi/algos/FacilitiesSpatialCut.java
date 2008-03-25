@@ -28,8 +28,8 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 public class FacilitiesSpatialCut extends FacilitiesAlgorithm {
@@ -67,8 +67,8 @@ public class FacilitiesSpatialCut extends FacilitiesAlgorithm {
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
 			CoordI c = f.getCenter();
-			if ((c.getX() >= min.getX()) && (c.getY() >= min.getY()) &&
-			    (c.getX() <= max.getX()) && (c.getY() <= max.getY())) {
+			if ((c.getX() >= this.min.getX()) && (c.getY() >= this.min.getY()) &&
+			    (c.getX() <= this.max.getX()) && (c.getY() <= this.max.getY())) {
 				// inside
 				f_array.add(f);
 			}
