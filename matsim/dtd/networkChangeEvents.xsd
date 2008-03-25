@@ -23,7 +23,7 @@
 
 <xs:complexType name="networkChangeEventType">
   <xs:attribute name="startTime" type="xs:time" use="required"/>
-  <xs:attribute name="endTime" type="xs:time" />
+  <xs:attribute name="endTime" type="xs:time"/>
   <xs:sequence>
     <xs:element name="link" type="idRefType" />
     <xs:element name="flowCapacity" type="networkChangeType" />
@@ -41,11 +41,13 @@
 			</xs:restriction>
 		</xs:simpleType>
 	</xs:attribute>
-	<xs:simpleContent>
-	  <xs:restriction base="xs:decimal">
-			<xs:minExclusive value="0.0"/>
-	  </xs:restriction>
-  </xs:simpleContent>
+	<xs:attribute name="value">
+		<xs:simpleType>
+		  <xs:restriction base="xs:decimal">
+			  <xs:minExclusive value="0.0"/>
+	    </xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
 </xs:complexType>
 
 </xs:schema>
