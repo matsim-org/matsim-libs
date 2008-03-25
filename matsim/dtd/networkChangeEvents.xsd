@@ -22,14 +22,14 @@
 </xs:element>
 
 <xs:complexType name="networkChangeEventType">
+  <xs:sequence>
+    <xs:element name="link" type="idRefType" minOccurs="1" maxOccurs="unbounded"/>
+    <xs:element name="flowCapacity" type="networkChangeType" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="freespeed" type="networkChangeType" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="lanes" type="networkChangeType" minOccurs="1" maxOccurs="1"/>
+  </xs:sequence>
   <xs:attribute name="startTime" type="xs:time" use="required"/>
   <xs:attribute name="endTime" type="xs:time"/>
-  <xs:sequence>
-    <xs:element name="link" type="idRefType" />
-    <xs:element name="flowCapacity" type="networkChangeType" />
-		<xs:element name="freespeed" type="networkChangeType"/>
-		<xs:element name="lanes" type="networkChangeType"/>
-  </xs:sequence>
 </xs:complexType>
 
 <xs:complexType name="networkChangeType">
@@ -37,7 +37,7 @@
 		<xs:simpleType>
 	  	<xs:restriction base="xs:string">
 		    <xs:enumeration value="absolut" />
-			  <xs:enumeration value="factor" />
+			  <xs:enumeration value="scaleFactor" />
 			</xs:restriction>
 		</xs:simpleType>
 	</xs:attribute>
