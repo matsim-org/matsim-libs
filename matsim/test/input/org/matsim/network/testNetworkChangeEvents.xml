@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<networkChangeEvents
+  xmlns="http://www.matsim.org/files/dtd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd">
+
+  <changeNetworkEvent startTime="14:00:00" endTime="undefined">
+				<link refId= "123" />
+				<link refId= "456" />
+				<flowcap absolut="" factor=""??? >
+  		  	<absolut value = "13.75" />
+  		  </flowcap>
+  		  <freespeed>
+  		    <factor value = "0.3" />
+  		  </freespeed>
+  		  <lanes>
+
+  		  </lanes>
+    </changeNetworkEvent>
+    <changeNetworkEvent startTime="14:00:00" endTime="15:00">
+  		  <flowcap absolut="" factor=""??? >
+  		  	<absolut value = "13.75" />
+  		  </flowcap>
+  		  <freespeed>
+  		    <factor value = "0.3" />
+  		  </freespeed>
+  		  <lanes>
+
+  		  </lanes>
+    </changeNetworkEvent>
+    </changeNetworkEvents>
+
+
+</networkChangeEvents>
