@@ -8,6 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
+import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
@@ -15,6 +16,7 @@ import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+// RetailerReaderV1
 public class RetailersReader extends MatsimXmlParser {
 	
 	private final static String RETAILERS = "retailers";
@@ -66,13 +68,10 @@ public class RetailersReader extends MatsimXmlParser {
 
 	private void startFacility(final Attributes meta) {
 		if (this.curr_retailer != null) {
-			String x = meta.getValue("x");
-			String y = meta.getValue("y");
-			if (x != null && y != null) {
-				CoordI coord = new Coord(new Double(x),new Double(y));
-				Facilities f = new Facilities(); //TODO Change the xml scheme or is it correct like that?
-				this.curr_retailer.createFacility(f,meta.getValue("id"),coord,Integer.parseInt(meta.getValue("min_cust_sqm")));
-			}
+			String fac_id = meta.getValue("id");
+			String min_cust_sqm = meta.getValue("min_cust_sqm");
+			boolean ok = this.curr_retailer.setFacility(new Id(fac_id), Double.parseDouble(min_cust_sqm));
+			if (!ok) { Gbl.errorMsg("Fac id=" + fac_id + " does not exist in the facilities DB!"); }
 		}
 	}
 

@@ -31,6 +31,7 @@ import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.AbstractLocation;
 
+// TODO: REMOVE
 public class Facility extends AbstractLocation {
 
 	//////////////////////////////////////////////////////////////////////

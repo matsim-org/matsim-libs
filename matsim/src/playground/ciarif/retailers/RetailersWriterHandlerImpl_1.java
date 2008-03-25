@@ -3,6 +3,7 @@ package playground.ciarif.retailers;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+// RetailersWriterHandlerImplV1
 public class RetailersWriterHandlerImpl_1 implements RetailersWriterHandler {
 	// interface implementation
 	//////////////////////////////////////////////////////////////////////
@@ -33,7 +34,7 @@ public class RetailersWriterHandlerImpl_1 implements RetailersWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 	public void startRetailer(final Retailer retailer, final BufferedWriter out) throws IOException {
 		out.write("\t<retailer");
-		out.write(" loc_id=\"" + retailer.getLocId() + "\"");
+		out.write(" loc_id=\"" + retailer.getRetailerId() + "\"");
 		if (retailer.getCoord() != null) {
 			out.write(" x=\"" + retailer.getCoord().getX() + "\"");
 			out.write(" y=\"" + retailer.getCoord().getY() + "\"");

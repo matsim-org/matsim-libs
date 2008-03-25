@@ -46,6 +46,7 @@ package playground.ciarif.retailers;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.misc.Time;
 
+//TODO: REMOVE
 public class Opentime implements Comparable<Opentime> {
 
 	//////////////////////////////////////////////////////////////////////

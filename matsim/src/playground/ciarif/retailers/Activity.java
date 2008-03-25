@@ -26,6 +26,7 @@ import java.util.TreeSet;
 
 import org.matsim.gbl.Gbl;
 
+// TODO: REMOVE
 public class Activity {
 
 	//////////////////////////////////////////////////////////////////////
