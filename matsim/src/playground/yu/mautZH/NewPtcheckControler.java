@@ -38,6 +38,7 @@ import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.Events;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.utils.io.IOUtils;
@@ -78,8 +79,8 @@ public class NewPtcheckControler extends Controler {
 				out = IOUtils
 						.getBufferedWriter(getOutputFilename("tollPaid.txt"));
 				out
-						.write("Iter\tBetaTraveling\tBetaTravelingPt\ttoll_amount[ï¿½/m]"
-								+ "\ttoll_paid[ï¿½]\tavg. executed score\tNumber of Drawees"
+						.write("Iter\tBetaTraveling\tBetaTravelingPt\ttoll_amount[€/m]"
+								+ "\ttoll_paid[€]\tavg. executed score\tNumber of Drawees"
 								+ "\tavg. triplength\tavg. tolled triplength"
 								+ "\ttraffic persformance\tavg. travel speed\n");
 				out.flush();
@@ -94,7 +95,7 @@ public class NewPtcheckControler extends Controler {
 			Events events = ctl.getEvents();
 			events.addHandler(cas);
 			events.addHandler(ctpf);
-			if (ctl.getRoadPricing() != null) {
+			if (Gbl.getConfig().roadpricing() != null) {
 				cattl = new CalcAverageTolledTripLength(network, ctl
 						.getRoadPricing().getRoadPricingScheme());
 				events.addHandler(cattl);
@@ -122,8 +123,10 @@ public class NewPtcheckControler extends Controler {
 									+ cf.getParam("planCalcScore",
 											"travelingPt")
 									+ "\t"
-									+ (rp != null ? rp.getRoadPricingScheme()
-											.getCostArray()[0].amount : 0)
+									+ ((Gbl.getConfig().roadpricing() != null) ? rp
+											.getRoadPricingScheme()
+											.getCostArray()[0].amount
+											: 0)
 									+ "\t"
 									+ ((tollCalc != null) ? tollCalc
 											.getAllAgentsToll() : 0.0)
@@ -151,7 +154,7 @@ public class NewPtcheckControler extends Controler {
 			int it = event.getIteration();
 			cas.reset(it);
 			ctpf.reset(it);
-			if (cattl != null) {
+			if (Gbl.getConfig().roadpricing() != null) {
 				cattl.reset(it);
 			}
 		}
