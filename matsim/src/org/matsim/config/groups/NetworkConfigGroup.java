@@ -35,9 +35,18 @@ public class NetworkConfigGroup extends Module {
 	private static final String LOCAL_INPUT_DTD = "localInputDTD";
 	private static final String OUTPUT_DTD = "outputNetworkDTD";
 	private static final String OUTPUT_VERSION = "outputVersion";
+	
+	private static final String TIME_VARIANT_NETWORK = "timeVariantNetwork";
+	private static final String CHANGE_EVENTS_INPUT_FILE = "inputChangeEventsFile";
+	private static final String CHANGE_EVENTS_OUTPUT_FILE = "outputChangeEventsFile";
 
 	private String inputFile = null;
 	private String outputFile = null;
+	
+	private String changeEventsInputFile = null;
+	private String changeEventsOutputFile = null;
+	
+	private boolean timeVariantNetwork = false;
 	
 	private static final Logger log = Logger.getLogger(NetworkConfigGroup.class);
 
@@ -51,7 +60,13 @@ public class NetworkConfigGroup extends Module {
 			return getInputFile();
 		} else if (NetworkConfigGroup.OUTPUT_FILE.equals(key)) {
 			return getOutputFile();
-		} else {
+		} else if (NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE.equals(key)) {
+			return getChangeEventsInputFile();
+		}else if (NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE.equals(key)) {
+			return getChangeEventsOutputFile();
+		}else if (NetworkConfigGroup.TIME_VARIANT_NETWORK.equals(key)) {
+			return isTimeVariantNetwork() ? "true" : "false";
+		}else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -68,16 +83,27 @@ public class NetworkConfigGroup extends Module {
 			log.info("The parameter " + OUTPUT_DTD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else if (NetworkConfigGroup.OUTPUT_VERSION.equals(key)) {
 			log.info("The parameter " + OUTPUT_VERSION + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else {
+		} else if (NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE.equals(key)) {
+			setChangeEventInputFile(value.replace('\\', '/'));
+		}else if (NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE.equals(key)) {
+			setChangeEventOutputFile(value.replace('\\', '/'));
+		}else if (NetworkConfigGroup.TIME_VARIANT_NETWORK.equals(key)) {
+			setTimeVariantNetwork("true".equals(value) || "yes".equals(value));
+		}else {
 			throw new IllegalArgumentException(key);
 		}
 	}
+
+
 
 	@Override
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(NetworkConfigGroup.INPUT_FILE, getValue(NetworkConfigGroup.INPUT_FILE));
 		map.put(NetworkConfigGroup.OUTPUT_FILE, getValue(NetworkConfigGroup.OUTPUT_FILE));
+		map.put(NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE, getValue(NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE));
+		map.put(NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE, getValue(NetworkConfigGroup.CHANGE_EVENTS_OUTPUT_FILE));
+		map.put(NetworkConfigGroup.TIME_VARIANT_NETWORK, getValue(NetworkConfigGroup.TIME_VARIANT_NETWORK));
 		return map;
 	}
 
@@ -96,5 +122,27 @@ public class NetworkConfigGroup extends Module {
 	public void setOutputFile(final String outputFile) {
 		this.outputFile = outputFile;
 	}
+	
+	private void setChangeEventInputFile(final String changeEventsInputFile) {
+		this.changeEventsInputFile = changeEventsInputFile;
+	}
+	public String getChangeEventsInputFile() {
+		return this.changeEventsInputFile;
+	}
+	
+	private void setChangeEventOutputFile(String changeEventsOutputFile) {
+		this.changeEventsOutputFile = changeEventsOutputFile;
+	}
+	public String getChangeEventsOutputFile() {
+		return this.changeEventsOutputFile;
+	}
 
+	private void setTimeVariantNetwork(boolean timeVariantNetwork) {
+		this.timeVariantNetwork = timeVariantNetwork;
+	}
+	public boolean isTimeVariantNetwork() {
+		return this.timeVariantNetwork;
+	}
+	
+	
 }
