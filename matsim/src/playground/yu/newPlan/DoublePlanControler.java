@@ -41,7 +41,8 @@ public class DoublePlanControler {
 	 */
 	public static void main(String[] args) {
 		final String netFilename = "./test/yu/newPlans/equil_net.xml";
-		final String plansFilename = "./test/yu/newPlans/equil_plans1k_w_pt.xml";
+//		final String plansFilename = "./test/yu/newPlans/equil_plans1k.xml";
+		final String plansFilename = "./test/yu/equil_test/equil_plans1k.xml";
 
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")
@@ -52,13 +53,13 @@ public class DoublePlanControler {
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
-		DoublePlan nap=new DoublePlan(population);
-		population.addAlgorithm(nap);
+		DoublePlan dp=new DoublePlan(population);
+		population.addAlgorithm(dp);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
 		world.setPopulation(population);
 		population.runAlgorithms();
-		nap.writeEndPlans();
+		dp.writeEndPlans();
 	}
 
 }

@@ -52,7 +52,7 @@ public class DoublePlan extends NewAgentPtPlan {
 	public void run(Person person) {
 		pw.writePerson(person);
 		// produce new Person with bigger Id
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 4; i++) {
 			newPersonId = Integer.parseInt(person.getId().toString()) + 1000;
 			person.setId(Integer.toString(newPersonId));
 			pw.writePerson(person);
