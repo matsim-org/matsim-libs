@@ -144,7 +144,7 @@ public final Node getToNode() {
 /**
  * This method returns the freespeed for current time
  * @param time - the current time
- * @Override {@link org.matsim.basic.v01.BasicLink}
+ * @Override {@link org.matsim.basic.v01.BasicLink.getFreespeed}
  */
 public double getFreespeed(double time) {
 	return this.freespeedEvents.floorEntry(time).getValue();
