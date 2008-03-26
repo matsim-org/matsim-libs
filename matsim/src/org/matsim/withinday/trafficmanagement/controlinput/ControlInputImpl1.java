@@ -43,7 +43,7 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /*
  *
- * Measures the travel time difference between route 1 and 2 and returns that as
+ * Measures the  travel time difference between route 1 and 2 and returns that as
  * the control signal. ("Reactive control")
  */
 
