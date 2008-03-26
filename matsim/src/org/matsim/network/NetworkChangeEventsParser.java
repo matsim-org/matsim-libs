@@ -191,7 +191,7 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 			if(value != null) {
 				Link link = network.getLink(value);
 				if(link != null)
-					currentEvent.getLinks().add(link);
+					currentEvent.addLink(link);
 				else
 					log.warn(String.format("Link %1$s not found!", value));
 			}

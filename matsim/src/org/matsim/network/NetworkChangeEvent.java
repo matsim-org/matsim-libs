@@ -24,6 +24,8 @@
 package org.matsim.network;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.utils.misc.Time;
@@ -66,6 +68,8 @@ public class NetworkChangeEvent {
 	// ========================================================================
 
 	private List<Link> links = new ArrayList<Link>();
+	
+	private List<Link> unmodifiableLinks = Collections.unmodifiableList(links);
 
 	private double startTime;
 
@@ -124,10 +128,26 @@ public class NetworkChangeEvent {
 
 	/**
 	 * 
-	 * @return a list of links that are affected by this event.
+	 * @param link a link that is affected by this event.
 	 */
-	public List<Link> getLinks() {
-		return links;
+	public void addLink(Link link) {
+		links.add(link);
+	}
+	
+	/**
+	 * 
+	 * @param link the link to remove.
+	 */
+	public void removeLink(Link link) {
+		links.remove(link);
+	}
+	
+	/**
+	 * 
+	 * @return a read-only view of the links that are affected by this event.
+	 */
+	public Collection<Link> getLinks() {
+		return unmodifiableLinks;
 	}
 
 	/**
