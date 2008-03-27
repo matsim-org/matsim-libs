@@ -56,7 +56,6 @@ public class KtiPtTester {
 		System.out.println("  done.");
 	}
 
-
 	public void run() {
 		Gbl.startMeasurement();
 		this.data.getWorld();
@@ -88,7 +87,6 @@ public class KtiPtTester {
 
 	public static void main(final String[] args) {
 		new KtiPtTester(args).run();
-
 	}
 
 }

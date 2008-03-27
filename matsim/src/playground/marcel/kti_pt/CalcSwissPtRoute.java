@@ -36,7 +36,7 @@ import org.matsim.world.Location;
 
 public class CalcSwissPtRoute implements PlanAlgorithmI {
 
-	private final static double WALK_SPEED = 1.0; // 1m/s = 3.6km/h = speed of people walking to the next station from home (bee-line!)
+	private final static double WALK_SPEED = 3.0/3.6; // 3.6km/h --> m/s = speed of people walking to the next station from home (bee-line!)
 
 	private final Matrix ptTravelTimes;
 	private final SwissHaltestellen haltestellen;
@@ -59,8 +59,11 @@ public class CalcSwissPtRoute implements PlanAlgorithmI {
 	}
 
 	public void handleLeg(final Act fromAct, final Leg leg, final Act toAct) {
-		final List<Location> froms = this.municipalities.getNearestLocations(fromAct.getCoord());
-		final List<Location> tos = this.municipalities.getNearestLocations(toAct.getCoord());
+		CoordI fromStop = this.haltestellen.getClosestLocation(fromAct.getCoord());
+		CoordI toStop = this.haltestellen.getClosestLocation(toAct.getCoord());
+		
+		final List<Location> froms = this.municipalities.getNearestLocations(fromStop);
+		final List<Location> tos = this.municipalities.getNearestLocations(toStop);
 		Location from = froms.get(0);
 		Location to = tos.get(0);
 		Entry traveltime = this.ptTravelTimes.getEntry(from, to);
@@ -69,12 +72,10 @@ public class CalcSwissPtRoute implements PlanAlgorithmI {
 		} else {
 			final double timeInVehicle = traveltime.getValue() * 60.0;
 			final double beeLineWalkTime = fromAct.getCoord().calcDistance(toAct.getCoord()) / WALK_SPEED;
-			CoordI fromStop = this.haltestellen.getClosestLocation(fromAct.getCoord());
-			CoordI toStop = this.haltestellen.getClosestLocation(toAct.getCoord());
 
 			final double walkDistance = fromAct.getCoord().calcDistance(fromStop) + toAct.getCoord().calcDistance(toStop);
 			final double walkTime = walkDistance / WALK_SPEED;
-			System.out.println(from.getId() + " > " + to.getId() + ": " + timeInVehicle/60 + " + " + (walkTime / 60) + " (" + walkDistance + "m); beeLine: " + beeLineWalkTime/60);
+//			System.out.println(from.getId() + " > " + to.getId() + ": " + timeInVehicle/60 + "min + " + (walkTime / 60) + "min (" + walkDistance + "m walk); beeLine: " + beeLineWalkTime/60 + "min walk");
 
 			Route oldRoute = leg.getRoute();
 			if (beeLineWalkTime < (timeInVehicle + walkTime)) {
@@ -82,7 +83,7 @@ public class CalcSwissPtRoute implements PlanAlgorithmI {
 			} else {
 				leg.createRoute(null, Time.writeTime(timeInVehicle + walkTime));
 			}
-			System.out.println("cmpr:\t" + Time.writeTime(oldRoute.getTravTime()) + "\t" + Time.writeTime(leg.getRoute().getTravTime()) + "\t" + beeLineWalkTime);
+//			System.out.println("cmpr:\t" + Time.writeTime(oldRoute.getTravTime()) + "\t" + Time.writeTime(leg.getRoute().getTravTime()) + "\t" + beeLineWalkTime);
 		}
 	}
 
