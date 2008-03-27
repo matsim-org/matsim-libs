@@ -62,6 +62,7 @@ public class SNControllerSecLoc extends Controler {
 	public static void main(final String[] args) {
 		final Controler controler = new SNControllerSecLoc(args);
 		controler.addControlerListener(new SNControllerListenerSecLoc());
+		controler.setOverwriteFiles(true);
 		controler.run();
 		System.exit(0);
 	}

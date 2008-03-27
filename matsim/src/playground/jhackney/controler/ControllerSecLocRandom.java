@@ -62,6 +62,7 @@ public class ControllerSecLocRandom extends Controler {
 	public static void main(final String[] args) {
 		final Controler controler = new ControllerSecLocRandom(args);
 		controler.addControlerListener(new ControllerListenerSecLocRandom());
+		controler.setOverwriteFiles(true);
 		controler.run();
 		System.exit(0);
 	}

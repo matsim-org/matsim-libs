@@ -57,14 +57,14 @@ import playground.jhackney.algorithms.PlanRandomReplaceSecLoc;
 /**
  * This controler implements a plan algorithm in which the locations of
  * secondary activities are changed randomly, assuming the agents know
- * something about the world. The plans are changed
- * according to this assumption. Each time the plans are changed, the replanning
- * algorithm is called and the plans are again optimized.
+ * everything about the world.
  * 
  * The difference between this controller and the SNControllerSecLoc is the call
  * to the PlanRandomReplaceSecLoc instead of to PersonSNSecLocRandomReRoute algorithm.
  * The former replaces the facility from the facilities layer while the latter
- * replaces it from the agent's knowledge. Thus in this conroller the information
+ * replaces it from the agent's knowledge.
+ * 
+ * Thus in this conroller the information
  * exchange between agents does not matter in replanning.
  * 
  * The intent is to be able to compare a random secondary location choice
