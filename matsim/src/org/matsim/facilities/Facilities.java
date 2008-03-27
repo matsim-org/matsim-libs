@@ -21,7 +21,9 @@
 package org.matsim.facilities;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
@@ -118,6 +120,20 @@ public class Facilities extends Layer {
 	@SuppressWarnings("unchecked")
 	public final Map<IdI, ? extends Facility> getFacilities() {
 		return (Map<IdI, ? extends Facility>) getLocations();
+	}
+	
+	//Added 27.03.08 JH for random secondary location changes
+	public final TreeMap<IdI,Facility> getFacilities(final String act_type) {
+		TreeMap<IdI,Facility> facs = new TreeMap<IdI, Facility>();
+		Iterator<? extends Facility> lit = this.getFacilities().values().iterator();
+		while(lit.hasNext()){
+			Facility f = (Facility) lit.next();
+			TreeMap<String, Activity> a = f.getActivities();
+			if(a.containsKey(act_type)){
+				facs.put(f.getId(),f);
+			}
+		}
+		return facs;
 	}
 
 	//////////////////////////////////////////////////////////////////////
