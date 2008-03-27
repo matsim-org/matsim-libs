@@ -40,6 +40,7 @@ package playground.jhackney.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
@@ -51,6 +52,7 @@ import org.matsim.plans.Knowledge;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.plans.algorithms.PersonPrepareForSim;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCostI;
@@ -117,7 +119,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 
 //		Get all instances of this facility type in the plan
 
-		ActIterator planIter= plan.getIteratorAct();
+		ActIterator planIter= newPlan.getIteratorAct();
 		ArrayList<Act> actsOfFacType= new ArrayList<Act>();
 		while(planIter.hasNext()){
 			Act nextAct=(Act) planIter.next();
@@ -129,6 +131,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 		// Choose a random act from this list. Return the plan unchanged if there are none.
 		if(actsOfFacType.size()<1){
 			person.setSelectedPlan(plan);
+			person.getPlans().remove(newPlan);
 			return;
 		}else{
 			Act newAct = (Act)(actsOfFacType.get(Gbl.random.nextInt(actsOfFacType.size())));
@@ -138,18 +141,19 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 
 			// Replace with plan.getRandomActivity(type)
 
-//			Pick a random ACTIVITY of this type from knowledge
+//			Pick a random ACTIVITY of this type from Facilities
 
-			List<Activity> actList = k.getActivities(factype);
-//			Facility fFromKnowledge = actList.get(Gbl.random.nextInt( actList.size())).getFacility();
 			Facilities facs = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
-			Facility f = facs.getFacilities().get(Gbl.random.nextInt(facs.getFacilities().size()));
-
+//			Id facId=new Id(Gbl.random.nextInt(facs.getFacilities().size()));
+			int facId=Gbl.random.nextInt(facs.getFacilities(factype).size());
+			Facility f= (Facility) facs.getFacilities(factype).values().toArray()[facId];
+			
+//			Facility f = facs.getFacilities().get(new Id(Gbl.random.nextInt(facs.getFacilities().size())));
 //			And replace the activity in the chain with it (only changes the facility)
 
 			if(newAct.getLinkId()!=f.getLink().getId()){
 				// If the first activity was chosen, make sure the last activity is also changed
-				if(newAct.equals(plan.getFirstActivity())){
+				if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
 					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
 //					Act lastAct = (Act) plan.getActsLegs().get(plan.getActsLegs().size()-1);
 					lastAct.setLink(f.getLink());
@@ -157,7 +161,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 					lastAct.setCoord(newCoord);
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
-				if(newAct.equals(plan.getActsLegs().get(plan.getActsLegs().size()-1))){
+				if(newAct.getType() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getType() && newAct.getLink() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getLink()){
 					Act firstAct = (Act) newPlan.getFirstActivity();
 					firstAct.setLink(f.getLink());
 					Coord newCoord = (Coord) f.getCenter();
@@ -182,8 +186,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 //				Reset the score to Undefined. Helps to see if the plan was really changed
 				newPlan.setScore(Double.NaN);
 				
-				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
-//				new PlansCalcRoute(network, tcost, ttime).run(plan);
+				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
 
 				k.map.learnActsActivities(newAct.getRefId(),f.getActivity(factype));
 				person.setSelectedPlan(newPlan);
