@@ -225,6 +225,7 @@ public class Controler {
 	private Controler(final String configFileName, final String dtdFileName, final Config config) {
 		super();
 		Gbl.printSystemInfo();
+		Gbl.printBuildInfo();
 		this.configFileName = configFileName;
 		this.dtdFileName = dtdFileName;
 		if (configFileName == null) {
