@@ -62,7 +62,7 @@ public class XY2Links extends PersonAlgorithm implements PlanAlgorithmI {
 			Act act = (Act)actslegs.get(j);
 			Link link = this.network.getNearestLink(act.getCoord());
 			if (null == link) {
-				throw new RuntimeException("getNearestLink returned Null!");
+				throw new RuntimeException("For person id="+plan.getPerson().getId()+": getNearestLink returned Null! act="+act);
 			}
 			act.setLink(link);
 		}
