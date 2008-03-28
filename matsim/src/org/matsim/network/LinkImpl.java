@@ -97,9 +97,14 @@ public class LinkImpl extends BasicLink implements Link {
 		double lb2 = bx*bx + by*by;
 		if (la2 == 0.0) { return Math.sqrt(lb2); } // from == to
 		double xla = ax*bx+ay*by; // scalar product
-		if (xla < 0.0) { return Math.sqrt(lb2); }
-		else if (xla > la2) { double cx = zx-tx; double cy = zy-ty; return Math.sqrt(cx*cx+cy*cy); }
-		else { return Math.sqrt(lb2-xla*xla/la2); // lb2-xla*xla/la2 = lb*lb-x*x
+		if (xla <= 0.0) { return Math.sqrt(lb2); }
+		else if (xla >= la2) { double cx = zx-tx; double cy = zy-ty; return Math.sqrt(cx*cx+cy*cy); }
+		else { // lb2-xla*xla/la2 = lb*lb-x*x
+			double tmp = xla*xla; 
+			tmp = tmp/la2; tmp = lb2 - tmp;
+			// tmp can be slightly negativ (coord lies on the link!). Therefore, using abs value
+			tmp = Math.abs(tmp);
+			return Math.sqrt(tmp);
 		}
 	}
 
