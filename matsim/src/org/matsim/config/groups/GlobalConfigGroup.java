@@ -34,15 +34,14 @@ public class GlobalConfigGroup extends Module {
 	}
 
 	private static final String RANDOM_SEED = "randomSeed";
-	private static final String OUTPUT_TIME_FORMAT = "outputTimeFormat";
-	private static final String GLOBAL_DTD_BASE = "globalDTDBase";
+	private static final String OUTPUT_TIME_FORMAT = "outputTimeFormat"; // usage deprecated
+	private static final String GLOBAL_DTD_BASE = "globalDTDBase";  // usage deprecated
 	private static final String LOCAL_DTD_BASE = "localDTDBase";
 	private static final String USE_ROAD_PRICING = "useRoadPricing"; // usage deprecated
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String COORDINATE_SYSTEM = "coordinateSystem";
 
 	private long randomSeed = 4711L;
-	private String outputTimeFormat = "HH:mm:ss";
 	private String localDtdBase = "dtd/";
 	private int numberOfThreads = 2;
 	private String coordinateSystem = "Atlantis";
@@ -53,8 +52,6 @@ public class GlobalConfigGroup extends Module {
 	public String getValue(final String key) {
 		if (RANDOM_SEED.equals(key)) {
 			return Long.toString(getRandomSeed());
-		} else if (OUTPUT_TIME_FORMAT.equals(key)) {
-			return getOutputTimeFormat();
 		} else if (LOCAL_DTD_BASE.equals(key)) {
 			return getLocalDtdBase();
 		} else if (NUMBER_OF_THREADS.equals(key)) {
@@ -71,7 +68,7 @@ public class GlobalConfigGroup extends Module {
 		if (RANDOM_SEED.equals(key)) {
 			setRandomSeed(Long.parseLong(value));
 		} else if (OUTPUT_TIME_FORMAT.equals(key)) {
-			setOutputTimeFormat(value);
+			log.info("The parameter " + OUTPUT_TIME_FORMAT + " in module " + GROUP_NAME + " is no longer supported and should be removed from the configuration file.");
 		} else if (GLOBAL_DTD_BASE.equals(key)) {
 			log.info("The parameter " + GLOBAL_DTD_BASE + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else if (LOCAL_DTD_BASE.equals(key)) {
@@ -91,7 +88,6 @@ public class GlobalConfigGroup extends Module {
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(RANDOM_SEED, getValue(RANDOM_SEED));
-		addNotNullParameterToMap(map, OUTPUT_TIME_FORMAT);
 		addNotNullParameterToMap(map, LOCAL_DTD_BASE);
 		addNotNullParameterToMap(map, COORDINATE_SYSTEM);
 		addNotNullParameterToMap(map, NUMBER_OF_THREADS);
@@ -105,13 +101,6 @@ public class GlobalConfigGroup extends Module {
 	}
 	public void setRandomSeed(final long randomSeed) {
 		this.randomSeed = randomSeed;
-	}
-
-	public String getOutputTimeFormat() {
-		return this.outputTimeFormat;
-	}
-	public void setOutputTimeFormat(final String outputTimeFormat) {
-		this.outputTimeFormat = outputTimeFormat;
 	}
 
 	public String getLocalDtdBase() {

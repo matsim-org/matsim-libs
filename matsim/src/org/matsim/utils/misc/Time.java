@@ -35,15 +35,22 @@ public class Time {
 
 	private static String defaultTimeFormat = TIMEFORMAT_HHMMSS;
 
+	/**
+	 * Sets the default time format to be used for conversion of seconds to a string-representation
+	 * ({@link #writeTime(double)}). If nothing is set, {@link #TIMEFORMAT_HHMMSS} is used as default.
+	 *
+	 * @param format
+	 */
 	public static final void setDefaultTimeFormat(final String format) {
 		defaultTimeFormat = format;
 	}
-	
+
 	/**
 	 * @deprecated use Time.parseTime(String, '-') instead
 	 * @param timeStr
 	 * @return
 	 */
+	@Deprecated
 	public static int secFromStr(final String timeStr) {
 		return (int)parseTime(timeStr, '-');
 	}
@@ -53,6 +60,7 @@ public class Time {
 	 * @param time_s
 	 * @return
 	 */
+	@Deprecated
 	public static String strFromSec(final int time_s) {
 		return writeTime(time_s, TIMEFORMAT_HHMMSS, '-');
 	}
@@ -60,15 +68,15 @@ public class Time {
 	public static final String writeTime(final double seconds, final String timeformat) {
 		return writeTime(seconds, timeformat, ':');
 	}
-	
+
 	public static final String writeTime(final double seconds, final char separator) {
 		return writeTime(seconds, defaultTimeFormat, separator);
 	}
-	
+
 	public static final String writeTime(final double seconds) {
 		return writeTime(seconds, defaultTimeFormat, ':');
 	}
-	
+
 	/**
 	 * Converts the given time in seconds after midnight into a textual representation
 	 *
@@ -113,7 +121,8 @@ public class Time {
 
 	/**
 	 * Parses the given string for a textual representation for time and returns
-	 * the time value in seconds past midnight.
+	 * the time value in seconds past midnight. It is the same as {@link #parseTime(String, char)}
+	 * with the separator set to ':'.
 	 *
 	 * @param time the string describing a time to parse.
 	 *
@@ -125,13 +134,25 @@ public class Time {
 		return parseTime(time, ':');
 	}
 
+	/**
+	 * Parses the given string for a textual representation for time and returns
+	 * the time value in seconds past midnight. The following formats are recognized:
+	 * HH:mm:ss, HH:mm, ssss.
+	 *
+	 * @param time the string describing a time to parse.
+	 * @param separator the character used between hours and minutes, and minutes and seconds.
+	 *
+	 * @return the parsed time as seconds after midnight.
+	 *
+	 * @throws IllegalArgumentException when the string cannot be interpreted as a valid time.
+	 */
 	public static final double parseTime(final String time, final char separator) {
 		if (time == null || time.length() == 0 || time.equals("undefined")) {
 			return Time.UNDEFINED_TIME;
 		}
 		boolean isNegative = (time.charAt(0) == '-');
 		String[] strings = (isNegative
-				? StringUtils.explode(time.substring(1), separator) 
+				? StringUtils.explode(time.substring(1), separator)
 						: StringUtils.explode(time, separator));
 		double seconds = 0;
 		if (strings.length == 1) {

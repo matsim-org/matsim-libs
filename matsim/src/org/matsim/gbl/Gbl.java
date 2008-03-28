@@ -34,7 +34,6 @@ import org.matsim.config.ConfigReaderMatsimV1;
 import org.matsim.counts.Counts;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.scoring.CharyparNagelScoringFunction;
-import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
@@ -117,7 +116,6 @@ public abstract class Gbl {
 		}
 
 		Gbl.random.setSeed(Gbl.config.global().getRandomSeed());
-		Time.setDefaultTimeFormat(Gbl.config.global().getOutputTimeFormat());
 
 		return Gbl.config;
 	}
