@@ -40,9 +40,9 @@ public class DoublePlanControler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String netFilename = "./test/yu/newPlans/equil_net.xml";
+		final String netFilename = "./test/yu/newPlans/input/equil_net.xml";
 //		final String plansFilename = "./test/yu/newPlans/equil_plans1k.xml";
-		final String plansFilename = "./test/yu/equil_test/equil_plans1k.xml";
+		final String plansFilename = "./test/yu/equil_test/plans100.xml";
 
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")

@@ -41,10 +41,11 @@ public class KMLNetWriterTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String netFilename = "./test/yu/ivtch/input/network.xml";
+		final String netFilename = "../schweiz-ivtch/network/ivtch-changed.xml";
+//		final String netFilename = "./test/yu/ivtch/input/network.xml";
 //		final String netFilename = "./test/yu/equil_test/equil_net.xml";
 //		final String kmzFilename = "./test/yu/ivtch/output/testEquil.kmz";
-		final String kmzFilename = "./test/yu/ivtch/output/testZrh.kmz";
+		final String kmzFilename = "./test/yu/utils/ivtch-changed_r1.1.kmz";
 
 		Gbl.createConfig(null);
 

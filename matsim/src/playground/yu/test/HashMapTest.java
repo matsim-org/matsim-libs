@@ -44,13 +44,8 @@ public class HashMapTest {
 		for (int i = 0; i < 100; i++) {
 			hm.put(i, new MyClass(i));
 		}
-		System.out.println("101-remove:" + hm.remove(101));
-		System.out.println("102-remove:" + hm.remove(102));
-		hm.get(98).append("100- appended String...");
-		hm.get(99).append("99- appended String...");
-		System.out.println("97: "+hm.get(97));
-		System.out.println("98: "+hm.get(98));
-		System.out.println("99: "+hm.get(99));
-		System.out.println("100: "+hm.get(100));
+		hm=null;
+		System.out.println(hm.get(0));
+		System.out.println(hm.get(1));
 	}
 }
