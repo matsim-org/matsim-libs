@@ -93,26 +93,27 @@ public class PolygonGeneratorII {
 		
 		 
 		HashSet<Point> currPoints = new HashSet<Point>();
-		HashSet<Point> lastPoints = new HashSet<Point>();
+		HashSet<Point> donePoints = new HashSet<Point>();
 		currPoints.add(lineStrings.get(0).getEndPoint()); ///Starting point
 				
 		
 		while(!currPoints.isEmpty()){
 		
 			HashSet<Point> nextPoints = new HashSet<Point>();
-			lastPoints.clear();
+//			lastPoints.clear();
 		
 			for(Iterator<Point> iter = currPoints.iterator() ; iter.hasNext() ; ){
 			
 				Point currPoint = iter.next();
 				
-				lastPoints.add(currPoint);
+//				lastPoints.add(currPoint);
 				Coordinate currPointCoor = currPoint.getCoordinate();
 										
 				Feature [] la = new Feature[0];
 				Feature [] lineArr = lineTree.get(currPoint.getX(), currPoint.getY(), CATCH_RADIUS).toArray(la);
 				
 //				Geometry [] nodePolys = new Geometry[lineArr.length];
+			
 				List<Polygon> nodePolys = new ArrayList<Polygon>();								
 				
 				for (int i = 0 ; i < lineArr.length ; i++){
@@ -122,28 +123,19 @@ public class PolygonGeneratorII {
 						nodePolys.add(returnPolys.get(ft.getAttribute(1)));
 //						nodePolys[i] = returnPolys.get(ft.getAttribute(1));
 					}					
-					if((ls.getStartPoint().equalsExact(currPoint, CATCH_RADIUS))&& (!lastPoints.contains(ls))){
+					if((ls.getStartPoint().equalsExact(currPoint, CATCH_RADIUS))&& (!donePoints.contains(ls))){
 						nextPoints.add(ls.getEndPoint());
 						
-					}else if(!lastPoints.contains(ls)){
+					}else if(!donePoints.contains(ls)){
 						nextPoints.add(ls.getStartPoint());
 					}
-				}	
-				Polygon [] co2 = new Polygon[nodePolys.size()];
-				int ii = 0;
-				for(Iterator<Polygon> it = nodePolys.iterator() ; it.hasNext() ; ){
-					 
-					co2[ii] = it.next();
-					ii++;						    
 				}
-				
-				
-				
-				GeometryCollection geoColl = new GeometryCollection(co2,geofac);
+								
+				Geometry[] geoArr = new Geometry[0];
+				GeometryCollection geoColl = new GeometryCollection(nodePolys.toArray(geoArr),geofac);
 				Geometry poly = (Geometry) geoColl.buffer(0.0);
-				Coordinate [] coor = poly.getCoordinates();
-					
 				
+				Coordinate [] coor = poly.getCoordinates();
 				
 				Envelope o = poly.getEnvelopeInternal();
 				QuadTree<Coordinate> polyCoor = new QuadTree<Coordinate>(o.getMinX(), o.getMinY(), o.getMaxX(), o.getMaxY());
@@ -154,10 +146,10 @@ public class PolygonGeneratorII {
 							
 				List<Point> points = new ArrayList<Point>();				
 						
+				
+				//verallgemeinern
 				for (int i = 0 ; i < lineArr.length ; i++ ){
 					
-					
-					////Überarbeiten
 					Feature ftI = lineArr[i];
 					LineString lineI = (LineString) ftI.getAttribute(0);
 					boolean startI = lineI.getStartPoint().equalsExact(currPoint, CATCH_RADIUS);
@@ -168,12 +160,14 @@ public class PolygonGeneratorII {
 					}else {
 						ftII = lineArr[i+1];
 					}
+					
 					LineString lineII = (LineString) ftII.getAttribute(0);
 					boolean startII = lineI.getStartPoint().equalsExact(currPoint, CATCH_RADIUS);
 					
 					LineString vecI = separateLine(lineI, startI);
 					LineString vecII = separateLine(lineII, startII);
-					//////
+					
+					double angle = getAngle(vecI,vecII);
 					
 					boolean found = false;
 					List<Coordinate> cList = new ArrayList<Coordinate>();
@@ -185,8 +179,10 @@ public class PolygonGeneratorII {
 						Coordinate [] cc = new Coordinate[]{currPointCoor, pp};
 						CoordinateSequence seq = new CoordinateArraySequence(cc);
 						LineString line = new LineString(seq, geofac);
-					
-						if((!line.intersects(vecI))&&(!line.intersects(vecII))){
+						double currAngleI = getAngle(vecI,line);
+						double currAngleII = getAngle(vecII,line);
+						
+						if(angle == currAngleI + currAngleII){
 							
 							Coordinate [] p = new Coordinate[]{pp};
 							CoordinateSequence seqII = new CoordinateArraySequence(p);
@@ -306,7 +302,9 @@ public class PolygonGeneratorII {
 				}
 				
 			}
-			currPoints = nextPoints;
+			donePoints.addAll(currPoints);
+			currPoints.clear();
+			currPoints.addAll(nextPoints);
 				
 		}
 		
@@ -646,8 +644,8 @@ public class PolygonGeneratorII {
 		return skalarprodukt;
 	}
 	
-	////Returns the first (start == true) or last (start == false) segment of a lineString
-	////The first point of the returned lineString is the start or end point of the original lineString
+	//Returns the first (start == true) or last (start == false) segment of a lineString
+	//The first point of the returned lineString is the start or end point of the original lineString
 	private LineString separateLine(LineString ls, boolean start){
 		
 		LineString vec;
@@ -662,6 +660,8 @@ public class PolygonGeneratorII {
 		}
 		return vec;
 	}
+	
+
 	
 	private LineString getBisectingLine(LineString ls, double angle){
 		
