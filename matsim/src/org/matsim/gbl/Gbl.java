@@ -20,7 +20,10 @@
 
 package org.matsim.gbl;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -168,10 +171,10 @@ public abstract class Gbl {
 		log.info("used RAM: " + usedMem + "B = " + (usedMem/1024) + "kB = " + (usedMem/1024/1024) + "MB" +
 				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB");
 	}
-	
+
 	public static final void printSystemInfo() {
-		log.info("JVM: " + System.getProperty("java.vm.version") + "; " 
-				+ System.getProperty("java.vm.vendor") + "; " 
+		log.info("JVM: " + System.getProperty("java.vm.version") + "; "
+				+ System.getProperty("java.vm.vendor") + "; "
 				+ System.getProperty("java.vm.info") + "; "
 				+ System.getProperty("sun.arch.data.model") + "-bit");
 		log.info("OS: " + System.getProperty("os.name") + "; "
@@ -181,6 +184,33 @@ public abstract class Gbl {
 		log.info("max. Memory: " + Runtime.getRuntime().maxMemory() / 1024.0 / 1024.0 + "MB (" + Runtime.getRuntime().maxMemory() + "B)");
 	}
 
+	/** Prints some information about the current build/revision of this code.
+	 * Currently, this will only work with the Nightly-Build-Jars.
+	 */
+	public static final void printBuildInfo() {
+		String revision = null;
+		String date = null;
+		URL url = Gbl.class.getResource("/revision.txt");
+		if (url != null) {
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+				revision = reader.readLine();
+				date = reader.readLine();
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (revision == null) {
+					log.info("MATSim-Build: unknown");
+				} else {
+					log.info("MATSim-Build: " + revision + " (" + date + ")");
+				}
+			}
+		} else {
+			log.info("MATSim-Build: unknown");
+		}
+	}
+
 	public static final void errorMsg(final Exception e) {
 		e.printStackTrace();
 		System.exit(-1);
@@ -188,12 +218,7 @@ public abstract class Gbl {
 
 	public static final void errorMsg(final String msg) {
 		// the following is only so we get a useful stacktrace and know where the error happened.
-		try {
-			throw new Exception(msg);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		new Exception(msg).printStackTrace();
 		System.exit(-1);
 	}
 
