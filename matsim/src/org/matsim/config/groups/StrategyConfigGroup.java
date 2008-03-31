@@ -20,7 +20,8 @@
 
 package org.matsim.config.groups;
 
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -38,10 +39,17 @@ public class StrategyConfigGroup extends Module {
 	private static final String MODULE = "Module_";
 	private static final String MODULE_PROBABILITY = "ModuleProbability_";
 	private static final String MODULE_DISABALE_AFTER_ITERATION = "ModuleDisableAfterIteration_";
+	private static final String MODULE_EXE_PATH = "ModuleExePath_";
+	private static final String EXTERNAL_EXE_CONFIG_TEMPLATE = "ExternalExeConfigTemplate";
+	private static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";
+	private static final String EXTERNAL_EXE_TIME_OUT = "ExternalExeTimeOut";
 
 	private int maxAgentPlanMemorySize = 0;
+	private String externalExeConfigTemplate = null;
+	private String externalExeTmpFileRootDir = null;
+	private long externalExeTimeOut = 3600;
 
-	private final Map<String, StrategySettings> settings = new HashMap<String, StrategySettings>();
+	private final Map<String, StrategySettings> settings = new LinkedHashMap<String, StrategySettings>();
 
 	public StrategyConfigGroup() {
 		super(GROUP_NAME);
@@ -73,6 +81,22 @@ public class StrategyConfigGroup extends Module {
 			}
 			return Integer.toString(settings.getDisableAfter());
 		}
+		if (key != null && key.startsWith(MODULE_EXE_PATH)) {
+			StrategySettings settings = getStrategySettings(key.substring(MODULE_EXE_PATH.length()), false);
+			if (settings == null) {
+				return null;
+			}
+			return settings.getExePath();
+		}
+		if (EXTERNAL_EXE_CONFIG_TEMPLATE.equals(key)) {
+			return getExternalExeConfigTemplate();
+		}
+		if (EXTERNAL_EXE_TMP_FILE_ROOT_DIR.equals(key)) {
+			return getExternalExeTmpFileRootDir();
+		}
+		if (EXTERNAL_EXE_TIME_OUT.equals(key)) {
+			return Long.toString(getExternalExeTimeOut());
+		}
 		throw new IllegalArgumentException(key);
 	}
 
@@ -89,6 +113,15 @@ public class StrategyConfigGroup extends Module {
 		} else if (key != null && key.startsWith(MODULE_DISABALE_AFTER_ITERATION)) {
 			StrategySettings settings = getStrategySettings(key.substring(MODULE_DISABALE_AFTER_ITERATION.length()), true);
 			settings.setDisableAfter(Integer.parseInt(value));
+		} else if (key != null && key.startsWith(MODULE_EXE_PATH)) {
+			StrategySettings settings = getStrategySettings(key.substring(MODULE_EXE_PATH.length()), true);
+			settings.setExePath(value);
+		} else if (EXTERNAL_EXE_CONFIG_TEMPLATE.equals(key)) {
+			setExternalExeConfigTemplate(value);
+		} else if (EXTERNAL_EXE_TMP_FILE_ROOT_DIR.equals(key)) {
+			setExternalExeTmpFileRootDir(value);
+		} else if (EXTERNAL_EXE_TIME_OUT.equals(key)) {
+			setExternalExeTimeOut(Long.parseLong(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -106,8 +139,11 @@ public class StrategyConfigGroup extends Module {
 			} else {
 				map.put(MODULE_DISABALE_AFTER_ITERATION + entry.getKey(), Integer.toString(entry.getValue().getDisableAfter()));
 			}
+			this.addNotNullParameterToMap(map, MODULE_EXE_PATH + entry.getKey());
 		}
-
+		this.addNotNullParameterToMap(map, EXTERNAL_EXE_CONFIG_TEMPLATE);
+		this.addNotNullParameterToMap(map, EXTERNAL_EXE_TMP_FILE_ROOT_DIR);
+		this.addNotNullParameterToMap(map, EXTERNAL_EXE_TIME_OUT);
 		return map;
 	}
 
@@ -138,6 +174,10 @@ public class StrategyConfigGroup extends Module {
 		}
 	}
 
+	public Collection<StrategySettings> getStrategySettings() {
+		return this.settings.values();
+	}
+
 	private StrategySettings getStrategySettings(final String index, final boolean createIfMissing) {
 		StrategySettings settings = this.settings.get(index);
 		if (settings == null && createIfMissing) {
@@ -155,10 +195,35 @@ public class StrategyConfigGroup extends Module {
 		return this.maxAgentPlanMemorySize;
 	}
 
+	public void setExternalExeConfigTemplate(final String externalExeConfigTemplate) {
+		this.externalExeConfigTemplate = externalExeConfigTemplate;
+	}
+
+	public String getExternalExeConfigTemplate() {
+		return this.externalExeConfigTemplate;
+	}
+
+	public void setExternalExeTmpFileRootDir(final String externalExeTmpFileRootDir) {
+		this.externalExeTmpFileRootDir = externalExeTmpFileRootDir;
+	}
+
+	public String getExternalExeTmpFileRootDir() {
+		return this.externalExeTmpFileRootDir;
+	}
+
+	public void setExternalExeTimeOut(final long externalExeTimeOut) {
+		this.externalExeTimeOut = externalExeTimeOut;
+	}
+
+	public long getExternalExeTimeOut() {
+		return this.externalExeTimeOut;
+	}
+
 	public static class StrategySettings {
 		private double probability = -1.0;
 		private String moduleName = null;
 		private int disableAfter = -1;
+		private String exePath = null;
 
 		public void setProbability(final double probability) {
 			this.probability = probability;
@@ -182,6 +247,14 @@ public class StrategyConfigGroup extends Module {
 
 		public int getDisableAfter() {
 			return this.disableAfter;
+		}
+
+		public void setExePath(final String exePath) {
+			this.exePath = exePath;
+		}
+
+		public String getExePath() {
+			return this.exePath;
 		}
 	}
 }
