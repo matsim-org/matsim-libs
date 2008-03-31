@@ -92,6 +92,9 @@ public class DEQSim extends ExternalMobsim {
 		Module module = deqConfig.createModule("network");
 		module.addParam("inputNetworkFile", simConfig.network().getInputFile());
 		module.addParam("localInputDTD", "dtd/matsim_v1.dtd");
+		// green time fractions
+		module = deqConfig.createModule("greentimefractions");
+		module.addParam("inputGTFfile",simConfig.findParam("greentimefractions","inputGTFfile"));
 		// plans
 		module = deqConfig.createModule("plans");
 		module.addParam("inputPlansFile", iterationPlansFile);
