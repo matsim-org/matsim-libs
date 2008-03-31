@@ -27,10 +27,13 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.basic.v01.Id;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 
 
 public class CountsFixture {
+	
+	NetworkLayer network;
 
 	public void setUp() {
 		String[] args={"test/input/org/matsim/counts/config.xml"};
@@ -38,18 +41,16 @@ public class CountsFixture {
 
 		MatsimCountsReader counts_parser = new MatsimCountsReader(Counts.getSingleton());
 		counts_parser.readFile(config.counts().getCountsFileName());
+		
+		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		
 	}
 
 	public CountsComparisonAlgorithm getCCA() {
-		CalcLinkStats linkStats = new AttributeFactory().createLinkStats();
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-
-		network.createNode("0", "2.0", "1.0", "test");
-		network.createNode("1", "1.0", "1.0", "test");
-		/* String id,  String from,  String to, String length, String freespeed,
-		 *    String capacity,  String permlanes, String origid, final String type)  */
-		network.createLink("100", "0", "1", "3", "1.0", "1.0", "1", "0", "test" );
-		CountsComparisonAlgorithm cca= new CountsComparisonAlgorithm(linkStats, Counts.getSingleton(), network);
+		
+		CalcLinkStats linkStats = new AttributeFactory().createLinkStats(this.network);			
+		CountsComparisonAlgorithm cca= new CountsComparisonAlgorithm(linkStats, Counts.getSingleton(), this.network);
 		cca.setDistanceFilter(100.0, "0");
 		return cca;
 	}
@@ -58,9 +59,8 @@ public class CountsFixture {
 
 		List<CountSimComparison> csc_l=new Vector<CountSimComparison>();
 		for (int i=0; i<24; i++) {
-			csc_l.add(new CountSimComparisonImpl(new Id(i+1), 1, 1.0, 1.0));
+			csc_l.add(new CountSimComparisonImpl(new Id(100), i+1, 1.0, 1.0));
 		}
-
 		return csc_l;
 	}
 
