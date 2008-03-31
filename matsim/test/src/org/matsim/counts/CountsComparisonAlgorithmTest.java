@@ -51,12 +51,13 @@ public class CountsComparisonAlgorithmTest extends MatsimTestCase {
 		for (CountSimComparison csc : csc_list) {
 			assertEquals("Wrong sim value set", 2*cnt, csc.getSimulationValue(), 0.0);
 			cnt++;
+			cnt=cnt%24;
 		}//while
 	}
 
 	public void testDistanceFilter() {
 		CountsComparisonAlgorithm cca = this.fixture.getCCA();
-		cca.setDistanceFilter(Double.valueOf(0.5), "0");
+		cca.setDistanceFilter(Double.valueOf(0.5), "1");
 		cca.run(Counts.getSingleton());
 
 		List<CountSimComparison> csc_list = cca.getComparison();
