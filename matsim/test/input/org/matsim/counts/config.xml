@@ -12,4 +12,8 @@
 		<param name="outputCountsFile" value="dummy/output_counts.xml" />
 		<param name="outputVersion" value="v1" />
 	</module>
+	
+	<module name="network">
+		<param name="inputNetworkFile" value="test/scenarios/triangle/network.xml" />
+	</module>
 </config>
