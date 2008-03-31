@@ -116,7 +116,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		// now test that the ReRoute-Strategy also knows about these travel times...
 		config.controler().setLastIteration(1);
-		Module strategyParams = config.createModule("strategy");
+		Module strategyParams = config.getModule("strategy");
 		strategyParams.addParam("maxAgentPlanMemorySize", "4");
 		strategyParams.addParam("ModuleProbability_1", "1.0");
 		strategyParams.addParam("Module_1", "ReRoute");
