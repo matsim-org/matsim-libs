@@ -37,6 +37,7 @@ import org.matsim.config.groups.PlansConfigGroup;
 import org.matsim.config.groups.RoadPricingConfigGroup;
 import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.config.groups.SocNetConfigGroup;
+import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.config.groups.WithindayConfigGroup;
 import org.matsim.config.groups.WorldConfigGroup;
 
@@ -63,9 +64,8 @@ public class Config {
 	private EventsConfigGroup events = null;
 	private RoadPricingConfigGroup roadpricing = null;
 	private EvacuationConfigGroup evacuation = null;
-//	 SN TEST
+	private StrategyConfigGroup strategy = null;
 	private SocNetConfigGroup socnetmodule = null;
-//	private StrategyConfigGroup strategy = null;
 
 	private static final Logger log = Logger.getLogger(Config.class);
 
@@ -74,6 +74,7 @@ public class Config {
 	//////////////////////////////////////////////////////////////////////
 
 	public Config() {
+		// nothing to do
 	}
 
 	public void addCoreModules() {
@@ -110,8 +111,8 @@ public class Config {
 		this.facilities = new FacilitiesConfigGroup();
 		this.modules.put(FacilitiesConfigGroup.GROUP_NAME, this.facilities);
 
-//		this.strategy = new StrategyConfigGroup();
-//		this.modules.put(StrategyConfigGroup.GROUP_NAME, this.strategy );
+		this.strategy = new StrategyConfigGroup();
+		this.modules.put(StrategyConfigGroup.GROUP_NAME, this.strategy);
 
 		this.matrices = new MatricesConfigGroup();
 		this.modules.put(MatricesConfigGroup.GROUP_NAME, this.matrices);
@@ -166,9 +167,9 @@ public class Config {
 		return this.modules;
 	}
 
-	/** 
+	/**
 	 * Returns the requested module, or <code>null</code> if the module does not exist.
-	 *  
+	 *
 	 * @param moduleName name of the requested module
 	 * @return requested module
 	 */
@@ -178,11 +179,11 @@ public class Config {
 
 	/** Returns the requested parameter. If the module or parameter is not known, an
 	 * error is logged and an IllegalArgumentException is thrown.
-	 * 
+	 *
 	 * @param moduleName
 	 * @param paramName
 	 * @return the requested parameter
-	 * 
+	 *
 	 * @throws IllegalArgumentException if the module or parameter does not exist
 	 * @see #findParam(String, String)
 	 */
@@ -206,7 +207,7 @@ public class Config {
 	 * @param moduleName name of the config-module
 	 * @param paramName name of parameter in the specified module
 	 * @return value of the parameter if it exists, <code>null</code> otherwise
-	 * 
+	 *
 	 * @see #getParam(String, String)
 	 */
 	public final String findParam(final String moduleName, final String paramName) {
@@ -312,12 +313,13 @@ public class Config {
 	public final EvacuationConfigGroup evacuation(){
 		return this.evacuation;
 	}
-//	 SN TEST
+
+	public final StrategyConfigGroup strategy() {
+		return this.strategy;
+	}
+
 	public final SocNetConfigGroup socnetmodule() {
-	    return this.socnetmodule;
-	    }
-//	public final StrategyConfigGroup strategy() {
-//		return this.strategy;
-//	}
+		return this.socnetmodule;
+	}
 
 }

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.config;
+package org.matsim.config.groups;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,10 +26,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.config");
+		TestSuite suite = new TestSuite("Tests for org.matsim.config.groups");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(ConfigReaderMatsimV1Test.class);
-		suite.addTest(org.matsim.config.groups.AllTests.suite());
+		suite.addTestSuite(StrategyConfigGroupTest.class);
 		//$JUnit-END$
 		return suite;
 	}
