@@ -71,11 +71,7 @@ public class AttributeFactory {
 		return meta;
 	}
 
-	public CalcLinkStats createLinkStats() {
-		NetworkLayer network = new NetworkLayer();
-		network.createNode("0", "0", "0", null);
-		network.createNode("1", "100", "0", null);
-		network.createLink("100", "0", "1", "1.0", "1.0", "1.0", "1", "0", null);
+	public CalcLinkStats createLinkStats(NetworkLayer network) {
 		CalcLinkStats linkStats = new CalcLinkStats(network);
 		linkStats.readFile("./test/input/org/matsim/counts/linkstats.att");
 		return linkStats;
