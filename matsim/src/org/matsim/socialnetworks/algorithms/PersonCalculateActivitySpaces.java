@@ -49,13 +49,8 @@ public class PersonCalculateActivitySpaces {
 			myAct = (Act) myAlter.getSelectedPlan().getActsLegs().get(0);
 			CoordI myAlterCoord = myAct.getCoord();
 			aSd = aSd + egoHomeCoord.calcDistance(myAlterCoord);
-			aSd = aSd / alters.size();
 		}
-		/* TODO [JH] Please check this, as it doesn't make sense for me:
-		 * I think that the last line in the for-loop ("aSd = aSd / alters.size()") should
-		 * be OUTSIDE of the loop. Don't you first sum up all the distances, and than divide
-		 * by the number of values to get the average?
-		 */
+		aSd = aSd / alters.size();
 		return aSd;
 	}
 
