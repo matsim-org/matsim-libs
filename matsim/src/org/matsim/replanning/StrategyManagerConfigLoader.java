@@ -21,6 +21,7 @@
 package org.matsim.replanning;
 
 import org.matsim.config.Config;
+import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -64,22 +65,15 @@ public class StrategyManagerConfigLoader {
 	public static void load(final Config config, final StrategyManager manager, final NetworkLayer network,
 			final TravelCostI travelCostCalc, final TravelTimeI travelTimeCalc, final LegTravelTimeEstimator legTravelTimeEstimator) {
 
-		String maxvalue = config.findParam("strategy", "maxAgentPlanMemorySize");
-		if (maxvalue != null){
-			manager.setMaxPlansPerAgent(Integer.parseInt(maxvalue));
-		}
+		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
 		int externalCounter = 0;
-		int i = 0;
-		while (true) {
-			i++;
-			String modrate = "ModuleProbability_" + i;
-			String ratevalue = config.findParam("strategy", modrate);
-			if (ratevalue == null) break;
-			double rate = Double.parseDouble(ratevalue);
+
+		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
+			double rate = settings.getProbability();
 			if (rate == 0.0) continue;
-			String modname = "Module_" + i;
-			String classname = config.getParam("strategy", modname);
+			String classname = settings.getModuleName();
+
 			if (classname.startsWith("org.matsim.demandmodeling.plans.strategies.")) {
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
@@ -106,16 +100,16 @@ public class StrategyManagerConfigLoader {
 			} else if (classname.equals("ExternalModule")) {
 				externalCounter++;
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				String exePath = config.getParam("strategy", "ModuleExePath_" + i);
+				String exePath = settings.getExePath();
 				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter));
 			} else if (classname.equals("PlanomatExe")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				String exePath = config.getParam("strategy", "ModuleExePath_" + i);
+				String exePath = settings.getExePath();
 				strategy.addStrategyModule(new PlanomatExe(exePath));
 				strategy.addStrategyModule(new ReRoute(network, travelCostCalc, travelTimeCalc));
 			} else if (classname.equals("PlanomatTimeRouteExe")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				String exePath = config.getParam("strategy", "ModuleExePath_" + i);
+				String exePath = settings.getExePath();
 				strategy.addStrategyModule(new PlanomatExe(exePath));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
@@ -149,11 +143,8 @@ public class StrategyManagerConfigLoader {
 			manager.addStrategy(strategy, rate);
 
 			// now check if this modules should be disabled after some iterations
-			String moditer = "ModuleDisableAfterIteration_" + i;
-			String itervalue = config.findParam("strategy", moditer);
-			if (itervalue != null) {
-				int maxIter = Integer.MAX_VALUE;
-				maxIter = Integer.parseInt(itervalue);
+			if (settings.getDisableAfter() >= 0) {
+				int maxIter = settings.getDisableAfter();
 				if (maxIter >= config.controler().getFirstIteration()) {
 					manager.addChangeRequest(maxIter + 1, strategy, 0.0);
 				} else {

@@ -149,7 +149,7 @@ public class ExternalModule implements StrategyModuleI {
 	}
 
 	public void prepareExternalExeConfig() {
-		String configFileName = Gbl.getConfig().findParam("strategy", "ExternalExeConfigTemplate");
+		String configFileName = Gbl.getConfig().strategy().getExternalExeConfigTemplate();
 		if (configFileName == null) {
 			this.extConfig = new Config();
 		} else {
