@@ -158,7 +158,7 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 					Leg leg = (Leg)bestactslegs.get(j);
 					leg.setRoute(null);
 				}
-//				Reset the score to -9999. Helps to see if the plan was really changed
+//				Reset the score.
 				newPlan.setScore(Plan.UNDEF_SCORE);
 				
 				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());

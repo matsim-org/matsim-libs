@@ -25,16 +25,28 @@ import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 
 public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
-	private NetworkLayer network;
-	private TravelCostI tcost;
-	private TravelTimeI ttime;
-	private String[] factypes;
+	private NetworkLayer network=null;
+	private TravelCostI tcost=null;
+	private TravelTimeI ttime=null;
+	/** 
+	 * TODO [JH] this is hard-coded here but has to match the standard facility types
+	 * in the facilities object. Need to make this change in the SNControllers, too.
+	 */
+	private String[] factypes={"home","work","shop","education","leisure"};
 	
-    public SNRandomFacilitySwitcher(String[] factypes, NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
-    	
+    public SNRandomFacilitySwitcher(NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
+//	public SNRandomFacilitySwitcher() {
+		System.out.println("initializing SNRandomFacilitySwitcher");
+    	this.network=network;
+    	this.tcost = tcost;
+    	this.ttime = ttime;
+//    	This is a workaround until factypes can be put into a config file that is
+//    	available to all elements of the SN run
+//    	this.factypes = playground.jhackney.controler.SNControllerListenerRePlanSecLoc.activityTypesForEncounters;
     }
 
     @Override
