@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SNControlerListenerSecLoc.java
+ * SNControlerListenerRePlanSecLoc.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -46,7 +46,6 @@ import org.matsim.socialnetworks.interactions.SocializingOpportunity;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
 import org.matsim.socialnetworks.io.PajekWriter;
-import org.matsim.socialnetworks.replanning.SNSecLocRandom;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
@@ -54,26 +53,29 @@ import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 /**
  * This controler initializes a social network which permits the exchange of influence
- * and information between agents in a loop surrounding the MobSim iterations. The agents'
- * plans can then be modified according to the new information. The new modified plan
- * is selected and used in the next iteration of the MobSim.
+ * and information between agents within the MobSim iterations. The agents'
+ * plans are modified according to the new information within the iterations of the MobSim.
+ * Thus the social network replanning occurs in parallel to the normal replanning and not
+ * serial to it. <p>
  * 
- * Essentially this Controler is providing a new initial demand each time social
- * interactions are permitted.
+ * Contrast this functionality to <a href= <a> playground/jhackney/controler/SNControllerListenerSecLoc.java</a>, which replans outside the
+ * MobSim loop and generates new initial demand (100% of agents replan with social network
+ * and a portion of the plans are optimized subsequently in MobSim).<p>
  * 
- * The plans are optimized using standard RePlanning algorithms and PlanSelectors.
- * 
- * The number of MobSim iterations to run before permitting social interactions and changes
- * to the plans which account for these interactions is set in the config.xml variable,
- * "replanning_interval". Something like 30 is appropriate.
+ * It is likely that neither implementation is right or wrong, but that different
+ * experiments will use different Controllers: e.g. secondary location choice still needs
+ * a route and/or departure time optimization either for the new secondary activities or
+ * for the primary activities.<p>
  * 
  * The fraction of agents socially interacting is set in the config.xml variables,
  * "fract_s_interact" for spatial interactions, and "fract_ns_interact" for simulating
- * other interactions.
+ * other interactions which occur/have occured outside the framework of the plans
+ * under consideration.<p>
  * 
- * After these interactions occur, all agents adapt their plans to their social group.
- * This is done in a PlanAlgorithm written to make the desired kind of changes one wants
- * to make to the plans as a result of social interactions.
+ * After these interactions occur, a percent of agents adapt their plans to their social
+ * group. This is done in a PlanAlgorithm written to make the desired kind of changes
+ * one wants to make to the plans as a result of social interactions. The PlanAlgorithm
+ * must be added to the StrategyManager.<p>
  * 
  * Initialization of social networks can use the initial plans and/or
  * other algorithms to generate relationships.
@@ -81,7 +83,7 @@ import org.matsim.world.algorithms.WorldBottom2TopCompletion;
  * @author jhackney
  *
  */
-public class SNControllerListenerSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener {
+public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener {
 
 	private static final boolean CALCSTATS = true;
 	private static final String DIRECTORY_SN = "socialnets/";
@@ -94,13 +96,13 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 	SpatialInteractor plansInteractorS;//spatial (face to face)
 	int max_sn_iter;
 	int snIter;
-	String [] infoToExchange;//type of info for non-spatial exchange is read in
+	public static String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
 	Collection<SocializingOpportunity> socialPlans=null;
 
-	private final Logger log = Logger.getLogger(SNControllerListenerSecLoc.class);
+	private final Logger log = Logger.getLogger(SNControllerListenerRePlanSecLoc.class);
 
 //	Variables for allocating the spatial meetings among different types of activities
 	double fractionS[];
@@ -183,9 +185,8 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 		Controler controler = event.getControler();
 
 		/* code previously in setupIteration() */
-//		int snIter = event.getIteration();
+
 		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
-//			if( event.getIteration()%replan_interval==0){
 
 //			// add the socNet-score to the existing scoring function
 //			controler.setScoringFunctionFactory(
@@ -240,14 +241,13 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 			}
 			this.log.info(" ... done");
 
-			this.log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE. Make this a person algorithm");
-			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
-			while (itreplan.hasNext()) {
-				Plan p = itreplan.next().getSelectedPlan();
-				new PersonSNSecLocRandomReRoute(activityTypesForEncounters, controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
-//				System.out.println( "SNControler1 Number of plans for person "+p.getPerson().getId()+" "+p.getPerson().getPlans().size());
-			}
-			this.log.info(" ... done");
+//			this.log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE. Make this a person algorithm");
+//			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
+//			while (itreplan.hasNext()) {
+//				Plan p = itreplan.next().getSelectedPlan();
+//				new PersonSNSecLocRandomReRoute(activityTypesForEncounters, controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
+//			}
+//			this.log.info(" ... done");
 			snIter++;
 		}
 	}
@@ -423,18 +423,6 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 		return total_spatial_fraction;
 	}
 
-//	private final void makeSNIterationPath(final int iteration) {
-//	new File(getSNIterationPath(iteration)).mkdir();
-//	}
-//	private final void makeSNIterationPath(final int iteration, final int snIter) {
-//	this.log.info(getSNIterationPath(iteration, snIter));
-//	File iterationOutFile= new File(getSNIterationPath(iteration, snIter));
-//	iterationOutFile.mkdir();
-////	if (!iterationOutFile.mkdir()) {
-////	Gbl.errorMsg("The output directory " + iterationOutFile + " could not be created. Does its parent directory exist?");
-////	}
-//	}
-
 	/**
 	 * returns the path to the specified social network iteration directory. The directory path does not include the trailing '/'
 	 * @param snIter the iteration the path to should be returned
@@ -456,3 +444,4 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 	}
 
 }
+

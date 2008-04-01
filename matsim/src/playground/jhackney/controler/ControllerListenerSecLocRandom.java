@@ -65,7 +65,8 @@ import playground.jhackney.algorithms.PlanRandomReplaceSecLoc;
  * replaces it from the agent's knowledge.
  * 
  * Thus in this conroller the information
- * exchange between agents does not matter in replanning.
+ * exchange between agents does not matter in replanning. There is no correlation between
+ * the information used by agents and that of their alters.
  * 
  * The intent is to be able to compare a random secondary location choice
  * algorithm with one that uses social network exchanges of information
