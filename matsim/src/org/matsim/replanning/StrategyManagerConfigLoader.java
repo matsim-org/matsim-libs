@@ -42,6 +42,8 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcher;
+import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -134,6 +136,12 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 			} else if (classname.equals("SelectPathSizeLogit")) {
 				strategy = new PlanStrategy(new PathSizeLogitSelector());
+				// JH
+			} else if (classname.equals("SNSecLoc")){
+				System.out.println(" #### Choosing social network replanning algorithm");
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcher(network, travelCostCalc, travelTimeCalc);
+				strategy.addStrategyModule(socialNetStrategyModule);
 			}
 
 			if (strategy == null) {
