@@ -73,11 +73,18 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 	
 	private List<Double> samplesReplanned = new LinkedList<Double>();
 	
+	private List<Double> samplesTravRiskyLink = new LinkedList<Double>();
+	
+	private List<Double> samplesTravSafeLink = new LinkedList<Double>();
+	
 	private SummaryWriter summaryWriter;
 	
-	public TripAndScoreStats(EUTRouterAnalyzer analyzer, SummaryWriter summaryWriter) {
+	private TraversedRiskyLink traversedRiskLink;
+	
+	public TripAndScoreStats(EUTRouterAnalyzer analyzer, TraversedRiskyLink traversedRiskyLink, SummaryWriter summaryWriter) {
 		this.analyzer = analyzer;
 		this.summaryWriter = summaryWriter;
+		this.traversedRiskLink = traversedRiskyLink;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -117,6 +124,19 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 			avrTripDur = avrTripDuration(analyzer.getRiskAversePersons(), samplesRiskAverse);
 			avrScore = avrSelectedScore(analyzer.getRiskAversePersons());
 			dump(avrTripDur, avrScore);
+			/*
+			 * Traversed risky links
+			 */
+			avrTripDur = avrTripDuration(traversedRiskLink.getPersons(), samplesTravRiskyLink);
+			avrScore = avrSelectedScore(traversedRiskLink.getPersons());
+			dump(avrTripDur, avrScore);
+			/*
+			 * Traversed save links
+			 */
+			Collection traversedSave = CollectionUtils.subtract(population, traversedRiskLink.getPersons());
+			avrTripDur = avrTripDuration(traversedSave, samplesTravSafeLink);
+			avrScore = avrSelectedScore(traversedSave);
+			dump(avrTripDur, avrScore);
 			
 			writer.newLine();
 			writer.flush();
@@ -134,7 +154,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 	}
 
 	private double avrTripDuration(Collection<Person> persons, List<Double> samples) {
-		if(persons.isEmpty())
+		if(persons == null || persons.isEmpty())
 			return 0;
 		
 		double sum = 0;
@@ -150,7 +170,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 	}
 	
 	private double avrSelectedScore(Collection<Person> persons) {
-		if(persons.isEmpty())
+		if(persons == null || persons.isEmpty())
 			return 0;
 		
 		double sum = 0;
@@ -189,6 +209,8 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 			writer.write("\tunguided_trip\tunguided_score");
 			writer.write("\treplaned_trip\treplaned_score");
 			writer.write("\triskaverse_trip\triskaverse_score");
+			writer.write("\triskyLink_trip\triskyLink_score");
+			writer.write("\tsafeLink_trip\tsafeLink_score");
 			writer.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -221,6 +243,19 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 			avr = calcAvr(samplesRiskAverse);
 			summaryWriter.setTt_riskaverse(avr);
 			writer.write(String.valueOf(avr));
+			
+			writer.write("\t");
+			writer.write("\t");
+			avr = calcAvr(samplesTravRiskyLink);
+			summaryWriter.setTt_riskaverse(avr);
+			writer.write(String.valueOf(avr));
+			
+			writer.write("\t");
+			writer.write("\t");
+			avr = calcAvr(samplesTravSafeLink);
+			summaryWriter.setTt_riskaverse(avr);
+			writer.write(String.valueOf(avr));
+			
 			writer.newLine();
 			writer.close();
 		} catch (IOException e) {

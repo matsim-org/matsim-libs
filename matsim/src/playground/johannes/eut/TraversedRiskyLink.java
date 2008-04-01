@@ -64,6 +64,8 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 	
 	private SummaryWriter summaryWriter;
 	
+	private Collection<Person> persons = null;
+	
 	public TraversedRiskyLink(Plans population, List<BasicLinkI> riskyLinks, SummaryWriter summaryWriter) {
 		this.summaryWriter = summaryWriter;
 		this.population = population;
@@ -88,9 +90,13 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 		}
 	}
 	
+	public Collection<Person> getPersons() {
+		return persons;
+	}
+	
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Collection subCollection = CollectionUtils.select(population.getPersons().values(), personPredicate);
-		
+		persons = subCollection;
 		try{
 			writer.write(String.valueOf(event.getIteration()));
 			writer.write("\t");

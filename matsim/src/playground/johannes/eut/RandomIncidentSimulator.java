@@ -36,6 +36,7 @@ import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.network.Link;
 
 /**
  * @author illenberger
@@ -45,7 +46,7 @@ public class RandomIncidentSimulator implements IterationStartsListener, Iterati
 	
 	private final double incidentProba;
 
-	private double capReduction = 0.5;
+	private double capReduction = 0.7;
 	
 	private int startIteration = 0;
 	
@@ -61,15 +62,20 @@ public class RandomIncidentSimulator implements IterationStartsListener, Iterati
 //		this.network = network;
 		this.incidentProba = proba;
 		
-		links.add((QueueLink) network.getLink("800"));
-		links.add((QueueLink) network.getLink("1100"));
-		links.add((QueueLink) network.getLink("1400"));
+//		links.add((QueueLink) network.getLink("800"));
+//		links.add((QueueLink) network.getLink("1100"));
+//		links.add((QueueLink) network.getLink("1400"));
+//		links.add((QueueLink) network.getLink("5"));
 		
 		try {
 			writer = new BufferedWriter(new FileWriter(Controler.getOutputFilename("incidents.txt")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void addLink(QueueLink link) {
+		links.add(link);
 	}
 	
 	public void setCapReduction(double factor) {
@@ -102,7 +108,7 @@ public class RandomIncidentSimulator implements IterationStartsListener, Iterati
 				if (Gbl.random.nextDouble() < incidentProba
 						&& event.getIteration() >= startIteration) {
 					
-					link.changeSimulatedFlowCapacity(0.5);
+					link.changeSimulatedFlowCapacity(capReduction);
 					changedCaps.add(link);
 					
 					writer.write("\t");
@@ -121,7 +127,7 @@ public class RandomIncidentSimulator implements IterationStartsListener, Iterati
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		for (QueueLink link : links) {
 			if (changedCaps.contains(link)) {
-				link.changeSimulatedFlowCapacity(1.0 / 0.5);
+				link.changeSimulatedFlowCapacity(1.0 / capReduction);
 				changedCaps.remove(link);
 			}
 		}

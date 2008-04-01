@@ -24,11 +24,15 @@
 package playground.johannes.eut;
 
 import java.io.BufferedWriter;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Person;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.withinday.WithindayAgent;
@@ -58,7 +62,8 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	
 	private BufferedWriter writer;
 	
-	/**
+	private Set<Person> guidedPersons;
+	/**#
 	 * @param network
 	 * @param scoringConfig
 	 */
@@ -91,6 +96,7 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			guidedPersons.add(agent.getPerson());
 			return forceReplan;
 		} else
 			return preventReplan;
@@ -100,6 +106,10 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	public RouteProvider createRouteProvider() {
 		return router;
 	}
+	
+	public Set<Person> getGuidedPersons() {
+		return guidedPersons;
+	}
 
 	public void reset() {
 		try {
@@ -108,11 +118,11 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 
 			writer = IOUtils.getBufferedWriter(Controler
 					.getIterationFilename("guidedPersons.txt"));
-			writer.newLine();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		random = new Random(10);
+		guidedPersons = new HashSet<Person>();
 	}
 
 }

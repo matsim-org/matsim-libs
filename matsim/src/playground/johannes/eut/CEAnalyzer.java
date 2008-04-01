@@ -117,8 +117,8 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 					utilsum += utilFunc.evaluate(d);
 				writer.write(p.getId().toString());
 				writer.write("\t");
-				writer.write(String.valueOf(utilsum
-						/ (double) personSamples.size()));
+				double exp_util = utilsum / (double) personSamples.size();
+				writer.write(String.valueOf(utilFunc.getTravelTime(exp_util)));
 				writer.newLine();
 			}
 			writer.close();
