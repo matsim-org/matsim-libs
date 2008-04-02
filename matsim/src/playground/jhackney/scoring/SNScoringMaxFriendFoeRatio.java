@@ -20,9 +20,12 @@
 
 package playground.jhackney.scoring;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
@@ -334,12 +337,21 @@ import org.matsim.utils.misc.Time;
 		// for all acts of type "factype"
 		int friend=0;
 		int foe=0;
-		ArrayList<Person> copresent = socialPlansMap;
+		Person p1=plan.getPerson();
+		Activity myActivity=p1.getKnowledge().map.getActivity(act);
+		Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
 		//for all agents in (social.plans.get(act){
-		// if (otheragent is a friend){friend++
-		//  }else foe++
-		//}
+		Enumeration<Person> e = othersThere.elements();
+		while(e.hasMoreElements()){
+			Person p2 =(Person) e.nextElement();
+			if(p1.getKnowledge().egoNet.knows(p2)){
+				friend++;
+			}else{
+				foe++;
+			}
+		}
 		//utility=utility+(double)friend/(double)foe * const
+		score+=10.*(double)friend/(double)foe;
 
 		return score;
 	}
