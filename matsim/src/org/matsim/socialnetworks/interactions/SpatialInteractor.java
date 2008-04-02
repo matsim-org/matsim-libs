@@ -44,10 +44,10 @@ public class SpatialInteractor {
 		this.net = snet;
 	}
 
-	public void interact(Collection<SocializingOpportunity> events, HashMap<String, Double> rndEncounterProb, int iteration) {
+	public void interact(Collection<SocialAct> events, HashMap<String, Double> rndEncounterProb, int iteration) {
 
 		System.out.println(" "+ this.getClass()+" Looking through social events and letting Persons interact "+iteration);
-		for (SocializingOpportunity event : events) {
+		for (SocialAct event : events) {
 
 			if (event.getAttendees().size() > 1) {
 
@@ -84,7 +84,7 @@ public class SpatialInteractor {
 		System.out.println("...finished");
 	}
 
-	private void makeSocialLinkToAll(SocializingOpportunity event, HashMap<String, Double> rndEncounterProbability, Person p1, int iteration) {
+	private void makeSocialLinkToAll(SocialAct event, HashMap<String, Double> rndEncounterProbability, Person p1, int iteration) {
 		// TODO Auto-generated method stub
 		// Person p1 encounters all persons p2 at the socializing opportunity
 		// the probability of encountering depends on the activity type
@@ -109,7 +109,7 @@ public class SpatialInteractor {
 		}
 	}
 
-	private void encounterOnePersonRandomlyFaceToFace(SocializingOpportunity event, HashMap<String, Double> rndEncounterProbability,
+	private void encounterOnePersonRandomlyFaceToFace(SocialAct event, HashMap<String, Double> rndEncounterProbability,
 			Person p1, int iteration) {
 
 		// Person p1 randomly encounters a person p2 at the socializing opportunity
@@ -132,7 +132,7 @@ public class SpatialInteractor {
 			}
 		}
 	}
-	private void encounterOnePersonRandomlyFaceToFaceInTimeWindow(SocializingOpportunity event, HashMap<String, Double> rndEncounterProbability,
+	private void encounterOnePersonRandomlyFaceToFaceInTimeWindow(SocialAct event, HashMap<String, Double> rndEncounterProbability,
 			Person p1, double StartTime, double EndTime, int iteration) {
 
 		// Person p1 randomly encounters a person p2 at the socializing opportunity
@@ -154,7 +154,7 @@ public class SpatialInteractor {
 			}
 		}
 	}
-	private void encounterAllPersonsFaceToFaceInTimeWindow(SocializingOpportunity event, HashMap<String, Double> rndEncounterProbability,
+	private void encounterAllPersonsFaceToFaceInTimeWindow(SocialAct event, HashMap<String, Double> rndEncounterProbability,
 			Person p1, double StartTime, double EndTime, int iteration) {
 
 		// Person p1 encounters all persons p2 at the socializing opportunity

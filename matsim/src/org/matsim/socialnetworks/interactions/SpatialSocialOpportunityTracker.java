@@ -32,7 +32,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 
-public class SpatialSocialOpportunityTracker implements SocializingOpportunityGeneratorI {
+public class SpatialSocialOpportunityTracker implements SocialActGeneratorI {
 
 	public SpatialSocialOpportunityTracker(){
 
@@ -46,9 +46,9 @@ public class SpatialSocialOpportunityTracker implements SocializingOpportunityGe
 	// Agents need to be able to find the socializing opportunity associated
 	//  with each of their Acts: person.map.dates gives the socializingopp's;
 
-	public Collection<SocializingOpportunity> generate(Plans plans) {
-		HashMap<Activity, SocializingOpportunity> events = new HashMap<Activity, SocializingOpportunity>();
-		SocializingOpportunity event = null;
+	public Collection<SocialAct> generate(Plans plans) {
+		HashMap<Activity, SocialAct> events = new HashMap<Activity, SocialAct>();
+		SocialAct event = null;
 
 		for( Person person : plans.getPersons().values() ){
 //			System.out.println("SSOgen Person "+person.getId()+" ");
@@ -67,7 +67,7 @@ public class SpatialSocialOpportunityTracker implements SocializingOpportunityGe
 					continue;}
 				event = events.get(myActivity);
 				if( event == null ){
-					event = new SocializingOpportunity( myActivity );
+					event = new SocialAct( myActivity );
 					events.put( myActivity,	event );
 				}
 				event.addAttendee(person);

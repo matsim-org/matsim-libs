@@ -24,10 +24,10 @@ import java.util.Collection;
 
 import org.matsim.plans.Plans;
 
-public interface SocializingOpportunityGeneratorI {
+public interface SocialActGeneratorI {
 
 	// A SocializingOpportunityGenerator generates SocializingOpportunity based on
 	// the persons and their plans (or knowledge, i.e. memories)
 	
-	Collection<SocializingOpportunity> generate( Plans plans );
+	Collection<SocialAct> generate( Plans plans );
 }

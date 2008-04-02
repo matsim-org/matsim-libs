@@ -36,7 +36,7 @@ import org.matsim.plans.Person;
  * @author jhackney, fmarchal
  *
  */
-public class SocializingOpportunity {
+public class SocialAct {
 
     Activity activity;
 
@@ -44,7 +44,7 @@ public class SocializingOpportunity {
     HashMap<Person,Double> arrivalTimes = new HashMap<Person,Double>();
     HashMap<Person,Double> departureTimes = new HashMap<Person,Double>();
 
-    public SocializingOpportunity( Activity a ){	
+    public SocialAct( Activity a ){	
 	this.activity = a;
     }
 

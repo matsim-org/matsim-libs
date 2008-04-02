@@ -37,7 +37,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Plan;
 import org.matsim.socialnetworks.algorithms.SortHashtableByValue;
-import org.matsim.socialnetworks.interactions.SocializingOpportunity;
+import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
@@ -69,7 +69,7 @@ public class MentalMap {
 	private Hashtable<Integer,IdI> mapActIdActivityId = new Hashtable<Integer,IdI>();
 
 	// Socializing opportunities are face-to-face meetings of the agents
-	private ArrayList<SocializingOpportunity> socializingOpportunities = new ArrayList<SocializingOpportunity>();
+	private ArrayList<SocialAct> socializingOpportunities = new ArrayList<SocialAct>();
 
 //	The activity score
 	private Hashtable<Activity, Double> activityScore = new Hashtable<Activity, Double>();
@@ -300,11 +300,11 @@ public class MentalMap {
 		return myActivity;
 	}
 
-	public void addDate(SocializingOpportunity date){
+	public void addDate(SocialAct date){
 		this.socializingOpportunities.add(date);
 	}
 
-	public void dropDate(SocializingOpportunity date){
+	public void dropDate(SocialAct date){
 		this.socializingOpportunities.remove(date);
 	}
 
