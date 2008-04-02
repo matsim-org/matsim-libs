@@ -1,0 +1,216 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="outputTimeFormat" value="HH:mm:ss" />
+		<param name="coordinateSystem" value="Atlantis" />
+	</module>
+	
+	<module name="world" >
+		<param name="inputWorldFile" value="./test/scenarios/triangle_mod/world.xml" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="./test/scenarios/triangle_mod/network.xml" />
+	</module>
+
+	<module name="plans">		
+		<param name="inputPlansFile" value="./test/scenarios/triangle_mod/plans.xml" />
+	</module>
+		
+	<module name="facilities" >
+		<param name="inputFacilitiesFile" value="./test/scenarios/triangle_mod/facilities.xml" />
+	</module>
+	
+	<module name="controler">
+		<param name="outputDirectory" value="./output" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="10" />
+	</module>
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+	
+		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims -->
+	</module>
+
+	<module name="planCalcScore">
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		
+		<param name="activityType_0"            value="home" /> <!-- home -->
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+	
+		<param name="activityType_1"            value="work" /> <!-- work -->
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityMinimalDuration_1" value="06:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="09:00:00" />
+		<param name="activityEarliestEndTime_1" value="" />
+		<param name="activityClosingTime_1"     value="18:00:00" />
+	
+		<param name="activityType_2"            value="w1" /> <!-- work1 -->
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="04:00:00" />
+		<param name="activityMinimalDuration_2" value="02:00:00" />
+		<param name="activityOpeningTime_2"     value="07:00:00" />
+		<param name="activityLatestStartTime_2" value="09:00:00" />
+		<param name="activityEarliestEndTime_2" value="" />
+		<param name="activityClosingTime_2"     value="18:00:00" />
+	
+		<param name="activityType_3"            value="w2" /> <!-- work2 -->
+		<param name="activityPriority_3"        value="1" />
+		<param name="activityTypicalDuration_3" value="04:00:00" />
+		<param name="activityMinimalDuration_3" value="02:00:00" />
+		<param name="activityOpeningTime_3"     value="07:00:00" />
+		<param name="activityLatestStartTime_3" value="" />
+		<param name="activityEarliestEndTime_3" value="" />
+		<param name="activityClosingTime_3"     value="18:00:00" />
+	
+		<param name="activityType_4"            value="education" /> <!-- edu -->
+		<param name="activityPriority_4"        value="1" />
+		<param name="activityTypicalDuration_4" value="06:00:00" />
+		<param name="activityMinimalDuration_4" value="04:00:00" />
+		<param name="activityOpeningTime_4"     value="07:00:00" />
+		<param name="activityLatestStartTime_4" value="09:00:00" />
+		<param name="activityEarliestEndTime_4" value="" />
+		<param name="activityClosingTime_4"     value="18:00:00" />
+	
+		<param name="activityType_5"            value="e1" /> <!-- edu1 -->
+		<param name="activityPriority_5"        value="1" />
+		<param name="activityTypicalDuration_5" value="03:00:00" />
+		<param name="activityMinimalDuration_5" value="01:00:00" />
+		<param name="activityOpeningTime_5"     value="07:00:00" />
+		<param name="activityLatestStartTime_5" value="09:00:00" />
+		<param name="activityEarliestEndTime_5" value="" />
+		<param name="activityClosingTime_5"     value="18:00:00" />
+	
+		<param name="activityType_6"            value="e2" /> <!-- edu2 -->
+		<param name="activityPriority_6"        value="1" />
+		<param name="activityTypicalDuration_6" value="03:00:00" />
+		<param name="activityMinimalDuration_6" value="01:00:00" />
+		<param name="activityOpeningTime_6"     value="07:00:00" />
+		<param name="activityLatestStartTime_6" value="" />
+		<param name="activityEarliestEndTime_6" value="" />
+		<param name="activityClosingTime_6"     value="18:00:00" />
+	
+		<param name="activityType_7"            value="shop" /> <!-- shop -->
+		<param name="activityPriority_7"        value="1" />
+		<param name="activityTypicalDuration_7" value="02:00:00" />
+		<param name="activityMinimalDuration_7" value="01:00:00" />
+		<param name="activityOpeningTime_7"     value="08:00:00" />
+		<param name="activityLatestStartTime_7" value="" />
+		<param name="activityEarliestEndTime_7" value="" />
+		<param name="activityClosingTime_7"     value="20:00:00" />
+	
+		<param name="activityType_8"            value="leisure" /> <!-- leisure -->
+		<param name="activityPriority_8"        value="1" />
+		<param name="activityTypicalDuration_8" value="02:00:00" />
+		<param name="activityMinimalDuration_8" value="01:00:00" />
+		<param name="activityOpeningTime_8"     value="06:00:00" />
+		<param name="activityLatestStartTime_8" value="" />
+		<param name="activityEarliestEndTime_8" value="" />
+		<param name="activityClosingTime_8"     value="24:00:00" />
+	
+		<param name="activityType_9"            value="w3" /> <!-- work3 -->
+		<param name="activityPriority_9"        value="1" />
+		<param name="activityTypicalDuration_9" value="08:00:00" />
+		<param name="activityMinimalDuration_9" value="06:00:00" />
+		<param name="activityOpeningTime_9"     value="07:00:00" />
+		<param name="activityLatestStartTime_9" value="" />
+		<param name="activityEarliestEndTime_9" value="" />
+		<param name="activityClosingTime_9"     value="18:00:00" />
+	
+		<param name="activityType_10"            value="e3" /> <!-- edu3 -->
+		<param name="activityPriority_10"        value="1" />
+		<param name="activityTypicalDuration_10" value="06:00:00" />
+		<param name="activityMinimalDuration_10" value="04:00:00" />
+		<param name="activityOpeningTime_10"     value="07:00:00" />
+		<param name="activityLatestStartTime_10" value="" />
+		<param name="activityEarliestEndTime_10" value="" />
+		<param name="activityClosingTime_10"     value="18:00:00" />
+	
+		<param name="activityType_11"            value="l1" /> <!-- leisure1 -->
+		<param name="activityPriority_11"        value="1" />
+		<param name="activityTypicalDuration_11" value="02:00:00" />
+		<param name="activityMinimalDuration_11" value="01:00:00" />
+		<param name="activityOpeningTime_11"     value="06:00:00" />
+		<param name="activityLatestStartTime_11" value="" />
+		<param name="activityEarliestEndTime_11" value="" />
+		<param name="activityClosingTime_11"     value="24:00:00" />
+	
+		<param name="activityType_12"            value="l2" /> <!-- leisure2 -->
+		<param name="activityPriority_12"        value="1" />
+		<param name="activityTypicalDuration_12" value="02:00:00" />
+		<param name="activityMinimalDuration_12" value="01:00:00" />
+		<param name="activityOpeningTime_12"     value="06:00:00" />
+		<param name="activityLatestStartTime_12" value="" />
+		<param name="activityEarliestEndTime_12" value="" />
+		<param name="activityClosingTime_12"     value="24:00:00" />
+	
+		<param name="activityType_13"            value="l3" /> <!-- leisure3 -->
+		<param name="activityPriority_13"        value="1" />
+		<param name="activityTypicalDuration_13" value="02:00:00" />
+		<param name="activityMinimalDuration_13" value="01:00:00" />
+		<param name="activityOpeningTime_13"     value="06:00:00" />
+		<param name="activityLatestStartTime_13" value="" />
+		<param name="activityEarliestEndTime_13" value="" />
+		<param name="activityClosingTime_13"     value="24:00:00" />
+	
+		<param name="activityType_14"            value="s1" /> <!-- shop -->
+		<param name="activityPriority_14"        value="1" />
+		<param name="activityTypicalDuration_14" value="02:00:00" />
+		<param name="activityMinimalDuration_14" value="01:00:00" />
+		<param name="activityOpeningTime_14"     value="08:00:00" />
+		<param name="activityLatestStartTime_14" value="" />
+		<param name="activityEarliestEndTime_14" value="" />
+		<param name="activityClosingTime_14"     value="20:00:00" />
+	
+		<param name="activityType_15"            value="s2" /> <!-- shop -->
+		<param name="activityPriority_15"        value="1" />
+		<param name="activityTypicalDuration_15" value="02:00:00" />
+		<param name="activityMinimalDuration_15" value="01:00:00" />
+		<param name="activityOpeningTime_15"     value="08:00:00" />
+		<param name="activityLatestStartTime_15" value="" />
+		<param name="activityEarliestEndTime_15" value="" />
+		<param name="activityClosingTime_15"     value="20:00:00" />
+	
+		<param name="activityType_16"            value="s3" /> <!-- shop -->
+		<param name="activityPriority_16"        value="1" />
+		<param name="activityTypicalDuration_16" value="02:00:00" />
+		<param name="activityMinimalDuration_16" value="01:00:00" />
+		<param name="activityOpeningTime_16"     value="08:00:00" />
+		<param name="activityLatestStartTime_16" value="" />
+		<param name="activityEarliestEndTime_16" value="" />
+		<param name="activityClosingTime_16"     value="20:00:00" />
+		
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.1" />
+		<param name="Module_1" value="BestScore" />
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute" />
+		
+		<param name="ModuleProbability_3" value="0.8" />
+		<param name="Module_3" value="playground.anhorni.secloc.LocationChoice2" />
+	</module>
+
+</config>
