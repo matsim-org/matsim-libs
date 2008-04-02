@@ -32,7 +32,7 @@ import org.matsim.utils.identifiers.IdI;
  */
 public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements MobsimAgent {
 	
-	private A agent;
+	protected A agent;
 	
 	public MobsimAgentDecorator(A agent) {
 		this.agent = agent;
@@ -56,6 +56,10 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements Mob
 
 	public Link getNextLink(double time) {
 		return agent.getNextLink(time);
+	}
+	
+	public Link getDestinationLink(double time) {
+		return agent.getDestinationLink(time);
 	}
 	
 	public boolean isDone() {

@@ -23,14 +23,26 @@
  */
 package playground.johannes.mobsim;
 
+import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
+import org.matsim.plans.Route;
 
 /**
  * @author illenberger
  *
  */
-public interface PlanStrategy {
+public abstract class PlanStrategy {
 
-	public Plan replan(double time);
+	protected PlanAgent agent;
+	
+	public PlanStrategy(PlanAgent agent) {
+		this.agent = agent;
+	}
+	
+	public abstract Plan replan(double time);
+	
+	protected void adaptRoute(Route route, Leg leg, int index) {
+		
+	}
 	
 }

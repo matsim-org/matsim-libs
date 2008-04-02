@@ -90,6 +90,13 @@ public class PlanAgent implements MobsimAgent {
 		 */
 		return null;
 	}
+	
+	public Link getDestinationLink(double time) {
+		if(currentPlanIndex % 2 == 0)
+			return getLink();
+		else
+			return ((Act)person.getSelectedPlan().getActsLegs().get(currentPlanIndex + 1)).getLink();
+	}
 
 	public void beforeSim() {
 		currentRouteIndex = -1;
@@ -159,6 +166,14 @@ public class PlanAgent implements MobsimAgent {
 		return person;
 	}
 
+	public int getCurrentPlanIndex() {
+		return currentPlanIndex;
+	}
+	
+	public int getCurrentRouteIndex() {
+		return currentRouteIndex;
+	}
+	
 	public IdI getId() {
 		// TODO Auto-generated method stub
 		return null;

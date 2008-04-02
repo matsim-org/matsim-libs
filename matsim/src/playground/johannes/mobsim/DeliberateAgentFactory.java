@@ -39,7 +39,7 @@ public class DeliberateAgentFactory implements MobsimAgentFactory {
 		List<DeliberateAgent> deliberateAgents = new ArrayList<DeliberateAgent>(planAgents.size());
 		
 		for(PlanAgent a : planAgents)
-			deliberateAgents.add(new DeliberateAgent(a));
+			deliberateAgents.add(new DeliberateAgent(a, null));
 		
 		return deliberateAgents;
 	}

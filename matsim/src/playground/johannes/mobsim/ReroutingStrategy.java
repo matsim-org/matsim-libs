@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReroutingFacade.java
+ * ReroutingStrategy.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,22 +24,58 @@
 package playground.johannes.mobsim;
 
 import org.matsim.network.Link;
+import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
+import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public abstract class ReroutingFacade implements PlanStrategy {
+public class ReroutingStrategy extends PlanStrategy {
 
-	protected abstract Route getRoute(Link origin, Link destination, double time);
-	
-	public Plan replan(double time) {
-		Plan newPlan = null;
-		Route route = getRoute(null, null, 0);
-		//TODO: adpat new route...
-		return newPlan;
+	private RouteProvider router;
+
+	public ReroutingStrategy(PlanAgent agent, RouteProvider router) {
+		super(agent);
 	}
 
+	public Plan replan(double time) {
+		if (allowReroute(time)) {
+			/*
+			 * TODO: Introduce standard clone() methods!
+			 */
+			Plan copy = new Plan(agent.getPerson());
+			copy.copyPlan(agent.getPerson().getSelectedPlan());
+
+			Route newRoute = getRoute(agent.getLink(), agent
+					.getDestinationLink(time), time);
+			/*
+			 * TODO: Do some route validation, e.g. check if departure and
+			 * destination links are consistent.
+			 */
+			adaptRoute(newRoute, (Leg) copy.getActsLegs().get(
+					agent.getCurrentPlanIndex()), agent.getCurrentRouteIndex());
+
+			return copy;
+		} else
+			return null;
+	}
+
+	protected boolean allowReroute(double time) {
+		if (agent.getCurrentPlanIndex() % 2 != 0) {
+			if (agent.getNextLink(time) == null) {
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	protected Route getRoute(Link origin, Link destination, double time) {
+		return router.requestRoute(origin, destination, time);
+	}
 }

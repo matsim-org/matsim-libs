@@ -64,6 +64,16 @@ public interface MobsimAgent {
 	public Link getNextLink(double time);
 
 	/**
+	 * Returns the desired destination link. If the agent is currently not
+	 * en-route, its desired destination link is its current link.
+	 * 
+	 * @param time
+	 *            the current simulation time.
+	 * @return the desired destination link.
+	 */
+	public Link getDestinationLink(double time);
+	
+	/**
 	 * Returns whether the agent intends to perform a further trip or not.
 	 * 
 	 * @return <tt>true</tt> if the agent does not intend to perform a further

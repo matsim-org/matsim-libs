@@ -24,19 +24,21 @@
 package playground.johannes.mobsim;
 
 import org.matsim.network.Link;
+import org.matsim.plans.Plan;
 
 /**
  * @author illenberger
- *
+ * 
  */
 public class DeliberateAgent extends MobsimAgentDecorator<PlanAgent> {
 
 	private PlanStrategy strategy;
-	
-	public DeliberateAgent(PlanAgent agent) {
+
+	public DeliberateAgent(PlanAgent agent, PlanStrategy strategy) {
 		super(agent);
+		this.strategy = strategy;
 	}
-	
+
 	@Override
 	public Link getNextLink(double time) {
 		replan(time);
@@ -44,7 +46,13 @@ public class DeliberateAgent extends MobsimAgentDecorator<PlanAgent> {
 	}
 
 	public void replan(double time) {
-		strategy.replan(time);
-		// TODO: Handle new plan...
+		Plan newPlan = strategy.replan(time);
+		if (newPlan != null) {
+			/*
+			 * TODO: Do some plan validation, e.g., if size of new plan equals
+			 * size of old plan.
+			 */
+			agent.getPerson().exchangeSelectedPlan(newPlan, false);
+		}
 	}
 }
