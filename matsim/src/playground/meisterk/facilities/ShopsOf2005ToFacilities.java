@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBContext;
@@ -37,10 +38,13 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.FileUtils;
 import org.matsim.basic.v01.Id;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.Facility;
+import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -125,6 +129,80 @@ public class ShopsOf2005ToFacilities {
 		}
 	}
 
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Gbl.createConfig(args);
+
+//		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
+		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
+
+	}
+	
+	private static void prepareRawDataForGeocoding() {
+
+
+		ShopsOf2005ToFacilities.setUp();
+		ShopsOf2005ToFacilities.setupStyles();
+		ShopsOf2005ToFacilities.dennerTGZHAddressesToKML();
+		ShopsOf2005ToFacilities.pickPayAddressesToKML();
+		ShopsOf2005ToFacilities.coopZHAddressesToKML();
+		ShopsOf2005ToFacilities.coopTGAddressesToKML();
+		ShopsOf2005ToFacilities.migrosZHAdressesToKML();
+		ShopsOf2005ToFacilities.migrosOstschweizAdressesToKML();
+		ShopsOf2005ToFacilities.write();		
+
+	}
+
+	private static void transformGeocodedKMLToFacilities() {
+
+		Facilities shopsOf2005 = new Facilities("shopsOf2005");
+
+		try {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
+			Unmarshaller unMarshaller = jaxbContext.createUnmarshaller();
+			JAXBElement<KmlType> kmlElement = (JAXBElement<KmlType>) unMarshaller.unmarshal(new FileInputStream(Gbl.getConfig().facilities().getInputFile()));
+
+			KmlType kml = kmlElement.getValue();
+			DocumentType document = (DocumentType) kml.getAbstractFeatureGroup().getValue();
+			System.out.println(document.getName());
+
+			// recursively search the KML for placemarks, transform it into a matsim facility 
+			// and place it in the list of facilities or in the quadtree, respectively
+
+			List<JAXBElement<? extends AbstractFeatureType>> featureGroup = document.getAbstractFeatureGroup();
+			Iterator<JAXBElement<? extends AbstractFeatureType>> it = featureGroup.iterator();
+			while (it.hasNext()) {
+				JAXBElement<AbstractFeatureType> feature = (JAXBElement<AbstractFeatureType>) (it.next());
+				if (feature.getValue().getClass().equals(FolderType.class)) {
+					//System.out.println("Going into folder...");
+					ShopsOf2005ToFacilities.extractPlacemarks((FolderType) feature.getValue(), shopsOf2005);
+				} else if (feature.getValue().getClass().equals(PlacemarkType.class)) {
+					//System.out.println("There is a placemark!");
+				}
+
+			}
+
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		ShopsOf2005ToFacilities.addOpentimesToFacilities(shopsOf2005);
+
+		System.out.println("Writing facilities xml file... ");
+		FacilitiesWriter facilities_writer = new FacilitiesWriter(shopsOf2005);
+		facilities_writer.write();
+		System.out.println("Writing facilities xml file...done.");
+
+	}
+	
+	
 	private static void setUp() {
 
 		myKML = new KML();
@@ -646,13 +724,14 @@ public class ShopsOf2005ToFacilities {
 
 		List<String> lines = null;
 		String[] openTokens = null, closeTokens = null;
+		Vector<Integer> openNumbers = new Vector<Integer>();
+		Vector<Integer> closeNumbers = new Vector<Integer>();
 		TreeMap<String, String> aPickpayOpentime = new TreeMap<String, String>();
 		String facilityId = null; 
 
 		final String OPEN = "Auf";
 		final String CLOSE = "Zu";
 
-		//String openLinePattern = "\t" + OPEN + "\t";
 		String openLinePattern = ".*\\s" + OPEN + "\\s.*";
 		String closeLinePattern = ".*\\s" + CLOSE + "\\s.*";
 		String anythingButDigits = "[^0-9]";
@@ -666,86 +745,127 @@ public class ShopsOf2005ToFacilities {
 		// remember relevant lines only
 		String key = null;
 		for (String line : lines) {
-			
-//			if (line.contains(openLinePattern)) {
+
 			if (line.matches(openLinePattern)) {
 				key = line;
-//				System.out.println(line);
 			} else if (line.matches(closeLinePattern)) {
 				if (!aPickpayOpentime.containsKey(key)) {
 					aPickpayOpentime.put(key, line);
 				}
-//				System.out.println(line);
 			}
-			
+
 		}
-		
+
 		for (String openLine : aPickpayOpentime.keySet()) {
-			
+
 			openTokens = openLine.split(anythingButDigits);
 //			System.out.println(openLine);
 			facilityId = ShopsOf2005ToFacilities.buildPickpayId(openTokens);
 			System.out.println(facilityId);
 			Facility theCurrentPickpay = (Facility) facilities.getLocation(facilityId);
 			if (theCurrentPickpay != null) {
-				theCurrentPickpay.createActivity(ACTIVITY_TYPE_SHOP);
+
+				// yeah, we can use the open times
+
+				Activity shopping = theCurrentPickpay.createActivity(ACTIVITY_TYPE_SHOP);
+				openNumbers.clear();
+				closeNumbers.clear();
+				
+				// print out and extract numbers
 
 				System.out.print(OPEN + ":\t");
 				for (String token : openTokens) {
 					if (!token.equals("") && !token.equals(openTokens[0])) {
+						openNumbers.add(Integer.parseInt(token));
 						System.out.print(token + "\t");
 					}
 				}
 				System.out.println();
-				
-				//System.out.println(aPickpayOpentime.get(openLine));
+
 				closeTokens = aPickpayOpentime.get(openLine).split(anythingButDigits);
 				System.out.print(CLOSE + ":\t");
 				for (String token : closeTokens) {
 					if (!token.equals("")) {
+						closeNumbers.add(Integer.parseInt(token));
 						System.out.print(token + "\t");
 					}
 				}
 				System.out.println();
+
+				// now process numbers
+
+				//String day = "wkday";
+				Day[] days = Day.values();
+				int dayPointer = 0;
+				Opentime opentime = null;
+				int openSeconds = 0; 
+				int closeSeconds = 0;
+				int previousOpenSeconds = 0;
+				
+				if (openNumbers.size() == closeNumbers.size()) {
+					for (int ii=0; ii < openNumbers.size(); ii += 2) {
+
+						openSeconds = openNumbers.get(ii) * 3600 + openNumbers.get(ii + 1) * 60;
+						closeSeconds = closeNumbers.get(ii) * 3600 + closeNumbers.get(ii + 1) * 60;
+						
+						// check if a new day starts
+						if (openSeconds <= previousOpenSeconds) {
+							dayPointer++;
+						}
+						
+						previousOpenSeconds = openSeconds;
+						String openTimeString = Time.writeTime(openSeconds);
+						String closeTimeString = Time.writeTime(closeSeconds);
+
+						opentime = new Opentime(days[dayPointer].getAbbrev(), openTimeString, closeTimeString);
+						
+						shopping.addOpentime(opentime);
+
+					}
+				} else {
+					Gbl.errorMsg("openNumbers[] and closeNumbers[] have different size. Aborting...");
+				}
+
+				System.out.flush();
 				
 			} else {
 				System.out.println("A pickpay with id " + facilityId + " does not exist.");
 			}
-			
+
 		}
-		
+
 //		for (String line : lines) {
-//
-//			if (line.contains(openLinePattern)) {
-//
-//				tokens = line.split(anythingButDigits);
-//				//System.out.println(tokens[0]);
-//				facilityId = ShopsOf2005ToFacilities.buildPickpayId(tokens);
-//				System.out.println(facilityId);
-//				Facility theCurrentPickpay = (Facility) facilities.getLocation(facilityId);
-//				theCurrentPickpay.createActivity(ACTIVITY_TYPE_SHOP);
-//
-//				System.out.print(OPEN + ":\t");
-//				for (String token : tokens) {
-//					if (!token.equals("") && !token.equals(tokens[0])) {
-//						System.out.print(token + "\t");
-//					}
-//				}
-//				System.out.println();
-//
-//			} else if (line.contains(closeLinePattern)) {
-//
-//				tokens = line.split(anythingButDigits);
-//				System.out.print(CLOSE + ":\t");
-//				for (String token : tokens) {
-//					if (!token.equals("")) {
-//						System.out.print(token + "\t");
-//					}
-//				}
-//				System.out.println();
-//
-//			}
-//
+
+//		if (line.contains(openLinePattern)) {
+
+//		tokens = line.split(anythingButDigits);
+//		//System.out.println(tokens[0]);
+//		facilityId = ShopsOf2005ToFacilities.buildPickpayId(tokens);
+//		System.out.println(facilityId);
+//		Facility theCurrentPickpay = (Facility) facilities.getLocation(facilityId);
+//		theCurrentPickpay.createActivity(ACTIVITY_TYPE_SHOP);
+
+//		System.out.print(OPEN + ":\t");
+//		for (String token : tokens) {
+//		if (!token.equals("") && !token.equals(tokens[0])) {
+//		System.out.print(token + "\t");
+//		}
+//		}
+//		System.out.println();
+
+//		} else if (line.contains(closeLinePattern)) {
+
+//		tokens = line.split(anythingButDigits);
+//		System.out.print(CLOSE + ":\t");
+//		for (String token : tokens) {
+//		if (!token.equals("")) {
+//		System.out.print(token + "\t");
+//		}
+//		}
+//		System.out.println();
+
+//		}
+
 //		}
 
 		System.out.println("done.");
@@ -762,68 +882,6 @@ public class ShopsOf2005ToFacilities {
 		writer.close();
 
 		System.out.println("done.");
-
-	}
-
-	private static void prepareRawDataForGeocoding() {
-
-
-		ShopsOf2005ToFacilities.setUp();
-		ShopsOf2005ToFacilities.setupStyles();
-		ShopsOf2005ToFacilities.dennerTGZHAddressesToKML();
-		ShopsOf2005ToFacilities.pickPayAddressesToKML();
-		ShopsOf2005ToFacilities.coopZHAddressesToKML();
-		ShopsOf2005ToFacilities.coopTGAddressesToKML();
-		ShopsOf2005ToFacilities.migrosZHAdressesToKML();
-		ShopsOf2005ToFacilities.migrosOstschweizAdressesToKML();
-		ShopsOf2005ToFacilities.write();		
-
-	}
-
-	private static void transformGeocodedKMLToFacilities() {
-
-		Facilities shopsOf2005 = new Facilities("shopsOf2005");
-
-		try {
-
-			JAXBContext jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
-			Unmarshaller unMarshaller = jaxbContext.createUnmarshaller();
-			JAXBElement<KmlType> kmlElement = (JAXBElement<KmlType>) unMarshaller.unmarshal(new FileInputStream("/home/konrad/workspace/MATSim/input/shopsOf2005_geocoded.kml"));
-
-			KmlType kml = kmlElement.getValue();
-			DocumentType document = (DocumentType) kml.getAbstractFeatureGroup().getValue();
-			System.out.println(document.getName());
-
-			// recursively search the KML for placemarks, transform it into a matsim facility 
-			// and place it in the list of facilities or in the quadtree, respectively
-
-			List<JAXBElement<? extends AbstractFeatureType>> featureGroup = document.getAbstractFeatureGroup();
-			Iterator<JAXBElement<? extends AbstractFeatureType>> it = featureGroup.iterator();
-			while (it.hasNext()) {
-				JAXBElement<AbstractFeatureType> feature = (JAXBElement<AbstractFeatureType>) (it.next());
-				if (feature.getValue().getClass().equals(FolderType.class)) {
-					//System.out.println("Going into folder...");
-					ShopsOf2005ToFacilities.extractPlacemarks((FolderType) feature.getValue(), shopsOf2005);
-				} else if (feature.getValue().getClass().equals(PlacemarkType.class)) {
-					//System.out.println("There is a placemark!");
-				}
-
-			}
-
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		ShopsOf2005ToFacilities.addOpentimesToFacilities(shopsOf2005);
-
-		System.out.println("Writing facilities xml file... ");
-		FacilitiesWriter facilities_writer = new FacilitiesWriter(shopsOf2005);
-		facilities_writer.write();
-		System.out.println("Writing facilities xml file...done.");
 
 	}
 
@@ -868,15 +926,5 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Gbl.createConfig(args);
-
-//		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
-		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
-		
-	}
 
 }

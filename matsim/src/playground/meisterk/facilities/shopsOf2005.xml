@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd" 
         [
-                <!ENTITY PROJECTBASE  "/home/konrad/workspace/MATSim">
+        		<!ENTITY HOMEBASE     "/home/meisterk">
+                <!ENTITY PROJECTBASE  "workspace/MATSim">
                 <!ENTITY OUTPUTBASE   "output">
+                <!ENTITY CVSBASE      "sandbox00">
         ]
 >
 <config>
 	<module name="facilities">
-		<param name="outputFacilitiesFile" value="&PROJECTBASE;/&OUTPUTBASE;/facilities_shopsOf2005.xml" />
+		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/ivt/studies/switzerland/facilities/shopsOf2005/shopsOf2005_geocoded.kml" />
+		<param name="outputFacilitiesFile" value="&HOMEBASE;/&PROJECTBASE;/&OUTPUTBASE;/facilities_shopsOf2005.xml" />
 	</module>
 </config>
