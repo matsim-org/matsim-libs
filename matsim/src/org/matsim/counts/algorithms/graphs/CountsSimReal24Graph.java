@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountsSimRealPerHourGraph.java
+ * CountsSimReal24Graph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -119,7 +119,7 @@ public class CountsSimReal24Graph extends CountsGraph{
 		url_gen.addURLSeries(urls);
 		tt_gen.addToolTipSeries(tooltips);
 
-		String title="Average Weekday Traffic Volumes, Iteration: "+this.iteration_;
+		String title="Avg. Weekday Traffic Volumes, Iteration: "+this.iteration_;
 		this.setChartTitle(title);
 		this.chart_ = ChartFactory.createXYLineChart(
 		title,
@@ -132,8 +132,8 @@ public class CountsSimReal24Graph extends CountsGraph{
 		true // urls
 		);
 		XYPlot plot=this.chart_.getXYPlot();
-		final LogarithmicAxis axis_x = new LogarithmicAxis("Count Volumes");
-		final LogarithmicAxis axis_y = new LogarithmicAxis("Sim Volumes");
+		final LogarithmicAxis axis_x = new LogarithmicAxis("Count Volumes [veh/24h]");
+		final LogarithmicAxis axis_y = new LogarithmicAxis("Sim Volumes [veh/24h]");
 		axis_x.setAllowNegativesFlag(false);
 		axis_y.setAllowNegativesFlag(false);
 
