@@ -34,6 +34,7 @@ import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsGraphWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
+import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 
@@ -76,6 +77,7 @@ public class CountControlerListener implements StartupListener,
 				cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
 				cgw.setGraphsCreator(new CountsErrorGraphCreator("errors"));
 				cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
+				cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
 				Counts.getSingleton().addAlgorithm(cgw);
 				Counts.getSingleton().runAlgorithms();
 			}
