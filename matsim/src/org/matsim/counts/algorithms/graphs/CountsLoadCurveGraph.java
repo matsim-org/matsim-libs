@@ -18,11 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
+/* 
+ * Temporarily (?) removing relative error marked with "TRRE"
+ * anhorni: 02.04.2008
+ */
+
 package org.matsim.counts.algorithms.graphs;
 
-import java.awt.BasicStroke;
+//TRRE: import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.geom.Rectangle2D;
+//TRRE:  import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import org.jfree.chart.ChartFactory;
@@ -30,33 +35,35 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
+//TRRE: import org.jfree.chart.axis.NumberAxis;
+//TRRE: import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.DatasetRenderingOrder;
+//TRRE: import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+//TRRE: import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.counts.CountSimComparison;
+
+
 
 public class CountsLoadCurveGraph extends CountsGraph {
 
 	private final DefaultCategoryDataset dataset0;
-	private final DefaultCategoryDataset dataset1;
+	// TRRE: private final DefaultCategoryDataset dataset1;
 	private String linkId;
 
 
 	public CountsLoadCurveGraph(final List<CountSimComparison> ccl, final int iteration, final String filename){
 		super(ccl, iteration, filename, filename);
 		this.dataset0 = new DefaultCategoryDataset();
-		this.dataset1 = new DefaultCategoryDataset();
+		// TRRE:  this.dataset1 = new DefaultCategoryDataset();
 	}
 
 	public void clearDatasets(){
 		this.dataset0.clear();
-		this.dataset1.clear();
+		// TRRE: this.dataset1.clear();
 	}
 
 	public void add2LoadCurveDataSets(final CountSimComparison cc ) {
@@ -69,7 +76,7 @@ public class CountsLoadCurveGraph extends CountsGraph {
 		this.dataset0.addValue(cc.getCountValue(),real_series,h);
 
 		//relative error
-		this.dataset1.addValue(cc.calculateRelativeError(),"Signed Rel. Error",Integer.toString(cc.getHour()));
+		// TRRE: this.dataset1.addValue(cc.calculateRelativeError(),"Signed Rel. Error",Integer.toString(cc.getHour()));
 	}//add2LoadCurveDataSets
 
 
@@ -98,12 +105,13 @@ public class CountsLoadCurveGraph extends CountsGraph {
 
 		plot.setRenderer(0, renderer);
 		plot.setDomainAxisLocation(AxisLocation.BOTTOM_OR_RIGHT);
-		plot.setDataset(1, this.dataset1);
+		// TRRE:  plot.setDataset(1, this.dataset1);
 		plot.mapDatasetToRangeAxis(1, 1);
 
 		final CategoryAxis axis1 = plot.getDomainAxis();
 		axis1.setCategoryMargin(0.25); // leave a gap of 25% between categories
 
+		/*  TRRE: 
 		final ValueAxis axis2 = new NumberAxis("Signed Rel. Error [%]");
 		plot.setRangeAxis(1, axis2);
 
@@ -114,6 +122,8 @@ public class CountsLoadCurveGraph extends CountsGraph {
 		renderer2.setBaseStroke(new BasicStroke(2.5f));
 		plot.setRenderer(1, renderer2);
 		plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
+		*/
+		
 		return this.chart_;
 	}
 
