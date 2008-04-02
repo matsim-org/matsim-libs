@@ -33,7 +33,15 @@ import org.matsim.network.NetworkLayer;
 
 public class CountsFixture {
 	
-	NetworkLayer network;
+	private NetworkLayer network;
+	
+	public NetworkLayer getNetwork() {
+		return network;
+	}
+
+	public void setNetwork(NetworkLayer network) {
+		this.network = network;
+	}
 
 	public void setUp() {
 		String[] args={"test/input/org/matsim/counts/config.xml"};
@@ -63,6 +71,4 @@ public class CountsFixture {
 		}
 		return csc_l;
 	}
-
-
 }
