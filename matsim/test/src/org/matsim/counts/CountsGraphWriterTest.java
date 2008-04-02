@@ -25,6 +25,7 @@ import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsGraphWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
+import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -55,6 +56,7 @@ public class CountsGraphWriterTest extends MatsimTestCase {
 		cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim vs. real volumes per hour"));
 		cgw.setGraphsCreator(new CountsErrorGraphCreator("Error Plots"));
 		cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("Load curve graph"));
+		cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
 		cgw.run(Counts.getSingleton());
 
 		assertTrue(cgw.getOutput().getGraphs().size()>0);
