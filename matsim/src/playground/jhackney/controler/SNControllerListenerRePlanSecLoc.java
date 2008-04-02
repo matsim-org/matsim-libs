@@ -33,6 +33,7 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Knowledge;
@@ -40,15 +41,18 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.router.PlansCalcRoute;
+import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.PersonSNSecLocRandomReRoute;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
-import org.matsim.socialnetworks.interactions.SocializingOpportunity;
+import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import playground.jhackney.scoring.*;
 
 
 /**
@@ -96,11 +100,12 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	SpatialInteractor plansInteractorS;//spatial (face to face)
 	int max_sn_iter;
 	int snIter;
-	public static String [] infoToExchange;//type of info for non-spatial exchange is read in
+	private String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
-	Collection<SocializingOpportunity> socialPlans=null;
+	HashMap<Activity, SocialAct> socialPlansMap=null;
+	Collection<SocialAct> socialPlans=null;
 
 	private final Logger log = Logger.getLogger(SNControllerListenerRePlanSecLoc.class);
 
@@ -146,6 +151,10 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		this.log.info("... done");
 
 		/* code previously in startup() */
+		SNScoringGeneralFactory factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
+		EventsToScore scoring = new EventsToScore(this.controler.getPopulation(), factory);
+		this.controler.getEvents().addHandler(scoring);
+		
 		snsetup();
 	}
 
@@ -194,15 +203,14 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 			if (total_spatial_fraction(this.fractionS) > 0) { // only generate the map if spatial meeting is important in this experiment
 
-				//if(Events have just changed or if no events are yet available and if there is an interest in the planned interactions)
-				this.log.info("  Generating planned [Spatial] socializing opportunities ...");
-				this.log.info("   Makes a map of time/place windows for all planned encounters between the agents");
-				this.socialPlans = this.gen2.generate(this.controler.getPopulation());
+				this.log.info("  Generating planned [Spatial] Social Acts base on last MobSim iteration...");
+				this.log.info("   Makes a map of time/place windows for all encounters between the agents");
+				this.socialPlansMap=this.gen2.generateMap(this.controler.getPopulation());
+				this.socialPlans = socialPlansMap.values();
 				this.log.info("...finished.");
-				//}// end if
 
 				// Agents' planned interactions
-				this.log.info("  Agents planned social interactions ...");
+				this.log.info("  Agents planned social interactions, respectively their meetings based on last MobSim iteration ...");
 				this.log.info("  Agents' relationships are updated to reflect these interactions! ...");
 				this.plansInteractorS.interact(this.socialPlans, this.rndEncounterProbs, snIter);
 			} else {

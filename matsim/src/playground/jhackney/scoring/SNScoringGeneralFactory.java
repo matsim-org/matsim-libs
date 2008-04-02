@@ -1,6 +1,5 @@
 package playground.jhackney.scoring;
 
-import java.util.Collection;
 import java.util.HashMap;
 
 import org.matsim.plans.Plan;

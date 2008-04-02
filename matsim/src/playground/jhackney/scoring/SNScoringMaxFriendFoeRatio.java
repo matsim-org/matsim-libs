@@ -95,7 +95,7 @@ import org.matsim.utils.misc.Time;
  * @author mrieser, jhackney
  */
 
-	public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
+public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 	/* TODO [MR] this class should take a ScoringFunctionConfigModule on
 	 * initialization once the new config-modules are available, instead
 	 * of reading everything from the config directly.
@@ -114,7 +114,7 @@ import org.matsim.utils.misc.Time;
 	private static final int INITIAL_INDEX = 0;
 	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
-	
+
 	private HashMap<Activity, SocialAct> socialPlansMap=null;
 	private String factype = "";
 
@@ -133,7 +133,7 @@ import org.matsim.utils.misc.Time;
 	public SNScoringMaxFriendFoeRatio(final Plan plan, HashMap<Activity, SocialAct> socialPlans, String factype) {
 		this.socialPlansMap=socialPlansMap; // Act in the Plan plus the facility where it happens and the other Persons there
 		this.factype=factype;// Type of activity in which social group matters to Person
-		
+
 		init();
 		this.reset();
 
@@ -306,7 +306,7 @@ import org.matsim.utils.misc.Time;
 
 		if (duration > 0) {
 			double utilPerf = marginalUtilityOfPerforming * typicalDuration
-					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
+			* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
 			double utilWait = marginalUtilityOfWaiting * duration;
 			score += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
@@ -329,30 +329,32 @@ import org.matsim.utils.misc.Time;
 		if (minimalDuration >= 0 && duration < minimalDuration) {
 			score += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
-		
+
 		//JH add positive utility for the ratio of friends to non-friends at
 		// a factype activity
 		//FIRST call SOCIAL.PLANS.GENERATOR AGAIN
 		// get the random act
 		// for all acts of type "factype"
-		int friend=0;
-		int foe=0;
-		Person p1=plan.getPerson();
-		Activity myActivity=p1.getKnowledge().map.getActivity(act);
-		Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
-		//for all agents in (social.plans.get(act){
-		Enumeration<Person> e = othersThere.elements();
-		while(e.hasMoreElements()){
-			Person p2 =(Person) e.nextElement();
-			if(p1.getKnowledge().egoNet.knows(p2)){
-				friend++;
-			}else{
-				foe++;
+		if(act.getType().equals(factype)){
+			int friend=0;
+			int foe=0;
+			Person p1=plan.getPerson();
+			Activity myActivity=p1.getKnowledge().map.getActivity(act);
+			Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
+			//for all agents in (social.plans.get(act){
+			Enumeration<Person> e = othersThere.elements();
+			while(e.hasMoreElements()){
+				Person p2 =(Person) e.nextElement();
+				if(p1.getKnowledge().egoNet.knows(p2)){
+					friend++;
+				}else{
+					foe++;
+				}
 			}
-		}
-		//utility=utility+(double)friend/(double)foe * const
-		score+=10.*(double)friend/(double)foe;
+			//utility=utility+(double)friend/(double)foe * const
 
+			score+=10.*(double)friend/(double)foe;
+		}
 		return score;
 	}
 
