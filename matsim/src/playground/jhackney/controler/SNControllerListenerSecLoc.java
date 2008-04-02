@@ -42,7 +42,7 @@ import org.matsim.plans.Plans;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.algorithms.PersonSNSecLocRandomReRoute;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
-import org.matsim.socialnetworks.interactions.SocializingOpportunity;
+import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
 import org.matsim.socialnetworks.io.PajekWriter;
@@ -98,7 +98,7 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
-	Collection<SocializingOpportunity> socialPlans=null;
+	Collection<SocialAct> socialPlans=null;
 
 	private final Logger log = Logger.getLogger(SNControllerListenerSecLoc.class);
 
@@ -196,7 +196,7 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 				//if(Events have just changed or if no events are yet available and if there is an interest in the planned interactions)
 				this.log.info("  Generating planned [Spatial] socializing opportunities ...");
 				this.log.info("   Makes a map of time/place windows for all planned encounters between the agents");
-				this.socialPlans = this.gen2.generate(this.controler.getPopulation());
+				this.socialPlans = this.gen2.generateValues(this.controler.getPopulation());
 				this.log.info("...finished.");
 				//}// end if
 
