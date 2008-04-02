@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountsSimRealPerHourGraphCreator.java
+ * CountsSimReal24GraphCreator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
