@@ -35,6 +35,7 @@ import org.matsim.counts.algorithms.graphs.BoxPlotErrorGraph;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
+import org.matsim.counts.algorithms.graphs.CountsSimReal24Graph;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -297,7 +298,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		simRealFolder.setName("XY Comparison Plots");
 		this.mainFolder.addFeature(simRealFolder);
 
-		// error graphs
+		// error graphs and awtv graph
 		ScreenOverlay errorGraph = createBiasErrorGraph();
 		errorGraph.setVisibility(true);
 		this.mainFolder.addFeature(errorGraph);
@@ -305,6 +306,11 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		if (errorGraph != null) {
 			errorGraph.setVisibility(false);
 			this.mainFolder.addFeature(errorGraph);
+		}
+		ScreenOverlay awtv=this.createAWTVGraph();
+		if (awtv != null) {
+			awtv.setVisibility(false);
+			this.mainFolder.addFeature(awtv);
 		}
 
 		// link graphs
@@ -641,6 +647,35 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			Icon icon1 = new Icon("./" + filename);
 			overlay.setIcon(icon1);
 			overlay.setName("Error Graph [Error/Bias]");
+			// place the image bottom right
+			Vec2Type overlayXY = new Vec2Type(1.0d, 0.0d, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
+			Vec2Type screenXY = new Vec2Type(0.98d, 0.1d, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
+
+			overlay.setOverlayXY(overlayXY);
+			overlay.setScreenXY(screenXY);
+			return overlay;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Creates the CountsSimReal24Graph for all the data
+	 * @param visible true if initially visible
+	 * @return the ScreenOverlay Feature
+	 */
+	private ScreenOverlay createAWTVGraph() {
+		CountsGraph awtv = new CountsSimReal24Graph(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber, "awtv graph");
+		awtv.createChart(0);
+
+		String filename = "awtv.png";
+		try {
+			writeChartToKmz(filename, awtv.getChart());
+			ScreenOverlay overlay = new ScreenOverlay("AWTV");
+			Icon icon1 = new Icon("./" + filename);
+			overlay.setIcon(icon1);
+			overlay.setName("AWTV");
 			// place the image bottom right
 			Vec2Type overlayXY = new Vec2Type(1.0d, 0.0d, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
 			Vec2Type screenXY = new Vec2Type(0.98d, 0.1d, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
