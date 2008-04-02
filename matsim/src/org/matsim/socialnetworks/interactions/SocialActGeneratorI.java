@@ -29,5 +29,5 @@ public interface SocialActGeneratorI {
 	// A SocializingOpportunityGenerator generates SocializingOpportunity based on
 	// the persons and their plans (or knowledge, i.e. memories)
 	
-	Collection<SocialAct> generate( Plans plans );
+	Collection<SocialAct> generateValues( Plans plans );
 }
