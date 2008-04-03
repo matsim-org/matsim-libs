@@ -20,8 +20,6 @@
 
 package playground.jhackney.scoring;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -115,8 +113,8 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
 
-	private HashMap<Activity, SocialAct> socialPlansMap=null;
-	private String factype = "";
+	private HashMap<Activity, SocialAct> socialPlansMap= SNScoringGeneralFactory.getSocialActsMap();
+	private String factype = SNScoringGeneralFactory.getFacType();// Type of activity in which social group matters to Person;
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
 	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
@@ -130,10 +128,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 
 	private static final Logger log = Logger.getLogger(SNScoringMaxFriendFoeRatio.class);
 
-	public SNScoringMaxFriendFoeRatio(final Plan plan, HashMap<Activity, SocialAct> socialPlans, String factype) {
-		this.socialPlansMap=socialPlansMap; // Act in the Plan plus the facility where it happens and the other Persons there
-		this.factype=factype;// Type of activity in which social group matters to Person
-
+	public SNScoringMaxFriendFoeRatio(final Plan plan) {
 		init();
 		this.reset();
 
@@ -343,6 +338,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 			Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
 			//for all agents in (social.plans.get(act){
 			Enumeration<Person> e = othersThere.elements();
+			System.out.print("### "+othersThere.size());
 			while(e.hasMoreElements()){
 				Person p2 =(Person) e.nextElement();
 				if(p1.getKnowledge().egoNet.knows(p2)){
@@ -351,9 +347,14 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 					foe++;
 				}
 			}
-			//utility=utility+(double)friend/(double)foe * const
-
-			score+=10.*(double)friend/(double)foe;
+			double ratio = (double)friend/(double)foe;
+			if(ratio>0. && ratio <= 1.){
+				//utility=utility+(double)friend/(double)foe * const
+				System.out.println("### test scoring "+ratio);
+				score+=10.*(double)friend/(double)foe;
+			}else{
+				System.out.println();
+			}
 		}
 		return score;
 	}

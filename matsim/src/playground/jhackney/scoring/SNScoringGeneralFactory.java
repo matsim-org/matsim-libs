@@ -11,18 +11,24 @@ import org.matsim.facilities.*;
 
 public class SNScoringGeneralFactory implements ScoringFunctionFactory {
 
-	private String factype="";
-	private HashMap<Activity, SocialAct> socialPlansMap=null;
+	private static String factype="";
+	private static HashMap<Activity, SocialAct> socialPlansMap=null;
 
 	public SNScoringGeneralFactory(String factype, HashMap<Activity,SocialAct> socialPlansMap) {
-			this.factype=factype;
-			this.socialPlansMap = socialPlansMap;
+			SNScoringGeneralFactory.factype=factype;
+			SNScoringGeneralFactory.socialPlansMap = socialPlansMap;
 			//INITIALIZE THE SCORER BY CALLING THE SOCIAL.PLANS.GENERATOR FOR THE
 			//NEWLY CHANGED PLANS.
 	}
 
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
-		return new SNScoringMaxFriendFoeRatio(plan, socialPlansMap, factype);
+		return new SNScoringMaxFriendFoeRatio(plan);
+	}
+	public static String getFacType(){
+		return factype;
+	}
+	public static HashMap<Activity,SocialAct> getSocialActsMap(){
+		return socialPlansMap;
 	}
 
 }

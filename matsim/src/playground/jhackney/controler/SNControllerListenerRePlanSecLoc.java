@@ -106,6 +106,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
 	HashMap<Activity, SocialAct> socialPlansMap=null;
 	Collection<SocialAct> socialPlans=null;
+	SNScoringGeneralFactory  factory=null;
 
 	private final Logger log = Logger.getLogger(SNControllerListenerRePlanSecLoc.class);
 
@@ -151,10 +152,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		this.log.info("... done");
 
 		/* code previously in startup() */
-		SNScoringGeneralFactory factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
-		EventsToScore scoring = new EventsToScore(this.controler.getPopulation(), factory);
-		this.controler.getEvents().addHandler(scoring);
-		
+
 		snsetup();
 	}
 
@@ -218,6 +216,8 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 			}
 			this.log.info(" ... Spatial interactions done\n");
 
+			this.log.info("  Instantiating social network scoring function");
+
 			this.log.info(" Non-Spatial interactions ...");
 			for (int ii = 0; ii < this.infoToExchange.length; ii++) {
 				String facTypeNS = this.infoToExchange[ii];
@@ -252,11 +252,21 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 //			this.log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE. Make this a person algorithm");
 //			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
 //			while (itreplan.hasNext()) {
-//				Plan p = itreplan.next().getSelectedPlan();
-//				new PersonSNSecLocRandomReRoute(activityTypesForEncounters, controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
+//			Plan p = itreplan.next().getSelectedPlan();
+//			new PersonSNSecLocRandomReRoute(activityTypesForEncounters, controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
 //			}
 //			this.log.info(" ... done");
+
+			this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
+			factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
+			this.log.info("... done");
 			snIter++;
+		}
+		if(factory!=null){
+			this.log.info("  Instantiating social network EventsToScore for scoring the plans");
+			EventsToScore scoring = new EventsToScore(this.controler.getPopulation(), factory);
+			this.controler.getEvents().addHandler(scoring);
+			this.log.info(" ... Instantiation of social network scoring done");
 		}
 	}
 
