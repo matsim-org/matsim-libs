@@ -27,6 +27,7 @@ import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.counts.CountSimComparison;
 
@@ -90,6 +91,7 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 			out.write(NEWLINE);
 
 			for (CountSimComparison csc : this.countComparisonFilter.getCountsForHour(this.timeFilter)) {
+							
 				out.write(csc.getId().toString());
 				out.write(SEPARATOR);
 				out.write(Integer.toString(csc.getHour()));
@@ -119,44 +121,31 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 	
 	private void writeAWTVTable(String file) {
 		System.out.println("Writing 'average weekday traffic volume' to AWTV" + file);
-		BufferedWriter out = null;
 		
-	 
-		 file.lastIndexOf((java.io.File.separatorChar));
-		 
-	     String fileExt=file.substring(file.lastIndexOf(".")+1,file.length());
-	     String filename=file.substring(0,file.indexOf("."))+"AWTV."+fileExt;
+		CountSimComparisonLinkFilter linkFilter=new CountSimComparisonLinkFilter(
+				this.countComparisonFilter.getCountsForHour(null));
+		
+		BufferedWriter out = null;
+		file.lastIndexOf((java.io.File.separatorChar));
+	    String fileExt=file.substring(file.lastIndexOf(".")+1,file.length());
+	    String filename=file.substring(0,file.indexOf("."))+"AWTV."+fileExt;
 	
 		try {
 			out = new BufferedWriter(new FileWriter(filename));
 			out.write("Link Id\tMATSIM volumes\tCount volumes");
 			out.write(NEWLINE);
 			
-			double countVal=0.0;
-			double simVal=0.0;
-			
-			IdI prevId=this.countComparisonFilter.getCountsForHour(null).get(0).getId();
-			
-			Iterator<CountSimComparison> csc_it = this.countComparisonFilter.getCountsForHour(null).iterator();		
-			while (csc_it.hasNext()) {
-				CountSimComparison csc= csc_it.next();	
-				
-				countVal+=csc.getCountValue();
-				simVal+=csc.getSimulationValue();
-			
-				// first element of next link id OR last element of last link id
-				if (csc.getId()!=prevId || (!csc_it.hasNext())) {
-					out.write(prevId.toString());
-					out.write(SEPARATOR);
-					out.write(this.numberFormat.format(simVal));
-					out.write(SEPARATOR);
-					out.write(this.numberFormat.format(countVal));
-					out.write(NEWLINE);
+			Iterator<IdI> id_it = new CountSimComparisonLinkFilter(
+					this.countComparisonFilter.getCountsForHour(null)).getLinkIds().iterator();
 					
-					countVal=0.0;
-					simVal=0.0;
-				}
-				prevId=csc.getId();
+			while (id_it.hasNext()) {
+				IdI id= id_it.next();				
+				out.write(id.toString());
+				out.write(SEPARATOR);
+				out.write(this.numberFormat.format(linkFilter.getAggregatedSimValue(id)));
+				out.write(SEPARATOR);
+				out.write(this.numberFormat.format(linkFilter.getAggregatedCountValue(id)));
+				out.write(NEWLINE);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
