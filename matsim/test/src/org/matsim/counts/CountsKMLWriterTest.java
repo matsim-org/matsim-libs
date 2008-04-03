@@ -20,6 +20,8 @@
 
 package org.matsim.counts;
 
+import java.io.File;
+
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
@@ -49,12 +51,12 @@ public class CountsKMLWriterTest extends MatsimTestCase {
 		CountsComparisonAlgorithm cca=this.fixture.getCCA();
 		cca.run(Counts.getSingleton());
 		
-		String filename = "test/output/org/matsim/counts/CountsKMLWriterTest/testKMLCreation/countscompare.kmz";
+		String filename = this.getOutputDirectory() + "countscompare.kmz";
 		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
 				cca.getComparison(), this.fixture.getNetwork(), TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84 ));
 		kmlWriter.setIterationNumber(0);
 		kmlWriter.write(filename);
 
-		assertTrue(!filename.isEmpty());
+		assertTrue(new File(filename).length() > 0);
 	}
 }
