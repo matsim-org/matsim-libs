@@ -43,6 +43,7 @@ import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.counts.CountSimComparison;
+import org.matsim.counts.algorithms.CountSimComparisonLinkFilter;
 import org.matsim.counts.algorithms.graphs.helper.Comp;
 import org.matsim.counts.algorithms.graphs.helper.MyComparator;
 import org.matsim.utils.identifiers.IdI;
@@ -72,38 +73,31 @@ public class CountsSimReal24Graph extends CountsGraph{
 		
 		
 		//--------------------
-		double countVal=0.0;
-		double simVal=0.0;
+		CountSimComparisonLinkFilter linkFilter=new CountSimComparisonLinkFilter(this.ccl_);
 		
-		IdI prevId=this.ccl_.get(0).getId();	
-		Iterator<CountSimComparison> csc_it = this.ccl_.iterator();		
-		while (csc_it.hasNext()) {
-			CountSimComparison csc= csc_it.next();	
+		Iterator<IdI> id_it = new CountSimComparisonLinkFilter(
+				this.ccl_).getLinkIds().iterator();
+				
+		while (id_it.hasNext()) {
+			IdI id= id_it.next();				
 			
-			countVal+=csc.getCountValue();
-			simVal+=csc.getSimulationValue();
-		
-			// first element of next link id OR last element of last link id
-			if (csc.getId()!=prevId || (!csc_it.hasNext())) {
-				if (countVal>0.0 && simVal>0.0) {
-					series.add(countVal,simVal);
-					comps.add(new Comp(countVal, "link"+prevId+".html", "Link "+prevId+"; " +
-							"Count: "+ countVal +", Sim: "+ simVal));
-				}
-				else {
-					/* values with simVal==0.0 or countVal==0.0 are drawn on the x==1 or/and y==1-line
-					 * Such values are the result of a poor simulation run, but they can also represent 
-					 * a valid result (closing summer road during winter time)
-					 */
-					countVal=Math.max(1.0, countVal);
-					simVal=Math.max(1.0, simVal);
-					series_outliers.add(countVal, simVal);
-				}
-				countVal=0.0;
-				simVal=0.0;
+			double countVal=linkFilter.getAggregatedCountValue(id);
+			double simVal=linkFilter.getAggregatedSimValue(id);
+			
+			if (countVal>0.0 &&	simVal>0.0) {
+				series.add(countVal,simVal);
+				comps.add(new Comp(countVal, "link"+id+".html", "Link "+id+"; " +
+						"Count: "+ countVal +", Sim: "+ simVal));
 			}
-			prevId=csc.getId();
-			
+			else {
+				/* values with simVal==0.0 or countVal==0.0 are drawn on the x==1 or/and y==1-line
+				 * Such values are the result of a poor simulation run, but they can also represent 
+				 * a valid result (closing summer road during winter time)
+				 */
+				countVal=Math.max(1.0, countVal);
+				simVal=Math.max(1.0, simVal);
+				series_outliers.add(countVal, simVal);
+			}	
 		}//while
 		dataset0.addSeries(series);
 		dataset_outliers.addSeries(series_outliers);
