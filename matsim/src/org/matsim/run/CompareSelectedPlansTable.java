@@ -132,12 +132,12 @@ public class CompareSelectedPlansTable {
 	
 	private static void printUsage() {
 		System.out.println();
-		System.out.println("WinnerLoserSummary:");
+		System.out.println("CompareSelectedPlansTable:");
 		System.out.println();
-		System.out.println("Creates an agent-based winner-loser table including all agent \n" +
+		System.out.println("Creates an agent-based table including all agent \n" +
 				"attributes, the selected plan score and the total travel time");
 		System.out.println();
-		System.out.println("usage: WinnerLoserSummary args");
+		System.out.println("usage: CompareSelectedPlansTable args");
 		System.out.println(" arg 0: path to plans file 0 (required)");
 		System.out.println(" arg 1: path to plans file 1 (required)");
 		System.out.println(" arg 2: name of output file (required)");
