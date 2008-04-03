@@ -2,7 +2,7 @@
 
 <counts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://matsim.org/files/dtd/counts_v1.xsd" name="test" desc="test counting stations" year="2007" layer="0">
    <count loc_id="100" cs_id="005">
-      <volume h="1" val="0.0"></volume>
+      <volume h="1" val="10.0"></volume>
       <volume h="2" val="1.0"></volume>
       <volume h="3" val="2.0"></volume>
       <volume h="4" val="3.0"></volume>
@@ -28,56 +28,56 @@
       <volume h="24" val="23.0"></volume>
    </count>
    <count loc_id="101" cs_id="005">
-      <volume h="1" val="20.56"></volume>
-      <volume h="2" val="9.41"></volume>
-      <volume h="3" val="4.63"></volume>
-      <volume h="4" val="3.99"></volume>
-      <volume h="5" val="9.91"></volume>
-      <volume h="6" val="22.65"></volume>
-      <volume h="7" val="115.56"></volume>
-      <volume h="8" val="143.03"></volume>
-      <volume h="9" val="119.96"></volume>
-      <volume h="10" val="138.71"></volume>
-      <volume h="11" val="177.72"></volume>
-      <volume h="12" val="271.81"></volume>
-      <volume h="13" val="206.76"></volume>
-      <volume h="14" val="183.97"></volume>
-      <volume h="15" val="193.44"></volume>
-      <volume h="16" val="197.63"></volume>
-      <volume h="17" val="274.42"></volume>
-      <volume h="18" val="382.31"></volume>
-      <volume h="19" val="304.02"></volume>
-      <volume h="20" val="190.46"></volume>
-      <volume h="21" val="121.38"></volume>
-      <volume h="22" val="92.55"></volume>
-      <volume h="23" val="91.62"></volume>
-      <volume h="24" val="52.16"></volume>
+      <volume h="1" val="200.0"></volume>
+      <volume h="2" val="1.0"></volume>
+      <volume h="3" val="2.0"></volume>
+      <volume h="4" val="3.0"></volume>
+      <volume h="5" val="4.0"></volume>
+      <volume h="6" val="5.0"></volume>
+      <volume h="7" val="6.0"></volume>
+      <volume h="8" val="7.0"></volume>
+      <volume h="9" val="8.0"></volume>
+      <volume h="10" val="9.0"></volume>
+      <volume h="11" val="10.0"></volume>
+      <volume h="12" val="11.0"></volume>
+      <volume h="13" val="12.0"></volume>
+      <volume h="14" val="13.0"></volume>
+      <volume h="15" val="14.0"></volume>
+      <volume h="16" val="15.0"></volume>
+      <volume h="17" val="16.0"></volume>
+      <volume h="18" val="17.0"></volume>
+      <volume h="19" val="18.0"></volume>
+      <volume h="20" val="19.0"></volume>
+      <volume h="21" val="20.0"></volume>
+      <volume h="22" val="21.0"></volume>
+      <volume h="23" val="22.0"></volume>
+      <volume h="24" val="23.0"></volume>
    </count>
    <count loc_id="102" cs_id="008">
-      <volume h="1" val="30.21"></volume>
-      <volume h="2" val="15.38"></volume>
-      <volume h="3" val="13.52"></volume>
-      <volume h="4" val="19.67"></volume>
-      <volume h="5" val="58.21"></volume>
-      <volume h="6" val="193.30"></volume>
-      <volume h="7" val="574.33"></volume>
-      <volume h="8" val="646.67"></volume>
-      <volume h="9" val="450.63"></volume>
-      <volume h="10" val="369.50"></volume>
-      <volume h="11" val="355.38"></volume>
-      <volume h="12" val="373.59"></volume>
-      <volume h="13" val="356.30"></volume>
-      <volume h="14" val="474.07"></volume>
-      <volume h="15" val="404.87"></volume>
-      <volume h="16" val="405.09"></volume>
-      <volume h="17" val="504.43"></volume>
-      <volume h="18" val="534.17"></volume>
-      <volume h="19" val="400.46"></volume>
-      <volume h="20" val="309.56"></volume>
-      <volume h="21" val="172.59"></volume>
-      <volume h="22" val="140.08"></volume>
-      <volume h="23" val="128.67"></volume>
-      <volume h="24" val="75.48"></volume>
+      <volume h="1" val="200.0"></volume>
+      <volume h="2" val="1.0"></volume>
+      <volume h="3" val="2.0"></volume>
+      <volume h="4" val="3.0"></volume>
+      <volume h="5" val="4.0"></volume>
+      <volume h="6" val="5.0"></volume>
+      <volume h="7" val="6.0"></volume>
+      <volume h="8" val="7.0"></volume>
+      <volume h="9" val="8.0"></volume>
+      <volume h="10" val="9.0"></volume>
+      <volume h="11" val="10.0"></volume>
+      <volume h="12" val="11.0"></volume>
+      <volume h="13" val="12.0"></volume>
+      <volume h="14" val="13.0"></volume>
+      <volume h="15" val="14.0"></volume>
+      <volume h="16" val="15.0"></volume>
+      <volume h="17" val="16.0"></volume>
+      <volume h="18" val="17.0"></volume>
+      <volume h="19" val="18.0"></volume>
+      <volume h="20" val="19.0"></volume>
+      <volume h="21" val="20.0"></volume>
+      <volume h="22" val="21.0"></volume>
+      <volume h="23" val="22.0"></volume>
+      <volume h="24" val="23.0"></volume>
    </count>
    <count loc_id="103" cs_id="008">
       <volume h="1" val="46.87"></volume>
@@ -522,29 +522,29 @@
       <volume h="24" val="167.15"></volume>
    </count>
    <count loc_id="120" cs_id="025">
-      <volume h="1" val="104.33"></volume>
-      <volume h="2" val="55.80"></volume>
-      <volume h="3" val="46.47"></volume>
-      <volume h="4" val="41.30"></volume>
-      <volume h="5" val="77.22"></volume>
-      <volume h="6" val="231.79"></volume>
-      <volume h="7" val="744.56"></volume>
-      <volume h="8" val="1215.47"></volume>
-      <volume h="9" val="1073.22"></volume>
-      <volume h="10" val="1013.75"></volume>
-      <volume h="11" val="1050.20"></volume>
-      <volume h="12" val="1015.77"></volume>
-      <volume h="13" val="927.53"></volume>
-      <volume h="14" val="1047.73"></volume>
-      <volume h="15" val="990.81"></volume>
-      <volume h="16" val="1019.96"></volume>
-      <volume h="17" val="1175.69"></volume>
-      <volume h="18" val="1389.75"></volume>
-      <volume h="19" val="1133.79"></volume>
-      <volume h="20" val="782.64"></volume>
-      <volume h="21" val="495.64"></volume>
-      <volume h="22" val="388.82"></volume>
-      <volume h="23" val="305.17"></volume>
-      <volume h="24" val="217.90"></volume>
+      <volume h="1" val="0.0"></volume>
+      <volume h="2" val="1.0"></volume>
+      <volume h="3" val="2.0"></volume>
+      <volume h="4" val="3.0"></volume>
+      <volume h="5" val="4.0"></volume>
+      <volume h="6" val="5.0"></volume>
+      <volume h="7" val="6.0"></volume>
+      <volume h="8" val="7.0"></volume>
+      <volume h="9" val="8.0"></volume>
+      <volume h="10" val="9.0"></volume>
+      <volume h="11" val="10.0"></volume>
+      <volume h="12" val="11.0"></volume>
+      <volume h="13" val="12.0"></volume>
+      <volume h="14" val="13.0"></volume>
+      <volume h="15" val="14.0"></volume>
+      <volume h="16" val="15.0"></volume>
+      <volume h="17" val="16.0"></volume>
+      <volume h="18" val="17.0"></volume>
+      <volume h="19" val="18.0"></volume>
+      <volume h="20" val="19.0"></volume>
+      <volume h="21" val="20.0"></volume>
+      <volume h="22" val="21.0"></volume>
+      <volume h="23" val="22.0"></volume>
+      <volume h="24" val="123.0"></volume>
    </count>
 </counts>
