@@ -2,30 +2,30 @@
 
 <counts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://matsim.org/files/dtd/counts_v1.xsd" name="test" desc="test counting stations" year="2007" layer="0">
    <count loc_id="100" cs_id="005">
-      <volume h="1" val="6.93"></volume>
-      <volume h="2" val="3.67"></volume>
-      <volume h="3" val="4.24"></volume>
-      <volume h="4" val="6.63"></volume>
-      <volume h="5" val="28.84"></volume>
-      <volume h="6" val="86.94"></volume>
-      <volume h="7" val="282.46"></volume>
-      <volume h="8" val="273.47"></volume>
-      <volume h="9" val="170.52"></volume>
-      <volume h="10" val="156.13"></volume>
-      <volume h="11" val="153.91"></volume>
-      <volume h="12" val="175.24"></volume>
-      <volume h="13" val="203.51"></volume>
-      <volume h="14" val="275.47"></volume>
-      <volume h="15" val="206.99"></volume>
-      <volume h="16" val="211.41"></volume>
-      <volume h="17" val="230.64"></volume>
-      <volume h="18" val="247.87"></volume>
-      <volume h="19" val="173.75"></volume>
-      <volume h="20" val="139.22"></volume>
-      <volume h="21" val="85.64"></volume>
-      <volume h="22" val="65.24"></volume>
-      <volume h="23" val="46.44"></volume>
-      <volume h="24" val="24.42"></volume>
+      <volume h="1" val="0.0"></volume>
+      <volume h="2" val="1.0"></volume>
+      <volume h="3" val="2.0"></volume>
+      <volume h="4" val="3.0"></volume>
+      <volume h="5" val="4.0"></volume>
+      <volume h="6" val="5.0"></volume>
+      <volume h="7" val="6.0"></volume>
+      <volume h="8" val="7.0"></volume>
+      <volume h="9" val="8.0"></volume>
+      <volume h="10" val="9.0"></volume>
+      <volume h="11" val="10.0"></volume>
+      <volume h="12" val="11.0"></volume>
+      <volume h="13" val="12.0"></volume>
+      <volume h="14" val="13.0"></volume>
+      <volume h="15" val="14.0"></volume>
+      <volume h="16" val="15.0"></volume>
+      <volume h="17" val="16.0"></volume>
+      <volume h="18" val="17.0"></volume>
+      <volume h="19" val="18.0"></volume>
+      <volume h="20" val="19.0"></volume>
+      <volume h="21" val="20.0"></volume>
+      <volume h="22" val="21.0"></volume>
+      <volume h="23" val="22.0"></volume>
+      <volume h="24" val="23.0"></volume>
    </count>
    <count loc_id="101" cs_id="005">
       <volume h="1" val="20.56"></volume>
