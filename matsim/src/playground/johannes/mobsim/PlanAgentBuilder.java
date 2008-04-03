@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DeliberateAgent.java
+ * PlanAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,55 +23,54 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.network.Link;
-import org.matsim.plans.Plan;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plans;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class DeliberateAgent extends MobsimAgentDecorator<PlanAgent> {
+public class PlanAgentBuilder implements MobsimAgentBuilder {
 
-	private IntradayStrategy strategy;
+	private static final Logger log = Logger.getLogger(PlanAgentBuilder.class);
 	
-	/*
-	 * TODO: Discuss the name of this field!
-	 */
-	private int replanCoolDownTime = 1;
-
-	private double lastReplanTime;
+	private final Plans population;
 	
-	public DeliberateAgent(PlanAgent agent, IntradayStrategy strategy) {
-		super(agent);
-		this.strategy = strategy;
-	}
-
-	public void setReplanCoolDownTime(int time) {
-		this.replanCoolDownTime = time;
+	public PlanAgentBuilder(Plans population) {
+		this.population = population;
 	}
 	
-	public int getReplanCoolDownTime() {
-		return replanCoolDownTime;
-	}
-	
-	@Override
-	public Link getNextLink(double time) {
-		replan(time);
-		return super.getNextLink(time);
-	}
-
-	public void replan(double time) {
-		if (time - lastReplanTime > replanCoolDownTime) {
-			lastReplanTime = time;
-			
-			Plan newPlan = strategy.replan(time);
-			if (newPlan != null) {
-				/*
-				 * TODO: Do some plan validation, e.g., if size of new plan
-				 * equals size of old plan.
-				 */
-				agent.getPerson().exchangeSelectedPlan(newPlan, false);
-			}
+	public List<PlanAgent> buildAgents() {
+		List<PlanAgent> agents = new ArrayList<PlanAgent>(population.getPersons().size());
+		int countInvalid = 0;
+		for(Person p : population) {
+			if(validatePerson(p)) {
+				agents.add(buildAgent(p));
+			} else
+				countInvalid++;
 		}
+		
+		if(countInvalid > 0)
+			log.warn(String.format(
+					"%1$s agents were not build because the person failed validation!",
+					countInvalid));
+		
+		return agents;
+	}
+	
+	protected PlanAgent buildAgent(Person p) {
+		return new PlanAgent(p);
+	}
+
+	protected boolean validatePerson(Person p) {
+		/*
+		 * TODO: Do some validation here, e.g., is there a selected plan, is the
+		 * selected plan valid (routes)?
+		 */
+		return true;
 	}
 }

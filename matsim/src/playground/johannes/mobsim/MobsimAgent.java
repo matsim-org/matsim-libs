@@ -23,17 +23,22 @@ package playground.johannes.mobsim;
 import org.matsim.network.Link;
 import org.matsim.utils.identifiers.IdI;
 
+/**
+ * @author illenberger
+ * 
+ */
 public interface MobsimAgent {
 
 	/**
-	 * Returns the desired transportation mode of the next trip.
+	 * Returns the desired transportation mode of the next trip, or the mode of
+	 * the current trip if the agent is en-route.
 	 * 
 	 * @param time
 	 *            the current simulation time.
 	 * @return the mode of the next trip, or <tt>null</tt> if there is no next
 	 *         trip.
 	 */
-	public String getNextMode(double time);
+	public String getMode(double time);
 
 	/**
 	 * Returns the desired departure time of the next trip.
@@ -58,21 +63,23 @@ public interface MobsimAgent {
 	 * 
 	 * @param time
 	 *            the current simulation time.
-	 * @return the next desired link, or <tt>null</tt> if the agent is already
-	 *         on its destination link.
+	 * @return the next desired link, or <tt>null</tt> if the agent has
+	 *         reached its destination link, i.e., {@link #getLink()} equals
+	 *         {@link #getDestinationLink(double)}.
 	 */
 	public Link getNextLink(double time);
 
 	/**
-	 * Returns the desired destination link. If the agent is currently not
-	 * en-route, its desired destination link is its current link.
+	 * Returns the desired destination link. If {@link #isDone()} returns
+	 * <tt>true</tt> the desired destination link is the current link, e.g.,
+	 * {@link #getLink()} equals {@link #getDestinationLink(double)}.
 	 * 
 	 * @param time
 	 *            the current simulation time.
 	 * @return the desired destination link.
 	 */
 	public Link getDestinationLink(double time);
-	
+
 	/**
 	 * Returns whether the agent intends to perform a further trip or not.
 	 * 

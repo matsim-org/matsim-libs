@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MobsimAgentFactory.java
+ * RouteProviderBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,14 +23,13 @@
  */
 package playground.johannes.mobsim;
 
-import java.util.List;
+import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
  * @author illenberger
  *
  */
-public abstract interface MobsimAgentFactory {
-	
-	public List<? extends MobsimAgent> buildAgents();
-	
+public interface RouteProviderBuilder {
+
+	public RouteProvider newRouteProvider(PlanAgent agent);
 }

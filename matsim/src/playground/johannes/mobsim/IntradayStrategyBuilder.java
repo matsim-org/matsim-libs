@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanStrategy.java
+ * IntradayStrategyBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.johannes.mobsim;
 
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Route;
+public interface IntradayStrategyBuilder {
 
-/**
- * @author illenberger
- *
- */
-public abstract class PlanStrategy {
-
-	protected PlanAgent agent;
-	
-	public PlanStrategy(PlanAgent agent) {
-		this.agent = agent;
-	}
-	
-	public abstract Plan replan(double time);
-	
-	protected void adaptRoute(Route route, Leg leg, int index) {
-		
-	}
+	public IntradayStrategy newIntradayStrategy(PlanAgent agent);
 	
 }

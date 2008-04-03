@@ -50,8 +50,8 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements Mob
 		return agent.getDepartureTime(time);
 	}
 
-	public String getNextMode(double time) {
-		return agent.getNextMode(time);
+	public String getMode(double time) {
+		return agent.getMode(time);
 	}
 
 	public Link getNextLink(double time) {

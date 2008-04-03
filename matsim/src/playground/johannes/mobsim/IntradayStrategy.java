@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DeliberateAgent.java
+ * PlanStrategy.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,55 +23,29 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.network.Link;
+import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
+import org.matsim.plans.Route;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class DeliberateAgent extends MobsimAgentDecorator<PlanAgent> {
+public abstract class IntradayStrategy {
 
-	private IntradayStrategy strategy;
+	protected PlanAgent agent;
 	
-	/*
-	 * TODO: Discuss the name of this field!
-	 */
-	private int replanCoolDownTime = 1;
-
-	private double lastReplanTime;
-	
-	public DeliberateAgent(PlanAgent agent, IntradayStrategy strategy) {
-		super(agent);
-		this.strategy = strategy;
-	}
-
-	public void setReplanCoolDownTime(int time) {
-		this.replanCoolDownTime = time;
+	public IntradayStrategy(PlanAgent agent) {
+		this.agent = agent;
 	}
 	
-	public int getReplanCoolDownTime() {
-		return replanCoolDownTime;
+	public abstract Plan replan(double time);
+	
+	protected void adaptRoute(Route route, Leg leg, int index, double time) {
+		/*
+		 * TODO: Need link-based route implementation here.
+		 * TODO: Move this to re-routing strategy?
+		 */
 	}
 	
-	@Override
-	public Link getNextLink(double time) {
-		replan(time);
-		return super.getNextLink(time);
-	}
-
-	public void replan(double time) {
-		if (time - lastReplanTime > replanCoolDownTime) {
-			lastReplanTime = time;
-			
-			Plan newPlan = strategy.replan(time);
-			if (newPlan != null) {
-				/*
-				 * TODO: Do some plan validation, e.g., if size of new plan
-				 * equals size of old plan.
-				 */
-				agent.getPerson().exchangeSelectedPlan(newPlan, false);
-			}
-		}
-	}
 }

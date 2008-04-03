@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DeliberateAgent.java
+ * ReroutingAgentBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,55 +23,35 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.network.Link;
-import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
+
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class DeliberateAgent extends MobsimAgentDecorator<PlanAgent> {
+public class ReroutingAgentBuilder extends DeliberateAgentBuilder {
 
-	private IntradayStrategy strategy;
-	
-	/*
-	 * TODO: Discuss the name of this field!
-	 */
-	private int replanCoolDownTime = 1;
-
-	private double lastReplanTime;
-	
-	public DeliberateAgent(PlanAgent agent, IntradayStrategy strategy) {
-		super(agent);
-		this.strategy = strategy;
-	}
-
-	public void setReplanCoolDownTime(int time) {
-		this.replanCoolDownTime = time;
+	public static ReroutingAgentBuilder newInstance(Plans population, RouteProviderBuilder builder) {
+		ReroutingStrategyBuilder sBuilder = new ReroutingStrategyBuilder(builder);
+		return new ReroutingAgentBuilder(population, sBuilder);
 	}
 	
-	public int getReplanCoolDownTime() {
-		return replanCoolDownTime;
-	}
-	
-	@Override
-	public Link getNextLink(double time) {
-		replan(time);
-		return super.getNextLink(time);
+	private ReroutingAgentBuilder(Plans population,	IntradayStrategyBuilder builder) {
+		super(population, builder);
 	}
 
-	public void replan(double time) {
-		if (time - lastReplanTime > replanCoolDownTime) {
-			lastReplanTime = time;
-			
-			Plan newPlan = strategy.replan(time);
-			if (newPlan != null) {
-				/*
-				 * TODO: Do some plan validation, e.g., if size of new plan
-				 * equals size of old plan.
-				 */
-				agent.getPerson().exchangeSelectedPlan(newPlan, false);
-			}
+	private static class ReroutingStrategyBuilder implements IntradayStrategyBuilder {
+
+		private final RouteProviderBuilder rBuilder;
+		
+		public ReroutingStrategyBuilder(RouteProviderBuilder rBuilder) {
+			this.rBuilder = rBuilder;
 		}
+		
+		public IntradayStrategy newIntradayStrategy(PlanAgent agent) {
+			return new ReroutingStrategy(agent,rBuilder.newRouteProvider(agent));
+		}
+		
 	}
 }

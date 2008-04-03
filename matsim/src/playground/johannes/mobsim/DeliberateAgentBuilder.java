@@ -26,22 +26,36 @@ package playground.johannes.mobsim;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.plans.Plans;
+
 /**
  * @author illenberger
  *
  */
-public class DeliberateAgentFactory implements MobsimAgentFactory {
+public abstract class DeliberateAgentBuilder implements MobsimAgentBuilder {
 
-	private PlanAgentFactory planAgentFactory;
+	private PlanAgentBuilder planAgentBuilder;
+	
+	private IntradayStrategyBuilder strategyBuilder;
+	
+	public DeliberateAgentBuilder(Plans population, IntradayStrategyBuilder sBuilder) {
+		this.strategyBuilder = sBuilder;
+		planAgentBuilder = new PlanAgentBuilder(population);
+	}
 	
 	public List<DeliberateAgent> buildAgents() {
-		List<PlanAgent> planAgents = planAgentFactory.buildAgents();
+		List<PlanAgent> planAgents = planAgentBuilder.buildAgents();
 		List<DeliberateAgent> deliberateAgents = new ArrayList<DeliberateAgent>(planAgents.size());
 		
 		for(PlanAgent a : planAgents)
-			deliberateAgents.add(new DeliberateAgent(a, null));
+			deliberateAgents.add(newDeliberateAgent(a));
 		
 		return deliberateAgents;
 	}
 
+	protected DeliberateAgent newDeliberateAgent(PlanAgent pAgent) {
+		IntradayStrategy strategy = strategyBuilder.newIntradayStrategy(pAgent);
+		DeliberateAgent dAgent = new DeliberateAgent(pAgent, strategy);
+		return dAgent;
+	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanAgentFactory.java
+ * MobsimAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -29,11 +29,8 @@ import java.util.List;
  * @author illenberger
  *
  */
-public class PlanAgentFactory implements MobsimAgentFactory {
-
-	public List<PlanAgent> buildAgents() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+public abstract interface MobsimAgentBuilder {
+	
+	public List<? extends MobsimAgent> buildAgents();
+	
 }

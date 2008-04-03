@@ -33,7 +33,7 @@ import org.matsim.withinday.routeprovider.RouteProvider;
  * @author illenberger
  * 
  */
-public class ReroutingStrategy extends PlanStrategy {
+public class ReroutingStrategy extends IntradayStrategy {
 
 	private RouteProvider router;
 
@@ -56,7 +56,7 @@ public class ReroutingStrategy extends PlanStrategy {
 			 * destination links are consistent.
 			 */
 			adaptRoute(newRoute, (Leg) copy.getActsLegs().get(
-					agent.getCurrentPlanIndex()), agent.getCurrentRouteIndex());
+					agent.getCurrentPlanIndex()), agent.getCurrentRouteIndex(), time);
 
 			return copy;
 		} else
