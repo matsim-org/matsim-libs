@@ -44,37 +44,34 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-//	private final NetworkLayer network;
+	/**
+	 * The routing algorithm to be used for finding routes on the network with actual travel times.
+	 */
 	protected final LeastCostPathCalculator routeAlgo;
-	protected final LeastCostPathCalculator dijkstraEmpty;
-	protected final boolean calcMissingOnly;
+	/**
+	 * The routing algorithm to be used for finding routes in the empty network, with freeflow travel times.
+	 */
+	protected final LeastCostPathCalculator routeAlgoFreeflow;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansCalcRoute(NetworkLayer network, TravelCostI costCalculator,
-			TravelTimeI timeCalculator) {
-		this(network, costCalculator, timeCalculator, false);
-	}
-
-	public PlansCalcRoute(NetworkLayer network, TravelCostI costCalculator,
-			TravelTimeI timeCalculator, boolean calcMissingOnly) {
+	public PlansCalcRoute(final NetworkLayer network, final TravelCostI costCalculator, final TravelTimeI timeCalculator) {
 		super();
-//		this.network = network;
 		this.routeAlgo = new Dijkstra(network, costCalculator, timeCalculator);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		this.dijkstraEmpty = new Dijkstra(network, timeCostCalc, timeCostCalc);
-		this.calcMissingOnly = calcMissingOnly;
+		this.routeAlgoFreeflow = new Dijkstra(network, timeCostCalc, timeCostCalc);
 	}
 
-	public PlansCalcRoute(NetworkLayer network, TravelCostI costCalculator, TravelTimeI timeCalculator,
-			boolean calcMissingOnly, LeastCostPathCalculator router, LeastCostPathCalculator routerEmpty) {
+	/**
+	 * @param router The routing algorithm to be used for finding routes on the network with actual travel times.
+	 * @param routerFreeflow The routing algorithm to be used for finding routes in the empty network, with freeflow travel times.
+	 */
+	public PlansCalcRoute(final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) {
 		super();
-//		this.network = network;
 		this.routeAlgo = router;
-		this.dijkstraEmpty = routerEmpty;
-		this.calcMissingOnly = calcMissingOnly;
+		this.routeAlgoFreeflow = routerFreeflow;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -82,7 +79,7 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		int nofPlans = person.getPlans().size();
 
 		for (int planId = 0; planId < nofPlans; planId++) {
@@ -91,7 +88,7 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		}
 	}
 
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 		handlePlan(plan);
 	}
 
@@ -99,11 +96,11 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 	// helper methods
 	//////////////////////////////////////////////////////////////////////
 
-	protected void handlePlan(Plan plan) {
+	protected void handlePlan(final Plan plan) {
 		ArrayList<?> actslegs = plan.getActsLegs();
 		Act fromAct = (Act)actslegs.get(0);
 		double now = 0;
-		
+
 		// loop over all <act>s
 		for (int j = 2; j < actslegs.size(); j=j+2) {
 			Act toAct = (Act)actslegs.get(j);
@@ -123,15 +120,15 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 				now += dur;
 			} else {
 				throw new RuntimeException("act " + j + " has neither end-time nor duration.");
-			}				
-						
+			}
+
 			handleLeg(leg, fromAct, toAct, now);
 
 			fromAct = toAct;
 		}
 	}
 
-	protected double handleLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	protected double handleLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		String legmode = leg.getMode();
 
 		if (legmode == "car") {
@@ -145,16 +142,16 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		} else if (legmode == "bike") {
 			return handleBikeLeg(leg, fromAct, toAct, depTime);
 		} else if (legmode == "undef") {
-			// TODO balmermi: No clue how to handle legs with 'undef' mode
-			//                Therefore, handle it similar like bike mode with 50 km/h
-			//                and no route assigned
+			/* TODO balmermi: No clue how to handle legs with 'undef' mode
+			 *                Therefore, handle it similar like bike mode with 50 km/h
+			 *                and no route assigned  */
 			return handleUndefLeg(leg, fromAct, toAct, depTime);
 		} else {
 			throw new RuntimeException("cannot handle legmode '" + legmode + "'.");
 		}
 	}
 
-	private double handleCarLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		double travTime = 0;
 		LinkImpl fromLink = fromAct.getLink();
 		LinkImpl toLink = toAct.getLink();
@@ -167,21 +164,10 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		Route route = null;
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
-			if (leg.getRoute() == null || !this.calcMissingOnly) {
-				route = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
-				if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-				leg.setRoute(route);
-				travTime = route.getTravTime();
-			} else {
-				route = leg.getRoute();
-				travTime = leg.getTravTime();
-				if (travTime == Time.UNDEFINED_TIME) {
-					travTime = route.getTravTime();
-				}
-				if (travTime == Time.UNDEFINED_TIME) {
-					travTime = 0;
-				}
-			}
+			route = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
+			if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			leg.setRoute(route);
+			travTime = route.getTravTime();
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			route = new Route();
@@ -196,13 +182,13 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		return travTime;
 	}
 
-	private double handleRideLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handleRideLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		// handle a ride exactly the same was as a car
 		// the simulation has to take car that this leg is not really simulated as a stand-alone driver
 		return handleCarLeg(leg, fromAct, toAct, depTime);
 	}
 
-	private double handlePtLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handlePtLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		// currently: calc route in empty street network, use twice the traveltime
 		// TODO [MR] later: use special pt-router
 
@@ -218,22 +204,11 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		Route route = null;
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
-			if (leg.getRoute() == null || !this.calcMissingOnly) {
-				route = this.dijkstraEmpty.calcLeastCostPath(startNode, endNode, depTime);
-				if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-				travTime = route.getTravTime() * 2;
-				route.setTravTime(travTime);
-				leg.setRoute(route);
-			} else {
-				route = leg.getRoute();
-				travTime = leg.getTravTime();
-				if (travTime == Time.UNDEFINED_TIME) {
-					travTime = route.getTravTime();
-				}
-				if (travTime == Time.UNDEFINED_TIME) {
-					travTime = 0;
-				}
-			}
+			route = this.routeAlgoFreeflow.calcLeastCostPath(startNode, endNode, depTime);
+			if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			travTime = route.getTravTime() * 2;
+			route.setTravTime(travTime);
+			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			route = new Route();
@@ -248,11 +223,11 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		return travTime;
 	}
 
-	private double handleWalkLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handleWalkLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		// make simple assumption about distance and walking speed
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 3.0 / 3.6; // 3.0 km/h --> m/s
-//	 create an empty route, but with realistic traveltime
+		// create an empty route, but with realistic traveltime
 		Route route = new Route();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
@@ -263,11 +238,11 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		return travTime;
 	}
 
-	private double handleBikeLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handleBikeLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		// make simple assumption about distance and cycling speed
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 15.0 / 3.6; // 15.0 km/h --> m/s
-//	 create an empty route, but with realistic traveltime
+		// create an empty route, but with realistic traveltime
 		Route route = new Route();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
@@ -278,11 +253,11 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		return travTime;
 	}
 
-	private double handleUndefLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
+	private double handleUndefLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		// make simple assumption about distance and a dummy speed (50 km/h)
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 50.0 / 3.6; // 50.0 km/h --> m/s
-//	 create an empty route, but with realistic traveltime
+		// create an empty route, but with realistic traveltime
 		Route route = new Route();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);

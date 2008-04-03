@@ -42,7 +42,6 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 
 	private final LeastCostPathCalculator router_m;
 	private final LeastCostPathCalculator ptRouter_m;
-	private final boolean calcMissingOnly_m;
 
 	private final static Logger log = Logger.getLogger(PlansCalcRoute.class);
 	
@@ -51,19 +50,13 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 	//////////////////////////////////////////////////////////////////////
 
 	public PlansCalcRoute(final LeastCostPathCalculator router) {
-		this(router, false);
+		this(router, null);
 	}
 
-	public PlansCalcRoute(final LeastCostPathCalculator router, final boolean calcMissingOnly) {
-		this(router, null, calcMissingOnly);
-	}
-
-	public PlansCalcRoute(final LeastCostPathCalculator router, final LeastCostPathCalculator ptRouter,
-			final boolean calcMissingOnly) {
+	public PlansCalcRoute(final LeastCostPathCalculator router, final LeastCostPathCalculator ptRouter) {
 		super();
 		this.router_m = router;
 		this.ptRouter_m = ptRouter;
-		this.calcMissingOnly_m = calcMissingOnly;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -149,16 +142,12 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		Route route = null;
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
-			if (leg.getRoute() == null || !this.calcMissingOnly_m) {
+			route = this.router_m.calcLeastCostPath(startNode, endNode, depTime);
+			if (route == null) {
 				route = this.router_m.calcLeastCostPath(startNode, endNode, depTime);
-				if (route == null) {
-					route = this.router_m.calcLeastCostPath(startNode, endNode, depTime);
-					throw new Exception("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-				}
-				leg.setRoute(route);
-			} else {
-				route = leg.getRoute();
+				throw new Exception("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			}
+			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			route = new Route();
@@ -193,15 +182,11 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		Route route = null;
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
-			if (leg.getRoute() == null || !this.calcMissingOnly_m) {
-				route = this.ptRouter_m.calcLeastCostPath(startNode, endNode, depTime);
-				if (route == null) throw new Exception("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-				travTime = route.getTravTime() * 2;
-				route.setTravTime(travTime);
-				leg.setRoute(route);
-			} else {
-				route = leg.getRoute();
-			}
+			route = this.ptRouter_m.calcLeastCostPath(startNode, endNode, depTime);
+			if (route == null) throw new Exception("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			travTime = route.getTravTime() * 2;
+			route.setTravTime(travTime);
+			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			route = new Route();

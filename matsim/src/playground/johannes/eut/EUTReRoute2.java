@@ -65,8 +65,7 @@ public class EUTReRoute2 extends MultithreadedModuleA {
 	public PlanAlgorithmI getPlanAlgoInstance() {
 		EUTRouter2 router = new EUTRouter2(network, provider, utilFunction);
 		router.setAnalyzer(analyzer);
-		return new PlanAlgorithmDecorator(new PlansCalcRoute(null, null, null,
-				false, router, router));
+		return new PlanAlgorithmDecorator(new PlansCalcRoute(router, router));
 	}
 
 //	@Override

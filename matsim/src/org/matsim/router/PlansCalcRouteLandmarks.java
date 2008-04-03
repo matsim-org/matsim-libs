@@ -27,40 +27,21 @@ import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 
 /**
- * A PersonAlgorithm that calculates and sets the routes of a person's actitivities.
- * Uses AStarLandmarks for routing.
- * @author lnicolas
+ * A PersonAlgorithm that calculates and sets the routes of a person's activities using {@link AStarLandmarks}.
  *
+ * @author lnicolas
  */
 public class PlansCalcRouteLandmarks extends PlansCalcRoute {
 
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+	public PlansCalcRouteLandmarks(final NetworkLayer network, final PreProcessLandmarks preProcessData,
+			final TravelCostI costCalculator, final TravelTimeI timeCalculator) {
+		this(network, preProcessData, costCalculator, timeCalculator, new FreespeedTravelTimeCost());
+	}
 
-	public PlansCalcRouteLandmarks(NetworkLayer network, PreProcessLandmarks preProcessData,
-			TravelCostI costCalculator, TravelTimeI timeCalculator) {
-		this(network, preProcessData, costCalculator, timeCalculator, false);
-	}
-	
-//	public PlansCalcRouteLandmarks(NetworkLayer network, TravelCostI costCalculator,
-//			TravelTimeI timeCalculator, boolean calcMissingOnly) {
-//		preProcessData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-//		preProcessData.run(network);
-//		this(network, null, costCalculator, timeCalculator, calcMissingOnly);
-//	}
-	
-	public PlansCalcRouteLandmarks(NetworkLayer network, PreProcessLandmarks preProcessData,
-			TravelCostI costCalculator, TravelTimeI timeCalculator, boolean calcMissingOnly) {
-		this(network, preProcessData, costCalculator, timeCalculator, calcMissingOnly,
-				new FreespeedTravelTimeCost());
-	}
-	
-	PlansCalcRouteLandmarks(NetworkLayer network, PreProcessLandmarks preProcessData,
-			TravelCostI costCalculator, TravelTimeI timeCalculator, boolean calcMissingOnly,
-			FreespeedTravelTimeCost timeCostCalc) {
-		super(network, costCalculator, timeCalculator, calcMissingOnly,
-				new AStarLandmarks(network, preProcessData, costCalculator, timeCalculator),
+	private PlansCalcRouteLandmarks(final NetworkLayer network, final PreProcessLandmarks preProcessData,
+			final TravelCostI costCalculator, final TravelTimeI timeCalculator,
+			final FreespeedTravelTimeCost timeCostCalc) {
+		super(new AStarLandmarks(network, preProcessData, costCalculator, timeCalculator),
 				new AStarLandmarks(network, preProcessData, timeCostCalc, timeCostCalc));
 	}
 }

@@ -28,10 +28,6 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
-import org.matsim.router.AStarEuclidean;
-import org.matsim.router.AStarLandmarks;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
@@ -140,7 +136,7 @@ public class RoutingTest extends MatsimTestCase {
 		this.initRan = true;
 	}
 
-	private Plans readPlans(String inPlansName) {
+	private Plans readPlans(final String inPlansName) {
 		Plans plans = new Plans();
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		plansReader.readFile(inPlansName);
@@ -164,7 +160,7 @@ public class RoutingTest extends MatsimTestCase {
 		LeastCostPathCalculator routingAlgo = provider.getRouter(network, calculator, calculator);
 
 		PlansCalcRoute router = null;
-		router = new PlansCalcRoute(network, calculator, calculator, false, routingAlgo, routingAlgo);
+		router = new PlansCalcRoute(routingAlgo, routingAlgo);
 		plans.addAlgorithm(router);
 		long now = System.currentTimeMillis();
 		plans.printPlansCount();

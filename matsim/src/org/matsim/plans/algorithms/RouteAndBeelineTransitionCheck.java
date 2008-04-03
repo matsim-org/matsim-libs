@@ -33,70 +33,60 @@ import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.identifiers.IdI;
 
-
 /**
- * @author glaemmel
+ * Checks if the fastest route between two activities ("beeline route") crosses a specific area.
  *
+ * @author glaemmel
  */
-//////////////////////////////////////////////////////////////////////
-// RouteAndBeelineTransitionCheck checks if a route/beeline crosses a specific area
-//////////////////////////////////////////////////////////////////////
 public class RouteAndBeelineTransitionCheck implements PlanAlgorithmI {
-
 
 	private NetworkLayer network = null;
 	private Set<IdI> aOI = new HashSet<IdI>();
 	private PlansCalcRoute router = null;
 
-	//the result of RouteAndBeelineTransitionCheck
+	// the result of RouteAndBeelineTransitionCheck
 	// count[0] --> # beeline does not intersect AOI, plan leg does not intersect AOI
 	// count[1] --> # beeline does not intersect AOI, plan leg intersect AOI
 	// count[2] --> # beeline intersect AOI, plan leg does not intersect AOI
 	// count[3] --> # beeline intersect AOI, plan leg intersect AOI
 	public int[] count;
 
-
-	public RouteAndBeelineTransitionCheck(NetworkLayer net, Set<IdI> areaOfInterest){
+	public RouteAndBeelineTransitionCheck(final NetworkLayer net, final Set<IdI> areaOfInterest) {
 		this.network = net;
 		this.aOI = areaOfInterest;
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		this.router = new PlansCalcRoute(this.network, timeCostCalc, timeCostCalc, false);
+		this.router = new PlansCalcRoute(this.network, timeCostCalc, timeCostCalc);
 		this.count = new int[4];
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.demandmodeling.plans.algorithms.PlanAlgorithmI#run(org.matsim.demandmodeling.plans.Plan)
-	 */
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 		Plan beeline = getBeeline(plan);
 
 		LegIterator itPlanLegs = plan.getIteratorLeg();
 		LegIterator itBeelineLegs = beeline.getIteratorLeg();
 
-		while (itPlanLegs.hasNext()){
+		while (itPlanLegs.hasNext()) {
 			Leg planLeg = (Leg) itPlanLegs.next();
 			Leg beelineLeg = (Leg) itBeelineLegs.next();
 			int type = 2 * intersectAOI(beelineLeg) + intersectAOI(planLeg);
 			this.count[type]++;
-
 		}
-
 	}
 
-
-	private int intersectAOI(Leg leg) {
-		for (Link link : leg.getRoute().getLinkRoute()){
-			if (this.aOI.contains(link.getId())) return 1;
+	private int intersectAOI(final Leg leg) {
+		for (Link link : leg.getRoute().getLinkRoute()) {
+			if (this.aOI.contains(link.getId()))
+				return 1;
 		}
 		return 0;
 	}
 
-	private Plan getBeeline(Plan plan){
+	private Plan getBeeline(final Plan plan) {
 		Plan beeline = new Plan(plan.getPerson());
 		ActIterator it = plan.getIteratorAct();
 		beeline.addAct(it.next());
-		while (it.hasNext()){
-			beeline.addLeg(new Leg(1,"car",0.0,0.0,0.0));
+		while (it.hasNext()) {
+			beeline.addLeg(new Leg(1, "car", 0.0, 0.0, 0.0));
 			beeline.addAct(it.next());
 		}
 		this.router.run(beeline);
