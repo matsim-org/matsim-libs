@@ -34,6 +34,7 @@ public class AllTests {
 		suite.addTestSuite(CountsParserWriterTest.class);
 		suite.addTestSuite(CountsGraphWriterTest.class);
 		suite.addTestSuite(CountsTableWriterTest.class);
+		suite.addTestSuite(CountsKMLWriterTest.class);
 
 
 		// logic unit tests --------------------------------
