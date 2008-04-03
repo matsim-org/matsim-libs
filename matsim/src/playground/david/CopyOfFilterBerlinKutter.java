@@ -96,7 +96,6 @@ public class CopyOfFilterBerlinKutter {
 		plansReader.readFile(popFileName);
 //		population.runAlgorithms();
 		
-		Gbl.getConfig().global().setOutputTimeFormat("HH:mm:ss");
 		PlansWriter plansWriter = new PlansWriter(relevantPopulation, outpopFileName, "v4");
 		plansWriter.write();
 	}
