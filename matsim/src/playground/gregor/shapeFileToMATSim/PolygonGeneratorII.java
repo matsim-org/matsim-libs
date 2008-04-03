@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -55,7 +57,7 @@ public class PolygonGeneratorII {
 	private List<Feature> featureList;
 	private GeometryFactory geofac;
 	static final double CATCH_RADIUS = 0.1;
-	static final double DEFAULT_DISTANCE = 50;
+	static final double DEFAULT_DISTANCE = 10;
 	private static final Logger log = Logger.getLogger(PolygonGeneratorII.class);
 	private boolean graph = false; 
 	
@@ -99,27 +101,20 @@ public class PolygonGeneratorII {
 		
 		while(!currPoints.isEmpty()){
 			
-			
-		
 			HashSet<Point> nextPoints = new HashSet<Point>();
 		
 			for(Iterator<Point> iter = currPoints.iterator() ; iter.hasNext() ; ){
 			
 				Point currPoint = iter.next();
-				
 				Coordinate currPointCoor = currPoint.getCoordinate();
-										
-				Feature [] la = new Feature[0];
-				Feature [] lineArr = lineTree.get(currPoint.getX(), currPoint.getY(), CATCH_RADIUS).toArray(la);
-				log.info("entering cutter");
-				if(!(lineArr.length == 3)) { continue; }
-				
-				
-				
+				List<Feature> lines = (List<Feature>) lineTree.get(currPoint.getX(), currPoint.getY(), CATCH_RADIUS);
+				if(lines.size()<3){ 
+					continue;
+				}
 				List<Polygon> nodePolys = new ArrayList<Polygon>();								
 				
-				for (int i = 0 ; i < lineArr.length ; i++){
-					Feature ft = lineArr[i];
+				for(Feature ft : lines ){
+					
 					LineString ls = (LineString) ft.getAttribute(0);
 					if(returnPolys.containsKey(ft.getAttribute(1))){
 						nodePolys.add(returnPolys.get(ft.getAttribute(1)));
@@ -140,37 +135,44 @@ public class PolygonGeneratorII {
 				
 				Envelope o = poly.getEnvelopeInternal();
 				
-							
 				List<Point> points = new ArrayList<Point>();				
-						
+										
+				SortedMap<Double, LineString> sortedLines = sortLines(lines,currPoint);
+				LineString [] l = new LineString[0];
+				Double [] d = new Double[0];
 				
-				//verallgemeinern
+				LineString [] lineArr = sortedLines.values().toArray(l);
+				Double [] angleArr = sortedLines.keySet().toArray(d);
+				
 				for (int i = 0 ; i < lineArr.length ; i++ ){
 					
-					Feature ftI = lineArr[i];
-					LineString lineI = (LineString) ftI.getAttribute(0);
-					boolean startI = lineI.getStartPoint().equalsExact(currPoint, CATCH_RADIUS);
-					
-					Feature ftII;
+					LineString lineI = lineArr[i];
+					double angleI = angleArr[i];
+					LineString lineII;
+					double angleII;
+					double deltaAngle;
 					if (i == ( lineArr.length -1) ) {	
-						ftII = lineArr[0];
+						lineII = lineArr[0];
+						angleII = angleArr[0];
+						deltaAngle = 360 - (angleII - angleI);			
 					}else {
-						ftII = lineArr[i+1];
+						lineII = lineArr[i+1];
+						angleII = angleArr[i+1];
+						deltaAngle = angleII - angleI;
 					}
 					
-					LineString lineII = (LineString) ftII.getAttribute(0);
-					boolean startII = lineII.getStartPoint().equalsExact(currPoint, CATCH_RADIUS);
+					Coordinate bisecCoor = getBisectingLine(lineI, lineII);
 					
-					System.out.println("vecI: ");
-					LineString vecI = separateLine(lineI, startI);
-					System.out.println("vecII: ");
-					LineString vecII = separateLine(lineII, startII);
-					
-					Coordinate [] tricoor = new Coordinate [] {vecI.getStartPoint().getCoordinate(), vecI.getEndPoint().getCoordinate(),
-							vecII.getEndPoint().getCoordinate(),vecII.getStartPoint().getCoordinate()}; 
-					CoordinateSequence triseq = new CoordinateArraySequence(tricoor);
-					LinearRing triRing = new LinearRing(triseq, geofac);
-					Polygon pol = new Polygon(triRing, null, geofac);
+					if (deltaAngle > 180 ){
+						Coordinate co = subCoord(currPointCoor, bisecCoor); 
+						bisecCoor = new Coordinate(currPointCoor.x + co.x , currPointCoor.y + co.y);
+					}
+											
+					Coordinate [] quadcoor = new Coordinate [] {lineI.getStartPoint().getCoordinate(), lineI.getEndPoint().getCoordinate(),
+							bisecCoor, lineII.getEndPoint().getCoordinate(), lineII.getStartPoint().getCoordinate()}; 
+					CoordinateSequence triseq = new CoordinateArraySequence(quadcoor);
+					LinearRing quadRing = new LinearRing(triseq, geofac);
+					Polygon pol = new Polygon(quadRing, null, geofac);
 					
 					boolean found = false;
 //					List<Coordinate> cList = new ArrayList<Coordinate>();
@@ -188,20 +190,16 @@ public class PolygonGeneratorII {
 						CoordinateSequence seq = new CoordinateArraySequence(cc);
 						LineString line = new LineString(seq, geofac);
 						
-						if(line.crosses(pol)){
+						if(line.crosses(pol)|| pol.contains(line)){
 							
 							Coordinate [] p = new Coordinate[]{pp};
 							CoordinateSequence seqII = new CoordinateArraySequence(p);
 							Point po = new Point(seqII, geofac);
 							points.add(po);
 							
-//							for(Coordinate c : cList ){
-//								polyCoor.put(c.x, c.y, c);
-//							}
 							found = true;
 							break;
 						}else{
-//							cList.add(pp);
 							polyCoor.remove(pp.x, pp.y, pp);
 						}
 					}	
@@ -271,13 +269,15 @@ public class PolygonGeneratorII {
 					coords = restPoly.toArray(co);
 				}
 				
-//				points.add(points.get(0));
-				Coordinate [] cos = new Coordinate[points.size()+1];
-				for(int i = 0 ; i < points.size() ; i++){
-					cos [i] = points.get(i).getCoordinate();
+				points.add(points.get(0));
+				List<Coordinate> pcoor = new ArrayList<Coordinate>();
+				
+				for(Point p : points){
+					pcoor.add(p.getCoordinate());
 				}
-				cos[points.size()] = cos[0];
- 				CoordinateSequence seq = new CoordinateArraySequence(cos);
+				Coordinate [] cos = new Coordinate[0];
+				Coordinate [] cosNew = pcoor.toArray(cos);
+ 				CoordinateSequence seq = new CoordinateArraySequence(cosNew);
 				LinearRing lr = new LinearRing(seq, geofac);
 				Polygon p = new Polygon(lr, null, geofac);
 				cutPolys.add(p);
@@ -285,7 +285,7 @@ public class PolygonGeneratorII {
 			}
 			donePoints.addAll(currPoints);
 			currPoints.clear();
-			currPoints.addAll(nextPoints);				
+			currPoints.addAll(nextPoints);			
 		}
 		
 		if(cutPolys.isEmpty()){log.info("no Poly");}
@@ -581,7 +581,8 @@ public class PolygonGeneratorII {
 		Coordinate coordII = subCoord(cII[1],cII[0]);
 		
 		double angle = Math.acos(skalarMultiCoord(coordI,coordII)/(getLength(coordI)*getLength(coordII)));
-		return angle;
+		return Math.toDegrees(angle);
+		
 	}
 	
 	public static double skalarMultiCoord(Coordinate coordI, Coordinate coordII){
@@ -618,5 +619,51 @@ public class PolygonGeneratorII {
 //		CoordinateSequence seqLine = new CoordinateArraySequence(line);
 //		LineString rl = new LineString(seqLine,geofac);
 //		return rl;
-//	}	
+//	}
+	
+//	LineStrings should have two coordinates. The first should be equal in ls1 and ls2
+	
+	private Coordinate getBisectingLine(LineString ls1, LineString ls2){
+		
+		Coordinate c1 = subCoord(ls1.getCoordinates()[1],ls1.getCoordinates()[0]);
+		Coordinate c2 = subCoord(ls2.getCoordinates()[1],ls2.getCoordinates()[0]);
+		c1 = multiCoord(c1,(1/getLength(c1)));
+		c2 = multiCoord(c2,(1/getLength(c2)));
+		Coordinate r = multiCoord(subCoord(c2,c1),0.5);
+		Coordinate r2 = new Coordinate((c1.x+r.x), (c1.y+r.y));
+		return r2;
+				
+	}
+	
+	private SortedMap<Double, LineString> sortLines(List<Feature> features, Point point){
+		
+		SortedMap<Double, LineString> sortedLines = new TreeMap<Double, LineString>();
+		List<LineString> lines = new ArrayList<LineString>();
+		Coordinate [] c = new Coordinate [] {new Coordinate(0,0),new Coordinate(0,1)};
+		CoordinateSequence seq = new CoordinateArraySequence(c);
+		LineString yLine = new LineString(seq, geofac);
+		Coordinate pc = point.getCoordinate();
+		
+		for (Feature ft : features){			
+			
+			LineString line = (LineString) ft.getAttribute(0);
+			boolean start = line.getStartPoint().equalsExact(point, CATCH_RADIUS);
+			LineString vec = separateLine(line, start);
+			lines.add(vec);
+		}
+		for (LineString line : lines){
+			
+			Coordinate [] co = line.getCoordinates();
+			Coordinate [] newCo = new Coordinate [] {new Coordinate(co[0].x - pc.x, co[0].y - pc.y), new Coordinate(co[1].x - pc.x, co[1].y - pc.y)  };
+			CoordinateSequence seq2 = new CoordinateArraySequence(newCo);
+			LineString li = new LineString(seq2, geofac);
+				
+			if((co[1].x - pc.x) < 0){
+				sortedLines.put(360 - getAngle(li,yLine), line);
+			}else{
+				sortedLines.put(getAngle(li,yLine), line);
+			}			
+		}
+		return sortedLines;
+	}
 }

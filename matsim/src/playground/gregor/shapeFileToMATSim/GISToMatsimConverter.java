@@ -55,7 +55,7 @@ public class GISToMatsimConverter {
 	public GISToMatsimConverter(){
 //		this("./padang/padang_streets.shp","./padang/vd10_streetnetwork_padang_v0.5_utm47s.shp");
 //		this("./padang/testcase1/padang/padangTeilStreets_test.shp", "./padang/testcase1/padang/padangTeil_test.shp");
-		this("./padang/testcase1/simple/simple.shp", "./padang/testcase1/simpleline/simplelineII.shp" );
+		this("./padang/testcase1/simple/simpleIII.shp", "./padang/testcase1/simpleline/simplelineIII.shp" );
 	}
 	
 	public GISToMatsimConverter(final String polyFile, final String lineFile){
