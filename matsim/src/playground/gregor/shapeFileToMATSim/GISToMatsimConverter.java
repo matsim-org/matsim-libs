@@ -32,7 +32,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReaderMatsimV1;
 import org.matsim.network.NetworkWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -55,7 +54,8 @@ public class GISToMatsimConverter {
 	
 	public GISToMatsimConverter(){
 //		this("./padang/padang_streets.shp","./padang/vd10_streetnetwork_padang_v0.5_utm47s.shp");
-		this("./padang/padang_streets.shp","./padang/debug.shp");
+//		this("./padang/testcase1/padang/padangTeilStreets_test.shp", "./padang/testcase1/padang/padangTeil_test.shp");
+		this("./padang/testcase1/simple/simple.shp", "./padang/testcase1/simpleline/simplelineII.shp" );
 	}
 	
 	public GISToMatsimConverter(final String polyFile, final String lineFile){
@@ -83,17 +83,29 @@ public class GISToMatsimConverter {
 	private void processData() throws Exception {
 		GraphGenerator gg = new GraphGenerator(features.get(linestringFile));
 		Collection<Feature> graph =  gg.createGraph();
-		ShapeFileWriter.writeGeometries(graph, "./padang/debug_graph.shp");
-		NetworkGenerator ng = new NetworkGenerator(graph,this.envelope);
-		NetworkLayer network = ng.generateFromGraph();
-		network = new NetworkLayer();
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(network);
-		nr.readFile("./networks/padang_net.xml");
-		NetworkWriter nw = new NetworkWriter(network,"./padang/debug_net.xml");
+		ShapeFileWriter.writeGeometries(graph, "./padang/testSimpleline.shp");
+		
+//		features.get(linestringFile)
+		
+		PolygonGeneratorII polyGen = new PolygonGeneratorII(graph ,features.get(polygonFile));
+		Collection<Feature> polyGraph = polyGen.generatePolygons();
+		ShapeFileWriter.writeGeometries(polyGraph, "./padang/testSimplepoly.shp");
+		
+//		NetworkGenerator ng = new NetworkGenerator(graph,this.envelope);
+//		NetworkLayer network = ng.generateFromGraph();
+
+
+
+//		network = new NetworkLayer();
+//		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(network);
+//		nr.readFile("./networks/padang_net.xml");
+//		NetworkWriter nw = new NetworkWriter(network,"./padang/debug_net.xml");
+//		NetworkWriter nw = new NetworkWriter(network,"./padang/testcase2.xml");
+		
 //		nw.write();
-		NetworkToGraph ntg = new NetworkToGraph(network,this.crs);
-		Collection<Feature> netGraph = ntg.generateFromNet();
-		ShapeFileWriter.writeGeometries(netGraph, "./padang/debug_net.shp");
+//		NetworkToGraph ntg = new NetworkToGraph(network,this.crs);
+//		Collection<Feature> netGraph = ntg.generateFromNet();
+//		ShapeFileWriter.writeGeometries(netGraph, "./padang/testcase2_net.shp");
 
 	}
 
