@@ -103,6 +103,7 @@ import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
 import org.matsim.utils.misc.Time;
+import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 
 /**
@@ -1034,6 +1035,14 @@ public class Controler {
 		return this.config;
 	}
 
+	public final World getWorld() {
+		return this.scenarioData.getWorld();
+	}
+	
+	public final Facilities getFacilities() {
+		return this.scenarioData.getFacilities();
+	}
+	
 	public final NetworkLayer getNetwork() {
 		return this.network;
 	}
