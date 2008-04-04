@@ -27,7 +27,7 @@ import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 
-public class ReRouteLandmarks extends ReRoute {
+public class ReRouteLandmarks extends ReRouteDijkstra {
 
 	private PreProcessLandmarks commonRouterData = null;
 

@@ -32,7 +32,7 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PlanAverageScore;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.modules.ReRoute;
+import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -79,7 +79,7 @@ public class MyControler5 {
 
 		TravelTimeCalculatorArray ttimeCalc = new TravelTimeCalculatorArray(network);
 		TravelTimeDistanceCostCalculator costCalc = new TravelTimeDistanceCostCalculator(ttimeCalc);
-		strategy2.addStrategyModule(new ReRoute(network, costCalc, ttimeCalc));
+		strategy2.addStrategyModule(new ReRouteDijkstra(network, costCalc, ttimeCalc));
 		events.addHandler(ttimeCalc);
 
 		for (int iteration = 0; iteration <= 10; iteration++) {

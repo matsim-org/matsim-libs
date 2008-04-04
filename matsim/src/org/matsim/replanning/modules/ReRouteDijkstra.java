@@ -22,25 +22,30 @@ package org.matsim.replanning.modules;
 
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.PlansCalcRouteDijkstra;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 
-public class ReRoute extends MultithreadedModuleA {
+/**
+ * Uses {@link org.matsim.router.Dijkstra} for calculating the routes of plans during Replanning.
+ *
+ * @author mrieser
+ */
+public class ReRouteDijkstra extends MultithreadedModuleA {
 
 	TravelCostI costCalculator = null;
 	TravelTimeI timeCalculator = null;
 	NetworkLayer network = null;
 
-	public ReRoute(NetworkLayer network, TravelCostI costCalculator, TravelTimeI timeCalculator) {
+	public ReRouteDijkstra(final NetworkLayer network, final TravelCostI costCalculator, final TravelTimeI timeCalculator) {
 		this.network = network;
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
 	}
-	
+
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
-		return new PlansCalcRoute(this.network, this.costCalculator, this.timeCalculator);
+		return new PlansCalcRouteDijkstra(this.network, this.costCalculator, this.timeCalculator);
 	}
 
 }

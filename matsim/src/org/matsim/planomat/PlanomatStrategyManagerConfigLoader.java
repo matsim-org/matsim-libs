@@ -29,7 +29,7 @@ import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.ExternalModule;
 import org.matsim.replanning.modules.PlanomatExe;
 import org.matsim.replanning.modules.PlanomatOptimizeTimes;
-import org.matsim.replanning.modules.ReRoute;
+import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.replanning.modules.StrategyModuleI;
 import org.matsim.replanning.modules.TimeAllocationMutator;
@@ -80,7 +80,7 @@ public class PlanomatStrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new KeepSelected());
 			} else if (classname.equals("ReRoute") || classname.equals("threaded.ReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				strategy.addStrategyModule(new ReRoute(network, travelCostCalc, travelTimeCalc));
+				strategy.addStrategyModule(new ReRouteDijkstra(network, travelCostCalc, travelTimeCalc));
 
 				int controlerFirstIteration = Gbl.getConfig().controler().getFirstIteration();
 				int controlerLastIteration = Gbl.getConfig().controler().getLastIteration();
@@ -109,7 +109,7 @@ public class PlanomatStrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = Gbl.getConfig().getParam("strategy", "ModuleExePath_" + i);
 				strategy.addStrategyModule(new PlanomatExe(exePath));
-				strategy.addStrategyModule(new ReRoute(network, travelCostCalc, travelTimeCalc));
+				strategy.addStrategyModule(new ReRouteDijkstra(network, travelCostCalc, travelTimeCalc));
 			} else if (classname.equals("PlanomatTimeRouteExe")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = Gbl.getConfig().getParam("strategy", "ModuleExePath_" + i);

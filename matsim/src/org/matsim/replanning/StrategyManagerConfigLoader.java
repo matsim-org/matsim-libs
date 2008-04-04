@@ -28,7 +28,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.replanning.modules.ExternalModule;
 import org.matsim.replanning.modules.PlanomatExe;
 import org.matsim.replanning.modules.PlanomatOptimizeTimes;
-import org.matsim.replanning.modules.ReRoute;
+import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.replanning.modules.StrategyModuleI;
 import org.matsim.replanning.modules.TimeAllocationMutator;
@@ -43,7 +43,6 @@ import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcher;
-import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -84,7 +83,7 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new KeepSelected());
 			} else if (classname.equals("ReRoute") || classname.equals("threaded.ReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				strategy.addStrategyModule(new ReRoute(network, travelCostCalc, travelTimeCalc));
+				strategy.addStrategyModule(new ReRouteDijkstra(network, travelCostCalc, travelTimeCalc));
 			} else if (classname.equals("ReRoute_Landmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
@@ -108,7 +107,7 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = settings.getExePath();
 				strategy.addStrategyModule(new PlanomatExe(exePath));
-				strategy.addStrategyModule(new ReRoute(network, travelCostCalc, travelTimeCalc));
+				strategy.addStrategyModule(new ReRouteDijkstra(network, travelCostCalc, travelTimeCalc));
 			} else if (classname.equals("PlanomatTimeRouteExe")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = settings.getExePath();
