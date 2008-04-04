@@ -335,6 +335,10 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 			int foe=0;
 			Person p1=plan.getPerson();
 			Activity myActivity=p1.getKnowledge().map.getActivity(act);
+			System.out.println("SNSCORING DEBUG SOCIALPLANSMAPSIZE "+ socialPlansMap.size());
+			System.out.println("SNSCORING DEBUG MYACTIVITY NUMBER" + myActivity.toString());
+			System.out.println("SNSCORING DEBUG SOCIALPLANSMAP(myActivity) "+ socialPlansMap.get(myActivity));
+			System.out.println("SNSCORING DEBUG SOCIALPLANSMAP(myActivity) "+ socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1,activityStart,activityEnd).toString());
 			Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
 			//for all agents in (social.plans.get(act){
 			Enumeration<Person> e = othersThere.elements();
