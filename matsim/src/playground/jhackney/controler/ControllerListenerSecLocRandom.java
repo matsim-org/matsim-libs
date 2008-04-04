@@ -134,6 +134,7 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 		//}
 
 		this.log.info(" Initializing agent knowledge about geography ...");
+		this.log.info(" If scoring crashes later it may be because this only initializes knowledge for the selected plan. This will happen if there are more than one initial plan");
 		initializeKnowledge(this.controler.getPopulation());
 		this.log.info("... done");
 
@@ -235,8 +236,10 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 			Iterator<Person> iperson = personList.iterator();
 			while (iperson.hasNext()) {
 				Person p = (Person) iperson.next();
-				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*1.5);
-				p.getKnowledge().map.manageMemory(max_memory, p.getSelectedPlan());		
+//				Remember a number of activities equal to at least the number of
+//				acts per plan times the number of plans in memory
+				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
+				p.getKnowledge().map.manageMemory(max_memory, p.getPlans());
 			}
 			this.log.info(" ... done");
 

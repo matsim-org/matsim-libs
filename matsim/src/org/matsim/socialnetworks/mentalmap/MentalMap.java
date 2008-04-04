@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicPlan.ActIterator;
@@ -165,19 +166,30 @@ public class MentalMap {
 		this.knowledge.removeActivity(myactivity);
 	}
 
-	public void manageMemory(int max, Plan myPlan){
+	public void manageMemory(int max, List<Plan> myPlans){
 
-		if(myPlan.getActsLegs().size()/2 >max){
-			Gbl.errorMsg(this.getClass()+" Number of activites an agent has to remember is greater than his memory! MAX = "+max+" "+myPlan.getActsLegs().size()/2+" "+this.knowledge.getActivities().size());
+//		if(myPlan.getActsLegs().size()/2 >max){
+//		Gbl.errorMsg(this.getClass()+
+//		" Number of activites an agent has to remember is greater than his memory! MAX = "+max+" "+myPlan.getActsLegs().size()/2+" "+this.knowledge.getActivities().size());
+//		}
+
+		if(myPlans.get(0).getActsLegs().size()/2 >max){
+		Gbl.errorMsg(this.getClass()+
+		" Number of activites an agent has to remember is greater than his memory! MAX = "+max+" "+myPlans.get(0).getActsLegs().size()/2+" "+this.knowledge.getActivities().size());
 		}
+		
 		if(this.knowledge.getActivities().size()>max){
-			// Mark the activities associated with the current plan
+			// Mark the activities associated with all plans in memory
 			// so that they won't be deleted
 			ArrayList<Integer> currentActs = new ArrayList<Integer>();
-			ActIterator actIter = myPlan.getIteratorAct();
-			while( actIter.hasNext() ){
-				Act act = (Act) actIter.next();
-				currentActs.add(act.getRefId());
+			Iterator<Plan> planIter = myPlans.iterator();
+			while(planIter.hasNext()){
+				Plan myPlan = (Plan) planIter.next();
+				ActIterator actIter = myPlan.getIteratorAct();
+				while( actIter.hasNext() ){
+					Act act = (Act) actIter.next();
+					currentActs.add(act.getRefId());
+				}
 			}
 
 //			Sort the activities by score so that they can be managed
