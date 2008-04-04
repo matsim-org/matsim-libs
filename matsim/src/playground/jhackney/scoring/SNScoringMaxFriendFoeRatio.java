@@ -355,7 +355,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 			Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
 			//for all agents in (social.plans.get(act){
 			Enumeration<Person> e = othersThere.elements();
-			System.out.print("### "+othersThere.size());
+//			System.out.print("### "+othersThere.size());
 			while(e.hasMoreElements()){
 				Person p2 =(Person) e.nextElement();
 				if(p1.getKnowledge().egoNet.knows(p2)){
@@ -367,7 +367,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 			double ratio = (double)friend/(double)foe;
 			if(ratio>0. && ratio <= 1.){
 				//utility=utility+(double)friend/(double)foe * const
-				System.out.println("### test scoring "+ratio);
+//				System.out.println("### test scoring "+ratio);
 				score+=10.*(double)friend/(double)foe;
 			}else{
 				System.out.println();
