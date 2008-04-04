@@ -4,7 +4,6 @@
 
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="outputTimeFormat" value="HH:mm:ss" />
 		<param name="localDTDBase" value="dtd/" />
 		<param name="numberOfThreads" value="0" />
 	</module>
@@ -34,7 +33,7 @@
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="4" />
 
-		<param name="Module_1" value="ReRoute" />
+		<param name="Module_1" value="ReRoute_Dijkstra" />
 		<param name="ModuleProbability_1" value="1.0" />
 	</module>
 

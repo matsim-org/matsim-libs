@@ -90,10 +90,13 @@ import org.matsim.plans.PlansWriter;
 import org.matsim.plans.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PersonPrepareForSim;
+import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
-import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
@@ -116,7 +119,7 @@ public class Controler {
 	public static final String FILENAME_LINKSTATS = "linkstats.txt";
 	public static final String FILENAME_SCORESTATS = "scorestats.txt";
 
-	private enum ControlerState {Init, Running, Shutdown, Finished};
+	private enum ControlerState {Init, Running, Shutdown, Finished}
 	private ControlerState state = ControlerState.Init;
 
 	private static String outputPath = null;
@@ -148,6 +151,9 @@ public class Controler {
 	protected LegTravelTimeEstimator legTravelTimeEstimator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
+
+	/** Stores data commonly used by all router instances. */
+	private PreProcessLandmarks commonRoutingData = null;
 
 	/*package*/ EventWriterTXT eventWriter = null;
 	/*package*/ boolean writeEvents = true;
@@ -521,7 +527,7 @@ public class Controler {
 	 */
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(this.config, manager, this.network, this.travelCostCalculator, this.travelTimeCalculator, this.legTravelTimeEstimator);
+		StrategyManagerConfigLoader.load(this, this.config, manager);
 		return manager;
 	}
 
@@ -546,7 +552,6 @@ public class Controler {
 
 
 		// load road pricing, if requested
-		//TODO this condition should be config.global.useRoadPricing() is there a reason (dg_ma_08)
 		if (this.config.roadpricing().getTollLinksFile() != null) {
 			this.roadPricing = new RoadPricing();
 			this.addCoreControlerListener(this.roadPricing);
@@ -907,7 +912,7 @@ public class Controler {
 	}
 
 	/**
-	 * @return true if events are written to a file.
+	 * @return <code>true</code> if events are written to a file.
 	 */
 	public final boolean getWriteEvents() {
 		return this.writeEvents;
@@ -949,6 +954,10 @@ public class Controler {
 		return this.travelTimeCalculator;
 	}
 
+	public final LegTravelTimeEstimator getLegTravelTimeEstimator() {
+		return this.legTravelTimeEstimator;
+	}
+	
 	/**
 	 * Sets a new {@link org.matsim.scoring.ScoringFunctionFactory} to use. <strong>Note:</strong> This will
 	 * reset all scores calculated so far! Only call this before any events are generated in an iteration.
@@ -972,6 +981,36 @@ public class Controler {
 	 */
 	public final StrategyManager getStrategyManager() {
 		return this.strategyManager;
+	}
+
+	/* ===================================================================
+	 * Factory methods
+	 * =================================================================== */
+
+	/**
+	 * @return a new instance of a {@link PlanAlgorithmI} to calculate the routes of plans with the default
+	 * (= the current from the last or current iteration) travel costs and travel times. Only to be used by
+	 * a single thread, use multiple instances for multiple threads!
+	 */
+	public PlanAlgorithmI getRoutingAlgorithm() {
+		return getRoutingAlgorithm(this.getTravelCostCalculator(), this.getTravelTimeCalculator());
+	}
+
+	/**
+	 * @param travelCosts the travel costs to be used for the routing
+	 * @param travelTimes the travel times to be used for the routing
+	 * @return a new instance of a {@link PlanAlgorithmI} to calculate the routes of plans with the specified
+	 * travelCosts and travelTimes. Only to be used by a single thread, use multiple instances for multiple threads!
+	 */
+	public PlanAlgorithmI getRoutingAlgorithm(final TravelCostI travelCosts, final TravelTimeI travelTimes) {
+		synchronized (this) {
+			if (this.commonRoutingData == null) {
+				this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+				this.commonRoutingData.run(this.network);
+			}
+		}
+
+		return new PlansCalcRouteLandmarks(this.network, this.commonRoutingData, travelCosts, travelTimes);
 	}
 
 	/* ===================================================================
@@ -1106,7 +1145,7 @@ public class Controler {
 			// make sure all routes are calculated.
 			ParallelPersonAlgorithmRunner.run(c.getPopulation(), c.config.global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 				public PersonAlgorithm getPersonAlgorithm() {
-					return new PersonPrepareForSim(new PlansCalcRoute(c.getNetwork(), c.getTravelCostCalculator(), c.getTravelTimeCalculator()), c.getNetwork());
+					return new PersonPrepareForSim(c.getRoutingAlgorithm(), c.getNetwork());
 				}
 			});
 		}

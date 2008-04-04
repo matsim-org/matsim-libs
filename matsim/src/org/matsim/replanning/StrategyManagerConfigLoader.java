@@ -22,12 +22,14 @@ package org.matsim.replanning;
 
 import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup;
+import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.replanning.modules.ExternalModule;
 import org.matsim.replanning.modules.PlanomatExe;
 import org.matsim.replanning.modules.PlanomatOptimizeTimes;
+import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.replanning.modules.StrategyModuleI;
@@ -56,16 +58,17 @@ public class StrategyManagerConfigLoader {
 	/**
 	 * Reads and instantiates the strategy modules specified in the config-object.
 	 *
-	 * @param config the configuration specifying which strategies should to be loaded
-	 * @param manager the strategy-manager the instantiated strategies will be added to
-	 * @param network the network strategy modules can use
-	 * @param travelCostCalc the travel cost calculator strategy modules can make use of
-	 * @param travelTimeCalc the travel time calculator strategy modules can make use of
-	 * @param legTravelTimeEstimator an estimator for travel times between two locations
+	 * @param controler the {@link Controler} that provides miscellaneous data for the replanning modules
+	 * @param config the {@link Config} object containing the configuration for the strategyManager
+	 * @param manager the {@link StrategyManager} to be configured according to the configuration
 	 */
-	public static void load(final Config config, final StrategyManager manager, final NetworkLayer network,
-			final TravelCostI travelCostCalc, final TravelTimeI travelTimeCalc, final LegTravelTimeEstimator legTravelTimeEstimator) {
+	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
 
+		NetworkLayer network = controler.getNetwork();
+		TravelCostI travelCostCalc = controler.getTravelCostCalculator();
+		TravelTimeI travelTimeCalc = controler.getTravelTimeCalculator();
+		LegTravelTimeEstimator legTravelTimeEstimator = controler.getLegTravelTimeEstimator();
+		
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
 		int externalCounter = 0;
@@ -82,6 +85,9 @@ public class StrategyManagerConfigLoader {
 			if (classname.equals("KeepLastSelected")) {
 				strategy = new PlanStrategy(new KeepSelected());
 			} else if (classname.equals("ReRoute") || classname.equals("threaded.ReRoute")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy.addStrategyModule(new ReRoute(controler));
+			} else if (classname.equals("ReRoute_Dijkstra")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new ReRouteDijkstra(network, travelCostCalc, travelTimeCalc));
 			} else if (classname.equals("ReRoute_Landmarks")) {
@@ -107,7 +113,7 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = settings.getExePath();
 				strategy.addStrategyModule(new PlanomatExe(exePath));
-				strategy.addStrategyModule(new ReRouteDijkstra(network, travelCostCalc, travelTimeCalc));
+				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (classname.equals("PlanomatTimeRouteExe")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = settings.getExePath();
@@ -121,9 +127,7 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
-				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-				preProcessRoutingData.run(network);
-				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+				strategy.addStrategyModule(new ReRoute(controler));
 				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
 			} else if (classname.equals("BestScore")) {
 				strategy = new PlanStrategy(new BestPlanSelector());
