@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MobsimAgentFactory.java
+ * OptionsFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -25,17 +25,14 @@ package playground.johannes.mobsim;
 
 import java.util.List;
 
+import org.matsim.plans.Plan;
+
 /**
- * A builder interface that builds instances of {@link MobsimAgent}.
- * 
  * @author illenberger
- * 
+ *
  */
-public interface MobsimAgentBuilder {
+public interface OptionsFilter {
 
-	/**
-	 * @return a list with newly created MobsimAgents.
-	 */
-	public List<? extends MobsimAgent> buildAgents();
-
+	public Plan filterOptions(List<Plan> options);
+	
 }

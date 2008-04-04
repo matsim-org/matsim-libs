@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReroutingStrategy.java
+ * BDIStrategy.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,68 +23,54 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.network.Link;
-import org.matsim.plans.Leg;
+import java.util.List;
+
 import org.matsim.plans.Plan;
-import org.matsim.plans.Route;
-import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class ReroutingStrategy implements IntradayStrategy {
+public class BDIStrategy implements IntradayStrategy {
 
-	private RouteProvider router;
+	private AgentBeliefs beliefs;
+	
+	private OptionsGenerator generator;
+	
+	private OptionsFilter filter;
 
 	private PlanAgent agent;
 	
-	public ReroutingStrategy(PlanAgent agent, RouteProvider router) {
+	public BDIStrategy(PlanAgent agent, AgentBeliefs beliefs, OptionsGenerator generator, OptionsFilter filter) {
 		this.agent = agent;
+		this.beliefs = beliefs;
+		this.generator = generator;
+		this.filter = filter;
+	}
+	
+	public AgentBeliefs getBeliefs() {
+		return beliefs;
+	}
+
+	public OptionsGenerator getGenerator() {
+		return generator;
+	}
+
+	public OptionsFilter getFilter() {
+		return filter;
+	}
+
+	public PlanAgent getAgent() {
+		return agent;
 	}
 
 	public Plan replan(double time) {
-		if (allowReroute(time)) {
-			/*
-			 * TODO: Introduce standard clone() methods!
-			 */
-			Plan copy = new Plan(agent.getPerson());
-			copy.copyPlan(agent.getPerson().getSelectedPlan());
-
-			Route newRoute = getRoute(agent.getLink(), agent
-					.getDestinationLink(time), time);
-			/*
-			 * TODO: Do some route validation, e.g. check if departure and
-			 * destination links are consistent.
-			 */
-			adaptRoute(newRoute, (Leg) copy.getActsLegs().get(
-					agent.getCurrentPlanIndex()), agent.getCurrentRouteIndex(), time);
-
-			return copy;
-		} else
-			return null;
-	}
-
-	protected boolean allowReroute(double time) {
-		if (agent.getCurrentPlanIndex() % 2 != 0) {
-			if (agent.getNextLink(time) == null) {
-				return false;
-			} else {
-				return true;
-			}
-		} else {
-			return false;
-		}
-	}
-
-	protected Route getRoute(Link origin, Link destination, double time) {
-		return router.requestRoute(origin, destination, time);
-	}
-	
-	protected void adaptRoute(Route route, Leg leg, int index, double time) {
 		/*
-		 * TODO: Need link-based route implementation here.
-		 * TODO: Move this to re-routing strategy?
+		 * TODO: What about replanAllowed()? -> no options
 		 */
+		beliefs.update();
+		List<Plan> options = generator.generateOptions();
+		return filter.filterOptions(options);
 	}
+
 }

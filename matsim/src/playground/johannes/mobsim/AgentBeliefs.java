@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MobsimAgentFactory.java
+ * AgentBeliefs.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,19 +23,15 @@
  */
 package playground.johannes.mobsim;
 
-import java.util.List;
+import org.matsim.router.util.TravelTimeI;
 
 /**
- * A builder interface that builds instances of {@link MobsimAgent}.
- * 
  * @author illenberger
- * 
+ *
  */
-public interface MobsimAgentBuilder {
-
-	/**
-	 * @return a list with newly created MobsimAgents.
-	 */
-	public List<? extends MobsimAgent> buildAgents();
-
+public interface AgentBeliefs {
+	
+	public abstract TravelTimeI getTravelTimes();
+	
+	public abstract void update();
 }

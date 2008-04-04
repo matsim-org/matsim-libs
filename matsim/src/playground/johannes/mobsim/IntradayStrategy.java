@@ -23,29 +23,36 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
-import org.matsim.plans.Route;
 
 /**
+ * An IntradayStrategy encapsulates the behavioral model for
+ * intraday-re-planning. The method {@link #replan(double)} returns a mutated
+ * copy of the selected plan. The concrete modification is up to the specific
+ * implementation. This can include en-route route-switching, departure time
+ * choice, mode choice or even activity addition, removal or re-ordering.
+ * However, modifications to plan entries the agent already performed or to
+ * parts of the route the agent already passed are not allowed. Use
+ * {@link PlanAgent#getCurrentPlanIndex()} and
+ * {@link PlanAgent#getCurrentRouteIndex()} to determine the agent's current state.
+ * 
+ * 
  * @author illenberger
- *
+ * 
  */
-public abstract class IntradayStrategy {
+public interface IntradayStrategy {
 
-	protected PlanAgent agent;
-	
-	public IntradayStrategy(PlanAgent agent) {
-		this.agent = agent;
-	}
-	
-	public abstract Plan replan(double time);
-	
-	protected void adaptRoute(Route route, Leg leg, int index, double time) {
-		/*
-		 * TODO: Need link-based route implementation here.
-		 * TODO: Move this to re-routing strategy?
-		 */
-	}
+	/**
+	 * Returns a new mutated copy of the selected plan. Modifications must keep
+	 * the restrictions mentioned in the class description. Can return
+	 * <tt>null</tt> if re-planning failed or is currently not allowed for any
+	 * reason.
+	 * 
+	 * @param time
+	 *            the current simulation time.
+	 * @return a new plan, or <tt>null</tt> if re-planning failed or is
+	 *         currently not allowed.
+	 */
+	public Plan replan(double time);
 	
 }

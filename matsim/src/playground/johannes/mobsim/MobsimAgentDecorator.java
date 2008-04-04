@@ -27,13 +27,30 @@ import org.matsim.network.Link;
 import org.matsim.utils.identifiers.IdI;
 
 /**
+ * A base-class for writing decorators of {@link MobsimAgent}.
+ * 
+ * @param A
+ *            The concrete implementation of {@link MobsimAgent} that will be
+ *            decorated.
+ * 
  * @author illenberger
- *
+ * 
  */
-public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements MobsimAgent {
-	
-	protected A agent;
-	
+public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements
+		MobsimAgent {
+
+	/**
+	 * The decorated MobsimAgent instance.
+	 */
+	protected final A agent;
+
+	/**
+	 * Creates a new decorator delegating all methods of {@link MobsimAgent} to
+	 * <tt>agent</tt>.
+	 * 
+	 * @param agent
+	 *            the agent to decorate.
+	 */
 	public MobsimAgentDecorator(A agent) {
 		this.agent = agent;
 	}
@@ -41,7 +58,7 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements Mob
 	public void beforeSim() {
 		agent.beforeSim();
 	}
-	
+
 	public Link getLink() {
 		return agent.getLink();
 	}
@@ -57,11 +74,11 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements Mob
 	public Link getNextLink(double time) {
 		return agent.getNextLink(time);
 	}
-	
+
 	public Link getDestinationLink(double time) {
 		return agent.getDestinationLink(time);
 	}
-	
+
 	public boolean isDone() {
 		return agent.isDone();
 	}
@@ -72,13 +89,12 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements Mob
 
 	public void departure(double time) {
 		agent.departure(time);
-		
 	}
 
 	public void enterLink(Link link, double time) {
 		agent.enterLink(link, time);
 	}
-	
+
 	public IdI getId() {
 		return agent.getId();
 	}
