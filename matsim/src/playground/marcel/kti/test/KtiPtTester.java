@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.kti_pt;
+package playground.marcel.kti.test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,9 +31,14 @@ import org.matsim.matrices.Matrix;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.utils.misc.Counter;
 import org.matsim.visum.VisumMatrixReader;
 import org.matsim.world.World;
+
+import playground.marcel.kti.router.PlansCalcRouteKti;
+import playground.marcel.kti.router.SwissHaltestellen;
 
 public class KtiPtTester {
 
@@ -73,8 +78,12 @@ public class KtiPtTester {
 			e.printStackTrace();
 		}
 		Gbl.printRoundTime();
+		PreProcessLandmarks commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+		commonRoutingData.run(this.data.getNetwork());
+		FreespeedTravelTimeCost fttc = new FreespeedTravelTimeCost();
+		Gbl.printRoundTime();
 		Counter counter = new Counter("handle person #");
-		CalcSwissPtRoute calcPtLeg = new CalcSwissPtRoute(this.ptTravelTimes, haltestellen, this.world.getLayer("municipality"));
+		PlansCalcRouteKti calcPtLeg = new PlansCalcRouteKti(this.data.getNetwork(), commonRoutingData, fttc, fttc, this.ptTravelTimes, haltestellen, this.world.getLayer("municipality"));
 		for (Person person : population) {
 			counter.incCounter();
 			calcPtLeg.run(person.getSelectedPlan());
