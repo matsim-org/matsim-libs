@@ -35,6 +35,7 @@ public class ReRoutingTest extends MatsimTestCase {
 		SimulationTimer.reset(10);
 
 		TestControler controler = new TestControler(config);
+		controler.setCreateGraphs(false);
 		controler.run();
 
 		System.out.println("calculating checksums...");

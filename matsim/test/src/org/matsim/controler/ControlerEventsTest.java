@@ -57,6 +57,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 
 	public void testCoreListenerExecutionOrder() {
 		Controler controler = new Controler(this.config);
+		controler.setCreateGraphs(false);
 		ControlerEventsTestListener firstListener = new ControlerEventsTestListener(1, this);
 		ControlerEventsTestListener secondListener = new ControlerEventsTestListener(2, this);
 		ControlerEventsTestListener thirdListener = new ControlerEventsTestListener(3, this);
@@ -65,14 +66,14 @@ public class ControlerEventsTest extends MatsimTestCase {
 		controler.addCoreControlerListener(secondListener);
 		controler.addCoreControlerListener(thirdListener);
 		controler.run();
-		assertEquals(Integer.valueOf(3), this.calledStartupListener.get(0));
-		assertEquals(Integer.valueOf(2), this.calledStartupListener.get(1));
-		assertEquals(Integer.valueOf(1), this.calledStartupListener.get(2));
+		assertEquals(3, this.calledStartupListener.get(0).intValue());
+		assertEquals(2, this.calledStartupListener.get(1).intValue());
+		assertEquals(1, this.calledStartupListener.get(2).intValue());
 	}
-
 
 	public void testEvents() {
 		Controler controler = new Controler(this.config);
+		controler.setCreateGraphs(false);
 		ControlerEventsTestListener listener = new ControlerEventsTestListener(1, this);
 		controler.addControlerListener(listener);
 		controler.run();
@@ -97,6 +98,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 		// prepare remove test
 		Gbl.reset();
 		controler = new Controler(this.config);
+		controler.setCreateGraphs(false);
 		listener = new ControlerEventsTestListener(1, this);
 		// we know from the code above, that "add" works
 		controler.addControlerListener(listener);
