@@ -50,6 +50,10 @@ import org.matsim.utils.identifiers.IdI;
 
 public class CountsSimReal24Graph extends CountsGraph{
 
+	/* 
+	 * TODO: Max. value of scale is set to 100'000 at the moment
+	 * Make it dependend on the data (max value)!
+	 */
 
 	public CountsSimReal24Graph(final List<CountSimComparison> ccl, final int iteration, final String filename){
 		super(ccl, iteration, filename, filename);
@@ -77,7 +81,10 @@ public class CountsSimReal24Graph extends CountsGraph{
 		
 		Iterator<IdI> id_it = new CountSimComparisonLinkFilter(
 				this.ccl_).getLinkIds().iterator();
-				
+		
+		double maxCountValue=0.0;
+		double maxSimValue=0.0;
+		
 		while (id_it.hasNext()) {
 			IdI id= id_it.next();				
 			
@@ -85,6 +92,10 @@ public class CountsSimReal24Graph extends CountsGraph{
 			double simVal=linkFilter.getAggregatedSimValue(id);
 			
 			if (countVal>0.0 &&	simVal>0.0) {
+				
+				if (countVal>maxCountValue) maxCountValue=countVal;
+				if (simVal>maxSimValue) maxSimValue=simVal;
+				
 				series.add(countVal,simVal);
 				comps.add(new Comp(countVal, "link"+id+".html", "Link "+id+"; " +
 						"Count: "+ countVal +", Sim: "+ simVal));
@@ -97,6 +108,9 @@ public class CountsSimReal24Graph extends CountsGraph{
 				countVal=Math.max(1.0, countVal);
 				simVal=Math.max(1.0, simVal);
 				series_outliers.add(countVal, simVal);
+				
+				if (countVal>maxCountValue) maxCountValue=countVal;
+				if (simVal>maxSimValue) maxSimValue=simVal;
 			}	
 		}//while
 		dataset0.addSeries(series);
@@ -144,12 +158,12 @@ public class CountsSimReal24Graph extends CountsGraph{
 		renderer2.setLinesVisible(false);
 		renderer2.setSeriesPaint(0, Color.red);
 		renderer2.setSeriesShape(0, new Ellipse2D.Double(-3.0, -3.0, 6.0, 6.0));
-
+	
 		// error band
 		DefaultXYDataset dataset1=new DefaultXYDataset();
-		dataset1.addSeries("f1x", new double[][] {{1.0, 10000.0},{1.0, 10000.0}});
-		dataset1.addSeries("f2x", new double[][] {{1.0, 10000.0},{2.0, 20000.0}});
-		dataset1.addSeries("f05x", new double[][] {{2.0, 10000.0},{1.0, 5000.0}});
+		dataset1.addSeries("f1x", new double[][] {{1.0, maxCountValue},{1.0, maxCountValue}});
+		dataset1.addSeries("f2x", new double[][] {{1.0, maxCountValue},{2.0, 2*maxCountValue}});
+		dataset1.addSeries("f05x", new double[][] {{2.0, maxCountValue},{1.0, 0.5*maxCountValue}});
 		
 		XYLineAndShapeRenderer renderer3 = new XYLineAndShapeRenderer();
 		renderer3.setShapesVisible(false);
@@ -161,13 +175,13 @@ public class CountsSimReal24Graph extends CountsGraph{
 		renderer3.setSeriesItemLabelsVisible(1, false);
 		renderer3.setSeriesItemLabelsVisible(2, false);
 		
-		XYTextAnnotation annotation0=new XYTextAnnotation("2.0 count",12000.0, 15500.0);
+		XYTextAnnotation annotation0=new XYTextAnnotation("2.0 count",maxCountValue, 2*maxCountValue);
 		annotation0.setFont(new Font("SansSerif", Font.BOLD, 11));
 		plot.addAnnotation(annotation0);
-		XYTextAnnotation annotation1=new XYTextAnnotation("count",13000.0, 10000.0);
+		XYTextAnnotation annotation1=new XYTextAnnotation("count", maxCountValue, maxCountValue);
 		annotation1.setFont(new Font("SansSerif", Font.BOLD, 11));
 		plot.addAnnotation(annotation1);
-		XYTextAnnotation annotation2=new XYTextAnnotation("0.5 count",11000.0, 3500.0);
+		XYTextAnnotation annotation2=new XYTextAnnotation("0.5 count",maxCountValue, 0.5*maxCountValue);
 		annotation2.setFont(new Font("SansSerif", Font.BOLD, 11));
 		plot.addAnnotation(annotation2);
 		
@@ -181,8 +195,8 @@ public class CountsSimReal24Graph extends CountsGraph{
         plot.setRenderer(2, renderer3);
 		plot.setDataset(2, dataset1);
 
-		plot.getRangeAxis().setRange(1.0, 19000.0);
-		plot.getDomainAxis().setRange(1.0, 19000.0);
+		//plot.getRangeAxis().setRange(1.0, 19000.0);
+		//plot.getDomainAxis().setRange(1.0, 19000.0);
 
 		return this.chart_;
 	}//drawGraph
