@@ -128,6 +128,13 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		}
 	}
 
+	/**
+	 * @param leg the leg to calculate the route for.
+	 * @param fromAct the Act the leg starts
+	 * @param toAct the Act the leg ends
+	 * @param depTime the time (seconds from midnight) the leg starts
+	 * @return the estimated travel time for this leg
+	 */
 	protected double handleLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		String legmode = leg.getMode();
 
