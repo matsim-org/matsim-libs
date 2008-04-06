@@ -25,6 +25,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -85,7 +86,7 @@ public class MatsimCountsReader extends MatsimXmlParser {
 		// Currently the only counts-type is v1
 		if (COUNTS_V1.equals(doctype)) {
 			this.delegate = new CountsReaderMatsimV1(this.counts);
-			System.out.println("using counts_v1-reader.");
+			Logger.getLogger(MatsimCountsReader.class).info("using counts_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}

@@ -44,7 +44,7 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 
 	/**
 	 * @param costFunction
-	 *          Returns the minimal possible cost for each link.
+	 *          A cost function that returns the minimal possible cost for each link.
 	 */
 	public PreProcessEuclidean(final TravelMinCostI costFunction) {
 		this.costFunction = costFunction;
@@ -55,8 +55,7 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 		super.run(network);
 
 		if (checkLinkLengths(network) == false) {
-			log
-					.warn("PreProcessAStar.run(...) There are links with stored length smaller than their euclidean distance in this network. Thus, NetworkAStar cannot guarantee to calculate the least-cost paths between two nodes!");
+			log.warn("There are links with stored length smaller than their euclidean distance in this network. Thus, A* cannot guarantee to calculate the least-cost paths between two nodes!");
 		}
 
 		updateMinTravelCostPerLength(network);
@@ -85,10 +84,6 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 		return true;
 	}
 
-	/**
-	 * @param minTravelCostPerLength
-	 *          the minTravelCostPerLength to set
-	 */
 	void setMinTravelCostPerLength(final double maxFreeSpeed) {
 		this.minTravelCostPerLength = maxFreeSpeed;
 	}

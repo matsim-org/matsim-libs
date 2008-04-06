@@ -25,6 +25,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -86,13 +87,13 @@ public class MatsimWorldReader extends MatsimXmlParser {
 		super.setDoctype(doctype);
 		if (WORLD_V0.equals(doctype)) {
 			this.delegate = new WorldReaderMatsimV0(this.world);
-			System.out.println("using world_v0-reader.");
+			Logger.getLogger(MatsimWorldReader.class).info("using world_v0-reader.");
 		} else if (WORLD_V1.equals(doctype)) {
 			this.delegate = new WorldReaderMatsimV1(this.world);
-			System.out.println("using world_v1-reader.");
+			Logger.getLogger(MatsimWorldReader.class).info("using world_v1-reader.");
 		} else if (WORLD_V2.equals(doctype)) {
 			this.delegate = new WorldReaderMatsimV2(this.world);
-			System.out.println("using world_v2-reader.");
+			Logger.getLogger(MatsimWorldReader.class).info("using world_v2-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}

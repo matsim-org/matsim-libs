@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
@@ -36,20 +37,17 @@ import org.matsim.utils.geometry.shared.Coord;
 
 class LandmarkerPieSlices extends NetworkAlgorithm {
 
-	Node[] landmarks;
+	private Node[] landmarks;
 
-	private Coord center = null; // not thread-safe to use one instance from multiple threads!
+	private Coord center = null;
 
-	int roleIndex;
+	private int roleIndex;
 
-	Rectangle2D.Double travelZone;
+	private final Rectangle2D.Double travelZone;
 
-	private double zoneExpansion = 0.1;
+	private static final Logger log = Logger.getLogger(LandmarkerPieSlices.class);
 
-	/**
-	 * A constant for the export to GDF (Guess file format) of the route.
-	 */
-	final static int exportedMarkedNodeSize = 1024;
+	private final double zoneExpansion = 0.1;
 
 	LandmarkerPieSlices(final int landmarkCount, final Rectangle2D.Double travelZone) {
 		this.landmarks = new Node[landmarkCount];
@@ -67,8 +65,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		run(nodes, network.requestNodeRole());
 	}
 
-	private Set<Node> getNodesInTravelZone(final NetworkLayer network,
-			Rectangle2D.Double travelZone) {
+	private Set<Node> getNodesInTravelZone(final NetworkLayer network, final Rectangle2D.Double travelZone) {
 		double minX = travelZone.getX();
 		double maxX = travelZone.getWidth() + minX;
 		double minY = travelZone.getY();
@@ -82,8 +79,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		Set<Node> resultNodes = new TreeSet<Node>();
 		for (Node n : network.getNodes().values()) {
 			if (n.getCoord().getX() <= maxX && n.getCoord().getX() >= minX
-					&& n.getCoord().getY() <= maxY
-					&& n.getCoord().getY() >= minY) {
+					&& n.getCoord().getY() <= maxY && n.getCoord().getY() >= minY) {
 				resultNodes.add(n);
 			}
 		}
@@ -91,39 +87,33 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		return resultNodes;
 	}
 
-	public void run(Collection<? extends Node> nodes, int roleIndex) {
-
+	public void run(final Collection<? extends Node> nodes, final int roleIndex) {
 		this.roleIndex = roleIndex;
-
 		this.center = getCenter(nodes);
-
 		putLandmarks(nodes, this.landmarks.length);
 	}
 
-	void putLandmarks(Collection<? extends Node> nodes, int landmarkCount) {
+	void putLandmarks(final Collection<? extends Node> nodes, final int landmarkCount) {
 
 		ArrayList<ArrayList<Node>> sectors = new ArrayList<ArrayList<Node>>();
 
-		System.out.println("Filling sectors...");
+		log.info("Filling sectors...");
 		double[][] angles = fillSectors(sectors, nodes);
 
 		if (angles.length < landmarkCount) {
-			System.out.println("Reducing number of landmarks from " +
-					landmarkCount + " to " + angles.length + "...");
-			landmarkCount = angles.length;
-			this.landmarks = new Node[landmarkCount];
+			log.info("Reducing number of landmarks from " + landmarkCount + " to " + angles.length + "...");
+			this.landmarks = new Node[angles.length];
 		}
-		for (int i = 0; i < landmarkCount; i++) {
+		for (int i = 0; i < this.landmarks.length; i++) {
 			this.landmarks[i] = getLandmark(sectors.get(i), angles[i]);
 		}
 
-		System.out.println("Refining landmarks...");
+		log.info("Refining landmarks...");
 		refineLandmarks(sectors, angles);
-		System.out.println("done");
+		log.info("done");
 	}
 
-	private double[][] fillSectors(ArrayList<ArrayList<Node>> sectors, Collection<? extends Node> nodes) {
-//		double[][] angles = new double[landmarks.length][2];
+	private double[][] fillSectors(final ArrayList<ArrayList<Node>> sectors, final Collection<? extends Node> nodes) {
 		ArrayList<double[]> angles = new ArrayList<double[]>();
 		// Sort nodes according to angle
 		TreeMap<Double, Node[]> sortedNodes = new TreeMap<Double, Node[]>();
@@ -148,8 +138,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		}
 		double lastAngle = 0;
 		Iterator<Node[]> it = sortedNodes.values().iterator();
-		// Fill sectors such that each sector contains on average the same
-		// number of nodes
+		// Fill sectors such that each sector contains on average the same number of nodes
 		Node[] tmpNodes = it.next();
 		int k = 0;
 		for (int i = 0; i < this.landmarks.length; i++) {
@@ -180,7 +169,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 				}
 			}
 			if (sectors.get(angles.size()).isEmpty()) {
-				System.out.println("There is no node in sector " + i + "!");
+				log.info("There is no node in sector " + i + "!");
 				sectors.remove(angles.size());
 			} else {
 				// Get the angle of the "rightmost" node
@@ -198,7 +187,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		return angles.toArray(new double[0][2]);
 	}
 
-	private Node getLandmark(ArrayList<Node> nodes, double[] angles) {
+	private Node getLandmark(final ArrayList<Node> nodes, final double[] angles) {
 		double maxDist = Double.NEGATIVE_INFINITY;
 		Node landmark = null;
 		for (Node node : nodes) {
@@ -213,10 +202,8 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 				} else {
 					minAngelToBorder = angles[1] - angle;
 				}
-				double distApprox = Math.sqrt(x * x + y * y)
-						* (1 + minAngelToBorder / (2 * Math.PI));
-				// Set the node that is farthest away from the center to be the
-				// landmark in the current sector
+				double distApprox = Math.sqrt(x * x + y * y) * (1 + minAngelToBorder / (2 * Math.PI));
+				// Set the node that is farthest away from the center to be the landmark in the current sector
 				if (distApprox > maxDist) {
 					landmark = node;
 					maxDist = distApprox;
@@ -227,8 +214,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		return landmark;
 	}
 
-	private void refineLandmarks(ArrayList<ArrayList<Node>> sectors,
-			double[][] sectorAngles) {
+	private void refineLandmarks(final ArrayList<ArrayList<Node>> sectors, final double[][] sectorAngles) {
 		boolean doRefine = true;
 		double[] landmarkAngels = new double[this.landmarks.length];
 		for (int i = 0; i < this.landmarks.length; i++) {
@@ -239,51 +225,40 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		double minAngelFactor = 0.5;
 		while (doRefine) {
 			doRefine = false;
-			for (int i = 0; i < this.landmarks.length
-					&& sectors.get(i).isEmpty() == false; i++) {
+			for (int i = 0; i < this.landmarks.length && sectors.get(i).isEmpty() == false; i++) {
 				int preInd = i - 1;
 				double angelDiff;
 				if (preInd == -1) {
 					preInd = this.landmarks.length - 1;
-					angelDiff = 2 * Math.PI + landmarkAngels[i]
-							- landmarkAngels[preInd];
+					angelDiff = 2 * Math.PI + landmarkAngels[i] - landmarkAngels[preInd];
 				} else {
 					angelDiff = landmarkAngels[i] - landmarkAngels[preInd];
 				}
 				// Get the lower size angle of the two sectors
 				double minSectorSize = sectorAngles[i][1] - sectorAngles[i][0];
 				if (sectorAngles[preInd][1] - sectorAngles[preInd][0] < minSectorSize) {
-					minSectorSize = sectorAngles[preInd][1]
-							- sectorAngles[preInd][0];
+					minSectorSize = sectorAngles[preInd][1] - sectorAngles[preInd][0];
 				}
 				if (angelDiff < minSectorSize * minAngelFactor) {
 					// Change landmark that is nearer to the center
 					int indexToChange = 0;
-					if (this.center.calcDistance(this.landmarks[preInd].getCoord()) < this.center
-							.calcDistance(this.landmarks[i].getCoord())) {
+					if (this.center.calcDistance(this.landmarks[preInd].getCoord()) < this.center.calcDistance(this.landmarks[i].getCoord())) {
 						// Narrow the sector
-						sectorAngles[preInd][1] -= minSectorSize
-								* minAngelFactor;
+						sectorAngles[preInd][1] -= minSectorSize * minAngelFactor;
 						indexToChange = preInd;
 					} else {
 						// Narrow the sector
 						sectorAngles[i][0] += minSectorSize * minAngelFactor;
 						indexToChange = i;
 					}
-					removeNodesFromSector(sectors.get(indexToChange),
-							sectorAngles[indexToChange]);
+					removeNodesFromSector(sectors.get(indexToChange), sectorAngles[indexToChange]);
 					if (sectors.get(indexToChange).isEmpty()) {
-						System.out.println("There is no node in sector "
-								+ indexToChange + " after narrowing it!");
+						log.info("There is no node in sector " + indexToChange + " after narrowing it!");
 					} else {
-						this.landmarks[indexToChange] = getLandmark(
-								sectors.get(indexToChange),
-								sectorAngles[indexToChange]);
+						this.landmarks[indexToChange] = getLandmark(sectors.get(indexToChange), sectorAngles[indexToChange]);
 					}
-					double x = this.landmarks[indexToChange].getCoord().getX()
-							- this.center.getX();
-					double y = this.landmarks[indexToChange].getCoord().getY()
-							- this.center.getY();
+					double x = this.landmarks[indexToChange].getCoord().getX() - this.center.getX();
+					double y = this.landmarks[indexToChange].getCoord().getY() - this.center.getY();
 					landmarkAngels[indexToChange] = Math.atan2(y, x) + Math.PI;
 					doRefine = true;
 					break;
@@ -292,8 +267,8 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		}
 	}
 
-	private void removeNodesFromSector(ArrayList<Node> sector,
-			double[] sectorAngles) {
+	private void removeNodesFromSector(final ArrayList<Node> sector,
+			final double[] sectorAngles) {
 		int i = 0;
 		while (i < sector.size()) {
 			Node node = sector.get(i);
@@ -310,7 +285,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		}
 	}
 
-	public Coord getCenter(Collection<? extends Node> nodes) {
+	public Coord getCenter(final Collection<? extends Node> nodes) {
 		double[] bBox = NetworkUtils.getBoundingBox(nodes);
 		double maxX = bBox[0];
 		double minX = bBox[1];
@@ -324,10 +299,10 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 	}
 
 	public Node[] getLandmarks() {
-		return this.landmarks;
+		return this.landmarks.clone();
 	}
 
-	LandmarkerPieSlicesRole getLandmarkerRole(Node n) {
+	private LandmarkerPieSlicesRole getLandmarkerRole(final Node n) {
 		LandmarkerPieSlicesRole r = (LandmarkerPieSlicesRole) n.getRole(this.roleIndex);
 
 		if (r == null) {
@@ -351,7 +326,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		 * @param partitionIndex
 		 *            the partitionIndex to set
 		 */
-		public void setSectorIndex(int partitionIndex) {
+		public void setSectorIndex(final int partitionIndex) {
 			this.sectorIndex = partitionIndex;
 		}
 	}

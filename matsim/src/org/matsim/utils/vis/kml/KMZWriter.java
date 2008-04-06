@@ -73,7 +73,7 @@ public class KMZWriter {
 
 	private ZipOutputStream zipOut = null;
 
-	private Map<String, String> nonKmlFiles = new HashMap<String, String>();
+	private final Map<String, String> nonKmlFiles = new HashMap<String, String>();
 
 	/**
 	 * Creates a new kmz-file and a writer for it and opens the file for writing.
@@ -195,7 +195,7 @@ public class KMZWriter {
 			while ((bytesRead = inStream.read(buffer)) != -1) {
 				this.zipOut.write(buffer, 0, bytesRead);
 			}
-			System.out.println(entry.getName() + " added to kmz.");
+			log.info(entry.getName() + " added to kmz.");
 		} finally {
 			if (inStream != null) {
 				inStream.close();
@@ -214,7 +214,7 @@ public class KMZWriter {
 		ZipEntry entry = new ZipEntry(inZipFilename);
 		this.zipOut.putNextEntry(entry);
 		this.zipOut.write(file);
-		System.out.println(entry.getName() + " added to kmz.");
+		log.info(entry.getName() + " added to kmz.");
 	}
 
 	/**

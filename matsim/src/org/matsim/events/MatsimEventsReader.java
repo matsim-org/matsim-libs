@@ -25,6 +25,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -110,7 +111,7 @@ public class MatsimEventsReader {
 			// Currently the only events-type is v1
 			if (EVENTS_V1.equals(doctype)) {
 				this.delegate = new EventsReaderXMLv1(this.events);
-				System.out.println("using events_v1-reader.");
+				Logger.getLogger(MatsimEventsReader.class).info("using events_v1-reader.");
 			} else {
 				throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 			}

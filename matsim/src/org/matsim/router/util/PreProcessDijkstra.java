@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
@@ -35,9 +36,12 @@ import org.matsim.utils.identifiers.IdI;
  * between a start and an end node. Specifically, marks the nodes
  * that are in dead-end, i.e. that are connected to the rest of
  * the network by a single 'entry' node only.
+ *
  * @author lnicolas
  */
 public class PreProcessDijkstra extends NetworkAlgorithm {
+
+	private static final Logger log = Logger.getLogger(PreProcessDijkstra.class);
 
 	/**
 	 * The role this algorithm uses to store its data in the network.
@@ -91,9 +95,7 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 						role.incrementInDeadEndCount();
 						incidentNodes = node.getIncidentNodes();
 					} else {
-						System.out.println("Error: All " + incidentNodes.size()
-								+ " incident nodes of node " + node.getId()
-								+ " are dead ends!");
+						log.error("All " + incidentNodes.size() + " incident nodes of node " + node.getId() + " are dead ends!");
 						return;
 					}
 				}
@@ -112,7 +114,7 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 			}
 			role.getDeadEndNodes().clear();
 		}
-		System.out.println("nodes in dead ends: " + deadEndNodeCount
+		log.info("nodes in dead ends: " + deadEndNodeCount
 				+ " (total nodes: " + network.getNodes().size() + "). Done in "
 				+ (System.currentTimeMillis() - now) + " ms");
 	}
@@ -180,10 +182,6 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 			return this.deadEndEntryNode;
 		}
 
-		/**
-		 * @param isInDeadEnd
-		 *            the isInDeadEnd to set
-		 */
 		private void setDeadEndEntryNode(final Node node) {
 			this.deadEndEntryNode = node;
 		}

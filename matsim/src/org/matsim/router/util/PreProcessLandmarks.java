@@ -27,26 +27,30 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
 /**
- * Pre-processes a given network, gathering information which
- * can be used by a AStarLandmarks when computing least-cost paths
+ * Pre-processes a given network, gathering information which can be used by
+ * {@link org.matsim.router.AStarLandmarks} when computing least-cost paths
  * between a start and an end node. Specifically, designates some
  * nodes in the network that act as landmarks and computes the distance
  * from and to each node in the network to each of the landmarks.
+ *
  * @author lnicolas
  */
 public class PreProcessLandmarks extends PreProcessEuclidean {
 
-	Rectangle2D.Double travelZone;
+	private final Rectangle2D.Double travelZone;
 
-	int landmarkCount;
+	private final int landmarkCount;
 
 	private Node[] landmarks;
+
+	private static final Logger log = Logger.getLogger(PreProcessLandmarks.class);
 
 	public PreProcessLandmarks(final TravelMinCostI costFunction) {
 		this(costFunction, new Rectangle2D.Double());
@@ -59,10 +63,10 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	/**
 	 * @param costFunction
 	 * @param travelZone The area within which the landmarks should lie. If you know the
-	 * plans before routing, you could
-	 * invoke org.matsim.demandmodeling.plans.algorithms.FromToSummary as a preprocess and
+	 * plans before routing, you could invoke
+	 * {@link org.matsim.plans.algorithms.FromToSummary} as a preprocess and
 	 * pass the travel zone to this constructor. Narrowing the zone where the landmarks should
-	 * be put normally improves the routing speed of AStarLandmarks.
+	 * be put normally improves the routing speed of {@link org.matsim.router.AStarLandmarks}.
 	 */
 	public PreProcessLandmarks(final TravelMinCostI costFunction,
 			final Rectangle2D.Double travelZone) {
@@ -72,14 +76,13 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	/**
 	 * @param costFunction
 	 * @param travelZone The area within which the landmarks should lie. If you know the
-	 * plans before routing, you could
-	 * invoke org.matsim.demandmodeling.plans.algorithms.FromToSummary as a preprocess and
+	 * plans before routing, you could invoke
+	 * {@link org.matsim.plans.algorithms.FromToSummary} as a preprocess and
 	 * pass the travel zone to this constructor. Narrowing the zone where the landmarks should
-	 * be put normally improves the routing speed of AStarLandmarks.
+	 * be put normally improves the routing speed of {@link org.matsim.router.AStarLandmarks}.
 	 * @param landmarkCount
 	 */
-	public PreProcessLandmarks(final TravelMinCostI costFunction,
-			final Rectangle2D.Double travelZone, final int landmarkCount) {
+	public PreProcessLandmarks(final TravelMinCostI costFunction, final Rectangle2D.Double travelZone, final int landmarkCount) {
 		super(costFunction);
 
 		this.travelZone = travelZone;
@@ -90,14 +93,13 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	public void run(final NetworkLayer network) {
 		super.run(network);
 
-		System.out.println("Putting landmarks on network...");
+		log.info("Putting landmarks on network...");
 		long now = System.currentTimeMillis();
-		LandmarkerPieSlices landmarker = new LandmarkerPieSlices(this.landmarkCount,
-				this.travelZone);
+		LandmarkerPieSlices landmarker = new LandmarkerPieSlices(this.landmarkCount, this.travelZone);
 		landmarker.run(network);
-		System.out.println("done in " + (System.currentTimeMillis() - now) + " ms");
+		log.info("done in " + (System.currentTimeMillis() - now) + " ms");
 
-		System.out.println("Calculating distance from each node to each of the " + this.landmarkCount + " landmarks...");
+ 		log.info("Calculating distance from each node to each of the " + this.landmarkCount + " landmarks...");
 		now = System.currentTimeMillis();
 
 		this.landmarks = landmarker.getLandmarks();
@@ -115,33 +117,27 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			LandmarksRole r = (LandmarksRole) getRole(node);
 			for (int i = 0; i < this.landmarks.length; i++) {
 				if (r.getMinLandmarkTravelTime(i) > r.getMaxLandmarkTravelTime(i)) {
-					System.out.println("Min > max for node " + node.getId() + " and landmark " + i);
+					log.info("Min > max for node " + node.getId() + " and landmark " + i);
 				}
 			}
 		}
 
-		System.out.println("done in " + (System.currentTimeMillis() - now) + " ms");
+		log.info("done in " + (System.currentTimeMillis() - now) + " ms");
 	}
 
 	void expandLandmark(final Node startNode, final int landmarkIndex) {
-		LandmarksTravelTimeComparator comparator = new LandmarksTravelTimeComparator(
-				this.roleIndex, landmarkIndex);
-		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(100,
-				comparator);
+		LandmarksTravelTimeComparator comparator = new LandmarksTravelTimeComparator(this.roleIndex, landmarkIndex);
+		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(100, comparator);
 		LandmarksRole role = (LandmarksRole) getRole(startNode);
 		role.setToLandmarkTravelTime(landmarkIndex, 0.0);
 		role.setFromLandmarkTravelTime(landmarkIndex, 0.0);
 		pendingNodes.add(startNode);
 		while (pendingNodes.isEmpty() == false) {
 			Node node = pendingNodes.poll();
-			double toTravTime = ((LandmarksRole) getRole(node))
-					.getToLandmarkTravelTime(landmarkIndex);
-			expandLinks(landmarkIndex, pendingNodes, node.getInLinks().values(),
-					toTravTime, false);
-			double fromTravTime = ((LandmarksRole) getRole(node))
-					.getFromLandmarkTravelTime(landmarkIndex);
-			expandLinks(landmarkIndex, pendingNodes, node.getOutLinks().values(),
-					fromTravTime, true);
+			double toTravTime = ((LandmarksRole) getRole(node)).getToLandmarkTravelTime(landmarkIndex);
+			expandLinks(landmarkIndex, pendingNodes, node.getInLinks().values(), toTravTime, false);
+			double fromTravTime = ((LandmarksRole) getRole(node)).getFromLandmarkTravelTime(landmarkIndex);
+			expandLinks(landmarkIndex, pendingNodes, node.getOutLinks().values(), fromTravTime, true);
 		}
 	}
 
@@ -221,8 +217,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 
 		void updateMinMaxTravelTimes() {
 			for (int i = 0; i < this.landmarkTravelTime1.length; i++) {
-				setTravelTimes(i, this.landmarkTravelTime2[i],
-						this.landmarkTravelTime1[i]);
+				setTravelTimes(i, this.landmarkTravelTime2[i], this.landmarkTravelTime1[i]);
 			}
 		}
 
@@ -253,7 +248,6 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * ordered list as if to order them according to the other value...
 	 *
 	 * @author lnicolas
-	 *
 	 */
 	static public class LandmarksTravelTimeComparator implements Comparator<Node>, Serializable {
 		private static final long serialVersionUID = 1L;
@@ -269,10 +263,8 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 
 		public int compare(final Node n1, final Node n2) {
 
-			double c1 = ((LandmarksRole) n1.getRole(this.roleIndex))
-					.getToLandmarkTravelTime(this.landmarkIndex);
-			double c2 = ((LandmarksRole) n2.getRole(this.roleIndex))
-					.getToLandmarkTravelTime(this.landmarkIndex);
+			double c1 = ((LandmarksRole) n1.getRole(this.roleIndex)).getToLandmarkTravelTime(this.landmarkIndex);
+			double c2 = ((LandmarksRole) n2.getRole(this.roleIndex)).getToLandmarkTravelTime(this.landmarkIndex);
 
 			if (c1 < c2) {
 				return -1;
