@@ -28,12 +28,13 @@ import org.matsim.testcases.TestDepth;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.roadpricing");
+		TestSuite suite = new TestSuite("Tests for org.matsim.roadpricing");
 		//$JUnit-BEGIN$
 		if (TestDepth.getDepth() == TestDepth.extended) {
 			suite.addTestSuite(org.matsim.roadpricing.BetaTravelTest.class);
 		}
 		suite.addTestSuite(org.matsim.roadpricing.RoadPricingTest.class);
+		suite.addTestSuite(org.matsim.roadpricing.RoadPricingControlerTest.class);
 		//$JUnit-END$
 		return suite;
 	}

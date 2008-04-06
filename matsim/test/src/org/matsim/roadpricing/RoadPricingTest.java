@@ -39,6 +39,7 @@ import org.matsim.plans.Route;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
@@ -46,15 +47,20 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.xml.sax.SAXException;
 
+/**
+ * Tests the RoadPricing features (scoring, router) as isolated as possible.
+ *
+ * @author mrieser
+ */
 public class RoadPricingTest extends MatsimTestCase {
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
-	};
+	}
 
-	/** Creates a simple network consisting of 5 equal links in a row. */
+	/** @return a simple network consisting of 5 equal links in a row. */
 	private QueueNetworkLayer createNetwork1() {
 		/* This creates the following network:
 		 *
@@ -80,7 +86,7 @@ public class RoadPricingTest extends MatsimTestCase {
 		return network;
 	}
 
-	/** Creates a simple network with route alternatives in 2 places. */
+	/** @return a simple network with route alternatives in 2 places. */
 	private QueueNetworkLayer createNetwork2() {
 		/* This creates the following network:
 		 *
@@ -132,7 +138,7 @@ public class RoadPricingTest extends MatsimTestCase {
 		return network;
 	}
 
-	/** creates a population for network1 */
+	/** @return a population for network1 */
 	private Plans createPopulation1() throws Exception {
 		Plans population = new Plans(Plans.NO_STREAMING);
 
@@ -150,7 +156,7 @@ public class RoadPricingTest extends MatsimTestCase {
 		return population;
 	}
 
-	/** creates a population for network2 */
+	/** @return a population for network2 */
 	private Plans createPopulation2() throws Exception {
 		Plans population = new Plans(Plans.NO_STREAMING);
 
@@ -447,13 +453,16 @@ public class RoadPricingTest extends MatsimTestCase {
 			Plans population = createPopulation2();
 			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 
-			new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, toll).run(population);
+			PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
+			commonRouterData.run(network);
+
+			new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
 			compareRoutes("1 2 3 4 5", ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1))).getRoute());
 			compareRoutes("6 7 9 10", ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(3))).getRoute());
 
 			// now add a toll in the afternoon too, so it is cheaper to pay the toll
 			Cost afternoonCost = toll.addCost(14*3600, 18*3600, 0.06);
-			new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, toll).run(population);
+			new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
 			compareRoutes("1 2 4 5", ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1))).getRoute());
 			compareRoutes("6 7 9 10", ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(3))).getRoute());
 
@@ -463,7 +472,7 @@ public class RoadPricingTest extends MatsimTestCase {
 			toll.addCost(6*3600, 10*3600, 0.7);
 			toll.addCost(14*3600, 18*3600, 0.7);
 			// the agent should now decide to drive around
-			new PlansCalcAreaTollRoute(network, timeCostCalc, timeCostCalc, toll).run(population);
+			new PlansCalcAreaTollRoute(network, commonRouterData, timeCostCalc, timeCostCalc, toll).run(population);
 			compareRoutes("1 2 3 4 5", ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1))).getRoute());
 			compareRoutes("6 7 8 9 10", ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(3))).getRoute());
 

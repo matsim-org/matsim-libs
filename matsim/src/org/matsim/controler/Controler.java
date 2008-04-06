@@ -93,6 +93,7 @@ import org.matsim.plans.algorithms.PersonPrepareForSim;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
+import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -1011,6 +1012,9 @@ public class Controler {
 			}
 		}
 
+		if (this.roadPricing != null && this.roadPricing.getRoadPricingScheme().getType().equals("area")) {
+			return new PlansCalcAreaTollRoute(this.network, this.commonRoutingData, travelCosts, travelTimes, this.roadPricing.getRoadPricingScheme());
+		}
 		return new PlansCalcRouteLandmarks(this.network, this.commonRoutingData, travelCosts, travelTimes);
 	}
 

@@ -30,16 +30,17 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
-import org.matsim.router.Dijkstra;
+import org.matsim.router.AStarLandmarks;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.misc.Time;
 
 /**
  * A special router for complete plans that assigns the best routes to a plan
- * with respect to an area toll.
+ * with respect to an area toll. Uses internally the {@link AStarLandmarks} routing algorithm.
  *
  * @author mrieser
  */
@@ -53,15 +54,16 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * Constructs a new Area-Toll Router.
 	 *
 	 * @param network
+	 * @param preProcessData common data for the A*-Landmarks algorithm
 	 * @param costCalculator This must be a normal implementation of TravelCostI that does not take care of the area toll!
 	 * @param timeCalculator
 	 * @param scheme
 	 */
-	public PlansCalcAreaTollRoute(final NetworkLayer network, final TravelCostI costCalculator, final TravelTimeI timeCalculator, final RoadPricingScheme scheme) {
+	public PlansCalcAreaTollRoute(final NetworkLayer network, final PreProcessLandmarks preProcessData, final TravelCostI costCalculator, final TravelTimeI timeCalculator, final RoadPricingScheme scheme) {
 		super(network, costCalculator, timeCalculator);
 		this.scheme = scheme;
 		this.timeCalculator = timeCalculator;
-		this.tollRouter = new Dijkstra(network, new TollTravelCostCalculator(costCalculator, scheme), timeCalculator); // TODO [MR] allow usage of other routing algorithms
+		this.tollRouter = new AStarLandmarks(network, preProcessData, new TollTravelCostCalculator(costCalculator, scheme), timeCalculator);
 	}
 
 	@Override
