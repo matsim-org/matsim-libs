@@ -98,6 +98,10 @@ public class ShopsOf2005ToFacilities {
 
 	private static final String ACTIVITY_TYPE_SHOP = "shop";
 
+	private static final String ANYTHING_BUT_DIGITS = "[^0-9]";
+	private static final String ANYTHING_BUT_DIGITS_AND_LETTERS = "[^0-9a-zA-Z]";
+	private static final String ANYTHING_BUT_LETTERS = "[^a-zA-Z]";
+
 	private static KML myKML = null;
 	private static Document myKMLDocument = null;
 	private static Folder mainKMLFolder = null;
@@ -110,23 +114,45 @@ public class ShopsOf2005ToFacilities {
 	private static Style dennerStyle = null;
 
 	public enum Day {
-		MONDAY ("mon"),
-		TUESDAY ("tue"),
-		WEDNESDAY ("wed"),
-		THURSDAY ("thu"),
-		FRIDAY ("fri"),
-		SATURDAY ("sat"),
-		SUNDAY ("sun");
+		MONDAY ("mon", "Mo"),
+		TUESDAY ("tue", "Di"),
+		WEDNESDAY ("wed", "Mi"),
+		THURSDAY ("thu", "Do"),
+		FRIDAY ("fri", "Fr"),
+		SATURDAY ("sat", "Sa"),
+		SUNDAY ("sun", "So");
 
-		private final String abbrev;
+		private final String abbrevEnglish;
+		private final String abbrevGerman;
 
-		Day(String abbrev) {
-			this.abbrev = abbrev;
+		Day(String abbrevEnglish, String abbrevGerman) {
+			this.abbrevEnglish = abbrevEnglish;
+			this.abbrevGerman = abbrevGerman;
 		}
 
-		public String getAbbrev() {
-			return abbrev;
+		public String getAbbrevGerman() {
+			return abbrevGerman;
 		}
+
+		public String getAbbrevEnglish() {
+			return abbrevEnglish;
+		}
+
+		public static Day getDayByGermanAbbrev(String germanAbbrev) {
+
+			Day theDay = null;
+
+			Day[] days = Day.values();
+			for (Day day : days) {
+				if (day.getAbbrevGerman().equals(germanAbbrev)) {
+					theDay = day;
+				}
+			}
+
+			return theDay;
+
+		}
+
 	}
 
 	/**
@@ -139,7 +165,7 @@ public class ShopsOf2005ToFacilities {
 		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
 
 	}
-	
+
 	private static void prepareRawDataForGeocoding() {
 
 
@@ -201,8 +227,8 @@ public class ShopsOf2005ToFacilities {
 		System.out.println("Writing facilities xml file...done.");
 
 	}
-	
-	
+
+
 	private static void setUp() {
 
 		myKML = new KML();
@@ -720,7 +746,69 @@ public class ShopsOf2005ToFacilities {
 		return "Migros (Ostschweiz) " + name;
 	}
 
+
+	private static void write() {
+
+		System.out.print("Writing KML files out...");
+
+		KMZWriter writer;
+		writer = new KMZWriter(kmlFilename);
+		writer.writeMainKml(myKML);
+		writer.close();
+
+		System.out.println("done.");
+
+	}
+
+	private static void extractPlacemarks(FolderType folderType, Facilities facilities) {
+
+		List<JAXBElement<? extends AbstractFeatureType>> featureGroup = folderType.getAbstractFeatureGroup();
+		Iterator it = featureGroup.iterator();
+		while (it.hasNext()) {
+			JAXBElement<AbstractFeatureType> feature = (JAXBElement<AbstractFeatureType>) (it.next());
+			if (feature.getValue().getClass().equals(FolderType.class)) {
+				//System.out.println("Going into folder...");
+				ShopsOf2005ToFacilities.extractPlacemarks((FolderType) feature.getValue(), facilities);
+			} else if (feature.getValue().getClass().equals(PlacemarkType.class)) {
+				//System.out.println("There is a placemark!");
+
+				PlacemarkType placemark = (PlacemarkType) feature.getValue();
+				JAXBElement<? extends AbstractGeometryType> geometry = placemark.getAbstractGeometryGroup();
+				// only process if coordinates exist
+				if (geometry != null) {
+					PointType point = (PointType) geometry.getValue();
+					String name = placemark.getName();
+
+					// transform coordinates
+					String[] coordinates = point.getCoordinates().get(0).split(",");
+					//System.out.println(point.getCoordinates().get(0));
+					CoordI wgs84Coords = new Coord(coordinates[0], coordinates[1]);
+					WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
+					CoordI ch1903Coordinates = trafo.transform(wgs84Coords);
+
+//					// create facility
+					if (name.equals("migrosZH_Glarus")) {
+						System.out.println("There it is: " + name);
+						System.out.flush();
+					}
+					Facility newFacility = facilities.createFacility(new Id(name), ch1903Coordinates);
+				}
+			}
+
+		}
+
+	}
+
+	private static void addOpentimesToFacilities(Facilities facilities) {
+
+		//ShopsOf2005ToFacilities.processPickPayOpenTimes(facilities);
+		ShopsOf2005ToFacilities.processMigrosZHOpenTimes(facilities);
+
+	}
+
 	private static void processPickPayOpenTimes(Facilities facilities) {
+
+		System.out.println("Setting up Pickpay open times...");
 
 		List<String> lines = null;
 		String[] openTokens = null, closeTokens = null;
@@ -734,7 +822,6 @@ public class ShopsOf2005ToFacilities {
 
 		String openLinePattern = ".*\\s" + OPEN + "\\s.*";
 		String closeLinePattern = ".*\\s" + CLOSE + "\\s.*";
-		String anythingButDigits = "[^0-9]";
 
 		try {
 			lines = FileUtils.readLines(new File(pickPayOpenTimesFilename), "UTF-8");
@@ -758,10 +845,10 @@ public class ShopsOf2005ToFacilities {
 
 		for (String openLine : aPickpayOpentime.keySet()) {
 
-			openTokens = openLine.split(anythingButDigits);
+			openTokens = openLine.split(ANYTHING_BUT_DIGITS);
 //			System.out.println(openLine);
 			facilityId = ShopsOf2005ToFacilities.buildPickpayId(openTokens);
-			System.out.println(facilityId);
+			//System.out.println(facilityId);
 			Facility theCurrentPickpay = (Facility) facilities.getLocation(facilityId);
 			if (theCurrentPickpay != null) {
 
@@ -770,27 +857,27 @@ public class ShopsOf2005ToFacilities {
 				Activity shopping = theCurrentPickpay.createActivity(ACTIVITY_TYPE_SHOP);
 				openNumbers.clear();
 				closeNumbers.clear();
-				
+
 				// print out and extract numbers
 
-				System.out.print(OPEN + ":\t");
+				//System.out.print(OPEN + ":\t");
 				for (String token : openTokens) {
 					if (!token.equals("") && !token.equals(openTokens[0])) {
 						openNumbers.add(Integer.parseInt(token));
-						System.out.print(token + "\t");
+						//System.out.print(token + "\t");
 					}
 				}
-				System.out.println();
+				//System.out.println();
 
-				closeTokens = aPickpayOpentime.get(openLine).split(anythingButDigits);
-				System.out.print(CLOSE + ":\t");
+				closeTokens = aPickpayOpentime.get(openLine).split(ANYTHING_BUT_DIGITS);
+				//System.out.print(CLOSE + ":\t");
 				for (String token : closeTokens) {
 					if (!token.equals("")) {
 						closeNumbers.add(Integer.parseInt(token));
-						System.out.print(token + "\t");
+						//System.out.print(token + "\t");
 					}
 				}
-				System.out.println();
+				//System.out.println();
 
 				// now process numbers
 
@@ -801,24 +888,24 @@ public class ShopsOf2005ToFacilities {
 				int openSeconds = 0; 
 				int closeSeconds = 0;
 				int previousOpenSeconds = 0;
-				
+
 				if (openNumbers.size() == closeNumbers.size()) {
 					for (int ii=0; ii < openNumbers.size(); ii += 2) {
 
 						openSeconds = openNumbers.get(ii) * 3600 + openNumbers.get(ii + 1) * 60;
 						closeSeconds = closeNumbers.get(ii) * 3600 + closeNumbers.get(ii + 1) * 60;
-						
+
 						// check if a new day starts
 						if (openSeconds <= previousOpenSeconds) {
 							dayPointer++;
 						}
-						
+
 						previousOpenSeconds = openSeconds;
 						String openTimeString = Time.writeTime(openSeconds);
 						String closeTimeString = Time.writeTime(closeSeconds);
 
-						opentime = new Opentime(days[dayPointer].getAbbrev(), openTimeString, closeTimeString);
-						
+						opentime = new Opentime(days[dayPointer].getAbbrevEnglish(), openTimeString, closeTimeString);
+
 						shopping.addOpentime(opentime);
 
 					}
@@ -827,104 +914,162 @@ public class ShopsOf2005ToFacilities {
 				}
 
 				System.out.flush();
-				
+
 			} else {
 				System.out.println("A pickpay with id " + facilityId + " does not exist.");
 			}
 
 		}
 
-//		for (String line : lines) {
-
-//		if (line.contains(openLinePattern)) {
-
-//		tokens = line.split(anythingButDigits);
-//		//System.out.println(tokens[0]);
-//		facilityId = ShopsOf2005ToFacilities.buildPickpayId(tokens);
-//		System.out.println(facilityId);
-//		Facility theCurrentPickpay = (Facility) facilities.getLocation(facilityId);
-//		theCurrentPickpay.createActivity(ACTIVITY_TYPE_SHOP);
-
-//		System.out.print(OPEN + ":\t");
-//		for (String token : tokens) {
-//		if (!token.equals("") && !token.equals(tokens[0])) {
-//		System.out.print(token + "\t");
-//		}
-//		}
-//		System.out.println();
-
-//		} else if (line.contains(closeLinePattern)) {
-
-//		tokens = line.split(anythingButDigits);
-//		System.out.print(CLOSE + ":\t");
-//		for (String token : tokens) {
-//		if (!token.equals("")) {
-//		System.out.print(token + "\t");
-//		}
-//		}
-//		System.out.println();
-
-//		}
-
-//		}
-
-		System.out.println("done.");
+		System.out.println("Setting up Pickpay open times...done.");
 
 	}
 
-	private static void write() {
+	private static void processMigrosZHOpenTimes(Facilities facilities) {
 
-		System.out.print("Writing KML files out...");
+		System.out.println("Setting up Migros ZH open times...");
 
-		KMZWriter writer;
-		writer = new KMZWriter(kmlFilename);
-		writer.writeMainKml(myKML);
-		writer.close();
+		List<String> lines = null;
+		String[] tokens = null;
+		String[] openHourTokens = null;
+		String[] openDayTokens = null;
+		Vector<Integer> numbers = new Vector<Integer>();
 
-		System.out.println("done.");
+		String migrosZHAusn = "Ausn";
 
-	}
+		try {
 
-	private static void extractPlacemarks(FolderType folderType, Facilities facilities) {
+			lines = FileUtils.readLines(new File(migrosZHFilename), "UTF-8");
 
-		List<JAXBElement<? extends AbstractFeatureType>> featureGroup = folderType.getAbstractFeatureGroup();
-		Iterator it = featureGroup.iterator();
-		while (it.hasNext()) {
-			JAXBElement<AbstractFeatureType> feature = (JAXBElement<AbstractFeatureType>) (it.next());
-			if (feature.getValue().getClass().equals(FolderType.class)) {
-				System.out.println("Going into folder...");
-				ShopsOf2005ToFacilities.extractPlacemarks((FolderType) feature.getValue(), facilities);
-			} else if (feature.getValue().getClass().equals(PlacemarkType.class)) {
-				System.out.println("There is a placemark!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-				PlacemarkType placemark = (PlacemarkType) feature.getValue();
-				JAXBElement<? extends AbstractGeometryType> geometry = placemark.getAbstractGeometryGroup();
-				// only process if coordinates exist
-				if (geometry != null) {
-					PointType point = (PointType) geometry.getValue();
-					String name = placemark.getName();
+		for (String line : lines) {
 
-					// transform coordinates
-					String[] coordinates = point.getCoordinates().get(0).split(",");
-					//System.out.println(point.getCoordinates().get(0));
-					CoordI wgs84Coords = new Coord(coordinates[0], coordinates[1]);
-					WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
-					CoordI ch1903Coordinates = trafo.transform(wgs84Coords);
+			//System.out.println(line);
+			tokens = line.split(FIELD_DELIM);
 
-//					// create facility
-					Facility newFacility = facilities.createFacility(new Id(name), ch1903Coordinates);
+			// ignore header line
+			if (tokens[0].equals("KST")) {
+				continue;
+			}
+
+			String facilityId = ShopsOf2005ToFacilities.buildMigrosZHId(tokens);
+			System.out.println(facilityId);
+			System.out.flush();
+			Facility theCurrentMigrosZH = (Facility) facilities.getLocation(facilityId);
+			if (theCurrentMigrosZH != null) {
+				Activity shopping = theCurrentMigrosZH
+				.createActivity(ACTIVITY_TYPE_SHOP);
+				String openTimeString = tokens[6];
+				openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
+				openDayTokens = openTimeString.split(ANYTHING_BUT_LETTERS);
+				numbers.clear();
+				// print open time strings
+				for (String token : openDayTokens) {
+					if (token.equals("")) {
+
+					} else {
+						System.out.print(token + "\t");
+					}
+				}
+				System.out.println();
+				for (String token : openHourTokens) {
+					if (token.equals("")) {
+
+					} else {
+						System.out.print(token + "\t");
+					}
+				}
+				System.out.println();
+				System.out.flush();
+				// extract numbers
+				if (openDayTokens[0].equals(Day.MONDAY.getAbbrevGerman())
+						&& openDayTokens[1]
+						                 .equals(Day.FRIDAY.getAbbrevGerman())) {
+					// ok
+					for (String token : openHourTokens) {
+						if (!token.equals("")) {
+							numbers.add(Integer.parseInt(token));
+						}
+						//					System.out.println(); 
+					}
+				} else {
+					System.out.println("Not a valid migros ZH open time line.");
+				}
+				System.out.flush();
+				// process numbers
+				int openDayTokenPointer = 1;
+				double time = 0;
+				double oldTime = 0;
+				double openingHour = 0;
+				boolean isHour = true;
+				boolean isOpen = true;
+				Opentime opentime = null;
+				Day[] days = Day.values();
+				for (String openHourToken : openHourTokens) {
+
+					if (!openHourToken.equals("")) {
+
+						if (isHour) {
+							time = Integer.parseInt(openHourToken) * 3600;
+						} else {
+							time += Integer.parseInt(openHourToken) * 60;
+
+							if (isOpen) {
+								openingHour = time;
+							} else {
+								switch (openDayTokenPointer) {
+								case 1:
+									System.out.println("Adding the weekdays...");
+									for (int weekday = 0; weekday <= 4; weekday++) {
+										opentime = new Opentime(days[weekday]
+										                             .getAbbrevEnglish(), Time
+										                             .writeTime(openingHour), Time
+										                             .writeTime(time));
+										shopping.addOpentime(opentime);
+									}
+									break;
+								default:
+									String englishDayString = Day.getDayByGermanAbbrev(openDayTokens[openDayTokenPointer]).getAbbrevEnglish();
+									System.out.println("Adding day " + englishDayString + "...");
+									opentime = new Opentime(
+											englishDayString, 
+											Time.writeTime(openingHour), 
+											Time.writeTime(time));
+								shopping.addOpentime(opentime);
+								break;
+								}
+							}
+
+							isOpen = !isOpen;
+
+							// go to next day
+							if (time < oldTime) {
+
+								openDayTokenPointer++;
+								while (openDayTokens[openDayTokenPointer].equals("Ausn")) {
+									openDayTokenPointer++;
+								}
+
+							} else {
+								oldTime = time;
+							}
+						}
+
+						isHour = !isHour;
+
+					}
+
 				}
 			}
 
 		}
 
-	}
 
-	private static void addOpentimesToFacilities(Facilities facilities) {
-
-		ShopsOf2005ToFacilities.processPickPayOpenTimes(facilities);
+		System.out.println("Setting up Migros ZH open times...done.");
 
 	}
-
 
 }
