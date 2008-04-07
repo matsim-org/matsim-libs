@@ -94,6 +94,7 @@ import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -959,7 +960,7 @@ public class Controler {
 	public final LegTravelTimeEstimator getLegTravelTimeEstimator() {
 		return this.legTravelTimeEstimator;
 	}
-	
+
 	/**
 	 * Sets a new {@link org.matsim.scoring.ScoringFunctionFactory} to use. <strong>Note:</strong> This will
 	 * reset all scores calculated so far! Only call this before any events are generated in an iteration.
@@ -1012,7 +1013,7 @@ public class Controler {
 			}
 		}
 
-		if (this.roadPricing != null && this.roadPricing.getRoadPricingScheme().getType().equals("area")) {
+		if ((this.roadPricing != null) && (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.roadPricing.getRoadPricingScheme().getType()))) {
 			return new PlansCalcAreaTollRoute(this.network, this.commonRoutingData, travelCosts, travelTimes, this.roadPricing.getRoadPricingScheme());
 		}
 		return new PlansCalcRouteLandmarks(this.network, this.commonRoutingData, travelCosts, travelTimes);
@@ -1042,11 +1043,11 @@ public class Controler {
 	public final World getWorld() {
 		return this.scenarioData.getWorld();
 	}
-	
+
 	public final Facilities getFacilities() {
 		return this.scenarioData.getFacilities();
 	}
-	
+
 	public final NetworkLayer getNetwork() {
 		return this.network;
 	}
