@@ -26,6 +26,12 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.scoring.ScoringFunction;
 
+/**
+ * A special {@linkplain ScoringFunction scoring function} that takes the paid tolls by the agents into
+ * account when calculating the score of a plan.
+ *
+ * @author mrieser
+ */
 public class RoadPricingScoringFunction implements ScoringFunction {
 
 	private final CalcPaidToll paidToll;

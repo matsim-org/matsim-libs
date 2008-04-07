@@ -24,9 +24,14 @@ import org.matsim.network.Link;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.router.util.TravelCostI;
 
+/**
+ * Calculates the travel costs for links, including tolls. Currently supports distance, cordon and area tolls.
+ *
+ * @author mrieser
+ */
 public class TollTravelCostCalculator implements TravelCostI {
 
-	private final RoadPricingScheme scheme;
+	/*package*/ final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
 	private final TravelCostI costHandler;
 
@@ -34,9 +39,9 @@ public class TollTravelCostCalculator implements TravelCostI {
 		this.scheme = scheme;
 		this.costHandler = costCalculator;
 
-		if (scheme.getType() == "distance") this.tollCostHandler = new DistanceTollCostBehaviour();
-		else if (scheme.getType() == "area") this.tollCostHandler = new AreaTollCostBehaviour();
-		else if (scheme.getType() == "cordon") this.tollCostHandler = new CordonTollCostBehaviour();
+		if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_DISTANCE) this.tollCostHandler = new DistanceTollCostBehaviour();
+		else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) this.tollCostHandler = new AreaTollCostBehaviour();
+		else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) this.tollCostHandler = new CordonTollCostBehaviour();
 		else {
 			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme + "\" is not supported.");
 		}
@@ -53,7 +58,7 @@ public class TollTravelCostCalculator implements TravelCostI {
 		public double getTollCost(Link link, double time);
 	}
 
-	private class DistanceTollCostBehaviour implements TollRouterBehaviour {
+	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		public double getTollCost(final Link link, final double time) {
 			Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
 			if (cost == null) {
@@ -63,7 +68,7 @@ public class TollTravelCostCalculator implements TravelCostI {
 		}
 	}
 
-	private class AreaTollCostBehaviour implements TollRouterBehaviour {
+	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		public double getTollCost(final Link link, final double time) {
 			RoadPricingScheme.Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
 			if (cost == null) {
@@ -76,15 +81,12 @@ public class TollTravelCostCalculator implements TravelCostI {
 		}
 	}
 
-	private class CordonTollCostBehaviour implements TollRouterBehaviour {
+	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		public double getTollCost(final Link link, final double time) {
 			RoadPricingScheme.Cost cost = TollTravelCostCalculator.this.scheme.getLinkCost(link.getId(), time);
 			if (cost == null) {
 				return 0.0;
 			}
-			/* just return some really high costs for tolled links, so that still a
-			 * route could be found if there is no other possibility.
-			 */
 			return cost.amount;
 		}
 	}

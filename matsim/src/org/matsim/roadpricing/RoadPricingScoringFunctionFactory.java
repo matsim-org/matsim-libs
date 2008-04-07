@@ -24,6 +24,11 @@ import org.matsim.plans.Plan;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 
+/**
+ * Factory for {@link RoadPricingScoringFunction}s.
+ *
+ * @author mrieser
+ */
 public class RoadPricingScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CalcPaidToll paidToll;

@@ -26,14 +26,19 @@ import org.matsim.network.Link;
 import org.matsim.utils.misc.Time;
 import org.matsim.writer.MatsimXmlWriter;
 
+/**
+ * Writes a {@link RoadPricingScheme} to a file according to <code>roadpricing_v1.dtd</code>.
+ *
+ * @author mrieser
+ */
 public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 
 	private final RoadPricingScheme scheme;
-	
+
 	public RoadPricingWriterXMLv1(final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 	}
-	
+
 	public void writeFile(final String filename) throws IOException {
 		openFile(filename);
 		writeXmlHead();
@@ -41,32 +46,32 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 		write();
 		close();
 	}
-	
+
 	private void write() throws IOException {
 		this.writer.write("<roadpricing type=\"" + this.scheme.getType() + "\" name=\"" + this.scheme.getName() + "\">\n");
-		
+
 		// description
 		this.writer.write("\t<description>" + this.scheme.getDescription() + "</description>\n");
-		
+
 		// links
 		this.writer.write("\t<links>\n");
 		for (Link link : this.scheme.getLinks()) {
 			this.writer.write("\t\t<link id=\"" + link.getId().toString() + "\" />\n");
 		}
 		this.writer.write("\t</links>\n");
-		
+
 		// cost
-		if (this.scheme.getType() == "distance") {
+		if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_DISTANCE) {
 			this.writer.write("\t<!-- amount: [monetary unit] / [link length unit] -->\n");
-		} else if (this.scheme.getType() == "area") {
+		} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
 			this.writer.write("\t<!-- amount: [monetary unit] / [simulation] -->\n");
-		} else if (this.scheme.getType() == "cordon") {
+		} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) {
 			this.writer.write("\t<!-- [monetary unit] / [travelling across a tolled link] -->\n");
 		}
-		
+
 		for (RoadPricingScheme.Cost cost : this.scheme.getCosts()) {
 			this.writer.write("\t<cost ");
-			if (cost.startTime != Time.UNDEFINED_TIME) {				
+			if (cost.startTime != Time.UNDEFINED_TIME) {
 				this.writer.write("start_time=\"" + Time.writeTime(cost.startTime) + "\" ");
 			}
 			if (cost.endTime != Time.UNDEFINED_TIME) {
@@ -74,7 +79,7 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 			}
 			this.writer.write("amount=\"" + cost.amount + "\" />\n");
 		}
-		
+
 		// finish
 		this.writer.write("</roadpricing>");
 	}

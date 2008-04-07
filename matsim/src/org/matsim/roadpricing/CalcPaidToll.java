@@ -38,8 +38,7 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  *
  * @author mrieser
  */
-public class CalcPaidToll implements EventHandlerLinkEnterI,
-		EventHandlerAgentWait2LinkI {
+public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWait2LinkI {
 
 	static class AgentInfo {
 		public double toll = 0.0;
@@ -52,20 +51,19 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 
 	private TollBehaviourI handler = null;
 
-	public CalcPaidToll(final NetworkLayer network,
-			final RoadPricingScheme scheme) {
+	public CalcPaidToll(final NetworkLayer network, final RoadPricingScheme scheme) {
 		super();
 		this.network = network;
 		this.scheme = scheme;
-		if ("distance".equals(scheme.getType()))
+		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
 			this.handler = new DistanceTollBehaviour();
-		else if ("area".equals(scheme.getType()))
+		} else if (RoadPricingScheme.TOLL_TYPE_AREA.equals(scheme.getType())) {
 			this.handler = new AreaTollBehaviour();
-		else if ("cordon".equals(scheme.getType()))
+		} else if (RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType())) {
 			this.handler = new CordonTollBehaviour();
-		else
-			throw new IllegalArgumentException("RoadPricingScheme of type \""
-					+ scheme.getType() + "\" is not supported.");
+		} else {
+			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
+		}
 	}
 
 	public void handleEvent(final EventLinkEnter event) {
@@ -120,9 +118,9 @@ public class CalcPaidToll implements EventHandlerLinkEnterI,
 	public int getDraweesNr() {
 		int dwCnt = 0;
 		for (AgentInfo ai : this.agents.values()) {
-			if (ai != null)
-				if (ai.toll > 0.0)
+			if ((ai != null) && (ai.toll > 0.0)) {
 					dwCnt++;
+			}
 		}
 		return dwCnt;
 	}
