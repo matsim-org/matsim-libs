@@ -22,6 +22,8 @@ package org.matsim.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTolledTripLength;
+import org.matsim.config.groups.StrategyConfigGroup;
+import org.matsim.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.StartupEvent;
@@ -38,7 +40,7 @@ import org.matsim.roadpricing.TollTravelCostCalculator;
  *
  * @author mrieser
  */
-public class RoadPricing implements StartupListener, IterationEndsListener{
+public class RoadPricing implements StartupListener, IterationEndsListener {
 
 	private RoadPricingScheme scheme = null;
 	private CalcPaidToll tollCalc = null;
@@ -57,43 +59,37 @@ public class RoadPricing implements StartupListener, IterationEndsListener{
 		}
 		this.scheme = rpReader.getScheme();
 
+		if (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scheme.getType())) {
+			// checks that the replanning strategies don't specify a certain router, as we need a special router ourselves.
+			final StrategyConfigGroup config = controler.getConfig().strategy();
+			for (StrategySettings settings : config.getStrategySettings()) {
+				if (settings.getModuleName().startsWith("ReRoute_")) {
+					throw new RuntimeException("The replanning module " + settings.getModuleName() + " is not supported together with an area toll. Please use the normal \"ReRoute\" instead.");
+				}
+			}
+		}
+
 		// add the events handler to calculate the tolls paid by agents
 		this.tollCalc = new CalcPaidToll(controler.getNetwork(), this.scheme);
 		controler.getEvents().addHandler(this.tollCalc);
 
 		// add the toll-score to the existing scoring function
-		controler.setScoringFunctionFactory(
-				new RoadPricingScoringFunctionFactory(this.tollCalc, controler.getScoringFunctionFactory()));
+		controler.setScoringFunctionFactory(new RoadPricingScoringFunctionFactory(this.tollCalc, controler.getScoringFunctionFactory()));
 		log.debug("Loaded RoadPricingScoringFunctionFactory and set in controler");
 		// replace the travelCostCalculator with a toll-dependent one if required
-		if ("distance".equals(this.scheme.getType()) || "cordon".equals(this.scheme.getType())) {
+		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
+			// area-toll requires a regular TravelCostI, no toll-specific one.
 			controler.setTravelCostCalculator(new TollTravelCostCalculator(controler.getTravelCostCalculator(), this.scheme));
 		}
 
 		this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);
 		controler.getEvents().addHandler(this.cattl);
-
-		// TODO [MR] I think that the Area-Router is not yet loaded (never was, neither in this nor in the old controler)
-
 	}
 
-/*/	public void notifyIterationStarts(IterationStartsEvent event) {
-//		int it = event.getIteration();
-//		cas.reset(it);
-//		ctpf.reset(it);
-//		cattl.reset(it);
-//	}*/
-
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		int it = event.getIteration();
-		if (it % 1 == 0) {
-			log.info("The sum of all paid tolls : "
-					+ this.tollCalc.getAllAgentsToll() + " Euro.");
-			log.info("The number of people, who paid toll : "
-					+ this.tollCalc.getDraweesNr());
-			log.info("The average paid trip length : "
-					+ this.cattl.getAverageTripLength() + " m.");
-		}
+	public void notifyIterationEnds(final IterationEndsEvent event) {
+		log.info("The sum of all paid tolls : " + this.tollCalc.getAllAgentsToll() + " Euro.");
+		log.info("The number of people, who paid toll : " + this.tollCalc.getDraweesNr());
+		log.info("The average paid trip length : " + this.cattl.getAverageTripLength() + " m.");
 	}
 
 	public RoadPricingScheme getRoadPricingScheme() {
@@ -104,13 +100,15 @@ public class RoadPricing implements StartupListener, IterationEndsListener{
 		return this.tollCalc;
 	}
 
-	public double getAllAgentsToll(){
+	public double getAllAgentsToll() {
 		return this.tollCalc.getAllAgentsToll();
 	}
-	public int getDraweesNr(){
+
+	public int getDraweesNr() {
 		return this.tollCalc.getDraweesNr();
 	}
-	public double getAvgPaidTripLength(){
+
+	public double getAvgPaidTripLength() {
 		return this.cattl.getAverageTripLength();
 	}
 }

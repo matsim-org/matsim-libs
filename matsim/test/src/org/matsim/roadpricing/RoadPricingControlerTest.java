@@ -20,9 +20,12 @@
 
 package org.matsim.roadpricing;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
+import org.matsim.gbl.Gbl;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.router.util.TravelCostI;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -33,6 +36,8 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class RoadPricingControlerTest extends MatsimTestCase {
 
+	static private final Logger log = Logger.getLogger(RoadPricingControlerTest.class);
+
 	/**
 	 * Make sure that the road-pricing classes are not loaded when no road pricing is simulated.
 	 */
@@ -41,11 +46,13 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setLastIteration(0);
 		Controler controler = new TestControler(config);
 		controler.run();
-		assertNull("RoadPricing shouldn't be loaded in case case.", controler.getRoadPricing());
+		assertNull("RoadPricing must not be loaded in case case.", controler.getRoadPricing());
 		PlanAlgorithmI router = controler.getRoutingAlgorithm();
-		assertFalse("BaseCase should not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
+		assertFalse("BaseCase must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
-		assertFalse("BaseCase should not use roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
+		assertFalse("BaseCase must not use roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
+		TravelCostI travelCosts = controler.getTravelCostCalculator();
+		assertFalse("BaseCase must not use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
 
 	public void testDistanceToll() {
@@ -54,11 +61,13 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
 		Controler controler = new TestControler(config);
 		controler.run();
-		assertNotNull("RoadPricing should be loaded in distance toll case.", controler.getRoadPricing());
+		assertNotNull("RoadPricing must be loaded in distance toll case.", controler.getRoadPricing());
 		PlanAlgorithmI router = controler.getRoutingAlgorithm();
-		assertFalse("distance toll should not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
+		assertFalse("Distance toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
-		assertTrue("distance toll should use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
+		assertTrue("Distance toll must use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
+		TravelCostI travelCosts = controler.getTravelCostCalculator();
+		assertTrue("Distance toll must use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
 
 	public void testCordonToll() {
@@ -67,11 +76,13 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "cordonToll.xml");
 		Controler controler = new TestControler(config);
 		controler.run();
-		assertNotNull("RoadPricing should be loaded in cordon toll case.", controler.getRoadPricing());
+		assertNotNull("RoadPricing must be loaded in cordon toll case.", controler.getRoadPricing());
 		PlanAlgorithmI router = controler.getRoutingAlgorithm();
-		assertFalse("cordon toll should not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
+		assertFalse("Cordon toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
-		assertTrue("cordon toll should use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
+		assertTrue("Cordon toll must use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
+		TravelCostI travelCosts = controler.getTravelCostCalculator();
+		assertTrue("Cordon toll must use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
 
 	public void testAreaToll() {
@@ -82,10 +93,67 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		controler.run();
 		assertNotNull("RoadPricing should be loaded in area toll case.", controler.getRoadPricing());
 		PlanAlgorithmI router = controler.getRoutingAlgorithm();
-		assertTrue("area toll should use area-toll router.", router instanceof PlansCalcAreaTollRoute);
+		assertTrue("Area toll should use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
-		assertTrue("area toll should use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
+		assertTrue("Area toll must use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
+		TravelCostI travelCosts = controler.getTravelCostCalculator();
+		assertFalse("Area toll must not use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
+
+	/** Checks that inconsistencies in the configuration are recognized, namely with the replanning strategies.
+	 *
+	 * @author mrieser
+	 */
+	public void testAreaTollStrategyConfig() {
+		// start with the default configuration, which is ok.
+		Config config = loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setLastIteration(0);
+		config.roadpricing().setTollLinksFile(getInputDirectory() + "areaToll.xml");
+		try {
+			Controler controler = new TestControler(config);
+			controler.run();
+		} catch (RuntimeException unexpected) {
+			throw unexpected;
+		}
+
+		// now add a strategy that is not okay
+		int index = config.strategy().getStrategySettings().size() + 1;
+		config.strategy().addParam("Module_" + index, "ReRoute_Landmarks");
+		config.strategy().addParam("ModuleProbability_" + index, "0.1");
+		try {
+			Gbl.reset();
+			Controler controler = new TestControler(config);
+			controler.setOverwriteFiles(true);
+			controler.run();
+			fail("Expected RuntimeException because of ReRoute_Landmarks, but got none.");
+		} catch (RuntimeException expected) {
+			log.info("Catched RuntimeException as expected: " + expected.getMessage());
+		}
+
+		// try to fix the strategy, but fail again
+		config.strategy().addParam("Module_" + index, "ReRoute_Dijkstra");
+		try {
+			Gbl.reset();
+			Controler controler = new TestControler(config);
+			controler.setOverwriteFiles(true);
+			controler.run();
+			fail("Expected RuntimeException because of ReRoute_Dijkstra, but got none.");
+		} catch (RuntimeException expected) {
+			log.info("Catched RuntimeException as expected: " + expected.getMessage());
+		}
+
+		// now fix it
+		config.strategy().addParam("Module_" + index, "ReRoute");
+		try {
+			Gbl.reset();
+			Controler controler = new TestControler(config);
+			controler.setOverwriteFiles(true);
+			controler.run();
+		} catch (RuntimeException unexpected) {
+			throw unexpected;
+		}
+	}
+
 
 	/** Just a simple Controler that does not run the mobsim, as we're not interested in that part here. */
 	private static class TestControler extends Controler {
