@@ -22,10 +22,13 @@ package playground.balmermi;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.algorithms.NetworkCalcTopoType;
+import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
+import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.network.algorithms.NetworkWriteAsTable;
 
 import playground.balmermi.modules.ivtch.NetworkParseETNet;
-import playground.balmermi.modules.ivtch.NetworkSimplifyAttributes;
 
 public class CleanNetwork {
 
@@ -37,12 +40,14 @@ public class CleanNetwork {
 
 		System.out.println("RUN: cleanNetwork");
 
+//		Config config = Gbl.createConfig(null);
+//		config.config().setOutputFile("output_config.xml");
 		Scenario.setUpScenarioConfig();
-		NetworkLayer network = Scenario.readNetwork();
-//		NetworkLayer network = new NetworkLayer();
+//		NetworkLayer network = Scenario.readNetwork();
+		NetworkLayer network = new NetworkLayer();
 
 		System.out.println("  running Network Validation and cleaning algorithms... ");
-//		new NetworkParseETNet("../../input/nodes.txt","../../input/linksET.txt").run(network);
+		new NetworkParseETNet("../../input/nodes.txt","../../input/linksET.txt").run(network);
 //		new NetworkSetDefaultCapacities().run(network);
 //		NetworkWriteETwithCounts nwetwc = new NetworkWriteETwithCounts(Counts.getSingleton());
 //		nwetwc.run(network);
@@ -52,20 +57,20 @@ public class CleanNetwork {
 //		NetworkWriteAsTable nwat = new NetworkWriteAsTable(Scenario.output_directory);
 //		nwat.run(network);
 //		nwat.close();
-//		network.addAlgorithm(new NetworkSummary());
+		network.addAlgorithm(new NetworkSummary());
 //		network.addAlgorithm(new NetworkAdaptCHNavtec());
 //		network.addAlgorithm(new NetworkSummary());
-//		network.addAlgorithm(new NetworkCleaner(false));
+		network.addAlgorithm(new NetworkCleaner(false));
 //		network.addAlgorithm(new NetworkSummary());
-//		network.addAlgorithm(new NetworkMergeDoubleLinks());
+		network.addAlgorithm(new NetworkMergeDoubleLinks());
 //		network.addAlgorithm(new NetworkSummary());
-//		network.addAlgorithm(new NetworkCalcTopoType());
-//		network.addAlgorithm(new NetworkSummary());
-//		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
-//		network.addAlgorithm(nwat);
-//		network.addAlgorithm(new NetworkSummary());
-//		network.runAlgorithms();
-//		nwat.close();
+		network.addAlgorithm(new NetworkCalcTopoType());
+		network.addAlgorithm(new NetworkSummary());
+		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
+		network.addAlgorithm(nwat);
+		network.addAlgorithm(new NetworkSummary());
+		network.runAlgorithms();
+		nwat.close();
 
 //		new NetworkSummary().run(network);
 //		new NetworkTransform(new CH1903LV03toWGS84()).run(network);
@@ -78,6 +83,7 @@ public class CleanNetwork {
 //		System.out.println("  done.");
 //
 		Scenario.writeNetwork(network);
+		Scenario.writeConfig();
 
 		System.out.println("RUN: cleanNetwork finished.");
 		System.out.println();

@@ -30,26 +30,21 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
+import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.PreProcessLandmarks;
 
 import playground.balmermi.algos.PersonSubTourAnalysis;
 
 public class PersonStreaming {
 
-	public static void run() {
+	public static void run(String[] args) {
 
 		System.out.println("person streaming...");
 		
-		Scenario.setUpScenarioConfig();
+		Gbl.createConfig(args);
+//		Scenario.setUpScenarioConfig();
 		NetworkLayer network = Scenario.readNetwork();
-
-		//////////////////////////////////////////////////////////////////////
-
-//		System.out.println("  reading network xml file...");
-//		NetworkLayer network = null;
-//		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
-//		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-//		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -62,7 +57,7 @@ public class PersonStreaming {
 
 		//////////////////////////////////////////////////////////////////////
 
-//		System.out.println("  adding person modules... ");
+		System.out.println("  adding person modules... ");
 //		PersonSubTourAnalysis psta = new PersonSubTourAnalysis();
 //		plans.addAlgorithm(psta);
 //		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt");
@@ -70,7 +65,11 @@ public class PersonStreaming {
 //		plans.addAlgorithm(new PersonCalcTripDistances());
 //		PersonTripSummaryTable ptst = new PersonTripSummaryTable("output/output_trip-summary-table.txt");
 //		plans.addAlgorithm(ptst);
-//		System.out.println("  done.");
+//		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+//		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
+//		preprocess.run(network);
+//		plans.addAlgorithm(new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc));
+		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -94,16 +93,6 @@ public class PersonStreaming {
 
 		//////////////////////////////////////////////////////////////////////
 
-//		System.out.println("  writing network xml file... ");
-//		NetworkWriter net_writer = new NetworkWriter(network);
-//		net_writer.write();
-//		System.out.println("  done.");
-
-		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
-		config_writer.write();
-		System.out.println("  done.");
-
 		System.out.println("done.");
 		System.out.println();
 	}
@@ -115,7 +104,7 @@ public class PersonStreaming {
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 
-		run();
+		run(args);
 
 		Gbl.printElapsedTime();
 	}

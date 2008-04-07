@@ -61,7 +61,7 @@ public class NetworkCreateLSA {
 		this.readLSALaneMapping(this.inputfolder+"LSA-Spur-Mapping.txt");
 		this.readLaneLinkMapping(this.inputfolder+"Spur-Link-Mapping.txt",5);
 		this.readLSAGreentimes(this.inputfolder+"gruen_10_15_09.txt");
-		this.writeData(this.outputfolder+"greetimes.xml");
+		this.writeData(this.outputfolder+"greentimes.xml");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -372,11 +372,19 @@ public class NetworkCreateLSA {
 						// building the average over all LSA of that link
 						double gtf = 0.0;
 						lsa_it = lsas.iterator();
+						int isnan_cnt = 0;
 						while (lsa_it.hasNext()) {
 							LSA lsa = lsa_it.next();
-							gtf += lsa.getGTF(h);
+							if (Double.isNaN(lsa.getGTF(h))) {
+								System.out.println("gtf is NaN for: [intersec_id="+lsa.intersection.id + "][lsa_nr="+lsa.nr+"][h="+h+"]: ignoring LSA...");
+								isnan_cnt++;
+							}
+							else {
+								gtf += lsa.getGTF(h);
+							}
 						}
-						gtf = gtf/lsas.size();
+						if (isnan_cnt > 0) { System.out.println("isnan_cnt="+isnan_cnt); }
+						gtf = gtf/(lsas.size()-isnan_cnt);
 						if (Double.isNaN(gtf)) { Gbl.errorMsg("THAT SHOULD NOT HAPPEN!"); }
 						out.write("\t\t<gtf time=\"" + Time.writeTime(h*3600) + "\" val=\"" + gtf + "\"/>\n");
 					}
