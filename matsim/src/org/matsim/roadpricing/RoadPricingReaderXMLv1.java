@@ -27,6 +27,11 @@ import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 
+/**
+ * Reads XML files containing a {@link RoadPricingScheme} according to <code>roadpricing_v1.dtd</code>.
+ *
+ * @author mrieser
+ */
 public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 
 	private final static String TAG_ROADPRICING = "roadpricing";
@@ -36,43 +41,39 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 
 	private final static String ATTR_NAME = "name";
 	private final static String ATTR_TYPE = "type";
-	private final static String ATTR_ACTIVE = "active";
 	private final static String ATTR_ID = "id";
 	private final static String ATTR_START_TIME = "start_time";
 	private final static String ATTR_END_TIME = "end_time";
 	private final static String ATTR_AMOUNT = "amount";
 
-	private final static String YES = "yes";
-
 	private NetworkLayer network = null;
 
 	private RoadPricingScheme scheme = null;
 
-	public RoadPricingReaderXMLv1(NetworkLayer network) {
+	public RoadPricingReaderXMLv1(final NetworkLayer network) {
 		this.network = network;
 	}
 
 	public RoadPricingScheme getScheme() {
 		return this.scheme;
 	}
-	
+
 	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
+	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if (TAG_ROADPRICING.equals(name)) {
 			this.scheme = new RoadPricingScheme(this.network);
 			this.scheme.setName(atts.getValue(ATTR_NAME));
 			this.scheme.setType(atts.getValue(ATTR_TYPE));
-			this.scheme.isActive(YES.equals(atts.getValue(ATTR_ACTIVE)));
 		} else if (TAG_LINK.equals(name)) {
 			this.scheme.addLink(atts.getValue(ATTR_ID));
 		} else if (TAG_COST.equals(name)) {
-			this.scheme.addCost(Time.parseTime(atts.getValue(ATTR_START_TIME)), 
+			this.scheme.addCost(Time.parseTime(atts.getValue(ATTR_START_TIME)),
 					Time.parseTime(atts.getValue(ATTR_END_TIME)), Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
 		}
 	}
-	
+
 	@Override
-	public void endTag(String name, String content, Stack<String> context) {
+	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (TAG_DESCRIPTION.equals(name)) {
 			this.scheme.setDescription(content);
 		}

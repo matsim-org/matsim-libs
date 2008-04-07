@@ -29,14 +29,28 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.identifiers.IdI;
 
+/**
+ * A road pricing scheme (sometimes also called toll scheme) contains the type of the toll, a list of the
+ * tolled links and the (time-dependent) toll amount agents have to pay.
+ *
+ * @author mrieser
+ */
 public class RoadPricingScheme {
+
+	/** The type to be used for distance tolls. */
+	public static final String TOLL_TYPE_DISTANCE = "distance";
+
+	/** The type to be used for cordon tolls. */
+	public static final String TOLL_TYPE_CORDON = "cordon";
+
+	/** The type to be used for area tolls. */
+	public static final String TOLL_TYPE_AREA = "area";
 
 	private NetworkLayer network = null;
 	private TreeMap<IdI, Link> links = null;
 
 	private String name = null;
 	private String type = null;
-	private boolean active = false;
 	private String description = null;
 	private ArrayList<Cost> costs = null;
 
@@ -73,14 +87,6 @@ public class RoadPricingScheme {
 		return this.type;
 	}
 
-	public void isActive(final boolean active) {
-		this.active = active;
-	}
-
-	public boolean isActive() {
-		return this.active;
-	}
-
 	public void setDescription(final String description) {
 		this.description = description;
 	}
@@ -112,7 +118,7 @@ public class RoadPricingScheme {
 		return this.costs;
 	}
 
-	/** @return Returns all Cost objects as an array for faster iteration. */
+	/** @return all Cost objects as an array for faster iteration. */
 	public Cost[] getCostArray() {
 		if (this.cacheIsInvalid) buildCache();
 		return this.costCache.clone();
@@ -147,6 +153,11 @@ public class RoadPricingScheme {
 		this.cacheIsInvalid = false;
 	}
 
+	/**
+	 * A single, time-dependent toll-amount for a roadpricing scheme.
+	 *
+	 * @author mrieser
+	 */
 	static public class Cost {
 		public final double startTime;
 		public final double endTime;
