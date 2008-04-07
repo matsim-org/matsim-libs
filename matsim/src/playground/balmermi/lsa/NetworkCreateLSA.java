@@ -25,6 +25,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -345,6 +346,23 @@ public class NetworkCreateLSA {
 	//////////////////////////////////////////////////////////////////////
 
 	public final void writeData(String outfile) {
+		// HARDCODED: links with LSA's which should be ignored
+		// for the ivtch network
+		ArrayList<IdI> links_to_ignore = new ArrayList<IdI>();
+		links_to_ignore.add(new Id(106026));
+		links_to_ignore.add(new Id(106305));
+		links_to_ignore.add(new Id(106307));
+		links_to_ignore.add(new Id(106308));
+		links_to_ignore.add(new Id(106309));
+		links_to_ignore.add(new Id(106310));
+		links_to_ignore.add(new Id(106312));
+		links_to_ignore.add(new Id(106315));
+		links_to_ignore.add(new Id(106317));
+		links_to_ignore.add(new Id(106318));
+		links_to_ignore.add(new Id(106319));
+		links_to_ignore.add(new Id(106320));
+		links_to_ignore.add(new Id(106322));
+
 		try {
 			FileWriter fw = new FileWriter(outfile);
 			BufferedWriter out = new BufferedWriter(fw);
@@ -355,7 +373,10 @@ public class NetworkCreateLSA {
 				IdI id = id_it.next();
 				Link link = this.network.getLink(id);
 				HashSet<LSA> lsas = this.lsalinklist.get(id);
-				if (!lsas.isEmpty()) {
+				if (links_to_ignore.contains(id)){
+					System.out.println("Link id=" + id + " will be ignored. (no LSA for that link)!");
+				}
+				else if (!lsas.isEmpty()) {
 					// create description
 					String desc = "StadtZH: ";
 					Iterator<LSA> lsa_it = lsas.iterator();
