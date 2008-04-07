@@ -30,6 +30,9 @@ import org.matsim.utils.io.IOUtils;
 
 public class MatsimTestCase extends TestCase {
 
+	/** A constant for the exactness when comparing doubles. */
+	public static final double EPSILON = 1e-10;
+
 	/** The default output directory, where files of this test should be written to.
 	 * Includes the trailing '/' to denote a directory. */
 	private String outputDirectory = null;
