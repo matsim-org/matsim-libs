@@ -32,16 +32,24 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.yu.analysis.PtCheck;
 
 /**
+ * This TestCase should ensure the correct behavior of agents when different
+ * values for beta_travelingPt-parameters are used. The agents drive on the
+ * equil-net, but can neither do departure-time adaptation, nor rerouting. This
+ * leads to all agents driving through the same one route in the network. The
+ * agents can only choose plans with type "car" or "pt".
+ * 
  * @author ychen
  * 
  */
 public class PtTest extends MatsimTestCase {
-	private static class TestControler extends Controler {
-		public TestControler(String configFileName) {
-			super(configFileName);
-		}
-	}
 
+	/**
+	 * Responsible for the verification of the tests. It adds a PersonAlgorithm
+	 * (PtCheck) and checks their result (number of ptUsers) in some specific
+	 * iterations.
+	 * 
+	 * @author ychen
+	 */
 	private static class TestControlerListener implements IterationEndsListener {
 		private PtCheck pc;
 
@@ -56,6 +64,7 @@ public class PtTest extends MatsimTestCase {
 			if (idx % 10 == 0) {
 				pc.resetCnt();
 				pc.run(event.getControler().getPopulation());
+				// AUTOMATIC VERIFICATION OF THE TESTS
 				if (betaPt == -6) {
 					System.out
 							.println("checking results for case `beta_travel = -6'...");
@@ -81,8 +90,7 @@ public class PtTest extends MatsimTestCase {
 						break;
 					}
 					assertEquals(criterion, pc.getPtUserCnt());
-				}
-				if (betaPt == -3) {
+				} else if (betaPt == -3) {
 					System.out
 							.println("checking results for case `beta_travel = -3'...");
 					int criterion = 0;
@@ -113,18 +121,21 @@ public class PtTest extends MatsimTestCase {
 	}
 
 	/**
-	 * 
+	 * Runs the test with a value of -6 for beta_travelingPt.
 	 */
 	public void testbetaPt_6() {
-		TestControler controler = new TestControler(
+		Controler controler = new Controler(
 				"test/yu/testCases/testPt/config-6.xml");
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.run();
 	}
 
+	/**
+	 * Runs the test with a value of -3 for beta_travelingPt
+	 */
 	public void testbetaPt_3() {
-		TestControler controler = new TestControler(
+		Controler controler = new Controler(
 				"test/yu/testCases/testPt/config-3.xml");
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);

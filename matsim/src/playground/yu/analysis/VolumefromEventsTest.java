@@ -20,9 +20,7 @@
 
 package playground.yu.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.analysis.VolumesAnalyzer;
@@ -34,7 +32,6 @@ import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
 public class VolumefromEventsTest {
@@ -44,10 +41,10 @@ public class VolumefromEventsTest {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		// final String plansFilename = "./examples/equil/plans100.xml";
 		final String eventsFilename = "./test/yu/test/input/miv_zrh30km_10pct100.events.txt.gz";
-		final String volumeTestFilename="./test/yu/test/output/miv_zrh30km_10pct100.eventsVolumeTest.txt.gz";
+		final String volumeTestFilename = "./test/yu/test/output/miv_zrh30km_10pct100.eventsVolumeTest.txt.gz";
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(null
-		//					new String[] { "./test/yu/test/configTest.xml" }
+		// new String[] { "./test/yu/test/configTest.xml" }
 				);
 
 		World world = Gbl.getWorld();
@@ -56,62 +53,18 @@ public class VolumefromEventsTest {
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
-		// Map<IdI, QueueLink> links = (Map<IdI, QueueLink>) network.getLinks();
-		/*
-		 * try { // BufferedWriter out = IOUtils //
-		 * .getBufferedWriter("./test/yu/test/output/capTest.txt.gz"); //
-		 * out.write("linkId\tCapacity\tSimulationFlowCapacity\n"); //
-		 * out.flush(); // for (QueueLink ql : links.values()) { //
-		 * out.write(ql.getId().toString() + "\t" + ql.getCapacity() // + "\t" +
-		 * ql.getSimulatedFlowCapacity() + "\n"); // out.flush(); // } //
-		 * out.close(); // } catch (FileNotFoundException e) { //
-		 * e.printStackTrace(); // } catch (IOException e) { //
-		 * e.printStackTrace(); // } // Plans population = new Plans(); // new
-		 * MatsimPlansReader(population).readFile(plansFilename); //
-		 * world.setPopulation(population);
-		 */
-
 		Events events = new Events();
 		VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1,
 				network);
+
 		events.addHandler(volumes);
+
 		new MatsimEventsReader(events).readFile(eventsFilename);
-		Map<IdI, QueueLink> links = (Map<IdI, QueueLink>) network.getLinks();
-		try {
-			BufferedWriter out = IOUtils
-					.getBufferedWriter(volumeTestFilename);
-			StringBuffer head = new StringBuffer(
-					"linkId\tCapacity\tSimulationFlowCapacity");
-			for (int i = 0; i < 24; i++) {
-				head.append("\tH" + Integer.toString(i) + "-"
-						+ Integer.toString(i + 1));
-			}
-			head.append("\n");
-			out.write(head.toString());
-			out.flush();
-			for (QueueLink ql : links.values()) {
-				int[] v = volumes.getVolumesForLink(ql.getId().toString());
-				StringBuffer line = new StringBuffer(ql.getId().toString()
-						+ "\t" + ql.getCapacity() + "\t"
-						+ ql.getSimulatedFlowCapacity());
-				if (v != null) {
-					for (int j = 0; j < 24; j++) {
-						line.append("\t" + v[j]);
-					}
-				} else {
-					for (int k = 0; k < 24; k++) {
-						line.append("\t" + 0);
-					}
-				}
-				line.append("\n");
-				out.write(line.toString());
-				out.flush();
-			}
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+
+		Map<String, Double> vol7s = new HashMap<String, Double>();
+		for (QueueLink ql : ((Map<IdI, QueueLink>) network.getLinks()).values()) {
+			int[] v = volumes.getVolumesForLink(ql.getId().toString());
+			vol7s.put(ql.getId().toString(), (double) ((v != null) ? v[7] : 0));
 		}
 		System.out.println("-> Done!");
 		System.exit(0);

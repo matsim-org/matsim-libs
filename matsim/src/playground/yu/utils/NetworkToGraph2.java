@@ -22,8 +22,9 @@ package playground.yu.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
-import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
@@ -52,20 +53,17 @@ public class NetworkToGraph2 {
 	private NetworkLayer network;
 	private CoordinateReferenceSystem crs;
 	private GeometryFactory geofac;
+	private Collection<Feature> features;
+	private DefaultFeatureTypeFactory dftf;
+	private List<Map<String, ?>> parameters = new ArrayList<Map<String, ?>>();
+	private List<AttributeType> attrTypes = new ArrayList<AttributeType>();
 
 	public NetworkToGraph2(NetworkLayer network,
 			CoordinateReferenceSystem coordinateReferenceSystem) {
 		this.geofac = new GeometryFactory();
 		this.network = network;
 		this.crs = coordinateReferenceSystem;
-	}
-
-	public Collection<Feature> generateFromNet()
-			throws FactoryRegistryException, SchemaException,
-			IllegalAttributeException {
-
-		Collection<Feature> features = new ArrayList<Feature>();
-
+		features = new ArrayList<Feature>();
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
 				"LineString", LineString.class, true, null, null, this.crs);
 		AttributeType id = AttributeTypeFactory.newAttributeType("ID",
@@ -80,12 +78,31 @@ public class NetworkToGraph2 {
 				Double.class);
 		AttributeType type = AttributeTypeFactory.newAttributeType("type",
 				Integer.class);
-		DefaultFeatureTypeFactory dftf = new DefaultFeatureTypeFactory();
+		AttributeType freespeed = AttributeTypeFactory.newAttributeType(
+				"freespeed", Double.class);
+		dftf = new DefaultFeatureTypeFactory();
 		dftf.setName("link");
 		dftf.addTypes(new AttributeType[] { geom, id, fromNode, toNode, length,
-				cap, type });
-		FeatureType ftRoad = dftf.getFeatureType();
+				cap, type, freespeed });
+	}
 
+	public void addParameter(String paramName, Class<?> clazz,
+			Map<String, ?> params) {
+		attrTypes.add(AttributeTypeFactory.newAttributeType(paramName, clazz));
+		this.parameters.add(params);
+	}
+
+	/**
+	 * @return the features
+	 * @throws SchemaException
+	 * @throws IllegalAttributeException
+	 * @throws NumberFormatException
+	 */
+	public Collection<Feature> getFeatures() throws SchemaException,
+			NumberFormatException, IllegalAttributeException {
+		for (int i = 0; i < attrTypes.size(); i++)
+			dftf.addType(attrTypes.get(i));
+		FeatureType ftRoad = dftf.getFeatureType();
 		for (Link link : this.network.getLinks().values()) {
 			LineString ls = new LineString(
 					new CoordinateArraySequence(
@@ -94,13 +111,21 @@ public class NetworkToGraph2 {
 											.getCoord()),
 									MGC.coord2Coordinate(link.getToNode()
 											.getCoord()) }), this.geofac);
-
-			Feature ft = ftRoad.create(new Object[] { ls,
-					link.getId().toString(),
-					link.getFromNode().getId().toString(),
-					link.getToNode().getId().toString(), link.getLength(),
-					link.getCapacity() / network.getCapacityPeriod() * 3600.0,
-					Integer.parseInt(link.getType()) }, "network");
+			int size = 8 + parameters.size();
+			Object[] o = new Object[size];
+			o[0] = ls;
+			o[1] = link.getId().toString();
+			o[2] = link.getFromNode().getId().toString();
+			o[3] = link.getToNode().getId().toString();
+			o[4] = link.getLength();
+			o[5] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
+			o[6] = Integer.parseInt(link.getType());
+			o[7] = link.getFreespeed(0);
+			for (int i = 0; i < parameters.size(); i++) {
+				o[i + 8] = parameters.get(i).get(link.getId().toString());
+			}
+			// parameters.get(link.getId().toString()) }
+			Feature ft = ftRoad.create(o, "network");
 			features.add(ft);
 		}
 		return features;
