@@ -33,14 +33,15 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.identifiers.IdI;
 
-
 /**
  * @author dgrether
  *
  */
-public class TravelTimeTest extends MatsimTestCase implements EventHandlerLinkLeaveI, EventHandlerLinkEnterI {
+public class TravelTimeTest extends MatsimTestCase implements
+		EventHandlerLinkLeaveI, EventHandlerLinkEnterI {
 
-	private Map<IdI, Double> travelTimes = new HashMap<IdI, Double>();
+
+  private Map<IdI, Map<IdI, Double>> agentTravelTimes;
 
 	/**
 	 * @see junit.framework.TestCase#setUp()
@@ -51,8 +52,8 @@ public class TravelTimeTest extends MatsimTestCase implements EventHandlerLinkLe
 	}
 
 	public void testEquilOneAgent() {
+		this.agentTravelTimes = new HashMap<IdI, Map<IdI, Double>>();
 		Config conf = loadConfig("test/scenarios/equil/config.xml");
-//		String netFileName = "test/scenarios/equil/network.xml";
 		String popFileName = "test/scenarios/equil/plans1.xml";
 
 		conf.plans().setInputFile(popFileName);
@@ -63,31 +64,68 @@ public class TravelTimeTest extends MatsimTestCase implements EventHandlerLinkLe
 		events.addHandler(this);
 		controler.run();
 
-		assertEquals(360.0, this.travelTimes.get(new Id(6)));
-		assertEquals(180.0, this.travelTimes.get(new Id(15)));
-		assertEquals(13560.0, this.travelTimes.get(new Id(20)));
-		assertEquals(360.0, this.travelTimes.get(new Id(21)));
-		assertEquals(1260.0, this.travelTimes.get(new Id(22)));
-		assertEquals(360.0, this.travelTimes.get(new Id(23)));
+		Map<IdI, Double> travelTimes = this.agentTravelTimes.get(new Id("1"));
+		assertEquals(360.0, travelTimes.get(new Id(6)));
+		assertEquals(180.0, travelTimes.get(new Id(15)));
+		assertEquals(13560.0, travelTimes.get(new Id(20)));
+		assertEquals(360.0, travelTimes.get(new Id(21)));
+		assertEquals(1260.0, travelTimes.get(new Id(22)));
+		assertEquals(360.0, travelTimes.get(new Id(23)));
+	}
+
+	public void testEquilTwoAgents() {
+		this.agentTravelTimes = new HashMap<IdI, Map<IdI, Double>>();
+		Config conf = loadConfig("test/scenarios/equil/config.xml");
+		String popFileName = "test/scenarios/equil/plans2.xml";
+
+		conf.plans().setInputFile(popFileName);
+		conf.controler().setLastIteration(0);
+
+		Controler controler = new Controler(conf);
+		Events events = controler.getEvents();
+		events.addHandler(this);
+		controler.run();
+
+		Map<IdI, Double> travelTimes = this.agentTravelTimes.get(new Id("1"));
+		assertEquals(360.0, travelTimes.get(new Id(6)));
+		assertEquals(180.0, travelTimes.get(new Id(15)));
+		assertEquals(13560.0, travelTimes.get(new Id(20)));
+		assertEquals(360.0, travelTimes.get(new Id(21)));
+		assertEquals(1260.0, travelTimes.get(new Id(22)));
+		assertEquals(360.0, travelTimes.get(new Id(23)));
+
+
+		travelTimes = this.agentTravelTimes.get(new Id("2"));
+		assertEquals(360.0, travelTimes.get(new Id(5)));
+		assertEquals(180.0, travelTimes.get(new Id(14)));
+		assertEquals(13560.0, travelTimes.get(new Id(20)));
+		assertEquals(360.0, travelTimes.get(new Id(21)));
+		assertEquals(1260.0, travelTimes.get(new Id(22)));
+		assertEquals(360.0, travelTimes.get(new Id(23)));
+
 	}
 
 	public void handleEvent(EventLinkEnter event) {
-		this.travelTimes.put(event.link.getId(), event.time);
+		Map<IdI, Double> travelTimes = this.agentTravelTimes.get(event.agent.getId());
+		if (travelTimes == null) {
+			travelTimes = new HashMap<IdI, Double>();
+			this.agentTravelTimes.put(event.agent.getId(), travelTimes);
+		}
+		travelTimes.put(event.link.getId(), event.time);
 	}
 
-
 	public void handleEvent(EventLinkLeave event) {
-		Double d = this.travelTimes.get(event.link.getId());
-		if (d != null) {
-			Double time = event.time - d.doubleValue();
-			this.travelTimes.put(event.link.getId(), time);
+		Map<IdI, Double> travelTimes = this.agentTravelTimes.get(event.agent.getId());
+		if (travelTimes != null) {
+			Double d = travelTimes.get(event.link.getId());
+			if (d != null) {
+				Double time = event.time - d.doubleValue();
+				travelTimes.put(event.link.getId(), time);
+			}
 		}
 	}
 
 	public void reset(int iteration) {
 	}
-
-
-
 
 }
