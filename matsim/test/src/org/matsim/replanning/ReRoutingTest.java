@@ -20,6 +20,7 @@
 
 package org.matsim.replanning;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
@@ -28,6 +29,8 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
 public class ReRoutingTest extends MatsimTestCase {
+
+	private static final Logger log = Logger.getLogger(ReRoutingTest.class);
 
 	public void testReRouting() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
@@ -38,11 +41,18 @@ public class ReRoutingTest extends MatsimTestCase {
 		controler.setCreateGraphs(false);
 		controler.run();
 
-		System.out.println("calculating checksums...");
-		long checksum1 = CRCChecksum.getCRCFromGZFile(getInputDirectory() + "plans.xml.gz");
-		long checksum2 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz");
-		System.out.println("checksum1 = " + checksum1);
-		System.out.println("checksum2 = " + checksum2);
+		log.info("calculating checksums for events...");
+		long checksum1 = CRCChecksum.getCRCFromGZFile(getInputDirectory() + "0.events.txt.gz");
+		long checksum2 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "ITERS/it.0/0.events.txt.gz");
+		log.info("checksum1 = " + checksum1);
+		log.info("checksum2 = " + checksum2);
+		assertEquals(checksum1, checksum2);
+
+		log.info("calculating checksums for plans...");
+		checksum1 = CRCChecksum.getCRCFromGZFile(getInputDirectory() + "plans.xml.gz");
+		checksum2 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz");
+		log.info("checksum1 = " + checksum1);
+		log.info("checksum2 = " + checksum2);
 		assertEquals(checksum1, checksum2);
 	}
 
@@ -62,7 +72,7 @@ public class ReRoutingTest extends MatsimTestCase {
 				throw new IllegalArgumentException("Controler.lastIteration must be at least 1. Current value is " + lastIter);
 			}
 			if (lastIter > 1) {
-				System.err.println("Controler.lastIteration is currently set to " + lastIter + ". Only the first iteration will be analyzed.");
+				log.error("Controler.lastIteration is currently set to " + lastIter + ". Only the first iteration will be analyzed.");
 			}
 		}
 
@@ -75,7 +85,7 @@ public class ReRoutingTest extends MatsimTestCase {
 				 */
 				super.runMobSim();
 			} else {
-				System.out.println("skipping mobsim, as it is not of interest in this iteration.");
+				log.info("skipping mobsim, as it is not of interest in this iteration.");
 			}
 		}
 
