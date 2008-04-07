@@ -33,8 +33,11 @@ public class AllTests {
 		if (TestDepth.getDepth() == TestDepth.extended) {
 			suite.addTestSuite(org.matsim.roadpricing.BetaTravelTest.class);
 		}
-		suite.addTestSuite(org.matsim.roadpricing.RoadPricingTest.class);
+		suite.addTestSuite(org.matsim.roadpricing.PlansCalcAreaTollRouteTest.class);
 		suite.addTestSuite(org.matsim.roadpricing.RoadPricingControlerTest.class);
+		suite.addTestSuite(org.matsim.roadpricing.RoadPricingIOTest.class);
+		suite.addTestSuite(org.matsim.roadpricing.RoadPricingScoringFunctionTest.class);
+		suite.addTestSuite(org.matsim.roadpricing.TollTravelCostCalculatorTest.class);
 		//$JUnit-END$
 		return suite;
 	}
