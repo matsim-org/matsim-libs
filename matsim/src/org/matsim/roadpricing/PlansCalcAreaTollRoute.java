@@ -23,7 +23,6 @@ package org.matsim.roadpricing;
 import java.util.ArrayList;
 
 import org.matsim.network.Link;
-import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
@@ -31,7 +30,7 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
 import org.matsim.router.AStarLandmarks;
-import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
@@ -44,7 +43,7 @@ import org.matsim.utils.misc.Time;
  *
  * @author mrieser
  */
-public class PlansCalcAreaTollRoute extends PlansCalcRoute {
+public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 
 	private final RoadPricingScheme scheme;
 	private final TravelTimeI timeCalculator;
@@ -60,7 +59,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param scheme
 	 */
 	public PlansCalcAreaTollRoute(final NetworkLayer network, final PreProcessLandmarks preProcessData, final TravelCostI costCalculator, final TravelTimeI timeCalculator, final RoadPricingScheme scheme) {
-		super(network, costCalculator, timeCalculator);
+		super(network, preProcessData, costCalculator, timeCalculator);
 		this.scheme = scheme;
 		this.timeCalculator = timeCalculator;
 		this.tollRouter = new AStarLandmarks(network, preProcessData, new TollTravelCostCalculator(costCalculator, scheme), timeCalculator);
@@ -68,7 +67,6 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 
 	@Override
 	protected void handlePlan(final Plan plan) {
-		// TODO [MR] currently, every leg is handled as a "car" leg.
 
 		boolean agentPaysToll = false;
 
@@ -77,9 +75,12 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 
 		final int TOLL_INDEX = 0;
 		final int NOTOLL_INDEX = 1;
-		Route[][] routes = new Route[2][(actslegs.size()  - 1) / 2];
-		double[][] depTimes = new double[2][(actslegs.size()  - 1) / 2];
-		int routeIndex = 0;
+		final int nofLegs = (actslegs.size() - 1) / 2;
+		Route[][] routes = new Route[2][nofLegs];
+		double[][] depTimes = new double[2][nofLegs];
+		boolean[] isCarLeg = new boolean[nofLegs];
+
+		int routeIndex = 0; // counter for the legs
 
 		// start at endtime of first activity, this must be available according spec
 		depTimes[TOLL_INDEX][routeIndex] = fromAct.getEndTime();
@@ -90,86 +91,104 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		 */
 		for (int i = 2, n = actslegs.size(); i < n; i += 2) {
 
+			Leg leg = (Leg)actslegs.get(i-1);
 			Act toAct = (Act)actslegs.get(i);
-
-			LinkImpl fromLink = fromAct.getLink();
-			LinkImpl toLink = toAct.getLink();
-			if (fromLink == null) throw new RuntimeException("fromLink missing.");
-			if (toLink == null) throw new RuntimeException("toLink missing.");
-
-			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-			Node endNode = toLink.getFromNode(); // the target is the start of the link
-
-			Route tollRoute = null;
-			Route noTollRoute = null;
-			if (toLink != fromLink) {
-				// do not drive/walk around, if we stay on the same link
-				tollRoute = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-				if (tollRoute == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			isCarLeg[routeIndex] = "car".equals(leg.getMode());
+			if (!isCarLeg[routeIndex]) {
+				super.handleLeg(leg, fromAct, toAct, depTimes[NOTOLL_INDEX][routeIndex]);
 			} else {
-				tollRoute = new Route();
-				tollRoute.setRoute(null, 0, 0.0);
-			}
+				// it is a car leg...
 
-			boolean tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, tollRoute, toLink, depTimes[TOLL_INDEX][routeIndex]);
-			boolean noTollRouteInsideTollArea = false;
-			if (tollRouteInsideTollArea && !agentPaysToll) {
-				/* The agent does not yet pay the toll, but the actual best route would
-				 * lead into the tolling area. If the agent must pay the toll, this
-				 * route may no longer be the best. Thus calculate a route that should
-				 * not cross the tolling area to compare it with the toll-route.
-				 */
-				noTollRoute = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-			}
-			if (noTollRoute != null) {
-				noTollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, noTollRoute, toLink, depTimes[TOLL_INDEX][routeIndex]);
-			}
+				// # init some values before searching for routes:
+				Link fromLink = fromAct.getLink();
+				Link toLink = toAct.getLink();
+				if (fromLink == null) {
+					throw new RuntimeException("fromLink missing.");
+				}
+				if (toLink == null) {
+					throw new RuntimeException("toLink missing.");
+				}
+				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
+				Node endNode = toLink.getFromNode(); // the target is the start of the link
+				Route tollRoute = null;
+				Route noTollRoute = null;
 
-			if (tollRouteInsideTollArea && noTollRouteInsideTollArea) {
-				/* both routes lead through the tolling area, so it seems the agent
-				 * can not avoid paying the toll.
-				 */
-				agentPaysToll = true;
-			}
+				// # start searching a route where agent may pay the toll
+				boolean tollRouteInsideTollArea = false;
+				if (toLink != fromLink) {
+					tollRoute = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
+					if (tollRoute == null) {
+						throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+					}
+					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, tollRoute, toLink, depTimes[TOLL_INDEX][routeIndex]);
+				} else {
+					// do not drive/walk around, if we stay on the same link
+					tollRoute = new Route();
+					tollRoute.setRoute(null, 0, 0.0);
+					// if we don't drive around, it doesn't matter  if we're in or out the toll area, so use "false"
+				}
 
-			routes[TOLL_INDEX][routeIndex] = tollRoute;
-			if (noTollRoute == null) {
-				// if there is no special no-toll route, use the toll route
-				routes[NOTOLL_INDEX][routeIndex] = tollRoute;
-			} else {
-				routes[NOTOLL_INDEX][routeIndex] = noTollRoute;
-			}
-			int prevIndex = routeIndex;
-			routeIndex++;
+				// # start searching a route where agent avoids paying the toll
+				if (tollRouteInsideTollArea && !agentPaysToll) {
+					/* The agent does not yet pay the toll, but the actual best route would
+					 * lead into the tolling area. If the agent must pay the toll, this
+					 * route may no longer be the best. Thus calculate a route that should
+					 * not cross the tolling area to compare it with the toll-route.
+					 * this.tollRouter has very high costs on links in the toll area. So if
+					 * it is possible for the agent to drive around, it will, otherwise there
+					 * will still be a route returned.
+					 */
+					noTollRoute = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
 
-			if (routeIndex < routes[0].length) {
-				// update time
-				// first, add travel time
-				depTimes[TOLL_INDEX][routeIndex] = depTimes[TOLL_INDEX][prevIndex] + routes[TOLL_INDEX][prevIndex].getTravTime();
-				depTimes[NOTOLL_INDEX][routeIndex] = depTimes[NOTOLL_INDEX][prevIndex] + routes[NOTOLL_INDEX][prevIndex].getTravTime();
-				// next, add activity duration or set endtime
-				double endTime = toAct.getEndTime();
-				double dur = toAct.getDur();
+					if (routeOverlapsTollLinks(fromLink, noTollRoute, toLink, depTimes[TOLL_INDEX][routeIndex])) {
+						/* the no-toll route leads also through the tolling area, so it seems the agent
+						 * can not avoid paying the toll. */
+						agentPaysToll = true;
+						noTollRoute = null; // delete this route again, as the tollRoute will likely be the better one with "normal" list costs.
+					}
+				}
 
-				if ((endTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-					double min = Math.min(endTime, depTimes[TOLL_INDEX][routeIndex] + dur);
-					if (depTimes[TOLL_INDEX][routeIndex] < min) depTimes[TOLL_INDEX][routeIndex] = min;
-					min = Math.min(endTime, depTimes[NOTOLL_INDEX][routeIndex] + dur);
-					if (depTimes[NOTOLL_INDEX][routeIndex] < min) depTimes[NOTOLL_INDEX][routeIndex] = min;
-				} else if (endTime != Time.UNDEFINED_TIME) {
-					if (depTimes[TOLL_INDEX][routeIndex] < endTime) depTimes[TOLL_INDEX][routeIndex] = endTime;
-					if (depTimes[NOTOLL_INDEX][routeIndex] < endTime) depTimes[NOTOLL_INDEX][routeIndex] = endTime;
-				} else if (dur != Time.UNDEFINED_TIME) {
-					depTimes[TOLL_INDEX][routeIndex] += dur;
-					depTimes[NOTOLL_INDEX][routeIndex] += dur;
-				} else if ((i+1) != actslegs.size()) {
-					// if it's the last act on the plan, we don't care, otherwise exception
-					throw new RuntimeException("act " + i + " has neither end-time nor duration.");
+				// # store the routes we calculated
+				routes[TOLL_INDEX][routeIndex] = tollRoute;
+				if (noTollRoute == null) {
+					// if there is no special no-toll route, use the toll route
+					routes[NOTOLL_INDEX][routeIndex] = tollRoute;
+				} else {
+					routes[NOTOLL_INDEX][routeIndex] = noTollRoute;
+				}
+
+				int nextIndex = routeIndex + 1;
+
+				if (nextIndex < routes[0].length) {
+					// update time
+					// first, add travel time
+					depTimes[TOLL_INDEX][nextIndex] = depTimes[TOLL_INDEX][routeIndex] + routes[TOLL_INDEX][routeIndex].getTravTime();
+					depTimes[NOTOLL_INDEX][nextIndex] = depTimes[NOTOLL_INDEX][routeIndex] + routes[NOTOLL_INDEX][routeIndex].getTravTime();
+					// next, add activity duration or set endtime
+					double endTime = toAct.getEndTime();
+					double dur = toAct.getDur();
+
+					if ((endTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+						double min = Math.min(endTime, depTimes[TOLL_INDEX][nextIndex] + dur);
+						if (depTimes[TOLL_INDEX][nextIndex] < min) depTimes[TOLL_INDEX][nextIndex] = min;
+						min = Math.min(endTime, depTimes[NOTOLL_INDEX][nextIndex] + dur);
+						if (depTimes[NOTOLL_INDEX][nextIndex] < min) depTimes[NOTOLL_INDEX][nextIndex] = min;
+					} else if (endTime != Time.UNDEFINED_TIME) {
+						if (depTimes[TOLL_INDEX][nextIndex] < endTime) depTimes[TOLL_INDEX][nextIndex] = endTime;
+						if (depTimes[NOTOLL_INDEX][nextIndex] < endTime) depTimes[NOTOLL_INDEX][nextIndex] = endTime;
+					} else if (dur != Time.UNDEFINED_TIME) {
+						depTimes[TOLL_INDEX][nextIndex] += dur;
+						depTimes[NOTOLL_INDEX][nextIndex] += dur;
+					} else if ((i+1) != actslegs.size()) {
+						// if it's the last act on the plan, we don't care, otherwise exception
+						throw new RuntimeException("act " + i + " has neither end-time nor duration.");
+					}
 				}
 			}
-
+			routeIndex++;
 			fromAct = toAct;
 		}
+		// # okay, we're through the plan once ...
 
 		/* Now decide if it is better for the agent to pay the toll or not, if the
 		 * agent is not yet already forced to pay it.
@@ -180,8 +199,10 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 			double cheapestCost = 0.0;
 			double noTollCost = 0.0;
 			for (int i = 0, n = routes[0].length; i < n; i++) {
-				cheapestCost += Math.min(routes[TOLL_INDEX][i].getTravelCost(), routes[NOTOLL_INDEX][i].getTravelCost());
-				noTollCost += routes[NOTOLL_INDEX][i].getTravelCost();
+				if (isCarLeg[i]) {
+					cheapestCost += Math.min(routes[TOLL_INDEX][i].getTravelCost(), routes[NOTOLL_INDEX][i].getTravelCost());
+					noTollCost += routes[NOTOLL_INDEX][i].getTravelCost();
+				}
 			}
 			double tollAmount = this.scheme.getCostArray()[0].amount; // just take the amount of the first cost object. For the area toll, all costs' amounts should be the same.
 			agentPaysToll = (cheapestCost + tollAmount) < noTollCost;
@@ -190,23 +211,27 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		/* Assign the routes to the legs according to the agent paying the toll or not */
 		if (agentPaysToll) {
 			// when the agent pays the toll, just take the cheaper route of the two
-			for (int i = 0, n = (actslegs.size() - 1) / 2; i < n; i++) {
-				Leg leg = (Leg)actslegs.get(i*2+1);
-				if (routes[TOLL_INDEX][i].getTravelCost() < routes[NOTOLL_INDEX][i].getTravelCost()) {
-					leg.setRoute(routes[TOLL_INDEX][i]);
-				} else {
-					leg.setRoute(routes[NOTOLL_INDEX][i]);
+			for (int i = 0; i < nofLegs; i++) {
+				if (isCarLeg[i]) {
+					Leg leg = (Leg)actslegs.get(i*2+1);
+					if (routes[TOLL_INDEX][i].getTravelCost() < routes[NOTOLL_INDEX][i].getTravelCost()) {
+						leg.setRoute(routes[TOLL_INDEX][i]);
+					} else {
+						leg.setRoute(routes[NOTOLL_INDEX][i]);
+					}
 				}
 			}
 		} else {
 			// the agent does not pay the toll, always take the no-toll route
-			for (int i = 0, n = (actslegs.size() - 1) / 2; i < n; i++) {
-				Leg leg = (Leg)actslegs.get(i*2+1);
-				leg.setRoute(routes[NOTOLL_INDEX][i]);
+			for (int i = 0; i < nofLegs; i++) {
+				if (isCarLeg[i]) {
+					// only set the route if its a leg with mode="car", otherwise it already should be handled.
+					Leg leg = (Leg)actslegs.get(i*2+1);
+					leg.setRoute(routes[NOTOLL_INDEX][i]);
+				}
 			}
 		}
 
-		/* That's it! ;-) */
 	}
 
 	/**
@@ -221,11 +246,13 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @return true if the route leads into an active tolling area and an agent
 	 * taking this route will likely have to pay the toll, false otherwise.
 	 */
-	private boolean routeOverlapsTollLinks(final Link startLink, final Route route, final LinkImpl endLink, final double depTime) {
+	private boolean routeOverlapsTollLinks(final Link startLink, final Route route, final Link endLink, final double depTime) {
 		double time = depTime;
 
 		// handle first link
-		if (isLinkTolled(startLink, time)) return true;
+		if (isLinkTolled(startLink, time)) {
+			return true;
+		}
 		/* do not advance the time yet. The router starts at the endNode of the
 		 * startLink, thus actually starts at the specified  time with the first
 		 * link of the route.
@@ -233,7 +260,9 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 
 		// handle following links
 		for (Link link : route.getLinkRoute()) {
-			if (isLinkTolled(link, time)) return true;
+			if (isLinkTolled(link, time)) {
+				return true;
+			}
 			time += this.timeCalculator.getLinkTravelTime(link, time);
 		}
 
