@@ -20,9 +20,6 @@
 
 package org.matsim.plans.algorithms;
 
-import java.util.Date;
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
@@ -34,17 +31,15 @@ public abstract class PersonAlgorithm extends PlansAlgorithm implements PersonAl
 
 	@Override
 	public final void run(final Plans plans) {
-		log.info("    running " + this.getClass().getName() + " algorithm..." + (new Date()));
+		log.info("running " + this.getClass().getName() + " algorithm...");
 		Counter counter = new Counter(" person # ");
 
-		Iterator<Person> it = plans.getPersons().values().iterator();
-		while (it.hasNext()) {
+		for (Person p : plans.getPersons().values()) {
 			counter.incCounter();
-			Person p = it.next();
 			this.run(p);
 		}
 		counter.printCounter();
-		log.info("    done running algorithm. " + (new Date()));
+		log.info("done running algorithm.");
 	}
 
 	public abstract void run(Person person);
