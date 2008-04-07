@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.utils;
+package playground.yu.newNetwork;
 
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -32,6 +32,8 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkWriter;
+
+import playground.yu.utils.GTFParser;
 
 /**
  * @author yu
@@ -66,7 +68,7 @@ public class GTFNetCreator {
 		}
 
 		new NetworkWriter(network,
-				"../schweiz-ivtch/network/ivtch-changed-with-GTF.xml.gz")
+				"../schweiz-ivtch/network/ivtch-changed-with-GTF.xml")
 				.write();
 
 		System.out.println("done!");

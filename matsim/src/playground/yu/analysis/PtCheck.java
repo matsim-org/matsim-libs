@@ -30,9 +30,9 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * outputs the amount of public transit user or its fraction into .txt-files
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class PtCheck extends PersonAlgorithm {
 	// ----------------------MEMBER VARIABLES----------------------------
@@ -63,6 +63,12 @@ public class PtCheck extends PersonAlgorithm {
 		System.out.println("-->begins to write txt-file about pt-rate");
 		this.out.write("Iter\tPersons\tPtRate\tPtUser\tCarUser\n");
 		this.out.flush();
+		this.personCnt = 0;
+		this.ptUserCnt = 0;
+		this.carUserCnt = 0;
+	}
+
+	public PtCheck() {
 		this.personCnt = 0;
 		this.ptUserCnt = 0;
 		this.carUserCnt = 0;
@@ -122,7 +128,7 @@ public class PtCheck extends PersonAlgorithm {
 
 	/**
 	 * writes public transit user amount and fraction into .txt-file.
-	 *
+	 * 
 	 * @param Iter -
 	 *            number of iteration
 	 * @throws IOException
