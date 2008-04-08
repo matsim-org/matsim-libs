@@ -370,7 +370,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 //				System.out.println("### test scoring "+ratio);
 				score+=10.*(double)friend/(double)foe;
 			}else{
-				System.out.println();
+//				System.out.println();
 			}
 		}
 		return score;

@@ -21,14 +21,20 @@
 package org.matsim.socialnetworks.replanning;
 
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.replanning.modules.MultithreadedModuleA;
+import org.matsim.replanning.modules.StrategyModuleI;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.socialnetworks.socialnet.SocialNetwork;
+/**
+ * The social network replanning StrategyModule is not multi-threaded because each
+ * agent could refer to and alter other agent objects in a random manner.
+ *  
+ * @author jhackney
+ *
+ */
 
-
-public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
+public class SNRandomFacilitySwitcher implements StrategyModuleI {
 	private NetworkLayer network=null;
 	private TravelCostI tcost=null;
 	private TravelTimeI ttime=null;
@@ -49,11 +55,28 @@ public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
 //    	this.factypes = playground.jhackney.controler.SNControllerListenerRePlanSecLoc.activityTypesForEncounters;
     }
 
-    @Override
     public PlanAlgorithmI getPlanAlgoInstance() {
 //	return new SNSecLocShortest(factypes, network, tcost, ttime);
 	return new SNSecLocRandom(factypes, network, tcost, ttime);
     }
+
+	@Override
+	public void finish() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handlePlan(Plan plan) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
 
 
 
