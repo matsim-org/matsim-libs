@@ -53,9 +53,9 @@ public class GISToMatsimConverter {
 	public static final double CAPACITY_COEF = 1.33;
 	
 	public GISToMatsimConverter(){
-//		this("./padang/padang_streets.shp","./padang/vd10_streetnetwork_padang_v0.5_utm47s.shp");
-//		this("./padang/testcase1/padang/padangTeilStreets_test.shp", "./padang/testcase1/padang/padangTeil_test.shp");
-		this("./padang/testcase1/simple/simpleIII.shp", "./padang/testcase1/simpleline/simplelineIII.shp" );
+		this("./padang/padang_streets.shp","./padang/vd10_streetnetwork_padang_v0.5_utm47s.shp");
+//		this("./padang/testcase1/padang/padangTeilStreets_testII.shp", "./padang/testcase1/padang/padangTeil_testII.shp");
+//		this("./padang/testcase1/simple/simpleIV.shp", "./padang/testcase1/simpleline/simplelineIV.shp" );
 	}
 	
 	public GISToMatsimConverter(final String polyFile, final String lineFile){
@@ -83,13 +83,13 @@ public class GISToMatsimConverter {
 	private void processData() throws Exception {
 		GraphGenerator gg = new GraphGenerator(features.get(linestringFile));
 		Collection<Feature> graph =  gg.createGraph();
-		ShapeFileWriter.writeGeometries(graph, "./padang/testSimpleline.shp");
+		ShapeFileWriter.writeGeometries(graph, "./padang/testSimpleline2.shp");
 		
 //		features.get(linestringFile)
 		
 		PolygonGeneratorII polyGen = new PolygonGeneratorII(graph ,features.get(polygonFile));
 		Collection<Feature> polyGraph = polyGen.generatePolygons();
-		ShapeFileWriter.writeGeometries(polyGraph, "./padang/testSimplepoly.shp");
+		ShapeFileWriter.writeGeometries(polyGraph, "./padang/testSimplepoly2.shp");
 		
 //		NetworkGenerator ng = new NetworkGenerator(graph,this.envelope);
 //		NetworkLayer network = ng.generateFromGraph();

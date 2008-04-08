@@ -49,14 +49,14 @@ public class PolygonGeneratorII {
 	private QuadTree<Feature> lineTree;
 	private HashSet<Polygon> polygons;
 	private HashMap<Integer, LineString> lineStrings;
-	private HashMap<Integer, Polygon> returnPolys;
-	private HashSet<Polygon> cutPolys = new HashSet<Polygon>(); 
+//	private HashMap<Integer, Polygon> returnPolys;
+	 
 	private FeatureSource featureSourcePolygon;
 	private FeatureSource featureSourceLineString;
 	private FeatureCollection collectionLineString;
 	private List<Feature> featureList;
 	private GeometryFactory geofac;
-	static final double CATCH_RADIUS = 0.1;
+	static final double CATCH_RADIUS = 0.2;
 	static final double DEFAULT_DISTANCE = 10;
 	private static final Logger log = Logger.getLogger(PolygonGeneratorII.class);
 	private boolean graph = false; 
@@ -81,256 +81,312 @@ public class PolygonGeneratorII {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		mergePolygons();
-		cutPolygons();
+//		mergePolygons();
+		
 		log.info("leaving polygonGenerator");
 		
-		return(genPolygonFeatureCollection());			
-		
+//		return(genPolygonFeatureCollection(mergePolygons()));			
+		return(genPolygonFeatureCollection(cutPolygons(lineStrings,mergePolygons())));
 	}
 	
-	private void cutPolygons(){
+	private HashMap<Integer, Polygon> cutPolygons(HashMap<Integer, LineString> lineStrings, HashMap<Integer, Polygon> returnPolys){
 		
+		int countlines = 0;
+
 		log.info("cutting polygons ...");
-		
-		 
-		HashSet<Point> currPoints = new HashSet<Point>();
-		HashSet<Point> donePoints = new HashSet<Point>();
-		currPoints.add(lineStrings.get(0).getEndPoint());
-				
-		
-		while(!currPoints.isEmpty()){
+//		int nodePolyId = returnPolys.size() + 1;
+		HashMap<Integer, Polygon> fPoly= new HashMap<Integer, Polygon>();
 			
-			HashSet<Point> nextPoints = new HashSet<Point>();
+		 	for(Iterator<Entry<Integer, LineString>> lsIter = lineStrings.entrySet().iterator() ; lsIter.hasNext() ; ){
 		
-			for(Iterator<Point> iter = currPoints.iterator() ; iter.hasNext() ; ){
-			
-				Point currPoint = iter.next();
-				Coordinate currPointCoor = currPoint.getCoordinate();
-				List<Feature> lines = (List<Feature>) lineTree.get(currPoint.getX(), currPoint.getY(), CATCH_RADIUS);
-				if(lines.size()<3){ 
-					continue;
-				}
-				List<Polygon> nodePolys = new ArrayList<Polygon>();								
+				Entry<Integer, LineString> lsEntry  = lsIter.next();
+				int lsId = lsEntry.getKey();
+				LineString currLs = lsEntry.getValue();
+				List<Point> po = new ArrayList<Point>();
+				po.add(currLs.getStartPoint());
+				po.add(currLs.getEndPoint());
 				
-				for(Feature ft : lines ){
+				for(Point currPoint : po){
 					
-					LineString ls = (LineString) ft.getAttribute(0);
-					if(returnPolys.containsKey(ft.getAttribute(1))){
-						nodePolys.add(returnPolys.get(ft.getAttribute(1)));
-					}					
-					if((ls.getStartPoint().equalsExact(currPoint, CATCH_RADIUS))&& (donePoints.contains(ls.getEndPoint()) == false)){
-						nextPoints.add(ls.getEndPoint());
-						
-					}else if(donePoints.contains(ls.getStartPoint()) == false){
-						nextPoints.add(ls.getStartPoint());
-					}
-				}
-								
-				Geometry[] geoArr = new Geometry[0];
-				GeometryCollection geoColl = new GeometryCollection(nodePolys.toArray(geoArr),geofac);
-				Geometry poly = (Geometry) geoColl.buffer(0.0);
+					log.info(countlines);
+					log.info(currPoint.getCoordinate().toString());
+					countlines++;
 				
-				Coordinate [] coor = poly.getCoordinates();
-				
-				Envelope o = poly.getEnvelopeInternal();
-				
-				List<Point> points = new ArrayList<Point>();				
-										
-				SortedMap<Double, LineString> sortedLines = sortLines(lines,currPoint);
-				LineString [] l = new LineString[0];
-				Double [] d = new Double[0];
-				
-				LineString [] lineArr = sortedLines.values().toArray(l);
-				Double [] angleArr = sortedLines.keySet().toArray(d);
-				
-				for (int i = 0 ; i < lineArr.length ; i++ ){
+					Coordinate currPointCoor = currPoint.getCoordinate();
+					List<Feature> lines = (List<Feature>) lineTree.get(currPoint.getX(), currPoint.getY(), CATCH_RADIUS);
 					
-					LineString lineI = lineArr[i];
-					double angleI = angleArr[i];
-					LineString lineII;
-					double angleII;
-					double deltaAngle;
-					if (i == ( lineArr.length -1) ) {	
-						lineII = lineArr[0];
-						angleII = angleArr[0];
-						deltaAngle = 360 - (angleII - angleI);			
-					}else {
-						lineII = lineArr[i+1];
-						angleII = angleArr[i+1];
-						deltaAngle = angleII - angleI;
-					}
 					
-					Coordinate bisecCoor = getBisectingLine(lineI, lineII);
-					
-					if (deltaAngle > 180 ){
-						Coordinate co = subCoord(currPointCoor, bisecCoor); 
-						bisecCoor = new Coordinate(currPointCoor.x + co.x , currPointCoor.y + co.y);
-					}
-											
-					Coordinate [] quadcoor = new Coordinate [] {lineI.getStartPoint().getCoordinate(), lineI.getEndPoint().getCoordinate(),
-							bisecCoor, lineII.getEndPoint().getCoordinate(), lineII.getStartPoint().getCoordinate()}; 
-					CoordinateSequence triseq = new CoordinateArraySequence(quadcoor);
-					LinearRing quadRing = new LinearRing(triseq, geofac);
-					Polygon pol = new Polygon(quadRing, null, geofac);
-					
-					boolean found = false;
-//					List<Coordinate> cList = new ArrayList<Coordinate>();
-					QuadTree<Coordinate> polyCoor = new QuadTree<Coordinate>(o.getMinX(), o.getMinY(), o.getMaxX(), o.getMaxY());
-					
-					for(int ii = 0 ; ii < coor.length ; ii++ ){
-						polyCoor.put(coor[ii].x, coor[ii].y, coor[ii]);
-					}
-					
-					while(!found){
-						
-						Coordinate pp = polyCoor.get(currPointCoor.x, currPointCoor.y);
-						
-						Coordinate [] cc = new Coordinate[]{currPointCoor, pp};
-						CoordinateSequence seq = new CoordinateArraySequence(cc);
-						LineString line = new LineString(seq, geofac);
-						
-						if(line.crosses(pol)|| pol.contains(line)){
-							
-							Coordinate [] p = new Coordinate[]{pp};
-							CoordinateSequence seqII = new CoordinateArraySequence(p);
-							Point po = new Point(seqII, geofac);
-							points.add(po);
-							
-							found = true;
-							break;
-						}else{
-							polyCoor.remove(pp.x, pp.y, pp);
-						}
-					}	
-					
-				}
-				Coordinate [] coords = coor;
-				for(Point p : points){
-					log.info(p.getCoordinate().toString());
-				}
-				
-				for(int it1 = 0 ; it1 < points.size() ; it1++){        
-					
-					List<Coordinate> newPoly = new ArrayList<Coordinate>();
-					List<Coordinate> restPoly = new ArrayList<Coordinate>();
-					
-					int countPoints = 0;
-				
-					for (int i = 0 ; i < coords.length ; i++){
-						CoordinateSequence seq = new CoordinateArraySequence(new Coordinate []{coords[i]});
-						Point p = new Point(seq, geofac);
-					
-						if (countPoints == 0 || countPoints == points.size()){
-							
-							newPoly.add(coords[i]);				
-							for (Iterator<Point> it = points.iterator() ; it.hasNext() ; ){
-								Point p1 = (Point) it.next();
-								if ((p.equalsExact(p1, CATCH_RADIUS)) && (i != 0)){
-									restPoly.add(coords[i]);						
-									countPoints++;
-									break;
-								}
-							}
-						}else{
-							restPoly.add(coords[i]);
-							for (Iterator<Point> it = points.iterator() ; it.hasNext() ; ){
-								Point p1 = (Point) it.next();
-								
-								if ((countPoints == (points.size()-1)) && (p.equalsExact(p1, CATCH_RADIUS))){
-									newPoly.add(coords[i]);
-									countPoints++;
-									break;
-								}else if (p.equalsExact(p1, CATCH_RADIUS)){
-									countPoints++;
-								}
-							}
+					for(Feature l : lines){
+						LineString ls = (LineString) l.getAttribute(0);
+						Coordinate [] cc = ls.getCoordinates();
+						for (int i = 0 ; i < cc.length ; i++){
+//							log.info(cc[i].toString());
 						}
 					}
-					if (newPoly.get(0) != newPoly.get(newPoly.size()-1)){
-						newPoly.add(newPoly.get(0));
-					}
-					if ((!restPoly.isEmpty()) && restPoly.get(0) != restPoly.get(restPoly.size()-1)){
-						restPoly.add(restPoly.get(0));
-					}
 					
-					Coordinate [] co = new Coordinate[0];
 					
-					Coordinate [] coNew = newPoly.toArray(co);
-					CoordinateSequence seq = new CoordinateArraySequence(coNew);
-					try{LinearRing lr = new LinearRing(seq, geofac);
-					Polygon p = new Polygon(lr, null, geofac);
-					cutPolys.add(p);
+					if(lines.size()<3){ 
+						continue;
+					}
+					List<Polygon> nodePolys = new ArrayList<Polygon>();								
+					
+					
+					for(Feature ft : lines ){
+						
+						
+						if(returnPolys.containsKey(ft.getAttribute(1)) && !fPoly.containsKey(lsId)){
+							nodePolys.add(returnPolys.get(ft.getAttribute(1)));
+						}else if(fPoly.containsKey(lsId)) {
+							nodePolys.add(fPoly.get(lsId));
+						}
+						
+						
+					}
+					if(nodePolys.isEmpty()){
+						continue;
+					}
+		
+					Geometry[] geoArr = new Geometry[0];
+					GeometryCollection geoColl = new GeometryCollection(nodePolys.toArray(geoArr),geofac);
+					
+					Polygon poly;
+					try{
+						poly = (Polygon) geoColl.buffer(0.05);
 					}catch(Exception e){
-						log.info(e);
+						log.warn("multipolygon");
+						poly = (Polygon) geoColl.buffer(0.05).getGeometryN(0);
+					}
+					Coordinate [] coor = poly.getCoordinates();	
+					
+					List<Point> points = new ArrayList<Point>();				
+											
+					SortedMap<Double, LineString> sortedLines = sortLines(lines,currPoint);
+					LineString [] l = new LineString[0];
+					Double [] d = new Double[0];
+					
+					LineString [] lineArr = sortedLines.values().toArray(l);
+					Double [] angleArr = sortedLines.keySet().toArray(d);
+					
+					for (int i = 0 ; i < lineArr.length ; i++ ){
+						
+						LineString lineI = lineArr[i];
+						double angleI = angleArr[i];
+						LineString lineII;
+						double angleII;
+						double deltaAngle;
+						if (i == ( lineArr.length -1) ) {	
+							lineII = lineArr[0];
+							angleII = angleArr[0];
+							
+							if ( (angleII - angleI) < -180 ){
+								deltaAngle = 60;
+							}else{
+								deltaAngle = 270;
+							}
+			
+						}else {
+							lineII = lineArr[i+1];
+							angleII = angleArr[i+1];
+							deltaAngle = angleII - angleI;
+						}
+						
+						Coordinate bisecCoor = getBisectingLine(lineII, lineI);
+						
+						if (deltaAngle >= 180 ){
+							Coordinate co = subCoord(currPointCoor, bisecCoor); 
+							bisecCoor = new Coordinate(currPointCoor.x + co.x , currPointCoor.y + co.y);
+						}
+												
+						Coordinate [] quadcoor = new Coordinate [] {lineI.getStartPoint().getCoordinate(), lineI.getEndPoint().getCoordinate(),
+								bisecCoor, lineII.getEndPoint().getCoordinate(), lineI.getStartPoint().getCoordinate()}; //TODO  letzte Koordinate berichtigen
+						CoordinateSequence triseq = new CoordinateArraySequence(quadcoor);
+						LinearRing quadRing = new LinearRing(triseq, geofac);
+						Polygon pol = new Polygon(quadRing, null, geofac);
+						
+						boolean found = false;
+						Envelope o = poly.getEnvelopeInternal();
+						QuadTree<Coordinate> polyCoor = new QuadTree<Coordinate>(o.getMinX(), o.getMinY(), o.getMaxX()+o.getMaxX()-o.getMinX(), o.getMaxY()+o.getMaxY()-o.getMinY());
+						
+						for(int ii = 0 ; ii < coor.length ; ii++ ){
+							polyCoor.put(coor[ii].x, coor[ii].y, coor[ii]);
+						}
+						
+						while(!found){
+							
+							Coordinate pp = polyCoor.get(currPointCoor.x, currPointCoor.y);
+							if(pp == null){
+								log.warn("ee");
+								break;
+							}
+							Coordinate [] cc = new Coordinate[]{currPointCoor, pp};
+							CoordinateSequence seq = new CoordinateArraySequence(cc);
+							LineString line = new LineString(seq, geofac);
+//							try{
+
+								if(pol.contains(line) || line.crosses(pol)){
+									
+									Coordinate [] p = new Coordinate[]{pp};
+									CoordinateSequence seqII = new CoordinateArraySequence(p);
+									Point poi = new Point(seqII, geofac);
+									points.add(poi);
+									
+									found = true;
+									break;
+								}else{
+									polyCoor.remove(pp.x, pp.y, pp);
+								}
+//							}catch(Exception e){
+//								log.warn(e);
+//							}
+						}	
+						
 					}
 					
+					Coordinate [] coords = coor;
+
+					HashSet<Polygon> cutPolys = new HashSet<Polygon>();
 					
-					coords = restPoly.toArray(co);
-				}
-				
-				points.add(points.get(0));
-				List<Coordinate> pcoor = new ArrayList<Coordinate>();
-				
-				for(Point p : points){
-					pcoor.add(p.getCoordinate());
-				}
-				Coordinate [] cos = new Coordinate[0];
-				Coordinate [] cosNew = pcoor.toArray(cos);
- 				CoordinateSequence seq = new CoordinateArraySequence(cosNew);
-				LinearRing lr = new LinearRing(seq, geofac);
-				Polygon p = new Polygon(lr, null, geofac);
-				cutPolys.add(p);
+					for(int it1 = 0 ; it1 < points.size() ; it1++){        
 						
+						log.info(points.get(it1).getCoordinate().toString());		//
+						
+						List<Coordinate> newPoly = new ArrayList<Coordinate>();
+						List<Coordinate> restPoly = new ArrayList<Coordinate>();
+						
+						int countPoints = 0;
+					
+						for (int i = 0 ; i < coords.length ; i++){
+							CoordinateSequence seq = new CoordinateArraySequence(new Coordinate []{coords[i]});
+							Point p = new Point(seq, geofac);
+						
+							if (countPoints == 0 || countPoints == points.size()){
+								
+								newPoly.add(coords[i]);				
+								for (Iterator<Point> it = points.iterator() ; it.hasNext() ; ){
+									Point p1 = (Point) it.next();
+									if ((p.equalsExact(p1, CATCH_RADIUS)) && (i != 0)){
+										restPoly.add(coords[i]);						
+										countPoints++;
+										break;
+									}
+								}
+							}else{
+								restPoly.add(coords[i]);
+								for (Iterator<Point> it = points.iterator() ; it.hasNext() ; ){
+									Point p1 = (Point) it.next();
+									
+									if ((countPoints == (points.size()-1)) && (p.equalsExact(p1, CATCH_RADIUS))){
+										newPoly.add(coords[i]);
+										countPoints++;
+										break;
+									}else if (p.equalsExact(p1, CATCH_RADIUS)){
+										countPoints++;
+									}
+								}
+							}
+						}
+						if (newPoly.get(0) != newPoly.get(newPoly.size()-1)){
+							newPoly.add(newPoly.get(0));
+						}
+						
+						if ((!restPoly.isEmpty()) && restPoly.get(0) != restPoly.get(restPoly.size()-1)){
+							restPoly.add(restPoly.get(0));
+						}
+						
+						Coordinate [] co = new Coordinate[0];
+						Coordinate [] coNew = newPoly.toArray(co);
+						CoordinateSequence seq = new CoordinateArraySequence(coNew);
+						
+						System.out.println(seq);
+						
+						try{
+							LinearRing lr = new LinearRing(seq, geofac);
+							Polygon p = new Polygon(lr, null, geofac);
+							cutPolys.add(p);
+						}catch(Exception e){
+							log.warn("linearRing");
+						}
+							
+						coords = restPoly.toArray(co);
+					}
+					for(Polygon pol : cutPolys){
+						
+						if(currLs.crosses(pol) || pol.contains(currLs) ){
+							
+							if(fPoly.containsKey(lsId)){
+								fPoly.remove(lsId);
+								fPoly.put(lsId, pol);
+							}else{
+								fPoly.put(lsId, pol);
+							}
+						}						
+					}
+//					if(!returnPolys.containsKey(nodePolyId)){
+//						
+//						points.add(points.get(0));
+//						List<Coordinate> pcoor = new ArrayList<Coordinate>();
+//						
+//						for(Point p : points){
+//							pcoor.add(p.getCoordinate());
+//						}
+//						Coordinate [] cos = new Coordinate[0];
+//						Coordinate [] cosNew = pcoor.toArray(cos);
+//		 				CoordinateSequence seq = new CoordinateArraySequence(cosNew);
+//						LinearRing lr = new LinearRing(seq, geofac);
+//						Polygon p = new Polygon(lr, null, geofac);
+//						
+//						returnPolys.put(nodePolyId, p);
+//						nodePolyId++;
+//					}
+					
 			}
-			donePoints.addAll(currPoints);
-			currPoints.clear();
-			currPoints.addAll(nextPoints);			
-		}
 		
-		if(cutPolys.isEmpty()){log.info("no Poly");}
+		 }
+//		if(cutPolys.isEmpty()){log.warn("no Poly");}
 		log.info("done.");
+		return fPoly;
+		
 	}
 		
-	private void mergePolygons(){
+	private HashMap<Integer, Polygon> mergePolygons(){
 		
 		log.info("merging polygons ...");
-		returnPolys = new HashMap<Integer, Polygon>();
+		HashMap<Integer, Polygon> returnPolys = new HashMap<Integer, Polygon>();
 		
-		for (Iterator lsIt = lineStrings.keySet().iterator() ; lsIt.hasNext() ; ){
+		for (Iterator<Integer> lsIt = lineStrings.keySet().iterator() ; lsIt.hasNext() ; ){
 		
 			Integer id = (Integer) lsIt.next();
 						
 			LineString ls = lineStrings.get(id);
+						
+			HashSet<Polygon> neighborhood = new HashSet<Polygon>();
+			Collection<Polygon> polys = polygonTree.get(ls.getCentroid().getX(),ls.getCentroid().getY() , 900);
 			
-			Collection<Polygon> polys = new ArrayList<Polygon>();
-			List<Polygon> finalPolys = new ArrayList<Polygon>();
-			polys = polygonTree.get(ls.getCentroid().getX(),ls.getCentroid().getY() , 500);
-//			polygonTree.get(c[0].x-CATCH_RADIUS, c[0].y-CATCH_RADIUS, c[2].x+CATCH_RADIUS, c[2].y+CATCH_RADIUS, polys);
-			Coordinate [] linkCoord = ls.getCoordinates();	
-//			GeometryFactory geofac = new GeometryFactory();
-							
-			for(int i=0 ; i < linkCoord.length ; i++){												
-				
-				Coordinate [] g = new Coordinate[]{};	
-				CoordinateSequence seq = new CoordinateArraySequence(g);
-        		Point point = new Point(seq,geofac);
-				
-        		for (Polygon po : polys){
-					if(po.covers(point)||po.crosses(ls)){
-						finalPolys.add(po);
-					}	
-				}			
+			for (Polygon po : polys){
+				if(ls.crosses(po) || po.covers(ls)) { 
+					neighborhood.add(po);
+				}	
 			}
+    		List<Polygon> extNeighborhood = new ArrayList<Polygon>();
+    		extNeighborhood.addAll(neighborhood);
+    		for (Polygon po : polys) {
+    			if (!neighborhood.contains(po)){
+    				for (Polygon tmp : neighborhood) {
+    					if (po.crosses(tmp)){
+    						extNeighborhood.add(po);
+    					}
+    				}
+    			}
+    		}
 			
-			if(finalPolys.isEmpty()){	continue;}
-   			   			   			
+			if(extNeighborhood.isEmpty()){	continue;}
+
 			Geometry [] gA = new Geometry[0];
-   			Geometry [] geoArray = finalPolys.toArray(gA);
+   			Geometry [] geoArray = extNeighborhood.toArray(gA);
    			GeometryCollection geoColl = new GeometryCollection(geoArray,geofac);	
    			   			 			
    			try{
-   			Geometry retPoly = (Geometry) geoColl.buffer(0.0);
+   			Geometry retPoly = (Geometry) geoColl.buffer(0.01);
    			
    			for (int i = 0; i < retPoly.getNumGeometries(); i++) {
 				Polygon polygon = (Polygon) retPoly.getGeometryN(i);
@@ -347,6 +403,7 @@ public class PolygonGeneratorII {
 		}
 
 		log.info("done.");
+		return returnPolys;
 	}
 		
 
@@ -410,7 +467,7 @@ public class PolygonGeneratorII {
 		
 	}
 	
-	private Collection<Feature> genPolygonFeatureCollection() throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
+	private Collection<Feature> genPolygonFeatureCollection(HashMap<Integer, Polygon> returnPolys) throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
 		
 		Collection<Feature> features = new ArrayList<Feature>();
 		
@@ -420,16 +477,16 @@ public class PolygonGeneratorII {
 		AttributeType area = AttributeTypeFactory.newAttributeType("area", Double.class);		
 		FeatureType ftRoadShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id, width, area }, "linkShape");
 		
-		for (Iterator<Polygon> it = this.cutPolys.iterator() ; it.hasNext() ; ){	
-			Feature ft = ftRoadShape.create(new Object [] {new MultiPolygon(new Polygon []{(Polygon)it.next()},this.geofac), -1, 0.0, 0.0},"network");
-			features.add(ft);
-		}
-				
-//		for (Iterator<Entry<Integer, Polygon>> it = this.returnPolys.entrySet().iterator() ; it.hasNext() ; ){	
-//			Polygon poly = (Polygon)it.next().getValue();
-//			Feature ft = ftRoadShape.create(new Object [] {new MultiPolygon(new Polygon []{ poly  },this.geofac), -1, 0.0, 0.0},"network");
+//		for (Iterator<Polygon> it = this.cutPolys.iterator() ; it.hasNext() ; ){	
+//			Feature ft = ftRoadShape.create(new Object [] {new MultiPolygon(new Polygon []{(Polygon)it.next()},this.geofac), -1, 0.0, 0.0},"network");
 //			features.add(ft);
 //		}
+				
+		for (Iterator<Entry<Integer, Polygon>> it = returnPolys.entrySet().iterator() ; it.hasNext() ; ){	
+			Polygon poly = (Polygon)it.next().getValue();
+			Feature ft = ftRoadShape.create(new Object [] {new MultiPolygon(new Polygon []{ poly  },this.geofac), -1, 0.0, 0.0},"network");
+			features.add(ft);
+		}
 		return features;
 	}
 	
@@ -598,12 +655,12 @@ public class PolygonGeneratorII {
 		Coordinate [] lineIcoor = ls.getCoordinates();
 		if(start){
 			CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(lineIcoor[0]), new Coordinate(lineIcoor[1])});
-			System.out.println(lineIcoor[0].toString()+lineIcoor[1].toString());
+//			System.out.println(lineIcoor[0].toString()+lineIcoor[1].toString());
 			vec = new LineString(seqd, geofac);
 		} else {
 			int length = lineIcoor.length;
 			CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(lineIcoor[length-1]), new Coordinate(lineIcoor[length-2])});
-			System.out.println(lineIcoor[length-1].toString()+lineIcoor[length-2].toString());
+//			System.out.println(lineIcoor[length-1].toString()+lineIcoor[length-2].toString());
 			vec = new LineString(seqd, geofac);		
 		}
 		return vec;
@@ -627,10 +684,11 @@ public class PolygonGeneratorII {
 		
 		Coordinate c1 = subCoord(ls1.getCoordinates()[1],ls1.getCoordinates()[0]);
 		Coordinate c2 = subCoord(ls2.getCoordinates()[1],ls2.getCoordinates()[0]);
-		c1 = multiCoord(c1,(1/getLength(c1)));
-		c2 = multiCoord(c2,(1/getLength(c2)));
-		Coordinate r = multiCoord(subCoord(c2,c1),0.5);
-		Coordinate r2 = new Coordinate((c1.x+r.x), (c1.y+r.y));
+		Coordinate c11 = multiCoord(c1,(1/getLength(c1)));
+		Coordinate c22 = multiCoord(c2,(1/getLength(c2)));
+		Coordinate r = multiCoord(subCoord(c22,c11),0.5);
+
+		Coordinate r2 = new Coordinate((ls1.getCoordinates()[1].x+r.x), (ls1.getCoordinates()[1].y+r.y));
 		return r2;
 				
 	}
@@ -659,7 +717,7 @@ public class PolygonGeneratorII {
 			LineString li = new LineString(seq2, geofac);
 				
 			if((co[1].x - pc.x) < 0){
-				sortedLines.put(360 - getAngle(li,yLine), line);
+				sortedLines.put((360 - getAngle(li,yLine)), line);
 			}else{
 				sortedLines.put(getAngle(li,yLine), line);
 			}			
