@@ -43,7 +43,7 @@ import org.matsim.events.Events;
 public class EventsReaderDEQv1 {
 
 	private final Events events;
-	
+
 	/*package*/ final static Logger log = Logger.getLogger(EventsReaderDEQv1.class);
 
 	public EventsReaderDEQv1(final Events events) {
@@ -80,7 +80,6 @@ public class EventsReaderDEQv1 {
 					int linkId = in.readInt();
 					int eventType = in.readInt();
 					eventComplete = true;
-					// TODO [MR] legNumber
 					this.events.processEvent(createEvent(time, agentId, linkId, eventType, 0));
 				}
 			} catch (EOFException e) {
@@ -208,7 +207,6 @@ public class EventsReaderDEQv1 {
 				int agentId = this.in.readInt();
 				int linkId = this.in.readInt();
 				int eventType = this.in.readInt();
-				// TODO [MR] legNumber
 				this.next = createEvent(time, agentId, linkId, eventType, 0);
 			} catch (EOFException e) {
 				this.next = null;
