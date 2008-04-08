@@ -127,7 +127,8 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 				this.countComparisonFilter.getCountsForHour(null));
 
 		BufferedWriter out = null;
-		String filename=file.substring(0,file.indexOf(".txt"))+"AWTV.txt";
+		// output file always ends with ".txt"
+		String filename=file.substring(0,file.length()-4)+"AWTV.txt";
 
 		try {
 			out = new BufferedWriter(new FileWriter(filename));
