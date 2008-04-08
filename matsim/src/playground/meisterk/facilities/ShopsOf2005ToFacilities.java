@@ -94,6 +94,7 @@ public class ShopsOf2005ToFacilities {
 	private static String coopTGFilename = SHOPS_PATH + "coop-tg.csv";
 	private static String migrosZHFilename = SHOPS_PATH + "migros-zh.csv";
 	private static String migrosOstschweizFilename = SHOPS_PATH + "migros-ostschweiz-filialen.csv";
+	private static String migrosOstschweizOpenTimesFilename = SHOPS_PATH + "migros-ostschweiz-oeffnungszeiten.csv";
 	private static String dennerTGZHFilename = SHOPS_PATH + "denner-tg-zh.csv";
 
 	private static final String ACTIVITY_TYPE_SHOP = "shop";
@@ -802,7 +803,10 @@ public class ShopsOf2005ToFacilities {
 	private static void addOpentimesToFacilities(Facilities facilities) {
 
 		//ShopsOf2005ToFacilities.processPickPayOpenTimes(facilities);
-		ShopsOf2005ToFacilities.processMigrosZHOpenTimes(facilities);
+		//ShopsOf2005ToFacilities.processMigrosZHOpenTimes(facilities);
+		//ShopsOf2005ToFacilities.processMigrosOstschweizOpenTimes(facilities);
+		//ShopsOf2005ToFacilities.processCoopZHOpenTimes(facilities);
+		ShopsOf2005ToFacilities.processCoopTGOpenTimes(facilities);
 
 	}
 
@@ -935,8 +939,6 @@ public class ShopsOf2005ToFacilities {
 		String[] openDayTokens = null;
 		Vector<Integer> numbers = new Vector<Integer>();
 
-		String migrosZHAusn = "Ausn";
-
 		try {
 
 			lines = FileUtils.readLines(new File(migrosZHFilename), "UTF-8");
@@ -985,59 +987,82 @@ public class ShopsOf2005ToFacilities {
 				System.out.println();
 				System.out.flush();
 				// extract numbers
-				if (openDayTokens[0].equals(Day.MONDAY.getAbbrevGerman())
-						&& openDayTokens[1]
-						                 .equals(Day.FRIDAY.getAbbrevGerman())) {
-					// ok
-					for (String token : openHourTokens) {
-						if (!token.equals("")) {
-							numbers.add(Integer.parseInt(token));
-						}
-						//					System.out.println(); 
-					}
-				} else {
-					System.out.println("Not a valid migros ZH open time line.");
-				}
-				System.out.flush();
+//				if (openDayTokens[0].equals(Day.MONDAY.getAbbrevGerman())
+//				&& openDayTokens[1]
+//				.equals(Day.FRIDAY.getAbbrevGerman())) {
+//				// ok
+//				for (String token : openHourTokens) {
+//				if (!token.equals("")) {
+//				numbers.add(Integer.parseInt(token));
+//				}
+//				//					System.out.println(); 
+//				}
+//				} else {
+//				System.out.println("Not a valid migros ZH open time line.");
+//				}
+//				System.out.flush();
+
+
 				// process numbers
 				int openDayTokenPointer = 1;
 				double time = 0;
 				double oldTime = 0;
-				double openingHour = 0;
 				boolean isHour = true;
 				boolean isOpen = true;
 				Opentime opentime = null;
 				Day[] days = Day.values();
+
 				for (String openHourToken : openHourTokens) {
-
 					if (!openHourToken.equals("")) {
-
 						if (isHour) {
 							time = Integer.parseInt(openHourToken) * 3600;
 						} else {
+
 							time += Integer.parseInt(openHourToken) * 60;
 
+//							System.out.println(Time.writeTime(time));
+
 							if (isOpen) {
-								openingHour = time;
+
+								System.out.println("Open: " + Time.writeTime(time));
+
+
+//								// check if we have to go to the next day
+								if (time < oldTime) {
+
+									openDayTokenPointer++;
+									while (
+											openDayTokens[openDayTokenPointer].equals("Ausn") || 
+											openDayTokens[openDayTokenPointer].equals("")) {
+										openDayTokenPointer++;
+									}
+
+								}								
+
 							} else {
-								switch (openDayTokenPointer) {
-								case 1:
-									System.out.println("Adding the weekdays...");
+
+								System.out.println("Close: " + Time.writeTime(time));
+
+								Day day = Day.getDayByGermanAbbrev(openDayTokens[openDayTokenPointer]);
+
+								switch(day) {
+								case FRIDAY:
+									System.out.println("Adding times to weekdays...");
 									for (int weekday = 0; weekday <= 4; weekday++) {
 										opentime = new Opentime(days[weekday]
 										                             .getAbbrevEnglish(), Time
-										                             .writeTime(openingHour), Time
+										                             .writeTime(oldTime), Time
 										                             .writeTime(time));
 										shopping.addOpentime(opentime);
 									}
 									break;
 								default:
-									String englishDayString = Day.getDayByGermanAbbrev(openDayTokens[openDayTokenPointer]).getAbbrevEnglish();
-									System.out.println("Adding day " + englishDayString + "...");
-									opentime = new Opentime(
-											englishDayString, 
-											Time.writeTime(openingHour), 
-											Time.writeTime(time));
+									String englishDayString = day.getAbbrevEnglish();
+								System.out.println("Adding times to " + englishDayString + "...");
+								opentime = new Opentime(
+										englishDayString, 
+										Time.writeTime(oldTime), 
+										Time.writeTime(time));
 								shopping.addOpentime(opentime);
 								break;
 								}
@@ -1045,20 +1070,12 @@ public class ShopsOf2005ToFacilities {
 
 							isOpen = !isOpen;
 
-							// go to next day
-							if (time < oldTime) {
+							oldTime = time;
 
-								openDayTokenPointer++;
-								while (openDayTokens[openDayTokenPointer].equals("Ausn")) {
-									openDayTokenPointer++;
-								}
-
-							} else {
-								oldTime = time;
-							}
 						}
 
 						isHour = !isHour;
+
 
 					}
 
@@ -1072,4 +1089,265 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
+	private static void processMigrosOstschweizOpenTimes(Facilities facilities) {
+
+		System.out.println("Setting up Migros Ostschwiiz open times...");
+
+		List<String> lines = null;
+		String[] tokens = null;
+		String[] openHourTokens = null;
+		Day[] days = Day.values();
+		boolean isHour = true;
+		boolean isOpen = true;
+		double time = 0;
+		double openingHour = 0;
+		Opentime opentime = null;
+
+		try {
+
+			lines = FileUtils.readLines(new File(migrosOstschweizOpenTimesFilename), "UTF-8");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (String line : lines) {
+
+			tokens = line.split(FIELD_DELIM);
+
+			// ignore empty lines
+			if (tokens.length == 0) {
+				continue;
+			}
+			// ignore header line
+			if (tokens[0].equals(" Kst. Nr.  ")) {
+				continue;
+			}
+			// ignore lines without data
+			if (tokens[0].equals(" ") || tokens[0].equals("")) {
+				continue;
+			}
+			//System.out.println(line);
+
+			// modify facility description in order to get correct ID
+			tokens[1] = tokens[1].split(" ", 3)[2];
+
+			String facilityId = ShopsOf2005ToFacilities.buildMigrosOstschweizId(tokens);
+			//System.out.println(facilityId);
+			Facility theCurrentMigrosOstschweiz = (Facility) facilities.getLocation(facilityId);
+			if (theCurrentMigrosOstschweiz != null) {
+
+				Activity shopping = theCurrentMigrosOstschweiz.createActivity(ACTIVITY_TYPE_SHOP);
+
+				// extract numbers
+				for (int tokenPos = 2; tokenPos < tokens.length; tokenPos++) {
+
+					String token = tokens[tokenPos];
+					int dayPointer = (tokenPos / 2) - 1;
+
+					openHourTokens = token.split(ANYTHING_BUT_DIGITS);
+					for (String openHourToken : openHourTokens) {
+						if (!openHourToken.equals("")) {
+
+							if (isHour) {
+								time = Integer.parseInt(openHourToken) * 3600;
+							} else {
+								time += Integer.parseInt(openHourToken) * 60;
+
+								if (isOpen) {
+									openingHour = time;
+								} else {
+
+									String englishDayString = days[dayPointer].getAbbrevEnglish();
+									System.out.println("Adding times to " + englishDayString + "...");
+									opentime = new Opentime(
+											englishDayString, 
+											Time.writeTime(openingHour), 
+											Time.writeTime(time));
+									shopping.addOpentime(opentime);
+
+								}
+
+								isOpen = !isOpen;
+
+							}
+
+							isHour = !isHour;
+
+						}
+					}
+				}
+
+				// process numbers
+
+
+			} else {
+				System.out.println("Not found: " + facilityId);
+			}
+
+			System.out.flush();
+
+		}
+
+		System.out.println("Setting up Migros Ostschwiiz open times...done!");
+
+	}
+
+	private static void processCoopZHOpenTimes(Facilities facilities) {
+
+		System.out.println("Setting up Coop ZH open times...");
+
+		final int START_OPEN_TOKEN_INDEX = 14;
+		final int END_OPEN_TOKEN_INDEX = START_OPEN_TOKEN_INDEX + (4 * 7) - 1;
+
+		List<String> lines = null;
+		String[] tokens = null;
+		Day[] days = Day.values();
+		boolean isOpen = true;
+		String time = null;
+		String openingHour = null;
+		Opentime opentime = null;
+
+		try {
+
+			lines = FileUtils.readLines(new File(coopZHFilename), "UTF-8");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (String line : lines) {
+
+			tokens = line.split(FIELD_DELIM);
+
+			// ignore header line
+			if (tokens[3].equals("KST-Nr")) {
+				continue;
+			}
+
+			String facilityId = ShopsOf2005ToFacilities.buildCoopZHId(tokens);
+			System.out.println(facilityId);
+			Facility theCurrentCoopZH = (Facility) facilities.getLocation(facilityId);
+			if (theCurrentCoopZH != null) {
+
+				Activity shopping = theCurrentCoopZH.createActivity(ACTIVITY_TYPE_SHOP);
+
+				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
+
+					String token = tokens[tokenPos];
+
+					if (!token.equals("")) {
+						int dayIndex = (tokenPos - START_OPEN_TOKEN_INDEX) / 4;
+						time = token;
+
+						if (isOpen) {
+							openingHour = time;
+						} else {									
+							String englishDayString = days[dayIndex].getAbbrevEnglish();
+							System.out.println("Open: " + openingHour);
+							System.out.println("Close: " + time);
+							System.out.println("Adding times to " + englishDayString + "...");
+							opentime = new Opentime(
+									englishDayString, 
+									openingHour, 
+									time);
+							shopping.addOpentime(opentime);
+						}
+
+						isOpen = !isOpen;
+					}
+				}
+
+			} else {
+				System.out.println("Not in the facilities file: " + facilityId);				
+			}
+			System.out.flush();
+
+		}
+
+		System.out.println("Setting up Coop ZH open times...done.");
+
+	}
+	
+	private static void processCoopTGOpenTimes(Facilities facilities) {
+
+		System.out.println("Setting up Coop TG open times...");
+
+		final int START_OPEN_TOKEN_INDEX = 4;
+		final int END_OPEN_TOKEN_INDEX = 7;
+
+		List<String> lines = null;
+		String[] tokens = null;
+		String[] openHourTokens = null;
+		Day[] days = Day.values();
+		double openingHour = 0;
+		double closingHour = 0;
+		Opentime opentime = null;
+
+		try {
+
+			lines = FileUtils.readLines(new File(coopTGFilename), "UTF-8");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (String line : lines) {
+
+			tokens = line.split(FIELD_DELIM);
+
+			String facilityId = ShopsOf2005ToFacilities.buildCoopTGId(tokens);
+			System.out.println(facilityId);
+			Facility theCurrentCoopTG = (Facility) facilities.getLocation(facilityId);
+			if (theCurrentCoopTG != null) {
+				Activity shopping = theCurrentCoopTG.createActivity(ACTIVITY_TYPE_SHOP);
+
+				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
+
+					String token = tokens[tokenPos];
+					
+					if (!token.equals("")) {
+						openHourTokens = token.split(ANYTHING_BUT_DIGITS);
+						// hier gehts weita!
+						openingHour = Integer.parseInt(openHourTokens[0]) * 3600;
+						openingHour += Integer.parseInt(openHourTokens[1]) * 60;
+						closingHour = Integer.parseInt(openHourTokens[2]) * 3600;
+						closingHour += Integer.parseInt(openHourTokens[3]) * 60;
+						switch(tokenPos) {
+						case START_OPEN_TOKEN_INDEX:
+						case START_OPEN_TOKEN_INDEX + 1:
+							System.out.println("Open: " + openingHour);
+							System.out.println("Close: " + closingHour);
+							System.out.println("Adding times to weekdays...");
+							for (int weekday = 0; weekday <= 4; weekday++) {
+								opentime = new Opentime(
+										days[weekday].getAbbrevEnglish(), 
+										Time.writeTime(openingHour), 
+										Time.writeTime(closingHour));
+								shopping.addOpentime(opentime);
+							}
+							break;
+						case START_OPEN_TOKEN_INDEX + 2:
+						case START_OPEN_TOKEN_INDEX + 3:
+							System.out.println("Open: " + openingHour);
+							System.out.println("Close: " + closingHour);
+							System.out.println("Adding times to saturday...");
+							opentime = new Opentime(
+									Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(), 
+									Time.writeTime(openingHour), 
+									Time.writeTime(closingHour));
+							shopping.addOpentime(opentime);
+							break;
+						}
+					}
+				}
+			} else {
+				System.out.println("Not in the facilities file: " + facilityId);				
+			}
+			
+		}
+		
+		System.out.println("Setting up Coop TG open times...done.");
+
+	}
 }
