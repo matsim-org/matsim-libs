@@ -206,8 +206,15 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			return new InputSource(localFileName);
 		}
 
+		// still no success, try to load it with the ClassLoader, in case we're stuck in a jar...
+		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
+		if (stream != null) {
+			Logger.getLogger(this.getClass()).info("Using local DTD from jar-file " + shortSystemId);
+			return new InputSource(stream);
+		}
+
 		// We could neither get the remote nor the local version of the dtd, show a warning
-		Logger.getLogger(this.getClass()).warn("Could neither get the DTD from the web nor the local one. " + systemId);
+		Logger.getLogger(this.getClass()).warn("Could neither get the DTD from the web nor a local one. " + systemId);
 		return null;
 	}
 
@@ -262,7 +269,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		System.err.println(ex.getMessage());
 	}
 
-	private String getInputSource(SAXParseException ex) {
+	private String getInputSource(final SAXParseException ex) {
 		if (ex.getSystemId() != null) {
 			return ex.getSystemId();
 		}
