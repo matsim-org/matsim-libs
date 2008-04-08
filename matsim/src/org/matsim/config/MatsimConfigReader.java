@@ -22,6 +22,7 @@ package org.matsim.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -124,17 +125,29 @@ public class MatsimConfigReader extends MatsimXmlParser {
 
 	@Override
 	public InputSource resolveEntity(final String publicId, final String systemId) {
-
 		InputSource is = super.resolveEntity(publicId, systemId);
-		if (is == null && this.localDtd != null) {
+		if (is != null) {
+			// everything is fine, we can access the dtd
+			return is;
+		}
+		// okay, standard procedure failed... let's see if we have it locally
+		if (this.localDtd != null) {
 			File dtdFile = new File(this.localDtd);
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
 				Logger.getLogger(MatsimConfigReader.class).info("Using the local DTD " + this.localDtd);
 				return new InputSource(this.localDtd);
 			}
-			return null;
 		}
-		return is;
+		// hmm, didn't find the local one either... maybe inside a jar somewhere?
+		int index = systemId.replace('\\', '/').lastIndexOf("/");
+		String shortSystemId = systemId.substring(index + 1);
+		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
+		if (stream != null) {
+			Logger.getLogger(this.getClass()).info("Using local DTD from jar-file " + shortSystemId);
+			return new InputSource(stream);
+		}
+		// we fail...
+		return null;
 	}
 
 }
