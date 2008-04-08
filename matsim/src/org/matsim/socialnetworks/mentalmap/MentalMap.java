@@ -173,9 +173,9 @@ public class MentalMap {
 //		" Number of activites an agent has to remember is greater than his memory! MAX = "+max+" "+myPlan.getActsLegs().size()/2+" "+this.knowledge.getActivities().size());
 //		}
 
-		if(myPlans.get(0).getActsLegs().size()/2 >max){
+		if(myPlans.get(0).getActsLegs().size()*myPlans.size()/2 >max){
 		Gbl.errorMsg(this.getClass()+
-		" Number of activites an agent has to remember is greater than his memory! MAX = "+max+" "+myPlans.get(0).getActsLegs().size()/2+" "+this.knowledge.getActivities().size());
+		" Number of activites an agent needs to remember for his plans is greater than his memory! MAX = "+max+" "+myPlans.get(0).getActsLegs().size()*myPlans.size()/2+" "+this.knowledge.getActivities().size());
 		}
 		
 		if(this.knowledge.getActivities().size()>max){
