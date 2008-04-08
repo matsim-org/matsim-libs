@@ -60,19 +60,16 @@ public class SNRandomFacilitySwitcher implements StrategyModuleI {
 	return new SNSecLocRandom(factypes, network, tcost, ttime);
     }
 
-	@Override
 	public void finish() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void handlePlan(Plan plan) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void init() {
 		// TODO Auto-generated method stub
 		
