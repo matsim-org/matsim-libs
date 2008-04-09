@@ -62,11 +62,11 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		this.CHANGE_COST_MULTIPLIER = costMultiplier;
 	}
 
-	@Override
+//	@Override TODO [MR] change to NetworkFactory when used again. Below too!
 	protected Node newNode(final String id, final String x, final String y, final String type) {
 		return new PtNode(id,x,y,type);
 	}
-	@Override
+//	@Override _TODO change to NetworkFactory when used again. 
 	protected Link newLink(final NetworkLayer network, final String id, final Node from, final Node to,
 			 final String length, final String freespeed, final String capacity, final String permlanes,
 			 final String origid, final String type) {

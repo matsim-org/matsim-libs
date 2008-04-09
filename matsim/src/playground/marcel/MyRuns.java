@@ -291,22 +291,12 @@ public class MyRuns {
 		System.out.println("RUN: readPlans");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.getWorld();
+		final ScenarioData data = new ScenarioData(config);
 
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		System.out.println("  reading world, facilities and network ... ");
+		data.getWorld();
+		data.getFacilities();
+		data.getNetwork();
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
@@ -613,6 +603,7 @@ public class MyRuns {
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
+		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1846,8 +1837,8 @@ public class MyRuns {
 		System.out.println("  writing VISUM file... ");
 		final ZoneLayer tvz = (ZoneLayer)world.getLayer("bezirke");
 		final Set<IdI> ids = new TreeSet<IdI>();
-		for (final Iterator iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
-			final Location loc = (Location)iter.next();
+		for (final Iterator<? extends Location> iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
+			final Location loc = iter.next();
 			if (Integer.parseInt(loc.getId().toString()) < 24) {
 				ids.add(loc.getId());
 			}
@@ -1918,8 +1909,8 @@ public class MyRuns {
 		matrices_writer.write();
 		final ZoneLayer bezirke = (ZoneLayer)world.getLayer(new Id("bezirke"));
 		final Set<IdI> ids = new TreeSet<IdI>();
-		for (final Iterator iter = bezirke.getLocations().values().iterator(); iter.hasNext(); ) {
-			final Location loc = (Location)iter.next();
+		for (final Iterator<? extends Location> iter = bezirke.getLocations().values().iterator(); iter.hasNext(); ) {
+			final Location loc = iter.next();
 			if (Integer.parseInt(loc.getId().toString()) < 24) {
 				ids.add(loc.getId());
 			}
@@ -1942,7 +1933,6 @@ public class MyRuns {
 	// convertMatrices
 	//////////////////////////////////////////////////////////////////////
 
-	@SuppressWarnings("unchecked")
 	public static void convertMatrices(final String[] args) {
 		System.out.println("RUN: convertMatrices");
 
@@ -3035,29 +3025,6 @@ public class MyRuns {
 	}
 
 	public static void someTest(final String[] args) {
-		final int nofLoops = 3600;
-		Integer[] array = new Integer[100000];
-		for (int i = 0; i < array.length; i++) {
-			array[i] = Integer.valueOf(i);
-		}
-		Gbl.startMeasurement();
-		for (int loop = 0; loop < nofLoops; loop++) {
-			long sum = 0;
-			for (Integer ii : array) {
-				sum += ii.intValue();
-			}
-//			System.out.println(sum);
-		}
-		Gbl.printElapsedTime();
-		Gbl.startMeasurement();
-		for (int loop = 0; loop < nofLoops; loop++) {
-			long sum = 0;
-			for (int i = 0; i < array.length; i++) {
-				sum += array[i].intValue();
-			}
-//			System.out.println(sum);
-		}
-		Gbl.printElapsedTime();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -3074,7 +3041,7 @@ public class MyRuns {
 //		createKutterPlans(args);
 //		fmaToTrips(args);
 
-		convertPlans(args);
+//		convertPlans(args);
 //		readPlans(args);
 //		removeLinkAndRoute(args);
 //		fixJTimes(args);
@@ -3182,7 +3149,7 @@ public class MyRuns {
 //		readCounts(args);
 //		writeKml();
 //		createQVDiagramm(args);
-//		someTest(args);
+		someTest(args);
 
 //		Gbl.printSystemInfo();
 
