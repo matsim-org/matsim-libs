@@ -17,10 +17,10 @@ public class OTFLinkTravelTimesHandler extends OTFDefaultLinkHandler {
 		}
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			Double erg = count.getLastLinkTravelTime(src.getId().toString());
-			if (erg != null) out.putFloat((float)(src.getLength()/erg.doubleValue()));
-			else out.putFloat((float)src.getFreespeed(Time.UNDEFINED_TIME));
-			
+			Double erg = count.getLastLinkTravelTime(this.src.getLink().getId().toString());
+			if (erg != null) out.putFloat((float)(this.src.getLink().getLength()/erg.doubleValue()));
+			else out.putFloat((float)this.src.getLink().getFreespeed(Time.UNDEFINED_TIME));
+
 		}
 
 		@Override

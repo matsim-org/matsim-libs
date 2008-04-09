@@ -29,7 +29,6 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -65,7 +64,7 @@ public class RouterVis {
 	public RouterVis(NetworkLayer network, TravelCostI costCalculator,
 			TravelTimeI timeCalculator){
 		this.writer = getNetStateWriter(network);
-		this.router = new VisDijkstra(network,costCalculator,timeCalculator,writer);
+		this.router = new VisDijkstra(network,costCalculator,timeCalculator,this.writer);
 	}
 
 /**
@@ -108,7 +107,7 @@ public class RouterVis {
 
 		VisConfig myVisConfig = VisConfig.newDefaultConfig();
 		myVisConfig.set(VisConfig.DELAY, "100");
-		
+
 		RouterNetStateWriter netStateWriter = new RouterNetStateWriter(network, config.network().getInputFile(), myVisConfig, snapshotFile, 1, buffers);
 		netStateWriter.open();
 		return netStateWriter;
@@ -138,7 +137,6 @@ public class RouterVis {
 
 		log.info("  reading the network...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		log.info("  done.");

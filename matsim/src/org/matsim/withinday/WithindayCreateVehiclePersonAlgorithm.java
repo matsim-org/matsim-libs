@@ -53,7 +53,7 @@ public class WithindayCreateVehiclePersonAlgorithm extends PersonAlgo_CreateVehi
 		if (plan != null) {
 			OccupiedVehicle veh = new OccupiedVehicle();
 			veh.setActLegs(plan.getActsLegs());
-			veh.setDriverID(person.getId().toString());
+//			veh.setDriverID(person.getId().toString());
 			veh.setDriver(person);
 			veh.initVeh();
 			this.controler.createAgent(person, veh);

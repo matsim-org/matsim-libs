@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.trafficmonitoring;
 
@@ -35,7 +35,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -49,7 +48,7 @@ public class TravelTimeCalculatorHashMapTest extends MatsimTestCase {
 	// to ensure this option isn't enabled for real tests!
 
 public final void testLinkTravelTime() throws Exception {
-	
+
 	String className =  "/" + this.getClass().getSimpleName();
 	String  inputDir = "test/input/" + (this.getClass().getCanonicalName().replace('.', '/')).replace(className, "")	+ "/TravelTimeCalculator/";
 	String networkFile = inputDir + "link10_network.xml";
@@ -64,7 +63,6 @@ public final void testLinkTravelTime() throws Exception {
 
 	// setup network
 	NetworkLayer network = null;
-	NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 	network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 
 	// read network

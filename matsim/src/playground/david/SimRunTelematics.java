@@ -23,8 +23,8 @@ package playground.david;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -38,13 +38,13 @@ public class SimRunTelematics {
 
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
-		
+
 		World world = Gbl.createWorld();
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		NetworkLayer network = new NetworkLayer();
+				new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
-		
+
 		Plans population = new MyPopulation();
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
@@ -53,13 +53,13 @@ public class SimRunTelematics {
 		Events events = new Events();
 		events.addHandler(new EventWriterTXT("EventsTelematicsSimWrapper.txt"));
 		world.setEvents(events);
-		
+
 		//TelematicsSimWrapper sim = new TelematicsSimWrapper(netFileName,population, events);
 		//sim.setStartEndTime(0,30000);
 		//sim.run();
-		// oder 
+		// oder
 		//sim.run(0*60*60, 10*60*60);
-		
+
 	}
 
 }

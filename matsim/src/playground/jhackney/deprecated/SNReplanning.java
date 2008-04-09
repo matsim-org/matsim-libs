@@ -44,13 +44,11 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.ExternalMobsim;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.Simulation;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.NetworkWriter;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.MatsimPlansReader;
@@ -96,7 +94,7 @@ public class SNReplanning  {
 
 	/** The Config instance the Controler uses. */
 	protected Config config = null;
-	
+
 	public static final String FILENAME_EVENTS = "events.txt";
 	public static final String FILENAME_PLANS = "plans.xml";
 	public static final String FILENAME_LINKSTATS = "linkstats.att";
@@ -139,7 +137,7 @@ public class SNReplanning  {
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
 	SpatialInteractor plansInteractorS;//spatial (face to face)
 	int max_sn_iter;
-	String [] infoToExchange;//type of info for non-spatial exchange is read in 
+	String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
 	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
@@ -153,19 +151,19 @@ public class SNReplanning  {
 //	New variables for replanning
 	int replan_interval;
 
-//	-------------------- end social network variables --------------------//    
+//	-------------------- end social network variables --------------------//
 
 	/** Describes whether the output directory is correctly set up and can be used. */
 	private boolean outputDirSetup = false;
 
 	private final static Logger log = Logger.getLogger(SNReplanning.class);
-	
+
 	public SNReplanning() {
 		super();
 	}
 
 	public final void run(String[] args) {
-		running = true;
+		this.running = true;
 
 		printNote("M A T S I M - C O N T R O L E R", "start");
 		this.config = Gbl.getConfig();
@@ -201,11 +199,11 @@ public class SNReplanning  {
 		System.out.println("----------Initialization of social network -------------------------------------");
 		snsetup();
 		System.out.println(" Beginning the relaxation of social connections...");
-		for (int snIter = 1; snIter <= max_sn_iter; snIter++) {
+		for (int snIter = 1; snIter <= this.max_sn_iter; snIter++) {
 			interact(snIter);
 		}
 		System.out.println("----------Closing social network statistic files and wrapping up ---------------");
-		snetstat.closeFiles();
+		this.snetstat.closeFiles();
 		snwrapup();
 
 //		JKH end
@@ -217,99 +215,99 @@ public class SNReplanning  {
 		printNote("M A T S I M - C O N T R O L E R", "exit");
 	}
 	private void snwrapup(){
-		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(outputPath,snet, population);
+		JUNGPajekNetWriterWrapper pnww = new JUNGPajekNetWriterWrapper(outputPath,this.snet, this.population);
 		pnww.write();
 
 		System.out.println(" Writing the statistics of the final social network to Output Directory...");
 
 		SocialNetworkStatistics snetstatFinal=new SocialNetworkStatistics();
 		snetstatFinal.openFiles(outputPath);
-		snetstatFinal.calculate(max_sn_iter, snet, population);
+		snetstatFinal.calculate(this.max_sn_iter, this.snet, this.population);
 
 		System.out.println(" ... done");
-		snetstatFinal.closeFiles();	
+		snetstatFinal.closeFiles();
 	}
 	private void snsetup() {
 
 //		Config config = Gbl.getConfig();
 
-		max_sn_iter = Integer.parseInt(config.socnetmodule().getNumIterations());
-		replan_interval = Integer.parseInt(config.socnetmodule().getRPInt());
-		String rndEncounterProbString = config.socnetmodule().getFacWt();
-		String interactorNSFacTypesString = config.socnetmodule().getXchange();
-		infoToExchange = getFacTypes(interactorNSFacTypesString);
-		fractionS = getActivityTypeAllocation(rndEncounterProbString);
-		rndEncounterProbs = getActivityTypeAllocationMap(activityTypesForEncounters, rndEncounterProbString);
+		this.max_sn_iter = Integer.parseInt(this.config.socnetmodule().getNumIterations());
+		this.replan_interval = Integer.parseInt(this.config.socnetmodule().getRPInt());
+		String rndEncounterProbString = this.config.socnetmodule().getFacWt();
+		String interactorNSFacTypesString = this.config.socnetmodule().getXchange();
+		this.infoToExchange = getFacTypes(interactorNSFacTypesString);
+		this.fractionS = getActivityTypeAllocation(rndEncounterProbString);
+		this.rndEncounterProbs = getActivityTypeAllocationMap(activityTypesForEncounters, rndEncounterProbString);
 
 		// TODO Auto-generated method stub
 		System.out.println(" Instantiating the Pajek writer ...");
 
-		pjw = new PajekWriter1(SOCNET_OUT_DIR, facilities);
+		pjw = new PajekWriter1(SOCNET_OUT_DIR, this.facilities);
 		System.out.println("... done");
 
 		System.out.println(" Initializing the social network ...");
-		snet = new SocialNetwork(population);
+		this.snet = new SocialNetwork(this.population);
 		System.out.println("... done");
 
 		System.out.println(" Calculating the statistics of the initial social network)...");
-		snetstat=new SocialNetworkStatistics();
-		snetstat.openFiles();
-		snetstat.calculate(0, snet, population);
+		this.snetstat=new SocialNetworkStatistics();
+		this.snetstat.openFiles();
+		this.snetstat.calculate(0, this.snet, this.population);
 		System.out.println(" ... done");
 
 		System.out.println(" Writing out the initial social network ...");
-		pjw.write(snet.getLinks(), population, 0);
+		pjw.write(this.snet.getLinks(), this.population, 0);
 		System.out.println("... done");
 
 		System.out.println(" Setting up the NonSpatial interactor ...");
-		plansInteractorNS=new NonSpatialInteractor(snet);
+		this.plansInteractorNS=new NonSpatialInteractor(this.snet);
 		System.out.println("... done");
 
 		System.out.println(" Setting up the Spatial interactor ...");
-		plansInteractorS=new SpatialInteractor(snet);
+		this.plansInteractorS=new SpatialInteractor(this.snet);
 		System.out.println("... done");
 	}
 
 	/**
 	 * The interact method runs the mobility simulation within the iterating social network
-	 * simulation. 
+	 * simulation.
 	 *
 	 */
 	private void interact(int snIter) {
 
-		System.out.println("----------- Begin social interaction iteration "+snIter+" -------------");	    
+		System.out.println("----------- Begin social interaction iteration "+snIter+" -------------");
 
 		System.out.println(" Spatial interactions...");
-		if(total_spatial_fraction(fractionS)>0){
+		if(total_spatial_fraction(this.fractionS)>0){
 			if(snIter==1){
 //				snsetup();
 				System.out.println("  Generating [Spatial] socializing opportunities ...");
 				System.out.println("   Mapping which agents were doing what, where, and when");
 				// Create the social opportunities from plans (updated each time plans change)
 				// OK to initialize from plans but do this from events if events != null!
-				socialEvents = gen2.generate(population);
+				this.socialEvents = this.gen2.generate(this.population);
 				System.out.println("...finished.");
 			}
 			// Agents interact at the social opportunities
 			System.out.println("  Agents interact at the social opportunities ...");
-			plansInteractorS.interact(socialEvents, rndEncounterProbs, snIter);
+			this.plansInteractorS.interact(this.socialEvents, this.rndEncounterProbs, snIter);
 		}else{
 			System.out.println("     (none)");
 		}
 		System.out.println(" ... Spatial interactions done\n");
 
 		System.out.println(" Removing social links ...");
-		snet.removeLinks(snIter);
+		this.snet.removeLinks(snIter);
 		System.out.println(" ... done");
 
 		System.out.println(" Non-Spatial interactions ...");
-		for (int ii = 0; ii < infoToExchange.length; ii++) {
-			String facTypeNS = infoToExchange[ii];
+		for (int ii = 0; ii < this.infoToExchange.length; ii++) {
+			String facTypeNS = this.infoToExchange[ii];
 
 			//	Geographic Knowledge about all types of places is exchanged
 			if (!facTypeNS.equals("none")) {
 				System.out.println("  Geographic Knowledge about all types of places is being exchanged ...");
-				plansInteractorNS.exchangeGeographicKnowledge(facTypeNS, snIter);
+				this.plansInteractorNS.exchangeGeographicKnowledge(facTypeNS, snIter);
 			}
 		}
 
@@ -317,7 +315,7 @@ public class SNReplanning  {
 		double fract_intro=Double.parseDouble(this.config.socnetmodule().getTriangles());
 		if (fract_intro > 0) {
 			System.out.println("  Knowledge about other people is being exchanged ...");
-			plansInteractorNS.exchangeSocialNetKnowledge(snIter);
+			this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
 		}
 
 		System.out.println("  ... done");
@@ -325,23 +323,23 @@ public class SNReplanning  {
 //		Altering plans
 
 
-		System.out.println(" Replan every "+replan_interval+"th iteration of the social network.");
+		System.out.println(" Replan every "+this.replan_interval+"th iteration of the social network.");
 
-		if (((snIter > 1) && (snIter % replan_interval == 0))||replan_interval==1) {
+		if (((snIter > 1) && (snIter % this.replan_interval == 0))||(this.replan_interval==1)) {
 			System.out.println("  Begin replanning snIter = "+snIter+" ...");
 			doReplanningIterations(snIter);
 			System.out.println("  Updating [Spatial] socializing opportunities to changed plans for iteration " + snIter + "...");
-			socialEvents=gen2.generate(population);
+			this.socialEvents=this.gen2.generate(this.population);
 			System.out.println("... finished.");
 		}
 
 		System.out.println(" Calculating and reporting network statistics ...");
-		snetstat.calculate(snIter, snet, population);
+		this.snetstat.calculate(snIter, this.snet, this.population);
 		System.out.println(" ... done");
 
 		System.out.println(" Writing out social network for iteration " + snIter + " ...");
-		pjw.write(snet.getLinks(), population, snIter);
-		System.out.println(" ... done");	
+		pjw.write(this.snet.getLinks(), this.population, snIter);
+		System.out.println(" ... done");
 	}
 
 
@@ -362,12 +360,12 @@ public class SNReplanning  {
 		if (externalMobsim == null) {
 			System.out.println("Write a Simulation object that returns the unloaded network travel times");
 			// queue-sim david
-			Simulation sim = new QueueSimulation((QueueNetworkLayer)network, population, events);
+			Simulation sim = new QueueSimulation(this.network, this.population, this.events);
 			sim.run();
 		} else {
 			/* remove eventswriter, as the external mobsim has to write the events */
-			events.removeHandler(eventwriter);
-			ExternalMobsim sim = new ExternalMobsim(population, events);
+			this.events.removeHandler(this.eventwriter);
+			ExternalMobsim sim = new ExternalMobsim(this.population, this.events);
 			sim.run();
 		}
 
@@ -377,7 +375,7 @@ public class SNReplanning  {
 	 * reader. Replace eventually with a routine that runs all of the
 	 * facTypes but uses a probability for each one, summing to 1.0. Change
 	 * the interactors accordingly.
-	 * 
+	 *
 	 * @param longString
 	 * @return
 	 */
@@ -423,7 +421,7 @@ public class SNReplanning  {
 		double sum = 0.;
 		for (int i = 0; i < s.length; i++) {
 			w[i] = Double.valueOf(s[i]).doubleValue();
-			if(w[i]<0.||w[i]>1.){
+			if((w[i]<0.)||(w[i]>1.)){
 				Gbl.errorMsg("All parameters \"s_weights\" must be >0 and <1. Check config file.");
 			}
 			sum=sum+w[i];
@@ -445,7 +443,7 @@ public class SNReplanning  {
 		double sum = 0.;
 		for (int i = 0; i < s.length; i++) {
 			w[i] = Double.valueOf(s[i]).doubleValue();
-			if(w[i]<0.||w[i]>1.){
+			if((w[i]<0.)||(w[i]>1.)){
 				Gbl.errorMsg("All parameters \"s_weights\" must be >0 and <1. Check config file.");
 			}
 			sum=sum+w[i];
@@ -458,12 +456,12 @@ public class SNReplanning  {
 			Gbl.errorMsg("At least one weight for the type of information exchange or meeting place must be > 0, check config file.");
 		}
 		return map;
-	}    
+	}
 
 	private final void doReplanningIterations(int snIter) {
 //		The scoring is based on Events.
 		Gbl.startMeasurement();
-		for (iteration = minIteration; iteration <= maxIterations; iteration++) {
+		for (iteration = this.minIteration; iteration <= this.maxIterations; iteration++) {
 			printNote("I T E R A T I O N   " + iteration, "[" + iteration + "] iteration begins");
 
 			makeSNIterationPath(snIter);
@@ -473,8 +471,8 @@ public class SNReplanning  {
 			Gbl.random.setSeed(this.config.global().getRandomSeed() + iteration);
 			Gbl.random.nextDouble(); // draw one because of strange "not-randomness" is the first draw...
 
-			if (tollCalc != null) {		// roadPricing only
-				tollCalc.reset(iteration);
+			if (this.tollCalc != null) {		// roadPricing only
+				this.tollCalc.reset(iteration);
 			}
 
 			//
@@ -482,13 +480,13 @@ public class SNReplanning  {
 			//
 			if (snIter > 1) {
 				printNote("R E P L A N N I N G   " + iteration, "[" + iteration + "] running strategy modules begins");
-				strategyManager.run(population, iteration);
+				this.strategyManager.run(this.population, iteration);
 				printNote("R E P L A N N I N G   " + iteration, "[" + iteration + "] running strategy modules ends");
 			}
 
 			setupIteration(iteration, snIter);
 
-			// reset random seed again before mobsim, as we do not know if strategy modules ran and if they used random numbers. 
+			// reset random seed again before mobsim, as we do not know if strategy modules ran and if they used random numbers.
 			Gbl.random.setSeed(this.config.global().getRandomSeed() + iteration);
 			Gbl.random.nextDouble(); // draw one because of strange "not-randomness" is the first draw...
 
@@ -513,13 +511,13 @@ public class SNReplanning  {
 		// TODO [MR] use events.resetHandlers();
 		((TravelTimeCalculatorArray)this.travelTimeCalculator).resetTravelTimes();	// reset, so we can collect the new events and build new travel times for the next iteration
 
-		eventwriter = new EventWriterTXT(getIterationFilename(FILENAME_EVENTS, snIter));
-		events.addHandler(eventwriter);
+		this.eventwriter = new EventWriterTXT(getIterationFilename(FILENAME_EVENTS, snIter));
+		this.events.addHandler(this.eventwriter);
 		if (this.planScorer == null) {
 //			if (Gbl.useRoadPricing()) {
 //			this.planScorer = new EventsToScore(this.population, new RoadPricingScoringFunctionFactory(this.tollCalc));
 //			}
-			if (hackSocNets) {
+			if (this.hackSocNets) {
 				System.out.println("### USING SOCIAL NETS SCORER");
 				this.planScorer = new EventsToScore(this.population, new SNScoringFunctionFactory01());
 			}else {
@@ -531,18 +529,18 @@ public class SNReplanning  {
 		}
 
 		// collect and average volumes information in iterations *6-*0, e.g. it.6-10, it.16-20, etc
-		if (iteration % 10 == 0 || iteration % 10 >= (this.minIteration + 6)) {
-			volumes.reset(iteration);
-			events.addHandler(volumes);
+		if ((iteration % 10 == 0) || (iteration % 10 >= (this.minIteration + 6))) {
+			this.volumes.reset(iteration);
+			this.events.addHandler(this.volumes);
 		}
 
-		legTimes.reset(iteration);
+		this.legTimes.reset(iteration);
 
 		// dump plans every 10th iteration
-		if (iteration % 10 == 0 || iteration < 3) {
+		if ((iteration % 10 == 0) || (iteration < 3)) {
 			printNote("", "dumping all agents' plans...");
 			String outversion = this.config.plans().getOutputVersion();
-			PlansWriter plansWriter = new PlansWriter(population, getIterationFilename(FILENAME_PLANS, snIter), outversion);
+			PlansWriter plansWriter = new PlansWriter(this.population, getIterationFilename(FILENAME_PLANS, snIter), outversion);
 			plansWriter.setUseCompression(true);
 			plansWriter.write();
 			printNote("", "done dumping plans.");
@@ -555,8 +553,8 @@ public class SNReplanning  {
 	 */
 	protected void finishIteration(int iteration, int snIter) {
 		System.out.println("close event writer");
-		events.removeHandler(eventwriter);
-		eventwriter.reset(iteration);
+		this.events.removeHandler(this.eventwriter);
+		this.eventwriter.reset(iteration);
 
 		//
 		// score plans and calc average
@@ -567,9 +565,9 @@ public class SNReplanning  {
 		average.run(this.population);
 		printNote("S C O R I N G", "[" + iteration + "] the average score is: " + average.getAverage());
 
-		if (iteration % 10 == 0 || iteration % 10 >= (this.minIteration + 6)) {
-			this.events.removeHandler(volumes);
-			this.linkStats.addData(volumes, this.travelTimeCalculator);
+		if ((iteration % 10 == 0) || (iteration % 10 >= (this.minIteration + 6))) {
+			this.events.removeHandler(this.volumes);
+			this.linkStats.addData(this.volumes, this.travelTimeCalculator);
 		}
 
 //		if (iteration % 10 == 0 && iteration > this.minIteration) {
@@ -606,7 +604,7 @@ public class SNReplanning  {
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 
 		System.out.println(" Initializing agent knowledge ...");
-		initializeKnowledge(population);
+		initializeKnowledge(this.population);
 		System.out.println("... done");
 	}
 
@@ -624,7 +622,6 @@ public class SNReplanning  {
 	protected NetworkLayer loadNetwork() {
 		// - read network: which buildertype??
 		printNote("", "  creating network layer... ");
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		printNote("", "  done");
 
@@ -638,13 +635,13 @@ public class SNReplanning  {
 	protected Facilities loadFacilities() {
 		if (this.config.facilities().getInputFile() != null) {
 			printNote("", "  reading facilities xml file... ");
-			facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-			new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+			this.facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+			new MatsimFacilitiesReader(this.facilities).readFile(this.config.facilities().getInputFile());
 			printNote("", "  done");
 		} else {
 			printNote("","  No Facilities input file given in config.xml!");
 		}
-		return facilities;
+		return this.facilities;
 	}
 
 	protected Plans loadPopulation() {
@@ -663,7 +660,7 @@ public class SNReplanning  {
 
 		if (Gbl.useRoadPricing()) {
 			System.out.println("setting up road pricing support...");
-			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(network);
+			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.network);
 			try {
 				rpReader.parse(this.config.getParam("roadpricing", "tollLinksFile"));
 			} catch (Exception e) {
@@ -675,8 +672,8 @@ public class SNReplanning  {
 			System.out.println("done.");
 		}
 
-		TravelTimeCalculatorArray travelTimeCalculator = new TravelTimeCalculatorArray(network, 15*60); // 15min bins
-		events.addHandler(travelTimeCalculator);
+		TravelTimeCalculatorArray travelTimeCalculator = new TravelTimeCalculatorArray(this.network, 15*60); // 15min bins
+		this.events.addHandler(travelTimeCalculator);
 		this.travelTimeCalculator = travelTimeCalculator;
 
 //		if (Gbl.useRoadPricing()) {
@@ -694,7 +691,7 @@ public class SNReplanning  {
 		 * while volumes uses 60min-steps! It works a.t.m., but the traveltimes
 		 * in linkStats are the avg. traveltimes between xx.00 and xx.15, and not
 		 * between xx.00 and xx.59
-		 */ 
+		 */
 		this.linkStats = new CalcLinkStats(this.network);
 		this.volumes = new VolumesAnalyzer(3600, 24*3600-1, this.network);
 
@@ -706,7 +703,7 @@ public class SNReplanning  {
 		 * - make sure the selected plan was routed
 		 */
 		printNote("", "  preparing plans for simulation...");
-		new PersonPrepareForSim(new PlansCalcRoute(network, this.travelCostCalculator, this.travelTimeCalculator), this.network).run(population);
+		new PersonPrepareForSim(new PlansCalcRoute(this.network, this.travelCostCalculator, this.travelTimeCalculator), this.network).run(this.population);
 		printNote("", "  done");
 
 		this.strategyManager = loadStrategyManager();
@@ -714,8 +711,8 @@ public class SNReplanning  {
 
 	/**
 	 * writes necessary information to files and ensures that all files get properly closed
-	 * 
-	 * @param unexpected indicates whether the shutdown was planned (<code>false</code>) or not (<code>true</code>) 
+	 *
+	 * @param unexpected indicates whether the shutdown was planned (<code>false</code>) or not (<code>true</code>)
 	 */
 	protected final void shutdown(boolean unexpected) {
 //		if (running) {
@@ -988,7 +985,7 @@ public class SNReplanning  {
 	}
 
 	public final Plans getPopulation() {
-		return population;
+		return this.population;
 	}
 
 	private final void setupOutputDir() {
@@ -1039,7 +1036,7 @@ public class SNReplanning  {
 		if (!snDir.mkdir() && !snDir.exists()) {
 			Gbl.errorMsg("The iterations directory " + (outputPath + "/" + DIRECTORY_SN) + " could not be created.");
 		}
-		outputDirSetup  = true;
+		this.outputDirSetup  = true;
 	}
 
 	private final void makeIterationPath(int iteration) {
@@ -1066,7 +1063,7 @@ public class SNReplanning  {
 	 * While useful in a productive environment, this security feature may be
 	 * interfering in testcases or while debugging. <br>
 	 * <strong>Use this setting with caution, as it can result in data loss!</strong>
-	 * 
+	 *
 	 * @param overwrite
 	 *          whether files and directories should be overwritten (true) or not
 	 *          (false)
@@ -1078,7 +1075,7 @@ public class SNReplanning  {
 	/**
 	 * returns whether the Controler is currently allowed to overwrite files in
 	 * the output directory.
-	 * 
+	 *
 	 * @return true if the Controler is currently allowed to overwrite files in
 	 *         the output directory, false if not.
 	 */
@@ -1089,7 +1086,7 @@ public class SNReplanning  {
 	/**
 	 * an internal routine to generated some (nicely?) formatted output. This helps that status output
 	 * looks about the same every time output is written.
-	 * 
+	 *
 	 * @param header the header to print, e.g. a module-name or similar. If empty <code>""</code>, no header will be printed at all
 	 * @param action the status message, will be printed together with a timestamp
 	 */
@@ -1134,6 +1131,7 @@ public class SNReplanning  {
 		Runtime run = Runtime.getRuntime();
 		run.addShutdownHook( new Thread()
 		{
+			@Override
 			public void run()
 			{
 				controler.shutdown(true);

@@ -26,9 +26,9 @@ import java.util.Set;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Leg;
 import org.matsim.plans.MatsimPlansReader;
@@ -43,11 +43,11 @@ class FilterPersons extends PersonAlgorithm{
 
 	public static Set<Node> relevantFromNodes = new HashSet<Node>();
 	public static Set<Node> relevantToNodes = new HashSet<Node>();
-	
+
 	public FilterPersons() {
 		super();
 		//Find relevant nodes to look for
-		QueueLink link1 = FilterBerlinKutter.network.getLinks().get(new Id(1655));
+		Link link1 = FilterBerlinKutter.network.getLinks().get(new Id(1655));
 		relevantFromNodes.add(link1.getFromNode());
 		relevantToNodes.add(link1.getToNode());
 		link1 = FilterBerlinKutter.network.getLinks().get(new Id(1659));
@@ -88,12 +88,12 @@ class FilterPersons extends PersonAlgorithm{
 			}
 		}
 	}
-	
+
 }
 
 public class FilterBerlinKutter {
 	public static Plans relevantPopulation;
-	public static QueueNetworkLayer network;
+	public static NetworkLayer network;
 
 
 	/**
@@ -108,13 +108,13 @@ public class FilterBerlinKutter {
 
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
-		
+
 		World world = Gbl.getWorld();
-		
-		network = new QueueNetworkLayer();
+
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
-		
+
 		relevantPopulation = new Plans(false);
 		Plans population = new MyPopulation();
 		MatsimPlansReader plansReader = new MatsimPlansReader(population);

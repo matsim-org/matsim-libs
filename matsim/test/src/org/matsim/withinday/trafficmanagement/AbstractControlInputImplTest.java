@@ -23,8 +23,8 @@ package org.matsim.withinday.trafficmanagement;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Route;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -46,7 +46,7 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 	}
 
 	public void testAbstractControlInputImpl() {
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		MatsimNetworkReader parser = new MatsimNetworkReader(network);
 		parser.readFile(networkPath);
 		Gbl.createWorld().setNetworkLayer(network);

@@ -37,7 +37,6 @@ import org.matsim.evacuation.EvacuationAreaFileReader;
 import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -278,7 +277,7 @@ public class ExitCountsCreator {
 		World world = Gbl.createWorld();
 
 		System.out.println("reading network xml file... ");
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("./networks/padang_net.xml");
 		world.setNetworkLayer(network);
 		System.out.println("done. ");

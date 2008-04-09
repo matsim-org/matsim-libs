@@ -48,7 +48,6 @@ import org.matsim.mobsim.SimulationTimer;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.Node;
 import org.matsim.plans.Plans;
 import org.matsim.utils.identifiers.IdI;
@@ -196,7 +195,6 @@ public class PartialQueueSimulation extends QueueSimulation implements
 		Gbl.createWorld();
 
 		try {
-			NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 			QueueNetworkLayer network = (QueueNetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 
 			PartialQueueSimulation pq = new PartialQueueSimulation(network, null, null);
@@ -284,7 +282,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 			fromID = ((QueueNode) link.getFromNode()).getPartitionId();
 			toID = ((QueueNode) link.getToNode()).getPartitionId();
 
-			if (fromID != this.partID && toID != this.partID) {
+			if ((fromID != this.partID) && (toID != this.partID)) {
 				// both nodes are not on my partition, remove link
 			} else if (fromID != toID) {
 				count++;
@@ -319,7 +317,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 			fromID = ((QueueNode) link.getFromNode()).getPartitionId();
 			toID = ((QueueNode) link.getToNode()).getPartitionId();
 
-			if (fromID != this.partID && toID != this.partID) {
+			if ((fromID != this.partID) && (toID != this.partID)) {
 				// both nodes are not on my partition, remove link
 				l_it.remove();
 			}

@@ -23,6 +23,7 @@ package org.matsim.basic.v01;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
@@ -63,6 +64,14 @@ implements BasicLinkI
 	@Deprecated
 	public BasicLink(NetworkLayer network, String id, Coord coord) {
 		super(network, id, coord);
+	}
+
+	protected BasicLink() {
+		super();
+	}
+
+	public BasicLink(IdI id, Node from, Node to) {
+		this(null, id, from, to);
 	}
 
 	// TODO [balmermi] For simplicity, we calculate only the distance to the center

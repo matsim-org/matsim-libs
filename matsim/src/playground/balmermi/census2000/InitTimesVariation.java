@@ -24,7 +24,6 @@ import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.NetworkWriter;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
@@ -36,14 +35,13 @@ import playground.balmermi.census2000.modules.PersonVaryTimes;
 public class InitTimesVariation {
 
 	public static void varyInitTimes() {
-		
+
 		System.out.println("MATSim-IIDM: vary init times.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading network xml file...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		System.out.println("  done.");
@@ -62,7 +60,7 @@ public class InitTimesVariation {
 		System.out.println("  adding person modules... ");
 		plans.addAlgorithm(new PersonVaryTimes());
 		System.out.println("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
@@ -71,14 +69,14 @@ public class InitTimesVariation {
 		plans.runAlgorithms();
 		plansWriter.write();
 		System.out.println("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing network xml file... ");
 		NetworkWriter net_writer = new NetworkWriter(network);
 		net_writer.write();
 		System.out.println("  done.");
-		
+
 		System.out.println("  writing config xml file... ");
 		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
 		config_writer.write();
@@ -87,7 +85,7 @@ public class InitTimesVariation {
 		System.out.println("done.");
 		System.out.println();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////

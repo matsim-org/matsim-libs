@@ -338,7 +338,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 			out.putInt(1); // value count of link colors, always 1
 	        double value = qLink.getDisplayableSpaceCapValue();
 	        out.putFloat((float)value);
-	        writeUTF(qLink.getId().toString(), out);
+	        writeUTF(qLink.getLink().getId().toString(), out);
 	        Collection<? extends DrawableAgentI> coll = qLink.getDrawableCollection();
 	        out.putInt(coll.size());
 	        Iterator<? extends DrawableAgentI> iter = coll.iterator();

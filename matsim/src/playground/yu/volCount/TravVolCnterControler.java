@@ -26,9 +26,9 @@
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -45,11 +45,11 @@ public class TravVolCnterControler {
 	public static void main(String[] args) {
 		final String netFilename = "./equil/equil_net.xml";
 		final String plansFilename = "./equil/equil_plans.xml";
-		
+
 		World world = Gbl.getWorld();
 		Config config = Gbl.createConfig(null);
-		
-		QueueNetworkLayer network = new QueueNetworkLayer();
+
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
@@ -62,7 +62,7 @@ public class TravVolCnterControler {
 
 		TraVolCnter traVolCounter = new TraVolCnter();
 		events.addHandler(traVolCounter);
-		
+
 		QueueSimulation sim = new QueueSimulation(network, population, events);
 		sim.run();
 	}

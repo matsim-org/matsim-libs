@@ -23,7 +23,6 @@ package org.matsim.router;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -145,7 +144,6 @@ public class RoutingTest extends MatsimTestCase {
 
 	private NetworkLayer readNetwork() {
 		System.out.println("  reading the network...");
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		System.out.println("  done.");

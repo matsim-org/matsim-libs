@@ -34,15 +34,15 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
 /**
  * prepare Departure time- arrival Time- Diagramm
- * 
+ *
  * @author ychen
  */
 public class TimeWriter implements EventHandlerAgentDepartureI,
@@ -77,12 +77,12 @@ public class TimeWriter implements EventHandlerAgentDepartureI,
 		String agentId = event.agentId;
 		if (this.agentDepTimes.containsKey(agentId)) {
 			int depT = (int) this.agentDepTimes.remove(agentId).doubleValue();
-			depTimes.add((double) depT);
+			this.depTimes.add((double) depT);
 			int depH = depT / 3600;
 			int depMin = (depT - depH * 3600) / 60;
 			int depSec = depT - depH * 3600 - depMin * 60;
 			int time = (int) event.time;
-			arrTimes.add((double) time);
+			this.arrTimes.add((double) time);
 			int h = time / 3600;
 			int min = (time - h * 3600) / 60;
 			int sec = time - h * 3600 - min * 60;
@@ -121,11 +121,11 @@ public class TimeWriter implements EventHandlerAgentDepartureI,
 	public void writeChart(String chartFilename) {
 		XYScatterChart chart = new XYScatterChart("departure and arrival Time",
 				"departureTime", "arrivalTime");
-		double[] dTArray = new double[depTimes.size()];
-		double[] aTArray = new double[arrTimes.size()];
-		for (int i = 0; i < depTimes.size(); i++) {
-			dTArray[i] = depTimes.get(i).doubleValue();
-			aTArray[i] = arrTimes.get(i).doubleValue();
+		double[] dTArray = new double[this.depTimes.size()];
+		double[] aTArray = new double[this.arrTimes.size()];
+		for (int i = 0; i < this.depTimes.size(); i++) {
+			dTArray[i] = this.depTimes.get(i).doubleValue();
+			aTArray[i] = this.arrTimes.get(i).doubleValue();
 		}
 		chart.addSeries("depTime/arrTime", dTArray, aTArray);
 		chart.saveAsPng(chartFilename, 1024, 768);
@@ -161,7 +161,7 @@ public class TimeWriter implements EventHandlerAgentDepartureI,
 		Config config = Gbl.createConfig(null);
 		World world = Gbl.getWorld();
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 

@@ -23,11 +23,11 @@ package playground.david;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.Simulation;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -37,17 +37,17 @@ public class ExternalMobsimTest {
 	public static void main(String[] args) {
 		String[] defaultArgs = {"test/simple/default_config.xml"};
 		Gbl.createConfig(defaultArgs);
-		
-		QueueNetworkLayer network = new QueueNetworkLayer() ;
-		new MatsimNetworkReader(network).readFile("e:/Development/tmp/studies/equil//equil_netENG.xml");
+
+		NetworkLayer network = new NetworkLayer();
+				new MatsimNetworkReader(network).readFile("e:/Development/tmp/studies/equil//equil_netENG.xml");
 		Gbl.getWorld().setNetworkLayer ( network ) ;
-		
+
 
 		System.out.println("[External MOBSIM called"  + "]");
-		
+
 		Events events_ = new Events();
 		Plans population_ = new Plans(Plans.NO_STREAMING);
-		
+
 		//load pop from popfile
 		System.out.println("[External MOBSIM"  + "] loading plansfile: " + args[0]);
 		PlansReaderI plansReader = new MatsimPlansReader(population_);

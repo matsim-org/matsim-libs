@@ -24,8 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Leg;
 import org.matsim.plans.MatsimPlansReader;
@@ -41,7 +41,7 @@ class FilterPersonsNonCarMode extends PersonAlgorithm{
 	public static Set<Node> relevantFromNodes = new HashSet<Node>();
 	public static Set<Node> relevantToNodes = new HashSet<Node>();
 	public int count = 0;
-	
+
 	public FilterPersonsNonCarMode() {
 		super();
 	}
@@ -54,10 +54,10 @@ class FilterPersonsNonCarMode extends PersonAlgorithm{
 			} else {
 				Leg leg = (Leg)plan.getActsLegs().get(jj);
 				// route
-				if (!leg.getMode().equals("car")  && count < 10) {
+				if (!leg.getMode().equals("car")  && (this.count < 10)) {
 					try {
 						CopyOfFilterBerlinKutter.relevantPopulation.addPerson(person);
-						count++;
+						this.count++;
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -66,12 +66,12 @@ class FilterPersonsNonCarMode extends PersonAlgorithm{
 			}
 		}
 	}
-	
+
 }
 
 public class CopyOfFilterBerlinKutter {
 	public static Plans relevantPopulation;
-	public static QueueNetworkLayer network;
+	public static NetworkLayer network;
 
 	public static void main(String[] args) {
 		//String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\DSkutter010car_bln.router_wip.plans.v4.xml";
@@ -82,13 +82,13 @@ public class CopyOfFilterBerlinKutter {
 
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
-		
+
 		World world = Gbl.getWorld();
-		
-		network = new QueueNetworkLayer();
+
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
-		
+
 		relevantPopulation = new Plans(false);
 		Plans population = new MyPopulation();
 		MatsimPlansReader plansReader = new MatsimPlansReader(population);

@@ -87,7 +87,7 @@ public class EstimReactiveLinkTT implements
 		LinkTTCalculator f = this.linkTTCalculators.get(link);
 		if(f == null) {
 			f = new LinkTTCalculator(link);
-			this.linkTTCalculators.put(link, f);
+			this.linkTTCalculators.put(link.getLink(), f);
 		}
 		f.enterLink(person, time);
 	}
@@ -141,7 +141,7 @@ public class EstimReactiveLinkTT implements
 		public LinkTTCalculator(QueueLink link) {
 			this.samples = new TreeSet<Sample>();
 			this.link = link;
-			this.freeFlowTravTime = link.getFreeTravelDuration();
+			this.freeFlowTravTime = link.getLink().getFreespeedTravelTime();
 			this.currentTravelTime = this.freeFlowTravTime;
 			this.feasibleOutFlow = link.getSimulatedFlowCapacity();
 			this.currentOutFlow = this.feasibleOutFlow;
@@ -187,7 +187,7 @@ public class EstimReactiveLinkTT implements
 				this.lastCall = time;
 
 				if (this.samples.isEmpty())
-					this.currentTravelTime = this.link.getFreespeed(Time.UNDEFINED_TIME);
+					this.currentTravelTime = this.link.getLink().getFreespeed(Time.UNDEFINED_TIME);
 				else {
 					double tt = this.samples.size() / this.feasibleOutFlow;
 					this.currentTravelTime = Math.max(this.freeFlowTravTime, tt);

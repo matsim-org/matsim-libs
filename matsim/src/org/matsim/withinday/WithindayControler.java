@@ -37,7 +37,6 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.trafficmonitoring.LinkTravelTimeCounter;
 import org.matsim.utils.io.IOUtils;
@@ -119,8 +118,7 @@ public class WithindayControler extends Controler {
 			WithindayCreateVehiclePersonAlgorithm vehicleAlgo = new WithindayCreateVehiclePersonAlgorithm(this);
 
 			//build the queuesim
-			WithindayQueueSimulation sim = new WithindayQueueSimulation((QueueNetworkLayer)this.network, this.population, this.events, this);
-			sim.setVehicleCreateAlgo(vehicleAlgo);
+			WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
 			if (this.trafficManagement != null) {
 				sim.setTrafficManagement(this.trafficManagement);
 			}

@@ -25,9 +25,9 @@ import java.io.IOException;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -47,8 +47,8 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 	@Override
 	protected void prepareSim() {
 		//myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans);
-		if (otfwriter == null) otfwriter = new OTFQuadFileHandler.Writer (60,network,"output/OTFQuadfile10p.mvi.gz");
-		if(otfwriter != null) otfwriter.open();
+		if (this.otfwriter == null) this.otfwriter = new OTFQuadFileHandler.Writer (60,this.network,"output/OTFQuadfile10p.mvi.gz");
+		if(this.otfwriter != null) this.otfwriter.open();
 
 		super.prepareSim();
 
@@ -59,12 +59,12 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 
 	@Override
 	protected void cleanupSim() {
-		if(myOTFServer != null) myOTFServer.cleanup();
-		myOTFServer = null;
+		if(this.myOTFServer != null) this.myOTFServer.cleanup();
+		this.myOTFServer = null;
 		super.cleanupSim();
 
 		try {
-			if(otfwriter != null) otfwriter.close();
+			if(this.otfwriter != null) this.otfwriter.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -77,7 +77,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 		super.afterSimStep(time);
 
 		try {
-			if(otfwriter != null) otfwriter.dump((int)time);
+			if(this.otfwriter != null) this.otfwriter.dump((int)time);
 		} catch (IOException e) {
 			Gbl.errorMsg("QueueSimulation.dumpWriters(): Unable to dump state.");
 		}
@@ -86,7 +86,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 
 	}
 
-	public OnTheFlyQueueSim2FILE(QueueNetworkLayer net, Plans plans, Events events) {
+	public OnTheFlyQueueSim2FILE(NetworkLayer net, Plans plans, Events events) {
 		super(net, plans, events);
 		// TODO Auto-generated constructor stub
 	}
@@ -121,7 +121,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 			world_parser.readFile(worldFileName);
 		}
 
-		QueueNetworkLayer net = new QueueNetworkLayer();
+		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
 

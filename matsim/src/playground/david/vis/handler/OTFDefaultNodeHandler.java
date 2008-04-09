@@ -21,24 +21,24 @@ public class OTFDefaultNodeHandler extends OTFDataReader implements  OTFDataXYCo
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
-			out.putFloat((float)(src.getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(src.getCoord().getY() - OTFServerQuad.offsetNorth));
+			out.putFloat((float)(this.src.getNode().getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
+			out.putFloat((float)(this.src.getNode().getCoord().getY() - OTFServerQuad.offsetNorth));
 		}
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
 		}
-		
+
 		public OTFDataWriter<QueueNode> getWriter() {
 			return new Writer();
 		}
 
 }
 
-	
+
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
-		if (xyReceiver != null) xyReceiver.setXYCoord(in.getFloat(), in.getFloat());
+		if (this.xyReceiver != null) this.xyReceiver.setXYCoord(in.getFloat(), in.getFloat());
 		else {in.getFloat();in.getFloat();};
 	}
 
@@ -51,13 +51,13 @@ public class OTFDefaultNodeHandler extends OTFDataReader implements  OTFDataXYCo
 	public void connect(OTFData.Receiver receiver) {
 		if (receiver instanceof OTFDataXYCoord.Receiver) {
 			this.xyReceiver = (OTFDataXYCoord.Receiver) receiver;
-			
+
 		}
 	}
 
 	@Override
 	public void invalidate(SceneGraph graph) {
-		if (xyReceiver != null) this.xyReceiver.invalidate(graph);
+		if (this.xyReceiver != null) this.xyReceiver.invalidate(graph);
 	}
 
 

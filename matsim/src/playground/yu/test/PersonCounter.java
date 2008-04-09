@@ -19,14 +19,14 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.test;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
@@ -36,31 +36,31 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class PersonCounter extends PersonAlgorithm {
 	private int cnt, nullCnt;
 
 	/**
-	 * 
+	 *
 	 */
 	public PersonCounter() {
-		cnt = 0;
-		nullCnt = 0;
+		this.cnt = 0;
+		this.nullCnt = 0;
 	}
 
 	@Override
 	public void run(Person person) {
 		if (person != null) {
-			cnt++;
+			this.cnt++;
 		} else {
-			nullCnt++;
+			this.nullCnt++;
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "There are " + cnt + " persons and " + nullCnt
+		return "There are " + this.cnt + " persons and " + this.nullCnt
 				+ " (null)persons";
 	}
 
@@ -76,7 +76,7 @@ public class PersonCounter extends PersonAlgorithm {
 		Config config = Gbl
 				.createConfig(new String[] { "./test/yu/test/configTest.xml" });
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 

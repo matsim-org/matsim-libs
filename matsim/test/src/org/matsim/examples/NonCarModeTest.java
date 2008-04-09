@@ -24,10 +24,10 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -56,7 +56,7 @@ public class NonCarModeTest extends MatsimTestCase {
 		config.simulation().setFlowCapFactor(0.01);
 		config.simulation().setStorageCapFactor(0.04);
 
-		QueueNetworkLayer network = new QueueNetworkLayer() ;
+		NetworkLayer network = new NetworkLayer() ;
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
 

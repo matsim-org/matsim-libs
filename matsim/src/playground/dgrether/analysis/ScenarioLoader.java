@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -89,8 +88,6 @@ public class ScenarioLoader {
 	private NetworkLayer loadNetwork(final String networkFile) {
 		// - read network: which buildertype??
 		printNote("", "  creating network layer... ");
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
 				NetworkLayer.LAYER_TYPE, null);
 		printNote("", "  done");

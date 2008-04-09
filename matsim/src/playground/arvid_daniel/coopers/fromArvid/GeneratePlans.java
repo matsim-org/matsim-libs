@@ -23,8 +23,8 @@ package playground.arvid_daniel.coopers.fromArvid;
 import java.util.Random;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -42,11 +42,11 @@ public class GeneratePlans {
 	 * @param net
 	 */
 
-	public static void createCOOPERSSpecificVehicles(Plans plans2, QueueNetworkLayer net) {
+	public static void createCOOPERSSpecificVehicles(Plans plans2, NetworkLayer net) {
 		// Erzeuge einen strom von vehicles, die die autobahn runter wollen
-		LinkImpl startLink1 = net.getLinks().get("7829");
-		LinkImpl startLink2 = net.getLinks().get("8453");
-		LinkImpl destLink = net.getLinks().get("8380");
+		Link startLink1 = net.getLinks().get("7829");
+		Link startLink2 = net.getLinks().get("8453");
+		Link destLink = net.getLinks().get("8380");
 		Random rnd = new Random(4711);
 
 		Gbl.getConfig().setParam("planCalcScore", "traveling", "-3600");
@@ -63,7 +63,7 @@ public class GeneratePlans {
 			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 3.*3600;
-			LinkImpl startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2;
+			Link startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2;
 			Act actstart = new Act("h", 0,0, startLink, 0, endTime, endTime, false);
 			Act actEnd = new Act("h", 0,0, destLink, arrivalTime, arrivalTime + 3*3600, 3*3600, false);
 

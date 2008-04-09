@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.mobsim.SimulationTimer;
+import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
@@ -107,7 +108,7 @@ public class WithindayAgent {
 			this.revisePercepts();
 			double replanningNeed = this.getReplanningNeed();
 			if (replanningNeed >= this.replanningThreshold) {
-				LinkImpl currentLink = this.vehicle.getCurrentLink();
+				Link currentLink = this.vehicle.getCurrentLink();
 				Node currentToNode = currentLink.getToNode();
 				Node currentDestinationNode = this.vehicle.getDestinationLink().getFromNode();
 				//as replanning is rerouting agents will only replan if they are on the road and not on the link of the next activity
@@ -138,7 +139,7 @@ public class WithindayAgent {
 			int min = (int) ((SimulationTimer.getTime() - (hours * 60)) / 60);
 			log.trace("time: " + hours + ":" + min);
 		}
-		LinkImpl currentLink = this.vehicle.getCurrentLink();
+		Link currentLink = this.vehicle.getCurrentLink();
 		Act nextAct = this.person.getSelectedPlan().getNextActivity(this.vehicle.getCurrentLeg());
 		LinkImpl destinationLink = nextAct.getLink();
 		Route alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());

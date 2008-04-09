@@ -19,13 +19,14 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationStartsListener;
@@ -33,7 +34,6 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.network.Link;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.WithindayCreateVehiclePersonAlgorithm;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
@@ -44,23 +44,23 @@ import org.matsim.withinday.trafficmanagement.TrafficManagement;
  *
  */
 public class EUTController2 extends WithindayControler {
-	
+
 	private static final String CONFIG_MODULE_NAME = "eut";
-	
+
 //	private static final Logger log = Logger.getLogger(EUTController.class);
-	
+
 	private EstimReactiveLinkTT reactTTs;
-	
+
 	private double incidentProba;
-	
+
 	private double equipmentFraction;
-	
+
 	private double rho;
-	
+
 	private RandomIncidentSimulator incidentSimulator;
-	
+
 	private SummaryWriter summaryWriter;
-	
+
 	private EUTRouterAnalyzer analyzer;
 	/**
 	 * @param args
@@ -68,30 +68,30 @@ public class EUTController2 extends WithindayControler {
 	public EUTController2(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
-		
-		
+
+
 	}
-	
+
 	@Override
 	protected void setup() {
-		equipmentFraction = string2Double(getConfig().getParam(CONFIG_MODULE_NAME, "equipmentFraction"));
+		this.equipmentFraction = string2Double(getConfig().getParam(CONFIG_MODULE_NAME, "equipmentFraction"));
 //		replanningFraction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "replanFraction"));
-		incidentProba = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "incidentProba"));
-				
-		rho = Integer.parseInt(getConfig().findParam(CONFIG_MODULE_NAME, "rho"));
+		this.incidentProba = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "incidentProba"));
+
+		this.rho = Integer.parseInt(getConfig().findParam(CONFIG_MODULE_NAME, "rho"));
 		/*
 		 * Dunno exactly where to place this...
 		 */
 		setTraveltimeBinSize(10);
-		
-		summaryWriter = new SummaryWriter(getConfig().findParam(CONFIG_MODULE_NAME, "summaryFile"));
-		addControlerListener(summaryWriter);
+
+		this.summaryWriter = new SummaryWriter(getConfig().findParam(CONFIG_MODULE_NAME, "summaryFile"));
+		addControlerListener(this.summaryWriter);
 		super.setup();
 		/*
 		 * Initialize the reactive travel times.
 		 */
-		reactTTs = new EstimReactiveLinkTT();
-		events.addHandler((EstimReactiveLinkTT)reactTTs);
+		this.reactTTs = new EstimReactiveLinkTT();
+		this.events.addHandler(this.reactTTs);
 		/*
 		 * Create a new factory for our withinday agents.
 		 */
@@ -99,51 +99,52 @@ public class EUTController2 extends WithindayControler {
 		/*
 		 * Trip stats...
 		 */
-		CARAFunction utilFunction = new CARAFunction(rho);
-		analyzer = new EUTRouterAnalyzer(utilFunction, summaryWriter);
-		addControlerListener(analyzer);
+		CARAFunction utilFunction = new CARAFunction(this.rho);
+		this.analyzer = new EUTRouterAnalyzer(utilFunction, this.summaryWriter);
+		addControlerListener(this.analyzer);
 		/*
 		 * Link stats...
 		 */
-		LinkTTVarianceStats linkStats = new LinkTTVarianceStats(getTravelTimeCalculator(), 25200, 32400, 60, summaryWriter);
+		LinkTTVarianceStats linkStats = new LinkTTVarianceStats(getTravelTimeCalculator(), 25200, 32400, 60, this.summaryWriter);
 		addControlerListener(linkStats);
 		/*
 		 * Create incident simulator...
 		 */
-		incidentSimulator = new RandomIncidentSimulator((QueueNetworkLayer) getNetwork(), incidentProba);
+		QueueNetworkLayer qnet = new QueueNetworkLayer(getNetwork());
+		this.incidentSimulator = new RandomIncidentSimulator(qnet, this.incidentProba);
 		String linkIds = getConfig().findParam(CONFIG_MODULE_NAME, "links");
 		List<BasicLinkI> riskyLinks = new LinkedList<BasicLinkI>();
 		for(String id : linkIds.split(" ")) {
-			Link link = getNetwork().getLink(id);
-			riskyLinks.add((QueueLink)link);
-			incidentSimulator.addLink((QueueLink)link);
+			QueueLink link = qnet.getQueueLink(new Id(id));
+			riskyLinks.add(link.getLink());
+			this.incidentSimulator.addLink(link);
 		}
 		double capReduction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "capReduction"));
-		incidentSimulator.setCapReduction(capReduction);
-		addControlerListener(incidentSimulator);
-		
-		
+		this.incidentSimulator.setCapReduction(capReduction);
+		addControlerListener(this.incidentSimulator);
+
+
 		/*
 		 * Count agents traversed risky links...
 		 */
-		TraversedRiskyLink travRiskyLink = new TraversedRiskyLink(getPopulation(), riskyLinks, summaryWriter); 
-		
-		
-		TripAndScoreStats stats = new TripAndScoreStats(analyzer, travRiskyLink, summaryWriter); 
+		TraversedRiskyLink travRiskyLink = new TraversedRiskyLink(getPopulation(), riskyLinks, this.summaryWriter);
+
+
+		TripAndScoreStats stats = new TripAndScoreStats(this.analyzer, travRiskyLink, this.summaryWriter);
 		addControlerListener(stats);
-		events.addHandler(stats);
+		this.events.addHandler(stats);
 		addControlerListener(travRiskyLink);
 		/*
-		 * 
+		 *
 		 */
 		String personsFile = getConfig().findParam(CONFIG_MODULE_NAME, "guidedPersons");
-		addControlerListener(new CEAnalyzer(personsFile, population, stats, utilFunction));
+		addControlerListener(new CEAnalyzer(personsFile, this.population, stats, utilFunction));
 		/*
-		 * 
+		 *
 		 */
-		scoringFunctionFactory = new EUTScoringFactory(utilFunction);
+		this.scoringFunctionFactory = new EUTScoringFactory(utilFunction);
 		/*
-		 * 
+		 *
 		 */
 		addControlerListener(new RemoveDuplicatePlans());
 		addControlerListener(new RemoveScores());
@@ -151,16 +152,15 @@ public class EUTController2 extends WithindayControler {
 
 	@Override
 	protected void runMobSim() {
-		
-		config.withinday().addParam("contentThreshold", "1");
-		config.withinday().addParam("replanningInterval", "1");
+
+		this.config.withinday().addParam("contentThreshold", "1");
+		this.config.withinday().addParam("replanningInterval", "1");
 		WithindayCreateVehiclePersonAlgorithm vehicleAlgo = new WithindayCreateVehiclePersonAlgorithm(this);
 
 		//build the queuesim
-		WithindayQueueSimulation sim = new WithindayQueueSimulation((QueueNetworkLayer)this.network, this.population, this.events, this);
-		sim.setVehicleCreateAlgo(vehicleAlgo);
-		trafficManagement = new TrafficManagement();
-		sim.setTrafficManagement(trafficManagement);
+		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
+		this.trafficManagement = new TrafficManagement();
+		sim.setTrafficManagement(this.trafficManagement);
 		//run the simulation
 //		long time = System.currentTimeMillis();
 //		QueueSimulation sim = new QueueSimulation((QueueNetworkLayer)this.network, this.population, this.events);
@@ -168,21 +168,21 @@ public class EUTController2 extends WithindayControler {
 //		System.err.println("Mobsim took " + (System.currentTimeMillis() - time) +" ms.")
 	}
 
-	
+
 	private class WithindayControlerListener implements StartupListener, IterationStartsListener {
 
 		public void notifyStartup(StartupEvent event) {
-			EUTController2.this.factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), reactTTs, equipmentFraction);
-			((GuidedAgentFactory)factory).setRouteAnalyzer(analyzer);
-		
+			EUTController2.this.factory = new GuidedAgentFactory(EUTController2.this.network, EUTController2.this.config.charyparNagelScoring(), EUTController2.this.reactTTs, EUTController2.this.equipmentFraction);
+			((GuidedAgentFactory)EUTController2.this.factory).setRouteAnalyzer(EUTController2.this.analyzer);
+
 		}
 
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			((GuidedAgentFactory)factory).reset();
+			((GuidedAgentFactory)EUTController2.this.factory).reset();
 		}
-		
+
 	}
-		
+
 	public static void main(String args[]) {
 //		EUTController controller = new EUTController(new String[]{"/Users/fearonni/vsp-work/eut/corridor/config/config.xml"});
 		EUTController2 controller = new EUTController2(args);
@@ -196,6 +196,6 @@ public class EUTController2 extends WithindayControler {
 			return Integer.parseInt(str.substring(0, str.length()-1))/100.0;
 		else
 			return Double.parseDouble(str);
-		
+
 	}
 }

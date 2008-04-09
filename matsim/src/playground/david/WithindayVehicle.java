@@ -22,8 +22,8 @@ package playground.david;
 
 import java.io.Serializable;
 
-import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.Vehicle;
+import org.matsim.network.Link;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 
 
@@ -32,7 +32,7 @@ public class WithindayVehicle extends Vehicle implements Serializable, DrawableA
 	// private Agent agent; //hold Johannes agent representation
 
 	@Override
-	public QueueLink chooseNextLink() {
+	public Link chooseNextLink() {
 		// Give the agent the opportunity to replan, if applicable and
 		// Ask agent for next link
 		// I dont know if we can include this easily here?

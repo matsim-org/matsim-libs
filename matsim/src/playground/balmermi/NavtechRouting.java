@@ -23,7 +23,6 @@ package playground.balmermi;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -38,11 +37,11 @@ public class NavtechRouting {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void xy2links(String[] args) {
-		
+
 		System.out.println("RUN: xy2links");
 
 		Gbl.createConfig(args);
-		
+
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
 		worldReader.readFile(Gbl.getConfig().world().getInputFile());
@@ -50,7 +49,6 @@ public class NavtechRouting {
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		System.out.println("  done.");
@@ -68,18 +66,18 @@ public class NavtechRouting {
 //		plans.addAlgorithm(new PlansCalcTravelDistance());
 //		plans.addAlgorithm(new PlansWriteTableForLoechl());
 		System.out.println("  done.");
-		
+
 		System.out.println("  reading, processing, writing plans...");
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		plans.printPlansCount();
 		plans.runAlgorithms();
 		plansWriter.write();
 		System.out.println("  done.");
-		
+
 		System.out.println("RUN: xy2links finished.");
 		System.out.println();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////

@@ -34,7 +34,6 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -56,7 +55,7 @@ import playground.yu.visum.writer.PrintStreamUDANET;
  * (EventFilterAlgorithm, EventFilterPersonSpecific, TraVolCal)] [to read events
  * file] [to run events algorithms] [to print additiv netFile of Visum...] [to
  * print attributsFile of link...]
- * 
+ *
  * @author ychen
  */
 public class EventFilterTestTraVol_personSpecific {
@@ -79,8 +78,6 @@ public class EventFilterTestTraVol_personSpecific {
 
 		// network
 		System.out.println("  creating network object... ");
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		NetworkLayer network = (NetworkLayer) world.createLayer(
 				NetworkLayer.LAYER_TYPE, null);
 		System.out.println("  done.");

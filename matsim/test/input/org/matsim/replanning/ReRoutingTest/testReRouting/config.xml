@@ -13,7 +13,8 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/scenarios/berlin/plans_hwh_1pct.xml.gz" />
+		<!-- <param name="inputPlansFile" value="test/scenarios/berlin/plans_hwh_1pct.xml.gz" />-->
+		<param name="inputPlansFile" value="test/input/org/matsim/replanning/ReRoutingTest/testReRouting/reroute-test.plans.xml" />
 	</module>
 
 	<module name="controler">
@@ -25,7 +26,7 @@
 	<module name="simulation">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="12:00:00" />
-		
+
 		<param name = "flowCapacityFactor"	value = "0.10"/>
 		<param name = "storageCapacityFactor"	value = "1.00"/>
 	</module>
@@ -33,7 +34,7 @@
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="4" />
 
-		<param name="Module_1" value="ReRoute_Dijkstra" />
+		<param name="Module_1" value="ReRoute" />
 		<param name="ModuleProbability_1" value="1.0" />
 	</module>
 
@@ -52,7 +53,7 @@
 		<param name="activityPriority_0"        value="1" />
 		<param name="activityTypicalDuration_0" value="12:00:00" />
 		<param name="activityMinimalDuration_0" value="08:00:00" />
-	
+
 		<param name="activityType_1"            value="work" />
 		<param name="activityPriority_1"        value="1" />
 		<param name="activityTypicalDuration_1" value="08:00:00" />

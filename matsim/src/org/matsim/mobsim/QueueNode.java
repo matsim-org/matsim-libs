@@ -20,85 +20,123 @@
 
 package org.matsim.mobsim;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.apache.log4j.Logger;
 import org.matsim.events.EventAgentStuck;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.network.Link;
 import org.matsim.network.Node;
 
-//////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////
 // QueueNode represents a node in the QueueSimulation
-//////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////
 
-public class QueueNode extends Node {
+public class QueueNode {
+
+	private static final Logger log = Logger.getLogger(QueueNode.class);
 
 	private boolean cacheIsInvalid = true;
 
 	private QueueLink[] inLinksArrayCache = null;
+
 	private QueueLink[] tempLinks = null;
+
 	private QueueLink[] auxLinks = null;
 
 	private boolean active = false;
 
-	/* Get/Set partitionId generated be MetisExeWrapper
-	 * only used when doing DistributedSimulation,
-	 * but I did not want to inherit for just this info */
-	private int partitionId = 0;
-	public int getPartitionId() { return this.partitionId; }
-	public void setPartitionId(final int partitionId) { this.partitionId = partitionId; }
+	private Node node;
 
-	//////////////////////////////////////////////////////////////////////
-	//constructor
-	//////////////////////////////////////////////////////////////////////
-	protected QueueNode(final String id, final String x, final String y, final String type) {
-		super(id, x, y, type);
+	private QueueNetworkLayer queueNetworkLayer;
+
+	public QueueNode(Node n, QueueNetworkLayer queueNetworkLayer) {
+		this.node = n;
+		this.queueNetworkLayer = queueNetworkLayer;
 	}
 
 	private void buildCache() {
-		this.inLinksArrayCache = new QueueLink[this.inlinks.size()];
-		this.inLinksArrayCache = this.inlinks.values().toArray(this.inLinksArrayCache);
-		this.tempLinks = new QueueLink[this.inlinks.size()];
-		this.auxLinks = new QueueLink[this.inlinks.size()];
+		this.inLinksArrayCache = new QueueLink[this.node.getInLinks().values()
+				.size()];
+		int i = 0;
+		for (Link l : this.node.getInLinks().values()) {
+			this.inLinksArrayCache[i] = this.queueNetworkLayer.getLinks().get(
+					l.getId());
+			i++;
+		}
+		//dg[april08] as the order of nodes has an influence on the simulation
+		//results they are sorted to avoid indeterministic simulations
+		Arrays.sort(this.inLinksArrayCache, new Comparator<QueueLink>() {
+			public int compare(final QueueLink o1, final QueueLink o2) {
+				return o1.getLink().getId().compareTo(o2.getLink().getId());
+			}
+		});
+		this.tempLinks = new QueueLink[this.node.getInLinks().values().size()];
+		this.auxLinks = new QueueLink[this.node.getInLinks().values().size()];
 		this.cacheIsInvalid = false;
 	}
 
-	@Override
-	public boolean addInLink(final BasicLinkI inlink) {
-		this.cacheIsInvalid = true;
-		return super.addInLink(inlink);
+	/*
+	 * Get/Set partitionId generated be MetisExeWrapper only used when doing
+	 * DistributedSimulation, but I did not want to inherit for just this info
+	 */
+	private int partitionId = 0;
+
+	public int getPartitionId() {
+		return this.partitionId;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// Queue related movement code
-	//////////////////////////////////////////////////////////////////////
-	public boolean moveVehicleOverNode(final Vehicle veh, final double now) {
-		// veh has to move over node
-		QueueLink nextLink = veh.chooseNextLink();
+	public void setPartitionId(final int partitionId) {
+		this.partitionId = partitionId;
+	}
 
+	public Node getNode() {
+		return this.node;
+	}
+
+	// ////////////////////////////////////////////////////////////////////
+	// Queue related movement code
+	// ////////////////////////////////////////////////////////////////////
+	public boolean moveVehicleOverNode(final Vehicle veh, final double now) {
+		Link nextLink = veh.chooseNextLink();
+		Link currentLink = veh.getCurrentLink();
+		QueueLink currentQueueLink = this.queueNetworkLayer
+				.getQueueLink(currentLink.getId());
+		// veh has to move over node
 		if (nextLink != null) {
-			if (nextLink.hasSpace()) {
-				veh.getCurrentLink().popFirstFromBuffer();
+
+		QueueLink nextQueueLink = this.queueNetworkLayer.getQueueLink(nextLink
+				.getId());
+
+			if (nextQueueLink.hasSpace()) {
+				currentQueueLink.popFirstFromBuffer();
 				veh.incCurrentNode();
-				nextLink.add(veh);
+				nextQueueLink.add(veh);
 				return true;
 			}
 
 			// check if veh is stuck!
 
 			if ((now - veh.getLastMovedTime()) > Simulation.getStuckTime()) {
-				/* We just push the vehicle further after stucktime is over,
-				 * regardless of if there is space on the next link or not..
-				 * optionally we let them die here, we have a config setting for that!
+				/*
+				 * We just push the vehicle further after stucktime is over, regardless
+				 * of if there is space on the next link or not.. optionally we let them
+				 * die here, we have a config setting for that!
 				 */
 				if (removeStuckVehicle()) {
-					veh.getCurrentLink().popFirstFromBuffer();
+					currentQueueLink.popFirstFromBuffer();
 					Simulation.decLiving();
 					Simulation.incLost();
-					QueueSimulation.getEvents().processEvent (new EventAgentStuck(now, veh.getDriverID(), veh.getCurrentLegNumber(), veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
-				} else {
-					veh.getCurrentLink().popFirstFromBuffer();
+					QueueSimulation.getEvents().processEvent(
+							new EventAgentStuck(now, veh.getDriverID(), veh
+									.getCurrentLegNumber(), currentLink.getId().toString(), veh
+									.getDriver(), veh.getCurrentLeg(), currentLink));
+				}
+				else {
+					currentQueueLink.popFirstFromBuffer();
 					veh.incCurrentNode();
-					nextLink.add(veh);
+					nextQueueLink.add(veh);
 					return true;
 				}
 			}
@@ -106,31 +144,36 @@ public class QueueNode extends Node {
 		}
 
 		// --> nextLink == null
-		veh.getCurrentLink().popFirstFromBuffer();
+		currentQueueLink.popFirstFromBuffer();
 		Simulation.decLiving();
 		Simulation.incLost();
-		Logger.getLogger(QueueNode.class).error("Agent has no or wrong route! agentId=" + veh.getDriverID()
-				+ " currentLegNumber=" + veh.getCurrentLegNumber()
-				+ " currentLink=" + veh.getCurrentLink().getId().toString()
-				+ ". The agent is removed from the simulation.");
+		Logger.getLogger(QueueNode.class).error(
+				"Agent has no or wrong route! agentId=" + veh.getDriverID()
+						+ " currentLegNumber=" + veh.getCurrentLegNumber()
+						+ " currentLink="
+						+ currentLink.getId().toString()
+						+ ". The agent is removed from the simulation.");
 		return true;
 	}
 
-	final public void activateNode() { this.active = true; }
+	final public void activateNode() {
+		this.active = true;
+	}
 
 	/**
 	 * Moves vehicles from the inlinks' buffer to the outlinks where possible.<br>
 	 * The inLinks are randomly chosen, and for each link all vehicles in the
-	 * buffer are moved to their desired outLink as long as there is space. If
-	 * the front most vehicle in a buffer cannot move across the node because
-	 * there is no free space on its destination link, the work on this inLink is
-	 * finished and the next inLink's buffer is handled (this means, that at the
-	 * node, all links have only like one lane, and there are no separate lanes
-	 * for the different outLinks. Thus if the front most vehicle cannot drive
-	 * further, all other vehicles behind must wait, too, even if their links
-	 * would be free).
+	 * buffer are moved to their desired outLink as long as there is space. If the
+	 * front most vehicle in a buffer cannot move across the node because there is
+	 * no free space on its destination link, the work on this inLink is finished
+	 * and the next inLink's buffer is handled (this means, that at the node, all
+	 * links have only like one lane, and there are no separate lanes for the
+	 * different outLinks. Thus if the front most vehicle cannot drive further,
+	 * all other vehicles behind must wait, too, even if their links would be
+	 * free).
 	 *
-	 * @param now The current time in seconds from midnight.
+	 * @param now
+	 *          The current time in seconds from midnight.
 	 */
 	public void moveNode(final double now) {
 		/* called by the framework, do all necessary action for node movement here */
@@ -150,7 +193,7 @@ public class QueueNode extends Node {
 			if (!link.bufferIsEmpty()) {
 				this.tempLinks[tempCounter] = link;
 				tempCounter++;
-				tempCap += link.getCapacity();
+				tempCap += link.getLink().getCapacity();
 			}
 		}
 
@@ -166,14 +209,15 @@ public class QueueNode extends Node {
 			double selCap = 0.0;
 			for (int i = 0; i < tempCounter; i++) {
 				QueueLink link = this.tempLinks[i];
-				if (link == null) continue;
-				selCap += link.getCapacity();
-				if ( selCap >= rndNum ) {
+				if (link == null)
+					continue;
+				selCap += link.getLink().getCapacity();
+				if (selCap >= rndNum) {
 					this.auxLinks[auxCounter] = link;
 					auxCounter++;
-					tempCap -= link.getCapacity();
+					tempCap -= link.getLink().getCapacity();
 					this.tempLinks[i] = null;
-					break ;
+					break;
 				}
 			}
 		}
@@ -190,9 +234,10 @@ public class QueueNode extends Node {
 		}
 	}
 
-
 	static boolean removeVehInitialized = false;
+
 	static boolean removeVehicles = true;
+
 	static boolean removeStuckVehicle() {
 		if (removeVehInitialized) {
 			return removeVehicles;

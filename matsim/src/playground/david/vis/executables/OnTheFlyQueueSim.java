@@ -24,9 +24,9 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -53,17 +53,17 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		OnTheFlyClientQuadSwing.main(new String []{"rmi:127.0.0.1:4019"});		
+		OnTheFlyClientQuadSwing.main(new String []{"rmi:127.0.0.1:4019"});
 	}
-	
+
 	@Override
 	protected void prepareSim() {
-		myOTFServer = OnTheFlyServer.createInstance("AName1", network, plans, events, false);
+		this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.plans, events, false);
 
 		super.prepareSim();
-		
-		hist = new LegHistogram(300);
-		events.addHandler(hist);
+
+		this.hist = new LegHistogram(300);
+		events.addHandler(this.hist);
 
 		// FOR TESTING ONLY!
 		new Thread(){@Override
@@ -72,8 +72,8 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 	@Override
 	protected void cleanupSim() {
-	
-		myOTFServer.cleanup();
+
+		this.myOTFServer.cleanup();
 		super.cleanupSim();
 	}
 
@@ -81,13 +81,12 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	public void afterSimStep(double time) {
 		super.afterSimStep(time);
 
-		int status = myOTFServer.getStatus(time);
+		int status = this.myOTFServer.getStatus(time);
 
 	}
 
-	public OnTheFlyQueueSim(QueueNetworkLayer net, Plans plans, Events events) {
+	public OnTheFlyQueueSim(NetworkLayer net, Plans plans, Events events) {
 		super(net, plans, events);
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -122,7 +121,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 			world_parser.readFile(worldFileName);
 		}
 
-		QueueNetworkLayer net = new QueueNetworkLayer();
+		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
 
@@ -151,7 +150,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 		Gbl.printElapsedTime();
 
-	
+
 	}
 
 	public void setOtfwriter(OTFQuadFileHandler.Writer  otfwriter) {

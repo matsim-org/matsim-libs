@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -57,7 +56,7 @@ public class OSMNetCreator {
 	}
 
 	public OSMNetCreator(NetworkLayer network) {
-		capperiod = (double) network.getCapacityPeriod() / 3600.0;// ss-->hh
+		capperiod = network.getCapacityPeriod() / 3600.0;// ss-->hh
 	}
 
 	public static void main(String[] args) {
@@ -67,7 +66,7 @@ public class OSMNetCreator {
 		// "../schweiz-ivtch/network/ivtch-osm.xml";
 		final String outputNetFilename = "test/yu/utils/ivtch-osm.1.3.xml";
 		Config config = Gbl.createConfig(null);
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		// (1) -----------links in Circle
 		Set<String> linkIdsInCircle = new NetworkLinkIdsInCircle(network)

@@ -30,8 +30,8 @@ import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -41,9 +41,9 @@ public class EventsWait2LinkTest {
 
 		public EventsWait2Link(String outputFilename) {
 			try {
-				writer = IOUtils.getBufferedWriter(outputFilename);
-				writer.write("personId\tlinkId\n");
-				writer.flush();
+				this.writer = IOUtils.getBufferedWriter(outputFilename);
+				this.writer.write("personId\tlinkId\n");
+				this.writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -53,8 +53,8 @@ public class EventsWait2LinkTest {
 
 		public void handleEvent(EventAgentWait2Link event) {
 			try {
-				writer.write(event.agentId + "\t" + event.linkId + "\n");
-				writer.flush();
+				this.writer.write(event.agentId + "\t" + event.linkId + "\n");
+				this.writer.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -62,14 +62,14 @@ public class EventsWait2LinkTest {
 
 		public void end() {
 			try {
-				writer.close();
+				this.writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
 		public void reset(int iteration) {
-			writer = null;
+			this.writer = null;
 		}
 	}
 
@@ -89,7 +89,7 @@ public class EventsWait2LinkTest {
 		Config config = Gbl.createConfig(null);
 		World world = Gbl.getWorld();
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 

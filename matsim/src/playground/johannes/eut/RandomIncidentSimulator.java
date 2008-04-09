@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
@@ -36,99 +36,98 @@ import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.network.Link;
 
 /**
  * @author illenberger
  *
  */
 public class RandomIncidentSimulator implements IterationStartsListener, IterationEndsListener {
-	
+
 	private final double incidentProba;
 
 	private double capReduction = 0.7;
-	
+
 	private int startIteration = 0;
-	
+
 //	private final QueueNetworkLayer network;
-	
+
 	private final List<QueueLink> changedCaps = new LinkedList<QueueLink>();
-	
+
 	private final List<QueueLink> links = new LinkedList<QueueLink>();
-	
+
 	private BufferedWriter writer;
-	
+
 	public RandomIncidentSimulator(QueueNetworkLayer network, double proba) {
 //		this.network = network;
 		this.incidentProba = proba;
-		
+
 //		links.add((QueueLink) network.getLink("800"));
 //		links.add((QueueLink) network.getLink("1100"));
 //		links.add((QueueLink) network.getLink("1400"));
 //		links.add((QueueLink) network.getLink("5"));
-		
+
 		try {
-			writer = new BufferedWriter(new FileWriter(Controler.getOutputFilename("incidents.txt")));
+			this.writer = new BufferedWriter(new FileWriter(Controler.getOutputFilename("incidents.txt")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void addLink(QueueLink link) {
-		links.add(link);
+		this.links.add(link);
 	}
-	
+
 	public void setCapReduction(double factor) {
 		this.capReduction = factor;
 	}
-	
+
 	public double getCapReduction() {
-		return capReduction;
+		return this.capReduction;
 	}
-	
+
 	public void setStartIteration(int iteration) {
-		startIteration = iteration;
+		this.startIteration = iteration;
 	}
-	
+
 	public int getStartIteration() {
-		return startIteration;
+		return this.startIteration;
 	}
-	
+
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		/*
 		 * Reduce capacity here...
 		 */
 		try {
-			
-			writer.write(String.valueOf(event.getIteration()));
-			writer.write("\t");
 
-			for (QueueLink link : links) {
+			this.writer.write(String.valueOf(event.getIteration()));
+			this.writer.write("\t");
+
+			for (QueueLink link : this.links) {
 				Gbl.random.nextDouble();
-				if (Gbl.random.nextDouble() < incidentProba
-						&& event.getIteration() >= startIteration) {
-					
-					link.changeSimulatedFlowCapacity(capReduction);
-					changedCaps.add(link);
-					
-					writer.write("\t");
-					writer.write(link.getId().toString());
+				if ((Gbl.random.nextDouble() < this.incidentProba)
+						&& (event.getIteration() >= this.startIteration)) {
+
+					link.changeSimulatedFlowCapacity(this.capReduction);
+					this.changedCaps.add(link);
+
+					this.writer.write("\t");
+					this.writer.write(link.getLink().getId().toString());
 				}
 
 			}
-			
-			writer.newLine();
-			writer.flush();
+
+			this.writer.newLine();
+			this.writer.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		for (QueueLink link : links) {
-			if (changedCaps.contains(link)) {
-				link.changeSimulatedFlowCapacity(1.0 / capReduction);
-				changedCaps.remove(link);
+		for (QueueLink link : this.links) {
+			if (this.changedCaps.contains(link)) {
+				link.changeSimulatedFlowCapacity(1.0 / this.capReduction);
+				this.changedCaps.remove(link);
 			}
 		}
 

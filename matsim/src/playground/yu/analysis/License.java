@@ -19,14 +19,14 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
@@ -36,25 +36,25 @@ import org.matsim.world.World;
 /**
  * checks, how many people have license for driving car and can choose from car
  * or pt
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class License extends PersonAlgorithm {
 	private int hasLicenseCount;
 
 	/**
-	 * 
+	 *
 	 */
 	public License() {
-		hasLicenseCount = 0;
+		this.hasLicenseCount = 0;
 	}
 
 	@Override
 	public void run(Person person) {
 		if (person != null) {
 			if (person.getLicense().equals("yes")) {
-				hasLicenseCount++;
+				this.hasLicenseCount++;
 			}
 		}
 	}
@@ -63,7 +63,7 @@ public class License extends PersonAlgorithm {
 	 * @return the hasLicenseCount
 	 */
 	public int getHasLicenseCount() {
-		return hasLicenseCount;
+		return this.hasLicenseCount;
 	}
 
 	/**
@@ -72,13 +72,13 @@ public class License extends PersonAlgorithm {
 	public static void main(String[] args) {
 		final String netFilename = "../data/ivtch/input/network.xml";
 		final String plansFilename = "../data/ivtch/input/_10pctZrhCarPtPlans_opt.xml.gz";
-	
+
 		Gbl.startMeasurement();
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(null);
 		World world = Gbl.getWorld();
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 

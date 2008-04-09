@@ -25,8 +25,8 @@ import junit.framework.TestCase;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
+import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -48,7 +48,7 @@ public class Fixture {
 	}
 
 	/** @return a simple network consisting of 5 equal links in a row. */
-	public static QueueNetworkLayer createNetwork1() {
+	public static NetworkLayer createNetwork1() {
 		/* This creates the following network:
 		 *
 		 * (1)-------(2)-------(3)-------(4)-------(5)-------(6)
@@ -56,7 +56,7 @@ public class Fixture {
 		 */
 		/* The vehicles can travel with 18km/h = 5m/s, so it should take them 20 seconds
 		 * to travel along one link.		 */
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod("01:00:00");
 		network.createNode("1", "0", "0", null);
 		network.createNode("2", "100", "0", null);
@@ -74,7 +74,7 @@ public class Fixture {
 	}
 
 	/** @return a simple network with route alternatives in 2 places. */
-	public static QueueNetworkLayer createNetwork2() {
+	public static NetworkLayer createNetwork2() {
 		/* This creates the following network:
 		 *
 		 *            3 /----(3)----\ 4
@@ -95,7 +95,7 @@ public class Fixture {
 		 *
 		 * each link is 100m long and can be traveled along with 18km/h = 5m/s = 20s for 100m
 		 */
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod("01:00:00");
 		network.createNode( "0",   "0",   "10", null);
 		network.createNode( "1",   "0",  "100", null);
@@ -180,7 +180,7 @@ public class Fixture {
 	public static Plans createReferencePopulation1() {
 		// run mobsim once without toll and get score for network1/population1
 		try {
-			QueueNetworkLayer network = createNetwork1();
+			NetworkLayer network = createNetwork1();
 			Gbl.getWorld().setNetworkLayer(network);
 			Plans referencePopulation = Fixture.createPopulation1();
 			Events events = new Events();

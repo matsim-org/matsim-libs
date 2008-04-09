@@ -21,10 +21,10 @@ public class OTFNoDynLinkHandler extends OTFDataReader implements OTFDataQuad.Pr
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
-			out.putFloat((float)(src.getFromNode().getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(src.getFromNode().getCoord().getY() - OTFServerQuad.offsetNorth));
-			out.putFloat((float)(src.getToNode().getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(src.getToNode().getCoord().getY() - OTFServerQuad.offsetNorth));
+			out.putFloat((float)(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
+			out.putFloat((float)(this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad.offsetNorth));
+			out.putFloat((float)(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
+			out.putFloat((float)(this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad.offsetNorth));
 		}
 
 		@Override
@@ -35,7 +35,7 @@ public class OTFNoDynLinkHandler extends OTFDataReader implements OTFDataQuad.Pr
 			return new Writer();
 		}
 	}
-	
+
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 	}
@@ -43,7 +43,7 @@ public class OTFNoDynLinkHandler extends OTFDataReader implements OTFDataQuad.Pr
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
-		quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat());
+		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat());
 	}
 
 

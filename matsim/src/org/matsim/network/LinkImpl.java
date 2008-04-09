@@ -25,7 +25,9 @@ import org.matsim.basic.v01.BasicLink;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.ResizableArray;
+import org.matsim.utils.misc.Time;
 
 public class LinkImpl extends BasicLink implements Link {
 
@@ -41,11 +43,29 @@ public class LinkImpl extends BasicLink implements Link {
 
 	private double flowCapacity;
 
+	private final double freespeedTravelTime;
+
 	protected final double euklideanDist;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
+
+	protected LinkImpl() {
+		super();
+		this.euklideanDist = 0.0;
+		this.freespeedTravelTime = this.getLength()
+		/ this.getFreespeed(Time.UNDEFINED_TIME);
+
+	}
+
+	protected LinkImpl(final NetworkLayer network, final IdI id, Node from, Node to, double length, double freespeed, double capacity, int permlanes) {
+		super(id, from, to);
+		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
+		this.freespeedTravelTime = this.getLength()
+		/ this.getFreespeed(Time.UNDEFINED_TIME);
+
+	}
 
 	protected LinkImpl(final NetworkLayer network, final String id,
 	               final Node from, final Node to, final String length,
@@ -60,6 +80,9 @@ public class LinkImpl extends BasicLink implements Link {
 		this.type = type;
 		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
 		calcFlowCapacity();
+		this.freespeedTravelTime = this.getLength()
+		/ this.getFreespeed(Time.UNDEFINED_TIME);
+
 		// do some semantic checks
 		if (this.from.equals(this.to)) { log.warn(this + "[from=to=" + this.to + " link is a loop]"); }
 		if (this.freespeed <= 0.0) { Gbl.errorMsg(this+"[freespeed="+freespeed+" not allowed]"); }
@@ -74,6 +97,7 @@ public class LinkImpl extends BasicLink implements Link {
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
+
 
 	private void calcFlowCapacity() {
 		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
@@ -115,6 +139,10 @@ public class LinkImpl extends BasicLink implements Link {
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
+
+	public double getFreespeedTravelTime() {
+		return this.freespeedTravelTime;
+	}
 
 	// DS TODO try to remove these and update references
 	// (for the time being, they are here because otherwise the returned type is wrong. kai)

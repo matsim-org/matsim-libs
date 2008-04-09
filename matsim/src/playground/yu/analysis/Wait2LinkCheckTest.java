@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
@@ -30,8 +30,8 @@ import java.io.IOException;
 import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -42,7 +42,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class Wait2LinkCheckTest {
 	public static class Wait2LinkCheck extends PersonAlgorithm {
@@ -50,9 +50,9 @@ public class Wait2LinkCheckTest {
 
 		public Wait2LinkCheck(String filename) {
 			try {
-				writer = IOUtils.getBufferedWriter(filename);
-				writer.write("personId\tlinkId\tactIdx\n");
-				writer.flush();
+				this.writer = IOUtils.getBufferedWriter(filename);
+				this.writer.write("personId\tlinkId\tactIdx\n");
+				this.writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -62,7 +62,7 @@ public class Wait2LinkCheckTest {
 
 		public void end() {
 			try {
-				writer.close();
+				this.writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -77,12 +77,12 @@ public class Wait2LinkCheckTest {
 				if (p != null) {
 					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
 						nextTmpLinkId = ai.next().getLink().getId().toString();
-						if (tmpLinkId != null && nextTmpLinkId != null) {
+						if ((tmpLinkId != null) && (nextTmpLinkId != null)) {
 							if (!tmpLinkId.equals(nextTmpLinkId)) {
 								try {
-									writer.write(person.getId().toString()
+									this.writer.write(person.getId().toString()
 											+ "\t" + tmpLinkId + "\n");
-									writer.flush();
+									this.writer.flush();
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -115,7 +115,7 @@ public class Wait2LinkCheckTest {
 
 		World world = Gbl.getWorld();
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 

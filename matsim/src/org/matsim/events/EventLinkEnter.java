@@ -20,7 +20,7 @@
 
 package org.matsim.events;
 
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
@@ -31,7 +31,7 @@ public class EventLinkEnter extends LinkEvent {
 
 	private static final long serialVersionUID = 1L;
 
-	public EventLinkEnter(final double time, final String agentId, final int legId, final String linkId, final Person agent, final LinkImpl link) {
+	public EventLinkEnter(final double time, final String agentId, final int legId, final String linkId, final Person agent, final Link link) {
 		super(time, agentId, linkId, agent, legId, link);
 	}
 

@@ -29,8 +29,6 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -75,7 +73,7 @@ public class WithindayAgentTest extends TestCase {
 
 	private NetworkLayer loadNetwork(final String filename) {
 		Gbl.reset();
-		NetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		Gbl.createConfig(null);
 		MatsimNetworkReader parser = new MatsimNetworkReader(network);
 		parser.readFile(filename);
@@ -146,7 +144,7 @@ public class WithindayAgentTest extends TestCase {
 		this.leg.setRoute(this.agentRoute);
 		//create the vehicle
 		WithindayAgentTestOccupiedVehicle v = new WithindayAgentTestOccupiedVehicle(
-				this.leg, (QueueLink) this.network.getLink("2"), (QueueLink) this.network
+				this.leg, this.network.getLink("2"), this.network
 						.getLink("7"), this.plan.getActsLegs());
 
 	  //create the agentlogicfactory with

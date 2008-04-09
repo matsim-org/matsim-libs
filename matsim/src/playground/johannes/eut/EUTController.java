@@ -19,13 +19,14 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.johannes.eut;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
@@ -35,7 +36,6 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.network.Link;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.BestPlanSelector;
@@ -50,45 +50,45 @@ import org.matsim.withinday.trafficmanagement.TrafficManagement;
  *
  */
 public class EUTController extends WithindayControler {
-	
+
 	private static final String CONFIG_MODULE_NAME = "eut";
-	
+
 //	private static final Logger log = Logger.getLogger(EUTController.class);
-	
+
 	private TwoStateTTKnowledge ttmemory;
-	
+
 	private EstimReactiveLinkTT reactTTs;
-	
+
 	private EUTRouterAnalyzer routerAnalyzer;
 
 	private double incidentProba;
-	
+
 	private double equipmentFraction;
-	
+
 	private double replanningFraction;
-	
+
 	private double ttLearningRate;
-	
+
 	private int maxMemorySlots;
-	
+
 	private double rho;
-	
+
 	private RandomIncidentSimulator incidentSimulator;
-	
+
 	private EUTReRoute2 eutReRoute;
-	
+
 	private BenefitAnalyzer bAnalyzer;
-	
+
 	private SummaryWriter summaryWriter;
-	
+
 	/**
 	 * @param args
 	 */
 	public EUTController(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
-		
-		
+
+
 	}
 
 	@Override
@@ -96,11 +96,11 @@ public class EUTController extends WithindayControler {
 		/*
 		 * Initialize the travel time memory for day2day re-planning.
 		 */
-		ttmemory = new TwoStateTTKnowledge();
-		ttmemory.setLearningRate(ttLearningRate);
-		ttmemory.setMaxMemorySlots(maxMemorySlots);
-		TimevariantTTStorage storage = ttmemory.makeTTStorage(getTravelTimeCalculator(), network, getTraveltimeBinSize(), 0, 86400);
-		ttmemory.appendNewStorage(storage);
+		this.ttmemory = new TwoStateTTKnowledge();
+		this.ttmemory.setLearningRate(this.ttLearningRate);
+		this.ttmemory.setMaxMemorySlots(this.maxMemorySlots);
+		TimevariantTTStorage storage = this.ttmemory.makeTTStorage(getTravelTimeCalculator(), this.network, getTraveltimeBinSize(), 0, 86400);
+		this.ttmemory.appendNewStorage(storage);
 		/*
 		 * Load the strategy manager.
 		 */
@@ -111,47 +111,47 @@ public class EUTController extends WithindayControler {
 		 * Add one EUTRouter and one empty module.
 		 */
 		PlanStrategy strategy = new PlanStrategy(selector);
-		eutReRoute = new EUTReRoute2(getNetwork(), ttmemory, rho);
-		strategy.addStrategyModule(eutReRoute);
-		manager.addStrategy(strategy, replanningFraction);
+		this.eutReRoute = new EUTReRoute2(getNetwork(), this.ttmemory, this.rho);
+		strategy.addStrategyModule(this.eutReRoute);
+		manager.addStrategy(strategy, this.replanningFraction);
 		/*
 		 * Do nothing...
 		 */
 		strategy = new PlanStrategy(selector);
-		manager.addStrategy(strategy, 1 - replanningFraction);
+		manager.addStrategy(strategy, 1 - this.replanningFraction);
 		/*
 		 * Create a router analyzer...
 		 */
-		routerAnalyzer = new EUTRouterAnalyzer(eutReRoute.getUtilFunction(), summaryWriter);
-		eutReRoute.setRouterAnalyzer(routerAnalyzer);
-		addControlerListener(routerAnalyzer);
-		
+		this.routerAnalyzer = new EUTRouterAnalyzer(this.eutReRoute.getUtilFunction(), this.summaryWriter);
+		this.eutReRoute.setRouterAnalyzer(this.routerAnalyzer);
+		addControlerListener(this.routerAnalyzer);
+
 		return manager;
 	}
 
 	@Override
 	protected void setup() {
-		equipmentFraction = string2Double(getConfig().getParam(CONFIG_MODULE_NAME, "equipmentFraction"));
-		replanningFraction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "replanFraction"));
-		incidentProba = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "incidentProba"));
-		
-		ttLearningRate = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "ttLearningRate"));
-		maxMemorySlots = Integer.parseInt(getConfig().findParam(CONFIG_MODULE_NAME, "maxMemorySlots"));
-		
-		rho = Integer.parseInt(getConfig().findParam(CONFIG_MODULE_NAME, "rho"));
+		this.equipmentFraction = string2Double(getConfig().getParam(CONFIG_MODULE_NAME, "equipmentFraction"));
+		this.replanningFraction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "replanFraction"));
+		this.incidentProba = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "incidentProba"));
+
+		this.ttLearningRate = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "ttLearningRate"));
+		this.maxMemorySlots = Integer.parseInt(getConfig().findParam(CONFIG_MODULE_NAME, "maxMemorySlots"));
+
+		this.rho = Integer.parseInt(getConfig().findParam(CONFIG_MODULE_NAME, "rho"));
 		/*
 		 * Dunno exactly where to place this...
 		 */
 		setTraveltimeBinSize(10);
-		
-		summaryWriter = new SummaryWriter(getConfig().findParam(CONFIG_MODULE_NAME, "summaryFile"));
-		addControlerListener(summaryWriter);
+
+		this.summaryWriter = new SummaryWriter(getConfig().findParam(CONFIG_MODULE_NAME, "summaryFile"));
+		addControlerListener(this.summaryWriter);
 		super.setup();
 		/*
 		 * Initialize the reactive travel times.
 		 */
-		reactTTs = new EstimReactiveLinkTT();
-		events.addHandler((EstimReactiveLinkTT)reactTTs);
+		this.reactTTs = new EstimReactiveLinkTT();
+		this.events.addHandler(this.reactTTs);
 		/*
 		 * Add the ttmemory updater for day2day re-replanning.
 		 */
@@ -163,48 +163,49 @@ public class EUTController extends WithindayControler {
 		/*
 		 * Trip stats...
 		 */
-		
+
 		/*
 		 * Link stats...
 		 */
-		LinkTTVarianceStats linkStats = new LinkTTVarianceStats(getTravelTimeCalculator(), 25200, 32400, 60, summaryWriter);
+		LinkTTVarianceStats linkStats = new LinkTTVarianceStats(getTravelTimeCalculator(), 25200, 32400, 60, this.summaryWriter);
 		addControlerListener(linkStats);
 		/*
 		 * Create incident simulator...
 		 */
-		incidentSimulator = new RandomIncidentSimulator((QueueNetworkLayer) getNetwork(), incidentProba);
+		QueueNetworkLayer qnet = new QueueNetworkLayer(getNetwork());
+		this.incidentSimulator = new RandomIncidentSimulator(qnet, this.incidentProba);
 		String linkIds = getConfig().findParam(CONFIG_MODULE_NAME, "links");
 		List<BasicLinkI> riskyLinks = new LinkedList<BasicLinkI>();
 		for(String id : linkIds.split(" ")) {
-			Link link = getNetwork().getLink(id);
-			riskyLinks.add((QueueLink)link);
-			incidentSimulator.addLink((QueueLink)link);
+			QueueLink link = qnet.getQueueLink(new Id(id));
+			riskyLinks.add(link.getLink());
+			this.incidentSimulator.addLink(link);
 		}
 		double capReduction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "capReduction"));
-		incidentSimulator.setCapReduction(capReduction);
-		addControlerListener(incidentSimulator);
+		this.incidentSimulator.setCapReduction(capReduction);
+		addControlerListener(this.incidentSimulator);
 		/*
 		 * Count agents traversed risky links...
 		 */
-		TraversedRiskyLink travRiskyLink = new TraversedRiskyLink(getPopulation(), riskyLinks, summaryWriter); 
-		
-		
-		TripAndScoreStats stats = new TripAndScoreStats(routerAnalyzer, travRiskyLink, summaryWriter); 
+		TraversedRiskyLink travRiskyLink = new TraversedRiskyLink(getPopulation(), riskyLinks, this.summaryWriter);
+
+
+		TripAndScoreStats stats = new TripAndScoreStats(this.routerAnalyzer, travRiskyLink, this.summaryWriter);
 		addControlerListener(stats);
-		events.addHandler(stats);
+		this.events.addHandler(stats);
 		addControlerListener(travRiskyLink);
 		/*
 		 * Analyze benefits...
 		 */
-		bAnalyzer = new BenefitAnalyzer(stats, routerAnalyzer, ttmemory, eutReRoute.getUtilFunction(), summaryWriter);
-		addControlerListener(bAnalyzer);
+		this.bAnalyzer = new BenefitAnalyzer(stats, this.routerAnalyzer, this.ttmemory, this.eutReRoute.getUtilFunction(), this.summaryWriter);
+		addControlerListener(this.bAnalyzer);
 		/*
-		 * 
+		 *
 		 */
 		String personsFile = getConfig().findParam(CONFIG_MODULE_NAME, "guidedPersons");
-		addControlerListener(new CEAnalyzer(personsFile, population, stats, eutReRoute.getUtilFunction()));
+		addControlerListener(new CEAnalyzer(personsFile, this.population, stats, this.eutReRoute.getUtilFunction()));
 		/*
-		 * 
+		 *
 		 */
 		addControlerListener(new RemoveDuplicatePlans());
 		addControlerListener(new RemoveScores());
@@ -212,16 +213,15 @@ public class EUTController extends WithindayControler {
 
 	@Override
 	protected void runMobSim() {
-		
-		config.withinday().addParam("contentThreshold", "1");
-		config.withinday().addParam("replanningInterval", "1");
+
+		this.config.withinday().addParam("contentThreshold", "1");
+		this.config.withinday().addParam("replanningInterval", "1");
 		WithindayCreateVehiclePersonAlgorithm vehicleAlgo = new WithindayCreateVehiclePersonAlgorithm(this);
 
 		//build the queuesim
-		WithindayQueueSimulation sim = new WithindayQueueSimulation((QueueNetworkLayer)this.network, this.population, this.events, this);
-		sim.setVehicleCreateAlgo(vehicleAlgo);
-		trafficManagement = new TrafficManagement();
-		sim.setTrafficManagement(trafficManagement);
+		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
+		this.trafficManagement = new TrafficManagement();
+		sim.setTrafficManagement(this.trafficManagement);
 		//run the simulation
 //		long time = System.currentTimeMillis();
 //		QueueSimulation sim = new QueueSimulation((QueueNetworkLayer)this.network, this.population, this.events);
@@ -232,28 +232,28 @@ public class EUTController extends WithindayControler {
 	private class TTMemotyUpdater implements IterationEndsListener {
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			TimevariantTTStorage storage = ttmemory.makeTTStorage(getTravelTimeCalculator(), network, getTraveltimeBinSize(), 0, 86400);
-			ttmemory.appendNewStorage(storage);
-			
+			TimevariantTTStorage storage = EUTController.this.ttmemory.makeTTStorage(getTravelTimeCalculator(), EUTController.this.network, getTraveltimeBinSize(), 0, 86400);
+			EUTController.this.ttmemory.appendNewStorage(storage);
+
 		}
-		
+
 	}
-	
+
 	private class WithindayControlerListener implements StartupListener, IterationStartsListener {
 
 		public void notifyStartup(StartupEvent event) {
-			EUTController.this.factory = new GuidedAgentFactory(network, config.charyparNagelScoring(), reactTTs, equipmentFraction);
-			((GuidedAgentFactory)factory).setRouteAnalyzer(routerAnalyzer);
-			((GuidedAgentFactory)factory).setBenefitAnalyzer(bAnalyzer);
-		
+			EUTController.this.factory = new GuidedAgentFactory(EUTController.this.network, EUTController.this.config.charyparNagelScoring(), EUTController.this.reactTTs, EUTController.this.equipmentFraction);
+			((GuidedAgentFactory)EUTController.this.factory).setRouteAnalyzer(EUTController.this.routerAnalyzer);
+			((GuidedAgentFactory)EUTController.this.factory).setBenefitAnalyzer(EUTController.this.bAnalyzer);
+
 		}
 
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			((GuidedAgentFactory)factory).reset();
+			((GuidedAgentFactory)EUTController.this.factory).reset();
 		}
-		
+
 	}
-		
+
 	public static void main(String args[]) {
 		EUTController controller = new EUTController(args);
 		long time = System.currentTimeMillis();
@@ -266,6 +266,6 @@ public class EUTController extends WithindayControler {
 			return Integer.parseInt(str.substring(0, str.length()-1))/100.0;
 		else
 			return Double.parseDouble(str);
-		
+
 	}
 }

@@ -31,7 +31,6 @@ import org.matsim.mobsim.QueueLink;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.Route;
 
 /**
@@ -124,8 +123,6 @@ public class CountsCreator {
 	protected NetworkLayer loadNetwork(final String networkFile) {
 		// - read network: which buildertype??
 		log.info("  creating network layer... ");
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
 				NetworkLayer.LAYER_TYPE, null);
 		log.info("   done");

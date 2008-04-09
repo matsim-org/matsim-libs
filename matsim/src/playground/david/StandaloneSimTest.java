@@ -25,9 +25,9 @@ import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -46,8 +46,8 @@ public class StandaloneSimTest {
 
 		World world = Gbl.getWorld();
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		NetworkLayer network = new NetworkLayer();
+				new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();

@@ -33,13 +33,13 @@ import org.matsim.utils.vis.netvis.visNet.DisplayAgent;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 public class OTFNetState {
-	
+
 	private final OTFVisNet indexNet;
 	public OTFNetState(OTFVisNet net) {
 		this.indexNet = net;
 	}
 
-	
+
 
 	public final void readLink(OTFVisNet.Link displLink, DataInputStream in) throws IOException {
 		int valueCnt = in.readInt();
@@ -72,7 +72,7 @@ public class OTFNetState {
         out.writeFloat((float) value);
 
         /* (3) write display text         */
-        String displText = link.getId().toString();
+        String displText = link.getLink().getId().toString();
         if (displText == null)
             out.writeUTF("");
         else
@@ -80,25 +80,25 @@ public class OTFNetState {
         /*
          * (4) write agents
          */
-        positions.clear();
-		link.getVehiclePositions(positions);
-		out.writeInt(positions.size());
-		
-		for (PositionInfo pos : positions) {
+        this.positions.clear();
+		link.getVehiclePositions(this.positions);
+		out.writeInt(this.positions.size());
+
+		for (PositionInfo pos : this.positions) {
 			out.writeUTF(pos.getAgentId().toString());
 			out.writeFloat((float)pos.getDistanceOnLink());
 			out.writeInt(1);
 		}
 
     }
-	
+
     public final void readNode(OTFVisNet.Node displNode, DataInputStream in) throws IOException {
 		in.readInt();
 		displNode.setDisplayValue(in.readFloat());
 		displNode.setDisplayText(in.readUTF());
 	}
 
-	
+
     public void writeNode(QueueNode node, DataOutputStream out) throws IOException {
 		out.writeInt(0);
         out.writeFloat((float)0.);
@@ -106,8 +106,8 @@ public class OTFNetState {
     }
 
     public void readMyself(DataInputStream in) throws IOException {
-		
-		for (OTFVisNet.Node node : indexNet.getNodes())
+
+		for (OTFVisNet.Node node : this.indexNet.getNodes())
 			if (node != null) {
 				readNode(node, in);
 			}else {
@@ -115,7 +115,7 @@ public class OTFNetState {
 		        in.skipBytes(length);
 			}
 
-		for (OTFVisNet.Link link : indexNet.getLinks())
+		for (OTFVisNet.Link link : this.indexNet.getLinks())
 			if (link != null) {
 				readLink(link, in);
 			}else {
@@ -128,14 +128,14 @@ public class OTFNetState {
 	}
 
     public void writeMyself(DataOutputStream out) throws IOException {
-		for (OTFVisNet.Node node : indexNet.getNodes())
+		for (OTFVisNet.Node node : this.indexNet.getNodes())
 			if (node != null) {
 				writeNode(node.getSrc(), out);
 			}else {
 				out.writeInt(0);
 			}
 
-		for (OTFVisNet.Link link : indexNet.getLinks())
+		for (OTFVisNet.Link link : this.indexNet.getLinks())
 			if (link != null) {
 				writeLink(link.getSrc(), out);
 			}else {

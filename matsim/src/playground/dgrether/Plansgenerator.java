@@ -24,7 +24,6 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -41,22 +40,22 @@ import org.matsim.plans.Route;
 public class Plansgenerator {
 
 	private static final String network = "../matsimWithindayTesting/testdata/tests/withinday/network.xml";
-	
+
 	private static final String plansOut = "../matsimWithindayTesting/testdata/tests/withinday/newPlans.xml";
-	
-	
+
+
 	private Plans plans;
 
 	private void init() {
 		Config config = Gbl.createConfig(null);
 		config.addCoreModules();
-		
+
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputFile(plansOut);
-		
+
 		this.loadNetwork(network);
 	}
-	
+
 	private void createPlans() throws Exception {
 		init();
 		this.plans = new Plans(false);
@@ -81,41 +80,40 @@ public class Plansgenerator {
 			route.setRoute("13 14 15 1");
 			leg.setRoute(route);
 			plan.createAct("h", "-25000", "0", "1", null, null, null, null);
-			
-			
-			
+
+
+
 			this.plans.addPerson(p);
-			
-			
-			
+
+
+
 		}
-		
-		
+
+
 		PlansWriter pwriter = new PlansWriter(this.plans);
 		pwriter.setWriterHandler(new PlansWriterHandlerImplV4());
 		pwriter.write();
-		
-		
+
+
 	}
 
 	protected NetworkLayer loadNetwork(String filename) {
 		// - read network: which buildertype??
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
-		NetworkLayer network = NetworkLayerBuilder.newNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		Gbl.getWorld().setNetworkLayer(network);
 
 		new MatsimNetworkReader(network).readFile(filename);
 
 		return network;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 	/**
 	 * @param args
 	 */

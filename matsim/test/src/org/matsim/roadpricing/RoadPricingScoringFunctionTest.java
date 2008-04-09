@@ -22,9 +22,9 @@ package org.matsim.roadpricing;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.SimulationTimer;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
@@ -155,7 +155,7 @@ public class RoadPricingScoringFunctionTest extends MatsimTestCase {
 	}
 
 	private Plans runTollSimulation(final String tollFile, final String tollType) {
-		QueueNetworkLayer network = Fixture.createNetwork1();
+		NetworkLayer network = Fixture.createNetwork1();
 		Gbl.getWorld().setNetworkLayer(network);
 
 		try {
@@ -172,7 +172,7 @@ public class RoadPricingScoringFunctionTest extends MatsimTestCase {
 		}
 	}
 
-	private void runTollSimulation(final QueueNetworkLayer network, final Plans population, final RoadPricingScheme toll) {
+	private void runTollSimulation(final NetworkLayer network, final Plans population, final RoadPricingScheme toll) {
 		try {
 			// run mobsim with toll and get score
 			SimulationTimer.reset();

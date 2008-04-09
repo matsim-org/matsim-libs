@@ -24,7 +24,6 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.algorithms.NetworkSummary;
 
 import playground.balmermi.algos.NetworkWriteVolumesAsTable;
@@ -36,14 +35,13 @@ public class WriteNetworkAsTable {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void cleanNetwork(String[] args) {
-		
+
 		System.out.println("RUN: cleanNetwork");
 
 		Config config = Gbl.createConfig(args);
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
@@ -56,7 +54,7 @@ public class WriteNetworkAsTable {
 		network.runAlgorithms();
 		nwvat.close();
 		System.out.println("  done.");
-		
+
 		System.out.println("RUN: cleanNetwork finished.");
 		System.out.println();
 	}

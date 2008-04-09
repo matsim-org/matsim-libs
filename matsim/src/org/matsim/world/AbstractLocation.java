@@ -60,6 +60,10 @@ public abstract class AbstractLocation implements Location {
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
+	protected AbstractLocation() {
+		this.center = null;
+		this.layer = null;
+	}
 
 	/**
 	 * A unique location for a given layer.

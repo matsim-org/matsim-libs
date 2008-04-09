@@ -23,19 +23,19 @@ package org.matsim.withinday.mobsim;
 import java.util.ArrayList;
 
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.Vehicle;
+import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.withinday.WithindayAgent;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class OccupiedVehicle extends Vehicle {
 
 //	private static final Logger log = Logger.getLogger(OccupiedVehicle.class);
-	
+
 	private WithindayAgent agent;
 
 	public OccupiedVehicle() {
@@ -43,9 +43,9 @@ public class OccupiedVehicle extends Vehicle {
 	}
 
 	@Override
-	public QueueLink chooseNextLink() {
+	protected Link chooseNextLink() {
 		this.agent.replan();
-		QueueLink l = super.chooseNextLink(); 
+		Link l = super.chooseNextLink();
 //		log.trace("vehicle : " + this.driverId + " next choosen link:" + l.getId().asString());
 		return l;
 	}
@@ -56,7 +56,7 @@ public class OccupiedVehicle extends Vehicle {
 		if (index != -1) {
 			this.actslegs = actslegs;
 			this.currentLeg = (BasicLeg) this.actslegs.get(index);
-		}		
+		}
 		else {
 			throw new IllegalArgumentException("Current leg: " + this.currentLeg
 					+ " can not be found in actslegs list!");

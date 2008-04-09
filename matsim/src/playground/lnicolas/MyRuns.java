@@ -34,7 +34,6 @@ import org.matsim.matrices.MatsimMatricesReader;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
@@ -331,8 +330,6 @@ public class MyRuns {
 
 	protected static void readNetwork() {
 		System.out.println("  reading the network...");
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		System.out.println("  done.");

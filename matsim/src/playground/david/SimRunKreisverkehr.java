@@ -24,10 +24,10 @@ import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -50,12 +50,12 @@ public class SimRunKreisverkehr {
 
 		World world = Gbl.getWorld();
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
+		NetworkLayer network = new NetworkLayer();
+				new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
 
 		int cellcount = 0;
-		for (QueueLink link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			double length = link.getLength()*link.getLanes();
 			cellcount += Math.min(1,(int)(length/7.5));
 		}

@@ -15,11 +15,11 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.identifiers.IdI;
+import org.matsim.utils.misc.Time;
 
 
 /**
@@ -155,7 +155,7 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 			/*
 			 * TODO: Replace this with a free travel time provider!
 			 */
-			return (int) ((QueueLink) link).getFreeTravelDuration();
+			return (int) link.getFreespeed(Time.UNDEFINED_TIME);
 		} else {
 			return (int) a.getAvg();
 		}

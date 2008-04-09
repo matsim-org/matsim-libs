@@ -28,7 +28,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;
@@ -101,8 +100,6 @@ public class KmlNetworkVisualizer {
 	protected NetworkLayer loadNetwork(final String networkFile) {
 		// - read network: which buildertype??
 		printNote("", "  creating network layer... ");
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
 				NetworkLayer.LAYER_TYPE, null);
 		printNote("", "  done");

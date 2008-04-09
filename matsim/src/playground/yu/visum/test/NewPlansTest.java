@@ -7,7 +7,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -35,8 +34,6 @@ public class NewPlansTest extends Plans {
 		System.out.println("  done.");
 
 		System.out.println("  creating network layer... ");
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
 				NetworkLayer.LAYER_TYPE, null);
 		System.out.println("  done.");

@@ -225,7 +225,7 @@ public class Controler {
 		this(null, null, config);
 	}
 
-	public Controler(final Config config, final QueueNetworkLayer network, final Plans population) {
+	public Controler(final Config config, final NetworkLayer network, final Plans population) {
 		this(null, null, config);
 		this.network = network;
 		this.population = population;
@@ -631,7 +631,7 @@ public class Controler {
 		SimulationTimer.setTime(0);
 
 		if (this.externalMobsim == null) {
-			Simulation sim = new QueueSimulation((QueueNetworkLayer)this.network, this.population, this.events);
+			Simulation sim = new QueueSimulation(this.network, this.population, this.events);
 			sim.run();
 		} else {
 			ExternalMobsim sim = new ExternalMobsim(this.population, this.events);

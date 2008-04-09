@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
@@ -23,7 +24,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer implements SnapshotW
 
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
-	
+
 	public OTFEvent2MVI(QueueNetworkLayer net, String EventFileName, String outFileName, double startTime, double intervall_s) {
 		super(intervall_s, net, outFileName);
 		this.vehFileName = EventFileName;
@@ -33,26 +34,26 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer implements SnapshotW
 
 	@Override
 	protected void onAdditionalQuadData() {
-		quad.addAdditionalElement(writer);
+		this.quad.addAdditionalElement(this.writer);
 	}
-	
+
 	ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
 	private final int cntPositions=0;
 	private double lastTime=-1;
 	private final int cntTimesteps=0;
-	
+
 	private void convert() {
 
 		open();
 		// read and convert data from veh-file
-		
+
 		// create SnapshotGenerator
 		Gbl.startMeasurement();
 		Gbl.getConfig().simulation().setSnapshotFormat("none");
-		Gbl.getConfig().simulation().setSnapshotPeriod(intervall_s);
+		Gbl.getConfig().simulation().setSnapshotPeriod(this.intervall_s);
 		Events2Snapshot app = new Events2Snapshot();
 		app.addExternalSnapshotWriter(this);
-		app.run(new File(vehFileName), Gbl.getConfig(), net);
+		app.run(new File(this.vehFileName), Gbl.getConfig(), this.net.getNetworkLayer());
 		finishIT();
 	}
 
@@ -65,8 +66,8 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer implements SnapshotW
 		e.printStackTrace();
 	}
 	}
-	
-	
+
+
 	public static void main(String[] args) {
 
 		if ( args.length==0 )
@@ -77,25 +78,25 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer implements SnapshotW
 		World world = Gbl.createWorld();
 
 		String netFileName = Gbl.getConfig().getParam("network","inputNetworkFile");
-		QueueNetworkLayer net = new QueueNetworkLayer();
+		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
-
+		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
 
 		String eventFile = null;
 		eventFile = "output/current/ITERS/it.0/0.events.txt.gz";
 		eventFile = "../../tmp/studies/berlin-wip/run125/200.events.txt.gz";
-		
-		OTFEvent2MVI test  = new OTFEvent2MVI(net, eventFile, "output/ds_fromEvent.mvi",0 , 600);
+
+		OTFEvent2MVI test  = new OTFEvent2MVI(qnet, eventFile, "output/ds_fromEvent.mvi",0 , 600);
 		test.convert();
 	}
 
 	public void addAgent(PositionInfo position) {
-		writer.positions.add(new OTFAgentsListHandler.ExtendedPositionInfo(position, 0,0));
+		this.writer.positions.add(new OTFAgentsListHandler.ExtendedPositionInfo(position, 0,0));
 	}
 
 	public void beginSnapshot(double time) {
-		writer.positions.clear();
+		this.writer.positions.clear();
 		this.lastTime = time;
 	}
 
@@ -110,7 +111,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer implements SnapshotW
 
 	public void finish() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 

@@ -23,7 +23,6 @@ package playground.balmermi;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkAdaptLength;
 import org.matsim.network.algorithms.NetworkSummary;
@@ -35,14 +34,13 @@ public class AdaptLinkLength {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void cleanNetwork(String[] args) {
-		
+
 		System.out.println("RUN: AdaptLinkLength");
 
 		Gbl.createConfig(args);
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		System.out.println("  done.");
@@ -53,7 +51,7 @@ public class AdaptLinkLength {
 		network.addAlgorithm(new NetworkSummary());
 		network.runAlgorithms();
 		System.out.println("  done.");
-		
+
 		System.out.println("  writing the network...");
 		NetworkWriter network_writer = new NetworkWriter(network);
 		network_writer.write();

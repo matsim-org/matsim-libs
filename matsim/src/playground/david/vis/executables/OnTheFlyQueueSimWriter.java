@@ -26,9 +26,9 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -47,30 +47,30 @@ public class OnTheFlyQueueSimWriter extends QueueSimulation{
 
 	@Override
 	protected void prepareSim() {
-		if (netStateWriter == null) netStateWriter = new OTFQuadFileHandler.Writer(600,network,"output/OTFQuadfileNoParking10p_wip.mvi");
-		if(netStateWriter != null) netStateWriter.open();
+		if (this.netStateWriter == null) this.netStateWriter = new OTFQuadFileHandler.Writer(600,this.network,"output/OTFQuadfileNoParking10p_wip.mvi");
+		if(this.netStateWriter != null) this.netStateWriter.open();
 
 		super.prepareSim();
-		
-		hist = new LegHistogram(300);
-		events.addHandler(hist);
+
+		this.hist = new LegHistogram(300);
+		events.addHandler(this.hist);
 
 	}
 
 	@Override
 	protected void cleanupSim() {
 		try {
-			netStateWriter.close();
+			this.netStateWriter.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-			hist.writeGraphic("output/OTFQuadfileNoParking10p_wip.leghist.png");
+			this.hist.writeGraphic("output/OTFQuadfileNoParking10p_wip.leghist.png");
 
 	}
 
 
-	public OnTheFlyQueueSimWriter(QueueNetworkLayer net, Plans plans, Events events) {
+	public OnTheFlyQueueSimWriter(NetworkLayer net, Plans plans, Events events) {
 		super(net, plans, events);
 		// TODO Auto-generated constructor stub
 	}
@@ -107,7 +107,7 @@ public class OnTheFlyQueueSimWriter extends QueueSimulation{
 			world_parser.readFile(worldFileName);
 		}
 
-		QueueNetworkLayer net = new QueueNetworkLayer();
+		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
 
@@ -136,7 +136,7 @@ public class OnTheFlyQueueSimWriter extends QueueSimulation{
 
 		Gbl.printElapsedTime();
 
-	
+
 	}
 
 	public void setOtfwriter(OTFQuadFileHandler.Writer  otfwriter) {

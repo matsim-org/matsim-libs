@@ -26,10 +26,12 @@ import java.util.Comparator;
 /**
  * @author dstrippgen
  *
- * Comparator object, to sort the Vehicle objects in QueueLink.parkingList according
- * to their departure time
+ * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
+ * according to their departure time
  */
-class VehicleDepartureTimeComparator implements Comparator<Vehicle>, Serializable {
+class VehicleDepartureTimeComparator implements Comparator<Vehicle>,
+		Serializable {
+
 	private static final long serialVersionUID = 1L;
 
 	public int compare(final Vehicle veh1, final Vehicle veh2) {

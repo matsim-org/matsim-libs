@@ -25,7 +25,6 @@ import org.matsim.config.Config;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
@@ -99,9 +98,9 @@ public class ScenarioData {
 		if (!this.networkLoaded) {
 			getWorld(); // make sure the world is loaded
 			log.info("loading network from " + this.networkFileName);
-			this.network = new QueueNetworkLayer();
-			this.world.setNetworkLayer(this.network);
+			this.network = new NetworkLayer();
 			new MatsimNetworkReader(this.network).readFile(this.networkFileName);
+			this.world.setNetworkLayer(this.network);
 			this.world.complete();
 			this.networkLoaded = true;
 		}

@@ -21,8 +21,8 @@
 package playground.marcel;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -37,7 +37,7 @@ public class ScoringTest {
 		PlanScorer scorer = new PlanScorer(new CharyparNagelScoringFunctionFactory());
 
 		Gbl.createConfig(new String[] {"../mystudies/scoringtest/config.xml"});
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("examples/equil/network.xml");
 		Gbl.getWorld().setNetworkLayer(network);
 		Plans population = new Plans(Plans.NO_STREAMING);

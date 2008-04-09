@@ -20,7 +20,7 @@
 
 package org.matsim.events;
 
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -32,7 +32,7 @@ public class EventAgentWait2Link extends AgentEvent {
 
 	private static final long serialVersionUID = 1867692305873299962L;
 
-	public EventAgentWait2Link(double time, String agentId, int legId, String linkId, Person agent, Leg leg, LinkImpl link) {
+	public EventAgentWait2Link(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
 		super(time, agentId, legId, linkId, agent, leg, link);
 	}
 

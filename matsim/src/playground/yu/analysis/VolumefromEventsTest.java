@@ -28,10 +28,9 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.network.NetworkLayer;
 import org.matsim.world.World;
 
 public class VolumefromEventsTest {
@@ -49,7 +48,7 @@ public class VolumefromEventsTest {
 
 		World world = Gbl.getWorld();
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
@@ -62,7 +61,7 @@ public class VolumefromEventsTest {
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
 		Map<String, Double> vol7s = new HashMap<String, Double>();
-		for (QueueLink ql : ((Map<IdI, QueueLink>) network.getLinks()).values()) {
+		for (Link ql : network.getLinks().values()) {
 			int[] v = volumes.getVolumesForLink(ql.getId().toString());
 			vol7s.put(ql.getId().toString(), (double) ((v != null) ? v[7] : 0));
 		}

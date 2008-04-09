@@ -37,7 +37,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.Leg;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
@@ -125,7 +124,6 @@ public class LinkSetRendererRoutes extends RendererA {
 		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
@@ -163,7 +161,7 @@ public class LinkSetRendererRoutes extends RendererA {
 		if (strokeWidth > (100.0 / scale)) strokeWidth = 100.0 / scale;  // max pixel-width on screen
 		display.setStroke(new BasicStroke((float)strokeWidth));
 
-		for (DisplayableLinkI link : network.getLinks().values()) {
+		for (DisplayableLinkI link : this.network.getLinks().values()) {
 
 			if (!comp.checkLineInClip(link.getStartEasting(), link.getStartNorthing(),
 					link.getEndEasting(), link.getEndNorthing())) {

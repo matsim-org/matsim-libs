@@ -19,14 +19,14 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.mautZH;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -34,7 +34,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class PlanCheckControler {
 	public static void main(final String[] args) {
@@ -46,7 +46,7 @@ public class PlanCheckControler {
 		Config config = Gbl
 				.createConfig(new String[] { "./test/yu/schweiz/multipleIterations_.xml" });
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 

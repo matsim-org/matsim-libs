@@ -30,7 +30,6 @@ import org.matsim.events.Events;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.Plans;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.algorithms.WorldAlgorithm;
@@ -53,7 +52,7 @@ public class World {
 	private final ArrayList<WorldAlgorithm> algorithms = new ArrayList<WorldAlgorithm>();
 
 	private final static Logger log = Logger.getLogger(World.class);
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -71,14 +70,14 @@ public class World {
 		Iterator<IdI> lid_it = this.layers.keySet().iterator();
 		while (lid_it.hasNext()) {
 			IdI lid = lid_it.next();
-			if (lid != NetworkLayer.LAYER_TYPE && lid != Facilities.LAYER_TYPE) {
+			if ((lid != NetworkLayer.LAYER_TYPE) && (lid != Facilities.LAYER_TYPE)) {
 				zlayers.add((ZoneLayer)this.layers.get(lid));
 			}
 		}
 
 		if (zlayers.size() > 0) {
 			if (zlayers.size() != (this.rules.size()+1)) { Gbl.errorMsg("This should never happen!"); }
-			
+
 			// find the top layer
 			this.top_layer = null;
 			for (int i=0; i<zlayers.size(); i++) {
@@ -86,10 +85,10 @@ public class World {
 				if (zlayers.get(i).getUpRule() == null) { this.top_layer = l; }
 			}
 			if (this.top_layer == null) { Gbl.errorMsg("Something is completely wrong!"); }
-			
+
 			// find the bottom layer
 			int step_cnt = 1;
-			this.bottom_layer = top_layer;
+			this.bottom_layer = this.top_layer;
 			while (this.bottom_layer.getDownRule() != null) {
 				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
 				step_cnt++;
@@ -103,7 +102,7 @@ public class World {
 			this.bottom_layer = null;
 		}
 	}
-	
+
 	public final void complete() {
 		// first, remove rules and mappings containing network and/or facility layers
 		Layer f_layer = this.layers.get(Facilities.LAYER_TYPE);
@@ -120,10 +119,10 @@ public class World {
 				this.removeMappingRule(l.getType(),n_layer.getType());
 			}
 		}
-		
+
 		// second, complete the zone layers
 		this.completeZoneLayers();
-		
+
 		// third, create rules and mappings for the facility layer
 		if (f_layer != null) {
 			if (this.bottom_layer == null) {
@@ -134,12 +133,12 @@ public class World {
 				// TODO [balmermi] actually we could defined a specific mapping rule,
 				// but then we need to set the mappings also.
 				// So, i'm too lazy and define the mapping "m-m".
-				this.createMappingRule(f_layer.getType().toString() + "[m]-[m]" + bottom_layer.getType().toString());
+				this.createMappingRule(f_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
 				// same as this.bottom_layer = f_layer, but with error checks
 				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
 			}
 		}
-		
+
 		// forth, create rules and mappings for the net layer
 		if (n_layer != null) {
 			if (this.bottom_layer == null) {
@@ -150,7 +149,7 @@ public class World {
 				// TODO [balmermi] a facility belongs to exactly one link
 				// and a link contains zero, one or may facilities. The actual
 				// mapping needs to be done later (as a MATSim-FUSION module)
-				this.createMappingRule(n_layer.getType().toString() + "[1]-[*]" + bottom_layer.getType().toString());
+				this.createMappingRule(n_layer.getType().toString() + "[1]-[*]" + this.bottom_layer.getType().toString());
 				// same as this.bottom_layer = n_layer, but with error checks
 				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
 			}
@@ -162,7 +161,7 @@ public class World {
 				// to connect the network with a zone layer anymore, since the
 				// facility layer shoulkd be in between. Well... we will change
 				// the whole strucutre anyway...
-				this.createMappingRule(n_layer.getType().toString() + "[m]-[m]" + bottom_layer.getType().toString());
+				this.createMappingRule(n_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
 				// same as this.bottom_layer = n_layer, but with error checks
 				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
 			}
@@ -195,7 +194,7 @@ public class World {
 		}
 		return true;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// create methods
 	//////////////////////////////////////////////////////////////////////
@@ -210,7 +209,7 @@ public class World {
 	public final Layer createLayer(final String type, final String name) {
 		return this.createLayer(new Id(type),name);
 	}
-	
+
 	public final MappingRule createMappingRule(final String mapping_rule) {
 		MappingRule m = new MappingRule(mapping_rule,this.layers);
 		this.rules.put(m.getDownLayer().getType().toString() + m.getUpLayer().getType().toString(), m);
@@ -222,15 +221,15 @@ public class World {
 		this.layers.put(l.getType(),l);
 		return l;
 	}
-	
+
 	private final Facilities createFacilityLayer() {
 		Facilities f = new Facilities();
 		this.setFacilityLayer(f);
 		return f;
 	}
-	
+
 	private final NetworkLayer createNetworkLayer() {
-		NetworkLayer n = NetworkLayerBuilder.newNetworkLayer();
+		NetworkLayer n = new NetworkLayer();
 		setNetworkLayer(n);
 		return n;
 	}
@@ -254,7 +253,7 @@ public class World {
 			this.complete();
 		}
 	}
-	
+
 	protected final void setName(final String name) {
 		this.name = name;
 	}
@@ -316,7 +315,7 @@ public class World {
 	public final Layer getLayer(final IdI layer_type) {
 		return this.layers.get(layer_type);
 	}
-	
+
 	public final Layer getLayer(final String layer_type) {
 		return this.layers.get(new Id(layer_type));
 	}
@@ -328,11 +327,11 @@ public class World {
 	public final TreeMap<String,MappingRule> getRules() {
 		return this.rules;
 	}
-	
+
 	protected final MappingRule getMappingRule(final IdI down_id, final IdI up_id) {
 		return this.rules.get(down_id.toString() + up_id.toString());
 	}
-	
+
 	protected final MappingRule getMappingRule(final Layer down_layer, final Layer up_layer) {
 		return this.getMappingRule(down_layer.getType(),up_layer.getType());
 	}

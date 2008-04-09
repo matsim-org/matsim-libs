@@ -26,7 +26,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;
@@ -45,12 +44,10 @@ public class KMLNetWriterTest {
 //		final String netFilename = "./test/yu/ivtch/input/network.xml";
 //		final String netFilename = "./test/yu/equil_test/equil_net.xml";
 //		final String kmzFilename = "./test/yu/ivtch/output/testEquil.kmz";
-		final String kmzFilename = "./test/yu/utils/ivtch-changed_r1.1.kmz";
+		final String kmzFilename = "./test/yu/ivtch/output/testZrh.kmz";
 
 		Gbl.createConfig(null);
 
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
 				NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(netFilename);

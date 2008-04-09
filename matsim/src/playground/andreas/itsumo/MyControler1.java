@@ -28,7 +28,6 @@ import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.NetworkWriter;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -259,7 +258,6 @@ public class MyControler1 extends Controler {
 	protected NetworkLayer loadNetwork() {
 
 		log.info("  creating network layer... ");
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		log.info("  done");
 

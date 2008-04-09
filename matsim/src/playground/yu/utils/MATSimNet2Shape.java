@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.utils;
 
@@ -44,27 +44,26 @@ import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerI;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.network.NetworkLayer;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * this class founds on many codes of Gregor Laemmel
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class MATSimNet2Shape {
 	/**
 	 * this class is only a copy of
 	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class>
 	 * Gregor Laemmel's
-	 * 
+	 *
 	 * @author ychen
-	 * 
+	 *
 	 */
 	public static class ShapeFileWriter2 {
 		public static void writeGeometries(Collection<Feature> features,
@@ -72,7 +71,7 @@ public class MATSimNet2Shape {
 				SchemaException {
 			ShapefileDataStore datastore = new ShapefileDataStore((new File(
 					filename)).toURI().toURL());
-			FeatureType ft = ((Feature) features.iterator().next())
+			FeatureType ft = (features.iterator().next())
 					.getFeatureType();
 			datastore.createSchema(ft);
 			((FeatureStore) (datastore.getFeatureSource(ft.getTypeName())))
@@ -80,15 +79,15 @@ public class MATSimNet2Shape {
 		}
 	}
 
-	private QueueNetworkLayer network;
+	private NetworkLayer network;
 	private CoordinateReferenceSystem crs = null;
 	public static String ch1903 = "PROJCS[\"CH1903_LV03\",GEOGCS[\"GCS_CH1903\",DATUM[\"D_CH1903\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Hotine_Oblique_Mercator_Azimuth_Center\"],PARAMETER[\"False_Easting\",600000],PARAMETER[\"False_Northing\",200000],PARAMETER[\"Scale_Factor\",1],PARAMETER[\"Azimuth\",90],PARAMETER[\"Longitude_Of_Center\",7.439583333333333],PARAMETER[\"Latitude_Of_Center\",46.95240555555556],UNIT[\"Meter\",1],AUTHORITY[\"EPSG\",\"21781\"]]";
 	private NetworkToGraph2 n2g;
 
 	public void readNetwork(String netFilename) {
 		Config config = Gbl.createConfig(null);
-		network = new QueueNetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		this.network = new NetworkLayer();
+		new MatsimNetworkReader(this.network).readFile(netFilename);
 	}
 
 	/**
@@ -97,11 +96,11 @@ public class MATSimNet2Shape {
 	 */
 	public void setCrs(String wkt) {
 		try {
-			crs = CRS.parseWKT(wkt);
+			this.crs = CRS.parseWKT(wkt);
 		} catch (FactoryException e) {
 			e.printStackTrace();
 		}
-		n2g = new NetworkToGraph2(network, crs);
+		this.n2g = new NetworkToGraph2(this.network, this.crs);
 	}
 
 	/**
@@ -110,7 +109,7 @@ public class MATSimNet2Shape {
 	 */
 	public void writeShapeFile(String ShapeFilename) {
 		try {
-			ShapeFileWriter2.writeGeometries(n2g.getFeatures(), ShapeFilename);
+			ShapeFileWriter2.writeGeometries(this.n2g.getFeatures(), ShapeFilename);
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (SchemaException e) {
@@ -126,14 +125,14 @@ public class MATSimNet2Shape {
 
 	public void addParameter(String paraName, Class clazz,
 			Map<String, ?> parameters) {
-		n2g.addParameter(paraName, clazz, parameters);
+		this.n2g.addParameter(paraName, clazz, parameters);
 	}
 
 	/**
 	 * @return the network
 	 */
-	public QueueNetworkLayer getNetwork() {
-		return network;
+	public NetworkLayer getNetwork() {
+		return this.network;
 	}
 
 	public void readEvents(String eventsFilename, EventHandlerI handler) {
@@ -158,7 +157,7 @@ public class MATSimNet2Shape {
 
 		Map<String, Integer> vol7s = new HashMap<String, Integer>();
 		Map<String, Integer> vol8s = new HashMap<String, Integer>();
-		for (QueueLink ql : ((Map<IdI, QueueLink>) mn2s.network.getLinks())
+		for (Link ql : (mn2s.network.getLinks())
 				.values()) {
 			int[] v = va.getVolumesForLink(ql.getId().toString());
 			vol7s.put(ql.getId().toString(), ((v != null) ? v[7] : 0) * 10);

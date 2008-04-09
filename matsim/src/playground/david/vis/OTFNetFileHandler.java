@@ -63,16 +63,16 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 	Map<Double,Long> timeSteps = new HashMap<Double,Long>();
 
 	public OTFNetFileHandler(double intervall_s, QueueNetworkLayer network, String fileName) {
-		if (network != null) net = new OTFVisNet(network);
-		out = new ByteArrayOutputStream(500000);
+		if (network != null) this.net = new OTFVisNet(network);
+		this.out = new ByteArrayOutputStream(500000);
 		this.intervall_s = intervall_s;
 		this.fileName = fileName;
 	}
 
 	public void close() throws IOException {
 		try {
-			outFile.close();
-			outStream.close();
+			this.outFile.close();
+			this.outStream.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -80,19 +80,19 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 	}
 
 	public boolean dump(int time_s) throws IOException {
-		if (time_s >= nextTime) {
+		if (time_s >= this.nextTime) {
 			// dump time
-			outFile.writeDouble(time_s);
+			this.outFile.writeDouble(time_s);
 			// get State
 			//Gbl.startMeasurement();
-			out.reset();
-			net.writeMyself(null, new DataOutputStream(out));
-			outFile.writeInt(out.size());
-			out.writeTo(outFile);
+			this.out.reset();
+			this.net.writeMyself(null, new DataOutputStream(this.out));
+			this.outFile.writeInt(this.out.size());
+			this.out.writeTo(this.outFile);
 			// dump State
 			//Gbl.printElapsedTime();
 
-			nextTime = time_s + intervall_s;
+			this.nextTime = time_s + this.intervall_s;
 			return true;
 		}
 		return false;
@@ -101,12 +101,12 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 	public void open() {
 		// open file
 		try {
-			if (fileName.endsWith(".gz")) {
-				outStream = new GZIPOutputStream (new FileOutputStream(fileName),BUFFERSIZE);
+			if (this.fileName.endsWith(".gz")) {
+				this.outStream = new GZIPOutputStream (new FileOutputStream(this.fileName),BUFFERSIZE);
 			}else {
-				outStream = new BufferedOutputStream(new FileOutputStream(fileName),BUFFERSIZE);
+				this.outStream = new BufferedOutputStream(new FileOutputStream(this.fileName),BUFFERSIZE);
 			}
-			outFile = new DataOutputStream(outStream);
+			this.outFile = new DataOutputStream(this.outStream);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -117,8 +117,8 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 
 		// dump some infos
 		try {
-			outFile.writeDouble(intervall_s);
-			new ObjectOutputStream(outStream).writeObject(net);
+			this.outFile.writeDouble(this.intervall_s);
+			new ObjectOutputStream(this.outStream).writeObject(this.net);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -135,13 +135,13 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 	public void readNet() {
 		// open file
 		try {
-			if (fileName.endsWith(".gz")) {
-				GZIPInputStream gzInStream =  new GZIPInputStream(new BufferedInputStream(new FileInputStream(fileName), BUFFERSIZE));
-				inStream = gzInStream;
+			if (this.fileName.endsWith(".gz")) {
+				GZIPInputStream gzInStream =  new GZIPInputStream(new BufferedInputStream(new FileInputStream(this.fileName), BUFFERSIZE));
+				this.inStream = gzInStream;
 			} else {
-				inStream = new FileInputStream(fileName);
+				this.inStream = new FileInputStream(this.fileName);
 			}
-			inFile = new DataInputStream(inStream);
+			this.inFile = new DataInputStream(this.inStream);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -152,8 +152,8 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 
 		// dump some infos
 		try {
-			intervall_s = inFile.readDouble();
-			net = (OTFVisNet) new ObjectInputStream(inStream).readObject();
+			this.intervall_s = this.inFile.readDouble();
+			this.net = (OTFVisNet) new ObjectInputStream(this.inStream).readObject();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -178,13 +178,13 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 	}
 
 	public int getLocalTime() throws RemoteException {
-		return (int)nextTime;
+		return (int)this.nextTime;
 	}
 
 	public OTFVisNet getNet(OTFNetHandler handler) throws RemoteException {
-		if (net == null) readNet();
+		if (this.net == null) readNet();
 
-		return net;
+		return this.net;
 	}
 
 	long filepos = 0;
@@ -193,22 +193,22 @@ public class OTFNetFileHandler implements SimStateWriterI, OTFServerRemote{
 		byte [] result = null;
 
 		try {
-			nextTime = inFile.readDouble();
-			size = inFile.readInt();
+			this.nextTime = this.inFile.readDouble();
+			size = this.inFile.readInt();
 
 			result = new byte[size];
 			int offset = 0;
 			int remain = size;
 			int read = 0;
 			while ((remain > 0) && (read != -1)){
-				read = inFile.read(result,offset,remain);
+				read = this.inFile.read(result,offset,remain);
 				remain -= read;
 				offset +=read;
 			}
 
 			if (offset != size) throw new IOException("READ SIZE did not fit! File corrupted!");
-			timeSteps.put(nextTime, filepos);
-			filepos += read;
+			this.timeSteps.put(this.nextTime, this.filepos);
+			this.filepos += read;
 
 		} catch (IOException e) {
 			System.out.println(e.toString());

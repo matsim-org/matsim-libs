@@ -51,15 +51,20 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	private double lastMovedTime = 0;
 
 	protected List<Object> actslegs = new ArrayList<Object>();
-	protected transient QueueLink cachedNextLink = null;
-	private transient QueueLink destinationLink = null;
+	protected transient Link cachedNextLink = null;
+	private transient Link destinationLink = null;
 	private transient Person driver = null;
-	protected transient QueueLink currentLink = null;
+	protected transient Link currentLink = null;
 	protected transient BasicLeg currentLeg = null;
 
 	private final static Logger log = Logger.getLogger(Vehicle.class);
 
 	private final int id = globalID++; // TODO change to IdI instead of int
+
+	public  Vehicle() {
+
+	}
+
 
 	/**
 	 * @return zero-based leg number.
@@ -78,14 +83,14 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	/**
 	 * @return Returns the currentLink.
 	 */
-	public QueueLink getCurrentLink() {
+	public Link getCurrentLink() {
 		return this.currentLink;
 	}
 
 	/**
 	 * @param currentLink The currentLink to set.
 	 */
-	public void setCurrentLink(final QueueLink currentLink) {
+	public void setCurrentLink(final Link currentLink) {
 		this.currentLink = currentLink;
 	}
 
@@ -99,7 +104,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	 *
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
-	public QueueLink chooseNextLink() {
+	protected Link chooseNextLink() {
 		if (this.cachedNextLink != null) {
 			return this.cachedNextLink;
 		}
@@ -121,7 +126,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 
 		for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
 			if (link.getToNode() == destNode) {
-				this.cachedNextLink = (QueueLink)link; //save time in later calls, if link is congested
+				this.cachedNextLink = link; //save time in later calls, if link is congested
 				return this.cachedNextLink;
 			}
 		}
@@ -133,7 +138,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		return (Route)this.currentLeg.getRoute();
 	}
 
-	public QueueLink getDestinationLink() {
+	public Link getDestinationLink() {
 		return this.destinationLink;
 	}
 
@@ -147,7 +152,8 @@ public class Vehicle implements Serializable, DrawableAgentI {
 					+ ", but is on link " + this.currentLink.getId().toString() + ". Removing the agent from the simulation.");
 			return false;
 		}
-		this.currentLink = (QueueLink) act.getLink();
+//		dg[march2008] if the condition above is true this is not needed!
+//		this.currentLink = (QueueLink) act.getLink();
 
 		if (this.nextActivity == this.actslegs.size()-1) {
 			// if this is the last activity, then stop vehicle
@@ -173,7 +179,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		}
 		setDepartureTime_s(departure);
 
-		this.destinationLink = (QueueLink)((Act)this.actslegs.get(this.nextActivity +2)).getLink();
+		this.destinationLink = ((Act)this.actslegs.get(this.nextActivity +2)).getLink();
 
 		// set the route according to the next leg
 		Leg leg = (Leg) this.actslegs.get(this.nextActivity+1);
@@ -182,35 +188,31 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		this.cachedNextLink = null;
 		this.nextActivity += 2;
 
-		// this is the starting point for our vehicle, so put it in the queue
-		transferToMobsim();
 
 		return true;
 	}
 
-	public void initVeh() {
+	public boolean initVeh() {
 		this.nextActivity = 0;
 		Act firstAct = (Act) this.actslegs.get(0);
+
 		SimulationTimer.updateSimStartTime(firstAct.getEndTime());
-		setCurrentLink((QueueLink)firstAct.getLink());
+		setCurrentLink(firstAct.getLink());
 
 		if (initNextLeg()) {
 			Simulation.incLiving();
+			// this is the starting point for our vehicle, so put it in the queue
+			return true;
 		}
+		return false;
 	}
 
-	public void rebuildVeh(final QueueLink link) {
+	public void rebuildVeh(final Link link) {
 		this.currentLink = link;
-		this.destinationLink = (QueueLink)((Act)this.actslegs.get(this.nextActivity)).getLink();
+		this.destinationLink = ((Act)this.actslegs.get(this.nextActivity)).getLink();
 		Leg actleg = (Leg) this.actslegs.get(this.nextActivity-1);
 		this.currentLeg = actleg;
 		this.cachedNextLink = null;
-	}
-
-	private void reinitVeh() {
-		if (!initNextLeg()) {
-			Simulation.decLiving();
-		}
 	}
 
 	public Leg getCurrentLeg() {
@@ -222,13 +224,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	 */
 	public void setActLegs(final List<Object> actLegs) {
 		this.actslegs = actLegs;
-	}
-
-	/**
-	 * @param driverId The driverId to set.
-	 */
-	public void setDriverID(final String driverId) {
-		this.driverId = driverId;
 	}
 
 	/**
@@ -262,8 +257,12 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	/**
 	 * @return Returns the driverID.
 	 */
+	@Deprecated
 	public String getDriverID() {
-		return this.driverId;
+		if (null != this.driverId) {
+			return this.driverId;
+		}
+		throw new Error("there can not be a driverId unless the driver is set!");
 	}
 
 	/**
@@ -284,7 +283,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	}
 
 	public double getPosInLink_m() {
-		double dur = this.currentLink.getFreeTravelDuration();
+		double dur = this.currentLink.getFreespeedTravelTime();
 		double mytime = getDepartureTime_s() - SimulationTimer.getTime();
 		if (mytime<0) {
 			mytime = 0.;
@@ -319,7 +318,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	 *
 	 * @param now the current time
 	 */
-	public void leaveActivity(final double now) {
+	protected void leaveActivity(final double now) {
 		Act act = (Act)this.actslegs.get(this.nextActivity - 2);
 		QueueSimulation.getEvents().processEvent(new EventActivityEnd(now, this.driverId, this.driver, this.currentLink, act));
 	}
@@ -329,16 +328,17 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	 *
 	 * @param now the current time
 	 */
-	public void reachActivity(final double now) {
+	 protected void reachActivity(final double now, QueueLink currentQueueLink) {
 		Act act = (Act)this.actslegs.get(this.nextActivity);
 		// no actStartEvent for first act.
 		QueueSimulation.getEvents().processEvent(new EventActivityStart(now, this.driverId, this.driver, this.currentLink, act));
 		// 	 this is the starting point for our vehicle, so put it in the queue
-		reinitVeh();
-	}
-
-	protected void transferToMobsim() {
-		this.currentLink.addParking(this);
+		if (!initNextLeg()) {
+			Simulation.decLiving();
+		}
+		else {
+			currentQueueLink.addParking(this);
+		}
 	}
 
 }

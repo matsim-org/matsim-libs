@@ -26,6 +26,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.gnuclasspath.TreeMap;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.misc.ResizableArray;
+import org.matsim.utils.misc.Time;
 
 
 
@@ -42,10 +43,12 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 	private final ResizableArray<Object> roles = new ResizableArray<Object>(5);
 
 	TreeMap<Double, Double> freespeedEvents;
-	
+
 	protected final double euklideanDist;
 
 	private double flowCapacity;
+
+	private final double freespeedTravelTime;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -63,7 +66,9 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 	this.origid = origid;
 	this.type = type;
 	this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
-	
+	this.freespeedTravelTime = this.getLength()
+	/ this.getFreespeed(Time.UNDEFINED_TIME);
+
 	initNetworkChangeEvents();
 	calcFlowCapacity();
 	// do some semantic checks
@@ -79,10 +84,10 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 	private void initNetworkChangeEvents() {
 		this.freespeedEvents = new TreeMap<Double, Double>();
 		this.freespeedEvents.put(-1., this.freespeed); // make sure that freespeed is set to 'default' freespeed as long as no change event occurs
-		
+
 	}
-	
-	
+
+
 //////////////////////////////////////////////////////////////////////
 // calc methods
 //////////////////////////////////////////////////////////////////////
@@ -115,7 +120,7 @@ public final double calcDistance(final CoordI coord) {
 	else if (xla > la2) { double cx = zx-tx; double cy = zy-ty; return Math.sqrt(cx*cx+cy*cy); }
 	else { return Math.sqrt(lb2-xla*xla/la2); // lb2-xla*xla/la2 = lb*lb-x*x
 	}
-	
+
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -146,6 +151,7 @@ public final Node getToNode() {
  * @param time - the current time
  * @Override {@link org.matsim.basic.v01.BasicLink.getFreespeed}
  */
+@Override
 public double getFreespeed(double time) {
 	return this.freespeedEvents.floorEntry(time).getValue();
 }
@@ -195,8 +201,8 @@ public final double getFlowCapacity() {
 /**
  * This method add a new freespeed change event. If there already exist an event for the given time, then
  * the old value will be overwritten.
- * 
- *  @param time - the time on which the event occurs 
+ *
+ *  @param time - the time on which the event occurs
  *  @param freespeed - the new freespeed
  */
 public void addFreespeedEvent(final double time, final double freespeed) {
@@ -239,5 +245,9 @@ public String toString() {
 			"[permlanes=" + this.permlanes + "]" +
 			"[origid=" + this.origid + "]" +
 			"[type=" + this.type + "]";
+}
+
+public double getFreespeedTravelTime() {
+	return this.freespeedTravelTime;
 }
 }

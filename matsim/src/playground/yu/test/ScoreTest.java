@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.test;
 
@@ -29,8 +29,8 @@ import java.io.IOException;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -41,7 +41,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- * 
+ *
  */
 public class ScoreTest extends PersonAlgorithm {
 	private double sumScoreWorst = 0.0, sumScoreBest = 0.0, sumAvgScores = 0.0,
@@ -51,12 +51,12 @@ public class ScoreTest extends PersonAlgorithm {
 	private BufferedWriter writer = null;
 
 	/**
-	 * 
+	 *
 	 */
 	public ScoreTest(String outputFilename) {
 		try {
-			writer = IOUtils.getBufferedWriter(outputFilename);
-			writer.write("of each agent\tavg. score\tsum\tn\n");
+			this.writer = IOUtils.getBufferedWriter(outputFilename);
+			this.writer.write("of each agent\tavg. score\tsum\tn\n");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -92,36 +92,36 @@ public class ScoreTest extends PersonAlgorithm {
 			cntScores++;
 			// executed plan?
 			if (plan.isSelected()) {
-				sumExecutedScores += plan.getScore();
-				nofExecutedScores++;
+				this.sumExecutedScores += plan.getScore();
+				this.nofExecutedScores++;
 			}
 		}
 		if (worstPlan != null) {
-			nofScoreWorst++;
-			sumScoreWorst += worstPlan.getScore();
+			this.nofScoreWorst++;
+			this.sumScoreWorst += worstPlan.getScore();
 		}
 		if (bestPlan != null) {
-			nofScoreBest++;
-			sumScoreBest += bestPlan.getScore();
+			this.nofScoreBest++;
+			this.sumScoreBest += bestPlan.getScore();
 		}
 		if (cntScores > 0) {
-			sumAvgScores += (sumScores / cntScores);
-			nofAvgScores++;
+			this.sumAvgScores += (sumScores / cntScores);
+			this.nofAvgScores++;
 		}
 	}
 
 	public void end() {
 		try {
-			writer.write("executed: " + "\t"
-					+ (sumExecutedScores / nofExecutedScores) + "\t"
-					+ sumExecutedScores + "\t" + nofExecutedScores
-					+ "\nworst: \t" + (sumScoreWorst / nofScoreWorst) + "\t"
-					+ sumScoreWorst + "\t" + nofScoreWorst + "\navg.: \t"
-					+ (sumAvgScores / nofAvgScores) + "\t" + sumAvgScores
-					+ "\t" + nofAvgScores + "\nbest: \t"
-					+ (sumScoreBest / nofScoreBest) + "\t" + sumScoreBest
-					+ "\t" + nofScoreBest + "\n");
-			writer.close();
+			this.writer.write("executed: " + "\t"
+					+ (this.sumExecutedScores / this.nofExecutedScores) + "\t"
+					+ this.sumExecutedScores + "\t" + this.nofExecutedScores
+					+ "\nworst: \t" + (this.sumScoreWorst / this.nofScoreWorst) + "\t"
+					+ this.sumScoreWorst + "\t" + this.nofScoreWorst + "\navg.: \t"
+					+ (this.sumAvgScores / this.nofAvgScores) + "\t" + this.sumAvgScores
+					+ "\t" + this.nofAvgScores + "\nbest: \t"
+					+ (this.sumScoreBest / this.nofScoreBest) + "\t" + this.sumScoreBest
+					+ "\t" + this.nofScoreBest + "\n");
+			this.writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -150,7 +150,7 @@ public class ScoreTest extends PersonAlgorithm {
 
 		World world = Gbl.getWorld();
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 

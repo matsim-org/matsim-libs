@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.newNetwork;
 
@@ -28,16 +28,16 @@ import java.util.TreeMap;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 
 import playground.yu.utils.GTFParser;
 
 /**
  * @author yu
- * 
+ *
  */
 public class GTFNetCreator {
 	/**
@@ -46,7 +46,7 @@ public class GTFNetCreator {
 	public static void main(String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch-changed.xml";
 		Config config = Gbl.createConfig(null);
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
 		GTFParser g = new GTFParser(

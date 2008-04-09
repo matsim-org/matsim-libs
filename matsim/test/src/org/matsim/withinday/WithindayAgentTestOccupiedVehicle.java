@@ -22,7 +22,6 @@ package org.matsim.withinday;
 
 import java.util.ArrayList;
 
-import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -38,7 +37,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 
 	private final Link destinationLink;
 
-	public WithindayAgentTestOccupiedVehicle(final Leg currentLeg, final QueueLink currentLink, final QueueLink destinationLink, final ArrayList<Object> arrayList) {
+	public WithindayAgentTestOccupiedVehicle(final Leg currentLeg, final Link currentLink, final Link destinationLink, final ArrayList<Object> arrayList) {
 		this.currentLeg = currentLeg;
 		this.currentLink = currentLink;
 		this.destinationLink = destinationLink;
@@ -57,8 +56,8 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 * @see org.matsim.mobsim.Vehicle#getDestinationLink()
 	 */
 	@Override
-	public QueueLink getDestinationLink() {
-		return (QueueLink) this.destinationLink;
+	public Link getDestinationLink() {
+		return this.destinationLink;
 	}
 
 	/**
@@ -87,7 +86,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	//for security reasons overwritten but not implemented methods
 
 	@Override
-	public QueueLink chooseNextLink() {
+	public Link chooseNextLink() {
 		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
@@ -167,7 +166,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 * @see org.matsim.mobsim.Vehicle#initVeh()
 	 */
 	@Override
-	public void initVeh() {
+	public boolean initVeh() {
 		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
@@ -179,27 +178,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
-	/**
-	 * @see org.matsim.mobsim.Vehicle#reachActivity()
-	 */
-	@Override
-	public void reachActivity(final double now) {
-		throw new UnsupportedOperationException("This method should not be used for this test!");
-	}
 
-	/**
-	 * @see org.matsim.mobsim.Vehicle#rebuildVeh(org.matsim.mobsim.QueueLink)
-	 */
-	@Override
-	public void rebuildVeh(final QueueLink link) {
-		throw new UnsupportedOperationException("This method should not be used for this test!");
-	}
 
-	/**
-	 * @see org.matsim.mobsim.Vehicle#transferToMobsim()
-	 */
-	@Override
-	protected void transferToMobsim() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");
-	}
+
 }

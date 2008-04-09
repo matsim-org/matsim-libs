@@ -26,7 +26,7 @@ import org.matsim.gbl.Gbl;
 
 // TODO [DS] this is completely wrong: move more functionality into QueueSimulator
 // leaving only most rudimentary functionality in Simulator itself
-public class Simulation {
+public abstract class Simulation {
 
 	protected Date starttime = new Date();
 
@@ -41,23 +41,15 @@ public class Simulation {
 		setStuckTime((int)Gbl.getConfig().simulation().getStuckTime());//TODO [DS] change time to double
 	}
 
-	protected void prepareSim()
-	{
-	}
-	protected void cleanupSim()
-	{
-	}
+	protected abstract void prepareSim();
 
-	public void beforeSimStep(final double time) {
-	}
+	protected abstract void cleanupSim();
 
-	public boolean doSimStep(final double time)
-	{
-		return false;
-	}
+	public abstract void beforeSimStep(final double time);
 
-	public void afterSimStep(final double time) {
-	}
+	public abstract boolean doSimStep(final double time);
+
+	public abstract void afterSimStep(final double time);
 
 	//////////////////////////////////////////////////////////////////////
 	// only the very basic simulation scheme here

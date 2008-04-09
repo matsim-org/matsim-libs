@@ -33,10 +33,10 @@ public class DefaultLinkHandler  extends OTFParamProviderA implements  OTFLinkHa
 
 	float value;
 	String text;
-	
+
 	public void readLink(DataInputStream in) throws IOException {
-		value = in.readFloat();
-		text = in.readUTF();
+		this.value = in.readFloat();
+		this.text = in.readUTF();
 	}
 
     public void writeLink(QueueLink link, DataOutputStream out) throws IOException {
@@ -47,24 +47,24 @@ public class DefaultLinkHandler  extends OTFParamProviderA implements  OTFLinkHa
         out.writeFloat((float) value);
 
         /* (3) write display text         */
-        String displText = link.getId().toString();
+        String displText = link.getLink().getId().toString();
         if (displText == null)
             out.writeUTF("");
         else
             out.writeUTF(displText);
     }
-	
+
 	@Override
 	public float getFloatParam(int index) throws UnsupportedOperationException {
 		switch(index) {
-		case 1: return value;
+		case 1: return this.value;
 		};
 		return 0; // throw exception here
 	}
 
 	@Override
 	public String getStringParam(int index) throws UnsupportedOperationException {
-		return text;
+		return this.text;
 	}
 
 	public int getParamCount() {

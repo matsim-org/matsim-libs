@@ -23,12 +23,15 @@ package org.matsim.mobsim;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
-import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.identifiers.IdI;
@@ -41,7 +44,7 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
  * QueueNetworkLayer is responsible for creating the QueueLinks/Nodes and for
  * implementing doSim
  */
-public class QueueNetworkLayer extends NetworkLayer {
+public class QueueNetworkLayer /* extends NetworkLayer */{
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
 	 * car is in one of the many queues).
@@ -64,16 +67,26 @@ public class QueueNetworkLayer extends NetworkLayer {
 	// set to true to move vehicles from waitingList before vehQueue
 	private boolean moveWaitFirst = false;
 
-	@Override
-	protected Node newNode(final String id, final String x, final String y, final String type) {
-		return new QueueNode(id,x,y,type);
+	private Map<IdI, QueueLink> links;
+
+	private Map<IdI, QueueNode> nodes;
+
+	private NetworkLayer networkLayer;
+
+	public QueueNetworkLayer(NetworkLayer networkLayer) {
+		this.networkLayer = networkLayer;
+		this.links = new HashMap<IdI, QueueLink>(networkLayer.getLinks().size());
+		this.nodes = new HashMap<IdI, QueueNode>(networkLayer.getNodes().size());
+		for (Node n : networkLayer.getNodes().values()) {
+			this.nodes.put(n.getId(), new QueueNode(n, this));
+		}
+		for (Link l : networkLayer.getLinks().values()) {
+			this.links.put(l.getId(), new QueueLink(l, this, this.nodes.get(l.getToNode().getId())));
+		}
 	}
 
-	@Override
-	protected LinkImpl newLink(final NetworkLayer network, final String id, final Node from, final Node to, final String length,
-			 final String freespeed, final String capacity, final String permlanes,
-			 final String origid, final String type) {
-		return new QueueLink(this,id,from,to,length,freespeed,capacity,permlanes,origid,type);
+	public NetworkLayer getNetworkLayer() {
+		return this.networkLayer;
 	}
 
 	public void beforeSim() {
@@ -84,6 +97,13 @@ public class QueueNetworkLayer extends NetworkLayer {
 		}
 
 		this.simNodesArrayCache = getNodes().values().toArray(this.simNodesArrayCache);
+		//dg[april08] as the order of nodes has an influence on the simulation
+		//results they are sorted to avoid indeterministic simulations
+		Arrays.sort(this.simNodesArrayCache, new Comparator<QueueNode>() {
+			public int compare(final QueueNode o1, final QueueNode o2) {
+				return o1.getNode().compareTo(o2.getNode());
+			}
+		});
 
 		this.simLinksArray.clear();
 		if (simulateAllLinks) {
@@ -221,36 +241,32 @@ public class QueueNetworkLayer extends NetworkLayer {
 		this.moveWaitFirst = moveWaitFirst;
 	}
 
-	@Override
-	public boolean removeLink(final Link link) {
-		((QueueLink)link).clearVehicles();
-		// we have to remove the link from both locations and simLinkArray
-		this.simLinksArray.remove(link);
-		return super.removeLink(link);
+//	@Override
+//	public boolean removeLink(final Link link) {
+//		((QueueLink)link).clearVehicles();
+//		// we have to remove the link from both locations and simLinkArray
+//		this.simLinksArray.remove(link);
+//		return super.removeLink(link);
+//	}
+//
+//	@Override
+//	public boolean removeNode(final Node node) {
+//		/* Just invalidate simNodesArrayCache. It will be rebuilt in beforeMobsim().
+//		 * During the MobSim, the network should not be changed. If somebody does that,
+//		 * it will crash with a NullPointerException... I can live with that ;-)
+//		 * TODO [MR] separate QueueNetworkLayer from NetworkLayer
+//		 * In that moment, it won't be possible anymore to remove nodes during a simulation.
+//		 */
+//		this.simNodesArrayCache = null;
+//		return super.removeNode(node);
+//	}
+
+	public Map<IdI, QueueLink> getLinks() {
+		return Collections.unmodifiableMap(this.links);
 	}
 
-	@Override
-	public boolean removeNode(final Node node) {
-		/* Just invalidate simNodesArrayCache. It will be rebuilt in beforeMobsim().
-		 * During the MobSim, the network should not be changed. If somebody does that,
-		 * it will crash with a NullPointerException... I can live with that ;-)
-		 * TODO [MR] separate QueueNetworkLayer from NetworkLayer
-		 * In that moment, it won't be possible anymore to remove nodes during a simulation.
-		 */
-		this.simNodesArrayCache = null;
-		return super.removeNode(node);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Map<IdI, ? extends QueueLink> getLinks() {
-		return (Map<IdI, ? extends QueueLink>)super.getLinks();
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Map<IdI, ? extends QueueNode> getNodes() {
-		return (Map<IdI, ? extends QueueNode>)super.getNodes();
+	public Map<IdI, QueueNode> getNodes() {
+		return Collections.unmodifiableMap(this.nodes);
 	}
 
 	final private static class LinkActivation implements Comparable<LinkActivation> {
@@ -279,6 +295,14 @@ public class QueueNetworkLayer extends NetworkLayer {
 		public int hashCode() {
 			return this.link.hashCode();
 		}
+	}
+
+	public QueueLink getQueueLink(IdI id) {
+		return this.links.get(id);
+	}
+
+	public Object getQueueNode(Id id) {
+		return this.nodes.get(id);
 	}
 
 }

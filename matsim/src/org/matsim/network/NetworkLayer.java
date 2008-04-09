@@ -65,12 +65,21 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 	private final static Logger log = Logger.getLogger(NetworkLayer.class);
 
+	private final NetworkFactory factory;
+
+
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
 	// ////////////////////////////////////////////////////////////////////
 
 	public NetworkLayer() {
 		super(LAYER_TYPE, null);
+		this.factory = new NetworkFactory(this);
+	}
+
+	public NetworkLayer(NetworkFactory factory) {
+		super(LAYER_TYPE, null);
+		this.factory = factory;
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -78,20 +87,11 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	// overload newNode/newLink in your own classes for supplying other nodes
 	// ////////////////////////////////////////////////////////////////////
 
-	protected Node newNode(final String id, final String x, final String y, final String type) {
-		return new Node(id, x, y, type);
-	}
-
-	protected Link newLink(final NetworkLayer network, final String id, final Node from, final Node to,
-	                       final String length, final String freespeed, final String capacity, final String permlanes,
-	                       final String origid, final String type) {
-		return new LinkImpl(this,id,from,to,length,freespeed,capacity,permlanes,origid,type);
-	}
 
 	public final Node createNode(final String id, final String x, final String y, final String type) {
 		IdI i = new Id(id);
 		if (this.nodes.containsKey(i)) { throw new IllegalArgumentException(this + "[id=" + id + " already exists]"); }
-		Node n = newNode(id, x, y, type);
+		Node n = this.factory.newNode(id, x, y, type);
 		this.nodes.put(i, n);
 		if (this.nodeQuadTree != null) {
 			// we changed the nodes, invalidate the quadTree
@@ -101,9 +101,10 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		return n;
 	}
 
+
 	public final Link createLink(final String id, final String from, final String to, final String length,
 	                             final String freespeed, final String capacity, final String permlanes,
-	                             final String origid, final String type) {
+	                             final String origid, String type) {
 		Id f = new Id(from);
 		Node from_node = this.nodes.get(f);
 		if (from_node == null) { throw new IllegalArgumentException(this+"[from="+from+" does not exist]"); }
@@ -113,11 +114,15 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		if (to_node == null) { throw new IllegalArgumentException(this+"[to="+to+" does not exist]"); }
 
 		if (this.locations.containsKey(new Id(id))) { throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!"); }
-		Link link = newLink(this,id,from_node,to_node,length,freespeed,capacity,permlanes,origid,type);
+		Link link = this.factory.newLink(id,from_node,to_node,length,freespeed,capacity,permlanes, origid, type);
 		from_node.addOutLink(link);
 		to_node.addInLink(link);
-		this.locations.put(link.getId(),link);
+		addLink(link);
 		return link;
+	}
+
+	public void addLink(Link l) {
+		this.locations.put(l.getId(),l);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -195,7 +200,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		return this.effectiveLaneWidth;
 	}
 
-	public Map<IdI, ? extends Node> getNodes() {
+	public Map<IdI, Node> getNodes() {
 		return this.nodes;
 	}
 
@@ -537,5 +542,6 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		}
 		return index;
 	}
+
 
 }

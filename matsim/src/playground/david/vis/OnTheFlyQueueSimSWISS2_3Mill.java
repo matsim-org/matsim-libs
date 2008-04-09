@@ -25,6 +25,7 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -39,31 +40,31 @@ import playground.david.vis.executables.OnTheFlyQueueSim;
  *
  */
 public class OnTheFlyQueueSimSWISS2_3Mill {
-	
-	public static void main(String[] args) {		
+
+	public static void main(String[] args) {
 		OnTheFlyQueueSim sim;
-		QueueNetworkLayer net;
+		NetworkLayer net;
 		Plans population;
 		Events events;
-		
+
 		String netFileName = "../../tmp/studies/ivtch/network.xml";
 //		String popFileName = "../../tmp/studies/ivtch/plans_10pct_miv_zrh.xml.gz";
 		String popFileName = "../../tmp/studies/ivtch/all_plans.xml.gz";
-				
+
 		args = new String [] {"../../tmp/studies/ivtch/config.xml"};
 		Gbl.createConfig(args);
 		Gbl.startMeasurement();
 		Config config = Gbl.getConfig();
 		config.setParam("global", "localDTDBase", "dtd/");
-		
+
 		World world = Gbl.getWorld();
 
-		net = new QueueNetworkLayer();
+		net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
 
-		Gbl.printElapsedTime();		
-		
+		Gbl.printElapsedTime();
+
 		population = new Plans();
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
@@ -71,19 +72,20 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 
 		events = new Events() ;
 		world.setEvents(events);
-		
+
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		//config.simulation().setEndTime(Time.parseTime("12:00:11"));
 
+		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
 		sim = new OnTheFlyQueueSim(net, population, events);
-		sim.setOtfwriter(new OTFQuadFileHandler.Writer (600,net,"output/OTFQuadfileSCHWEIZ2.3.mvi"));
-		
+		sim.setOtfwriter(new OTFQuadFileHandler.Writer (600,qnet,"output/OTFQuadfileSCHWEIZ2.3.mvi"));
+
 
 		sim.run();
 
-		Gbl.printElapsedTime();		
+		Gbl.printElapsedTime();
 
 	}
-	
-		
+
+
 }

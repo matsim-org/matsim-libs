@@ -30,7 +30,6 @@ import org.matsim.events.algorithms.SnapshotGenerator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.ArgumentParser;
 import org.matsim.utils.vis.netvis.VisConfig;
@@ -176,7 +175,6 @@ public class Events2Snapshot {
 	private void prepare() {
 		if (this.network == null) {
 			// read network
-			NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 			this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 			new MatsimNetworkReader(this.network).readFile(this.config.network().getInputFile());
 		}

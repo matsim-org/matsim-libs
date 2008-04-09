@@ -35,7 +35,6 @@ import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 
 /**
@@ -239,8 +238,6 @@ public class CountsAnalyser {
 	protected NetworkLayer loadNetwork() {
 		// - read network: which buildertype??
 		printNote("", "  creating network layer... ");
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
 				NetworkLayer.LAYER_TYPE, null);
 		printNote("", "  done");

@@ -25,8 +25,8 @@ import org.matsim.config.Config;
 import org.matsim.config.Module;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -55,7 +55,7 @@ public class ControlerTest extends MatsimTestCase {
 		 * the average travel time on that link should be 150sec for the two cars
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		Gbl.getWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
 		network.createNode("1",  "-100.0", "0.0", null);
@@ -148,7 +148,7 @@ public class ControlerTest extends MatsimTestCase {
 		 * the average travel time on that link should be 150sec for the two cars
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		Gbl.getWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
 		network.createNode("1",  "-100.0", "0.0", null);
@@ -224,7 +224,7 @@ public class ControlerTest extends MatsimTestCase {
 		 * the average travel time on that link should be 150sec for the two cars
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		Gbl.getWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
 		network.createNode("1",  "-100.0", "0.0", null);

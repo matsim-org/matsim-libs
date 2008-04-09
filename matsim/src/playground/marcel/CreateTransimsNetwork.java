@@ -30,7 +30,6 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.NetworkWriterHandlerImplTLinks;
 import org.matsim.network.NetworkWriterHandlerImplTNodes;
 
@@ -69,7 +68,6 @@ public class CreateTransimsNetwork {
 
 		System.out.println("reading network from " + this.networkFileName);
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(this.networkFileName);
 

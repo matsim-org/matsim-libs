@@ -73,12 +73,13 @@ public class DSOnePercentBerlin10sTest{
 		Gbl.getConfig().simulation().setFlowCapFactor(0.01);
 		Gbl.getConfig().simulation().setStorageCapFactor(0.04);
 
-		QueueNetworkLayer network = new QueueNetworkLayer() ;
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
-
+		QueueNetworkLayer qnet = new QueueNetworkLayer(network);
 		double sum = 0.0;
-		for (QueueLink link : network.getLinks().values()) {
+
+		for (QueueLink link : qnet.getLinks().values()) {
 			sum+= link.getSpaceCap()*network.getEffectiveCellSize();
 		}
 		System.out.println("Overall network length = " + sum);

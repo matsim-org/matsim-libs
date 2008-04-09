@@ -21,7 +21,6 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
-import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -37,7 +36,7 @@ abstract class ActEvent extends BasicEvent {
 	public transient Link link;
 	public transient Act act;
 
-	ActEvent(final double time, final String agentId, final Person agent, final LinkImpl link, final Act act) {
+	ActEvent(final double time, final String agentId, final Person agent, final Link link, final Act act) {
 		super(time, agentId,agent);
 		this.act = act;
 		this.link = link;

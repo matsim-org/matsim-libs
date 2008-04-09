@@ -50,7 +50,6 @@ import org.matsim.mobsim.SimulationTimer;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.Plans;
 import org.matsim.utils.misc.Time;
 
@@ -88,22 +87,22 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 	public void signalSimStepDone(int partID, int partLiving) throws RemoteException {
 
 //		System.out.println("SimStep" + " done from #" + partID + " " + accu + " of " + count);
-		synchronized(simStepStart) {
-			accu++;
+		synchronized(this.simStepStart) {
+			this.accu++;
 			incLiving(partLiving);
-			if (accu >= count)
+			if (this.accu >= this.count)
 			{
 				// signal, that all partsims have called back, for not running into wait in case
 				// all parsim were faster than MainSim... should only happen while debugging!
 	//			System.out.println("SimStep completed" + " done from #" + partID + " " + accu + " of " + count);
-					synchronized(simStepDone) {
-					simStepDone.notifyAll();
+					synchronized(this.simStepDone) {
+					this.simStepDone.notifyAll();
 					}
 
 			}
 	//					System.out.println("SimStep done from ALL notify Main");
 			try {
-				simStepStart.wait();
+				this.simStepStart.wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -114,19 +113,19 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 	public int waitSimStepDone() {
 		int result = 0;
 //		System.out.println("ENTERING SimStepDone from Main");
-		synchronized(simStepDone) {
+		synchronized(this.simStepDone) {
 
-			while (accu < count) { // accu == count all partsims have already returned
+			while (this.accu < this.count) { // accu == count all partsims have already returned
 				  try {
-					  simStepDone.wait();
+					  this.simStepDone.wait();
 				  } catch ( InterruptedException e ) {
 					  System.out.println("*LEAVING SimStepDone with Exception");
 				  }
 			  }
-			  accu = 0;
+			  this.accu = 0;
 			  result = getLiving();
 			  setLiving(0);
-			  count = partSims.size();
+			  this.count = partSims.size();
 //			  System.out.println("*LEAVING SimStepDone from Main"+count);
 		}
 		return result;
@@ -191,8 +190,8 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 	}
 
 	synchronized protected void signalNextSimStep() {
-		synchronized(simStepStart) {
-			simStepStart.notifyAll();
+		synchronized(this.simStepStart) {
+			this.simStepStart.notifyAll();
 		}
 	}
 
@@ -206,7 +205,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 		if(time % INFO_PERIOD == 0)
 		{
 			Date endtime = new Date();
-			long diffreal = (endtime.getTime() - starttime.getTime())/1000;
+			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
 			double diffsim = time - SimulationTimer.getSimStartTime();
 			System.out.println(Time.writeTime(time) + ": # act. Veh= " + living + " lost: " + getLost() + " + delta: simTime: " + diffsim + "s took realTime: " + (diffreal) + "s; ratio(s/r): " + (diffsim/(diffreal+0.0000001)));
 		}
@@ -219,15 +218,15 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 	{
 		if (events == null)  {
 			events = new Events();
-			myeventwriter = new EventWriterTXT("MatSimJEvents.txt");
-			events.addHandler(myeventwriter);
+			this.myeventwriter = new EventWriterTXT("MatSimJEvents.txt");
+			events.addHandler(this.myeventwriter);
 		}
 	}
 
 	@Override
 	protected void cleanupSim()
 	{
-		if (myeventwriter != null )myeventwriter.reset(0);
+		if (this.myeventwriter != null )this.myeventwriter.reset(0);
 	}
 
 	static DistributedQueueSimulation testRMI;
@@ -434,7 +433,6 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 
 	@Override
 	protected void prepareNetwork() {
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		// DS TODO somebody made network FINAL therefor i had to add a local network here
 		// this breaks functionality ... repair if needed
 		QueueNetworkLayer network = (QueueNetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
@@ -455,7 +453,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 	synchronized public void add(BasicEvent event) throws RemoteException {
 		// rebuild missing references to person/link/leg
 		try {
-			event.rebuild(plans, network);
+			event.rebuild(this.plans, this.network);
 		} catch (NullPointerException e )
 		{
 		}
@@ -469,7 +467,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 	private boolean checkForEqualLastTimes()
 	{
 		for(int i= 0; i < partSims.size()-1 ; i++) {
-			if (lastTimes[i] != lastTimes[i+1])return false;
+			if (this.lastTimes[i] != this.lastTimes[i+1])return false;
 		}
 		return true;
 	}
@@ -479,21 +477,21 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 
 		// Sort all event into pendingEvents List. Update lastTime[partID]
 		ListIterator<BasicEvent> newIt = eventlist.listIterator(eventlist.size());
-		ListIterator<BasicEvent> oldIt = pendingEvents.listIterator(pendingEvents.size());
+		ListIterator<BasicEvent> oldIt = this.pendingEvents.listIterator(this.pendingEvents.size());
 
 		while (newIt.hasPrevious()) {
 			event = newIt.previous();
-			while (oldIt.hasPrevious() && oldIt.previous().time > event.time);
+			while (oldIt.hasPrevious() && (oldIt.previous().time > event.time));
 			oldIt.add (event);
 		}
-		lastTimes[partID] = lastTime;
+		this.lastTimes[partID] = lastTime;
 
 		// every time, all lastTimes have catched up it is safe to dump the whole
 		// eventslist
 //		int size1 = pendingEvents.size();
 		boolean hasEqualLastTimes = checkForEqualLastTimes();
 		if (hasEqualLastTimes ){
-			oldIt = pendingEvents.listIterator();
+			oldIt = this.pendingEvents.listIterator();
 			while (oldIt.hasNext())
 			{
 				event = oldIt.next();
@@ -502,7 +500,7 @@ public class DistributedQueueSimulation extends QueueSimulation implements Distr
 					oldIt.remove();
 					// rebuild missing references to person/link/leg
 					try {
-						event.rebuild(plans, network);
+						event.rebuild(this.plans, this.network);
 					} catch (NullPointerException e )
 					{
 					}

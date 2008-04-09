@@ -37,28 +37,30 @@ public class QueueNetStateWriter extends DisplayNetStateWriter {
 
 	private static final boolean writeSpaceCap = true;
 
+	private QueueNetworkLayer queueNetwork;
+
     @Override
     protected Collection<AgentOnLink> getAgentsOnLink(final BasicLinkI link) {
-        QueueLink qlink = (QueueLink) link;
+    		QueueLink qlink = this.queueNetwork.getQueueLink(link.getId());
         return qlink.getDrawableCollection();
     }
 
-    public QueueNetStateWriter(final BasicNetI network, final String networkFileName,
+    public QueueNetStateWriter(final QueueNetworkLayer queueNetwork, final BasicNetI network, final String networkFileName,
     		final VisConfig visConfig, final String filePrefix, final int timeStepLength_s, final int bufferSize) {
         super(network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
+        this.queueNetwork = queueNetwork;
     }
 
     @Override
     protected double getLinkDisplValue(final BasicLinkI link, final int index) {
-        QueueLink mylink = (QueueLink) link;
+        QueueLink mylink = this.queueNetwork.getQueueLink(link.getId());
         double value = writeSpaceCap ? mylink.getDisplayableSpaceCapValue() : mylink.getDisplayableTimeCapValue();
         return value;
     }
 
     @Override
     protected String getLinkDisplLabel(final BasicLinkI link) {
-        QueueLink mylink = (QueueLink) link;
-        return mylink.getId().toString();
+        return link.getId().toString();
     }
 
 }

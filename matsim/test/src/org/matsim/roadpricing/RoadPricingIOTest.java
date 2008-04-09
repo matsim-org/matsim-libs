@@ -27,7 +27,7 @@ import java.util.Iterator;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.xml.sax.SAXException;
@@ -52,7 +52,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 
 		loadConfig(null);
 
-		QueueNetworkLayer network = Fixture.createNetwork1();
+		NetworkLayer network = Fixture.createNetwork1();
 		// first, read the scheme from file
 		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(network);
 		reader1.parse(origFile);

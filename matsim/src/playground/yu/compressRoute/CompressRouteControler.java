@@ -26,7 +26,6 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -34,9 +33,9 @@ import org.matsim.world.MatsimWorldReader;
 
 
 /**
- * Controler to run MATSim in order to get compression ratio of the sparely new network with sparely linkroute. 
+ * Controler to run MATSim in order to get compression ratio of the sparely new network with sparely linkroute.
  * @author ychen
- * 
+ *
  */
 public class CompressRouteControler {
 
@@ -50,12 +49,10 @@ public class CompressRouteControler {
 		System.out.println("  reading world xml file... ");
         final MatsimWorldReader world_parser = new MatsimWorldReader(Gbl.getWorld());
         world_parser.readFile(config.world().getInputFile());
-        System.out.println("  done."); 
+        System.out.println("  done.");
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer) Gbl.getWorld().createLayer(
 				NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
@@ -80,7 +77,7 @@ public class CompressRouteControler {
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		System.out.println("  done.");
-		
+
 		System.out.println("-->begins to write result...");
 		cr.writeEnd();
 		System.out.println("-->done");

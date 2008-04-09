@@ -42,13 +42,9 @@ import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.mobsim.QueueNode;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
@@ -109,7 +105,6 @@ public class MyMonsterClass {
 
 		System.out.println("  create new empty network...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		network.setCapacityPeriod("01:00:00");
 		try {
@@ -237,7 +232,6 @@ public class MyMonsterClass {
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
@@ -266,7 +260,6 @@ public class MyMonsterClass {
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
@@ -292,7 +285,6 @@ public class MyMonsterClass {
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
@@ -363,7 +355,6 @@ public class MyMonsterClass {
 //
 //		System.out.println("  reading the network...");
 //		NetworkLayer network = null;
-//		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 //		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,"false",null);
 //		final NetworkParser network_parser = new NetworkParser(network);
 //		network_parser.parse();
@@ -403,7 +394,7 @@ public class MyMonsterClass {
 
 
 		System.out.println("reading network xml file... ");
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFile);
 		world.setNetworkLayer(network);
 		System.out.println("done. ");
@@ -441,7 +432,7 @@ public class MyMonsterClass {
 		Iterator it = network.getLinks().values().iterator();
 
 		while (it.hasNext()) {
-			QueueLink link = (QueueLink) it.next();
+			Link link = (Link)it.next();
 			Node a = link.getFromNode();
 			Node b = link.getToNode();
 			CoordinateSequence seqA = new CoordinateArraySequence(new Coordinate[]{MGC.coord2Coordinate(a.getCoord())});
@@ -456,10 +447,10 @@ public class MyMonsterClass {
 				continue;
 			} else {
 				Iterator outIt = b.getOutLinks().values().iterator();
-				QueueLink oneWayLink = link;
+				Link oneWayLink = link;
 				while(outIt.hasNext()){
 
-					Node temp = ((QueueLink)outIt.next()).getToNode();
+					Node temp = ((Link)outIt.next()).getToNode();
 					if (temp == a){
 						oneWayLink = null;
 						break;
@@ -555,7 +546,7 @@ int three=0;
 
 
 		System.out.println("reading network xml file... ");
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFile);
 		world.setNetworkLayer(network);
 		System.out.println("done. ");
@@ -612,13 +603,13 @@ int three=0;
 		Config config = Gbl.createConfig(new String[] {configFile});
 
 		System.out.println("reading network xml file... ");
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
 		world.setNetworkLayer(network);
 		System.out.println("done. ");
 
 		System.out.println("reading subnetwork xml file... ");
-		QueueNetworkLayer subNetwork = new QueueNetworkLayer();
+		NetworkLayer subNetwork = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(subNetfile);
 //		world.setNetworkLayer(subnetwork);
 		System.out.println("done. ");
@@ -658,7 +649,7 @@ int three=0;
 
 
 		System.out.println("reading old network xml file... ");
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(net);
 		world.setNetworkLayer(network);
 		System.out.println("done. ");
@@ -730,7 +721,7 @@ int three=0;
 
 
 		System.out.println("reading old network xml file... ");
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(old_netfile);
 		world.setNetworkLayer(network);
 		System.out.println("done. ");
@@ -757,7 +748,7 @@ int three=0;
 
 		System.out.println("reading new network xml file... ");
 		network = null;
-		QueueNetworkLayer new_network = new QueueNetworkLayer();
+		NetworkLayer new_network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
 //		world.setNetworkLayer(network);
 		System.out.println("done. ");
@@ -787,7 +778,7 @@ int three=0;
 		Config config = Gbl.createConfig(new String[] {configFile});
 
 		System.out.println("reading network xml file... ");
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
 		world.setNetworkLayer(network);
 		System.out.println("done. ");
@@ -802,16 +793,16 @@ int three=0;
 		double minX = Math.min(A.getX(),B.getX());
 		double minY = Math.min(A.getY(),B.getY());
 
-		QueueNetworkLayer new_network = new QueueNetworkLayer();
+		NetworkLayer new_network = new NetworkLayer();
 
-		for (QueueNode node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			if ((node.getCoord().getX() <= maxX) && (node.getCoord().getX() >= minX) )
 				if ((node.getCoord().getY() <= maxY) && (node.getCoord().getY() >= minY) )
 					new_network.createNode(node.getId().toString(), Double.toString(node.getCoord().getX()), Double.toString(node.getCoord().getY()), node.getType());
 		}
 
 		int extracted = 0;
-		for (QueueLink link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			Coord from = link.getFromNode().getCoord();
 			Coord to = link.getToNode().getCoord();
 			if ((from.getX() <= maxX) && (from.getX() >= minX)) {
@@ -866,7 +857,7 @@ int three=0;
 		Config config = Gbl.createConfig(new String[] {configFile});
 
 		System.out.println("reading network xml file... ");
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
 		world.setNetworkLayer(network);
 		System.out.println("done. ");
@@ -908,7 +899,6 @@ int three=0;
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");

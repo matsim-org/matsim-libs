@@ -33,6 +33,7 @@ import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -57,7 +58,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		World world = Gbl.getWorld();
 
 		/* build network */
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
 		network.createNode("1", "0", "0", null);
@@ -144,7 +145,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		World world = Gbl.getWorld();
 
 		/* build network */
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
 		network.createNode("1", "0", "0", null);
@@ -220,7 +221,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		World world = Gbl.getWorld();
 
 		/* build network */
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
 		network.createNode("1", "0", "0", null);
@@ -364,7 +365,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		World world = Gbl.getWorld();
 
 		/* build network */
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
 		network.createNode("1", "0", "0", null);

@@ -134,7 +134,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		} else {
 			this.network.setEffectiveCellSize(Double.parseDouble(effectivecellsize));
 		}
-		
+
 		String effectivelanewidth = atts.getValue("effectivelanewidth");
 		if (effectivelanewidth == null){
 			this.network.setEffectiveLaneWidth(3.75); // the default lane width is 3.75

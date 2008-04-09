@@ -27,7 +27,6 @@ import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
 import org.matsim.plans.Act;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plan;
@@ -40,9 +39,9 @@ import org.matsim.world.MatsimWorldReader;
  * This Class is able to compare two plan files of different iterations. In a
  * config file the world and network must be given. The arguments needed to run
  * this tool will be described when called without arguments.
- * 
+ *
  * @author dgrether
- * 
+ *
  */
 public class PlanComparator {
 
@@ -58,7 +57,7 @@ public class PlanComparator {
 
 	/**
    * Creates the object and computes the resulting comparison
-   * 
+   *
    * @param configPath
    * @param firstPlanPath
    * @param secondPlanPath
@@ -73,39 +72,39 @@ public class PlanComparator {
 		loadNetwork();
 
 		// load first plans file
-		population = loadPlansFile(firstPlanPath);
-		_result = new PlanComparison(population.getPersons().keySet().size());
+		this.population = loadPlansFile(firstPlanPath);
+		this._result = new PlanComparison(this.population.getPersons().keySet().size());
 		Plan plan;
 		Act act;
-		for (IdI id : population.getPersons().keySet()) {
-			plan = population.getPerson(id).getSelectedPlan();
+		for (IdI id : this.population.getPersons().keySet()) {
+			plan = this.population.getPerson(id).getSelectedPlan();
 			act = (Act) plan.getIteratorAct().next();
-			_result.addFirstPlansData(id, plan.getScore(), act);
+			this._result.addFirstPlansData(id, plan.getScore(), act);
 		}
 		// many people can be in one pop -> care about memory
-		population = null;
+		this.population = null;
 		System.gc();
 		// load second population
-		population = loadPlansFile(secondPlanPath);
-		for (IdI id : population.getPersons().keySet()) {
-			plan = population.getPerson(id).getSelectedPlan();
-			_result.addSecondPlansData(id, plan.getScore());
+		this.population = loadPlansFile(secondPlanPath);
+		for (IdI id : this.population.getPersons().keySet()) {
+			plan = this.population.getPerson(id).getSelectedPlan();
+			this._result.addSecondPlansData(id, plan.getScore());
 		}
 
 		if (outpath == null) {
 			PlanComparisonStringWriter writer = new PlanComparisonStringWriter();
-			writer.write(_result);
+			writer.write(this._result);
 			System.out.println(writer.getResult());
 		}
 		else {
-			new PlanComparisonFileWriter(outpath).write(_result);
+			new PlanComparisonFileWriter(outpath).write(this._result);
 			System.out.println("Results written to: " + outpath);
 		}
 	}
 
 	/**
    * load the world
-   * 
+   *
    */
 	protected void loadWorld() {
 		if (Gbl.getConfig().world().getInputFile() != null) {
@@ -121,14 +120,12 @@ public class PlanComparator {
 
 	/**
    * load the network
-   * 
+   *
    * @return the network layer
    */
 	protected NetworkLayer loadNetwork() {
 		// - read network: which buildertype??
 		printNote("", "  creating network layer... ");
-		NetworkLayerBuilder
-				.setNetworkLayerType(NetworkLayerBuilder.NETWORK_SIMULATION);
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
 				NetworkLayer.LAYER_TYPE, null);
 		printNote("", "  done");
@@ -142,7 +139,7 @@ public class PlanComparator {
 
 	/**
    * Load the plan file with the given path.
-   * 
+   *
    * @param filename
    *          the path to the filename
    * @return the Plans object containing the population
@@ -161,7 +158,7 @@ public class PlanComparator {
 
 	/**
    * Reads the configuration file
-   * 
+   *
    * @param configPath
    */
 	private void initConfig(String configPath) {
@@ -184,7 +181,7 @@ public class PlanComparator {
 	/**
    * an internal routine to generated some (nicely?) formatted output. This
    * helps that status output looks about the same every time output is written.
-   * 
+   *
    * @param header
    *          the header to print, e.g. a module-name or similar. If empty
    *          <code>""</code>, no header will be printed at all
@@ -225,7 +222,7 @@ public class PlanComparator {
    * Should be called with 3 arguments, each of them a path to a file: 1. the
    * config file containing the world and the network 2. the first plan file 3.
    * the second plan file
-   * 
+   *
    * @param args
    */
 	public static void main(String[] args) {

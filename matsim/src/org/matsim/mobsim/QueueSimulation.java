@@ -36,6 +36,8 @@ import org.matsim.events.EventAgentStuck;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -85,13 +87,17 @@ public class QueueSimulation extends Simulation {
 	protected final Plans plans;
 	protected final QueueNetworkLayer network;
 
-	private PersonAlgo_CreateVehicle veh_algo = new PersonAlgo_CreateVehicle();
+//	private PersonAlgo_CreateVehicle veh_algo = new PersonAlgo_CreateVehicle();
 	protected EventWriterTXT myeventwriter = null;
 
 	protected static Events events = null; // TODO [MR] instead of making this static and Links/Nodes using QueueSimulation.getEvents(), Gbl should hold a global events-object
 	protected  SimStateWriterI netStateWriter = null;
 
 	private final List<SnapshotWriterI> snapshotWriters = new ArrayList<SnapshotWriterI>();
+
+	private Class<? extends Vehicle> vehiclePrototype = Vehicle.class;
+
+	protected NetworkLayer networkLayer;
 
 	/**
 	 * teleportationList includes all vehicle that have transportation modes unknown to
@@ -101,11 +107,13 @@ public class QueueSimulation extends Simulation {
 
 	final private static Logger log = Logger.getLogger(QueueSimulation.class);
 
-	public QueueSimulation(final QueueNetworkLayer net, final Plans plans, final Events events) {
+	public QueueSimulation(final NetworkLayer networkLayer, final Plans plans, final Events events) {
 		super();
 		setEvents(events);
 		this.plans = plans;
-		this.network = net;
+
+		this.network = new QueueNetworkLayer(networkLayer);
+		this.networkLayer = networkLayer;
 		this.config = Gbl.getConfig();
 	}
 
@@ -115,15 +123,35 @@ public class QueueSimulation extends Simulation {
 		if (this.plans == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
-		// add veh algo and run it through all plans
-		if (this.veh_algo != null) {
 			//Make sure SOME plan has been selected, select plan number 0
-			this.plans.addAlgorithm(new PersonAlgo_CheckSelected());
-			this.plans.addAlgorithm(this.veh_algo);
-			this.plans.runAlgorithms();
-			this.plans.clearAlgorithms();
+			new PersonAlgo_CheckSelected().run(this.plans);
+//			this.plans.addAlgorithm(this.veh_algo);
+		for (Person p : this.plans.getPersons().values()) {
+			Vehicle veh;
+			try {
+				veh = this.vehiclePrototype.newInstance();
+				veh.setActLegs(p.getSelectedPlan().getActsLegs());
+				veh.setDriver(p);
+				if (veh.initVeh()) {
+					initVehicle(veh);
+				}
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
 		}
 
+	}
+
+	protected void setVehiclePrototye(Class<? extends Vehicle> proto) {
+		this.vehiclePrototype = proto;
+	}
+
+	private void initVehicle(Vehicle veh) {
+		Link link = veh.getCurrentLink();
+		QueueLink qlink = this.network.getQueueLink(link.getId());
+		qlink.addParking(veh);
 	}
 
 	protected void prepareNetwork() {
@@ -188,7 +216,7 @@ public class QueueSimulation extends Simulation {
 					buffers = Math.max(5, Math.min(500000/buffers, 100));
 				} else buffers = Integer.parseInt(buffString);
 
-				this.netStateWriter = new QueueNetStateWriter(this.network, networkFile.getAbsolutePath(), myvisconf, snapshotFile, this.snapshotPeriod, buffers);
+				this.netStateWriter = new QueueNetStateWriter(this.network, this.network.getNetworkLayer(), networkFile.getAbsolutePath(), myvisconf, snapshotFile, this.snapshotPeriod, buffers);
 				this.netStateWriter.open();
 			}
 		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
@@ -209,7 +237,7 @@ public class QueueSimulation extends Simulation {
 		this.stopTime = this.config.simulation().getEndTime();
 
 		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
-		if (this.stopTime == Time.UNDEFINED_TIME || this.stopTime == 0) this.stopTime = Double.MAX_VALUE;
+		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;
 
 		SimulationTimer.setSimStartTime(24*3600);
 		SimulationTimer.setTime(startTime);
@@ -232,7 +260,7 @@ public class QueueSimulation extends Simulation {
 		this.network.afterSim();
 		double now = SimulationTimer.getTime();
 		for (Vehicle veh : teleportationList) {
-			new EventAgentStuck(now, veh.getDriverID(), veh.getCurrentLegNumber(),
+			new EventAgentStuck(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 					veh.getCurrentLink().getId().toString(), veh.getDriver(),
 					veh.getCurrentLeg(), veh.getCurrentLink());
 		}
@@ -252,6 +280,10 @@ public class QueueSimulation extends Simulation {
 			this.netStateWriter = null;
 		}
 
+	}
+
+	@Override
+	public void beforeSimStep(double time) {
 	}
 
 	/**
@@ -328,7 +360,7 @@ public class QueueSimulation extends Simulation {
 
 				getEvents().processEvent(new EventAgentArrival(now, veh.getDriverID(), veh.getCurrentLegNumber(),
 						veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
-	  			veh.reachActivity(now);
+	  			veh.reachActivity(now, this.network.getQueueLink(veh.getCurrentLink().getId()));
 
 	  		} else break;
   		}
@@ -342,7 +374,4 @@ public class QueueSimulation extends Simulation {
 		return this.snapshotWriters.remove(writer);
 	}
 
-	public void setVehicleCreateAlgo(final PersonAlgo_CreateVehicle algo) {
-		this.veh_algo = algo;
-	}
 }

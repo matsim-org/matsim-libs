@@ -22,8 +22,8 @@ package playground.yu.newPlan;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -31,9 +31,9 @@ import org.matsim.world.World;
 
 /**
  * test of NewAgentPtPlan
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class MakeHwhPlansControler {
 
@@ -45,7 +45,7 @@ public class MakeHwhPlansControler {
 		Config config = Gbl
 				.createConfig(new String[] { "./test/yu/ivtch/config_for_make_hwhPlans.xml" });
 
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 

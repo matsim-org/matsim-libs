@@ -38,6 +38,7 @@ import java.util.Map;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plan;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.collections.QuadTree.Rect;
@@ -73,14 +74,14 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 
 	    @Override
 		public void writeAgents(DataOutputStream out) throws IOException {
-			OTFAgentHandler<PositionInfo> agentHandler = handler.getAgentHandler();
+			OTFAgentHandler<PositionInfo> agentHandler = this.handler.getAgentHandler();
 			agentHandler.setOTFNet(this);
 
-			if (positions.size() == 0) return;
+			if (this.positions.size() == 0) return;
 
-			out.writeInt(positions.size());
+			out.writeInt(this.positions.size());
 
-			for (PositionInfo pos : positions) {
+			for (PositionInfo pos : this.positions) {
 				agentHandler.writeAgent(pos, out);
 	    }
 	  }
@@ -98,11 +99,11 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 	Map<Double,Long> timeSteps = new HashMap<Double,Long>();
 
 	public OTFNetEventFileHandler(double intervall_s, QueueNetworkLayer network, String fileName) {
-		if (network != null) net = new OTFEventVisNet(network);
-		out = new ByteArrayOutputStream(5000000);
+		if (network != null) this.net = new OTFEventVisNet(network);
+		this.out = new ByteArrayOutputStream(5000000);
 		this.intervall_s = intervall_s;
 		this.fileName = fileName;
-		qnetwork = network;
+		this.qnetwork = network;
 	}
 
 	public void run(String eventFileName) {
@@ -111,7 +112,7 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 		Gbl.startMeasurement();
 		Events2Snapshot app = new Events2Snapshot();
 		app.addExternalSnapshotWriter(this);
-		app.run(new File(eventFileName), Gbl.getConfig(), qnetwork);
+		app.run(new File(eventFileName), Gbl.getConfig(), this.qnetwork.getNetworkLayer());
 		try {
 			close();
 		} catch (IOException e) {
@@ -122,8 +123,8 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 
 	public void close() throws IOException {
 		try {
-			outFile.close();
-			outStream.close();
+			this.outFile.close();
+			this.outStream.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -131,25 +132,25 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 	}
 
 	public boolean dump(int time_s) throws IOException {
-		if (time_s >= nextTime) {
+		if (time_s >= this.nextTime) {
 			// dump time
 			System.out.print(" Time spend on event to snap ");
 			Gbl.printElapsedTime();
 			Gbl.startMeasurement();
-			outFile.writeDouble(time_s);
+			this.outFile.writeDouble(time_s);
 			// get State
 			//Gbl.startMeasurement();
-			out.reset();
-			net.writeMyself(null, new DataOutputStream(out));
-			outFile.writeInt(out.size());
-			out.writeTo(outFile);
+			this.out.reset();
+			this.net.writeMyself(null, new DataOutputStream(this.out));
+			this.outFile.writeInt(this.out.size());
+			this.out.writeTo(this.outFile);
 			System.out.print(" Time spend on snap to vis ");
 			Gbl.printElapsedTime();
 			Gbl.startMeasurement();
 			// dump State
 			//Gbl.printElapsedTime();
 
-			nextTime = time_s + intervall_s;
+			this.nextTime = time_s + this.intervall_s;
 			return true;
 		}
 		return false;
@@ -158,9 +159,9 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 	public void open() {
 		// open file
 		try {
-			outStream = new FileOutputStream(fileName);
+			this.outStream = new FileOutputStream(this.fileName);
 //			outFile = new DataOutputStream(new BufferedOutputStream(outStream, 100000000));
-			outFile = new DataOutputStream(outStream);
+			this.outFile = new DataOutputStream(this.outStream);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -168,8 +169,8 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 
 		// dump some infos
 		try {
-			outFile.writeDouble(intervall_s);
-			new ObjectOutputStream(outStream).writeObject(net);
+			this.outFile.writeDouble(this.intervall_s);
+			new ObjectOutputStream(this.outStream).writeObject(this.net);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -186,8 +187,8 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 	public void readNet() {
 		// open file
 		try {
-			inStream = new FileInputStream(fileName);
-			inFile = new DataInputStream(inStream);
+			this.inStream = new FileInputStream(this.fileName);
+			this.inFile = new DataInputStream(this.inStream);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -195,8 +196,8 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 
 		// dump some infos
 		try {
-			intervall_s = inFile.readDouble();
-			net = (OTFEventVisNet) new ObjectInputStream(inStream).readObject();
+			this.intervall_s = this.inFile.readDouble();
+			this.net = (OTFEventVisNet) new ObjectInputStream(this.inStream).readObject();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -221,13 +222,13 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 	}
 
 	public int getLocalTime() throws RemoteException {
-		return (int)nextTime;
+		return (int)this.nextTime;
 	}
 
 	public OTFVisNet getNet(OTFNetHandler handler) throws RemoteException {
-		if (net == null) readNet();
+		if (this.net == null) readNet();
 
-		return net;
+		return this.net;
 	}
 
 	long filepos = 0;
@@ -236,15 +237,15 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 		byte [] result = null;
 
 		try {
-			nextTime = inFile.readDouble();
-			size = inFile.readInt();
+			this.nextTime = this.inFile.readDouble();
+			size = this.inFile.readInt();
 
 			result = new byte[size];
-			int read = inFile.read(result);
+			int read = this.inFile.read(result);
 
 			if (read != size) throw new IOException("READ SIZE did not fit! File corrupted!");
-			timeSteps.put(nextTime, filepos);
-			filepos += read;
+			this.timeSteps.put(this.nextTime, this.filepos);
+			this.filepos += read;
 
 		} catch (IOException e) {
 			System.out.println(e.toString());
@@ -268,17 +269,17 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 
 	double actualTime = 0;
 	public void beginSnapshot(double time) {
-		net.positions.clear();
-		actualTime = time;
+		this.net.positions.clear();
+		this.actualTime = time;
 	}
 
 	public void addAgent(PositionInfo position) {
-		net.positions.add(position);
+		this.net.positions.add(position);
 	}
 
 	public void endSnapshot() {
 		try {
-			dump((int)actualTime);
+			dump((int)this.actualTime);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -297,15 +298,15 @@ public class OTFNetEventFileHandler implements Serializable, SimStateWriterI, OT
 		World world = Gbl.createWorld();
 
 		String netFileName = Gbl.getConfig().getParam("network","inputNetworkFile");
-		QueueNetworkLayer net = new QueueNetworkLayer();
-		new MatsimNetworkReader(net).readFile(netFileName);
+		NetworkLayer net = new NetworkLayer();
+				new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
-
+		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
 
 		String eventFile = Gbl.getConfig().getParam("events","outputFile");
 		eventFile = "output/current/ITERS/it.0/0.events.txt.gz";
 		eventFile = "../../tmp/studies/berlin-wip/run125/200.events.txt.gz";
-		OTFNetEventFileHandler test = new OTFNetEventFileHandler(10, net,"output/ds_fromEvent.mvi" );
+		OTFNetEventFileHandler test = new OTFNetEventFileHandler(10, qnet,"output/ds_fromEvent.mvi" );
 		test.run(eventFile);
 	}
 

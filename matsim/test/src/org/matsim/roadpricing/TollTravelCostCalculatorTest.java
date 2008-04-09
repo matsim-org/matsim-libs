@@ -23,7 +23,7 @@ package org.matsim.roadpricing;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPlan.LegIterator;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -49,7 +49,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		try {
 			loadConfig(null);
 
-			QueueNetworkLayer network = Fixture.createNetwork2();
+			NetworkLayer network = Fixture.createNetwork2();
 			Gbl.getWorld().setNetworkLayer(network);
 			// a basic toll where only the morning hours are tolled
 			RoadPricingScheme toll = new RoadPricingScheme(network);
@@ -104,7 +104,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		try {
 			loadConfig(null);
 
-			QueueNetworkLayer network = Fixture.createNetwork2();
+			NetworkLayer network = Fixture.createNetwork2();
 			Gbl.getWorld().setNetworkLayer(network);
 			// a basic toll where only the morning hours are tolled
 			RoadPricingScheme toll = new RoadPricingScheme(network);

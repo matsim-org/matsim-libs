@@ -22,10 +22,11 @@ package org.matsim.withinday.mobsim;
 
 import java.util.PriorityQueue;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.trafficmanagement.Accident;
@@ -47,10 +48,11 @@ public class WithindayQueueSimulation extends QueueSimulation {
 
 	private TrafficManagement trafficManagement;
 
-	public WithindayQueueSimulation(final QueueNetworkLayer net,
+	public WithindayQueueSimulation(final NetworkLayer net,
 			final Plans plans, final Events events, final WithindayControler controler) {
 		super(net, plans, events);
 		this.controler = controler;
+		this.setVehiclePrototye(OccupiedVehicle.class);
 	}
 
 	@Override
@@ -82,7 +84,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	 * @param a
 	 */
 	public void setAccident(final Accident a) {
-		QueueLink accidentLink = (QueueLink) this.network.getLink(a.getLinkId());
+		QueueLink accidentLink = this.network.getQueueLink(new Id(a.getLinkId()));
 		this.capacityEvents.add(new CapacityChangeEvent(a.getStartTime(), accidentLink, a.getCapacityReductionFactor()));
 		this.capacityEvents.add(new CapacityChangeEvent(a.getEndTime(), accidentLink, 1/a.getCapacityReductionFactor()));
 	}

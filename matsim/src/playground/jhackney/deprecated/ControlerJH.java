@@ -53,7 +53,6 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.ExternalMobsim;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.Simulation;
 import org.matsim.mobsim.SimulationTimer;
@@ -102,17 +101,17 @@ public class Controler {
 	protected Plans population = null;
 
 	protected PlanStatsManager statsManager = null;
-	
+
 // jhackney
 	protected Facilities facilities = null;
-	
+
 	private boolean running = false;
 	protected StrategyManager strategyManager = null;
 	protected NetworkLayer network = null;
 	protected AbstractTravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCostI travelCostCalculator = null;
-	
-//	jhackney	
+
+//	jhackney
 	protected static String outputPath = null;
 	private static int iteration = -1;
 
@@ -128,10 +127,10 @@ public class Controler {
 
 // jhackney
 	private boolean overwriteFiles = true;
-	
+
 //	jhackney
 	protected int minIteration;
-//	jhackney	
+//	jhackney
 	protected int maxIterations;
 	/**
 	 * The swing event listener list to manage ControlerListeners efficiently.
@@ -229,7 +228,7 @@ public class Controler {
 		String externalMobsim = this.config.findParam("simulation", "externalExe");
 		if (externalMobsim == null) {
 			// queue-sim david
-			Simulation sim = new QueueSimulation((QueueNetworkLayer)this.network, this.population, this.events);
+			Simulation sim = new QueueSimulation(this.network, this.population, this.events);
 			sim.run();
 		} else {
 			/* remove eventswriter, as the external mobsim has to write the events */
@@ -458,7 +457,7 @@ public class Controler {
 
 	protected NetworkLayer loadNetwork() {
 		printNote("", "  creating network layer... ");
-		QueueNetworkLayer network = new QueueNetworkLayer();
+		NetworkLayer network = new NetworkLayer();
 		Gbl.getWorld().setNetworkLayer(network);
 		printNote("", "  done");
 
@@ -473,8 +472,8 @@ public class Controler {
 	protected void loadFacilities() {
 		if (this.config.facilities().getInputFile() != null) {
 			printNote("", "  reading facilities xml file... ");
-			facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-			new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+			this.facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+			new MatsimFacilitiesReader(this.facilities).readFile(this.config.facilities().getInputFile());
 			printNote("", "  done");
 		} else {
 			printNote("","  No Facilities input file given in config.xml!");
@@ -509,20 +508,20 @@ public class Controler {
 			printNote("", "done.");
 		}
 
-		int endTime = (int) (this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30 * 3600); //if no end time is given assume 30 hours  
+		int endTime = (int) (this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30 * 3600); //if no end time is given assume 30 hours
 		this.travelTimeCalculator = this.config.controler().getTravelTimeCalculator(this.network, endTime);
 		this.events.addHandler(this.travelTimeCalculator);
-		 
+
 
 		if (Gbl.useRoadPricing()) {
 			if ((this.toll.getType().equals("distance")) || (this.toll.getType().equals("cordon"))) {
-				this.travelCostCalculator = new TollTravelCostCalculator(new TravelTimeDistanceCostCalculator(travelTimeCalculator), this.toll);
+				this.travelCostCalculator = new TollTravelCostCalculator(new TravelTimeDistanceCostCalculator(this.travelTimeCalculator), this.toll);
 			} else {
 				// use the standard travelCostCalcualtor in case of an area toll
-				this.travelCostCalculator = new TravelTimeDistanceCostCalculator(travelTimeCalculator);
+				this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator);
 			}
 		} else {
-			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(travelTimeCalculator);
+			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator);
 		}
 
 		/* TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has 15min-steps,
