@@ -51,7 +51,6 @@ public class RetailersReader extends MatsimXmlParser {
 	private void startRetailers(final Attributes meta) {
 		this.retailers.setName(meta.getValue("name"));
 		//this.retailers.setDescription(meta.getValue("desc"));
-		this.retailers.setLayer(meta.getValue("aggregation_layer"));
 	}
 
 	private void startRetailer(final Attributes meta) {

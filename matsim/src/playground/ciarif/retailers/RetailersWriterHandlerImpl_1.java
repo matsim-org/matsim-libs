@@ -3,6 +3,8 @@ package playground.ciarif.retailers;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.facilities.Facility;
+
 // RetailersWriterHandlerImplV1
 public class RetailersWriterHandlerImpl_1 implements RetailersWriterHandler {
 	// interface implementation
@@ -20,10 +22,6 @@ public class RetailersWriterHandlerImpl_1 implements RetailersWriterHandler {
 		if (retailers.getDescription() != null) {
 			out.write(" desc=\"" + retailers.getDescription() + "\"");
 		}
-		out.write(" year=\"" + retailers.getYear() + "\" ");
-		if (retailers.getLayer() != null) {
-			out.write(" layer=\"" + retailers.getLayer() + "\" \n");
-		}
 		out.write(" > \n");
 	}
 	public void endRetailers(final BufferedWriter out) throws IOException {
@@ -35,10 +33,6 @@ public class RetailersWriterHandlerImpl_1 implements RetailersWriterHandler {
 	public void startRetailer(final Retailer retailer, final BufferedWriter out) throws IOException {
 		out.write("\t<retailer");
 		out.write(" loc_id=\"" + retailer.getRetailerId() + "\"");
-		if (retailer.getCoord() != null) {
-			out.write(" x=\"" + retailer.getCoord().getX() + "\"");
-			out.write(" y=\"" + retailer.getCoord().getY() + "\"");
-		}
 		out.write(">\n");
 	}
 	public void endRetailer(final BufferedWriter out) throws IOException {
@@ -50,8 +44,7 @@ public class RetailersWriterHandlerImpl_1 implements RetailersWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 	public void startFacility(final Facility facility, final BufferedWriter out) throws IOException {
 		out.write("\t\t<facility");
-		out.write(" h=\"" + facility.getCapacity() + "\"");
-		out.write(" val=\"" + facility.getMin_cust_sqm() + "\"");
+		out.write(" h=\"" + facility.getId() + "\"");
 		out.write(" />\n");
 	}
 	public void endFacility(final BufferedWriter out) throws IOException {

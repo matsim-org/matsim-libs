@@ -3,6 +3,7 @@ package playground.ciarif.retailers;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;

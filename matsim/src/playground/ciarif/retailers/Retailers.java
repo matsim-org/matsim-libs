@@ -41,10 +41,8 @@ import org.matsim.utils.identifiers.IdI;
 public class Retailers {
 
 	private static Retailers singleton = new Retailers();
-	private String name = null; // problably unnessesary, or include it into schema
+	private String name = null; // probably unnecessary, or include it into schema
 	private String desc = null;
-	private int year = 0; // ???
-	private String layer = null; // no layer for reatailers
 	private final TreeMap<IdI, Retailer> Retailers = new TreeMap<IdI, Retailer>();
 	private final ArrayList<RetailersAlgorithm> algorithms = new ArrayList<RetailersAlgorithm>();
 	
@@ -94,14 +92,6 @@ public class Retailers {
 		this.desc = desc;
 	}
 
-	public final void setYear(final int year) { // remove that
-		this.year = year;
-	}
-
-	public final void setLayer(final String layer) { // NO!
-		this.layer = layer;
-	}
-
 	public ArrayList<RetailersAlgorithm> getAlgorithms() {
 		return this.algorithms;
 	}
@@ -112,14 +102,6 @@ public class Retailers {
 
 	public final String getDescription() {
 		return this.desc;
-	}
-
-	public final int getYear() { // remove that
-		return this.year;
-	}
-
-	public final String getLayer() { // NO!
-		return this.layer;
 	}
 
 	public final TreeMap<IdI, Retailer> getRetailers() {
