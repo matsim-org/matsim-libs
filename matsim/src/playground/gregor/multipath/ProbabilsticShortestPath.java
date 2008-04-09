@@ -162,9 +162,9 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 					if (foundRoute){
 						break;
 					}
-					Gbl.warningMsg(this.getClass(), "calcLeastCostPath()",
-							"No route was found from node " + fromNode.getId()
-							+ " to node " + toNode.getId());
+//					Gbl.warningMsg(this.getClass(), "calcLeastCostPath()",
+//							"No route was found from node " + fromNode.getId()
+//							+ " to node " + toNode.getId());
 					return null;
 				}
 
@@ -174,7 +174,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 				if (count++ >= slowdown){
 					count = 0;
 					doSnapshot();
-					this.netStateWriter.resetNodes();
+//					this.netStateWriter.resetNodes();
 				}
 
 				if (outNodeD.getId() == toNode.getId()){
@@ -720,7 +720,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 	}
 
 	private void paintNode(Node node, String msg){
-		this.netStateWriter.setNodeMsg(node.getId(), msg);
+//		this.netStateWriter.setNodeMsg(node.getId(), msg);
 	}
 
 	private void paintLink(Link link, double color, String  msg){
