@@ -41,7 +41,7 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 	private BasicNodeI toNode;
 	public static final double LANE_WIDTH = 4.0;
 	private double length_m = 0;
-	private int lanes = 0;
+	private double lanes = 0;
 	private AffineTransform linear2PlaneTransform = null;
 	private double nodeDist;
 	private double[] displayValue = new double[1];
@@ -188,6 +188,10 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 
+	public double getLanes() {
+		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
+	}
+	
 
 	// -------------------- IMPLEMENTATION OF TrafficLinkI --------------------
 
@@ -195,7 +199,7 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 		this.length_m = length_m;
 	}
 
-	public void setLanes(int lanes) {
+	public void setLanes(double lanes) {
 		this.lanes = lanes;
 	}
 
@@ -203,8 +207,8 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 		return this.length_m;
 	}
 
-	public int getLanes() {
-		return this.lanes;
+	public int getLanesAsInt() {
+		return Math.round((float)Math.max(this.lanes,1.0d));
 	}
 
 	// ---------- IMPLEMENTATION OF DrawableLinkI ----------
@@ -233,6 +237,8 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 	public IdI getId() {
 		return this.id;
 	}
+
+
 
 
 }

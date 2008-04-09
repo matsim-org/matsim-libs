@@ -90,7 +90,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 	private void renderLink(DisplayableLinkI link, Graphics2D display, AffineTransform linkTransform) {
 
 		final int NodeWidth = 20;
-		final int lanes = link.getLanes();
+		final int lanes = link.getLanesAsInt();
 		final int cellLength_m = (int)Math.round(link.getLength_m());
 		final int cellWidth_m = (int)Math.round(laneWidth * lanes);
 		int cellStart_m = 0;
@@ -163,7 +163,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 	        double dy = link.getEndEasting() - link.getStartEasting();
 	        double dx = link.getEndNorthing() - link.getStartNorthing();
 	        double sqr = Math.sqrt(dx*dx +dy*dy);
-			final double cellWidth_m = laneWidth * link.getLanes();
+			final double cellWidth_m = laneWidth * link.getLanesAsInt();
 
 			dx = dx*cellWidth_m/sqr;
 	        dy = -dy*cellWidth_m/sqr;
@@ -258,7 +258,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 					renderLink(link, display, linkTransform);
 				}
 
-				final int lanes = link.getLanes();
+				final int lanes = link.getLanesAsInt();
 				/*
 				 * (2) RENDER VEHICLES
 				 *

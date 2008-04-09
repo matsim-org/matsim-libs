@@ -72,7 +72,7 @@ public class DisplayNet implements BasicNetI, DisplayableNetI {
 			link2.setToNode(to);
 
 			link2.setLength_m(((LinkImpl) link).getLength());
-			link2.setLanes(((LinkImpl) link).getLanes());
+			link2.setLanes(((LinkImpl) link).getLanesAsInt());
 
 			links.put(link2.getId(), link2);
 		}

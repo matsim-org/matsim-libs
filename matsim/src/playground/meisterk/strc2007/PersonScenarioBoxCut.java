@@ -155,7 +155,7 @@ public class PersonScenarioBoxCut extends PersonAlgorithm {
 					Double.toString(link.getLength()),
 					Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)),
 					Double.toString(link.getCapacity()),
-					Integer.toString(link.getLanes()),
+					Integer.toString(link.getLanesAsInt()),
 					link.getOrigId(),
 					link.getType());
 		}

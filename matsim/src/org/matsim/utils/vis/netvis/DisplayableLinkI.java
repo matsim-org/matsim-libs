@@ -19,7 +19,7 @@ public interface DisplayableLinkI extends DrawableLinkI, BasicLinkI {
 
 	public double getLength_m();
 
-	public int getLanes();
+	public int getLanesAsInt();
 
   public void build();
 

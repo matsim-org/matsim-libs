@@ -93,12 +93,12 @@ public class LinkSetRendererLanes extends RendererA {
     		display.setTransform(linkTransform);
 
     		int cellLength_m = (int)Math.round(link.getLength_m() / link.getDisplayValueCount());
-    		int cellWidth_m = (int)Math.round(linkWidth * link.getLanes());
+    		int cellWidth_m = (int)Math.round(linkWidth * link.getLanesAsInt());
     		int cellStart_m = 0;
 
     		for (int i = 0; i < link.getDisplayValueCount(); i++) {
 
-    			display.setColor(colorizer.getColor(link.getLanes()));
+    			display.setColor(colorizer.getColor(link.getLanesAsInt()));
     			display.fillRect(cellStart_m, -cellWidth_m, cellLength_m, cellWidth_m);
 
     			display.setColor(Color.BLACK);

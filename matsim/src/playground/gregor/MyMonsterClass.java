@@ -482,7 +482,7 @@ int three=0;
 		while (oneWayLink != null){
 			Node toNode = oneWayLink.getFromNode();
 			Node fromNode = oneWayLink.getToNode();
-			Link testlink = network.createLink(oneWayLink.getId().toString() + "666", fromNode.getId().toString(), toNode.getId().toString(),((Double) oneWayLink.getLength()).toString(), ((Double)oneWayLink.getFreespeed(Time.UNDEFINED_TIME)).toString(),((Double)oneWayLink.getCapacity()).toString(), ((Integer)oneWayLink.getLanes()).toString(), oneWayLink.getOrigId() + "666",oneWayLink.getType());
+			Link testlink = network.createLink(oneWayLink.getId().toString() + "666", fromNode.getId().toString(), toNode.getId().toString(),((Double) oneWayLink.getLength()).toString(), ((Double)oneWayLink.getFreespeed(Time.UNDEFINED_TIME)).toString(),((Double)oneWayLink.getCapacity()).toString(), ((Integer)oneWayLink.getLanesAsInt()).toString(), oneWayLink.getOrigId() + "666",oneWayLink.getType());
 
 			EvacuationAreaLink el = new EvacuationAreaLink((Id) testlink.getId(),3600.0 * 11 + 85*60);
 			links.put(el.getId(),el);
@@ -816,7 +816,7 @@ int three=0;
 									Double.toString(link.getLength()),
 									Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)),
 									Double.toString(link.getCapacity()),
-									Integer.toString(link.getLanes()),
+									Integer.toString(link.getLanesAsInt()),
 									link.getOrigId(), link.getType());
 							extracted++;
 							if (extracted % 1000 == 0)

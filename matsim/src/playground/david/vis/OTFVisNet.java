@@ -363,7 +363,7 @@ public class OTFVisNet implements Serializable, DisplayableNetI {
 			this.from = OTFVisNet.this.nodes.get(source.getLink().getFromNode().getId().toString());
 			this.to = OTFVisNet.this.nodes.get(source.getLink().getToNode().getId().toString());
 			this.src = source;
-			this.lanes = source.getLink().getLanes();
+			this.lanes = source.getLink().getLanesAsInt();
 
 			final double deltaNorthing = getEndNorthing() - getStartNorthing();
 			final double deltaEasting = getEndEasting() - getStartEasting();

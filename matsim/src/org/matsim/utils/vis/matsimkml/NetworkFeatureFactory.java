@@ -196,7 +196,7 @@ public class NetworkFeatureFactory {
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Number of Lanes: ");
-		buffer.append(l.getLanes());
+		buffer.append(l.getLanesAsInt());
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Length: ");

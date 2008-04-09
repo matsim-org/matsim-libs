@@ -84,7 +84,7 @@ public interface TrafficLinkI extends BasicLinkI {
      * @throws IllegalArgumentException
      *             if <code>lanes</code> is negative
      */
-    public void setLanes(int lanes);
+    public void setLanes(double lanes);
 
     /**
      * Returns this link's length in meters.
@@ -112,6 +112,6 @@ public interface TrafficLinkI extends BasicLinkI {
      * 
      * @return this link's number of lanes
      */
-    public int getLanes();
+    public int getLanesAsInt();
 
 }

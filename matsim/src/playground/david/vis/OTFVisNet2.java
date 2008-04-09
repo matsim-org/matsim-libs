@@ -388,7 +388,7 @@ public class OTFVisNet2 implements Serializable, DisplayableNetI {
 			this.from = OTFVisNet2.this.nodes.get(source.getLink().getFromNode().getId().toString());
 			this.to = OTFVisNet2.this.nodes.get(source.getLink().getToNode().getId().toString());
 			this.src = source;
-			this.lanes = source.getLink().getLanes();
+			this.lanes = source.getLink().getLanesAsInt();
 
 			final double deltaNorthing = getEndNorthing() - getStartNorthing();
 			final double deltaEasting = getEndEasting() - getStartEasting();

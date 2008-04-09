@@ -80,7 +80,11 @@ public interface BasicLinkI {
 
     public double getLength();
 
-    public int getLanes();
+    public double getLanes();
+    
+    public int getLanesAsInt();
+    
+    
 
     public double getFreespeed(final double time);
 
@@ -96,7 +100,7 @@ public interface BasicLinkI {
 
     public void setLength(double length);
 
-  	public void setLanes(int lanes);
+  	public void setLanes(double lanes);
 
   	public void setCapacity(double capacity);
 

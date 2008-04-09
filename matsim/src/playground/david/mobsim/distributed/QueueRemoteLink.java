@@ -43,7 +43,7 @@ public class QueueRemoteLink extends QueueLink implements RemoteLinkI {
 	public QueueRemoteLink(final QueueLink link, final NetworkLayer network) {
 		super(network, link.getId().toString(), link.getFromNode(), link.getToNode(),
 			Double.toString(link.getLength()), Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)),
-			Double.toString(link.getCapacity()), Integer.toString(link.getLanes()),
+			Double.toString(link.getCapacity()), Integer.toString(link.getLanesAsInt()),
 			link.getOrigId(), link.getType());
 
 	}

@@ -95,7 +95,7 @@ public class LinkSetRenderer extends RendererA {
 
             display.setTransform(linkTransform);
 
-            final int lanes = link.getLanes();
+            final int lanes = link.getLanesAsInt();
             final int cellLength_m = (int)Math.round(link.getLength_m()
                     / link.getDisplayValueCount());
             final int cellWidth_m = (int)Math.round(laneWidth * lanes);

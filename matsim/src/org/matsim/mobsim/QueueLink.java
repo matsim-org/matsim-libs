@@ -168,7 +168,7 @@ public class QueueLink {
 				- (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
-		this.storageCapacity = (this.link.getLength() * this.link.getLanes())
+		this.storageCapacity = (this.link.getLength() * this.link.getLanesAsInt())
 				/ ((NetworkLayer) this.link.getLayer()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the
@@ -600,7 +600,7 @@ public class QueueLink {
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.buffer) {
 
-			int lane = 1 + (veh.getID() % this.link.getLanes());
+			int lane = 1 + (veh.getID() % this.link.getLanesAsInt());
 
 			int cmp = (int) (veh.getDepartureTime_s()
 					+ this.inverseSimulatedFlowCapacity + 2.0);
@@ -652,7 +652,7 @@ public class QueueLink {
 					+ this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(Time.UNDEFINED_TIME);
 			veh.setSpeed(speed);
-			int lane = 1 + (veh.getID() % this.link.getLanes());
+			int lane = 1 + (veh.getID() % this.link.getLanesAsInt());
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
 					distanceOnLink,// +
 													// ((NetworkLayer)this.layer).getEffectiveCellSize(),
@@ -667,7 +667,7 @@ public class QueueLink {
 		 * position doesn't matter, so they are just placed to the coordinates of
 		 * the from node
 		 */
-		int lane = this.link.getLanes() + 1; // place them next to the link
+		int lane = this.link.getLanesAsInt() + 1; // place them next to the link
 		for (Vehicle veh : this.waitingList) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
 					((NetworkLayer) this.link.getLayer()).getEffectiveCellSize(), lane, 0.0,
@@ -681,7 +681,7 @@ public class QueueLink {
 		 * doesn't matter, so they are just placed to the coordinates of the from
 		 * node
 		 */
-		lane = this.link.getLanes() + 2; // place them next to the link
+		lane = this.link.getLanesAsInt() + 2; // place them next to the link
 		for (Vehicle veh : this.parkingList) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
 					((NetworkLayer) this.link.getLayer()).getEffectiveCellSize(), lane, 0.0,
@@ -704,7 +704,7 @@ public class QueueLink {
 	public void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
 		double time = SimulationTimer.getTime();
 		int cnt = this.buffer.size() + this.vehQueue.size();
-		int nLanes = this.link.getLanes();
+		int nLanes = this.link.getLanesAsInt();
 		if (cnt > 0) {
 			double cellSize = this.link.getLength() / cnt;
 			double distFromFromNode = this.link.getLength() - cellSize / 2.0;

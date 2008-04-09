@@ -54,7 +54,7 @@ public class NetworkSetDefaultCapacities extends NetworkAlgorithm {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		for (Link l : network.getLinks().values()) {
-			int lanes = l.getLanes();
+			int lanes = l.getLanesAsInt();
 			if (lanes == 1) { l.setCapacity(2000.0); }
 			else if (lanes == 2) { l.setCapacity(4000.0); }
 			else if (lanes == 3) { l.setCapacity(5800.0); }

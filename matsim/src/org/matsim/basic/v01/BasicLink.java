@@ -129,11 +129,17 @@ implements BasicLinkI
 		this.length = length;
 	}
 
-	public int getLanes() {
+	//TODO permlanes should be refectored to lanes or getLanes() and so on to getPermLanes() [GL]
+	
+	public double getLanes() {
+		return this.permlanes;
+	}
+	
+	public int getLanesAsInt() {
 		return Math.round((float)Math.max(this.permlanes,1.0d));
 	}
 
-	public void setLanes(int lanes) {
+	public void setLanes(double lanes) {
 		this.permlanes = lanes;
 	}
 }

@@ -111,7 +111,7 @@ public class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 		out.write(" length=\"" + link.getLength() + "\"");
 		out.write(" freespeed=\"" + link.getFreespeed(Time.UNDEFINED_TIME) + "\"");
 		out.write(" capacity=\"" + link.getCapacity() + "\"");
-		out.write(" permlanes=\"" + link.getLanes() + "\"");
+		out.write(" permlanes=\"" + link.getLanesAsInt() + "\"");
 		out.write(" oneway=\"" + "1" + "\"");
 		if (link.getOrigId() != null) {
 			out.write(" origid=\"" + link.getOrigId() + "\"");

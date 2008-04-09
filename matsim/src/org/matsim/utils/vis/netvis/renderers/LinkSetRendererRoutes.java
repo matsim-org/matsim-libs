@@ -179,7 +179,7 @@ public class LinkSetRendererRoutes extends RendererA {
 			display.setTransform(linkTransform);
 
 			int cellLength_m = (int)Math.round(link.getLength_m() / link.getDisplayValueCount());
-			int cellWidth_m = (int)Math.round(this.linkWidth * link.getLanes());
+			int cellWidth_m = (int)Math.round(this.linkWidth * link.getLanesAsInt());
 			int cellStart_m = 0;
 
 			for (int i = 0; i < link.getDisplayValueCount(); i++) {

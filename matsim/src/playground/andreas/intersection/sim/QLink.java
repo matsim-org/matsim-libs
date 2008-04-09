@@ -38,7 +38,7 @@ public class QLink extends LinkImpl {
 		// Original LinkErstellen
 		this.originalLink = new PseudoLink(this, true);
 		// Configurieren
-		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLength(), this.getLanes(), this.getFreespeed(Time.UNDEFINED_TIME), this.getFlowCapacity(),this.effectiveCelleSize)) {
+		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLength(), this.getLanesAsInt(), this.getFreespeed(Time.UNDEFINED_TIME), this.getFlowCapacity(),this.effectiveCelleSize)) {
 			
 			if ( spaceCapWarningCount <=10 ) {
 				log.warn("Link " + this.getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
@@ -121,7 +121,7 @@ public class QLink extends LinkImpl {
 						originalLink.addDestLink(this.getToNode().getOutLinks().get(signalLane.getLinkId()));			
 							
 						newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h,this.effectiveCelleSize);
-						this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLength() - signalLane.getLength(), this.getLanes(), this.getFreespeed(Time.UNDEFINED_TIME), this.getFlowCapacity(),this.effectiveCelleSize);
+						this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLength() - signalLane.getLength(), this.getLanesAsInt(), this.getFreespeed(Time.UNDEFINED_TIME), this.getFlowCapacity(),this.effectiveCelleSize);
 						
 						pseudoLinksList.add(newNodePseudoLink);
 						firstNodeLinkInitialized = true;

@@ -90,7 +90,7 @@ public class NetworkWriterHandlerImplTLinks {
 		this.out.write(link.getFromNode().getId() + "\t");		// NODEA
 		this.out.write(link.getToNode().getId() + "\t");		// NODEB
 		this.out.write("0\t");						// PERMLANESA
-		this.out.write(link.getLanes() + "\t");	// PERMLANESB
+		this.out.write(link.getLanesAsInt() + "\t");	// PERMLANESB
 		this.out.write("0\t");						// LEFTPCKTSA
 		this.out.write("0\t");						// LEFTPCKTSB
 		this.out.write("0\t");						// RGHTPCKTSA

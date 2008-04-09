@@ -56,7 +56,7 @@ public class SimRunKreisverkehr {
 
 		int cellcount = 0;
 		for (Link link : network.getLinks().values()) {
-			double length = link.getLength()*link.getLanes();
+			double length = link.getLength()*link.getLanesAsInt();
 			cellcount += Math.min(1,(int)(length/7.5));
 		}
 		System.out.println("Summarized Cell count is " + cellcount);
