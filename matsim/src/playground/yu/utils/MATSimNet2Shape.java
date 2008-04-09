@@ -25,8 +25,10 @@ package playground.yu.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.DataUtilities;
@@ -141,30 +143,61 @@ public class MATSimNet2Shape {
 		new MatsimEventsReader(events).readFile(eventsFilename);
 	}
 
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		MATSimNet2Shape mn2s = new MATSimNet2Shape();
+		// /////////////////////////////////////////////////////
+		// write MATSim-network to Shp-file
+		// /////////////////////////////////////////////////////
 		// mn2s.readNetwork("test/yu/utils/ivtch-osm.1.2.xml");
 		// mn2s.setCrs(ch1903);
 		// mn2s.writeShapeFile("test/yu/utils/0.shp");
+		// /////////////////////////////////////////////////////
 		mn2s.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml");
 		mn2s.setCrs(ch1903);
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1,
 				mn2s.network);
 		mn2s.readEvents("../runs/run439/100.events.txt.gz", va);
 
-		Map<String, Integer> vol7s = new HashMap<String, Integer>();
-		Map<String, Integer> vol8s = new HashMap<String, Integer>();
+		// Map<String, Integer> vol7s = new HashMap<String, Integer>();
+		// Map<String, Integer> vol8s = new HashMap<String, Integer>();
+		// for (QueueLink ql : ((Map<IdI, QueueLink>) mn2s.network.getLinks())
+		// .values()) {
+		// int[] v = va.getVolumesForLink(ql.getId().toString());
+		// vol7s.put(ql.getId().toString(), ((v != null) ? v[7] : 0) * 10);
+		// vol8s.put(ql.getId().toString(), ((v != null) ? v[8] : 0) * 10);
+		// }
+		// //add new parameters or properties for links in Shp-file
+		// mn2s.addParameter("volume(7-8h)", Integer.class, vol7s);
+		// mn2s.addParameter("volume(8-9h)", Integer.class, vol7s);
+
+		List<Map<String, Integer>> vols = new ArrayList<Map<String, Integer>>(
+				24);
+		for (int i = 0; i < 24; i++) {
+			vols.add(i, null);
+		}
 		for (Link ql : (mn2s.network.getLinks())
 				.values()) {
-			int[] v = va.getVolumesForLink(ql.getId().toString());
-			vol7s.put(ql.getId().toString(), ((v != null) ? v[7] : 0) * 10);
-			vol8s.put(ql.getId().toString(), ((v != null) ? v[8] : 0) * 10);
+			String qlId = ql.getId().toString();
+			int[] v = va.getVolumesForLink(qlId);
+			for (int i = 0; i < 24; i++) {
+				Map<String, Integer> m = vols.get(i);
+				if (m != null) {
+					m.put(qlId, ((v != null) ? v[i] : 0) * 10);
+				} else if (m == null) {
+					m = new HashMap<String, Integer>();
+					m.put(qlId, ((v != null) ? v[i] : 0) * 10);
+					vols.add(i, m);
+				}
+			}
 		}
-		mn2s.addParameter("volume(7-8h)", Integer.class, vol7s);
-		mn2s.addParameter("volume(8-9h)", Integer.class, vol7s);
+		for (int i = 0; i < 24; i++) {
+			mn2s.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
+					vols.get(i));
+		}
 		mn2s.writeShapeFile("test/yu/utils/test.shp");
 	}
 }
