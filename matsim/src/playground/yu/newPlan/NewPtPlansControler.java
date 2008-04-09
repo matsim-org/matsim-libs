@@ -26,14 +26,13 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
 import org.matsim.world.World;
 
 /**
  * test of NewAgentPtPlan
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewPtPlansControler {
 
@@ -55,8 +54,7 @@ public class NewPtPlansControler {
 
 		population.addAlgorithm(nap);
 
-		PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(plansFilename);
+		new MatsimPlansReader(population).readFile(plansFilename);
 		world.setPopulation(population);
 
 		population.runAlgorithms();

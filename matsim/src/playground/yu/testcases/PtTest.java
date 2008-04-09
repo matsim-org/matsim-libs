@@ -124,8 +124,7 @@ public class PtTest extends MatsimTestCase {
 	 * Runs the test with a value of -6 for beta_travelingPt.
 	 */
 	public void testbetaPt_6() {
-		Controler controler = new Controler(
-				"test/yu/testCases/testPt/config-6.xml");
+		Controler controler = new Controler(getInputDirectory() + "config.xml");
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.run();
@@ -135,8 +134,7 @@ public class PtTest extends MatsimTestCase {
 	 * Runs the test with a value of -3 for beta_travelingPt
 	 */
 	public void testbetaPt_3() {
-		Controler controler = new Controler(
-				"test/yu/testCases/testPt/config-3.xml");
+		Controler controler = new Controler(getInputDirectory() + "config.xml");
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.run();
