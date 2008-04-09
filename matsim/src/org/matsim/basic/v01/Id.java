@@ -20,9 +20,13 @@
 
 package org.matsim.basic.v01;
 
+import java.io.Serializable;
+
 import org.matsim.utils.identifiers.IdI;
 
-public class Id implements IdI {
+public class Id implements IdI, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private final String id;
 
