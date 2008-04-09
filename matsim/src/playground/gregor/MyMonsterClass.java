@@ -783,7 +783,7 @@ int three=0;
 		world.setNetworkLayer(network);
 		System.out.println("done. ");
 
-		network.beforeSim();
+//		network.beforeSim();
 
 		System.out.println("extracting links ... ");
 		Coord A = network.getNode("101472392").getCoord();
@@ -834,7 +834,7 @@ int three=0;
 
 
 		System.out.println("Cleaning up network ...");
-		new_network.beforeSim();
+//		new_network.beforeSim();
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(new_network);
 
