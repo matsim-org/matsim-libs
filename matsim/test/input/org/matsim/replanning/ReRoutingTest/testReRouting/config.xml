@@ -13,8 +13,8 @@
 	</module>
 
 	<module name="plans">
-		<!-- <param name="inputPlansFile" value="test/scenarios/berlin/plans_hwh_1pct.xml.gz" />-->
-		<param name="inputPlansFile" value="test/input/org/matsim/replanning/ReRoutingTest/testReRouting/reroute-test.plans.xml" />
+		 <param name="inputPlansFile" value="test/scenarios/berlin/plans_hwh_1pct.xml.gz" />
+		<!-- <param name="inputPlansFile" value="test/input/org/matsim/replanning/ReRoutingTest/testReRouting/reroute-test.plans.xml" /> -->
 	</module>
 
 	<module name="controler">
