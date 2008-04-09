@@ -141,7 +141,7 @@ public class EstimReactiveLinkTT implements
 		public LinkTTCalculator(QueueLink link) {
 			this.samples = new TreeSet<Sample>();
 			this.link = link;
-			this.freeFlowTravTime = link.getLink().getFreespeedTravelTime();
+			this.freeFlowTravTime = link.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 			this.currentTravelTime = this.freeFlowTravTime;
 			this.feasibleOutFlow = link.getSimulatedFlowCapacity();
 			this.currentOutFlow = this.feasibleOutFlow;

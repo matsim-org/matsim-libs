@@ -140,7 +140,7 @@ public class LinkImpl extends BasicLink implements Link {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public double getFreespeedTravelTime() {
+	public double getFreespeedTravelTime(double time) {
 		return this.freespeedTravelTime;
 	}
 

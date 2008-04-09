@@ -181,7 +181,7 @@ public class QueueLink {
 		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap TWO times
 		 * the flowCap to handle the flowCap.
 		 */
-		if (this.storageCapacity < this.getLink().getFreespeedTravelTime()
+		if (this.storageCapacity < this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME)
 				* this.simulatedFlowCapacity) {
 			if (spaceCapWarningCount <= 10) {
 				log
@@ -193,7 +193,7 @@ public class QueueLink {
 				}
 				spaceCapWarningCount++;
 			}
-			this.storageCapacity = this.getLink().getFreespeedTravelTime()
+			this.storageCapacity = this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME)
 					* this.simulatedFlowCapacity;
 		}
 	}
@@ -417,7 +417,7 @@ public class QueueLink {
 		activateLink();
 		veh.setCurrentLink(this.link);
 		this.vehQueue.add(veh);
-		veh.setDepartureTime_s((int) (now + this.getLink().getFreespeedTravelTime()));
+		veh.setDepartureTime_s((int) (now + this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME)));
 		QueueSimulation.getEvents().processEvent(
 				new EventLinkEnter(now, veh.getDriverID(), veh.getCurrentLegNumber(),
 						this.link.getId().toString(), veh.getDriver(), this.link));
@@ -627,9 +627,9 @@ public class QueueLink {
 		double lastDistance = Integer.MAX_VALUE;
 		for (Vehicle veh : this.vehQueue) {
 			double travelTime = now
-					- (veh.getDepartureTime_s() - this.getLink().getFreespeedTravelTime());
-			double distanceOnLink = (this.getLink().getFreespeedTravelTime() == 0.0 ? 0.0
-					: ((travelTime / this.getLink().getFreespeedTravelTime()) * this.link.getLength()));
+					- (veh.getDepartureTime_s() - this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+			double distanceOnLink = (this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME) == 0.0 ? 0.0
+					: ((travelTime / this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME)) * this.link.getLength()));
 			if (distanceOnLink > queueEnd) { // vehicle is already in queue
 				distanceOnLink = queueEnd;
 				queueEnd -= vehLen;

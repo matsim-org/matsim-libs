@@ -38,6 +38,6 @@ public interface Link extends BasicLinkI, Location {
 
 	public void setMaxRoleIndex(final int index);
 
-	public double getFreespeedTravelTime();
+	public double getFreespeedTravelTime(double time);
 
 }

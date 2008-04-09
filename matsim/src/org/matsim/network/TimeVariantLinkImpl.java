@@ -247,7 +247,7 @@ public String toString() {
 			"[type=" + this.type + "]";
 }
 
-public double getFreespeedTravelTime() {
+public double getFreespeedTravelTime(double time) {
 	return this.freespeedTravelTime;
 }
 }
