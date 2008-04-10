@@ -38,6 +38,7 @@ import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.plans.Person;
@@ -55,6 +56,8 @@ public class EstimReactiveLinkTT implements
 		EventHandlerAgentWait2LinkI,
 		TravelTimeI {
 
+	private QueueNetworkLayer queueNetwork;
+	
 	private Map<BasicLinkI, LinkTTCalculator> linkTTCalculators;
 
 	private BasicLinkI lastQueriedLink;
@@ -63,36 +66,40 @@ public class EstimReactiveLinkTT implements
 
 	private double lastTravelTime;
 
+	public EstimReactiveLinkTT(QueueNetworkLayer network) {
+		queueNetwork = network;
+	}
+	
 	public void reset(int iteration) {
 		this.linkTTCalculators = new LinkedHashMap<BasicLinkI, LinkTTCalculator>();
 	}
 
 	public void handleEvent(EventLinkEnter event) {
-		increaseCount((QueueLink) event.link, event.agent, event.time);
+		increaseCount(event.link, event.agent, event.time);
 	}
 
 	public void handleEvent(EventLinkLeave event) {
-		decreaseCount((QueueLink) event.link, event.agent, event.time);
+		decreaseCount(event.link, event.agent, event.time);
 	}
 
 	public void handleEvent(EventAgentArrival event) {
-		decreaseCount((QueueLink) event.link, event.agent, event.time);
+		decreaseCount(event.link, event.agent, event.time);
 	}
 
 	public void handleEvent(EventAgentWait2Link event) {
-		increaseCount((QueueLink) event.link, event.agent, event.time);
+		increaseCount(event.link, event.agent, event.time);
 	}
 
-	private void increaseCount(QueueLink link, Person person, double time) {
+	private void increaseCount(Link link, Person person, double time) {
 		LinkTTCalculator f = this.linkTTCalculators.get(link);
 		if(f == null) {
 			f = new LinkTTCalculator(link);
-			this.linkTTCalculators.put(link.getLink(), f);
+			this.linkTTCalculators.put(link, f);
 		}
 		f.enterLink(person, time);
 	}
 
-	private void decreaseCount(QueueLink link, Person person, double time) {
+	private void decreaseCount(Link link, Person person, double time) {
 		LinkTTCalculator f = this.linkTTCalculators.get(link);
 		f.leaveLink(person, time);
 	}
@@ -120,7 +127,7 @@ public class EstimReactiveLinkTT implements
 
 	private class LinkTTCalculator {
 
-		private final QueueLink link;
+		private final QueueLink qLink;
 
 		private final double freeFlowTravTime;
 
@@ -138,12 +145,13 @@ public class EstimReactiveLinkTT implements
 
 		private SortedSet<Sample> samples;
 
-		public LinkTTCalculator(QueueLink link) {
+		public LinkTTCalculator(Link link) {
+			this.qLink = queueNetwork.getQueueLink(link.getId());
+			
 			this.samples = new TreeSet<Sample>();
-			this.link = link;
-			this.freeFlowTravTime = link.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+			this.freeFlowTravTime = link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
 			this.currentTravelTime = this.freeFlowTravTime;
-			this.feasibleOutFlow = link.getSimulatedFlowCapacity();
+			this.feasibleOutFlow = this.qLink.getSimulatedFlowCapacity();
 			this.currentOutFlow = this.feasibleOutFlow;
 		}
 
@@ -154,18 +162,19 @@ public class EstimReactiveLinkTT implements
 		public void leaveLink(Person person, double time) {
 			this.outCount++;
 
-			Sample sample = null;
+//			Sample sample = null;
 			/*
 			 * Since we can expect that the person is near the head of the set,
 			 * this should not be that expensive...
 			 */
 			for(Sample s : this.samples) {
 				if(s.person.equals(person)) {
-					sample = s;
+					this.samples.remove(s);
+//					sample = s;
 					break;
 				}
 			}
-			this.samples.remove(sample);
+//			this.samples.remove(sample);
 
 			double deltaT = time - this.lastEvent;
 			if(deltaT > 0) {
@@ -174,9 +183,9 @@ public class EstimReactiveLinkTT implements
 				this.outCount = 0;
 
 				if(this.samples.isEmpty())
-					this.feasibleOutFlow = this.link.getSimulatedFlowCapacity();
+					this.feasibleOutFlow = this.qLink.getSimulatedFlowCapacity();
 				else if(this.samples.first().linkLeaveTime > time)
-					this.feasibleOutFlow = this.link.getSimulatedFlowCapacity();
+					this.feasibleOutFlow = this.qLink.getSimulatedFlowCapacity();
 				else
 					this.feasibleOutFlow = this.currentOutFlow;
 			}
@@ -187,7 +196,8 @@ public class EstimReactiveLinkTT implements
 				this.lastCall = time;
 
 				if (this.samples.isEmpty())
-					this.currentTravelTime = this.link.getLink().getFreespeed(Time.UNDEFINED_TIME);
+					this.currentTravelTime = qLink.getLink().getLength() /
+											 qLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 				else {
 					double tt = this.samples.size() / this.feasibleOutFlow;
 					this.currentTravelTime = Math.max(this.freeFlowTravTime, tt);

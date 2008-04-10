@@ -26,16 +26,13 @@ package playground.johannes.eut;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.network.Link;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.BestPlanSelector;
@@ -73,13 +70,18 @@ public class EUTController extends WithindayControler {
 
 	private double rho;
 
-	private RandomIncidentSimulator incidentSimulator;
+//	private RandomIncidentSimulator incidentSimulator;
 
 	private EUTReRoute2 eutReRoute;
 
 	private BenefitAnalyzer bAnalyzer;
 
 	private SummaryWriter summaryWriter;
+	
+	private double capReduction;
+	
+	private List<Link> riskyLinks;
+	
 
 	/**
 	 * @param args
@@ -139,19 +141,12 @@ public class EUTController extends WithindayControler {
 		this.maxMemorySlots = Integer.parseInt(getConfig().findParam(CONFIG_MODULE_NAME, "maxMemorySlots"));
 
 		this.rho = Integer.parseInt(getConfig().findParam(CONFIG_MODULE_NAME, "rho"));
-		/*
-		 * Dunno exactly where to place this...
-		 */
-		setTraveltimeBinSize(10);
+
 
 		this.summaryWriter = new SummaryWriter(getConfig().findParam(CONFIG_MODULE_NAME, "summaryFile"));
 		addControlerListener(this.summaryWriter);
 		super.setup();
-		/*
-		 * Initialize the reactive travel times.
-		 */
-		this.reactTTs = new EstimReactiveLinkTT();
-		this.events.addHandler(this.reactTTs);
+		
 		/*
 		 * Add the ttmemory updater for day2day re-replanning.
 		 */
@@ -172,18 +167,14 @@ public class EUTController extends WithindayControler {
 		/*
 		 * Create incident simulator...
 		 */
-		QueueNetworkLayer qnet = new QueueNetworkLayer(getNetwork());
-		this.incidentSimulator = new RandomIncidentSimulator(qnet, this.incidentProba);
 		String linkIds = getConfig().findParam(CONFIG_MODULE_NAME, "links");
-		List<BasicLinkI> riskyLinks = new LinkedList<BasicLinkI>();
+		capReduction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "capReduction"));
+		riskyLinks = new LinkedList<Link>();
 		for(String id : linkIds.split(" ")) {
-			QueueLink link = qnet.getQueueLink(new Id(id));
-			riskyLinks.add(link.getLink());
-			this.incidentSimulator.addLink(link);
+			Link link = getNetwork().getLink(id);
+			riskyLinks.add(link);
+			
 		}
-		double capReduction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "capReduction"));
-		this.incidentSimulator.setCapReduction(capReduction);
-		addControlerListener(this.incidentSimulator);
 		/*
 		 * Count agents traversed risky links...
 		 */
@@ -216,17 +207,31 @@ public class EUTController extends WithindayControler {
 
 		this.config.withinday().addParam("contentThreshold", "1");
 		this.config.withinday().addParam("replanningInterval", "1");
-		WithindayCreateVehiclePersonAlgorithm vehicleAlgo = new WithindayCreateVehiclePersonAlgorithm(this);
 
-		//build the queuesim
+		WithindayCreateVehiclePersonAlgorithm algo = new WithindayCreateVehiclePersonAlgorithm(EUTController.this);
+		
 		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
+		sim.setVehicleAlgo(algo);
 		this.trafficManagement = new TrafficManagement();
 		sim.setTrafficManagement(this.trafficManagement);
-		//run the simulation
-//		long time = System.currentTimeMillis();
-//		QueueSimulation sim = new QueueSimulation((QueueNetworkLayer)this.network, this.population, this.events);
+		/*
+		 * Initialize the reactive travel times.
+		 */
+		this.reactTTs = new EstimReactiveLinkTT(sim.getQueueNetworkLayer());
+		this.events.addHandler(this.reactTTs);
+		this.reactTTs.reset(getIteration());
+		
+		RandomIncidentSimulator simulator = new RandomIncidentSimulator(incidentProba);
+		simulator.setCapReduction(capReduction);
+		for(Link link : riskyLinks)
+			simulator.addLink(sim.getQueueNetworkLayer().getQueueLink(link.getId()));
+		simulator.notifyIterationStarts(EUTController.getIteration());
+		
 		sim.run();
-//		System.err.println("Mobsim took " + (System.currentTimeMillis() - time) +" ms.")
+		
+		simulator.notifyIterationEnds(null);
+		events.removeHandler(reactTTs);
+
 	}
 
 	private class TTMemotyUpdater implements IterationEndsListener {

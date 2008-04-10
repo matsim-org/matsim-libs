@@ -66,7 +66,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 	
 	private Collection<Person> persons = null;
 	
-	public TraversedRiskyLink(Plans population, List<BasicLinkI> riskyLinks, SummaryWriter summaryWriter) {
+	public TraversedRiskyLink(Plans population, List<Link> riskyLinks, SummaryWriter summaryWriter) {
 		this.summaryWriter = summaryWriter;
 		this.population = population;
 		

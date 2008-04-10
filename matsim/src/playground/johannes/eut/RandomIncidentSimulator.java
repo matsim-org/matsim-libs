@@ -30,18 +30,14 @@ import java.util.List;
 
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
-import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.listener.IterationEndsListener;
-import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
 
 /**
  * @author illenberger
  *
  */
-public class RandomIncidentSimulator implements IterationStartsListener, IterationEndsListener {
+public class RandomIncidentSimulator {
 
 	private final double incidentProba;
 
@@ -49,22 +45,14 @@ public class RandomIncidentSimulator implements IterationStartsListener, Iterati
 
 	private int startIteration = 0;
 
-//	private final QueueNetworkLayer network;
-
 	private final List<QueueLink> changedCaps = new LinkedList<QueueLink>();
 
 	private final List<QueueLink> links = new LinkedList<QueueLink>();
 
 	private BufferedWriter writer;
 
-	public RandomIncidentSimulator(QueueNetworkLayer network, double proba) {
-//		this.network = network;
+	public RandomIncidentSimulator(double proba) {
 		this.incidentProba = proba;
-
-//		links.add((QueueLink) network.getLink("800"));
-//		links.add((QueueLink) network.getLink("1100"));
-//		links.add((QueueLink) network.getLink("1400"));
-//		links.add((QueueLink) network.getLink("5"));
 
 		try {
 			this.writer = new BufferedWriter(new FileWriter(Controler.getOutputFilename("incidents.txt")));
@@ -93,19 +81,19 @@ public class RandomIncidentSimulator implements IterationStartsListener, Iterati
 		return this.startIteration;
 	}
 
-	public void notifyIterationStarts(IterationStartsEvent event) {
+	public void notifyIterationStarts(int iteration) {
 		/*
 		 * Reduce capacity here...
 		 */
 		try {
 
-			this.writer.write(String.valueOf(event.getIteration()));
+			this.writer.write(String.valueOf(iteration));
 			this.writer.write("\t");
 
 			for (QueueLink link : this.links) {
 				Gbl.random.nextDouble();
 				if ((Gbl.random.nextDouble() < this.incidentProba)
-						&& (event.getIteration() >= this.startIteration)) {
+						&& (iteration >= this.startIteration)) {
 
 					link.changeSimulatedFlowCapacity(this.capReduction);
 					this.changedCaps.add(link);
