@@ -20,6 +20,7 @@
 
 package playground.ciarif;
 
+import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
@@ -36,9 +37,10 @@ import playground.ciarif.models.subtours.PersonModeChoiceModel;
 
 public class PersonStreaming {
 
-	public static void run() {
+	public static void run(String[] args) {
 
-		Scenario.setUpScenarioConfig();
+		Config config = Gbl.createConfig(args);
+//		Scenario.setUpScenarioConfig();
 
 		System.out.println("person streaming...");
 
@@ -76,8 +78,8 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
-		//plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		plansReader.readFile ("input/plans.xml");
+		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+//		plansReader.readFile ("input/plans.xml");
 		plans.printPlansCount();
 		plans.runAlgorithms();
 		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt", pmcm.getPersonSubtours());
@@ -99,7 +101,7 @@ public class PersonStreaming {
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
-		run();
+		run(args);
 		Gbl.printElapsedTime();
 	}
 }
