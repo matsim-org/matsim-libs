@@ -52,6 +52,8 @@ import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+
+import playground.jhackney.kml.EgoNetPlansMakeKML;
 import playground.jhackney.scoring.*;
 
 
@@ -98,6 +100,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	PajekWriter pjw;
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
 	SpatialInteractor plansInteractorS;//spatial (face to face)
+	EgoNetPlansMakeKML kmlOut;
 	int max_sn_iter;
 	int snIter;
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
@@ -186,6 +189,14 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
 				this.snetstat.closeFiles();
 			}
+			Person testP=this.controler.getPopulation().getPerson("100000");
+			Iterator<Person> alterIt= testP.getKnowledge().egoNet.getAlters().iterator();
+			while(alterIt.hasNext()){
+				Person myAlter=alterIt.next();
+				Plan myPlan=myAlter.getSelectedPlan();
+				EgoNetPlansMakeKML.loadData(myPlan);
+			}
+			EgoNetPlansMakeKML.write();
 		}
 	}
 
@@ -331,6 +342,12 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
 			this.log.info(" ... done");
 		}
+		
+		this.log.info("  Initializing the KML output");
+//		this.kmlOut=new EgoNetPlansMakeKML();
+		EgoNetPlansMakeKML.setUp(this.controler.getConfig());
+		EgoNetPlansMakeKML.generateStyles();
+		this.log.info("... done");
 
 		this.log.info(" Writing out the initial social network ...");
 		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getFirstIteration());
