@@ -26,7 +26,7 @@ import java.util.TreeMap;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNetI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.identifiers.IdI;
@@ -71,8 +71,8 @@ public class DisplayNet implements BasicNetI, DisplayableNetI {
 			to.addInLink(link2);
 			link2.setToNode(to);
 
-			link2.setLength_m(((LinkImpl) link).getLength());
-			link2.setLanes(((LinkImpl) link).getLanesAsInt());
+			link2.setLength_m(((Link) link).getLength());
+			link2.setLanes(((Link) link).getLanesAsInt());
 
 			links.put(link2.getId(), link2);
 		}

@@ -26,7 +26,6 @@ import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.network.Link;
-import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 
 public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
@@ -99,7 +98,7 @@ public class TravelTimeCalculatorHashMap extends AbstractTravelTimeCalculator {
 		EnterEvent e = this.enterEvents.remove(event.agentId);
 		if ((e != null) && e.linkId.equals(event.linkId)) {
 			double timediff = event.time - e.time;
-			if (event.link == null) event.link = (LinkImpl)this.network.getLocation(event.linkId);
+			if (event.link == null) event.link = (Link)this.network.getLocation(event.linkId);
 			if (event.link != null) {
 				getTravelTimeRole(event.link).addTravelTime(e.time, timediff);
 			}

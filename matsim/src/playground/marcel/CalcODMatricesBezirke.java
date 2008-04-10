@@ -31,7 +31,7 @@ import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -124,7 +124,7 @@ public class CalcODMatricesBezirke implements EventHandlerAgentArrivalI, EventHa
 
 
 	private Location getLocation(final String agentId, final String linkId) {
-		LinkImpl link = (LinkImpl)this.network.getLocation(linkId);
+		Link link = (Link)this.network.getLocation(linkId);
 
 		if (this.population != null) {
 			// let's try to find the cell from the plans

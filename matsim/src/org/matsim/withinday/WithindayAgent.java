@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
-import org.matsim.network.LinkImpl;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -141,7 +140,7 @@ public class WithindayAgent {
 		}
 		Link currentLink = this.vehicle.getCurrentLink();
 		Act nextAct = this.person.getSelectedPlan().getNextActivity(this.vehicle.getCurrentLeg());
-		LinkImpl destinationLink = nextAct.getLink();
+		Link destinationLink = nextAct.getLink();
 		Route alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
 		Plan oldPlan = this.person.getSelectedPlan();
 		Leg currentLeg = this.vehicle.getCurrentLeg();

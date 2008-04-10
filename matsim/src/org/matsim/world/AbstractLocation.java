@@ -26,14 +26,14 @@ import java.util.TreeMap;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 
 /**
  * Basic geographical class in MATSim.
- * @see LinkImpl
+ * @see Link
  * @see Facility
  * @see Zone
  * @author Michael Balmer

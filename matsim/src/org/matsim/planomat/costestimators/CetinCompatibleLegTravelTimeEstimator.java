@@ -21,7 +21,6 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.network.Link;
-import org.matsim.network.LinkImpl;
 import org.matsim.plans.Route;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.identifiers.IdI;
@@ -66,7 +65,7 @@ public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTi
 
 		now = this.processDeparture((Link) origin, now);
 		now = this.processRouteTravelTime(route, now);
-		now = this.processLink((LinkImpl) destination, now);
+		now = this.processLink((Link) destination, now);
 
 		return (now - departureTime);
 	}

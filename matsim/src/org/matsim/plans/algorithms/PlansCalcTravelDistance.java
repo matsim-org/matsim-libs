@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.network.Link;
-import org.matsim.network.LinkImpl;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -88,7 +87,7 @@ public class PlansCalcTravelDistance extends PersonAlgorithm implements PlanAlgo
 			Act toAct = (Act)actslegs.get(j);
 			Leg leg = (Leg)actslegs.get(j-1);
 
-			LinkImpl startlink = fromAct.getLink();
+			Link startlink = fromAct.getLink();
 			if (startlink == null) throw new Exception("start link missing");
 			Node startnode = startlink.getFromNode();
 

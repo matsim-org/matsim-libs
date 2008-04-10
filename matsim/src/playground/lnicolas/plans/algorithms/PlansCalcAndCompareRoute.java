@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.network.Link;
-import org.matsim.network.LinkImpl;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -145,8 +144,8 @@ public class PlansCalcAndCompareRoute extends PersonAlgorithm implements PlanAlg
 	}
 
 	private double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) throws Exception {
-		LinkImpl fromLink = fromAct.getLink();
-		LinkImpl toLink = toAct.getLink();
+		Link fromLink = fromAct.getLink();
+		Link toLink = toAct.getLink();
 		if (fromLink == null) throw new Exception("fromLink missing.");
 		if (toLink == null) throw new Exception("toLink missing.");
 

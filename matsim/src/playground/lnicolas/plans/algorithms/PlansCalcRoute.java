@@ -23,7 +23,7 @@ package playground.lnicolas.plans.algorithms;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;

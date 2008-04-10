@@ -23,7 +23,7 @@ package org.matsim.network.algorithms;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
@@ -51,7 +51,7 @@ public class NetworkMergeDoubleLinks extends NetworkAlgorithm {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void mergeLink2IntoLink1(LinkImpl link1, LinkImpl link2, NetworkLayer network) {
+	private final void mergeLink2IntoLink1(Link link1, Link link2, NetworkLayer network) {
 		if (mergetype == 0) {
 			System.out.println("        Link id=" + link2.getId() + " removed because of Link id=" + link1.getId());
 			network.removeLink(link2);
@@ -100,10 +100,10 @@ public class NetworkMergeDoubleLinks extends NetworkAlgorithm {
 		for (Node n : network.getNodes().values()) {
 			Iterator<?> l1_it = n.getOutLinks().values().iterator();
 			while (l1_it.hasNext()) {
-				LinkImpl l1 = (LinkImpl)l1_it.next();
+				Link l1 = (Link)l1_it.next();
 				Iterator<?> l2_it = n.getOutLinks().values().iterator();
 				while (l2_it.hasNext()) {
-					LinkImpl l2 = (LinkImpl)l2_it.next();
+					Link l2 = (Link)l2_it.next();
 					if (!l2.equals(l1)) {
 						if (l2.getToNode().equals(l1.getToNode())) {
 							System.out.println("      Node id=" + n.getId());

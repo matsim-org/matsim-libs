@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.ActUtilityParameters;
 import org.matsim.plans.Leg;
@@ -100,8 +100,8 @@ public class AppraisalScorer implements ScoringFunction {
 	}
 
 	private int calcPersontype() {
-		LinkImpl homeLink = ((Act)(this.plan.getActsLegs().get(0))).getLink();
-		LinkImpl workLink = ((Act)(this.plan.getActsLegs().get(2))).getLink();
+		Link homeLink = ((Act)(this.plan.getActsLegs().get(0))).getLink();
+		Link workLink = ((Act)(this.plan.getActsLegs().get(2))).getLink();
 		boolean homeInside = this.toll.getLinkIds().contains(homeLink.getId());
 		boolean workInside = this.toll.getLinkIds().contains(workLink.getId());
 

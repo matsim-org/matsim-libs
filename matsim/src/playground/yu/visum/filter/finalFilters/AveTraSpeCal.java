@@ -3,7 +3,7 @@ package playground.yu.visum.filter.finalFilters;
 import java.util.List;
 
 import org.matsim.events.EventLinkEnter;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
 import org.matsim.utils.misc.Time;
@@ -95,7 +95,7 @@ public class AveTraSpeCal extends LinkAveCalA {
 	@Override
 	public double atxCal(final String linkID, final String timeBin) {
 		double ats = getLinkTraSpeed(linkID, Integer.parseInt(timeBin) * 900);
-		ats = (ats != 0) ? ats : ((LinkImpl) this.network.getLocation(linkID)).getFreespeed(Time.UNDEFINED_TIME);
+		ats = (ats != 0) ? ats : ((Link) this.network.getLocation(linkID)).getFreespeed(Time.UNDEFINED_TIME);
 		return ats;
 	}
 }

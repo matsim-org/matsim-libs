@@ -23,7 +23,7 @@ package org.matsim.facilities;
 import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.AbstractLocation;
@@ -83,10 +83,10 @@ public class Facility extends AbstractLocation {
 		return this.activities.get(type);
 	}
 
-	public final LinkImpl getLink() {
+	public final Link getLink() {
 		if (this.down_mapping.isEmpty()) { return null; }
 		if (this.down_mapping.size() > 1) { Gbl.errorMsg("Something is wrong!!! A facility contains at most one Link (as specified for the moment)!"); }
-		return (LinkImpl)this.getDownMapping().get(this.down_mapping.firstKey());
+		return (Link)this.getDownMapping().get(this.down_mapping.firstKey());
 	}
 	
 	//////////////////////////////////////////////////////////////////////

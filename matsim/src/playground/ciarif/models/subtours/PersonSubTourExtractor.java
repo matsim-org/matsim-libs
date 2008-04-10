@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;

@@ -32,7 +32,7 @@ import java.io.IOException;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
@@ -99,7 +99,7 @@ public final void testLinkTravelTime() throws Exception {
 	}
 
 	// prepare comparison
-	LinkImpl link10 = (LinkImpl)network.getLocation(10);
+	Link link10 = (Link)network.getLocation(10);
 
 	if (generateNewCompareData) {
 		BufferedWriter outfile = null;

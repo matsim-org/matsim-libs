@@ -33,7 +33,7 @@ import org.matsim.basic.v01.BasicPlan.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.LinkImpl;
+import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Plan;
@@ -121,7 +121,7 @@ public class MentalMap {
 			}
 
 			// Else the activity is null and we choose an activity to assign to the act
-			LinkImpl myLink = myAct.getLink();
+			Link myLink = myAct.getLink();
 			// These Locations are facilities by the new convention
 			Collection<Location> locations = myLink.getUpMapping().values();
 			// These Objects are facilities by convention
@@ -241,7 +241,7 @@ public class MentalMap {
 		boolean remapped = false;
 		// Associate one act with a random facility on the link
 		Activity newActivity = null;
-		LinkImpl myLink = myAct.getLink();
+		Link myLink = myAct.getLink();
 		// These Locations are facilities by the new convention
 		Collection<Location> locations = myLink.getUpMapping().values();
 		// These Objects are facilities by convention

@@ -28,7 +28,6 @@ import java.io.Serializable;
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -150,7 +149,8 @@ public class Act extends BasicAct implements Serializable {
 		if (network == null) {
 			throw new RuntimeException("Network layer does not exist");
 		}
-		this.link = (LinkImpl)network.getLocation(link);
+		this.link = (Link)network.getLocation(link);
+		
 		if (this.link == null) {
 			throw new RuntimeException("link=" + link +" does not exist");
 		}
@@ -196,7 +196,7 @@ public class Act extends BasicAct implements Serializable {
 					throw new RuntimeException("Network layer does not exist.");
 				}
 			}
-			act.link = (LinkImpl)this.network.getLocation(linkId);
+			act.link = (Link)this.network.getLocation(linkId);
 			if (act.link == null) {
 				throw new RuntimeException("link=" + linkId +" does not exist.");
 			}
@@ -236,8 +236,8 @@ public class Act extends BasicAct implements Serializable {
 	}
 
 	@Override // here to return correct link type
-	public final LinkImpl getLink() {
-		return (LinkImpl)this.link;
+	public final Link getLink() {
+		return (Link)this.link;
 	}
 
 
