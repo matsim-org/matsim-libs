@@ -100,7 +100,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	PajekWriter pjw;
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
 	SpatialInteractor plansInteractorS;//spatial (face to face)
-	EgoNetPlansMakeKML kmlOut;
+//	EgoNetPlansMakeKML kmlOut;
 	int max_sn_iter;
 	int snIter;
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
@@ -189,13 +189,12 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
 				this.snetstat.closeFiles();
 			}
+		}
+//		Write out the KML for the EgoNet of a chosen agent
+//		if ((event.getIteration()-1)%replan_interval == 0){
+		if (event.getIteration() == this.controler.getLastIteration()){	
 			Person testP=this.controler.getPopulation().getPerson("100000");
-			Iterator<Person> alterIt= testP.getKnowledge().egoNet.getAlters().iterator();
-			while(alterIt.hasNext()){
-				Person myAlter=alterIt.next();
-				Plan myPlan=myAlter.getSelectedPlan();
-				EgoNetPlansMakeKML.loadData(myPlan);
-			}
+			EgoNetPlansMakeKML.loadData(testP);
 			EgoNetPlansMakeKML.write();
 		}
 	}
@@ -342,10 +341,10 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
 			this.log.info(" ... done");
 		}
-		
+
 		this.log.info("  Initializing the KML output");
 //		this.kmlOut=new EgoNetPlansMakeKML();
-		EgoNetPlansMakeKML.setUp(this.controler.getConfig());
+		EgoNetPlansMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
 		EgoNetPlansMakeKML.generateStyles();
 		this.log.info("... done");
 
