@@ -77,7 +77,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		this.factory = new NetworkFactory(this);
 	}
 
-	public NetworkLayer(NetworkFactory factory) {
+	public NetworkLayer(final NetworkFactory factory) {
 		super(LAYER_TYPE, null);
 		this.factory = factory;
 	}
@@ -104,7 +104,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 	public final Link createLink(final String id, final String from, final String to, final String length,
 	                             final String freespeed, final String capacity, final String permlanes,
-	                             final String origid, String type) {
+	                             final String origid, final String type) {
 		Id f = new Id(from);
 		Node from_node = this.nodes.get(f);
 		if (from_node == null) { throw new IllegalArgumentException(this+"[from="+from+" does not exist]"); }
@@ -121,7 +121,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		return link;
 	}
 
-	public void addLink(Link l) {
+	public void addLink(final Link l) {
 		this.locations.put(l.getId(),l);
 	}
 
@@ -447,7 +447,10 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		buildQuadTree();
 	}
 
-	private void buildQuadTree() {
+	private synchronized void buildQuadTree() {
+		if (this.nodeQuadTree != null) {
+			return;
+		}
 		double startTime = System.currentTimeMillis();
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
