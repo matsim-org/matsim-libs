@@ -25,41 +25,26 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.network.Link;
+import org.apache.log4j.Logger;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.identifiers.IdI;
 
+/**
+ * Ensures that each link in the network can be reached by any other link. 
+ * Links that cannot be reached by some other links, or links from which it
+ * is not possible to reach all other links, are removed from the network.
+ * Nodes with no incoming or outgoing links are removed as well from the 
+ * network.
+ */
 public class NetworkCleaner extends NetworkAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
 
 	private final TreeMap<IdI, Node> visitedNodes = new TreeMap<IdI, Node>();
 	private TreeMap<IdI, Node> biggestCluster = new TreeMap<IdI, Node>();
 	private NetworkLayer network = null;
 	private int roleIndex;
-	private boolean renumber;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
-	public NetworkCleaner() {
-		this(false);
-	}
-
-	public NetworkCleaner(boolean renumber) {
-		super();
-		this.renumber = renumber;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
+	
+	private static final Logger log = Logger.getLogger(NetworkCleaner.class);
 
 	/**
 	 * Finds the cluster of nodes <pre>startNode</pre> is part of. The cluster
@@ -132,11 +117,10 @@ public class NetworkCleaner extends NetworkAlgorithm {
 	public void run(NetworkLayer network) {
 		this.network = network;
 		this.roleIndex = network.requestNodeRole();
-		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-
-		System.out.println("      checking " + network.getNodes().size() + " nodes for dead-ends...");
+		log.info("running " + this.getClass().getName() + " algorithm...");
 
 		// search the biggest cluster of nodes in the network
+		log.info("  checking " + network.getNodes().size() + " nodes for dead-ends...");
 		boolean stillSearching = true;
 		Iterator<? extends Node> iter = network.getNodes().values().iterator();
 		while (iter.hasNext() && stillSearching) {
@@ -153,9 +137,8 @@ public class NetworkCleaner extends NetworkAlgorithm {
 				}
 			}
 		}
-
-		System.out.println("        The biggest cluster consists of " + this.biggestCluster.size() + " nodes.");
-		System.out.println("      done.");
+		log.info("    The biggest cluster consists of " + this.biggestCluster.size() + " nodes.");
+		log.info("  done.");
 
 		/* Reducing the network so it only contains nodes included in the biggest Cluster.
 		 * Loop over all nodes and check if they are in the cluster, if not, remove them from the network
@@ -167,24 +150,7 @@ public class NetworkCleaner extends NetworkAlgorithm {
 			}
 		}
 
-		// renumber links and nodes if requested
-		if (this.renumber) {
-			int id = 1;
-			for (Node node : network.getNodes().values()) {
-				node.setOrigId(node.getId().toString());
-				node.setId(new Id(id));
-				id++;
-			}
-
-			id = 1;
-			for (Link link : network.getLinks().values()) {
-				link.setOrigId(link.getId().toString());
-				link.setId(new Id(id));
-				id++;
-			}
-		}
-
-		System.out.println("    done.");
+		log.info("done.");
 	}
 
 	private DoubleFlagRole getDoubleFlag(Node n) {
@@ -199,6 +165,10 @@ public class NetworkCleaner extends NetworkAlgorithm {
 	static private class DoubleFlagRole {
 		public boolean forwardFlag = false;
 		public boolean backwardFlag = false;
-	};
+		
+		public DoubleFlagRole() {
+			// make constructor public in private class
+		}
+	}
 
 }
