@@ -51,8 +51,8 @@ import org.matsim.utils.identifiers.IdI;
 public class CountsSimReal24Graph extends CountsGraph{
 
 	/* 
-	 * TODO: Max. value of scale is set to 100'000 at the moment
-	 * Make it dependend on the data (max value)!
+	 * TODO: Min. value of scale is set to 100.0 at the moment
+	 * Make it dependend on the data (min value)!
 	 */
 
 	public CountsSimReal24Graph(final List<CountSimComparison> ccl, final int iteration, final String filename){
@@ -91,7 +91,7 @@ public class CountsSimReal24Graph extends CountsGraph{
 			double countVal=linkFilter.getAggregatedCountValue(id);
 			double simVal=linkFilter.getAggregatedSimValue(id);
 			
-			if (countVal>0.0 &&	simVal>0.0) {
+			if (countVal>100.0 &&	simVal>100.0) {
 				
 				if (countVal>maxCountValue) maxCountValue=countVal;
 				if (simVal>maxSimValue) maxSimValue=simVal;
@@ -101,12 +101,10 @@ public class CountsSimReal24Graph extends CountsGraph{
 						"Count: "+ countVal +", Sim: "+ simVal));
 			}
 			else {
-				/* values with simVal==0.0 or countVal==0.0 are drawn on the x==1 or/and y==1-line
-				 * Such values are the result of a poor simulation run, but they can also represent 
-				 * a valid result (closing summer road during winter time)
+				/* values with simVal<100.0 or countVal<100.0 are drawn on the x==100 or/and y==100-line
 				 */
-				countVal=Math.max(1.0, countVal);
-				simVal=Math.max(1.0, simVal);
+				countVal=Math.max(100.0, countVal);
+				simVal=Math.max(100.0, simVal);
 				series_outliers.add(countVal, simVal);
 				
 				if (countVal>maxCountValue) maxCountValue=countVal;
@@ -161,9 +159,9 @@ public class CountsSimReal24Graph extends CountsGraph{
 	
 		// error band
 		DefaultXYDataset dataset1=new DefaultXYDataset();
-		dataset1.addSeries("f1x", new double[][] {{1.0, maxCountValue},{1.0, maxCountValue}});
-		dataset1.addSeries("f2x", new double[][] {{1.0, maxCountValue},{2.0, 2*maxCountValue}});
-		dataset1.addSeries("f05x", new double[][] {{2.0, maxCountValue},{1.0, 0.5*maxCountValue}});
+		dataset1.addSeries("f1x", new double[][] {{100.0, maxCountValue},{100.0, maxCountValue}});
+		dataset1.addSeries("f2x", new double[][] {{100.0, maxCountValue},{200.0, 2*maxCountValue}});
+		dataset1.addSeries("f05x", new double[][] {{200.0, maxCountValue},{100.0, 0.5*maxCountValue}});
 		
 		XYLineAndShapeRenderer renderer3 = new XYLineAndShapeRenderer();
 		renderer3.setShapesVisible(false);
