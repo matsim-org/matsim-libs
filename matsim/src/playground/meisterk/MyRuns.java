@@ -129,7 +129,7 @@ public class MyRuns {
 	public static void run() throws Exception {
 
 //		MyRuns.writeGUESSFile();
-		MyRuns.planomatStandAloneDemo();
+//		MyRuns.planomatStandAloneDemo();
 //		MyRuns.testReplanningRate();
 //		MyRuns.testDepartureDelayCalculator();
 //		MyRuns.testTravelTimeEstimator();
@@ -138,7 +138,7 @@ public class MyRuns {
 //		MyRuns.conversionSpeedTest();
 //		MyRuns.convertPlansV0ToPlansV4();
 //		MyRuns.extractBoxForSTRC2007();
-//		MyRuns.produceSTRC2007KML();
+		MyRuns.produceSTRC2007KML();
 
 		System.out.println();
 
@@ -350,7 +350,7 @@ public class MyRuns {
 		}
 
 		///////////////////////////
-		// display agent #1003771's first activity plan
+		// display agent #1008808's first activity plan
 		///////////////////////////
 
 		String myAgentId = new String("1008808");
