@@ -80,40 +80,6 @@ import com.google.earth.kml._2.PointType;
  */
 public class ShopsOf2005ToFacilities {
 
-	private static final String HOME_DIR = System.getenv("HOME");
-	private static final String FILE_SEPARATOR = System.getProperty("file.separator");
-	private static final String FIELD_DELIM = ";";
-
-	private static final String SANDBOX_NAME = "sandbox00";
-	private static final String SHOPS_CVS_MODULE = "ivt/studies/switzerland/facilities/shopsOf2005";
-	private static final String SHOPS_PATH = HOME_DIR + FILE_SEPARATOR + SANDBOX_NAME + FILE_SEPARATOR + SHOPS_CVS_MODULE + FILE_SEPARATOR;
-
-	private static String pickPayOpenTimesFilename = SHOPS_PATH + "pickpay_opentimes.txt";
-	private static String pickPayAdressesFilename = SHOPS_PATH + "pickpay_addresses.csv";
-	private static String coopZHFilename = SHOPS_PATH + "coop-zh.csv";
-	private static String coopTGFilename = SHOPS_PATH + "coop-tg.csv";
-	private static String migrosZHFilename = SHOPS_PATH + "migros-zh.csv";
-	private static String migrosOstschweizFilename = SHOPS_PATH + "migros-ostschweiz-filialen.csv";
-	private static String migrosOstschweizOpenTimesFilename = SHOPS_PATH + "migros-ostschweiz-oeffnungszeiten.csv";
-	private static String dennerTGZHFilename = SHOPS_PATH + "denner-tg-zh.csv";
-
-	private static final String ACTIVITY_TYPE_SHOP = "shop";
-
-	private static final String ANYTHING_BUT_DIGITS = "[^0-9]";
-	private static final String ANYTHING_BUT_DIGITS_AND_LETTERS = "[^0-9a-zA-Z]";
-	private static final String ANYTHING_BUT_LETTERS = "[^a-zA-Z]";
-
-	private static KML myKML = null;
-	private static Document myKMLDocument = null;
-	private static Folder mainKMLFolder = null;
-
-	private static String kmlFilename = "output" + FILE_SEPARATOR + "shopsOf2005.kmz";
-
-	private static Style coopStyle = null;
-	private static Style pickpayStyle = null;
-	private static Style migrosStyle = null;
-	private static Style dennerStyle = null;
-
 	public enum Day {
 		MONDAY ("mon", "Mo"),
 		TUESDAY ("tue", "Di"),
@@ -155,6 +121,51 @@ public class ShopsOf2005ToFacilities {
 		}
 
 	}
+	
+	private static final String HOME_DIR = System.getenv("HOME");
+	private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+	private static final String FIELD_DELIM = ";";
+
+	private static final String SANDBOX_NAME = "sandbox00";
+	private static final String SHOPS_CVS_MODULE = "ivt/studies/switzerland/facilities/shopsOf2005";
+	private static final String SHOPS_PATH = HOME_DIR + FILE_SEPARATOR + SANDBOX_NAME + FILE_SEPARATOR + SHOPS_CVS_MODULE + FILE_SEPARATOR;
+
+	private static String pickPayOpenTimesFilename = SHOPS_PATH + "pickpay_opentimes.txt";
+	private static String pickPayAdressesFilename = SHOPS_PATH + "pickpay_addresses.csv";
+	private static String coopZHFilename = SHOPS_PATH + "coop-zh.csv";
+	private static String coopTGFilename = SHOPS_PATH + "coop-tg.csv";
+	private static String migrosZHFilename = SHOPS_PATH + "migros-zh.csv";
+	private static String migrosOstschweizFilename = SHOPS_PATH + "migros-ostschweiz-filialen.csv";
+	private static String migrosOstschweizOpenTimesFilename = SHOPS_PATH + "migros-ostschweiz-oeffnungszeiten.csv";
+	
+	private static final String DENNER = "Denner";
+	private static String dennerTGZHFilename = SHOPS_PATH + "denner-tg-zh.csv";
+
+	private static final String ACTIVITY_TYPE_SHOP = "shop";
+
+	private static final String ANYTHING_BUT_DIGITS = "[^0-9]";
+	private static final String ANYTHING_BUT_DIGITS_AND_LETTERS = "[^0-9a-zA-Z]";
+	private static final String ANYTHING_BUT_LETTERS = "[^a-zA-Z]";
+	private static final String BEGINS_WITH_3_DIGITS = "^[0-9]{3}.*$";
+
+	private static final String FAX = "FAX";
+	private static final String CONTAINS_FAX = ".*" + FAX + ".*";
+	private static final String SATURDAY = ";SA    ";
+	private static final String CONTAINS_SATURDAY = ".*" + SATURDAY + ".*";
+	private static final String PALETTE = "PALETTE";
+	private static final String CONTAINS_PALETTE = ".*" + PALETTE + ".*";
+
+	private static KML myKML = null;
+	private static Document myKMLDocument = null;
+	private static Folder mainKMLFolder = null;
+
+	private static String kmlFilename = "output" + FILE_SEPARATOR + "shopsOf2005.kmz";
+
+	private static Style coopStyle = null;
+	private static Style pickpayStyle = null;
+	private static Style migrosStyle = null;
+	private static Style dennerStyle = null;
+
 
 	/**
 	 * @param args
@@ -173,11 +184,11 @@ public class ShopsOf2005ToFacilities {
 		ShopsOf2005ToFacilities.setUp();
 		ShopsOf2005ToFacilities.setupStyles();
 		ShopsOf2005ToFacilities.dennerTGZHAddressesToKML();
-		ShopsOf2005ToFacilities.pickPayAddressesToKML();
-		ShopsOf2005ToFacilities.coopZHAddressesToKML();
-		ShopsOf2005ToFacilities.coopTGAddressesToKML();
-		ShopsOf2005ToFacilities.migrosZHAdressesToKML();
-		ShopsOf2005ToFacilities.migrosOstschweizAdressesToKML();
+//		ShopsOf2005ToFacilities.pickPayAddressesToKML();
+//		ShopsOf2005ToFacilities.coopZHAddressesToKML();
+//		ShopsOf2005ToFacilities.coopTGAddressesToKML();
+//		ShopsOf2005ToFacilities.migrosZHAdressesToKML();
+//		ShopsOf2005ToFacilities.migrosOstschweizAdressesToKML();
 		ShopsOf2005ToFacilities.write();		
 
 	}
@@ -283,6 +294,7 @@ public class ShopsOf2005ToFacilities {
 
 		Folder aFolder = null;
 		Placemark aShop = null;
+		ShopId shopId = null;
 
 		aFolder = new Folder(
 				"dennerFolder",
@@ -311,7 +323,7 @@ public class ShopsOf2005ToFacilities {
 		// Java regex has to match ENTIRE string rather than "quick match" in most libraries
 		// for a discussion see
 		// http://www.regular-expressions.info/java.html
-		String beginsWith3Digits = "^[0-9]{3}.*$";
+//		String beginsWith3Digits = "^[0-9]{3}.*$";
 		boolean nextLineIsTheAddressLine = false;
 		String city = null;
 		String street = null;
@@ -326,12 +338,13 @@ public class ShopsOf2005ToFacilities {
 				//System.out.println(line);
 				tokens = line.split(FIELD_DELIM);
 				street = tokens[9];
-
+				shopId = new ShopId(DENNER, "", "", "", "", city, street);
+				
 				aShop = new Placemark(
-						buildDennerId(city, street),
-						buildDennerId(city, street),
-						buildDennerDescription(city, street),
-						buildAddress(street, "", city),
+						shopId.getShopId(),
+						shopId.getShopId(),
+						shopId.getShopId(),
+						shopId.getAddress(),
 						Feature.DEFAULT_LOOK_AT,
 						dennerStyle.getStyleUrl(),
 						Feature.DEFAULT_VISIBILITY,
@@ -342,7 +355,7 @@ public class ShopsOf2005ToFacilities {
 
 			}
 
-			if (Pattern.matches(beginsWith3Digits, line)) {
+			if (Pattern.matches(BEGINS_WITH_3_DIGITS, line)) {
 
 				nextLineIsTheAddressLine = true;
 
@@ -359,13 +372,13 @@ public class ShopsOf2005ToFacilities {
 
 	}	
 
-	private static String buildDennerId(String city, String street) {
-		return "Denner_" + city + "_" + street;
-	}
-
-	private static String buildDennerDescription(String city, String street) {
-		return "Denner " + city + " " + street;
-	}
+//	private static String buildDennerId(String city, String street) {
+//		return "Denner_" + city + "_" + street;
+//	}
+//
+//	private static String buildDennerDescription(String city, String street) {
+//		return "Denner " + city + " " + street;
+//	}
 
 	private static String buildAddress(String street, String postcode, String city) {
 		return street + ", " + postcode + " " + city + ", Schweiz";
@@ -802,11 +815,12 @@ public class ShopsOf2005ToFacilities {
 
 	private static void addOpentimesToFacilities(Facilities facilities) {
 
-		//ShopsOf2005ToFacilities.processPickPayOpenTimes(facilities);
-		//ShopsOf2005ToFacilities.processMigrosZHOpenTimes(facilities);
-		//ShopsOf2005ToFacilities.processMigrosOstschweizOpenTimes(facilities);
-		//ShopsOf2005ToFacilities.processCoopZHOpenTimes(facilities);
-		ShopsOf2005ToFacilities.processCoopTGOpenTimes(facilities);
+//		ShopsOf2005ToFacilities.processPickPayOpenTimes(facilities);
+//		ShopsOf2005ToFacilities.processMigrosZHOpenTimes(facilities);
+//		ShopsOf2005ToFacilities.processMigrosOstschweizOpenTimes(facilities);
+//		ShopsOf2005ToFacilities.processCoopZHOpenTimes(facilities);
+//		ShopsOf2005ToFacilities.processCoopTGOpenTimes(facilities);
+		ShopsOf2005ToFacilities.processDennerOpenTimes(facilities);
 
 	}
 
@@ -1268,7 +1282,7 @@ public class ShopsOf2005ToFacilities {
 		System.out.println("Setting up Coop ZH open times...done.");
 
 	}
-	
+
 	private static void processCoopTGOpenTimes(Facilities facilities) {
 
 		System.out.println("Setting up Coop TG open times...");
@@ -1281,8 +1295,10 @@ public class ShopsOf2005ToFacilities {
 		String[] openHourTokens = null;
 		Day[] days = Day.values();
 		double openingHour = 0;
-		double closingHour = 0;
+		double time = 0;
 		Opentime opentime = null;
+		boolean isHour = true;
+		boolean isOpen = true;
 
 		try {
 
@@ -1305,49 +1321,216 @@ public class ShopsOf2005ToFacilities {
 				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
 
 					String token = tokens[tokenPos];
-					
+
 					if (!token.equals("")) {
 						openHourTokens = token.split(ANYTHING_BUT_DIGITS);
 						// hier gehts weita!
-						openingHour = Integer.parseInt(openHourTokens[0]) * 3600;
-						openingHour += Integer.parseInt(openHourTokens[1]) * 60;
-						closingHour = Integer.parseInt(openHourTokens[2]) * 3600;
-						closingHour += Integer.parseInt(openHourTokens[3]) * 60;
-						switch(tokenPos) {
-						case START_OPEN_TOKEN_INDEX:
-						case START_OPEN_TOKEN_INDEX + 1:
-							System.out.println("Open: " + openingHour);
-							System.out.println("Close: " + closingHour);
-							System.out.println("Adding times to weekdays...");
-							for (int weekday = 0; weekday <= 4; weekday++) {
-								opentime = new Opentime(
-										days[weekday].getAbbrevEnglish(), 
-										Time.writeTime(openingHour), 
-										Time.writeTime(closingHour));
-								shopping.addOpentime(opentime);
+						for (String openHourToken : openHourTokens) {
+
+							if (!openHourToken.equals("")) {
+
+								if (isHour) {
+									time = Integer.parseInt(openHourToken) * 3600;
+								} else {
+									time += Integer.parseInt(openHourToken) * 60;
+
+									if (isOpen) {
+										openingHour = time;
+									} else {
+
+										System.out.println("Open: " + Time.writeTime(openingHour));
+										System.out.println("Close: " + Time.writeTime(time));
+
+										switch(tokenPos) {
+										case START_OPEN_TOKEN_INDEX:
+										case START_OPEN_TOKEN_INDEX + 1:
+											System.out.println("Adding times to weekdays...");
+											for (int weekday = 0; weekday <= 4; weekday++) {
+												opentime = new Opentime(
+														days[weekday].getAbbrevEnglish(), 
+														Time.writeTime(openingHour), 
+														Time.writeTime(time));
+												shopping.addOpentime(opentime);
+											}
+											break;
+										case START_OPEN_TOKEN_INDEX + 2:
+										case START_OPEN_TOKEN_INDEX + 3:
+											System.out.println("Adding times to saturday...");
+											opentime = new Opentime(
+													Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(), 
+													Time.writeTime(openingHour), 
+													Time.writeTime(time));
+											shopping.addOpentime(opentime);
+											break;
+										}
+									}
+
+									isOpen = !isOpen;
+
+								}
+
+								isHour = !isHour;
+
 							}
-							break;
-						case START_OPEN_TOKEN_INDEX + 2:
-						case START_OPEN_TOKEN_INDEX + 3:
-							System.out.println("Open: " + openingHour);
-							System.out.println("Close: " + closingHour);
-							System.out.println("Adding times to saturday...");
-							opentime = new Opentime(
-									Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(), 
-									Time.writeTime(openingHour), 
-									Time.writeTime(closingHour));
-							shopping.addOpentime(opentime);
-							break;
+
 						}
 					}
 				}
 			} else {
 				System.out.println("Not in the facilities file: " + facilityId);				
 			}
-			
+
 		}
-		
 		System.out.println("Setting up Coop TG open times...done.");
+	}
+
+	private static void processDennerOpenTimes(Facilities facilities) {
+
+		System.out.println("Setting up Denner open times...");
+
+		List<String> lines = null;
+		String[] tokens = null;
+		String street = null;
+		String city = null;
+		String weekDayToken = null;
+		String saturdayToken = null;
+//		String facilityId = null;
+		ShopId shopId = null;
+		String[] openHourTokens = null;
+
+		Day[] days = Day.values();
+		double openingHour = 0;
+		double time = 0;
+		Opentime opentime = null;
+		boolean isHour = true;
+		boolean isOpen = true;
+
+
+		final int UNINTERESTING_LINE = -1;
+		final int STREET_LINE = 0;
+		final int WEEKDAY_LINE = 1;
+		final int SATURDAY_LINE = 2;
+		final int CITY_LINE = 3;
+		int lineType = UNINTERESTING_LINE;
+
+		try {
+			lines = FileUtils.readLines(new File(dennerTGZHFilename), "UTF-8");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		for (String line : lines) {
+
+			// find out what line it is
+			lineType = UNINTERESTING_LINE;
+			if (Pattern.matches(BEGINS_WITH_3_DIGITS, line)) {
+				lineType = CITY_LINE;
+			} else if (Pattern.matches(CONTAINS_PALETTE, line)) {
+				lineType = STREET_LINE;
+			} else if (Pattern.matches(CONTAINS_FAX, line)) {
+				lineType = WEEKDAY_LINE;
+			} else if (Pattern.matches(CONTAINS_SATURDAY, line)) {
+				lineType = SATURDAY_LINE;
+			}
+
+			tokens = line.split(FIELD_DELIM);
+
+			// extract interesting data by line type
+			switch(lineType) {
+			case CITY_LINE:
+				city = tokens[9];
+				break;
+			case STREET_LINE:
+				street = tokens[9];
+				break;
+			case WEEKDAY_LINE:
+				weekDayToken = tokens[7];
+				break;
+			case SATURDAY_LINE:
+				saturdayToken = tokens[7];
+				break;
+			case UNINTERESTING_LINE:
+				continue;
+			default:
+				System.out.println("You should not come here...");
+			break;	
+			}
+
+			// now process information
+			switch(lineType) {
+			case SATURDAY_LINE:
+				
+				// reset switches in case of lines such as
+				// SA    09.00-17.00 / FR   -20.00
+				// where process only the SA part
+				isHour = true;
+				isOpen = true;
+
+				
+				shopId = new ShopId(DENNER, "", "", "", "", city, street);
+				System.out.println(shopId.getShopId());
+				System.out.println(weekDayToken);
+				System.out.println(saturdayToken);
+				System.out.println();
+
+				Facility theCurrentDenner = (Facility) facilities.getLocation(shopId.getShopId());
+				if (theCurrentDenner != null) {
+					Activity shopping = theCurrentDenner.createActivity(ACTIVITY_TYPE_SHOP);
+					for (String openTimeString : new String[]{weekDayToken, saturdayToken}) {
+
+						openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
+						for (String openHourToken : openHourTokens) {
+							if (!openHourToken.equals("")) {
+
+								if (isHour) {
+									time = Integer.parseInt(openHourToken) * 3600;
+								} else {
+									time += Integer.parseInt(openHourToken) * 60;
+
+									if (isOpen) {
+										openingHour = time;
+									} else {
+
+										System.out.println("Open: " + Time.writeTime(openingHour));
+										System.out.println("Close: " + Time.writeTime(time));
+
+										if (openTimeString.equals(weekDayToken)) {
+											System.out.println("Adding times to weekdays...");
+											for (int weekday = 0; weekday <= 4; weekday++) {
+												opentime = new Opentime(
+														days[weekday].getAbbrevEnglish(), 
+														Time.writeTime(openingHour), 
+														Time.writeTime(time));
+												shopping.addOpentime(opentime);
+											}
+										} else if (openTimeString.equals(saturdayToken)) {
+											System.out.println("Adding times to saturday...");
+											opentime = new Opentime(
+													Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(), 
+													Time.writeTime(openingHour), 
+													Time.writeTime(time));
+											shopping.addOpentime(opentime);
+										}
+									}
+									isOpen = !isOpen;
+								}
+								isHour = !isHour;
+							}
+						}
+
+					}
+				} else {
+					System.out.println("Not in the facilities file: " + shopId.getShopId());				
+				}
+				break;
+			default:
+				continue;
+			}
+
+		}
+
+		System.out.println("Setting up Denner open times...done.");
 
 	}
+
 }
