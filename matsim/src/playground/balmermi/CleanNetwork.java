@@ -60,7 +60,7 @@ public class CleanNetwork {
 		network.addAlgorithm(new NetworkSummary());
 //		network.addAlgorithm(new NetworkAdaptCHNavtec());
 //		network.addAlgorithm(new NetworkSummary());
-		network.addAlgorithm(new NetworkCleaner(false));
+		network.addAlgorithm(new NetworkCleaner());
 //		network.addAlgorithm(new NetworkSummary());
 		network.addAlgorithm(new NetworkMergeDoubleLinks());
 //		network.addAlgorithm(new NetworkSummary());

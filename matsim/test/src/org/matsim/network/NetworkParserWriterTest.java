@@ -22,8 +22,6 @@ package org.matsim.network;
 
 import org.matsim.examples.TriangleScenario;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkCalcTopoType;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
@@ -62,7 +60,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 	private final void runModules(NetworkLayer network) {
 		System.out.println("  running network modules... ");
 		new NetworkSummary().run(network);
-		new NetworkCleaner(false).run(network);
+		new NetworkCleaner().run(network);
 		new NetworkMergeDoubleLinks().run(network);
 		new NetworkCalcTopoType().run(network);
 		new NetworkSummary().run(network);

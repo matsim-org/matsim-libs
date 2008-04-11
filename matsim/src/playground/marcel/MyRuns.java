@@ -66,6 +66,7 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 import org.matsim.matrices.MatsimMatricesReader;
+import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -1418,9 +1419,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  running NetworkCleaner... ");
-		final NetworkAlgorithm netAlgo = new NetworkCleaner(true);
-		network.addAlgorithm(netAlgo);
-		network.runAlgorithms();
+		new NetworkCleaner().run(network);
 		System.out.println("  done.");
 
 		System.out.println("  writing the network...");
@@ -3025,6 +3024,13 @@ public class MyRuns {
 	}
 
 	public static void someTest(final String[] args) {
+		Config config = Gbl.createConfig(args);
+		NetworkLayer network = new NetworkLayer();
+		Gbl.startMeasurement();
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		Gbl.printRoundTime();
+		QueueNetworkLayer qnet = new QueueNetworkLayer(network);
+		Gbl.printRoundTime();
 	}
 
 	//////////////////////////////////////////////////////////////////////
