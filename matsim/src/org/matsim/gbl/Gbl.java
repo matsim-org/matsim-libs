@@ -171,7 +171,7 @@ public abstract class Gbl {
 	}
 
 	public static final void printSystemInfo() {
-		log.info("JVM: " + System.getProperty("java.vm.version") + "; "
+		log.info("JVM: " + System.getProperty("java.version") + "; "
 				+ System.getProperty("java.vm.vendor") + "; "
 				+ System.getProperty("java.vm.info") + "; "
 				+ System.getProperty("sun.arch.data.model") + "-bit");
