@@ -62,16 +62,15 @@ public class OSMNetCreator {
 	public static void main(String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch.xml";
 		final String OSMPatchFilename = "test/yu/utils/osmpatch.xml";
-		// final String outputNetFilename =
-		// "../schweiz-ivtch/network/ivtch-osm.xml";
-		final String outputNetFilename = "test/yu/utils/ivtch-osm.1.3.xml";
+		final String outputNetFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
+		//		final String outputNetFilename = "test/yu/utils/ivtch-osm.1.3.xml";
 		Config config = Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		// (1) -----------links in Circle
+		// (1) -----------links in Circle---------------------------
 		Set<String> linkIdsInCircle = new NetworkLinkIdsInCircle(network)
 				.getLinks(682845.0, 247388.0, 4000.0);
-		// (2) -----------type=80->Cap=2000, type=81->cap=600
+		// (2) -----------type=80->Cap=2000, type=81->cap=600---------
 		OSMNetCreator osmNC = new OSMNetCreator(network);
 
 		for (String linkId : linkIdsInCircle) {
@@ -80,24 +79,21 @@ public class OSMNetCreator {
 				osmNC.resetCapacity(l);
 			}
 		}
-		// (3) -----------patch primary road (red links) in
-		// OpenStreetMap.org-----
+		// (3) ------patch primary road (red links) in OpenStreetMap.org-----
 		OSMPatchPaser osmP = new OSMPatchPaser();
 		osmP.readFile(OSMPatchFilename);
 		int up = 0, upgraded = 0;
 		for (String linkId : osmP.getUpgradeLinks()) {
 			up++;
-			if (linkIdsInCircle.contains(linkId)) {
-				upgraded++;
-				Link l = network.getLink(linkId);
-				if (l != null) {
-					if (l.getCapacity() / capperiod < 2000.0) {
-						System.out.print("link " + l.getId().toString()
-								+ " capacity from " + l.getCapacity()
-								/ capperiod + " to ");
-						l.setCapacity(2000.0 * capperiod);
-						System.out.println(l.getCapacity() / capperiod);
-					}
+			upgraded++;
+			Link l = network.getLink(linkId);
+			if (l != null) {
+				if (l.getCapacity() / capperiod < 2000.0) {
+					System.out.print("link " + l.getId().toString()
+							+ " capacity from " + l.getCapacity() / capperiod
+							+ " to ");
+					l.setCapacity(2000.0 * capperiod);
+					System.out.println(l.getCapacity() / capperiod);
 				}
 			}
 		}
@@ -106,17 +102,15 @@ public class OSMNetCreator {
 		int down = 0, degraded = 0;
 		for (String linkId : osmP.getDegradeLinks()) {
 			down++;
-			if (linkIdsInCircle.contains(linkId)) {
-				degraded++;
-				Link l = network.getLink(linkId);
-				if (l != null) {
-					if (l.getCapacity() / capperiod > 600.0) {
-						System.out.print("link " + l.getId().toString()
-								+ " capacity from " + l.getCapacity()
-								/ capperiod + " to ");
-						l.setCapacity(600.0 * capperiod);
-						System.out.println(l.getCapacity() / capperiod);
-					}
+			degraded++;
+			Link l = network.getLink(linkId);
+			if (l != null) {
+				if (l.getCapacity() / capperiod > 600.0) {
+					System.out.print("link " + l.getId().toString()
+							+ " capacity from " + l.getCapacity() / capperiod
+							+ " to ");
+					l.setCapacity(600.0 * capperiod);
+					System.out.println(l.getCapacity() / capperiod);
 				}
 			}
 		}
