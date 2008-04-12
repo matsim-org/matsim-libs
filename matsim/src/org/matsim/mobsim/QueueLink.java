@@ -44,7 +44,9 @@ import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 /**
- * @author david
+ * @author dstrippgen
+ * @author dgrether
+ * @author mrieser
  *
  * Queue Model Link implementation
  */
@@ -78,25 +80,22 @@ public class QueueLink {
 	private final Queue<Vehicle> vehQueue = new LinkedList<Vehicle>();
 
 	/**
-	 * buffer is holding all vehicles that are ready to cross the outgoing
-	 * intersection
+	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
 	private final Queue<Vehicle> buffer = new LinkedList<Vehicle>();
 
 	private double storageCapacity;
 
 	/**
-	 * The number of vehicles able to leave the buffer in one time step (usually
-	 * 1s).
+	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
 	 */
 	private double simulatedFlowCapacity; // previously called timeCap
 
-	private double inverseSimulatedFlowCapacity; // optimization, cache 1.0 /
-																								// simulatedFlowCapacity
+	private double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
 
-	private int timeCapCeil; // optimization, cache Math.ceil(timeCap)
+	private int flowCapCeil; // optimization, cache Math.ceil(simulatedFlowCap)
 
-	private double timeCapFraction; // optimization, cache timeCap - (int)timeCap
+	private double flowCapFraction; // optimization, cache simulatedFlowCap - (int)simulatedFlowCap
 
 	/**
 	 * The (flow) capacity available in one time step to move vehicles into the
@@ -107,22 +106,22 @@ public class QueueLink {
 
 	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
-	 * timeCapFraction.
+	 * flowCapFraction.
 	 */
 	private double buffercap_accumulate = 1.0;
 
 	private boolean active = false;
 
-	private Link link;
+	private final Link link;
 
-	private QueueNetworkLayer queueNetworkLayer;
+	private final QueueNetworkLayer queueNetworkLayer;
 
-	private QueueNode toQueueNode;
+	private final QueueNode toQueueNode;
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
-	public QueueLink(Link l, QueueNetworkLayer queueNetworkLayer, QueueNode toNode) {
+	public QueueLink(final Link l, final QueueNetworkLayer queueNetworkLayer, final QueueNode toNode) {
 		this.link = l;
 		this.queueNetworkLayer = queueNetworkLayer;
 		this.toQueueNode = toNode;
@@ -147,8 +146,7 @@ public class QueueLink {
 	}
 
 	private void initFlowCapacity() {
-		// network.capperiod is in hours, we need it per sim-tick and multiplied
-		// with flowCapFactor
+		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double flowCapFactor = Gbl.getConfig().simulation().getFlowCapFactor();
 
 		// multiplying capacity from file by simTickCapFactor **and** flowCapFactor:
@@ -157,23 +155,19 @@ public class QueueLink {
 	}
 
 	private void recalcCapacity() {
-		// network.capperiod is in hours, we need it per sim-tick and multiplied
-		// with flowCapFactor
-		double storageCapFactor = Gbl.getConfig().simulation()
-				.getStorageCapFactor();
+		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
+		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
-		this.timeCapCeil = (int) Math.ceil(this.simulatedFlowCapacity);
-		this.timeCapFraction = this.simulatedFlowCapacity
-				- (int) this.simulatedFlowCapacity;
+		this.flowCapCeil = (int) Math.ceil(this.simulatedFlowCapacity);
+		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.link.getLength() * this.link.getLanesAsInt())
 				/ ((NetworkLayer) this.link.getLayer()).getEffectiveCellSize() * storageCapFactor;
 
-		// storage capacity needs to be at least enough to handle the
-		// cap_per_time_step:
-		this.storageCapacity = Math.max(this.storageCapacity, this.timeCapCeil);
+		// storage capacity needs to be at least enough to handle the cap_per_time_step:
+		this.storageCapacity = Math.max(this.storageCapacity, this.flowCapCeil);
 
 		/*
 		 * If speed on link is relatively slow, then we need MORE cells than the
@@ -181,19 +175,15 @@ public class QueueLink {
 		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap TWO times
 		 * the flowCap to handle the flowCap.
 		 */
-		if (this.storageCapacity < this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME)
-				* this.simulatedFlowCapacity) {
+		if (this.storageCapacity < this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME) * this.simulatedFlowCapacity) {
 			if (spaceCapWarningCount <= 10) {
-				log
-						.warn("Link "
-								+ this.link.getId()
-								+ " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
+				log.warn("Link " + this.link.getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
 				if (spaceCapWarningCount == 10) {
 					log.warn("Additional warnings of this type are suppressed.");
 				}
 				spaceCapWarningCount++;
 			}
-			this.storageCapacity = this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+			this.storageCapacity = this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME)
 					* this.simulatedFlowCapacity;
 		}
 	}
@@ -215,15 +205,14 @@ public class QueueLink {
 	// Is called after link has been read completely
 	// ////////////////////////////////////////////////////////////////////
 	public void finishInit() {
-		this.buffercap_accumulate = (this.timeCapFraction == 0.0 ? 0.0 : 1.0);
+		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
 		this.active = false;
 	}
 
 	private void processVehicleArrival(final double now, final Vehicle veh) {
 		QueueSimulation.getEvents().processEvent(
-				new EventAgentArrival(now, veh.getDriverID(),
-						veh.getCurrentLegNumber(), this.link.getId().toString(), veh
-								.getDriver(), veh.getCurrentLeg(), this.link));
+				new EventAgentArrival(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+						this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.link));
 		// Need to inform the veh that it now reached its destination.
 		veh.reachActivity(now, this);
 	}
@@ -247,28 +236,25 @@ public class QueueLink {
 
 			// Generate departure event
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentDeparture(now, veh.getDriverID(), veh
+					new EventAgentDeparture(now, veh.getDriver().getId().toString(), veh
 							.getCurrentLegNumber(), this.link.getId().toString(), veh.getDriver(), veh
 							.getCurrentLeg(), this.link));
 
 			/*
-			 * A.) we have an unknown leg mode (aka != "car") in this cases do
-			 * teleport veh to next Activity location B.) we have no route (aka "next
-			 * activity on same link") -> no waitingList C.) route known AND mode ==
-			 * "car" -> regular case, put veh in waitingList
+			 * A.) we have an unknown leg mode (aka != "car").
+			 *     In this case teleport veh to next activity location
+			 * B.) we have no route (aka "next activity on same link") -> no waitingList
+			 * C.) route known AND mode == "car" -> regular case, put veh in waitingList
 			 */
 			Leg leg = veh.getCurrentLeg();
 
 			if (!leg.getMode().equals("car")) {
 				QueueSimulation.handleUnknownLegMode(veh);
-			}
-			else {
+			} else {
 				if (leg.getRoute().getRoute().size() != 0) {
 					this.waitingList.add(veh);
-				}
-				else {
-					// this is the case where (hopefully) the next act happens at the same
-					// location as this act
+				} else {
+					// this is the case where (hopefully) the next act happens at the same location as this act
 					processVehicleArrival(now, veh);
 				}
 			}
@@ -298,9 +284,8 @@ public class QueueLink {
 			}
 			addToBuffer(veh, now);
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentWait2Link(now, veh.getDriverID(), veh
-							.getCurrentLegNumber(), this.link.getId().toString(), veh.getDriver(), veh
-							.getCurrentLeg(), this.link));
+					new EventAgentWait2Link(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+							this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.link));
 		}
 	}
 
@@ -318,7 +303,6 @@ public class QueueLink {
 			if (veh.getDepartureTime_s() > now) {
 				return;
 			}
-
 			// Check if veh has reached destination:
 			if (veh.getDestinationLink().getId() == this.link.getId()) {
 				processVehicleArrival(now, veh);
@@ -352,8 +336,7 @@ public class QueueLink {
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		this.active = (this.buffercap_accumulate < 1.0)
-				|| (this.vehQueue.size() != 0) || (this.waitingList.size() != 0);
+		this.active = (this.buffercap_accumulate < 1.0) || (this.vehQueue.size() != 0) || (this.waitingList.size() != 0);
 		return this.active;
 	}
 
@@ -367,7 +350,7 @@ public class QueueLink {
 	// ////////////////////////////////////////////////////////////////////
 	// called from framework, do everything related to link movement here
 	// ////////////////////////////////////////////////////////////////////
-	/* default */boolean moveLink(final double now) {
+	/*package*/ boolean moveLink(final double now) {
 		updateBufferCapacity(now);
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
@@ -379,7 +362,7 @@ public class QueueLink {
 		return updateActiveStatus();
 	}
 
-	/* default */boolean moveLinkWaitFirst(final double now) {
+	/*package*/ boolean moveLinkWaitFirst(final double now) {
 		updateBufferCapacity(now);
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
@@ -394,11 +377,11 @@ public class QueueLink {
 	private void updateBufferCapacity(final double time) {
 		this.bufferCap = this.simulatedFlowCapacity;
 		if (this.buffercap_accumulate < 1.0) {
-			this.buffercap_accumulate += this.timeCapFraction;
+			this.buffercap_accumulate += this.flowCapFraction;
 		}
 	}
 
-	void addParking(final Vehicle veh) {
+	/*package*/ void addParking(final Vehicle veh) {
 		this.parkingList.add(veh);
 		this.queueNetworkLayer.setLinkActivation(
 				veh.getDepartureTime_s(), this);
@@ -417,9 +400,9 @@ public class QueueLink {
 		activateLink();
 		veh.setCurrentLink(this.link);
 		this.vehQueue.add(veh);
-		veh.setDepartureTime_s((int) (now + this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME)));
+		veh.setDepartureTime_s((int) (now + this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME)));
 		QueueSimulation.getEvents().processEvent(
-				new EventLinkEnter(now, veh.getDriverID(), veh.getCurrentLegNumber(),
+				new EventLinkEnter(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 						this.link.getId().toString(), veh.getDriver(), this.link));
 	}
 
@@ -439,8 +422,7 @@ public class QueueLink {
 		return this.simulatedFlowCapacity;
 	}
 
-
-	Vehicle popFirstFromBuffer() {
+	/*package*/ Vehicle popFirstFromBuffer() {
 		double now = SimulationTimer.getTime();
 		Vehicle veh = this.buffer.poll();
 		Vehicle v2 = this.buffer.peek();
@@ -448,9 +430,8 @@ public class QueueLink {
 			v2.setLastMovedTime(now);
 		}
 
-		QueueSimulation.getEvents().processEvent(
-				new EventLinkLeave(now, veh.getDriverID(), veh.getCurrentLegNumber(),
-						this.link.getId().toString(), veh.getDriver(), this.link));
+		QueueSimulation.getEvents().processEvent(new EventLinkLeave(now, veh.getDriver().getId().toString(),
+				veh.getCurrentLegNumber(), this.link.getId().toString(), veh.getDriver(), this.link));
 
 		return veh;
 	}
@@ -458,13 +439,10 @@ public class QueueLink {
 	private void addToBuffer(final Vehicle veh, final double now) {
 		if (this.bufferCap >= 1.0) {
 			this.bufferCap--;
-		}
-		else if (this.buffercap_accumulate >= 1.0) {
+		} else if (this.buffercap_accumulate >= 1.0) {
 			this.buffercap_accumulate--;
-		}
-		else {
-			throw new RuntimeException("Buffer of link " + this.link.getId()
-					+ " has no space left!");
+		} else {
+			throw new RuntimeException("Buffer of link " + this.link.getId() + " has no space left!");
 		}
 		this.buffer.add(veh);
 		veh.setLastMovedTime(now);
@@ -492,16 +470,14 @@ public class QueueLink {
 	}
 
 	/**
-	 * @return <code>true</code> if there are less vehicles in buffer than the
-	 *         flowCapacity's ceil
+	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
 	private boolean hasBufferSpace() {
 		return ((this.bufferCap >= 1.0) || (this.buffercap_accumulate >= 1.0));
 	}
 
 	/**
-	 * @return The value for coloring the link in NetVis. Actual: veh count /
-	 *         space capacity
+	 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
 	 */
 	public double getDisplayableSpaceCapValue() {
 		return (this.buffer.size() + this.vehQueue.size()) / this.storageCapacity;
@@ -556,11 +532,9 @@ public class QueueLink {
 		String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
 		if ("queue".equals(snapshotStyle)) {
 			getVehiclePositionsQueue(positions);
-		}
-		else if ("equiDist".equals(snapshotStyle)) {
+		} else if ("equiDist".equals(snapshotStyle)) {
 			getVehiclePositionsEquil(positions);
-		}
-		else {
+		} else {
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
 		}
 		return positions;
@@ -579,57 +553,40 @@ public class QueueLink {
 	public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
 		double now = SimulationTimer.getTime();
 		int cnt = 0;
-		double queueEnd = this.link.getLength(); // the length of the queue jammed vehicles
-																		// build at the end of the link
-		double storageCapFactor = Gbl.getConfig().simulation()
-				.getStorageCapFactor();
+		double queueEnd = this.link.getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
+		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 		double vehLen = Math.min( // the length of a vehicle in visualization
-				this.link.getLength() / this.storageCapacity, // all vehicles must have place on
-																						// the link
-				((NetworkLayer)this.link.getLayer()).getEffectiveCellSize() / storageCapFactor); // a
-																																								// vehicle
-																																								// should
-																																								// not
-																																								// be
-																																								// larger
-																																								// than
-																																								// it's
-																																								// actual
-																																								// size
+				this.link.getLength() / (this.storageCapacity + this.flowCapCeil), // all vehicles must have place on the link
+				((NetworkLayer)this.link.getLayer()).getEffectiveCellSize() / storageCapFactor); // a vehicle should not be larger than it's actual size
 
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.buffer) {
 
 			int lane = 1 + (veh.getID() % this.link.getLanesAsInt());
 
-			int cmp = (int) (veh.getDepartureTime_s()
-					+ this.inverseSimulatedFlowCapacity + 2.0);
+			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(Time.UNDEFINED_TIME);
 			veh.setSpeed(speed);
 
-			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
-					queueEnd,// + ((NetworkLayer)this.layer).getEffectiveCellSize(),
-					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver()
-							.getVisualizerData());
+			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link, queueEnd,
+					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
 			positions.add(position);
 			cnt++;
 			queueEnd -= vehLen;
 		}
 
 		/*
-		 * place other driving cars according the following rule: - calculate the
-		 * time how long the vehicle is on the link already - calculate the position
-		 * where the vehicle should be if it could drive with freespeed - if the
-		 * position is already within the congestion queue, add it to the queue with
-		 * slow speed - if the position is not within the queue, just place the car
-		 * with free speed at that place
+		 * place other driving cars according the following rule:
+		 * - calculate the time how long the vehicle is on the link already
+		 * - calculate the position where the vehicle should be if it could drive with freespeed
+		 * - if the position is already within the congestion queue, add it to the queue with slow speed
+		 * - if the position is not within the queue, just place the car 	with free speed at that place
 		 */
 		double lastDistance = Integer.MAX_VALUE;
 		for (Vehicle veh : this.vehQueue) {
-			double travelTime = now
-					- (veh.getDepartureTime_s() - this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME));
-			double distanceOnLink = (this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME) == 0.0 ? 0.0
-					: ((travelTime / this.getLink().getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME)) * this.link.getLength()));
+			double travelTime = now - (veh.getDepartureTime_s() - this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME));
+			double distanceOnLink = (this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME) == 0.0 ? 0.0
+					: ((travelTime / this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME)) * this.link.getLength()));
 			if (distanceOnLink > queueEnd) { // vehicle is already in queue
 				distanceOnLink = queueEnd;
 				queueEnd -= vehLen;
@@ -653,11 +610,8 @@ public class QueueLink {
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(Time.UNDEFINED_TIME);
 			veh.setSpeed(speed);
 			int lane = 1 + (veh.getID() % this.link.getLanesAsInt());
-			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
-					distanceOnLink,// +
-													// ((NetworkLayer)this.layer).getEffectiveCellSize(),
-					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver()
-							.getVisualizerData());
+			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link, distanceOnLink,
+					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
 			positions.add(position);
 			lastDistance = distanceOnLink;
 		}
@@ -671,8 +625,7 @@ public class QueueLink {
 		for (Vehicle veh : this.waitingList) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
 					((NetworkLayer) this.link.getLayer()).getEffectiveCellSize(), lane, 0.0,
-					PositionInfo.VehicleState.Parking, veh.getDriver()
-							.getVisualizerData());
+					PositionInfo.VehicleState.Parking, veh.getDriver().getVisualizerData());
 			positions.add(position);
 		}
 
@@ -685,8 +638,7 @@ public class QueueLink {
 		for (Vehicle veh : this.parkingList) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
 					((NetworkLayer) this.link.getLayer()).getEffectiveCellSize(), lane, 0.0,
-					PositionInfo.VehicleState.Parking, veh.getDriver()
-							.getVisualizerData());
+					PositionInfo.VehicleState.Parking, veh.getDriver().getVisualizerData());
 			positions.add(position);
 		}
 	}
@@ -713,12 +665,10 @@ public class QueueLink {
 			// the cars in the buffer
 			for (Vehicle veh : this.buffer) {
 				int lane = 1 + veh.getID() % nLanes;
-				int cmp = (int) (veh.getDepartureTime_s()
-						+ this.inverseSimulatedFlowCapacity + 2.0);
+				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
 				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
-						distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving,
-						null);
+						distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				distFromFromNode -= cellSize;
 			}
@@ -726,12 +676,10 @@ public class QueueLink {
 			// the cars in the drivingQueue
 			for (Vehicle veh : this.vehQueue) {
 				int lane = 1 + veh.getID() % nLanes;
-				int cmp = (int) (veh.getDepartureTime_s()
-						+ this.inverseSimulatedFlowCapacity + 2.0);
+				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
 				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
-						distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving,
-						null);
+						distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				distFromFromNode -= cellSize;
 			}
@@ -747,8 +695,7 @@ public class QueueLink {
 			double distFromFromNode = this.link.getLength() - cellSize / 2.0;
 			for (Vehicle veh : this.waitingList) {
 				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
-						distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking,
-						null);
+						distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
 				positions.add(position);
 				distFromFromNode -= cellSize;
 			}
@@ -764,8 +711,7 @@ public class QueueLink {
 			double distFromFromNode = this.link.getLength() - cellSize / 2.0;
 			for (Vehicle veh : this.parkingList) {
 				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
-						distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking,
-						null);
+						distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
 				positions.add(position);
 				distFromFromNode -= cellSize;
 			}
@@ -777,9 +723,8 @@ public class QueueLink {
 
 		for (Vehicle veh : this.parkingList) {
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriverID(),
-							veh.getCurrentLegNumber(), this.link.getId().toString(), veh
-									.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
+					new EventAgentStuck(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+							this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.parkingList.size());
 		Simulation.incLost(this.parkingList.size());
@@ -787,9 +732,8 @@ public class QueueLink {
 
 		for (Vehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriverID(),
-							veh.getCurrentLegNumber(), this.link.getId().toString(), veh
-									.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
+					new EventAgentStuck(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+							this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.waitingList.size());
 		Simulation.incLost(this.waitingList.size());
@@ -797,9 +741,8 @@ public class QueueLink {
 
 		for (Vehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriverID(),
-							veh.getCurrentLegNumber(), this.link.getId().toString(), veh
-									.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
+					new EventAgentStuck(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+							this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.vehQueue.size());
 		Simulation.incLost(this.vehQueue.size());
@@ -807,9 +750,8 @@ public class QueueLink {
 
 		for (Vehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriverID(),
-							veh.getCurrentLegNumber(), this.link.getId().toString(), veh
-									.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
+					new EventAgentStuck(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+							this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.buffer.size());
 		Simulation.incLost(this.buffer.size());
@@ -877,7 +819,6 @@ public class QueueLink {
 	 * node only
 	 */
 	public boolean hasDrivingCars() {
-		return ((this.vehQueue.size() + this.waitingList.size() + this.buffer
-				.size()) != 0);
+		return ((this.vehQueue.size() + this.waitingList.size() + this.buffer.size()) != 0);
 	}
 }
