@@ -2,14 +2,28 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd" 
         [
         		<!ENTITY HOMEBASE     "/home/meisterk">
-                <!ENTITY PROJECTBASE  "workspace/MATSim">
                 <!ENTITY OUTPUTBASE   "output">
                 <!ENTITY CVSBASE      "sandbox00">
+                <!ENTITY SHOPSMODULE  "ivt/studies/switzerland/facilities/shopsOf2005">
         ]
 >
+
+<!-- for ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities() -->
+
+<!--
 <config>
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/ivt/studies/switzerland/facilities/shopsOf2005/shopsOf2005_geocoded.kml" />
-		<param name="outputFacilitiesFile" value="&HOMEBASE;/&PROJECTBASE;/&OUTPUTBASE;/facilities_shopsOf2005.xml" />
+		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/shopsOf2005_geocoded.kml" />
+		<param name="outputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/facilities_shopsOf2005.xml" />
+	</module>
+</config>
+-->
+
+<!-- for ShopsOf2005ToFacilities.shopsToTXT() -->
+
+<config>
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/facilities_shopsOf2005.xml" />
+		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/facilities_shopsOf2005.txt" />
 	</module>
 </config>

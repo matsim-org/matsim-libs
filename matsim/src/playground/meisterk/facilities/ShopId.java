@@ -2,7 +2,7 @@ package playground.meisterk.facilities;
 
 public class ShopId {
 	
-	private static final String SEPARATOR = "_";
+	public static final String SEPARATOR = "_";
 	
 	private String retailer = null;
 	private String shopType = null;
@@ -24,6 +24,19 @@ public class ShopId {
 		this.street = street;
 	}
 
+	public ShopId(String shopIdString) throws java.lang.ArrayIndexOutOfBoundsException {
+		
+		String tokens[] = shopIdString.split(ShopId.SEPARATOR);
+		
+		this.retailer = tokens[0];
+		this.shopType = tokens[1]; 
+		this.shopDescription = tokens[2]; 
+		this.businessRegion = tokens[3];
+		this.postcode = tokens[4];
+		this.city = tokens[5]; 
+		this.street = tokens[6];
+		
+	}
 
 	public String getShopId() {
 		
@@ -50,8 +63,36 @@ public class ShopId {
 		
 	}
 	
-	public String getAddress() {
-		return this.street + ", " + this.postcode + " " + this.city + ", Schweiz";
+	public String getAddressForGeocoding() {
+		return this.street + ", " + this.city + ", Schweiz";
+	}
+
+	public String getRetailer() {
+		return retailer;
+	}
+
+	public String getShopType() {
+		return shopType;
+	}
+
+	public String getShopDescription() {
+		return shopDescription;
+	}
+
+	public String getBusinessRegion() {
+		return businessRegion;
+	}
+
+	public String getPostcode() {
+		return postcode;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public String getStreet() {
+		return street;
 	}
 	
 }
