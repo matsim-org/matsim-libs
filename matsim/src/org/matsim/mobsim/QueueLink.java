@@ -473,7 +473,7 @@ public class QueueLink {
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
 	private boolean hasBufferSpace() {
-		return ((this.bufferCap >= 1.0) || (this.buffercap_accumulate >= 1.0));
+		return ((this.buffer.size() < this.flowCapCeil) && ((this.bufferCap >= 1.0) || (this.buffercap_accumulate >= 1.0)));
 	}
 
 	/**
