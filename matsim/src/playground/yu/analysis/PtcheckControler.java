@@ -112,7 +112,8 @@ public class PtcheckControler extends Controler {
 									+ cf.getParam("planCalcScore",
 											"travelingPt")
 									+ "\t"
-									+ ctl.getScoreStats().getHistory()[3][it]
+									+ ctl.getScoreStats().getHistory()[3][it
+											- ctl.getFirstIteration()]
 									+ "\t"
 									+ catl.getAverageTripLength()
 									+ "\t"

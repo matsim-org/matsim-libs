@@ -43,7 +43,7 @@ public class Volume2QGIS {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MATSimNet2Shape mn2s = new MATSimNet2Shape();
+		MATSimNet2QGIS mn2s = new MATSimNet2QGIS();
 		/*/////////////////////////////////////////////////////
 		// write MATSim-network to Shp-file
 		// /////////////////////////////////////////////////////

@@ -59,7 +59,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author ychen
  * 
  */
-public class MATSimNet2Shape {
+public class MATSimNet2QGIS {
 	/**
 	 * this class is only a copy of
 	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class>
@@ -142,10 +142,5 @@ public class MATSimNet2Shape {
 		Events events = new Events();
 		events.addHandler(handler);
 		new MatsimEventsReader(events).readFile(eventsFilename);
-	}
-
-	/**
-	 * @param args
-	 */
-	
+	}	
 }

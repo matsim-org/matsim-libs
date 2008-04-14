@@ -71,20 +71,21 @@ public class MergePlans {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// final String path = "../data/ivtch/input/";
-		// final String netFilename = path + "ivtch-osm.xml";
-		// final String plansFilenameA = path +
-		// "plans_all_zrh30km_10pct.xml.gz";
-		// final String plansFilenameB = path
-		// + "plans_miv_zrh30km_transitincl_10pct.xml.gz";
-		// final String outputPlansFilename = path
-		// + "plans_all_zrh30km_transitincl_10pct.xml.gz";
+		final String path = "../data/ivtch/input/";
+		final String netFilename = path + "ivtch-osm.xml";
+		final String plansFilenameA = path + "plans_all_zrh30km_10pct.xml.gz";
+		final String plansFilenameB = path
+				+ "plans_miv_zrh30km_transitincl_10pct.xml.gz";
+		final String outputPlansFilename = path
+				+ "plans_all_zrh30km_transitincl_10pct.xml.gz";
 
-		final String path = "test/yu/equil_test/";
-		final String netFilename = path + "equil_net.xml";
-		final String plansFilenameA = path + "plans100pt.xml";
-		final String plansFilenameB = path + "plans300.xml";
-		final String outputPlansFilename = path + "sum_plans_100pt_201-300.xml";
+		// final String path = "test/yu/equil_test/";
+		// final String netFilename = path + "equil_net.xml";
+		// final String plansFilenameA = path + "plans100pt.xml";
+		// final String plansFilenameB = path + "plans300.xml";
+		// final String outputPlansFilename = path +
+		// "sum_plans_100pt_201-300.xml";
+
 		final int lower_limit = 1000000000;
 
 		World world = Gbl.getWorld();
