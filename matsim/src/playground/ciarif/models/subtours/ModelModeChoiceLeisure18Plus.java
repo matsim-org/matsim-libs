@@ -79,8 +79,8 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 	
 	@Override
 	protected final double calcCarUtil() {
-		if (license==0)  {return Double.NEGATIVE_INFINITY;}
-		if ((prev_mode == 3)||(prev_mode == 0)) {
+		
+		if ((prev_mode == 3)||(prev_mode == 0)&& license ==1) {
 			double util = 0.0;
 			util += B1_CONST * 1.0;
 			util += B1_Dist * dist_subtour;

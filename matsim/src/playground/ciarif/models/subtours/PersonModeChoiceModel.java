@@ -102,8 +102,10 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		double dist_h_w = 0.0;
 		while (act_it.hasNext()) {
 			Act act = (Act)act_it.next();
-			if (H.equals(act.getType())) { home_coord = act.getCoord();}
-			else if (W.equals(act.getType())) { work_coord = act.getCoord(); }
+			//String act_type = act.getType().substring(0,1);
+			//System.out.println("type" + act_type);
+			if (H.equals(act.getType().substring(0,1))) { home_coord = act.getCoord();}
+			else if (W.equals(act.getType().substring(0,1))) { work_coord = act.getCoord(); }
 		}
 		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
 		if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
@@ -117,25 +119,28 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			CoordI prev = start;
 			String type = null;
 			for (int k=1; k<subtour.size()-1; k=k+1) { 
-				type = ((Act)plan.getActsLegs().get(subtour.get(k))).getType();
+				type = ((Act)plan.getActsLegs().get(subtour.get(k))).getType().substring(0,1);
+				System.out.println("Activity = " + type);
 				if (mainpurpose == 1){
-					if (type == W) { mainpurpose = 0; break; }
+					if (type.equals(W)) { mainpurpose = 0; break; }
 				}
 				else if (mainpurpose == 2) {
-					if (type == W) { mainpurpose = 0; break; }
-					else if (type == E) { mainpurpose = 1; }
+					if (type.equals(W)) { mainpurpose = 0; break; }
+					else if (type.equals(E)) { mainpurpose = 1;}
 				}
 				else if (mainpurpose == 3) {
-					if (type == W) {mainpurpose = 0; break; }
-					else if (type == E) {mainpurpose = 1; break;}
-					else if (type == S) {mainpurpose = 2;}
+					if (type.equals(W)) {mainpurpose = 0; break; }
+					else if (type.equals(E)) {mainpurpose = 1; break;}
+					else if (type.equals (S)) {mainpurpose = 2;}
 				} 
 				CoordI curr = ((Act)plan.getActsLegs().get(subtour.get(k))).getCoord();
 				d = d + curr.calcDistance(prev);
 				prev = curr;
 			}
 			d = d/1000.0;
-			
+			dist_h_w = dist_h_w/1000.0;
+			System.out.println("dist = " + d);
+			System.out.println("dist_h_w = " + dist_h_w);
 			// Defining previous mode
 			int prev_mode = 0;
 			if (subtour.get(0) != 0) {
@@ -167,18 +172,20 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			// setting person parameters
 			System.out.println(model);
 			model.setDistanceHome2Work(dist_h_w);
+			System.out.println("dist_h_w: " + dist_h_w);
 			model.setAge(plan.getPerson().getAge());
 			//model.setHHDimension(p.getHousehold().getPersonCount());
 			model.setLicenseOwnership(plan.getPerson().hasLicense());
+			System.out.println("license: " + model.license);
 			model.setCar(plan.getPerson().getCarAvail());
 			model.setTickets(plan.getPerson().getTravelcards());
-			model.setLicenseOwnership(plan.getPerson().hasLicense());
+			System.out.println("Travelcards: " + model.tickets);
 			model.setBike(has_bike);
 			model.setMale (plan.getPerson().getSex());
-			int udeg = 3; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
+			int udeg = 5; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
 			model.setUrbanDegree(udeg);
 			model.setMainPurpose(mainpurpose);
-			model.setDistanceTour(d); // model needs meters! TODO check dimensions of distances!!!!
+			model.setDistanceTour(d); // model needs meters! 
 			model.setPrevMode(prev_mode);
 			model.setHomeCoord(home_coord);
 			// getting the chosen mode
@@ -219,12 +226,12 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		subtours = pste.getSubtours();
 		subtour_idx = pste.getSubtourIdx();
 		System.out.println("subtour_idx != " + subtour_idx );
-		//this.handleSubTours(plan,subtours,subtour_idx);
+		this.handleSubTours(plan,subtours,subtour_idx);
 		PersonSubtourHandler psh = new PersonSubtourHandler ();
-		PersonSubtour personSubtour = new PersonSubtour();
+		PersonSubtour personSubtour = new PersonSubtour(); //TODO Change the constructor and place it below the psh.run
 		psh.run (plan,subtours,subtour_idx);
 		personSubtour = psh.getPers_sub();
-		personSubtour.setPerson_id(person.getId());
+		personSubtour.setPerson_id(person.getId());	
 		
 //		System.out.println("subtours != " + subtours );
 //		Iterator i= subtours.entrySet().iterator();
@@ -232,7 +239,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 //			Map.Entry e = (Map.Entry)i.next();
 //			Integer key=(Integer)e.getKey();
 //			ArrayList<Integer> values =(ArrayList<Integer>)e.getValue();
-//			Subtour subtour =new Subtour();
+//			Subtour subtour = new Subtour();
 //			//subtour.setId(key);
 //			//subtour.setPurpose(1);
 //			
@@ -242,6 +249,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 //			}
 //			personSubtour.setSubtour(subtour);			
 //		}
+		
 		this.personSubtours.add(personSubtour);		
 	}
 	

@@ -37,7 +37,7 @@ public abstract class ModelModeChoice {
 	protected double udeg; // degree of urbanization [2-5] (1=urbanized=reference)
 	protected double license; // yes = 1; no = 0;
 	protected double dist_subtour; // distance of the tour (in kilometers)
-	protected double dist_w_e; // distance between home and work or education facility (in meter)
+	protected double dist_h_w; // distance between home and work or education facility (in meter)
 	protected double tickets; // holds some kind of season tickets 
 	protected int purpose; // main purpose of the tour (Work = 1, Education = 2, Shop=3)
 	protected String car; // av. of car (Always, Sometimes, Never)
@@ -56,7 +56,7 @@ public abstract class ModelModeChoice {
 		this.udeg = -1.0;
 		this.license = -1.0;
 		this.dist_subtour = -1.0;
-		this.dist_w_e = -1.0;
+		this.dist_h_w = -1.0;
 		this.car= null;
 		this.tickets = -1.0;
 		this.purpose = -1;
@@ -84,7 +84,7 @@ public abstract class ModelModeChoice {
 	
 	public final boolean setDistanceHome2Work(double distance) {
 		if (distance < 0.0) { return false; }
-		this.dist_w_e = distance;
+		this.dist_h_w = distance;
 		return true;
 	}
 	
@@ -216,7 +216,7 @@ public abstract class ModelModeChoice {
 		                   "udeg=" + udeg +
 		                   "license=" + license +
 		                   "dist_subtour=" + dist_subtour +
-		                   "dist_w_e=" + dist_w_e +
+		                   "dist_w_e=" + dist_h_w +
 		                   "tickets=" + tickets +
 		                   "purpose=" + purpose +
 		                   "car=" + car +

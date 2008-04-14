@@ -33,6 +33,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 //import playground.balmermi.census2000.data.Household;
@@ -48,7 +49,7 @@ public class PersonInitDemandSummaryTable {
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
 	private List<PersonSubtour> personSubtours;
-	
+		
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -58,6 +59,7 @@ public class PersonInitDemandSummaryTable {
 		this.personSubtours = personSubtours;
 		try {
 			fw = new FileWriter(outfile);
+			System.out.println(outfile);
 			out = new BufferedWriter(fw);
 			out.write("pid \t subtour_id \t purpose\t prev_subtour\t start_x \t start_y \t mode \t distance\n");
 			out.flush();
@@ -104,7 +106,7 @@ public class PersonInitDemandSummaryTable {
 					out.write(subtour.getMode()+"\t");
 					out.write(subtour.getDistance()+"\n");
 					
-					System.out.println("Anzahl"+subtour.getPurpose());
+					//System.out.println("Anzahl"+subtour.getPurpose());
 					
 					
 					out.flush();

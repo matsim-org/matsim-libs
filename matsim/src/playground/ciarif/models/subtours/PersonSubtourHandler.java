@@ -80,6 +80,7 @@ public class PersonSubtourHandler {
 				if (curr.getX()>0 & curr.getY()>0) {d = d + curr.calcDistance(prev);}
 				prev = curr;
 				String mode =((Leg)plan.getActsLegs().get(subtour.get(k)-1)).getMode();
+				
 				int modechoice = 0;
 				if (mode == CAR) {modechoice=0;}
 				else if (mode == PT) {modechoice=1;}
