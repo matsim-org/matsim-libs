@@ -46,6 +46,7 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -187,8 +188,9 @@ public class ShopsOf2005ToFacilities {
 
 //		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
 //		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
-		ShopsOf2005ToFacilities.shopsToTXT();
-
+//		ShopsOf2005ToFacilities.shopsToTXT();
+		ShopsOf2005ToFacilities.shopsToQuadTree();
+		
 	}
 
 	private static void prepareRawDataForGeocoding() {
@@ -1632,4 +1634,46 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
+	private static void shopsToQuadTree() {
+		
+		final double MIN_X = 70000.0;
+		final double MAX_X = 300000.0;
+		final double MIN_Y = 480000.0;
+		final double MAX_Y = 840000.0;
+		double x = 0.0;
+		double y = 0.0;
+		String facilityId = null;
+		
+		Facilities shopsOf2005 = new Facilities("shopsOf2005");
+		// construct the QuadTree with the bounding box of Switzerland with the CH1903 system
+		// stick to the reverse X/Y property of this system
+		QuadTree<Facility> facilityQuadTree = new QuadTree<Facility>(MIN_X, MAX_X, MIN_Y, MAX_Y);
+
+		System.out.println("Reading facilities xml file... ");
+		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(shopsOf2005);
+		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
+		System.out.println("Reading facilities xml file...done.");
+
+		Iterator facilityIterator = shopsOf2005.getFacilities().values().iterator();
+		System.out.println("Numvber of facilities: " + shopsOf2005.getFacilities().values().size());
+
+		while (facilityIterator.hasNext()) {
+			Facility facility = (Facility) facilityIterator.next();
+			facilityId = facility.getId().toString();
+			//System.out.println(facilityId);
+			
+			// revert x and y here
+			x = facility.getCenter().getY();
+			y = facility.getCenter().getX();
+			
+			if (!facilityQuadTree.put(x, y, facility)) {
+				System.out.println("Error inserting facility in quad tree.");
+			}
+			
+		}
+		
+		System.out.println("Size of quadtree: " + facilityQuadTree.size());
+		
+	}
+	
 }
