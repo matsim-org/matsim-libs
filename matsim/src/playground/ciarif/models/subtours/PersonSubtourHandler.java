@@ -96,7 +96,7 @@ public class PersonSubtourHandler {
 			sub.setDistance(d);
 			
 			// Defining previous mode
-			int prev_subtour = -1;
+			int prev_subtour = 5; // The sub-tour starts at the agent's home location
 			if (subtour.get(0) != 0) {
 				for (int j=subtours.size()-1; j>=0; j=j-1) {
 					if (subtours.get(j).contains(subtour.get(0))) {

@@ -67,7 +67,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 		// when the tour (plan) has work as main purpose
 		double util = 0.0;
 		util += B5_CONST * 1.0;
-		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 5)) {util += B5_Prev * 1.0;}
+		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B5_Prev * 1.0;}
 		System.out.println("Util walk = " + util);
 		return util;
 	}
@@ -75,12 +75,12 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 	@Override
 	protected final double calcBikeUtil() {
 		if (bike) {
-			if ((prev_mode == 4)||(prev_mode == 0) ){
+			if ((prev_mode == 3)||(prev_mode == 5) ){
 				double util = 0.0;
 				util += B4_CONST * 1.0;
 				util += B4_Dist * dist_subtour;
 				util += B4_H_W * dist_h_w;
-				if (prev_mode == 4) {util += B4_Prev * prev_mode;}
+				if (prev_mode == 3) {util += B4_Prev * prev_mode;}
 				return util;
 			}
 			else {return Double.NEGATIVE_INFINITY;}
@@ -89,16 +89,14 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 	}
 	
 	@Override
-	// TODO Warning! The fact that a person has a driving license isn't taken into account yet!!!!!!
-	// If a person doesn't own a driving license shouldn't be allowed to have car as option!!!!!
+
 	protected final double calcCarUtil() {
 		
 		if (license == 1){
-			System.out.println("prev_mode_model = " + prev_mode);
-			if ((prev_mode == 3)||(prev_mode == 0)) {
+			//System.out.println("prev_mode_model = " + prev_mode);
+			if ((prev_mode == 5)||(prev_mode == 0)) {
 				double util = 0.0;
 				util += B1_CONST * 1.0;
-				System.out.println("Util car = " + util);
 				System.out.println ("dist_subtour =" + dist_subtour);
 				util += B1_Dist * dist_subtour; System.out.println ("B1_Dist * dist_subtour =" + B1_Dist * dist_subtour);
 				util += B1_H_W * dist_h_w; System.out.println ("B1_H_W * dist_h_w = " + B1_H_W * dist_h_w);
@@ -145,7 +143,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 			util += B3_CONST * 1.0;
 			util += B3_Dist * dist_subtour;
 			util += B3_H_W * dist_h_w;
-			if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 5)) {util += B3_Prev * 1.0;}
+			if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B3_Prev * 1.0;}
 			if (age <= 30 & age > 18) { util += B3_18_30 * 1.0; }
 			System.out.println("Util ride = " + util);
 			return util;

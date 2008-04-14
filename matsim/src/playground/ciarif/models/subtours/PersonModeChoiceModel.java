@@ -102,14 +102,12 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		double dist_h_w = 0.0;
 		while (act_it.hasNext()) {
 			Act act = (Act)act_it.next();
-			//String act_type = act.getType().substring(0,1);
-			//System.out.println("type" + act_type);
 			if (H.equals(act.getType().substring(0,1))) { home_coord = act.getCoord();}
 			else if (W.equals(act.getType().substring(0,1))) { work_coord = act.getCoord(); }
 		}
 		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
 		if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
-		if (work_coord != null) { dist_h_w = work_coord.calcDistance(home_coord); }
+		if (work_coord != null) { dist_h_w = work_coord.calcDistance(home_coord); dist_h_w = dist_h_w/1000.0;}
 		TreeMap<Integer, Integer> modeSubTours = new TreeMap<Integer, Integer>();
 		for (int i=subtour_idx-1; i>=0; i=i-1) {
 			ArrayList<Integer> subtour = subtours.get(i);
@@ -120,7 +118,6 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			String type = null;
 			for (int k=1; k<subtour.size()-1; k=k+1) { 
 				type = ((Act)plan.getActsLegs().get(subtour.get(k))).getType().substring(0,1);
-				System.out.println("Activity = " + type);
 				if (mainpurpose == 1){
 					if (type.equals(W)) { mainpurpose = 0; break; }
 				}
@@ -138,11 +135,11 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 				prev = curr;
 			}
 			d = d/1000.0;
-			dist_h_w = dist_h_w/1000.0;
 			System.out.println("dist = " + d);
 			System.out.println("dist_h_w = " + dist_h_w);
+			System.out.println("Activity type = " + type);
 			// Defining previous mode
-			int prev_mode = 0;
+			int prev_mode = 5; // It means that the sub-tour starts at the agent's home location
 			if (subtour.get(0) != 0) {
 				for (int j=subtours.size()-1; j>=0; j=j-1) {
 					if (subtours.get(j).contains(subtour.get(0))) {
@@ -150,6 +147,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 					}
 				}	
 			}
+			System.out.println("prev_mode = " + prev_mode);
 			
 			// choose mode choice model based on main purpose
 			if (plan.getPerson().getAge() >=18) {
@@ -188,7 +186,9 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			model.setDistanceTour(d); // model needs meters! 
 			model.setPrevMode(prev_mode);
 			model.setHomeCoord(home_coord);
+			
 			// getting the chosen mode
+			System.out.println("prev_mode_model = " + model.prev_mode);
 			int modechoice = model.calcModeChoice();
 			String mode = null;
 			if (modechoice == 0) { mode = CAR; }
@@ -197,10 +197,9 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			else if (modechoice == 3) { mode = BIKE; }
 			else if (modechoice == 4) { mode = WALK; }
 			else { Gbl.errorMsg("Mode choice returns undefined value!"); }
-			
+			System.out.println("modechoice = " + modechoice);
 			modeSubTours.put(i,modechoice);
 			System.out.println("mode sub tour = " + modeSubTours);
-			System.out.println("prev_mode = " + prev_mode);
 			System.out.println("modechoice " +  i + " = " + modechoice);
 			System.out.println("subtour= " + subtour);
 			
@@ -232,23 +231,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		psh.run (plan,subtours,subtour_idx);
 		personSubtour = psh.getPers_sub();
 		personSubtour.setPerson_id(person.getId());	
-		
-//		System.out.println("subtours != " + subtours );
-//		Iterator i= subtours.entrySet().iterator();
-//		while (i.hasNext()) {
-//			Map.Entry e = (Map.Entry)i.next();
-//			Integer key=(Integer)e.getKey();
-//			ArrayList<Integer> values =(ArrayList<Integer>)e.getValue();
-//			Subtour subtour = new Subtour();
-//			//subtour.setId(key);
-//			//subtour.setPurpose(1);
-//			
-//			Iterator<Integer> j = values.iterator();
-//			while (j.hasNext()) {
-//				subtour.setNode(new Integer(j.next()));
-//			}
-//			personSubtour.setSubtour(subtour);			
-//		}
+
 		
 		this.personSubtours.add(personSubtour);		
 	}

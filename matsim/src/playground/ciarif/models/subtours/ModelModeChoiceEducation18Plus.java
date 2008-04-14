@@ -59,29 +59,33 @@ public class ModelModeChoiceEducation18Plus extends ModelModeChoice {
 			// when the tour (plan) has education as main purpose
 			double util = 0.0;
 			util += B5_CONST * 1.0;
-			if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 5)) {util += B5_Prev * 1.0;}
+			if ((prev_mode == 1) || (prev_mode == 2)|| (prev_mode == 4)) {util += B5_Prev * 1.0;}
 			return util;
 		}
 
 		@Override
 		protected final double calcBikeUtil() {
-			if (!bike) { return Double.NEGATIVE_INFINITY; }
-			if ((prev_mode == 4)||(prev_mode == 0) ) {
-				double util = 0.0;
-				util += B4_CONST * 1.0;
-				util += B4_Dist * dist_subtour;
-				return util;
+			if (bike) { 
+				if ((prev_mode == 3)||(prev_mode == 5) ) {
+					double util = 0.0;
+					util += B4_CONST * 1.0;
+					util += B4_Dist * dist_subtour;
+					return util;
+				}
+				else {return Double.NEGATIVE_INFINITY;}	
 			}
-			else {return Double.NEGATIVE_INFINITY;}	
+			else {return Double.NEGATIVE_INFINITY;}
 		}
 		
 		@Override
 		protected final double calcCarUtil() {
-			if (((prev_mode == 3)||(prev_mode == 0)&& license == 1)) {
+			if (license == 1){
+				//System.out.println("prev_mode_model = " + prev_mode);
+				if ((prev_mode == 5)||(prev_mode == 0)) {
 				double util = 0.0;
 				util += B1_CONST * 1.0;
 				util += B1_Dist * dist_subtour;
-				if (prev_mode == 1) {util += B1_Prev * 1.0;}
+				if (prev_mode == 0) {util += B1_Prev * 1.0;}
 				if (car == "always") { util += B1_Car_Always * 1.0; }
 				if (udeg == 1) { /* reference type */ }
 				else if (udeg == 2) { util += B1_T2 * 1.0; }
@@ -90,8 +94,10 @@ public class ModelModeChoiceEducation18Plus extends ModelModeChoice {
 				else if (udeg == 5) { util += B1_T5 * 1.0; }
 				else { Gbl.errorMsg("This should never happen!"); }
 				return util;
+				}
+				else {return Double.NEGATIVE_INFINITY;}
 			}
-			else {return Double.NEGATIVE_INFINITY;}	
+			else {return Double.NEGATIVE_INFINITY;}
 		}
 		 
 		@Override
@@ -99,7 +105,7 @@ public class ModelModeChoiceEducation18Plus extends ModelModeChoice {
 			double util = 0.0;
 			util += B2_Season * tickets ;
 			util += B2_Dist * dist_subtour;
-			if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 5)) {util += B2_Prev * 1.0;}
+			if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B2_Prev * 1.0;}
 			if (udeg == 1) { /* reference type */ }
 			else if (udeg == 2) { util += B2_T2 * 1.0; }
 			else if (udeg == 3) { util += B2_T3 * 1.0; }
@@ -111,12 +117,15 @@ public class ModelModeChoiceEducation18Plus extends ModelModeChoice {
 
 		@Override
 		protected final double calcCarRideUtil() {
-			double util = 0.0;
-			util += B3_CONST * 1.0;
-			util += B3_Dist * dist_subtour;
-			if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 5)) {util += B3_Prev * 1.0;}
-			if (age <= 30 & age > 18) { util += B3_18_30 * 1.0; }
-			return util;
+			if (license ==0) {
+				double util = 0.0;
+				util += B3_CONST * 1.0;
+				util += B3_Dist * dist_subtour;
+				if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B3_Prev * 1.0;}
+				if (age <= 30 & age > 18) { util += B3_18_30 * 1.0; }
+				return util;
+			}
+			else {return Double.NEGATIVE_INFINITY;}
 		}
 
 	}

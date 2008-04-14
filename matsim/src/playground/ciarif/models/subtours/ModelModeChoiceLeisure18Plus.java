@@ -61,40 +61,44 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 		double util = 0.0;
 		util += B5_CONST * 1.0;
 		util += B5_Dist * dist_subtour;
-		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 5)) {util += B5_Prev * 1.0;}
+		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B5_Prev * 1.0;}
 		return util;
 	}
 
 	@Override
 	protected final double calcBikeUtil() {
-		if (!bike) { return Double.NEGATIVE_INFINITY; }
-		if ((prev_mode == 4)||(prev_mode == 0)) {
-			double util = 0.0;
-			util += B4_CONST * 1.0;
-			util += B4_Dist * dist_subtour;
-			return util;
+		if (bike) {
+			if ((prev_mode == 3)||(prev_mode == 5)) {
+				double util = 0.0;
+				util += B4_CONST * 1.0;
+				util += B4_Dist * dist_subtour;
+				return util;
+			}
+			else {return Double.NEGATIVE_INFINITY;}
 		}
 		else {return Double.NEGATIVE_INFINITY;}
 	}
 	
 	@Override
 	protected final double calcCarUtil() {
-		
-		if ((prev_mode == 3)||(prev_mode == 0)&& license ==1) {
-			double util = 0.0;
-			util += B1_CONST * 1.0;
-			util += B1_Dist * dist_subtour;
-			if (prev_mode == 1) {util += B1_Prev * 1.0;}
-			if (car == "always") { util += B1_Car_Always * 1.0; }
-			if (udeg == 1) { /* reference type */ }
-			else if (udeg == 2) { util += B1_T2 * 1.0; }
-			else if (udeg == 3) { util += B1_T3 * 1.0; }
-			else if (udeg == 4) { util += B1_T4 * 1.0; }
-			else if (udeg == 5) { util += B1_T5 * 1.0; }
-			else { Gbl.errorMsg("This should never happen!"); }
-			return util;
+		if (license == 1) {
+			if ((prev_mode == 5)||(prev_mode == 0)) {
+				double util = 0.0;
+				util += B1_CONST * 1.0;
+				util += B1_Dist * dist_subtour;
+				if (prev_mode == 0) {util += B1_Prev * 1.0;}
+				if (car == "always") { util += B1_Car_Always * 1.0; }
+				if (udeg == 1) { /* reference type */ }
+				else if (udeg == 2) { util += B1_T2 * 1.0; }
+				else if (udeg == 3) { util += B1_T3 * 1.0; }
+				else if (udeg == 4) { util += B1_T4 * 1.0; }
+				else if (udeg == 5) { util += B1_T5 * 1.0; }
+				else { Gbl.errorMsg("This should never happen!"); }
+				return util;
+			}
+			else {return Double.NEGATIVE_INFINITY;}	
 		}
-		else {return Double.NEGATIVE_INFINITY;}	
+		else {return Double.NEGATIVE_INFINITY;}
 	}
 	 
 	@Override
@@ -114,10 +118,13 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 
 	@Override
 	protected final double calcCarRideUtil() {
-		double util = 0.0;
-		util += B3_CONST * 1.0;
-		if (age >= 18 & age < 30) {util += B3_18_30 * 1.0;}
-		if (age >= 60 ) { util += B3_60 * 1.0; }
-		return util;
+		if (license ==0) {
+			double util = 0.0;
+			util += B3_CONST * 1.0;
+			if (age >= 18 & age < 30) {util += B3_18_30 * 1.0;}
+			if (age >= 60 ) { util += B3_60 * 1.0; }
+			return util;
+		}
+		else {return Double.NEGATIVE_INFINITY;}
 	}
 }

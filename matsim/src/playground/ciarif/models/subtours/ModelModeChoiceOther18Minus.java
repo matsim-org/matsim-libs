@@ -55,14 +55,16 @@ public class ModelModeChoiceOther18Minus extends ModelModeChoice {
 
 	@Override
 	protected final double calcBikeUtil() {
-		if (!bike) { return Double.NEGATIVE_INFINITY; }
-		if ((prev_mode == 4)|| (prev_mode == 0)) {
-			double util = 0.0;
-			util += B4_CONST * 1.0;
-			util += B4_Dist * dist_subtour;
-			return util;
+		if (bike) {
+			if ((prev_mode == 3)|| (prev_mode == 5)) {
+				double util = 0.0;
+				util += B4_CONST * 1.0;
+				util += B4_Dist * dist_subtour;
+				return util;
+			}
+			else {return Double.NEGATIVE_INFINITY;}
 		}
-		else {return Double.NEGATIVE_INFINITY;}
+		else { return Double.NEGATIVE_INFINITY; }
 	}
 	
 	@Override

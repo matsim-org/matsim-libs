@@ -136,7 +136,7 @@ public abstract class ModelModeChoice {
 	}
 	
 	public final boolean setPrevMode(int prev_mode) {
-		if ((prev_mode < 1) || (5 < prev_mode)) { return false; }
+		if ((prev_mode < 0) || (5 < prev_mode)) { return false; }
 		this.prev_mode = prev_mode;
 		return true;
 	}
