@@ -41,6 +41,7 @@ public class AllTests {
 
 		TestSuite suite = new TestSuite("All tests for org.matsim");
 		//$JUnit-BEGIN$
+		suite.addTest(org.matsim.basic.v01.AllTests.suite());
 		suite.addTest(org.matsim.config.AllTests.suite());
 		suite.addTest(org.matsim.controler.AllTests.suite());
 		suite.addTest(org.matsim.counts.AllTests.suite());
