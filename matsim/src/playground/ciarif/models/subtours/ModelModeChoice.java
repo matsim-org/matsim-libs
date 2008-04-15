@@ -45,6 +45,7 @@ public abstract class ModelModeChoice {
 	protected boolean bike; // bike ownership
 	protected double prev_mode; // 1= car; 2= Pt; 3= Car passenger; 4= Bike; 5= Walk;
 	protected CoordI home_coord; //Coordinates of the home facility of the agent
+	protected boolean ride; // states if a car lift is possible, to avoid too much ride instead of pt, to check about the reason
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -61,6 +62,7 @@ public abstract class ModelModeChoice {
 		this.tickets = -1.0;
 		this.purpose = -1;
 		this.bike = false;
+		this.ride= false;
 		this.prev_mode = -1.0;
 		//this.home_coord.setXY(-1.0,-1.0);
 		Gbl.random.nextDouble();
@@ -147,6 +149,9 @@ public abstract class ModelModeChoice {
 		return true;
 	}
 	
+	public void setRide(boolean ride) {
+		this.ride = ride;
+	}
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
@@ -222,6 +227,7 @@ public abstract class ModelModeChoice {
 		                   "car=" + car +
 		                   "bike=" + bike);
 	}
+
 }
 
 

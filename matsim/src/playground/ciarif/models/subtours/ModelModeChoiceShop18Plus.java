@@ -58,6 +58,7 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 		util += B5_CONST * 1.0;
 		util += B5_Dist * dist_subtour;
 		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B5_Prev * 1.0;}
+		System.out.println("Util walk = " + util);
 		return util;
 	}
 
@@ -68,6 +69,7 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 				double util = 0.0;
 				util += B4_CONST * 1.0;
 				util += B4_Dist * dist_subtour;
+				System.out.println("Util bike = " + util);
 				return util;
 			}
 			else {return Double.NEGATIVE_INFINITY;}	
@@ -84,12 +86,13 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 				util += B1_Dist * dist_subtour;
 				if (prev_mode == 0) {util += B1_Prev * 1.0;}
 				if (car == "always") { util += B1_Car_Always * 1.0; }
-				if (udeg == 1) { /* reference type */ }
+				if (udeg == 1) { util += 0;/* reference type */ }
 				else if (udeg == 2) { util += B1_T2 * 1.0; }
 				else if (udeg == 3) { util += B1_T3 * 1.0; }
 				else if (udeg == 4) { util += B1_T4 * 1.0; }
 				else if (udeg == 5) { util += B1_T5 * 1.0; }
 				else { Gbl.errorMsg("This should never happen!"); }
+				System.out.println("Util car = " + util);
 				return util;
 			}
 			else {return Double.NEGATIVE_INFINITY;}
@@ -103,23 +106,28 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 		util += B2_Season * tickets ;
 		util += B2_Dist * dist_subtour;
 		if (car == "never") { util += B2_Car_Never *  1.0; }
-		if (udeg == 1) { /* reference type */ }
+		if (udeg == 1) { util += 0;/* reference type */ }
 		else if (udeg == 2) { util += B2_T2 * 1.0; }
 		else if (udeg == 3) { util += B2_T3 * 1.0; }
 		else if (udeg == 4) { util += B2_T4 * 1.0; }
 		else if (udeg == 5) { util += B2_T5 * 1.0; }
 		else { Gbl.errorMsg("This should never happen!"); }
+		System.out.println("Util pt = " + util);
 		return util;
 	}
 
 	@Override
 	protected final double calcCarRideUtil() {
 		if (license == 0) {
-			double util = 0.0;
-			util += B5_CONST * 1.0;
-			if (age >= 18 & age < 30) {util += B3_18_30 * 1.0;}
-			if (age >= 60 ) { util += B3_60 * 1.0; }
-			return util;
+			if (ride) {
+				double util = 0.0;
+				util += B5_CONST * 1.0;
+				if (age >= 18 & age < 30) {util += B3_18_30 * 1.0;}
+				if (age >= 60 ) { util += B3_60 * 1.0; }
+				System.out.println("Util ride = " + util);
+				return util;
+			}
+			else {return Double.NEGATIVE_INFINITY;}
 		}
 		else {return Double.NEGATIVE_INFINITY;}
 	}

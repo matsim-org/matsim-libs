@@ -63,28 +63,31 @@ public class PersonSubtourHandler {
 			CoordI prev = start;
 			String type = null;
 			for (int k=1; k<subtour.size()-1; k=k+1) { 
-				type = ((Act)plan.getActsLegs().get(subtour.get(k))).getType();
+				type = ((Act)plan.getActsLegs().get(subtour.get(k))).getType().substring(0,1);
 				if (mainpurpose == 1){
-					if (type == W) { mainpurpose = 0;}//; break; }
+					if (type.equals(W)) { mainpurpose = 0;}// break; }
 				}
 				else if (mainpurpose == 2) {
-					if (type == W) { mainpurpose = 0;}// break; }
-					else if (type == E) { mainpurpose = 1; }
+					if (type.equals(W)) { mainpurpose = 0;}// break; }
+					else if (type.equals(E)) { mainpurpose = 1;}// break; }
 				}
 				else if (mainpurpose == 3) {
-					if (type == W) {mainpurpose = 0;}// break; }
-					else if (type == E) {mainpurpose = 1;}// break;}
-					else if (type == S) {mainpurpose = 2;}
+					if (type.equals(W)) {mainpurpose = 0;} //break; }
+					else if (type.equals(E)) {mainpurpose = 1;}// break;}
+					else if (type.equals(S)) {mainpurpose = 2;}
 				} 
 				CoordI curr = ((Act)plan.getActsLegs().get(subtour.get(k))).getCoord();
 				if (curr.getX()>0 & curr.getY()>0) {d = d + curr.calcDistance(prev);}
 				prev = curr;
-				String mode =((Leg)plan.getActsLegs().get(subtour.get(k)-1)).getMode();
 				
+				// Getting the main mode at the sub-tour level
+				String mode =((Leg)plan.getActsLegs().get(subtour.get(k)-1)).getMode();
+				int license = 0;
+				if (plan.getPerson().hasLicense()){license =1;}
 				int modechoice = 0;
 				if (mode == CAR) {modechoice=0;}
 				else if (mode == PT) {modechoice=1;}
-				else if (mode == RIDE) {modechoice=2;}
+				else if ((mode == CAR) && (license==0)) {modechoice=2;}
 				else if (mode == BIKE) {modechoice=3;}
 				else if (mode == WALK) {modechoice=4;}
 				if (sub.getMode() > modechoice) {sub.setMode(modechoice);}
@@ -95,17 +98,23 @@ public class PersonSubtourHandler {
 			d = d/1000.0; // distance in the model is in Km
 			sub.setDistance(d);
 			
-			// Defining previous mode
-			int prev_subtour = 5; // The sub-tour starts at the agent's home location
-			if (subtour.get(0) != 0) {
+			// Defining previous sub-tour
+			 // The sub-tour starts at the agent's home location
+			int prev_subtour = -1;
+			System.out.println("subtour first node" + subtour.get(0));
+			if (subtour.get(0) == 0) {prev_subtour = 5;}
+			else {
 				for (int j=subtours.size()-1; j>=0; j=j-1) {
 					if (subtours.get(j).contains(subtour.get(0))) {
+						System.out.println ("subtour = " + subtour);
+						System.out.println ("prev_subtour = " + subtours.get(j));
 						prev_subtour = j; break;
 					}
-				}
-				sub.setPrev_subtour(prev_subtour);  
+				}  
 			}
+			sub.setPrev_subtour(prev_subtour);
 			pers_sub.setSubtour(sub);
+			System.out.println ("prev_subtour idx = " + sub.getPrev_subtour());
 		}
 	}
 	
