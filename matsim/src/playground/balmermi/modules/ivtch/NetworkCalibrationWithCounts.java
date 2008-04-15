@@ -73,12 +73,16 @@ public class NetworkCalibrationWithCounts extends NetworkAlgorithm {
 				else {
 					out.write("\t<linkgtfs id=\""+l.getId()+"\" time_period=\"24:00:00\" desc=\"from csid "+c.getCsId()+"\">\n");
 					for (int h=1; h<25; h++) {
-						int time = h*3600-1800;
+						int time_start = (h-1)*3600;
+//						int time = h*3600-1800;
+						int time_end = h*3600-1;
 //						System.out.println("lcap="+l.getCapacity()+";vol("+h+")="+c.getVolume(h));
 						double val = c.getVolume(h).getValue()/(l.getCapacity()/network.getCapacityPeriod()*3600);
 						if (val >= 1.0) { System.out.println("csid="+c.getCsId()+";locid="+c.getLocId()+": val="+val); }
 						if (val < 0.01) { val = 0.01; }
-						out.write("\t\t<gtf time=\""+Time.writeTime(time)+"\" val=\""+val+"\"/>\n");
+						out.write("\t\t<gtf time=\""+Time.writeTime(time_start)+"\" val=\""+val+"\"/>\n");
+//						out.write("\t\t<gtf time=\""+Time.writeTime(time)+"\" val=\""+val+"\"/>\n");
+						out.write("\t\t<gtf time=\""+Time.writeTime(time_end)+"\" val=\""+val+"\"/>\n");
 						if (maxval < val) { maxval = val; }
 					}
 					out.write("\t</linkgtfs>\n");

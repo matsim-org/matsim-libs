@@ -74,8 +74,8 @@ public abstract class Scenario {
 		config.world().setInputFile(input_directory + "world.xml");
 		config.world().setOutputFile(output_directory + "output_world.xml");
 
-		config.network().setInputFile(input_directory + "network.xml.gz");
-		config.network().setOutputFile(output_directory + "output_network.xml.gz");
+		config.network().setInputFile(input_directory + "network.xml");
+		config.network().setOutputFile(output_directory + "output_network.xml");
 
 		config.facilities().setInputFile(input_directory + "facilities.xml");
 		config.facilities().setOutputFile(output_directory + "output_facilities.xml");

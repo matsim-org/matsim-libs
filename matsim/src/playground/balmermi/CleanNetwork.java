@@ -20,15 +20,11 @@
 
 package playground.balmermi;
 
+import org.matsim.counts.Counts;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkCalcTopoType;
-import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
-import org.matsim.network.algorithms.NetworkSummary;
-import org.matsim.network.algorithms.NetworkWriteAsTable;
 
-import playground.balmermi.modules.ivtch.NetworkParseETNet;
+import playground.balmermi.modules.ivtch.NetworkCalibrationWithCounts;
 
 public class CleanNetwork {
 
@@ -38,50 +34,35 @@ public class CleanNetwork {
 
 	public static void cleanNetwork(String[] args) {
 
-		System.out.println("RUN: cleanNetwork");
+		System.out.println("RUN:");
 
 //		Config config = Gbl.createConfig(null);
 //		config.config().setOutputFile("output_config.xml");
 		Scenario.setUpScenarioConfig();
-//		NetworkLayer network = Scenario.readNetwork();
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = Scenario.readNetwork();
+		Counts counts = Scenario.readCounts();
+//		NetworkLayer network = new NetworkLayer();
 
-		System.out.println("  running Network Validation and cleaning algorithms... ");
-		new NetworkParseETNet("../../input/nodes.txt","../../input/linksET.txt").run(network);
+		System.out.println("  running Network modules... ");
+//		new NetworkParseETNet("../../input/nodes.txt","../../input/linksET.txt").run(network);
+		new NetworkCalibrationWithCounts("../../output/greentimes.xml",counts).run(network);
 //		new NetworkSetDefaultCapacities().run(network);
+//		new NetworkSummary().run(network);
+//		new NetworkSimplifyAttributes().run(network);
+//		new NetworkAdaptCHNavtec().run(network);
+//		new NetworkCleaner().run(network);
+//		new NetworkMergeDoubleLinks().run(network);
+//		new NetworkCalcTopoType().run(network);
+//		new NetworkTransform(new CH1903LV03toWGS84()).run(network);
+		System.out.println("  done.");
+
 //		NetworkWriteETwithCounts nwetwc = new NetworkWriteETwithCounts(Counts.getSingleton());
 //		nwetwc.run(network);
 //		nwetwc.close();
-//		new NetworkSummary().run(network);
-//		new NetworkSimplifyAttributes().run(network);
 //		NetworkWriteAsTable nwat = new NetworkWriteAsTable(Scenario.output_directory);
 //		nwat.run(network);
 //		nwat.close();
-		network.addAlgorithm(new NetworkSummary());
-//		network.addAlgorithm(new NetworkAdaptCHNavtec());
-//		network.addAlgorithm(new NetworkSummary());
-		network.addAlgorithm(new NetworkCleaner());
-//		network.addAlgorithm(new NetworkSummary());
-		network.addAlgorithm(new NetworkMergeDoubleLinks());
-//		network.addAlgorithm(new NetworkSummary());
-		network.addAlgorithm(new NetworkCalcTopoType());
-		network.addAlgorithm(new NetworkSummary());
-		NetworkWriteAsTable nwat = new NetworkWriteAsTable();
-		network.addAlgorithm(nwat);
-		network.addAlgorithm(new NetworkSummary());
-		network.runAlgorithms();
-		nwat.close();
 
-//		new NetworkSummary().run(network);
-//		new NetworkTransform(new CH1903LV03toWGS84()).run(network);
-//		new NetworkSummary().run(network);
-		System.out.println("  done.");
-
-//		System.out.println("  writing the network...");
-//		NetworkWriter network_writer = new NetworkWriter(network);
-//		network_writer.write();
-//		System.out.println("  done.");
-//
 		Scenario.writeNetwork(network);
 		Scenario.writeConfig();
 
