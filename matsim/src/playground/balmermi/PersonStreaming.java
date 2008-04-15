@@ -20,21 +20,12 @@
 
 package playground.balmermi;
 
-import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkLayerBuilder;
-import org.matsim.network.NetworkWriter;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
-import org.matsim.router.PlansCalcRouteLandmarks;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.PreProcessLandmarks;
-
-import playground.balmermi.algos.PersonSubTourAnalysis;
 
 public class PersonStreaming {
 
