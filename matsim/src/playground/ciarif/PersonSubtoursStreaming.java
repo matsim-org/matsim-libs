@@ -46,17 +46,17 @@ public class PersonSubtoursStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  parsing additional municipality information... ");
-		Municipalities municipalities = new Municipalities("../../input/gg25_2001_infos.txt");
+		Municipalities municipalities = new Municipalities("input/gg25_2001_infos.txt");
 		municipalities.parse();
 		System.out.println("  done.");
 
 		System.out.println("  parsing household information... ");
-		Households households = new Households(municipalities,"../../input/households2000.txt");
+		Households households = new Households(municipalities,"input/households2000.txt");
 		households.parse();
 		System.out.println("  done.");
 
 		System.out.println("  parsing person information... ");
-		Persons persons = new Persons(households,"../../input/persons2000.txt");
+		Persons persons = new Persons(households,"input/persons2000.txt");
 		persons.parse();
 		System.out.println("  done.");
 
@@ -94,7 +94,7 @@ public class PersonSubtoursStreaming {
 		System.out.println("  done.");
 
 		System.out.println("  writing summary table...");
-		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("../../output/output_persons.txt", pmcm.getPersonSubtours());
+		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt", pmcm.getPersonSubtours());
 		pidst.write();
 		System.out.println("  done.");
 
