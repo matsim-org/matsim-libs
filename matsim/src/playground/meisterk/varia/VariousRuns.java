@@ -84,7 +84,7 @@ public class VariousRuns {
 		String to = null;
 
 		try {
-			while (it.hasNext() && (lineCount < 1000)) {
+			while (it.hasNext() && (lineCount < Integer.MAX_VALUE)) {
 
 				line = it.nextLine();
 //				System.out.println(line);
@@ -95,12 +95,12 @@ public class VariousRuns {
 						(tokens[0].equals("\"Unique_ID\""))
 						) {
 
-					System.out.println(tokens[4]);
+//					System.out.println(tokens[4]);
 					tokens[4] = tokens[4].substring(1, tokens[4].length() - 1);
-					System.out.println(tokens[4]);
+//					System.out.println(tokens[4]);
 					tokens[4] = tokens[4].toLowerCase();
-					System.out.println(tokens[4]);
-					System.out.println();
+//					System.out.println(tokens[4]);
+//					System.out.println();
 
 					Iterator<String> replacementIt = replacements.keySet().iterator();
 					while(replacementIt.hasNext()) {
