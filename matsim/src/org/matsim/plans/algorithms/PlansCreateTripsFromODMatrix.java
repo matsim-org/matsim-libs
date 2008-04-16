@@ -29,7 +29,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.WorldUtils;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordI;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
@@ -87,7 +87,7 @@ public class PlansCreateTripsFromODMatrix extends PlansAlgorithm {
 						sum--;
 						Person person = new Person(Integer.toString(counter), null/*sex*/, null/*age*/, null/*license*/, "yes"/*car_avail*/, "yes"/*employed*/);
 						Plan plan = person.createPlan(null, "yes");
-						Coord coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
+						CoordI coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
 						int endTime = -1;
 
 						double rnd = Gbl.random.nextDouble();

@@ -57,12 +57,12 @@ public class WorldUtils {
 	 *
 	 * @author mrieser
 	 */
-	public static final Coord getRandomCoordInZone(final Zone zone, final Layer layer) {
-		Coord min = (Coord)zone.getMin();
+	public static final CoordI getRandomCoordInZone(final Zone zone, final Layer layer) {
+		CoordI min = zone.getMin();
 
 		if (min != null) {
 			// we know min and max of the zone-area, choose randomly in this area
-			Coord max = (Coord)zone.getMax();
+			CoordI max = zone.getMax();
 			double x = min.getX() + Gbl.random.nextDouble()*(max.getX() - min.getX());
 			double y = min.getY() + Gbl.random.nextDouble()*(max.getY() - min.getY());
 			return new Coord(x, y);
@@ -71,13 +71,13 @@ public class WorldUtils {
 		double x, y;
 		// min == null, --> place the random point within a circle around the center
 		// first, determine radius of circle. for this, search the nearest (neighbor) zone
-		Coord center = (Coord)zone.getCenter();
+		CoordI center = zone.getCenter();
 		ArrayList<Location> nearestZones = layer.getNearestLocations(center, zone);
 		double shortestDistance = Double.MAX_VALUE;
 		Iterator<Location> zoneIter = nearestZones.iterator();
 		while (zoneIter.hasNext()) {
 			Zone aZone = (Zone)zoneIter.next();
-			Coord zoneMin = (Coord)aZone.getMin();
+			CoordI zoneMin = aZone.getMin();
 			double radius;
 			if (zoneMin == null) {
 				// the distance is center-to-center, only take half the distance as radius
@@ -120,7 +120,7 @@ public class WorldUtils {
 	 *
 	 * @author mrieser
 	 */
-	public static double distancePointLinesegment(final CoordI lineFrom, final CoordI lineTo, final Coord point) {
+	public static double distancePointLinesegment(final CoordI lineFrom, final CoordI lineTo, final CoordI point) {
 		/* The shortest distance is where the tangent of the line goes through "point".
 		 * The dot product (point - P) dot (lineTo - lineFrom) must be 0, when P is a point
 		 * on the line. P can be substituted with lineFrom + u*(lineTo - lineFrom).
