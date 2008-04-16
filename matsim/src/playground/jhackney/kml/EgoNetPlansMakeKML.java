@@ -170,7 +170,7 @@ public class EgoNetPlansMakeKML {
 		myKMLDocument.addStyle(shopStyle);
 		homeStyle=new Style("homeStyle");
 		myKMLDocument.addStyle(homeStyle);
-//
+
 		double labelScale = 1.0;
 		workStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/W.png")));
 		workStyle.setLabelStyle(
@@ -282,10 +282,10 @@ public class EgoNetPlansMakeKML {
 
 		Plan myPlan = myPerson.getSelectedPlan();
 
-		Color color = setColor(i, nColors);
+		Color color = setColor(i, nColors+1);
 //		setFacStyles(color);
-		
-		
+
+
 		Style agentLinkStyle = new Style("agentLinkStyle"+myPerson.getId().toString());
 		myKMLDocument.addStyle(agentLinkStyle);
 		agentLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 14));
@@ -317,82 +317,22 @@ public class EgoNetPlansMakeKML {
 				Feature.DEFAULT_TIME_PRIMITIVE);
 		myKMLDocument.addFeature(facilitiesFolder);
 
-		String styleUrl = null;
-		String fullActName = null;
-		double actEndTime;
 		ActLegIterator actLegIter = myPlan.getIterator();
+		Act act0 = (Act) actLegIter.nextAct();
+		makeActKML(myPerson, act0, agentFolder, agentLinkStyle);
 		while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
-
-			Act act = (Act) actLegIter.nextAct();
-
-			char actType = act.getType().charAt(0);
-			switch(actType) {
-			case 'h':
-				styleUrl = homeStyle.getStyleUrl();
-				if (act.getStartTime() == 0.0) {
-					fullActName = "morning home "+myPerson.getId()+" "+act.getRefId();
-				} else {
-					fullActName = "evening home "+myPerson.getId()+" "+act.getRefId();
-					System.out.println(fullActName);
-				}
-				break;
-			case 's':
-				styleUrl = shopStyle.getStyleUrl();
-				fullActName = "shop"+myPerson.getId()+" "+act.getRefId();
-				break;
-			case 'l':
-				styleUrl = leisureStyle.getStyleUrl();
-				fullActName = "leisure"+myPerson.getId()+" "+act.getRefId();
-				break;
-			case 'w':
-				styleUrl = workStyle.getStyleUrl();
-				fullActName = "work"+myPerson.getId()+" "+act.getRefId();
-				break;
-			case 'e':
-				styleUrl = educStyle.getStyleUrl();
-				fullActName = "education"+myPerson.getId()+" "+act.getRefId();
-				break;
-			}
-
-			actEndTime = act.getEndTime();
-			if (actEndTime == Time.UNDEFINED_TIME) {
-				actEndTime = 24.0 * 60 * 60;
-			}
-
 			
-			Placemark pl = new Placemark(
-					fullActName,
-					fullActName+": "+Time.writeTime(act.getStartTime()) + " - " + Time.writeTime(actEndTime),
-					fullActName + " activity",
-					Feature.DEFAULT_ADDRESS,
-					Feature.DEFAULT_LOOK_AT,
-					styleUrl,
-					Feature.DEFAULT_VISIBILITY,
-					Feature.DEFAULT_REGION,
-					Feature.DEFAULT_TIME_PRIMITIVE);
-			agentFolder.addFeature(pl);
+				Leg leg = (Leg) actLegIter.nextLeg();
 
-			CoordI geometryCoord = trafo.transform(new Coord(act.getCoord().getX(), act.getCoord().getY()));
-			Point actPoint = new Point(geometryCoord.getX(), geometryCoord.getY(), 0.0);
-			pl.setGeometry(actPoint);
-
-//			if (!fullActName.equals("evening home")) {
-				Link actLink = act.getLink();
-				Placemark agentLink = generateLinkPlacemark(actLink, agentLinkStyle, trafo);
-				if(!agentFolder.containsFeature(agentLink.getId())){
-					agentFolder.addFeature(agentLink);
-				}
-//			}
-
-			Leg leg = (Leg) actLegIter.nextLeg();
-
-			Link[] routeLinks = (leg).getRoute().getLinkRoute();
-			for (Link routeLink : routeLinks) {
-				Placemark agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
-				if(!agentFolder.containsFeature(agentLinkL.getId())){
-					agentFolder.addFeature(agentLinkL);
-				}
+				Link[] routeLinks = (leg).getRoute().getLinkRoute();
+				for (Link routeLink : routeLinks) {
+					Placemark agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
+					if(!agentFolder.containsFeature(agentLinkL.getId())){
+						agentFolder.addFeature(agentLinkL);
+					}
 			}
+				Act act = (Act) actLegIter.nextAct();
+				makeActKML(myPerson, act, agentFolder,agentLinkStyle);
 		}
 
 
@@ -492,6 +432,73 @@ public class EgoNetPlansMakeKML {
 //		networkLinksFolder.addFeature(nl);
 
 		System.out.println("    done.");
+
+	}
+
+	private static void makeActKML(Person myPerson, Act act, Folder agentFolder, Style agentLinkStyle) {
+		// TODO Auto-generated method stub
+
+		String styleUrl = null;
+		String fullActName = null;
+		char actType = act.getType().charAt(0);
+		double actEndTime;
+		switch(actType) {
+		case 'h':
+			styleUrl = homeStyle.getStyleUrl();
+			if (act.getStartTime() == 0.0) {
+				fullActName = "morning home "+myPerson.getId()+" "+act.getRefId();
+			} else {
+				fullActName = "evening home "+myPerson.getId()+" "+act.getRefId();
+				System.out.println(fullActName);
+			}
+			break;
+		case 's':
+			styleUrl = shopStyle.getStyleUrl();
+			fullActName = "shop"+myPerson.getId()+" "+act.getRefId();
+			break;
+		case 'l':
+			styleUrl = leisureStyle.getStyleUrl();
+			fullActName = "leisure"+myPerson.getId()+" "+act.getRefId();
+			break;
+		case 'w':
+			styleUrl = workStyle.getStyleUrl();
+			fullActName = "work"+myPerson.getId()+" "+act.getRefId();
+			break;
+		case 'e':
+			styleUrl = educStyle.getStyleUrl();
+			fullActName = "education"+myPerson.getId()+" "+act.getRefId();
+			break;
+		}
+
+		actEndTime = act.getEndTime();
+		if (actEndTime == Time.UNDEFINED_TIME) {
+			actEndTime = 24.0 * 60 * 60;
+		}
+
+
+		Placemark pl = new Placemark(
+				fullActName,
+				fullActName+": "+Time.writeTime(act.getStartTime()) + " - " + Time.writeTime(actEndTime),
+				fullActName + " activity",
+				Feature.DEFAULT_ADDRESS,
+				Feature.DEFAULT_LOOK_AT,
+				styleUrl,
+				Feature.DEFAULT_VISIBILITY,
+				Feature.DEFAULT_REGION,
+				Feature.DEFAULT_TIME_PRIMITIVE);
+		agentFolder.addFeature(pl);
+
+		CoordI geometryCoord = trafo.transform(new Coord(act.getCoord().getX(), act.getCoord().getY()));
+		Point actPoint = new Point(geometryCoord.getX(), geometryCoord.getY(), 0.0);
+		pl.setGeometry(actPoint);
+
+//		if (!fullActName.equals("evening home")) {
+		Link actLink = act.getLink();
+		Placemark agentLink = generateLinkPlacemark(actLink, agentLinkStyle, trafo);
+		if(!agentFolder.containsFeature(agentLink.getId())){
+			agentFolder.addFeature(agentLink);
+		}
+//		}
 
 	}
 
