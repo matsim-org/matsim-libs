@@ -63,7 +63,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final Coord ZERO = new Coord(0.0,0.0);
 	private final Persons persons;
 	private ModelModeChoice model;
-	private  List<PersonSubtour> personSubtours;
+	private List<PersonSubtour> personSubtours = new Vector<PersonSubtour>();
 	 
 		
 	//////////////////////////////////////////////////////////////////////
@@ -74,9 +74,12 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.persons = persons;
 		System.out.println("    done.");
-		this.personSubtours = new Vector<PersonSubtour>();
 	}
 	
+	//////////////////////////////////////////////////////////////////////
+	// get/set methods
+	//////////////////////////////////////////////////////////////////////
+
 	public List<PersonSubtour> getPersonSubtours() {
 		return personSubtours;
 	}
@@ -89,8 +92,6 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
-	
-
 	
 	private final void setUpModeChoice(final Plan plan, final PersonSubtour personSubtour) {
 		
@@ -204,20 +205,19 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 
 	@Override
 	public void run(Person person) {
-				
 		Plan plan = person.getSelectedPlan();
 		int subtour_idx =0;
 		TreeMap<Integer, ArrayList<Integer>> subtours = new TreeMap<Integer,ArrayList<Integer>>();
-		PersonSubTourExtractor pste = new PersonSubTourExtractor(persons);
+		PersonSubTourExtractor pste = new PersonSubTourExtractor(this.persons);
 		pste.run(person);
 		subtours = pste.getSubtours();
 		subtour_idx = pste.getSubtourIdx();
-		System.out.println("subtour_idx != " + subtour_idx );
-		PersonSubtourHandler psh = new PersonSubtourHandler ();
+		System.out.println("subtour_idx != " + subtour_idx);
+		PersonSubtourHandler psh = new PersonSubtourHandler();
 		PersonSubtour personSubtour = new PersonSubtour(); //TODO Change the constructor and place it below the psh.run
-		psh.run (plan,subtours,subtour_idx);
+		psh.run(plan,subtours,subtour_idx);
 		personSubtour = psh.getPers_sub();
-		this.setUpModeChoice (plan,personSubtour);
+		this.setUpModeChoice(plan,personSubtour);
 		personSubtour.setPerson_id(person.getId());	
 		this.personSubtours.add(personSubtour);	
 	}

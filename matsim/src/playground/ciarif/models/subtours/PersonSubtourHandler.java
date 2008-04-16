@@ -65,15 +65,15 @@ public class PersonSubtourHandler {
 			for (int k=1; k<subtour.size()-1; k=k+1) { 
 				type = ((Act)plan.getActsLegs().get(subtour.get(k))).getType().substring(0,1);
 				if (mainpurpose == 1){
-					if (type.equals(W)) { mainpurpose = 0;}// break; }
+					if (type.equals(W)) { mainpurpose = 0;}
 				}
 				else if (mainpurpose == 2) {
-					if (type.equals(W)) { mainpurpose = 0;}// break; }
-					else if (type.equals(E)) { mainpurpose = 1;}// break; }
+					if (type.equals(W)) { mainpurpose = 0;}
+					else if (type.equals(E)) { mainpurpose = 1;}
 				}
 				else if (mainpurpose == 3) {
-					if (type.equals(W)) {mainpurpose = 0;} //break; }
-					else if (type.equals(E)) {mainpurpose = 1;}// break;}
+					if (type.equals(W)) {mainpurpose = 0;}
+					else if (type.equals(E)) {mainpurpose = 1;}
 					else if (type.equals(S)) {mainpurpose = 2;}
 				} 
 				CoordI curr = ((Act)plan.getActsLegs().get(subtour.get(k))).getCoord();
@@ -123,7 +123,7 @@ public class PersonSubtourHandler {
 	//////////////////////////////////////////////////////////////////////
 	
 	public void run (final Plan plan, final TreeMap<Integer, ArrayList<Integer>> subtours, int subtour_idx) {
-		handleSubTours (plan,subtours,subtour_idx);
+		handleSubTours(plan,subtours,subtour_idx);
 	}
 
 	//////////////////////////////////////////////////////////////////////

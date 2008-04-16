@@ -110,8 +110,6 @@ public class PersonSubTourExtractor extends PersonAlgorithm implements PlanAlgor
 			tour.add(i);
 		}
 	}
-	//TODO@ !!!!!  Cos� probabilmente non basta, va fatto ancora qualcosa perch� funzioni bene anche per estrarre i subtour
-	// quando non si vuole stimare il mode choice
 	
 	//////////////////////////////////////////////////////////////////////
 	// run methods
@@ -121,11 +119,9 @@ public class PersonSubTourExtractor extends PersonAlgorithm implements PlanAlgor
 	public void run(Person person) {
 				
 		Plan plan = person.getSelectedPlan();
-		//int subtour_idx =0;
 		ArrayList<Integer> tour = new ArrayList<Integer>();
 		ArrayList<Integer> start_end = new ArrayList<Integer>();
 		boolean all_leafs = false;		
-		//TreeMap<Integer, ArrayList<Integer>> subtours = new TreeMap<Integer,ArrayList<Integer>>();
 		this.registerPlan (plan,tour);
 		
 		while (all_leafs == false){
@@ -135,14 +131,11 @@ public class PersonSubTourExtractor extends PersonAlgorithm implements PlanAlgor
 			subtour_idx = subtour_idx+1;
 			this.removeSubTour(start_end.get(0),start_end.get(1), tour);
 		}
-		//chiamare qui un metodo che faccia le seguenti cose: riordini i subtours, definisca chi � il precedente di chi,
-		//dia un id ragionevole ai subtours
 		System.out.println("subtours end = " + subtours);
-		//writeSubTours ("output/output_persons_subtours.txt"); 
 	}
 	
 	public void run(Plan plan){
-		}
+	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// Get methods
