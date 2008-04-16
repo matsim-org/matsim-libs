@@ -24,7 +24,9 @@
 package playground.yu.utils;
 
 /**
- * @author yu
+ * This class can convert a MATSim-network to a QGIS .shp-file
+ * 
+ * @author ychen
  * 
  */
 public class MATSimNet2QGISDemo {
@@ -35,8 +37,9 @@ public class MATSimNet2QGISDemo {
 		// ///////////////////////////////////////////////////
 		// write MATSim-network to Shp-file
 		// ///////////////////////////////////////////////////
-		mn2s.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml");
+		mn2s.readNetwork("../schweiz-ivtch/network/ivtch-osm.1.4.xml");
 		mn2s.setCrs(ch1903);
-		mn2s.writeShapeFile("test/yu/utils/cap1.3.shp");
+		mn2s.writeShapeFile("test/yu/utils/cap1.4.shp");
+		System.out.println("done.");
 	}
 }

@@ -51,11 +51,12 @@ public class Volume2QGIS {
 		// mn2s.setCrs(ch1903);
 		// mn2s.writeShapeFile("test/yu/utils/0.shp");
 		// /////////////////////////////////////////////////////*/
-		mn2s.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml");
+//		mn2s.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml");
+		mn2s.readNetwork("../runs/run445b/ivtch-osm.1.2.xml");
 		mn2s.setCrs(ch1903);
 		NetworkLayer net = mn2s.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2s.readEvents("../runs/run445/100.events.txt.gz", va);
+		mn2s.readEvents("../runs/run445b/100.events.txt.gz", va);
 
 		List<Map<String, Integer>> vols = new ArrayList<Map<String, Integer>>(
 				24);
@@ -80,7 +81,7 @@ public class Volume2QGIS {
 			mn2s.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
 					vols.get(i));
 		}
-		mn2s.writeShapeFile("test/yu/utils/445.shp");
+		mn2s.writeShapeFile("../runs/run445b/445b.shp");
 	}
 
 }
