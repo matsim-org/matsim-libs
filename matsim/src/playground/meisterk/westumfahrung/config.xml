@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+        [
+        		<!ENTITY HOMEBASE     "/home/meisterk">
+                <!ENTITY OUTPUTBASE   "output">
+                <!ENTITY CVSBASE      "sandbox00">
+        ]
+>
+<config>
+
+<!-- this config will be used for the test -->
+
+	<module name="plans">
+		<param name="inputPlansFile" value="examples/equil/plans100.xml" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="examples/equil/network.xml" />
+	</module>
+
+	<module name="events">
+		<param name="inputFile" value="src/playground/meisterk/westumfahrung/1000.events.txt"/>
+	</module>
+
+<!--	<module name="plans">-->
+<!--		<param name="inputPlansFile" value="&HOMEBASE;/&CVSBASE;/ivt/studies/switzerland/plans/ivtch/census2000_dilZh30km_miv_transitincl_10pct/plans.xml.gz" />-->
+<!--	</module>-->
+<!---->
+<!--	<module name="network">-->
+<!--		<param name="inputNetworkFile" value="&HOMEBASE;/&CVSBASE;/ivt/studies/switzerland/networks/ivtch-changed/network.xml" />-->
+<!--	</module>-->
+
+
+</config>
