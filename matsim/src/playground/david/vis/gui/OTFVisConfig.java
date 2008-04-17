@@ -1,5 +1,6 @@
 package playground.david.vis.gui;
 
+import java.awt.Color;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -19,7 +20,7 @@ public class OTFVisConfig extends Module {
 	public static final String MIDDLE_MOUSE_FUNC = "middleMouseFunc";
 	public static final String LEFT_MOUSE_FUNC = "leftMouseFunc";
 	public static final String RIGHT_MOUSE_FUNC = "rightMouseFunc";
-	
+
 	public static final String FILE_VERSION = "fileVersion";
 	public static final String FILE_MINOR_VERSION = "fileMinorVersion";
 
@@ -37,7 +38,9 @@ public class OTFVisConfig extends Module {
 	private final int timeStep = 1;
 	private String queryType = "Agent";
 	private boolean multipleSelect = true;
-	
+	private Color backgroundColor = new Color(179, 179, 179, 0);
+	private Color networkColor = new Color(128, 128, 255, 128);
+	private float linkWidth = 30;
 
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
@@ -185,5 +188,28 @@ public class OTFVisConfig extends Module {
 		this.multipleSelect = multipleSelect;
 	}
 
-	
+	public Color getNetworkColor() {
+		return this.networkColor;
+	}
+
+	public void setNetworkColor(final Color networkColor) {
+		this.networkColor = new Color(networkColor.getRed(), networkColor.getGreen(), networkColor.getBlue(), 128);
+	}
+
+	public Color getBackgroundColor() {
+		return this.backgroundColor;
+	}
+
+	public void setBackgroundColor(final Color bgColor) {
+		this.backgroundColor = bgColor;
+	}
+
+	public float getLinkWidth() {
+		return this.linkWidth;
+	}
+
+	public void setLinkWidth(final float linkWidth) {
+		this.linkWidth = linkWidth;
+	}
+
 }
