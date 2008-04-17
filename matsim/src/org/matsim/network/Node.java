@@ -70,7 +70,7 @@ public class Node extends BasicNode implements Comparable<Node> {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected Node(final String id, final String x, final String y, final String type) {
+	protected Node(final IdI id, final String x, final String y, final String type) {
 		super(id, new Coord(x, y));
 		this.type = type;
 	}

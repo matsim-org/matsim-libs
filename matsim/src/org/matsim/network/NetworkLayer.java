@@ -74,10 +74,10 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 	public NetworkLayer() {
 		super(LAYER_TYPE, null);
-		this.factory = new NetworkFactory(this);
+		this.factory = new NetworkFactory();
 	}
 
-	public NetworkLayer(final NetworkFactory factory) {
+	public NetworkLayer(NetworkFactory factory) {
 		super(LAYER_TYPE, null);
 		this.factory = factory;
 	}
@@ -104,7 +104,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 	public final Link createLink(final String id, final String from, final String to, final String length,
 	                             final String freespeed, final String capacity, final String permlanes,
-	                             final String origid, final String type) {
+	                             final String origid, String type) {
 		Id f = new Id(from);
 		Node from_node = this.nodes.get(f);
 		if (from_node == null) { throw new IllegalArgumentException(this+"[from="+from+" does not exist]"); }
@@ -112,17 +112,21 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		Id t = new Id(to);
 		Node to_node = this.nodes.get(t);
 		if (to_node == null) { throw new IllegalArgumentException(this+"[to="+to+" does not exist]"); }
+		IdI linkId = new Id(id);
+		if (this.locations.containsKey(linkId)) { throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!"); }
 
-		if (this.locations.containsKey(new Id(id))) { throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!"); }
-		Link link = this.factory.newLink(id,from_node,to_node,length,freespeed,capacity,permlanes, origid, type);
+		double dlength = Double.parseDouble(length);
+		double dfreespeed = Double.parseDouble(freespeed);
+		double dcapacity = Double.parseDouble(capacity);
+		double dpermlanes = Double.parseDouble(permlanes);
+
+		Link link = this.factory.newLink(linkId,from_node,to_node, this, dlength, dfreespeed, dcapacity, dpermlanes);
+		link.setType(type);
+		link.setOrigId(origid);
 		from_node.addOutLink(link);
 		to_node.addInLink(link);
-		addLink(link);
+		this.locations.put(link.getId(),link);
 		return link;
-	}
-
-	public void addLink(final Link l) {
-		this.locations.put(l.getId(),l);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -447,10 +451,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		buildQuadTree();
 	}
 
-	private synchronized void buildQuadTree() {
-		if (this.nodeQuadTree != null) {
-			return;
-		}
+	private void buildQuadTree() {
 		double startTime = System.currentTimeMillis();
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;

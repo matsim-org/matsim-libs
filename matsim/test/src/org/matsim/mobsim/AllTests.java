@@ -28,6 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.matsim.mobsim");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(QueueLinkTest.class);
 		suite.addTestSuite(QueueSimulationTest.class);
 		//$JUnit-END$
 		return suite;

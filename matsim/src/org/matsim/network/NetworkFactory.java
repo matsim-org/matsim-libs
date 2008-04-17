@@ -19,8 +19,12 @@
  * *********************************************************************** */
 package org.matsim.network;
 
-import org.matsim.utils.identifiers.IdI;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+import org.matsim.basic.v01.BasicNode;
+import org.matsim.basic.v01.Id;
+import org.matsim.utils.identifiers.IdI;
 
 /**
  * @author dgrether
@@ -28,31 +32,74 @@ import org.matsim.utils.identifiers.IdI;
  */
 public class NetworkFactory {
 
-	private final NetworkLayer networkLayer;
+	private Class<? extends Link> linkPrototype = LinkImpl.class;
 
+	private Constructor prototypeContructor;
 
-	public NetworkFactory(NetworkLayer networkLayer) {
-		this.networkLayer = networkLayer;
+	private static final Class[] PROTOTYPECONSTRUCTOR = { IdI.class,
+			BasicNode.class, BasicNode.class, NetworkLayer.class, double.class,
+			double.class, double.class, double.class};
+
+	public NetworkFactory() {
+		try {
+			this.prototypeContructor = LinkImpl.class
+					.getConstructor(PROTOTYPECONSTRUCTOR);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public Node newNode(final String id, final String x, final String y, final String type) {
-		return new Node(id, x, y, type);
+	protected Node newNode(final String id, final String x, final String y,
+			final String type) {
+		return new Node(new Id(id), x, y, type);
 	}
 
-
-	protected Link newLink(final IdI id, Node from, Node to, double length, double freespeed, double capacity, int permlanes) {
-		Link ret = new LinkImpl(this.networkLayer, id, from, to, length, freespeed, capacity, permlanes);
-		this.networkLayer.addLink(ret);
-		return ret;
+	protected Link newLink(final IdI id, Node from, Node to,
+			NetworkLayer network, double length, double freespeedTT, double capacity,
+			double lanes) {
+		Link ret;
+		Exception ex;
+		try {
+			ret = (Link) this.prototypeContructor.newInstance(new Object[] { id,
+					from, to, network, length, freespeedTT, capacity, lanes });
+			return ret;
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+			ex = e;
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			ex = e;
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			ex = e;
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+			ex = e;
+		}
+		throw new RuntimeException(
+				"Cannot instantiate link from prototype, this should never happen, but never say never!",
+				ex);
 	}
 
-	public Link newLink(String id, Node from_node, Node to_node, String length,
-			String freespeed, String capacity, String permlanes,  final String origid, final String type) {
-		Link ret = new LinkImpl(this.networkLayer, id, from_node, to_node, length, freespeed, capacity, permlanes, origid, type);
-		this.networkLayer.addLink(ret);
-		return ret;
+	public void setLinkPrototype(Class<? extends Link> prototype) {
+		try {
+			Constructor c = prototype.getConstructor(PROTOTYPECONSTRUCTOR);
+			if (null != c) {
+				this.prototypeContructor = c;
+			}
+			else {
+				throw new IllegalArgumentException(
+						"A prototype must have a public constructor with parameter types: "
+								+ PROTOTYPECONSTRUCTOR);
+			}
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+
 	}
-
-
 
 }

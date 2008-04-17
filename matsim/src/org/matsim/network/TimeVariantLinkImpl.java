@@ -78,6 +78,9 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 		if (this.permlanes < 1) { Gbl.errorMsg(this+"[permlanes="+permlanes+" not allowed]"); }
 	}
 
+	public void init() {
+
+	}
 
 //	init methods
 
@@ -214,13 +217,6 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#setOrigId(java.lang.String)
-	 */
-	public final void setOrigId(final String id) {
-		Gbl.errorMsg("location id=" + id + ": there is no orig_id anymore!");
-	}
-
-	/* (non-Javadoc)
 	 * @see org.matsim.network.Link#setRole(int, java.lang.Object)
 	 */
 	public final void setRole(final int idx, final Object role) {
@@ -253,5 +249,14 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 
 	public double getFreespeedTravelTime(double time) {
 		return this.freespeedTravelTime.floorEntry(time).getValue();
+	}
+
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public void setOrigId(String origid) {
+		this.origid = origid;
 	}
 }

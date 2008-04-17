@@ -114,8 +114,6 @@ public class WithindayControler extends Controler {
 		//check if withinday replanning should be enabled
 		if (withindayIterations.contains(getIteration())) {
 			log.info("Starting withinday replanning iteration...");
-			//prepare everything to create the agents
-			WithindayCreateVehiclePersonAlgorithm vehicleAlgo = new WithindayCreateVehiclePersonAlgorithm(this);
 
 			//build the queuesim
 			WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);

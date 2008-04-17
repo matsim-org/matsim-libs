@@ -28,7 +28,6 @@ import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.utils.geometry.shared.Coord;
 
 public class BasicNode implements BasicNodeI {
 	protected final Map<IdI, BasicLinkI> inlinks  = new HashMap<IdI, BasicLinkI>(4, 0.95f);
@@ -42,37 +41,31 @@ public class BasicNode implements BasicNodeI {
 	protected final CoordI coord;
 	protected IdI id;
 
-	public BasicNode(String id, CoordI coord) {
-		this.id = new Id(id);
+	public BasicNode(IdI id, CoordI coord) {
+		this.id = id;
 		if (coord == null) { Gbl.errorMsg("Coord must be defined!"); }
 		this.coord = coord;
 	}
 
-	// TODO [balmermi] see above why ...
-	@Deprecated
-	public BasicNode(String id) {
-		this(id, new Coord(0, 0));
-	}
-
 	public boolean addInLink(BasicLinkI link) {
-		inlinks.put(link.getId(), link);
+		this.inlinks.put(link.getId(), link);
 		return true;
 	}
 
 
 	public boolean addOutLink(BasicLinkI link) {
-		outlinks.put(link.getId(), link);
+		this.outlinks.put(link.getId(), link);
 		return true;
 	}
 
 
 	public Map<IdI, ? extends BasicLinkI> getInLinks() {
-		return inlinks;
+		return this.inlinks;
 	}
 
 
 	public Map<IdI, ? extends BasicLinkI> getOutLinks() {
-		return outlinks;
+		return this.outlinks;
 	}
 
 	// TODO [balmermi] see above why ...
@@ -88,9 +81,4 @@ public class BasicNode implements BasicNodeI {
 	public void setId(final IdI id) {
 		this.id = id;
 	}
-
-	public void setId(final String idstring) {
-		this.id = new Id(idstring);
-	}
-
 }

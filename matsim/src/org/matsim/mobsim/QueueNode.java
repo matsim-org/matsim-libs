@@ -77,20 +77,6 @@ public class QueueNode {
 		this.cacheIsInvalid = false;
 	}
 
-	/*
-	 * Get/Set partitionId generated be MetisExeWrapper only used when doing
-	 * DistributedSimulation, but I did not want to inherit for just this info
-	 */
-	private int partitionId = 0;
-
-	public int getPartitionId() {
-		return this.partitionId;
-	}
-
-	public void setPartitionId(final int partitionId) {
-		this.partitionId = partitionId;
-	}
-
 	public Node getNode() {
 		return this.node;
 	}

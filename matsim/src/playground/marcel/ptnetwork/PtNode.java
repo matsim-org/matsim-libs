@@ -19,12 +19,13 @@
  * *********************************************************************** */
 
 package playground.marcel.ptnetwork;
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Node;
 
 public class PtNode extends Node{
 
 	protected PtNode(final String id, final String x, final String y, final String type) {
-		super(id, x, y, type);
+		super(new Id(id), x, y, type);
 	}
 
 	protected int actTime = Integer.MAX_VALUE;

@@ -75,7 +75,6 @@ public class NetworkRenumber extends NetworkAlgorithm {
 
 			for (Link link : network.getLinks().values()) {
 				link.setId(new Id(link.getOrigId()));
-				link.setOrigId(null);
 			}
 		} 	else {
 			// renumber
@@ -88,7 +87,6 @@ public class NetworkRenumber extends NetworkAlgorithm {
 
 			id = 1;
 			for (Link link : network.getLinks().values()) {
-				link.setOrigId(link.getId().toString());
 				link.setId(new Id(id));
 				id++;
 			}

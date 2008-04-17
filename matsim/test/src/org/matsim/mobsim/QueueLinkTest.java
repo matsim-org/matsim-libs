@@ -23,7 +23,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Leg;
@@ -40,8 +39,6 @@ public class QueueLinkTest extends MatsimTestCase {
 
 	private NetworkLayer network;
 
-	private NetworkFactory factory;
-
 	private Node node1;
 
 	private Node node2;
@@ -57,13 +54,10 @@ public class QueueLinkTest extends MatsimTestCase {
 		super.setUp();
 		this.network = new NetworkLayer();
 		this.network.setCapacityPeriod(1.0);
-		this.factory = new NetworkFactory(this.network);
-		this.node1 = this.factory.newNode("1", "0", "0", null);
-		this.node2 = this.factory.newNode("2", "1", "0", null);
-		this.link = this.factory.newLink("1", this.node1, this.node2, "1", "1",
+		this.node1 = this.network.createNode("1", "0", "0", null);
+		this.node2 = this.network.createNode("2", "1", "0", null);
+		this.link = this.network.createLink("1", "1", "2", "1", "1",
 				"1", "1", null, null);
-
-		this.network.addLink(this.link);
 		super.loadConfig(null);
 		this.queueNetwork = new QueueNetworkLayer(this.network);
 		this.qlink = this.queueNetwork.getQueueLink(new Id("1"));

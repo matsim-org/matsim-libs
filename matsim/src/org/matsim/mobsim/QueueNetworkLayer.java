@@ -75,8 +75,8 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 
 	public QueueNetworkLayer(NetworkLayer networkLayer) {
 		this.networkLayer = networkLayer;
-		this.links = new HashMap<IdI, QueueLink>(networkLayer.getLinks().size());
-		this.nodes = new HashMap<IdI, QueueNode>(networkLayer.getNodes().size());
+		this.links = new HashMap<IdI, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.nodes = new HashMap<IdI, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
 			this.nodes.put(n.getId(), new QueueNode(n, this));
 		}
@@ -241,26 +241,6 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 		this.moveWaitFirst = moveWaitFirst;
 	}
 
-//	@Override
-//	public boolean removeLink(final Link link) {
-//		((QueueLink)link).clearVehicles();
-//		// we have to remove the link from both locations and simLinkArray
-//		this.simLinksArray.remove(link);
-//		return super.removeLink(link);
-//	}
-//
-//	@Override
-//	public boolean removeNode(final Node node) {
-//		/* Just invalidate simNodesArrayCache. It will be rebuilt in beforeMobsim().
-//		 * During the MobSim, the network should not be changed. If somebody does that,
-//		 * it will crash with a NullPointerException... I can live with that ;-)
-//		 * TODO [MR] separate QueueNetworkLayer from NetworkLayer
-//		 * In that moment, it won't be possible anymore to remove nodes during a simulation.
-//		 */
-//		this.simNodesArrayCache = null;
-//		return super.removeNode(node);
-//	}
-
 	public Map<IdI, QueueLink> getLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
@@ -301,7 +281,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 		return this.links.get(id);
 	}
 
-	public Object getQueueNode(Id id) {
+	public QueueNode getQueueNode(Id id) {
 		return this.nodes.get(id);
 	}
 

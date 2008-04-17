@@ -23,9 +23,7 @@ package org.matsim.basic.v01;
 import org.matsim.interfaces.networks.basicNet.BasicLinkI;
 import org.matsim.interfaces.networks.basicNet.BasicNodeI;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.AbstractLocation;
 
@@ -58,20 +56,6 @@ implements BasicLinkI
 	@Deprecated
 	public BasicLink(String id) {
 		super(id);
-	}
-
-	// TODO [balmermi] see above why...
-	@Deprecated
-	public BasicLink(NetworkLayer network, String id, Coord coord) {
-		super(network, id, coord);
-	}
-
-	protected BasicLink() {
-		super();
-	}
-
-	public BasicLink(IdI id, Node from, Node to) {
-		this(null, id, from, to);
 	}
 
 	// TODO [balmermi] For simplicity, we calculate only the distance to the center
@@ -112,11 +96,15 @@ implements BasicLinkI
 	public void setCapacity(double capacity) {
 		this.capacity = capacity;
 	}
-
+	/**
+	 * This method returns the freespeed velocity in meter per seconds.
+	 */
 	public double getFreespeed(final double time) {
 		return this.freespeed;
 	}
-
+	/**
+	 * Sets the freespeed velocity of the link in meter per seconds.
+	 */
 	public void setFreespeed(double freespeed) {
 		this.freespeed = freespeed;
 	}
@@ -130,11 +118,11 @@ implements BasicLinkI
 	}
 
 	//TODO permlanes should be refectored to lanes or getLanes() and so on to getPermLanes() [GL]
-	
+
 	public double getLanes() {
 		return this.permlanes;
 	}
-	
+
 	public int getLanesAsInt() {
 		return Math.round((float)Math.max(this.permlanes,1.0d));
 	}

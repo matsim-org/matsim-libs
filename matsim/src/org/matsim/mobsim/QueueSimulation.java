@@ -39,9 +39,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.VisConfig;
@@ -51,28 +49,6 @@ import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
 import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
-
-class PersonAlgo_CheckSelected extends PersonAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// run Method, creates a new Vehicle for every person
-	//////////////////////////////////////////////////////////////////////
-
-	/* (non-Javadoc)
-	 * @see org.matsim.plans.algorithms.PersonAlgorithm#run(org.matsim.plans.Person)
-	 */
-	@Override
-	public void run(final Person person) {
-		// Choose Plan to follow
-		// this actually ensures that there is one plan selected
-		Plan selected = person.getSelectedPlan();
-		if (selected == null) {
-			if (person.getPlans().size() != 0) {
-				person.setSelectedPlan(person.getPlans().get(0));
-			}
-		}
-	}
-}
 
 //////////////////////////////////////////////////////////////////////
 // A Queue Simulator class
@@ -123,9 +99,6 @@ public class QueueSimulation extends Simulation {
 		if (this.plans == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
-			//Make sure SOME plan has been selected, select plan number 0
-			new PersonAlgo_CheckSelected().run(this.plans);
-//			this.plans.addAlgorithm(this.veh_algo);
 		for (Person p : this.plans.getPersons().values()) {
 			Vehicle veh;
 			try {

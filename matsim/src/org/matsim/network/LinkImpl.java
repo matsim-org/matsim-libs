@@ -22,7 +22,7 @@ package org.matsim.network;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLink;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicNode;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
@@ -43,41 +43,28 @@ public class LinkImpl extends BasicLink implements Link {
 
 	private double flowCapacity;
 
-	private final double freespeedTravelTime;
+	private double freespeedTravelTime;
 
-	protected final double euklideanDist;
+	private double euklideanDist;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected LinkImpl() {
-		super();
-		this.euklideanDist = 0.0;
-		this.freespeedTravelTime = this.getLength()
-		/ this.getFreespeed(Time.UNDEFINED_TIME);
-
+	public LinkImpl(IdI id, BasicNode from, BasicNode to, NetworkLayer network, double length, double freespeed, double capacity, double lanes) {
+		super(network, id, from, to);
+		super.length = length;
+		super.freespeed = freespeed;
+		super.capacity = capacity;
+		super.permlanes = lanes;
+		init();
 	}
 
-	protected LinkImpl(final NetworkLayer network, final IdI id, Node from, Node to, double length, double freespeed, double capacity, int permlanes) {
-		super(id, from, to);
-		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
-		this.freespeedTravelTime = this.getLength()
-		/ this.getFreespeed(Time.UNDEFINED_TIME);
+	//////////////////////////////////////////////////////////////////////
+	// init methods
+	//////////////////////////////////////////////////////////////////////
 
-	}
-
-	protected LinkImpl(final NetworkLayer network, final String id,
-	               final Node from, final Node to, final String length,
-	               final String freespeed, final String capacity,
-	               final String permlanes, final String origid, final String type) {
-		super(network,new Id(id),from,to);
-		this.length = Double.parseDouble(length);
-		this.freespeed = Double.parseDouble(freespeed);
-		this.capacity = Double.parseDouble(capacity);
-		this.permlanes = Double.parseDouble(permlanes);
-		this.origid = origid;
-		this.type = type;
+	private void init() {
 		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
 		calcFlowCapacity();
 		this.freespeedTravelTime = this.getLength()
@@ -85,14 +72,11 @@ public class LinkImpl extends BasicLink implements Link {
 
 		// do some semantic checks
 		if (this.from.equals(this.to)) { log.warn(this + "[from=to=" + this.to + " link is a loop]"); }
-		if (this.freespeed <= 0.0) { Gbl.errorMsg(this+"[freespeed="+freespeed+" not allowed]"); }
-		if (this.capacity <= 0.0) { Gbl.errorMsg(this+"[capacity="+capacity+" not allowed]"); }
-		if (this.permlanes < 1) { Gbl.errorMsg(this+"[permlanes="+permlanes+" not allowed]"); }
-	}
+		if (this.freespeed <= 0.0) { Gbl.errorMsg(this+"[freespeed="+this.freespeed+" not allowed]"); }
+		if (this.capacity <= 0.0) { Gbl.errorMsg(this+"[capacity="+this.capacity+" not allowed]"); }
+		if (this.permlanes < 1) { Gbl.errorMsg(this+"[permlanes="+this.permlanes+" not allowed]"); }
 
-	//////////////////////////////////////////////////////////////////////
-	// init methods
-	//////////////////////////////////////////////////////////////////////
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
@@ -169,6 +153,7 @@ public class LinkImpl extends BasicLink implements Link {
 		return this.origid;
 	}
 
+
 	/* (non-Javadoc)
 	 * @see org.matsim.network.Link#getType()
 	 */
@@ -204,12 +189,10 @@ public class LinkImpl extends BasicLink implements Link {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#setOrigId(java.lang.String)
-	 */
 	public final void setOrigId(final String id) {
-		Gbl.errorMsg("location id=" + id + ": there is no orig_id anymore!");
+		this.origid = id;
 	}
+
 
 	/* (non-Javadoc)
 	 * @see org.matsim.network.Link#setRole(int, java.lang.Object)
@@ -241,4 +224,19 @@ public class LinkImpl extends BasicLink implements Link {
 				"[origid=" + this.origid + "]" +
 				"[type=" + this.type + "]";
 	}
+
+
+	protected void setFreespeedTravelTime(double freespeedTravelTime) {
+		this.freespeedTravelTime = freespeedTravelTime;
+	}
+
+
+	protected void setEuklideanDist(double euklideanDist) {
+		this.euklideanDist = euklideanDist;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 }

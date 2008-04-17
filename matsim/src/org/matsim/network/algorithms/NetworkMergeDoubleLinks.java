@@ -67,7 +67,6 @@ public class NetworkMergeDoubleLinks extends NetworkAlgorithm {
 			link1.setFreespeed(fs);
 			link1.setLanes(lanes);
 			link1.setLength(length);
-			link1.setOrigId(origid);
 			network.removeLink(link2);
 		}
 		else if (mergetype == 2) {
@@ -81,7 +80,6 @@ public class NetworkMergeDoubleLinks extends NetworkAlgorithm {
 			link1.setFreespeed(fs);
 			link1.setLanes(lanes);
 			link1.setLength(length);
-			link1.setOrigId(origid);
 			network.removeLink(link2);
 		}
 		else {

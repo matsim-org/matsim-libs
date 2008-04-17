@@ -24,6 +24,7 @@ package playground.marcel.ptnetwork;
 import java.util.Arrays;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -40,7 +41,7 @@ public class PtLink extends LinkImpl{
 
 	public PtLink(NetworkLayer network, String id, Node from, Node to, String length, String freespeed,
 			String capacity, String permlanes, String origid, String type) {
-		super(network, id, from, to, length, freespeed, capacity, permlanes, origid, type);
+		super(new Id(id), from, to, network, Double.parseDouble(length), Double.parseDouble(freespeed), Double.parseDouble(capacity), Double.parseDouble(permlanes));
 	}
 
 	/**
