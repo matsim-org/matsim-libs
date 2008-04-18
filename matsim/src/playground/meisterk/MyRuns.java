@@ -132,7 +132,7 @@ public class MyRuns {
 //		MyRuns.planomatStandAloneDemo();
 //		MyRuns.testReplanningRate();
 //		MyRuns.testDepartureDelayCalculator();
-//		MyRuns.testTravelTimeEstimator();
+		MyRuns.testTravelTimeEstimator();
 //		MyRuns.testTravelTimeI();
 //		MyRuns.testCharyparNagelFitnessFunction();
 //		MyRuns.conversionSpeedTest();
@@ -948,7 +948,7 @@ public class MyRuns {
 
 	}
 
-	private static void readEvents(Events events, NetworkLayer network) {
+	public static void readEvents(Events events, NetworkLayer network) {
 
 		// load test events
 		long startTime, endTime;

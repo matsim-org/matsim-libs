@@ -23,6 +23,7 @@ package playground.meisterk.facilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ import java.util.regex.Pattern;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.FileUtils;
@@ -49,6 +51,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.Document;
@@ -63,11 +66,17 @@ import org.matsim.utils.vis.kml.Style;
 
 import com.google.earth.kml._2.AbstractFeatureType;
 import com.google.earth.kml._2.AbstractGeometryType;
+import com.google.earth.kml._2.BoundaryType;
 import com.google.earth.kml._2.DocumentType;
 import com.google.earth.kml._2.FolderType;
 import com.google.earth.kml._2.KmlType;
+import com.google.earth.kml._2.LinearRingType;
+import com.google.earth.kml._2.ObjectFactory;
 import com.google.earth.kml._2.PlacemarkType;
 import com.google.earth.kml._2.PointType;
+import com.google.earth.kml._2.PolyStyleType;
+import com.google.earth.kml._2.PolygonType;
+import com.google.earth.kml._2.StyleType;
 
 /**
  * In April 2005, I collected information on shop facilities of the major
@@ -189,8 +198,8 @@ public class ShopsOf2005ToFacilities {
 //		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
 //		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
 //		ShopsOf2005ToFacilities.shopsToTXT();
-		ShopsOf2005ToFacilities.shopsToQuadTree();
-		
+		ShopsOf2005ToFacilities.shopsViaQuadTreeToOpentimesKML();
+
 	}
 
 	private static void prepareRawDataForGeocoding() {
@@ -212,38 +221,39 @@ public class ShopsOf2005ToFacilities {
 
 		Facilities shopsOf2005 = new Facilities("shopsOf2005");
 
+		JAXBElement<KmlType> kmlElement = null;
+
 		try {
 
 			JAXBContext jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
 			Unmarshaller unMarshaller = jaxbContext.createUnmarshaller();
-			JAXBElement<KmlType> kmlElement = (JAXBElement<KmlType>) unMarshaller.unmarshal(new FileInputStream(Gbl.getConfig().facilities().getInputFile()));
-
-			KmlType kml = kmlElement.getValue();
-			DocumentType document = (DocumentType) kml.getAbstractFeatureGroup().getValue();
-			System.out.println(document.getName());
-
-			// recursively search the KML for placemarks, transform it into a matsim facility 
-			// and place it in the list of facilities or in the quadtree, respectively
-
-			List<JAXBElement<? extends AbstractFeatureType>> featureGroup = document.getAbstractFeatureGroup();
-			Iterator<JAXBElement<? extends AbstractFeatureType>> it = featureGroup.iterator();
-			while (it.hasNext()) {
-				JAXBElement<AbstractFeatureType> feature = (JAXBElement<AbstractFeatureType>) (it.next());
-				if (feature.getValue().getClass().equals(FolderType.class)) {
-					//System.out.println("Going into folder...");
-					ShopsOf2005ToFacilities.extractPlacemarks((FolderType) feature.getValue(), shopsOf2005);
-				} else if (feature.getValue().getClass().equals(PlacemarkType.class)) {
-					//System.out.println("There is a placemark!");
-				}
-
-			}
-
+			kmlElement = (JAXBElement<KmlType>) unMarshaller.unmarshal(new FileInputStream(Gbl.getConfig().facilities().getInputFile()));
 		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+
+		KmlType kml = kmlElement.getValue();
+		DocumentType document = (DocumentType) kml.getAbstractFeatureGroup().getValue();
+		System.out.println(document.getName());
+
+		// recursively search the KML for placemarks, transform it into a matsim facility 
+		// and place it in the list of facilities or in the quadtree, respectively
+
+		List<JAXBElement<? extends AbstractFeatureType>> featureGroup = document.getAbstractFeatureGroup();
+		Iterator<JAXBElement<? extends AbstractFeatureType>> it = featureGroup.iterator();
+		while (it.hasNext()) {
+			JAXBElement<AbstractFeatureType> feature = (JAXBElement<AbstractFeatureType>) (it.next());
+			if (feature.getValue().getClass().equals(FolderType.class)) {
+				//System.out.println("Going into folder...");
+				ShopsOf2005ToFacilities.extractPlacemarks((FolderType) feature.getValue(), shopsOf2005);
+			} else if (feature.getValue().getClass().equals(PlacemarkType.class)) {
+				//System.out.println("There is a placemark!");
+			}
+
 		}
 
 		ShopsOf2005ToFacilities.addOpentimesToFacilities(shopsOf2005);
@@ -762,6 +772,9 @@ public class ShopsOf2005ToFacilities {
 					CoordI wgs84Coords = new Coord(coordinates[0], coordinates[1]);
 					WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
 					CoordI ch1903Coordinates = trafo.transform(wgs84Coords);
+
+					// round coordinates to meters
+					ch1903Coordinates.setXY((int) ch1903Coordinates.getX(), (int) ch1903Coordinates.getY()); 
 
 //					// create facility
 					if (name.equals("migrosZH_Glarus")) {
@@ -1634,8 +1647,8 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void shopsToQuadTree() {
-		
+	private static void shopsViaQuadTreeToOpentimesKML() {
+
 		final double MIN_X = 70000.0;
 		final double MAX_X = 300000.0;
 		final double MIN_Y = 480000.0;
@@ -1643,7 +1656,7 @@ public class ShopsOf2005ToFacilities {
 		double x = 0.0;
 		double y = 0.0;
 		String facilityId = null;
-		
+
 		Facilities shopsOf2005 = new Facilities("shopsOf2005");
 		// construct the QuadTree with the bounding box of Switzerland with the CH1903 system
 		// stick to the reverse X/Y property of this system
@@ -1655,25 +1668,135 @@ public class ShopsOf2005ToFacilities {
 		System.out.println("Reading facilities xml file...done.");
 
 		Iterator facilityIterator = shopsOf2005.getFacilities().values().iterator();
-		System.out.println("Numvber of facilities: " + shopsOf2005.getFacilities().values().size());
 
 		while (facilityIterator.hasNext()) {
 			Facility facility = (Facility) facilityIterator.next();
 			facilityId = facility.getId().toString();
+//			System.out.println(facility.toString());
 			//System.out.println(facilityId);
-			
+
 			// revert x and y here
 			x = facility.getCenter().getY();
 			y = facility.getCenter().getX();
-			
+
 			if (!facilityQuadTree.put(x, y, facility)) {
 				System.out.println("Error inserting facility in quad tree.");
 			}
-			
+
 		}
-		
-		System.out.println("Size of quadtree: " + facilityQuadTree.size());
-		
+
+//		ArrayList<QuadTree.Rect> boundsList = facilityQuadTree.getBoundsOfPopulatedNodes();
+//		for (QuadTree.Rect rect : boundsList) {
+//			System.out.println(rect.toString());
+//			System.out.println("Corresponding facilities:");
+//
+//			ArrayList<Facility> shopsInALeaf = new ArrayList<Facility>();
+//			facilityQuadTree.get(rect, shopsInALeaf);
+//
+//			for (Facility shop : shopsInALeaf) {
+//				System.out.println("\t" + shop.toString());
+//			}
+//
+//			System.out.println();
+//		}
+//
+//		System.out.println("Number of facilities: " + shopsOf2005.getFacilities().values().size());
+//		System.out.println("Size of quadtree: " + facilityQuadTree.size());
+//		System.out.println("Size of boundsList: " + boundsList.size());
+//		System.out.println();
+//
+//		System.out.println("Producing opentimes KML...");
+//
+//		JAXBContext jaxbContext = null;
+//		JAXBElement<KmlType> kmlElement = null;
+//		try {
+//			jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
+//		} catch (JAXBException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		ObjectFactory factory = new ObjectFactory();
+//
+//		KmlType kml = factory.createKmlType();
+//		DocumentType document = factory.createDocumentType();
+//		document.setName("The shops of 2005 open times KML.");
+//		kml.setAbstractFeatureGroup(factory.createDocument(document));
+//
+//		// styles
+//		final String SHOP_STYLE = "migrosStyle"; 
+//
+//
+//		StyleType shopRegionStyle = factory.createStyleType();
+//		document.getAbstractStyleSelectorGroup().add(factory.createStyle(shopRegionStyle));
+//		shopRegionStyle.setId(SHOP_STYLE);
+//		PolyStyleType migrosRegionPolyStyle = factory.createPolyStyleType();
+//		shopRegionStyle.setPolyStyle(migrosRegionPolyStyle);
+//		migrosRegionPolyStyle.setColor(new byte[]{100, 100, 0, 0});
+//
+//		for (QuadTree.Rect rect : boundsList) {
+//
+//			// transform coordinates
+//
+//			CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
+//
+//			CoordI northWestCH1903 = new Coord(rect.minY, rect.maxX);
+//			CoordI northWestWGS84 = trafo.transform(northWestCH1903);
+//			CoordI northEastCH1903 = new Coord(rect.maxY, rect.maxX);
+//			CoordI northEastWGS84 = trafo.transform(northEastCH1903);
+//			CoordI southWestCH1903 = new Coord(rect.minY, rect.minX);
+//			CoordI southWestWGS84 = trafo.transform(southWestCH1903);
+//			CoordI southEastCH1903 = new Coord(rect.maxY, rect.minX);
+//			CoordI southEastWGS84 = trafo.transform(southEastCH1903);
+//
+//			// build up placemark structure
+//
+//			PlacemarkType anOpentimeRegion = factory.createPlacemarkType();
+//			document.getAbstractFeatureGroup().add(factory.createPlacemark(anOpentimeRegion));
+//
+//			// give it a name: name of first facility in the leaf list
+//			
+//			ArrayList<Facility> shopsInALeaf = new ArrayList<Facility>();
+//			facilityQuadTree.get(rect, shopsInALeaf);
+//
+//			anOpentimeRegion.setName(shopsInALeaf.get(0).getId().toString());
+//			
+//			anOpentimeRegion.setStyleUrl(SHOP_STYLE);
+//
+//			PolygonType box = factory.createPolygonType();
+//			anOpentimeRegion.setAbstractGeometryGroup(factory.createPolygon(box));
+//
+//			BoundaryType outerBoundary = factory.createBoundaryType();
+//			box.setOuterBoundaryIs(outerBoundary);
+//			LinearRingType outerRing = factory.createLinearRingType();
+//			outerBoundary.setLinearRing(outerRing);
+//
+//			// fill coordinates in: Linienzug von und nach nordwestliche Ecke
+//			for (CoordI corner : new CoordI[]{
+//					northWestWGS84, 
+//					northEastWGS84, 
+//					southEastWGS84, 
+//					southWestWGS84,
+//					northWestWGS84}) {
+//				outerRing.getCoordinates().add(corner.getX() + "," + corner.getY() + ",0.0");
+//			}
+//
+//		}		
+//
+//		try {
+//			Marshaller marshaller = jaxbContext.createMarshaller();
+//			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+//			marshaller.marshal(factory.createKml(kml), new FileOutputStream(Gbl.getConfig().facilities().getOutputFile()));
+//		} catch (JAXBException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		System.out.println("Producing opentimes KML...done.");
+
 	}
-	
+
 }

@@ -19,11 +19,24 @@
 </config>
 -->
 
-<!-- for ShopsOf2005ToFacilities.shopsToTXT() -->
+<!-- for --> 
+<!-- ShopsOf2005ToFacilities.shopsToTXT() -->
 
+<!--
 <config>
 	<module name="facilities">
 		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/facilities_shopsOf2005.xml" />
 		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/facilities_shopsOf2005.txt" />
+	</module>
+</config>
+-->
+
+<!-- for --> 
+<!-- ShopsOf2005ToFacilities.shopsViaQuadTreeToOpentimesKML() -->
+
+<config>
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/facilities_shopsOf2005.xml" />
+		<param name="outputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/shopsOf2005.kml" />
 	</module>
 </config>

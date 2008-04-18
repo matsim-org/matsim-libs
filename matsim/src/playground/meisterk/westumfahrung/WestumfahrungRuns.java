@@ -7,10 +7,11 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
+import org.matsim.plans.Person;
 import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.plans.filters.AbstractPersonFilter;
-
-import playground.meisterk.MyRuns;
+import org.matsim.plans.filters.PersonIdFilter;
+import org.matsim.utils.identifiers.IdI;
 
 public class WestumfahrungRuns {
 
@@ -20,40 +21,50 @@ public class WestumfahrungRuns {
 	public static void main(String[] args) {
 
 		Gbl.createConfig(args);
-		
-		WestumfahrungRuns.runAverageTripDurAnalysis();
-		
+
+		WestumfahrungRuns.transitNonTransitAverageTripDurAnalysis();
+
 	}
 
-	private static void runAverageTripDurAnalysis() {
-		
-		String nonTransitPersonIdPattern = "[0-9]{10}";
-		ArrayList<PlansAlgorithm> plansAlgos = new ArrayList<PlansAlgorithm>();
-		
-		PersonIdFilter personIdFilter = new PersonIdFilter(nonTransitPersonIdPattern, true);
-		plansAlgos.add((PlansAlgorithm) personIdFilter);
+	private static void transitNonTransitAverageTripDurAnalysis() {
+
+		// transit agents have ids > 1'000'000'000
+		String TRANSIT_PERSON_ID_PATTERN = "[0-9]{10}";
+
+		PersonIdFilter transitAgentsFilter = new PersonIdFilter(TRANSIT_PERSON_ID_PATTERN);
 
 		NetworkLayer network = playground.meisterk.MyRuns.initWorldNetwork();
-		playground.meisterk.MyRuns.initMatsimAgentPopulation(true, plansAlgos);
-		
-		System.out.println(
-				"Number of persons with id matching '" + nonTransitPersonIdPattern + "': " + 
-				((AbstractPersonFilter) personIdFilter).getCount());
-		
-		Plans filteredPlans = personIdFilter.getPlans();
+		Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(false, null);
 
-		System.out.println(
-				"Number of persons with id matching '" + nonTransitPersonIdPattern + "': " + 
-				filteredPlans.getPersons().size());
+		Plans plansTransitAgents = new Plans();
+		Plans plansNonTransitAgents = new Plans();
+
+		try {
+			for (Person person : plans.getPersons().values()) {
+				if (transitAgentsFilter.judge(person)) {
+					plansTransitAgents.addPerson(person);
+				} else {
+					plansNonTransitAgents.addPerson(person);
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.out.println("Number of transit agents: " + plansTransitAgents.getPersons().size());
+		System.out.println("Number of non transit agents: " + plansNonTransitAgents.getPersons().size());
 
 		System.out.println();
-		
-		Events events = new Events();
-		CalcLegTimes calcLegTimes = new CalcLegTimes(filteredPlans);
-		events.addHandler(calcLegTimes);
-		playground.meisterk.MyRuns.readEvents(events, network);
-		
+
+//		Events events = new Events();
+//		CalcLegTimes calcLegTimes = new CalcLegTimes(plansTransitAgents);
+//		events.addHandler(calcLegTimes);
+//		playground.meisterk.MyRuns.readEvents(events, network);
+//
+//		System.out.println(calcLegTimes.getAverageTripDuration());
+
 	}
-	
-	
+
+
 }
