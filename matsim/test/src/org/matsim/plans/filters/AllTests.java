@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for org.matsim.plans.filters");
 		suite.addTestSuite(PersonIntersectAreaFilterTest.class);
 		suite.addTestSuite(RouteLinkFilterTest.class);
+		suite.addTestSuite(PersonIdFilterTest.class);
 		return suite;
 	}
 
