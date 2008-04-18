@@ -21,14 +21,17 @@
 <!--	<module name="events">-->
 <!--		<param name="inputFile" value="src/playground/meisterk/westumfahrung/1000.events.txt"/>-->
 <!--	</module>-->
-<!---->
+
 	<module name="plans">
-		<param name="inputPlansFile" value="&HOMEBASE;/&CVSBASE;/ivt/studies/switzerland/plans/ivtch/census2000_dilZh30km_miv_transitincl_10pct/plans.xml.gz" />
+		<param name="inputPlansFile" value="&HOMEBASE;/Desktop/westumfahrung_runs/run243/200.plans.xml.gz" />
 	</module>
 
 	<module name="network">
 		<param name="inputNetworkFile" value="&HOMEBASE;/&CVSBASE;/ivt/studies/switzerland/networks/ivtch-changed/network.xml" />
 	</module>
 
+	<module name="events">
+		<param name="inputFile" value="&HOMEBASE;/Desktop/westumfahrung_runs/run243/200.deq_events.dat"/>
+	</module>
 
 </config>
