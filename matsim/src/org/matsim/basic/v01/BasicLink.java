@@ -57,6 +57,12 @@ implements BasicLinkI
 	public BasicLink(String id) {
 		super(id);
 	}
+	
+	@Deprecated
+	public BasicLink(NetworkLayer network, String id, CoordI coord) {
+		super(network, id, coord);
+	}
+
 
 	// TODO [balmermi] For simplicity, we calculate only the distance to the center
 	// of that link. A better version is implemented in org.matsim.demandmodeling.network.Link.
