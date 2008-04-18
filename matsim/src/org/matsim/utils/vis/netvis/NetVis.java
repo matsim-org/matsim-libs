@@ -256,6 +256,11 @@ public class NetVis {
     	}
     }
 
+    public static void start(String visFileName) {
+ 			String configFile = StreamConfig.getConfigFileName(visFileName, FILE_SUFFIX);
+ 			(new NetVis(configFile, configFile, visFileName)).run();
+    }
+
     class VisMouseHandler extends MouseInputAdapter implements ChangeListener {
         public Point start = null;
 
