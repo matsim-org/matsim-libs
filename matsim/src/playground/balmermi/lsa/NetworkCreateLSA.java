@@ -362,6 +362,7 @@ public class NetworkCreateLSA {
 		links_to_ignore.add(new Id(106319));
 		links_to_ignore.add(new Id(106320));
 		links_to_ignore.add(new Id(106322));
+		links_to_ignore.add(new Id(108042));
 
 		try {
 			FileWriter fw = new FileWriter(outfile);
