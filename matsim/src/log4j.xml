@@ -21,6 +21,15 @@
 		</filter>
 	</appender>
 
+<!--    <appender name="file" class="org.apache.log4j.RollingFileAppender">
+    <param name="file" value="matsim.log"/>
+    <param name="MaxFileSize" value="10000KB"/>
+    <param name="MaxBackupIndex" value="1"/>
+    <layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %5p %C{1}:%L %m%n"/>
+    </layout>
+  </appender>-->
+
 	 <!-- Print only messages of level warn or above in the package com.foo -->
 	<!--<logger name="org.matsim.demandmodeling.mobsim.QueueLink">
       <level value="INFO"/>
