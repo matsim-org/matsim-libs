@@ -5,6 +5,11 @@ import java.util.regex.Pattern;
 import org.matsim.plans.Person;
 import org.matsim.plans.algorithms.PersonAlgorithmI;
 
+/**
+ * Filters persons whose id matches a certain pattern (regular expression).
+ *
+ * @author kmeister
+ */
 public class PersonIdFilter extends AbstractPersonFilter {
 
 	private String personIdPattern = null;
