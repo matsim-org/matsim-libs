@@ -1,6 +1,11 @@
 package playground.meisterk.westumfahrung;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeMap;
 
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.basic.v01.Id;
@@ -11,6 +16,8 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
+import org.matsim.plans.algorithms.PlanAverageScore;
+import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.plans.filters.PersonIdFilter;
 import org.matsim.plans.filters.RouteLinkFilter;
 import org.matsim.plans.filters.SelectedPlanFilter;
@@ -18,6 +25,48 @@ import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 
 public class WestumfahrungRuns {
+
+	public class ScenarioResult {
+
+		private String name;
+		private Plans plans;
+		private CalcLegTimes calcLegTimes;
+		private PlanAverageScore planAverageScore;
+
+		public ScenarioResult(String name, Plans plans,
+				CalcLegTimes calcLegTimes, PlanAverageScore planAverageScore) {
+			super();
+			this.name = name;
+			this.plans = plans;
+			this.calcLegTimes = calcLegTimes;
+			this.planAverageScore = planAverageScore;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public Plans getPlans() {
+			return plans;
+		}
+		public void setPlans(Plans plans) {
+			this.plans = plans;
+		}
+		public CalcLegTimes getCalcLegTimes() {
+			return calcLegTimes;
+		}
+		public void setCalcLegTimes(CalcLegTimes calcLegTimes) {
+			this.calcLegTimes = calcLegTimes;
+		}
+		public PlanAverageScore getPlanAverageScore() {
+			return planAverageScore;
+		}
+		public void setPlanAverageScore(PlanAverageScore planAverageScore) {
+			this.planAverageScore = planAverageScore;
+		}
+
+	}
 
 	private Plans inputPlans = null;
 	private NetworkLayer network = null;
@@ -40,8 +89,6 @@ public class WestumfahrungRuns {
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		Gbl.getWorld().setNetworkLayer(network);
 
-		inputPlans = playground.meisterk.MyRuns.initMatsimAgentPopulation(false, null);
-
 //		this.transitNonTransitAverageTripDurAnalysis();
 		this.analyseRouteSwitchers();
 
@@ -49,68 +96,74 @@ public class WestumfahrungRuns {
 
 	private void transitNonTransitAverageTripDurAnalysis() {
 
+		ArrayList<ScenarioResult> results = new ArrayList<ScenarioResult>();
+		Events events = new Events();
+		String scenarioName = null;
+
 		// transit agents have ids > 1'000'000'000
 		String TRANSIT_PERSON_ID_PATTERN = "[0-9]{10}";
+		String NON_TRANSIT_PERSON_ID_PATTERN = "[0-9]{1,9}";
 
-		PersonIdFilter transitAgentsFilter = new PersonIdFilter(TRANSIT_PERSON_ID_PATTERN, null);
+		inputPlans = playground.meisterk.MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), false, null);
 
-		Plans plansTransitAgents = new Plans();
-		plansTransitAgents.setName("transit");
-		Plans plansNonTransitAgents = new Plans();
-		plansNonTransitAgents.setName("swiss");
+		System.out.println("Filtering agents...");
+		PersonIdRecorder transitAgentsIdRecorder = new PersonIdRecorder();
+		PersonIdFilter transitAgentsFilter = new PersonIdFilter(TRANSIT_PERSON_ID_PATTERN, transitAgentsIdRecorder);
+		inputPlans.addAlgorithm(transitAgentsFilter);
 
+		PersonIdRecorder nonTransitAgentsIdRecorder = new PersonIdRecorder();
+		PersonIdFilter nonTransitAgentsFilter = new PersonIdFilter(NON_TRANSIT_PERSON_ID_PATTERN, nonTransitAgentsIdRecorder);
+		inputPlans.addAlgorithm(nonTransitAgentsFilter);
+		inputPlans.runAlgorithms();
+		
+		System.out.println("Filtering agents...done.");
+
+		Plans plansTransitAgents = null;
+		Plans plansNonTransitAgents = null;
+		
 		try {
-			for (Person person : inputPlans.getPersons().values()) {
-				if (transitAgentsFilter.judge(person)) {
-					plansTransitAgents.addPerson(person);
-				} else {
-					plansNonTransitAgents.addPerson(person);
-				}
+
+			System.out.println("Building transit agents...");
+			plansTransitAgents = new Plans();
+			for (IdI personId : transitAgentsIdRecorder.getIds()) {
+				plansTransitAgents.addPerson(inputPlans.getPerson(personId));
 			}
-		} catch (Exception e) {
+			System.out.println("Building transit agents...done.");
+
+			System.out.println("Building non transit agents...");
+			plansNonTransitAgents = new Plans();
+			for (IdI personId : nonTransitAgentsIdRecorder.getIds()) {
+				plansNonTransitAgents.addPerson(inputPlans.getPerson(personId));
+			}
+			System.out.println("Building non transit agents...done.");
+
+			for (Plans aPlans : new Plans[]{plansNonTransitAgents, plansTransitAgents}) {
+
+				if (aPlans.equals(plansNonTransitAgents)) {
+					scenarioName = "swiss";
+				} else if (aPlans.equals(plansTransitAgents)) {
+					scenarioName = "transit";
+				}
+
+				PlanAverageScore planAverageScore = new PlanAverageScore();
+				aPlans.addAlgorithm(planAverageScore);
+
+				aPlans.runAlgorithms();
+
+				CalcLegTimes calcLegTimes = new CalcLegTimes(aPlans);
+				results.add(new ScenarioResult(scenarioName, aPlans, calcLegTimes, planAverageScore));
+				events.addHandler(calcLegTimes);
+
+			}
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		Events events = new Events();
-
-		HashMap<Plans, CalcLegTimes> calcMe = new HashMap<Plans, CalcLegTimes>();
-		calcMe.put(plansTransitAgents, new CalcLegTimes(plansTransitAgents));
-		calcMe.put(plansNonTransitAgents, new CalcLegTimes(plansNonTransitAgents));
-		for (CalcLegTimes calcLegTimes : calcMe.values()) {
-			events.addHandler(calcLegTimes);
+			e1.printStackTrace();
 		}
 
 		EventsReaderDEQv1 eventsReader = new EventsReaderDEQv1(events);
 		eventsReader.readFile(Gbl.getConfig().events().getInputFile());
 
-		// output
-		double avgScoreSelected = 0.0;
-
-		System.out.println("subpop\tsize\tscore\ttravel");
-
-		for (Plans plans : new Plans[]{plansTransitAgents, plansNonTransitAgents}) {
-
-			System.out.print(plans.getName());
-			System.out.print("\t");
-
-			System.out.print(plans.getPersons().size());
-			System.out.print("\t");
-
-			avgScoreSelected = 0.0;
-			for (Person person : plans.getPersons().values()) {
-				avgScoreSelected += person.getSelectedPlan().getScore();
-			}
-			avgScoreSelected /= plans.getPersons().size();
-			System.out.print(Double.toString(avgScoreSelected));
-			System.out.print("\t");
-
-			CalcLegTimes calcLegTimes = calcMe.get(plans);
-			System.out.print(Time.writeTime(calcLegTimes.getAverageTripDuration()));
-
-			System.out.println();
-		}
-
+		this.compareResults(results);
 	}
 
 	/**
@@ -122,18 +175,109 @@ public class WestumfahrungRuns {
 	 */
 	private void analyseRouteSwitchers() {
 
-		PersonIds personIds = new PersonIds();
-		RouteLinkFilter routeLinkFilterBefore = new RouteLinkFilter(personIds);
-		SelectedPlanFilter findAgentsOnLinksInSelectedPlan = new SelectedPlanFilter(routeLinkFilterBefore);
 
-		routeLinkFilterBefore.addLink(new Id(106306));
-		inputPlans.addAlgorithm(findAgentsOnLinksInSelectedPlan);
-		inputPlans.runAlgorithms();
+		String BEFORE = "before";
+		String AFTER = "after";
+		String[] scenarios = new String[]{BEFORE, AFTER};
+		
+		TreeMap<String, String> scenarioPlansFilenames = new TreeMap<String, String>();
+		scenarioPlansFilenames.put(BEFORE, Gbl.getConfig().plans().getInputFile());
+		scenarioPlansFilenames.put(AFTER, "/home/meisterk/Desktop/westumfahrung_runs/run500/200.plans.xml.gz");
 
-		for (IdI personId : personIds.getIds()) {
-			System.out.println(personId.toString());
+		TreeMap<String, Plans> scenarioPlans = new TreeMap<String, Plans>();
+		TreeMap<String, PersonIdRecorder> personIdRecorders = new TreeMap<String, PersonIdRecorder>();
+		
+		TreeMap<String, String> scenarioEventsFilenames = new TreeMap<String, String>();
+		scenarioEventsFilenames.put(BEFORE, Gbl.getConfig().events().getInputFile());
+		scenarioEventsFilenames.put(AFTER, "/home/meisterk/Desktop/westumfahrung_runs/run500/200.deq_events.dat");
+		
+		TreeMap<String, IdI> filterLinks = new TreeMap<String, IdI>();
+		
+		for (String scenarioName : scenarios) {
+
+			Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(scenarioPlansFilenames.get(scenarioName), false, null);
+			scenarioPlans.put(scenarioName, plans);
+			
+			PersonIdRecorder personIds = new PersonIdRecorder();
+			RouteLinkFilter routeLinkFilter = new RouteLinkFilter(personIds);
+			SelectedPlanFilter findAgentsOnLinksInSelectedPlan = new SelectedPlanFilter(routeLinkFilter);
+			personIdRecorders.put(scenarioName, personIds);
+			
+			if (scenarioName.equals(BEFORE)) {
+				routeLinkFilter.addLink(new Id(106306));
+			} else if (scenarioName.equals(AFTER)) {
+				routeLinkFilter.addLink(new Id(101204));
+			}
+
+			plans.addAlgorithm(findAgentsOnLinksInSelectedPlan);
+			plans.runAlgorithms();
+
+		}
+
+		HashSet<IdI> routeSwitchers = personIdRecorders.get(AFTER).getIds();
+		routeSwitchers.retainAll(personIdRecorders.get(BEFORE).getIds());
+
+		System.out.println("Agents before: " + personIdRecorders.get(BEFORE).getIds().size());
+		System.out.println("Agents after: " + personIdRecorders.get(AFTER).getIds().size());
+		System.out.println("Route switchers: " + routeSwitchers.size());
+
+		ArrayList<ScenarioResult> results = new ArrayList<ScenarioResult>();
+		for (String scenarioName : scenarios) {
+			
+			Plans aPlans = new Plans();
+			Iterator<IdI> personIterator = routeSwitchers.iterator();
+			
+			while(personIterator.hasNext()) {
+				try {
+					aPlans.addPerson(scenarioPlans.get(scenarioName).getPerson(personIterator.next()));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			PlanAverageScore planAverageScore = new PlanAverageScore();
+			aPlans.addAlgorithm(planAverageScore);
+			aPlans.runAlgorithms();
+			
+			Events events = new Events();
+			
+			CalcLegTimes calcLegTimes = new CalcLegTimes(aPlans);
+			events.addHandler(calcLegTimes);
+
+			results.add(new ScenarioResult(scenarioName, aPlans, calcLegTimes, planAverageScore));
+
+			EventsReaderDEQv1 eventsReader = new EventsReaderDEQv1(events);
+			eventsReader.readFile(scenarioEventsFilenames.get(scenarioName));
+			
+		}
+	
+		this.compareResults(results);
+
+	}
+
+	private void compareResults(List<ScenarioResult> results) {
+
+		System.out.println("subpop\tsize\tscore\ttravel");
+
+		for (ScenarioResult result : results) {
+
+			System.out.print(result.getName());
+			System.out.print("\t");
+
+			System.out.print(result.getPlans().getPersons().size());
+			System.out.print("\t");
+
+			System.out.print(result.getPlanAverageScore().getAverage());
+			System.out.print("\t");
+
+			System.out.print(Time.writeTime(result.calcLegTimes.getAverageTripDuration()));
+
+			System.out.println();
+
 		}
 
 	}
+
 
 }

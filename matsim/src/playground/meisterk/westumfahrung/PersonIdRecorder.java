@@ -1,6 +1,5 @@
 package playground.meisterk.westumfahrung;
 
-import java.util.List;
 import java.util.HashSet;
 
 import org.matsim.plans.Person;
@@ -9,7 +8,7 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.identifiers.IdI;
 
-public class PersonIds extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonIdRecorder extends PersonAlgorithm implements PlanAlgorithmI {
 
 	private HashSet<IdI> ids = new HashSet<IdI>();
 
@@ -19,12 +18,11 @@ public class PersonIds extends PersonAlgorithm implements PlanAlgorithmI {
 
 	@Override
 	public void run(Person person) {
-		// TODO Auto-generated method stub
-		
-	}
+		ids.add(person.getId());	
+}
 
 	public void run(Plan plan) {
-		ids.add(plan.getPerson().getId());
+		this.run(plan.getPerson());
 	}
 
 }

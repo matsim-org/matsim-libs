@@ -861,7 +861,8 @@ public class MyRuns {
 		return network;
 	}
 
-	public static Plans initMatsimAgentPopulation(boolean isStreaming, ArrayList<PlansAlgorithm> algos) {
+	// Gbl.getConfig().plans().getInputFile()
+	public static Plans initMatsimAgentPopulation(String inputFilename, boolean isStreaming, ArrayList<PlansAlgorithm> algos) {
 
 		Plans population = null;
 
@@ -877,7 +878,7 @@ public class MyRuns {
 			}
 		}
 		PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(inputFilename);
 		population.printPlansCount();
 		System.out.println("  done.");
 

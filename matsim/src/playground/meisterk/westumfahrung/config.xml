@@ -27,7 +27,8 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="&HOMEBASE;/&CVSBASE;/ivt/studies/switzerland/networks/ivtch-changed/network.xml" />
+<!--		<param name="inputNetworkFile" value="&HOMEBASE;/&CVSBASE;/ivt/studies/switzerland/networks/ivtch-changed/network.xml" />-->
+		<param name="inputNetworkFile" value="&HOMEBASE;/&CVSBASE;/ivt/studies/switzerland/networks/ivtch-changed-wu/network.xml" />
 	</module>
 
 	<module name="events">
