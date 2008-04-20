@@ -90,7 +90,7 @@ public class WestumfahrungRuns {
 		Gbl.getWorld().setNetworkLayer(network);
 
 //		this.transitNonTransitAverageTripDurAnalysis();
-		this.analyseRouteSwitchers();
+		this.buildBeforeAfterAnalyses();
 
 	}
 
@@ -173,89 +173,125 @@ public class WestumfahrungRuns {
 	 * 
 	 * Summarize their average trip travel times, the scores of their selected plans, and their home locations.
 	 */
-	private void analyseRouteSwitchers() {
-
+	private void buildBeforeAfterAnalyses() {
 
 		String BEFORE = "before";
 		String AFTER = "after";
 		String[] scenarios = new String[]{BEFORE, AFTER};
 		
+		HashSet<IdI> westtangenteLinkIds = new HashSet<IdI>();
+//		westtangenteLinkIds.add(new Id(106305));
+		westtangenteLinkIds.add(new Id(106306));
+
+		HashSet<IdI> westumfahrungLinkIds = new HashSet<IdI>();
+//		westumfahrungLinkIds.add(new Id(101203));
+		westumfahrungLinkIds.add(new Id(101204));
+
 		TreeMap<String, String> scenarioPlansFilenames = new TreeMap<String, String>();
 		scenarioPlansFilenames.put(BEFORE, Gbl.getConfig().plans().getInputFile());
 		scenarioPlansFilenames.put(AFTER, "/home/meisterk/Desktop/westumfahrung_runs/run500/200.plans.xml.gz");
 
 		TreeMap<String, Plans> scenarioPlans = new TreeMap<String, Plans>();
-		TreeMap<String, PersonIdRecorder> personIdRecorders = new TreeMap<String, PersonIdRecorder>();
+		TreeMap<String, PersonIdRecorder> routeUsers = new TreeMap<String, PersonIdRecorder>();
+		TreeMap<String, PersonIdRecorder> neighbors = new TreeMap<String, PersonIdRecorder>();
 		
 		TreeMap<String, String> scenarioEventsFilenames = new TreeMap<String, String>();
 		scenarioEventsFilenames.put(BEFORE, Gbl.getConfig().events().getInputFile());
 		scenarioEventsFilenames.put(AFTER, "/home/meisterk/Desktop/westumfahrung_runs/run500/200.deq_events.dat");
-		
-		TreeMap<String, IdI> filterLinks = new TreeMap<String, IdI>();
 		
 		for (String scenarioName : scenarios) {
 
 			Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(scenarioPlansFilenames.get(scenarioName), false, null);
 			scenarioPlans.put(scenarioName, plans);
 			
-			PersonIdRecorder personIds = new PersonIdRecorder();
-			RouteLinkFilter routeLinkFilter = new RouteLinkFilter(personIds);
+			// route link analysis
+			PersonIdRecorder routeLinkPersonIds = new PersonIdRecorder();
+			RouteLinkFilter routeLinkFilter = new RouteLinkFilter(routeLinkPersonIds);
 			SelectedPlanFilter findAgentsOnLinksInSelectedPlan = new SelectedPlanFilter(routeLinkFilter);
-			personIdRecorders.put(scenarioName, personIds);
-			
+			routeUsers.put(scenarioName, routeLinkPersonIds);
+
 			if (scenarioName.equals(BEFORE)) {
-				routeLinkFilter.addLink(new Id(106306));
+				for (IdI linkId : westtangenteLinkIds) {
+					routeLinkFilter.addLink(linkId);
+				}
 			} else if (scenarioName.equals(AFTER)) {
-				routeLinkFilter.addLink(new Id(101204));
+				for (IdI linkId : westumfahrungLinkIds) {
+					routeLinkFilter.addLink(linkId);
+				}
 			}
 
 			plans.addAlgorithm(findAgentsOnLinksInSelectedPlan);
+
+			// westtangente neighbor analysis
+			PersonIdRecorder actLinkPersonIds = new PersonIdRecorder();
+			ActLinkFilter homeAtTheWesttangenteFilter = new ActLinkFilter(".*h.*", actLinkPersonIds);
+			SelectedPlanFilter findAgentsHomeLinksInSelectedPlan = new SelectedPlanFilter(homeAtTheWesttangenteFilter);
+			neighbors.put(scenarioName, actLinkPersonIds);
+			
+			for (IdI linkId : westtangenteLinkIds) {
+				homeAtTheWesttangenteFilter.addLink(linkId);
+			}
+			
+			plans.addAlgorithm(findAgentsHomeLinksInSelectedPlan);
 			plans.runAlgorithms();
 
 		}
 
-		HashSet<IdI> routeSwitchers = personIdRecorders.get(AFTER).getIds();
-		routeSwitchers.retainAll(personIdRecorders.get(BEFORE).getIds());
+		HashSet<IdI> routeSwitchersPersonIds = (HashSet<IdI>) routeUsers.get(AFTER).getIds().clone();
+		routeSwitchersPersonIds.retainAll(routeUsers.get(BEFORE).getIds());
 
-		System.out.println("Agents before: " + personIdRecorders.get(BEFORE).getIds().size());
-		System.out.println("Agents after: " + personIdRecorders.get(AFTER).getIds().size());
-		System.out.println("Route switchers: " + routeSwitchers.size());
-
-		ArrayList<ScenarioResult> results = new ArrayList<ScenarioResult>();
-		for (String scenarioName : scenarios) {
-			
-			Plans aPlans = new Plans();
-			Iterator<IdI> personIterator = routeSwitchers.iterator();
-			
-			while(personIterator.hasNext()) {
-				try {
-					aPlans.addPerson(scenarioPlans.get(scenarioName).getPerson(personIterator.next()));
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-			PlanAverageScore planAverageScore = new PlanAverageScore();
-			aPlans.addAlgorithm(planAverageScore);
-			aPlans.runAlgorithms();
-			
-			Events events = new Events();
-			
-			CalcLegTimes calcLegTimes = new CalcLegTimes(aPlans);
-			events.addHandler(calcLegTimes);
-
-			results.add(new ScenarioResult(scenarioName, aPlans, calcLegTimes, planAverageScore));
-
-			EventsReaderDEQv1 eventsReader = new EventsReaderDEQv1(events);
-			eventsReader.readFile(scenarioEventsFilenames.get(scenarioName));
-			
-		}
-	
-		this.compareResults(results);
-
+		HashSet<IdI> neighborsPersonIds = neighbors.get(BEFORE).getIds();
+		
+		System.out.println("Agents before: " + routeUsers.get(BEFORE).getIds().size());
+		System.out.println("Agents after: " + routeUsers.get(AFTER).getIds().size());
+		System.out.println("Route switchers: " + routeSwitchersPersonIds.size());
+		System.out.println("number of neighbors: " + neighborsPersonIds.size());
+		
+		// HIER GEHTS WEITER: neighbor aggregates ausgeben
+		
+//		ArrayList<ScenarioResult> results = new ArrayList<ScenarioResult>();
+//		for (String scenarioName : scenarios) {
+//			
+//			Plans routeSwitchers = new Plans();
+//			Iterator<IdI> personIterator = routeSwitchersPersonIds.iterator();
+//			
+//			while(personIterator.hasNext()) {
+//				try {
+//					routeSwitchers.addPerson(scenarioPlans.get(scenarioName).getPerson(personIterator.next()));
+//				} catch (Exception e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//
+//			PlanAverageScore planAverageScore = new PlanAverageScore();
+//			routeSwitchers.addAlgorithm(planAverageScore);
+//			routeSwitchers.runAlgorithms();
+//			
+//			Events events = new Events();
+//			
+//			CalcLegTimes calcLegTimes = new CalcLegTimes(routeSwitchers);
+//			events.addHandler(calcLegTimes);
+//
+//			results.add(new ScenarioResult(scenarioName, routeSwitchers, calcLegTimes, planAverageScore));
+//
+//			EventsReaderDEQv1 eventsReader = new EventsReaderDEQv1(events);
+//			eventsReader.readFile(scenarioEventsFilenames.get(scenarioName));
+//			
+//		}
+//	
+//		this.compareResults(results);
+		
 	}
 
+	/**
+	 * Perform analysis for all agents whose home locations are on the same set of links,
+	 * e.g. all agents living at the Westtangente 
+	 */
+	private void analyseNeighbors() {
+		
+	}
+	
 	private void compareResults(List<ScenarioResult> results) {
 
 		System.out.println("subpop\tsize\tscore\ttravel");
