@@ -22,7 +22,7 @@ package playground.ciarif.models;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -76,7 +76,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		// calc plan distance and main purpose
 		double plan_dist = 0.0;
 		int mainpurpose = 3; // 0 := w; 1 := e; 2 := s 3:=l
-		Iterator<BasicAct> act_it = person.getSelectedPlan().getIteratorAct();
+		Iterator<BasicActImpl> act_it = person.getSelectedPlan().getIteratorAct();
 		CoordI home_coord = null;
 		CoordI work_coord = null;
 		act_it.hasNext(); // first act is always 'home'

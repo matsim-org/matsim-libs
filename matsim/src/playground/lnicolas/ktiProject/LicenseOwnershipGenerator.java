@@ -22,9 +22,9 @@ package playground.lnicolas.ktiProject;
 
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 
@@ -52,7 +52,7 @@ public class LicenseOwnershipGenerator extends MobilityResourceGenerator impleme
 	static final double KONST = +1.7480172e+001;
 
 	public LicenseOwnershipGenerator(World world,
-			TreeMap<IdI, MunicipalityInformation> municipalityInfo) {
+			TreeMap<Id, MunicipalityInformation> municipalityInfo) {
 		super(world, municipalityInfo);
 	}
 

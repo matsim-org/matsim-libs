@@ -20,12 +20,12 @@
 
 package org.matsim.interfaces.networks.basicNet;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 /**
  * A topological representation of a network link.
  */
-public interface BasicLinkI {
+public interface BasicLink {
 
   /**
    * Returns a non-<code>null</code> instance of <code>IdI</code> that
@@ -33,7 +33,7 @@ public interface BasicLinkI {
    *
    * @return this object's identifier
    */
-  public IdI getId();
+  public Id getId();
 
     /**
      * Sets this link's non-<code>null</code> upstream node.
@@ -47,7 +47,7 @@ public interface BasicLinkI {
      * @throws IllegalArgumentException
      *             if <code>node</code> is <code>null</code>
      */
-    public boolean setFromNode(BasicNodeI node);
+    public boolean setFromNode(BasicNode node);
 
     /**
      * Sets this link's non-<code>null</code> downstream node.
@@ -61,21 +61,21 @@ public interface BasicLinkI {
      * @throws IllegalArgumentException
      *             if <code>node</code> is <code>null</code>
      */
-    public boolean setToNode(BasicNodeI node);
+    public boolean setToNode(BasicNode node);
 
     /**
      * Returns this link's upstream node. Must not return <code>null</code>.
      *
      * @return this link's upstream node
      */
-    public BasicNodeI getFromNode();
+    public BasicNode getFromNode();
 
     /**
      * Returns this link's downstream node. Must not return <code>null</code>.
      *
      * @return this link's downstream node
      */
-    public BasicNodeI getToNode();
+    public BasicNode getToNode();
 
 
     public double getLength();

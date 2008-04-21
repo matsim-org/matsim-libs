@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.LinkImpl;
@@ -31,7 +31,7 @@ public class QLink extends LinkImpl {
 	private double effectiveCelleSize;
 
 	public QLink(NetworkLayer network, String id, Node from, Node to, String length, String freespeed, String capacity, String permlanes, String origid, String type) {
-		super(new Id(id), from, to, network, Double.parseDouble(length), Double.parseDouble(freespeed), Double.parseDouble(capacity), Double.parseDouble(permlanes));
+		super(new IdImpl(id), from, to, network, Double.parseDouble(length), Double.parseDouble(freespeed), Double.parseDouble(capacity), Double.parseDouble(permlanes));
 
 		effectiveCelleSize = network.getEffectiveCellSize();
 

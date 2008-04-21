@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -67,7 +67,7 @@ public class CountsFixture {
 
 		List<CountSimComparison> csc_l=new Vector<CountSimComparison>();
 		for (int i=0; i<24; i++) {
-			csc_l.add(new CountSimComparisonImpl(new Id(100), i+1, 1.0, 1.0));
+			csc_l.add(new CountSimComparisonImpl(new IdImpl(100), i+1, 1.0, 1.0));
 		}
 		return csc_l;
 	}

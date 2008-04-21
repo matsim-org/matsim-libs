@@ -24,25 +24,25 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.plans.Act;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.plans.filters.AbstractPlanFilter;
-import org.matsim.utils.identifiers.IdI;
 
 public class ActLinkFilter extends AbstractPlanFilter {
 
-	private final Set<IdI> linkIds;
+	private final Set<Id> linkIds;
 	private final String actTypePattern;
 
 	public ActLinkFilter(final String actTypePattern, final PlanAlgorithmI nextAlgo) {
 		this.nextAlgorithm = nextAlgo;
-		this.linkIds = new HashSet<IdI>();
+		this.linkIds = new HashSet<Id>();
 		this.actTypePattern = actTypePattern;
 	}
 
-	public void addLink(final IdI linkId) {
+	public void addLink(final Id linkId) {
 		this.linkIds.add(linkId);
 	}
 

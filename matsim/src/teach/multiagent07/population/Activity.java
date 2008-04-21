@@ -20,11 +20,11 @@
 
 package teach.multiagent07.population;
 
-import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
 
 import teach.multiagent07.net.CALink;
 
-public class Activity extends BasicAct{
+public class Activity extends BasicActImpl{
 
 	public static final String HOME_TYPE = "h";
 	public static final String WORK_TYPE = "w";

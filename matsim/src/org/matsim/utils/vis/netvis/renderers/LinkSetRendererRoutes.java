@@ -32,6 +32,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -46,7 +47,6 @@ import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.Route;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.ControlToolbar;
@@ -64,7 +64,7 @@ public class LinkSetRendererRoutes extends RendererA {
 
 	ControlToolbar toolbar = null;
 
-	private final TreeMap<IdI, Integer> linkValues = new TreeMap<IdI, Integer>();
+	private final TreeMap<Id, Integer> linkValues = new TreeMap<Id, Integer>();
 
 	private final ValueColorizer colorizer = new ValueColorizer(new double[] { 0.0, MAX_PER_LINK }, new Color[] {
 			Color.WHITE, Color.RED });
@@ -184,7 +184,7 @@ public class LinkSetRendererRoutes extends RendererA {
 
 			for (int i = 0; i < link.getDisplayValueCount(); i++) {
 
-				Integer value = this.linkValues.get(new Id(link.getId().toString()));
+				Integer value = this.linkValues.get(new IdImpl(link.getId().toString()));
 				if (value != null) {
 					if (this.mode == MODE_COLOR) {
 						display.setColor(this.colorizer.getColor(value));
@@ -214,9 +214,9 @@ public class LinkSetRendererRoutes extends RendererA {
 
 	public static class RouteLinkMarker extends  PersonAlgorithm implements PlanAlgorithmI {
 
-		private final TreeMap<IdI, Integer> linkValues;
+		private final TreeMap<Id, Integer> linkValues;
 
-		public RouteLinkMarker(final TreeMap<IdI, Integer> linkValues) {
+		public RouteLinkMarker(final TreeMap<Id, Integer> linkValues) {
 			this.linkValues = linkValues;
 		}
 
@@ -238,7 +238,7 @@ public class LinkSetRendererRoutes extends RendererA {
 
 			Link[] links = route.getLinkRoute();
 			for (Link link : links) {
-				IdI id = link.getId();
+				Id id = link.getId();
 				Integer counter = this.linkValues.get(id);
 				if (counter == null) counter = 0;
 				counter++;

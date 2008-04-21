@@ -24,9 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.helper.MyURL;
-import org.matsim.utils.identifiers.IdI;
 
 public class CountsLoadCurveGraphCreator extends CountsGraphsCreator {
 
@@ -49,7 +49,7 @@ public class CountsLoadCurveGraphCreator extends CountsGraphsCreator {
 				lcg.add2LoadCurveDataSets(cc_last);
 			}
 			CountSimComparison cc= l_it.next();
-			IdI linkId = cc.getId();
+			Id linkId = cc.getId();
 			while (cc.getId().equals(linkId)) {
 				if (l_it.hasNext()) {
 					lcg.add2LoadCurveDataSets(cc);

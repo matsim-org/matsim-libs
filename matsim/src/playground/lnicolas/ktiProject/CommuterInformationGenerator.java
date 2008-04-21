@@ -27,7 +27,8 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
@@ -36,7 +37,6 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 
@@ -248,7 +248,7 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 	}
 
 	private boolean planContainsType(final Plan plan, final String actType) {
-		BasicPlan.ActIterator it = plan.getIteratorAct();
+		BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 		while (it.hasNext()) {
 			BasicAct act = it.next();
 			if (act.getType().equals(actType)) {
@@ -298,9 +298,9 @@ public class CommuterInformationGenerator extends PersonToHomeFacilityMapper {
 	}
 
 	public static int getCapacity(final Facilities facilities, final String actType, final Zone zone) {
-		Set<IdI> facilityIds = zone.getDownMapping().keySet();
+		Set<Id> facilityIds = zone.getDownMapping().keySet();
 		int capacityCount = 0;
-		for (IdI facilityId : facilityIds) {
+		for (Id facilityId : facilityIds) {
 			Facility facility = (Facility)facilities.getLocation(facilityId);
 			if (facility != null) {
 				Activity activity = facility.getActivity(actType);

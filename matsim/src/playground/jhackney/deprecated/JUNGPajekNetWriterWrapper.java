@@ -25,9 +25,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
 
 import playground.jhackney.module.socialnet.SocialNetEdge;
 import playground.jhackney.module.socialnet.SocialNetwork;
@@ -57,7 +57,7 @@ public class JUNGPajekNetWriterWrapper {
     // This is a map of MatSim Person ID to the JUNG vertex object
     // (The JUNG Vertex UserDatum container is used
     // to get the Person ID given a Vertex object
-    TreeMap<IdI, Vertex> verticesPersons = new TreeMap<IdI, Vertex>();
+    TreeMap<Id, Vertex> verticesPersons = new TreeMap<Id, Vertex>();
 
     public JUNGPajekNetWriterWrapper(String outputPath, SocialNetwork snet, Plans plans) {
 

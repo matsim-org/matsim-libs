@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.EventActivityEnd;
 import org.matsim.events.EventActivityStart;
 import org.matsim.events.EventAgentArrival;
@@ -46,7 +47,6 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.Route;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 
 // "GeneratePlansFromEvents" would be more appropriate as class name...
@@ -125,7 +125,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 				}
 				double endtime = time;
 				String acttype = "unknown";
-				IdI linkId = new Id("");
+				Id linkId = new IdImpl("");
 				if (this.oldplans != null) {
 					Person person = this.oldplans.getPerson(agentId);
 					Act act = (Act)(person.getSelectedPlan().getActsLegs().get(plan.getActsLegs().size()));
@@ -152,7 +152,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 	public void handleEvent(final EventAgentStuck event) {
 		Plan plan;
 		double time = event.time;
-		IdI linkId;
+		Id linkId;
 		String agentId;
 		try {
 			if (event.agent != null) {

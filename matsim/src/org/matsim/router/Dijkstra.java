@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -36,7 +37,6 @@ import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Implementation of <a
@@ -94,7 +94,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 */
 	final TravelTimeI timeFunction;
 
-	final private HashMap<IdI, DijkstraNodeData> nodeData;
+	final private HashMap<Id, DijkstraNodeData> nodeData;
 
 	/**
 	 * Provides an unique id (loop number) for each routing request, so we don't
@@ -177,7 +177,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
 
-		this.nodeData = new HashMap<IdI, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
+		this.nodeData = new HashMap<Id, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.comparator = new ComparatorDijkstraCost(this.nodeData);
 
 		if (preProcessData != null) {
@@ -548,9 +548,9 @@ public class Dijkstra implements LeastCostPathCalculator {
 
 		private static final long serialVersionUID = 1L;
 
-		protected Map<IdI, ? extends DijkstraNodeData> nodeData;
+		protected Map<Id, ? extends DijkstraNodeData> nodeData;
 
-		public ComparatorDijkstraCost(final Map<IdI, ? extends DijkstraNodeData> nodeData) {
+		public ComparatorDijkstraCost(final Map<Id, ? extends DijkstraNodeData> nodeData) {
 			this.nodeData = nodeData;
 		}
 

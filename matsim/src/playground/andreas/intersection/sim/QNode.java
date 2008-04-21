@@ -2,7 +2,7 @@ package playground.andreas.intersection.sim;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.network.Node;
 import org.matsim.trafficlights.data.SignalGroupSettings;
@@ -14,7 +14,7 @@ public class QNode extends Node{
 	private SignalSystemControlerImpl myNodeTrafficLightControler;
 
 	public QNode(String id, String x, String y, String type) {
-		super(new Id(id), x, y, type);
+		super(new IdImpl(id), x, y, type);
 	}
 
 	public void setSignalSystemControler(SignalSystemControlerImpl nodeControler){

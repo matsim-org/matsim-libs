@@ -23,15 +23,15 @@ package org.matsim.plans.algorithms;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.basic.v01.BasicPlan.ActIterator;
-import org.matsim.basic.v01.BasicPlan.LegIterator;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Checks if the fastest route between two activities ("beeline route") crosses a specific area.
@@ -41,7 +41,7 @@ import org.matsim.utils.identifiers.IdI;
 public class RouteAndBeelineTransitionCheck implements PlanAlgorithmI {
 
 	private NetworkLayer network = null;
-	private Set<IdI> aOI = new HashSet<IdI>();
+	private Set<Id> aOI = new HashSet<Id>();
 	private PlansCalcRoute router = null;
 
 	// the result of RouteAndBeelineTransitionCheck
@@ -51,7 +51,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithmI {
 	// count[3] --> # beeline intersect AOI, plan leg intersect AOI
 	public int[] count;
 
-	public RouteAndBeelineTransitionCheck(final NetworkLayer net, final Set<IdI> areaOfInterest) {
+	public RouteAndBeelineTransitionCheck(final NetworkLayer net, final Set<Id> areaOfInterest) {
 		this.network = net;
 		this.aOI = areaOfInterest;
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();

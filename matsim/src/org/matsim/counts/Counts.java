@@ -22,8 +22,8 @@ package org.matsim.counts;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.counts.algorithms.CountsAlgorithm;
-import org.matsim.utils.identifiers.IdI;
 
 public class Counts {
 
@@ -32,7 +32,7 @@ public class Counts {
 	private String desc = null;
 	private int year = 0;
 	private String layer = null;
-	private final TreeMap<IdI, Count> counts = new TreeMap<IdI, Count>();
+	private final TreeMap<Id, Count> counts = new TreeMap<Id, Count>();
 	private final ArrayList<CountsAlgorithm> algorithms = new ArrayList<CountsAlgorithm>();
 
 	private Counts() {
@@ -62,7 +62,7 @@ public class Counts {
 	 * @param csId
 	 * @return the created Count object, or null if it could not be created (maybe because it already exists)
 	 */
-	public final Count createCount(final IdI locId, final String csId) {
+	public final Count createCount(final Id locId, final String csId) {
 		// check id string for uniqueness
 		if (this.counts.containsKey(locId)) {
 			return null;
@@ -108,11 +108,11 @@ public class Counts {
 		return this.layer;
 	}
 
-	public final TreeMap<IdI, Count> getCounts() {
+	public final TreeMap<Id, Count> getCounts() {
 		return this.counts;
 	}
 
-	public final Count getCount(final IdI locId) {
+	public final Count getCount(final Id locId) {
 		return this.counts.get(locId);
 	}
 

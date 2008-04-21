@@ -1,24 +1,24 @@
 package playground.anhorni.crossborder;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 public class MyLink {
 	
-	private IdI id;
+	private Id id;
 	private double volume;
 
 
 	public MyLink(){}
 	
-	public MyLink(IdI id, double volume) {
+	public MyLink(Id id, double volume) {
 		this.id=id;
 		this.volume=volume;
 	}
 	
-	public IdI getId() {
+	public Id getId() {
 		return id;
 	}
-	public void setId(IdI id) {
+	public void setId(Id id) {
 		this.id = id;
 	}
 	public double getVolume() {

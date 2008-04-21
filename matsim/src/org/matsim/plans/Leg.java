@@ -25,12 +25,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicNode;
-import org.matsim.basic.v01.BasicRoute;
+import org.matsim.basic.v01.BasicLegImpl;
+import org.matsim.basic.v01.BasicNodeImpl;
+import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.utils.misc.Time;
 
-public class Leg extends BasicLeg implements Serializable{
+public class Leg extends BasicLegImpl implements Serializable{
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -87,7 +87,7 @@ public class Leg extends BasicLeg implements Serializable{
 			this.route = new Route((Route) leg.route);	
 		}
 		else {
-			this.route = new BasicRoute<BasicNode>();
+			this.route = new BasicRouteImpl<BasicNodeImpl>();
 			this.route.setRoute(leg.getRoute().getRoute());
 		}
 		

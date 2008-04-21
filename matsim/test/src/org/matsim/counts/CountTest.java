@@ -22,26 +22,26 @@ package org.matsim.counts;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class CountTest extends MatsimTestCase {
 
 	public void testCreateVolume() {
-		Count count = new Count(new Id(0), "1");
+		Count count = new Count(new IdImpl(0), "1");
 		Volume volume = count.createVolume(1, 100.0);
 		assertTrue("Creation and initialization of volume failed", volume.getHour()==1);
 		assertTrue("Creation and initialization of volume failed", volume.getValue()==100.0);
 	}
 
 	public void testGetVolume() {
-		Count count = new Count(new Id(0), "1");
+		Count count = new Count(new IdImpl(0), "1");
 		count.createVolume(1, 100.0);
 		assertTrue("Getting volume failed", count.getVolume(1).getValue() == 100.0);
 	}
 
 	public void testGetVolumes() {
-		Count count = new Count(new Id(0), "1");
+		Count count = new Count(new IdImpl(0), "1");
 		count.createVolume(1, 100.0);
 
 		Iterator<Volume> vol_it = count.getVolumes().values().iterator();

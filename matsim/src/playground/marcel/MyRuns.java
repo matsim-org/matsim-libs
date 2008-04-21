@@ -46,6 +46,7 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.StuckVehStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.controler.ScenarioData;
@@ -123,7 +124,6 @@ import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.geometry.shared.CoordWGS84;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
@@ -178,7 +178,7 @@ public class MyRuns {
 
 		System.out.println("  setting up plans object... ");
 		final Plans plans = new Plans(Plans.USE_STREAMING);
-		plans.setRefLayer(world.getLayer(new Id("tvz")));
+		plans.setRefLayer(world.getLayer(new IdImpl("tvz")));
 		final PlansWriter plansWriter = new PlansWriter(plans);
 		plans.setPlansWriter(plansWriter);
 		System.out.println("  done.");
@@ -225,7 +225,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices file... ");
-		final Matrix matrix = new VisumMatrixReader("test", world.getLayer(new Id("tvz"))).readFile(config.matrices().getInputFile());
+		final Matrix matrix = new VisumMatrixReader("test", world.getLayer(new IdImpl("tvz"))).readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 
 		final ArrayList<Double> timeDistro = new TimeDistributionReader().readFile(config.getParam("plans", "timeDistributionInputFile"));
@@ -417,7 +417,7 @@ public class MyRuns {
 		System.out.println("RUN: filterPlansWithRouteInArea");
 
 		final Coord center = new Coord(x, y);
-		final Map<IdI, Link> areaOfInterest = new HashMap<IdI, Link>();
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
 		final Config config = Gbl.createConfig(args);
 		final World world = Gbl.getWorld();
@@ -1703,8 +1703,8 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  writing VISUM file... ");
-		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new Id("tvz"));
-		final Set<IdI> ids = new TreeSet<IdI>();
+		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
+		final Set<Id> ids = new TreeSet<Id>();
 		for (final Iterator<? extends Location> iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
 			final Location loc = iter.next();
 			ids.add(loc.getId());
@@ -1755,7 +1755,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  adding events algorithms...");
-		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new Id("tvz"));
+		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
 		final ArrayList<CalcODMatrices> odcalcs = new ArrayList<CalcODMatrices>();
 		for (int i = 0; i < 30; i++) {
 			final CalcODMatrices odcalc = new CalcODMatrices(network, tvz, population, "od_" + i + "-" + (i + 1));
@@ -1773,7 +1773,7 @@ public class MyRuns {
 		System.out.println("  writing matrices files... ");
 		final MatricesWriter matrices_writer = new MatricesWriter(Matrices.getSingleton());
 		matrices_writer.write();
-		final Set<IdI> ids = new TreeSet<IdI>();
+		final Set<Id> ids = new TreeSet<Id>();
 		for (final Iterator<? extends Location> iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
 			final Location loc = iter.next();
 			if (Integer.parseInt(loc.getId().toString()) < 24) {
@@ -1835,7 +1835,7 @@ public class MyRuns {
 
 		System.out.println("  writing VISUM file... ");
 		final ZoneLayer tvz = (ZoneLayer)world.getLayer("bezirke");
-		final Set<IdI> ids = new TreeSet<IdI>();
+		final Set<Id> ids = new TreeSet<Id>();
 		for (final Iterator<? extends Location> iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
 			final Location loc = iter.next();
 			if (Integer.parseInt(loc.getId().toString()) < 24) {
@@ -1888,7 +1888,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  adding events algorithms...");
-		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new Id("tvz"));
+		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
 		final ArrayList<CalcODMatricesBezirke> odcalcs = new ArrayList<CalcODMatricesBezirke>();
 		for (int i = 0; i < 30; i++) {
 			final CalcODMatricesBezirke odcalc = new CalcODMatricesBezirke(network, tvz, population, "od_" + i + "-" + (i + 1));
@@ -1906,8 +1906,8 @@ public class MyRuns {
 		System.out.println("  writing matrices files... ");
 		final MatricesWriter matrices_writer = new MatricesWriter(Matrices.getSingleton());
 		matrices_writer.write();
-		final ZoneLayer bezirke = (ZoneLayer)world.getLayer(new Id("bezirke"));
-		final Set<IdI> ids = new TreeSet<IdI>();
+		final ZoneLayer bezirke = (ZoneLayer)world.getLayer(new IdImpl("bezirke"));
+		final Set<Id> ids = new TreeSet<Id>();
 		for (final Iterator<? extends Location> iter = bezirke.getLocations().values().iterator(); iter.hasNext(); ) {
 			final Location loc = iter.next();
 			if (Integer.parseInt(loc.getId().toString()) < 24) {
@@ -1952,9 +1952,9 @@ public class MyRuns {
 		MatricesWriter matrices_writer = new MatricesWriter(Matrices.getSingleton());
 		matrices_writer.write();
 
-		final TreeSet<IdI> ids = new TreeSet<IdI>();
+		final TreeSet<Id> ids = new TreeSet<Id>();
 		for (int i = 1; i < 882; i++) {
-			ids.add(new Id(i));
+			ids.add(new IdImpl(i));
 		}
 		for (final String name : Matrices.getSingleton().getMatrices().keySet()) {
 			final Matrix matrix = Matrices.getSingleton().getMatrices().get(name);
@@ -2222,7 +2222,7 @@ public class MyRuns {
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(config.world().getInputFile());
-		ZoneLayer tvz = (ZoneLayer)world.getLayer(new Id("tvz"));
+		ZoneLayer tvz = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
 		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
@@ -2535,7 +2535,7 @@ public class MyRuns {
 		Runtime.getRuntime().gc();
 		Gbl.printMemoryUsage();
 		System.out.println("  reading matrices file... " + (new Date()));
-		new VisumMatrixReader("oev_reisezeiten", world.getLayer(new Id("municipality"))).readFile(config.matrices().getInputFile());
+		new VisumMatrixReader("oev_reisezeiten", world.getLayer(new IdImpl("municipality"))).readFile(config.matrices().getInputFile());
 		System.out.println("  done." + (new Date()));
 
 		Runtime.getRuntime().gc();
@@ -2555,10 +2555,10 @@ public class MyRuns {
 	//////////////////////////////////////////////////////////////////////
 
 	private static Geometry getNetworkAsKml(final NetworkLayer network, final CoordinateTransformationI coordTransform) {
-		return getNetworkAsKml(network, new TreeMap<IdI, Integer>(), coordTransform);
+		return getNetworkAsKml(network, new TreeMap<Id, Integer>(), coordTransform);
 	}
 
-	private static Geometry getNetworkAsKml(final NetworkLayer network, final TreeMap<IdI, Integer> linkVolumes, final CoordinateTransformationI coordTransform) {
+	private static Geometry getNetworkAsKml(final NetworkLayer network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformationI coordTransform) {
 		final MultiGeometry networkGeom = new MultiGeometry();
 
 		for (Link link : network.getLinks().values()) {
@@ -2579,7 +2579,7 @@ public class MyRuns {
 
 		System.out.println("RUN: buildKML2");
 
-		final TreeMap<Integer, TreeMap<IdI, Integer>> linkValues = new TreeMap<Integer, TreeMap<IdI, Integer>>();
+		final TreeMap<Integer, TreeMap<Id, Integer>> linkValues = new TreeMap<Integer, TreeMap<Id, Integer>>();
 
 		Config config = Gbl.createConfig(args);
 
@@ -2627,10 +2627,10 @@ public class MyRuns {
 							if ((hour > 30) || (hour < 0)) return;
 
 							for (final Link link : route.getLinkRoute()) {
-								final IdI id = link.getId();
-								TreeMap<IdI, Integer> hourValues = linkValues.get(hour);
+								final Id id = link.getId();
+								TreeMap<Id, Integer> hourValues = linkValues.get(hour);
 								if (hourValues == null) {
-									hourValues = new TreeMap<IdI, Integer>();
+									hourValues = new TreeMap<Id, Integer>();
 									linkValues.put(hour, hourValues);
 								}
 								Integer counter = hourValues.get(id);
@@ -2676,9 +2676,9 @@ public class MyRuns {
 						new TimeSpan(new GregorianCalendar(1970, 0, 1, hour, 0, 0),
 								new GregorianCalendar(1970, 0, 1, hour, 59, 59)));
 				networksFolder.addFeature(placemark);
-				TreeMap<IdI, Integer> hourValues = linkValues.get(hour);
+				TreeMap<Id, Integer> hourValues = linkValues.get(hour);
 				if (hourValues == null) {
-					hourValues = new TreeMap<IdI, Integer>();
+					hourValues = new TreeMap<Id, Integer>();
 				}
 				placemark.setGeometry(getNetworkAsKml(network, hourValues, new CH1903LV03toWGS84()));
 			}

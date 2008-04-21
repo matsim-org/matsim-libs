@@ -1,10 +1,10 @@
 package org.matsim.network;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.world.Location;
 
-public interface Link extends BasicLinkI, Location {
+public interface Link extends BasicLink, Location {
 
 	public double calcDistance(final CoordI coord);
 

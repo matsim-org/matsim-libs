@@ -22,7 +22,7 @@ package org.matsim.trafficlights.data;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 
 /**
@@ -33,15 +33,15 @@ public class SignalSystemConfiguration {
 
 	private static final Logger log = Logger.getLogger(SignalSystemConfiguration.class);
 
-	private IdI id;
+	private Id id;
 
 	private SignalSystemControlInfo signalSystemControler;
 
-	public SignalSystemConfiguration(IdI id) {
+	public SignalSystemConfiguration(Id id) {
 		this.id = id;
 	}
 
-	public IdI getId() {
+	public Id getId() {
 		return this.id;
 	}
 

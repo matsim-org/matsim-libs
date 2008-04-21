@@ -22,9 +22,9 @@ package playground.balmermi.lsa;
 
 import java.util.HashMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.utils.identifiers.IdI;
 
 public class Lane implements Comparable<Lane> {
 
@@ -36,7 +36,7 @@ public class Lane implements Comparable<Lane> {
 	protected final Integer nr;
 	protected final HashMap<Integer,Lane> tolanes = new HashMap<Integer, Lane>();
 	protected final HashMap<Integer,LSA> lsas = new HashMap<Integer, LSA>();
-	protected final HashMap<IdI,Link> links = new HashMap<IdI, Link>();
+	protected final HashMap<Id,Link> links = new HashMap<Id, Link>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors

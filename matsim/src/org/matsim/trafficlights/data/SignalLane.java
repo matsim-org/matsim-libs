@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.trafficlights.data;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 
 /**
@@ -28,24 +28,24 @@ import org.matsim.utils.identifiers.IdI;
  */
 public class SignalLane {
 
-	private IdI id;
+	private Id id;
 
-	private IdI linkId;
+	private Id linkId;
 
 	private double length = Double.NaN;
 
 	private boolean isMixedLane;
 
-	public SignalLane(IdI laneId, IdI linkId) {
+	public SignalLane(Id laneId, Id linkId) {
 		this.id = laneId;
 		this.linkId = linkId;
 	}
 
-	public IdI getId() {
+	public Id getId() {
 		return this.id;
 	}
 
-	public IdI getLinkId() {
+	public Id getLinkId() {
 		return this.linkId;
 	}
 

@@ -20,19 +20,19 @@
 
 package teach.multiagent07.simulation;
 
-import org.matsim.basic.v01.BasicLink;
+import org.matsim.basic.v01.BasicLinkImpl;
 
 public class SimpleVehicle extends Vehicle {
 
-	private BasicLink depLink;
+	private BasicLinkImpl depLink;
 	private double depTime;
 	
-	public SimpleVehicle(BasicLink link, double time) {
+	public SimpleVehicle(BasicLinkImpl link, double time) {
 		depLink = link;
 		depTime = time;
 	}
 	@Override
-	public BasicLink getDepartureLink() {
+	public BasicLinkImpl getDepartureLink() {
 		return depLink;
 	}
 

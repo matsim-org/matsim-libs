@@ -22,13 +22,13 @@ package org.matsim.interfaces.networks.basicNet;
 
 import java.util.Map;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * A topological representation of an network node.
  */
-public interface BasicNodeI {
+public interface BasicNode {
 
   /**
    * Returns a non-<code>null</code> instance of <code>IdI</code> that
@@ -36,7 +36,7 @@ public interface BasicNodeI {
    *
    * @return this object's identifier
    */
-  public IdI getId();
+  public Id getId();
 
     /**
      * Adds a non-<code>null</code> link to this node's set of ingoing links.
@@ -50,7 +50,7 @@ public interface BasicNodeI {
      * @throws IllegalArgumentException
      *             if <code>link</code> is <code>null</code>
      */
-    public boolean addInLink(BasicLinkI link);
+    public boolean addInLink(BasicLink link);
 
     /**
      * Adds a non-<code>null</code> link to this node's set of outgoing
@@ -65,7 +65,7 @@ public interface BasicNodeI {
      * @throws IllegalArgumentException
      *             if <code>link</code> is <code>null</code>
      */
-    public boolean addOutLink(BasicLinkI link);
+    public boolean addOutLink(BasicLink link);
 
     /**
      * Returns this node's set of ingoing links. This set might be empty, but it
@@ -73,7 +73,7 @@ public interface BasicNodeI {
      *
      * @return this node's ingoing links
      */
-    public Map<IdI, ? extends BasicLinkI> getInLinks();
+    public Map<Id, ? extends BasicLink> getInLinks();
 
     /**
      * Returns this node's set of outgoing links. This set might be empty, but
@@ -81,7 +81,7 @@ public interface BasicNodeI {
      *
      * @return this node's outgoing links
      */
-    public Map<IdI, ? extends BasicLinkI> getOutLinks();
+    public Map<Id, ? extends BasicLink> getOutLinks();
 
     public CoordI getCoord();
 }

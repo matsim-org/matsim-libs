@@ -22,7 +22,7 @@ package org.matsim.plans;
 
 import java.io.IOException;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.CoordI;
@@ -165,7 +165,7 @@ public class PlansReaderKutter implements PlansReaderI {
 		public PersonRowHandler() {
 			this.idCnt = 0;
 			World world = Gbl.getWorld();
-			this.tvzLayer = (ZoneLayer)world.getLayer(new Id("tvz"));
+			this.tvzLayer = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
 		}
 
 		public long getPersonCountCreated() {

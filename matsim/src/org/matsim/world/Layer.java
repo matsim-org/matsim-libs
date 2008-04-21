@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Basic collection of same geographical objects in MATSim.
@@ -45,25 +45,25 @@ public abstract class Layer {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	protected final IdI type;
+	protected final Id type;
 	protected String name;
 
 	protected MappingRule up_rule = null; // to aggregate
 	protected MappingRule down_rule = null; // to disaggregate
 
-	protected final TreeMap<IdI, Location> locations = new TreeMap<IdI,Location>();
+	protected final TreeMap<Id, Location> locations = new TreeMap<Id,Location>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected Layer(final IdI type, final String name) {
+	protected Layer(final Id type, final String name) {
 		this.type = type;
 		this.name = name;
 	}
 
 	protected Layer(final String type, final String name) {
-		this(new Id(type),name);
+		this(new IdImpl(type),name);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -126,7 +126,7 @@ public abstract class Layer {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final IdI getType() {
+	public final Id getType() {
 		return this.type;
 	}
 
@@ -142,16 +142,16 @@ public abstract class Layer {
 		return this.down_rule;
 	}
 
-	public final Location getLocation(final IdI location_id) {
+	public final Location getLocation(final Id location_id) {
 		return this.locations.get(location_id);
 	}
 
 	public final Location getLocation(final String location_id) {
-		return this.locations.get(new Id(location_id));
+		return this.locations.get(new IdImpl(location_id));
 	}
 
 	public final Location getLocation(final int location_id) {
-		return this.getLocation(new Id(location_id));
+		return this.getLocation(new IdImpl(location_id));
 	}
 
 	/**
@@ -202,7 +202,7 @@ public abstract class Layer {
 		return locs;
 	}
 
-	public final TreeMap<IdI, ? extends Location> getLocations() {
+	public final TreeMap<Id, ? extends Location> getLocations() {
 		return this.locations;
 	}
 

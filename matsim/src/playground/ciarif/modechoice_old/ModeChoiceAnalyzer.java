@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
@@ -57,7 +57,7 @@ public class ModeChoiceAnalyzer extends PersonAlgorithm {
 	@Override
 	public void run(Person person) {
 		Plan plan = person.getSelectedPlan();
-		BasicPlan.LegIterator legIt = plan.getIteratorLeg();
+		BasicPlanImpl.LegIterator legIt = plan.getIteratorLeg();
 		
 		while (legIt.hasNext()) {
 			BasicLeg leg = legIt.next();

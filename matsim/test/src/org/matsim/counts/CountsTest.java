@@ -20,7 +20,7 @@
 
 package org.matsim.counts;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class CountsTest extends MatsimTestCase {
@@ -44,7 +44,7 @@ public class CountsTest extends MatsimTestCase {
 	}
 
 	public void testGetCounts() {
-		Counts.getSingleton().createCount(new Id(0), "1");
+		Counts.getSingleton().createCount(new IdImpl(0), "1");
 		assertTrue("Getting counts failed", Counts.getSingleton().getCounts().size()==1);
 	}
 }

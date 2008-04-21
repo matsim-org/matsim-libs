@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.GZIPOutputStream;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -48,7 +49,6 @@ import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessEuclidean;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 public class MyRunsLoechl extends MyRuns {
@@ -77,7 +77,7 @@ public class MyRunsLoechl extends MyRuns {
 //		Gbl.createConfig(args);
 		if (args[2].equals("v")) {
 
-			TreeMap<IdI, Link> nearestLinks = new TreeMap<IdI, Link>();
+			TreeMap<Id, Link> nearestLinks = new TreeMap<Id, Link>();
 			for (Location fac : facilities.getLocations().values()) {
 				Link nearestLink = network.getNearestRightEntryLink(fac.getCenter());
 				nearestLinks.put(fac.getId(), nearestLink);
@@ -112,7 +112,7 @@ public class MyRunsLoechl extends MyRuns {
 	 */
 	private static void writeLeastDistanceToPointOfInterest(final String arg) {
 		Collection<? extends Location> facs = (Gbl.getWorld().getLayer(Facilities.LAYER_TYPE)).getLocations().values();
-		TreeMap<IdI, Link> nearestLinks = new TreeMap<IdI, Link>();
+		TreeMap<Id, Link> nearestLinks = new TreeMap<Id, Link>();
 
 		// get Autobahnauffahrten, ptStops, railstations and CDBs
 		ArrayList<Facility> highwayDriveUp = new ArrayList<Facility>();
@@ -221,7 +221,7 @@ public class MyRunsLoechl extends MyRuns {
 	private static void writeFacilitiesInVicinity() {
 		Collection<? extends Location> facs = (Gbl.getWorld().getLayer(Facilities.LAYER_TYPE)).getLocations().values();
 
-		TreeMap<IdI, Link> nearestLinks = new TreeMap<IdI, Link>();
+		TreeMap<Id, Link> nearestLinks = new TreeMap<Id, Link>();
 
 		for (Location fac : facs) {
 			Link nearestLink = network.getNearestRightEntryLink(fac.getCenter());
@@ -275,7 +275,7 @@ public class MyRunsLoechl extends MyRuns {
 	}
 
 	synchronized static double[] getShortestPathDistanceAndHopCount(final Location fac1,
-			final Location fac2, final Map<IdI, Link> nearestLinks, final LeastCostPathCalculator router) {
+			final Location fac2, final Map<Id, Link> nearestLinks, final LeastCostPathCalculator router) {
 		Link fromLink = nearestLinks.get(fac1.getId());
 		Link toLink = nearestLinks.get(fac2.getId());
 		Node fromNode = fromLink.getToNode();
@@ -303,7 +303,7 @@ public class MyRunsLoechl extends MyRuns {
 
 		Collection<Facility> cityCenter = null;
 
-		Map<IdI, Link> nearestLinks = null;
+		Map<Id, Link> nearestLinks = null;
 
 		LeastCostPathCalculator router = null;
 
@@ -323,7 +323,7 @@ public class MyRunsLoechl extends MyRuns {
 				final Collection<Facility> highwayDriveUp,
 				final Collection<Facility> ptStop, final Collection<Facility> railstation,
 				final Collection<Facility> cityCenter,
-				final Map<IdI, Link> nearestLinks, final PreProcessEuclidean preRouter,
+				final Map<Id, Link> nearestLinks, final PreProcessEuclidean preRouter,
 				final NetworkLayer network, final int id, final String type) {
 			this.facilities = facilities;
 			this.nearestLinks = nearestLinks;
@@ -439,10 +439,10 @@ class CalcFacilitiesInVicinityThread extends Thread {
 
 	private final PreProcessLandmarks preRouter;
 
-	private final TreeMap<IdI, Link> nearestLinks;
+	private final TreeMap<Id, Link> nearestLinks;
 
 	CalcFacilitiesInVicinityThread(final int id, final int threadCount, final String outputPath, final NetworkLayer network,
-			final PreProcessLandmarks preRouter, final TreeMap<IdI, Link> nearestLinks) {
+			final PreProcessLandmarks preRouter, final TreeMap<Id, Link> nearestLinks) {
 		super(Integer.toString(id));
 		this.id = id;
 		this.threadCount = threadCount;

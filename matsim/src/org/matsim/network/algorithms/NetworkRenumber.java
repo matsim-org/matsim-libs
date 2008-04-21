@@ -20,7 +20,7 @@
 
 package org.matsim.network.algorithms;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -69,25 +69,25 @@ public class NetworkRenumber extends NetworkAlgorithm {
 		if (this.restore) {
 			// restore
 			for (Node node : network.getNodes().values()) {
-				node.setId(new Id(node.getOrigId()));
+				node.setId(new IdImpl(node.getOrigId()));
 				node.setOrigId(null);
 			}
 
 			for (Link link : network.getLinks().values()) {
-				link.setId(new Id(link.getOrigId()));
+				link.setId(new IdImpl(link.getOrigId()));
 			}
 		} 	else {
 			// renumber
 			int id = 1;
 			for (Node node : network.getNodes().values()) {
 				node.setOrigId(node.getId().toString());
-				node.setId(new Id(id));
+				node.setId(new IdImpl(id));
 				id++;
 			}
 
 			id = 1;
 			for (Link link : network.getLinks().values()) {
-				link.setId(new Id(id));
+				link.setId(new IdImpl(id));
 				id++;
 			}
 		}

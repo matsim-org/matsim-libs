@@ -3,12 +3,12 @@ package playground.ciarif.models.subtours;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 
 public class PersonSubtour {
 	
-	private IdI person_id;
+	private Id person_id;
 	private List<Subtour> subtours;
 	
 	public PersonSubtour () {
@@ -24,7 +24,7 @@ public class PersonSubtour {
 		subtours.add(subtour); 
 	}
 	
-	public void setPerson_id(IdI person_id) {
+	public void setPerson_id(Id person_id) {
 		this.person_id = person_id;
 	}
 	
@@ -36,7 +36,7 @@ public class PersonSubtour {
 	// Getters methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public IdI getPerson_id() {
+	public Id getPerson_id() {
 		return person_id;
 	}
 	

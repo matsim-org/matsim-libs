@@ -20,10 +20,10 @@
 
 package org.matsim.planomat.costestimators;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.plans.Route;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 /**
@@ -41,7 +41,7 @@ public class BeeLine implements LegTravelTimeEstimator {
 	final static double SPEED = 20.0 / 3.6; // 20km/h --> m/s
 	
 	public double getLegTravelTimeEstimation(
-			IdI personId, 
+			Id personId, 
 			double departureTime, 
 			Location origin, 
 			Location destination,

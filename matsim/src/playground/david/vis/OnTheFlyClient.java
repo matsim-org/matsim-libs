@@ -28,7 +28,7 @@ import java.util.List;
 
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 
-import org.matsim.basic.v01.BasicLink;
+import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Route;
@@ -78,7 +78,7 @@ public class OnTheFlyClient extends Thread {
 					Act.setLinkBuilder(new Act.LinkBuilder() {
 						@Override
 						public void addLink(Act act, String linkId) {
-							act.setLink(new BasicLink(linkId));
+							act.setLink(new BasicLinkImpl(linkId));
 						}
 					});
 					visnet = host.getNet(null);

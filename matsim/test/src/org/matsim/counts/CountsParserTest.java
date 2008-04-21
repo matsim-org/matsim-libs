@@ -20,7 +20,7 @@
 
 package org.matsim.counts;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -70,7 +70,7 @@ public class CountsParserTest extends MatsimTestCase {
 			throw new RuntimeException(e);
 		}
 
-		Count count = Counts.getSingleton().getCount(new Id(1));
+		Count count = Counts.getSingleton().getCount(new IdImpl(1));
 		assertTrue("Count attribute setting failed", count.getCsId().equals("testNr"));
 		assertNull("Count attributes x,y should not be set", count.getCoord());
 
@@ -94,7 +94,7 @@ public class CountsParserTest extends MatsimTestCase {
 			throw new RuntimeException(e);
 		}
 
-		Count count = Counts.getSingleton().getCount(new Id(1));
+		Count count = Counts.getSingleton().getCount(new IdImpl(1));
 		assertNotNull("Count attribute x,y setting failed", count.getCoord());
 		assertEquals("Count attribute x setting failed", 123.456, count.getCoord().getX(), 1e-9);
 		assertEquals("Count attribute y setting failed", 987.654, count.getCoord().getY(), 1e-9);
@@ -120,7 +120,7 @@ public class CountsParserTest extends MatsimTestCase {
 			throw new RuntimeException(e);
 		}
 
-		assertTrue("Volume attribute setting failed",Counts.getSingleton().getCount(new Id(1)).getVolume(1).getValue()==100.0);
+		assertTrue("Volume attribute setting failed",Counts.getSingleton().getCount(new IdImpl(1)).getVolume(1).getValue()==100.0);
 
 		try {
 			reader.endElement("", "volume", "volume");

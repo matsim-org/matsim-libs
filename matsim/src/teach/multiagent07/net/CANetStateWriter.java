@@ -21,36 +21,36 @@
 package teach.multiagent07.net;
 import java.util.Collection;
 
-import org.matsim.basic.v01.BasicLink;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
+import org.matsim.basic.v01.BasicLinkImpl;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 
 public class CANetStateWriter extends DisplayNetStateWriter {
 
-	public CANetStateWriter(BasicNetI network, String networkFileName, String filePrefix, int timeStepLength_s, int bufferSize) {
+	public CANetStateWriter(BasicNet network, String networkFileName, String filePrefix, int timeStepLength_s, int bufferSize) {
 		super(network, networkFileName, filePrefix, timeStepLength_s, bufferSize);
 	}
 	@Override
-	protected Collection<DrawableAgentI> getAgentsOnLink(BasicLinkI link) {
+	protected Collection<DrawableAgentI> getAgentsOnLink(BasicLink link) {
 		return ((CANetStateWritableI)link).getDisplayAgents();
 	}
 	@Override
-	protected String getLinkDisplLabel(BasicLinkI link) {
-		return ((BasicLink)link).getId().toString();
+	protected String getLinkDisplLabel(BasicLink link) {
+		return ((BasicLinkImpl)link).getId().toString();
 	}
 	@Override
-	protected double getLinkDisplValue(BasicLinkI link) {
+	protected double getLinkDisplValue(BasicLink link) {
 		return ((CANetStateWritableI)link).getDisplayValue();
 	}
-	public static CANetStateWriter createWriter(BasicNetI network, String netFile, String outputFile) {
+	public static CANetStateWriter createWriter(BasicNet network, String netFile, String outputFile) {
 		return new CANetStateWriter(network, netFile, outputFile, 60, 300);
 	}
 
 	@Override
-	protected String getNodeDisplLabel(BasicNodeI node) {
+	protected String getNodeDisplLabel(BasicNode node) {
 		return ((CANode)node).getId().toString();
 	}
 

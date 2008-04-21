@@ -29,12 +29,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.identifiers.IdI;
 
 public class MetisExeWrapper {
 
@@ -49,7 +49,7 @@ public class MetisExeWrapper {
 
 	public static ArrayList<Integer> readPartitionInfoFromFile(QueueNetworkLayer network, String myID, int parts) throws IOException {
 		int count = 1;
-		TreeMap<Integer, IdI> IDToInt = new TreeMap<Integer, IdI>();
+		TreeMap<Integer, Id> IDToInt = new TreeMap<Integer, Id>();
 		for (Node node : network.getNodes().values()) {
 			IDToInt.put(count++, node.getId());
 		}
@@ -114,7 +114,7 @@ public class MetisExeWrapper {
 	}
 
 	public static void writeNetworkToFile(NetworkLayer network, String myID) throws IOException {
-		TreeMap<IdI, Integer> IDToInt = new TreeMap<IdI, Integer>();
+		TreeMap<Id, Integer> IDToInt = new TreeMap<Id, Integer>();
 		BufferedWriter out = null;
 		try {
 			out = new BufferedWriter(new FileWriter("MetiscompatibleGraph"+myID+".txt"));

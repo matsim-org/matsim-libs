@@ -20,8 +20,8 @@
 
 package playground.dgrether.analysis;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 
 
 /**
@@ -56,7 +56,7 @@ public class PlanComparisonStringWriter implements PlanComparisonWriter {
 		_buffer.append("Improvement");
 		_buffer.append(linesep);
 
-		for (IdI i : pc.getPersonIds()) {
+		for (Id i : pc.getPersonIds()) {
 			score1 = pc.getFirstScore(i);
 			score2 = pc.getSecondScore(i);
 			coordinates = pc.getHomeLocation(i).getCoord();

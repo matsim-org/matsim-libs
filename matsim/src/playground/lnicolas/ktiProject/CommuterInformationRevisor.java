@@ -23,12 +23,12 @@ package playground.lnicolas.ktiProject;
 import java.util.ArrayList;
 import java.util.Set;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 
@@ -130,8 +130,8 @@ public class CommuterInformationRevisor {
 	}
 
 	private boolean containsActivityFacility(final Location location, final String activityType) {
-		Set<IdI> facilityIds = location.getDownMapping().keySet();
-		for (IdI facilityId : facilityIds) {
+		Set<Id> facilityIds = location.getDownMapping().keySet();
+		for (Id facilityId : facilityIds) {
 			Facility facility = (Facility)this.facilities.getLocation(facilityId);
 			Activity activity = facility.getActivity(activityType);
 			if (activity != null && activity.getCapacity() > 0) {

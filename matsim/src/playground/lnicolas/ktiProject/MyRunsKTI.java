@@ -32,8 +32,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Map.Entry;
 
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -56,7 +57,6 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.AbstractLocation;
 import org.matsim.world.Location;
 import org.matsim.world.World;
@@ -91,7 +91,7 @@ public class MyRunsKTI extends MyRuns {
 		 */
 		final String outputFolder =  "/data/matsim-t/lnicolas/";
 		ArrayList<Zone> referenceZones = null;
-		TreeMap<IdI, MunicipalityInformation> municipalityInfo = null;
+		TreeMap<Id, MunicipalityInformation> municipalityInfo = null;
 		ArrayList<Zone> homeZones = null;
 		ArrayList<Zone> primaryActZones = null;
 		if (args[2].equals("2000r") == false && args[2].equals("2006r") == false) {
@@ -104,7 +104,7 @@ public class MyRunsKTI extends MyRuns {
 			 * Get the ZoneLayer containing the municipalities
 			 */
 			referenceZones = new ArrayList((Gbl.getWorld().getLayer(
-					new Id("municipality"))).getLocations().values());
+					new IdImpl("municipality"))).getLocations().values());
 
 			/**
 			 * Read additional information per municipality from the given input file
@@ -245,7 +245,7 @@ public class MyRunsKTI extends MyRuns {
 			 * Again some analysis...
 			 */
 			analyzePopulation(population, homeZones, args[2],
-					((ZoneLayer) Gbl.getWorld().getLayer(new Id("municipality"))).getLocations().values());
+					((ZoneLayer) Gbl.getWorld().getLayer(new IdImpl("municipality"))).getLocations().values());
 			analyzePopulation(plans, args[2]);
 			MicroCensus2005ActChainGenerator.writeActChainDistributionWorkNoWork(
 					plans, outputFolder + "actChainDistr" + args[2] + ".csv");
@@ -267,7 +267,7 @@ public class MyRunsKTI extends MyRuns {
 			 * Get the layer that connects the each facility to the zones it lies in.
 			 */
 			ZoneLayer facilityLocations =
-				(ZoneLayer) Gbl.getWorld().getLayer(new Id("facility"));
+				(ZoneLayer) Gbl.getWorld().getLayer(new IdImpl("facility"));
 			// A Facility and the corresponding Facility Location (enclosing the given Facility)
 			// have the same Id
 			Location location = null;
@@ -322,7 +322,7 @@ public class MyRunsKTI extends MyRuns {
 			commuterGen.run(workCommuterMatrix, educationCommuterMatrix);
 			System.out.println("done");
 
-			TreeMap<IdI, Zone> tmpZones = new TreeMap<IdI, Zone>();
+			TreeMap<Id, Zone> tmpZones = new TreeMap<Id, Zone>();
 			for (Zone zone : referenceZones) {
 				tmpZones.put(zone.getId(), zone);
 			}
@@ -362,7 +362,7 @@ public class MyRunsKTI extends MyRuns {
 			 */
 			for (Person person : plans.getPersons().values()) {
 				for (Plan plan : person.getPlans()) {
-					BasicPlan.LegIterator legIt = plan.getIteratorLeg();
+					BasicPlanImpl.LegIterator legIt = plan.getIteratorLeg();
 					while (legIt.hasNext()) {
 						legIt.next().setMode("car");
 					}
@@ -527,7 +527,7 @@ public class MyRunsKTI extends MyRuns {
 		readWorld();
 		ArrayList<Zone> referenceZones =
 			new ArrayList((Gbl.getWorld().getLayer(
-		new Id("municipality"))).getLocations().values());
+		new IdImpl("municipality"))).getLocations().values());
 		facsPerZone.run(referenceZones, facilities);
 		System.out.println("done");
 
@@ -785,7 +785,7 @@ public class MyRunsKTI extends MyRuns {
 		int cnt = 0;
 		for (Plan p : plans2000) {
 			String actChain = "";
-			BasicPlan.ActIterator it = p.getIteratorAct();
+			BasicPlanImpl.ActIterator it = p.getIteratorAct();
 			while (it.hasNext()) {
 				actChain += it.next().getType();
 			}
@@ -814,7 +814,7 @@ public class MyRunsKTI extends MyRuns {
 	 */
 	private static void addCensusIncomeInformationToPopulation(final ArrayList<Person> population,
 			final ArrayList<HouseholdI> households, final ArrayList<Zone> zones, final World world,
-			final TreeMap<IdI, MunicipalityInformation> incomeInfo) {
+			final TreeMap<Id, MunicipalityInformation> incomeInfo) {
 		System.out.println("Adding municipality income information to population...");
 
 		Income2000Generator incInfGen = new Income2000Generator(world, incomeInfo);
@@ -847,7 +847,7 @@ public class MyRunsKTI extends MyRuns {
 	 */
 	private static void addMobilityInformationToPopulation(final ArrayList<Person> population,
 			final ArrayList<HouseholdI> households, final ArrayList<Zone> zones, final World world,
-			final TreeMap<IdI, MunicipalityInformation> municipalityInfo) {
+			final TreeMap<Id, MunicipalityInformation> municipalityInfo) {
 		System.out.println("Adding license and mobility information to population...");
 		LicenseOwnershipGenerator licInfGen =
 			new LicenseOwnershipGenerator(world, municipalityInfo);
@@ -902,7 +902,7 @@ public class MyRunsKTI extends MyRuns {
 
 	private static void writePopulationAgeDistribution(final ArrayList<Person> population,
 			final ArrayList<Zone> zones, final String suffix, final Collection<Zone> referenceZones) {
-		TreeMap<IdI, ArrayList<Integer> > personsPerZone = new TreeMap<IdI, ArrayList<Integer>>();
+		TreeMap<Id, ArrayList<Integer> > personsPerZone = new TreeMap<Id, ArrayList<Integer>>();
 		ArrayList<Integer> nullAges = new ArrayList<Integer>();
 		for (int j = 0; j < 126; j++) {
 			nullAges.add(0);
@@ -954,8 +954,8 @@ public class MyRunsKTI extends MyRuns {
 
 	private static void writePopulationIncomeDistribution(final ArrayList<Person> population,
 			final ArrayList<Zone> zones, final String suffix, final Collection<Zone> referenceZones) {
-		TreeMap<IdI, Integer> personsPerZone = new TreeMap<IdI, Integer>();
-		TreeMap<IdI, Double> incomePerZone = new TreeMap<IdI, Double>();
+		TreeMap<Id, Integer> personsPerZone = new TreeMap<Id, Integer>();
+		TreeMap<Id, Double> incomePerZone = new TreeMap<Id, Double>();
 		for (int i = 0; i < zones.size(); i++) {
 			Person p = population.get(i);
 			Zone z = zones.get(i);
@@ -994,9 +994,9 @@ public class MyRunsKTI extends MyRuns {
 			final ArrayList<Zone> zones, String suffix, final Collection<Zone> referenceZones,
 			final int differenceTypeIndex) {
 
-		TreeMap<IdI, Integer> yesPersonsPerZone = new TreeMap<IdI, Integer>();
-		TreeMap<IdI, Integer> noPersonsPerZone = new TreeMap<IdI, Integer>();
-		TreeMap<IdI, Integer> tmpDistr = null;
+		TreeMap<Id, Integer> yesPersonsPerZone = new TreeMap<Id, Integer>();
+		TreeMap<Id, Integer> noPersonsPerZone = new TreeMap<Id, Integer>();
+		TreeMap<Id, Integer> tmpDistr = null;
 		for (int i = 0; i < zones.size(); i++) {
 			Person p = population.get(i);
 			Zone z = zones.get(i);
@@ -1083,8 +1083,8 @@ public class MyRunsKTI extends MyRuns {
 
 	private static void writePersonCountPerZoneDistribution(final ArrayList<Person> population,
 			final ArrayList<Zone> zones, final String suffix) {
-		TreeMap<IdI, Integer> personsPerZone = new TreeMap<IdI, Integer>();
-		TreeMap<IdI, Zone> zoneByID = new TreeMap<IdI, Zone>();
+		TreeMap<Id, Integer> personsPerZone = new TreeMap<Id, Integer>();
+		TreeMap<Id, Zone> zoneByID = new TreeMap<Id, Zone>();
 		for (Zone z : zones) {
 			int pCount = 0;
 			if (personsPerZone.containsKey(z.getId())) {
@@ -1098,7 +1098,7 @@ public class MyRunsKTI extends MyRuns {
 		String filename = "/home/lnicolas/data/kti-projekt/zonePopulationDistr" + suffix + ".csv";
 		try {
 			out = new BufferedWriter(new FileWriter(filename));
-			for (Entry<IdI, Zone> entry : zoneByID.entrySet()) {
+			for (Entry<Id, Zone> entry : zoneByID.entrySet()) {
 				out.write(entry.getValue().getName() + "," + personsPerZone.get(entry.getKey()));
 				out.newLine();
 			}

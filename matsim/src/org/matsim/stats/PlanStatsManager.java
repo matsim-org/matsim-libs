@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -31,7 +32,6 @@ import org.matsim.plans.Plans;
 import org.matsim.stats.algorithms.BasicPlanStats;
 import org.matsim.stats.algorithms.PlanScoreTrajectory;
 import org.matsim.stats.algorithms.PlanStatsI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.writer.MatsimWriter;
 
 /**
@@ -46,10 +46,10 @@ public class PlanStatsManager  {
 	public int minIteration;
 	public int maxIteration;
 	private final int iters;
-	private HashMap<IdI, ArrayList<PlanStatsI>> stats = null;
+	private HashMap<Id, ArrayList<PlanStatsI>> stats = null;
 
 	public PlanStatsManager(){
-		this.stats = new HashMap<IdI, ArrayList<PlanStatsI>>();
+		this.stats = new HashMap<Id, ArrayList<PlanStatsI>>();
 		this.minIteration = Gbl.getConfig().controler().getFirstIteration();
 		this.maxIteration = Gbl.getConfig().controler().getLastIteration();
 		this.iters = 1 + this.maxIteration - this.minIteration;
@@ -78,7 +78,7 @@ public class PlanStatsManager  {
 	}
 
 	public void print(final Person person) {
-		IdI persId = person.getId();
+		Id persId = person.getId();
 		for (PlanStatsI plan : this.stats.get(persId)){
 			System.out.print("stats " + persId);
 			plan.print();
@@ -91,7 +91,7 @@ public class PlanStatsManager  {
 		StatsWriter wrt = new StatsWriter();
 		wrt.openFile(Gbl.getConfig().getParam(STATS_MODULE, STATS_FILE));
 		for (Person pers : population.getPersons().values()) {
-			IdI persId = pers.getId();
+			Id persId = pers.getId();
 			for (PlanStatsI plan : this.stats.get(persId)){
 				String str = persId + plan.printStr() + "\n";
 				wrt.write(str);
@@ -102,7 +102,7 @@ public class PlanStatsManager  {
 
 	public void initPlan(final Plan plan){
 		plan.firstPlanStatsAlgorithm = new BasicPlanStats(new PlanScoreTrajectory(this.iters, this.minIteration));
-		IdI persId = plan.getPerson().getId();
+		Id persId = plan.getPerson().getId();
 
 		ArrayList<PlanStatsI> plans  = this.stats.get(persId);
 		if (this.stats.get(persId) == null){

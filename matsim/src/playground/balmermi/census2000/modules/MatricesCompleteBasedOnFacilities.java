@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -31,7 +32,6 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.matrices.algorithms.MatricesAlgorithm;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -71,12 +71,12 @@ public class MatricesCompleteBasedOnFacilities extends MatricesAlgorithm {
 	/**
 	 * The mapping between each <i>facility</i> id and the <i>zone</i> it belongs to.
 	 */
-	private final HashMap<IdI,Zone> fac_zone_map = new HashMap<IdI,Zone>();
+	private final HashMap<Id,Zone> fac_zone_map = new HashMap<Id,Zone>();
 
 	/**
 	 * The mapping between each <i>zone</i> id and the <i>facilities</i> which belongs to that zone.
 	 */
-	private final HashMap<IdI, ArrayList<Facility>> zone_fac_map = new HashMap<IdI, ArrayList<Facility>>();
+	private final HashMap<Id, ArrayList<Facility>> zone_fac_map = new HashMap<Id, ArrayList<Facility>>();
 
 	/**
 	 * Fast access data structure for all <i>facilities</i> containing <code>work</code> <i>activities</i>.
@@ -150,9 +150,9 @@ public class MatricesCompleteBasedOnFacilities extends MatricesAlgorithm {
 		System.out.println("        fac_zone_map size =" + this.fac_zone_map.size());
 		System.out.println("        zone_fac_map size =" + this.zone_fac_map.size());
 		System.out.println("        Zone to Fac mapping:...");
-		Iterator<IdI> zid_it = this.zone_fac_map.keySet().iterator();
+		Iterator<Id> zid_it = this.zone_fac_map.keySet().iterator();
 		while (zid_it.hasNext()) {
-			IdI zid = zid_it.next();
+			Id zid = zid_it.next();
 			System.out.println("          Zone id=" + zid + ": #Facs=" + this.zone_fac_map.get(zid).size());
 		}
 		System.out.println("        done.");

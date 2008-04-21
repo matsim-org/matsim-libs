@@ -23,6 +23,7 @@ package org.matsim.plans.filters;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -32,7 +33,6 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Filters all persons out whose routes do not lead at least once through
@@ -50,11 +50,11 @@ import org.matsim.utils.identifiers.IdI;
  */
 public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 
-	private final Map<IdI, Link> areaOfInterest;
+	private final Map<Id, Link> areaOfInterest;
 	private Coord aoiCenter = null;
 	private double aoiRadius = 0.0;
 
-	public PersonIntersectAreaFilter(final PersonAlgorithmI nextAlgorithm, final Map<IdI, Link> areaOfInterest) {
+	public PersonIntersectAreaFilter(final PersonAlgorithmI nextAlgorithm, final Map<Id, Link> areaOfInterest) {
 		this.nextAlgorithm = nextAlgorithm;
 		this.areaOfInterest = areaOfInterest;
 	}

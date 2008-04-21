@@ -23,23 +23,23 @@ package org.matsim.plans.filters;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.basic.v01.BasicPlan.LegIterator;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.network.Link;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.utils.identifiers.IdI;
 
 public class RouteLinkFilter extends AbstractPlanFilter {
 
-	private final Set<IdI> linkIds;
+	private final Set<Id> linkIds;
 
 	public RouteLinkFilter(final PlanAlgorithmI nextAlgo) {
 		this.nextAlgorithm = nextAlgo;
-		this.linkIds = new HashSet<IdI>();
+		this.linkIds = new HashSet<Id>();
 	}
 
-	public void addLink(final IdI linkId) {
+	public void addLink(final Id linkId) {
 		this.linkIds.add(linkId);
 	}
 

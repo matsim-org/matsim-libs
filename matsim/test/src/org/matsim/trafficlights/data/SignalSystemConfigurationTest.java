@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.trafficlights.data.PlanbasedSignalSystemControlInfo;
 import org.matsim.trafficlights.data.SignalGroupDefinition;
@@ -37,7 +38,6 @@ import org.matsim.trafficlights.data.SignalSystemConfiguration;
 import org.matsim.trafficlights.data.SignalSystemConfigurationParser;
 import org.matsim.trafficlights.data.SignalSystemControlInfo;
 import org.matsim.trafficlights.data.SignalSystemPlan;
-import org.matsim.utils.identifiers.IdI;
 import org.xml.sax.SAXException;
 
 
@@ -61,9 +61,9 @@ public class SignalSystemConfigurationTest extends MatsimTestCase {
 
 			SignalSystemConfigurationParser parser = new SignalSystemConfigurationParser(signalGroups);
 			parser.parse(this.getPackageInputDirectory() + TESTXML);
-			Map<IdI, SignalSystemConfiguration> configs = parser.getSignalSystemConfigurations();
+			Map<Id, SignalSystemConfiguration> configs = parser.getSignalSystemConfigurations();
 			assertNotNull(configs);
-			SignalSystemConfiguration ssc = configs.get(new Id("456"));
+			SignalSystemConfiguration ssc = configs.get(new IdImpl("456"));
 			assertNotNull(ssc);
 			Set<SignalGroupDefinition> sgDefs = ssc.getSignalGroupDefinitions();
 			assertNotNull(sgDefs);
@@ -75,7 +75,7 @@ public class SignalSystemConfigurationTest extends MatsimTestCase {
 			List<SignalSystemPlan> signalPlans = controler.getSignalSystemPlans();
 			assertEquals(1, signalPlans.size());
 			SignalSystemPlan plan = signalPlans.get(0);
-			assertEquals(new Id("7"), plan.getId());
+			assertEquals(new IdImpl("7"), plan.getId());
 			assertEquals(0.0, plan.getStartTime());
 			assertEquals(60.0 * 60.0 * 24.0, plan.getStopTime());
 			assertEquals(60, plan.getCirculationTime());
@@ -83,7 +83,7 @@ public class SignalSystemConfigurationTest extends MatsimTestCase {
 			assertEquals(0, plan.getPowerOnTime());
 			assertEquals(50, plan.getPowerOffTime());
 
-			SignalGroupSettings settings = plan.getSignalGroupSettings().get(new Id("123"));
+			SignalGroupSettings settings = plan.getSignalGroupSettings().get(new IdImpl("123"));
 			assertNotNull(settings);
 			assertEquals(0, settings.getRoughCast());
 			assertEquals(45, settings.getDropping());

@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Zone;
 
 /**
@@ -39,7 +39,7 @@ import org.matsim.world.Zone;
  */
 public class MunicipalityInformation {
 
-	Id id = null;
+	IdImpl id = null;
 
 	int personCount = -1;
 
@@ -64,7 +64,7 @@ public class MunicipalityInformation {
 	 * @param avgWorkingIncome2003
 	 * @param avgRetireeIncome2003
 	 */
-	public MunicipalityInformation(Id id, int personCount, int urbanizationIndex,
+	public MunicipalityInformation(IdImpl id, int personCount, int urbanizationIndex,
 			double avgGasPrice, double avgIncome2000, double avgWorkingIncome2003,
 			double avgRetireeIncome2003) {
 		super();
@@ -134,10 +134,10 @@ public class MunicipalityInformation {
 		return populationDensity;
 	}
 
-	public static TreeMap<IdI, MunicipalityInformation> readTabbedMunicipalityInfo(
+	public static TreeMap<Id, MunicipalityInformation> readTabbedMunicipalityInfo(
 			String filename, ArrayList<Zone> zones) {
 		FileReader fileReader;
-		TreeMap<IdI, MunicipalityInformation> mInfo = new TreeMap<IdI, MunicipalityInformation>();
+		TreeMap<Id, MunicipalityInformation> mInfo = new TreeMap<Id, MunicipalityInformation>();
 		int lineCount = DatapulsPopulationGenerator.getLineCount(filename);
 
 		System.out.println("reading municipality information...");
@@ -155,7 +155,7 @@ public class MunicipalityInformation {
 
 				String[] entries = currentLine.split("\t", -1);
 
-				Id id = new Id(entries[0].trim());
+				IdImpl id = new IdImpl(entries[0].trim());
 				int personCount = Integer.parseInt(entries[1].trim());
 				int urbanizationIndex = Integer.parseInt(entries[2].trim());
 				double avgGasPrice = Double.parseDouble(entries[3].trim());
@@ -187,7 +187,7 @@ public class MunicipalityInformation {
 		return mInfo;
 	}
 
-	public static void setPopulationDensity(TreeMap<IdI, MunicipalityInformation> municipalityInfo, ArrayList<Zone> zones) {
+	public static void setPopulationDensity(TreeMap<Id, MunicipalityInformation> municipalityInfo, ArrayList<Zone> zones) {
 		for (Zone zone : zones) {
 			MunicipalityInformation mInfo =
 				municipalityInfo.get(zone.getId());

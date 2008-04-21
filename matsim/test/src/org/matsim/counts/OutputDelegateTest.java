@@ -24,7 +24,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.counts.algorithms.graphs.helper.OutputDelegate;
 import org.matsim.counts.algorithms.graphs.helper.Section;
@@ -46,7 +46,7 @@ public class OutputDelegateTest extends MatsimTestCase {
 
 		List<CountSimComparison> countSimCompList=new Vector<CountSimComparison>();
 		for (int i=0; i<24; i++) {
-			countSimCompList.add(new CountSimComparisonImpl(new Id(i+1), 1, 1.0, 1.0));
+			countSimCompList.add(new CountSimComparisonImpl(new IdImpl(i+1), 1, 1.0, 1.0));
 		}//for
 		this.sg = new CountsSimRealPerHourGraph(countSimCompList, 1, "testOutPutAll");
 	}

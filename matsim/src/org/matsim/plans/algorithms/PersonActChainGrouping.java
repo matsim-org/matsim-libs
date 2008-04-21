@@ -47,11 +47,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
-import org.matsim.utils.identifiers.IdI;
 
 public class PersonActChainGrouping extends PersonAlgorithm {
 
@@ -59,7 +59,7 @@ public class PersonActChainGrouping extends PersonAlgorithm {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final TreeMap<String,TreeSet<IdI>> chaingroups = new TreeMap<String,TreeSet<IdI>>();
+	private final TreeMap<String,TreeSet<Id>> chaingroups = new TreeMap<String,TreeSet<Id>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -90,10 +90,10 @@ public class PersonActChainGrouping extends PersonAlgorithm {
 
 		String chain = chainBuilder.toString();
 		if (!this.chaingroups.containsKey(chain)) {
-			this.chaingroups.put(chain, new TreeSet<IdI>());
+			this.chaingroups.put(chain, new TreeSet<Id>());
 		}
 
-		TreeSet<IdI> ts = this.chaingroups.get(chain);
+		TreeSet<Id> ts = this.chaingroups.get(chain);
 		if (!ts.add(person.getId())) {
 			Gbl.errorMsg("person id=" +
 			             person.getId() + " is already in that TreeSet.");
@@ -111,10 +111,10 @@ public class PersonActChainGrouping extends PersonAlgorithm {
 			String chain = chain_it.next();
 			System.out.println(chain);
 
-			TreeSet<IdI> ts = this.chaingroups.get(chain);
-			Iterator<IdI> ts_it = ts.iterator();
+			TreeSet<Id> ts = this.chaingroups.get(chain);
+			Iterator<Id> ts_it = ts.iterator();
 			while (ts_it.hasNext()) {
-				IdI id = ts_it.next();
+				Id id = ts_it.next();
 				System.out.println(id);
 			}
 		}

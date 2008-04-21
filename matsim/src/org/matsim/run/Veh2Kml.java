@@ -24,7 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.geometry.transformations.IdentityTransformation;
@@ -220,7 +220,7 @@ public class Veh2Kml {
 						String speed = result[6];
 						String elevation = result[13];
 						String azimuth = result[14];
-						PositionInfo position = new PositionInfo(new Id(agent), easting, northing,
+						PositionInfo position = new PositionInfo(new IdImpl(agent), easting, northing,
 								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving,null);
 						addVehicle(Double.parseDouble(time), position);
 					}

@@ -21,7 +21,7 @@
 package teach.multiagent07.simulation;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.utils.vis.netvis.NetVis;
 
 import teach.multiagent07.net.CANetStateWriter;
@@ -104,13 +104,13 @@ public class Controler4 {
 				
 				// take a random sample
 				if (Math.random() < 0.1){
-					BasicPlan.ActLegIterator it = person.getSelectedPlan().getIterator() ;
+					BasicPlanImpl.ActLegIterator it = person.getSelectedPlan().getIterator() ;
 					BasicAct startAct = it.nextAct();
 					// set randomtime to some time between 6:00 and 6:30 am
 					startAct.setEndTime(6*3600 + Math.random()*1800);
 				}else 
 				if (Math.random() < replanningRate) {
-					BasicPlan.ActLegIterator it = person.getSelectedPlan().getIterator() ;
+					BasicPlanImpl.ActLegIterator it = person.getSelectedPlan().getIterator() ;
 					BasicAct startAct = it.nextAct();
 					startAct.setEndTime(scorer.calcDepTime());
 				}

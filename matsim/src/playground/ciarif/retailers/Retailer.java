@@ -3,28 +3,28 @@ package playground.ciarif.retailers;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 //import org.matsim.facilities.Facility;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 public class Retailer {
-	private final IdI id;
+	private final Id id;
 	private int cust_sqm; // must be a double
 
 	private final HashMap<Integer,Facility> facilities = new HashMap<Integer, Facility>();
 	// private final HashMap<IdI,Facility> facilities = new HashMap<IdI, Facility>();
 
-	private final HashMap<IdI,Double> fac_minCusts = new HashMap<IdI,Double>();
+	private final HashMap<Id,Double> fac_minCusts = new HashMap<Id,Double>();
 	
-	protected Retailer(final IdI id, final int cust_sqm) {
+	protected Retailer(final Id id, final int cust_sqm) {
 		this.id = id;
 		this.cust_sqm = cust_sqm;
 	}
 
-	public final boolean setFacility(IdI fac_id, Double minCustsqm) {
+	public final boolean setFacility(Id fac_id, Double minCustsqm) {
 		// TODO: implement
 		return false;
 	}
@@ -38,7 +38,7 @@ public class Retailer {
 		this.cust_sqm = cust_sqm;
 	}
 
-	public final IdI getRetailerId() {
+	public final Id getRetailerId() {
 		return this.id;
 	}
 
@@ -47,7 +47,7 @@ public class Retailer {
 	}
 
 	// NO! Always use IdI for that instead of String or int or similar
-	public final Facility getFacility(final IdI fac_id) {
+	public final Facility getFacility(final Id fac_id) {
 //	public final Facility getFacility(final int h) {
 		return this.facilities.get(fac_id);
 	}

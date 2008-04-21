@@ -36,7 +36,7 @@ class CALink implements CANetStateWritableI {
 	
 	List cells = new ArrayList() ;
 	
-	public CALink( BasicLinkI ll ) {
+	public CALink( BasicLink ll ) {
 		// ...
 	}
 
@@ -66,10 +66,10 @@ class CASim {
 	Map caLinks = new HashMap() ;
 	Map caNodes = new HashMap() ;
 
-	public CASim( BasicNetI net, CANetStateWriter netVis ) {
+	public CASim( BasicNet net, CANetStateWriter netVis ) {
 		Map links = net.getLinks() ;
 		for ( Iterator it = links.values().iterator(); it.hasNext() ; ) {
-			BasicLinkI ll = (BasicLinkI) it.next();
+			BasicLink ll = (BasicLink) it.next();
 			CALink caLink = new CALink( ll ) ;	
 //			caLink.randomFill() ;
 //			caLink.tty() ;
@@ -97,7 +97,7 @@ public class MyControler {
 		String netFileName = "net.xml" ;
 		String visFileName = "output/ABC" ;
 	
-		BasicNetI net = new NetworkLayer() ;
+		BasicNet net = new NetworkLayer() ;
 		MatsimNetworkReader reader = new MatsimNetworkReader((NetworkLayer)net);
 		reader.readFile(netFileName) ;
 		// from here on, net can do everything that is guaranteed in BasicNetI
@@ -107,7 +107,7 @@ public class MyControler {
 		nodes.get("123") ;
 		
 		for ( Iterator it = nodes.values().iterator(); it.hasNext() ; ) {
-			BasicNodeI nn = (BasicNodeI) it.next();
+			BasicNode nn = (BasicNode) it.next();
 			System.out.println ( nn.getId() ) ;
 		}
 		

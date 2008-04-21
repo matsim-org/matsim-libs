@@ -22,7 +22,7 @@ package playground.balmermi.census2000.modules;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
@@ -68,7 +68,7 @@ public class PlansCreatePopulation extends PlansAlgorithm {
 		while (pid_it.hasNext()) {
 			Integer pid = pid_it.next();
 			playground.balmermi.census2000.data.Person p = this.persons.getPersons().get(pid);
-			Id id = new Id(pid);
+			IdImpl id = new IdImpl(pid);
 			Person person = new Person(id,p.getSex(),p.getAge(),p.getLicense(),p.getCarAvail(),p.getEmployed());
 			try {
 				plans.addPerson(person);

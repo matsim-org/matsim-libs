@@ -30,8 +30,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
@@ -66,7 +66,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 		if (this.pos == -1) this.pos = in.position();
 		else in.position(this.pos);
 
-		for (BasicNodeI node : this.indexConfig.getIndexedNodeView())
+		for (BasicNode node : this.indexConfig.getIndexedNodeView())
 			if (node != null) {
 				readNodeBB(node, in);
 			}else {
@@ -74,7 +74,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 		        in.position(in.position()+length);
 			}
 
-		for (BasicLinkI link : this.indexConfig.getIndexedLinkView())
+		for (BasicLink link : this.indexConfig.getIndexedLinkView())
 			if (link != null) {
 				readLinkBB(link, in);
 			}else {
@@ -95,14 +95,14 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 		}
 	}
 
-	public final void readNodeBB(final BasicNodeI node, final ByteBuffer in) throws IOException {
+	public final void readNodeBB(final BasicNode node, final ByteBuffer in) throws IOException {
 		DisplayNode displNode = (DisplayNode) node;
         int length = in.getInt();
 		displNode.setDisplayValue(in.getFloat());
 		displNode.setDisplayText(readUTF(in));
 	}
 
-	public final void readLinkBB(final BasicLinkI link, final ByteBuffer in) throws IOException {
+	public final void readLinkBB(final BasicLink link, final ByteBuffer in) throws IOException {
         int length = in.getInt();
 		DisplayLink displLink = (DisplayLink) link;
 		int valueCnt = in.getInt();
@@ -121,7 +121,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 		displLink.setMovingAgents(agentsNow);
 	}
 
-	public final void readNode(final BasicNodeI node, final DataInputStream in) throws IOException {
+	public final void readNode(final BasicNode node, final DataInputStream in) throws IOException {
 
 		DisplayNode displNode = (DisplayNode) node;
 		/*
@@ -134,7 +134,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 		displNode.setDisplayText(in.readUTF());
 	}
 
-	public final void readLink(final BasicLinkI link, final DataInputStream in) throws IOException {
+	public final void readLink(final BasicLink link, final DataInputStream in) throws IOException {
 		DisplayLink displLink = (DisplayLink) link;
 
 		/*
@@ -315,14 +315,14 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 			if (this.pos == -1) this.pos = out.position();
 			else out.position(this.pos);
 
-			for (BasicNodeI node : this.indexConfig.getIndexedNodeView())
+			for (BasicNode node : this.indexConfig.getIndexedNodeView())
 				if (node != null) {
 					writeNodeBB(node, out);
 				}else {
 					out.putInt(0);
 				}
 
-			for (BasicLinkI link : this.indexConfig.getIndexedLinkView())
+			for (BasicLink link : this.indexConfig.getIndexedLinkView())
 				if (link != null) {
 					writeLinkBB(link, out);
 				}else {
@@ -332,7 +332,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 			return;
 		}
 
-		private void writeLinkBB(final BasicLinkI link, final ByteBuffer out) throws IOException {
+		private void writeLinkBB(final BasicLink link, final ByteBuffer out) throws IOException {
 			QueueLink qLink = (QueueLink) link;
 			out.putInt(0);
 			out.putInt(1); // value count of link colors, always 1
@@ -349,7 +349,7 @@ public class DisplayCachedNetState extends BufferedStateA implements StateI {
 	        }
 		}
 
-		private void writeNodeBB(final BasicNodeI node, final ByteBuffer out) throws IOException {
+		private void writeNodeBB(final BasicNode node, final ByteBuffer out) throws IOException {
 			QueueNode qNode = (QueueNode) node;
 			out.putInt(0);
 	        out.putFloat((float)0.);

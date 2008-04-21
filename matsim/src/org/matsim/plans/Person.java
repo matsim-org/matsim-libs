@@ -24,12 +24,12 @@ import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicPerson;
+import org.matsim.basic.v01.BasicPersonImpl;
 import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.identifiers.IdI;
 
-public class Person extends BasicPerson<Plan>{
+public class Person extends BasicPersonImpl<Plan>{
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -72,7 +72,7 @@ public class Person extends BasicPerson<Plan>{
 		this.employed = (employed == null) ? null : employed.intern(); // (yes,no,null)
 	}
 
-	public Person(final IdI id, final String sex, final int age, final String license,
+	public Person(final Id id, final String sex, final int age, final String license,
 			final String carAvail, final String employed) {
 		super(id.toString());
 		int intID = Integer.parseInt(id.toString());

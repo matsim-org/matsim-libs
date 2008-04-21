@@ -24,8 +24,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -43,7 +44,6 @@ import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -70,7 +70,7 @@ public class PopulationGeneratorControler {
 	private ArrayList<HouseholdI> households;
 	private ArrayList<Zone> homeZones;
 	private final ArrayList<Zone> referenceZones;
-	private final TreeMap<IdI, MunicipalityInformation> municipalityInfo;
+	private final TreeMap<Id, MunicipalityInformation> municipalityInfo;
 	private final ArrayList<Zone> primaryActZones;
 	private final GroupFacilitiesPerZone facsPerZone;
 	private final NetworkLayer network;
@@ -91,7 +91,7 @@ public class PopulationGeneratorControler {
 		 * Get the ZoneLayer containing the municipalities
 		 */
 		this.referenceZones = new ArrayList((Gbl.getWorld().getLayer(
-				new Id("municipality"))).getLocations().values());
+				new IdImpl("municipality"))).getLocations().values());
 
 		/**
 		 * Read additional information per municipality from the given input file
@@ -124,7 +124,7 @@ public class PopulationGeneratorControler {
 		 * Get the layer that connects the each facility to the zones it lies in.
 		 */
 		ZoneLayer facilityLocations =
-			(ZoneLayer) Gbl.getWorld().getLayer(new Id("facility"));
+			(ZoneLayer) Gbl.getWorld().getLayer(new IdImpl("facility"));
 		// A Facility and the corresponding Facility Location (enclosing the given Facility)
 		// have the same Id
 		Location location = null;
@@ -394,7 +394,7 @@ public class PopulationGeneratorControler {
 		commuterGen.run(workCommuterMatrix, educationCommuterMatrix);
 		System.out.println("done");
 
-		TreeMap<IdI, Zone> tmpZones = new TreeMap<IdI, Zone>();
+		TreeMap<Id, Zone> tmpZones = new TreeMap<Id, Zone>();
 		for (Zone zone : this.referenceZones) {
 			tmpZones.put(zone.getId(), zone);
 		}
@@ -444,7 +444,7 @@ public class PopulationGeneratorControler {
 		 */
 		for (Person person : plans.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				BasicPlan.LegIterator legIt = plan.getIteratorLeg();
+				BasicPlanImpl.LegIterator legIt = plan.getIteratorLeg();
 				while (legIt.hasNext()) {
 					legIt.next().setMode("car");
 				}

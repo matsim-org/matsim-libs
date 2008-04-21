@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.ScenarioData;
@@ -41,7 +42,6 @@ import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;
 import org.matsim.utils.vis.kml.KML;
@@ -167,9 +167,9 @@ public class TollSchemeGenerator {
 		this.usedCoords = parseGoogleEarthCoord(this.config);
 
 		//prepare data
-		List<IdI> linkIdsToFilter = new ArrayList<IdI>(this.usedLinkIdsToFilterArray.length);
+		List<Id> linkIdsToFilter = new ArrayList<Id>(this.usedLinkIdsToFilterArray.length);
 		for (int i = 0; i < this.usedLinkIdsToFilterArray.length; i++) {
-			linkIdsToFilter.add(new Id(this.usedLinkIdsToFilterArray[i]));
+			linkIdsToFilter.add(new IdImpl(this.usedLinkIdsToFilterArray[i]));
 		}
 
 
@@ -207,8 +207,8 @@ public class TollSchemeGenerator {
 
 
 	private NetworkLayer applyLinkIdFilter(NetworkLayer tollNetwork,
-			List<IdI> linkIdsToFilter) {
-		for (IdI i : linkIdsToFilter) {
+			List<Id> linkIdsToFilter) {
+		for (Id i : linkIdsToFilter) {
 			tollNetwork.removeLink(tollNetwork.getLink(i));
 		}
 		return tollNetwork;

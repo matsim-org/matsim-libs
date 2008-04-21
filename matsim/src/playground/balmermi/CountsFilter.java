@@ -25,12 +25,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.counts.Counts;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 public class CountsFilter {
 
@@ -54,7 +54,7 @@ public class CountsFilter {
 
 		double radius = 30000.0;
 		final Coord center = new Coord(683518.0,246836.0);
-		final Map<IdI, Link> areaOfInterest = new HashMap<IdI, Link>();
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 		System.out.println("  => area of interest (aoi): center=" + center + "; radius=" + radius);
 
 		System.out.println("  extracting links of the aoi... " + (new Date()));
@@ -72,13 +72,13 @@ public class CountsFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  filtering counts... " + (new Date()));
-		TreeSet<IdI> counts2remove = new TreeSet<IdI>();
-		for (IdI locid : counts.getCounts().keySet()) {
+		TreeSet<Id> counts2remove = new TreeSet<Id>();
+		for (Id locid : counts.getCounts().keySet()) {
 			if (!areaOfInterest.containsKey(locid)) { counts2remove.add(locid); }
 		}
 		System.out.println("    # counts           : " + counts.getCounts().size());
 		System.out.println("    # counts to remove : " + counts2remove.size());
-		for (IdI locid: counts2remove) { counts.getCounts().remove(locid); }
+		for (Id locid: counts2remove) { counts.getCounts().remove(locid); }
 		System.out.println("    # remaining counts : " + counts.getCounts().size());
 		System.out.println("  done. " + (new Date()));
 

@@ -23,7 +23,7 @@ package org.matsim.socialnetworks.replanning;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;

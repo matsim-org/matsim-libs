@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicNode;
+import org.matsim.basic.v01.BasicNodeImpl;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.ResizableArray;
 
-public class Node extends BasicNode implements Comparable<Node> {
+public class Node extends BasicNodeImpl implements Comparable<Node> {
 
 	//////////////////////////////////////////////////////////////////////
 	// constants
@@ -70,7 +70,7 @@ public class Node extends BasicNode implements Comparable<Node> {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected Node(final IdI id, final String x, final String y, final String type) {
+	protected Node(final Id id, final String x, final String y, final String type) {
 		super(id, new Coord(x, y));
 		this.type = type;
 	}
@@ -101,9 +101,9 @@ public class Node extends BasicNode implements Comparable<Node> {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public boolean addInLink(final BasicLinkI inlink) {
+	public boolean addInLink(final BasicLink inlink) {
 	//public boolean addInLink(Link inlink) {
-		IdI linkid = inlink.getId();
+		Id linkid = inlink.getId();
 		if (this.inlinks.containsKey(linkid)) {
 			Gbl.errorMsg(this + "[inlink_id=" + inlink.getId() + " already exists]");
 		}
@@ -115,9 +115,9 @@ public class Node extends BasicNode implements Comparable<Node> {
 	}
 
 	@Override
-	public boolean addOutLink(final BasicLinkI outlink) {
+	public boolean addOutLink(final BasicLink outlink) {
 	//public boolean addOutLink(Link outlink) {
-		IdI linkid = outlink.getId();
+		Id linkid = outlink.getId();
 		if (this.outlinks.containsKey(linkid)) {
 			Gbl.errorMsg(this + "[inlink_id=" + outlink.getId() + " already exists]");
 		}
@@ -186,14 +186,14 @@ public class Node extends BasicNode implements Comparable<Node> {
 		return (Coord) this.coord;
 	}
 
-	public final Map<IdI, ? extends Link> getIncidentLinks() {
-		Map<IdI, Link> links = new TreeMap<IdI, Link>(getInLinks());
+	public final Map<Id, ? extends Link> getIncidentLinks() {
+		Map<Id, Link> links = new TreeMap<Id, Link>(getInLinks());
 		links.putAll(getOutLinks());
 		return links;
 	}
 
-	public final Map<IdI, ? extends Node> getInNodes() {
-		Map<IdI, Node> nodes = new TreeMap<IdI, Node>();
+	public final Map<Id, ? extends Node> getInNodes() {
+		Map<Id, Node> nodes = new TreeMap<Id, Node>();
 		for (Link link : getInLinks().values()) {
 			Node node = link.getFromNode();
 			nodes.put(node.getId(), node);
@@ -201,8 +201,8 @@ public class Node extends BasicNode implements Comparable<Node> {
 		return nodes;
 	}
 
-	public final Map<IdI, ? extends Node> getOutNodes() {
-		Map<IdI, Node> nodes = new TreeMap<IdI, Node>();
+	public final Map<Id, ? extends Node> getOutNodes() {
+		Map<Id, Node> nodes = new TreeMap<Id, Node>();
 		for (Link link : getOutLinks().values()) {
 			Node node = link.getToNode();
 			nodes.put(node.getId(), node);
@@ -210,8 +210,8 @@ public class Node extends BasicNode implements Comparable<Node> {
 		return nodes;
 	}
 
-	public final Map<IdI, ? extends Node> getIncidentNodes() {
-		Map<IdI, Node> nodes = new TreeMap<IdI, Node>(getInNodes());
+	public final Map<Id, ? extends Node> getIncidentNodes() {
+		Map<Id, Node> nodes = new TreeMap<Id, Node>(getInNodes());
 		nodes.putAll(getOutNodes());
 		return nodes;
 	}
@@ -236,14 +236,14 @@ public class Node extends BasicNode implements Comparable<Node> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<IdI, ? extends Link> getInLinks() {
-		return (Map<IdI, Link>) super.getInLinks();
+	public Map<Id, ? extends Link> getInLinks() {
+		return (Map<Id, Link>) super.getInLinks();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<IdI, ? extends Link> getOutLinks() {
-		return (Map<IdI, Link>)super.getOutLinks();
+	public Map<Id, ? extends Link> getOutLinks() {
+		return (Map<Id, Link>)super.getOutLinks();
 	}
 
 	//////////////////////////////////////////////////////////////////////

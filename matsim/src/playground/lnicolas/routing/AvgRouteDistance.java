@@ -20,7 +20,7 @@
 
 package playground.lnicolas.routing;
 
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.network.Node;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -38,7 +38,7 @@ public class AvgRouteDistance extends PersonAlgorithm {
 	@Override
 	public void run(Person person) {
 		for (Plan plan : person.getPlans()) {
-			BasicPlan.LegIterator it = plan.getIteratorLeg();
+			BasicPlanImpl.LegIterator it = plan.getIteratorLeg();
 			while (it.hasNext()) {
 				Route route = (Route)it.next().getRoute();
 				if (route != null && route.getRoute().size() > 0) {

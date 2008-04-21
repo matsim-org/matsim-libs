@@ -28,6 +28,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventAgentStuck;
@@ -38,7 +39,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Leg;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
@@ -794,7 +794,7 @@ public class QueueLink {
 	}
 
 	// search for vehicleId..
-	public Vehicle getVehicle(final IdI id) {
+	public Vehicle getVehicle(final Id id) {
 		for (Vehicle veh : this.vehQueue) {
 			if (veh.getDriver().getId().equals(id))
 				return veh;

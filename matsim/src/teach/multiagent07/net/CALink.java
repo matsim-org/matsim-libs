@@ -24,14 +24,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import org.matsim.basic.v01.BasicLink;
+import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 
 import teach.multiagent07.simulation.CAMobSim;
 import teach.multiagent07.simulation.Vehicle;
 import teach.multiagent07.util.Event;
 
-public class CALink extends BasicLink implements CANetStateWritableI{
+public class CALink extends BasicLinkImpl implements CANetStateWritableI{
 
 	class DepatureTimeComparator implements Comparator<Vehicle>
 	{

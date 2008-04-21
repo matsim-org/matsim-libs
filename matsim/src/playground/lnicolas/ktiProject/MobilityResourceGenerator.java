@@ -26,11 +26,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 
@@ -49,10 +49,10 @@ public class MobilityResourceGenerator extends Income2000Generator {
 
 	World world = null;
 
-	TreeMap<IdI, MunicipalityInformation> municipalityInfo = null;
+	TreeMap<Id, MunicipalityInformation> municipalityInfo = null;
 
 	public MobilityResourceGenerator(World world,
-			TreeMap<IdI, MunicipalityInformation> municipalityInfo) {
+			TreeMap<Id, MunicipalityInformation> municipalityInfo) {
 		super(world, municipalityInfo);
 
 		this.world = world;

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
@@ -134,7 +134,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 				Plan plan = person.getSelectedPlan();
 				for (int i = 0, max = plan.getActsLegs().size(); i < max; i += 2) {
 					Act act = (Act)plan.getActsLegs().get(i);
-					if (act.getLink().getId().equals(new Id(linkId)) && (act.getRefId() != Integer.MIN_VALUE)) {
+					if (act.getLink().getId().equals(new IdImpl(linkId)) && (act.getRefId() != Integer.MIN_VALUE)) {
 						return this.tvzLayer.getLocation(act.getRefId());
 					}
 				}

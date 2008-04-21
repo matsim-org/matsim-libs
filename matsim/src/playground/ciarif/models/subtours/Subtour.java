@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 public class Subtour {
 		

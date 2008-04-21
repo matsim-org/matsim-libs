@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
@@ -42,8 +42,8 @@ import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
@@ -426,7 +426,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 	}
 
 	private static class EventAgent implements Comparable<EventAgent>, DrawableAgentI {
-		public final Id id;
+		public final IdImpl id;
 		public final int intId;
 		public double time;
 		public EventLink currentLink = null;
@@ -435,7 +435,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 		public double linkPosition = 0.0;
 
 		public EventAgent(final String id, final double time) {
-			this.id = new Id(id);
+			this.id = new IdImpl(id);
 			this.time = time;
 			this.intId = id.hashCode();
 		}
@@ -470,7 +470,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 
 	private class NetStateWriter extends DisplayNetStateWriter implements SnapshotWriterI {
 
-		public NetStateWriter(final BasicNetI network, final String networkFileName,
+		public NetStateWriter(final BasicNet network, final String networkFileName,
 				final VisConfig visConfig, final String filePrefix, final int timeStepLength_s, final int bufferSize) {
 			super(network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
 		}
@@ -501,18 +501,18 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 		/* methods for DisplayNetStateWriter */
 
 		@Override
-		protected String getLinkDisplLabel(final BasicLinkI link) {
+		protected String getLinkDisplLabel(final BasicLink link) {
 			return link.getId().toString();
 		}
 
 		@Override
-		protected double getLinkDisplValue(final BasicLinkI link, final int index) {
+		protected double getLinkDisplValue(final BasicLink link, final int index) {
 			EventLink mylink = SnapshotGenerator.this.eventLinks.get(link.getId().toString());
 			return (mylink.buffer.size() + mylink.drivingQueue.size()) / mylink.spaceCap;
 		}
 
 		@Override
-		protected Collection<? extends DrawableAgentI> getAgentsOnLink(final BasicLinkI link) {
+		protected Collection<? extends DrawableAgentI> getAgentsOnLink(final BasicLink link) {
 			EventLink mylink = SnapshotGenerator.this.eventLinks.get(link.getId().toString());
 			Collection<EventAgent> agents = new ArrayList<EventAgent>(mylink.buffer.size() + mylink.drivingQueue.size());
 			agents.addAll(mylink.buffer);
@@ -521,7 +521,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 		}
 	}
 
-	public void addNetStateWriter(final BasicNetI network, final String networkFileName,
+	public void addNetStateWriter(final BasicNet network, final String networkFileName,
 			final VisConfig visConfig, final String filePrefix, final int timeStepLength_s, final int bufferSize) {
 		NetStateWriter netStateWriter = new NetStateWriter(this.network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
 		netStateWriter.open();

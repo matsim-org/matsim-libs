@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -75,7 +75,7 @@ public class ActChainDistributionWriter {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				String actChain = "";
-				BasicPlan.ActIterator it = plan.getIteratorAct();
+				BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 				while (it.hasNext()) {
 					actChain += it.next().getType();
 				}
@@ -142,7 +142,7 @@ public class ActChainDistributionWriter {
 		TreeSet<String> actTypes = new TreeSet<String>();
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				BasicPlan.ActIterator it = plan.getIteratorAct();
+				BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 				while (it.hasNext()) {
 					actTypes.add(it.next().getType());
 				}
@@ -158,7 +158,7 @@ public class ActChainDistributionWriter {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				String actChain = "";
-				BasicPlan.ActIterator it = plan.getIteratorAct();
+				BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 				while (it.hasNext()) {
 					actChain += it.next().getType();
 				}

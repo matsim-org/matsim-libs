@@ -22,6 +22,7 @@ package playground.marcel;
 
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
@@ -31,7 +32,6 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
@@ -79,7 +79,7 @@ public class ODMatrixBezirke extends PersonAlgorithm implements PlanAlgorithmI {
 	}
 
 	public Location mapLocation(final Location loc) {
-		TreeMap<IdI, Location> mapping = loc.getUpMapping();
+		TreeMap<Id, Location> mapping = loc.getUpMapping();
 		if (mapping.size() == 1) {
 			return mapping.get(mapping.firstKey());
 		}

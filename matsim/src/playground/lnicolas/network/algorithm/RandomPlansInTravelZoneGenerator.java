@@ -24,6 +24,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -33,7 +34,6 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
-import org.matsim.utils.identifiers.IdI;
 
 public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 
@@ -176,7 +176,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 	}
 
 	class PlansGeneratorRole {
-		TreeMap<IdI, Node> existingPlans = new TreeMap<IdI, Node>();
+		TreeMap<Id, Node> existingPlans = new TreeMap<Id, Node>();
 
 		public boolean planExists(final Node toNode) {
 			return this.existingPlans.containsKey(toNode.getId());

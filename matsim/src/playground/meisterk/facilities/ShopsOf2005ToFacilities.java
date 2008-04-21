@@ -40,7 +40,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.FileUtils;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -781,7 +781,7 @@ public class ShopsOf2005ToFacilities {
 						System.out.println("There it is: " + name);
 						System.out.flush();
 					}
-					Facility newFacility = facilities.createFacility(new Id(name), ch1903Coordinates);
+					Facility newFacility = facilities.createFacility(new IdImpl(name), ch1903Coordinates);
 				}
 			}
 

@@ -36,7 +36,7 @@ public class BasicPlanTest extends MatsimTestCase {
 	private static final Logger log = Logger.getLogger(BasicPlanTest.class);
 
 	/**
-	 * Tests the behavior of {@link BasicPlan.ActLegIterator}.
+	 * Tests the behavior of {@link BasicPlanImpl.ActLegIterator}.
 	 *
 	 * @throws Exception
 	 * @author mrieser
@@ -46,7 +46,7 @@ public class BasicPlanTest extends MatsimTestCase {
 		Plan plan = person.createPlan(null, "yes");
 
 		// test with empty plan, should not produce an error/exception
-		BasicPlan.ActLegIterator iter = plan.getIterator();
+		BasicPlanImpl.ActLegIterator iter = plan.getIterator();
 		assertFalse(iter.hasNextLeg());
 
 		// add one act, no legs yet, test again
@@ -103,7 +103,7 @@ public class BasicPlanTest extends MatsimTestCase {
 
 		// now test that two iterators are independent of each other
 		iter = plan.getIterator();
-		BasicPlan.ActLegIterator iter2 = plan.getIterator();
+		BasicPlanImpl.ActLegIterator iter2 = plan.getIterator();
 		assertEquals(act1, iter.nextAct());
 		assertEquals(act1, iter2.nextAct()); // must be possible, it's iter2
 		assertEquals(leg1, iter.nextLeg());
@@ -115,7 +115,7 @@ public class BasicPlanTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests the behavior of {@link BasicPlan.LegIterator}.
+	 * Tests the behavior of {@link BasicPlanImpl.LegIterator}.
 	 *
 	 * @throws Exception
 	 * @author mrieser
@@ -125,7 +125,7 @@ public class BasicPlanTest extends MatsimTestCase {
 		Plan plan = person.createPlan(null, "yes");
 
 		// test with empty plan, should not produce an error/exception
-		BasicPlan.LegIterator iter = plan.getIteratorLeg();
+		BasicPlanImpl.LegIterator iter = plan.getIteratorLeg();
 		assertFalse(iter.hasNext());
 
 		// add one act, no legs yet, test again
@@ -163,7 +163,7 @@ public class BasicPlanTest extends MatsimTestCase {
 
 		// now test that two iterators are independent of each other
 		iter = plan.getIteratorLeg();
-		BasicPlan.LegIterator iter2 = plan.getIteratorLeg();
+		BasicPlanImpl.LegIterator iter2 = plan.getIteratorLeg();
 		assertEquals(leg1, iter.next());
 		assertEquals(leg2, iter.next());
 		assertEquals(leg1, iter2.next()); // iter2 is still at leg1
@@ -172,7 +172,7 @@ public class BasicPlanTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests the behavior of {@link BasicPlan.ActIterator}.
+	 * Tests the behavior of {@link BasicPlanImpl.ActIterator}.
 	 *
 	 * @throws Exception
 	 * @author mrieser
@@ -182,7 +182,7 @@ public class BasicPlanTest extends MatsimTestCase {
 		Plan plan = person.createPlan(null, "yes");
 
 		// test with empty plan, should not produce an error/exception
-		BasicPlan.ActIterator iter = plan.getIteratorAct();
+		BasicPlanImpl.ActIterator iter = plan.getIteratorAct();
 		assertFalse(iter.hasNext());
 
 		// add one act, no legs yet, test again
@@ -224,7 +224,7 @@ public class BasicPlanTest extends MatsimTestCase {
 
 		// now test that two iterators are independent of each other
 		iter = plan.getIteratorAct();
-		BasicPlan.ActIterator iter2 = plan.getIteratorAct();
+		BasicPlanImpl.ActIterator iter2 = plan.getIteratorAct();
 		assertEquals(act1, iter.next());
 		assertEquals(act2, iter.next());
 		assertEquals(act1, iter2.next()); // iter2 is still at act1

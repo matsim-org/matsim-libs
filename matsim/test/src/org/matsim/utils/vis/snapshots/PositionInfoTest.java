@@ -20,7 +20,7 @@
 
 package org.matsim.utils.vis.snapshots;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -46,7 +46,7 @@ public class PositionInfoTest extends MatsimTestCase {
 		Link link1 = network.createLink("1", "1", "2", "1000", "10", "9999", "1", null, null);
 
 		// place the vehicle at one quarter of the link
-		PositionInfo posInfo = new PositionInfo(new Id(1), link1, 250, 0, 10, PositionInfo.VehicleState.Driving, null);
+		PositionInfo posInfo = new PositionInfo(new IdImpl(1), link1, 250, 0, 10, PositionInfo.VehicleState.Driving, null);
 		assertEquals(250.0, posInfo.getEasting(), epsilon);
 		assertEquals(250.0, posInfo.getNorthing(), epsilon);
 	}
@@ -66,7 +66,7 @@ public class PositionInfoTest extends MatsimTestCase {
 		Link link1 = network.createLink("1", "1", "2", "2000", "10", "9999", "1", null, null);
 
 		// place the vehicle at one quarter of the link
-		PositionInfo posInfo = new PositionInfo(new Id(1), link1, 500, 0, 10, PositionInfo.VehicleState.Driving, null);
+		PositionInfo posInfo = new PositionInfo(new IdImpl(1), link1, 500, 0, 10, PositionInfo.VehicleState.Driving, null);
 		assertEquals(250.0, posInfo.getEasting(), epsilon);
 		assertEquals(250.0, posInfo.getNorthing(), epsilon);
 	}

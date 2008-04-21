@@ -23,16 +23,16 @@ package org.matsim.utils.vis.netvis.visNet;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
+import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableNodeI;
 
 /**
  * @author gunnar
  */
-public class DisplayNode implements DrawableNodeI, BasicNodeI {
+public class DisplayNode implements DrawableNodeI, BasicNode {
 
 	// -------------------- CLASS VARIABLES --------------------
 
@@ -40,19 +40,19 @@ public class DisplayNode implements DrawableNodeI, BasicNodeI {
 
 	// -------------------- MEMBER VARIABLES --------------------
 
-	private final Map<IdI, BasicLinkI> inLinks;
-	private final Map<IdI, BasicLinkI> outLinks;
+	private final Map<Id, BasicLink> inLinks;
+	private final Map<Id, BasicLink> outLinks;
 	private CoordI coord = null;
 	private double displayValue;
 	private String displayLabel;
-	protected IdI id;
+	protected Id id;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public DisplayNode(IdI id, DisplayNet network) {
+	public DisplayNode(Id id, DisplayNet network) {
 		this.id = id;
-		inLinks = new TreeMap<IdI, BasicLinkI>();
-		outLinks = new TreeMap<IdI, BasicLinkI>();
+		inLinks = new TreeMap<Id, BasicLink>();
+		outLinks = new TreeMap<Id, BasicLink>();
 	}
 
 	// -------------------- SETTERS --------------------
@@ -67,21 +67,21 @@ public class DisplayNode implements DrawableNodeI, BasicNodeI {
 
 	// -------------------- IMPLEMENTATION of BasicNodeI --------------------
 
-	public boolean addInLink(BasicLinkI link) {
+	public boolean addInLink(BasicLink link) {
 		inLinks.put(link.getId(), link);
 		return true;
 	}
 
-	public boolean addOutLink(BasicLinkI link) {
+	public boolean addOutLink(BasicLink link) {
 		outLinks.put(link.getId(), link);
 		return true;
 	}
 
-	public Map<IdI, ? extends BasicLinkI> getInLinks() {
+	public Map<Id, ? extends BasicLink> getInLinks() {
 		return inLinks;
 	}
 
-	public Map<IdI, ? extends BasicLinkI> getOutLinks() {
+	public Map<Id, ? extends BasicLink> getOutLinks() {
 		return outLinks;
 	}
 
@@ -121,7 +121,7 @@ public class DisplayNode implements DrawableNodeI, BasicNodeI {
 	}
 
 
-	public IdI getId() {
+	public Id getId() {
 		return this.id;
 	}
 

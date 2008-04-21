@@ -2,6 +2,7 @@ package playground.yu.visum.filter;
 
 import java.util.List;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.plans.Act;
@@ -9,7 +10,6 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * transfer the "right" persons to next PersonFilter. These "right" persons
@@ -25,12 +25,12 @@ public class PersonRouteFilter extends PersonFilterA {
 	/**
 	 * The underlying list of link-IDs of this PersonRouteFilter.
 	 */
-	private List<IdI> criterionLinkIds;
+	private List<Id> criterionLinkIds;
 
 	/**
 	 * The underlying list of node-IDs of this PersonRouteFilter.
 	 */
-	private List<IdI> criterionNodeIds;
+	private List<Id> criterionNodeIds;
 
 	/**
 	 * create a PersonFilter, which deletes Persons moving or staying on some
@@ -42,7 +42,7 @@ public class PersonRouteFilter extends PersonFilterA {
 	 *            a list of node-IDs, which should not exist in network-file
 	 * 
 	 */
-	public PersonRouteFilter(List<IdI> linkIds, List<IdI> nodeIds) {
+	public PersonRouteFilter(List<Id> linkIds, List<Id> nodeIds) {
 		this.criterionLinkIds = linkIds;
 		this.criterionNodeIds = nodeIds;
 	}

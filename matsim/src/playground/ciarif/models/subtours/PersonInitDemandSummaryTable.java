@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;

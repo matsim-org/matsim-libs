@@ -25,7 +25,7 @@ import java.awt.geom.Rectangle2D.Double;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;

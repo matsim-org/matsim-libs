@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -34,7 +35,6 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 
 public class PlansCreateFromMZ extends PlansAlgorithm {
@@ -65,7 +65,7 @@ public class PlansCreateFromMZ extends PlansAlgorithm {
 		if (plans.getName() == null) { plans.setName("created by '" + this.getClass().getName() + "'"); }
 		if (!plans.getPersons().isEmpty()) { Gbl.errorMsg("[plans=" + plans + " is not empty]"); }
 		
-		TreeMap<IdI,Person> person_err = new TreeMap<IdI, Person>();
+		TreeMap<Id,Person> person_err = new TreeMap<Id, Person>();
 
 		System.out.println("      reading and creating persons with plans from file...");
 
@@ -82,7 +82,7 @@ public class PlansCreateFromMZ extends PlansAlgorithm {
 				// example: 5751       57511    5751101  540  507720  137360  493620  120600  560   20          20          1        3          575   1        1
 				// index:   0          1        2        3    4       5       6       7       8     9           10          11       12         13    14       15
 
-				IdI pid = new Id(entries[0].trim());
+				Id pid = new IdImpl(entries[0].trim());
 
 				int m = Integer.parseInt(entries[12].trim());
 				String mode = null;

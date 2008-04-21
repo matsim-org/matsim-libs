@@ -36,7 +36,7 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.SimulationTimer;
@@ -58,9 +58,9 @@ public class EstimReactiveLinkTT implements
 
 	private QueueNetworkLayer queueNetwork;
 	
-	private Map<BasicLinkI, LinkTTCalculator> linkTTCalculators;
+	private Map<BasicLink, LinkTTCalculator> linkTTCalculators;
 
-	private BasicLinkI lastQueriedLink;
+	private BasicLink lastQueriedLink;
 
 	private double lastQueryTime;
 
@@ -71,7 +71,7 @@ public class EstimReactiveLinkTT implements
 	}
 	
 	public void reset(int iteration) {
-		this.linkTTCalculators = new LinkedHashMap<BasicLinkI, LinkTTCalculator>();
+		this.linkTTCalculators = new LinkedHashMap<BasicLink, LinkTTCalculator>();
 	}
 
 	public void handleEvent(EventLinkEnter event) {

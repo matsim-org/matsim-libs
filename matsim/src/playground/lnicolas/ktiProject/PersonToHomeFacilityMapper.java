@@ -22,7 +22,7 @@ package playground.lnicolas.ktiProject;
 
 import java.util.ArrayList;
 
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
@@ -157,7 +157,7 @@ public class PersonToHomeFacilityMapper  {
 //	}
 
 	private static void setActCoord(Plan plan, CoordI coord, String actType) {
-		BasicPlan.ActIterator it = plan.getIteratorAct();
+		BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 		while (it.hasNext()) {
 			Act act = (Act) it.next();
 			if (act.getType().equals(actType)) {
@@ -189,7 +189,7 @@ public class PersonToHomeFacilityMapper  {
 //	}
 
 	private static CoordI getHomeCoord(Plan plan) {
-		BasicPlan.ActIterator it = plan.getIteratorAct();
+		BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 		while (it.hasNext()) {
 			Act act = (Act) it.next();
 			if (act.getType().equals(PlansGenerator.homeActType)) {

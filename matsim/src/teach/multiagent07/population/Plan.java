@@ -20,9 +20,9 @@
 
 package teach.multiagent07.population;
 
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 
-public class Plan extends BasicPlan {
+public class Plan extends BasicPlanImpl {
 
 	public Plan() {
 		

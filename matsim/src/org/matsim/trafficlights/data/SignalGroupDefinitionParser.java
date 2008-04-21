@@ -26,8 +26,8 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.collections.Tuple;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -64,7 +64,7 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 
 	private SignalGroupDefinition currentSignalGroup;
 
-	private IdI currentLaneId;
+	private Id currentLaneId;
 
 	private double currentLaneLength;
 
@@ -74,7 +74,7 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 	 * This a bit sophisticated map has as key value a tuple consisting of the link id and the id of the SignalLane
 	 * respectively.
 	 */
-	private Map<Tuple<IdI, IdI>, SignalLane> linkLaneMap = new HashMap<Tuple<IdI, IdI>, SignalLane>();
+	private Map<Tuple<Id, Id>, SignalLane> linkLaneMap = new HashMap<Tuple<Id, Id>, SignalLane>();
 
 	/**
 	 *
@@ -113,15 +113,15 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (SIGNALGROUP.equalsIgnoreCase(name)) {
-			this.currentSignalGroup = new SignalGroupDefinition(new Id(atts.getValue(ID)));
+			this.currentSignalGroup = new SignalGroupDefinition(new IdImpl(atts.getValue(ID)));
 		}
 		else if (FROMLANE.equalsIgnoreCase(name) || TOLANE.equalsIgnoreCase(name)) {
-			this.currentLaneId = new Id(atts.getValue(ID));
+			this.currentLaneId = new IdImpl(atts.getValue(ID));
 			this.currentLaneLength = Double.parseDouble(atts.getValue(LENGTH));
 		}
 		else if (LINK.equalsIgnoreCase(name)) {
-			IdI id = new Id(atts.getValue(REFID));
-			Tuple<IdI, IdI> key = new Tuple<IdI, IdI>(id, this.currentLaneId);
+			Id id = new IdImpl(atts.getValue(REFID));
+			Tuple<Id, Id> key = new Tuple<Id, Id>(id, this.currentLaneId);
 			this.currentLane = this.linkLaneMap.get(key);
 			if (this.currentLane == null) {
 				this.currentLane = new SignalLane(this.currentLaneId, id);

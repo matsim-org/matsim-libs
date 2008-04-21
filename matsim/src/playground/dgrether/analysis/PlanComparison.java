@@ -23,8 +23,8 @@ package playground.dgrether.analysis;
 import java.util.Hashtable;
 import java.util.Set;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.plans.Act;
-import org.matsim.utils.identifiers.IdI;
 /**
  * This Class provides a data object to compare to iterations. It
  * is needed to save some memory while running the PlanComparator. 
@@ -33,13 +33,13 @@ import org.matsim.utils.identifiers.IdI;
  */
 public class PlanComparison {
 	
-	private Hashtable<IdI, Triple> _table;
+	private Hashtable<Id, Triple> _table;
 	/**
 	 * Creates a PlanComparison Object with the initial size
 	 * @param size
 	 */
 	public PlanComparison(int size) {
-     _table = new Hashtable<IdI, Triple>(size, 0.9f);
+     _table = new Hashtable<Id, Triple>(size, 0.9f);
 	
 	}
 	/**
@@ -48,7 +48,7 @@ public class PlanComparison {
 	 * @param score
 	 * @param home
 	 */
-	public void addFirstPlansData(IdI id, double score, Act home) {
+	public void addFirstPlansData(Id id, double score, Act home) {
 		Triple t = new Triple(score, home);
 		_table.put(id, t);
 	}
@@ -57,7 +57,7 @@ public class PlanComparison {
 	 * @param id
 	 * @param score
 	 */
-	public void addSecondPlansData(IdI id, double score) {
+	public void addSecondPlansData(Id id, double score) {
 	  Triple t = _table.get(id);
 	  t.setSecondScore(score);
 	}
@@ -66,7 +66,7 @@ public class PlanComparison {
 	 * Get all Ids of the population
 	 * @return a Set with IdIs
 	 */
-	public Set<IdI> getPersonIds() {
+	public Set<Id> getPersonIds() {
 		return _table.keySet();
 	}
 	/**
@@ -74,7 +74,7 @@ public class PlanComparison {
 	 * @param personId
 	 * @return the score of the first iteration
 	 */
-	public double getFirstScore(IdI personId) {
+	public double getFirstScore(Id personId) {
 		return _table.get(personId)._score1;
 	}
 	/**
@@ -82,7 +82,7 @@ public class PlanComparison {
 	 * @param personId
 	 * @return the score of the second iteration
 	 */
-	public double getSecondScore(IdI personId) {
+	public double getSecondScore(Id personId) {
 		return _table.get(personId)._score2;
 	}
 	/**
@@ -90,7 +90,7 @@ public class PlanComparison {
 	 * @param personId
 	 * @return the home location of the agent with the given IdI
 	 */
-	public Act getHomeLocation(IdI personId) {
+	public Act getHomeLocation(Id personId) {
 		return _table.get(personId)._act;
 	}
 	

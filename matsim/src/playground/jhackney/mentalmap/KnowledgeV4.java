@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -55,7 +56,6 @@ import org.matsim.plans.ActivitySpaceBean;
 import org.matsim.plans.ActivitySpaceCassini;
 import org.matsim.plans.ActivitySpaceEllipse;
 import org.matsim.plans.ActivitySpaceSuperEllipse;
-import org.matsim.utils.identifiers.IdI;
 
 import playground.jhackney.socialnet.EgoNet;
 import playground.jhackney.mentalmap.MentalMap;
@@ -69,7 +69,7 @@ public class Knowledge {
 	private String desc = null;
 
 	private final ArrayList<Activity> activities = new ArrayList<Activity>();
-	private final TreeMap<IdI,Facility> facilities = new TreeMap<IdI,Facility>();
+	private final TreeMap<Id,Facility> facilities = new TreeMap<Id,Facility>();
 	private final ArrayList<ActivitySpace> act_spaces = new ArrayList<ActivitySpace>();
 
 	//////////////////////////////////////////////////////////////////////
@@ -166,7 +166,7 @@ public class Knowledge {
 	// query methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final boolean containsFacility(final IdI id) {
+	public final boolean containsFacility(final Id id) {
 		return this.facilities.containsKey(id);
 	}
 	
@@ -174,12 +174,12 @@ public class Knowledge {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final TreeMap<IdI,Facility> getFacilities() {
+	public final TreeMap<Id,Facility> getFacilities() {
 		return this.facilities;
 	}
 	
-	public final TreeMap<IdI,Facility> getFacilities(final String act_type) {
-		TreeMap<IdI,Facility> facs = new TreeMap<IdI, Facility>();
+	public final TreeMap<Id,Facility> getFacilities(final String act_type) {
+		TreeMap<Id,Facility> facs = new TreeMap<Id, Facility>();
 		for (int i=0; i<this.activities.size(); i++) {
 			Activity a = this.activities.get(i);
 			Facility f = a.getFacility();

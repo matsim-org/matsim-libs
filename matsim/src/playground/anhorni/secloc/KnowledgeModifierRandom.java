@@ -1,9 +1,9 @@
 package playground.anhorni.secloc;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Knowledge;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 
@@ -15,7 +15,7 @@ public class KnowledgeModifierRandom extends KnowledgeModifier {
 	private final String[] types2change={"leisure"};
 
 	// explore and modify	
-	public KnowledgeModifierRandom(TreeMap<IdI, ? extends Location> facilities) {
+	public KnowledgeModifierRandom(TreeMap<Id, ? extends Location> facilities) {
 		super(facilities);		
 	}
 

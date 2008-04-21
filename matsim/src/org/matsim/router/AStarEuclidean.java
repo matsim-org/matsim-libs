@@ -24,13 +24,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.router.util.PreProcessEuclidean;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Implements the <a href="http://en.wikipedia.org/wiki/A%2A">A* router algorithm</a>
@@ -80,7 +80,7 @@ public class AStarEuclidean extends Dijkstra {
 	double overdoFactor;
 
 	private double minTravelCostPerLength;
-	final private HashMap<IdI, AStarNodeData> nodeData;
+	final private HashMap<Id, AStarNodeData> nodeData;
 
 	/**
 	 * Default constructor; sets the overdo factor to 1.
@@ -128,7 +128,7 @@ public class AStarEuclidean extends Dijkstra {
 
 		setMinTravelCostPerLength(preProcessData.getMinTravelCostPerLength());
 
-		this.nodeData = new HashMap<IdI, AStarNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
+		this.nodeData = new HashMap<Id, AStarNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.comparator = new ComparatorAStarNodeCost(this.nodeData);
 		this.overdoFactor = overdoFactor;
 	}
@@ -312,7 +312,7 @@ public class AStarEuclidean extends Dijkstra {
 		/**
 		 * @param data A map to look up the data with information about cost.
 		 */
-		public ComparatorAStarNodeCost(Map<IdI, AStarNodeData> data) {
+		public ComparatorAStarNodeCost(Map<Id, AStarNodeData> data) {
 			super(data);
 		}
 

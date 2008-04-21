@@ -45,11 +45,11 @@ package org.matsim.plans.algorithms;
 
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
 
 public class PlansReduction extends PlansAlgorithm {
 
@@ -73,8 +73,8 @@ public class PlansReduction extends PlansAlgorithm {
 	public void run(final Plans plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		TreeSet<IdI> pid_set = new TreeSet<IdI>();
-		for (IdI pid : plans.getPersons().keySet()) {
+		TreeSet<Id> pid_set = new TreeSet<Id>();
+		for (Id pid : plans.getPersons().keySet()) {
 			Person p = plans.getPerson(pid);
 
 			for (int i=p.getPlans().size()-1; i>=0; i--) {
@@ -95,7 +95,7 @@ public class PlansReduction extends PlansAlgorithm {
 			}
 		}
 
-		for (IdI pid : pid_set) {
+		for (Id pid : pid_set) {
 			plans.getPersons().remove(pid);
 		}
 

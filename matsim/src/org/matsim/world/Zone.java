@@ -20,10 +20,10 @@
 
 package org.matsim.world;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * A geographical object in MATSim. It describes a zone as a rectangle.
@@ -53,7 +53,7 @@ public class Zone extends AbstractLocation {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected Zone(final ZoneLayer layer, final IdI id, final CoordI center) {
+	protected Zone(final ZoneLayer layer, final Id id, final CoordI center) {
 		super(layer,id,center);
 		this.setMin(center);
 		this.setMax(center);
@@ -61,7 +61,7 @@ public class Zone extends AbstractLocation {
 		this.setName(null);
 	}
 
-	public Zone(final ZoneLayer layer, final IdI id, final CoordI center,
+	public Zone(final ZoneLayer layer, final Id id, final CoordI center,
 	               final CoordI min, final CoordI max, final double area, final String name) {
 		super(layer,id,center);
 		this.setMin(min);

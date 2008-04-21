@@ -23,10 +23,10 @@ package org.matsim.plans.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Tests the class {@link ParallelPersonAlgorithmRunner}.
@@ -63,7 +63,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 		Plans population = new Plans(Plans.NO_STREAMING);
 		try {
 			for (int i = 0; i < 100; i++) {
-				Person person = new Person(new Id(i), "m", 45, "yes", "yes", "yes");
+				Person person = new Person(new IdImpl(i), "m", 45, "yes", "yes", "yes");
 				population.addPerson(person);
 			}
 		} catch (Exception e) {
@@ -109,7 +109,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	private static class PersonAlgorithmTester extends PersonAlgorithm {
-		public final ArrayList<IdI> personIds = new ArrayList<IdI>(100);
+		public final ArrayList<Id> personIds = new ArrayList<Id>(100);
 		
 		public PersonAlgorithmTester() {
 			// make constructor public

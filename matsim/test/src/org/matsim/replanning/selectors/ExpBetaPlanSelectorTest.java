@@ -21,7 +21,7 @@
 package org.matsim.replanning.selectors;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -52,7 +52,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testExpBeta2() {
 		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
-		Person person = new Person(new Id(1), "m", 40, null, null, null);
+		Person person = new Person(new IdImpl(1), "m", 40, null, null, null);
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		Plan plan1 = person.createPlan("96.0", "no"); // weight: 0.0003.35462627902512
 		Plan plan2 = person.createPlan("97.0", "no"); // weight: 0.0024787521766663594
@@ -99,7 +99,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testExpBeta1() {
 		this.config.charyparNagelScoring().setBrainExpBeta(1.0);
-		Person person = new Person(new Id(1), "m", 40, null, null, null);
+		Person person = new Person(new IdImpl(1), "m", 40, null, null, null);
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		Plan plan1 = person.createPlan("96.0", "no"); // weight: 0.018315638888734186
 		Plan plan2 = person.createPlan("97.0", "no"); // weight: 0.04978706836786395

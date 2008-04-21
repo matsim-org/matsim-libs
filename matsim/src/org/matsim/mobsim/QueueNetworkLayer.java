@@ -31,10 +31,10 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -67,16 +67,16 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 	// set to true to move vehicles from waitingList before vehQueue
 	private boolean moveWaitFirst = false;
 
-	private Map<IdI, QueueLink> links;
+	private Map<Id, QueueLink> links;
 
-	private Map<IdI, QueueNode> nodes;
+	private Map<Id, QueueNode> nodes;
 
 	private NetworkLayer networkLayer;
 
 	public QueueNetworkLayer(NetworkLayer networkLayer) {
 		this.networkLayer = networkLayer;
-		this.links = new HashMap<IdI, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
-		this.nodes = new HashMap<IdI, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.links = new HashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.nodes = new HashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
 			this.nodes.put(n.getId(), new QueueNode(n, this));
 		}
@@ -241,11 +241,11 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 		this.moveWaitFirst = moveWaitFirst;
 	}
 
-	public Map<IdI, QueueLink> getLinks() {
+	public Map<Id, QueueLink> getLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
-	public Map<IdI, QueueNode> getNodes() {
+	public Map<Id, QueueNode> getNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
@@ -277,11 +277,11 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 		}
 	}
 
-	public QueueLink getQueueLink(IdI id) {
+	public QueueLink getQueueLink(Id id) {
 		return this.links.get(id);
 	}
 
-	public QueueNode getQueueNode(Id id) {
+	public QueueNode getQueueNode(IdImpl id) {
 		return this.nodes.get(id);
 	}
 

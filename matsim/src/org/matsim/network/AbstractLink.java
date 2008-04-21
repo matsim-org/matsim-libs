@@ -20,13 +20,13 @@
 
 package org.matsim.network;
 
-import org.matsim.basic.v01.BasicLink;
-import org.matsim.basic.v01.BasicNode;
+import org.matsim.basic.v01.BasicLinkImpl;
+import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.ResizableArray;
 
-public abstract class AbstractLink extends BasicLink implements Link {
+public abstract class AbstractLink extends BasicLinkImpl implements Link {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -37,13 +37,13 @@ public abstract class AbstractLink extends BasicLink implements Link {
 	private final ResizableArray<Object> roles = new ResizableArray<Object>(5);
 
 	protected double euklideanDist;
-	
 
-	public AbstractLink(NetworkLayer network, IdI id, BasicNode from,
+
+	public AbstractLink(NetworkLayer network, Id id, BasicNode from,
 			BasicNode to) {
 		super(network, id, from, to);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////

@@ -23,8 +23,8 @@
  */
 package playground.johannes.mobsim;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * A base-class for writing decorators of {@link MobsimAgent}.
@@ -95,7 +95,7 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements
 		agent.enterLink(link, time);
 	}
 
-	public IdI getId() {
+	public Id getId() {
 		return agent.getId();
 	}
 }

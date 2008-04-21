@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
@@ -42,9 +42,9 @@ public class Matrix {
 
 	// double data structure. for fast access via from_location or via to_location
 	// TreeMap<Integer f_loc_id,ArrayList<Entry entry>>
-	private final TreeMap<IdI,ArrayList<Entry>> fromLocs = new TreeMap<IdI,ArrayList<Entry>>();
+	private final TreeMap<Id,ArrayList<Entry>> fromLocs = new TreeMap<Id,ArrayList<Entry>>();
 	// TreeMap<Integer t_loc_id,ArrayList<Entry entry>>
-	private final TreeMap<IdI,ArrayList<Entry>> toLocs = new TreeMap<IdI,ArrayList<Entry>>();
+	private final TreeMap<Id,ArrayList<Entry>> toLocs = new TreeMap<Id,ArrayList<Entry>>();
 
 	private static final Logger log = Logger.getLogger(Matrix.class);
 
@@ -86,8 +86,8 @@ public class Matrix {
 
 	public final Entry createEntry(final Location fromLoc, final Location toLoc, final double value) {
 
-		IdI f_id = fromLoc.getId();
-		IdI t_id = toLoc.getId();
+		Id f_id = fromLoc.getId();
+		Id t_id = toLoc.getId();
 
 		// create an entry
 		Entry e = new Entry(fromLoc,toLoc,value);
@@ -212,11 +212,11 @@ public class Matrix {
 		return this.desc;
 	}
 
-	public final TreeMap<IdI, ArrayList<Entry>> getFromLocations() {
+	public final TreeMap<Id, ArrayList<Entry>> getFromLocations() {
 		return this.fromLocs;
 	}
 
-	public final TreeMap<IdI, ArrayList<Entry>> getToLocations() {
+	public final TreeMap<Id, ArrayList<Entry>> getToLocations() {
 		return this.toLocs;
 	}
 
@@ -232,7 +232,7 @@ public class Matrix {
 		return this.getEntry(fromLocation.getId(),toLocation.getId());
 	}
 
-	public final Entry getEntry(final IdI from, final IdI to) {
+	public final Entry getEntry(final Id from, final Id to) {
 		ArrayList<Entry> fe = this.fromLocs.get(from);
 		if (fe == null) return null;
 		for (int i=0; i<fe.size(); i++) {

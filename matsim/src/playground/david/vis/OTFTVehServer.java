@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
@@ -95,7 +95,7 @@ public class OTFTVehServer implements OTFServerRemote{
 
 					lineFound = true;
 					this.time = Double.parseDouble(time);
-					this.readVehicle = new OTFAgentsListHandler.ExtendedPositionInfo(new Id(agent), easting, northing,
+					this.readVehicle = new OTFAgentsListHandler.ExtendedPositionInfo(new IdImpl(agent), easting, northing,
 							Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 					return true;
 				}

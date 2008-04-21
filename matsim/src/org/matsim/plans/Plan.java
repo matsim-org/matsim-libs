@@ -24,14 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.stats.algorithms.PlanStatsI;
 import org.matsim.utils.misc.Time;
 
 
-public class Plan extends BasicPlan {
+public class Plan extends BasicPlanImpl {
 
 	private static final long serialVersionUID = 1L;
 

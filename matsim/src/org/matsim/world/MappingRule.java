@@ -23,8 +23,8 @@ package org.matsim.world;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.identifiers.IdI;
 
 public class MappingRule {
 
@@ -41,15 +41,15 @@ public class MappingRule {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected MappingRule(final String mapping_rule, final TreeMap<IdI,Layer> layers) {
+	protected MappingRule(final String mapping_rule, final TreeMap<Id,Layer> layers) {
 		if (!mapping_rule.matches("[a-zA-Z]+\\[[\\?\\*1\\+m]\\]-\\[[\\?\\*1\\+m]\\][a-zA-Z]+")) {
 			Gbl.errorMsg("[mapping_rule=" + mapping_rule + " does not match]");
 		}
 		String [] strings = mapping_rule.split("\\[|\\]-\\[|\\]");
-		this.downLayer = layers.get(new Id(strings[0]));
+		this.downLayer = layers.get(new IdImpl(strings[0]));
 		this.downCardinality = strings[1].charAt(0);
 		this.upCardinality = strings[2].charAt(0);
-		this.upLayer = layers.get(new Id(strings[3]));
+		this.upLayer = layers.get(new IdImpl(strings[3]));
 
 		if (this.downLayer == null) { Gbl.errorMsg("[down_layer_type=" + strings[0] + " does not exist]"); }
 		if (this.upLayer == null) { Gbl.errorMsg("[up_layer_type=" + strings[3] + " does not exist]"); }

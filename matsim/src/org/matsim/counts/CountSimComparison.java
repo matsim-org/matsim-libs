@@ -20,7 +20,7 @@
 
 package org.matsim.counts;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 /**
  * Classes implementing this interface can be used to access the data
@@ -34,7 +34,7 @@ public interface CountSimComparison {
 	/**
 	 * @return The Id of the link
 	 */
-	public IdI getId();
+	public Id getId();
 
 	/**
 	 * The time at which the data was measured.

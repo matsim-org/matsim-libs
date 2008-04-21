@@ -30,10 +30,10 @@ import java.util.Map;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -82,19 +82,19 @@ public class IndexationConfig extends DefaultHandler {
 
     // -------------------- MEMBER VARIABLES --------------------
 
-    private BasicNetI network; // only for xml parsing
+    private BasicNet network; // only for xml parsing
 
-    private List<BasicNodeI> nodes;
+    private List<BasicNode> nodes;
 
-    private List<BasicLinkI> links;
+    private List<BasicLink> links;
 
-    private Map<BasicNodeI, Integer> node2index;
+    private Map<BasicNode, Integer> node2index;
 
-    private Map<BasicLinkI, Integer> link2index;
+    private Map<BasicLink, Integer> link2index;
 
-    private Map<Integer, BasicNodeI> index2node;
+    private Map<Integer, BasicNode> index2node;
 
-    private Map<Integer, BasicLinkI> index2link;
+    private Map<Integer, BasicLink> index2link;
 
     // -------------------- CONSTRUCTION --------------------
 
@@ -105,7 +105,7 @@ public class IndexationConfig extends DefaultHandler {
      * @param network
      * @param fileName
      */
-    public IndexationConfig(BasicNetI network, String fileName) {
+    public IndexationConfig(BasicNet network, String fileName) {
         this.network = network;
         read(fileName);
         this.network = null;
@@ -116,17 +116,17 @@ public class IndexationConfig extends DefaultHandler {
      * <code>network</code>.
      * @param network
      */
-    public IndexationConfig(BasicNetI network) {
-        createNodeIndices(new ArrayList<BasicNodeI>(network.getNodes().values()));
-        createLinkIndices(new ArrayList<BasicLinkI>(network.getLinks().values()));
+    public IndexationConfig(BasicNet network) {
+        createNodeIndices(new ArrayList<BasicNode>(network.getNodes().values()));
+        createLinkIndices(new ArrayList<BasicLink>(network.getLinks().values()));
     }
 
-    private void createNodeIndices(List<BasicNodeI> nodes) {
+    private void createNodeIndices(List<BasicNode> nodes) {
         this.nodes = Collections.unmodifiableList(nodes);
-        node2index = new LinkedHashMap<BasicNodeI, Integer>();
-        index2node = new LinkedHashMap<Integer, BasicNodeI>();
+        node2index = new LinkedHashMap<BasicNode, Integer>();
+        index2node = new LinkedHashMap<Integer, BasicNode>();
         for (int i = 0; i < nodes.size(); i++) {
-            BasicNodeI node = nodes.get(i);
+            BasicNode node = nodes.get(i);
             if (node != null) {
                 node2index.put(node, i);
                 index2node.put(i, node);
@@ -136,12 +136,12 @@ public class IndexationConfig extends DefaultHandler {
         index2node = Collections.unmodifiableMap(index2node);
     }
 
-    private void createLinkIndices(List<BasicLinkI> links) {
+    private void createLinkIndices(List<BasicLink> links) {
         this.links = Collections.unmodifiableList(links);
-        link2index = new LinkedHashMap<BasicLinkI, Integer>();
-        index2link = new LinkedHashMap<Integer, BasicLinkI>();
+        link2index = new LinkedHashMap<BasicLink, Integer>();
+        index2link = new LinkedHashMap<Integer, BasicLink>();
         for (int i = 0; i < links.size(); i++) {
-            BasicLinkI link = links.get(i);
+            BasicLink link = links.get(i);
             if (link != null) {
                 link2index.put(link, i);
                 index2link.put(i, link);
@@ -159,19 +159,19 @@ public class IndexationConfig extends DefaultHandler {
 
     // -------------------- CONTENT ACCESS --------------------
 
-    public List<BasicNodeI> getIndexedNodeView() {
+    public List<BasicNode> getIndexedNodeView() {
         return nodes;
     }
 
-    public List<BasicLinkI> getIndexedLinkView() {
+    public List<BasicLink> getIndexedLinkView() {
         return links;
     }
 
-    public BasicNodeI getNode(int index) {
+    public BasicNode getNode(int index) {
         return index2node.get(index);
     }
 
-    public BasicLinkI getLink(int index) {
+    public BasicLink getLink(int index) {
         return index2link.get(index);
     }
 
@@ -180,7 +180,7 @@ public class IndexationConfig extends DefaultHandler {
      * @return node's (nonnegative) index and -1 if node is not contained or
      *         null
      */
-    public int getIndex(BasicNodeI node) {
+    public int getIndex(BasicNode node) {
         if (node == null)
             return -1;
 
@@ -196,7 +196,7 @@ public class IndexationConfig extends DefaultHandler {
      * @return link's (nonnegative) index and -1 if link is not contained or
      *         null
      */
-    public int getIndex(BasicLinkI link) {
+    public int getIndex(BasicLink link) {
         if (link == null)
             return -1;
 
@@ -209,8 +209,8 @@ public class IndexationConfig extends DefaultHandler {
     // -------------------- READING --------------------
 
     void read(String fileName) {
-        nodes = new ArrayList<BasicNodeI>();
-        links = new ArrayList<BasicLinkI>();
+        nodes = new ArrayList<BasicNode>();
+        links = new ArrayList<BasicLink>();
 
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -234,7 +234,7 @@ public class IndexationConfig extends DefaultHandler {
     }
 
     private void startNode(Attributes attrs) {
-        BasicNodeI node = network.getNodes().get(new Id(attrs.getValue(NODE_ID_ATTR)));
+        BasicNode node = network.getNodes().get(new IdImpl(attrs.getValue(NODE_ID_ATTR)));
         if (node != null)
             nodes.add(node);
         else
@@ -242,7 +242,7 @@ public class IndexationConfig extends DefaultHandler {
     }
 
     private void startLink(Attributes attrs) {
-        BasicLinkI link = network.getLinks().get(new Id(attrs.getValue(LINK_ID_ATTR)));
+        BasicLink link = network.getLinks().get(new IdImpl(attrs.getValue(LINK_ID_ATTR)));
         if (link != null)
             links.add(link);
         else
@@ -264,7 +264,7 @@ public class IndexationConfig extends DefaultHandler {
         result.append(indent + "\t<" + NETWORK_ELEM + ">" + newline);
         result.append(indent + "\t\t<" + NODES_ELEM + ">" + newline);
 
-        for (BasicNodeI node : getIndexedNodeView()) {
+        for (BasicNode node : getIndexedNodeView()) {
             if (node != null)
                 result.append(indent + "\t\t\t<" + NODE_ELEM + " "
                         + NODE_ID_ATTR + "=" + quote + node.getId().toString()
@@ -278,7 +278,7 @@ public class IndexationConfig extends DefaultHandler {
         result.append(indent + "\t\t</" + NODES_ELEM + ">" + newline);
         result.append(indent + "\t\t<" + LINKS_ELEM + ">" + newline);
 
-        for (BasicLinkI link : getIndexedLinkView()) {
+        for (BasicLink link : getIndexedLinkView()) {
             if (link != null)
                 result.append(indent + "\t\t\t<" + LINK_ELEM + " "
                         + LINK_ID_ATTR + "=" + quote + link.getId().toString()
@@ -309,16 +309,16 @@ public class IndexationConfig extends DefaultHandler {
      * @param strict
      * @return see description
      */
-    public boolean indexes(BasicNetI net, boolean strict) {
+    public boolean indexes(BasicNet net, boolean strict) {
         if (strict && net.getNodes().size() != nodes.size())
             return false;
         if (strict && net.getLinks().size() != links.size())
             return false;
-        for (BasicNodeI node : net.getNodes().values()) {
+        for (BasicNode node : net.getNodes().values()) {
             if (getIndex(node) < 0)
                 return false;
         }
-        for (BasicLinkI link : net.getLinks().values()) {
+        for (BasicLink link : net.getLinks().values()) {
             if (getIndex(link) < 0)
                 return false;
         }

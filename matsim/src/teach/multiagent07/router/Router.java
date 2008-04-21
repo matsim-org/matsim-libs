@@ -25,10 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.basic.v01.BasicNet;
-import org.matsim.basic.v01.BasicNode;
+import org.matsim.basic.v01.BasicNetImpl;
+import org.matsim.basic.v01.BasicNodeImpl;
 import org.matsim.basic.v01.BasicRoute;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.BasicRouteImpl;
+import org.matsim.basic.v01.Id;
 
 import teach.multiagent07.interfaces.EventHandlerI;
 import teach.multiagent07.net.CANetworkReader;
@@ -37,11 +38,11 @@ import teach.multiagent07.util.Event;
 
 public class Router implements EventHandlerI{
 
-	BasicNet targetNet;
+	BasicNetImpl targetNet;
 	RouterNet net;
-	Map<IdI, Integer> starttimeMap = new HashMap<IdI, Integer>();
+	Map<Id, Integer> starttimeMap = new HashMap<Id, Integer>();
 
-	public Router (BasicNet net) {
+	public Router (BasicNetImpl net) {
 		this.targetNet = net;
 	}
 
@@ -67,8 +68,8 @@ public class Router implements EventHandlerI{
 		}
 	}
 
-	public BasicRoute reRoute(IdI fromNodeId, IdI toNodeId, double starttime) {
-		BasicRoute<BasicNode> route = new BasicRoute<BasicNode>();
+	public BasicRoute reRoute(Id fromNodeId, Id toNodeId, double starttime) {
+		BasicRoute<BasicNodeImpl> route = new BasicRouteImpl<BasicNodeImpl>();
 
 		RouterNode fromNode = (RouterNode) net.getNodes().get(fromNodeId.toString());
 		RouterNode toNode = (RouterNode) net.getNodes().get(toNodeId.toString());
@@ -82,9 +83,9 @@ public class Router implements EventHandlerI{
 		nodes.remove(0);
 
 		// convert route to targetNet
-		ArrayList<BasicNode> targetNodes = new ArrayList<BasicNode>();
+		ArrayList<BasicNodeImpl> targetNodes = new ArrayList<BasicNodeImpl>();
 		for (RouterNode node : nodes) {
-			targetNodes.add((BasicNode)targetNet.getNodes().get(node.getId()));
+			targetNodes.add((BasicNodeImpl)targetNet.getNodes().get(node.getId()));
 		}
 		route.setRoute(targetNodes);
 

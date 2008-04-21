@@ -21,9 +21,9 @@
 package org.matsim.network;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicNode;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.misc.Time;
 
 public class LinkImpl extends AbstractLink {
@@ -45,7 +45,7 @@ public class LinkImpl extends AbstractLink {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public LinkImpl(IdI id, BasicNode from, BasicNode to, NetworkLayer network, double length, double freespeed, double capacity, double lanes) {
+	public LinkImpl(Id id, BasicNode from, BasicNode to, NetworkLayer network, double length, double freespeed, double capacity, double lanes) {
 		super(network, id, from, to);
 		super.length = length;
 		super.freespeed = freespeed;
@@ -72,11 +72,11 @@ public class LinkImpl extends AbstractLink {
 
 	}
 
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	private void calcFlowCapacity() {
 		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
 //		log.debug("capacity period: " + capacityPeriod);
@@ -100,26 +100,26 @@ public class LinkImpl extends AbstractLink {
 				"[type=" + this.type + "]";
 	}
 
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	public double getFreespeedTravelTime(double time) {
 		return this.freespeedTravelTime;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.matsim.network.Link#getFlowCapacity()
 	 */
 	public final double getFlowCapacity() {
 		return this.flowCapacity;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	protected void setFreespeedTravelTime(double freespeedTravelTime) {
 		this.freespeedTravelTime = freespeedTravelTime;
 	}

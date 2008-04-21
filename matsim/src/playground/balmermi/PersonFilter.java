@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -34,7 +35,6 @@ import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 import org.matsim.plans.filters.PersonIntersectAreaFilter;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 public class PersonFilter {
 
@@ -59,7 +59,7 @@ public class PersonFilter {
 
 		double radius = 30000.0;
 		final Coord center = new Coord(683518.0,246836.0);
-		final Map<IdI, Link> areaOfInterest = new HashMap<IdI, Link>();
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 		System.out.println("  => area of interest (aoi): center=" + center + "; radius=" + radius);
 
 		System.out.println("  extracting links of the aoi... " + (new Date()));

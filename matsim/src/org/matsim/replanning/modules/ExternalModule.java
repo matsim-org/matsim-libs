@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.config.MatsimConfigReader;
@@ -43,7 +44,6 @@ import org.matsim.plans.PlansWriterHandler;
 import org.matsim.plans.Route;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PersonCalcTimes;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.ExeRunner;
 
 /**
@@ -65,7 +65,7 @@ public class ExternalModule implements StrategyModuleI {
 	protected static final String ExternalConfigFileName = "config.xml";
 
 	/** holds a personId and the reference to the person for reloading the plans later */
-	private final TreeMap<IdI, Person> persons = new TreeMap<IdI, Person>();
+	private final TreeMap<Id, Person> persons = new TreeMap<Id, Person>();
 	protected PlansWriter plansWriter = null;
 	private PlansWriterHandler handler = null;
 	private BufferedWriter writer = null;
@@ -196,9 +196,9 @@ public class ExternalModule implements StrategyModuleI {
 
 	private static class UpdatePlansAlgo extends PersonAlgorithm {
 
-		private final TreeMap<IdI, Person> persons;
+		private final TreeMap<Id, Person> persons;
 
-		public UpdatePlansAlgo(final TreeMap<IdI, Person> persons) {
+		public UpdatePlansAlgo(final TreeMap<Id, Person> persons) {
 			this.persons = persons;
 		}
 
@@ -206,7 +206,7 @@ public class ExternalModule implements StrategyModuleI {
 		public void run(final Person dummyperson) {
 			Plan newplan = dummyperson.getPlans().get(0);
 			// Find the original person
-			IdI Id = dummyperson.getId();
+			Id Id = dummyperson.getId();
 			Person person = this.persons.get(Id);
 
 			// replace / append the new plan

@@ -31,7 +31,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -42,7 +43,6 @@ import org.matsim.socialnetworks.algorithms.PlanEuclideanLength;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 import cern.colt.list.DoubleArrayList;
 import edu.uci.ics.jung.graph.Edge;
@@ -89,7 +89,7 @@ public class SocialNetworkStatistics {
 	// This is a map of MatSim Person ID to the JUNG vertex object
 	// (The JUNG Vertex UserDatum container is used
 	// to get the Person ID given a Vertex object
-	TreeMap<IdI, Vertex> verticesPersons = new TreeMap<IdI, Vertex>();
+	TreeMap<Id, Vertex> verticesPersons = new TreeMap<Id, Vertex>();
 
 	public SocialNetworkStatistics(String dir) {
 

@@ -8,17 +8,17 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 
 
@@ -49,7 +49,7 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 	 */
 	private LinkedList<TTElement> ttimes = new LinkedList<TTElement>();
 
-	private Map<BasicLinkI, Averager> averagedTTimes = new HashMap<BasicLinkI, Averager>();
+	private Map<BasicLink, Averager> averagedTTimes = new HashMap<BasicLink, Averager>();
 
 //	private SimTimeI simTime;
 
@@ -133,7 +133,7 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 			/*
 			 * Average the remaining travel time elements...
 			 */
-			this.averagedTTimes = new HashMap<BasicLinkI, Averager>();
+			this.averagedTTimes = new HashMap<BasicLink, Averager>();
 			for (TTElement e : this.ttimes) {
 				Averager a = this.averagedTTimes.get(e.getLink());
 				if (a == null) {
@@ -149,7 +149,7 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 		return this;
 	}
 
-	public int getLinkTravelTime_s(BasicLinkI link, int time_s) {
+	public int getLinkTravelTime_s(BasicLink link, int time_s) {
 		Averager a = this.averagedTTimes.get(link);
 		if (a == null) {
 			/*
@@ -161,7 +161,7 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 		}
 	}
 
-	public double getLinkTravelCost(BasicLinkI link, int time_s) {
+	public double getLinkTravelCost(BasicLink link, int time_s) {
 		return this.getLinkTravelTime_s(link, time_s);
 	}
 
@@ -173,25 +173,25 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 //		return null;
 //	}
 
-	public IdI getId() {
+	public Id getId() {
 		return null;
 	}
 
 	private class TTElement {
 
-		private final BasicLinkI link;
+		private final BasicLink link;
 
 		private final int timeStamp;
 
 		private final int ttime;
 
-		public TTElement(BasicLinkI link, int timeStamp, int ttime) {
+		public TTElement(BasicLink link, int timeStamp, int ttime) {
 			this.link = link;
 			this.timeStamp = timeStamp;
 			this.ttime = ttime;
 		}
 
-		public BasicLinkI getLink() {
+		public BasicLink getLink() {
 			return this.link;
 		}
 

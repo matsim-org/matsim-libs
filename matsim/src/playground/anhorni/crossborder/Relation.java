@@ -3,13 +3,13 @@ package playground.anhorni.crossborder;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import java.util.Collections;
 import java.util.Vector;
 import java.util.List;
-import org.matsim.utils.identifiers.IdI;
 
 public class Relation {
 	
@@ -232,7 +232,7 @@ public class Relation {
 		Collections.sort(this.outLinkVolumes, new LinkComparator());
 	}
 
-	private Plan createPlan(IdI out_id, IdI in_id){
+	private Plan createPlan(Id out_id, Id in_id){
 		
 		 Plan plan=new Plan(out_id, in_id);
 		 

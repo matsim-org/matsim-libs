@@ -24,14 +24,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 
-public class BasicNode implements BasicNodeI {
-	protected final Map<IdI, BasicLinkI> inlinks  = new HashMap<IdI, BasicLinkI>(4, 0.95f);
-	protected final Map<IdI, BasicLinkI> outlinks = new HashMap<IdI, BasicLinkI>(4, 0.95f);
+public class BasicNodeImpl implements BasicNode {
+	protected final Map<Id, BasicLink> inlinks  = new HashMap<Id, BasicLink>(4, 0.95f);
+	protected final Map<Id, BasicLink> outlinks = new HashMap<Id, BasicLink>(4, 0.95f);
 
 	/* TODO [balmermi]: Since the basic link is a location, it MUST have
 	 * defined some geographical information (coords). These are defined
@@ -39,32 +38,32 @@ public class BasicNode implements BasicNodeI {
 	 * defined. See also BasicLink. If this is not O.K., then the BasicLink must
 	 * not extend Location. */
 	protected final CoordI coord;
-	protected IdI id;
+	protected Id id;
 
-	public BasicNode(IdI id, CoordI coord) {
+	public BasicNodeImpl(Id id, CoordI coord) {
 		this.id = id;
 		if (coord == null) { Gbl.errorMsg("Coord must be defined!"); }
 		this.coord = coord;
 	}
 
-	public boolean addInLink(BasicLinkI link) {
+	public boolean addInLink(BasicLink link) {
 		this.inlinks.put(link.getId(), link);
 		return true;
 	}
 
 
-	public boolean addOutLink(BasicLinkI link) {
+	public boolean addOutLink(BasicLink link) {
 		this.outlinks.put(link.getId(), link);
 		return true;
 	}
 
 
-	public Map<IdI, ? extends BasicLinkI> getInLinks() {
+	public Map<Id, ? extends BasicLink> getInLinks() {
 		return this.inlinks;
 	}
 
 
-	public Map<IdI, ? extends BasicLinkI> getOutLinks() {
+	public Map<Id, ? extends BasicLink> getOutLinks() {
 		return this.outlinks;
 	}
 
@@ -74,11 +73,11 @@ public class BasicNode implements BasicNodeI {
 	}
 
 
-	public IdI getId() {
+	public Id getId() {
 		return this.id;
 	}
 
-	public void setId(final IdI id) {
+	public void setId(final Id id) {
 		this.id = id;
 	}
 }

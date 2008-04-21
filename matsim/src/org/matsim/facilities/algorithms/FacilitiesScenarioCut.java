@@ -23,10 +23,10 @@ package org.matsim.facilities.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 
 public class FacilitiesScenarioCut extends FacilitiesAlgorithm {
 
@@ -63,10 +63,10 @@ public class FacilitiesScenarioCut extends FacilitiesAlgorithm {
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
-		TreeSet<IdI> fid_set = new TreeSet<IdI>();
-		Iterator<IdI> fid_it = facilities.getFacilities().keySet().iterator();
+		TreeSet<Id> fid_set = new TreeSet<Id>();
+		Iterator<Id> fid_it = facilities.getFacilities().keySet().iterator();
 		while (fid_it.hasNext()) {
-			IdI fid = fid_it.next();
+			Id fid = fid_it.next();
 			Facility f = facilities.getFacilities().get(fid);
 			CoordI coord = f.getCenter();
 			double x = coord.getX();
@@ -79,7 +79,7 @@ public class FacilitiesScenarioCut extends FacilitiesAlgorithm {
 		System.out.println("      Number of facilities to be cut = " + fid_set.size() + "...");
 		fid_it = fid_set.iterator();
 		while (fid_it.hasNext()) {
-			IdI fid = fid_it.next();
+			Id fid = fid_it.next();
 			facilities.getFacilities().remove(fid);
 		}
 		System.out.println("      done.");

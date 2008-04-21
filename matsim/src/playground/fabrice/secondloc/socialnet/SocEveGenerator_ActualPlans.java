@@ -23,7 +23,7 @@ package playground.fabrice.secondloc.socialnet;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.network.Link;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;

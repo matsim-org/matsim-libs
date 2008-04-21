@@ -25,10 +25,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Pre-processes a given network, gathering information which
@@ -71,7 +71,7 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 		for (Node node : network.getNodes().values()) {
 			role = getRole(node);
 
-			Map<IdI, ? extends Node> incidentNodes = node.getIncidentNodes();
+			Map<Id, ? extends Node> incidentNodes = node.getIncidentNodes();
 			if (incidentNodes.size() == 1) {
 				ArrayList<Node> deadEndNodes = new ArrayList<Node>();
 

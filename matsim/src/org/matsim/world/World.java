@@ -26,12 +26,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.algorithms.WorldAlgorithm;
 
 
@@ -43,7 +43,7 @@ public class World {
 
 	private String name = null;
 
-	private final TreeMap<IdI, Layer> layers = new TreeMap<IdI, Layer>();
+	private final TreeMap<Id, Layer> layers = new TreeMap<Id, Layer>();
 	private final TreeMap<String, MappingRule> rules = new TreeMap<String, MappingRule>();
 
 	private Layer top_layer = null;
@@ -67,9 +67,9 @@ public class World {
 	private final void completeZoneLayers() {
 		// get zone layers
 		ArrayList<ZoneLayer> zlayers = new ArrayList<ZoneLayer>();
-		Iterator<IdI> lid_it = this.layers.keySet().iterator();
+		Iterator<Id> lid_it = this.layers.keySet().iterator();
 		while (lid_it.hasNext()) {
-			IdI lid = lid_it.next();
+			Id lid = lid_it.next();
 			if ((lid != NetworkLayer.LAYER_TYPE) && (lid != Facilities.LAYER_TYPE)) {
 				zlayers.add((ZoneLayer)this.layers.get(lid));
 			}
@@ -172,7 +172,7 @@ public class World {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final boolean removeMappingRule(final IdI l1_id, final IdI l2_id) {
+	private final boolean removeMappingRule(final Id l1_id, final Id l2_id) {
 		if ((this.layers.get(l1_id) == null) || (this.layers.get(l2_id) == null)) { return false; }
 		Layer down_layer = null;
 		Layer up_layer = null;
@@ -199,7 +199,7 @@ public class World {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Layer createLayer(final IdI type, final String name) {
+	public final Layer createLayer(final Id type, final String name) {
 		if (this.layers.containsKey(type)) { Gbl.errorMsg("Layer type=" + type + " already exixts."); }
 		if (type.equals(Facilities.LAYER_TYPE)) { return this.createFacilityLayer(); }
 		if (type.equals(NetworkLayer.LAYER_TYPE)) { return this.createNetworkLayer(); }
@@ -207,7 +207,7 @@ public class World {
 	}
 
 	public final Layer createLayer(final String type, final String name) {
-		return this.createLayer(new Id(type),name);
+		return this.createLayer(new IdImpl(type),name);
 	}
 
 	public final MappingRule createMappingRule(final String mapping_rule) {
@@ -216,7 +216,7 @@ public class World {
 		return m;
 	}
 
-	private final ZoneLayer createZoneLayer(final IdI type,final String name) {
+	private final ZoneLayer createZoneLayer(final Id type,final String name) {
 		ZoneLayer l = new ZoneLayer(type,name);
 		this.layers.put(l.getType(),l);
 		return l;
@@ -312,15 +312,15 @@ public class World {
 		return this.name;
 	}
 
-	public final Layer getLayer(final IdI layer_type) {
+	public final Layer getLayer(final Id layer_type) {
 		return this.layers.get(layer_type);
 	}
 
 	public final Layer getLayer(final String layer_type) {
-		return this.layers.get(new Id(layer_type));
+		return this.layers.get(new IdImpl(layer_type));
 	}
 
-	public final TreeMap<IdI,Layer> getLayers() {
+	public final TreeMap<Id,Layer> getLayers() {
 		return this.layers;
 	}
 
@@ -328,7 +328,7 @@ public class World {
 		return this.rules;
 	}
 
-	protected final MappingRule getMappingRule(final IdI down_id, final IdI up_id) {
+	protected final MappingRule getMappingRule(final Id down_id, final Id up_id) {
 		return this.rules.get(down_id.toString() + up_id.toString());
 	}
 

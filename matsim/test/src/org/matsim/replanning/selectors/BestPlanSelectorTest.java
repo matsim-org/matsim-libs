@@ -21,7 +21,7 @@
 package org.matsim.replanning.selectors;
 
 import org.matsim.basic.v01.BasicPlan;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 
@@ -43,7 +43,7 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testBestPlan() {
-		Person person = new Person(new Id(1), "m", 40, null, null, null);
+		Person person = new Person(new IdImpl(1), "m", 40, null, null, null);
 		person.createPlan(null, "no");
 		person.createPlan("10.0", "no");
 		person.createPlan("-50.0", "no");

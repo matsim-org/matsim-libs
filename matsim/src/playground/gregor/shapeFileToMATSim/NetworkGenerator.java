@@ -28,11 +28,11 @@ import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.matsim.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.identifiers.IdI;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;

@@ -22,7 +22,7 @@ package org.matsim.plans.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -56,7 +56,7 @@ public class ActLocationFalsifier extends PersonAlgorithm implements PlanAlgorit
 
 	@SuppressWarnings("unchecked")
 	public void run(Plan plan) {
-		Iterator<BasicAct> actIter = plan.getIteratorAct();
+		Iterator<BasicActImpl> actIter = plan.getIteratorAct();
 		while (actIter.hasNext()) {
 			Act act = (Act) actIter.next();
 			CoordI coord = act.getCoord();

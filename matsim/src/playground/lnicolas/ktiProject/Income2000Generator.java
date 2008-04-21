@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
@@ -47,17 +47,17 @@ public class Income2000Generator {
 
 	private ArrayList<Zone> municipalities;
 
-	private TreeMap<IdI, MunicipalityInformation> municipalityInfo;
+	private TreeMap<Id, MunicipalityInformation> municipalityInfo;
 
 	public Income2000Generator(World world,
-			TreeMap<IdI, MunicipalityInformation> mInfo) {
-		TreeMap<IdI, ? extends Location> locations = world.getLayer("municipality").getLocations();
-		this.municipalityInfo = new TreeMap<IdI, MunicipalityInformation>();
+			TreeMap<Id, MunicipalityInformation> mInfo) {
+		TreeMap<Id, ? extends Location> locations = world.getLayer("municipality").getLocations();
+		this.municipalityInfo = new TreeMap<Id, MunicipalityInformation>();
 		this.municipalities = new ArrayList<Zone>();
 		// Remove those entries that contain invalid income 2000 information
-		Iterator<Entry<IdI, MunicipalityInformation> > it = mInfo.entrySet().iterator();
+		Iterator<Entry<Id, MunicipalityInformation> > it = mInfo.entrySet().iterator();
 		while (it.hasNext()) {
-			Entry<IdI, MunicipalityInformation> entry = it.next();
+			Entry<Id, MunicipalityInformation> entry = it.next();
 			if (entry.getValue().getAvgIncome2000() >= 0) {
 				this.municipalityInfo.put(entry.getKey(), entry.getValue());
 				this.municipalities.add((Zone) locations.get(entry.getKey()));
@@ -166,7 +166,7 @@ public class Income2000Generator {
 	 */
 	public static ArrayList<Zone> mapPersonsToZones(
 			ArrayList<Person> persons, ArrayList<Zone> zones,
-			TreeMap<IdI, MunicipalityInformation> mInfo) {
+			TreeMap<Id, MunicipalityInformation> mInfo) {
 		Iterator<Zone> it = zones.iterator();
 		System.out.println("Nof zones before removing invalid income 2000 entries: "
 				+ zones.size());

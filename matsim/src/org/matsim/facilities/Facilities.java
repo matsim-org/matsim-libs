@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Layer;
 
 public class Facilities extends Layer {
@@ -39,7 +39,7 @@ public class Facilities extends Layer {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	public static final IdI LAYER_TYPE = new Id("facility");
+	public static final Id LAYER_TYPE = new IdImpl("facility");
 
 	private final ArrayList<FacilitiesAlgorithm> algorithms = new ArrayList<FacilitiesAlgorithm>();
 
@@ -62,7 +62,7 @@ public class Facilities extends Layer {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Facility createFacility(final IdI id, final CoordI center) {
+	public final Facility createFacility(final Id id, final CoordI center) {
 		if (this.locations.containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " aready exists.");
 		}
@@ -79,7 +79,7 @@ public class Facilities extends Layer {
 	}
 
 	public final Facility createFacility(final String id, final String x, final String y) {
-		return this.createFacility(new Id(id),new Coord(x,y));
+		return this.createFacility(new IdImpl(id),new Coord(x,y));
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -118,13 +118,13 @@ public class Facilities extends Layer {
 	//////////////////////////////////////////////////////////////////////
 
 	@SuppressWarnings("unchecked")
-	public final Map<IdI, ? extends Facility> getFacilities() {
-		return (Map<IdI, ? extends Facility>) getLocations();
+	public final Map<Id, ? extends Facility> getFacilities() {
+		return (Map<Id, ? extends Facility>) getLocations();
 	}
 	
 	//Added 27.03.08 JH for random secondary location changes
-	public final TreeMap<IdI,Facility> getFacilities(final String act_type) {
-		TreeMap<IdI,Facility> facs = new TreeMap<IdI, Facility>();
+	public final TreeMap<Id,Facility> getFacilities(final String act_type) {
+		TreeMap<Id,Facility> facs = new TreeMap<Id, Facility>();
 		Iterator<? extends Facility> lit = this.getFacilities().values().iterator();
 		while(lit.hasNext()){
 			Facility f = (Facility) lit.next();

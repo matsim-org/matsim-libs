@@ -3,7 +3,8 @@ package org.matsim.run;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicPlan.LegIterator;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -12,7 +13,6 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.IOUtils;
 
 public class CompareSelectedPlansTable {
@@ -71,7 +71,7 @@ public class CompareSelectedPlansTable {
 			BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(this.header + "\n");
 
-			for (IdI person_id : this.plans0.getPersons().keySet()) {
+			for (Id person_id : this.plans0.getPersons().keySet()) {
 
 				// method person.toString() not appropriate
 				out.write(person_id.toString()+"\t");

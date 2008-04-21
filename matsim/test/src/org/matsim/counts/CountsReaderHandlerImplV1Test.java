@@ -20,7 +20,7 @@
 
 package org.matsim.counts;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class CountsReaderHandlerImplV1Test extends MatsimTestCase {
@@ -49,7 +49,7 @@ public class CountsReaderHandlerImplV1Test extends MatsimTestCase {
 		reader.startTag("counts", this.attributeFactory.createCountsAttributes(), null);
 		reader.startTag("count", this.attributeFactory.createCountAttributes(), null);
 
-		assertTrue("Count attribute setting failed", Counts.getSingleton().getCount(new Id(1)).getCsId().equals("testNr"));
+		assertTrue("Count attribute setting failed", Counts.getSingleton().getCount(new IdImpl(1)).getCsId().equals("testNr"));
 	}
 
 	public void testSEVolume() {
@@ -58,7 +58,7 @@ public class CountsReaderHandlerImplV1Test extends MatsimTestCase {
 		reader.startTag("count", this.attributeFactory.createCountAttributes(), null);
 		reader.startTag("volume", this.attributeFactory.createVolumeAttributes(), null);
 
-		assertTrue("Volume attribute setting failed", Counts.getSingleton().getCount(new Id(1)).getVolume(1).getValue()==100.0);
+		assertTrue("Volume attribute setting failed", Counts.getSingleton().getCount(new IdImpl(1)).getVolume(1).getValue()==100.0);
 
 	}
 }

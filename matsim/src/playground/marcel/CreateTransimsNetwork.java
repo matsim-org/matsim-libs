@@ -26,7 +26,7 @@ import java.io.File;
 import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -75,10 +75,10 @@ public class CreateTransimsNetwork {
 		if (network.getNode("0") != null) {
 			Logger.getLogger(CreateTransimsNetwork.class).error("The network contains a node with id 0. Transims is likely to have problems with that!");
 		}
-		if (network.getLink(new Id(0)) != null) {
+		if (network.getLink(new IdImpl(0)) != null) {
 			Logger.getLogger(CreateTransimsNetwork.class).error("The network contains a link with id 0. Transims is likely to have problems with that!");
-			if (network.getLink(new Id(999999)) == null) {
-				network.getLink(new Id(0)).setId(new Id("999999"));
+			if (network.getLink(new IdImpl(999999)) == null) {
+				network.getLink(new IdImpl(0)).setId(new IdImpl("999999"));
 				Logger.getLogger(CreateTransimsNetwork.class).error("Changed link 0 to link 999999.");
 			}
 		}

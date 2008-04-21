@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
@@ -104,7 +104,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 						String elevation = result[13];
 						String azimuth = result[14];
 						String type = result[7];
-						ExtendedPositionInfo position = new ExtendedPositionInfo(new Id(agent), easting, northing,
+						ExtendedPositionInfo position = new ExtendedPositionInfo(new IdImpl(agent), easting, northing,
 								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 						addVehicle(Double.parseDouble(time), position);
 					}

@@ -31,6 +31,7 @@ import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -40,7 +41,6 @@ import org.matsim.plans.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 
 import playground.gregor.vis.LinkPainter;
@@ -81,7 +81,7 @@ public class DCLogit implements LeastCostPathCalculator{
 	protected ComparatorDCLogitCost comparator;
 
 
-	final private HashMap<IdI, DCLogitNodeData> nodeData;
+	final private HashMap<Id, DCLogitNodeData> nodeData;
 
 	/**
 	 * Provides an unique id (loop number) for each routing request, so we don't
@@ -114,7 +114,7 @@ public class DCLogit implements LeastCostPathCalculator{
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
 
-		this.nodeData = new HashMap<IdI, DCLogitNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
+		this.nodeData = new HashMap<Id, DCLogitNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.comparator = new ComparatorDCLogitCost(this.nodeData);
 
 		//TODO DEBUG
@@ -583,9 +583,9 @@ public class DCLogit implements LeastCostPathCalculator{
 
 		private boolean checkIDs = false;
 
-		protected Map<IdI, ? extends DCLogitNodeData> nodeData;
+		protected Map<Id, ? extends DCLogitNodeData> nodeData;
 
-		public ComparatorDCLogitCost(Map<IdI, ? extends DCLogitNodeData> nodeData) {
+		public ComparatorDCLogitCost(Map<Id, ? extends DCLogitNodeData> nodeData) {
 			this.nodeData = nodeData;
 		}
 
@@ -620,7 +620,7 @@ public class DCLogit implements LeastCostPathCalculator{
 
 	static class DCLogitNodeData  {
 
-		public final IdI id;
+		public final Id id;
 
 		private Node shortestPrev;
 
@@ -647,7 +647,7 @@ public class DCLogit implements LeastCostPathCalculator{
 
 		private int openLinks;
 
-		public DCLogitNodeData(IdI id, int numOfOutLinks){
+		public DCLogitNodeData(Id id, int numOfOutLinks){
 			this.id = id;
 			this.openLinks = numOfOutLinks;
 		}
@@ -673,7 +673,7 @@ public class DCLogit implements LeastCostPathCalculator{
 		}
 
 
-		public int getInPaths(IdI id){
+		public int getInPaths(Id id){
 			int inPaths = 0;
 			if (this.backLinks.size() == 0)
 				return 0;

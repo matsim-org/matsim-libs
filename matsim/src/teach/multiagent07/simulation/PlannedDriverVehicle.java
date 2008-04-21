@@ -23,10 +23,11 @@ package teach.multiagent07.simulation;
 import java.util.Collection;
 
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicLink;
+import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.BasicRoute;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 
 import teach.multiagent07.net.CALink;
 import teach.multiagent07.net.CANode;
@@ -40,13 +41,13 @@ public class PlannedDriverVehicle extends Vehicle {
 	private BasicPlan plan;
 
 	private BasicLeg currentLeg = null;
-	private BasicLinkI currentlink;
+	private BasicLink currentlink;
 	private BasicRoute currentRoute;
 	private Activity lastAct = null;
 	private Activity nextAct = null;
 
 	private int routeidx = 0;
-	private BasicPlan.ActLegIterator iter = null;
+	private BasicPlanImpl.ActLegIterator iter = null;
 	private double departuretime = 0;
 
 	public PlannedDriverVehicle(Person agent, CAMobSim sim) {
@@ -71,7 +72,7 @@ public class PlannedDriverVehicle extends Vehicle {
 	}
 
 	@Override
-	public BasicLinkI getDepartureLink() {
+	public BasicLink getDepartureLink() {
 		return this.currentlink;
 	}
 
@@ -81,19 +82,19 @@ public class PlannedDriverVehicle extends Vehicle {
 	}
 
 	@Override
-	public void setCurrentLink(BasicLink link)  {
+	public void setCurrentLink(BasicLinkImpl link)  {
 		this.currentlink = link;
 		this.routeidx++;
 	}
 
 	@Override
-	public CALink getNextLink(Collection<? extends BasicLinkI> nextLinks) {
+	public CALink getNextLink(Collection<? extends BasicLink> nextLinks) {
 
 		if (this.routeidx >= this.currentRoute.getRoute().size() ) return getDestinationLink();
 
 		CANode destNode = (CANode)this.currentRoute.getRoute().get(this.routeidx);
 
-		for (BasicLinkI link : nextLinks) {
+		for (BasicLink link : nextLinks) {
 			if (link.getToNode() == destNode) {
 				return (CALink)link;
 			}

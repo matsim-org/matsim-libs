@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -47,16 +47,16 @@ class FilterPersons extends PersonAlgorithm{
 	public FilterPersons() {
 		super();
 		//Find relevant nodes to look for
-		Link link1 = FilterBerlinKutter.network.getLinks().get(new Id(1655));
+		Link link1 = FilterBerlinKutter.network.getLinks().get(new IdImpl(1655));
 		relevantFromNodes.add(link1.getFromNode());
 		relevantToNodes.add(link1.getToNode());
-		link1 = FilterBerlinKutter.network.getLinks().get(new Id(1659));
+		link1 = FilterBerlinKutter.network.getLinks().get(new IdImpl(1659));
 		relevantFromNodes.add(link1.getFromNode());
 		relevantToNodes.add(link1.getToNode());
-		link1 = FilterBerlinKutter.network.getLinks().get(new Id(1663));
+		link1 = FilterBerlinKutter.network.getLinks().get(new IdImpl(1663));
 		relevantFromNodes.add(link1.getFromNode());
 		relevantToNodes.add(link1.getToNode());
-		link1 = FilterBerlinKutter.network.getLinks().get(new Id(1668));
+		link1 = FilterBerlinKutter.network.getLinks().get(new IdImpl(1668));
 		relevantFromNodes.add(link1.getFromNode());
 		relevantToNodes.add(link1.getToNode());
 	}

@@ -26,7 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.utils.vis.netvis.config.IndexationConfig;
 import org.matsim.utils.vis.netvis.config.TemporalConfig;
 
@@ -65,7 +65,7 @@ public abstract class StreamReaderA implements SimStateReaderI {
      * @param fileSuffix
      *            the read files' suffix
      */
-    protected StreamReaderA(BasicNetI network, String filePrefix,
+    protected StreamReaderA(BasicNet network, String filePrefix,
             String fileSuffix) {
         this.streamConfig = new StreamConfig(network, filePrefix, fileSuffix, false);
     }
@@ -80,7 +80,7 @@ public abstract class StreamReaderA implements SimStateReaderI {
         return bufferStartTime_s + bufferIndex * timeStepLength_s();
     }
 
-    public BasicNetI getNetwork() {
+    public BasicNet getNetwork() {
         return streamConfig.getNetwork();
     }
 

@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
@@ -69,7 +69,7 @@ public class CalcLegTimes implements EventHandlerAgentDepartureI, EventHandlerAg
 
 	public void handleEvent(final EventAgentArrival event) {
 		Double depTime = this.agentDepartures.remove(event.agentId);
-		Person agent = this.population.getPerson(new Id(event.agentId));
+		Person agent = this.population.getPerson(new IdImpl(event.agentId));
 		if (depTime != null && agent != null) {
 			double travTime = event.time - depTime;
 			int legNr = this.agentLegs.get(event.agentId);

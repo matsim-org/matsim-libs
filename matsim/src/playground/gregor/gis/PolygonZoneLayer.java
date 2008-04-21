@@ -21,11 +21,11 @@
 package playground.gregor.gis;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Layer;
 
 /**
@@ -40,7 +40,7 @@ public class PolygonZoneLayer extends Layer{
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-	public static final IdI LAYER_TYPE = new Id("polyzone");
+	public static final Id LAYER_TYPE = new IdImpl("polyzone");
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -49,11 +49,11 @@ public class PolygonZoneLayer extends Layer{
 		super(type,name);
 	}
 
-	protected PolygonZoneLayer(final IdI type, final String name) {
+	protected PolygonZoneLayer(final Id type, final String name) {
 		super(type,name);
 	}
 	
-	public final PolygonZone createPolygonZone( final IdI id, final CoordI center,
+	public final PolygonZone createPolygonZone( final Id id, final CoordI center,
             final CoordI[] shell, final double area, final String name){
 //		IdI i = new Id(id);
 		if (this.locations.containsKey(id)) { Gbl.errorMsg(this.toString() + "[zone id=" + id + " already exists]"); }

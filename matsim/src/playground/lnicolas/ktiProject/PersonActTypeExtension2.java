@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -95,11 +96,11 @@ public class PersonActTypeExtension2 extends PersonAlgorithm {
 	
 	private void distributeActTypes(Person person,
 			TreeSet<String> actTypes, int totalActDuration) {
-		ArrayList<BasicAct> acts = new ArrayList<BasicAct>();
+		ArrayList<BasicActImpl> acts = new ArrayList<BasicActImpl>();
 		for (Plan plan : person.getPlans()) {
-			BasicPlan.ActIterator it = plan.getIteratorAct();
+			BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 			while (it.hasNext()) {
-				BasicAct act = it.next();
+				BasicActImpl act = it.next();
 				if (actTypes.contains(act.getType())) {
 					acts.add(act);
 				}
@@ -140,11 +141,11 @@ public class PersonActTypeExtension2 extends PersonAlgorithm {
 	}
 
 	private int processWorkOrEduAct(Person person, String actType, int totalActDuration) {
-		ArrayList<BasicAct> acts = new ArrayList<BasicAct>();
+		ArrayList<BasicActImpl> acts = new ArrayList<BasicActImpl>();
 		for (Plan plan : person.getPlans()) {
-			BasicPlan.ActIterator it = plan.getIteratorAct();
+			BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 			while (it.hasNext()) {
-				BasicAct act = it.next();
+				BasicActImpl act = it.next();
 				if (actType.equals(act.getType())) {
 					acts.add(act);
 				}
@@ -218,7 +219,7 @@ public class PersonActTypeExtension2 extends PersonAlgorithm {
 		int c = 0;
 		String newActType = homeActType + homeActType1Duration;
 		for (Plan plan : person.getPlans()) {
-			BasicPlan.ActIterator it = plan.getIteratorAct();
+			BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 			while (it.hasNext()) {
 				BasicAct act = it.next();
 				if (act.getType().equals(homeActType)
@@ -239,7 +240,7 @@ public class PersonActTypeExtension2 extends PersonAlgorithm {
 
 	private int getTypeOccurenceCount(Plan plan, String actType) {
 		int c = 0;
-		BasicPlan.ActIterator it = plan.getIteratorAct();
+		BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 		while (it.hasNext()) {
 			BasicAct act = it.next();
 			if (act.getType().equals(actType)) {

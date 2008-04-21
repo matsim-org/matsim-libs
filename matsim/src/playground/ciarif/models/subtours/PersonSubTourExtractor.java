@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.plans.Act;
@@ -16,7 +17,6 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.utils.identifiers.IdI;
 
 
 import playground.balmermi.census2000.data.Persons;

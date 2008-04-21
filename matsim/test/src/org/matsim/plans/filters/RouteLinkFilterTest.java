@@ -20,7 +20,7 @@
 
 package org.matsim.plans.filters;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -41,7 +41,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		TestAlgorithm tester = new TestAlgorithm();
 
 		RouteLinkFilter linkFilter = new RouteLinkFilter(tester);
-		linkFilter.addLink(new Id(15));
+		linkFilter.addLink(new IdImpl(15));
 
 		SelectedPlanFilter selectedPlanFilter = new SelectedPlanFilter(linkFilter);
 		selectedPlanFilter.run(population);

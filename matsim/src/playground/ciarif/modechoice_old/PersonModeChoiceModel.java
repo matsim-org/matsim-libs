@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
-import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -77,7 +77,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		
 		// setting subtour parameters
 		if (plan == null) { Gbl.errorMsg("Person id=" + plan.getPerson().getId() + "does not have a selected plan."); }
-		Iterator<BasicAct> act_it = plan.getIteratorAct();
+		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
 		CoordI home_coord = null;
 		CoordI work_coord = null;
 		//act_it.hasNext(); // first act is always 'home'
@@ -212,9 +212,9 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private final void deleteSubTour (Plan plan, TreeMap<Integer, List<Integer>> subtours, int start, int end,int subtour_idx) {
 		for (int i=start+2; i<end; i=i+2){
 			plan.removeAct(i);
-			plan.removeLeg(i-1);//Cambiare!!!! Così non funziona sicuramente perchè 
-								//non tornanon piü i numeri di act_leg, la soluzione
-								// migliore probabilmente è creare un'altro oggetto
+			plan.removeLeg(i-1);//Cambiare!!!! Cosï¿½ non funziona sicuramente perchï¿½ 
+								//non tornanon piï¿½ i numeri di act_leg, la soluzione
+								// migliore probabilmente ï¿½ creare un'altro oggetto
 								// fin dall'inizio e non usare i plan
 		}
 		

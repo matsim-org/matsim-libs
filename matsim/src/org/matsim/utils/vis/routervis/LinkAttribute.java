@@ -20,14 +20,14 @@
 
 package org.matsim.utils.vis.routervis;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 public class LinkAttribute {
-	private IdI id;
+	private Id id;
 	private double color;
 	private String msg;
 	
-	public LinkAttribute(IdI id){
+	public LinkAttribute(Id id){
 		this.id = id;
 		this.color = 0;
 		this.msg = this.id.toString();

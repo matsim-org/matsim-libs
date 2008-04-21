@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -41,7 +42,6 @@ import org.matsim.trafficlights.data.SignalGroupDefinition;
 import org.matsim.trafficlights.data.SignalGroupDefinitionParser;
 import org.matsim.trafficlights.data.SignalSystemConfiguration;
 import org.matsim.trafficlights.data.SignalSystemConfigurationParser;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.SAXException;
 
@@ -68,7 +68,7 @@ public class QSim extends Simulation {
 	
 	private void readSignalSystemControler(){
 		
-		Map<IdI, SignalSystemConfiguration> signalSystemConfigurations = null;
+		Map<Id, SignalSystemConfiguration> signalSystemConfigurations = null;
 				
 		final String signalSystems = "./src/playground/andreas/intersection/signalSystemConfig.xml";
 		final String groupDefinitions = "./src/playground/andreas/intersection/signalGroupDefinition.xml";

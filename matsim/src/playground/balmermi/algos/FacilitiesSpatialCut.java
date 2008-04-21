@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 public class FacilitiesSpatialCut extends FacilitiesAlgorithm {
@@ -76,7 +76,7 @@ public class FacilitiesSpatialCut extends FacilitiesAlgorithm {
 			}
 		}
 
-		TreeMap<IdI, Facility> fs = (TreeMap<IdI, Facility>) facilities.getFacilities();
+		TreeMap<Id, Facility> fs = (TreeMap<Id, Facility>) facilities.getFacilities();
 		fs.clear();
 
 		for (int i=0; i<f_array.size(); i++) {

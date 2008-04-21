@@ -22,9 +22,9 @@ package org.matsim.utils.vis.netvis;
 
 import java.util.Collection;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.vis.netvis.config.IndexationConfig;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableLinkI;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableNodeI;
@@ -53,14 +53,14 @@ public class DisplayNetStateWriter extends StreamWriterA {
 
     // -------------------- CONSTRUCTION --------------------
 
-    public DisplayNetStateWriter(BasicNetI network,
+    public DisplayNetStateWriter(BasicNet network,
             String networkFileName, String filePrefix,
             int timeStepLength_s, int bufferSize) {
         super(network, networkFileName, new IndexationConfig(network),
                 filePrefix, NetVis.FILE_SUFFIX, timeStepLength_s, bufferSize);
     }
 
-    public DisplayNetStateWriter(BasicNetI network,
+    public DisplayNetStateWriter(BasicNet network,
             String networkFileName, VisConfig visConfig,
             String filePrefix, int timeStepLength_s, int bufferSize) {
         this(network, networkFileName, filePrefix, timeStepLength_s, bufferSize);
@@ -79,7 +79,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
      * Is expected to return the value to be displayed for <code>node</code>
      * in color-coding.
      */
-    protected double getNodeDisplValue(BasicNodeI node) {
+    protected double getNodeDisplValue(BasicNode node) {
         return 0;
     }
 
@@ -87,7 +87,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
      * Is expected to return the single value to be displayed for
      * <code>link</code> in color-coding.
      */
-    protected double getLinkDisplValue(BasicLinkI link) {
+    protected double getLinkDisplValue(BasicLink link) {
         return 0;
     }
 
@@ -95,7 +95,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
      * Is expected to return a <code>String</code> to be displayed on top of
      * the passed <code>node</code>.
      */
-    protected String getNodeDisplLabel(BasicNodeI node) {
+    protected String getNodeDisplLabel(BasicNode node) {
         return "";
     }
 
@@ -103,7 +103,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
      * Is expected to return a <code>String</code> to be displayed on top of
      * the passed <code>link</code>.
      */
-    protected String getLinkDisplLabel(BasicLinkI link) {
+    protected String getLinkDisplLabel(BasicLink link) {
         return "";
     }
 
@@ -120,7 +120,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
      * <code>link</code> in color-coding. Returns <code>1</code> if not
      * overridden.
      */
-    protected int getLinkDisplValueCnt(BasicLinkI link) {
+    protected int getLinkDisplValueCnt(BasicLink link) {
         return 1;
     }
 
@@ -128,7 +128,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
      * Is expected to return the (<code>index+1</code>)st value to be
      * displayed for <code>link</code> in color-coding.
      */
-    protected double getLinkDisplValue(BasicLinkI link, int index) {
+    protected double getLinkDisplValue(BasicLink link, int index) {
         return getLinkDisplValue(link);
     }
 
@@ -137,7 +137,7 @@ public class DisplayNetStateWriter extends StreamWriterA {
      * instances or <code>null</code>, if no agents are to be drawn.
      */
     protected Collection<? extends DrawableAgentI> getAgentsOnLink(
-            BasicLinkI link) {
+            BasicLink link) {
         return null;
     }
 
@@ -157,21 +157,21 @@ public class DisplayNetStateWriter extends StreamWriterA {
         }
 
         @Override
-				protected BufferedStateA newNodeState(BasicNodeI node) {
+				protected BufferedStateA newNodeState(BasicNode node) {
             return new DisplayNodeState(new MyDrawableNode(node));
         }
 
         @Override
-				protected BufferedStateA newLinkState(BasicLinkI link) {
+				protected BufferedStateA newLinkState(BasicLink link) {
             return new DisplayLinkState(new MyDrawableLink(link));
         }
     }
 
     private class MyDrawableNode implements DrawableNodeI {
 
-        private BasicNodeI node;
+        private BasicNode node;
 
-        private MyDrawableNode(BasicNodeI node) {
+        private MyDrawableNode(BasicNode node) {
             this.node = node;
         }
 
@@ -187,9 +187,9 @@ public class DisplayNetStateWriter extends StreamWriterA {
 
     private class MyDrawableLink implements DrawableLinkI {
 
-        private BasicLinkI link;
+        private BasicLink link;
 
-        private MyDrawableLink(BasicLinkI link) {
+        private MyDrawableLink(BasicLink link) {
             this.link = link;
         }
 

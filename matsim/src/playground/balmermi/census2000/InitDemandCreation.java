@@ -20,7 +20,7 @@
 
 package playground.balmermi.census2000;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.ConfigWriter;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
@@ -132,7 +132,7 @@ public class InitDemandCreation {
 		plans.addAlgorithm(pcst);
 		PersonMunicipalitySummaryTable pmst = new PersonMunicipalitySummaryTable("output/output_municipalities.txt",persons);
 		plans.addAlgorithm(pmst);
-		PersonZoneSummary pzs = new PersonZoneSummary((ZoneLayer)Gbl.getWorld().getLayer(new Id("municipality")),persons,"output/output_zones.txt");
+		PersonZoneSummary pzs = new PersonZoneSummary((ZoneLayer)Gbl.getWorld().getLayer(new IdImpl("municipality")),persons,"output/output_zones.txt");
 		plans.addAlgorithm(pzs);
 		//////////////////////////////////////////////////////////////////////
 		PersonRoundTimes prt = new PersonRoundTimes(); // must be last one!!!

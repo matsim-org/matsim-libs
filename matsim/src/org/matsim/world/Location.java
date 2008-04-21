@@ -2,8 +2,8 @@ package org.matsim.world;
 
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 
 public interface Location {
 
@@ -36,21 +36,21 @@ public interface Location {
 	public abstract boolean removeAllDownMappings();
 
 	// TODO [balmermi] I do not like that (see above why)
-	public abstract void setId(IdI id);
+	public abstract void setId(Id id);
 
-	public abstract IdI getId();
+	public abstract Id getId();
 
 	public abstract Layer getLayer();
 
 	public abstract CoordI getCenter();
 
-	public abstract Location getUpLocation(IdI id);
+	public abstract Location getUpLocation(Id id);
 
-	public abstract Location downLocation(IdI id);
+	public abstract Location downLocation(Id id);
 
-	public abstract TreeMap<IdI, Location> getUpMapping();
+	public abstract TreeMap<Id, Location> getUpMapping();
 
-	public abstract TreeMap<IdI, Location> getDownMapping();
+	public abstract TreeMap<Id, Location> getDownMapping();
 
 	public abstract String toString();
 

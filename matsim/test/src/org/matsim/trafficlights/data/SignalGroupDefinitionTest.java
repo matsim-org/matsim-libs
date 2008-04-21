@@ -25,7 +25,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -55,27 +55,27 @@ public class SignalGroupDefinitionTest extends MatsimTestCase {
 			parser.parse(this.getPackageInputDirectory() + TESTXML);
 			assertEquals(2, signalGroups.size());
 			SignalGroupDefinition current = signalGroups.get(0);
-			assertEquals(0, current.getId().compareTo(new Id("123")));
+			assertEquals(0, current.getId().compareTo(new IdImpl("123")));
 			assertEquals(2, current.getFromLanes().size());
 			for (SignalLane s : current.getFromLanes()) {
-				assertTrue(s.getId().equals(new Id("1")) || s.getId().equals(new Id("2")));
-				assertEquals(new Id("23"), s.getLinkId());
+				assertTrue(s.getId().equals(new IdImpl("1")) || s.getId().equals(new IdImpl("2")));
+				assertEquals(new IdImpl("23"), s.getLinkId());
 			}
 			assertEquals(2, current.getToLanes().size());
 			for (SignalLane s : current.getFromLanes()) {
-				assertTrue(s.getId().equals(new Id("1")) || s.getId().equals(new Id("2")));
-				assertEquals(new Id("23"), s.getLinkId());
+				assertTrue(s.getId().equals(new IdImpl("1")) || s.getId().equals(new IdImpl("2")));
+				assertEquals(new IdImpl("23"), s.getLinkId());
 			}
 			assertEquals(false, current.isTurnIfRed());
 			assertEquals(2, current.getPassingClearingTime());
 
-			assertTrue(current.getFromSignalLane(new Id("1")).isMixedLane());
-			assertEquals(45.0d, current.getFromSignalLane(new Id("1")).getLength());
+			assertTrue(current.getFromSignalLane(new IdImpl("1")).isMixedLane());
+			assertEquals(45.0d, current.getFromSignalLane(new IdImpl("1")).getLength());
 
 			current = signalGroups.get(1);
-			assertEquals(0, current.getId().compareTo(new Id("124")));
+			assertEquals(0, current.getId().compareTo(new IdImpl("124")));
 
-			assertEquals(23.3d, current.getToSignalLane(new Id("3")).getLength());
+			assertEquals(23.3d, current.getToSignalLane(new IdImpl("3")).getLength());
 			assertEquals(true, current.isTurnIfRed());
 			assertEquals(15, current.getPassingClearingTime());
 

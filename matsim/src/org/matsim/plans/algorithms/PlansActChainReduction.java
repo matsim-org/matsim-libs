@@ -47,12 +47,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
 
 public class PlansActChainReduction extends PlansAlgorithm {
 
@@ -159,7 +159,7 @@ public class PlansActChainReduction extends PlansAlgorithm {
 				ArrayList<Person> persons = chains.get(chain);
 
 				for (int j=0, n=persons.size(); j<n; j++) {
-					IdI pid = (persons.get(j)).getId();
+					Id pid = (persons.get(j)).getId();
 					plans.getPersons().remove(pid);
 				}
 			}

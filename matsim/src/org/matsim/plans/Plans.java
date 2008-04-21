@@ -25,12 +25,12 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicPopulation;
+import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.algorithms.PersonAlgorithmI;
 import org.matsim.plans.algorithms.PlansAlgorithm;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Layer;
 
 /**
@@ -44,7 +44,7 @@ import org.matsim.world.Layer;
  *   (i.e. PlansHandlerImplXXX to PopulationHandlerImplXXX, and so on).
  *   Therefore everybody must agree with that!
  */
-public class Plans extends BasicPopulation<Person> implements Iterable<Person> {
+public class Plans extends BasicPopulationImpl<Person> implements Iterable<Person> {
 
 	public static final boolean USE_STREAMING = true;
 	public static final boolean NO_STREAMING = false;
@@ -215,7 +215,7 @@ public class Plans extends BasicPopulation<Person> implements Iterable<Person> {
 
 	public final void setRefLayer(final String layer_type) {
 		if (layer_type != null) {
-			this.refLayer = Gbl.getWorld().getLayer(new Id(layer_type));
+			this.refLayer = Gbl.getWorld().getLayer(new IdImpl(layer_type));
 			if (this.refLayer == null) {
 				Gbl.errorMsg(this + "[layer_type=" + layer_type + " does not exist]");
 			}
@@ -233,7 +233,7 @@ public class Plans extends BasicPopulation<Person> implements Iterable<Person> {
 		return this.name;
 	}
 
-	public final Map<IdI, Person> getPersons() {
+	public final Map<Id, Person> getPersons() {
 		return this.persons;
 	}
 

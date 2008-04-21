@@ -40,8 +40,8 @@ package playground.jhackney.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;

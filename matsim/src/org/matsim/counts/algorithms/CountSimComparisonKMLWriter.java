@@ -29,6 +29,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.matsim.basic.v01.Id;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.BiasErrorGraph;
 import org.matsim.counts.algorithms.graphs.BoxPlotErrorGraph;
@@ -43,7 +44,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;
@@ -399,7 +399,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * document
 	 */
 	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final Folder folder) {
-		IdI linkid;
+		Id linkid;
 		Link link;
 		Placemark placemark;
 		double relativeError;

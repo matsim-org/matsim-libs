@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -37,7 +38,6 @@ import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Calculates the k minimal cost paths from a start to an end node,
@@ -150,7 +150,7 @@ public class KShortestPathGenerator {
 		LinkedList<Route> pendingRoutes = new LinkedList<Route>();
 		AStarLandmarks router = new AStarLandmarks(this.network, this.preProcessData,
 				this.timeFunction);
-		TreeSet<IdI> processedLinks = new TreeSet<IdI>();
+		TreeSet<Id> processedLinks = new TreeSet<Id>();
 		Route route = router.calcLeastCostPath(fromNode, toNode, startTime);
 		if (route == null) {
 			Gbl.errorMsg("No route found from node "

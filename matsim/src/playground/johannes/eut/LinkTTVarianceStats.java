@@ -34,8 +34,8 @@ import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.io.IOUtils;
 
@@ -45,7 +45,7 @@ import org.matsim.utils.io.IOUtils;
  */
 public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListener {
 	
-	private Map<BasicLinkI, List<Double>> linkSamples;
+	private Map<BasicLink, List<Double>> linkSamples;
 	
 	private TravelTimeI travelTimes;
 	
@@ -63,14 +63,14 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 		this.startTime = start;
 		this.endTime = end;
 		this.binsize = binsize;
-		linkSamples = new HashMap<BasicLinkI, List<Double>>();
+		linkSamples = new HashMap<BasicLink, List<Double>>();
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		BasicNetI network = event.getControler().getNetwork();
+		BasicNet network = event.getControler().getNetwork();
 		LinkTTStats linkStats = new LinkTTStats(network, travelTimes, startTime, endTime, binsize);
 	
-		for(BasicLinkI link : network.getLinks().values()) {
+		for(BasicLink link : network.getLinks().values()) {
 			List<Double> samples = linkSamples.get(link);
 			if(samples == null) {
 				samples = new LinkedList<Double>();
@@ -81,12 +81,12 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 	}
 
 	public void notifyShutdown(ShutdownEvent event) {
-		Map<BasicLinkI, Double> variances = new HashMap<BasicLinkI, Double>();
-		Map<BasicLinkI, Double> maxTTs = new HashMap<BasicLinkI, Double>();
-		Map<BasicLinkI, Double> minTTs = new HashMap<BasicLinkI, Double>();
+		Map<BasicLink, Double> variances = new HashMap<BasicLink, Double>();
+		Map<BasicLink, Double> maxTTs = new HashMap<BasicLink, Double>();
+		Map<BasicLink, Double> minTTs = new HashMap<BasicLink, Double>();
 		
 		double varianceSum = 0;
-		for(BasicLinkI link : linkSamples.keySet()) {
+		for(BasicLink link : linkSamples.keySet()) {
 			List<Double> samples = linkSamples.get(link);
 			
 			double avr = 0;
@@ -119,7 +119,7 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 			writer.write("link\tvariance\tmin\tmax");
 			writer.newLine();
 			
-			for(BasicLinkI link : variances.keySet()) {
+			for(BasicLink link : variances.keySet()) {
 				writer.write(link.getId().toString());
 				writer.write("\t");
 				writer.write(variances.get(link).toString());

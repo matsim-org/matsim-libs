@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -36,7 +37,6 @@ import org.matsim.plans.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.routervis.RouterNetStateWriter;
 import org.matsim.utils.vis.routervis.VisLeastCostPathCalculator;
 
@@ -77,7 +77,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 	protected ComparatorNodeData comparator;
 
 
-	final private HashMap<IdI, NodeData> nodeData;
+	final private HashMap<Id, NodeData> nodeData;
 
 	/**
 	 * Provides an unique id (loop number) for each routing request, so we don't
@@ -112,7 +112,7 @@ public class ProbabilsticShortestPath implements LeastCostPathCalculator, VisLea
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
 
-		this.nodeData = new HashMap<IdI, NodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
+		this.nodeData = new HashMap<Id, NodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.comparator = new ComparatorNodeData(this.nodeData);
 
 		//TODO DEBUGGING STUFF

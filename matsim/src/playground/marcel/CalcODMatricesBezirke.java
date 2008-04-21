@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
@@ -37,7 +38,6 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.ZoneLayer;
 
@@ -149,7 +149,7 @@ public class CalcODMatricesBezirke implements EventHandlerAgentArrivalI, EventHa
 	}
 
 	private Location mapLocation(final Location loc) {
-		TreeMap<IdI, Location> mapping = loc.getUpMapping();
+		TreeMap<Id, Location> mapping = loc.getUpMapping();
 		if (mapping.size() == 1) {
 			return mapping.get(mapping.firstKey());
 		}

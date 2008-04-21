@@ -50,6 +50,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventLinkEnter;
@@ -61,7 +62,6 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * @author mrieser
@@ -81,9 +81,9 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 
 //	private Collection<Link> gemarkung = null;
 
-	private Set<IdI> hundekopfLinkIds;
+	private Set<Id> hundekopfLinkIds;
 
-	private Set<IdI> gemarkungLinkIds;
+	private Set<Id> gemarkungLinkIds;
 
 	private double [] distHundekopf = new double[TIMESTEPS];
 
@@ -110,8 +110,8 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 		this.network = network;
 //		this.hundekopf = hundekopf.getLinks();
 //		this.gemarkung = gemarkung.getLinks();
-		this.hundekopfLinkIds = new HashSet<IdI>(hundekopf.getLinkIds());
-		this.gemarkungLinkIds = new HashSet<IdI>(gemarkung.getLinkIds());
+		this.hundekopfLinkIds = new HashSet<Id>(hundekopf.getLinkIds());
+		this.gemarkungLinkIds = new HashSet<Id>(gemarkung.getLinkIds());
 	}
 
 	/**

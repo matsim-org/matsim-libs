@@ -22,7 +22,7 @@ package org.matsim.roadpricing;
 
 import junit.framework.TestCase;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueSimulation;
@@ -153,7 +153,7 @@ public class Fixture {
 	}
 
 	private static Person createPerson1(final int personId, final String startTime, final String homeLink, final String routeNodes, final String workLeg) throws Exception {
-		Person person = new Person(new Id(personId), "m", 30, "yes", "yes", "yes");
+		Person person = new Person(new IdImpl(personId), "m", 30, "yes", "yes", "yes");
 		Plan plan = new Plan(person);
 		person.addPlan(plan);
 		plan.createAct("h", (String)null, null, homeLink, "00:00", startTime, startTime, "no");
@@ -166,7 +166,7 @@ public class Fixture {
 	}
 
 	private static Person createPerson2(final int personId, final String startTime, final String homeLink, final String workLink, final String finishLink) throws Exception {
-		Person person = new Person(new Id(personId), "m", 30, "yes", "yes", "yes");
+		Person person = new Person(new IdImpl(personId), "m", 30, "yes", "yes", "yes");
 		Plan plan = new Plan(person);
 		person.addPlan(plan);
 		plan.createAct("h", (String)null, null, homeLink, "00:00", startTime, startTime, "no");

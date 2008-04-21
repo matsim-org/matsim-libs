@@ -26,7 +26,7 @@ import java.util.Iterator;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
@@ -62,9 +62,9 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		assertEquals("distance-toll-1", scheme1.getName());
 		assertEquals("distance toll for org.matsim.roadpricing.Fixture.createNetwork1().", scheme1.getDescription());
 		assertEquals(3, scheme1.getLinks().size());
-		assertTrue(scheme1.getLinkIds().contains(new Id(1)));
-		assertTrue(scheme1.getLinkIds().contains(new Id(2)));
-		assertTrue(scheme1.getLinkIds().contains(new Id(3)));
+		assertTrue(scheme1.getLinkIds().contains(new IdImpl(1)));
+		assertTrue(scheme1.getLinkIds().contains(new IdImpl(2)));
+		assertTrue(scheme1.getLinkIds().contains(new IdImpl(3)));
 		assertEquals(3, scheme1.getCostArray().length);
 		Iterator<RoadPricingScheme.Cost> costIter = scheme1.getCosts().iterator();
 		RoadPricingScheme.Cost cost = costIter.next();

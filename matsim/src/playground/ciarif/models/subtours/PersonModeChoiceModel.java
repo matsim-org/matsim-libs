@@ -28,8 +28,9 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 
-import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -39,7 +40,6 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 import playground.balmermi.census2000.data.Persons;
 
@@ -97,7 +97,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		
 		// setting subtour parameters
 		if (plan == null) { Gbl.errorMsg("Person id=" + plan.getPerson().getId() + "does not have a selected plan."); }
-		Iterator<BasicAct> act_it = plan.getIteratorAct();
+		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
 		CoordI home_coord = null;
 		CoordI work_coord = null;
 		act_it.hasNext();

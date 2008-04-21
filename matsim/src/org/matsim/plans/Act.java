@@ -25,16 +25,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 
-public class Act extends BasicAct implements Serializable {
+public class Act extends BasicActImpl implements Serializable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -241,7 +241,7 @@ public class Act extends BasicAct implements Serializable {
 	}
 
 
-	public final IdI getLinkId() { // convenience method
+	public final Id getLinkId() { // convenience method
 		return this.link.getId();
 	}
 

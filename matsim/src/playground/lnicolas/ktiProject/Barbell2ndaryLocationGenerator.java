@@ -23,15 +23,15 @@ package playground.lnicolas.ktiProject;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Zone;
 
 /**
@@ -47,7 +47,7 @@ public class Barbell2ndaryLocationGenerator extends PersonAlgorithm {
 	private GroupFacilitiesPerZone facilities;
 	private ArrayList<Zone> referenceZones;
 
-	TreeMap<IdI, Zone> referenceZoneMap = new TreeMap<IdI, Zone>();
+	TreeMap<Id, Zone> referenceZoneMap = new TreeMap<Id, Zone>();
 
 	public Barbell2ndaryLocationGenerator(
 			GroupFacilitiesPerZone facilities,
@@ -110,7 +110,7 @@ public class Barbell2ndaryLocationGenerator extends PersonAlgorithm {
 	public boolean run(Person person, Zone secondaryActZone) {
 		Plan plan = person.getPlans().get(0);
 		// Get several random facilities in random zones for the secondary locations
-		BasicPlan.ActIterator it = plan.getIteratorAct();
+		BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 		while (it.hasNext()) {
 			Act act = (Act) it.next();
 			if (act.getCoord() == null
@@ -170,10 +170,10 @@ public class Barbell2ndaryLocationGenerator extends PersonAlgorithm {
 	public void run(Person person) {
 		String desc = person.getKnowledge().getDesc();
 		String[] zoneIds = desc.split(";");
-		Zone homeZone = referenceZoneMap.get(new Id(zoneIds[0]));
+		Zone homeZone = referenceZoneMap.get(new IdImpl(zoneIds[0]));
 		Zone primActZone = null;
 		if (zoneIds.length > 1) {
-			primActZone = referenceZoneMap.get(new Id(zoneIds[1]));
+			primActZone = referenceZoneMap.get(new IdImpl(zoneIds[1]));
 		}
 		run(person, homeZone, primActZone);
 	}

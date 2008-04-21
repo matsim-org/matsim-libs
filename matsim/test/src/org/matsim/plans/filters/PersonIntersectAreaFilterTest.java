@@ -22,6 +22,7 @@ package org.matsim.plans.filters;
 
 import java.util.HashMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -31,7 +32,6 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Some tests for org.matsim.plans.filters.PersonIntersectAreaFilter.
@@ -72,7 +72,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		route.setRoute("1 2 4");
 
 		// prepare area of interest
-		HashMap<IdI, Link> aoi = new HashMap<IdI, Link>();
+		HashMap<Id, Link> aoi = new HashMap<Id, Link>();
 
 		// prepare filter
 		PersonIntersectAreaFilter filter = null;

@@ -2,7 +2,7 @@ package playground.meisterk.westumfahrung;
 
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Person;
@@ -58,18 +58,18 @@ public class ActLinkFilterTest extends MatsimTestCase {
 
 
 		ActLinkFilter allHomeFilter = new ActLinkFilter(".*" + GENERAL_HOME_ACT_TYPE + ".*", null);
-		allHomeFilter.addLink(new Id("1"));
+		allHomeFilter.addLink(new IdImpl("1"));
 		assertTrue(allHomeFilter.judge(persons.get("1").getPlans().get(0)));
 		assertFalse(allHomeFilter.judge(persons.get("2").getPlans().get(0)));
-		allHomeFilter.addLink(new Id("2"));
+		allHomeFilter.addLink(new IdImpl("2"));
 		assertTrue(allHomeFilter.judge(persons.get("1").getPlans().get(0)));
 		assertTrue(allHomeFilter.judge(persons.get("2").getPlans().get(0)));
 
 		ActLinkFilter home19Filter = new ActLinkFilter(NINETEEN_HOUR_HOME_ACT_TYPE, null);
-		home19Filter.addLink(new Id("1"));
+		home19Filter.addLink(new IdImpl("1"));
 		assertFalse(home19Filter.judge(persons.get("1").getPlans().get(0)));
 		assertFalse(home19Filter.judge(persons.get("2").getPlans().get(0)));
-		home19Filter.addLink(new Id("2"));
+		home19Filter.addLink(new IdImpl("2"));
 		System.out.println();
 		assertFalse(home19Filter.judge(persons.get("1").getPlans().get(0)));
 		assertTrue(home19Filter.judge(persons.get("2").getPlans().get(0)));

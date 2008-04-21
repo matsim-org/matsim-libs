@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TrafficNetI.java
+ * BasicNet.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.networks.trafficNet;
+package org.matsim.basic.v01;
 
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
+import java.util.Map;
+import java.util.TreeMap;
 
-/**
- * A network representation from a traffic engineering point of view.
- */
-public interface TrafficNetI extends BasicNetI {
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 
-    /**
-     * Builds this network's internal structure. Requires that the all nodes'
-     * and links' adjacencies have been properly registered among each other, as
-     * it is ensured by a call to <code>BasicNetworkI.connect()</code>.
-     */
-    public void build();
+public class BasicNetImpl implements BasicNet {
+	protected final TreeMap<Id, BasicLink> links = new TreeMap<Id, BasicLink>();
+	protected final TreeMap<Id, BasicNode> nodes = new TreeMap<Id, BasicNode>();
+
+	public boolean add(BasicNode node) {
+		nodes.put(node.getId(), node);
+		return true;
+	}
+
+	public boolean add(BasicLink link) {
+		links.put(link.getId(), link);
+		return true;
+	}
+
+	public Map<Id, ? extends BasicLink> getLinks() {
+		return links;
+	}
+
+	public Map<Id, ? extends BasicNode> getNodes() {
+		return nodes;
+	}
+
+	public BasicLink newLink(String label) {
+		throw new UnsupportedOperationException("Please implement/override method before using!");
+	}
+
+	public BasicNode newNode(String label) {
+		throw new UnsupportedOperationException("Please implement/override method before using!");
+	}
+
+	public void connect() {
+		System.out.println("Please implement method before using!");
+	}
 
 }

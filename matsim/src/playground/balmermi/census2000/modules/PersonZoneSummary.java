@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -33,7 +34,6 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -70,7 +70,7 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 	private final Persons persons;
 	private final String outfile;
 
-	private final HashMap<IdI, int[]> zones = new HashMap<IdI, int[]>();
+	private final HashMap<Id, int[]> zones = new HashMap<Id, int[]>();
 	private final String[] heads = {"p","male","female",
 	                                "age05","age67","age814","age1517","age1865","age66inf",
 	                                "licyes","licno",
@@ -137,9 +137,9 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 
 	public final void close() {
 		try {
-			Iterator<IdI> id_it = this.zones.keySet().iterator();
+			Iterator<Id> id_it = this.zones.keySet().iterator();
 			while (id_it.hasNext()) {
-				IdI id = id_it.next();
+				Id id = id_it.next();
 				int[] vals = this.zones.get(id);
 				for (int i=0; i<vals.length; i++) { this.out.write(vals[i] + "\t"); }
 				this.out.write(id + "\n");
@@ -227,7 +227,7 @@ public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI
 	@Override
 	public void run(Person person) {
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
-		IdI zone_id = p.getHousehold().getMunicipality().getZone().getId();
+		Id zone_id = p.getHousehold().getMunicipality().getZone().getId();
 		int[] vals = this.zones.get(zone_id);
 
 		vals[0]++;

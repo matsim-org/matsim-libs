@@ -39,6 +39,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.factory.GeotoolsFactory;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -48,7 +49,6 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -126,7 +126,7 @@ public class PlanScoreAnalysis {
 		}
 	}
 
-	private Feature createHomeFeature(double score, CoordI loc, IdI id) {
+	private Feature createHomeFeature(double score, CoordI loc, Id id) {
 		Coordinate coord = new Coordinate(loc.getX(), loc.getY());
 		CoordinateSequence coords = new CoordinateArraySequence(
 				new Coordinate[] { coord });
@@ -168,7 +168,7 @@ public class PlanScoreAnalysis {
 			Plan plan;
 			double score1, score2;
 			CoordI loc;
-			IdI id;
+			Id id;
 			for (Person person : plans.getPersons().values()) {
 				plan = person.getSelectedPlan();
 				id = person.getId();

@@ -23,7 +23,7 @@ package playground.marcel;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
@@ -78,7 +78,7 @@ public class QVDiagramm implements EventHandlerLinkEnterI, EventHandlerLinkLeave
 
 	public QVDiagramm(final NetworkLayer network, final String linkId) {
 		this.linkId = linkId;
-		Link link = network.getLink(new Id(linkId));
+		Link link = network.getLink(new IdImpl(linkId));
 		this.linkLength = link.getLength();
 	}
 

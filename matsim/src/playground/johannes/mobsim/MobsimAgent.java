@@ -20,8 +20,8 @@
 
 package playground.johannes.mobsim;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * @author illenberger
@@ -126,5 +126,5 @@ public interface MobsimAgent {
 	 * 
 	 * @return the agent's id.
 	 */
-	public IdI getId();
+	public Id getId();
 }

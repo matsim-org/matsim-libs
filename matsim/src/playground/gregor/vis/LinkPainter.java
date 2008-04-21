@@ -23,10 +23,10 @@ package playground.gregor.vis;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 
 /**
@@ -37,20 +37,20 @@ import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 public class LinkPainter extends DisplayNetStateWriter {
 
 
-	private HashMap<IdI,LinkAttribute> linkData = new HashMap<IdI,LinkAttribute>();
-	private HashMap<IdI,NodeAttribute> nodeData = new HashMap<IdI,NodeAttribute>();
+	private HashMap<Id,LinkAttribute> linkData = new HashMap<Id,LinkAttribute>();
+	private HashMap<Id,NodeAttribute> nodeData = new HashMap<Id,NodeAttribute>();
 
 
-	public LinkPainter(final BasicNetI network, final String networkFileName,
+	public LinkPainter(final BasicNet network, final String networkFileName,
     		final String filePrefix, final int timeStepLength_s, final int bufferSize) {
         super(network, networkFileName, filePrefix, timeStepLength_s, bufferSize);
     }
 
-	public boolean linkAttribExist(IdI id){
+	public boolean linkAttribExist(Id id){
 		return linkData.containsKey(id);
 	}
 
-	public void setLinkColor(IdI id, double color) {
+	public void setLinkColor(Id id, double color) {
 		LinkAttribute attrib;
 		if (linkData.containsKey(id)) {
 			attrib = linkData.get(id);
@@ -61,7 +61,7 @@ public class LinkPainter extends DisplayNetStateWriter {
 		attrib.setColor(color);
 	}
 
-	public void setLinkMsg(IdI id, String msg){
+	public void setLinkMsg(Id id, String msg){
 		LinkAttribute attrib;
 		if (linkData.containsKey(id)) {
 			attrib = linkData.get(id);
@@ -72,7 +72,7 @@ public class LinkPainter extends DisplayNetStateWriter {
 		attrib.setMsg(msg);
 	}
 
-	public void setNodeMsg(IdI id, String msg){
+	public void setNodeMsg(Id id, String msg){
 		NodeAttribute attrib;
 		if (nodeData.containsKey(id)) {
 			attrib = nodeData.get(id);
@@ -102,7 +102,7 @@ public class LinkPainter extends DisplayNetStateWriter {
 	//NetStateWriter Stuff
 
     @Override
-    protected double getLinkDisplValue(final BasicLinkI link, final int index) {
+    protected double getLinkDisplValue(final BasicLink link, final int index) {
 		LinkAttribute attrib;
 		if (linkData.containsKey(link.getId())) {
 			attrib = linkData.get(link.getId());
@@ -115,7 +115,7 @@ public class LinkPainter extends DisplayNetStateWriter {
     }
 
     @Override
-    public String getLinkDisplLabel(final BasicLinkI link) {
+    public String getLinkDisplLabel(final BasicLink link) {
 		LinkAttribute attrib;
 		if (linkData.containsKey(link.getId())) {
 			attrib = linkData.get(link.getId());
@@ -130,8 +130,8 @@ public class LinkPainter extends DisplayNetStateWriter {
 
 
 	@Override
-	protected String getNodeDisplLabel(BasicNodeI node) {
-		IdI id = node.getId();
+	protected String getNodeDisplLabel(BasicNode node) {
+		Id id = node.getId();
 		NodeAttribute attrib;
 		if (nodeData.containsKey(id)){
 			attrib = nodeData.get(id);
@@ -145,11 +145,11 @@ public class LinkPainter extends DisplayNetStateWriter {
 
 	private class LinkAttribute {
 
-		private IdI id;
+		private Id id;
 		private double color;
 		private String msg;
 
-		public LinkAttribute(IdI id){
+		public LinkAttribute(Id id){
 			this.id = id;
 			this.color = 0;
 			this.msg = this.id.toString();
@@ -173,10 +173,10 @@ public class LinkPainter extends DisplayNetStateWriter {
 
 	private class NodeAttribute {
 
-		private IdI id;
+		private Id id;
 		private String msg;
 
-		public NodeAttribute(IdI id){
+		public NodeAttribute(Id id){
 			this.id = id;
 			this.msg = this.id.toString();
 		}

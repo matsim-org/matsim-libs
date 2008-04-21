@@ -23,8 +23,9 @@ package teach.multiagent07.simulation;
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.BasicRoute;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.utils.vis.netvis.NetVis;
 
 import teach.multiagent07.net.CANetStateWriter;
@@ -105,13 +106,13 @@ public class Controler {
 				if (Math.random() < replanningRate) {
 					BasicPlan plan = person.getSelectedPlan();
 
-					BasicPlan.ActLegIterator it = plan.getIterator() ;
+					BasicPlanImpl.ActLegIterator it = plan.getIterator() ;
 					BasicAct startAct = it.nextAct();
 					BasicLeg leg = it.nextLeg() ;
 					BasicAct endAct = it.nextAct();
 
-				    BasicLinkI start = startAct.getLink();
-				    BasicLinkI end   = endAct.getLink();
+				    BasicLink start = startAct.getLink();
+				    BasicLink end   = endAct.getLink();
 				    BasicRoute route = router.reRoute(start.getToNode().getId(), end.getFromNode().getId(), startAct.getEndTime());
 				    leg.setRoute(route); // Set new Route
 				}

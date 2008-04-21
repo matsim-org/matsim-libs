@@ -23,7 +23,7 @@ package playground.fabrice.secondloc;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -49,7 +49,7 @@ public class KnowledgeHacks {
 		TreeMap<String, ActivityFacilities> actfacs = knowledge.getActivityFacilities();
 		for( String type : actfacs.keySet() ){
 			ActivityFacilities actfac = actfacs.get(type);		
-			TreeMap<Id, Facility> facilities = actfac.getFacilities();
+			TreeMap<IdImpl, Facility> facilities = actfac.getFacilities();
 			for( Facility facility : facilities.values()){
 				Activity activity = facility.getActivity( type );
 				CoolPlace coolplace = facool.get(activity );

@@ -20,8 +20,8 @@
 
 package org.matsim.planomat.costestimators;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.plans.Route;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 /**
@@ -46,7 +46,7 @@ public interface LegTravelTimeEstimator {
 	 * @return Returns a travel time estimation.
 	 */
 	public double getLegTravelTimeEstimation(
-			IdI personId,
+			Id personId,
 			double departureTime,
 			Location origin,
 			Location destination,

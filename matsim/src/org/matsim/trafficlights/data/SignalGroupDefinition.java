@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 
 /**
@@ -34,21 +34,21 @@ import org.matsim.utils.identifiers.IdI;
  */
 public class SignalGroupDefinition {
 
-	private IdI id;
-	private IdI linkId;
-	private Map<IdI, SignalLane> fromLanesIdMap;
-	private Map<IdI, SignalLane> toLanesIdLanesMap;
+	private Id id;
+	private Id linkId;
+	private Map<Id, SignalLane> fromLanesIdMap;
+	private Map<Id, SignalLane> toLanesIdLanesMap;
 	private int passingClearingTime;
 	private boolean turnIfRed;
 
 
-	public SignalGroupDefinition(IdI id) {
+	public SignalGroupDefinition(Id id) {
 		this.id = id;
-		this.toLanesIdLanesMap = new HashMap<IdI, SignalLane>();
-		this.fromLanesIdMap = new HashMap<IdI, SignalLane>();
+		this.toLanesIdLanesMap = new HashMap<Id, SignalLane>();
+		this.fromLanesIdMap = new HashMap<Id, SignalLane>();
 	}
 
-	public void setLink(IdI id) {
+	public void setLink(Id id) {
 		this.linkId = id;
 	}
 
@@ -74,7 +74,7 @@ public class SignalGroupDefinition {
 	/**
 	 * @return the id
 	 */
-	public IdI getId() {
+	public Id getId() {
 		return this.id;
 	}
 
@@ -82,7 +82,7 @@ public class SignalGroupDefinition {
 	/**
 	 * @return the fromLinkId
 	 */
-	public IdI getLinkId() {
+	public Id getLinkId() {
 		return this.linkId;
 	}
 
@@ -94,11 +94,11 @@ public class SignalGroupDefinition {
 		return this.toLanesIdLanesMap.values();
 	}
 
-	public  SignalLane getFromSignalLane(IdI id) {
+	public  SignalLane getFromSignalLane(Id id) {
 		return this.fromLanesIdMap.get(id);
 	}
 
-	public SignalLane getToSignalLane(IdI id) {
+	public SignalLane getToSignalLane(Id id) {
 		return this.toLanesIdLanesMap.get(id);
 	}
 

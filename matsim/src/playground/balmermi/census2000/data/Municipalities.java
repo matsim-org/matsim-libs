@@ -28,8 +28,8 @@ import java.util.Iterator;
 import java.util.Random;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 
@@ -40,7 +40,7 @@ public class Municipalities {
 	//////////////////////////////////////////////////////////////////////
 
 	private static final String MUNICIPALITY = "municipality";
-	private final HashMap<IdI,Municipality> municipalities = new HashMap<IdI,Municipality>();
+	private final HashMap<Id,Municipality> municipalities = new HashMap<Id,Municipality>();
 	private final String inputfile;
 
 	private Random random = new Random(123);
@@ -60,7 +60,7 @@ public class Municipalities {
 	//////////////////////////////////////////////////////////////////////
 
 	public final Municipality getMunicipality(int m_id) {
-		return this.municipalities.get(new Id(m_id));
+		return this.municipalities.get(new IdImpl(m_id));
 	}
 
 	//////////////////////////////////////////////////////////////////////

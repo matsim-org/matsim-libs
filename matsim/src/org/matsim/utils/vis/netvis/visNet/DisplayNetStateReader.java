@@ -20,7 +20,7 @@
 
 package org.matsim.utils.vis.netvis.visNet;
 
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.utils.vis.netvis.streaming.StateI;
 import org.matsim.utils.vis.netvis.streaming.StreamReaderA;
@@ -34,7 +34,7 @@ public class DisplayNetStateReader extends StreamReaderA {
 
     // -------------------- CONSTRUCTION --------------------
 
-    public DisplayNetStateReader(BasicNetI network, String filePrefix) {
+    public DisplayNetStateReader(BasicNet network, String filePrefix) {
         super(network, filePrefix, NetVis.FILE_SUFFIX);
     }
 

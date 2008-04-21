@@ -25,8 +25,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.geometry.shared.Coord;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -56,8 +56,8 @@ public class CANetworkReader extends DefaultHandler {
 		} else if (qName.equals("link")) {
 
 			CALink link = net.newLink(attributes.getValue("id"));
-			BasicNodeI from = net.getNodes().get(new Id(attributes.getValue("from")));
-			BasicNodeI to = net.getNodes().get(new Id(attributes.getValue("to")));
+			BasicNode from = net.getNodes().get(new IdImpl(attributes.getValue("from")));
+			BasicNode to = net.getNodes().get(new IdImpl(attributes.getValue("to")));
 			link.setFromNode(from);
 			link.setToNode(to);
 			link.setLength(Double.parseDouble(attributes.getValue("length")));

@@ -26,7 +26,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -93,18 +93,18 @@ public class SignalSystemConfigurationParser extends MatsimXmlParser {
 
 	private SignalGroupSettings currentSignalGroupSettings;
 
-	private Map<IdI, SignalGroupDefinition> signalGroupDefinitions;
+	private Map<Id, SignalGroupDefinition> signalGroupDefinitions;
 
-	private Map<IdI, SignalSystemConfiguration> signalSystemConfigurations;
+	private Map<Id, SignalSystemConfiguration> signalSystemConfigurations;
 
 	private SignalSystemControlInfo currentSignalSystemControler;
 
 	public SignalSystemConfigurationParser(List<SignalGroupDefinition> signalGroups) {
-		this.signalGroupDefinitions = new HashMap<IdI, SignalGroupDefinition>(signalGroups.size());
+		this.signalGroupDefinitions = new HashMap<Id, SignalGroupDefinition>(signalGroups.size());
 		for (SignalGroupDefinition s : signalGroups) {
 			this.signalGroupDefinitions.put(s.getId(), s);
 		}
-		this.signalSystemConfigurations = new HashMap<IdI, SignalSystemConfiguration>();
+		this.signalSystemConfigurations = new HashMap<Id, SignalSystemConfiguration>();
 	}
 
 
@@ -138,7 +138,7 @@ public class SignalSystemConfigurationParser extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (SIGNALSYSTEMConfiguration.equalsIgnoreCase(name)) {
-			this.currentSignalSystem = new SignalSystemConfiguration(new Id(atts.getValue(ID)));
+			this.currentSignalSystem = new SignalSystemConfiguration(new IdImpl(atts.getValue(ID)));
 		}
 		else if (SIGNALSYSTEMCONTROLInfo.equalsIgnoreCase(name)) {
 			if (PLANBASEDCONTROL.equalsIgnoreCase(atts.getValue(SCHEMANS, TYPE))) {
@@ -152,7 +152,7 @@ public class SignalSystemConfigurationParser extends MatsimXmlParser {
 			}
 		}
 		else if (SIGNALSYSTEMPLAN.equalsIgnoreCase(name)) {
-			this.currentSignalPlan = new SignalSystemPlan(new Id(atts.getValue(ID)));
+			this.currentSignalPlan = new SignalSystemPlan(new IdImpl(atts.getValue(ID)));
 		}
 		else if (START.equalsIgnoreCase(name)) {
 			this.currentSignalPlan.setStartTime(Time.parseTime(atts.getValue(DAYTIME)));
@@ -173,7 +173,7 @@ public class SignalSystemConfigurationParser extends MatsimXmlParser {
 			this.currentSignalPlan.setPowerOffTime(Integer.parseInt(atts.getValue(SEC)));
 		}
 		else if (SIGNALGROUPSETTINGS.equalsIgnoreCase(name)) {
-			SignalGroupDefinition def = this.signalGroupDefinitions.get(new Id(atts.getValue(REFID)));
+			SignalGroupDefinition def = this.signalGroupDefinitions.get(new IdImpl(atts.getValue(REFID)));
 			if (def != null) {
 				this.currentSignalGroupSettings = new SignalGroupSettings(def);
 			}
@@ -198,7 +198,7 @@ public class SignalSystemConfigurationParser extends MatsimXmlParser {
 		}
 	}
 
-	public Map<IdI, SignalSystemConfiguration> getSignalSystemConfigurations() {
+	public Map<Id, SignalSystemConfiguration> getSignalSystemConfigurations() {
 		return this.signalSystemConfigurations;
 	}
 

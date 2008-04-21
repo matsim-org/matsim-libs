@@ -24,14 +24,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * select an existing Plan according to the Path Size Logit (e.g. Frejinger, E. and Bierlaire, M.: Capturing Correlation
@@ -89,7 +89,7 @@ public class PathSizeLogitSelector implements PlanSelectorI {
 
 		wc.maxScore = Double.NEGATIVE_INFINITY;
 
-		HashMap<IdI, ArrayList<Double>> linksInTime = new HashMap<IdI, ArrayList<Double>>();
+		HashMap<Id, ArrayList<Double>> linksInTime = new HashMap<Id, ArrayList<Double>>();
 		HashMap<Integer,Double> planLength = new HashMap<Integer, Double>();
 		//this gets the choice sets C_n
 		//TODO [GL] since the lack of information in Route(),
@@ -100,7 +100,7 @@ public class PathSizeLogitSelector implements PlanSelectorI {
 
 			double pathSize = 0;
 			double currentEndTime = 0.0;
-			BasicPlan.LegIterator it = plan.getIteratorLeg();
+			BasicPlanImpl.LegIterator it = plan.getIteratorLeg();
 			while (it.hasNext()){
 					Leg leg = ((Leg)it.next());
 					currentEndTime = leg.getDepTime();
@@ -124,7 +124,7 @@ public class PathSizeLogitSelector implements PlanSelectorI {
 		for (Plan plan : plans){
 
 			double tmp = 0;
-			BasicPlan.LegIterator it = plan.getIteratorLeg();
+			BasicPlanImpl.LegIterator it = plan.getIteratorLeg();
 			while(it.hasNext()){
 				Leg leg = (Leg) it.next();
 				double currentTime = leg.getDepTime();

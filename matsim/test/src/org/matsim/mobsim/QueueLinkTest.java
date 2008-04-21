@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.mobsim;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -60,7 +60,7 @@ public class QueueLinkTest extends MatsimTestCase {
 				"1", "1", null, null);
 		super.loadConfig(null);
 		this.queueNetwork = new QueueNetworkLayer(this.network);
-		this.qlink = this.queueNetwork.getQueueLink(new Id("1"));
+		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
 		this.qlink.finishInit();
 	}
 
@@ -73,7 +73,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		// Extend the tests by checking the methods initFlowCapacity and
 		// recalcCapacity
 		assertEquals(this.link, this.qlink.getLink());
-		assertEquals(this.queueNetwork.getQueueNode(new Id("2")), this.qlink
+		assertEquals(this.queueNetwork.getQueueNode(new IdImpl("2")), this.qlink
 				.getToQueueNode());
 	}
 
@@ -88,7 +88,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testAdd() {
 		Vehicle v = new Vehicle();
 
-		Person p = new Person(new Id("1"), null, 0, null, null, null);
+		Person p = new Person(new IdImpl("1"), null, 0, null, null, null);
 		v.setDriver(p);
 		Exception e = null;
 		//as QueueLink has static access to the rest of the simulation
@@ -122,12 +122,12 @@ public class QueueLinkTest extends MatsimTestCase {
 		Link link2 = network.createLink("2", "2", "3", "1", "1", "1", "1", null, null);
 		Gbl.getWorld().setNetworkLayer(network);
 		this.queueNetwork = new QueueNetworkLayer(network);
-		this.qlink = this.queueNetwork.getQueueLink(new Id("1"));
+		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
 		this.qlink.finishInit();
 
 		new QueueSimulation(this.network, null, new Events());
 		Vehicle v1 = new Vehicle();
-		Person p = new Person(new Id("1"), null, 0, null, null, null);
+		Person p = new Person(new IdImpl("1"), null, 0, null, null, null);
 		Plan plan = p.createPlan(null, "yes");
 		try {
 			plan.createAct("h", 0.0, 0.0, link1, 0.0, 0.0, 0.0, false);

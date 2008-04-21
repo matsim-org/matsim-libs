@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableLinkI;
@@ -35,10 +35,10 @@ import org.matsim.utils.vis.netvis.drawableNet.DrawableLinkI;
 /**
  * @author gunnar
  */
-public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI {
+public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLink {
 
-	private BasicNodeI fromNode;
-	private BasicNodeI toNode;
+	private BasicNode fromNode;
+	private BasicNode toNode;
 	public static final double LANE_WIDTH = 4.0;
 	private double length_m = 0;
 	private double lanes = 0;
@@ -47,11 +47,11 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 	private double[] displayValue = new double[1];
 	private String displayLabel;
 	private List<DrawableAgentI> agents = new ArrayList<DrawableAgentI>();
-	protected IdI id;
+	protected Id id;
 
 	// -------------------- CONSTRUCTION AND INITIALIZATION --------------------
 
-	DisplayLink(IdI id, DisplayNet network) {
+	DisplayLink(Id id, DisplayNet network) {
 		this.id = id;
 	}
 
@@ -146,21 +146,21 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 
 	// -------------------- IMPLEMENTATION OF BasicLinkI --------------------
 
-	public boolean setFromNode(BasicNodeI node) {
+	public boolean setFromNode(BasicNode node) {
 		this.fromNode = node;
 		return true;
 	}
 
-	public boolean setToNode(BasicNodeI node) {
+	public boolean setToNode(BasicNode node) {
 		this.toNode = node;
 		return true;
 	}
 
-	public BasicNodeI getFromNode() {
+	public BasicNode getFromNode() {
 		return this.fromNode;
 	}
 
-	public BasicNodeI getToNode() {
+	public BasicNode getToNode() {
 		return this.toNode;
 	}
 
@@ -234,7 +234,7 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLinkI 
 	}
 
 
-	public IdI getId() {
+	public Id getId() {
 		return this.id;
 	}
 

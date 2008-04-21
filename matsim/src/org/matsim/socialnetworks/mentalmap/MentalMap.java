@@ -29,7 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -39,7 +40,6 @@ import org.matsim.plans.Knowledge;
 import org.matsim.plans.Plan;
 import org.matsim.socialnetworks.algorithms.SortHashtableByValue;
 import org.matsim.socialnetworks.interactions.SocialAct;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 /**
@@ -67,7 +67,7 @@ public class MentalMap {
 	private Hashtable<Integer, Act> actIdAct = new Hashtable<Integer, Act>();
 
 //	Map of act and activity ID numbers. Reverse of above. Acts change so we use Id's
-	private Hashtable<Integer,IdI> mapActIdActivityId = new Hashtable<Integer,IdI>();
+	private Hashtable<Integer,Id> mapActIdActivityId = new Hashtable<Integer,Id>();
 
 	// Socializing opportunities are face-to-face meetings of the agents
 	private ArrayList<SocialAct> socializingOpportunities = new ArrayList<SocialAct>();
@@ -299,8 +299,8 @@ public class MentalMap {
 
 	public Activity getActivity (Act myAct){
 
-		IdI myActivityId= this.mapActIdActivityId.get(myAct.getRefId());
-		TreeMap<IdI,Facility> facilities=this.knowledge.getFacilities();
+		Id myActivityId= this.mapActIdActivityId.get(myAct.getRefId());
+		TreeMap<Id,Facility> facilities=this.knowledge.getFacilities();
 
 		if(myActivityId == null){
 			Gbl.errorMsg(this.knowledge.egoNet.getEgoLinks().get(0).person1.getId().toString());

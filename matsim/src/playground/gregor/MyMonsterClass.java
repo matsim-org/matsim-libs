@@ -35,7 +35,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.evacuation.EvacuationAreaFileWriter;
 import org.matsim.evacuation.EvacuationAreaLink;
@@ -62,7 +64,6 @@ import org.matsim.plans.algorithms.PlansFilterActInArea;
 import org.matsim.plans.algorithms.XY2Links;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
@@ -304,7 +305,7 @@ public class MyMonsterClass {
 		for (Person person : persons){
 			Person nperson = new Person(person.getId().toString(), person.getSex(), (new Integer(person.getAge())).toString(),person.getLicense(),person.getCarAvail(),person.getEmployed());
 
-			BasicAct act = new BasicAct();
+			BasicAct act = new BasicActImpl();
 			Iterator it = person.getPlans().get(0).getIteratorAct();
 
 			while (it.hasNext()){
@@ -428,7 +429,7 @@ public class MyMonsterClass {
 		ConcurrentLinkedQueue<Node> n = new ConcurrentLinkedQueue<Node>();
 		ConcurrentLinkedQueue<Link> l = new ConcurrentLinkedQueue<Link>();
 		ConcurrentLinkedQueue<Link> oneWay = new ConcurrentLinkedQueue<Link>();
-		HashMap<IdI,EvacuationAreaLink> links = new HashMap<IdI,EvacuationAreaLink>();
+		HashMap<Id,EvacuationAreaLink> links = new HashMap<Id,EvacuationAreaLink>();
 		Iterator it = network.getLinks().values().iterator();
 
 		while (it.hasNext()) {
@@ -463,7 +464,7 @@ public class MyMonsterClass {
 					link.setCapacity(link.getCapacity()*2);
 					two++;
 				}
-				EvacuationAreaLink el = new EvacuationAreaLink((Id) link.getId(),3600.0 * 11 + 85*60);
+				EvacuationAreaLink el = new EvacuationAreaLink((IdImpl) link.getId(),3600.0 * 11 + 85*60);
 				links.put(el.getId(),el);
 			}
 
@@ -484,7 +485,7 @@ int three=0;
 			Node fromNode = oneWayLink.getToNode();
 			Link testlink = network.createLink(oneWayLink.getId().toString() + "666", fromNode.getId().toString(), toNode.getId().toString(),((Double) oneWayLink.getLength()).toString(), ((Double)oneWayLink.getFreespeed(Time.UNDEFINED_TIME)).toString(),((Double)oneWayLink.getCapacity()).toString(), ((Integer)oneWayLink.getLanesAsInt()).toString(), oneWayLink.getOrigId() + "666",oneWayLink.getType());
 
-			EvacuationAreaLink el = new EvacuationAreaLink((Id) testlink.getId(),3600.0 * 11 + 85*60);
+			EvacuationAreaLink el = new EvacuationAreaLink((IdImpl) testlink.getId(),3600.0 * 11 + 85*60);
 			links.put(el.getId(),el);
 			oneWayLink = oneWay.poll();
 			three++;
@@ -539,7 +540,7 @@ int three=0;
 		double radius = 1000;
 		Coord center = new Coord(4595406.5, 5821171.5);
 
-		HashMap<IdI,Link> areaOfInteresst = new HashMap<IdI,Link>();
+		HashMap<Id,Link> areaOfInteresst = new HashMap<Id,Link>();
 
 		Config config = Gbl.createConfig(new String[] {configFile});
 		World world = Gbl.getWorld();

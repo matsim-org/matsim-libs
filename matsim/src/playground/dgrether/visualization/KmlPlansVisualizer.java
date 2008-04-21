@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanCollectFromAlgorithm;
@@ -115,8 +115,8 @@ public class KmlPlansVisualizer {
 
 		RouteLinkFilter linkFilter = new RouteLinkFilter(collector);
 		for (Tuple<String, String> t : this.linkTuples) {
-			linkFilter.addLink(new Id(t.getFirst()));
-			linkFilter.addLink(new Id(t.getSecond()));
+			linkFilter.addLink(new IdImpl(t.getFirst()));
+			linkFilter.addLink(new IdImpl(t.getSecond()));
 		}
 
 		SelectedPlanFilter selectedPlanFilter = new SelectedPlanFilter(linkFilter);

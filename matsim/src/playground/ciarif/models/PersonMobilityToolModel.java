@@ -22,7 +22,7 @@ package playground.ciarif.models;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -70,7 +70,7 @@ public class PersonMobilityToolModel extends PersonAlgorithm implements PlanAlgo
 	@Override
 	public void run(Person person) {
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
-		Iterator<BasicAct> act_it = person.getSelectedPlan().getIteratorAct();
+		Iterator<BasicActImpl> act_it = person.getSelectedPlan().getIteratorAct();
 		CoordI home_coord = null;
 		CoordI work_coord = null;
 		while (act_it.hasNext()) {

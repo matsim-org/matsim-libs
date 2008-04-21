@@ -20,10 +20,10 @@
 
 package org.matsim.planomat.costestimators;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.plans.Route;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 /**
@@ -54,7 +54,7 @@ public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTi
 
 	@Override
 	public double getLegTravelTimeEstimation(
-			IdI personId,
+			Id personId,
 			double departureTime,
 			Location origin,
 			Location destination,

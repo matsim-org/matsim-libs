@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -34,7 +35,6 @@ import org.matsim.plans.Route;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.utils.vis.netvis.VisConfig;
 
@@ -115,22 +115,22 @@ public class RouterVis {
 
 	public static void main(String [] args){
 
-		IdI fromNodeId;
-		IdI toNodeId;
+		Id fromNodeId;
+		Id toNodeId;
 
 		log.info("starting RouterVis demo");
 		String testConfigFile = "./examples/siouxfalls/config.xml";
 
 		if (args.length == 3) {
 			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
-			fromNodeId = new Id(args[1]);
-			toNodeId = new Id(args[2]);
+			fromNodeId = new IdImpl(args[1]);
+			toNodeId = new IdImpl(args[2]);
 
 		}	else {
 			log.info(" reading default config file: " + testConfigFile);
 			Gbl.createConfig(new String[] {testConfigFile});
-			fromNodeId = new Id("13");
-			toNodeId = new Id("7");
+			fromNodeId = new IdImpl("13");
+			toNodeId = new IdImpl("7");
 		}
 		log.info(" done.");
 

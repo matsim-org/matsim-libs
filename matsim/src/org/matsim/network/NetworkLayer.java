@@ -27,28 +27,28 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
-public class NetworkLayer extends Layer implements BasicNetI {
+public class NetworkLayer extends Layer implements BasicNet {
 
 	// ////////////////////////////////////////////////////////////////////
 	// member variables
 	// ////////////////////////////////////////////////////////////////////
 
-	public static final IdI LAYER_TYPE = new Id("link");
+	public static final Id LAYER_TYPE = new IdImpl("link");
 
 
 	protected int capperiod = Integer.MIN_VALUE ;
 
-	protected Map<IdI, Node> nodes = new TreeMap<IdI, Node>();
+	protected Map<Id, Node> nodes = new TreeMap<Id, Node>();
 
 	private final ArrayList<NetworkAlgorithm> algorithms = new ArrayList<NetworkAlgorithm>();
 
@@ -89,7 +89,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 
 
 	public final Node createNode(final String id, final String x, final String y, final String type) {
-		IdI i = new Id(id);
+		Id i = new IdImpl(id);
 		if (this.nodes.containsKey(i)) { throw new IllegalArgumentException(this + "[id=" + id + " already exists]"); }
 		Node n = this.factory.newNode(id, x, y, type);
 		this.nodes.put(i, n);
@@ -105,14 +105,14 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	public final Link createLink(final String id, final String from, final String to, final String length,
 	                             final String freespeed, final String capacity, final String permlanes,
 	                             final String origid, String type) {
-		Id f = new Id(from);
+		IdImpl f = new IdImpl(from);
 		Node from_node = this.nodes.get(f);
 		if (from_node == null) { throw new IllegalArgumentException(this+"[from="+from+" does not exist]"); }
 
-		Id t = new Id(to);
+		IdImpl t = new IdImpl(to);
 		Node to_node = this.nodes.get(t);
 		if (to_node == null) { throw new IllegalArgumentException(this+"[to="+to+" does not exist]"); }
-		IdI linkId = new Id(id);
+		Id linkId = new IdImpl(id);
 		if (this.locations.containsKey(linkId)) { throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!"); }
 
 		double dlength = Double.parseDouble(length);
@@ -204,12 +204,12 @@ public class NetworkLayer extends Layer implements BasicNetI {
 		return this.effectiveLaneWidth;
 	}
 
-	public Map<IdI, Node> getNodes() {
+	public Map<Id, Node> getNodes() {
 		return this.nodes;
 	}
 
 	public final Node getNode(final String id) {
-		return this.nodes.get(new Id(id));
+		return this.nodes.get(new IdImpl(id));
 	}
 
 	/**
@@ -386,7 +386,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	 * is successfully removed.
 	 */
 	public boolean removeLink(final Link link) {
-		IdI id = link.getId();
+		Id id = link.getId();
 		Link l = (Link)this.locations.get(id);
 
 		if ((l == null) || (link != l)) {
@@ -418,7 +418,7 @@ public class NetworkLayer extends Layer implements BasicNetI {
      *
 	 */
 	public boolean removeNode(final Node node) {
-		IdI id = node.getId();
+		Id id = node.getId();
 		Node n = this.nodes.get(id);
 
 		if (n == null) { return false; }
@@ -476,16 +476,16 @@ public class NetworkLayer extends Layer implements BasicNetI {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<IdI, ? extends Link> getLinks() {
-		return (Map<IdI, Link>) this.getLocations();
+	public Map<Id, ? extends Link> getLinks() {
+		return (Map<Id, Link>) this.getLocations();
 	}
 
 	public Link getLink(final String linkId) {
-		Id i = new Id(linkId);
+		IdImpl i = new IdImpl(linkId);
 		return (Link) this.locations.get(i);
 	}
 
-	public Link getLink(final IdI linkId) {
+	public Link getLink(final Id linkId) {
 		return (Link) this.locations.get(linkId);
 	}
 

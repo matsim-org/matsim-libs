@@ -23,7 +23,7 @@ package teach.multiagent07.simulation;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 import teach.multiagent07.interfaces.EventHandlerI;
 import teach.multiagent07.population.Person;
@@ -32,7 +32,7 @@ import teach.multiagent07.population.Population;
 import teach.multiagent07.util.Event;
 
 public class Scorer  implements EventHandlerI{
-	Map<IdI, Double> agentDeparture = new TreeMap<IdI, Double>();
+	Map<Id, Double> agentDeparture = new TreeMap<Id, Double>();
 	private Population population;
 
 	private final double beta_EARLY =  0.25/60;

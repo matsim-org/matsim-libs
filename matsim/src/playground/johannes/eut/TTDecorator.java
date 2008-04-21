@@ -26,7 +26,7 @@ package playground.johannes.eut;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.network.Link;
 import org.matsim.router.util.TravelTimeI;
 
@@ -38,7 +38,7 @@ public class TTDecorator implements TravelTimeI {
 
 	private TravelTimeI meantts;
 
-	private List<BasicLinkI> accidantLinks = new LinkedList<BasicLinkI>();
+	private List<BasicLink> accidantLinks = new LinkedList<BasicLink>();
 
 //	public TTDecorator(TravelTimeI traveltimes) {
 //		this.meantts = traveltimes;
@@ -48,11 +48,11 @@ public class TTDecorator implements TravelTimeI {
 		this.meantts = meantts;
 	}
 
-	public void addAccidantLink(BasicLinkI link) {
+	public void addAccidantLink(BasicLink link) {
 		this.accidantLinks.add(link);
 	}
 
-	public void removeAccidantLink(BasicLinkI link) {
+	public void removeAccidantLink(BasicLink link) {
 		this.accidantLinks.remove(link);
 	}
 

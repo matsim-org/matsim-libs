@@ -21,6 +21,7 @@
 package teach.multiagent07.util;
 
 import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 
 import teach.multiagent07.population.Person;
 import teach.multiagent07.population.PersonHandler;
@@ -34,7 +35,7 @@ public class PersonsWriterTXT extends PersonHandler{
 		
 		for(BasicPlan plan: person.getPlans()) {
 			System.out.println("Plan Score: " + plan.getScore());
-			BasicPlan.ActLegIterator iter = plan.getIterator();
+			BasicPlanImpl.ActLegIterator iter = plan.getIterator();
 			System.out.println(iter.nextAct());
 			while (iter.hasNextLeg()) {
 				System.out.println(iter.nextLeg());

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 
 public class CopyOfBasicPerson<P extends BasicPlan> {
 	
@@ -45,7 +46,7 @@ public class CopyOfBasicPerson<P extends BasicPlan> {
 		return selectedPlan;
 	}
 	
-	public List<? extends BasicPlan> plans() {
+	public List<? extends BasicPlanImpl> plans() {
 		return plans;
 	}
 	

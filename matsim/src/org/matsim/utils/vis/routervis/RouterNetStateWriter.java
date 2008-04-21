@@ -22,9 +22,9 @@ package org.matsim.utils.vis.routervis;
 
 import java.util.HashMap;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.VisConfig;
 
@@ -34,19 +34,19 @@ import org.matsim.utils.vis.netvis.VisConfig;
 public class RouterNetStateWriter extends DisplayNetStateWriter {
 
 	//holds the information of the links explored so far
-	private HashMap<IdI,LinkAttribute> linkStates;
+	private HashMap<Id,LinkAttribute> linkStates;
 
-	public RouterNetStateWriter(BasicNetI network, String networkFileName, VisConfig visConfig, String filePrefix, int timeStepLength_s, int bufferSize) {
+	public RouterNetStateWriter(BasicNet network, String networkFileName, VisConfig visConfig, String filePrefix, int timeStepLength_s, int bufferSize) {
 		super(network,networkFileName,visConfig,filePrefix,timeStepLength_s,bufferSize);
 
-		this.linkStates = new HashMap<IdI,LinkAttribute>();
+		this.linkStates = new HashMap<Id,LinkAttribute>();
 	}
 
-	public boolean linkAttribExist(IdI id){
+	public boolean linkAttribExist(Id id){
 		return linkStates.containsKey(id);
 	}
 
-	public void setLinkColor(IdI id, double color) {
+	public void setLinkColor(Id id, double color) {
 		LinkAttribute attrib;
 		if (linkStates.containsKey(id)) {
 			attrib = linkStates.get(id);
@@ -57,7 +57,7 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
 		attrib.setColor(color);
 	}
 
-	public void setLinkMsg(IdI id, String msg){
+	public void setLinkMsg(Id id, String msg){
 		LinkAttribute attrib;
 		if (linkStates.containsKey(id)) {
 			attrib = linkStates.get(id);
@@ -78,7 +78,7 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
 	//NetStateWriter Stuff
 	///////////////////////////////////////////////////////////////
     @Override
-    protected double getLinkDisplValue(final BasicLinkI link, final int index) {
+    protected double getLinkDisplValue(final BasicLink link, final int index) {
 		LinkAttribute attrib;
 		if (linkStates.containsKey(link.getId())) {
 			attrib = linkStates.get(link.getId());
@@ -89,7 +89,7 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
     }
 
     @Override
-    protected String getLinkDisplLabel(final BasicLinkI link) {
+    protected String getLinkDisplLabel(final BasicLink link) {
 		LinkAttribute attrib;
 		if (linkStates.containsKey(link.getId())) {
 			attrib = linkStates.get(link.getId());

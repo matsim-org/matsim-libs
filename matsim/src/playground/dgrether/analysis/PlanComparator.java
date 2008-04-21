@@ -23,6 +23,7 @@ package playground.dgrether.analysis;
 import java.io.PrintWriter;
 import java.util.Date;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -32,7 +33,6 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.MatsimWorldReader;
 
 /**
@@ -76,7 +76,7 @@ public class PlanComparator {
 		this._result = new PlanComparison(this.population.getPersons().keySet().size());
 		Plan plan;
 		Act act;
-		for (IdI id : this.population.getPersons().keySet()) {
+		for (Id id : this.population.getPersons().keySet()) {
 			plan = this.population.getPerson(id).getSelectedPlan();
 			act = (Act) plan.getIteratorAct().next();
 			this._result.addFirstPlansData(id, plan.getScore(), act);
@@ -86,7 +86,7 @@ public class PlanComparator {
 		System.gc();
 		// load second population
 		this.population = loadPlansFile(secondPlanPath);
-		for (IdI id : this.population.getPersons().keySet()) {
+		for (Id id : this.population.getPersons().keySet()) {
 			plan = this.population.getPerson(id).getSelectedPlan();
 			this._result.addSecondPlansData(id, plan.getScore());
 		}

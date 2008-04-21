@@ -22,6 +22,7 @@ package teach.multiagent07.simulation;
 
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.utils.vis.netvis.NetVis;
 
 import teach.multiagent07.net.CANetStateWriter;
@@ -99,7 +100,7 @@ public class Controler2 {
 				if (Math.random() < replanningRate) {
 					BasicPlan plan = person.getSelectedPlan();
 					
-					BasicPlan.ActLegIterator it = plan.getIterator() ;
+					BasicPlanImpl.ActLegIterator it = plan.getIterator() ;
 					BasicAct startAct = it.nextAct();
 					
 					double arrTime = arrTimes.getArrivalTimeAtFirstActivity(person.getId());

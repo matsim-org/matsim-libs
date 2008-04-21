@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.utils.vis.netvis.streaming.StateI;
 import org.matsim.utils.vis.netvis.visNet.DisplayNetStateReader;
 
@@ -33,7 +33,7 @@ public class DisplayCachedNetStateReader extends DisplayNetStateReader {
 
 	public ByteBuffer bb = null;
 
-		public DisplayCachedNetStateReader(BasicNetI network, String filePrefix) {
+		public DisplayCachedNetStateReader(BasicNet network, String filePrefix) {
 		super(network, filePrefix);
 	}
 

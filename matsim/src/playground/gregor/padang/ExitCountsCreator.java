@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -42,7 +43,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
@@ -68,7 +68,7 @@ public class ExitCountsCreator {
 	private final static String saveBX = "662433";
 	private final static String saveBY = "9898853";
 
-	private HashMap<IdI, EvacuationAreaLink> evacuationAreaLinks = new HashMap<IdI, EvacuationAreaLink>();
+	private HashMap<Id, EvacuationAreaLink> evacuationAreaLinks = new HashMap<Id, EvacuationAreaLink>();
 	private final HashSet<Node> saveNodes = new HashSet<Node>();
 	private final HashSet<Node> redundantNodes = new HashSet<Node>();
 	private ArrayList<Link> countLink;
@@ -77,7 +77,7 @@ public class ExitCountsCreator {
 	private final NetworkLayer network;
 
 
-	public ExitCountsCreator(NetworkLayer network, final HashMap<IdI, EvacuationAreaLink> evacuationAreaLinks) {
+	public ExitCountsCreator(NetworkLayer network, final HashMap<Id, EvacuationAreaLink> evacuationAreaLinks) {
 		this.network = network;
 		this.evacuationAreaLinks = evacuationAreaLinks;
 		this.countLink = new ArrayList<Link>();
@@ -281,7 +281,7 @@ public class ExitCountsCreator {
 		new MatsimNetworkReader(network).readFile("./networks/padang_net.xml");
 		world.setNetworkLayer(network);
 		System.out.println("done. ");
-		HashMap<IdI,EvacuationAreaLink> links = new HashMap<IdI,EvacuationAreaLink>();
+		HashMap<Id,EvacuationAreaLink> links = new HashMap<Id,EvacuationAreaLink>();
 		EvacuationAreaFileReader er = new EvacuationAreaFileReader(links);
 		try {
 			er.readFile(config.evacuation().getEvacuationAreaFile());

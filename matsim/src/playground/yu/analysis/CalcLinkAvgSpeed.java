@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventLinkEnter;
@@ -40,7 +41,6 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.charts.XYLineChart;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -145,7 +145,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		}
 	}
 
-	public double getAvgSpeed(IdI linkId, double time) {
+	public double getAvgSpeed(Id linkId, double time) {
 		SpeedCounter sc = this.speedCounters.get(linkId.toString());
 		return (sc != null) ? sc.getSpeed(getBinIdx(time)) : 0.0;
 	}
@@ -222,7 +222,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 
 			for (Link l : ((this.interestLinks == null) ? (this.network.getLinks())
 					.values() : this.interestLinks)) {
-				IdI linkId = l.getId();
+				Id linkId = l.getId();
 				StringBuffer line = new StringBuffer(linkId.toString() + "\t"
 						+ l.getCapacity());
 				for (int j = 0; j < this.nofBins - 1; j++) {

@@ -1,7 +1,7 @@
 package playground.anhorni.secloc;
 
 import org.matsim.replanning.modules.StrategyModuleI;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.plans.Plan;
 import playground.anhorni.secloc.KnowledgeModifierRandom;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
@@ -48,7 +48,7 @@ public class LocationChoice2 implements StrategyModuleI {
 		wc.run(Gbl.getWorld());
 		
 		this.locationSelector=new RandomLocationSelector();
-		this.knowledgeModifier=new KnowledgeModifierRandom(Gbl.getWorld().getLayer(new Id("facility")).getLocations());
+		this.knowledgeModifier=new KnowledgeModifierRandom(Gbl.getWorld().getLayer(new IdImpl("facility")).getLocations());
 	}
 	public void finish(){}	
 }

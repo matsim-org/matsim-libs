@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 import playground.david.vis.data.OTFDataSimpleAgent;
@@ -30,7 +30,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		int type = 0;
 		int user = 0;
 		
-		public ExtendedPositionInfo(IdI driverId, double easting, double northing, double elevation, double azimuth, double speed, VehicleState vehicleState, int type, int userdata) {
+		public ExtendedPositionInfo(Id driverId, double easting, double northing, double elevation, double azimuth, double speed, VehicleState vehicleState, int type, int userdata) {
 			super(driverId, easting, northing, elevation, azimuth, speed, vehicleState, "");
 			this.type = type;
 			this.user = userdata;

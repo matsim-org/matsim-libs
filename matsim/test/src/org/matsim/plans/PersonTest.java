@@ -20,7 +20,7 @@
 
 package org.matsim.plans;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PersonTest extends MatsimTestCase {
@@ -175,7 +175,7 @@ public class PersonTest extends MatsimTestCase {
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans
 		try {
-			person = new Person(new Id(1), "m", 40, null, null, null);
+			person = new Person(new IdImpl(1), "m", 40, null, null, null);
 			plans[0] = person.createPlan(null, "no");
 			plans[1] = person.createPlan("0.0", "no");
 			plans[2] = person.createPlan(null, "no");

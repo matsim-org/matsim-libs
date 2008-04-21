@@ -24,14 +24,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicNode;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicNodeImpl;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.geometry.CoordI;
 
 import teach.multiagent07.simulation.Vehicle;
 
 
-public class CANode extends BasicNode {
+public class CANode extends BasicNodeImpl {
 
 	public void move(int time) {
 		randomMove(time);
@@ -66,10 +66,10 @@ public class CANode extends BasicNode {
 
 	}
 
-	private Id vorfahrtLinkId = new Id("15");
+	private IdImpl vorfahrtLinkId = new IdImpl("15");
 
 	private void moveVorfahrt12(int time) {
-		if (this.id.equals(new Id("12")) ){
+		if (this.id.equals(new IdImpl("12")) ){
 
 			CALink specialLink = (CALink)inlinks.get(vorfahrtLinkId);
 			moveVehicleOverNode(specialLink);
@@ -86,11 +86,11 @@ public class CANode extends BasicNode {
 		} else randomMove(time);
 	}
 
-	private Id graderLinkId = new Id("22");
-	private Id ungraderLinkId = new Id("26");
+	private IdImpl graderLinkId = new IdImpl("22");
+	private IdImpl ungraderLinkId = new IdImpl("26");
 
 	private void moveAmpel15(int time) {
-		if (this.id.equals(new Id("15")) ){
+		if (this.id.equals(new IdImpl("15")) ){
 
 			int phase = time /60;
 			if (phase %2 == 0 ) {

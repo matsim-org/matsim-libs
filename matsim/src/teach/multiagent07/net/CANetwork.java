@@ -22,9 +22,9 @@ package teach.multiagent07.net;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicNet;
+import org.matsim.basic.v01.BasicNetImpl;
 
-public class CANetwork extends BasicNet {
+public class CANetwork extends BasicNetImpl {
 
 	@Override
 	public CANode newNode(String label) {

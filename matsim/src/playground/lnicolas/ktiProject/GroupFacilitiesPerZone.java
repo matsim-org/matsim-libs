@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Zone;
 
 /**
@@ -42,11 +42,11 @@ import org.matsim.world.Zone;
  */
 public class GroupFacilitiesPerZone {
 
-	private TreeMap<String, TreeMap<IdI, ArrayList<Facility> > > facilitiesPerZonePerType =
-		new TreeMap<String, TreeMap<IdI, ArrayList<Facility> > >();
+	private TreeMap<String, TreeMap<Id, ArrayList<Facility> > > facilitiesPerZonePerType =
+		new TreeMap<String, TreeMap<Id, ArrayList<Facility> > >();
 
-	private TreeMap<IdI, QuadTree<Facility>> homeFacilitiesPerZone =
-		new TreeMap<IdI, QuadTree<Facility>>();
+	private TreeMap<Id, QuadTree<Facility>> homeFacilitiesPerZone =
+		new TreeMap<Id, QuadTree<Facility>>();
 
 	TreeMap<String, String> planActToFacActMapping = new TreeMap<String, String>();
 
@@ -63,7 +63,7 @@ public class GroupFacilitiesPerZone {
 	public void run(ArrayList<Zone> zones, Facilities facilities) {
 		for (String actType : PlansGenerator.actTypes) {
 			facilitiesPerZonePerType.put(actType,
-					new TreeMap<IdI,ArrayList<Facility>>());
+					new TreeMap<Id,ArrayList<Facility>>());
 		}
 
 		planActToFacActMapping.put(PlansGenerator.workActType,
@@ -90,7 +90,7 @@ public class GroupFacilitiesPerZone {
 
 		int i = 0;
 		for (Zone zone : zones) {
-			Set<IdI> facilityIds = zone.getDownMapping().keySet();
+			Set<Id> facilityIds = zone.getDownMapping().keySet();
 			double maxX = Double.NEGATIVE_INFINITY;
 			double maxY = Double.NEGATIVE_INFINITY;
 			double minX = Double.POSITIVE_INFINITY;
@@ -101,7 +101,7 @@ public class GroupFacilitiesPerZone {
 			for (String actType : PlansGenerator.actTypes) {
 				facs.put(actType, new ArrayList<Facility>());
 			}
-			for (IdI facilityId : facilityIds) {
+			for (Id facilityId : facilityIds) {
 				Facility facility = (Facility) facilities.getLocation(facilityId);
 				if (facility != null) {
 					Activity activity = facility.getActivity(
@@ -156,7 +156,7 @@ public class GroupFacilitiesPerZone {
 			}
 			for (String actType : PlansGenerator.actTypes) {
 				if (facs.get(actType).size() > 0) {
-					TreeMap<IdI, ArrayList<Facility> > facilitiesPerZone =
+					TreeMap<Id, ArrayList<Facility> > facilitiesPerZone =
 						facilitiesPerZonePerType.get(actType);
 					facilitiesPerZone.put(zone.getId(), facs.get(actType));
 				}
@@ -172,7 +172,7 @@ public class GroupFacilitiesPerZone {
 		System.out.println();
 	}
 
-	public Facility getNearestHomeFacility(IdI zoneId, CoordI coord) {
+	public Facility getNearestHomeFacility(Id zoneId, CoordI coord) {
 		QuadTree<Facility> facilities =
 			homeFacilitiesPerZone.get(zoneId);
 		if (facilities == null) {
@@ -182,7 +182,7 @@ public class GroupFacilitiesPerZone {
 		return facilities.get(coord.getX(), coord.getY());
 	}
 
-	public Zone getNearestZone(IdI zoneId, String planActType) {
+	public Zone getNearestZone(Id zoneId, String planActType) {
 		Zone zone = null;
 		for (Zone z : zones) {
 			if (z.getId().equals(zoneId)) {
@@ -204,7 +204,7 @@ public class GroupFacilitiesPerZone {
 		return nearestZone;
 	}
 
-	public Facility getRandomFacility(IdI zoneId, String planActType) {
+	public Facility getRandomFacility(Id zoneId, String planActType) {
 		ArrayList<Facility> facilities =
 			facilitiesPerZonePerType.get(planActType).get(zoneId);
 		if (facilities == null || facilities.size() == 0) {
@@ -215,7 +215,7 @@ public class GroupFacilitiesPerZone {
 				planActToFacActMapping.get(planActType));
 	}
 
-	public boolean containsActivityFacility(IdI zoneId, String planActType) {
+	public boolean containsActivityFacility(Id zoneId, String planActType) {
 		ArrayList<Facility> facilities =
 			facilitiesPerZonePerType.get(planActType).get(zoneId);
 		if (facilities == null) {

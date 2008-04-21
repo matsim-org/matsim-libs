@@ -21,13 +21,13 @@
 package teach.multiagent07.population;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicPerson;
-import org.matsim.basic.v01.BasicPlan;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicPersonImpl;
+import org.matsim.basic.v01.BasicPlanImpl;
+import org.matsim.basic.v01.IdImpl;
 
-public class Person extends BasicPerson<Plan> {
+public class Person extends BasicPersonImpl<Plan> {
 
-	public Person(Id id) {
+	public Person(IdImpl id) {
 		super(id);
 	}
 
@@ -55,7 +55,7 @@ public class Person extends BasicPerson<Plan> {
 			
 			// try another value for starttime
 			final double offsetInSec = 600;
-			BasicPlan.ActLegIterator it = selected.getIterator() ;
+			BasicPlanImpl.ActLegIterator it = selected.getIterator() ;
 			BasicAct startAct = it.nextAct();
 			startAct.setEndTime(startAct.getEndTime() + offsetInSec*(Math.random()-0.5));
 			

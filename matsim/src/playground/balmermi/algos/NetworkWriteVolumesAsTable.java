@@ -25,10 +25,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkAlgorithm;
-import org.matsim.utils.identifiers.IdI;
 
 public class NetworkWriteVolumesAsTable extends NetworkAlgorithm {
 
@@ -89,7 +89,7 @@ public class NetworkWriteVolumesAsTable extends NetworkAlgorithm {
 
 		try {
 			for (Link l : network.getLinks().values()) {
-				IdI l_id = l.getId();
+				Id l_id = l.getId();
 
 				Random r = new Random();
 

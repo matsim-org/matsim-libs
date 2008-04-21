@@ -23,13 +23,13 @@ package org.matsim.utils.vis.netvis.visNet;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
+import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.DisplayableNetI;
 
@@ -37,7 +37,7 @@ import org.matsim.utils.vis.netvis.DisplayableNetI;
  * @author gunnar
  *
  */
-public class DisplayNet implements BasicNetI, DisplayableNetI {
+public class DisplayNet implements BasicNet, DisplayableNetI {
 
 	// -------------------- MEMBER VARIABLES --------------------
 
@@ -46,28 +46,28 @@ public class DisplayNet implements BasicNetI, DisplayableNetI {
 	private double minNorthing;
 	private double maxNorthing;
 
-	private final Map<IdI, DisplayNode> nodes = new TreeMap<IdI, DisplayNode>();
-	private final Map<IdI, DisplayLink> links = new TreeMap<IdI, DisplayLink>();
+	private final Map<Id, DisplayNode> nodes = new TreeMap<Id, DisplayNode>();
+	private final Map<Id, DisplayLink> links = new TreeMap<Id, DisplayLink>();
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public DisplayNet(NetworkLayer layer) {
 		// first create nodes
-		for (BasicNodeI node : layer.getNodes().values()) {
+		for (BasicNode node : layer.getNodes().values()) {
 			DisplayNode node2 = new DisplayNode(node.getId(), this);
 			node2.setCoord(((Node) node).getCoord());
 			nodes.put(node2.getId(), node2);
 		}
 
 		// second, create links
-		for (BasicLinkI link : layer.getLinks().values()) {
+		for (BasicLink link : layer.getLinks().values()) {
 			DisplayLink link2 = new DisplayLink(link.getId(), this);
 
-			BasicNodeI from = this.getNodes().get(link.getFromNode().getId());
+			BasicNode from = this.getNodes().get(link.getFromNode().getId());
 			from.addOutLink(link2);
 			link2.setFromNode(from);
 
-			BasicNodeI to = this.getNodes().get(link.getToNode().getId());
+			BasicNode to = this.getNodes().get(link.getToNode().getId());
 			to.addInLink(link2);
 			link2.setToNode(to);
 
@@ -86,11 +86,11 @@ public class DisplayNet implements BasicNetI, DisplayableNetI {
 	public void connect() {
 	}
 
-	public Map<IdI, ? extends DisplayNode> getNodes() {
+	public Map<Id, ? extends DisplayNode> getNodes() {
 		return nodes;
 	}
 
-	public Map<IdI, ? extends DisplayableLinkI> getLinks() {
+	public Map<Id, ? extends DisplayableLinkI> getLinks() {
 		return links;
 	}
 

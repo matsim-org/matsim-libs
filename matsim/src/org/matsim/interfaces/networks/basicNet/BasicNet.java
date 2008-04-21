@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicNet.java
+ * BasicNetI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,48 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.basic.v01;
+package org.matsim.interfaces.networks.basicNet;
 
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
-public class BasicNet implements BasicNetI {
-	protected final TreeMap<IdI, BasicLinkI> links = new TreeMap<IdI, BasicLinkI>();
-	protected final TreeMap<IdI, BasicNodeI> nodes = new TreeMap<IdI, BasicNodeI>();
+/**
+ * A topological network representation.
+ */
+public interface BasicNet {
 
-	public boolean add(BasicNodeI node) {
-		nodes.put(node.getId(), node);
-		return true;
-	}
+    /**
+     * Connects this network in the following sense: After a call to this
+     * function, all contained nodes and links must know about all of their
+     * adjacent network elements.
+     */
+    public void connect();
 
-	public boolean add(BasicLinkI link) {
-		links.put(link.getId(), link);
-		return true;
-	}
+    /**
+     * Returns a set of this network's nodes. This set might be empty, but it
+     * must not be <code>null</code>.
+     *
+     * @return a set of this network's nodes
+     */
+    public Map<Id, ? extends BasicNode> getNodes();
 
-	public Map<IdI, ? extends BasicLinkI> getLinks() {
-		return links;
-	}
-
-	public Map<IdI, ? extends BasicNodeI> getNodes() {
-		return nodes;
-	}
-
-	public BasicLinkI newLink(String label) {
-		throw new UnsupportedOperationException("Please implement/override method before using!");
-	}
-
-	public BasicNodeI newNode(String label) {
-		throw new UnsupportedOperationException("Please implement/override method before using!");
-	}
-
-	public void connect() {
-		System.out.println("Please implement method before using!");
-	}
+    /**
+     * Returns a set of this network's links. This set might be empty, but it
+     * must not be <code>null</code>.
+     *
+     * @return a set of this network's links
+     */
+    public Map<Id, ? extends BasicLink> getLinks();
 
 }

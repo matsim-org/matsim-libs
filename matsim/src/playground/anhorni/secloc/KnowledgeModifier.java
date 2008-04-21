@@ -1,8 +1,9 @@
 package playground.anhorni.secloc;
 
 import java.util.TreeMap;
+
+import org.matsim.basic.v01.Id;
 import org.matsim.plans.Knowledge;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 
@@ -15,9 +16,9 @@ public abstract class KnowledgeModifier {
 	 * The coice of an additional facility can be done as next best choice or randomly
 	 */
 	
-	protected TreeMap<IdI, ? extends Location> facilities;
+	protected TreeMap<Id, ? extends Location> facilities;
 	
-	public KnowledgeModifier(TreeMap<IdI, ? extends Location> facilities){
+	public KnowledgeModifier(TreeMap<Id, ? extends Location> facilities){
 		this.facilities=facilities;
 	}
 	

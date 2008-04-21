@@ -21,8 +21,8 @@
 package playground.gregor.gis;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.AbstractLocation;
 
 /**
@@ -46,7 +46,7 @@ public class PolygonZone extends AbstractLocation {
 
 	private final String name;
 
-	protected PolygonZone(final PolygonZoneLayer layer, final IdI id, final CoordI center, final CoordI[] shell,
+	protected PolygonZone(final PolygonZoneLayer layer, final Id id, final CoordI center, final CoordI[] shell,
 			final double area, final String name) {
 		super(layer, id, center);
 		this.shell = setShell(shell);

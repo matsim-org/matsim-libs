@@ -25,11 +25,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * This class returns an ArrayList of the facilities of a certain type that a
@@ -56,12 +56,12 @@ public class PersonFindFacilities {
 	    if (actType.equals(at)) {
 		// only add those activities which match the desired activity
 		// type
-		final TreeMap<Id, Integer> freqs = af2.getFrequencies();
+		final TreeMap<IdImpl, Integer> freqs = af2.getFrequencies();
 		final Iterator<Facility> fIter = af2.getFacilities().values()
 			.iterator();
 		while (fIter.hasNext()) {
 		    final Facility f = fIter.next();
-		    final IdI id = f.getId();
+		    final Id id = f.getId();
 		    int freq = freqs.get(id);
 		    if (freq < 1) {
 			freq = 1;

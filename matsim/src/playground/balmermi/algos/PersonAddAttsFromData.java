@@ -20,12 +20,12 @@
 
 package playground.balmermi.algos;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.utils.identifiers.IdI;
 
 import playground.balmermi.census2000.data.Persons;
 
@@ -51,7 +51,7 @@ public class PersonAddAttsFromData extends PersonAlgorithm implements PlanAlgori
 
 	@Override
 	public void run(Person person) {
-		IdI id = person.getId();
+		Id id = person.getId();
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(id.toString()));
 		if (p == null) {
 			Gbl.errorMsg("Person id=" + id + " does not exist in the person data!");

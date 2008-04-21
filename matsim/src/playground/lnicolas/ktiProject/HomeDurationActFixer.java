@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -78,7 +78,7 @@ public class HomeDurationActFixer extends PersonAlgorithm {
 	}
 	
 	private boolean planContainsType(Plan plan, String actType) {
-		BasicPlan.ActIterator it = plan.getIteratorAct();
+		BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 		while (it.hasNext()) {
 			BasicAct act = it.next();
 			if (act.getType().equals(actType)) {

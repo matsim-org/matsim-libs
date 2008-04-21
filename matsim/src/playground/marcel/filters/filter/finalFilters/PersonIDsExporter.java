@@ -23,8 +23,8 @@ package playground.marcel.filters.filter.finalFilters;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.plans.Person;
-import org.matsim.utils.identifiers.IdI;
 
 import playground.marcel.filters.filter.PersonFilterA;
 
@@ -37,7 +37,7 @@ import playground.marcel.filters.filter.PersonFilterA;
  * 
  */
 public class PersonIDsExporter extends PersonFilterA {
-	private static Set<IdI> idSet = new HashSet<IdI>();
+	private static Set<Id> idSet = new HashSet<Id>();
 
 	/**
 	 * only a virtual overriding, the function will never be used
@@ -54,7 +54,7 @@ public class PersonIDsExporter extends PersonFilterA {
 	 * 
 	 * @return a Set of Person-IDs
 	 */
-	public Set<IdI> idSet() {
+	public Set<Id> idSet() {
 		System.out.println("exporting " + idSet.size() + " person- IDs.");
 		return idSet;
 	}

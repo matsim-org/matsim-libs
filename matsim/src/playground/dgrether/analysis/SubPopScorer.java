@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Plan;
@@ -35,7 +36,6 @@ import org.matsim.plans.filters.RouteLinkFilter;
 import org.matsim.plans.filters.SelectedPlanFilter;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
-import org.matsim.utils.identifiers.IdI;
 
 import playground.dgrether.events.FilteredEvents;
 import playground.dgrether.events.filters.PersonEventFilter;
@@ -58,12 +58,12 @@ public class SubPopScorer {
 	public SubPopScorer(final String config, final List<String> linkIds) {
 		this.scenario = new ScenarioLoader(config);
 		this.linkIds = linkIds;
-		Set<IdI> idSet = filterPlans(this.scenario.getPlans());
+		Set<Id> idSet = filterPlans(this.scenario.getPlans());
 		calculateScore(idSet);
 
 	}
 
-  private void calculateScore(Set<IdI> idSet) {
+  private void calculateScore(Set<Id> idSet) {
   	String eventsFilePath = Gbl.getConfig().events().getInputFile();
   	FilteredEvents events = new FilteredEvents();
   	MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -80,16 +80,16 @@ public class SubPopScorer {
   	log.info("Score of subpopulation: " + scorer.getAveragePlanPerformance());
 	}
 
-	private Set<IdI> filterPlans(Plans plans) {
+	private Set<Id> filterPlans(Plans plans) {
 		PlanCollectFromAlgorithm collector = new PlanCollectFromAlgorithm();
 		RouteLinkFilter linkFilter = new RouteLinkFilter(collector);
 		for (String id : this.linkIds) {
-			linkFilter.addLink(new Id(id));
+			linkFilter.addLink(new IdImpl(id));
 		}
 		SelectedPlanFilter selectedPlanFilter = new SelectedPlanFilter(linkFilter);
 		selectedPlanFilter.run(plans);
 		Set<Plan> planSet = collector.getPlans();
-		Set<IdI> idSet = new HashSet<IdI>(planSet.size());
+		Set<Id> idSet = new HashSet<Id>(planSet.size());
 		for (Plan p : planSet) {
 			idSet.add(p.getPerson().getId());
 		}

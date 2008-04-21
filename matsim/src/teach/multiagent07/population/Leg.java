@@ -22,11 +22,11 @@ package teach.multiagent07.population;
 
 import java.util.ArrayList;
 
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicRoute;
+import org.matsim.basic.v01.BasicLegImpl;
+import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.utils.misc.Time;
 
-public class Leg extends BasicLeg {
+public class Leg extends BasicLegImpl {
 	private double duration = Time.UNDEFINED_TIME;
 	
 	public Leg(String mode) {
@@ -37,7 +37,7 @@ public class Leg extends BasicLeg {
 		this.mode = leg.getMode();
 		this.duration = leg.getDuration();
 		this.num = leg.getNum();
-		this.route = new BasicRoute();
+		this.route = new BasicRouteImpl();
 		ArrayList newRoute = new ArrayList();
 		
 		for (Object node: leg.getRoute().getRoute()) {

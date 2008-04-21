@@ -20,20 +20,19 @@
 
 package org.matsim.basic.v01;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.interfaces.networks.basicNet.BasicNodeI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.AbstractLocation;
 
-public class BasicLink
+public class BasicLinkImpl
 // <L extends BasicLinkI, N extends BasicNodeI > // and then change all BasicLink/BasicNode below into L and N
 extends AbstractLocation
-implements BasicLinkI
+implements BasicLink
 {
-	protected BasicNodeI from = null;
-	protected BasicNodeI to = null;
+	protected BasicNode from = null;
+	protected BasicNode to = null;
 
 	protected double length = Double.NaN;
 	protected double freespeed = Double.NaN;
@@ -45,7 +44,7 @@ implements BasicLinkI
 	// object, the BasicLink must contains geographic info. Since this must be defined
 	// by the to- and from-node, they HAVE to contain a coordinate. (see also BasicNode)
 	// If this is not O.K., then the BasicLink must not extend Location.
-	public BasicLink(NetworkLayer network, IdI id, BasicNode from, BasicNode to) {
+	public BasicLinkImpl(NetworkLayer network, Id id, BasicNode from, BasicNode to) {
 		super(network,id,0.5*(from.getCoord().getX()+to.getCoord().getX()),
 		                 0.5*(from.getCoord().getY()+to.getCoord().getY()));
 		this.from = from;
@@ -54,12 +53,12 @@ implements BasicLinkI
 
 	// TODO [balmermi] see above why...
 	@Deprecated
-	public BasicLink(String id) {
+	public BasicLinkImpl(String id) {
 		super(id);
 	}
-	
+
 	@Deprecated
-	public BasicLink(NetworkLayer network, String id, CoordI coord) {
+	public BasicLinkImpl(NetworkLayer network, String id, CoordI coord) {
 		super(network, id, coord);
 	}
 
@@ -72,20 +71,20 @@ implements BasicLinkI
 		return this.center.calcDistance(coord);
 	}
 
-	public BasicNodeI getFromNode() {
+	public BasicNode getFromNode() {
 		return this.from;
 	}
 
-	public BasicNodeI getToNode() {
+	public BasicNode getToNode() {
 		return this.to;
 	}
 
-	public boolean setFromNode(BasicNodeI node) {
+	public boolean setFromNode(BasicNode node) {
 		this.from = node;
 		return true;
 	}
 
-	public boolean setToNode(BasicNodeI node) {
+	public boolean setToNode(BasicNode node) {
 		this.to = node;
 		return true;
 	}

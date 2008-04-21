@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Id.java
+ * IdI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,48 +20,20 @@
 
 package org.matsim.basic.v01;
 
-import java.io.Serializable;
 
-import org.matsim.utils.identifiers.IdI;
+/**
+ * Represents a unique identifier.
+ */
+public interface Id extends Comparable<Id> {
 
-public class Id implements IdI, Serializable {
-
-	private static final long serialVersionUID = 1L;
-
-	private final String id;
-
-	public Id(final String id) {
-		this.id = id;
-	}
-
-	public Id(final int id) {
-		this.id = Integer.toString(id);
-	}
-
-	@Override
-	public boolean equals(final Object other) {
-		if (other == null) return false;
-		if (!(other instanceof Id)) return false;
-		if (other == this) return true;
-		return this.id.equals(((Id)other).id);
-	}
-
-	@Override
-	public int hashCode() {
-		return this.id.hashCode();
-	}
-
-	public int compareTo(final Id o) {
-		return this.id.compareTo(o.id);
-	}
-
-	public int compareTo(final IdI id) {
-		return this.id.compareTo(id.toString());
-	}
-
-	@Override
-	public String toString() {
-		return this.id;
-	}
+    /**
+     * This function must return a unique, non-<code>null</code> <code>String</code>
+     * representation of this identifier. For more verbose stuff,
+     * <code>toString()</code> should be used.
+     *
+     * @return a unique, non-<code>null</code> <code>String</code>-representation
+     *         of this identifier
+     */
+    public String toString();
 
 }

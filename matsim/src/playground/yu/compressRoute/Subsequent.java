@@ -30,11 +30,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.writer.MatsimXmlWriter;
 
 /**
@@ -45,7 +45,7 @@ import org.matsim.writer.MatsimXmlWriter;
  */
 public class Subsequent extends MatsimXmlWriter {
 
-	private Map<IdI, ? extends Link> links;
+	private Map<Id, ? extends Link> links;
 
 	/**
 	 * Criterion to judge Capacity

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicNetI.java
+ * BasicRoute.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,38 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.networks.basicNet;
+package org.matsim.basic.v01;
 
-import java.util.Map;
+import java.util.ArrayList;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 
-/**
- * A topological network representation.
- */
-public interface BasicNetI {
+public class BasicRouteImpl <T extends BasicNode> implements BasicRoute<T>{
+	protected ArrayList<T> route = new ArrayList<T>();
 
-    /**
-     * Connects this network in the following sense: After a call to this
-     * function, all contained nodes and links must know about all of their
-     * adjacent network elements.
-     */
-    public void connect();
+	/* (non-Javadoc)
+	 * @see org.matsim.basic.v01.BasicRoute#getRoute()
+	 */
+	public ArrayList<T> getRoute() {
+		return this.route;
+	}
 
-    /**
-     * Returns a set of this network's nodes. This set might be empty, but it
-     * must not be <code>null</code>.
-     *
-     * @return a set of this network's nodes
-     */
-    public Map<IdI, ? extends BasicNodeI> getNodes();
-
-    /**
-     * Returns a set of this network's links. This set might be empty, but it
-     * must not be <code>null</code>.
-     *
-     * @return a set of this network's links
-     */
-    public Map<IdI, ? extends BasicLinkI> getLinks();
+	/* (non-Javadoc)
+	 * @see org.matsim.basic.v01.BasicRoute#setRoute(java.util.ArrayList)
+	 */
+	public void setRoute (ArrayList<T> srcRoute) {
+		if (srcRoute == null) {
+			this.route.clear();
+		} else {
+			this.route = srcRoute;
+		}
+		this.route.trimToSize();
+	}
 
 }

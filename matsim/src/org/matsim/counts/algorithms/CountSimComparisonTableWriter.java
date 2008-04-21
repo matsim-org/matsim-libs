@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.counts.CountSimComparison;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * This class can write a List of CountSimComparison Objects to a simple table
@@ -135,11 +135,11 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 			out.write("Link Id\tMATSIM volumes\tCount volumes");
 			out.write(NEWLINE);
 
-			Iterator<IdI> id_it = new CountSimComparisonLinkFilter(
+			Iterator<Id> id_it = new CountSimComparisonLinkFilter(
 					this.countComparisonFilter.getCountsForHour(null)).getLinkIds().iterator();
 
 			while (id_it.hasNext()) {
-				IdI id= id_it.next();
+				Id id= id_it.next();
 				out.write(id.toString());
 				out.write(SEPARATOR);
 				out.write(this.numberFormat.format(linkFilter.getAggregatedSimValue(id)));

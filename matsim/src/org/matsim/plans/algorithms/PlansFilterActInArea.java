@@ -21,7 +21,7 @@
 package org.matsim.plans.algorithms;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicPlan.ActIterator;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;

@@ -23,6 +23,7 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventAgentStuck;
@@ -30,7 +31,6 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.plans.Route;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 public class MyRecentEventsBasedEstimator
@@ -41,16 +41,16 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 	}
 
 	private final HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
-	private final HashMap<DepartureEvent, IdI> departureEventsLinkIDs = new HashMap<DepartureEvent, IdI>();
+	private final HashMap<DepartureEvent, Id> departureEventsLinkIDs = new HashMap<DepartureEvent, Id>();
 
 	private static class LegTravelTimeEntry {
 
-		private final IdI agentId;
-		private final IdI originLocationId;
-		private final IdI destinationLocationId;
+		private final Id agentId;
+		private final Id originLocationId;
+		private final Id destinationLocationId;
 		private final String mode;
 
-		public LegTravelTimeEntry(final IdI agentId, final IdI originLocationId, final IdI destinationLocationId, final String mode) {
+		public LegTravelTimeEntry(final Id agentId, final Id originLocationId, final Id destinationLocationId, final String mode) {
 			super();
 			this.agentId = agentId;
 			this.originLocationId = originLocationId;
@@ -97,7 +97,7 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 	}
 
 	public double getLegTravelTimeEstimation(
-			final IdI personId,
+			final Id personId,
 			final double departureTime,
 			final Location origin,
 			final Location destination,
@@ -108,24 +108,24 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 
 	public void handleEvent(final EventAgentDeparture event) {
 
-		DepartureEvent depEvent = new DepartureEvent(new Id(event.agentId), event.legId);
+		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.agentId), event.legId);
 
 		this.departureEventsTimes.put(depEvent, event.time);
-		this.departureEventsLinkIDs.put(depEvent, new Id(event.linkId));
+		this.departureEventsLinkIDs.put(depEvent, new IdImpl(event.linkId));
 	}
 
 	public void handleEvent(final EventAgentArrival event) {
 
-		Id agentId = new Id(event.agentId);
+		IdImpl agentId = new IdImpl(event.agentId);
 
 		DepartureEvent removeMe = new DepartureEvent(agentId, event.legId);
 
 		Double departureTime = this.departureEventsTimes.remove(removeMe);
-		IdI departureLinkId = this.departureEventsLinkIDs.remove(removeMe);
+		Id departureLinkId = this.departureEventsLinkIDs.remove(removeMe);
 
 		Double travelTime = event.time - departureTime;
 
-		LegTravelTimeEntry newLtte = new LegTravelTimeEntry(agentId, departureLinkId, new Id(event.linkId), "car");
+		LegTravelTimeEntry newLtte = new LegTravelTimeEntry(agentId, departureLinkId, new IdImpl(event.linkId), "car");
 		this.legTravelTimeEstimations.put(newLtte, travelTime);
 	}
 

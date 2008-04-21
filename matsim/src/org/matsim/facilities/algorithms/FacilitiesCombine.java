@@ -24,11 +24,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 
 public class FacilitiesCombine extends FacilitiesAlgorithm {
@@ -107,7 +107,7 @@ public class FacilitiesCombine extends FacilitiesAlgorithm {
 			}
 		}
 
-		TreeMap<IdI, Facility> fs = (TreeMap<IdI, Facility>) facilities.getFacilities();
+		TreeMap<Id, Facility> fs = (TreeMap<Id, Facility>) facilities.getFacilities();
 		fs.clear();
 
 		Iterator<TreeMap<Double,Facility>> t_it = facs.values().iterator();

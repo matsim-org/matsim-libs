@@ -23,14 +23,14 @@ package teach.multiagent07.simulation;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 import teach.multiagent07.interfaces.EventHandlerI;
 import teach.multiagent07.util.Event;
 
 public class ArrivalTimeCollector implements EventHandlerI{
 
-	Map<IdI, Double> agentArrival = new TreeMap<IdI, Double>();
+	Map<Id, Double> agentArrival = new TreeMap<Id, Double>();
 
 	public void handleEvent(Event event) {
 		if(event.type == Event.ACT_ARRIVAL && event.legNumber == 1) {
@@ -38,7 +38,7 @@ public class ArrivalTimeCollector implements EventHandlerI{
 		}
 	}
 
-	public double getArrivalTimeAtFirstActivity(IdI agentID) {
+	public double getArrivalTimeAtFirstActivity(Id agentID) {
 		double result = 0;
 
 		if(agentArrival.containsKey(agentID))return agentArrival.get(agentID);

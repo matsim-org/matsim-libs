@@ -32,14 +32,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 
 public class MicroCensus2005ActChainGenerator {
@@ -85,11 +85,11 @@ public class MicroCensus2005ActChainGenerator {
 	}
 
 	private static int removeOneActPlans(Plans population) {
-		Iterator<Map.Entry<IdI, Person> > personIt = population.getPersons().entrySet().iterator();
+		Iterator<Map.Entry<Id, Person> > personIt = population.getPersons().entrySet().iterator();
 		int removeCnt = 0;
 		
 		while (personIt.hasNext()) {
-			Map.Entry<IdI, Person> entry = personIt.next();
+			Map.Entry<Id, Person> entry = personIt.next();
 			Iterator<Plan> planIt = entry.getValue().getPlans().iterator();
 			while (planIt.hasNext()) {
 				Plan plan = planIt.next();
@@ -151,14 +151,14 @@ public class MicroCensus2005ActChainGenerator {
 	}
 	
 	private static int removePlansByActivityType(Plans population, String typeToRemove) {
-		Iterator<Map.Entry<IdI, Person> > it =
+		Iterator<Map.Entry<Id, Person> > it =
 			population.getPersons().entrySet().iterator();
 		int removeCnt = 0;
 		
 		while (it.hasNext()) {
-			Map.Entry<IdI, Person> entry = it.next();
+			Map.Entry<Id, Person> entry = it.next();
 			for (Plan plan : entry.getValue().getPlans()) {
-				BasicPlan.ActIterator actIt = plan.getIteratorAct();
+				BasicPlanImpl.ActIterator actIt = plan.getIteratorAct();
 				while (actIt.hasNext()) {
 					if (actIt.next().getType().equals(typeToRemove)) {
 						it.remove();
@@ -420,7 +420,7 @@ public class MicroCensus2005ActChainGenerator {
 
 		for (Plan plan : plans) {
 			String actChain = "";
-			BasicPlan.ActIterator it = plan.getIteratorAct();
+			BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 			while (it.hasNext()) {
 				actChain += it.next().getType();
 			}
@@ -458,7 +458,7 @@ public class MicroCensus2005ActChainGenerator {
 
 		for (Plan plan : plans) {
 			String actChain = "";
-			BasicPlan.ActIterator it = plan.getIteratorAct();
+			BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 			while (it.hasNext()) {
 				actChain += it.next().getType();
 			}
@@ -521,7 +521,7 @@ public class MicroCensus2005ActChainGenerator {
 	}
 	
 	private static boolean containsWork(Plan plan) {
-		BasicPlan.ActIterator it = plan.getIteratorAct();
+		BasicPlanImpl.ActIterator it = plan.getIteratorAct();
 		while (it.hasNext()) {
 			BasicAct act = it.next();
 			if (act.getType().equals("w")) {

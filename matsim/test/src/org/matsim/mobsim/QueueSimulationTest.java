@@ -26,7 +26,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.Events;
@@ -74,7 +74,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 		try {
 			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-			Person person = new Person(new Id(0), "m", 35, "yes", "yes", "yes");
+			Person person = new Person(new IdImpl(0), "m", 35, "yes", "yes", "yes");
 			Plan plan = person.createPlan(null, "yes");
 			plan.createAct("h", 199.0, 0.0, link1, 0, 6*3600-500, 6*3600-500, false);
 			Leg leg = plan.createLeg(1, "car", 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
@@ -86,7 +86,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 			// add a lot of other persons with legs from link1 to link3, starting at 6:30
 			for (int i = 1; i <= 10000; i++) {
-				person = new Person(new Id(i), "m", 35, "yes", "yes", "yes");
+				person = new Person(new IdImpl(i), "m", 35, "yes", "yes", "yes");
 				plan = person.createPlan(null, "yes");
 				/* exact dep. time: 6:28:18. The agents needs:
 				 * - at the specified time, the agent goes into the waiting list, and if space is available, into
@@ -161,7 +161,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 		try {
 			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-			Person person = new Person(new Id(0), "m", 35, "yes", "yes", "yes");
+			Person person = new Person(new IdImpl(0), "m", 35, "yes", "yes", "yes");
 			Plan plan = person.createPlan(null, "yes");
 			plan.createAct("h", 199.0, 0.0, link1, 0, 6*3600-500, 6*3600-500, false);
 			Leg leg = plan.createLeg(1, "car", 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
@@ -173,7 +173,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 			// add a lot of persons with legs from link2 to link3
 			for (int i = 1; i <= 10000; i++) {
-				person = new Person(new Id(i), "m", 35, "yes", "yes", "yes");
+				person = new Person(new IdImpl(i), "m", 35, "yes", "yes", "yes");
 				plan = person.createPlan(null, "yes");
 				plan.createAct("h", 99.0, 0.0, link2, 0, 7*3600 - 1801, 7*3600 - 1801, false);
 				leg = plan.createLeg(1, "car", 7*3600 - 1801, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
@@ -237,7 +237,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 		try {
 			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-			Person person = new Person(new Id(0), "m", 35, "yes", "yes", "yes");
+			Person person = new Person(new IdImpl(0), "m", 35, "yes", "yes", "yes");
 			Plan plan = person.createPlan(null, "yes");
 			plan.createAct("h", 199.0, 0.0, link1, 0, 6*3600-500, 6*3600-500, false);
 			Leg leg = plan.createLeg(1, "car", 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
@@ -249,7 +249,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 			// add a lot of persons with legs from link2 to link3
 			for (int i = 1; i <= 5000; i++) {
-				person = new Person(new Id(i), "m", 35, "yes", "yes", "yes");
+				person = new Person(new IdImpl(i), "m", 35, "yes", "yes", "yes");
 				plan = person.createPlan(null, "yes");
 				plan.createAct("h", 99.0, 0.0, link2, 0, 7*3600 - 1801, 7*3600 - 1801, false);
 				leg = plan.createLeg(1, "car", 7*3600 - 1801, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
@@ -261,7 +261,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			}
 			// add a lot of persons with legs from link1 to link3
 			for (int i = 5001; i <= 10000; i++) {
-				person = new Person(new Id(i), "m", 35, "yes", "yes", "yes");
+				person = new Person(new IdImpl(i), "m", 35, "yes", "yes", "yes");
 				plan = person.createPlan(null, "yes");
 				plan.createAct("h", 99.0, 0.0, link1, 0, 7*3600 - 1902, 7*3600 - 1902, false);
 				leg = plan.createLeg(1, "car", 7*3600 - 1902, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
@@ -387,7 +387,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 		try {
 			// create a person with a car-leg from link1 to link5, but an incomplete route
-			Person person = new Person(new Id(0), "m", 35, "yes", "yes", "yes");
+			Person person = new Person(new IdImpl(0), "m", 35, "yes", "yes", "yes");
 			Plan plan = person.createPlan(null, "yes");
 			plan.createAct("h", 199.0, 0.0, link1, 0, 8*3600, 8*3600, false);
 			Leg leg = plan.createLeg(0, "car", 8*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);

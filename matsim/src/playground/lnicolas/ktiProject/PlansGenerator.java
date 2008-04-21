@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -126,7 +126,7 @@ public class PlansGenerator {
 		boolean containsShop = false;
 		boolean containsEdu = false;
 		boolean containsWork = false;
-		BasicPlan.ActIterator it = p.getIteratorAct();
+		BasicPlanImpl.ActIterator it = p.getIteratorAct();
 		while (it.hasNext()) {
 			BasicAct act = it.next();
 			if (act.getType().equals(workActType)) {
@@ -462,7 +462,7 @@ public class PlansGenerator {
 		// Get home coords of person, assuming that the current person already has
 		// a plan that contains a home activity with coords
 		Act initialAct = (Act)p.getPlans().get(0).getActsLegs().get(0);
-		BasicPlan.ActIterator actIt = newPlan.getIteratorAct();
+		BasicPlanImpl.ActIterator actIt = newPlan.getIteratorAct();
 		while (actIt.hasNext()) {
 			Act act = (Act) actIt.next();
 			if (act.getType().equals(homeActType)) {

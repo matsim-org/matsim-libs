@@ -23,19 +23,19 @@ package teach.multiagent07.simulation;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicLink;
+import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 
 import teach.multiagent07.net.CALink;
 
 public class Vehicle {
 
 	public static int Idcounter = 0;
-	protected IdI id  = new Id(Idcounter++);
+	protected Id id  = new IdImpl(Idcounter++);
 
-	public IdI getId() {return this.id;};
+	public Id getId() {return this.id;};
 
 
 	// new Methods for moving planed vehicles
@@ -44,15 +44,15 @@ public class Vehicle {
 		return 0;
 	}
 
-	public BasicLinkI getDepartureLink() {
+	public BasicLink getDepartureLink() {
 		return null;
 	}
 
-	public BasicLinkI getDestinationLink() {
+	public BasicLink getDestinationLink() {
 		return null;
 	}
 
-	public void setCurrentLink(BasicLink link)  {
+	public void setCurrentLink(BasicLinkImpl link)  {
 	}
 
 	public void leaveActivity() {
@@ -63,17 +63,17 @@ public class Vehicle {
 
 	}
 
-	public CALink getNextLink(Collection<? extends BasicLinkI> outlinks) {
+	public CALink getNextLink(Collection<? extends BasicLink> outlinks) {
 		//return getNextLink23(outlinks);
 		return getNextLinkNormal(outlinks);
 	}
 
-	private Id hauptstrasseId = new Id("23");
+	private IdImpl hauptstrasseId = new IdImpl("23");
 
-	public CALink getNextLink23(Collection<? extends BasicLinkI> outlinks) {
+	public CALink getNextLink23(Collection<? extends BasicLink> outlinks) {
 		CALink erg = null;
 
-		for (BasicLinkI link : outlinks) {
+		for (BasicLink link : outlinks) {
 			if (link.getId().equals(this.hauptstrasseId)) {
 				erg = (CALink) link;
 			}
@@ -86,7 +86,7 @@ public class Vehicle {
 	}
 
 
-	public CALink getNextLinkNormal(Collection<? extends BasicLinkI> outlinks) {
+	public CALink getNextLinkNormal(Collection<? extends BasicLink> outlinks) {
 		CALink erg = null;
 
 		int rnd = (int)(Math.random() * outlinks.size());

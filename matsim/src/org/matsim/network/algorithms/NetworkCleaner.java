@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Ensures that each link in the network can be reached by any other link. 
@@ -39,8 +39,8 @@ import org.matsim.utils.identifiers.IdI;
  */
 public class NetworkCleaner extends NetworkAlgorithm {
 
-	private final TreeMap<IdI, Node> visitedNodes = new TreeMap<IdI, Node>();
-	private TreeMap<IdI, Node> biggestCluster = new TreeMap<IdI, Node>();
+	private final TreeMap<Id, Node> visitedNodes = new TreeMap<Id, Node>();
+	private TreeMap<Id, Node> biggestCluster = new TreeMap<Id, Node>();
 	private NetworkLayer network = null;
 	private int roleIndex;
 	
@@ -54,7 +54,7 @@ public class NetworkCleaner extends NetworkAlgorithm {
 	 * @param startNode the node to start building the cluster
 	 * @return cluster of nodes <pre>startNode</pre> is part of
 	 */
-	private TreeMap<IdI, Node> findCluster(Node startNode) {
+	private TreeMap<Id, Node> findCluster(Node startNode) {
 
 		for (Node node : this.network.getNodes().values()) {
 			DoubleFlagRole r = (DoubleFlagRole)node.getRole(this.roleIndex);
@@ -67,7 +67,7 @@ public class NetworkCleaner extends NetworkAlgorithm {
 		ArrayList<Node> pendingForward = new ArrayList<Node>();
 		ArrayList<Node> pendingBackward = new ArrayList<Node>();
 
-		TreeMap<IdI, Node> clusterNodes = new TreeMap<IdI, Node>();
+		TreeMap<Id, Node> clusterNodes = new TreeMap<Id, Node>();
 		clusterNodes.put(startNode.getId(), startNode);
 		DoubleFlagRole r = getDoubleFlag(startNode);
 		r.forwardFlag = true;
@@ -126,7 +126,7 @@ public class NetworkCleaner extends NetworkAlgorithm {
 		while (iter.hasNext() && stillSearching) {
 			Node startNode = iter.next();
 			if (!this.visitedNodes.containsKey(startNode.getId())) {
-				TreeMap<IdI, Node> cluster = this.findCluster(startNode);
+				TreeMap<Id, Node> cluster = this.findCluster(startNode);
 				this.visitedNodes.putAll(cluster);
 				if (cluster.size() > this.biggestCluster.size()) {
 					this.biggestCluster = cluster;

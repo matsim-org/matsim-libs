@@ -25,8 +25,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicPlan.ActIterator;
-import org.matsim.basic.v01.BasicPlan.ActLegIterator;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;

@@ -20,9 +20,9 @@
 
 package org.matsim.utils.vis.snapshots.writers;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * A helper class to store information about agents (id, position, speed), mainly used to create
@@ -40,7 +40,7 @@ public class PositionInfo {
 	private static final double PI_HALF = Math.PI / 2.0;
 	private static final double TWO_PI = 2.0 * Math.PI;
 
-	final private IdI agentId;
+	final private Id agentId;
 
 	final private double easting;
 	final private double northing;
@@ -69,7 +69,7 @@ public class PositionInfo {
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
 	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
-	public PositionInfo(final IdI agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
+	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
 		this.agentId = agentId;
 		this.link = link;
 		this.speed = speed;
@@ -111,7 +111,7 @@ public class PositionInfo {
 	 * @param vehicleState The state of the vehicle (Parking, Driving)
 	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
-	public PositionInfo(final IdI driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final VehicleState vehicleState, final String visualizerData) {
+	public PositionInfo(final Id driverId, final double easting, final double northing, final double elevation, final double azimuth, final double speed, final VehicleState vehicleState, final String visualizerData) {
 		this.agentId = driverId;
 		this.link = null;
 		this.easting = easting;
@@ -124,7 +124,7 @@ public class PositionInfo {
 		this.visualizerData = visualizerData;
 	}
 
-	public IdI getAgentId() {
+	public Id getAgentId() {
 		return this.agentId;
 	}
 

@@ -31,10 +31,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 
 public class NetworkCreateLSA {
@@ -47,7 +47,7 @@ public class NetworkCreateLSA {
 	private final String outputfolder = "../../output/";
 	private final NetworkLayer network;
 	private final HashMap<Integer,Intersection> intersections = new HashMap<Integer, Intersection>();
-	private final HashMap<IdI,HashSet<LSA>> lsalinklist = new HashMap<IdI, HashSet<LSA>>();
+	private final HashMap<Id,HashSet<LSA>> lsalinklist = new HashMap<Id, HashSet<LSA>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -239,7 +239,7 @@ public class NetworkCreateLSA {
 		if ((net_idx < 2) || (5 < net_idx)) { Gbl.errorMsg("Index must be in range [2,5]"); }
 		int map_cnt = 0;
 		int ignored = 0;
-		IdI ignore_flag = new Id("-");
+		Id ignore_flag = new IdImpl("-");
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -254,7 +254,7 @@ public class NetworkCreateLSA {
 
 				Integer knotennr  = new Integer(entries[0].trim());
 				Integer lnr = new Integer(entries[1].trim());
-				IdI linkid = new Id(entries[net_idx].trim());
+				Id linkid = new IdImpl(entries[net_idx].trim());
 				if (!linkid.equals(ignore_flag)) {
 					if (!this.intersections.containsKey(knotennr)) { Gbl.errorMsg("Intersection id = " + knotennr + " does not exist!"); }
 					Intersection intersec = this.intersections.get(knotennr);
@@ -348,30 +348,30 @@ public class NetworkCreateLSA {
 	public final void writeData(String outfile) {
 		// HARDCODED: links with LSA's which should be ignored
 		// for the ivtch network
-		ArrayList<IdI> links_to_ignore = new ArrayList<IdI>();
-		links_to_ignore.add(new Id(106026));
-		links_to_ignore.add(new Id(106305));
-		links_to_ignore.add(new Id(106307));
-		links_to_ignore.add(new Id(106308));
-		links_to_ignore.add(new Id(106309));
-		links_to_ignore.add(new Id(106310));
-		links_to_ignore.add(new Id(106312));
-		links_to_ignore.add(new Id(106315));
-		links_to_ignore.add(new Id(106317));
-		links_to_ignore.add(new Id(106318));
-		links_to_ignore.add(new Id(106319));
-		links_to_ignore.add(new Id(106320));
-		links_to_ignore.add(new Id(106322));
-		links_to_ignore.add(new Id(108042));
+		ArrayList<Id> links_to_ignore = new ArrayList<Id>();
+		links_to_ignore.add(new IdImpl(106026));
+		links_to_ignore.add(new IdImpl(106305));
+		links_to_ignore.add(new IdImpl(106307));
+		links_to_ignore.add(new IdImpl(106308));
+		links_to_ignore.add(new IdImpl(106309));
+		links_to_ignore.add(new IdImpl(106310));
+		links_to_ignore.add(new IdImpl(106312));
+		links_to_ignore.add(new IdImpl(106315));
+		links_to_ignore.add(new IdImpl(106317));
+		links_to_ignore.add(new IdImpl(106318));
+		links_to_ignore.add(new IdImpl(106319));
+		links_to_ignore.add(new IdImpl(106320));
+		links_to_ignore.add(new IdImpl(106322));
+		links_to_ignore.add(new IdImpl(108042));
 
 		try {
 			FileWriter fw = new FileWriter(outfile);
 			BufferedWriter out = new BufferedWriter(fw);
 			out.write("<greentimefractions desc=\"based on LSA data from City of Zurich\">\n");
 			out.flush();
-			Iterator<IdI> id_it = this.lsalinklist.keySet().iterator();
+			Iterator<Id> id_it = this.lsalinklist.keySet().iterator();
 			while (id_it.hasNext()) {
-				IdI id = id_it.next();
+				Id id = id_it.next();
 				Link link = this.network.getLink(id);
 				HashSet<LSA> lsas = this.lsalinklist.get(id);
 				if (links_to_ignore.contains(id)){

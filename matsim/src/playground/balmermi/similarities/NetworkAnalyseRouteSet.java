@@ -31,12 +31,12 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
-import org.matsim.utils.identifiers.IdI;
 
 public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 
@@ -57,11 +57,11 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 	private static final int NATBEL = 7;
 	private static final int DTVKAT = 8;
 
-	private final TreeMap<IdI,Double> node_heights = new TreeMap<IdI, Double>();
+	private final TreeMap<Id,Double> node_heights = new TreeMap<Id, Double>();
 	// Link atts: Laenge  VWeg  VWegEm  ParkW  Ampel  Bruecke  Tunnel  NatBel  DTVKat
 	// idx:       0       1     2       3      4      5        6       7       8
-	private final TreeMap<IdI,Double[]> link_atts = new TreeMap<IdI, Double[]>();
-	private final TreeMap<IdI,ArrayList<Node>> routes = new TreeMap<IdI, ArrayList<Node>>();
+	private final TreeMap<Id,Double[]> link_atts = new TreeMap<Id, Double[]>();
+	private final TreeMap<Id,ArrayList<Node>> routes = new TreeMap<Id, ArrayList<Node>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -87,7 +87,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 				// example: 10001    404.60
 				// index:   0        1
 
-				IdI nodeid = new Id(entries[0].trim());
+				Id nodeid = new IdImpl(entries[0].trim());
 				if (!network.getNodes().containsKey(nodeid)) { Gbl.errorMsg("Node id=" + nodeid + " does not exist in the network!"); }
 				Double height = new Double(entries[1].trim());
 				if (this.node_heights.put(nodeid,height) != null) { Gbl.errorMsg("Node id=" + nodeid + " already has a height assigned!"); }
@@ -115,7 +115,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 				// example: 1    10001     10002   11.71   1     1       0      0      0        0       0       5
 				// index:   0    1         2       3       4     5       6      7      8        9       10      11
 
-				IdI linkid = new Id(entries[0].trim());
+				Id linkid = new IdImpl(entries[0].trim());
 				if (!network.getLinks().containsKey(linkid)) { Gbl.errorMsg("Link id=" + linkid + " does not exist in the network!"); }
 				this.link_atts.put(linkid,new Double[9]);
 				Double[] atts = this.link_atts.get(linkid);
@@ -163,7 +163,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 				if (!last.getId().equals(node_routes.get(node_routes.size()-1).getId())) {
 					Gbl.errorMsg("Last node does not fit!");
 				}
-				IdI routeid = new Id(entries[0].trim());
+				Id routeid = new IdImpl(entries[0].trim());
 				if (this.routes.put(routeid,node_routes) != null) { Gbl.errorMsg("Route id=" + routeid + " already exists!"); }
 			}
 			buffered_reader.close();
@@ -174,7 +174,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		System.out.println("      => # routes: " + this.routes.size());
 	}
 
-	private final void analysis(IdI routeid, ArrayList<Node> route) {
+	private final void analysis(Id routeid, ArrayList<Node> route) {
 		double length = 0.0;
 		double rise_av = 0.0;
 		double rise_min = 0.0;
@@ -481,7 +481,7 @@ public class NetworkAnalyseRouteSet extends NetworkAlgorithm {
 		System.out.print("tunnel_av\t");
 		System.out.print("tunnel_linkcnt\t");
 		System.out.print("tlights_linkcnt\n");
-		for (IdI routeid : this.routes.keySet()) {
+		for (Id routeid : this.routes.keySet()) {
 			this.analysis(routeid,this.routes.get(routeid));
 		}
 		System.out.println("      done.");

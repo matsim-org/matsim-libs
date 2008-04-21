@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.ActivitySpace;
 import org.matsim.plans.ActivitySpaceBean;
@@ -35,7 +36,6 @@ import org.matsim.plans.ActivitySpaceEllipse;
 import org.matsim.plans.ActivitySpaceSuperEllipse;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.optimization.BeanObjective;
 import org.matsim.utils.optimization.CassiniObjective;
 import org.matsim.utils.optimization.EllipseObjective;
@@ -156,7 +156,7 @@ public class PersonWriteActivitySpaceTable extends PersonAlgorithm {
 		loc_cnts.put("all",know.getActivities().size());
 
 		try {
-			IdI pid = person.getId();
+			Id pid = person.getId();
 			ArrayList<ActivitySpace> act_spaces = know.getActivitySpaces();
 			for (int i=0; i<act_spaces.size(); i++) {
 				ActivitySpace as = act_spaces.get(i);

@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import javax.vecmath.Vector2d;
 
-import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -62,7 +62,7 @@ public class PersonModeChoiceModel1 extends PersonAlgorithm implements PlanAlgor
 		
 		// setting subtour parameters
 		if (plan == null) { Gbl.errorMsg("Person id=" + plan.getPerson().getId() + "does not have a selected plan."); }
-		Iterator<BasicAct> act_it = plan.getIteratorAct();
+		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
 		CoordI home_coord = null;
 		CoordI work_coord = null;
 		//act_it.hasNext();
@@ -118,7 +118,7 @@ public class PersonModeChoiceModel1 extends PersonAlgorithm implements PlanAlgor
 						System.out.println("j = " + j);
 						//System.out.println("i = " + i);
 						System.out.println("prev_mode = " + modeSubTours.get(j));
-						prev_mode = modeSubTours.get(j); break; //Questo è sbagliato, va visto qual'è quello giusto!!!
+						prev_mode = modeSubTours.get(j); break; //Questo ï¿½ sbagliato, va visto qual'ï¿½ quello giusto!!!
 					}
 				}	
 			}

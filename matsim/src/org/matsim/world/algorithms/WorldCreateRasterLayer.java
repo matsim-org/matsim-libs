@@ -25,10 +25,10 @@ import java.util.Collection;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
@@ -40,7 +40,7 @@ public class WorldCreateRasterLayer extends WorldAlgorithm {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final IdI layerid = new Id("raster");
+	private final Id layerid = new IdImpl("raster");
 	private final int cellsize;
 
 	//////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ public class WorldCreateRasterLayer extends WorldAlgorithm {
 		if (nof_layers == 0) { Gbl.errorMsg("      At least one zone layer must already exist."); }
 		if (!(world.getBottomLayer() instanceof ZoneLayer)) { Gbl.errorMsg("      Bottom layer must be a zone layer."); }
 
-		for (IdI lid : world.getLayers().keySet()) {
+		for (Id lid : world.getLayers().keySet()) {
 			if (lid.toString().equals(this.layerid.toString())) { Gbl.errorMsg("      A layer with type " + this.layerid + " already exists."); }
 		}
 
@@ -100,13 +100,13 @@ public class WorldCreateRasterLayer extends WorldAlgorithm {
 		System.out.println("      done.");
 
 		System.out.println("      creating " + n + " x " + m + " cells...");
-		TreeMap<IdI,Zone> zones = (TreeMap<IdI,Zone>)layer.getLocations();
+		TreeMap<Id,Zone> zones = (TreeMap<Id,Zone>)layer.getLocations();
 		for (int i=0; i<n ; i++) {
 			for (int j=0; j<m; j++) {
 				CoordI z_min = new Coord(min.getX()+j*this.cellsize,min.getY()+i*this.cellsize);
 				CoordI z_max = new Coord(min.getX()+(j+1)*this.cellsize,min.getY()+(i+1)*this.cellsize);
 				CoordI z_center = new Coord((z_min.getX()+z_max.getX())/2.0,(z_min.getY()+z_max.getY())/2.0);
-				Zone zone = new Zone(layer,new Id(j+i*m),z_center,z_min,z_max,this.cellsize*this.cellsize,"raster("+i+","+j+")");
+				Zone zone = new Zone(layer,new IdImpl(j+i*m),z_center,z_min,z_max,this.cellsize*this.cellsize,"raster("+i+","+j+")");
 				zones.put(zone.getId(),zone);
 			}
 		}

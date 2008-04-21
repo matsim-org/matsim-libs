@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
@@ -50,7 +51,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
 
 
 public class PartialQueueSimulation extends QueueSimulation implements
@@ -254,7 +254,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 	}
 
 	private QueueRemoteLink replaceLink(final QueueLink linkold) {
-		IdI key = linkold.getId();
+		Id key = linkold.getId();
 		QueueRemoteLink linknew = new QueueRemoteLink(linkold, this.network);
 		Node from = linkold.getFromNode();
 		if(from.getOutLinks().containsKey(key)){
@@ -291,7 +291,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 					if (startup) {
 						// exchange Normal QueueLink with remote
 						QueueRemoteLink link2 = replaceLink(link);
-						((Map<IdI, QueueLink>) this.network.getLinks()).put(link2.getId(), link2);
+						((Map<Id, QueueLink>) this.network.getLinks()).put(link2.getId(), link2);
 						link2.initRemoteVisibility(); // open RMI interface to talk to other
 																					// partition
 					} else
@@ -300,7 +300,7 @@ public class PartialQueueSimulation extends QueueSimulation implements
 					// this link goes out to another CPU
 					// exchange Normal QueueLink with remote
 					QueueRemoteLink link2 = replaceLink(link);
-					((Map<IdI, QueueLink>) this.network.getLinks()).put(link2.getId(), link2);
+					((Map<Id, QueueLink>) this.network.getLinks()).put(link2.getId(), link2);
 					// gets connected in connectNetwork()
 				}
 			}

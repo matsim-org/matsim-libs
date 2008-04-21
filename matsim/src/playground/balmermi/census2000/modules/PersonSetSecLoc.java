@@ -23,7 +23,7 @@ package playground.balmermi.census2000.modules;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -253,7 +253,7 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 		CoordI home_coord = null;
 		CoordI prim_coord = null;
 		Plan plan = person.getSelectedPlan();
-		Iterator<BasicAct> act_it = plan.getIteratorAct();
+		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
 			Act act = (Act)act_it.next();
 			if (H.equals(act.getType())) {

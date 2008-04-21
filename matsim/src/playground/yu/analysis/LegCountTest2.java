@@ -27,7 +27,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicPlan.LegIterator;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;

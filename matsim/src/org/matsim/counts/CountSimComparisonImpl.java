@@ -20,7 +20,7 @@
 
 package org.matsim.counts;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 /**
  * Implementation of the CountSimComparison Interface.
@@ -39,7 +39,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	/**
 	 * the Id of the link
 	 */
-	private final IdI id;
+	private final Id id;
 
 	/**
 	 * @param id
@@ -47,7 +47,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	 * @param countValue2
 	 * @param simValue
 	 */
-	public CountSimComparisonImpl(final IdI id, final int hour, final double countValue2, final double simValue) {
+	public CountSimComparisonImpl(final Id id, final int hour, final double countValue2, final double simValue) {
 		this.id = id;
 		this.hour = hour;
 		this.countValue = countValue2;
@@ -87,7 +87,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	/**
 	 * @see org.matsim.counts.CountSimComparison#getId()
 	 */
-	public IdI getId() {
+	public Id getId() {
 		return this.id;
 	}
 

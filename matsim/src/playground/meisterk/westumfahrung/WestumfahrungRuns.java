@@ -9,6 +9,7 @@ import java.util.TreeMap;
 
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.deqsim.EventsReaderDEQv1;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -21,7 +22,6 @@ import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.plans.filters.PersonIdFilter;
 import org.matsim.plans.filters.RouteLinkFilter;
 import org.matsim.plans.filters.SelectedPlanFilter;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.Time;
 
 public class WestumfahrungRuns {
@@ -125,14 +125,14 @@ public class WestumfahrungRuns {
 
 			System.out.println("Building transit agents...");
 			plansTransitAgents = new Plans();
-			for (IdI personId : transitAgentsIdRecorder.getIds()) {
+			for (Id personId : transitAgentsIdRecorder.getIds()) {
 				plansTransitAgents.addPerson(inputPlans.getPerson(personId));
 			}
 			System.out.println("Building transit agents...done.");
 
 			System.out.println("Building non transit agents...");
 			plansNonTransitAgents = new Plans();
-			for (IdI personId : nonTransitAgentsIdRecorder.getIds()) {
+			for (Id personId : nonTransitAgentsIdRecorder.getIds()) {
 				plansNonTransitAgents.addPerson(inputPlans.getPerson(personId));
 			}
 			System.out.println("Building non transit agents...done.");
@@ -179,13 +179,13 @@ public class WestumfahrungRuns {
 		String AFTER = "after";
 		String[] scenarios = new String[]{BEFORE, AFTER};
 		
-		HashSet<IdI> westtangenteLinkIds = new HashSet<IdI>();
+		HashSet<Id> westtangenteLinkIds = new HashSet<Id>();
 //		westtangenteLinkIds.add(new Id(106305));
-		westtangenteLinkIds.add(new Id(106306));
+		westtangenteLinkIds.add(new IdImpl(106306));
 
-		HashSet<IdI> westumfahrungLinkIds = new HashSet<IdI>();
+		HashSet<Id> westumfahrungLinkIds = new HashSet<Id>();
 //		westumfahrungLinkIds.add(new Id(101203));
-		westumfahrungLinkIds.add(new Id(101204));
+		westumfahrungLinkIds.add(new IdImpl(101204));
 
 		TreeMap<String, String> scenarioPlansFilenames = new TreeMap<String, String>();
 		scenarioPlansFilenames.put(BEFORE, Gbl.getConfig().plans().getInputFile());
@@ -211,11 +211,11 @@ public class WestumfahrungRuns {
 			routeUsers.put(scenarioName, routeLinkPersonIds);
 
 			if (scenarioName.equals(BEFORE)) {
-				for (IdI linkId : westtangenteLinkIds) {
+				for (Id linkId : westtangenteLinkIds) {
 					routeLinkFilter.addLink(linkId);
 				}
 			} else if (scenarioName.equals(AFTER)) {
-				for (IdI linkId : westumfahrungLinkIds) {
+				for (Id linkId : westumfahrungLinkIds) {
 					routeLinkFilter.addLink(linkId);
 				}
 			}
@@ -228,7 +228,7 @@ public class WestumfahrungRuns {
 			SelectedPlanFilter findAgentsHomeLinksInSelectedPlan = new SelectedPlanFilter(homeAtTheWesttangenteFilter);
 			neighbors.put(scenarioName, actLinkPersonIds);
 			
-			for (IdI linkId : westtangenteLinkIds) {
+			for (Id linkId : westtangenteLinkIds) {
 				homeAtTheWesttangenteFilter.addLink(linkId);
 			}
 			
@@ -237,10 +237,10 @@ public class WestumfahrungRuns {
 
 		}
 
-		HashSet<IdI> routeSwitchersPersonIds = (HashSet<IdI>) routeUsers.get(AFTER).getIds().clone();
+		HashSet<Id> routeSwitchersPersonIds = (HashSet<Id>) routeUsers.get(AFTER).getIds().clone();
 		routeSwitchersPersonIds.retainAll(routeUsers.get(BEFORE).getIds());
 
-		HashSet<IdI> neighborsPersonIds = neighbors.get(BEFORE).getIds();
+		HashSet<Id> neighborsPersonIds = neighbors.get(BEFORE).getIds();
 		
 		System.out.println("Agents before: " + routeUsers.get(BEFORE).getIds().size());
 		System.out.println("Agents after: " + routeUsers.get(AFTER).getIds().size());

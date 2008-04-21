@@ -28,14 +28,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicRoute;
+import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
 
-public class Route extends BasicRoute<Node> implements  Serializable{
+public class Route extends BasicRouteImpl<Node> implements  Serializable{
 
 	private static final long serialVersionUID = -3615114784178389239L;
 

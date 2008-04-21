@@ -23,9 +23,9 @@ package org.matsim.plans.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * This algorithm filters out all persons without plans, leaving only persons in the
@@ -56,10 +56,10 @@ public class PlansFilterPersonHasPlans extends PlansAlgorithm {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// first search all persons without plans
-		TreeSet<IdI> pid_set = new TreeSet<IdI>();	// ids of persons to remove
-		Iterator<IdI> pid_it = plans.getPersons().keySet().iterator();
+		TreeSet<Id> pid_set = new TreeSet<Id>();	// ids of persons to remove
+		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
-			IdI personId = pid_it.next();
+			Id personId = pid_it.next();
 			Person person = plans.getPerson(personId);
 
 			if (person.getPlans().isEmpty()) {
@@ -71,7 +71,7 @@ public class PlansFilterPersonHasPlans extends PlansAlgorithm {
 		// okay, now remove in a 2nd step all persons we do no longer need
 		pid_it = pid_set.iterator();
 		while (pid_it.hasNext()) {
-			IdI pid = pid_it.next();
+			Id pid = pid_it.next();
 			plans.getPersons().remove(pid);
 		}
 

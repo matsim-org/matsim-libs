@@ -22,9 +22,9 @@ package teach.multiagent07.population;
 
 import java.util.Collection;
 
-import org.matsim.basic.v01.BasicPopulation;
+import org.matsim.basic.v01.BasicPopulationImpl;
 
-public class Population extends BasicPopulation<Person> {
+public class Population extends BasicPopulationImpl<Person> {
 
 	public Collection<Person> getPersons() { return persons.values();};
 	

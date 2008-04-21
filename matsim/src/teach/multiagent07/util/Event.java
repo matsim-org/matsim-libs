@@ -20,8 +20,8 @@
 
 package teach.multiagent07.util;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 
 public class Event {
 	// Event Types
@@ -34,18 +34,18 @@ public class Event {
 
 	public int time = 0;
 	public int type = UNKNOWN;
-	public BasicLinkI link;
-	public IdI agentId;
+	public BasicLink link;
+	public Id agentId;
 	public int legNumber = -1;
 
-	public Event( int time, int type, BasicLinkI link, IdI agentId) {
+	public Event( int time, int type, BasicLink link, Id agentId) {
 		this.time = time;
 		this.type = type;
 		this.link = link;
 		this.agentId = agentId;
 	}
 
-	public Event( int time, int type, BasicLinkI link, IdI agentId, int legNumber) {
+	public Event( int time, int type, BasicLink link, Id agentId, int legNumber) {
 		this(time, type, link, agentId);
 		this.legNumber = legNumber;
 	}

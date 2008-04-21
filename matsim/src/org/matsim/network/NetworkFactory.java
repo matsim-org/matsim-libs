@@ -22,9 +22,10 @@ package org.matsim.network;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.matsim.basic.v01.BasicNode;
+import org.matsim.basic.v01.BasicNodeImpl;
 import org.matsim.basic.v01.Id;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 
 /**
  * @author dgrether
@@ -36,7 +37,7 @@ public class NetworkFactory {
 
 	private Constructor prototypeContructor;
 
-	private static final Class[] PROTOTYPECONSTRUCTOR = { IdI.class,
+	private static final Class[] PROTOTYPECONSTRUCTOR = { Id.class,
 			BasicNode.class, BasicNode.class, NetworkLayer.class, double.class,
 			double.class, double.class, double.class};
 
@@ -53,10 +54,10 @@ public class NetworkFactory {
 
 	protected Node newNode(final String id, final String x, final String y,
 			final String type) {
-		return new Node(new Id(id), x, y, type);
+		return new Node(new IdImpl(id), x, y, type);
 	}
 
-	protected Link newLink(final IdI id, Node from, Node to,
+	protected Link newLink(final Id id, Node from, Node to,
 			NetworkLayer network, double length, double freespeedTT, double capacity,
 			double lanes) {
 		Link ret;

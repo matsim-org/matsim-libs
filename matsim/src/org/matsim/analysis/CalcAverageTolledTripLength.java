@@ -22,7 +22,7 @@ package org.matsim.analysis;
 
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
@@ -53,7 +53,7 @@ public class CalcAverageTolledTripLength implements EventHandlerLinkEnterI, Even
 	}
 
 	public void handleEvent(final EventLinkEnter event) {
-		Cost cost = this.scheme.getLinkCost(new Id(event.linkId), event.time);
+		Cost cost = this.scheme.getLinkCost(new IdImpl(event.linkId), event.time);
 		if (cost != null) {
 			Link link = event.link;
 			if (link == null) {

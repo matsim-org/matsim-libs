@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -43,7 +43,7 @@ public class KSPPenalty {
 	private final PenaltyLinkcost penaltyLinkcost;
 
 //	private Set<LinkDecorator> penalizedLinks;
-	private java.util.Map<BasicLinkI, Double> linkPenalties;
+	private java.util.Map<BasicLink, Double> linkPenalties;
 
 //	private static boolean logging = true;
 //
@@ -149,7 +149,7 @@ public class KSPPenalty {
 		 * object for the bestpath algo.
 		 */
 		//penalizedLinks = new LinkedHashSet<LinkDecorator>();
-		this.linkPenalties = new HashMap<BasicLinkI, Double>();
+		this.linkPenalties = new HashMap<BasicLink, Double>();
 		this.penaltyLinkcost.linkcost = travelTimes;
 		//algorithm.setLinkCost(penaltyLinkcost);
 		/*

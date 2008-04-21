@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 
 /**
@@ -33,18 +33,18 @@ import org.matsim.utils.identifiers.IdI;
  */
 public class SignalSystemPlan {
 
-	private IdI id;
+	private Id id;
 	private double startTime;
 	private double stopTime;
 	private int circulationTime;
 	private int syncTime;
 	private int powerOnTime;
 	private int powerOffTime;
-	private Map<IdI, SignalGroupSettings> signalGroupSettings;
+	private Map<Id, SignalGroupSettings> signalGroupSettings;
 
-	public SignalSystemPlan(IdI id) {
+	public SignalSystemPlan(Id id) {
 		this.id = id;
-		this.signalGroupSettings = new HashMap<IdI, SignalGroupSettings>();
+		this.signalGroupSettings = new HashMap<Id, SignalGroupSettings>();
 	}
 
 	public void addSignalGroupSettings(
@@ -60,11 +60,11 @@ public class SignalSystemPlan {
 		return ret;
 	}
 
-	public Map<IdI, SignalGroupSettings> getSignalGroupSettings() {
+	public Map<Id, SignalGroupSettings> getSignalGroupSettings() {
 		return this.signalGroupSettings;
 	}
 
-	public IdI getId() {
+	public Id getId() {
 		return  this.id;
 	}
 

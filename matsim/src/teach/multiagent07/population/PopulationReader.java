@@ -26,9 +26,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.matsim.basic.v01.BasicNode;
+import org.matsim.basic.v01.BasicNodeImpl;
 import org.matsim.basic.v01.BasicRoute;
-import org.matsim.interfaces.networks.basicNet.BasicNetI;
+import org.matsim.basic.v01.BasicRouteImpl;
+import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -40,7 +41,7 @@ import teach.multiagent07.util.DateConversion;
 public class PopulationReader extends DefaultHandler {
 
 	private Population population;
-	private BasicNetI net;
+	private BasicNet net;
 	private String fileName;
 	private String buffer; // for Route parsing
 	private Person actPerson;
@@ -48,7 +49,7 @@ public class PopulationReader extends DefaultHandler {
 	private Leg actLeg;
 
 
-	public PopulationReader(Population population, BasicNetI net, String filename) {
+	public PopulationReader(Population population, BasicNet net, String filename) {
 		this.population = population;
 		this.fileName = filename;
 		this.net = net;
@@ -109,7 +110,7 @@ public class PopulationReader extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		//System.out.println("finished..." + qName);
 		if (qName.equals("route")) {
-			BasicRoute<BasicNode> route = new BasicRoute<BasicNode>();
+			BasicRoute<BasicNodeImpl> route = new BasicRouteImpl<BasicNodeImpl>();
 			String[] parts = buffer.split("[ \t\n]+");
 			// node[0] == toNode of last activity, Read from node 1 on!
 			for (int i = 1; i < parts.length; i++) {

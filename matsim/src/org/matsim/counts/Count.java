@@ -22,19 +22,19 @@ package org.matsim.counts;
 
 import java.util.HashMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.identifiers.IdI;
 
 public class Count {
 
-	private final IdI locId;
+	private final Id locId;
 	private String csId;
 
 	private final HashMap<Integer,Volume> volumes = new HashMap<Integer, Volume>();
 	private CoordI coord;
 
 
-	protected Count(final IdI locId, final String csId) {
+	protected Count(final Id locId, final String csId) {
 		this.locId = locId;
 		this.csId = csId;
 	}
@@ -50,7 +50,7 @@ public class Count {
 		this.csId = cs_id;
 	}
 
-	public final IdI getLocId() {
+	public final Id getLocId() {
 		return this.locId;
 	}
 

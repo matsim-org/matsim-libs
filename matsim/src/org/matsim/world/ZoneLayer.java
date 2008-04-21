@@ -21,12 +21,12 @@
 package org.matsim.world;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * The collection of zone objects in MATSim.
@@ -49,7 +49,7 @@ public class ZoneLayer extends Layer {
 		super(type,name);
 	}
 
-	protected ZoneLayer(final IdI type, final String name) {
+	protected ZoneLayer(final Id type, final String name) {
 		super(type,name);
 	}
 
@@ -60,7 +60,7 @@ public class ZoneLayer extends Layer {
 	public final Zone createZone(final String id, final String center_x, final String center_y,
 	                             final String min_x, final String min_y, final String max_x, final String max_y,
 	                             final String area, final String name) {
-		IdI i = new Id(id);
+		Id i = new IdImpl(id);
 		if (this.locations.containsKey(i)) { Gbl.errorMsg(this.toString() + "[zone id=" + id + " already exists]"); }
 		CoordI center = null;
 		CoordI min = null;

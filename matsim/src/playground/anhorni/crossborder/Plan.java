@@ -1,32 +1,32 @@
 package playground.anhorni.crossborder;
 
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.Id;
 
 public class Plan {
 	
-	private IdI startLink;
-	private IdI endLink;
+	private Id startLink;
+	private Id endLink;
 	
-	private IdI id;
+	private Id id;
 	private String activityType;
 	private String tempHomeType;
 	private int startTime;
 	
-	public Plan(IdI startLink, IdI endLink) {
+	public Plan(Id startLink, Id endLink) {
 		this.startLink=startLink;
 		this.endLink=endLink;
 	}
 	
-	public IdI getStartLink() {
+	public Id getStartLink() {
 		return startLink;
 	}
-	public void setStartLink(IdI startLink) {
+	public void setStartLink(Id startLink) {
 		this.startLink = startLink;
 	}
-	public IdI getEndLink() {
+	public Id getEndLink() {
 		return endLink;
 	}
-	public void setEndLink(IdI endLink) {
+	public void setEndLink(Id endLink) {
 		this.endLink = endLink;
 	}
 	public String getActivityType() {
@@ -48,11 +48,11 @@ public class Plan {
 		this.startTime = startTime;
 	}
 
-	public IdI getId() {
+	public Id getId() {
 		return id;
 	}
 
-	public void setId(IdI id) {
+	public void setId(Id id) {
 		this.id = id;
 	}
 }

@@ -24,8 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * A EventFilterPersonSpecific lets the events, whose agentId belong to the
@@ -40,14 +40,14 @@ public class EventFilterPersonSpecific extends EventFilterA implements EventFilt
 	/**
 	 * Every EventFilterPersonSpecific must have a Set of Person-IDs
 	 */
-	private Set<IdI> personIds = new HashSet<IdI>();
+	private Set<Id> personIds = new HashSet<Id>();
 
 	/*----------------------CONSTRUCTOR----------------------*/
 	/**
 	 * @param personIDs -
 	 *            A set of Person- IDs, which is any Integer object
 	 */
-	public EventFilterPersonSpecific(Set<IdI> personIDs) {
+	public EventFilterPersonSpecific(Set<Id> personIDs) {
 		System.out.println("importing " + personIDs.size() + " Person- IDs.");
 		setPersonIDs(personIDs);
 	}
@@ -59,7 +59,7 @@ public class EventFilterPersonSpecific extends EventFilterA implements EventFilt
 	 * @param personIDs -
 	 *            a Set of Person-IDs
 	 */
-	public void setPersonIDs(Set<IdI> personIDs) {
+	public void setPersonIDs(Set<Id> personIDs) {
 		this.personIds = personIDs;
 	}
 
@@ -76,6 +76,6 @@ public class EventFilterPersonSpecific extends EventFilterA implements EventFilt
 	 */
 	@Override
 	public boolean judge(BasicEvent event) {
-		return this.personIds.contains(new Id(event.agentId));
+		return this.personIds.contains(new IdImpl(event.agentId));
 	}
 }

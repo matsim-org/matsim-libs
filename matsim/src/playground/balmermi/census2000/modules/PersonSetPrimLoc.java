@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -37,7 +38,6 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -52,15 +52,15 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 
 	private static final String E = "e";
 	private static final String W = "w";
-	private static final IdI MUNICIPALITY = new Id("municipality");
+	private static final Id MUNICIPALITY = new IdImpl("municipality");
 	private static final String EDUCATION = "education";
 	private static final String WORK = "work";
 
 	private final Facilities facilities;
 	private final Persons persons;
 	private final Matrices matrices;
-	private final TreeMap<IdI, ArrayList<Facility>> zone_work_fac_mapping = new TreeMap<IdI, ArrayList<Facility>>();
-	private final TreeMap<IdI, ArrayList<Facility>> zone_educ_fac_mapping = new TreeMap<IdI, ArrayList<Facility>>();
+	private final TreeMap<Id, ArrayList<Facility>> zone_work_fac_mapping = new TreeMap<Id, ArrayList<Facility>>();
+	private final TreeMap<Id, ArrayList<Facility>> zone_educ_fac_mapping = new TreeMap<Id, ArrayList<Facility>>();
 
 	private QuadTree<Facility> workFacQuadTree = null;
 	private QuadTree<Facility> educFacQuadTree = null;
@@ -180,7 +180,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 		}
 
 		System.out.println("      Zone to work-facility mapping:");
-		Iterator<IdI> z_it = this.zone_work_fac_mapping.keySet().iterator();
+		Iterator<Id> z_it = this.zone_work_fac_mapping.keySet().iterator();
 		while (z_it.hasNext()) {
 			Zone z = (Zone)layer.getLocation(z_it.next());
 			ArrayList<Facility> facs = this.zone_work_fac_mapping.get(z.getId());

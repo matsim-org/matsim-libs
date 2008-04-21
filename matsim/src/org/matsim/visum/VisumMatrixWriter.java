@@ -26,9 +26,9 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * @author mrieser
@@ -39,12 +39,12 @@ import org.matsim.utils.identifiers.IdI;
 public class VisumMatrixWriter {
 
 	Matrix matrix;
-	Set<IdI> ids;
+	Set<Id> ids;
 
 	public VisumMatrixWriter(final Matrix matrix) {
 		super();
 		this.matrix = matrix;
-		this.ids = new TreeSet<IdI>();
+		this.ids = new TreeSet<Id>();
 		this.ids.addAll(matrix.getFromLocations().keySet());
 		this.ids.addAll(matrix.getToLocations().keySet());
 	}
@@ -58,7 +58,7 @@ public class VisumMatrixWriter {
 	 * contain values, but should still be written out in the matrix containing
 	 * only zeros.
 	 */
-	public void setIds(final Set<IdI> ids) {
+	public void setIds(final Set<Id> ids) {
 		this.ids = ids;
 	}
 
@@ -75,7 +75,7 @@ public class VisumMatrixWriter {
 
 			out.write("*\tBezirksNummern\n");
 			int cnt = 0;
-			for (IdI value : this.ids) {
+			for (Id value : this.ids) {
 				cnt++;
 				if (cnt > 1) {
 					out.write("\t");
@@ -84,10 +84,10 @@ public class VisumMatrixWriter {
 			}
 			out.write("\n");
 
-			for (IdI from : this.ids) {
+			for (Id from : this.ids) {
 				out.write("*\t" + from.toString() + "\n");
 				cnt = 0;
-				for (IdI to : this.ids) {
+				for (Id to : this.ids) {
 					cnt++;
 					Entry e = this.matrix.getEntry(from, to);
 					if (cnt > 1) {

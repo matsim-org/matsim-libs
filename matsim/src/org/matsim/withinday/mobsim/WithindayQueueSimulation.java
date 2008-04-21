@@ -22,7 +22,7 @@ package org.matsim.withinday.mobsim;
 
 import java.util.PriorityQueue;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueSimulation;
@@ -84,7 +84,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	 * @param a
 	 */
 	public void setAccident(final Accident a) {
-		QueueLink accidentLink = this.network.getQueueLink(new Id(a.getLinkId()));
+		QueueLink accidentLink = this.network.getQueueLink(new IdImpl(a.getLinkId()));
 		this.capacityEvents.add(new CapacityChangeEvent(a.getStartTime(), accidentLink, a.getCapacityReductionFactor()));
 		this.capacityEvents.add(new CapacityChangeEvent(a.getEndTime(), accidentLink, 1/a.getCapacityReductionFactor()));
 	}

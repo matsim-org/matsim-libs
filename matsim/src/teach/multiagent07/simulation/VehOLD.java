@@ -19,9 +19,9 @@
  * *********************************************************************** */
 
 package teach.multiagent07.simulation;
-import org.matsim.basic.v01.BasicLink;
+import org.matsim.basic.v01.BasicLinkImpl;
+import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.trafficNet.TrafficLinkI;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 
 import teach.multiagent07.population.Person;
@@ -45,7 +45,7 @@ public class VehOLD implements  DrawableAgentI {
 		return sim;
 	}
 
-	public IdI getId() {
+	public Id getId() {
 		return agent.getId();
 	}
 
@@ -69,7 +69,7 @@ public class VehOLD implements  DrawableAgentI {
 
 	}
 
-	public void setCurrentLink(BasicLink link) {
+	public void setCurrentLink(BasicLinkImpl link) {
 	}
 
 	public TrafficLinkI chooseNextLink() {

@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
@@ -42,7 +43,6 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.GeoStatistics;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 
@@ -56,7 +56,7 @@ public class PajekWriter {
 
 	private CoordI minCoord;
 	private CoordI maxCoord;
-	private TreeMap<IdI, Integer> pajekIndex= new TreeMap<IdI, Integer>();
+	private TreeMap<Id, Integer> pajekIndex= new TreeMap<Id, Integer>();
 	String dir;
 
 	private final static Logger log = Logger.getLogger(PajekWriter.class);

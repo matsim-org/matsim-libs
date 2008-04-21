@@ -7,11 +7,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -56,7 +56,7 @@ public class RetailersReader extends MatsimXmlParser {
 	private void startRetailer(final Attributes meta) {
 		int locId = Integer.parseInt(meta.getValue("id"));
 		int cust_sqm = Integer.parseInt(meta.getValue("cust_sqm"));
-		this.curr_retailer = this.retailers.createRetailer(new Id(locId), cust_sqm);
+		this.curr_retailer = this.retailers.createRetailer(new IdImpl(locId), cust_sqm);
 		if (this.curr_retailer == null) {
 			log.warn("There is already a retailers object for location " + locId +
 					". The retailers for loc_id=" + locId + ", cs_id=" + meta.getValue("cs_id") + " will be ignored.");
@@ -69,7 +69,7 @@ public class RetailersReader extends MatsimXmlParser {
 		if (this.curr_retailer != null) {
 			String fac_id = meta.getValue("id");
 			String min_cust_sqm = meta.getValue("min_cust_sqm");
-			boolean ok = this.curr_retailer.setFacility(new Id(fac_id), Double.parseDouble(min_cust_sqm));
+			boolean ok = this.curr_retailer.setFacility(new IdImpl(fac_id), Double.parseDouble(min_cust_sqm));
 			if (!ok) { Gbl.errorMsg("Fac id=" + fac_id + " does not exist in the facilities DB!"); }
 		}
 	}

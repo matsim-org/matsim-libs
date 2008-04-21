@@ -25,9 +25,9 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * A road pricing scheme (sometimes also called toll scheme) contains the type of the toll, a list of the
@@ -47,7 +47,7 @@ public class RoadPricingScheme {
 	public static final String TOLL_TYPE_AREA = "area";
 
 	private NetworkLayer network = null;
-	private TreeMap<IdI, Link> links = null;
+	private TreeMap<Id, Link> links = null;
 
 	private String name = null;
 	private String type = null;
@@ -59,7 +59,7 @@ public class RoadPricingScheme {
 
 	public RoadPricingScheme(final NetworkLayer network) {
 		this.network = network;
-		this.links = new TreeMap<IdI, Link>();
+		this.links = new TreeMap<Id, Link>();
 		this.costs = new ArrayList<Cost>();
 	}
 
@@ -110,7 +110,7 @@ public class RoadPricingScheme {
 		return this.links.values();
 	}
 
-	public Set<IdI> getLinkIds() {
+	public Set<Id> getLinkIds() {
 		return this.links.keySet();
 	}
 
@@ -134,7 +134,7 @@ public class RoadPricingScheme {
 	 * <code>null</code> if the link is either not part of the tolling scheme
 	 * or there is no toll at the specified time for the link.
 	 */
-	public Cost getLinkCost(final IdI linkId, final double time) {
+	public Cost getLinkCost(final Id linkId, final double time) {
 		if (this.cacheIsInvalid) buildCache();
 		if (this.links.keySet().contains(linkId)) {
 			for (Cost cost : this.costCache) {

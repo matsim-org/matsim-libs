@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
@@ -34,7 +35,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PlansAlgorithm;
-import org.matsim.utils.identifiers.IdI;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
@@ -208,7 +208,7 @@ public class PrimlocDriver  extends PlansAlgorithm {
 	void getNumberHomesPerZone( Plans plans ){
 		this.core.P = new double[ this.core.numZ ];
 		// Determine how many employed persons live in each zone
-		Map<IdI, Person> agents = plans.getPersons();
+		Map<Id, Person> agents = plans.getPersons();
 		for (Person guy : agents.values()) {
 			Facility facility = guy.getKnowledge().getActivities("home").get(0).getFacility();
 			ArrayList<Location> list = this.zonelayer.getNearestLocations(facility.getCenter(), null);

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.events.EventLinkEnter;
@@ -31,7 +32,6 @@ import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * @author dgrether
@@ -41,7 +41,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		EventHandlerLinkLeaveI, EventHandlerLinkEnterI {
 
 
-  private Map<IdI, Map<IdI, Double>> agentTravelTimes;
+  private Map<Id, Map<Id, Double>> agentTravelTimes;
 
 	/**
 	 * @see junit.framework.TestCase#setUp()
@@ -52,7 +52,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 	}
 
 	public void testEquilOneAgent() {
-		this.agentTravelTimes = new HashMap<IdI, Map<IdI, Double>>();
+		this.agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
 		Config conf = loadConfig("test/scenarios/equil/config.xml");
 		String popFileName = "test/scenarios/equil/plans1.xml";
 
@@ -64,17 +64,17 @@ public class TravelTimeTest extends MatsimTestCase implements
 		events.addHandler(this);
 		controler.run();
 
-		Map<IdI, Double> travelTimes = this.agentTravelTimes.get(new Id("1"));
-		assertEquals(360.0, travelTimes.get(new Id(6)));
-		assertEquals(180.0, travelTimes.get(new Id(15)));
-		assertEquals(13560.0, travelTimes.get(new Id(20)));
-		assertEquals(360.0, travelTimes.get(new Id(21)));
-		assertEquals(1260.0, travelTimes.get(new Id(22)));
-		assertEquals(360.0, travelTimes.get(new Id(23)));
+		Map<Id, Double> travelTimes = this.agentTravelTimes.get(new IdImpl("1"));
+		assertEquals(360.0, travelTimes.get(new IdImpl(6)));
+		assertEquals(180.0, travelTimes.get(new IdImpl(15)));
+		assertEquals(13560.0, travelTimes.get(new IdImpl(20)));
+		assertEquals(360.0, travelTimes.get(new IdImpl(21)));
+		assertEquals(1260.0, travelTimes.get(new IdImpl(22)));
+		assertEquals(360.0, travelTimes.get(new IdImpl(23)));
 	}
 
 	public void testEquilTwoAgents() {
-		this.agentTravelTimes = new HashMap<IdI, Map<IdI, Double>>();
+		this.agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
 		Config conf = loadConfig("test/scenarios/equil/config.xml");
 		String popFileName = "test/scenarios/equil/plans2.xml";
 
@@ -86,36 +86,36 @@ public class TravelTimeTest extends MatsimTestCase implements
 		events.addHandler(this);
 		controler.run();
 
-		Map<IdI, Double> travelTimes = this.agentTravelTimes.get(new Id("1"));
-		assertEquals(360.0, travelTimes.get(new Id(6)));
-		assertEquals(180.0, travelTimes.get(new Id(15)));
-		assertEquals(13560.0, travelTimes.get(new Id(20)));
-		assertEquals(360.0, travelTimes.get(new Id(21)));
-		assertEquals(1260.0, travelTimes.get(new Id(22)));
-		assertEquals(360.0, travelTimes.get(new Id(23)));
+		Map<Id, Double> travelTimes = this.agentTravelTimes.get(new IdImpl("1"));
+		assertEquals(360.0, travelTimes.get(new IdImpl(6)));
+		assertEquals(180.0, travelTimes.get(new IdImpl(15)));
+		assertEquals(13560.0, travelTimes.get(new IdImpl(20)));
+		assertEquals(360.0, travelTimes.get(new IdImpl(21)));
+		assertEquals(1260.0, travelTimes.get(new IdImpl(22)));
+		assertEquals(360.0, travelTimes.get(new IdImpl(23)));
 
 
-		travelTimes = this.agentTravelTimes.get(new Id("2"));
-		assertEquals(360.0, travelTimes.get(new Id(5)));
-		assertEquals(180.0, travelTimes.get(new Id(14)));
-		assertEquals(13560.0, travelTimes.get(new Id(20)));
-		assertEquals(360.0, travelTimes.get(new Id(21)));
-		assertEquals(1260.0, travelTimes.get(new Id(22)));
-		assertEquals(360.0, travelTimes.get(new Id(23)));
+		travelTimes = this.agentTravelTimes.get(new IdImpl("2"));
+		assertEquals(360.0, travelTimes.get(new IdImpl(5)));
+		assertEquals(180.0, travelTimes.get(new IdImpl(14)));
+		assertEquals(13560.0, travelTimes.get(new IdImpl(20)));
+		assertEquals(360.0, travelTimes.get(new IdImpl(21)));
+		assertEquals(1260.0, travelTimes.get(new IdImpl(22)));
+		assertEquals(360.0, travelTimes.get(new IdImpl(23)));
 
 	}
 
 	public void handleEvent(EventLinkEnter event) {
-		Map<IdI, Double> travelTimes = this.agentTravelTimes.get(event.agent.getId());
+		Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.agent.getId());
 		if (travelTimes == null) {
-			travelTimes = new HashMap<IdI, Double>();
+			travelTimes = new HashMap<Id, Double>();
 			this.agentTravelTimes.put(event.agent.getId(), travelTimes);
 		}
 		travelTimes.put(event.link.getId(), event.time);
 	}
 
 	public void handleEvent(EventLinkLeave event) {
-		Map<IdI, Double> travelTimes = this.agentTravelTimes.get(event.agent.getId());
+		Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.agent.getId());
 		if (travelTimes != null) {
 			Double d = travelTimes.get(event.link.getId());
 			if (d != null) {

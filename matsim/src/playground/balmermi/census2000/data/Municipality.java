@@ -21,7 +21,7 @@
 package playground.balmermi.census2000.data;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.world.Zone;
 
 
@@ -50,12 +50,12 @@ public class Municipality implements Comparable<Municipality> {
 	//////////////////////////////////////////////////////////////////////
 
 	public int compareTo(Municipality other) {
-		return ((Id)this.zone.getId()).compareTo((Id)other.zone.getId());
+		return ((IdImpl)this.zone.getId()).compareTo((IdImpl)other.zone.getId());
 	}
 
 	//////////////////////////////////////////////////////////////////////
 
-	public final IdI getId() {
+	public final Id getId() {
 		return this.zone.getId();
 	}
 	

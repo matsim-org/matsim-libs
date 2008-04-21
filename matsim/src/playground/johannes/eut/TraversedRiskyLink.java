@@ -40,7 +40,7 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.interfaces.networks.basicNet.BasicLinkI;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.network.Link;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -72,7 +72,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 		
 		if (!riskyLinks.isEmpty()) {
 			List<Predicate> linkPlanPredicates = new LinkedList<Predicate>();
-			for (BasicLinkI link : riskyLinks) {
+			for (BasicLink link : riskyLinks) {
 				linkPlanPredicates.add(new LinkPlanPredicate(link));
 			}
 
@@ -126,9 +126,9 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 	
 	private class LinkPlanPredicate implements Predicate {
 
-		private BasicLinkI predicateLink;
+		private BasicLink predicateLink;
 		
-		public LinkPlanPredicate(BasicLinkI link) {
+		public LinkPlanPredicate(BasicLink link) {
 			predicateLink = link;
 		}
 		

@@ -20,11 +20,11 @@
 package org.matsim.network;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicNode;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.utils.collections.gnuclasspath.TreeMap;
-import org.matsim.utils.identifiers.IdI;
 
 
 
@@ -51,7 +51,7 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
-	public TimeVariantLinkImpl(IdI id, BasicNode from, BasicNode to, NetworkLayer network, double length, double freespeed, double capacity, double lanes) {
+	public TimeVariantLinkImpl(Id id, BasicNode from, BasicNode to, NetworkLayer network, double length, double freespeed, double capacity, double lanes) {
 		super(network, id, from, to);
 		super.length = length;
 		super.freespeed = freespeed;
@@ -59,8 +59,8 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		super.permlanes = lanes;
 		init();
 	}
-	
-	
+
+
 //	init methods
 	public void init() {
 		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
@@ -81,7 +81,7 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		this.freespeedEvents = new TreeMap<Double, Double>();
 		this.freespeedEvents.put(-1., this.freespeed); // make sure that freespeed is set to 'default' freespeed as long as no change event occurs
 		this.freespeedEvents.put(org.matsim.utils.misc.Time.UNDEFINED_TIME, this.freespeed); // make sure that freespeed is set to 'default' freespeed as long as no change event occurs
-		
+
 		this.freespeedTravelTime = new TreeMap<Double, Double>();
 		this.freespeedTravelTime.put(-1., this.length / this.freespeed);
 		this.freespeedTravelTime.put(org.matsim.utils.misc.Time.UNDEFINED_TIME, this.length / this.freespeed);
@@ -144,18 +144,18 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		if (freespeed <= 0) {
 			this.freespeedTravelTime.put(time,Double.POSITIVE_INFINITY);
 		}else {
-			this.freespeedTravelTime.put(time,this.length/freespeed);	
+			this.freespeedTravelTime.put(time,this.length/freespeed);
 		}
-		
+
 	}
 
 	/**
-	 * This method applies a new change event to the link. 
-	 * The order in which these change events are applied to 
-	 * the link does not matter as long as ALL change event 
-	 * types are ABSOLUTE with undefined end time. In all other 
+	 * This method applies a new change event to the link.
+	 * The order in which these change events are applied to
+	 * the link does not matter as long as ALL change event
+	 * types are ABSOLUTE with undefined end time. In all other
 	 * cases the events have to be applied chronological.
-	 * 
+	 *
 	 * @param event
 	 */
 	public void applyEvent(NetworkChangeEvent event) {
@@ -167,19 +167,19 @@ public class TimeVariantLinkImpl extends AbstractLink {
 			} else {
 				this.addFreespeedEvent(event.getStartTime(), freespeedChange.getValue());
 			}
-			
+
 			if (event.getEndTime() != org.matsim.utils.misc.Time.UNDEFINED_TIME) {
 				this.addFreespeedEvent(event.getEndTime(), currentFreeSpeed);
 			}
-			
+
 		}
 		if (event.getFlowCapacityChange() != null) {
 			throw  new RuntimeException("Flow capacity change capability is not implemented yet!");
 		}
 		if (event.getLanesChange() != null) {
 			throw  new RuntimeException("Lanes change capability is not implemented yet!");
-		}		
-		
+		}
+
 	}
 
 //	print methods

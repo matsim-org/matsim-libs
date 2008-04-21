@@ -23,10 +23,10 @@ package playground.marcel.ptnetwork;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Aggregates a PtNetworkLayer from HaltePunkte to HalteBereiche. In the
@@ -38,7 +38,7 @@ import org.matsim.utils.identifiers.IdI;
 public class PtNetworkAggregator {
 
 	private NetworkLayer network = null;
-	private TreeMap<IdI, IdI> linkMatching = null; // TreeMap<oldLinkId, newLinkId>
+	private TreeMap<Id, Id> linkMatching = null; // TreeMap<oldLinkId, newLinkId>
 
 	public PtNetworkAggregator(NetworkLayer ptNetwork) {
 		aggregate(ptNetwork);
@@ -48,14 +48,14 @@ public class PtNetworkAggregator {
 		return this.network;
 	}
 
-	public IdI lookupNewLinkId(IdI oldLinkId) {
+	public Id lookupNewLinkId(Id oldLinkId) {
 		return this.linkMatching.get(oldLinkId);
 	}
 
 	@SuppressWarnings("unchecked")
 	private void aggregate(NetworkLayer ptNetwork) {
 		this.network = new NetworkLayer();
-		this.linkMatching = new TreeMap<IdI, IdI>();
+		this.linkMatching = new TreeMap<Id, Id>();
 
 		// first, add all Haltebereiche-Nodes
 		for (Iterator<? extends Node> iter = ptNetwork.getNodes().values().iterator(); iter.hasNext(); ) {

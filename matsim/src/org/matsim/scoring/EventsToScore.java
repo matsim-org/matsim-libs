@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.Id;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventAgentStuck;
@@ -33,7 +34,6 @@ import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Calculates continuously the score of the selected plans of a given population
@@ -131,7 +131,7 @@ public class EventsToScore implements EventHandlerAgentArrivalI, EventHandlerAge
 	 * @param agentId The id of the agent the score is requested for.
 	 * @return The score of the specified agent.
 	 */
-	public double getAgentScore(final IdI agentId) {
+	public double getAgentScore(final Id agentId) {
 		ScoringFunction sf = this.agentScorers.get(agentId.toString());
 		if (sf == null) return BasicPlan.UNDEF_SCORE;
 		return sf.getScore();

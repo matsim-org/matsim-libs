@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicPlan.LegIterator;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;

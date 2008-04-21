@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.utils.identifiers.IdI;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.VisConfig;

@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Node;
-import org.matsim.utils.identifiers.IdI;
 
 public class NodeData {
 
@@ -120,7 +120,7 @@ public class NodeData {
 	}
 
 	
-	public IdI getId(){
+	public Id getId(){
 		return matSimNode.getId();
 	}
 
@@ -373,9 +373,9 @@ public void addNodeProb(double prob) {
 
 		private boolean checkIDs = false;
 
-		protected Map<IdI, ? extends NodeData> nodeData;
+		protected Map<Id, ? extends NodeData> nodeData;
 
-		public ComparatorNodeData(Map<IdI, ? extends NodeData> nodeData) {
+		public ComparatorNodeData(Map<Id, ? extends NodeData> nodeData) {
 			this.nodeData = nodeData;
 		}
 

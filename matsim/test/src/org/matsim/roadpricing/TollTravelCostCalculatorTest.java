@@ -21,7 +21,7 @@
 package org.matsim.roadpricing;
 
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicPlan.LegIterator;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Leg;

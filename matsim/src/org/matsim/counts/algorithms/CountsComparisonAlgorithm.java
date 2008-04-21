@@ -25,6 +25,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.basic.v01.Id;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
@@ -34,7 +35,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * This algorithm can be used to obtain a List of CountSimComparison objects from the
@@ -112,7 +112,7 @@ public class CountsComparisonAlgorithm extends CountsAlgorithm {
 	 * @return <code>true</true> if the Link with the given Id is not farther away than the
 	 * distance specified by the distance filter from the center node of the filter.
 	 */
-	private boolean isInRange(final IdI linkid) {
+	private boolean isInRange(final Id linkid) {
 		if ((this.distanceFilterNode == null) || (this.distanceFilter == null)) {
 			return true;
 		}

@@ -20,7 +20,7 @@
 
 package playground.david;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 
 public class PlaygroundTest {
 
@@ -30,8 +30,8 @@ public class PlaygroundTest {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		Id i1 = new Id("20");
-		Id i2 = new Id("20");
+		IdImpl i1 = new IdImpl("20");
+		IdImpl i2 = new IdImpl("20");
 		String s1 = "20";
 		String s2 = "20";
 		boolean erg = i1.equals(i2);

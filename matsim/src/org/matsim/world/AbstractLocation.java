@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.identifiers.IdI;
 
 /**
  * Basic geographical class in MATSim.
@@ -47,15 +47,15 @@ public abstract class AbstractLocation implements Location {
 	// TODO [balmermi] The id should be unchangeable ('final'), but there
 	// are modules which actually want to change ids of locations (see NetworkCleaner).
 	// I'm not that happy the Ids can change (otherwise it would not be an id)!
-	protected IdI id;
+	protected Id id;
 	protected final Layer layer;
 	protected final CoordI center;
 
 	// points to the zones of the lower resolution layer
-	protected final TreeMap<IdI,Location> up_mapping = new TreeMap<IdI,Location>();
+	protected final TreeMap<Id,Location> up_mapping = new TreeMap<Id,Location>();
 
 	// points to the zones of the higher resolution layer
-	protected final TreeMap<IdI,Location> down_mapping = new TreeMap<IdI,Location>();
+	protected final TreeMap<Id,Location> down_mapping = new TreeMap<Id,Location>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -67,7 +67,7 @@ public abstract class AbstractLocation implements Location {
 	 * @param id The unique id of that location.
 	 * @param center The center of that location. Does not have to be the middle of the location object.
 	 */
-	protected AbstractLocation(final Layer layer, final IdI id, final CoordI center) {
+	protected AbstractLocation(final Layer layer, final Id id, final CoordI center) {
 		this.layer = layer;
 		this.id = id;
 		this.center = center;
@@ -85,7 +85,7 @@ public abstract class AbstractLocation implements Location {
 	 */
 	@Deprecated
 	protected AbstractLocation(final String id) {
-		this(null,new Id(id),null);
+		this(null,new IdImpl(id),null);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public abstract class AbstractLocation implements Location {
 	 * @param center_x
 	 * @param center_y
 	 */
-	protected AbstractLocation(final Layer layer, final IdI id, final double center_x, final double center_y) {
+	protected AbstractLocation(final Layer layer, final Id id, final double center_x, final double center_y) {
 		this(layer,id,new Coord(center_x,center_y));
 	}
 
@@ -117,7 +117,7 @@ public abstract class AbstractLocation implements Location {
 	 * @param center The center of that location. Does not have to be the middle of the location object.
 	 */
 	protected AbstractLocation(final Layer layer, final String id, final CoordI center) {
-		this(layer,new Id(id),center);
+		this(layer,new IdImpl(id),center);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -143,7 +143,7 @@ public abstract class AbstractLocation implements Location {
 		if (!this.layer.getUpRule().getUpLayer().equals(other.getLayer())) {
 			Gbl.errorMsg(this.toString() + "[other=" + other + " has wrong layer]");
 		}
-		IdI other_id = other.getId();
+		Id other_id = other.getId();
 		if (!this.up_mapping.containsKey(other_id)) {
 			this.up_mapping.put(other_id,other);
 		}
@@ -159,7 +159,7 @@ public abstract class AbstractLocation implements Location {
 		if (!this.layer.getDownRule().getDownLayer().equals(other.getLayer())) {
 			Gbl.errorMsg(this.toString() + "[other=" + other + " has wrong layer]");
 		}
-		IdI other_id = other.getId();
+		Id other_id = other.getId();
 		if (!this.down_mapping.containsKey(other_id)) {
 			this.down_mapping.put(other_id,other);
 		}
@@ -169,7 +169,7 @@ public abstract class AbstractLocation implements Location {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
-	protected final boolean removeUpMapping(final IdI other_id) {
+	protected final boolean removeUpMapping(final Id other_id) {
 		if (this.up_mapping.get(other_id) == null) { return true; }
 		AbstractLocation other = (AbstractLocation) this.up_mapping.get(other_id);
 		if (other.down_mapping.remove(this.getId()) == null) { Gbl.errorMsg("This should never happen!"); }
@@ -177,7 +177,7 @@ public abstract class AbstractLocation implements Location {
 		return true;
 	}
 
-	protected final boolean removeDownMapping(final IdI other_id) {
+	protected final boolean removeDownMapping(final Id other_id) {
 		if (this.down_mapping.get(other_id) == null) { return true; }
 		AbstractLocation other = (AbstractLocation) this.down_mapping.get(other_id);
 		if (other.up_mapping.remove(this.getId()) == null) { Gbl.errorMsg("This should never happen!"); }
@@ -189,7 +189,7 @@ public abstract class AbstractLocation implements Location {
 	 * @see org.matsim.world.Location#removeAllUpMappings()
 	 */
 	public final boolean removeAllUpMappings() {
-		ArrayList<IdI> other_ids = new ArrayList<IdI>(this.up_mapping.keySet());
+		ArrayList<Id> other_ids = new ArrayList<Id>(this.up_mapping.keySet());
 		for (int i=0; i<other_ids.size(); i++) { this.removeUpMapping(other_ids.get(i)); }
 		return true;
 	}
@@ -198,7 +198,7 @@ public abstract class AbstractLocation implements Location {
 	 * @see org.matsim.world.Location#removeAllDownMappings()
 	 */
 	public final boolean removeAllDownMappings() {
-		ArrayList<IdI> other_ids = new ArrayList<IdI>(this.down_mapping.keySet());
+		ArrayList<Id> other_ids = new ArrayList<Id>(this.down_mapping.keySet());
 		for (int i=0; i<other_ids.size(); i++) { this.removeDownMapping(other_ids.get(i)); }
 		return true;
 	}
@@ -211,7 +211,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#setId(org.matsim.utils.identifiers.IdI)
 	 */
-	public final void setId(IdI id) {
+	public final void setId(Id id) {
 		this.id = id;
 	}
 
@@ -222,7 +222,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getId()
 	 */
-	public final IdI getId() {
+	public final Id getId() {
 		return this.id;
 	}
 
@@ -243,28 +243,28 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getUpLocation(org.matsim.utils.identifiers.IdI)
 	 */
-	public final Location getUpLocation(IdI id) {
+	public final Location getUpLocation(Id id) {
 		return this.up_mapping.get(id);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#downLocation(org.matsim.utils.identifiers.IdI)
 	 */
-	public final Location downLocation(IdI id) {
+	public final Location downLocation(Id id) {
 		return this.down_mapping.get(id);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getUpMapping()
 	 */
-	public final TreeMap<IdI,Location> getUpMapping() {
+	public final TreeMap<Id,Location> getUpMapping() {
 		return this.up_mapping;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getDownMapping()
 	 */
-	public final TreeMap<IdI, Location> getDownMapping() {
+	public final TreeMap<Id, Location> getDownMapping() {
 		return this.down_mapping;
 	}
 
