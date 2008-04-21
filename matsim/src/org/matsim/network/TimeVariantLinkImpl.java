@@ -20,19 +20,16 @@
 package org.matsim.network;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicLink;
 import org.matsim.basic.v01.BasicNode;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.utils.collections.gnuclasspath.TreeMap;
-import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.identifiers.IdI;
-import org.matsim.utils.misc.ResizableArray;
 
 
 
 
-public class TimeVariantLinkImpl extends BasicLink implements Link {
+public class TimeVariantLinkImpl extends AbstractLink {
 
 	private final static Logger log = Logger.getLogger(TimeVariantLinkImpl.class);
 
@@ -40,14 +37,12 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	protected String type = null;
-	protected String origid = null;
-	private final ResizableArray<Object> roles = new ResizableArray<Object>(5);
+
 
 	private TreeMap<Double, Double> freespeedEvents;
 	private TreeMap<Double, Double> freespeedTravelTime;
 
-	protected  double euklideanDist;
+
 
 	private double flowCapacity;
 
@@ -106,50 +101,10 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 		this.flowCapacity = this.capacity / capacityPeriod;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#calcDistance(org.matsim.utils.geometry.CoordI)
-	 */
-	@Override
-	public final double calcDistance(final CoordI coord) {
-		CoordI fc = this.from.getCoord();
-		CoordI tc =  this.to.getCoord();
-		double tx = tc.getX();    double ty = tc.getY();
-		double fx = fc.getX();    double fy = fc.getY();
-		double zx = coord.getX(); double zy = coord.getY();
-		double ax = tx-fx;        double ay = ty-fy;
-		double bx = zx-fx;        double by = zy-fy;
-		double la2 = ax*ax + ay*ay;
-		double lb2 = bx*bx + by*by;
-		if (la2 == 0.0) { return Math.sqrt(lb2); } // from == to
-		double xla = ax*bx+ay*by; // scalar product
-		if (xla < 0.0) { return Math.sqrt(lb2); }
-		else if (xla > la2) { double cx = zx-tx; double cy = zy-ty; return Math.sqrt(cx*cx+cy*cy); }
-		else { return Math.sqrt(lb2-xla*xla/la2); // lb2-xla*xla/la2 = lb*lb-x*x
-		}
-
-	}
 
 
 //	get methods
 
-
-//	DS TODO try to remove these and update references
-//	(for the time being, they are here because otherwise the returned type is wrong. kai)
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getFromNode()
-	 */
-	@Override
-	public final Node getFromNode() {
-		return (Node)this.from;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getToNode()
-	 */
-	@Override
-	public final Node getToNode() {
-		return (Node)this.to;
-	}
 
 
 	/**
@@ -162,35 +117,8 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 		return this.freespeedEvents.floorEntry(time).getValue();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getOrigId()
-	 */
-	public final String getOrigId() {
-		return this.origid;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getType()
-	 */
-	public final String getType() {
-		return this.type;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getRole(int)
-	 */
-	public final Object getRole(final int idx) {
-		if (idx < this.roles.size() ) {
-			return this.roles.get(idx);
-		}
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getEuklideanDistance()
-	 */
-	public final double getEuklideanDistance() {
-		return this.euklideanDist;
+	public double getFreespeedTravelTime(double time) {
+		return this.freespeedTravelTime.floorEntry(time).getValue();
 	}
 
 	/* (non-Javadoc)
@@ -219,50 +147,6 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 			this.freespeedTravelTime.put(time,this.length/freespeed);	
 		}
 		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#setRole(int, java.lang.Object)
-	 */
-	public final void setRole(final int idx, final Object role) {
-		if (idx > this.roles.size()) {
-			this.roles.resize(idx+1);
-		}
-		this.roles.set(idx, role);
-	}
-
-	public void setMaxRoleIndex(final int index) {
-		this.roles.resize(index+1);
-	}
-
-
-//	print methods
-
-
-	@Override
-	public String toString() {
-		return super.toString() +
-		"[from_id=" + this.from.getId() + "]" +
-		"[to_id=" + this.to.getId() + "]" +
-		"[length=" + this.length + "]" +
-		"[freespeed=" + this.freespeed + "]" +
-		"[capacity=" + this.capacity + "]" +
-		"[permlanes=" + this.permlanes + "]" +
-		"[origid=" + this.origid + "]" +
-		"[type=" + this.type + "]";
-	}
-
-	public double getFreespeedTravelTime(double time) {
-		return this.freespeedTravelTime.floorEntry(time).getValue();
-	}
-
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public void setOrigId(String origid) {
-		this.origid = origid;
 	}
 
 	/**
@@ -297,4 +181,25 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 		}		
 		
 	}
+
+//	print methods
+
+
+	@Override
+	public String toString() {
+		return super.toString() +
+		"[from_id=" + this.from.getId() + "]" +
+		"[to_id=" + this.to.getId() + "]" +
+		"[length=" + this.length + "]" +
+		"[freespeed=" + this.freespeed + "]" +
+		"[capacity=" + this.capacity + "]" +
+		"[permlanes=" + this.permlanes + "]" +
+		"[origid=" + this.origid + "]" +
+		"[type=" + this.type + "]";
+	}
+
+
+
+
+
 }
