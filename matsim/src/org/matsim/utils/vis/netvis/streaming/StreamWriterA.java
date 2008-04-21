@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.log4j.Logger;
 import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.utils.vis.netvis.config.ConfigModuleI;
 import org.matsim.utils.vis.netvis.config.GeneralConfig;
@@ -37,9 +38,9 @@ import org.matsim.utils.vis.netvis.config.TemporalConfig;
 /**
  * An abstract superclass that provides basic functionality for writing of
  * network states in files, where one file corresponds to one buffer block.
- * 
+ *
  * @author gunnar
- * 
+ *
  */
 public abstract class StreamWriterA implements SimStateWriterI {
 
@@ -90,7 +91,7 @@ public abstract class StreamWriterA implements SimStateWriterI {
 
     /**
      * Which type of network state information is to be written.
-     * 
+     *
      */
     protected abstract StateI newState();
 
@@ -154,7 +155,7 @@ public abstract class StreamWriterA implements SimStateWriterI {
 
         if (bufferIndex == 0) {
             String newName = streamConfig.getStreamFileName(fileStartTime_s);
-            System.out.println("opening file: " + newName);
+            Logger.getLogger(StreamWriterA.class).info("opening file: " + newName);
             outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(newName)));
         }
 
