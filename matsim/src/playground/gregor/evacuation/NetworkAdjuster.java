@@ -48,7 +48,10 @@ public class NetworkAdjuster {
 	}
 	
 	
-	public NetworkLayer performChanges(){
+	public NetworkLayer performChanges(double effectiveCellSize, double effectiveLaneWidth){
+		
+		this.network.setEffectiveCellSize(effectiveCellSize);
+		this.network.setEffectiveLaneWidth(effectiveLaneWidth);
 		
 		ConcurrentLinkedQueue<Link> links = new ConcurrentLinkedQueue<Link>();
 		for (Link link : this.network.getLinks().values()) {
@@ -78,7 +81,7 @@ public class NetworkAdjuster {
 			this.network.createLink(id, from, to, length, freespeed, capacity, permlanes, origid, type);
 			
 		}
-		
+
 		return this.network;
 		
 	}
@@ -90,8 +93,10 @@ public class NetworkAdjuster {
 		
 		final double storageCap = 5.4;
 		final double flowCap = 1.33;
+		final double effCS = 0.26;
+		final double effLW = 0.71;
 		
-		String configFile = "./configs/evacuationConf.xml";
+		String configFile = "./configs/timeVariantEvac.xml";
 
 		Config config = Gbl.createConfig(new String[] {configFile});
 		System.out.println("  reading the network...");
@@ -104,7 +109,7 @@ public class NetworkAdjuster {
 		NetworkAdjuster na = new NetworkAdjuster(network);
 		na.setStorageCap(storageCap);
 		na.setFlowCap(flowCap);
-		network = na.performChanges();
+		network = na.performChanges(effCS,effLW);
 		
 		NetworkWriter writer = new NetworkWriter(network,"padang_net2.xml");
 		writer.write();

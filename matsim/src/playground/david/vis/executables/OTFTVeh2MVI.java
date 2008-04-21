@@ -170,9 +170,9 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 //		String vehFileName = "../../tmp/studies/ivtch/T.veh";
 //		String outFileName = "output/testSWI2.mvi.gz";
 
-		String netFileName = "../../tmp/studies/padang/padang_net.xml";
-//		String vehFileName = "../../tmp/studies/padang/run301.it100.colorized.T.veh.gz";
-		String vehFileName = "../runs/run301/output/100.T.veh.gz";
+		String netFileName = "./networks/padang_net_dynStorageCap.xml";
+		String vehFileName = "./output/colorizedT.veh.txt.gz";
+//		String vehFileName = "../runs/run301/output/100.T.veh.gz";
 		String outFileName = "../OnTheFlyVis/test/testPadabang1.3.mvi";
 		int intervall_s = 60;
 
