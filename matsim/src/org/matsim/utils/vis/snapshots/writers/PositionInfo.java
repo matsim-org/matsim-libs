@@ -33,7 +33,10 @@ import org.matsim.utils.identifiers.IdI;
 public class PositionInfo {
 	public enum VehicleState {Driving, Parking};
 
-	private static final double LANE_WIDTH = 3.75;
+	private static final double LANE_WIDTH = 3.75;//TODO lane width is no longer static but it is defined in network. The question is,
+																						//how to get this information here? One possibility is to use Gbl ... but I suppose not everyone
+																						//would be comfortable with this idea? Is there a solution to do this in a strict OO manner 
+																						//(without a static Gbl)? [GL] - april 08 
 	private static final double PI_HALF = Math.PI / 2.0;
 	private static final double TWO_PI = 2.0 * Math.PI;
 
