@@ -31,6 +31,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(NetworkParserWriterTest.class);
 		suite.addTestSuite(LinkImplTest.class);
+		suite.addTestSuite(TimeVariantLinkImplTest.class);
 		suite.addTest(org.matsim.network.algorithms.AllTests.suite());
 		//$JUnit-END$
 		return suite;
