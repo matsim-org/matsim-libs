@@ -18,29 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
-/* *********************************************************************** *
- *                    org.matsim.demandmodeling.config                     *
- *                               Module.java                               *
- *                          ---------------------                          *
- * copyright       : (C) 2006 by                                           *
- *                   Michael Balmer, Konrad Meister, Marcel Rieser,        *
- *                   David Strippgen, Kai Nagel, Kay W. Axhausen,          *
- *                   Technische Universitaet Berlin (TU-Berlin) and        *
- *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
- * email           : balmermi at gmail dot com                             *
- *                 : rieser at gmail dot com                               *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package org.matsim.config;
 
 import java.util.Map;
@@ -48,6 +25,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Implements a generic config-group that stores all parameters in a simple Map.
+ * 
+ * @author mrieser
+ * @author balmermi
+ */
 public class Module {
 
 	//////////////////////////////////////////////////////////////////////
@@ -112,7 +95,8 @@ public class Module {
 		return this.name;
 	}
 
-	protected TreeMap<String, String> getParams() {
+	/** @return a Map containing all parameters and their values known to this config group. */
+	protected Map<String, String> getParams() {
 		return this.params;
 	}
 

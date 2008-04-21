@@ -41,14 +41,23 @@ import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.config.groups.WithindayConfigGroup;
 import org.matsim.config.groups.WorldConfigGroup;
 
+/**
+ * Stores all configuration settings specified in a configuration file
+ * and provides access to the settings at runtime.
+ *
+ * @author mrieser
+ */
 public class Config {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	/** Map of all config-groups known to this instance. */
 	protected final TreeMap<String, Module> modules = new TreeMap<String,Module>();
 
+	/* the following members are for the direct access to the core config groups. */
+	
 	private GlobalConfigGroup global = null;
 	private ConfigConfigGroup config = null;
 	private ControlerConfigGroup controler = null;
@@ -67,6 +76,7 @@ public class Config {
 	private StrategyConfigGroup strategy = null;
 	private SocNetConfigGroup socnetmodule = null;
 
+	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
 
 	//////////////////////////////////////////////////////////////////////
@@ -77,6 +87,11 @@ public class Config {
 		// nothing to do
 	}
 
+	/**
+	 * Adds all the commonly used config-groups, also known as "core modules",
+	 * to this config-instance. This should be called before reading any
+	 * configuration from file.
+	 */
 	public void addCoreModules() {
 		this.global = new GlobalConfigGroup();
 		this.modules.put(GlobalConfigGroup.GROUP_NAME, this.global);
@@ -126,7 +141,6 @@ public class Config {
 		this.evacuation = new EvacuationConfigGroup();
 		this.modules.put(EvacuationConfigGroup.GROUP_NAME, this.evacuation);
 
-//		 SN TEST (not a default module)
 		this.socnetmodule = new SocNetConfigGroup();
 		this.modules.put(SocNetConfigGroup.GROUP_NAME, this.socnetmodule);
 	}
@@ -143,20 +157,34 @@ public class Config {
 	// add / set methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Module createModule(final String modulename) {
-		if (this.modules.containsKey(modulename)) {
-			throw new IllegalArgumentException("Module " + modulename + " exists already.");
+	/** Creates a new module / config-group with the specified name.
+	 * @param name The name of the config-group to be created.
+	 * 
+	 * @return the newly created config group
+	 * @throws IllegalArgumentException if a config-group with the specified name already exists.
+	 */
+	public final Module createModule(final String name) {
+		if (this.modules.containsKey(name)) {
+			throw new IllegalArgumentException("Module " + name + " exists already.");
 		}
-		Module m = new Module(modulename);
-		this.modules.put(modulename, m);
+		Module m = new Module(name);
+		this.modules.put(name, m);
 		return m;
 	}
 
-	public final void addModule(final String modulename, final Module module) {
-		if (this.modules.containsKey(modulename)) {
-			throw new IllegalArgumentException("Module " + modulename + " exists already.");
+	/**
+	 * Adds the specified module / config-group with the specified name to the configuration.
+	 * 
+	 * @param name
+	 * @param module
+	 * 
+	 * @throws IllegalArgumentException if a config-group with the specified name already exists.
+	 */
+	public final void addModule(final String name, final Module module) {
+		if (this.modules.containsKey(name)) {
+			throw new IllegalArgumentException("Module " + name + " exists already.");
 		}
-		this.modules.put(modulename, module);
+		this.modules.put(name, module);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -237,16 +265,26 @@ public class Config {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// is used for using Config without an config-file given
+	// is used for using Config without a config-file given
 	//////////////////////////////////////////////////////////////////////
-	public final void setParam(final String module_name, final String param_name, final String value) {
-		Module m = this.modules.get(module_name);
+	/**
+	 * Sets the parameter <code>paramName</code> in the module/config-group 
+	 * <code>moduleName</code> to the specified value.
+	 * If there is no config-group with the specified name, a new group will
+	 * be created. 
+	 * 
+	 * @param moduleName
+	 * @param paramName
+	 * @param value
+	 */
+	public final void setParam(final String moduleName, final String paramName, final String value) {
+		Module m = this.modules.get(moduleName);
 		if (m == null) {
-			m = createModule(module_name);
-			log.info("module \"" + module_name + "\" added.");
+			m = createModule(moduleName);
+			log.info("module \"" + moduleName + "\" added.");
 		}
 		if (m != null) {
-			m.addParam(param_name, value);
+			m.addParam(paramName, value);
 		}
 	}
 
