@@ -85,7 +85,17 @@ public class PolygonGeneratorII {
 	private HashMap<Integer, Polygon> cutPolygons(HashMap<Integer, LineString> lineStrings, HashMap<Integer, Polygon> returnPolys){
 		
 		int countlines = 0;
+		int cCP = 0;
+		
+		HashMap<Integer, Polygon> controlPolys = new HashMap<Integer, Polygon>();
+		HashMap<Integer, Polygon> debugPolys = new HashMap<Integer, Polygon>();
 
+		CoordinateArraySequence s1 = new CoordinateArraySequence(new Coordinate[] {new Coordinate(651048.912,9893489.699)});
+		Point p1 = new Point(s1,this.geofac);
+		CoordinateArraySequence s2 = new CoordinateArraySequence(new Coordinate[] {new Coordinate(650854.77,9893215.73)});
+		Point p2 = new Point(s2,this.geofac);
+		
+		
 		log.info("cutting polygons ...");
 		HashMap<Integer, Polygon> fPoly= new HashMap<Integer, Polygon>();
 			
@@ -98,7 +108,10 @@ public class PolygonGeneratorII {
 				po.add(currLs.getStartPoint());
 				po.add(currLs.getEndPoint());
 				
+				
+				
 				for(Point currPoint : po){
+					
 					
 					log.info(countlines);
 					log.info(currPoint.getCoordinate().toString() + " lsId: "+lsId);
@@ -118,7 +131,9 @@ public class PolygonGeneratorII {
 						log.warn("no poly");
 						break;
 					}
-
+					if (lsId == 98) {
+						debugPolys.put(61, poly);
+					}
 					Coordinate [] coor = poly.getCoordinates();	
 					
 					List<Point> points = new ArrayList<Point>();				
@@ -133,6 +148,9 @@ public class PolygonGeneratorII {
 					for (int i = 0 ; i < lineArr.length ; i++ ){
 												
 						Polygon controlPoly = getControlPoly(currPointCoor, lineArr, angleArr, i);
+						
+						controlPolys.put(cCP, controlPoly);
+						cCP++;
 						
 						boolean found = false;
 						Envelope o = poly.getEnvelopeInternal();
@@ -150,15 +168,87 @@ public class PolygonGeneratorII {
 							}
 							
 							Coordinate [] cc = new Coordinate[]{currPointCoor, pp};
-							CoordinateSequence seq = new CoordinateArraySequence(cc);
-							LineString line = new LineString(seq, geofac);
+							CoordinateSequence seq2 = new CoordinateArraySequence(cc);
+							LineString line = new LineString(seq2, geofac);
 
 								if(controlPoly.contains(line) || line.crosses(controlPoly)  ){ 
 									
 									Coordinate [] p = new Coordinate[]{pp};
+									
+									////////
+									if(line.getLength() > 5){
+										
+										LineString lineI = lineArr[i];
+										double angleI = angleArr[i];
+										LineString lineII;
+										double angleII;
+										double deltaAngle;
+										if (i == ( lineArr.length -1) ) {	
+											lineII = lineArr[0];
+											angleII = angleArr[0];
+											
+											if ( (angleII - angleI) <= -180 ){
+												deltaAngle = 60;
+											}else{
+												deltaAngle = 270;
+											}
+
+										}else {
+											lineII = lineArr[i+1];
+											angleII = angleArr[i+1];
+											deltaAngle = angleII - angleI;
+										}
+										
+										Coordinate bisecCoor = getBisectingLine(lineII, lineI);
+										
+										if (deltaAngle > 180 ){
+											Coordinate co = subCoord(currPointCoor, bisecCoor); 
+											bisecCoor = addCoord(currPointCoor, co);
+										}
+										
+										Coordinate [] ccc = new Coordinate[]{currPointCoor, pp};
+										CoordinateSequence seq3 = new CoordinateArraySequence(ccc);
+										LineString interLine = new LineString(seq3, geofac);
+										SortedMap<Double, Coordinate> lengths = new TreeMap<Double, Coordinate>();
+										Coordinate [] inter = poly.intersection(interLine).getCoordinates();
+										
+										if(poly.intersects(interLine)){
+											
+											for(int iii = 0 ; iii < inter.length-1 ; iii++ ){
+												lengths.put( getLength(subCoord(inter[iii],currPointCoor)),inter[iii]);								
+											}
+										}
+										
+										for(int iii = 0 ; iii < inter.length-1 ; iii++ ){
+											
+											Coordinate ppp = lengths.get(lengths.firstKey());
+											if(pp == null){
+												log.warn("polyCoor is empty: no point found. ControlPoly: " + controlPoly.toString());
+												break;
+											}
+											
+											Coordinate [] cccc = new Coordinate[]{currPointCoor, ppp};
+											CoordinateSequence seq4 = new CoordinateArraySequence(cccc);
+											LineString line2 = new LineString(seq4, geofac);
+
+												if(controlPoly.contains(line2) || line2.crosses(controlPoly)  ){
+													
+													p = new Coordinate[] {lengths.get(lengths.firstKey())};
+													break;
+													
+												}else{
+													lengths.remove(lengths.firstKey());
+												}
+										}
+									}
+									///////
+									
+									
 									CoordinateSequence seqII = new CoordinateArraySequence(p);
 									Point poi = new Point(seqII, geofac);
 									points.add(poi);
+									
+//									log.info("Point: "+poi.toString());
 									
 									found = true;
 									break;
@@ -179,18 +269,20 @@ public class PolygonGeneratorII {
 						
 						if(currLs.crosses(polygon) || polygon.contains(currLs) ){	//
 							
-							log.info(polygon.toString());
+//							log.info(polygon.toString());
 							
 							if(fPoly.containsKey(lsId)){
 								fPoly.remove(lsId);
 							}
 							fPoly.put(lsId, polygon);
+							if (p1.equalsExact(po.get(0),0.5) && p2.equalsExact(po.get(1),0.5)) debugPolys.put(61, polygon);
 						}						
 					}
 				}
 			}
 		log.info("done.");
 		return fPoly;
+//		return controlPolys;
 	}
 		
 	private HashMap<Integer, Polygon> mergePolygons(){
@@ -206,6 +298,7 @@ public class PolygonGeneratorII {
 						
 			HashSet<Polygon> neighborhood = new HashSet<Polygon>();
 			Collection<Polygon> polys = polygonTree.get(ls.getCentroid().getX(),ls.getCentroid().getY() , 900);
+
 			
 			for (Polygon po : polys){
 				if(ls.intersects(po)) { 
@@ -506,12 +599,33 @@ public class PolygonGeneratorII {
 		
 		LineString vec;
 		Coordinate [] lineIcoor = ls.getCoordinates();
+		Coordinate [] coor;
+		int length = lineIcoor.length;
+		
+		
+		if(lineIcoor[0] == lineIcoor[1]){
+			 coor = new Coordinate [length-1];
+			 for(int i = 0 ; i < length-1 ; i++){
+				 coor[i] = lineIcoor[i+1];
+ 			 }
+			 lineIcoor = coor;
+		}
+		
+		else if(lineIcoor[length -1] == lineIcoor[length -2]){
+			 coor = new Coordinate [length-1];
+			 for(int i = 0 ; i < length-1 ; i++){
+				 coor[i] = lineIcoor[i];
+			 }
+			 lineIcoor = coor;
+		}
+		
+		
 		if(start){
 			CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(lineIcoor[0]), new Coordinate(lineIcoor[1])});
 			vec = new LineString(seqd, geofac);
 		} else {
-			int length = lineIcoor.length;
-			CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(lineIcoor[length-1]), new Coordinate(lineIcoor[length-2])});
+			
+			CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(lineIcoor[lineIcoor.length-1]), new Coordinate(lineIcoor[lineIcoor.length-2])});
 			vec = new LineString(seqd, geofac);		
 		}
 		return vec;
@@ -540,11 +654,29 @@ public class PolygonGeneratorII {
 			Coordinate r = 	multiCoord(subCoord(c22,c11),0.5);
 			Coordinate r2 = addCoord(ls1.getCoordinates()[0], c11);
 			Coordinate r3 = addCoord(r2, r);
-			Coordinate r4 = subCoord(r3 , ls1.getCoordinates()[0]);
-			r5 = addCoord(ls1.getCoordinates()[0], multiCoord(r4, Math.min(c1Length, c2Length)));
+			Coordinate r4; 
+			
+			
+			if(getAngle(ls1, ls2) == 180){
+				r4 = new Coordinate( - c1.y , c1.x);
+			} else {
+				r4 = subCoord(r3 , ls1.getCoordinates()[0]);
+			}
+			//TODO ausrichtung
+			
+//			if(getLength(r4) < 1){
+				r4 = multiCoord(r4, (1/getLength(r4))*Math.min(c1Length, c2Length));
+//			}
+				 
+			r5 = addCoord(ls1.getCoordinates()[0], r4);  //multiCoord(r4, ((c1Length + c2Length)/2))
 //		}
-		
-		log.info(r5.toString());
+//			if (r5 == null){
+//				
+//				Coordinate c = new Coordinate(0,0);
+//				
+//				return c;
+//			}
+//		log.info(r5.toString());
 		return r5;
 	}
 	
@@ -703,7 +835,7 @@ public class PolygonGeneratorII {
 			lineII = lineArr[0];
 			angleII = angleArr[0];
 			
-			if ( (angleII - angleI) < -180 ){	//
+			if ( (angleII - angleI) <= -180 ){
 				deltaAngle = 60;
 			}else{
 				deltaAngle = 270;
@@ -727,7 +859,7 @@ public class PolygonGeneratorII {
 		CoordinateSequence triseq = new CoordinateArraySequence(quadcoor);
 		LinearRing quadRing = new LinearRing(triseq, geofac);
 		Polygon controlPoly = new Polygon(quadRing, null, geofac);
-		log.info("controlPoly: "+controlPoly.toString());
+//		log.info("controlPoly: "+controlPoly.toString());
 		return controlPoly;
 	}
 }
