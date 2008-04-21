@@ -208,7 +208,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
 			this.effectiveCellSize = effectiveCellSize;
-			this.spaceCap = (this.link.getLength() * this.link.getLanesAsInt()) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
+			this.spaceCap = (this.link.getLength() * this.link.getLanes()) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
 		}
 
 		public void enter(final EventAgent agent) {
