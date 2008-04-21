@@ -47,7 +47,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 
@@ -74,7 +73,7 @@ public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 //////////////////////////////////////////////////////////////////////
 
 	public void writeModule(final Module module, final BufferedWriter out) throws IOException {
-		TreeMap<String, String> params = module.getParams();
+		Map<String, String> params = module.getParams();
 
 		out.write("\t<module");
 		out.write(" name=\"" + module.getName() + "\" >\n");
