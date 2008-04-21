@@ -26,6 +26,7 @@ package org.matsim.network;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -123,6 +124,23 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 		return events;
 	}
 	
+	/**
+	 * Parses a file with network change events and apply the events
+	 * to network
+	 * 
+	 * @param file
+	 *            a xml file containing network change events.
+	 */	
+	public void parseAndApplyEvents(String file) {
+		List<NetworkChangeEvent> events = parseEvents(file);		
+		Collections.sort(events);
+		for (NetworkChangeEvent event : events) {
+			for (Link link : event.getLinks()) {
+				((TimeVariantLinkImpl)link).applyEvent(event);
+			}
+		}
+	}
+
 
 	@Override
 	public void parse(String filename) throws SAXException,

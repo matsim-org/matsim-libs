@@ -21,10 +21,12 @@ package org.matsim.network;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLink;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicNode;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.utils.collections.gnuclasspath.TreeMap;
 import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.identifiers.IdI;
 import org.matsim.utils.misc.ResizableArray;
 
 
@@ -45,7 +47,7 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 	private TreeMap<Double, Double> freespeedEvents;
 	private TreeMap<Double, Double> freespeedTravelTime;
 
-	protected final double euklideanDist;
+	protected  double euklideanDist;
 
 	private double flowCapacity;
 
@@ -54,18 +56,18 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
-
-	protected TimeVariantLinkImpl(final NetworkLayer network, final String id,
-			final Node from, final Node to, final String length,
-			final String freespeed, final String capacity,
-			final String permlanes, final String origid, final String type) {
-		super(network,new Id(id),from,to);
-		this.length = Double.parseDouble(length);
-		this.freespeed = Double.parseDouble(freespeed);
-		this.capacity = Double.parseDouble(capacity);
-		this.permlanes = Double.parseDouble(permlanes);
-		this.origid = origid;
-		this.type = type;
+	public TimeVariantLinkImpl(IdI id, BasicNode from, BasicNode to, NetworkLayer network, double length, double freespeed, double capacity, double lanes) {
+		super(network, id, from, to);
+		super.length = length;
+		super.freespeed = freespeed;
+		super.capacity = capacity;
+		super.permlanes = lanes;
+		init();
+	}
+	
+	
+//	init methods
+	public void init() {
 		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
 
 
@@ -78,18 +80,16 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 		if (this.permlanes < 1) { Gbl.errorMsg(this+"[permlanes="+permlanes+" not allowed]"); }
 	}
 
-	public void init() {
 
-	}
-
-//	init methods
 
 	private void initNetworkChangeEvents() {
 		this.freespeedEvents = new TreeMap<Double, Double>();
 		this.freespeedEvents.put(-1., this.freespeed); // make sure that freespeed is set to 'default' freespeed as long as no change event occurs
-
+		this.freespeedEvents.put(org.matsim.utils.misc.Time.UNDEFINED_TIME, this.freespeed); // make sure that freespeed is set to 'default' freespeed as long as no change event occurs
+		
 		this.freespeedTravelTime = new TreeMap<Double, Double>();
 		this.freespeedTravelTime.put(-1., this.length / this.freespeed);
+		this.freespeedTravelTime.put(org.matsim.utils.misc.Time.UNDEFINED_TIME, this.length / this.freespeed);
 
 	}
 
@@ -213,7 +213,12 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 	 */
 	public void addFreespeedEvent(final double time, final double freespeed) {
 		this.freespeedEvents.put(time, freespeed);
-		this.freespeedTravelTime.put(time,this.length/freespeed);
+		if (freespeed <= 0) {
+			this.freespeedTravelTime.put(time,Double.POSITIVE_INFINITY);
+		}else {
+			this.freespeedTravelTime.put(time,this.length/freespeed);	
+		}
+		
 	}
 
 	/* (non-Javadoc)
@@ -258,5 +263,38 @@ public class TimeVariantLinkImpl extends BasicLink implements Link {
 
 	public void setOrigId(String origid) {
 		this.origid = origid;
+	}
+
+	/**
+	 * This method applies a new change event to the link. 
+	 * The order in which these change events are applied to 
+	 * the link does not matter as long as ALL change event 
+	 * types are ABSOLUTE with undefined end time. In all other 
+	 * cases the events have to be applied chronological.
+	 * 
+	 * @param event
+	 */
+	public void applyEvent(NetworkChangeEvent event) {
+		if (event.getFreespeedChange() != null) {
+			ChangeValue freespeedChange = event.getFreespeedChange();
+			double currentFreeSpeed = getFreespeed(event.getStartTime());
+			if (freespeedChange.getType() == NetworkChangeEvent.ChangeType.FACTOR){
+				this.addFreespeedEvent(event.getStartTime(),currentFreeSpeed * freespeedChange.getValue());
+			} else {
+				this.addFreespeedEvent(event.getStartTime(), freespeedChange.getValue());
+			}
+			
+			if (event.getEndTime() != org.matsim.utils.misc.Time.UNDEFINED_TIME) {
+				this.addFreespeedEvent(event.getEndTime(), currentFreeSpeed);
+			}
+			
+		}
+		if (event.getFlowCapacityChange() != null) {
+			throw  new RuntimeException("Flow capacity change capability is not implemented yet!");
+		}
+		if (event.getLanesChange() != null) {
+			throw  new RuntimeException("Lanes change capability is not implemented yet!");
+		}		
+		
 	}
 }

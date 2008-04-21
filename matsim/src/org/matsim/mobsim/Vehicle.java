@@ -283,7 +283,8 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	}
 
 	public double getPosInLink_m() {
-		double dur = this.currentLink.getFreespeedTravelTime(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+		
+		double dur = this.currentLink.getFreespeedTravelTime(SimulationTimer.getTime());
 		double mytime = getDepartureTime_s() - SimulationTimer.getTime();
 		if (mytime<0) {
 			mytime = 0.;

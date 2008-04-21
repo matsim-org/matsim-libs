@@ -163,7 +163,7 @@ public class QueueLink {
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
-		this.storageCapacity = (this.link.getLength() * this.link.getLanesAsInt())
+		this.storageCapacity = (this.link.getLength() * this.link.getLanes())
 				/ ((NetworkLayer) this.link.getLayer()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
@@ -400,7 +400,7 @@ public class QueueLink {
 		activateLink();
 		veh.setCurrentLink(this.link);
 		this.vehQueue.add(veh);
-		veh.setDepartureTime_s((int) (now + this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME)));
+		veh.setDepartureTime_s((int) (now + this.getLink().getFreespeedTravelTime(now)));
 		QueueSimulation.getEvents().processEvent(
 				new EventLinkEnter(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 						this.link.getId().toString(), veh.getDriver(), this.link));
@@ -584,9 +584,9 @@ public class QueueLink {
 		 */
 		double lastDistance = Integer.MAX_VALUE;
 		for (Vehicle veh : this.vehQueue) {
-			double travelTime = now - (veh.getDepartureTime_s() - this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME));
-			double distanceOnLink = (this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME) == 0.0 ? 0.0
-					: ((travelTime / this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME)) * this.link.getLength()));
+			double travelTime = now - (veh.getDepartureTime_s() - this.getLink().getFreespeedTravelTime(now));
+			double distanceOnLink = (this.getLink().getFreespeedTravelTime(now) == 0.0 ? 0.0
+					: ((travelTime / this.getLink().getFreespeedTravelTime(now)) * this.link.getLength()));
 			if (distanceOnLink > queueEnd) { // vehicle is already in queue
 				distanceOnLink = queueEnd;
 				queueEnd -= vehLen;
@@ -607,7 +607,7 @@ public class QueueLink {
 			}
 			int cmp = (int) (veh.getDepartureTime_s()
 					+ this.inverseSimulatedFlowCapacity + 2.0);
-			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(Time.UNDEFINED_TIME);
+			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(now);
 			veh.setSpeed(speed);
 			int lane = 1 + (veh.getID() % this.link.getLanesAsInt());
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link, distanceOnLink,

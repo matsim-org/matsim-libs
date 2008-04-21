@@ -26,7 +26,11 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkChangeEvent;
+import org.matsim.network.NetworkChangeEventsParser;
+import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -45,7 +49,9 @@ public class ScenarioData {
 	private final String networkFileName;
 	private final String facilitiesFileName;
 	private final String populationFileName;
-
+	private boolean isTimeVariantNetwork;
+	private String changEventsInputFile;
+	
 	private boolean worldLoaded = false;
 	private boolean networkLoaded = false;
 	private boolean facilitiesLoaded = false;
@@ -55,6 +61,8 @@ public class ScenarioData {
 	private NetworkLayer network = null;
 	private Facilities facilities = null;
 	private Plans population = null;
+	
+	
 
 	private static final Logger log = Logger.getLogger(ScenarioData.class);
 
@@ -67,6 +75,8 @@ public class ScenarioData {
 	public ScenarioData(final Config config) {
 		this.worldFileName = config.world().getInputFile();
 		this.networkFileName = config.network().getInputFile();
+		this.isTimeVariantNetwork = config.network().isTimeVariantNetwork();
+		this.changEventsInputFile = config.network().getChangeEventsInputFile();
 		this.facilitiesFileName = config.facilities().getInputFile();
 		this.populationFileName = config.plans().getInputFile();
 	}
@@ -98,15 +108,26 @@ public class ScenarioData {
 		if (!this.networkLoaded) {
 			getWorld(); // make sure the world is loaded
 			log.info("loading network from " + this.networkFileName);
-			this.network = new NetworkLayer();
+			NetworkFactory nf = new NetworkFactory();			
+			if (this.isTimeVariantNetwork){
+				nf.setLinkPrototype(TimeVariantLinkImpl.class);
+			}
+			this.network = new NetworkLayer(nf);	
+			
 			new MatsimNetworkReader(this.network).readFile(this.networkFileName);
 			this.world.setNetworkLayer(this.network);
 			this.world.complete();
+			
+			if (this.changEventsInputFile != null && this.isTimeVariantNetwork){
+				log.info("loading change events from " + this.changEventsInputFile);
+				new NetworkChangeEventsParser(this.network).parseAndApplyEvents(this.changEventsInputFile);
+			}
+			
 			this.networkLoaded = true;
 		}
 		return this.network;
 	}
-
+	
 	public Facilities getFacilities() {
 		if (!this.facilitiesLoaded) {
 			if (this.facilitiesFileName != null) {

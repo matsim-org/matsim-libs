@@ -37,7 +37,7 @@ import org.matsim.utils.misc.Time;
  * @author illenberger
  * 
  */
-public class NetworkChangeEvent {
+public class NetworkChangeEvent implements Comparable{
 
 	public static enum ChangeType {
 		ABSOLUTE, FACTOR
@@ -75,11 +75,11 @@ public class NetworkChangeEvent {
 
 	private double endTime = Time.UNDEFINED_TIME;
 
-	private ChangeValue flowCapacityChange;
+	private ChangeValue flowCapacityChange = null;
 
-	private ChangeValue freespeedChange;
+	private ChangeValue freespeedChange = null;
 
-	private ChangeValue lanesChange;
+	private ChangeValue lanesChange = null;
 
 	// ========================================================================
 	// constructor
@@ -202,5 +202,14 @@ public class NetworkChangeEvent {
 	 */
 	public void setLanesChange(ChangeValue lanesChange) {
 		this.lanesChange = lanesChange;
+	}
+
+	public int compareTo(Object o) {
+		if (this.startTime < ((NetworkChangeEvent) o).getStartTime()) {
+			return -1;
+		} else if (this.startTime > ((NetworkChangeEvent) o).getStartTime()){
+			return 1;
+		}
+		return 0;
 	}
 }
