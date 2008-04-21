@@ -34,15 +34,15 @@ public class MyControler1 {
 		if ( args.length==0 ) {
 //			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});
 //			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
-//			Gbl.createConfig(new String[] {"./examples/equil/newconfig.xml"});
+			Gbl.createConfig(new String[] {"./examples/equil/newconfig.xml"});
 //			Gbl.createConfig(new String[] {"../padang/dlr-network/pconfig.xml"});
-			Gbl.createConfig(new String[] {"/home/nagel/vsp-cvs/studies/ivtch-schweiz/plans/kaiconfig.xml"});
+//			Gbl.createConfig(new String[] {"/home/nagel/vsp-cvs/studies/ivtch-schweiz/plans/kaiconfig.xml"});
 		} else {
 			Gbl.createConfig(args) ;
 		}
 
 		final Controler controler = new Controler(Gbl.getConfig());
-		controler.setOverwriteFiles(true);
+//		controler.setOverwriteFiles(true);
 		controler.run();
 
 //		// Visualize
