@@ -21,7 +21,6 @@
 package teach.matsim08.network;
 import java.util.Collection;
 
-import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
@@ -39,7 +38,7 @@ public class CANetStateWriter extends DisplayNetStateWriter {
 	}
 	@Override
 	protected String getLinkDisplLabel(BasicLink link) {
-		return ((BasicLinkImpl)link).getId().toString();
+		return ((BasicLink)link).getId().toString();
 	}
 	@Override
 	protected double getLinkDisplValue(BasicLink link) {
