@@ -24,8 +24,7 @@ class Veh implements DrawableAgentI {
 	}
 
 	public double getPosInLink_m() {
-		// TODO Auto-generated method stub
-		return 0;
+		return pos ;
 	}
 
 }
