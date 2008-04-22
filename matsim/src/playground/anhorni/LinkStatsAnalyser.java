@@ -1,0 +1,274 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CountsAnalyser.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.anhorni;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Vector;
+
+import org.matsim.analysis.CalcLinkStats;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.counts.Count;
+import org.matsim.counts.CountSimComparison;
+import org.matsim.counts.Counts;
+import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
+import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.gbl.Gbl;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.transformations.TransformationFactory;
+
+/**
+ * This class is able to produce a crapy kml file to compare the link volumes
+ * on selected links given two linkStats files. The results are written to 
+ * a kmz file.
+ */
+public class LinkStatsAnalyser {
+
+	//the network
+	private NetworkLayer network;
+
+	/**
+	 * the number of the iteration which can be set in the config file
+	 */
+	private Integer iterationNumber;
+	/**
+	 * the CalcLinkStats read for the analysis
+	 */
+	private CalcLinkStats linkStats0;
+	private CalcLinkStats linkStats1;
+
+	private String coordSystem=null;
+	
+	private String linksAttributeFilename0;
+	private String linksAttributeFilename1;
+	private String selectedLinksFilename;
+	/**
+	 * the name(path) to the output file
+	 */
+	private String outputFilename;
+	private String networkFilename;
+	private double scaleFactor;
+	private List<Id> selectedLinks;
+
+	/**
+	 *
+	 * @param config
+	 */
+	
+	private void init(final String[] args){
+		try {
+			this.linksAttributeFilename0=args[0];
+			this.linksAttributeFilename1=args[1];
+			this.selectedLinksFilename=args[2];
+			this.outputFilename=args[3];
+			this.networkFilename=args[4];
+			this.scaleFactor=Double.parseDouble(args[5]);
+			
+			//this.iterationNumber=0;
+			this.iterationNumber=new Integer(args[6]);
+			//this.coordSystem="CH1903_LV03";
+			this.coordSystem=args[7];
+			
+			this.selectedLinks=readSelectedLinks();
+			
+			System.out.println("  reading network...");
+			this.network = loadNetwork();
+			System.out.println("  done.");
+			
+			System.out.println("  Coordinate System: " + this.coordSystem);
+			System.out.println("  reading LinkAttributes from: " + linksAttributeFilename0);
+			this.linkStats0 = new CalcLinkStats(this.network);
+			this.linkStats0.readFile(linksAttributeFilename0);
+			
+			System.out.println("  reading LinkAttributes from: " + linksAttributeFilename1);
+			this.linkStats1 = new CalcLinkStats(this.network);
+			this.linkStats1.readFile(linksAttributeFilename1);
+			
+			
+			System.out.println("  Scale Factor set to: " + this.scaleFactor);
+			System.out.println("  Iteration Number set to : " + this.iterationNumber);
+
+			System.out.println("  done.");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Init aborted!");
+		}
+	}
+	
+	private List<Id> readSelectedLinks() {
+		List<Id> links=new Vector<Id>();
+		
+		try {
+			FileReader file_reader = new FileReader(this.selectedLinksFilename);
+			BufferedReader buffered_reader = new BufferedReader(file_reader);
+
+			// Skip header
+			String curr_line = buffered_reader.readLine(); 
+			
+			while ((curr_line = buffered_reader.readLine()) != null) {			
+				links.add(new IdImpl(curr_line.trim()));
+			}
+
+			buffered_reader.close();
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+		
+		
+		return links;
+	}
+
+	/**
+	 *
+	 * @param calcLinkStats
+	 * @return The table containing the count and sim values, link id and the
+	 *         relative error.
+	 */
+	private List<CountSimComparison> createCountsComparisonList() {
+
+		// create a Counts object, which holds the old sim values.
+		// That is clearly a violation, but it is needed for WU
+		Counts counts=Counts.getSingleton();
+		
+		
+		
+		for (Id linkId: this.selectedLinks) {
+			Count count = counts.createCount(new IdImpl(linkId.toString()), "-");
+			double linkVolumes []=this.linkStats0.getAvgLinkVolumes(linkId.toString());
+			
+			for (int i=0; i<24; i++) {		
+				count.createVolume(i+1, linkVolumes[i] );
+				count.setCoord(new Coord(this.network.getLink(linkId).getCenter().getX(),
+						this.network.getLink(linkId).getCenter().getY()));
+			}
+		}
+			
+		
+		// processing counts
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats1,
+				Counts.getSingleton(), this.network);
+		
+		cca.setCountsScaleFactor(this.scaleFactor);
+		cca.run(Counts.getSingleton());
+		return cca.getComparison();
+	}
+
+	/**
+	 * Writes the results of the comparison to a file
+	 *
+	 * @param filename
+	 *          the path to the kml file
+	 */
+	private void writeCountsComparisonList(final String filename) {
+		List<CountSimComparison> countsComparisonList = createCountsComparisonList();
+		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
+				countsComparisonList, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
+		kmlWriter.setIterationNumber(this.iterationNumber);
+		kmlWriter.write(filename);
+
+	}
+
+	/**
+	 * load the network
+	 * 
+	 * @return the network layer
+	 */
+	protected NetworkLayer loadNetwork() {
+		// - read network: which buildertype??
+		printNote("", "  creating network layer... ");
+		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
+				NetworkLayer.LAYER_TYPE, null);
+		printNote("", "  done");
+
+		printNote("", "  reading network xml file... ");
+		new MatsimNetworkReader(network).readFile(this.networkFilename);
+		printNote("", "  done");
+
+		return network;
+	}
+
+	/**
+	 * an internal routine to generated some (nicely?) formatted output. This
+	 * helps that status output looks about the same every time output is written.
+	 *
+	 * @param header
+	 *          the header to print, e.g. a module-name or similar. If empty
+	 *          <code>""</code>, no header will be printed at all
+	 * @param action
+	 *          the status message, will be printed together with a timestamp
+	 */
+	private final void printNote(final String header, final String action) {
+		if (header != "") {
+			System.out.println();
+			System.out.println("===============================================================");
+			System.out.println("== " + header);
+			System.out.println("===============================================================");
+		}
+		if (action != "") {
+			System.out.println("== " + action + " at " + (new Date()));
+		}
+		if (header != "") {
+			System.out.println();
+		}
+	}
+
+	/**
+	 * help output
+	 *
+	 */
+	private static void printHelp() {
+		// String ls = System.getProperty("line.separator");
+		System.out.println("This tool needs the following 8 arguments: ");
+		System.out.println("  - The path to link attributes file 0");
+		System.out.println("  - The path to link attributes file 1");
+		System.out.println("  - The path to file which contains the selected links");
+		System.out.println("  - The path to the output file");
+		System.out.println("  - The path to the network file");
+		System.out.println("  - The scale factor");
+		System.out.println("  - The iteration number");
+		System.out.println("  - The coordinate system");
+	}
+
+	/**
+	 * See printHelp() method
+	 *
+	 * @param args
+	 */
+	public static void main(final String[] args) {
+		LinkStatsAnalyser linkStatsAnalyzer = null;
+		if (args.length != 8) {
+			printHelp();
+		}
+		else {			
+			linkStatsAnalyzer = new LinkStatsAnalyser();
+			linkStatsAnalyzer.init(args);
+			linkStatsAnalyzer.writeCountsComparisonList(linkStatsAnalyzer.outputFilename);
+			System.out.println("File written to " + linkStatsAnalyzer.outputFilename);
+		}
+	}
+}
