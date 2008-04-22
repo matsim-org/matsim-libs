@@ -40,7 +40,12 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.world.Layer;
+import org.matsim.world.Location;
+import org.matsim.world.World;
 
+import playground.balmermi.census2000.data.Municipalities;
+import playground.balmermi.census2000.data.Municipality;
 import playground.balmermi.census2000.data.Persons;
 
 
@@ -56,12 +61,11 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final String CAR = "car";
 	private static final String BIKE = "bike";
 	private static final String WALK = "walk";
-	private static final String E = "e";
 	private static final String W = "w";
-	private static final String S = "s";
 	private static final String H = "h";
 	private static final Coord ZERO = new Coord(0.0,0.0);
 	private final Persons persons;
+	private final Municipalities municipalities;
 	private ModelModeChoice model;
 	private List<PersonSubtour> personSubtours = new Vector<PersonSubtour>();
 	 
@@ -69,10 +73,11 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
-
-	public PersonModeChoiceModel(final Persons persons) {
+	//public PersonModeChoiceModel(final Persons persons, Municipalities municipalities) {
+	public PersonModeChoiceModel(final Persons persons, Municipalities municipalities) {
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.persons = persons;
+		this.municipalities = municipalities;
 		System.out.println("    done.");
 	}
 	
@@ -93,8 +98,8 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void setUpModeChoice(final Plan plan, final PersonSubtour personSubtour) {
-		
+	//private final void setUpModeChoice(final Plan plan, final PersonSubtour personSubtour, final Municipalities municipalities) {
+	private final void setUpModeChoice(final Plan plan, final PersonSubtour personSubtour) {	
 		// setting subtour parameters
 		if (plan == null) { Gbl.errorMsg("Person id=" + plan.getPerson().getId() + "does not have a selected plan."); }
 		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
@@ -116,8 +121,12 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		System.out.println("Work coord " + work_coord);
 
 		int subtours_nr = personSubtour.getSubtours().size()-1;
-		for (int i=subtours_nr; i>=0; i=i-1){	
+		for (int i=0; i<=subtours_nr; i=i+1){
+			
 			Subtour sub = personSubtour.getSubtours().get(i);
+			System.out.println ("sub_in model = " + sub.getNodes());
+			System.out.println ("i = " + i);
+			System.out.println ("sub_mode before = " + sub.getMode());
 			int mainpurpose = sub.getPurpose();
 			// choose mode choice model based on main purpose
 			if (plan.getPerson().getAge() >=18) {
@@ -134,13 +143,6 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 					
 			// generating a random bike ownership (see STRC2007 paper Ciari for more details)
 			boolean has_bike = false;
-//			
-//			if (plan.getPerson().getTravelcards().isEmpty()) {
-//					has_bike = true; 
-//				}
-//			if (!plan.getPerson().hasLicense()) {
-//				has_bike = true; 
-//			}
 			if (Gbl.random.nextDouble() < 0.56) { has_bike = true; }			
 			
 			boolean ride_possible = false;
@@ -148,13 +150,17 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			model.setRide(ride_possible);
 			if (Gbl.random.nextDouble () < 0.38) {ride_possible = true;} // to verify if it makes sense, but till then a mean to 
 			// make things work the right way
+			
 			if (sub.getPrev_subtour()<5){
-				System.out.println("prev subtour = " +  sub.getPrev_subtour());
-				System.out.println("set prev mode = " +  personSubtour.getSubtours().get(sub.getPrev_subtour()).getMode());
-				model.setPrevMode(personSubtour.getSubtours().get(sub.getPrev_subtour()).getMode()); //It seeks the previous sub-tour and get the mode
+				if (i>=1) {
+					System.out.println ("prev_mode in database = " + personSubtour.getSubtours().get(i-1).getMode());
+					model.setPrevMode (personSubtour.getSubtours().get(i-1).getMode());
+				}
+				//				model.setPrevMode(personSubtour.getSubtours().get(sub.getPrev_subtour()).getMode()); //It seeks the previous sub-tour and get the mode
 				
 			}
 			else model.setPrevMode(5); // 5 means that the subtour starts at home
+			System.out.println("prev subtour's mode = " +  model.prev_mode);
 			
 			// setting person parameters
 			System.out.println(model);
@@ -169,7 +175,16 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			System.out.println("Travelcards: " + model.tickets);
 			model.setBike(has_bike);
 			model.setMale (plan.getPerson().getSex());
-			int udeg = 4; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
+			//int udeg = 4; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
+			Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
+			ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
+			Location loc = locs.get(Gbl.random.nextInt(locs.size()));
+			Municipality m = municipalities.getMunicipality(new Integer(loc.getId().toString()));
+			int udeg = m.getRegType();
+			System.out.println ("udeg");
+			//Iterator<Location> l_it = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY).getLocations().values().iterator(); //TODO controllare se serve!!!!!
+			
+			
 			model.setUrbanDegree(udeg);
 			model.setMainPurpose(mainpurpose);
 			model.setDistanceTour(sub.getDistance()); // model needs meters! 
@@ -189,7 +204,8 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			else { Gbl.errorMsg("Mode choice returns undefined value!"); }
 			System.out.println("modechoice = " + modechoice);
 			System.out.println();
-			sub.setMode(modechoice);
+			personSubtour.getSubtours().get(i).setMode(modechoice);
+			//sub.setMode(modechoice);
 						
 			for (int k=1; k<sub.getNodes().size(); k=k+1){
 				((Leg)plan.getActsLegs().get(sub.getNodes().get(k)-1)).setMode(mode);
@@ -212,11 +228,12 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		pste.run(person);
 		subtours = pste.getSubtours();
 		subtour_idx = pste.getSubtourIdx();
-		System.out.println("subtour_idx != " + subtour_idx);
+		System.out.println("person_id = " + person.getId());
 		PersonSubtourHandler psh = new PersonSubtourHandler();
 		PersonSubtour personSubtour = new PersonSubtour(); //TODO Change the constructor and place it below the psh.run
 		psh.run(plan,subtours,subtour_idx);
 		personSubtour = psh.getPers_sub();
+		//this.setUpModeChoice(plan,personSubtour, municipalities);
 		this.setUpModeChoice(plan,personSubtour);
 		personSubtour.setPerson_id(person.getId());	
 		this.personSubtours.add(personSubtour);	

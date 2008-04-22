@@ -101,12 +101,11 @@ public class PersonSubtourHandler {
 			// Defining previous sub-tour
 			 // The sub-tour starts at the agent's home location
 			int prev_subtour = -1;
-			System.out.println("subtour first node" + subtour.get(0));
+			System.out.println("subtour first node = " + subtour.get(0));
 			if (subtour.get(0) == 0) {prev_subtour = 5;}
 			else {
 				for (int j=subtours.size()-1; j>=0; j=j-1) {
 					if (subtours.get(j).contains(subtour.get(0))) {
-						System.out.println ("subtour = " + subtour);
 						System.out.println ("prev_subtour = " + subtours.get(j));
 						prev_subtour = j; break;
 					}

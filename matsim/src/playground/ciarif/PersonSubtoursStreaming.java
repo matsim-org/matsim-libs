@@ -81,7 +81,8 @@ public class PersonSubtoursStreaming {
 //		persons.persons.put(person.p_id,person);
 		
 		System.out.println("  adding mode choice module...");
-		PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons);
+		PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons, municipalities);
+		//PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons);
 		plans.addAlgorithm(pmcm);
 		System.out.println("  done.");
 

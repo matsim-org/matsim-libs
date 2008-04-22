@@ -60,7 +60,7 @@ public class ModelModeChoiceEducation18Minus extends ModelModeChoice {
 		else if (udeg == 4) { util += B2_T4 * 1.0; }
 		else if (udeg == 5) { util += B2_T5 * 1.0; }
 		else { Gbl.errorMsg("This should never happen!"); }
-		System.out.println("Util pt = " + util);
+		//System.out.println("Util pt = " + util);
 		return util;
 	}
 
@@ -69,7 +69,7 @@ public class ModelModeChoiceEducation18Minus extends ModelModeChoice {
 		double util = 0.0;
 		util += B3_CONST * 1.0;
 		if (age <= 12 & age >= 6 ) { util += B3_6_12 * 1.0; }
-		System.out.println("Util ride = " + util);
+		//System.out.println("Util ride = " + util);
 		return util;
 	}
 	
@@ -80,7 +80,7 @@ public class ModelModeChoiceEducation18Minus extends ModelModeChoice {
 				double util = 0.0;
 				util += B4_CONST * 1.0;
 				util += B4_Dist * dist_subtour;
-				System.out.println("Util bike = " + util);
+				//System.out.println("Util bike = " + util);
 				return util;
 			}
 			else {return Double.NEGATIVE_INFINITY;}
@@ -98,7 +98,7 @@ public class ModelModeChoiceEducation18Minus extends ModelModeChoice {
 		util += B5_CONST * 1.0;
 		util += B5_Dist * dist_subtour;
 		if (age <= 12 & age >= 6 ) { util += B5_6_12 * 1.0; } 
-		System.out.println("Util walk = " + util);
+		//System.out.println("Util walk = " + util);
 		return util;
 	}
 }

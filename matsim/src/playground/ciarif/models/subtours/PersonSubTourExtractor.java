@@ -60,7 +60,6 @@ public class PersonSubTourExtractor extends PersonAlgorithm implements PlanAlgor
 	 private final ArrayList<Integer> removeSubTour (int start, int end,ArrayList<Integer> tour) {
 			for (int i=0; i<(end-start); i=i+1){
 				tour.remove(start+1);
-				System.out.println("tour " + tour);
 			}
 			return tour;
 	 }

@@ -62,7 +62,7 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 		util += B5_CONST * 1.0;
 		util += B5_Dist * dist_subtour;
 		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B5_Prev * 1.0;}
-		System.out.println("Util walk = " + util);
+		//System.out.println("Util walk = " + util);
 		return util;
 	}
 
@@ -73,7 +73,7 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 				double util = 0.0;
 				util += B4_CONST * 1.0;
 				util += B4_Dist * dist_subtour;
-				System.out.println("Util bike = " + util);
+				//System.out.println("Util bike = " + util);
 				return util;
 			}
 			else {return Double.NEGATIVE_INFINITY;}
@@ -96,7 +96,7 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 				else if (udeg == 4) { util += B1_T4 * 1.0; }
 				else if (udeg == 5) { util += B1_T5 * 1.0; }
 				else { Gbl.errorMsg("This should never happen!"); }
-				System.out.println("Util car = " + util);
+				//System.out.println("Util car = " + util);
 				return util;
 			}
 			else {return Double.NEGATIVE_INFINITY;}	
@@ -116,7 +116,7 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 		else if (udeg == 4) { util += B2_T4 * 1.0; }
 		else if (udeg == 5) { util += B2_T5 * 1.0; }
 		else { Gbl.errorMsg("This should never happen!"); }
-		System.out.println("Util pt = " + util);
+		//System.out.println("Util pt = " + util);
 		return util;
 	}
 
@@ -128,7 +128,7 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 				util += B3_CONST * 1.0;
 				if (age >= 18 & age < 30) {util += B3_18_30 * 1.0;}
 				if (age >= 60 ) { util += B3_60 * 1.0; }
-				System.out.println("Util ride = " + util);
+				//System.out.println("Util ride = " + util);
 				return util;
 			}
 			else {return Double.NEGATIVE_INFINITY;}

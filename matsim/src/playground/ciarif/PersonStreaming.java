@@ -27,7 +27,6 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 
-import playground.balmermi.Scenario;
 import playground.balmermi.census2000.data.Household;
 import playground.balmermi.census2000.data.Households;
 import playground.balmermi.census2000.data.Person;
@@ -37,10 +36,10 @@ import playground.ciarif.models.subtours.PersonModeChoiceModel;
 
 public class PersonStreaming {
 
-	public static void run(String[] args) {
+	public static void run() {
 
-		Config config = Gbl.createConfig(args);
-//		Scenario.setUpScenarioConfig();
+		//Config config = Gbl.createConfig(args);
+		Scenario.setUpScenarioConfig();
 
 		System.out.println("person streaming...");
 
@@ -70,20 +69,20 @@ public class PersonStreaming {
 //		persons.households = hhs;
 		persons.persons.put(person.p_id,person);
 		
-		PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons);
-		plans.addAlgorithm(pmcm);
+		//PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons);
+		//plans.addAlgorithm(pmcm);
 		
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-//		plansReader.readFile ("input/plans.xml");
+		//plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile ("input/plans.xml");
 		plans.printPlansCount();
 		plans.runAlgorithms();
-		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt", pmcm.getPersonSubtours());
-		pidst.write();
+		//PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt", pmcm.getPersonSubtours());
+		//pidst.write();
 		plansWriter.write();
 		System.out.println("  done.");
 
@@ -101,7 +100,7 @@ public class PersonStreaming {
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 		Gbl.printElapsedTime();
-		run(args);
+		run();
 		Gbl.printElapsedTime();
 	}
 }

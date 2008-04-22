@@ -68,7 +68,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 		double util = 0.0;
 		util += B5_CONST * 1.0;
 		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B5_Prev * 1.0;}
-		System.out.println("Util walk = " + util);
+		//System.out.println("Util walk = " + util);
 		return util;
 	}
 
@@ -81,7 +81,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 				util += B4_Dist * dist_subtour;
 				util += B4_H_W * dist_h_w;
 				if (prev_mode == 3) {util += B4_Prev * prev_mode;}
-				System.out.println("Util bike = " + util);
+				//System.out.println("Util bike = " + util);
 				return util;
 			}
 			else {return Double.NEGATIVE_INFINITY;}
@@ -95,7 +95,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 		
 		if (license == 1){
 			//System.out.println("prev_mode_model = " + prev_mode);
-			if ((prev_mode == 5)||(prev_mode == 0)) {
+			if (prev_mode == 5 || prev_mode == 0) {
 				double util = 0.0;
 				util += B1_CONST * 1.0;
 				util += B1_Dist * dist_subtour;
@@ -108,7 +108,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 				else if (udeg == 4) { util += B1_T4 * 1.0; }
 				else if (udeg == 5) { util += B1_T5 * 1.0; }
 				else { Gbl.errorMsg("This should never happen!"); }
-				System.out.println("Util car = " + util);
+				//System.out.println("Util car = " + util);
 				return util;
 				
 			}
@@ -131,7 +131,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 		else if (udeg == 4) { util += B2_T4 * 1.0; }
 		else if (udeg == 5) { util += B2_T5 * 1.0; }
 		else { Gbl.errorMsg("This should never happen!"); }
-		System.out.println("Util pt = " + util);
+		//System.out.println("Util pt = " + util);
 		return util;
 	}
 
@@ -145,7 +145,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 				util += B3_H_W * dist_h_w;
 				if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B3_Prev * 1.0;}
 				if (age < 30 & age >= 18) { util += B3_18_30 * 1.0; }
-				System.out.println("Util ride = " + util);
+				//System.out.println("Util ride = " + util);
 				return util;
 			}
 			else {return Double.NEGATIVE_INFINITY;}
