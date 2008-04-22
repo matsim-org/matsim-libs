@@ -72,7 +72,12 @@ public class CountsComparisonAlgorithm extends CountsAlgorithm {
 		this.counts = counts;
 		this.countSimComp = new Vector<CountSimComparison>();
 		this.network = network;
-		this.countsScaleFactor = Gbl.getConfig().counts().getCountsScaleFactor();
+		if (Gbl.getConfig()!=null) {
+			this.countsScaleFactor = Gbl.getConfig().counts().getCountsScaleFactor();
+		}
+		else {
+			this.countsScaleFactor=1.0;
+		}
 	}
 	/**
 	 * Creates the List with the counts vs sim values stored in the
