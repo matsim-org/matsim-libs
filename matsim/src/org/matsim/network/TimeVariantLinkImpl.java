@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.network;
 
+import java.util.PriorityQueue;
+
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
@@ -41,8 +43,8 @@ public class TimeVariantLinkImpl extends AbstractLink {
 
 	private TreeMap<Double, Double> freespeedEvents;
 	private TreeMap<Double, Double> freespeedTravelTime;
-
-
+	
+	private PriorityQueue<NetworkChangeEvent> changeEvents;
 
 	private double flowCapacity;
 
@@ -78,6 +80,16 @@ public class TimeVariantLinkImpl extends AbstractLink {
 
 
 	private void initNetworkChangeEvents() {
+		
+		this.changeEvents = new PriorityQueue<NetworkChangeEvent>();		
+		
+		initFreespeedEvent();
+		
+
+
+	}
+
+	private void initFreespeedEvent() {
 		this.freespeedEvents = new TreeMap<Double, Double>();
 		this.freespeedEvents.put(-1., this.freespeed); // make sure that freespeed is set to 'default' freespeed as long as no change event occurs
 		this.freespeedEvents.put(org.matsim.utils.misc.Time.UNDEFINED_TIME, this.freespeed); // make sure that freespeed is set to 'default' freespeed as long as no change event occurs
@@ -85,12 +97,13 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		this.freespeedTravelTime = new TreeMap<Double, Double>();
 		this.freespeedTravelTime.put(-1., this.length / this.freespeed);
 		this.freespeedTravelTime.put(org.matsim.utils.misc.Time.UNDEFINED_TIME, this.length / this.freespeed);
-
+		
 	}
 
-
-
 //	calc methods
+
+
+
 
 
 
@@ -114,10 +127,16 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	 */
 	@Override
 	public double getFreespeed(double time) {
+		if (this.freespeedEvents == null) {
+			rebuildFreespeedChange();
+		}
 		return this.freespeedEvents.floorEntry(time).getValue();
 	}
 
 	public double getFreespeedTravelTime(double time) {
+		if (this.freespeedTravelTime == null) {
+			rebuildFreespeedChange();
+		}
 		return this.freespeedTravelTime.floorEntry(time).getValue();
 	}
 
@@ -139,7 +158,7 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	 *  @param time - the time on which the event occurs
 	 *  @param freespeed - the new freespeed
 	 */
-	public void addFreespeedEvent(final double time, final double freespeed) {
+	private void addFreespeedEvent(final double time, final double freespeed) {
 		this.freespeedEvents.put(time, freespeed);
 		if (freespeed <= 0) {
 			this.freespeedTravelTime.put(time,Double.POSITIVE_INFINITY);
@@ -151,27 +170,16 @@ public class TimeVariantLinkImpl extends AbstractLink {
 
 	/**
 	 * This method applies a new change event to the link.
-	 * The order in which these change events are applied to
-	 * the link does not matter as long as ALL change event
-	 * types are ABSOLUTE with undefined end time. In all other
-	 * cases the events have to be applied chronological.
 	 *
 	 * @param event
 	 */
 	public void applyEvent(NetworkChangeEvent event) {
+		
+		this.changeEvents.add(event);
+		
 		if (event.getFreespeedChange() != null) {
-			ChangeValue freespeedChange = event.getFreespeedChange();
-			double currentFreeSpeed = getFreespeed(event.getStartTime());
-			if (freespeedChange.getType() == NetworkChangeEvent.ChangeType.FACTOR){
-				this.addFreespeedEvent(event.getStartTime(),currentFreeSpeed * freespeedChange.getValue());
-			} else {
-				this.addFreespeedEvent(event.getStartTime(), freespeedChange.getValue());
-			}
-
-			if (event.getEndTime() != org.matsim.utils.misc.Time.UNDEFINED_TIME) {
-				this.addFreespeedEvent(event.getEndTime(), currentFreeSpeed);
-			}
-
+			this.freespeedEvents = null;
+			this.freespeedTravelTime = null;
 		}
 		if (event.getFlowCapacityChange() != null) {
 			throw  new RuntimeException("Flow capacity change capability is not implemented yet!");
@@ -183,6 +191,33 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	}
 
 //	print methods
+
+
+	private void rebuildFreespeedChange() {
+		
+		
+		PriorityQueue<NetworkChangeEvent> events = new PriorityQueue<NetworkChangeEvent>(this.changeEvents);
+		this.initFreespeedEvent();
+		while (events.peek() != null) {
+			NetworkChangeEvent event = events.poll();
+			if (event.getFreespeedChange() != null) {
+				ChangeValue freespeedChange = event.getFreespeedChange();
+				double currentFreeSpeed = getFreespeed(event.getStartTime());
+				if (freespeedChange.getType() == NetworkChangeEvent.ChangeType.FACTOR){
+					this.addFreespeedEvent(event.getStartTime(),currentFreeSpeed * freespeedChange.getValue());
+				} else {
+					this.addFreespeedEvent(event.getStartTime(), freespeedChange.getValue());
+				}
+
+				if (event.getEndTime() != org.matsim.utils.misc.Time.UNDEFINED_TIME) {
+					//TODO this makes trouble with overlapping intervals. for now we throw an exception ... [GL] 
+					throw new RuntimeException("at the moment only events without a duration can be handled!");
+//					this.addFreespeedEvent(event.getEndTime(), currentFreeSpeed);
+				}				
+			}
+		}
+		
+	}
 
 
 	@Override
