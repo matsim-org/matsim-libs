@@ -67,21 +67,29 @@ public class WestumfahrungRuns {
 	private final String TRANSIT_PERSON_ID_PATTERN = "[0-9]{10}";
 	private final String NON_TRANSIT_PERSON_ID_PATTERN = "[0-9]{1,9}";
 
-	// compare 2 scenarios. one might comapre as many as one wants, just have to expand the list of command line parameters
-	private final String BEFORE = "before";
-	private final String AFTER = "after";
-	private final String[] scenarios = new String[]{BEFORE, AFTER};
+	// compare 2 scenarios
+	private String scenarioNameBefore = "before";
+	private String scenarioNameAfter = "after";
+	private String[] scenarioNames = new String[]{scenarioNameBefore, scenarioNameAfter};
 
 	// analyses
 	private final int TRANSIT_AGENTS_ANALYSIS_NAME = 0;
 	private final int NON_TRANSIT_AGENTS_ANALYSIS_NAME = 1;
 	private final int ROUTE_SWITCHERS_ANALYSIS_NAME = 2;
-	private final int WESTTANGENTE_NEIGHBORS_ANALYSIS_NAME = 3;
+	private final int WESTSTRASSE_NEIGHBORS_ANALYSIS_NAME = 3;
 	private TreeMap<Integer, String> analysisNames = new TreeMap<Integer, String>();
 
-	private String networkInputFilename = null;
+	// analysisRegions
+	private HashSet<Id> weststrasseLinkIds = new HashSet<Id>();
+	private HashSet<Id> seebahnstrasseLinkIds = new HashSet<Id>();
+	private HashSet<Id> rosengartenstrasseLinkIds = new HashSet<Id>();
+
+//	private HashSet<Id> westtangenteLinkIds = new HashSet<Id>();
+	private HashSet<Id> westumfahrungLinkIds = new HashSet<Id>();
+
 	private TreeMap<String, String> plansInputFilenames = new TreeMap<String, String>();
 	private TreeMap<String, String> eventsInputFilenames = new TreeMap<String, String>();
+	private TreeMap<String, String> networkInputFilenames = new TreeMap<String, String>();
 	private String outFilename = null;
 	private ArrayList<String> outLines = new ArrayList<String>();
 
@@ -97,9 +105,43 @@ public class WestumfahrungRuns {
 
 	private void run(String[] args) {
 
-		if (args.length != 6) {
+		System.out.println("Processing command line parameters...");
+		this.processArgs(args);
+		System.out.println("Processing command line parameters...done.");
+		System.out.flush();
+		System.out.println("Init...");
+		this.init();
+		System.out.println("Init...done.");
+		System.out.flush();
+		System.out.println("Performing analyses...");
+		this.doAnalyses();
+		System.out.println("Performing analyses...done.");
+		System.out.flush();
+		System.out.println("Writing out results...");
+		this.writeResults();
+		System.out.println("Writing out results...done.");
+		System.out.flush();
+
+	}
+
+	private void writeResults() {
+
+		File outFile = new File(outFilename);
+		try {
+			FileUtils.writeLines(outFile, "UTF-8", outLines);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	private void processArgs(String[] args) {
+
+
+		if (args.length != 8) {
 			System.out.println("Usage:");
-			System.out.println("java WestumfahrungRuns network plans_before events_before plans_after events_after output");
+			System.out.println("java WestumfahrungRuns network plans_before events_before plans_after events_after");
 			System.out.println("");
 			System.out.println("You might populate your MATSim/input directory like the following:");
 			System.out.println("");
@@ -119,37 +161,71 @@ public class WestumfahrungRuns {
 			System.out.println("");
 			System.exit(-1);
 		} else {
-			networkInputFilename = args[0];
-			int argsIndex = 1;
-			for (String scenarioName : scenarios) {
-				plansInputFilenames.put(scenarioName, args[argsIndex]);
+			int argsIndex = 0;
+			for (int ii=0; ii<=1; ii++) {
+				switch(ii) {
+				case 0:
+					scenarioNameBefore = args[argsIndex];
+					break;
+				case 1:
+					scenarioNameAfter = args[argsIndex];
+					break;
+				}
+				scenarioNames[ii] = args[argsIndex];
 				argsIndex++;
-				eventsInputFilenames.put(scenarioName, args[argsIndex]);
+				networkInputFilenames.put(scenarioNames[ii], args[argsIndex]);
+				argsIndex++;
+				plansInputFilenames.put(scenarioNames[ii], args[argsIndex]);
+				argsIndex++;
+				eventsInputFilenames.put(scenarioNames[ii], args[argsIndex]);
 				argsIndex++;
 			}
-			outFilename = args[5];
+			outFilename = "output/" + args[0] + "_vs_" + args[4] + ".txt";
 		}
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkInputFilename);
-		Gbl.getWorld().setNetworkLayer(network);
+	}
+
+	private void init() {
 
 		analysisNames.put(new Integer(TRANSIT_AGENTS_ANALYSIS_NAME), "transit");
 		analysisNames.put(new Integer(NON_TRANSIT_AGENTS_ANALYSIS_NAME), "non transit");
 		analysisNames.put(new Integer(ROUTE_SWITCHERS_ANALYSIS_NAME), "route switchers");
-		analysisNames.put(new Integer(WESTTANGENTE_NEIGHBORS_ANALYSIS_NAME), "westtangente neighbors");
+		analysisNames.put(new Integer(WESTSTRASSE_NEIGHBORS_ANALYSIS_NAME), "weststrasse neighbors");
 
-		this.buildBeforeAfterAnalyses();
+		List<String> lines = new ArrayList<String>();
 
-		File outFile = new File(outFilename);
-		try {
-			FileUtils.writeLines(outFile, "UTF-8", outLines);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		File streetLinksFile = null;
+
+		// build up westtangente streets
+		for (String street : new String[]{"seebahnstrasse", "weststrasse", "rosengartenstrasse"}) {
+			streetLinksFile = new File("input/" + street + ".txt");
+			try {
+				lines = FileUtils.readLines(streetLinksFile, "UTF-8");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			if (street.equals("seebahnstrasse")) {
+				for (String line : lines) {
+					seebahnstrasseLinkIds.add(new IdImpl(Integer.parseInt(line)));
+				}
+			} else if (street.equals("weststrasse")) {
+				for (String line : lines) {
+					weststrasseLinkIds.add(new IdImpl(Integer.parseInt(line)));
+				}
+			} else if (street.equals("rosengartenstrasse")) {
+				for (String line : lines) {
+					rosengartenstrasseLinkIds.add(new IdImpl(Integer.parseInt(line)));
+				}
+			}
 		}
-	}
 
+		// build up westumfahrung
+		for (int linkNr = 3000000; linkNr <= 3000005; linkNr++) {
+			westumfahrungLinkIds.add(new IdImpl(linkNr));
+		}
+
+	}
 
 	/**
 	 * Gets all agents that use a set of links in one plans file and use another set in another plans file.
@@ -158,28 +234,7 @@ public class WestumfahrungRuns {
 	 * 
 	 * Summarize their average trip travel times, the scores of their selected plans, and their home locations.
 	 */
-	private void buildBeforeAfterAnalyses() {
-
-		HashSet<Id> westtangenteLinkIds = new HashSet<Id>();
-		westtangenteLinkIds.add(new IdImpl(106121));
-		westtangenteLinkIds.add(new IdImpl(106122));
-		westtangenteLinkIds.add(new IdImpl(106118));
-		westtangenteLinkIds.add(new IdImpl(107166));
-		westtangenteLinkIds.add(new IdImpl(108039));
-		westtangenteLinkIds.add(new IdImpl(108041));
-		westtangenteLinkIds.add(new IdImpl(110650));
-		westtangenteLinkIds.add(new IdImpl(106304));
-		westtangenteLinkIds.add(new IdImpl(106303));
-		westtangenteLinkIds.add(new IdImpl(106116));
-		westtangenteLinkIds.add(new IdImpl(108049));
-		westtangenteLinkIds.add(new IdImpl(106110));
-		westtangenteLinkIds.add(new IdImpl(106721));
-		westtangenteLinkIds.add(new IdImpl(106722));
-
-		HashSet<Id> westumfahrungLinkIds = new HashSet<Id>();
-		for (int linkNr = 3000000; linkNr <= 3000005; linkNr++) {
-			westumfahrungLinkIds.add(new IdImpl(linkNr));
-		}
+	private void doAnalyses() {
 
 		TreeMap<Integer, TreeMap<String, PersonIdRecorder>> personIdRecorders = new TreeMap<Integer, TreeMap<String, PersonIdRecorder>>();
 
@@ -187,10 +242,16 @@ public class WestumfahrungRuns {
 			personIdRecorders.put(analysis, new TreeMap<String, PersonIdRecorder>());
 		}
 		TreeMap<String, Plans> scenarioPlans = new TreeMap<String, Plans>();
+		TreeMap<String, NetworkLayer> scenarioNetworks = new TreeMap<String, NetworkLayer>();
 
 		PersonIdRecorder personIdRecorder = null;
 		PlansAlgorithm filterAlgorithm = null;
-		for (String scenarioName : scenarios) {
+		for (String scenarioName : scenarioNames) {
+
+			NetworkLayer network = new NetworkLayer();
+			new MatsimNetworkReader(network).readFile(networkInputFilenames.get(scenarioName));
+			scenarioNetworks.put(scenarioName, network);
+			Gbl.getWorld().setNetworkLayer(network);
 
 			Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null);
 			scenarioPlans.put(scenarioName, plans);
@@ -211,22 +272,28 @@ public class WestumfahrungRuns {
 					RouteLinkFilter routeLinkFilter = new RouteLinkFilter(personIdRecorder);
 					filterAlgorithm = new SelectedPlanFilter(routeLinkFilter);
 
-					if (scenarioName.equals(BEFORE)) {
-						for (Id linkId : westtangenteLinkIds) {
+					if (scenarioName.equals(scenarioNameBefore)) {
+						for (Id linkId : weststrasseLinkIds) {
 							routeLinkFilter.addLink(linkId);
 						}
-					} else if (scenarioName.equals(AFTER)) {
+						for (Id linkId : seebahnstrasseLinkIds) {
+							routeLinkFilter.addLink(linkId);
+						}
+						for (Id linkId : rosengartenstrasseLinkIds) {
+							routeLinkFilter.addLink(linkId);
+						}
+					} else if (scenarioName.equals(scenarioNameAfter)) {
 						for (Id linkId : westumfahrungLinkIds) {
 							routeLinkFilter.addLink(linkId);
 						}
 					}
 					break;
-				case WESTTANGENTE_NEIGHBORS_ANALYSIS_NAME:
-					ActLinkFilter homeAtTheWesttangenteFilter = new ActLinkFilter(".*h.*", personIdRecorder);
-					filterAlgorithm = new SelectedPlanFilter(homeAtTheWesttangenteFilter);
+				case WESTSTRASSE_NEIGHBORS_ANALYSIS_NAME:
+					ActLinkFilter homeAtTheWeststrasseFilter = new ActLinkFilter(".*h.*", personIdRecorder);
+					filterAlgorithm = new SelectedPlanFilter(homeAtTheWeststrasseFilter);
 
-					for (Id linkId : westtangenteLinkIds) {
-						homeAtTheWesttangenteFilter.addLink(linkId);
+					for (Id linkId : weststrasseLinkIds) {
+						homeAtTheWeststrasseFilter.addLink(linkId);
 					}
 					break;
 				default:
@@ -241,15 +308,15 @@ public class WestumfahrungRuns {
 		}
 
 		// make this nicer, because all analyses are of the same kind :-)
-		HashSet<Id> routeSwitchersPersonIds = (HashSet<Id>) personIdRecorders.get(ROUTE_SWITCHERS_ANALYSIS_NAME).get(AFTER).getIds().clone();
-		routeSwitchersPersonIds.retainAll(personIdRecorders.get(ROUTE_SWITCHERS_ANALYSIS_NAME).get(BEFORE).getIds());
+		HashSet<Id> routeSwitchersPersonIds = (HashSet<Id>) personIdRecorders.get(ROUTE_SWITCHERS_ANALYSIS_NAME).get(scenarioNameAfter).getIds().clone();
+		routeSwitchersPersonIds.retainAll(personIdRecorders.get(ROUTE_SWITCHERS_ANALYSIS_NAME).get(scenarioNameBefore).getIds());
 
-		HashSet<Id> neighborsPersonIds = personIdRecorders.get(WESTTANGENTE_NEIGHBORS_ANALYSIS_NAME).get(BEFORE).getIds();
-		HashSet<Id> transitAgentsIds = personIdRecorders.get(TRANSIT_AGENTS_ANALYSIS_NAME).get(BEFORE).getIds();
-		HashSet<Id> nonTransitAgentsIds = personIdRecorders.get(NON_TRANSIT_AGENTS_ANALYSIS_NAME).get(BEFORE).getIds();
+		HashSet<Id> neighborsPersonIds = personIdRecorders.get(WESTSTRASSE_NEIGHBORS_ANALYSIS_NAME).get(scenarioNameBefore).getIds();
+		HashSet<Id> transitAgentsIds = personIdRecorders.get(TRANSIT_AGENTS_ANALYSIS_NAME).get(scenarioNameBefore).getIds();
+		HashSet<Id> nonTransitAgentsIds = personIdRecorders.get(NON_TRANSIT_AGENTS_ANALYSIS_NAME).get(scenarioNameBefore).getIds();
 
-		System.out.println("Agents before: " + personIdRecorders.get(ROUTE_SWITCHERS_ANALYSIS_NAME).get(BEFORE).getIds().size());
-		System.out.println("Agents after: " + personIdRecorders.get(ROUTE_SWITCHERS_ANALYSIS_NAME).get(AFTER).getIds().size());
+		System.out.println("Agents before: " + personIdRecorders.get(ROUTE_SWITCHERS_ANALYSIS_NAME).get(scenarioNameBefore).getIds().size());
+		System.out.println("Agents after: " + personIdRecorders.get(ROUTE_SWITCHERS_ANALYSIS_NAME).get(scenarioNameAfter).getIds().size());
 		System.out.println("Route switchers: " + routeSwitchersPersonIds.size());
 		System.out.println("number of neighbors: " + neighborsPersonIds.size());
 		System.out.println("number of transit agents: " + transitAgentsIds.size());
@@ -260,7 +327,10 @@ public class WestumfahrungRuns {
 		for (Integer analysis : analysisNames.keySet()) {
 
 			ArrayList<CaseStudyResult> results = new ArrayList<CaseStudyResult>();
-			for (String scenarioName : scenarios) {
+			for (String scenarioName : scenarioNames) {
+
+				// choose right network
+				Gbl.getWorld().setNetworkLayer(scenarioNetworks.get(scenarioName));
 
 				Plans plansSubPop = new Plans(false);
 				switch(analysis.intValue()) {
@@ -273,7 +343,7 @@ public class WestumfahrungRuns {
 				case ROUTE_SWITCHERS_ANALYSIS_NAME:
 					personIterator = routeSwitchersPersonIds.iterator();
 					break;
-				case WESTTANGENTE_NEIGHBORS_ANALYSIS_NAME:
+				case WESTSTRASSE_NEIGHBORS_ANALYSIS_NAME:
 					personIterator = neighborsPersonIds.iterator();
 					break;
 				default:
