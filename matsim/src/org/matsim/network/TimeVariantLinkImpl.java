@@ -209,11 +209,6 @@ public class TimeVariantLinkImpl extends AbstractLink {
 					this.addFreespeedEvent(event.getStartTime(), freespeedChange.getValue());
 				}
 
-				if (event.getEndTime() != org.matsim.utils.misc.Time.UNDEFINED_TIME) {
-					//TODO this makes trouble with overlapping intervals. for now we throw an exception ... [GL] 
-					throw new RuntimeException("at the moment only events without a duration can be handled!");
-//					this.addFreespeedEvent(event.getEndTime(), currentFreeSpeed);
-				}				
 			}
 		}
 		

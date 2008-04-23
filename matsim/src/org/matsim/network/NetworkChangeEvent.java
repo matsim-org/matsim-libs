@@ -73,8 +73,6 @@ public class NetworkChangeEvent implements Comparable{
 
 	private double startTime;
 
-	private double endTime = Time.UNDEFINED_TIME;
-
 	private ChangeValue flowCapacityChange = null;
 
 	private ChangeValue freespeedChange = null;
@@ -107,24 +105,6 @@ public class NetworkChangeEvent implements Comparable{
 		return startTime;
 	}
 
-	/**
-	 * 
-	 * @return the time at which all changes induces by this event should be
-	 *         reversed.
-	 */
-	public double getEndTime() {
-		return endTime;
-	}
-
-	/**
-	 * 
-	 * @param endTime
-	 *            the time at which all changes induces by this event should be
-	 *            reversed.
-	 */
-	public void setEndTime(double endTime) {
-		this.endTime = endTime;
-	}
 
 	/**
 	 * 

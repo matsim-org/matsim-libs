@@ -61,8 +61,6 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 	
 	protected static final String START_TIME_TAG = "startTime";
 	
-	protected static final String END_TIME_TAG = "endTime";
-	
 	protected static final String LINK_TAG = "link";
 	
 	protected static final String REF_ID_TAG = "refId";
@@ -194,9 +192,6 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 			String value = atts.getValue(START_TIME_TAG);
 			if(value != null) {
 				currentEvent = new NetworkChangeEvent(Time.parseTime(value));
-				value = atts.getValue(END_TIME_TAG);
-				if(value != null)
-					currentEvent.setEndTime(Time.parseTime(value));
 			} else {
 				currentEvent = null;
 				log.warn("A start time must be defined!");

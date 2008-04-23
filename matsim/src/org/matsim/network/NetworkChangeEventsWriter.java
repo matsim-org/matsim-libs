@@ -125,14 +125,6 @@ public class NetworkChangeEventsWriter extends MatsimXmlWriter {
 		writer.write(QUOTE);
 		writer.write(Time.writeTime(event.getStartTime()));
 		writer.write(QUOTE);
-		if(event.getEndTime() >= 0) {
-			writer.write(WHITESPACE);
-			writer.write(NetworkChangeEventsParser.END_TIME_TAG);
-			writer.write(EQUALS);
-			writer.write(QUOTE);
-			writer.write(Time.writeTime(event.getEndTime()));
-			writer.write(QUOTE);
-		}
 		writer.write(CLOSE_TAG_1);
 		writer.write(NL);
 		
