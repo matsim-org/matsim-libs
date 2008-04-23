@@ -54,7 +54,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author ychen
  * 
  */
-public class MATSimNet2QGIS {
+public class MATSimNet2QGIS3 {
 	/**
 	 * this class is only a copy of
 	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class>
@@ -79,7 +79,7 @@ public class MATSimNet2QGIS {
 	private NetworkLayer network;
 	private CoordinateReferenceSystem crs = null;
 	public static String ch1903 = "PROJCS[\"CH1903_LV03\",GEOGCS[\"GCS_CH1903\",DATUM[\"D_CH1903\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Hotine_Oblique_Mercator_Azimuth_Center\"],PARAMETER[\"False_Easting\",600000],PARAMETER[\"False_Northing\",200000],PARAMETER[\"Scale_Factor\",1],PARAMETER[\"Azimuth\",90],PARAMETER[\"Longitude_Of_Center\",7.439583333333333],PARAMETER[\"Latitude_Of_Center\",46.95240555555556],UNIT[\"Meter\",1],AUTHORITY[\"EPSG\",\"21781\"]]";
-	private NetworkToGraph2 n2g;
+	private NetworkToGraph3 n2g;
 
 	public void readNetwork(String netFilename) {
 		Config config = Gbl.createConfig(null);
@@ -97,7 +97,7 @@ public class MATSimNet2QGIS {
 		} catch (FactoryException e) {
 			e.printStackTrace();
 		}
-		this.n2g = new NetworkToGraph2(this.network, this.crs);
+		this.n2g = new NetworkToGraph3(this.network, this.crs);
 	}
 
 	/**

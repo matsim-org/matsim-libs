@@ -50,13 +50,16 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  */
 public class NetworkToGraph2 {
 
-	private NetworkLayer network;
-	private CoordinateReferenceSystem crs;
-	private GeometryFactory geofac;
-	private Collection<Feature> features;
-	private DefaultFeatureTypeFactory dftf;
-	private List<Map<String, ?>> parameters = new ArrayList<Map<String, ?>>();
-	private List<AttributeType> attrTypes = new ArrayList<AttributeType>();
+	protected NetworkLayer network;
+	protected CoordinateReferenceSystem crs;
+	protected GeometryFactory geofac;
+	protected Collection<Feature> features;
+	protected DefaultFeatureTypeFactory dftf;
+	protected List<Map<String, ?>> parameters = new ArrayList<Map<String, ?>>();
+	protected List<AttributeType> attrTypes = new ArrayList<AttributeType>();
+
+	public NetworkToGraph2() {
+	}// dummy constructor
 
 	public NetworkToGraph2(NetworkLayer network,
 			CoordinateReferenceSystem coordinateReferenceSystem) {
