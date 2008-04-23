@@ -19,8 +19,8 @@ public class CompareSelectedPlansTable {
 
 	private Plans plans0;
 	private Plans plans1;
-	private String header="person_id\tsex\tage\tlicense\tcar_avail\t" +
-			"employed\thome_x\thome_y\thome_link\tscore_0\tscore_1\ttravel_time_0\ttravel_time_1\t";
+	private String header="person_id\tsex\tage\tlicense\tcaravail\t" +
+			"employed\thomex\thomey\thomelink\tscore0\tscore1\ttraveltime0\ttraveltime1\t";
 	private NetworkLayer network;
 
 
@@ -126,6 +126,7 @@ public class CompareSelectedPlansTable {
 		this.init(networkPath);
 		readFiles(plansfilePath0, plansfilePath1);
 		writeSummaryFile(outfile);
+		System.out.println("finished");
 	}
 
 	private static void printUsage() {
