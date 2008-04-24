@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * BestPlanSelectorTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,22 +20,36 @@
 
 package org.matsim.replanning.selectors;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.apache.log4j.Logger;
+import org.matsim.config.Config;
 
-public class AllTests {
+// FIXME [GL] fix test
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.replanning.selectors");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(BestPlanSelectorTest.class);
-		suite.addTestSuite(ExpBetaPlanChangerTest.class);
-		suite.addTestSuite(ExpBetaPlanSelectorTest.class);
-		suite.addTestSuite(KeepSelectedTest.class);
-//		suite.addTestSuite(PathSizeLogitSelectorTest.class); FIXME [GL] disabled because test fails
-		suite.addTestSuite(RandomPlanSelectorTest.class);
-		//$JUnit-END$
-		return suite;
+// **********************************************
+// WARNING: THIS TEST DOES FAIL (as of 08jan2008)
+// **********************************************
+
+/**
+ * Tests for {@link ExpBetaPlanSelector}.
+ *
+ * @author mrieser
+ */
+public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
+
+	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
+	private Config config = null;
+
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
 	}
+
+	@Override
+	protected PlanSelectorI getPlanSelector() {
+		return new PathSizeLogitSelector();
+	}
+
+	// TODO write specific tests for PathSizeLogitSelector, see ExpBetaPlanSelectorTest for examples
 
 }
