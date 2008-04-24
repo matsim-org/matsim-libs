@@ -73,17 +73,25 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 
 	private NetworkLayer networkLayer;
 
+	private QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
+
 	public QueueNetworkLayer(NetworkLayer networkLayer) {
+		this(networkLayer, new DefaultQueueNetworkFactory());
+	}
+
+	public QueueNetworkLayer(NetworkLayer networkLayer, QueueNetworkFactory factory) {
 		this.networkLayer = networkLayer;
+		this.queueNetworkFactory = factory;
 		this.links = new HashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		this.nodes = new HashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
-			this.nodes.put(n.getId(), new QueueNode(n, this));
+			this.nodes.put(n.getId(), queueNetworkFactory.newQueueNode(n, this));
 		}
 		for (Link l : networkLayer.getLinks().values()) {
-			this.links.put(l.getId(), new QueueLink(l, this, this.nodes.get(l.getToNode().getId())));
+			this.links.put(l.getId(), queueNetworkFactory.newQueueLink(l, this, this.nodes.get(l.getToNode().getId())));
 		}
 	}
+
 
 	public NetworkLayer getNetworkLayer() {
 		return this.networkLayer;
