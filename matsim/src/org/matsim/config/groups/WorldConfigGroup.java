@@ -38,8 +38,8 @@ public class WorldConfigGroup extends Module {
 	private String inputFile = null;
 	private String outputFile = null;
 
-	private Logger log = Logger.getLogger(WorldConfigGroup.class);
-	
+	private static final Logger log = Logger.getLogger(WorldConfigGroup.class);
+
 	public WorldConfigGroup() {
 		super(WorldConfigGroup.GROUP_NAME);
 	}
@@ -61,12 +61,8 @@ public class WorldConfigGroup extends Module {
 			setInputFile(value.replace('\\', '/'));
 		} else if (WorldConfigGroup.OUTPUT_FILE.equals(key)) {
 			setOutputFile(value.replace('\\', '/'));
-		} else if (WorldConfigGroup.LOCAL_INPUT_DTD.equals(key)) {
-			log.info("The parameter " + LOCAL_INPUT_DTD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (WorldConfigGroup.OUTPUT_DTD.equals(key)) {
-			log.info("The parameter " + OUTPUT_DTD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (WorldConfigGroup.OUTPUT_VERSION.equals(key)) {
-			log.info("The parameter " + OUTPUT_VERSION + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+		} else if (WorldConfigGroup.LOCAL_INPUT_DTD.equals(key) || WorldConfigGroup.OUTPUT_DTD.equals(key) || WorldConfigGroup.OUTPUT_VERSION.equals(key)) {
+			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}

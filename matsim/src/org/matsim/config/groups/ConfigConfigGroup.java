@@ -36,7 +36,7 @@ public class ConfigConfigGroup extends Module {
 	private String outputFile = null;
 
 	private static final Logger log = Logger.getLogger(ConfigConfigGroup.class);
-	
+
 	public ConfigConfigGroup() {
 		super(ConfigConfigGroup.GROUP_NAME);
 	}
@@ -53,10 +53,8 @@ public class ConfigConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (ConfigConfigGroup.OUTPUT_FILE.equals(key)) {
 			setOutputFile(value.replace('\\', '/'));
-		} else if (ConfigConfigGroup.OUTPUT_DTD.equals(key)) {
-			log.info("The parameter " + OUTPUT_DTD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (ConfigConfigGroup.OUTPUT_VERSION.equals(key)) {
-			log.info("The parameter " + OUTPUT_VERSION + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+		} else if (ConfigConfigGroup.OUTPUT_DTD.equals(key) || ConfigConfigGroup.OUTPUT_VERSION.equals(key)) {
+			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}

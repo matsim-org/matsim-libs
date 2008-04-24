@@ -38,7 +38,7 @@ public class FacilitiesConfigGroup extends Module {
 
 	private String inputFile = null;
 	private String outputFile = null;
-	
+
 	private static final Logger log = Logger.getLogger(FacilitiesConfigGroup.class);
 
 	public FacilitiesConfigGroup() {
@@ -62,14 +62,8 @@ public class FacilitiesConfigGroup extends Module {
 			setInputFile(value.replace('\\', '/'));
 		} else if (OUTPUT_FILE.equals(key)) {
 			setOutputFile(value.replace('\\', '/'));
-		} else if (LOCAL_INPUT_DTD.equals(key)) {
-			log.info("The parameter " + LOCAL_INPUT_DTD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (INPUT_VERSION.equals(key)) {
-			log.info("The parameter " + INPUT_VERSION + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (OUTPUT_DTD.equals(key)) {
-			log.info("The parameter " + OUTPUT_DTD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (OUTPUT_VERSION.equals(key)) {
-			log.info("The parameter " + OUTPUT_VERSION + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+		} else if (LOCAL_INPUT_DTD.equals(key) || INPUT_VERSION.equals(key) || OUTPUT_DTD.equals(key) || OUTPUT_VERSION.equals(key)) {
+			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}

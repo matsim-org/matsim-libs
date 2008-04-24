@@ -67,18 +67,14 @@ public class GlobalConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (RANDOM_SEED.equals(key)) {
 			setRandomSeed(Long.parseLong(value));
-		} else if (OUTPUT_TIME_FORMAT.equals(key)) {
-			log.info("The parameter " + OUTPUT_TIME_FORMAT + " in module " + GROUP_NAME + " is no longer supported and should be removed from the configuration file.");
-		} else if (GLOBAL_DTD_BASE.equals(key)) {
-			log.info("The parameter " + GLOBAL_DTD_BASE + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+		} else if (OUTPUT_TIME_FORMAT.equals(key) || GLOBAL_DTD_BASE.equals(key) || USE_ROAD_PRICING.equals(key)) {
+			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer supported and should be removed from the configuration file.");
 		} else if (LOCAL_DTD_BASE.equals(key)) {
 			setLocalDtdBase(value);
 		} else if (NUMBER_OF_THREADS.equals(key)) {
 			setNumberOfThreads(Integer.parseInt(value));
 		} else if (COORDINATE_SYSTEM.equals(key)) {
 			setCoordinateSystem(value);
-		} else if (USE_ROAD_PRICING.equals(key)) {
-			log.info("The parameter " + USE_ROAD_PRICING + " in module " + GROUP_NAME + " is no longer supported and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}

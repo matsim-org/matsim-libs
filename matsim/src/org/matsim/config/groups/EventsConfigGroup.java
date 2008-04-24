@@ -37,7 +37,7 @@ public class EventsConfigGroup extends Module {
 
 	private String inputFile = null;
 	private String outputFile = null;
-	
+
 	private static final Logger log = Logger.getLogger(EventsConfigGroup.class);
 
 	public EventsConfigGroup() {
@@ -61,10 +61,8 @@ public class EventsConfigGroup extends Module {
 			setInputFile(value.replace('\\', '/'));
 		} else if (EventsConfigGroup.OUTPUT_FILE.equals(key)) {
 			setOutputFile(value.replace('\\', '/'));
-		} else if (EventsConfigGroup.OUTPUT_FORMAT.equals(key)) {
-			log.info("The parameter " + OUTPUT_FORMAT + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (EventsConfigGroup.INPUT_FORMAT.equals(key)) {
-			log.info("The parameter " + INPUT_FORMAT + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+		} else if (EventsConfigGroup.OUTPUT_FORMAT.equals(key) || EventsConfigGroup.INPUT_FORMAT.equals(key)) {
+			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}

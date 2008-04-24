@@ -142,7 +142,7 @@ public class CountsConfigGroup extends Module {
 	 */
 	private double countsScaleFactor = 1.0;
 
-	private Logger log = Logger.getLogger(CountsConfigGroup.class);
+	private static final Logger log = Logger.getLogger(CountsConfigGroup.class);
 
 	public CountsConfigGroup() {
 		super(GROUP_NAME);
@@ -223,12 +223,8 @@ public class CountsConfigGroup extends Module {
 			}
 		} else if (COUNTSINPUTFILENAME.equals(key)) {
 			setCountsFileName(value.replace('\\', '/'));
-		} else if (LOCALINPUTXSD.equals(key)) {
-			log.info("The parameter " + LOCALINPUTXSD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (OUTPUTCOUNTSXSD.equals(key)) {
-			log.info("The parameter " + OUTPUTCOUNTSXSD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (OUTPUTVERSION.equals(key)) {
-			log.info("The parameter " + OUTPUTVERSION + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+		} else if (LOCALINPUTXSD.equals(key) || OUTPUTCOUNTSXSD.equals(key) || OUTPUTVERSION.equals(key)) {
+			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else if (COUNTSSCALEFACTOR.equals(key)) {
 			this.setCountsScaleFactor(Double.parseDouble(value));
 		} else {

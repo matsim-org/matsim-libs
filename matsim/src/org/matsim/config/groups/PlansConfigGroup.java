@@ -48,7 +48,7 @@ public class PlansConfigGroup extends Module {
 	private String outputVersion = "v4"; // use the newest version by default
 
 	private static final Logger log = Logger.getLogger(PlansConfigGroup.class);
-	
+
 	public PlansConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -78,16 +78,12 @@ public class PlansConfigGroup extends Module {
 			setOutputSample(Double.parseDouble(value));
 		} else if (INPUT_FILE.equals(key)) {
 			setInputFile(value.replace('\\', '/'));
-		} else if (LOCAL_INPUT_DTD.equals(key)) {
-			log.info("The parameter " + LOCAL_INPUT_DTD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (INPUT_VERSION.equals(key)) {
-			log.info("The parameter " + INPUT_VERSION + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else if (OUTPUT_FILE.equals(key)) {
 			setOutputFile(value.replace('\\', '/'));
-		} else if (OUTPUT_DTD.equals(key)) {
-			log.info("The parameter " + OUTPUT_DTD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else if (OUTPUT_VERSION.equals(key)) {
 			setOutputVersion(value);
+		} else if (LOCAL_INPUT_DTD.equals(key) || INPUT_VERSION.equals(key) || OUTPUT_DTD.equals(key)) {
+			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}

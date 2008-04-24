@@ -39,8 +39,8 @@ public class MatricesConfigGroup extends Module {
 	private String inputFile = null;
 	private String outputFile = null;
 
-	private Logger log = Logger.getLogger(MatricesConfigGroup.class);
-	
+	private final Logger log = Logger.getLogger(MatricesConfigGroup.class);
+
 	public MatricesConfigGroup() {
 		super(MatricesConfigGroup.GROUP_NAME);
 	}
@@ -58,18 +58,12 @@ public class MatricesConfigGroup extends Module {
 
 	@Override
 	public void addParam(final String key, final String value) {
-		if (MatricesConfigGroup.INPUT_FILE.equals(key)) {
+		if (INPUT_FILE.equals(key)) {
 			setInputFile(value.replace('\\', '/'));
-		} else if (MatricesConfigGroup.OUTPUT_FILE.equals(key)) {
+		} else if (OUTPUT_FILE.equals(key)) {
 			setOutputFile(value.replace('\\', '/'));
-		} else if (MatricesConfigGroup.LOCAL_INPUT_DTD.equals(key)) {
-			log.info("The parameter " + LOCAL_INPUT_DTD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (MatricesConfigGroup.INPUT_VERSION.equals(key)) {
-			log.info("The parameter " + INPUT_VERSION + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (MatricesConfigGroup.OUTPUT_DTD.equals(key)) {
-			log.info("The parameter " + OUTPUT_DTD + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
-		} else if (MatricesConfigGroup.OUTPUT_VERSION.equals(key)) {
-			log.info("The parameter " + OUTPUT_VERSION + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+		} else if (LOCAL_INPUT_DTD.equals(key) || INPUT_VERSION.equals(key) || OUTPUT_DTD.equals(key) || OUTPUT_VERSION.equals(key)) {
+			this.log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}
