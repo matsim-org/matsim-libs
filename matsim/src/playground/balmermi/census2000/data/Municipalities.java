@@ -39,7 +39,7 @@ public class Municipalities {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final String MUNICIPALITY = "municipality";
+	public static final String MUNICIPALITY = "municipality";
 	private final HashMap<Id,Municipality> municipalities = new HashMap<Id,Municipality>();
 	private final String inputfile;
 
