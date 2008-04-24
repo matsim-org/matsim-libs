@@ -26,10 +26,11 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.plans.filters");
+		TestSuite suite = new TestSuite("Tests for org.matsim.plans.filters");
+		suite.addTestSuite(ActLinkFilterTest.class);
+		suite.addTestSuite(PersonIdFilterTest.class);
 		suite.addTestSuite(PersonIntersectAreaFilterTest.class);
 		suite.addTestSuite(RouteLinkFilterTest.class);
-		suite.addTestSuite(PersonIdFilterTest.class);
 		return suite;
 	}
 
