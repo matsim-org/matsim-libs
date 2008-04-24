@@ -138,6 +138,7 @@ public class MentalMap {
 				}
 			}
 		}
+		//here handle the input file of activities and acts if you want
 	}
 
 	public void learnActsActivities (Integer myactId, Activity myactivity){
@@ -240,6 +241,7 @@ public class MentalMap {
 	private boolean mapActToNewActivity(Act myAct, Activity oldActivity) {
 		boolean remapped = false;
 		// Associate one act with a random facility on the link
+//		System.out.println(this.getClass()+" WARNING WARNING WARNING assignment is not the same between runs. Use a new Gbl.random(seed) here!");
 		Activity newActivity = null;
 		Link myLink = myAct.getLink();
 		// These Locations are facilities by the new convention

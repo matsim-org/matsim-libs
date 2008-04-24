@@ -45,6 +45,7 @@ import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
+import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.replanning.SNSecLocRandom;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
@@ -83,6 +84,7 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 
 	SocialNetwork snet;
 	SocialNetworkStatistics snetstat;
+	ActivityActWriter aaw;
 	PajekWriter pjw;
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
 	SpatialInteractor plansInteractorS;//spatial (face to face)
@@ -158,21 +160,28 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 
 //			You could forget activities here, after the replanning and assignment
 
-			if(CALCSTATS){
+			if(CALCSTATS && event.getIteration()%10==0){
 				this.log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
 				this.log.info(" ... done");
+				
+				this.log.info(" Writing out the map between Acts and Facilities ...");
+				aaw.write(snIter,this.controler.getPopulation());
+				this.log.info(" ... done");
 			}
 
-			this.log.info(" Writing out social network for iteration " + snIter + " ...");
-			this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
-			this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
-			this.log.info(" ... done");
+			if(event.getIteration()%10==0){
+				this.log.info(" Writing out social network for iteration " + snIter + " ...");
+				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
+				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
+				this.log.info(" ... done");
+			}
 		}
 		if (event.getIteration() == this.controler.getLastIteration()) {
 			if(CALCSTATS){
 				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
 				this.snetstat.closeFiles();
+				this.aaw.close();
 			}
 		}
 	}
@@ -308,13 +317,17 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 		this.log.info("... done");
 
 		if(CALCSTATS){
-//			this.log.info(" Calculating the statistics of the initial social network)...");
 			this.log.info(" Opening the files for the social network statistics...");
 			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
 			this.snetstat.openFiles();
 //			Social networks do not change until the first iteration of Replanning,
 //			so we can skip writing out this initial state because the networks will still be unchanged after the first assignment
 //			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
+			this.log.info(" ... done");
+			
+			this.log.info("  Opening the file to map Acts to Facilities");
+			this.aaw=new ActivityActWriter();
+			this.aaw.openFile(Controler.getOutputFilename("ActivityActMap.txt"));
 			this.log.info(" ... done");
 		}
 

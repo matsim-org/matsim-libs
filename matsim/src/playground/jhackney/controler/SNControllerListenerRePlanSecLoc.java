@@ -48,6 +48,7 @@ import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
+import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
@@ -97,6 +98,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 	SocialNetwork snet;
 	SocialNetworkStatistics snetstat;
+	ActivityActWriter aaw;
 	PajekWriter pjw;
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
 	SpatialInteractor plansInteractorS;//spatial (face to face)
@@ -162,7 +164,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		/* code previously in finishIteration() */
-		this.log.info("finishIteration ... ");
+		this.log.info("finishIteration ... "+event.getIteration());
 //		snIter = event.getIteration();
 
 		if( event.getIteration()%replan_interval==0){
@@ -177,6 +179,10 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				this.log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
 				this.log.info(" ... done");
+				
+				this.log.info(" Writing out the map between Acts and Facilities ...");
+				aaw.write(snIter,this.controler.getPopulation());
+				this.log.info(" ... done");
 			}
 
 			if(event.getIteration()%10==0){
@@ -190,6 +196,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 			if(CALCSTATS){
 				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
 				this.snetstat.closeFiles();
+				this.aaw.close();
 			}
 		}
 //		Write out the KML for the EgoNet of a chosen agent
@@ -344,6 +351,11 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 //			Social networks do not change until the first iteration of Replanning,
 //			so we can skip writing out this initial state because the networks will still be unchanged after the first assignment
 //			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
+			this.log.info(" ... done");
+			
+			this.log.info("  Opening the file to map Acts to Facilities");
+			this.aaw=new ActivityActWriter();
+			this.aaw.openFile(Controler.getOutputFilename("ActivityActMap.txt"));
 			this.log.info(" ... done");
 		}
 
