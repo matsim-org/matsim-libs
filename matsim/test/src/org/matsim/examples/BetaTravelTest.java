@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.examples;
 
 import java.util.ArrayList;
 import java.util.Collections;

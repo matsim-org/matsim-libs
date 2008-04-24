@@ -34,7 +34,8 @@ public class AllTests {
 		suite.addTestSuite(TriangleTest.class);
 
 		if (TestDepth.getDepth() == TestDepth.extended) {
-			suite.addTestSuite(OnePercentBerlin10sTest.class); 
+			suite.addTestSuite(BetaTravelTest.class);
+			suite.addTestSuite(OnePercentBerlin10sTest.class);
 		}
 		//$JUnit-END$
 		return suite;
