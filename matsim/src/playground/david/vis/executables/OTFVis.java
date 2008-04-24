@@ -1,4 +1,4 @@
-package playground.david.vis;
+package playground.david.vis.executables;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;

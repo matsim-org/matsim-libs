@@ -1,4 +1,7 @@
-package playground.david.vis.data;
+package playground.david.vis.caching;
+
+import playground.david.vis.data.OTFData;
+import playground.david.vis.data.OTFData.Receiver;
 
 public interface SceneLayer {
 	public void init(SceneGraph graph);

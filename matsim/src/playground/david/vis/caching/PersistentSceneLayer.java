@@ -1,8 +1,9 @@
-package playground.david.vis.data;
+package playground.david.vis.caching;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import playground.david.vis.data.OTFData;
 import playground.david.vis.data.OTFData.Receiver;
 import playground.david.vis.gui.OTFDrawable;
 

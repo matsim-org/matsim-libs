@@ -1,4 +1,4 @@
-package playground.david.vis;
+package playground.david.vis.server;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -22,7 +22,6 @@ import playground.david.vis.data.OTFDefaultNetWriterFactoryImpl;
 import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.handler.OTFAgentsListHandler;
-import playground.david.vis.interfaces.OTFNetHandler;
 import playground.david.vis.interfaces.OTFServerRemote;
 
 public class OTFTVehServer implements OTFServerRemote{
@@ -185,10 +184,6 @@ public class OTFTVehServer implements OTFServerRemote{
 
 	public int getLocalTime() throws RemoteException {
 		return (int)this.nextTime;
-	}
-
-	public OTFVisNet getNet(OTFNetHandler handler) throws RemoteException {
-		throw new RemoteException("getNet not implemented for OTFTVehServer");
 	}
 
 

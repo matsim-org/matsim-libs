@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-import playground.david.vis.OnTheFlyServer;
+import playground.david.vis.server.OnTheFlyServer;
 
 public abstract class OTFDataWriter<SrcData> implements Serializable {
 	/**

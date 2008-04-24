@@ -13,8 +13,8 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
 import org.matsim.world.World;
 
-import playground.david.vis.OTFQuadFileHandler;
 import playground.david.vis.handler.OTFAgentsListHandler;
+import playground.david.vis.server.OTFQuadFileHandler;
 
 public class OTFEvent2MVI extends OTFQuadFileHandler.Writer implements SnapshotWriterI{
 	private final   String netFileName = "";
@@ -42,7 +42,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer implements SnapshotW
 	private double lastTime=-1;
 	private final int cntTimesteps=0;
 
-	private void convert() {
+	public void convert() {
 
 		open();
 		// read and convert data from veh-file

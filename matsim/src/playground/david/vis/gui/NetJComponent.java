@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.vis;
+package playground.david.vis.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -48,13 +48,11 @@ import javax.swing.event.MouseInputAdapter;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 
-import playground.david.vis.OTFGUI.NetVisResizable;
+import playground.david.vis.caching.SceneGraph;
 import playground.david.vis.data.OTFClientQuad;
 import playground.david.vis.data.OTFData;
 import playground.david.vis.data.OTFDataQuad;
 import playground.david.vis.data.OTFDataSimpleAgent;
-import playground.david.vis.data.SceneGraph;
-import playground.david.vis.gui.OTFDrawable;
 import playground.david.vis.interfaces.OTFDrawer;
 import playground.david.vis.interfaces.OTFQuery;
 
@@ -78,6 +76,13 @@ abstract class OTFSwingDrawable implements OTFDrawable, OTFData.Receiver{
 }
 
 public class NetJComponent extends JComponent  implements OTFDrawer {
+
+	public static interface NetVisResizable {
+		public void scaleNetwork(float scale);
+		public float getScale();
+		public void repaint();
+	}
+
 
 	public static class myNetVisScrollPane extends NetVisScrollPane implements NetVisResizable {
 

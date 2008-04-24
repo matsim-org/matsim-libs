@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import playground.david.vis.caching.SceneGraph;
+import playground.david.vis.caching.SceneLayer;
 import playground.david.vis.interfaces.OTFDataReader;
 
 

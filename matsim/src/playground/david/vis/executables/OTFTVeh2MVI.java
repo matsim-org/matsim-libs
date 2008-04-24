@@ -14,9 +14,9 @@ import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
 
-import playground.david.vis.OTFQuadFileHandler;
 import playground.david.vis.handler.OTFAgentsListHandler;
 import playground.david.vis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
+import playground.david.vis.server.OTFQuadFileHandler;
 
 public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 	private final   String netFileName = "";

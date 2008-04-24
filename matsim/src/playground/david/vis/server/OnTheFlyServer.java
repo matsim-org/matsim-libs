@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.vis;
+package playground.david.vis.server;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
@@ -78,12 +78,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public boolean updateState = false;
 	private int localTime = 0;
 
-	private OTFVisNet net = null;
-
 	private final Map<String, QuadStorage> quads = new HashMap<String, QuadStorage>();
 	public Set<String> updateThis = new HashSet<String>();
 
-	private OTFNetHandler handler = null;
+	private final OTFNetHandler handler = null;
 	private Plans pop = null;
 	public ByteArrayOutputStream out = null;
 	public QueueNetworkLayer network = null;
@@ -93,8 +91,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, Events events) throws RemoteException {
 		super(4019,new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
 		UserReadableName = ReadableName;
-		net = new OTFVisNet(network);
-		net.buildWriteMask();
 		this.network = network;
 		out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
@@ -105,8 +101,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, Events events, boolean noSSL) throws RemoteException {
 		super(4019);
 		UserReadableName = ReadableName;
-		net = new OTFVisNet(network);
-		net.buildWriteMask();
 		this.network = network;
 		out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
@@ -304,14 +298,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 		return result;
 	}
-
-	public OTFVisNet getNet(OTFNetHandler handler) throws RemoteException {
-		this.handler = handler;
-		net.handler = handler;
-
-		return net;
-	}
-
 
 	public int getLocalTime() throws RemoteException {
 		return localTime;

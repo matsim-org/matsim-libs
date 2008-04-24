@@ -26,7 +26,6 @@ import java.rmi.RemoteException;
 import org.matsim.plans.Plan;
 import org.matsim.utils.collections.QuadTree;
 
-import playground.david.vis.OTFVisNet;
 import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
 
@@ -37,8 +36,6 @@ public interface OTFServerRemote extends Remote {
 	public void play() throws RemoteException;;
 	public void pause() throws RemoteException;
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException;
-	public byte[] getStateBuffer() throws RemoteException;
-	public OTFVisNet getNet(OTFNetHandler handler) throws RemoteException;
 	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException;
 	public int getLocalTime() throws RemoteException;
 	public Plan getAgentPlan(String id) throws RemoteException;

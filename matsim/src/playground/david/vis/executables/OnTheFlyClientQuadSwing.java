@@ -11,10 +11,10 @@ import javax.swing.JSplitPane;
 
 import org.matsim.gbl.Gbl;
 
-import playground.david.vis.NetJComponent;
 import playground.david.vis.data.OTFClientQuad;
 import playground.david.vis.data.OTFConnectionManager;
 import playground.david.vis.data.OTFDefaultNetWriterFactoryImpl;
+import playground.david.vis.gui.NetJComponent;
 import playground.david.vis.gui.OTFHostControlBar;
 import playground.david.vis.gui.OTFVisConfig;
 import playground.david.vis.gui.PreferencesDialog;

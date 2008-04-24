@@ -12,6 +12,7 @@ import java.util.Map;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
 
+import playground.david.vis.caching.SceneGraph;
 import playground.david.vis.gui.PoolFactory;
 import playground.david.vis.interfaces.OTFDataReader;
 import playground.david.vis.interfaces.OTFDrawer;

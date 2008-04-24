@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DefaultNodeHandler.java
+ * PadangEventConverter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,53 +18,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.vis.handler;
+package playground.david.vis.executables;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.world.World;
 
-import org.matsim.mobsim.QueueNode;
 
-import playground.david.vis.OTFParamProviderA;
-import playground.david.vis.interfaces.OTFNodeHandler;
+public class PadangEventConverter {
+	public static void main(String[] args) {
+		if ( args.length==0 )
+			args = new String[] {"./test/dstrippgen/myconfig.xml"};
 
-public class DefaultNodeHandler extends OTFParamProviderA implements  OTFNodeHandler<QueueNode> {
+		Gbl.createConfig(args);
+		Gbl.startMeasurement();
+		World world = Gbl.createWorld();
 
-	float value;
-	String text;
-	
-	public void readNode(DataInputStream in) throws IOException {
-		value = in.readFloat();
-		text = in.readUTF();
-	}
+		String netFileName = Gbl.getConfig().getParam("network","inputNetworkFile");
+		netFileName = "../../tmp/studies/padang/evacuation_net.xml";
+		NetworkLayer net = new NetworkLayer();
+		new MatsimNetworkReader(net).readFile(netFileName);
+		world.setNetworkLayer(net);
+		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
 
-    public void writeNode(QueueNode node, DataOutputStream out) throws IOException {
-        out.writeFloat((float)0.);
-        out.writeUTF("");
-    }
-	
-	@Override
-	public float getFloatParam(int index) throws UnsupportedOperationException {
-		switch(index) {
-		case 1: return value;
-		};
-		return 0; // throw exception here
-	}
 
-	@Override
-	public String getStringParam(int index) throws UnsupportedOperationException {
-		return text;
-	}
-
-	public int getParamCount() {
-		return 2;
-	}
-	public final String getLongName(int index) {
-		switch(index) {
-		case 0: return "Text";
-		case 1: return "Value";
-		};
-		return null; // throw exception here
+		String eventFile = Gbl.getConfig().getParam("events","outputFile");
+		eventFile = "../../tmp/studies/padang/0.events.txt.gz";
+		OTFEvent2MVI test = new OTFEvent2MVI(qnet, eventFile, "../../tmp/studies/padang/ds_fromEvent.vis", 0,10);
+		test.convert();
 	}
 }

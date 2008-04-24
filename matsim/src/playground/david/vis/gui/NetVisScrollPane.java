@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.vis;
+package playground.david.vis.gui;
 
 import java.awt.Dimension;
 import java.awt.Point;

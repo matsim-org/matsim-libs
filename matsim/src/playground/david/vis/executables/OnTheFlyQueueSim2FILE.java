@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.vis;
+package playground.david.vis.executables;
 
 import java.io.IOException;
 
@@ -35,6 +35,10 @@ import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
+
+import playground.david.vis.server.OTFQuadFileHandler;
+import playground.david.vis.server.OnTheFlyServer;
+import playground.david.vis.server.OTFQuadFileHandler.Writer;
 
 /**
  * @author DS

@@ -25,10 +25,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
-import playground.david.vis.OTFVisNet;
-
 public interface OTFAgentHandler<SrcAgent>  extends Serializable{
-	public void setOTFNet(OTFVisNet net);
 	public void writeAgent(SrcAgent agent, DataOutputStream out) throws IOException;
 	public void readAgent(DataInputStream in) throws IOException;
 }

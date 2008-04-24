@@ -26,10 +26,10 @@ import java.util.List;
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.BasicPlanImpl;
 
-public class CopyOfBasicPerson<P extends BasicPlan> {
+public class CopyOfBasicPerson<P extends BasicPlanImpl> {
 	
 	private final int id; // unchangeable
-	private ArrayList<P> plans = new ArrayList<P>();
+	private final ArrayList<P> plans = new ArrayList<P>();
 	protected BasicPlan selectedPlan = null;
 	
 	public CopyOfBasicPerson(int id) {

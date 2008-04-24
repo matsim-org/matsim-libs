@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Module;
 import org.matsim.config.groups.GlobalConfigGroup;
 
-import playground.david.vis.OTFQuadFileHandler;
+import playground.david.vis.server.OTFQuadFileHandler;
 
 public class OTFVisConfig extends Module {
 	public static final String GROUP_NAME = "otfvis";

@@ -1,4 +1,4 @@
-package playground.david.vis.data;
+package playground.david.vis.caching;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,6 +9,9 @@ import java.util.Map;
 
 import org.matsim.utils.collections.QuadTree.Rect;
 
+import playground.david.vis.data.OTFConnectionManager;
+import playground.david.vis.data.OTFData;
+import playground.david.vis.data.OTFData.Receiver;
 import playground.david.vis.interfaces.OTFDrawer;
 
 

@@ -37,8 +37,6 @@ import javax.swing.event.ChangeListener;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.misc.Time;
 
-import playground.david.vis.OTFQuadFileHandler;
-import playground.david.vis.OTFTVehServer;
 import playground.david.vis.data.OTFClientQuad;
 import playground.david.vis.data.OTFConnectionManager;
 import playground.david.vis.data.OTFNetWriterFactory;
@@ -46,6 +44,8 @@ import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.interfaces.OTFDataReader;
 import playground.david.vis.interfaces.OTFDrawer;
 import playground.david.vis.interfaces.OTFServerRemote;
+import playground.david.vis.server.OTFQuadFileHandler;
+import playground.david.vis.server.OTFTVehServer;
 
 public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener {
 

@@ -13,11 +13,11 @@ import org.matsim.mobsim.QueueLink;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 
+import playground.david.vis.caching.SceneGraph;
 import playground.david.vis.data.OTFDataSimpleAgent;
 import playground.david.vis.data.OTFDataWriter;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.data.OTFWriterFactory;
-import playground.david.vis.data.SceneGraph;
 import playground.david.vis.data.OTFData.Receiver;
 import playground.david.vis.interfaces.OTFDataReader;
 

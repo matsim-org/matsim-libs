@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.vis;
+package playground.david.vis.server;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -51,7 +51,6 @@ import playground.david.vis.data.OTFDefaultNetWriterFactoryImpl;
 import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.gui.OTFVisConfig;
-import playground.david.vis.interfaces.OTFNetHandler;
 import playground.david.vis.interfaces.OTFServerRemote;
 
 public class OTFQuadFileHandler {
@@ -331,10 +330,7 @@ public class OTFQuadFileHandler {
 			return (int)this.nextTime;
 		}
 
-		public OTFVisNet getNet(OTFNetHandler handler) throws RemoteException {
-			throw new RemoteException("getNet not implemented for QuadFileHandler");
-		}
-
+	
 		public void readStateBuffer(byte[] result) throws RemoteException {
 			int size =  0 ;
 

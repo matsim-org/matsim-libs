@@ -25,8 +25,8 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import playground.david.vis.caching.SceneGraph;
 import playground.david.vis.data.OTFData;
-import playground.david.vis.data.SceneGraph;
 
 public abstract class  OTFDataReader {
 	public static Map<String, Class> previousVersions = new HashMap<String, Class>();

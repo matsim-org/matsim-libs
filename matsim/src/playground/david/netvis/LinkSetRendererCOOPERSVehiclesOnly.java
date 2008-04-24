@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.vis;
+package playground.david.netvis;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -46,6 +46,9 @@ import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 
 public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> extends RendererA {
 
+	private static class OTFVisNet {
+		
+	};
 	private final boolean RANDOMIZE_LANES = true;
 
 	private final boolean RENDER_CELL_CONTOURS = true;
@@ -54,11 +57,11 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 
 	private final NET network;
 
-	private double laneWidth;
+	private final double laneWidth;
 
 	private BufferedImage image;
-	private AffineTransform boxTransformOLD = new AffineTransform();
-	private AffineTransform displayTransformOLD = new AffineTransform();
+	private final AffineTransform boxTransformOLD = new AffineTransform();
+	private final AffineTransform displayTransformOLD = new AffineTransform();
 	private boolean isOTF = false;
 
 	public LinkSetRendererCOOPERSVehiclesOnly(VisConfig visConfig, NET network) {
@@ -70,7 +73,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 		* visConfig.getLinkWidthFactor();
 	}
 
-	private boolean redrawLanes = false;
+	private final boolean redrawLanes = false;
 
 	public BufferedImage captureScreen(Graphics2D display) {
 		Component target = getNetJComponent();
@@ -96,10 +99,10 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 		int cellStart_m = 0;
 
 		display.setColor(Color.WHITE);
-			if (isOTF) {
-				if (((OTFVisNet)network).lastLink == link) {
-					display.setColor(Color.lightGray);
-				}
+			if (isOTF && false) {
+//				if (((OTFVisNet)network).lastLink == link) {
+//					display.setColor(Color.lightGray);
+//				}
 			}
 
 			display.fillRect(cellStart_m + NodeWidth, -cellWidth_m, cellLength_m - NodeWidth,
@@ -132,7 +135,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 
 		Iterator it = null;
 		if (isOTF) {
-			it = ((OTFVisNet)network).getLinks().iterator();
+//			it = ((OTFVisNet)network).getLinks().iterator();
 		} else  {
 			it = ((DisplayNet)network).getLinks().values().iterator();
 		}
@@ -141,7 +144,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 		{
 			DisplayableLinkI link = (DisplayableLinkI) it.next();
 			if (isOTF) {
-				((OTFVisNet.Link)link).setVisible(false);
+//				((OTFVisNet.Link)link).setVisible(false);
 			}
 
 			if (!comp.checkLineInClip(link.getStartEasting(), link
@@ -196,7 +199,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 			AffineTransform boxTransform) {
 		String test = getVisConfig().get("ShowAgents");
 		boolean drawAgents = test == null || test.equals("true");
-		this.laneWidth = OTFVisNet.Link.laneWidth* getVisConfig().getLinkWidthFactor();
+//		this.laneWidth = OTFVisNet.Link.laneWidth* getVisConfig().getLinkWidthFactor();
 
 		NetJComponent comp = getNetJComponent();
 
@@ -229,7 +232,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 
 			Iterator it = null;
 			if (isOTF) {
-				it = ((OTFVisNet)network).getLinks().iterator();
+//				it = ((OTFVisNet)network).getLinks().iterator();
 			} else  {
 				it = ((DisplayNet)network).getLinks().values().iterator();
 			}
@@ -254,9 +257,9 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 				AffineTransform lin2trans =  link.getLinear2PlaneTransform();
 				if (lin2trans != null) linkTransform.concatenate(lin2trans);
 				display.setTransform(linkTransform);
-				if (isOTF && ((OTFVisNet)network).lastLink == link) {
-					renderLink(link, display, linkTransform);
-				}
+//				if (isOTF && ((OTFVisNet)network).lastLink == link) {
+//					renderLink(link, display, linkTransform);
+//				}
 
 				final int lanes = link.getLanesAsInt();
 				/*
@@ -308,12 +311,12 @@ public class LinkSetRendererCOOPERSVehiclesOnly<NET extends DisplayableNetI> ext
 						 display.fillOval((int)Math.round(x + offsetX), y, (int)Math.round(agentLength),
 								 (int)Math.round(agentWidth));
 
-							if (isOTF && ((OTFVisNet)network).selectedAgents.contains(((OTFVisNet.DisplayAgent)agent).id)) {
-								// Also: Draw a circle around the selected agent
-								display.setColor(Color.BLUE);
-								int circleWidth = (int)(2.* agentWidth);
-								display.drawArc((int)Math.round(x-circleWidth), (int)Math.round(y-circleWidth+0.5*agentWidth), 2*circleWidth, 2*circleWidth, 0, 360);
-							}
+//							if (isOTF && ((OTFVisNet)network).selectedAgents.contains(((OTFVisNet.DisplayAgent)agent).id)) {
+//								// Also: Draw a circle around the selected agent
+//								display.setColor(Color.BLUE);
+//								int circleWidth = (int)(2.* agentWidth);
+//								display.drawArc((int)Math.round(x-circleWidth), (int)Math.round(y-circleWidth+0.5*agentWidth), 2*circleWidth, 2*circleWidth, 0, 360);
+//							}
 
 					 }
 			}
