@@ -255,17 +255,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	}
 
 	/**
-	 * @return Returns the driverID.
-	 */
-	@Deprecated
-	public String getDriverID() {
-		if (null != this.driverId) {
-			return this.driverId;
-		}
-		throw new Error("there can not be a driverId unless the driver is set!");
-	}
-
-	/**
 	 * @return Returns the driver.
 	 */
 	public Person getDriver() {
