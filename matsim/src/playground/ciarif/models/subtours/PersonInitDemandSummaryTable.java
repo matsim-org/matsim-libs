@@ -23,11 +23,10 @@ package playground.ciarif.models.subtours;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
-
+import java.util.ArrayList;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -61,7 +60,7 @@ public class PersonInitDemandSummaryTable {
 			fw = new FileWriter(outfile);
 			System.out.println(outfile);
 			out = new BufferedWriter(fw);
-			out.write("pid \t subtour_id \t purpose\t prev_subtour\t start_x \t start_y \t mode \t distance\n");
+			out.write("pid \t subtour_id \t purpose\t prev_subtour\t start_x \t start_y \t mode \t start_udeg\t distance\t trips\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -104,7 +103,9 @@ public class PersonInitDemandSummaryTable {
 					out.write(subtour.getStart_coord().getX()+"\t");
 					out.write(subtour.getStart_coord().getY()+"\t");
 					out.write(subtour.getMode()+"\t");
-					out.write(subtour.getDistance()+"\n");
+					out.write(subtour.getStart_udeg()+"\t");
+					out.write(subtour.getDistance()+"\t");
+					out.write(subtour.getNodes().size()-1 + "\n");
 					
 					//System.out.println("Anzahl"+subtour.getPurpose());
 					

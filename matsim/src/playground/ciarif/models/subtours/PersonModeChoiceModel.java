@@ -118,15 +118,15 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			dist_h_w = work_coord.calcDistance(home_coord); 
 			dist_h_w = dist_h_w/1000.0;
 		}
-		System.out.println("Work coord " + work_coord);
+		//System.out.println("Work coord " + work_coord);
 
 		int subtours_nr = personSubtour.getSubtours().size()-1;
 		for (int i=0; i<=subtours_nr; i=i+1){
 			
 			Subtour sub = personSubtour.getSubtours().get(i);
-			System.out.println ("sub_in model = " + sub.getNodes());
-			System.out.println ("i = " + i);
-			System.out.println ("sub_mode before = " + sub.getMode());
+			//System.out.println ("sub_in model = " + sub.getNodes());
+			//System.out.println ("i = " + i);
+			//System.out.println ("sub_mode before = " + sub.getMode());
 			int mainpurpose = sub.getPurpose();
 			// choose mode choice model based on main purpose
 			if (plan.getPerson().getAge() >=18) {
@@ -153,26 +153,26 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			
 			if (sub.getPrev_subtour()<5){
 				if (i>=1) {
-					System.out.println ("prev_mode in database = " + personSubtour.getSubtours().get(i-1).getMode());
+					//System.out.println ("prev_mode in database = " + personSubtour.getSubtours().get(i-1).getMode());
 					model.setPrevMode (personSubtour.getSubtours().get(i-1).getMode());
 				}
 				//				model.setPrevMode(personSubtour.getSubtours().get(sub.getPrev_subtour()).getMode()); //It seeks the previous sub-tour and get the mode
 				
 			}
 			else model.setPrevMode(5); // 5 means that the subtour starts at home
-			System.out.println("prev subtour's mode = " +  model.prev_mode);
+			//System.out.println("prev subtour's mode = " +  model.prev_mode);
 			
 			// setting person parameters
-			System.out.println(model);
+			//System.out.println(model);
 			model.setDistanceHome2Work(dist_h_w);
-			System.out.println("dist_h_w: " + dist_h_w);
+			//System.out.println("dist_h_w: " + dist_h_w);
 			model.setAge(plan.getPerson().getAge());
 			//model.setHHDimension(p.getHousehold().getPersonCount());
 			model.setLicenseOwnership(plan.getPerson().hasLicense());
-			System.out.println("license: " + model.license);
+			//System.out.println("license: " + model.license);
 			model.setCar(plan.getPerson().getCarAvail());
 			model.setTickets(plan.getPerson().getTravelcards());
-			System.out.println("Travelcards: " + model.tickets);
+			//System.out.println("Travelcards: " + model.tickets);
 			model.setBike(has_bike);
 			model.setMale (plan.getPerson().getSex());
 			//int udeg = 4; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
@@ -181,14 +181,14 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			Location loc = locs.get(Gbl.random.nextInt(locs.size()));
 			Municipality m = municipalities.getMunicipality(new Integer(loc.getId().toString()));
 			int udeg = m.getRegType();
-			System.out.println ("udeg");
+			//System.out.println ("udeg");
 			//Iterator<Location> l_it = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY).getLocations().values().iterator(); //TODO controllare se serve!!!!!
 			
 			
 			model.setUrbanDegree(udeg);
 			model.setMainPurpose(mainpurpose);
 			model.setDistanceTour(sub.getDistance()); // model needs meters! 
-			System.out.println("dist subtour: " + sub.getDistance());
+			//System.out.println("dist subtour: " + sub.getDistance());
 			 
 			model.setHomeCoord(home_coord);
 			
@@ -205,8 +205,8 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			System.out.println("modechoice = " + modechoice);
 			System.out.println();
 			personSubtour.getSubtours().get(i).setMode(modechoice);
-			//sub.setMode(modechoice);
-						
+			personSubtour.getSubtours().get(i).setStart_udeg(udeg);
+			
 			for (int k=1; k<sub.getNodes().size(); k=k+1){
 				((Leg)plan.getActsLegs().get(sub.getNodes().get(k)-1)).setMode(mode);
 				System.out.println("leg = " + ((Leg)plan.getActsLegs().get(sub.getNodes().get(k)-1)));

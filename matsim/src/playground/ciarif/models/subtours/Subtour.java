@@ -21,6 +21,7 @@ public class Subtour {
 	private CoordI start_coord;
 	private int prev_subtour;
 	private double distance; 
+	private int start_udeg;
 	
 
 	public Subtour() {
@@ -66,6 +67,10 @@ public class Subtour {
 		this.mode = mode;
 	}
 	
+	public void setStart_udeg(int start_udeg) {
+		this.start_udeg = start_udeg;
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// Getters methods
 	//////////////////////////////////////////////////////////////////////
@@ -97,6 +102,9 @@ public class Subtour {
 	public int getMode() {
 		return mode;
 	}
+	
+	public int getStart_udeg() {
+		return start_udeg;
+	}
 
-			
 }
