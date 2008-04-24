@@ -28,6 +28,9 @@ import java.util.List;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkChangeEvent;
+import org.matsim.network.NetworkChangeEventsWriter;
+import org.matsim.network.NetworkChangeEventsParser;
 import org.matsim.network.NetworkLayer;
 
 /**
@@ -48,7 +51,7 @@ public class ParserTest {
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
 //		List<NetworkChangeEvent> events = parser.parseEvents("/Users/fearonni/workspace/matsim_sf/output/netevents.xml");
 		List<NetworkChangeEvent> events = parser.parseEvents("/Users/fearonni/workspace/matsim_sf/test/input/org/matsim/network/testNetworkChangeEvents.xml");
-		NetworkChangeEventWriter writer = new NetworkChangeEventWriter();
+		NetworkChangeEventsWriter writer = new NetworkChangeEventsWriter();
 		writer.write("output/netevents.xml", events);
 
 	}

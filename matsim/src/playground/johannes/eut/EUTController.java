@@ -211,20 +211,21 @@ public class EUTController extends WithindayControler {
 		WithindayCreateVehiclePersonAlgorithm algo = new WithindayCreateVehiclePersonAlgorithm(EUTController.this);
 		
 		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
-		sim.setVehicleAlgo(algo);
 		this.trafficManagement = new TrafficManagement();
 		sim.setTrafficManagement(this.trafficManagement);
 		/*
 		 * Initialize the reactive travel times.
 		 */
-		this.reactTTs = new EstimReactiveLinkTT(sim.getQueueNetworkLayer());
+//		this.reactTTs = new EstimReactiveLinkTT(sim.getQueueNetworkLayer());
+		this.reactTTs = new EstimReactiveLinkTT(null); // FIXME
 		this.events.addHandler(this.reactTTs);
 		this.reactTTs.reset(getIteration());
 		
 		RandomIncidentSimulator simulator = new RandomIncidentSimulator(incidentProba);
 		simulator.setCapReduction(capReduction);
 		for(Link link : riskyLinks)
-			simulator.addLink(sim.getQueueNetworkLayer().getQueueLink(link.getId()));
+//			simulator.addLink(sim.getQueueNetworkLayer().getQueueLink(link.getId()));
+			simulator.addLink(null); //FIXME
 		simulator.notifyIterationStarts(EUTController.getIteration());
 		
 		sim.run();
