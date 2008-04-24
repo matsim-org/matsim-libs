@@ -50,9 +50,6 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
 import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
 
-//////////////////////////////////////////////////////////////////////
-// A Queue Simulator class
-//////////////////////////////////////////////////////////////////////
 public class QueueSimulation extends Simulation {
 
 	private int snapshotPeriod = Integer.MAX_VALUE;
@@ -63,7 +60,6 @@ public class QueueSimulation extends Simulation {
 	protected final Plans plans;
 	protected final QueueNetworkLayer network;
 
-//	private PersonAlgo_CreateVehicle veh_algo = new PersonAlgo_CreateVehicle();
 	protected EventWriterTXT myeventwriter = null;
 
 	protected static Events events = null; // TODO [MR] instead of making this static and Links/Nodes using QueueSimulation.getEvents(), Gbl should hold a global events-object
@@ -76,7 +72,7 @@ public class QueueSimulation extends Simulation {
 	protected NetworkLayer networkLayer;
 
 	/**
-	 * teleportationList includes all vehicle that have transportation modes unknown to
+	 * Includes all vehicle that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
 	private static PriorityQueue<Vehicle> teleportationList = new PriorityQueue<Vehicle>(30, new VehicleDepartureTimeComparator());
@@ -93,7 +89,6 @@ public class QueueSimulation extends Simulation {
 		this.config = Gbl.getConfig();
 	}
 
-	// creating vehicles with PersonAlgo_CreateVehicles
 	protected final void createAgents() {
 
 		if (this.plans == null) {
@@ -114,14 +109,13 @@ public class QueueSimulation extends Simulation {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
-	protected void setVehiclePrototye(Class<? extends Vehicle> proto) {
+	protected void setVehiclePrototye(final Class<? extends Vehicle> proto) {
 		this.vehiclePrototype = proto;
 	}
 
-	private void initVehicle(Vehicle veh) {
+	private void initVehicle(final Vehicle veh) {
 		Link link = veh.getCurrentLink();
 		QueueLink qlink = this.network.getQueueLink(link.getId());
 		qlink.addParking(veh);
@@ -195,9 +189,9 @@ public class QueueSimulation extends Simulation {
 		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// Prepare Simulation, get all settings from config.xml
-	//////////////////////////////////////////////////////////////////////
+	/**
+	 * Prepare the simulation and get all the settings from the configuration.
+	 */
 	@Override
 	protected void  prepareSim() {
 		if (events == null) {
@@ -256,7 +250,7 @@ public class QueueSimulation extends Simulation {
 	}
 
 	@Override
-	public void beforeSimStep(double time) {
+	public void beforeSimStep(final double time) {
 	}
 
 	/**
@@ -331,7 +325,7 @@ public class QueueSimulation extends Simulation {
 	  		if (veh.getDepartureTime_s() <= now) {
 	  			teleportationList.poll();
 
-				getEvents().processEvent(new EventAgentArrival(now, veh.getDriverID(), veh.getCurrentLegNumber(),
+				getEvents().processEvent(new EventAgentArrival(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 						veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 	  			veh.reachActivity(now, this.network.getQueueLink(veh.getCurrentLink().getId()));
 

@@ -29,10 +29,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 
-// ////////////////////////////////////////////////////////////////////
-// QueueNode represents a node in the QueueSimulation
-// ////////////////////////////////////////////////////////////////////
-
+/**
+ * Represents a node in the QueueSimulation.
+ */
 public class QueueNode {
 
 	private static final Logger log = Logger.getLogger(QueueNode.class);
@@ -65,8 +64,9 @@ public class QueueNode {
 					l.getId());
 			i++;
 		}
-		//dg[april08] as the order of nodes has an influence on the simulation
-		//results they are sorted to avoid indeterministic simulations
+		/* As the order of nodes has an influence on the simulation results,
+		 * the nodes are sorted to avoid indeterministic simulations. dg[april08] 
+		 */
 		Arrays.sort(this.inLinksArrayCache, new Comparator<QueueLink>() {
 			public int compare(final QueueLink o1, final QueueLink o2) {
 				return o1.getLink().getId().compareTo(o2.getLink().getId());
@@ -105,8 +105,7 @@ public class QueueNode {
 			// check if veh is stuck!
 
 			if ((now - veh.getLastMovedTime()) > Simulation.getStuckTime()) {
-				/*
-				 * We just push the vehicle further after stucktime is over, regardless
+				/* We just push the vehicle further after stucktime is over, regardless
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
 				 */
@@ -115,9 +114,9 @@ public class QueueNode {
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
-							new EventAgentStuck(now, veh.getDriverID(), veh
-									.getCurrentLegNumber(), currentLink.getId().toString(), veh
-									.getDriver(), veh.getCurrentLeg(), currentLink));
+							new EventAgentStuck(now, veh.getDriver().getId().toString(), 
+									veh.getCurrentLegNumber(), currentLink.getId().toString(), 
+									veh.getDriver(), veh.getCurrentLeg(), currentLink));
 				}
 				else {
 					currentQueueLink.popFirstFromBuffer();
@@ -133,11 +132,10 @@ public class QueueNode {
 		currentQueueLink.popFirstFromBuffer();
 		Simulation.decLiving();
 		Simulation.incLost();
-		Logger.getLogger(QueueNode.class).error(
-				"Agent has no or wrong route! agentId=" + veh.getDriverID()
+		log.error(
+				"Agent has no or wrong route! agentId=" + veh.getDriver().getId()
 						+ " currentLegNumber=" + veh.getCurrentLegNumber()
-						+ " currentLink="
-						+ currentLink.getId().toString()
+						+ " currentLink=" + currentLink.getId().toString()
 						+ ". The agent is removed from the simulation.");
 		return true;
 	}
