@@ -13,7 +13,7 @@ DTD = config_v1.dtd
 MEMORY = -Xms1450m -Xmx1800m
 
 ######################################################################
-# do NOT change that!
+# do NOT change that just for normal runs!
 
 LIBS := libs/colt.jar
 LIBS := $(LIBS):libs/commons-collections-3.2.jar
@@ -23,6 +23,13 @@ LIBS := $(LIBS):libs/jfreechart-1.0.6.modified.0.jar
 LIBS := $(LIBS):libs/jgap-3.1.jar
 LIBS := $(LIBS):libs/jung-1.7.6.jar
 LIBS := $(LIBS):libs/log4j-1.2.15.jar
+
+LIBS := $(LIBS):libs/jaxb-2.1.6/lib/activation.jar
+LIBS := $(LIBS):libs/jaxb-2.1.6/lib/jaxb-api.jar
+LIBS := $(LIBS):libs/jaxb-2.1.6/lib/jaxb-impl.jar
+LIBS := $(LIBS):libs/jaxb-2.1.6/lib/jaxb-xjc.jar
+LIBS := $(LIBS):libs/jaxb-2.1.6/lib/jaxb1-impl.jar
+LIBS := $(LIBS):libs/jaxb-2.1.6/lib/jsr173_1.0_api.jar
 
 LIBS := $(LIBS):libs/geotools/ant-optional-1.5.1.jar
 LIBS := $(LIBS):libs/geotools/batik-awt-util-1.6.jar
