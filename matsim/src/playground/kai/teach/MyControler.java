@@ -9,11 +9,11 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.NetVis;
 
-import teach.multiagent07.net.CANetStateWritableI;
-import teach.multiagent07.net.CANetStateWriter;
+import teach.matsim08.network.CANetStateWritableI;
+import teach.matsim08.network.CANetStateWriter;
 
 class Veh implements DrawableAgentI {
-	
+
 	private double pos ;
 	public void setPosition ( double tmp ) {
 		pos = tmp ;
@@ -29,12 +29,12 @@ class Veh implements DrawableAgentI {
 
 }
 
-class CALink implements CANetStateWritableI {	
-	
+class CALink implements CANetStateWritableI {
+
 	final double CELLSIZE=7.5 ;
-	
+
 	List cells = new ArrayList() ;
-	
+
 	public CALink( BasicLink ll ) {
 		// ...
 	}
@@ -51,7 +51,7 @@ class CALink implements CANetStateWritableI {
 		return list ;
 	}
 
-	public double getDisplayValue() {	
+	public double getDisplayValue() {
 		// count occupied cells
 		// return occ.cells/cells
 		return 0.5 ;
@@ -59,9 +59,9 @@ class CALink implements CANetStateWritableI {
 }
 
 class CASim {
-	
+
 	CANetStateWriter netVis ;
-	
+
 	Map caLinks = new HashMap() ;
 	Map caNodes = new HashMap() ;
 
@@ -69,14 +69,14 @@ class CASim {
 		Map links = net.getLinks() ;
 		for ( Iterator it = links.values().iterator(); it.hasNext() ; ) {
 			BasicLink ll = (BasicLink) it.next();
-			CALink caLink = new CALink( ll ) ;	
+			CALink caLink = new CALink( ll ) ;
 //			caLink.randomFill() ;
 //			caLink.tty() ;
 		}
 		// dto for nodes
 
 		// connect??
-		
+
 		try {
 			netVis.dump(0) ;
 		} catch (IOException e) {
@@ -84,38 +84,38 @@ class CASim {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	
+
+
+
 }
 
 public class MyControler {
-	
+
 
 	public static void main(String[] args) {
 		String netFileName = "net.xml" ;
 		String visFileName = "output/ABC" ;
-	
+
 		BasicNet net = new NetworkLayer() ;
 		MatsimNetworkReader reader = new MatsimNetworkReader((NetworkLayer)net);
 		reader.readFile(netFileName) ;
 		// from here on, net can do everything that is guaranteed in BasicNetI
-		
+
 		Map nodes = net.getNodes() ;
-		
+
 		nodes.get("123") ;
-		
+
 		for ( Iterator it = nodes.values().iterator(); it.hasNext() ; ) {
 			BasicNode nn = (BasicNode) it.next();
 			System.out.println ( nn.getId() ) ;
 		}
-		
-		CANetStateWriter netVis = CANetStateWriter.createWriter( net, netFileName, visFileName );		
-		
+
+		CANetStateWriter netVis = CANetStateWriter.createWriter( net, netFileName, visFileName );
+
 		CASim sim = new CASim( net , netVis ) ;
-		
+
 		NetVis.start(visFileName) ;
-		
+
 	}
 
 }
