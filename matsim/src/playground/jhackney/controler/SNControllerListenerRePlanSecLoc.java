@@ -173,16 +173,18 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 //			You could forget activities here, after the replanning and assignment
 
-			if(CALCSTATS){
+			if(CALCSTATS && event.getIteration()%10==0){
 				this.log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
 				this.log.info(" ... done");
 			}
 
-			this.log.info(" Writing out social network for iteration " + snIter + " ...");
-			this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
-			this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
-			this.log.info(" ... done");
+			if(event.getIteration()%10==0){
+				this.log.info(" Writing out social network for iteration " + snIter + " ...");
+				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
+				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
+				this.log.info(" ... done");
+			}
 		}
 		if (event.getIteration() == this.controler.getLastIteration()) {
 			if(CALCSTATS){
@@ -335,10 +337,13 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		this.log.info("... done");
 
 		if(CALCSTATS){
-			this.log.info(" Calculating the statistics of the initial social network)...");
+//			this.log.info(" Calculating the statistics of the initial social network)...");
+			this.log.info(" Opening the files for the social network statistics...");
 			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
 			this.snetstat.openFiles();
-			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
+//			Social networks do not change until the first iteration of Replanning,
+//			so we can skip writing out this initial state because the networks will still be unchanged after the first assignment
+//			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
 			this.log.info(" ... done");
 		}
 

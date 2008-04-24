@@ -88,7 +88,7 @@ public class PersonExchangeKnowledge {
 		Person friend2 = k0.egoNet.getRandomPerson(myEgo);
 		if ((friend1 != null) && (friend2 != null)) {
 
-			net.makeSocialContact(friend1, friend2, iteration, "newfof");
+			net.makeSocialContact(friend1, friend2, iteration, "fof");
 		}
 	}
 }

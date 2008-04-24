@@ -66,6 +66,9 @@ public class SocialNetEdge {
     public String getType(){
 	return type;
     }
+    public void setNumberOfTimesMet(int timesMet){
+    	this.timesMet=timesMet;
+    }
     public void incrementNumberOfTimesMet(){
 	timesMet++;
     }

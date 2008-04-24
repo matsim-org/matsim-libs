@@ -308,10 +308,13 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 		this.log.info("... done");
 
 		if(CALCSTATS){
-			this.log.info(" Calculating the statistics of the initial social network)...");
+//			this.log.info(" Calculating the statistics of the initial social network)...");
+			this.log.info(" Opening the files for the social network statistics...");
 			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
 			this.snetstat.openFiles();
-			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
+//			Social networks do not change until the first iteration of Replanning,
+//			so we can skip writing out this initial state because the networks will still be unchanged after the first assignment
+//			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
 			this.log.info(" ... done");
 		}
 

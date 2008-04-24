@@ -50,6 +50,8 @@ public class SocNetConfigGroup extends Module {
 	private static final String SOCNET_DEG_SAT = "degree_saturation_rate";
 	private static final String SOCNET_RP_INT = "replanning_interval";
 	private static final String SOCNET_GRID = "grid_spacing";
+	private static final String INPUT_SN_DIR = "inputSocNetDir";
+	private static final String INIT_ITER = "inputIter";
 
 	private String graphalgo = null;
 	private String linkstrengthalgo = null;
@@ -73,6 +75,8 @@ public class SocNetConfigGroup extends Module {
 	private String degsat=null; // double
 	private String interval=null;//int
 	private String grid_spacing=null;// int
+	private String input_sn_dir=null;// String
+	private String init_iter=null;// int
 
 
 	public SocNetConfigGroup() {
@@ -124,6 +128,10 @@ public class SocNetConfigGroup extends Module {
 			setRPInt(value);
 		}else if (SOCNET_GRID.equals(key)) {
 			setGridSpace(value);
+		}else if (INPUT_SN_DIR.equals(key)) {
+			setInDirName(value);
+		}else if (INIT_ITER.equals(key)){
+			setInitIter(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -176,6 +184,10 @@ public class SocNetConfigGroup extends Module {
 			return getRPInt();
 		}else if (SOCNET_GRID.equals(key)) {
 			return getGridSpace();
+		}else if (INPUT_SN_DIR.equals(key)) {
+			return getInDirName();
+		}else if (INIT_ITER.equals(key)){
+			return getInitIter();
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -206,6 +218,8 @@ public class SocNetConfigGroup extends Module {
 		addNotNullParameterToMap(map, SOCNET_DEG_SAT);
 		addNotNullParameterToMap(map, SOCNET_RP_INT);
 		addNotNullParameterToMap(map, SOCNET_GRID);
+		addNotNullParameterToMap(map, INPUT_SN_DIR);
+		addNotNullParameterToMap(map, INIT_ITER);
 		return map;
 	}
 	/* direct access */
@@ -345,5 +359,17 @@ public class SocNetConfigGroup extends Module {
 	}
 	public void setGridSpace(final String grid_spacing) {
 		this.grid_spacing = grid_spacing;
+	}
+	public String getInDirName() {
+		return this.input_sn_dir;
+	}
+	public void setInDirName(final String input_sn_file){
+		this.input_sn_dir=input_sn_file;
+	}
+	public String getInitIter(){
+		return this.init_iter;
+	}
+	public void setInitIter(final String init_iter){
+		this.init_iter = init_iter;
 	}
 }
