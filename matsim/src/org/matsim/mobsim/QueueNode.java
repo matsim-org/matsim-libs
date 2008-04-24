@@ -48,7 +48,7 @@ public class QueueNode {
 
 	private Node node;
 
-	private QueueNetworkLayer queueNetworkLayer;
+	public QueueNetworkLayer queueNetworkLayer;
 
 	public QueueNode(Node n, QueueNetworkLayer queueNetworkLayer) {
 		this.node = n;

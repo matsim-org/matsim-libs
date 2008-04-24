@@ -3,18 +3,22 @@ package playground.andreas.intersection.sim;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNode;
+import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.trafficlights.data.SignalGroupSettings;
 
 import playground.andreas.intersection.tl.SignalSystemControlerImpl;
 
-public class QNode extends Node{
+public class QNode extends QueueNode{
 
 	private SignalSystemControlerImpl myNodeTrafficLightControler;
-
-	public QNode(String id, String x, String y, String type) {
-		super(new IdImpl(id), x, y, type);
+	
+	public QNode(Node n, QueueNetworkLayer queueNetworkLayer) {
+		super(n,  queueNetworkLayer);
 	}
 
 	public void setSignalSystemControler(SignalSystemControlerImpl nodeControler){
@@ -39,9 +43,11 @@ public class QNode extends Node{
 				for (int i = 0; i < greenSignalGroups.length; i++) {
 					SignalGroupSettings signalGroupSetting = greenSignalGroups[i];
 
-					QLink link = (QLink) this.inlinks.get((signalGroupSetting.getSignalGroupDefinition().getLinkId()));
+					Link link = (Link) this.getNode().getInLinks().get((signalGroupSetting.getSignalGroupDefinition().getLinkId()));
+					
+					QLink qLink = (QLink) queueNetworkLayer.getQueueLink(link.getId());
 
-					for (PseudoLink pseudoLink : link.getNodePseudoLinks()) {
+					for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
 						while (!pseudoLink.flowQueueIsEmpty()) {
 							QVehicle veh = pseudoLink.getFirstFromBuffer();
 							if (!moveVehicleOverNode(veh, now, pseudoLink)) {
@@ -59,10 +65,13 @@ public class QNode extends Node{
 
 			//Node is NOT traffic light controlled
 
-			for (Iterator iter = this.inlinks.values().iterator(); iter.hasNext();) {
-				QLink link = (QLink) iter.next();
+			for (Iterator iter = this.getNode().getInLinks().values().iterator(); iter.hasNext();) {
+				Link link = (Link) iter.next();
+				
+				QLink qLink = (QLink) queueNetworkLayer.getQueueLink(link.getId());
+				
 
-				for (PseudoLink pseudoLink : link.getNodePseudoLinks()) {
+				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
 					while (!pseudoLink.flowQueueIsEmpty()) {
 						QVehicle veh = pseudoLink.getFirstFromBuffer();
 						if (!moveVehicleOverNode(veh, now, pseudoLink)) {

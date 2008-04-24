@@ -28,8 +28,6 @@ import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -37,7 +35,6 @@ import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.NetVis;
 
-import playground.andreas.intersection.sim.QNetworkLayer;
 import playground.andreas.intersection.sim.QSim;
 
 public class QControler extends Controler {
@@ -60,20 +57,9 @@ public class QControler extends Controler {
 //		this.events.addHandler(this.eventwriter);
 		// I don't think this is really needed. -marcel/21jan2008
 
-		QSim sim = new QSim(this.events, this.population, (QNetworkLayer) this.network);
+		QSim sim = new QSim(this.events, this.population, this.network);
 		sim.run();
 
-	}
-
-	/** Needed to specify a QNetworkLayer as target */
-	@Override
-	protected NetworkLayer loadNetwork() {
-		QNetworkLayer network = new QNetworkLayer();
-		Gbl.getWorld().setNetworkLayer(network);
-
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-
-		return network;
 	}
 
 	/** Should be overwritten in case of artificial population */
@@ -115,9 +101,9 @@ public class QControler extends Controler {
 	/** Conversion of events -> snapshots */
 	protected void makeVis() {
 
-		File driversLog = new File("./output/ITERS/it.0/0.events.txt");
+		File driversLog = new File("./output/ITERS/it.0/0.events.txt.gz");
 		File visDir = new File("./output/vis");
-		File eventsFile = new File("./output/vis/events.txt");
+		File eventsFile = new File("./output/vis/events.txt.gz");
 
 		if (driversLog.exists()) {
 			visDir.mkdir();
@@ -137,8 +123,8 @@ public class QControler extends Controler {
 			System.exit(0);
 		}
 
-		String[] visargs = { "./output/ITERS/it.0/Snapshot" };
-		NetVis.main(visargs);
+//		String[] visargs = { "./output/ITERS/it.0/Snapshot" };
+//		NetVis.main(visargs);
 	}
 
 	public static void main(final String[] args) {
@@ -153,6 +139,7 @@ public class QControler extends Controler {
 
 		final QControler controler = new QControler(config);
 		controler.setOverwriteFiles(true);
+		controler.setWriteEvents(true);
 
 		controler.run();
 

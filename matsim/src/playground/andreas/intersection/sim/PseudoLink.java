@@ -117,10 +117,10 @@ public class PseudoLink {
 				break;
 			}
 
-			if (veh.getDestinationLink().getId() == this.realLink.getId()) {
+			if (veh.getDestinationLink().getLink().getId() == this.realLink.getLink().getId()) {
 
 				QSim.getEvents().processEvent(new EventAgentArrival(now, veh.getDriverID(),
-						veh.getCurrentLegNumber(), this.realLink.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink));
+						veh.getCurrentLegNumber(), this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
 				veh.reachActivity();
 				this.storageQueue.poll();
 				continue;
@@ -174,7 +174,7 @@ public class PseudoLink {
 
 		while(moveOn && !this.flowQueue.isEmpty() && (this.toLinks.size() != 0)){
 			QVehicle veh = this.flowQueue.peek();
-			Link nextLink = veh.chooseNextLink();
+			Link nextLink = (Link) veh.chooseNextLink();
 
 			if (nextLink != null) {
 				for (PseudoLink toLink : this.toLinks) {
@@ -216,7 +216,7 @@ public class PseudoLink {
 			veh.leaveActivity();
 
 			QSim.getEvents().processEvent(new EventAgentDeparture(now, veh.getDriverID(),
-					veh.getCurrentLegNumber(), this.realLink.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink));
+					veh.getCurrentLegNumber(), this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
 
 			Leg actLeg = veh.getCurrentLeg();
 
@@ -242,7 +242,7 @@ public class PseudoLink {
 			addToFlowQueue(veh, now);
 
 			QSim.getEvents().processEvent(new EventAgentWait2Link(now, veh.getDriverID(),
-					veh.getCurrentLegNumber(), this.realLink.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink));
+					veh.getCurrentLegNumber(), this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
 
 			this.parkToLinkQueue.poll(); // remove the just handled vehicle from parkToLinkQueue
 		}
@@ -289,7 +289,7 @@ public class PseudoLink {
 		QVehicle veh = this.flowQueue.poll();
 
 		QSim.getEvents().processEvent(new EventLinkLeave(now, veh.getDriverID(), veh.getCurrentLegNumber(),
-						this.realLink.getId().toString(), veh.getDriver(), this.realLink));
+						this.realLink.getLink().getId().toString(), veh.getDriver(), this.realLink.getLink()));
 
 		return veh;
 	}

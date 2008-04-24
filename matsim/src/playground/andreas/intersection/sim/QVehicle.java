@@ -91,7 +91,7 @@ public class QVehicle implements Serializable, DrawableAgentI {
 
 		Node destNode = (Node) route.get(this.currentNode);
 
-		for (Link link : this.currentLink.getToNode().getOutLinks().values()) {
+		for (Link link : this.currentLink.getLink().getToNode().getOutLinks().values()) {
 			if (link.getToNode() == destNode) {
 				this.cachedNextLink = (QLink) link; // save time in later calls, if link is congested
 				return this.cachedNextLink;
@@ -128,7 +128,7 @@ public class QVehicle implements Serializable, DrawableAgentI {
 		if (this.nextActivity > 0) {
 			// no actStartEvent for first act.
 			QSim.getEvents().processEvent(
-					new EventActivityStart(now, this.driverId, this.driver, this.currentLink, act));
+					new EventActivityStart(now, this.driverId, this.driver, this.currentLink.getLink(), act));
 		}
 
 		if (this.nextActivity == this.actslegs.size() - 1) {
@@ -172,7 +172,7 @@ public class QVehicle implements Serializable, DrawableAgentI {
 		transferToMobsim();
 
 		QSim.getEvents().processEvent(
-				new EventActivityEnd(departure, this.driverId, this.driver, this.currentLink, act));
+				new EventActivityEnd(departure, this.driverId, this.driver, this.currentLink.getLink(), act));
 
 		return true;
 	}
@@ -226,7 +226,7 @@ public class QVehicle implements Serializable, DrawableAgentI {
 	@Override
 	public String toString() {
 		return "Vehicle Id " + getID() + ", driven by (personId) " + this.driverId + ", on link "
-				+ this.currentLink.getId() + ", routeindex: " + this.currentNode + ", next activity#: "
+				+ this.currentLink.getLink().getId() + ", routeindex: " + this.currentNode + ", next activity#: "
 				+ this.nextActivity;
 	}
 
@@ -265,7 +265,7 @@ public class QVehicle implements Serializable, DrawableAgentI {
 			mytime = 0.;
 		}
 		mytime /= dur;
-		mytime = (1. - mytime) * this.currentLink.getLength();
+		mytime = (1. - mytime) * this.currentLink.getLink().getLength();
 		return mytime;
 	}
 

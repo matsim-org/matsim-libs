@@ -58,7 +58,7 @@ public class QueueSimulation extends Simulation {
 
 	private final Config config;
 	protected final Plans plans;
-	protected final QueueNetworkLayer network;
+	protected QueueNetworkLayer network;
 
 	protected EventWriterTXT myeventwriter = null;
 
