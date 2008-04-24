@@ -107,14 +107,6 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getDriverID()
-	 */
-	@Override
-	public String getDriverID() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");
-	}
-
-	/**
 	 * @see org.matsim.mobsim.Vehicle#getID()
 	 */
 	@Override

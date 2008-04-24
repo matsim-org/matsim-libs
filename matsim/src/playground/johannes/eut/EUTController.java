@@ -38,7 +38,6 @@ import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.PlanSelectorI;
 import org.matsim.withinday.WithindayControler;
-import org.matsim.withinday.WithindayCreateVehiclePersonAlgorithm;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 
@@ -208,8 +207,6 @@ public class EUTController extends WithindayControler {
 		this.config.withinday().addParam("contentThreshold", "1");
 		this.config.withinday().addParam("replanningInterval", "1");
 
-		WithindayCreateVehiclePersonAlgorithm algo = new WithindayCreateVehiclePersonAlgorithm(EUTController.this);
-		
 		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
 		this.trafficManagement = new TrafficManagement();
 		sim.setTrafficManagement(this.trafficManagement);
