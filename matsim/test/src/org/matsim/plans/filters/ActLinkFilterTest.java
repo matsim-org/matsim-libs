@@ -1,4 +1,4 @@
-package playground.meisterk.westumfahrung;
+package org.matsim.plans.filters;
 
 import java.util.TreeMap;
 
@@ -7,6 +7,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.plans.filters.ActLinkFilter;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 

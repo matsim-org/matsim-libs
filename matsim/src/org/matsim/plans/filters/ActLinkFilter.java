@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.westumfahrung;
+package org.matsim.plans.filters;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +31,13 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.plans.filters.AbstractPlanFilter;
 
+/**
+ * Filters all plans where activities of the same type take place at the same link 7 set of links.
+ * For example: Filter all agents who are neighbors (have their home location on the same link)
+ * 
+ * @author meisterk
+ *
+ */
 public class ActLinkFilter extends AbstractPlanFilter {
 
 	private final Set<Id> linkIds;

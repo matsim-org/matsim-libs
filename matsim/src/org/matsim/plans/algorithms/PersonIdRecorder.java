@@ -1,12 +1,10 @@
-package playground.meisterk.westumfahrung;
+package org.matsim.plans.algorithms;
 
 import java.util.HashSet;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
-import org.matsim.plans.algorithms.PersonAlgorithm;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
 
 public class PersonIdRecorder extends PersonAlgorithm implements PlanAlgorithmI {
 

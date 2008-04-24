@@ -1,4 +1,4 @@
-package playground.meisterk.westumfahrung;
+package org.matsim.run;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,16 +16,27 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
+import org.matsim.plans.PlansReaderI;
+import org.matsim.plans.algorithms.PersonIdRecorder;
 import org.matsim.plans.algorithms.PlanAverageScore;
 import org.matsim.plans.algorithms.PlansAlgorithm;
+import org.matsim.plans.filters.ActLinkFilter;
 import org.matsim.plans.filters.PersonIdFilter;
 import org.matsim.plans.filters.RouteLinkFilter;
 import org.matsim.plans.filters.SelectedPlanFilter;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.misc.Time;
 
-public class WestumfahrungRuns {
+/**
+ * Compare two scenarios (network, plans, events) with each other.
+ * Contains several analyses that were performed for the Westumfahrung Zurich study.
+ * 
+ * @author meisterk
+ *
+ */
+public class CompareScenariosWestumfahrung {
 
 	public class CaseStudyResult {
 
@@ -98,8 +109,8 @@ public class WestumfahrungRuns {
 	 */
 	public static void main(String[] args) {
 
-		WestumfahrungRuns wuRuns = new WestumfahrungRuns();
-		wuRuns.run(args);
+		CompareScenariosWestumfahrung compareScenarios = new CompareScenariosWestumfahrung();
+		compareScenarios.run(args);
 
 	}
 
@@ -141,23 +152,16 @@ public class WestumfahrungRuns {
 
 		if (args.length != 8) {
 			System.out.println("Usage:");
-			System.out.println("java WestumfahrungRuns network plans_before events_before plans_after events_after");
+			System.out.println("java CompareScenarios args");
 			System.out.println("");
-			System.out.println("You might populate your MATSim/input directory like the following:");
-			System.out.println("");
-			System.out.println(" events_after.dat.0 -> /home/meisterk/Desktop/westumfahrung_runs/run500/200.deq_events.dat.0");
-			System.out.println(" events_after.dat.1 -> /home/meisterk/Desktop/westumfahrung_runs/run500/200.deq_events.dat.1");
-			System.out.println(" events_before.dat.0 -> /home/meisterk/Desktop/westumfahrung_runs/run243/200.deq_events.dat.0");
-			System.out.println(" events_before.dat.1 -> /home/meisterk/Desktop/westumfahrung_runs/run243/200.deq_events.dat.1");
-			System.out.println(" events_before.dat.2 -> /home/meisterk/Desktop/westumfahrung_runs/run243/200.deq_events.dat.2");
-			System.out.println(" events_before.dat.3 -> /home/meisterk/Desktop/westumfahrung_runs/run243/200.deq_events.dat.3");
-			System.out.println(" network.xml -> /home/meisterk/sandbox00/ivt/studies/switzerland/networks/ivtch-changed-wu/network.xml");
-			System.out.println(" plans_after.xml.gz -> /home/meisterk/Desktop/westumfahrung_runs/run500/200.plans.xml.gz");
-			System.out.println(" plans_before.xml.gz -> /home/meisterk/Desktop/westumfahrung_runs/run243/200.plans.xml.gz");
-			System.out.println("");
-			System.out.println("and run ");
-			System.out.println("");
-			System.out.println("java WestumfahrungRuns input/network.xml input/plans_before.xml.gz input/events_before.dat input/plans_after input/events_after.dat output/westumfahrung.txt");
+			System.out.println("arg 0: scenarioNameBefore");
+			System.out.println("arg 1: network_before.xml");
+			System.out.println("arg 2: plans_before.xml.gz");
+			System.out.println("arg 3: events_before.dat");
+			System.out.println("arg 4: scenarioNameAfter");
+			System.out.println("arg 5: network_after.xml");
+			System.out.println("arg 6: plans_after.xml.gz");
+			System.out.println("arg 7: events_after.dat");
 			System.out.println("");
 			System.exit(-1);
 		} else {
@@ -253,7 +257,12 @@ public class WestumfahrungRuns {
 			scenarioNetworks.put(scenarioName, network);
 			Gbl.getWorld().setNetworkLayer(network);
 
-			Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null);
+			//Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null);
+			Plans plans = new Plans(false);
+			PlansReaderI plansReader = new MatsimPlansReader(plans);
+			plansReader.readFile(plansInputFilenames.get(scenarioName));
+			plans.printPlansCount();
+
 			scenarioPlans.put(scenarioName, plans);
 
 			for (Integer analysis : analysisNames.keySet()) {
