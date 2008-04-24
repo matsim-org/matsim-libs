@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils;
+package org.matsim.utils.vis;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,14 +26,10 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils");
+		TestSuite suite = new TestSuite("Tests for org.matsim.utils.vis");
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.utils.charts.AllTests.suite());
-		suite.addTest(org.matsim.utils.collections.AllTests.suite());
-		suite.addTest(org.matsim.utils.geometry.AllTests.suite());
-		suite.addTest(org.matsim.utils.misc.AllTests.suite());
-		suite.addTest(org.matsim.utils.vis.AllTests.suite());
-		suite.addTestSuite(WorldUtilsTest.class);
+		suite.addTest(org.matsim.utils.vis.routervis.AllTests.suite());
+		suite.addTest(org.matsim.utils.vis.snapshots.AllTests.suite());
 		//$JUnit-END$
 		return suite;
 	}
