@@ -33,6 +33,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.geotools.MGC;
@@ -55,7 +56,7 @@ public class Network2LinkGraph {
 	protected GeometryFactory geofac;
 	protected Collection<Feature> features;
 	protected DefaultFeatureTypeFactory dftf;
-	protected List<Map<String, ?>> parameters = new ArrayList<Map<String, ?>>();
+	protected List<Map<Id, ?>> parameters = new ArrayList<Map<Id, ?>>();
 	protected List<AttributeType> attrTypes = new ArrayList<AttributeType>();
 
 	public Network2LinkGraph() {
@@ -89,8 +90,7 @@ public class Network2LinkGraph {
 				cap, type, freespeed });
 	}
 
-	public void addParameter(String paramName, Class<?> clazz,
-			Map<String, ?> params) {
+	public void addParameter(String paramName, Class<?> clazz, Map<Id, ?> params) {
 		attrTypes.add(AttributeTypeFactory.newAttributeType(paramName, clazz));
 		this.parameters.add(params);
 	}

@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
@@ -40,22 +41,21 @@ import org.matsim.network.NetworkLayer;
 public class Volume2QGIS {
 	public static String ch1903 = "PROJCS[\"CH1903_LV03\",GEOGCS[\"GCS_CH1903\",DATUM[\"D_CH1903\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Hotine_Oblique_Mercator_Azimuth_Center\"],PARAMETER[\"False_Easting\",600000],PARAMETER[\"False_Northing\",200000],PARAMETER[\"Scale_Factor\",1],PARAMETER[\"Azimuth\",90],PARAMETER[\"Longitude_Of_Center\",7.439583333333333],PARAMETER[\"Latitude_Of_Center\",46.95240555555556],UNIT[\"Meter\",1],AUTHORITY[\"EPSG\",\"21781\"]]";
 
-	public static List<Map<String, Integer>> createVolumes(NetworkLayer net,
+	public static List<Map<Id, Integer>> createVolumes(NetworkLayer net,
 			VolumesAnalyzer va) {
-		List<Map<String, Integer>> volumes = new ArrayList<Map<String, Integer>>(
-				24);
+		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
 		for (int i = 0; i < 24; i++) {
 			volumes.add(i, null);
 		}
 		for (Link link : (net.getLinks()).values()) {
-			String linkId = link.getId().toString();
-			int[] v = va.getVolumesForLink(linkId);
+			Id linkId = link.getId();
+			int[] v = va.getVolumesForLink(linkId.toString());
 			for (int i = 0; i < 24; i++) {
-				Map<String, Integer> m = volumes.get(i);
+				Map<Id, Integer> m = volumes.get(i);
 				if (m != null) {
 					m.put(linkId, ((v != null) ? v[i] : 0) * 10);
 				} else if (m == null) {
-					m = new HashMap<String, Integer>();
+					m = new HashMap<Id, Integer>();
 					m.put(linkId, ((v != null) ? v[i] : 0) * 10);
 					volumes.add(i, m);
 				}
@@ -68,7 +68,7 @@ public class Volume2QGIS {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MATSimNet2QGIS3 mn2q = new MATSimNet2QGIS3();
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		/*
 		 * ///////////////////////////////////////////////////////////////
 		 * Traffic Volumes and MATSim-network to Shp-file // *
@@ -95,13 +95,13 @@ public class Volume2QGIS {
 		NetworkLayer net = mn2q.getNetwork();
 		VolumesAnalyzer vaA = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 		mn2q.readEvents("../runs/run456/200.events.txt.gz", vaA);
-		List<Map<String, Integer>> volsA = createVolumes(net, vaA);
+		List<Map<Id, Integer>> volsA = createVolumes(net, vaA);
 		VolumesAnalyzer vaB = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 		mn2q.readEvents("../runs/run454/200.events.txt.gz", vaB);
-		List<Map<String, Integer>> volsB = createVolumes(net, vaB);
+		List<Map<Id, Integer>> volsB = createVolumes(net, vaB);
 		for (int i = 0; i < 24; i++) {
-			Map<String, Integer> diff = new TreeMap<String, Integer>();
-			for (String linkId : volsB.get(i).keySet()) {
+			Map<Id, Integer> diff = new TreeMap<Id, Integer>();
+			for (Id linkId : volsB.get(i).keySet()) {
 				diff.put(linkId, volsA.get(i).get(linkId).intValue()
 						- volsB.get(i).get(linkId).intValue());
 			}

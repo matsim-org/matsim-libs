@@ -43,7 +43,7 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction for
- * Plansfile with Car_License
+ * Plansfile with "Car_License"
  * 
  * @author ychen
  * 

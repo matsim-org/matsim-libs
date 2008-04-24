@@ -45,6 +45,7 @@ import org.matsim.utils.io.IOUtils;
 
 import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
+import playground.yu.analysis.PtRate;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction

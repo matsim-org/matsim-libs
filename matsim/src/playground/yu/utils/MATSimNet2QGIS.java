@@ -37,6 +37,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
@@ -54,7 +55,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author ychen
  * 
  */
-public class MATSimNet2QGIS3 {
+public class MATSimNet2QGIS {
 	/**
 	 * this class is only a copy of
 	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class>
@@ -122,7 +123,7 @@ public class MATSimNet2QGIS3 {
 	}
 
 	public void addParameter(String paraName, Class<?> clazz,
-			Map<String, ?> parameters) {
+			Map<Id, ?> parameters) {
 		this.n2g.addParameter(paraName, clazz, parameters);
 	}
 

@@ -46,7 +46,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	/**
@@ -81,9 +81,13 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		this(network, binSize, 30 * 3600 / binSize + 1);
 	}
 
+	public CalcLinkAvgSpeed(NetworkLayer network) {
+		this(network, 3600);
+	}
+
 	/**
 	 * support the speed calculation only for the links in a circle area
-	 *
+	 * 
 	 * @param network
 	 * @param x-abscissa
 	 *            of the center of the circle area
@@ -94,9 +98,9 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	 */
 	public CalcLinkAvgSpeed(NetworkLayer network, double x, double y,
 			double radius) {
-		this(network, 3600);
-		this.interestLinks = new NetworkLinksInCircle(network)
-				.getLinks(x, y, radius);
+		this(network);
+		this.interestLinks = new NetworkLinksInCircle(network).getLinks(x, y,
+				radius);
 	}
 
 	public static class SpeedCounter {
@@ -220,8 +224,8 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 			out.write(head.toString());
 			out.flush();
 
-			for (Link l : ((this.interestLinks == null) ? (this.network.getLinks())
-					.values() : this.interestLinks)) {
+			for (Link l : ((this.interestLinks == null) ? (this.network
+					.getLinks()).values() : this.interestLinks)) {
 				Id linkId = l.getId();
 				StringBuffer line = new StringBuffer(linkId.toString() + "\t"
 						+ l.getCapacity());
@@ -246,13 +250,13 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	public void writeChart(String chartFilename) {
-		int xsLength =this.nofBins-1;
+		int xsLength = this.nofBins - 1;
 		double[] xs = new double[xsLength];
 		for (int i = 0; i < xsLength; i++) {
 			xs[i] = ((double) i) * (double) this.binSize / 3600.0;
 		}
 		double[] ySpeed = new double[xsLength];
-		for (int i = 0; i <xsLength; i++) {
+		for (int i = 0; i < xsLength; i++) {
 			if (this.speedsCount[i] > 0) {
 				ySpeed[i] = this.speeds[i] / this.speedsCount[i];
 			}

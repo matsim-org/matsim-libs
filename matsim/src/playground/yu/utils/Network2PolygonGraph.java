@@ -54,7 +54,8 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 	 * @param network
 	 * @param coordinateReferenceSystem
 	 */
-	public Network2PolygonGraph(NetworkLayer network, CoordinateReferenceSystem crs) {
+	public Network2PolygonGraph(NetworkLayer network,
+			CoordinateReferenceSystem crs) {
 		this.geofac = new GeometryFactory();
 		this.network = network;
 		this.crs = crs;
@@ -126,7 +127,7 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 			o[6] = Integer.parseInt(link.getType());
 			o[7] = link.getFreespeed(0);
 			for (int i = 0; i < parameters.size(); i++) {
-				o[i + 8] = parameters.get(i).get(link.getId().toString());
+				o[i + 8] = parameters.get(i).get(link.getId());
 			}
 			// parameters.get(link.getId().toString()) }
 			Feature ft = ftRoad.create(o, "network");
