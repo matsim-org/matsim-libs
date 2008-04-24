@@ -41,6 +41,8 @@ public class AllTests {
 
 		TestSuite suite = new TestSuite("All tests for org.matsim");
 		//$JUnit-BEGIN$
+
+		// run unit tests
 		suite.addTest(org.matsim.basic.v01.AllTests.suite());
 		suite.addTest(org.matsim.config.AllTests.suite());
 		suite.addTest(org.matsim.controler.AllTests.suite());
@@ -60,7 +62,13 @@ public class AllTests {
 		suite.addTest(org.matsim.utils.AllTests.suite());
 		suite.addTest(org.matsim.world.AllTests.suite());
 		suite.addTest(org.matsim.withinday.AllTests.suite());
+
+		// run integration tests
+		suite.addTest(org.matsim.integration.AllTests.suite());
+
+		// run examples (=extensive integration tests)
 		suite.addTest(org.matsim.examples.AllTests.suite());
+
 		//$JUnit-END$
 		return suite;
 	}
