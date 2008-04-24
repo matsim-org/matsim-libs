@@ -21,6 +21,7 @@
 package playground.meisterk;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,7 +68,9 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 import org.matsim.plans.Route;
+import org.matsim.plans.algorithms.PersonAnalyseTimesByActivityType;
 import org.matsim.plans.algorithms.PlansAlgorithm;
+import org.matsim.plans.algorithms.PersonAnalyseTimesByActivityType.Activities;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.PlanomatOptimizeTimes;
@@ -99,8 +102,6 @@ import org.matsim.utils.vis.kml.Style;
 import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.world.Location;
 
-import playground.meisterk.strc2007.PersonScenarioBoxCut;
-
 public class MyRuns {
 
 	public final static String CONFIG_MODULE = "planCalcScore";
@@ -111,6 +112,8 @@ public class MyRuns {
 	public final static String CONFIG_PERFORMING = "performing";
 	public final static String CONFIG_LEARNINGRATE = "learningRate";
 	public final static String CONFIG_DISTANCE_COST = "distanceCost";
+
+	public static final int TIME_BIN_SIZE = 300;
 
 	protected static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
 	protected static double marginalUtilityOfWaiting = Double.NaN;
@@ -137,7 +140,6 @@ public class MyRuns {
 //		MyRuns.testCharyparNagelFitnessFunction();
 //		MyRuns.conversionSpeedTest();
 //		MyRuns.convertPlansV0ToPlansV4();
-//		MyRuns.extractBoxForSTRC2007();
 		MyRuns.produceSTRC2007KML();
 
 		System.out.println();
@@ -169,71 +171,6 @@ public class MyRuns {
 
 	}
 
-	private static void extractBoxForSTRC2007() {
-
-		// determine the rectangle we want to present
-
-		CoordinateTransformationI cti = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
-
-		double n = 47 + 25.0 / 60 + 34.0 / 3600;
-		double s = 47 + 24.0 / 60 + 37.0 / 3600;
-		double w = 8 + 32.0 / 60 + 46.0 / 3600;
-		double e = 8 + 34.0 / 60 + 46.0 / 3600;
-
-		CoordI nwCornerWGS84 = new Coord(w, n);
-		CoordI seCornerWGS84 = new Coord(e, s);
-
-		CoordI nwCornerCH1903 = cti.transform(nwCornerWGS84);
-		CoordI seCornerCH1903 = cti.transform(seCornerWGS84);
-
-		System.out.println("North: " + nwCornerCH1903.getY());
-		System.out.println("South: " + seCornerCH1903.getY());
-		System.out.println("West: " + nwCornerCH1903.getX());
-		System.out.println("East: " + seCornerCH1903.getX());
-
-		// cut out demand in this rectangle
-
-		// initialize scenario with events from a given events file
-		// - network
-		NetworkLayer network = MyRuns.initWorldNetwork();
-		// - population
-		PersonScenarioBoxCut boxAlgo = new PersonScenarioBoxCut(
-				network,
-				nwCornerCH1903.getY(),
-				seCornerCH1903.getY(),
-				nwCornerCH1903.getX(),
-				seCornerCH1903.getX());
-		ArrayList<PlansAlgorithm> plansAlgos = new ArrayList<PlansAlgorithm>();
-		plansAlgos.add(boxAlgo);
-
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Plans.USE_STREAMING, plansAlgos);
-
-		Plans populationInTheBox = boxAlgo.getPlansInTheHomeBox();
-		NetworkLayer touchedNetwork = boxAlgo.getTouchedNetwork();
-
-		System.out.println("Number of persons with home location in the box: " + populationInTheBox.getPersons().size());
-
-//		MyRuns.writePopulation(populationInTheBox);
-
-		MyRuns.writeNetwork(
-				touchedNetwork,
-				Gbl.getConfig().getParam("network", "networkInitDemandFilename"));
-//		NetworkCutBox networkCutBox = new NetworkCutBox(
-//		nwCornerCH1903.getY(),
-//		seCornerCH1903.getY(),
-//		nwCornerCH1903.getX(),
-//		seCornerCH1903.getX());
-
-//		network.addAlgorithm(networkCutBox);
-//		network.runAlgorithms();
-
-//		NetworkLayer theNetworkCut = networkCutBox.getNetworkCut();
-
-//		String networkCutFilename = Gbl.getConfig().getParam(Gbl.getConfig().NETWORK, "networkCutFilename");
-
-//		MyRuns.writeNetwork(theNetworkCut, networkCutFilename);
-
-	}
 
 	private static void produceSTRC2007KML() {
 
@@ -257,7 +194,7 @@ public class MyRuns {
 		// - network
 		NetworkLayer network = MyRuns.initWorldNetwork();
 		// - population
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Plans.NO_STREAMING, null);
+		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
 
 		KML myKML;
 		Document myKMLDocument;
@@ -538,7 +475,7 @@ public class MyRuns {
 		// - network
 		NetworkLayer network = MyRuns.initWorldNetwork();
 		// - population
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Plans.NO_STREAMING, null);
+		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
 //		TravelTimeI tTravelCalc = new TravelTimeCalculator(network);
@@ -621,7 +558,7 @@ public class MyRuns {
 		// - network
 		NetworkLayer network = MyRuns.initWorldNetwork();
 		// - population
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Plans.NO_STREAMING, null);
+		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
 		DepartureDelayAverageCalculator delayCalc = new DepartureDelayAverageCalculator(network, 900);
@@ -685,7 +622,7 @@ public class MyRuns {
 		// - network
 		NetworkLayer network = MyRuns.initWorldNetwork();
 		// - population
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Plans.NO_STREAMING, null);
+		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
 		TravelTimeI tTravelCalc = MyRuns.initTravelTimeIForPlanomat(network);
@@ -790,7 +727,7 @@ public class MyRuns {
 		System.out.println("performing vo to v4 plans conversion...");
 
 		NetworkLayer network = MyRuns.initWorldNetwork();
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Plans.NO_STREAMING, null);
+		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
 		MyRuns.writePopulation(matsimAgentPopulation);
 
 		System.out.println("performing vo to v4 plans conversion...DONE.");
@@ -820,7 +757,7 @@ public class MyRuns {
 		// - network
 		NetworkLayer network = MyRuns.initWorldNetwork();
 		// - population
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Plans.NO_STREAMING, null);
+		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
 		TravelTimeI tTravelCalc = MyRuns.initTravelTimeIForPlanomat(network);
@@ -988,7 +925,7 @@ public class MyRuns {
 		// - network
 		NetworkLayer network = MyRuns.initWorldNetwork();
 		// - population
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Plans.NO_STREAMING, null);
+		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
 		TravelTimeI tTravelCalc = new TravelTimeCalculatorArray(network);
@@ -1231,4 +1168,76 @@ public class MyRuns {
 
 	}
 
+	/**
+	 * Used this routine for MeisterEtAl_Heureka_2008 paper,
+	 * plot of number of deps, arrs by activity type to visualize 
+	 * the time distribution from microcensus.
+	 */
+	public static void analyseInitialTimes() {
+
+		// initialize scenario with events from a given events file
+		// - network
+		final NetworkLayer network = MyRuns.initWorldNetwork();
+		// - population
+		PlansAlgorithm pa = new PersonAnalyseTimesByActivityType(TIME_BIN_SIZE);
+		ArrayList<PlansAlgorithm> plansAlgos = new ArrayList<PlansAlgorithm>();
+		plansAlgos.add(pa);
+
+		Plans matsimAgentPopulation = new Plans(Plans.USE_STREAMING);
+		PlansReaderI plansReader = new MatsimPlansReader(matsimAgentPopulation);
+		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		matsimAgentPopulation.printPlansCount();
+		int[][] numDeps = ((PersonAnalyseTimesByActivityType) pa).getNumDeps();
+		MyRuns.writeAnArray(numDeps, "output/deptimes.txt");
+		int[][] numArrs = ((PersonAnalyseTimesByActivityType) pa).getNumArrs();
+		MyRuns.writeAnArray(numArrs, "output/arrtimes.txt");
+		int[][] numTraveling = ((PersonAnalyseTimesByActivityType) pa).getNumTraveling();
+		MyRuns.writeAnArray(numTraveling, "output/traveling.txt");
+
+	}
+
+	private static void writeAnArray(int[][] anArray, String filename) {
+		
+		File outFile = null;
+		BufferedWriter out = null;
+
+		outFile = new File(filename);
+
+		try {
+			out = new BufferedWriter(new FileWriter(outFile));
+
+			boolean timesAvailable = true;
+			int timeIndex = 0;
+
+			out.write("#");
+			for (int ii=0; ii < Activities.values().length; ii++) {
+				out.write(Activities.values()[ii] + "\t");
+			}
+			out.newLine();
+			
+			while (timesAvailable) {
+
+				timesAvailable = false;
+				
+				out.write(Time.writeTime(timeIndex * TIME_BIN_SIZE) + "\t");
+				for (int aa=0; aa < anArray.length; aa++) {
+
+//					if (numDeps[aa][timeIndex] != null) {
+					if (timeIndex < anArray[aa].length) {
+						out.write(Integer.toString(anArray[aa][timeIndex]));
+						timesAvailable = true;
+					} else {
+						out.write("0");
+					}
+					out.write("\t");
+				}
+				out.newLine();
+				timeIndex++;
+			}
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
 }
