@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jhackney.deprecated;
+package playground.jhackney.archive;
 
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PlanAlgorithmI;

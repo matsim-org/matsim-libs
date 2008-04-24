@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialNetworkI.java
+ * DummyMobSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,15 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.deprecated;
+package playground.jhackney.archive;
 
-import java.util.Collection;
+import org.matsim.events.Events;
+import org.matsim.mobsim.Simulation;
+import org.matsim.plans.Plans;
 
-public interface SocialNetworkI {
-	public void generateLinks(int iteration);
 
-	public void removeLinks();
-	
-	public Collection getLinks();
+public class DummyMobSim extends Simulation {
+    protected Plans plans=null;
+    protected Events events= null;
+    
+	public DummyMobSim(final Plans plans, final Events events) {
+		super();
+//		setEvents(events);
+		this.events=events;
+		this.plans = plans;
+		System.out.println("NOTE this doesn't change the plan scores. Are the events non-null?");
 
+	}
+	public final Events getEvents() {
+		return events;
+	}
 }

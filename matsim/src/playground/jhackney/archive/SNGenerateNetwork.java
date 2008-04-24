@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.deprecated;
+package playground.jhackney.archive;
 
 import java.io.BufferedWriter;
 import java.io.File;

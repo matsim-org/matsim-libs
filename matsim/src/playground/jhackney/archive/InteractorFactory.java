@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DummyMobSim.java
+ * InteractorFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,26 +18,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.deprecated;
+package playground.jhackney.archive;
 
-import org.matsim.events.Events;
-import org.matsim.mobsim.Simulation;
-import org.matsim.plans.Plans;
+import playground.jhackney.interactions.NonSpatialInteractor;
+import playground.jhackney.socialnet.SocialNetwork;
+/**
+ * Deprecated
+ * @author jhackney
+ *
+ */
+public class InteractorFactory {
+    public static Interactor createNonSpatialInteractor(String type, SocialNetwork net) {
 
-
-public class DummyMobSim extends Simulation {
-    protected Plans plans=null;
-    protected Events events= null;
-    
-	public DummyMobSim(final Plans plans, final Events events) {
-		super();
-//		setEvents(events);
-		this.events=events;
-		this.plans = plans;
-		System.out.println("NOTE this doesn't change the plan scores. Are the events non-null?");
-
+	Interactor inter;
+	if (type.equals("random")) {
+	    inter = new NonSpatialInteractor(net);
 	}
-	public final Events getEvents() {
-		return events;
+	else inter = null;
+	inter.setType(type);
+	return inter;
+    }
+    public static Interactor createSpatialInteractor(String type, SocialNetwork net) {
+
+	Interactor inter;
+	if (type.equals("random")){
+	    inter = new SpatialInteractor(net);
 	}
+	else inter = null;
+	inter.setType(type);
+	return inter;
+    }
 }

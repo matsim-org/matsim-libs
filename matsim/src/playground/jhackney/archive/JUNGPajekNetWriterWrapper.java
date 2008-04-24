@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.io;
+package playground.jhackney.archive;
 
 import java.io.IOException;
 import java.util.Collection;

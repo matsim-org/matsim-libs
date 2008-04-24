@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RandomSocialNetwork.java
+ * EmptySocialNetwork.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,58 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.deprecated;
+package playground.jhackney.archive;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 
 import playground.jhackney.socialnet.SocialNetwork;
 
-/*
- * Constructs a random social network.
- * Parameters: kbar = average degree, numPersons = number of nodes.
- * No spatial dimension possible in this algorithm.
- * Undirected Erd�s/R�nyi random graph. Dorogovtsev and Mendes 2003.
- * To make this algorithm DIRECTED, double the number of links.
- */
-public class RandomSocialNetwork extends SocialNetwork {
-    // kbar is the average degree of the random graph.
-    // It should be a config parameter, not hard-coded
-    int kbar; // get from config
+public class EmptySocialNetwork extends SocialNetwork{
 
     Object[] personList;
 
     int numPersons;
 
     int numLinks;
-    
-    public RandomSocialNetwork(Plans plans) {
+
+    public EmptySocialNetwork(Plans plans) {
 	super(plans);
 	setupIter=1;
-	kbar = Integer.parseInt(Gbl.getConfig().socnetmodule().getSocNetKbar());
-	System.out.println(" Links the Persons together in UNDIRECTED Erd�s/R�nyi random graph. Dorogovtsev and Mendes 2003.");
+
 	personList = plans.getPersons().values().toArray();
 	numPersons = personList.length;
-	numLinks = (int) ((kbar * numPersons) / 2.);
-
-	System.out.println(" kbar, numPersons, numLinks approximately= [" + kbar + ", " + numPersons + ", " + numLinks
-		+ "]");
+	numLinks = 0;
     }
 
     public void generateLinks(int iteration) {
-	for (int i = 0; i < numLinks; i++) {
-	    Person person1 = (Person) personList[Gbl.random.nextInt(personList.length)];
-	    Person person2 = (Person) personList[Gbl.random.nextInt(personList.length)];
-	    this.makeSocialContact(person1, person2, iteration);
-//	    if(UNDIRECTED){
-//	    this.generateUndirectedLink(person1, person2, iteration);
-//	    }else this.generateDirectedLink(person1,person2, iteration);
-	}
+	int countMultiples = 0; // counts attempts made to initiate multiple
+
+	System.out.println(" " + this.getClass() + " " + countMultiples
+		+ " links were prevented from being added multiple times.");
+	System.out.println(" " + this.getClass()
+		+ ": kbar, numPersons, numLinks = ["
+		+ (2. * (numLinks - countMultiples) / numPersons)
+		+ ", " + numPersons + ", " + (numLinks - countMultiples) + "]");
     }
 
     public void removeLinks() {
 	// TODO Auto-generated method stub
-	
+
     }
- }
+
+
+}

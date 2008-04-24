@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.deprecated;
+package playground.jhackney.archive;
 
 import static org.matsim.controler.Controler.DIRECTORY_ITERS;
 import static org.matsim.controler.Controler.outputPath;

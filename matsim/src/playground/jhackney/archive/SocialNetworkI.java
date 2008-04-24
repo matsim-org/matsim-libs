@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InteractorFactory.java
+ * SocialNetworkI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,34 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.deprecated;
+package playground.jhackney.archive;
 
-import playground.jhackney.interactions.NonSpatialInteractor;
-import playground.jhackney.socialnet.SocialNetwork;
-/**
- * Deprecated
- * @author jhackney
- *
- */
-public class InteractorFactory {
-    public static Interactor createNonSpatialInteractor(String type, SocialNetwork net) {
+import java.util.Collection;
 
-	Interactor inter;
-	if (type.equals("random")) {
-	    inter = new NonSpatialInteractor(net);
-	}
-	else inter = null;
-	inter.setType(type);
-	return inter;
-    }
-    public static Interactor createSpatialInteractor(String type, SocialNetwork net) {
+public interface SocialNetworkI {
+	public void generateLinks(int iteration);
 
-	Interactor inter;
-	if (type.equals("random")){
-	    inter = new SpatialInteractor(net);
-	}
-	else inter = null;
-	inter.setType(type);
-	return inter;
-    }
+	public void removeLinks();
+	
+	public Collection getLinks();
+
 }
