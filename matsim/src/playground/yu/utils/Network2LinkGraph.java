@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * 
  * @author ychen
  */
-public class NetworkToGraph2 {
+public class Network2LinkGraph {
 
 	protected NetworkLayer network;
 	protected CoordinateReferenceSystem crs;
@@ -58,10 +58,10 @@ public class NetworkToGraph2 {
 	protected List<Map<String, ?>> parameters = new ArrayList<Map<String, ?>>();
 	protected List<AttributeType> attrTypes = new ArrayList<AttributeType>();
 
-	public NetworkToGraph2() {
+	public Network2LinkGraph() {
 	}// dummy constructor
 
-	public NetworkToGraph2(NetworkLayer network,
+	public Network2LinkGraph(NetworkLayer network,
 			CoordinateReferenceSystem coordinateReferenceSystem) {
 		this.geofac = new GeometryFactory();
 		this.network = network;

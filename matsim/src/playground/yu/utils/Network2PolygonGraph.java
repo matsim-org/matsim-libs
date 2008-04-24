@@ -49,12 +49,12 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * @author yu
  * 
  */
-public class NetworkToGraph3 extends NetworkToGraph2 {
+public class Network2PolygonGraph extends Network2LinkGraph {
 	/**
 	 * @param network
 	 * @param coordinateReferenceSystem
 	 */
-	public NetworkToGraph3(NetworkLayer network, CoordinateReferenceSystem crs) {
+	public Network2PolygonGraph(NetworkLayer network, CoordinateReferenceSystem crs) {
 		this.geofac = new GeometryFactory();
 		this.network = network;
 		this.crs = crs;
@@ -82,34 +82,7 @@ public class NetworkToGraph3 extends NetworkToGraph2 {
 	}
 
 	private LinearRing getLinearRing(Link link) {
-		// double minWidth = link.getCapacity() / network.getCapacityPeriod()
-		// * 3600.0 / 50.0;
-		//
-		// Coordinate from = new
-		// Coordinate(link.getFromNode().getCoord().getX(),
-		// link.getFromNode().getCoord().getY());
-		//
-		// Coordinate to = new Coordinate(link.getToNode().getCoord().getX(),
-		// link
-		// .getToNode().getCoord().getY());
-		//
-		// double xdiff = to.x - from.x;
-		// double ydiff = to.y - from.y;
-		//
-		// double ogradient = Double.MAX_VALUE;
-		// if (ydiff != 0)
-		// ogradient = -xdiff / ydiff;
-		// double csq = Math.pow(minWidth, 2);
-		// // double csq = Math.pow(4,2);
-		// double xwidth = Math.sqrt(csq / (1 + Math.pow(ogradient, 2)));
-		// double ywidth = xwidth * ogradient;
-		//
-		// Coordinate fromB = new Coordinate(from.x + xwidth, from.y + ywidth,
-		// 0);
-		// Coordinate toB = new Coordinate(to.x + xwidth, to.y + ywidth, 0);
-		//
-		// return new LinearRing(new CoordinateArraySequence(new Coordinate[] {
-		// from, to, toB, fromB, from }), this.geofac);
+
 		double minWidth = link.getCapacity() / network.getCapacityPeriod()
 				* 3600.0 / 50.0;
 

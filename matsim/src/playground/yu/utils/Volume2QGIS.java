@@ -70,15 +70,6 @@ public class Volume2QGIS {
 	public static void main(String[] args) {
 		MATSimNet2QGIS3 mn2q = new MATSimNet2QGIS3();
 		/*
-		 * ///////////////////////////////////////////////////// // write
-		 * MATSim-network to Shp-file //
-		 * ///////////////////////////////////////////////////// //
-		 * mn2s.readNetwork("test/yu/utils/ivtch-osm.1.2.xml"); //
-		 * mn2s.setCrs(ch1903); // mn2s.writeShapeFile("test/yu/utils/0.shp"); //
-		 * /////////////////////////////////////////////////////
-		 */
-
-		/*
 		 * ///////////////////////////////////////////////////////////////
 		 * Traffic Volumes and MATSim-network to Shp-file // *
 		 * ///////////////////////////////////////////////////////////////
@@ -117,6 +108,6 @@ public class Volume2QGIS {
 			mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
 					diff);
 		}
-		mn2q.writeShapeFile("test/yu/ivtch/456.200-454.200.shp");
+		mn2q.writeShapeFile("test/yu/test/test.shp");
 	}
 }
