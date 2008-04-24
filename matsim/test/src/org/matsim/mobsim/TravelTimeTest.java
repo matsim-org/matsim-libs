@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.controler.Controler;
+import org.matsim.controler.ScenarioData;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.events.Events;
@@ -40,16 +40,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class TravelTimeTest extends MatsimTestCase implements
 		EventHandlerLinkLeaveI, EventHandlerLinkEnterI {
 
-
   private Map<Id, Map<Id, Double>> agentTravelTimes;
-
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
 
 	public void testEquilOneAgent() {
 		this.agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
@@ -57,20 +48,20 @@ public class TravelTimeTest extends MatsimTestCase implements
 		String popFileName = "test/scenarios/equil/plans1.xml";
 
 		conf.plans().setInputFile(popFileName);
-		conf.controler().setLastIteration(0);
-
-		Controler controler = new Controler(conf);
-		Events events = controler.getEvents();
+		
+		ScenarioData data = new ScenarioData(conf);
+		Events events = new Events();
 		events.addHandler(this);
-		controler.run();
+		
+		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 
 		Map<Id, Double> travelTimes = this.agentTravelTimes.get(new IdImpl("1"));
-		assertEquals(360.0, travelTimes.get(new IdImpl(6)));
-		assertEquals(180.0, travelTimes.get(new IdImpl(15)));
-		assertEquals(13560.0, travelTimes.get(new IdImpl(20)));
-		assertEquals(360.0, travelTimes.get(new IdImpl(21)));
-		assertEquals(1260.0, travelTimes.get(new IdImpl(22)));
-		assertEquals(360.0, travelTimes.get(new IdImpl(23)));
+		assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), EPSILON);
+		assertEquals(180.0, travelTimes.get(new IdImpl(15)).intValue(), EPSILON);
+		assertEquals(13560.0, travelTimes.get(new IdImpl(20)).intValue(), EPSILON);
+		assertEquals(360.0, travelTimes.get(new IdImpl(21)).intValue(), EPSILON);
+		assertEquals(1260.0, travelTimes.get(new IdImpl(22)).intValue(), EPSILON);
+		assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), EPSILON);
 	}
 
 	public void testEquilTwoAgents() {
@@ -79,30 +70,29 @@ public class TravelTimeTest extends MatsimTestCase implements
 		String popFileName = "test/scenarios/equil/plans2.xml";
 
 		conf.plans().setInputFile(popFileName);
-		conf.controler().setLastIteration(0);
-
-		Controler controler = new Controler(conf);
-		Events events = controler.getEvents();
+		
+		ScenarioData data = new ScenarioData(conf);
+		Events events = new Events();
 		events.addHandler(this);
-		controler.run();
+		
+		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 
 		Map<Id, Double> travelTimes = this.agentTravelTimes.get(new IdImpl("1"));
-		assertEquals(360.0, travelTimes.get(new IdImpl(6)));
-		assertEquals(180.0, travelTimes.get(new IdImpl(15)));
-		assertEquals(13560.0, travelTimes.get(new IdImpl(20)));
-		assertEquals(360.0, travelTimes.get(new IdImpl(21)));
-		assertEquals(1260.0, travelTimes.get(new IdImpl(22)));
-		assertEquals(360.0, travelTimes.get(new IdImpl(23)));
+		assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), EPSILON);
+		assertEquals(180.0, travelTimes.get(new IdImpl(15)).intValue(), EPSILON);
+		assertEquals(13560.0, travelTimes.get(new IdImpl(20)).intValue(), EPSILON);
+		assertEquals(360.0, travelTimes.get(new IdImpl(21)).intValue(), EPSILON);
+		assertEquals(1260.0, travelTimes.get(new IdImpl(22)).intValue(), EPSILON);
+		assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), EPSILON);
 
 
 		travelTimes = this.agentTravelTimes.get(new IdImpl("2"));
-		assertEquals(360.0, travelTimes.get(new IdImpl(5)));
-		assertEquals(180.0, travelTimes.get(new IdImpl(14)));
-		assertEquals(13560.0, travelTimes.get(new IdImpl(20)));
-		assertEquals(360.0, travelTimes.get(new IdImpl(21)));
-		assertEquals(1260.0, travelTimes.get(new IdImpl(22)));
-		assertEquals(360.0, travelTimes.get(new IdImpl(23)));
-
+		assertEquals(360.0, travelTimes.get(new IdImpl(5)).intValue(), EPSILON);
+		assertEquals(180.0, travelTimes.get(new IdImpl(14)).intValue(), EPSILON);
+		assertEquals(13560.0, travelTimes.get(new IdImpl(20)).intValue(), EPSILON);
+		assertEquals(360.0, travelTimes.get(new IdImpl(21)).intValue(), EPSILON);
+		assertEquals(1260.0, travelTimes.get(new IdImpl(22)).intValue(), EPSILON);
+		assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), EPSILON);
 	}
 
 	public void handleEvent(EventLinkEnter event) {
@@ -111,7 +101,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 			travelTimes = new HashMap<Id, Double>();
 			this.agentTravelTimes.put(event.agent.getId(), travelTimes);
 		}
-		travelTimes.put(event.link.getId(), event.time);
+		travelTimes.put(event.link.getId(), Double.valueOf(event.time));
 	}
 
 	public void handleEvent(EventLinkLeave event) {
@@ -119,8 +109,8 @@ public class TravelTimeTest extends MatsimTestCase implements
 		if (travelTimes != null) {
 			Double d = travelTimes.get(event.link.getId());
 			if (d != null) {
-				Double time = event.time - d.doubleValue();
-				travelTimes.put(event.link.getId(), time);
+				double time = event.time - d.doubleValue();
+				travelTimes.put(event.link.getId(), Double.valueOf(time));
 			}
 		}
 	}

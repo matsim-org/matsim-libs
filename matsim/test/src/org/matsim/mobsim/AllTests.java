@@ -26,10 +26,11 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.mobsim");
+		TestSuite suite = new TestSuite("Tests for org.matsim.mobsim");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(QueueLinkTest.class);
 		suite.addTestSuite(QueueSimulationTest.class);
+		suite.addTestSuite(TravelTimeTest.class);
 		//$JUnit-END$
 		return suite;
 	}
