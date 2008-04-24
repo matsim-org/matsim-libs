@@ -60,7 +60,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 		Gbl.getWorld().setNetworkLayer(network);
 
-		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
+		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
 		network.createNode("1", "0", "0", null);
 		network.createNode("2", "100", "0", null);
 		network.createNode("3", "200", "0", null);
@@ -93,12 +93,12 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		Person person2 = new Person(new IdImpl(2), "f", 40, "yes", "always", "yes");
 		plans.addPerson(person2);
 		Plan plan2 = person2.createPlan(null, "yes");
-		plan2.createAct("h", 0, 0, link1, 0.0, 7*3600.0, 7*3600.0, false);
+		plan2.createAct("h", 0, 0, link1, 0.0, 9*3600.0, 9*3600.0, false);
 		Leg leg2 = plan2.createLeg(0, "car", 9*3600.0, 10, 9*3600.0 + 10);
 		Route route2 = new Route();
 		route2.setRoute("2 3");
 		leg2.setRoute(route2);
-		plan2.createAct("w", 300, 0, link3, 7*3600.0+10, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, true);
+		plan2.createAct("w", 300, 0, link3, 9*3600.0+10, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, true);
 
 		// run the simulation with the timevariant network and the two persons
 		Events events = new Events();

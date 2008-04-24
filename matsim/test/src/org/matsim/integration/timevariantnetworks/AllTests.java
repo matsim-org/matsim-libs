@@ -20,8 +20,6 @@
 
 package org.matsim.integration.timevariantnetworks;
 
-import org.matsim.integration.timevariantnetworks.TravelTimeCalculatorIntegrationTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -31,7 +29,7 @@ public class AllTests {
 
 		TestSuite suite = new TestSuite("Integration Tests for time variant networks");
 		//$JUnit-BEGIN$
-//		suite.addTestSuite(QueueSimulationIntegrationTest.class); // FIXME test disabled because it does not yet work
+		suite.addTestSuite(QueueSimulationIntegrationTest.class);
 		suite.addTestSuite(TravelTimeCalculatorIntegrationTest.class);
 		//$JUnit-END$
 		return suite;
