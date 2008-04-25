@@ -123,6 +123,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 		double util = 0.0;
 		util += B2_Season * tickets ;
 		util += B2_H_W * dist_h_w;
+		util +=B2_Dist * dist_subtour;
 		if (age >= 18 & age < 30) {util += B2_18_30 * 1.0;}
 		if (car == "never") { util += B2_Car_Never *  1.0; }
 		if (udeg == 1) { util += 0; /* reference type */ }

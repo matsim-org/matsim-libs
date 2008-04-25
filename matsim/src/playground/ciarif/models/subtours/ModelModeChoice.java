@@ -36,16 +36,16 @@ public abstract class ModelModeChoice {
 	protected double nump; // number of persons of the household
 	protected double udeg; // degree of urbanization [2-5] (1=urbanized=reference)
 	protected double license; // yes = 1; no = 0;
-	protected double dist_subtour; // distance of the tour (in kilometers)
-	protected double dist_h_w; // distance between home and work or education facility (in meter)
+	protected double dist_subtour; // distance of the sub-tour (in kilometers)
+	protected double dist_h_w; // distance between home and work or education facility (in km)
 	protected double tickets; // holds some kind of season tickets 
 	protected int purpose; // main purpose of the tour (Work = 1, Education = 2, Shop=3)
-	protected String car; // av. of car (Always, Sometimes, Never)
+	protected String car; // availability of car (Always, Sometimes, Never)
 	protected String male; // 0-[unlimited]
 	protected boolean bike; // bike ownership
 	protected double prev_mode; // 1= car; 2= Pt; 3= Car passenger; 4= Bike; 5= Walk;
 	protected CoordI home_coord; //Coordinates of the home facility of the agent
-	protected boolean ride; // states if a car lift is possible, to avoid too much ride instead of pt, to check about the reason
+	protected boolean ride; // states if a car lift is possible, to avoid too much ride instead of pt, to check the reason it works like this
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors

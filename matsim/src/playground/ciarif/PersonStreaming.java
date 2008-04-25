@@ -29,6 +29,7 @@ import org.matsim.plans.PlansWriter;
 
 import playground.balmermi.census2000.data.Household;
 import playground.balmermi.census2000.data.Households;
+import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Person;
 import playground.balmermi.census2000.data.Persons;
 import playground.ciarif.models.subtours.PersonInitDemandSummaryTable;
@@ -40,9 +41,10 @@ public class PersonStreaming {
 
 		//Config config = Gbl.createConfig(args);
 		Scenario.setUpScenarioConfig();
-
-		System.out.println("person streaming...");
-
+		
+		//////////////////////////////////////////////////////////////////////
+		
+		
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
