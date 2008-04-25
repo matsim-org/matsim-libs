@@ -9,8 +9,6 @@ import org.matsim.plans.Plans;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
-import playground.jhackney.controler.ControllerListenerSecLocRandom;
-
 //structured this way, one can read several edge files in for a set of plans
 //and the edges will be added accordingly. so nets can be superposed.
 
