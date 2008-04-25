@@ -185,7 +185,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	private static double marginalUtilityOfWaiting = Double.NaN;
 	private static double marginalUtilityOfLateArrival = Double.NaN;
 	private static double marginalUtilityOfEarlyDeparture = Double.NaN;
-	private static double marginalUtilityOfTraveling = Double.NaN;
+	protected static double marginalUtilityOfTraveling = Double.NaN;
 	private static double marginalUtilityOfTravelingPT = Double.NaN; // public transport
 	private static double marginalUtilityOfPerforming = Double.NaN;
 	private static double distanceCost = Double.NaN;
@@ -316,7 +316,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		return score;
 	}
 
-	private double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double score = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
