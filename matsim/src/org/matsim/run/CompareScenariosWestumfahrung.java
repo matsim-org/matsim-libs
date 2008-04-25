@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.matsim.analysis.CalcLegTimes;
@@ -16,7 +17,9 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Act;
 import org.matsim.plans.MatsimPlansReader;
+import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.algorithms.PersonIdRecorder;
@@ -27,6 +30,7 @@ import org.matsim.plans.filters.PersonIdFilter;
 import org.matsim.plans.filters.RouteLinkFilter;
 import org.matsim.plans.filters.SelectedPlanFilter;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -95,14 +99,18 @@ public class CompareScenariosWestumfahrung {
 	private HashSet<Id> seebahnstrasseLinkIds = new HashSet<Id>();
 	private HashSet<Id> rosengartenstrasseLinkIds = new HashSet<Id>();
 
-//	private HashSet<Id> westtangenteLinkIds = new HashSet<Id>();
 	private HashSet<Id> westumfahrungLinkIds = new HashSet<Id>();
 
 	private TreeMap<String, String> plansInputFilenames = new TreeMap<String, String>();
 	private TreeMap<String, String> eventsInputFilenames = new TreeMap<String, String>();
 	private TreeMap<String, String> networkInputFilenames = new TreeMap<String, String>();
-	private String outFilename = null;
-	private ArrayList<String> outLines = new ArrayList<String>();
+
+	private String scenarioComparisonFilename = null;
+	private ArrayList<String> scenarioComparisonLines = new ArrayList<String>();
+
+	private String routeSwitchersListFilename = null;
+	private ArrayList<String> routeSwitchersLines = new ArrayList<String>();
+
 
 	/**
 	 * @param args
@@ -137,9 +145,11 @@ public class CompareScenariosWestumfahrung {
 
 	private void writeResults() {
 
-		File outFile = new File(outFilename);
+		File scenarioComparisonFile = new File(scenarioComparisonFilename);
+		File routeSwitchersFile = new File(routeSwitchersListFilename);
 		try {
-			FileUtils.writeLines(outFile, "UTF-8", outLines);
+			FileUtils.writeLines(scenarioComparisonFile, "UTF-8", scenarioComparisonLines);
+			FileUtils.writeLines(routeSwitchersFile, "UTF-8", routeSwitchersLines);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -154,14 +164,14 @@ public class CompareScenariosWestumfahrung {
 			System.out.println("Usage:");
 			System.out.println("java CompareScenarios args");
 			System.out.println("");
-			System.out.println("arg 0: scenarioNameBefore");
-			System.out.println("arg 1: network_before.xml");
-			System.out.println("arg 2: plans_before.xml.gz");
-			System.out.println("arg 3: events_before.dat");
-			System.out.println("arg 4: scenarioNameAfter");
-			System.out.println("arg 5: network_after.xml");
-			System.out.println("arg 6: plans_after.xml.gz");
-			System.out.println("arg 7: events_after.dat");
+			System.out.println("args[0]: scenarioNameBefore");
+			System.out.println("args[1]: network_before.xml");
+			System.out.println("args[2]: plans_before.xml.gz");
+			System.out.println("args[3]: events_before.dat");
+			System.out.println("args[4]: scenarioNameAfter");
+			System.out.println("args[5]: network_after.xml");
+			System.out.println("args[6]: plans_after.xml.gz");
+			System.out.println("args[7]: events_after.dat");
 			System.out.println("");
 			System.exit(-1);
 		} else {
@@ -184,7 +194,8 @@ public class CompareScenariosWestumfahrung {
 				eventsInputFilenames.put(scenarioNames[ii], args[argsIndex]);
 				argsIndex++;
 			}
-			outFilename = "output/" + args[0] + "_vs_" + args[4] + ".txt";
+			scenarioComparisonFilename = "output/" + args[0] + "_vs_" + args[4] + ".txt";
+			routeSwitchersListFilename = "output/" + args[0] + "_vs_" + args[4] + "_routeSwitchers.txt";
 		}
 
 	}
@@ -368,6 +379,28 @@ public class CompareScenariosWestumfahrung {
 					}
 				}
 
+				Act homeActivity = null;
+				if (analysis.intValue() == ROUTE_SWITCHERS_ANALYSIS_NAME) {
+					if (scenarioName.equals(scenarioNames[0])) {
+						routeSwitchersLines.add("person\thome_link\thome_x\thome_y");
+						for (Person person : plansSubPop.getPersons().values()) {
+							ActIterator actIterator = person.getSelectedPlan().getIteratorAct();
+							while (actIterator.hasNext()) {
+								homeActivity = (Act) actIterator.next();
+								if (Pattern.matches(".*h.*", homeActivity.getType())) {
+									continue;
+								}
+							}
+							routeSwitchersLines.add(new String(
+									person.getId() + "\t" +
+									homeActivity.getLinkId().toString() + "\t" +
+									homeActivity.getCoord().getX() + "\t" +
+									homeActivity.getCoord().getY()
+							));
+						}
+					}
+				}
+
 				PlanAverageScore planAverageScore = new PlanAverageScore();
 				plansSubPop.addAlgorithm(planAverageScore);
 				plansSubPop.runAlgorithms();
@@ -384,9 +417,9 @@ public class CompareScenariosWestumfahrung {
 				eventsReader.readFile(eventsInputFilenames.get(scenarioName));
 
 			}
-			outLines.add("Analysis: " + analysisNames.get(analysis));
+			scenarioComparisonLines.add("Analysis: " + analysisNames.get(analysis));
 			this.writeComparison(results);
-			outLines.add("");
+			scenarioComparisonLines.add("");
 
 		}
 
@@ -394,11 +427,11 @@ public class CompareScenariosWestumfahrung {
 
 	private void writeComparison(List<CaseStudyResult> results) {
 
-		outLines.add("casestudy\tsize\tscore\ttravel");
+		scenarioComparisonLines.add("casestudy\tsize\tscore\ttravel");
 
 		for (CaseStudyResult result : results) {
 
-			outLines.add( 
+			scenarioComparisonLines.add( 
 					result.getName() + "\t" + 
 					result.getRouteSwitchers().getPersons().size() + "\t" + 
 					result.getRouteSwitchersAverageScore().getAverage() + "\t" + 
