@@ -66,9 +66,11 @@ import org.matsim.utils.vis.kml.Style;
 
 import com.google.earth.kml._2.AbstractFeatureType;
 import com.google.earth.kml._2.AbstractGeometryType;
+import com.google.earth.kml._2.BasicLinkType;
 import com.google.earth.kml._2.BoundaryType;
 import com.google.earth.kml._2.DocumentType;
 import com.google.earth.kml._2.FolderType;
+import com.google.earth.kml._2.IconStyleType;
 import com.google.earth.kml._2.KmlType;
 import com.google.earth.kml._2.LinearRingType;
 import com.google.earth.kml._2.ObjectFactory;
@@ -77,6 +79,7 @@ import com.google.earth.kml._2.PointType;
 import com.google.earth.kml._2.PolyStyleType;
 import com.google.earth.kml._2.PolygonType;
 import com.google.earth.kml._2.StyleType;
+import com.google.earth.kml._2.TimeSpanType;
 
 /**
  * In April 2005, I collected information on shop facilities of the major
@@ -198,7 +201,7 @@ public class ShopsOf2005ToFacilities {
 //		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
 //		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
 //		ShopsOf2005ToFacilities.shopsToTXT();
-		ShopsOf2005ToFacilities.shopsViaQuadTreeToOpentimesKML();
+		ShopsOf2005ToFacilities.shopsToOpentimesKML();
 
 	}
 
@@ -1647,25 +1650,57 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void shopsViaQuadTreeToOpentimesKML() {
+	private static void shopsToOpentimesKML() {
 
-		final double MIN_X = 70000.0;
-		final double MAX_X = 300000.0;
-		final double MIN_Y = 480000.0;
-		final double MAX_Y = 840000.0;
-		double x = 0.0;
-		double y = 0.0;
+		final String SHOP_STYLE = "shopStyle"; 
+		Day[] days = Day.values();
+
 		String facilityId = null;
+		CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
+		PlacemarkType aShop = null;
+		PointType aPointType = null;
+		TimeSpanType aTimeSpanType = null;
+		CoordI northWestCH1903 = null;
+		CoordI northWestWGS84 = null;
+
+		// as a start, let's use the week April, 21 to April 27, 2008 as THE week
+		int mondayDay = 21;
 
 		Facilities shopsOf2005 = new Facilities("shopsOf2005");
-		// construct the QuadTree with the bounding box of Switzerland with the CH1903 system
-		// stick to the reverse X/Y property of this system
-		QuadTree<Facility> facilityQuadTree = new QuadTree<Facility>(MIN_X, MAX_X, MIN_Y, MAX_Y);
 
 		System.out.println("Reading facilities xml file... ");
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(shopsOf2005);
 		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
 		System.out.println("Reading facilities xml file...done.");
+
+		System.out.println("Initializing KML... ");
+
+		// kml and document
+		JAXBContext jaxbContext = null;
+		try {
+			jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		ObjectFactory factory = new ObjectFactory();
+
+		KmlType kml = factory.createKmlType();
+		DocumentType document = factory.createDocumentType();
+		document.setName("The shops of 2005 open times KML.");
+		kml.setAbstractFeatureGroup(factory.createDocument(document));
+
+		// styles
+		StyleType shopStyle = factory.createStyleType();
+		document.getAbstractStyleSelectorGroup().add(factory.createStyle(shopStyle));
+		shopStyle.setId(SHOP_STYLE);
+		IconStyleType shopIconStyle = factory.createIconStyleType();
+		shopStyle.setIconStyle(shopIconStyle);
+		BasicLinkType shopIconLink = factory.createBasicLinkType();
+		shopIconStyle.setIcon(shopIconLink);
+		shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
+		System.out.println("Initializing KML...done.");
 
 		Iterator facilityIterator = shopsOf2005.getFacilities().values().iterator();
 
@@ -1675,128 +1710,53 @@ public class ShopsOf2005ToFacilities {
 //			System.out.println(facility.toString());
 			//System.out.println(facilityId);
 
-			// revert x and y here
-			x = facility.getCenter().getY();
-			y = facility.getCenter().getX();
+			// transform coordinates incl. toggle easting and northing
+			northWestCH1903 = new Coord(facility.getCenter().getX(), facility.getCenter().getY());
+			northWestWGS84 = trafo.transform(northWestCH1903);
 
-			if (!facilityQuadTree.put(x, y, facility)) {
-				System.out.println("Error inserting facility in quad tree.");
+			// have to iterate this over opening times
+			for (Day day : new Day[]{Day.MONDAY}) {
+				if (facility.getActivity(ACTIVITY_TYPE_SHOP) != null) {
+					TreeSet<Opentime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
+					if (dailyOpentimes != null) {
+						for (Opentime opentime : dailyOpentimes) {
+
+							// build up placemark structure
+							aShop = factory.createPlacemarkType();
+							document.getAbstractFeatureGroup().add(factory.createPlacemark(aShop));
+							aShop.setStyleUrl(SHOP_STYLE);
+							aShop.setName(facilityId.split("_", 2)[0]);
+							aShop.setDescription(facilityId);
+
+							aPointType = factory.createPointType();
+							aShop.setAbstractGeometryGroup(factory.createPoint(aPointType));
+							aPointType.getCoordinates().add(northWestWGS84.getX() + "," + northWestWGS84.getY() + ",0.0");
+
+							// transform opening times to GE time primitives
+							aTimeSpanType = factory.createTimeSpanType();
+							aShop.setAbstractTimePrimitiveGroup(factory.createAbstractTimePrimitiveGroup(aTimeSpanType));
+							aTimeSpanType.setBegin("2008-04-21T" + Time.writeTime(opentime.getStartTime()) + "Z");
+							aTimeSpanType.setEnd("2008-04-21T" + Time.writeTime(opentime.getEndTime()) + "Z");
+						}
+					}
+				}
 			}
 
 		}
 
-//		ArrayList<QuadTree.Rect> boundsList = facilityQuadTree.getBoundsOfPopulatedNodes();
-//		for (QuadTree.Rect rect : boundsList) {
-//			System.out.println(rect.toString());
-//			System.out.println("Corresponding facilities:");
-//
-//			ArrayList<Facility> shopsInALeaf = new ArrayList<Facility>();
-//			facilityQuadTree.get(rect, shopsInALeaf);
-//
-//			for (Facility shop : shopsInALeaf) {
-//				System.out.println("\t" + shop.toString());
-//			}
-//
-//			System.out.println();
-//		}
-//
-//		System.out.println("Number of facilities: " + shopsOf2005.getFacilities().values().size());
-//		System.out.println("Size of quadtree: " + facilityQuadTree.size());
-//		System.out.println("Size of boundsList: " + boundsList.size());
-//		System.out.println();
-//
-//		System.out.println("Producing opentimes KML...");
-//
-//		JAXBContext jaxbContext = null;
-//		JAXBElement<KmlType> kmlElement = null;
-//		try {
-//			jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
-//		} catch (JAXBException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//		ObjectFactory factory = new ObjectFactory();
-//
-//		KmlType kml = factory.createKmlType();
-//		DocumentType document = factory.createDocumentType();
-//		document.setName("The shops of 2005 open times KML.");
-//		kml.setAbstractFeatureGroup(factory.createDocument(document));
-//
-//		// styles
-//		final String SHOP_STYLE = "migrosStyle"; 
-//
-//
-//		StyleType shopRegionStyle = factory.createStyleType();
-//		document.getAbstractStyleSelectorGroup().add(factory.createStyle(shopRegionStyle));
-//		shopRegionStyle.setId(SHOP_STYLE);
-//		PolyStyleType migrosRegionPolyStyle = factory.createPolyStyleType();
-//		shopRegionStyle.setPolyStyle(migrosRegionPolyStyle);
-//		migrosRegionPolyStyle.setColor(new byte[]{100, 100, 0, 0});
-//
-//		for (QuadTree.Rect rect : boundsList) {
-//
-//			// transform coordinates
-//
-//			CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
-//
-//			CoordI northWestCH1903 = new Coord(rect.minY, rect.maxX);
-//			CoordI northWestWGS84 = trafo.transform(northWestCH1903);
-//			CoordI northEastCH1903 = new Coord(rect.maxY, rect.maxX);
-//			CoordI northEastWGS84 = trafo.transform(northEastCH1903);
-//			CoordI southWestCH1903 = new Coord(rect.minY, rect.minX);
-//			CoordI southWestWGS84 = trafo.transform(southWestCH1903);
-//			CoordI southEastCH1903 = new Coord(rect.maxY, rect.minX);
-//			CoordI southEastWGS84 = trafo.transform(southEastCH1903);
-//
-//			// build up placemark structure
-//
-//			PlacemarkType anOpentimeRegion = factory.createPlacemarkType();
-//			document.getAbstractFeatureGroup().add(factory.createPlacemark(anOpentimeRegion));
-//
-//			// give it a name: name of first facility in the leaf list
-//			
-//			ArrayList<Facility> shopsInALeaf = new ArrayList<Facility>();
-//			facilityQuadTree.get(rect, shopsInALeaf);
-//
-//			anOpentimeRegion.setName(shopsInALeaf.get(0).getId().toString());
-//			
-//			anOpentimeRegion.setStyleUrl(SHOP_STYLE);
-//
-//			PolygonType box = factory.createPolygonType();
-//			anOpentimeRegion.setAbstractGeometryGroup(factory.createPolygon(box));
-//
-//			BoundaryType outerBoundary = factory.createBoundaryType();
-//			box.setOuterBoundaryIs(outerBoundary);
-//			LinearRingType outerRing = factory.createLinearRingType();
-//			outerBoundary.setLinearRing(outerRing);
-//
-//			// fill coordinates in: Linienzug von und nach nordwestliche Ecke
-//			for (CoordI corner : new CoordI[]{
-//					northWestWGS84, 
-//					northEastWGS84, 
-//					southEastWGS84, 
-//					southWestWGS84,
-//					northWestWGS84}) {
-//				outerRing.getCoordinates().add(corner.getX() + "," + corner.getY() + ",0.0");
-//			}
-//
-//		}		
-//
-//		try {
-//			Marshaller marshaller = jaxbContext.createMarshaller();
-//			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-//			marshaller.marshal(factory.createKml(kml), new FileOutputStream(Gbl.getConfig().facilities().getOutputFile()));
-//		} catch (JAXBException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//		System.out.println("Producing opentimes KML...done.");
-
+		System.out.println("Writing out KML...");
+		try {
+			Marshaller marshaller = jaxbContext.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			marshaller.marshal(factory.createKml(kml), new FileOutputStream(Gbl.getConfig().facilities().getOutputFile()));
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Writing out KML...done.");
 	}
 
 }
