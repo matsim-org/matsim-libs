@@ -81,7 +81,7 @@ public class RoutesForGianluca {
 				LinkedList<Link> links = new LinkedList<Link>();
 				int idx = 3;
 				Node curr_node = o_node;
-				while (!entries[idx].isEmpty()) {
+				while (entries[idx].length() > 0) {
 					String orig_id = entries[idx].trim();
 					boolean link_found = false;
 					Iterator<? extends Link> outlink_it = curr_node.getOutLinks().values().iterator();
