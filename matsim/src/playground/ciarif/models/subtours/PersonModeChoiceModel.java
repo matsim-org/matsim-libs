@@ -175,12 +175,12 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			//System.out.println("Travelcards: " + model.tickets);
 			model.setBike(has_bike);
 			model.setMale (plan.getPerson().getSex());
-			int udeg = 4; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
-			//Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
-			//ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
-			//Location loc = locs.get(Gbl.random.nextInt(locs.size()));
-			//Municipality m = municipalities.getMunicipality(new Integer(loc.getId().toString()));
-			//int udeg = m.getRegType();
+			//int udeg = 4; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
+			Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
+			ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
+			Location loc = locs.get(Gbl.random.nextInt(locs.size()));
+			Municipality m = municipalities.getMunicipality(new Integer(loc.getId().toString()));
+			int udeg = m.getRegType();
 			//System.out.println ("udeg");
 			//Iterator<Location> l_it = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY).getLocations().values().iterator(); //TODO controllare se serve!!!!!
 			
