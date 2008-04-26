@@ -243,7 +243,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 		}
 	}
 
-	public void moveWaitFirst(final boolean moveWaitFirst){
+	public void setMoveWaitFirst(final boolean moveWaitFirst){
 		//TODO [GL] may be we should invalidate simNodesArrayCache to make sure
 		// that nobody changes this during the MobSim ...
 		this.moveWaitFirst = moveWaitFirst;
