@@ -30,43 +30,35 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 
-
 public class CountsFixture {
-	
+
 	private NetworkLayer network;
 	public final Counts counts = new Counts();
-	
+
 	public NetworkLayer getNetwork() {
 		return network;
 	}
 
-	public void setNetwork(NetworkLayer network) {
-		this.network = network;
-	}
-
 	public void setUp() {
-		String[] args={"test/input/org/matsim/counts/config.xml"};
+		String[] args = {"test/input/org/matsim/counts/config.xml"};
 		org.matsim.config.Config config = Gbl.createConfig(args);
 
 		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
 		counts_parser.readFile(config.counts().getCountsFileName());
-		
+
 		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		
 	}
 
 	public CountsComparisonAlgorithm getCCA() {
-		
 		CalcLinkStats linkStats = new AttributeFactory().createLinkStats(this.network);			
-		CountsComparisonAlgorithm cca= new CountsComparisonAlgorithm(linkStats, this.counts, this.network);
+		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(linkStats, this.counts, this.network);
 		cca.setDistanceFilter(100.0, "0");
 		return cca;
 	}
 
 	public List<CountSimComparison> ceateCountSimCompList() {
-
-		List<CountSimComparison> csc_l=new Vector<CountSimComparison>();
+		List<CountSimComparison> csc_l = new Vector<CountSimComparison>(24);
 		for (int i=0; i<24; i++) {
 			csc_l.add(new CountSimComparisonImpl(new IdImpl(100), i+1, 1.0, 1.0));
 		}
