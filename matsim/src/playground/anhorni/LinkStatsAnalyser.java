@@ -153,7 +153,7 @@ public class LinkStatsAnalyser {
 
 		// create a Counts object, which holds the old sim values.
 		// That is clearly a violation, but it is needed for WU
-		Counts counts=Counts.getSingleton();
+		Counts counts = new Counts();
 		
 		
 		
@@ -171,10 +171,10 @@ public class LinkStatsAnalyser {
 		
 		// processing counts
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats1,
-				Counts.getSingleton(), this.network);
+				counts, this.network);
 		
 		cca.setCountsScaleFactor(this.scaleFactor);
-		cca.run(Counts.getSingleton());
+		cca.run(counts);
 		return cca.getComparison();
 	}
 
@@ -199,7 +199,6 @@ public class LinkStatsAnalyser {
 	 * @return the network layer
 	 */
 	protected NetworkLayer loadNetwork() {
-		// - read network: which buildertype??
 		printNote("", "  creating network layer... ");
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
 				NetworkLayer.LAYER_TYPE, null);

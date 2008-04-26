@@ -34,6 +34,7 @@ import org.matsim.network.NetworkLayer;
 public class CountsFixture {
 	
 	private NetworkLayer network;
+	public final Counts counts = new Counts();
 	
 	public NetworkLayer getNetwork() {
 		return network;
@@ -47,7 +48,7 @@ public class CountsFixture {
 		String[] args={"test/input/org/matsim/counts/config.xml"};
 		org.matsim.config.Config config = Gbl.createConfig(args);
 
-		MatsimCountsReader counts_parser = new MatsimCountsReader(Counts.getSingleton());
+		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
 		counts_parser.readFile(config.counts().getCountsFileName());
 		
 		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
@@ -58,7 +59,7 @@ public class CountsFixture {
 	public CountsComparisonAlgorithm getCCA() {
 		
 		CalcLinkStats linkStats = new AttributeFactory().createLinkStats(this.network);			
-		CountsComparisonAlgorithm cca= new CountsComparisonAlgorithm(linkStats, Counts.getSingleton(), this.network);
+		CountsComparisonAlgorithm cca= new CountsComparisonAlgorithm(linkStats, this.counts, this.network);
 		cca.setDistanceFilter(100.0, "0");
 		return cca;
 	}

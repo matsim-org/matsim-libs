@@ -25,26 +25,24 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountsTest extends MatsimTestCase {
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
 	public void testAddAlgorithm() {
+		final Counts counts = new Counts();
 		MockAlgo algo=new MockAlgo();
-		Counts.getSingleton().addAlgorithm(algo);
-		assertTrue("Adding algorithm failed", Counts.getSingleton().getAlgorithms().size()==1);
+		counts.addAlgorithm(algo);
+		assertEquals("Adding algorithm failed", 1, counts.getAlgorithms().size());
 	}
 
 	public void testRunAlgorithms() {
+		final Counts counts = new Counts();
 		MockAlgo algo=new MockAlgo();
-		Counts.getSingleton().addAlgorithm(algo);
-		Counts.getSingleton().runAlgorithms();
-		assertTrue("Running algorithms failed", Counts.getSingleton().getDescription().equals("SetByMock"));
+		counts.addAlgorithm(algo);
+		counts.runAlgorithms();
+		assertEquals("Running algorithms failed", "SetByMock", counts.getDescription());
 	}
 
 	public void testGetCounts() {
-		Counts.getSingleton().createCount(new IdImpl(0), "1");
-		assertTrue("Getting counts failed", Counts.getSingleton().getCounts().size()==1);
+		final Counts counts = new Counts();
+		counts.createCount(new IdImpl(0), "1");
+		assertEquals("Getting counts failed", 1, counts.getCounts().size());
 	}
 }

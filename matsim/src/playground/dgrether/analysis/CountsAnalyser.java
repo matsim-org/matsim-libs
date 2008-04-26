@@ -126,6 +126,8 @@ public class CountsAnalyser {
 
 	private String coordSystem;
 
+	final private Counts counts =  new Counts();
+	
 	/**
 	 *
 	 * @param config
@@ -144,13 +146,13 @@ public class CountsAnalyser {
 	/**
 	 * Reads the parameters from the config file
 	 *
-	 * @param config
+	 * @param configFile
 	 * @throws Exception
 	 */
 	private void readConfig(final String configFile) throws Exception {
 		Config config = Gbl.createConfig(new String[] { configFile, "config_v1.dtd" });
 		System.out.println("  reading counts xml file... ");
-		MatsimCountsReader counts_parser = new MatsimCountsReader(Counts.getSingleton());
+		MatsimCountsReader counts_parser = new MatsimCountsReader(counts);
 		counts_parser.readFile(config.counts().getCountsFileName());
 		System.out.println("  reading counts done.");
 		System.out.println("  reading network...");
@@ -195,11 +197,11 @@ public class CountsAnalyser {
 			final CalcLinkStats calcLinkStats) {
 		// processing counts
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats,
-				Counts.getSingleton(), this.network);
+				counts, this.network);
 		if ((this.distanceFilter != null) && (this.distanceFilterCenterNode != null))
 			cca.setDistanceFilter(this.distanceFilter, this.distanceFilterCenterNode);
 		cca.setCountsScaleFactor(Gbl.getConfig().counts().getCountsScaleFactor());
-		cca.run(Counts.getSingleton());
+		cca.run(counts);
 		return cca.getComparison();
 	}
 

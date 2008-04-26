@@ -121,9 +121,10 @@ public abstract class Scenario {
 	
 	public static final Counts readCounts() {
 		System.out.println("  reading the counts...");
-		new MatsimCountsReader(Counts.getSingleton()).readFile(Gbl.getConfig().counts().getCountsFileName());
+		final Counts counts = new Counts();
+		new MatsimCountsReader(counts).readFile(Gbl.getConfig().counts().getCountsFileName());
 		System.out.println("  done.");
-		return Counts.getSingleton();
+		return counts;
 	}
 	
 	public static final Matrices readMatrices() {

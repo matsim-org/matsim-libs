@@ -96,7 +96,7 @@ public class CountsCreator {
 	}
 
 	public void createCounts(Set<Link> links) {
-		Counts counts = Counts.getSingleton();
+		Counts counts = new Counts();
 		Count c;
 		counts.setLayer("superLayer");
 		counts.setDescription("");

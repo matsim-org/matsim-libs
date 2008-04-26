@@ -50,13 +50,13 @@ public class CountsParserWriterTest extends MatsimTestCase {
 
 		// test if required fields of schema are filled out:
 		// Counts:
-		assertNotNull(Counts.getSingleton().getCounts());
-		assertTrue(Counts.getSingleton().getYear()>2000);
-		assertNotNull(Counts.getSingleton().getLayer());
-		assertNotNull(Counts.getSingleton().getName());
+		assertNotNull(this.fixture.counts.getCounts());
+		assertTrue(this.fixture.counts.getYear()>2000);
+		assertNotNull(this.fixture.counts.getLayer());
+		assertNotNull(this.fixture.counts.getName());
 
 		// Count & Volume
-		Iterator<Count> c_it = Counts.getSingleton().getCounts().values().iterator();
+		Iterator<Count> c_it = this.fixture.counts.getCounts().values().iterator();
 		while (c_it.hasNext()) {
 			Count c = c_it.next();
 			assertNotNull(c.getLocId());
@@ -75,7 +75,7 @@ public class CountsParserWriterTest extends MatsimTestCase {
 
 		Gbl.getConfig();
 		String filename = this.getOutputDirectory() + "output_counts.xml";
-		CountsWriter counts_writer = new CountsWriter(Counts.getSingleton(), filename);
+		CountsWriter counts_writer = new CountsWriter(this.fixture.counts, filename);
 		counts_writer.write();
 		File f = new File(filename);
 		assertTrue(f.length() > 0.0);

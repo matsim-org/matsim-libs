@@ -23,7 +23,6 @@ package org.matsim.counts;
 import java.io.File;
 import java.util.Locale;
 
-import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
@@ -45,7 +44,7 @@ public class CountsTableWriterTest extends MatsimTestCase {
 
 	public void testTableCreation() {
 		CountsComparisonAlgorithm cca = this.fixture.getCCA();
-		cca.run(Counts.getSingleton());
+		cca.run(this.fixture.counts);
 
 		CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
 		ctw.write(this.getOutputDirectory() + "/countTable.txt");

@@ -21,26 +21,26 @@
 package playground.jhackney.mytools;
 
 	import org.matsim.config.Config;
-	import org.matsim.config.ConfigWriter;
-	import org.matsim.counts.Counts;
-	import org.matsim.counts.CountsWriter;
-	import org.matsim.counts.MatsimCountsReader;
-	import org.matsim.facilities.Facilities;
-	import org.matsim.facilities.FacilitiesWriter;
-	import org.matsim.facilities.MatsimFacilitiesReader;
-	import org.matsim.gbl.Gbl;
-	import org.matsim.matrices.Matrices;
-	import org.matsim.matrices.MatricesWriter;
-	import org.matsim.matrices.MatsimMatricesReader;
-	import org.matsim.network.MatsimNetworkReader;
-	import org.matsim.network.NetworkLayer;
-	import org.matsim.network.NetworkWriter;
-	import org.matsim.plans.MatsimPlansReader;
-	import org.matsim.plans.Plans;
-	import org.matsim.plans.PlansWriter;
-	import org.matsim.world.MatsimWorldReader;
-	import org.matsim.world.World;
-	import org.matsim.world.WorldWriter;
+import org.matsim.config.ConfigWriter;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsWriter;
+import org.matsim.counts.MatsimCountsReader;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.gbl.Gbl;
+import org.matsim.matrices.Matrices;
+import org.matsim.matrices.MatricesWriter;
+import org.matsim.matrices.MatsimMatricesReader;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkWriter;
+import org.matsim.plans.MatsimPlansReader;
+import org.matsim.plans.Plans;
+import org.matsim.plans.PlansWriter;
+import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
+import org.matsim.world.WorldWriter;
 
 	public abstract class Scenario {
 
@@ -121,9 +121,10 @@ package playground.jhackney.mytools;
 		
 		public static final Counts readCounts() {
 			System.out.println("  reading the counts...");
-			new MatsimCountsReader(Counts.getSingleton()).readFile(Gbl.getConfig().counts().getCountsFileName());
+			final Counts counts = new Counts();
+			new MatsimCountsReader(counts).readFile(Gbl.getConfig().counts().getCountsFileName());
 			System.out.println("  done.");
-			return Counts.getSingleton();
+			return counts;
 		}
 		
 		public static final Matrices readMatrices() {

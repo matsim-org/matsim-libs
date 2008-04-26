@@ -20,7 +20,6 @@
 
 package org.matsim.counts;
 
-import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsGraphWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
@@ -50,14 +49,14 @@ public class CountsGraphWriterTest extends MatsimTestCase {
 	public void testGraphCreation() {
 
 		CountsComparisonAlgorithm cca=this.fixture.getCCA();
-		cca.run(Counts.getSingleton());
+		cca.run(this.fixture.counts);
 
 		CountsGraphWriter cgw = new CountsGraphWriter(this.getOutputDirectory(), cca.getComparison(),1, true, true);
 		cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim vs. real volumes per hour"));
 		cgw.setGraphsCreator(new CountsErrorGraphCreator("Error Plots"));
 		cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("Load curve graph"));
 		cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-		cgw.run(Counts.getSingleton());
+		cgw.run(this.fixture.counts);
 
 		assertTrue(cgw.getOutput().getGraphs().size()>0);
 	}

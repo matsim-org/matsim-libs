@@ -244,7 +244,7 @@ public class ExitCountsCreator {
 	}
 
 	public void createCounts() {
-		Counts counts = Counts.getSingleton();
+		Counts counts = new Counts();
 		Count c;
 		counts.setLayer("padang evacuation");
 		counts.setDescription("");

@@ -2955,14 +2955,15 @@ public class MyRuns {
 	public static void readCounts(final String[] args) {
 		System.out.println("RUN: readCounts");
 		final Config config = Gbl.createConfig(args);
+		final Counts counts = new Counts();
 
 		NetworkLayer network = null;
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
-		new MatsimCountsReader(Counts.getSingleton()).readFile(config.counts().getCountsFileName());
+		new MatsimCountsReader(counts).readFile(config.counts().getCountsFileName());
 
-		new CountsWriter(Counts.getSingleton()).writeFile("test_counts.xml");
+		new CountsWriter(counts).writeFile("test_counts.xml");
 
 		System.out.println("RUN: readCounts finished.");
 		System.out.println();

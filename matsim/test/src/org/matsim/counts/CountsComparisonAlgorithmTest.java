@@ -22,8 +22,6 @@ package org.matsim.counts;
 
 import java.util.List;
 
-import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -43,7 +41,7 @@ public class CountsComparisonAlgorithmTest extends MatsimTestCase {
 
 	public void testCompare() {
 		CountsComparisonAlgorithm cca = this.fixture.getCCA();
-		cca.run(Counts.getSingleton());
+		cca.run(this.fixture.counts);
 
 		List<CountSimComparison> csc_list = cca.getComparison();
 
@@ -58,7 +56,7 @@ public class CountsComparisonAlgorithmTest extends MatsimTestCase {
 	public void testDistanceFilter() {
 		CountsComparisonAlgorithm cca = this.fixture.getCCA();
 		cca.setDistanceFilter(Double.valueOf(0.5), "1");
-		cca.run(Counts.getSingleton());
+		cca.run(this.fixture.counts);
 
 		List<CountSimComparison> csc_list = cca.getComparison();
 		assertEquals("Distance filter not working", 0, csc_list.size());

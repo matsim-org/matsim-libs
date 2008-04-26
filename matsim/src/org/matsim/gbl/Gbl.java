@@ -31,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigReaderMatsimV1;
-import org.matsim.counts.Counts;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.world.World;
@@ -45,7 +44,6 @@ import org.xml.sax.SAXException;
  * - getWorld();
  * - createFacilities();
  * - createMatrices();
- * - createCounts();
  * - reset();
  *
  * The problem: It is not clear, who is responsible to create the globals.
@@ -158,7 +156,6 @@ public abstract class Gbl {
 		Gbl.world = null;
 		Gbl.random.setSeed(DEFAULT_RANDOM_SEED);
 		SimulationTimer.reset();
-		Counts.reset();
 		CharyparNagelScoringFunction.initialized = false; // TODO [MR] see todo-comment in BasicScoringFunction.java
 	}
 

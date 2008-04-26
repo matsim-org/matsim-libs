@@ -19,6 +19,7 @@
  * *********************************************************************** */
 
 package org.matsim.counts;
+
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -27,20 +28,12 @@ import org.matsim.counts.algorithms.CountsAlgorithm;
 
 public class Counts {
 
-	private static Counts singleton = new Counts();
 	private String name = null;
 	private String desc = null;
 	private int year = 0;
 	private String layer = null;
 	private final TreeMap<Id, Count> counts = new TreeMap<Id, Count>();
 	private final ArrayList<CountsAlgorithm> algorithms = new ArrayList<CountsAlgorithm>();
-
-	private Counts() {
-	}
-
-	public static final Counts getSingleton() {
-		return singleton;
-	}
 
 	public final void addAlgorithm(final CountsAlgorithm algo) {
 		this.algorithms.add(algo);
@@ -114,11 +107,6 @@ public class Counts {
 
 	public final Count getCount(final Id locId) {
 		return this.counts.get(locId);
-	}
-
-	//needed for testing
-	public static final void reset() {
-		singleton = new Counts();
 	}
 
 	@Override

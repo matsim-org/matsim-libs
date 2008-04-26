@@ -22,7 +22,6 @@ package org.matsim.counts;
 
 import java.io.File;
 
-import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
@@ -49,7 +48,7 @@ public class CountsKMLWriterTest extends MatsimTestCase {
 	public void testKMLCreation() {
 
 		CountsComparisonAlgorithm cca=this.fixture.getCCA();
-		cca.run(Counts.getSingleton());
+		cca.run(this.fixture.counts);
 		
 		String filename = this.getOutputDirectory() + "countscompare.kmz";
 		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(

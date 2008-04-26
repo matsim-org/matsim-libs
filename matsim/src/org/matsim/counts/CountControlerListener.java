@@ -45,13 +45,15 @@ public class CountControlerListener implements StartupListener,
 		IterationEndsListener {
 
 	private final Config config;
+	private final Counts counts;
 
 	public CountControlerListener(final Config config) {
 		this.config = config;
+		this.counts = new Counts();
 	}
 
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-		MatsimCountsReader counts_parser = new MatsimCountsReader(Counts.getSingleton());
+		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
 		counts_parser.readFile(this.config.counts().getCountsFileName());
 	}
 
@@ -59,12 +61,12 @@ public class CountControlerListener implements StartupListener,
 		Controler controler = event.getControler();
 		if ((event.getIteration() % 10 == 0) && (event.getIteration() > controler.getFirstIteration())) {
 			controler.stopwatch.beginOperation("compare with counts");
-			CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(controler.getLinkStats(), Counts.getSingleton(), controler.getNetwork());
+			CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(controler.getLinkStats(), this.counts, controler.getNetwork());
 			if ((this.config.counts().getDistanceFilter() != null) && (this.config.counts().getDistanceFilterCenterNode() != null)) {
 				cca.setDistanceFilter(this.config.counts().getDistanceFilter(), this.config.counts().getDistanceFilterCenterNode());
 			}
 			cca.setCountsScaleFactor(this.config.counts().getCountsScaleFactor());
-			cca.run(Counts.getSingleton());
+			cca.run(this.counts);
 
 			if (this.config.counts().getOutputFormat().contains("html") ||
 					this.config.counts().getOutputFormat().contains("all")) {
@@ -78,8 +80,8 @@ public class CountControlerListener implements StartupListener,
 				cgw.setGraphsCreator(new CountsErrorGraphCreator("errors"));
 				cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
 				cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-				Counts.getSingleton().addAlgorithm(cgw);
-				Counts.getSingleton().runAlgorithms();
+				this.counts.addAlgorithm(cgw);
+				this.counts.runAlgorithms();
 			}
 			if (this.config.counts().getOutputFormat().contains("kml")||
 					this.config.counts().getOutputFormat().contains("all")) {
