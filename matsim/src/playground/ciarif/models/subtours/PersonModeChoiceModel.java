@@ -143,12 +143,12 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 					
 			// generating a random bike ownership (see STRC2007 paper Ciari for more details)
 			boolean has_bike = false;
-			if (Gbl.random.nextDouble() < 0.56) { has_bike = true; }			
+			if (Gbl.random.nextDouble() < 0.70) { has_bike = true; }			
 			
 			boolean ride_possible = false;
 			
 			model.setRide(ride_possible);
-			if (Gbl.random.nextDouble () < 0.38) {ride_possible = true;} // to verify if it makes sense, but till then a mean to 
+			if (Gbl.random.nextDouble () < 0.35) {ride_possible = true;} // to verify if it makes sense, but till then a mean to 
 			// make things work the right way
 			
 			if (sub.getPrev_subtour()<5){
