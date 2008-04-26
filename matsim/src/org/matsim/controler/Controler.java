@@ -76,7 +76,6 @@ import org.matsim.mobsim.ExternalMobsim;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.Simulation;
-import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.planomat.PlanomatConfig;
@@ -628,8 +627,6 @@ public class Controler {
 	 * =================================================================== */
 
 	protected void runMobSim() {
-		SimulationTimer.setTime(0);
-
 		if (this.externalMobsim == null) {
 			Simulation sim = new QueueSimulation(this.network, this.population, this.events);
 			sim.run();

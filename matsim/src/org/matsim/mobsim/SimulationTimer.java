@@ -56,11 +56,10 @@ public class SimulationTimer {
 	}
 
 	/**
-	 * Returns the number of time steps the simulation advances when increasing the simulation time.
+	 * Returns the number of seconds (time steps) the simulation advances when increasing the simulation time.
 	 *
 	 * @return The number of time steps.
 	 * @see #incTime()
-	 * @see #reset(double)
 	 */
 	public static final double getSimTickTime() {
 		// TODO [MR,DS] rename this to something like getSimTimestepSize?
@@ -88,7 +87,7 @@ public class SimulationTimer {
 	 *
 	 * @param stepSize The step-size the simulation uses to advance time.
 	 */
-	public static final void reset(final double stepSize) {
+	/*package*/ static final void reset(final double stepSize) {
 		SimulationTimer.simStartTime = 24*3600;
 		SimulationTimer.time = 0;
 		SimulationTimer.SIM_TICK_TIME_S = stepSize;

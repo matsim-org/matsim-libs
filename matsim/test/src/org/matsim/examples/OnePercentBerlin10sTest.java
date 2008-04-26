@@ -29,7 +29,6 @@ import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueSimulation;
-import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
@@ -65,8 +64,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		World world = Gbl.getWorld();
 		// this needs to be done before reading the network
 		// because QueueLinks timeCap dependents on SIM_TICK_TIME_S
-		SimulationTimer.reset(10);
-		SimulationTimer.setTime(0);
+		config.simulation().setTimeStepSize(10.0);
 		config.simulation().setFlowCapFactor(0.01);
 		config.simulation().setStorageCapFactor(0.04);
 		config.charyparNagelScoring().setLearningRate(1.0);
@@ -89,7 +87,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		StuckAndAbortCounter counter = new StuckAndAbortCounter();
 		events.addHandler(counter);
 
-		QueueSimulation sim = new QueueSimulation(network, population, events) ;
+		QueueSimulation sim = new QueueSimulation(network, population, events);
 		System.out.println("START testOnePercent10s SIM @ " + (new Date()));
 		sim.run();
 		System.out.println("STOP testOnePercent10s SIM @ " + (new Date()));

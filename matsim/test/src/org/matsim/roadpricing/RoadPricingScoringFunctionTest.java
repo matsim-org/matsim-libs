@@ -23,7 +23,6 @@ package org.matsim.roadpricing;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueSimulation;
-import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
@@ -174,9 +173,6 @@ public class RoadPricingScoringFunctionTest extends MatsimTestCase {
 
 	private void runTollSimulation(final NetworkLayer network, final Plans population, final RoadPricingScheme toll) {
 		try {
-			// run mobsim with toll and get score
-			SimulationTimer.reset();
-
 			Events events = new Events();
 			CalcPaidToll paidToll = new CalcPaidToll(network, toll);
 			events.addHandler(paidToll);

@@ -31,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigReaderMatsimV1;
-import org.matsim.mobsim.SimulationTimer;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
@@ -155,7 +154,6 @@ public abstract class Gbl {
 		Gbl.config = null;
 		Gbl.world = null;
 		Gbl.random.setSeed(DEFAULT_RANDOM_SEED);
-		SimulationTimer.reset();
 		CharyparNagelScoringFunction.initialized = false; // TODO [MR] see todo-comment in BasicScoringFunction.java
 	}
 

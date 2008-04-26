@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.SimulationTimer;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
@@ -34,8 +33,7 @@ public class ReRoutingTest extends MatsimTestCase {
 
 	public void testReRouting() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
-
-		SimulationTimer.reset(10);
+		config.simulation().setTimeStepSize(10.0);
 
 		TestControler controler = new TestControler(config);
 		controler.setCreateGraphs(false);

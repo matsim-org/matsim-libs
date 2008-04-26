@@ -32,6 +32,7 @@ public class SimulationConfigGroup extends Module {
 
 	private static final String START_TIME = "startTime";
 	private static final String END_TIME = "endTime";
+	private static final String TIME_STEP_SIZE = "timeStepSize";
 	private static final String SNAPSHOT_PERIOD = "snapshotperiod";
 	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String SNAPSHOT_FILE = "snapshotfile";
@@ -55,6 +56,7 @@ public class SimulationConfigGroup extends Module {
 
 	private double startTime = Time.UNDEFINED_TIME;
 	private double endTime = Time.UNDEFINED_TIME;
+	private double timeStepSize = 1.0;
 	private double snapshotPeriod = 0; // off, no snapshots
 	private String snapshotFormat = "";
 	private String snapshotFile = "Snapshot";
@@ -78,6 +80,8 @@ public class SimulationConfigGroup extends Module {
 			setStartTime(Time.parseTime(value));
 		} else if (END_TIME.equals(key)) {
 			setEndTime(Time.parseTime(value));
+		} else if (TIME_STEP_SIZE.equals(key)) {
+			setTimeStepSize(Time.parseTime(value));
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
 			setSnapshotPeriod(Time.parseTime(value));
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
@@ -117,6 +121,8 @@ public class SimulationConfigGroup extends Module {
 			return Time.writeTime(getStartTime());
 		} else if (END_TIME.equals(key)) {
 			return Time.writeTime(getEndTime());
+		} else if (TIME_STEP_SIZE.equals(key)) {
+			return Time.writeTime(getTimeStepSize());
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
 			return Time.writeTime(getSnapshotPeriod());
 		} else if (SNAPSHOT_FORMAT.equals(key)) {
@@ -151,6 +157,7 @@ public class SimulationConfigGroup extends Module {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(START_TIME, getValue(START_TIME));
 		map.put(END_TIME, getValue(END_TIME));
+		map.put(TIME_STEP_SIZE, getValue(TIME_STEP_SIZE));
 		map.put(SNAPSHOT_PERIOD, getValue(SNAPSHOT_PERIOD));
 		map.put(SNAPSHOT_FORMAT, getValue(SNAPSHOT_FORMAT));
 		map.put(SNAPSHOT_FILE, getValue(SNAPSHOT_FILE));
@@ -187,6 +194,19 @@ public class SimulationConfigGroup extends Module {
 		return this.endTime;
 	}
 
+	/**
+	 * Sets the number of seconds the simulation should advance from one simulated time step to the next.
+	 * 
+	 * @param seconds
+	 */
+	public void setTimeStepSize(final double seconds) {
+		this.timeStepSize = seconds;
+	}
+	
+	public double getTimeStepSize() {
+		return this.timeStepSize;
+	}
+	
 	public void setSnapshotPeriod(final double snapshotPeriod) {
 		this.snapshotPeriod = snapshotPeriod;
 	}

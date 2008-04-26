@@ -79,14 +79,15 @@ public class QueueSimulation extends Simulation {
 
 	final private static Logger log = Logger.getLogger(QueueSimulation.class);
 
-	public QueueSimulation(final NetworkLayer networkLayer, final Plans plans, final Events events) {
+	public QueueSimulation(final NetworkLayer network, final Plans plans, final Events events) {
 		super();
+		this.config = Gbl.getConfig();
+		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
 		setEvents(events);
 		this.plans = plans;
 
-		this.network = new QueueNetworkLayer(networkLayer);
-		this.networkLayer = networkLayer;
-		this.config = Gbl.getConfig();
+		this.network = new QueueNetworkLayer(network);
+		this.networkLayer = network;
 	}
 
 	protected final void createAgents() {

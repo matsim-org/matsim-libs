@@ -29,7 +29,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
-import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
@@ -68,8 +67,7 @@ public class DSOnePercentBerlin10sTest{
 		World world = Gbl.getWorld();
 		// this needs to be done before reading the network
 		// because QueueLinks timeCap dependents on SIM_TICK_TIME_S
-		SimulationTimer.reset(10);
-		SimulationTimer.setTime(0);
+		Gbl.getConfig().simulation().setTimeStepSize(10.0);
 		Gbl.getConfig().simulation().setFlowCapFactor(0.01);
 		Gbl.getConfig().simulation().setStorageCapFactor(0.04);
 
@@ -101,7 +99,7 @@ public class DSOnePercentBerlin10sTest{
 		GenerateRealPlans realPlansGenerator = new GenerateRealPlans(population);
 		events.addHandler(realPlansGenerator);
 
-		QueueSimulation sim = new QueueSimulation(network, population, events) ;
+		QueueSimulation sim = new QueueSimulation(network, population, events);
 		sim.run();
 
 		writer.closefile();
