@@ -30,7 +30,8 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PlansAlgorithm;
-import org.matsim.utils.geometry.shared.CoordWGS84;
+import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Feature;
 import org.matsim.utils.vis.kml.Icon;
@@ -165,24 +166,19 @@ public class PopulationExportToKML extends PlansAlgorithm {
 
 	public void writePopulation(Plans population) throws IOException {
 
-		CoordWGS84 chCoord;
 		int cnt = 0, skip = 1, age = 0, sizeClass = 0;
 
 		System.out.println("Processing population...");
 		Iterator<Person> it = population.getPersons().values().iterator();
 
+		CH1903LV03toWGS84 ct = new CH1903LV03toWGS84();
+
 		while(it.hasNext()) {
 
-			final double x, y, lat, lon;
 			Person p = it.next();
 			Act homeActivitiy = ((Act)p.getPlans().get(0).getActsLegs().get(0));
-			x = homeActivitiy.getCoord().getX();
-			y = homeActivitiy.getCoord().getY();
-
-			// data in enterprise census have x and y wrong, so we have to revert them here
-			chCoord = CoordWGS84.createFromCH1903(x, y);
-			lat = chCoord.getLatitude();
-			lon = chCoord.getLongitude();
+			CoordI chCoord = homeActivitiy.getCoord();
+			CoordI lonLat = ct.transform(chCoord);
 
 			age = p.getAge();
 
@@ -214,7 +210,7 @@ public class PopulationExportToKML extends PlansAlgorithm {
 						Placemark.DEFAULT_VISIBILITY,
 						Placemark.DEFAULT_REGION,
 						Feature.DEFAULT_TIME_PRIMITIVE);
-				aPerson.setGeometry(new Point(lon, lat, 0));
+				aPerson.setGeometry(new Point(lonLat.getX(), lonLat.getY(), 0));
 
 				theDocument.addFeature(aPerson);
 			}
@@ -417,9 +413,7 @@ public class PopulationExportToKML extends PlansAlgorithm {
 
 	}
 
-	public KML createFacilitiesKML(CoordWGS84 chCoord, int sizeClass) {
-
-		CoordWGS84 southWestCorner, northEastCorner;
+	public KML createFacilitiesKML(CoordI chCoord, int sizeClass) {
 
 		double regionSize = 0;
 		int kmlX = 0, kmlY = 0;
@@ -433,8 +427,8 @@ public class PopulationExportToKML extends PlansAlgorithm {
 		for (int ii=4; ii >= sizeClass; ii--) {
 
 			regionSize = this.regionSizes.get(ii);
-			kmlX = (new Double(chCoord.getXCH1903()).intValue() / new Double(regionSize).intValue()) * new Double(regionSize).intValue();
-			kmlY = (new Double(chCoord.getYCH1903()).intValue() / new Double(regionSize).intValue()) * new Double(regionSize).intValue();
+			kmlX = ( ((int) chCoord.getX()) / (int)regionSize ) * (int)regionSize;
+			kmlY = ( ((int) chCoord.getY()) / (int)regionSize ) * (int)regionSize;
 
 			kmlId = kmlId.concat("/" + kmlX + "_" + kmlY);
 
@@ -463,18 +457,13 @@ public class PopulationExportToKML extends PlansAlgorithm {
 					kmlId,
 					kmlId,
 					"Contains all facilities with number of employees > " + this.sizeClasses.get(sizeClass) +
-					" of square (" + kmlX + ";" + kmlY + ") - ("+ new Double(kmlX + regionSize) + ";" + new Double(kmlY + regionSize) + ")",
+					" of square (" + kmlX + ";" + kmlY + ") - ("+ Double.toString(kmlX + regionSize) + ";" + Double.toString(kmlY + regionSize) + ")",
 					Feature.DEFAULT_ADDRESS,
 					Feature.DEFAULT_LOOK_AT,
 					Feature.DEFAULT_STYLE_URL,
 					Feature.DEFAULT_VISIBILITY,
 					Feature.DEFAULT_REGION,
 					Feature.DEFAULT_TIME_PRIMITIVE));
-
-			// create the corners
-			southWestCorner = CoordWGS84.createFromCH1903(kmlX, kmlY);
-
-			northEastCorner = CoordWGS84.createFromCH1903(kmlX + regionSize, kmlY + regionSize);
 
 			this.kmls.put(kmlId, newKML);
 

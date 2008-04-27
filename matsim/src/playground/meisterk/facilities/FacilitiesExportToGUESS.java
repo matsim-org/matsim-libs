@@ -29,7 +29,9 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.shared.CoordWGS84;
+import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Feature;
 import org.matsim.utils.vis.kml.Icon;
@@ -196,24 +198,19 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 
 	public void doFacilitiesWithNetworkLinks(Facilities facilities) throws IOException {
 
-		double x, y, lat, lon;
-		CoordWGS84 chCoord;
 		String actType = "work", tmpActType;
 		int cnt = 0, skip = 1, workCapacity = 0, sizeClass = 0;
 
 		System.out.println("Processing facilities...");
 		Iterator<? extends Location> f_i = facilities.getLocations().values().iterator();
 
+		CH1903LV03toWGS84 ct = new CH1903LV03toWGS84();
+
 		while(f_i.hasNext()) {
 
 			Facility f = (Facility)f_i.next();
-			x = f.getCenter().getX();
-			y = f.getCenter().getY();
-
-			// data in enterprise census have x and y wrong, so we have to revert them here
-			chCoord = CoordWGS84.createFromCH1903(y, x);
-			lat = chCoord.getLatitude();
-			lon = chCoord.getLongitude();
+			CoordI chCoord = f.getCenter();
+			CoordI lonLat = ct.transform(chCoord);
 
 			workCapacity = f.getActivity("work").getCapacity();
 
@@ -255,7 +252,7 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 						Placemark.DEFAULT_VISIBILITY,
 						Placemark.DEFAULT_REGION,
 						Feature.DEFAULT_TIME_PRIMITIVE);
-				aFacility.setGeometry(new Point(lon, lat, 0));
+				aFacility.setGeometry(new Point(lonLat.getX(), lonLat.getY(), 0));
 
 				theDocument.addFeature(aFacility);
 
@@ -509,9 +506,7 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 
 	}
 
-	public KML createFacilitiesKML(CoordWGS84 chCoord, int sizeClass) {
-
-		CoordWGS84 southWestCorner, northEastCorner;
+	public KML createFacilitiesKML(CoordI chCoord, int sizeClass) {
 
 		double regionSize = 0;
 		int kmlX = 0, kmlY = 0;
@@ -525,8 +520,8 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 		for (int ii=4; ii >= sizeClass; ii--) {
 
 			regionSize = this.regionSizes.get(ii);
-			kmlX = (new Double(chCoord.getXCH1903()).intValue() / new Double(regionSize).intValue()) * new Double(regionSize).intValue();
-			kmlY = (new Double(chCoord.getYCH1903()).intValue() / new Double(regionSize).intValue()) * new Double(regionSize).intValue();
+			kmlX = ( ((int) chCoord.getX()) / (int)regionSize ) * (int)regionSize;
+			kmlY = ( ((int) chCoord.getY()) / (int)regionSize ) * (int)regionSize;
 
 			kmlFilename = kmlFilename.concat(SEP + kmlX + "_" + kmlY);
 
@@ -561,7 +556,7 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 					kmlFilename,
 					kmlFilename,
 					"Contains all facilities with number of employees > " + this.sizeClasses.get(sizeClass) +
-					" of square (" + kmlX + ";" + kmlY + ") - ("+ new Double(kmlX + regionSize) + ";" + new Double(kmlY + regionSize) + ")",
+					" of square (" + kmlX + ";" + kmlY + ") - ("+ Double.toString(kmlX + regionSize) + ";" + Double.toString(kmlY + regionSize) + ")",
 					Feature.DEFAULT_ADDRESS,
 					Feature.DEFAULT_LOOK_AT,
 					Feature.DEFAULT_STYLE_URL,
@@ -570,16 +565,16 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 					Feature.DEFAULT_TIME_PRIMITIVE));
 
 			// create the corners
-			southWestCorner = CoordWGS84.createFromCH1903(kmlX, kmlY);
-
-			northEastCorner = CoordWGS84.createFromCH1903(kmlX + regionSize, kmlY + regionSize);
+			CH1903LV03toWGS84 transform = new CH1903LV03toWGS84();
+			CoordI southWestCorner = transform.transform(new Coord(kmlX, kmlY));
+			CoordI northEastCorner = transform.transform(new Coord(kmlX + regionSize, kmlY + regionSize));
 
 			// create the region
 			Region theRegion = new Region(
-					northEastCorner.getLatitude(),
-					southWestCorner.getLatitude(),
-					southWestCorner.getLongitude(),
-					northEastCorner.getLongitude(),
+					northEastCorner.getY(),
+					southWestCorner.getY(),
+					southWestCorner.getX(),
+					northEastCorner.getX(),
 					512,
 					Region.DEFAULT_MAX_LOD_PIXELS);
 
