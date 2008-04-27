@@ -38,7 +38,6 @@ import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24Graph;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
@@ -61,6 +60,7 @@ import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.utils.vis.kml.fields.Vec2Type;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 import org.matsim.utils.vis.matsimkml.NetworkFeatureFactory;
+
 /**
  * @author dgrether
  */
@@ -214,8 +214,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	}
 
 	/**
-	 * This method initializes the styles for the different icons used
-	 *
+	 * This method initializes the styles for the different icons used.
 	 */
 	private void createStyles() {
 		this.redCrossStyle = new Style("redCrossStyle");
@@ -251,7 +250,6 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		this.mainDoc.addStyle(this.greyMinusStyle);
 	}
 
-
 	/**
 	 * Writes the data to the file at the path given as String
 	 *
@@ -272,21 +270,21 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		// the writer
 		this.writer = new KMZWriter(filename, KMLWriter.DEFAULT_XMLNS);
 
-		//try to create the legend
-		ScreenOverlay legend;
 		try {
-			legend = createLegend();
-			this.mainFolder.addFeature(legend);
-			//add the matsim logo to the kml
-			MatsimKMLLogo logo = new MatsimKMLLogo(this.writer);
-			this.mainFolder.addFeature(logo);
+			//try to create the legend
+			this.mainFolder.addFeature(createLegend());
 		} catch (IOException e) {
-			Gbl.errorMsg("Cannot create legend or logo cause: " + e.getMessage());
-			e.printStackTrace();
+			log.error("Cannot add legend to the KMZ file.", e);
+		}
+		try {
+			//add the matsim logo to the kml
+			this.mainFolder.addFeature(new MatsimKMLLogo(this.writer));
+		} catch (IOException e) {
+			log.error("Cannot add logo to the KMZ file.", e);
 		}
 
-		// copy required icons to the kmz
 		try {
+			// copy required icons to the kmz
 			this.writer.addNonKMLFile("res/icons/plus.png", CROSSICON);
 			this.writer.addNonKMLFile("res/icons/minus.png", MINUSICON);
 		} catch (IOException e) {
@@ -390,13 +388,16 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		stringBuffer.delete(0, stringBuffer.length());
 		stringBuffer.append(LINK);
 		stringBuffer.append(linkid);
-//		placemark.setName(stringBuffer.toString());
 		placemark.setDescription(createPlacemarkDescription(linkid, csc, relativeError, timestep));
 		return placemark;
 	}
+
 	/**
 	 * This method writes all the data for each of the links/counts to the kml
-	 * document
+	 * document.
+	 *
+	 * @param countSimComparisonList provides "the data"
+	 * @param folder The folder to which to add the data in the kml-file.
 	 */
 	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final Folder folder) {
 		Id linkid;
@@ -525,6 +526,10 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * Creates CountsSimRealPerHourGraphs and adds them to the kmz in the given folder. The creation of the graphs is
 	 * only done if the map attribute of this class for CountsSimRealPerHourGraphs is null.
+	 *
+	 * @param folder
+	 * @param timestep
+	 * @param timespan
 	 */
 	private void addCountsSimRealPerHourGraphs(final Folder folder, final int timestep, final TimeSpan timespan) {
 		StringBuffer filename;
@@ -659,7 +664,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Creates the CountsSimReal24Graph for all the data
 	 * @param visible true if initially visible
