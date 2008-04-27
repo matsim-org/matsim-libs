@@ -23,7 +23,6 @@ package playground.marcel;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -35,8 +34,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.analysis.CalcAverageTripLength;
@@ -107,7 +104,6 @@ import org.matsim.plans.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.plans.algorithms.XY2Links;
 import org.matsim.plans.filters.PersonIntersectAreaFilter;
 import org.matsim.replanning.modules.ReRouteLandmarks;
-import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.router.PlansCalcRoute;
@@ -121,7 +117,6 @@ import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.geometry.shared.CoordWGS84;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.misc.Time;
@@ -151,9 +146,7 @@ import org.matsim.world.Location;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
-import org.xml.sax.SAXException;
 
-import playground.andreas.itsumo.ITSUMONetworkReader;
 import playground.marcel.ptnetwork.PtNetworkLayer;
 import playground.marcel.ptnetwork.PtNode;
 
@@ -866,50 +859,6 @@ public class MyRuns {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// xy2links
-	//////////////////////////////////////////////////////////////////////
-
-	public static void xy2links(final String[] args) {
-
-		System.out.println("RUN: xy2links");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.getWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final Plans plans = new Plans(Plans.USE_STREAMING);
-		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
-		final PlansReaderI plansReader = new MatsimPlansReader(plans);
-		System.out.println("  done.");
-
-		System.out.println("  adding plans algorithm... ");
-		plans.addAlgorithm(new XY2Links(network));
-		System.out.println("  done.");
-
-		System.out.println("  reading, processing, writing plans..." + (new Date()));
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
-		plans.runAlgorithms();
-		plansWriter.write();
-		System.out.println("  done." + (new Date()));
-
-		System.out.println("RUN: xy2links finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
 	// calcRoute
 	//////////////////////////////////////////////////////////////////////
 
@@ -1485,184 +1434,7 @@ public class MyRuns {
 		System.out.println("RUN: falsifyNetwork finished.");
 		System.out.println();
 	}
-
-	public static void events2traveltimes(final String[] args) {
-		// this method doesn't do much useful stuff as its only intend is to be profiled.
-		System.out.println("RUN: events2traveltimes");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		Gbl.startMeasurement();
-		System.out.println("  reading events and calculating travel times... ");
-		final Events events = new Events();
-		final TravelTimeCalculatorArray ttime = new TravelTimeCalculatorArray(network, 15*60);
-		events.addHandler(ttime);
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		events.printEventsCount();
-		System.out.println("  done.");
-		Gbl.printElapsedTime();
-
-		System.out.println("RUN: events2traveltimes finished.");
-		System.out.println();
-	}
-
-	public static void volvoAnalysis(final String[] args) {
-		System.out.println("RUN: volvoAnalaysis");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		final NetworkLayer network = new NetworkLayer();
-		Gbl.getWorld().setNetworkLayer(network);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading tolls...");
-		RoadPricingScheme hundekopf;
-		RoadPricingScheme gemarkung;
-//		try {
-//			RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(network);
-//			reader.parse("tolllinks_areatoll.xml");
-//			hundekopf = reader.getScheme();
-//			reader.parse("tolllinks_gemarkungbln.xml");
-//			gemarkung = reader.getScheme();
-			hundekopf = new RoadPricingScheme(network);
-			gemarkung = new RoadPricingScheme(network);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			return;
-//		} catch (SAXException e) {
-//			e.printStackTrace();
-//			return;
-//		} catch (ParserConfigurationException e) {
-//			e.printStackTrace();
-//			return;
-//		}
-		System.out.println("  done.");
-
-		final Events events = new Events();
-
-		final VolvoAnalysis analysis = new VolvoAnalysis(network, hundekopf, gemarkung);
-		events.addHandler(analysis);
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		events.printEventsCount();
-
-		// TODO output analysis.results
-
-		System.out.println("RUN: volvoAnalaysis finished.");
-	}
-
-	public static void appraisalAnalysis(final String[] args) {
-		System.out.println("RUN: appraisalAnalysis");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		final NetworkLayer network = new NetworkLayer();
-		Gbl.getWorld().setNetworkLayer(network);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-
-		System.out.println("  reading population...");
-		final Plans population = new Plans(Plans.NO_STREAMING);
-		final PlansWriter plansWriter = new PlansWriter(population);
-		population.setPlansWriter(plansWriter);
-		final PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(config.plans().getInputFile());
-		population.printPlansCount();
-
-		System.out.println("  setting up toll...");
-		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(network);
-		try {
-			reader.parse(config.roadpricing().getTollLinksFile());
-		} catch (SAXException e) {
-			e.printStackTrace();
-			return;
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			return;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-		RoadPricingScheme toll = reader.getScheme();
-		CalcPaidToll tollCalc = new CalcPaidToll(network, toll);
-
-		System.out.println("  setting up appraisal scorer...");
-		final AppraisalScorerFactory factory = new AppraisalScorerFactory(tollCalc, toll);
-		final EventsToScore scoring = new EventsToScore(population, factory);
-
-		System.out.println("  reading and processing events...");
-		final Events events = new Events();
-		events.addHandler(tollCalc);
-		events.addHandler(scoring);
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		scoring.finish();
-
-		int countAgentType[] = {0, 0, 0, 0};
-		double sumScoresLateArrival[] = {0.0, 0.0, 0.0, 0.0};
-		double sumScoresWaiting[] = {0.0, 0.0, 0.0, 0.0};
-		double sumScoresEarlyDeparture[] = {0.0, 0.0, 0.0, 0.0};
-		double sumScoresPerforming[] = {0.0, 0.0, 0.0, 0.0};
-		double sumScoresTraveling[] = {0.0, 0.0, 0.0, 0.0};
-		double sumScoresDistance[] = {0.0, 0.0, 0.0, 0.0};
-		double sumScoresStuck[] = {0.0, 0.0, 0.0, 0.0};
-		double sumTolls[] = {0.0, 0.0, 0.0, 0.0};
-		double sumMorningTravelTime[] = {0.0, 0.0, 0.0, 0.0};
-		double sumEveningTravelTime[] = {0.0, 0.0, 0.0, 0.0};
-		double sumWorkDuration[] = {0.0, 0.0, 0.0, 0.0};
-		double sumHomeDuration[] = {0.0, 0.0, 0.0, 0.0};
-		for (final AppraisalScorer scorer : factory.scorers) {
-			int agenttype = scorer.persontype;
-			countAgentType[agenttype]++;
-			sumScoresLateArrival[agenttype] += scorer.scoreLateArrival;
-			sumScoresWaiting[agenttype] += scorer.scoreWaiting;
-			sumScoresEarlyDeparture[agenttype] += scorer.scoreEarlyDeparture;
-			sumScoresPerforming[agenttype] += scorer.scorePerforming;
-			sumScoresTraveling[agenttype] += scorer.scoreTraveling;
-			sumScoresDistance[agenttype] += scorer.scoreDistance;
-			sumScoresStuck[agenttype] += scorer.scoreStuck;
-			sumTolls[agenttype] += scorer.tollAmount;
-			sumMorningTravelTime[agenttype] += scorer.traveltime[0];
-			sumEveningTravelTime[agenttype] += scorer.traveltime[1];
-			sumWorkDuration[agenttype] += scorer.workduration;
-			sumHomeDuration[agenttype] += scorer.homeduration;
-		}
-
-		PlanAverageScore average = new PlanAverageScore();
-		average.run(population);
-
-		System.out.println("Results:");
-		System.out.println("========");
-		for (int i = 0; i < 4; i++) {
-			System.out.println(" agenttype = " + i);
-			System.out.println(" --------------");
-			System.out.println("  Number of agents: " + countAgentType[i]);
-			System.out.println("  LateArrival-Scores: " + sumScoresLateArrival[i]);
-			System.out.println("  Waiting-Scores: " + sumScoresWaiting[i]);
-			System.out.println("  EarlyDeparture-Scores: " + sumScoresEarlyDeparture[i]);
-			System.out.println("  Performing-Scores: " + sumScoresPerforming[i]);
-			System.out.println("  Traveling-Scores: " + sumScoresTraveling[i]);
-			System.out.println("  Distance-Scores: " + sumScoresDistance[i]);
-			System.out.println("  Stuck-Scores: " + sumScoresStuck[i]);
-			System.out.println("  TollAmounts: " + sumTolls[i]);
-			System.out.println("  MorningTravelTime: " + sumMorningTravelTime[i]);
-			System.out.println("  EveningTravelTime: " + sumEveningTravelTime[i]);
-			System.out.println("  Work duration: " + sumWorkDuration[i]);
-			System.out.println("  Home duration: " + sumHomeDuration[i]);
-			System.out.println();
-		}
-		System.out.println("Total average: " + average.getAverage());
-		System.out.println();
-
-		System.out.println("RUN: appraisalAnalysis finished.");
-	}
-
+	
 	//////////////////////////////////////////////////////////////////////
 	// calcODMatrices
 	//////////////////////////////////////////////////////////////////////
@@ -2392,127 +2164,6 @@ public class MyRuns {
 		System.out.println();
 	}
 
-
-	//////////////////////////////////////////////////////////////////////
-	// convertBrazilNetwork
-	//////////////////////////////////////////////////////////////////////
-
-	public static void convertBrazilNetwork(final String[] args) {
-
-		System.out.println("RUN: convertBrazilNetwork");
-
-		final Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		final ITSUMONetworkReader reader = new ITSUMONetworkReader(network);
-		reader.read(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing the network...");
-		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: convertBrazilNetwork finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// createPlansWMBefragung
-	//////////////////////////////////////////////////////////////////////
-
-	public static void createPlansWMBefragung(final String[] args) {
-
-		System.out.println("TEST RUN 04: create plans from soccer wm_befragung");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.getWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  creating network layer... ");
-
-		final NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
-		System.out.println("  done.");
-
-		System.out.println("  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-//		System.out.println("  reading facilities xml file... ");
-//		FacilitiesParser facilities_parser = new FacilitiesParser(Facilities.getSingleton());
-//		facilities_parser.parse();
-//		System.out.println("  done.");
-
-		System.out.println("  creating plans object... ");
-		final Plans plans = new Plans();
-		System.out.println("  done.");
-
-		System.out.println("  creating plans writer object... ");
-		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
-		System.out.println("  done.");
-
-		System.out.println("  setting plans algorithms... ");
-//		plans.addAlgorithm(new PersonBasic());
-//		plans.addAlgorithm(new XY2Links(network));
-//		plans.addAlgorithm(new PersonRemoveCertainActs());
-//		plans.addAlgorithm(new PlansCalcRoute(network, new TravelTimeCost()));
-//		plans.addAlgorithm(new PersonCalcActivitySpace());
-		System.out.println("  done.");
-
-//		System.out.println("  reading/creating plans... ");
-//		PlansReaderHandlerImplSoccerWM plansReader = new PlansReaderHandlerImplSoccerWM(plans);
-//		plansReader.readfile(Config.getSingleton().getParam(Config.PLANS, "inputFileKeyMap"),
-//				Config.getSingleton().getParam(Config.PLANS, "inputFileNodes"),
-//				Config.getSingleton().getParam(Config.PLANS, "inputFileLinks"),
-//				Config.getSingleton().getParam(Config.PLANS, "inputFilePersonen"),
-//				Config.getSingleton().getParam(Config.PLANS, "inputFileAktivitaetenPLZ"),
-//				Config.getSingleton().getParam(Config.PLANS, "inputFileAktivitaeten"));
-//		System.out.println("  done.");
-//
-//		if (Config.getSingleton().getParam(Config.PLANS,Config.PLANS_SWITCHOFFSTREAMING).equals("yes")) {
-//			System.out.println("  running algorithms over all plans...");
-//			plans.runAlgorithms();
-//			System.out.println("  done.");
-//		}
-
-		// writing all available input
-
-		System.out.println("  writing plans xml file... ");
-		plansWriter.write();
-		System.out.println("  done.");
-
-//		System.out.println("  writing facilities xml file... ");
-//		FacilitiesWriter facilities_writer = new FacilitiesWriter(Facilities.getSingleton());
-//		facilities_writer.write();
-//		System.out.println("  done.");
-
-//		System.out.println("  writing network xml file... ");
-//		NetworkWriter network_writer = new NetworkWriter(network);
-//		network_writer.write();
-//		System.out.println("  done.");
-
-//		System.out.println("  writing world xml file... ");
-//		WorldWriter world_writer = new WorldWriter(World.getSingleton());
-//		world_writer.write();
-//		System.out.println("  done.");
-
-//		System.out.println("  writing config xml file... ");
-//		ConfigWriter config_writer = new ConfigWriter(Config.getSingleton());
-//		config_writer.write();
-//		System.out.println("  done.");
-
-		System.out.println("TEST SUCCEEDED.");
-		System.out.println();
-
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// visumMatrixTest
 	//////////////////////////////////////////////////////////////////////
@@ -2756,21 +2407,6 @@ public class MyRuns {
 		System.out.println();
 	}
 
-	public static void testCoordinateTransform(final String[] args) {
-
-		final CoordWGS84 toCoord = CoordWGS84.createFromCH1903(100000, 700000);
-		System.out.println("swiss        " + toCoord.getLongitude() + ", " + toCoord.getLatitude());
-
-		final CH1903LV03toWGS84 ct = new CH1903LV03toWGS84();
-		CoordI fromCoord = new Coord(700000, 100000);
-		CoordI toCoord2 = ct.transform(fromCoord);
-		System.out.println("swiss2       " + toCoord2.getX() + ", " + toCoord2.getY());
-
-		fromCoord = new Coord(683510, 246850);
-		toCoord2 = ct.transform(fromCoord);
-		System.out.println("swiss2       " + toCoord2.getX() + ", " + toCoord2.getY());
-	}
-
 	public static void readPlansDat(final String[] args) {
 		Gbl.createConfig(null);
 		try {
@@ -2942,16 +2578,6 @@ public class MyRuns {
 		}
 	}
 
-	public static void readConfig(final String[] args) {
-		System.out.println("RUN: readConfig");
-		final Config config = Gbl.createConfig(args);
-
-		new ConfigWriter(config, new PrintWriter(System.out)).write();
-
-		System.out.println("RUN: readConfig finished.");
-		System.out.println();
-	}
-
 	public static void readCounts(final String[] args) {
 		System.out.println("RUN: readCounts");
 		final Config config = Gbl.createConfig(args);
@@ -3051,7 +2677,6 @@ public class MyRuns {
 //		convertPlans(args);
 //		readPlans(args);
 //		removeLinkAndRoute(args);
-//		fixJTimes(args);
 
 		/* ***   DEMAND MODELING   *** */
 
@@ -3067,31 +2692,19 @@ public class MyRuns {
 //		filterWork(args);
 //		filterWorkEdu(args);
 //		createDebugPlans(args);
-//		xy2links(args);
 //		calcRoute(args);
 //		calcRouteMTwithTimes(args); // multithreaded, use traveltimes from events
 //		calcRoutePt(args);  // public transport
 
 //		testPt(args);  // public transport
-//		mutateTimeAllocationMT(args);
 //		calcRealPlans(args);
-//		calcScore(args);
 //		calcScoreFromEvents_old(args);
 //		calcScoreFromEvents_new(args);
-
-/* ***   S O C C E R   *** */
-//		calcWMPlan(args);
-//		minimizeLegs(args);
-
 
 /* ***   N E T W O R K S   *** */
 //		convertNetwork(args);
 //		renumberNetwork(args, false);
-//		speedupNetwork(args);
-//		slowdownNetwork(args);
-//		scaleCapacity(args, 22, 0.6, 1.2);
 //		cleanNetwork(args);
-//		calcRealSpeed(args);
 //		calcNofLanes(args);
 //		falsifyNetwork(args);
 
@@ -3102,18 +2715,7 @@ public class MyRuns {
 
 /* ***   A N A L Y S I S   *** */
 
-		/* ***   VOLUMES / COUNTS   *** */
-//		events2volumes(args);
-//		events2traveltimes(args);
-//		events2linkStats(args);
-//		counts2networkId_soccer(args);
-//		counts2networkId_uckermark(args);
-//		counts2networkId_wip(args);
-//		volumesVsCounts(args, 10.0);
-//		countsCoordinates_wip(args);
-//		volvoAnalysis(args);
-//		appraisalAnalysis(args);
-
+		/* ***   VOLUMES   *** */
 //		calcODMatrix(args); // calcs OD matrix 0-24h from Plans, using 1004 tvz from Berlin
 //		calc1hODMatrices(args);		// calcs 1h OD matrices from plans and events, using 1004 tvz from Berlin
 //		calcODMatrixBezirke(args);	// calcs OD matrix 0-24h from Plans, using Bezirke 1-23 instead of tvz within Berlin
@@ -3121,14 +2723,12 @@ public class MyRuns {
 
 		/* ***   PLANS   *** */
 //		calcPlanStatistics(args);
-//		analyzeLegDepTimes_plans(args, 300); // deprecated
 //		analyzeLegTimes_events(args, 300); // # departure, # arrival, # stuck per time bin
 //		calcTripLength(args); // from plans
 //		calcTolledTripLength(args); // calc avg trip length on tolled links
 //		generateRealPlans(args);
 //		planPlotActLocations(args);
 //		writeVisumRouten_plans(args);
-//		vehCountPerLinkViz(args);
 
 		/* ***   EVENTS   *** */
 //		readEvents(args);
@@ -3141,22 +2741,18 @@ public class MyRuns {
 
 		/* ***   P L A Y G R O U N D   *** */
 
-//		convertBrazilNetwork(args);
-//		buildKML(args, true);
 //		buildKML2(args, false);
 //		network2kml(args);
-//		testCoordinateTransform(args);
 //		readPlansDat(args);
 //		readEventsDat(args);
 //		speedEventsDat(args);
 //		readMatrices(args);
 //		readWriteLinkStats(args);
 //		randomWalk(10000);
-//		readConfig(args);
 //		readCounts(args);
 //		writeKml();
 //		createQVDiagramm(args);
-		someTest(args);
+//		someTest(args);
 
 //		Gbl.printSystemInfo();
 
