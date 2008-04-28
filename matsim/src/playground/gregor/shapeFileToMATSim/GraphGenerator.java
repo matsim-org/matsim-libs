@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -47,11 +48,13 @@ import org.geotools.feature.SchemaException;
 import org.matsim.utils.collections.QuadTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * @author laemmel
@@ -79,6 +82,7 @@ public class GraphGenerator {
 		cleanUpLineStrings();
 		checkForIntersectionsToSplit();
 		simplifyNetwork();
+		mergeNodes();
 
 		return genFeatureCollection();
 	}
@@ -187,6 +191,46 @@ public class GraphGenerator {
 	}
 
 
+	private void mergeNodes() {
+		log.info("");
+	
+		
+		ConcurrentLinkedQueue<LineString> lineStringsQueue = new ConcurrentLinkedQueue<LineString>(this.lineStrings);
+		Iterator<LineString> it = lineStringsQueue.iterator();
+		while (it.hasNext()) {
+			LineString ls = it.next();
+			
+			Point [] points = new Point[]{ls.getStartPoint(), ls.getEndPoint()};
+			
+			for(int i = 0 ; i < points.length ; i++){
+			
+				Point p = points[i];
+				Collection<LineString> lsList = tree.get(p.getX(), p.getY(), GISToMatsimConverter.CATCH_RADIUS);
+				for (LineString l : lsList){
+					if(l.getStartPoint().equalsExact(p, GISToMatsimConverter.CATCH_RADIUS)){
+						if(!l.getStartPoint().equalsExact(p)){
+							Coordinate [] c = l.getCoordinates();
+							c[0] = p.getCoordinate(); 
+							CoordinateSequence seq = new CoordinateArraySequence(c);
+							LineString newLine = new LineString(seq, geofac);
+							remove(l);
+							add(newLine);
+						}
+					} else if(l.getEndPoint().equalsExact(p, GISToMatsimConverter.CATCH_RADIUS)){
+						if(!l.getEndPoint().equalsExact(p)){
+							Coordinate [] c = l.getCoordinates();
+							c[c.length-1] = p.getCoordinate(); 
+							CoordinateSequence seq = new CoordinateArraySequence(c);
+							LineString newLine = new LineString(seq, geofac);
+							remove(l);
+							add(newLine);
+						}
+					}
+				}
+			}
+		}
+	}
+	
 
 	private void parseLineStrings() throws IOException {
 

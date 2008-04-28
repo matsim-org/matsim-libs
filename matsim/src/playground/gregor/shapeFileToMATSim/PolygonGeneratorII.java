@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -55,6 +56,9 @@ public class PolygonGeneratorII {
 	static final double DEFAULT_DISTANCE = 10;
 	private static final Logger log = Logger.getLogger(PolygonGeneratorII.class);
 	private boolean graph = false; 
+	
+	
+	private HashMap<Integer, Point> interPoints = new HashMap<Integer, Point>();
 	
 	public PolygonGeneratorII(FeatureSource ls, FeatureSource po){
 		this.featureSourcePolygon = po;
@@ -80,15 +84,20 @@ public class PolygonGeneratorII {
 		log.info("leaving polygonGenerator");		
 //		return(genPolygonFeatureCollection(mergePolygons()));			
 		return(genPolygonFeatureCollection(cutPolygons(lineStrings,mergePolygons())));
+		
+//		cutPolygons(lineStrings,mergePolygons());
+//		return(genPointFeatureCollection(interPoints));
 	}
 	
 	private HashMap<Integer, Polygon> cutPolygons(HashMap<Integer, LineString> lineStrings, HashMap<Integer, Polygon> returnPolys){
 		
 		int countlines = 0;
 		int cCP = 0;
+		int countInter = 0;
 		
 		HashMap<Integer, Polygon> controlPolys = new HashMap<Integer, Polygon>();
 		HashMap<Integer, Polygon> debugPolys = new HashMap<Integer, Polygon>();
+		
 
 		CoordinateArraySequence s1 = new CoordinateArraySequence(new Coordinate[] {new Coordinate(651048.912,9893489.699)});
 		Point p1 = new Point(s1,this.geofac);
@@ -97,7 +106,7 @@ public class PolygonGeneratorII {
 		
 		
 		log.info("cutting polygons ...");
-		HashMap<Integer, Polygon> fPoly= new HashMap<Integer, Polygon>();
+		HashMap<Integer, Polygon> fPoly = new HashMap<Integer, Polygon>();
 			
 		 	for(Iterator<Entry<Integer, LineString>> lsIter = lineStrings.entrySet().iterator() ; lsIter.hasNext() ; ){
 		
@@ -110,12 +119,14 @@ public class PolygonGeneratorII {
 				
 				
 				
+				
+				
+				
 				for(Point currPoint : po){
 					
-					
-					log.info(countlines);
-					log.info(currPoint.getCoordinate().toString() + " lsId: "+lsId);
 					countlines++;
+					log.info(countlines+": " + " lsId: "+lsId + " " +  currLs.getStartPoint().getCoordinate().toString() + " "+ currLs.getEndPoint().getCoordinate().toString());
+					
 				
 					Coordinate currPointCoor = currPoint.getCoordinate();
 					List<Feature> lines = (List<Feature>) lineTree.get(currPoint.getX(), currPoint.getY(), CATCH_RADIUS);
@@ -127,13 +138,66 @@ public class PolygonGeneratorII {
 						poly = fPoly.get(lsId);
 					}else if (returnPolys.containsKey(lsId)) {
 						poly  = returnPolys.get(lsId);
+					
+					
+						///////
+						Coordinate [] c = currLs.getCoordinates();
+						
+						for(int i = 0 ; i < c.length-1 ; i++){
+							Coordinate [] c1 = new Coordinate[]{c[i],c[i+1]};
+							CoordinateSequence seq4 = new CoordinateArraySequence(c1);
+							LineString li = new LineString(seq4, geofac);	
+						
+							if(poly.intersects(li)){
+								
+								
+								Geometry g = poly.intersection(li);
+								Coordinate co [] = g.getCoordinates();
+								
+								for(int ii = 0 ; ii < co.length ; ii++){
+									
+									Coordinate [] c3 = new Coordinate[]{co[ii]};
+									CoordinateSequence seq5 = new CoordinateArraySequence(c3);
+									Point p = new Point(seq5, geofac);
+									
+									
+									
+									if(!p.within(poly)){
+										log.warn(countlines+": LineString intersects polygon "+c.length+" times");
+										interPoints.put((countInter), p);
+										countInter++;
+									}
+								}
+								
+//								continue;
+							}
+							
+							
+						}
+						/////////
+										
 					}else {
-						log.warn("no poly");
-						break;
+						log.warn(countlines+": LineString has no poly");
+						continue;
 					}
 					if (lsId == 98) {
 						debugPolys.put(61, poly);
 					}
+					
+					
+					
+					
+					
+					if (!currPoint.within(poly)){
+						log.warn(countlines+": Point is not covered by its polygon");
+						if (fPoly.containsKey(lsId)){
+							fPoly.remove(lsId);
+						}
+						continue;
+					}
+					
+					
+					
 					Coordinate [] coor = poly.getCoordinates();	
 					
 					List<Point> points = new ArrayList<Point>();				
@@ -162,9 +226,106 @@ public class PolygonGeneratorII {
 						while(!found){
 							
 							Coordinate pp = polyCoor.get(currPointCoor.x, currPointCoor.y);
-							if(pp == null){
-								log.warn("polyCoor is empty: no point found. ControlPoly: " + controlPoly.toString());
-								break;
+							
+							Coordinate [] cpp = new Coordinate[]{pp};
+							CoordinateSequence seq10 = new CoordinateArraySequence(cpp);
+							Point cppPoint = new Point(seq10, geofac);
+							
+							
+							if(pp == null || (currPoint.distance(cppPoint) > 10)){
+								
+								
+//								log.warn(countlines+": polyCoor is empty: no point found. ControlPoly: " + controlPoly.toString());
+								
+								
+								
+								///////////////////////////////
+								LineString lineI = lineArr[i];
+								double angleI = angleArr[i];
+								LineString lineII;
+								double angleII;
+								double deltaAngle;
+								if (i == ( lineArr.length -1) ) {	
+									lineII = lineArr[0];
+									angleII = angleArr[0];
+									
+									if ( (angleII - angleI) <= -180 ){
+										deltaAngle = 60;
+									}else{
+										deltaAngle = 270;
+									}
+
+								}else {
+									lineII = lineArr[i+1];
+									angleII = angleArr[i+1];
+									deltaAngle = angleII - angleI;
+								}
+								
+								Coordinate bisecCoor = getBisectingLine(lineII, lineI);
+								
+								if (deltaAngle > 180 ){
+									Coordinate co = subCoord(currPointCoor, bisecCoor); 
+									bisecCoor = addCoord(currPointCoor, co);
+								}
+								///
+								
+								Coordinate cb = subCoord(currPointCoor, bisecCoor); 
+								Coordinate bisecCoorII = addCoord(currPointCoor, cb);
+								
+								
+								Coordinate [] ccc = new Coordinate[]{bisecCoorII, bisecCoor};
+								CoordinateSequence seq6 = new CoordinateArraySequence(ccc);
+								LineString interLine = new LineString(seq6, geofac);
+								
+								SortedMap<Double, Coordinate> lengths = new TreeMap<Double, Coordinate>();
+								
+								Coordinate [] inter = null;
+								
+//								if(poly.intersects(interLine)){
+									
+									inter = poly.intersection(interLine).getCoordinates();
+									
+									
+									for(int iii = 0 ; iii < inter.length ; iii++ ){
+										lengths.put(inter[iii].distance(currPointCoor),inter[iii]);								
+//										log.info(inter[iii].toString());
+									}
+//								}
+								
+								
+								
+								
+								for(int iii = 0 ; iii < inter.length ; iii++ ){
+									
+									Coordinate ppp = lengths.get(lengths.firstKey());
+									if(ppp == null){
+										log.warn(countlines+": polyCoor is empty: no intersection found.");
+										break;
+									}
+									
+									Coordinate [] cccc = new Coordinate[]{currPointCoor, ppp};
+									CoordinateSequence seq4 = new CoordinateArraySequence(cccc);
+									LineString line2 = new LineString(seq4, geofac);
+
+										if(controlPoly.contains(line2) || line2.crosses(controlPoly)  ){
+											Coordinate [] p = new Coordinate[] {lengths.get(lengths.firstKey())};
+											CoordinateSequence seqII = new CoordinateArraySequence(p);
+											Point poi = new Point(seqII, geofac);
+											
+											if (pp == null || (currPoint.distance(cppPoint) > currPoint.distance(poi))){
+												points.add(poi);
+												found = true;
+												break;
+											}
+											
+										}else{
+											lengths.remove(lengths.firstKey());
+										}								
+										
+										
+								
+								}
+								if (found){break;}
 							}
 							
 							Coordinate [] cc = new Coordinate[]{currPointCoor, pp};
@@ -174,82 +335,11 @@ public class PolygonGeneratorII {
 								if(controlPoly.contains(line) || line.crosses(controlPoly)  ){ 
 									
 									Coordinate [] p = new Coordinate[]{pp};
-									
-									////////
-									if(line.getLength() > 5){
-										
-										LineString lineI = lineArr[i];
-										double angleI = angleArr[i];
-										LineString lineII;
-										double angleII;
-										double deltaAngle;
-										if (i == ( lineArr.length -1) ) {	
-											lineII = lineArr[0];
-											angleII = angleArr[0];
-											
-											if ( (angleII - angleI) <= -180 ){
-												deltaAngle = 60;
-											}else{
-												deltaAngle = 270;
-											}
 
-										}else {
-											lineII = lineArr[i+1];
-											angleII = angleArr[i+1];
-											deltaAngle = angleII - angleI;
-										}
-										
-										Coordinate bisecCoor = getBisectingLine(lineII, lineI);
-										
-										if (deltaAngle > 180 ){
-											Coordinate co = subCoord(currPointCoor, bisecCoor); 
-											bisecCoor = addCoord(currPointCoor, co);
-										}
-										
-										Coordinate [] ccc = new Coordinate[]{currPointCoor, pp};
-										CoordinateSequence seq3 = new CoordinateArraySequence(ccc);
-										LineString interLine = new LineString(seq3, geofac);
-										SortedMap<Double, Coordinate> lengths = new TreeMap<Double, Coordinate>();
-										Coordinate [] inter = poly.intersection(interLine).getCoordinates();
-										
-										if(poly.intersects(interLine)){
-											
-											for(int iii = 0 ; iii < inter.length-1 ; iii++ ){
-												lengths.put( getLength(subCoord(inter[iii],currPointCoor)),inter[iii]);								
-											}
-										}
-										
-										for(int iii = 0 ; iii < inter.length-1 ; iii++ ){
-											
-											Coordinate ppp = lengths.get(lengths.firstKey());
-											if(pp == null){
-												log.warn("polyCoor is empty: no point found. ControlPoly: " + controlPoly.toString());
-												break;
-											}
-											
-											Coordinate [] cccc = new Coordinate[]{currPointCoor, ppp};
-											CoordinateSequence seq4 = new CoordinateArraySequence(cccc);
-											LineString line2 = new LineString(seq4, geofac);
-
-												if(controlPoly.contains(line2) || line2.crosses(controlPoly)  ){
-													
-													p = new Coordinate[] {lengths.get(lengths.firstKey())};
-													break;
-													
-												}else{
-													lengths.remove(lengths.firstKey());
-												}
-										}
-									}
-									///////
-									
-									
 									CoordinateSequence seqII = new CoordinateArraySequence(p);
 									Point poi = new Point(seqII, geofac);
 									points.add(poi);
-									
-//									log.info("Point: "+poi.toString());
-									
+
 									found = true;
 									break;
 								}else{
@@ -260,7 +350,7 @@ public class PolygonGeneratorII {
 					}
 					
 					if(points.size()<3){
-						break;
+						continue;
 					}
 					
 					HashSet<Polygon> cutPolys = separatePoly(poly, points);
@@ -297,7 +387,7 @@ public class PolygonGeneratorII {
 			LineString ls = lineStrings.get(id);
 						
 			HashSet<Polygon> neighborhood = new HashSet<Polygon>();
-			Collection<Polygon> polys = polygonTree.get(ls.getCentroid().getX(),ls.getCentroid().getY() , 900);
+			Collection<Polygon> polys = polygonTree.get(ls.getCentroid().getX(),ls.getCentroid().getY() , 2000);
 
 			
 			for (Polygon po : polys){
@@ -310,7 +400,7 @@ public class PolygonGeneratorII {
     		for (Polygon po : polys) {
     			if (!neighborhood.contains(po)){
     				for (Polygon tmp : neighborhood) {
-    					if (po.intersects(tmp)){
+    					if (po.intersects(tmp)||po.touches(tmp)){
     						extNeighborhood.add(po);
     						break;
     					}
@@ -327,7 +417,7 @@ public class PolygonGeneratorII {
    			try{
    				Geometry retPoly = (Geometry) geoColl.buffer(0.01);
    				if (retPoly.getNumGeometries() > 1) {
-   					log.warn("multipoly");
+   					log.warn("Multipolygon produced in mergePolygons()");
    				}
    				
    				
@@ -440,6 +530,24 @@ public class PolygonGeneratorII {
 		Feature ft = ftLineString.create(new Object [] {ls, iid},"lineString");
 		return ft;
 	}
+	
+	
+	private Collection<Feature> genPointFeatureCollection(HashMap<Integer, Point> interPoints)throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
+		
+		Collection<Feature> features = new ArrayList<Feature>();
+		
+		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
+		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
+		FeatureType ftRoadShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id }, "interPoint");
+						
+		for (Iterator<Entry<Integer, Point>> it = interPoints.entrySet().iterator() ; it.hasNext() ; ){	
+			Entry<Integer, Point> e = it.next();
+			Feature ft = ftRoadShape.create(new Object [] { e.getValue() , e.getKey().toString()},"network");
+			features.add(ft);
+		}
+		return features;
+	}
+	
 		
 //	private double calcWitdh(LineString ls, List<Polygon> po){
 //		
@@ -662,10 +770,10 @@ public class PolygonGeneratorII {
 			} else {
 				r4 = subCoord(r3 , ls1.getCoordinates()[0]);
 			}
-			//TODO ausrichtung
+		
 			
 //			if(getLength(r4) < 1){
-				r4 = multiCoord(r4, (1/getLength(r4))*Math.min(c1Length, c2Length));
+				r4 = multiCoord(r4, (1/getLength(r4))*50);  //Math.min(c1Length, c2Length)
 //			}
 				 
 			r5 = addCoord(ls1.getCoordinates()[0], r4);  //multiCoord(r4, ((c1Length + c2Length)/2))
@@ -731,8 +839,15 @@ public class PolygonGeneratorII {
 			CoordinateSequence seq = new CoordinateArraySequence(cosNew);
 			LinearRing lr = new LinearRing(seq, geofac);
 			Polygon p = new Polygon(lr, null, geofac);
+			Polygon b = (Polygon) p.buffer(0.5);
 			
-			Geometry geo = (Geometry) poly.difference(p);
+			
+			if(!poly.contains(p)){
+//				log.info("poly touches point: "+ p.toString());
+			}
+			
+			Geometry geo = (Geometry) poly.difference(b);
+			
 			
 			if (geo.getNumGeometries() == 1){
 				pp.add((Polygon) geo);
