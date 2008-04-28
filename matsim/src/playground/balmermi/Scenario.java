@@ -48,8 +48,8 @@ public abstract class Scenario {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	public static final String output_directory = "../../output/";
-	public static final String input_directory = "../../input/";
+	public static final String output_directory = "../output/";
+	public static final String input_directory = "../input/";
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

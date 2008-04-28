@@ -20,11 +20,17 @@
 
 package playground.balmermi;
 
-import org.matsim.counts.Counts;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.algorithms.NetworkCalcTopoType;
+import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
+import org.matsim.network.algorithms.NetworkSummary;
+import org.matsim.network.algorithms.NetworkTransform;
+import org.matsim.network.algorithms.NetworkWriteAsTable;
+import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 
-import playground.balmermi.modules.ivtch.NetworkCalibrationWithCounts;
+import playground.balmermi.modules.ivtch.NetworkParseETNet;
 
 public class CleanNetwork {
 
@@ -40,12 +46,12 @@ public class CleanNetwork {
 //		config.config().setOutputFile("output_config.xml");
 		Scenario.setUpScenarioConfig();
 		NetworkLayer network = Scenario.readNetwork();
-		Counts counts = Scenario.readCounts();
+//		Counts counts = Scenario.readCounts();
 //		NetworkLayer network = new NetworkLayer();
 
 		System.out.println("  running Network modules... ");
 //		new NetworkParseETNet("../../input/nodes.txt","../../input/linksET.txt").run(network);
-		new NetworkCalibrationWithCounts("../../output/greentimes.xml",counts).run(network);
+//		new NetworkCalibrationWithCounts("../../output/greentimes.xml",counts).run(network);
 //		new NetworkSetDefaultCapacities().run(network);
 //		new NetworkSummary().run(network);
 //		new NetworkSimplifyAttributes().run(network);
@@ -53,7 +59,8 @@ public class CleanNetwork {
 //		new NetworkCleaner().run(network);
 //		new NetworkMergeDoubleLinks().run(network);
 //		new NetworkCalcTopoType().run(network);
-//		new NetworkTransform(new CH1903LV03toWGS84()).run(network);
+		new NetworkTransform(new CH1903LV03toWGS84()).run(network);
+//		new NetworkSummary().run(network);
 		System.out.println("  done.");
 
 //		NetworkWriteETwithCounts nwetwc = new NetworkWriteETwithCounts(Counts.getSingleton());
@@ -64,7 +71,7 @@ public class CleanNetwork {
 //		nwat.close();
 
 		Scenario.writeNetwork(network);
-		Scenario.writeConfig();
+//		Scenario.writeConfig();
 
 		System.out.println("RUN: cleanNetwork finished.");
 		System.out.println();
