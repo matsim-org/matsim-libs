@@ -27,18 +27,14 @@ import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.SimulationTimer;
-import org.matsim.network.Link;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
 import org.matsim.run.Events2Snapshot;
-import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.NetVis;
 
 import playground.andreas.intersection.sim.QSim;
 
 public class QControler extends Controler {
 
+	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QControler.class);
 
 	public QControler(final Config config) {
@@ -47,55 +43,9 @@ public class QControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-
 		SimulationTimer.setTime(0);
-
-		// TODO [an] Is needed ? or
-		// remove eventswriter, as the external mobsim has to write the events */
-//		this.events.removeHandler(this.eventwriter);
-//		this.eventwriter = new EventWriterTXT(getIterationFilename(Controler.FILENAME_EVENTS.replaceAll(".gz", "")));
-//		this.events.addHandler(this.eventwriter);
-		// I don't think this is really needed. -marcel/21jan2008
-
 		QSim sim = new QSim(this.events, this.population, this.network);
 		sim.run();
-
-	}
-
-	/** Should be overwritten in case of artificial population */
-	@Override
-	protected Plans loadPopulation() {
-
-		Plans pop = new Plans(Plans.NO_STREAMING);
-
-		log.info("  generating plans... ");
-
-		for (int jj = 1; jj <= 10; jj++) {
-
-			Link destLink = this.network.getLink("20");
-			Link sourceLink = this.network.getLink("60");
-			generatePerson(jj, sourceLink, destLink, pop);
-		}
-
-		return pop;
-
-	}
-
-	/** Generates one Person a time */
-	private void generatePerson(final int ii, final Link sourceLink, final Link destLink, final Plans population) {
-		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
-		Plan plan = new Plan(p);
-		try {
-			plan.createAct("h", 100., 100., sourceLink, 0., 3 * 60 * 60., Time.UNDEFINED_TIME, true);
-			plan.createLeg("1", "car", null, null, null);
-			plan.createAct("h", 200., 200., destLink, 8 * 60 * 60, 0., 0., true);
-
-			p.addPlan(plan);
-			population.addPerson(p);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 	}
 
 	/** Conversion of events -> snapshots */
@@ -132,7 +82,7 @@ public class QControler extends Controler {
 		Config config;
 
 		if (args.length == 0) {
-			config = Gbl.createConfig(new String[] { "./test/shared/itsumo-sesam-scenario/config.xml" });
+			config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/config.xml" });
 		} else {
 			config = Gbl.createConfig(args);
 		}
@@ -142,7 +92,6 @@ public class QControler extends Controler {
 		controler.setWriteEvents(true);
 
 		controler.run();
-
 		controler.makeVis();
 	}
 

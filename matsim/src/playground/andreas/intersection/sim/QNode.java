@@ -2,11 +2,10 @@ package playground.andreas.intersection.sim;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
+import org.matsim.mobsim.Vehicle;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.trafficlights.data.SignalGroupSettings;
@@ -49,7 +48,7 @@ public class QNode extends QueueNode{
 
 					for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
 						while (!pseudoLink.flowQueueIsEmpty()) {
-							QVehicle veh = pseudoLink.getFirstFromBuffer();
+							Vehicle veh = pseudoLink.getFirstFromBuffer();
 							if (!moveVehicleOverNode(veh, now, pseudoLink)) {
 								break;
 							}
@@ -65,7 +64,7 @@ public class QNode extends QueueNode{
 
 			//Node is NOT traffic light controlled
 
-			for (Iterator iter = this.getNode().getInLinks().values().iterator(); iter.hasNext();) {
+			for (Iterator<? extends Link> iter = this.getNode().getInLinks().values().iterator(); iter.hasNext();) {
 				Link link = (Link) iter.next();
 				
 				QLink qLink = (QLink) queueNetworkLayer.getQueueLink(link.getId());
@@ -73,7 +72,7 @@ public class QNode extends QueueNode{
 
 				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
 					while (!pseudoLink.flowQueueIsEmpty()) {
-						QVehicle veh = pseudoLink.getFirstFromBuffer();
+						Vehicle veh = pseudoLink.getFirstFromBuffer();
 						if (!moveVehicleOverNode(veh, now, pseudoLink)) {
 							break;
 						}
@@ -87,15 +86,16 @@ public class QNode extends QueueNode{
 
 	/** Simple moveNode, Complex one can be found in {@link QueueLink}
 	 * @param pseudoLink */
-	public boolean moveVehicleOverNode(final QVehicle veh, final double now, PseudoLink pseudoLink) {
+	public boolean moveVehicleOverNode(final Vehicle veh, final double now, PseudoLink pseudoLink) {
 		// veh has to move over node
-		QLink nextLink = veh.chooseNextLink();
+		Link nextLink = ((QVehicle)veh).chooseNextLink();
+		QLink nextQLink = (QLink) this.queueNetworkLayer.getQueueLink(nextLink.getId());
 
 		if (nextLink != null) {
-			if (nextLink.hasSpace()) {
+			if (nextQLink.hasSpace()) {
 				pseudoLink.pollFirstFromBuffer();
 				veh.incCurrentNode();
-				nextLink.add(veh);
+				nextQLink.add(veh);
 				return true;
 			}
 			return false;

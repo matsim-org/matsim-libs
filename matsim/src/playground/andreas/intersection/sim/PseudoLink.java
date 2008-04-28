@@ -12,12 +12,14 @@ import org.matsim.events.EventAgentWait2Link;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.SimulationTimer;
+import org.matsim.mobsim.VehicleDepartureTimeComparator;
 import org.matsim.network.Link;
 import org.matsim.plans.Leg;
 
 public class PseudoLink {
 
 	/** Logger */
+	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QLink.class);
 
 	/** Id of the real link, null if this is not the first/original <code>PseudoLink</code> */
@@ -56,7 +58,7 @@ public class PseudoLink {
 	/** parking queue includes all vehicles that do not have yet reached their
 	 * start time, but will start at this link at some time */
 	private final PriorityQueue<QVehicle> parkingQueue = new PriorityQueue<QVehicle>(30,
-			new QVehicleDepartureTimeComparator());
+			new VehicleDepartureTimeComparator());
 
 	/** All vehicles from parkingQueue move to the waitingList as soon as their time
 	 * has come. They are then filled into the storageQueue, depending on free space
@@ -112,16 +114,16 @@ public class PseudoLink {
 		double maximumFlowCapacity = this.flowCapacity;
 
 		QVehicle veh;
-		while ((veh = this.storageQueue.peek()) != null) {
+		while ((veh = (QVehicle)this.storageQueue.peek()) != null) {
 			if (veh.getDepartureTime_s() > now) {
 				break;
 			}
 
-			if (veh.getDestinationLink().getLink().getId() == this.realLink.getLink().getId()) {
+			if (veh.getDestinationLink().getId() == this.realLink.getLink().getId()) {
 
-				QSim.getEvents().processEvent(new EventAgentArrival(now, veh.getDriverID(),
-						veh.getCurrentLegNumber(), this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
-				veh.reachActivity();
+				QSim.getEvents().processEvent(new EventAgentArrival(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+						this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
+				veh.reachActivity(now, this.realLink);
 				this.storageQueue.poll();
 				continue;
 			}
@@ -213,10 +215,10 @@ public class PseudoLink {
 				break;
 			}
 
-			veh.leaveActivity();
+			veh.leaveActivity(now);
 
-			QSim.getEvents().processEvent(new EventAgentDeparture(now, veh.getDriverID(),
-					veh.getCurrentLegNumber(), this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
+			QSim.getEvents().processEvent(new EventAgentDeparture(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+					this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
 
 			Leg actLeg = veh.getCurrentLeg();
 
@@ -241,8 +243,7 @@ public class PseudoLink {
 
 			addToFlowQueue(veh, now);
 
-			QSim.getEvents().processEvent(new EventAgentWait2Link(now, veh.getDriverID(),
-					veh.getCurrentLegNumber(), this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
+			QSim.getEvents().processEvent(new EventAgentWait2Link(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(), this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
 
 			this.parkToLinkQueue.poll(); // remove the just handled vehicle from parkToLinkQueue
 		}
@@ -288,7 +289,7 @@ public class PseudoLink {
 		double now = SimulationTimer.getTime();
 		QVehicle veh = this.flowQueue.poll();
 
-		QSim.getEvents().processEvent(new EventLinkLeave(now, veh.getDriverID(), veh.getCurrentLegNumber(),
+		QSim.getEvents().processEvent(new EventLinkLeave(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 						this.realLink.getLink().getId().toString(), veh.getDriver(), this.realLink.getLink()));
 
 		return veh;
