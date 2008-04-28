@@ -22,6 +22,7 @@ package org.matsim.network;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -66,6 +67,9 @@ public class NetworkLayer extends Layer implements BasicNet {
 	private final static Logger log = Logger.getLogger(NetworkLayer.class);
 
 	private final NetworkFactory factory;
+
+
+	private Collection<NetworkChangeEvent> networkChangeEvents = null;
 
 
 	// ////////////////////////////////////////////////////////////////////
@@ -187,6 +191,9 @@ public class NetworkLayer extends Layer implements BasicNet {
 		this.effectiveLaneWidth = effectiveLaneWidth;
 	}
 
+	public final void setNetworkChangeEvents(final Collection<NetworkChangeEvent> events) {
+		this.networkChangeEvents = events;
+	}
 
 	// ////////////////////////////////////////////////////////////////////
 	// get methods
@@ -371,6 +378,11 @@ public class NetworkLayer extends Layer implements BasicNet {
 		return this.nodeQuadTree.get(coord.getX(), coord.getY(), distance);
 	}
 
+	
+	public Collection<NetworkChangeEvent> getNetworkChangeEvents() {
+		return this.networkChangeEvents;
+	}
+	
 	// ////////////////////////////////////////////////////////////////////
 	// remove methods
 	// ////////////////////////////////////////////////////////////////////
@@ -546,6 +558,8 @@ public class NetworkLayer extends Layer implements BasicNet {
 		}
 		return index;
 	}
+
+
 
 
 }

@@ -196,10 +196,59 @@ public class QueueLink {
 	 *
 	 * @param factor
 	 */
-	public void changeSimulatedFlowCapacity(final double factor) {
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * factor;
+	public void scaleSimulatedFlowCapacity(final double factor) {
+		this.link.setCapacity(link.getCapacity() * factor);
+		this.link.calcFlowCapacity();
+		initFlowCapacity();
 		recalcCapacity();
 	}
+	
+	/**
+	 * This method will set the simulated flow capacity to the given value, and
+	 * recalculate the timeCapCeil and Fraction attributes of QueueLink.
+	 * Furthermore it checks the storage Capacity of the link and change it if
+	 * needed.
+	 *
+	 * @param value
+	 */
+	public void setSimulatedFlowCapacity(final double value) {
+		this.link.setCapacity(value);
+		this.link.calcFlowCapacity();
+		initFlowCapacity();
+		recalcCapacity();
+	}
+	
+	/**
+	 * This method will scale the number of lanes by the given factor, and
+	 * recalculate the timeCapCeil and Fraction attributes of QueueLink.
+	 * Furthermore it checks the storage Capacity of the link and change it if
+	 * needed.
+	 *
+	 * @param factor
+	 */
+	public void scaleLanes(final double factor) {
+		this.link.setLanes(this.link.getLanes() * factor);
+		recalcCapacity();
+	}
+	
+	/**
+	 * This method will set the number of lanes to the given value, and
+	 * recalculate the timeCapCeil and Fraction attributes of QueueLink.
+	 * Furthermore it checks the storage Capacity of the link and change it if
+	 * needed.
+	 *
+	 * @param value
+	 */
+	public void setLanes(final double value) {
+		this.link.setLanes(value);
+		recalcCapacity();
+	}
+	
+	
+	
+	
+	
+	
 
 	// ////////////////////////////////////////////////////////////////////
 	// Is called after link has been read completely
@@ -350,7 +399,7 @@ public class QueueLink {
 	// ////////////////////////////////////////////////////////////////////
 	// called from framework, do everything related to link movement here
 	// ////////////////////////////////////////////////////////////////////
-	/*package*/ protected boolean moveLink(final double now) {
+	/*package*/  boolean moveLink(final double now) {
 		updateBufferCapacity(now);
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);

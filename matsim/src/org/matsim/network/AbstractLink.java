@@ -20,6 +20,7 @@
 
 package org.matsim.network;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
@@ -28,6 +29,9 @@ import org.matsim.utils.misc.ResizableArray;
 
 public abstract class AbstractLink extends BasicLinkImpl implements Link {
 
+	
+	private final static Logger log = Logger.getLogger(AbstractLink.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -37,19 +41,28 @@ public abstract class AbstractLink extends BasicLinkImpl implements Link {
 	private final ResizableArray<Object> roles = new ResizableArray<Object>(5);
 
 	protected double euklideanDist;
-
+	
+	private double flowCapacity;
 
 	public AbstractLink(NetworkLayer network, Id id, BasicNode from,
 			BasicNode to) {
 		super(network, id, from, to);
 	}
 
+	
+	
+	
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
 
-
+	public void calcFlowCapacity() {
+		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		
+		this.flowCapacity = this.capacity / capacityPeriod;
+//		log.debug("flow cap: " + this.flowCapacity);
+	}
 
 
 
@@ -140,7 +153,12 @@ public abstract class AbstractLink extends BasicLinkImpl implements Link {
 		return this.euklideanDist;
 	}
 
-
+	/* (non-Javadoc)
+	 * @see org.matsim.network.Link#getFlowCapacity()
+	 */
+	public final double getFlowCapacity() {
+		return this.flowCapacity;
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// set methods

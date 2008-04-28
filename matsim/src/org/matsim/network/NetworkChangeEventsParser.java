@@ -137,6 +137,7 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 				((TimeVariantLinkImpl)link).applyEvent(event);
 			}
 		}
+		this.network.setNetworkChangeEvents(events);
 	}
 
 

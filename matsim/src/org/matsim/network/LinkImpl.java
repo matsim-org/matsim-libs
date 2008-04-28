@@ -35,11 +35,7 @@ public class LinkImpl extends AbstractLink {
 	//////////////////////////////////////////////////////////////////////
 
 
-	private double flowCapacity;
-
 	private double freespeedTravelTime;
-
-
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -72,17 +68,6 @@ public class LinkImpl extends AbstractLink {
 
 	}
 
-
-	//////////////////////////////////////////////////////////////////////
-	// calc methods
-	//////////////////////////////////////////////////////////////////////
-
-	private void calcFlowCapacity() {
-		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
-//		log.debug("capacity period: " + capacityPeriod);
-			this.flowCapacity = this.capacity / capacityPeriod;
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
@@ -109,22 +94,7 @@ public class LinkImpl extends AbstractLink {
 		return this.freespeedTravelTime;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getFlowCapacity()
-	 */
-	public final double getFlowCapacity() {
-		return this.flowCapacity;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
-	protected void setFreespeedTravelTime(double freespeedTravelTime) {
-		this.freespeedTravelTime = freespeedTravelTime;
-	}
-
-
-
+	
+	
 
 }

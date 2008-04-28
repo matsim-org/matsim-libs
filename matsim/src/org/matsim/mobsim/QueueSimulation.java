@@ -37,7 +37,9 @@ import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
@@ -70,6 +72,8 @@ public class QueueSimulation extends Simulation {
 	private Class<? extends Vehicle> vehiclePrototype = Vehicle.class;
 
 	protected NetworkLayer networkLayer;
+
+	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 
 	/**
 	 * Includes all vehicle that have transportation modes unknown to
@@ -190,6 +194,12 @@ public class QueueSimulation extends Simulation {
 		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
 	}
 
+	private void prepareNetworkChangeEventsQueue() {
+			if (this.networkLayer.getNetworkChangeEvents() != null && this.networkLayer.getNetworkChangeEvents().size() > 0) {
+				this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(this.networkLayer.getNetworkChangeEvents());
+			}
+	}
+	
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
 	 */
@@ -217,7 +227,11 @@ public class QueueSimulation extends Simulation {
 		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
 
 		createSnapshotwriter();
+		
+		prepareNetworkChangeEventsQueue();
 	}
+
+
 
 	//////////////////////////////////////////////////////////////////////
 	// close any files, etc.
@@ -252,7 +266,13 @@ public class QueueSimulation extends Simulation {
 
 	@Override
 	public void beforeSimStep(final double time) {
+		
+		if (this.networkChangeEventsQueue != null && this.networkChangeEventsQueue.size() > 0){
+			handleNetworkChangeEvents(time);
+		}
 	}
+
+
 
 	/**
 	 * Do one step of the simulation run.
@@ -334,6 +354,39 @@ public class QueueSimulation extends Simulation {
   		}
 	}
 
+	private void handleNetworkChangeEvents(final double time) {
+		while (this.networkChangeEventsQueue.peek().getStartTime() <= time){
+			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
+//			ChangeValue freespeedChange = event.getFreespeedChange();
+			ChangeValue lanesChange = event.getLanesChange();
+			ChangeValue flowCapacityChange = event.getFlowCapacityChange();
+			
+			for (Link link : event.getLinks()) {
+				QueueLink queueLink = this.network.getQueueLink(link.getId());
+//				if (freespeedChange != null) {
+//					queueLink.setIsUnblocked(freespeedChange.getValue() > 0.);
+//				}
+				if (lanesChange != null) {
+					if (lanesChange.getType() == NetworkChangeEvent.ChangeType.ABSOLUTE) {
+						queueLink.setLanes(lanesChange.getValue());
+					} else {
+						queueLink.scaleLanes(lanesChange.getValue());
+					}
+				}
+				if (flowCapacityChange != null) {
+					if (flowCapacityChange.getType() == NetworkChangeEvent.ChangeType.ABSOLUTE) {
+						queueLink.setSimulatedFlowCapacity(flowCapacityChange.getValue());
+					} else {
+						queueLink.scaleSimulatedFlowCapacity(flowCapacityChange.getValue());
+					}						
+				}
+				
+			}
+
+		}
+		
+	}
+	
 	public boolean addSnapshotWriter(final SnapshotWriterI writer) {
 		return this.snapshotWriters.add(writer);
 	}

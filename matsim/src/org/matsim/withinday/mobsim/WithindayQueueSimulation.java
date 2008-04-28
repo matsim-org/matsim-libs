@@ -92,7 +92,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	private void doCapacityChanges(final double time) {
 		while ((this.capacityEvents.size() != 0) && (this.capacityEvents.peek().getTime() < time)) {
 			CapacityChangeEvent event = this.capacityEvents.poll();
-			event.getLink().changeSimulatedFlowCapacity(event.getCapacityScaleFactor());
+			event.getLink().scaleSimulatedFlowCapacity(event.getCapacityScaleFactor());
 		}
 	}
 

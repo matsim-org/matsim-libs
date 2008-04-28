@@ -46,7 +46,7 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	
 	private PriorityQueue<NetworkChangeEvent> changeEvents;
 
-	private double flowCapacity;
+
 
 
 
@@ -100,22 +100,6 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		
 	}
 
-//	calc methods
-
-
-
-
-
-
-
-	private void calcFlowCapacity() {
-		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
-//		log.debug("capacity period: " + capacityPeriod);
-		this.flowCapacity = this.capacity / capacityPeriod;
-	}
-
-
-
 //	get methods
 
 
@@ -140,12 +124,7 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		return this.freespeedTravelTime.floorEntry(time).getValue();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getFlowCapacity()
-	 */
-	public final double getFlowCapacity() {
-		return this.flowCapacity;
-	}
+
 
 
 //	set methods
@@ -182,15 +161,15 @@ public class TimeVariantLinkImpl extends AbstractLink {
 			this.freespeedTravelTime = null;
 		}
 		if (event.getFlowCapacityChange() != null) {
-			throw  new RuntimeException("Flow capacity change capability is not implemented yet!");
+			log.warn("FlowCapacityChange will be ignored in TimeVariantLinkImpl. The functionality is implemented in QueueSimulation");
 		}
 		if (event.getLanesChange() != null) {
-			throw  new RuntimeException("Lanes change capability is not implemented yet!");
+			log.warn("LanesChange will be ignored in TimeVariantLinkImpl. The functionality is implemented in QueueSimulation");
 		}
 
 	}
 
-//	print methods
+
 
 
 	private void rebuildFreespeedChange() {
@@ -213,7 +192,7 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		}
 		
 	}
-
+//	print methods
 
 	@Override
 	public String toString() {
