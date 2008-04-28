@@ -350,7 +350,7 @@ public class QueueLink {
 	// ////////////////////////////////////////////////////////////////////
 	// called from framework, do everything related to link movement here
 	// ////////////////////////////////////////////////////////////////////
-	/*package*/ boolean moveLink(final double now) {
+	/*package*/ protected boolean moveLink(final double now) {
 		updateBufferCapacity(now);
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
@@ -381,7 +381,7 @@ public class QueueLink {
 		}
 	}
 
-	/*package*/ void addParking(final Vehicle veh) {
+	/*package*/ protected void addParking(final Vehicle veh) {
 		this.parkingList.add(veh);
 		this.queueNetworkLayer.setLinkActivation(
 				veh.getDepartureTime_s(), this);

@@ -29,7 +29,7 @@ import java.util.Comparator;
  * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
  * according to their departure time
  */
-class VehicleDepartureTimeComparator implements Comparator<Vehicle>,
+public class VehicleDepartureTimeComparator implements Comparator<Vehicle>,
 		Serializable {
 
 	private static final long serialVersionUID = 1L;
