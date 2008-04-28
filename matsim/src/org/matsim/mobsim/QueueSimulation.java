@@ -355,7 +355,7 @@ public class QueueSimulation extends Simulation {
 	}
 
 	private void handleNetworkChangeEvents(final double time) {
-		while (this.networkChangeEventsQueue.peek().getStartTime() <= time){
+		while (this.networkChangeEventsQueue.size() > 0 && this.networkChangeEventsQueue.peek().getStartTime() <= time){
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
 //			ChangeValue freespeedChange = event.getFreespeedChange();
 			ChangeValue lanesChange = event.getLanesChange();
