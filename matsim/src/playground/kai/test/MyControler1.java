@@ -42,7 +42,7 @@ public class MyControler1 {
 		}
 
 		final Controler controler = new Controler(Gbl.getConfig());
-//		controler.setOverwriteFiles(true);
+		controler.setOverwriteFiles(true);
 		controler.run();
 
 //		// Visualize
