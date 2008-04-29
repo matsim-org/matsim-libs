@@ -175,7 +175,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			//System.out.println("Travelcards: " + model.tickets);
 			model.setBike(has_bike);
 			model.setMale (plan.getPerson().getSex());
-			//int udeg = 4; // TODO The program should crash here, now only an initial value is given. afterwards something like that should replace it: int udeg = start.getMunicipality().getRegType();
+			//int udeg = 4; // 
 			Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
 			ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
 			Location loc = locs.get(Gbl.random.nextInt(locs.size()));

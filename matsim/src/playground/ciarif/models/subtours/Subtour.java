@@ -22,6 +22,8 @@ public class Subtour {
 	private int prev_subtour;
 	private double distance; 
 	private int start_udeg;
+	private String starting_time;
+	private int prev_mode;
 	
 
 	public Subtour() {
@@ -33,6 +35,14 @@ public class Subtour {
 	//////////////////////////////////////////////////////////////////////
 	// Setters methods
 	//////////////////////////////////////////////////////////////////////
+	
+	public void setStarting_time(String starting_time) {
+		this.starting_time = starting_time;
+	}
+
+	public void setPrev_mode(int prev_mode) {
+		this.prev_mode = prev_mode;
+	}
 	
 	public void setDistance(double distance) {
 		this.distance = distance;
@@ -74,6 +84,15 @@ public class Subtour {
 	//////////////////////////////////////////////////////////////////////
 	// Getters methods
 	//////////////////////////////////////////////////////////////////////
+	
+	public String getStarting_time() {
+		return starting_time;
+	}
+
+
+	public int getPrev_mode() {
+		return prev_mode;
+	}
 	
 	public double getDistance() {
 		return distance;
