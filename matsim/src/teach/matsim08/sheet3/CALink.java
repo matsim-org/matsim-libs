@@ -12,11 +12,9 @@ import teach.matsim08.network.CANetStateWritableI;
 
 public class CALink implements CANetStateWritableI, BasicLink  {
 
-	final double CELLSIZE=7.5 ;
+	final double CELLSIZE = 37.5 ;
 
 	private int nCells;
-
-	private double length;
 
 	private List cells;
 
@@ -27,12 +25,11 @@ public class CALink implements CANetStateWritableI, BasicLink  {
 
 	public CALink(BasicLink l) {
 		this.basicLink = l;
-		this.length = this.basicLink.getLength();
 	}
 
 	public List<DrawableAgentI> getDisplayAgents() {
 		List<DrawableAgentI> list = new ArrayList() ;
-		for ( int ii=0 ; ii<cells.size() ; ii++ ) {
+		for ( int ii=0 ; ii< nCells ; ii++ ) {
 			CAVehicle veh = (CAVehicle) cells.get(ii) ;
 			if ( veh!= null ) {
 				veh.setPosition(ii*CELLSIZE ) ;
@@ -72,14 +69,12 @@ public class CALink implements CANetStateWritableI, BasicLink  {
 	}
 
 
-	public void setLength(double l) {
-		length = l;
-	}
+
 
 	public void build() {
 		// calc number of cells
-		nCells = (int)(length /CELLSIZE);
-		cells = new ArrayList();
+		nCells = (int)(getLength() /CELLSIZE);
+		cells = new ArrayList(nCells);
 		// Fill the cells up to nCells
 		for (int i = 0; i < nCells; i++) cells.add(null);
 	}
@@ -100,7 +95,7 @@ public class CALink implements CANetStateWritableI, BasicLink  {
 	}
 
 	public void move(int step) {
-		for (int i=0; i< nCells -1; i++) {
+		for (int i=0; i < nCells -1; i++) {
 			if (cells.get(i) != null && cells.get(i+1) == null) {
 				CAVehicle veh = (CAVehicle) cells.get(i);
 				cells.set(i+1, veh);
@@ -110,23 +105,12 @@ public class CALink implements CANetStateWritableI, BasicLink  {
 		}
 	}
 
-	public static void main(String[] args) {
-
-		// CreateLink
-		CALink link = new CALink();
-
-		// Prepare Link
-		link.setLength(375);
-		link.build();
-		link.randomFill(0.5);
-
-		//Simulation Run
-		for(int step = 0; step < 30; step++) {
-			link.move(step);
-			link.tty();
-		}
+	//delegates
+	
+	public void setLength(double l) {
+		this.basicLink.setLength(l);
 	}
-
+	
 	public double getCapacity() {
 		return basicLink.getCapacity();
 	}

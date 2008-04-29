@@ -1,15 +1,10 @@
 package teach.matsim08.sheet3;
-import java.util.Iterator;
 import java.util.Map;
 
-import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNet;
-import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.vis.netvis.NetVis;
-
-import teach.matsim08.network.CANetStateWriter;
 
 
 
@@ -29,6 +24,7 @@ public class MyControler {
 		Map links = net.getLinks();
 
 		CASim sim = new CASim(net) ;
+		sim.runSimulation(0, 7200);
 
 		NetVis.start(VISFILENAME) ;
 	}

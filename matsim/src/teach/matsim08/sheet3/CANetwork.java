@@ -29,8 +29,9 @@ public class CANetwork implements BasicNet {
 			CALink caLink = new CALink(basicLink);
 			this.caLinks.put(basicLink.getId(), caLink);
 			caLink.build();
-			caLink.randomFill(0.99) ;
+			caLink.randomFill(0.9) ;
 		}
+		this.connect();
 	}
 
 	public Map<Id, ? extends BasicLink> getLinks() {
@@ -42,6 +43,30 @@ public class CANetwork implements BasicNet {
 	}
 
 	public void connect() {
+		// fill up outlinks/inlinks information in nodes
+		for (Iterator it = caLinks.values().iterator(); it.hasNext();) {
+			CALink calink = (CALink)it.next();
+			//get from and to CANodes from the maps of the CANetwork
+			Id toNodeId = calink.getToNode().getId();
+			Id fromNodeId = calink.getFromNode().getId();
+			CANode toNode = (CANode)caNodes.get(toNodeId);
+			CANode fromNode = (CANode)caNodes.get(fromNodeId);
+			//store the link as in and outlink
+			toNode.addCaInLink(calink);
+			fromNode.addCaOutLink(calink);
+		}
 	}
 
+	public void move(int time) {
+		for (Iterator it = caNodes.values().iterator(); it.hasNext(); ) {
+		  CANode caNode = (CANode) it.next();
+		  caNode.randomMove();	
+	  }
+		for (Iterator it = caLinks.values().iterator(); it.hasNext();) {
+			CALink caLink = (CALink) it.next();
+			caLink.move(time);
+		}
+		
+		
+	}
 }

@@ -8,17 +8,27 @@ import teach.matsim08.network.CANetStateWriter;
 public class CASim {
 
 	public CANetwork network;
-
+	private CANetStateWriter netVis;
+	
 	public CASim(BasicNet net) {
-
 		network = new CANetwork(net);
-		CANetStateWriter netVis = CANetStateWriter.createWriter(network, MyControler.NETFILENAME, MyControler.VISFILENAME );
-
+		netVis = CANetStateWriter.createWriter(network, MyControler.NETFILENAME, MyControler.VISFILENAME );
+	}
+	
+	public void runSimulation(int starttime, int endtime) {
 		try {
-			netVis.dump(0) ;
+			// simulate movement
+			for (int time = starttime; time < endtime; time++) {
+				network.move(time);
+				netVis.dump(time);
+				if (time % 3600 == 0 )
+					System.out.println("Simulating: Time: " + time /3600 + "h 0min");
+			}
+			// finish netVis
 			netVis.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
 }
