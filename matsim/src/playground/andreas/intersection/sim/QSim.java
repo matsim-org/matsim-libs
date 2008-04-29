@@ -51,21 +51,24 @@ public class QSim extends QueueSimulation {
 	final private static Logger log = Logger.getLogger(QueueLink.class);
 
 	protected static final int INFO_PERIOD = 3600;
+	
+	final String signalSystems;
+	final String groupDefinitions;
 
-	public QSim(Events events, Plans population, NetworkLayer network) {
+	public QSim(Events events, Plans population, NetworkLayer network, String signalSystems, String groupDefinitions) {
 		super(network, population, events);
 		
 		this.network = new QueueNetworkLayer(networkLayer, new TrafficLightQueueNetworkFactory());
+		this.signalSystems = signalSystems;
+		this.groupDefinitions = groupDefinitions;
+		
 		this.setVehiclePrototye(QVehicle.class);
 	}
 	
 	private void readSignalSystemControler(){
 		
 		Map<Id, SignalSystemConfiguration> signalSystemConfigurations = null;
-				
-		final String signalSystems = "./src/playground/andreas/intersection/signalSystemConfig.xml";
-		final String groupDefinitions = "./src/playground/andreas/intersection/signalGroupDefinition.xml";
-				
+						
 		try {
 			List<SignalGroupDefinition> signalGroups = new LinkedList<SignalGroupDefinition>();
 			

@@ -49,7 +49,7 @@ public class PlansGeneratorControler extends Controler {
 	@Override
 	protected Plans loadPopulation() {
 		
-		final int agentsPerDest = 10;
+		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
 		Plans pop = new Plans(Plans.NO_STREAMING);

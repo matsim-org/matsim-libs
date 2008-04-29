@@ -36,6 +36,9 @@ public class QControler extends Controler {
 
 	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QControler.class);
+	
+	final String signalSystems = "./src/playground/andreas/intersection/signalSystemConfig.xml";
+	final String groupDefinitions = "./src/playground/andreas/intersection/signalGroupDefinition.xml";
 
 	public QControler(final Config config) {
 		super(config);
@@ -44,7 +47,7 @@ public class QControler extends Controler {
 	@Override
 	protected void runMobSim() {
 		SimulationTimer.setTime(0);
-		QSim sim = new QSim(this.events, this.population, this.network);
+		QSim sim = new QSim(this.events, this.population, this.network, this.signalSystems, this.groupDefinitions);
 		sim.run();
 	}
 
