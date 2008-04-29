@@ -8,30 +8,54 @@ public class ModelModeChoiceEducation18Plus extends ModelModeChoice {
 		//////////////////////////////////////////////////////////////////////
 		// member variables
 		//////////////////////////////////////////////////////////////////////
-		
-		static final double B1_CONST = -2.4216678e-001;
-		static final double B1_Car_Always	= +2.4723895e+000;
-		static final double B1_Dist = +1.1649350e+000;
-		static final double B1_Prev =	+3.4951771e+000;
-		static final double B1_T2 =	-4.6955261e-001;
-		static final double B1_T3 = +1.3053780e-002;
-		static final double B1_T4 =	-9.8112696e-001;
-		static final double B1_T5 = -3.0486070e-001;
-		static final double B2_Dist = +1.1652987e+000;
-		static final double B2_Prev =	+9.8087247e-001;
-		static final double B2_Season  = +2.1381660e+000;
-		static final double B2_T2 = +3.5402915e-001;
-		static final double B2_T3 =	+3.3905042e-001;
-		static final double B2_T4 = -7.1233272e-001;
-		static final double B2_T5 =	-7.3461326e-001;
-		static final double B3_18_30 = +2.6793573e+000;
-		static final double B3_CONST = -2.6492674e+000;
-		static final double B3_Dist = +1.0563418e+000;
-		static final double B3_Prev = +2.0302658e+000;
-		static final double B4_CONST = +2.7938237e+000;
-		static final double B4_Dist = +7.7803800e-001;
-		static final double B5_CONST = +4.5111231e+000;
-		static final double B5_Prev  = +2.1951780e+000;
+	static final double B1_CONST =	-7.0002406e-001;
+	static final double B1_Car_Always 	=+2.6034433e+000;
+	static final double B1_Dist =	+1.0617650e-001;
+	static final double B1_Prev =	+2.8953502e+000;
+	static final double B1_T2 =	+2.0706084e-001;
+	static final double B1_T3 =	+5.3884391e-001;
+	static final double B1_T4 =	-4.4745173e-001;
+	static final double B1_T5 =	+3.1666737e-001;
+	static final double B2_Dist =	+1.1425651e-001;
+	static final double B2_Prev =	+8.5672341e+000;
+	static final double B2_Season =	+2.1013993e+000;
+	static final double B2_T2 	=+4.3334178e-001;
+	static final double B2_T3 =	+3.6919145e-001;
+	static final double B2_T4 =	-7.3837802e-001;
+	static final double B2_T5 =	-7.2974722e-001;
+	static final double B3_18_30 	=+2.6244885e+000;
+	static final double B3_CONST 	=-2.5390169e+000;
+	static final double B3_Prev 	=+9.6032362e+000;
+	static final double B4_CONST =	+3.0145083e+000;
+	static final double B4_Dist =	-3.0646942e-001;
+	static final double B5_CONST =	+5.0042208e+000;
+	static final double B5_Dist =	-1.2548186e+000;
+	static final double B5_Prev =	+1.0000000e+001;
+
+
+//		static final double B1_CONST = -2.4216678e-001;
+//		static final double B1_Car_Always	= +2.4723895e+000;
+//		static final double B1_Dist = +1.1649350e+000;
+//		static final double B1_Prev =	+3.4951771e+000;
+//		static final double B1_T2 =	-4.6955261e-001;
+//		static final double B1_T3 = +1.3053780e-002;
+//		static final double B1_T4 =	-9.8112696e-001;
+//		static final double B1_T5 = -3.0486070e-001;
+//		static final double B2_Dist = +1.1652987e+000;
+//		static final double B2_Prev =	+9.8087247e-001;
+//		static final double B2_Season  = +2.1381660e+000;
+//		static final double B2_T2 = +3.5402915e-001;
+//		static final double B2_T3 =	+3.3905042e-001;
+//		static final double B2_T4 = -7.1233272e-001;
+//		static final double B2_T5 =	-7.3461326e-001;
+//		static final double B3_18_30 = +2.6793573e+000;
+//		static final double B3_CONST = -2.6492674e+000;
+//		static final double B3_Dist = +1.0563418e+000;
+//		static final double B3_Prev = +2.0302658e+000;
+//		static final double B4_CONST = +2.7938237e+000;
+//		static final double B4_Dist = +7.7803800e-001;
+//		static final double B5_CONST = +4.5111231e+000;
+//		static final double B5_Prev  = +2.1951780e+000;
 
 		//////////////////////////////////////////////////////////////////////
 		// constructors
@@ -59,6 +83,7 @@ public class ModelModeChoiceEducation18Plus extends ModelModeChoice {
 			// when the tour (plan) has education as main purpose
 			double util = 0.0;
 			util += B5_CONST * 1.0;
+			util += B5_Dist * dist_subtour;
 			if ((prev_mode == 1) || (prev_mode == 2)|| (prev_mode == 4)) {util += B5_Prev * 1.0;}
 			//System.out.println("Util walk = " + util);
 			return util;
@@ -125,7 +150,7 @@ public class ModelModeChoiceEducation18Plus extends ModelModeChoice {
 				if (ride) {
 					double util = 0.0;
 					util += B3_CONST * 1.0;
-					util += B3_Dist * dist_subtour;
+					//util += B3_Dist * dist_subtour;
 					if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B3_Prev * 1.0;}
 					if (age <= 30 & age > 18) { util += B3_18_30 * 1.0; }
 					//System.out.println("Util ride = " + util);

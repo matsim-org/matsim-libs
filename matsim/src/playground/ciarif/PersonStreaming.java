@@ -79,8 +79,8 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
-		//plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		plansReader.readFile ("input/plans.xml");
+		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		//plansReader.readFile ("input/plans.xml");
 		plans.printPlansCount();
 		plans.runAlgorithms();
 		//PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt", pmcm.getPersonSubtours());
