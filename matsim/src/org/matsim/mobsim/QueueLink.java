@@ -399,7 +399,7 @@ public class QueueLink {
 	// ////////////////////////////////////////////////////////////////////
 	// called from framework, do everything related to link movement here
 	// ////////////////////////////////////////////////////////////////////
-	/*package*/  boolean moveLink(final double now) {
+	/*package*/  protected boolean moveLink(final double now) {
 		updateBufferCapacity(now);
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
@@ -411,7 +411,7 @@ public class QueueLink {
 		return updateActiveStatus();
 	}
 
-	/*package*/ boolean moveLinkWaitFirst(final double now) {
+	/*package*/  boolean moveLinkWaitFirst(final double now) {
 		updateBufferCapacity(now);
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
