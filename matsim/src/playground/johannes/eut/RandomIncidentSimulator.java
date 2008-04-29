@@ -95,7 +95,7 @@ public class RandomIncidentSimulator {
 				if ((Gbl.random.nextDouble() < this.incidentProba)
 						&& (iteration >= this.startIteration)) {
 
-					link.changeSimulatedFlowCapacity(this.capReduction);
+					link.scaleSimulatedFlowCapacity(this.capReduction);
 					this.changedCaps.add(link);
 
 					this.writer.write("\t");
@@ -114,7 +114,7 @@ public class RandomIncidentSimulator {
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		for (QueueLink link : this.links) {
 			if (this.changedCaps.contains(link)) {
-				link.changeSimulatedFlowCapacity(1.0 / this.capReduction);
+				link.scaleSimulatedFlowCapacity(1.0 / this.capReduction);
 				this.changedCaps.remove(link);
 			}
 		}
