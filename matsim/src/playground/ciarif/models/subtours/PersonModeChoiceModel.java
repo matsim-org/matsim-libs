@@ -155,11 +155,16 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 				if (i>=1) {
 					//System.out.println ("prev_mode in database = " + personSubtour.getSubtours().get(i-1).getMode());
 					model.setPrevMode (personSubtour.getSubtours().get(i-1).getMode());
+					sub.setPrev_mode(personSubtour.getSubtours().get(i-1).getMode());
 				}
 				//				model.setPrevMode(personSubtour.getSubtours().get(sub.getPrev_subtour()).getMode()); //It seeks the previous sub-tour and get the mode
 				
 			}
-			else model.setPrevMode(5); // 5 means that the subtour starts at home
+			// 5 means that the subtour starts at home
+			else {
+				model.setPrevMode(5);sub.setPrev_mode(5);
+				}
+				 
 			//System.out.println("prev subtour's mode = " +  model.prev_mode);
 			
 			// setting person parameters
