@@ -94,7 +94,7 @@ public class CALink implements CANetStateWritableI, BasicLink  {
 		}
 	}
 
-	public void move(int step) {
+	public void move() {
 		for (int i=0; i < nCells -1; i++) {
 			if (cells.get(i) != null && cells.get(i+1) == null) {
 				CAVehicle veh = (CAVehicle) cells.get(i);

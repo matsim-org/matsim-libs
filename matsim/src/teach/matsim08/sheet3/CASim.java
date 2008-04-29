@@ -7,22 +7,31 @@ import teach.matsim08.network.CANetStateWriter;
 
 public class CASim {
 
+	static int TIMESTEP;
+
+	public static int getTimeStep() {
+		return TIMESTEP;
+	}
+
 	public CANetwork network;
 	private CANetStateWriter netVis;
+	
 	
 	public CASim(BasicNet net) {
 		network = new CANetwork(net);
 		netVis = CANetStateWriter.createWriter(network, MyControler.NETFILENAME, MyControler.VISFILENAME );
 	}
 	
-	public void runSimulation(int starttime, int endtime) {
+	public void runSimulation() {
 		try {
+			TIMESTEP = 0;
 			// simulate movement
-			for (int time = starttime; time < endtime; time++) {
-				network.move(time);
-				netVis.dump(time);
-				if (time % 3600 == 0 )
-					System.out.println("Simulating: Time: " + time /3600 + "h 0min");
+			while (TIMESTEP < 7200) {
+				TIMESTEP++;
+				network.move();
+				netVis.dump(TIMESTEP);
+				if (TIMESTEP % 3600 == 0 )
+					System.out.println("Simulating: Time: " + TIMESTEP /3600 + "h 0min");
 			}
 			// finish netVis
 			netVis.close();

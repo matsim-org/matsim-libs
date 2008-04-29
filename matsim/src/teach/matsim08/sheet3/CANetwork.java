@@ -57,14 +57,14 @@ public class CANetwork implements BasicNet {
 		}
 	}
 
-	public void move(int time) {
+	public void move() {
 		for (Iterator it = caNodes.values().iterator(); it.hasNext(); ) {
 		  CANode caNode = (CANode) it.next();
 		  caNode.randomMove();	
 	  }
 		for (Iterator it = caLinks.values().iterator(); it.hasNext();) {
 			CALink caLink = (CALink) it.next();
-			caLink.move(time);
+			caLink.move();
 		}
 		
 		

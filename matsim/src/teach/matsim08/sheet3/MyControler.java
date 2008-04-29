@@ -24,7 +24,7 @@ public class MyControler {
 		Map links = net.getLinks();
 
 		CASim sim = new CASim(net) ;
-		sim.runSimulation(0, 7200);
+		sim.runSimulation();
 
 		NetVis.start(VISFILENAME) ;
 	}
