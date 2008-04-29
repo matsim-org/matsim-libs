@@ -21,7 +21,6 @@
 package playground.jhackney.kml;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -39,11 +38,8 @@ import org.matsim.plans.Plan;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.geometry.shared.CoordWGS84;
-import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.kml.ColorStyle.ColorMode;
 import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.utils.vis.kml.*;
 
@@ -339,7 +335,7 @@ public class EgoNetPlansMakeKML {
 
 		// Fill the facilities folder
 
-		ActIterator aIter = (ActIterator) myPlan.getIteratorAct();
+		ActIterator aIter = myPlan.getIteratorAct();
 		while(aIter.hasNext()){
 			Act myAct = (Act) aIter.next();
 			Style myStyle=facStyle.get(myAct.getType());
