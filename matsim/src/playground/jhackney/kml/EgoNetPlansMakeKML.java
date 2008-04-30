@@ -67,31 +67,18 @@ public class EgoNetPlansMakeKML {
 	educStyle, shopStyle, homeStyle;//, agentLinkStyle;
 	private static HashMap<String,Style> facStyle= new HashMap<String,Style>();
 	private static CoordinateTransformationI trafo;
+	private static Config config = null;
 
-//	private static Config config = null;
-
-
-//	public static void main(final String[] args) {
-
-//	config = Gbl.createConfig(args);
-
-//	System.out.println("  starting KML demo...");
-
-//	setUp();
-//	generateStyles();
-//	loaData(plan);
-//	write();
-
-//	System.out.println("  done.");
-//	}
 
 	public static void setUp(Config config, NetworkLayer network) {
-
+		EgoNetPlansMakeKML.config=config;
+		if(config.getModule(KML21_MODULE)==null) return;
+		
 		System.out.println("    Set up...");
 
 		trafo = TransformationFactory.getCoordinateTransformation(
 				TransformationFactory.CH1903_LV03, TransformationFactory.WGS84);
-
+	
 		mainKMLFilename =
 			config.getParam(KML21_MODULE, CONFIG_OUTPUT_DIRECTORY) +
 			SEP +
@@ -150,6 +137,8 @@ public class EgoNetPlansMakeKML {
 
 	public static void generateStyles() {
 
+		if(config.getModule(KML21_MODULE)==null) return;
+		
 		System.out.println("    generating styles...");
 
 //		agentLinkStyle = new Style("agentLinkStyle");
@@ -254,6 +243,8 @@ public class EgoNetPlansMakeKML {
 
 	public static void loadData(Person myPerson){
 
+		if(config.getModule(KML21_MODULE)==null) return;
+		
 		System.out.println("    loading Plan data. Processing EgoNet ...");
 
 		// load Data into KML folders for myPerson
@@ -569,6 +560,7 @@ public class EgoNetPlansMakeKML {
 
 	public static void write() {
 
+		if(config.getModule(KML21_MODULE)==null) return;
 		System.out.println("    writing KML files out...");
 
 		KMLWriter myKMLDocumentWriter;
