@@ -57,7 +57,9 @@ public class SocialAct {
     	attendees.add( person );
 	}
 //	Act myAct = person.getKnowledge().map.getAct(this.activity);
+
 	Act myAct = person.getKnowledge().map.getActUsingId(this.activity);
+
 	arrivalTimes.put(person,myAct.getStartTime());
 	departureTimes.put(person,myAct.getEndTime());
     }

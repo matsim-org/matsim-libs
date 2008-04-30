@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
@@ -40,7 +41,10 @@ import org.matsim.plans.Knowledge;
 import org.matsim.plans.Plan;
 import org.matsim.socialnetworks.algorithms.SortHashtableByValue;
 import org.matsim.socialnetworks.interactions.SocialAct;
+import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.world.Location;
+
+import playground.jhackney.controler.SNControllerListenerRePlanSecLoc;
 
 /**
  *
@@ -78,20 +82,76 @@ public class MentalMap {
 //	Total maximum number of activities (locations + action) an agent can remember
 
 	private Knowledge knowledge = null;
+	private Logger log= Logger.getLogger(MentalMap.class);
 
 	public MentalMap(Knowledge knowledge){
 		this.knowledge=knowledge;
 	}
 
-	public void initializeActActivityMap (Plan myPlan){
-		// Associate each act in the plan with a random facility on the link
+	public void initializeActActivityMapRandom (Plan myPlan){
+
+//		Associate each act in the plan with a random facility on the link
+		ActIterator planActIter = myPlan.getIteratorAct();
+
+		while(planActIter.hasNext()){
+			Act myAct = (Act) planActIter.next();
+
+			Activity myActivity = null;
+			// If there is already knowledge in the initial plans file, use it
+			if(this.knowledge.getActivities(myAct.getType()).size()>0){
+				myActivity=this.knowledge.getActivities(myAct.getType()).get(Gbl.random.nextInt(this.knowledge.getActivities(myAct.getType()).size()));
+				learnActsActivities(myAct.getRefId(),myActivity);
+			}
+
+			// Else the activity is null and we choose an activity to assign to the act
+			Link myLink = myAct.getLink();
+			// These Locations are facilities by the new convention
+			Collection<Location> locations = myLink.getUpMapping().values();
+			// These Objects are facilities by convention
+			Object[] facs =  locations.toArray();
+			// Assign a random activity (a facility) on the link to the act
+			// thus giving it in effect a street address
+			while(myActivity==null){
+				int k = Gbl.random.nextInt(facs.length);
+				Facility f = (Facility) facs[k];
+				myActivity = f.getActivity(myAct.getType());
+				if(myActivity!=null){
+					learnActsActivities(myAct.getRefId(),myActivity);
+				}
+			}
+		}
+	}
+
+	public void initializeActActivityMapFromFile(Plan myPlan, ActivityActReader aar){
+
+
+		if(aar==null) return;
+//		this.log.info("READING ACT-ACTIVITY MAP FROM FILE PERSON "+myPlan.getPerson().getId());
+		ActIterator planActIter = myPlan.getIteratorAct();
+		while(planActIter.hasNext()){
+			Act myAct = (Act) planActIter.next();
+			Id myActivityId = aar.getNextActivityId();
+			Activity myActivity = knowledge.getFacilities().get(myActivityId).getActivity(myAct.getType());
+			if(myActivity!=null){
+				learnActsActivities(myAct.getRefId(),myActivity);
+			}	
+		}
+
+	}
+
+	public void prepareActs(Plan myPlan){
+
+//		Tidy the acts up so they correspond to the expectations of the social net module.
+//		First, change the types to be the same as the facility types.
+//		Should not have to be done: adapt SocialNetworks code to use only the first letter
+//		or else some standard MATSim "type", if this exists
+//		Next, make sure each act has a number within the plan
+
 		ActIterator planActIter = myPlan.getIteratorAct();
 		int actId = 0;
 		while(planActIter.hasNext()){
 			Act myAct = (Act) planActIter.next();
 
-//			Tidy the acts up so they correspond to the expectations of the social net module
-			// Actually to the facility types, too
 			String type="none";
 			char typechar=myAct.getType().charAt(0);
 			if(typechar=='h'){
@@ -112,35 +172,11 @@ public class MentalMap {
 				myAct.setRefId(actId);
 				this.actIdAct.put(actId,myAct);
 				actId++;
-			}
-			Activity myActivity = null;
-			// If there is already knowledge in the initial plans file, use it
-			if(this.knowledge.getActivities(myAct.getType()).size()>0){
-				myActivity=this.knowledge.getActivities(myAct.getType()).get(Gbl.random.nextInt(this.knowledge.getActivities(myAct.getType()).size()));
-				learnActsActivities(myAct.getRefId(),myActivity);
-			}
-
-			// Else the activity is null and we choose an activity to assign to the act
-			Link myLink = myAct.getLink();
-			// These Locations are facilities by the new convention
-			Collection<Location> locations = myLink.getUpMapping().values();
-			// These Objects are facilities by convention
-			Object[] facs =  locations.toArray();
-
-			// Assign a random activity (a facility) on the link to the act
-			// thus giving it in effect a street address
-			while(myActivity==null){
-				int k = Gbl.random.nextInt(facs.length);
-				Facility f = (Facility) facs[k];
-				myActivity = f.getActivity(type);
-				if(myActivity!=null){
-					learnActsActivities(myAct.getRefId(),myActivity);
-				}
+			}else{
+				this.actIdAct.put(myAct.getRefId(),myAct);
 			}
 		}
-		//here handle the input file of activities and acts if you want
 	}
-
 	public void learnActsActivities (Integer myactId, Activity myactivity){
 
 		this.mapActivityActId.put(myactivity,myactId);
@@ -175,10 +211,10 @@ public class MentalMap {
 //		}
 
 		if(myPlans.get(0).getActsLegs().size()*myPlans.size()/2 >max){
-		Gbl.errorMsg(this.getClass()+
-		" Number of activites an agent needs to remember for his plans is greater than his memory! MAX = "+max+" "+myPlans.get(0).getActsLegs().size()*myPlans.size()/2+" "+this.knowledge.getActivities().size());
+			Gbl.errorMsg(this.getClass()+
+					" Number of activites an agent needs to remember for his plans is greater than his memory! MAX = "+max+" "+myPlans.get(0).getActsLegs().size()*myPlans.size()/2+" "+this.knowledge.getActivities().size());
 		}
-		
+
 		if(this.knowledge.getActivities().size()>max){
 			// Mark the activities associated with all plans in memory
 			// so that they won't be deleted

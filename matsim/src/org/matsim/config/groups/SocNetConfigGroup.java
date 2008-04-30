@@ -52,6 +52,7 @@ public class SocNetConfigGroup extends Module {
 	private static final String SOCNET_GRID = "grid_spacing";
 	private static final String INPUT_SN_DIR = "inputSocNetDir";
 	private static final String INIT_ITER = "inputIter";
+	private static final String READ_MENTALMAP = "readMentalMap";
 
 	private String graphalgo = null;
 	private String linkstrengthalgo = null;
@@ -77,6 +78,7 @@ public class SocNetConfigGroup extends Module {
 	private String grid_spacing=null;// int
 	private String input_sn_dir=null;// String
 	private String init_iter=null;// int
+	private String read_mm=null;// boolean
 
 
 	public SocNetConfigGroup() {
@@ -132,6 +134,8 @@ public class SocNetConfigGroup extends Module {
 			setInDirName(value);
 		}else if (INIT_ITER.equals(key)){
 			setInitIter(value);
+		}else if (READ_MENTALMAP.equals(key)){
+			setReadMentalMap(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -188,6 +192,8 @@ public class SocNetConfigGroup extends Module {
 			return getInDirName();
 		}else if (INIT_ITER.equals(key)){
 			return getInitIter();
+		}else if (READ_MENTALMAP.equals(key)){
+			return getReadMentalMap();
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -220,6 +226,7 @@ public class SocNetConfigGroup extends Module {
 		addNotNullParameterToMap(map, SOCNET_GRID);
 		addNotNullParameterToMap(map, INPUT_SN_DIR);
 		addNotNullParameterToMap(map, INIT_ITER);
+		addNotNullParameterToMap(map, READ_MENTALMAP);
 		return map;
 	}
 	/* direct access */
@@ -371,5 +378,11 @@ public class SocNetConfigGroup extends Module {
 	}
 	public void setInitIter(final String init_iter){
 		this.init_iter = init_iter;
+	}
+	public String getReadMentalMap(){
+		return this.read_mm;
+	}
+	public void setReadMentalMap(final String read_mm){
+		this.read_mm = read_mm;
 	}
 }

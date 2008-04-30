@@ -27,7 +27,7 @@ public class ActivityActWriter {
 
 	BufferedWriter out;
 
-	public void ActivityActWriter(){
+	public ActivityActWriter(){
 
 	}
 	public void openFile(String outFileName){
@@ -35,13 +35,13 @@ public class ActivityActWriter {
 
 //		File outDir = new File(outDirName);
 //		if (!outDir.mkdir() && !outDir.exists()) {
-//			Gbl.errorMsg("Cannot make directory " + outDirName);
+//		Gbl.errorMsg("Cannot make directory " + outDirName);
 //		}
 //		File outFile = new File(outFileName);
 //		if (!outFile.mkdir() && !outFile.exists()) {
-//			Gbl.errorMsg("Cannot make directory " + outFileName);
+//		Gbl.errorMsg("Cannot make directory " + outFileName);
 //		}
-		
+
 //		String outFileName = outDirName + "ActivityActMap.txt";
 		try{
 			out = new BufferedWriter(new FileWriter(outFileName));
@@ -60,23 +60,23 @@ public class ActivityActWriter {
 			Person myPerson = (Person) pIt.next();
 			Knowledge myKnowledge = myPerson.getKnowledge();
 			List<Plan> myPersonPlans = myPerson.getPlans();
-			
+
 			for (int i=0;i<myPersonPlans.size();i++){
-			Plan myPlan = myPersonPlans.get(i);
-			ArrayList<Object> actsLegs=myPlan.getActsLegs();
-			for (int j=0;j<actsLegs.size();j=j+2){
-				Act myAct= (Act) actsLegs.get(j);
-				Activity myActivity= myKnowledge.map.getActivity(myAct);
-//				System.out.println(" AAW DEBUG J=: "+j);
-				try {
-					out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+myAct.getRefId());
-					out.newLine();
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				Plan myPlan = myPersonPlans.get(i);
+				ArrayList<Object> actsLegs=myPlan.getActsLegs();
+				for (int j=0;j<actsLegs.size()+1;j=j+2){
+					Act myAct= (Act) actsLegs.get(j);
+					Activity myActivity= myKnowledge.map.getActivity(myAct);
+//					System.out.println(" AAW DEBUG J=: "+j);
+					try {
+						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+myAct.getRefId());
+						out.newLine();
+
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-			}
 			}
 		}
 		// out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getRefId()+" "+myAct.getId());
