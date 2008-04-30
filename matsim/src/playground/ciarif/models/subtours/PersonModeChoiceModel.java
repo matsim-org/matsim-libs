@@ -65,7 +65,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final String H = "h";
 	private static final Coord ZERO = new Coord(0.0,0.0);
 	private final Persons persons;
-	private final Municipalities municipalities;
+	private final Municipalities municipalities; // Da cambiare per PersonStreaming
 	private ModelModeChoice model;
 	private List<PersonSubtour> personSubtours = new Vector<PersonSubtour>();
 	 
@@ -74,10 +74,10 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 	//public PersonModeChoiceModel(final Persons persons) {
-	public PersonModeChoiceModel(final Persons persons, Municipalities municipalities) {
+	public PersonModeChoiceModel(final Persons persons, Municipalities municipalities) {// Da cammbiare per PersonStreaming
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.persons = persons;
-		this.municipalities = municipalities;
+		this.municipalities = municipalities;// Da cammbiare per PersonStreaming
 		System.out.println("    done.");
 	}
 	
@@ -124,9 +124,6 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		for (int i=0; i<=subtours_nr; i=i+1){
 			
 			Subtour sub = personSubtour.getSubtours().get(i);
-			//System.out.println ("sub_in model = " + sub.getNodes());
-			//System.out.println ("i = " + i);
-			//System.out.println ("sub_mode before = " + sub.getMode());
 			int mainpurpose = sub.getPurpose();
 			// choose mode choice model based on main purpose
 			if (plan.getPerson().getAge() >=18) {
@@ -143,44 +140,36 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 					
 			// generating a random bike ownership (see STRC2007 paper Ciari for more details)
 			boolean has_bike = false;
-			if (Gbl.random.nextDouble() < 0.70) { has_bike = true; }			
+			if (Gbl.random.nextDouble() < 0.65) { has_bike = true; }			
 			
 			boolean ride_possible = false;
 			
 			model.setRide(ride_possible);
-			if (Gbl.random.nextDouble () < 0.35) {ride_possible = true;} // to verify if it makes sense, but till then a mean to 
+			if (Gbl.random.nextDouble () < 0.2) {ride_possible = true;} // to verify if it makes sense, but till then a mean to 
 			// make things work the right way
 			
 			if (sub.getPrev_subtour()<5){
 				if (i>=1) {
-					//System.out.println ("prev_mode in database = " + personSubtour.getSubtours().get(i-1).getMode());
 					model.setPrevMode (personSubtour.getSubtours().get(i-1).getMode());
 					personSubtour.getSubtours().get(i).setPrev_mode(personSubtour.getSubtours().get(i-1).getMode());
 				}
-				//				model.setPrevMode(personSubtour.getSubtours().get(sub.getPrev_subtour()).getMode()); //It seeks the previous sub-tour and get the mode
-				
 			}
 			// 5 means that the subtour starts at home
 			else {
 				model.setPrevMode(5);personSubtour.getSubtours().get(i).setPrev_mode(5);
 				}
-				 
-			//System.out.println("prev subtour's mode = " +  model.prev_mode);
 			
 			// setting person parameters
-			//System.out.println(model);
+			model.setRide(ride_possible);
 			model.setDistanceHome2Work(dist_h_w);
-			//System.out.println("dist_h_w: " + dist_h_w);
 			model.setAge(plan.getPerson().getAge());
-			//model.setHHDimension(p.getHousehold().getPersonCount());
 			model.setLicenseOwnership(plan.getPerson().hasLicense());
-			//System.out.println("license: " + model.license);
 			model.setCar(plan.getPerson().getCarAvail());
 			model.setTickets(plan.getPerson().getTravelcards());
-			//System.out.println("Travelcards: " + model.tickets);
 			model.setBike(has_bike);
 			model.setMale (plan.getPerson().getSex());
-			//int udeg = 4; // 
+			//model.setHHDimension(p.getHousehold().getPersonCount());
+			//int udeg = 5; // // Da cammbiare per PersonStreaming
 			Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
 			ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
 			Location loc = locs.get(Gbl.random.nextInt(locs.size()));
@@ -192,13 +181,10 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			
 			model.setUrbanDegree(udeg);
 			model.setMainPurpose(mainpurpose);
-			model.setDistanceTour(sub.getDistance()); // 
-			System.out.println("dist subtour: " + sub.getDistance());
-			 
+			model.setDistanceTour(sub.getDistance()); // 			 
 			model.setHomeCoord(home_coord);
 			
 			// getting the chosen mode
-			//System.out.println("prev_mode_model = " + model.prev_mode);
 			int modechoice = model.calcModeChoice();
 			String mode = null;
 			if (modechoice == 0) { mode = CAR; }

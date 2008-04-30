@@ -118,11 +118,11 @@ public class ModelModeChoiceLeisure18Plus  extends ModelModeChoice {
 		util += B5_CONST * 1.0;
 		util += B5_Dist * dist_subtour;
 		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B5_Prev * 1.0;}
-//		if (udeg == 1) { util += 0;/* reference type */ }
-//		else if (udeg == 2) { util += B5_T2 * 1.0; }
-//		else if (udeg == 3) { util += B5_T3 * 1.0; }
-//		else if (udeg == 4) { util += B5_T4 * 1.0; }
-//		else if (udeg == 5) { util += B5_T5 * 1.0; }
+		if (udeg == 1) { util += 0;/* reference type */ }
+		else if (udeg == 2) { util += B5_T2 * 1.0; }
+		else if (udeg == 3) { util += B5_T3 * 1.0; }
+		else if (udeg == 4) { util += B5_T4 * 1.0; }
+		else if (udeg == 5) { util += B5_T5 * 1.0; }
 		//System.out.println("Util walk = " + util);
 		return util;
 	}
