@@ -71,6 +71,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (FACILITY.equals(name)) {
+			this.facilities.finishFacility(this.currfacility);
 			this.currfacility = null;
 		} else if (ACTIVITY.equals(name)) {
 			this.curractivity = null;

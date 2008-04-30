@@ -25,10 +25,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
+import org.matsim.facilities.algorithms.FacilityAlgorithmI;
 import org.matsim.gbl.Gbl;
+import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
@@ -46,16 +49,24 @@ public class Facilities extends Layer {
 	private long counter = 0;
 	private long nextMsg = 1;
 
+	public static final boolean FACILITIES_USE_STREAMING = Boolean.TRUE;
+	public static final boolean FACILITIES_NO_STREAMING = Boolean.FALSE;
+
+	private boolean isStreaming = Facilities.FACILITIES_NO_STREAMING;
+
+	private static final Logger log = Logger.getLogger(Facilities.class);
+
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public Facilities(final String name) {
+	public Facilities(final String name, final boolean isStreaming) {
 		super(LAYER_TYPE,name);
+		this.isStreaming = isStreaming;
 	}
 
 	public Facilities() {
-		this(null);
+		this(null, false);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -64,7 +75,7 @@ public class Facilities extends Layer {
 
 	public final Facility createFacility(final Id id, final CoordI center) {
 		if (this.locations.containsKey(id)) {
-			Gbl.errorMsg("Facility id=" + id + " aready exists.");
+			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}
 		Facility f = new Facility(this,id,center);
 		this.locations.put(f.getId(),f);
@@ -75,6 +86,7 @@ public class Facilities extends Layer {
 			this.nextMsg *= 2;
 			System.out.println("    facility # " + this.counter);
 		}
+
 		return f;
 	}
 
@@ -95,9 +107,33 @@ public class Facilities extends Layer {
 	//////////////////////////////////////////////////////////////////////
 
 	public final void runAlgorithms() {
-		for (int i = 0; i < this.algorithms.size(); i++) {
-			FacilitiesAlgorithm algo = this.algorithms.get(i);
-			algo.run(this);
+		if (!this.isStreaming) {
+			for (int i = 0; i < this.algorithms.size(); i++) {
+				FacilitiesAlgorithm algo = this.algorithms.get(i);
+				algo.run(this);
+			}
+		} else {
+			log.info("Facilities streaming is on. Algos were run during parsing");
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// finish methods
+	//////////////////////////////////////////////////////////////////////
+
+	public final void finishFacility(Facility f) {
+		if (this.isStreaming) {
+			// run algorithms
+			for (FacilitiesAlgorithm facilitiesAlgo : this.algorithms) {
+				if (facilitiesAlgo instanceof FacilityAlgorithmI) {
+					((FacilityAlgorithmI) facilitiesAlgo).run(f);
+				}
+			}
+
+			// remove facility because we are streaming
+			this.locations.remove(f.getId());
+		} else {
+			// do nothing
 		}
 	}
 
@@ -121,7 +157,7 @@ public class Facilities extends Layer {
 	public final Map<Id, ? extends Facility> getFacilities() {
 		return (Map<Id, ? extends Facility>) getLocations();
 	}
-	
+
 	//Added 27.03.08 JH for random secondary location changes
 	public final TreeMap<Id,Facility> getFacilities(final String act_type) {
 		TreeMap<Id,Facility> facs = new TreeMap<Id, Facility>();
@@ -143,6 +179,6 @@ public class Facilities extends Layer {
 	@Override
 	public final String toString() {
 		return super.toString() +
-		       "[nof_algorithms=" + this.algorithms.size() + "]";
+		"[nof_algorithms=" + this.algorithms.size() + "]";
 	}
 }

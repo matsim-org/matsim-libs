@@ -47,6 +47,10 @@ import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
+import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
+import org.matsim.facilities.algorithms.FacilitiesWriterAlgorithm;
+import org.matsim.facilities.algorithms.FacilityAlgorithmI;
+import org.matsim.facilities.filters.FacilitiesActTypeFilter;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
@@ -201,12 +205,12 @@ public class ShopsOf2005ToFacilities {
 //		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
 //		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
 //		ShopsOf2005ToFacilities.shopsToTXT();
-		ShopsOf2005ToFacilities.shopsToOpentimesKML();
-
+//		ShopsOf2005ToFacilities.shopsToOpentimesKML();
+		ShopsOf2005ToFacilities.applyOpentimesToEnterpriseCensus();
+		
 	}
 
 	private static void prepareRawDataForGeocoding() {
-
 
 		ShopsOf2005ToFacilities.setUp();
 		ShopsOf2005ToFacilities.setupStyles();
@@ -222,7 +226,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void transformGeocodedKMLToFacilities() {
 
-		Facilities shopsOf2005 = new Facilities("shopsOf2005");
+		Facilities shopsOf2005 = new Facilities("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
 
 		JAXBElement<KmlType> kmlElement = null;
 
@@ -1536,7 +1540,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToTXT() {
 
-		Facilities shopsOf2005 = new Facilities("shopsOf2005");
+		Facilities shopsOf2005 = new Facilities("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
 		ArrayList<String> txtLines = new ArrayList<String>();
 		ShopId shopId = null;
 		String aShopLine = null;
@@ -1664,9 +1668,9 @@ public class ShopsOf2005ToFacilities {
 		CoordI northWestWGS84 = null;
 
 		// as a start, let's use the week April, 21 to April 27, 2008 as THE week
-		int mondayDay = 21;
+		final int MONDAY_DAY = 21;
 
-		Facilities shopsOf2005 = new Facilities("shopsOf2005");
+		Facilities shopsOf2005 = new Facilities("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
 
 		System.out.println("Reading facilities xml file... ");
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(shopsOf2005);
@@ -1715,7 +1719,8 @@ public class ShopsOf2005ToFacilities {
 			northWestWGS84 = trafo.transform(northWestCH1903);
 
 			// have to iterate this over opening times
-			for (Day day : new Day[]{Day.MONDAY}) {
+			int dayCounter = 0;
+			for (Day day : days) {
 				if (facility.getActivity(ACTIVITY_TYPE_SHOP) != null) {
 					TreeSet<Opentime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
 					if (dailyOpentimes != null) {
@@ -1735,11 +1740,12 @@ public class ShopsOf2005ToFacilities {
 							// transform opening times to GE time primitives
 							aTimeSpanType = factory.createTimeSpanType();
 							aShop.setAbstractTimePrimitiveGroup(factory.createAbstractTimePrimitiveGroup(aTimeSpanType));
-							aTimeSpanType.setBegin("2008-04-21T" + Time.writeTime(opentime.getStartTime()) + "Z");
-							aTimeSpanType.setEnd("2008-04-21T" + Time.writeTime(opentime.getEndTime()) + "Z");
+							aTimeSpanType.setBegin("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getStartTime()) + "+01:00");
+							aTimeSpanType.setEnd("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getEndTime()) + "+01:00");
 						}
 					}
 				}
+				dayCounter++;
 			}
 
 		}
@@ -1759,4 +1765,25 @@ public class ShopsOf2005ToFacilities {
 		System.out.println("Writing out KML...done.");
 	}
 
+	private static void applyOpentimesToEnterpriseCensus() {
+		
+		Facilities facilities_KTIYear1 = new Facilities("Switzerland based on Enterprise census 2000.", Facilities.FACILITIES_USE_STREAMING);
+		
+		Facilities facilities_KTIYear2 = new Facilities("Facilities KTI Year 2", Facilities.FACILITIES_NO_STREAMING);
+		
+		FacilitiesWriterAlgorithm writerAlgo = new FacilitiesWriterAlgorithm(facilities_KTIYear2);
+		FacilitiesActTypeFilter shopFilter = new FacilitiesActTypeFilter((FacilityAlgorithmI) writerAlgo);
+		shopFilter.addActTypePattern("shop");
+		facilities_KTIYear1.addAlgorithm((FacilitiesAlgorithm) shopFilter);
+//		facilities_KTIYear1.addAlgorithm((FacilitiesAlgorithm) writerAlgo); 
+		
+		System.out.println("Reading (and writing) facilities xml file... ");
+		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities_KTIYear1);
+		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
+		System.out.println("Reading (and writing) facilities xml file...done.");
+		
+		writerAlgo.finish();
+		
+	}
+	
 }

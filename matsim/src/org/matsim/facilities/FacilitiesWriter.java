@@ -20,6 +20,7 @@
 
 package org.matsim.facilities;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -73,43 +74,68 @@ public class FacilitiesWriter extends Writer {
 
 	@Override
 	public final void write() {
+		this.writeOpenAndinit();
+		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
+		while (f_it.hasNext()) {
+			Facility f = (Facility)f_it.next();
+			this.writeFacility(f);
+		}
+		this.writeFinish();
+	}
+
+	public final void writeOpenAndinit() {
 		try {
 			this.out = IOUtils.getBufferedWriter(this.outfile);
 			writeHeader("facilities");
 			this.handler.startFacilities(this.facilities, this.out);
 			this.handler.writeSeparator(this.out);
-			Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
-			while (f_it.hasNext()) {
-				Facility f = (Facility)f_it.next();
-				this.handler.startFacility(f, this.out);
-				Iterator<Activity> a_it = f.getActivities().values().iterator();
-				while (a_it.hasNext()) {
-					Activity a = a_it.next();
-					this.handler.startActivity(a, this.out);
-					this.handler.startCapacity(a, this.out);
-					this.handler.endCapacity(this.out);
-					Iterator<TreeSet<Opentime>> o_set_it = a.getOpentimes().values().iterator();
-					while (o_set_it.hasNext()) {
-						TreeSet<Opentime> o_set = o_set_it.next();
-						Iterator<Opentime> o_it = o_set.iterator();
-						while (o_it.hasNext()) {
-							Opentime o = o_it.next();
-							this.handler.startOpentime(o, this.out);
-							this.handler.endOpentime(this.out);
-						}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public final void writeFacility(Facility f) {
+		try {
+			this.handler.startFacility(f, this.out);
+			Iterator<Activity> a_it = f.getActivities().values().iterator();
+			while (a_it.hasNext()) {
+				Activity a = a_it.next();
+				this.handler.startActivity(a, this.out);
+				this.handler.startCapacity(a, this.out);
+				this.handler.endCapacity(this.out);
+				Iterator<TreeSet<Opentime>> o_set_it = a.getOpentimes().values().iterator();
+				while (o_set_it.hasNext()) {
+					TreeSet<Opentime> o_set = o_set_it.next();
+					Iterator<Opentime> o_it = o_set.iterator();
+					while (o_it.hasNext()) {
+						Opentime o = o_it.next();
+						this.handler.startOpentime(o, this.out);
+						this.handler.endOpentime(this.out);
 					}
-					this.handler.endActivity(this.out);
 				}
-				this.handler.endFacility(this.out);
-				this.handler.writeSeparator(this.out);
-				this.out.flush();
+				this.handler.endActivity(this.out);
 			}
+			this.handler.endFacility(this.out);
+			this.handler.writeSeparator(this.out);
+			this.out.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public final void writeFinish() {
+		try {
 			this.handler.endFacilities(this.out);
 			this.out.flush();
 			this.out.close();
-		}
-		catch (IOException e) {
-			Gbl.errorMsg(e);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
