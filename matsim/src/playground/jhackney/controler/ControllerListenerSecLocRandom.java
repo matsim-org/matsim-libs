@@ -45,6 +45,7 @@ import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
+import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.replanning.SNSecLocRandom;
@@ -53,6 +54,7 @@ import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.algorithms.PlanRandomReplaceSecLoc;
+import playground.jhackney.kml.EgoNetPlansMakeKML;
 
 
 /**
@@ -85,6 +87,7 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 	SocialNetwork snet;
 	SocialNetworkStatistics snetstat;
 	ActivityActWriter aaw;
+	ActivityActReader aar = null;
 	PajekWriter pjw;
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
 	SpatialInteractor plansInteractorS;//spatial (face to face)
@@ -271,22 +274,36 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 
 	void initializeKnowledge(final Plans plans ) {
 
+
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)
-
+	
+		
+//		If the user has an existing file that maps activities to acts, open it and read it in
+		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){
+			this.log.info("  Opening the file to read in the map of Acts to Facilities");
+			aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
+			String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "/ActivityActMap.txt";
+			aar.openFile(fileName);
+			this.log.info(" ... done");
+		}
+		
 		for( Person person : plans.getPersons().values() ){
 
 			Knowledge k = person.getKnowledge();
 			if(k ==null){
 				k = person.createKnowledge("created by " + this.getClass().getName());
 			}
-			// Initialize knowledge to the facilities that are in all initial plans
-//			Iterator<Plan> piter=person.getPlans().iterator();
-//			while (piter.hasNext()){
-//			Plan plan = piter.next();
+
 			Plan plan = person.getSelectedPlan();
-			k.map.initializeActActivityMap(plan);
+			k.map.prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
+			k.map.initializeActActivityMapRandom(plan);
+			k.map.initializeActActivityMapFromFile(plan,aar);
 //			}
+			
+		}
+		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){
+			aar.close();//close the file with the input act-activity map
 		}
 	}
 
@@ -331,6 +348,12 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 			this.log.info(" ... done");
 		}
 
+		this.log.info("  Initializing the KML output");
+//		this.kmlOut=new EgoNetPlansMakeKML();
+		EgoNetPlansMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
+		EgoNetPlansMakeKML.generateStyles();
+		this.log.info("... done");
+		
 		this.log.info(" Writing out the initial social network ...");
 		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getFirstIteration());
 		this.log.info("... done");

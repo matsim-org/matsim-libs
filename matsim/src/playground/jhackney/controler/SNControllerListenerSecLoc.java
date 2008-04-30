@@ -45,11 +45,15 @@ import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
+import org.matsim.socialnetworks.io.ActivityActReader;
+import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.replanning.SNSecLocRandom;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+
+import playground.jhackney.kml.EgoNetPlansMakeKML;
 
 
 /**
@@ -89,6 +93,8 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 
 	SocialNetwork snet;
 	SocialNetworkStatistics snetstat;
+	ActivityActWriter aaw;
+	ActivityActReader aar = null;
 	PajekWriter pjw;
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
 	SpatialInteractor plansInteractorS;//spatial (face to face)
@@ -161,22 +167,36 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 
 //			You could forget activities here, after the replanning and assignment
 
-			if(CALCSTATS){
+			if(CALCSTATS && event.getIteration()%1==0){
 				this.log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
 				this.log.info(" ... done");
+				
+				this.log.info(" Writing out the map between Acts and Facilities ...");
+				aaw.write(snIter,this.controler.getPopulation());
+				this.log.info(" ... done");
 			}
 
-			this.log.info(" Writing out social network for iteration " + snIter + " ...");
-			this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
-			this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
-			this.log.info(" ... done");
+			if(event.getIteration()%1==0){
+				this.log.info(" Writing out social network for iteration " + snIter + " ...");
+				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
+				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
+				this.log.info(" ... done");
+			}
 		}
 		if (event.getIteration() == this.controler.getLastIteration()) {
 			if(CALCSTATS){
 				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
 				this.snetstat.closeFiles();
+				this.aaw.close();
 			}
+		}
+//		Write out the KML for the EgoNet of a chosen agent
+//		if ((event.getIteration()-1)%replan_interval == 0){
+		if (event.getIteration() == this.controler.getLastIteration()){	
+			Person testP=this.controler.getPopulation().getPerson("100000");
+			EgoNetPlansMakeKML.loadData(testP);
+			EgoNetPlansMakeKML.write();
 		}
 	}
 
@@ -264,20 +284,33 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)
-
+	
+		
+//		If the user has an existing file that maps activities to acts, open it and read it in
+		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){
+			this.log.info("  Opening the file to read in the map of Acts to Facilities");
+			aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
+			String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "/ActivityActMap.txt";
+			aar.openFile(fileName);
+			this.log.info(" ... done");
+		}
+		
 		for( Person person : plans.getPersons().values() ){
 
 			Knowledge k = person.getKnowledge();
 			if(k ==null){
 				k = person.createKnowledge("created by " + this.getClass().getName());
 			}
-			// Initialize knowledge to the facilities that are in all initial plans
-//			Iterator<Plan> piter=person.getPlans().iterator();
-//			while (piter.hasNext()){
-//			Plan plan = piter.next();
+
 			Plan plan = person.getSelectedPlan();
-			k.map.initializeActActivityMap(plan);
+			k.map.prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
+			k.map.initializeActActivityMapRandom(plan);
+			k.map.initializeActActivityMapFromFile(plan,aar);
 //			}
+			
+		}
+		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){
+			aar.close();//close the file with the input act-activity map
 		}
 	}
 
@@ -316,7 +349,18 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 //			so we can skip writing out this initial state because the networks will still be unchanged after the first assignment
 //			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
 			this.log.info(" ... done");
+			
+			this.log.info("  Opening the file to write out the map of Acts to Facilities");
+			this.aaw=new ActivityActWriter();
+			this.aaw.openFile(Controler.getOutputFilename("ActivityActMap.txt"));
+			this.log.info(" ... done");
 		}
+
+		this.log.info("  Initializing the KML output");
+//		this.kmlOut=new EgoNetPlansMakeKML();
+		EgoNetPlansMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
+		EgoNetPlansMakeKML.generateStyles();
+		this.log.info("... done");
 
 		this.log.info(" Writing out the initial social network ...");
 		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getFirstIteration());
