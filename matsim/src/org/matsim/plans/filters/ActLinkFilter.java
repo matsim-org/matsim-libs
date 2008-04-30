@@ -32,7 +32,7 @@ import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.plans.filters.AbstractPlanFilter;
 
 /**
- * Filters all plans where activities of the same type take place at the same link 7 set of links.
+ * Filters all plans where activities of the same type take place at the same link or set of links.
  * For example: Filter all agents who are neighbors (have their home location on the same link)
  * 
  * @author meisterk
