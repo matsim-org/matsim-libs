@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd" 
         [
-        		<!ENTITY HOMEBASE     "/home/meisterk">
+        		<!ENTITY HOMEBASE     "	">
                 <!ENTITY OUTPUTBASE   "output">
                 <!ENTITY CVSBASE      "sandbox00">
                 <!ENTITY SHOPSMODULE  "ivt/studies/switzerland/facilities/shopsOf2005">

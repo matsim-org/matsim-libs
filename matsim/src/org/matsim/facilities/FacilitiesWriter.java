@@ -74,7 +74,7 @@ public class FacilitiesWriter extends Writer {
 
 	@Override
 	public final void write() {
-		this.writeOpenAndinit();
+		this.writeOpenAndInit();
 		Iterator<? extends Location> f_it = this.facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility f = (Facility)f_it.next();
@@ -83,7 +83,7 @@ public class FacilitiesWriter extends Writer {
 		this.writeFinish();
 	}
 
-	public final void writeOpenAndinit() {
+	public final void writeOpenAndInit() {
 		try {
 			this.out = IOUtils.getBufferedWriter(this.outfile);
 			writeHeader("facilities");

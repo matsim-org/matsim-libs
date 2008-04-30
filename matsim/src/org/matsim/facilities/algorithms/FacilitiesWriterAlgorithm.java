@@ -37,7 +37,7 @@ public class FacilitiesWriterAlgorithm extends FacilityAlgorithm {
 	public FacilitiesWriterAlgorithm(Facilities facilities) {
 		super();
 		this.facilitiesWriter = new FacilitiesWriter(facilities);
-		this.facilitiesWriter.writeOpenAndinit();
+		this.facilitiesWriter.writeOpenAndInit();
 	}
 	
 	@Override
@@ -45,6 +45,10 @@ public class FacilitiesWriterAlgorithm extends FacilityAlgorithm {
 		this.facilitiesWriter.writeFacility(facility);
 	}
 
+	/**
+	 * Calls the facilities writer to close the out stream.
+	 * Don't forget to call this method after streaming all facilities.
+	 */
 	public void finish() {
 		this.facilitiesWriter.writeFinish();
 	}

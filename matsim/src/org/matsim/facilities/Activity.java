@@ -37,7 +37,7 @@ public class Activity {
 	private final Facility facility;
 
 	// TreeMap(String day,TreeSet(Opentime opentime))
-	private final TreeMap<String,TreeSet<Opentime>> opentimes = new TreeMap<String,TreeSet<Opentime>>();
+	private TreeMap<String,TreeSet<Opentime>> opentimes = new TreeMap<String,TreeSet<Opentime>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -137,6 +137,10 @@ public class Activity {
 			throw new NumberFormatException("A capacity of an activity must be >= 0.");
 		}
 		this.capacity = capacity;
+	}
+
+	public void setOpentimes(TreeMap<String, TreeSet<Opentime>> opentimes) {
+		this.opentimes = opentimes;
 	}
 
 	//////////////////////////////////////////////////////////////////////

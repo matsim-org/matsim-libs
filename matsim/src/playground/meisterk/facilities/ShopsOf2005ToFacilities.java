@@ -205,9 +205,9 @@ public class ShopsOf2005ToFacilities {
 //		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
 //		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
 //		ShopsOf2005ToFacilities.shopsToTXT();
-//		ShopsOf2005ToFacilities.shopsToOpentimesKML();
-		ShopsOf2005ToFacilities.applyOpentimesToEnterpriseCensus();
-		
+		ShopsOf2005ToFacilities.shopsToOpentimesKML();
+//		ShopsOf2005ToFacilities.applyOpentimesToEnterpriseCensus();
+
 	}
 
 	private static void prepareRawDataForGeocoding() {
@@ -1656,12 +1656,13 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToOpentimesKML() {
 
-		final String SHOP_STYLE = "shopStyle"; 
+		// variables used
 		Day[] days = Day.values();
 
 		String facilityId = null;
 		CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
-		PlacemarkType aShop = null;
+		FolderType aShop = null;
+		PlacemarkType aShopOpeningPeriod = null;
 		PointType aPointType = null;
 		TimeSpanType aTimeSpanType = null;
 		CoordI northWestCH1903 = null;
@@ -1670,120 +1671,162 @@ public class ShopsOf2005ToFacilities {
 		// as a start, let's use the week April, 21 to April 27, 2008 as THE week
 		final int MONDAY_DAY = 21;
 
-		Facilities shopsOf2005 = new Facilities("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
+		// we produce two kml files:
+		// 1, the shops of 2005
+		// 2, the shops from enterprise census
+		final int SHOPS_OF_2005 = 0;
+		final int SHOPS_FROM_ENTERPRISE_CENSUS = 1;
+		TreeMap<Integer, String> shopsNames = new TreeMap<Integer, String>();
+		shopsNames.put(new Integer(SHOPS_OF_2005), "shopsOf2005");
+		shopsNames.put(new Integer(SHOPS_FROM_ENTERPRISE_CENSUS), "shopsFromEnterpriseCensus2000");
 
-		System.out.println("Reading facilities xml file... ");
-		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(shopsOf2005);
-		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
-		System.out.println("Reading facilities xml file...done.");
+		TreeMap<Integer, String> facilitiesInputFilenames = new TreeMap<Integer, String>();
+		facilitiesInputFilenames.put(SHOPS_OF_2005, "/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/facilities_shopsOf2005.xml");
+		facilitiesInputFilenames.put(SHOPS_FROM_ENTERPRISE_CENSUS, "/home/meisterk/workspace/MATSim/output/facilities_KTIYear2.xml.gz");
 
-		System.out.println("Initializing KML... ");
+		TreeMap<Integer, String> kmlOutputFilenames = new TreeMap<Integer, String>();
+		kmlOutputFilenames.put(SHOPS_OF_2005, "/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/shopsOf2005.kml");
+		kmlOutputFilenames.put(SHOPS_FROM_ENTERPRISE_CENSUS, "/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/facilities_KTIYear2.kml");
 
-		// kml and document
-		JAXBContext jaxbContext = null;
-		try {
-			jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		TreeMap<Integer, String> shopStyleNames = new TreeMap<Integer, String>();
+		shopStyleNames.put(SHOPS_OF_2005, "shopsOf2005Style");
+		shopStyleNames.put(SHOPS_FROM_ENTERPRISE_CENSUS, "shopsEC2000Style");
 
-		ObjectFactory factory = new ObjectFactory();
+		TreeMap<Integer, Double> shopIconScales = new TreeMap<Integer, Double>();
+		shopIconScales.put(SHOPS_OF_2005, 1.0);
+		shopIconScales.put(SHOPS_FROM_ENTERPRISE_CENSUS, 2.0);
+		
+		Facilities facilities = null;
+		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
+			facilities = new Facilities(shopsNames.get(new Integer(dataSetIndex)), Facilities.FACILITIES_NO_STREAMING);
 
-		KmlType kml = factory.createKmlType();
-		DocumentType document = factory.createDocumentType();
-		document.setName("The shops of 2005 open times KML.");
-		kml.setAbstractFeatureGroup(factory.createDocument(document));
+			System.out.println("Reading facilities xml file... ");
+			FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities);
+			facilities_reader.readFile(facilitiesInputFilenames.get(new Integer(dataSetIndex)));
+			System.out.println("Reading facilities xml file...done.");
 
-		// styles
-		StyleType shopStyle = factory.createStyleType();
-		document.getAbstractStyleSelectorGroup().add(factory.createStyle(shopStyle));
-		shopStyle.setId(SHOP_STYLE);
-		IconStyleType shopIconStyle = factory.createIconStyleType();
-		shopStyle.setIconStyle(shopIconStyle);
-		BasicLinkType shopIconLink = factory.createBasicLinkType();
-		shopIconStyle.setIcon(shopIconLink);
-		shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
-		System.out.println("Initializing KML...done.");
+			System.out.println("Initializing KML... ");
 
-		Iterator facilityIterator = shopsOf2005.getFacilities().values().iterator();
-
-		while (facilityIterator.hasNext()) {
-			Facility facility = (Facility) facilityIterator.next();
-			facilityId = facility.getId().toString();
-//			System.out.println(facility.toString());
-			//System.out.println(facilityId);
-
-			// transform coordinates incl. toggle easting and northing
-			northWestCH1903 = new Coord(facility.getCenter().getX(), facility.getCenter().getY());
-			northWestWGS84 = trafo.transform(northWestCH1903);
-
-			// have to iterate this over opening times
-			int dayCounter = 0;
-			for (Day day : days) {
-				if (facility.getActivity(ACTIVITY_TYPE_SHOP) != null) {
-					TreeSet<Opentime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
-					if (dailyOpentimes != null) {
-						for (Opentime opentime : dailyOpentimes) {
-
-							// build up placemark structure
-							aShop = factory.createPlacemarkType();
-							document.getAbstractFeatureGroup().add(factory.createPlacemark(aShop));
-							aShop.setStyleUrl(SHOP_STYLE);
-							aShop.setName(facilityId.split("_", 2)[0]);
-							aShop.setDescription(facilityId);
-
-							aPointType = factory.createPointType();
-							aShop.setAbstractGeometryGroup(factory.createPoint(aPointType));
-							aPointType.getCoordinates().add(northWestWGS84.getX() + "," + northWestWGS84.getY() + ",0.0");
-
-							// transform opening times to GE time primitives
-							aTimeSpanType = factory.createTimeSpanType();
-							aShop.setAbstractTimePrimitiveGroup(factory.createAbstractTimePrimitiveGroup(aTimeSpanType));
-							aTimeSpanType.setBegin("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getStartTime()) + "+01:00");
-							aTimeSpanType.setEnd("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getEndTime()) + "+01:00");
-						}
-					}
-				}
-				dayCounter++;
+			// kml and document
+			JAXBContext jaxbContext = null;
+			try {
+				jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
+			} catch (JAXBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 
-		}
+			ObjectFactory factory = new ObjectFactory();
 
-		System.out.println("Writing out KML...");
-		try {
-			Marshaller marshaller = jaxbContext.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.marshal(factory.createKml(kml), new FileOutputStream(Gbl.getConfig().facilities().getOutputFile()));
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			KmlType kml = factory.createKmlType();
+			DocumentType document = factory.createDocumentType();
+			document.setName(shopsNames.get(new Integer(dataSetIndex)));
+			kml.setAbstractFeatureGroup(factory.createDocument(document));
+
+			// styles
+			StyleType shopStyle = factory.createStyleType();
+			document.getAbstractStyleSelectorGroup().add(factory.createStyle(shopStyle));
+			shopStyle.setId(shopStyleNames.get(new Integer(dataSetIndex)));
+			IconStyleType shopIconStyle = factory.createIconStyleType();
+			shopStyle.setIconStyle(shopIconStyle);
+			BasicLinkType shopIconLink = factory.createBasicLinkType();
+			shopIconStyle.setIcon(shopIconLink);
+			shopIconStyle.setScale(shopIconScales.get(new Integer(dataSetIndex)));
+			shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
+			System.out.println("Initializing KML...done.");
+
+			Iterator facilityIterator = facilities.getFacilities().values().iterator();
+
+			while (facilityIterator.hasNext()) {
+				Facility facility = (Facility) facilityIterator.next();
+				facilityId = facility.getId().toString();
+//				System.out.println(facility.toString());
+				//System.out.println(facilityId);
+
+				aShop = factory.createFolderType();
+				document.getAbstractFeatureGroup().add(factory.createFolder(aShop));
+				aShop.setName(facilityId.split("_", 2)[0]);
+				aShop.setDescription(facilityId);
+				
+				// transform coordinates incl. toggle easting and northing
+				northWestCH1903 = new Coord(facility.getCenter().getX(), facility.getCenter().getY());
+				northWestWGS84 = trafo.transform(northWestCH1903);
+
+				// have to iterate this over opening times
+				int dayCounter = 0;
+				for (Day day : days) {
+					if (facility.getActivity(ACTIVITY_TYPE_SHOP) != null) {
+						TreeSet<Opentime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
+						if (dailyOpentimes != null) {
+							for (Opentime opentime : dailyOpentimes) {
+
+								// build up placemark structure
+								aShopOpeningPeriod = factory.createPlacemarkType();
+								aShop.getAbstractFeatureGroup().add(factory.createPlacemark(aShopOpeningPeriod));
+								aShopOpeningPeriod.setStyleUrl(shopStyleNames.get(new Integer(dataSetIndex)));
+								aShopOpeningPeriod.setName(facilityId.split("_", 2)[0]);
+								aShopOpeningPeriod.setDescription(facilityId);
+
+								aPointType = factory.createPointType();
+								aShopOpeningPeriod.setAbstractGeometryGroup(factory.createPoint(aPointType));
+								aPointType.getCoordinates().add(northWestWGS84.getX() + "," + northWestWGS84.getY() + ",0.0");
+
+								// transform opening times to GE time primitives
+								aTimeSpanType = factory.createTimeSpanType();
+								aShopOpeningPeriod.setAbstractTimePrimitiveGroup(factory.createAbstractTimePrimitiveGroup(aTimeSpanType));
+								aTimeSpanType.setBegin("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getStartTime()) + "+01:00");
+								aTimeSpanType.setEnd("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getEndTime()) + "+01:00");
+							}
+						}
+					}
+					dayCounter++;
+				}
+
+			}
+
+			System.out.println("Writing out KML...");
+			try {
+				Marshaller marshaller = jaxbContext.createMarshaller();
+				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+				marshaller.marshal(factory.createKml(kml), new FileOutputStream(kmlOutputFilenames.get(new Integer(dataSetIndex))));
+			} catch (JAXBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("Writing out KML...done.");
 		}
-		System.out.println("Writing out KML...done.");
 	}
 
 	private static void applyOpentimesToEnterpriseCensus() {
-		
+
 		Facilities facilities_KTIYear1 = new Facilities("Switzerland based on Enterprise census 2000.", Facilities.FACILITIES_USE_STREAMING);
-		
-		Facilities facilities_KTIYear2 = new Facilities("Facilities KTI Year 2", Facilities.FACILITIES_NO_STREAMING);
-		
-		FacilitiesWriterAlgorithm writerAlgo = new FacilitiesWriterAlgorithm(facilities_KTIYear2);
-		FacilitiesActTypeFilter shopFilter = new FacilitiesActTypeFilter((FacilityAlgorithmI) writerAlgo);
-		shopFilter.addActTypePattern("shop");
-		facilities_KTIYear1.addAlgorithm((FacilitiesAlgorithm) shopFilter);
-//		facilities_KTIYear1.addAlgorithm((FacilitiesAlgorithm) writerAlgo); 
-		
-		System.out.println("Reading (and writing) facilities xml file... ");
+
+		Facilities facilities_Dummy_KTIYear2 = new Facilities("Facilities KTI Year 2", Facilities.FACILITIES_NO_STREAMING);
+
+		// init algorithms
+		FacilitiesOpentimesKTIYear2 facilitiesOpentimesKTIYear2 = new FacilitiesOpentimesKTIYear2();
+		facilitiesOpentimesKTIYear2.init();
+
+		FacilitiesWriterAlgorithm writerAlgo = new FacilitiesWriterAlgorithm(facilities_Dummy_KTIYear2);
+
+		// let algorithms work for "shop" facilities only
+		FacilitiesActTypeFilter shopFilter = null;
+		for (FacilitiesAlgorithm facilitiesAlgorithm : new FacilitiesAlgorithm[]{facilitiesOpentimesKTIYear2, writerAlgo}) {
+			shopFilter = new FacilitiesActTypeFilter((FacilityAlgorithmI) facilitiesAlgorithm);
+			shopFilter.addActTypePattern("shop");
+			facilities_KTIYear1.addAlgorithm((FacilitiesAlgorithm) shopFilter);
+		}
+
+		System.out.println("Streaming Facilities KTI Year 2 file... ");
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities_KTIYear1);
 		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
-		System.out.println("Reading (and writing) facilities xml file...done.");
-		
+		System.out.println("Streaming Facilities KTI Year 2 file...done.");
+
 		writerAlgo.finish();
-		
+
 	}
-	
+
 }
