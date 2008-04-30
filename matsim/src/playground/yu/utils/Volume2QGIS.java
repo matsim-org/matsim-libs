@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.basic.v01.Id;
@@ -74,40 +73,42 @@ public class Volume2QGIS {
 		 * Traffic Volumes and MATSim-network to Shp-file // *
 		 * ///////////////////////////////////////////////////////////////
 		 */
-		/*
-		 * mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml"); // //
-		 * mn2s.readNetwork("../runs/run445b/ivtch-osm.1.2.xml");
-		 * mn2q.setCrs(ch1903); NetworkLayer net = mn2q.getNetwork();
-		 * VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		 * mn2q.readEvents("../runs/run454/500.events.txt.gz", va); List<Map<String,
-		 * Integer>> vols = createVolumes(net, va); for (int i = 0; i < 24; i++) {
-		 * mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
-		 * vols.get(i)); } mn2q.writeShapeFile("../runs/run454/454.500.shp");
-		 */
+		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml"); // //
+		mn2q.setCrs(ch1903);
+		NetworkLayer net = mn2q.getNetwork();
+		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+		mn2q.readEvents("../runs/run465/500.events.txt.gz", va);
+		List<Map<Id, Integer>> vols = createVolumes(net, va);
+		for (int i = 0; i < 24; i++) {
+			mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
+					vols.get(i));
+		}
+		mn2q.writeShapeFile("../runs/run465/465.500.shp");
+
 		/*
 		 * //////////////////////////////////////////////////////////////
 		 * Differenz of Traffic Volumes and MATSim-network to Shp-file
 		 * /////////////////////////////////////////////////////////////
 		 */
 
-		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu.xml");
-		mn2q.setCrs(ch1903);
-		NetworkLayer net = mn2q.getNetwork();
-		VolumesAnalyzer vaA = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../runs/run456/200.events.txt.gz", vaA);
-		List<Map<Id, Integer>> volsA = createVolumes(net, vaA);
-		VolumesAnalyzer vaB = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../runs/run454/200.events.txt.gz", vaB);
-		List<Map<Id, Integer>> volsB = createVolumes(net, vaB);
-		for (int i = 0; i < 24; i++) {
-			Map<Id, Integer> diff = new TreeMap<Id, Integer>();
-			for (Id linkId : volsB.get(i).keySet()) {
-				diff.put(linkId, volsA.get(i).get(linkId).intValue()
-						- volsB.get(i).get(linkId).intValue());
-			}
-			mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
-					diff);
-		}
-		mn2q.writeShapeFile("test/yu/test/test.shp");
+		// mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu.xml");
+		// mn2q.setCrs(ch1903);
+		// NetworkLayer net = mn2q.getNetwork();
+		// VolumesAnalyzer vaA = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+		// mn2q.readEvents("../runs/run456/500.events.txt.gz", vaA);
+		// List<Map<Id, Integer>> volsA = createVolumes(net, vaA);
+		// VolumesAnalyzer vaB = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+		// mn2q.readEvents("../runs/run454/500.events.txt.gz", vaB);
+		// List<Map<Id, Integer>> volsB = createVolumes(net, vaB);
+		// for (int i = 0; i < 24; i++) {
+		// Map<Id, Integer> diff = new TreeMap<Id, Integer>();
+		// for (Id linkId : volsB.get(i).keySet()) {
+		// diff.put(linkId, volsA.get(i).get(linkId).intValue()
+		// - volsB.get(i).get(linkId).intValue());
+		// }
+		// mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
+		// diff);
+		// }
+		// mn2q.writeShapeFile("test/yu/ivtch/456.500-454.500.shp");
 	}
 }

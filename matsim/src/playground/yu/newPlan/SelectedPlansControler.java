@@ -31,21 +31,19 @@ import org.matsim.world.World;
 
 /**
  * test of NewAgentPtPlan
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class SelectedPlansControler {
 
 	public static void main(final String[] args) {
-		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/schweiz/input/ch.xml";
-		final String plansFilename = "../data/schweiz/input/410.100.plans.xml.gz";
+		final String plansFilename = "../data/schweiz/input/459.100.plans.xml.gz";
 
 		World world = Gbl.getWorld();
-		Config config = Gbl.createConfig(new String[] {
-		// "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
-				"../data/schweiz/selectedPlans.xml" });
+		Config config = Gbl
+				.createConfig(new String[] { "../data/schweiz/selectedPlans.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

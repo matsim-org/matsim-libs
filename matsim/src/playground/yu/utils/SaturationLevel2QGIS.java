@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AvgSpeed2QGIS.java
+ * Saturation2QGIS.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -28,41 +28,44 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-
-import playground.yu.analysis.CalcLinkAvgSpeed;
 
 /**
  * @author yu
  * 
  */
-public class AvgSpeed2QGIS {
+public class SaturationLevel2QGIS {
 	public static String ch1903 = "PROJCS[\"CH1903_LV03\",GEOGCS[\"GCS_CH1903\",DATUM[\"D_CH1903\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Hotine_Oblique_Mercator_Azimuth_Center\"],PARAMETER[\"False_Easting\",600000],PARAMETER[\"False_Northing\",200000],PARAMETER[\"Scale_Factor\",1],PARAMETER[\"Azimuth\",90],PARAMETER[\"Longitude_Of_Center\",7.439583333333333],PARAMETER[\"Latitude_Of_Center\",46.95240555555556],UNIT[\"Meter\",1],AUTHORITY[\"EPSG\",\"21781\"]]";
 
-	private static List<Map<Id, Double>> createSpeeds(NetworkLayer net,
-			CalcLinkAvgSpeed clas) {
-		List<Map<Id, Double>> speeds = new ArrayList<Map<Id, Double>>(24);
+	public static List<Map<Id, Double>> createSaturationLevels(
+			NetworkLayer net, VolumesAnalyzer va) {
+		List<Map<Id, Double>> saturationLevels = new ArrayList<Map<Id, Double>>(
+				24);
 		for (int i = 0; i < 24; i++) {
-			speeds.add(i, null);
+			saturationLevels.add(i, null);
 		}
-		for (int i = 0; i < 24; i++) {
-			Map<Id, Double> aSpeeds = speeds.get(i);
-			for (Link link : (net.getLinks()).values()) {
-				Id linkId = link.getId();
-				if (aSpeeds != null) {
-					aSpeeds.put(linkId, clas.getAvgSpeed(linkId,
-							(double) i * 3600.0));
-				} else if (aSpeeds == null) {
-					aSpeeds = new HashMap<Id, Double>();
-					aSpeeds.put(linkId, clas.getAvgSpeed(linkId,
-							(double) i * 3600.0));
-					speeds.add(i, aSpeeds);
+		for (Link link : (net.getLinks()).values()) {
+			Id linkId = link.getId();
+			int[] v = va.getVolumesForLink(linkId.toString());
+			for (int i = 0; i < 24; i++) {
+				Map<Id, Double> m = saturationLevels.get(i);
+				if (m != null) {
+					m.put(linkId, (double) ((v != null) ? v[i] : 0) * 10.0
+							/ link.getCapacity()
+							* (double) net.getCapacityPeriod() / 3600.0);
+				} else if (m == null) {
+					m = new HashMap<Id, Double>();
+					m.put(linkId, (double) ((v != null) ? v[i] : 0) * 10.0
+							/ link.getCapacity()
+							* (double) net.getCapacityPeriod() / 3600.0);
+					saturationLevels.add(i, m);
 				}
 			}
 		}
-		return speeds;
+		return saturationLevels;
 	}
 
 	/**
@@ -71,20 +74,21 @@ public class AvgSpeed2QGIS {
 	public static void main(String[] args) {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		/*
-		 * ///////////////////////////////////////////////////////////////
-		 * Traffic Volumes and MATSim-network to Shp-file // *
-		 * ///////////////////////////////////////////////////////////////
+		 * //////////////////////////////////////////////////////////////////////////////////
+		 * Traffic saturation level and MATSim-network to Shp-file
+		 * /////////////////////////////////////////////////////////////////////////////////
 		 */
 		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml");
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
-		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(net);
-		mn2q.readEvents("../runs/run465/500.events.txt.gz", clas);
-		List<Map<Id, Double>> speeds = createSpeeds(net, clas);
+		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+		mn2q.readEvents("../runs/run465/500.events.txt.gz", va);
+		List<Map<Id, Double>> sls = createSaturationLevels(net, va);
 		for (int i = 0; i < 24; i++) {
-			mn2q.addParameter("aS" + i + "-" + (i + 1) + "h", Double.class,
-					speeds.get(i));
+			mn2q.addParameter("sl" + i + "-" + (i + 1) + "h", Double.class, sls
+					.get(i));
 		}
-		mn2q.writeShapeFile("../runs/run465/465.500.avgSpeed.shp");
+		mn2q.writeShapeFile("../runs/run465/465.500.saturationLevel.shp");
 	}
+
 }
