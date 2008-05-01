@@ -54,8 +54,8 @@ public class RouterVisTest extends MatsimTestCase{
 		String outSnapshot = outDir + "/Snapshot00-00-00.vis";
 		long checksumSnapshot = CRCChecksum.getCRCFromFile(outSnapshot);
 
-		assertEquals(this.referenceChecksumConfig,checksumConfig);
-		assertEquals(this.referenceChecksumSnapshot,checksumSnapshot);
+		assertEquals("different config files", this.referenceChecksumConfig,checksumConfig);
+		assertEquals("different snapshot files", this.referenceChecksumSnapshot,checksumSnapshot);
 	}
 
 	private void init(final String configFile) {

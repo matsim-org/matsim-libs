@@ -44,14 +44,14 @@ public class ReRoutingTest extends MatsimTestCase {
 		long checksum2 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "ITERS/it.0/0.events.txt.gz");
 		log.info("checksum1 = " + checksum1);
 		log.info("checksum2 = " + checksum2);
-		assertEquals(checksum1, checksum2);
+		assertEquals("different event files", checksum1, checksum2);
 
 		log.info("calculating checksums for plans...");
 		checksum1 = CRCChecksum.getCRCFromGZFile(getInputDirectory() + "plans.xml.gz");
 		checksum2 = CRCChecksum.getCRCFromGZFile(getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz");
 		log.info("checksum1 = " + checksum1);
 		log.info("checksum2 = " + checksum2);
-		assertEquals(checksum1, checksum2);
+		assertEquals("different plans files", checksum1, checksum2);
 	}
 
 	static public class TestControler extends Controler {
