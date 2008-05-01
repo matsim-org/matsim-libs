@@ -77,27 +77,23 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
 	///////////////////////////////////////////////////////////////
 	//NetStateWriter Stuff
 	///////////////////////////////////////////////////////////////
-    @Override
-    protected double getLinkDisplValue(final BasicLink link, final int index) {
-		LinkAttribute attrib;
-		if (linkStates.containsKey(link.getId())) {
-			attrib = linkStates.get(link.getId());
-		} else {
+	@Override
+	protected double getLinkDisplValue(final BasicLink link, final int index) {
+		LinkAttribute attrib = linkStates.get(link.getId());
+		if (attrib == null) {
 			return 0;
 		}
-    	return attrib.getColor();
-    }
+		return attrib.getColor();
+	}
 
-    @Override
-    protected String getLinkDisplLabel(final BasicLink link) {
-		LinkAttribute attrib;
-		if (linkStates.containsKey(link.getId())) {
-			attrib = linkStates.get(link.getId());
-		} else {
+	@Override
+	protected String getLinkDisplLabel(final BasicLink link) {
+		LinkAttribute attrib = linkStates.get(link.getId());
+		if (attrib == null) {
 			return "null";
 		}
 		return attrib.getMsg();
-    }
+	}
 
 
 }
