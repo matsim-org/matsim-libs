@@ -139,18 +139,21 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 	 
 	@Override
 	protected final double calcPublicUtil() {
-		double util = 0.0;
-		util += B2_Season * tickets ;
-		util += B2_Dist * dist_subtour;
-		if (car == "never") { util += B2_Car_Never *  1.0; }
-		if (udeg == 1) { util += 0;/* reference type */ }
-		else if (udeg == 2) { util += B2_T2 * 1.0; }
-		else if (udeg == 3) { util += B2_T3 * 1.0; }
-		else if (udeg == 4) { util += B2_T4 * 1.0; }
-		else if (udeg == 5) { util += B2_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
-		//System.out.println("Util pt = " + util);
-		return util;
+		if (pt) {
+			double util = 0.0;
+			util += B2_Season * tickets ;
+			util += B2_Dist * dist_subtour;
+			if (car == "never") { util += B2_Car_Never *  1.0; }
+			if (udeg == 1) { util += 0;/* reference type */ }
+			else if (udeg == 2) { util += B2_T2 * 1.0; }
+			else if (udeg == 3) { util += B2_T3 * 1.0; }
+			else if (udeg == 4) { util += B2_T4 * 1.0; }
+			else if (udeg == 5) { util += B2_T5 * 1.0; }
+			else { Gbl.errorMsg("This should never happen!"); }
+			//System.out.println("Util pt = " + util);
+			return util;
+		}
+		else {return Double.NEGATIVE_INFINITY;}
 	}
 
 	@Override
