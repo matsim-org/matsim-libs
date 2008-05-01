@@ -20,7 +20,7 @@
 
 package org.matsim.basic.v01;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.gbl.Gbl;
@@ -29,8 +29,8 @@ import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.geometry.CoordI;
 
 public class BasicNodeImpl implements BasicNode {
-	protected final Map<Id, BasicLink> inlinks  = new HashMap<Id, BasicLink>(4, 0.95f);
-	protected final Map<Id, BasicLink> outlinks = new HashMap<Id, BasicLink>(4, 0.95f);
+	protected final Map<Id, BasicLink> inlinks  = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
+	protected final Map<Id, BasicLink> outlinks = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
 
 	/* TODO [balmermi]: Since the basic link is a location, it MUST have
 	 * defined some geographical information (coords). These are defined
