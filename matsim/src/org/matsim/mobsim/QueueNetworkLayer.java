@@ -104,7 +104,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 			this.simNodesArrayCache = new QueueNode[0];
 		}
 
-		this.simNodesArrayCache = getNodes().values().toArray(this.simNodesArrayCache);
+		this.simNodesArrayCache = this.nodes.values().toArray(this.simNodesArrayCache);
 		//dg[april08] as the order of nodes has an influence on the simulation
 		//results they are sorted to avoid indeterministic simulations
 		Arrays.sort(this.simNodesArrayCache, new Comparator<QueueNode>() {
@@ -115,11 +115,11 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 
 		this.simLinksArray.clear();
 		if (simulateAllLinks) {
-			this.simLinksArray.addAll(getLinks().values());
+			this.simLinksArray.addAll(this.links.values());
 		}
 
 		// finish init for links
-		for (QueueLink link : getLinks().values()) {
+		for (QueueLink link : this.links.values()) {
 			link.finishInit();
 		}
 	}
@@ -183,7 +183,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 	 */
 	public Collection<PositionInfo> getVehiclePositions() {
 		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
-		for (QueueLink link : getLinks().values()) {
+		for (QueueLink link : this.links.values()) {
 			link.getVehiclePositions(positions);
 		}
 		return positions;
@@ -209,7 +209,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
-		for (QueueLink link : getLinks().values()) {
+		for (QueueLink link : this.links.values()) {
 			link.clearVehicles();
 		}
 	}
