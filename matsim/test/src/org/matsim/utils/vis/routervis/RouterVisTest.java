@@ -20,6 +20,7 @@
 
 package org.matsim.utils.vis.routervis;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -30,52 +31,46 @@ import org.matsim.router.util.TravelTimeI;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
-public class RouterVisTest extends MatsimTestCase{
-	private NetworkLayer network;
-	private long referenceChecksumConfig;
-	private long referenceChecksumSnapshot;
-
+/**
+ * @author glaemmel
+ */
+public class RouterVisTest extends MatsimTestCase {
+	
+	private static final Logger log = Logger.getLogger(RouterVisTest.class);
+	
 	public void testRouterVis(){
-		init("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
+		loadConfig(getInputDirectory() + "config.xml");
+		// read network
+		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 
-		Node fromNode = this.network.getNode("13");
-		Node toNode = this.network.getNode("7");
+		// calculate reference checksums
+		String visConfigFile = getInputDirectory() + "SnapshotCONFIG.vis";
+		long referenceChecksumConfig = CRCChecksum.getCRCFromFile(visConfigFile);
+		log.info("Reference checksum config = " + referenceChecksumConfig + " file: " + visConfigFile);
+
+		String visSnapshotFile = getInputDirectory() + "Snapshot00-00-00.vis";
+		long referenceChecksumSnapshot = CRCChecksum.getCRCFromFile(visSnapshotFile);
+		log.info("Reference checksum snapshot = " + referenceChecksumSnapshot + " file: " + visSnapshotFile);
+
+		// run test
+		Node fromNode = network.getNode("13");
+		Node toNode = network.getNode("7");
 
 		TravelTimeI costCalc = new FreespeedTravelTimeCost();
-		RouterVis routerVis = new RouterVis(this.network,(TravelCostI) costCalc,costCalc);
+		RouterVis routerVis = new RouterVis(network, (TravelCostI) costCalc, costCalc);
 
 		routerVis.runRouter(fromNode, toNode, 0.0);
 
+		// check results
 		String outDir = getOutputDirectory();
-
-		String outConfig = outDir + "/SnapshotCONFIG.vis";
+		String outConfig = outDir + "SnapshotCONFIG.vis";
 		long checksumConfig = CRCChecksum.getCRCFromFile(outConfig);
 
-		String outSnapshot = outDir + "/Snapshot00-00-00.vis";
+		String outSnapshot = outDir + "Snapshot00-00-00.vis";
 		long checksumSnapshot = CRCChecksum.getCRCFromFile(outSnapshot);
 
-		assertEquals("different config files", this.referenceChecksumConfig,checksumConfig);
-		assertEquals("different snapshot files", this.referenceChecksumSnapshot,checksumSnapshot);
-	}
-
-	private void init(final String configFile) {
-		loadConfig(configFile);
-		this.network = readNetwork();
-		String visConfigFile = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/SnapshotCONFIG.vis";
-		this.referenceChecksumConfig = CRCChecksum.getCRCFromFile(visConfigFile);
-		System.out.println("Reference checksum config = " + this.referenceChecksumConfig + " file: " + visConfigFile);
-
-		String visSnapshotFile = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/Snapshot00-00-00.vis";
-		this.referenceChecksumSnapshot = CRCChecksum.getCRCFromFile(visSnapshotFile);
-		System.out.println("Reference checksum snapshot = " + this.referenceChecksumSnapshot + " file: " + visSnapshotFile);
-		System.out.println();
-	}
-
-	private NetworkLayer readNetwork() {
-		System.out.println("  reading the network...");
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		System.out.println("  done.");
-		return network;
+		assertEquals("different config files", referenceChecksumConfig, checksumConfig);
+		assertEquals("different snapshot files", referenceChecksumSnapshot, checksumSnapshot);
 	}
 }
