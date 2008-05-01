@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -39,7 +39,8 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 /**
  * @author david
- * @author mrieser // node de-/activation, activationQueue for parking vehicles
+ * @author mrieser
+ * @author dgrether
  *
  * QueueNetworkLayer is responsible for creating the QueueLinks/Nodes and for
  * implementing doSim
@@ -82,8 +83,8 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 	public QueueNetworkLayer(NetworkLayer networkLayer, QueueNetworkFactory factory) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
-		this.links = new HashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
-		this.nodes = new HashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.links = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.nodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
 			this.nodes.put(n.getId(), queueNetworkFactory.newQueueNode(n, this));
 		}
@@ -214,7 +215,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 		}
 	}
 
-	public void addActiveLink(final QueueLink link) {
+	/*package*/ void addActiveLink(final QueueLink link) {
 		if (!simulateAllLinks) {
 			this.simActivateThis.add(link);
 		}
@@ -237,15 +238,13 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 		}
 	}
 
-	public void setLinkActivation(final double time, final QueueLink link) {
+	/*package*/ void setLinkActivation(final double time, final QueueLink link) {
 		if (!simulateAllLinks) {
 			this.activationQueue.add(new LinkActivation(time, link));
 		}
 	}
 
 	public void setMoveWaitFirst(final boolean moveWaitFirst){
-		//TODO [GL] may be we should invalidate simNodesArrayCache to make sure
-		// that nobody changes this during the MobSim ...
 		this.moveWaitFirst = moveWaitFirst;
 	}
 
