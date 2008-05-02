@@ -113,8 +113,8 @@ public class RandomIncidentSimulator implements IterationStartsListener {
 					events.add(e1);
 					
 					NetworkChangeEvent e2 = new NetworkChangeEvent(86400);
-					e1.addLink(link);
-					e1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1.0/capReduction));
+					e2.addLink(link);
+					e2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1.0/capReduction));
 					events.add(e2);
 					
 //					link.changeSimulatedFlowCapacity(this.capReduction);
