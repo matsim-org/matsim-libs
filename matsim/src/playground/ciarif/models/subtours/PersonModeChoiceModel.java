@@ -143,13 +143,17 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 //			
 			boolean ride_possible = false;
 			double rd2 = Gbl.random.nextDouble ();
-			if (rd2 < 0.50) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership 
+			if (rd2 < 0.30) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership 
 			// at the houshold level or something similar 
 						
-			boolean pt = false;
-			double rd3 = Gbl.random.nextDouble ();
-			if (rd3 < 0.85) {pt = true; System.out.println("random = " + rd3);}
-			System.out.println("pt = " + pt );
+			boolean pt = false; // Should be substituted with actual access to pt;
+			double rd3 = Gbl.random.nextDouble (); 
+			if (plan.getPerson().getCarAvail().equals("always")) {
+				if (rd3 < 0.40) {pt = true; System.out.println("random = " + rd3);}
+				System.out.println("pt = " + pt );
+			}
+			else if (rd3 < 0.90) {pt =true;}
+			//else {pt =true;}	
 			
 			if (sub.getPrev_subtour()<5){
 				if (i>=1) {
@@ -173,7 +177,14 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			model.setBike(has_bike);
 			model.setMale (plan.getPerson().getSex());
 			//model.setHHDimension(p.getHousehold().getPersonCount());
-//			int udeg = 4; // // Da cambiare per PersonStreaming
+//			int udeg = 1; // // Da cambiare per PersonStreaming
+//			double rd4 = Gbl.random.nextDouble();
+//			if (rd4<=0.81) {udeg=2;}
+//			if (rd4<0.70) {udeg=3;}
+//			if (rd4<0.63) {udeg=4;}
+//			if (rd4<.30) {udeg=5;}
+					
+			
 			Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
 			ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
 			Location loc = locs.get(Gbl.random.nextInt(locs.size()));
