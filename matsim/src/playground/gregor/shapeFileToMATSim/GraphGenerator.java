@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -273,9 +272,9 @@ public class GraphGenerator {
 				"toID", Integer.class);		
 		FeatureType ftRoad = FeatureTypeFactory.newFeatureType(
 				new AttributeType[] { geom, id, fromNode, toNode }, "link");
-		
+		int ID = 0;
 		for (LineString ls : this.lineStrings){
-			Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},this.geofac) , -1, -1,-1},"network");
+			Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},this.geofac) , ID++, -1,-1},"network");
 			features.add(ft);
 				
 		}

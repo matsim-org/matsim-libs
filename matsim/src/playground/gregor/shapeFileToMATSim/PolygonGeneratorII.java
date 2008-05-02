@@ -34,7 +34,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -51,6 +50,7 @@ public class PolygonGeneratorII {
 	private FeatureSource featureSourceLineString;
 	private FeatureCollection collectionLineString;
 	private List<Feature> featureList;
+	private Collection<Feature> polgons;
 	private GeometryFactory geofac;
 	static final double CATCH_RADIUS = 0.2;
 	static final double DEFAULT_DISTANCE = 10;
@@ -59,11 +59,15 @@ public class PolygonGeneratorII {
 	
 	
 	private HashMap<Integer, Point> interPoints = new HashMap<Integer, Point>();
+	private FeatureType ftPolygon;
+	private FeatureType ftPoint;
+	private FeatureType ftLineString;
 	
 	public PolygonGeneratorII(FeatureSource ls, FeatureSource po){
 		this.featureSourcePolygon = po;
 		this.featureSourceLineString = ls;
 		this.geofac = new GeometryFactory();
+		initFeatureGenerator();
 	}
 		
 	public PolygonGeneratorII(Collection<Feature> graph, FeatureSource po) {
@@ -71,6 +75,28 @@ public class PolygonGeneratorII {
 		this.featureList = (List<Feature>) graph;
 		this.geofac = new GeometryFactory();
 		this.graph = true;
+		initFeatureGenerator();
+	}
+	
+	private void initFeatureGenerator(){
+		
+		AttributeType polygon = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
+		AttributeType point = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
+		AttributeType linestring = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
+		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
+		AttributeType width = AttributeTypeFactory.newAttributeType("width", Double.class);
+		AttributeType area = AttributeTypeFactory.newAttributeType("area", Double.class);
+		AttributeType info = AttributeTypeFactory.newAttributeType("info", String.class);
+		try {
+			this.ftPolygon = FeatureTypeFactory.newFeatureType(new AttributeType[] {polygon, id, width, area, info }, "linkShape");
+			this.ftPoint = FeatureTypeFactory.newFeatureType(new AttributeType[] {point, id, info }, "pointShape");
+			this.ftLineString = FeatureTypeFactory.newFeatureType(new AttributeType[] {linestring, id }, "linString");			
+		} catch (FactoryRegistryException e) {
+			e.printStackTrace();
+		} catch (SchemaException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public Collection<Feature> generatePolygons() throws Exception{
@@ -82,8 +108,12 @@ public class PolygonGeneratorII {
 		}
 
 		log.info("leaving polygonGenerator");		
-//		return(genPolygonFeatureCollection(mergePolygons()));			
-		return(genPolygonFeatureCollection(cutPolygons(lineStrings,mergePolygons())));
+//		return(genPolygonFeatureCollection(mergePolygons()));	
+		
+		
+		
+		createPolygonFeatures(cutPolygons(this.lineStrings,mergePolygons()));
+		return this.polgons;
 		
 //		cutPolygons(lineStrings,mergePolygons());
 //		return(genPointFeatureCollection(interPoints));
@@ -117,11 +147,7 @@ public class PolygonGeneratorII {
 				po.add(currLs.getStartPoint());
 				po.add(currLs.getEndPoint());
 				
-				
-				
-				
-				
-				
+		
 				for(Point currPoint : po){
 					
 					countlines++;
@@ -466,16 +492,23 @@ public class PolygonGeneratorII {
 		}
 		this.lineStrings = new HashMap<Integer, LineString>();
 		this.lineTree = new QuadTree<Feature>(o.getMinX(), o.getMinY(), o.getMaxX(), o.getMaxY());
-		int id = 0;
 		while (iit.hasNext()) {
 			Feature feature = (Feature) iit.next();
-			
+			int id = (Integer) feature.getAttribute(1);
 			MultiLineString multiLineString = (MultiLineString) feature.getDefaultGeometry();
-			for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
-				LineString lineString = (LineString) multiLineString.getGeometryN(i);
-				this.add(id, lineString);
-				id++;
+			
+			if (multiLineString.getNumGeometries() > 1) {
+				throw new RuntimeException("only one LineString is allowed per MultiLineString");
 			}
+			LineString lineString = (LineString) multiLineString.getGeometryN(0);
+			this.add(id, lineString);
+			
+			
+//			for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
+//				LineString lineString = (LineString) multiLineString.getGeometryN(i);
+//				this.add(id, lineString);
+//				id++;
+//			}
 		}
 		
 		log.info("done.");
@@ -497,52 +530,32 @@ public class PolygonGeneratorII {
 		
 	}
 	
-	private Collection<Feature> genPolygonFeatureCollection(HashMap<Integer, Polygon> returnPolys) throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
-		
-		Collection<Feature> features = new ArrayList<Feature>();
-		
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
-		AttributeType width = AttributeTypeFactory.newAttributeType("width", Double.class);
-		AttributeType area = AttributeTypeFactory.newAttributeType("area", Double.class);
-		AttributeType info = AttributeTypeFactory.newAttributeType("info", String.class);
-		FeatureType ftRoadShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id, width, area, info }, "linkShape");
-		
-//		for (Iterator<Polygon> it = this.cutPolys.iterator() ; it.hasNext() ; ){	
-//			Feature ft = ftRoadShape.create(new Object [] {new MultiPolygon(new Polygon []{(Polygon)it.next()},this.geofac), -1, 0.0, 0.0},"network");
-//			features.add(ft);
-//		}
-				
-		for (Iterator<Entry<Integer, Polygon>> it = returnPolys.entrySet().iterator() ; it.hasNext() ; ){	
-			Entry<Integer, Polygon> e = it.next();
-			Feature ft = ftRoadShape.create(new Object [] {new MultiPolygon(new Polygon []{ e.getValue()  },this.geofac), -1, 0.0, 0.0, e.getKey().toString()},"network");
-			features.add(ft);
+	private void createPolygonFeatures(HashMap<Integer, Polygon> polygons) {
+
+		try {
+			for (Iterator<Entry<Integer, Polygon>> it = polygons.entrySet().iterator() ; it.hasNext() ; ){	
+				Entry<Integer, Polygon> e = it.next();
+				Feature ft = this.ftPolygon.create(new Object [] {new MultiPolygon(new Polygon []{ e.getValue()  },this.geofac), e.getKey().toString(), 0.0, 0.0, 0},"network");
+				this.polgons.add(ft);
+			}
+		} catch (IllegalAttributeException e1) {
+			e1.printStackTrace();
 		}
-		return features;
 	}
 	
+	
+
 	private Feature genLineStringFeature(Integer iid, LineString ls)throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
-		
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
-		
-		FeatureType ftLineString = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id }, "linString");
-		Feature ft = ftLineString.create(new Object [] {ls, iid},"lineString");
-		return ft;
+		return this.ftLineString.create(new Object [] {ls, iid},"lineString");
 	}
 	
 	
 	private Collection<Feature> genPointFeatureCollection(HashMap<Integer, Point> interPoints)throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
 		
 		Collection<Feature> features = new ArrayList<Feature>();
-		
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
-		FeatureType ftRoadShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id }, "interPoint");
-						
 		for (Iterator<Entry<Integer, Point>> it = interPoints.entrySet().iterator() ; it.hasNext() ; ){	
 			Entry<Integer, Point> e = it.next();
-			Feature ft = ftRoadShape.create(new Object [] { e.getValue() , e.getKey().toString()},"network");
+			Feature ft = this.ftPoint.create(new Object [] { e.getValue() , e.getKey().toString()},"network");
 			features.add(ft);
 		}
 		return features;
