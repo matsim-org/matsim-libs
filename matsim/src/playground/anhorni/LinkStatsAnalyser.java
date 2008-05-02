@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
 import org.matsim.analysis.CalcLinkStats;
@@ -34,6 +35,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
+import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -72,6 +74,7 @@ public class LinkStatsAnalyser {
 	private String outputFilename;
 	private String networkFilename;
 	private double scaleFactor;
+	private double vol_scale_factor;
 	private List<Id> selectedLinks;
 
 	/**
@@ -87,11 +90,12 @@ public class LinkStatsAnalyser {
 			this.outputFilename=args[3];
 			this.networkFilename=args[4];
 			this.scaleFactor=Double.parseDouble(args[5]);
+			this.vol_scale_factor= Double.parseDouble(args[6]);
 			
 			//this.iterationNumber=0;
-			this.iterationNumber=new Integer(args[6]);
+			this.iterationNumber=new Integer(args[7]);
 			//this.coordSystem="CH1903_LV03";
-			this.coordSystem=args[7];
+			this.coordSystem=args[8];
 			
 			this.selectedLinks=readSelectedLinks();
 			
@@ -100,12 +104,12 @@ public class LinkStatsAnalyser {
 			System.out.println("  done.");
 			
 			System.out.println("  Coordinate System: " + this.coordSystem);
-			System.out.println("  reading LinkAttributes from: " + linksAttributeFilename0);
-			this.linkStats0 = new CalcLinkStats(this.network);
+			System.out.println("  reading LinkAttributes from: " + linksAttributeFilename0 + " with vol_scale factor = " + vol_scale_factor);
+			this.linkStats0 = new CalcLinkStats(this.network,this.vol_scale_factor);
 			this.linkStats0.readFile(linksAttributeFilename0);
 			
-			System.out.println("  reading LinkAttributes from: " + linksAttributeFilename1);
-			this.linkStats1 = new CalcLinkStats(this.network);
+			System.out.println("  reading LinkAttributes from: " + linksAttributeFilename1 + " with vol_scale factor = " + vol_scale_factor);
+			this.linkStats1 = new CalcLinkStats(this.network,this.vol_scale_factor);
 			this.linkStats1.readFile(linksAttributeFilename1);
 			
 			
@@ -190,7 +194,8 @@ public class LinkStatsAnalyser {
 				countsComparisonList, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
 		kmlWriter.setIterationNumber(this.iterationNumber);
 		kmlWriter.write(filename);
-
+		CountSimComparisonTableWriter txtWriter = new CountSimComparisonTableWriter(countsComparisonList,null);
+		txtWriter.write(filename+".txt");
 	}
 
 	/**
@@ -249,6 +254,7 @@ public class LinkStatsAnalyser {
 		System.out.println("  - The path to the output file");
 		System.out.println("  - The path to the network file");
 		System.out.println("  - The scale factor");
+		System.out.println("  - The volume scale factor");
 		System.out.println("  - The iteration number");
 		System.out.println("  - The coordinate system");
 	}
@@ -260,14 +266,14 @@ public class LinkStatsAnalyser {
 	 */
 	public static void main(final String[] args) {
 		LinkStatsAnalyser linkStatsAnalyzer = null;
-		if (args.length != 8) {
+		if (args.length != 9) {
 			printHelp();
 		}
 		else {			
 			linkStatsAnalyzer = new LinkStatsAnalyser();
 			linkStatsAnalyzer.init(args);
 			linkStatsAnalyzer.writeCountsComparisonList(linkStatsAnalyzer.outputFilename);
-			System.out.println("File written to " + linkStatsAnalyzer.outputFilename);
+			System.out.println("File written to " + linkStatsAnalyzer.outputFilename + "[.kmz|.txt|AWTV.txt]");
 		}
 	}
 }

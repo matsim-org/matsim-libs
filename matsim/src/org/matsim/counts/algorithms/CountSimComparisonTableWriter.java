@@ -23,6 +23,7 @@ package org.matsim.counts.algorithms;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -67,12 +68,17 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 	/**
    *
    * @param countSimComparisons
-	 * @param l the Locale used
+	 * @param l the Locale used, if null then DecimalFormat("#.############") is used
    */
 	public CountSimComparisonTableWriter(
 			final List<CountSimComparison> countSimComparisons, final Locale l) {
 		super(countSimComparisons);
-		this.numberFormat = NumberFormat.getInstance(l);
+		if (l == null) {
+			this.numberFormat = new DecimalFormat("#.############");
+		}
+		else {
+			this.numberFormat = NumberFormat.getInstance(l);
+		}
 	}
 
 	/**
