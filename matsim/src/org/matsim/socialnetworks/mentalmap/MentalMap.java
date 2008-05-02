@@ -44,8 +44,6 @@ import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.world.Location;
 
-import playground.jhackney.controler.SNControllerListenerRePlanSecLoc;
-
 /**
  *
  * @author fmarchal, jhackney
