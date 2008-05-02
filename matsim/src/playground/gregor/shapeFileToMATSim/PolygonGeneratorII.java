@@ -50,7 +50,7 @@ public class PolygonGeneratorII {
 	private FeatureSource featureSourceLineString;
 	private FeatureCollection collectionLineString;
 	private List<Feature> featureList;
-	private Collection<Feature> polgons;
+	private Collection<Feature> retPolygons;
 	private GeometryFactory geofac;
 	static final double CATCH_RADIUS = 0.2;
 	static final double DEFAULT_DISTANCE = 10;
@@ -67,6 +67,7 @@ public class PolygonGeneratorII {
 		this.featureSourcePolygon = po;
 		this.featureSourceLineString = ls;
 		this.geofac = new GeometryFactory();
+		this.retPolygons = new ArrayList<Feature>();
 		initFeatureGenerator();
 	}
 		
@@ -75,6 +76,7 @@ public class PolygonGeneratorII {
 		this.featureList = (List<Feature>) graph;
 		this.geofac = new GeometryFactory();
 		this.graph = true;
+		this.retPolygons = new ArrayList<Feature>();
 		initFeatureGenerator();
 	}
 	
@@ -113,7 +115,7 @@ public class PolygonGeneratorII {
 		
 		
 		createPolygonFeatures(cutPolygons(this.lineStrings,mergePolygons()));
-		return this.polgons;
+		return this.retPolygons;
 		
 //		cutPolygons(lineStrings,mergePolygons());
 //		return(genPointFeatureCollection(interPoints));
@@ -379,7 +381,14 @@ public class PolygonGeneratorII {
 						continue;
 					}
 					
-					HashSet<Polygon> cutPolys = separatePoly(poly, points);
+					HashSet<Polygon> cutPolys = null;
+					try {
+						cutPolys = separatePoly(poly, points);
+					} catch (RuntimeException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						continue;
+					}
 										
 					for(Polygon polygon : cutPolys){
 						
@@ -470,8 +479,8 @@ public class PolygonGeneratorII {
 		FeatureCollection collectionPolygon = this.featureSourcePolygon.getFeatures();
 		Envelope o = this.featureSourcePolygon.getBounds();
 		this.polygons = new HashSet<Polygon>();
-		this.polygonTree = new QuadTree<Polygon>(o.getMinX(), o.getMinY(), o.getMaxX(), o.getMaxY());
-
+		this.polygonTree = new QuadTree<Polygon>(o.getMinX(), o.getMinY(), o.getMaxX() + (o.getMaxX() - o.getMinX()), o.getMaxY() + (o.getMaxY()-o.getMinY()));
+		log.info("\t-PolygonString");
 		FeatureIterator it = collectionPolygon.features();
 		while (it.hasNext()) {
 			Feature feature = it.next();
@@ -481,8 +490,9 @@ public class PolygonGeneratorII {
 				Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
 				this.add(polygon);
 			}
+
 		}
-		
+		log.info("\t-LineString");		
 		Iterator iit;
 		if(!graph){
 			this.collectionLineString = this.featureSourceLineString.getFeatures();
@@ -491,7 +501,7 @@ public class PolygonGeneratorII {
 			iit = featureList.iterator();
 		}
 		this.lineStrings = new HashMap<Integer, LineString>();
-		this.lineTree = new QuadTree<Feature>(o.getMinX(), o.getMinY(), o.getMaxX(), o.getMaxY());
+		this.lineTree = new QuadTree<Feature>(o.getMinX(), o.getMinY(), o.getMaxX() + (o.getMaxX() - o.getMinX()), o.getMaxY() + (o.getMaxY()-o.getMinY()));
 		while (iit.hasNext()) {
 			Feature feature = (Feature) iit.next();
 			int id = (Integer) feature.getAttribute(1);
@@ -536,7 +546,7 @@ public class PolygonGeneratorII {
 			for (Iterator<Entry<Integer, Polygon>> it = polygons.entrySet().iterator() ; it.hasNext() ; ){	
 				Entry<Integer, Polygon> e = it.next();
 				Feature ft = this.ftPolygon.create(new Object [] {new MultiPolygon(new Polygon []{ e.getValue()  },this.geofac), e.getKey().toString(), 0.0, 0.0, 0},"network");
-				this.polgons.add(ft);
+				this.retPolygons.add(ft);
 			}
 		} catch (IllegalAttributeException e1) {
 			e1.printStackTrace();

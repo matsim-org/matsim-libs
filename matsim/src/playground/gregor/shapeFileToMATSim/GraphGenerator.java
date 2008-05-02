@@ -81,7 +81,7 @@ public class GraphGenerator {
 		cleanUpLineStrings();
 		checkForIntersectionsToSplit();
 		simplifyNetwork();
-		mergeNodes();
+//		mergeNodes();
 
 		return genFeatureCollection();
 	}
