@@ -127,7 +127,7 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 	}
 
 	private void writeAWTVTable(final String file) {
-		log.info("Writing 'average weekday traffic volume' to AWTV" + file);
+		log.info("Writing 'average weekday traffic volume' to " + file.substring(0,file.length()-4)+"AWTV.txt");
 
 		CountSimComparisonLinkFilter linkFilter=new CountSimComparisonLinkFilter(
 				this.countComparisonFilter.getCountsForHour(null));
