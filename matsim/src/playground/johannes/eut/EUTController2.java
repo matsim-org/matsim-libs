@@ -40,6 +40,10 @@ import org.matsim.withinday.trafficmanagement.TrafficManagement;
  *
  */
 public class EUTController2 extends WithindayControler {
+	
+	//==============================================================================
+	// private fields
+	//==============================================================================
 
 	private static final String CONFIG_MODULE_NAME = "eut";
 
@@ -60,25 +64,25 @@ public class EUTController2 extends WithindayControler {
 	private double capReduction;
 	
 	private List<Link> riskyLinks;
-	/**
-	 * @param args
-	 */
+
+	//==============================================================================
+	// 
+	//==============================================================================
+	
 	public EUTController2(String[] args) {
 		super(args);
 		setOverwriteFiles(true);
-
-
 	}
 
 	@Override
 	protected void setup() {
 		this.equipmentFraction = string2Double(getConfig().getParam(CONFIG_MODULE_NAME, "equipmentFraction"));
-//		replanningFraction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "replanFraction"));
 		this.incidentProba = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "incidentProba"));
-
 		this.rho = Integer.parseInt(getConfig().findParam(CONFIG_MODULE_NAME, "rho"));
-
-
+		this.capReduction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "capReduction"));
+		/*
+		 * Output writer for summary...
+		 */
 		this.summaryWriter = new SummaryWriter(getConfig().findParam(CONFIG_MODULE_NAME, "summaryFile"));
 		addControlerListener(this.summaryWriter);
 		super.setup();
@@ -87,21 +91,23 @@ public class EUTController2 extends WithindayControler {
 		 */
 		addControlerListener(new WithindayControlerListener());
 		/*
-		 * Trip stats...
+		 * Create a new utility function...
 		 */
 		CARAFunction utilFunction = new CARAFunction(this.rho);
+		/*
+		 * Create a router analyser...
+		 */
 		this.analyzer = new EUTRouterAnalyzer(utilFunction, this.summaryWriter);
 		addControlerListener(this.analyzer);
 		/*
-		 * Link stats...
+		 * Link variance statistics...
 		 */
 		LinkTTVarianceStats linkStats = new LinkTTVarianceStats(getTravelTimeCalculator(), 25200, 32400, 60, this.summaryWriter);
 		addControlerListener(linkStats);
 		/*
-		 * Create incident simulator...
+		 * Get the "risky" links...
 		 */
 		String linkIds = getConfig().findParam(CONFIG_MODULE_NAME, "links");
-		capReduction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "capReduction"));
 		riskyLinks = new LinkedList<Link>();
 		for(String id : linkIds.split(" ")) {
 			Link link = getNetwork().getLink(id);
@@ -112,26 +118,42 @@ public class EUTController2 extends WithindayControler {
 		 * Count agents traversed risky links...
 		 */
 		TraversedRiskyLink travRiskyLink = new TraversedRiskyLink(getPopulation(), riskyLinks, this.summaryWriter);
-
-
+		/*
+		 * Trip and score statistics...
+		 */
 		TripAndScoreStats stats = new TripAndScoreStats(this.analyzer, travRiskyLink, this.summaryWriter);
 		addControlerListener(stats);
 		this.events.addHandler(stats);
 		addControlerListener(travRiskyLink);
 		/*
-		 *
+		 * Currently disabled...
 		 */
-		String personsFile = getConfig().findParam(CONFIG_MODULE_NAME, "guidedPersons");
-		addControlerListener(new CEAnalyzer(personsFile, this.population, stats, utilFunction));
+		// String personsFile = getConfig().findParam(CONFIG_MODULE_NAME, "guidedPersons");
+		// addControlerListener(new CEAnalyzer(personsFile, this.population, stats, utilFunction));
 		/*
-		 *
+		 * Replace the default scoring function with the "risk"-scoring function.
 		 */
 		this.scoringFunctionFactory = new EUTScoringFactory(utilFunction);
 		/*
-		 *
+		 * Remove all scores in the 0-th iteration.
+		 * We have to remove duplicate plans, i.e., plans with the same route and departure time!
 		 */
 		addControlerListener(new RemoveDuplicatePlans());
 		addControlerListener(new RemoveScores());
+		/*
+		 * Travel time provider for reactive travel times.
+		 * FIXME: Need changes from Gregor!
+		 */
+//		this.reactTTs = new EstimReactiveLinkTT(null);
+//		this.events.addHandler(this.reactTTs);
+//		this.reactTTs.reset(getIteration());
+		/*
+		 * Create a new incident simulator...
+		 */
+		RandomIncidentSimulator simulator = new RandomIncidentSimulator(network, incidentProba);
+		simulator.setCapReduction(capReduction);
+		addControlerListener(simulator);
+
 	}
 
 	@Override
@@ -143,26 +165,8 @@ public class EUTController2 extends WithindayControler {
 		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
 		this.trafficManagement = new TrafficManagement();
 		sim.setTrafficManagement(this.trafficManagement);
-		/*
-		 * Initialize the reactive travel times.
-		 */
-//		this.reactTTs = new EstimReactiveLinkTT(sim.getQueueNetworkLayer());
-		this.reactTTs = new EstimReactiveLinkTT(null);
-		this.events.addHandler(this.reactTTs);
-		this.reactTTs.reset(getIteration());
-		
-		RandomIncidentSimulator simulator = new RandomIncidentSimulator(incidentProba);
-		simulator.setCapReduction(capReduction);
-		for(Link link : riskyLinks)
-//			simulator.addLink(sim.getQueueNetworkLayer().getQueueLink(link.getId()));
-			simulator.addLink(null);
-		simulator.notifyIterationStarts(EUTController.getIteration());
 		
 		sim.run();
-		
-		simulator.notifyIterationEnds(null);
-		events.removeHandler(reactTTs);
-
 	}
 
 
@@ -181,7 +185,6 @@ public class EUTController2 extends WithindayControler {
 	}
 
 	public static void main(String args[]) {
-//		EUTController controller = new EUTController(new String[]{"/Users/fearonni/vsp-work/eut/corridor/config/config.xml"});
 		EUTController2 controller = new EUTController2(args);
 		long time = System.currentTimeMillis();
 		controller.run();

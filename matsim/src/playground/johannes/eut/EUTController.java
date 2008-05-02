@@ -218,7 +218,7 @@ public class EUTController extends WithindayControler {
 		this.events.addHandler(this.reactTTs);
 		this.reactTTs.reset(getIteration());
 		
-		RandomIncidentSimulator simulator = new RandomIncidentSimulator(incidentProba);
+		RandomIncidentSimulator simulator = new RandomIncidentSimulator(network, incidentProba);
 		simulator.setCapReduction(capReduction);
 		for(Link link : riskyLinks)
 //			simulator.addLink(sim.getQueueNetworkLayer().getQueueLink(link.getId()));
@@ -227,7 +227,7 @@ public class EUTController extends WithindayControler {
 		
 		sim.run();
 		
-		simulator.notifyIterationEnds(null);
+//		simulator.notifyIterationEnds(null);
 		events.removeHandler(reactTTs);
 
 	}
