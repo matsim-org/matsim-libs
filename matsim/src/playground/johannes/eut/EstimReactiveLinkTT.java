@@ -152,7 +152,7 @@ public class EstimReactiveLinkTT implements
 			this.samples = new TreeSet<Sample>();
 			this.freeFlowTravTime = link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
 			this.currentTravelTime = this.freeFlowTravTime;
-			this.feasibleOutFlow = link.getFlowCapacity() * capacityFactor;
+			this.feasibleOutFlow = link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capacityFactor;
 			this.currentOutFlow = this.feasibleOutFlow;
 		}
 
@@ -184,9 +184,9 @@ public class EstimReactiveLinkTT implements
 				this.outCount = 0;
 
 				if(this.samples.isEmpty())
-					this.feasibleOutFlow = this.link.getFlowCapacity() * capacityFactor;
+					this.feasibleOutFlow = this.link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capacityFactor;
 				else if(this.samples.first().linkLeaveTime > time)
-					this.feasibleOutFlow = this.link.getFlowCapacity() * capacityFactor;
+					this.feasibleOutFlow = this.link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capacityFactor;
 				else
 					this.feasibleOutFlow = this.currentOutFlow;
 			}
