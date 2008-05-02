@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.basic.v01.Id;
 import org.matsim.deqsim.EventsReaderDEQv1;
@@ -48,14 +49,27 @@ public class CompareScenariosWestumfahrung {
 		private Plans plans;
 		private CalcLegTimes calcLegTimes;
 		private PlanAverageScore planAverageScore;
+		private CalcAverageTripLength calcAverageTripLength;
+
+
+//		public CaseStudyResult(String name, Plans plans,
+//		CalcLegTimes calcLegTimes, PlanAverageScore planAverageScore) {
+//		super();
+//		this.name = name;
+//		this.plans = plans;
+//		this.calcLegTimes = calcLegTimes;
+//		this.planAverageScore = planAverageScore;
+//		}
 
 		public CaseStudyResult(String name, Plans plans,
-				CalcLegTimes calcLegTimes, PlanAverageScore planAverageScore) {
+				CalcLegTimes calcLegTimes, PlanAverageScore planAverageScore,
+				CalcAverageTripLength calcAverageTripLength) {
 			super();
 			this.name = name;
 			this.plans = plans;
 			this.calcLegTimes = calcLegTimes;
 			this.planAverageScore = planAverageScore;
+			this.calcAverageTripLength = calcAverageTripLength;
 		}
 
 		public String getName() {
@@ -73,6 +87,11 @@ public class CompareScenariosWestumfahrung {
 		public PlanAverageScore getRouteSwitchersAverageScore() {
 			return planAverageScore;
 		}
+
+		public CalcAverageTripLength getCalcAverageTripLength() {
+			return calcAverageTripLength;
+		}
+
 
 	}
 
@@ -403,6 +422,8 @@ public class CompareScenariosWestumfahrung {
 
 				PlanAverageScore planAverageScore = new PlanAverageScore();
 				plansSubPop.addAlgorithm(planAverageScore);
+				CalcAverageTripLength calcAverageTripLength = new CalcAverageTripLength();
+				plansSubPop.addAlgorithm(calcAverageTripLength);
 				plansSubPop.runAlgorithms();
 
 				Events events = new Events();
@@ -410,7 +431,7 @@ public class CompareScenariosWestumfahrung {
 				CalcLegTimes calcLegTimes = new CalcLegTimes(plansSubPop);
 				events.addHandler(calcLegTimes);
 
-				results.add(new CaseStudyResult(scenarioName, plansSubPop, calcLegTimes, planAverageScore));
+				results.add(new CaseStudyResult(scenarioName, plansSubPop, calcLegTimes, planAverageScore, calcAverageTripLength));
 
 				EventsReaderDEQv1 eventsReader = new EventsReaderDEQv1(events);
 				System.out.println("events filename: " + eventsInputFilenames.get(scenarioName));
@@ -427,7 +448,7 @@ public class CompareScenariosWestumfahrung {
 
 	private void writeComparison(List<CaseStudyResult> results) {
 
-		scenarioComparisonLines.add("casestudy\tsize\tscore\ttravel");
+		scenarioComparisonLines.add("casestudy\tn_{agents}\tscore_{avg}\tt_{trip, avg}\td_{trip, avg}[m]");
 
 		for (CaseStudyResult result : results) {
 
@@ -435,7 +456,8 @@ public class CompareScenariosWestumfahrung {
 					result.getName() + "\t" + 
 					result.getRouteSwitchers().getPersons().size() + "\t" + 
 					result.getRouteSwitchersAverageScore().getAverage() + "\t" + 
-					Time.writeTime(result.calcLegTimes.getAverageTripDuration())
+					Time.writeTime(result.calcLegTimes.getAverageTripDuration()) + "\t" +
+					result.getCalcAverageTripLength().getAverageTripLength()
 			);
 
 		}
