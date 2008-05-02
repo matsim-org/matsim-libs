@@ -76,9 +76,6 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 		} else if (version.equals("v4")) {
 			this.dtd = "http://www.matsim.org/files/dtd/plans_v4.dtd";
 			this.handler = new PlansWriterHandlerImplV4();
-		} else if (version.equals("NULL")) {
-			this.dtd = "";
-			this.handler = new PlansWriterHandlerImplNIL();
 		} else {
 			throw new IllegalArgumentException("output version \"" + version + "\" not known.");
 		}
