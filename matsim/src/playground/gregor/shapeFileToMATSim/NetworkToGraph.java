@@ -92,7 +92,7 @@ public class NetworkToGraph {
 	}
 
 	private LinearRing getLinearRing(Link link) {
-		double minWidth = link.getCapacity() / GISToMatsimConverter.CAPACITY_COEF;
+		double minWidth = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / GISToMatsimConverter.CAPACITY_COEF;
 //		minWidth = 10;
 		Coordinate zero = new Coordinate(0,0);
 		Coordinate  from = new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()) ;

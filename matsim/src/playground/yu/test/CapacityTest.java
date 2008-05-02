@@ -51,7 +51,7 @@ public class CapacityTest {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outputFilename);
 			for (Link link : network.getLinks().values()) {
-				out.write(link.getId() + "\t" + link.getCapacity() + "\n");
+				out.write(link.getId() + "\t" + link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\n");
 				out.flush();
 			}
 			out.close();

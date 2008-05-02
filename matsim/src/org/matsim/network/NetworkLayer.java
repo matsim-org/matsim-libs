@@ -22,6 +22,7 @@ package org.matsim.network;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -191,8 +192,33 @@ public class NetworkLayer extends Layer implements BasicNet {
 		this.effectiveLaneWidth = effectiveLaneWidth;
 	}
 
-	public final void setNetworkChangeEvents(final Collection<NetworkChangeEvent> events) {
+	public final void setNetworkChangeEvents(final List<NetworkChangeEvent> events) {
+		if (!this.factory.isTimeVariant()) {
+			throw new RuntimeException("trying to set NetworkChangeEvents but NetworkFactory is not time variant");
+		}
+		
+		
 		this.networkChangeEvents = events;
+		for (NetworkChangeEvent event : events) {
+			for (Link link : event.getLinks()) {
+				((TimeVariantLinkImpl)link).applyEvent(event);
+			}
+		}
+	}
+	
+	public final void addNetworkChangeEvent(final NetworkChangeEvent event) {
+		if (!this.factory.isTimeVariant()) {
+			throw new RuntimeException("trying to set NetworkChangeEvents but NetworkFactory is not time variant");
+		}
+		if (this.networkChangeEvents == null) {
+			this.networkChangeEvents = new ArrayList<NetworkChangeEvent>();
+		}
+		
+		this.networkChangeEvents.add(event);
+		for (Link link : event.getLinks()) {
+			((TimeVariantLinkImpl)link).applyEvent(event);
+		}		
+		
 	}
 
 	// ////////////////////////////////////////////////////////////////////

@@ -93,12 +93,12 @@ public class LinkSetRendererLanes extends RendererA {
     		display.setTransform(linkTransform);
 
     		int cellLength_m = (int)Math.round(link.getLength_m() / link.getDisplayValueCount());
-    		int cellWidth_m = (int)Math.round(linkWidth * link.getLanesAsInt());
+    		int cellWidth_m = (int)Math.round(linkWidth * link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
     		int cellStart_m = 0;
 
     		for (int i = 0; i < link.getDisplayValueCount(); i++) {
 
-    			display.setColor(colorizer.getColor(link.getLanesAsInt()));
+    			display.setColor(colorizer.getColor(link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME)));
     			display.fillRect(cellStart_m, -cellWidth_m, cellLength_m, cellWidth_m);
 
     			display.setColor(Color.BLACK);

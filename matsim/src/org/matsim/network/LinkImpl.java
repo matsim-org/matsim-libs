@@ -67,6 +67,16 @@ public class LinkImpl extends AbstractLink {
 		if (this.permlanes < 1) { Gbl.errorMsg(this+"[permlanes="+this.permlanes+" not allowed]"); }
 
 	}
+	
+	//////////////////////////////////////////////////////////////////////
+	// print methods
+	//////////////////////////////////////////////////////////////////////	
+	public void calcFlowCapacity() {
+		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		
+		this.flowCapacity = this.capacity / capacityPeriod;
+//		log.debug("flow cap: " + this.flowCapacity);
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// print methods
@@ -94,7 +104,12 @@ public class LinkImpl extends AbstractLink {
 		return this.freespeedTravelTime;
 	}
 
-	
+	/* (non-Javadoc)
+	 * @see org.matsim.network.Link#getFlowCapacity()
+	 */
+	public final double getFlowCapacity(double time) {
+		return this.flowCapacity;
+	}
 	
 
 }

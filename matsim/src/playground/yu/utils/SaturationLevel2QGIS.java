@@ -54,12 +54,12 @@ public class SaturationLevel2QGIS {
 				Map<Id, Double> m = saturationLevels.get(i);
 				if (m != null) {
 					m.put(linkId, (double) ((v != null) ? v[i] : 0) * 10.0
-							/ link.getCapacity()
+							/ link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
 							* (double) net.getCapacityPeriod() / 3600.0);
 				} else if (m == null) {
 					m = new HashMap<Id, Double>();
 					m.put(linkId, (double) ((v != null) ? v[i] : 0) * 10.0
-							/ link.getCapacity()
+							/ link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
 							* (double) net.getCapacityPeriod() / 3600.0);
 					saturationLevels.add(i, m);
 				}

@@ -154,7 +154,7 @@ public class Subsequent extends MatsimXmlWriter {
 			if (minThetaOutNodeIds.size() == 1) {
 				String outNodeId = minThetaOutNodeIds.get(0);
 				Link outLink = findOutLink(outNodeId, l);
-				if (outLink.getCapacity() >= BETA * l.getCapacity())
+				if (outLink.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) >= BETA * l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME))
 					outLinkId = outLink.getId().toString();
 				else {
 					thetas.remove(outNodeId);
@@ -164,11 +164,11 @@ public class Subsequent extends MatsimXmlWriter {
 				String outNodeIdB = minThetaOutNodeIds.get(1);
 				Link outLinkA = findOutLink(outNodeIdA, l);
 				Link outLinkB = findOutLink(outNodeIdB, l);
-				double capA = outLinkA.getCapacity();
-				double capB = outLinkB.getCapacity();
+				double capA = outLinkA.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+				double capB = outLinkB.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 				String outLinkAId = outLinkA.getId().toString();
 				String outLinkBId = outLinkB.getId().toString();
-				if (l.getCapacity() > Math.min(capA, capB)) {
+				if (l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) > Math.min(capA, capB)) {
 					outLinkId = (capA == Math.max(capA, capB)) ? outLinkAId
 							: outLinkBId;
 				} else {

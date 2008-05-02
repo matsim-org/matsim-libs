@@ -192,11 +192,11 @@ public class NetworkFeatureFactory {
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Capacity: ");
-		buffer.append(l.getCapacity());
+		buffer.append(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Number of Lanes: ");
-		buffer.append(l.getLanes());
+		buffer.append(l.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("Length: ");

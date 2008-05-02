@@ -28,11 +28,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.matsim.utils.misc.Time;
-
 /**
  * A container class for events that represent time-variant changes for link
- * attributes.
+ * attributes (in SI units).
  * 
  * @author illenberger
  * 

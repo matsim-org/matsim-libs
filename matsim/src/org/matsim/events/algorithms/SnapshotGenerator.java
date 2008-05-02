@@ -205,10 +205,10 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			this.euklideanDist = link2.getFromNode().getCoord().calcDistance(link2.getToNode().getCoord());
 			this.radioLengthToEuklideanDist = this.link.getLength() / this.euklideanDist;
 			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed(Time.UNDEFINED_TIME);
-			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
+			this.timeCap = this.link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capCorrectionFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
 			this.effectiveCellSize = effectiveCellSize;
-			this.spaceCap = (this.link.getLength() * this.link.getLanes()) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
+			this.spaceCap = (this.link.getLength() * this.link.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME)) / this.effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
 		}
 
 		public void enter(final EventAgent agent) {
@@ -270,7 +270,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			// put all cars in the buffer one after the other
 			for (EventAgent agent : this.buffer) {
 
-				int lane = 1 + (agent.intId % this.link.getLanesAsInt());
+				int lane = 1 + (agent.intId % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 
 				int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
@@ -312,7 +312,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 				int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
 				agent.speed = speed;
-				int lane = 1 + (agent.intId % this.link.getLanesAsInt());
+				int lane = 1 + (agent.intId % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/,
 						lane, speed, PositionInfo.VehicleState.Driving,null);
@@ -324,7 +324,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			/* Put the vehicles from the waiting list in positions.
 			 * Their actual position doesn't matter, so they are just placed
 			 * to the coordinates of the from node */
-			int lane = this.link.getLanesAsInt() + 1; // place them next to the link
+			int lane = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
 			for (EventAgent agent : this.waitingQueue) {
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, this.effectiveCellSize, lane, 0.0, PositionInfo.VehicleState.Parking,null);
@@ -334,7 +334,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 			/* put the vehicles from the parking list in positions
 			 * their actual position doesn't matter, so they are just placed
 			 * to the coordinates of the from node */
-			lane = this.link.getLanesAsInt() + 2; // place them next to the link
+			lane = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
 			for (EventAgent agent : this.parkingQueue) {
 				PositionInfo position = new PositionInfo(agent.id,
 						this.link, this.effectiveCellSize, lane, 0.0, PositionInfo.VehicleState.Parking,null);
@@ -352,7 +352,7 @@ public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHand
 		 */
 		public void getVehiclePositionsEquil(final Collection<PositionInfo> positions, final double time) {
 			int cnt = this.buffer.size() + this.drivingQueue.size();
-			int nLanes = this.link.getLanesAsInt();
+			int nLanes = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 			if (cnt > 0) {
 				double cellSize = this.link.getLength() / cnt;
 				double distFromFromNode = this.link.getLength() - cellSize / 2.0;

@@ -175,7 +175,7 @@ public class CalcLinkStats {
 				out.write("\t" + link.getToNode().getId().toString());
 				out.write("\t" + Double.toString(link.getLength()));
 				out.write("\t" + Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)));
-				out.write("\t" + Double.toString(link.getCapacity()));
+				out.write("\t" + Double.toString(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)));
 
 				// HRS0-1, HRS1-2, ... HRS23-24
 //				int[] sum = {0, 0, 0};

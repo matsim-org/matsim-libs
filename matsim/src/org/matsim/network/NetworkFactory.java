@@ -99,5 +99,9 @@ public class NetworkFactory {
 		}
 
 	}
+	
+	public boolean isTimeVariant() {
+		return (this.prototypeContructor.getDeclaringClass() == TimeVariantLinkImpl.class);
+	}
 
 }

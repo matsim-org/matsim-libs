@@ -85,7 +85,7 @@ public class LinkSetRendererTRANSIMS extends RendererA {
 
             display.setTransform(linkTransform);
 
-            final int lanes = link.getLanesAsInt();
+            final int lanes = link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
             final int cellLength_m = (int)Math.round(link.getLength_m()
                     / link.getDisplayValueCount());
             final int cellWidth_m = (int)Math.round(this.laneWidth * lanes);

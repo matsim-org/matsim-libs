@@ -122,24 +122,6 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 		return events;
 	}
 	
-	/**
-	 * Parses a file with network change events and apply the events
-	 * to network
-	 * 
-	 * @param file
-	 *            a xml file containing network change events.
-	 */	
-	public void parseAndApplyEvents(String file) {
-		List<NetworkChangeEvent> events = parseEvents(file);		
-		Collections.sort(events);
-		for (NetworkChangeEvent event : events) {
-			for (Link link : event.getLinks()) {
-				((TimeVariantLinkImpl)link).applyEvent(event);
-			}
-		}
-		this.network.setNetworkChangeEvents(events);
-	}
-
 
 	@Override
 	public void parse(String filename) throws SAXException,

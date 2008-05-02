@@ -90,7 +90,7 @@ public class NetworkWriterHandlerImplTLinks {
 		this.out.write(link.getFromNode().getId() + "\t");		// NODEA
 		this.out.write(link.getToNode().getId() + "\t");		// NODEB
 		this.out.write("0\t");						// PERMLANESA
-		this.out.write(link.getLanesAsInt() + "\t");	// PERMLANESB
+		this.out.write(link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t");	// PERMLANESB
 		this.out.write("0\t");						// LEFTPCKTSA
 		this.out.write("0\t");						// LEFTPCKTSB
 		this.out.write("0\t");						// RGHTPCKTSA
@@ -101,7 +101,7 @@ public class NetworkWriterHandlerImplTLinks {
 		this.out.write("0\t");						// SETBACKA
 		this.out.write("0\t");						// SETBACKB
 		this.out.write("0\t");						// CAPACITYA
-		this.out.write((int)link.getCapacity() + "\t");	// CAPACITYB
+		this.out.write((int)link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t");	// CAPACITYB
 		this.out.write("0\t");						// SPEEDLMTA
 		this.out.write(link.getFreespeed(Time.UNDEFINED_TIME) + "\t");	// SPEEDLMTB
 		this.out.write("0\t");						// FREESPDA

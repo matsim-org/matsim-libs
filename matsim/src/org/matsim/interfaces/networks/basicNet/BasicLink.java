@@ -80,9 +80,9 @@ public interface BasicLink {
 
     public double getLength();
 
-    public double getLanes();
+    public double getLanes(double time);
     
-    public int getLanesAsInt();
+    public int getLanesAsInt(double time);
     
     
 
@@ -92,9 +92,10 @@ public interface BasicLink {
   	 * This method returns the capacity as set in the xml defining the network. Be aware
   	 * that this capacity is not normalized in time, it depends on the period set
   	 * in the network file (the capperiod attribute).
+     * @param time TODO
   	 * @return the capacity per network's capperiod timestep
   	 */
-    public double getCapacity();
+    public double getCapacity(double time);
 
     public void setFreespeed(double freespeed);
 

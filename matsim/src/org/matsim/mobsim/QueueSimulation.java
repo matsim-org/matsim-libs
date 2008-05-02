@@ -357,34 +357,10 @@ public class QueueSimulation extends Simulation {
 	private void handleNetworkChangeEvents(final double time) {
 		while (this.networkChangeEventsQueue.size() > 0 && this.networkChangeEventsQueue.peek().getStartTime() <= time){
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
-//			ChangeValue freespeedChange = event.getFreespeedChange();
-			ChangeValue lanesChange = event.getLanesChange();
-			ChangeValue flowCapacityChange = event.getFlowCapacityChange();
-			
 			for (Link link : event.getLinks()) {
-				QueueLink queueLink = this.network.getQueueLink(link.getId());
-//				if (freespeedChange != null) {
-//					queueLink.setIsUnblocked(freespeedChange.getValue() > 0.);
-//				}
-				if (lanesChange != null) {
-					if (lanesChange.getType() == NetworkChangeEvent.ChangeType.ABSOLUTE) {
-						queueLink.setLanes(lanesChange.getValue());
-					} else {
-						queueLink.scaleLanes(lanesChange.getValue());
-					}
-				}
-				if (flowCapacityChange != null) {
-					if (flowCapacityChange.getType() == NetworkChangeEvent.ChangeType.ABSOLUTE) {
-						queueLink.setSimulatedFlowCapacity(flowCapacityChange.getValue());
-					} else {
-						queueLink.scaleSimulatedFlowCapacity(flowCapacityChange.getValue());
-					}						
-				}
-				
+				this.network.getQueueLink(link.getId()).recalcTimeVariantAttributes(time);
 			}
-
 		}
-		
 	}
 	
 	public boolean addSnapshotWriter(final SnapshotWriterI writer) {

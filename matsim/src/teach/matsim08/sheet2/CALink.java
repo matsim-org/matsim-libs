@@ -127,8 +127,8 @@ public class CALink implements CANetStateWritableI, BasicLink  {
 		}
 	}
 
-	public double getCapacity() {
-		return basicLink.getCapacity();
+	public double getCapacity(double time) {
+		return basicLink.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 	}
 
 	public double getFreespeed(double time) {
@@ -143,12 +143,12 @@ public class CALink implements CANetStateWritableI, BasicLink  {
 		return basicLink.getId();
 	}
 
-	public double getLanes() {
-		return basicLink.getLanes();
+	public double getLanes(double time) {
+		return basicLink.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 	}
 
-	public int getLanesAsInt() {
-		return basicLink.getLanesAsInt();
+	public int getLanesAsInt(double time) {
+		return basicLink.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 	}
 
 	public double getLength() {

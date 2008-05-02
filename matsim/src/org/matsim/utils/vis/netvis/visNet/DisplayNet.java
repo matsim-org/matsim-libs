@@ -72,7 +72,7 @@ public class DisplayNet implements BasicNet, DisplayableNetI {
 			link2.setToNode(to);
 
 			link2.setLength_m(((Link) link).getLength());
-			link2.setLanes(((Link) link).getLanesAsInt());
+			link2.setLanes(((Link) link).getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 
 			links.put(link2.getId(), link2);
 		}

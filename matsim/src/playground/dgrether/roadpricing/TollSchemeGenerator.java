@@ -195,7 +195,7 @@ public class TollSchemeGenerator {
 	private NetworkLayer applyCapacityFilter(NetworkLayer network, double lowerBound, double upperBound) {
 		Set<Link> linksToRemove = new HashSet<Link>();
 		for (Link l : network.getLinks().values()) {
-			if ((lowerBound > l.getCapacity()) || (upperBound < l.getCapacity())) {
+			if ((lowerBound > l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)) || (upperBound < l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME))) {
 				linksToRemove.add(l);
 			}
 		}

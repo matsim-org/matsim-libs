@@ -57,12 +57,12 @@ public class GTFNetCreator {
 			Link l = network.getLink(linkId);
 			if (l != null) {
 				System.out.println("#a-->linkId:\t" + linkId + "\tcapacity:\t"
-						+ l.getCapacity());
+						+ l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 				System.out.println("greentimefraction:\t"
 						+ g.getAvgGtfs(linkId));
-				l.setCapacity(l.getCapacity() * g.getAvgGtfs(linkId));
+				l.setCapacity(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * g.getAvgGtfs(linkId));
 				System.out.println("#b-->linkId:\t" + linkId + "\tcapacity:\t"
-						+ network.getLink(linkId).getCapacity());
+						+ network.getLink(linkId).getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 				System.out.println("-------------------------");
 			}
 		}

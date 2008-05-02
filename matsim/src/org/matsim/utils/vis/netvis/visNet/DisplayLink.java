@@ -164,7 +164,7 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLink {
 		return this.toNode;
 	}
 
-	public double getCapacity() {
+	public double getCapacity(double time) {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 
@@ -188,7 +188,7 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLink {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 
-	public double getLanes() {
+	public double getLanes(double time) {
 		throw new UnsupportedOperationException("Method only implemented to fullfill requirements of BasicLinkI, which was extended after this class was written!");
 	}
 	
@@ -207,7 +207,7 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLink {
 		return this.length_m;
 	}
 
-	public int getLanesAsInt() {
+	public int getLanesAsInt(double time) {
 		return Math.round((float)Math.max(this.lanes,1.0d));
 	}
 

@@ -42,7 +42,7 @@ public abstract class AbstractLink extends BasicLinkImpl implements Link {
 
 	protected double euklideanDist;
 	
-	private double flowCapacity;
+	protected double flowCapacity;
 
 	public AbstractLink(NetworkLayer network, Id id, BasicNode from,
 			BasicNode to) {
@@ -57,13 +57,7 @@ public abstract class AbstractLink extends BasicLinkImpl implements Link {
 	//////////////////////////////////////////////////////////////////////
 
 
-	public void calcFlowCapacity() {
-		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
-		
-		this.flowCapacity = this.capacity / capacityPeriod;
-//		log.debug("flow cap: " + this.flowCapacity);
-	}
-
+	
 
 
 	/* (non-Javadoc)
@@ -96,6 +90,9 @@ public abstract class AbstractLink extends BasicLinkImpl implements Link {
 			return Math.sqrt(tmp);
 		}
 	}
+	
+
+	
 
 	//////////////////////////////////////////////////////////////////////
 	// get methods
@@ -153,12 +150,7 @@ public abstract class AbstractLink extends BasicLinkImpl implements Link {
 		return this.euklideanDist;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getFlowCapacity()
-	 */
-	public final double getFlowCapacity() {
-		return this.flowCapacity;
-	}
+
 
 	//////////////////////////////////////////////////////////////////////
 	// set methods

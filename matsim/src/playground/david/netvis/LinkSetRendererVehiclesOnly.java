@@ -91,7 +91,7 @@ public class LinkSetRendererVehiclesOnly<NET extends DisplayableNetI> extends Re
 	private void renderLink(DisplayableLinkI link, Graphics2D display, AffineTransform linkTransform) {
 
 		final int NodeWidth = 20;
-		final int lanes = link.getLanesAsInt();
+		final int lanes = link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 		final int cellLength_m = (int)Math.round(link.getLength_m());
 		final int cellWidth_m = (int)Math.round(laneWidth * lanes);
 		int cellStart_m = 0;
@@ -165,7 +165,7 @@ public class LinkSetRendererVehiclesOnly<NET extends DisplayableNetI> extends Re
 	        double dy = link.getEndEasting() - link.getStartEasting();
 	        double dx = link.getEndNorthing() - link.getStartNorthing();
 	        double sqr = Math.sqrt(dx*dx +dy*dy);
-			final double cellWidth_m = laneWidth * link.getLanesAsInt();
+			final double cellWidth_m = laneWidth * link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 
 			dx = dx*cellWidth_m/sqr;
 	        dy = -dy*cellWidth_m/sqr;
@@ -259,7 +259,7 @@ public class LinkSetRendererVehiclesOnly<NET extends DisplayableNetI> extends Re
 //					renderLink(link, display, linkTransform);
 //				}
 
-				final int lanes = link.getLanesAsInt();
+				final int lanes = link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 				/*
 				 * (2) RENDER VEHICLES
 				 *

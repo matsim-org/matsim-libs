@@ -153,7 +153,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 		Link[] altRouteLinks = this.getAlternativeRoute().getLinkRoute();
 		this.altRouteNaturalBottleNeck = altRouteLinks[0];
 		for ( int i = 1; i < altRouteLinks.length; i++ ) {
-			if ( altRouteLinks[i].getCapacity() <= this.altRouteNaturalBottleNeck.getCapacity() )
+			if ( altRouteLinks[i].getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) <= this.altRouteNaturalBottleNeck.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) )
 				this.altRouteNaturalBottleNeck = altRouteLinks[i];
 		}
 
@@ -175,7 +175,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, EventHan
 		Link[] mainRouteLinks = this.getMainRoute().getLinkRoute();
 		this.mainRouteNaturalBottleNeck = mainRouteLinks[0];
 		for ( int i = 1; i < mainRouteLinks.length; i++ ) {
-			if ( mainRouteLinks[i].getCapacity() < this.mainRouteNaturalBottleNeck.getCapacity() )
+			if ( mainRouteLinks[i].getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) < this.mainRouteNaturalBottleNeck.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) )
 				this.mainRouteNaturalBottleNeck = mainRouteLinks[i];
 		}
 	}

@@ -20,6 +20,11 @@
 
 package org.matsim.controler;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.facilities.Facilities;
@@ -36,6 +41,7 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
+import org.xml.sax.SAXException;
 
 /**
  * Provides convenient methods to load often used data. The methods ensure that possibly
@@ -120,7 +126,17 @@ public class ScenarioData {
 			
 			if (this.changEventsInputFile != null && this.isTimeVariantNetwork){
 				log.info("loading change events from " + this.changEventsInputFile);
-				new NetworkChangeEventsParser(this.network).parseAndApplyEvents(this.changEventsInputFile);
+				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(this.network);
+				try {
+					parser.parse(this.changEventsInputFile);
+				} catch (SAXException e) {
+					e.printStackTrace();
+				} catch (ParserConfigurationException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				this.network.setNetworkChangeEvents(parser.getEvents()); 
 			}
 			
 			this.networkLoaded = true;

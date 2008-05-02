@@ -42,6 +42,8 @@ public class TimeVariantLinkImpl extends AbstractLink {
 
 
 	private TreeMap<Double, Double> freespeedEvents;
+	private TreeMap<Double, Double> flowCapacityEvents;
+	private TreeMap<Double, Double> lanesEvents;
 	private TreeMap<Double, Double> freespeedTravelTime;
 	
 	private PriorityQueue<NetworkChangeEvent> changeEvents;
@@ -69,7 +71,7 @@ public class TimeVariantLinkImpl extends AbstractLink {
 
 
 		initNetworkChangeEvents();
-		calcFlowCapacity();
+//		calcFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 		// do some semantic checks
 		if (this.from.equals(this.to)) { log.warn(this + "[from=to=" + this.to + " link is a loop]"); }
 		if (this.freespeed <= 0.0) { Gbl.errorMsg(this+"[freespeed="+freespeed+" not allowed]"); }
@@ -84,6 +86,7 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		this.changeEvents = new PriorityQueue<NetworkChangeEvent>();		
 		
 		initFreespeedEvent();
+		initFlowCapacityEvent();
 		
 
 
@@ -97,6 +100,23 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		this.freespeedTravelTime = new TreeMap<Double, Double>();
 		this.freespeedTravelTime.put(-1., this.length / this.freespeed);
 		this.freespeedTravelTime.put(org.matsim.utils.misc.Time.UNDEFINED_TIME, this.length / this.freespeed);
+		
+	}
+						   
+	private void initFlowCapacityEvent() {
+		this.flowCapacityEvents = new TreeMap<Double, Double>();
+		
+		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		this.flowCapacityEvents.put(-1., this.capacity / capacityPeriod); // make sure that flowcapacity is set to 'default' flowcapacity as long as no change event occurs
+		this.flowCapacityEvents.put(org.matsim.utils.misc.Time.UNDEFINED_TIME, this.capacity / capacityPeriod); // make sure that flowcapacity is set to 'default' flowcapacity as long as no change event occurs
+		
+	}
+	
+	private void initLanesEvent() {
+		this.lanesEvents = new TreeMap<Double, Double>();
+		
+		this.lanesEvents.put(-1., this.permlanes); // make sure that flowcapacity is set to 'default' flowcapacity as long as no change event occurs
+		this.lanesEvents.put(org.matsim.utils.misc.Time.UNDEFINED_TIME, this.permlanes); // make sure that flowcapacity is set to 'default' flowcapacity as long as no change event occurs
 		
 	}
 
@@ -126,8 +146,50 @@ public class TimeVariantLinkImpl extends AbstractLink {
 
 
 
-
 //	set methods
+
+
+	public double getFlowCapacity(double time) {
+		if (this.flowCapacityEvents == null) {
+			rebuildFlowCapacityChange();
+		}
+		return this.flowCapacityEvents.floorEntry(time).getValue();
+	}
+	
+	
+	/**
+	 * This method returns the capacity as set in the xml defining the network. Be aware
+	 * that this capacity is not normalized in time, it depends on the period set
+	 * in the network file (the capperiod attribute).
+	 * @param time - the current time
+	 * @return the capacity per network's capperiod timestep
+	 */
+	@Override
+	public double getCapacity(double time) {
+		if (this.flowCapacityEvents == null) {
+			rebuildFlowCapacityChange();
+		}
+		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		return this.flowCapacityEvents.floorEntry(time).getValue() * capacityPeriod;
+	}
+
+
+	@Override
+	public double getLanes(double time) {
+		if (this.lanesEvents == null) {
+			rebuildLanesChange();
+		}
+		return this.lanesEvents.floorEntry(time).getValue();
+	}
+
+
+	@Override
+	public int getLanesAsInt(double time) {
+		if (this.lanesEvents == null) {
+			rebuildLanesChange();
+		}
+		return Math.round((float)Math.max(this.lanesEvents.floorEntry(time).getValue(),1.0d));
+	}
 
 
 	/**
@@ -144,7 +206,29 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		}else {
 			this.freespeedTravelTime.put(time,this.length/freespeed);
 		}
-
+	}
+	
+	
+	/**
+	 * This method add a new flowcapacity  change event. If there already exist an event for the given time, then
+	 * the old value will be overwritten.
+	 *
+	 *  @param time - the time on which the event occurs
+	 *  @param flowcapcity - the new flowCapacity
+	 */
+	private void addFlowCapacityEvent(final double time, final double flowCapacity) {
+		this.flowCapacityEvents.put(time, flowCapacity);
+	}
+	
+	/**
+	 * This method add a new lanes  change event. If there already exist an event for the given time, then
+	 * the old value will be overwritten.
+	 *
+	 *  @param time - the time on which the event occurs
+	 *  @param lanes - the new number of lanes
+	 */
+	private void addLanesEvent(final double time, final double lanes) {
+		this.lanesEvents.put(time, lanes);
 	}
 
 	/**
@@ -152,7 +236,7 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	 *
 	 * @param event
 	 */
-	public void applyEvent(NetworkChangeEvent event) {
+	/*package*/ protected void applyEvent(NetworkChangeEvent event) {
 		
 		this.changeEvents.add(event);
 		
@@ -161,10 +245,10 @@ public class TimeVariantLinkImpl extends AbstractLink {
 			this.freespeedTravelTime = null;
 		}
 		if (event.getFlowCapacityChange() != null) {
-			log.warn("FlowCapacityChange will be ignored in TimeVariantLinkImpl. The functionality is implemented in QueueSimulation");
+			this.flowCapacityEvents = null;
 		}
 		if (event.getLanesChange() != null) {
-			log.warn("LanesChange will be ignored in TimeVariantLinkImpl. The functionality is implemented in QueueSimulation");
+			this.lanesEvents = null;
 		}
 
 	}
@@ -190,8 +274,53 @@ public class TimeVariantLinkImpl extends AbstractLink {
 
 			}
 		}
-		
 	}
+	
+	private void rebuildFlowCapacityChange() {
+		
+		
+		PriorityQueue<NetworkChangeEvent> events = new PriorityQueue<NetworkChangeEvent>(this.changeEvents);
+		this.initFlowCapacityEvent();
+		while (events.peek() != null) {
+			NetworkChangeEvent event = events.poll();
+			if (event.getFlowCapacityChange() != null) {
+				ChangeValue flowCapacityChange = event.getFlowCapacityChange();
+				double currentFlowCapacity = getFlowCapacity(event.getStartTime());
+				if (flowCapacityChange.getType() == NetworkChangeEvent.ChangeType.FACTOR){
+					this.addFlowCapacityEvent(event.getStartTime(),currentFlowCapacity * flowCapacityChange.getValue());
+				} else {
+					this.addFlowCapacityEvent(event.getStartTime(), flowCapacityChange.getValue());
+				}
+
+			}
+		}
+	}
+	
+	private void rebuildLanesChange() {
+		
+		
+		PriorityQueue<NetworkChangeEvent> events = new PriorityQueue<NetworkChangeEvent>(this.changeEvents);
+		this.initLanesEvent();
+		while (events.peek() != null) {
+			NetworkChangeEvent event = events.poll();
+			if (event.getLanesChange() != null) {
+				ChangeValue lanesChange = event.getLanesChange();
+				double currentLanes = getLanes(event.getStartTime());
+				if (lanesChange.getType() == NetworkChangeEvent.ChangeType.FACTOR){
+					this.addLanesEvent(event.getStartTime(),currentLanes * lanesChange.getValue());
+				} else {
+					this.addLanesEvent(event.getStartTime(), lanesChange.getValue());
+				}
+
+			}
+		}
+	}
+	
+	public void calcFlowCapacity() {
+		rebuildFlowCapacityChange();
+	}
+	
+	
 //	print methods
 
 	@Override
@@ -206,6 +335,9 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		"[origid=" + this.origid + "]" +
 		"[type=" + this.type + "]";
 	}
+
+
+
 
 
 

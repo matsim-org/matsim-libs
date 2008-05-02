@@ -141,12 +141,12 @@ public class NetworkWriteETwithCounts extends NetworkAlgorithm {
 				Node t = l.getToNode();
 				this.out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				this.out_l.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\t" + l.getLength() + "\t");
-				this.out_l.write(l.getFreespeed(Time.UNDEFINED_TIME) + "\t" + (l.getCapacity()/capperiod) + "\t" + l.getLanesAsInt() + "\t1\n");
+				this.out_l.write(l.getFreespeed(Time.UNDEFINED_TIME) + "\t" + (l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + l.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t1\n");
 				this.out_l.flush();
 
 				this.out_et.write(l.getId() + "\t" + l.getFromNode().getId() + "\t" + l.getToNode().getId() + "\t");
 				this.out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed(Time.UNDEFINED_TIME)*3.6) + "\t");
-				this.out_et.write(Math.round(l.getCapacity()/capperiod) + "\t" + l.getLanesAsInt() + "\t");
+				this.out_et.write(Math.round(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + l.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t");
 				this.out_et.write(l.getOrigId() + "\t" + l.getType() + "\t" + maxvol + "\t");
 				this.out_et.write(f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				this.out_et.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\n");

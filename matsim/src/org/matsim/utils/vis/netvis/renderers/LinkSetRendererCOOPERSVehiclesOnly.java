@@ -107,7 +107,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 	        double dy = link.getEndEasting() - link.getStartEasting();
 	        double dx = link.getEndNorthing() - link.getStartNorthing();
 	        double sqr = Math.sqrt(dx*dx +dy*dy);
-			final double cellWidth_m = laneWidth * link.getLanesAsInt();
+			final double cellWidth_m = laneWidth * link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 
 			dx = dx*cellWidth_m/sqr;
 	        dy = -dy*cellWidth_m/sqr;
@@ -165,7 +165,7 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 				if (lin2trans != null) linkTransform.concatenate(lin2trans);
 				display.setTransform(linkTransform);
 
-				final int lanes = link.getLanesAsInt();
+				final int lanes = link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 				/*
 				 * (2) RENDER VEHICLES
 				 *

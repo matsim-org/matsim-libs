@@ -238,7 +238,7 @@ public class MyMonsterClass {
 		System.out.println("  done.");
 		for (Link link : network.getLinks().values()) {
 			link.setFreespeed(1.666);
-			link.setCapacity(link.getCapacity() * 8.19 );
+			link.setCapacity(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * 8.19 );
 		}
 		NetworkWriter nw = new NetworkWriter(network,"./networks/evacuationnet_zurich_navteq.xml");
 		nw.write();
@@ -461,7 +461,7 @@ public class MyMonsterClass {
 					oneWay.add(oneWayLink);
 					one++;
 				}else {
-					link.setCapacity(link.getCapacity()*2);
+					link.setCapacity(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)*2);
 					two++;
 				}
 				EvacuationAreaLink el = new EvacuationAreaLink((IdImpl) link.getId(),3600.0 * 11 + 85*60);
@@ -483,7 +483,7 @@ int three=0;
 		while (oneWayLink != null){
 			Node toNode = oneWayLink.getFromNode();
 			Node fromNode = oneWayLink.getToNode();
-			Link testlink = network.createLink(oneWayLink.getId().toString() + "666", fromNode.getId().toString(), toNode.getId().toString(),((Double) oneWayLink.getLength()).toString(), ((Double)oneWayLink.getFreespeed(Time.UNDEFINED_TIME)).toString(),((Double)oneWayLink.getCapacity()).toString(), ((Integer)oneWayLink.getLanesAsInt()).toString(), oneWayLink.getOrigId() + "666",oneWayLink.getType());
+			Link testlink = network.createLink(oneWayLink.getId().toString() + "666", fromNode.getId().toString(), toNode.getId().toString(),((Double) oneWayLink.getLength()).toString(), ((Double)oneWayLink.getFreespeed(Time.UNDEFINED_TIME)).toString(),((Double)oneWayLink.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)).toString(), ((Integer)oneWayLink.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME)).toString(), oneWayLink.getOrigId() + "666",oneWayLink.getType());
 
 			EvacuationAreaLink el = new EvacuationAreaLink((IdImpl) testlink.getId(),3600.0 * 11 + 85*60);
 			links.put(el.getId(),el);
@@ -816,8 +816,8 @@ int three=0;
 											.getToNode().getId().toString(),
 									Double.toString(link.getLength()),
 									Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)),
-									Double.toString(link.getCapacity()),
-									Integer.toString(link.getLanesAsInt()),
+									Double.toString(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)),
+									Integer.toString(link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME)),
 									link.getOrigId(), link.getType());
 							extracted++;
 							if (extracted % 1000 == 0)

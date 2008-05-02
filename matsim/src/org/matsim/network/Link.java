@@ -28,12 +28,13 @@ public interface Link extends BasicLink, Location {
 	 * capacity of vehicles per second. Be aware that it will not consider the
 	 * capacity reduction factors set in the config and used in the simulation. If interested
 	 * in this values, check the appropriate methods of QueueLink.
+	 * @param time
 	 * @return the flow capacity of this link per second
 	 */
-	public double getFlowCapacity();
+	public double getFlowCapacity(double time);
 
 	public void setRole(final int idx, final Object role);
-
+	
 	public void setMaxRoleIndex(final int index);
 	/**
 	 * Get the the freespeed travel time on this links in seconds.

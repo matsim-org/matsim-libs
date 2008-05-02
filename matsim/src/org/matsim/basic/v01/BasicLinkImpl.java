@@ -92,9 +92,11 @@ implements BasicLink
 	 * This method returns the capacity as set in the xml defining the network. Be aware
 	 * that this capacity is not normalized in time, it depends on the period set
 	 * in the network file (the capperiod attribute).
+	 * 
+ 	 * @param time - the current time
 	 * @return the capacity per network's capperiod timestep
 	 */
-	public double getCapacity() {
+	public double getCapacity(double time) {
 		return this.capacity;
 	}
 
@@ -103,6 +105,9 @@ implements BasicLink
 	}
 	/**
 	 * This method returns the freespeed velocity in meter per seconds.
+	 * 
+	 * @param time - the current time
+	 * @return freespeed
 	 */
 	public double getFreespeed(final double time) {
 		return this.freespeed;
@@ -124,11 +129,11 @@ implements BasicLink
 
 	//TODO permlanes should be refectored to lanes or getLanes() and so on to getPermLanes() [GL]
 
-	public double getLanes() {
+	public double getLanes(double time) {
 		return this.permlanes;
 	}
 
-	public int getLanesAsInt() {
+	public int getLanesAsInt(double time) {
 		return Math.round((float)Math.max(this.permlanes,1.0d));
 	}
 

@@ -77,7 +77,7 @@ public class NetworkCalibrationWithCounts extends NetworkAlgorithm {
 //						int time = h*3600-1800;
 						int time_end = h*3600-1;
 //						System.out.println("lcap="+l.getCapacity()+";vol("+h+")="+c.getVolume(h));
-						double val = c.getVolume(h).getValue()/(l.getCapacity()/network.getCapacityPeriod()*3600);
+						double val = c.getVolume(h).getValue()/(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)/network.getCapacityPeriod()*3600);
 						if (val >= 1.0) { System.out.println("csid="+c.getCsId()+";locid="+c.getLocId()+": val="+val); }
 						if (val < 0.01) { val = 0.01; }
 						out.write("\t\t<gtf time=\""+Time.writeTime(time_start)+"\" val=\""+val+"\"/>\n");
@@ -105,7 +105,7 @@ public class NetworkCalibrationWithCounts extends NetworkAlgorithm {
 	@Override
 	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
-		for (Link l : network.getLinks().values()) { l.setCapacity(l.getCapacity()*1.5); }
+		for (Link l : network.getLinks().values()) { l.setCapacity(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)*1.5); }
 		this.writeGTFfile(network);
 		System.out.println("    done.");
 	}

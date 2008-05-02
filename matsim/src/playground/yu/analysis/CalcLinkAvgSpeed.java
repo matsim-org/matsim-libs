@@ -228,7 +228,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 					.getLinks()).values() : this.interestLinks)) {
 				Id linkId = l.getId();
 				StringBuffer line = new StringBuffer(linkId.toString() + "\t"
-						+ l.getCapacity());
+						+ l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 				for (int j = 0; j < this.nofBins - 1; j++) {
 					double speed = getAvgSpeed(linkId, (double) j * 3600);
 					line.append("\t" + speed);

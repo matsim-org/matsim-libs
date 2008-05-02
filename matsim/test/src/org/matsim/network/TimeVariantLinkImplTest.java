@@ -20,10 +20,16 @@
 
 package org.matsim.network;
 
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.NetworkChangeEvent.ChangeType;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
+
+import com.lowagie.text.html.simpleparser.ALink;
 
 /**
  * @author mrieser
@@ -243,10 +249,9 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	}
 
 	/**
-//	 * Tests whether an absolute change to the flow capacity really can be observed on the link when
-//	 * no end-time for the change is specified.
-//	 */
-	public void disabled_testFlowCapChangeAbsoluteNoEnd() {
+	 * Tests whether an absolute change to the flow capacity really can be observed on the link .
+	 */
+	public void testFlowCapChangeAbsolute() {
 		NetworkFactory nf = new NetworkFactory();
 		nf.setLinkPrototype(TimeVariantLinkImpl.class);
 		final NetworkLayer network = new NetworkLayer(nf);
@@ -257,20 +262,19 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createLink("1", "1", "2", "100", "10", "3600", "1", null, null);
 
 		// test base values
-		assertEquals(3600.0, link.getCapacity(), EPSILON);
-		assertEquals(1.0, link.getFlowCapacity(), EPSILON);
+		assertEquals(3600.0, link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(1.0, link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
 
 		// add an absolute change
 		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
 		change.addLink(link);
-		change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 7200));
+		change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 2));
 		link.applyEvent(change);
 
 		// do the tests
-		fail("time-dependent getters are missing!");
-		assertEquals(3600.0, link.getCapacity(), EPSILON);
-		assertEquals(1.0, link.getFlowCapacity(), EPSILON);
-		assertEquals(2.0, link.getFlowCapacity(), EPSILON);
+		assertEquals(3600.0, link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(1.0, link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(2.0, link.getFlowCapacity(7*3600), EPSILON);
 
 		// test derived values
 		// TODO test flowcap by sending vehicles through the link, this requires to create a queuenetwork from this time-variant network
@@ -279,10 +283,9 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	// TODO additional tests for flowCap once there are useful implementations
 
 	/**
-	 * Tests whether an absolute change to the number of lanes really can be observed on the link when
-	 * no end-time for the change is specified.
+	 * Tests whether an absolute change to the number of lanes really can be observed on the link.
 	 */
-	public void disabled_testLanesChangeAbsoluteNoEnd() {
+	public void testLanesChangeAbsolute() {
 		NetworkFactory nf = new NetworkFactory();
 		nf.setLinkPrototype(TimeVariantLinkImpl.class);
 		final NetworkLayer network = new NetworkLayer(nf);
@@ -293,7 +296,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createLink("1", "1", "2", "100", "10", "3600", "1", null, null);
 
 		// test base values
-		assertEquals(1.0, link.getLanes(), EPSILON);
+		assertEquals(1.0, link.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
 
 		// add an absolute change
 		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
@@ -302,14 +305,116 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		link.applyEvent(change);
 
 		// do the tests
-		fail("time-dependent getters are missing!");
-		assertEquals(1.0, link.getLanes(), EPSILON);
-		assertEquals(2.0, link.getLanes(), EPSILON);
+		assertEquals(1.0, link.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(2.0, link.getLanes(7*3600), EPSILON);
 
 		// test derived values
 		// TODO e.g. test storage capacity on a queuelink based on this time-variant link
 	}
 
-	// TODO additional tests for lanes once there are useful implementations
+	
+	
+	//////////////////////////////////////////////////////////////////////
+	// Time variant tests on QueueLink
+	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Tests the change of storage capacity if a lanes change event occurs   
+	 */
+	public void testStorageCapacity() {
+		loadConfig(null);
+
+		// create a network
+		NetworkFactory nf = new NetworkFactory();
+		nf.setLinkPrototype(TimeVariantLinkImpl.class);
+		final NetworkLayer network = new NetworkLayer(nf);
+		network.setCapacityPeriod(3600.0);
+		Gbl.getWorld().setNetworkLayer(network);
+
+		// the network has 2 nodes and 1 link, the length is 75 and has by default 4 lanes with a lanes with a cell size of 7.5 m --> storage cap = 40
+		network.createNode("1", "0", "0", null);
+		network.createNode("2", "100", "0", null);
+		Link link = network.createLink("1", "1", "2", "75", "10", "3600", "4", null, null);
+		// add a lanes change to 2 at 8am.
+		NetworkChangeEvent change1 = new NetworkChangeEvent(8*3600.0);
+		change1.addLink(link);
+		change1.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, 2));
+		network.addNetworkChangeEvent(change1);
+		// scale lanes by 0.5 at 10am.
+		NetworkChangeEvent change2 = new NetworkChangeEvent(10*3600.0);
+		change2.addLink(link);
+		change2.setLanesChange(new ChangeValue(ChangeType.FACTOR, 0.5));
+		network.addNetworkChangeEvent(change2);
+		
+		
+		QueueNetworkLayer qNetwork = new QueueNetworkLayer(network);
+		QueueLink qLink = qNetwork.getQueueLink(new IdImpl("1"));
+		qLink.finishInit();
+		
+		// the qLink has to be triggered if a network change event occurs - usually this is handled by the qsim
+		// default 
+		assertEquals(40.,qLink.getSpaceCap(),EPSILON);
+		// tests if storage cap is still O.K. if the qlink is triggered for another reason before 8am
+		qLink.recalcTimeVariantAttributes(7*3600.0);
+		assertEquals(40.,qLink.getSpaceCap(),EPSILON);
+		
+		// 8am
+		qLink.recalcTimeVariantAttributes(8*3600.0);
+		assertEquals(20.,qLink.getSpaceCap(),EPSILON);
+		// 10am
+		qLink.recalcTimeVariantAttributes(10*3600.0);
+		assertEquals(10.,qLink.getSpaceCap(),EPSILON);
+		//it's also possible to move backward in time ...
+		qLink.recalcTimeVariantAttributes(7*3600.0);
+		assertEquals(40., qLink.getSpaceCap(), EPSILON);		
+	}
+	
+	/**
+	 * Tests the change of flow capacity
+	 */
+	public void testFlowCapacity(){
+		loadConfig(null);
+
+		// create a network
+		NetworkFactory nf = new NetworkFactory();
+		nf.setLinkPrototype(TimeVariantLinkImpl.class);
+		final NetworkLayer network = new NetworkLayer(nf);
+		network.setCapacityPeriod(3600.0);
+		Gbl.getWorld().setNetworkLayer(network);
+
+		// the network has 2 nodes and 1 link, the length is 75 and has  a flow capacity of 1 Veh/s by default
+		network.createNode("1", "0", "0", null);
+		network.createNode("2", "100", "0", null);
+		Link link = network.createLink("1", "1", "2", "75", "10", "3600", "4", null, null);
+		// add a flow capacity change to 2 Veh/s at 8am.
+		NetworkChangeEvent change1 = new NetworkChangeEvent(8*3600.0);
+		change1.addLink(link);
+		change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 2));
+		network.addNetworkChangeEvent(change1);
+		// add a flow capacity change factor of 0.5 at 10am.
+		NetworkChangeEvent change2 = new NetworkChangeEvent(10*3600.0);
+		change2.addLink(link);
+		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 0.5));
+		network.addNetworkChangeEvent(change2);
+		
+		QueueNetworkLayer qNetwork = new QueueNetworkLayer(network);
+		QueueLink qLink = qNetwork.getQueueLink(new IdImpl("1"));
+		qLink.finishInit();
+		
+		//default
+		assertEquals(1., qLink.getSimulatedFlowCapacity(), EPSILON);
+		// 7am
+		qLink.recalcTimeVariantAttributes(7*3600.0);
+		assertEquals(1., qLink.getSimulatedFlowCapacity(), EPSILON);
+		// 8am
+		qLink.recalcTimeVariantAttributes(8*3600.0);
+		assertEquals(2., qLink.getSimulatedFlowCapacity(), EPSILON);		
+		// 10am
+		qLink.recalcTimeVariantAttributes(10*3600.0);
+		assertEquals(1., qLink.getSimulatedFlowCapacity(), EPSILON);
+		//it's also possible to move backward in time ...
+		qLink.recalcTimeVariantAttributes(8*3600.0);
+		assertEquals(2., qLink.getSimulatedFlowCapacity(), EPSILON);		
+		
+	}
 }

@@ -65,11 +65,11 @@ public class NetworkAdjuster {
 			String to = link.getToNode().getId().toString();
 			String length = Double.toString(link.getLength());
 			String freespeed =  Double.toString(link.getFreespeed(org.matsim.utils.misc.Time.UNDEFINED_TIME));
-			String capacity = Double.toString(link.getCapacity());
+			String capacity = Double.toString(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 			String origid = link.getOrigId();
 			String type = link.getType();
 			
-			double min_width = link.getCapacity() / this.flowCap;
+			double min_width = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / this.flowCap;
 			double storage = min_width * link.getLength() * this.storageCap;
 			double laneCap = this.network.getEffectiveLaneWidth() * link.getLength() * this.storageCap;
 			

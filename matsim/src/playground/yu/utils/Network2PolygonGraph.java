@@ -84,7 +84,7 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 
 	private LinearRing getLinearRing(Link link) {
 
-		double minWidth = link.getCapacity() / network.getCapacityPeriod()
+		double minWidth = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / network.getCapacityPeriod()
 				* 3600.0 / 50.0;
 
 		Coordinate from = new Coordinate(link.getFromNode().getCoord().getX(),
@@ -123,7 +123,7 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 			o[2] = link.getFromNode().getId().toString();
 			o[3] = link.getToNode().getId().toString();
 			o[4] = link.getLength();
-			o[5] = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
+			o[5] = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / network.getCapacityPeriod() * 3600.0;
 			o[6] = Integer.parseInt(link.getType());
 			o[7] = link.getFreespeed(0);
 			for (int i = 0; i < parameters.size(); i++) {

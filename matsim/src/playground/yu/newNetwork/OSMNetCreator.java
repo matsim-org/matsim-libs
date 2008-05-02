@@ -37,20 +37,20 @@ public class OSMNetCreator {
 
 	private void resetCapacity(Link link) {
 		if (link.getType().equals("80")) {
-			if (link.getCapacity() / capperiod < 2000.0) {
+			if (link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod < 2000.0) {
 				System.out.print("link " + link.getId().toString()
-						+ " capacity from " + link.getCapacity() / capperiod
+						+ " capacity from " + link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod
 						+ " to ");
 				link.setCapacity(2000.0 * capperiod);
-				System.out.println(link.getCapacity() / capperiod);
+				System.out.println(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod);
 			}
 		} else if (link.getType().equals("81")) {
-			if (link.getCapacity() / capperiod > 600.0) {
+			if (link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod > 600.0) {
 				System.out.print("link " + link.getId().toString()
-						+ " capacity from " + link.getCapacity() / capperiod
+						+ " capacity from " + link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod
 						+ " to ");
 				link.setCapacity(600.0 * capperiod);
-				System.out.println(link.getCapacity() / capperiod);
+				System.out.println(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod);
 			}
 		}
 	}
@@ -88,12 +88,12 @@ public class OSMNetCreator {
 			upgraded++;
 			Link l = network.getLink(linkId);
 			if (l != null) {
-				if (l.getCapacity() / capperiod < 2000.0) {
+				if (l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod < 2000.0) {
 					System.out.print("link " + l.getId().toString()
-							+ " capacity from " + l.getCapacity() / capperiod
+							+ " capacity from " + l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod
 							+ " to ");
 					l.setCapacity(2000.0 * capperiod);
-					System.out.println(l.getCapacity() / capperiod);
+					System.out.println(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod);
 				}
 			}
 		}
@@ -105,12 +105,12 @@ public class OSMNetCreator {
 			degraded++;
 			Link l = network.getLink(linkId);
 			if (l != null) {
-				if (l.getCapacity() / capperiod > 600.0) {
+				if (l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod > 600.0) {
 					System.out.print("link " + l.getId().toString()
-							+ " capacity from " + l.getCapacity() / capperiod
+							+ " capacity from " + l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod
 							+ " to ");
 					l.setCapacity(600.0 * capperiod);
-					System.out.println(l.getCapacity() / capperiod);
+					System.out.println(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / capperiod);
 				}
 			}
 		}

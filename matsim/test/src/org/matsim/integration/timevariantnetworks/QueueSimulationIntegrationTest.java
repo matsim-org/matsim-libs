@@ -73,7 +73,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
 		change.addLink(link2);
 		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
-		link2.applyEvent(change);
+		network.addNetworkChangeEvent(change);
 
 		// create a population
 		Plans plans = new Plans(Plans.NO_STREAMING);

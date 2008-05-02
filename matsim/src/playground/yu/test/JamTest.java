@@ -57,7 +57,7 @@ public class JamTest extends Controler {
 					for (int i = 6; i < 10; i++) {
 						sb.append("\t" + v[i]);
 					}
-					out.write(linkId + "\t" + n.getLink(linkId).getCapacity()
+					out.write(linkId + "\t" + n.getLink(linkId).getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
 							/ 100.0 + sb + "\n");
 					out.flush();
 				}

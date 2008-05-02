@@ -22,12 +22,15 @@ package playground.gregor.shapeFileToMATSim;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 
@@ -55,5 +58,7 @@ public class ShapeFileReader {
 
 
 
-	}   
+	}
+	
+	
 }

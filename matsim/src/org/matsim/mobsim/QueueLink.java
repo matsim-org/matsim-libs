@@ -133,8 +133,8 @@ public class QueueLink {
 		 * moved capacity calculation to two methods, to be able to call it from
 		 * outside e.g. for reducing cap in case of an incident
 		 */
-		initFlowCapacity();
-		recalcCapacity();
+		initFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+		recalcCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 	}
 
 	public Link getLink() {
@@ -145,16 +145,16 @@ public class QueueLink {
 		return this.toQueueNode;
 	}
 
-	private void initFlowCapacity() {
+	private void initFlowCapacity(final double time) {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double flowCapFactor = Gbl.getConfig().simulation().getFlowCapFactor();
 
 		// multiplying capacity from file by simTickCapFactor **and** flowCapFactor:
-		this.simulatedFlowCapacity = this.link.getFlowCapacity()
+		this.simulatedFlowCapacity = this.link.getFlowCapacity(time)
 				* SimulationTimer.getSimTickTime() * flowCapFactor;
 	}
 
-	private void recalcCapacity() {
+	private void recalcCapacity(final double time) {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
@@ -163,7 +163,7 @@ public class QueueLink {
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
-		this.storageCapacity = (this.link.getLength() * this.link.getLanes())
+		this.storageCapacity = (this.link.getLength() * this.link.getLanes(time))
 				/ ((NetworkLayer) this.link.getLayer()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
@@ -175,7 +175,7 @@ public class QueueLink {
 		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap TWO times
 		 * the flowCap to handle the flowCap.
 		 */
-		if (this.storageCapacity < this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME) * this.simulatedFlowCapacity) {
+		if (this.storageCapacity < this.getLink().getFreespeedTravelTime(time) * this.simulatedFlowCapacity) {
 			if (spaceCapWarningCount <= 10) {
 				log.warn("Link " + this.link.getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
 				if (spaceCapWarningCount == 10) {
@@ -183,12 +183,14 @@ public class QueueLink {
 				}
 				spaceCapWarningCount++;
 			}
-			this.storageCapacity = this.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME)
+			this.storageCapacity = this.getLink().getFreespeedTravelTime(time)
 					* this.simulatedFlowCapacity;
 		}
 	}
 
 	/**
+	 * This method is deprecated and should be removed in future ...  
+	 * 
 	 * This method will scale the simulated flow capacity by the given factor, and
 	 * recalculate the timeCapCeil and Fraction attributes of QueueLink.
 	 * Furthermore it checks the storage Capacity of the link and change it if
@@ -196,59 +198,20 @@ public class QueueLink {
 	 *
 	 * @param factor
 	 */
+	@Deprecated
 	public void scaleSimulatedFlowCapacity(final double factor) {
-		this.link.setCapacity(link.getCapacity() * factor);
+		this.link.setCapacity(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * factor);
 		this.link.calcFlowCapacity();
-		initFlowCapacity();
-		recalcCapacity();
-	}
-	
-	/**
-	 * This method will set the simulated flow capacity to the given value, and
-	 * recalculate the timeCapCeil and Fraction attributes of QueueLink.
-	 * Furthermore it checks the storage Capacity of the link and change it if
-	 * needed.
-	 *
-	 * @param value
-	 */
-	public void setSimulatedFlowCapacity(final double value) {
-		this.link.setCapacity(value);
-		this.link.calcFlowCapacity();
-		initFlowCapacity();
-		recalcCapacity();
-	}
-	
-	/**
-	 * This method will scale the number of lanes by the given factor, and
-	 * recalculate the timeCapCeil and Fraction attributes of QueueLink.
-	 * Furthermore it checks the storage Capacity of the link and change it if
-	 * needed.
-	 *
-	 * @param factor
-	 */
-	public void scaleLanes(final double factor) {
-		this.link.setLanes(this.link.getLanes() * factor);
-		recalcCapacity();
-	}
-	
-	/**
-	 * This method will set the number of lanes to the given value, and
-	 * recalculate the timeCapCeil and Fraction attributes of QueueLink.
-	 * Furthermore it checks the storage Capacity of the link and change it if
-	 * needed.
-	 *
-	 * @param value
-	 */
-	public void setLanes(final double value) {
-		this.link.setLanes(value);
-		recalcCapacity();
+		initFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+		recalcCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 	}
 	
 	
-	
-	
-	
-	
+	public void recalcTimeVariantAttributes(final double now) {
+		initFlowCapacity(now);
+		recalcCapacity(now);
+	}
+
 
 	// ////////////////////////////////////////////////////////////////////
 	// Is called after link has been read completely
@@ -611,7 +574,7 @@ public class QueueLink {
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.buffer) {
 
-			int lane = 1 + (veh.getID() % this.link.getLanesAsInt());
+			int lane = 1 + (veh.getID() % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 
 			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(Time.UNDEFINED_TIME);
@@ -658,7 +621,7 @@ public class QueueLink {
 					+ this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(now);
 			veh.setSpeed(speed);
-			int lane = 1 + (veh.getID() % this.link.getLanesAsInt());
+			int lane = 1 + (veh.getID() % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link, distanceOnLink,
 					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
 			positions.add(position);
@@ -670,7 +633,7 @@ public class QueueLink {
 		 * position doesn't matter, so they are just placed to the coordinates of
 		 * the from node
 		 */
-		int lane = this.link.getLanesAsInt() + 1; // place them next to the link
+		int lane = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
 		for (Vehicle veh : this.waitingList) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
 					((NetworkLayer) this.link.getLayer()).getEffectiveCellSize(), lane, 0.0,
@@ -683,7 +646,7 @@ public class QueueLink {
 		 * doesn't matter, so they are just placed to the coordinates of the from
 		 * node
 		 */
-		lane = this.link.getLanesAsInt() + 2; // place them next to the link
+		lane = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
 		for (Vehicle veh : this.parkingList) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
 					((NetworkLayer) this.link.getLayer()).getEffectiveCellSize(), lane, 0.0,
@@ -705,7 +668,7 @@ public class QueueLink {
 	public void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
 		double time = SimulationTimer.getTime();
 		int cnt = this.buffer.size() + this.vehQueue.size();
-		int nLanes = this.link.getLanesAsInt();
+		int nLanes = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 		if (cnt > 0) {
 			double cellSize = this.link.getLength() / cnt;
 			double distFromFromNode = this.link.getLength() - cellSize / 2.0;

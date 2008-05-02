@@ -95,7 +95,7 @@ public class NetworkWriteVolumesAsTable extends NetworkAlgorithm {
 
 				if (r.nextDouble() > 0.99) {
 					for (int i=0; i<3600*24; i=i+30*60) {
-						double cap_max = l.getCapacity()/capperiod/2;
+						double cap_max = l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)/capperiod/2;
 						double cap = r.nextDouble() * cap_max;
 						out.write("st" + l_id + "\t" + l_id + "\t" + i + "\t" + (i+30*60) + "\t" + cap + "\n");
 						out.flush();

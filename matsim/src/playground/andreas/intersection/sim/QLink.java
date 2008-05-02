@@ -40,7 +40,7 @@ public class QLink extends QueueLink {
 		// Original LinkErstellen
 		originalLink = new PseudoLink(this, true);
 		// Konfigurieren
-		if(! originalLink.recalculatePseudoLinkProperties(0., this.getLink().getLength(), this.getLink().getLanesAsInt(), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getLink().getFlowCapacity(),effectiveCelleSize)) {
+		if(! originalLink.recalculatePseudoLinkProperties(0., this.getLink().getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getLink().getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME),effectiveCelleSize)) {
 
 			if ( spaceCapWarningCount <=10 ) {
 				log.warn("Link " + this.getLink().getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
@@ -136,7 +136,7 @@ public class QLink extends QueueLink {
 						originalLink.addDestLink(this.getLink().getToNode().getOutLinks().get(signalLane.getLinkId()));
 
 						newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h,effectiveCelleSize);
-						originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(), this.getLink().getLanesAsInt(), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getSimulatedFlowCapacity(),effectiveCelleSize);
+						originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getSimulatedFlowCapacity(),effectiveCelleSize);
 
 						pseudoLinksList.add(newNodePseudoLink);
 						firstNodeLinkInitialized = true;

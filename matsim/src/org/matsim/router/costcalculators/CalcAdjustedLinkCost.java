@@ -44,7 +44,7 @@ public class CalcAdjustedLinkCost implements TravelCostI {
 	}
 
 	public double getLinkTravelCost(final Link link, final double time) {
-		double factor = (4000.0/3600.0*this.flowCapFactor - link.getCapacity())*0.1 + 1.0;
+		double factor = (4000.0/3600.0*this.flowCapFactor - link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME))*0.1 + 1.0;
 		return this.baseCost.getLinkTravelCost(link, time) * factor;
 	}
 
