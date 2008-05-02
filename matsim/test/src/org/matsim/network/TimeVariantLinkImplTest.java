@@ -29,8 +29,6 @@ import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 
-import com.lowagie.text.html.simpleparser.ALink;
-
 /**
  * @author mrieser
  * @author laemmel
