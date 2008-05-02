@@ -19,8 +19,9 @@ public class CompareSelectedPlansTable {
 
 	private Plans plans0;
 	private Plans plans1;
-	private String header="person_id\tsex\tage\tlicense\tcaravail\t" +
-			"employed\thomex\thomey\thomelink\tscore0\tscore1\ttraveltime0\ttraveltime1\t";
+	private String header="personid\tsex\tage\tlicense\tcaravail\t" +
+			"employed\thomex\thomey\thomelink\tscore0\tscore1\tplantraveltime0\tplantraveltime1\t" +
+			"plantraveldistance0\tplantraveldistance1\tnumberoftrips0\tnumberoftrips1";
 	private NetworkLayer network;
 
 
@@ -69,7 +70,8 @@ public class CompareSelectedPlansTable {
 	private void writeSummaryFile(String outfile) {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outfile);
-			out.write(this.header + "\n");
+			out.write(this.header);
+			out.newLine();
 
 			for (Id person_id : this.plans0.getPersons().keySet()) {
 
@@ -100,8 +102,15 @@ public class CompareSelectedPlansTable {
 
 				out.write(this.getTravelTime(person)+"\t");
 				out.write(this.getTravelTime(person_comp)+"\t");
-
-				out.write("\n");
+				
+				out.write(this.getTravelDist(person)+"\t");
+				out.write(this.getTravelDist(person_comp)+"\t");
+				
+				out.write(this.getNumberOfTrips(person)+"\t");
+				// TODO: using newline(). But still a tab is necessary (!?) Correct that later.
+				out.write(this.getNumberOfTrips(person_comp)+"\t");
+				
+				out.newLine();
 				out.flush();
 			}
 			out.close();
@@ -111,6 +120,10 @@ public class CompareSelectedPlansTable {
 		}
 	}
 
+	/*  TODO: Put the next three methods into a "stats" class and use  
+	 *  traveltime, numberOfTrips and traveldist as attributes.
+	 *  At the moment it is "nicer" to have everything in one single class */
+	
 	private double getTravelTime(Person person) {
 
 		double travelTime=0.0;
@@ -121,6 +134,31 @@ public class CompareSelectedPlansTable {
 		}
 		return travelTime;
 	}
+	
+	private double getTravelDist(Person person) {
+
+		double travelDist=0.0;
+		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
+				
+		while (leg_it.hasNext()) {
+			Leg leg = (Leg)leg_it.next();
+			travelDist+=leg.getRoute().getDist();
+		}
+		return travelDist;
+	}
+	
+	private int getNumberOfTrips(Person person) {
+
+		int numberOfLegs=0;
+		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
+		while (leg_it.hasNext()) {
+			leg_it.next();
+			numberOfLegs++;
+		}
+		return numberOfLegs;
+	}
+	
+	// --------------------------------------------------------------------------
 
 	private void run(String plansfilePath0, String plansfilePath1, String outfile, String networkPath) {
 		this.init(networkPath);
