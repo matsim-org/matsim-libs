@@ -138,22 +138,28 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			}
 					
 			// generating a random bike ownership (see STRC2007 paper Ciari for more details)
+//			boolean has_bike = true;
 			boolean has_bike = false;
-			if (Gbl.random.nextDouble() < 0.70) { has_bike = true; }			
+			if (Gbl.random.nextDouble() < 0.54) { has_bike = true; }			
 //			
+//			boolean ride_possible = true;
 			boolean ride_possible = false;
 			double rd2 = Gbl.random.nextDouble ();
-			if (rd2 < 0.30) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership 
-			// at the houshold level or something similar 
-						
-			boolean pt = false; // Should be substituted with actual access to pt;
-			double rd3 = Gbl.random.nextDouble (); 
-			if (plan.getPerson().getCarAvail().equals("always")) {
-				if (rd3 < 0.40) {pt = true; System.out.println("random = " + rd3);}
-				System.out.println("pt = " + pt );
+			if (plan.getPerson().hasLicense()) {}
+			else {
+				if (rd2 < 0.54) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership 
 			}
-			else if (rd3 < 0.90) {pt =true;}
-			//else {pt =true;}	
+			
+			// at the houshold level or something similar 
+			boolean pt = true;			
+//			boolean pt = false; // Should be substituted with actual access to pt;
+//			double rd3 = Gbl.random.nextDouble (); 
+//			if (plan.getPerson().getCarAvail().equals("always")) {
+//				if (rd3 < 0.40) {pt = true; System.out.println("random = " + rd3);}
+//				System.out.println("pt = " + pt );
+//			}
+//			else if (rd3 < 0.90) {pt =true;}
+//			//else {pt =true;}	
 			
 			if (sub.getPrev_subtour()<5){
 				if (i>=1) {
@@ -183,7 +189,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 //			if (rd4<0.70) {udeg=3;}
 //			if (rd4<0.63) {udeg=4;}
 //			if (rd4<.30) {udeg=5;}
-					
+//					
 			
 			Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
 			ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());

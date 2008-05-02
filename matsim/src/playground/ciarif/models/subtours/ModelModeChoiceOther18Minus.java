@@ -92,11 +92,14 @@ public class ModelModeChoiceOther18Minus extends ModelModeChoice {
 
 	@Override
 	protected final double calcCarRideUtil() {
-		double util = 0.0;
-		util += B3_CONST * 1.0;
-		if (age <= 12 & age >= 6 ) { util += B3_6_12 * 1.0; }
-		//System.out.println("Util ride = " + util);
-		return util;
+		if (ride) {
+			double util = 0.0;
+			util += B3_CONST * 1.0;
+			if (age <= 12 & age >= 6 ) { util += B3_6_12 * 1.0; }
+			//System.out.println("Util ride = " + util);
+			return util;
+		}
+		else {return Double.NEGATIVE_INFINITY;}
 	}
 }
 
