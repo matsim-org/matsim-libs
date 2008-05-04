@@ -690,8 +690,8 @@ public class PolygonGeneratorII {
 					
 					if(!polygon.isEmpty()){	
 //						if (lsId == 2409) 
-//						polygon = setAdditionalIntersects(polygon,ls.getStartPoint());
-//						polygon = setAdditionalIntersects(polygon,ls.getEndPoint());
+						polygon = setAdditionalIntersects(polygon,ls.getStartPoint());
+						polygon = setAdditionalIntersects(polygon,ls.getEndPoint());
 	
 //						polygon.
 						returnPolys.put( id ,polygon);
