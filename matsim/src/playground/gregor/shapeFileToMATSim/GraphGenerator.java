@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryRegistryException;
@@ -69,32 +70,86 @@ public class GraphGenerator {
 	private QuadTree<LineString> tree;
 
 	private GeometryFactory geofac;
+	
+	private final static double MIN_LENGTH = 3.0;	
 
 	public GraphGenerator(FeatureSource featureSource) {
 		this.geofac = new GeometryFactory();
 		this.featureSource = featureSource;
+		log.setLevel(Level.INFO);
 
 	}
 
 	public Collection<Feature> createGraph() throws Exception {
 		parseLineStrings();
+		 deleteToShortLineStrings();
 		cleanUpLineStrings();
 		checkForIntersectionsToSplit();
 		simplifyNetwork();
-//		mergeNodes();
+		mergeNodes();
 
 		return genFeatureCollection();
 	}
+	
+	private void deleteToShortLineStrings(){
+//		int rm = 0;
+		
+		log.info("removing very short LineStrings ...");
+		ConcurrentLinkedQueue<LineString> lineStringsQueue = new ConcurrentLinkedQueue<LineString>(this.lineStrings);
+		while (lineStringsQueue.peek() != null) {
+			LineString ls = lineStringsQueue.poll();
+			if (ls.getLength() >= MIN_LENGTH) {
+				continue;
+			}
+//			System.out.println("removed: " + ++rm);
+			remove(ls);
+			
+			Point sp = ls.getStartPoint();
+			Point ep = ls.getEndPoint();
+			
+			double joinX = (sp.getCoordinate().x + ep.getCoordinate().x) / 2;
+			double joinY = (sp.getCoordinate().y + ep.getCoordinate().y) / 2;
+			
+			Collection<LineString> stmp = this.tree.get(sp.getX(), sp.getY(), GISToMatsimConverter.CATCH_RADIUS);
+			for (LineString tmpLs : stmp) {
+				if (tmpLs.getStartPoint().distance(sp) < tmpLs.getEndPoint().distance(sp)) {
+					tmpLs.getStartPoint().getCoordinate().x = joinX;
+					tmpLs.getStartPoint().getCoordinate().y = joinY;
+				} else {
+					tmpLs.getEndPoint().getCoordinate().x = joinX;
+					tmpLs.getEndPoint().getCoordinate().y = joinY;					
+				}
+				tmpLs.geometryChanged();
+			}
+			Collection<LineString> etmp = this.tree.get(ep.getX(), ep.getY(), GISToMatsimConverter.CATCH_RADIUS);
+			for (LineString tmpLs : etmp) {
+				if (tmpLs.getStartPoint().distance(ep) < tmpLs.getEndPoint().distance(ep)) {
+					tmpLs.getStartPoint().getCoordinate().x = joinX;
+					tmpLs.getStartPoint().getCoordinate().y = joinY;
+				} else {
+					tmpLs.getEndPoint().getCoordinate().x = joinX;
+					tmpLs.getEndPoint().getCoordinate().y = joinY;					
+				}
+				tmpLs.geometryChanged();
+			}			
+
+		}
+		
+		log.info("done.");
+		
+		
+	}
+	
 
 	private void cleanUpLineStrings() {
 		log.info("removing redundant points ...");
-		Iterator<LineString> it = this.lineStrings.iterator();
-		ConcurrentLinkedQueue<LineString> lineStringsQueue = new ConcurrentLinkedQueue<LineString>();
-		while (it.hasNext()) {
-			lineStringsQueue.add((LineString) it.next());
-		}
+		ConcurrentLinkedQueue<LineString> lineStringsQueue = new ConcurrentLinkedQueue<LineString>(this.lineStrings);
 		while (lineStringsQueue.peek() != null) {
 			LineString ls = lineStringsQueue.poll();
+			if (ls.getNumPoints() <= 2) {
+				log.debug("LineString consists of 2 points only - ignoring!!");
+				continue;
+			}
 			Point p = ls.getStartPoint();
 			Vector<Coordinate> coords = new Vector<Coordinate>();
 			coords.add(p.getCoordinate());
@@ -116,29 +171,34 @@ public class GraphGenerator {
 				for (int i = 0; i < coords.size(); i++) {
 					carray[i] = coords.elementAt(i);
 				}
-				LineString cleanLs = this.geofac.createLineString(carray);
-				add(cleanLs);
+				try {
+					LineString cleanLs = this.geofac.createLineString(carray);
+					add(cleanLs);
+				} catch (RuntimeException e) {
+					e.printStackTrace();
+					add(ls);
+				}
 			}
 		}
 		log.info("done.");
 	}
 
 	private void simplifyNetwork() {
+
 		log.info("unifying fragmented links...");
-		Iterator<LineString> it = this.lineStrings.iterator();
-		ConcurrentLinkedQueue<LineString> lineStringsQueue = new ConcurrentLinkedQueue<LineString>();
-		while (it.hasNext()) {
-			lineStringsQueue.add((LineString) it.next());
-		}
+		ConcurrentLinkedQueue<LineString> lineStringsQueue = new ConcurrentLinkedQueue<LineString>(this.lineStrings);
 		while (lineStringsQueue.peek() != null) {
 			LineString ls = lineStringsQueue.poll();
-			Collection<LineString> tmp = this.tree.get(ls.getStartPoint()
-					.getX(), ls.getStartPoint().getY(), GISToMatsimConverter.CATCH_RADIUS);
+			Collection<LineString> tmp = this.tree.get(ls.getStartPoint().getX(), ls.getStartPoint().getY(), GISToMatsimConverter.CATCH_RADIUS);
+			
+			
+			
 			if (tmp.size() != 2) {
 				tmp = this.tree.get(ls.getEndPoint().getX(), ls.getEndPoint()
 						.getY(), GISToMatsimConverter.CATCH_RADIUS);
 			}
 			if (tmp.size() == 2) {
+
 				for (LineString neighbor : tmp) {
 					if (neighbor.equals(ls)) {
 						continue;
@@ -148,12 +208,28 @@ public class GraphGenerator {
 					LineString union = catAtTouchPoint(ls, neighbor);
 					add(union);
 					lineStringsQueue.add(union);
-					break;
+
 				}
 
 			}
 
 		}
+//		for (LineString ls : this.lineStrings) {
+//			Collection<LineString> tmp = this.tree.get(ls.getStartPoint().getX(), ls.getStartPoint().getY(), GISToMatsimConverter.CATCH_RADIUS);
+//			
+//			
+//			
+//			if (tmp.size() != 2) {
+//				tmp = this.tree.get(ls.getEndPoint().getX(), ls.getEndPoint()
+//						.getY(), GISToMatsimConverter.CATCH_RADIUS);
+//			}
+//			if (tmp.size() == 2) {
+//				System.err.println("this is not possible!!!");
+//				
+//			}
+//		}
+		
+		
 		log.info("done.");
 	}
 
