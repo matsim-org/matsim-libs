@@ -20,9 +20,10 @@ public class RetailerControlerListener implements StartupListener,IterationEndsL
 			retailers_parser.readFile("input/retailers.txt"); //TODO Now is hard coded but should use a config file
 		}
 
-		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			// TODO Auto-generated method stub
 			
 		}
+
+	
 }
