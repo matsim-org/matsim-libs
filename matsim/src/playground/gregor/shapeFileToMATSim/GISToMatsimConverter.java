@@ -54,7 +54,7 @@ public class GISToMatsimConverter {
 	
 	public GISToMatsimConverter(){
 //		this("./padang/padang_streets.shp","./padang/vd10_streetnetwork_padang_v0.5_utm47s.shp");
-		this("./padang/converter/p.shp", "./padang/converter/d_ls.shp");
+		this("./padang/converter/p.shp", "./padang/converter/ls.shp");
 //		this("./padang/testcase1/simple/simpleIV.shp", "./padang/testcase1/simpleline/simplelineIV.shp" );
 //		this("./padang/test4poly.shp", "./padang/test8line.shp");
 	}
@@ -82,14 +82,15 @@ public class GISToMatsimConverter {
 	}
 	
 	private void processData() throws Exception {
-//		GraphGenerator gg = new GraphGenerator(features.get(linestringFile));
-//		Collection<Feature> graph =  gg.createGraph();
+		GraphGenerator gg = new GraphGenerator(features.get(linestringFile));
+		Collection<Feature> graph =  gg.createGraph();
 //		ShapeFileWriter.writeGeometries(graph, "./padang/converter/d_ls.shp");
 //		ShapeFileWriter.writeGeometries(graph, "./padang/testPadangLine.shp");
 		
 //		features.get(linestringFile);
 		
-		PolygonGeneratorII polyGen = new PolygonGeneratorII(features.get(linestringFile) ,features.get(polygonFile));
+//		PolygonGeneratorII polyGen = new PolygonGeneratorII(features.get(linestringFile) ,features.get(polygonFile));
+		PolygonGeneratorII polyGen = new PolygonGeneratorII(graph,features.get(polygonFile));
 		Collection<Feature> polyGraph = polyGen.generatePolygons();
 
 //		ShapeFileWriter.writeGeometries(polyGraph, "./padang/testSimpleControlPoly2.shp");

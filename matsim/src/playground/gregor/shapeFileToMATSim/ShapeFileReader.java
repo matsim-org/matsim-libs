@@ -22,15 +22,12 @@ package playground.gregor.shapeFileToMATSim;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Collection;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 
 
@@ -42,7 +39,7 @@ public class ShapeFileReader {
 
 	public static FeatureSource readDataFile(String fileName) throws Exception {
 
-
+		log.info("reading features from: " + fileName);
 
 		File dataFile = new File(fileName);
 
@@ -52,9 +49,11 @@ public class ShapeFileReader {
 		DataStore dataStore = DataStoreFinder.getDataStore( connect );
 		String[] typeNames = dataStore.getTypeNames ();
 		String typeName = typeNames[0];
-		log.info( "Reading content "+ typeName);// + " ... performing coordinate transformation if needed");
+		FeatureSource fs = dataStore.getFeatureSource( typeName ); 
 
-		return dataStore.getFeatureSource( typeName );
+		log.info("done.");
+
+		return fs;
 
 
 
