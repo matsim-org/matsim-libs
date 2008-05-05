@@ -11,8 +11,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.NetVis;
 
-import teach.matsim08.network.*;
-
 
 class CALink implements CANetStateWritableI {	
 	
