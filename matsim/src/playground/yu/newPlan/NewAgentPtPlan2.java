@@ -30,7 +30,6 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
-import org.matsim.plans.Plan.Type;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PersonAlgorithmI;
 
@@ -115,7 +114,7 @@ public class NewAgentPtPlan2 extends PersonAlgorithm implements
 		this.pw.writePerson(person);
 	}
 
-	static Type getPlanType(String mode) {
+	static Plan.Type getPlanType(String mode) {
 		if (BasicLeg.MIVMODE.equalsIgnoreCase(mode))
 			return Plan.Type.CAR;
 		else if (BasicLeg.CARMODE.equalsIgnoreCase(mode))
