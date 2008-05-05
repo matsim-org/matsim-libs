@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.BasicRoute;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
@@ -72,20 +73,22 @@ public class AvoidOldNodes extends NewPlan {
 		for (Plan p : person.getPlans()) {
 			for (LegIterator i = p.getIteratorLeg(); i.hasNext();) {
 				BasicLeg bl = i.next();
-				tag: for (final Node n : (ArrayList<Node>) (bl.getRoute()
-						.getRoute())) {
-					final String nId = n.getId().toString();
-					for (String nodeId : nodeIds) {
-						if (nId.equals(nodeId)) {
-							nullRoute = true;
-							break tag;
+				BasicRoute br = bl.getRoute();
+				if (br != null) {
+					tag: for (final Node n : (ArrayList<Node>) (br.getRoute())) {
+						final String nId = n.getId().toString();
+						for (String nodeId : nodeIds) {
+							if (nId.equals(nodeId)) {
+								nullRoute = true;
+								break tag;
+							}
 						}
 					}
+					if (nullRoute) {
+						bl.setRoute(null);
+						nullRoute = false;
+					}
 				}
-
-				if (nullRoute)
-					bl.setRoute(null);
-				nullRoute = false;
 			}
 		}
 		this.pw.writePerson(person);
