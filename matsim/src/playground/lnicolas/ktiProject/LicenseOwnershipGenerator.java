@@ -79,12 +79,12 @@ public class LicenseOwnershipGenerator extends MobilityResourceGenerator impleme
 
 			double r = Gbl.random.nextDouble();
 			if (r < hasLicenseProbability) {
-				person.setLicense("yes");
+				person.setLicence("yes");
 			} else {
-				person.setLicense("no");
+				person.setLicence("no");
 			}
 		} else {
-			person.setLicense("no");
+			person.setLicence("no");
 		}
 	}
 
