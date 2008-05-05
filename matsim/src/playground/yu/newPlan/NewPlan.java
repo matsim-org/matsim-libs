@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MATSimNet2ShapeDemo.java
+ * NewPlan.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,25 +21,31 @@
 /**
  * 
  */
-package playground.yu.utils;
+package playground.yu.newPlan;
+
+import org.matsim.plans.Plans;
+import org.matsim.plans.PlansWriter;
+import org.matsim.plans.algorithms.PersonAlgorithm;
 
 /**
- * This class can convert a MATSim-network to a QGIS .shp-file
- * 
- * @author ychen
+ * @author yu
  * 
  */
-public class MATSimNet2QGISDemo {
-	public static String ch1903 = "PROJCS[\"CH1903_LV03\",GEOGCS[\"GCS_CH1903\",DATUM[\"D_CH1903\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Hotine_Oblique_Mercator_Azimuth_Center\"],PARAMETER[\"False_Easting\",600000],PARAMETER[\"False_Northing\",200000],PARAMETER[\"Scale_Factor\",1],PARAMETER[\"Azimuth\",90],PARAMETER[\"Longitude_Of_Center\",7.439583333333333],PARAMETER[\"Latitude_Of_Center\",46.95240555555556],UNIT[\"Meter\",1],AUTHORITY[\"EPSG\",\"21781\"]]";
+public abstract class NewPlan extends PersonAlgorithm {
+	protected PlansWriter pw;
 
-	public static void main(String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
-		// ///////////////////////////////////////////////////
-		// write MATSim-network to Shp-file
-		// ///////////////////////////////////////////////////
-		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu-flama-noUetli.xml");
-		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile("../schweiz-ivtch/network/ivtch-osm-wu-flama-noUetli.shp");
-		System.out.println("done.");
+	/**
+	 * 
+	 */
+	public NewPlan(Plans plans) {
+		pw = new PlansWriter(plans);
+		pw.writeStartPlans();
+	}
+
+	public NewPlan() {
+	}// dummy constructor
+
+	public void writeEndPlans() {
+		pw.writeEndPlans();
 	}
 }
