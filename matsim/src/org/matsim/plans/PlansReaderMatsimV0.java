@@ -26,6 +26,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -126,7 +127,7 @@ public class PlansReaderMatsimV0 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new Person(atts.getValue("id"),null,null,null,null,null);
+		this.currperson = new Person(new IdImpl(atts.getValue("id")),null,0,null,null,null);
 	}
 
 	private void startPlan(final Attributes atts) {

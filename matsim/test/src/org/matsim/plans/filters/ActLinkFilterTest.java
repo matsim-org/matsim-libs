@@ -56,7 +56,7 @@ public class ActLinkFilterTest extends MatsimTestCase {
 		String linkId = null;
 		String actType = null;
 		for (String personId : new String[]{"1", "2"}) {
-			Person person = new Person(personId, "f", "30", "yes", "yes", "yes");
+			Person person = new Person(new IdImpl(personId), "f", 30, "yes", "yes", "yes");
 			Plan plan = person.createPlan("0.0", "yes");
 			if (personId.equals("1")) {
 				linkId = "1";

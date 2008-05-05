@@ -23,6 +23,7 @@ package playground.andreas.intersection;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
@@ -88,7 +89,7 @@ public class PlansGeneratorControler extends Controler {
 
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Plans population) {
-		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
+		Person p = new Person(new IdImpl(String.valueOf(ii)), "m", 12, "yes", "always", "yes");
 		Plan plan = new Plan(p);
 		try {
 			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60., Time.UNDEFINED_TIME, true);

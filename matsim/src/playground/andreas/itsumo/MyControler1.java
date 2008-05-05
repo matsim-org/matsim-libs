@@ -23,6 +23,7 @@ package playground.andreas.itsumo;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
@@ -107,7 +108,7 @@ public class MyControler1 extends Controler {
 
 
 		for (int i=0; i<100; i++) {
-			Person p = new Person(String.valueOf(i+1), "m", "12", "yes", "always", "yes");
+			Person p = new Person(new IdImpl(String.valueOf(i+1)), "m", 12, "yes", "always", "yes");
 
 			try {
 				Plan plan1 = new Plan(p);
@@ -305,7 +306,7 @@ public class MyControler1 extends Controler {
 	}
 
 	private void generatePerson(final int ii, final LinkImpl sourceLink, final LinkImpl destLink, final Plans population){
-		Person p = new Person(String.valueOf(ii), "m", "12", "yes", "always", "yes");
+		Person p = new Person(new IdImpl(String.valueOf(ii)), "m", 12, "yes", "always", "yes");
 		Plan plan = new Plan(p);
 		try {
 			plan.createAct("h", 100., 100., sourceLink, 0., 0*60*60., 0., true);

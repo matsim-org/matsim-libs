@@ -27,10 +27,18 @@ package org.matsim.basic.v01;
 
 public interface BasicPopulation<T extends BasicPerson> {
 
+	public String getName();
+	
+	public void setName(String name);
+	
 	public void addPerson(T person) throws Exception;
 
 	public T getPerson(Id personId);
 
 	public T getPerson(String personId);
+
+	public void setRefLayer(String layer);
+	
+	public String getRefLayer();
 
 }

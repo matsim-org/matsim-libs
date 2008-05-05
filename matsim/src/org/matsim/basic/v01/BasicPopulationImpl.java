@@ -26,7 +26,13 @@ import java.util.TreeMap;
 
 public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulation<T> {
 	
+	private String name = null;
+
+	
 	protected Map<Id, T> persons = new TreeMap<Id, T>();
+
+
+	private String layerName;
 
 	
     /////////////////////////////////////////////////
@@ -61,4 +67,21 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 	protected void clearPersons() {
 		persons.clear();
 	}
+	
+	public final String getName() {
+		return this.name;
+	}
+
+	public final void setName(final String name) {
+		this.name = name;
+	}
+
+	public String getRefLayer() {
+		return this.layerName;
+	}
+
+	public void setRefLayer(String layer) {
+		this.layerName = layer;
+	}
+
 }

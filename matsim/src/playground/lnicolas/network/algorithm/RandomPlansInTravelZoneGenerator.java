@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -71,7 +72,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 		int roleIndex = network.requestNodeRole();
 
 		Plans plans = new Plans();
-		Person person = new Person("1", "f", "26", "yes", "always", "yes");
+		Person person = new Person(new IdImpl("1"), "f", 26, "yes", "always", "yes");
 		Plan plan = person.createPlan(null, "yes");
 		try {
 			plans.addPerson(person);

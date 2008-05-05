@@ -26,6 +26,8 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicPopulation;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
@@ -57,7 +59,7 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 	private final static String LEG = "leg";
 	private final static String ROUTE = "route";
 
-	private final Plans plans;
+	private final BasicPopulation plans;
 	private Person currperson = null;
 	private Knowledge currknowledge = null;
 	private ActivitySpace curractspace = null;
@@ -73,8 +75,8 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 
 	private int warnPlanTypeCount = 0;
 
-	public PlansReaderMatsimV4(final Plans plans) {
-		this.plans = plans;
+	public PlansReaderMatsimV4(final BasicPopulation pop) {
+		this.plans = pop;
 	}
 
 	@Override
@@ -172,7 +174,11 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new Person(atts.getValue("id"), atts.getValue("sex"), atts.getValue("age"),
+		String ageString = atts.getValue("age");
+		int age = Integer.MIN_VALUE;
+		if (ageString != null)
+			age = Integer.parseInt(ageString);
+		this.currperson = new Person(new IdImpl(atts.getValue("id")), atts.getValue("sex"), age,
 				atts.getValue("license"), atts.getValue("car_avail"), atts.getValue("employed"));
 	}
 

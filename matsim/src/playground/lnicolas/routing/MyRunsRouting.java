@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -473,7 +474,7 @@ public class MyRunsRouting extends MyRuns {
 		try {
 
 			for (int j = 0; j < tripCount; j++) {
-				Person person = new Person(j + "", null, null, null, null, null);
+				Person person = new Person(new IdImpl(Integer.toString(j)), null, 0, null, null, null);
 				Plan plan = person.createPlan(null, "yes");
 
 				int choice = (int) (Math.random() * links.size());

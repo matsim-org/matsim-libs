@@ -29,12 +29,14 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 	protected List<T> plans = new ArrayList<T>(6);
 	protected T selectedPlan = null;
 	protected Id id;
+	private String sex;
+	private int age = Integer.MIN_VALUE;
+	private String license;
+	private String carAvail;
+	private String employed;
 
-	public BasicPersonImpl(final String id) {
-		this(new IdImpl(id));
-	}
 
-	public BasicPersonImpl(final IdImpl id) {
+	public BasicPersonImpl(final Id id) {
 		this.id = id;
 	}
 
@@ -91,4 +93,53 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 		this.id = new IdImpl(idstring);
 	}
 
+	public final String getSex() {
+		return this.sex;
+	}
+
+	public final int getAge() {
+		return this.age;
+	}
+
+	public final String getLicense() {
+		return this.license;
+	}
+
+	public final boolean hasLicense() {
+		return ("yes".equals(this.license));
+	}
+
+	public final String getCarAvail() {
+		return this.carAvail;
+	}
+
+	public final String getEmployed() {
+		return this.employed;
+	}
+
+	public final boolean isEmpoyed() {
+		return ("yes".equals(this.employed));
+	}
+
+	public void setAge(final int age) {
+		this.age = age;
+	}
+
+	public final void setSex(final String sex) {
+		this.sex = (sex == null) ? null : sex.intern();
+	}
+
+	public final void setLicence(final String licence) {
+		this.license = (licence == null) ? null : licence.intern();
+	}
+
+	public final void setCarAvail(final String carAvail) {
+		this.carAvail = (carAvail == null) ? null : carAvail.intern();
+	}
+
+	public final void setEmployed(final String employed) {
+		this.employed = (employed == null) ? null : employed.intern();
+	}
+
+	
 }

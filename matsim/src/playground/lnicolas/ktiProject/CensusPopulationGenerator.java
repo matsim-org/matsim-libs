@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -337,8 +338,8 @@ public class CensusPopulationGenerator {
 						license = "yes";
 					}
 
-					Person person = new Person(Integer.toString(id), sex,
-							Integer.toString(age), license, car, employed);
+					Person person = new Person(new IdImpl(Integer.toString(id)), sex,
+							age, license, car, employed);
 					person.setNationality(nationality);
 //							nationality, null, Integer.toString(hh_personCount),
 //							Integer.toString(hh_kidCount));

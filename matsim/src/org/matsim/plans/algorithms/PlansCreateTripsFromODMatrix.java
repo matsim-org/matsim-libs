@@ -22,6 +22,7 @@ package org.matsim.plans.algorithms;
 
 import java.util.ArrayList;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -85,7 +86,7 @@ public class PlansCreateTripsFromODMatrix extends PlansAlgorithm {
 					while (sum >= 1.0) {
 						counter++;
 						sum--;
-						Person person = new Person(Integer.toString(counter), null/*sex*/, null/*age*/, null/*license*/, "yes"/*car_avail*/, "yes"/*employed*/);
+						Person person = new Person(new IdImpl(Integer.toString(counter)), null/*sex*/, 0/*age*/, null/*license*/, "yes"/*car_avail*/, "yes"/*employed*/);
 						Plan plan = person.createPlan(null, "yes");
 						CoordI coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
 						int endTime = -1;

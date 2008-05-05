@@ -276,7 +276,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		Person realperson = this.realplans.getPerson(personId);
 		if (realperson == null) {
 			try {
-				realperson = new Person(personId, null, null, null, null, null);
+				realperson = new Person(new IdImpl(personId), null, 0, null, null, null);
 				realperson.createPlan(null, "yes");
 				this.realplans.addPerson(realperson);
 			} catch (Exception e) {

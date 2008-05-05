@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -256,8 +257,8 @@ public class DatapulsPopulationGenerator {
 			if (pInfo.getIsEmployed() == false) {
 				employed = "no";
 			}
-			Person person = new Person(Integer.toString(personID), pInfo.getSex(),
-					Integer.toString(pInfo.getAge()), null, null, employed);
+			Person person = new Person(new IdImpl(Integer.toString(personID)), pInfo.getSex(),
+					pInfo.getAge(), null, null, employed);
 			person.setNationality(pInfo.getNationality());
 //					pInfo.getNationality(), Double.toString(bInfo.getBuyingValuePerHH()),
 //					Integer.toString(hInfo.getPersonCount()), Integer.toString(hInfo.getKidCount()));

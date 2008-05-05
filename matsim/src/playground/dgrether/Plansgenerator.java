@@ -20,6 +20,7 @@
 
 package playground.dgrether;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -61,7 +62,7 @@ public class Plansgenerator {
 		this.plans = new Plans(false);
 		int homeEndtime = 6 * 3600;
 		for (int i = 1; i <= 100; i++) {
-			Person p = new Person(String.valueOf(i), null, null, "yes", "always", "yes");
+			Person p = new Person(new IdImpl(String.valueOf(i)), null, 0, "yes", "always", "yes");
 			Plan plan = new Plan(p);
 			p.addPlan(plan);
 			//home

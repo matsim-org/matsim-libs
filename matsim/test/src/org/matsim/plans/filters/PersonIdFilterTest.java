@@ -22,6 +22,7 @@ package org.matsim.plans.filters;
 
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.plans.Person;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -36,7 +37,7 @@ public class PersonIdFilterTest extends MatsimTestCase {
 		// create fixture: 4 persons with special ids
 		TreeMap<String, Person> persons = new TreeMap<String, Person>();
 		for (String personId : new String[]{"1", "2102002002", "30", "3030"}) {
-			persons.put(personId, new Person(personId, "f", "30", "yes", "yes", "yes"));
+			persons.put(personId, new Person(new IdImpl(personId), "f", 30, "yes", "yes", "yes"));
 		}
 
 		PersonIdFilter tenDigitIdFilter = new PersonIdFilter("[0-9]{10}", null);

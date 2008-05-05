@@ -49,4 +49,29 @@ public interface BasicPerson<T extends BasicPlan> {
 
 	public void setId(final String idstring);
 
+	public String getSex();
+
+	public int getAge();
+
+	public String getLicense(); 
+
+	public boolean hasLicense(); 
+
+	public String getCarAvail();
+
+	public String getEmployed();
+
+	public boolean isEmpoyed(); 
+
+	public void setAge(final int age); 
+
+	public void setSex(final String sex); 
+
+	public void setLicence(final String licence); 
+
+	public void setCarAvail(final String carAvail); 
+
+	public void setEmployed(final String employed); 
+
+	
 }

@@ -32,7 +32,7 @@ public class PersonTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_nullType() {
-		Person person = new Person("1", "m", "35", "yes", "yes", "yes");
+		Person person = new Person(new IdImpl("1"), "m", 35, "yes", "yes", "yes");
 
 		Plan plan1 = new Plan("15.0", person);
 		Plan plan2 = new Plan("22.0", person);
@@ -81,7 +81,7 @@ public class PersonTest extends MatsimTestCase {
 		 * plan4: b,  1.0
 		 * plan3: a, null
 		 */
-		Person person = new Person("1", "m", "35", "yes", "yes", "yes");
+		Person person = new Person(new IdImpl("1"), "m", 35, "yes", "yes", "yes");
 
 		Plan plan1 = new Plan("15.0", person);
 		plan1.setType(Plan.Type.CAR);
@@ -129,7 +129,7 @@ public class PersonTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_selectedPlan() {
-		Person person = new Person("1", "m", "35", "yes", "yes", "yes");
+		Person person = new Person(new IdImpl("1"), "m", 35, "yes", "yes", "yes");
 
 		Plan plan1 = new Plan("15.0", person);
 		Plan plan2 = new Plan("22.0", person);

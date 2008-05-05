@@ -44,6 +44,7 @@
 package org.matsim.plans;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.xml.sax.Attributes;
 
@@ -99,7 +100,7 @@ public class PopReaderHandlerImpl	implements PopReaderHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startAgent(final Attributes meta) {
-		this.currperson = new Person(meta.getValue("id").substring(1),null,null,null,null,null);
+		this.currperson = new Person(new IdImpl(meta.getValue("id").substring(1)),null,0,null,null,null);
 	}
 
 	public void endAgent() {

@@ -20,6 +20,7 @@
 
 package org.matsim.plans.algorithms;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkSummary;
@@ -110,7 +111,7 @@ public class PlansCreateFromNetwork extends PlansAlgorithm {
 						else if (rd2 < 0.4) { car_avail = "always"; }
 					}
 				}
-				Person p = new Person(Integer.toString(i),sex,Integer.toString(age),license,car_avail,employed);
+				Person p = new Person(new IdImpl(Integer.toString(i)),sex, age,license,car_avail,employed);
 				plans.addPerson(p);
 			}
 			catch (Exception e) {

@@ -162,4 +162,5 @@ public class CALink implements CANetStateWritableI, BasicLink  {
 	public boolean setToNode(BasicNode node) {
 		return basicLink.setToNode(node);
 	}
+
 }

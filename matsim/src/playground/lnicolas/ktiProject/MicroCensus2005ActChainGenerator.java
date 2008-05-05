@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -258,7 +259,7 @@ public class MicroCensus2005ActChainGenerator {
 					}
 					
 					personId++;
-					person = new Person(Integer.toString(personId), null, null, null, null, null);
+					person = new Person(new IdImpl(Integer.toString(personId)), null, 0, null, null, null);
 					plan = new Plan(person);
 					population.addPerson(person);
 					person.addPlan(plan);

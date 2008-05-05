@@ -53,7 +53,6 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private String name = null;
 	private Layer refLayer = null;
 	private PlansWriter planswriter = null;
 	private long counter = 0;
@@ -197,9 +196,6 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 	// set/add methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void setName(final String name) {
-		this.name = name;
-	}
 
 	public final void addAlgorithm(final PlansAlgorithm algo) {
 		this.plansalgos.add(algo);
@@ -229,9 +225,6 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final String getName() {
-		return this.name;
-	}
 
 	public final Map<Id, Person> getPersons() {
 		return this.persons;
@@ -241,17 +234,13 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 		return this.isStreaming;
 	}
 
-	public final Layer getRefLayer() {
-		return this.refLayer;
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public final String toString() {
-		return "[name=" + this.name + "]" +
+		return "[name=" + this.getName() + "]" +
 				"[is_streaming=" + this.isStreaming + "]" +
 				"[nof_persons=" + this.persons.size() + "]" +
 				"[nof_plansalgos=" + this.plansalgos.size() + "]";
@@ -263,6 +252,10 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 
 	public Iterator<Person> iterator() {
 		return this.persons.values().iterator();
+	}
+
+	public Layer getReferencedLayer() {
+		return refLayer;
 	}
 
 }

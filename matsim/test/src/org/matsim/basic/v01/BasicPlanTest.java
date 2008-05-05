@@ -42,7 +42,7 @@ public class BasicPlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testActLegIterator() throws Exception {
-		Person person = new Person("1", "m", "35", "yes", "always", "yes");
+		Person person = new Person(new IdImpl("1"), "m", 35, "yes", "always", "yes");
 		Plan plan = person.createPlan(null, "yes");
 
 		// test with empty plan, should not produce an error/exception
@@ -121,7 +121,7 @@ public class BasicPlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testLegIterator() throws Exception {
-		Person person = new Person("1", "f", "35", "yes", "always", "yes");
+		Person person = new Person(new IdImpl("1"), "f", 35, "yes", "always", "yes");
 		Plan plan = person.createPlan(null, "yes");
 
 		// test with empty plan, should not produce an error/exception
@@ -178,7 +178,7 @@ public class BasicPlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetIteratorAct() throws Exception {
-		Person person = new Person("1", "m", "101", "no", "never", "no");
+		Person person = new Person(new IdImpl("1"), "m", 101, "no", "never", "no");
 		Plan plan = person.createPlan(null, "yes");
 
 		// test with empty plan, should not produce an error/exception

@@ -27,6 +27,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.SimulationTimer;
@@ -129,7 +130,7 @@ public class WithindayAgentTest extends TestCase {
 	}
 
 	private WithindayAgent createAgent(final String homeLink, final String workLink) {
-		Person p = new Person("1", "f", "23", "yes", "always", "yes");
+		Person p = new Person(new IdImpl("1"), "f", 23, "yes", "always", "yes");
 		this.plan = new Plan(p);
 		p.addPlan(this.plan);
 		this.leg = null;

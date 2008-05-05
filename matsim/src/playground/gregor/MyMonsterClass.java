@@ -303,7 +303,7 @@ public class MyMonsterClass {
 		PlansWriter writer = new PlansWriter(population,"./output/evacuationplans_zurich_navteq1.xml","v4");
 		writer.writeStartPlans();
 		for (Person person : persons){
-			Person nperson = new Person(person.getId().toString(), person.getSex(), (new Integer(person.getAge())).toString(),person.getLicense(),person.getCarAvail(),person.getEmployed());
+			Person nperson = new Person(person.getId(), person.getSex(), (new Integer(person.getAge())),person.getLicense(),person.getCarAvail(),person.getEmployed());
 
 			BasicAct act = new BasicActImpl();
 			Iterator it = person.getPlans().get(0).getIteratorAct();

@@ -22,6 +22,7 @@ package playground.arvid_daniel.coopers.fromArvid;
 
 import java.util.Random;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -65,7 +66,7 @@ public class GeneratePlansTest {
 			double earliestStartTime = 7*3600;
 
 			String ID = Integer.toString(i);
-			Person person = new Person(ID, null, "33",null, null,"yes");
+			Person person = new Person(new IdImpl(ID), null, 33,null, null,"yes");
 			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.0*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
@@ -98,7 +99,7 @@ public class GeneratePlansTest {
 			double earliestStartTime = 7*3600;
 
 			String ID = Integer.toString(i);
-			Person person = new Person(ID, null, "33",null, null,"yes");
+			Person person = new Person(new IdImpl(ID), null, 33,null, null,"yes");
 			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
@@ -130,7 +131,7 @@ public class GeneratePlansTest {
 			double earliestStartTime = 7*3600;
 
 			String ID = Integer.toString(i);
-			Person person = new Person(ID, null, "33",null, null,"yes");
+			Person person = new Person(new IdImpl(ID), null, 33,null, null,"yes");
 			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
