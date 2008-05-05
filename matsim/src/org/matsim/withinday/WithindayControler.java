@@ -127,21 +127,11 @@ public class WithindayControler extends Controler {
 			super.runMobSim();
 		}
 	}
-
-	/**
-	 * Is currently used to create the WithindayAgent objects with the default belief and desire (intentions are still fixed by
-	 * the game theory plans) modules.
-	 * Visibility is package as it is called from the WithindayCreateVehiclePersonAlgorithm.
-	 * @param person
-	 * @param veh
-	 */
-	void createAgent(final Person person, final OccupiedVehicle veh) {
-		WithindayAgent agent = new WithindayAgent(person, veh, this.config.withinday().getAgentVisibilityRange(), this.factory);
-		//set the agent's replanning interval
-		agent.setReplanningInterval(this.config.withinday().getReplanningInterval());
-		//set the contentment threshold
-		agent.setReplanningThreshold(this.config.withinday().getContentmentThreshold());
+	
+	public WithindayAgentLogicFactory getAgentLogicFactory() {
+		return this.factory;
 	}
+
 
 	public class WithindayControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 

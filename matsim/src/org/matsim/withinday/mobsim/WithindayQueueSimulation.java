@@ -26,8 +26,11 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueSimulation;
+import org.matsim.mobsim.Vehicle;
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
+import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.trafficmanagement.Accident;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
@@ -54,6 +57,27 @@ public class WithindayQueueSimulation extends QueueSimulation {
 		this.controler = controler;
 		this.setVehiclePrototye(OccupiedVehicle.class);
 	}
+	
+	@Override
+	protected void initVehicle(final Vehicle veh) {
+		super.initVehicle(veh);
+		createAgent(veh.getDriver(), (OccupiedVehicle)veh);
+	}
+	
+	/**
+	 * Is currently used to create the WithindayAgent objects with the default belief and desire (intentions are still fixed by
+	 * the game theory plans) modules.
+	 * @param person
+	 * @param veh
+	 */
+	private void createAgent(final Person person, final OccupiedVehicle veh) {
+		WithindayAgent agent = new WithindayAgent(person, veh, controler.getConfig().withinday().getAgentVisibilityRange(), this.controler.getAgentLogicFactory());
+		//set the agent's replanning interval
+		agent.setReplanningInterval(controler.getConfig().withinday().getReplanningInterval());
+		//set the contentment threshold
+		agent.setReplanningThreshold(controler.getConfig().withinday().getContentmentThreshold());
+	}
+
 
 	@Override
 	protected void prepareSim() {

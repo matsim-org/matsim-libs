@@ -120,7 +120,7 @@ public class QueueSimulation extends Simulation {
 		this.vehiclePrototype = proto;
 	}
 
-	private void initVehicle(final Vehicle veh) {
+	protected void initVehicle(final Vehicle veh) {
 		Link link = veh.getCurrentLink();
 		QueueLink qlink = this.network.getQueueLink(link.getId());
 		qlink.addParking(veh);
