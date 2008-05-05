@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MATSimNet2ShapeDemo.java
+ * DoublePermlanesNetwork.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,25 +21,47 @@
 /**
  * 
  */
-package playground.yu.utils;
+package playground.yu.newNetwork;
+
+import org.matsim.config.Config;
+import org.matsim.gbl.Gbl;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkWriter;
 
 /**
- * This class can convert a MATSim-network to a QGIS .shp-file
- * 
- * @author ychen
- * 
+ * @author yu
+ *
  */
-public class MATSimNet2QGISDemo {
-	public static String ch1903 = "PROJCS[\"CH1903_LV03\",GEOGCS[\"GCS_CH1903\",DATUM[\"D_CH1903\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Hotine_Oblique_Mercator_Azimuth_Center\"],PARAMETER[\"False_Easting\",600000],PARAMETER[\"False_Northing\",200000],PARAMETER[\"Scale_Factor\",1],PARAMETER[\"Azimuth\",90],PARAMETER[\"Longitude_Of_Center\",7.439583333333333],PARAMETER[\"Latitude_Of_Center\",46.95240555555556],UNIT[\"Meter\",1],AUTHORITY[\"EPSG\",\"21781\"]]";
+public class DoublePermlanesNetwork{
+//
+//	/**
+//	 * @param network
+//	 */
+//	public DoublePermlanesNetwork(NetworkLayer network) {
+//		super(network);
+//		// TODO Auto-generated constructor stub
+//	}
+//
+//	/**
+//	 * @param network
+//	 * @param filename
+//	 */
+//	public DoublePermlanesNetwork(NetworkLayer network, String filename) {
+//		super(network, filename);
+//		// TODO Auto-generated constructor stub
+//	}
 
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
-		// ///////////////////////////////////////////////////
-		// write MATSim-network to Shp-file
-		// ///////////////////////////////////////////////////
-		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu-flama.xml");
-		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile("../schweiz-ivtch/network/ivtch-osm-wu-flama.shp");
-		System.out.println("done.");
+		final String inputNetFilename = "../schweiz-ivtch/network/ivtch-changed-wu.xml";
+		final String outputNetFilename = "../schweiz-ivtch/tmp/ivtch-changed-wu.xml";
+		Config config = Gbl.createConfig(null);
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(inputNetFilename);
+		new NetworkWriter(network, outputNetFilename).write();
 	}
+
 }

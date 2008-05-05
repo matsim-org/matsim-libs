@@ -75,16 +75,16 @@ public class AvgSpeed2QGIS {
 		 * Traffic Volumes and MATSim-network to Shp-file // *
 		 * ///////////////////////////////////////////////////////////////
 		 */
-		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml");
+		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu.xml");
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(net);
-		mn2q.readEvents("../runs/run465/500.events.txt.gz", clas);
+		mn2q.readEvents("../runs/run466/500.events.txt.gz", clas);
 		List<Map<Id, Double>> speeds = createSpeeds(net, clas);
 		for (int i = 0; i < 24; i++) {
 			mn2q.addParameter("aS" + i + "-" + (i + 1) + "h", Double.class,
 					speeds.get(i));
 		}
-		mn2q.writeShapeFile("../runs/run465/465.500.avgSpeed.shp");
+		mn2q.writeShapeFile("../runs/run466/466.500.avgSpeed.shp");
 	}
 }
