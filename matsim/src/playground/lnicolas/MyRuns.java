@@ -45,7 +45,6 @@ import org.matsim.plans.Route;
 import org.matsim.world.MatsimWorldReader;
 
 import playground.lnicolas.kml.PopulationExportToKML;
-import playground.lnicolas.ktiProject.PopulationGeneratorControler;
 import playground.lnicolas.network.algorithm.NetworkCutter;
 import playground.lnicolas.network.algorithm.NetworkReducer;
 
@@ -69,8 +68,8 @@ public class MyRuns {
 		readWorld();
 		readNetwork();
 		readMatrices();
-		PopulationGeneratorControler popGen = new PopulationGeneratorControler(network);
-		Plans p = popGen.generateCompleteCensus2000Population();
+//		PopulationGeneratorControler popGen = new PopulationGeneratorControler(network);
+//		Plans p = popGen.generateCompleteCensus2000Population();
 
 //		getMaxMinNodes();
 
