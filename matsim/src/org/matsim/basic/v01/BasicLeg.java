@@ -50,16 +50,27 @@ public interface BasicLeg {
 
 	public int getNum();
 
-	public String getMode();
-
-	// could be overwritten in higher classes for providing  BasicRoute derived
-	// return values
-	public BasicRoute getRoute();
-
 	public void setNum(int num);
 
+	public String getMode();
+	
 	public void setMode(String mode);
+
+	public BasicRoute getRoute();
 
 	public void setRoute(BasicRoute route);
 
+	public double getDepTime();
+
+	public void setDepTime(final double depTime);
+
+	public double getTravTime();
+
+	public void setTravTime(final double travTime);
+	
+	public double getArrTime();
+
+	public void setArrTime(final double arrTime);
+	
+	
 }

@@ -43,8 +43,6 @@ public class Route extends BasicRouteImpl<Node> implements  Serializable{
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private double dist = Double.NaN;
-	private double travTime = Time.UNDEFINED_TIME;
 	private double cost = Double.NaN;
 	private static NodeBuilder nodeBuilder = new NodeBuilder();
 
@@ -58,16 +56,16 @@ public class Route extends BasicRouteImpl<Node> implements  Serializable{
 	public Route(final String dist, final String travTime) {
 
 		if (dist != null) {
-			this.dist = Double.parseDouble(dist);
+			super.setDist(Double.parseDouble(dist));
 		}
 		if (travTime != null) {
-			this.travTime = Time.parseTime(travTime);
+			super.setTravTime(Time.parseTime(travTime));
 		}
 	}
 
 	public Route(final Route route) {
-		this.dist = route.dist;
-		this.travTime = route.travTime;
+		super.setDist(route.getDist());
+		super.setTravTime(route.getTravTime());
 		this.route = new ArrayList<Node>(route.route);
 	}
 
@@ -101,29 +99,12 @@ public class Route extends BasicRouteImpl<Node> implements  Serializable{
 		this.cost = Double.NaN;
 	}
 
-	public final void setRoute(final String route, final int travelTime) {
-		setRoute(route);
-		this.travTime = travelTime;
-	}
-
-	public final void setRoute(final ArrayList<Node> route, final double travelTime) {
-		setRoute(route);
-		this.travTime = travelTime;
-	}
-
 	public final void setRoute(final ArrayList<Node> route, final double travelTime, final double travelCost) {
 		setRoute(route);
-		this.travTime = travelTime;
+		super.setTravTime(travelTime);
 		this.cost = travelCost;
 	}
 
-	public final void setTravTime(final double travTime) {
-		this.travTime = travTime;
-	}
-
-	public final void setDist(final double dist) {
-		this.dist = dist;
-	}
 
 	public static void setNodeBuilder(final NodeBuilder builder) {
 		nodeBuilder = builder;
@@ -132,17 +113,14 @@ public class Route extends BasicRouteImpl<Node> implements  Serializable{
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
-
+	@Override
 	public final double getDist() {
-		if (Double.isNaN(this.dist)) {
-			this.calcDistance();
+		if (Double.isNaN(super.getDist())) {
+			super.setDist(this.calcDistance());
 		}
-		return this.dist;
+		return super.getDist();
 	}
 
-	public final double getTravTime() {
-		return this.travTime;
-	}
 
 	@Override
 	public final ArrayList<Node> getRoute() {
@@ -199,7 +177,7 @@ public class Route extends BasicRouteImpl<Node> implements  Serializable{
 		return links;
 	}
 
-	private final void calcDistance() {
+	private final double calcDistance() {
 		/* TODO we cannot calculate the real distance, as we do not know the
 		 * very first or the very last link of the route, only the links in between.
 		 * fix this somehow, but how?? MR, jan07
@@ -209,7 +187,7 @@ public class Route extends BasicRouteImpl<Node> implements  Serializable{
 		for (Link link : links) {
 			distance += link.getLength();
 		}
-		this.dist = distance;
+		return distance;
 	}
 
 	/**
@@ -285,8 +263,8 @@ public class Route extends BasicRouteImpl<Node> implements  Serializable{
 
 	@Override
 	public final String toString() {
-		return "[dist=" + this.dist + "]" +
-				"[trav_time=" + Time.writeTime(this.travTime) + "]" +
+		return "[dist=" + this.getDist() + "]" +
+				"[trav_time=" + Time.writeTime(this.getTravTime()) + "]" +
 				"[nof_nodes=" + this.route.size() + "]";
 	}
 }

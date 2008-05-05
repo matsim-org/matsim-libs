@@ -21,6 +21,7 @@
 package org.matsim.basic.v01;
 
 import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.misc.Time;
 
 public class BasicActImpl implements BasicAct {
@@ -30,54 +31,61 @@ public class BasicActImpl implements BasicAct {
 	protected String type;
 	protected BasicLink link = null;
 
-	//////////////////////////////////////////////////////////////////////
-	// getter methods
-	//////////////////////////////////////////////////////////////////////
+	private int refId = Integer.MIN_VALUE;
+	private CoordI coord = null;
+	
+	protected double startTime = Time.UNDEFINED_TIME;
+	protected double dur = Time.UNDEFINED_TIME;
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicAct#getEndTime()
-	 */
 	public final double getEndTime() {
 		return this.endTime;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicAct#getType()
-	 */
 	public final String getType() {
 		return this.type;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicAct#getLink()
-	 */
 	public BasicLink getLink() {
 		return this.link;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// setter methods
-	//////////////////////////////////////////////////////////////////////
-
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicAct#setEndTime(double)
-	 */
 	public final void setEndTime(final double endTime) {
 		this.endTime = endTime;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicAct#setType(java.lang.String)
-	 */
 	public final void setType(final String type) {
 		this.type = type.intern();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicAct#setLink(org.matsim.interfaces.networks.basicNet.BasicLink)
-	 */
 	public final void setLink(final BasicLink link) {
 		this.link = link;
 	}
+	
 
+	public final CoordI getCoord() {
+		return this.coord;
+	}
+
+	public final int getRefId() {
+		return this.refId;
+	}
+
+
+	public void setCoord(final CoordI coord) {
+		this.coord = coord;
+	}
+
+	public final void setRefId(final int refId) {
+		this.refId = refId;
+	}
+
+	public final double getStartTime() {
+		return this.startTime;
+	}
+
+	public final void setStartTime(final double startTime) {
+		this.startTime = startTime;
+	}
+
+	
 }

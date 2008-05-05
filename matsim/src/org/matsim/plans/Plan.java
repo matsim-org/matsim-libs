@@ -35,21 +35,15 @@ public class Plan extends BasicPlanImpl {
 
 	private static final long serialVersionUID = 1L;
 
+	private final static Logger log = Logger.getLogger(Plan.class);
+
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-//	private String type = null;
-
 	private transient Person person = null;
 
 	public PlanStatsI firstPlanStatsAlgorithm = null;
-
-	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED};
-
-	private Type type = null;
-
-	private final static Logger log = Logger.getLogger(Plan.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -217,9 +211,6 @@ public class Plan extends BasicPlanImpl {
 		return this.actsLegs;
 	}
 
-	public final Type getType() {
-		return this.type;
-	}
 
 	public final Person getPerson() {
 		return this.person;
@@ -228,10 +219,6 @@ public class Plan extends BasicPlanImpl {
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
-
-	public final void setType(Type type) {
-		this.type = type;
-	}
 
 	/**
 	 * Loops through all acts and updates their start-, endtime and duration according to the
@@ -280,8 +267,8 @@ public class Plan extends BasicPlanImpl {
 
 	//////////////////////////////////////////////////////////////////////
 	// query methods
-	//////////////////////////////////////////////////////////////////////
-
+	//////////////// 
+	@Override
 	public final boolean isSelected() {
 		return this.person.getSelectedPlan() == this;
 	}
@@ -301,7 +288,7 @@ public class Plan extends BasicPlanImpl {
 	public void copyPlan(final Plan in) {
 		setScore(in.getScore());
 		this.firstPlanStatsAlgorithm = null;
-		this.type = in.type;
+		this.setType(in.getType());
 		this.person = in.person;
 		List<?> actl = in.getActsLegs();
 		for (int i= 0; i< actl.size() ; i++) {

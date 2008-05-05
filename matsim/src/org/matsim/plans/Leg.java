@@ -32,15 +32,7 @@ import org.matsim.utils.misc.Time;
 
 public class Leg extends BasicLegImpl implements Serializable{
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
 	private static final long serialVersionUID = 5123937717277263980L;
-
-	private double depTime = Time.UNDEFINED_TIME;
-	private double travTime = Time.UNDEFINED_TIME;
-	private double arrTime = Time.UNDEFINED_TIME;
 
 	public Leg(final String num, final String mode, final String depTime, final String travTime, final String arrTime) {
 		if (num != null) {
@@ -51,13 +43,13 @@ public class Leg extends BasicLegImpl implements Serializable{
 		}
 		this.mode = mode.intern();
 		if (depTime != null) {
-			this.depTime = Time.parseTime(depTime);
+			this.setDepTime(Time.parseTime(depTime));
 		}
 		if (travTime != null) {
-			this.travTime = Time.parseTime(travTime);
+			this.setTravTime(Time.parseTime(travTime));
 		}
 		if (arrTime != null) {
-			this.arrTime = Time.parseTime(arrTime);
+			this.setArrTime(Time.parseTime(arrTime));
 		}
 	}
 
@@ -67,9 +59,9 @@ public class Leg extends BasicLegImpl implements Serializable{
 			throw new NumberFormatException("A Leg's num has to be an  integer >= 0.");
 		}
 		this.mode = mode.intern();
-		this.depTime = depTime;
-		this.travTime = travTime;
-		this.arrTime = arrTime;
+		this.setDepTime(depTime);
+		this.setTravTime(travTime);
+		this.setArrTime(arrTime);
 	}
 	
 	/**
@@ -80,9 +72,9 @@ public class Leg extends BasicLegImpl implements Serializable{
 	public Leg(final Leg leg) {
 		this.num = leg.num;
 		this.mode = leg.mode;
-		this.depTime = leg.depTime;
-		this.arrTime = leg.arrTime;
-		this.travTime = leg.travTime;
+		this.setDepTime(leg.getDepTime());
+		this.setTravTime(leg.getTravTime());
+		this.setArrTime(leg.getArrTime());
 		if (leg.route instanceof Route) {
 			this.route = new Route((Route) leg.route);	
 		}
@@ -110,55 +102,20 @@ public class Leg extends BasicLegImpl implements Serializable{
 		this.route = null;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
-
-	
-	public final double getDepTime() {
-		return this.depTime;
-	}
-
-	public final double getTravTime() {
-		return this.travTime;
-	}
-
-	public final double getArrTime() {
-		return this.arrTime;
-	}
-
 	@Override
 	public Route getRoute() {
 		return (Route) this.route;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void setDepTime(final double depTime) {
-		this.depTime = depTime;
-	}
-
-	public final void setTravTime(final double travTime) {
-		this.travTime = travTime;
-	}
-
-	public final void setArrTime(final double arrTime) {
-		this.arrTime = arrTime;
 	}
 
 	@Override
 	public final String toString() {
 		return "[num=" + this.num + "]" +
 				"[mode=" + this.mode + "]" +
-				"[depTime=" + Time.writeTime(this.depTime) + "]" +
-				"[travTime=" + Time.writeTime(this.travTime) + "]" +
-				"[arrTime=" + Time.writeTime(this.arrTime) + "]" +
+				"[depTime=" + Time.writeTime(this.getDepTime()) + "]" +
+				"[travTime=" + Time.writeTime(this.getTravTime()) + "]" +
+				"[arrTime=" + Time.writeTime(this.getArrTime()) + "]" +
 				"[route=" + this.route + "]";
 	}
-
-
 
 	// BasicLeg is not yet serializable, so we have to serialize it by hand
 	private void writeObject(final ObjectOutputStream s) throws IOException

@@ -147,7 +147,8 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 		routeNodes.add(0, tmpNode);	// add the fromNode at the beginning of the list
 
 		Route route = new Route();
-		route.setRoute(routeNodes, (int)(arrivalTime - startTime));
+		route.setRoute(routeNodes);
+		route.setTravTime((int)(arrivalTime - startTime));
 
 		this.avgTravelTime = (this.routeCnt * this.avgTravelTime + route.getTravTime())
 			/ (this.routeCnt + 1);

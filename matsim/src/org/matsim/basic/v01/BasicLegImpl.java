@@ -21,6 +21,7 @@
 package org.matsim.basic.v01;
 
 import org.apache.log4j.Logger;
+import org.matsim.utils.misc.Time;
 
 public class BasicLegImpl implements BasicLeg {
 
@@ -28,47 +29,31 @@ public class BasicLegImpl implements BasicLeg {
 	protected String mode;
 	protected BasicRoute route = null;
 
-	//////////////////////////////////////////////////////////////////////
-	// getter methods
-	//////////////////////////////////////////////////////////////////////
+	private double depTime = Time.UNDEFINED_TIME;
+	private double travTime = Time.UNDEFINED_TIME;
+	private double arrTime = Time.UNDEFINED_TIME;
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicLeg#getNum()
-	 */
+	
 	public final int getNum() {
 		return this.num;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicLeg#getMode()
-	 */
-	public final String getMode() {
-		return this.mode;
-	}
-
-	// could be overwritten in higher classes for providing  BasicRoute derived
-	// return values
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicLeg#getRoute()
-	 */
-	public BasicRoute getRoute() {
-		return this.route;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// setter methods
-	//////////////////////////////////////////////////////////////////////
-
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicLeg#setNum(int)
-	 */
 	public final void setNum(int num) {
 		this.num = num;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicLeg#setMode(java.lang.String)
-	 */
+	public BasicRoute getRoute() {
+		return this.route;
+	}
+
+	public final void setRoute(BasicRoute route) {
+		this.route = route;
+	}
+
+	public final String getMode() {
+		return this.mode;
+	}
+
 	public final void setMode(String mode) {
 		if (MIVMODE.equalsIgnoreCase(mode))
 			this.mode = MIVMODE;
@@ -92,11 +77,27 @@ public class BasicLegImpl implements BasicLeg {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicLeg#setRoute(org.matsim.basic.v01.BasicRouteImpl)
-	 */
-	public final void setRoute(BasicRoute route) {
-		this.route = route;
+	public final double getDepTime() {
+		return this.depTime;
 	}
 
+	public final void setDepTime(final double depTime) {
+		this.depTime = depTime;
+	}
+
+	public final double getTravTime() {
+		return this.travTime;
+	}
+
+	public final void setTravTime(final double travTime) {
+		this.travTime = travTime;
+	}
+
+	public final double getArrTime() {
+		return this.arrTime;
+	}
+
+	public final void setArrTime(final double arrTime) {
+		this.arrTime = arrTime;
+	}
 }

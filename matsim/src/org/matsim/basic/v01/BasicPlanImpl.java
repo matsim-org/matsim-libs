@@ -32,14 +32,19 @@ import org.apache.log4j.Logger;
  *
  */
 public class BasicPlanImpl implements Serializable, BasicPlan {
+	
 	private static final long serialVersionUID = 1L;
+
+	private final static Logger log = Logger.getLogger(BasicPlanImpl.class);
 
 	protected ArrayList<Object> actsLegs = new ArrayList<Object>();
 
 	private double score = UNDEF_SCORE;
 	
-	private final static Logger log = Logger.getLogger(BasicPlanImpl.class);
-
+	private Type type = null;
+	
+	private boolean isSelected;
+	
 	/* (non-Javadoc)
 	 * @see org.matsim.basic.v01.BasicPlan#getScore()
 	 */
@@ -57,7 +62,26 @@ public class BasicPlanImpl implements Serializable, BasicPlan {
 			this.score = score;
 		}
 	}
+	
+	public boolean isSelected() {
+		return isSelected;
+	}
+	
+	public void setSelected(boolean selected) {
+		this.isSelected = selected;
+	}
 
+
+	public Type getType() {
+		return this.type;
+	}
+	
+
+	public void setType(Type type) {
+		this.type = type;
+	}
+
+	
 	/* (non-Javadoc)
 	 * @see org.matsim.basic.v01.BasicPlan#hasUndefinedScore()
 	 */

@@ -21,6 +21,7 @@
 package org.matsim.basic.v01;
 
 import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.utils.geometry.CoordI;
 /**
  *
  * @author dgrether
@@ -28,16 +29,33 @@ import org.matsim.interfaces.networks.basicNet.BasicLink;
  */
 public interface BasicAct {
 
-	public double getEndTime();
-
-	public String getType();
-
 	public BasicLink getLink();
-
-	public void setEndTime(final double endTime);
-
-	public void setType(final String type);
 
 	public void setLink(final BasicLink link);
 
+	public double getEndTime();
+
+	public void setEndTime(final double endTime);
+
+	public String getType();
+	
+	public void setType(final String type);
+
+	public CoordI getCoord();
+	
+	public void setCoord(CoordI coordinates);
+	
+	public double getStartTime();
+	
+	public void setStartTime(double time);
+	
+//	public double getDuration();
+	
+//	public void setDuration(double duration);
+	
+	public int getRefId();
+	
+	public void setRefId(final int refId);
+
+	
 }

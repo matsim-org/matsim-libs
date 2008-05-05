@@ -37,6 +37,8 @@ public interface BasicPlan {
 	 */
 	public static final double UNDEF_SCORE = Double.NaN;
 
+	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED};
+	
 	public double getScore();
 
 	public void setScore(final double score);
@@ -58,4 +60,12 @@ public interface BasicPlan {
 
 	public void addAct(final BasicAct act);
 
+	public boolean isSelected();
+	
+	public void setSelected(boolean selected);
+	
+	public void setType(Type type);
+	
+	public Type getType();
 }
+

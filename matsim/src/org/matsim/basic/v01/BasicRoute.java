@@ -38,4 +38,12 @@ public interface BasicRoute<T extends BasicNode> {
 	 */
 	public void setRoute(ArrayList<T> srcRoute);
 
+	public double getDist();
+
+	public void setDist(final double dist);
+
+	public double getTravTime();
+	
+	public void setTravTime(final double travTime);
+	
 }

@@ -50,7 +50,7 @@ public class Knowledge {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected Knowledge(final String desc) {
+	public Knowledge(final String desc) {
 		this.desc = desc;
 	}
 

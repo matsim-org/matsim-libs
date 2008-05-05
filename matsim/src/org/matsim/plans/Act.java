@@ -36,18 +36,12 @@ import org.matsim.utils.misc.Time;
 
 public class Act extends BasicActImpl implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-
-	private static final long serialVersionUID = 1L;
-
-	private int refId = Integer.MIN_VALUE;
-	private CoordI coord = null;
 	private boolean isPrimary = false;
-
-	protected double startTime = Time.UNDEFINED_TIME;
-	protected double dur = Time.UNDEFINED_TIME;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -60,7 +54,7 @@ public class Act extends BasicActImpl implements Serializable {
 		if (((x==null) && (y!=null)) || ((x!=null) && (y==null))) {
 			Gbl.errorMsg(this + "[either both or non of the coordinates must exist.]");
 		} else if ((x!=null) && (y!=null)) {
-			this.coord = new Coord(x.doubleValue(), y.doubleValue()); // set the coord, because they are defined
+			this.setCoord(new Coord(x.doubleValue(), y.doubleValue())); // set the coord, because they are defined
 		} else if (link == null) { // both coords are == null, therefore link MUST exist
 			Gbl.errorMsg(this + "[the coord AND the link is not defined! forbidden!]");
 		}
@@ -82,17 +76,10 @@ public class Act extends BasicActImpl implements Serializable {
 		}
 	}
 
-	public Act(final String type, final String x, final String y, final String link,
-						 final String startTime, final String endTime, final String dur, final String isPrimary) {
-		this(type, (x == null) ? null : Double.valueOf(x),
-							(y == null) ? null : Double.valueOf(y),
-							link, startTime, endTime, dur, isPrimary);
-	}
-
 	public Act(final String type, final double x, final double y, final Link link,
 			final double startTime, final double endTime, final double dur, final boolean isPrimary) {
 		this.type = type.intern();
-		this.coord = new Coord(x, y);
+		this.setCoord(new Coord(x, y));
 		this.link = link;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -103,13 +90,14 @@ public class Act extends BasicActImpl implements Serializable {
 	public Act(final Act act) {
 		this.type = act.type;
 		// Act coord could be null according to first c'tor!
-		this.coord = act.coord == null ? null : new Coord(act.coord);
+		CoordI c = act.getCoord() == null ? null : new Coord(act.getCoord());
+		this.setCoord(c);
 		this.link = act.link;
 		this.startTime = act.startTime;
 		this.endTime = act.endTime;
 		this.dur = act.dur;
 		this.isPrimary = act.isPrimary;
-		this.refId = act.refId;
+		this.setRefId(act.getRefId());
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -120,29 +108,6 @@ public class Act extends BasicActImpl implements Serializable {
 		return this.isPrimary;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
-	public void setCoord(final CoordI coord) {
-		this.coord = coord;
-	}
-
-	public final void setRefId(final int refId) {
-		this.refId = refId;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final CoordI getCoord() {
-		return this.coord;
-	}
-
-	public final int getRefId() {
-		return this.refId;
-	}
 
 	protected void setLinkFromString(final String link) {
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
@@ -163,7 +128,7 @@ public class Act extends BasicActImpl implements Serializable {
 	@Override
 	public final String toString() {
 		return "[type=" + this.type + "]" +
-				"[coord=" + this.coord + "]" +
+				"[coord=" + this.getCoord() + "]" +
 				"[link=" + this.link + "]" +
 				"[startTime=" + Time.writeTime(this.startTime) + "]" +
 				"[endTime=" + Time.writeTime(this.endTime) + "]" +
@@ -219,17 +184,11 @@ public class Act extends BasicActImpl implements Serializable {
 	  linkBuilder.addLink(this,(String)s.readObject());
 	}
 
-	public final double getStartTime() {
-		return this.startTime;
-	}
 
 	public final double getDur() {
 		return this.dur;
 	}
 
-	public final void setStartTime(final double startTime) {
-		this.startTime = startTime;
-	}
 
 	public final void setDur(final double dur) {
 		this.dur = dur;

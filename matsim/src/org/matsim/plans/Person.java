@@ -21,68 +21,42 @@
 package org.matsim.plans;
 
 import java.util.HashMap;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPersonImpl;
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 
 public class Person extends BasicPersonImpl<Plan>{
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	private String type = null;
-
-	private final TreeSet<String> travelcards = new TreeSet<String>();
-	private Knowledge knowledge = null;
-	private String visualizerData = null;
-	
 	private final static Logger log = Logger.getLogger(Person.class);
 
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+	private String visualizerData = null;
 
 
+	public Person(Id id) {
+		super(id);
+	}
+	
+	/**
+	 * Use single argument constructor instead and set only needed attributes. 
+	 * @param id
+	 * @param sex
+	 * @param age
+	 * @param license
+	 * @param carAvail
+	 * @param employed
+	 */
+	@Deprecated 
 	public Person(final Id id, final String sex, final int age, final String license,
 			final String carAvail, final String employed) {
 		super(id);
-		int intID = Integer.parseInt(id.toString());
-		if (intID < 0) {
-			throw new NumberFormatException("A person's id has to be an integer >= 0.");
-		}
-		if (sex != null) { // (m,f,null)
-			this.setSex(sex.intern());
-		}
+		this.setSex(sex);
 		this.setAge(age);
-		if ((this.getAge() < 0) && (this.getAge() != Integer.MIN_VALUE)) {
-				throw new NumberFormatException("A person's age has to be an integer >= 0.");
-			}
-		if (license != null) {
-			this.setLicence(license.intern());
-		}
-		if (carAvail != null) {
-			this.setCarAvail(carAvail.intern());
-		}
-		if (employed != null) {
-			this.setEmployed(employed.intern());
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// create methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final Knowledge createKnowledge(final String desc) {
-		if (this.knowledge == null) {
-			this.knowledge = new Knowledge(desc);
-		}
-		return this.knowledge;
+		this.setLicence(license);
+		this.setCarAvail(carAvail);
+		this.setEmployed(employed);
 	}
 
 	public final Plan createPlan(final String score, final String selected) {
@@ -95,42 +69,6 @@ public class Person extends BasicPersonImpl<Plan>{
 		// Make sure there is a selected plan if there is at least one plan
 		if (this.selectedPlan == null) this.selectedPlan = p;
 		return p;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// add methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void addTravelcard(final String type) {
-		if (this.travelcards.contains(type)) {
-			log.info(this + "[type=" + type + " already exists]");
-		} else {
-			this.travelcards.add(type.intern());
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void setType(final String type) {
-		this.type = (type == null) ? null : type.intern();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final TreeSet<String> getTravelcards() {
-		return this.travelcards;
-	}
-
-	public final Knowledge getKnowledge() {
-		return this.knowledge;
-	}
-
-	public final String getType() {
-		return this.type;
 	}
 
 	/**
@@ -222,8 +160,8 @@ public class Person extends BasicPersonImpl<Plan>{
 				"[license=" + this.getLicense() + "]" +
 				"[car_avail=" + this.getCarAvail() + "]" +
 				"[employed=" + this.getEmployed() + "]" +
-				"[nof_travelcards=" + this.travelcards.size() + "]" +
-				"[knowledge=" + this.knowledge + "]" +
+				"[nof_travelcards=" + this.getTravelcards().size() + "]" +
+				"[knowledge=" + this.getKnowledge() + "]" +
 				"[nof_plans=" + this.plans.size() + "]";
 	}
 

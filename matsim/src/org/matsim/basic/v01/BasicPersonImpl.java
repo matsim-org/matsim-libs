@@ -22,10 +22,16 @@ package org.matsim.basic.v01;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
+import org.matsim.plans.Knowledge;
 
 
 public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 
+	private static final Logger log = Logger.getLogger(BasicPersonImpl.class);
+	
 	protected List<T> plans = new ArrayList<T>(6);
 	protected T selectedPlan = null;
 	protected Id id;
@@ -35,6 +41,8 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 	private String carAvail;
 	private String employed;
 
+	private final TreeSet<String> travelcards = new TreeSet<String>();
+	private Knowledge knowledge = null;
 
 	public BasicPersonImpl(final Id id) {
 		this.id = id;
@@ -122,6 +130,9 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 	}
 
 	public void setAge(final int age) {
+		if ((age < 0) && (age != Integer.MIN_VALUE)) {
+			throw new NumberFormatException("A person's age has to be an integer >= 0.");
+		}
 		this.age = age;
 	}
 
@@ -139,6 +150,31 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
 
 	public final void setEmployed(final String employed) {
 		this.employed = (employed == null) ? null : employed.intern();
+	}
+
+	public final Knowledge createKnowledge(final String desc) {
+		if (this.knowledge == null) {
+			this.knowledge = new Knowledge(desc);
+		}
+		return this.knowledge;
+	}
+	
+
+	public final void addTravelcard(final String type) {
+		if (this.travelcards.contains(type)) {
+			log.info(this + "[type=" + type + " already exists]");
+		} else {
+			this.travelcards.add(type.intern());
+		}
+	}
+
+
+	public final TreeSet<String> getTravelcards() {
+		return this.travelcards;
+	}
+
+	public final Knowledge getKnowledge() {
+		return this.knowledge;
 	}
 
 	

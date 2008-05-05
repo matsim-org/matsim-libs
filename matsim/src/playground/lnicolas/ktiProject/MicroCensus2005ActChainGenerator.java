@@ -367,7 +367,7 @@ public class MicroCensus2005ActChainGenerator {
 				&& xStartCoord != 0 && yStartCoord != 0) {
 			actType = actHomeType.intern();
 		}
-		return new Act(actType, Double.toString(xHomeCoord), Double.toString(yHomeCoord),
+		return new Act(actType, xHomeCoord, yHomeCoord,
 				null, "0", Integer.toString(legStartTime * 60),
 				Integer.toString(legStartTime * 60), null);
 	}
@@ -402,11 +402,11 @@ public class MicroCensus2005ActChainGenerator {
 		int startTime = Integer.parseInt(formerEntries[41].trim());
 		if (nextEntries != null) {
 			int endTime = Integer.parseInt(nextEntries[5].trim());
-			return new Act(actType, Double.toString(xCoord), Double.toString(yCoord),
+			return new Act(actType, xCoord, yCoord,
 					null, Integer.toString(startTime * 60), Integer.toString(endTime * 60),
 					Integer.toString((endTime - startTime) * 60), null);
 		} else {
-			return new Act(actType, Double.toString(xCoord), Double.toString(yCoord),
+			return new Act(actType, xCoord, yCoord,
 					null, Integer.toString(startTime * 60),
 					null, null, null);
 		}
