@@ -142,7 +142,7 @@ public class MakeScenario {
 		Scenario.writePlans(plans);
 		Scenario.writeNetwork(network);
 		Scenario.writeFacilities(facilities);
-		Scenario.writeWorld();
+		Scenario.writeWorld(Gbl.getWorld());
 		Scenario.writeConfig();
 
 		System.out.println("TEST SUCCEEDED.");
