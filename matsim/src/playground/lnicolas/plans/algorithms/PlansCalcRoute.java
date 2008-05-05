@@ -131,8 +131,8 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 	}
 
 	private double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) throws Exception {
-		LinkImpl fromLink = fromAct.getLink();
-		LinkImpl toLink = toAct.getLink();
+		Link fromLink = fromAct.getLink();
+		Link toLink = toAct.getLink();
 		if (fromLink == null) throw new Exception("fromLink missing.");
 		if (toLink == null) throw new Exception("toLink missing.");
 
@@ -171,8 +171,8 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		// later: use special pt-router
 
 		double travTime = 0;
-		LinkImpl fromLink = fromAct.getLink();
-		LinkImpl toLink = toAct.getLink();
+		Link fromLink = fromAct.getLink();
+		Link toLink = toAct.getLink();
 		if (fromLink == null) throw new Exception("fromLink missing.");
 		if (toLink == null) throw new Exception("toLink missing.");
 
