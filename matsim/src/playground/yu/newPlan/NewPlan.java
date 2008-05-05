@@ -23,6 +23,7 @@
  */
 package playground.yu.newPlan;
 
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
 import org.matsim.plans.algorithms.PersonAlgorithm;
@@ -33,11 +34,13 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
  */
 public abstract class NewPlan extends PersonAlgorithm {
 	protected PlansWriter pw;
+	protected NetworkLayer net;
 
 	/**
 	 * 
 	 */
-	public NewPlan(Plans plans) {
+	public NewPlan(NetworkLayer network, Plans plans) {
+		net = network;
 		pw = new PlansWriter(plans);
 		pw.writeStartPlans();
 	}
