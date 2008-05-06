@@ -27,11 +27,7 @@ public class CompareSelectedPlansTable {
 
 
 	/**
-	 * @param args:
-	 * arg 0: path to plans file 0
-	 * arg 1: path to plans file 1
-	 * arg 2: name of output file
-	 * arg 3: path to network file
+	 * @param args array with 4 entries: {path to plans file 0, path to plans file 1, name of output file, path to network file}
 	 */
 	public static void main(String[] args) {
 
