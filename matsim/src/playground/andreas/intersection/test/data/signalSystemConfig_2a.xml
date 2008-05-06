@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<signalSystemConfig
+  xmlns="http://www.matsim.org/files/dtd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystemConfig.xsd">
+
+  <signalSystemConfiguration id="2">
+		<signalSystemControlInfo xsi:type="planbasedSignalSystemControlInfoType">
+			<signalSystemPlan id="2">
+				<start daytime="00:00:00" />
+				<stop daytime="24:00:00" />
+				<circulationTime sec="60" />
+				<syncTime sec="0" />
+				<powerOnTime sec="0" />
+				<powerOffTime sec="50" />
+				<signalGroupSettings refId="100">
+					<roughcast sec="0" />
+					<dropping sec="60" />
+					<interimTimeRoughcast sec="2" />
+					<interimTimeDropping sec="3" />
+				</signalGroupSettings>
+			</signalSystemPlan>
+		</signalSystemControlInfo>
+  </signalSystemConfiguration>
+</signalSystemConfig>

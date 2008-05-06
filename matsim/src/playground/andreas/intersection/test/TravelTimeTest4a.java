@@ -17,21 +17,21 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.andreas.intersection.sim.QSim;
 
 /**
- * @author dgrether
+ * @author aneumann
  *
  */
 public class TravelTimeTest4a extends MatsimTestCase implements	EventHandlerLinkLeaveI, EventHandlerLinkEnterI {
 
   private Map<Id, Double> agentTravelTimes;
-
-	public void testEquilTwoAgents() {
+  
+	public void testTrafficLightIntersection4arms() {
 		this.agentTravelTimes = new HashMap<Id, Double>();
 		Config conf = loadConfig("src/playground/andreas/intersection/test/config.xml");
-		String popFileName = "src/playground/andreas/intersection/test/plans_12agents.xml";
-		String netFileName = "src/playground/andreas/intersection/test/net_crossing_4arms.xml";
+		String popFileName = "src/playground/andreas/intersection/test/data/plans_4a_12.xml.gz";
+		String netFileName = "src/playground/andreas/intersection/test/data/net_4a.xml.gz";
 		
-		String signalSystems = "./src/playground/andreas/intersection/test/signalSystemConfig_4arms.xml";
-		String groupDefinitions = "./src/playground/andreas/intersection/test/signalGroupDefinition_4arms.xml";
+		String signalSystems = "./src/playground/andreas/intersection/test/data/signalSystemConfig_4a.xml";
+		String groupDefinitions = "./src/playground/andreas/intersection/test/data/signalGroupDefinition_4a.xml";
 
 		conf.plans().setInputFile(popFileName);
 		conf.network().setInputFile(netFileName);
@@ -47,7 +47,7 @@ public class TravelTimeTest4a extends MatsimTestCase implements	EventHandlerLink
 		assertEquals(141.0, agentTravelTimes.get(new IdImpl(3)).intValue(), EPSILON);
 		assertEquals(101.0, agentTravelTimes.get(new IdImpl(4)).intValue(), EPSILON);
 		assertEquals(100.0, agentTravelTimes.get(new IdImpl(5)).intValue(), EPSILON);
-		assertEquals(99.0, agentTravelTimes.get(new IdImpl(6)).intValue(), EPSILON);
+		assertEquals( 99.0, agentTravelTimes.get(new IdImpl(6)).intValue(), EPSILON);
 		assertEquals(109.0, agentTravelTimes.get(new IdImpl(7)).intValue(), EPSILON);
 		assertEquals(110.0, agentTravelTimes.get(new IdImpl(8)).intValue(), EPSILON);
 		assertEquals(111.0, agentTravelTimes.get(new IdImpl(9)).intValue(), EPSILON);

@@ -48,6 +48,7 @@ import playground.andreas.intersection.tl.SignalSystemControlerImpl;
 
 public class QSim extends QueueSimulation {
 
+	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QueueLink.class);
 
 	protected static final int INFO_PERIOD = 3600;
@@ -92,6 +93,8 @@ public class QSim extends QueueSimulation {
 		
 		for (Iterator<QueueNode> iter = network.getNodes().values().iterator(); iter.hasNext();) {
 			QNode node = (QNode) iter.next();
+			
+			// TODO [an] really bad hack, has to be rewritten and adopted to new infrastructure of DG
 					
 			if (node.getNode().getId().toString().equals("99")){
 				SignalSystemControlerImpl nodeControler = new SignalSystemControlerImpl(signalSystemConfigurations.get(node.getNode().getId()));
@@ -102,26 +105,37 @@ public class QSim extends QueueSimulation {
 					QLink qLink = (QLink) network.getQueueLink(link.getId());
 					qLink.reconfigure(signalSystemConfigurations.get(node.getNode().getId()).getSignalGroupDefinitions());
 				}
-			}						
+			}		
+			
+			if (node.getNode().getId().toString().equals("2")){
+				SignalSystemControlerImpl nodeControler = new SignalSystemControlerImpl(signalSystemConfigurations.get(node.getNode().getId()));
+				node.setSignalSystemControler(nodeControler);
+				
+				for (Iterator<? extends Link> iterator = node.getNode().getInLinks().values().iterator(); iterator.hasNext();) {
+					Link link = (Link) iterator.next();
+					QLink qLink = (QLink) network.getQueueLink(link.getId());
+					qLink.reconfigure(signalSystemConfigurations.get(node.getNode().getId()).getSignalGroupDefinitions());
+				}
+			}		
 		}		
 	}
 
 	protected void prepareSim() {
 		super.prepareSim();
-		log.info("prepareSim");
+//		log.info("prepareSim");
 		readSignalSystemControler();
 	}
 
 	protected void cleanupSim() {
-		log.info("cleanup");
+//		log.info("cleanup");
 	}
 
 	public void beforeSimStep(final double time) {
-		 log.info("before sim step");
+//		 log.info("before sim step");
 	}
 
 	public void afterSimStep(final double time) {
-		 log.info("after sim step");
+//		 log.info("after sim step");
 	}
 
 }

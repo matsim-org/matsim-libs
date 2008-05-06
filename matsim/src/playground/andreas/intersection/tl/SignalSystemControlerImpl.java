@@ -33,19 +33,20 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 		int currentSecondInPlan = (int) (time %  signalSystemPlan.getCirculationTime());		
 		
 		// Debug only
-		System.out.println(currentSecondInPlan);
+//		System.out.println(currentSecondInPlan);
 		
 		ArrayList<SignalGroupSettings> greenLinksList = new ArrayList<SignalGroupSettings>();
 		
 		for (SignalGroupSettings signalGroupSetting : signalSystemPlan.getSignalGroupSettings().values()) {
 			
-			if ( signalGroupSetting.getRoughCast() <= currentSecondInPlan && currentSecondInPlan <= signalGroupSetting.getDropping()){
+			if ( signalGroupSetting.getRoughCast() < currentSecondInPlan && currentSecondInPlan < signalGroupSetting.getDropping()){
 				// Debug only
-				System.out.println("green " + signalGroupSetting.getSignalGroupDefinition().toString());
+//				System.out.println("green " + signalGroupSetting.getSignalGroupDefinition().toString());
 				
 				greenLinksList.add(signalGroupSetting);
-			} else System.out.println(" red " + signalGroupSetting.getSignalGroupDefinition().toString());
-			
+			} else {
+//				System.out.println(" red " + signalGroupSetting.getSignalGroupDefinition().toString());
+			}
 			
 		}
 		
@@ -53,9 +54,9 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 		greenLinks = (SignalGroupSettings[]) greenLinksList.toArray(greenLinks);
 		
 		// Debug only
-		for (int i = 0; i < greenLinks.length; i++) {
-			System.out.println(greenLinks[i].getSignalGroupDefinition().getId());
-		}
+//		for (int i = 0; i < greenLinks.length; i++) {
+//			System.out.println(greenLinks[i].getSignalGroupDefinition().getId());
+//		}
 	
 		return greenLinks;
 	}
