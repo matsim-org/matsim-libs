@@ -114,13 +114,9 @@ public class PolygonNodesGenerator {
 		log.info("generating polygon nodes ...");
 		this.nodes = new QuadTree<Feature>(this.pg.getEnvelope().getMinX(), this.pg.getEnvelope().getMinY(), this.pg.getEnvelope().getMaxX() + (this.pg.getEnvelope().getMaxX() - this.pg.getEnvelope().getMinX()), this.pg.getEnvelope().getMaxY() + (this.pg.getEnvelope().getMaxY()-this.pg.getEnvelope().getMinY()));
 		
-		int toGo = this.pg.getLineStringsMap().size();
+	
 	 	for(Iterator<Entry<Integer, LineString>> lsIter = this.pg.getLineStringsMap().entrySet().iterator() ; lsIter.hasNext() ; ){
 			
-	 		toGo--;
-	 		if (toGo % 100 == 0) {
-	 			log.info("toGo:" + toGo);
-	 		}
 	 		
 			Entry<Integer, LineString> lsEntry  = lsIter.next();
 			int lsId = lsEntry.getKey();

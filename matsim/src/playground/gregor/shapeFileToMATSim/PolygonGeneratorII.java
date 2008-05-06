@@ -152,12 +152,14 @@ public class PolygonGeneratorII {
 //		HashMap<Integer, Polygon> tmpPolygons = mergePolygons();
 //		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
 		HashMap<Integer, Polygon> merged = new PolygonMerger(this,"./padang/converter/d_p_merged.shp").getMergedPolygons();
+//		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
 		
 		
 //		QuadTree<Polygon> polygonNodes = getPolygonNodes(merged);
 		QuadTree<Feature> nodeFeatures = new PolygonNodesGenerator(this,"./padang/converter/d_p_nodes.shp").getPolygonNodes(merged);
+//		QuadTree<Feature> nodeFeatures = new PolygonNodesGenerator("./padang/converter/d_p_nodes.shp").getPolygonNodes(merged);
 		
-		new PolygonLinksGenerator(this, "./padang/converter/d_p_links.shp").createPolygonLinks(nodeFeatures);
+		new PolygonLinksGenerator(this, "./padang/converter/d_p_links.shp").getPolygonLinks(nodeFeatures,merged);
 		
 //		cutPolygons(this.lineStrings,);
 //		createPolygonFeatures(cutPolygons(this.lineStrings,mergePolygons()));
@@ -586,7 +588,9 @@ public class PolygonGeneratorII {
 	
 	
 	void createPolygonFeature(Polygon polygon, int info, int id, int from, int to, double min_width, double area) {
+		
 		this.retPolygons.add(getPolygonFeature(polygon, info, id, from, to,min_width,  area));
+		log.info("created new debug polygon with id " + id);
 	}
 	
 	public Feature getPolygonFeature(Polygon polygon, int info, int id, int from, int to,double min_width, double area ){

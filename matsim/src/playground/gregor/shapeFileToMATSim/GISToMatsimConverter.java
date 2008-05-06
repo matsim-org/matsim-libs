@@ -84,7 +84,7 @@ public class GISToMatsimConverter {
 	private void processData() throws Exception {
 		GraphGenerator gg = new GraphGenerator(features.get(linestringFile));
 		Collection<Feature> graph =  gg.createGraph();
-//		ShapeFileWriter.writeGeometries(graph, "./padang/converter/d_ls.shp");
+		ShapeFileWriter.writeGeometries(graph, "./padang/converter/d_ls.shp");
 //		ShapeFileWriter.writeGeometries(graph, "./padang/testPadangLine.shp");
 		
 //		features.get(linestringFile);
