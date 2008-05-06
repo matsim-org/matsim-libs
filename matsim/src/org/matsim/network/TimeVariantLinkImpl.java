@@ -48,7 +48,13 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	
 	private PriorityQueue<NetworkChangeEvent> changeEvents;
 
-
+	/* TODO [MR,GL] instead of these "foreign" TreeMap's, why not use two simple arrays of doubles per
+	 * TreeMap, one to store the time ("key"), the other to store the actual values. Then, one could
+	 * access the value-array with Arrays.binarySearch(). BinarySearch and TreeMap both use O(log n) for
+	 * finding the corresponding value, but for the TreeMap, a multitude of auto-boxing- and -unboxing-
+	 * operations need to be executed, making it probably slow. One needs to test/benchmark this first,
+	 * but it could be a possibility for further optimizations. -marcel/06may2008 
+	 */
 
 
 
@@ -127,7 +133,6 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	/**
 	 * This method returns the freespeed for current time
 	 * @param time - the current time
-	 * @Override {@link org.matsim.basic.v01.BasicLink.getFreespeed}
 	 */
 	@Override
 	public double getFreespeed(double time) {
@@ -210,11 +215,11 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	
 	
 	/**
-	 * This method add a new flowcapacity  change event. If there already exist an event for the given time, then
+	 * This method add a new flow capacity change event. If there already exist an event for the given time, then
 	 * the old value will be overwritten.
 	 *
 	 *  @param time - the time on which the event occurs
-	 *  @param flowcapcity - the new flowCapacity
+	 *  @param flowCapacity - the new flowCapacity
 	 */
 	private void addFlowCapacityEvent(final double time, final double flowCapacity) {
 		this.flowCapacityEvents.put(time, flowCapacity);
@@ -236,7 +241,7 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	 *
 	 * @param event
 	 */
-	/*package*/ protected void applyEvent(NetworkChangeEvent event) {
+	protected void applyEvent(NetworkChangeEvent event) {
 		
 		this.changeEvents.add(event);
 		
