@@ -146,7 +146,7 @@ public class PolygonMerger {
     				for (Polygon tmp : neighborhood) {
     					
 //    					if (po.intersects(tmp)||po.touches(tmp) || ls.getStartPoint().distance(po) < CATCH_RADIUS || ls.getEndPoint().distance(po) < CATCH_RADIUS ){
-    					if (po.intersects(tmp)||po.touches(tmp) || po.distance(tmp)< PolygonGeneratorII.CATCH_RADIUS ){
+    					if (po.intersects(tmp) ){
     						extNeighborhood.add(po);
     						break;
     					} 

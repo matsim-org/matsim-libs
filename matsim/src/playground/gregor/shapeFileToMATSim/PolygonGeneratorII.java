@@ -502,7 +502,7 @@ public class PolygonGeneratorII {
 			for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
 				Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
 				try {
-					polygon = (Polygon) polygon.buffer(0.05);
+					polygon = (Polygon) polygon.buffer(0.01);
 				} catch (RuntimeException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

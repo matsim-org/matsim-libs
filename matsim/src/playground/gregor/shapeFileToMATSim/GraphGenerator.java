@@ -82,7 +82,7 @@ public class GraphGenerator {
 
 	public Collection<Feature> createGraph() throws Exception {
 		parseLineStrings();
-		 deleteToShortLineStrings();
+//		 deleteToShortLineStrings();
 		cleanUpLineStrings();
 		checkForIntersectionsToSplit();
 		simplifyNetwork();
