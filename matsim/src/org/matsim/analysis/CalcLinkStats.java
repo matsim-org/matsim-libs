@@ -39,7 +39,6 @@ import org.matsim.utils.misc.Time;
  * Calculates the average link volumes and travel times over any number of iterations.
  *
  * @author mrieser
- *
  */
 public class CalcLinkStats {
 
@@ -53,7 +52,7 @@ public class CalcLinkStats {
 		}
 	}
 
-	private static double vol_scale_factor = 1.0;
+	private double volScaleFactor = 1.0;
 	
 	private int count = 0;
 	private final Map<String, LinkData> linkData;
@@ -74,7 +73,7 @@ public class CalcLinkStats {
 
 	public CalcLinkStats(final NetworkLayer network, double vol_scale_factor) {
 		this(network);
-		this.vol_scale_factor = vol_scale_factor;
+		this.volScaleFactor = vol_scale_factor;
 	}
 
 	public void addData(final VolumesAnalyzer analyzer, final TravelTimeI ttimes) {
@@ -268,11 +267,11 @@ public class CalcLinkStats {
 						int baseTTimes;
 						for (int i = 0; i < this.nofHours; i++) {
 							data.volumes[MIN][i] = Integer.parseInt(parts[7 + i*3]);
-							data.volumes[MIN][i] *= this.vol_scale_factor;
+							data.volumes[MIN][i] *= this.volScaleFactor;
 							data.volumes[SUM][i] = Integer.parseInt(parts[8 + i*3]);
-							data.volumes[SUM][i] *= this.vol_scale_factor;
+							data.volumes[SUM][i] *= this.volScaleFactor;
 							data.volumes[MAX][i] = Integer.parseInt(parts[9 + i*3]);
-							data.volumes[MAX][i] *= this.vol_scale_factor;
+							data.volumes[MAX][i] *= this.volScaleFactor;
 							baseTTimes = 7 + (this.nofHours+1)*3;
 							data.ttimes[MIN][i] = Double.parseDouble(parts[baseTTimes + i*3]);
 							if (data.volumes[SUM][i] == 0) {
@@ -283,11 +282,11 @@ public class CalcLinkStats {
 							data.ttimes[MAX][i] = Double.parseDouble(parts[baseTTimes + i*3 + 2]);
 						}
 						data.volumes[MIN][this.nofHours] = Integer.parseInt(parts[7 + this.nofHours*3]);
-						data.volumes[MIN][this.nofHours] *= this.vol_scale_factor;
+						data.volumes[MIN][this.nofHours] *= this.volScaleFactor;
 						data.volumes[SUM][this.nofHours] = Integer.parseInt(parts[8 + this.nofHours*3]);
-						data.volumes[SUM][this.nofHours] *= this.vol_scale_factor;
+						data.volumes[SUM][this.nofHours] *= this.volScaleFactor;
 						data.volumes[MAX][this.nofHours] = Integer.parseInt(parts[9 + this.nofHours*3]);
-						data.volumes[MAX][this.nofHours] *= this.vol_scale_factor;
+						data.volumes[MAX][this.nofHours] *= this.volScaleFactor;
 					}
 				}
 				else if (parts.length == 153) {
@@ -299,11 +298,11 @@ public class CalcLinkStats {
 						int baseTTimes;
 						for (int i = 0; i < this.nofHours; i++) {
 							data.volumes[MIN][i] = Integer.parseInt(parts[6 + i*3]);
-							data.volumes[MIN][i] *= this.vol_scale_factor;
+							data.volumes[MIN][i] *= this.volScaleFactor;
 							data.volumes[SUM][i] = Integer.parseInt(parts[7 + i*3]);
-							data.volumes[SUM][i] *= this.vol_scale_factor;
+							data.volumes[SUM][i] *= this.volScaleFactor;
 							data.volumes[MAX][i] = Integer.parseInt(parts[8 + i*3]);
-							data.volumes[MAX][i] *= this.vol_scale_factor;
+							data.volumes[MAX][i] *= this.volScaleFactor;
 							baseTTimes = 6 + (this.nofHours+1)*3;
 							data.ttimes[MIN][i] = Double.parseDouble(parts[baseTTimes + i*3]);
 							if (data.volumes[SUM][i] == 0) {
@@ -314,11 +313,11 @@ public class CalcLinkStats {
 							data.ttimes[MAX][i] = Double.parseDouble(parts[baseTTimes + i*3 + 2]);
 						}
 						data.volumes[MIN][this.nofHours] = Integer.parseInt(parts[6 + this.nofHours*3]);
-						data.volumes[MIN][this.nofHours] *= this.vol_scale_factor;
+						data.volumes[MIN][this.nofHours] *= this.volScaleFactor;
 						data.volumes[SUM][this.nofHours] = Integer.parseInt(parts[7 + this.nofHours*3]);
-						data.volumes[SUM][this.nofHours] *= this.vol_scale_factor;
+						data.volumes[SUM][this.nofHours] *= this.volScaleFactor;
 						data.volumes[MAX][this.nofHours] = Integer.parseInt(parts[8 + this.nofHours*3]);
-						data.volumes[MAX][this.nofHours] *= this.vol_scale_factor;
+						data.volumes[MAX][this.nofHours] *= this.volScaleFactor;
 					}
 				}
 				else {
