@@ -144,16 +144,27 @@ public class PolygonLinksGenerator {
 				continue;
 			}
 			
+			int i = 0;
+			for(Iterator<Entry<Integer, LineString>> lsIt = this.pg.getLineStringsMap().entrySet().iterator() ; lsIt.hasNext() ; ){
+				LineString lsEn = lsIt.next().getValue();
+				if (lsEn.overlaps(pLink)) i++;
+				if (i > 1) {
+					log.warn(" ");
+					break;
+				}
+			}
+			if(i > 1) continue;
+			
 			Feature ftLink = this.pg.getPolygonFeature(pLink, 0, id, nodeIds.get(0), nodeIds.get(1), 0, 0);
 			this.ftLinks.put(id, ftLink);
 	 	}
 		
 		
 	}
-	
+		
 	private Collection<Polygon> separatePoly(Polygon pLink , Polygon pNode){
 		
-		Polygon b = (Polygon) pNode.buffer(4);
+		Polygon b = (Polygon) pNode.buffer(0.2);
 			Collection<Polygon> p = new ArrayList<Polygon>();
 			try {
 				Geometry geo = (Geometry) pLink.difference(b);

@@ -366,7 +366,7 @@ public class PolygonGeneratorII {
 //								///
 //								
 //								Coordinate cb = subCoord(currPointCoor, bisecCoor); 
-//								Coordinate bisecCoorII = addCoord(currPointCoor, cb);
+//								Coordinate bisecCoorII = addCoord(currPointCoor, multiCoord(cb,50 ));
 //								
 //								
 //								Coordinate [] ccc = new Coordinate[]{bisecCoorII, bisecCoor};
@@ -1111,6 +1111,9 @@ public LineString separateLine(LineString ls, boolean start){
 	}
 	return vec;
 }
+
+
+
 
 	/////////////////////////////////////////////////////////
 	// getter

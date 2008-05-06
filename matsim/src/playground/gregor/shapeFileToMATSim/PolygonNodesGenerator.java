@@ -113,7 +113,7 @@ public class PolygonNodesGenerator {
 	private void createPolygonNodes(HashMap<Integer, Polygon> mergedPolygons) {
 		log.info("generating polygon nodes ...");
 		this.nodes = new QuadTree<Feature>(this.pg.getEnvelope().getMinX(), this.pg.getEnvelope().getMinY(), this.pg.getEnvelope().getMaxX() + (this.pg.getEnvelope().getMaxX() - this.pg.getEnvelope().getMinX()), this.pg.getEnvelope().getMaxY() + (this.pg.getEnvelope().getMaxY()-this.pg.getEnvelope().getMinY()));
-		
+		int nodeId = 0;
 	
 	 	for(Iterator<Entry<Integer, LineString>> lsIter = this.pg.getLineStringsMap().entrySet().iterator() ; lsIter.hasNext() ; ){
 			
@@ -193,7 +193,7 @@ public class PolygonNodesGenerator {
 				Polygon p = this.pg.getGeofac().createPolygon(lr, null);
 			
 				
-				Feature ft = this.pg.getPolygonFeature(p, 0, lsId, 0, 0, currPoint.getX(), currPoint.getY());
+				Feature ft = this.pg.getPolygonFeature(p, 0, nodeId++, 0, 0, currPoint.getX(), currPoint.getY());
 				this.nodes.put(currPoint.getX(), currPoint.getY(), ft);
 				
 				//DEBUG
