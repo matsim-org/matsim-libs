@@ -120,6 +120,8 @@ public class GraphGenerator {
 					tmpLs.getEndPoint().getCoordinate().y = joinY;					
 				}
 				tmpLs.geometryChanged();
+				remove(tmpLs);
+				add(tmpLs);
 			}
 			Collection<LineString> etmp = this.tree.get(ep.getX(), ep.getY(), GISToMatsimConverter.CATCH_RADIUS);
 			for (LineString tmpLs : etmp) {
@@ -131,6 +133,8 @@ public class GraphGenerator {
 					tmpLs.getEndPoint().getCoordinate().y = joinY;					
 				}
 				tmpLs.geometryChanged();
+				remove(tmpLs);
+				add(tmpLs);
 			}			
 
 		}
