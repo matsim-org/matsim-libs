@@ -26,6 +26,7 @@ package playground.johannes.eut;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationStartsListener;
@@ -152,6 +153,9 @@ public class EUTController2 extends WithindayControler {
 		 */
 		RandomIncidentSimulator simulator = new RandomIncidentSimulator(network, incidentProba);
 		simulator.setCapReduction(capReduction);
+		for(Link link : riskyLinks)
+			simulator.addLink(link);
+		
 		addControlerListener(simulator);
 
 	}

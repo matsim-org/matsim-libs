@@ -40,14 +40,14 @@ import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
 import org.xml.sax.SAXException;
 
-import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
-import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
+import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseGraph;
+import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
+import edu.uci.ics.jung.io.GraphMLFile;
+import edu.uci.ics.jung.io.PajekNetWriter;
 import edu.uci.ics.jung.utils.UserDataContainer;
 
 public class RndNetworkGenerator {
@@ -68,13 +68,14 @@ public class RndNetworkGenerator {
 	
 	private final static String DIST_KEY = "dist";
 	
-	public static DirectedGraph createGraph(Plans plans) {
+	public static Graph createGraph(Plans plans) {
 		Random rnd = new Random(seed);
-		DirectedSparseGraph g = new DirectedSparseGraph();
+		UndirectedSparseGraph g = new UndirectedSparseGraph();
 		
 		int cnt = 0;
 		for(Person p : plans.getPersons().values()) {
-			DirectedSparseVertex v = (DirectedSparseVertex) g.addVertex(new DirectedSparseVertex());
+			UndirectedSparseVertex v =  new UndirectedSparseVertex();
+			g.addVertex(v);
 			v.addUserDatum(PERSON_KEY, p, copyAct);
 			cnt++;
 		}
@@ -85,8 +86,8 @@ public class RndNetworkGenerator {
 		for(Object v1 : g.getVertices()) {
 			for(Object v2 : v2set) {
 				if(!v1.equals(v2)) {
-					Person p1 = (Person) ((DirectedSparseVertex)v1).getUserDatum(PERSON_KEY);
-					Person p2 = (Person) ((DirectedSparseVertex)v2).getUserDatum(PERSON_KEY);
+					Person p1 = (Person) ((UndirectedSparseVertex)v1).getUserDatum(PERSON_KEY);
+					Person p2 = (Person) ((UndirectedSparseVertex)v2).getUserDatum(PERSON_KEY);
 					CoordI c1 = p1.getSelectedPlan().getFirstActivity().getCoord();
 					CoordI c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
 					
@@ -96,7 +97,7 @@ public class RndNetworkGenerator {
 					
 					rnd.nextDouble();
 					if(rnd.nextDouble() < F) {
-						DirectedSparseEdge e = new DirectedSparseEdge((DirectedSparseVertex)v1, (DirectedSparseVertex)v2);
+						UndirectedSparseEdge e = new UndirectedSparseEdge((UndirectedSparseVertex)v1, (UndirectedSparseVertex)v2);
 						e.addUserDatum(DIST_KEY, dist, copyAct);
 						g.addEdge(e);
 						cnt++;
@@ -108,7 +109,7 @@ public class RndNetworkGenerator {
 			v2set.remove(v1);
 		}
 		
-		System.out.println("Graph density is "+ g.numEdges()/(g.numVertices() * (g.numVertices()-1)));
+		System.out.println("Graph density is "+ g.numEdges()/(double)(g.numVertices() * (g.numVertices()-1)));
 		return g;
 	}
 	
@@ -195,15 +196,24 @@ public class RndNetworkGenerator {
 		System.out.println("Creating graph...");
 		Graph g = createGraph(plans);
 		
+		GraphMLFile gmlFile = new GraphMLFile();
+		gmlFile.save(g, "/Users/fearonni/vsp-work/socialnets/devel/snowball/network.gml");
+		
+		PajekNetWriter pWriter = new PajekNetWriter();
 		try {
-			System.out.println("Dumping graph...");
-			dump(g, "/Users/fearonni/vsp-work/socialnets/devel/rdata/");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		pWriter.save(g, "/Users/fearonni/vsp-work/socialnets/devel/snowball/network.net");
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
+//		try {
+//			System.out.println("Dumping graph...");
+//			dump(g, "/Users/fearonni/vsp-work/socialnets/devel/rdata/");
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 }
