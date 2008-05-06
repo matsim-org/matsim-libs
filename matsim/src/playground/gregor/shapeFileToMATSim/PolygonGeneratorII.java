@@ -956,10 +956,6 @@ public class PolygonGeneratorII {
 	}
 	
 	/* package */ protected LineString addVertexToLineString(LineString ls, Point p, double min_dist) {
-		if (!ls.getStartPoint().equalsExact(ls.getEndPoint())) {
-			int iii = 0;
-			iii++;
-		}
 		
 		Coordinate [] coords = new Coordinate [ls.getNumPoints()+1];
 		coords[0] = ls.getStartPoint().getCoordinate();
