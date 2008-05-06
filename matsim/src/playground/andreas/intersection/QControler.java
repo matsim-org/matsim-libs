@@ -37,8 +37,8 @@ public class QControler extends Controler {
 	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QControler.class);
 	
-	final String signalSystems = "./src/playground/andreas/intersection/signalSystemConfig.xml";
-	final String groupDefinitions = "./src/playground/andreas/intersection/signalGroupDefinition.xml";
+	final String signalSystems = "./src/playground/andreas/intersection/test/signalSystemConfig_2a.xml";
+	final String groupDefinitions = "./src/playground/andreas/intersection/test/signalGroupDefinition_2a.xml";
 
 	public QControler(final Config config) {
 		super(config);

@@ -10,12 +10,14 @@
 <config>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="&INPUTBASE;/4armig.xml" />
+		<!--<param name="inputNetworkFile" value="&INPUTBASE;/4armig.xml" />-->
+		<param name="inputNetworkFile" value="&INPUTBASE;/test/net_2arms.xml" />
 		<param name="outputNetworkFile" value="&OUTPUTBASE;/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="&INPUTBASE;/plane.xml" />
+<!--		<param name="inputPlansFile" value="&INPUTBASE;/plane.xml" />-->
+		<param name="inputPlansFile" value="&INPUTBASE;/test/plans_2a_2500.xml" />
 		<param name="outputPlansFile" value="&OUTPUTBASE;/plans.xml" />
 		<param name="outputVersion" value="v4" />
 	</module>

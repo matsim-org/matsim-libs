@@ -50,7 +50,7 @@ public class PlansGeneratorControler extends Controler {
 	@Override
 	protected Plans loadPopulation() {
 		
-		final int agentsPerDest = 1;
+		final int agentsPerDest = 2500;
 		int numberOfPlans = 1;
 
 		Plans pop = new Plans(Plans.NO_STREAMING);
@@ -59,15 +59,15 @@ public class PlansGeneratorControler extends Controler {
 		LinkedList <Link> fromLinks = new LinkedList<Link>();
 		LinkedList <Link> toLinks = new LinkedList<Link>();
 		
-		fromLinks.add(this.network.getLink("20"));
-		fromLinks.add(this.network.getLink("40"));
-		fromLinks.add(this.network.getLink("60"));
-		fromLinks.add(this.network.getLink("80"));
+		fromLinks.add(this.network.getLink("5"));
+//		fromLinks.add(this.network.getLink("40"));
+//		fromLinks.add(this.network.getLink("60"));
+//		fromLinks.add(this.network.getLink("80"));
 		
-		toLinks.add(this.network.getLink("20"));
-		toLinks.add(this.network.getLink("40"));
-		toLinks.add(this.network.getLink("60"));
-		toLinks.add(this.network.getLink("80"));
+		toLinks.add(this.network.getLink("3"));
+//		toLinks.add(this.network.getLink("40"));
+//		toLinks.add(this.network.getLink("60"));
+//		toLinks.add(this.network.getLink("80"));
 		
 		for (Link fromLink : fromLinks) {
 			
