@@ -23,8 +23,6 @@ package playground.yu.newPlan;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
-import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PersonAlgorithmI;
 
 /**
@@ -35,12 +33,7 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
  * @author ychen
  * 
  */
-public class SelectedPlans extends PersonAlgorithm implements PersonAlgorithmI {
-	/**
-	 * internal writer, which can be used by object of subclass.
-	 */
-	protected PlansWriter pw;
-
+public class SelectedPlans extends NewPlan implements PersonAlgorithmI {
 	/**
 	 * Constructor, writes file-head
 	 * 
@@ -48,12 +41,7 @@ public class SelectedPlans extends PersonAlgorithm implements PersonAlgorithmI {
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
 	public SelectedPlans(Plans plans) {
-		pw = new PlansWriter(plans);
-		pw.writeStartPlans();
-	}
-
-	public void writeEndPlans() {
-		pw.writeEndPlans();
+		super(plans);
 	}
 
 	@Override
@@ -63,5 +51,4 @@ public class SelectedPlans extends PersonAlgorithm implements PersonAlgorithmI {
 		person.addPlan(selectedPlan);
 		pw.writePerson(person);
 	}
-
 }

@@ -29,41 +29,27 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
-import org.matsim.plans.algorithms.PersonAlgorithm;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- *
+ * 
  * @author ychen
- *
+ * 
  */
-public class NewAgentPtPlan2 extends PersonAlgorithm implements
-		PersonAlgorithmI {
-	/**
-	 * internal writer, which can be used by object of subclass.
-	 */
-	protected PlansWriter pw;
-
+public class NewAgentPtPlan2 extends NewPlan {
 	private List<Plan> copyPlans = new ArrayList<Plan>();
 
 	/**
 	 * Constructor, writes file-head
-	 *
+	 * 
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewAgentPtPlan2(final Plans plans) {
+		super(plans);
 		this.copyPlans.clear();
-		this.pw = new PlansWriter(plans);
-		this.pw.writeStartPlans();
-	}
-
-	public void writeEndPlans() {
-		this.pw.writeEndPlans();
 	}
 
 	@Override

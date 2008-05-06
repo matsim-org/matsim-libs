@@ -40,7 +40,7 @@ public class NewSmallPlan extends NewPlan implements PersonAlgorithmI {
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewSmallPlan(Plans plans) {
-		super(null, plans);
+		super(plans);
 	}
 
 	@Override

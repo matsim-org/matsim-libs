@@ -73,7 +73,7 @@ public class AvoidOldNodes extends NewPlan {
 		for (Plan p : person.getPlans()) {
 			for (LegIterator i = p.getIteratorLeg(); i.hasNext();) {
 				BasicLeg bl = i.next();
-				BasicRoute br = bl.getRoute();
+				BasicRoute<Node> br = bl.getRoute();
 				if (br != null) {
 					tag: for (final Node n : (ArrayList<Node>) (br.getRoute())) {
 						final String nId = n.getId().toString();

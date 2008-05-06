@@ -36,17 +36,18 @@ public abstract class NewPlan extends PersonAlgorithm {
 	protected PlansWriter pw;
 	protected NetworkLayer net;
 
-	/**
-	 * 
-	 */
-	public NewPlan(NetworkLayer network, Plans plans) {
-		net = network;
+	public NewPlan(Plans plans) {
 		pw = new PlansWriter(plans);
 		pw.writeStartPlans();
 	}
 
-	public NewPlan() {
-	}// dummy constructor
+	/**
+	 * 
+	 */
+	public NewPlan(NetworkLayer network, Plans plans) {
+		this(plans);
+		net = network;
+	}
 
 	public void writeEndPlans() {
 		pw.writeEndPlans();

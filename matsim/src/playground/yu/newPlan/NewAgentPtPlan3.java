@@ -28,8 +28,6 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
-import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PersonAlgorithmI;
 
 /**
@@ -40,12 +38,7 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
  * @author ychen
  *
  */
-public class NewAgentPtPlan3 extends PersonAlgorithm implements
-		PersonAlgorithmI {
-	/**
-	 * internal writer, which can be used by object of subclass.
-	 */
-	protected PlansWriter pw;
+public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithmI {
 
 	private List<Plan> copyPlans = new ArrayList<Plan>();
 
@@ -56,13 +49,8 @@ public class NewAgentPtPlan3 extends PersonAlgorithm implements
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewAgentPtPlan3(final Plans plans) {
+		super(plans);
 		this.copyPlans.clear();
-		this.pw = new PlansWriter(plans);
-		this.pw.writeStartPlans();
-	}
-
-	public void writeEndPlans() {
-		this.pw.writeEndPlans();
 	}
 
 	@Override
