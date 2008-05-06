@@ -501,6 +501,12 @@ public class PolygonGeneratorII {
 			MultiPolygon multiPolygon = (MultiPolygon) feature.getDefaultGeometry();
 			for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
 				Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
+				try {
+					polygon = (Polygon) polygon.buffer(0.05);
+				} catch (RuntimeException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				this.add(polygon);
 			}
 

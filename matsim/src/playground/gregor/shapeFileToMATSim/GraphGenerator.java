@@ -71,7 +71,7 @@ public class GraphGenerator {
 
 	private GeometryFactory geofac;
 	
-	private final static double MIN_LENGTH = 10.01;	
+	private final static double MIN_LENGTH = 2.;	
 
 	public GraphGenerator(FeatureSource featureSource) {
 		this.geofac = new GeometryFactory();

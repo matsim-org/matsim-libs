@@ -53,11 +53,13 @@ public class GISToMatsimConverter {
 	public static final double CAPACITY_COEF = 1.33;
 	
 	public GISToMatsimConverter(){
-//		this("./padang/padang_streets.shp","./padang/vd10_streetnetwork_padang_v0.5_utm47s.shp");
+		this("./padang/padang_streets.shp","./padang/vd10_streetnetwork_padang_v0.5_utm47s.shp");//
+//		this("./padang/padang_streets.shp","./padang/converter/d_ls.shp");
+		
 //		this("./padang/converter/p.shp", "./padang/converter/ls.shp");
 //		this("./padang/testcase1/simple/simpleIV.shp", "./padang/testcase1/simpleline/simplelineIV.shp" );
 //		this("./padang/test4poly.shp", "./padang/test8line.shp");
-		this("./padang/testcase1/padang/padangTeilStreets_testII.shp", "./padang/testcase1/padang/padangTeil_testIV.shp");
+//		this("./padang/testcase1/padang/padangTeilStreets_testII.shp", "./padang/testcase1/padang/padangTeil_testIV.shp");
 	}
 	
 	public GISToMatsimConverter(final String polyFile, final String lineFile){

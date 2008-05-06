@@ -147,9 +147,9 @@ public class PolygonLinksGenerator {
 			int i = 0;
 			for(Iterator<Entry<Integer, LineString>> lsIt = this.pg.getLineStringsMap().entrySet().iterator() ; lsIt.hasNext() ; ){
 				LineString lsEn = lsIt.next().getValue();
-				if (lsEn.overlaps(pLink)) i++;
+				if (lsEn.intersects(pLink) || lsEn.touches(pLink)) i++;
 				if (i > 1) {
-					log.warn(" ");
+//					log.warn(" ");
 					break;
 				}
 			}
