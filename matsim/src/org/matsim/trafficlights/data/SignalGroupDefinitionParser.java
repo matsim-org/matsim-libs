@@ -76,9 +76,6 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 	 */
 	private Map<Tuple<Id, Id>, SignalLane> linkLaneMap = new HashMap<Tuple<Id, Id>, SignalLane>();
 
-	/**
-	 *
-	 */
 	public SignalGroupDefinitionParser(List<SignalGroupDefinition> signalGroups) {
 		this.signalGroups = signalGroups;
 		this.setNamespaceAware(true);
@@ -93,7 +90,7 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 			this.currentSignalGroup.setTurnIfRed("true".compareToIgnoreCase(content.trim()) == 0);
 		}
 		else if (PASSINGCLEARINGTIME.equalsIgnoreCase(name)) {
-			this.currentSignalGroup.setPassingClearingTime(Integer.valueOf(content.trim()));
+			this.currentSignalGroup.setPassingClearingTime(Integer.parseInt(content.trim()));
 		}
 		else if (SIGNALGROUP.equalsIgnoreCase(name)) {
 			this.signalGroups.add(this.currentSignalGroup);
