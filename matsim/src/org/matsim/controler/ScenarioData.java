@@ -21,7 +21,6 @@
 package org.matsim.controler;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -31,7 +30,6 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkChangeEventsParser;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
