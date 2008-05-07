@@ -89,7 +89,7 @@ public class PlansGeneratorControler extends Controler {
 
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Plans population) {
-		Person p = new Person(new IdImpl(String.valueOf(ii)), "m", 12, "yes", "always", "yes");
+		Person p = new Person(new IdImpl(String.valueOf(ii)));
 		Plan plan = new Plan(p);
 		try {
 			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60., Time.UNDEFINED_TIME, true);
@@ -107,6 +107,9 @@ public class PlansGeneratorControler extends Controler {
 	public static void main(final String[] args) {
 
 		Config config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/config.xml" });
+		
+		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
+		config.network().setInputFile(netFileName);
 		
 		final PlansGeneratorControler controler = new PlansGeneratorControler(config);
 		controler.setOverwriteFiles(true);
