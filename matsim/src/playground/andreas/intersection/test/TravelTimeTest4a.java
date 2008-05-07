@@ -42,18 +42,18 @@ public class TravelTimeTest4a extends MatsimTestCase implements	EventHandlerLink
 		
 		new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions).run();
 
-		assertEquals(139.0, agentTravelTimes.get(new IdImpl(1)).intValue(), EPSILON);
-		assertEquals(140.0, agentTravelTimes.get(new IdImpl(2)).intValue(), EPSILON);
-		assertEquals(141.0, agentTravelTimes.get(new IdImpl(3)).intValue(), EPSILON);
+		assertEquals(140.0, agentTravelTimes.get(new IdImpl(1)).intValue(), EPSILON);
+		assertEquals(141.0, agentTravelTimes.get(new IdImpl(2)).intValue(), EPSILON);
+		assertEquals(142.0, agentTravelTimes.get(new IdImpl(3)).intValue(), EPSILON);
 		assertEquals(101.0, agentTravelTimes.get(new IdImpl(4)).intValue(), EPSILON);
 		assertEquals(100.0, agentTravelTimes.get(new IdImpl(5)).intValue(), EPSILON);
 		assertEquals( 99.0, agentTravelTimes.get(new IdImpl(6)).intValue(), EPSILON);
-		assertEquals(109.0, agentTravelTimes.get(new IdImpl(7)).intValue(), EPSILON);
-		assertEquals(110.0, agentTravelTimes.get(new IdImpl(8)).intValue(), EPSILON);
-		assertEquals(111.0, agentTravelTimes.get(new IdImpl(9)).intValue(), EPSILON);
-		assertEquals(124.0, agentTravelTimes.get(new IdImpl(10)).intValue(), EPSILON);
-		assertEquals(125.0, agentTravelTimes.get(new IdImpl(11)).intValue(), EPSILON);
-		assertEquals(126.0, agentTravelTimes.get(new IdImpl(12)).intValue(), EPSILON);
+		assertEquals(110.0, agentTravelTimes.get(new IdImpl(7)).intValue(), EPSILON);
+		assertEquals(111.0, agentTravelTimes.get(new IdImpl(8)).intValue(), EPSILON);
+		assertEquals(112.0, agentTravelTimes.get(new IdImpl(9)).intValue(), EPSILON);
+		assertEquals(125.0, agentTravelTimes.get(new IdImpl(10)).intValue(), EPSILON);
+		assertEquals(126.0, agentTravelTimes.get(new IdImpl(11)).intValue(), EPSILON);
+		assertEquals(127.0, agentTravelTimes.get(new IdImpl(12)).intValue(), EPSILON);		
 		
 	}
 

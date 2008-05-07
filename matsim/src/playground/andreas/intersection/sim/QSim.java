@@ -33,7 +33,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.mobsim.QueueNode;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -91,33 +90,18 @@ public class QSim extends QueueSimulation {
 			e.printStackTrace();
 		}
 		
-		for (Iterator<QueueNode> iter = network.getNodes().values().iterator(); iter.hasNext();) {
-			QNode node = (QNode) iter.next();
+		for (SignalSystemConfiguration signalSystemConfiguration : signalSystemConfigurations.values()) {
 			
-			// TODO [an] really bad hack, has to be rewritten and adopted to new infrastructure of DG
-					
-			if (node.getNode().getId().toString().equals("99")){
-				SignalSystemControlerImpl nodeControler = new SignalSystemControlerImpl(signalSystemConfigurations.get(node.getNode().getId()));
-				node.setSignalSystemControler(nodeControler);
-				
-				for (Iterator<? extends Link> iterator = node.getNode().getInLinks().values().iterator(); iterator.hasNext();) {
-					Link link = (Link) iterator.next();
-					QLink qLink = (QLink) network.getQueueLink(link.getId());
-					qLink.reconfigure(signalSystemConfigurations.get(node.getNode().getId()).getSignalGroupDefinitions());
-				}
-			}		
+			QNode qNode = (QNode) network.getNodes().get(signalSystemConfiguration.getId());
+			qNode.setSignalSystemControler(new SignalSystemControlerImpl(signalSystemConfiguration));
 			
-			if (node.getNode().getId().toString().equals("2")){
-				SignalSystemControlerImpl nodeControler = new SignalSystemControlerImpl(signalSystemConfigurations.get(node.getNode().getId()));
-				node.setSignalSystemControler(nodeControler);
-				
-				for (Iterator<? extends Link> iterator = node.getNode().getInLinks().values().iterator(); iterator.hasNext();) {
-					Link link = (Link) iterator.next();
-					QLink qLink = (QLink) network.getQueueLink(link.getId());
-					qLink.reconfigure(signalSystemConfigurations.get(node.getNode().getId()).getSignalGroupDefinitions());
-				}
-			}		
-		}		
+			for (Iterator<? extends Link> iterator = qNode.getNode().getInLinks().values().iterator(); iterator.hasNext();) {
+				Link link = (Link) iterator.next();
+				QLink qLink = (QLink) network.getQueueLink(link.getId());
+				qLink.reconfigure(signalSystemConfigurations.get(qNode.getNode().getId()).getSignalGroupDefinitions());
+			}
+		}
+		
 	}
 
 	protected void prepareSim() {
