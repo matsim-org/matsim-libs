@@ -187,6 +187,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				aaw.openFile(SOCNET_OUT_DIR+"ActivityActMap"+snIter+".txt");
 				this.log.info(" Writing out the map between Acts and Facilities ...");
 				aaw.write(snIter,this.controler.getPopulation());
+				aaw.close();
 				this.log.info(" ... done");
 			}
 
@@ -201,13 +202,12 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 			if(CALCSTATS){
 				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
 				this.snetstat.closeFiles();
-				aaw.close();
 			}
 		}
 //		Write out the KML for the EgoNet of a chosen agent
 //		if ((event.getIteration()-1)%replan_interval == 0){
 		if (event.getIteration() == this.controler.getLastIteration()){	
-			Person testP=this.controler.getPopulation().getPerson("100000");
+			Person testP=this.controler.getPopulation().getPerson("21924270");
 			EgoNetPlansMakeKML.loadData(testP);
 			EgoNetPlansMakeKML.write();
 		}
