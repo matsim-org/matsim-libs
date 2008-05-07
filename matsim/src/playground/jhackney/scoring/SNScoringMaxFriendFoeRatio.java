@@ -334,23 +334,10 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 			int friend=0;
 			int foe=0;
 			Person p1=plan.getPerson();
-			Activity myActivity=p1.getKnowledge().map.getActivity(act);//IF the exchange of information is working
-			//correctly, there will ALWAYS be an activity assigned to an act in the agent's plan.
-			//IF there is no activity (null) for the act, then this means that a change has occurred to
-			//a Plan.Act without this being updated in Person.Knowledge.
-			//Is this happening?
-			//The changes to acts permitted in the replanning algorithms are based on activities that are
-			//in Knowledge. No change could be made without the activity being in Knowledge. What could be happening?
-			//1) the act and activity are not correctly mapped to each other
-			//2) the activity is deleted even though the Act in the Plan depends on it
-			//3) the activities in the active (seleted) plan are insulated from deletion, so ...
-			//4) what if the activity of a non-selected plan is delected and then the plan is reactivated in
-			// another iteration, only to have the activity not found anymore ...
-//			System.out.println("SNSCORING DEBUG SOCIALPLANSMAPSIZE "+ socialPlansMap.size());
-//			System.out.println("SNSCORING DEBUG MYACTIVITY NUMBER" + myActivity.toString());
-//			System.out.println("SNSCORING DEBUG SOCIALPLANSMAP(myActivity) "+ socialPlansMap.get(myActivity));
+			Activity myActivity=p1.getKnowledge().map.getActivity(act);
+
 			if(socialPlansMap.get(myActivity)== null){
-				System.out.println("BUG");
+				Gbl.errorMsg("BUG");
 			}
 			Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
 			//for all agents in (social.plans.get(act){
@@ -368,7 +355,9 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 			if(ratio>0. && ratio <= 1.){
 				//utility=utility+(double)friend/(double)foe * const
 //				System.out.println("### test scoring "+ratio);
-				score+=10.*(double)friend/(double)foe;
+				if(myActivity.getType().equals("leisure")){
+					score+=10.*(double)friend/(double)foe;					
+				}
 			}else{
 //				System.out.println();
 			}
