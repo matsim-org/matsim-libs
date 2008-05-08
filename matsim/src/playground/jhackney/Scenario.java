@@ -37,6 +37,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
+import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -48,7 +49,7 @@ public abstract class Scenario {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final String output_directory = "output/raster";
+	private static final String output_directory = "output/";
 	private static final String input_directory = "input/";
 
 	//////////////////////////////////////////////////////////////////////
@@ -74,8 +75,8 @@ public abstract class Scenario {
 		config.world().setInputFile(input_directory + "world.xml");
 		config.world().setOutputFile(output_directory + "output_world.xml");
 
-		config.network().setInputFile(input_directory + "network.xml.gz");
-		config.network().setOutputFile(output_directory + "output_network.xml.gz");
+		config.network().setInputFile(input_directory + "network.xml");
+		config.network().setOutputFile(output_directory + "output_network.xml");
 
 		config.facilities().setInputFile(input_directory + "facilities.xml");
 		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
@@ -135,9 +136,10 @@ public abstract class Scenario {
 	}
 	
 	public static final Plans readPlans() {
-		System.out.println("  reding plans xml file... ");
+		System.out.println("  reading plans xml file... ");
 		Plans plans = new Plans();
 		new MatsimPlansReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
+
 		System.out.println("  done.");
 		return plans;
 	}

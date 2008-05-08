@@ -21,10 +21,15 @@
 package playground.jhackney;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.plans.MatsimPlansReader;
+import org.matsim.plans.Plans;
+import org.matsim.plans.PlansReaderI;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldCreateRasterLayer;
 import org.matsim.world.algorithms.WorldValidation;
+
+import playground.jhackney.algorithms.PersonsRandomizeId;
 
 public class ScenarioParsing {
 
@@ -39,6 +44,8 @@ public class ScenarioParsing {
 		Scenario.setUpScenarioConfig();
 
 		Scenario.readWorld();
+		Scenario.readNetwork();
+		Plans plans = Scenario.readPlans();
 		
 //		System.out.println("  reading world xml file... ");
 //		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
@@ -61,8 +68,8 @@ public class ScenarioParsing {
 //		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton());
 //		reader.readFile(Gbl.getConfig().matrices().getInputFile());
 //		System.out.println("  done.");
-
-//		System.out.println("  reding plans xml file... ");
+//
+//		System.out.println("  reading plans xml file... ");
 //		Plans plans = new Plans();
 //		PlansReaderI plansReader = new MatsimPlansReader(plans);
 //		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
@@ -101,23 +108,24 @@ public class ScenarioParsing {
 //		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-
-		System.out.println("  running world modules... ");
-		new WorldCreateRasterLayer(3000).run(Gbl.getWorld());
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
-		new WorldCheck().run(Gbl.getWorld());
-		System.out.println("  done.");
+//
+//		System.out.println("  running world modules... ");
+//		new WorldCreateRasterLayer(3000).run(Gbl.getWorld());
+//		new WorldCheck().run(Gbl.getWorld());
+//		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+//		new WorldValidation().run(Gbl.getWorld());
+//		new WorldCheck().run(Gbl.getWorld());
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-//		System.out.println("  running plans modules... ");
+		System.out.println("  running plans modules... ");
 //		new PersonAssignLinkViaFacility(network,facilities).run(plans);
 ////		new XY2Links(network).run(plans);
 //		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 //		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
-//		System.out.println("  done.");
+		new PersonsRandomizeId(plans);
+		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -127,11 +135,11 @@ public class ScenarioParsing {
 
 		//////////////////////////////////////////////////////////////////////
 
-//		Scenario.writePlans(plans);
+		Scenario.writePlans(plans);
 //		Scenario.writeNetwork(network);
 //		Scenario.writeFacilities(facilities);
-		Scenario.writeWorld(Gbl.getWorld());
-		Scenario.writeConfig();
+//		Scenario.writeWorld(Gbl.getWorld());
+//		Scenario.writeConfig();
 
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();
