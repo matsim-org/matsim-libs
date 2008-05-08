@@ -25,7 +25,6 @@ import java.util.TreeMap;
 
 import org.matsim.enterprisecensus.EnterpriseCensus;
 import org.matsim.enterprisecensus.EnterpriseCensusParser;
-import org.matsim.enterprisecensus.EnterpriseCensusWriter;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
@@ -45,7 +44,8 @@ public class FacilitiesWork9To18 extends FacilitiesAlgorithm {
 		int hectareCnt = 0, facilityCnt = 0;
 		int skip = 1;
 		int B01S2, B01S3, B01EQTS2, B01EQTS3, jobsPerFacility;
-		String reli, X, Y;
+		Double reli; 
+		String X, Y;
 		Facility f;
 		Activity a;
 
@@ -63,16 +63,17 @@ public class FacilitiesWork9To18 extends FacilitiesAlgorithm {
 		System.out.println("  done.");
 
 		System.out.println("  creating facilities... ");
-		TreeMap<String, double[]> ecHectars = this.myCensus.getEnterpriseCensusHectareAggregation();
-		Iterator<String> it = ecHectars.keySet().iterator();
+		TreeMap<Double, TreeMap<String, Double>> hectareAggregation = this.myCensus.getHectareAggregation();
+//		TreeMap<String, double[]> ecHectars = this.myCensus.getEnterpriseCensusHectareAggregation();
+		Iterator<Double> it = hectareAggregation.keySet().iterator();
 		while (it.hasNext()) {
 			reli = it.next();
-			B01S2 = this.myCensus.getHectareAttributeFloor(reli, "B01S2");
-			B01S3 = this.myCensus.getHectareAttributeFloor(reli, "B01S3");
+			B01S2 = this.myCensus.getHectareAggregationInformationFloor(reli, "B01S2");
+			B01S3 = this.myCensus.getHectareAggregationInformationFloor(reli, "B01S3");
 			B01EQTS2 = this.myCensus.getHectareAttributeRound(reli, "B01EQTS2");
 			B01EQTS3 = this.myCensus.getHectareAttributeRound(reli, "B01EQTS3");
-			X = Integer.toString(this.myCensus.getHectareAttributeFloor(reli, "X"));
-			Y = Integer.toString(this.myCensus.getHectareAttributeFloor(reli, "Y"));
+			X = Integer.toString(this.myCensus.getHectareAggregationInformationFloor(reli, "X"));
+			Y = Integer.toString(this.myCensus.getHectareAggregationInformationFloor(reli, "Y"));
 
 			for (int i=0; i<B01S2; i++) {
 				f = facilities.createFacility(Integer.toString(facilityCnt++), X, Y);
@@ -111,14 +112,14 @@ public class FacilitiesWork9To18 extends FacilitiesAlgorithm {
 		}
 		System.out.println("  creating facilities...DONE.");
 
-		System.out.println("  writing EnterpriseCensus object to output file... ");
-		EnterpriseCensusWriter myCensusWriter = new EnterpriseCensusWriter();
-		try {
-			myCensusWriter.write(this.myCensus);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		System.out.println("  done.");
+//		System.out.println("  writing EnterpriseCensus object to output file... ");
+//		EnterpriseCensusWriter myCensusWriter = new EnterpriseCensusWriter();
+//		try {
+//			myCensusWriter.write(this.myCensus);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		System.out.println("  done.");
 	}
 
 }

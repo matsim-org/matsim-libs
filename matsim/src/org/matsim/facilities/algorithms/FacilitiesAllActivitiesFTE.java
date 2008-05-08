@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.enterprisecensus.EnterpriseCensus;
 import org.matsim.enterprisecensus.EnterpriseCensusParser;
 import org.matsim.facilities.Activity;
@@ -33,6 +34,8 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 
 public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
+
+	private static Logger log = Logger.getLogger(FacilitiesAllActivitiesFTE.class);
 
 	private final static String TEMPORARY_FACILITY_ID_SEPARATOR = "_";
 
@@ -48,11 +51,26 @@ public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
 	@Override
 	public void run(Facilities facilities) {
 
+//		this.createThem2008();
 		this.createThem(facilities);
 		//this.testTemporaryFacilityIds();
 
 	}
 
+	private void loadCensus() {
+		
+		log.info("Reading enterprise census files into EnterpriseCensus object...");
+		this.myCensus = new EnterpriseCensus();
+
+		EnterpriseCensusParser myCensusParser = new EnterpriseCensusParser(this.myCensus);
+		try {
+			myCensusParser.parse(this.myCensus);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		log.info("Reading enterprise census files into EnterpriseCensus object...done.");
+	}
+	
 	private void createThem(Facilities facilities) {
 
 		this.loadFacilityActivities();
@@ -104,37 +122,27 @@ public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
 		Facility f;
 		Activity a;
 
-		System.out.println("  creating EnterpriseCensus object... ");
-		this.myCensus = new EnterpriseCensus();
-		System.out.println("  done.");
-
-		System.out.println("  reading enterprise census files into EnterpriseCensus object... ");
-		EnterpriseCensusParser myCensusParser = new EnterpriseCensusParser(this.myCensus);
-		try {
-			myCensusParser.parse(this.myCensus);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		System.out.println("  done.");
-
+		loadCensus();
+		
 		System.out.println("  creating facilities... ");
-		Set<String> ecHectares = this.myCensus.getHectareAggregationKeys();
+		Set<Double> ecHectares = this.myCensus.getHectareAggregation().keySet();
+//		Set<String> ecHectares = this.myCensus.getHectareAggregationKeys();
 
 		TreeSet<String> sector2_attributeIds = this.myCensus.getHectareAttributeIdentifiersBySector(2);
 		TreeSet<String> sector3_attributeIds = this.myCensus.getHectareAttributeIdentifiersBySector(3);
 		Iterator<String> attributeIds_it = null;
 
-		for (String reli : ecHectares) {
-			X = Integer.toString(this.myCensus.getHectareAttributeFloor(reli, "X"));
-			Y = Integer.toString(this.myCensus.getHectareAttributeFloor(reli, "Y"));
+		for (Double reli : ecHectares) {
+			X = Integer.toString(this.myCensus.getHectareAggregationInformationFloor(reli, "X"));
+			Y = Integer.toString(this.myCensus.getHectareAggregationInformationFloor(reli, "Y"));
 
 			for (int sector = 2; sector <=3; sector++) {
 
 				if (sector == 2) {
-					numSectorFTE = this.myCensus.getHectareAttributeFloor(reli, "B01EQTS2");
+					numSectorFTE = this.myCensus.getHectareAggregationInformationFloor(reli, "B01EQTS2");
 					attributeIds_it = sector2_attributeIds.iterator();
 				} else if (sector == 3) {
-					numSectorFTE = this.myCensus.getHectareAttributeFloor(reli, "B01EQTS3");
+					numSectorFTE = this.myCensus.getHectareAggregationInformationFloor(reli, "B01EQTS3");
 					attributeIds_it = sector3_attributeIds.iterator();
 				}
 				if (numSectorFTE == Integer.MAX_VALUE) {
@@ -144,7 +152,7 @@ public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
 				// create temporary facilities with minimum number of FTEs
 				while (attributeIds_it.hasNext()) {
 					attributeId = attributeIds_it.next();
-					numFacilities = this.myCensus.getHectareAttributeFloor(reli, attributeId);
+					numFacilities = this.myCensus.getHectareAggregationInformationFloor(reli, attributeId);
 					// assign minimum work capacity, here number of fulltime equivalents
 					sizeRange =	Integer.parseInt(attributeId.substring(attributeId.length() - 1));
 					minFTEs = (minFTEsPerFacility.get(sizeRange)).intValue();
