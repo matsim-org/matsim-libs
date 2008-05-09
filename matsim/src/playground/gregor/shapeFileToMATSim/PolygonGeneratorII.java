@@ -1002,7 +1002,7 @@ public QuadTree<Coordinate> getCoordinateQuatTree(Polygon p) {
 		return q;
 }
 
-/*package*/ protected SortedMap<Double, LineString> sortLines(Collection<LineString> ls, Point point){
+/*package*/ protected SortedMap<Double, LineString> sortLines(Collection<LineString> ls, Point point) throws Exception{
 	
 	SortedMap<Double, LineString> sortedLines = new TreeMap<Double, LineString>();
 	List<LineString> lines = new ArrayList<LineString>();
@@ -1082,7 +1082,7 @@ public static double skalarMultiCoord(Coordinate coordI, Coordinate coordII){
 
 //Returns the first (start == true) or last (start == false) segment of a lineString
 //The first point of the returned lineString is the start or end point of the original lineString
-public LineString separateLine(LineString ls, boolean start){
+public LineString separateLine(LineString ls, boolean start) throws Exception{
 	
 	LineString vec;
 	Coordinate [] lineIcoor = ls.getCoordinates();

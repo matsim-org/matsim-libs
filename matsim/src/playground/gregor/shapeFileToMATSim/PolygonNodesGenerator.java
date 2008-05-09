@@ -149,7 +149,18 @@ public class PolygonNodesGenerator {
 				}
 				
 				
-				SortedMap<Double, LineString> sortedLs = this.pg.sortLines(tmpLs,currPoint);
+				SortedMap<Double, LineString> sortedLs = null;
+				try {
+					sortedLs = this.pg.sortLines(tmpLs,currPoint);
+				} catch (Exception e) {
+					log.warn("could not sort line strings");
+					continue;
+				}
+				
+				
+				
+				
+				
 				org.matsim.utils.collections.gnuclasspath.TreeMap<Double,LineString> sortedLsTree = new org.matsim.utils.collections.gnuclasspath.TreeMap<Double,LineString>(sortedLs);
 				if (sortedLsTree.values().size() < 3) {
 					log.warn("intersection with only: " + sortedLsTree.values().size() + " LineString found, this should not happen!" );

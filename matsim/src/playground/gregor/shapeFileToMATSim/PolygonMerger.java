@@ -165,20 +165,22 @@ public class PolygonMerger {
    				for (double dbl = 0.05; dbl <= 0.551; dbl += 0.05) {
    					retPoly = (Geometry) geoColl.buffer(dbl);
 	   				if (retPoly.getNumGeometries() > 1) {
-	   					if (dbl >= 0.5) {
-	   						log.warn("Multipolygon produced in mergePolygons() - increasing radius!");
-//	   			   			for (int i = 0; i < retPoly.getNumGeometries(); i++) {
-//	   							Polygon polygon = (Polygon) retPoly.getGeometryN(i);
-//	   							this.pg.createPolygonFeature(polygon,3,id,0,0,0,0);
-//	   			   			}	   						
-	   					} else {
-	   						log.info("Multipolygon produced in mergePolygons() - increasing radius!");
-	   					}
+//	   					if (dbl >= 0.5) {
+//	   						log.warn("Multipolygon produced in mergePolygons() - increasing radius!");
+////	   			   			for (int i = 0; i < retPoly.getNumGeometries(); i++) {
+////	   							Polygon polygon = (Polygon) retPoly.getGeometryN(i);
+////	   							this.pg.createPolygonFeature(polygon,3,id,0,0,0,0);
+////	   			   			}	   						
+//	   					} else {
+//	   						log.info("Multipolygon produced in mergePolygons() - increasing radius!");
+//	   					}
 	   				} else {
 	   					break;
 	   				}
 	   				
    				}
+   				
+   				
 	   			for (int i = 0; i < retPoly.getNumGeometries(); i++) {
 					Polygon polygon = (Polygon) retPoly.getGeometryN(i);
 					

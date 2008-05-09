@@ -164,9 +164,9 @@ public class PolygonLinksGenerator {
 		
 	private Collection<Polygon> separatePoly(Polygon pLink , Polygon pNode){
 		
-		Polygon b = (Polygon) pNode.buffer(0.2);
 			Collection<Polygon> p = new ArrayList<Polygon>();
 			try {
+				Polygon b = (Polygon) pNode.buffer(0.2);
 				Geometry geo = (Geometry) pLink.difference(b);
 				for (int i = 0; i<geo.getNumGeometries(); i++) {
 					p.add((Polygon) geo.getGeometryN(i));

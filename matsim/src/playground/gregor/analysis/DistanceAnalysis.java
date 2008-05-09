@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
@@ -60,6 +58,7 @@ import org.opengis.referencing.FactoryException;
 import playground.gregor.shapeFileToMATSim.ShapeFileReader;
 import playground.gregor.shapeFileToMATSim.ShapeFileWriter;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -70,6 +69,7 @@ public class DistanceAnalysis {
 	private static final Logger log = Logger.getLogger(DistanceAnalysis.class);
 	private FeatureSource featureSourcePolygon;
 	private ArrayList<Polygon> polygons;
+
 	private Plans population;
 	private Envelope envelope = null;
 	private QuadTree<Person> personTree;
@@ -81,212 +81,222 @@ public class DistanceAnalysis {
 	private HashMap<Polygon,Double> catchRadi = new HashMap<Polygon,Double>();
 	private static double CATCH_RADIUS;
 	org.matsim.utils.collections.gnuclasspath.TreeMap<Double, Feature> ft_tree;
-	private int num_of_classes;
-	
-	
-	
-	
-	public DistanceAnalysis(FeatureSource features, Plans population, NetworkLayer network, int num_of_classes) {
+
+
+
+
+
+	public DistanceAnalysis(FeatureSource features, Plans population, NetworkLayer network) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
 		this.network = network;
-		this.num_of_classes = num_of_classes;
+		this.envelope  = this.featureSourcePolygon.getBounds();
 		this.router = new PlansCalcRoute(network, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());
 		this.geofac = new GeometryFactory();
-		try {
-			initFeatureCollection();
-		} catch (FactoryRegistryException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (SchemaException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
-			parsePolygons();
-		} catch (Exception e) {
-				e.printStackTrace();
-		}
+
+		initFeatureCollection();
+		parsePolygons();
+		createPolygons();
 		handlePlans();
 		iteratePolygons();
 		writePolygons();
-		
-		
+
+
 
 
 	}
 	private void writePolygons() {
-		double from = this.ft_tree.firstKey();
-		double to = this.ft_tree.lastKey();
-		double stepsize = (to - from) / this.num_of_classes;
-		
-		
-		
-		for (double key = from+stepsize; key < (to+stepsize); key += stepsize) {
-			this.features.clear();
-			while (this.ft_tree.lowerEntry(key) != null) {
-				double tmp_key = this.ft_tree.lowerKey(key);
-				Feature ft = this.ft_tree.get(tmp_key);
-				this.features.add(ft);
-				this.ft_tree.remove(tmp_key);
+		try {
+			ShapeFileWriter.writeGeometries(this.features, "./padang/evac_classification.shp");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FactoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SchemaException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+	private void createPolygons() throws Exception {
+		this.polygons = new ArrayList<Polygon>();
+		double length = 750;
+		GTH gth = new GTH(this.geofac);
+		Envelope e = this.featureSourcePolygon.getBounds();
+		for (double x = e.getMinX(); x < e.getMaxX(); x += length) {
+			for (double y = e.getMinY(); y < e.getMaxY(); y+= length) {
+				Polygon p = gth.getSquare(new Coordinate(x,y), length);
+				this.polygons.add(p);
 			}
-			try {
-				ShapeFileWriter.writeGeometries(this.features, "./padang/test_ft" + (int)key  + ".shp");
-			} catch (Exception e) {
-					e.printStackTrace();
-			}			
-			
 			
 		}
 		
 		
-		
-		
-		
-
-		
 	}
-	private void iteratePolygons() {
-		
-		this.ft_tree =  new org.matsim.utils.collections.gnuclasspath.TreeMap<Double, Feature>();
 
-		
-		
+
+
+
+
+	private void iteratePolygons(){
+
+		this.ft_tree =  new org.matsim.utils.collections.gnuclasspath.TreeMap<Double, Feature>();
+		int id = 0;
+
+		int toGo = this.polygons.size();
 		for (Polygon polygon : this.polygons) {
 			int num_pers = 0;
-			double length_shortest = 0;
-			double length_selected = 0;
-			
-			
-			
-			Collection<Person> persons = this.personTree.get(polygon.getCentroid().getX(), polygon.getCentroid().getY(),this.catchRadi.get(polygon));
-			System.out.println("11111111111111111" + persons.size());
+
+			Collection<Person> persons = this.personTree.get(polygon.getCentroid().getX(), polygon.getCentroid().getY(),400);
+
 			persons = rmAliens(persons,polygon);
-			System.out.println("22222222222222222" + persons.size());
+
 			num_pers = persons.size();
 			if (num_pers == 0) continue;
-			double meanDeviance = handlePersons(persons) / num_pers;
+
+			double [] dists = handlePersons(persons);
+			double meanDeviance = (dists[0] - dists[1]) / num_pers;
+			double length_shortest = dists[1] / num_pers;
+			double length_selected = dists[0] / num_pers;
+			double evac_time = (-dists[2] * 10) / num_pers;  
+			double varK = dists[3];
 			
 			try {
-				ft_tree.put(meanDeviance, getFeature(polygon,meanDeviance,length_shortest,length_selected, num_pers));
+				this.features.add(getFeature(polygon, meanDeviance, length_shortest, length_selected, num_pers, id++, evac_time,varK));
 			} catch (IllegalAttributeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-//			try {
-//				this.features.add(getFeature(polygon,meanDeviance,length_shortest,length_selected, num_pers));
-//			} catch (IllegalAttributeException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-			
+			toGo--;
+			if (toGo % 100 == 0)
+				log.info("ToGo:" + toGo);
+
 		}
-		
-	}
-	private Feature getFeature(Polygon polygon, double meanDeviance,
-			double length_shortest, double length_selected, int num_pers) throws IllegalAttributeException {
-
-		return this.ftDistrictShape.create(new Object [] {new MultiPolygon(new Polygon []{polygon },this.geofac), -1, 0.0, polygon.getArea(), " ", num_pers, meanDeviance },"network");
 
 	}
-	private double handlePersons(Collection<Person> persons) {
-		double length_selected = 0;
-		double length_shortest = 0;
+
+	private double[] handlePersons(Collection<Person> persons) {
+
+		double [] dist = {0., 0.,0., 0.}; 
+		double diff = 0;
+		double [] diffAll = new double [persons.size()];
+		int i = 0;
 		for (Person person : persons) {
 			Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
-			length_selected += leg.getRoute().getDist();
+			dist[0] += leg.getRoute().getDist();
+			dist[2] += person.getSelectedPlan().getScore(); 
 			Plan plan = new Plan(person);
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
 			plan.addLeg(new Leg(1,"car",0.0,0.0,0.0));
 			plan.addAct(person.getSelectedPlan().getNextActivity(leg));
 			router.run(plan);
 			Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
-			length_shortest += leg2.getRoute().getDist();
+			dist[1] += leg2.getRoute().getDist();
+			diff += dist[2] - dist[1];
+			diffAll[i++] = dist[2] - dist[1];
 		}
-		
-		return length_selected  - length_shortest;
-		
+		double mean = diff / i;
+		double var = 0;
+		for (i = 0; i < persons.size(); i++) {
+			var += (diffAll[i] - mean) * (diffAll[i] - mean);
+			
+		}
+		double sd = Math.sqrt(var);
+		double varK = sd / mean;
+		dist[3] = varK;
+		return dist;
+
 	}
 	private Collection<Person>  rmAliens(Collection<Person> persons, Polygon polygon) {
-//		ConcurrentLinkedQueue<Person> ret = new ConcurrentLinkedQueue<Person>(persons);
+
 		ArrayList<Person> ret = new ArrayList<Person>();
 		for (Person person : persons) {
 			Point p = MGC.coord2Point(person.getSelectedPlan().getFirstActivity().getCoord());
 			if (polygon.contains(p)) {
-//				ret.remove(person);
 				ret.add(person);
 			}
 		}
 		return ret;
 	}
 	private void handlePlans() {
-		
-		this.personTree = new QuadTree<Person>(this.envelope.getMinX(),this.envelope.getMinY(),this.envelope.getMaxX(),this.envelope.getMaxY());
+
+		this.personTree = new QuadTree<Person>(0,0,3*this.envelope.getMaxX(),3*this.envelope.getMaxY());
 		for (Person person : this.population.getPersons().values()){
 			CoordI c = person.getSelectedPlan().getFirstActivity().getCoord();
 			this.personTree.put(c.getX(), c.getY(), person);
 		}
-		
+
 	}
 	private void parsePolygons()throws Exception{
-		
+
 		log.info("parseing features ...");
-		
+
 		FeatureCollection collectionPolygon = this.featureSourcePolygon.getFeatures();
 		this.envelope  = this.featureSourcePolygon.getBounds();
-	
-		
+
+
 		this.polygons = new ArrayList<Polygon>();
-		
+
 
 		FeatureIterator it = collectionPolygon.features();
 		while (it.hasNext()) {
 			Feature feature = it.next();
 			double catch_radius = Math.max(feature.getBounds().getHeight(),feature.getBounds().getWidth())/2;
-//			 CATCH_RADIUS = Math.max(CATCH_RADIUS,catch_radius);
-			
+//			CATCH_RADIUS = Math.max(CATCH_RADIUS,catch_radius);
+
 			MultiPolygon multiPolygon = (MultiPolygon) feature.getDefaultGeometry();
 			for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
 				Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
 				this.catchRadi .put(polygon,catch_radius);
 				this.polygons.add(polygon);
-			
+
 			}
 		}
-		
+
 		log.info("done.");
-		
+
 	}
-	
+
+	private Feature getFeature(Polygon polygon, double meanDeviance,
+			double length_shortest, double length_selected, int num_pers, int id, double evac_time, double varK ) throws IllegalAttributeException {
+
+		return this.ftDistrictShape.create(new Object [] {new MultiPolygon(new Polygon []{polygon },this.geofac),id,num_pers, length_shortest, length_selected, meanDeviance, meanDeviance*meanDeviance,evac_time, varK},"network");
+
+	}
+
 	private void initFeatureCollection() throws FactoryRegistryException, SchemaException {
 		this.features = new ArrayList<Feature>();
-		
+
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
 		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
-		AttributeType width = AttributeTypeFactory.newAttributeType("width", Double.class);
-		AttributeType area = AttributeTypeFactory.newAttributeType("area", Double.class);
-		AttributeType info = AttributeTypeFactory.newAttributeType("info", String.class);
-		AttributeType persons = AttributeTypeFactory.newAttributeType("persons", Integer.class);
-		AttributeType deviance = AttributeTypeFactory.newAttributeType("deviance", Double.class);
-		this.ftDistrictShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id, width, area, info, persons, deviance }, "linkShape");
-		
-		
+		AttributeType inhabitants = AttributeTypeFactory.newAttributeType("inhabitants", Integer.class);
+		AttributeType shortest = AttributeTypeFactory.newAttributeType("shortest_path", Double.class);
+		AttributeType current = AttributeTypeFactory.newAttributeType("current_path", Double.class);
+		AttributeType deviance = AttributeTypeFactory.newAttributeType("diff_shortest_current", Double.class);
+		AttributeType devianceSqr = AttributeTypeFactory.newAttributeType("square_diff_shortest_current", Double.class);
+		AttributeType evac_time = AttributeTypeFactory.newAttributeType("evac_time", Double.class);
+		AttributeType varK = AttributeTypeFactory.newAttributeType("varK", Double.class);
+		this.ftDistrictShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id, inhabitants, shortest, current, deviance, devianceSqr, evac_time, varK }, "gridShape");
+
+
 	}
-	
+
 	public static void main(String [] args) {
 
-		
+
 		String district_shape_file;
-		int num_of_classes;
+		
 
 
-		if (args.length != 3) {
-			throw new RuntimeException("wrong number of arguments! Pleas run DistanceAnalysis config.xml shapefile.shp num_classes" );
+		if (args.length != 2) {
+			throw new RuntimeException("wrong number of arguments! Pleas run DistanceAnalysis config.xml shapefile.shp" );
 		} else {
 			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 			district_shape_file = args[1];
-			num_of_classes = Integer.parseInt(args[2]);
+			
 		}
 
 		World world = Gbl.createWorld();
@@ -297,7 +307,7 @@ public class DistanceAnalysis {
 		world.setNetworkLayer(network);
 		world.complete();
 		log.info("done.");
-		
+
 		log.info("loading shape file from " + district_shape_file);
 		FeatureSource features = null;
 		try {
@@ -306,17 +316,29 @@ public class DistanceAnalysis {
 			e.printStackTrace();
 		}
 		log.info("done");
-		
+
 
 		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
 		Plans population = new Plans();
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		log.info("done.");
+
+
+		try {
+			new DistanceAnalysis(features,population,network);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		
-		DistanceAnalysis da = new DistanceAnalysis(features,population,network, num_of_classes);
-		
+		try {
+			new EgressAnalysis(features,population,network);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }
 
