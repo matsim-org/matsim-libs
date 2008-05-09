@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.jhackney.algorithms;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
@@ -31,12 +28,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.socialnetworks.algorithms.FacilitiesFindScenarioMinMaxCoords;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.world.AbstractLocation;
-import org.matsim.world.MappingRule;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
-import org.matsim.world.algorithms.WorldAlgorithm;
 
 /**
  * 
@@ -51,7 +45,7 @@ import org.matsim.world.algorithms.WorldAlgorithm;
  * establish the X,Y limits and to calculate a mapping rule.
  *
  */
-public class WorldCreateRasterLayer2 extends WorldAlgorithm {
+public class WorldCreateRasterLayer2 {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -77,7 +71,6 @@ public class WorldCreateRasterLayer2 extends WorldAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final World world) {
 		System.out.println("    running " + this.getClass().getName() + " module with cell size = " + cellsize + " x " + cellsize + " meters...");
 

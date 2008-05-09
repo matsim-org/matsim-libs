@@ -29,7 +29,7 @@ import org.matsim.world.Location;
 import org.matsim.world.MappingRule;
 import org.matsim.world.World;
 
-public class WorldValidation extends WorldAlgorithm {
+public class WorldValidation {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -57,7 +57,7 @@ public class WorldValidation extends WorldAlgorithm {
 		if (down_layer.getLocations().isEmpty() || up_layer.getLocations().isEmpty()) {
 			log.info("      mapping rule='" + m + "'");
 			if ((m.getDownCardinality() != 'm') || (m.getUpCardinality() != 'm')) {
-				log.info("      ==> NOT VALID: one or both layers are empty!");
+				log.warn("      ==> NOT VALID: one or both layers are empty!");
 				return false;
 			}
 		}
@@ -112,7 +112,7 @@ public class WorldValidation extends WorldAlgorithm {
 		log.info("      current rule='" + curr_rule + "'");
 		if (m.getDownCardinality() == 'm') { return true; }
 		if (!curr_rule.equals(m.toString())) {
-			log.info("      ==> NOT VALID: mapping does not respect the rule!");
+			log.warn("      ==> NOT VALID: mapping does not respect the rule!");
 			return false;
 		}
 		return true;
@@ -122,7 +122,6 @@ public class WorldValidation extends WorldAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final World world) {
 		log.info("    running " + this.getClass().getName() + " algorithm...");
 

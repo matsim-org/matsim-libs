@@ -36,7 +36,7 @@ import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-public class WorldBottom2TopCompletion extends WorldAlgorithm {
+public class WorldBottom2TopCompletion {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -135,7 +135,6 @@ public class WorldBottom2TopCompletion extends WorldAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(World world) {
 		log.info("    running " + this.getClass().getName() + " module...");
 

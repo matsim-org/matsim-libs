@@ -34,7 +34,7 @@ import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-public class WorldCreateRasterLayer extends WorldAlgorithm {
+public class WorldCreateRasterLayer {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -60,7 +60,6 @@ public class WorldCreateRasterLayer extends WorldAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final World world) {
 		System.out.println("    running " + this.getClass().getName() + " module with cell size = " + this.cellsize + " x " + this.cellsize + " meters...");
 
@@ -100,14 +99,14 @@ public class WorldCreateRasterLayer extends WorldAlgorithm {
 		System.out.println("      done.");
 
 		System.out.println("      creating " + n + " x " + m + " cells...");
-		TreeMap<Id,Zone> zones = (TreeMap<Id,Zone>)layer.getLocations();
+		TreeMap<Id, Zone> zones = (TreeMap<Id, Zone>) layer.getLocations();
 		for (int i=0; i<n ; i++) {
 			for (int j=0; j<m; j++) {
 				CoordI z_min = new Coord(min.getX()+j*this.cellsize,min.getY()+i*this.cellsize);
 				CoordI z_max = new Coord(min.getX()+(j+1)*this.cellsize,min.getY()+(i+1)*this.cellsize);
 				CoordI z_center = new Coord((z_min.getX()+z_max.getX())/2.0,(z_min.getY()+z_max.getY())/2.0);
 				Zone zone = new Zone(layer,new IdImpl(j+i*m),z_center,z_min,z_max,this.cellsize*this.cellsize,"raster("+i+","+j+")");
-				zones.put(zone.getId(),zone);
+				zones.put(zone.getId(), zone);
 			}
 		}
 		System.out.println("      done.");

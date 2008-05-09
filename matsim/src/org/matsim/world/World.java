@@ -32,8 +32,6 @@ import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
-import org.matsim.world.algorithms.WorldAlgorithm;
-
 
 public class World {
 
@@ -48,8 +46,6 @@ public class World {
 
 	private Layer top_layer = null;
 	private Layer bottom_layer = null;
-
-	private final ArrayList<WorldAlgorithm> algorithms = new ArrayList<WorldAlgorithm>();
 
 	private final static Logger log = Logger.getLogger(World.class);
 
@@ -84,7 +80,9 @@ public class World {
 				Layer l = zlayers.get(i);
 				if (zlayers.get(i).getUpRule() == null) { this.top_layer = l; }
 			}
-			if (this.top_layer == null) { Gbl.errorMsg("Something is completely wrong!"); }
+			if (this.top_layer == null) {
+				throw new RuntimeException("Something is completely wrong!");
+			}
 
 			// find the bottom layer
 			int step_cnt = 1;
@@ -238,20 +236,20 @@ public class World {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void setFacilityLayer(final Facilities facilitylayer) {
-		if (facilitylayer == null) { Gbl.errorMsg("facilitylayer=null not allowed!"); }
-		else {
-			this.layers.put(Facilities.LAYER_TYPE,facilitylayer);
-			this.complete();
+	public void setFacilityLayer(final Facilities facilityLayer) {
+		if (facilityLayer == null) { 
+			throw new IllegalArgumentException("facilityLayer=null not allowed!");
 		}
+		this.layers.put(Facilities.LAYER_TYPE, facilityLayer);
+		this.complete();
 	}
 
 	public void setNetworkLayer(final NetworkLayer network) {
-		if (network == null) { Gbl.errorMsg("network=null not allowed!"); }
-		else {
-			this.layers.put(NetworkLayer.LAYER_TYPE,network);
-			this.complete();
+		if (network == null) {
+			throw new IllegalArgumentException("network=null not allowed!");
 		}
+		this.layers.put(NetworkLayer.LAYER_TYPE, network);
+		this.complete();
 	}
 
 	protected final void setName(final String name) {
@@ -261,10 +259,6 @@ public class World {
 	//////////////////////////////////////////////////////////////////////
 	// add methods
 	//////////////////////////////////////////////////////////////////////
-
-	public final void addAlgorithm(final WorldAlgorithm algo) {
-		this.algorithms.add(algo);
-	}
 
 	public final void addMapping(final Zone zone1, final Zone zone2) {
 		if (this.getMappingRule(zone1.getLayer(),zone2.getLayer()) != null) {
@@ -284,24 +278,13 @@ public class World {
 		Zone down_zone = (Zone)mapping_rule.getDownLayer().getLocation(down_zone_id);
 		Zone up_zone   = (Zone)mapping_rule.getUpLayer().getLocation(up_zone_id);
 		if (down_zone == null) {
-			Gbl.errorMsg(this.toString() + "[mapping_rule=" + mapping_rule + ",down_zone_id=" + down_zone_id + " down_zone does not exist]");
+			throw new RuntimeException(this.toString() + "[mapping_rule=" + mapping_rule + ",down_zone_id=" + down_zone_id + " down_zone does not exist]");
 		}
 		if (up_zone == null) {
-			Gbl.errorMsg(this.toString() + "[mapping_rule=" + mapping_rule + ",up_zone_id=" + up_zone_id + " down_zone does not exist]");
+			throw new RuntimeException(this.toString() + "[mapping_rule=" + mapping_rule + ",up_zone_id=" + up_zone_id + " down_zone does not exist]");
 		}
 		down_zone.addUpMapping(up_zone);
 		up_zone.addDownMapping(down_zone);
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void runAlgorithms() {
-		for (int i = 0; i < this.algorithms.size(); i++) {
-			WorldAlgorithm algo = this.algorithms.get(i);
-			algo.run(this);
-		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -360,8 +343,7 @@ public class World {
 				"[nof_layers=" + this.layers.size() + "]" +
 				"[nof_rules=" + this.rules.size() + "]" +
 				"[top_layer=" + this.top_layer + "]" +
-				"[bottom_layer=" + this.bottom_layer + "]" +
-				"[nof_algorithms=" + this.algorithms.size() + "]";
+				"[bottom_layer=" + this.bottom_layer + "]";
 	}
 
 	//////////////////////////////////////////////////////////////////////
