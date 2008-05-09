@@ -166,6 +166,7 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 
 				k.map.learnActsActivities(newAct.getRefId(),fFromKnowledge.getActivity(factype));
 				person.setSelectedPlan(newPlan);
+				System.out.println("   ### new location for "+person.getId()+" "+newAct.getType());
 
 			}else{
 //				System.out.println("   ### newPlan same as old plan");
