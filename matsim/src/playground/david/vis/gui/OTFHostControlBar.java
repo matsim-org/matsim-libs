@@ -3,7 +3,10 @@ package playground.david.vis.gui;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
 import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,6 +28,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -61,6 +65,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private static final String TOGGLE_LINK_LABELS = "Link Labels";
 	private static final String STEP_BB = "step_bb";
 	private static final String STEP_B = "step_b";
+	private static final String FULLSCREEN = "fullscreen";
 
 	private static final int SKIP = 30;
 
@@ -82,6 +87,10 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private ImageIcon playIcon = null;
 	private ImageIcon pauseIcon = null;
 
+	public JFrame frame = null;
+	
+	private Rectangle windowBounds = null;
+	
 	// -------------------- CONSTRUCTION --------------------
 
 	public OTFHostControlBar(String address, Class res) throws RemoteException, InterruptedException, NotBoundException {
@@ -173,8 +182,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		OTFServerRemote host = new OTFQuadFileHandler.Reader(fileName);
 		host.pause();
 		Gbl.printMemoryUsage();
-		long freeMem = Runtime.getRuntime().freeMemory();
-
 		return host;
 	}
 
@@ -227,6 +234,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private void addButtons() {
 
+		this.setFloatable(false);
+		
 		URL imageURL = resourceHandler != null ? resourceHandler.getResource("images/buttonPlay.png") : null;
 		Image image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage("images/buttonPlay.png");
     playIcon = new ImageIcon(image, "Play");
@@ -240,10 +249,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
 		}
 		playButton = createButton("PLAY", PLAY, "buttonPlay", "press to play simulation continuously");
-		playButton.setText("Play");
-		playButton.setMinimumSize(new Dimension(120, 60));
-		playButton.setMaximumSize(new Dimension(120, 60));
-		playButton.setPreferredSize(new Dimension(120, 60));
 		add(playButton);
 		add(createButton(">", STEP_F, "buttonStepF", "go one timestep forward"));
 		add(createButton(">>", STEP_FF, "buttonStepFF", "go several timesteps forward"));
@@ -255,6 +260,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		add( timeField );
 		timeField.addActionListener( this );
 
+//		add(createButton("fullscreen", FULLSCREEN, "buttonFullscreen", "toggles to fullscreen and back"));
+		
 		//add(createButton("--", ZOOM_OUT));
 		//add(createButton("+", ZOOM_IN));
 
@@ -281,7 +288,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		button.putClientProperty("JButton.buttonType","icon");
 		button.setActionCommand(actionCommand);
 		button.addActionListener(this);
-	    button.setToolTipText(toolTipText);
+	  button.setToolTipText(toolTipText);
+	  button.setBorderPainted(false);
+	  button.setMargin(new Insets(0, 0, 0, 0));
 
 	    if (imageName != null ) {                      //image found
 			//Look for the image.
@@ -323,7 +332,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private void pressed_PAUSE() throws IOException {
 		stopMovie();
 		host.pause();
-		playButton.setText("Play");
 		playButton.setIcon(playIcon);
 	}
 
@@ -332,12 +340,32 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
  	  	movieTimer = new MovieTimer();
  	 	  movieTimer.start();
  			movieTimer.setActive(true);
- 			playButton.setText("Pause");
  			playButton.setIcon(pauseIcon);
 // 			playButton.setSelected(true);
  	  } else {
  	   	pressed_PAUSE();
  	  }
+	}
+	
+	private void pressed_FULLSCREEN() {
+		if (this.frame == null) {
+			return;
+		}
+		GraphicsDevice gd = this.frame.getGraphicsConfiguration().getDevice();
+		if (gd.getFullScreenWindow() == null) {
+			System.out.println("enter fullscreen");
+			this.windowBounds = frame.getBounds();
+	  	frame.dispose();
+	  	frame.setUndecorated(true);
+	  	gd.setFullScreenWindow(frame);
+		} else {
+			System.out.println("exit fullscreen");
+			gd.setFullScreenWindow(null);			
+			frame.dispose();
+			frame.setUndecorated(false);
+			frame.setBounds(this.windowBounds);
+			frame.setVisible(true);
+		}
 	}
 
 	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
@@ -427,6 +455,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				pressed_STEP_BB();
 			else if (STOP.equals(command))
 				pressed_STOP();
+			else if (FULLSCREEN.equals(command)) {
+				pressed_FULLSCREEN();
+			}
 			else if (command.equals(SET_TIME))
 				changed_SET_TIME(event);
 		} catch (IOException e) {
