@@ -39,8 +39,6 @@ public class TimeVariantLinkImpl extends AbstractLink {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-
-
 	private TreeMap<Double, Double> freespeedEvents;
 	private TreeMap<Double, Double> flowCapacityEvents;
 	private TreeMap<Double, Double> lanesEvents;
@@ -85,7 +83,16 @@ public class TimeVariantLinkImpl extends AbstractLink {
 		if (this.permlanes < 1) { Gbl.errorMsg(this+"[permlanes="+permlanes+" not allowed]"); }
 	}
 
-
+	/**
+	 * Removes all NetworkChangeEvents so that the link's attributes will be
+	 * reset to their initial values.
+	 */
+	protected void clearNetworkChangeEvents() {
+		if(changeEvents != null) changeEvents.clear();
+		if(freespeedEvents != null) initFreespeedEvent();
+		if(flowCapacityEvents != null) initFlowCapacityEvent();
+		if(lanesEvents != null) initLanesEvent();
+	}
 
 	private void initNetworkChangeEvents() {
 		

@@ -191,11 +191,22 @@ public class NetworkLayer extends Layer implements BasicNet {
 		this.effectiveLaneWidth = effectiveLaneWidth;
 	}
 
+	/**
+	 * Sets the network change events and replaces existing events. Before
+	 * events are applied to their corresponding links, all links are reseted to
+	 * their initial state. Pass an empty event list to reset the complete network.
+	 * 
+	 * @param events a list of events.
+	 */
 	public final void setNetworkChangeEvents(final List<NetworkChangeEvent> events) {
 		if (!this.factory.isTimeVariant()) {
-			throw new RuntimeException("trying to set NetworkChangeEvents but NetworkFactory is not time variant");
+			throw new RuntimeException(
+					"Trying to set NetworkChangeEvents but NetworkFactory is not time variant");
 		}
 		
+		for(Link link : getLinks().values()) {
+			((TimeVariantLinkImpl)link).clearNetworkChangeEvents();
+		}
 		
 		this.networkChangeEvents = events;
 		for (NetworkChangeEvent event : events) {
@@ -205,10 +216,19 @@ public class NetworkLayer extends Layer implements BasicNet {
 		}
 	}
 	
+	/**
+	 * Adds a single network change event and applies it to the corresponding
+	 * links.
+	 * 
+	 * @param event
+	 *            a network change event.
+	 */
 	public final void addNetworkChangeEvent(final NetworkChangeEvent event) {
 		if (!this.factory.isTimeVariant()) {
-			throw new RuntimeException("trying to set NetworkChangeEvents but NetworkFactory is not time variant");
+			throw new RuntimeException(
+					"Trying to set NetworkChangeEvents but NetworkFactory is not time variant");
 		}
+		
 		if (this.networkChangeEvents == null) {
 			this.networkChangeEvents = new ArrayList<NetworkChangeEvent>();
 		}
@@ -217,7 +237,6 @@ public class NetworkLayer extends Layer implements BasicNet {
 		for (Link link : event.getLinks()) {
 			((TimeVariantLinkImpl)link).applyEvent(event);
 		}		
-		
 	}
 
 	// ////////////////////////////////////////////////////////////////////

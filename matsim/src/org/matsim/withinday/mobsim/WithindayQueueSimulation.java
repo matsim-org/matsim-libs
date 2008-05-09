@@ -87,7 +87,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 
 	@Override
 	public void beforeSimStep(final double time) {
-		super.afterSimStep(time);
+		super.beforeSimStep(time);
   	//check capacity change whishes for pending items
 		doCapacityChanges(time);
 		this.trafficManagement.updateBeforeSimStep(time);
