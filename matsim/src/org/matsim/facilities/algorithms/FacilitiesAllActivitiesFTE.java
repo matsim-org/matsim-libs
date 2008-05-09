@@ -30,7 +30,9 @@ import org.matsim.enterprisecensus.EnterpriseCensus;
 import org.matsim.enterprisecensus.EnterpriseCensusParser;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesProductionKTI;
 import org.matsim.facilities.Facility;
+import org.matsim.facilities.FacilitiesProductionKTI.KTIYear;
 import org.matsim.gbl.Gbl;
 
 public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
@@ -42,10 +44,11 @@ public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
 	private EnterpriseCensus myCensus;
 	private TreeMap<String, String> facilityActivities = new TreeMap<String, String>();
 
-	public FacilitiesAllActivitiesFTE() {
-
+	private FacilitiesProductionKTI.KTIYear ktiYear;
+	
+	public FacilitiesAllActivitiesFTE(KTIYear ktiYear) {
 		super();
-
+		this.ktiYear = ktiYear;
 	}
 
 	@Override
@@ -68,6 +71,10 @@ public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		myCensus.printPresenceCodesReport();
+		myCensus.printHectareAggregationReport();
+		
 		log.info("Reading enterprise census files into EnterpriseCensus object...done.");
 	}
 	
@@ -206,15 +213,20 @@ public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
 							X,
 							Y);
 
-					// create the work activity and its capacity according to all the computation done before
-					a = f.createActivity("work");
-					a.setCapacity(tempFacilities.get(tempFacilityId));
+					if (ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
+						// create the work activity and its capacity according to all the computation done before
+						a = f.createActivity("work");
+						a.setCapacity(tempFacilities.get(tempFacilityId));
 
-					// create the other activities
-					if (this.facilityActivities.containsKey(attributeId)) {
-						activityId = this.facilityActivities.get(attributeId);
-						a = f.createActivity(activityId);
+						// create the other activities
+						if (this.facilityActivities.containsKey(attributeId)) {
+							activityId = this.facilityActivities.get(attributeId);
+							a = f.createActivity(activityId);
+						}
+					} else if (ktiYear.equals(KTIYear.KTI_YEAR_2008)) {
+						// na dann mach mal hier weiter
 					}
+					
 				}
 
 				tempFacilities.clear();

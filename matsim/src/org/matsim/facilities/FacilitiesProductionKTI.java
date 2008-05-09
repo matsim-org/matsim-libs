@@ -34,8 +34,10 @@ import org.matsim.gbl.Gbl;
  * @author meisterk
  *
  */
-public class FacilitiesProductionKTIYear1 {
+public class FacilitiesProductionKTI {
 
+	public enum KTIYear {KTI_YEAR_2007, KTI_YEAR_2008};
+	
 	private static Logger log = Logger.getLogger(FacilitiesAllActivitiesFTE.class);
 	
 	/**
@@ -44,7 +46,11 @@ public class FacilitiesProductionKTIYear1 {
 	public static void main(String[] args) {
 
 		Gbl.createConfig(args);
-//		Gbl.getConfig().createModule("enterprisecensus");
+		FacilitiesProductionKTI.facilitiesProduction(KTIYear.KTI_YEAR_2008);
+
+	}
+	
+	private static void facilitiesProduction(KTIYear ktiYear) {
 		
 		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
 		
@@ -53,17 +59,17 @@ public class FacilitiesProductionKTIYear1 {
 				);
 		
 		log.info("Adding and running facilities algorithms...");
-		facilities.addAlgorithm(new FacilitiesAllActivitiesFTE());
-//		facilities.addAlgorithm(new FacilitiesOpentimesKTIYear1());
-//		facilities.addAlgorithm(new FacilitiesRandomizeHectareCoordinates());
+		facilities.addAlgorithm(new FacilitiesAllActivitiesFTE(ktiYear));
+		facilities.addAlgorithm(new FacilitiesOpentimesKTIYear1());
+		facilities.addAlgorithm(new FacilitiesRandomizeHectareCoordinates());
 		facilities.runAlgorithms();
 		log.info("Adding and running facilities algorithms...done.");
 
-//		System.out.println("  writing facilities file... ");
-//		FacilitiesWriter facilities_writer = new FacilitiesWriter(facilities);
-//		facilities_writer.write();
-//		System.out.println("  done.");
-
+		System.out.println("  writing facilities file... ");
+		FacilitiesWriter facilities_writer = new FacilitiesWriter(facilities);
+		facilities_writer.write();
+		System.out.println("  done.");
+		
 	}
-
+	
 }
