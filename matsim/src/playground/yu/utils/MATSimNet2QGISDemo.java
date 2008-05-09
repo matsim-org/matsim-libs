@@ -37,9 +37,10 @@ public class MATSimNet2QGISDemo {
 		// ///////////////////////////////////////////////////
 		// write MATSim-network to Shp-file
 		// ///////////////////////////////////////////////////
-		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml");
+		// mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml");
+		mn2q.readNetwork("./test/yu/paper/equil_net.xml");
 		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile("../schweiz-ivtch/network/ivtch-osm.shp");
+		mn2q.writeShapeFile("./test/yu/paper/equil_net.shp");
 		System.out.println("done.");
 	}
 }

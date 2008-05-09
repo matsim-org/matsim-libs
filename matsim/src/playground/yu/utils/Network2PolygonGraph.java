@@ -126,7 +126,8 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 			o[4] = link.getLength();
 			o[5] = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
 					/ network.getCapacityPeriod() * 3600.0;
-			o[6] = Integer.parseInt(link.getType());
+			o[6] = (link.getType() != null) ? Integer.parseInt(link.getType())
+					: 0;
 			o[7] = link.getFreespeed(0);
 			for (int i = 0; i < parameters.size(); i++) {
 				o[i + 8] = parameters.get(i).get(link.getId());
