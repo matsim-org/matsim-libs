@@ -38,6 +38,7 @@ public class OTFVisConfig extends Module {
 	private final int timeStep = 1;
 	private String queryType = "Agent";
 	private boolean multipleSelect = true;
+	private boolean showParking = false;
 	private Color backgroundColor = new Color(179, 179, 179, 0);
 	private Color networkColor = new Color(128, 128, 255, 128);
 	private float linkWidth = 30;
@@ -210,6 +211,20 @@ public class OTFVisConfig extends Module {
 
 	public void setLinkWidth(final float linkWidth) {
 		this.linkWidth = linkWidth;
+	}
+
+	/**
+	 * @return the showParking
+	 */
+	public boolean isShowParking() {
+		return showParking;
+	}
+
+	/**
+	 * @param showParking the showParking to set
+	 */
+	public void setShowParking(boolean showParking) {
+		this.showParking = showParking;
 	}
 
 }

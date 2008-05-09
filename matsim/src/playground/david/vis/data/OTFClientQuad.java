@@ -152,7 +152,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		Gbl.startMeasurement();
 		int colls = this.execute(bound, this.new ReadDataExecutor(in, readConst, result));
 		if (readAdd) getAdditionalData(in, readConst, result);
-		//System.out.print("readData: "); Gbl.printElapsedTime();
+		//System.out.println("# readData: " + colls);
 
 		PoolFactory.resetAll();
 		
@@ -167,6 +167,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	}
 	 
 	private final Map<Integer,SceneGraph> cachedTimes = new HashMap<Integer,SceneGraph>();
+	
+	public void clearCache() {
+		cachedTimes.clear();
+	}
 
 	/*
 	 * new getScenegraph(time, rect) called from either OGLDrawer or (for caching) from builderThread
@@ -274,6 +278,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	public double getMaxNorthing() {
 		return maxNorthing;
 	}
+
 	public OTFQuery doQuery(OTFQuery query) {
 		OTFQuery result = null;
 		try {

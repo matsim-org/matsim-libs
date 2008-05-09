@@ -3,6 +3,7 @@ package playground.david.vis.gui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Constructor;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -24,13 +25,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener {
+public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener  {
 
-	private final OTFVisConfig cfg;
+	public static Class PreDialogClass = PreferencesDialog.class;
+	
+	protected final OTFVisConfig cfg;
 	private JComboBox rightMFunc;
 	private JComboBox middleMFunc;
 	private JComboBox leftMFunc;
-	private OTFHostControlBar host = null;
+	protected OTFHostControlBar host = null;
 	private JSlider agentSizeSlider = null;
 //	private JSlider linkWidthSlider = null;
 
@@ -54,7 +57,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		initGUI();
 	}
 
-	private void initGUI() {
+	protected void initGUI() {
 		try {
 			getContentPane().setLayout(null);
 			this.setResizable(false);
@@ -133,6 +136,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 					jButton.addActionListener(this);
 					jButton.setActionCommand("networkColor");
 				}
+			    
 
 			}
 
@@ -224,7 +228,29 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	}
 
     public static PreferencesDialog buildMenu(final JFrame frame, final OTFVisConfig config, final OTFHostControlBar host) {
-    	final PreferencesDialog preferencesDialog = new PreferencesDialog(frame, config, host);
+    	PreferencesDialog preferencesDialog = new PreferencesDialog(frame, config, host);
+    	Class partypes[] = new Class[3];
+        partypes[0] = JFrame.class;
+        partypes[1] = OTFVisConfig.class;
+        partypes[2] = OTFHostControlBar.class;
+        try {
+			Constructor ct = PreDialogClass.getConstructor(partypes);
+	           Object arglist[] = new Object[3];
+	            arglist[0] = frame;
+	            arglist[1] = config;
+	            arglist[2] = host;
+	            preferencesDialog = (PreferencesDialog)ct.newInstance(arglist);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		buildMenu(frame, preferencesDialog);
+        return preferencesDialog;
+	}
+
+    public static void buildMenu(final JFrame frame, final PreferencesDialog preferencesDialog) {
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu( "File" );
         fileMenu.add("Open...");
@@ -239,8 +265,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
           fileMenu.add( exitAction );
 
         frame.setJMenuBar( menuBar );
-        return preferencesDialog;
-	}
+ 	}
 
 	public void actionPerformed(final ActionEvent e) {
 		if (e.getSource() instanceof JComboBox) {
@@ -277,4 +302,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 		}
 	}
+
+
 }

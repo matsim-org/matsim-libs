@@ -188,6 +188,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 
 	public void writeDynData(QuadTree.Rect bounds, ByteBuffer out) {
 		int colls = this.execute(bounds, this.new WriteDataExecutor(out,false));
+		//System.out.print("# of Writes: " + colls + " -> ");
 
 		for(OTFDataWriter element : this.additionalElements) {
 			try {

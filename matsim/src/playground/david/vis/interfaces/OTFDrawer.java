@@ -12,4 +12,5 @@ public interface OTFDrawer {
 	public void handleClick(Point2D.Double point, int mouseButton);
 	public OTFClientQuad getQuad();
 	public Component getComponent();
+	public void clearCache();
 }

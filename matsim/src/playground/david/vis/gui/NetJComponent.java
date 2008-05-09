@@ -579,5 +579,8 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		
 	}
 	
+	public void clearCache() {
+		if(quad != null) quad.clearCache();
+	}
 
 }

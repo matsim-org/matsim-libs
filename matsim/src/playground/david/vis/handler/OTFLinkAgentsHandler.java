@@ -28,6 +28,8 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	private final Logger log = Logger.getLogger(OTFLinkAgentsHandler.class);
 
 	private Class agentReceiverClass = null;
+
+	public static boolean showParked = false;
 	
 	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	
@@ -46,6 +48,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 
 		public void writeAgent(PositionInfo pos, ByteBuffer out) throws IOException {
+			try{
 			String id = pos.getAgentId().toString();
 			out.putInt(id.length());
 			for (int i=0; i<id.length(); i++) out.putChar(id.charAt(i));
@@ -53,6 +56,9 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
 			out.putInt(pos.getVehicleState()== VehicleState.Parking ? 1:0);
 			out.putFloat((float)pos.getSpeed());
+			}catch (Exception e){
+				System.out.println("Agent could not be written fully to stream");
+			}
 		}
 		
 		protected void writeAllAgents(ByteBuffer out) throws IOException {
@@ -62,11 +68,25 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	         */
 	        positions.clear();
 			src.getVehiclePositions(positions);
-			out.putInt(positions.size());
 
-			for (PositionInfo pos : positions) {
-				writeAgent(pos, out);
+			if(showParked) {
+				out.putInt(positions.size());
+
+				for (PositionInfo pos : positions) {
+					writeAgent(pos, out);
+				}
+			}else {
+				int valid = 0;
+				for (PositionInfo pos : positions) {
+					if (pos.getVehicleState() != VehicleState.Parking) valid++;
+				}
+				out.putInt(valid);
+
+				for (PositionInfo pos : positions) {
+					if (pos.getVehicleState() != VehicleState.Parking) writeAgent(pos, out);
+				}
 			}
+
 		}
 		
 		@Override
@@ -86,7 +106,9 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	static char[] idBuffer = new char[100];
 	
 	public void readAgent(ByteBuffer in, SceneGraph graph) throws IOException {
+		try{
 		int length = in.getInt();
+		if(length > 100)throw new Exception();
 		idBuffer = new char[length];
 		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
 		float x = in.getFloat();
@@ -94,7 +116,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		int state = in.getInt();
 		// Convert to km/h 
 		float color = in.getFloat()*3.6f;
-		
 		// No agent receiver given, then we are finished
 		if (agentReceiverClass == null) return;
 
@@ -110,6 +131,9 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 				e.printStackTrace();
 			} //factoryAgent.getOne();
 
+		}catch (Exception e){
+			log.warn("Agent could not be read fully from stream");
+		}
  	}
 	
 	@Override

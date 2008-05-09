@@ -7,12 +7,17 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import playground.david.vis.caching.SceneGraph;
 import playground.david.vis.caching.SceneLayer;
 import playground.david.vis.interfaces.OTFDataReader;
 
 
 public class OTFConnectionManager {
+
+	private final Logger log = Logger.getLogger(OTFConnectionManager.class);
+	private boolean isValidated = false;
 
 	class Entry {
 		Class from, to;
@@ -31,6 +36,7 @@ public class OTFConnectionManager {
 	
 	private final List<Entry> connections = new LinkedList<Entry>();
 	
+	@Override
 	public OTFConnectionManager clone() {
 		OTFConnectionManager clone = new OTFConnectionManager();
 		Iterator<Entry> iter = connections.iterator();
@@ -40,8 +46,27 @@ public class OTFConnectionManager {
 		}
 		return clone;
 	}
+	
+	public void validate() {
+		isValidated = true;
+		
+		for (Entry entry  : connections) {
+			if(OTFDataWriter.class.isAssignableFrom(entry.from)){
+				Collection<Class> readerClasses = this.getEntries(entry.from);
+				int count = readerClasses.size();
+				if (count != 1) {
+					// there must be exactly ONE Reader class corresponding to every Writer class
+					if (count > 1) log.fatal("For Writer class" + entry.from.getCanonicalName() + " there is more than ONE reader class defined");
+					else log.fatal("For Writer class" + entry.from.getCanonicalName() + " there is more than ONE reader class defined");
+					System.exit(1);
+				}
+			}
+		}
+
+	}
 
 	public void add(Entry entry) {
+		remove(entry.from,entry.to);
 		connections.add(entry);
 	}
 	
@@ -66,6 +91,8 @@ public class OTFConnectionManager {
 	}
 
 	public Collection<Class> getEntries(Class srcClass) {
+		if (!isValidated) validate();
+		
 		List<Class> classList = new LinkedList<Class>();
 		for(Entry entry : connections) {
 			if (entry.from.equals(srcClass)) classList.add(entry.to);

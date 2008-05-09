@@ -47,6 +47,8 @@ import playground.david.vis.data.OTFNetWriterFactory;
 import playground.david.vis.data.OTFServerQuad;
 import playground.david.vis.interfaces.OTFDataReader;
 import playground.david.vis.interfaces.OTFDrawer;
+import playground.david.vis.interfaces.OTFLiveServerRemote;
+import playground.david.vis.interfaces.OTFQuery;
 import playground.david.vis.interfaces.OTFServerRemote;
 import playground.david.vis.server.OTFQuadFileHandler;
 import playground.david.vis.server.OTFTVehServer;
@@ -229,6 +231,12 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				// Possibly lost contact to host DS TODO Handle this!
 				e.printStackTrace();
 			}
+		}
+	}
+
+	public void clearCaches() {
+		for (OTFDrawer handler : handlers.values()) {
+			handler.clearCache();
 		}
 	}
 
@@ -588,6 +596,23 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	public boolean isLiveHost() {
 		return liveHost;
 	}
+
+	// consolidate this with the OTFQuadClient Query method , there shoul only be ONE way to send queies,
+	// apparently quereies are not dependen on a certain view right now, so it should be hot.doQuery
+	
+	public OTFQuery doQuery(OTFQuery query) {
+		OTFQuery result = null;
+		try {
+			if(host.isLive()) {
+				result = ((OTFLiveServerRemote)host).answerQuery(query);
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+
 
 
 }
