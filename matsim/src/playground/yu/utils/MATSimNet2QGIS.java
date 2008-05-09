@@ -122,11 +122,13 @@ public class MATSimNet2QGIS {
 		}
 	}
 
+	// /////////////////////////////
 	public void addParameter(String paraName, Class<?> clazz,
 			Map<Id, ?> parameters) {
 		this.n2g.addParameter(paraName, clazz, parameters);
 	}
 
+	// /////////////////////////////
 	/**
 	 * @return the network
 	 */
