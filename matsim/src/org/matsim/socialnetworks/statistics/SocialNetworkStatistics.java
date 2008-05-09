@@ -148,7 +148,7 @@ public class SocialNetworkStatistics {
 
 	public void calculate(int iteration, SocialNetwork snet, Plans plans) {
 		// First instantiate the JUNG-compatible graph structure
-		if (snet.UNDIRECTED) {
+		if (snet.isUNDIRECTED()) {
 			this.g = new UndirectedSparseGraph();
 		}
 		else {
@@ -398,7 +398,7 @@ public class SocialNetworkStatistics {
 		Iterator<Person> iperson = personList.iterator();
 		while (iperson.hasNext()) {
 			Person p = iperson.next();
-			if (snet.UNDIRECTED) {
+			if (snet.isUNDIRECTED()) {
 				v = new UndirectedSparseVertex();
 			}
 			else {
@@ -417,7 +417,7 @@ public class SocialNetworkStatistics {
 					.getId());
 			Vertex alterVertex = this.verticesPersons.get(myLink.getPersonTo()
 					.getId());
-			if (snet.UNDIRECTED) {
+			if (snet.isUNDIRECTED()) {
 				e = new UndirectedSparseEdge(egoVertex, alterVertex);
 			}
 			else {

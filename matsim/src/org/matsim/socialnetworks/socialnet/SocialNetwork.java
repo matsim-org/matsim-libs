@@ -21,6 +21,7 @@
 package org.matsim.socialnetworks.socialnet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -32,14 +33,15 @@ import org.matsim.socialnetworks.io.MakeSocialNetworkFromFile;
 
 public class SocialNetwork {
 
-	public boolean UNDIRECTED;
+	private boolean UNDIRECTED;
 	private SocNetConfigGroup socnetConfig = Gbl.getConfig().socnetmodule();
 	String linkRemovalCondition= socnetConfig.getSocNetLinkRemovalAlgo();
 	String edge_type= socnetConfig.getEdgeType();
 	double remove_p= Double.parseDouble(socnetConfig.getSocNetLinkRemovalP());
 	double remove_age= Double.parseDouble(socnetConfig.getSocNetLinkRemovalAge());
-	public double degree_saturation_rate= Double.parseDouble(socnetConfig.getDegSat());
-
+	private double degree_saturation_rate= Double.parseDouble(socnetConfig.getDegSat());
+	private Collection<Person> persons;
+	
 	// a Collection of all the Links in the network
 	public ArrayList<SocialNetEdge> linksList = new ArrayList<SocialNetEdge>();
 
@@ -50,6 +52,8 @@ public class SocialNetwork {
 
 	public SocialNetwork(Plans plans) {
 
+		this.persons=plans.getPersons().values();
+		
 		if(edge_type.equals("UNDIRECTED")){
 			UNDIRECTED=true;
 		}else if(edge_type.equals("DIRECTED")){
@@ -243,6 +247,7 @@ public class SocialNetwork {
 		if (linkRemovalCondition.equals("random")) {
 			log.info("  Removing links older than "+remove_age+" with probability "+remove_p);
 			log.info("  Number of links before removal: "+this.getLinks().size());
+			
 			Iterator<SocialNetEdge> it_link = this.getLinks().iterator();
 			while (it_link.hasNext()) {
 				SocialNetEdge myLink = it_link.next();
@@ -252,25 +257,29 @@ public class SocialNetwork {
 				}
 			}
 			log.info("  Number of links after removal: "+(this.getLinks().size()-linksToRemove.size()));
+		
 		}else if(linkRemovalCondition.equals("random_node_degree")){
 			// Removal probability proportional to node degree
 			// Implemented in Jin, Girvan, Newman 2001
+			
 			log.info("  Removing links older than "+remove_age+" proportional to degree times probability "+remove_p);
 			log.info("  Number of links before removal: "+this.getLinks().size());
+			int maxDeg=this.getMaxDegree();
 			Iterator<SocialNetEdge> it_link = this.getLinks().iterator();
 			while (it_link.hasNext()) {
 				SocialNetEdge myLink = it_link.next();
 				double randremove=Gbl.random.nextDouble();
 				int degree =myLink.getPersonFrom().getKnowledge().egoNet.getOutDegree();
-				if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*degree ) {
+				if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*((double)degree/(double)maxDeg)) {
 					linksToRemove.add(myLink);
 				}
 			}
 			log.info("  Number of links after removal: "+(this.getLinks().size()-linksToRemove.size()));
+		
 		}else if(linkRemovalCondition.equals("random_link_age")){
-			// Removal probability proportional to node degree
-			// Implemented in Jin, Girvan, Newman 2001
+			// Removal probability proportional to edge age
 			log.info("  Removing links proportional to age times probability "+remove_p);
+			Gbl.errorMsg("Implementation is wrong"); //JH 07.05.08
 			log.info("  Number of links before removal: "+this.getLinks().size());
 			Iterator<SocialNetEdge> it_link = this.getLinks().iterator();
 			while (it_link.hasNext()) {
@@ -291,6 +300,21 @@ public class SocialNetwork {
 		removeFlaggedLinks(linksToRemove);
 
 	}
+	private int getMaxDegree() {
+		// TODO Auto-generated method stub
+		int maxDegree=0;
+		Object myPersons[]= this.getNodes().toArray();
+		
+		for(int i=0;i<myPersons.length;i++){
+			Person myPerson = (Person) myPersons[i];
+			int deg= myPerson.getKnowledge().egoNet.getOutDegree();
+			if(maxDegree<deg){
+				maxDegree=deg;
+			}
+		}
+		return maxDegree;
+	}
+
 	public void removeFlaggedLinks(ArrayList<SocialNetEdge> links){
 		Iterator<SocialNetEdge> itltr = links.iterator();
 		while (itltr.hasNext()) {
@@ -316,6 +340,10 @@ public class SocialNetwork {
 		return linksList;
 	}
 
+	public Collection<Person> getNodes(){
+		return this.persons;
+	}
+	
 	public void printLinks() {
 		// Call writer instance (use a config parameter). Options
 		// are XML (pick a DTD and see other XML writers),
@@ -327,6 +355,10 @@ public class SocialNetwork {
 			log.info(ii + " " + link.person1.getId() + " " + link.person2.getId());
 			ii++;
 		}
+	}
+	
+	public boolean isUNDIRECTED(){
+		return UNDIRECTED;
 	}
 
 }
