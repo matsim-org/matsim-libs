@@ -5,10 +5,6 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.algorithms.CountsAlgorithm;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;

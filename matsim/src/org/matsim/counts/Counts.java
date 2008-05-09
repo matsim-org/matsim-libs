@@ -20,11 +20,9 @@
 
 package org.matsim.counts;
 
-import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.counts.algorithms.CountsAlgorithm;
 
 public class Counts {
 
@@ -33,22 +31,6 @@ public class Counts {
 	private int year = 0;
 	private String layer = null;
 	private final TreeMap<Id, Count> counts = new TreeMap<Id, Count>();
-	private final ArrayList<CountsAlgorithm> algorithms = new ArrayList<CountsAlgorithm>();
-
-	public final void addAlgorithm(final CountsAlgorithm algo) {
-		this.algorithms.add(algo);
-	}
-
-	public final void runAlgorithms() {
-		for (int i = 0; i < this.algorithms.size(); i++) {
-			CountsAlgorithm algo = this.algorithms.get(i);
-			algo.run(this);
-		}
-	}
-
-	public final void clearAlgorithms() {
-		this.algorithms.clear();
-	}
 
 	/**
 	 * @param locId
@@ -60,7 +42,7 @@ public class Counts {
 		if (this.counts.containsKey(locId)) {
 			return null;
 		}
-		Count c = new Count(locId,csId);
+		Count c = new Count(locId, csId);
 		this.counts.put(locId, c);
 		return c;
 	}
@@ -79,10 +61,6 @@ public class Counts {
 
 	public final void setLayer(final String layer) {
 		this.layer = layer;
-	}
-
-	public ArrayList<CountsAlgorithm> getAlgorithms() {
-		return this.algorithms;
 	}
 
 	public final String getName() {
@@ -111,8 +89,6 @@ public class Counts {
 
 	@Override
 	public final String toString() {
-		return "[name=" + this.name + "]" +
-				"[nof_counts=" + this.counts.size() + "]" +
-				"[nof_algorithms=" + this.algorithms.size() + "]";
+		return "[name=" + this.name + "]" + "[nof_counts=" + this.counts.size() + "]";
 	}
 }

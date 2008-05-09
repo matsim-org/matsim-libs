@@ -25,21 +25,6 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountsTest extends MatsimTestCase {
 
-	public void testAddAlgorithm() {
-		final Counts counts = new Counts();
-		MockAlgo algo=new MockAlgo();
-		counts.addAlgorithm(algo);
-		assertEquals("Adding algorithm failed", 1, counts.getAlgorithms().size());
-	}
-
-	public void testRunAlgorithms() {
-		final Counts counts = new Counts();
-		MockAlgo algo=new MockAlgo();
-		counts.addAlgorithm(algo);
-		counts.runAlgorithms();
-		assertEquals("Running algorithms failed", "SetByMock", counts.getDescription());
-	}
-
 	public void testGetCounts() {
 		final Counts counts = new Counts();
 		counts.createCount(new IdImpl(0), "1");

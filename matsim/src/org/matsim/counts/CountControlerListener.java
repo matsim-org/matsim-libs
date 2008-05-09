@@ -80,8 +80,7 @@ public class CountControlerListener implements StartupListener,
 				cgw.setGraphsCreator(new CountsErrorGraphCreator("errors"));
 				cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
 				cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-				this.counts.addAlgorithm(cgw);
-				this.counts.runAlgorithms();
+				cgw.createGraphs();
 			}
 			if (this.config.counts().getOutputFormat().contains("kml")||
 					this.config.counts().getOutputFormat().contains("all")) {

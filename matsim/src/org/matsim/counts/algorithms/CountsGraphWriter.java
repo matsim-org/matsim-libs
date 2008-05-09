@@ -26,12 +26,11 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsGraphsCreator;
 import org.matsim.counts.algorithms.graphs.helper.OutputDelegate;
 
-public class CountsGraphWriter extends CountsAlgorithm {
+public class CountsGraphWriter {
 
 	private String iter_path_;
 	private List<CountSimComparison> ccl_;
@@ -83,8 +82,7 @@ public class CountsGraphWriter extends CountsAlgorithm {
 		this.graphsCreators.add(graphsCreator);
 	}
 
-	@Override
-	public void run(final Counts count){
+	public void createGraphs() {
 		log.info("Creating graphs");
 		this.outputDelegate_.setProjectName(this.projectName_);
 

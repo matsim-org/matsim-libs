@@ -48,7 +48,7 @@ public class CountsGraphWriterTest extends MatsimTestCase {
 
 	public void testGraphCreation() {
 
-		CountsComparisonAlgorithm cca=this.fixture.getCCA();
+		CountsComparisonAlgorithm cca = this.fixture.getCCA();
 		cca.run(this.fixture.counts);
 
 		CountsGraphWriter cgw = new CountsGraphWriter(this.getOutputDirectory(), cca.getComparison(),1, true, true);
@@ -56,7 +56,7 @@ public class CountsGraphWriterTest extends MatsimTestCase {
 		cgw.setGraphsCreator(new CountsErrorGraphCreator("Error Plots"));
 		cgw.setGraphsCreator(new CountsLoadCurveGraphCreator("Load curve graph"));
 		cgw.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-		cgw.run(this.fixture.counts);
+		cgw.createGraphs();
 
 		assertTrue(cgw.getOutput().getGraphs().size()>0);
 	}

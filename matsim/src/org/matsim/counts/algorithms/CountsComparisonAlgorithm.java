@@ -43,7 +43,7 @@ import org.matsim.network.Node;
  *
  * @author dgrether
  */
-public class CountsComparisonAlgorithm extends CountsAlgorithm {
+public class CountsComparisonAlgorithm {
 	/**
 	 * The LinkAttributes of the simulation
 	 */
@@ -138,7 +138,6 @@ public class CountsComparisonAlgorithm extends CountsAlgorithm {
 		return this.countSimComp;
 	}
 
-	@Override
 	public void run(final Counts counts) {
 		this.counts = counts;
 		this.compare();
