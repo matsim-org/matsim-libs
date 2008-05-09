@@ -275,12 +275,12 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 
-		final String netFilename = "./test/yu/ivtch/input/network.xml";
+		final String netFilename = "../schweiz-ivtch/network/ivtch-osm-wu-flama.xml";
 		// final String eventsFilename =
 		// "./test/yu/test/input/run265opt100.events.txt.gz";
-		final String eventsFilename = "../runs/run275/100.events.txt.gz";
-		final String outputFilename = "./test/yu/test/output/run275AvgSpeed.txt.gz";
-		final String chartFilename = "./test/yu/test/output/run275avgSpeed.png";
+		final String eventsFilename = "../runs/run467/500.events.txt.gz";
+		final String outputFilename = "../runs/run467/AvgSpeed.txt.gz";
+		final String chartFilename = "../runs/run467/cityAreaAvgSpeed.png";
 
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(null);

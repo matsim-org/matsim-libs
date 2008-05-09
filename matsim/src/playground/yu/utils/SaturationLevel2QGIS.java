@@ -78,17 +78,17 @@ public class SaturationLevel2QGIS {
 		 * Traffic saturation level and MATSim-network to Shp-file
 		 * /////////////////////////////////////////////////////////////////////////////////
 		 */
-		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu.xml");
+		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu-flama-noUetli.xml");
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../runs/run466/500.events.txt.gz", va);
+		mn2q.readEvents("../runs/run468/500.events.txt.gz", va);
 		List<Map<Id, Double>> sls = createSaturationLevels(net, va);
 		for (int i = 0; i < 24; i++) {
 			mn2q.addParameter("sl" + i + "-" + (i + 1) + "h", Double.class, sls
 					.get(i));
 		}
-		mn2q.writeShapeFile("../runs/run466/466.500.saturationLevel.shp");
+		mn2q.writeShapeFile("../runs/run468/468.500.saturationLevel.shp");
 	}
 
 }

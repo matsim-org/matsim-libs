@@ -30,7 +30,7 @@ import org.matsim.plans.Plans;
  * @author ychen
  * 
  */
-public class DoublePlan extends NewAgentPtPlan {
+public class DoublePlan extends NewPlan {
 	private int newPersonId;
 
 	/**
@@ -53,7 +53,7 @@ public class DoublePlan extends NewAgentPtPlan {
 		pw.writePerson(person);
 		// produce new Person with bigger Id
 		for (int i = 0; i < 1; i++) {
-			newPersonId = Integer.parseInt(person.getId().toString()) + 100;
+			newPersonId = Integer.parseInt(person.getId().toString()) + 1000;
 			person.setId(Integer.toString(newPersonId));
 			pw.writePerson(person);
 		}

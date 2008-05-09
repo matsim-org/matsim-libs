@@ -31,8 +31,9 @@ import org.matsim.world.World;
 
 /**
  * test of DoublePtPlan
+ * 
  * @author ychen
- *
+ * 
  */
 public class DoublePlanControler {
 
@@ -40,23 +41,20 @@ public class DoublePlanControler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String netFilename = "./test/yu/newPlans/input/equil_net.xml";
-//		final String plansFilename = "./test/yu/newPlans/equil_plans1k.xml";
-		final String plansFilename = "./test/yu/equil_test/plans100.xml";
-
 		World world = Gbl.getWorld();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(new String[] {"./test/yu/newPlans/config.xml"});
+		Config config = Gbl
+				.createConfig(new String[] { "./test/yu/newPlans/newPlans.xml" });
 
 		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(network).readFile(config.network()
+				.getInputFile());
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
-		DoublePlan dp=new DoublePlan(population);
+		DoublePlan dp = new DoublePlan(population);
 		population.addAlgorithm(dp);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(plansFilename);
+		plansReader.readFile(config.plans().getInputFile());
 		world.setPopulation(population);
 		population.runAlgorithms();
 		dp.writeEndPlans();

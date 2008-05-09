@@ -37,28 +37,21 @@ import org.matsim.world.World;
 public class NewPtPlansControler {
 
 	public static void main(final String[] args) {
-		final String netFilename = "../data/ivtch/input/ivtch-changed.xml";
-		final String plansFilename = "../data/ivtch/input/plans_zrh30km_10pct_raw.xml.gz";
-
 		World world = Gbl.getWorld();
-		@SuppressWarnings("unused")
-		Config config = Gbl
-				.createConfig(new String[] { "../data/ivtch/configMakeCarPtPlans.xml" });
+		Config config = Gbl.createConfig(args);
 
 		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(network).readFile(config.network()
+				.getInputFile());
 		world.setNetworkLayer(network);
 
 		Plans population = new Plans();
 		NewAgentPtPlan nap = new NewAgentPtPlan(population);
-
 		population.addAlgorithm(nap);
-
-		new MatsimPlansReader(population).readFile(plansFilename);
+		new MatsimPlansReader(population).readFile(config.plans()
+				.getInputFile());
 		world.setPopulation(population);
-
 		population.runAlgorithms();
-
 		nap.writeEndPlans();
 	}
 }

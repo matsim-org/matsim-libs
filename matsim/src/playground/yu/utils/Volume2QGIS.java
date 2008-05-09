@@ -74,31 +74,32 @@ public class Volume2QGIS {
 		 * Traffic Volumes and MATSim-network to Shp-file // *
 		 * ///////////////////////////////////////////////////////////////
 		 */
-		// mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu.xml"); // //
-		// mn2q.setCrs(ch1903);
-		// NetworkLayer net = mn2q.getNetwork();
-		// VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		// mn2q.readEvents("../runs/run466/500.events.txt.gz", va);
-		// List<Map<Id, Integer>> vols = createVolumes(net, va);
-		// for (int i = 0; i < 24; i++) {
-		// mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
-		// vols.get(i));
-		// }
-		// mn2q.writeShapeFile("../runs/run466/466.500.shp");
+//		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu-flama-noUetli.xml"); // //
+//		mn2q.setCrs(ch1903);
+//		NetworkLayer net = mn2q.getNetwork();
+//		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+//		mn2q.readEvents("../runs/run468/500.events.txt.gz", va);
+//		List<Map<Id, Integer>> vols = createVolumes(net, va);
+//		for (int i = 0; i < 24; i++) {
+//			mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
+//					vols.get(i));
+//		}
+//		mn2q.writeShapeFile("../runs/run468/468.500.shp");
 		/*
 		 * //////////////////////////////////////////////////////////////
 		 * Differenz of Traffic Volumes and MATSim-network to Shp-file
 		 * /////////////////////////////////////////////////////////////
 		 */
 
-		mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu.xml");
+		 mn2q
+				.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu-flama.xml");
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		VolumesAnalyzer vaA = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../runs/run466/500.events.txt.gz", vaA);
+		mn2q.readEvents("../runs/run468/500.events.txt.gz", vaA);
 		List<Map<Id, Integer>> volsA = createVolumes(net, vaA);
 		VolumesAnalyzer vaB = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("../runs/run465/500.events.txt.gz", vaB);
+		mn2q.readEvents("../runs/run467/500.events.txt.gz", vaB);
 		List<Map<Id, Integer>> volsB = createVolumes(net, vaB);
 		for (int i = 0; i < 24; i++) {
 			Map<Id, Integer> diff = new TreeMap<Id, Integer>();
@@ -109,6 +110,6 @@ public class Volume2QGIS {
 			mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
 					diff);
 		}
-		mn2q.writeShapeFile("test/yu/ivtch/466.500-465.500.shp");
+		mn2q.writeShapeFile("test/yu/ivtch/468.500-467.500.shp");
 	}
 }
