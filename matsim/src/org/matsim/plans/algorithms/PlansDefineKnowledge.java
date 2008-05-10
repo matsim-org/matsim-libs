@@ -27,17 +27,17 @@ import java.util.Random;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
-import org.matsim.world.Location;
 
 public class PlansDefineKnowledge {
 
 	private final Random rand = new Random(101);
-
-	public PlansDefineKnowledge() {
+	private final Facilities facilities;
+	
+	public PlansDefineKnowledge(final Facilities facilities) {
+		this.facilities = facilities;
 		this.rand.nextInt();
 	}
 
@@ -47,9 +47,7 @@ public class PlansDefineKnowledge {
 		// get home and other activities
 		ArrayList<Activity> home_acts = new ArrayList<Activity>();
 		ArrayList<Activity> other_acts = new ArrayList<Activity>();
-		Iterator<? extends Location> loc_it = Gbl.getWorld().getLayer(Facilities.LAYER_TYPE).getLocations().values().iterator();
-		while (loc_it.hasNext()) {
-			Facility f = (Facility)loc_it.next();
+		for (Facility f : this.facilities.getFacilities().values()) {
 			Iterator<Activity> a_it = f.getActivities().values().iterator();
 			while (a_it.hasNext()) {
 				Activity a = a_it.next();

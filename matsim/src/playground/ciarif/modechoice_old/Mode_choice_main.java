@@ -21,6 +21,7 @@
 package playground.ciarif.modechoice_old;
 
 import org.matsim.config.ConfigWriter;
+import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -48,6 +49,7 @@ public class Mode_choice_main {
 		
 		System.out.println("TEST RUN 01:");
 		final World world = Gbl.getWorld();
+		final Facilities facilities = new Facilities();
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(Gbl.getConfig().world().getInputFile());
@@ -97,13 +99,13 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  reading facilities xml file... ");
-		//FacilitiesParser facilities_parser = new FacilitiesParser(Facilities.getSingleton());
+		//FacilitiesParser facilities_parser = new FacilitiesParser(facilities);
 		//facilities_parser.parse();
 		System.out.println("  done.");
 
 		System.out.println("  running facilities algorithms... ");
-		//Facilities.getSingleton().addAlgorithm(new FacilitiesAggregation(network));
-		//Facilities.getSingleton().runAlgorithms();
+		//facilities.addAlgorithm(new FacilitiesAggregation(network));
+		//facilities.runAlgorithms();
 		System.out.println("  done.");
 
 		System.out.println();
@@ -111,9 +113,9 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  running facilities algorithms... ");
-		//Facilities.getSingleton().clearAlgorithms();
-		//Facilities.getSingleton().addAlgorithm(new FacilitiesDefineCapAndOpentime(plans.getPersons().size()));
-		//Facilities.getSingleton().runAlgorithms();
+		//facilities.clearAlgorithms();
+		//facilities.addAlgorithm(new FacilitiesDefineCapAndOpentime(plans.getPersons().size()));
+		//facilities.runAlgorithms();
 		System.out.println("  done.");
 
 		System.out.println();
@@ -121,7 +123,7 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  running plans algorithms... ");
-		new PlansDefineKnowledge().run(plans);
+		new PlansDefineKnowledge(facilities).run(plans);
 		System.out.println("  done.");
 
 		System.out.println();
