@@ -49,7 +49,6 @@ public class MyControler1 {
 
 		Plans population = new Plans();
 		new MatsimPlansReader(population).readFile(plansFilename);
-		world.setPopulation(population);
 
 		Events events = new Events();
 

@@ -69,10 +69,9 @@ public class ControlerTest extends MatsimTestCase {
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
 		Plans population = new Plans(Plans.NO_STREAMING);
-		Gbl.getWorld().setPopulation(population);
 		Person person1 = null;
 		try {
-			person1 = new Person(new IdImpl(1), "m", 35, "yes", "yes", "yes");
+			person1 = new Person(new IdImpl(1));
 			Plan plan1 = person1.createPlan(null, "yes");
 			plan1.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 			Leg leg1 = plan1.createLeg("0", "car", "07:00:00", "00:00:00", null);
@@ -81,7 +80,7 @@ public class ControlerTest extends MatsimTestCase {
 			plan1.createAct("h", (String)null, null, "3", "07:00:00", null, null, "no");
 			population.addPerson(person1);
 
-			Person person2 = new Person(new IdImpl(2), "f", 35, "yes", "yes", "yes");
+			Person person2 = new Person(new IdImpl(2));
 			Plan plan2 = person2.createPlan(null, "yes");
 			plan2.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 			Leg leg2 = plan2.createLeg("0", "car", "07:00:00", "00:00:00", null);
@@ -161,12 +160,11 @@ public class ControlerTest extends MatsimTestCase {
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Plans population = new Plans(Plans.NO_STREAMING);
-		Gbl.getWorld().setPopulation(population);
 		Person person1 = null;
 		Leg leg1 = null;
 		Leg leg2 = null;
 		try {
-			person1 = new Person(new IdImpl(1), "m", 35, "yes", "yes", "yes");
+			person1 = new Person(new IdImpl(1));
 			// --- plan 1 ---
 			Plan plan1 = person1.createPlan(null, "yes");
 			plan1.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
@@ -237,7 +235,6 @@ public class ControlerTest extends MatsimTestCase {
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Plans population = new Plans(Plans.NO_STREAMING);
-		Gbl.getWorld().setPopulation(population);
 		Person person1 = null;
 		Act act1a = null;
 		Act act1b = null;
@@ -246,7 +243,7 @@ public class ControlerTest extends MatsimTestCase {
 		Leg leg1 = null;
 		Leg leg2 = null;
 		try {
-			person1 = new Person(new IdImpl(1), "m", 35, "yes", "yes", "yes");
+			person1 = new Person(new IdImpl(1));
 			// --- plan 1 ---
 			Plan plan1 = person1.createPlan(null, "yes");
 			act1a = plan1.createAct("h", "-50.0", "10.0", null, "00:00:00", "07:00:00", "07:00:00", "no");

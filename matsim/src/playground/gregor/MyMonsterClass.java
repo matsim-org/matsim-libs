@@ -558,7 +558,6 @@ int three=0;
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFile);
 		population.printPlansCount();
-		world.setPopulation(population);
 
 		System.out.println("done. ");
 
@@ -627,7 +626,6 @@ int three=0;
 
 		population = ((PlansFilterActInArea)algo).getPlans();
 		population.printPlansCount();
-		world.setPopulation(population);
 
 		PlansWriter writer = new PlansWriter(population,"./networks/evacuationplans_zurich_navteq.xml","v4");
 		writer.writeStartPlans();
@@ -648,7 +646,6 @@ int three=0;
 		World world = Gbl.getWorld();
 		Config config = Gbl.createConfig(new String[] {configFile});
 
-
 		System.out.println("reading old network xml file... ");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(net);
@@ -662,8 +659,6 @@ int three=0;
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plans);
 		population.printPlansCount();
-
-		world.setPopulation(population);
 
 		System.out.println("done. ");
 
@@ -734,8 +729,6 @@ int three=0;
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(in_plans);
 		population.printPlansCount();
-
-		world.setPopulation(population);
 
 		System.out.println("done. ");
 

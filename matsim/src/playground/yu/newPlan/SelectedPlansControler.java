@@ -54,7 +54,6 @@ public class SelectedPlansControler {
 		population.addAlgorithm(sp);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
-		world.setPopulation(population);
 		population.runAlgorithms();
 		sp.writeEndPlans();
 	}

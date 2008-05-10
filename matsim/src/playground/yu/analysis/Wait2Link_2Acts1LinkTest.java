@@ -221,7 +221,6 @@ public class Wait2Link_2Acts1LinkTest {
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPlansReader(population).readFile(plansFilename);
-		world.setPopulation(population);
 
 		population.runAlgorithms();
 

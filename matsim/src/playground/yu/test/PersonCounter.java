@@ -85,7 +85,6 @@ public class PersonCounter extends PersonAlgorithm {
 		population.addAlgorithm(pc);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
-		world.setPopulation(population);
 		population.runAlgorithms();
 		System.out.println(pc.toString());
 	}

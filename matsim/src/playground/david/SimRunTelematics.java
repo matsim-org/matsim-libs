@@ -48,11 +48,9 @@ public class SimRunTelematics {
 		Plans population = new MyPopulation();
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
-		world.setPopulation(population);
 
 		Events events = new Events();
 		events.addHandler(new EventWriterTXT("EventsTelematicsSimWrapper.txt"));
-		world.setEvents(events);
 
 		//TelematicsSimWrapper sim = new TelematicsSimWrapper(netFileName,population, events);
 		//sim.setStartEndTime(0,30000);

@@ -133,10 +133,8 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 		// Read plans file with special Reader Implementation
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
-		world.setPopulation(population);
 
-		Events events = new Events() ;
-		world.setEvents(events);
+		Events events = new Events();
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		config.simulation().setEndTime(Time.parseTime("12:02:00"));

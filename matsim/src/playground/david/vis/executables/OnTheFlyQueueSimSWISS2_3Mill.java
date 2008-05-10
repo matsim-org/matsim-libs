@@ -69,10 +69,8 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 		population = new Plans();
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
-		world.setPopulation(population);
 
-		events = new Events() ;
-		world.setEvents(events);
+		events = new Events();
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		//config.simulation().setEndTime(Time.parseTime("12:00:11"));

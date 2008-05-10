@@ -151,7 +151,6 @@ public class LegCountTest {
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPlansReader(population).readFile(plansFilename);
-		world.setPopulation(population);
 
 		population.runAlgorithms();
 

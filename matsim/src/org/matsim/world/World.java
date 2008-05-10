@@ -27,11 +27,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.Events;
 import org.matsim.facilities.Facilities;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plans;
 
 public class World {
 
@@ -53,9 +50,6 @@ public class World {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public World() {
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// complete
 	//////////////////////////////////////////////////////////////////////
@@ -72,7 +66,9 @@ public class World {
 		}
 
 		if (zlayers.size() > 0) {
-			if (zlayers.size() != (this.rules.size()+1)) { Gbl.errorMsg("This should never happen!"); }
+			if (zlayers.size() != (this.rules.size()+1)) {
+				throw new RuntimeException("This should never happen!");
+			}
 
 			// find the top layer
 			this.top_layer = null;
@@ -91,11 +87,15 @@ public class World {
 				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
 				step_cnt++;
 			}
-			if (step_cnt != zlayers.size()) { Gbl.errorMsg("Something is completely wrong!"); }
+			if (step_cnt != zlayers.size()) {
+				throw new RuntimeException("Something is completely wrong!");
+			}
 
 		}
 		else {
-			if (!this.rules.isEmpty()) { Gbl.errorMsg("This should never happen!"); }
+			if (!this.rules.isEmpty()) {
+				throw new RuntimeException("This should never happen!");
+			}
 			this.top_layer = null;
 			this.bottom_layer = null;
 		}
@@ -188,7 +188,7 @@ public class World {
 		down_layer.removeUpRule();
 		up_layer.removeDownRule();
 		if (this.rules.remove(down_layer.getType().toString() + up_layer.getType().toString()) == null) {
-			Gbl.errorMsg("This should never happen!");
+			throw new RuntimeException("This should never happen!");
 		}
 		return true;
 	}
@@ -198,14 +198,12 @@ public class World {
 	//////////////////////////////////////////////////////////////////////
 
 	public final Layer createLayer(final Id type, final String name) {
-		if (this.layers.containsKey(type)) { Gbl.errorMsg("Layer type=" + type + " already exixts."); }
+		if (this.layers.containsKey(type)) {
+			throw new IllegalArgumentException("Layer type=" + type + " already exixts.");
+		}
 		if (type.equals(Facilities.LAYER_TYPE)) { return this.createFacilityLayer(); }
 		if (type.equals(NetworkLayer.LAYER_TYPE)) { return this.createNetworkLayer(); }
 		return this.createZoneLayer(type,name);
-	}
-
-	public final Layer createLayer(final String type, final String name) {
-		return this.createLayer(new IdImpl(type),name);
 	}
 
 	public final MappingRule createMappingRule(final String mapping_rule) {
@@ -321,14 +319,14 @@ public class World {
 
 	public final Layer getBottomLayer() {
 		if ((this.bottom_layer == null) && !this.layers.isEmpty()) {
-			Gbl.errorMsg("bottom_layer = null while world contains layers!");
+			throw new RuntimeException("bottom_layer = null while world contains layers!");
 		}
 		return this.bottom_layer;
 	}
 
 	public final Layer getTopLayer() {
 		if ((this.top_layer == null) && !this.layers.isEmpty()) {
-			Gbl.errorMsg("top_layer = null while world contains layers!");
+			throw new RuntimeException("top_layer = null while world contains layers!");
 		}
 		return this.top_layer;
 	}
@@ -344,27 +342,6 @@ public class World {
 				"[nof_rules=" + this.rules.size() + "]" +
 				"[top_layer=" + this.top_layer + "]" +
 				"[bottom_layer=" + this.bottom_layer + "]";
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// new methods and variables for globally handling pop/event/sim
-	//////////////////////////////////////////////////////////////////////
-
-	private Plans population;
-	private Events events;
-
-	public void setPopulation(final Plans population) {
-		this.population = population;
-	}
-	public Plans getPopulation() {
-		return this.population;
-	}
-
-	public void setEvents(final Events events) {
-		this.events = events;
-	}
-	public Events getEvents() {
-		return this.events;
 	}
 
 }

@@ -62,8 +62,7 @@ public class AnalysisTest {
 		final String rpFilename = "./test/yu/analysis/input/rpZH1_05.xml";
 		final String eventsFilename = "./test/yu/analysis/input/100.events_pt-6t-12.txt";
 		final String outputFilename = "./test/yu/analysis/output/outputPt-6t-12.txt";
-		Config config = Gbl
-				.createConfig(new String[] { "./test/yu/analysis/analysisConfig.xml" });
+		Config config = Gbl.createConfig(new String[] { "./test/yu/analysis/analysisConfig.xml" });
 
 		World world = Gbl.getWorld();
 		NetworkLayer network = new NetworkLayer();
@@ -76,7 +75,6 @@ public class AnalysisTest {
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
 		population.runAlgorithms();
-		world.setPopulation(population);
 
 		Events events = new Events();
 

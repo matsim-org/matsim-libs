@@ -55,7 +55,6 @@ public class DoublePlanControler {
 		population.addAlgorithm(dp);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(config.plans().getInputFile());
-		world.setPopulation(population);
 		population.runAlgorithms();
 		dp.writeEndPlans();
 	}

@@ -89,7 +89,6 @@ public class License extends PersonAlgorithm {
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPlansReader(population).readFile(plansFilename);
-		world.setPopulation(population);
 
 		population.runAlgorithms();
 

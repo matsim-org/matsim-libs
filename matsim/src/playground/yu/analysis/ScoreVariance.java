@@ -93,7 +93,6 @@ public class ScoreVariance extends PersonAlgorithm implements PlanAlgorithmI {
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPlansReader(population).readFile(plansFilename);
-		world.setPopulation(population);
 
 		population.runAlgorithms();
 		sv.writeVariance();

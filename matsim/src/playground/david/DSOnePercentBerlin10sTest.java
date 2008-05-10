@@ -50,7 +50,7 @@ class StuckAndAbortCounter implements EventHandlerAgentStuckI
 	}
 
 }
-public class DSOnePercentBerlin10sTest{
+public class DSOnePercentBerlin10sTest {
 
 	public String configfile;
 
@@ -86,12 +86,10 @@ public class DSOnePercentBerlin10sTest{
 		// Read plans file with special dtd version
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
-		world.setPopulation(population);
 
 		Events events = new Events();
 		EventWriterTXT writer = new EventWriterTXT("../MatsimJ-Testing/testdata/tmp/DSberlin1PercentEvents.txt");
 		events.addHandler(writer);
-		world.setEvents(events);
 
 		StuckAndAbortCounter counter = new StuckAndAbortCounter();
 		events.addHandler(counter);
@@ -115,8 +113,7 @@ public class DSOnePercentBerlin10sTest{
 		// does not compile anymore??
 		//realPop.addAlgorithm(new PlanCalcScore());
 		//realPop.addAlgorithm(new UpdateScores(population));
-		realPop.addAlgorithm(average);
-		realPop.runAlgorithms();
+		average.run(realPop);
 
 		System.out.println("S C O R I N G" +  "] the average score is: " + average.getAverage());
 

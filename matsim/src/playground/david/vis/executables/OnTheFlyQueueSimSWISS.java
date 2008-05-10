@@ -61,10 +61,8 @@ public class OnTheFlyQueueSimSWISS {
 		Gbl.printElapsedTime();
 
 		population = new Plans();
-		world.setPopulation(population);
 
-		events = new Events() ;
-		world.setEvents(events);
+		events = new Events();
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		config.simulation().setEndTime(Time.parseTime("00:00:11"));

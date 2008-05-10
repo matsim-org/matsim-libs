@@ -55,7 +55,6 @@ public class PtCheckTest {
 
 			population.addAlgorithm(pc);
 			new MatsimPlansReader(population).readFile(plansFilename);
-			world.setPopulation(population);
 			population.runAlgorithms();
 
 			pc.write(100);

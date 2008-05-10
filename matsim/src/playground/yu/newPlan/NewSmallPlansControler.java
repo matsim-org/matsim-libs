@@ -56,7 +56,6 @@ public class NewSmallPlansControler {
 		population.addAlgorithm(nsp);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
-		world.setPopulation(population);
 		population.runAlgorithms();
 		nsp.writeEndPlans();
 	}

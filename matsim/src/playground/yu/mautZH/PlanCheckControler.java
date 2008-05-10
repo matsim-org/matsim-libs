@@ -43,8 +43,7 @@ public class PlanCheckControler {
 		final String planCheckFilename = "./test/yu/schweiz/output/planCheck.txt";
 		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")
-		Config config = Gbl
-				.createConfig(new String[] { "./test/yu/schweiz/multipleIterations_.xml" });
+		Config config = Gbl.createConfig(new String[] { "./test/yu/schweiz/multipleIterations_.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
@@ -55,7 +54,6 @@ public class PlanCheckControler {
 		population.addAlgorithm(pc);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
-		world.setPopulation(population);
 		population.runAlgorithms();
 		pc.writeResult();
 	}

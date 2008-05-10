@@ -57,7 +57,6 @@ public class NewPtPlans2Controler {
 
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
-		world.setPopulation(population);
 
 		population.runAlgorithms();
 

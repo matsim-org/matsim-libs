@@ -54,7 +54,6 @@ public class NewCarPlansControler {
 		population.addAlgorithm(nac);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
-		world.setPopulation(population);
 		population.runAlgorithms();
 		nac.writeEndPlans();
 	}

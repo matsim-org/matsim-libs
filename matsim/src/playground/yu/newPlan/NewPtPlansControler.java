@@ -50,7 +50,6 @@ public class NewPtPlansControler {
 		population.addAlgorithm(nap);
 		new MatsimPlansReader(population).readFile(config.plans()
 				.getInputFile());
-		world.setPopulation(population);
 		population.runAlgorithms();
 		nap.writeEndPlans();
 	}

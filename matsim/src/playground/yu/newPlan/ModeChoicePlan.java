@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.yu.newPlan;
 
 import java.util.List;
@@ -115,7 +112,6 @@ public class ModeChoicePlan extends NewPlan {
 		population.addAlgorithm(mcp);
 		new MatsimPlansReader(population).readFile(config.plans()
 				.getInputFile());
-		world.setPopulation(population);
 		population.runAlgorithms();
 		mcp.writeEndPlans();
 	}

@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.yu.newPlan;
 
 import org.matsim.config.Config;
@@ -102,13 +99,11 @@ public class MergePlans {
 		pw.writeStartPlans();
 		plansA.addAlgorithm(new CopyPlans(pw));
 		new MatsimPlansReader(plansA).readFile(plansFilenameA);
-		world.setPopulation(plansA);
 		plansA.runAlgorithms();
 
 		Plans plansB = new Plans();
 		plansB.addAlgorithm(new PersonIdCopyPlans(pw, lower_limit));
 		new MatsimPlansReader(plansB).readFile(plansFilenameB);
-		world.setPopulation(plansB);
 		plansB.runAlgorithms();
 		pw.writeEndPlans();
 	}

@@ -77,19 +77,16 @@ public class SimRunKreisverkehr {
 		// Read plans file with special Reader Implementation
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
-		world.setPopulation(population);
 
 		Events events = new Events() ;
 		events.addHandler(new EventWriterXML("MatSimJEventsXML.txt"));
 		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
-		world.setEvents(events);
 
 		//Config.getSingleton().setParam(Simulation.SIMULATION, Simulation.STARTTIME, "05:55:00");
 		//Config.getSingleton().setParam(Simulation.SIMULATION, Simulation.ENDTIME, "08:00:00");
 
 		QueueSimulation sim = new QueueSimulation(network, population, events);
 		sim.openNetStateWriter("../../tmp/testWrite2", netFileName, 60);
-
 
 		sim.run();
 

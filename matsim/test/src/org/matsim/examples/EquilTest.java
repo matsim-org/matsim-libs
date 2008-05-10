@@ -54,15 +54,13 @@ public class EquilTest extends MatsimTestCase {
 		Plans population = new Plans();
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
-		world.setPopulation(population);
 
 		Events events = new Events();
 		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		events.addHandler(writer);
-		world.setEvents(events);
 
 		SimulationTimer.setTime(0);
-		QueueSimulation sim = new QueueSimulation(network, population, events) ;
+		QueueSimulation sim = new QueueSimulation(network, population, events);
 		sim.run();
 
 		writer.closefile();
@@ -72,6 +70,5 @@ public class EquilTest extends MatsimTestCase {
 		System.out.println("checksum1 = " + checksum1);
 		System.out.println("checksum2 = " + checksum2);
 		assertEquals(checksum1, checksum2);
-
 	}
 }

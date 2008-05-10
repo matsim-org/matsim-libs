@@ -56,7 +56,6 @@ public class TravVolCnterControler {
 		Plans population = new Plans();
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
-		world.setPopulation(population);
 
 		Events events = new Events();
 

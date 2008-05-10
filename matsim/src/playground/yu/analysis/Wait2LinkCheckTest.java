@@ -126,7 +126,6 @@ public class Wait2LinkCheckTest {
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPlansReader(population).readFile(plansFilename);
-		world.setPopulation(population);
 
 		population.runAlgorithms();
 

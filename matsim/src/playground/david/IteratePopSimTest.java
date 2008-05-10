@@ -56,9 +56,8 @@ public class IteratePopSimTest {
 		world.setNetworkLayer(network);
 		Plans population = new Plans();
 		// Read plans file with special Reader Implementation
-		PlansReaderI plansReader = new MatsimPlansReader(population);;
+		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
-		world.setPopulation(population);
 
 		Gbl.startMeasurement();
 		long sum = 0;
@@ -73,7 +72,6 @@ public class IteratePopSimTest {
 		Events events = new Events() ;
 		events.addHandler(new EventWriterXML("MatSimJEventsXML.txt"));
 		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
-		world.setEvents(events);
 
 		config.simulation().setStartTime(Time.parseTime("05:55:00"));
 		config.simulation().setEndTime(Time.parseTime("08:00:00"));

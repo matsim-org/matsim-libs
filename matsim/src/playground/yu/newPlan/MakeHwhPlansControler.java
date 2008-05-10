@@ -56,7 +56,6 @@ public class MakeHwhPlansControler {
 
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
-		world.setPopulation(population);
 
 		population.runAlgorithms();
 		hpm.writeEndPlans();

@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.yu.newPlan;
 
 import java.util.ArrayList;
@@ -50,9 +47,6 @@ public class AvoidOldNodes extends NewPlan {
 	private boolean nullRoute = false;
 	private Set<String> nodeIds;
 
-	/**
-	 * 
-	 */
 	public AvoidOldNodes(NetworkLayer network, Plans plans) {
 		super(network, plans);
 		nodeIds = new HashSet<String>();
@@ -117,7 +111,6 @@ public class AvoidOldNodes extends NewPlan {
 		population.addAlgorithm(aon);
 		new MatsimPlansReader(population).readFile(config.plans()
 				.getInputFile());
-		world.setPopulation(population);
 		population.runAlgorithms();
 		aon.writeEndPlans();
 	}

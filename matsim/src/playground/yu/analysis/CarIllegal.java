@@ -96,7 +96,6 @@ public class CarIllegal extends PersonAlgorithm {
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPlansReader(population).readFile(plansFilename);
-		world.setPopulation(population);
 
 		population.runAlgorithms();
 

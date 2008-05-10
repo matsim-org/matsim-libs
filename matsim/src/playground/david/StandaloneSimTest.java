@@ -53,12 +53,10 @@ public class StandaloneSimTest {
 		Plans population = new Plans();
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
-		world.setPopulation(population);
 
 		Events events = new Events() ;
 		events.addHandler(new EventWriterXML("MatSimJEventsXML.txt"));
 		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
-		world.setEvents(events);
 
 		config.simulation().setStartTime(Time.parseTime("05:55:00"));
 		config.simulation().setEndTime(Time.parseTime("08:00:00"));

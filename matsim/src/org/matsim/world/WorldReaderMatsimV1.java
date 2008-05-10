@@ -25,6 +25,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -101,7 +102,7 @@ public class WorldReaderMatsimV1 extends MatsimXmlParser {
 		this.currLayer = (ZoneLayer)this.world.getLayer(atts.getValue("type"));
 		if (this.currLayer==null) {
 			this.currLayer =
-				(ZoneLayer)this.world.createLayer(atts.getValue("type"),"created by "+this.getClass().getName()+" by zone (id="+atts.getValue("id")+")");
+				(ZoneLayer)this.world.createLayer(new IdImpl(atts.getValue("type")),"created by "+this.getClass().getName()+" by zone (id="+atts.getValue("id")+")");
 		}
 		this.currZone =
 			this.currLayer.createZone(atts.getValue("id"), atts.getValue("center_x"), atts.getValue("center_y"), atts.getValue("min_x"), atts.getValue("min_y"),

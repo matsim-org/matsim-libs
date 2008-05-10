@@ -25,6 +25,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -99,8 +100,8 @@ public class WorldReaderMatsimV0 extends MatsimXmlParser {
 
 	private void startWorld(final Attributes atts) {
 		this.world.setName(atts.getValue("name"));
-		this.hektar_layer = (ZoneLayer)this.world.createLayer("hektar", "created by " + this.getClass().getName() + " from a world_v0-file");
-		this.currLayer = (ZoneLayer)this.world.createLayer("municipality", "created by " + this.getClass().getName() + " from a world_v0-file");
+		this.hektar_layer = (ZoneLayer)this.world.createLayer(new IdImpl("hektar"), "created by " + this.getClass().getName() + " from a world_v0-file");
+		this.currLayer = (ZoneLayer)this.world.createLayer(new IdImpl("municipality"), "created by " + this.getClass().getName() + " from a world_v0-file");
 		this.world.createMappingRule("hektar[+]-[1]municipality");
 	}
 

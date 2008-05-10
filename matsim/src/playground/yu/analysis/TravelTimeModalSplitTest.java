@@ -72,7 +72,6 @@ public class TravelTimeModalSplitTest {
 		Plans population = new Plans();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPlansReader(population).readFile(plansFilename);
-		world.setPopulation(population);
 
 		Events events = new Events();
 

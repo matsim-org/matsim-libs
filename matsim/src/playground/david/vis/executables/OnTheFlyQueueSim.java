@@ -46,11 +46,9 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	protected LegHistogram hist = null;
 
 	public static void runnIt() {
-		String [] args = {};
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		OnTheFlyClientQuadSwing.main(new String []{"rmi:127.0.0.1:4019"});
@@ -129,10 +127,8 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		// Read plans file with special Reader Implementation
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
-		world.setPopulation(population);
 
-		Events events = new Events() ;
-		world.setEvents(events);
+		Events events = new Events();
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		//config.simulation().setEndTime(Time.parseTime("07:02:00"));
