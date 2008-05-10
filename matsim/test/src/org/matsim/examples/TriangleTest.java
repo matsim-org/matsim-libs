@@ -20,6 +20,7 @@
 
 package org.matsim.examples;
 
+import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
@@ -51,6 +52,8 @@ public class TriangleTest extends MatsimTestCase {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private Config config = null;
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -65,8 +68,8 @@ public class TriangleTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		super.loadConfig(null);
-		TriangleScenario.setUpScenarioConfig(super.getOutputDirectory());
+		this.config = super.loadConfig(null);
+		TriangleScenario.setUpScenarioConfig(this.config, super.getOutputDirectory());
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -75,23 +78,23 @@ public class TriangleTest extends MatsimTestCase {
 
 	private final void compareOutputWorld() {
 		System.out.println("  comparing input and output world file... ");
-		long checksum_ref = CRCChecksum.getCRCFromFile(Gbl.getConfig().world().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(Gbl.getConfig().world().getOutputFile());
+		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.world().getInputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(this.config.world().getOutputFile());
 		assertEquals("different world files", checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
 
 	private final void checkEnrichedOutputFacilities() {
 		System.out.println("  checksum check of enriched output facilities... ");
-		long checksum_facilities = CRCChecksum.getCRCFromFile(Gbl.getConfig().facilities().getOutputFile());
+		long checksum_facilities = CRCChecksum.getCRCFromFile(this.config.facilities().getOutputFile());
 		assertEquals("different facilities files", TriangleScenario.CHECKSUM_FACILITIES_ENRICHED,checksum_facilities);
 		System.out.println("  done.");
 	}
 
 	private final void compareOutputNetwork() {
 		System.out.println("  comparing input and output network file... ");
-		long checksum_ref = CRCChecksum.getCRCFromFile(Gbl.getConfig().network().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(Gbl.getConfig().network().getOutputFile());
+		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.network().getInputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(this.config.network().getOutputFile());
 		assertEquals("different network files", checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
@@ -99,7 +102,7 @@ public class TriangleTest extends MatsimTestCase {
 	private final void compareOutputPlans() {
 		System.out.println("  comparing reference and output plans file... ");
 		long checksum_ref = CRCChecksum.getCRCFromGZFile(getInputDirectory() + "plans.xml.gz");
-		long checksum_run = CRCChecksum.getCRCFromGZFile(Gbl.getConfig().plans().getOutputFile());
+		long checksum_run = CRCChecksum.getCRCFromGZFile(this.config.plans().getOutputFile());
 		assertEquals("different plans files", checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
@@ -115,17 +118,17 @@ public class TriangleTest extends MatsimTestCase {
 		final World world = Gbl.getWorld();
 		
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(world).readFile(Gbl.getConfig().world().getInputFile());
+		new MatsimWorldReader(world).readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println();
@@ -212,7 +215,7 @@ public class TriangleTest extends MatsimTestCase {
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		new ConfigWriter(Gbl.getConfig()).write();
+		new ConfigWriter(this.config).write();
 		System.out.println("  done.");
 
 		this.compareOutputPlans();

@@ -20,10 +20,10 @@
 
 package org.matsim.world;
 
+import org.matsim.config.Config;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
@@ -40,6 +40,8 @@ public class WorldParserWriterTest extends MatsimTestCase {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private Config config = null;
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -54,43 +56,43 @@ public class WorldParserWriterTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		super.loadConfig(null);
-		TriangleScenario.setUpScenarioConfig(super.getOutputDirectory());
+		this.config = super.loadConfig(null);
+		TriangleScenario.setUpScenarioConfig(this.config, super.getOutputDirectory());
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void runModules() {
+	private final void runModules(final World world) {
 		System.out.println("  running world modules... ");
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
-		new WorldCheck().run(Gbl.getWorld());
+		new WorldCheck().run(world);
+		new WorldBottom2TopCompletion().run(world);
+		new WorldValidation().run(world);
+		new WorldCheck().run(world);
 		System.out.println("  done.");
 	}
 	
 	private final void compareOutputWorld() {
 		System.out.println("  comparing input and output world file... ");
-		long checksum_ref = CRCChecksum.getCRCFromFile(Gbl.getConfig().world().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(Gbl.getConfig().world().getOutputFile());
+		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.world().getInputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(this.config.world().getOutputFile());
 		assertEquals(checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
 
 	private final void compareOutputFacilities() {
 		System.out.println("  comparing input and output facilities file... ");
-		long checksum_ref = CRCChecksum.getCRCFromFile(Gbl.getConfig().facilities().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(Gbl.getConfig().facilities().getOutputFile());
+		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.facilities().getInputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(this.config.facilities().getOutputFile());
 		assertEquals(checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
 
 	private final void compareOutputNetwork() {
 		System.out.println("  comparing input and output network file... ");
-		long checksum_ref = CRCChecksum.getCRCFromFile(Gbl.getConfig().network().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(Gbl.getConfig().network().getOutputFile());
+		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.network().getInputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(this.config.network().getOutputFile());
 		assertEquals(checksum_ref, checksum_run);
 		System.out.println("  done.");
 	}
@@ -104,14 +106,14 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("running testParserWriter1()...");
 
 		System.out.println("  reading world xml file... ");
-		World world = Gbl.getWorld();
+		World world = new World();
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
-		this.runModules();
+		this.runModules(world);
 
-		TriangleScenario.writeWorld();
+		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeConfig();
 
 		this.compareOutputWorld();
@@ -126,24 +128,24 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("running testParserWriter2()...");
 
 		System.out.println("  reading world xml file... ");
-		World world = Gbl.getWorld();
+		World world = new World();
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file as a layer of the world...");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 		
-		this.runModules();
+		this.runModules(world);
 
-		TriangleScenario.writeWorld();
+		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
 		TriangleScenario.writeConfig();
@@ -162,24 +164,24 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("running testParserWriter3()...");
 
 		System.out.println("  reading world xml file... ");
-		World world = Gbl.getWorld();
+		World world = new World();
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file as a layer of the world...");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 		
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
-		this.runModules();
+		this.runModules(world);
 
-		TriangleScenario.writeWorld();
+		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
 		TriangleScenario.writeConfig();
@@ -197,26 +199,26 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("running testParserWriter4()...");
 
-		World world = Gbl.getWorld();
+		World world = new World();
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file as a layer of the world...");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 		
-		this.runModules();
+		this.runModules(world);
 
-		TriangleScenario.writeWorld();
+		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
 		TriangleScenario.writeConfig();
@@ -234,26 +236,26 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("running testParserWriter5()...");
 
-		World world = Gbl.getWorld();
+		World world = new World();
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file as a layer of the world...");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 		
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
-		this.runModules();
+		this.runModules(world);
 
-		TriangleScenario.writeWorld();
+		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
 		TriangleScenario.writeConfig();
@@ -271,26 +273,26 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("running testParserWriter6()...");
 
-		World world = Gbl.getWorld();
+		World world = new World();
 		
 		System.out.println("  reading network xml file as a layer of the world...");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 		
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
-		this.runModules();
+		this.runModules(world);
 
-		TriangleScenario.writeWorld();
+		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
 		TriangleScenario.writeConfig();
@@ -308,26 +310,26 @@ public class WorldParserWriterTest extends MatsimTestCase {
 
 		System.out.println("running testParserWriter7()...");
 
-		World world = Gbl.getWorld();
+		World world = new World();
 
 		System.out.println("  reading network xml file as a layer of the world...");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 		System.out.println("  done.");
 		
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		worldReader.readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
 
-		this.runModules();
+		this.runModules(world);
 
-		TriangleScenario.writeWorld();
+		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
 		TriangleScenario.writeConfig();

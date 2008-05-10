@@ -31,6 +31,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
+import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 
 public abstract class TriangleScenario {
@@ -59,24 +60,22 @@ public abstract class TriangleScenario {
 	// setup
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void setUpScenarioConfig(final String output_directory) {
-		final Config config = Gbl.getConfig();
-		
-		config.config().setOutputFile(output_directory + "output_config.xml");
+	public static final void setUpScenarioConfig(final Config config, final String outputDirectory) {
+		config.config().setOutputFile(outputDirectory + "output_config.xml");
 		
 		config.world().setInputFile(studyfolder + "world.xml");
-		config.world().setOutputFile(output_directory + "output_world.xml");
+		config.world().setOutputFile(outputDirectory + "output_world.xml");
 		
 		config.network().setInputFile(studyfolder + "network.xml");
-		config.network().setOutputFile(output_directory + "output_network.xml");
+		config.network().setOutputFile(outputDirectory + "output_network.xml");
 		
 		config.facilities().setInputFile(studyfolder + "facilities.xml");
-		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
+		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
 		
 		config.matrices().setInputFile(studyfolder + "matrices.xml");
-		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
+		config.matrices().setOutputFile(outputDirectory + "output_matrices.xml");
 		
-		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
+		config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
 	}
@@ -92,9 +91,9 @@ public abstract class TriangleScenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeWorld() {
+	public static final void writeWorld(final World world) {
 		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
+		WorldWriter world_writer = new WorldWriter(world);
 		world_writer.write();
 		System.out.println("  done.");
 	}
