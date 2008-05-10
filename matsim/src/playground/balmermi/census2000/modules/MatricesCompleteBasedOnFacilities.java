@@ -30,7 +30,6 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
-import org.matsim.matrices.algorithms.MatricesAlgorithm;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
@@ -56,7 +55,7 @@ import org.matsim.world.ZoneLayer;
  *
  * @author Michael Balmer
  */
-public class MatricesCompleteBasedOnFacilities extends MatricesAlgorithm {
+public class MatricesCompleteBasedOnFacilities {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -267,7 +266,6 @@ public class MatricesCompleteBasedOnFacilities extends MatricesAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final Matrices matrices) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 

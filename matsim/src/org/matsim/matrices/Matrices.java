@@ -20,11 +20,9 @@
 
 package org.matsim.matrices;
 
-import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.matrices.algorithms.MatricesAlgorithm;
 import org.matsim.world.Layer;
 
 public class Matrices {
@@ -37,7 +35,6 @@ public class Matrices {
 
 	private String name = null;
 	private final TreeMap<String, Matrix> matrices = new TreeMap<String, Matrix>();
-	private final ArrayList<MatricesAlgorithm> algorithms = new ArrayList<MatricesAlgorithm>();
 
 	//////////////////////////////////////////////////////////////////////
 	// Constructors
@@ -52,33 +49,6 @@ public class Matrices {
 
 	public static final Matrices getSingleton() {
 		return singleton;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// add methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void addAlgorithm(final MatricesAlgorithm algo) {
-		this.algorithms.add(algo);
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void runAlgorithms() {
-		for (int i = 0; i < this.algorithms.size(); i++) {
-			MatricesAlgorithm algo = this.algorithms.get(i);
-			algo.run(this);
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// clear methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void clearAlgorithms() {
-		this.algorithms.clear();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -132,7 +102,6 @@ public class Matrices {
 	@Override
 	public final String toString() {
 		return "[name=" + this.name + "]" +
-				"[nof_matrices=" + this.matrices.size() + "]" +
-				"[nof_algorithms=" + this.algorithms.size() + "]";
+				"[nof_matrices=" + this.matrices.size() + "]";
 	}
 }

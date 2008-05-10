@@ -32,7 +32,7 @@ import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 
-public class MatricesValidateWithFacilities extends MatricesAlgorithm {
+public class MatricesValidateWithFacilities {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -61,7 +61,9 @@ public class MatricesValidateWithFacilities extends MatricesAlgorithm {
 		while (dl_it.hasNext()) {
 			Location dl = dl_it.next();
 			Facility f = (Facility)this.facilities.getLocation(dl.getId());
-			if (f == null) { Gbl.errorMsg("SOMETHING IS WRONG!!!"); }
+			if (f == null) { 
+				throw new RuntimeException("SOMETHING IS WRONG!!!");
+			}
 			if (f.getActivities().containsKey(act_type)) {
 				return true;
 			}
@@ -84,7 +86,7 @@ public class MatricesValidateWithFacilities extends MatricesAlgorithm {
 			}
 		}
 		if (nearest_facility == null) {
-			Gbl.errorMsg("No facility with act_type = " + act_type + "exists");
+			throw new RuntimeException("No facility with act_type = " + act_type + "exists");
 		}
 		Location dl = this.world.getLayer(Facilities.LAYER_TYPE).getLocation(nearest_facility.getId());
 		if (dl.getUpMapping().size() != 1) {
@@ -98,7 +100,6 @@ public class MatricesValidateWithFacilities extends MatricesAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final Matrices matrices) {
 
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
