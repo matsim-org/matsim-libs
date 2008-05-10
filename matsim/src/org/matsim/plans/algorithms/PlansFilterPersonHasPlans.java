@@ -29,29 +29,16 @@ import org.matsim.plans.Plans;
 
 /**
  * This algorithm filters out all persons without plans, leaving only persons in the
- * population having at least one plan.<br/>0
+ * population having at least one plan.<br/>
  * Useful when other algorithms may remove plans matching some criteria, so we do not
  * have "empty" people in the population.
  */
-public class PlansFilterPersonHasPlans extends PlansAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+public class PlansFilterPersonHasPlans {
 
 	public PlansFilterPersonHasPlans() {
 		super();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(final Plans plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 

@@ -29,7 +29,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.vis.kml.Document;
@@ -47,7 +46,7 @@ import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 import org.matsim.utils.vis.kml.Link.ViewRefreshMode;
 import org.matsim.utils.vis.kml.fields.Color;
 
-public class PopulationExportToKML extends PlansAlgorithm {
+public class PopulationExportToKML {
 
 	private KML masterKML;
 	private Document masterDocument;
@@ -74,7 +73,6 @@ public class PopulationExportToKML extends PlansAlgorithm {
 		this.KMLDirname = KMLDirname;
 	}
 
-	@Override
 	public void run(Plans population) {
 
 		for (int i = 0; i <= 15; i++) {

@@ -58,8 +58,8 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 import org.matsim.plans.algorithms.ActLocationFalsifier;
+import org.matsim.plans.algorithms.PersonAlgorithmI;
 import org.matsim.plans.algorithms.PersonRemoveLinkAndRoute;
-import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.plans.algorithms.PlansFilterActInArea;
 import org.matsim.plans.algorithms.XY2Links;
 import org.matsim.utils.geometry.geotools.MGC;
@@ -617,7 +617,7 @@ int three=0;
 
 
 		Plans population = new Plans(Plans.USE_STREAMING);
-		PlansAlgorithm algo = new PlansFilterActInArea(subNetwork,"w");
+		PersonAlgorithmI algo = new PlansFilterActInArea(subNetwork,"w");
 		population.addAlgorithm(algo);
 
 		System.out.println("reading plans xml file... ");
@@ -740,30 +740,24 @@ int three=0;
 		System.out.println("done. ");
 
 		System.out.println("performing network2network mapping... ");
-		PlansAlgorithm rm = new PersonRemoveLinkAndRoute();
-		PlansAlgorithm alf = new ActLocationFalsifier(500.0);
 
-
-		rm.run(population);
-		alf.run(population);
+		new PersonRemoveLinkAndRoute().run(population);
+		new ActLocationFalsifier(500.0).run(population);
 
 		System.out.println("reading new network xml file... ");
 		network = null;
 		NetworkLayer new_network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
-//		world.setNetworkLayer(network);
+		world.setNetworkLayer(new_network);
 		System.out.println("done. ");
 
-		PlansAlgorithm xy = new XY2Links(new_network);
-		world.setNetworkLayer(new_network);
-		xy.run(population);
+		new XY2Links(new_network).run(population);
 
 		PlansWriter writer = new PlansWriter(population,out_plans,"v4");
 		writer.writeStartPlans();
 		Collection<Person> persons = population.getPersons().values();
 		for (Person person : persons){
 			writer.run(person);
-
 		}
 		writer.writeEndPlans();
 

@@ -68,8 +68,8 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
 import org.matsim.plans.Route;
+import org.matsim.plans.algorithms.PersonAlgorithmI;
 import org.matsim.plans.algorithms.PersonAnalyseTimesByActivityType;
-import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.plans.algorithms.PersonAnalyseTimesByActivityType.Activities;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
@@ -799,7 +799,7 @@ public class MyRuns {
 	}
 
 	// Gbl.getConfig().plans().getInputFile()
-	public static Plans initMatsimAgentPopulation(String inputFilename, boolean isStreaming, ArrayList<PlansAlgorithm> algos) {
+	public static Plans initMatsimAgentPopulation(String inputFilename, boolean isStreaming, ArrayList<PersonAlgorithmI> algos) {
 
 		Plans population = null;
 
@@ -809,8 +809,8 @@ public class MyRuns {
 		if (isStreaming) {
 			// add plans algos for streaming
 			if (algos != null) {
-				for (PlansAlgorithm plansAlgo : algos) {
-					population.addAlgorithm(plansAlgo);
+				for (PersonAlgorithmI algo : algos) {
+					population.addAlgorithm(algo);
 				}
 			}
 		}
@@ -1179,8 +1179,8 @@ public class MyRuns {
 		// - network
 		final NetworkLayer network = MyRuns.initWorldNetwork();
 		// - population
-		PlansAlgorithm pa = new PersonAnalyseTimesByActivityType(TIME_BIN_SIZE);
-		ArrayList<PlansAlgorithm> plansAlgos = new ArrayList<PlansAlgorithm>();
+		PersonAlgorithmI pa = new PersonAnalyseTimesByActivityType(TIME_BIN_SIZE);
+		ArrayList<PersonAlgorithmI> plansAlgos = new ArrayList<PersonAlgorithmI>();
 		plansAlgos.add(pa);
 
 		Plans matsimAgentPopulation = new Plans(Plans.USE_STREAMING);

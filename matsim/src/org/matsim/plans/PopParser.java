@@ -107,7 +107,7 @@ public class PopParser extends MatsimXmlParser {
 				this.planswriter.writeStartPlans();
 			}
 			else if (command == PERSON_FINISHED) {
-				plans.runPersonAlgorithms();
+				plans.runAlgorithms();
 				this.planswriter.writePersons();
 				plans.clearPersons();
 			}

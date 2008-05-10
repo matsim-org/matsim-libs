@@ -26,11 +26,10 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PlansAlgorithm;
 
 import playground.balmermi.census2000.data.Persons;
 
-public class PlansCreatePopulation extends PlansAlgorithm {
+public class PlansCreatePopulation {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -53,7 +52,6 @@ public class PlansCreatePopulation extends PlansAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final Plans plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
@@ -68,8 +66,12 @@ public class PlansCreatePopulation extends PlansAlgorithm {
 		while (pid_it.hasNext()) {
 			Integer pid = pid_it.next();
 			playground.balmermi.census2000.data.Person p = this.persons.getPersons().get(pid);
-			IdImpl id = new IdImpl(pid);
-			Person person = new Person(id,p.getSex(),p.getAge(),p.getLicense(),p.getCarAvail(),p.getEmployed());
+			Person person = new Person(new IdImpl(pid.toString()));
+			person.setSex(p.getSex());
+			person.setAge(p.getAge());
+			person.setLicence(p.getLicense());
+			person.setCarAvail(p.getCarAvail());
+			person.setCarAvail(p.getEmployed());
 			try {
 				plans.addPerson(person);
 			} catch (Exception e) {

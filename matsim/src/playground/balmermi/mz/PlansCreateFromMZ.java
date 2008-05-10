@@ -22,7 +22,6 @@ package playground.balmermi.mz;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
@@ -32,12 +31,11 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.misc.Time;
 
-public class PlansCreateFromMZ extends PlansAlgorithm {
+public class PlansCreateFromMZ {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -58,7 +56,6 @@ public class PlansCreateFromMZ extends PlansAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final Plans plans) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
@@ -111,7 +108,7 @@ public class PlansCreateFromMZ extends PlansAlgorithm {
 				to.setY(Math.round(to.getY()/100.0)*100);
 				
 				Person person = plans.getPerson(pid);
-				if (person == null) { person = new Person(pid,null,Integer.MIN_VALUE,null,null,null); plans.addPerson(person); }
+				if (person == null) { person = new Person(pid); plans.addPerson(person); }
 				Plan plan = person.getSelectedPlan();
 				if (plan == null) { person.createPlan(null,"yes"); plan = person.getSelectedPlan(); }
 				if (plan.getActsLegs().size() != 0) {

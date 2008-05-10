@@ -36,11 +36,7 @@ import org.matsim.utils.geometry.shared.Coord;
  * are kept.<br/>
  * Persons with no plans left are removed from the population.
  */
-public class PlansFilterArea extends PlansAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+public class PlansFilterArea {
 
 	private final double minX;
 	private final double maxX;
@@ -55,11 +51,6 @@ public class PlansFilterArea extends PlansAlgorithm {
 		this.maxY = max.getY();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(final Plans plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 

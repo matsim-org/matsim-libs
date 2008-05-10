@@ -24,14 +24,13 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
 
-public class PlansScenarioCut extends PlansAlgorithm {
+public class PlansScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -55,16 +54,11 @@ public class PlansScenarioCut extends PlansAlgorithm {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final Plans plans) {
-		System.out.println("    running " + this.getClass().getName() + " module...");
+		System.out.println("running " + this.getClass().getName() + " module...");
 
 		TreeSet<Id> pid_set = new TreeSet<Id>(); // ids of persons to remove
 		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
@@ -76,14 +70,16 @@ public class PlansScenarioCut extends PlansAlgorithm {
 			}
 			else {
 				if (person.getPlans().size() > 1) {
-					Gbl.errorMsg("Module does handle Persons with more than one plan!");
+					throw new RuntimeException("Module does not handle Persons with more than one plan!");
 				}
 				Plan plan = person.getPlans().get(0);
 				Iterator<?> a_it = plan.getIteratorAct();
 				while (a_it.hasNext()) {
 					Act a = (Act)a_it.next();
 					CoordI coord = a.getCoord();
-					if (coord == null) { Gbl.errorMsg("Module requires 'act coord'"); }
+					if (coord == null) { 
+						throw new RuntimeException("Module requires 'act coord'");
+					}
 					double x = coord.getX();
 					double y = coord.getY();
 					if (!((x < this.maxX) && (this.minX < x) && (y < this.maxY) && (this.minY < y))) {
@@ -93,14 +89,13 @@ public class PlansScenarioCut extends PlansAlgorithm {
 			}
 		}
 
-		System.out.println("      Number of persons to be cut = " + pid_set.size() + "...");
+		System.out.println("  Number of persons to be cut = " + pid_set.size() + "...");
 		pid_it = pid_set.iterator();
 		while (pid_it.hasNext()) {
 			Id pid = pid_it.next();
 			plans.getPersons().remove(pid);
 		}
-		System.out.println("      done.");
 
-		System.out.println("    done.");
+		System.out.println("done.");
   }
 }

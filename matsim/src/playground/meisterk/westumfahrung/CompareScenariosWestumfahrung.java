@@ -26,8 +26,8 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.algorithms.PersonIdRecorder;
 import org.matsim.plans.algorithms.PlanAverageScore;
-import org.matsim.plans.algorithms.PlansAlgorithm;
 import org.matsim.plans.filters.ActLinkFilter;
+import org.matsim.plans.filters.PersonFilterI;
 import org.matsim.plans.filters.PersonIdFilter;
 import org.matsim.plans.filters.RouteLinkFilter;
 import org.matsim.plans.filters.SelectedPlanFilter;
@@ -324,7 +324,7 @@ public class CompareScenariosWestumfahrung {
 		TreeMap<String, NetworkLayer> scenarioNetworks = new TreeMap<String, NetworkLayer>();
 
 		PersonIdRecorder personIdRecorder = null;
-		PlansAlgorithm filterAlgorithm = null;
+		PersonFilterI filterAlgorithm = null;
 		
 		for (String scenarioName : scenarioNames) {
 

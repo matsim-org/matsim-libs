@@ -223,8 +223,7 @@ public class MyRuns {
 		final ArrayList<Double> timeDistro = new TimeDistributionReader().readFile(config.getParam("plans", "timeDistributionInputFile"));
 
 		System.out.println("  writing plans (trips) based on matrix...");
-		final PlansCreateTripsFromODMatrix tripsmaker = new PlansCreateTripsFromODMatrix(matrix, timeDistro);
-		tripsmaker.run(plans);
+		new PlansCreateTripsFromODMatrix(matrix, timeDistro).run(plans);
 		plans.printPlansCount();
 		plansWriter.write();
 		System.out.println("  done.");
@@ -390,8 +389,7 @@ public class MyRuns {
 
 		final Coord minCoord = new Coord(Math.min(x1, x2), Math.min(y1, y2));
 		final Coord maxCoord = new Coord(Math.max(x1, x2), Math.max(y1, y2));
-		plans.addAlgorithm(new PlansFilterArea(minCoord, maxCoord)); // needs PLANS.NO_STREAMING
-		plans.runAlgorithms();
+		new PlansFilterArea(minCoord, maxCoord).run(plans); // requires PLANS.NO_STREAMING
 
 		System.out.println("  writing plans...");
 		final PlansWriter plansWriter = new PlansWriter(plans);
@@ -492,9 +490,8 @@ public class MyRuns {
 
 		final Coord minCoord = summary.getMinCoord();
 		final Coord maxCoord = summary.getMaxCoord();
-		plans.addAlgorithm(new PlansFilterArea(minCoord, maxCoord));
-		plans.runAlgorithms();
-
+		new PlansFilterArea(minCoord, maxCoord).run(plans);
+		
 		System.out.println("  writing plans...");
 		final PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.write();
@@ -592,36 +589,26 @@ public class MyRuns {
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
 		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
 		final Plans plans = new Plans(Plans.NO_STREAMING);
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
-		System.out.println("  done.");
-
-		System.out.println("  adding plans algorithm... ");
-		plans.addAlgorithm(new PlansFilterByLegMode("car", false));
-		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
-		System.out.println("  done;");
 
 		System.out.println("  processing plans...");
-		plans.runAlgorithms();
-		System.out.println("  done;");
+		new PlansFilterByLegMode("car", false).run(plans);
 
 		System.out.println("  writing plans...");
 		final PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.write();
-		System.out.println("  done.");
 
 		System.out.println("RUN: filterCars finished.");
 		System.out.println();
@@ -642,36 +629,26 @@ public class MyRuns {
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
 		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
 		final Plans plans = new Plans(Plans.NO_STREAMING);
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
-		System.out.println("  done.");
-
-		System.out.println("  adding plans algorithm... ");
-		plans.addAlgorithm(new PlansFilterByLegMode("pt", true));
-		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
-		System.out.println("  done;");
 
 		System.out.println("  processing plans...");
-		plans.runAlgorithms();
-		System.out.println("  done;");
+		new PlansFilterByLegMode("pt", true).run(plans);
 
 		System.out.println("  writing plans...");
 		final PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.write();
-		System.out.println("  done.");
 
 		System.out.println("RUN: filterPt finished.");
 		System.out.println();
@@ -705,16 +682,14 @@ public class MyRuns {
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
-		System.out.println("  adding plans algorithm... ");
-		plans.addAlgorithm(new PersonRemoveCertainActs());
-		plans.addAlgorithm(new PersonRemovePlansWithoutLegs());
-		plans.addAlgorithm(new PlansFilterPersonHasPlans());
-		System.out.println("  done.");
-
 		System.out.println("  reading, processing, writing plans...");
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
-		plans.runAlgorithms();
+
+		new PersonRemoveCertainActs().run(plans);
+		new PersonRemovePlansWithoutLegs().run(plans);
+		new PlansFilterPersonHasPlans().run(plans);
+		
 		final PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.write();
 		System.out.println("  done.");
@@ -745,15 +720,13 @@ public class MyRuns {
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
-		System.out.println("  adding plans algorithm... ");
-		plans.addAlgorithm(new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}));
-		plans.addAlgorithm(new PlansFilterPersonHasPlans());
-		System.out.println("  done.");
-
 		System.out.println("  reading, processing, writing plans...");
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
-		plans.runAlgorithms();
+		
+		new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}).run(plans);
+		new PlansFilterPersonHasPlans().run(plans);
+
 		final PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.write();
 		System.out.println("  done.");
@@ -793,17 +766,13 @@ public class MyRuns {
 		final PlansReaderI plansReader = new MatsimPlansReader(population);
 		System.out.println("  done.");
 
-		System.out.println("  adding plans algorithm... ");
-		population.addAlgorithm(new PlanSimplifyForDebug(network));
-		population.addAlgorithm(new PlansFilterPersonHasPlans());
-		System.out.println("  done.");
-
 		System.out.println("  reading plans...");
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 
 		System.out.println("  processing plans...");
-		population.runAlgorithms();
+		new PlanSimplifyForDebug(network).run(population);
+		new PlansFilterPersonHasPlans().run(population);
 
 		System.out.println("  writing plans...");
 		final PlansWriter plansWriter = new PlansWriter(population);

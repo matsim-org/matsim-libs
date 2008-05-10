@@ -34,19 +34,11 @@ import org.matsim.utils.geometry.CoordI;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-public class PlansCreateTripsFromODMatrix extends PlansAlgorithm {
+public class PlansCreateTripsFromODMatrix {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	Matrix matrix = null;
-	ArrayList<Double> timeDistribution = null;
-	int timeBinSize;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+	private final Matrix matrix;
+	private final ArrayList<Double> timeDistribution;
+	private final int timeBinSize;
 
 	public PlansCreateTripsFromODMatrix(final Matrix matrix, final ArrayList<Double> timeDistribution) {
 		super();
@@ -55,16 +47,11 @@ public class PlansCreateTripsFromODMatrix extends PlansAlgorithm {
 		double sum = 0.0;
 		for (int i = 1, max = timeDistribution.size(); i < max; i++) {
 			sum += timeDistribution.get(i);	// instead of building the sum every time
-			this.timeDistribution.add(sum); // build the sum once and cache them
+			this.timeDistribution.add(sum); // build the sum once and cache it
 		}
 		this.timeBinSize = (24*3600) / timeDistribution.size();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(final Plans plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
@@ -86,7 +73,9 @@ public class PlansCreateTripsFromODMatrix extends PlansAlgorithm {
 					while (sum >= 1.0) {
 						counter++;
 						sum--;
-						Person person = new Person(new IdImpl(Integer.toString(counter)), null/*sex*/, 0/*age*/, null/*license*/, "yes"/*car_avail*/, "yes"/*employed*/);
+						Person person = new Person(new IdImpl(counter));
+						person.setCarAvail("yes");
+						person.setEmployed("yes");
 						Plan plan = person.createPlan(null, "yes");
 						CoordI coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
 						int endTime = -1;

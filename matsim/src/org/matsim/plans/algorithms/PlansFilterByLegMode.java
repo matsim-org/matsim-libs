@@ -38,7 +38,7 @@ import org.matsim.plans.Plans;
  * Plans which do not fulfill the filter criteria are removed from a person, Persons with
  * no plans are removed from the population.
  */
-public class PlansFilterByLegMode extends PlansAlgorithm {
+public class PlansFilterByLegMode {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -64,7 +64,6 @@ public class PlansFilterByLegMode extends PlansAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(Plans plans) {
 		int planCount = 0;
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");

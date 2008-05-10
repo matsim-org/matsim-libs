@@ -30,7 +30,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.algorithms.PersonAlgorithmI;
-import org.matsim.plans.algorithms.PlansAlgorithm;
+import org.matsim.utils.misc.Counter;
 import org.matsim.world.Layer;
 
 /**
@@ -60,7 +60,7 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 	private boolean isStreaming;
 
 	// algorithms over plans
-	private final ArrayList<PlansAlgorithm> plansalgos = new ArrayList<PlansAlgorithm>();
+	private final ArrayList<PersonAlgorithmI> personAlgos = new ArrayList<PersonAlgorithmI>();
 
 	private static final Logger log = Logger.getLogger(Plans.class);
 
@@ -107,11 +107,9 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 			// streaming is on, run algorithm on the person and write it to file.
 
 			// run algos
-			for (int i=0; i<this.plansalgos.size(); i++) {
-				PlansAlgorithm algo = this.plansalgos.get(i);
-				if (algo instanceof PersonAlgorithmI) {
-					((PersonAlgorithmI)algo).run(p);
-				}
+			for (int i=0; i<this.personAlgos.size(); i++) {
+				PersonAlgorithmI algo = this.personAlgos.get(i);
+				algo.run(p);
 			}
 			// DS remove again as we are streaming here!
 			this.persons.remove(p.getId());
@@ -139,19 +137,6 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// trigger methods
-	//////////////////////////////////////////////////////////////////////
-
-	protected final void runPersonAlgorithms() {
-		for (int i=0; i<this.plansalgos.size(); i++) {
-			PlansAlgorithm algo = this.plansalgos.get(i);
-			if (algo instanceof PersonAlgorithmI) {
-				algo.run(this);
-			}
-		}
-	}
-
 	@Override
 	protected final void clearPersons() {
 		if (this.isStreaming) {
@@ -159,7 +144,6 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 				this.planswriter.writeEndPlans();	// close the file
 			}
 		}
-
 		this.persons.clear();
 		this.counter = 0;
 		this.nextMsg = 1;
@@ -171,9 +155,16 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 
 	public final void runAlgorithms() {
 		if (!this.isStreaming) {
-			for (int i=0; i<this.plansalgos.size(); i++) {
-				PlansAlgorithm algo = this.plansalgos.get(i);
-				algo.run(this);
+			for (int i=0; i<this.personAlgos.size(); i++) {
+				PersonAlgorithmI algo = this.personAlgos.get(i);
+				log.info("running algorithm " + algo.getClass().getName());
+				Counter counter = new Counter(" person # ");
+				for (Person person : this.persons.values()) {
+					counter.incCounter();
+					algo.run(person);
+				}
+				counter.incCounter();
+				log.info("done running algorithm.");
 			}
 		} else {
 			log.info("Plans-Streaming is on. Algos were run during parsing");
@@ -185,11 +176,11 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 	//////////////////////////////////////////////////////////////////////
 
 	public final void clearAlgorithms() {
-		this.plansalgos.clear();
+		this.personAlgos.clear();
 	}
 
-	public boolean removeAlgorithm(final PlansAlgorithm algo) {
-		return this.plansalgos.remove(algo);
+	public boolean removeAlgorithm(final PersonAlgorithmI algo) {
+		return this.personAlgos.remove(algo);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -197,8 +188,8 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 	//////////////////////////////////////////////////////////////////////
 
 
-	public final void addAlgorithm(final PlansAlgorithm algo) {
-		this.plansalgos.add(algo);
+	public final void addAlgorithm(final PersonAlgorithmI algo) {
+		this.personAlgos.add(algo);
 	}
 
 	public final void setPlansWriter(final PlansWriter planswriter) {
@@ -243,7 +234,7 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 		return "[name=" + this.getName() + "]" +
 				"[is_streaming=" + this.isStreaming + "]" +
 				"[nof_persons=" + this.persons.size() + "]" +
-				"[nof_plansalgos=" + this.plansalgos.size() + "]";
+				"[nof_plansalgos=" + this.personAlgos.size() + "]";
 	}
 
 	public void printPlansCount() {

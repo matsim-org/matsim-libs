@@ -23,9 +23,8 @@ package org.matsim.plans.filters;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonAlgorithmI;
-import org.matsim.plans.algorithms.PlansAlgorithm;
 
-public abstract class AbstractPersonFilter extends PlansAlgorithm implements PersonFilterI {
+public abstract class AbstractPersonFilter implements PersonAlgorithmI, PersonFilterI {
 
 	protected PersonAlgorithmI nextAlgorithm = null;
 	private int count = 0;
@@ -47,7 +46,6 @@ public abstract class AbstractPersonFilter extends PlansAlgorithm implements Per
 		return this.count;
 	}
 
-	@Override
 	public void run(Plans population) {
 		for (Person person : population.getPersons().values()) {
 			run(person);

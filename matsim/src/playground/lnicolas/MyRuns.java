@@ -111,9 +111,8 @@ public class MyRuns {
 	}
 
 	private static void exportPopulationToKML(final Plans plans, final String dir) {
-		PopulationExportToKML exp = new PopulationExportToKML(dir);
 		System.out.println("Running export algorithm");
-		exp.run(plans);
+		new PopulationExportToKML(dir).run(plans);
 		System.out.println("Done");
 	}
 

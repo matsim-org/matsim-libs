@@ -54,23 +54,15 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 
-public class PlansActChainReduction extends PlansAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+public class PlansActChainReduction {
 
 	private final double cut;
 
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
-	public PlansActChainReduction() {
+	public PlansActChainReduction(final double cut) {
 		super();
-		this.cut = Double.parseDouble(Gbl.getConfig().getParam("plansActChainReduction", "cumulativeFractionCut"));
+		this.cut = cut;
 		if ((this.cut < 0.0) || (this.cut > 1.0)) {
-			Gbl.errorMsg("[cut=" + this.cut + " is not allowed]");
+			throw new IllegalArgumentException("cut=" + this.cut + " is not allowed.");
 		}
 	}
 
@@ -134,7 +126,6 @@ public class PlansActChainReduction extends PlansAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(Plans plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
@@ -178,8 +169,4 @@ public class PlansActChainReduction extends PlansAlgorithm {
 
 		System.out.println("    done.");
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
 }

@@ -27,7 +27,7 @@ import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 
-public class PlansCreateFromNetwork extends PlansAlgorithm {
+public class PlansCreateFromNetwork {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -52,7 +52,6 @@ public class PlansCreateFromNetwork extends PlansAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final Plans plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
@@ -111,7 +110,12 @@ public class PlansCreateFromNetwork extends PlansAlgorithm {
 						else if (rd2 < 0.4) { car_avail = "always"; }
 					}
 				}
-				Person p = new Person(new IdImpl(Integer.toString(i)),sex, age,license,car_avail,employed);
+				Person p = new Person(new IdImpl(i));
+				p.setSex(sex);
+				p.setAge(age);
+				p.setLicence(license);
+				p.setCarAvail(car_avail);
+				p.setEmployed(employed);
 				plans.addPerson(p);
 			}
 			catch (Exception e) {

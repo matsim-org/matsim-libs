@@ -89,9 +89,7 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 
 		System.out.println("  running plans algorithms... ");
-		PlansCreateFromNetwork pcfn_algo = new PlansCreateFromNetwork(network,ns_algo, 0);
-		plans.addAlgorithm(pcfn_algo);
-		plans.runAlgorithms();
+		new PlansCreateFromNetwork(network,ns_algo, 0).run(plans);
 		System.out.println("  done.");
 
 		System.out.println();
@@ -123,9 +121,7 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  running plans algorithms... ");
-		plans.clearAlgorithms();
-		plans.addAlgorithm(new PlansDefineKnowledge());
-		plans.runAlgorithms();
+		new PlansDefineKnowledge().run(plans);
 		System.out.println("  done.");
 
 		System.out.println();

@@ -25,11 +25,10 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.utils.misc.Counter;
 
-public abstract class PersonAlgorithm extends PlansAlgorithm implements PersonAlgorithmI {
+public abstract class PersonAlgorithm implements PersonAlgorithmI {
 
 	private final static Logger log = Logger.getLogger(PersonAlgorithm.class);
 
-	@Override
 	public final void run(final Plans plans) {
 		log.info("running " + this.getClass().getName() + " algorithm...");
 		Counter counter = new Counter(" person # ");
