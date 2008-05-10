@@ -28,8 +28,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.enterprisecensus.algorithms.EnterpriseCensusAlgorithm;
-import org.matsim.facilities.algorithms.FacilitiesAllActivitiesFTE;
 import org.matsim.gbl.Gbl;
 
 
@@ -71,12 +69,8 @@ public class EnterpriseCensus {
 	 * 48661120 -> {B011310B, B012300A}
 	 */
 	private TreeMap<Double, HashSet<String>> presenceCodes = new TreeMap<Double, HashSet<String>>();
-
-	
 	
 	private ArrayList<String> hectareAttributeIdentifiers = new ArrayList<String>();
-
-	private final ArrayList<EnterpriseCensusAlgorithm> algorithms = new ArrayList<EnterpriseCensusAlgorithm>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -85,7 +79,6 @@ public class EnterpriseCensus {
 	public EnterpriseCensus() {
 		this.hectareAggregation.clear();
 		this.presenceCodes.clear();
-//		this.enterpriseCensusMunicipality.clear();
 		this.hectareAttributeIdentifiers.clear();
 	}
 
@@ -128,9 +121,8 @@ public class EnterpriseCensus {
 		numHectareAggregationFileAttributes = aCSVLine.length;
 		for (int ii=0; ii < aCSVLine.length; ii++) {
 			str = aCSVLine[ii];
-			str = this.trim(str, '\"');
+			str = trim(str, '\"');
 			this.hectareAttributeIdentifiers.add(str);
-
 		}
 
 	}
@@ -155,7 +147,7 @@ public class EnterpriseCensus {
 
 	public final void addHectareAggregationInformation(String reli, String noga, double value) {
 		
-		double reliDouble = Double.parseDouble(reli);
+		Double reliDouble = Double.valueOf(reli);
 		
 		TreeMap<String, Double> entries = null;
 		
@@ -236,7 +228,7 @@ public class EnterpriseCensus {
 
 	public final void addPresenceCode(String reli, String noga) {
 
-		double reliDouble = Double.parseDouble(reli);
+		Double reliDouble = Double.valueOf(reli);
 		
 		HashSet<String> nogasInReli = null;
 
@@ -250,46 +242,9 @@ public class EnterpriseCensus {
 
 	}
 
-	public final void addAlgorithm(EnterpriseCensusAlgorithm algo) {
-		this.algorithms.add(algo);
-	}
-
-//	public final void addNOGACode(final String codeString) {
-//	this.nogaCodeStrings.add(codeString);
-//	}
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void runAlgorithms() throws Exception {
-		for (int i = 0; i < this.algorithms.size(); i++) {
-			EnterpriseCensusAlgorithm algo = this.algorithms.get(i);
-			algo.run(this);
-		}
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
-
-//	public final int getNumFacilities(final String municipality_id, final String nogaCodeString) {
-//	String strKey = this.getMNKey(municipality_id, nogaCodeString);
-//	int numFacilities = -1;
-//	if (enterpriseCensusMunicipality.containsKey(strKey)) {
-//	numFacilities = ((MunicipalityData)enterpriseCensusMunicipality.get(strKey)).numFacilities;
-//	}
-//	return numFacilities;
-//	}
-
-//	public final int getNumJobs(final String municipality_id, final String nogaCodeString) {
-//	String strKey = this.getMNKey(municipality_id, nogaCodeString);
-//	int numJobs = -1;
-//	if (enterpriseCensusMunicipality.containsKey(strKey)) {
-//	numJobs = ((MunicipalityData)enterpriseCensusMunicipality.get(strKey)).numJobs;
-//	}
-//	return numJobs;
-//	}
-
 
 	public final int getHectareAggregationInformationFloor(final Double reli, final String noga) {
 		return (int) (this.hectareAggregation.get(reli).get(noga).doubleValue());
@@ -326,7 +281,6 @@ public class EnterpriseCensus {
 		return str;
 	}
 
-	//private String quote(final String string, final String mark) {
 	private String quote(final String string, final char mark) {
 
 		String markString = new String(new char[]{mark});
@@ -350,10 +304,10 @@ public class EnterpriseCensus {
 		
 		int numEntries = 0;
 		for (Double reli : this.hectareAggregation.keySet()) {
-			for (String noga : this.hectareAggregation.get(reli).keySet()) {
+//			for (String noga : this.hectareAggregation.get(reli).keySet()) {
 //				System.out.println(reli + ":" + noga + " -> " + this.hectareAggregation.get(reli).get(noga).toString());
-				numEntries++;
-			}
+//			}
+			numEntries += this.hectareAggregation.get(reli).size();
 		}		
 
 		log.info("Number of hectare aggregation entries: " + numEntries);
@@ -365,10 +319,10 @@ public class EnterpriseCensus {
 		int numPresenceCodes = 0;
 		
 		for (Double reli : this.presenceCodes.keySet()) {
-			for (String noga : this.presenceCodes.get(reli)) {
+//			for (String noga : this.presenceCodes.get(reli)) {
 //				System.out.println(reli + " -> " + noga);
-				numPresenceCodes++;
-			}
+//			}
+			numPresenceCodes += this.presenceCodes.get(reli).size();
 		}
 		
 		log.info("Number of presence code entries: " + numPresenceCodes);
