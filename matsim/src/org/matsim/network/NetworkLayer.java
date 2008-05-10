@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.networks.basicNet.BasicNet;
-import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -50,8 +49,6 @@ public class NetworkLayer extends Layer implements BasicNet {
 	protected int capperiod = Integer.MIN_VALUE ;
 
 	protected Map<Id, Node> nodes = new TreeMap<Id, Node>();
-
-	private final ArrayList<NetworkAlgorithm> algorithms = new ArrayList<NetworkAlgorithm>();
 
 	private QuadTree<Node> nodeQuadTree = null;
 
@@ -131,29 +128,6 @@ public class NetworkLayer extends Layer implements BasicNet {
 		to_node.addInLink(link);
 		this.locations.put(link.getId(),link);
 		return link;
-	}
-
-	// ////////////////////////////////////////////////////////////////////
-	// add methods
-	// ////////////////////////////////////////////////////////////////////
-
-	public final void addAlgorithm(final NetworkAlgorithm algo) {
-		this.algorithms.add(algo);
-	}
-
-	public final boolean removeAlgorithm(final NetworkAlgorithm algo) {
-		return this.algorithms.remove(algo);
-	}
-
-	// ////////////////////////////////////////////////////////////////////
-	// run methods
-	// ////////////////////////////////////////////////////////////////////
-
-	public final void runAlgorithms() {
-		for (int i = 0; i < this.algorithms.size(); i++) {
-			NetworkAlgorithm algo = this.algorithms.get(i);
-			algo.run(this);
-		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -499,8 +473,7 @@ public class NetworkLayer extends Layer implements BasicNet {
 	public String toString() {
 		return super.toString() +
 				"[capperiod=" + this.capperiod + "]" +
-				"[nof_nodes=" + this.nodes.size() + "]" +
-				"[nof_algorithms=" + this.algorithms.size() + "]";
+				"[nof_nodes=" + this.nodes.size() + "]";
 	}
 
 	public void connect() {

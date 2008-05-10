@@ -438,22 +438,13 @@ public class MyRunsRouting extends MyRuns {
 	}
 
 	private static void generateRandomPlansInTravelZone(final double xCenter, final double yCenter, final double nodeDist, final int tripCount) {
-		RandomPlansInTravelZoneGenerator gen = new RandomPlansInTravelZoneGenerator(xCenter, yCenter, nodeDist, tripCount);
-
-		network.addAlgorithm(gen);
-
-		network.runAlgorithms();
-
+		new RandomPlansInTravelZoneGenerator(xCenter, yCenter, nodeDist, tripCount).run(network);
 	}
 
 	private static void generateRandomPlans(final double fromToDistance, final int tripCount) {
-		RandomPlansGenerator gen
-			= new RandomPlansGenerator(fromToDistance, tripCount);
+		RandomPlansGenerator gen = new RandomPlansGenerator(fromToDistance, tripCount);
 
-//		network.addAlgorithm(gen);
-
-//		network.runAlgorithms();
-
+//		gen.run(network);
 		gen.runDumb(network);
 
 //		Plans plans = gen.getPlans();
@@ -474,7 +465,7 @@ public class MyRunsRouting extends MyRuns {
 		try {
 
 			for (int j = 0; j < tripCount; j++) {
-				Person person = new Person(new IdImpl(Integer.toString(j)), null, 0, null, null, null);
+				Person person = new Person(new IdImpl(j));
 				Plan plan = person.createPlan(null, "yes");
 
 				int choice = (int) (Math.random() * links.size());

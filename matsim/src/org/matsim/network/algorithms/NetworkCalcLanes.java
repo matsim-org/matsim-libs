@@ -26,21 +26,12 @@ import org.matsim.network.NetworkLayer;
 /**
  * Calculates the number of lanes for each link, based on the capacity.
  */
-public class NetworkCalcLanes extends NetworkAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+public class NetworkCalcLanes {
 
 	public NetworkCalcLanes() {
 		super();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(NetworkLayer network) {
 		double capDivider = network.getCapacityPeriod();
 		for (Link link : network.getLinks().values()) {

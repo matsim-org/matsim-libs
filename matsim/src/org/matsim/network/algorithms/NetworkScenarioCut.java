@@ -23,24 +23,19 @@ package org.matsim.network.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.geometry.CoordI;
 
-public class NetworkScenarioCut extends NetworkAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+public class NetworkScenarioCut {
 
 	private final double minX;
 	private final double maxX;
 	private final double minY;
 	private final double maxY;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+	
+	private final static Logger log = Logger.getLogger(NetworkScenarioCut.class);
 
 	public NetworkScenarioCut(final CoordI min, final CoordI max) {
 		super();
@@ -50,17 +45,8 @@ public class NetworkScenarioCut extends NetworkAlgorithm {
 		this.maxY = max.getY();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(final NetworkLayer network) {
-		System.out.println("    running " + this.getClass().getName() + " module...");
+		log.info("running module...");
 
 		TreeSet<Node> n_set = new TreeSet<Node>();
 		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
@@ -74,7 +60,7 @@ public class NetworkScenarioCut extends NetworkAlgorithm {
 			}
 		}
 
-		System.out.println("      Number of nodes to be cut out = " + n_set.size() + "...");
+		log.info("  Number of nodes to be cut out = " + n_set.size() + "...");
 		n_it = n_set.iterator();
 		int l_cnt = 0;
 		while (n_it.hasNext()) {
@@ -82,9 +68,8 @@ public class NetworkScenarioCut extends NetworkAlgorithm {
 			l_cnt += n.getIncidentLinks().size();
 			network.removeNode(n);
 		}
-		System.out.println("        Number of links cut out = " + l_cnt + ".");
-		System.out.println("      done.");
+		log.info("  Number of links cut out = " + l_cnt + ".");
 
-		System.out.println("    done.");
+		log.info("done.");
 	}
 }

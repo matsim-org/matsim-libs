@@ -27,13 +27,12 @@ import org.matsim.network.Node;
 /* See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
  * for a description of node types. It's the graph matching paper. */
 
-public class NetworkCalcTopoType extends NetworkAlgorithm {
+public class NetworkCalcTopoType {
 
 	public NetworkCalcTopoType() {
 		super();
 	}
 
-	@Override
 	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 

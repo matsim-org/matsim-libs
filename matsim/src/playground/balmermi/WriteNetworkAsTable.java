@@ -47,12 +47,11 @@ public class WriteNetworkAsTable {
 		System.out.println("  done.");
 
 		System.out.println("  running Network Validation and cleaning algorithms... ");
-		network.addAlgorithm(new NetworkSummary());
+		new NetworkSummary().run(network);
 		NetworkWriteVolumesAsTable nwvat = new NetworkWriteVolumesAsTable();
-		network.addAlgorithm(nwvat);
-		network.addAlgorithm(new NetworkSummary());
-		network.runAlgorithms();
+		nwvat.run(network);
 		nwvat.close();
+		new NetworkSummary().run(network);
 		System.out.println("  done.");
 
 		System.out.println("RUN: cleanNetwork finished.");

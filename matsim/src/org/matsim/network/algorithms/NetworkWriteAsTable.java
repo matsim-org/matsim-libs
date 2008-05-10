@@ -21,27 +21,24 @@
 package org.matsim.network.algorithms;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 
-public class NetworkWriteAsTable extends NetworkAlgorithm {
+public class NetworkWriteAsTable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
 	private final String outdir;
-	private FileWriter fw_n = null;
 	private BufferedWriter out_n = null;
-	private FileWriter fw_l = null;
 	private BufferedWriter out_l = null;
-	private FileWriter fw_et = null;
 	private BufferedWriter out_et = null;
 
 	//////////////////////////////////////////////////////////////////////
@@ -52,18 +49,15 @@ public class NetworkWriteAsTable extends NetworkAlgorithm {
 		super();
 		this.outdir = outdir;
 		try {
-			this.fw_n = new FileWriter(this.outdir + "/nodes.txt");
-			this.out_n = new BufferedWriter(this.fw_n);
+			this.out_n = IOUtils.getBufferedWriter(this.outdir + "/nodes.txt");
 			this.out_n.write("ID\tX\tY\n");
 			this.out_n.flush();
 
-			this.fw_l = new FileWriter(this.outdir + "/links.txt");
-			this.out_l = new BufferedWriter(this.fw_l);
+			this.out_l = IOUtils.getBufferedWriter(this.outdir + "/links.txt");
 			this.out_l.write("ID\tX1\tY1\tX2\tY2\tLENGHT\tFREESPEED\tCAPACITY\tPERMLANES\tONEWAY\n");
 			this.out_l.flush();
 
-			this.fw_et = new FileWriter(this.outdir + "/linksET.txt");
-			this.out_et = new BufferedWriter(this.fw_et);
+			this.out_et = IOUtils.getBufferedWriter(this.outdir + "/linksET.txt");
 			this.out_et.write("ID\tFROMID\tTOID\tLENGTH\tSPEED\tCAP\tLANES\tORIGID\tTYPE\tX1\tY1\tX2\tY2\n");
 			this.out_et.flush();
 		} catch (IOException e) {
@@ -83,16 +77,13 @@ public class NetworkWriteAsTable extends NetworkAlgorithm {
 		try {
 			this.out_n.flush();
 			this.out_n.close();
-			this.fw_n.close();
 
 			this.out_l.flush();
 			this.out_l.close();
-			this.fw_l.close();
 
 			this.out_et.write("END\n");
 			this.out_et.flush();
 			this.out_et.close();
-			this.fw_et.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
@@ -106,7 +97,6 @@ public class NetworkWriteAsTable extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 

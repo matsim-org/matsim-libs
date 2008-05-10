@@ -27,43 +27,22 @@ import org.matsim.network.Node;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 
-public class NetworkTransform extends NetworkAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+public class NetworkTransform {
 
 	private final CoordinateTransformationI transformer;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
 
 	public NetworkTransform(final CoordinateTransformationI transformer) {
 		super();
 		this.transformer = transformer;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(final NetworkLayer network) {
-		System.out.println("    running " + this.getClass().getName() + " module...");
-
 		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
 		while (n_it.hasNext()) {
 			Node n = n_it.next();
 			CoordI coord = n.getCoord();
 			CoordI new_coord = transformer.transform(coord);
-			coord.setXY(new_coord.getX(),new_coord.getY());
+			coord.setXY(new_coord.getX(), new_coord.getY());
 		}
-
-		System.out.println("    done.");
 	}
 }

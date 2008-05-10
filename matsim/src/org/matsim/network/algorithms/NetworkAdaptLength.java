@@ -26,7 +26,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.shared.Coord;
 
-public class NetworkAdaptLength extends NetworkAlgorithm {
+public class NetworkAdaptLength {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -48,7 +48,6 @@ public class NetworkAdaptLength extends NetworkAlgorithm {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(final NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 

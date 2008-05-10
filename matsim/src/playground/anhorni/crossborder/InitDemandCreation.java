@@ -91,10 +91,9 @@ public class InitDemandCreation {
 		new MatsimNetworkReader(this.network).readFile(Config.networkFile);
 
 		// running Network adaptation algorithms
-		this.network.addAlgorithm(new NetworkSummary());
-		this.network.addAlgorithm(new NetworkAdaptLength());
-		this.network.addAlgorithm(new NetworkSummary());
-		this.network.runAlgorithms();
+		new NetworkSummary().run(this.network);
+		new NetworkAdaptLength().run(this.network);
+		new NetworkSummary().run(this.network);
 	}
 
 

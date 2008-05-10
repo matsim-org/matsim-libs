@@ -28,14 +28,13 @@ import org.matsim.network.Node;
  *
  * @author mrieser
  */
-public class CalcBoundingBox extends NetworkAlgorithm {
+public class CalcBoundingBox {
 
 	private double minX = Double.POSITIVE_INFINITY;
 	private double minY = Double.POSITIVE_INFINITY;
 	private double maxX = Double.NEGATIVE_INFINITY;
 	private double maxY = Double.NEGATIVE_INFINITY;
 
-	@Override
 	public void run(final NetworkLayer network) {
 		this.minX = Double.POSITIVE_INFINITY;
 		this.minY = Double.POSITIVE_INFINITY;

@@ -33,7 +33,7 @@ import org.matsim.utils.geometry.shared.Coord;
  *
  * @author mrieser
  */
-public class NetworkFalsifier extends NetworkAlgorithm {
+public class NetworkFalsifier {
 
 	private final double distance;
 
@@ -41,7 +41,6 @@ public class NetworkFalsifier extends NetworkAlgorithm {
 		this.distance = distance;
 	}
 
-	@Override
 	public void run(NetworkLayer network) {
 		double maxDistance = this.distance * 2.0;
 		for (Node node : network.getNodes().values()) {

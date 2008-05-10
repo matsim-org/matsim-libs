@@ -74,7 +74,6 @@ import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.network.algorithms.NetworkCalcLanes;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.network.algorithms.NetworkFalsifier;
-import org.matsim.network.algorithms.NetworkRenumber;
 import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -1320,38 +1319,6 @@ public class MyRuns {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// renumberNetwork
-	//////////////////////////////////////////////////////////////////////
-
-	public static void renumberNetwork(final String[] args, final boolean restore) {
-
-		System.out.println("RUN: renumberNetwork");
-
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  running NetworkRenumber... ");
-		final NetworkAlgorithm netAlgo = new NetworkRenumber(restore);
-		network.addAlgorithm(netAlgo);
-		network.runAlgorithms();
-		System.out.println("  done.");
-
-		System.out.println("  writing the network...");
-		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write();
-		System.out.println("  done.");
-
-		System.out.println("RUN: renumberNetwork finished.");
-		System.out.println();
-	}
-
-
-	//////////////////////////////////////////////////////////////////////
 	// cleanNetwork
 	//////////////////////////////////////////////////////////////////////
 
@@ -1397,9 +1364,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  calculating number of lanes... ");
-		final NetworkAlgorithm netAlgo = new NetworkCalcLanes();
-		network.addAlgorithm(netAlgo);
-		network.runAlgorithms();
+		new NetworkCalcLanes().run(network);
 		System.out.println("  done.");
 
 		System.out.println("  writing the network...");
@@ -2703,7 +2668,6 @@ public class MyRuns {
 
 /* ***   N E T W O R K S   *** */
 //		convertNetwork(args);
-//		renumberNetwork(args, false);
 //		cleanNetwork(args);
 //		calcNofLanes(args);
 //		falsifyNetwork(args);

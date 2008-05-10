@@ -37,7 +37,7 @@ import org.matsim.network.Node;
  * Nodes with no incoming or outgoing links are removed as well from the 
  * network.
  */
-public class NetworkCleaner extends NetworkAlgorithm {
+public class NetworkCleaner {
 
 	private final TreeMap<Id, Node> visitedNodes = new TreeMap<Id, Node>();
 	private TreeMap<Id, Node> biggestCluster = new TreeMap<Id, Node>();
@@ -109,11 +109,6 @@ public class NetworkCleaner extends NetworkAlgorithm {
 		return clusterNodes;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(NetworkLayer network) {
 		this.network = network;
 		this.roleIndex = network.requestNodeRole();

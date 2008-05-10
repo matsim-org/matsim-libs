@@ -76,9 +76,8 @@ public class Mode_choice_main {
 
 		System.out.println("  running network algorithms... ");
 		NetworkSummary ns_algo = new NetworkSummary();
-		network.addAlgorithm(ns_algo);
-		network.addAlgorithm(new NetworkCalcTopoType());
-		network.runAlgorithms();
+		ns_algo.run(network);
+		new NetworkCalcTopoType().run(network);
 		System.out.println("  done.");
 
 		System.out.println();

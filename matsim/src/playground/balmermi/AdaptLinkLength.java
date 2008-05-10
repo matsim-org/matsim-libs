@@ -46,10 +46,9 @@ public class AdaptLinkLength {
 		System.out.println("  done.");
 
 		System.out.println("  running Network adaptation algorithms... ");
-		network.addAlgorithm(new NetworkSummary());
-		network.addAlgorithm(new NetworkAdaptLength());
-		network.addAlgorithm(new NetworkSummary());
-		network.runAlgorithms();
+		new NetworkSummary().run(network);
+		new NetworkAdaptLength().run(network);
+		new NetworkSummary().run(network);
 		System.out.println("  done.");
 
 		System.out.println("  writing the network...");
