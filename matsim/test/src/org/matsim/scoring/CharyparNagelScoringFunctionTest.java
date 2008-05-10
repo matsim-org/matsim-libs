@@ -90,7 +90,7 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 		this.network.createLink("5", "5", "6", "500", "25", "3600", "1", null, null);
 		Gbl.getWorld().setNetworkLayer(this.network);
 
-		this.person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		this.person = new Person(new IdImpl(1));
 		this.plan = this.person.createPlan(null, "yes");
 		try {
 			this.plan.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", null);

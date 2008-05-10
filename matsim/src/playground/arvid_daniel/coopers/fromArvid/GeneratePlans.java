@@ -60,7 +60,7 @@ public class GeneratePlans {
 			double earliestStartTime = 8*3600;
 
 			String ID = Integer.toString(Integer.MAX_VALUE - i);
-			Person person = new Person(new IdImpl(ID), null, 33,null,"true","true");
+			Person person = new Person(new IdImpl(ID));
 			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 3.*3600;

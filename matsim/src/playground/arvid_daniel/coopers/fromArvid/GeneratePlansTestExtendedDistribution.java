@@ -67,8 +67,7 @@ public class GeneratePlansTestExtendedDistribution {
 		for (int i = 0; i< 1999; i++) {
 			double earliestStartTime = 7*3600;
 
-			String ID = Integer.toString(i);
-			Person person = new Person(new IdImpl(ID), null, 33,null, null,"yes");
+			Person person = new Person(new IdImpl(i));
 			Plan plan = new Plan("0",person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.0*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
@@ -100,8 +99,7 @@ public class GeneratePlansTestExtendedDistribution {
 		for (int i = 2000; i< 3999; i++) {
 			double earliestStartTime = 7*3600;
 
-			String ID = Integer.toString(i);
-			Person person = new Person(new IdImpl(ID), null, 33,null, null,"yes");
+			Person person = new Person(new IdImpl(i));
 			Plan plan = new Plan("0",person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
@@ -132,8 +130,7 @@ public class GeneratePlansTestExtendedDistribution {
 		for (int i = 4000; i< 5999; i++) {
 			double earliestStartTime = 7*3600;
 
-			String ID = Integer.toString(i);
-			Person person = new Person(new IdImpl(ID), null, 33,null, null,"yes");
+			Person person = new Person(new IdImpl(i));
 			Plan plan = new Plan("0",person);
 
 			int charge = rnd.nextInt(11);
@@ -167,8 +164,7 @@ public class GeneratePlansTestExtendedDistribution {
 		for (int i = 6000; i< 7999; i++) {
 			double earliestStartTime = 7*3600;
 
-			String ID = Integer.toString(i);
-			Person person = new Person(new IdImpl(ID), null, 33,null, null,"yes");
+			Person person = new Person(new IdImpl(i));
 			Plan plan = new Plan("0",person);
 
 			int charge = rnd.nextInt(1);

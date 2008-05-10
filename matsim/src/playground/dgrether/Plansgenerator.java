@@ -62,7 +62,7 @@ public class Plansgenerator {
 		this.plans = new Plans(false);
 		int homeEndtime = 6 * 3600;
 		for (int i = 1; i <= 100; i++) {
-			Person p = new Person(new IdImpl(String.valueOf(i)), null, 0, "yes", "always", "yes");
+			Person p = new Person(new IdImpl(i));
 			Plan plan = new Plan(p);
 			p.addPlan(plan);
 			//home

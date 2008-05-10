@@ -43,7 +43,7 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testBestPlan() {
-		Person person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		Person person = new Person(new IdImpl(1));
 		person.createPlan(null, "no");
 		person.createPlan("10.0", "no");
 		person.createPlan("-50.0", "no");

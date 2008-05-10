@@ -34,31 +34,10 @@ public class Person extends BasicPersonImpl<Plan>{
 
 	private String visualizerData = null;
 
-
 	public Person(Id id) {
 		super(id);
 	}
 	
-	/**
-	 * Use single argument constructor instead and set only needed attributes. 
-	 * @param id
-	 * @param sex
-	 * @param age
-	 * @param license
-	 * @param carAvail
-	 * @param employed
-	 */
-	@Deprecated 
-	public Person(final Id id, final String sex, final int age, final String license,
-			final String carAvail, final String employed) {
-		super(id);
-		this.setSex(sex);
-		this.setAge(age);
-		this.setLicence(license);
-		this.setCarAvail(carAvail);
-		this.setEmployed(employed);
-	}
-
 	public final Plan createPlan(final String score, final String selected) {
 		Plan p = new Plan(score, this);
 		this.plans.add(p);

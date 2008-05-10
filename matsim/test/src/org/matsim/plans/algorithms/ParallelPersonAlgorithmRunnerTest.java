@@ -63,7 +63,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 		Plans population = new Plans(Plans.NO_STREAMING);
 		try {
 			for (int i = 0; i < 100; i++) {
-				Person person = new Person(new IdImpl(i), "m", 45, "yes", "yes", "yes");
+				Person person = new Person(new IdImpl(i));
 				population.addPerson(person);
 			}
 		} catch (Exception e) {

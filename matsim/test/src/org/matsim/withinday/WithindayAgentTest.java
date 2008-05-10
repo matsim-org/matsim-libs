@@ -130,7 +130,7 @@ public class WithindayAgentTest extends TestCase {
 	}
 
 	private WithindayAgent createAgent(final String homeLink, final String workLink) {
-		Person p = new Person(new IdImpl("1"), "f", 23, "yes", "always", "yes");
+		Person p = new Person(new IdImpl("1"));
 		this.plan = new Plan(p);
 		p.addPlan(this.plan);
 		this.leg = null;

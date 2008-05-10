@@ -116,7 +116,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
-			Person person = new Person(new IdImpl("1"), "m", 45, "yes", "yes", "yes");
+			Person person = new Person(new IdImpl("1"));
 			plan = person.createPlan(null, "yes");
 			act1 = plan.createAct("h", 0, 0, link1, 0, 4*3600, 4*3600, false);
 			plan.createLeg(0, "car", 6*3600, 0, Time.UNDEFINED_TIME);

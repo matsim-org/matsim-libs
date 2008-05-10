@@ -42,7 +42,7 @@ public class KeepSelectedTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testSelected() {
-		Person person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		Person person = new Person(new IdImpl(1));
 		Plan plan1 = person.createPlan(null, "no");
 		Plan plan2 = person.createPlan("10.0", "yes");
 		Plan plan3 = person.createPlan("-50.0", "no");

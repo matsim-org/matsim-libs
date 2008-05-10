@@ -108,7 +108,7 @@ public class MyControler1 extends Controler {
 
 
 		for (int i=0; i<100; i++) {
-			Person p = new Person(new IdImpl(String.valueOf(i+1)), "m", 12, "yes", "always", "yes");
+			Person p = new Person(new IdImpl(i+1));
 
 			try {
 				Plan plan1 = new Plan(p);
@@ -306,7 +306,7 @@ public class MyControler1 extends Controler {
 	}
 
 	private void generatePerson(final int ii, final LinkImpl sourceLink, final LinkImpl destLink, final Plans population){
-		Person p = new Person(new IdImpl(String.valueOf(ii)), "m", 12, "yes", "always", "yes");
+		Person p = new Person(new IdImpl(ii));
 		Plan plan = new Plan(p);
 		try {
 			plan.createAct("h", 100., 100., sourceLink, 0., 0*60*60., 0., true);

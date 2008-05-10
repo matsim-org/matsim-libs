@@ -118,8 +118,12 @@ public class PlansReaderMatsimV1 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new Person(new IdImpl(atts.getValue("id")), atts.getValue("sex"), Integer.parseInt(atts.getValue("age")), atts
-				.getValue("license"), atts.getValue("car_avail"), atts.getValue("employed"));
+		this.currperson = new Person(new IdImpl(atts.getValue("id")));
+		this.currperson.setSex(atts.getValue("sex"));
+		this.currperson.setAge(Integer.parseInt(atts.getValue("age")));
+		this.currperson.setLicence(atts.getValue("license"));
+		this.currperson.setCarAvail(atts.getValue("car_avail"));
+		this.currperson.setEmployed(atts.getValue("employed"));
 	}
 
 	private void startPlan(final Attributes atts) {

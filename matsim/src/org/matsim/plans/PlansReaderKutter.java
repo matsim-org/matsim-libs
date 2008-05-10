@@ -190,7 +190,12 @@ public class PlansReaderKutter implements PlansReaderI {
 			this.idCnt++;
 			this.cnt++;
 			int age = this.pgMinAge[this.pg_] + (int)Math.round(Gbl.random.nextDouble()*(this.pgMaxAge[this.pg_]+1 - this.pgMinAge[this.pg_]));
-			Person p = new Person(new IdImpl(id), this.pgSex[this.pg_], age, this.pgLicense[this.pg_], this.pgCarAvail[this.pg_], this.pgEmployed[this.pg_]);
+			Person p = new Person(new IdImpl(id));
+			p.setSex(this.pgSex[this.pg_]);
+			p.setAge(age);
+			p.setLicence(this.pgLicense[this.pg_]);
+			p.setCarAvail(this.pgCarAvail[this.pg_]);
+			p.setEmployed(this.pgEmployed[this.pg_]);
 			return p;
 		}
 

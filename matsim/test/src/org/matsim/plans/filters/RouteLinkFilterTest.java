@@ -61,7 +61,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Leg leg;
 		Route route;
 		try {
-			person = new Person(new IdImpl("1"), "m", 35, "yes", "yes", "yes");
+			person = new Person(new IdImpl("1"));
 			plan = person.createPlan(null, "yes");
 			plan.createAct("h", (String)null, null, "1", null, "07:00:00", null, null);
 			leg = plan.createLeg(null, "car", "07:00:00", null, null);
@@ -71,7 +71,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 			plan.createAct("w", (String)null, null, "20", "08:00:00", null, null, null);
 			population.addPerson(person);
 
-			person = new Person(new IdImpl("2"), "m", 35, "yes", "yes", "yes");
+			person = new Person(new IdImpl("2"));
 			plan = person.createPlan(null, "yes");
 			plan.createAct("h", (String)null, null, "1", null, "07:05:00", null, null);
 			leg = plan.createLeg(null, "car", "07:05:00", null, null);
@@ -81,7 +81,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 			plan.createAct("w", (String)null, null, "20", "08:05:00", null, null, null);
 			population.addPerson(person);
 
-			person = new Person(new IdImpl("3"), "m", 35, "yes", "yes", "yes");
+			person = new Person(new IdImpl("3"));
 			plan = person.createPlan(null, "yes");
 			plan.createAct("h", (String)null, null, "1", null, "07:10:00", null, null);
 			leg = plan.createLeg(null, "car", "07:10:00", null, null);
@@ -98,7 +98,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		return population;
 	}
 
-	private static class TestAlgorithm implements PlanAlgorithmI {
+	/*package*/ static class TestAlgorithm implements PlanAlgorithmI {
 
 		public void run(final Plan plan) {
 			assertTrue("1".equals(plan.getPerson().getId().toString())

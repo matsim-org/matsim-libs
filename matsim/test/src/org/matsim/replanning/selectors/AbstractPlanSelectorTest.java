@@ -49,24 +49,24 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 		PlanSelectorI selector = getPlanSelector();
 
 		// test 1: exactly one plan, with undefined score
-		person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		person = new Person(new IdImpl(1));
 		person.createPlan(null, "no");
 		assertNotNull(selector.selectPlan(person));
 
 		// test 2: one plan with undefined score, one with defined score. The one with undefined comes first.
-		person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		person = new Person(new IdImpl(1));
 		person.createPlan(null, "no");
 		person.createPlan("10.0", "no");
 		assertNotNull(selector.selectPlan(person));
 
 		// test 3: one plan with undefined score, one with defined score. The one with undefined comes last.
-		person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		person = new Person(new IdImpl(1));
 		person.createPlan("10.0", "no");
 		person.createPlan(null, "no");
 		assertNotNull(selector.selectPlan(person));
 
 		// test 4: one plan with undefined score, two with defined score.
-		person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		person = new Person(new IdImpl(1));
 		person.createPlan("10.0", "no");
 		person.createPlan(null, "no");
 		person.createPlan("10.0", "no");
@@ -81,7 +81,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testNoPlans() {
-		Person person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		Person person = new Person(new IdImpl(1));
 		assertNull(getPlanSelector().selectPlan(person));
 	}
 
@@ -95,25 +95,25 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 		PlanSelectorI selector = getPlanSelector();
 
 		// test with only one plan...
-		Person person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		Person person = new Person(new IdImpl(1));
 		person.createPlan("-10.0", "no");
 		assertNotNull(selector.selectPlan(person));
 
 		// ... test with multiple plans that all have negative score
-		person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		person = new Person(new IdImpl(1));
 		person.createPlan("-10.0", "no");
 		person.createPlan("-50.0", "no");
 		assertNotNull(selector.selectPlan(person));
 
 		// ... and test with multiple plans where the sum of all scores stays negative
-		person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		person = new Person(new IdImpl(1));
 		person.createPlan("-10.0", "no");
 		person.createPlan("-50.0", "no");
 		person.createPlan("+20.0", "no");
 		assertNotNull(selector.selectPlan(person));
 
 		// test with only one plan, but with NEGATIVE_INFINITY...
-		person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		person = new Person(new IdImpl(1));
 		person.createPlan(Double.toString(Double.NEGATIVE_INFINITY), "no");
 		assertNotNull(selector.selectPlan(person));
 	}
@@ -125,7 +125,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	public void testZeroScore() {
 		PlanSelectorI selector = getPlanSelector();
 
-		Person person = new Person(new IdImpl(1), "m", 40, null, null, null);
+		Person person = new Person(new IdImpl(1));
 		person.createPlan("0.0", "no");
 		assertNotNull(selector.selectPlan(person));
 	}

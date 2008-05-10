@@ -20,8 +20,6 @@
 
 package org.matsim.utils.vis.snapshots.writers;
 
-
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
@@ -77,7 +75,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriterI {
 	}
 
 	public void addAgent(PositionInfo position) {
-		Person pers = new Person(position.getAgentId(), null, 0, null, "always", null);
+		Person pers = new Person(position.getAgentId());
 
 		Plan plan = new Plan(pers);
 		Act actA = new Act("h", position.getEasting(), position.getNorthing(),
@@ -88,7 +86,9 @@ public class PlansFileSnapshotWriter implements SnapshotWriterI {
 
 		try {
 			this.plans.addPerson(pers);
-		} catch (Exception e) { e.printStackTrace(); };
+		} catch (Exception e) { 
+			e.printStackTrace();
+		}
 
 	}
 

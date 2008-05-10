@@ -58,15 +58,14 @@ public class GeneratePlansTest {
 		Random rnd = new Random(4711);
 
 		Gbl.getConfig().setParam("planCalcScore", "traveling", "-3600");
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		final Dijkstra dijkstra = new Dijkstra(net, timeCostCalc, timeCostCalc);
-
+//		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+//		final Dijkstra dijkstra = new Dijkstra(net, timeCostCalc, timeCostCalc);
 
 		for (int i = 0; i< 4000; i++) {
 			double earliestStartTime = 7*3600;
 
 			String ID = Integer.toString(i);
-			Person person = new Person(new IdImpl(ID), null, 33,null, null,"yes");
+			Person person = new Person(new IdImpl(ID));
 			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.0*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
@@ -98,8 +97,7 @@ public class GeneratePlansTest {
 		for (int i = 4001; i< 8000; i++) {
 			double earliestStartTime = 7*3600;
 
-			String ID = Integer.toString(i);
-			Person person = new Person(new IdImpl(ID), null, 33,null, null,"yes");
+			Person person = new Person(new IdImpl(i));
 			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
@@ -131,7 +129,7 @@ public class GeneratePlansTest {
 			double earliestStartTime = 7*3600;
 
 			String ID = Integer.toString(i);
-			Person person = new Person(new IdImpl(ID), null, 33,null, null,"yes");
+			Person person = new Person(new IdImpl(ID));
 			Plan plan = new Plan("0", person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;

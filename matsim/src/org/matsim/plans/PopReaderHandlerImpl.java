@@ -100,7 +100,7 @@ public class PopReaderHandlerImpl	implements PopReaderHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startAgent(final Attributes meta) {
-		this.currperson = new Person(new IdImpl(meta.getValue("id").substring(1)),null,0,null,null,null);
+		this.currperson = new Person(new IdImpl(meta.getValue("id").substring(1)));
 	}
 
 	public void endAgent() {

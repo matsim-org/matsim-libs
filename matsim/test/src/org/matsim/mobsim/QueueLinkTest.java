@@ -88,7 +88,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testAdd() {
 		Vehicle v = new Vehicle();
 
-		Person p = new Person(new IdImpl("1"), null, 0, null, null, null);
+		Person p = new Person(new IdImpl("1"));
 		v.setDriver(p);
 		Exception e = null;
 		//as QueueLink has static access to the rest of the simulation
@@ -127,7 +127,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		new QueueSimulation(this.network, null, new Events());
 		Vehicle v1 = new Vehicle();
-		Person p = new Person(new IdImpl("1"), null, 0, null, null, null);
+		Person p = new Person(new IdImpl("1"));
 		Plan plan = p.createPlan(null, "yes");
 		try {
 			plan.createAct("h", 0.0, 0.0, link1, 0.0, 0.0, 0.0, false);

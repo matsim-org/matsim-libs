@@ -37,7 +37,7 @@ public class PersonIdFilterTest extends MatsimTestCase {
 		// create fixture: 4 persons with special ids
 		TreeMap<String, Person> persons = new TreeMap<String, Person>();
 		for (String personId : new String[]{"1", "2102002002", "30", "3030"}) {
-			persons.put(personId, new Person(new IdImpl(personId), "f", 30, "yes", "yes", "yes"));
+			persons.put(personId, new Person(new IdImpl(personId)));
 		}
 
 		PersonIdFilter tenDigitIdFilter = new PersonIdFilter("[0-9]{10}", null);

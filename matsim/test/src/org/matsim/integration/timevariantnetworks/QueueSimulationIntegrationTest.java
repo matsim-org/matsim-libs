@@ -90,6 +90,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * Test the queue simulation for correct behavior if capacity of links is
 	 * reduced during the run.
 	 * 
+	 * @throws Exception
 	 * @author illenberger
 	 */
 	public void testCapacity() throws Exception {
@@ -186,10 +187,11 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @throws Exception
 	 * @author illenberger
 	 */
-	private List<Person> createPersons(double depTime, Link depLink, Link destLink, int count) throws Exception {
+	private List<Person> createPersons(double depTime, final Link depLink, final Link destLink, 
+			final int count) throws Exception {
 		List<Person> persons = new ArrayList<Person>(count);
 		for(int i = 0; i < count; i++) {
-			Person person = new Person(new IdImpl(i + (int)depTime), "m", 40, "yes", "always", "yes");
+			Person person = new Person(new IdImpl(i + (int)depTime));
 			Plan plan1 = person.createPlan(null, "yes");
 			plan1.createAct("h", 0, 0, depLink, 0.0, depTime, depTime, false);
 			Leg leg1 = plan1.createLeg(0, "car", depTime, 10, depTime + 10);

@@ -127,7 +127,7 @@ public class PlansReaderMatsimV0 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new Person(new IdImpl(atts.getValue("id")),null,0,null,null,null);
+		this.currperson = new Person(new IdImpl(atts.getValue("id")));
 	}
 
 	private void startPlan(final Attributes atts) {
