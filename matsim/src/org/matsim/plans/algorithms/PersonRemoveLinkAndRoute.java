@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,10 +20,8 @@
 
 package org.matsim.plans.algorithms;
 
-import java.util.ArrayList;
-
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 
@@ -43,18 +41,16 @@ public class PersonRemoveLinkAndRoute extends PersonAlgorithm implements PlanAlg
 	}
 
 	public void run(final Plan plan) {
-		ArrayList<?> actslegs = plan.getActsLegs();
-
 		//		 loop over all <act>s, remove link-information
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			Act act = (Act)actslegs.get(j);
-			act.setLink(null);
+		ActIterator actIter = plan.getIteratorAct();
+		while (actIter.hasNext()) {
+			actIter.next().setLink(null);
 		}
 
 		//		 loop over all <leg>s, remove route-information
-		for (int j = 1; j < actslegs.size(); j=j+2) {
-			Leg leg = (Leg)actslegs.get(j);
-			leg.setRoute(null);
+		LegIterator legIter = plan.getIteratorLeg();
+		while (legIter.hasNext()) {
+			legIter.next().setRoute(null);
 		}
 	}
 }
