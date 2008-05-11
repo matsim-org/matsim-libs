@@ -18,25 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
-/* *********************************************************************** *
- * copyright       : (C) 2007 by                                           *
- *                   Michael Balmer, Konrad Meister, Marcel Rieser,        *
- *                   David Strippgen, Kai Nagel, Kay W. Axhausen,          *
- *                   Technische Universitaet Berlin (TU-Berlin) and        *
- *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package org.matsim.network;
 
 import java.io.IOException;
@@ -63,7 +44,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private final NetworkLayer network;
 
-	private final Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
+	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
 
 	public NetworkReaderMatsimV1(final NetworkLayer network) {
 		super();
@@ -109,11 +90,10 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	private void startNetwork(final Attributes atts) {
 		this.network.setName(atts.getValue("name"));
 		if (atts.getValue("type") != null) {
-			this.log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which" +
-									" transportation mode is allowed to use it (for the future)]");
+			log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which transportation mode is allowed to use it (for the future)");
 		}
 		if (atts.getValue("capDivider") != null) {
-			this.log.warn("[capDivider defined. it will be used but should be gone somewhen]");
+			log.warn("capDivider defined. it will be used but should be gone somewhen");
 			String capperiod = atts.getValue("capDivider") + ":00:00";
 			this.network.setCapacityPeriod(capperiod);
 		}
@@ -124,7 +104,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		if (capperiod == null) {
 			// TODO [balmermi] sometime we should define the default by 1 hour!!!
 			capperiod = "12:00:00";
-			this.log.warn("capperiod was not defined. Using default value of 12:00:00.");
+			log.info("capperiod was not defined. Using default value of 12:00:00.");
 		}
 		this.network.setCapacityPeriod(capperiod);
 
@@ -136,14 +116,14 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		}
 
 		String effectivelanewidth = atts.getValue("effectivelanewidth");
-		if (effectivelanewidth == null){
+		if (effectivelanewidth == null) {
 			this.network.setEffectiveLaneWidth(3.75); // the default lane width is 3.75
 		} else {
 			this.network.setEffectiveLaneWidth(Double.parseDouble(effectivelanewidth));
 		}
 
 		if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
-			this.log.warn("capPeriod, capDivider and/or capdivider are set in the network file. They will be ignored.");
+			log.warn("capPeriod, capDivider and/or capdivider are set in the network file. They will be ignored.");
 		}
 	}
 
@@ -159,13 +139,13 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 														atts.getValue("freespeed"), atts.getValue("capacity"), atts.getValue("permlanes"),
 														atts.getValue("origid"), atts.getValue("type"));
 		if (atts.getValue("volume") != null) {
-			this.log.info("Attribute volume for element link is deprecated.");
+			log.info("Attribute volume for element link is deprecated.");
 		}
 		if (atts.getValue("nt_category") != null) {
-			this.log.info("Attribute nt_category for element link is deprecated.");
+			log.info("Attribute nt_category for element link is deprecated.");
 		}
 		if (atts.getValue("nt_type") != null) {
-			this.log.info("Attribute nt_type for element link is deprecated.");
+			log.info("Attribute nt_type for element link is deprecated.");
 		}
 	}
 
