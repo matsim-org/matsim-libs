@@ -1,18 +1,12 @@
-/*
- * $Id: EventFilterTestTraVol_ohne_Maut.java,v 1.11 2007/11/11 01:25:42 mrieser Exp $
- */
-
 /* *********************************************************************** *
- *                    org.matsim.demandmodeling.events                     *
- *                             EventsTest.java                             *
- *                          ---------------------                          *
- * copyright       : (C) 2006 by                                           *
- *                   Michael Balmer, Konrad Meister, Marcel Rieser,        *
- *                   David Strippgen, Kai Nagel, Kay W. Axhausen,          *
- *                   Technische Universitaet Berlin (TU-Berlin) and        *
- *                   Swiss Federal Institute of Technology Zurich (ETHZ)   *
- * email           : balmermi at gmail dot com                             *
- *                 : rieser at gmail dot com                               *
+ * project: org.matsim.*
+ * EventFilterTestTraVol_ohne_Maut.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
