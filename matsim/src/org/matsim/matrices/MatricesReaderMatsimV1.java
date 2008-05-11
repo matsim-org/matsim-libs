@@ -96,7 +96,8 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startMatrix(final Attributes atts) {
-		this.currMatrix = this.matrices.createMatrix(atts.getValue("id"), atts.getValue("world_layer"),atts.getValue("desc"));
+		this.currMatrix = this.matrices.createMatrix(atts.getValue("id"), 
+				Gbl.getWorld().getLayer(atts.getValue("world_layer")), atts.getValue("desc"));
 	}
 
 	private void startEntry(final Attributes  atts) {

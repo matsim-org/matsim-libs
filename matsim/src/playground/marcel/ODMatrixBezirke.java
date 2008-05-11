@@ -45,7 +45,7 @@ public class ODMatrixBezirke extends PersonAlgorithm implements PlanAlgorithmI {
 	public ODMatrixBezirke(final String matrixId) {
 		this.world = Gbl.getWorld();
 		this.tvzLayer = (ZoneLayer)this.world.getLayer("tvz");
-		this.matrix = Matrices.getSingleton().createMatrix(matrixId, this.world.getLayer("bezirke").getType().toString(), "od for miv, 0-24h, 23 bezirke in berlin, 123 outside berlin");
+		this.matrix = Matrices.getSingleton().createMatrix(matrixId, this.world.getLayer("bezirke"), "od for miv, 0-24h, 23 bezirke in berlin, 123 outside berlin");
 	}
 
 	@Override

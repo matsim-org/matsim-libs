@@ -55,18 +55,13 @@ public class Matrices {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Matrix createMatrix(final String id, final String world_layer, final String desc) {
+	public final Matrix createMatrix(final String id, final Layer worldLayer, final String desc) {
 		// check id string for uniqueness
 		if (this.matrices.containsKey(id)) {
 			Gbl.errorMsg("[id="+id+" already exists.]");
 		}
-		// find layer in the world
-		Layer layer = Gbl.getWorld().getLayer(world_layer);
-		if (layer == null) {
-			Gbl.errorMsg("[world_layer="+world_layer+" not found]");
-		}
 		// create the matrix
-		Matrix m = new Matrix(id,layer,desc);
+		Matrix m = new Matrix(id, worldLayer, desc);
 		this.matrices.put(id,m);
 		return m;
 	}

@@ -52,7 +52,7 @@ public class VisumMatrixReader {
 
 	public Matrix readFile(final String filename) {
 		Matrix matrix = null;
-		matrix = Matrices.getSingleton().createMatrix(this.id, this.layer.getType().toString(), "");
+		matrix = Matrices.getSingleton().createMatrix(this.id, this.layer, "");
 		BufferedReader infile = null;
 		try {
 			infile = IOUtils.getBufferedReader(filename);

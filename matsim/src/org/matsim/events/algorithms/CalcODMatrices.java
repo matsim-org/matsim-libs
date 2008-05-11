@@ -60,7 +60,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 		this.network = network;
 		this.tvzLayer = tvzLayer;
 		this.population = population;
-		this.matrix = Matrices.getSingleton().createMatrix(id, tvzLayer.getType().toString(), "od for miv");
+		this.matrix = Matrices.getSingleton().createMatrix(id, tvzLayer, "od for miv");
 	}
 
 	//////////////////////////////////////////////////////////////////////

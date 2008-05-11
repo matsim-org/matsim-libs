@@ -57,7 +57,7 @@ public class Matrix {
 
 	protected Matrix(final String id, final Layer worldLayer, final String desc) {
 		if ((id == null) || (worldLayer == null)) {
-			Gbl.errorMsg("[id="+id+",world_layer="+worldLayer+"]");
+			throw new IllegalArgumentException("id and layer must not be null: id="+id+", worldLayer="+worldLayer);
 		}
 		this.id = id;
 		this.worldLayer = worldLayer;
