@@ -45,7 +45,6 @@ public class PlansDumping implements BeforeMobsimListener {
 			log.info("dumping plans...");
 			String outversion = controler.getConfig().plans().getOutputVersion();
 			PlansWriter plansWriter = new PlansWriter(controler.getPopulation(), Controler.getIterationFilename("plans.xml.gz"), outversion);
-			plansWriter.setUseCompression(true);
 			plansWriter.write();
 			log.info("finished plans dump.");
 			controler.stopwatch.endOperation("dump all plans");

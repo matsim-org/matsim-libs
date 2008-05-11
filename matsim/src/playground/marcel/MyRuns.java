@@ -70,7 +70,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
-import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.network.algorithms.NetworkCalcLanes;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.network.algorithms.NetworkFalsifier;
@@ -1246,7 +1245,6 @@ public class MyRuns {
 
 		System.out.println("  writing plans...");
 		final PlansWriter plansWriter = new PlansWriter(population);
-		plansWriter.setUseCompression(true);
 		plansWriter.write();
 		System.out.println("  done.");
 

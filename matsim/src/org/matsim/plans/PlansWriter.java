@@ -35,7 +35,6 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 
 	private final double write_person_percentage;
 	private boolean fileOpened = false;
-	private boolean useCompression = false;
 
 	private PlansWriterHandler handler = null;
 	private final Plans population;
@@ -82,12 +81,12 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 	 * @param version
 	 */
 	private void createHandler(final String version) {
-		if (version.equals("v0")) {
-			this.dtd = "http://www.matsim.org/files/dtd/plans_v0.dtd";
-			this.handler = new PlansWriterHandlerImplV0();
-		} else if (version.equals("v4")) {
+		if (version.equals("v4")) {
 			this.dtd = "http://www.matsim.org/files/dtd/plans_v4.dtd";
 			this.handler = new PlansWriterHandlerImplV4();
+		} else if (version.equals("v0")) {
+			this.dtd = "http://www.matsim.org/files/dtd/plans_v0.dtd";
+			this.handler = new PlansWriterHandlerImplV0();
 		} else {
 			throw new IllegalArgumentException("output version \"" + version + "\" not known.");
 		}
@@ -103,11 +102,7 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 
 	public final void writeStartPlans() {
 		try {
-			if (this.useCompression) {
-				this.out = IOUtils.getBufferedWriter(this.outfile, true);
-			} else {
-				this.out = IOUtils.getBufferedWriter(this.outfile);
-			}
+			this.out = IOUtils.getBufferedWriter(this.outfile);
 			this.fileOpened = true;
 			this.writeHeader("plans");
 			this.handler.startPlans(this.population, this.out);
@@ -246,19 +241,9 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 		}
 	}
 
-	public void setUseCompression(final boolean compress) {
-		this.useCompression = compress;
-	}
-
 	public PlansWriterHandler getHandler() {
 		return this.handler;
 	}
-
-	@Override
-	public final String toString() {
-		return super.toString();
-	}
-
 
 	// implementation of PersonAlgorithmI
 	// this is primarily to use the PlansWriter with filters and other algorithms.
