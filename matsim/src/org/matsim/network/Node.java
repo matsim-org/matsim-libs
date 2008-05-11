@@ -20,8 +20,6 @@
 
 package org.matsim.network;
 
-import java.io.Serializable;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -102,7 +100,6 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 
 	@Override
 	public boolean addInLink(final BasicLink inlink) {
-	//public boolean addInLink(Link inlink) {
 		Id linkid = inlink.getId();
 		if (this.inlinks.containsKey(linkid)) {
 			Gbl.errorMsg(this + "[inlink_id=" + inlink.getId() + " already exists]");
@@ -116,7 +113,6 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 
 	@Override
 	public boolean addOutLink(final BasicLink outlink) {
-	//public boolean addOutLink(Link outlink) {
 		Id linkid = outlink.getId();
 		if (this.outlinks.containsKey(linkid)) {
 			Gbl.errorMsg(this + "[inlink_id=" + outlink.getId() + " already exists]");
@@ -138,11 +134,6 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 	protected final void setMaxRoleIndex(final int index) {
 		this.roles.resize(index+1);
 	}
-
-//	@Override
-//	public final void setId(final Id id) {
-//		this.id = id;
-//	}
 
 	public final void setOrigId(final String id) {
 		this.origid = id;
@@ -223,15 +214,6 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 	public final Object getRole(final int idx) {
 		if (idx < this.roles.size() ) return this.roles.get(idx);
 		return null;
-	}
-
-
-	public static class IDComparator implements Comparator<Node>, Serializable {
-		private static final long serialVersionUID = 1L;
-
-		public int compare(final Node n1, final Node n2) {
-			return n1.getId().toString().compareTo(n2.getId().toString());
-		}
 	}
 
 	@Override
