@@ -90,7 +90,6 @@ public class ExternalModule implements StrategyModuleI {
 
 	protected PlansWriter getPlansWriterHandler() {
 		String filename = this.outFileRoot + "/" + this.moduleId + ExternalInFileName;
-		String dtd = "http://www.vsp.tu-berlin.de/projects/Matsim/data/dtd/plans_v4.dtd";
 		String version = "v4";
 		return new PlansWriter(new Plans(Plans.USE_STREAMING), filename, version);
 	}
