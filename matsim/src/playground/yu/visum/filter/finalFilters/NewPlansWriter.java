@@ -26,7 +26,6 @@ public class NewPlansWriter extends FinalPersonFilter {
 	 */
 	public NewPlansWriter(Plans plans) {
 		this.plansWriter = new PlansWriter(plans);
-		this.plansWriter.writeStartPlans();
 	}
 
 	/**

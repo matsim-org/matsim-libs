@@ -93,7 +93,7 @@ public class XY2Links {
 		System.out.println("-h, --help:     Displays this message.");
 		System.out.println();
 		System.out.println("----------------");
-		System.out.println("2007, matsim.org");
+		System.out.println("2008, matsim.org");
 		System.out.println();
 	}
 
@@ -119,7 +119,6 @@ public class XY2Links {
 		final Plans plans = new Plans(Plans.USE_STREAMING);
 		final PlansReaderI plansReader = new MatsimPlansReader(plans);
 		final PlansWriter plansWriter = new PlansWriter(plans);
-		plansWriter.writeStartPlans();
 		plans.addAlgorithm(new org.matsim.plans.algorithms.XY2Links(network));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());

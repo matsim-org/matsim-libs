@@ -75,7 +75,7 @@ public class ModeChoiceNavteqMain {
 //		System.out.println("3. CREATING A POPULATION BASED ON THE NETWORK");
 //		System.out.println();
 //		System.out.println("  creating plans object... ");
-		Plans plans = new Plans();
+		Plans plans = new Plans(Plans.USE_STREAMING);
 //		System.out.println("  done.");
 //		System.out.println("  running plans algorithms... ");
 //		PlansCreateFromNetwork pcfn_algo = new PlansCreateFromNetwork(network,ns_algo);
@@ -85,7 +85,6 @@ public class ModeChoiceNavteqMain {
 		
 //		PlansParser plansParser = new MatsimPlansReader(plans);
 		PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 		System.out.println("  adding plans algorithm... ");
@@ -95,6 +94,7 @@ public class ModeChoiceNavteqMain {
 		plans.addAlgorithm(modeAnalyzer);
 		System.out.println("  done.");
 		System.out.println("  reading, processing, writing plans...");
+		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		plans.printPlansCount();
 		plans.runAlgorithms();

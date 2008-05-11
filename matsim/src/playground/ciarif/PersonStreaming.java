@@ -51,7 +51,6 @@ public class PersonStreaming {
 		Plans plans = new Plans(Plans.USE_STREAMING);
 		PlansWriter plansWriter = new PlansWriter(plans);
 		//SubtoursWriteTable subtoursWriteTable = new SubtoursWriteTable ("output/output_persons_subtours.txt");
-		plans.setPlansWriter(plansWriter);
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
@@ -79,10 +78,10 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
+		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		//plansReader.readFile ("input/plans.xml");
 		plans.printPlansCount();
-		plans.runAlgorithms();
 		//PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt", pmcm.getPersonSubtours());
 		//pidst.write();
 		plansWriter.write();

@@ -52,7 +52,6 @@ public class InitRouteCreation {
 		System.out.println("  setting up plans objects...");
 		Plans plans = new Plans(Plans.USE_STREAMING);
 		PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
@@ -67,9 +66,9 @@ public class InitRouteCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
+		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		plans.printPlansCount();
-		plans.runAlgorithms();
 		plansWriter.write();
 		System.out.println("  done.");
 

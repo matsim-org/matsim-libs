@@ -85,10 +85,10 @@ public class MergePlans {
 
 		final int lower_limit = 1000000000;
 
-		World world = Gbl.getWorld();
+		World world = Gbl.createWorld();
 		Config config = Gbl.createConfig(null);
-		Gbl.getConfig().plans().setOutputFile(outputPlansFilename);
-		Gbl.getConfig().plans().switchOffPlansStreaming(false);
+		config.plans().setOutputFile(outputPlansFilename);
+		config.plans().switchOffPlansStreaming(false);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
@@ -96,7 +96,6 @@ public class MergePlans {
 
 		Plans plansA = new Plans();
 		PlansWriter pw = new PlansWriter(plansA);
-		pw.writeStartPlans();
 		plansA.addAlgorithm(new CopyPlans(pw));
 		new MatsimPlansReader(plansA).readFile(plansFilenameA);
 		plansA.runAlgorithms();
@@ -105,6 +104,6 @@ public class MergePlans {
 		plansB.addAlgorithm(new PersonIdCopyPlans(pw, lower_limit));
 		new MatsimPlansReader(plansB).readFile(plansFilenameB);
 		plansB.runAlgorithms();
-		pw.writeEndPlans();
+		pw.write();
 	}
 }

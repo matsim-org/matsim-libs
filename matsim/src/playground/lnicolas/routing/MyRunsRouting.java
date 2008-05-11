@@ -165,9 +165,6 @@ public class MyRunsRouting extends MyRuns {
 		// System.out.println("Wrote net");
 		// }
 
-		PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
-		System.out.println("  done.");
 
 		FromToSummary alg = new FromToSummary();
 		plans.addAlgorithm(alg);
@@ -238,7 +235,7 @@ public class MyRunsRouting extends MyRuns {
 					+ preProcessTimer + " msecs in total)");
 		}
 
-		plansWriter.write();
+		new PlansWriter(plans).write();
 
 		System.out.println("  done.");
 	}
@@ -460,7 +457,7 @@ public class MyRunsRouting extends MyRuns {
 		ArrayList<Link> links = new ArrayList<Link>(network.getLinks().values());
 		Plans plans = new Plans();
 		PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
+		plans.addAlgorithm(plansWriter);
 
 		try {
 

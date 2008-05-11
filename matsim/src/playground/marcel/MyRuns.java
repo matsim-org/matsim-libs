@@ -172,7 +172,7 @@ public class MyRuns {
 		final Plans plans = new Plans(Plans.USE_STREAMING);
 		plans.setRefLayer(world.getLayer(new IdImpl("tvz")));
 		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
+		plans.addAlgorithm(plansWriter);
 		System.out.println("  done.");
 
 		System.out.println("  reading kutter data, creating plans... ");
@@ -213,7 +213,7 @@ public class MyRuns {
 		System.out.println("  setting up plans objects...");
 		final Plans plans = new Plans(Plans.USE_STREAMING);
 		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
+		plans.addAlgorithm(plansWriter);
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices file... ");
@@ -264,7 +264,7 @@ public class MyRuns {
 		System.out.println("  setting up plans objects...");
 		final Plans plans = new Plans(Plans.USE_STREAMING);
 		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
+		plans.addAlgorithm(plansWriter);
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
@@ -342,7 +342,7 @@ public class MyRuns {
 		final Plans plans = new Plans(Plans.USE_STREAMING);
 		plans.addAlgorithm(new PersonFilterSelectedPlan());
 		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
+		plans.addAlgorithm(plansWriter);
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
@@ -440,7 +440,6 @@ public class MyRuns {
 
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		final PlansWriter plansWriter = new PlansWriter(population);
-		plansWriter.writeStartPlans();
 		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter, areaOfInterest);
 		filter.setAlternativeAOI(center, radius);
 		population.addAlgorithm(filter);
@@ -809,7 +808,6 @@ public class MyRuns {
 		System.out.println("  setting up plans objects...");
 		final Plans plans = new Plans(Plans.USE_STREAMING);
 		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
 		final PlansReaderI plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
@@ -818,6 +816,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  reading, processing, writing plans...");
+		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
 		plansWriter.write();
 		System.out.println("  done.");
@@ -855,8 +854,6 @@ public class MyRuns {
 
 		System.out.println("  setting up plans objects...");
 		final Plans plans = new Plans(Plans.NO_STREAMING);
-		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
 		final PlansReaderI plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
@@ -877,6 +874,7 @@ public class MyRuns {
 		System.out.println("  done. " + (new Date()));
 
 		System.out.println("  writing plans...");
+		final PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.write();
 		System.out.println("  done.");
 
@@ -1004,8 +1002,6 @@ public class MyRuns {
 
 		System.out.println("  reading plans...");
 		final Plans plans = new Plans(Plans.NO_STREAMING);
-		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
 		final PlansReaderI plansReader = new MatsimPlansReader(plans);
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
@@ -1040,6 +1036,7 @@ public class MyRuns {
 		System.out.println("  done. at " + (new Date()));
 
 		System.out.println("  writing plans...");
+		final PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.write();
 		System.out.println("  done.");
 
@@ -2088,7 +2085,7 @@ public class MyRuns {
 		population.addAlgorithm(new XY2Links(network));
 		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost();
 		population.addAlgorithm(new PlansCalcRoute(network, timeCostFunction, timeCostFunction));
-		population.setPlansWriter(plansWriter);
+		population.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		plansWriter.write();

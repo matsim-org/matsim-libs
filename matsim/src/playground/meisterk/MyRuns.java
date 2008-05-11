@@ -905,7 +905,6 @@ public class MyRuns {
 
 		System.out.println("Writing plans file...");
 		PlansWriter plans_writer = new PlansWriter(population);
-		population.setPlansWriter(plans_writer);
 		plans_writer.write();
 		System.out.println("Writing plans file...DONE.");
 	}

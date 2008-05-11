@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -40,7 +40,7 @@ import org.matsim.world.Layer;
  *   'population' because it is the description of the population. inside each
  *   person there are the infos of the plans (also called the demand) a person
  *   has. At one point this 'plans' should be changed, which then means also
- *   the dtd must change and all the other thing which are dependent on that
+ *   the dtd must change and all the other things which are dependent on that
  *   (i.e. PlansHandlerImplXXX to PopulationHandlerImplXXX, and so on).
  *   Therefore everybody must agree with that!
  */
@@ -54,7 +54,6 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 	//////////////////////////////////////////////////////////////////////
 
 	private Layer refLayer = null;
-	private PlansWriter planswriter = null;
 	private long counter = 0;
 	private long nextMsg = 1;
 	private boolean isStreaming;
@@ -69,7 +68,7 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 	//////////////////////////////////////////////////////////////////////
 
 	public Plans() {
-		this.isStreaming = !Gbl.getConfig().plans().switchOffPlansStreaming();
+		this(!Gbl.getConfig().plans().switchOffPlansStreaming());
 	}
 
 	public Plans(final boolean isStreaming) {
@@ -98,52 +97,25 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 			// streaming is off, just add the person to our list
 			this.persons.put(p.getId(), p);
 		} else {
-			// DS Add Person to map, for algorithms might reference to the person
-			// with 		agent = population.getPersons().get(agentID);
-			// used in distributed event scheduling (ActEvent.java:l.55)
-			// remove it after running the algorithms!
-			this.persons.put(p.getId(), p);
-
 			// streaming is on, run algorithm on the person and write it to file.
 
+			/* Add Person to map, for algorithms might reference to the person
+			 * with "agent = population.getPersons().get(personId);"
+			 * remove it after running the algorithms! */
+			this.persons.put(p.getId(), p);
+
 			// run algos
-			for (int i=0; i<this.personAlgos.size(); i++) {
-				PersonAlgorithmI algo = this.personAlgos.get(i);
+			for (PersonAlgorithmI algo : this.personAlgos) {
 				algo.run(p);
 			}
-			// DS remove again as we are streaming here!
-			this.persons.remove(p.getId());
 
-			// write person
-			if (this.planswriter != null) {
-				if (this.counter == 1) {
-					/* MR: does this make sense? we open the file, but we cannot close it, because we do not know
-					 * when the last person was handed to us. I don't like this distributed responsability: one
-					 * opens the file, the other has to close it... What happens if we never open the file because
-					 * the plans file was empty? The other part wouldn't know about that and still try to close it!
-					 * --> I suggest that we require the file to be open already, and do no open it ourself!
-					 * on the other hand: <plans> may have some attributes we do not know before the plans are
-					 * being parsed. if we require the header to be written before any plans are parsed, we lose
-					 * these attributes. hmm :-|
-					 * A possible solution: implement writers as algorithms. the algorithm handles then all the
-					 * open/close of files. the algorithms has something like a "finish" routine which closes the
-					 * file -- if it was ever opened, and only the algorithm knows that and can handle accordingly.
-					 * I like that last idea the most :-)
-					 */
-					this.planswriter.writeStartPlans();
-				}
-				this.planswriter.writePerson(p);
-			}
+			// remove again as we are streaming
+			this.persons.remove(p.getId());
 		}
 	}
 
 	@Override
 	protected final void clearPersons() {
-		if (this.isStreaming) {
-			if (this.counter > 0) {
-				this.planswriter.writeEndPlans();	// close the file
-			}
-		}
 		this.persons.clear();
 		this.counter = 0;
 		this.nextMsg = 1;
@@ -192,8 +164,13 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 		this.personAlgos.add(algo);
 	}
 
+	/**
+	 * @param planswriter
+	 * @deprecated use the PlansWriter as an algorithm (11may2008)
+	 */
+	@Deprecated
 	public final void setPlansWriter(final PlansWriter planswriter) {
-		this.planswriter = planswriter;
+		throw new UnsupportedOperationException("deprecated. add the plans-writer as last algorithm to achieve the same result.");
 	}
 
 	public final void setRefLayer(final Layer refLayer) {

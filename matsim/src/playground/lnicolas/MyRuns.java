@@ -104,8 +104,6 @@ public class MyRuns {
 		System.out.println("Writing plans to " + outFilename);
 		PlansWriter plansWriter = new PlansWriter(plans, outFilename,
 				Gbl.getConfig().plans().getOutputVersion());
-		plansWriter.setUseCompression(true);
-		plans.setPlansWriter(plansWriter);
 		plansWriter.write();
 		System.out.println("done");
 	}

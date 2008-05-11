@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -127,7 +127,6 @@ public class InitRoutes {
 		final Plans plans = new Plans(Plans.USE_STREAMING);
 		final PlansReaderI plansReader = new MatsimPlansReader(plans);
 		final PlansWriter plansWriter = new PlansWriter(plans);
-		plansWriter.writeStartPlans();
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 		preprocess.run(network);

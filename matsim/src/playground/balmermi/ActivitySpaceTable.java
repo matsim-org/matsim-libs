@@ -77,7 +77,7 @@ public class ActivitySpaceTable {
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		Plans plans = new Plans();
+		Plans plans = new Plans(Plans.USE_STREAMING);
 		System.out.println("  done.");
 
 		System.out.println("  adding person algorithms... ");
@@ -87,7 +87,7 @@ public class ActivitySpaceTable {
 
 		System.out.println("  creating plans writer object... ");
 		PlansWriter plans_writer = new PlansWriter(plans);
-		plans.setPlansWriter(plans_writer);
+		plans.addAlgorithm(plans_writer);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans, running person-algos and writing the xml file... ");

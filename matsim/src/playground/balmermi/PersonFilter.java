@@ -80,7 +80,6 @@ public class PersonFilter {
 		Plans plans = new Plans(Plans.USE_STREAMING);
 		PlansReaderI plansReader = new MatsimPlansReader(plans);
 		PlansWriter plansWriter = new PlansWriter(plans);
-		plansWriter.writeStartPlans();
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter,areaOfInterest);
 		filter.setAlternativeAOI(center,radius);
 		plans.addAlgorithm(filter);

@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.config.Config;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -33,10 +32,6 @@ import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
 
 public class PlansWriter extends Writer implements PersonAlgorithmI {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
 
 	private final double write_person_percentage;
 	private boolean fileOpened = false;
@@ -47,28 +42,45 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 	
 	private final static Logger log = Logger.getLogger(PlansWriter.class);
 
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
-	public PlansWriter(final Plans plans) {
-		super();
-		Config config = Gbl.getConfig();
-		this.population = plans;
-		this.outfile = config.plans().getOutputFile();
-		this.write_person_percentage = config.plans().getOutputSample();
-		createHandler(config.plans().getOutputVersion());
+	/**
+	 * Creates a new PlansWriter to write out the specified plans to the file and with version
+	 * as specified in the {@linkplain org.matsim.config.groups.PlansConfigGroup configuration}.
+	 * If plans-streaming is on, the file will already be opened and the file-header be written.
+	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
+	 * 
+	 * @param population the population to write to file
+	 */
+	public PlansWriter(final Plans population) {
+		this(population, Gbl.getConfig().plans().getOutputFile(), Gbl.getConfig().plans().getOutputVersion());
 	}
-
-	public PlansWriter(final Plans plans, final String outfilename, final String version) {
+	
+	/**
+	 * Creates a new PlansWriter to write out the specified plans to the specified file and with 
+	 * the specified version.
+	 * If plans-streaming is on, the file will already be opened and the file-header be written.
+	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
+	 * 
+	 * @param population the population to write to file
+	 * @param filename the filename where to write the data
+	 * @param version specifies the file-format
+	 */
+	public PlansWriter(final Plans population, final String filename, final String version) {
 		super();
-		this.population = plans;
-		this.outfile = outfilename;
+		this.population = population;
+		this.outfile = filename;
 		this.write_person_percentage = Gbl.getConfig().plans().getOutputSample();
 		createHandler(version);
+		
+		if (this.population.isStreaming()) {
+			// write the file head if it is used with streaming.
+			writeStartPlans();
+		}
 	}
 
-	// Just a helper method with code that was needed from both c'tors
+	/**
+	 * Just a helper method to instantiate the correct handler
+	 * @param version
+	 */
 	private void createHandler(final String version) {
 		if (version.equals("v0")) {
 			this.dtd = "http://www.matsim.org/files/dtd/plans_v0.dtd";
@@ -217,14 +229,16 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 		}
 	}
 
+	/**
+	 * Writes all plans to the file. If plans-streaming is on, this will end the writing and close the file.
+	 */
 	@Override
 	public void write() {
 		if (!this.population.isStreaming()) {
 			this.writeStartPlans();
 			this.writePersons();
 			this.writeEndPlans();
-		}
-		else {
+		} else {
 			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");
 			if (this.fileOpened) {
 				writeEndPlans();
@@ -232,25 +246,13 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
 	public void setUseCompression(final boolean compress) {
 		this.useCompression = compress;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
-
 	public PlansWriterHandler getHandler() {
 		return this.handler;
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public final String toString() {
