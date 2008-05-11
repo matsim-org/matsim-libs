@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -66,7 +66,8 @@ public class AllTests {
 		// run integration tests
 		suite.addTest(org.matsim.integration.AllTests.suite());
 
-		// run examples (=extensive integration tests)
+		// run applications and examples (=extensive integration tests)
+		suite.addTest(org.matsim.run.AllTests.suite());
 		suite.addTest(org.matsim.examples.AllTests.suite());
 
 		//$JUnit-END$

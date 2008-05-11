@@ -127,11 +127,12 @@ public class InitRoutes {
 		final Plans plans = new Plans(Plans.USE_STREAMING);
 		final PlansReaderI plansReader = new MatsimPlansReader(plans);
 		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
+		plansWriter.writeStartPlans();
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 		preprocess.run(network);
 		plans.addAlgorithm(new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc));
+		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();
 		plansWriter.write();
@@ -144,8 +145,7 @@ public class InitRoutes {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(final String[] args) {
-		InitRoutes app = new InitRoutes();
-		app.run(args);
+		new InitRoutes().run(args);
 	}
 
 }

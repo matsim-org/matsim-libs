@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -119,8 +119,9 @@ public class XY2Links {
 		final Plans plans = new Plans(Plans.USE_STREAMING);
 		final PlansReaderI plansReader = new MatsimPlansReader(plans);
 		final PlansWriter plansWriter = new PlansWriter(plans);
-		plans.setPlansWriter(plansWriter);
+		plansWriter.writeStartPlans();
 		plans.addAlgorithm(new org.matsim.plans.algorithms.XY2Links(network));
+		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();
 		plansWriter.write();
@@ -131,11 +132,10 @@ public class XY2Links {
 	/**
 	 * Main method to start the assignment of links to activities.
 	 *
-	 * @param args
+	 * @param args Array of arguments, usually passed on the command line.
 	 */
 	public static void main(final String[] args) {
-		XY2Links app = new XY2Links();
-		app.run(args);
+		new XY2Links().run(args);
 	}
 
 }
