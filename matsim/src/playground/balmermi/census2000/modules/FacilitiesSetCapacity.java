@@ -25,7 +25,6 @@ import java.util.Iterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 
 /**
  * <p>
@@ -45,18 +44,10 @@ import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
  *
  * @author Michael Balmer
  */
-public class FacilitiesSetCapacity extends FacilitiesAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+public class FacilitiesSetCapacity {
 
 	private static final String WORK = "work";
 	private static final String HOME = "home";
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
 
 	public FacilitiesSetCapacity() {
 		super();
@@ -64,15 +55,6 @@ public class FacilitiesSetCapacity extends FacilitiesAlgorithm {
 		System.out.println("    done.");
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 

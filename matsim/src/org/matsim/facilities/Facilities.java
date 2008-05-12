@@ -31,7 +31,6 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.facilities.algorithms.FacilityAlgorithmI;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
@@ -49,8 +48,8 @@ public class Facilities extends Layer {
 	private long counter = 0;
 	private long nextMsg = 1;
 
-	public static final boolean FACILITIES_USE_STREAMING = Boolean.TRUE;
-	public static final boolean FACILITIES_NO_STREAMING = Boolean.FALSE;
+	public static final boolean FACILITIES_USE_STREAMING = true;
+	public static final boolean FACILITIES_NO_STREAMING = false;
 
 	private boolean isStreaming = Facilities.FACILITIES_NO_STREAMING;
 

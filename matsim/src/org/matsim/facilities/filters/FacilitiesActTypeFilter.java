@@ -48,7 +48,6 @@ public class FacilitiesActTypeFilter extends AbstractFacilityFilter {
 		this.actTypePatterns.add(actTypePattern);
 	}
 
-	@Override
 	public boolean judge(Facility facility) {
 
 		Iterator<String> activityIterator = facility.getActivities().keySet().iterator();

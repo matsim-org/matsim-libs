@@ -29,8 +29,6 @@ public abstract class AbstractFacilityFilter extends FacilitiesAlgorithm impleme
 	protected FacilityAlgorithmI nextAlgorithm = null;
 	private int count = 0;
 
-	abstract public boolean judge(Facility facility);
-
 	public void run(Facility facility) {
 		if (judge(facility)) {
 			count();

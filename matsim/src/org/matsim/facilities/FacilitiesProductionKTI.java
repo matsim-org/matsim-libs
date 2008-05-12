@@ -36,9 +36,9 @@ import org.matsim.gbl.Gbl;
  */
 public class FacilitiesProductionKTI {
 
-	public enum KTIYear {KTI_YEAR_2007, KTI_YEAR_2008};
+	public enum KTIYear {KTI_YEAR_2007, KTI_YEAR_2008}
 	
-	private static Logger log = Logger.getLogger(FacilitiesAllActivitiesFTE.class);
+	private static Logger log = Logger.getLogger(FacilitiesProductionKTI.class);
 	
 	/**
 	 * @param args
@@ -59,15 +59,14 @@ public class FacilitiesProductionKTI {
 				);
 		
 		log.info("Adding and running facilities algorithms...");
-		facilities.addAlgorithm(new FacilitiesAllActivitiesFTE(ktiYear));
-		facilities.addAlgorithm(new FacilitiesOpentimesKTIYear1());
-		facilities.addAlgorithm(new FacilitiesRandomizeHectareCoordinates());
+		new FacilitiesAllActivitiesFTE(ktiYear).run(facilities);
+		new FacilitiesOpentimesKTIYear1().run(facilities);
+		new FacilitiesRandomizeHectareCoordinates().run(facilities);
 		facilities.runAlgorithms();
 		log.info("Adding and running facilities algorithms...done.");
 
 		System.out.println("  writing facilities file... ");
-		FacilitiesWriter facilities_writer = new FacilitiesWriter(facilities);
-		facilities_writer.write();
+		new FacilitiesWriter(facilities).write();
 		System.out.println("  done.");
 		
 	}

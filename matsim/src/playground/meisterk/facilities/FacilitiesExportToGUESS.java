@@ -27,7 +27,6 @@ import java.util.TreeMap;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -50,7 +49,7 @@ import org.matsim.utils.vis.kml.Link.ViewRefreshMode;
 import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.world.Location;
 
-public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
+public class FacilitiesExportToGUESS {
 
 	// config parameters
 	public static final String KML21_MODULE = "kml21";
@@ -83,7 +82,6 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 		super();
 	}
 
-	@Override
 	public void run(Facilities facilities) {
 
 		// initialize from config
@@ -102,9 +100,9 @@ public class FacilitiesExportToGUESS extends FacilitiesAlgorithm {
 		}
 
 		if (Gbl.getConfig().getParam(KML21_MODULE, CONFIG_USE_KMZ_WRITER).equals("true")) {
-			this.useKMZWriter = Boolean.TRUE;
+			this.useKMZWriter = true;
 		} else if(Gbl.getConfig().getParam(KML21_MODULE, CONFIG_USE_KMZ_WRITER).equals("false")) {
-			this.useKMZWriter = Boolean.FALSE;
+			this.useKMZWriter = false;
 		} else {
 			Gbl.errorMsg(
 					"Invalid value for config parameter " + CONFIG_USE_KMZ_WRITER +

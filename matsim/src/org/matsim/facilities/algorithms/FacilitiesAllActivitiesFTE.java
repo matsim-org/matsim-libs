@@ -35,7 +35,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.facilities.FacilitiesProductionKTI.KTIYear;
 import org.matsim.gbl.Gbl;
 
-public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
+public class FacilitiesAllActivitiesFTE {
 
 	private static Logger log = Logger.getLogger(FacilitiesAllActivitiesFTE.class);
 
@@ -51,7 +51,6 @@ public class FacilitiesAllActivitiesFTE extends FacilitiesAlgorithm {
 		this.ktiYear = ktiYear;
 	}
 
-	@Override
 	public void run(Facilities facilities) {
 
 //		this.createThem2008();

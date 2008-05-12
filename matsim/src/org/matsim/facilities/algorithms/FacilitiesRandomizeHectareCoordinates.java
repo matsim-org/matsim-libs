@@ -25,15 +25,8 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 
-public class FacilitiesRandomizeHectareCoordinates extends FacilitiesAlgorithm {
+public class FacilitiesRandomizeHectareCoordinates {
 
-	public FacilitiesRandomizeHectareCoordinates() {
-
-		super();
-
-	}
-
-	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
@@ -44,7 +37,6 @@ public class FacilitiesRandomizeHectareCoordinates extends FacilitiesAlgorithm {
 		}
 
 		System.out.println("    done.");
-
 	}
 
 }

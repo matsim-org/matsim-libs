@@ -30,7 +30,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 
-public class FacilitiesWork9To18 extends FacilitiesAlgorithm {
+public class FacilitiesWork9To18 {
 
 	private EnterpriseCensus myCensus;
 
@@ -38,7 +38,6 @@ public class FacilitiesWork9To18 extends FacilitiesAlgorithm {
 		super();
 	}
 
-	@Override
 	public void run(Facilities facilities) {
 
 		int hectareCnt = 0, facilityCnt = 0;

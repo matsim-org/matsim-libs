@@ -30,19 +30,13 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 
-public class FacilitiesOpentimesKTIYear1 extends FacilitiesAlgorithm {
+public class FacilitiesOpentimesKTIYear1 {
 
 	private TreeMap<String, Opentime> openingTimes = new TreeMap<String, Opentime>();
 	
 	private final static Logger log = Logger.getLogger(FacilitiesOpentimesKTIYear1.class);
 
-	public FacilitiesOpentimesKTIYear1() {
-		super();
-	}
-
-	@Override
 	public void run(Facilities facilities) {
-
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		this.loadOpeningTimes();
@@ -59,29 +53,19 @@ public class FacilitiesOpentimesKTIYear1 extends FacilitiesAlgorithm {
 				o.clear();
 
 				if (openingTimes.containsKey(actType)) {
-
 					a.addOpentime(openingTimes.get(actType));
-
-				}
-				else {
-
+				} else {
 					log.warn("For activity type " + actType + " no opening time is defined");
-
 				}
 			}
-
 		}
-
 		System.out.println("    done.");
-
 	}
 
 	private void loadOpeningTimes() {
-
 		openingTimes.put("work", new Opentime("wkday", "7:00", "18:00"));
 		openingTimes.put("shop", new Opentime("wkday", "8:00", "20:00"));
 		openingTimes.put("education", new Opentime("wkday", "7:00", "18:00"));
 		openingTimes.put("leisure", new Opentime("wkday", "6:00", "24:00"));
-
 	}
 }

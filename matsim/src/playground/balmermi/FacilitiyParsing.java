@@ -45,8 +45,8 @@ public class FacilitiyParsing {
 		System.out.println("  running facilities algorithms... ");
 //		Facilities.getSingleton().addAlgorithm(new FacilitiesSummary());
 //		Facilities.getSingleton().addAlgorithm(new FacilitiesSpatialCut());
-		facilities.addAlgorithm(new FacilitiesSetCapacity());
-		facilities.runAlgorithms();
+		new FacilitiesSetCapacity().run(facilities);
+//		facilities.runAlgorithms();
 		System.out.println("  done.");
 		
 		System.out.println("  writing facilities xml file... ");

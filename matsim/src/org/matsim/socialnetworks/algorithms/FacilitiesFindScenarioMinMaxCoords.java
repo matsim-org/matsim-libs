@@ -22,34 +22,18 @@ package org.matsim.socialnetworks.algorithms;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 
-public class FacilitiesFindScenarioMinMaxCoords extends FacilitiesAlgorithm {
+public class FacilitiesFindScenarioMinMaxCoords {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
 	private CoordI minCoord;
 	private CoordI maxCoord;
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
 
 	public FacilitiesFindScenarioMinMaxCoords() {
 		super();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		System.out.println("  NOTE you could get these limits from world");
@@ -61,7 +45,6 @@ public class FacilitiesFindScenarioMinMaxCoords extends FacilitiesAlgorithm {
 
 		for (Facility f : facilities.getFacilities().values()) {
 			CoordI c = f.getCenter();
-			//System.out.println("      Facility id = " + f.getId());
 			if(c.getX()<=min_x){
 				min_x=c.getX();
 			}

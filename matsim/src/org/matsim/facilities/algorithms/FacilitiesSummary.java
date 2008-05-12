@@ -27,29 +27,12 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.geometry.shared.Coord;
 
-public class FacilitiesSummary extends FacilitiesAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+public class FacilitiesSummary {
 
 	public FacilitiesSummary() {
 		super();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		int f_cnt = 0;
@@ -87,10 +70,9 @@ public class FacilitiesSummary extends FacilitiesAlgorithm {
 						caps[4] += a.getCapacity();
 					}
 					else {
-						System.err.println("ERROR: in " + this.getClass().getName() +
-															 " in run(Facilities facilities):" +
+						throw new RuntimeException("ERROR: in " + this.getClass().getName() +
+															 " in run(Facilities facilities):" + 
 															 " do not know type = " + a.getType());
-						System.exit( -1);
 					}
 				}
 				else {

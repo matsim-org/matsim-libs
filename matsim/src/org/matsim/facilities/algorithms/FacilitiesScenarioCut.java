@@ -28,20 +28,12 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.geometry.CoordI;
 
-public class FacilitiesScenarioCut extends FacilitiesAlgorithm {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+public class FacilitiesScenarioCut {
 
 	private final double minX;
 	private final double maxX;
 	private final double minY;
 	private final double maxY;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
 
 	public FacilitiesScenarioCut(final CoordI min, final CoordI max) {
 		super();
@@ -51,15 +43,6 @@ public class FacilitiesScenarioCut extends FacilitiesAlgorithm {
 		this.maxY = max.getY();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
@@ -82,7 +65,6 @@ public class FacilitiesScenarioCut extends FacilitiesAlgorithm {
 			Id fid = fid_it.next();
 			facilities.getFacilities().remove(fid);
 		}
-		System.out.println("      done.");
 
 		System.out.println("    done.");
 	}

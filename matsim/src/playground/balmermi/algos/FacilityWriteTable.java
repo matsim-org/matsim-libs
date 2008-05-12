@@ -28,9 +28,8 @@ import java.util.Iterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 
-public class FacilityWriteTable extends FacilitiesAlgorithm {
+public class FacilityWriteTable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -74,14 +73,9 @@ public class FacilityWriteTable extends FacilitiesAlgorithm {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
