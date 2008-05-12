@@ -24,7 +24,6 @@ import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.gbl.Gbl;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.network.NetworkLayer;
@@ -119,9 +118,9 @@ public abstract class TriangleScenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeConfig() {
+	public static final void writeConfig(final Config config) {
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		System.out.println("  done.");
 	}

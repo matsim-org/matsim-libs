@@ -51,7 +51,6 @@ import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
-import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.utils.misc.Time;
@@ -331,7 +330,7 @@ public class BetaTravelTest extends MatsimTestCase {
 				event.getControler().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {
-				double beta_travel = Double.parseDouble(Gbl.getConfig().getParam(CharyparNagelScoringFunction.CONFIG_MODULE, CharyparNagelScoringFunction.CONFIG_TRAVELING));
+				double beta_travel = event.getControler().getConfig().charyparNagelScoring().getTraveling();
 				/* ***************************************************************
 				 * AUTOMATIC VERIFICATION OF THE TESTS:
 				 * 

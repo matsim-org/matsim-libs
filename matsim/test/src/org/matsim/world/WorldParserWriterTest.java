@@ -114,7 +114,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		this.runModules(world);
 
 		TriangleScenario.writeWorld(world);
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 
@@ -148,7 +148,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -184,7 +184,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -221,7 +221,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -258,7 +258,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -295,7 +295,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();
@@ -332,7 +332,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		TriangleScenario.writeWorld(world);
 		TriangleScenario.writeFacilities(facilities);
 		TriangleScenario.writeNetwork(network);
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 
 		this.compareOutputWorld();
 		this.compareOutputFacilities();

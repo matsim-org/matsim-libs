@@ -23,7 +23,6 @@ package org.matsim.replanning;
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
@@ -65,7 +64,7 @@ public class ReRoutingTest extends MatsimTestCase {
 			super.setup();
 
 			// do some test to ensure the scenario is correct
-			int lastIter = Gbl.getConfig().controler().getLastIteration();
+			int lastIter = this.config.controler().getLastIteration();
 			if (lastIter < 1) {
 				throw new IllegalArgumentException("Controler.lastIteration must be at least 1. Current value is " + lastIter);
 			}

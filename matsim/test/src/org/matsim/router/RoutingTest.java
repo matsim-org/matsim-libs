@@ -20,6 +20,8 @@
 
 package org.matsim.router;
 
+import org.apache.log4j.Logger;
+import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -43,6 +45,8 @@ public class RoutingTest extends MatsimTestCase {
 	private long referenceChecksum = -1L;
 	private NetworkLayer network = null;
 	private Plans population = null;
+
+	/*package*/ static final Logger log = Logger.getLogger(RoutingTest.class);
 
 	private interface RouterProvider {
 		public String getName();
@@ -69,7 +73,7 @@ public class RoutingTest extends MatsimTestCase {
 				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 				long now = System.currentTimeMillis();
 				preProcessData.run(network);
-				System.out.println("Elapsed time for preprocessing:\n" + Gbl.printTimeDiff(System.currentTimeMillis(), now));
+				log.info("Elapsed time for preprocessing:\n" + Gbl.printTimeDiff(System.currentTimeMillis(), now));
 				return new Dijkstra(network, costCalc, timeCalc, preProcessData);
 			}
 		});
@@ -84,7 +88,7 @@ public class RoutingTest extends MatsimTestCase {
 				PreProcessEuclidean preProcessData = new PreProcessEuclidean(costCalc);
 				long now = System.currentTimeMillis();
 				preProcessData.run(network);
-				System.out.println("Elapsed time for preprocessing:\n" + Gbl.printTimeDiff(System.currentTimeMillis(), now));
+				log.info("Elapsed time for preprocessing:\n" + Gbl.printTimeDiff(System.currentTimeMillis(), now));
 				return new AStarEuclidean(network, preProcessData, timeCalc);
 			}
 		});
@@ -99,33 +103,32 @@ public class RoutingTest extends MatsimTestCase {
 				PreProcessLandmarks preProcessData = new PreProcessLandmarks(costCalc);
 				long now = System.currentTimeMillis();
 				preProcessData.run(network);
-				System.out.println("Elapsed time for preprocessing:\n" + Gbl.printTimeDiff(System.currentTimeMillis(), now));
+				log.info("Elapsed time for preprocessing:\n" + Gbl.printTimeDiff(System.currentTimeMillis(), now));
 				return new AStarLandmarks(network, preProcessData, timeCalc);
 			}
 		});
 	}
 
 	private void doTest(final RouterProvider provider) {
-		init("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
+		Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
+		init(config);
 
 		String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
 
 		calcRoute(provider, this.network, this.population);
 		PlansWriter plansWriter = new PlansWriter(this.population, outPlansName,
-				Gbl.getConfig().plans().getOutputVersion());
+				config.plans().getOutputVersion());
 		plansWriter.write();
 		final long routerChecksum = CRCChecksum.getCRCFromGZFile(outPlansName);
-		System.out.println("routerChecksum = " + routerChecksum + " file: " + outPlansName);
+		log.info("routerChecksum = " + routerChecksum + " file: " + outPlansName);
 		assertEquals(this.referenceChecksum, routerChecksum);
 		System.out.println();
 	}
 
-	private void init(final String configFile) {
-		loadConfig(configFile);
-
+	private void init(final Config config) {
 		if (this.initRan) return;
 
-		this.network = readNetwork();
+		this.network = readNetwork(config.network().getInputFile());
 		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		this.population = readPlans(inPlansName);
 		this.referenceChecksum = CRCChecksum.getCRCFromGZFile(inPlansName);
@@ -142,10 +145,10 @@ public class RoutingTest extends MatsimTestCase {
 		return plans;
 	}
 
-	private NetworkLayer readNetwork() {
+	private NetworkLayer readNetwork(final String filename) {
 		System.out.println("  reading the network...");
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(filename);
 		System.out.println("  done.");
 		return network;
 	}
@@ -162,7 +165,7 @@ public class RoutingTest extends MatsimTestCase {
 		plans.addAlgorithm(router);
 		long now = System.currentTimeMillis();
 		plans.printPlansCount();
-		if (Gbl.getConfig().plans().switchOffPlansStreaming()) {
+		if (!plans.isStreaming()) {
 			now = System.currentTimeMillis();
 			plans.runAlgorithms();
 		}

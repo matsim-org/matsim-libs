@@ -116,7 +116,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 		this.runModules(network, world);
 
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 		TriangleScenario.writeNetwork(network);
 		TriangleScenario.writeWorld(world);
 
@@ -140,7 +140,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		
 		this.runModules(network, world);
 
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 		TriangleScenario.writeNetwork(network);
 		TriangleScenario.writeWorld(world);
 		
@@ -173,7 +173,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		
 		this.runModules(network, world);
 
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 		TriangleScenario.writeNetwork(network);
 		TriangleScenario.writeWorld(world);
 		
@@ -206,7 +206,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		new WorldCheck().run(world);
 		System.out.println("  done.");
 
-		TriangleScenario.writeConfig();
+		TriangleScenario.writeConfig(this.config);
 		TriangleScenario.writeNetwork(network);
 		TriangleScenario.writeWorld(world);
 		
