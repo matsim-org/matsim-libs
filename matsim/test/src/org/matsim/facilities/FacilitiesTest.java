@@ -58,6 +58,29 @@ public class FacilitiesTest extends MatsimTestCase {
 		assertEquals("TestAlgo should have handled 6 facilities.", 6, algo2.getCounter());
 	}
 	
+	public void testStreaming() {
+		final Facilities facilities = new Facilities("test", true);
+		// create 2 algo and add them to the facilities-object
+		MockAlgo algo1 = new MockAlgo();
+		MockAlgo algo2 = new MockAlgo();
+		facilities.addAlgorithm(algo1);
+		facilities.addAlgorithm(algo2);
+		// create a first facility
+		Facility f1 = facilities.createFacility(new IdImpl(1), new Coord(1.0, 1.0));
+		facilities.finishFacility(f1);
+		assertEquals(1, algo1.getCounter());
+		assertEquals(1, algo2.getCounter());
+		assertEquals("in streaming, facilities should contain no facility", 0, facilities.getFacilities().size());
+		// create two other facilities
+		Facility f2 = facilities.createFacility(new IdImpl(2), new Coord(2.0, 2.0));
+		facilities.finishFacility(f2);
+		Facility f3 = facilities.createFacility(new IdImpl(3), new Coord(3.0, 3.0));
+		facilities.finishFacility(f3);
+		assertEquals(3, algo1.getCounter());
+		assertEquals(3, algo2.getCounter());
+		assertEquals("in streaming, facilities should contain no facility", 0, facilities.getFacilities().size());		
+	}
+
 	/*package*/ static class MockAlgo extends FacilityAlgorithm {
 		private int counter = 0;
 		
