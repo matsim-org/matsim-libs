@@ -73,7 +73,6 @@ public class CountsParserWriterTest extends MatsimTestCase {
 		// what to test?
 		// check if xml file not empty
 
-		Gbl.getConfig();
 		String filename = this.getOutputDirectory() + "output_counts.xml";
 		CountsWriter counts_writer = new CountsWriter(this.fixture.counts, filename);
 		counts_writer.write();
