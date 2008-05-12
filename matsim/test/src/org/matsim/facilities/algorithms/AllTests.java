@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.facilities;
+package org.matsim.facilities.algorithms;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -27,11 +27,9 @@ public class AllTests {
 
 	public static Test suite() {
 
-		TestSuite suite = new TestSuite("Tests for org.matsim.facilities");
+		TestSuite suite = new TestSuite("Tests for org.matsim.facilities.algorithms");
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.facilities.algorithms.AllTests.suite());
-//		suite.addTestSuite(FacilitiesTest.class); // FIXME [KM,MR] test disabled as it does not yet work
-		suite.addTestSuite(FacilitiesParserWriterTest.class);
+//		suite.addTestSuite(FacilityAlgorithmTest.class); // FIXME [KM,MR] test disabled as it does not yet work
 		//$JUnit-END$
 		return suite;
 	}

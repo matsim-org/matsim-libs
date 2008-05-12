@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * FacilityAlgorithmTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,22 +18,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.facilities;
+package org.matsim.facilities.algorithms;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.Facility;
+import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.geometry.shared.Coord;
 
-public class AllTests {
+public class FacilityAlgorithmTest extends MatsimTestCase {
 
-	public static Test suite() {
-
-		TestSuite suite = new TestSuite("Tests for org.matsim.facilities");
-		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.facilities.algorithms.AllTests.suite());
-//		suite.addTestSuite(FacilitiesTest.class); // FIXME [KM,MR] test disabled as it does not yet work
-		suite.addTestSuite(FacilitiesParserWriterTest.class);
-		//$JUnit-END$
-		return suite;
+	public void testRunAlgorithms() {
+		final Facilities facilities = new Facilities();
+		// create 2 facilities
+		facilities.createFacility(new IdImpl(1), new Coord(1.0, 1.0));
+		facilities.createFacility(new IdImpl(2), new Coord(2.0, 2.0));
+		// create an algo and let it run over the facilities
+		MockAlgo algo = new MockAlgo();
+		algo.run(facilities);
+		assertEquals("TestAlgo should have handled 2 facilities.", 2, algo.getCounter());
 	}
-
+	
+	/*package*/ static class MockAlgo extends FacilityAlgorithm {
+		private int counter = 0;
+		
+		@Override
+		public void run(final Facility facility) {
+			this.counter++;
+		}
+		
+		public int getCounter() {
+			return this.counter;
+		}
+	}
 }
