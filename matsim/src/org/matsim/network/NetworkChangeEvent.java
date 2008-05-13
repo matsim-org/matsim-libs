@@ -114,6 +114,14 @@ public class NetworkChangeEvent implements Comparable{
 	
 	/**
 	 * 
+	 * @param links a collection of links affected by this event.
+	 */
+	public void addLinks(Collection<Link> links) {
+		links.addAll(links);
+	}
+	
+	/**
+	 * 
 	 * @param link the link to remove.
 	 */
 	public void removeLink(Link link) {

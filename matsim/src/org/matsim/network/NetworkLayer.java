@@ -167,7 +167,7 @@ public class NetworkLayer extends Layer implements BasicNet {
 
 	/**
 	 * Sets the network change events and replaces existing events. Before
-	 * events are applied to their corresponding links, all links are reseted to
+	 * events are applied to their corresponding links, all links are reset to
 	 * their initial state. Pass an empty event list to reset the complete network.
 	 * 
 	 * @param events a list of events.
@@ -179,7 +179,7 @@ public class NetworkLayer extends Layer implements BasicNet {
 		}
 		
 		for(Link link : getLinks().values()) {
-			((TimeVariantLinkImpl)link).clearNetworkChangeEvents();
+			((TimeVariantLinkImpl)link).clearEvents();
 		}
 		
 		this.networkChangeEvents = events;

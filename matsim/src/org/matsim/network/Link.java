@@ -47,6 +47,9 @@ public interface Link extends BasicLink, Location {
 
 	public void setOrigId(String origid);
 	
+	/**
+	 * @deprecated
+	 */
 	public void calcFlowCapacity();
 
 }
