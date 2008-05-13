@@ -98,7 +98,7 @@ public class MentalMap {
 			// If there is already knowledge in the initial plans file, use it
 			if(this.knowledge.getActivities(myAct.getType()).size()>0){
 				myActivity=this.knowledge.getActivities(myAct.getType()).get(Gbl.random.nextInt(this.knowledge.getActivities(myAct.getType()).size()));
-				learnActsActivities(myAct.getRefId(),myActivity);
+				learnActsActivities(myAct,myActivity);
 			}
 
 			// Else the activity is null and we choose an activity to assign to the act
@@ -114,7 +114,7 @@ public class MentalMap {
 				Facility f = (Facility) facs[k];
 				myActivity = f.getActivity(myAct.getType());
 				if(myActivity!=null){
-					learnActsActivities(myAct.getRefId(),myActivity);
+					learnActsActivities(myAct,myActivity);
 				}
 			}
 		}
@@ -131,7 +131,7 @@ public class MentalMap {
 			Id myActivityId = aar.getNextActivityId();
 			Activity myActivity = knowledge.getFacilities().get(myActivityId).getActivity(myAct.getType());
 			if(myActivity!=null){
-				learnActsActivities(myAct.getRefId(),myActivity);
+				learnActsActivities(myAct,myActivity);
 			}	
 		}
 
@@ -175,11 +175,16 @@ public class MentalMap {
 			}
 		}
 	}
-	public void learnActsActivities (Integer myactId, Activity myactivity){
+	public void learnActsActivities (Act myAct, Activity myactivity){
 
-		this.mapActivityActId.put(myactivity,myactId);
-		this.mapActIdActivityId.put(myactId,myactivity.getFacility().getId());
+		int myActId = myAct.getRefId();
+		this.mapActivityActId.put(myactivity,myActId);
+		this.mapActIdActivityId.put(myActId,myactivity.getFacility().getId());
 
+		// Drop (myActId,myAct)
+		this.actIdAct.remove(myActId);
+		this.actIdAct.put(myActId,myAct);
+		
 		setActivityScore(myactivity);
 
 		this.knowledge.addActivity(myactivity);
@@ -292,7 +297,7 @@ public class MentalMap {
 				// If a new facility of the correct type is found, remap the act to it
 				if((newActivity!=null) && (newActivity!=oldActivity)){
 					forgetActsActivities(myAct.getRefId(),newActivity);
-					learnActsActivities(myAct.getRefId(),newActivity);
+					learnActsActivities(myAct,newActivity);
 					remapped= true;
 				}
 				i++;
@@ -329,6 +334,7 @@ public class MentalMap {
 			return null;
 		}else{
 			return this.actIdAct.get(myActId);
+			
 		}
 
 	}

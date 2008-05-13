@@ -171,7 +171,7 @@ public class SNSecLocShortest implements PlanAlgorithmI {
 				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 
-				k.map.learnActsActivities(newAct.getRefId(),fFromKnowledge.getActivity(factype));
+				k.map.learnActsActivities(newAct,fFromKnowledge.getActivity(factype));
 				person.setSelectedPlan(newPlan);
 //				person.setSelectedPlan(plan);
 				// Remove previous plan

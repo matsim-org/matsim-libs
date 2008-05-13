@@ -196,7 +196,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 				if(Integer.parseInt(person.getId().toString())==3356172){
 					System.out.println("#### OUTPLAN: "+newPlan);
 				}
-				k.map.learnActsActivities(newAct.getRefId(),fFromKnowledge.getActivity(factype));
+				k.map.learnActsActivities(newAct,fFromKnowledge.getActivity(factype));
 				person.setSelectedPlan(newPlan);
 
 			}else{
