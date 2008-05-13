@@ -23,10 +23,16 @@
  */
 package playground.johannes.socialnets;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+
+import org.geotools.util.MapEntry;
 
 import cern.jet.stat.Descriptive;
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.statistics.DegreeDistributions;
 
 /**
@@ -35,9 +41,19 @@ import edu.uci.ics.jung.statistics.DegreeDistributions;
  */
 public class GraphStatistics {
 
-	
 	static public double meanDegree(Graph g) {
 		return Descriptive.mean(DegreeDistributions.getDegreeValues(g.getVertices()));
+	}
+	
+	static public double meanDegreeSampled(Graph g) {
+		Set<Vertex> vertices = new HashSet<Vertex>();
+		for(Object v : g.getVertices()) {
+			Boolean bool = (Boolean)((Vertex)v).getUserDatum(UserDataKeys.PARTICIPATE_KEY);
+			if(bool != null && bool == true) {
+				vertices.add((Vertex) v);
+			}
+		}
+		return Descriptive.mean(DegreeDistributions.getDegreeValues(vertices));
 	}
 	
 	static public double meanClusterCoefficient(Graph g) {
@@ -47,5 +63,20 @@ public class GraphStatistics {
 			sum += (Double)d;
 		
 		return sum/(double)coefficients.size();
+	}
+	
+	static public double meanClusterCoefficientSampled(Graph g) {
+		Map<Vertex, Double> coefficients = edu.uci.ics.jung.statistics.GraphStatistics.clusteringCoefficients(g);
+		double sum = 0;
+		int count = 0;
+		for(Entry<Vertex, Double> m : coefficients.entrySet()) {
+			Vertex v = m.getKey();
+			Boolean b = (Boolean) v.getUserDatum(UserDataKeys.PARTICIPATE_KEY); 
+			if(b != null && b.booleanValue() == true) {
+				sum += m.getValue();
+				count++;
+			}
+		}
+		return sum/(double)count;
 	}
 }

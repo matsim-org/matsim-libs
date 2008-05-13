@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonGraphMLFileHandler.java
+ * UserDataKeys.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,37 +23,26 @@
  */
 package playground.johannes.socialnets;
 
-import java.util.Map;
-
-import edu.uci.ics.jung.graph.ArchetypeVertex;
-import edu.uci.ics.jung.io.GraphMLFileHandler;
+import edu.uci.ics.jung.utils.UserDataContainer;
 
 /**
  * @author illenberger
  *
  */
-public class PersonGraphMLFileHandler extends GraphMLFileHandler {
+public interface UserDataKeys {
 
-//	private Plans plans;
+//	public static final String PERSON_KEY = "person";
 	
-	@Override
-	protected ArchetypeVertex createVertex(Map attrs) {
-		ArchetypeVertex v = super.createVertex(attrs);
-//		String personString = (String)attrs.get(UserDataKeys.PERSON_KEY);
-//		int startPos = personString.indexOf("[id=") + 4;
-//		int endPos = personString.indexOf("]", startPos);
-//		String id = personString.substring(startPos, endPos);
-//		Person person = plans.getPerson(id);
-//		v.setUserDatum(UserDataKeys.PERSON_KEY, person, UserDataKeys.COPY_ACT);
-
-		v.setUserDatum(UserDataKeys.ID, (String)attrs.get(UserDataKeys.ID), UserDataKeys.COPY_ACT);
-		v.setUserDatum(UserDataKeys.X_COORD, Double.parseDouble((String) attrs.get(UserDataKeys.X_COORD)), UserDataKeys.COPY_ACT);
-		v.setUserDatum(UserDataKeys.Y_COORD, Double.parseDouble((String) attrs.get(UserDataKeys.Y_COORD)), UserDataKeys.COPY_ACT);
-		return v;
-	}
-
-//	public PersonGraphMLFileHandler(Plans plans) {
-//		this.plans = plans;
-//	}
+	public static final String ID = "person_id";
+	
+	public static final String X_COORD = "x";
+	
+	public static final String Y_COORD = "y";
+	
+	public static final String WAVE_KEY = "wave";
+	
+	public static final String PARTICIPATE_KEY = "participate";
+	
+	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
 
 }

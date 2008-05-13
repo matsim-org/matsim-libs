@@ -25,83 +25,111 @@ package playground.johannes.snowball;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
+import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Plans;
 import org.matsim.utils.io.IOUtils;
 
+import playground.johannes.socialnets.GraphStatistics;
 import playground.johannes.socialnets.PersonGraphMLFileHandler;
+import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.io.GraphMLFile;
 
 /**
  * @author illenberger
- *
+ * 
  */
 public class EgosVsWaves {
 
 	private static final Logger logger = Logger.getLogger(EgosVsWaves.class);
-	
-	public static void main(String[] args) {
-		Config config = new Config();
-		config.addCoreModules();
-		Gbl.setConfig(config);
-		Gbl.createWorld();
 
-		String networkFile = args[0];
-		String plansFile = args[1];
-		String graphFile = args[2];
+	public static void main(String[] args) {
+		Config config = Gbl.createConfig(args);
+//		ScenarioData data = new ScenarioData(config);
+
+		final String MODULE_NAME = "snowballsampling";
+		String graphFile = config.getParam(MODULE_NAME, "graphFile");
+		// String graphPajekFile = config.getParam(MODULE_NAME,
+		// "graphPajekFile");
+		// String sampledPajekFile = config.getParam(MODULE_NAME,
+		// "sampledPajekFile");
+
 		/*
-		 * Load the traffic network...
+		 * Load the social network...
 		 */
-		logger.info("Loading network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFile);
-		Gbl.getWorld().setNetworkLayer(network);
-		/*
-		 * Load the population...
-		 */
-		logger.info("Loading plans...");
-		Plans plans = new Plans();
-		MatsimPlansReader reader = new MatsimPlansReader(plans);
-		try {
-			reader.parse(plansFile);
-			/*
-			 * Load the social network...
-			 */
-			logger.info("Loading social network...");
-			PersonGraphMLFileHandler fileHandler = new PersonGraphMLFileHandler(
-					plans);
-			GraphMLFile gmlFile = new GraphMLFile(fileHandler);
-			Graph g = gmlFile.load(graphFile);
-			
-			int[][] sampledVertices = new int[5][10];
-			
-			Sampler sampler = new Sampler();
-			for(int wave = 1; wave < 6; wave++) {
-				for(int egos = 1; egos < 11; egos++) {
-					sampler.run(g, wave, egos);
-					sampledVertices[wave-1][egos-1] = SampleStatistics.countSampledVertices(g).get("totalSampled");
-				}
+		logger.info("Loading social network...");
+		PersonGraphMLFileHandler fileHandler = new PersonGraphMLFileHandler();
+		GraphMLFile gmlFile = new GraphMLFile(fileHandler);
+		Graph g = gmlFile.load(graphFile);
+
+		System.out.println("Graph has " + g.numVertices() +" vertices, " + g.numEdges() + " edges, cluster coefficient: " +
+				GraphStatistics.meanClusterCoefficient(g) + ", mean degree: " + GraphStatistics.meanDegree(g) + ", components: " +
+				new WeakComponentClusterer().extract(g).size());
+		
+		String outputDir = "/Users/fearonni/vsp-work/socialnets/devel/snowball/";
+		
+		int seeds = 10;
+		int waves = 3;
+		float[][] sampledVertices = new float[waves][seeds];
+		float[][] verticesSampledTwice = new float[waves][seeds];
+		float[][] sampledEdges = new float[waves][seeds];
+		float[][] sampledEdgesTwice = new float[waves][seeds];
+		float[][] degrees = new float[waves][seeds];
+		float[][] clusterCoefficients = new float[waves][seeds];
+		float[][] weakComponents = new float[waves][seeds];
+
+		Sampler sampler = new Sampler();
+		for (int wave = 1; wave < waves+1; wave++) {
+			for (int egos = 1; egos < seeds+1; egos++) {
+				sampler.run(g, wave, egos);
+				
+				Map<String, Integer> sampledVerticesMap = SampleStatistics
+				.countSampledVertices(g);
+				
+				int vertices = sampledVerticesMap.get("totalSampled");
+				sampledVertices[wave - 1][egos - 1] = vertices / (float)g.numVertices();
+				
+				int multiple = sampledVerticesMap.get("totalMultipleSampled");
+				verticesSampledTwice[wave - 1][egos - 1] = multiple/(float)vertices;
+				
+				Map<String, Integer> sampledEdgesMap = SampleStatistics.countSampledEdges(g);
+				
+				int edges = sampledEdgesMap.get("totalSampled");
+				sampledEdges[wave-1][egos-1] = edges/(float)g.numEdges();
+				
+				int multipleEdges = sampledEdgesMap.get("totalMultipleSampled");
+				sampledEdgesTwice[wave-1][egos-1] = multipleEdges/(float)edges;
+				
+//				Graph extGraph = sampler.extractSampledGraph(g, true);
+				Graph reducedGraph = sampler.extractSampledGraph(g, false);
+				
+				degrees[wave-1][egos-1] = (float) GraphStatistics.meanDegreeSampled(reducedGraph);				
+				weakComponents[wave-1][egos-1] = new WeakComponentClusterer().extract(reducedGraph).size();
+				sampler.removeDeadEnds(reducedGraph);
+				clusterCoefficients[wave-1][egos-1] = (float) GraphStatistics.meanClusterCoefficientSampled(reducedGraph);
 			}
-			
-			dump(sampledVertices, "/Users/fearonni/vsp-work/socialnets/devel/snowball/sampledVertices.txt");
-		} catch (Exception e) {
-			logger.fatal("Exception occured!", e);
 		}
+
+		dump(sampledVertices, seeds, waves, outputDir + "sampledVertices.txt");
+		dump(verticesSampledTwice, seeds, waves, outputDir + "sampledVerticesTwice.txt");
+		dump(sampledEdges, seeds, waves, outputDir + "sampledEdges.txt");
+		dump(sampledEdgesTwice, seeds, waves, outputDir + "sampledEdgesTwice.txt");
+		dump(degrees, seeds, waves, outputDir + "sampledMeanDegree.txt");
+		dump(clusterCoefficients, seeds, waves, outputDir + "sampledClusterCoef.txt");
+		dump(weakComponents, seeds, waves, outputDir + "sampledComponents.txt");
+
 	}
 
-	static private void dump(int[][] matrix, String filename) {
+	static private void dump(float[][] matrix, int seeds, int waves, String filename) {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			for(int wave = 1; wave < 6; wave++) {
-				for(int egos = 1; egos < 11; egos++) {
-					writer.write(String.valueOf(matrix[wave-1][egos-1]));
+			for (int wave = 1; wave < waves+1; wave++) {
+				for (int egos = 1; egos < seeds+1; egos++) {
+					writer.write(String.valueOf(matrix[wave - 1][egos - 1]));
 					writer.write("\t");
 				}
 				writer.newLine();

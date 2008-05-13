@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import playground.johannes.socialnets.UserDataKeys;
 import cern.colt.list.IntArrayList;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
@@ -51,7 +52,7 @@ public class SampleStatistics {
 		int totalSampled = 0;
 		int totalMultiSampled = 0;
 		for(UserDataContainer e : elements) {
-			IntArrayList waves = (IntArrayList) e.getUserDatum(Sampler.WAVE_KEY);
+			IntArrayList waves = (IntArrayList) e.getUserDatum(UserDataKeys.WAVE_KEY);
 			if(waves != null) {
 				String key = "wave" + waves.get(0);
 				Integer waveCount = table.get(key);

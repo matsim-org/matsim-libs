@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonGraphMLFileHandler.java
+ * Pajek2GML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,39 +21,29 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.snowball;
 
-import java.util.Map;
-
-import edu.uci.ics.jung.graph.ArchetypeVertex;
-import edu.uci.ics.jung.io.GraphMLFileHandler;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.io.GraphMLFile;
 
 /**
  * @author illenberger
  *
  */
-public class PersonGraphMLFileHandler extends GraphMLFileHandler {
+public class Pajek2GML {
 
-//	private Plans plans;
-	
-	@Override
-	protected ArchetypeVertex createVertex(Map attrs) {
-		ArchetypeVertex v = super.createVertex(attrs);
-//		String personString = (String)attrs.get(UserDataKeys.PERSON_KEY);
-//		int startPos = personString.indexOf("[id=") + 4;
-//		int endPos = personString.indexOf("]", startPos);
-//		String id = personString.substring(startPos, endPos);
-//		Person person = plans.getPerson(id);
-//		v.setUserDatum(UserDataKeys.PERSON_KEY, person, UserDataKeys.COPY_ACT);
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		String source = args[0];
+		String target = args[1];
+		
+		Graph g = CustomPajekReader.read(source);
+		
+		GraphMLFile gmlFile = new GraphMLFile();
+		gmlFile.save(g, target);
 
-		v.setUserDatum(UserDataKeys.ID, (String)attrs.get(UserDataKeys.ID), UserDataKeys.COPY_ACT);
-		v.setUserDatum(UserDataKeys.X_COORD, Double.parseDouble((String) attrs.get(UserDataKeys.X_COORD)), UserDataKeys.COPY_ACT);
-		v.setUserDatum(UserDataKeys.Y_COORD, Double.parseDouble((String) attrs.get(UserDataKeys.Y_COORD)), UserDataKeys.COPY_ACT);
-		return v;
 	}
-
-//	public PersonGraphMLFileHandler(Plans plans) {
-//		this.plans = plans;
-//	}
 
 }

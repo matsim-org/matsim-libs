@@ -33,6 +33,7 @@ import org.matsim.plans.Person;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.io.IOUtils;
 
+import playground.johannes.socialnets.UserDataKeys;
 import cern.colt.list.IntArrayList;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
@@ -84,19 +85,25 @@ public class PajekVisWriter {
 			Map<Vertex, String> vertexIds = new HashMap<Vertex, String>();
 			int counter = 1;
 			for(Object v : g.getVertices()) {
-				Person p = ((Person)((Vertex)v).getUserDatum(Sampler.PERSON_KEY));
-				CoordI c = p.getSelectedPlan().getFirstActivity().getCoord();
-				IntArrayList waves = (IntArrayList)(((Vertex)v).getUserDatum(Sampler.WAVE_KEY));
+//				Person p = ((Person)((Vertex)v).getUserDatum(UserDataKeys.PERSON_KEY));
+//				CoordI c = p.getSelectedPlan().getFirstActivity().getCoord();
+				String id = (String)((Vertex)v).getUserDatum(UserDataKeys.ID);
+				double x = ((Double)((Vertex)v).getUserDatum(UserDataKeys.X_COORD)).doubleValue();
+				double y = ((Double)((Vertex)v).getUserDatum(UserDataKeys.Y_COORD)).doubleValue();
+				IntArrayList waves = (IntArrayList)(((Vertex)v).getUserDatum(UserDataKeys.WAVE_KEY));
 				
 				writer.write(String.valueOf(counter));
 				writer.write(WHITESPACE);
 				writer.write(QUOTE);
-				writer.write(p.getId().toString());
+//				writer.write(p.getId().toString());
+				writer.write(id);
 				writer.write(QUOTE);
 				writer.write(WHITESPACE);
-				writer.write(String.valueOf(c.getX()));
+//				writer.write(String.valueOf(c.getX()));
+				writer.write(String.valueOf(x));
 				writer.write(WHITESPACE);
-				writer.write(String.valueOf(c.getY()));
+//				writer.write(String.valueOf(c.getY()));
+				writer.write(String.valueOf(y));
 				writer.write(WHITESPACE);
 				writer.write(ZERO);
 				writer.write(WHITESPACE);
@@ -120,7 +127,7 @@ public class PajekVisWriter {
 			writer.write(NEW_LINE);
 			
 			for(Object e : g.getEdges()) {
-				IntArrayList waves = (IntArrayList)(((Edge)e).getUserDatum(Sampler.WAVE_KEY));
+				IntArrayList waves = (IntArrayList)(((Edge)e).getUserDatum(UserDataKeys.WAVE_KEY));
 				Pair pair = ((Edge)e).getEndpoints();
 				Vertex source = (Vertex) pair.getFirst();
 				Vertex target = (Vertex) pair.getSecond();

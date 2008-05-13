@@ -20,200 +20,152 @@
 
 package playground.johannes.socialnets;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
+import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.plans.MatsimPlansReader;
+import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
-import org.xml.sax.SAXException;
+import org.matsim.utils.geometry.shared.Coord;
 
-import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
 import edu.uci.ics.jung.io.GraphMLFile;
-import edu.uci.ics.jung.io.PajekNetWriter;
-import edu.uci.ics.jung.utils.UserDataContainer;
+import edu.uci.ics.jung.io.GraphMLFileHandler;
 
 public class RndNetworkGenerator {
+	
+	private static final Logger logger = Logger.getLogger(RndNetworkGenerator.class);
 
-	private static final String PERSON_KEY = "person";
-	
-	private final static UserDataContainer.CopyAction.Shared copyAct = new UserDataContainer.CopyAction.Shared();
-	
-//	private final static double dist_norm = 20000;
-	
 	private final static double alpha = 0.01;
 	
-	private final static double beta = 1;
+//	private final static String ID_KEY = "ID";
+//	
+//	private final static String DIST_KEY = "dist";
 	
-	private final static int seed = 815;
-	
-	private final static String ID_KEY = "ID";
-	
-	private final static String DIST_KEY = "dist";
-	
+	@SuppressWarnings("unchecked")
 	public static Graph createGraph(Plans plans) {
-		Random rnd = new Random(seed);
-		UndirectedSparseGraph g = new UndirectedSparseGraph();
+		logger.info("Generating social network...");
 		
-		int cnt = 0;
+		Random rnd = new Random(Gbl.getConfig().global().getRandomSeed());
+		UndirectedSparseGraph g = new UndirectedSparseGraph();
+		/*
+		 * Create a vertex for each person.
+		 */
 		for(Person p : plans.getPersons().values()) {
 			UndirectedSparseVertex v =  new UndirectedSparseVertex();
 			g.addVertex(v);
-			v.addUserDatum(PERSON_KEY, p, copyAct);
-			cnt++;
+			v.addUserDatum(UserDataKeys.ID, p.getId().toString(), UserDataKeys.COPY_ACT);
+			Act act = p.getSelectedPlan().getFirstActivity();
+			v.addUserDatum(UserDataKeys.X_COORD, act.getCoord().getX(), UserDataKeys.COPY_ACT);
+			v.addUserDatum(UserDataKeys.Y_COORD, act.getCoord().getY(), UserDataKeys.COPY_ACT);
 		}
-		System.out.println("Added "+cnt+" vertices.");
-		
-		cnt = 0;
-		Set v2set = new HashSet(g.getVertices());
+		logger.info(String.format("Created %1$s vertices.", g.numVertices()));
+		/*
+		 * Insert random ties between persons.
+		 */
+		Set<Vertex> pendingVertices = new HashSet<Vertex>(g.getVertices());
 		for(Object v1 : g.getVertices()) {
-			for(Object v2 : v2set) {
+			for(Vertex v2 : pendingVertices) {
 				if(!v1.equals(v2)) {
-					Person p1 = (Person) ((UndirectedSparseVertex)v1).getUserDatum(PERSON_KEY);
-					Person p2 = (Person) ((UndirectedSparseVertex)v2).getUserDatum(PERSON_KEY);
-					CoordI c1 = p1.getSelectedPlan().getFirstActivity().getCoord();
-					CoordI c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
-					
-					double dist = c1.calcDistance(c2)/1000;
-					
-					double F = alpha*beta*Math.pow(dist,beta-1)*Math.exp(-alpha*Math.pow(dist,beta));
-					
 					rnd.nextDouble();
-					if(rnd.nextDouble() < F) {
+					if(rnd.nextDouble() <= getTieProba((Vertex) v1, v2)) {
 						UndirectedSparseEdge e = new UndirectedSparseEdge((UndirectedSparseVertex)v1, (UndirectedSparseVertex)v2);
-						e.addUserDatum(DIST_KEY, dist, copyAct);
+//						e.addUserDatum(DIST_KEY, dist, copyAct);
 						g.addEdge(e);
-						cnt++;
-						if(cnt % 100 == 0)
-							System.out.println("Added " + cnt + " edges.");
+						if(g.numEdges() % 1000 == 0)
+							logger.info(String.format("Inserted %1$s edges...", g.numEdges()));
 					}
 				}
 			}
-			v2set.remove(v1);
+			pendingVertices.remove(v1);
 		}
+		logger.info(String.format("Inserted %1$s edges.", g.numEdges()));
+		logger.info(String.format("Graph density is %1$s.", g.numEdges()/(double)(g.numVertices() * (g.numVertices()-1))));
 		
-		System.out.println("Graph density is "+ g.numEdges()/(double)(g.numVertices() * (g.numVertices()-1)));
 		return g;
 	}
 	
-	private static Plans loadPopulation(String file) {
-		Plans plans = new Plans();
-		MatsimPlansReader reader = new MatsimPlansReader(plans);
-		try {
-			reader.parse(file);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	private static double getTieProba(Vertex v1, Vertex v2) {
+//		Person p1 = (Person) ((UndirectedSparseVertex)v1).getUserDatum(UserDataKeys.PERSON_KEY);
+//		Person p2 = (Person) ((UndirectedSparseVertex)v2).getUserDatum(UserDataKeys.PERSON_KEY);
+		Double x1 = (Double) v1.getUserDatum(UserDataKeys.X_COORD);
+		Double y1 = (Double) v1.getUserDatum(UserDataKeys.Y_COORD);
+		CoordI c1 = new Coord(x1,y1);
+		Double x2 = (Double) v2.getUserDatum(UserDataKeys.X_COORD);
+		Double y2 = (Double) v2.getUserDatum(UserDataKeys.Y_COORD);
+		CoordI c2 = new Coord(x2,y2);
 		
-		return plans;
+		double dist = c1.calcDistance(c2)/1000.0;
+		
+		return alpha * 1/dist;
 	}
 	
-	private static void dump(Graph g, String outDir) throws FileNotFoundException, IOException {
-		System.out.println("Writing vertices...");
-		BufferedWriter writer = org.matsim.utils.io.IOUtils.getBufferedWriter(outDir + "vertices.txt");
-		writer.write("id\tperson\tx\ty\tdist");
-		writer.newLine();
-		
-		int i = 1;
-		for(Object v : g.getVertices()) {
-			((Vertex)v).addUserDatum(ID_KEY, i, copyAct);
-			writer.write(String.valueOf(i));
-			i++;
-			writer.write("\t");
-			
-			Person p = (Person) ((Vertex)v).getUserDatum(PERSON_KEY);
-			writer.write(p.getId().toString());
-			writer.write("\t");
-			
-			CoordI c = p.getSelectedPlan().getFirstActivity().getCoord();
-			writer.write(String.valueOf(c.getX()));
-			writer.write("\t");
-			writer.write(String.valueOf(c.getY()));
-			writer.newLine();
-		}
-		writer.close();
-		
-		System.out.println("Writing edges...");
-		writer = org.matsim.utils.io.IOUtils.getBufferedWriter(outDir + "edges.txt");
-		writer.write("id\tfrom\tto");
-		writer.newLine();
-		
-		i = 1;
-		for(Object e : g.getEdges()) {
-			writer.write(String.valueOf(i));
-			writer.write("\t");
-			Iterator it = ((Edge)e).getIncidentVertices().iterator();
-			writer.write(((Vertex)it.next()).getUserDatum(ID_KEY).toString());
-			writer.write("\t");
-			writer.write(((Vertex)it.next()).getUserDatum(ID_KEY).toString());
-			writer.write("\t");
-			writer.write(String.valueOf(((Edge)e).getUserDatum(DIST_KEY)));
-			writer.newLine();
-			i++;
-		}
-		writer.close();
-	}
+//	private static void dump(Graph g, String outDir) throws FileNotFoundException, IOException {
+//		System.out.println("Writing vertices...");
+//		BufferedWriter writer = org.matsim.utils.io.IOUtils.getBufferedWriter(outDir + "vertices.txt");
+//		writer.write("id\tperson\tx\ty\tdist");
+//		writer.newLine();
+//		
+//		int i = 1;
+//		for(Object v : g.getVertices()) {
+//			((Vertex)v).addUserDatum(ID_KEY, i, copyAct);
+//			writer.write(String.valueOf(i));
+//			i++;
+//			writer.write("\t");
+//			
+//			Person p = (Person) ((Vertex)v).getUserDatum(PERSON_KEY);
+//			writer.write(p.getId().toString());
+//			writer.write("\t");
+//			
+//			CoordI c = p.getSelectedPlan().getFirstActivity().getCoord();
+//			writer.write(String.valueOf(c.getX()));
+//			writer.write("\t");
+//			writer.write(String.valueOf(c.getY()));
+//			writer.newLine();
+//		}
+//		writer.close();
+//		
+//		System.out.println("Writing edges...");
+//		writer = org.matsim.utils.io.IOUtils.getBufferedWriter(outDir + "edges.txt");
+//		writer.write("id\tfrom\tto");
+//		writer.newLine();
+//		
+//		i = 1;
+//		for(Object e : g.getEdges()) {
+//			writer.write(String.valueOf(i));
+//			writer.write("\t");
+//			Iterator it = ((Edge)e).getIncidentVertices().iterator();
+//			writer.write(((Vertex)it.next()).getUserDatum(ID_KEY).toString());
+//			writer.write("\t");
+//			writer.write(((Vertex)it.next()).getUserDatum(ID_KEY).toString());
+//			writer.write("\t");
+//			writer.write(String.valueOf(((Edge)e).getUserDatum(DIST_KEY)));
+//			writer.newLine();
+//			i++;
+//		}
+//		writer.close();
+//	}
 	
 	public static void main(String args[]) {
+		Config config = Gbl.createConfig(args);
+		ScenarioData data = new ScenarioData(config);
 		
-		Config config = new Config();
-		config.addCoreModules();
-		Gbl.setConfig(config);
-		Gbl.createWorld();
-		
-		System.out.println("Loading network...");
-		String networkFile = "/Users/fearonni/vsp-cvs/studies/DA-Illenberger/data/berlin/network/0.net.xml";
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFile);
-		Gbl.getWorld().setNetworkLayer(network);
-		
-		System.out.println("Loading plans...");
-		Plans plans = loadPopulation("/Users/fearonni/vsp-cvs/studies/DA-Illenberger/data/berlin/plans/plans.sample0.1.xml");
-		System.out.println("Creating graph...");
+		Plans plans = data.getPopulation();
 		Graph g = createGraph(plans);
-		
-		GraphMLFile gmlFile = new GraphMLFile();
-		gmlFile.save(g, "/Users/fearonni/vsp-work/socialnets/devel/snowball/network.gml");
-		
-		PajekNetWriter pWriter = new PajekNetWriter();
-		try {
-		pWriter.save(g, "/Users/fearonni/vsp-work/socialnets/devel/snowball/network.net");
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-//		try {
-//			System.out.println("Dumping graph...");
-//			dump(g, "/Users/fearonni/vsp-work/socialnets/devel/rdata/");
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		GraphMLFileHandler gmlHandler = new PersonGraphMLFileHandler();
+		GraphMLFile gmlFile = new GraphMLFile(gmlHandler);
+		logger.info("Saving social network...");
+		gmlFile.save(g, config.getParam("randomGraphGenerator", "outputFile"));
+		logger.info("Done.");
 	}
 }
