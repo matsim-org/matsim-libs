@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.utils;
+package playground.yu.utils.qgis;
 
 import java.util.ArrayList;
 import java.util.Collection;

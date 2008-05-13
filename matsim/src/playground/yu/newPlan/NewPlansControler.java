@@ -19,6 +19,7 @@
  * *********************************************************************** */
 
 package playground.yu.newPlan;
+
 /*
  * $Id: NewPlansControler.java,v 1.7 2007/11/23 13:04:04 ychen Exp $
  */
@@ -29,13 +30,12 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
-import org.matsim.world.World;
-
 
 /**
  * test of NewAgentPtPlan
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewPlansControler {
 
@@ -43,16 +43,16 @@ public class NewPlansControler {
 		final String netFilename = "./test/yu/newPlans/equil_net.xml";
 		final String plansFilename = "./test/yu/newPlans/equil_plans1k.xml";
 
-		World world = Gbl.getWorld();
 		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(new String[] {"./test/yu/newPlans/config.xml"});
+		Config config = Gbl
+				.createConfig(new String[] { "./test/yu/newPlans/config.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
+		Gbl.getWorld().setNetworkLayer(network);
 
 		Plans population = new Plans();
-		NewAgentPtPlan nap=new NewAgentPtPlan(population);
+		NewAgentPtPlan nap = new NewAgentPtPlan(population);
 		population.addAlgorithm(nap);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFilename);
