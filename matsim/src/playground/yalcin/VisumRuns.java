@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
 
@@ -33,7 +32,6 @@ import playground.marcel.visum.VisumNetwork;
 import playground.marcel.visum.VisumNetworkReader;
 
 public class VisumRuns {
-
 
 	public static void findNearestStopExample() {
 		// read visum network
@@ -64,31 +62,33 @@ public class VisumRuns {
 			throw new RuntimeException(e);
 		}
 
-		/* read text file with coordinates
+		/* read text file with segments
 		 * expected format:
-		 * ID1  ID2  X1  Y1  X2  Y2
+		 * 0:PersonID  1:TripID  2:SegmentID
+		 * 3:XStartingPoint  4:YStartingPoint  5:ZStartingPoint  6:StartingDate  7:StartingTime
+		 * 8:XEndingPoint  9:YEndingPoint  10:ZEndingPoint  11:EndingDate  12:EndingTime
+		 * 13:Distance  14:TravelTime
+		 * 15:Probability_Walk  16:Probability_Bike  17:Probability_Car  18:Probability_UrbanPuT  19:Probability_Rail
 		 */
 		final TabularFileParser parser = new TabularFileParser();
 		final TabularFileParserConfig parserConfig = new TabularFileParserConfig();
+		parserConfig.setFileName("../mystudies/yalcin/WalkAndPuTSegmentsYalcin_ZHl.txt");
 		parserConfig.setDelimiterTags(new String[] { "\t" });
+		SegmentsTableHandler handler = new SegmentsTableHandler(vNetwork, 0.4, "../mystudies/yalcin/results.txt");
+
 		try {
-			parser.parse(parserConfig, new TabularFileHandlerI() {
-				public void startRow(final String[] row) {
-					final Coord coord1 = new Coord(Double.parseDouble(row[2]), Double.parseDouble(row[3]));
-					final Coord coord2 = new Coord(Double.parseDouble(row[4]), Double.parseDouble(row[5]));
-					final Collection<VisumNetwork.Stop> stop1 = vNetwork.findStops(coord1, 0.8);
-					final Collection<VisumNetwork.Stop> stop2 = vNetwork.findStops(coord2, 0.8);
-				}
-			});
+			// this will read the file AND write out the looked up data
+			parser.parse(parserConfig, handler);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		handler.finish();
 	}
 
 
 	public static void main(final String args[]) {
-		findNearestStopExample();
-//		findNearestStops();
+//		findNearestStopExample();
+		findNearestStops();
 	}
 
 }
