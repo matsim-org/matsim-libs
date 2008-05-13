@@ -30,11 +30,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.controler.Controler;
-import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueLink;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
