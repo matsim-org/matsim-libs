@@ -33,6 +33,7 @@ import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkAlgorithm;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.misc.Time;
 
 public class NetworkCalibrationWithCounts extends NetworkAlgorithm {
@@ -71,6 +72,7 @@ public class NetworkCalibrationWithCounts extends NetworkAlgorithm {
 				Link l = network.getLink(c.getLocId());
 				if (l == null) { System.out.println("csid="+c.getCsId()+";locid="+c.getLocId()+": link not found"); }
 				else {
+					l.setFreespeed(360.0/3.6);
 					out.write("\t<linkgtfs id=\""+l.getId()+"\" time_period=\"24:00:00\" desc=\"from csid "+c.getCsId()+"\">\n");
 					for (int h=1; h<25; h++) {
 						int time_start = (h-1)*3600;
@@ -105,7 +107,8 @@ public class NetworkCalibrationWithCounts extends NetworkAlgorithm {
 	@Override
 	public void run(NetworkLayer network) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
-		for (Link l : network.getLinks().values()) { l.setCapacity(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)*1.5); }
+//		for (Link l : network.getLinks().values()) { l.setCapacity(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)*1.5); }
+		for (Link l : network.getLinks().values()) { l.setCapacity(10000.0); l.setLanes(5.0); l.setFreespeed(36.0/3.6); }
 		this.writeGTFfile(network);
 		System.out.println("    done.");
 	}

@@ -26,6 +26,13 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
+import org.matsim.plans.algorithms.XY2Links;
+import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.PreProcessLandmarks;
+
+import playground.balmermi.algos.DoAndUndo;
+import playground.balmermi.algos.PersonLinkRoutesTable;
 
 public class PersonStreaming {
 
@@ -55,12 +62,22 @@ public class PersonStreaming {
 //		plans.addAlgorithm(new PersonCalcTripDistances());
 //		PersonTripSummaryTable ptst = new PersonTripSummaryTable("output/output_trip-summary-table.txt");
 //		plans.addAlgorithm(ptst);
-//		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-//		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
-//		preprocess.run(network);
-//		plans.addAlgorithm(new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc));
-		System.out.println("  done.");
+		
+		DoAndUndo dau = new DoAndUndo();
+		plans.addAlgorithm(dau);
 
+		plans.addAlgorithm(new XY2Links(network));
+		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
+		preprocess.run(network);
+		plans.addAlgorithm(new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc));
+		
+		plans.addAlgorithm(dau);
+
+		PersonLinkRoutesTable plrt = new PersonLinkRoutesTable("output/linkroutes");
+		plans.addAlgorithm(plrt);
+		System.out.println("  done.");
+		
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
@@ -79,6 +96,7 @@ public class PersonStreaming {
 //		psta.writeSubtourDistVsModeDistSum("output/SubtourDistVsModeDistSum.txt");
 //		pidst.close();
 //		ptst.close();
+		plrt.close();
 //		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
