@@ -48,8 +48,8 @@ public abstract class Scenario {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	public static final String output_directory = "../output/";
-	public static final String input_directory = "../input/";
+	public static String output_directory = "../../output/";
+	public static String input_directory = "../../input/";
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -65,7 +65,7 @@ public abstract class Scenario {
 	//////////////////////////////////////////////////////////////////////
 	// setup
 	//////////////////////////////////////////////////////////////////////
-
+	
 	public static final void setUpScenarioConfig() {
 		final Config config = Gbl.createConfig(null);
 
