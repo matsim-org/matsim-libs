@@ -156,6 +156,8 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	/*
 	 * Under what circumstances do we have lanes that are not integers? joh
 	 * 10may2008
+	 * in the case of pedestrian simulation. We use the information of the double lanes to
+	 * encode the (min) width of the link to calculate the flow capacity - [GL] 13may08
 	 */
 	@Override
 	public double getLanes(double time) {
@@ -171,6 +173,8 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 */
 	/*
 	 * I do not see any reason for this method! See above... joh 10may2008
+	 * this method is just for being backward compatible ... Might be we
+	 * could mark this method as deprecated [GL] - 13may2008   
 	 */
 	@Override
 	public int getLanesAsInt(double time) {
