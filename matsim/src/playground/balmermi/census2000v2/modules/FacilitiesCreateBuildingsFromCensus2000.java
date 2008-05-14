@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -74,6 +75,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 			FileReader fr = new FileReader(this.infile);
 			BufferedReader br = new BufferedReader(fr);
 			int line_cnt = 0;
+			int max_home_cap = 1;
 
 			// Skip header
 			String curr_line = br.readLine(); line_cnt++;
@@ -90,11 +92,18 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				Id f_id = new IdImpl(entries[2]);
 				CoordI coord = new Coord(entries[170],entries[171]);
 				Facility f = facilities.getFacilities().get(f_id);
-				if (f == null) { f = facilities.createFacility(f_id,coord); }
+				if (f == null) {
+					f = facilities.createFacility(f_id,coord);
+					Activity act = f.createActivity(HOME);
+					act.setCapacity(1);
+				}
 				else {
 					if ((coord.getX() != f.getCenter().getX()) || coord.getY() != f.getCenter().getY()) {
 						Gbl.errorMsg("Line "+line_cnt+": facility id="+f_id+" already exists and has another coordinate!");
 					}
+					Activity act = f.getActivity(HOME);
+					act.setCapacity(act.getCapacity()+1);
+					if (act.getCapacity()>max_home_cap) { max_home_cap = act.getCapacity(); }
 				}
 				
 				// progress report
@@ -105,25 +114,10 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 			}
 			br.close();
 			fr.close();
+			System.out.println("    "+facilities.getFacilities().size()+" home facilities with capcacities from 1 to "+max_home_cap+" created!");
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		
-//		for (Facility f : facilities.getFacilities().values()) {
-//			Iterator<Activity> act_it = f.getActivities().values().iterator();
-//			while (act_it.hasNext()) {
-//				Activity activity = act_it.next();
-//				if ((activity.getCapacity() <= 0) || (activity.getCapacity() == Integer.MAX_VALUE)) {
-//					activity.setCapacity(1);
-//					if (HOME.equals(activity.getType())) {
-//						System.out.println("      Fac id=" + f.getId() + ": home cap undefined. Setting to one.");
-//					}
-//					if (WORK.equals(activity.getType())) {
-//						System.out.println("      Fac id=" + f.getId() + ": work cap undefined. Setting to one.");
-//					}
-//				}
-//			}
-//		}
 		System.out.println("    done.");
 	}
 }

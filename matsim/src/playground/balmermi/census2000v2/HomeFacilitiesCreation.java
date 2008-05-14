@@ -56,6 +56,7 @@ public class HomeFacilitiesCreation {
 		String indir = Gbl.getConfig().facilities().getInputFile();
 		indir = indir.substring(0,indir.lastIndexOf("/"));
 		System.out.println(indir);
+//		new FacilitiesCreateBuildingsFromCensus2000(indir+"/KANT_16.tab",Gbl.getWorld().getLayer("municipality")).run(facilities);
 		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers.tab",Gbl.getWorld().getLayer("municipality")).run(facilities);
 		System.out.println("  done.");
 
