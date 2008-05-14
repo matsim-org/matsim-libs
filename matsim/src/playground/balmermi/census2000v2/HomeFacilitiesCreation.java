@@ -51,7 +51,10 @@ public class HomeFacilitiesCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running facilities module... ");
-		new FacilitiesCreateBuildingsFromCensus2000("input/KANT_16.tab",Gbl.getWorld().getLayer("municipality")).run(facilities);
+		String indir = Gbl.getConfig().facilities().getInputFile();
+		indir = indir.substring(0,indir.lastIndexOf("/"));
+		System.out.println(indir);
+		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers_tab",Gbl.getWorld().getLayer("municipality")).run(facilities);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

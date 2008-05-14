@@ -80,7 +80,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				// ZGDE  GEBAEUDE_ID  ...  XACH  YACH
 				// 1     2                 170   171
 				
-				Id zone_id = new IdImpl(entries[2]);
+				Id zone_id = new IdImpl(entries[1]);
 				Location zone = this.municipalities.getLocation(zone_id);
 				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 
