@@ -182,7 +182,9 @@ public class MentalMap {
 		this.mapActIdActivityId.put(myActId,myactivity.getFacility().getId());
 
 		// Drop (myActId,myAct)
+//		System.out.println("Removing act number: "+myActId);
 		this.actIdAct.remove(myActId);
+//		System.out.println("Adding act index "+myActId+" "+myAct);
 		this.actIdAct.put(myActId,myAct);
 		
 		setActivityScore(myactivity);
@@ -346,7 +348,6 @@ public class MentalMap {
 
 		if(myActivityId == null){
 			Gbl.errorMsg(this.knowledge.egoNet.getEgoLinks().get(0).person1.getId().toString());
-			this.knowledge.egoNet.getEgoLinks().get(0).person1.getId();
 		}
 		Facility myFacility=facilities.get(myActivityId);
 		Activity myActivity=myFacility.getActivity(myAct.getType());

@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
@@ -164,6 +165,28 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		snsetup();
 	}
 
+	public void notifyAfterMobSimEvent(final AfterMobsimEvent event){
+		
+		this.log.info("  Generating realized [Spatial] Social Acts base on current MobSim iteration...");
+		this.log.info("   Makes a map of time/place windows for all encounters between the agents");
+		this.socialPlansMap=this.gen2.generateMap(this.controler.getPopulation());
+		this.socialPlans = socialPlansMap.values();
+		this.log.info("...finished.");
+		
+		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
+		factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
+		this.log.info("... done");
+		snIter++;
+
+		if(factory!=null){
+			this.log.info("  Instantiating social network EventsToScore for scoring the plans");
+			EventsToScore scoring = new EventsToScore(this.controler.getPopulation(), factory);
+			this.controler.getEvents().addHandler(scoring);
+			this.log.info(" ... Instantiation of social network scoring done");
+		}
+		
+	}
+	
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		/* code previously in finishIteration() */
 		this.log.info("finishIteration ... "+event.getIteration());
@@ -284,17 +307,18 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 //			}
 //			this.log.info(" ... done");
 
-			this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
-			factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
-			this.log.info("... done");
-			snIter++;
+
+//			this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
+//			factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
+//			this.log.info("... done");
+//			snIter++;
 		}
-		if(factory!=null){
-			this.log.info("  Instantiating social network EventsToScore for scoring the plans");
-			EventsToScore scoring = new EventsToScore(this.controler.getPopulation(), factory);
-			this.controler.getEvents().addHandler(scoring);
-			this.log.info(" ... Instantiation of social network scoring done");
-		}
+//		if(factory!=null){
+//		this.log.info("  Instantiating social network EventsToScore for scoring the plans");
+//		EventsToScore scoring = new EventsToScore(this.controler.getPopulation(), factory);
+//		this.controler.getEvents().addHandler(scoring);
+//		this.log.info(" ... Instantiation of social network scoring done");
+//		}
 	}
 
 	/* ===================================================================
