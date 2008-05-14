@@ -176,7 +176,6 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
 		factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
 		this.log.info("... done");
-		snIter++;
 
 		if(factory!=null){
 			this.log.info("  Instantiating social network EventsToScore for scoring the plans");
@@ -311,7 +310,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 //			this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
 //			factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
 //			this.log.info("... done");
-//			snIter++;
+			snIter++;
 		}
 //		if(factory!=null){
 //		this.log.info("  Instantiating social network EventsToScore for scoring the plans");
