@@ -48,13 +48,15 @@ public class HomeFacilitiesCreation {
 		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		System.out.println("  done.");
 
+		Gbl.getWorld().complete();
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running facilities module... ");
 		String indir = Gbl.getConfig().facilities().getInputFile();
 		indir = indir.substring(0,indir.lastIndexOf("/"));
 		System.out.println(indir);
-		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers_tab",Gbl.getWorld().getLayer("municipality")).run(facilities);
+		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers.tab",Gbl.getWorld().getLayer("municipality")).run(facilities);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

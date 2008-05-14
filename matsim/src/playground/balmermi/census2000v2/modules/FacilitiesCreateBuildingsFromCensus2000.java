@@ -27,7 +27,10 @@ import java.io.IOException;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
+import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
@@ -84,6 +87,16 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				Location zone = this.municipalities.getLocation(zone_id);
 				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 
+				Id f_id = new IdImpl(entries[2]);
+				CoordI coord = new Coord(entries[170],entries[171]);
+				Facility f = facilities.getFacilities().get(f_id);
+				if (f == null) { f = facilities.createFacility(f_id,coord); }
+				else {
+					if ((coord.getX() != f.getCenter().getX()) || coord.getY() != f.getCenter().getY()) {
+						Gbl.errorMsg("Line "+line_cnt+": facility id="+f_id+" already exists and has another coordinate!");
+					}
+				}
+				
 				// progress report
 				if (line_cnt % 100000 == 0) {
 					System.out.println("    Line " + line_cnt + ": # facilities = " + facilities.getFacilities().size());
