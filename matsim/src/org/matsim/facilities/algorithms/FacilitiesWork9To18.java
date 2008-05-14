@@ -43,7 +43,7 @@ public class FacilitiesWork9To18 {
 		int hectareCnt = 0, facilityCnt = 0;
 		int skip = 1;
 		int B01S2, B01S3, B01EQTS2, B01EQTS3, jobsPerFacility;
-		Double reli; 
+		Integer reli; 
 		String X, Y;
 		Facility f;
 		Activity a;
@@ -62,17 +62,17 @@ public class FacilitiesWork9To18 {
 		System.out.println("  done.");
 
 		System.out.println("  creating facilities... ");
-		TreeMap<Double, TreeMap<String, Double>> hectareAggregation = this.myCensus.getHectareAggregation();
+		TreeMap<Integer, TreeMap<String, Double>> hectareAggregation = this.myCensus.getHectareAggregation();
 //		TreeMap<String, double[]> ecHectars = this.myCensus.getEnterpriseCensusHectareAggregation();
-		Iterator<Double> it = hectareAggregation.keySet().iterator();
+		Iterator<Integer> it = hectareAggregation.keySet().iterator();
 		while (it.hasNext()) {
 			reli = it.next();
-			B01S2 = this.myCensus.getHectareAggregationInformationFloor(reli, "B01S2");
-			B01S3 = this.myCensus.getHectareAggregationInformationFloor(reli, "B01S3");
-			B01EQTS2 = this.myCensus.getHectareAttributeRound(reli, "B01EQTS2");
-			B01EQTS3 = this.myCensus.getHectareAttributeRound(reli, "B01EQTS3");
-			X = Integer.toString(this.myCensus.getHectareAggregationInformationFloor(reli, "X"));
-			Y = Integer.toString(this.myCensus.getHectareAggregationInformationFloor(reli, "Y"));
+			B01S2 = (int) this.myCensus.getHectareAggregationInformation(reli, "B01S2");
+			B01S3 = (int) this.myCensus.getHectareAggregationInformation(reli, "B01S3");
+			B01EQTS2 = (int) Math.round(this.myCensus.getHectareAggregationInformation(reli, "B01EQTS2"));
+			B01EQTS3 = (int) Math.round(this.myCensus.getHectareAggregationInformation(reli, "B01EQTS3"));
+			X = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "X"));
+			Y = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "Y"));
 
 			for (int i=0; i<B01S2; i++) {
 				f = facilities.createFacility(Integer.toString(facilityCnt++), X, Y);

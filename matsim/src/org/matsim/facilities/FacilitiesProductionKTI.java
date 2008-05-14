@@ -59,9 +59,12 @@ public class FacilitiesProductionKTI {
 				);
 		
 		log.info("Adding and running facilities algorithms...");
+//		facilities.addAlgorithm(new FacilitiesAllActivitiesFTE(ktiYear));
+//		facilities.addAlgorithm(new FacilitiesOpentimesKTIYear1());
+//		facilities.addAlgorithm(new FacilitiesRandomizeHectareCoordinates());
 		new FacilitiesAllActivitiesFTE(ktiYear).run(facilities);
-		new FacilitiesOpentimesKTIYear1().run(facilities);
-		new FacilitiesRandomizeHectareCoordinates().run(facilities);
+//		new FacilitiesOpentimesKTIYear1().run(facilities);
+//		new FacilitiesRandomizeHectareCoordinates().run(facilities);
 		facilities.runAlgorithms();
 		log.info("Adding and running facilities algorithms...done.");
 

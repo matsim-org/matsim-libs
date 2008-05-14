@@ -11,12 +11,20 @@
 
 <config>
 	<module name="enterprisecensus">
-<!--		<param name="inputHectareAggregationFile" value="&HOMEBASE;/Desktop/BZ2001/BZ01_UNT.TXT" />-->
+<!--		<param name="inputHectareAggregationFile" value="&HOMEBASE;/Desktop/BZ2001/Sample/BZ01_UNT.TXT" />-->
 		<param name="inputHectareAggregationFile" value="&HOMEBASE;/Desktop/BZ2001/BZ01_UNT.TXT" />
 		<param name="inputHectareAggregationSeparator" value="," />
 <!--		<param name="presenceCodeFile" value="&HOMEBASE;/Desktop/BZ2001/Sample/BZ01_UNT_P_DSVIEW.TXT" />-->
 		<param name="presenceCodeFile" value="&HOMEBASE;/Desktop/BZ2001/BZ01_UNT_P_DSVIEW.TXT" />
 		<param name="presenceCodeSeparator" value=";" />
+	</module>
+	
+	<module name="facilities">
+		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/facilities_KTIYear2.xml.gz" />
+	</module>
+	
+	<module name="global">
+		<param name="randomSeed" value="4711" />
 	</module>
 </config>
 

@@ -20,12 +20,18 @@
 
 package org.matsim.facilities.algorithms;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.io.FileUtils;
 import org.matsim.enterprisecensus.EnterpriseCensus;
 import org.matsim.enterprisecensus.EnterpriseCensusParser;
 import org.matsim.facilities.Activity;
@@ -41,11 +47,37 @@ public class FacilitiesAllActivitiesFTE {
 
 	private final static String TEMPORARY_FACILITY_ID_SEPARATOR = "_";
 
+	// education
+	private static final String EDUCATION_KINDERGARTEN = "education_kindergarten";
+	private static final String EDUCATION_PRIMARY = "education_primary";
+	private static final String EDUCATION_SECONDARY = "education_secondary";
+	private static final String EDUCATION_HIGHER = "education_higher";
+	private static final String EDUCATION_OTHER = "education_other";
+
+	// shopping
+	private static final String SHOP_RETAIL_GT2500 = "shop_retail_gt2500sqm";
+	private static final String SHOP_RETAIL_GET1000 = "shop_retail_get1000sqm";
+	private static final String SHOP_RETAIL_GET400 = "shop_retail_get400sqm";
+	private static final String SHOP_RETAIL_GET100 = "shop_retail_get100sqm";
+	private static final String SHOP_RETAIL_LT100 = "shop_retail_lt100sqm";
+	private static final String SHOP_OTHER = "shop_other";
+
+	private static final String SHOP_NOGA_SECTION = "52";
+
+	// leisure
+	private static final String LEISURE_SPORTS = "leisure_sports";
+	private static final String LEISURE_CULTURE = "leisure_culture";
+	private static final String LEISURE_GASTRO = "leisure_gastro";
+	private static final String LEISURE_HOSPITALITY = "leisure_hospitality";
+
+	private static final int HOSPITALITY_NOGA_SECTION = 55;
+	private static final int CULTURE_NOGA_SECTION = 92;
+
 	private EnterpriseCensus myCensus;
 	private TreeMap<String, String> facilityActivities = new TreeMap<String, String>();
 
 	private FacilitiesProductionKTI.KTIYear ktiYear;
-	
+
 	public FacilitiesAllActivitiesFTE(KTIYear ktiYear) {
 		super();
 		this.ktiYear = ktiYear;
@@ -60,7 +92,7 @@ public class FacilitiesAllActivitiesFTE {
 	}
 
 	private void loadCensus() {
-		
+
 		log.info("Reading enterprise census files into EnterpriseCensus object...");
 		this.myCensus = new EnterpriseCensus();
 
@@ -70,14 +102,19 @@ public class FacilitiesAllActivitiesFTE {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		myCensus.printPresenceCodesReport();
 		myCensus.printHectareAggregationReport();
-		
+
 		log.info("Reading enterprise census files into EnterpriseCensus object...done.");
 	}
-	
+
 	private void createThem(Facilities facilities) {
+
+		Random random = new Random(Gbl.getConfig().global().getRandomSeed());
+
+		// see http://www.matsim.org/node/36 for the next step
+		int dontUseTheFirstDraw = random.nextInt();
 
 		this.loadFacilityActivities();
 
@@ -124,31 +161,31 @@ public class FacilitiesAllActivitiesFTE {
 		int hectareCnt = 0, facilityCnt = 0;
 		int skip = 1;
 		int numFacilities, numFTEs, numSectorFTE = Integer.MAX_VALUE, sizeRange;
-		String X, Y, attributeId, tempFacilityId, activityId;
+		String X, Y, attributeId, tempFacilityId, activityId = null;
+		HashSet<String> presenceCodeItems = null;
 		Facility f;
 		Activity a;
 
 		loadCensus();
-		
+
 		System.out.println("  creating facilities... ");
-		Set<Double> ecHectares = this.myCensus.getHectareAggregation().keySet();
-//		Set<String> ecHectares = this.myCensus.getHectareAggregationKeys();
+		Set<Integer> ecHectares = this.myCensus.getHectareAggregation().keySet();
 
 		TreeSet<String> sector2_attributeIds = this.myCensus.getHectareAttributeIdentifiersBySector(2);
 		TreeSet<String> sector3_attributeIds = this.myCensus.getHectareAttributeIdentifiersBySector(3);
 		Iterator<String> attributeIds_it = null;
 
-		for (Double reli : ecHectares) {
-			X = Integer.toString(this.myCensus.getHectareAggregationInformationFloor(reli, "X"));
-			Y = Integer.toString(this.myCensus.getHectareAggregationInformationFloor(reli, "Y"));
+		for (Integer reli : ecHectares) {
+			X = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "X"));
+			Y = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "Y"));
 
 			for (int sector = 2; sector <=3; sector++) {
 
 				if (sector == 2) {
-					numSectorFTE = this.myCensus.getHectareAggregationInformationFloor(reli, "B01EQTS2");
+					numSectorFTE = (int) Math.round(this.myCensus.getHectareAggregationInformation(reli, "B01EQTS2"));
 					attributeIds_it = sector2_attributeIds.iterator();
 				} else if (sector == 3) {
-					numSectorFTE = this.myCensus.getHectareAggregationInformationFloor(reli, "B01EQTS3");
+					numSectorFTE = (int) Math.round(this.myCensus.getHectareAggregationInformation(reli, "B01EQTS3"));
 					attributeIds_it = sector3_attributeIds.iterator();
 				}
 				if (numSectorFTE == Integer.MAX_VALUE) {
@@ -158,7 +195,7 @@ public class FacilitiesAllActivitiesFTE {
 				// create temporary facilities with minimum number of FTEs
 				while (attributeIds_it.hasNext()) {
 					attributeId = attributeIds_it.next();
-					numFacilities = this.myCensus.getHectareAggregationInformationFloor(reli, attributeId);
+					numFacilities = (int) this.myCensus.getHectareAggregationInformation(reli, attributeId);
 					// assign minimum work capacity, here number of fulltime equivalents
 					sizeRange =	Integer.parseInt(attributeId.substring(attributeId.length() - 1));
 					minFTEs = (minFTEsPerFacility.get(sizeRange)).intValue();
@@ -167,7 +204,7 @@ public class FacilitiesAllActivitiesFTE {
 					for (int i=0; i < numFacilities; i++) {
 
 						tempFacilityId = this.createTemporaryFacilityID(facilityCnt++, attributeId);
-						//System.out.println("Creating temporary " + facilityId + "...");
+//						System.out.println("Creating temporary " + tempFacilityId + "...");
 						tempFacilities.put(tempFacilityId, minFTEs);
 						numSectorFTE -= minFTEs;
 						// the number of distributed FTEs should not exceed the number of available ones
@@ -223,48 +260,69 @@ public class FacilitiesAllActivitiesFTE {
 							a = f.createActivity(activityId);
 						}
 					} else if (ktiYear.equals(KTIYear.KTI_YEAR_2008)) {
-						// na dann mach mal hier weiter
+
+						//						System.out.println("attributeId: " + attributeId);
+						// usually more than one presence code is available,
+						// or there are multiple facilities with the same presence code, clearly
+						// without marginal sums over the presence codes we cannot find out
+						// the correct code (this is intended in the presence code concept)
+						// so...let's randomly chose a presence code...
+						presenceCodeItems = myCensus.getPresenceCodeItemsPerNOGASection(reli, attributeId);
+						activityId = (String) presenceCodeItems.toArray()[random.nextInt(presenceCodeItems.size())];
+
+						// let's put the presence code in as an activity,
+						// so one can refer to it when modeling something with activities
+						a = f.createActivity(activityId);
+
+						// create the work activity, because the enterprise census is a directory of workplaces
+						// set the capacity to the number of fulltime equivalents revealed
+						a = f.createActivity("work");
+						a.setCapacity(tempFacilities.get(tempFacilityId));
+
+						// add more activities as planned for KTI Year 2008
+						if (this.facilityActivities.containsKey(activityId)) {
+							a = f.createActivity(this.facilityActivities.get(activityId));
+							// for all activity types assume the same simple thing
+							// one worker (teacher, salesman, sports facility employee) can at maximum serve 10-20 clients (pupils, costumers, trainees)
+							// so capacity depends on the number of people working somewhere
+							// this is especially opposed to using sales area as trip attraction/trip production parameter
+							// as used in established transport models
+							a.setCapacity(f.getActivity("work").getCapacity() * (10 + random.nextInt(10)));
+						}
 					}
-					
+
 				}
 
 				tempFacilities.clear();
 
 //				System.out.println(
-//						"Remaining FTEs in sector " + new Integer(sector).toString() +
-//						" of hectare " + new Integer(hectareCnt).toString() +
-//						": " + new Integer(numSectorFTE).toString());
+//				"Remaining FTEs in sector " + new Integer(sector).toString() +
+//				" of hectare " + new Integer(hectareCnt).toString() +
+//				": " + new Integer(numSectorFTE).toString());
 			}
+
 			hectareCnt++;
-			//System.out.println("\t\t\tProcessed " + hectareCnt + " hectares.");
-			if ((hectareCnt % skip) == 0) {
-				System.out.println("\t\t\tProcessed " + hectareCnt + " hectares.");
-				skip *= 2;
-			}
+//			if ((hectareCnt % skip) == 0) {
+//			log.info("Processed " + hectareCnt + " hectares.");
+//			skip *= 2;
+//			}
 		}
+		log.info("Processed " + hectareCnt + " hectares.");
 		System.out.println("  creating facilities...DONE.");
 
-//		System.out.println("  writing EnterpriseCensus object to output file... ");
-//		EnterpriseCensusWriter myCensusWriter = new EnterpriseCensusWriter();
-//		try {
-//			myCensusWriter.write(myCensus);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		System.out.println("  done.");
 	}
 
 //	private void testTemporaryFacilityIds() {
-//
-//		int number = 2000;
-//		String attrId = "krassomat";
-//		String tempFacId = this.createTemporaryFacilityID(number, attrId);
-//
-//		System.out.println(
-//				tempFacId + System.getProperty("line.separator") +
-//				this.getNumberFromTemporaryFacilityID(tempFacId) + System.getProperty("line.separator") +
-//				this.getAttributeIdFromTemporaryFacilityID(tempFacId));
-//
+
+//	int number = 2000;
+//	String attrId = "krassomat";
+//	String tempFacId = this.createTemporaryFacilityID(number, attrId);
+
+//	System.out.println(
+//	tempFacId + System.getProperty("line.separator") +
+//	this.getNumberFromTemporaryFacilityID(tempFacId) + System.getProperty("line.separator") +
+//	this.getAttributeIdFromTemporaryFacilityID(tempFacId));
+
 //	}
 
 	private String createTemporaryFacilityID(final int number, final String attributeId) {
@@ -279,7 +337,7 @@ public class FacilitiesAllActivitiesFTE {
 		return temporaryFacilityId.substring(
 				0,
 				temporaryFacilityId.indexOf(TEMPORARY_FACILITY_ID_SEPARATOR)
-				);
+		);
 
 	}
 	private String getAttributeIdFromTemporaryFacilityID(final String temporaryFacilityId) {
@@ -287,38 +345,121 @@ public class FacilitiesAllActivitiesFTE {
 		return temporaryFacilityId.substring(
 				temporaryFacilityId.indexOf(TEMPORARY_FACILITY_ID_SEPARATOR) + 1,
 				temporaryFacilityId.length()
-				);
+		);
 
 	}
 
 	private void loadFacilityActivities() {
 
-		// shop
-		// "52: Detailhandel; Reparatur von Gebrauchsgütern"
-		this.facilityActivities.put("B015201", "shop");
-		this.facilityActivities.put("B015202", "shop");
-		this.facilityActivities.put("B015203", "shop");
-		this.facilityActivities.put("B015204", "shop");
+		final String EC01_PREFIX = "B01";
 
-		// education
-		// "80: Unterrichtswesen"
-		this.facilityActivities.put("B018001", "education");
-		this.facilityActivities.put("B018002", "education");
-		this.facilityActivities.put("B018003", "education");
-		this.facilityActivities.put("B018004", "education");
+		if (this.ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 
-		// leisure
-		// "55: Gastgewerbe"
-		this.facilityActivities.put("B015501", "leisure");
-		this.facilityActivities.put("B015502", "leisure");
-		this.facilityActivities.put("B015503", "leisure");
-		this.facilityActivities.put("B015504", "leisure");
+			// shop
+			// "52: Detailhandel; Reparatur von Gebrauchsgütern"
+			this.facilityActivities.put("B015201", "shop");
+			this.facilityActivities.put("B015202", "shop");
+			this.facilityActivities.put("B015203", "shop");
+			this.facilityActivities.put("B015204", "shop");
 
-		// "92: Unterhaltung, Kultur und Sport"
-		this.facilityActivities.put("B019201", "leisure");
-		this.facilityActivities.put("B019202", "leisure");
-		this.facilityActivities.put("B019203", "leisure");
-		this.facilityActivities.put("B019204", "leisure");
+			// education
+			// "80: Unterrichtswesen"
+			this.facilityActivities.put("B018001", "education");
+			this.facilityActivities.put("B018002", "education");
+			this.facilityActivities.put("B018003", "education");
+			this.facilityActivities.put("B018004", "education");
+
+			// leisure
+			// "55: Gastgewerbe"
+			this.facilityActivities.put("B015501", "leisure");
+			this.facilityActivities.put("B015502", "leisure");
+			this.facilityActivities.put("B015503", "leisure");
+			this.facilityActivities.put("B015504", "leisure");
+
+			// "92: Unterhaltung, Kultur und Sport"
+			this.facilityActivities.put("B019201", "leisure");
+			this.facilityActivities.put("B019202", "leisure");
+			this.facilityActivities.put("B019203", "leisure");
+			this.facilityActivities.put("B019204", "leisure");
+
+		} else if (this.ktiYear.equals(KTIYear.KTI_YEAR_2008)) {
+
+			// education
+			for (String str : new String[]{"B018010A"}) {
+				this.facilityActivities.put(str, EDUCATION_KINDERGARTEN);
+			}
+
+			for (String str : new String[]{"B018010B"}) {
+				this.facilityActivities.put(str, EDUCATION_PRIMARY);
+			}
+
+			for (String str : new String[]{"B018021A", "B018021B", "B018021C", "B018022A"}) {
+				this.facilityActivities.put(str, EDUCATION_SECONDARY);
+			}
+
+			for (String str : new String[]{"B018030A", "B018030B", "B018030C", "B018030D"}) {
+				this.facilityActivities.put(str, EDUCATION_HIGHER);
+			}
+
+			for (String str : new String[]{"B018041A", "B018042A", "B018042B", "B018042C", "B018042D", "B018042E"}) {
+				this.facilityActivities.put(str, EDUCATION_OTHER);
+			}
+
+			// shopping
+			for (String str : new String[]{"11A"}) {
+				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_RETAIL_GT2500);
+			}
+
+			for (String str : new String[]{"11B"}) {
+				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_RETAIL_GET1000);
+			}
+
+			for (String str : new String[]{"11C"}) {
+				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_RETAIL_GET400);
+			}
+
+			for (String str : new String[]{"11D"}) {
+				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_RETAIL_GET100);
+			}
+
+			for (String str : new String[]{"11E"}) {
+				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_RETAIL_LT100);
+			}
+
+			for (String str : new String[]{
+					"12A","12B",
+					"21A","22A","23A","24A","25A","26A","27A","27B",
+					"31A","32A","33A","33B",
+					"41A","42A","42B","42C","42D","42E","43A","43B","44A","44B","44C","45A","45B","45C","45D","45E","46A","46B","47A","47B","47C","48A","48B","48C","48D","48E","48F","48G","48H","48I","48J","48K","48L","48M","48N","48O","48P",
+					"50A","50B",
+					"61A","62A","63A",
+					"71A","72A","73A","74A"}) {
+				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_OTHER);
+			}
+
+			// leisure
+			for (String str : new String[]{"30A", "40A", "51A", "52A"}) {
+				this.facilityActivities.put(EC01_PREFIX + HOSPITALITY_NOGA_SECTION + str, LEISURE_GASTRO);
+			}
+
+			for (String str : new String[]{"11A","12A","21A","22A","23A","23B","23C"}) {
+				this.facilityActivities.put(EC01_PREFIX + HOSPITALITY_NOGA_SECTION + str, LEISURE_HOSPITALITY);
+			}
+
+			for (String str : new String[]{"B019261A", "B019262A", "B019262B"}) {
+				this.facilityActivities.put(str, LEISURE_SPORTS);
+			}
+
+			for (String str : new String[]{
+					"11A","12A","13A",
+					"20A","20B",
+					"31A","31B","31C","31D","32A","32B","33A","34A","34B","34C","34D",
+					"40A","40B",
+					"51A","52A","53A"}) {
+				this.facilityActivities.put(EC01_PREFIX + CULTURE_NOGA_SECTION + str, LEISURE_CULTURE);
+			}
+		}
 
 	}
+
 }
