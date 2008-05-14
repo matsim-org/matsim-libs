@@ -23,7 +23,7 @@
 
 <!ELEMENT activity   (capacity?,opentime*)>
 <!ATTLIST activity
-          type       (home|work|education|shop|leisure) #REQUIRED>
+          type       CDATA #REQUIRED>
 
 <!ELEMENT capacity   EMPTY>
 <!ATTLIST capacity
