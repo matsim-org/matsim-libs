@@ -22,7 +22,6 @@ package org.matsim.enterprisecensus;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -36,21 +35,23 @@ public class EnterpriseCensusParser {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+//	public static final int FIRST_DATA_COL_INDEX = 3;
+	
 	private static Logger log = Logger.getLogger(EnterpriseCensusParser.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public EnterpriseCensusParser(EnterpriseCensus enterpriseCensus) {
+	public EnterpriseCensusParser(EnterpriseCensus ec) {
 	}
 
-	public void parse(EnterpriseCensus enterpriseCensus) {
-		this.readPresenceCodes(enterpriseCensus);
-		this.readHectareAggregations(enterpriseCensus);
+	public void parse(EnterpriseCensus ec) {
+		this.readPresenceCodes(ec);
+		this.readHectareAggregations(ec);
 	}
 
-	private final void readPresenceCodes(EnterpriseCensus enterpriseCensus) {
+	private final void readPresenceCodes(EnterpriseCensus ec) {
 
 		log.info("Reading the presence code file...");
 
@@ -66,7 +67,6 @@ public class EnterpriseCensusParser {
 		String line = null;
 		String[] tokens = null;
 		String reli = null;
-		TreeMap<Integer, String> presenceCodesNOGATypes = new TreeMap<Integer, String>();
 
 		try {
 			it = FileUtils.lineIterator(file, "UTF-8");
@@ -81,16 +81,18 @@ public class EnterpriseCensusParser {
 
 				if (lineCounter == 0) {
 					log.info("Processing header line...");
-					for (int pos = 3; pos < tokens.length; pos++) {
-						presenceCodesNOGATypes.put(new Integer(pos), EnterpriseCensus.trim(tokens[pos], '"'));
+					for (String token : tokens) {
+						ec.addPresenceCodeNOGAType(token.replaceAll("\"", ""));
 					}
 					log.info("Processing header line...done.");
 				} else {
 
 					reli = tokens[0];
-					for (int pos = 3; pos < tokens.length; pos++) {
+					for (int pos = 0; pos < tokens.length; pos++) {
 						if (Pattern.matches("1", tokens[pos])) {
-							enterpriseCensus.addPresenceCode(reli, presenceCodesNOGATypes.get(new Integer(pos)));
+							ec.addPresenceCode(
+									reli,
+									ec.getPresenceCodeNOGAType(pos));
 						}
 					}					
 				}
@@ -111,7 +113,7 @@ public class EnterpriseCensusParser {
 
 	}
 
-	private final void readHectareAggregations(EnterpriseCensus enterpriseCensus) {
+	private final void readHectareAggregations(EnterpriseCensus ec) {
 
 		log.info("Reading the hectare aggregation file...");
 
@@ -124,7 +126,6 @@ public class EnterpriseCensusParser {
 		String[] tokens = null;
 		String reli = null;
 		int lineCounter = 0, skip = 1;
-		TreeMap<Integer, String> hectareAggregationsNOGATypes = new TreeMap<Integer, String>();
 
 		try {
 			it = FileUtils.lineIterator(file, "UTF-8");
@@ -139,18 +140,18 @@ public class EnterpriseCensusParser {
 
 				if (lineCounter == 0) {
 					log.info("Processing header line...");
-					for (int pos = 3; pos < tokens.length; pos++) {
-						hectareAggregationsNOGATypes.put(new Integer(pos), EnterpriseCensus.trim(tokens[pos], '"'));
+					for (String token : tokens) {
+						ec.addhectareAggregationNOGAType(token.replaceAll("\"", ""));
 					}
 					log.info("Processing header line...done.");
 				} else {
 
 					reli = tokens[0];
-					for (int pos = 3; pos < tokens.length; pos++) {
+					for (int pos = 0; pos < tokens.length; pos++) {
 						if (!Pattern.matches("0", tokens[pos])) {
-							enterpriseCensus.addHectareAggregationInformation(
-									reli, 
-									hectareAggregationsNOGATypes.get(new Integer(pos)),
+							ec.addHectareAggregationInformation(
+									reli,
+									ec.getHectareAggregationNOGAType(pos),
 									Double.parseDouble(tokens[pos]));
 						}
 					}					

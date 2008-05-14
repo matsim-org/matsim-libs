@@ -22,10 +22,10 @@ package org.matsim.enterprisecensus;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
@@ -47,20 +47,8 @@ public class EnterpriseCensus {
 	public static final String EC_PRESENCECODESEPARATOR = "presenceCodeSeparator";
 	public static final String EC_INPUTHECTAREAGGREGATIONFILE = "inputHectareAggregationFile";
 	public static final String EC_INPUTHECTAREAGGREGATIONSEPARATOR = "inputHectareAggregationSeparator";
-	public static final String EC_OUTPUTHECTAREAGGREGATIONFILE = "outputHectareAggregationFile";
-	public static final String EC_OUTPUTHECTAREAGGREGATIONSEPARATOR = "outputHectareAggregationSeparator";
-	public static final String EC_OUTPUTDIRFACILITIES = "outputDirFacilities";
-	public static final String EC_OUTPUTDIRJOBS = "outputDirJobs";
-	public static final String EC_OUTPUTSUBDIRCOLUMN = "outputSubdirColumn";
-	public static final String EC_OUTPUTSUBDIRROW = "outputSubdirRow";
-	public static final String EC_OUTPUTSUBDIRMATRIX = "outputSubdirMatrix";
-	public static final String EC_OUTPUTDIRPRESENTHECTARES = "outputDirPresentHectares";
-	public static final String EC_OUTPUTDIRPRESENTFACILITYTYPES = "outputDirPresentFacilityTypes";
-	public static final String EC_FIRSTELEMENTINDEX = "firstElementIndex";
 
-	private static int numHectareAggregationFileAttributes;
-
-	private TreeMap<Double, TreeMap<String, Double>> hectareAggregation = new TreeMap<Double, TreeMap<String, Double>>();
+	private TreeMap<Integer, TreeMap<String, Double>> hectareAggregation = new TreeMap<Integer, TreeMap<String, Double>>();
 
 	/**
 	 * Maps a RELI coordinate to one or more NOGA types for all presence codes == "1"
@@ -68,9 +56,10 @@ public class EnterpriseCensus {
 	 * 48661119 -> {B011310A}
 	 * 48661120 -> {B011310B, B012300A}
 	 */
-	private TreeMap<Double, HashSet<String>> presenceCodes = new TreeMap<Double, HashSet<String>>();
-	
-	private ArrayList<String> hectareAttributeIdentifiers = new ArrayList<String>();
+	private TreeMap<Integer, HashSet<String>> presenceCodes = new TreeMap<Integer, HashSet<String>>();
+
+	private ArrayList<String> hectareAggregationItems = new ArrayList<String>();
+	private ArrayList<String> presenceCodeNOGATypes = new ArrayList<String>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -79,17 +68,17 @@ public class EnterpriseCensus {
 	public EnterpriseCensus() {
 		this.hectareAggregation.clear();
 		this.presenceCodes.clear();
-		this.hectareAttributeIdentifiers.clear();
+		this.hectareAggregationItems.clear();
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// add/set methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final ArrayList<String> getHectareAttributeIdentifiers() {
-		return this.hectareAttributeIdentifiers;
+	public final String getHectareAggregationNOGAType(int pos) {
+		return this.hectareAggregationItems.get(pos);
 	}
-
+	
 	public final TreeSet<String> getHectareAttributeIdentifiersBySector(final int sector) {
 
 		TreeSet<String> attributeIds = new TreeSet<String>();
@@ -106,138 +95,57 @@ public class EnterpriseCensus {
 		}
 
 		for (int i = first; i <= last; i++) {
-			attributeIds.add(this.hectareAttributeIdentifiers.get(i));
+			attributeIds.add(this.hectareAggregationItems.get(i));
 		}
 
 		return attributeIds;
 	}
 
-	public final void processHectareAggregationHeaderLine(final String headerLine) {
-
-		String separator = Gbl.getConfig().getParam(EC_MODULE, EC_INPUTHECTAREAGGREGATIONSEPARATOR);
-		String[] aCSVLine = headerLine.split(separator);
-		String str;
-
-		numHectareAggregationFileAttributes = aCSVLine.length;
-		for (int ii=0; ii < aCSVLine.length; ii++) {
-			str = aCSVLine[ii];
-			str = trim(str, '\"');
-			this.hectareAttributeIdentifiers.add(str);
-		}
-
+	public void addhectareAggregationNOGAType(String type) {
+		this.hectareAggregationItems.add(type);
 	}
-
-	public final String getHectareAggregationHeaderLine() {
-
-		String separator = Gbl.getConfig().getParam(EC_MODULE, EC_OUTPUTHECTAREAGGREGATIONSEPARATOR);
-		String headerLine = "";
-
-		Iterator<String> it = this.hectareAttributeIdentifiers.iterator();
-		while (it.hasNext()) {
-			headerLine = headerLine.concat(this.quote(it.next(), '\"'));
-			headerLine = headerLine.concat(separator);
-		}
-		// take away the last separator
-		headerLine = headerLine.substring(0, headerLine.length() - 1);
-		// append a newline
-		headerLine = headerLine.concat("\r\n");
-
-		return headerLine;
-	}
-
+	
 	public final void addHectareAggregationInformation(String reli, String noga, double value) {
 		
-		Double reliDouble = Double.valueOf(reli);
+		int reliInt = Integer.parseInt(reli);
 		
 		TreeMap<String, Double> entries = null;
 		
-		if (this.hectareAggregation.containsKey(reliDouble)) {
-			entries = this.hectareAggregation.get(reliDouble);
+		if (this.hectareAggregation.containsKey(reliInt)) {
+			entries = this.hectareAggregation.get(reliInt);
 			entries.put(noga, new Double(value));
 		} else {
 			entries = new TreeMap<String, Double>();
 			entries.put(noga, new Double(value));
-			this.hectareAggregation.put(reliDouble, entries);
+			this.hectareAggregation.put(reliInt, entries);
 		}
 		
 	}
 	
-//	public final void addHectareAggregationLine(final String line) {
-//
-//		String separator = Gbl.getConfig().getParam(EC_MODULE, EC_INPUTHECTAREAGGREGATIONSEPARATOR);
-//		String[] aCSVLine = line.split(separator);
-//
-//		if (aCSVLine.length != numHectareAggregationFileAttributes) {
-//			Gbl.errorMsg("Wrong number of attributes.");
-//		}
-//
-//		//Coord lowerLeftCorner = new Coord(aCSVLine[1], aCSVLine[2]);
-//		String RELI = aCSVLine[0];
-//
-//		double[] hectareData = new double[numHectareAggregationFileAttributes];
-//
-//		for (int i=0; i < numHectareAggregationFileAttributes; i++) {
-//			hectareData[i] = Double.parseDouble(aCSVLine[i]);
-//		}
-//
-//		this.hectareAggregation.put(RELI, hectareData);
-//	}
-
-//	public final HashMap getEnterpriseCensusHectareAggregation() {
-//	return enterpriseCensusHectareAggregation;
-//	}
-
-	public final Set<Double> getHectareAggregationKeys() {
+	public final Set<Integer> getHectareAggregationKeys() {
 		return this.hectareAggregation.keySet();
 	}
 
-//	public final TreeMap<String, double[]> getEnterpriseCensusHectareAggregation() {
-//		return this.hectareAggregation;
-//	}
-
-//	public final String getHectareAggregationLine(String reli) {
-//
-//		String separator = Gbl.getConfig().getParam(EC_MODULE, EC_OUTPUTHECTAREAGGREGATIONSEPARATOR);
-//		String line = "";
-//
-//		//double[] hectareData = (double[]) enterpriseCensusHectareAggregation.get(coord);
-//		double[] hectareData = this.hectareAggregation.get(reli);
-//		double storedDoubleValue;
-//		int intValue;
-//
-//		for (int i=0; i < numHectareAggregationFileAttributes; i++) {
-//
-//			storedDoubleValue = hectareData[i];
-//			intValue = (int) storedDoubleValue;
-//
-//			if (Double.compare(storedDoubleValue, intValue) != 0) {
-//				line = line.concat(Double.toString(storedDoubleValue));
-//			} else {
-//				line = line.concat(Integer.toString(intValue));
-//			}
-//			line = line.concat(separator);
-//		}
-//		// take away the last separator
-//		line = line.substring(0, line.length() - 1);
-//		// append Windows line feed, because original file is given in this format
-//		line = line.concat("\r\n");
-//
-//		return line;
-//
-//	}
-
+	public final void addPresenceCodeNOGAType(String type) {
+		this.presenceCodeNOGATypes.add(type);
+	}
+	
+	public final String getPresenceCodeNOGAType(int pos) {
+		return this.presenceCodeNOGATypes.get(pos);
+	}
+	
 	public final void addPresenceCode(String reli, String noga) {
 
-		Double reliDouble = Double.valueOf(reli);
+		int reliInt = Integer.parseInt(reli);
 		
 		HashSet<String> nogasInReli = null;
 
-		if (this.presenceCodes.containsKey(reliDouble)) {
-			this.presenceCodes.get(reliDouble).add(noga);
+		if (this.presenceCodes.containsKey(reliInt)) {
+			this.presenceCodes.get(reliInt).add(noga);
 		} else {
 			nogasInReli = new HashSet<String>();
 			nogasInReli.add(noga);
-			this.presenceCodes.put(reliDouble, nogasInReli);
+			this.presenceCodes.put(reliInt, nogasInReli);
 		}
 
 	}
@@ -246,54 +154,50 @@ public class EnterpriseCensus {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final int getHectareAggregationInformationFloor(final Double reli, final String noga) {
-		return (int) (this.hectareAggregation.get(reli).get(noga).doubleValue());
-	}
-
-	public final int getHectareAttributeRound(final Double reli, final String noga) {
-		return (int) Math.round(this.hectareAggregation.get(reli).get(noga).doubleValue());
-	}
-
-	public final double getHectareAttributeDouble(final Double reli, final String noga) {
-		return this.hectareAggregation.get(reli).get(noga).doubleValue();
-	}
-
-	public final String getMNKey(final String municipality_id, final String nogaCodeString) {
-		String strKey = nogaCodeString.concat(municipality_id);
-		return strKey;
+	public final double getHectareAggregationInformation(final Integer reli, final String noga) {
+		
+		double value = 0.0;
+		
+		if (this.hectareAggregation.containsKey(reli)) {
+			if (this.hectareAggregation.get(reli).containsKey(noga)) {
+				value = this.hectareAggregation.get(reli).get(noga).doubleValue();
+			}
+		}
+		
+		return value;
 	}
 
 	public final int getHectareAttributeIdentifierIndex(final String identifier) {
-		return this.hectareAttributeIdentifiers.indexOf(identifier);
+		return this.hectareAggregationItems.indexOf(identifier);
 	}
 
-	public static String trim(final String string, final char mark) {
-
-		String str = string;
-		int index = str.indexOf(mark);
-
-		while (index > -1)
-		{
-			str = str.substring(0, index) + str.substring(index + 1);
-			index = str.indexOf(mark);
-		}
-
-		return str;
-	}
-
-	private String quote(final String string, final char mark) {
-
-		String markString = new String(new char[]{mark});
-		return markString.concat(string).concat(markString);
-
-	}
-
-	public TreeMap<Double, HashSet<String>> getPresenceCodes() {
+	public TreeMap<Integer, HashSet<String>> getPresenceCodes() {
 		return presenceCodes;
 	}
 
-	public TreeMap<Double, TreeMap<String, Double>> getHectareAggregation() {
+	public TreeMap<Integer, TreeMap<String, Double>> getHectareAggregation() {
 		return hectareAggregation;
+	}
+	
+	public final HashSet<String> getPresenceCodeItemsPerNOGASection(final Integer reli, final String noga) {
+		
+		HashSet<String> presenceCodeItems = null;
+		
+		String nogaSection = noga.substring(0, 5);
+
+		if (this.presenceCodes.containsKey(reli)) {
+			if (presenceCodeItems == null) {
+				presenceCodeItems = new HashSet<String>();
+			}
+			for (String presenceCodeItem : this.presenceCodes.get(reli)) {
+				if (Pattern.matches(nogaSection + ".*", presenceCodeItem)) {
+					presenceCodeItems.add(presenceCodeItem);
+				}
+			}
+		}
+		
+		return presenceCodeItems;
+		
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -303,11 +207,11 @@ public class EnterpriseCensus {
 	public void printHectareAggregationReport() {
 		
 		int numEntries = 0;
-		for (Double reli : this.hectareAggregation.keySet()) {
-//			for (String noga : this.hectareAggregation.get(reli).keySet()) {
+		for (Integer reli : this.hectareAggregation.keySet()) {
+			for (String noga : this.hectareAggregation.get(reli).keySet()) {
 //				System.out.println(reli + ":" + noga + " -> " + this.hectareAggregation.get(reli).get(noga).toString());
-//			}
-			numEntries += this.hectareAggregation.get(reli).size();
+				numEntries++;
+			}
 		}		
 
 		log.info("Number of hectare aggregation entries: " + numEntries);
@@ -318,11 +222,11 @@ public class EnterpriseCensus {
 		
 		int numPresenceCodes = 0;
 		
-		for (Double reli : this.presenceCodes.keySet()) {
-//			for (String noga : this.presenceCodes.get(reli)) {
+		for (Integer reli : this.presenceCodes.keySet()) {
+			for (String noga : this.presenceCodes.get(reli)) {
 //				System.out.println(reli + " -> " + noga);
-//			}
-			numPresenceCodes += this.presenceCodes.get(reli).size();
+				numPresenceCodes++;
+			}
 		}
 		
 		log.info("Number of presence code entries: " + numPresenceCodes);
