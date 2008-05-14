@@ -353,6 +353,10 @@ public class MentalMap {
 
 		return myActivity;
 	}
+	
+	public Hashtable<Integer,Act> getActIdAct(){
+		return this.actIdAct;
+	}
 
 	public void addDate(SocialAct date){
 		this.socializingOpportunities.add(date);

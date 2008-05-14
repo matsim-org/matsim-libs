@@ -22,6 +22,7 @@ package playground.jhackney.scoring;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -337,6 +338,12 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 			Activity myActivity=p1.getKnowledge().map.getActivity(act);
 
 			if(socialPlansMap.get(myActivity)== null){
+				System.out.println(myActivity.getFacility().getLink());
+				Hashtable<Integer,Act> myActs= p1.getKnowledge().map.getActIdAct();
+				for (int iii = 0; iii<myActs.size();iii++){
+					System.out.println(iii+" "+myActs.get(iii));					
+				}
+
 				Gbl.errorMsg("BUG");
 			}
 			Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
