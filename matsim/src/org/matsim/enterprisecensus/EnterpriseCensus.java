@@ -48,6 +48,45 @@ public class EnterpriseCensus {
 	public static final String EC_INPUTHECTAREAGGREGATIONFILE = "inputHectareAggregationFile";
 	public static final String EC_INPUTHECTAREAGGREGATIONSEPARATOR = "inputHectareAggregationSeparator";
 
+	// some things from the dataset
+	public static final String EC01_PREFIX = "B01";
+
+	public static final int SHOP_NOGA_SECTION = 52;
+	public static final int HOSPITALITY_NOGA_SECTION = 55;
+	public static final int CULTURE_NOGA_SECTION = 92;
+	
+	public enum ProductionSector {
+		
+		SECTOR2("B011001", "B014504", "B01EQTS2"),
+		SECTOR3("B015001", "B019304", "B01EQTS3");
+
+		private final String first;
+		private final String last;
+		/**
+		 * Item containing the full time equivalent
+		 */
+		private final String fteItem;
+		
+		private ProductionSector(String first, String last, String item) {
+			this.first = first;
+			this.last = last;
+			this.fteItem = item;
+		}
+
+		public String getFirst() {
+			return first;
+		}
+
+		public String getLast() {
+			return last;
+		}
+
+		public String getFteItem() {
+			return fteItem;
+		}
+		
+}
+	
 	private TreeMap<Integer, TreeMap<String, Double>> hectareAggregation = new TreeMap<Integer, TreeMap<String, Double>>();
 
 	/**
@@ -79,17 +118,17 @@ public class EnterpriseCensus {
 		return this.hectareAggregationItems.get(pos);
 	}
 	
-	public final TreeSet<String> getHectareAttributeIdentifiersBySector(final int sector) {
+	public final TreeSet<String> getHectareAttributeIdentifiersBySector(final ProductionSector sector) {
 
 		TreeSet<String> attributeIds = new TreeSet<String>();
 		int first = 0, last = 0;
-
-		if (sector == 2) {
-			first = this.getHectareAttributeIdentifierIndex("B011001");
-			last = this.getHectareAttributeIdentifierIndex("B014504");
-		} else if (sector == 3) {
-			first = this.getHectareAttributeIdentifierIndex("B015001");
-			last = this.getHectareAttributeIdentifierIndex("B019304");
+		
+		if (sector.equals(ProductionSector.SECTOR2)) {
+			first = this.getHectareAttributeIdentifierIndex(ProductionSector.SECTOR2.getFirst());
+			last = this.getHectareAttributeIdentifierIndex(ProductionSector.SECTOR2.getLast());
+		} else if (sector.equals(ProductionSector.SECTOR3)) {
+			first = this.getHectareAttributeIdentifierIndex(ProductionSector.SECTOR3.getFirst());
+			last = this.getHectareAttributeIdentifierIndex(ProductionSector.SECTOR3.getLast());
 		} else {
 			Gbl.errorMsg("Invalid economy sector id.");
 		}

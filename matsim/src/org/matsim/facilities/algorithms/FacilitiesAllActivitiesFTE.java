@@ -20,20 +20,17 @@
 
 package org.matsim.facilities.algorithms;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.apache.commons.io.FileUtils;
 import org.matsim.enterprisecensus.EnterpriseCensus;
 import org.matsim.enterprisecensus.EnterpriseCensusParser;
+import org.matsim.enterprisecensus.EnterpriseCensus.ProductionSector;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesProductionKTI;
@@ -46,32 +43,6 @@ public class FacilitiesAllActivitiesFTE {
 	private static Logger log = Logger.getLogger(FacilitiesAllActivitiesFTE.class);
 
 	private final static String TEMPORARY_FACILITY_ID_SEPARATOR = "_";
-
-	// education
-	private static final String EDUCATION_KINDERGARTEN = "education_kindergarten";
-	private static final String EDUCATION_PRIMARY = "education_primary";
-	private static final String EDUCATION_SECONDARY = "education_secondary";
-	private static final String EDUCATION_HIGHER = "education_higher";
-	private static final String EDUCATION_OTHER = "education_other";
-
-	// shopping
-	private static final String SHOP_RETAIL_GT2500 = "shop_retail_gt2500sqm";
-	private static final String SHOP_RETAIL_GET1000 = "shop_retail_get1000sqm";
-	private static final String SHOP_RETAIL_GET400 = "shop_retail_get400sqm";
-	private static final String SHOP_RETAIL_GET100 = "shop_retail_get100sqm";
-	private static final String SHOP_RETAIL_LT100 = "shop_retail_lt100sqm";
-	private static final String SHOP_OTHER = "shop_other";
-
-	private static final String SHOP_NOGA_SECTION = "52";
-
-	// leisure
-	private static final String LEISURE_SPORTS = "leisure_sports";
-	private static final String LEISURE_CULTURE = "leisure_culture";
-	private static final String LEISURE_GASTRO = "leisure_gastro";
-	private static final String LEISURE_HOSPITALITY = "leisure_hospitality";
-
-	private static final int HOSPITALITY_NOGA_SECTION = 55;
-	private static final int CULTURE_NOGA_SECTION = 92;
 
 	private EnterpriseCensus myCensus;
 	private TreeMap<String, String> facilityActivities = new TreeMap<String, String>();
@@ -171,23 +142,17 @@ public class FacilitiesAllActivitiesFTE {
 		System.out.println("  creating facilities... ");
 		Set<Integer> ecHectares = this.myCensus.getHectareAggregation().keySet();
 
-		TreeSet<String> sector2_attributeIds = this.myCensus.getHectareAttributeIdentifiersBySector(2);
-		TreeSet<String> sector3_attributeIds = this.myCensus.getHectareAttributeIdentifiersBySector(3);
 		Iterator<String> attributeIds_it = null;
 
 		for (Integer reli : ecHectares) {
 			X = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "X"));
 			Y = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "Y"));
 
-			for (int sector = 2; sector <=3; sector++) {
+			for (ProductionSector sector : ProductionSector.values()) {
 
-				if (sector == 2) {
-					numSectorFTE = (int) Math.round(this.myCensus.getHectareAggregationInformation(reli, "B01EQTS2"));
-					attributeIds_it = sector2_attributeIds.iterator();
-				} else if (sector == 3) {
-					numSectorFTE = (int) Math.round(this.myCensus.getHectareAggregationInformation(reli, "B01EQTS3"));
-					attributeIds_it = sector3_attributeIds.iterator();
-				}
+				numSectorFTE = (int) Math.round(this.myCensus.getHectareAggregationInformation(reli, sector.getFteItem()));
+				attributeIds_it = this.myCensus.getHectareAttributeIdentifiersBySector(sector).iterator();
+					
 				if (numSectorFTE == Integer.MAX_VALUE) {
 					Gbl.errorMsg("numFTE was not correctly set.");
 				}
@@ -276,7 +241,11 @@ public class FacilitiesAllActivitiesFTE {
 
 						// create the work activity, because the enterprise census is a directory of workplaces
 						// set the capacity to the number of fulltime equivalents revealed
-						a = f.createActivity("work");
+						if (sector.equals(ProductionSector.SECTOR2)) {
+							a = f.createActivity(FacilitiesProductionKTI.WORK_SECTOR2);
+						} else if(sector.equals(ProductionSector.SECTOR3)) {
+							a = f.createActivity(FacilitiesProductionKTI.WORK_SECTOR3);
+						}
 						a.setCapacity(tempFacilities.get(tempFacilityId));
 
 						// add more activities as planned for KTI Year 2008
@@ -287,7 +256,7 @@ public class FacilitiesAllActivitiesFTE {
 							// so capacity depends on the number of people working somewhere
 							// this is especially opposed to using sales area as trip attraction/trip production parameter
 							// as used in established transport models
-							a.setCapacity(f.getActivity("work").getCapacity() * (10 + random.nextInt(10)));
+							a.setCapacity(tempFacilities.get(tempFacilityId) * (10 + random.nextInt(10)));
 						}
 					}
 
@@ -308,7 +277,7 @@ public class FacilitiesAllActivitiesFTE {
 //			}
 		}
 		log.info("Processed " + hectareCnt + " hectares.");
-		System.out.println("  creating facilities...DONE.");
+		log.info("creating facilities...DONE.");
 
 	}
 
@@ -351,8 +320,6 @@ public class FacilitiesAllActivitiesFTE {
 
 	private void loadFacilityActivities() {
 
-		final String EC01_PREFIX = "B01";
-
 		if (this.ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 
 			// shop
@@ -386,44 +353,74 @@ public class FacilitiesAllActivitiesFTE {
 
 			// education
 			for (String str : new String[]{"B018010A"}) {
-				this.facilityActivities.put(str, EDUCATION_KINDERGARTEN);
+				this.facilityActivities.put(
+						str, 
+						FacilitiesProductionKTI.EDUCATION_KINDERGARTEN);
 			}
 
 			for (String str : new String[]{"B018010B"}) {
-				this.facilityActivities.put(str, EDUCATION_PRIMARY);
+				this.facilityActivities.put(
+						str, 
+						FacilitiesProductionKTI.EDUCATION_PRIMARY);
 			}
 
 			for (String str : new String[]{"B018021A", "B018021B", "B018021C", "B018022A"}) {
-				this.facilityActivities.put(str, EDUCATION_SECONDARY);
+				this.facilityActivities.put(
+						str, 
+						FacilitiesProductionKTI.EDUCATION_SECONDARY);
 			}
 
 			for (String str : new String[]{"B018030A", "B018030B", "B018030C", "B018030D"}) {
-				this.facilityActivities.put(str, EDUCATION_HIGHER);
+				this.facilityActivities.put(
+						str, 
+						FacilitiesProductionKTI.EDUCATION_HIGHER);
 			}
 
 			for (String str : new String[]{"B018041A", "B018042A", "B018042B", "B018042C", "B018042D", "B018042E"}) {
-				this.facilityActivities.put(str, EDUCATION_OTHER);
+				this.facilityActivities.put(
+						str, 
+						FacilitiesProductionKTI.EDUCATION_OTHER);
 			}
 
 			// shopping
 			for (String str : new String[]{"11A"}) {
-				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_RETAIL_GT2500);
+				this.facilityActivities.put(
+						EnterpriseCensus.EC01_PREFIX + 
+						EnterpriseCensus.SHOP_NOGA_SECTION + 
+						str, 
+						FacilitiesProductionKTI.SHOP_RETAIL_GT2500);
 			}
 
 			for (String str : new String[]{"11B"}) {
-				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_RETAIL_GET1000);
+				this.facilityActivities.put(
+						EnterpriseCensus.EC01_PREFIX + 
+						EnterpriseCensus.SHOP_NOGA_SECTION + 
+						str, 
+						FacilitiesProductionKTI.SHOP_RETAIL_GET1000);
 			}
 
 			for (String str : new String[]{"11C"}) {
-				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_RETAIL_GET400);
+				this.facilityActivities.put(
+						EnterpriseCensus.EC01_PREFIX + 
+						EnterpriseCensus.SHOP_NOGA_SECTION + 
+						str, 
+						FacilitiesProductionKTI.SHOP_RETAIL_GET400);
 			}
 
 			for (String str : new String[]{"11D"}) {
-				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_RETAIL_GET100);
+				this.facilityActivities.put(
+						EnterpriseCensus.EC01_PREFIX + 
+						EnterpriseCensus.SHOP_NOGA_SECTION + 
+						str, 
+						FacilitiesProductionKTI.SHOP_RETAIL_GET100);
 			}
 
 			for (String str : new String[]{"11E"}) {
-				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_RETAIL_LT100);
+				this.facilityActivities.put(
+						EnterpriseCensus.EC01_PREFIX + 
+						EnterpriseCensus.SHOP_NOGA_SECTION + 
+						str, 
+						FacilitiesProductionKTI.SHOP_RETAIL_LT100);
 			}
 
 			for (String str : new String[]{
@@ -434,20 +431,34 @@ public class FacilitiesAllActivitiesFTE {
 					"50A","50B",
 					"61A","62A","63A",
 					"71A","72A","73A","74A"}) {
-				this.facilityActivities.put(EC01_PREFIX + SHOP_NOGA_SECTION + str, SHOP_OTHER);
+				this.facilityActivities.put(
+						EnterpriseCensus.EC01_PREFIX + 
+						EnterpriseCensus.SHOP_NOGA_SECTION + 
+						str, 
+						FacilitiesProductionKTI.SHOP_OTHER);
 			}
 
 			// leisure
 			for (String str : new String[]{"30A", "40A", "51A", "52A"}) {
-				this.facilityActivities.put(EC01_PREFIX + HOSPITALITY_NOGA_SECTION + str, LEISURE_GASTRO);
+				this.facilityActivities.put(
+						EnterpriseCensus.EC01_PREFIX + 
+						EnterpriseCensus.HOSPITALITY_NOGA_SECTION + 
+						str, 
+						FacilitiesProductionKTI.LEISURE_GASTRO);
 			}
 
 			for (String str : new String[]{"11A","12A","21A","22A","23A","23B","23C"}) {
-				this.facilityActivities.put(EC01_PREFIX + HOSPITALITY_NOGA_SECTION + str, LEISURE_HOSPITALITY);
+				this.facilityActivities.put(
+						EnterpriseCensus.EC01_PREFIX +
+						EnterpriseCensus.HOSPITALITY_NOGA_SECTION + 
+						str, 
+						FacilitiesProductionKTI.LEISURE_HOSPITALITY);
 			}
 
 			for (String str : new String[]{"B019261A", "B019262A", "B019262B"}) {
-				this.facilityActivities.put(str, LEISURE_SPORTS);
+				this.facilityActivities.put(
+						str, 
+						FacilitiesProductionKTI.LEISURE_SPORTS);
 			}
 
 			for (String str : new String[]{
@@ -456,7 +467,11 @@ public class FacilitiesAllActivitiesFTE {
 					"31A","31B","31C","31D","32A","32B","33A","34A","34B","34C","34D",
 					"40A","40B",
 					"51A","52A","53A"}) {
-				this.facilityActivities.put(EC01_PREFIX + CULTURE_NOGA_SECTION + str, LEISURE_CULTURE);
+				this.facilityActivities.put(
+						EnterpriseCensus.EC01_PREFIX + 
+						EnterpriseCensus.CULTURE_NOGA_SECTION + 
+						str, 
+						FacilitiesProductionKTI.LEISURE_CULTURE);
 			}
 		}
 

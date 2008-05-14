@@ -37,7 +37,38 @@ import org.matsim.gbl.Gbl;
 public class FacilitiesProductionKTI {
 
 	public enum KTIYear {KTI_YEAR_2007, KTI_YEAR_2008}
-	
+
+	// work
+	public static final String ACT_TYPE_WORK = "work";
+	public static final String WORK_SECTOR2 = "work_sector2";
+	public static final String WORK_SECTOR3 = "work_sector3";
+
+	// education
+	public static final String ACT_TYPE_EDUCATION = "education";
+
+	public static final String EDUCATION_KINDERGARTEN = ACT_TYPE_EDUCATION + "_kindergarten";
+	public static final String EDUCATION_PRIMARY = ACT_TYPE_EDUCATION + "_primary";
+	public static final String EDUCATION_SECONDARY = ACT_TYPE_EDUCATION + "_secondary";
+	public static final String EDUCATION_HIGHER = ACT_TYPE_EDUCATION + "_higher";
+	public static final String EDUCATION_OTHER = ACT_TYPE_EDUCATION + "_other";
+
+	// shopping
+	public static final String ACT_TYPE_SHOP = "shop";
+	public static final String SHOP_RETAIL_GT2500 = ACT_TYPE_SHOP + "_retail_gt2500sqm";
+	public static final String SHOP_RETAIL_GET1000 = ACT_TYPE_SHOP + "_retail_get1000sqm";
+	public static final String SHOP_RETAIL_GET400 = ACT_TYPE_SHOP + "_retail_get400sqm";
+	public static final String SHOP_RETAIL_GET100 = ACT_TYPE_SHOP + "_retail_get100sqm";
+	public static final String SHOP_RETAIL_LT100 = ACT_TYPE_SHOP + "_retail_lt100sqm";
+	public static final String SHOP_OTHER = ACT_TYPE_SHOP + "_other";
+
+	// leisure
+	public static final String ACT_TYPE_LEISURE = "leisure";
+	public static final String LEISURE_SPORTS = ACT_TYPE_LEISURE + "_sports";
+	public static final String LEISURE_CULTURE = ACT_TYPE_LEISURE + "_culture";
+	public static final String LEISURE_GASTRO = ACT_TYPE_LEISURE + "_gastro";
+	public static final String LEISURE_HOSPITALITY = ACT_TYPE_LEISURE + "_hospitality";
+
+
 	private static Logger log = Logger.getLogger(FacilitiesProductionKTI.class);
 	
 	/**

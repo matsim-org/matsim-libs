@@ -47,8 +47,8 @@
 
 <config>
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&FACILITIESMODULE;/facilities.xml.gz" />
-		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/facilities_KTIYear2.xml.gz" />
+		<param name="inputFacilitiesFile" value="&OUTPUTBASE;/facilities_KTIYear2.xml.gz" />
+		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/facilities_KTIYear2_with_opentimes.xml.gz" />
 	</module>
 </config>
 

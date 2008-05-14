@@ -1803,34 +1803,36 @@ public class ShopsOf2005ToFacilities {
 
 	private static void applyOpentimesToEnterpriseCensus() {
 
-		Facilities facilities_KTIYear1 = new Facilities("Switzerland based on Enterprise census 2000.", Facilities.FACILITIES_USE_STREAMING);
+		Facilities facilities_input = new Facilities("Switzerland based on Enterprise census 2000.", Facilities.FACILITIES_USE_STREAMING);
 
-		Facilities facilities_Dummy_KTIYear2 = new Facilities("Facilities KTI Year 2", Facilities.FACILITIES_NO_STREAMING);
+		Facilities facilities_output = new Facilities("Facilities KTI Year 2", Facilities.FACILITIES_NO_STREAMING);
 
 		// init algorithms
 		FacilitiesOpentimesKTIYear2 facilitiesOpentimesKTIYear2 = new FacilitiesOpentimesKTIYear2();
 		facilitiesOpentimesKTIYear2.init();
 
-		FacilitiesWriterAlgorithm writerAlgo = new FacilitiesWriterAlgorithm(facilities_Dummy_KTIYear2);
+		FacilitiesWriterAlgorithm writerAlgo = new FacilitiesWriterAlgorithm(facilities_output);
 
-		FacilitiesToRegionalizedKML facilitiesToRegionalizedKML = new FacilitiesToRegionalizedKML();
-		facilitiesToRegionalizedKML.init();
+//		FacilitiesToRegionalizedKML facilitiesToRegionalizedKML = new FacilitiesToRegionalizedKML();
+//		facilitiesToRegionalizedKML.init();
+//		
 		
-		// let algorithms work for "shop" facilities only
-		FacilitiesActTypeFilter shopFilter = null;
-		for (FacilitiesAlgorithm facilitiesAlgorithm : new FacilitiesAlgorithm[]{facilitiesOpentimesKTIYear2, writerAlgo, facilitiesToRegionalizedKML}) {
-			shopFilter = new FacilitiesActTypeFilter((FacilityAlgorithmI) facilitiesAlgorithm);
-			shopFilter.addActTypePattern("shop");
-			facilities_KTIYear1.addAlgorithm((FacilitiesAlgorithm) shopFilter);
+		//		FacilitiesActTypeFilter shopFilter = null;
+		for (FacilitiesAlgorithm facilitiesAlgorithm : new FacilitiesAlgorithm[]{facilitiesOpentimesKTIYear2, writerAlgo/*, facilitiesToRegionalizedKML*/}) {
+//			shopFilter = new FacilitiesActTypeFilter((FacilityAlgorithmI) facilitiesAlgorithm);
+//			shopFilter.addActTypePattern("shop.*");
+//			facilities_input.addAlgorithm((FacilitiesAlgorithm) shopFilter);
+			facilities_input.addAlgorithm(facilitiesAlgorithm);
 		}
 
 		System.out.println("Streaming Facilities KTI Year 2 file... ");
-		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities_KTIYear1);
+		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities_input);
+		facilities_reader.setValidating(false);
 		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
 		System.out.println("Streaming Facilities KTI Year 2 file...done.");
 
 		writerAlgo.finish();
-		facilitiesToRegionalizedKML.finish();
+//		facilitiesToRegionalizedKML.finish();
 
 	}
 
