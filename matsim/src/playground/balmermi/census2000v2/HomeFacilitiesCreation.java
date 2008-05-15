@@ -28,7 +28,9 @@ import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 
 import playground.balmermi.census2000.data.Municipalities;
+import playground.balmermi.census2000v2.data.Households;
 import playground.balmermi.census2000v2.modules.FacilitiesCreateBuildingsFromCensus2000;
+import playground.balmermi.census2000v2.modules.HouseholdsCreateFromCensus2000;
 
 public class HomeFacilitiesCreation {
 
@@ -47,9 +49,8 @@ public class HomeFacilitiesCreation {
 
 		System.out.println("  creating Facilities object... ");
 		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		System.out.println("  done.");
-
 		Gbl.getWorld().complete();
+		System.out.println("  done.");
 
 		System.out.println("  extracting input directory... ");
 		String indir = Gbl.getConfig().facilities().getInputFile();
@@ -64,11 +65,17 @@ public class HomeFacilitiesCreation {
 		municipalities.parse();
 		System.out.println("  done.");
 
+		System.out.println("  creating Households object... ");
+		Households households = new Households(municipalities);
+		System.out.println("  done.");
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running facilities module... ");
 //		new FacilitiesCreateBuildingsFromCensus2000(indir+"/KANT_16.tab",Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY)).run(facilities);
+//		new HouseholdsCreateFromCensus2000(indir+"/KANT_16.tab",facilities,municipalities).run(households);
 		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers.tab",Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY)).run(facilities);
+		new HouseholdsCreateFromCensus2000(indir+"/ETHZ_Pers.tab",facilities,municipalities).run(households);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

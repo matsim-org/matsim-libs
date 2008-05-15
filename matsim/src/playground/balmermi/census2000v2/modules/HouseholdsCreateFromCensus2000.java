@@ -26,17 +26,17 @@ import java.io.IOException;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
-import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
-public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm {
+import playground.balmermi.census2000.data.Municipalities;
+import playground.balmermi.census2000.data.Municipality;
+import playground.balmermi.census2000v2.data.Household;
+import playground.balmermi.census2000v2.data.Households;
+
+public class HouseholdsCreateFromCensus2000 {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -44,16 +44,18 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 
 	private static final String HOME = "home";
 	private final String infile;
-	private final Layer municipalities;
+	private final Facilities facilities;
+	private final Municipalities municipalities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public FacilitiesCreateBuildingsFromCensus2000(final String infile, final Layer municipalities) {
+	public HouseholdsCreateFromCensus2000(final String infile, final Facilities facilities, final Municipalities municipalities) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.infile = infile;
+		this.facilities = facilities;
 		this.municipalities = municipalities;
 		System.out.println("    done.");
 	}
@@ -62,71 +64,70 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Facilities facilities) {
+	public void run(Households households) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
-		if (!facilities.getFacilities().isEmpty()) { Gbl.errorMsg("Facilities DB is not empty!"); }
 		try {
 			FileReader fr = new FileReader(this.infile);
 			BufferedReader br = new BufferedReader(fr);
 			int line_cnt = 0;
-			int max_home_cap = 1;
-			int min_f_id = Integer.MAX_VALUE;
-			int max_f_id = Integer.MIN_VALUE;
+			int min_hh_id = Integer.MAX_VALUE;
+			int max_hh_id = Integer.MIN_VALUE;
 
 			// Skip header
 			String curr_line = br.readLine(); line_cnt++;
 			curr_line = br.readLine(); line_cnt++;
 			while ((curr_line = br.readLine()) != null) {
 				String[] entries = curr_line.split("\t", -1);
-				// ZGDE  GEBAEUDE_ID  ...  XACH  YACH
-				// 1     2                 170   171
+				// P_ZGDE  P_GEBAEUDE_ID  P_HHNR  ...  P_HHTPZ  P_HHTPW
+				// 1       2              3       ...  49       50
+
+				// check for existing zone
+				Id zone_id = new IdImpl(entries[1]);
+				Location zone = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY).getLocation(zone_id);
+				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
+				
+				// check for existing facility
+				Id f_id = new IdImpl(entries[2]);
+				Facility f = (Facility)this.facilities.getLocation(f_id);
+				if (f == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
+				if (f.getActivity(HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
 				
 				// check for existing municipality
-				Id zone_id = new IdImpl(entries[1]);
-				Location zone = this.municipalities.getLocation(zone_id);
-				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
+				Municipality muni = this.municipalities.getMunicipality(Integer.parseInt(zone_id.toString()));
+				if (muni == null) { Gbl.errorMsg("Line "+line_cnt+": Municipality id="+zone_id+" does not exist!"); }
+				
+				// household creation
+				Id hh_id = new IdImpl(entries[3]);
+				Household hh = households.getHousehold(hh_id);
+				if (hh == null) {
+					// create new household
+					hh = new Household(hh_id,muni,f);
+					households.setHH(hh);
 
-				// home facility creation
-				Id f_id = new IdImpl(entries[2]);
-				CoordI coord = new Coord(entries[170],entries[171]);
-				Facility f = facilities.getFacilities().get(f_id);
-				if (f == null) {
-					// create new home facility id
-					f = facilities.createFacility(f_id,coord);
-					Activity act = f.createActivity(HOME);
-					act.setCapacity(1);
-					
 					// store some info
-					int id = Integer.parseInt(f.getId().toString());
-					if (id < min_f_id) { min_f_id = id; }
-					if (id > max_f_id) { max_f_id = id; }
+					int id = Integer.parseInt(hh.getId().toString());
+					if (id < min_hh_id) { min_hh_id = id; }
+					if (id > max_hh_id) { max_hh_id = id; }
 				}
 				else {
-					// check for coordinate consistency of existing home facility
-					if ((coord.getX() != f.getCenter().getX()) || coord.getY() != f.getCenter().getY()) {
-						Gbl.errorMsg("Line "+line_cnt+": facility id="+f_id+" already exists and has another coordinate!");
+					// check for muni and facility consistency of existing household
+					if ((!hh.getMunicipality().equals(muni)) || (!hh.getFacility().equals(f))) {
+						Gbl.errorMsg("Line "+line_cnt+": municipality id="+muni.getId()+" or facility id="+f_id+" are different to the existing household!");
 					}
-					
-					// add 1 to capacity
-					Activity act = f.getActivity(HOME);
-					act.setCapacity(act.getCapacity()+1);
-					
-					// store some info
-					if (act.getCapacity()>max_home_cap) { max_home_cap = act.getCapacity(); }
 				}
 				
 				// progress report
 				if (line_cnt % 100000 == 0) {
-					System.out.println("    Line " + line_cnt + ": # facilities = " + facilities.getFacilities().size());
+					System.out.println("    Line " + line_cnt + ": # households = " + households.getHouseholds().size());
 				}
 				line_cnt++;
 			}
 			br.close();
 			fr.close();
-			System.out.println("    "+facilities.getFacilities().size()+" home facilities with capcacities from 1 to "+max_home_cap+" created!");
-			System.out.println("    min facility id="+min_f_id);
-			System.out.println("    max facility id="+max_f_id);
+			System.out.println("    "+households.getHouseholds().size()+" households created!");
+			System.out.println("    min household id="+min_hh_id);
+			System.out.println("    max household id="+max_hh_id);
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
