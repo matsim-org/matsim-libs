@@ -20,7 +20,7 @@
 	</module>
 	
 	<module name="facilities">
-		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/facilities_KTIYear2.xml.gz" />
+		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/facilities_KTIYear2_activities.xml.gz" />
 	</module>
 	
 	<module name="global">

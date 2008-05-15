@@ -452,7 +452,8 @@ public class FacilitiesAllActivitiesFTE {
 						EnterpriseCensus.EC01_PREFIX +
 						EnterpriseCensus.HOSPITALITY_NOGA_SECTION + 
 						str, 
-						FacilitiesProductionKTI.LEISURE_HOSPITALITY);
+//						FacilitiesProductionKTI.LEISURE_HOSPITALITY);	
+						FacilitiesProductionKTI.LEISURE_GASTRO);
 			}
 
 			for (String str : new String[]{"B019261A", "B019262A", "B019262B"}) {
