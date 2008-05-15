@@ -76,6 +76,8 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 			BufferedReader br = new BufferedReader(fr);
 			int line_cnt = 0;
 			int max_home_cap = 1;
+			int min_f_id = Integer.MAX_VALUE;
+			int max_f_id = Integer.MIN_VALUE;
 
 			// Skip header
 			String curr_line = br.readLine(); line_cnt++;
@@ -85,24 +87,37 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				// ZGDE  GEBAEUDE_ID  ...  XACH  YACH
 				// 1     2                 170   171
 				
+				// check for existing municipality
 				Id zone_id = new IdImpl(entries[1]);
 				Location zone = this.municipalities.getLocation(zone_id);
 				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 
+				// home facility creation
 				Id f_id = new IdImpl(entries[2]);
 				CoordI coord = new Coord(entries[170],entries[171]);
 				Facility f = facilities.getFacilities().get(f_id);
 				if (f == null) {
+					// create new home facility id
 					f = facilities.createFacility(f_id,coord);
 					Activity act = f.createActivity(HOME);
 					act.setCapacity(1);
+					
+					// store some info
+					int id = Integer.parseInt(f.getId().toString());
+					if (id < min_f_id) { min_f_id = id; }
+					if (id > max_f_id) { max_f_id = id; }
 				}
 				else {
+					// check for coordinate consistency of existing home facility
 					if ((coord.getX() != f.getCenter().getX()) || coord.getY() != f.getCenter().getY()) {
 						Gbl.errorMsg("Line "+line_cnt+": facility id="+f_id+" already exists and has another coordinate!");
 					}
+					
+					// add 1 to capacity
 					Activity act = f.getActivity(HOME);
 					act.setCapacity(act.getCapacity()+1);
+					
+					// store some info
 					if (act.getCapacity()>max_home_cap) { max_home_cap = act.getCapacity(); }
 				}
 				
@@ -115,6 +130,8 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 			br.close();
 			fr.close();
 			System.out.println("    "+facilities.getFacilities().size()+" home facilities with capcacities from 1 to "+max_home_cap+" created!");
+			System.out.println("    min facility id="+min_f_id);
+			System.out.println("    max facility id="+max_f_id);
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
