@@ -52,7 +52,8 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 	private String endDate = null;
 	private String endTime = null;
 	private int cntSegments = 0;
-	private int cntPtSegments = 0;
+	private int cntPuTSegments = 0;
+	private int cntRailSegments = 0;
 
 	private int line =  0;
 
@@ -78,7 +79,7 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 		if (this.line == 1) {
 			// header
 			try {
-				this.writer.write("PersonID\tTripID\tSegments\tPtSegments\tXStartingPoint\tYStartingPoint\tStartingDate\tStartingTime\tXEndingPoint\tYEndingPoint\tEndingDate\tEndingTime\tStartingStops\tEndingStops\n");
+				this.writer.write("PersonID\tTripID\tSegments\tPutSegments\tRailSegments\tXStartingPoint\tYStartingPoint\tStartingDate\tStartingTime\tXEndingPoint\tYEndingPoint\tEndingDate\tEndingTime\tStartStopId\tStartStopDistance\tEndStopID\tEndStopDistance\n");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -87,7 +88,7 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 
 		if (!row[0].equals(this.personId) || !row[1].equals(this.tripId)) {
 			// either personId or tripId has changed: process the last trip
-			if (this.cntPtSegments > 0) {
+			if (this.cntPuTSegments > 0 || this.cntRailSegments > 0) {
 				try {
 					handleTrip();
 				} catch (IOException e) {
@@ -101,52 +102,47 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 			this.startTime = row[7];
 			this.startCoord = new Coord(Double.parseDouble(row[3])/1000.0, Double.parseDouble(row[4])/1000.0);
 			this.cntSegments = 0;
-			this.cntPtSegments = 0;
+			this.cntPuTSegments = 0;
+			this.cntRailSegments = 0;
 		}
 
 		this.endDate = row[11];
 		this.endTime = row[12];
 		this.endCoord = new Coord(Double.parseDouble(row[8])/1000.0, Double.parseDouble(row[9])/1000.0);
 		this.cntSegments++;
-		if (Double.parseDouble(row[18]) >= 0.5 || Double.parseDouble(row[19]) >= 0.5) {
-			this.cntPtSegments++;
+		if (Double.parseDouble(row[18]) >= 0.5) {
+			this.cntPuTSegments++;
+		}
+		if (Double.parseDouble(row[19]) >= 0.5) {
+			this.cntRailSegments++;
 		}
 	}
 
 	private void handleTrip() throws IOException {
-		if (this.cntPtSegments > 0) {
+		if (this.cntPuTSegments > 0) {
 			// the last trip had at least one public transport segment, so write the person out
 			final Collection<VisumNetwork.Stop> startStops = this.vNetwork.findStops(this.startCoord, this.searchRadius);
 			final Collection<VisumNetwork.Stop> endStops = this.vNetwork.findStops(this.endCoord, this.searchRadius);
 			// write basic information
-			this.writer.write(this.personId + "\t" + this.tripId + "\t" + this.cntSegments + "\t" + this.cntPtSegments
+			this.writer.write(this.personId + "\t" + this.tripId + "\t" + this.cntSegments + "\t" + this.cntPuTSegments + "\t" + this.cntRailSegments
 					+ "\t" + this.startCoord.getX() * 1000.0 + "\t" + this.startCoord.getY()*1000.0 + "\t" + this.startDate+ "\t" + this.startTime
 					+ "\t" + this.endCoord.getX() * 1000.0 + "\t" + this.endCoord.getY() * 1000.0 + "\t" + this.endDate+ "\t" + this.endTime);
 
 			// write possible starting stops
-			this.writer.write("\t");
-			Iterator<VisumNetwork.Stop> stopIterator = startStops.iterator();
-			if (stopIterator.hasNext()) {
-				this.writer.write(stopIterator.next().id.toString());
-			} else {
-				this.writer.write("-");
+			this.writer.write("\tSTART-ID\tstart-distance\tEND-ID\tend-distance\n");
+			for (VisumNetwork.Stop stop : startStops) {
+				this.writer.write("\t\t\t\t\t\t\t\t\t\t\t\t\t");
+				this.writer.write(stop.id.toString() + "\t");
+				this.writer.write(Double.toString(this.startCoord.calcDistance(stop.coord)));
+				this.writer.write("\n");
 			}
-			while (stopIterator.hasNext()) {
-				this.writer.write("," + stopIterator.next().id.toString());
-			}
-
 			// write possible ending stops
-			this.writer.write("\t");
-			stopIterator = endStops.iterator();
-			if (stopIterator.hasNext()) {
-				this.writer.write(stopIterator.next().id.toString());
-			} else {
-				this.writer.write("-");
+			for (VisumNetwork.Stop stop : endStops) {
+				this.writer.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+				this.writer.write(stop.id.toString() + "\t");
+				this.writer.write(Double.toString(this.startCoord.calcDistance(stop.coord)));
+				this.writer.write("\n");
 			}
-			while (stopIterator.hasNext()) {
-				this.writer.write("," + stopIterator.next().id.toString());
-			}
-			this.writer.write("\n");
 		}
 	}
 
