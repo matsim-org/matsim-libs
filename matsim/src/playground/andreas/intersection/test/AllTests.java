@@ -11,6 +11,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(TravelTimeTest2a.class);
 		suite.addTestSuite(TravelTimeTest4a.class);
+		suite.addTestSuite(CalculateAngleTest4a.class);
 //		suite.addTest(org.matsim.network.algorithms.AllTests.suite());
 		//$JUnit-END$
 		return suite;
