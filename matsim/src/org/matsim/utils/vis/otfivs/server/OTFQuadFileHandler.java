@@ -52,6 +52,7 @@ import org.matsim.utils.vis.otfivs.data.OTFDefaultNetWriterFactoryImpl;
 import org.matsim.utils.vis.otfivs.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfivs.data.OTFServerQuad;
 import org.matsim.utils.vis.otfivs.gui.OTFVisConfig;
+import org.matsim.utils.vis.otfivs.handler.OTFAgentsListHandler;
 import org.matsim.utils.vis.otfivs.handler.OTFDefaultLinkHandler;
 import org.matsim.utils.vis.otfivs.handler.OTFDefaultNodeHandler;
 import org.matsim.utils.vis.otfivs.handler.OTFLinkAgentsHandler;
@@ -344,6 +345,7 @@ public class OTFQuadFileHandler {
 				else if(name.equals("playground.david.vis.handler.OTFLinkAgentsNoParkingHandler$Writer")) return OTFLinkAgentsNoParkingHandler.Writer.class;
 				else if(name.equals("playground.david.vis.handler.OTFLinkTravelTimesHandler$Writer")) return OTFLinkTravelTimesHandler.Writer.class;
 				else if(name.equals("playground.david.vis.handler.OTFNoDynLinkHandler$Writer")) return OTFNoDynLinkHandler.Writer.class;
+				else if(name.equals("playground.david.vis.handler.OTFAgentsListHandler$Writer")) return OTFAgentsListHandler.Writer.class;
 				else if (name.startsWith("playground.david.vis")){
 					name = name.replaceFirst("playground.david.vis", "org.matsim.utils.vis.otfvis");
 				    return Class.forName(name);
