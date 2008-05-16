@@ -44,7 +44,7 @@ public class QuadTree<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/** The top node or root of the tree */
-	protected Node top = null;
+	protected Node<T> top = null;
 
 	/** The number of entries in the tree */
 	private int size = 0;
@@ -217,7 +217,7 @@ public class QuadTree<T> implements Serializable {
 	 * @param maxY The largest y coordinate expected
 	 */
 	protected void setTopNode(final double minX, final double minY, final double maxX, final double maxY) {
-		this.top = new Node(minX, minY, maxX, maxY);
+		this.top = new Node<T>(minX, minY, maxX, maxY);
 	}
 
 	/** @return the minimum x coordinate (left-right, longitude, easting) of the bounds of the QuadTree. */
@@ -260,7 +260,7 @@ public class QuadTree<T> implements Serializable {
 				public Iterator<T> iterator() {
 					Iterator<T> iterator = new Iterator<T>() {
 
-						private Leaf currentLeaf = firstLeaf();
+						private Leaf<T> currentLeaf = firstLeaf();
 						private int nextIndex = 0;
 						private T next = first();
 
@@ -322,11 +322,11 @@ public class QuadTree<T> implements Serializable {
 		return this.values;
 	}
 
-	private Leaf firstLeaf() {
+	private Leaf<T> firstLeaf() {
 		return this.top.firstLeaf();
 	}
 
-	private Leaf nextLeaf(final Leaf currentLeaf) {
+	private Leaf<T> nextLeaf(final Leaf<T> currentLeaf) {
 		return this.top.nextLeaf(currentLeaf);
 	}
 
@@ -335,7 +335,7 @@ public class QuadTree<T> implements Serializable {
 	 * Here a double value is packaged within an object so the value can be
 	 * changed in a method and the changed value is available outside of a method.
 	 */
-	private class MutableDouble {
+	private static class MutableDouble {
 		public double value;
 
 		public MutableDouble(final double value) {
@@ -347,19 +347,18 @@ public class QuadTree<T> implements Serializable {
 	 * An internal class to hold variable parameters when calling methods.
 	 * Here a Leaf value is packaged within an object so the value can be
 	 * changed in a method and the changed value is available outside of a method.
+	 *
+	 * @param <T> the type for the Leaf
 	 */
-	private class MutableLeaf {
-		public Leaf value;
+	private static class MutableLeaf<T> {
+		public Leaf<T> value;
 
-		public MutableLeaf(final Leaf value) {
+		public MutableLeaf(final Leaf<T> value) {
 			this.value = value;
 		}
 	}
 
 	public static class Rect implements Serializable {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -837712701959689133L;
 		public final double minX;
 		public final double minY;
@@ -422,9 +421,8 @@ public class QuadTree<T> implements Serializable {
 		/**
 		 * Tests if a specified rect is inside or on the boundary of this <code>Rect</code>.
 		 * @param rect the rect to test
-		 * @param y the y-coordinate to test
-		 * @return <code>true</code> if the specified coordinates are
-		 * inside the boundary of this <code>Rect</code>;
+		 * @return <code>true</code> if the specified rect is
+		 * inside or on the boundary of this <code>Rect</code>;
 		 * <code>false</code> otherwise.
 		 */
 		public boolean containsOrEquals(final Rect rect) {
@@ -499,7 +497,8 @@ public class QuadTree<T> implements Serializable {
 		    }
 	}
 
-	private class Leaf implements Serializable {
+	private static class Leaf<T> implements Serializable {
+		private static final long serialVersionUID = -6527830222532634476L;
 		final public double x;
 		final public double y;
 		final public ArrayList<T> values;
@@ -512,22 +511,23 @@ public class QuadTree<T> implements Serializable {
 		}
 	}
 
-	protected class Node implements Serializable {
+	protected static class Node<T> implements Serializable {
+		private static final long serialVersionUID = 8151154226742383421L;
 
-		private Leaf leaf = null;
+		private Leaf<T> leaf = null;
 
 		private boolean hasChilds = false;
-		private Node northwest = null;
-		private Node northeast = null;
-		private Node southeast = null;
-		private Node southwest = null;
+		private Node<T> northwest = null;
+		private Node<T> northeast = null;
+		private Node<T> southeast = null;
+		private Node<T> southwest = null;
 		private Rect bounds = null;
 
 		public Node(final double minX, final double minY, final double maxX, final double maxY) {
 			this.bounds = new Rect(minX, minY, maxX, maxY);
 		}
 
-		public boolean put(final Leaf leaf) {
+		public boolean put(final Leaf<T> leaf) {
 			if (this.hasChilds) return getChild(leaf.x, leaf.y).put(leaf);
 			if (this.leaf == null) {
 				this.leaf = leaf;
@@ -547,7 +547,7 @@ public class QuadTree<T> implements Serializable {
 		}
 
 		public boolean put(final double x, final double y, final T value) {
-			return put(new Leaf(x, y, value));
+			return put(new Leaf<T>(x, y, value));
 		}
 
 		public boolean remove(final double x, final double y, final T value) {
@@ -700,10 +700,10 @@ public class QuadTree<T> implements Serializable {
 		}
 
 		private void split() {
-			this.northwest = new Node(this.bounds.minX, this.bounds.centerY, this.bounds.centerX, this.bounds.maxY);
-			this.northeast = new Node(this.bounds.centerX, this.bounds.centerY, this.bounds.maxX, this.bounds.maxY);
-			this.southeast = new Node(this.bounds.centerX, this.bounds.minY, this.bounds.maxX, this.bounds.centerY);
-			this.southwest = new Node(this.bounds.minX, this.bounds.minY, this.bounds.centerX, this.bounds.centerY);
+			this.northwest = new Node<T>(this.bounds.minX, this.bounds.centerY, this.bounds.centerX, this.bounds.maxY);
+			this.northeast = new Node<T>(this.bounds.centerX, this.bounds.centerY, this.bounds.maxX, this.bounds.maxY);
+			this.southeast = new Node<T>(this.bounds.centerX, this.bounds.minY, this.bounds.maxX, this.bounds.centerY);
+			this.southwest = new Node<T>(this.bounds.minX, this.bounds.minY, this.bounds.centerX, this.bounds.centerY);
 			this.hasChilds = true;
 			if (this.leaf != null) {
 				getChild(this.leaf.x, this.leaf.y).put(this.leaf);
@@ -711,7 +711,7 @@ public class QuadTree<T> implements Serializable {
 			}
 		}
 
-		private Node getChild(final double x, final double y) {
+		private Node<T> getChild(final double x, final double y) {
 			if (this.hasChilds) {
 				if (x < this.bounds.centerX) {
 					if (y < this.bounds.centerY)
@@ -725,9 +725,9 @@ public class QuadTree<T> implements Serializable {
 			return null;
 		}
 
-		/* default */ Leaf firstLeaf() {
+		/* default */ Leaf<T> firstLeaf() {
 			if (this.hasChilds) {
-				Leaf leaf = this.southwest.firstLeaf();
+				Leaf<T> leaf = this.southwest.firstLeaf();
 				if (leaf == null) { leaf = this.northwest.firstLeaf(); }
 				if (leaf == null) { leaf = this.southeast.firstLeaf(); }
 				if (leaf == null) { leaf = this.northeast.firstLeaf(); }
@@ -736,7 +736,7 @@ public class QuadTree<T> implements Serializable {
 			return this.leaf;
 		}
 
-		/* default */ boolean nextLeaf(final Leaf currentLeaf, final MutableLeaf nextLeaf) {
+		/* default */ boolean nextLeaf(final Leaf<T> currentLeaf, final MutableLeaf<T> nextLeaf) {
 			if (this.hasChilds) {
 				if (!this.bounds.contains(currentLeaf.x, currentLeaf.y)) return false;
 				boolean found = this.southwest.nextLeaf(currentLeaf, nextLeaf);
@@ -762,8 +762,8 @@ public class QuadTree<T> implements Serializable {
 			return currentLeaf == this.leaf;
 		}
 
-		public Leaf nextLeaf(final Leaf currentLeaf) {
-			MutableLeaf nextLeaf = new MutableLeaf(null);
+		public Leaf<T> nextLeaf(final Leaf<T> currentLeaf) {
+			MutableLeaf<T> nextLeaf = new MutableLeaf<T>(null);
 			nextLeaf(currentLeaf, nextLeaf);
 			return nextLeaf.value;
 		}

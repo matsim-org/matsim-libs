@@ -1,0 +1,66 @@
+package org.matsim.utils.vis.otfivs.opengl.gui;
+
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import org.matsim.utils.vis.otfivs.gui.OTFHostControlBar;
+import org.matsim.utils.vis.otfivs.gui.OTFVisConfig;
+import org.matsim.utils.vis.otfivs.gui.PreferencesDialog;
+import org.matsim.utils.vis.otfivs.opengl.queries.QueryToggleShowParking;
+
+
+public class PreferencesDialog2 extends PreferencesDialog implements ItemListener{
+
+	public PreferencesDialog2(JFrame frame, OTFVisConfig config, OTFHostControlBar mother) {
+		super(frame, config, mother);
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5778562849300898138L;
+
+	/* (non-Javadoc)
+	 * @see playground.david.vis.gui.PreferencesDialog#initGUI()
+	 */
+	@Override
+	protected void initGUI() {
+		// TODO Auto-generated method stub
+		super.initGUI();
+		{
+			JPanel panel = new JPanel(null);
+			getContentPane().add(panel);
+			panel.setBorder(BorderFactory.createTitledBorder("Colors"));
+			panel.setBounds(240, 130, 220, 60);
+
+			JCheckBox SynchBox = new JCheckBox("show parked vehicles");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.isShowParking());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 20, 200, 31);
+			SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
+		}
+	}
+
+	public void itemStateChanged(ItemEvent e) {
+		JCheckBox source = (JCheckBox)e.getItemSelectable();
+		if (source.getText().equals("show parked vehicles")) {
+			cfg.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);
+			cfg.setShowParking(!cfg.isShowParking());
+			if (host != null) {
+				host.doQuery(new QueryToggleShowParking());
+				host.clearCaches();
+				host.invalidateHandlers();
+			}
+		}
+	}
+	
+}

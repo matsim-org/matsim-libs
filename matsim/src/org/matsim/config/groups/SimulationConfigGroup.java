@@ -215,6 +215,11 @@ public class SimulationConfigGroup extends Module {
 		return this.snapshotPeriod;
 	}
 
+	/** Sets which snapshot files should be written. Possible values are
+	 *  "plansfile", "transims", "googleearth", "netvis" and "otfvis"
+	 *
+	 * @param snapshotFormat
+	 */
 	public void setSnapshotFormat(final String snapshotFormat) {
 		this.snapshotFormat = snapshotFormat;
 	}

@@ -39,13 +39,13 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
+import org.matsim.utils.vis.otfivs.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
@@ -190,6 +190,11 @@ public class QueueSimulation extends Simulation {
 
 				this.netStateWriter = new QueueNetStateWriter(this.network, this.network.getNetworkLayer(), networkFile.getAbsolutePath(), myvisconf, snapshotFile, this.snapshotPeriod, buffers);
 				this.netStateWriter.open();
+			} 
+			if(snapshotFormat.contains("otfvis")){
+				String snapshotFile = Controler.getIterationFilename("otfvis.mvi");
+				
+				this.snapshotWriters.add(new OTFQuadFileHandler.Writer(this.snapshotPeriod, this.network, snapshotFile));
 			}
 		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
 	}
