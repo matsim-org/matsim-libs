@@ -79,8 +79,8 @@ public class HouseholdsCreateFromCensus2000 {
 			curr_line = br.readLine(); line_cnt++;
 			while ((curr_line = br.readLine()) != null) {
 				String[] entries = curr_line.split("\t", -1);
-				// P_ZGDE  P_GEBAEUDE_ID  P_HHNR  ...  P_HHTPZ  P_HHTPW
-				// 1       2              3       ...  49       50
+				// P_ZGDE  P_GEBAEUDE_ID  P_HHNR
+				// 1       2              3
 
 				// check for existing zone
 				Id zone_id = new IdImpl(entries[1]);
@@ -103,7 +103,7 @@ public class HouseholdsCreateFromCensus2000 {
 				if (hh == null) {
 					// create new household
 					hh = new Household(hh_id,muni,f);
-					households.setHH(hh);
+					households.addHH(hh);
 
 					// store some info
 					int id = Integer.parseInt(hh.getId().toString());

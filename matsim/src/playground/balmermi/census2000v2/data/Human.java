@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Households.java
+ * Household.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,67 +20,64 @@
 
 package playground.balmermi.census2000v2.data;
 
-import java.util.HashMap;
-
 import org.matsim.basic.v01.Id;
 
-import playground.balmermi.census2000.data.Municipalities;
-
-public class Households {
+public class Human {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final HashMap<Id,Household> households = new HashMap<Id, Household>();
-	private final Municipalities municipalities;
-
+	private final Id id;
+	private Household hh_z = null;
+	private Household hh_w = null;
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public Households(Municipalities municipalities) {
-		super();
-		this.municipalities = municipalities;
+	public Human(final Id id) {
+		this.id = id;
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
+	
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Household getHousehold(final Id id) {
-		return this.households.get(id);
+	public final Id getId() {
+		return this.id;
 	}
 	
-	public final HashMap<Id,Household> getHouseholds() {
-		return this.households;
+	//////////////////////////////////////////////////////////////////////
+	// get/set methods
+	//////////////////////////////////////////////////////////////////////
+	
+	public final Household getHouseholdZ() {
+		return this.hh_z;
 	}
 	
-	public final Municipalities getMunicipalities() {
-		return this.municipalities;
+	public final Household getHouseholdW() {
+		return this.hh_w;
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+
+	public final void setHouseholdZ(Household household) {
+		this.hh_z = household;
+	}
+
+	public final void setHouseholdW(Household household) {
+		this.hh_w = household;
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// set/create methods
-	//////////////////////////////////////////////////////////////////////
-	
-	public final void addHH(Household hh) {
-		this.households.put(hh.getId(),hh);
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// public methods
-	//////////////////////////////////////////////////////////////////////
-
+	// write methods
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public final String toString() {
-		return "[nof_munis=" + this.municipalities.getMunicipalities().size() + "]" +
-			"[nof_hhs=" + this.households.size() + "]";
+		return "[id=" + this.id + "]" +
+			"[hhW_id=" + this.hh_w.getId() + "]" +
+			"[hhZ_id=" + this.hh_w.getId() + "]";
 	}
 }

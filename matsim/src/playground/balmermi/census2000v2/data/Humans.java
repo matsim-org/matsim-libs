@@ -24,24 +24,20 @@ import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
 
-import playground.balmermi.census2000.data.Municipalities;
-
-public class Households {
+public class Humans {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final HashMap<Id,Household> households = new HashMap<Id, Household>();
-	private final Municipalities municipalities;
+	private final HashMap<Id,Human> humans = new HashMap<Id,Human>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public Households(Municipalities municipalities) {
+	public Humans() {
 		super();
-		this.municipalities = municipalities;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -52,24 +48,20 @@ public class Households {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Household getHousehold(final Id id) {
-		return this.households.get(id);
+	public final Human getHuman(final Id id) {
+		return this.humans.get(id);
 	}
 	
-	public final HashMap<Id,Household> getHouseholds() {
-		return this.households;
-	}
-	
-	public final Municipalities getMunicipalities() {
-		return this.municipalities;
+	public final HashMap<Id,Human> getHumans() {
+		return this.humans;
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// set/create methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void addHH(Household hh) {
-		this.households.put(hh.getId(),hh);
+	public final void addHuman(Human xyz) {
+		this.humans.put(xyz.getId(),xyz);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -80,7 +72,6 @@ public class Households {
 
 	@Override
 	public final String toString() {
-		return "[nof_munis=" + this.municipalities.getMunicipalities().size() + "]" +
-			"[nof_hhs=" + this.households.size() + "]";
+		return "[nof_humans=" + this.humans.size() + "]";
 	}
 }

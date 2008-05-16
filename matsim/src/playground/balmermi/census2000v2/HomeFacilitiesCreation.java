@@ -29,8 +29,10 @@ import org.matsim.world.WorldWriter;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
+import playground.balmermi.census2000v2.data.Humans;
 import playground.balmermi.census2000v2.modules.FacilitiesCreateBuildingsFromCensus2000;
 import playground.balmermi.census2000v2.modules.HouseholdsCreateFromCensus2000;
+import playground.balmermi.census2000v2.modules.HumansCreateFromCensus2000;
 
 public class HomeFacilitiesCreation {
 
@@ -69,13 +71,19 @@ public class HomeFacilitiesCreation {
 		Households households = new Households(municipalities);
 		System.out.println("  done.");
 
+		System.out.println("  creating Humans object... ");
+		Humans humans = new Humans();
+		System.out.println("  done.");
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running facilities module... ");
 //		new FacilitiesCreateBuildingsFromCensus2000(indir+"/KANT_16.tab",Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY)).run(facilities);
 //		new HouseholdsCreateFromCensus2000(indir+"/KANT_16.tab",facilities,municipalities).run(households);
+//		new HumansCreateFromCensus2000(indir+"/KANT_16.tab",households).run(humans);
 		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers.tab",Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY)).run(facilities);
 		new HouseholdsCreateFromCensus2000(indir+"/ETHZ_Pers.tab",facilities,municipalities).run(households);
+		new HumansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households).run(humans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
