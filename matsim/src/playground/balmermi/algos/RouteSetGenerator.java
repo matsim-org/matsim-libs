@@ -162,7 +162,9 @@ public class RouteSetGenerator {
 		System.out.println("--- Number of created routes = " + routes.size() + " ---");
 		System.out.println("--- Randomly removing routes until " + k + " routes left... ---");
 		// Remove randomly some routes until it contains k-1 elements
-		while (k-1 < routes.size()) { routes.remove((int)Math.random()*routes.size()); }
+		// TODO [balmermi]: Inform Gianluca
+//		while (k-1 < routes.size()) { routes.remove((int)Math.random()*routes.size()); }
+		while (k-1 < routes.size()) { routes.remove(Gbl.random.nextInt(routes.size())); }
 		// add the least cost path at the beginning of the route
 		routes.addFirst(route);
 		System.out.println("--- done. ---");

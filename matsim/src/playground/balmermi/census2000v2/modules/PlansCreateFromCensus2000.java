@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilitiesSetCapacity.java
+ * PlansFilterArea.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,24 +22,27 @@ package playground.balmermi.census2000v2.modules;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plans;
 
 import playground.balmermi.census2000v2.data.Household;
 import playground.balmermi.census2000v2.data.Households;
-import playground.balmermi.census2000v2.data.Human;
-import playground.balmermi.census2000v2.data.Humans;
 
-public class HumansCreateFromCensus2000 {
+public class PlansCreateFromCensus2000 {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private static final String HH_Z = "hh_z";
+	private static final String HH_W = "hh_w";
+	private static final String SWISS = "swiss";
 	private final String infile;
 	private final Households households;
 
@@ -47,7 +50,7 @@ public class HumansCreateFromCensus2000 {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public HumansCreateFromCensus2000(final String infile, final Households households) {
+	public PlansCreateFromCensus2000(final String infile, final Households households) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.infile = infile;
@@ -55,13 +58,18 @@ public class HumansCreateFromCensus2000 {
 		System.out.println("    done.");
 	}
 
-	private final boolean addDemographics(final Human human, final String[] entries) {
+	//////////////////////////////////////////////////////////////////////
+	// private methods
+	//////////////////////////////////////////////////////////////////////
+
+	private final void addDemographics(final Person person, final String[] entries) {
+		Map<String,Object> p_atts = person.getCustomAttributes();
 //		16	P_ALTJ
-		human.age = Integer.parseInt(entries[16]);
+		person.setAge(Integer.parseInt(entries[16]));
 //		23	P_GESL
-		if (entries[23].equals("1")) { human.is_male = true; } else { human.is_male = false; }
+		if (entries[23].equals("1")) { person.setSex("m"); } else { person.setSex("f"); }
 //		26	P_HMAT
-		if (entries[26].equals("1")) { human.is_swiss = true; } else { human.is_swiss = false; }
+		if (entries[26].equals("1")) { p_atts.put(SWISS,true); } else { p_atts.put(SWISS,false); }
 //		43	P_STHHZ
 //		44	P_STHHW
 //		49	P_HHTPZ
@@ -125,18 +133,18 @@ public class HumansCreateFromCensus2000 {
 //		167	P_SVAND
 //		168	P_SNOGA
 //		169	P_SREFO
-		return false;
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Humans humans) {
-		System.out.println("    running " + this.getClass().getName() + " module...");
+	public void run(final Plans plans) {
+		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		if (!humans.getHumans().isEmpty()) { Gbl.errorMsg("Humans DB is not empty!"); }
-		
+		if (!plans.getPersons().isEmpty()) { Gbl.errorMsg("plans DB is not empty!"); }
+		plans.setName("created by '" + this.getClass().getName() + "'");
+
 		try {
 			FileReader fr = new FileReader(this.infile);
 			BufferedReader br = new BufferedReader(fr);
@@ -174,64 +182,78 @@ public class HumansCreateFromCensus2000 {
 				// 3     id    id      2/person   person is part of w and z. current line reflects w
 				// 4     id    id      2/person   person is part of w and z. current line reflects z
 				if ((wkat == 1) && (gem2 == -9) && (partnr == -9)) {
-					Human h = humans.getHuman(pid);
-					if (h != null) { Gbl.errorMsg(e_head+"human alread exists!"); }
-					h = new Human(pid);
-					h.setHouseholdW(hh);
-					h.setHouseholdZ(hh);
-					humans.addHuman(h);
+					Person p = plans.getPerson(pid);
+					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
+					p = new Person(pid);
+					Map<String,Object> p_atts = p.getCustomAttributes();
+					p_atts.put(PlansCreateFromCensus2000.HH_W,hh);
+					p_atts.put(HH_Z,hh);
+					plans.addPerson(p);
+					this.addDemographics(p,entries);
 				}
 				else if ((wkat == 3) && (gem2 == -7) && (partnr == -7)) {
-					Human h = humans.getHuman(pid);
-					if (h != null) { Gbl.errorMsg(e_head+"human alread exists!"); }
-					h = new Human(pid);
-					h.setHouseholdW(hh);
-					h.setHouseholdZ(null);
-					humans.addHuman(h);
+					Person p = plans.getPerson(pid);
+					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
+					p = new Person(pid);
+					Map<String,Object> p_atts = p.getCustomAttributes();
+					p_atts.put(PlansCreateFromCensus2000.HH_W,hh);
+					p_atts.put(HH_Z,null);
+					plans.addPerson(p);
+					this.addDemographics(p,entries);
 				}
 				else if ((wkat == 4) && (gem2 == -7) && (partnr == -7)) {
-					Human h = humans.getHuman(pid);
-					if (h != null) { Gbl.errorMsg(e_head+"human alread exists!"); }
-					h = new Human(pid);
-					h.setHouseholdW(null);
-					h.setHouseholdZ(hh);
-					humans.addHuman(h);
+					Person p = plans.getPerson(pid);
+					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
+					p = new Person(pid);
+					Map<String,Object> p_atts = p.getCustomAttributes();
+					p_atts.put(PlansCreateFromCensus2000.HH_W,null);
+					p_atts.put(HH_Z,hh);
+					plans.addPerson(p);
+					this.addDemographics(p,entries);
 				}
 				else if ((wkat == 3) && ((1 <= gem2)&&(gem2 <= 7011)) && ((1 <= partnr)&&(partnr <= 999999999))) {
-					Human h = humans.getHuman(new IdImpl(partnr));
-					if (h == null) {
-						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner human not found, but pid found in the set!"); }
-						h = new Human(pid);
-						h.setHouseholdW(hh);
-						h.setHouseholdZ(null);
-						humans.addHuman(h);
+					Person p = plans.getPerson(new IdImpl(partnr));
+					if (p == null) {
+						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner person not found, but pid found in the set!"); }
+						p = new Person(pid);
+						Map<String,Object> p_atts = p.getCustomAttributes();
+						p_atts.put(PlansCreateFromCensus2000.HH_W,hh);
+						p_atts.put(HH_Z,null);
+						plans.addPerson(p);
+						this.addDemographics(p,entries);
 					}
 					else {
-						if (!pids.remove(new IdImpl(partnr))) { Gbl.errorMsg(e_head+"partner human found, but not found in the set!"); }
-						if (!((h.getHouseholdW() == null) && (h.getHouseholdZ() != null))) { Gbl.errorMsg(e_head+"something is wrong!"); }
-						h.setHouseholdW(hh);
+						if (!pids.remove(new IdImpl(partnr))) { Gbl.errorMsg(e_head+"partner person found, but not found in the set!"); }
+						Map<String,Object> p_atts = p.getCustomAttributes();
+						if (!((p_atts.get(PlansCreateFromCensus2000.HH_W) == null) && (p_atts.get(HH_Z) != null))) { Gbl.errorMsg(e_head+"something is wrong!"); }
+						p_atts.put(PlansCreateFromCensus2000.HH_W,hh);
+						// att check
 					}
 				}
 				else if ((wkat == 4) && ((1 <= gem2)&&(gem2 <= 7011)) && ((1 <= partnr)&&(partnr <= 999999999))) {
-					Human h = humans.getHuman(new IdImpl(partnr));
-					if (h == null) {
-						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner human not found, but pid found in the set!"); }
-						h = new Human(pid);
-						h.setHouseholdW(null);
-						h.setHouseholdZ(hh);
-						humans.addHuman(h);
+					Person p = plans.getPerson(new IdImpl(partnr));
+					if (p == null) {
+						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner person not found, but pid found in the set!"); }
+						p = new Person(pid);
+						Map<String,Object> p_atts = p.getCustomAttributes();
+						p_atts.put(PlansCreateFromCensus2000.HH_W,null);
+						p_atts.put(HH_Z,hh);
+						plans.addPerson(p);
+						this.addDemographics(p,entries);
 					}
 					else {
-						if (!pids.remove(new IdImpl(partnr))) { Gbl.errorMsg(e_head+"partner human found, but not found in the set!"); }
-						if (!((h.getHouseholdW() != null) && (h.getHouseholdZ() == null))) { Gbl.errorMsg(e_head+"something is wrong!"); }
-						h.setHouseholdZ(hh);
+						if (!pids.remove(new IdImpl(partnr))) { Gbl.errorMsg(e_head+"partner person found, but not found in the set!"); }
+						Map<String,Object> p_atts = p.getCustomAttributes();
+						if (!((p_atts.get(PlansCreateFromCensus2000.HH_W) != null) && (p_atts.get(HH_Z) == null))) { Gbl.errorMsg(e_head+"something is wrong!"); }
+						p_atts.put(HH_Z,hh);
+						// att check
 					}
 				}
 				else { Gbl.errorMsg(e_head+"not allowed!"); }
 
 				// progress report
 				if (line_cnt % 100000 == 0) {
-					System.out.println("    Line " + line_cnt + ": # humans = " + humans.getHumans().size() + "; # pids = " + pids.size());
+					System.out.println("    Line " + line_cnt + ": # persons = " + plans.getPersons().size() + "; # pids = " + pids.size());
 				}
 				line_cnt++;
 			}
@@ -239,22 +261,22 @@ public class HumansCreateFromCensus2000 {
 			fr.close();
 			
 			// some info
-			System.out.println("    "+humans.getHumans().size()+" humans created! (#pids="+pids.size()+")");
+			System.out.println("    "+plans.getPersons().size()+" persons created! (#pids="+pids.size()+")");
 			int same_cnt = 0; int diff_cnt = 0; int wonly_cnt = 0; int zonly_cnt = 0;
-			for (Human h : humans.getHumans().values()) {
-				if ((h.getHouseholdW()==null)&&(h.getHouseholdZ()==null)) { Gbl.errorMsg("WAHHH!"); }
-				else if ((h.getHouseholdW()==null)&&(h.getHouseholdZ()!=null)) { zonly_cnt++; }
-				else if ((h.getHouseholdW()!=null)&&(h.getHouseholdZ()==null)) { wonly_cnt++; }
-				else { if (h.getHouseholdW().equals(h.getHouseholdZ())) { same_cnt++; } else { diff_cnt++; }
-				}
+			for (Person p : plans.getPersons().values()) {
+				Map<String,Object> p_atts = p.getCustomAttributes();
+				if ((p_atts.get(PlansCreateFromCensus2000.HH_W)==null)&&(p_atts.get(HH_Z)==null)) { Gbl.errorMsg("WAHHH!"); }
+				else if ((p_atts.get(PlansCreateFromCensus2000.HH_W)==null)&&(p_atts.get(HH_Z)!=null)) { zonly_cnt++; }
+				else if ((p_atts.get(PlansCreateFromCensus2000.HH_W)!=null)&&(p_atts.get(HH_Z)==null)) { wonly_cnt++; }
+				else { if (p_atts.get(PlansCreateFromCensus2000.HH_W).equals(p_atts.get(HH_Z))) { same_cnt++; } else { diff_cnt++; } }
 			}
-			System.out.println("    # zivil only          = " + zonly_cnt);
+			System.out.println("    # civil only          = " + zonly_cnt);
 			System.out.println("    # econo only          = " + wonly_cnt);
 			System.out.println("    # one household only  = " + same_cnt);
 			System.out.println("    # two households      = " + diff_cnt);
 			System.out.println("    left over pids:");
 			for (Id pid : pids) { System.out.println("    "+pid); }
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Gbl.errorMsg(e);
 		}
 		System.out.println("    done.");

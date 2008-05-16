@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Household.java
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,78 +18,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.balmermi.census2000v2.data;
+package org.matsim.utils.customize;
 
-import org.matsim.basic.v01.Id;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Human {
+/**
+ * Standard implementation of the <tt>Customizable</tt> interface.
+ * 
+ * <p>In an experiment---implemented in the <tt>playground</tt>---it can be
+ * useful to add additional information, objects or complex structures to
+ * MATSim core classes. Therefore, it is allowed to extend 
+ * any class given in <tt>org.matsim</tt> and assign additional information
+ * from the <tt>playground</tt> only.</p>
+ * 
+ * <p><b>BUT:</b> is is strictly prohibited to call methods defined and implemented
+ * in this class from any point inside the MATSim core (<tt>org.matsim</tt>).</p>
+ * 
+ * @see Customizable
+ * 
+ * @author balmermi
+ */
+public class CustomizableImpl implements Customizable {
 
-	private class WHousehold {
-		private final Household hh = null;
-	}
-	
-	private class ZHousehold {
-		private final Household hh = null;
-	}
-	
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final Id id;
-	private Household hh_z = null;
-	private Household hh_w = null;
-	
-	public int age;
-	public boolean is_male;
-	public boolean is_swiss;
-	
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
-	public Human(final Id id) {
-		this.id = id;
-	}
-	
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final Id getId() {
-		return this.id;
-	}
-	
-	//////////////////////////////////////////////////////////////////////
-	// get/set methods
-	//////////////////////////////////////////////////////////////////////
-	
-	public final Household getHouseholdZ() {
-		return this.hh_z;
-	}
-	
-	public final Household getHouseholdW() {
-		return this.hh_w;
-	}
-	
-	//////////////////////////////////////////////////////////////////////
-
-	public final void setHouseholdZ(Household household) {
-		this.hh_z = household;
-	}
-
-	public final void setHouseholdW(Household household) {
-		this.hh_w = household;
-	}
+	/**
+	 * Container for custom attributes
+	 */
+	private Map<String,Object> custom_attributes = null;
 
 	//////////////////////////////////////////////////////////////////////
-	// write methods
+	// interface implementation
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
-	public final String toString() {
-		return "[id=" + this.id + "]" +
-			"[hhW_id=" + this.hh_w.getId() + "]" +
-			"[hhZ_id=" + this.hh_w.getId() + "]";
+	/**
+	 * returns a container for adding arbitrary additional information to
+	 * a MATSim core object. The Container will be created on demand.
+	 * 
+	 * @return map for storing custom attributes
+	 */
+	public final Map<String,Object> getCustomAttributes() {
+		if (this.custom_attributes == null) {
+			this.custom_attributes = new HashMap<String,Object>();
+		}
+		return this.custom_attributes;
 	}
 }

@@ -26,9 +26,10 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.plans.Knowledge;
+import org.matsim.utils.customize.CustomizableImpl;
 
-
-public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T> {
+// TODO [balmermi]: need discussion about 'extends CustomizableImpl'
+public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl implements BasicPerson<T> {
 
 	private static final Logger log = Logger.getLogger(BasicPersonImpl.class);
 	
