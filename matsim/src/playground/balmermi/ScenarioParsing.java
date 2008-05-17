@@ -22,30 +22,12 @@ package playground.balmermi;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.facilities.algorithms.FacilitiesScenarioCut;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.network.algorithms.NetworkScenarioCut;
-import org.matsim.network.algorithms.NetworkSummary;
-import org.matsim.network.algorithms.NetworkWriteAsTable;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
-import org.matsim.plans.algorithms.PersonRemoveReferences;
-import org.matsim.plans.algorithms.PlansScenarioCut;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldCreateRasterLayer;
 import org.matsim.world.algorithms.WorldValidation;
-
-import playground.balmermi.algos.PersonAssignLinkViaFacility;
 
 public class ScenarioParsing {
 
@@ -57,10 +39,6 @@ public class ScenarioParsing {
 
 		System.out.println("TEST RUN 01:");
 
-		Scenario.setUpScenarioConfig();
-
-		Scenario.readWorld();
-		
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
 		worldReader.readFile(Gbl.getConfig().world().getInputFile());
@@ -163,8 +141,10 @@ public class ScenarioParsing {
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(final String[] args) {
-
 		Gbl.startMeasurement();
+
+		Gbl.createConfig(args);
+		Gbl.createWorld();
 
 		run();
 
