@@ -60,17 +60,34 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 	}
 
 	//////////////////////////////////////////////////////////////////////
+	// private methods
+	//////////////////////////////////////////////////////////////////////
+
+	private final int getMinFacilityId(Facilities facilities) {
+		int min_id = Integer.MAX_VALUE;
+		for (Id id : facilities.getFacilities().keySet()) {
+			int f_id = Integer.parseInt(id.toString());
+			if (f_id < min_id) { min_id = f_id; }
+		}
+		return min_id;
+	}
+	
+	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
+		System.out.println("      # facilities = " + facilities.getFacilities().size());
+		
+		int min_id_given = this.getMinFacilityId(facilities);
+		System.out.println("      min_f_id = " + min_id_given);
 
-		if (!facilities.getFacilities().isEmpty()) { Gbl.errorMsg("Facilities DB is not empty!"); }
 		try {
 			FileReader fr = new FileReader(this.infile);
 			BufferedReader br = new BufferedReader(fr);
 			int line_cnt = 0;
+			int home_fac_cnt = 0;
 			int max_home_cap = 1;
 			int min_f_id = Integer.MAX_VALUE;
 			int max_f_id = Integer.MIN_VALUE;
@@ -88,8 +105,11 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 				Location zone = this.municipalities.getLocation(zone_id);
 				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 
-				// home facility creation
+				// check for facility id
 				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
+				if (Integer.parseInt(f_id.toString()) >= min_id_given) { Gbl.errorMsg("Line "+line_cnt+": f_id="+f_id+" must be less then min_id="+min_id_given+"!"); }
+
+				// home facility creation
 				CoordI coord = new Coord(entries[CAtts.I_XACH],entries[CAtts.I_YACH]);
 				Facility f = facilities.getFacilities().get(f_id);
 				if (f == null) {
@@ -99,6 +119,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 					act.setCapacity(1);
 					
 					// store some info
+					home_fac_cnt++;
 					int id = Integer.parseInt(f.getId().toString());
 					if (id < min_f_id) { min_f_id = id; }
 					if (id > max_f_id) { max_f_id = id; }
@@ -125,9 +146,10 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 			}
 			br.close();
 			fr.close();
-			System.out.println("    "+facilities.getFacilities().size()+" home facilities with capcacities from 1 to "+max_home_cap+" created!");
-			System.out.println("    min facility id="+min_f_id);
-			System.out.println("    max facility id="+max_f_id);
+			System.out.println("    "+home_fac_cnt+" home facilities with capcacities from 1 to "+max_home_cap+" created!");
+			System.out.println("    min home facility id="+min_f_id);
+			System.out.println("    max home facility id="+max_f_id);
+			System.out.println("      # facilities = " + facilities.getFacilities().size());
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}

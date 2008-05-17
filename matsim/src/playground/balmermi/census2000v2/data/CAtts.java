@@ -20,7 +20,6 @@
 
 package playground.balmermi.census2000v2.data;
 
-
 public abstract class CAtts {
 
 	//////////////////////////////////////////////////////////////////////
@@ -28,6 +27,27 @@ public abstract class CAtts {
 	//////////////////////////////////////////////////////////////////////
 
 	public static final String ACT_HOME = "home";
+
+	public static final String ACT_W2 = "work_sector2";
+	public static final String ACT_W3 = "work_sector3";
+
+	public static final String ACT_EKIGA = "education_kindergarten";
+	public static final String ACT_EPRIM = "education_primary";
+	public static final String ACT_ESECO = "education_secondary";
+	public static final String ACT_EHIGH = "education_higher";
+	public static final String ACT_EOTHR = "education_other";
+
+	public static final String ACT_S1 = "shop_retail_lt100sqm";
+	public static final String ACT_S2 = "shop_retail_get100sqm";
+	public static final String ACT_S3 = "shop_retail_get400sqm";
+	public static final String ACT_S4 = "shop_retail_get1000sqm";
+	public static final String ACT_S5 = "shop_retail_gt2500sqm";
+	public static final String ACT_SOTHR = "shop_other";
+	
+	public static final String ACT_LC = "leisure_culture";
+	public static final String ACT_LG = "leisure_gastro";
+	public static final String ACT_LS = "leisure_sports";
+
 
 	//////////////////////////////////////////////////////////////////////
 	// household indentifiers
