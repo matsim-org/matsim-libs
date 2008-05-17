@@ -36,7 +36,9 @@ import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
 import playground.balmermi.census2000v2.modules.HouseholdsCreateFromCensus2000;
 import playground.balmermi.census2000v2.modules.PlansCreateFromCensus2000;
+import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
 import playground.balmermi.census2000v2.modules.WorldFacilityZoneMapping;
+import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
 
 public class PopulationCreation {
 
@@ -109,12 +111,14 @@ public class PopulationCreation {
 		new WorldFacilityZoneMapping(households).run(Gbl.getWorld());
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldValidation().run(Gbl.getWorld());
+		new WorldWriteFacilityZoneMapping(outdir+"/f2z_mapping.txt").run(Gbl.getWorld());
 		System.out.println("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running plans modules... ");
 		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households).run(plans);
+//		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
