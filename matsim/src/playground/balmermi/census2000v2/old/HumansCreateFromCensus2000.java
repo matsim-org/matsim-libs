@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.balmermi.census2000v2.modules;
+package playground.balmermi.census2000v2.old;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -31,8 +31,6 @@ import org.matsim.gbl.Gbl;
 
 import playground.balmermi.census2000v2.data.Household;
 import playground.balmermi.census2000v2.data.Households;
-import playground.balmermi.census2000v2.data.Human;
-import playground.balmermi.census2000v2.data.Humans;
 
 public class HumansCreateFromCensus2000 {
 

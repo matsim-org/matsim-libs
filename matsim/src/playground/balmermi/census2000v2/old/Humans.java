@@ -18,11 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.balmermi.census2000v2.data;
+package playground.balmermi.census2000v2.old;
 
 import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
+
 
 public class Humans {
 

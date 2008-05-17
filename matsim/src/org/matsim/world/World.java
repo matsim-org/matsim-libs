@@ -257,19 +257,23 @@ public class World {
 	//////////////////////////////////////////////////////////////////////
 	// add methods
 	//////////////////////////////////////////////////////////////////////
-
-	public final void addMapping(final Zone zone1, final Zone zone2) {
-		if (this.getMappingRule(zone1.getLayer(),zone2.getLayer()) != null) {
-			// zone1 = down_zone; zone2 = up_zone
-			zone1.addUpMapping(zone2);
-			zone2.addDownMapping(zone1);
-		} else if (this.getMappingRule(zone2.getLayer(),zone1.getLayer()) != null) {
-			// zone1 = up_zone; zone2 = down_zone
-			zone1.addDownMapping(zone2);
-			zone2.addUpMapping(zone1);
+	
+	public final void addMapping(Location loc1, Location loc2) {
+		if (this.getMappingRule(loc1.getLayer(),loc2.getLayer()) != null) {
+			// loc1 = down_loc; loc2 = up_loc
+			loc1.addUpMapping(loc2);
+			loc2.addDownMapping(loc1);
+		} else if (this.getMappingRule(loc2.getLayer(),loc1.getLayer()) != null) {
+			// loc1 = up_loc; loc2 = down_loc
+			loc1.addDownMapping(loc2);
+			loc2.addUpMapping(loc1);
 		} else {
-			log.warn(this.toString() + "[zone1=" + zone1 + ",zone2=" + zone2 + " mapping rule not found]");
+			log.warn(this.toString() + "[loc1=" + loc1 + ",loc2=" + loc2 + " mapping rule not found]");
 		}
+	}
+
+	protected final void addMapping(final Zone zone1, final Zone zone2) {
+		this.addMapping(zone1,zone2);
 	}
 
 	protected final void addMapping(final MappingRule mapping_rule, final String down_zone_id, final String up_zone_id) {

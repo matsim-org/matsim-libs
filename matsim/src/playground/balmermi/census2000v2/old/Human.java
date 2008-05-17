@@ -18,9 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.balmermi.census2000v2.data;
+package playground.balmermi.census2000v2.old;
 
 import org.matsim.basic.v01.Id;
+
+import playground.balmermi.census2000v2.data.Household;
 
 public class Human {
 
