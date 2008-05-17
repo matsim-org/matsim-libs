@@ -20,8 +20,12 @@
 
 package playground.balmermi.census2000v2.data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facility;
+import org.matsim.plans.Person;
 
 import playground.balmermi.census2000.data.Municipality;
 
@@ -34,6 +38,10 @@ public class Household {
 	private final Id id;
 	private final Municipality municipality;
 	private final Facility facility;
+	private final Map<Id,Person> persons_w = new HashMap<Id,Person>();
+	private final Map<Id,Person> persons_z = new HashMap<Id,Person>();
+	private int hhtpz = Integer.MIN_VALUE;
+	private int hhtpw = Integer.MIN_VALUE;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -46,7 +54,27 @@ public class Household {
 	}
 	
 	//////////////////////////////////////////////////////////////////////
-	// methods
+	// set methods
+	//////////////////////////////////////////////////////////////////////
+
+	public final boolean setHHTPZ(int hhtpz) {
+		if (hhtpz == -9) { return true; }
+		if ((hhtpz < 1000) || (hhtpz > 9804)) { System.err.println("hhtpz val not allowed! "+ this.toString()); return false; }
+		if (this.hhtpz == Integer.MIN_VALUE) { this.hhtpz = hhtpz; return true; }
+		else if (this.hhtpz == hhtpz) { return true; }
+		else { System.err.println("hhtpz val does not match! "+ this.toString()); return false; }
+	}
+	
+	public final boolean setHHTPW(int hhtpw) {
+		if (hhtpw == -9) { return true; }
+		if ((hhtpw < 1000) || (hhtpw > 9804)) { System.err.println("hhtpw val not allowed! "+ this.toString()); return false; }
+		if (this.hhtpw == Integer.MIN_VALUE) { this.hhtpw = hhtpw; return true; }
+		else if (this.hhtpw == hhtpw) { return true; }
+		else { System.err.println("hhtpw val does not match! "+ this.toString()); return false; }
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+	// get methods
 	//////////////////////////////////////////////////////////////////////
 
 	public final Id getId() {
@@ -61,12 +89,27 @@ public class Household {
 		return this.facility;
 	}
 	
+	public final Map<Id,Person> getPersonsW() {
+		return this.persons_w;
+	}
+	
+	public final Map<Id,Person> getPersonsZ() {
+		return this.persons_z;
+	}
+	
 	//////////////////////////////////////////////////////////////////////
+	// print methods
+	//////////////////////////////////////////////////////////////////////
+
 
 	@Override
 	public final String toString() {
 		return "[id=" + this.id + "]" +
 			"[muni_id=" + this.municipality.getId() + "]" +
-			"[fac_id=" + this.facility.getId() + "]";
+			"[fac_id=" + this.facility.getId() + "]" +
+			"[hhtpz=" + this.hhtpz + "]" +
+			"[hhtpw=" + this.hhtpw + "]" +
+			"[nof_p_w=" + this.persons_w.size() + "]" +
+			"[nof_p_z=" + this.persons_z.size() + "]";
 	}
 }

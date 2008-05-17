@@ -76,6 +76,15 @@ public class Households {
 	// public methods
 	//////////////////////////////////////////////////////////////////////
 
+	public final void print() {
+		System.out.println("---------- printing households ----------");
+		System.out.println(this.toString());
+		for (Household hh : this.households.values()) {
+			System.out.println(hh.toString());
+		}
+		System.out.println("------- printing households done. -------");
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 
 	@Override

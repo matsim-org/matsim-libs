@@ -33,6 +33,7 @@ import org.matsim.world.Location;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Municipality;
+import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
 import playground.balmermi.census2000v2.data.Households;
 
@@ -42,7 +43,6 @@ public class HouseholdsCreateFromCensus2000 {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final String HOME = "home";
 	private final String infile;
 	private final Facilities facilities;
 	private final Municipalities municipalities;
@@ -60,6 +60,17 @@ public class HouseholdsCreateFromCensus2000 {
 		System.out.println("    done.");
 	}
 
+	//////////////////////////////////////////////////////////////////////
+	// private method
+	//////////////////////////////////////////////////////////////////////
+
+	private final void setAttributes(Household hh, String[] entries, int line_cnt) {
+		int hhtpz = Integer.parseInt(entries[CAtts.I_HHTPZ]);
+		if (!hh.setHHTPZ(hhtpz)) { Gbl.errorMsg("Line "+line_cnt+": Household id="+hh.getId()+" something is wrong!");  }
+		int hhtpw = Integer.parseInt(entries[CAtts.I_HHTPW]);
+		if (!hh.setHHTPW(hhtpw)) { Gbl.errorMsg("Line "+line_cnt+": Household id="+hh.getId()+" something is wrong!");  }
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
@@ -83,27 +94,30 @@ public class HouseholdsCreateFromCensus2000 {
 				// 1       2              3
 
 				// check for existing zone
-				Id zone_id = new IdImpl(entries[1]);
+				Id zone_id = new IdImpl(entries[CAtts.I_ZGDE]);
 				Location zone = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY).getLocation(zone_id);
 				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 				
 				// check for existing facility
-				Id f_id = new IdImpl(entries[2]);
+				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
 				Facility f = (Facility)this.facilities.getLocation(f_id);
 				if (f == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
-				if (f.getActivity(HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
+				if (f.getActivity(CAtts.ACT_HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
 				
 				// check for existing municipality
 				Municipality muni = this.municipalities.getMunicipality(Integer.parseInt(zone_id.toString()));
 				if (muni == null) { Gbl.errorMsg("Line "+line_cnt+": Municipality id="+zone_id+" does not exist!"); }
 				
 				// household creation
-				Id hh_id = new IdImpl(entries[3]);
+				Id hh_id = new IdImpl(entries[CAtts.I_HHNR]);
 				Household hh = households.getHousehold(hh_id);
 				if (hh == null) {
 					// create new household
 					hh = new Household(hh_id,muni,f);
 					households.addHH(hh);
+					
+					// set attributes
+					this.setAttributes(hh,entries,line_cnt);
 
 					// store some info
 					int id = Integer.parseInt(hh.getId().toString());
@@ -115,6 +129,8 @@ public class HouseholdsCreateFromCensus2000 {
 					if ((!hh.getMunicipality().equals(muni)) || (!hh.getFacility().equals(f))) {
 						Gbl.errorMsg("Line "+line_cnt+": municipality id="+muni.getId()+" or facility id="+f_id+" are different to the existing household!");
 					}
+					// set attributes
+					this.setAttributes(hh,entries,line_cnt);
 				}
 				
 				// progress report

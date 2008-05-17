@@ -36,13 +36,14 @@ import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
+import playground.balmermi.census2000v2.data.CAtts;
+
 public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final String HOME = "home";
 	private final String infile;
 	private final Layer municipalities;
 
@@ -83,18 +84,18 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 				// 1     2                 170   171
 				
 				// check for existing municipality
-				Id zone_id = new IdImpl(entries[1]);
+				Id zone_id = new IdImpl(entries[CAtts.I_ZGDE]);
 				Location zone = this.municipalities.getLocation(zone_id);
 				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 
 				// home facility creation
-				Id f_id = new IdImpl(entries[2]);
-				CoordI coord = new Coord(entries[170],entries[171]);
+				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
+				CoordI coord = new Coord(entries[CAtts.I_XACH],entries[CAtts.I_YACH]);
 				Facility f = facilities.getFacilities().get(f_id);
 				if (f == null) {
 					// create new home facility id
 					f = facilities.createFacility(f_id,coord);
-					Activity act = f.createActivity(HOME);
+					Activity act = f.createActivity(CAtts.ACT_HOME);
 					act.setCapacity(1);
 					
 					// store some info
@@ -109,7 +110,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 					}
 					
 					// add 1 to capacity
-					Activity act = f.getActivity(HOME);
+					Activity act = f.getActivity(CAtts.ACT_HOME);
 					act.setCapacity(act.getCapacity()+1);
 					
 					// store some info
