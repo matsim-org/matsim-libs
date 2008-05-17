@@ -85,13 +85,13 @@ public class HomeFacilitiesCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running facilities module... ");
-		new FacilitiesCreateBuildingsFromCensus2000(indir+"/KANT_16.tab",Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY)).run(facilities);
-		new HouseholdsCreateFromCensus2000(indir+"/KANT_16.tab",facilities,municipalities).run(households);
-		new PlansCreateFromCensus2000(indir+"/KANT_16.tab",households).run(plans);
+//		new FacilitiesCreateBuildingsFromCensus2000(indir+"/KANT_16.tab",Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY)).run(facilities);
+//		new HouseholdsCreateFromCensus2000(indir+"/KANT_16.tab",facilities,municipalities).run(households);
+//		new PlansCreateFromCensus2000(indir+"/KANT_16.tab",households).run(plans);
 
-//		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers.tab",Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY)).run(facilities);
-//		new HouseholdsCreateFromCensus2000(indir+"/ETHZ_Pers.tab",facilities,municipalities).run(households);
-//		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households).run(plans);
+		new FacilitiesCreateBuildingsFromCensus2000(indir+"/ETHZ_Pers.tab",Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY)).run(facilities);
+		new HouseholdsCreateFromCensus2000(indir+"/ETHZ_Pers.tab",facilities,municipalities).run(households);
+		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households).run(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
