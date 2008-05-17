@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
@@ -43,6 +44,8 @@ public class HouseholdsCreateFromCensus2000 {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private final static Logger log = Logger.getLogger(HouseholdsCreateFromCensus2000.class);
+
 	private final String infile;
 	private final Facilities facilities;
 	private final Municipalities municipalities;
@@ -53,11 +56,11 @@ public class HouseholdsCreateFromCensus2000 {
 
 	public HouseholdsCreateFromCensus2000(final String infile, final Facilities facilities, final Municipalities municipalities) {
 		super();
-		System.out.println("    init " + this.getClass().getName() + " module...");
+		log.info("    init " + this.getClass().getName() + " module...");
 		this.infile = infile;
 		this.facilities = facilities;
 		this.municipalities = municipalities;
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -76,7 +79,7 @@ public class HouseholdsCreateFromCensus2000 {
 	//////////////////////////////////////////////////////////////////////
 
 	public void run(Households households) {
-		System.out.println("    running " + this.getClass().getName() + " module...");
+		log.info("    running " + this.getClass().getName() + " module...");
 
 		try {
 			FileReader fr = new FileReader(this.infile);
@@ -135,18 +138,18 @@ public class HouseholdsCreateFromCensus2000 {
 				
 				// progress report
 				if (line_cnt % 100000 == 0) {
-					System.out.println("    Line " + line_cnt + ": # households = " + households.getHouseholds().size());
+					log.info("    Line " + line_cnt + ": # households = " + households.getHouseholds().size());
 				}
 				line_cnt++;
 			}
 			br.close();
 			fr.close();
-			System.out.println("    "+households.getHouseholds().size()+" households created!");
-			System.out.println("    min household id="+min_hh_id);
-			System.out.println("    max household id="+max_hh_id);
+			log.info("    "+households.getHouseholds().size()+" households created!");
+			log.info("    min household id="+min_hh_id);
+			log.info("    max household id="+max_hh_id);
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 }

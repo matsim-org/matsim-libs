@@ -31,6 +31,7 @@ import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
+import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
 import playground.balmermi.census2000v2.data.Households;
@@ -42,6 +43,7 @@ public class WorldFacilityZoneMapping {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(WorldFacilityZoneMapping.class);
+
 	private final Households households;
 
 	//////////////////////////////////////////////////////////////////////
@@ -50,9 +52,9 @@ public class WorldFacilityZoneMapping {
 
 	public WorldFacilityZoneMapping(Households households) {
 		super();
-		System.out.println("    init " + this.getClass().getName() + " module...");
+		log.info("    init " + this.getClass().getName() + " module...");
 		this.households = households;
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -78,7 +80,7 @@ public class WorldFacilityZoneMapping {
 			Zone z = h.getMunicipality().getZone();
 			Facility f = h.getFacility();
 			world.addMapping(z,f);
-			if (!z.contains(f.getCenter())) { log.warn("      dist(f->z)="+z.calcDistance(f.getCenter())); }
+			if (!z.contains(f.getCenter())) { log.warn("      mapping via census info produces dist(f["+f.getId()+"]->z["+z.getId()+"])="+z.calcDistance(f.getCenter())); }
 		}
 		
 		// add mapping for the remaining facilities (non home facilities)
@@ -103,7 +105,6 @@ public class WorldFacilityZoneMapping {
 				}
 			}
 		}
-		
 		log.info("    done.");
 	}
 }

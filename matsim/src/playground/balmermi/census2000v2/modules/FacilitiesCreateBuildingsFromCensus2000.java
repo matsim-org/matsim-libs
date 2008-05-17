@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
@@ -44,6 +45,8 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private final static Logger log = Logger.getLogger(FacilitiesCreateBuildingsFromCensus2000.class);
+
 	private final String infile;
 	private final Layer municipalities;
 
@@ -53,10 +56,10 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 
 	public FacilitiesCreateBuildingsFromCensus2000(final String infile, final Layer municipalities) {
 		super();
-		System.out.println("    init " + this.getClass().getName() + " module...");
+		log.info("    init " + this.getClass().getName() + " module...");
 		this.infile = infile;
 		this.municipalities = municipalities;
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -77,11 +80,11 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 	//////////////////////////////////////////////////////////////////////
 
 	public void run(Facilities facilities) {
-		System.out.println("    running " + this.getClass().getName() + " module...");
-		System.out.println("      # facilities = " + facilities.getFacilities().size());
+		log.info("    running " + this.getClass().getName() + " module...");
+		log.info("      # facilities = " + facilities.getFacilities().size());
 		
 		int min_id_given = this.getMinFacilityId(facilities);
-		System.out.println("      min_f_id = " + min_id_given);
+		log.info("      min_f_id = " + min_id_given);
 
 		try {
 			FileReader fr = new FileReader(this.infile);
@@ -140,19 +143,19 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 				
 				// progress report
 				if (line_cnt % 100000 == 0) {
-					System.out.println("    Line " + line_cnt + ": # facilities = " + facilities.getFacilities().size());
+					log.info("    Line " + line_cnt + ": # facilities = " + facilities.getFacilities().size());
 				}
 				line_cnt++;
 			}
 			br.close();
 			fr.close();
-			System.out.println("    "+home_fac_cnt+" home facilities with capcacities from 1 to "+max_home_cap+" created!");
-			System.out.println("    min home facility id="+min_f_id);
-			System.out.println("    max home facility id="+max_f_id);
-			System.out.println("      # facilities = " + facilities.getFacilities().size());
+			log.info("    "+home_fac_cnt+" home facilities with capcacities from 1 to "+max_home_cap+" created!");
+			log.info("    min home facility id="+min_f_id);
+			log.info("    max home facility id="+max_f_id);
+			log.info("      # facilities = " + facilities.getFacilities().size());
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 }

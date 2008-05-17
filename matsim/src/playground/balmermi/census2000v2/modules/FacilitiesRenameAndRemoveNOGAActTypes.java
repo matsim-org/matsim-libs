@@ -22,6 +22,7 @@ package playground.balmermi.census2000v2.modules;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
@@ -33,14 +34,16 @@ public class FacilitiesRenameAndRemoveNOGAActTypes extends FacilitiesAlgorithm {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private final static Logger log = Logger.getLogger(FacilitiesRenameAndRemoveNOGAActTypes.class);
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public FacilitiesRenameAndRemoveNOGAActTypes() {
 		super();
-		System.out.println("    init " + this.getClass().getName() + " module...");
-		System.out.println("    done.");
+		log.info("    init " + this.getClass().getName() + " module...");
+		log.info("    done.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -48,8 +51,8 @@ public class FacilitiesRenameAndRemoveNOGAActTypes extends FacilitiesAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	public void run(Facilities facilities) {
-		System.out.println("    running " + this.getClass().getName() + " module...");
-		System.out.println("      # facilities = " + facilities.getFacilities().size());
+		log.info("    running " + this.getClass().getName() + " module...");
+		log.info("      # facilities = " + facilities.getFacilities().size());
 
 		ArrayList<Facility> facs = new ArrayList<Facility>(facilities.getFacilities().values());
 		facilities.getFacilities().clear();
@@ -64,7 +67,7 @@ public class FacilitiesRenameAndRemoveNOGAActTypes extends FacilitiesAlgorithm {
 			ff.getActivities().putAll(f.getActivities());
 		}
 		
-		System.out.println("      # facilities = " + facilities.getFacilities().size());
-		System.out.println("    done.");
+		log.info("      # facilities = " + facilities.getFacilities().size());
+		log.info("    done.");
 	}
 }

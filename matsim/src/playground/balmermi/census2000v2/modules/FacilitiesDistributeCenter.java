@@ -20,6 +20,7 @@
 
 package playground.balmermi.census2000v2.modules;
 
+import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -31,15 +32,17 @@ public class FacilitiesDistributeCenter {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private final static Logger log = Logger.getLogger(FacilitiesDistributeCenter.class);
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public FacilitiesDistributeCenter() {
 		super();
-		System.out.println("    init " + this.getClass().getName() + " module...");
+		log.info("    init " + this.getClass().getName() + " module...");
 		Gbl.random.nextDouble();
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -51,8 +54,8 @@ public class FacilitiesDistributeCenter {
 	//////////////////////////////////////////////////////////////////////
 
 	public void run(final Facilities facilities) {
-		System.out.println("    running " + this.getClass().getName() + " module...");
-		System.out.println("      # facilities = " + facilities.getFacilities().size());
+		log.info("    running " + this.getClass().getName() + " module...");
+		log.info("      # facilities = " + facilities.getFacilities().size());
 		
 		for (Facility f : facilities.getFacilities().values()) {
 			CoordI c = f.getCenter();
@@ -62,7 +65,7 @@ public class FacilitiesDistributeCenter {
 			c.setY(c.getY()+Gbl.random.nextDouble()*100.0);
 		}
 
-		System.out.println("      # facilities = " + facilities.getFacilities().size());
-		System.out.println("    done.");
+		log.info("      # facilities = " + facilities.getFacilities().size());
+		log.info("    done.");
 	}
 }

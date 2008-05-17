@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
@@ -41,6 +42,8 @@ public class PlansCreateFromCensus2000 {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private final static Logger log = Logger.getLogger(PlansCreateFromCensus2000.class);
+
 	private final String infile;
 	private final Households households;
 
@@ -50,10 +53,10 @@ public class PlansCreateFromCensus2000 {
 
 	public PlansCreateFromCensus2000(final String infile, final Households households) {
 		super();
-		System.out.println("    init " + this.getClass().getName() + " module...");
+		log.info("    init " + this.getClass().getName() + " module...");
 		this.infile = infile;
 		this.households = households;
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -72,7 +75,7 @@ public class PlansCreateFromCensus2000 {
 	//////////////////////////////////////////////////////////////////////
 
 	public void run(final Plans plans) {
-		System.out.println("    running " + this.getClass().getName() + " algorithm...");
+		log.info("    running " + this.getClass().getName() + " algorithm...");
 
 		if (!plans.getPersons().isEmpty()) { Gbl.errorMsg("plans DB is not empty!"); }
 		plans.setName("created by '" + this.getClass().getName() + "'");
@@ -185,7 +188,7 @@ public class PlansCreateFromCensus2000 {
 
 				// progress report
 				if (line_cnt % 100000 == 0) {
-					System.out.println("    Line " + line_cnt + ": # persons = " + plans.getPersons().size() + "; # pids = " + pids.size());
+					log.info("    Line " + line_cnt + ": # persons = " + plans.getPersons().size() + "; # pids = " + pids.size());
 				}
 				line_cnt++;
 			}
@@ -193,7 +196,7 @@ public class PlansCreateFromCensus2000 {
 			fr.close();
 			
 			// some info
-			System.out.println("    "+plans.getPersons().size()+" persons created! (#pids="+pids.size()+")");
+			log.info("    "+plans.getPersons().size()+" persons created! (#pids="+pids.size()+")");
 			int same_cnt = 0; int diff_cnt = 0; int wonly_cnt = 0; int zonly_cnt = 0;
 			for (Person p : plans.getPersons().values()) {
 				Map<String,Object> p_atts = p.getCustomAttributes();
@@ -202,15 +205,15 @@ public class PlansCreateFromCensus2000 {
 				else if ((p_atts.get(CAtts.HH_W)!=null)&&(p_atts.get(CAtts.HH_Z)==null)) { wonly_cnt++; }
 				else { if (p_atts.get(CAtts.HH_W).equals(p_atts.get(CAtts.HH_Z))) { same_cnt++; } else { diff_cnt++; } }
 			}
-			System.out.println("    # civil only          = " + zonly_cnt);
-			System.out.println("    # econo only          = " + wonly_cnt);
-			System.out.println("    # one household only  = " + same_cnt);
-			System.out.println("    # two households      = " + diff_cnt);
-			System.out.println("    left over pids:");
+			log.info("    # civil only          = " + zonly_cnt);
+			log.info("    # econo only          = " + wonly_cnt);
+			log.info("    # one household only  = " + same_cnt);
+			log.info("    # two households      = " + diff_cnt);
+			log.info("    left over pids:");
 			for (Id pid : pids) { System.out.println("    "+pid); }
 		} catch (Exception e) {
 			Gbl.errorMsg(e);
 		}
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 }

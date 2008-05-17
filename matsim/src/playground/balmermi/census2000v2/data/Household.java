@@ -23,6 +23,7 @@ package playground.balmermi.census2000v2.data;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facility;
 import org.matsim.plans.Person;
@@ -34,6 +35,8 @@ public class Household {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
+
+	private final static Logger log = Logger.getLogger(Household.class);
 
 	private final Id id;
 	private final Municipality municipality;
@@ -59,18 +62,18 @@ public class Household {
 
 	public final boolean setHHTPZ(int hhtpz) {
 		if (hhtpz == -9) { return true; }
-		if ((hhtpz < 1000) || (hhtpz > 9804)) { System.err.println("hhtpz val not allowed! "+ this.toString()); return false; }
+		if ((hhtpz < 1000) || (hhtpz > 9804)) { log.error("hhtpz val not allowed! "+ this.toString()); return false; }
 		if (this.hhtpz == Integer.MIN_VALUE) { this.hhtpz = hhtpz; return true; }
 		else if (this.hhtpz == hhtpz) { return true; }
-		else { System.err.println("hhtpz val does not match! "+ this.toString()); return false; }
+		else { log.error("hhtpz val does not match! "+ this.toString()); return false; }
 	}
 	
 	public final boolean setHHTPW(int hhtpw) {
 		if (hhtpw == -9) { return true; }
-		if ((hhtpw < 1000) || (hhtpw > 9804)) { System.err.println("hhtpw val not allowed! "+ this.toString()); return false; }
+		if ((hhtpw < 1000) || (hhtpw > 9804)) { log.error("hhtpw val not allowed! "+ this.toString()); return false; }
 		if (this.hhtpw == Integer.MIN_VALUE) { this.hhtpw = hhtpw; return true; }
 		else if (this.hhtpw == hhtpw) { return true; }
-		else { System.err.println("hhtpw val does not match! "+ this.toString()); return false; }
+		else { log.error("hhtpw val does not match! "+ this.toString()); return false; }
 	}
 	
 	//////////////////////////////////////////////////////////////////////
