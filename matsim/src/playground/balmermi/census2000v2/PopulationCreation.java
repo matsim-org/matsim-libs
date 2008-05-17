@@ -25,6 +25,8 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.plans.Plans;
+import org.matsim.plans.PlansWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldCheck;
@@ -33,6 +35,7 @@ import org.matsim.world.algorithms.WorldValidation;
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
 import playground.balmermi.census2000v2.modules.HouseholdsCreateFromCensus2000;
+import playground.balmermi.census2000v2.modules.PlansCreateFromCensus2000;
 import playground.balmermi.census2000v2.modules.WorldFacilityZoneMapping;
 
 public class PopulationCreation {
@@ -50,7 +53,13 @@ public class PopulationCreation {
 		System.out.println("  extracting input directory... ");
 		String indir = Gbl.getConfig().facilities().getInputFile();
 		indir = indir.substring(0,indir.lastIndexOf("/"));
-		System.out.println(indir);
+		System.out.println("    "+indir);
+		System.out.println("  done.");
+
+		System.out.println("  extracting output directory... ");
+		String outdir = Gbl.getConfig().facilities().getOutputFile();
+		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
+		System.out.println("    "+outdir);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -77,9 +86,9 @@ public class PopulationCreation {
 		Households households = new Households(municipalities);
 		System.out.println("  done.");
 
-//		System.out.println("  creating plans object...");
-//		Plans plans = new Plans(Plans.NO_STREAMING);
-//		System.out.println("  done.");
+		System.out.println("  creating plans object...");
+		Plans plans = new Plans(Plans.NO_STREAMING);
+		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -104,22 +113,20 @@ public class PopulationCreation {
 		
 		//////////////////////////////////////////////////////////////////////
 
-//		System.out.println("  running plans modules... ");
-//		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households).run(plans);
-//		System.out.println("  done.");
+		System.out.println("  running plans modules... ");
+		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households).run(plans);
+		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 		
-//		System.out.println("  dumping households...");
-//		households.print();
-//		System.out.println("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
+		System.out.println("  writing plans xml file... ");
+		PlansWriter plans_writer = new PlansWriter(plans);
+		plans_writer.write();
+		System.out.println("  done.");
 
-//		System.out.println("  writing plans xml file... ");
-//		PlansWriter plans_writer = new PlansWriter(plans);
-//		plans_writer.write();
-//		System.out.println("  done.");
+		System.out.println("  writing households txt file... ");
+		households.writeTable(outdir+"/output_households.txt");
+		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
 		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);

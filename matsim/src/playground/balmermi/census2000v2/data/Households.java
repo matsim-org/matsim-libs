@@ -20,6 +20,9 @@
 
 package playground.balmermi.census2000v2.data;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
@@ -85,6 +88,31 @@ public class Households {
 		System.out.println("------- printing households done. -------");
 	}
 	
+	//////////////////////////////////////////////////////////////////////
+
+	public final void writeTable(String outfile) {
+		try {
+			FileWriter fw = new FileWriter(outfile);
+			BufferedWriter out = new BufferedWriter(fw);
+			out.write("hh_id\tz_id\tf_id\thhtpw\thhtpz\tp_w_list\tp_z_list\n");
+			out.flush();
+			for (Household hh : this.households.values()) {
+				out.write(hh.getId()+"\t"+
+				          hh.getMunicipality().getZone().getId()+"\t"+
+				          hh.getFacility().getId()+"\t"+
+				          hh.getHHTPW()+"\t"+
+				          hh.getHHTPZ()+"\t");
+				for (Id id : hh.getPersonsW().keySet()) { out.write(id+";"); } out.write("\t");
+				for (Id id : hh.getPersonsZ().keySet()) { out.write(id+";"); } out.write("\n");
+			}
+			out.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+
 	//////////////////////////////////////////////////////////////////////
 
 	@Override

@@ -100,6 +100,14 @@ public class Household {
 		return this.persons_z;
 	}
 	
+	public final int getHHTPW() {
+		return this.hhtpw;
+	}
+	
+	public final int getHHTPZ() {
+		return this.hhtpz;
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////

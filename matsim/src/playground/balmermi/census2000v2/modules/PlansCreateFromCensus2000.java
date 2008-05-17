@@ -210,7 +210,7 @@ public class PlansCreateFromCensus2000 {
 			log.info("    # one household only  = " + same_cnt);
 			log.info("    # two households      = " + diff_cnt);
 			log.info("    left over pids:");
-			for (Id pid : pids) { System.out.println("    "+pid); }
+			for (Id pid : pids) { log.info("    "+pid); }
 		} catch (Exception e) {
 			Gbl.errorMsg(e);
 		}
