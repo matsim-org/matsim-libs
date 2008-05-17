@@ -103,7 +103,6 @@ public class ScenarioParsing {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running world modules... ");
-		new WorldCreateRasterLayer(1000).run(Gbl.getWorld());
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 		new WorldValidation().run(Gbl.getWorld());
