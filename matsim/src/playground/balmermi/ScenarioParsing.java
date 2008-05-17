@@ -47,6 +47,7 @@ public class ScenarioParsing {
 		System.out.println("  reading facilities xml file... ");
 		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		Gbl.getWorld().complete();
 		System.out.println("  done.");
 
 //		System.out.println("  reading the network xml file...");
