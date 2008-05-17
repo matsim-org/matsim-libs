@@ -61,15 +61,15 @@ public class ScenarioParsing {
 
 		Scenario.readWorld();
 		
-//		System.out.println("  reading world xml file... ");
-//		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-//		worldReader.readFile(Gbl.getConfig().world().getInputFile());
-//		System.out.println("  done.");
+		System.out.println("  reading world xml file... ");
+		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
+		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		System.out.println("  done.");
 
-//		System.out.println("  reading facilities xml file... ");
-//		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-//		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-//		System.out.println("  done.");
+		System.out.println("  reading facilities xml file... ");
+		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		System.out.println("  done.");
 
 //		System.out.println("  reading the network xml file...");
 ////		NetworkLayer network = null;
@@ -150,7 +150,7 @@ public class ScenarioParsing {
 
 //		Scenario.writePlans(plans);
 //		Scenario.writeNetwork(network);
-//		Scenario.writeFacilities(facilities);
+		Scenario.writeFacilities(facilities);
 		Scenario.writeWorld(Gbl.getWorld());
 		Scenario.writeConfig();
 
