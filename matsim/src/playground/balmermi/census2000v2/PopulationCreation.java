@@ -117,7 +117,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running plans modules... ");
-		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households).run(plans);
+		new PlansCreateFromCensus2000(indir+"/ETHZ_Pers.tab",households,facilities).run(plans);
 //		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(plans);
 		System.out.println("  done.");
 

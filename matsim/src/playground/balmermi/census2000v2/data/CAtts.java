@@ -48,9 +48,8 @@ public abstract class CAtts {
 	public static final String ACT_LG = "leisure_gastro";
 	public static final String ACT_LS = "leisure_sports";
 
-
 	//////////////////////////////////////////////////////////////////////
-	// household indentifiers
+	// household identifiers
 	//////////////////////////////////////////////////////////////////////
 
 	public static final String HH_Z = "hh_z";
