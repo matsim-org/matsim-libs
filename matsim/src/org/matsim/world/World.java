@@ -272,10 +272,6 @@ public class World {
 		}
 	}
 
-	protected final void addMapping(final Zone zone1, final Zone zone2) {
-		this.addMapping(zone1,zone2);
-	}
-
 	protected final void addMapping(final MappingRule mapping_rule, final String down_zone_id, final String up_zone_id) {
 		Zone down_zone = (Zone)mapping_rule.getDownLayer().getLocation(down_zone_id);
 		Zone up_zone   = (Zone)mapping_rule.getUpLayer().getLocation(up_zone_id);
