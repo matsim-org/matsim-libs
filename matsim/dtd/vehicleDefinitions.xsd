@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://www.matsim.org/files/dtd"
+xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
+xml:lang="en">
+<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+<!-- This xml schema contains xml definitions for household information in the MATSim framework  -->
+
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+
+<xs:element name="vehicleDefinitions">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="vehicleType" type="vehicleTypeType" minOccurs="1" maxOccurs="unbounded" />
+      <xs:element name="vehicle" type="vehicleDefType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="vehicleTypeType">
+  <xs:sequence>
+    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
+    <xs:element name="capacity" type="capacityType" minOccurs="1" maxOccurs="1"/>
+    <xs:element name="length">  
+      <xs:complexType>
+        <xs:attribute name="meter" type="xs:decimal" use="required" default="7.5"/>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="width">  
+      <xs:complexType>
+        <xs:attribute name="meter" type="xs:decimal" use="required" default="1"/>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="maximumVelocity">
+      <xs:complexType>
+      <xs:attribute name="meterPerSecond" type="xs:decimal" use="optional" default="1"/>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="typeName" type="xs:string" use="optional" />
+</xs:complexType>
+
+<xs:complexType name="capacityType">
+  <xs:sequence>
+    <xs:element name="seats" minOccurs="1" maxOccurs="1">
+      <xs:complexType>
+        <xs:attribute name="persons" type="xs:nonNegativeInteger"/>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="standingRoom" minOccurs="1" maxOccurs="1">
+      <xs:complexType>
+        <xs:attribute name="persons" type="xs:nonNegativeInteger"/>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+
+<xs:complexType name="vehicleDefType">
+  <xs:annotation>
+    <xs:documentation></xs:documentation>
+  </xs:annotation>
+  <xs:complexContent>
+    <xs:extension base="matsimObjectType">
+      <xs:attribute name="type" type="xs:string" />
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+</xs:schema>

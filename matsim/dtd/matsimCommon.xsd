@@ -37,4 +37,27 @@ xml:lang="en">
   <xs:attribute name="refId" type="matsimIdType" use="required" />
 </xs:complexType>
 
+<xs:complexType name="locationType">
+  <xs:annotation>
+    <xs:documentation>This type can be used for all georeferenced data within the 
+    framework. As we try to avoid reimplementing GIS functionality this is a very 
+    limited basic type without spatial reference system information. However it
+    seems to be useful to have a common type for such information, which can
+    be extended if needed.</xs:documentation>
+  </xs:annotation>
+  <xs:choice>
+    <xs:sequence>
+      <xs:element name="xCoord" type="xs:decimal" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="yCoord" type="xs:decimal" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:element name="facility" >
+      <xs:complexType>
+        <xs:complexContent>
+          <xs:extension base="idRefType" />
+        </xs:complexContent>
+      </xs:complexType>
+    </xs:element>
+  </xs:choice>
+</xs:complexType>
+
 </xs:schema>

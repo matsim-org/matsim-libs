@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vehicleDefinitions
+  xmlns="http://www.matsim.org/files/dtd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions.xsd">
+ 
+<vehicleType typeName="normalCar">
+  <description> </description>
+  <!-- capacity including driver -->
+  <capacity>
+    <seats persons="5"/>
+    <stehplatz persons="20" />
+  </capacity>
+  <length meter="7.5" />
+  <width meter="3" />
+  <maximumVelocity meterPerSecond="42" />
+</vehicleType>
+
+<vehicle id="25" type="normalCar" />
+
+</vehicleDefinitions>
