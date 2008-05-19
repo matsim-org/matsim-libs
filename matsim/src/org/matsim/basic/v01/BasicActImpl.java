@@ -87,5 +87,19 @@ public class BasicActImpl implements BasicAct {
 		this.startTime = startTime;
 	}
 
-	
+//  This overrides java.lang.equals
+    public boolean equals(Object o) {
+        if ((o instanceof BasicAct) 
+            && (((BasicAct) o).getType().equals(type))
+            && (((BasicAct) o).getLink().getId().toString().equals(link.getId().toString()))
+        	&& (((BasicAct) o).getStartTime()==startTime)
+        	&& (((BasicAct) o).getEndTime()==endTime))
+    	return true;
+        else
+            return false;
+    }
+//  This overrides java.lang.hashCode
+    public int hashCode() {
+        return type.hashCode() + link.getId().toString().hashCode();
+    }
 }

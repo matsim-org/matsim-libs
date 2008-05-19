@@ -294,7 +294,8 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 //				Remember a number of activities equal to at least the number of
 //				acts per plan times the number of plans in memory
 				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
-				p.getKnowledge().map.manageMemory(max_memory, p.getPlans());
+				this.log.info("NOTE that manageMemory is turned off");
+//				p.getKnowledge().map.manageMemory(max_memory, p.getPlans());
 			}
 			this.log.info(" ... done");
 
@@ -355,8 +356,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				k.map.prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
 //				Note that this crashes if I am using an output plans file with a lot of activities.
 //				The activities and acts are not associated correctly.
-//				does this mean that the activities written out in knowledge are not correct for the acts?
-//				or does this mean that the act.RefId() needs to be unique per act AND plan?
+//				does this mean that the act.RefId() needs to be unique per act AND plan?
 				k.map.initializeActActivityMapRandom(plan);
 				k.map.initializeActActivityMapFromFile(plan,aar);
 			}
