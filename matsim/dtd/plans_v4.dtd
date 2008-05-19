@@ -54,7 +54,7 @@
 
 <!ELEMENT activity       (location+)>
 <!ATTLIST activity
-          type           (home|work|education|shop|leisure) #REQUIRED>
+          type           CDATA #REQUIRED>
 
 <!ELEMENT location       (capacity?,opentime*)>
 <!ATTLIST location
