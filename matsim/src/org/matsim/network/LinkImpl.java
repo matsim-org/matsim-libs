@@ -213,10 +213,6 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		this.roles.resize(index+1);
 	}
 
-	protected void setEuklideanDist(double euklideanDist) {
-		this.euklideanDist = euklideanDist;
-	}
-
 	public void setType(String type) {
 		this.type = type;
 	}
