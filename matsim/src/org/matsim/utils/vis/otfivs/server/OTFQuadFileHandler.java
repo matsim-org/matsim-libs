@@ -328,7 +328,7 @@ public class OTFQuadFileHandler {
 			}
 		}
 		
-		protected class OTFObjectInputStream extends ObjectInputStream {
+		public static class OTFObjectInputStream extends ObjectInputStream {
 			public OTFObjectInputStream(InputStream in) throws IOException {
 				super(in);
 				// TODO Auto-generated constructor stub

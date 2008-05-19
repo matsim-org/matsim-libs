@@ -23,6 +23,7 @@ public class SimpleBackgroundDrawer extends OTFGLDrawableImpl implements OTFGLDr
 
 	public void onDraw(GL gl) {
 		if (picture == null) this.picture = OTFOGLDrawer.createTexture(name);
+		if (picture == null) return;
         TextureCoords tc = picture.getImageTexCoords();
         float tx1 = tc.left();
         float ty1 = tc.top();

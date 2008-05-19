@@ -39,8 +39,8 @@ public class OTFVisConfig extends Module {
 	private String queryType = "Agent";
 	private boolean multipleSelect = true;
 	private boolean showParking = false;
-	private Color backgroundColor = new Color(179, 179, 179, 0);
-	private Color networkColor = new Color(128, 128, 255, 128);
+	private Color backgroundColor = new Color(230, 230, 230, 0);
+	private Color networkColor = new Color(128, 128, 190, 200);
 	private float linkWidth = 30;
 
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);

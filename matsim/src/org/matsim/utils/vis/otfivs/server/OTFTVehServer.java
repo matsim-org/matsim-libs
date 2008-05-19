@@ -147,6 +147,7 @@ public class OTFTVehServer implements OTFServerRemote{
 			this.nextTime = actTime;
 			this.timesteps.put((int)this.nextTime, buffer);
 			this.actBuffer = buffer;
+			//System.out.println("Read timestep: " + actTime);
 		}
 
 	}

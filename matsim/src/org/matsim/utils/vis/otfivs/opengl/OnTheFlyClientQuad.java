@@ -45,7 +45,7 @@ public class OnTheFlyClientQuad extends Thread {
 
 		connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-//		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.add(QueueLink.class, OTFLinkAgentsHandler.Writer.class);
 		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
