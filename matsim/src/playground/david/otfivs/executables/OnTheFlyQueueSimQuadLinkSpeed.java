@@ -78,7 +78,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 
 		//Gbl.printElapsedTime();
 //		myOTFServer.updateOut(time);
-		status = this.myOTFServer.getStatus(time);
+		status = this.myOTFServer.updateStatus(time);
 
 	}
 

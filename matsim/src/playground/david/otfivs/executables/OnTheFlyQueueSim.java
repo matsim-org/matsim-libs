@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.otfivs.executables;
+package playground.david.otfivs.executables;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.config.Config;
@@ -31,6 +31,7 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.utils.misc.Time;
+import org.matsim.utils.vis.otfivs.executables.OnTheFlyClientQuadSwing;
 import org.matsim.utils.vis.otfivs.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.otfivs.server.OnTheFlyServer;
 import org.matsim.world.MatsimWorldReader;
@@ -79,7 +80,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	public void afterSimStep(double time) {
 		super.afterSimStep(time);
 
-		int status = this.myOTFServer.getStatus(time);
+		this.myOTFServer.updateStatus(time);
 
 	}
 

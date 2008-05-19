@@ -183,7 +183,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		lastTime = time;
 	}
 
-	public int getStatus(double time){
+	public int updateStatus(double time){
 		localTime = (int)time;
 
 		if (updateThis.size() != 0) {
