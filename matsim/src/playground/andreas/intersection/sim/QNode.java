@@ -34,6 +34,8 @@ public class QNode extends QueueNode{
 		if(this.myNodeTrafficLightControler != null){
 
 			// Node is traffic light controlled
+			
+			// TODO [an] has to be changed to getGreenInLANES instead of LINKS
 
 			SignalGroupSettings[] greenSignalGroups = this.myNodeTrafficLightControler.getGreenInLinks(now);
 

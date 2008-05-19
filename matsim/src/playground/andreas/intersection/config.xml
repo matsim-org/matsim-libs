@@ -11,13 +11,13 @@
 
 	<module name="network">
 		<!--<param name="inputNetworkFile" value="&INPUTBASE;/4armig.xml" />-->
-		<param name="inputNetworkFile" value="&INPUTBASE;/test/net_2arms.xml" />
+		<param name="inputNetworkFile" value="&INPUTBASE;/test/data/net_4a.xml.gz" />
 		<param name="outputNetworkFile" value="&OUTPUTBASE;/network.xml" />
 	</module>
 
 	<module name="plans">
 <!--		<param name="inputPlansFile" value="&INPUTBASE;/plane.xml" />-->
-		<param name="inputPlansFile" value="&INPUTBASE;/test/plans_2a_2500.xml" />
+		<param name="inputPlansFile" value="&INPUTBASE;/test/data/plans_4a_160ue.xml.gz" />
 		<param name="outputPlansFile" value="&OUTPUTBASE;/plans.xml" />
 		<param name="outputVersion" value="v4" />
 	</module>
@@ -36,6 +36,7 @@
 
 		<param name = "snapshotperiod"	value = "00:00:01"/>
  		<param name = "snapshotFormat"	value = "netvis"/>  
+		<param name = "snapshotStyle"	value = "queue"/>
 	</module>
 
 	<module name="planCalcScore">

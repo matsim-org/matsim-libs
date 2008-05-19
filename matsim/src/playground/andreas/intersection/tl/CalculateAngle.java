@@ -1,5 +1,7 @@
 package playground.andreas.intersection.tl;
 
+import java.util.TreeMap;
+
 import org.matsim.network.Link;
 import org.matsim.utils.geometry.shared.Coord;
 
@@ -27,17 +29,35 @@ public class CalculateAngle {
 	public static Link getLeftLane(Link inLink){
 		
 		CalculateAngle myCalculateAngle = new CalculateAngle(inLink);
-		return myCalculateAngle.calculateLeftLane();		
-	}
+		TreeMap<Double, Link> result = myCalculateAngle.calculateOutLinksSortedByAngle();
 
-	private Link calculateLeftLane() {
+		if (result.size() == 0){
+			return null;
+		}else
+			return result.get(result.lastKey());
+	}
+	
+	/**
+	 * Calculates the orientation of the outLinks for a given inLink
+	 * beginning from the right. The most 'left' outLink comes last.
+	 * backLink is ignored
+	 * 
+	 * @param inLink The inLink given
+	 * @return Collection of outLinks, or an empty collection, if there is only
+	 * one outLink back to the inLinks fromNode.
+	 */
+	public static TreeMap<Double, Link> getOutLinksSortedByAngle(Link inLink){
+		CalculateAngle myCalculateAngle = new CalculateAngle(inLink);
+		return myCalculateAngle.calculateOutLinksSortedByAngle();
+	}
+	
+	private TreeMap<Double, Link> calculateOutLinksSortedByAngle() {
 		
 		Coord coordInLink = getVector(this.inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
 		
-		Link leftLane = null;
-		double thetaLeftLane = Double.NEGATIVE_INFINITY;
-				
+		TreeMap<Double, Link> leftLane = new TreeMap<Double, Link>();
+						
 		for (Link outLink : this.inLink.getToNode().getOutLinks().values()) {
 			
 			if (!(outLink.getToNode().equals(this.inLink.getFromNode()))){
@@ -55,15 +75,13 @@ public class CalculateAngle {
 
 				}
 				
-				if (thetaDiff > thetaLeftLane){
-					thetaLeftLane = thetaDiff;
-					leftLane = outLink;
-				}				
+				leftLane.put(thetaDiff, outLink);
+				
 			}			
 		}
-		System.out.println("t LeftLane: " + thetaLeftLane);
+		
 		return leftLane;
-	}
+	}	
 	
 	private Coord getVector(Link link){
 		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();

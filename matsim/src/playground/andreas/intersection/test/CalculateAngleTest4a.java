@@ -36,7 +36,7 @@ public class CalculateAngleTest4a extends MatsimTestCase {
 		
 		assertEquals(" ",
 				data.getNetwork().getLink("5"), CalculateAngle.getLeftLane(data.getNetwork().getLink("3")));
-		
+				
 	}	
 
 	public void reset(int iteration) {

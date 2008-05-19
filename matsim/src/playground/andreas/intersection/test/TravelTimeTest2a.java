@@ -90,7 +90,7 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 			}
 
 //			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
-			new QSim(events, data.getPopulation(), data.getNetwork(), tempFile, groupDefinitions).run();
+			new QSim(events, data.getPopulation(), data.getNetwork(), tempFile, groupDefinitions, false).run();
 			results.put(Integer.valueOf(i), beginningOfLink2);
 			
 			File delFile = new File(tempFile);
@@ -125,7 +125,7 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 		Events events = new Events();
 		events.addHandler(this);
 		
-		new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions).run();
+		new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false).run();
 		System.out.println("tF = 60s, " + beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + beginningOfLink2.numberOfVehPassed_ + ", " + beginningOfLink2.firstVehPassTime_s + ", " + beginningOfLink2.lastVehPassTime_s);
 		MeasurePoint QSim = beginningOfLink2;
 		

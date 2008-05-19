@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.SimulationTimer;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.netvis.NetVis;
 
@@ -37,8 +36,9 @@ public class QControler extends Controler {
 	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QControler.class);
 	
-	final String signalSystems = "./src/playground/andreas/intersection/test/signalSystemConfig_2a.xml";
-	final String groupDefinitions = "./src/playground/andreas/intersection/test/signalGroupDefinition_2a.xml";
+	final String signalSystems = "./src/playground/andreas/intersection/test/data/signalSystemConfig_4a.xml";
+	final String groupDefinitions = "./src/playground/andreas/intersection/test/data/signalGroupDefinition_4a.xml";
+	final static Boolean useOTF = false;
 
 	public QControler(final Config config) {
 		super(config);
@@ -46,8 +46,8 @@ public class QControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		SimulationTimer.setTime(0);
-		QSim sim = new QSim(this.events, this.population, this.network, this.signalSystems, this.groupDefinitions);
+		QSim sim = new QSim(this.events, this.population, this.network,
+				this.signalSystems, this.groupDefinitions, useOTF);
 		sim.run();
 	}
 
@@ -76,8 +76,8 @@ public class QControler extends Controler {
 			System.exit(0);
 		}
 
-//		String[] visargs = { "./output/ITERS/it.0/Snapshot" };
-//		NetVis.main(visargs);
+		String[] visargs = { "./output/ITERS/it.0/Snapshot" };
+		NetVis.main(visargs);
 	}
 
 	public static void main(final String[] args) {
@@ -95,7 +95,13 @@ public class QControler extends Controler {
 		controler.setWriteEvents(true);
 
 		controler.run();
-		controler.makeVis();
+//		controler.makeVis();
+		
+		if (QControler.useOTF){
+//			OTFVis.main(new String [] {"./output/ITERS/it.0/0.otfvis.mvi"});
+		} else {
+			NetVis.main(new String[]{"./output/ITERS/it.0/Snapshot"});
+		}
 	}
 
 }

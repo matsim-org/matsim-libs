@@ -21,6 +21,7 @@
 package playground.andreas.intersection.sim;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.LegHistogram;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueLink;
@@ -41,11 +43,16 @@ import org.matsim.trafficlights.data.SignalGroupDefinition;
 import org.matsim.trafficlights.data.SignalGroupDefinitionParser;
 import org.matsim.trafficlights.data.SignalSystemConfiguration;
 import org.matsim.trafficlights.data.SignalSystemConfigurationParser;
+import org.matsim.utils.vis.otfivs.executables.OnTheFlyClientQuadSwing;
+import org.matsim.utils.vis.otfivs.gui.PreferencesDialog;
+import org.matsim.utils.vis.otfivs.opengl.OnTheFlyClientQuad;
+import org.matsim.utils.vis.otfivs.opengl.gui.PreferencesDialog2;
+import org.matsim.utils.vis.otfivs.server.OnTheFlyServer;
 import org.xml.sax.SAXException;
 
 import playground.andreas.intersection.tl.SignalSystemControlerImpl;
 
-public class QSim extends QueueSimulation {
+public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 
 	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QueueLink.class);
@@ -54,13 +61,18 @@ public class QSim extends QueueSimulation {
 	
 	final String signalSystems;
 	final String groupDefinitions;
+	
+	protected OnTheFlyServer myOTFServer = null;
+	protected Boolean useOTF = true;
+	protected LegHistogram hist = null;
 
-	public QSim(Events events, Plans population, NetworkLayer network, String signalSystems, String groupDefinitions) {
+	public QSim(Events events, Plans population, NetworkLayer network, String signalSystems, String groupDefinitions, Boolean useOTF) {
 		super(network, population, events);
 		
 		this.network = new QueueNetworkLayer(networkLayer, new TrafficLightQueueNetworkFactory());
 		this.signalSystems = signalSystems;
 		this.groupDefinitions = groupDefinitions;
+		this.useOTF = useOTF;
 		
 		this.setVehiclePrototye(QVehicle.class);
 	}
@@ -105,21 +117,57 @@ public class QSim extends QueueSimulation {
 	}
 
 	protected void prepareSim() {
+		
+		if (useOTF){
+			this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.plans, events, false);
+		}
 		super.prepareSim();
+		
+		if (useOTF){
+			this.hist = new LegHistogram(300);
+			events.addHandler(this.hist);
+			
+			// FOR TESTING ONLY!
+			PreferencesDialog.PreDialogClass = PreferencesDialog2.class;
+			OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019");
+			client.start();
+			try {
+				this.myOTFServer.pause();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 //		log.info("prepareSim");
 		readSignalSystemControler();
 	}
 
 	protected void cleanupSim() {
-//		log.info("cleanup");
+		if (useOTF){
+			this.myOTFServer.cleanup();
+			this.myOTFServer = null;
+		}
+		super.cleanupSim();
 	}
-
-	public void beforeSimStep(final double time) {
-//		 log.info("before sim step");
-	}
-
+//
+//	public void beforeSimStep(final double time) {
+////		 log.info("before sim step");
+//	}
+//
 	public void afterSimStep(final double time) {
-//		 log.info("after sim step");
+		super.afterSimStep(time);
+		if (useOTF){
+			this.myOTFServer.updateStatus(time);
+		}
 	}
 
+	public static void runnIt() {
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		OnTheFlyClientQuadSwing.main(new String []{"rmi:127.0.0.1:4019"});
+	}
 }

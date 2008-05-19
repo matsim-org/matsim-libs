@@ -50,7 +50,7 @@ public class PlansGeneratorControler extends Controler {
 	@Override
 	protected Plans loadPopulation() {
 		
-		final int agentsPerDest = 2500;
+		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
 		Plans pop = new Plans(Plans.NO_STREAMING);
@@ -59,29 +59,36 @@ public class PlansGeneratorControler extends Controler {
 		LinkedList <Link> fromLinks = new LinkedList<Link>();
 		LinkedList <Link> toLinks = new LinkedList<Link>();
 		
-		fromLinks.add(this.network.getLink("5"));
-//		fromLinks.add(this.network.getLink("40"));
-//		fromLinks.add(this.network.getLink("60"));
-//		fromLinks.add(this.network.getLink("80"));
+		fromLinks.add(this.network.getLink("20"));
+		fromLinks.add(this.network.getLink("40"));
+		fromLinks.add(this.network.getLink("60"));
+		fromLinks.add(this.network.getLink("80"));
 		
-		toLinks.add(this.network.getLink("3"));
-//		toLinks.add(this.network.getLink("40"));
-//		toLinks.add(this.network.getLink("60"));
-//		toLinks.add(this.network.getLink("80"));
+		toLinks.add(this.network.getLink("101"));
+		toLinks.add(this.network.getLink("201"));
+		toLinks.add(this.network.getLink("301"));
+		toLinks.add(this.network.getLink("401"));
 		
-		for (Link fromLink : fromLinks) {
-			
-			for (Link toLink : toLinks) {
+		for(int i=0; i<10; i++){
+			for (Link fromLink : fromLinks) {
 				
-				if (!fromLink.equals(toLink)){
-				
-					for (int ii = 1; ii <= agentsPerDest; ii++) {
-						generatePerson(numberOfPlans, fromLink, toLink, pop);
-						numberOfPlans++;
+				for (Link toLink : toLinks) {
+					
+					if (!fromLink.equals(toLink)){
+					
+						for (int ii = 1; ii <= agentsPerDest; ii++) {
+							generatePerson(numberOfPlans, fromLink, toLink, pop);
+							numberOfPlans++;
+						}
 					}
-				}
-			}			
-		}	
+				}			
+			}	
+			
+		}
+		
+		
+		
+//		generatePerson(numberOfPlans, this.network.getLink("30"), this.network.getLink("201"), pop);
 
 		return pop;
 
@@ -108,7 +115,7 @@ public class PlansGeneratorControler extends Controler {
 
 		Config config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/config.xml" });
 		
-		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
+		String netFileName = "src/playground/andreas/intersection/test/data/net_4a.xml.gz";
 		config.network().setInputFile(netFileName);
 		
 		final PlansGeneratorControler controler = new PlansGeneratorControler(config);

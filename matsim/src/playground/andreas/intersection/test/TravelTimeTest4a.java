@@ -27,7 +27,7 @@ public class TravelTimeTest4a extends MatsimTestCase implements	EventHandlerLink
 	public void testTrafficLightIntersection4arms() {
 		this.agentTravelTimes = new HashMap<Id, Double>();
 		Config conf = loadConfig("src/playground/andreas/intersection/test/config.xml");
-		String popFileName = "src/playground/andreas/intersection/test/data/plans_4a_12.xml.gz";
+		String popFileName = "src/playground/andreas/intersection/test/data/plans_4a_16.xml.gz";
 		String netFileName = "src/playground/andreas/intersection/test/data/net_4a.xml.gz";
 		
 		String signalSystems = "./src/playground/andreas/intersection/test/data/signalSystemConfig_4a.xml";
@@ -40,27 +40,31 @@ public class TravelTimeTest4a extends MatsimTestCase implements	EventHandlerLink
 		Events events = new Events();
 		events.addHandler(this);
 		
-		new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions).run();
+		new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false).run();
 
-		assertEquals(140.0, agentTravelTimes.get(new IdImpl(1)).intValue(), EPSILON);
-		assertEquals(141.0, agentTravelTimes.get(new IdImpl(2)).intValue(), EPSILON);
-		assertEquals(142.0, agentTravelTimes.get(new IdImpl(3)).intValue(), EPSILON);
-		assertEquals(101.0, agentTravelTimes.get(new IdImpl(4)).intValue(), EPSILON);
-		assertEquals(100.0, agentTravelTimes.get(new IdImpl(5)).intValue(), EPSILON);
-		assertEquals( 99.0, agentTravelTimes.get(new IdImpl(6)).intValue(), EPSILON);
-		assertEquals(110.0, agentTravelTimes.get(new IdImpl(7)).intValue(), EPSILON);
-		assertEquals(111.0, agentTravelTimes.get(new IdImpl(8)).intValue(), EPSILON);
-		assertEquals(112.0, agentTravelTimes.get(new IdImpl(9)).intValue(), EPSILON);
-		assertEquals(125.0, agentTravelTimes.get(new IdImpl(10)).intValue(), EPSILON);
-		assertEquals(126.0, agentTravelTimes.get(new IdImpl(11)).intValue(), EPSILON);
-		assertEquals(127.0, agentTravelTimes.get(new IdImpl(12)).intValue(), EPSILON);		
+		assertEquals(118.0, agentTravelTimes.get(new IdImpl(1)).intValue(), EPSILON);
+		assertEquals(118.0, agentTravelTimes.get(new IdImpl(2)).intValue(), EPSILON);
+		assertEquals(119.0, agentTravelTimes.get(new IdImpl(3)).intValue(), EPSILON);
+		assertEquals(120.0, agentTravelTimes.get(new IdImpl(4)).intValue(), EPSILON);
+		assertEquals( 80.0, agentTravelTimes.get(new IdImpl(5)).intValue(), EPSILON);
+		assertEquals( 79.0, agentTravelTimes.get(new IdImpl(6)).intValue(), EPSILON);
+		assertEquals( 78.0, agentTravelTimes.get(new IdImpl(7)).intValue(), EPSILON);
+		assertEquals( 77.0, agentTravelTimes.get(new IdImpl(8)).intValue(), EPSILON);
+		assertEquals( 90.0, agentTravelTimes.get(new IdImpl(9)).intValue(), EPSILON);
+		assertEquals( 87.0, agentTravelTimes.get(new IdImpl(10)).intValue(), EPSILON);
+		assertEquals( 89.0, agentTravelTimes.get(new IdImpl(11)).intValue(), EPSILON);
+		assertEquals( 89.0, agentTravelTimes.get(new IdImpl(12)).intValue(), EPSILON);
+		assertEquals(103.0, agentTravelTimes.get(new IdImpl(13)).intValue(), EPSILON);	
+		assertEquals(103.0, agentTravelTimes.get(new IdImpl(14)).intValue(), EPSILON);	
+		assertEquals(104.0, agentTravelTimes.get(new IdImpl(15)).intValue(), EPSILON);	
+		assertEquals(105.0, agentTravelTimes.get(new IdImpl(16)).intValue(), EPSILON);	
 		
 	}
 
 	public void handleEvent(EventLinkEnter event) {
 		
-		if (event.linkId.equalsIgnoreCase("20") || event.linkId.equalsIgnoreCase("40") ||
-				event.linkId.equalsIgnoreCase("60") || event.linkId.equalsIgnoreCase("80")) {
+		if (event.linkId.equalsIgnoreCase("101") || event.linkId.equalsIgnoreCase("201") ||
+				event.linkId.equalsIgnoreCase("301") || event.linkId.equalsIgnoreCase("401")) {
 			
 //			System.out.println(event);
 					

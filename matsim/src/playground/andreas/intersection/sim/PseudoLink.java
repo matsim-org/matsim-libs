@@ -1,5 +1,6 @@
 package playground.andreas.intersection.sim;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -12,9 +13,13 @@ import org.matsim.events.EventAgentWait2Link;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.SimulationTimer;
+import org.matsim.mobsim.Vehicle;
 import org.matsim.mobsim.VehicleDepartureTimeComparator;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Leg;
+import org.matsim.utils.misc.Time;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 public class PseudoLink {
 
@@ -70,6 +75,10 @@ public class PseudoLink {
 	private double flowCapacityFraction = Double.NaN;
 
 	private double flowCapacityFractionalRest = 1.0;
+	
+	/** For Visualization only */
+	int lane = 1;
+	double length_m = -1;
 
 
 	public PseudoLink(QLink originalLink, boolean amIOriginalLink) {
@@ -79,6 +88,7 @@ public class PseudoLink {
 
 	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double length_m, int numberOfLanes, double freeSpeed_m_s, double flowCapacityFromNetFile_Veh_h, double effectiveCellSize){
 
+		this.length_m = length_m;
 		this.meterFromLinkEnd = meterFromLinkEnd_m;
 
 		this.freeSpeedTravelTime = length_m / freeSpeed_m_s;
@@ -256,6 +266,18 @@ public class PseudoLink {
 	public Queue<QVehicle> getFlowQueue(){
 		return this.flowQueue;
 	}
+	
+	public Queue<QVehicle> getStorageQueue(){
+		return this.storageQueue;
+	}
+	
+	public Queue<QVehicle> getParkToLinkQueue(){
+		return parkToLinkQueue;
+	}
+	
+	public Queue<QVehicle> getParkingQueue(){
+		return this.parkingQueue;
+	}
 
 	public double getMeterFromLinkEnd() {
 		return this.meterFromLinkEnd;
@@ -294,6 +316,110 @@ public class PseudoLink {
 
 		return veh;
 	}
+	
+	double getMaxPossibleNumberOfVehOnLink(){
+		return this.storageCapacity + this.flowCapacityCeil;
+	}
 
+	void getVehPositions(final Collection<PositionInfo> positions){
+
+		double now = SimulationTimer.getTime();
+		int cnt = 0;
+
+		double queueEnd = this.realLink.getLink().getLength() - meterFromLinkEnd; // the position of the start of the queue jammed vehicles build at the end of the link
+
+		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
+
+		double vehLen = Math.min( // the length of a vehicle in visualization
+				this.length_m / (this.getMaxPossibleNumberOfVehOnLink()), // all vehicles must have place on the link
+				((NetworkLayer)this.realLink.getLink().getLayer()).getEffectiveCellSize() / storageCapFactor); // a vehicle should not be larger than it's actual size
+
+
+		// put all cars in the buffer one after the other
+		for (Vehicle veh : this.flowQueue) {
+
+			int lane = this.lane;
+
+			int cmp = (int) (veh.getDepartureTime_s() + (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
+			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
+			veh.setSpeed(speed);
+
+			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.realLink.getLink(), queueEnd,
+					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
+			positions.add(position);
+			cnt++;
+			queueEnd -= vehLen;
+		}
+
+		/*
+		 * place other driving cars according the following rule:
+		 * - calculate the time how long the vehicle is on the link already
+		 * - calculate the position where the vehicle should be if it could drive with freespeed
+		 * - if the position is already within the congestion queue, add it to the queue with slow speed
+		 * - if the position is not within the queue, just place the car 	with free speed at that place
+		 */
+		double lastDistance = Integer.MAX_VALUE;
+		for (Vehicle veh : this.storageQueue) {
+			double travelTime = now - (veh.getDepartureTime_s() - this.realLink.getLink().getFreespeedTravelTime(now));
+			double distanceOnLink = (this.realLink.getLink().getFreespeedTravelTime(now) == 0.0 ? 0.0
+					: ((travelTime / this.realLink.getLink().getFreespeedTravelTime(now)) * (this.realLink.getLink().getLength() - meterFromLinkEnd)));
+			if (distanceOnLink > queueEnd) { // vehicle is already in queue
+				distanceOnLink = queueEnd;
+				queueEnd -= vehLen;
+			}
+			if (distanceOnLink >= lastDistance) {
+				/*
+				 * we have a queue, so it should not be possible that one vehicles
+				 * overtakes another. additionally, if two vehicles entered at the same
+				 * time, they would be drawn on top of each other. we don't allow this,
+				 * so in this case we put one after the other. Theoretically, this could
+				 * lead to vehicles placed at negative distance when a lot of vehicles
+				 * all enter at the same time on an empty link. not sure what to do
+				 * about this yet... just setting them to 0 currently.
+				 */
+				distanceOnLink = lastDistance - vehLen;
+				if (distanceOnLink < 0)
+					distanceOnLink = 0.0;
+			}
+			int cmp = (int) (veh.getDepartureTime_s()
+					+ (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
+			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(now);
+			veh.setSpeed(speed);
+			int lane = this.lane;
+			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.realLink.getLink(), distanceOnLink,
+					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
+			positions.add(position);
+			lastDistance = distanceOnLink;
+		}
+
+		int lane = this.lane; // place them next to the link
+
+		/*
+		 * Put the vehicles from the waiting list in positions. Their actual
+		 * position doesn't matter, so they are just placed to the coordinates of
+		 * the from node
+		 */
+
+		for (Vehicle veh : this.parkToLinkQueue) {
+			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.realLink.getLink(),
+					((NetworkLayer) this.realLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
+					PositionInfo.VehicleState.Parking, veh.getDriver().getVisualizerData());
+			positions.add(position);
+		}
+
+		/*
+		 * put the vehicles from the parking list in positions their actual position
+		 * doesn't matter, so they are just placed to the coordinates of the from
+		 * node
+		 */
+		lane = this.lane; // place them next to the link
+		for (Vehicle veh : this.parkingQueue) {
+			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.realLink.getLink(),
+					((NetworkLayer) this.realLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
+					PositionInfo.VehicleState.Parking, veh.getDriver().getVisualizerData());
+			positions.add(position);
+		}			
+
+	}
 
 }

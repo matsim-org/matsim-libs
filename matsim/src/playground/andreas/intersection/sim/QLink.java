@@ -1,13 +1,16 @@
 package playground.andreas.intersection.sim;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.events.EventLinkEnter;
+import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
@@ -17,6 +20,9 @@ import org.matsim.network.Link;
 import org.matsim.trafficlights.data.SignalGroupDefinition;
 import org.matsim.trafficlights.data.SignalLane;
 import org.matsim.utils.misc.Time;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+
+import playground.andreas.intersection.tl.CalculateAngle;
 
 public class QLink extends QueueLink {
 
@@ -180,6 +186,77 @@ public class QLink extends QueueLink {
 				}
 			}
 		}
+		
+		findLayout();
+		
+		addUTurn();
 	}
-
+	
+	private void addUTurn(){
+		
+		for (Link outLink : this.getLink().getToNode().getOutLinks().values()) {
+			
+			if((outLink.getToNode().equals(this.getLink().getFromNode()))){
+				
+				PseudoLink tempPseudoLink = null;
+				for (PseudoLink pseudoLink : pseudoLinksList) {
+					
+					if( tempPseudoLink == null || tempPseudoLink.lane < pseudoLink.lane){
+						tempPseudoLink = pseudoLink;
+					}					
+				}
+				
+				tempPseudoLink.addDestLink(outLink);
+				originalLink.addDestLink(outLink);	
+				
+			}
+		}
+		
+		
+	}
+	
+	private void findLayout(){
+		
+		SortedMap<Double, Link> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
+		
+		for (PseudoLink pseudoLink : pseudoLinksList) {
+			int lane = 1;
+			for (Link link : result.values()) {
+				if (pseudoLink.getDestLinks().contains(link)){
+					pseudoLink.lane = lane;
+					break;
+				} else
+					lane++;
+			}			
+		}		
+	}
+	
+	public Collection<PositionInfo> getVehiclePositions(
+			final Collection<PositionInfo> positions) {
+		String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
+		if ("queue".equals(snapshotStyle)) {
+			getVehiclePositionsQueue(positions);			
+		} else {
+			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
+		}
+		return positions;
+	}
+	
+	/**
+	 * Calculates the positions of all vehicles on this link according to the
+	 * queue-logic: Vehicles are placed on the link according to the ratio between
+	 * the free-travel time and the time the vehicles are already on the link. If
+	 * they could have left the link already (based on the time), the vehicles
+	 * start to build a traffic-jam (queue) at the end of the link.
+	 *
+	 * @param positions
+	 *          A collection where the calculated positions can be stored.
+	 */
+	public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
+		
+		for (PseudoLink pseudoLink : pseudoLinksList) {
+			pseudoLink.getVehPositions(positions);
+		}		
+		
+	}
 }
