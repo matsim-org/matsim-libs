@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * SceneGraph.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.utils.vis.otfivs.caching;
 
 import java.util.Collections;
@@ -10,7 +30,6 @@ import java.util.Map;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.otfivs.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfivs.data.OTFData;
-import org.matsim.utils.vis.otfivs.data.OTFData.Receiver;
 import org.matsim.utils.vis.otfivs.interfaces.OTFDrawer;
 
 
