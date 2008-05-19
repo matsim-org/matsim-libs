@@ -61,13 +61,13 @@ public class PtRate2QGIS implements X2QGIS {
 			Id linkId = plan.getFirstActivity().getLinkId();
 			Integer a = agents.get(linkId);
 			if (a == null)
-				a = new Integer(0);// TODO to inspect
-			agents.put(linkId, new Integer(a.intValue() + 1));
+				a = Integer.valueOf(0);
+			agents.put(linkId, Integer.valueOf(a.intValue() + 1));
 			if (plan.getType().equals(Plan.Type.PT)) {
 				Integer p = ptUsers.get(linkId);
 				if (p == null)
-					p = new Integer(0);// TODO to inspect
-				ptUsers.put(linkId, new Integer(p.intValue() + 1));
+					p = Integer.valueOf(0);
+				ptUsers.put(linkId, Integer.valueOf(p.intValue() + 1));
 			}
 		}
 
@@ -76,11 +76,24 @@ public class PtRate2QGIS implements X2QGIS {
 			for (Id linkId : ptUsers.keySet()) {
 				double a = ((double) agents.get(linkId).intValue());
 				double ptRate = ((double) ptUsers.get(linkId).intValue()) / a;
-				ptRates
-						.put(linkId,
-								new Double((ptRate == 0.0) ? -1.0 : ptRate));
+				ptRates.put(linkId, Double.valueOf((ptRate == 0.0) ? -1.0
+						: ptRate));
 			}
 			return ptRates;
+		}
+
+		/**
+		 * @return the ptUsers
+		 */
+		public Map<Id, Integer> getPtUsers() {
+			return ptUsers;
+		}
+
+		/**
+		 * @return the agents
+		 */
+		public Map<Id, Integer> getAgents() {
+			return agents;
 		}
 	}
 
@@ -97,11 +110,37 @@ public class PtRate2QGIS implements X2QGIS {
 		mn2q.readNetwork("../data/ivtch/input/ivtch-osm-wu.xml"); // //
 		mn2q.setCrs(ch1903);
 		LinkPtRate lpr = new LinkPtRate();
-		mn2q.readPlans("/net/ils/run466/output/ITERS/it.400/400.plans.xml.gz",
+		mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
 				lpr);
-		mn2q.addParameter("PtRate on link", Double.class, lpr.getPtRate());
+		mn2q.addParameter("PtRate", Double.class, lpr.getPtRate());
+		mn2q.addParameter("PtUsers", Integer.class, lpr.getPtUsers());
+		mn2q.addParameter("Persons", Integer.class, lpr.getAgents());
 		mn2q
-				.writeShapeFile("/net/ils/run466/output/ITERS/it.400/466.400.ptRate.shp");
+				.writeShapeFile("/net/ils/run466/output/ITERS/it.500/466.500.ptRate.shp");
+		/*
+		 * //
+		 * ////////////////////////////////////////////////////////////////////
+		 * Differenz-Network for pt-rate to Shp-file //
+		 * /////////////////////////////////////////////////////////////////////
+		 */
+		// mn2q.readNetwork("../data/ivtch/input/ivtch-osm-wu.xml"); // //
+		// mn2q.setCrs(ch1903);
+		// LinkPtRate lprA = new LinkPtRate();
+		// mn2q.readPlans("/net/ils/run466/output/ITERS/it.200/200.plans.xml.gz",
+		// lprA);
+		// LinkPtRate lprB = new LinkPtRate();
+		// mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
+		// lprB);
+		// Map<Id, Double> diff = new TreeMap<Id, Double>();
+		// for (Id linkId : lprA.getAgents().keySet()) {
+		// Double B = lprB.getPtRate().get(linkId);
+		// double b = (B != null) ? B.doubleValue() : 0.0;
+		// Double A = lprA.getPtRate().get(linkId);
+		// double a = (A != null) ? A.doubleValue() : 0.0;
+		// diff.put(linkId, Double.valueOf(b - a));
+		// }
+		// mn2q.addParameter("PtRate", Double.class, diff);
+		// mn2q
+		// .writeShapeFile("/net/ils/run466/output/ITERS/it.500/466.500-200.ptRate.shp");
 	}
-
 }

@@ -1,0 +1,133 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * DeparTime2QGIS.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+/**
+ * 
+ */
+package playground.yu.utils.qgis;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.matsim.basic.v01.Id;
+import org.matsim.plans.Act;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
+import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.plans.algorithms.PlanAlgorithmI;
+
+/**
+ * @author yu
+ * 
+ */
+public class DeparTime2QGIS implements X2QGIS {
+	public static class LinkDeparTime extends PersonAlgorithm implements
+			PlanAlgorithmI {
+		/**
+		 * @param arg0
+		 *            a linkId
+		 * @param arg1
+		 *            sum of departuretimes
+		 */
+		private Map<Id, Double> dpTimes;
+		/**
+		 * @param arg0
+		 *            a linkId
+		 * @param arg1
+		 *            counter of departure
+		 */
+		private Map<Id, Integer> dpCnt;
+
+		public LinkDeparTime() {
+			dpCnt = new HashMap<Id, Integer>();
+			dpTimes = new HashMap<Id, Double>();
+		}
+
+		@Override
+		public void run(Person person) {
+			run(person.getSelectedPlan());
+		}
+
+		public void run(Plan plan) {
+			Act fa = plan.getFirstActivity();
+			double dt = fa.getEndTime();
+			Id linkId = fa.getLinkId();
+			Integer c = dpCnt.get(linkId);
+			if (c == null)
+				c = Integer.valueOf(0);
+			dpCnt.put(linkId, Integer.valueOf(c.intValue() + 1));
+			Double times = dpTimes.get(linkId);
+			if (times == null)
+				times = Double.valueOf(0.0);
+			dpTimes.put(linkId, Double.valueOf(times.doubleValue() + dt));
+		}
+
+		public Map<Id, Double> getAvgDeparTime() {
+			Map<Id, Double> avgDpTimes = new TreeMap<Id, Double>();
+			for (Id linkId : dpCnt.keySet()) {
+				avgDpTimes.put(linkId, Double.valueOf(dpTimes.get(linkId)
+						.doubleValue()
+						/ dpCnt.get(linkId).doubleValue()));
+			}
+			return avgDpTimes;
+		}
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
+		/*
+		 * ///////////////////////////////////////////////////////////////
+		 * DepartureTime and MATSim-network to Shp-file // *
+		 * ///////////////////////////////////////////////////////////////
+		 */
+		// mn2q.readNetwork("../data/ivtch/input/ivtch-osm-wu.xml"); // //
+		// mn2q.setCrs(ch1903);
+		// LinkDeparTime ldt = new LinkDeparTime();
+		// mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
+		// ldt);
+		// mn2q.addParameter("DeparTime", Double.class, ldt.getAvgDeparTime());
+		// mn2q
+		// .writeShapeFile("/net/ils/run466/output/ITERS/it.500/466.500.deparTime.shp");
+		mn2q.readNetwork("../data/ivtch/input/ivtch-osm-wu.xml"); // //
+		mn2q.setCrs(ch1903);
+		LinkDeparTime lprA = new LinkDeparTime();
+		mn2q.readPlans("/net/ils/run465/output/ITERS/it.500/500.plans.xml.gz",
+				lprA);
+		LinkDeparTime lprB = new LinkDeparTime();
+		mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
+				lprB);
+		Map<Id, Double> diff = new TreeMap<Id, Double>();
+//		for (Id linkId : lprA.getAgents().keySet()) {
+//			Double B = lprB.getPtRate().get(linkId);
+//			double b = (B != null) ? B.doubleValue() : 0.0;
+//			Double A = lprA.getPtRate().get(linkId);
+//			double a = (A != null) ? A.doubleValue() : 0.0;
+//			diff.put(linkId, Double.valueOf(b - a));
+//		}
+		mn2q.addParameter("PtRate", Double.class, diff);
+		mn2q
+				.writeShapeFile("/net/ils/run466/output/ITERS/it.500/466.500-200.ptRate.shp");
+	}
+
+}

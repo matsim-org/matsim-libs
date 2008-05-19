@@ -80,8 +80,8 @@ public class MATSimNet2QGIS {
 		}
 	}
 
-	private NetworkLayer network;
-	private CoordinateReferenceSystem crs = null;
+	protected NetworkLayer network;
+	protected CoordinateReferenceSystem crs = null;
 	private Network2PolygonGraph n2g;
 
 	public void readNetwork(String netFilename) {
@@ -102,7 +102,7 @@ public class MATSimNet2QGIS {
 			e.printStackTrace();
 		}
 		this.n2g = new Network2PolygonGraph(this.network, this.crs);
-	}
+	}// TODO override
 
 	/**
 	 * @param ShapeFilename
@@ -150,5 +150,13 @@ public class MATSimNet2QGIS {
 		population.addAlgorithm(pa);
 		new MatsimPlansReader(population).readFile(plansFilename);
 		population.runAlgorithms();
+	}
+
+	/**
+	 * @param n2g
+	 *            the n2g to set
+	 */
+	public void setN2g(Network2PolygonGraph n2g) {
+		this.n2g = n2g;
 	}
 }

@@ -35,13 +35,18 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.config.Config;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventAgentStuck;
+import org.matsim.events.Events;
+import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
+import org.matsim.gbl.Gbl;
+import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -51,7 +56,7 @@ import org.matsim.utils.misc.Time;
 
 /**
  * @author mrieser
- *
+ * 
  * Counts the number of vehicles departed, arrived or got stuck per time bin
  * based on events.
  */
@@ -75,7 +80,7 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 	/**
 	 * Creates a new LegHistogram with the specified binSize and the specified
 	 * number of bins.
-	 *
+	 * 
 	 * @param binSize
 	 *            The size of a time bin in seconds.
 	 * @param nofBins
@@ -105,7 +110,7 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 	/**
 	 * Creates a new LegHistogram with the specified binSize and a default
 	 * number of bins, such that 30 hours are analyzed.
-	 *
+	 * 
 	 * @param binSize
 	 *            The size of a time bin in seconds.
 	 */
@@ -117,11 +122,13 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 	/* Implementation of eventhandler-Interfaces */
 
 	public void handleEvent(final EventAgentDeparture event) {
-		internHandleEvent(event, this.countsDep, this.carCountsDep, this.ptCountsDep);
+		internHandleEvent(event, this.countsDep, this.carCountsDep,
+				this.ptCountsDep);
 	}
 
 	public void handleEvent(final EventAgentArrival event) {
-		internHandleEvent(event, this.countsArr, this.carCountsArr, this.ptCountsArr);
+		internHandleEvent(event, this.countsArr, this.carCountsArr,
+				this.ptCountsArr);
 	}
 
 	public void handleEvent(final EventAgentStuck event) {
@@ -151,7 +158,7 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 
 	/**
 	 * Writes the gathered data tab-separated into a text file.
-	 *
+	 * 
 	 * @param filename
 	 *            The name of a file where to write the gathered data.
 	 */
@@ -170,21 +177,24 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 	}
 
 	private void calcOnRoute() {
-		this.onRoute[0] = this.countsDep[0] - this.countsArr[0] - this.countsStuck[0];
-		this.carOnRoute[0] = this.carCountsDep[0] - this.carCountsArr[0] - this.carCountsStuck[0];
+		this.onRoute[0] = this.countsDep[0] - this.countsArr[0]
+				- this.countsStuck[0];
+		this.carOnRoute[0] = this.carCountsDep[0] - this.carCountsArr[0]
+				- this.carCountsStuck[0];
 		this.ptOnRoute[0] = this.ptCountsDep[0] - this.ptCountsArr[0];
 		for (int i = 1; i < this.countsDep.length; i++) {
-			this.onRoute[i] = this.onRoute[i - 1] + this.countsDep[i] - this.countsArr[i]
-					- this.countsStuck[i];
+			this.onRoute[i] = this.onRoute[i - 1] + this.countsDep[i]
+					- this.countsArr[i] - this.countsStuck[i];
 			this.carOnRoute[i] = this.carOnRoute[i - 1] + this.carCountsDep[i]
 					- this.carCountsArr[i] - this.carCountsStuck[i];
-			this.ptOnRoute[i] = this.ptOnRoute[i - 1] + this.ptCountsDep[i] - this.ptCountsArr[i];
+			this.ptOnRoute[i] = this.ptOnRoute[i - 1] + this.ptCountsDep[i]
+					- this.ptCountsArr[i];
 		}
 	}
 
 	/**
 	 * Writes the gathered data tab-separated into a text stream.
-	 *
+	 * 
 	 * @param bw
 	 *            The data stream where to write the gathered data.
 	 */
@@ -195,13 +205,14 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 					+ "\tcarDepartures\tcarArrivals\tcarStuck\tcarOnRoute"
 					+ "\tptDepartures\tptArrivals\tptStuck\tptOnRoute\n");
 			for (int i = 0; i < this.countsDep.length; i++) {
-				bw.write(Time.writeTime(i * this.binSize) + "\t" + i * this.binSize
-						+ "\t" + this.countsDep[i] + "\t" + this.countsArr[i] + "\t"
-						+ this.countsStuck[i] + "\t" + this.onRoute[i] + "\t"
-						+ this.carCountsDep[i] + "\t" + this.carCountsArr[i] + "\t"
-						+ this.carCountsStuck[i] + "\t" + this.carOnRoute[i] + "\t"
-						+ this.ptCountsDep[i] + "\t" + this.ptCountsArr[i] + "\t" + 0
-						+ "\t" + this.ptOnRoute[i] + "\n");
+				bw.write(Time.writeTime(i * this.binSize) + "\t"
+						+ i * this.binSize + "\t" + this.countsDep[i] + "\t"
+						+ this.countsArr[i] + "\t" + this.countsStuck[i] + "\t"
+						+ this.onRoute[i] + "\t" + this.carCountsDep[i] + "\t"
+						+ this.carCountsArr[i] + "\t" + this.carCountsStuck[i]
+						+ "\t" + this.carOnRoute[i] + "\t"
+						+ this.ptCountsDep[i] + "\t" + this.ptCountsArr[i]
+						+ "\t" + 0 + "\t" + this.ptOnRoute[i] + "\n");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
