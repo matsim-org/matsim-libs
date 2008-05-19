@@ -39,7 +39,6 @@ public class IdImpl implements Id, Serializable {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (other == null) return false;
 		if (!(other instanceof IdImpl)) return false;
 		if (other == this) return true;
 		return this.id.equals(((IdImpl)other).id);
