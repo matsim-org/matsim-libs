@@ -20,17 +20,21 @@
 
 package playground.balmermi.census2000v2.modules;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
-import org.matsim.world.Location;
+import org.matsim.world.Layer;
 import org.matsim.world.World;
 
-public class WorldWriteFacilityZoneMapping {
+import playground.balmermi.census2000.data.Municipalities;
+
+public class WorldParseFacilityZoneMapping {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -38,22 +42,18 @@ public class WorldWriteFacilityZoneMapping {
 
 	private final static Logger log = Logger.getLogger(WorldWriteFacilityZoneMapping.class);
 
-	private final String outfile;
+	private final String infile;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public WorldWriteFacilityZoneMapping(String outfile) {
+	public WorldParseFacilityZoneMapping(String infile) {
 		super();
 		log.info("    init " + this.getClass().getName() + " module...");
-		this.outfile = outfile;
+		this.infile = infile;
 		log.info("    done.");
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////
 	// run methods
@@ -61,20 +61,26 @@ public class WorldWriteFacilityZoneMapping {
 
 	public void run(World world) {
 		log.info("    running " + this.getClass().getName() + " module...");
+		Layer fl = world.getLayer(Facilities.LAYER_TYPE);
+		Layer zl = world.getLayer(Municipalities.MUNICIPALITY);
+		int line_cnt = 0;
 		try {
-			FileWriter fw = new FileWriter(outfile);
-			BufferedWriter out = new BufferedWriter(fw);
-			out.write("f_id\tz_id\n");
-			out.flush();
-			for (Location f : world.getLayer(Facilities.LAYER_TYPE).getLocations().values()) {
-				if (f.getUpMapping().size() != 1) { Gbl.errorMsg("f_id"+f.getId()+": There must be exactly one zone mapping!"); }
-				out.write(f.getId()+"\t"+f.getUpMapping().firstKey()+"\n");
+			FileReader fr = new FileReader(this.infile);
+			BufferedReader br = new BufferedReader(fr);
+
+			// Skip header
+			String curr_line = br.readLine(); line_cnt++;
+			while ((curr_line = br.readLine()) != null) {
+				String[] entries = curr_line.split("\t", -1);
+				// f_id  z_id
+				// 0     1
+				Id fid = new IdImpl(entries[0]);
+				Id zid = new IdImpl(entries[1]);
+				world.addMapping(fl.getLocation(fid),zl.getLocation(zid));
+				line_cnt++;
 			}
-			out.close();
-			fw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
+			Gbl.errorMsg(e);
 		}
 		log.info("    done.");
 	}

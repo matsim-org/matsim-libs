@@ -20,14 +20,24 @@
 
 package playground.balmermi.census2000v2.data;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.Facility;
+import org.matsim.gbl.Gbl;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plans;
+import org.matsim.world.Layer;
 
 import playground.balmermi.census2000.data.Municipalities;
+import playground.balmermi.census2000.data.Municipality;
 
 public class Households {
 
@@ -78,6 +88,59 @@ public class Households {
 	//////////////////////////////////////////////////////////////////////
 	// public methods
 	//////////////////////////////////////////////////////////////////////
+	
+	public final void parse(String infile, Plans plans) {
+		Layer fl = Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+		int line_cnt = 0;
+		try {
+			FileReader fr = new FileReader(infile);
+			BufferedReader br = new BufferedReader(fr);
+
+			// Skip header
+			String curr_line = br.readLine(); line_cnt++;
+			while ((curr_line = br.readLine()) != null) {
+				String[] entries = curr_line.split("\t", -1);
+				// hh_id    z_id  f_id    hhtpw  hhtpz  p_w_list          p_z_list
+				// 1404079  3103  914921  2111   2111   5742752;5757646;  5742752;5757646;
+				// 0        1     2       3      4      5                 6
+
+				Id hhid = new IdImpl(entries[0]);
+				Id zid = new IdImpl(entries[1]);
+				int mid = Integer.parseInt(zid.toString());
+				Id fid = new IdImpl(entries[2]);
+				int hhtpw = Integer.parseInt(entries[3]);
+				int hhtpz = Integer.parseInt(entries[4]);
+				
+				Municipality m = this.municipalities.getMunicipality(mid);
+				Facility f = (Facility)fl.getLocation(fid);
+				
+				Household hh = new Household(hhid,m,f);
+				if (hhtpw != Integer.MIN_VALUE) { hh.setHHTPW(hhtpw); }
+				if (hhtpz != Integer.MIN_VALUE) { hh.setHHTPZ(hhtpz); }
+				this.addHH(hh);
+				
+				String p_w_list = entries[5];
+				String p_z_list = entries[6];
+				entries = p_w_list.split(";",-1);
+				for (int i=0; i<entries.length-1; i++) {
+					Id pid = new IdImpl(entries[i]);
+					Person p = plans.getPerson(pid);
+					if (p == null) { Gbl.errorMsg("that should not happen!"); }
+					if (hh.getPersonsW().put(p.getId(),p)!= null) { Gbl.errorMsg("that should not happen!"); }
+				}
+				entries = p_z_list.split(";",-1);
+				for (int i=0; i<entries.length-1; i++) {
+					Id pid = new IdImpl(entries[i]);
+					Person p = plans.getPerson(pid);
+					if (p == null) { Gbl.errorMsg("that should not happen!"); }
+					if (hh.getPersonsZ().put(p.getId(),p)!= null) { Gbl.errorMsg("that should not happen!"); }
+				}
+				line_cnt++;
+			}
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+	}
 
 	public final void print() {
 		System.out.println("---------- printing households ----------");
