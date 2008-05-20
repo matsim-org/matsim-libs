@@ -126,14 +126,20 @@ public class Households {
 					Id pid = new IdImpl(entries[i]);
 					Person p = plans.getPerson(pid);
 					if (p == null) { Gbl.errorMsg("that should not happen!"); }
-					if (hh.getPersonsW().put(p.getId(),p)!= null) { Gbl.errorMsg("that should not happen!"); }
+					if (hh.getPersonsW().put(p.getId(),p) !=  null) { Gbl.errorMsg("that should not happen!"); }
+					if (p.getCustomAttributes().put(CAtts.HH_W,hh) != null) {
+						Gbl.errorMsg("hhid="+hh.getId()+", pid="+p.getId()+": person does already have a "+CAtts.HH_W+" assigned!");
+					}
 				}
 				entries = p_z_list.split(";",-1);
 				for (int i=0; i<entries.length-1; i++) {
 					Id pid = new IdImpl(entries[i]);
 					Person p = plans.getPerson(pid);
 					if (p == null) { Gbl.errorMsg("that should not happen!"); }
-					if (hh.getPersonsZ().put(p.getId(),p)!= null) { Gbl.errorMsg("that should not happen!"); }
+					if (hh.getPersonsZ().put(p.getId(),p) != null) { Gbl.errorMsg("that should not happen!"); }
+					if (p.getCustomAttributes().put(CAtts.HH_Z,hh) != null) {
+						Gbl.errorMsg("hhid="+hh.getId()+", pid="+p.getId()+": person does already have a "+CAtts.HH_Z+" assigned!");
+					}
 				}
 				line_cnt++;
 			}

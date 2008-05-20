@@ -20,6 +20,7 @@
 
 package org.matsim.basic.v01;
 
+import org.matsim.facilities.Facility;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.misc.Time;
@@ -30,6 +31,7 @@ public class BasicActImpl implements BasicAct {
 	protected double endTime = Time.UNDEFINED_TIME;
 	protected String type;
 	protected BasicLink link = null;
+	protected Facility facility = null;
 
 	private int refId = Integer.MIN_VALUE;
 	private CoordI coord = null;
@@ -48,6 +50,10 @@ public class BasicActImpl implements BasicAct {
 	public BasicLink getLink() {
 		return this.link;
 	}
+	
+	public Facility getFacility() {
+		return this.facility;
+	}
 
 	public final void setEndTime(final double endTime) {
 		this.endTime = endTime;
@@ -61,6 +67,9 @@ public class BasicActImpl implements BasicAct {
 		this.link = link;
 	}
 	
+	public final void setFacility(final Facility facility) {
+		this.facility = facility;
+	}
 
 	public final CoordI getCoord() {
 		return this.coord;

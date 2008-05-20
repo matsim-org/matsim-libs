@@ -271,6 +271,9 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 			if (atts.getValue("ref_id") != null) {
 				this.curract.setRefId(Integer.parseInt(atts.getValue("ref_id")));
 			}
+			if (atts.getValue("facility") != null) {
+				this.curract.setFacility(atts.getValue("facility"));
+			}
 		} catch (Exception e) {
 			Gbl.errorMsg(e);
 		}

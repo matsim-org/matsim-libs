@@ -27,6 +27,8 @@ import java.io.Serializable;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.Id;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -108,7 +110,17 @@ public class Act extends BasicActImpl implements Serializable {
 		return this.isPrimary;
 	}
 
+	//////////////////////////////////////////////////////////////////////
+	// set methods
+	//////////////////////////////////////////////////////////////////////
 
+	protected void setFacility(final String f_id) {
+		Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+		if (facilities == null) { throw new RuntimeException("Facilities Layer does not exist!"); }
+		this.facility = (Facility)facilities.getLocation(f_id);
+		if (this.facility == null) { throw new RuntimeException("facility id="+f_id+" does not exist"); }
+	}
+	
 	protected void setLinkFromString(final String link) {
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		if (network == null) {

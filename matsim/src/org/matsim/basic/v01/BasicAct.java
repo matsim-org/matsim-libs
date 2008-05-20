@@ -20,6 +20,7 @@
 
 package org.matsim.basic.v01;
 
+import org.matsim.facilities.Facility;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.utils.geometry.CoordI;
 /**
@@ -32,6 +33,10 @@ public interface BasicAct {
 	public BasicLink getLink();
 
 	public void setLink(final BasicLink link);
+	
+	public Facility getFacility();
+	
+	public void setFacility(final Facility facility);
 
 	public double getEndTime();
 

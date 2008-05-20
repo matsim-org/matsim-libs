@@ -246,6 +246,8 @@ public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 		out.write(" type=\"" + act.getType() + "\"");
 		if (act.getLink() != null)
 			out.write(" link=\"" + act.getLink().getId() + "\"");
+		if (act.getFacility() != null)
+			out.write(" facility=\"" + act.getFacility().getId() + "\"");
 		if (act.getCoord() != null) {
 			out.write(" x=\"" + act.getCoord().getX() + "\" y=\"" + act.getCoord().getY() + "\"");
 		}

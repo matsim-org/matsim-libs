@@ -35,6 +35,7 @@ import org.matsim.world.algorithms.WorldValidation;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
+import playground.balmermi.census2000v2.modules.PersonCreateFakePlanFromKnowledge;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
 import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
 
@@ -120,6 +121,12 @@ public class IIDMGeneration {
 		households.parse(indir+"/households.txt",plans);
 		System.out.println("  done.");
 
+		//////////////////////////////////////////////////////////////////////
+		
+		System.out.println("  running person modules... ");
+		new PersonCreateFakePlanFromKnowledge().run(plans);
+		System.out.println("  done.");
+		
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing households txt file... ");

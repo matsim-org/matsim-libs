@@ -87,6 +87,7 @@
           x              CDATA #IMPLIED
           y              CDATA #IMPLIED
           link           CDATA #IMPLIED
+          facility       CDATA #IMPLIED
           start_time     CDATA #IMPLIED
           end_time       CDATA #IMPLIED
           dur            CDATA #IMPLIED
