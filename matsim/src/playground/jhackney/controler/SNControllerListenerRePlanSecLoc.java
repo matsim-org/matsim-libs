@@ -294,8 +294,8 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 //				Remember a number of activities equal to at least the number of
 //				acts per plan times the number of plans in memory
 				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
-				this.log.info("NOTE that manageMemory is turned off");
-//				p.getKnowledge().map.manageMemory(max_memory, p.getPlans());
+//				this.log.info("NOTE that manageMemory is turned off");
+				p.getKnowledge().map.manageMemory(max_memory, p.getPlans());
 			}
 			this.log.info(" ... done");
 
