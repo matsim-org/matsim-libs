@@ -63,7 +63,7 @@ public class MentalMap {
 	// In a Plan, each Act takes place in one Facility.
 	// One Facility can have multiple Acts, however, since Facilities can have several Activities.
 	// The Act will change each iteration of the mobility simulation (start/end times).
-	// Its ID will be stored so that it can be found again.
+	// Its mapping to the Activity is stored so it can be found again
 
 //	Map of activities and acts: this is like a memory of having been someplace
 	private Hashtable<Activity,Act> mapActivityAct = new Hashtable<Activity,Act>();
