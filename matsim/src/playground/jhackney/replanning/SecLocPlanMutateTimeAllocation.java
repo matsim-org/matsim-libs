@@ -26,7 +26,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.socialnetworks.mentalmap.MentalMap2;
+import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -62,10 +62,12 @@ public class SecLocPlanMutateTimeAllocation implements PlanAlgorithmI {
 
 			if (i % 2 == 0) {
 				Act act = (Act)(plan.getActsLegs().get(i));
-				Act oldAct = (Act) (plan.getActsLegs().get(i));
-				System.out.println("###### TEST "+plan.getPerson().getId());
-				System.out.println("###### TEST "+act.getType()+" "+act.getStartTime()+" "+act.getEndTime()+" "+act.getLinkId());
-				System.out.println("###### TEST "+oldAct.getType()+" "+oldAct.getStartTime()+" "+oldAct.getEndTime()+" "+oldAct.getLinkId());
+				Act oldAct = new Act(act); 
+				
+				
+//				System.out.println("###### TEST "+plan.getPerson().getId());
+//				System.out.println("###### TEST "+act.getType()+" "+act.getStartTime()+" "+act.getEndTime()+" "+act.getLinkId());
+//				System.out.println("###### TEST "+oldAct.getType()+" "+oldAct.getStartTime()+" "+oldAct.getEndTime()+" "+oldAct.getLinkId());
 				// invalidate previous activity times because durations will change
 				act.setStartTime(Time.UNDEFINED_TIME);
 
@@ -101,9 +103,9 @@ public class SecLocPlanMutateTimeAllocation implements PlanAlgorithmI {
 					act.setEndTime(Time.UNDEFINED_TIME);
 
 				}
-				MentalMap2 map = plan.getPerson().getKnowledge().map;
+				MentalMap map = plan.getPerson().getKnowledge().map;
 				Activity myactivity = map.getActivity(oldAct);
-				System.out.println("###### TEST "+act.getType()+" "+act.getStartTime()+" "+act.getEndTime()+" "+act.getLinkId()+" "+myactivity.getFacility().getLink().getId());
+//				System.out.println("###### TEST "+act.getType()+" "+act.getStartTime()+" "+act.getEndTime()+" "+act.getLinkId()+" "+myactivity.getFacility().getLink().getId());
 				map.learnActsActivities(act, myactivity);
 
 			} else {
