@@ -102,6 +102,8 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 //		Pick a type of facility to replace in this plan according to config settings
 		double rand = Gbl.random.nextDouble();
 
+		// TODO JH generalize to any length of array of "facility types" for the future
+		// in which there can be any number of facility/activity types
 		if (rand < cum_p_factype[0]) {
 			factype = factypes[0];
 		}else if (cum_p_factype[0] <= rand && rand < cum_p_factype[1]) {
