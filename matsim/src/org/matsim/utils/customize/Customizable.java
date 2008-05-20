@@ -39,7 +39,7 @@ import java.util.Map;
  * 
  * @author balmermi
  */
-interface Customizable {
+public interface Customizable {
 
 	//////////////////////////////////////////////////////////////////////
 	// methods
