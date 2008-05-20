@@ -57,7 +57,8 @@ public class FacilitiesAllActivitiesFTE {
 	public void run(Facilities facilities) {
 
 //		this.createThem2008();
-		this.createThem(facilities);
+		this.loadFacilityActivities();
+//		this.createThem(facilities);
 		//this.testTemporaryFacilityIds();
 
 	}
@@ -87,7 +88,6 @@ public class FacilitiesAllActivitiesFTE {
 		// see http://www.matsim.org/node/36 for the next step
 		int dontUseTheFirstDraw = random.nextInt();
 
-		this.loadFacilityActivities();
 
 		TreeMap<String, Integer> tempFacilities = new TreeMap<String, Integer>();
 
@@ -474,6 +474,9 @@ public class FacilitiesAllActivitiesFTE {
 						str, 
 						FacilitiesProductionKTI.LEISURE_CULTURE);
 			}
+		}
+		for (String str : facilityActivities.keySet()) {
+			System.out.println(str + "\t|\t" + facilityActivities.get(str));
 		}
 
 	}

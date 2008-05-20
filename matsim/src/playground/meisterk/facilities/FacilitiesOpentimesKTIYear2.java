@@ -25,7 +25,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesProductionKTI;
@@ -33,7 +32,6 @@ import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
-import org.matsim.gbl.Gbl;
 import org.matsim.utils.misc.Day;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
