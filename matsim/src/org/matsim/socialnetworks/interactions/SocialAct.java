@@ -97,7 +97,7 @@ public class SocialAct {
     public Person getRandomInterlocutorInTimeWindow(Person p1, double StartTime, double EndTime){
 	Vector<Person> peopleCopresent=getAttendeesInTimeWindow(p1, StartTime, EndTime);
 	Person p2=null;
-	if(peopleCopresent!=null){
+	if(peopleCopresent!=null && peopleCopresent.size()>0){
 	int size = peopleCopresent.size();
 	p2 = peopleCopresent.get( Gbl.random.nextInt( size ) );
 	while( p1.equals(p2))

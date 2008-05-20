@@ -140,7 +140,7 @@ public class SpatialInteractor {
 
 		if(Gbl.random.nextDouble() <rndEncounterProbability.get(event.activity.getType())){
 			Person p2 = event.getRandomInterlocutorInTimeWindow(p1, StartTime, EndTime);
-
+if(p2==null) return;
 			// If they know each other, probability is 1.0 that the relationship is reinforced
 			if (p1.getKnowledge().egoNet.knows(p2)) {
 				net.makeSocialContact(p1,p2,iteration,"renew"+event.activity.getType());
