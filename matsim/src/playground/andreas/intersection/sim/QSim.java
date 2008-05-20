@@ -128,7 +128,7 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 			events.addHandler(this.hist);
 			
 			// FOR TESTING ONLY!
-			PreferencesDialog.PreDialogClass = PreferencesDialog2.class;
+			PreferencesDialog.preDialogClass = PreferencesDialog2.class;
 			OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019");
 			client.start();
 			try {
