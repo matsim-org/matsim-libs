@@ -21,7 +21,6 @@
 package org.matsim.utils.vis.otfivs.data;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Iterator;
@@ -37,7 +36,7 @@ import org.matsim.utils.vis.otfivs.interfaces.OTFServerRemote;
 
 
 
-public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializable {
+public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 
 	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
 
@@ -59,7 +58,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 					this.client.put(x, y, (OTFDataReader)reader);
 				} catch (Exception e) {
 					e.printStackTrace();
-					System.exit(1);
+					throw new RuntimeException();
 				}
 			}
 		}
@@ -173,7 +172,8 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 		client.offsetEast = this.minEasting;
 		client.offsetNorth = this.minNorthing;
 
-		int colls = this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
+		//int colls = 
+		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
 				this.new ConvertToClientExecutor(connect,client));
 //		System.out.print("server executor count: " +colls );
 
@@ -185,7 +185,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 					client.addAdditionalElement((OTFDataReader)reader);
 				} catch (Exception e) {
 					e.printStackTrace();
-					System.exit(1);
+					throw new RuntimeException();
 				}
 			}
 
@@ -194,7 +194,8 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 	}
 
 	public void writeConstData(ByteBuffer out) {
-		int colls = this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
+		//int colls = 
+		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
 				this.new WriteDataExecutor(out,true));
 
 		for(OTFDataWriter element : this.additionalElements) {
@@ -207,7 +208,8 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> implements Serializab
 	}
 
 	public void writeDynData(QuadTree.Rect bounds, ByteBuffer out) {
-		int colls = this.execute(bounds, this.new WriteDataExecutor(out,false));
+		//int colls = 
+		this.execute(bounds, this.new WriteDataExecutor(out,false));
 		//System.out.print("# of Writes: " + colls + " -> ");
 
 		for(OTFDataWriter element : this.additionalElements) {

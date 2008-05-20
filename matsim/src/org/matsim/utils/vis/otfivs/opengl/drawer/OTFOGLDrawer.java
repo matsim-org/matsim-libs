@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -48,7 +49,6 @@ import javax.swing.JFrame;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 import org.matsim.utils.vis.otfivs.caching.SceneGraph;
 import org.matsim.utils.vis.otfivs.caching.SceneLayer;
@@ -109,11 +109,11 @@ abstract class OGLSceneLayerImpl implements SceneLayer{
 public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener, OGLProvider{
 	private static int linkTexWidth = 0;
 	private static float agentSize = 10.f;
-	private static float scaledAgentSize = 10.f;
+	//private static float scaledAgentSize = 10.f;
 	private int netDisplList = 0;
 	private int agentDisplList = 0;
 
-	private boolean isValid = false;
+	//private boolean isValid = false;
 	public boolean isActiveNet = false;
 	private GL gl = null;
 	private GLCanvas canvas = null;
@@ -123,10 +123,10 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 	//Handle these separately, as the agents needs textures set, which should only be done once
 	private final List<OTFGLDrawable> netItems = new ArrayList<OTFGLDrawable>();
 	private final List<OTFGLDrawable> agentItems = new ArrayList<OTFGLDrawable>();
-	private final List<OTFGLDrawable> otherItems = new ArrayList<OTFGLDrawable>();
+	//private final List<OTFGLDrawable> otherItems = new ArrayList<OTFGLDrawable>();
 	private final List<OTFQuery> queryItems = new ArrayList<OTFQuery>();
 
-	private final SimpleBackgroundDrawer background = null;
+	//private final SimpleBackgroundDrawer background = null;
 
 	private static List<OTFGLDrawable> newItems = new ArrayList<OTFGLDrawable>();
 
@@ -224,10 +224,11 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 	}
 	public static class RandomColorizer{
 		Color [] fastValues;
+		private static final Random rand = new Random();
 
 		public RandomColorizer(int size) {
 			this.fastValues = new Color[size];
-			for (int i = 0; i < size; i++) this.fastValues[i] = new Color((int)(255*Math.random()), (int)(255*Math.random()),(int)(255*Math.random()));
+			for (int i = 0; i < size; i++) this.fastValues[i] = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255));
 		}
 
 		public Color getColor(int value) {
@@ -235,7 +236,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 		}
 	}
 
-	public static class AgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgent.Receiver , OTFGLDrawable{
+	public static class AgentDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgent.Receiver {
 		//Anything above 50km/h should be yellow!
 		private final static FastColorizer colorizer = new FastColorizer(
 				new double[] { 0.0, 25, 50, 75}, new Color[] {
@@ -303,7 +304,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 				return;
 			}
 
-			gl.glBegin(gl.GL_QUADS);
+			gl.glBegin(GL.GL_QUADS);
 			gl.glTexCoord2f(1,1); gl.glVertex3f(this.startX - length, this.startY - width, z);
 			gl.glTexCoord2f(1,0); gl.glVertex3f(this.startX - length, this.startY + width, z);
 			gl.glTexCoord2f(0,0); gl.glVertex3f(this.startX + length, this.startY + width, z);
@@ -315,7 +316,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 
 
 
-	protected static GLContext motherContext = null;
+	protected static volatile GLContext motherContext = null;
 
 	public OTFOGLDrawer(JFrame frame, OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
@@ -378,7 +379,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 		//System.out.println("CLIENT DRAWER DRAWED  == " + netItems.size()  +"objects time");
 	}
 
-	private String lastTime = "";
+	//private String lastTime = "";
 	
 	synchronized public void display(GLAutoDrawable drawable) {
 //		Gbl.startMeasurement();
@@ -470,7 +471,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 		this.agentDisplList = this.gl.glGenLists(1);
 
 		drawNetList();
-		this.isValid = false;
+		//this.isValid = false;
 	}
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
@@ -553,10 +554,11 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 	public void invalidate(int time) throws RemoteException {
 
 		agentSize = Float.parseFloat(Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.AGENT_SIZE));
-		scaledAgentSize = agentSize * this.mouseMan.getScale();
+		//scaledAgentSize = agentSize * this.mouseMan.getScale();
 
 
-		lastTime = Time.writeTime(time, ':');
+		//lastTime = Time.writeTime(time, ':');
+		
 		// do something like
 		// getTimeStep from somewhere
 		// check: is there a cached version for timestep
@@ -593,7 +595,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 		// display(gl) we only display the two lists
 
 
-        this.isValid = false;
+        //this.isValid = false;
 		redraw();
 	}
 

@@ -47,7 +47,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 
 	private final OTFQueryHandler handler;
 	private String queryType = "Agent";
-	private final OTFVisConfig cfg;
+	private transient final OTFVisConfig cfg;
 	
 	public OTFQueryControlBar(String name, OTFQueryHandler handler) {
 		super(name);

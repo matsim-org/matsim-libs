@@ -21,7 +21,6 @@
 package org.matsim.utils.vis.otfivs.handler;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,13 +52,13 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	
 	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	
-	static public class Writer extends  OTFDefaultLinkHandler.Writer implements Serializable, OTFWriterFactory<QueueLink>{
+	static public class Writer extends  OTFDefaultLinkHandler.Writer implements  OTFWriterFactory<QueueLink>{
 
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = -7916541567386865404L;
-		protected static transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
+		protected static final transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
@@ -68,7 +67,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 
 		public void writeAgent(PositionInfo pos, ByteBuffer out) throws IOException {
-			try{
 			String id = pos.getAgentId().toString();
 			out.putInt(id.length());
 			for (int i=0; i<id.length(); i++) out.putChar(id.charAt(i));
@@ -76,9 +74,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
 			out.putInt(pos.getVehicleState()== VehicleState.Parking ? 1:0);
 			out.putFloat((float)pos.getSpeed());
-			}catch (Exception e){
-				System.out.println("Agent could not be written fully to stream");
-			}
 		}
 		
 		protected void writeAllAgents(ByteBuffer out) throws IOException {

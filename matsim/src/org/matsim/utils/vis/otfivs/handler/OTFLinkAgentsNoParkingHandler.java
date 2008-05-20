@@ -21,19 +21,17 @@
 package org.matsim.utils.vis.otfivs.handler;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 
 import org.matsim.mobsim.QueueLink;
 import org.matsim.utils.vis.otfivs.data.OTFDataWriter;
-import org.matsim.utils.vis.otfivs.data.OTFWriterFactory;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 
 
 public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 	
-	static public class Writer extends  OTFLinkAgentsHandler.Writer implements Serializable, OTFWriterFactory<QueueLink>{
+	static public class Writer extends  OTFLinkAgentsHandler.Writer {
 		/**
 		 * 
 		 */

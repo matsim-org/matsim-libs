@@ -21,13 +21,14 @@
 package org.matsim.utils.vis.otfivs.opengl;
 
 import java.awt.BorderLayout;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.vis.otfivs.data.OTFClientQuad;
 import org.matsim.utils.vis.otfivs.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfivs.data.OTFDefaultNetWriterFactoryImpl;
@@ -82,7 +83,7 @@ public class OnTheFlyClientQuad extends Thread {
 		this.connect = connect;
 	}
 	
-	NetworkLayer network = new NetworkLayer();
+	//NetworkLayer network = new NetworkLayer();
 
 
 	@Override
@@ -149,11 +150,24 @@ public class OnTheFlyClientQuad extends Thread {
 			hostControl.addHandler(id1, drawer);
 			//hostControl.addHandler(id2, drawer2);
 
-		} catch (Exception e) {
+		} catch (RemoteException e) {
 			// TODO DS Handle with grace!
 			e.printStackTrace();
 		}
 		//host.play();
+		catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 //		do 
 //	{

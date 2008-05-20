@@ -33,6 +33,10 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 
 public class QueryAgentId implements OTFQuery {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4466967514266968254L;
 	double x;
 	double y;
 	public String agentId;

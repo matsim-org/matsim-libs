@@ -140,12 +140,12 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		additionalElements.add(element);
 	}
 
-	public void createReceiver(final OTFConnectionManager connect) {
+	public synchronized void createReceiver(final OTFConnectionManager connect) {
 
 		this.connect = connect;
 
 		SceneGraph graph = new SceneGraph(null, -1, connect, null);
-		int colls = this.execute(this.top.getBounds(),
+		this.execute(this.top.getBounds(),
 				new CreateReceiverExecutor(connect, graph));
 		for(OTFDataReader element : additionalElements) {
 			Collection<OTFData.Receiver> drawers = connect.getReceivers(element.getClass(), graph);
@@ -170,7 +170,8 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, bound);
 		ByteBuffer in = ByteBuffer.wrap(bbyte);
 		Gbl.startMeasurement();
-		int colls = this.execute(bound, this.new ReadDataExecutor(in, readConst, result));
+		//int colls = 
+		this.execute(bound, this.new ReadDataExecutor(in, readConst, result));
 		if (readAdd) getAdditionalData(in, readConst, result);
 		//System.out.println("# readData: " + colls);
 
@@ -273,7 +274,8 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 			rect = this.top.getBounds();
 		}
 
-		int colls = this.execute(rect, this.new InvalidateExecutor(result));
+		//int colls = 
+		this.execute(rect, this.new InvalidateExecutor(result));
 		for(OTFDataReader element : additionalElements) {
 			element.invalidate(result);
 		}

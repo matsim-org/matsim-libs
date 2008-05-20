@@ -21,7 +21,6 @@
 package org.matsim.utils.vis.otfivs.handler;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 
 import org.matsim.mobsim.QueueNode;
@@ -37,7 +36,7 @@ import org.matsim.utils.vis.otfivs.interfaces.OTFDataReader;
 public class OTFDefaultNodeHandler extends OTFDataReader implements  OTFDataXYCoord.Provider  {
 	private OTFDataXYCoord.Receiver xyReceiver = null;
 
-	static public class Writer extends  OTFDataWriter<QueueNode> implements Serializable,OTFWriterFactory<QueueNode> {
+	static public class Writer extends  OTFDataWriter<QueueNode> implements OTFWriterFactory<QueueNode> {
 
 		/**
 		 * 

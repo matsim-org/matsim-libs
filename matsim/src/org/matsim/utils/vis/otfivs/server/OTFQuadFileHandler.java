@@ -295,10 +295,10 @@ public class OTFQuadFileHandler {
 				String currentEntry = entry.getName();
 				System.out.println("Extracting: " + entry);
 				if(currentEntry.contains("step")) {
-					String regex = "";
-					String [] spliti = StringUtils.explode(currentEntry, '.', 10);
+					//String regex = "";
+					//String [] spliti = StringUtils.explode(currentEntry, '.', 10);
 
-					int time_s = Integer.parseInt(spliti[1]);
+					//int time_s = Integer.parseInt(spliti[1]);
 					//byte [] buffer = timesteps.get(time_s);
 					//inFile = new DataInputStream(new BufferedInputStream(zipFile.getInputStream(entry)));
 					//readStateBuffer(buffer);
@@ -412,7 +412,7 @@ public class OTFQuadFileHandler {
 				}
 
 				if (offset != size) {
-					throw new IOException("READ SIZE did not fit! File corrupted!");
+					throw new IOException("READ SIZE did not fit! File corrupted! in second " + timenextTime);
 				}
 
 			} catch (IOException e) {

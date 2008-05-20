@@ -32,6 +32,11 @@ public class QueryToggleShowParking implements OTFQuery {
 
 	// This is not a real query it just toggles the rendering of vehicles while activities
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3558773539361553004L;
+
 	public void draw(OTFDrawer drawer) {
 		
 	}

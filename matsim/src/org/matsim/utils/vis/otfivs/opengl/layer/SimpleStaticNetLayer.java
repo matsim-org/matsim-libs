@@ -35,18 +35,17 @@ import org.matsim.utils.vis.otfivs.data.OTFData.Receiver;
 import org.matsim.utils.vis.otfivs.gui.OTFDrawable;
 import org.matsim.utils.vis.otfivs.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfivs.opengl.drawer.OGLProvider;
-import org.matsim.utils.vis.otfivs.opengl.drawer.OTFGLDrawable;
 import org.matsim.utils.vis.otfivs.opengl.drawer.OTFGLDrawableImpl;
 
 
 public class SimpleStaticNetLayer  extends SimpleSceneLayer{
-	public static class SimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQuad.Receiver, OTFGLDrawable{
+	public static class SimpleQuadDrawer extends OTFGLDrawableImpl implements OTFDataQuad.Receiver{
 		protected final Point2D.Float[] quad = new Point2D.Float[4];
 		protected float coloridx = 0;
 
 		public void onDraw( GL gl) {
 			//Draw quad
-			gl.glBegin(gl.GL_QUADS);
+			gl.glBegin(GL.GL_QUADS);
 			gl.glVertex3f(quad[0].x, quad[0].y, 0);
 			gl.glVertex3f(quad[1].x, quad[1].y, 0);
 			gl.glVertex3f(quad[3].x, quad[3].y, 0);
@@ -80,7 +79,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	}
 
 	protected OGLProvider myDrawer;
-	protected static Map<OGLProvider, Integer> netDisplListMap = new HashMap<OGLProvider, Integer>(); // not yet defined
+	protected static final Map<OGLProvider, Integer> netDisplListMap = new HashMap<OGLProvider, Integer>(); // not yet defined
 	protected int netDisplList = -1;
 
 	@Override

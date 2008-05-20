@@ -33,10 +33,8 @@ import javax.media.opengl.GL;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.otfivs.caching.DefaultSceneLayer;
 import org.matsim.utils.vis.otfivs.caching.SceneGraph;
-import org.matsim.utils.vis.otfivs.data.OTFData;
 import org.matsim.utils.vis.otfivs.data.OTFDataSimpleAgent;
 import org.matsim.utils.vis.otfivs.gui.OTFVisConfig;
-import org.matsim.utils.vis.otfivs.opengl.drawer.OTFGLDrawable;
 import org.matsim.utils.vis.otfivs.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.utils.vis.otfivs.opengl.drawer.OTFOGLDrawer;
 import org.matsim.utils.vis.otfivs.opengl.drawer.OTFOGLDrawer.AgentDrawer;
@@ -53,7 +51,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			new double[] { 0.0, 30., 120.}, new Color[] {
 					Color.GREEN, Color.YELLOW, Color.RED});
 	
-	public static class AgentArrayDrawer extends OTFGLDrawableImpl implements  OTFGLDrawable , OTFData.Receiver{
+	public static class AgentArrayDrawer extends OTFGLDrawableImpl {
 		public final static RandomColorizer colorizer2 = new RandomColorizer(256);
 
 
@@ -87,7 +85,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			gl.glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
 			gl.glEnable(GL.GL_POINT_SPRITE_ARB);
 
-			float quadratic[] = { 0.0f, 0.0f, 0.0001f };
+			//float quadratic[] = { 0.0f, 0.0f, 0.0001f };
 
 			// DS TODO Chack out ways to make sure extension for gl.glPointParameterf() is given, does not work on Yus Thinkpad
 //			gl.glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
@@ -216,7 +214,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		
 	}
 	
-	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgent.Receiver , OTFGLDrawable{
+	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgent.Receiver {
 	
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			drawer.addAgent(id, startX, startY, colorizer.getColor(0.1 + 0.9*color), true);
@@ -292,6 +290,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		while (drawer.vertex.hasRemaining()) {
 			float x = drawer.vertex.get();
 			float y = drawer.vertex.get();
+			// DS We do not need z value here but need to fetch it from buffer!
 			float z =  drawer.vertex.get();
 			
 			// Manhattan dist reicht uns hier

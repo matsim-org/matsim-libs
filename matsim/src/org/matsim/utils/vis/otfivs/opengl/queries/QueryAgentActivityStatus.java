@@ -35,6 +35,11 @@ import org.matsim.utils.vis.otfivs.interfaces.OTFQuery;
 
 
 public class QueryAgentActivityStatus implements OTFQuery{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8532403277319196797L;
+
 	public final String agentID;
 
 	boolean calcOffset = true;

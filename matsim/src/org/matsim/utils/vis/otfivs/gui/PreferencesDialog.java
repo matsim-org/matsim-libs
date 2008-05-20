@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -47,9 +48,9 @@ import javax.swing.event.ChangeListener;
 
 public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener  {
 
-	public static Class PreDialogClass = PreferencesDialog.class;
+	public static Class preDialogClass = PreferencesDialog.class;
 	
-	protected final OTFVisConfig cfg;
+	protected transient final OTFVisConfig cfg;
 	private JComboBox rightMFunc;
 	private JComboBox middleMFunc;
 	private JComboBox leftMFunc;
@@ -78,7 +79,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	}
 
 	protected void initGUI() {
-		try {
 			getContentPane().setLayout(null);
 			this.setResizable(false);
 			setSize(470, 300);
@@ -200,9 +200,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 //				getContentPane().add(this.linkWidthSlider);
 //			}
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void stateChanged(final ChangeEvent e) {
@@ -254,14 +251,29 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
         partypes[1] = OTFVisConfig.class;
         partypes[2] = OTFHostControlBar.class;
         try {
-			Constructor ct = PreDialogClass.getConstructor(partypes);
+			Constructor ct = preDialogClass.getConstructor(partypes);
 	           Object arglist[] = new Object[3];
 	            arglist[0] = frame;
 	            arglist[1] = config;
 	            arglist[2] = host;
 	            preferencesDialog = (PreferencesDialog)ct.newInstance(arglist);
 
-		} catch (Exception e) {
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -300,7 +312,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				this.cfg.setRightMouseFunc(newFunc);
 			}
 		} else if (e.getSource() instanceof JButton) {
-			if (e.getActionCommand() == "backgroundColor") {
+			if (e.getActionCommand().equals("backgroundColor")) {
 				JPanel frame = new JPanel();
 				Color c = JColorChooser.showDialog(frame, "Choose the background color", this.cfg.getBackgroundColor());
 				if (c != null) {

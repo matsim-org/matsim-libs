@@ -46,16 +46,23 @@ import org.matsim.utils.vis.otfivs.opengl.drawer.OTFOGLDrawer;
 import org.matsim.utils.vis.otfivs.opengl.gl.InfoText;
 import org.matsim.utils.vis.otfivs.opengl.layer.OGLAgentPointLayer;
 import org.matsim.utils.vis.otfivs.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
-import org.matsim.utils.vis.otfivs.opengl.queries.QueryAgentActivityStatus;
-
 
 import com.sun.opengl.util.BufferUtil;
 
 public class QueryAgentPlan implements OTFQuery {
-	private class myInfoText implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8415337571576184768L;
+
+	private static class MyInfoText implements Serializable{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		float east, north;
 		String name;
-		public myInfoText(float east, float north, String name) {
+		public MyInfoText(float east, float north, String name) {
 			this.east = east;
 			this.north = north;
 			this.name = name;
@@ -89,7 +96,7 @@ public class QueryAgentPlan implements OTFQuery {
 			Act act = (Act)plan.getActsLegs().get(i*2);
 			Link link = net.getQueueLink(act.getLinkId()).getLink();
 			Node node = link.getToNode();
-			this.acts[i] = new myInfoText( (float)node.getCoord().getX(), (float)node.getCoord().getY(), act.getType());
+			this.acts[i] = new MyInfoText( (float)node.getCoord().getX(), (float)node.getCoord().getY(), act.getType());
 		}
 
 		List actslegs = plan.getActsLegs();
@@ -157,7 +164,7 @@ public class QueryAgentPlan implements OTFQuery {
 			}
 			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 			for (int i=0;i< this.acts.length; i++) {
-				myInfoText inf = (myInfoText)this.acts[i];
+				MyInfoText inf = (MyInfoText)this.acts[i];
 				this.acts[i] = InfoText.showTextPermanent(inf.name, inf.east - east, inf.north - north, -0.001f );
 				((InfoText)this.acts[i]).setAlpha(0.7f);
 			}

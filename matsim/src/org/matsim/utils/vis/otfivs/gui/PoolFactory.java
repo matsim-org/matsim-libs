@@ -62,11 +62,14 @@ public class PoolFactory<ObjectType> {
 					result = array.get(usage);
 					usage++;
 				}
-			} catch (Exception e) {
+			} catch (InstantiationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				System.out.println("Class object of pool factory could not be created!");
-				System.exit(1);
+				throw new RuntimeException();
+			} catch (IllegalAccessException e) {
+				System.out.println("Class object of pool factory could not be created!");
+				throw new RuntimeException();
 			}
 		return result;
 	}

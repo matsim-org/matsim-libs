@@ -28,6 +28,11 @@ import org.matsim.utils.vis.otfivs.handler.OTFLinkAgentsNoParkingHandler;
 
 public class OTFDefaultNetWriterFactoryImpl implements Serializable, OTFNetWriterFactory {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8558382907215410103L;
+	
 	private  OTFWriterFactory agentWriterFac = null;
 	private  OTFWriterFactory nodeWriterFac = new OTFDefaultNodeHandler.Writer();
 	private  OTFWriterFactory linkWriterFac = new OTFLinkAgentsNoParkingHandler.Writer();

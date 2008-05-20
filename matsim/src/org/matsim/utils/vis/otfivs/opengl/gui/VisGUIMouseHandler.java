@@ -33,7 +33,6 @@ import static javax.media.opengl.GL.GL_VIEWPORT;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
@@ -47,7 +46,6 @@ import javax.swing.event.MouseInputAdapter;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTargetAdapter;
 import org.jdesktop.animation.timing.interpolation.KeyFrames;
-import org.jdesktop.animation.timing.interpolation.KeyTimes;
 import org.jdesktop.animation.timing.interpolation.KeyValues;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.matsim.gbl.Gbl;
@@ -63,19 +61,19 @@ import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 
 public class VisGUIMouseHandler extends MouseInputAdapter
-implements MouseMotionListener, MouseWheelListener{
+implements MouseWheelListener{
     private Point3f cameraStart = new Point3f(30000f, 3000f, 1500f);
     private Point3f cameraTarget = new Point3f(30000f, 3000f, 0f);
  	double[] modelview = new double[16];
 	double[] projection = new double[16];
 	int[] viewport = new int[4];
-    private GL gl = null;
-    private QuadTree.Rect viewBounds;
+    //private GL gl = null;
+    private QuadTree.Rect viewBounds = null;
 
 
     private Camera camera;
-    private Animator cameraAnimator;
-	private Point2D.Float clickPoint = null;
+    //private Animator cameraAnimator;
+	//private Point2D.Float clickPoint = null;
 
     private double aspectRatio = 1;
 	public Point start = null;
@@ -103,7 +101,7 @@ implements MouseMotionListener, MouseWheelListener{
         KeyValues<Point3f> values = KeyValues.create(new EvaluatorPoint3f(),
                 start, end);
 
-        KeyTimes times = new KeyTimes(0f, 1f);
+        //KeyTimes times = new KeyTimes(0f, 1f);
         KeyFrames frames = new KeyFrames(values);
         PropertySetter ps = new PropertySetter(camera, prop, frames);
         Animator cameraAnimator = new Animator(2000, ps);
@@ -145,7 +143,7 @@ implements MouseMotionListener, MouseWheelListener{
 		int x = e.getX();
 		int y = e.getY();
 		int mbutton = e.getButton();
-		String function = null;
+		String function = "";
 		switch (mbutton) {
 		case 1:
 			function = Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.LEFT_MOUSE_FUNC);
@@ -163,8 +161,8 @@ implements MouseMotionListener, MouseWheelListener{
 		else if (function.equals("Select")) button = 4;
 		else button = 0;
 		start = new Point(x, y);
-		Point3f pp = GetOGLPos(x, y);
-		clickPoint = new Point2D.Float(pp.getX(),pp.getY());
+		Point3f pp = getOGLPos(x, y);
+		//clickPoint = new Point2D.Float(pp.getX(),pp.getY());
 		alpha = 1.0f;
 		currentRect = null;
 
@@ -180,7 +178,7 @@ implements MouseMotionListener, MouseWheelListener{
 			int deltay = start.y - e.getY();
 			start.x = e.getX();
 			start.y = e.getY();
-			setToNewPos(GetOGLPos(viewport[2]/2+deltax, viewport[3]/2+deltay));
+			setToNewPos(getOGLPos(viewport[2]/2+deltax, viewport[3]/2+deltay));
 		}
 	}
 
@@ -208,7 +206,7 @@ implements MouseMotionListener, MouseWheelListener{
 				//currentRect = null;
 			}
 		} else {
-			Point3f newcameraStart = GetOGLPos(start.x, start.y);
+			Point3f newcameraStart = getOGLPos(start.x, start.y);
 			//setToNewPos(newcameraStart);
 			Point2D.Double point = new Point2D.Double(newcameraStart.getX(), newcameraStart.getY());
 			clickHandler.handleClick(point, button);
@@ -218,8 +216,8 @@ implements MouseMotionListener, MouseWheelListener{
 	}
 
 	void updateSize(MouseEvent e) {
-		Point3f newRectStart = GetOGLPos(start.x, start.y);
-		Point3f newRectEnd = GetOGLPos(e.getX(), e.getY());
+		Point3f newRectStart = getOGLPos(start.x, start.y);
+		Point3f newRectEnd = getOGLPos(e.getX(), e.getY());
 		currentRect = new Rectangle(new Point((int)newRectStart.getX(), (int)newRectStart.getY()));
 		currentRect.add(newRectEnd.getX(), newRectEnd.getY());
 		// This only redraws GUI Elements, no need to invalidate(), just redraw()
@@ -282,8 +280,8 @@ implements MouseMotionListener, MouseWheelListener{
 	    }
 
 	    public void updateBounds() {
-			Point3f p1 = GetOGLPos(viewport[0], viewport[1]);
-			Point3f p2 = GetOGLPos(viewport[2], viewport[3]);
+			Point3f p1 = getOGLPos(viewport[0], viewport[1]);
+			Point3f p2 = getOGLPos(viewport[2], viewport[3]);
 			viewBounds =  new QuadTree.Rect(p1.x, p1.y, p2.x, p2.y);
 	    }
 	    
@@ -347,11 +345,11 @@ implements MouseMotionListener, MouseWheelListener{
 		setToNewPos(new Point3f(cameraStart.getX(),cameraStart.getY(),zPos));
 	}
 	
-	synchronized public Point3f GetOGLPos(int x, int y)
+	synchronized public Point3f getOGLPos(int x, int y)
 	{
 		double[] obj_pos = new double[3];
-		float winX, winY, winZ = cameraStart.getZ();
-		float posX, posY, posZ;
+		float winX, winY;//, winZ = cameraStart.getZ();
+		float posX, posY;//, posZ;
 		double[] w_pos = new double[3];
 		double[] z_pos = new double[1];
 
@@ -369,7 +367,7 @@ implements MouseMotionListener, MouseWheelListener{
 
 		posX = (float)obj_pos[0];
 		posY = (float)obj_pos[1];
-		posZ = (float)obj_pos[2];
+		//posZ = (float)obj_pos[2];
 		// maintain z-pos == zoom level
 		return new Point3f(posX, posY, cameraStart.getZ());
 	}
@@ -379,7 +377,7 @@ implements MouseMotionListener, MouseWheelListener{
 	}
 
 	public void init(GL gl) {
-		this.gl = gl;
+		//this.gl = gl;
 		initCamera();
 	}
 
@@ -387,7 +385,7 @@ implements MouseMotionListener, MouseWheelListener{
 		this.aspectRatio = aspectRatio;
 	}
 	
-	Rectangle2D.Float bounds;
+	Rectangle2D.Float bounds = null;
 	private float minZoom;
 	private float maxZoom;
 	public void setBounds(float minEasting, float minNorthing, float maxEasting, float maxNorthing, float minZoom) {

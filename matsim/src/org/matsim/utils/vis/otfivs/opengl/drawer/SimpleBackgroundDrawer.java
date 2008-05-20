@@ -29,7 +29,7 @@ import javax.media.opengl.GL;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 
-public class SimpleBackgroundDrawer extends OTFGLDrawableImpl implements OTFGLDrawable{
+public class SimpleBackgroundDrawer extends OTFGLDrawableImpl {
 	private Texture picture = null;
 	private final Rectangle2D.Float abskoords;
 	private final String name;

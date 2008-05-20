@@ -50,6 +50,11 @@ import org.matsim.utils.vis.otfivs.interfaces.OTFQuery;
 
 
 public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServerRemote{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4012748585344947013L;
+
 	static class QuadStorage {
 		public String id;
 		public OTFServerQuad quad;
@@ -82,10 +87,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public Set<String> updateThis = new HashSet<String>();
 
 	private final OTFNetHandler handler = null;
-	private Plans pop = null;
-	public ByteArrayOutputStream out = null;
-	public QueueNetworkLayer network = null;
-	public Events events;
+	private transient Plans pop = null;
+	public transient ByteArrayOutputStream out = null;
+	public transient QueueNetworkLayer network = null;
+	public transient Events events;
 
 
 	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, Events events) throws RemoteException {
@@ -95,7 +100,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
 		this.events = events;
-		OTFDataWriter.server = this;
+		OTFDataWriter.setServer(this);
 	}
 
 	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, Events events, boolean noSSL) throws RemoteException {
@@ -327,7 +332,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		OTFServerQuad quad = new OTFServerQuad(network);
 		quads.put(id, new QuadStorage(id, quad, null, null));
 
-		OTFDataWriter.server = this;
+		OTFDataWriter.setServer(this);
 		
 		quad.fillQuadTree(writers);
 		return quad;
@@ -344,7 +349,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}	
 
 	
-	ByteBuffer buf = ByteBuffer.allocate(20000000);
+	private transient final ByteBuffer buf = ByteBuffer.allocate(20000000);
 
 	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException {
 		byte [] result;

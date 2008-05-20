@@ -66,8 +66,11 @@ public class OTFAbortGoto extends Thread  {
 				if (host.getLocalTime() < toTime && terminate == true) {
 					host.requestNewTime(actTime, TimePreference.EARLIER);
 				}
-			} catch (Exception e) {
+			} catch (RemoteException e) {
 				terminate = true;;
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		progressMonitor.close();

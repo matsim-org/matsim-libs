@@ -55,8 +55,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		OTFClientQuad clientQ = hostControl.createNewView(null, null, connect1);
 
 		OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
-		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
-		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
+		//loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
+		//loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
 //		int ux= 662043;
 //		int uy = 9919140;
 //		int dx = ((634883-662043))/10;
@@ -114,7 +114,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../MatsimJ/output/testSWI2.mvi.gz";
 //		String filename = "test/padang.mvi";
 		
-		String filename = "../OnTheFlyVis-test/test/padang.mvi";
+		String filename = "../OnTheFlyVis-test/test/padangFlooding.mvi";
 
 		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect1.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);

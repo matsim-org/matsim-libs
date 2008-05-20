@@ -56,7 +56,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		super.prepareSim();
 
 		// FOR TESTING ONLY!
-		PreferencesDialog.PreDialogClass = PreferencesDialog2.class;
+		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
 		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019");
 		client.start();
 		try {
@@ -78,11 +78,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 	@Override
 	public void afterSimStep(double time) {
 		super.afterSimStep(time);
-		int status = 0;
-
-		//Gbl.printElapsedTime();
-//		myOTFServer.updateOut(time);
-		status = this.myOTFServer.updateStatus(time);
+		this.myOTFServer.updateStatus(time);
 
 	}
 

@@ -45,7 +45,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 import org.matsim.utils.vis.otfivs.caching.SceneGraph;
 import org.matsim.utils.vis.otfivs.data.OTFClientQuad;
@@ -62,7 +61,7 @@ import org.matsim.utils.vis.otfivs.interfaces.OTFQuery;
  */
 abstract class OTFSwingDrawable implements OTFDrawable, OTFData.Receiver{
 	static Graphics2D g2d = null;
-	static AffineTransform boxTransform = null;
+	//static AffineTransform boxTransform = null;
 
 	public final void draw() {
 		onDraw(g2d);
@@ -84,10 +83,10 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	}
 
 
-	public static class myNetVisScrollPane extends NetVisScrollPane implements NetVisResizable {
+	public static class MyNetVisScrollPane extends NetVisScrollPane implements NetVisResizable {
 
 		private float scale = 1.f;
-		public myNetVisScrollPane(NetJComponent networkComponent) {
+		public MyNetVisScrollPane(NetJComponent networkComponent) {
 			super(networkComponent);
 			// TODO Auto-generated constructor stub
 		}
@@ -131,10 +130,10 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 	private final JFrame frame;
 
-	private SceneGraph sceneGraph;
-	private myNetVisScrollPane networkScrollPane = null;
+	private transient SceneGraph sceneGraph;
+	private MyNetVisScrollPane networkScrollPane = null;
 
-	private final vizGuiHandler mouseMan;
+	private transient final VizGuiHandler mouseMan;
 
     public void setViewClipCoords( double minX, double minY, double maxX, double maxY) {
     	viewMinX  = networkClippingMinEasting() +  minX * networkClippingWidth();
@@ -198,8 +197,8 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
         scale(1);
         setViewClipCoords(0,0,1,1);
         
-        networkScrollPane = new myNetVisScrollPane(this);
-		vizGuiHandler handi = new vizGuiHandler();
+        networkScrollPane = new MyNetVisScrollPane(this);
+		VizGuiHandler handi = new VizGuiHandler();
 		networkScrollPane.addMouseMotionListener(handi);
 		networkScrollPane.addMouseListener(handi);
 		networkScrollPane.getViewport().addChangeListener(handi);
@@ -318,7 +317,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
 		AffineTransform originalTransform = g2.getTransform();
 
-		OTFSwingDrawable.boxTransform = getBoxTransform();
+		//OTFSwingDrawable.boxTransform = getBoxTransform();
 		OTFSwingDrawable.g2d = g2;
 
 		g2.setStroke(new BasicStroke(Math.round(0.05 * linkWidth)));
@@ -347,8 +346,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	}
 
 	public void invalidate(int time) throws RemoteException {
-		Rect rect = null;
-		this.sceneGraph = quad.getSceneGraph(time, rect, this);
+		this.sceneGraph = quad.getSceneGraph(time, null, this);
 		redraw();
 	}
 
@@ -469,7 +467,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	/***
 	 * VizGuiHandler handles mouse input etc
 	 */
-	class vizGuiHandler extends MouseInputAdapter implements ChangeListener,MouseWheelListener {
+	class VizGuiHandler extends MouseInputAdapter implements ChangeListener,MouseWheelListener {
 		public Point start = null;
 
 		public Rectangle currentRect = null;
@@ -519,8 +517,8 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 				} else {
 					// try to find agent under mouse
 					// calc mouse pos to component pos
-			        Rectangle rect = networkScrollPane.getViewport().getViewRect();
-			    	Point2D.Double p =  getNetCoord(e.getX() + rect.getX(), e.getY()+ + rect.getY());
+			        //Rectangle rect = networkScrollPane.getViewport().getViewRect();
+			    	//Point2D.Double p =  getNetCoord(e.getX() + rect.getX(), e.getY()+ + rect.getY());
 //					String id = visnet.getAgentId(p);
 //					Plan plan = null;
 //					try {

@@ -22,7 +22,6 @@ package org.matsim.utils.vis.otfivs.executables;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
@@ -32,14 +31,13 @@ import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.otfivs.handler.OTFAgentsListHandler;
 import org.matsim.utils.vis.otfivs.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
-import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
 import org.matsim.world.World;
 
 
-public class OTFEvent2MVI extends OTFQuadFileHandler.Writer implements SnapshotWriterI{
+public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 	private final   String netFileName = "";
 	private  String vehFileName = "";
-	private  String outFileName = "";
+	//private  String outFileName = "";
 	private static final int BUFFERSIZE = 100000000;
 
 
@@ -48,7 +46,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer implements SnapshotW
 	public OTFEvent2MVI(QueueNetworkLayer net, String EventFileName, String outFileName, double startTime, double intervall_s) {
 		super(intervall_s, net, outFileName);
 		this.vehFileName = EventFileName;
-		this.outFileName = outFileName;
+		//this.outFileName = outFileName;
 		this.intervall_s = intervall_s;
 	}
 
@@ -57,10 +55,10 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer implements SnapshotW
 		this.quad.addAdditionalElement(this.writer);
 	}
 
-	ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
-	private final int cntPositions=0;
+	//ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
+	//private final int cntPositions=0;
 	private double lastTime=-1;
-	private final int cntTimesteps=0;
+	//private final int cntTimesteps=0;
 
 	public void convert() {
 

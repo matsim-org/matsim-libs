@@ -31,6 +31,11 @@ import org.matsim.utils.vis.otfivs.interfaces.OTFQuery;
 
 
 public class QueryLinkId implements OTFQuery {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1389950511283282110L;
+	
 	public String linkId = null;;
 	double x;
 	double y;

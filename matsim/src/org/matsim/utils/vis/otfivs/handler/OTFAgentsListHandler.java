@@ -21,7 +21,6 @@
 package org.matsim.utils.vis.otfivs.handler;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,7 +63,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	}
 	
 	@SuppressWarnings("unchecked")
-	static public class Writer extends  OTFDataWriter implements Serializable {
+	static public class Writer extends  OTFDataWriter {
 
 
 		/**
@@ -123,6 +122,8 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			OTFDataSimpleAgent.Receiver drawer = null;
 			try {
 				drawer = (org.matsim.utils.vis.otfivs.data.OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
+				drawer.setAgent(idBuffer, x, y, type, user, speed);
+				agents.add(drawer);
 			} catch (InstantiationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -130,8 +131,6 @@ public class OTFAgentsListHandler extends OTFDataReader {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} //factoryAgent.getOne();
-			drawer.setAgent(idBuffer, x, y, type, user, speed);
-			agents.add(drawer);
 
  	}
 	
@@ -192,6 +191,8 @@ public class OTFAgentsListHandler extends OTFDataReader {
 				OTFDataSimpleAgent.Receiver drawer = null;
 				try {
 					drawer = (org.matsim.utils.vis.otfivs.data.OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
+					drawer.setAgent(idBuffer, x, y, 0, state, color);
+					agents.add(drawer);
 				} catch (InstantiationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -200,8 +201,6 @@ public class OTFAgentsListHandler extends OTFDataReader {
 					e.printStackTrace();
 				} //factoryAgent.getOne();
 				// at this version, only userdata was defined... aka state
-				drawer.setAgent(idBuffer, x, y, 0, state, color);
-				agents.add(drawer);
 
 	 	}
 		

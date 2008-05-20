@@ -23,13 +23,13 @@ package org.matsim.utils.vis.otfivs.opengl;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.vis.otfivs.data.OTFClientQuad;
 import org.matsim.utils.vis.otfivs.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfivs.gui.OTFHostControlBar;
@@ -57,7 +57,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 	OTFConnectionManager connect = new OTFConnectionManager();
 
-	NetworkLayer network = new NetworkLayer();
+	//NetworkLayer network = new NetworkLayer();
 
 
 	public OTFDrawer getLeftDrawerComponent( JFrame frame) throws RemoteException {
@@ -151,9 +151,15 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 
 
-		}catch (Exception e) {
+		}catch (RemoteException e) {
 			e.printStackTrace();
-			System.exit(1);
+			throw new RuntimeException();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

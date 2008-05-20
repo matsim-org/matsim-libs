@@ -21,7 +21,6 @@
 package org.matsim.utils.vis.otfivs.handler;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 
 import org.matsim.mobsim.QueueLink;
@@ -37,7 +36,12 @@ import org.matsim.utils.vis.otfivs.interfaces.OTFDataReader;
 public class OTFNoDynLinkHandler extends OTFDataReader implements OTFDataQuad.Provider{
 	private OTFDataQuad.Receiver quadReceiver = null;
 
-	static public class Writer extends  OTFDataWriter<QueueLink> implements Serializable, OTFWriterFactory<QueueLink> {
+	static public class Writer extends  OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink> {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1475109959645870144L;
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {

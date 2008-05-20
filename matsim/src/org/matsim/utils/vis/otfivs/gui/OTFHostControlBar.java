@@ -54,7 +54,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -94,7 +93,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	// -------------------- MEMBER VARIABLES --------------------
 
 	//private DisplayableNetI network;
-	private MovieTimer movieTimer = null;
+	private transient MovieTimer movieTimer = null;
 	private JButton playButton;
 	private JFormattedTextField timeField;
 	private int simTime = 0;
@@ -432,7 +431,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	int gotoTime = 0;
-	private OTFAbortGoto progressBar = null;
+	private transient OTFAbortGoto progressBar = null;
 	public void gotoTime() {
 		try {
 			if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER))
@@ -529,20 +528,20 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		if (source.getText().equals(TOGGLE_SYNCH)) {
 			synchronizedPlay = e.getStateChange() != ItemEvent.DESELECTED;
 			if (movieTimer != null) movieTimer.updateSyncPlay();
-		} else if (source.getText().equals(TOGGLE_LINK_LABELS)) {
-			if (e.getStateChange() == ItemEvent.DESELECTED) {
-				//visConfig.set(VisConfig.SHOW_LINK_LABELS, "false");
-			} else {
-				//visConfig.set(VisConfig.SHOW_LINK_LABELS, "true");
-			}
+//		} else if (source.getText().equals(TOGGLE_LINK_LABELS)) {
+//			if (e.getStateChange() == ItemEvent.DESELECTED) {
+//				//visConfig.set(VisConfig.SHOW_LINK_LABELS, "false");
+//			} else {
+//				//visConfig.set(VisConfig.SHOW_LINK_LABELS, "true");
+//			}
 		}
 		repaint();
 		//networkScrollPane.repaint();
 	}
 
 	public void stateChanged(ChangeEvent e) {
-		JSpinner spinner = (JSpinner)e.getSource();
-		int i = ((SpinnerNumberModel)spinner.getModel()).getNumber().intValue();
+		//JSpinner spinner = (JSpinner)e.getSource();
+		//int i = ((SpinnerNumberModel)spinner.getModel()).getNumber().intValue();
 
 		//visConfig.set(VisConfig.LINK_WIDTH_FACTOR, Integer.toString(i));
 		repaint();
@@ -603,8 +602,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 						if (isActive)  invalidateHandlers();
 					}
 					//simTime = actTime;
-				} catch (Exception e) {
+				} catch (RemoteException e) {
 					stopMovie();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}

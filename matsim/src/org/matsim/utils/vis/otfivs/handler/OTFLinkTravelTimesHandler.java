@@ -33,6 +33,11 @@ public class OTFLinkTravelTimesHandler extends OTFDefaultLinkHandler {
 
 	private static transient LinkTravelTimeCounter count =null;
 	static public class Writer extends  OTFDefaultLinkHandler.Writer {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7249785000303972319L;
+
 		public Writer() {
 		}
 		@Override

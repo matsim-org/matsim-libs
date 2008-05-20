@@ -25,27 +25,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import javax.media.opengl.GLAutoDrawable;
-import javax.swing.JComponent;
-
-import org.matsim.utils.vis.otfivs.opengl.gui.InfoText2D;
-import org.matsim.utils.vis.otfivs.opengl.gui.TextBubble;
-
-
-
-import com.sun.opengl.util.j2d.TextRenderer;
-
 public  class InfoText2D extends TextBubble{
 	private static List<InfoText2D> elements = new LinkedList<InfoText2D>(); 
 	
-	String line = null;
+	//String line = null;
 	int x=30,y=10;
 	boolean isValid = true;
 	public boolean isValid() {return isValid;};
 	
 	public InfoText2D(String line) {
 		super(line);
-		this.line = line;
+		//this.line = line;
 	}
 	
 	public void render(Graphics2D g2) {

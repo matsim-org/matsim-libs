@@ -21,7 +21,6 @@
 package org.matsim.utils.vis.otfivs.server;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
@@ -45,20 +44,20 @@ import org.matsim.world.World;
 
 
 public class OTFTVehServer implements OTFServerRemote{
-	private final   String netFileName = "";
+	//private final   String netFileName = "";
 	private  String vehFileName = "";
-	private final  String outFileName = "";
+	//private final  String outFileName = "";
 	private static final int BUFFERSIZE = 100000000;
 	BufferedReader reader = null;
 	private double nextTime = -1;
 	TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
-	private byte[] actBuffer = null;
+	//private byte[] actBuffer = null;
 
 
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
-	private final ByteArrayOutputStream out;
-	private QueueNetworkLayer net;
+	//private final ByteArrayOutputStream out;
+	//private QueueNetworkLayer net;
 	public OTFServerQuad quad;
 
 	public OTFTVehServer(String netFileName, String vehFileName) {
@@ -74,7 +73,7 @@ public class OTFTVehServer implements OTFServerRemote{
 		world.setNetworkLayer(net);
 		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
 
-		this.out = new ByteArrayOutputStream(20000000);
+		//this.out = new ByteArrayOutputStream(20000000);
 		this.quad = new OTFServerQuad(qnet);
 		this.quad.fillQuadTree(new OTFDefaultNetWriterFactoryImpl());
 		this.quad.addAdditionalElement(this.writer);
@@ -83,9 +82,9 @@ public class OTFTVehServer implements OTFServerRemote{
 	}
 
 	ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
-	private final int cntPositions=0;
-	private final double lastTime=-1;
-	private final int cntTimesteps=0;
+	//private final int cntPositions=0;
+	//private final double lastTime=-1;
+	//private final int cntTimesteps=0;
 	private OTFAgentsListHandler.ExtendedPositionInfo readVehicle = null;
 	private double time;
 
@@ -166,7 +165,7 @@ public class OTFTVehServer implements OTFServerRemote{
 			System.arraycopy(this.buf.array(), 0, buffer, 0, buffer.length);
 			this.nextTime = actTime;
 			this.timesteps.put((int)this.nextTime, buffer);
-			this.actBuffer = buffer;
+			//this.actBuffer = buffer;
 			//System.out.println("Read timestep: " + actTime);
 		}
 
@@ -303,7 +302,7 @@ public class OTFTVehServer implements OTFServerRemote{
 		if (foundTime == -1) return false;
 
 		this.nextTime = foundTime;
-		this.actBuffer = null;
+		//this.actBuffer = null;
 		return true;
 	}
 

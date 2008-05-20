@@ -27,13 +27,9 @@ import javax.media.opengl.GL;
 
 import org.matsim.utils.vis.otfivs.caching.SceneGraph;
 import org.matsim.utils.vis.otfivs.data.OTFClientQuad;
-import org.matsim.utils.vis.otfivs.data.OTFDataQuad;
 import org.matsim.utils.vis.otfivs.handler.OTFDefaultLinkHandler;
-import org.matsim.utils.vis.otfivs.opengl.drawer.OTFGLDrawable;
 import org.matsim.utils.vis.otfivs.opengl.drawer.OTFOGLDrawer.FastColorizer;
 import org.matsim.utils.vis.otfivs.opengl.gl.Point3f;
-import org.matsim.utils.vis.otfivs.opengl.layer.ColoredStaticNetLayer;
-import org.matsim.utils.vis.otfivs.opengl.layer.SimpleStaticNetLayer;
 
 
 public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
@@ -51,7 +47,7 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 	public void draw() {
 		GL gl = this.myDrawer.getGL();
 		Point3f cam = this.myDrawer.getView();
-		float z = cam.z - 500;
+		//float z = cam.z - 500;
 
 		checkNetList(gl);
 		enableLinkTexture(gl);
@@ -90,7 +86,6 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
 	}
 
-	static int killme = 0;
 	/* (non-Javadoc)
 	 * @see otfvis.layer.SimpleStaticNetLayer#init(playground.david.vis.data.SceneGraph)
 	 */
@@ -116,7 +111,6 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 			for (int j=3;j<this.linkTexWidth*this.linkTexWidth*4;j+=4)this.linkTexBuffer[j] = (byte)(128);
 		}
 		actLayer = this;
-		killme = 0;
 	}
 
 	private final static FastColorizer colorizer = new FastColorizer(
@@ -127,17 +121,18 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 			new double[] { 0.0, 8.3,  13.8}, new Color[] {
 					Color.RED, Color.YELLOW, Color.GREEN});
 
-	public static class QuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer implements OTFDataQuad.Receiver, OTFGLDrawable{
+	public static class QuadDrawer extends SimpleStaticNetLayer.SimpleQuadDrawer {
 		protected final int texIdx;
 
 		public QuadDrawer(){
-			this.texIdx = actLayer.gTexIdx++;
+			if (actLayer != null) this.texIdx = actLayer.gTexIdx++;
+			else this.texIdx = 0;
 		}
 
 		@Override
 		public void onDraw( GL gl) {
-			final double tx = ((this.texIdx % actLayer.linkTexWidth) *1.0 + 0.5) /actLayer.linkTexWidth;
-			final double ty = ((this.texIdx / actLayer.linkTexWidth)*1.0 + 0.5)/actLayer.linkTexWidth ;
+			final double tx = ((this.texIdx % actLayer.linkTexWidth) *1.0 + 0.5) / actLayer.linkTexWidth;
+			final double ty = ((this.texIdx / actLayer.linkTexWidth)*1.0 + 0.5)/ actLayer.linkTexWidth ;
 			//Draw quad
 			gl.glBegin(gl.GL_QUADS);
 			gl.glTexCoord2d(tx,ty); gl.glVertex3f(this.quad[0].x, this.quad[0].y, 0);
@@ -149,8 +144,6 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 
 		@Override
 		public void setColor(float coloridx) {
-			killme++;
-
 			Color color = colorizer.getColor(coloridx);
 			if (coloridx == 0.0) color = Color.WHITE;
 			else {
@@ -173,7 +166,6 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 	public static class QuadDrawerLinkSpeed extends QuadDrawer {
 		@Override
 		public void setColor(float coloridx) {
-			killme++;
 
 			Color color = colorizerLinkSpeed.getColor(coloridx);
 			if (coloridx == 0.0) color = Color.WHITE;

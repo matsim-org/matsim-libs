@@ -22,7 +22,6 @@ package org.matsim.utils.vis.otfivs.executables;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
@@ -39,9 +38,9 @@ import org.matsim.world.World;
 
 
 public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
-	private final   String netFileName = "";
+	//private final   String netFileName = "";
 	private  String vehFileName = "";
-	private  String outFileName = "";
+	//private  String outFileName = "";
 	private static final int BUFFERSIZE = 100000000;
 
 
@@ -50,7 +49,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 	public OTFTVeh2MVI(QueueNetworkLayer net, String vehFileName, String outFileName, double startTime, double intervall_s) {
 		super(intervall_s, net, outFileName);
 		this.vehFileName = vehFileName;
-		this.outFileName = outFileName;
+		//this.outFileName = outFileName;
 		this.intervall_s = intervall_s;
 	}
 
@@ -87,7 +86,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 //		return result;
 //	}
 
-	ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
+	//ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
 	private int cntPositions=0;
 	private double lastTime=-1;
 	private int cntTimesteps=0;
@@ -123,7 +122,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 						String speed = result[6];
 						String elevation = result[13];
 						String azimuth = result[14];
-						String type = result[7];
+						//String type = result[7];
 						ExtendedPositionInfo position = new ExtendedPositionInfo(new IdImpl(agent), easting, northing,
 								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 						addVehicle(Double.parseDouble(time), position);

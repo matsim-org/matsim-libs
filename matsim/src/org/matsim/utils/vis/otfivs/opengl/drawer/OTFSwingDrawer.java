@@ -28,7 +28,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import org.matsim.utils.vis.otfivs.data.OTFClientQuad;
-import org.matsim.utils.vis.otfivs.gui.NetJComponent.myNetVisScrollPane;
 import org.matsim.utils.vis.otfivs.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfivs.interfaces.OTFQuery;
 
@@ -39,7 +38,7 @@ public class OTFSwingDrawer extends JComponent implements OTFDrawer {
 
 	public OTFSwingDrawer(JFrame frame, OTFClientQuad quad ) {
 		this.quad = quad;
-		myNetVisScrollPane networkScrollPane = new myNetVisScrollPane(null);
+		//MyNetVisScrollPane networkScrollPane = new MyNetVisScrollPane(null);
 	}
 	public Component getComponent() {
 		return this;

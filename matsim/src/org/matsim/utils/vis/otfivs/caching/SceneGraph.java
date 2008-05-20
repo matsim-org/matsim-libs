@@ -20,6 +20,7 @@
 
 package org.matsim.utils.vis.otfivs.caching;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -34,7 +35,12 @@ import org.matsim.utils.vis.otfivs.interfaces.OTFDrawer;
 
 
 
-class LayerDrawingOrderComparator implements Comparator<SceneLayer> {
+class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public int compare(SceneLayer o1, SceneLayer o2) {
 		int diff = (int)Math.signum(o1.getDrawOrder() - o2.getDrawOrder());

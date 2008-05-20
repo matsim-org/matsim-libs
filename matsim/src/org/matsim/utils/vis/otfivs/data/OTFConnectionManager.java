@@ -34,12 +34,12 @@ import org.matsim.utils.vis.otfivs.interfaces.OTFDataReader;
 
 
 
-public class OTFConnectionManager {
+public class OTFConnectionManager implements Cloneable {
 
 	private final Logger log = Logger.getLogger(OTFConnectionManager.class);
 	private boolean isValidated = false;
 
-	class Entry {
+	public static class Entry {
 		Class from, to;
 
 		public Entry(Class from, Class to) {
@@ -77,8 +77,8 @@ public class OTFConnectionManager {
 				if (count != 1) {
 					// there must be exactly ONE Reader class corresponding to every Writer class
 					if (count > 1) log.fatal("For Writer class" + entry.from.getCanonicalName() + " there is more than ONE reader class defined");
-					else log.fatal("For Writer class" + entry.from.getCanonicalName() + " there is more than ONE reader class defined");
-					System.exit(1);
+					else log.fatal("For Writer class" + entry.from.getCanonicalName() + " there is NO reader class defined");
+					throw new RuntimeException(); //System.exit(1);
 				}
 			}
 		}
@@ -161,8 +161,10 @@ public class OTFConnectionManager {
 			try {
 				Object o = entry.to.newInstance();
 				Object p = entry.from.newInstance();
-			} catch (Exception e) {
-				
+			} catch (InstantiationException e) {
+				log.warn("For Writer class" + entry.from.getCanonicalName()+ "or " + entry.to.getCanonicalName() + " instance could not be generated");
+			} catch (IllegalAccessException e) {
+				log.warn("For Writer class" + entry.from.getCanonicalName()+ "or " + entry.to.getCanonicalName() + " instance could not be accessed");
 			}
 			
 			// check for both classes, if they need to be replaced

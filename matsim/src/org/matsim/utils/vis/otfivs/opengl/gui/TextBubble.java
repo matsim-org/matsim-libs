@@ -22,7 +22,6 @@ package org.matsim.utils.vis.otfivs.opengl.gui;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.font.TextLayout;
@@ -59,7 +58,7 @@ public class TextBubble {
                              RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                              RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        AlphaComposite comp = AlphaComposite.SrcOver;
+        //AlphaComposite comp = AlphaComposite.SrcOver;
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
         g2d.setColor(bgColor);
         g2d.setFont(g2d.getFont().deriveFont(20.0f));

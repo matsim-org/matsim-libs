@@ -46,15 +46,18 @@ import org.matsim.utils.vis.otfivs.interfaces.OTFQuery;
 import org.matsim.utils.vis.otfivs.opengl.drawer.OTFOGLDrawer;
 import org.matsim.utils.vis.otfivs.opengl.gl.InfoText;
 
-
 import com.sun.opengl.util.BufferUtil;
 
 
 public class QuerySpinne implements OTFQuery {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -749787121253826794L;
 	private final Id linkId;
-	private transient Map<Link,Integer> drivenLinks;
+	private transient Map<Link,Integer> drivenLinks = null;
 	private float[] vertex = null;
-	private int[] count;
+	private int[] count = null;
 	boolean calcOffset = true;
 	private transient FloatBuffer vert;
 //	private transient FloatBuffer cnt;
@@ -152,8 +155,7 @@ public class QuerySpinne implements OTFQuery {
 		}
 	}
 
-	private OTFOGLDrawer.FastColorizer colorizer3;
-	private Object agentText;
+	private transient InfoText agentText = null;
 
 	public void draw(OTFOGLDrawer drawer) {
 		if(this.vertex == null) return;
@@ -171,14 +173,14 @@ public class QuerySpinne implements OTFQuery {
 
 			for(int i= 0;i< this.count.length; i++) if (this.count[i] > maxCount) maxCount = this.count[i];
 
-			this.colorizer3 = new OTFOGLDrawer.FastColorizer(
+			OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
 					new double[] { 0.0, maxCount}, new Color[] {
 							Color.YELLOW, Color.RED});
 
 			this.colors = ByteBuffer.allocateDirect(this.count.length*4*2);
 
 			for (int i = 0; i< this.count.length; i++) {
-				Color mycolor = this.colorizer3.getColor(this.count[i]);
+				Color mycolor = colorizer3.getColor(this.count[i]);
 				this.colors.put( (byte)mycolor.getRed());
 				this.colors.put( (byte)mycolor.getGreen());
 				this.colors.put((byte)mycolor.getBlue());
@@ -215,5 +217,6 @@ public class QuerySpinne implements OTFQuery {
 	}
 
 	public void remove() {
+		if (this.agentText != null) InfoText.removeTextPermanent(this.agentText);
 	}
 }
