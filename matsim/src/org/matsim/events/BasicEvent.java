@@ -20,15 +20,13 @@
 
 package org.matsim.events;
 
-import java.io.Serializable;
-
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 
-public abstract class BasicEvent implements Serializable{
+public abstract class BasicEvent {
 
 	public double time;
 	public String agentId;
@@ -36,18 +34,18 @@ public abstract class BasicEvent implements Serializable{
 
 	private static String timeString = null;
 	private static double timeCache = Time.UNDEFINED_TIME;
-	
+
 	// supply one c'tor with reference to person and one without
-	BasicEvent(double time, String agentId, Person agent) {this.time = time; this.agentId = agentId; this.agent = agent;}
-	BasicEvent(double time, String agentId) {this.time = time; this.agentId = agentId;}
-	
+	BasicEvent(final double time, final String agentId, final Person agent) {this.time = time; this.agentId = agentId; this.agent = agent;}
+	BasicEvent(final double time, final String agentId) {this.time = time; this.agentId = agentId;}
+
 	public abstract Attributes getAttributes();
 	@Override
 	public abstract String toString();
 
 	public abstract void rebuild(Plans population, NetworkLayer network);
-	
-	protected static String getTimeString(double time) {
+
+	protected static String getTimeString(final double time) {
 		if (time != timeCache) {
 			timeCache = time;
 			timeString = Long.toString((long) timeCache) + "\t";
