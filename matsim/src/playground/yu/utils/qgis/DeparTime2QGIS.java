@@ -68,16 +68,18 @@ public class DeparTime2QGIS implements X2QGIS {
 
 		public void run(Plan plan) {
 			Act fa = plan.getFirstActivity();
-			double dt = fa.getEndTime();
-			Id linkId = fa.getLinkId();
-			Integer c = dpCnt.get(linkId);
-			if (c == null)
-				c = Integer.valueOf(0);
-			dpCnt.put(linkId, Integer.valueOf(c.intValue() + 1));
-			Double times = dpTimes.get(linkId);
-			if (times == null)
-				times = Double.valueOf(0.0);
-			dpTimes.put(linkId, Double.valueOf(times.doubleValue() + dt));
+			if (fa.getType().startsWith("h")) {
+				Id linkId = fa.getLinkId();
+				Integer c = dpCnt.get(linkId);
+				if (c == null)
+					c = Integer.valueOf(0);
+				dpCnt.put(linkId, Integer.valueOf(c.intValue() + 1));
+				Double times = dpTimes.get(linkId);
+				if (times == null)
+					times = Double.valueOf(0.0);
+				dpTimes.put(linkId, Double.valueOf(times.doubleValue()
+						+ fa.getEndTime()));
+			}
 		}
 
 		public Map<Id, Double> getAvgDeparTime() {
@@ -92,7 +94,14 @@ public class DeparTime2QGIS implements X2QGIS {
 	}
 
 	/**
-	 * @param args
+	 * @param args0
+	 *            netfilename
+	 * @param args1
+	 *            1st plansfilename
+	 * @param args2
+	 *            2nd plansfilename
+	 * @param args3
+	 *            3nd Shape-filename (.shp-file)
 	 */
 	public static void main(String[] args) {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
@@ -109,25 +118,22 @@ public class DeparTime2QGIS implements X2QGIS {
 		// mn2q.addParameter("DeparTime", Double.class, ldt.getAvgDeparTime());
 		// mn2q
 		// .writeShapeFile("/net/ils/run466/output/ITERS/it.500/466.500.deparTime.shp");
-		mn2q.readNetwork("../data/ivtch/input/ivtch-osm-wu.xml"); // //
+		mn2q.readNetwork(args[0]);
 		mn2q.setCrs(ch1903);
 		LinkDeparTime lprA = new LinkDeparTime();
-		mn2q.readPlans("/net/ils/run465/output/ITERS/it.500/500.plans.xml.gz",
-				lprA);
+		mn2q.readPlans(args[1], lprA);
 		LinkDeparTime lprB = new LinkDeparTime();
-		mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
-				lprB);
+		mn2q.readPlans(args[2], lprB);
 		Map<Id, Double> diff = new TreeMap<Id, Double>();
-//		for (Id linkId : lprA.getAgents().keySet()) {
-//			Double B = lprB.getPtRate().get(linkId);
-//			double b = (B != null) ? B.doubleValue() : 0.0;
-//			Double A = lprA.getPtRate().get(linkId);
-//			double a = (A != null) ? A.doubleValue() : 0.0;
-//			diff.put(linkId, Double.valueOf(b - a));
-//		}
-		mn2q.addParameter("PtRate", Double.class, diff);
-		mn2q
-				.writeShapeFile("/net/ils/run466/output/ITERS/it.500/466.500-200.ptRate.shp");
+		for (Id linkId : lprB.getAvgDeparTime().keySet()) {
+			Double B = lprB.getAvgDeparTime().get(linkId);
+			double b = (B != null) ? B.doubleValue() : 0.0;
+			Double A = lprA.getAvgDeparTime().get(linkId);
+			double a = (A != null) ? A.doubleValue() : 0.0;
+			diff.put(linkId, Double.valueOf(b - a));
+		}
+		mn2q.addParameter("deparTime", Double.class, diff);
+		mn2q.writeShapeFile(args[3]);
 	}
 
 }

@@ -28,13 +28,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 
 /**
- * @author yu
+ * @author ychen
  * 
  */
 public class PtRate2QGIS implements X2QGIS {
@@ -58,16 +59,21 @@ public class PtRate2QGIS implements X2QGIS {
 		}
 
 		public void run(Plan plan) {
-			Id linkId = plan.getFirstActivity().getLinkId();
-			Integer a = agents.get(linkId);
-			if (a == null)
-				a = Integer.valueOf(0);
-			agents.put(linkId, Integer.valueOf(a.intValue() + 1));
-			if (plan.getType().equals(Plan.Type.PT)) {
-				Integer p = ptUsers.get(linkId);
-				if (p == null)
-					p = Integer.valueOf(0);
-				ptUsers.put(linkId, Integer.valueOf(p.intValue() + 1));
+			Act fa = plan.getFirstActivity();
+			Id linkId = fa.getLinkId();
+			if (fa.getType().startsWith("h")) {
+				Integer a = agents.get(linkId);
+				if (a == null)
+					a = Integer.valueOf(0);
+				agents.put(linkId, Integer.valueOf(a.intValue() + 1));
+				if (plan.getType().equals(Plan.Type.PT)) {
+					Integer p = ptUsers.get(linkId);
+					if (p == null)
+						p = Integer.valueOf(0);
+					ptUsers.put(linkId, Integer.valueOf(p.intValue() + 1));
+				}
+			} else {
+				System.out.println(fa.toString());
 			}
 		}
 
