@@ -58,7 +58,7 @@ public class CustomizableImpl implements Customizable {
 	 * returns a container for adding arbitrary additional information to
 	 * a MATSim core object. The Container will be created on demand.
 	 * 
-	 * <p>INPORTANT NOTE: This container is meant to use for experiments only.
+	 * <p>IMPORTANT NOTE: This container is meant to use for experiments only.
 	 * Therefore, do NOT call this method from the core (<tt>org.matsim</tt>).</p>
 	 * 
 	 * @see Customizable
