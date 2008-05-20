@@ -34,6 +34,7 @@ import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 
+import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
@@ -107,7 +108,7 @@ public class RndNetworkGenerator {
 		
 		double dist = c1.calcDistance(c2)/1000.0;
 		
-		return alpha * 1/dist;
+		return alpha * 1/Math.pow(dist,2);
 	}
 	
 //	private static void dump(Graph g, String outDir) throws FileNotFoundException, IOException {
@@ -162,6 +163,12 @@ public class RndNetworkGenerator {
 		
 		Plans plans = data.getPopulation();
 		Graph g = createGraph(plans);
+		
+//		System.out.println("Graph has " + g.numVertices() +" vertices, " + g.numEdges() + " edges, cluster coefficient: " +
+//				GraphStatistics.meanClusterCoefficient(g) + ", mean degree: " + GraphStatistics.meanDegree(g) + ", components: " +
+//				new WeakComponentClusterer().extract(g).size() + ", pearson coeff: " + GraphStatistics.pearsonCorrelationCoefficient(g));
+//		
+		
 		GraphMLFileHandler gmlHandler = new PersonGraphMLFileHandler();
 		GraphMLFile gmlFile = new GraphMLFile(gmlHandler);
 		logger.info("Saving social network...");

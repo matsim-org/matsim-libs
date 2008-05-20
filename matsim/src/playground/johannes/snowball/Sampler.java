@@ -26,30 +26,21 @@ package playground.johannes.snowball;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
-import org.matsim.gbl.Gbl;
-
-import playground.johannes.socialnets.GraphStatistics;
-import playground.johannes.socialnets.PersonGraphMLFileHandler;
 import playground.johannes.socialnets.UserDataKeys;
 import cern.colt.list.IntArrayList;
-import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
-import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.SparseGraph;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
-import edu.uci.ics.jung.io.GraphMLFile;
 import edu.uci.ics.jung.utils.Pair;
 
 /**
@@ -58,16 +49,26 @@ import edu.uci.ics.jung.utils.Pair;
  */
 public class Sampler {
 
-//	public final static UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
+	private long seed;
+	
+	private Random rnd;
+	
+	private double pTieNamed = 1;
+	
+	private double pParticipate = 1;
+	
+	public Sampler(long randomSeed) {
+		seed = randomSeed;
+	}
 
-//	public static final String PERSON_KEY = "person";
-
-//	public static final String WAVE_KEY = "wave";
-
-	private static final Logger logger = Logger.getLogger(Sampler.class);
-
-	private Random rnd = new Random(5);
-
+	public void setPTieNamed(double p) {
+		pTieNamed = p;
+	}
+	
+	public void setPParticipate(double p) {
+		pParticipate = p;
+	}
+	
 	private void init(Graph g) {
 		for(Object v : g.getVertices()) {
 			((Vertex)v).removeUserDatum(UserDataKeys.PARTICIPATE_KEY);
@@ -80,6 +81,7 @@ public class Sampler {
 	}
 	
 	public void run(Graph g, int waves, int initialEgos) {
+		rnd = new Random(seed);
 		init(g);
 		Collection<Vertex> egos = selectedIntialEgos(g, initialEgos);
 
@@ -88,9 +90,13 @@ public class Sampler {
 		}
 
 		for (int wave = 1; wave <= waves; wave++) {
-			System.out.println("Sampling wave " + wave + "...");
+			if(wave == 1)
+				System.out.print("Sampling wave " + wave + "...");
+			else
+				System.out.print(wave + "...");
 			egos = runWave(egos, wave);
 		}
+		System.out.println(" done.");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -170,11 +176,11 @@ public class Sampler {
 	}
 
 	private double getProbaTieNamed(Vertex ego, Vertex alter) {
-		return 1;
+		return pTieNamed;
 	}
 	
 	private double getProbaParticipate(Vertex ego) {
-		return 1;
+		return pParticipate;
 	}
 
 	public Graph extractSampledGraph(Graph fullGraph, boolean extend) {
@@ -251,8 +257,8 @@ public class Sampler {
 	}
 	
 	public void removeDeadEnds(Graph g) {
-		List<Edge> edges = new LinkedList<Edge>();
-		List<Vertex> vertices = new LinkedList<Vertex>();
+		Set<Edge> edges = new HashSet<Edge>();
+		Set<Vertex> vertices = new HashSet<Vertex>();
 		for(Object v : g.getVertices()) {
 			if(((Vertex)v).degree() == 1) {
 				Edge e = (Edge) ((Vertex)v).getIncidentEdges().iterator().next();
@@ -270,97 +276,101 @@ public class Sampler {
 			g.removeVertex(v);
 	}
 	
-//	public void completeSampledGraph(Graph sampledGraph, Graph fullGraph) {
-//		for(Object v : sampledGraph.getVertices()) {
-//			for(Object e : ((Vertex)v).getOutEdges()) {
-//				/*
-//				 * Edge has not been covered during sampling. Insert it into the
-//				 * graph.
-//				 */
-//				if(((Edge)e).getUserDatum(UserDataKeys.WAVE_KEY) == null) {
-//					
-//				}
-//			}
-//			
-//		}
-//	}
+	public void removeIsolates(Graph g) {
+		Set<Vertex> vertices = new HashSet<Vertex>();
+		for(Object v : g.getVertices())
+			if(((Vertex)v).degree() == 0)
+				vertices.add((Vertex) v);
+		
+		for(Vertex v : vertices)
+			g.removeVertex(v);
+	}
 	
-	public static void main(String args[]) {
-		Config config = Gbl.createConfig(args);
-		ScenarioData data = new ScenarioData(config);
-		
-		final String MODULE_NAME = "snowballsampling";
-		String graphFile = config.getParam(MODULE_NAME, "graphFile");
-		String graphPajekFile = config.getParam(MODULE_NAME, "graphPajekFile");
-		String sampledPajekFile = config.getParam(MODULE_NAME, "sampledPajekFile");
-		
-//		Plans plans = data.getPopulation();
-			/*
-			 * Load the social network...
-			 */
-			logger.info("Loading social network...");
-			PersonGraphMLFileHandler fileHandler = new PersonGraphMLFileHandler();
-			GraphMLFile gmlFile = new GraphMLFile(fileHandler);
-			Graph g = gmlFile.load(graphFile);
-			/*
-			 * Simulate snowball sampling...
-			 */
-			Sampler s = new Sampler();
-			s.run(g, 2, 1);
-			/*
-			 * Compute statistics...
-			 */
-			Map<String, Integer> sampledVertices = SampleStatistics.countSampledVertices(g);
-			StringBuilder sBuilder = new StringBuilder();
-			sBuilder.append("Sampled vertex statistics:\n");
-			for(String key : sampledVertices.keySet()) {
-				sBuilder.append("\t");
-				sBuilder.append(key);
-				sBuilder.append(":\t");
-				sBuilder.append(sampledVertices.get(key));
-				sBuilder.append("\n");
-			}
-			logger.info(sBuilder.toString());
-			
-			Map<String, Integer> sampledEdges = SampleStatistics.countSampledEdges(g);
-			sBuilder = new StringBuilder();
-			sBuilder.append("Sampled edge statistics:\n");
-			for(String key : sampledEdges.keySet()) {
-				sBuilder.append("\t");
-				sBuilder.append(key);
-				sBuilder.append(":\t");
-				sBuilder.append(sampledEdges.get(key));
-				sBuilder.append("\n");
-			}
-			logger.info(sBuilder.toString());
-			
-			Graph extSampledGraph = s.extractSampledGraph(g, true);
-			Graph reducedSampledGraph = s.extractSampledGraph(g, false);
-			s.removeDeadEnds(reducedSampledGraph);
-			
-			logger.info("Mean degrees: observed: " + 
-					GraphStatistics.meanDegree(g) + 
-					"\tsampled: "+GraphStatistics.meanDegreeSampled(extSampledGraph));
+//	public static void main(String args[]) {
+//		Config config = Gbl.createConfig(args);
+//		
+//		final String MODULE_NAME = "snowballsampling";
+//		String graphFile = config.getParam(MODULE_NAME, "graphFile");
+//		String graphPajekFile = config.getParam(MODULE_NAME, "graphPajekFile");
+//		String sampledPajekFile = config.getParam(MODULE_NAME, "sampledPajekFile");
+//		String outDir ="";
+//		
+//		/*
+//		 * Load the social network...
+//		 */
+//		logger.info("Loading social network...");
+//		PersonGraphMLFileHandler fileHandler = new PersonGraphMLFileHandler();
+//		GraphMLFile gmlFile = new GraphMLFile(fileHandler);
+//		Graph g = gmlFile.load(graphFile);
+//			
+//		logger.info("Graph has " + g.numVertices() +" vertices, " + g.numEdges());
+//		Histogram1D h = GraphStatistics.createClusteringCoefficientsHistogram(g, 0);
+//		GraphStatistics.saveHistogram(h, "/Users/fearonni/vsp-work/socialnets/devel/snowball/cc-distr-orig.txt");
+//			/*
+//			 * Simulate snowball sampling...
+//			 */
+//			Sampler s = new Sampler(config.global().getRandomSeed());
+//			s.run(g, 3, 5);
+//			/*
+//			 * Compute statistics...
+//			 */
+//			Map<String, Integer> sampledVertices = SampleStatistics.countSampledVertices(g);
+//			StringBuilder sBuilder = new StringBuilder();
+//			sBuilder.append("Sampled vertex statistics:\n");
+//			for(String key : sampledVertices.keySet()) {
+//				sBuilder.append("\t");
+//				sBuilder.append(key);
+//				sBuilder.append(":\t");
+//				sBuilder.append(sampledVertices.get(key));
+//				sBuilder.append("\n");
+//			}
+//			logger.info(sBuilder.toString());
+//			
+//			Map<String, Integer> sampledEdges = SampleStatistics.countSampledEdges(g);
+//			sBuilder = new StringBuilder();
+//			sBuilder.append("Sampled edge statistics:\n");
+//			for(String key : sampledEdges.keySet()) {
+//				sBuilder.append("\t");
+//				sBuilder.append(key);
+//				sBuilder.append(":\t");
+//				sBuilder.append(sampledEdges.get(key));
+//				sBuilder.append("\n");
+//			}
+//			logger.info(sBuilder.toString());
+//			
+//			Graph extSampledGraph = s.extractSampledGraph(g, true);
+//			Graph reducedSampledGraph = s.extractSampledGraph(g, false);
+////			s.removeDeadEnds(reducedSampledGraph);
+//			
+//			logger.info("Mean degrees: observed: " + 
+//					GraphStatistics.meanDegree(g) + 
+//					"\tsampled: "+GraphStatistics.meanDegreeSampled(extSampledGraph));
 //			logger.info("Mean clustering coefficient: observed: " + 
 //					GraphStatistics.meanClusterCoefficient(g) + 
-//					"\tsampled: "+GraphStatistics.meanClusterCoefficientSampled(g2));
-
-			logger.info("Mean clustering coefficient: observed: " + 
-					0 + 
-					"\tsampled: "+GraphStatistics.meanClusterCoefficient(reducedSampledGraph));
-			
+//					"\tsampled: "+GraphStatistics.meanClusterCoefficient(reducedSampledGraph));
+//
+////			logger.info("Mean clustering coefficient: observed: " + 
+////					0 + 
+////					"\tsampled: "+GraphStatistics.meanClusterCoefficient(reducedSampledGraph));
+//			
 //			WeakComponentClusterer wcc = new WeakComponentClusterer();
 //			ClusterSet observerCluster = wcc.extract(g);
-//			ClusterSet sampledCluster = wcc.extract(g2);
+//			ClusterSet sampledCluster = wcc.extract(reducedSampledGraph);
 //			logger.info("Weak components: observed: " + 
 //					observerCluster.size() +" components;\tsampled: " +
 //					sampledCluster.size() + " components.");
-			/*
-			 * Dump graph for visualization in Pajek.
-			 */
-			PajekVisWriter w = new PajekVisWriter();
-			w.write(extSampledGraph, sampledPajekFile);
-			w.write(g, graphPajekFile);
-		
-	}
+//			
+//			logger.info("Isolated nodes: observer: " + GraphStatistics.countIsolates(g) +
+//					";\tsampled: " + GraphStatistics.countIsolates(extSampledGraph));
+//			
+//			h = GraphStatistics.createClusteringCoefficientsHistogram(reducedSampledGraph, 0);
+//			GraphStatistics.saveHistogram(h, "/Users/fearonni/vsp-work/socialnets/devel/snowball/cc-distr-sampled.txt");
+//			/*
+//			 * Dump graph for visualization in Pajek.
+//			 */
+//			PajekVisWriter w = new PajekVisWriter();
+//			w.write(extSampledGraph, sampledPajekFile);
+//			w.write(g, graphPajekFile);
+//		
+//	}
 }
