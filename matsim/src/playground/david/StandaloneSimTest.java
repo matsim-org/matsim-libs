@@ -44,6 +44,9 @@ public class StandaloneSimTest {
 		Gbl.startMeasurement();
 		final Config config = Gbl.createConfig(args);
 
+		String localDtdBase = "./dtd/";
+		Gbl.getConfig().global().setLocalDtdBase(localDtdBase);
+		
 		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
