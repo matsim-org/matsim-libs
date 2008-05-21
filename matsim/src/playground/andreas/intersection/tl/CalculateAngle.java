@@ -34,7 +34,7 @@ public class CalculateAngle {
 		if (result.size() == 0){
 			return null;
 		}else
-			return result.get(result.lastKey());
+			return result.get(result.firstKey());
 	}
 	
 	/**
@@ -75,7 +75,7 @@ public class CalculateAngle {
 
 				}
 				
-				leftLane.put(thetaDiff, outLink);
+				leftLane.put(-thetaDiff, outLink);
 				
 			}			
 		}

@@ -201,9 +201,10 @@ public class QLink extends QueueLink {
 				PseudoLink tempPseudoLink = null;
 				for (PseudoLink pseudoLink : pseudoLinksList) {
 					
-					if( tempPseudoLink == null || tempPseudoLink.lane < pseudoLink.lane){
+					if( tempPseudoLink == null || (pseudoLink.lane == 1 && pseudoLink.getMeterFromLinkEnd() == 0)){
 						tempPseudoLink = pseudoLink;
-					}					
+					}	
+										
 				}
 				
 				tempPseudoLink.addDestLink(outLink);
