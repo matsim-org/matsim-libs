@@ -37,9 +37,9 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		// write MATSim-network to Shp-file
 		// ///////////////////////////////////////////////////
 		// mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml");
-		mn2q.readNetwork("./test/yu/paper/equil_net.xml");
+		mn2q.readNetwork("./test/yu/test/equil_net_test.xml");
 		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile("./test/yu/paper/equil_net.shp");
+		mn2q.writeShapeFile("./test/yu/test/equil_net_test/equil_net_test.shp");
 		System.out.println("done.");
 	}
 }
