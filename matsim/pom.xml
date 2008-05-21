@@ -1,9 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                      http://maven.apache.org/maven-v4_0_0.xsd">
-
+<?xml version="1.0" encoding="UTF-8"?><project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim</groupId>
   <artifactId>matsim</artifactId>
@@ -46,18 +41,11 @@
         <configuration>
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
-            <descriptorRef>bin</descriptorRef>
-            <descriptorRef>project</descriptorRef>
           </descriptorRefs>
-					<!--  <descriptors>
-            <descriptor>assembly.xml</descriptor>
-          </descriptors>-->
         </configuration>
-     </plugin>
+      </plugin>
     </plugins>
   </build>
-
-
   <repositories>
     <repository>
       <id>geotools</id>
@@ -77,6 +65,34 @@
       <version>3.1</version>
       <scope>system</scope>
       <systemPath>${basedir}/libs/jgap-3.1.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>jogl</groupId>
+      <artifactId>jogl</artifactId>
+      <version>1.1</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/jogl-1.1.0/jogl.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>gluegen</groupId>
+      <artifactId>jogl-gluegen</artifactId>
+      <version>1.1</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/jogl-1.1.0/gluegen-rt.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>kml</groupId>
+      <artifactId>kml22jaxb21</artifactId>
+      <version>2.2</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/kml2.2-jaxb2.1.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.jdesktop</groupId>
+      <artifactId>timingframework</artifactId>
+      <version>0.53</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/TimingFramework-0.53.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -137,6 +153,26 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.2</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+      <version>2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>jfree</groupId>
+      <artifactId>jcommon</artifactId>
+      <version>1.0.9</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
     </dependency>
   </dependencies>
 </project>
