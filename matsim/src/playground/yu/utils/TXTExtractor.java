@@ -43,6 +43,19 @@ public class TXTExtractor {
 
 	}
 
+	private static void printUsage() {
+		System.out.println("----------------");
+		System.out.println("TXTExtractor:");
+		System.out
+				.println("Creates a new .txt-file from a old normal .txt-file, only the lines, which contains the specified sequence of char values, should be included");
+		System.out.println();
+		System.out.println("usage: TXTExtractor args");
+		System.out.println(" arg 0: path to the old .txt-file (required)");
+		System.out.println(" arg 1: the old .txt-file (required)");
+		System.out.println(" arg 2: the specified sequence of char values (required)");
+		System.out.println("----------------");
+	}
+
 	/**
 	 * @param args0
 	 *            inputTXTFilename
@@ -52,6 +65,8 @@ public class TXTExtractor {
 	 *            the String, man is looking for
 	 */
 	public static void main(String[] args) {
+		if (args.length != 3)
+			printUsage();
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(args[0]);
 			BufferedWriter writer = IOUtils.getBufferedWriter(args[1]);
