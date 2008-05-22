@@ -237,6 +237,10 @@ public class NetworkLayer extends Layer implements BasicNet {
 		return this.nodes.get(new IdImpl(id));
 	}
 
+	public final Node getNode(Id id) {
+		return this.nodes.get(id);
+	}
+	
 	/**
 	 * Finds the (approx.) nearest link to a given point on the map.<br />
 	 * It searches first for the nearest node, and then for the nearest link
