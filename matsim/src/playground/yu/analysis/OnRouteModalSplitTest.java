@@ -32,6 +32,18 @@ import org.matsim.world.World;
 
 public class OnRouteModalSplitTest {
 
+	/**
+	 * @param args0
+	 *            netFilename
+	 * @param args1
+	 *            plansFilename
+	 * @param args2
+	 *            eventsFilename
+	 * @param args3
+	 *            chartFilename
+	 * @param args4
+	 *            legFilename
+	 */
 	@SuppressWarnings("unchecked")
 	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/test/input/equil_net.xml";
@@ -43,11 +55,11 @@ public class OnRouteModalSplitTest {
 		// "./test/yu/test/output/3kVolumeTest.txt.gz";
 		// final String chartFilename = "./test/yu/test/output/3kChart.png";
 		// final String legFilename = "./test/yu/test/output/3kLeg.txt.gz";
-		final String netFilename = "../data/ivtch/input/network.xml";
-		final String plansFilename = "../data/ivtch/input/analysis/carActTime100.plans.xml.gz";
-		final String eventsFilename = "../data/ivtch/input/analysis/carActTime100.events.txt.gz";
-		final String chartFilename = "../data/ivtch/analysis/carActTimeChart.png";
-		final String legFilename = "../data/ivtch/analysis/carActTimeLeg.txt.gz";
+		final String netFilename = args[0];
+		final String plansFilename = args[1];
+		final String eventsFilename = args[2];
+		final String chartFilename = args[3];
+		final String legFilename = args[4];
 
 		Gbl.startMeasurement();
 		@SuppressWarnings("unused")

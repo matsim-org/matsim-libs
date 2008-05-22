@@ -80,6 +80,7 @@ public class MATSimNet2QGIS {
 		}
 	}
 
+	protected static double flowCapFactor = 1.0;
 	protected NetworkLayer network;
 	protected CoordinateReferenceSystem crs = null;
 	private Network2PolygonGraph n2g;
@@ -103,6 +104,14 @@ public class MATSimNet2QGIS {
 		}
 		this.n2g = new Network2PolygonGraph(this.network, this.crs);
 	}// TODO override
+
+	/**
+	 * @param flowCapFactor
+	 *            the flowCapFactor to set
+	 */
+	public static void setFlowCapFactor(double flowCapacityFactor) {
+		flowCapFactor = flowCapacityFactor;
+	}
 
 	/**
 	 * @param ShapeFilename

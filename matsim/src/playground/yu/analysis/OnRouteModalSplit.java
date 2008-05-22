@@ -35,18 +35,13 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.config.Config;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.EventAgentStuck;
-import org.matsim.events.Events;
-import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -65,15 +60,10 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 
 	private int iteration = 0;
 	private final int binSize;
-	private final int[] countsDep;
-	private final int[] countsArr;
-	private final int[] countsStuck;
-	private final int[] carCountsDep;
-	private final int[] carCountsArr;
-	private final int[] carCountsStuck;
-	private final int[] ptCountsDep;
-	private final int[] ptCountsArr;
-	private final int[] onRoute, carOnRoute, ptOnRoute;
+	private final int[] dep, arr, stuck, onRoute;
+	private final int[] carDep, carArr, carStuck, carOnRoute;
+	private final int[] ptDep, ptArr, ptOnRoute;
+	private final int[] otherDep, otherArr, otherStuck, otherOnRoute;
 	private final NetworkLayer network;
 	private final Plans plans;
 
@@ -90,18 +80,22 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 			NetworkLayer network, Plans plans) {
 		super();
 		this.binSize = binSize;
-		this.countsDep = new int[nofBins + 1]; // +1 for all times out of our
+		this.dep = new int[nofBins + 1]; // +1 for all times out of our
 		// range
-		this.countsArr = new int[nofBins + 1];
-		this.countsStuck = new int[nofBins + 1];
-		this.carCountsArr = new int[nofBins + 1];
-		this.carCountsDep = new int[nofBins + 1];
-		this.carCountsStuck = new int[nofBins + 1];
-		this.ptCountsArr = new int[nofBins + 1];
-		this.ptCountsDep = new int[nofBins + 1];
+		this.arr = new int[nofBins + 1];
+		this.stuck = new int[nofBins + 1];
+		this.carArr = new int[nofBins + 1];
+		this.carDep = new int[nofBins + 1];
+		this.carStuck = new int[nofBins + 1];
+		this.ptArr = new int[nofBins + 1];
+		this.ptDep = new int[nofBins + 1];
 		this.onRoute = new int[nofBins + 1];
 		this.carOnRoute = new int[nofBins + 1];
 		this.ptOnRoute = new int[nofBins + 1];
+		this.otherDep = new int[nofBins + 1];
+		this.otherArr = new int[nofBins + 1];
+		this.otherOnRoute = new int[nofBins + 1];
+		this.otherStuck = new int[nofBins + 1];
 		reset(0);
 		this.network = network;
 		this.plans = plans;
@@ -122,35 +116,34 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 	/* Implementation of eventhandler-Interfaces */
 
 	public void handleEvent(final EventAgentDeparture event) {
-		internHandleEvent(event, this.countsDep, this.carCountsDep,
-				this.ptCountsDep);
+		internHandleEvent(event, this.dep, this.carDep, this.ptDep,
+				this.otherDep);
 	}
 
 	public void handleEvent(final EventAgentArrival event) {
-		internHandleEvent(event, this.countsArr, this.carCountsArr,
-				this.ptCountsArr);
+		internHandleEvent(event, this.arr, this.carArr, this.ptArr,
+				this.otherArr);
 	}
 
 	public void handleEvent(final EventAgentStuck event) {
-		internHandleEvent(event, this.countsStuck, this.carCountsStuck, null);
+		internHandleEvent(event, this.stuck, this.carStuck, null,
+				this.otherStuck);
 	}
 
 	private void internHandleEvent(AgentEvent ae, int[] allCount,
-			int[] carCount, int[] ptCount) {
+			int[] carCount, int[] ptCount, int[] otherCount) {
 		int binIdx = getBinIndex(ae.time);
 		allCount[binIdx]++;
 		ae.rebuild(this.plans, this.network);
 		Plan.Type planType = ae.agent.getSelectedPlan().getType();
-		if ((planType == null) || (planType == Plan.Type.UNDEFINED)) {
+		if (planType.equals(Plan.Type.CAR)) {
 			carCount[binIdx]++;
+		} else if (planType.equals(Plan.Type.PT)) {
+			if (ptCount != null)
+				ptCount[binIdx]++;
 		} else {
-			if (planType.equals(Plan.Type.CAR)) {
-				carCount[binIdx]++;
-			} else if (planType.equals(Plan.Type.PT)) {
-				if (ptCount != null) {
-					ptCount[binIdx]++;
-				}
-			}
+			if (Integer.parseInt(ae.agentId) > 1000000000)
+				otherCount[binIdx]++;
 		}
 	}
 
@@ -177,18 +170,20 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 	}
 
 	private void calcOnRoute() {
-		this.onRoute[0] = this.countsDep[0] - this.countsArr[0]
-				- this.countsStuck[0];
-		this.carOnRoute[0] = this.carCountsDep[0] - this.carCountsArr[0]
-				- this.carCountsStuck[0];
-		this.ptOnRoute[0] = this.ptCountsDep[0] - this.ptCountsArr[0];
-		for (int i = 1; i < this.countsDep.length; i++) {
-			this.onRoute[i] = this.onRoute[i - 1] + this.countsDep[i]
-					- this.countsArr[i] - this.countsStuck[i];
-			this.carOnRoute[i] = this.carOnRoute[i - 1] + this.carCountsDep[i]
-					- this.carCountsArr[i] - this.carCountsStuck[i];
-			this.ptOnRoute[i] = this.ptOnRoute[i - 1] + this.ptCountsDep[i]
-					- this.ptCountsArr[i];
+		this.onRoute[0] = this.dep[0] - this.arr[0] - this.stuck[0];
+		this.carOnRoute[0] = this.carDep[0] - this.carArr[0] - this.carStuck[0];
+		this.ptOnRoute[0] = this.ptDep[0] - this.ptArr[0];
+		this.otherOnRoute[0] = this.otherDep[0] - this.otherArr[0]
+				- this.otherStuck[0];
+		for (int i = 1; i < this.dep.length; i++) {
+			this.onRoute[i] = this.onRoute[i - 1] + this.dep[i] - this.arr[i]
+					- this.stuck[i];
+			this.carOnRoute[i] = this.carOnRoute[i - 1] + this.carDep[i]
+					- this.carArr[i] - this.carStuck[i];
+			this.ptOnRoute[i] = this.ptOnRoute[i - 1] + this.ptDep[i]
+					- this.ptArr[i];
+			this.otherOnRoute[i] = this.otherOnRoute[i - 1] + this.otherDep[i]
+					- this.otherArr[i] - this.otherStuck[i];
 		}
 	}
 
@@ -201,18 +196,23 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 	public void write(final BufferedWriter bw) {
 		calcOnRoute();
 		try {
-			bw.write("time\ttimeBin\tdepartures\tarrivals\tstuck\ton_route"
-					+ "\tcarDepartures\tcarArrivals\tcarStuck\tcarOnRoute"
-					+ "\tptDepartures\tptArrivals\tptStuck\tptOnRoute\n");
-			for (int i = 0; i < this.countsDep.length; i++) {
+			bw
+					.write("time\ttimeBin\tdepartures\tarrivals\tstuck\ton_route"
+							+ "\tcarDepartures\tcarArrivals\tcarStuck\tcarOnRoute"
+							+ "\tptDepartures\tptArrivals\tptStuck\tptOnRoute"
+							+ "\totherDepartures\totherArrivals\totherStuck\totherOnRoute"
+							+ "\n");
+			for (int i = 0; i < this.dep.length; i++) {
 				bw.write(Time.writeTime(i * this.binSize) + "\t"
-						+ i * this.binSize + "\t" + this.countsDep[i] + "\t"
-						+ this.countsArr[i] + "\t" + this.countsStuck[i] + "\t"
-						+ this.onRoute[i] + "\t" + this.carCountsDep[i] + "\t"
-						+ this.carCountsArr[i] + "\t" + this.carCountsStuck[i]
-						+ "\t" + this.carOnRoute[i] + "\t"
-						+ this.ptCountsDep[i] + "\t" + this.ptCountsArr[i]
-						+ "\t" + 0 + "\t" + this.ptOnRoute[i] + "\n");
+						+ i * this.binSize + "\t" + this.dep[i] + "\t"
+						+ this.arr[i] + "\t" + this.stuck[i] + "\t"
+						+ this.onRoute[i] + "\t" + this.carDep[i] + "\t"
+						+ this.carArr[i] + "\t" + this.carStuck[i] + "\t"
+						+ this.carOnRoute[i] + "\t" + this.ptDep[i] + "\t"
+						+ this.ptArr[i] + "\t" + 0 + "\t" + this.ptOnRoute[i]
+						+ "\t" + this.otherDep[i] + "\t" + this.otherArr[i]
+						+ "\t" + this.otherStuck[i] + "\t"
+						+ this.otherOnRoute[i] + "\n");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -226,12 +226,11 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 		final XYSeries arrivalsSerie = new XYSeries("arrivals", false, true);
 		final XYSeries onRouteSerie = new XYSeries("on route", false, true);
 		int onRoute = 0;
-		for (int i = 0; i < this.countsDep.length; i++) {
-			onRoute = onRoute + this.countsDep[i] - this.countsArr[i]
-					- this.countsStuck[i];
+		for (int i = 0; i < this.dep.length; i++) {
+			onRoute = onRoute + this.dep[i] - this.arr[i] - this.stuck[i];
 			double hour = i * this.binSize / 60.0 / 60.0;
-			departuresSerie.add(hour, this.countsDep[i]);
-			arrivalsSerie.add(hour, this.countsArr[i]);
+			departuresSerie.add(hour, this.dep[i]);
+			arrivalsSerie.add(hour, this.arr[i]);
 			onRouteSerie.add(hour, onRoute);
 		}
 
@@ -267,23 +266,23 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 
 	private int getBinIndex(final double time) {
 		int bin = (int) (time / this.binSize);
-		if (bin >= this.countsDep.length) {
-			return this.countsDep.length - 1;
+		if (bin >= this.dep.length) {
+			return this.dep.length - 1;
 		}
 		return bin;
 	}
 
 	public void reset(final int iteration) {
 		this.iteration = iteration;
-		for (int i = 0; i < this.countsDep.length; i++) {
-			this.countsDep[i] = 0;
-			this.countsArr[i] = 0;
-			this.countsStuck[i] = 0;
+		for (int i = 0; i < this.dep.length; i++) {
+			this.dep[i] = 0;
+			this.arr[i] = 0;
+			this.stuck[i] = 0;
 		}
 	}
 
 	public void writeCharts(final String filename) {
-		double[] category = new double[this.countsDep.length + 1];
+		double[] category = new double[this.dep.length + 1];
 		for (int j = 0; j < category.length; j++) {
 			category[j] = ((double) j) * (double) this.binSize / 3600.0;
 		}
@@ -293,15 +292,18 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 		double[] onRoute = new double[length];
 		double[] carOnRoute = new double[length];
 		double[] ptOnRoute = new double[length];
+		double[] otherOnRoute=new double[length];
 		for (int i = 0; i < length; i++) {
 			onRoute[i] = this.onRoute[i];
 			carOnRoute[i] = this.carOnRoute[i];
 			ptOnRoute[i] = this.ptOnRoute[i];
+			otherOnRoute[i]=this.otherOnRoute[i];
 		}
 		onRouteChart.addSeries("all agents on route", category, onRoute);
 		onRouteChart.addSeries("drivers on route", category, carOnRoute);
 		onRouteChart.addSeries("public transit users on route", category,
 				ptOnRoute);
+		onRouteChart.addSeries("others on route", category, otherOnRoute);
 		onRouteChart.saveAsPng(filename, 1024, 768);
 	}
 }

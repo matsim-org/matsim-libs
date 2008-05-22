@@ -75,16 +75,16 @@ public class AvgSpeed2QGIS implements X2QGIS {
 		 * ///////////////////////////////////////////////////////////////
 		 */
 		mn2q
-				.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu-flama-noUetli.xml");
+				.readNetwork("test/yu/test/equil_net.xml");
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(net);
-		mn2q.readEvents("../runs/run468/500.events.txt.gz", clas);
+		mn2q.readEvents("test/yu/test/events.txt", clas);
 		List<Map<Id, Double>> speeds = createSpeeds(net, clas);
 		for (int i = 0; i < 24; i++) {
 			mn2q.addParameter("aS" + i + "-" + (i + 1) + "h", Double.class,
 					speeds.get(i));
 		}
-		mn2q.writeShapeFile("../runs/run468/468.500.avgSpeed.shp");
+		mn2q.writeShapeFile("test/yu/test/gunnar-avgSpeed.shp");
 	}
 }

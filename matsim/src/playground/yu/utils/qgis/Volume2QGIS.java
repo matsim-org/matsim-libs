@@ -51,13 +51,22 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 			int[] v = va.getVolumesForLink(linkId.toString());
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Integer> m = volumes.get(i);
-				if (m != null) {
-					m.put(linkId, ((v != null) ? v[i] : 0) * 10);
-				} else if (m == null) {
+				// if (m != null) {
+				// m.put(linkId, (int)(((double)((v != null) ? v[i] :
+				// 0))/flowCapFactor));
+				// } else if (m == null) {
+				// m = new HashMap<Id, Integer>();
+				// m.put(linkId, ((v != null) ? v[i] : 0) * 10);
+				// volumes.add(i, m);
+				// }
+				if (m == null) {
 					m = new HashMap<Id, Integer>();
-					m.put(linkId, ((v != null) ? v[i] : 0) * 10);
 					volumes.add(i, m);
 				}
+				m
+						.put(
+								linkId,
+								(int) (((double) ((v != null) ? v[i] : 0)) / flowCapFactor));
 			}
 		}
 		return volumes;
@@ -75,7 +84,7 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 	public static void main(String[] args) {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		// String netFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
-		String netFilename = "test/yu/test/equil_net_test.xml";
+		String netFilename = "test/yu/test/equil_net.xml";
 		/*
 		 * ///////////////////////////////////////////////////////////////
 		 * Traffic Volumes and MATSim-network to Shp-file // *
@@ -87,13 +96,14 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		mn2q.readEvents("test/yu/test/1000.events.txt.gz", va);
+		// MATSimNet2QGIS.setFlowCapFactor(0.1);
+		mn2q.readEvents("test/yu/test/events.txt", va);
 		List<Map<Id, Integer>> vols = createVolumes(net, va);
 		for (int i = 0; i < 24; i++) {
 			mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
 					vols.get(i));
 		}
-		mn2q.writeShapeFile("test/yu/test/1000.volumes.shp");
+		mn2q.writeShapeFile("test/yu/test/gunnar-volumes.shp");
 		/*
 		 * //////////////////////////////////////////////////////////////
 		 * Differenz of Traffic Volumes and MATSim-network to Shp-file
@@ -137,6 +147,6 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 		// String index = "vol" + i + "-" + (i + 1) + "h";
 		// v2q.addParameter(index, Integer.class, vols.get(i));
 		// v2q.writeShapeFile("test/yu/test/1000." + index + ".shp");
-		//		}
+		// }
 	}
 }
