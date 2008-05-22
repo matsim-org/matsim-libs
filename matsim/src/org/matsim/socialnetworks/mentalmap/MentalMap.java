@@ -213,11 +213,6 @@ public class MentalMap {
 
 	public void manageMemory(int max, List<Plan> myPlans){
 
-//		if(myPlan.getActsLegs().size()/2 >max){
-//		Gbl.errorMsg(this.getClass()+
-//		" Number of activites an agent has to remember is greater than his memory! MAX = "+max+" "+myPlan.getActsLegs().size()/2+" "+this.knowledge.getActivities().size());
-//		}
-
 		if(myPlans.get(0).getActsLegs().size()*myPlans.size()/2 >max){
 			Gbl.errorMsg(this.getClass()+
 					" Number of activites an agent needs to remember for his plans is greater than his memory! MAX = "+max+" "+myPlans.get(0).getActsLegs().size()*myPlans.size()/2+" "+this.knowledge.getActivities().size());
@@ -254,6 +249,21 @@ public class MentalMap {
 				Activity myactivity=e.nextElement();
 //				double score=(Double) sortedScores.get(myactivity);
 				// note which activity to forget
+				
+				// JH 21.05.2008 I don't know what happens if a Plan is deleted, along with its
+				// Acts. Make sure no null Acts are kept
+				if(this.getActUsingId(myactivity)== null){
+//					log.info("the Act is null");
+					forgetList.add(myactivity);
+					counter++;
+				}
+			}
+			// If there are still too many activities 
+			for (Enumeration<Activity> e = sortedScores.keys() ; e.hasMoreElements() ;) {
+				Activity myactivity=e.nextElement();
+//				double score=(Double) sortedScores.get(myactivity);
+				// note which activity to forget
+				
 				if(counter<=numToForget){
 					forgetList.add(myactivity);
 					counter++;
