@@ -60,4 +60,15 @@ xml:lang="en">
   </xs:choice>
 </xs:complexType>
 
+<xs:complexType name="matsimParamType">
+  <xs:annotation>
+    <xs:documentation> This type is unfortunately quite central for the MATSim framework. One can
+    store any type of parameter in the well-known, however redoubtable name/value format.
+    The usage of this type should be avoided if other solutions exist!    
+    </xs:documentation>
+  </xs:annotation>
+  <xs:attribute name="name" type="xs:string" use="required"/>
+  <xs:attribute name="value" type="xs:string" use="required" />
+</xs:complexType>
+
 </xs:schema>
