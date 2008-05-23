@@ -39,16 +39,26 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
+import org.matsim.network.TimeVariantLinkImpl;
+import org.matsim.network.algorithms.NetworkSegmentDoubleLinks;
 import org.matsim.plans.Leg;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
+import org.matsim.plans.PlansWriter;
+import org.matsim.plans.Route;
+import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.geotools.MGC;
@@ -61,6 +71,7 @@ import playground.gregor.shapeFileToMATSim.ShapeFileWriter;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -81,6 +92,7 @@ public class DistanceAnalysis {
 	private HashMap<Polygon,Double> catchRadi = new HashMap<Polygon,Double>();
 	private static double CATCH_RADIUS;
 	org.matsim.utils.collections.gnuclasspath.TreeMap<Double, Feature> ft_tree;
+	
 
 
 
@@ -91,15 +103,20 @@ public class DistanceAnalysis {
 		this.population = population;
 		this.network = network;
 		this.envelope  = this.featureSourcePolygon.getBounds();
-		this.router = new PlansCalcRoute(network, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());
+		
+		this.router = new PlansCalcRoute(network, new TravelTimeDistanceCostCalculator(new FreespeedTravelTimeCost()), new FreespeedTravelTimeCost());
 		this.geofac = new GeometryFactory();
-
+		
 		initFeatureCollection();
 		parsePolygons();
 		createPolygons();
 		handlePlans();
 		iteratePolygons();
 		writePolygons();
+
+		
+		
+
 
 
 
@@ -123,7 +140,7 @@ public class DistanceAnalysis {
 
 	private void createPolygons() throws Exception {
 		this.polygons = new ArrayList<Polygon>();
-		double length = 750;
+		double length = 375;
 		GTH gth = new GTH(this.geofac);
 		Envelope e = this.featureSourcePolygon.getBounds();
 		for (double x = e.getMinX(); x < e.getMaxX(); x += length) {
@@ -184,9 +201,14 @@ public class DistanceAnalysis {
 		double diff = 0;
 		double [] diffAll = new double [persons.size()];
 		int i = 0;
+		
+
+		
 		for (Person person : persons) {
 			Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
-			dist[0] += leg.getRoute().getDist();
+			double l1 = leg.getRoute().getDist();
+			
+			dist[0] +=  l1;
 			dist[2] += person.getSelectedPlan().getScore(); 
 			Plan plan = new Plan(person);
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
@@ -194,9 +216,11 @@ public class DistanceAnalysis {
 			plan.addAct(person.getSelectedPlan().getNextActivity(leg));
 			router.run(plan);
 			Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
-			dist[1] += leg2.getRoute().getDist();
-			diff += dist[2] - dist[1];
-			diffAll[i++] = dist[2] - dist[1];
+			double l2 = leg2.getRoute().getDist();
+			dist[1] = l2;
+		
+			diff += dist[0] - dist[1];
+			diffAll[i++] = dist[0] - dist[1];
 		}
 		double mean = diff / i;
 		double var = 0;
@@ -302,11 +326,17 @@ public class DistanceAnalysis {
 		World world = Gbl.createWorld();
 
 		log.info("loading network from " + Gbl.getConfig().network().getInputFile());
-		NetworkLayer network = new NetworkLayer();
+		NetworkFactory fc = new NetworkFactory();
+		fc.setLinkPrototype(TimeVariantLinkImpl.class);
+		
+		NetworkLayer network = new NetworkLayer(fc);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		world.setNetworkLayer(network);
 		world.complete();
 		log.info("done.");
+		
+
+		
 
 		log.info("loading shape file from " + district_shape_file);
 		FeatureSource features = null;
@@ -322,6 +352,7 @@ public class DistanceAnalysis {
 		Plans population = new Plans();
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+//		plansReader.readFile("./badPersons.xml");
 		log.info("done.");
 
 

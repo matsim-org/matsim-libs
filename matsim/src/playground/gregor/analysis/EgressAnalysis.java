@@ -139,7 +139,7 @@ public class EgressAnalysis {
 		
 		for (EgressNode e : this.egressNodes.values()) {
 				try {
-					length = Math.max(100,e.num_current / 90);
+					length = Math.max(100,e.num_current / 50);
 					this.features.add(getPolyFeature(MGC.coord2Coordinate(e.node.getCoord()),e.num_current,e.num_shortest,length));
 				} catch (IllegalAttributeException e1) {
 					// TODO Auto-generated catch block
@@ -218,7 +218,7 @@ public class EgressAnalysis {
 		AttributeType current = AttributeTypeFactory.newAttributeType("current_path", Integer.class);
 		AttributeType deviance = AttributeTypeFactory.newAttributeType("diff_shortest_current", Integer.class);
 		AttributeType devianceSqr = AttributeTypeFactory.newAttributeType("square_diff_shortest_current", Integer.class);
-		this.ftDistrictShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id,  shortest, current, deviance, devianceSqr }, "egressShape");
+		this.ftDistrictShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id,   current, shortest, deviance, devianceSqr }, "egressShape");
 
 
 	}

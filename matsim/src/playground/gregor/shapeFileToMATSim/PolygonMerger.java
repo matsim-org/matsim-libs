@@ -239,21 +239,23 @@ public class PolygonMerger {
 			MultiLineString mls = this.pg.getGeofac().createMultiLineString(lineStrings);
 			Geometry v =  mls.intersection(tmp);
 	
-		
-			int idx = 0;
-			double dist = Double.MAX_VALUE;
-			for (int i = 0; i < v.getNumGeometries(); i++) {
-				double tmpdist = ((Point)v.getGeometryN(i)).distance(currPoint);
-				if ( tmpdist < dist){
-					dist = tmpdist;
-					idx = i;
-				}
-				
-			}
+//		
+//			int idx = 0;
+//			double dist = Double.MAX_VALUE;
+//			for (int i = 0; i < v.getNumGeometries(); i++) {
+//				double tmpdist = ((Point)v.getGeometryN(i)).distance(currPoint);
+//				if ( tmpdist < dist){
+//					dist = tmpdist;
+//					idx = i;
+//				}
+//				
+//			}
 			
 			
 			if (!v.isEmpty()) {
-					poly = this.pg.addVertex(poly,(Point) v.getGeometryN(idx));	
+				for (int idx = 0; idx < v.getNumGeometries(); idx++) {
+					poly = this.pg.addVertex(poly,(Point) v.getGeometryN(idx));
+				}
 			}
 			
 		}
