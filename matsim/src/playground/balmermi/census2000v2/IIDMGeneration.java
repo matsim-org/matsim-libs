@@ -28,6 +28,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
+import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldCheck;
@@ -36,6 +38,7 @@ import org.matsim.world.algorithms.WorldValidation;
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
 import playground.balmermi.census2000v2.modules.PersonCreateFakePlanFromKnowledge;
+import playground.balmermi.census2000v2.modules.PlansScenarioCut;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
 import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
 
@@ -123,8 +126,13 @@ public class IIDMGeneration {
 
 		//////////////////////////////////////////////////////////////////////
 		
+		// ch.cut.640000.200000.740000.310000.xml
+		CoordI min = new Coord(640000.0,200000.0);
+		CoordI max = new Coord(740000.0,310000.0);
+
 		System.out.println("  running person modules... ");
 		new PersonCreateFakePlanFromKnowledge().run(plans);
+		new PlansScenarioCut(min,max).run(plans);
 		System.out.println("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
