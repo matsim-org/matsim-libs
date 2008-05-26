@@ -35,6 +35,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileFilter;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.vis.netvis.config.GeneralConfig;
@@ -65,13 +66,13 @@ public class NetVis {
 
     // -------------------- INSTANCE VARIABLES --------------------
 
-    private JFrame vizFrame;
+    /*package*/ JFrame vizFrame;
 
-    private NetVisScrollPane networkScrollPane;
+    /*package*/ NetVisScrollPane networkScrollPane;
 
     private NetJComponent networkComponent;
 
-    private ControlToolbar buttonComponent;
+    /*package*/ ControlToolbar buttonComponent;
 
     // -------------------- CONSTRUCTION --------------------
 
@@ -242,6 +243,7 @@ public class NetVis {
     }
 
     public static void main(String[] args) {
+    	Gbl.createConfig(null);
     	if (args.length == 1) {
    			String configFile = StreamConfig.getConfigFileName(args[0], FILE_SUFFIX);
    			(new NetVis(configFile, configFile, args[0])).run();
