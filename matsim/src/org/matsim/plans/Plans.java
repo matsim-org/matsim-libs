@@ -164,15 +164,6 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 		this.personAlgos.add(algo);
 	}
 
-	/**
-	 * @param planswriter
-	 * @deprecated use the PlansWriter as an algorithm (11may2008)
-	 */
-	@Deprecated
-	public final void setPlansWriter(final PlansWriter planswriter) {
-		throw new UnsupportedOperationException("deprecated. add the plans-writer as last algorithm to achieve the same result.");
-	}
-
 	public final void setRefLayer(final Layer refLayer) {
 		this.refLayer = refLayer;
 	}
