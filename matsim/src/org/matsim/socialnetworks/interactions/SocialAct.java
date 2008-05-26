@@ -38,72 +38,83 @@ import org.matsim.plans.Person;
  */
 public class SocialAct {
 
-    Activity activity;
+	Activity activity;
 
-    Vector<Person> attendees = new Vector<Person>();
-    HashMap<Person,Double> arrivalTimes = new HashMap<Person,Double>();
-    HashMap<Person,Double> departureTimes = new HashMap<Person,Double>();
+	Vector<Person> attendees = new Vector<Person>();
+	HashMap<Person,Double> arrivalTimes = new HashMap<Person,Double>();
+	HashMap<Person,Double> departureTimes = new HashMap<Person,Double>();
 
-    public SocialAct( Activity a ){	
-	this.activity = a;
-    }
-
-    public Vector<Person> getAttendees(){
-	return attendees;
-    }
-
-    public void addAttendee(Person person) {
-	if(!attendees.contains(person)){
-    	attendees.add( person );
+	public SocialAct( Activity a ){	
+		this.activity = a;
 	}
-//	Act myAct = person.getKnowledge().map.getAct(this.activity);
 
-	Act myAct = person.getKnowledge().map.getActUsingId(this.activity);
-
-	arrivalTimes.put(person,myAct.getStartTime());
-	departureTimes.put(person,myAct.getEndTime());
-    }
-
-    public double getArrivalTime(Person person){
-	return arrivalTimes.get(person);
-    }
-
-    public double getDepartureTime(Person person){
-	return departureTimes.get(person);
-    }
-
-    public Person getRandomInterlocutor( Person p1 ){
-	int size = attendees.size();
-	if( size == 1 )
-	    Gbl.errorMsg( new Exception("SocialEvent with only one lonely person"));// JH should this be error?
-	Person p2 = attendees.get( Gbl.random.nextInt( size ) );
-	while( p1.equals(p2))
-	    p2 = attendees.get( Gbl.random.nextInt( size ) );
-	return p2;
-    }
-
-    public Vector<Person> getAttendeesInTimeWindow(Person p1, double StartTime, double EndTime){
-	Vector<Person> peopleCopresent=new Vector<Person>();
-	int size = attendees.size();
-	for(int i=0; i<size;i++){
-	    Person p2=attendees.get(i);
-	    if(this.getArrivalTime(p2)<=StartTime && this.getDepartureTime(p2)>=EndTime && !p1.equals(p2)){
-		if(p2!=null){		peopleCopresent.add(p2);}
-	    }
+	public Vector<Person> getAttendees(){
+		return attendees;
 	}
-	return peopleCopresent;
-    }
-    
-    public Person getRandomInterlocutorInTimeWindow(Person p1, double StartTime, double EndTime){
-	Vector<Person> peopleCopresent=getAttendeesInTimeWindow(p1, StartTime, EndTime);
-	Person p2=null;
-	if(peopleCopresent!=null && peopleCopresent.size()>0){
-	int size = peopleCopresent.size();
-	p2 = peopleCopresent.get( Gbl.random.nextInt( size ) );
-	while( p1.equals(p2))
-	    p2 = peopleCopresent.get( Gbl.random.nextInt( size ) );
+
+	public void addAttendee(Person person) {
+		if(!attendees.contains(person)){
+			attendees.add( person );
+		}
+//		Act myAct = person.getKnowledge().map.getAct(this.activity);
+
+		Act myAct = person.getKnowledge().map.getActUsingId(this.activity);
+
+		arrivalTimes.put(person,myAct.getStartTime());
+		departureTimes.put(person,myAct.getEndTime());
 	}
-	return p2;
-    }    
+
+	public double getArrivalTime(Person person){
+		return arrivalTimes.get(person);
+	}
+
+	public double getDepartureTime(Person person){
+		return departureTimes.get(person);
+	}
+
+	public Person getRandomAttendee( Person p1 ){
+		int size = attendees.size();
+		if( size == 1 )
+			Gbl.errorMsg( new Exception("SocialEvent with only one lonely person"));// JH should this be error?
+		Person p2 = attendees.get( Gbl.random.nextInt( size ) );
+		while( p1.equals(p2))
+			p2 = attendees.get( Gbl.random.nextInt( size ) );
+		return p2;
+	}
+
+	public Vector<Person> getAttendeesInTimeWindow(Person p1, double startTime, double endTime){
+		Vector<Person> peopleCopresent=new Vector<Person>();
+		int size = attendees.size();
+		for(int i=0; i<size;i++){
+			Person p2=attendees.get(i);
+			if(this.getDepartureTime(p2)>=startTime && this.getArrivalTime(p2)<=endTime && !p1.equals(p2)){
+				if(p2!=null){		peopleCopresent.add(p2);}
+			}
+		}
+		return peopleCopresent;
+	}
+
+	public Person getRandomAttendeeInTimeWindow(Person p1, double startTime, double endTime){
+		Vector<Person> peopleCopresent=getAttendeesInTimeWindow(p1, startTime, endTime);
+		Person p2=null;
+		if(peopleCopresent!=null && peopleCopresent.size()>0){
+			int size = peopleCopresent.size();
+			p2 = peopleCopresent.get( Gbl.random.nextInt( size ) );
+			while( p1.equals(p2))
+				p2 = peopleCopresent.get( Gbl.random.nextInt( size ) );
+		}
+		return p2;
+	}
+
+	public Person getAttendeeInTimeWindow(Person p1, double startTime,
+			double endTime, int i) {
+		// 
+		Vector<Person> peopleCopresent=getAttendeesInTimeWindow(p1, startTime, endTime);
+		Person p2=null;
+		if(peopleCopresent!=null && peopleCopresent.size()>0){
+			p2 = peopleCopresent.get( i );
+		}
+		return p2;
+	}    
 
 }

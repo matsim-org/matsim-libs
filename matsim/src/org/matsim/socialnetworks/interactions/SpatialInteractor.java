@@ -74,6 +74,10 @@ public class SpatialInteractor {
 						double t1=event.getArrivalTime(p1);
 						double t2=event.getDepartureTime(p1);
 						encounterAllPersonsFaceToFaceInTimeWindow(event, rndEncounterProb, p1, t1, t2, iteration);
+					}else if(interaction_type.equals("MarchalNagelChain")){
+						double t1=event.getArrivalTime(p1);
+						double t2=event.getDepartureTime(p1);
+						makeSocialLinkBetweenLastTwo(event,rndEncounterProb,p1,t1, t2,iteration);
 					} else {
 						Gbl.errorMsg(" Spatial interaction type is \"" + interaction_type
 								+ "\". Only \"random\" and \"timewindow\" are supported at this time.");
@@ -84,8 +88,45 @@ public class SpatialInteractor {
 		System.out.println("...finished");
 	}
 
+	private void makeSocialLinkBetweenLastTwo(SocialAct event,
+			HashMap<String, Double> rndEncounterProbability, Person p1, double startTime, double endTime, int iteration) {
+		/**
+		 * Based on Marchal and Nagel 2007, TRR 1935
+		 * Person p1 meets and befriends the person who arrived just before him, if
+		 * this person is still at the SocialAct.
+		 * The natural order of the agents in the SocialAct HashMap is not the order of arrival,
+		 * so sorting is necessary.
+		 * Cycle through all the agents who were co-present with p1 at the SocialAct
+		 * and find the agent whose arrival time is closest to and less than that of p1
+		 * Subject to the likelihood of a meeting taking place in a given facility type
+		 */
+
+		Person nextInQueue=null;
+		if(Gbl.random.nextDouble() <rndEncounterProbability.get(event.activity.getType())){
+
+			Vector<Person> persons = event.getAttendeesInTimeWindow(p1,startTime,endTime);
+			if(persons!=null && persons.size()>0){
+				int size = persons.size();
+				nextInQueue = event.getAttendeeInTimeWindow(p1,startTime,endTime,0);
+				for(int i=0; i<size;i++){
+					Person p2 = event.getAttendeeInTimeWindow(p1, startTime, endTime, i);
+					if(event.getArrivalTime(p2)<=event.getArrivalTime(p1)){
+						if(event.getArrivalTime(p2)<=event.getArrivalTime(nextInQueue)){
+							nextInQueue=p2;
+						}
+					}
+				}
+				if(p1.getKnowledge().egoNet.knows(nextInQueue)){
+				} else {
+					// If the two do not already know each other,
+					net.makeSocialContact(p1,nextInQueue,iteration,"new"+event.activity.getType());
+				}
+			}
+		}
+	}
+
 	private void makeSocialLinkToAll(SocialAct event, HashMap<String, Double> rndEncounterProbability, Person p1, int iteration) {
-		// TODO Auto-generated method stub
+
 		// Person p1 encounters all persons p2 at the socializing opportunity
 		// the probability of encountering depends on the activity type
 
@@ -101,7 +142,7 @@ public class SpatialInteractor {
 						// If the two do not already know each other,
 
 
-							net.makeSocialContact(p1,p2,iteration,"new"+event.activity.getType());
+						net.makeSocialContact(p1,p2,iteration,"new"+event.activity.getType());
 
 					}
 				}
@@ -116,7 +157,7 @@ public class SpatialInteractor {
 		// the probability of encountering depends on the activity type
 
 		if(Gbl.random.nextDouble() <rndEncounterProbability.get(event.activity.getType())){
-			Person p2 = event.getRandomInterlocutor(p1);
+			Person p2 = event.getRandomAttendee(p1);
 
 			// If they know each other, probability is 1.0 that the relationship is reinforced
 			if (p1.getKnowledge().egoNet.knows(p2)) {
@@ -139,8 +180,8 @@ public class SpatialInteractor {
 		// the probability of encountering depends on the activity type
 
 		if(Gbl.random.nextDouble() <rndEncounterProbability.get(event.activity.getType())){
-			Person p2 = event.getRandomInterlocutorInTimeWindow(p1, StartTime, EndTime);
-if(p2==null) return;
+			Person p2 = event.getRandomAttendeeInTimeWindow(p1, StartTime, EndTime);
+			if(p2==null) return;
 			// If they know each other, probability is 1.0 that the relationship is reinforced
 			if (p1.getKnowledge().egoNet.knows(p2)) {
 				net.makeSocialContact(p1,p2,iteration,"renew"+event.activity.getType());
