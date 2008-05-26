@@ -100,6 +100,7 @@ public class Act extends BasicActImpl implements Serializable {
 		this.dur = act.dur;
 		this.isPrimary = act.isPrimary;
 		this.setRefId(act.getRefId());
+		this.setFacility(act.getFacility());
 	}
 
 	//////////////////////////////////////////////////////////////////////
