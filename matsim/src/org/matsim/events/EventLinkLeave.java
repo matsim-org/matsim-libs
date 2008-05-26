@@ -31,12 +31,12 @@ public class EventLinkLeave extends LinkEvent {
 
 	private static final long serialVersionUID = 1L;
 
-	public EventLinkLeave(final double time, final String agentId, final int legId, final String linkId, final Person agent, final Link link) {
-		super(time, agentId, linkId, agent, legId, link);
+	public EventLinkLeave(final double time, final String agentId, final int legNumber, final String linkId, final Person agent, final Link link) {
+		super(time, agentId, linkId, agent, legNumber, link);
 	}
 
-	public EventLinkLeave(final double time, final String agentId, final int legId, final String linkId) {
-		super(time, agentId, legId, linkId);
+	public EventLinkLeave(final double time, final String agentId, final int legNumber, final String linkId) {
+		super(time, agentId, legNumber, linkId);
 	}
 
 	@Override

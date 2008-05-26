@@ -30,18 +30,21 @@ abstract class LinkEvent extends BasicEvent {
 
 	public String linkId;
 	public transient Link link;
+	/**
+	 * The number of the leg in the plans file, starting from 0.
+	 */
 	public int legId;
 
-	LinkEvent(final double time, final String agentId, final String linkId, final Person agent, final int legId, final Link link) {
+	LinkEvent(final double time, final String agentId, final String linkId, final Person agent, final int legNumber, final Link link) {
 		super(time, agentId, agent);
-		this.legId = legId;
+		this.legId = legNumber;
 		this.linkId = linkId;
 		this.link = link;
 	}
 
-	LinkEvent(final double time, final String agentId, final int legId, final String linkId) {
+	LinkEvent(final double time, final String agentId, final int legNumber, final String linkId) {
 		super(time, agentId);
-		this.legId = legId;
+		this.legId = legNumber;
 		this.linkId = linkId;
 	}
 
