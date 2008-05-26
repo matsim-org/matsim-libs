@@ -169,7 +169,7 @@ public class MyRuns {
 
 		System.out.println("  setting up plans object... ");
 		final Plans plans = new Plans(Plans.USE_STREAMING);
-		plans.setRefLayer(world.getLayer(new IdImpl("tvz")));
+//		plans.setRefLayer(world.getLayer(new IdImpl("tvz")));
 		final PlansWriter plansWriter = new PlansWriter(plans);
 		plans.addAlgorithm(plansWriter);
 		System.out.println("  done.");
@@ -489,7 +489,7 @@ public class MyRuns {
 		final Coord minCoord = summary.getMinCoord();
 		final Coord maxCoord = summary.getMaxCoord();
 		new PlansFilterArea(minCoord, maxCoord).run(plans);
-		
+
 		System.out.println("  writing plans...");
 		final PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.write();
@@ -687,7 +687,7 @@ public class MyRuns {
 		new PersonRemoveCertainActs().run(plans);
 		new PersonRemovePlansWithoutLegs().run(plans);
 		new PlansFilterPersonHasPlans().run(plans);
-		
+
 		final PlansWriter plansWriter = new PlansWriter(plans);
 		plansWriter.write();
 		System.out.println("  done.");
@@ -721,7 +721,7 @@ public class MyRuns {
 		System.out.println("  reading, processing, writing plans...");
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
-		
+
 		new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}).run(plans);
 		new PlansFilterPersonHasPlans().run(plans);
 
@@ -793,10 +793,10 @@ public class MyRuns {
 		final Config config = Gbl.createConfig(args);
 		final World world = Gbl.getWorld();
 
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
+//		System.out.println("  reading world xml file... ");
+//		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+//		worldReader.readFile(config.world().getInputFile());
+//		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
@@ -1363,7 +1363,7 @@ public class MyRuns {
 		System.out.println("RUN: falsifyNetwork finished.");
 		System.out.println();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// calcODMatrices
 	//////////////////////////////////////////////////////////////////////

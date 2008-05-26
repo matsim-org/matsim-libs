@@ -27,11 +27,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.algorithms.PersonAlgorithmI;
 import org.matsim.utils.misc.Counter;
-import org.matsim.world.Layer;
 
 /**
  * root class of the population description (plans file)
@@ -53,7 +51,6 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private Layer refLayer = null;
 	private long counter = 0;
 	private long nextMsg = 1;
 	private boolean isStreaming;
@@ -164,22 +161,6 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 		this.personAlgos.add(algo);
 	}
 
-	public final void setRefLayer(final Layer refLayer) {
-		this.refLayer = refLayer;
-	}
-
-	public final void setRefLayer(final String layer_type) {
-		if (layer_type != null) {
-			this.refLayer = Gbl.getWorld().getLayer(new IdImpl(layer_type));
-			if (this.refLayer == null) {
-				Gbl.errorMsg(this + "[layer_type=" + layer_type + " does not exist]");
-			}
-		} else {
-			this.refLayer = null;
-		}
-	}
-
-
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
@@ -211,10 +192,6 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 
 	public Iterator<Person> iterator() {
 		return this.persons.values().iterator();
-	}
-
-	public Layer getReferencedLayer() {
-		return refLayer;
 	}
 
 }

@@ -26,8 +26,6 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicPerson;
-import org.matsim.basic.v01.BasicPersonImpl;
 import org.matsim.basic.v01.BasicPopulation;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
@@ -172,7 +170,9 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 
 	private void startPlans(final Attributes atts) {
 		this.plans.setName(atts.getValue("name"));
-		this.plans.setRefLayer(atts.getValue("reference_layer"));
+		if (atts.getValue("reference_layer") != null) {
+			log.warn("plans.reference_layer is no longer supported.");
+		}
 	}
 
 	private void startPerson(final Attributes atts) {

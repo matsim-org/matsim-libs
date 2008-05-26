@@ -53,9 +53,6 @@ public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 		if (plans.getName() != null) {
 			out.write(" name=\"" + plans.getName() + "\"");
 		}
-		if (plans.getReferencedLayer() != null) {
-			out.write(" reference_layer=\"" + plans.getReferencedLayer().getType() + "\"");
-		}
 		out.write(">\n\n");
 	}
 
