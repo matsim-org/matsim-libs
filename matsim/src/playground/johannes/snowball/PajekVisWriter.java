@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.socialnets.UserDataKeys;
-import cern.colt.list.IntArrayList;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -86,7 +85,7 @@ public class PajekVisWriter {
 				String id = (String)((Vertex)v).getUserDatum(UserDataKeys.ID);
 				double x = ((Double)((Vertex)v).getUserDatum(UserDataKeys.X_COORD)).doubleValue();
 				double y = ((Double)((Vertex)v).getUserDatum(UserDataKeys.Y_COORD)).doubleValue();
-				IntArrayList waves = (IntArrayList)(((Vertex)v).getUserDatum(UserDataKeys.WAVE_KEY));
+				Integer wave = (Integer)(((Vertex)v).getUserDatum(UserDataKeys.SAMPLED_KEY));
 				
 				writer.write(String.valueOf(counter));
 				writer.write(WHITESPACE);
@@ -102,7 +101,7 @@ public class PajekVisWriter {
 				writer.write(WHITESPACE);
 				writer.write(FILL_COLOR);
 				writer.write(WHITESPACE);
-				writer.write(getColor(waves));
+				writer.write(getColor(wave));
 				
 				writer.write(NEW_LINE);
 				
@@ -117,7 +116,7 @@ public class PajekVisWriter {
 			writer.write(NEW_LINE);
 			
 			for(Object e : g.getEdges()) {
-				IntArrayList waves = (IntArrayList)(((Edge)e).getUserDatum(UserDataKeys.WAVE_KEY));
+				Integer wave = (Integer)(((Edge)e).getUserDatum(UserDataKeys.SAMPLED_KEY));
 				Pair pair = ((Edge)e).getEndpoints();
 				Vertex source = (Vertex) pair.getFirst();
 				Vertex target = (Vertex) pair.getSecond();
@@ -131,7 +130,7 @@ public class PajekVisWriter {
 				
 				writer.write(COLOR);
 				writer.write(WHITESPACE);
-				writer.write(getColor(waves));
+				writer.write(getColor(wave));
 				writer.write(NEW_LINE);
 			}
 			
@@ -142,11 +141,11 @@ public class PajekVisWriter {
 		}
 	}
 	
-	private String getColor(IntArrayList waves) {
-		if(waves == null)
+	private String getColor(Integer wave) {
+		if(wave == null)
 			return WHITE_COLOR;
 		else {
-			int idx = waves.get(0);
+			int idx = wave.intValue();
 			if(idx < waveColor.length)
 				return waveColor[idx];
 			else

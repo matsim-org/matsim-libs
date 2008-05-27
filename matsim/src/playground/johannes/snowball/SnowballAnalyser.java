@@ -31,6 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
@@ -40,6 +41,7 @@ import org.matsim.utils.io.IOUtils;
 import playground.johannes.socialnets.GraphStatistics;
 import playground.johannes.socialnets.PersonGraphMLFileHandler;
 import playground.johannes.socialnets.UserDataKeys;
+import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
 import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 import edu.uci.ics.jung.graph.Graph;
@@ -64,6 +66,8 @@ public class SnowballAnalyser {
 	private static final String BETWEENESS_DIR = "betweeness/";
 	
 	private static final String APL_DIR = "apl/";
+	
+	private static final String DISTANCE_DIR = "distance/";
 	
 	private static final String PAJEK_DIR = "pajek/";
 	
@@ -92,12 +96,14 @@ public class SnowballAnalyser {
 		int seeds = Integer.parseInt(config.getParam(MODULE_NAME, "seeds"));
 		int waves = Integer.parseInt(config.getParam(MODULE_NAME, "waves"));
 		boolean extendedAnalysis = Boolean.parseBoolean(config.getParam(MODULE_NAME, "extendedAnalysis"));
+		boolean runWaves = Boolean.parseBoolean(config.getParam(MODULE_NAME, "runWaves"));
 		
 		new File(outDir + DEGREE_DIR).mkdirs();
 		new File(outDir + CLUSTERING_DIR).mkdirs();
 		new File(outDir + BETWEENESS_DIR).mkdirs();
 		new File(outDir + APL_DIR).mkdirs();
 		new File(outDir + PAJEK_DIR).mkdirs();
+		new File(outDir + DISTANCE_DIR).mkdirs();
 		/*
 		 * Load the social network...
 		 */
@@ -125,13 +131,23 @@ public class SnowballAnalyser {
 		}
 	
 		BufferedWriter meanWriter = IOUtils.getBufferedWriter(outDir + "meanValues.txt");
-		meanWriter.write("wave\tnumVertices\tnumEdges\tfracVertices\tfracEdges\tnumVNotTail\tfracVNotTail\tnumIsolated\tdegree\tclustering\tassortativity\tcomponents\tbetweeness\tapl");
+		meanWriter.write("run\tnumVertices\tnumEdges\tfracVertices\tfracEdges\tnumDetected\tfracDetected\tnumIsolated\tdegree\tclustering\tassortativity\tcomponents\tdistance\tbetweeness\tapl");
 		meanWriter.newLine();
 		
 		logger.info("Computing graph statistics...");
 		GraphStatsContainer dummy = new GraphStatsContainer();
 		dummy.g = g;
 		GraphStatsContainer obsGraphStats = dumpGraphStatistics(g, dummy, meanWriter, outDir, 0, extendedAnalysis);
+		
+		if(runWaves)
+			runWaves(g, randomseed, pParticipate, pTieNamed, seeds, waves, obsGraphStats, meanWriter, extendedAnalysis, outDir);
+		else
+			runNonResponse(g, randomseed, pParticipate, pTieNamed, seeds, waves, obsGraphStats, meanWriter, extendedAnalysis, outDir);
+		
+		logger.info("Done.");
+	}
+	
+	private static void runWaves(Graph g, long randomseed, double pParticipate, double pTieNamed, int seeds, int waves, GraphStatsContainer obsGraphStats, BufferedWriter meanWriter, boolean extendedAnalysis, String outDir) throws IOException {
 		
 		
 		Sampler sampler = new Sampler(randomseed);
@@ -148,16 +164,34 @@ public class SnowballAnalyser {
 			logger.info("Computing sampled graph statistics...");
 			dumpGraphStatistics(sample, obsGraphStats, meanWriter, outDir, wave, extendedAnalysis);
 		}
+	}
+	
+	private static void runNonResponse(Graph g, long randomseed, double pParticipate, double pTieNamed, int seeds, int waves, GraphStatsContainer obsGraphStats, BufferedWriter meanWriter, boolean extendedAnalysis, String outDir) throws IOException {
 		
-		logger.info("Done.");
+		
+		for(double pResponse = 1.0; pResponse >= pParticipate; pResponse -= 0.05) {
+			Sampler sampler = new Sampler(randomseed);
+			sampler.setPParticipate(pResponse);
+			sampler.setPTieNamed(pTieNamed);
+			
+		
+			logger.info("Sampling with " + waves + " waves...");
+			sampler.run(g, waves, seeds);
+			
+			logger.info("Extracting sampled graph...");
+			Graph sample = sampler.extractSampledGraph(g, false);
+		
+			logger.info("Computing sampled graph statistics...");
+			dumpGraphStatistics(sample, obsGraphStats, meanWriter, outDir, waves, extendedAnalysis);
+		}
 	}
 
 	private static void initUserDatums(Graph g) {
 		int counter = 0;
 		for(Object v : g.getVertices()) {
 			((Vertex)v).addUserDatum(UserDataKeys.ID, String.valueOf(counter), UserDataKeys.COPY_ACT);
-			((Vertex)v).addUserDatum(UserDataKeys.X_COORD, 0.0, UserDataKeys.COPY_ACT);
-			((Vertex)v).addUserDatum(UserDataKeys.Y_COORD, 0.0, UserDataKeys.COPY_ACT);
+			((Vertex)v).addUserDatum(UserDataKeys.X_COORD, Math.random(), UserDataKeys.COPY_ACT);
+			((Vertex)v).addUserDatum(UserDataKeys.Y_COORD, Math.random(), UserDataKeys.COPY_ACT);
 		}
 	}
 	
@@ -169,12 +203,15 @@ public class SnowballAnalyser {
 		ComponentsThread componentsThread = new ComponentsThread(g);
 		BetweenessThread betweenessThread = null;
 		APLThread aplThread = null;
+		DistanceThread distanceThread = null;
+//		DegreeSampleThread dSampleThread = new DegreeSampleThread(g,0,0,0);
 		
 		if(wave == 0) {
 			degreeThread = new DegreeHistogramThread(g, wave, -1, -1);
 			clusteringThread = new ClusteringThread(g, wave, -1, -1);
 			betweenessThread = new BetweenessThread(g, wave, -1, -1);
 			aplThread = new APLThread(g, wave, -1, -1);
+			distanceThread = new DistanceThread(g, wave, -1, -1);
 		} else {
 			degreeThread = new DegreeHistogramThread(g, wave, 
 					(int)stats.degreeHistogram.xAxis().lowerEdge(),
@@ -182,12 +219,17 @@ public class SnowballAnalyser {
 			clusteringThread = new ClusteringThread(g, wave,
 					stats.clusteringHistogram.xAxis().lowerEdge(),
 					stats.clusteringHistogram.xAxis().upperEdge());
-			betweenessThread = new BetweenessThread(g, wave,
+			distanceThread = new DistanceThread(g, wave,
+					stats.distanceHistogram.xAxis().lowerEdge(),
+					stats.distanceHistogram.xAxis().upperEdge());
+			if(extendedAnalysis) {
+				betweenessThread = new BetweenessThread(g, wave,
 					stats.betweenessHistogram.xAxis().lowerEdge(),
 					stats.betweenessHistogram.xAxis().upperEdge());
-			aplThread = new APLThread(g, wave,
+				aplThread = new APLThread(g, wave,
 					stats.aplHistogram.xAxis().lowerEdge(),
 					stats.aplHistogram.xAxis().upperEdge());
+			}
 		}
 		
 		List<Thread> threads = new ArrayList<Thread>();
@@ -196,10 +238,12 @@ public class SnowballAnalyser {
 		threads.add(clusteringThread);
 		threads.add(assortativityThread);
 		threads.add(componentsThread);
+		threads.add(distanceThread);
 		if(extendedAnalysis) {
 			threads.add(betweenessThread);
 			threads.add(aplThread);
 		}
+//		threads.add(dSampleThread);
 		
 		for(Thread t : threads)
 			t.start();
@@ -219,13 +263,13 @@ public class SnowballAnalyser {
 		meanWriter.write("\t");
 		meanWriter.write(String.valueOf(coverageThread.numEdges));
 		meanWriter.write("\t");
-		meanWriter.write(String.valueOf(coverageThread.numVertices/(float)stats.g.numVertices()));
+		meanWriter.write(String.valueOf(coverageThread.getNumVertices()/(float)stats.g.numVertices()));
 		meanWriter.write("\t");
 		meanWriter.write(String.valueOf(coverageThread.numEdges/(float)stats.g.numEdges()));
 		meanWriter.write("\t");
-		meanWriter.write(String.valueOf(coverageThread.numVerticesNotTail));
+		meanWriter.write(String.valueOf(coverageThread.getNumDetected()));
 		meanWriter.write("\t");
-		meanWriter.write(String.valueOf(coverageThread.numVerticesNotTail/(float)stats.g.numVertices()));
+		meanWriter.write(String.valueOf(coverageThread.getNumDetected()/(float)stats.g.numVertices()));
 		meanWriter.write("\t");
 		meanWriter.write(String.valueOf(coverageThread.numIsolatedVertices));
 		meanWriter.write("\t");
@@ -236,6 +280,8 @@ public class SnowballAnalyser {
 		meanWriter.write(String.valueOf((float)assortativityThread.getAssortativity()));
 		meanWriter.write("\t");
 		meanWriter.write(String.valueOf(componentsThread.getNumComponents()));
+		meanWriter.write("\t");
+		meanWriter.write(String.valueOf((float)distanceThread.getHistogram().mean()));
 		if(extendedAnalysis) {
 			meanWriter.write("\t");
 			meanWriter.write(String.valueOf((float)betweenessThread.getHistogram().mean()));
@@ -247,12 +293,19 @@ public class SnowballAnalyser {
 		meanWriter.newLine();
 		meanWriter.flush();
 		
-		GraphStatistics.writeHistogram(degreeThread.getHistogram(), outDir + DEGREE_DIR + wave +".degree.png");
-		GraphStatistics.writeHistogram(clusteringThread.getHistogram(), outDir + CLUSTERING_DIR + wave + ".clustering.png");
+		GraphStatistics.plotHistogram(degreeThread.getHistogram(), outDir + DEGREE_DIR + wave +".degree.png");
+		GraphStatistics.writeHistogramNormalized(degreeThread.getHistogram(),  outDir + DEGREE_DIR + wave +".degree.norm.txt");
+		GraphStatistics.writeHistogram(degreeThread.getHistogram(),  outDir + DEGREE_DIR + wave +".degree.txt");
+		
+		GraphStatistics.plotHistogram(clusteringThread.getHistogram(), outDir + CLUSTERING_DIR + wave + ".clustering.png");
+		GraphStatistics.plotHistogram(distanceThread.getHistogram(), outDir + DISTANCE_DIR + wave + ".distance.png");
 		if(extendedAnalysis) {
-			GraphStatistics.writeHistogram(betweenessThread.getHistogram(), outDir + BETWEENESS_DIR + wave +".betweeness.png");
-			GraphStatistics.writeHistogram(aplThread.getHistogram(), outDir + APL_DIR + wave +".apl.png");
+			GraphStatistics.plotHistogram(betweenessThread.getHistogram(), outDir + BETWEENESS_DIR + wave +".betweeness.png");
+			GraphStatistics.plotHistogram(aplThread.getHistogram(), outDir + APL_DIR + wave +".apl.png");
 		}
+		
+//		GraphStatistics.plotHistogram(dSampleThread.getHistogram(), outDir + wave + "sampleDegree.png");
+		
 		
 		PajekVisWriter pajekWriter = new PajekVisWriter();
 		pajekWriter.write(g, outDir + PAJEK_DIR + wave + ".sampled.net");
@@ -261,11 +314,16 @@ public class SnowballAnalyser {
 		container.g = g;
 		container.degreeHistogram = degreeThread.getHistogram();
 		container.clusteringHistogram = clusteringThread.getHistogram();
-		container.betweenessHistogram = betweenessThread.getHistogram();
-		container.aplHistogram = aplThread.getHistogram();
+		container.distanceHistogram = distanceThread.getHistogram();
+		if(extendedAnalysis) {
+			container.betweenessHistogram = betweenessThread.getHistogram();
+			container.aplHistogram = aplThread.getHistogram();
+		}
 		
 		return container;
 	}
+	
+	
 
 	private static class CoverageThread extends Thread {
 		
@@ -277,7 +335,7 @@ public class SnowballAnalyser {
 		
 		private int numEdges;
 		
-		private int numVerticesNotTail;
+		private int numVerticesDeteced;
 		
 		private int numIsolatedVertices;
 		
@@ -287,18 +345,22 @@ public class SnowballAnalyser {
 		}
 		
 		public void run() {
-			numVertices = g.numVertices();
-			numEdges = g.numEdges();
-			
-			numVerticesNotTail = 0;
-			for(Object o : g.getVertices()) {
-				IntArrayList waves = (IntArrayList) ((Vertex)o).getUserDatum(UserDataKeys.WAVE_KEY);
-				if(waves != null) {
-					if(waves.get(0) != wave)
-						numVerticesNotTail++;
+			if(wave == 0)
+				numVertices = g.numVertices();
+			else {
+				Set<Vertex> vertices = g.getVertices();
+				for (Vertex v : vertices) {
+					Integer sampled = (Integer) v.getUserDatum(UserDataKeys.SAMPLED_KEY);
+					if(sampled != null)
+						numVertices++;
+					
+					Integer detected = (Integer) v.getUserDatum(UserDataKeys.DETECTED_KEY);
+					if(detected != null)
+						numVerticesDeteced++;
 				}
 			}
 			
+			numEdges = g.numEdges();
 			numIsolatedVertices = GraphStatistics.countIsolates(g);
 		}
 		
@@ -310,8 +372,12 @@ public class SnowballAnalyser {
 			return numEdges;
 		}
 		
-		public int getNumVerticesNotTail() {
-			return numVerticesNotTail;
+//		public int getNumVerticesNotTail() {
+//			return numVerticesNotTail;
+//		}
+		
+		public int getNumDetected() {
+			return numVerticesDeteced;
 		}
 		
 		public int getNumIsolatedVertices() { 
@@ -369,6 +435,21 @@ public class SnowballAnalyser {
 			else
 				histogram = GraphStatistics.createClusteringCoefficientsHistogram(g, min, max, wave);
 		}
+	}
+	
+	private static class DistanceThread extends HistogramThread {
+
+		public DistanceThread(Graph g, int wave, double min, double max) {
+			super(g, wave, min, max);
+		}
+		
+		public void run() {
+			if(wave == 0)
+				histogram = GraphStatistics.getDistanceHistogram(g, -1, -1);
+			else
+				histogram = GraphStatistics.getDistanceHistogram(g, min, max);
+		}
+		
 	}
 	
 	private static class AssortativityThread extends Thread {
@@ -432,6 +513,43 @@ public class SnowballAnalyser {
 		}
 	}
 	
+	private static class DegreeSampleThread extends HistogramThread {
+		
+		public DegreeSampleThread(Graph g, int wave, double min, double max) {
+			super(g, wave, min, max);
+		}
+
+		public void run() {
+			Set<Vertex> vertices = g.getVertices();
+			Histogram1D samples = new Histogram1D("degree vs. detects", 100, 0, 100);
+			for(Vertex v : vertices) {
+				Integer detects = (Integer) v.getUserDatum(UserDataKeys.DETECTED_KEY);
+				if(detects != null) {
+					int k = v.degree();
+					for(int i = 1; i < detects; i++)
+						samples.fill(k);
+				}
+			}
+			
+			Histogram1D degree = GraphStatistics.createDegreeHistogram(g, 0, 100, wave);
+			
+			histogram = new Histogram1D("",100,0,100);
+			for(int i = 0; i < 100; i++) {
+				double num_k = degree.binHeight(i);
+				double num_sample = samples.binHeight(i);
+//				System.out.println(num_k);
+//				System.out.println(num_sample);
+				int count = 0;
+				if(num_sample > 0)
+					count = (int) ((num_k/num_sample)*1000);
+//				System.out.println(count);
+				for(int k = 0; k < count; k++) {
+					histogram.fill(i);
+				}
+			}
+		}
+	}
+	
 	private static class GraphStatsContainer {
 		
 		public Graph g;
@@ -443,5 +561,7 @@ public class SnowballAnalyser {
 		public Histogram1D betweenessHistogram;
 		
 		public Histogram1D aplHistogram;
+		
+		public Histogram1D distanceHistogram;
 	}
 }

@@ -26,9 +26,12 @@ package playground.johannes.socialnets;
 import hep.aida.ref.Histogram1D;
 
 import java.awt.Font;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +47,12 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.io.IOUtils;
 
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
+import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
+import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 import edu.uci.ics.jung.algorithms.importance.BetweennessCentrality;
 import edu.uci.ics.jung.algorithms.importance.NodeRanking;
 import edu.uci.ics.jung.graph.Edge;
@@ -61,29 +67,10 @@ import edu.uci.ics.jung.utils.Pair;
  */
 public class GraphStatistics {
 
-//	static public double meanDegree(Graph g) {
-//		return Descriptive.mean(DegreeDistributions.getDegreeValues(g.getVertices()));
-//	}
-	
-//	static public double meanDegreeSampled(Graph g) {
-//		Set<Vertex> vertices = new HashSet<Vertex>();
-//		for(Object v : g.getVertices()) {
-//			Boolean bool = (Boolean)((Vertex)v).getUserDatum(UserDataKeys.PARTICIPATE_KEY);
-//			if(bool != null && bool == true) {
-//				vertices.add((Vertex) v);
-//			}
-//		}
-//		return Descriptive.mean(DegreeDistributions.getDegreeValues(vertices));
-//	}
-	
 	static public Histogram1D createDegreeHistogram(Graph g, int min, int max, int ignoreWave) {
 		Set<Vertex> vertices = new HashSet<Vertex>();
 		for(Object o : g.getVertices()) {
-			IntArrayList waves = (IntArrayList) ((Vertex)o).getUserDatum(UserDataKeys.WAVE_KEY);
-			if(waves != null) {
-				if(waves.get(0) != ignoreWave)
-					vertices.add((Vertex) o);
-			} else
+			if(((Vertex)o).getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null)
 				vertices.add((Vertex) o);
 		}
 		DoubleArrayList values = DegreeDistributions.getDegreeValues(vertices);
@@ -92,6 +79,8 @@ public class GraphStatistics {
 			min = (int)values.get(0);
 			max = (int)values.get(values.size()-1);
 		}
+		
+		System.out.println("Gamma exponent is estimated to " + estimatePowerLawExponent(values));
 		return createHistogram(values, min, max, "Degree distribution");
 	}
 	
@@ -102,11 +91,7 @@ public class GraphStatistics {
 			if(((Vertex)v).degree() == 1)
 				coeffs.put(v, 0.0);
 			
-			IntArrayList waves = (IntArrayList) (v).getUserDatum(UserDataKeys.WAVE_KEY);
-			if(waves != null) {
-				if(waves.get(0) != ignoreWave)
-					values.add(coeffs.get(v));
-			} else
+			if(((Vertex)v).getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null)
 				values.add(coeffs.get(v));
 		}
 		
@@ -124,7 +109,8 @@ public class GraphStatistics {
 		List<NodeRanking> rankings = bc.getRankings();
 		DoubleArrayList values = new DoubleArrayList(rankings.size());
 		for(NodeRanking r : rankings)
-			values.add(r.rankScore);
+			if(r.vertex.getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null)
+				values.add(r.rankScore);
 		
 		if(min < 0 && max < 0) {
 			values.sort();
@@ -135,10 +121,18 @@ public class GraphStatistics {
 	}
 	
 	public static Histogram1D createAPLHistogram(Graph g, double min, double max) {
-		Map<Vertex, Double> distances = edu.uci.ics.jung.statistics.GraphStatistics.averageDistances(g);
+		ClusterSet clusters = new WeakComponentClusterer().extract(g);
+		Map<Vertex, Double> distances = new HashMap<Vertex, Double>();
+		for(int i = 0; i < clusters.size(); i++) {
+			Graph subGraph = clusters.getClusterAsNewSubGraph(i);
+			if(subGraph.numVertices() > 1)
+				distances.putAll(edu.uci.ics.jung.statistics.GraphStatistics.averageDistances(subGraph));
+		}
 		DoubleArrayList values = new DoubleArrayList(distances.size());
-		for(Double d : distances.values())
-			values.add(d);
+		for(Vertex v : distances.keySet()) {
+			if(v.getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null)
+				values.add(distances.get(v));
+		}
 		
 		if(min < 0 && max < 0) {
 			values.sort();
@@ -149,6 +143,13 @@ public class GraphStatistics {
 	}
 	
 	private static Histogram1D createHistogram(DoubleArrayList values, double min, double max, String title) {
+		if(max <= min) {
+			/*
+			 * Should never occur, but to avoid an exception...
+			 */
+			min = 0;
+			max = 1;
+		}
 		Histogram1D histogram = new Histogram1D(title, 100, min, max);
 		
 		int cnt = values.size();
@@ -157,22 +158,6 @@ public class GraphStatistics {
 		}
 		return histogram;
 	}
-	
-//	static public void saveHistogram(Histogram1D histogram, String filename) {
-//		try {
-//			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-//			
-//			for(int i = 0; i < 100; i++) {
-//				writer.write(String.valueOf(i));
-//				writer.write("\t");
-//				writer.write(String.valueOf(histogram.binHeight(i)));
-//				writer.newLine();
-//			}
-//			writer.close();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
 	
 	static public int countIsolates(Graph g) {
 		int sum = 0;
@@ -183,6 +168,9 @@ public class GraphStatistics {
 		return sum;
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	public static IntArrayList countEdgewiseSharedPartners(Graph g) {
 		IntArrayList espCounts = new IntArrayList();
 		
@@ -221,6 +209,9 @@ public class GraphStatistics {
 		return espCounts;
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	public static double averagePathLength(Graph g) {
 		Map values = edu.uci.ics.jung.statistics.GraphStatistics.averageDistances(g);
 		double sum = 0;
@@ -254,27 +245,6 @@ public class GraphStatistics {
 		return numerator/denumerator;
 	}
 	
-//	public static void dumpHistograms(Graph g, String prefix, int igonreWave) {
-//		/*
-//		 * Degree histogram
-//		 */
-//		Histogram1D degreeHist = createDegreeHistogram(g, igonreWave);
-//		try {
-//			ChartUtilities.saveChartAsPNG(new File(prefix + "degree.png"), makeChart(degreeHist, "Degree distribution"), 1024, 768);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		/*
-//		 * Clustering coefficient distribution
-//		 */
-//		Histogram1D ccHist = createClusteringCoefficientsHistogram(g, igonreWave);
-//		try {
-//			ChartUtilities.saveChartAsPNG(new File(prefix + "clustering.png"), makeChart(ccHist, "Clustering coefficient distribution"), 1024, 768);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-	
 	public static JFreeChart makeChart(Histogram1D hist, String title) {
 		final XYSeriesCollection data = new XYSeriesCollection();
 		final XYSeries wave = new XYSeries(title, false, true);
@@ -301,7 +271,7 @@ public class GraphStatistics {
 		return chart;
 	}
 	
-	public static Histogram1D getDistanceHistogram(Graph g) {
+	public static Histogram1D getDistanceHistogram(Graph g, double min, double max) {
 		DoubleArrayList values = new DoubleArrayList(g.numEdges());
 		for(Object e : g.getEdges()) {
 			Pair endPoints = ((Edge)e).getEndpoints(); 
@@ -317,14 +287,94 @@ public class GraphStatistics {
 			values.add(c1.calcDistance(c2));
 		}
 		
-		return createHistogram(values, 0, 50, "Distance distribution");
+		if(min < 0 && max < 0) {
+			values.sort();
+			min = values.get(0);
+			max = values.get(values.size()-1);
+		}
+		
+		return createHistogram(values, min, max, "distance distribution");
 	}
 	
-	public static void writeHistogram(Histogram1D hist, String filename) {
+	public static void plotHistogram(Histogram1D hist, String filename) {
 		try {
 			ChartUtilities.saveChartAsPNG(new File(filename), makeChart(hist, hist.title()), 1024, 768);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void writeHistogramNormalized(Histogram1D hist, String filename) {
+		try {
+			int maxBin = hist.minMaxBins()[1];
+			double maxY = hist.binHeight(maxBin);
+			
+			
+			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+			writer.write("x\ty");
+			writer.newLine();
+			for (int i = 0; i < 100; i++) {
+				writer.write(String.valueOf(hist.xAxis().binCentre(i)));
+				writer.write("\t");
+				writer.write(String.valueOf(hist.binHeight(i)/maxY));
+				writer.newLine();
+			}
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static void writeHistogram(Histogram1D hist, String filename) {
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+			writer.write("x\ty");
+			writer.newLine();
+			for (int i = 0; i < 100; i++) {
+				writer.write(String.valueOf(hist.xAxis().binCentre(i)));
+				writer.write("\t");
+				writer.write(String.valueOf(hist.binHeight(i)));
+				writer.newLine();
+			}
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	public static double estimatePowerLawExponent(DoubleArrayList values) {
+		values.sort();
+		double min = values.get(0);
+		double max = values.get(values.size()-1);
+		Histogram1D hist = createHistogram(values, min, max, "");
+		int maxBin = hist.minMaxBins()[1];
+		double minVal = hist.xAxis().binCentre(maxBin);
+		
+		int count = 0;
+		double logsum = 0;
+		for(int i = 0; i < values.size(); i++) {
+			if(values.get(i) >= minVal) {
+				logsum += Math.log(values.get(i)/minVal);
+				count++;
+			}
+		}
+		
+		double gamma = 1 + (count/logsum);
+		double maxY = hist.binHeight(maxBin);
+		double scalesum = 0;
+		for (int i = maxBin; i < 100; i++) {
+			scalesum += (hist.binHeight(i)/maxY)/(Math.pow(hist.xAxis().binCentre(i),-gamma));
+		}
+		double scale = scalesum/100.0;
+		System.out.println("Coefficient A is " + scale);
+		return gamma;
 	}
 }

@@ -21,8 +21,10 @@
 package playground.johannes.socialnets;
 
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
@@ -47,21 +49,19 @@ public class RndNetworkGenerator {
 	
 	private static final Logger logger = Logger.getLogger(RndNetworkGenerator.class);
 
-	private final static double alpha = 0.01;
+//	private static int numPendingVertices;
 	
-//	private final static String ID_KEY = "ID";
-//	
-//	private final static String DIST_KEY = "dist";
+	private static Queue<Vertex> pendingVerticesRef;
 	
 	@SuppressWarnings("unchecked")
-	public static Graph createGraph(Plans plans) {
+	public static Graph createGraph(Plans plans, double alpha) throws InterruptedException {
 		logger.info("Generating social network...");
 		
-		Random rnd = new Random(Gbl.getConfig().global().getRandomSeed());
 		UndirectedSparseGraph g = new UndirectedSparseGraph();
 		/*
 		 * Create a vertex for each person.
 		 */
+		logger.info("Creating vertices...");
 		for(Person p : plans.getPersons().values()) {
 			UndirectedSparseVertex v =  new UndirectedSparseVertex();
 			g.addVertex(v);
@@ -74,31 +74,40 @@ public class RndNetworkGenerator {
 		/*
 		 * Insert random ties between persons.
 		 */
-		Set<Vertex> pendingVertices = new HashSet<Vertex>(g.getVertices());
-		for(Object v1 : g.getVertices()) {
-			for(Vertex v2 : pendingVertices) {
-				if(!v1.equals(v2)) {
-					rnd.nextDouble();
-					if(rnd.nextDouble() <= getTieProba((Vertex) v1, v2)) {
-						UndirectedSparseEdge e = new UndirectedSparseEdge((UndirectedSparseVertex)v1, (UndirectedSparseVertex)v2);
-//						e.addUserDatum(DIST_KEY, dist, copyAct);
-						g.addEdge(e);
-						if(g.numEdges() % 1000 == 0)
-							logger.info(String.format("Inserted %1$s edges...", g.numEdges()));
-					}
-				}
-			}
-			pendingVertices.remove(v1);
-		}
-		logger.info(String.format("Inserted %1$s edges.", g.numEdges()));
-		logger.info(String.format("Graph density is %1$s.", g.numEdges()/(double)(g.numVertices() * (g.numVertices()-1))));
+		logger.info("Creating edges...");
+		long randomSeed = Gbl.getConfig().global().getRandomSeed();
+		int numThreads = 1;//Runtime.getRuntime().availableProcessors();
 		
+		int i = 0;
+		ConcurrentLinkedQueue<Vertex> pendingVertices = new ConcurrentLinkedQueue<Vertex>(g.getVertices());
+		pendingVerticesRef = pendingVertices;
+		Thread[] threads = new Thread[numThreads];
+		for(i = 0; i < numThreads; i++) {
+			threads[i] = new CreateEdgeThread(g, pendingVertices, new Random(randomSeed * i), alpha);
+			threads[i].start();
+		}
+		
+		for(i = 0; i < numThreads; i++) {
+			threads[i].join();
+		}
+		
+		Set<Vertex> vertices = new HashSet<Vertex>();
+		for(Vertex v : vertices) {
+			if(v.degree() == 0)
+				g.removeVertex(v);
+		}
+		
+		logger.info(String.format("Inserted %1$s edges.", g.numEdges()));
+		logger.info(String.format("Graph has %1$s vertices, %2$s edges, density = %3$s, mean degree = %4$s and %5$s components.",
+				g.numVertices(),
+				g.numEdges(),
+				g.numEdges()/((double)(g.numVertices() * (g.numVertices()-1))),
+				GraphStatistics.createDegreeHistogram(g, -1, -1, 0).mean(),
+				new WeakComponentClusterer().extract(g).size()));
 		return g;
 	}
 	
-	private static double getTieProba(Vertex v1, Vertex v2) {
-//		Person p1 = (Person) ((UndirectedSparseVertex)v1).getUserDatum(UserDataKeys.PERSON_KEY);
-//		Person p2 = (Person) ((UndirectedSparseVertex)v2).getUserDatum(UserDataKeys.PERSON_KEY);
+	private static double getTieProba(Vertex v1, Vertex v2, double alpha) {
 		Double x1 = (Double) v1.getUserDatum(UserDataKeys.X_COORD);
 		Double y1 = (Double) v1.getUserDatum(UserDataKeys.Y_COORD);
 		CoordI c1 = new Coord(x1,y1);
@@ -109,65 +118,63 @@ public class RndNetworkGenerator {
 		double dist = c1.calcDistance(c2)/1000.0;
 		
 		return alpha * 1/Math.pow(dist,2);
+//		return alpha * 1/dist;
 	}
 	
-//	private static void dump(Graph g, String outDir) throws FileNotFoundException, IOException {
-//		System.out.println("Writing vertices...");
-//		BufferedWriter writer = org.matsim.utils.io.IOUtils.getBufferedWriter(outDir + "vertices.txt");
-//		writer.write("id\tperson\tx\ty\tdist");
-//		writer.newLine();
-//		
-//		int i = 1;
-//		for(Object v : g.getVertices()) {
-//			((Vertex)v).addUserDatum(ID_KEY, i, copyAct);
-//			writer.write(String.valueOf(i));
-//			i++;
-//			writer.write("\t");
-//			
-//			Person p = (Person) ((Vertex)v).getUserDatum(PERSON_KEY);
-//			writer.write(p.getId().toString());
-//			writer.write("\t");
-//			
-//			CoordI c = p.getSelectedPlan().getFirstActivity().getCoord();
-//			writer.write(String.valueOf(c.getX()));
-//			writer.write("\t");
-//			writer.write(String.valueOf(c.getY()));
-//			writer.newLine();
-//		}
-//		writer.close();
-//		
-//		System.out.println("Writing edges...");
-//		writer = org.matsim.utils.io.IOUtils.getBufferedWriter(outDir + "edges.txt");
-//		writer.write("id\tfrom\tto");
-//		writer.newLine();
-//		
-//		i = 1;
-//		for(Object e : g.getEdges()) {
-//			writer.write(String.valueOf(i));
-//			writer.write("\t");
-//			Iterator it = ((Edge)e).getIncidentVertices().iterator();
-//			writer.write(((Vertex)it.next()).getUserDatum(ID_KEY).toString());
-//			writer.write("\t");
-//			writer.write(((Vertex)it.next()).getUserDatum(ID_KEY).toString());
-//			writer.write("\t");
-//			writer.write(String.valueOf(((Edge)e).getUserDatum(DIST_KEY)));
-//			writer.newLine();
-//			i++;
-//		}
-//		writer.close();
-//	}
+	private static synchronized void updateProgress(int edges, int totalVertices) {
+		int size = pendingVerticesRef.size();
+		logger.info(String.format("Created %1$s edges - %2$s vertices to process (%3$s).", edges, size, 100 * size/(float)totalVertices));
+	}
+
+	private static class CreateEdgeThread extends Thread {
+		
+		private Graph g;
+		
+		private ConcurrentLinkedQueue<Vertex> pendingVertices;
+		
+		private Random rnd;
+		
+		private double alpha;
+
+		public CreateEdgeThread(Graph g, ConcurrentLinkedQueue<Vertex> pendingVertices, Random rnd, double alpha) {
+			this.g = g;
+			this.pendingVertices = pendingVertices;
+			this.rnd = rnd;
+			this.alpha = alpha;
+		}
+		
+		public void run() {
+			int count = 0; 
+			Vertex v1 = pendingVertices.poll();
+			while(v1 != null) {
+				
+				for(Vertex v2 : pendingVertices) {
+						rnd.nextDouble();
+						if(rnd.nextDouble() <= getTieProba((Vertex) v1, v2, alpha)) {
+							try {
+								UndirectedSparseEdge e = new UndirectedSparseEdge(v1, v2);
+								g.addEdge(e);
+								count++;
+								if(count % 100 == 0) {
+									updateProgress(g.numEdges(), g.numVertices());
+								}
+							} catch (IllegalArgumentException e) {
+								System.err.println("Tried to insert a doubled edge.");
+							}
+						}
+				}
+				v1 = pendingVertices.poll();
+			}
+		}
+	}
 	
-	public static void main(String args[]) {
+	public static void main(String args[]) throws InterruptedException {
 		Config config = Gbl.createConfig(args);
 		ScenarioData data = new ScenarioData(config);
+		double alpha = Double.parseDouble(config.getParam("randomGraphGenerator", "alpha"));
 		
 		Plans plans = data.getPopulation();
-		Graph g = createGraph(plans);
-		
-//		System.out.println("Graph has " + g.numVertices() +" vertices, " + g.numEdges() + " edges, cluster coefficient: " +
-//				GraphStatistics.meanClusterCoefficient(g) + ", mean degree: " + GraphStatistics.meanDegree(g) + ", components: " +
-//				new WeakComponentClusterer().extract(g).size() + ", pearson coeff: " + GraphStatistics.pearsonCorrelationCoefficient(g));
-//		
+		Graph g = createGraph(plans, alpha);
 		
 		GraphMLFileHandler gmlHandler = new PersonGraphMLFileHandler();
 		GraphMLFile gmlFile = new GraphMLFile(gmlHandler);

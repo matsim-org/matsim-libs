@@ -39,9 +39,15 @@ public interface UserDataKeys {
 	
 	public static final String Y_COORD = "y";
 	
-	public static final String WAVE_KEY = "wave";
+//	public static final String WAVE_KEY = "wave";
 	
-	public static final String PARTICIPATE_KEY = "participate";
+	public static final String SAMPLED_KEY = "sampled";
+	
+	public static final String DETECTED_KEY = "detected";
+	
+//	public static final String PARTICIPATE_KEY = "participate";
+	
+	public static final String ANONYMOUS_KEY = "anonymous";
 	
 	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
 

@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ import java.util.Random;
 import java.util.Set;
 
 import playground.johannes.socialnets.UserDataKeys;
-import cern.colt.list.IntArrayList;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -71,12 +71,13 @@ public class Sampler {
 	
 	private void init(Graph g) {
 		for(Object v : g.getVertices()) {
-			((Vertex)v).removeUserDatum(UserDataKeys.PARTICIPATE_KEY);
-			((Vertex)v).removeUserDatum(UserDataKeys.WAVE_KEY);
+			((Vertex)v).removeUserDatum(UserDataKeys.SAMPLED_KEY);
+			((Vertex)v).removeUserDatum(UserDataKeys.DETECTED_KEY);
+			((Vertex)v).removeUserDatum(UserDataKeys.ANONYMOUS_KEY);
 		}
 		
 		for(Object e : g.getEdges()) {
-			((Edge)e).removeUserDatum(UserDataKeys.WAVE_KEY);
+			((Edge)e).removeUserDatum(UserDataKeys.SAMPLED_KEY);
 		}
 	}
 	
@@ -86,7 +87,7 @@ public class Sampler {
 		Collection<Vertex> egos = selectedIntialEgos(g, initialEgos);
 
 		for (Vertex ego : egos) {
-			tagAsVisited(ego, 0);
+			tagAsDetected(ego);
 		}
 
 		for (int wave = 1; wave <= waves; wave++) {
@@ -107,7 +108,7 @@ public class Sampler {
 	}
 
 	private Collection<Vertex> runWave(Collection<Vertex> egos, int wave) {
-		Collection<Vertex> alters = new LinkedList<Vertex>();
+		Collection<Vertex> alters = new LinkedHashSet<Vertex>();
 		/*
 		 * Expand to each ego's alters.
 		 */
@@ -117,62 +118,74 @@ public class Sampler {
 			 * The initial egos (first wave) always participate.
 			 */
 			if(wave == 1 || getProbaParticipate(ego) >= rnd.nextDouble()) {
-				ego.addUserDatum(UserDataKeys.PARTICIPATE_KEY, true, UserDataKeys.COPY_ACT);
-				alters.addAll(expand(ego, wave));
+//				ego.addUserDatum(UserDataKeys.PARTICIPATE_KEY, true, UserDataKeys.COPY_ACT);
+				if(ego.getUserDatum(UserDataKeys.SAMPLED_KEY) == null) {
+					/*
+					 * FIXME: Dunno why this happends?
+					 */
+					tagAsSampled(ego, wave);
+					alters.addAll(expand(ego, wave));
+				}
 			}
 		}
 
 		return alters;
 	}
 
-	private void tagAsVisited(Vertex v, int wave) {
+	private void tagAsSampled(Vertex v, int wave) {
+		v.addUserDatum(UserDataKeys.SAMPLED_KEY, wave, UserDataKeys.COPY_ACT);
 		/*
-		 * Tag the destination vertex.
+		 * The vertex is no more anonymous.
 		 */
-		IntArrayList vertexVisits = (IntArrayList) v.getUserDatum(UserDataKeys.WAVE_KEY);
-		if (vertexVisits == null) {
-			vertexVisits = new IntArrayList();
-			v.addUserDatum(UserDataKeys.WAVE_KEY, vertexVisits, UserDataKeys.COPY_ACT);
-		}
-		vertexVisits.add(wave);
+		tagAsAnonymous(v, false);
 	}
 
-	private void tagAsVisited(Edge e, int wave) {
-		/*
-		 * Tag the edge.
-		 */
-		IntArrayList edgeVisits = (IntArrayList) e.getUserDatum(UserDataKeys.WAVE_KEY);
-		if (edgeVisits == null) {
-			edgeVisits = new IntArrayList();
-			e.addUserDatum(UserDataKeys.WAVE_KEY, edgeVisits, UserDataKeys.COPY_ACT);
+	private void tagAsSampled(Edge e, int wave) {
+		if(e.getUserDatum(UserDataKeys.SAMPLED_KEY) == null)
+			e.addUserDatum(UserDataKeys.SAMPLED_KEY, wave, UserDataKeys.COPY_ACT);
+	}
+	
+	private void tagAsAnonymous(Vertex v, boolean flag) {
+		if(flag) {
+			if(v.getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null)
+				v.addUserDatum(UserDataKeys.ANONYMOUS_KEY, true, UserDataKeys.COPY_ACT);
+			else
+				v.setUserDatum(UserDataKeys.ANONYMOUS_KEY, true, UserDataKeys.COPY_ACT);
+		} else {
+			v.removeUserDatum(UserDataKeys.ANONYMOUS_KEY);
 		}
-		edgeVisits.add(wave);
 	}
 
+	private void tagAsDetected(Vertex v) {
+		Integer i = (Integer) v.getUserDatum(UserDataKeys.DETECTED_KEY);
+		if(i == null)
+			i = 0;
+		i++;
+		v.setUserDatum(UserDataKeys.DETECTED_KEY, i, UserDataKeys.COPY_ACT);
+	}
+	
 	@SuppressWarnings("unchecked")
 	private Collection<Vertex> expand(Vertex ego, int wave) {
-		List<Vertex> sampledAlters = new LinkedList<Vertex>();
+		Set<Vertex> detectedAlters = new LinkedHashSet<Vertex>();
 		Set<Edge> ties = ego.getOutEdges();
 
 		for (Edge e : ties) {
 			Vertex alter = e.getOpposite(ego);
 			/*
-			 * Do not go back to the ego and do not sample egos that have been
-			 * already visited in a previous wave.
+			 * Do not sample egos that have been already visited in a previous wave.
 			 */
-//			if (!alter.equals(ego)) {
-				rnd.nextDouble();
-				if (getProbaTieNamed(ego, alter) >= rnd.nextDouble()) {
-					if (alter.getUserDatum(UserDataKeys.WAVE_KEY) == null) {
-						sampledAlters.add(alter);
-					}
-					tagAsVisited(e, wave);
-					tagAsVisited(alter, wave);
+			rnd.nextDouble();
+			if (getProbaTieNamed(ego, alter) >= rnd.nextDouble()) {
+				if (alter.getUserDatum(UserDataKeys.SAMPLED_KEY) == null) {
+					detectedAlters.add(alter);
+					tagAsAnonymous(alter, true);
 				}
-//			}
+				tagAsDetected(alter);
+				tagAsSampled(e, wave);
+			}
 		}
 
-		return sampledAlters;
+		return detectedAlters;
 	}
 
 	private double getProbaTieNamed(Vertex ego, Vertex alter) {
@@ -188,9 +201,11 @@ public class Sampler {
 		Map<Vertex, Vertex> vertexMapping = new HashMap<Vertex, Vertex>();
 
 		for (Object v : fullGraph.getVertices()) {
-			IntArrayList waves = (IntArrayList) ((Vertex) v)
-					.getUserDatum(UserDataKeys.WAVE_KEY);
-			if (waves != null) {
+//			Boolean sampled = (Boolean) ((Vertex) v)
+//					.getUserDatum(UserDataKeys.SAMPLED_KEY);
+//			Boolean flag = (Boolean)((Vertex) v).getUserDatum(UserDataKeys.ANONYMOUS_KEY);
+			Integer detected = (Integer)((Vertex) v).getUserDatum(UserDataKeys.DETECTED_KEY);
+			if (detected != null) {
 				Vertex newVertex = cloneVertex((Vertex)v);
 				sampledGraph.addVertex(newVertex);
 				vertexMapping.put((Vertex) v, newVertex);
@@ -198,14 +213,15 @@ public class Sampler {
 		}
 
 		for (Object e : fullGraph.getEdges()) {
-			IntArrayList waves = (IntArrayList) ((Edge) e)
-					.getUserDatum(UserDataKeys.WAVE_KEY);
+//			IntArrayList waves = (IntArrayList) ((Edge) e)
+//					.getUserDatum(UserDataKeys.WAVE_KEY);
+			Integer sampled = (Integer)((Edge) e).getUserDatum(UserDataKeys.SAMPLED_KEY);
 			Pair endPoints = ((Edge) e).getEndpoints();
-			if (waves != null) {
+			if (sampled != null) {
 				Edge newEdge = new UndirectedSparseEdge(vertexMapping
 						.get(endPoints.getFirst()), vertexMapping.get(endPoints
 						.getSecond()));
-				newEdge.addUserDatum(UserDataKeys.WAVE_KEY, waves, UserDataKeys.COPY_ACT);
+//				newEdge.addUserDatum(UserDataKeys.WAVE_KEY, waves, UserDataKeys.COPY_ACT);
 				sampledGraph.addEdge(newEdge);
 			} else if(extend) {
 				/*
@@ -215,9 +231,9 @@ public class Sampler {
 				Vertex v2 = (Vertex)endPoints.getSecond();
 				
 				boolean notSampled = false;
-				if(v1.getUserDatum(UserDataKeys.WAVE_KEY) != null)
+				if(v1.getUserDatum(UserDataKeys.DETECTED_KEY) != null)
 					notSampled = true;
-				else if(v2.getUserDatum(UserDataKeys.WAVE_KEY) != null)
+				else if(v2.getUserDatum(UserDataKeys.DETECTED_KEY) != null)
 					notSampled = true;
 				
 				if(notSampled) {
@@ -246,12 +262,18 @@ public class Sampler {
 		newVertex.addUserDatum(UserDataKeys.ID, ((Vertex)v).getUserDatum(UserDataKeys.ID), UserDataKeys.COPY_ACT);
 		newVertex.addUserDatum(UserDataKeys.X_COORD, ((Vertex)v).getUserDatum(UserDataKeys.X_COORD), UserDataKeys.COPY_ACT);
 		newVertex.addUserDatum(UserDataKeys.Y_COORD, ((Vertex)v).getUserDatum(UserDataKeys.Y_COORD), UserDataKeys.COPY_ACT);
-		IntArrayList waves = (IntArrayList) ((Vertex)v).getUserDatum(UserDataKeys.WAVE_KEY); 
-		if(waves != null)
-			newVertex.addUserDatum(UserDataKeys.WAVE_KEY, waves, UserDataKeys.COPY_ACT);
-		Boolean bool = (Boolean)((Vertex)v).getUserDatum(UserDataKeys.PARTICIPATE_KEY);
-		if(bool != null)
-			newVertex.addUserDatum(UserDataKeys.PARTICIPATE_KEY, bool, UserDataKeys.COPY_ACT);
+		
+		Boolean anonymous = (Boolean)((Vertex)v).getUserDatum(UserDataKeys.ANONYMOUS_KEY);
+		if(anonymous != null)
+			newVertex.addUserDatum(UserDataKeys.ANONYMOUS_KEY, anonymous, UserDataKeys.COPY_ACT);
+		
+		Integer sampled = (Integer)((Vertex)v).getUserDatum(UserDataKeys.SAMPLED_KEY);
+		if(sampled != null)
+			newVertex.addUserDatum(UserDataKeys.SAMPLED_KEY, sampled, UserDataKeys.COPY_ACT);
+		
+		Integer detected = (Integer)((Vertex)v).getUserDatum(UserDataKeys.DETECTED_KEY);
+		if(detected != null)
+			newVertex.addUserDatum(UserDataKeys.DETECTED_KEY, detected, UserDataKeys.COPY_ACT);
 		
 		return newVertex;
 	}
