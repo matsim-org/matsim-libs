@@ -57,6 +57,7 @@ import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.kml.EgoNetPlansMakeKML;
+import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 import playground.jhackney.scoring.*;
 
 
@@ -228,10 +229,13 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		}
 //		Write out the KML for the EgoNet of a chosen agent
 //		if ((event.getIteration()-1)%replan_interval == 0){
+		Person testP=this.controler.getPopulation().getPerson("21924270");
+		EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
 		if (event.getIteration() == this.controler.getLastIteration()){	
-			Person testP=this.controler.getPopulation().getPerson("21924270");
-			EgoNetPlansMakeKML.loadData(testP);
-			EgoNetPlansMakeKML.write();
+//			Person testP=this.controler.getPopulation().getPerson("21924270");
+//			EgoNetPlansMakeKML.loadData(testP);
+//			EgoNetPlansMakeKML.write();
+			EgoNetPlansItersMakeKML.write();
 		}
 	}
 
@@ -410,8 +414,10 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 		this.log.info("  Initializing the KML output");
 //		this.kmlOut=new EgoNetPlansMakeKML(this.controler.getConfig());
-		EgoNetPlansMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
-		EgoNetPlansMakeKML.generateStyles();
+//		EgoNetPlansMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
+//		EgoNetPlansMakeKML.generateStyles();
+		EgoNetPlansItersMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
+		EgoNetPlansItersMakeKML.generateStyles();
 		this.log.info("... done");
 
 		this.log.info(" Writing out the initial social network ...");
