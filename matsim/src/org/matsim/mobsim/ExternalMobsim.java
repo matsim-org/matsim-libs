@@ -25,8 +25,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.config.Module;
@@ -56,6 +56,8 @@ public class ExternalMobsim {
 	protected String configFileName = null;
 
 	protected String executable = null;
+
+	private static final Logger log = Logger.getLogger(ExternalMobsim.class);
 
 	public ExternalMobsim(final Plans population, final Events events) {
 		this.population = population;
@@ -92,7 +94,7 @@ public class ExternalMobsim {
 
 
 	protected void writeConfig(final String iterationPlansFile, final String iterationEventsFile, final String iterationConfigFile) throws FileNotFoundException, IOException {
-		System.out.println("writing config for external mobsim at " + (new Date()));
+		log.info("writing config for external mobsim");
 		Config simConfig = Gbl.getConfig();
 		Config extConfig = new Config();
 		// network
@@ -121,7 +123,7 @@ public class ExternalMobsim {
 	}
 
 	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
-		System.out.println("writing plans for external mobsim at " + (new Date()));
+		log.info("writing plans for external mobsim");
 		String version = "v4";
 		PlansWriter plansWriter = new PlansWriter(new Plans(Plans.USE_STREAMING), iterationPlansFile, version);
 		PlansWriterHandler handler = plansWriter.getHandler();
@@ -166,7 +168,7 @@ public class ExternalMobsim {
 	as classes inheriting from this class may throw exceptions in their implementation of this method. */
 	protected void runExe(final String iterationConfigFile) throws FileNotFoundException, IOException {
 		String cmd = this.executable + " " + iterationConfigFile;
-		System.out.println("running command \"" + cmd + "\" at " + (new Date()));
+		log.info("running command: " + cmd);
 		Gbl.printMemoryUsage();
 		String logfileName = Controler.getIterationFilename("mobsim.log");
 		int timeout = Gbl.getConfig().simulation().getExternalTimeOut();
@@ -179,7 +181,7 @@ public class ExternalMobsim {
 	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,
 	as classes inheriting from this class may throw exceptions in their implementation of this method. */
 	protected void readEvents(final String iterationEventsFile) throws FileNotFoundException, IOException {
-		System.out.println("reading events from external mobsim at " + (new Date()));
+		log.info("reading events from external mobsim");
 		new MatsimEventsReader(this.events).readFile(iterationEventsFile);
 	}
 
