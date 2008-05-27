@@ -20,6 +20,7 @@
 
 package playground.jhackney.replanning;
 
+import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
@@ -28,6 +29,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.utils.misc.Time;
+
 
 /**
  * Mutates the duration of activities randomly within a specified range.
@@ -42,6 +44,7 @@ import org.matsim.utils.misc.Time;
 public class SecLocPlanMutateTimeAllocation implements PlanAlgorithmI {
 
 	private final int mutationRange;
+	private final Logger log = Logger.getLogger(SecLocPlanMutateTimeAllocation.class);
 
 	public SecLocPlanMutateTimeAllocation(final int mutationRange) {
 		this.mutationRange = mutationRange;
@@ -105,7 +108,7 @@ public class SecLocPlanMutateTimeAllocation implements PlanAlgorithmI {
 				}
 				MentalMap map = plan.getPerson().getKnowledge().map;
 				Activity myactivity = map.getActivity(oldAct);
-//				System.out.println("###### TEST "+act.getType()+" "+act.getStartTime()+" "+act.getEndTime()+" "+act.getLinkId()+" "+myactivity.getFacility().getLink().getId());
+				this.log.info(act.getType()+" "+act.getStartTime()+" "+act.getEndTime()+" "+act.getLinkId()+" "+myactivity.getFacility().getLink().getId());
 				map.learnActsActivities(act, myactivity);
 
 			} else {
