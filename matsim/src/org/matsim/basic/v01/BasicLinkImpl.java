@@ -44,30 +44,18 @@ implements BasicLink
 	// object, the BasicLink must contains geographic info. Since this must be defined
 	// by the to- and from-node, they HAVE to contain a coordinate. (see also BasicNode)
 	// If this is not O.K., then the BasicLink must not extend Location.
-	public BasicLinkImpl(NetworkLayer network, Id id, BasicNode from, BasicNode to) {
+	public BasicLinkImpl(final NetworkLayer network, final Id id, final BasicNode from, final BasicNode to) {
 		super(network,id,0.5*(from.getCoord().getX()+to.getCoord().getX()),
 		                 0.5*(from.getCoord().getY()+to.getCoord().getY()));
 		this.from = from;
 		this.to = to;
 	}
 
-	// TODO [balmermi] see above why...
-	@Deprecated
-	public BasicLinkImpl(String id) {
-		super(id);
-	}
-
-	@Deprecated
-	public BasicLinkImpl(NetworkLayer network, String id, CoordI coord) {
-		super(network, id, coord);
-	}
-
-
 	// TODO [balmermi] For simplicity, we calculate only the distance to the center
 	// of that link. A better version is implemented in org.matsim.demandmodeling.network.Link.
 	// It would be better to implement the version in Link here and remove the one in Link.
 	@Override
-	public double calcDistance(CoordI coord) {
+	public double calcDistance(final CoordI coord) {
 		return this.center.calcDistance(coord);
 	}
 
@@ -79,12 +67,12 @@ implements BasicLink
 		return this.to;
 	}
 
-	public boolean setFromNode(BasicNode node) {
+	public boolean setFromNode(final BasicNode node) {
 		this.from = node;
 		return true;
 	}
 
-	public boolean setToNode(BasicNode node) {
+	public boolean setToNode(final BasicNode node) {
 		this.to = node;
 		return true;
 	}
@@ -92,20 +80,20 @@ implements BasicLink
 	 * This method returns the capacity as set in the xml defining the network. Be aware
 	 * that this capacity is not normalized in time, it depends on the period set
 	 * in the network file (the capperiod attribute).
-	 * 
+	 *
  	 * @param time - the current time
 	 * @return the capacity per network's capperiod timestep
 	 */
-	public double getCapacity(double time) {
+	public double getCapacity(final double time) {
 		return this.capacity;
 	}
 
-	public void setCapacity(double capacity) {
+	public void setCapacity(final double capacity) {
 		this.capacity = capacity;
 	}
 	/**
 	 * This method returns the freespeed velocity in meter per seconds.
-	 * 
+	 *
 	 * @param time - the current time
 	 * @return freespeed
 	 */
@@ -115,7 +103,7 @@ implements BasicLink
 	/**
 	 * Sets the freespeed velocity of the link in meter per seconds.
 	 */
-	public void setFreespeed(double freespeed) {
+	public void setFreespeed(final double freespeed) {
 		this.freespeed = freespeed;
 	}
 
@@ -123,21 +111,21 @@ implements BasicLink
 		return this.length;
 	}
 
-	public void setLength(double length) {
+	public void setLength(final double length) {
 		this.length = length;
 	}
 
 	//TODO permlanes should be refectored to lanes or getLanes() and so on to getPermLanes() [GL]
 
-	public double getLanes(double time) {
+	public double getLanes(final double time) {
 		return this.permlanes;
 	}
 
-	public int getLanesAsInt(double time) {
+	public int getLanesAsInt(final double time) {
 		return Math.round((float)Math.max(this.permlanes,1.0d));
 	}
 
-	public void setLanes(double lanes) {
+	public void setLanes(final double lanes) {
 		this.permlanes = lanes;
 	}
 }

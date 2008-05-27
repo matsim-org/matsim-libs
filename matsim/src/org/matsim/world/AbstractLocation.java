@@ -80,15 +80,6 @@ public abstract class AbstractLocation implements Location {
 	}
 
 	/**
-	 * @deprecated This constructor must not be used anymore. It will produce an error message anyway.
-	 * @param id
-	 */
-	@Deprecated
-	protected AbstractLocation(final String id) {
-		this(null,new IdImpl(id),null);
-	}
-
-	/**
 	 * A unique location for a given layer.
 	 * @param layer The layer the location belongs to.
 	 * @param id The unique id of that location.
@@ -211,7 +202,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#setId(org.matsim.utils.identifiers.IdI)
 	 */
-	public final void setId(Id id) {
+	public final void setId(final Id id) {
 		this.id = id;
 	}
 
@@ -243,14 +234,14 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getUpLocation(org.matsim.utils.identifiers.IdI)
 	 */
-	public final Location getUpLocation(Id id) {
+	public final Location getUpLocation(final Id id) {
 		return this.up_mapping.get(id);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#downLocation(org.matsim.utils.identifiers.IdI)
 	 */
-	public final Location downLocation(Id id) {
+	public final Location downLocation(final Id id) {
 		return this.down_mapping.get(id);
 	}
 
