@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.io.IOUtils;
@@ -140,7 +139,7 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 			for (VisumNetwork.Stop stop : endStops) {
 				this.writer.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
 				this.writer.write(stop.id.toString() + "\t");
-				this.writer.write(Double.toString(this.startCoord.calcDistance(stop.coord)));
+				this.writer.write(Double.toString(this.endCoord.calcDistance(stop.coord)));
 				this.writer.write("\n");
 			}
 		}
