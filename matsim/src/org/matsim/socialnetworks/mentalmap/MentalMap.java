@@ -193,6 +193,7 @@ public class MentalMap {
 		setActivityScore(myactivity);
 
 		this.knowledge.addActivity(myactivity);
+		myAct.setFacility(myactivity.getFacility());
 	}
 
 	public void forgetActsActivities (Act myAct, Activity myactivity){
@@ -254,7 +255,7 @@ public class MentalMap {
 				// Acts. Make sure no null Acts are kept
 				if(this.getActUsingId(myactivity)== null){
 //					log.info("the Act is null");
-					forgetList.add(myactivity);
+//					forgetList.add(myactivity);
 					counter++;
 				}
 			}
