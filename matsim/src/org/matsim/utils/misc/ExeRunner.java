@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.util.Date;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -35,11 +36,9 @@ import java.util.Date;
  *
  * @author mrieser
  */
-public class ExeRunner {
+public abstract class ExeRunner {
 
-	private ExeRunner() {
-		// this is a static class
-	}
+	/*package*/ final static Logger log = Logger.getLogger(ExeRunner.class);
 
 	/**
 	 * Runs an executable and waits until the executable finishes or until
@@ -63,7 +62,7 @@ public class ExeRunner {
 					// reduce the timeout to the residual of the timeout
 					timeoutMillis -= System.currentTimeMillis() - startTime;
 					myExecutor.wait(timeoutMillis);
-					// wait can return for different reasons.
+					// wait can return for different reasons
 					if (myExecutor.getState().equals(Thread.State.TERMINATED)) {
 						break;
 					}
@@ -74,8 +73,7 @@ public class ExeRunner {
 					myExecutor.join();
 				}
 			} catch (InterruptedException e) {
-				System.out.println("ExeRunner.run() got interrupted while waiting for timeout");
-				e.printStackTrace();
+				log.info("ExeRunner.run() got interrupted while waiting for timeout", e);
 			}
 		}
 
@@ -118,23 +116,33 @@ public class ExeRunner {
 				StreamHandler errorHandler = new StreamHandler(err, writerErr);
 				outputHandler.start();
 				errorHandler.start();
-				System.out.println("  Starting external exe with command: " + this.cmd);
-				System.out.println("  Output of the externel exe is written to: " + this.stdoutFileName);
+				log.info("Starting external exe with command: " + this.cmd);
+				log.info("Output of the externel exe is written to: " + this.stdoutFileName);
 				boolean processRunning = true;
 				while (processRunning && !this.timeout) {
 					try {
 						this.p.waitFor();
 						this.erg = this.p.exitValue();
-						System.out.println("  external exe returned " + this.erg);
+						log.info("external exe returned " + this.erg);
 						processRunning = false;
 					} catch (InterruptedException e) {
-						System.err.println("Thread waiting for external exe to finish was interrupted at " + (new Date()));
+						log.info("Thread waiting for external exe to finish was interrupted");
 						this.erg = -3;
 					}
 				}
 				if (this.timeout) {
-					System.out.println("Timeout reached, killing process...");
+					log.info("Timeout reached, killing process...");
 					killProcess();
+				}
+				try {
+					outputHandler.join();
+				} catch (InterruptedException e) {
+					log.info("got interrupted while waiting for outputHandler to die.", e);
+				}
+				try {
+					errorHandler.join();
+				} catch (InterruptedException e) {
+					log.info("got interrupted while waiting for errorHandler to die.", e);
 				}
 				writerIn.flush();
 				writerIn.close();
@@ -176,7 +184,7 @@ public class ExeRunner {
 				}
 				this.out.flush();
 			} catch (IOException e) {
-				System.out.println("StreamHandler got interrupted at " + (new Date()));
+				log.info("StreamHandler got interrupted");
 				e.printStackTrace();
 			}
 		}
