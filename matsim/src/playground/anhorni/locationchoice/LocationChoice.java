@@ -32,7 +32,8 @@ public class LocationChoice extends MultithreadedModuleA {
 
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
-		return new RandomLocationMutator();
+		//return new RandomLocationMutator();
+		return new GrowingCirclesLocationMutator();
 	}
 
 }
