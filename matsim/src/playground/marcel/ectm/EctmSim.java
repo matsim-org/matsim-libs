@@ -23,8 +23,8 @@ package playground.marcel.ectm;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.config.MatsimConfigReader;
@@ -41,6 +41,8 @@ public class EctmSim extends ExternalMobsim {
 	private static final String CONFIG_CONFIG_TEMPLATE = "configTemplate";
 
 	private String eventsFile = null;
+
+	private static final Logger log = Logger.getLogger(EctmSim.class);
 
 	public EctmSim(final Plans population, final Events events) {
 		super(population, events);
@@ -65,7 +67,7 @@ public class EctmSim extends ExternalMobsim {
 	@Override
 	protected void runExe(final String iterationConfigFile) throws FileNotFoundException, IOException {
 		String cmd = this.executable + " " + iterationConfigFile + " " + this.eventsFile;
-		System.out.println("running command \"" + cmd + "\" at " + (new Date()));
+		log.info("running command: \"" + cmd);
 		Gbl.printMemoryUsage();
 		String logfileName = Controler.getIterationFilename("mobsim.log");
 		int timeout = Gbl.getConfig().simulation().getExternalTimeOut();
