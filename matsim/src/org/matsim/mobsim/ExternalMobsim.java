@@ -162,6 +162,9 @@ public class ExternalMobsim {
 				writer.flush();
 			}
 		}
+		handler.endPlans(writer);
+		writer.flush();
+		writer.close();
 	}
 
 	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,
