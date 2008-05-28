@@ -25,7 +25,9 @@ import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.otfivs.gui.OTFHostControlBar;
+import org.matsim.utils.vis.otfivs.gui.OTFVisConfig;
 
 
 public class OTFVis   extends Thread {
@@ -33,6 +35,13 @@ public class OTFVis   extends Thread {
 	private final OTFHostControlBar hostControl;
 	
 	public OTFVis(String address) throws RemoteException, InterruptedException, NotBoundException{
+		if (Gbl.getConfig() == null) Gbl.createConfig(null);
+
+		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+
+		if (config == null) config = new OTFVisConfig();
+	    Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, config);
+
 		frame = new JFrame("MATSIM NetVis" + address);
 		hostControl = new OTFHostControlBar(address);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
