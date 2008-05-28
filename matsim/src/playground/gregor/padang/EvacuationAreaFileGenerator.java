@@ -74,7 +74,7 @@ public class EvacuationAreaFileGenerator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+				
 		
 	}
 
@@ -89,7 +89,7 @@ public class EvacuationAreaFileGenerator {
 			
 			double distance = Math.max(p.getExteriorRing().getEnvelopeInternal().getHeight(),p.getExteriorRing().getEnvelopeInternal().getWidth());
 			Coord coord = (Coord) MGC.point2Coord(p.getCentroid());
-			Collection<Node> nodes = this.network.getNearestNodes(coord, distance);
+			Collection<Node> nodes = this.network.getNearestNodes(coord, distance * 2);
 			handleNodes(nodes,p);
 			
 			
@@ -208,6 +208,7 @@ public class EvacuationAreaFileGenerator {
 		readPolygons(evac_zone,fz_5_10);
 		
 		new EvacuationAreaFileGenerator(network,evac_zone);
+		
 		
 		
 	}

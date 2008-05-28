@@ -155,6 +155,7 @@ public class PolygonLinksGenerator {
 			}
 			if(i > 1) continue;
 			
+			double minWidth = getMinWidth(pLink,currLs);
 			Feature ftLink = this.pg.getPolygonFeature(pLink, 0, id, nodeIds.get(0), nodeIds.get(1), 0, 0);
 			this.ftLinks.put(id, ftLink);
 	 	}
@@ -162,6 +163,10 @@ public class PolygonLinksGenerator {
 		
 	}
 		
+	private double getMinWidth(Polygon link, LineString currLs) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	private Collection<Polygon> separatePoly(Polygon pLink , Polygon pNode){
 		
 			Collection<Polygon> p = new ArrayList<Polygon>();

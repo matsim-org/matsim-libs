@@ -219,11 +219,11 @@ public class PolygonMerger {
 			}
 			double x_diff = currPoint.getX() - p.getX();
 			double y_diff = currPoint.getY() - p.getY();
-			double length = Math.max(Math.sqrt(x_diff*x_diff + y_diff * y_diff),10.0);
+			double length = Math.max(Math.sqrt(x_diff*x_diff + y_diff * y_diff),20.0);
 			double scale =  l.getLength()/length ;
 			x_diff *= scale;
 			y_diff *= scale;
-			Coordinate [] c = new Coordinate [] {currPoint.getCoordinate(), new Coordinate(currPoint.getX() + x_diff, currPoint.getY() + y_diff)};
+			Coordinate [] c = new Coordinate [] {new Coordinate(currPoint.getX() - x_diff, currPoint.getY() - y_diff), new Coordinate(currPoint.getX() + x_diff, currPoint.getY() + y_diff)};
 			LineString tmp = this.pg.getGeofac().createLineString(c);
 
 			List<LineString> rings = new ArrayList<LineString>();

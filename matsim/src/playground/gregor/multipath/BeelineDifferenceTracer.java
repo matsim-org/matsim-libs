@@ -42,7 +42,7 @@ public class BeelineDifferenceTracer {
 	
 	private final double TRACE_WEIGHT;
 	
-	private double crit = 1;
+	private double crit = 0.9;
 	private final double coef = 0.99;
 	
 	public BeelineDifferenceTracer(Coord orig, Coord dest){
@@ -98,7 +98,7 @@ public class BeelineDifferenceTracer {
 //		double deviance = (linkLength * (newDiff+oldDiff)/2);
 		
 		
-		double newTrace = deviance + (TRACE_WEIGHT) * oldTrace; 
+		double newTrace = 0.2 * deviance + (TRACE_WEIGHT) * oldTrace; 
 //			(1-TRACE_WEIGHT) * oldTrace + TRACE_WEIGHT * deviance + oldTrace;
 		
 		return newTrace;
