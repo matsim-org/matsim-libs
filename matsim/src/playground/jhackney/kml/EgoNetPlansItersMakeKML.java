@@ -264,28 +264,31 @@ public class EgoNetPlansItersMakeKML {
 		Folder agentFolder = new Folder(
 				"agent "+myPlan.getPerson().getId().toString()+"-"+iter,
 				"agent "+myPlan.getPerson().getId().toString()+"-"+iter,
-				"Contains one agent",
+				"Contains one agent's route and its activities in one iteration",
 				Feature.DEFAULT_ADDRESS,
 				Feature.DEFAULT_LOOK_AT,
 				Feature.DEFAULT_STYLE_URL,
 				true,
 				Feature.DEFAULT_REGION,
-				new TimeStamp(new GregorianCalendar(1970, 0, 1, iter, 0, 0)));
+//				new TimeStamp(new GregorianCalendar(1970, 0, 1, iter, 0, 0))
+				new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
 		myKMLDocument.addFeature(agentFolder);
 
 		// put facilities in a folder, one for each Plan
 		Folder facilitiesFolder = new Folder(
 				"facilities "+myPlan.getPerson().getId().toString()+"-"+iter,
 				"facilities "+myPlan.getPerson().getId().toString()+"-"+iter,
-				"Contains all the facilities.",
+				"Contains all the facilities of one agent in one time step.",
 				Feature.DEFAULT_ADDRESS,
 				Feature.DEFAULT_LOOK_AT,
 				Feature.DEFAULT_STYLE_URL,
 				false,
 				Feature.DEFAULT_REGION,
-				new TimeStamp(new GregorianCalendar(1970, 0, 1, iter, 0, 0)));
-		myKMLDocument.addFeature(facilitiesFolder);
-
+//				new TimeStamp(new GregorianCalendar(1970, 0, 1, iter, 0, 0))
+				new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
+//		myKMLDocument.addFeature(facilitiesFolder);
+		agentFolder.addFeature(facilitiesFolder);
+		
 		ActLegIterator actLegIter = myPlan.getIterator();
 		Act act0 = (Act) actLegIter.nextAct();
 		makeActKML(myPerson, act0, agentFolder, agentLinkStyle);
@@ -314,7 +317,8 @@ public class EgoNetPlansItersMakeKML {
 			Style myStyle=facStyle.get(myAct.getType());
 			Placemark aFacility = new Placemark(
 					myAct.getType().substring(0, 1)+myAct.getRefId(),
-					myAct.getType().substring(0, 1)+myAct.getRefId(),
+//					myAct.getType().substring(0, 1)+myAct.getRefId(),
+					null,
 					myPerson.getKnowledge().map.getActivity(myAct).getFacility().toString(),
 					"address",
 					Feature.DEFAULT_LOOK_AT,
@@ -513,11 +517,11 @@ public class EgoNetPlansItersMakeKML {
 		int alpha = 255;
 
 		int r = (int)(127.0 * (Math.sin((i * 2 * Math.PI) / intervals) + 1));
-		System.out.println(r);
+//		System.out.println(r);
 		int g = (int)(127.0 * (Math.cos((i * 2 * Math.PI) / intervals) + 1));
-		System.out.println(g);
+//		System.out.println(g);
 		int b = (int)(127.0 * (Math.sin((i * 2 * Math.PI) / intervals) * (-1) + 1));
-		System.out.println(b);
+//		System.out.println(b);
 
 		String aStr = Integer.toHexString(alpha);
 		if (aStr.length() == 1) {
