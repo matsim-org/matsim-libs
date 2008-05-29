@@ -188,7 +188,7 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 				} else {
 					
 					if (!outNodeD.isShadow()) {
-						this.netStateWriter.setNodeMsg(outNodeD.getMatsimNode().getId(), "" + outNodeD.getShadowNodes().size());
+//						this.netStateWriter.setNodeMsg(outNodeD.getMatsimNode().getId(), "" + outNodeD.getShadowNodes().size());
 						relaxNode(outNodeD,pendingNodes);	
 						
 					} else {
