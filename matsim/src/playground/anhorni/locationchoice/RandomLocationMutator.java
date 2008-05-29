@@ -3,7 +3,6 @@ package playground.anhorni.locationchoice;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
@@ -57,7 +56,7 @@ public class RandomLocationMutator extends PersonAlgorithm implements PlanAlgori
 			final Facility leisure_facility=(Facility)leisure_facilities.entrySet().toArray()[
  			           Gbl.random.nextInt(leisure_facilities.size()-1)];
 
- 			final BasicLinkImpl linkExchangeLeisure=(BasicLinkImpl)leisure_facility.getLink();
+ 			final Link linkExchangeLeisure=leisure_facility.getLink();
  			System.out.println("link_id"+linkExchangeLeisure.getId());
  			exchangeLink("l",linkExchangeShop, plan);
 		}
@@ -95,11 +94,4 @@ public class RandomLocationMutator extends PersonAlgorithm implements PlanAlgori
 	public void run(final Plan plan) {
 		handlePlan(plan);
 	}
-
-
-
-
-
-
-
 }
