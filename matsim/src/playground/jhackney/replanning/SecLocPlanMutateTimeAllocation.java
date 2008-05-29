@@ -108,7 +108,7 @@ public class SecLocPlanMutateTimeAllocation implements PlanAlgorithmI {
 				}
 				MentalMap map = plan.getPerson().getKnowledge().map;
 				Activity myactivity = map.getActivity(oldAct);
-				this.log.info(act.getType()+" "+act.getStartTime()+" "+act.getEndTime()+" "+act.getLinkId()+" "+myactivity.getFacility().getLink().getId());
+//				this.log.info(act.getType()+" "+act.getStartTime()+" "+act.getEndTime()+" "+act.getLinkId()+" "+myactivity.getFacility().getLink().getId());
 				map.learnActsActivities(act, myactivity);
 
 			} else {
