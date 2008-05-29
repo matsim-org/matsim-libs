@@ -177,7 +177,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 			// primary act have a fixed location
 			// check that in scoring function
 			for (int ii=0; ii < sampleGenes.length; ii++) {
-				sampleGenes[ii] = new IntegerGene(jgapConfiguration, 0, shop_array_size);
+				sampleGenes[ii] = new IntegerGene(jgapConfiguration, 0, shop_array_size-1);
 			}
 
 			final IChromosome sampleChromosome = new Chromosome(jgapConfiguration, sampleGenes);
