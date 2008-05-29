@@ -94,8 +94,11 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 	public void run(final Plan plan) {
 
 		// distinguish for optimization tools
+		/* TODO:
 		final String optiToolboxName = PlanomatConfig.getOptimizationToolboxName();
 		if (optiToolboxName.equals("jgap")) {
+
+		*/
 			final Genotype initialGAPopulation =
 				PlanomatOptimizeLocations.initJGAP(
 						plan,
@@ -103,6 +106,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 						this.travelCostCalculator,
 						this.travelTimeCalculator,
 						this.shop_facilities);
+
 			final IChromosome fittest = PlanomatOptimizeLocations
 				.evolveAndReturnFittest(initialGAPopulation);
 			PlanomatOptimizeLocations.writeChromosome2Plan(
@@ -112,7 +116,9 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 					this.network,
 					this.travelCostCalculator,
 					this.travelTimeCalculator);
-		}
+
+
+		// TODO: }
 	}
 
 	/**
@@ -131,7 +137,8 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 
 		Genotype jgapGAPopulation = null;
 
-		final int popSize = PlanomatConfig.getPopSize();
+		// TODO: final int popSize = PlanomatConfig.getPopSize();
+		final int popSize = 1000;
 
 		// put all the parameters in the config file later
 	    final Id [] shop_array = shop_facilities.keySet().toArray(
@@ -206,14 +213,17 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 	private static IChromosome evolveAndReturnFittest(final Genotype population) {
 
 		final double travelPenalty = Math.abs(Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling"))) / 3600;
-		final double minDiff = travelPenalty * PlanomatConfig.getIndifference();
+		// TODO: final double minDiff = travelPenalty * PlanomatConfig.getIndifference();
+		final double minDiff = travelPenalty * 0.001;
 
 		IChromosome fittest = null;
-		double avg = 0, max = 0, oldmax = 0;
+		final double avg = 0;
+		double max = 0, oldmax = 0;
 		boolean cancelEvolution = false;
 		int generation = 0;
 
-		final int maxNumGenerations = PlanomatConfig.getJgapMaxGenerations();
+		// TODO: final int maxNumGenerations = PlanomatConfig.getJgapMaxGenerations();
+		final int maxNumGenerations = 10;
 		final int percentEvolution = maxNumGenerations / 10;
 
 		while (cancelEvolution == false) {
@@ -226,10 +236,12 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 				oldmax = fittest.getFitnessValue();
 			} else if ((generation > 0) && (generation % percentEvolution == 0)) {
 				max = fittest.getFitnessValue();
+				/* TODO:
 				if (PlanomatConfig.isBeVerbose()) {
 					avg = PlanomatOptimizeLocations.getAverageFitness(population);
 					System.out.println(" [Planomat] Generation " + generation + ":\t" + avg + "\t" + max);
 				}
+				*/
 				if ((max - oldmax) < minDiff) {
 					cancelEvolution = true;
 				}
@@ -243,10 +255,12 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 		}
 
 		fittest = population.getFittestChromosome();
+		/* TODO:
 		if (PlanomatConfig.isBeVerbose()) {
 			final double fitness = fittest.getFitnessValue();
 			System.out.println("Currently fittest Chromosome has fitness " + fitness);
 		}
+		*/
 		return fittest;
 	}
 
