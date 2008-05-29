@@ -7,7 +7,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -46,30 +45,30 @@ public class RandomLocationMutator extends PersonAlgorithm implements PlanAlgori
 
 		for (int j=0; j<this.nbrChanges; j++) {
 
-			final Facility shop_facility=(Facility)shop_facilities.entrySet().toArray()[
+			final Facility shop_facility=(Facility)shop_facilities.values().toArray()[
 			           Gbl.random.nextInt(shop_facilities.size()-1)];
 
-			final Link linkExchangeShop=shop_facility.getLink();
-			System.out.println("link_id"+linkExchangeShop.getId());
-			exchangeLink("s",linkExchangeShop, plan);
+			exchangeFacility("s",shop_facility, plan);
 
-			final Facility leisure_facility=(Facility)leisure_facilities.entrySet().toArray()[
+			final Facility leisure_facility=(Facility)leisure_facilities.values().toArray()[
  			           Gbl.random.nextInt(leisure_facilities.size()-1)];
 
- 			final Link linkExchangeLeisure=leisure_facility.getLink();
- 			System.out.println("link_id"+linkExchangeLeisure.getId());
- 			exchangeLink("l",linkExchangeShop, plan);
+			exchangeFacility("l",leisure_facility, plan);
 		}
 	}
 
 
-	public void exchangeLink(final String type, final Link link, final Plan plan) {
+	public void exchangeFacility(final String type, final Facility facility, final Plan plan) {
 		// modify plan by randomly exchanging a link (facility) in the plan
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			if (act.getType().startsWith(type)) {
-				act.setLink(link);
+
+				// plans: link, coords
+				// facilities: coords
+				// => use coords
+				act.setCoord(facility.getCenter());
 			}
 		}
 

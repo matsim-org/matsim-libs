@@ -20,20 +20,44 @@
 
 package playground.anhorni.locationchoice;
 
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
+import org.matsim.router.util.TravelCostI;
+import org.matsim.router.util.TravelTimeI;
+
+import playground.anhorni.locationchoice.planomatLocationChoice.PlanomatOptimizeLocations;
 
 
 public class LocationChoice extends MultithreadedModuleA {
 
-	public LocationChoice() {
+	private NetworkLayer network=null;
+	private TravelCostI travelCostCalc=null;
+	private TravelTimeI travelTimeCalc=null;
 
+
+	public LocationChoice() {
 	}
+
+	public LocationChoice(
+			final NetworkLayer network,
+			final TravelCostI travelCostCalc,
+			final TravelTimeI travelTimeCalc ) {
+
+		this.network=network;
+		this.travelCostCalc=travelCostCalc;
+		this.travelTimeCalc=travelTimeCalc;
+	}
+
 
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
 		//return new RandomLocationMutator();
-		return new GrowingCirclesLocationMutator();
+		//return new GrowingCirclesLocationMutator();
+		return new PlanomatOptimizeLocations(this.network, this.travelCostCalc, this.travelTimeCalc);
 	}
+
+
+
 
 }
