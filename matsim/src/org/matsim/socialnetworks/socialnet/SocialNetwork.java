@@ -41,7 +41,7 @@ public class SocialNetwork {
 	double remove_age= Double.parseDouble(socnetConfig.getSocNetLinkRemovalAge());
 	private double degree_saturation_rate= Double.parseDouble(socnetConfig.getDegSat());
 	private Collection<Person> persons;
-	
+
 	// a Collection of all the Links in the network
 	public ArrayList<SocialNetEdge> linksList = new ArrayList<SocialNetEdge>();
 
@@ -53,7 +53,7 @@ public class SocialNetwork {
 	public SocialNetwork(Plans plans) {
 
 		this.persons=plans.getPersons().values();
-		
+
 		if(edge_type.equals("UNDIRECTED")){
 			UNDIRECTED=true;
 		}else if(edge_type.equals("DIRECTED")){
@@ -80,22 +80,114 @@ public class SocialNetwork {
 			log.info("Setting up the " + sNAlgorithmName_ + " algorithm.");
 			initEmptySocialNetwork(plans);
 
+		} else if (sNAlgorithmName_.equals("barabasialbert")) {
+			log.info("Setting up the " + sNAlgorithmName_ + " algorithm.");
+			initBASocialNetwork(plans);
+
 		} else if (sNAlgorithmName_.equals("read")){
 			log.info("Preparing to read in the social network");
 			initReadInNetwork(plans);
-			
+
 		} else {
 			Gbl.errorMsg(" "+ getClass()
 					+ ".run(). Social Network Algorithm > "
 					+ sNAlgorithmName_
 					+ " < is not known. Poor choice of input parameter in module "
 					+ SocNetConfigGroup.GROUP_NAME
-					+ ". Check spelling or choose from: random, wattssmallworld, jingirnew, empty");
+					+ ". Check spelling or choose from: random, wattssmallworld, jingirnew, barabasialbert, empty, read");
+		}
+	}
+
+	private void initBASocialNetwork(Plans plans) {
+		/**
+		 * Generates a Barabasi-Albert scale-free network with random spatial
+		 * distribution and fixed parameters gamma and initial core size, m0.
+		 * 
+		 * 2-3 is typically observed in large growing social networks
+		 * where adding an additional link brings more benefit/cost ratio than adding the first link to
+		 * a node (citation of papers, airline routes, or internet routers, for example).
+		 * The established activities at the node, or flows through the node, or some other
+		 * dynamic in the "market" (say for example, the ease of citing a well-known author who
+		 * was already cited in a paper you've just read, versus searching all available literature for
+		 * the most relevant paper) make this economy of preferential attachment emerge.
+		 * 
+		 * Gamma=2 is the minimum for scale-free percolation. Scale-free means that the minimum spanning
+		 * tree for the phase change to a discontinuous non-percolating network is null (zero nodes).
+		 * 
+		 * M0 is a parameter for the initial number of nodes in the network, here set to 1.
+		 * M is a parameter for the number of links to add each step and must be < m0.
+		 */
+		double gamma = 2.5; //
+		int kbar=Integer.parseInt(socnetConfig.getSocNetKbar()); 
+		int m0= (int) (((double)kbar)/2.); // initial core size
+		int m=m0;// number of links to add each step, m< m0
+//		if(m>m0){
+//			Gbl.errorMsg(this.getClass()+" m must be >= m0");
+//		}
+		double A = 2.*(gamma-2);
+		int E; // number of edges in network each time m links are added
+
+		Person[] personList = new Person[1];
+		personList = plans.getPersons().values().toArray( personList );
+		
+		int maxE = kbar*personList.length;
+
+		log.info("Links the Persons together in UNDIRECTED Barabasi/Albert random graph of Gamma="+gamma+", core="+m0+", Emax="+maxE);
+
+		ArrayList<Person> population = new ArrayList<Person>();
+		for (int i=0;i<personList.length;i++){
+			population.add(personList[i]);
+		}
+
+		//Define the core network of m0 nodes, chosen from personList
+		ArrayList<Person> core = new ArrayList<Person>();
+		for (int ii=0;ii<m0;ii++){
+			int pick=Gbl.random.nextInt(population.size());
+			core.add(population.get(pick));
+			population.remove(pick);
+		}
+
+		//Loop through the remainder of the population and let each one add m new links to the core
+		E=this.getLinks().size();
+		int coreSize = core.size();
+		while(population.size()>0 && E< maxE){
+			Person pI=population.get(Gbl.random.nextInt(population.size()));
+			// Attachment probabilities are based on last iteration
+			boolean met=false;
+			int j=0;
+			while (j<Math.min(m,coreSize)){ // the new member links to this many old members. m < m0
+				int pick=Gbl.random.nextInt(coreSize);//start at a random core member
+				Person pJ = core.get(pick);
+				double pIJ= (pJ.getKnowledge().egoNet.getOutDegree()+A)/(2*E + coreSize*A);
+				if(coreSize==0){
+					pIJ = 1.;
+				}
+				
+
+				if (Gbl.random.nextInt()<pIJ){
+					if(makeSocialContactNotify(pI, pJ, 0, "random")==2){
+					met=true;
+					j++;
+//					log.info(" "+pJ.getId()+" "+pJ.getKnowledge().egoNet.getOutDegree());
+					}
+				}
+				if(met==false){
+					pick=(pick+1)%coreSize;
+					pJ=core.get(pick);
+					pIJ=(pJ.getKnowledge().egoNet.getOutDegree()+A)/(2*E + coreSize*A);
+				}
+			}
+			core.add(pI);// add pI to core
+			coreSize = core.size();
+			population.remove(pI); // remove pI from un-linked population
+			E=this.getLinks().size(); // increase number of edges for pIJ calculation
 		}
 	}
 
 	void initRandomSocialNetwork( Plans plans ){
-
+		/**
+		 * Generates a classical (Erdös/Renyi) undirected random graph of debree kbar
+		 */
 		int kbar = Integer.parseInt(socnetConfig.getSocNetKbar());
 		log.info("Links the Persons together in UNDIRECTED Erdos/Renyi random graph. Dorogovtsev and Mendes 2003.");
 		Person[] personList = new Person[1];
@@ -112,25 +204,35 @@ public class SocialNetwork {
 	}
 
 	void initWattsSocialNetwork( Plans plans ){
-
+		/**
+		 * Not implemented
+		 */
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported.");
 		throw new UnsupportedOperationException();
 	}
 
 	void initJGNSocialNetwork(Plans plans) {
-
+		/**
+		 * Not implemented
+		 */
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported. To generate a similar network, initialize a random network and let a small number of agents introduce friends to each other.");
 		throw new UnsupportedOperationException();
 	}
 
 	void initEmptySocialNetwork( Plans plans) {
-
+		/**
+		 * Unsupported. Use "random" keyword and kbar = 0
+		 */
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported. Use a \"random\" social network instead, with kbar=0");
 		throw new UnsupportedOperationException();
 	}
 
 	void initReadInNetwork(Plans plans){
-
+		/**
+		 * Reads in any social network in the format of socialnetworks.statistics.SocialNetworkStatistics.java.
+		 * Requires a valid plans file.
+		 * Text file containing a mapping of activities to acts must be present for the corresponding plans file if indicated in config.
+		 */
 		String filename = socnetConfig.getInDirName()+ "/edge.txt";
 		new MakeSocialNetworkFromFile(this, plans).read(filename, Integer.valueOf(socnetConfig.getInitIter()).intValue());
 
@@ -223,8 +325,49 @@ public class SocialNetwork {
 		}
 	}
 
+	public int makeSocialContactNotify(Person person1, Person person2, int iteration, String linkType) {
+
+		int status=0;
+		SocialNetEdge newLink;
+		SocialNetEdge newOpposingLink;
+
+		if (!person1.equals(person2)) {
+
+//			NOTE this could be made more efficient by directly accessing
+//			the link and testing for null
+			if(person1.getKnowledge().egoNet.knows(person2)){
+
+				newLink = person1.getKnowledge().egoNet.getEgoLink(person2);
+				newOpposingLink = person2.getKnowledge().egoNet.getEgoLink(person1);
+
+				newLink.setTimeLastUsed(iteration);
+				newLink.setType(linkType);
+				newLink.incrementNumberOfTimesMet();
+				newOpposingLink.setTimeLastUsed(iteration);
+				newOpposingLink.setType(linkType);
+				newOpposingLink.incrementNumberOfTimesMet();
+				status=1; // status=1 means existing link was renewed
+			} else 
+//				They do not know each other, make new link subject to saturation effects	
+				if(Gbl.random.nextDouble()<Math.exp(this.degree_saturation_rate * person1.getKnowledge().egoNet.getOutDegree())){
+					newLink = new SocialNetEdge(person1, person2);
+					addLink(newLink,iteration, linkType);
+					linksList.add(newLink);
+//					New symmetric link if undirected network
+					if(UNDIRECTED){
+						newLink = new SocialNetEdge(person2, person1);
+						addLink(newLink,iteration, linkType);
+					}
+					status=2;// status=2 means the new link was made
+				}else status=3; // status=3 means that the link was not made because the ego is saturated with links
+		}else{
+		status=0; // status=0 means that person1=person2 and no self-links are made
+		}
+		return status;
+	}
+	
 	public void addLink(SocialNetEdge myLink, int iteration){
-		
+
 		myLink.getPersonFrom().getKnowledge().egoNet.addEgoLink(myLink);
 		myLink.setTimeMade(iteration);
 		myLink.setTimeLastUsed(iteration);
@@ -247,7 +390,7 @@ public class SocialNetwork {
 		if (linkRemovalCondition.equals("random")) {
 			log.info("  Removing links older than "+remove_age+" with probability "+remove_p);
 			log.info("  Number of links before removal: "+this.getLinks().size());
-			
+
 			Iterator<SocialNetEdge> it_link = this.getLinks().iterator();
 			while (it_link.hasNext()) {
 				SocialNetEdge myLink = it_link.next();
@@ -257,11 +400,11 @@ public class SocialNetwork {
 				}
 			}
 			log.info("  Number of links after removal: "+(this.getLinks().size()-linksToRemove.size()));
-		
+
 		}else if(linkRemovalCondition.equals("random_node_degree")){
 			// Removal probability proportional to node degree
 			// Implemented in Jin, Girvan, Newman 2001
-			
+
 			log.info("  Removing links older than "+remove_age+" proportional to degree times probability "+remove_p);
 			log.info("  Number of links before removal: "+this.getLinks().size());
 			int maxDeg=this.getMaxDegree();
@@ -275,7 +418,7 @@ public class SocialNetwork {
 				}
 			}
 			log.info("  Number of links after removal: "+(this.getLinks().size()-linksToRemove.size()));
-		
+
 		}else if(linkRemovalCondition.equals("random_link_age")){
 			// Removal probability proportional to edge age
 			log.info("  Removing links proportional to age times probability "+remove_p);
@@ -304,7 +447,7 @@ public class SocialNetwork {
 		// TODO Auto-generated method stub
 		int maxDegree=0;
 		Object myPersons[]= this.getNodes().toArray();
-		
+
 		for(int i=0;i<myPersons.length;i++){
 			Person myPerson = (Person) myPersons[i];
 			int deg= myPerson.getKnowledge().egoNet.getOutDegree();
@@ -343,7 +486,7 @@ public class SocialNetwork {
 	public Collection<Person> getNodes(){
 		return this.persons;
 	}
-	
+
 	public void printLinks() {
 		// Call writer instance (use a config parameter). Options
 		// are XML (pick a DTD and see other XML writers),
@@ -356,7 +499,7 @@ public class SocialNetwork {
 			ii++;
 		}
 	}
-	
+
 	public boolean isUNDIRECTED(){
 		return UNDIRECTED;
 	}
