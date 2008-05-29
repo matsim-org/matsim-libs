@@ -40,6 +40,8 @@ import org.matsim.utils.misc.Time;
  * leg travel time is not modified (e.g. updated according to new expected departure time).
  *
  * @author mrieser
+ * 
+ * Modified to update the mapping between Act and Facility: only works if such a mapping exists, NOT failsafe -- jhackney
  */
 public class SecLocPlanMutateTimeAllocation implements PlanAlgorithmI {
 
