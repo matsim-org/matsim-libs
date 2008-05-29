@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +44,8 @@ import org.matsim.utils.vis.otfivs.opengl.drawer.OTFOGLDrawer.RandomColorizer;
 import com.sun.opengl.util.BufferUtil;
 
 public class OGLAgentPointLayer extends DefaultSceneLayer {
+	private final static int BUFFERSIZE = 25000;
+	
 	private final static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 50.}, new Color[] {
 					Color.RED, Color.YELLOW, Color.GREEN});
@@ -55,16 +58,17 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		public final static RandomColorizer colorizer2 = new RandomColorizer(256);
 
 
-		private static final byte[] colBuf = new byte[5000000*4];
-		private static final float[] vertBuf = new float [5000000*2];
-		
 		public int count = 0;
 		
-		private final ByteBuffer colorsIN =  ByteBuffer.wrap(colBuf);
-		private final FloatBuffer vertexIN =  FloatBuffer.wrap(vertBuf);
+		private ByteBuffer colorsIN;
+		private FloatBuffer vertexIN;
 		
 		private ByteBuffer colors =  null;
 		private FloatBuffer vertex =  null;
+		
+		private final  ArrayList<FloatBuffer> posBuffers= new ArrayList<FloatBuffer>();
+		private final  ArrayList<ByteBuffer> colBuffers= new ArrayList<ByteBuffer>();
+		
 				
 		private final Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
 		
@@ -73,14 +77,12 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		
 		
 		public void onDraw(GL gl) {
-			if ( vertex == null) return ;
+			if (posBuffers.size() == 0) return ;
 			
 			float agentSize = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getAgentSize();
 			
 			//System.out.println("Count veh = " + count);
 
-			colors.position(0);
-			vertex.position(0);
 			
 			gl.glEnable(GL.GL_POINT_SPRITE_ARB);
 
@@ -108,10 +110,16 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			gl.glTexEnvf(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
 			AgentDrawer.carjpg.bind();
 			
-
-	        gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
-	        gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);      
-	        gl.glDrawArrays (GL.GL_POINTS, 0, count);
+			for(int i = 0; i < posBuffers.size(); i++) {
+				colors = colBuffers.get(i);
+				vertex = posBuffers.get(i);
+				int count = vertex.limit() / 2;
+				colors.position(0);
+				vertex.position(0);
+		        gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
+		        gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);      
+		        gl.glDrawArrays (GL.GL_POINTS, 0, count);
+			}
 
 	        gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 	        gl.glDisableClientState (GL.GL_VERTEX_ARRAY); 
@@ -123,6 +131,12 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 
 		public void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){
+			if (count % BUFFERSIZE == 0) {
+				vertexIN = BufferUtil.newFloatBuffer(BUFFERSIZE*2);
+				colorsIN = BufferUtil.newByteBuffer(BUFFERSIZE*4);
+				colBuffers.add(colorsIN);
+				posBuffers.add(vertexIN);
+			}
 			vertexIN.put(startX);
 			vertexIN.put(startY);
 			//vertexIN.put(0.f);
@@ -144,36 +158,39 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 
 		public void compress() {
-			if (vertexIN.position() == 0) return;
-			
-			int newVSize = 0, newCSize = 0;
-			if (vertex != null) {
-				newVSize = vertex.capacity();
-				newCSize = colors.capacity();
-			}
-
-			newVSize += vertexIN.position();
-			newCSize += colorsIN.position();
-			
-			FloatBuffer newVertex = BufferUtil.newFloatBuffer(newVSize);
-			ByteBuffer newColor = BufferUtil.newByteBuffer(newCSize);
-			if (vertex != null) {
-				vertex.position(0);
-				newVertex.put(vertex);
-				colors.position(0);
-				newColor.put(colors);
-			}
 			vertexIN.limit(vertexIN.position());
-			vertexIN.position(0);
-			newVertex.put(vertexIN);
 			colorsIN.limit(colorsIN.position());
-			colorsIN.position(0);
-			newColor.put(colorsIN);
-			
-			colors = newColor;
-			vertex = newVertex;
-			vertexIN.clear();
-			colorsIN.clear();
+//			
+//			if (vertexIN.position() == 0) return;
+//			
+//			int newVSize = 0, newCSize = 0;
+//			if (vertex != null) {
+//				newVSize = vertex.capacity();
+//				newCSize = colors.capacity();
+//			}
+//
+//			newVSize += vertexIN.position();
+//			newCSize += colorsIN.position();
+//			
+//			FloatBuffer newVertex = BufferUtil.newFloatBuffer(newVSize);
+//			ByteBuffer newColor = BufferUtil.newByteBuffer(newCSize);
+//			if (vertex != null) {
+//				vertex.position(0);
+//				newVertex.put(vertex);
+//				colors.position(0);
+//				newColor.put(colors);
+//			}
+//			vertexIN.limit(vertexIN.position());
+//			vertexIN.position(0);
+//			newVertex.put(vertexIN);
+//			colorsIN.limit(colorsIN.position());
+//			colorsIN.position(0);
+//			newColor.put(colorsIN);
+//			
+//			colors = newColor;
+//			vertex = newVertex;
+//			vertexIN.clear();
+//			colorsIN.clear();
 		}
 		
 	}
