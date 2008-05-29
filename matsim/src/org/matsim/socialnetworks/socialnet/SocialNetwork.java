@@ -98,25 +98,31 @@ public class SocialNetwork {
 		}
 	}
 
+	/**
+	 * Generates a Barabasi-Albert scale-free network with random spatial
+	 * distribution and fixed parameters gamma and initial core size, m0.
+	 * 
+	 * Each agent enters the network and constructs on average kbar/2 new edges.
+	 * (average degree is kbar).
+	 * 
+	 * 2-3 is typically observed in large growing social networks
+	 * where adding an additional link brings more benefit/cost ratio than adding the first link to
+	 * a node (citation of papers, airline routes, or internet routers, for example).
+	 * The established activities at the node, or flows through the node, or some other
+	 * dynamic in the "market" (say for example, the ease of citing a well-known author who
+	 * was already cited in a paper you've just read, versus searching all available literature for
+	 * the most relevant paper) make this economy of preferential attachment emerge.
+	 * 
+	 * Gamma=2 is the minimum for scale-free percolation. Scale-free means that the minimum spanning
+	 * tree for the phase change to a discontinuous non-percolating network is null (zero nodes).
+	 * 
+	 * M0 is a parameter for the initial number of nodes in the network, here set to 1.
+	 * M is a parameter for the number of links to add each step and must be < m0.
+	 * 
+	 * @author jhackney
+	 */
 	private void initBASocialNetwork(Plans plans) {
-		/**
-		 * Generates a Barabasi-Albert scale-free network with random spatial
-		 * distribution and fixed parameters gamma and initial core size, m0.
-		 * 
-		 * 2-3 is typically observed in large growing social networks
-		 * where adding an additional link brings more benefit/cost ratio than adding the first link to
-		 * a node (citation of papers, airline routes, or internet routers, for example).
-		 * The established activities at the node, or flows through the node, or some other
-		 * dynamic in the "market" (say for example, the ease of citing a well-known author who
-		 * was already cited in a paper you've just read, versus searching all available literature for
-		 * the most relevant paper) make this economy of preferential attachment emerge.
-		 * 
-		 * Gamma=2 is the minimum for scale-free percolation. Scale-free means that the minimum spanning
-		 * tree for the phase change to a discontinuous non-percolating network is null (zero nodes).
-		 * 
-		 * M0 is a parameter for the initial number of nodes in the network, here set to 1.
-		 * M is a parameter for the number of links to add each step and must be < m0.
-		 */
+
 		double gamma = 2.5; //
 		int kbar=Integer.parseInt(socnetConfig.getSocNetKbar()); 
 		int m0= (int) (((double)kbar)/2.); // initial core size
@@ -130,7 +136,7 @@ public class SocialNetwork {
 		Person[] personList = new Person[1];
 		personList = plans.getPersons().values().toArray( personList );
 		
-		int maxE = kbar*personList.length;
+		int maxE = (int) ((double)kbar/2.)*personList.length;
 
 		log.info("Links the Persons together in UNDIRECTED Barabasi/Albert random graph of Gamma="+gamma+", core="+m0+", Emax="+maxE);
 
@@ -184,10 +190,13 @@ public class SocialNetwork {
 		}
 	}
 
+	/**
+	 * Generates a classical (Erdös/Renyi) undirected random graph of degree kbar
+	 * @author jhackney
+	 * 
+	 */
 	void initRandomSocialNetwork( Plans plans ){
-		/**
-		 * Generates a classical (Erdös/Renyi) undirected random graph of debree kbar
-		 */
+
 		int kbar = Integer.parseInt(socnetConfig.getSocNetKbar());
 		log.info("Links the Persons together in UNDIRECTED Erdos/Renyi random graph. Dorogovtsev and Mendes 2003.");
 		Person[] personList = new Person[1];
@@ -203,36 +212,42 @@ public class SocialNetwork {
 		}
 	}
 
+	/**
+	 * Not implemented
+	 */
 	void initWattsSocialNetwork( Plans plans ){
-		/**
-		 * Not implemented
-		 */
+
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported.");
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Not implemented
+	 */
 	void initJGNSocialNetwork(Plans plans) {
-		/**
-		 * Not implemented
-		 */
+
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported. To generate a similar network, initialize a random network and let a small number of agents introduce friends to each other.");
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Unsupported. Use "random" keyword and kbar = 0
+	 */
 	void initEmptySocialNetwork( Plans plans) {
-		/**
-		 * Unsupported. Use "random" keyword and kbar = 0
-		 */
+
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported. Use a \"random\" social network instead, with kbar=0");
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Reads in any social network in the format of socialnetworks.statistics.SocialNetworkStatistics.java.
+	 * Requires a valid plans file.
+	 * Text file containing a mapping of activities to acts must be present for the corresponding plans file if indicated in config.
+	 * 
+	 * @author jhackney
+	 */
 	void initReadInNetwork(Plans plans){
-		/**
-		 * Reads in any social network in the format of socialnetworks.statistics.SocialNetworkStatistics.java.
-		 * Requires a valid plans file.
-		 * Text file containing a mapping of activities to acts must be present for the corresponding plans file if indicated in config.
-		 */
+
 		String filename = socnetConfig.getInDirName()+ "/edge.txt";
 		new MakeSocialNetworkFromFile(this, plans).read(filename, Integer.valueOf(socnetConfig.getInitIter()).intValue());
 
@@ -254,7 +269,9 @@ public class SocialNetwork {
 	 *                The Person from which the link originates
 	 * @param person2
 	 *                The Person at which the link terminates
-	 * @author J.Hackney
+	 * @param iteration
+	 *                The socializing iteration (iteration of the social network)
+	 * @author jhackney
 	 */
 
 	public void makeSocialContact(Person person1, Person person2, int iteration) {
@@ -289,7 +306,32 @@ public class SocialNetwork {
 				}
 		}
 	}
-
+	/**
+	 * Adds a single directed link from person1 to person2 of type "type".
+	 * If network is
+	 * UNDIRECTED, it adds two links, one link in each direction,
+	 * and records only one link in the links list,
+	 * thus "undirected" rather than "bidirectional" 
+	 * (symmetric network). Prevents
+	 * multiple links and self-linking. Does not impose any other conditions
+	 * on adding the link (do this upon calling the method).
+	 * If a link is altered in
+	 * one direction asymmetrically in another method, this method could cause
+	 * undetected bugs if called again.
+	 * 
+	 * @param person1
+	 *                The Person from which the link originates
+	 * @param person2
+	 *                The Person at which the link terminates
+	 *                
+	 * @param iteration
+	 *                The socializing iteration (iteration of the social network)
+	 *                
+	 * @param linkType
+	 *                The type of social interaction
+	 *                
+	 * @author jhackney
+	 */
 	public void makeSocialContact(Person person1, Person person2, int iteration, String linkType) {
 
 		SocialNetEdge newLink;
@@ -324,7 +366,39 @@ public class SocialNetwork {
 				}
 		}
 	}
-
+	/**
+	 * Adds a single directed link from person1 to person2 of type "type".
+	 * If network is
+	 * UNDIRECTED, it adds two links, one link in each direction,
+	 * and records only one link in the links list,
+	 * thus "undirected" rather than "bidirectional" 
+	 * (symmetric network). Prevents
+	 * multiple links and self-linking. Does not impose any other conditions
+	 * on adding the link (do this upon calling the method).
+	 * If a link is altered in
+	 * one direction asymmetrically in another method, this method could cause
+	 * undetected bugs if called again.
+	 * 
+	 * @param person1
+	 *                The Person from which the link originates
+	 * @param person2
+	 *                The Person at which the link terminates
+	 *                
+	 * @param iteration
+	 *                The socializing iteration (iteration of the social network)
+	 *                
+	 * @param linkType
+	 *                The type of social interaction
+	 *   
+	 *                
+	 * @return int
+	 *              <li>status=0: means that person1=person2. No self-links are made</li>
+	 *              <li>status=1: means existing link was renewed</li>
+	 *              <li>status=2: means the new link was made</li>
+	 *              <li>status=3: means that the link was not made because the ego is saturated with links</li>
+	 *              
+	 * @author jhackney
+	 */
 	public int makeSocialContactNotify(Person person1, Person person2, int iteration, String linkType) {
 
 		int status=0;
@@ -380,6 +454,24 @@ public class SocialNetwork {
 		myLink.setType(linkType);
 	}    
 
+	/**
+	 * Removes links each iteration of the socializing dynamic.
+	 * The linkRemovalCondition determines the algorithm for removing the links,
+	 * using parameters set in the configuration file, see
+	 * {@link org.matsim.config.groups.SocNetConfigGroup.java}.
+	 * 
+	 * Each algorithm uses the parameter remove_age (measured in iterations) as a threshold
+	 * under which no link is removed and above which the algorithm begins processing links.
+	 * 
+	 *  <li>"none": no removal</li>
+	 *  <li>"random": removes links with probability remove_p
+	 *  <li>"random_node_degree" removes links proportional to degree times probability remove_p</li>
+	 *  <li>"random_link_age" removes links proportional to age times probability remove_p</li>
+	 * 
+	 * @param iteration
+	 *                 The iteration of the socializing dynamic
+	 * @author jhackney
+	 */
 	public void removeLinks(int iteration) {
 		// Establish the link removal policy from config parameters and call
 		// method
@@ -435,7 +527,7 @@ public class SocialNetwork {
 			}
 			log.info("  Number of links after removal: "+(this.getLinks().size()-linksToRemove.size()));
 		}else{
-			Gbl.errorMsg("Supported removal algorithms: \"random_link_age\""+", \"random_node_degree\""+", \"random\"");
+			Gbl.errorMsg("Supported removal algorithms: \"none\""+","+"\"random_link_age\""+", \"random_node_degree\""+", \"random\"");
 		}
 
 		// This runs for all removal algorithms
