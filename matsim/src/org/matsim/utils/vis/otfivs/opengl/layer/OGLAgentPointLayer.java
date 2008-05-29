@@ -56,7 +56,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 
 		private static final byte[] colBuf = new byte[5000000*4];
-		private static final float[] vertBuf = new float [5000000*3];
+		private static final float[] vertBuf = new float [5000000*2];
 		
 		public int count = 0;
 		
@@ -71,50 +71,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		public AgentArrayDrawer() {
 		}
 		
-		public void onDraw(GL gl) {
-
-			if ( vertex == null) return ;
-
-			float agentSize = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getAgentSize();
-			//System.out.println("Count veh = " + count);
-			colors.position(0);
-			vertex.position(0);
-			// Query for the max point size supported by the hardware
-			float [] maxSize = {0.0f};
-
-			gl.glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
-			gl.glEnable(GL.GL_POINT_SPRITE_ARB);
-
-			//float quadratic[] = { 0.0f, 0.0f, 0.0001f };
-
-			// DS TODO Chack out ways to make sure extension for gl.glPointParameterf() is given, does not work on Yus Thinkpad
-//			gl.glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
-//			gl.glPointSize(agentSize);
-//			gl.glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 10);
-//			gl.glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, 100);
-			gl.glEnableClientState (GL.GL_COLOR_ARRAY);
-			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
-
-			gl.glPointSize(agentSize/10);
-
-			AgentDrawer.carjpg.enable();
-			gl.glEnable(GL.GL_TEXTURE_2D);
-			gl.glTexEnvf(GL.GL_POINT_SPRITE_NV, GL.GL_COORD_REPLACE_NV, GL.GL_TRUE);
-			AgentDrawer.carjpg.bind();
-			gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
-			gl.glVertexPointer (3, GL.GL_FLOAT, 0, vertex);
-			
-			gl.glDrawArrays (GL.GL_POINTS, 0, count);
-			
-			gl.glDisableClientState (GL.GL_COLOR_ARRAY);
-			gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
-
-			AgentDrawer.carjpg.disable();
-			gl.glDisable(GL.GL_POINT_SPRITE_ARB);
-
-			}
 		
-		public void onDraw2(GL gl) {
+		public void onDraw(GL gl) {
 			if ( vertex == null) return ;
 			
 			float agentSize = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getAgentSize();
@@ -124,29 +82,35 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			colors.position(0);
 			vertex.position(0);
 			
-		    // Query for the max point size supported by the hardware
-		    float [] maxSize = {0.0f};
-		    gl.glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
-
 			gl.glEnable(GL.GL_POINT_SPRITE_ARB);
-		    float quadratic[] =  { 0.0f, 0.0f, 0.0001f };
-		    gl.glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
 
-		    gl.glPointSize(agentSize);
-	        gl.glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 10);
-	        gl.glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, 100);
+
+		    if (gl.isFunctionAvailable("glPointParameterfvARB")) {
+				// Query for the max point size supported by the hardware
+			    float [] maxSize = {0.0f};
+			    gl.glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
+			    float quadratic[] =  { 0.0f, 0.0f, 0.0001f };
+			    gl.glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
+
+			    gl.glPointSize(agentSize);
+		        gl.glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 10);
+		        gl.glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, 100);
+		    	
+		    } else {
+		    	gl.glPointSize(agentSize/10);
+		    }
 			
 	        gl.glEnableClientState (GL.GL_COLOR_ARRAY);
 	        gl.glEnableClientState (GL.GL_VERTEX_ARRAY);   
 	        
 			AgentDrawer.carjpg.enable();
 			gl.glEnable(GL.GL_TEXTURE_2D);
-			gl.glTexEnvf(GL.GL_POINT_SPRITE_NV, GL.GL_COORD_REPLACE_NV, GL.GL_TRUE);
+			gl.glTexEnvf(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
 			AgentDrawer.carjpg.bind();
 			
 
 	        gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
-	        gl.glVertexPointer (3, GL.GL_FLOAT, 0, vertex);      
+	        gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);      
 	        gl.glDrawArrays (GL.GL_POINTS, 0, count);
 
 	        gl.glDisableClientState (GL.GL_COLOR_ARRAY);
@@ -161,7 +125,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		public void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){
 			vertexIN.put(startX);
 			vertexIN.put(startY);
-			vertexIN.put(0.f);
+			//vertexIN.put(0.f);
 			if (saveId) id2coord.put(Arrays.hashCode(id),count);
 			
 			colorsIN.put( (byte)mycolor.getRed());
