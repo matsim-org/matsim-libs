@@ -8,6 +8,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -33,26 +34,23 @@ public class RandomLocationMutator extends PersonAlgorithm implements PlanAlgori
 		final TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
 
 
-		for (int i=0; i<10; i++) {
-			shop_facilities.putAll(facilities.getFacilities("shop_retail_gt2500sqm"));
-			shop_facilities.putAll(facilities.getFacilities("shop_retail_get1000sqm"));
-			shop_facilities.putAll(facilities.getFacilities("shop_retail_get400sqm"));
-			shop_facilities.putAll(facilities.getFacilities("shop_retail_get100sqm"));
-			shop_facilities.putAll(facilities.getFacilities("shop_other"));
-		}
+		shop_facilities.putAll(facilities.getFacilities("shop_retail_gt2500sqm"));
+		shop_facilities.putAll(facilities.getFacilities("shop_retail_get1000sqm"));
+		shop_facilities.putAll(facilities.getFacilities("shop_retail_get400sqm"));
+		shop_facilities.putAll(facilities.getFacilities("shop_retail_get100sqm"));
+		shop_facilities.putAll(facilities.getFacilities("shop_other"));
 
-		for (int i=0; i<10; i++) {
-			leisure_facilities.putAll(facilities.getFacilities("leisure_gastro"));
-			leisure_facilities.putAll(facilities.getFacilities("leisure_culture"));
-			leisure_facilities.putAll(facilities.getFacilities("leisure_sports"));
-		}
+		leisure_facilities.putAll(facilities.getFacilities("leisure_gastro"));
+		leisure_facilities.putAll(facilities.getFacilities("leisure_culture"));
+		leisure_facilities.putAll(facilities.getFacilities("leisure_sports"));
+
 
 		for (int j=0; j<this.nbrChanges; j++) {
 
 			final Facility shop_facility=(Facility)shop_facilities.entrySet().toArray()[
 			           Gbl.random.nextInt(shop_facilities.size()-1)];
 
-			final BasicLinkImpl linkExchangeShop=(BasicLinkImpl)shop_facility.getLink();
+			final Link linkExchangeShop=shop_facility.getLink();
 			System.out.println("link_id"+linkExchangeShop.getId());
 			exchangeLink("s",linkExchangeShop, plan);
 
@@ -66,7 +64,7 @@ public class RandomLocationMutator extends PersonAlgorithm implements PlanAlgori
 	}
 
 
-	public void exchangeLink(final String type, final BasicLinkImpl link, final Plan plan) {
+	public void exchangeLink(final String type, final Link link, final Plan plan) {
 		// modify plan by randomly exchanging a link (facility) in the plan
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
