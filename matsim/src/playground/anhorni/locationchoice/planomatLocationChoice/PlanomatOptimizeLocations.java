@@ -171,10 +171,10 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 
 			// use ordinary DoubleGene encoding with simple crossover and
 			// random mutation, later maybe use a mutator dependent on var mut prob
-			final Gene[] sampleGenes = new Gene[numActs-1];
+			final Gene[] sampleGenes = new Gene[numActs];
 
 			//use IntegerGene
-			// primary act have a fixed location
+			// primary act have a fixed location, TODO --->
 			// check that in scoring function
 			for (int ii=0; ii < sampleGenes.length; ii++) {
 				sampleGenes[ii] = new IntegerGene(jgapConfiguration, 0, shop_array_size-1);
