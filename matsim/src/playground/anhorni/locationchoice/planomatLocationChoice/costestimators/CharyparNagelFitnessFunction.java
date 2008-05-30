@@ -55,7 +55,7 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 
 	final Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 	final TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
-
+	final TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
 
 	public CharyparNagelFitnessFunction(
 			final ScoringFunction sf,
@@ -69,6 +69,18 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 		this.network=network;
 		this.travelCostCalculator=travelCostCalculator;
 		this.travelTimeCalculator=travelTimeCalculator;
+
+
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_gt2500sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get1000sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get400sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get100sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_other"));
+
+		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_gastro"));
+		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_culture"));
+		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_sports"));
+
 	}
 
 	public Plan evaluateLast(final IChromosome a_subject, final Plan plan) {
