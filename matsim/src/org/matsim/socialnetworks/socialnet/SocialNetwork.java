@@ -240,9 +240,11 @@ public class SocialNetwork {
 	}
 
 	/**
-	 * Reads in any social network in the format of socialnetworks.statistics.SocialNetworkStatistics.java.
-	 * Requires a valid plans file.
-	 * Text file containing a mapping of activities to acts must be present for the corresponding plans file if indicated in config.
+	 * Reads in any social network "edge.txt" file in the format of {@link socialnetworks.statistics.SocialNetworkStatistics.java}.
+	 * Requires a valid plans file (thus in the standard configuration where plans are written out every 10 time steps
+	 * or else only at the end of a run, you are restricted to re-starting or loading a social network from these iterations).
+	 * Text file containing a mapping of activities to acts must be present for the corresponding plans file, if
+	 * indicated in the config.xml
 	 * 
 	 * @author jhackney
 	 */
