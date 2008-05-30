@@ -106,7 +106,8 @@ public class AnalysisTest {
 
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network);
-		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(network);
+		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(network, 682845.0,
+				247388.0, 2000.0);
 		LegDistance ld = new LegDistance(network);
 
 		events.addHandler(ctpf);
@@ -151,5 +152,6 @@ public class AnalysisTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		System.out.println("done.");
 	}
 }
