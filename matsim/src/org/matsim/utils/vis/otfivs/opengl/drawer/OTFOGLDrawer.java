@@ -247,6 +247,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 		protected int state;
 
 		public static  Texture  carjpg = null;
+		public static  Texture  wavejpg = null;
 
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			this.id = id;
@@ -459,6 +460,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 		this.mouseMan.init(this.gl);
 
 		AgentDrawer.carjpg = createTexture("res/car.png");
+		AgentDrawer.wavejpg = createTexture("res/icon18.png");
 
 		int test = this.gl.glGetError();
 		System.out.println("GLerror = " + test);

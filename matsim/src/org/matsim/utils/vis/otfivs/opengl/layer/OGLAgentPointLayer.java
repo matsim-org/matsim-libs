@@ -42,6 +42,7 @@ import org.matsim.utils.vis.otfivs.opengl.drawer.OTFOGLDrawer.AgentDrawer;
 import org.matsim.utils.vis.otfivs.opengl.drawer.OTFOGLDrawer.RandomColorizer;
 
 import com.sun.opengl.util.BufferUtil;
+import com.sun.opengl.util.texture.Texture;
 
 public class OGLAgentPointLayer extends DefaultSceneLayer {
 	private final static int BUFFERSIZE = 25000;
@@ -55,13 +56,13 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 					Color.GREEN, Color.YELLOW, Color.RED});
 	
 	public static class AgentArrayDrawer extends OTFGLDrawableImpl {
-		public final static RandomColorizer colorizer2 = new RandomColorizer(256);
+		public final static RandomColorizer colorizer2 = new RandomColorizer(257);
 
 
 		public int count = 0;
 		
-		private ByteBuffer colorsIN;
-		private FloatBuffer vertexIN;
+		private ByteBuffer colorsIN = null;
+		private FloatBuffer vertexIN = null;
 		
 		private ByteBuffer colors =  null;
 		private FloatBuffer vertex =  null;
@@ -71,20 +72,22 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		
 				
 		private final Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
+		protected Texture texture;
 		
 		public AgentArrayDrawer() {
+			
 		}
 		
+		protected void setTexture() {
+			this.texture = AgentDrawer.carjpg;
+		}
 		
-		public void onDraw(GL gl) {
-			if (posBuffers.size() == 0) return ;
-			
+		protected void setAgentSize() {
 			float agentSize = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getAgentSize();
 			
 			//System.out.println("Count veh = " + count);
 
 			
-			gl.glEnable(GL.GL_POINT_SPRITE_ARB);
 
 
 		    if (gl.isFunctionAvailable("glPointParameterfvARB")) {
@@ -102,13 +105,23 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		    	gl.glPointSize(agentSize/10);
 		    }
 			
+		}
+		
+		public void onDraw(GL gl) {
+			if (posBuffers.size() == 0) return ;
+			gl.glEnable(GL.GL_POINT_SPRITE_ARB);
+		
+			setAgentSize();
+			
 	        gl.glEnableClientState (GL.GL_COLOR_ARRAY);
 	        gl.glEnableClientState (GL.GL_VERTEX_ARRAY);   
 	        
-			AgentDrawer.carjpg.enable();
+	        setTexture();
+	        
+			texture.enable();
 			gl.glEnable(GL.GL_TEXTURE_2D);
 			gl.glTexEnvf(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
-			AgentDrawer.carjpg.bind();
+			texture.bind();
 			
 			for(int i = 0; i < posBuffers.size(); i++) {
 				colors = colBuffers.get(i);
@@ -124,7 +137,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	        gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 	        gl.glDisableClientState (GL.GL_VERTEX_ARRAY); 
 
-	        AgentDrawer.carjpg.disable();
+	        texture.disable();
 	        
 	        gl.glDisable(GL.GL_POINT_SPRITE_ARB);
 		
@@ -158,6 +171,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 
 		public void compress() {
+			if (vertexIN == null) return;
+			
 			vertexIN.limit(vertexIN.position());
 			colorsIN.limit(colorsIN.position());
 //			
@@ -209,19 +224,31 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 		
 	}
+	
+	public class AgentPadangDrawer  extends AgentPointDrawer {
+		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
+			@Override
+			protected void setAgentSize(){gl.glPointSize(500);};
+			@Override
+			protected void setTexture(){this.texture = AgentDrawer.wavejpg;};
+		};
+		
+	}
 
-	public class AgentPadangRegionDrawer extends AgentPointDrawer {
+	public class AgentPadangRegionDrawer extends AgentPadangDrawer {
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			drawer.addAgent(id, startX, startY, AgentArrayDrawer.colorizer2.getColor(user), false);
+			if (user !=-1) drawer.addAgent(id, startX, startY, AgentArrayDrawer.colorizer2.getColor(user), false);
+			else drawerWave.addAgent(id, startX, startY, Color.BLUE, false);
 		}
 	
 	}
 
-	public class AgentPadangTimeDrawer extends AgentPointDrawer {
+	public class AgentPadangTimeDrawer extends AgentPadangDrawer {
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			drawer.addAgent(id, startX, startY, colorizer3.getColor(state),false);
+			if (user != -1) drawer.addAgent(id, startX, startY, colorizer3.getColor(state),false);
+			else drawerWave.addAgent(id, startX, startY, Color.BLUE,false);
 		}
 	
 	}
@@ -234,6 +261,9 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	@Override
 	public void draw() {
 		drawer.draw();
+
+		regiondrawer.drawerWave.draw();
+		timedrawer.drawerWave.draw();
 	}
 
 	@Override
