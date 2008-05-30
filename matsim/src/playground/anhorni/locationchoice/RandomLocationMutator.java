@@ -72,6 +72,7 @@ public class RandomLocationMutator extends PersonAlgorithm implements PlanAlgori
 				// plans: link, coords
 				// facilities: coords
 				// => use coords
+				act.setLink(null);
 				act.setCoord(facility.getCenter());
 			}
 		}

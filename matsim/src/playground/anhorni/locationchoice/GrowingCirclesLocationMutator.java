@@ -302,6 +302,7 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 				final Act act = (Act)act_it.next();
 				if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
 					final Facility f = this.getFacility(coord1,coord2,radius,act.getType());
+					act.setLink(null);
 					act.setCoord(f.getCenter());
 				}
 			}

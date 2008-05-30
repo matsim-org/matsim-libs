@@ -138,7 +138,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 		Genotype jgapGAPopulation = null;
 
 		// TODO: final int popSize = PlanomatConfig.getPopSize();
-		final int popSize = 1000;
+		final int popSize = 50;
 
 		// put all the parameters in the config file later
 	    final Id [] shop_array = shop_facilities.keySet().toArray(
@@ -214,7 +214,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 
 		final double travelPenalty = Math.abs(Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling"))) / 3600;
 		// TODO: final double minDiff = travelPenalty * PlanomatConfig.getIndifference();
-		final double minDiff = travelPenalty * 0.001;
+		final double minDiff = travelPenalty * 0.1;
 
 		IChromosome fittest = null;
 		final double avg = 0;
@@ -331,6 +331,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 				// plans: link, coords
 				// facilities: coords
 				// => use coords
+				act.setLink(null);
 				act.setCoord(facility.getCenter());
 			}
 		}
