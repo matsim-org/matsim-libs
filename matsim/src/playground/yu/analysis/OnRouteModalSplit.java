@@ -113,6 +113,10 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 		this(binSize, 30 * 3600 / binSize + 1, network, plans);
 	}
 
+	public OnRouteModalSplit(NetworkLayer network, Plans plans) {
+		this(300, network, plans);
+	}
+
 	/* Implementation of eventhandler-Interfaces */
 
 	public void handleEvent(final EventAgentDeparture event) {
@@ -136,14 +140,13 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 		allCount[binIdx]++;
 		ae.rebuild(this.plans, this.network);
 		Plan.Type planType = ae.agent.getSelectedPlan().getType();
+		if (Integer.parseInt(ae.agentId) > 1000000000)
+			otherCount[binIdx]++;
 		if (planType.equals(Plan.Type.CAR)) {
 			carCount[binIdx]++;
 		} else if (planType.equals(Plan.Type.PT)) {
 			if (ptCount != null)
 				ptCount[binIdx]++;
-		} else {
-			if (Integer.parseInt(ae.agentId) > 1000000000)
-				otherCount[binIdx]++;
 		}
 	}
 
@@ -292,12 +295,12 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 		double[] onRoute = new double[length];
 		double[] carOnRoute = new double[length];
 		double[] ptOnRoute = new double[length];
-		double[] otherOnRoute=new double[length];
+		double[] otherOnRoute = new double[length];
 		for (int i = 0; i < length; i++) {
 			onRoute[i] = this.onRoute[i];
 			carOnRoute[i] = this.carOnRoute[i];
 			ptOnRoute[i] = this.ptOnRoute[i];
-			otherOnRoute[i]=this.otherOnRoute[i];
+			otherOnRoute[i] = this.otherOnRoute[i];
 		}
 		onRouteChart.addSeries("all agents on route", category, onRoute);
 		onRouteChart.addSeries("drivers on route", category, carOnRoute);

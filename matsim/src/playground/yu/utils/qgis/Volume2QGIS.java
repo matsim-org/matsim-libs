@@ -83,27 +83,28 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 	 */
 	public static void main(String[] args) {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
-		// String netFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
-		String netFilename = "test/yu/test/equil_net.xml";
+		//		String netFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
+		// String netFilename = "test/yu/test/equil_net.xml";
+		String netFilename = "../swiss-advest/ch.cut.640000.200000.740000.310000.xml";
+		// ////////////////////////////////////////
+		// MATSimNet2QGIS.setFlowCapFactor(0.1);
+		// //////////////////////////////////////
 		/*
 		 * ///////////////////////////////////////////////////////////////
 		 * Traffic Volumes and MATSim-network to Shp-file // *
 		 * ///////////////////////////////////////////////////////////////
 		 */
-		// mn2q
-		// .readNetwork("../schweiz-ivtch/network/ivtch-osm-wu-flama-noUetli.xml");
-		mn2q.readNetwork(netFilename);
-		mn2q.setCrs(ch1903);
-		NetworkLayer net = mn2q.getNetwork();
-		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		// MATSimNet2QGIS.setFlowCapFactor(0.1);
-		mn2q.readEvents("test/yu/test/events.txt", va);
-		List<Map<Id, Integer>> vols = createVolumes(net, va);
-		for (int i = 0; i < 24; i++) {
-			mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
-					vols.get(i));
-		}
-		mn2q.writeShapeFile("test/yu/test/gunnar-volumes.shp");
+		// mn2q.readNetwork(netFilename);
+		// mn2q.setCrs(ch1903);
+		// NetworkLayer net = mn2q.getNetwork();
+		// VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+		// mn2q.readEvents("../runs/run474/250.events.txt.gz", va);
+		// List<Map<Id, Integer>> vols = createVolumes(net, va);
+		// for (int i = 0; i < 24; i++) {
+		// mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
+		// vols.get(i));
+		// }
+		// mn2q.writeShapeFile("../runs/run474/250.volumes.shp");
 		/*
 		 * //////////////////////////////////////////////////////////////
 		 * Differenz of Traffic Volumes and MATSim-network to Shp-file
@@ -131,22 +132,23 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 		// }
 		// mn2q.writeShapeFile("test/yu/ivtch/468.500-467.500.shp");
 		/*
-		 * ////////////////////////////////////////////////////////////////////////////////
-		 * Shp-file with 25 Layers //////////////////////////
+		 * /////////////////////////////////////////////////////////////////////
+		 * Shp-file with 25 Layers
+		 * ////////////////////////////////////////////////////////////////////////
 		 */
-		// mn2q.readNetwork(netFilename);
-		// mn2q.setCrs(ch1903);
-		// mn2q.writeShapeFile("test/yu/test/1000.net.shp");
-		// VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1,
-		// mn2q.network);
-		// mn2q.readEvents("test/yu/test/1000.events.txt.gz", va);
-		// List<Map<Id, Integer>> vols = createVolumes(mn2q.network, va);
-		// for (int i = 0; i < 24; i++) {
-		// Volume2QGIS v2q = new Volume2QGIS();
-		// v2q.setCrs(ch1903, mn2q.network, mn2q.crs);
-		// String index = "vol" + i + "-" + (i + 1) + "h";
-		// v2q.addParameter(index, Integer.class, vols.get(i));
-		// v2q.writeShapeFile("test/yu/test/1000." + index + ".shp");
-		// }
+		mn2q.readNetwork(netFilename);
+		mn2q.setCrs(ch1903);
+		mn2q.writeShapeFile("../runs/run478/qgis/478.net.shp");
+		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1,
+				mn2q.network);
+		mn2q.readEvents("../runs/run478/99.events.txt.gz", va);
+		List<Map<Id, Integer>> vols = createVolumes(mn2q.network, va);
+		for (int i = 0; i < 24; i++) {
+			Volume2QGIS v2q = new Volume2QGIS();
+			v2q.setCrs(ch1903, mn2q.network, mn2q.crs);
+			String index = "vol" + i + "-" + (i + 1) + "h";
+			v2q.addParameter(index, Integer.class, vols.get(i));
+			v2q.writeShapeFile("../runs/run478/qgis/99." + index + ".shp");
+		}
 	}
 }

@@ -49,7 +49,7 @@ import org.matsim.utils.io.IOUtils;
  */
 public class PtcheckControler extends Controler {
 
-	public PtcheckControler(String[] configFileName) {
+	public PtcheckControler(final String[] configFileName) {
 		super(configFileName);
 	}
 
@@ -68,7 +68,7 @@ public class PtcheckControler extends Controler {
 		private LegDistance ld = null;
 		private CalcLinkAvgSpeed clas = null;
 
-		public void notifyStartup(StartupEvent event) {
+		public void notifyStartup(final StartupEvent event) {
 			Controler ctl = event.getControler();
 			Config cf = ctl.getConfig();
 			try {
@@ -95,7 +95,7 @@ public class PtcheckControler extends Controler {
 			events.addHandler(ctpf);
 		}
 
-		public void notifyIterationEnds(IterationEndsEvent event) {
+		public void notifyIterationEnds(final IterationEndsEvent event) {
 			int it = event.getIteration();
 			Controler ctl = event.getControler();
 			if (it % 10 == 0) {
@@ -121,8 +121,8 @@ public class PtcheckControler extends Controler {
 									+ "\t"
 									+ cas.getNetAvgSpeed()
 									+ "\t"
-									+ (((rp != null) && (rp
-											.getRoadPricingScheme() != null)) ? rp
+									+ (rp != null
+											&& rp.getRoadPricingScheme() != null ? rp
 											.getRoadPricingScheme()
 											.getCostArray()[0].amount
 											+ "\t"
@@ -157,7 +157,7 @@ public class PtcheckControler extends Controler {
 			}
 		}
 
-		public void notifyShutdown(ShutdownEvent event) {
+		public void notifyShutdown(final ShutdownEvent event) {
 			try {
 				ptRateWriter.close();
 			} catch (IOException e) {
@@ -165,26 +165,25 @@ public class PtcheckControler extends Controler {
 			}
 		}
 
-		public void notifyIterationStarts(IterationStartsEvent event) {
+		public void notifyIterationStarts(final IterationStartsEvent event) {
 			Controler c = event.getControler();
 			Events es = c.getEvents();
 			NetworkLayer nl = c.getNetwork();
 			Plans ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
-				orms = new OnRouteModalSplit(300, nl, ps);
+				orms = new OnRouteModalSplit(nl, ps);
 				es.addHandler(orms);
-				ttms = new TravelTimeModalSplit(300, nl, ps);
+				ttms = new TravelTimeModalSplit(nl, ps);
 				es.addHandler(ttms);
-				ld = new LegDistance(300, nl);
+				ld = new LegDistance(nl);
 				es.addHandler(ld);
 				clas = new CalcLinkAvgSpeed(nl, 682845.0, 247388.0, 2000.0);
 				es.addHandler(clas);
 				c.getConfig().simulation().setSnapshotPeriod(300);
-			} else if (event.getIteration() == c.getFirstIteration()) {
+			} else if (event.getIteration() == c.getFirstIteration())
 				c.getConfig().simulation().setSnapshotPeriod(300);
-			} else {
+			else
 				c.getConfig().simulation().setSnapshotPeriod(0);
-			}
 		}
 	}
 

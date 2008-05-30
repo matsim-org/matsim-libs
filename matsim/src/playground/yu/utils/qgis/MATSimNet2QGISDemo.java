@@ -33,13 +33,16 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 
 	public static void main(String[] args) {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
+		MATSimNet2QGIS.setFlowCapFactor(0.1);
 		// ///////////////////////////////////////////////////
 		// write MATSim-network to Shp-file
 		// ///////////////////////////////////////////////////
-		// mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm.xml");
-		mn2q.readNetwork("./test/yu/test/equil_net_test.xml");
+		mn2q
+				.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu-flama.xml");
+		// mn2q.readNetwork("./test/yu/test/equil_net_test.xml");
 		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile("./test/yu/test/equil_net_test/equil_net_test.shp");
+		mn2q
+				.writeShapeFile("../runs/run467/compare/ivtch-osm-wu-flama.shp");
 		System.out.println("done.");
 	}
 }

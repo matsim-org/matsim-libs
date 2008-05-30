@@ -43,7 +43,7 @@ import org.matsim.utils.misc.Time;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class LegDistance implements EventHandlerLinkEnterI,
 		EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
@@ -97,6 +97,10 @@ public class LegDistance implements EventHandlerLinkEnterI,
 		this(binSize, 30 * 3600 / binSize + 1, network);
 	}
 
+	public LegDistance(NetworkLayer network) {
+		this(300, network);
+	}
+
 	public void handleEvent(EventLinkEnter event) {
 		String linkId = event.linkId;
 		Link l = this.network.getLink(linkId);
@@ -142,9 +146,10 @@ public class LegDistance implements EventHandlerLinkEnterI,
 					.write("time\ttimeBin\tlegistances [m]\tn._Legs\tavg. legDistance [m]\n");
 
 			for (int i = 0; i < this.legDistances.length; i++) {
-				bw.write(Time.writeTime(i * this.binSize) + "\t" + i * this.binSize
-						+ "\t" + this.legDistances[i] + "\t" + this.legCount[i] + "\t"
-						+ this.legDistances[i] / this.legCount[i] + "\n");
+				bw.write(Time.writeTime(i * this.binSize) + "\t" + i
+						* this.binSize + "\t" + this.legDistances[i] + "\t"
+						+ this.legCount[i] + "\t" + this.legDistances[i]
+						/ this.legCount[i] + "\n");
 			}
 			bw.write("----------------------------------------\n");
 			double legDistSum = 0.0;
@@ -176,8 +181,8 @@ public class LegDistance implements EventHandlerLinkEnterI,
 				this.legDistances);
 		legDistanceSumChart.saveAsPng(filename + "Sum.png", 1024, 768);
 		for (int i = 0; i < xsLength - 1; i++) {
-			this.legDistances[i] = (this.legCount[i] == 0) ? 0.0 : this.legDistances[i]
-					/ this.legCount[i];
+			this.legDistances[i] = (this.legCount[i] == 0) ? 0.0
+					: this.legDistances[i] / this.legCount[i];
 		}
 		XYLineChart avgLegDistanceChart = new XYLineChart(
 				"average LegDistance", "time", "average legDistances [m]");

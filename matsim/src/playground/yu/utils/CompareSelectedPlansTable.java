@@ -4,20 +4,23 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicPlan.Type;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
+import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * it is a copy of <class>org.matsim.run.CompareSelectedPlansTable</class>,
- * only some small changes were taken
+ * only some small changes were taken.
  * 
  */
 public class CompareSelectedPlansTable {
@@ -28,8 +31,8 @@ public class CompareSelectedPlansTable {
 			+ "score0;score1;s1-s0;relativScoreDiff;"
 			+ "plantraveltime0;plantraveltime1;t1-t0;"
 			+ "plantraveldistance0;plantraveldistance1;d1-d0;"
-			// +"plantype0;plantype1;change;"
-			// +"departuretime0;departuretime1;dt1-dt0;"
+			+ "plantype0;plantype1;planTypeChange;"
+			+ "departuretime0;departuretime1;dt1-dt0;"
 			+ "numberoftrips0;numberoftrips1;n1-n0";
 	private NetworkLayer network;
 
@@ -74,11 +77,17 @@ public class CompareSelectedPlansTable {
 	}
 
 	private void writeSummaryFile(String outfile) {
+		XYScatterChart chart = new XYScatterChart("Score differences",
+				"score0", "score1");
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(this.header);
 			out.newLine();
-
+			double[] score0s = new double[this.plans0.getPersons().size()];
+			double[] score1s = new double[this.plans0.getPersons().size()];
+			double[] absDiffs = new double[this.plans0.getPersons().size()];
+			double[] relativeDiffs = new double[this.plans0.getPersons().size()];
+			int i = 0;
 			for (Id person_id : this.plans0.getPersons().keySet()) {
 
 				// method person.toString() not appropriate
@@ -109,11 +118,16 @@ public class CompareSelectedPlansTable {
 
 				double s0 = person.getSelectedPlan().getScore();
 				out.write(s0 + ";");
+				score0s[i] = s0;
 				Person person_comp = this.plans1.getPerson(person_id);
 				double s1 = person_comp.getSelectedPlan().getScore();
 				out.write(s1 + ";");
+				score1s[i] = s1;
+
 				out.write(Double.toString(s1 - s0) + ";");
+				absDiffs[i] = s1 - s0;
 				out.write(Double.toString((s1 - s0) / Math.abs(s0)) + ";");
+				relativeDiffs[i] = (s1 - s0) / Math.abs(s0);
 
 				double t0 = this.getTravelTime(person);
 				out.write(t0 + ";");
@@ -127,9 +141,25 @@ public class CompareSelectedPlansTable {
 				out.write(d1 + ";");
 				out.write(Double.toString(d1 - d0) + ";");
 
-				// TODO plantype
-				// Plan.Type type0=person.getSelectedPlan().getType();
-				// TODO departuretime
+				Type type0 = person.getSelectedPlan().getType();
+				String tp0 = ((type0.equals(Type.CAR) || type0.equals(Type.PT)) ? type0
+						: "-").toString();
+				out.write(tp0 + ";");
+				Type type1 = person_comp.getSelectedPlan().getType();
+				String tp1 = ((type1.equals(Type.CAR) || type1.equals(Type.PT)) ? type1
+						: "-").toString();
+				out.write(tp1 + ";");
+				out.write(tp0 + "->" + tp1 + ";");
+
+				Act fa0 = person.getSelectedPlan().getFirstActivity();
+				double dpt0 = fa0.getEndTime();
+				boolean hact0 = fa0.getType().startsWith("h");
+				out.write((hact0 ? dpt0 : 0.0) + ";");
+				Act fa1 = person_comp.getSelectedPlan().getFirstActivity();
+				double dpt1 = fa1.getEndTime();
+				boolean hact1 = fa1.getType().startsWith("h");
+				out.write((hact1 ? dpt1 : 0.0) + ";");
+				out.write(((hact0 && hact1) ? (dpt1 - dpt0) : 0.0) + ";");
 
 				int n0 = this.getNumberOfTrips(person);
 				out.write(n0 + ";");
@@ -139,8 +169,16 @@ public class CompareSelectedPlansTable {
 
 				out.newLine();
 				out.flush();
+
+				i++;
 			}
 			out.close();
+			chart.addSeries("score0<->score1", score0s, score1s);
+			chart.addSeries("score0<->absolute score differences", score0s,
+					absDiffs);
+			chart.addSeries("score0<->relative score differences", score0s,
+					relativeDiffs);
+			chart.saveAsPng(outfile + "s0-s1.png", 1024, 768);
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}

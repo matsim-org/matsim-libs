@@ -27,11 +27,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.analysis.CalcAverageTripLength;
-import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -40,89 +36,116 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
-import org.matsim.roadpricing.CalcPaidToll;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.World;
-import org.xml.sax.SAXException;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class AnalysisTest {
+	private static void printUsage() {
+		System.out.println();
+		System.out.println("AnalysisTest:");
+		System.out.println("----------------");
+		System.out
+				.println("Create an additional analysis for the runs, which were done with only org.matsim.controler.Controler");
+		System.out.println();
+		System.out.println("usage: AnalysisTest args");
+		System.out
+				.println(" arg 0: name incl. path to net file (.xml[.gz])(required)");
+		System.out
+				.println(" arg 1: name incl. to events file (.txt[.gz])(required)");
+		System.out.println(" arg 2: path to output file (.txt[.gz])(required)");
+		System.out
+				.println(" arg 3: name incl. path to plans file (.xml[.gz])(optional)");
+		System.out.println("----------------");
+	}
+
+	private static BufferedWriter writer;
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		final String netFilename = "./test/yu/analysis/input/ch.xml";
-		final String plansFilename = "./test/yu/analysis/input/100ITERs_pt-6t-12output_plans.xml";
-		final String rpFilename = "./test/yu/analysis/input/rpZH1_05.xml";
-		final String eventsFilename = "./test/yu/analysis/input/100.events_pt-6t-12.txt";
-		final String outputFilename = "./test/yu/analysis/output/outputPt-6t-12.txt";
-		Config config = Gbl.createConfig(new String[] { "./test/yu/analysis/analysisConfig.xml" });
+	public static void main(final String[] args) {
+		if (args.length < 3) {
+			printUsage();
+			System.exit(0);
+		}
 
-		World world = Gbl.getWorld();
+		final String netFilename = args[0];
+		final String eventsFilename = args[1];
+		final String outputpath = args[2];
+		String plansFilename = null;
+		if (args.length == 4)
+			plansFilename = args[3];
+
+		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
+		Gbl.getWorld().setNetworkLayer(network);
 
-		Plans population = new Plans();
-		CalcAverageTripLength catl = new CalcAverageTripLength();
-		population.addAlgorithm(catl);
-		PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(plansFilename);
-		population.runAlgorithms();
+		OnRouteModalSplit orms = null;
+		TravelTimeModalSplit ttms = null;
+		CalcAverageTripLength catl = null;
+
+		if (plansFilename != null) {
+			Plans plans = new Plans();
+
+			catl = new CalcAverageTripLength();
+			plans.addAlgorithm(catl);
+
+			PlansReaderI plansReader = new MatsimPlansReader(plans);
+			plansReader.readFile(plansFilename);
+			plans.runAlgorithms();
+
+			orms = new OnRouteModalSplit(network, plans);
+			ttms = new TravelTimeModalSplit(network, plans);
+		}
 
 		Events events = new Events();
 
-		RoadPricingScheme toll = new RoadPricingScheme(network);
-		CalcAverageTolledTripLength cattl = null;
-		if (rpFilename != null) {
-			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(
-					network);
-			try {
-				rpReader.parse(rpFilename);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			toll = rpReader.getScheme();
-			CalcPaidToll cpt = new CalcPaidToll(network, toll);
-			cattl = new CalcAverageTolledTripLength(network, toll);
-			events.addHandler(cpt);
-			events.addHandler(cattl);
-		}
-
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network);
+		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(network);
+		LegDistance ld = new LegDistance(network);
 
 		events.addHandler(ctpf);
 		events.addHandler(cas);
+		events.addHandler(clas);
+		events.addHandler(ld);
+
+		if (orms != null)
+			events.addHandler(orms);
+		if (ttms != null)
+			events.addHandler(ttms);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
+		if (orms != null) {
+			orms.write(outputpath + "onRoute.txt.gz");
+			orms.writeCharts(outputpath + "onRoute.png");
+		}
+		if (ttms != null) {
+			ttms.write(outputpath + "traveltimes.txt.gz");
+			ttms.writeCharts(outputpath + "traveltimes");
+		}
+		clas.write(outputpath + "avgSpeed.txt.gz");
+		clas.writeChart(outputpath + "avgSpeedCityArea.png");
+		ld.write(outputpath + "legDistances.txt.gz");
+		ld.writeCharts(outputpath + "legDistances");
+
 		try {
-			BufferedWriter out = IOUtils.getBufferedWriter(outputFilename);
-			out.write("netsfile:\t" + netFilename + "\neventsfile:\t"
-					+ eventsFilename + "\nplansfile:\t" + plansFilename
-					+ "\nroadpricingfile:\t" + rpFilename + "\n");
-			out.write("avg. trip length:\t" + catl.getAverageTripLength()
-					+ "\t[m]\n");
-			if (cattl != null)
-				out.write("avg. tolled trip length:\t"
-						+ cattl.getAverageTripLength() + "\t[m]\n");
-			out.write("traffic performance:\t" + ctpf.getTrafficPerformance()
-					+ "\t[Pkm]\n");
-			out
-					.write("avg. travel Speed:\t" + cas.getNetAvgSpeed()
-							+ "\t[km/h]\n");
-			out.close();
+			writer = IOUtils.getBufferedWriter(outputpath + "output.txt");
+			writer.write("netfile:\t" + netFilename + "\neventsFile:\t"
+					+ eventsFilename + "\noutputpath:\t" + outputpath + "\n");
+			if (catl != null)
+				writer.write("avg. Trip length:\t"
+						+ catl.getAverageTripLength() + " [m]\n");
+			writer.write("traffic performance:\t"
+					+ ctpf.getTrafficPerformance() + " [Pkm]\n");
+			writer.write("avg. speed of the total network:\t"
+					+ cas.getNetAvgSpeed() + " [km/h]\n");
+			writer.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

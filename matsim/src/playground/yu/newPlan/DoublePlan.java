@@ -52,7 +52,7 @@ public class DoublePlan extends NewPlan {
 	public void run(Person person) {
 		pw.writePerson(person);
 		// produce new Person with bigger Id
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 17; i++) {
 			newPersonId = Integer.parseInt(person.getId().toString()) + 1000;
 			person.setId(Integer.toString(newPersonId));
 			pw.writePerson(person);

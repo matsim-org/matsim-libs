@@ -51,7 +51,7 @@ public class TXTExtractor {
 		System.out.println();
 		System.out.println("usage: TXTExtractor args");
 		System.out.println(" arg 0: path to the old .txt-file (required)");
-		System.out.println(" arg 1: the old .txt-file (required)");
+		System.out.println(" arg 1: path to the new .txt-file (required)");
 		System.out.println(" arg 2: the specified sequence of char values (required)");
 		System.out.println("----------------");
 	}
