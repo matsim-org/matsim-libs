@@ -45,15 +45,19 @@ public class RandomLocationMutator extends PersonAlgorithm implements PlanAlgori
 
 		for (int j=0; j<this.nbrChanges; j++) {
 
-			final Facility shop_facility=(Facility)shop_facilities.values().toArray()[
-			           Gbl.random.nextInt(shop_facilities.size()-1)];
+			if (shop_facilities.size()>0) {
+				final Facility shop_facility=(Facility)shop_facilities.values().toArray()[
+				           Gbl.random.nextInt(shop_facilities.size()-1)];
 
-			exchangeFacility("s",shop_facility, plan);
+				exchangeFacility("s",shop_facility, plan);
+			}
 
-			final Facility leisure_facility=(Facility)leisure_facilities.values().toArray()[
- 			           Gbl.random.nextInt(leisure_facilities.size()-1)];
+			if (leisure_facilities.size()>0) {
+				final Facility leisure_facility=(Facility)leisure_facilities.values().toArray()[
+	 			           Gbl.random.nextInt(leisure_facilities.size()-1)];
 
-			exchangeFacility("l",leisure_facility, plan);
+				exchangeFacility("l",leisure_facility, plan);
+			}
 		}
 	}
 
@@ -73,10 +77,13 @@ public class RandomLocationMutator extends PersonAlgorithm implements PlanAlgori
 		}
 
 		// loop over all <leg>s, remove route-information
+		// routing is done after location choice
+
 		for (int j = 1; j < actslegs.size(); j=j+2) {
 			final Leg leg = (Leg)actslegs.get(j);
 			leg.setRoute(null);
 		}
+
 	}
 
 

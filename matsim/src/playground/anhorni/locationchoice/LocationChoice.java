@@ -26,8 +26,6 @@ import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 
-import playground.anhorni.locationchoice.planomatLocationChoice.PlanomatOptimizeLocations;
-
 
 public class LocationChoice extends MultithreadedModuleA {
 
@@ -52,9 +50,9 @@ public class LocationChoice extends MultithreadedModuleA {
 
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
-		//return new RandomLocationMutator();
+		return new RandomLocationMutator();
 		//return new GrowingCirclesLocationMutator();
-		return new PlanomatOptimizeLocations(this.network, this.travelCostCalc, this.travelTimeCalc);
+		//return new PlanomatOptimizeLocations(this.network, this.travelCostCalc, this.travelTimeCalc);
 	}
 
 

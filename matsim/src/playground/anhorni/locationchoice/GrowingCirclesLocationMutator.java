@@ -20,6 +20,7 @@
 
 package playground.anhorni.locationchoice;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -28,6 +29,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
+import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
@@ -303,6 +305,13 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 					act.setCoord(f.getCenter());
 				}
 			}
+
+			final ArrayList<?> actslegs = plan.getActsLegs();
+			for (int j = 1; j < actslegs.size(); j=j+2) {
+				final Leg leg = (Leg)actslegs.get(j);
+				leg.setRoute(null);
+			}
+
 		}
 	}
 
