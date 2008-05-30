@@ -37,7 +37,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
-import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.PlansCalcRouteDijkstra;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.ScoringFunction;
@@ -101,8 +101,9 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 		}
 
 		// calculate new route --------------
-		final PlansCalcRouteLandmarks router=new PlansCalcRouteLandmarks(
-				this.network, null , this.travelCostCalculator, this.travelTimeCalculator);
+
+		final PlansCalcRouteDijkstra router=new PlansCalcRouteDijkstra(
+				this.network, this.travelCostCalculator, this.travelTimeCalculator);
 		router.run(this.plan);
 
 		// do the scoring
