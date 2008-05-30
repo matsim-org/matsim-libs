@@ -62,7 +62,7 @@ public class PersonCreatePlanFromKnowledge extends PersonAlgorithm {
 
 			// first act (= home)
 			p.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),0.0,time,time,false);
-			p.createLeg(0,"car",time,0.0,time);
+			p.createLeg("car",time,0.0,time);
 
 			int nof_acts = 1 + Gbl.random.nextInt(3);
 			int dur = 12*3600/nof_acts;
@@ -74,7 +74,7 @@ public class PersonCreatePlanFromKnowledge extends PersonAlgorithm {
 				Facility f = act.getFacility();
 				p.createAct(act.getType(),f.getCenter().getX(),f.getCenter().getY(),f.getLink(),time,(time+dur),dur,false);
 				time += dur;
-				p.createLeg(i+1,"car",time,0.0,time);
+				p.createLeg("car",time,0.0,time);
 			}
 
 			// last act (= home)

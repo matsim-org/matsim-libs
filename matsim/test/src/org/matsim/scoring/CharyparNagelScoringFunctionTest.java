@@ -94,10 +94,10 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 		this.plan = this.person.createPlan(null, "yes");
 		try {
 			this.plan.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", null);
-			Leg leg = this.plan.createLeg(null, "car", "07:00:00", "00:30:00", null);
+			Leg leg = this.plan.createLeg("car", "07:00:00", "00:30:00", null);
 			leg.createRoute("25000", "00:30:00");
 			this.plan.createAct("w", (String)null, null, "3", "07:30:00", "16:00:00", "08:30:00", null);
-			leg = this.plan.createLeg(null, "pt", "16:00:00", "00:15:00", null);
+			leg = this.plan.createLeg("pt", "16:00:00", "00:15:00", null);
 			leg.createRoute("20000", "00:15:00");
 			this.plan.createAct("h", (String)null, null, "5", "16:15:00", null, null, null);
 		} catch (Exception e) {

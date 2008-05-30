@@ -34,12 +34,10 @@ public class Leg extends BasicLegImpl implements Serializable{
 
 	private static final long serialVersionUID = 5123937717277263980L;
 
-	public Leg(final String num, final String mode, final String depTime, final String travTime, final String arrTime) {
-		if (num != null) {
-			this.num = Integer.parseInt(num);
-			if (this.num < 0) {
-				throw new NumberFormatException("A Leg's num has to be an  integer >= 0.");
-			}
+	public Leg(final int num, final String mode, final String depTime, final String travTime, final String arrTime) {
+		this.num = num;
+		if (this.num < 0) {
+			throw new NumberFormatException("A Leg's num has to be an  integer >= 0.");
 		}
 		this.mode = mode.intern();
 		if (depTime != null) {
@@ -63,9 +61,9 @@ public class Leg extends BasicLegImpl implements Serializable{
 		this.setTravTime(travTime);
 		this.setArrTime(arrTime);
 	}
-	
+
 	/**
-	 * Makes a deep copy of this leg, however only when the Leg has a route which is 
+	 * Makes a deep copy of this leg, however only when the Leg has a route which is
 	 * instance of Route or BasicRoute. Other route instances are not considered.
 	 * @param leg
 	 */
@@ -76,13 +74,13 @@ public class Leg extends BasicLegImpl implements Serializable{
 		this.setTravTime(leg.getTravTime());
 		this.setArrTime(leg.getArrTime());
 		if (leg.route instanceof Route) {
-			this.route = new Route((Route) leg.route);	
+			this.route = new Route((Route) leg.route);
 		}
 		else {
 			this.route = new BasicRouteImpl<BasicNodeImpl>();
 			this.route.setRoute(leg.getRoute().getRoute());
 		}
-		
+
 	}
 
 	//////////////////////////////////////////////////////////////////////

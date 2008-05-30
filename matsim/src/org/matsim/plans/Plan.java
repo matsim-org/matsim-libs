@@ -89,22 +89,17 @@ public class Plan extends BasicPlanImpl {
 		return a;
 	}
 
-	public final Leg createLeg(final String num, final String mode, final String depTime,
-														 final String travTime, final String arrTime) throws Exception {
+	public final Leg createLeg(final String mode, final String depTime, final String travTime,
+														 final String arrTime) throws Exception {
 		verifyCreateLeg();
-		String legnum = num;
-		if (num == null) {
-			// Override leg number with an appropriate value if no number was give
-			int legnumber = (this.actsLegs.size()-1) /2;
-			legnum = Integer.toString(legnumber);
-		}
-		Leg l = new Leg(legnum, mode, depTime, travTime, arrTime);
+		int legnumber = (this.actsLegs.size()-1) /2;
+		Leg l = new Leg(legnumber, mode, depTime, travTime, arrTime);
 		this.actsLegs.add(l);
 		return l;
 	}
 
-	public final Leg createLeg(final int num, final String mode, final double depTime,
-			 final double travTime, final double arrTime) throws Exception {
+	public final Leg createLeg(final String mode, final double depTime, final double travTime,
+			 final double arrTime) throws Exception {
 		verifyCreateLeg();
 		// Override leg number with an appropriate value
 		int legnum = (this.actsLegs.size()-1) /2;
@@ -267,7 +262,7 @@ public class Plan extends BasicPlanImpl {
 
 	//////////////////////////////////////////////////////////////////////
 	// query methods
-	//////////////// 
+	////////////////
 	@Override
 	public final boolean isSelected() {
 		return this.person.getSelectedPlan() == this;
@@ -300,7 +295,7 @@ public class Plan extends BasicPlanImpl {
 				} else {
 					// Leg
 					Leg l = (Leg) actl.get(i);
-					Leg l2 = createLeg(l.getNum(), l.getMode(), l.getDepTime(), l.getTravTime(),l.getArrTime());
+					Leg l2 = createLeg(l.getMode(), l.getDepTime(), l.getTravTime(), l.getArrTime());
 					if (l.getRoute() != null) {
 						Route r = new Route(l.getRoute());
 						l2.setRoute(r);

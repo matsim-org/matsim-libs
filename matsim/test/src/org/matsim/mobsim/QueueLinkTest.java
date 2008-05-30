@@ -131,7 +131,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Plan plan = p.createPlan(null, "yes");
 		try {
 			plan.createAct("h", 0.0, 0.0, link1, 0.0, 0.0, 0.0, false);
-			Leg leg = plan.createLeg(0, "car", 0.0, 1.0, 1.0);
+			Leg leg = plan.createLeg("car", 0.0, 1.0, 1.0);
 			Route route = leg.createRoute("1", "00:00:01");
 			route.setRoute("2");
 			leg.setRoute(route);

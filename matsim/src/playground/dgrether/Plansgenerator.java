@@ -69,14 +69,14 @@ public class Plansgenerator {
 			homeEndtime += 0.5 * 60;
 			plan.createAct("h", "-25000", "0", "1", null, Integer.toString(homeEndtime), null, null);
 			//leg to work
-			Leg leg = plan.createLeg("1", "car", null, null, null);
+			Leg leg = plan.createLeg("car", null, null, null);
 			Route route = new Route();
 			route.setRoute("2 4 5");
 			leg.setRoute(route);
 			//work
 			plan.createAct("w", "10000", "0", "20", null, null, "2:30", "true");
 			//leg to work
-			leg = plan.createLeg("2", "car", null, null, null);
+			leg = plan.createLeg("car", null, null, null);
 			route = new Route();
 			route.setRoute("13 14 15 1");
 			leg.setRoute(route);

@@ -229,7 +229,7 @@ public class PersonSetActChains extends PersonAlgorithm {
 		for (int j=1; j<acttypes.length; j++) {
 			try {
 				if (j != 1) {
-					p.createLeg(Integer.toString(leg_cnt),"car",null,null,null);
+					p.createLeg("car",null,null,null);
 					leg_cnt++;
 				}
 				p.createAct(acttypes[j],"-1","-1",null,"00:00:00", "00:00:00", "00:00:00", null);

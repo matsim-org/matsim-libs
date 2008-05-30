@@ -157,7 +157,7 @@ public class Fixture {
 		Plan plan = new Plan(person);
 		person.addPlan(plan);
 		plan.createAct("h", (String)null, null, homeLink, "00:00", startTime, startTime, "no");
-		Leg leg = plan.createLeg("1", "car", startTime, "00:01", null);
+		Leg leg = plan.createLeg("car", startTime, "00:01", null);
 		Route route = new Route();
 		route.setRoute(routeNodes);
 		leg.setRoute(route);
@@ -170,9 +170,9 @@ public class Fixture {
 		Plan plan = new Plan(person);
 		person.addPlan(plan);
 		plan.createAct("h", (String)null, null, homeLink, "00:00", startTime, startTime, "no");
-		plan.createLeg("1", "car", startTime, "00:01", null);
+		plan.createLeg("car", startTime, "00:01", null);
 		plan.createAct("w", (String)null, null, workLink, null, "16:00", "08:00", "no");
-		plan.createLeg("2", "car", "16:00", null, null);
+		plan.createLeg("car", "16:00", null, null);
 		plan.createAct("h", (String)null, null, finishLink, null, "24:00", "00:00", "no");
 		return person;
 	}

@@ -64,7 +64,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Person person = new Person(new IdImpl("1"));
 		Plan plan = person.createPlan(null, "yes");
 		plan.createAct("h", (String)null, (String)null, "0", "00:00:00", "08:00:00", null, null);
-		Leg leg = plan.createLeg(null, "car", "08:00:00", "00:02:00", null);
+		Leg leg = plan.createLeg("car", "08:00:00", "00:02:00", null);
 		plan.createAct("w", (String)null, (String)null, "5", null, null, null, null);
 		Route route = new Route();
 		leg.setRoute(route);

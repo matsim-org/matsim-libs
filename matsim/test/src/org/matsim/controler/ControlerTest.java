@@ -74,7 +74,7 @@ public class ControlerTest extends MatsimTestCase {
 			person1 = new Person(new IdImpl(1));
 			Plan plan1 = person1.createPlan(null, "yes");
 			plan1.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
-			Leg leg1 = plan1.createLeg("0", "car", "07:00:00", "00:00:00", null);
+			Leg leg1 = plan1.createLeg("car", "07:00:00", "00:00:00", null);
 			Route route1 = leg1.createRoute(null, null);
 			route1.setRoute("2 3");
 			plan1.createAct("h", (String)null, null, "3", "07:00:00", null, null, "no");
@@ -83,7 +83,7 @@ public class ControlerTest extends MatsimTestCase {
 			Person person2 = new Person(new IdImpl(2));
 			Plan plan2 = person2.createPlan(null, "yes");
 			plan2.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
-			Leg leg2 = plan2.createLeg("0", "car", "07:00:00", "00:00:00", null);
+			Leg leg2 = plan2.createLeg("car", "07:00:00", "00:00:00", null);
 			Route route2 = leg2.createRoute(null, null);
 			route2.setRoute("2 3");
 			plan2.createAct("h", (String)null, null, "3", "07:00:00", null, null, "no");
@@ -168,13 +168,13 @@ public class ControlerTest extends MatsimTestCase {
 			// --- plan 1 ---
 			Plan plan1 = person1.createPlan(null, "yes");
 			plan1.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
-			leg1 = plan1.createLeg("0", "car", "07:00:00", "00:00:00", null);
+			leg1 = plan1.createLeg("car", "07:00:00", "00:00:00", null);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
 			plan1.createAct("h", (String)null, null, "3", "07:00:00", null, null, "no");
 			// --- plan 2 ---
 			Plan plan2 = person1.createPlan(null, "yes");
 			plan2.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
-			leg2 = plan2.createLeg("0", "car", "07:00:00", "00:00:00", null);
+			leg2 = plan2.createLeg("car", "07:00:00", "00:00:00", null);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
 			plan2.createAct("h", (String)null, null, "3", "07:00:00", null, null, "no");
 			population.addPerson(person1);
@@ -247,13 +247,13 @@ public class ControlerTest extends MatsimTestCase {
 			// --- plan 1 ---
 			Plan plan1 = person1.createPlan(null, "yes");
 			act1a = plan1.createAct("h", "-50.0", "10.0", null, "00:00:00", "07:00:00", "07:00:00", "no");
-			leg1 = plan1.createLeg("0", "car", "07:00:00", "00:00:00", null);
+			leg1 = plan1.createLeg("car", "07:00:00", "00:00:00", null);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
 			act1b = plan1.createAct("h", "1075.0", "-10.0", null, "07:00:00", null, null, "no");
 			// --- plan 2 ---
 			Plan plan2 = person1.createPlan(null, "yes");
 			act2a = plan2.createAct("h", "-50.0", "-10.0", null, "00:00:00", "07:00:00", "07:00:00", "no");
-			leg2 = plan2.createLeg("0", "car", "07:00:00", "00:00:00", null);
+			leg2 = plan2.createLeg("car", "07:00:00", "00:00:00", null);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
 			act2b = plan2.createAct("h", "1111.1", "10.0", null, "07:00:00", null, null, "no");
 			population.addPerson(person1);

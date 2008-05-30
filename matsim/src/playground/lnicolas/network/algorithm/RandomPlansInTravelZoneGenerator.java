@@ -129,7 +129,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 	private void addTrip(final Plan plan, final Link toLink, final int id) {
 		try {
 			if (id != 0) {
-				plan.createLeg(Integer.toString(id), "car", null, null, null);
+				plan.createLeg("car", null, null, null);
 			}
 
 			// Get random link

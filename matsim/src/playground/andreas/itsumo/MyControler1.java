@@ -113,7 +113,7 @@ public class MyControler1 extends Controler {
 			try {
 				Plan plan1 = new Plan(p);
 				plan1.createAct("h", 100., 100., this.network.getLink("9"), 0., 0*60*60., 0., true);
-				Leg leg = plan1.createLeg("1", "car", null, null, null);
+				Leg leg = plan1.createLeg("car", null, null, null);
 				Route route = new Route();
 				route.setRoute("3 4");
 				leg.setRoute(route);
@@ -122,7 +122,7 @@ public class MyControler1 extends Controler {
 
 				Plan plan2 = new Plan(p);
 				plan2.createAct("h", 100., 100., this.network.getLink("9"), 0., 0*60*60., 0., true);
-				Leg leg2 = plan2.createLeg("1", "car", null, null, null);
+				Leg leg2 = plan2.createLeg("car", null, null, null);
 				Route route2 = new Route();
 				route2.setRoute("3 6 4");
 				leg2.setRoute(route2);
@@ -310,7 +310,7 @@ public class MyControler1 extends Controler {
 		Plan plan = new Plan(p);
 		try {
 			plan.createAct("h", 100., 100., sourceLink, 0., 0*60*60., 0., true);
-			plan.createLeg("1", "car", null, null, null);
+			plan.createLeg("car", null, null, null);
 			plan.createAct("h", 200., 200., destLink, 8*60*60, 0., 0., true);
 
 			p.addPlan(plan);

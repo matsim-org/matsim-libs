@@ -141,8 +141,8 @@ public class PlansReaderMatsimV1 extends MatsimXmlParser implements PlansReaderI
 
 	private void startLeg(final Attributes atts) {
 		try {
-			this.currleg = this.currplan.createLeg(atts.getValue("num"), atts.getValue("mode"), atts.getValue("dep_time"),
-					atts.getValue("trav_time"), atts.getValue("arr_time"));
+			this.currleg = this.currplan.createLeg(atts.getValue("mode"), atts.getValue("dep_time"), atts.getValue("trav_time"),
+					atts.getValue("arr_time"));
 		} catch (Exception e) {
 			Gbl.errorMsg(e);
 		}

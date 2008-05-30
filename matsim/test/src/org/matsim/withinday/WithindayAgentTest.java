@@ -136,7 +136,7 @@ public class WithindayAgentTest extends TestCase {
 		this.leg = null;
 		try {
 			this.plan.createAct("h", 0.0, 0.0, homeLink, "00:00", "00:00", "00:00", "false");
-			this.leg = this.plan.createLeg(null, "car", "00:00", "00:00", "00:00");
+			this.leg = this.plan.createLeg("car", "00:00", "00:00", "00:00");
 			this.plan.createAct("work", 0.0, 0.0, workLink, "00:00", "00:00", "00:00", "false");
 		} catch (Exception e) {
 			e.printStackTrace();

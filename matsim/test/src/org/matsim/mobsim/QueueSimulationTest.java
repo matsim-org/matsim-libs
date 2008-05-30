@@ -77,7 +77,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Person person = new Person(new IdImpl(0));
 			Plan plan = person.createPlan(null, "yes");
 			plan.createAct("h", 199.0, 0.0, link1, 0, 6*3600-500, 6*3600-500, false);
-			Leg leg = plan.createLeg(1, "car", 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Leg leg = plan.createLeg("car", 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 			Route route = new Route();
 			route.setRoute("2 3");
 			leg.setRoute(route);
@@ -99,7 +99,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 				 * So, the start time is 7*3600 - 1800 - 102 = 7*3600 - 1902
 				 */
 				plan.createAct("h", 99.0, 0.0, link1, 0, 7*3600-1902, 7*3600-1902, false);
-				leg = plan.createLeg(1, "car", 7*3600-1902, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+				leg = plan.createLeg("car", 7*3600-1902, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 				route = new Route();
 				route.setRoute("2 3");
 				leg.setRoute(route);
@@ -164,7 +164,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Person person = new Person(new IdImpl(0));
 			Plan plan = person.createPlan(null, "yes");
 			plan.createAct("h", 199.0, 0.0, link1, 0, 6*3600-500, 6*3600-500, false);
-			Leg leg = plan.createLeg(1, "car", 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Leg leg = plan.createLeg("car", 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 			Route route = new Route();
 			route.setRoute("2 3");
 			leg.setRoute(route);
@@ -176,7 +176,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 				person = new Person(new IdImpl(i));
 				plan = person.createPlan(null, "yes");
 				plan.createAct("h", 99.0, 0.0, link2, 0, 7*3600 - 1801, 7*3600 - 1801, false);
-				leg = plan.createLeg(1, "car", 7*3600 - 1801, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+				leg = plan.createLeg("car", 7*3600 - 1801, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 				route = new Route();
 				route.setRoute("3");
 				leg.setRoute(route);
@@ -240,7 +240,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Person person = new Person(new IdImpl(0));
 			Plan plan = person.createPlan(null, "yes");
 			plan.createAct("h", 199.0, 0.0, link1, 0, 6*3600-500, 6*3600-500, false);
-			Leg leg = plan.createLeg(1, "car", 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Leg leg = plan.createLeg("car", 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 			Route route = new Route();
 			route.setRoute("2 3");
 			leg.setRoute(route);
@@ -252,7 +252,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 				person = new Person(new IdImpl(i));
 				plan = person.createPlan(null, "yes");
 				plan.createAct("h", 99.0, 0.0, link2, 0, 7*3600 - 1801, 7*3600 - 1801, false);
-				leg = plan.createLeg(1, "car", 7*3600 - 1801, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+				leg = plan.createLeg("car", 7*3600 - 1801, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 				route = new Route();
 				route.setRoute("3");
 				leg.setRoute(route);
@@ -264,7 +264,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 				person = new Person(new IdImpl(i));
 				plan = person.createPlan(null, "yes");
 				plan.createAct("h", 99.0, 0.0, link1, 0, 7*3600 - 1902, 7*3600 - 1902, false);
-				leg = plan.createLeg(1, "car", 7*3600 - 1902, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+				leg = plan.createLeg("car", 7*3600 - 1902, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 				route = new Route();
 				route.setRoute("2 3");
 				leg.setRoute(route);
@@ -390,12 +390,12 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Person person = new Person(new IdImpl(0));
 			Plan plan = person.createPlan(null, "yes");
 			plan.createAct("h", 199.0, 0.0, link1, 0, 8*3600, 8*3600, false);
-			Leg leg = plan.createLeg(0, "car", 8*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Leg leg = plan.createLeg("car", 8*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 			Route route = new Route();
 			route.setRoute(nodes);
 			leg.setRoute(route);
 			plan.createAct("w", 99.0, 0.0, link5, 8*3600, 9*3600, Time.UNDEFINED_TIME, true);
-			leg = plan.createLeg(1, "car", 9*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			leg = plan.createLeg("car", 9*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 			route = new Route();
 			route.setRoute("6");
 			leg.setRoute(route);

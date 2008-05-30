@@ -43,7 +43,7 @@ public class GeneratePlans {
 	 * @param net
 	 */
 
-	public static void createCOOPERSSpecificVehicles(Plans plans2, NetworkLayer net) {
+	public static void createCOOPERSSpecificVehicles(final Plans plans2, final NetworkLayer net) {
 		// Erzeuge einen strom von vehicles, die die autobahn runter wollen
 		Link startLink1 = net.getLinks().get("7829");
 		Link startLink2 = net.getLinks().get("8453");
@@ -68,7 +68,7 @@ public class GeneratePlans {
 			Act actstart = new Act("h", 0,0, startLink, 0, endTime, endTime, false);
 			Act actEnd = new Act("h", 0,0, destLink, arrivalTime, arrivalTime + 3*3600, 3*3600, false);
 
-			Leg leg = new Leg("0", "car", "00","00","00");
+			Leg leg = new Leg(0, "car", "00","00","00");
 			org.matsim.plans.Route route = dijkstra.calcLeastCostPath(startLink.getToNode(), destLink.getFromNode(), endTime);
 			if (route == null) throw new RuntimeException("No route found from node 2 to 22");
 			leg.setRoute(route);

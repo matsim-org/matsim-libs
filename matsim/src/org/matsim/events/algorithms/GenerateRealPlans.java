@@ -137,9 +137,9 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 
 			Leg leg;
 			if (event.leg != null) {
-				leg = plan.createLeg(1, event.leg.getMode(), time, Integer.MIN_VALUE, Integer.MIN_VALUE);
+				leg = plan.createLeg(event.leg.getMode(), time, Integer.MIN_VALUE, Integer.MIN_VALUE);
 			} else {
-				leg = plan.createLeg(1, "car", time, Integer.MIN_VALUE, Integer.MIN_VALUE); // maybe get the leg mode from oldplans if available?
+				leg = plan.createLeg("car", time, Integer.MIN_VALUE, Integer.MIN_VALUE); // maybe get the leg mode from oldplans if available?
 			}
 
 			leg.setDepTime(time);
@@ -165,7 +165,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 			if (plan.getActsLegs().size() % 2 != 0) {
 				// not all agents must get stuck on a trip: if the simulation is ended early, some agents may still be doing some activity
 				// insert for those a dummy leg so we can safely create the stuck-act afterwards
-				Leg leg = plan.createLeg(1, event.leg.getMode(), time, 0., time);
+				Leg leg = plan.createLeg(event.leg.getMode(), time, 0., time);
 				finishLeg(event.agentId, leg);
 			}
 			if (event.link == null) {

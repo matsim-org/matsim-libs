@@ -100,7 +100,7 @@ public class PlansGeneratorControler extends Controler {
 		Plan plan = new Plan(p);
 		try {
 			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60., Time.UNDEFINED_TIME, true);
-			plan.createLeg("1", "car", null, null, null);
+			plan.createLeg("car", null, null, null);
 			plan.createAct("h", 200., 200., toLink, 8 * 60 * 60, 0., 0., true);
 
 			p.addPlan(plan);

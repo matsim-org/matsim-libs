@@ -469,7 +469,7 @@ public class MyRunsRouting extends MyRuns {
 				plan.createAct("h", (Double)null, null, links.get(choice).getId().toString(),
 						null, 6*3600+"", null, "false");
 
-				plan.createLeg(Integer.toString(j), "car", null, null, null);
+				plan.createLeg("car", null, null, null);
 
 				// Get random link
 				choice = (int) (Math.random() * links.size());

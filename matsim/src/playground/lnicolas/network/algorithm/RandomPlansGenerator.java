@@ -232,7 +232,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		int startTime = (int) (Gbl.random.nextDouble() * 60*60*24);
 		try {
 			plan.createAct("w", -1, -1, fromLink, startTime, 0, 0, false);
-			plan.createLeg("0", "car", null, null, null);
+			plan.createLeg("car", null, null, null);
 			Link toLink = toNode.getInLinks().values().iterator().next();
 			int endTime = (int) (Gbl.random.nextDouble() * 60*60*2);
 			plan.createAct("w", -1, -1, toLink, startTime + endTime, 0, 0, false);

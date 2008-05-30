@@ -194,7 +194,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			Person person = new Person(new IdImpl(i + (int)depTime));
 			Plan plan1 = person.createPlan(null, "yes");
 			plan1.createAct("h", 0, 0, depLink, 0.0, depTime, depTime, false);
-			Leg leg1 = plan1.createLeg(0, "car", depTime, 10, depTime + 10);
+			Leg leg1 = plan1.createLeg("car", depTime, 10, depTime + 10);
 			Route route = new Route();
 			route.setRoute("2 3");
 			leg1.setRoute(route);

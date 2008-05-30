@@ -100,7 +100,7 @@ public class PersonCreateFakePlanFromKnowledge extends PersonAlgorithm {
 				int leg_cnt = 0;
 				Act act = p.createAct(home.getType(),home.getFacility().getCenter().getX(),home.getFacility().getCenter().getY(),null,start_time,end_time,end_time,true);
 				act.setFacility(home.getFacility());
-				p.createLeg(leg_cnt,"car",end_time,0.0,end_time);
+				p.createLeg("car",end_time,0.0,end_time);
 				leg_cnt++;
 				
 				if (work!=null) {
@@ -110,7 +110,7 @@ public class PersonCreateFakePlanFromKnowledge extends PersonAlgorithm {
 					sum_dur = sum_dur + (end_time-start_time);
 					act = p.createAct(work.getType(),work.getFacility().getCenter().getX(),work.getFacility().getCenter().getY(),null,start_time,end_time,(end_time-start_time),true);
 					act.setFacility(work.getFacility());
-					p.createLeg(leg_cnt,"car",end_time,0.0,end_time);
+					p.createLeg("car",end_time,0.0,end_time);
 					leg_cnt++;
 				}
 				
@@ -121,7 +121,7 @@ public class PersonCreateFakePlanFromKnowledge extends PersonAlgorithm {
 					sum_dur = sum_dur + (end_time-start_time);
 					act = p.createAct(educ.getType(),educ.getFacility().getCenter().getX(),educ.getFacility().getCenter().getY(),null,start_time,end_time,(end_time-start_time),true);
 					act.setFacility(educ.getFacility());
-					p.createLeg(leg_cnt,"car",end_time,0.0,end_time);
+					p.createLeg("car",end_time,0.0,end_time);
 					leg_cnt++;
 				}
 				start_time = end_time;

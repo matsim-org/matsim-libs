@@ -199,7 +199,7 @@ public class PlansReaderKutter implements PlansReaderI {
 			return p;
 		}
 
-		private final void handleActivity(final int acttype, final int cellid, final int legmode, final int legnum) {
+		private final void handleActivity(final int acttype, final int cellid, final int legmode) {
 			String mode = this.legModes[legmode];
 
 			int arrTime = this.currTime;
@@ -227,7 +227,7 @@ public class PlansReaderKutter implements PlansReaderI {
 				}
 
 				if (!skipActivity) {
-					this.currPlan.createLeg(legnum, mode, this.currTime, travTime, arrTime);
+					this.currPlan.createLeg(mode, this.currTime, travTime, arrTime);
 					this.currTime = this.currTime + duration;
 					Act act = this.currPlan.createAct(activity, coord.getX(), coord.getY(), null/*link*/, arrTime, this.currTime, duration, false);
 					act.setRefId(cellid);
@@ -294,7 +294,7 @@ public class PlansReaderKutter implements PlansReaderI {
 				Gbl.errorMsg(e);
 			}
 
-			handleActivity(acttype, cellid, legmode, 1);
+			handleActivity(acttype, cellid, legmode);
 
 			if (acttype == 99) {
 				return;	// the person went home
@@ -304,7 +304,7 @@ public class PlansReaderKutter implements PlansReaderI {
 			cellid = Integer.parseInt(row[6]);
 			legmode = Integer.parseInt(row[7]);
 
-			handleActivity(acttype, cellid, legmode, 2);
+			handleActivity(acttype, cellid, legmode);
 
 			if (acttype == 99) {
 				return;	// the person went home
@@ -314,7 +314,7 @@ public class PlansReaderKutter implements PlansReaderI {
 			cellid = Integer.parseInt(row[9]);
 			legmode = Integer.parseInt(row[10]);
 
-			handleActivity(acttype, cellid, legmode, 3);
+			handleActivity(acttype, cellid, legmode);
 
 			if (acttype == 99) {
 				return;	// the person went home
@@ -324,14 +324,14 @@ public class PlansReaderKutter implements PlansReaderI {
 			cellid = Integer.parseInt(row[12]);
 			legmode = Integer.parseInt(row[13]);
 
-			handleActivity(acttype, cellid, legmode, 4);
+			handleActivity(acttype, cellid, legmode);
 
 			if (acttype == 99) {
 				return;	// the person went home
 			}
 
 			// if the person went not yet home, send it home now
-			handleActivity(99, cellid, legmode, 5); // cellid will be ignored, because the person goes home (there is only one home!)
+			handleActivity(99, cellid, legmode); // cellid will be ignored, because the person goes home (there is only one home!)
 		}
 
 		public final void startRow(final String[] row) {

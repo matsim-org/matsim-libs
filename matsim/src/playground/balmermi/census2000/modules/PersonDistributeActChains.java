@@ -224,7 +224,7 @@ public class PersonDistributeActChains extends PersonAlgorithm implements PlanAl
 				int end_time = time_sum;
 				try {
 					plan.createAct(type,0.0,0.0,null,start_time,end_time,dur,primary);
-					plan.createLeg(i/2,UNDEF,end_time,0,end_time);
+					plan.createLeg(UNDEF,end_time,0,end_time);
 				}
 				catch (Exception e) { Gbl.errorMsg(e); }
 			}
