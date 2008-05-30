@@ -49,7 +49,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.PlansCalcRouteDijkstra;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunction;
@@ -315,8 +315,8 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 		}
 
 		// calculate new route --------------
-		final PlansCalcRouteLandmarks router=new PlansCalcRouteLandmarks(
-				network, null , travelCostCalculator, travelTimeCalculator);
+		final PlansCalcRouteDijkstra router=new PlansCalcRouteDijkstra(
+				network, travelCostCalculator, travelTimeCalculator);
 		router.run(plan);
 		// invalidate score information
 		plan.setScore(Double.NaN);
