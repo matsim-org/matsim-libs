@@ -42,7 +42,18 @@ public class LocationChoice extends MultithreadedModuleA {
 			final TravelCostI travelCostCalc,
 			final TravelTimeI travelTimeCalc ) {
 
+		this.init(network, travelCostCalc,travelTimeCalc );
+	}
+
+
+	private void init(
+			final NetworkLayer network,
+			final TravelCostI travelCostCalc,
+			final TravelTimeI travelTimeCalc) {
+
+
 		this.network=network;
+		this.network.connect();
 		this.travelCostCalc=travelCostCalc;
 		this.travelTimeCalc=travelTimeCalc;
 	}
@@ -50,8 +61,8 @@ public class LocationChoice extends MultithreadedModuleA {
 
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
-		return new RandomLocationMutator(this.network);
-		//return new GrowingCirclesLocationMutator(this.network);
+		//return new RandomLocationMutator(this.network);
+		return new GrowingCirclesLocationMutator(this.network);
 		//return new PlanomatOptimizeLocations(this.network, this.travelCostCalc, this.travelTimeCalc);
 	}
 }

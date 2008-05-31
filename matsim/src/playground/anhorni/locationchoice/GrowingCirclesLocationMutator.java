@@ -75,6 +75,7 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 	private void init(final NetworkLayer network) {
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
+		this.network=network;
 		this.buildShopFacQuadTree();
 		this.buildLeisFacQuadTree();
 		this.buildEducFacQuadTree();
@@ -284,6 +285,7 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 				final Act act = (Act)act_it.next();
 				if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
 					final Facility f = this.getFacility(home_coord,radius,act.getType());
+					act.setLink(this.network.getNearestLink(f.getCenter()));
 					act.setCoord(f.getCenter());
 				}
 			}
