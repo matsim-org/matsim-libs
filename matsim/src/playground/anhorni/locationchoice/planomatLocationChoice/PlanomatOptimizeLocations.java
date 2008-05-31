@@ -62,7 +62,7 @@ import playground.anhorni.locationchoice.planomatLocationChoice.costestimators.C
  */
 public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 
-	private final NetworkLayer network;
+	private NetworkLayer network=null;
 	private TravelTimeI travelTimeCalculator = null;
 	private TravelCostI travelCostCalculator = null;
 
@@ -74,6 +74,13 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 			final TravelCostI travelCostCalculator,
 			final TravelTimeI travelTimeCalculator) {
 		super();
+		this.init(network, travelCostCalculator, travelTimeCalculator);
+
+	}
+
+	private void init(final NetworkLayer network, final TravelCostI travelCostCalculator,
+			final TravelTimeI travelTimeCalculator) {
+
 		this.network=network;
 		this.travelCostCalculator=travelCostCalculator;
 		this.travelTimeCalculator=travelTimeCalculator;
@@ -91,6 +98,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 		this.leisure_facilities.putAll(facilities.getFacilities("leisure_sports"));
 	}
 
+
 	public void run(final Plan plan) {
 
 		// distinguish for optimization tools
@@ -100,16 +108,15 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 
 		*/
 			final Genotype initialGAPopulation =
-				PlanomatOptimizeLocations.initJGAP(
+				this.initJGAP(
 						plan,
 						this.network,
 						this.travelCostCalculator,
 						this.travelTimeCalculator,
 						this.shop_facilities);
 
-			final IChromosome fittest = PlanomatOptimizeLocations
-				.evolveAndReturnFittest(initialGAPopulation);
-			PlanomatOptimizeLocations.writeChromosome2Plan(
+			final IChromosome fittest = this.evolveAndReturnFittest(initialGAPopulation);
+			this.writeChromosome2Plan(
 					fittest,
 					plan,
 					this.shop_facilities,
@@ -129,7 +136,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 	 * @param estimator
 	 * @return the initial population of GA individuals ready for evolution
 	 */
-	private static Genotype initJGAP(final Plan plan,
+	private Genotype initJGAP(final Plan plan,
 			final NetworkLayer network,
 			final TravelCostI travelCostCalculator,
 			final TravelTimeI travelTimeCalculator,
@@ -210,7 +217,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 	 * @param population the initial GA population that serves as breed for evolution
 	 * @return the fittest individual after evolution
 	 */
-	private static IChromosome evolveAndReturnFittest(final Genotype population) {
+	private IChromosome evolveAndReturnFittest(final Genotype population) {
 
 		final double travelPenalty = Math.abs(Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling"))) / 3600;
 		// TODO: final double minDiff = travelPenalty * PlanomatConfig.getIndifference();
@@ -264,7 +271,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 		return fittest;
 	}
 
-	private static double getAverageFitness(final Genotype population) {
+	private double getAverageFitness(final Genotype population) {
 
 		double averageFitness = 0;
 
@@ -286,7 +293,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 	 * @param individual the GA individual (usually the fittest after evolution) whose values will be written back to a plan object
 	 * @param plan the plan that will be altered
 	 */
-	private static void writeChromosome2Plan(
+	private void writeChromosome2Plan(
 			final IChromosome a_subject,
 			final Plan plan,
 			final TreeMap<Id,Facility> shop_facilities,
@@ -322,7 +329,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 		plan.setScore(Double.NaN);
 	}
 
-	private static void exchangeFacility(final String type, final Facility facility, final Plan plan) {
+	private void exchangeFacility(final String type, final Facility facility, final Plan plan) {
 		// modify plan by randomly exchanging a link (facility) in the plan
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -331,7 +338,7 @@ public class PlanomatOptimizeLocations implements PlanAlgorithmI {
 				// plans: link, coords
 				// facilities: coords
 				// => use coords
-				act.setLink(null);
+				act.setLink(this.network.getNearestLink(facility.getCenter()));
 				act.setCoord(facility.getCenter());
 			}
 		}

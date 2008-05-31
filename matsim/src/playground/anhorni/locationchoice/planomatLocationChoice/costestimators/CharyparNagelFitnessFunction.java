@@ -47,8 +47,8 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 	public static final double FITNESS_OFFSET = 10000.0;
 	private static final long serialVersionUID = 1L;
 
-	private final  ScoringFunction sf;
-	private final Plan plan;
+	private  ScoringFunction sf=null;
+	private  Plan plan=null;
 	private  NetworkLayer network = null;
 	private  TravelCostI travelCostCalculator = null;
 	private  TravelTimeI travelTimeCalculator = null;
@@ -64,6 +64,16 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 			final TravelCostI travelCostCalculator,
 			final TravelTimeI travelTimeCalculator) {
 		super();
+		this.init(sf, plan, network, travelCostCalculator, travelTimeCalculator);
+	}
+
+	private void init(
+			final ScoringFunction sf,
+			final Plan plan,
+			final NetworkLayer network,
+			final TravelCostI travelCostCalculator,
+			final TravelTimeI travelTimeCalculator) {
+
 		this.sf = sf;
 		this.plan = plan;
 		this.network=network;
@@ -146,6 +156,7 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 				// plans: link, coords
 				// facilities: coords
 				// => use coords
+				act.setLink(this.network.getNearestLink(facility.getCenter()));
 				act.setCoord(facility.getCenter());
 			}
 		}

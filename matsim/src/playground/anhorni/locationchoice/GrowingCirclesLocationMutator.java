@@ -28,6 +28,7 @@ import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -53,7 +54,8 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 	private static final String SHOP = "shop";
 	private static final Coord ZERO = new Coord(0.0,0.0);
 
-	private final Facilities facilities;
+	private NetworkLayer network;
+	private Facilities facilities=null;
 	//private final Persons persons;
 
 	private QuadTree<Facility> shopFacQuadTree = null;
@@ -64,8 +66,13 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public GrowingCirclesLocationMutator() {
+	public GrowingCirclesLocationMutator(final NetworkLayer network) {
 		super();
+		this.init(network);
+	}
+
+
+	private void init(final NetworkLayer network) {
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 		this.buildShopFacQuadTree();
@@ -302,11 +309,12 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 				final Act act = (Act)act_it.next();
 				if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
 					final Facility f = this.getFacility(coord1,coord2,radius,act.getType());
-					act.setLink(null);
+					act.setLink(this.network.getNearestLink(f.getCenter()));
 					act.setCoord(f.getCenter());
 				}
 			}
 
+			// clear the route
 			final ArrayList<?> actslegs = plan.getActsLegs();
 			for (int j = 1; j < actslegs.size(); j=j+2) {
 				final Leg leg = (Leg)actslegs.get(j);
