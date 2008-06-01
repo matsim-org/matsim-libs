@@ -61,8 +61,8 @@ public class LocationChoice extends MultithreadedModuleA {
 
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
-		//return new RandomLocationMutator(this.network);
-		return new GrowingCirclesLocationMutator(this.network);
+		return new RandomLocationMutator(this.network);
+		//return new GrowingCirclesLocationMutator(this.network);
 		//return new PlanomatOptimizeLocations(this.network, this.travelCostCalc, this.travelTimeCalc);
 	}
 }
