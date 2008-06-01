@@ -55,26 +55,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		OTFClientQuad clientQ = hostControl.createNewView(null, null, connect1);
 
 		OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
-		//loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
-		//loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
-//		int ux= 662043;
-//		int uy = 9919140;
-//		int dx = ((634883-662043))/10;
-//		int dy = ((9879565-9919140))/10;
-//		for (int xx = 0; xx <10; xx++) {
-//			uy = 9919140;
-//			for (int yy = 0; yy <10; yy++) {
-//					String slice =  BG_IMG_ROOT + "slice_"+ xx + "_" + yy + ".png";
-////					String slice =  "../runs/run301/slice_2_2.png"; 
-//					System.out.println(slice);
-//					OGLSimpleBackgroundLayer.addPersistentItem(new SimpleBackgroundDrawer(slice, new Rectangle2D.Float(ux,uy,dx,dy)));
-//					
-//					uy+=dy;
-//			}
-//			ux+=dx;
-//	}
-//		background = new SimpleBackgroundDrawer("../runs/run301/Padang_Map_#1_IKONOS_HiRes.png", new Rectangle2D.Float(662043,9919140,634883-662043,9879565-9919140));
-//		if ( background != null) OGLSimpleBackgroundLayer.addPersistentItem(background);
+
+
 		// DS TODO Repair painting of this colored net drawer.isActiveNet = true;
 		return drawer;
 	}
@@ -102,10 +84,12 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	
 	@Override
 	public OTFDrawer getRightDrawerComponent(JFrame frame) throws RemoteException {
-		OTFClientQuad clientQ2 = hostControl.createNewView(null, null, connect2);
+		OTFClientQuad clientQ2 = hostControl.createNewView(null, null, connect1);
 
 		OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
-
+		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
+		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
+		
 		return drawer2;
 	}
 	
@@ -113,8 +97,11 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../MatsimJ/output/OTFQuadfileSCHWEIZ2.3.mvi.gz";
 //		String filename = "../MatsimJ/output/testSWI2.mvi.gz";
 //		String filename = "test/padang.mvi";
+
 		
-		String filename = "../OnTheFlyVis-test/test/padangFlooding.mvi";
+//		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
+//		String filename = "../OnTheFlyVis/test/testPadabang1.3.mvi"; //Flooding.mvi";
+		String filename = "../vsp-cvs/runs/run306/output/ITERS/it.100/100.movie.mvi";
 
 		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect1.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
@@ -130,15 +117,24 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		connect2.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		connect2.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		connect2.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangRegionDrawer.class);
-		connect2.add(OGLAgentPointLayer.AgentPadangRegionDrawer.class, OGLAgentPointLayer.class);
-	
+		connect2.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
+//	
 		//main2(args);
 		
 //		OTFOGLDrawer.linkWidth =2;
-
-		OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, true);
-	
+		
+//		Gbl.createConfig(null);
+//		OTFVisConfig conf = new OTFVisConfig();
+//		conf.setLinkWidth(10);
+//		Gbl.getConfig().addModule("otfvis", conf);
+//		
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(1); 
+		
+		OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, false);
+		
+//		new OnTheFlyClientFilePadang()
 		client.run();
+		
 	}
 
  
