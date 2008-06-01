@@ -39,7 +39,7 @@ public class ScenarioParsing {
 
 	public static void run() {
 
-		System.out.println("TEST RUN 01:");
+		System.out.println("Make randomized IDs for 10% population ZH-cut:");
 
 		Scenario.setUpScenarioConfig();
 
