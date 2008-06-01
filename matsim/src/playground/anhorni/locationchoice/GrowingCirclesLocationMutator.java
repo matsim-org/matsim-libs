@@ -23,8 +23,10 @@ package playground.anhorni.locationchoice;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -50,17 +52,30 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 	private static final String S = "s";
 	private static final String E = "e";
 	private static final String EDUCATION = "education";
-	private static final String LEISURE = "leisure";
-	private static final String SHOP = "shop";
+
+	private static final String SHOP_0 = "shop_retail_gt2500sqm";
+	private static final String SHOP_1 = "shop_retail_get1000sqm";
+	private static final String SHOP_2 = "shop_retail_get400sqm";
+	private static final String SHOP_3 = "shop_retail_get100sqm";
+	private static final String SHOP_4 = "shop_other";
+
+	private static final String LEISURE_0 = "leisure_gastro";
+	private static final String LEISURE_1 = "leisure_culture";
+	private static final String LEISURE_2 = "leisure_sports";
+	
+	
 	private static final Coord ZERO = new Coord(0.0,0.0);
 
 	private NetworkLayer network;
-	private Facilities facilities=null;
 	//private final Persons persons;
 
 	private QuadTree<Facility> shopFacQuadTree = null;
 	private QuadTree<Facility> leisFacQuadTree = null;
 	private QuadTree<Facility> educFacQuadTree = null;
+	
+	private Facilities facilities = null;  
+	private final TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
+	private final TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -79,6 +94,17 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 		this.buildShopFacQuadTree();
 		this.buildLeisFacQuadTree();
 		this.buildEducFacQuadTree();
+		
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_gt2500sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get1000sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get400sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get100sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_other"));
+
+		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_gastro"));
+		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_culture"));
+		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_sports"));
+		
 		System.out.println("    done.");
 	}
 
@@ -93,13 +119,11 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (final Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(SHOP) != null) {
-				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-				if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
-			}
+		for (final Facility f : this.shop_facilities.values()) {
+			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
+			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
+			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
+			if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
 		}
 		minx -= 1.0;
 		miny -= 1.0;
@@ -107,10 +131,8 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.shopFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (final Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(SHOP) != null) {
-				this.shopFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
-			}
+		for (final Facility f : this.shop_facilities.values()) {
+			this.shopFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 		}
 		System.out.println("      done.");
 		Gbl.printRoundTime();
@@ -123,13 +145,11 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (final Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(LEISURE) != null) {
-				if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
-				if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
-				if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
-				if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
-			}
+		for (final Facility f : this.leisure_facilities.values()) {
+			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
+			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
+			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
+			if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
 		}
 		minx -= 1.0;
 		miny -= 1.0;
@@ -137,10 +157,8 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.leisFacQuadTree = new QuadTree<Facility>(minx, miny, maxx, maxy);
-		for (final Facility f : this.facilities.getFacilities().values()) {
-			if (f.getActivity(LEISURE) != null) {
-				this.leisFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
-			}
+		for (final Facility f : this.leisure_facilities.values()) {
+			this.leisFacQuadTree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 		}
 		System.out.println("      done.");
 		Gbl.printRoundTime();
@@ -189,8 +207,8 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 
 	private final String getFacilityActType(final String act_type) {
 		if (E.equals(act_type)) { return EDUCATION; }
-		else if (S.equals(act_type)) { return SHOP; }
-		else if (L.equals(act_type)) { return LEISURE; }
+		else if (S.equals(act_type)) { return SHOP_0; }
+		else if (L.equals(act_type)) { return LEISURE_0; }
 		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
 	}
 
