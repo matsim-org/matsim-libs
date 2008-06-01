@@ -233,25 +233,40 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			@Override
 			protected void setTexture(){this.texture = AgentDrawer.wavejpg;};
 		};
+		public final AgentArrayDrawer drawerEvacuees = new AgentArrayDrawer(){
+			@Override
+			protected void setTexture(){this.texture = AgentDrawer.pedpng;}
+		};		
 		
+		
+		
+		public void drawAll() {
+			drawerWave.draw();
+			drawerEvacuees.draw();
+		}
 	}
 
 	public class AgentPadangRegionDrawer extends AgentPadangDrawer {
+		
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			if (user !=-1) drawer.addAgent(id, startX, startY, AgentArrayDrawer.colorizer2.getColor(user), false);
-			else drawerWave.addAgent(id, startX, startY, Color.BLUE, false);
+			if (user !=-1) drawerEvacuees.addAgent(id, startX, startY, AgentArrayDrawer.colorizer2.getColor(user), false);
+			else drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
 		}
+		
+		
 	
 	}
 
 	public class AgentPadangTimeDrawer extends AgentPadangDrawer {
+		
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			if (user != -1) drawer.addAgent(id, startX, startY, colorizer3.getColor(state),false);
+			if (user != -1) drawerEvacuees.addAgent(id, startX, startY, colorizer3.getColor(state),false);
 			else drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
 		}
-	
+		
+
 	}
 
 	private final AgentArrayDrawer drawer = new AgentArrayDrawer();
@@ -263,8 +278,9 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	public void draw() {
 		drawer.draw();
 
-		regiondrawer.drawerWave.draw();
-		timedrawer.drawerWave.draw();
+		regiondrawer.drawAll();
+		timedrawer.drawAll();
+		
 	}
 
 	@Override
