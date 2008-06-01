@@ -19,7 +19,6 @@ import org.matsim.plans.algorithms.PlanAlgorithmI;
 public class RandomLocationMutator extends PersonAlgorithm implements PlanAlgorithmI {
 
 	// parameters of the specific selector ----------------------
-	private final int nbrChanges=1;
 	private NetworkLayer network=null;
 	private final Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 	private final TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
@@ -47,32 +46,25 @@ public class RandomLocationMutator extends PersonAlgorithm implements PlanAlgori
 	// plan == selected plan
 	public void handlePlan(final Plan plan){
 
-		for (int j=0; j<this.nbrChanges; j++) {
+		if (this.shop_facilities.size()>0) {
+			exchangeFacilities("s",this.shop_facilities, plan);
+		}
 
-			if (this.shop_facilities.size()>0) {
-				final Facility shop_facility=(Facility)this.shop_facilities.values().toArray()[
-				           Gbl.random.nextInt(this.shop_facilities.size()-1)];
-
-				exchangeFacility("s",shop_facility, plan);
-			}
-
-			if (this.leisure_facilities.size()>0) {
-				final Facility leisure_facility=(Facility)this.leisure_facilities.values().toArray()[
-	 			           Gbl.random.nextInt(this.leisure_facilities.size()-1)];
-
-				exchangeFacility("l",leisure_facility, plan);
-			}
+		if (this.leisure_facilities.size()>0) {
+			exchangeFacilities("l",this.leisure_facilities, plan);
 		}
 	}
 
 
-	public void exchangeFacility(final String type, final Facility facility, final Plan plan) {
-		// modify plan by randomly exchanging a link (facility) in the plan
+	public void exchangeFacilities(final String type, TreeMap<Id,Facility>  exchange_facilities, final Plan plan) {
+		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			if (act.getType().startsWith(type)) {
-
+				
+				final Facility facility=(Facility)exchange_facilities.values().toArray()[
+				           Gbl.random.nextInt(exchange_facilities.size()-1)];
 				// plans: link, coords
 				// facilities: coords
 				// => use coords
