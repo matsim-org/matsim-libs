@@ -262,7 +262,7 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
 			final Act act = (Act)act_it.next();
-			if (H.equals(act.getType())) {
+			if (act.getType().startsWith(H)) {
 				if (act.getCoord() == null) { Gbl.errorMsg("Person id=" + person.getId() + " has no home coord!"); }
 				if (act.getCoord().equals(ZERO)) { Gbl.errorMsg("Person id=" + person.getId() + " has a ZERO home coord!"); }
 				home_coord = act.getCoord();
@@ -273,10 +273,6 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 		}
 		if ((prim_coord == null) || (home_coord.equals(prim_coord))) {
 			// only one location
-
-			//final playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
-			//final Zone z = p.getHousehold().getMunicipality().getZone();
-			// final double radius = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
 
 			final double radius=10000.0;
 
