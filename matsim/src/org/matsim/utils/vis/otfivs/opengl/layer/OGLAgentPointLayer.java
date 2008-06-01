@@ -52,8 +52,9 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 					Color.RED, Color.YELLOW, Color.GREEN});
 	// for Padang time-based agents
 	private final static OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
-			new double[] { 0.0, 30., 120.}, new Color[] {
-					Color.GREEN, Color.YELLOW, Color.RED});
+			new double[] { 0.0, 30., 120., 255. ,256.}, new Color[] {	Color.GREEN, Color.YELLOW, Color.RED, Color.RED, Color.BLUE});
+	private final static OTFOGLDrawer.FastColorizer colorizer4 = new OTFOGLDrawer.FastColorizer(
+			 new double[] { 0.0, 20.,255.}, new Color[] {	new Color(0,255,128,0), Color.CYAN, Color.BLUE});
 	
 	public static class AgentArrayDrawer extends OTFGLDrawableImpl {
 		public final static RandomColorizer colorizer2 = new RandomColorizer(257);
@@ -228,7 +229,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	public class AgentPadangDrawer  extends AgentPointDrawer {
 		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
 			@Override
-			protected void setAgentSize(){gl.glPointSize(500);};
+			protected void setAgentSize(){gl.glPointSize(10);};
 			@Override
 			protected void setTexture(){this.texture = AgentDrawer.wavejpg;};
 		};
@@ -248,7 +249,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			if (user != -1) drawer.addAgent(id, startX, startY, colorizer3.getColor(state),false);
-			else drawerWave.addAgent(id, startX, startY, Color.BLUE,false);
+			else drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
 		}
 	
 	}
