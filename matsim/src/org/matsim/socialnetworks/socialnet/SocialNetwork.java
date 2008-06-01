@@ -128,14 +128,14 @@ public class SocialNetwork {
 		int m0= (int) (((double)kbar)/2.); // initial core size
 		int m=m0;// number of links to add each step, m< m0
 //		if(m>m0){
-//			Gbl.errorMsg(this.getClass()+" m must be >= m0");
+//		Gbl.errorMsg(this.getClass()+" m must be >= m0");
 //		}
 		double A = 2.*(gamma-2);
 		int E; // number of edges in network each time m links are added
 
 		Person[] personList = new Person[1];
 		personList = plans.getPersons().values().toArray( personList );
-		
+
 		int maxE = (int) ((double)kbar/2.)*personList.length;
 
 		log.info("Links the Persons together in UNDIRECTED Barabasi/Albert random graph of Gamma="+gamma+", core="+m0+", Emax="+maxE);
@@ -168,13 +168,13 @@ public class SocialNetwork {
 				if(coreSize==0){
 					pIJ = 1.;
 				}
-				
+
 
 				if (Gbl.random.nextInt()<pIJ){
 					if(makeSocialContactNotify(pI, pJ, 0, "random")==2){
-					met=true;
-					j++;
-//					log.info(" "+pJ.getId()+" "+pJ.getKnowledge().egoNet.getOutDegree());
+						met=true;
+						j++;
+//						log.info(" "+pJ.getId()+" "+pJ.getKnowledge().egoNet.getOutDegree());
 					}
 				}
 				if(met==false){
@@ -437,11 +437,11 @@ public class SocialNetwork {
 					status=2;// status=2 means the new link was made
 				}else status=3; // status=3 means that the link was not made because the ego is saturated with links
 		}else{
-		status=0; // status=0 means that person1=person2 and no self-links are made
+			status=0; // status=0 means that person1=person2 and no self-links are made
 		}
 		return status;
 	}
-	
+
 	public void addLink(SocialNetEdge myLink, int iteration){
 
 		myLink.getPersonFrom().getKnowledge().egoNet.addEgoLink(myLink);
@@ -500,6 +500,7 @@ public class SocialNetwork {
 			// Implemented in Jin, Girvan, Newman 2001
 
 			log.info("  Removing links older than "+remove_age+" proportional to degree times probability "+remove_p);
+			log.warn("Implementation is wrong"); //JH 07.05.08
 			log.info("  Number of links before removal: "+this.getLinks().size());
 			int maxDeg=this.getMaxDegree();
 			Iterator<SocialNetEdge> it_link = this.getLinks().iterator();
@@ -528,14 +529,32 @@ public class SocialNetwork {
 				}
 			}
 			log.info("  Number of links after removal: "+(this.getLinks().size()-linksToRemove.size()));
+
+		}else if(linkRemovalCondition.equals("random_constant_kbar")){
+			// Removal probability proportional to edge age
+			log.info("  Removing links keeping the average degree roughly constant");
+			log.info("  Number of links before removal: "+this.getLinks().size());
+			int kbar=Integer.parseInt(socnetConfig.getSocNetKbar());
+			int numRemoved=0;
+			if (UNDIRECTED) {
+				int nRemove=this.getLinks().size()-(int) ((double) kbar/2.*this.persons.size());
+				log.info("  Number of links to remove: "+nRemove);
+				for(int i=0;i<nRemove;i++){
+					int index = Gbl.random.nextInt(this.getLinks().size());
+					SocialNetEdge edge = (SocialNetEdge) this.getLinks().get(index);
+					removeLink(edge);
+
+					SocialNetEdge myOpposingLink=edge.getPersonTo().getKnowledge().egoNet.getEgoLink(edge.getPersonFrom());
+					this.removeLink(myOpposingLink);
+					numRemoved++;
+				}
+			}else if(!UNDIRECTED){
+				Gbl.errorMsg(this.getClass()+" does not support DIRECTED networks.");
+			}		
+			log.info("  Number of links after removal: "+(this.getLinks().size()));
 		}else{
 			Gbl.errorMsg("Supported removal algorithms: \"none\""+","+"\"random_link_age\""+", \"random_node_degree\""+", \"random\"");
 		}
-
-		// This runs for all removal algorithms
-		log.info("Removing Flagged Links Now");
-		removeFlaggedLinks(linksToRemove);
-
 	}
 	private int getMaxDegree() {
 		// TODO Auto-generated method stub
