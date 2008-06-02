@@ -23,6 +23,7 @@ package playground.yu.newPlan;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.v01.BasicPlan.Type;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -34,23 +35,23 @@ import org.matsim.plans.algorithms.PersonAlgorithmI;
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
  * have only a blank <Route></Rout>
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithmI {
 
-	private List<Plan> copyPlans = new ArrayList<Plan>();
+	private final List<Plan> copyPlans = new ArrayList<Plan>();
 
 	/**
 	 * Constructor, writes file-head
-	 *
+	 * 
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewAgentPtPlan3(final Plans plans) {
 		super(plans);
-		this.copyPlans.clear();
+		copyPlans.clear();
 	}
 
 	@Override
@@ -66,22 +67,22 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithmI {
 				if (person.getLicense().equals("yes")) {
 					Plan copyPlan = new Plan(person);
 					copyPlan.setType(Plan.Type.CAR);
-					this.copyPlans.add(copyPlan);
+					copyPlans.add(copyPlan);
 				}
 			} else if (!legMode.equals("pt")) {
 				Plan copyPlan = new Plan(person);
 				copyPlan.setType(Plan.Type.PT);
-				this.copyPlans.add(copyPlan);
+				copyPlans.add(copyPlan);
 			}
 
 			List actsLegs = pl.getActsLegs();
 			int actsLegsSize = actsLegs.size();
-			for (Plan copyPlan : this.copyPlans) {
+			for (Plan copyPlan : copyPlans)
 				for (int i = 0; i < actsLegsSize; i++) {
 					Object o = actsLegs.get(i);
-					if (i % 2 == 0) {
+					if (i % 2 == 0)
 						copyPlan.addAct((Act) o);
-					} else {
+					else {
 						Leg leg = (Leg) o;
 						Leg copyLeg = new Leg(leg);
 						copyLeg.setRoute(null);
@@ -93,24 +94,20 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithmI {
 						copyPlan.addLeg(copyLeg);
 					}
 				}
-			}
 		}
 
-		for (Plan copyPlan : this.copyPlans) {
+		for (Plan copyPlan : copyPlans)
 			person.addPlan(copyPlan);
-		}
-		this.copyPlans.clear();
+		copyPlans.clear();
 
 		// }
 		if (person.getLicense().equals("no")) {
 			List<Plan> plans = person.getPlans();
-			for (Plan pl : plans) {
-				if (pl.getType().equals("car")) {
+			for (Plan pl : plans)
+				if (pl.getType().equals(Type.CAR))
 					plans.remove(pl);
-				}
-			}
 		}
 
-		this.pw.writePerson(person);
+		pw.writePerson(person);
 	}
 }

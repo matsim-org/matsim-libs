@@ -24,27 +24,26 @@ import java.util.HashMap;
 
 public class HashMapTest {
 	private static class MyClass {
-		private StringBuffer sb;
+		private final StringBuffer sb;
 
-		public MyClass(int i) {
-			sb = new StringBuffer(Double.toString((double) i * Math.PI));
+		public MyClass(final int i) {
+			sb = new StringBuffer(Double.toString(i * Math.PI));
 		}
 
-		public StringBuffer append(String s) {
+		public StringBuffer append(final String s) {
 			return sb.append(s);
 		}
 
+		@Override
 		public String toString() {
 			return sb.toString();
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		HashMap<Integer, MyClass> hm = new HashMap<Integer, MyClass>();
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 100; i++)
 			hm.put(i, new MyClass(i));
-		}
-		hm=null;
 		System.out.println(hm.get(0));
 		System.out.println(hm.get(1));
 	}

@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.matsim.basic.v01.BasicPlan.Type;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -45,20 +46,20 @@ import org.matsim.plans.algorithms.PersonAlgorithm;
 public class PlanChecker extends PersonAlgorithm {
 
 	private DataOutputStream out, out14, out41;
-	private HashMap<String, Integer> hm;
+	private final HashMap<String, Integer> hm;
 
 	/**
 	 * @param fileName
 	 * 
 	 */
-	public PlanChecker(String fileName) {
+	public PlanChecker(final String fileName) {
 		try {
 			out = new DataOutputStream(new BufferedOutputStream(
 					new FileOutputStream(new File(fileName))));
 			out.writeBytes("ratio\tamount\n");
 			out14 = new DataOutputStream(new BufferedOutputStream(
 					new FileOutputStream(new File(fileName + "_14.txt"))));
-			String head = "agend-ID\t" +"type\t"+ "distance1\ttraveltime1\t"
+			String head = "agend-ID\t" + "type\t" + "distance1\ttraveltime1\t"
 					+ "distance2\ttraveltime2\n";
 			out14.writeBytes(head);
 			out41 = new DataOutputStream(new BufferedOutputStream(
@@ -74,65 +75,61 @@ public class PlanChecker extends PersonAlgorithm {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		int ivCnt = 0;
 		int oevCnt = 0;
-		for (Plan pl : person.getPlans()) {
-			if (pl.getType().equals("iv")) {
+		for (Plan pl : person.getPlans())
+			if (pl.getType().equals(Type.CAR))
 				ivCnt++;
-			} else {
+			else
 				oevCnt++;
-			}
-		}
 		String k = "iv" + ivCnt + "oev" + oevCnt;
 		int i = 0;
-		if (hm.containsKey(k)) {
+		if (hm.containsKey(k))
 			i = hm.get(k);
-		}
 		i++;
 		hm.put(k, i);
-		if (k.equals("iv4oev1")) {
+		if (k.equals("iv4oev1"))
 			run41(person);
-		} else if (k.equals("iv1oev4")) {
+		else if (k.equals("iv1oev4"))
 			run14(person);
-		}
 	}
 
-	public void run14(Person person) {
+	public void run14(final Person person) {
 		run_(person, out14);
 	}
 
-	public void run41(Person person) {
+	public void run41(final Person person) {
 		run_(person, out41);
 	}
 
-	public void run_(Person person, DataOutputStream out) {
+	public void run_(final Person person, final DataOutputStream out) {
 		for (Plan pl : person.getPlans()) {
-//			if (pl.getType().equals("oev")) {
-				String text = "\t";
-				for (Iterator<Leg> it = pl.getIteratorLeg(); it.hasNext();) {
-					Leg l = it.next();
-					Route r = l.getRoute();
-					text += r.getDist() + "\t" + r.getTravTime() + "\t";
-				}
-				try {
-					out.writeBytes(person.getId().toString() +"\t"+pl.getType()+ text + "\n");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-//			}
+			// if (pl.getType().equals("oev")) {
+			StringBuilder text = new StringBuilder("\t");
+			for (Iterator<Leg> it = pl.getIteratorLeg(); it.hasNext();) {
+				Leg l = it.next();
+				Route r = l.getRoute();
+				text.append(r.getDist() + "\t" + r.getTravTime() + "\t");
+			}
+			try {
+				out.writeBytes(person.getId().toString() + "\t" + pl.getType()
+						+ text + "\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			// }
 		}
 	}
 
 	public void writeResult() {
 		System.out.println(": Writer begins to write rows");
-		for (String k : hm.keySet()) {
+		for (String k : hm.keySet())
 			try {
 				out.writeBytes(k + "\t" + Integer.toString(hm.get(k)) + "\n");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
 		System.out.println(": Done.");
 		try {
 			System.out.println(": Writer begins to close!");

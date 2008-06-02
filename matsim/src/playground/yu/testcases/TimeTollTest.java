@@ -29,6 +29,7 @@ import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
+import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -38,15 +39,26 @@ import org.matsim.testcases.MatsimTestCase;
 public class TimeTollTest extends MatsimTestCase {
 	private static class TestControlerListener implements
 			IterationEndsListener, IterationStartsListener {
+		private CalcLegTimes clt = null;
 
-		public void notifyIterationEnds(IterationEndsEvent event) {
-
+		public void notifyIterationEnds(final IterationEndsEvent event) {
+			if (event.getIteration() == event.getControler().getLastIteration()
+					&& clt != null) {
+				double traveling = Double.parseDouble(Gbl.getConfig().getParam(
+						"planCalcScore", "traveling"));
+				double criterion = 0.0;
+				if (traveling == -6.0)
+					criterion = 315.0;
+				else if (traveling == -3.0)
+					criterion = 314.0;
+				assertEquals(criterion, clt.getAverageTripDuration());
+			}
 		}
 
-		public void notifyIterationStarts(IterationStartsEvent event) {
+		public void notifyIterationStarts(final IterationStartsEvent event) {
 			if (event.getIteration() == event.getControler().getLastIteration()) {
-				CalcLegTimes clt = new CalcLegTimes(event.getControler().getPopulation());
-				event.getControler().getEvents().addHandler(null);
+				clt = new CalcLegTimes(event.getControler().getPopulation());
+				event.getControler().getEvents().addHandler(clt);
 			}
 		}
 
