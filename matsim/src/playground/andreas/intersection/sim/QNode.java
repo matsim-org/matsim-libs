@@ -49,6 +49,8 @@ public class QNode extends QueueNode{
 					QLink qLink = (QLink) queueNetworkLayer.getQueueLink(link.getId());
 
 					for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
+						
+						//TODO [an] Falscher Abruf, hier muss die FlowCapacity beim Aufruf von getFirstFromBuffer beachtet werden 
 						while (!pseudoLink.flowQueueIsEmpty()) {
 							Vehicle veh = pseudoLink.getFirstFromBuffer();
 							if (!moveVehicleOverNode(veh, now, pseudoLink)) {
@@ -91,9 +93,10 @@ public class QNode extends QueueNode{
 	public boolean moveVehicleOverNode(final Vehicle veh, final double now, PseudoLink pseudoLink) {
 		// veh has to move over node
 		Link nextLink = ((QVehicle)veh).chooseNextLink();
-		QLink nextQLink = (QLink) this.queueNetworkLayer.getQueueLink(nextLink.getId());
-
+		
 		if (nextLink != null) {
+			QLink nextQLink = (QLink) this.queueNetworkLayer.getQueueLink(nextLink.getId());
+		
 			if (nextQLink.hasSpace()) {
 				pseudoLink.pollFirstFromBuffer();
 				veh.incCurrentNode();
