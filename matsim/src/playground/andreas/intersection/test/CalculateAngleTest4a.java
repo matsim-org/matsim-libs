@@ -39,7 +39,7 @@ public class CalculateAngleTest4a extends MatsimTestCase {
 				
 	}	
 
-	public void reset(int iteration) {
-	}
+//	public void reset(int iteration) {
+//	}
 
 }

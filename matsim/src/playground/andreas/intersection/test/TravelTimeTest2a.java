@@ -55,12 +55,12 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 
 			try {
 				
-				beginningOfLink2 = null;
+				this.beginningOfLink2 = null;
 
 				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(signalSystems)));
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile)));
 
-				Boolean moveOn = true;
+				boolean moveOn = true;
 
 				while(moveOn){
 
@@ -91,7 +91,7 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 
 //			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 			new QSim(events, data.getPopulation(), data.getNetwork(), tempFile, groupDefinitions, false).run();
-			results.put(Integer.valueOf(i), beginningOfLink2);
+			results.put(Integer.valueOf(i), this.beginningOfLink2);
 			
 			File delFile = new File(tempFile);
 			delFile.delete();
@@ -126,14 +126,14 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 		events.addHandler(this);
 		
 		new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false).run();
-		System.out.println("tF = 60s, " + beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + beginningOfLink2.numberOfVehPassed_ + ", " + beginningOfLink2.firstVehPassTime_s + ", " + beginningOfLink2.lastVehPassTime_s);
-		MeasurePoint QSim = beginningOfLink2;
+		System.out.println("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
+		MeasurePoint QSim = this.beginningOfLink2;
 		
-		beginningOfLink2 = null;
+		this.beginningOfLink2 = null;
 		
 		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
-		System.out.println("tF = 60s, " + beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + beginningOfLink2.numberOfVehPassed_ + ", " + beginningOfLink2.firstVehPassTime_s + ", " + beginningOfLink2.lastVehPassTime_s);
-		MeasurePoint QueueSimulation = beginningOfLink2;
+		System.out.println("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
+		MeasurePoint QueueSimulation = this.beginningOfLink2;
 				
 		// circle time is 60s, green 60s
 		assertEquals(2500.0, QSim.numberOfVehPassed_, EPSILON);
@@ -148,15 +148,15 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 		
 		if (event.linkId.equalsIgnoreCase("2")) {
 
-			if (beginningOfLink2 == null){				
-				beginningOfLink2 = new MeasurePoint(event.time);
+			if (this.beginningOfLink2 == null){				
+				this.beginningOfLink2 = new MeasurePoint(event.time);
 			}
 			
-			beginningOfLink2.numberOfVehPassed_++;
-			beginningOfLink2.lastVehPassTime_s = event.time;
+			this.beginningOfLink2.numberOfVehPassed_++;
+			this.beginningOfLink2.lastVehPassTime_s = event.time;
 			
-			if (beginningOfLink2.firstVehPassTime_s + beginningOfLink2.timeToMeasure_s > event.time){
-				beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_++;
+			if (this.beginningOfLink2.firstVehPassTime_s + this.beginningOfLink2.timeToMeasure_s > event.time){
+				this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_++;
 			}			
 		}		
 	}	
@@ -170,10 +170,10 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 	private class MeasurePoint{
 		
 		private final int timeToMeasure_s = 60 * 60;
-		private final double firstVehPassTime_s;
-	  	private double lastVehPassTime_s;
-	  	private int numberOfVehPassed_ = 0;
-	  	private int numberOfVehPassedDuringTimeToMeasure_ = 0;
+		final double firstVehPassTime_s;
+	  	double lastVehPassTime_s;
+	  	int numberOfVehPassed_ = 0;
+	  	int numberOfVehPassedDuringTimeToMeasure_ = 0;
 		
 		public MeasurePoint(double time) {
 			this.firstVehPassTime_s = time;

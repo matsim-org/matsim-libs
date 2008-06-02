@@ -33,8 +33,9 @@ public class CalculateAngle {
 
 		if (result.size() == 0){
 			return null;
-		}else
+		} else {
 			return result.get(result.firstKey());
+		}
 	}
 	
 	/**
@@ -71,11 +72,9 @@ public class CalculateAngle {
 					thetaDiff += 2 * Math.PI;
 				} else if (thetaDiff > Math.PI){
 					thetaDiff -= 2 * Math.PI;
-				} else {
-
 				}
 				
-				leftLane.put(-thetaDiff, outLink);
+				leftLane.put(Double.valueOf(-thetaDiff), outLink);
 				
 			}			
 		}

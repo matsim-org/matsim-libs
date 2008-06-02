@@ -70,7 +70,7 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 	public QSim(Events events, Plans population, NetworkLayer network, String signalSystems, String groupDefinitions, boolean useOTF) {
 		super(network, population, events);
 		
-		this.network = new QueueNetworkLayer(networkLayer, new TrafficLightQueueNetworkFactory());
+		this.network = new QueueNetworkLayer(this.networkLayer, new TrafficLightQueueNetworkFactory());
 		this.signalSystems = signalSystems;
 		this.groupDefinitions = groupDefinitions;
 		this.useOTF = useOTF;
@@ -86,11 +86,25 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 			List<SignalGroupDefinition> signalGroups = new LinkedList<SignalGroupDefinition>();
 			
 			SignalGroupDefinitionParser groupParser = new SignalGroupDefinitionParser(signalGroups);
-			groupParser.parse(groupDefinitions);
+			groupParser.parse(this.groupDefinitions);
 			SignalSystemConfigurationParser signalParser = new SignalSystemConfigurationParser(signalGroups);
-			signalParser.parse(signalSystems);
+			signalParser.parse(this.signalSystems);
 		
 			signalSystemConfigurations = signalParser.getSignalSystemConfigurations();
+			
+			for (SignalSystemConfiguration signalSystemConfiguration : signalSystemConfigurations.values()) {
+				
+				TrafficLightsManager trafficLightManager = new TrafficLightsManager(signalSystemConfiguration.getSignalGroupDefinitions(), this.networkLayer);
+
+				QNode qNode = (QNode) this.network.getNodes().get(signalSystemConfiguration.getId());
+				qNode.setSignalSystemControler(new SignalSystemControlerImpl(signalSystemConfiguration));
+				
+				for (Iterator<? extends Link> iterator = qNode.getNode().getInLinks().values().iterator(); iterator.hasNext();) {
+					Link link = iterator.next();
+					QLink qLink = (QLink) this.network.getQueueLink(link.getId());
+					qLink.reconfigure(trafficLightManager);
+				}
+			}
 		
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
@@ -101,24 +115,7 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
-		
-		
-		for (SignalSystemConfiguration signalSystemConfiguration : signalSystemConfigurations.values()) {
-			
-			TrafficLightsManager trafficLightManager = new TrafficLightsManager(signalSystemConfiguration.getSignalGroupDefinitions(), this.networkLayer);
-
-			QNode qNode = (QNode) network.getNodes().get(signalSystemConfiguration.getId());
-			qNode.setSignalSystemControler(new SignalSystemControlerImpl(signalSystemConfiguration));
-			
-			for (Iterator<? extends Link> iterator = qNode.getNode().getInLinks().values().iterator(); iterator.hasNext();) {
-				Link link = (Link) iterator.next();
-				QLink qLink = (QLink) network.getQueueLink(link.getId());
-				qLink.reconfigure(trafficLightManager);
-			}
-		}
-		
+		}		
 	}
 
 	@Override

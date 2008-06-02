@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.velocity.runtime.directive.Foreach;
-import org.matsim.basic.v01.Id;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
@@ -48,9 +46,9 @@ public class QNode extends QueueNode{
 				for (int i = 0; i < greenSignalGroups.length; i++) {
 					SignalGroupSettings signalGroupSetting = greenSignalGroups[i];
 
-					Link link = (Link) this.getNode().getInLinks().get((signalGroupSetting.getSignalGroupDefinition().getLinkId()));
+					Link link = this.getNode().getInLinks().get((signalGroupSetting.getSignalGroupDefinition().getLinkId()));
 					
-					QLink qLink = (QLink) queueNetworkLayer.getQueueLink(link.getId());
+					QLink qLink = (QLink) this.queueNetworkLayer.getQueueLink(link.getId());
 					
 					List <Link> toLinks = new ArrayList<Link>();
 					for (SignalLane signalLane : signalGroupSetting.getSignalGroupDefinition().getToLanes()) {
@@ -77,9 +75,9 @@ public class QNode extends QueueNode{
 			//Node is NOT traffic light controlled
 
 			for (Iterator<? extends Link> iter = this.getNode().getInLinks().values().iterator(); iter.hasNext();) {
-				Link link = (Link) iter.next();
+				Link link = iter.next();
 				
-				QLink qLink = (QLink) queueNetworkLayer.getQueueLink(link.getId());
+				QLink qLink = (QLink) this.queueNetworkLayer.getQueueLink(link.getId());
 				
 
 				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {

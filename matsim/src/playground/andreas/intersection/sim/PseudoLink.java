@@ -106,7 +106,9 @@ public class PseudoLink {
 			this.storageCapacity = this.freeSpeedTravelTime * this.flowCapacity;
 			return false;
 
-		} else return true;
+		} else {
+			return true;
+		}
 
 	}
 
@@ -124,7 +126,7 @@ public class PseudoLink {
 		double maximumFlowCapacity = this.flowCapacity;
 
 		QVehicle veh;
-		while ((veh = (QVehicle)this.storageQueue.peek()) != null) {
+		while ((veh = this.storageQueue.peek()) != null) {
 			if (veh.getDepartureTime_s() > now) {
 				break;
 			}
@@ -181,16 +183,18 @@ public class PseudoLink {
 	public boolean hasSpace() {
 		if (this.storageQueue.size() < this.storageCapacity) {
 			return true;
-		} else return false;
+		} else {
+			return false;
+		}
 	}
 
 	private void moveFlowQueueToNextPseudoLink(){
 
-		Boolean moveOn = true;
+		boolean moveOn = true;
 
 		while(moveOn && !this.flowQueue.isEmpty() && (this.toLinks.size() != 0)){
 			QVehicle veh = this.flowQueue.peek();
-			Link nextLink = (Link) veh.chooseNextLink();
+			Link nextLink = veh.chooseNextLink();
 
 			if (nextLink != null) {
 				for (PseudoLink toLink : this.toLinks) {
@@ -276,7 +280,7 @@ public class PseudoLink {
 	}
 	
 	public Queue<QVehicle> getParkToLinkQueue(){
-		return parkToLinkQueue;
+		return this.parkToLinkQueue;
 	}
 	
 	public Queue<QVehicle> getParkingQueue(){
@@ -308,51 +312,6 @@ public class PseudoLink {
 	}
 
 	QVehicle getFirstFromBuffer() {
-		
-//		double maximumFlowCapacity = this.flowCapacity;
-//
-//		QVehicle veh;
-//		while ((veh = (QVehicle)this.storageQueue.peek()) != null) {
-//			if (veh.getDepartureTime_s() > now) {
-//				break;
-//			}
-//
-//			if (veh.getDestinationLink().getId() == this.realLink.getLink().getId()) {
-//
-//				QSim.getEvents().processEvent(new EventAgentArrival(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
-//						this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
-//				veh.reachActivity(now, this.realLink);
-//				this.storageQueue.poll();
-//				continue;
-//			}
-//
-//			if (!hasFlowQueueSpace()) {
-//				break;
-//			}
-//
-//			if (maximumFlowCapacity >= 1.0) {
-//				maximumFlowCapacity--;
-//				addToFlowQueue(veh, now);
-//				this.storageQueue.poll();
-//				continue;
-//
-//			} else if (this.flowCapacityFractionalRest >= 1.0) {
-//				this.flowCapacityFractionalRest--;
-//				addToFlowQueue(veh, now);
-//				this.storageQueue.poll();
-//				break;
-//			} else {
-//				break;
-//			}
-//		}
-//
-//		if (this.flowCapacityFractionalRest < 1.0) {
-//			this.flowCapacityFractionalRest += this.flowCapacityFraction;
-//		}
-		
-		
-		
-		
 		return this.flowQueue.peek();
 	}
 
@@ -375,7 +334,7 @@ public class PseudoLink {
 		double now = SimulationTimer.getTime();
 		int cnt = 0;
 
-		double queueEnd = this.realLink.getLink().getLength() - meterFromLinkEnd; // the position of the start of the queue jammed vehicles build at the end of the link
+		double queueEnd = this.realLink.getLink().getLength() - this.meterFromLinkEnd; // the position of the start of the queue jammed vehicles build at the end of the link
 
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
@@ -411,7 +370,7 @@ public class PseudoLink {
 		for (Vehicle veh : this.storageQueue) {
 			double travelTime = now - (veh.getDepartureTime_s() - this.realLink.getLink().getFreespeedTravelTime(now));
 			double distanceOnLink = (this.realLink.getLink().getFreespeedTravelTime(now) == 0.0 ? 0.0
-					: ((travelTime / this.realLink.getLink().getFreespeedTravelTime(now)) * (this.realLink.getLink().getLength() - meterFromLinkEnd)));
+					: ((travelTime / this.realLink.getLink().getFreespeedTravelTime(now)) * (this.realLink.getLink().getLength() - this.meterFromLinkEnd)));
 			if (distanceOnLink > queueEnd) { // vehicle is already in queue
 				distanceOnLink = queueEnd;
 				queueEnd -= vehLen;
