@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.mobsim;
 
+import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -128,7 +129,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		new QueueSimulation(this.network, null, new Events());
 		Vehicle v1 = new Vehicle();
 		Person p = new Person(new IdImpl("1"));
-		Plan plan = p.createPlan(null, "yes");
+		Plan plan = p.createPlan(true);
 		try {
 			plan.createAct("h", 0.0, 0.0, link1, 0.0, 0.0, 0.0, false);
 			Leg leg = plan.createLeg("car", 0.0, 1.0, 1.0);

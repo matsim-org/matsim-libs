@@ -53,11 +53,6 @@ public class Plan extends BasicPlanImpl {
 		this.person = person;
 	}
 
-	public Plan(final String score, final Person person) {
-		this.person = person;
-		if (score != null) { this.setScore(Double.parseDouble(score)); }
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// create methods
 	//////////////////////////////////////////////////////////////////////

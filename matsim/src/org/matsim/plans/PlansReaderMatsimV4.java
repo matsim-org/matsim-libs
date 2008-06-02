@@ -235,7 +235,26 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	private void startPlan(final Attributes atts) {
-		this.currplan = this.currperson.createPlan(atts.getValue("score"), atts.getValue("selected"));
+		String sel = atts.getValue("selected");
+		boolean selected;
+		if (sel.equals("yes")) {
+			selected = true;
+		}
+		else if (sel.equals("no")) {
+			selected = false;
+		}
+		else {
+			throw new NumberFormatException(
+					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+		}
+		this.currplan = this.currperson.createPlan(selected);
+
+		String scoreString = atts.getValue("score");
+		if (scoreString != null) {
+			double score = Double.parseDouble(scoreString);
+			this.currplan.setScore(score);
+		}
+		
 		String type = atts.getValue("type");
 		if (type == null) {
 			this.currplan.setType(Plan.Type.UNDEFINED);

@@ -221,7 +221,7 @@ public class PersonSetActChains extends PersonAlgorithm {
 		}
 
 		person.getPlans().clear();
-		Plan p = person.createPlan(null, "yes");
+		Plan p = person.createPlan(true);
 
 		String [] acttypes = chain.split("");
 		// note: by splitting, the string[0] is always = ""!

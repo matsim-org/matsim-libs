@@ -76,7 +76,7 @@ public class PlansCreateTripsFromODMatrix {
 						Person person = new Person(new IdImpl(counter));
 						person.setCarAvail("yes");
 						person.setEmployed("yes");
-						Plan plan = person.createPlan(null, "yes");
+						Plan plan = person.createPlan(true);
 						CoordI coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
 						int endTime = -1;
 

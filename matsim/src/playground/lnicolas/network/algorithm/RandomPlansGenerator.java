@@ -221,7 +221,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 
 	private boolean addPlan(final Plans plans, final int id, final Node toNode, final Node fromNode) {
 		Person person = new Person(new IdImpl(id));
-		Plan plan = person.createPlan(null, "yes");
+		Plan plan = person.createPlan(true);
 		try {
 			plans.addPerson(person);
 		} catch (Exception e) {

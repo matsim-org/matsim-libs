@@ -73,7 +73,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 
 		Plans plans = new Plans();
 		Person person = new Person(new IdImpl("1"));
-		Plan plan = person.createPlan(null, "yes");
+		Plan plan = person.createPlan(true);
 		try {
 			plans.addPerson(person);
 		} catch (Exception e) {

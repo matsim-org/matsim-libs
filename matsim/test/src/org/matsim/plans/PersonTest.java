@@ -20,6 +20,7 @@
 
 package org.matsim.plans;
 
+import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -34,11 +35,15 @@ public class PersonTest extends MatsimTestCase {
 	public void testRemoveWorstPlans_nullType() {
 		Person person = new Person(new IdImpl("1"));
 
-		Plan plan1 = new Plan("15.0", person);
-		Plan plan2 = new Plan("22.0", person);
-		Plan plan3 = new Plan(null, person);
-		Plan plan4 = new Plan("1.0", person);
-		Plan plan5 = new Plan("18.0", person);
+		Plan plan1 = new Plan(person);
+		plan1.setScore(15.0);
+		Plan plan2 = new Plan(person);
+		plan2.setScore(22.0);
+		Plan plan3 = new Plan(person);
+		Plan plan4 = new Plan(person);
+		plan4.setScore(1.0);
+		Plan plan5 = new Plan(person);
+		plan5.setScore(18.0);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
 		person.addPlan(plan3);
@@ -83,17 +88,23 @@ public class PersonTest extends MatsimTestCase {
 		 */
 		Person person = new Person(new IdImpl("1"));
 
-		Plan plan1 = new Plan("15.0", person);
+		Plan plan1 = new Plan(person);
+		plan1.setScore(15.0);
+		Plan plan2 = new Plan(person);
+		plan2.setScore(22.0);
+		Plan plan3 = new Plan(person);
+		Plan plan4 = new Plan(person);
+		plan4.setScore(1.0);
+		Plan plan5 = new Plan(person);
+		plan5.setScore(18.0);
+		Plan plan6 = new Plan(person);
+		plan6.setScore(21.0);
+		
 		plan1.setType(Plan.Type.CAR);
-		Plan plan2 = new Plan("22.0", person);
 		plan2.setType(Plan.Type.PT);
-		Plan plan3 = new Plan(null, person);
 		plan3.setType(Plan.Type.CAR);
-		Plan plan4 = new Plan("1.0", person);
 		plan4.setType(Plan.Type.PT);
-		Plan plan5 = new Plan("18.0", person);
 		plan5.setType(Plan.Type.CAR);
-		Plan plan6 = new Plan("21.0", person);
 		plan6.setType(Plan.Type.PT);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
@@ -131,12 +142,17 @@ public class PersonTest extends MatsimTestCase {
 	public void testRemoveWorstPlans_selectedPlan() {
 		Person person = new Person(new IdImpl("1"));
 
-		Plan plan1 = new Plan("15.0", person);
-		Plan plan2 = new Plan("22.0", person);
-		Plan plan3 = new Plan(null, person);
-		Plan plan4 = new Plan("1.0", person);
-		Plan plan5 = new Plan("18.0", person);
-		Plan plan6 = new Plan("21.0", person);
+		Plan plan1 = new Plan(person);
+		plan1.setScore(15.0);
+		Plan plan2 = new Plan(person);
+		plan2.setScore(22.0);
+		Plan plan3 = new Plan(person);
+		Plan plan4 = new Plan(person);
+		plan4.setScore(1.0);
+		Plan plan5 = new Plan(person);
+		plan5.setScore(18.0);
+		Plan plan6 = new Plan(person);
+		plan6.setScore(21.0);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
 		person.addPlan(plan3);
@@ -176,16 +192,22 @@ public class PersonTest extends MatsimTestCase {
 		// create a person with 4 unscored plans
 		try {
 			person = new Person(new IdImpl(1));
-			plans[0] = person.createPlan(null, "no");
-			plans[1] = person.createPlan("0.0", "no");
-			plans[2] = person.createPlan(null, "no");
-			plans[3] = person.createPlan("-50.0", "no");
-			plans[4] = person.createPlan("+50.0", "no");
-			plans[5] = person.createPlan("+50.0", "no");
-			plans[6] = person.createPlan("+60.0",  "no");
-			plans[7] = person.createPlan(null, "no");
-			plans[8] = person.createPlan("-10.0",  "no");
-			plans[9] = person.createPlan(null, "no");
+			plans[0] = person.createPlan(false);
+			plans[1] = person.createPlan(false);
+			plans[1].setScore(0.0);
+			plans[2] = person.createPlan(false);
+			plans[3] = person.createPlan(false);
+			plans[3].setScore(-50.0);
+			plans[4] = person.createPlan(false);
+			plans[4].setScore(50.0);
+			plans[5] = person.createPlan(false);
+			plans[5].setScore(50.0);
+			plans[6] = person.createPlan(false);
+			plans[6].setScore(60.0);
+			plans[7] = person.createPlan(false);
+			plans[8] = person.createPlan(false);
+			plans[8].setScore(-10.0);
+			plans[9] = person.createPlan(false);
 			population.addPerson(person);
 		}
 		catch (Exception e) {

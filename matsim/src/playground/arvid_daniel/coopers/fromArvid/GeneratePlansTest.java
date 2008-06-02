@@ -34,8 +34,6 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
 import org.matsim.plans.Route;
-import org.matsim.router.Dijkstra;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
 public class GeneratePlansTest {
 
@@ -66,7 +64,7 @@ public class GeneratePlansTest {
 
 			String ID = Integer.toString(i);
 			Person person = new Person(new IdImpl(ID));
-			Plan plan = new Plan("0", person);
+			Plan plan = new Plan(person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.0*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
 //			Link startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2;
@@ -98,7 +96,7 @@ public class GeneratePlansTest {
 			double earliestStartTime = 7*3600;
 
 			Person person = new Person(new IdImpl(i));
-			Plan plan = new Plan("0", person);
+			Plan plan = new Plan(person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
 			Act actstart = new Act("h", 0,0, startLink1, 0, endTime, endTime, false);
@@ -130,7 +128,7 @@ public class GeneratePlansTest {
 
 			String ID = Integer.toString(i);
 			Person person = new Person(new IdImpl(ID));
-			Plan plan = new Plan("0", person);
+			Plan plan = new Plan(person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
 			Act actstart = new Act("h", 0,0, startLink2, 0, endTime, endTime, false);

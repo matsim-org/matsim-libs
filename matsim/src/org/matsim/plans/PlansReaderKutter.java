@@ -238,7 +238,7 @@ public class PlansReaderKutter implements PlansReaderI {
 		}
 
 		private final void parsePlan(final String[] row) {
-			this.currPlan = this.currPerson.createPlan(null, "yes");
+			this.currPlan = this.currPerson.createPlan(true);
 
 			String homeCell = row[1];
 			Zone zone = (Zone)this.tvzLayer.getLocation(homeCell);

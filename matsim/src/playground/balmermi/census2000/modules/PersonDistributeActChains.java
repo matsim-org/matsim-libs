@@ -196,7 +196,7 @@ public class PersonDistributeActChains extends PersonAlgorithm implements PlanAl
 		ArrayList<ArrayList<Integer>> chains = this.actchains.getChains(bitcode);
 		int index = Gbl.random.nextInt(chains.size());
 		ArrayList<Integer> chain = chains.get(index);
-		Plan plan =  p.createPlan(null, "yes");
+		Plan plan =  p.createPlan(true);
 		int time_sum = 0;
 		for (int i=0; i<chain.size(); i=i+2) {
 			int val = chain.get(i);

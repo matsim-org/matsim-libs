@@ -34,16 +34,16 @@ public class Person extends BasicPersonImpl<Plan>{
 
 	private String visualizerData = null;
 
+	
 	public Person(Id id) {
 		super(id);
 	}
 	
-	public final Plan createPlan(final String score, final String selected) {
-		Plan p = new Plan(score, this);
+	public final Plan createPlan(final boolean selected) {
+		Plan p = new Plan(this);
 		this.plans.add(p);
-		if (selected.equals("yes")) {	setSelectedPlan(p); }
-		else if (!selected.equals("no")) {
-			throw new NumberFormatException("Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+		if (selected) {
+			setSelectedPlan(p);
 		}
 		// Make sure there is a selected plan if there is at least one plan
 		if (this.selectedPlan == null) this.selectedPlan = p;

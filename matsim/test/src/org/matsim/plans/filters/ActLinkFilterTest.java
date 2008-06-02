@@ -22,6 +22,7 @@ package org.matsim.plans.filters;
 
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
@@ -56,7 +57,7 @@ public class ActLinkFilterTest extends MatsimTestCase {
 		String actType = null;
 		for (String personId : new String[]{"1", "2"}) {
 			Person person = new Person(new IdImpl(personId));
-			Plan plan = person.createPlan("0.0", "yes");
+			Plan plan = person.createPlan(true);
 			if (personId.equals("1")) {
 				linkId = "1";
 				actType = GENERAL_HOME_ACT_TYPE;

@@ -39,7 +39,7 @@ import java.util.Map;
  * 
  * @author balmermi
  */
-public class CustomizableImpl implements Customizable {
+public abstract class CustomizableImpl implements Customizable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

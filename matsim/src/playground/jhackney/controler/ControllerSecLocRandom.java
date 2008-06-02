@@ -21,10 +21,6 @@
 package playground.jhackney.controler;
 
 import org.matsim.controler.Controler;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.selectors.BestPlanSelector;
-import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcher;
 
 
 public class ControllerSecLocRandom extends Controler {

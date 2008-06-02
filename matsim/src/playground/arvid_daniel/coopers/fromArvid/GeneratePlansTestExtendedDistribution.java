@@ -68,7 +68,7 @@ public class GeneratePlansTestExtendedDistribution {
 			double earliestStartTime = 7*3600;
 
 			Person person = new Person(new IdImpl(i));
-			Plan plan = new Plan("0",person);
+			Plan plan = new Plan(person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.0*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
 //			Link startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2;
@@ -100,7 +100,7 @@ public class GeneratePlansTestExtendedDistribution {
 			double earliestStartTime = 7*3600;
 
 			Person person = new Person(new IdImpl(i));
-			Plan plan = new Plan("0",person);
+			Plan plan = new Plan(person);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 7.*3600;
 			Act actstart = new Act("h", 0,0, startLink1, 0, endTime, endTime, false);
@@ -131,7 +131,7 @@ public class GeneratePlansTestExtendedDistribution {
 			double earliestStartTime = 7*3600;
 
 			Person person = new Person(new IdImpl(i));
-			Plan plan = new Plan("0",person);
+			Plan plan = new Plan(person);
 
 			int charge = rnd.nextInt(11);
 			double endTime = earliestStartTime + (charge + 0) * 10 * 60 + (int)(rnd.nextDouble() * 5 * 60);
@@ -165,7 +165,7 @@ public class GeneratePlansTestExtendedDistribution {
 			double earliestStartTime = 7*3600;
 
 			Person person = new Person(new IdImpl(i));
-			Plan plan = new Plan("0",person);
+			Plan plan = new Plan(person);
 
 			int charge = rnd.nextInt(1);
 			double endTime = earliestStartTime + 5 *60  + (charge + 1) * 10 *60 + (int)(rnd.nextDouble() * 5 *60);

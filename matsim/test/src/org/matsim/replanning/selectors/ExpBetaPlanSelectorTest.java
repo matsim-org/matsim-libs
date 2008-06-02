@@ -54,12 +54,17 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
 		Person person = new Person(new IdImpl(1));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
-		Plan plan1 = person.createPlan("96.0", "no"); // weight: 0.0003.35462627902512
-		Plan plan2 = person.createPlan("97.0", "no"); // weight: 0.0024787521766663594
-		Plan plan3 = person.createPlan("98.0", "no"); // weight: 0.018315638888734186
-		Plan plan4 = person.createPlan("99.0", "no"); // weight: 0.1353352832366127
-		Plan plan5 = person.createPlan("100.0", "no");// weight: 1
-
+		Plan plan1 = person.createPlan(false); // weight: 0.0003.35462627902512
+		plan1.setScore(96.0);
+		Plan plan2 = person.createPlan(false); // weight: 0.0024787521766663594
+		plan2.setScore(97.0);
+		Plan plan3 = person.createPlan(false); // weight: 0.018315638888734186
+		plan3.setScore(98.0);
+		Plan plan4 = person.createPlan(false); // weight: 0.1353352832366127
+		plan4.setScore(99.0);
+		Plan plan5 = person.createPlan(false);// weight: 1
+		plan5.setScore(100.0);
+		
 		ExpBetaPlanSelector selector = new ExpBetaPlanSelector();
 		int cnt1 = 0;
 		int cnt2 = 0;
@@ -101,12 +106,24 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		this.config.charyparNagelScoring().setBrainExpBeta(1.0);
 		Person person = new Person(new IdImpl(1));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
-		Plan plan1 = person.createPlan("96.0", "no"); // weight: 0.018315638888734186
-		Plan plan2 = person.createPlan("97.0", "no"); // weight: 0.04978706836786395
-		Plan plan3 = person.createPlan("98.0", "no"); // weight: 0.1353352832366127
-		Plan plan4 = person.createPlan("99.0", "no"); // weight: 0.3678794411714423
-		Plan plan5 = person.createPlan("100.0", "no");// weight: 1
+		// weight: 0.018315638888734186
+		Plan plan1 = person.createPlan(false); 
+		plan1.setScore(96.0);
+		// weight: 0.04978706836786395
+		Plan plan2 = person.createPlan(false); 
+		plan2.setScore(97.0);
+		// weight: 0.1353352832366127
+		Plan plan3 = person.createPlan(false); 
+		plan3.setScore(98.0);
+		// weight: 0.3678794411714423
+		Plan plan4 = person.createPlan(false); 
+		plan4.setScore(99.0);
+		// weight: 1
+		Plan plan5 = person.createPlan(false);
+		plan5.setScore(100.0);
 
+		
+		
 		ExpBetaPlanSelector selector = new ExpBetaPlanSelector();
 		int cnt1 = 0;
 		int cnt2 = 0;

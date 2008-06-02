@@ -43,7 +43,7 @@ public class GeneratePlans {
 	 * @param net
 	 */
 
-	public static void createCOOPERSSpecificVehicles(final Plans plans2, final NetworkLayer net) {
+	public static void createCOOPERSSpecificVehicles(Plans plans2, NetworkLayer net) {
 		// Erzeuge einen strom von vehicles, die die autobahn runter wollen
 		Link startLink1 = net.getLinks().get("7829");
 		Link startLink2 = net.getLinks().get("8453");
@@ -61,7 +61,8 @@ public class GeneratePlans {
 
 			String ID = Integer.toString(Integer.MAX_VALUE - i);
 			Person person = new Person(new IdImpl(ID));
-			Plan plan = new Plan("0", person);
+			Plan plan = new Plan(person);
+			plan.setScore(0.0);
 			double endTime = earliestStartTime + (int)(rnd.nextDouble()*2.*3600);
 			double arrivalTime = earliestStartTime + 3.*3600;
 			Link startLink = rnd.nextDouble() < 0.5 ? startLink1 : startLink2;

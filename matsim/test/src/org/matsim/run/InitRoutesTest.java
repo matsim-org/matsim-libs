@@ -65,7 +65,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		Plans population = new Plans(Plans.NO_STREAMING);
 		Person person = new Person(new IdImpl("1"));
 		population.addPerson(person);
-		Plan plan = person.createPlan(null, "yes");
+		Plan plan = person.createPlan(true);
 		plan.createAct("h", 50, 25, network.getLink(new IdImpl("1")), 0, 3600, 3600, false);
 		plan.createLeg("car", 3600, 100, 3700);
 		plan.createAct("w", 50, 25, network.getLink(new IdImpl("20")), 3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);

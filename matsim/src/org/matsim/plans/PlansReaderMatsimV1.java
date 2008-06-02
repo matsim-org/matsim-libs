@@ -33,23 +33,33 @@ import org.xml.sax.SAXException;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v1.dtd</code>.
- *
+ * 
  * @author mrieser
  * @author balmermi
  */
-public class PlansReaderMatsimV1 extends MatsimXmlParser implements PlansReaderI {
+public class PlansReaderMatsimV1 extends MatsimXmlParser implements
+		PlansReaderI {
 
 	private final static String PLANS = "plans";
+
 	private final static String PERSON = "person";
+
 	private final static String PLAN = "plan";
+
 	private final static String ACT = "act";
+
 	private final static String LEG = "leg";
+
 	private final static String ROUTE = "route";
 
 	private final Plans plans;
+
 	private Person currperson = null;
+
 	private Plan currplan = null;
+
 	private Leg currleg = null;
+
 	private Route currroute = null;
 
 	public PlansReaderMatsimV1(final Plans plans) {
@@ -57,26 +67,34 @@ public class PlansReaderMatsimV1 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	@Override
-	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+	public void startTag(final String name, final Attributes atts,
+			final Stack<String> context) {
 		if (PLANS.equals(name)) {
 			startPlans(atts);
-		} else if (PERSON.equals(name)) {
+		}
+		else if (PERSON.equals(name)) {
 			startPerson(atts);
-		} else if (PLAN.equals(name)) {
+		}
+		else if (PLAN.equals(name)) {
 			startPlan(atts);
-		} else if (ACT.equals(name)) {
+		}
+		else if (ACT.equals(name)) {
 			startAct(atts);
-		} else if (LEG.equals(name)) {
+		}
+		else if (LEG.equals(name)) {
 			startLeg(atts);
-		} else if (ROUTE.equals(name)) {
+		}
+		else if (ROUTE.equals(name)) {
 			startRoute(atts);
-		} else {
+		}
+		else {
 			Gbl.errorMsg(this + "[tag=" + name + " not known or not supported]");
 		}
 	}
 
 	@Override
-	public void endTag(final String name, final String content, final Stack<String> context) {
+	public void endTag(final String name, final String content,
+			final Stack<String> context) {
 		if (PERSON.equals(name)) {
 			try {
 				this.plans.addPerson(this.currperson);
@@ -84,22 +102,26 @@ public class PlansReaderMatsimV1 extends MatsimXmlParser implements PlansReaderI
 				Gbl.errorMsg(e);
 			}
 			this.currperson = null;
-		} else if (PLAN.equals(name)) {
+		}
+		else if (PLAN.equals(name)) {
 			this.currplan.getActsLegs().trimToSize();
 			this.currplan = null;
-		} else if (LEG.equals(name)) {
+		}
+		else if (LEG.equals(name)) {
 			this.currleg = null;
-		} else if (ROUTE.equals(name)) {
+		}
+		else if (ROUTE.equals(name)) {
 			this.currroute.setRoute(content);
 			this.currroute = null;
 		}
 	}
 
 	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
+	 * Parses the specified plans file. This method calls {@link #parse(String)},
+	 * but handles all possible exceptions on its own.
+	 * 
+	 * @param filename
+	 *          The name of the file to parse.
 	 */
 	public void readFile(final String filename) {
 		try {
@@ -127,13 +149,34 @@ public class PlansReaderMatsimV1 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	private void startPlan(final Attributes atts) {
-		this.currplan = this.currperson.createPlan(atts.getValue("score"), atts.getValue("selected"));
+		String sel = atts.getValue("selected");
+		boolean selected;
+		if (sel.equals("yes")) {
+			selected = true;
+		}
+		else if (sel.equals("no")) {
+			selected = false;
+		}
+		else {
+			throw new NumberFormatException(
+					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+		}
+		this.currplan = this.currperson.createPlan(selected);
+
+		String scoreString = atts.getValue("score");
+		if (scoreString != null) {
+			double score = Double.parseDouble(scoreString);
+			this.currplan.setScore(score);
+		}
+
 	}
 
 	private void startAct(final Attributes atts) {
 		try {
-			this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"), atts.getValue("y100"), atts
-					.getValue("link"), atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"), null);
+			this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"),
+					atts.getValue("y100"), atts.getValue("link"), atts
+							.getValue("start_time"), atts.getValue("end_time"), atts
+							.getValue("dur"), null);
 		} catch (Exception e) {
 			Gbl.errorMsg(e);
 		}
@@ -149,7 +192,8 @@ public class PlansReaderMatsimV1 extends MatsimXmlParser implements PlansReaderI
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = this.currleg.createRoute(atts.getValue("dist"), atts.getValue("trav_time"));
+		this.currroute = this.currleg.createRoute(atts.getValue("dist"), atts
+				.getValue("trav_time"));
 	}
 
 }

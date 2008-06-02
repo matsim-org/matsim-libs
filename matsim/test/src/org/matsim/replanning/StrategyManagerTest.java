@@ -136,16 +136,22 @@ public class StrategyManagerTest extends MatsimTestCase {
 		// create a person with 4 unscored plans
 		try {
 			person = new Person(new IdImpl(1));
-			plans[0] = person.createPlan(null, "no");
-			plans[1] = person.createPlan("0.0", "no");
-			plans[2] = person.createPlan(null, "no");
-			plans[3] = person.createPlan("-50.0", "no");
-			plans[4] = person.createPlan("+50.0", "no");
-			plans[5] = person.createPlan("+50.0", "no");
-			plans[6] = person.createPlan("+60.0",  "no");
-			plans[7] = person.createPlan(null, "no");
-			plans[8] = person.createPlan("-10.0",  "no");
-			plans[9] = person.createPlan(null, "no");
+			plans[0] = person.createPlan(false);
+			plans[1] = person.createPlan(false);
+			plans[1].setScore(0.0);
+			plans[2] = person.createPlan(false);
+			plans[3] = person.createPlan(false);
+			plans[3].setScore(-50.0);
+			plans[4] = person.createPlan(false);
+			plans[4].setScore(50.0);
+			plans[5] = person.createPlan(false);
+			plans[5].setScore(50.0);
+			plans[6] = person.createPlan(false);
+			plans[6].setScore(60.0);
+			plans[7] = person.createPlan(false);
+			plans[8] = person.createPlan(false);
+			plans[8].setScore(-10.0);
+			plans[9] = person.createPlan(false);
 			population.addPerson(person);
 		}
 		catch (Exception e) {

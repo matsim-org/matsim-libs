@@ -463,7 +463,7 @@ public class MyRunsRouting extends MyRuns {
 
 			for (int j = 0; j < tripCount; j++) {
 				Person person = new Person(new IdImpl(j));
-				Plan plan = person.createPlan(null, "yes");
+				Plan plan = person.createPlan(true);
 
 				int choice = (int) (Math.random() * links.size());
 				plan.createAct("h", (Double)null, null, links.get(choice).getId().toString(),

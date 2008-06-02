@@ -110,7 +110,7 @@ public class PlansCreateFromMZ {
 				Person person = plans.getPerson(pid);
 				if (person == null) { person = new Person(pid); plans.addPerson(person); }
 				Plan plan = person.getSelectedPlan();
-				if (plan == null) { person.createPlan(null,"yes"); plan = person.getSelectedPlan(); }
+				if (plan == null) { person.createPlan(true); plan = person.getSelectedPlan(); }
 				if (plan.getActsLegs().size() != 0) {
 					plan.createLeg(mode,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME);
 					plan.createAct(acttype,to.getX(),to.getY(),null,0,0,0,false);

@@ -72,7 +72,7 @@ public class ControlerTest extends MatsimTestCase {
 		Person person1 = null;
 		try {
 			person1 = new Person(new IdImpl(1));
-			Plan plan1 = person1.createPlan(null, "yes");
+			Plan plan1 = person1.createPlan(true);
 			plan1.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 			Leg leg1 = plan1.createLeg("car", "07:00:00", "00:00:00", null);
 			Route route1 = leg1.createRoute(null, null);
@@ -81,7 +81,7 @@ public class ControlerTest extends MatsimTestCase {
 			population.addPerson(person1);
 
 			Person person2 = new Person(new IdImpl(2));
-			Plan plan2 = person2.createPlan(null, "yes");
+			Plan plan2 = person2.createPlan(true);
 			plan2.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 			Leg leg2 = plan2.createLeg("car", "07:00:00", "00:00:00", null);
 			Route route2 = leg2.createRoute(null, null);
@@ -166,13 +166,13 @@ public class ControlerTest extends MatsimTestCase {
 		try {
 			person1 = new Person(new IdImpl(1));
 			// --- plan 1 ---
-			Plan plan1 = person1.createPlan(null, "yes");
+			Plan plan1 = person1.createPlan(true);
 			plan1.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 			leg1 = plan1.createLeg("car", "07:00:00", "00:00:00", null);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
 			plan1.createAct("h", (String)null, null, "3", "07:00:00", null, null, "no");
 			// --- plan 2 ---
-			Plan plan2 = person1.createPlan(null, "yes");
+			Plan plan2 = person1.createPlan(true);
 			plan2.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 			leg2 = plan2.createLeg("car", "07:00:00", "00:00:00", null);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
@@ -245,13 +245,13 @@ public class ControlerTest extends MatsimTestCase {
 		try {
 			person1 = new Person(new IdImpl(1));
 			// --- plan 1 ---
-			Plan plan1 = person1.createPlan(null, "yes");
+			Plan plan1 = person1.createPlan(true);
 			act1a = plan1.createAct("h", "-50.0", "10.0", null, "00:00:00", "07:00:00", "07:00:00", "no");
 			leg1 = plan1.createLeg("car", "07:00:00", "00:00:00", null);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
 			act1b = plan1.createAct("h", "1075.0", "-10.0", null, "07:00:00", null, null, "no");
 			// --- plan 2 ---
-			Plan plan2 = person1.createPlan(null, "yes");
+			Plan plan2 = person1.createPlan(true);
 			act2a = plan2.createAct("h", "-50.0", "-10.0", null, "00:00:00", "07:00:00", "07:00:00", "no");
 			leg2 = plan2.createLeg("car", "07:00:00", "00:00:00", null);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!

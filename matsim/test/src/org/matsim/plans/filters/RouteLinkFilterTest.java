@@ -20,6 +20,7 @@
 
 package org.matsim.plans.filters;
 
+import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -62,7 +63,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Route route;
 		try {
 			person = new Person(new IdImpl("1"));
-			plan = person.createPlan(null, "yes");
+			plan = person.createPlan(true);
 			plan.createAct("h", (String)null, null, "1", null, "07:00:00", null, null);
 			leg = plan.createLeg("car", "07:00:00", null, null);
 			route = new Route();
@@ -72,7 +73,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 			population.addPerson(person);
 
 			person = new Person(new IdImpl("2"));
-			plan = person.createPlan(null, "yes");
+			plan = person.createPlan(true);
 			plan.createAct("h", (String)null, null, "1", null, "07:05:00", null, null);
 			leg = plan.createLeg("car", "07:05:00", null, null);
 			route = new Route();
@@ -82,7 +83,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 			population.addPerson(person);
 
 			person = new Person(new IdImpl("3"));
-			plan = person.createPlan(null, "yes");
+			plan = person.createPlan(true);
 			plan.createAct("h", (String)null, null, "1", null, "07:10:00", null, null);
 			leg = plan.createLeg("car", "07:10:00", null, null);
 			route = new Route();

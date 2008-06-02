@@ -86,7 +86,7 @@ public class PersonCreateFakePlanFromKnowledge extends PersonAlgorithm {
 			if (!educ_acts.isEmpty()) { educ = educ_acts.get(0); }
 		}
 		
-		Plan p = person.createPlan(null,"yes");
+		Plan p = person.createPlan(true);
 		try {
 			if ((work==null)&&(educ==null)) {
 				Act act = p.createAct(home.getType(),home.getFacility().getCenter().getX(),home.getFacility().getCenter().getY(),null,0,24*3600,24*3600,true);

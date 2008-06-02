@@ -44,16 +44,22 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testBestPlan() {
 		Person person = new Person(new IdImpl(1));
-		person.createPlan(null, "no");
-		person.createPlan("10.0", "no");
-		person.createPlan("-50.0", "no");
-		person.createPlan("40.0", "no");
-		person.createPlan("30.0", "no");
-		person.createPlan("-20.0", "no");
+		Plan plan;
+		person.createPlan(false);
+		plan = person.createPlan(false);
+		plan.setScore(10.0);
+		plan = person.createPlan(false);
+		plan.setScore(-50.0);
+		plan = person.createPlan(false);
+		plan.setScore(40.0);
+		plan = person.createPlan(false);
+		plan.setScore(30.0);
+		plan = person.createPlan(false);
+		plan.setScore(-20.0);
 
 		BestPlanSelector selector = new BestPlanSelector();
 
-		Plan plan = selector.selectPlan(person);
+		plan = selector.selectPlan(person);
 		assertEquals(40.0, plan.getScore(), 0.0);
 		plan.setScore(BasicPlan.UNDEF_SCORE);
 
