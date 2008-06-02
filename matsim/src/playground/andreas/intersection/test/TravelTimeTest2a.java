@@ -173,7 +173,7 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 		private final double firstVehPassTime_s;
 	  	private double lastVehPassTime_s;
 	  	private int numberOfVehPassed_ = 0;
-	  	private int numberOfVehPassedDuringTimeToMeasure_ ;
+	  	private int numberOfVehPassedDuringTimeToMeasure_ = 0;
 		
 		public MeasurePoint(double time) {
 			this.firstVehPassTime_s = time;
