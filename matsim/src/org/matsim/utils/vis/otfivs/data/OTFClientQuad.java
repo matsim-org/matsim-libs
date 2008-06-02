@@ -52,6 +52,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	private final String id;
 	private final OTFServerRemote host;
 	private OTFConnectionManager connect;
+	private static boolean cachingAllowed = true;
 	
 	private final List<OTFDataReader> additionalElements= new LinkedList<OTFDataReader>();
 
@@ -265,7 +266,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 
 		result.finish();
-		cachedTimes.put(time, result);
+		if (isCachingAllowed()) cachedTimes.put(time, result);
 		return result;
 	}
 	
@@ -312,5 +313,19 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	/**
+	 * @return the chachingAllowed
+	 */
+	public static boolean isCachingAllowed() {
+		return cachingAllowed;
+	}
+
+	/**
+	 * @param chachingAllowed the chachingAllowed to set
+	 */
+	public static void setCachingAllowed(boolean cachingAllowed) {
+		OTFClientQuad.cachingAllowed = cachingAllowed;
 	}
 }

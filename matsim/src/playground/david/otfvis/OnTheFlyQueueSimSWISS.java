@@ -69,7 +69,7 @@ public class OnTheFlyQueueSimSWISS {
 		config.simulation().setEndTime(Time.parseTime("00:00:11"));
 		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
 		sim = new OnTheFlyQueueSim(net, population, events);
-		sim.setOtfwriter(new OTFQuadFileHandler.Writer (600,qnet,"output/OTFQuadfileSCHWEIZ2.mvi.gz"));
+		sim.setOtfwriter(new OTFQuadFileHandler.Writer (600,qnet,"output/OTFQuadfileSCHWEIZ2.mvi"));
 
 
 		sim.run();

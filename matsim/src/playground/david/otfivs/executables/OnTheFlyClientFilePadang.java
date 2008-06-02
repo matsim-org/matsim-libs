@@ -54,7 +54,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	public OTFDrawer getLeftDrawerComponent(JFrame frame) throws RemoteException {
 		 ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(2);
 		OTFClientQuad clientQ = hostControl.createNewView(null, null, connect1);
-
+		//clientQ.setCachingAllowed(false);
+		
 		OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
 
 
@@ -86,6 +87,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	@Override
 	public OTFDrawer getRightDrawerComponent(JFrame frame) throws RemoteException {
 		OTFClientQuad clientQ2 = hostControl.createNewView(null, null, connect1);
+		//clientQ2.setCachingAllowed(false);
 
 		OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
 		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
@@ -99,10 +101,11 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../MatsimJ/output/testSWI2.mvi.gz";
 //		String filename = "test/padang.mvi";
 
-		
+
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
 //		String filename = "../OnTheFlyVis/test/testPadabang1.3.mvi"; //Flooding.mvi";
-		String filename = "../vsp-cvs/runs/run306/output/ITERS/it.100/100.movie.mvi";
+//		String filename = "../vsp-cvs/runs/run306/output/ITERS/it.100/100.movie.mvi";
+		String filename = "output/testPadabang1.3.mvi";
 
 		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect1.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);

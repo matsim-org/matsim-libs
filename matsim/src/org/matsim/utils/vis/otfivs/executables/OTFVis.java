@@ -29,7 +29,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.otfivs.gui.OTFHostControlBar;
 import org.matsim.utils.vis.otfivs.gui.OTFVisConfig;
 
-
+/**
+ * @deprecated 
+ * use org.matsim.run.OTFVis instead
+ */
+@Deprecated
 public class OTFVis   extends Thread {
 	private final JFrame frame;
 	private final OTFHostControlBar hostControl;

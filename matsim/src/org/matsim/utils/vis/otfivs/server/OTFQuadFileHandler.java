@@ -279,6 +279,9 @@ public class OTFQuadFileHandler {
 
 			this.inFile = new DataInputStream(new BufferedInputStream(this.zipFile.getInputStream(entry)));
 			readStateBuffer(buffer);
+			
+			//Gbl.printMemoryUsage();
+			
 			return buffer;
 		}
 
@@ -455,6 +458,7 @@ public class OTFQuadFileHandler {
 			try {
 				this.inFile = new DataInputStream(this.zipFile.getInputStream(entry));
 				readStateBuffer(buffer);
+				this.inFile.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
