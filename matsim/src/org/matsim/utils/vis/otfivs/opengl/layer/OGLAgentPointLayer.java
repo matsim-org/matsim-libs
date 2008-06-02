@@ -118,11 +118,13 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	        gl.glEnableClientState (GL.GL_VERTEX_ARRAY);   
 	        
 	        setTexture();
-	        
-			texture.enable();
-			gl.glEnable(GL.GL_TEXTURE_2D);
-			gl.glTexEnvf(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
-			texture.bind();
+	        if (texture != null) {
+				texture.enable();
+				gl.glEnable(GL.GL_TEXTURE_2D);
+				gl.glTexEnvf(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
+				texture.bind();	        	
+	        }
+
 			
 			for(int i = 0; i < posBuffers.size(); i++) {
 				colors = colBuffers.get(i);
@@ -137,8 +139,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 	        gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 	        gl.glDisableClientState (GL.GL_VERTEX_ARRAY); 
-
-	        texture.disable();
+	        if (texture != null ) {
+	        	texture.disable();	
+	        }
+	        
 	        
 	        gl.glDisable(GL.GL_POINT_SPRITE_ARB);
 		
@@ -231,7 +235,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			@Override
 			protected void setAgentSize(){gl.glPointSize(10);};
 			@Override
-			protected void setTexture(){this.texture = AgentDrawer.wavejpg;};
+			protected void setTexture(){this.texture = null;};
 		};
 		public final AgentArrayDrawer drawerEvacuees = new AgentArrayDrawer(){
 			@Override
