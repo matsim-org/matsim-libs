@@ -161,6 +161,10 @@ public class PseudoLink {
 		if (this.flowCapacityFractionalRest < 1.0) {
 			this.flowCapacityFractionalRest += this.flowCapacityFraction;
 		}
+		
+//		if(!this.hasFlowQueueSpace() && this.amIOriginalLink == false && meterFromLinkEnd == 0 && this.flowCapacityFractionalRest > 1.0){
+//			this.flowCapacityFractionalRest = 1.0;
+//		}
 
 	}
 
@@ -304,6 +308,51 @@ public class PseudoLink {
 	}
 
 	QVehicle getFirstFromBuffer() {
+		
+//		double maximumFlowCapacity = this.flowCapacity;
+//
+//		QVehicle veh;
+//		while ((veh = (QVehicle)this.storageQueue.peek()) != null) {
+//			if (veh.getDepartureTime_s() > now) {
+//				break;
+//			}
+//
+//			if (veh.getDestinationLink().getId() == this.realLink.getLink().getId()) {
+//
+//				QSim.getEvents().processEvent(new EventAgentArrival(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+//						this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
+//				veh.reachActivity(now, this.realLink);
+//				this.storageQueue.poll();
+//				continue;
+//			}
+//
+//			if (!hasFlowQueueSpace()) {
+//				break;
+//			}
+//
+//			if (maximumFlowCapacity >= 1.0) {
+//				maximumFlowCapacity--;
+//				addToFlowQueue(veh, now);
+//				this.storageQueue.poll();
+//				continue;
+//
+//			} else if (this.flowCapacityFractionalRest >= 1.0) {
+//				this.flowCapacityFractionalRest--;
+//				addToFlowQueue(veh, now);
+//				this.storageQueue.poll();
+//				break;
+//			} else {
+//				break;
+//			}
+//		}
+//
+//		if (this.flowCapacityFractionalRest < 1.0) {
+//			this.flowCapacityFractionalRest += this.flowCapacityFraction;
+//		}
+		
+		
+		
+		
 		return this.flowQueue.peek();
 	}
 

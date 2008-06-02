@@ -7,15 +7,18 @@ import org.matsim.network.Link;
 @SuppressWarnings("serial")
 public class QVehicle extends Vehicle {
 
-	 protected void reachActivity(final double now, QueueLink currentQueueLink) {
+	 @Override
+	protected void reachActivity(final double now, QueueLink currentQueueLink) {
 		 super.reachActivity(now, currentQueueLink);
 	 }
 	 
-	 protected Link chooseNextLink() {
+	 @Override
+	protected Link chooseNextLink() {
 		 return super.chooseNextLink();
 	 }
 
-	 protected void leaveActivity(final double now) {
+	 @Override
+	protected void leaveActivity(final double now) {
 		 super.leaveActivity(now);
 	 }
 	 

@@ -44,20 +44,20 @@ public class TravelTimeTest4a extends MatsimTestCase implements	EventHandlerLink
 
 		assertEquals(118.0, agentTravelTimes.get(new IdImpl(1)).intValue(), EPSILON);
 		assertEquals(118.0, agentTravelTimes.get(new IdImpl(2)).intValue(), EPSILON);
-		assertEquals(119.0, agentTravelTimes.get(new IdImpl(3)).intValue(), EPSILON);
-		assertEquals(120.0, agentTravelTimes.get(new IdImpl(4)).intValue(), EPSILON);
-		assertEquals( 80.0, agentTravelTimes.get(new IdImpl(5)).intValue(), EPSILON);
-		assertEquals( 79.0, agentTravelTimes.get(new IdImpl(6)).intValue(), EPSILON);
-		assertEquals( 78.0, agentTravelTimes.get(new IdImpl(7)).intValue(), EPSILON);
-		assertEquals( 77.0, agentTravelTimes.get(new IdImpl(8)).intValue(), EPSILON);
-		assertEquals( 90.0, agentTravelTimes.get(new IdImpl(9)).intValue(), EPSILON);
-		assertEquals( 87.0, agentTravelTimes.get(new IdImpl(10)).intValue(), EPSILON);
-		assertEquals( 89.0, agentTravelTimes.get(new IdImpl(11)).intValue(), EPSILON);
-		assertEquals( 89.0, agentTravelTimes.get(new IdImpl(12)).intValue(), EPSILON);
-		assertEquals(103.0, agentTravelTimes.get(new IdImpl(13)).intValue(), EPSILON);	
-		assertEquals(103.0, agentTravelTimes.get(new IdImpl(14)).intValue(), EPSILON);	
-		assertEquals(104.0, agentTravelTimes.get(new IdImpl(15)).intValue(), EPSILON);	
-		assertEquals(105.0, agentTravelTimes.get(new IdImpl(16)).intValue(), EPSILON);	
+		assertEquals(129.0, agentTravelTimes.get(new IdImpl(3)).intValue(), EPSILON);
+		assertEquals( 80.0, agentTravelTimes.get(new IdImpl(4)).intValue(), EPSILON);
+		assertEquals(167.0, agentTravelTimes.get(new IdImpl(5)).intValue(), EPSILON);
+		assertEquals(111.0, agentTravelTimes.get(new IdImpl(6)).intValue(), EPSILON);
+		assertEquals(110.0, agentTravelTimes.get(new IdImpl(7)).intValue(), EPSILON);
+		assertEquals(110.0, agentTravelTimes.get(new IdImpl(8)).intValue(), EPSILON);
+		assertEquals(110.0, agentTravelTimes.get(new IdImpl(9)).intValue(), EPSILON);
+		assertEquals(167.0, agentTravelTimes.get(new IdImpl(10)).intValue(), EPSILON);
+		assertEquals(111.0, agentTravelTimes.get(new IdImpl(11)).intValue(), EPSILON);
+		assertEquals(110.0, agentTravelTimes.get(new IdImpl(12)).intValue(), EPSILON);
+		assertEquals(167.0, agentTravelTimes.get(new IdImpl(13)).intValue(), EPSILON);	
+		assertEquals(111.0, agentTravelTimes.get(new IdImpl(14)).intValue(), EPSILON);	
+		assertEquals(110.0, agentTravelTimes.get(new IdImpl(15)).intValue(), EPSILON);	
+		assertEquals(110.0, agentTravelTimes.get(new IdImpl(16)).intValue(), EPSILON);	
 		
 	}
 

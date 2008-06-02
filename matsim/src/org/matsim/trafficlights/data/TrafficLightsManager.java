@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
@@ -36,13 +37,13 @@ import org.matsim.network.NetworkLayer;
  */
 public class TrafficLightsManager {
 
-	private List<SignalGroupDefinition> signalDefinitions;
+	private Set<SignalGroupDefinition> signalDefinitions;
 
 	private Map<SignalLane, SignalGroupDefinition> fromLaneGroupMap;
 
 	private NetworkLayer network;
 
-	public TrafficLightsManager(List<SignalGroupDefinition> defs, NetworkLayer net) {
+	public TrafficLightsManager(Set<SignalGroupDefinition> defs, NetworkLayer net) {
 		this.signalDefinitions = defs;
 		this.network = net;
 		this.fromLaneGroupMap = new HashMap<SignalLane, SignalGroupDefinition>(defs.size(), 0.95f);

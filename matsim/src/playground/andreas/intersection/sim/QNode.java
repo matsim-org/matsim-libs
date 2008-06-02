@@ -1,7 +1,11 @@
 package playground.andreas.intersection.sim;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import org.apache.velocity.runtime.directive.Foreach;
+import org.matsim.basic.v01.Id;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueNode;
@@ -9,6 +13,7 @@ import org.matsim.mobsim.Vehicle;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.trafficlights.data.SignalGroupSettings;
+import org.matsim.trafficlights.data.SignalLane;
 
 import playground.andreas.intersection.tl.SignalSystemControlerImpl;
 
@@ -29,13 +34,12 @@ public class QNode extends QueueNode{
 	}
 
 	/** Simple moveNode, Complex one can be found in {@link QueueLink} */
+	@Override
 	public void moveNode(final double now) {
 
 		if(this.myNodeTrafficLightControler != null){
 
 			// Node is traffic light controlled
-			
-			// TODO [an] has to be changed to getGreenInLANES instead of LINKS
 
 			SignalGroupSettings[] greenSignalGroups = this.myNodeTrafficLightControler.getGreenInLinks(now);
 
@@ -47,10 +51,14 @@ public class QNode extends QueueNode{
 					Link link = (Link) this.getNode().getInLinks().get((signalGroupSetting.getSignalGroupDefinition().getLinkId()));
 					
 					QLink qLink = (QLink) queueNetworkLayer.getQueueLink(link.getId());
+					
+					List <Link> toLinks = new ArrayList<Link>();
+					for (SignalLane signalLane : signalGroupSetting.getSignalGroupDefinition().getToLanes()) {
+						toLinks.add(this.getNode().getOutLinks().get(signalLane.getLinkId()));
+					}
 
-					for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
+					for (PseudoLink pseudoLink : qLink.getNodePseudoLinks(toLinks)) {
 						
-						//TODO [an] Falscher Abruf, hier muss die FlowCapacity beim Aufruf von getFirstFromBuffer beachtet werden 
 						while (!pseudoLink.flowQueueIsEmpty()) {
 							Vehicle veh = pseudoLink.getFirstFromBuffer();
 							if (!moveVehicleOverNode(veh, now, pseudoLink)) {

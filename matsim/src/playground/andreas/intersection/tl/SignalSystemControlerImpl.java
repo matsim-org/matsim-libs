@@ -30,7 +30,7 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 		// TODO [an] Es wird nur der erste Plan genommen, aber nicht ausgewählt
 		SignalSystemPlan signalSystemPlan = plan.get(0);
 		
-		int currentSecondInPlan = (int) (time %  signalSystemPlan.getCirculationTime());		
+		int currentSecondInPlan = (int) (time % signalSystemPlan.getCirculationTime());		
 		
 		// Debug only
 //		System.out.println(currentSecondInPlan);
@@ -39,6 +39,7 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 		
 		for (SignalGroupSettings signalGroupSetting : signalSystemPlan.getSignalGroupSettings().values()) {
 			
+			// TODO check whether it should be <= instead of <
 			if ( signalGroupSetting.getRoughCast() < currentSecondInPlan && currentSecondInPlan < signalGroupSetting.getDropping()){
 				// Debug only
 //				System.out.println("green " + signalGroupSetting.getSignalGroupDefinition().toString());
@@ -51,7 +52,7 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 		}
 		
 		SignalGroupSettings[] greenLinks = new SignalGroupSettings[0];		
-		greenLinks = (SignalGroupSettings[]) greenLinksList.toArray(greenLinks);
+		greenLinks = greenLinksList.toArray(greenLinks);
 		
 		// Debug only
 //		for (int i = 0; i < greenLinks.length; i++) {

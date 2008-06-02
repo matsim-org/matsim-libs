@@ -3,12 +3,12 @@ package playground.andreas.intersection.sim;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
@@ -19,6 +19,7 @@ import org.matsim.mobsim.Vehicle;
 import org.matsim.network.Link;
 import org.matsim.trafficlights.data.SignalGroupDefinition;
 import org.matsim.trafficlights.data.SignalLane;
+import org.matsim.trafficlights.data.TrafficLightsManager;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
@@ -32,6 +33,8 @@ public class QLink extends QueueLink {
 	private PseudoLink originalLink = null;
 
 	private ArrayList<PseudoLink> pseudoLinksList = new ArrayList<PseudoLink>();
+	private ArrayList<PseudoLink> nodePseudoLinksList;
+	
 
 	/** FreeLinkTravelTime */
 	private double freeSpeedTT;
@@ -101,95 +104,124 @@ public class QLink extends QueueLink {
 						this.getLink().getId().toString(), veh.getDriver(), this.getLink()));
 	}
 
-	public List<PseudoLink> getNodePseudoLinks(){
-
-		List<PseudoLink> nodePseudoLinksList = new LinkedList<PseudoLink>();
-
-		for (PseudoLink pseudoLink : pseudoLinksList) {
-			if (pseudoLink.getMeterFromLinkEnd() == 0){
-				nodePseudoLinksList.add(pseudoLink);
-			}
+	public List<PseudoLink> getNodePseudoLinks(){		
+		if (this.nodePseudoLinksList == null && this.pseudoLinksList.size() == 1){
+			return this.pseudoLinksList;
+		} else
+			return this.nodePseudoLinksList;
+	}
+	
+	public List<PseudoLink> getNodePseudoLinks(List<Link> destLinks){		
+		
+		if (this.nodePseudoLinksList == null && this.pseudoLinksList.size() == 1){
+			return this.pseudoLinksList;
 		}
-		return nodePseudoLinksList;
+		
+		List<PseudoLink> returnPseudoLinkList = new ArrayList<PseudoLink>();
+		for (PseudoLink pseudoLink : this.nodePseudoLinksList) {
+			for (Link destLink : destLinks) {
+				if(pseudoLink.getDestLinks().contains(destLink)){
+					returnPseudoLinkList.add(pseudoLink);
+				}
+			}			
+		}
+		return returnPseudoLinkList;
 	}
 
-	public void reconfigure(Set<SignalGroupDefinition> signalGroupDefinitions) {
+	public void reconfigure(TrafficLightsManager trafficLightsManager) {
 
 		boolean firstNodeLinkInitialized = false;
 
-		for (SignalGroupDefinition signalGroupDefinition : signalGroupDefinitions) {
+		for (SignalLane signalLane : trafficLightsManager.getFromLanes(this.getLink().getId())) {
 
-			if(signalGroupDefinition.getLinkId().equals(getLink().getId())){
+			int numberOfLanes_ = 1;
+			double freeSpeed_m_s = this.getLink().getFreespeed(Time.UNDEFINED_TIME);
+			double flowCapacity_Veh_h = this.getSimulatedFlowCapacity();
 
-				int numberOfLanes_ = 1;
-				double freeSpeed_m_s = this.getLink().getFreespeed(Time.UNDEFINED_TIME);
-				double flowCapacity_Veh_h = this.getSimulatedFlowCapacity();
-				
-				//TODO [an] has to be checked, not sure about it
+			//TODO [an] has to be checked, not sure about it
 
-				PseudoLink newNodePseudoLink;
+			PseudoLink newNodePseudoLink;
 
-				for (Iterator<SignalLane> iter = signalGroupDefinition.getToLanes().iterator(); iter.hasNext();) {
-					SignalLane signalLane = (SignalLane) iter.next();
+			if(!firstNodeLinkInitialized){
 
-					if(!firstNodeLinkInitialized){
+				newNodePseudoLink = new PseudoLink(this, false);
 
-						newNodePseudoLink = new PseudoLink(this, false);
+				newNodePseudoLink.setFromLink(originalLink);
+				originalLink.getToLinks().add(newNodePseudoLink);
 
-						newNodePseudoLink.setFromLink(originalLink);
-						newNodePseudoLink.addDestLink(this.getLink().getToNode().getOutLinks().get(signalLane.getLinkId()));
-						originalLink.getToLinks().add(newNodePseudoLink);
-						originalLink.addDestLink(this.getLink().getToNode().getOutLinks().get(signalLane.getLinkId()));
-
-						newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h,effectiveCelleSize);
-						originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getSimulatedFlowCapacity(),effectiveCelleSize);
-
-						pseudoLinksList.add(newNodePseudoLink);
-						firstNodeLinkInitialized = true;
-
-					} else {
-
-						// Now we have the original link and one extension pseudo Link
-						// therefore add additional extension links for the rest of the outLinks
-
-						// Check, if the new extension link is in proximity of an old one's staring point
-						if (signalLane.getLength() - originalLink.getMeterFromLinkEnd() > 15.0){
-							// It is not
-
-							System.err.println("Not Implemented yet: Every PseudoNode in 15m proximity of an old PseudoNode will be ajected to the old one");
-
-							// Insert new one...
-							// Fix Pointer...
-							// Adjust SC, SQ...
-							// Generate new NodePseudoLink
-							// Fix Pointer...
-							// Adjust SC, SQ...
-
-						}else{
-							// It is
-							// New NodePseudoLink will start at originalLink
-
-							newNodePseudoLink = new PseudoLink(this, false);
-
-							newNodePseudoLink.setFromLink(originalLink);
-							newNodePseudoLink.addDestLink(this.getLink().getToNode().getOutLinks().get(signalLane.getLinkId()));
-							originalLink.getToLinks().add(newNodePseudoLink);
-							originalLink.addDestLink(this.getLink().getToNode().getOutLinks().get(signalLane.getLinkId()));
-
-							// Only need to fix properties of new link. Original link hasn't changed
-							newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h,effectiveCelleSize);
-
-							pseudoLinksList.add(newNodePseudoLink);
-
-						}
-					}
+				for (Link link : trafficLightsManager.getToLinks(signalLane)) {
+					newNodePseudoLink.addDestLink(link);
+					originalLink.addDestLink(link);
 				}
+
+				newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h, effectiveCelleSize);
+				originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getSimulatedFlowCapacity(),effectiveCelleSize);
+
+				pseudoLinksList.add(newNodePseudoLink);
+				firstNodeLinkInitialized = true;
+
+			} else {
+
+				// Now we have the original link and one extension pseudo Link
+				// therefore add additional extension links for the rest of the outLinks
+
+				// Check, if the new extension link is in proximity of an old one's staring point
+				if (signalLane.getLength() - originalLink.getMeterFromLinkEnd() > 15.0){
+					// It is not
+
+					System.err.println("Not Implemented yet: Every PseudoNode in 15m proximity of an old PseudoNode will be ajected to the old one");
+
+					// Insert new one...
+					// Fix Pointer...
+					// Adjust SC, SQ...
+					// Generate new NodePseudoLink
+					// Fix Pointer...
+					// Adjust SC, SQ...
+
+				}else{
+					// It is
+					// New NodePseudoLink will start at originalLink
+
+					newNodePseudoLink = new PseudoLink(this, false);
+
+					newNodePseudoLink.setFromLink(originalLink);
+					originalLink.getToLinks().add(newNodePseudoLink);
+
+					for (Link link : trafficLightsManager.getToLinks(signalLane)) {
+						newNodePseudoLink.addDestLink(link);
+						originalLink.addDestLink(link);
+					}
+
+					// Only need to fix properties of new link. Original link hasn't changed
+					newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h,effectiveCelleSize);
+
+					pseudoLinksList.add(newNodePseudoLink);
+
+				}
+
+			}
+
+		}
+
+		findLayout();
+
+		addUTurn();
+
+		resortPseudoLinks();
+	}
+	
+	private void resortPseudoLinks(){
+		this.nodePseudoLinksList = new ArrayList<PseudoLink>();
+
+		for (PseudoLink pseudoLink : pseudoLinksList) {
+			if (pseudoLink.getMeterFromLinkEnd() == 0){
+				this.nodePseudoLinksList.add(pseudoLink);								
 			}
 		}
 		
-		findLayout();
-		
-		addUTurn();
+//		for (PseudoLink pseudoLink : nodePseudoLinksList){
+//			this.pseudoLinksList.remove(pseudoLink);
+//		}
 	}
 	
 	private void addUTurn(){
