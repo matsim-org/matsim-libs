@@ -104,9 +104,19 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 		try {
 
-			OTFVisConfig visconf = new OTFVisConfig();
+			
 			if (Gbl.getConfig() == null) Gbl.createConfig(null);
-			Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
+			
+			OTFVisConfig visconf = (OTFVisConfig) Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+			if (visconf == null) {
+				visconf = new OTFVisConfig();
+				Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
+			}
+			
+			
+			
+			
+
 
 
 //			hostControl = new OTFHostControlBar("file:../MatsimJ/output/OTFQuadfile10p.mvi.gz");

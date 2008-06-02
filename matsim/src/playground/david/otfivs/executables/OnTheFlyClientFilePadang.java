@@ -1,5 +1,6 @@
 package playground.david.otfivs.executables;
 
+import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
 
@@ -110,7 +111,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		connect1.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		connect1.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangTimeDrawer.class);
 		connect1.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
-
+		connect1.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		
+		
 		connect2.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect2.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
 		connect2.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
@@ -118,18 +121,19 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		connect2.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		connect2.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangRegionDrawer.class);
 		connect2.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
+		connect2.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
 //	
 		//main2(args);
 		
 //		OTFOGLDrawer.linkWidth =2;
 		
-//		Gbl.createConfig(null);
-//		OTFVisConfig conf = new OTFVisConfig();
-//		conf.setLinkWidth(10);
-//		Gbl.getConfig().addModule("otfvis", conf);
-//		
-//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(1); 
+		Gbl.createConfig(null);
+		OTFVisConfig conf = new OTFVisConfig();
+		conf.setLinkWidth(10);
+		Gbl.getConfig().addModule("otfvis", conf);
 		
+		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(10); 
+		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50));
 		OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, false);
 		
 //		new OnTheFlyClientFilePadang()
