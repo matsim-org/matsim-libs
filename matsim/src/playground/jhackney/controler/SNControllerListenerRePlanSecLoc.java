@@ -229,11 +229,10 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		}
 //		Write out the KML for the EgoNet of a chosen agent
 //		if ((event.getIteration()-1)%replan_interval == 0){
-        Person testP=this.controler.getPopulation().getPerson("21462061");
-//      Person testP=this.controler.getPopulation().getPerson("21924270");
+		Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
+//        Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
 		EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
 		if (event.getIteration() == this.controler.getLastIteration()){	
-//			Person testP=this.controler.getPopulation().getPerson("21924270");
 //			EgoNetPlansMakeKML.loadData(testP);
 //			EgoNetPlansMakeKML.write();
 			EgoNetPlansItersMakeKML.write();
