@@ -57,7 +57,7 @@ public class EventsReaderTXTv1 {
 
 	}
 
-	static public final void createEvent(final Events events, final int time, final String agentId, final int legNumber,
+	static public final void createEvent(final Events events, final double time, final String agentId, final int legNumber,
 			final String linkId, final int nodeId, final int flag, final String desc, final int activity, final String acttype) {
 		BasicEvent data = null;
 
@@ -103,7 +103,7 @@ public class EventsReaderTXTv1 {
 	protected void parseLine(final String line) {
 		String[] result = StringUtils.explode(line, '\t', 7);
 		if (result.length == 7) {
-			createEvent(this.events, Integer.parseInt(result[0]),	// time
+			createEvent(this.events, Double.parseDouble(result[0]),	// time
 									result[1],		// vehID
 									Integer.parseInt(result[2]),		// legNumber
 									result[3],		// linkID
