@@ -10,13 +10,17 @@ public class OnTheFlyClientFileTveh {
 //		String vehFileName = "../matsim-trunk/output/equil/ITERS/it.200/200.T.veh.gz";
 		
 //		String netFileName = "/home/nagel/vsp-cvs/studies/schweiz/2network/ch.xml"; 
+//		String vehFileName = "/home/nagel/vsp-cvs/studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/routes-and-times/it.150/150.T.veh.gz" ;
 //		String vehFileName = "/home/nagel/vsp-cvs/runs/run198/100.T.veh.gz"; 
+//		String vehFileName = "/home/nagel/vsp-cvs/runs/run475/fromEvent.mvi" ;
+		
+//		String netFileName = "/home/nagel/vsp-cvs/studies/big-zrh-hires/network/net.xml" ;
+//		String vehFileName = "/home/nagel/vsp-cvs/studies/big-zrh-hires/metro-plans-IT2/it.0/T.0540-0550.1sec.veh.gz" ;
 		
 		String netFileName = "/home/nagel/vsp-cvs/studies/schweiz-ivtch/network/ivtch.xml" ;
-//		String vehFileName = "/home/nagel/vsp-cvs/runs/run270/100.T.veh.gz" ;
-//		String vehFileName = "/home/nagel/vsp-cvs/runs/run299/100.T.veh.gz" ;
-//		String vehFileName = "/home/nagel/vsp-cvs/runs/run450/0.T.veh.gz" ;
-		String vehFileName = "/home/nagel/vsp-cvs/runs/run465/500.T.veh.gz" ;
+//		String vehFileName = "/home/nagel/vsp-cvs/runs/run465/0.T.veh.gz" ; 
+//		String vehFileName = "/home/nagel/vsp-cvs/runs/run465/500.T.veh.gz" ; // current (may08) base case
+		String vehFileName = "/home/nagel/vsp-cvs/runs/run469/200.T.veh.gz" ; // current (may08) base case
 //		String vehFileName = "../matsim-trunk/output/myrun/ITERS/it.99/99.T.veh.gz" ;
 
 //		String netFileName = "/home/nagel/vsp-cvs/studies/padang/dlr-network/network/dlr/padang_net.xml" ;
