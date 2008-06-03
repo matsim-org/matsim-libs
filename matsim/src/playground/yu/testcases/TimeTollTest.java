@@ -46,12 +46,14 @@ public class TimeTollTest extends MatsimTestCase {
 					&& clt != null) {
 				double traveling = Double.parseDouble(Gbl.getConfig().getParam(
 						"planCalcScore", "traveling"));
-				double criterion = 0.0;
-				if (traveling == -6.0)
-					criterion = 315.0;
-				else if (traveling == -3.0)
-					criterion = 314.0;
-				assertEquals(criterion, clt.getAverageTripDuration());
+				double criterion = 0;
+				if (traveling == -30.0) {
+					criterion = 1800.0;
+					assertEquals(clt.getAverageTripDuration() < criterion, true);
+				} else if (traveling == -6.0) {
+					criterion = 1900.0;
+					assertEquals(clt.getAverageTripDuration() > criterion, true);
+				}
 			}
 		}
 
@@ -65,6 +67,13 @@ public class TimeTollTest extends MatsimTestCase {
 	}
 
 	public void testBetaTraveling_6() {
+		Controler ctl = new Controler(getInputDirectory() + "config.xml");
+		ctl.addControlerListener(new TestControlerListener());
+		ctl.setCreateGraphs(false);
+		ctl.run();
+	}
+
+	public void testBetaTraveling_30() {
 		Controler ctl = new Controler(getInputDirectory() + "config.xml");
 		ctl.addControlerListener(new TestControlerListener());
 		ctl.setCreateGraphs(false);

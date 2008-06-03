@@ -51,13 +51,13 @@ public class PtTest extends MatsimTestCase {
 	 * @author ychen
 	 */
 	private static class TestControlerListener implements IterationEndsListener {
-		private PtCheck pc;
+		private final PtCheck pc;
 
 		public TestControlerListener() {
 			pc = new PtCheck();
 		}
 
-		public void notifyIterationEnds(IterationEndsEvent event) {
+		public void notifyIterationEnds(final IterationEndsEvent event) {
 			double betaPt = Double.parseDouble(Gbl.getConfig().getParam(
 					"planCalcScore", "travelingPt"));
 			int idx = event.getIteration();
@@ -71,7 +71,7 @@ public class PtTest extends MatsimTestCase {
 					int criterion = 0;
 					switch (idx) {
 					case 0:
-						criterion = 100;
+						criterion = 0;
 						break;
 					case 10:
 						criterion = 38;
@@ -96,7 +96,7 @@ public class PtTest extends MatsimTestCase {
 					int criterion = 0;
 					switch (idx) {
 					case 0:
-						criterion = 100;
+						criterion = 0;
 						break;
 					case 10:
 						criterion = 99;
@@ -105,7 +105,7 @@ public class PtTest extends MatsimTestCase {
 						criterion = 98;
 						break;
 					case 30:
-						criterion = 98;
+						criterion = 99;
 						break;
 					case 40:
 						criterion = 98;
