@@ -59,14 +59,14 @@ public class EctmSim extends ExternalMobsim {
 		final File networkFile = new File(gblConfig.network().getInputFile());
 		ectmConfig.setParam("general", "netfile", networkFile.getAbsolutePath());
 		final File plansFile = new File(iterationPlansFile);
-		ectmConfig.setParam("matsimplansloader", "plansfile", plansFile.getAbsolutePath());
+		ectmConfig.setParam("MatsimPlansLoader", "plansfile", plansFile.getAbsolutePath());
 
 		new ConfigWriter(ectmConfig, iterationConfigFile).write();
 	}
 
 	@Override
 	protected void runExe(final String iterationConfigFile) throws FileNotFoundException, IOException {
-		String cmd = this.executable + " " + iterationConfigFile + " " + this.eventsFile;
+		String cmd = this.executable + " " + iterationConfigFile + " " + this.eventsFile + " " + Controler.getIterationPath() + "/netvis";
 		log.info("running command: \"" + cmd);
 		Gbl.printMemoryUsage();
 		String logfileName = Controler.getIterationFilename("mobsim.log");

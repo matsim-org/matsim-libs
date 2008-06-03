@@ -35,7 +35,7 @@ public class EctmControler extends Controler {
 
 	public static void main(final String[] args) {
 		Controler controler = new EctmControler(args);
-		controler.setOverwriteFiles(true);
+//		controler.setOverwriteFiles(true);
 		controler.run();
 	}
 
