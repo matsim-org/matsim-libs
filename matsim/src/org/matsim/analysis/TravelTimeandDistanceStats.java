@@ -118,14 +118,14 @@ public class TravelTimeandDistanceStats implements StartupListener, IterationEnd
 
 		log.info("-- avg. plan traveltime of the selected plan: " + sumPlanTraveltime / nr_persons);
 		log.info("-- avg. plan traveldistance of the selected plan: "  + sumPlanTraveldistance / nr_persons);
-		log.info("-- avg. leg traveltime of the selected plan: "  + sumPlanTraveltime / (sumNumberOfLegs * nr_persons));
-		log.info("-- avg. leg traveldistance of the selected plan: "  + sumPlanTraveldistance / (sumNumberOfLegs * nr_persons));
+		log.info("-- avg. leg traveltime of the selected plan: "  + sumPlanTraveltime / sumNumberOfLegs);
+		log.info("-- avg. leg traveldistance of the selected plan: "  + sumPlanTraveldistance / sumNumberOfLegs);
 
 
 		try {
 			this.out.write(event.getIteration() + "\t" + (sumPlanTraveltime / nr_persons) + "\t" +
-					(sumPlanTraveldistance / nr_persons) + "\t" + (sumPlanTraveltime / (sumNumberOfLegs * nr_persons)) + "\t" +
-					(sumPlanTraveldistance / (sumNumberOfLegs * nr_persons)) + "\n");
+					(sumPlanTraveldistance / nr_persons) + "\t" + (sumPlanTraveltime / sumNumberOfLegs) + "\t" +
+					(sumPlanTraveldistance / sumNumberOfLegs) + "\n");
 			this.out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -135,8 +135,8 @@ public class TravelTimeandDistanceStats implements StartupListener, IterationEnd
 			int index = event.getIteration() - this.minIteration;
 			this.history[INDEX_PLANTT][index] = (sumPlanTraveltime / nr_persons);
 			this.history[INDEX_PLANTD][index] = (sumPlanTraveldistance / nr_persons);
-			this.history[INDEX_LEGTT][index] = (sumPlanTraveltime / (sumNumberOfLegs * nr_persons));
-			this.history[INDEX_LEGTD][index] = (sumPlanTraveldistance / (sumNumberOfLegs * nr_persons));
+			this.history[INDEX_LEGTT][index] = (sumPlanTraveltime / sumNumberOfLegs);
+			this.history[INDEX_LEGTD][index] = (sumPlanTraveldistance / sumNumberOfLegs);
 
 			if (event.getIteration() != this.minIteration) {
 				// create chart when data of more than one iteration is available.
