@@ -4,6 +4,11 @@ import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 
+/*
+ * This is a helper class for TravelTimeandDistanceStats
+ * TODO: move this functionality to Person.java
+ */
+
 public class PersonTimeDistanceCalculator {
 
 	private static double planTravelTime;
