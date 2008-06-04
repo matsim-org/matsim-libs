@@ -164,6 +164,7 @@ public class RouterVis {
 
 		log.info("  starting NetVis.");
 		String [] visargs = {Gbl.getConfig().controler().getOutputDirectory() + "/Snapshot"};
+		Gbl.reset();
 		NetVis.main(visargs);
 		log.info("  done.");
 	}
