@@ -36,7 +36,6 @@ import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
 import playground.balmermi.census2000v2.modules.HouseholdsCreateFromCensus2000;
 import playground.balmermi.census2000v2.modules.PlansCreateFromCensus2000;
-import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
 import playground.balmermi.census2000v2.modules.WorldFacilityZoneMapping;
 import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
 
