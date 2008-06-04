@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -42,7 +41,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class LegCountTest2 {
 	public static class LegCount extends PersonAlgorithm {
@@ -54,11 +53,11 @@ public class LegCountTest2 {
 				licensedPtUserCount = 0, licensedCarLegCount = 0,
 				licensedPtLegCount = 0;
 
-		public LegCount(String filename) {
+		public LegCount(final String filename) {
 			try {
-				this.writer = IOUtils.getBufferedWriter(filename);
-				this.writer.write("personId\tLegNumber\n");
-				this.writer.flush();
+				writer = IOUtils.getBufferedWriter(filename);
+				writer.write("personId\tLegNumber\n");
+				writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -68,84 +67,78 @@ public class LegCountTest2 {
 
 		public void end() {
 			try {
-				this.writer.write("------------------------------------\ncarUser:\t"
-						+ this.carUserCount
+				writer.write("------------------------------------\ncarUser:\t"
+						+ carUserCount
 						+ ";\tcarLegs:\t"
-						+ this.carLegCount
+						+ carLegCount
 						+ ";\t"
-						+ (double) this.carLegCount / (double) this.carUserCount
+						+ (double) carLegCount / (double) carUserCount
 						+ "\tLegs pro carUser;\tlicensedCarUser:\t"
-						+ this.licensedCarUserCount
+						+ licensedCarUserCount
 						+ ";\tlicensedCarLegs:\t"
-						+ this.licensedCarLegCount
+						+ licensedCarLegCount
 						+ ";\t"
-						+ (double) this.licensedCarLegCount
-								/ (double) this.licensedCarUserCount
+						+ (double) licensedCarLegCount
+								/ (double) licensedCarUserCount
 						+ "\tLegs pro licensedCarUser;\n" + "\nptUser:\t"
-						+ this.ptUserCount + ";\tptLegs:\t" + this.ptLegCount + ";\t"
-						+ (double) this.ptLegCount / (double) this.ptUserCount
+						+ ptUserCount + ";\tptLegs:\t" + ptLegCount + ";\t"
+						+ (double) ptLegCount / (double) ptUserCount
 						+ "\tLegs pro ptUser;\tlicensedPtUser:\t"
-						+ this.licensedPtUserCount + ";\tlicensedPtLegs:\t"
-						+ this.licensedPtLegCount + ";\t"
-						+ (double) this.licensedPtLegCount
-						/ (double) this.licensedPtUserCount
+						+ licensedPtUserCount + ";\tlicensedPtLegs:\t"
+						+ licensedPtLegCount + ";\t"
+						+ (double) licensedPtLegCount
+						/ (double) licensedPtUserCount
 						+ "\tLegs pro licensedPtUser.");
-				this.writer.flush();
-				this.writer.close();
+				writer.flush();
+				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-		public static int getLegsNumber(Plan selectedPlan) {
+		public static int getLegsNumber(final Plan selectedPlan) {
 			int i = 0;
-			for (LegIterator li = selectedPlan.getIteratorLeg(); li.hasNext();) {
+			for (LegIterator li = selectedPlan.getIteratorLeg(); li.hasNext();)
 				i = li.next().getNum();
-			}
 			i++;
 			return i;
 		}
 
-		private void carAppend(int legsNumber) {
-			this.carUserCount++;
-			this.carLegCount += legsNumber;
+		private void carAppend(final int legsNumber) {
+			carUserCount++;
+			carLegCount += legsNumber;
 		}
 
-		private void carLicensedAppend(int legsNumber) {
-			this.licensedCarUserCount++;
-			this.licensedCarLegCount += legsNumber;
+		private void carLicensedAppend(final int legsNumber) {
+			licensedCarUserCount++;
+			licensedCarLegCount += legsNumber;
 		}
 
 		@Override
-		public void run(Person person) {
+		public void run(final Person person) {
 			Plan p = person.getSelectedPlan();
 			if (p != null) {
 				int nLegs = getLegsNumber(p);
 				try {
-					this.writer.write(person.getId() + "\t" + nLegs + "\n");
-					this.writer.flush();
+					writer.write(person.getId() + "\t" + nLegs + "\n");
+					writer.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				Plan.Type planType = p.getType();
-				if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
+				if (planType != null && Plan.Type.UNDEFINED != planType)
 					if (planType.equals(Plan.Type.CAR)) {
 						carAppend(nLegs);
-						if (person.getLicense().equals("yes")) {
+						if (person.getLicense().equals("yes"))
 							carLicensedAppend(nLegs);
-						}
 					} else if (planType.equals(Plan.Type.PT)) {
-						this.ptUserCount++;
-						this.ptLegCount += nLegs;
+						ptUserCount++;
+						ptLegCount += nLegs;
 						if (person.getLicense().equals("yes")) {
-							this.licensedPtUserCount++;
-							this.licensedPtLegCount += nLegs;
+							licensedPtUserCount++;
+							licensedPtLegCount += nLegs;
 						}
 					}
-				}
-				// else {
-				// carAppend(nLegs);
-				// }
 			}
 		}
 	}
@@ -153,7 +146,7 @@ public class LegCountTest2 {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/ivtch/input/network.xml";
 		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
@@ -165,8 +158,7 @@ public class LegCountTest2 {
 		final String outFilename = "../data/ivtch/run271/legsCount.txt";
 
 		Gbl.startMeasurement();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		World world = Gbl.getWorld();
 

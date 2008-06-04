@@ -27,7 +27,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.config.Config;
+import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -41,7 +41,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class ScoreTest extends PersonAlgorithm {
 	private double sumScoreWorst = 0.0, sumScoreBest = 0.0, sumAvgScores = 0.0,
@@ -51,12 +51,12 @@ public class ScoreTest extends PersonAlgorithm {
 	private BufferedWriter writer = null;
 
 	/**
-	 *
+	 * 
 	 */
-	public ScoreTest(String outputFilename) {
+	public ScoreTest(final String outputFilename) {
 		try {
-			this.writer = IOUtils.getBufferedWriter(outputFilename);
-			this.writer.write("of each agent\tavg. score\tsum\tn\n");
+			writer = IOUtils.getBufferedWriter(outputFilename);
+			writer.write("of each agent\tavg. score\tsum\tn\n");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -65,63 +65,59 @@ public class ScoreTest extends PersonAlgorithm {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		Plan worstPlan = null;
 		Plan bestPlan = null;
 		double sumScores = 0.0;
 		double cntScores = 0;
 		for (Plan plan : person.getPlans()) {
 
-			if (Plan.isUndefinedScore(plan.getScore())) {
+			if (BasicPlanImpl.isUndefinedScore(plan.getScore()))
 				continue;
-			}
 			// worst plan
-			if (worstPlan == null) {
+			if (worstPlan == null)
 				worstPlan = plan;
-			} else if (plan.getScore() < worstPlan.getScore()) {
+			else if (plan.getScore() < worstPlan.getScore())
 				worstPlan = plan;
-			}
 			// best plan
-			if (bestPlan == null) {
+			if (bestPlan == null)
 				bestPlan = plan;
-			} else if (plan.getScore() > bestPlan.getScore()) {
+			else if (plan.getScore() > bestPlan.getScore())
 				bestPlan = plan;
-			}
 			// avg. score
 			sumScores += plan.getScore();
 			cntScores++;
 			// executed plan?
 			if (plan.isSelected()) {
-				this.sumExecutedScores += plan.getScore();
-				this.nofExecutedScores++;
+				sumExecutedScores += plan.getScore();
+				nofExecutedScores++;
 			}
 		}
 		if (worstPlan != null) {
-			this.nofScoreWorst++;
-			this.sumScoreWorst += worstPlan.getScore();
+			nofScoreWorst++;
+			sumScoreWorst += worstPlan.getScore();
 		}
 		if (bestPlan != null) {
-			this.nofScoreBest++;
-			this.sumScoreBest += bestPlan.getScore();
+			nofScoreBest++;
+			sumScoreBest += bestPlan.getScore();
 		}
 		if (cntScores > 0) {
-			this.sumAvgScores += (sumScores / cntScores);
-			this.nofAvgScores++;
+			sumAvgScores += sumScores / cntScores;
+			nofAvgScores++;
 		}
 	}
 
 	public void end() {
 		try {
-			this.writer.write("executed: " + "\t"
-					+ (this.sumExecutedScores / this.nofExecutedScores) + "\t"
-					+ this.sumExecutedScores + "\t" + this.nofExecutedScores
-					+ "\nworst: \t" + (this.sumScoreWorst / this.nofScoreWorst) + "\t"
-					+ this.sumScoreWorst + "\t" + this.nofScoreWorst + "\navg.: \t"
-					+ (this.sumAvgScores / this.nofAvgScores) + "\t" + this.sumAvgScores
-					+ "\t" + this.nofAvgScores + "\nbest: \t"
-					+ (this.sumScoreBest / this.nofScoreBest) + "\t" + this.sumScoreBest
-					+ "\t" + this.nofScoreBest + "\n");
-			this.writer.close();
+			writer.write("executed: " + "\t"
+					+ sumExecutedScores / nofExecutedScores + "\t"
+					+ sumExecutedScores + "\t" + nofExecutedScores
+					+ "\nworst: \t" + sumScoreWorst / nofScoreWorst + "\t"
+					+ sumScoreWorst + "\t" + nofScoreWorst + "\navg.: \t"
+					+ sumAvgScores / nofAvgScores + "\t" + sumAvgScores + "\t"
+					+ nofAvgScores + "\nbest: \t" + sumScoreBest / nofScoreBest
+					+ "\t" + sumScoreBest + "\t" + nofScoreBest + "\n");
+			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -130,7 +126,7 @@ public class ScoreTest extends PersonAlgorithm {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		// final String netFilename = "../data/ivtch/input/network.xml";
 		final String netFilename = "test/yu/equil_test/equil_net.xml";
 		// final String plansFilename =
@@ -138,15 +134,15 @@ public class ScoreTest extends PersonAlgorithm {
 		// final String plansFilename =
 		// "../data/ivtch/input/_10pctZrhCarPtPlans_opt.xml.gz";
 		// final String plansFilename = "test/yu/equil_test/100.plans.xml.gz";
-//		final String plansFilename = "test/yu/equil_test/equil269/output_plans.xml.gz";
+		// final String plansFilename =
+		// "test/yu/equil_test/equil269/output_plans.xml.gz";
 		final String plansFilename = "test/yu/equil_test/equil269/ITERS/it.90/90.plans.xml.gz";
 		// final String outputFilename =
 		// "../data/ivtch/run265optChg_run270/scoreTest_input.txt";
 		final String outputFilename = "test/yu/equil_test/equil269/90.scoreTest.txt";
 
 		Gbl.startMeasurement();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		World world = Gbl.getWorld();
 

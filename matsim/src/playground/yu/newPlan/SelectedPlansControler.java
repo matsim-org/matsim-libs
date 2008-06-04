@@ -20,7 +20,6 @@
 
 package playground.yu.newPlan;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -42,8 +41,7 @@ public class SelectedPlansControler {
 		final String plansFilename = "../data/schweiz/input/459.100.plans.xml.gz";
 
 		World world = Gbl.getWorld();
-		Config config = Gbl
-				.createConfig(new String[] { "../data/schweiz/selectedPlans.xml" });
+		Gbl.createConfig(new String[] { "../data/schweiz/selectedPlans.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

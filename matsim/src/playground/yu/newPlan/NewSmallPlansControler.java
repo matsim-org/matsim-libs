@@ -20,7 +20,6 @@
 
 package playground.yu.newPlan;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -31,20 +30,20 @@ import org.matsim.world.World;
 
 /**
  * test of NewAgentPtPlan
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewSmallPlansControler {
 
 	public static void main(final String[] args) {
-		//		final String netFilename = "./test/yu/ivtch/input/network.xml";
+		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/ivtch/input/network.xml";
 		final String plansFilename = "../data/ivtch/input/plans_10pct_miv_zrh.xml.gz";
 
 		World world = Gbl.getWorld();
-		Config config = Gbl.createConfig(new String[] {
-		//						"./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
+		Gbl.createConfig(new String[] {
+		// "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
 				"../data/ivtch/make0.1pctPlans.xml" });
 
 		NetworkLayer network = new NetworkLayer();

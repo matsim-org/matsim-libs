@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.config.Config;
 import org.matsim.events.EventAgentWait2Link;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
@@ -49,15 +48,16 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class Wait2Link_2Acts1LinkTest {
 	public static class AgentLinkPair {
-		private String agentId;
-		private String linkId;
-		private int legNr;
+		private final String agentId;
+		private final String linkId;
+		private final int legNr;
 
-		public AgentLinkPair(String agentId, String linkId, int legNr) {
+		public AgentLinkPair(final String agentId, final String linkId,
+				final int legNr) {
 			this.agentId = agentId;
 			this.linkId = linkId;
 			this.legNr = legNr;
@@ -65,7 +65,7 @@ public class Wait2Link_2Acts1LinkTest {
 
 		@Override
 		public String toString() {
-			return this.legNr + "\t" + this.agentId + "\t" + this.linkId + "\n";
+			return legNr + "\t" + agentId + "\t" + linkId + "\n";
 		}
 	}
 
@@ -79,12 +79,12 @@ public class Wait2Link_2Acts1LinkTest {
 		 *            linkId, which indicates a link, where 2 following
 		 *            activities happened.
 		 */
-		private Set<AgentLinkPair> agentLinks = new HashSet<AgentLinkPair>();
+		private final Set<AgentLinkPair> agentLinks = new HashSet<AgentLinkPair>();
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public void run(Person person) {
-			this.actsAtSameLink = false;
+		public void run(final Person person) {
+			actsAtSameLink = false;
 			String tmpLinkId = null;
 			String nextTmpLinkId = null;
 			if (person != null) {
@@ -92,26 +92,23 @@ public class Wait2Link_2Acts1LinkTest {
 				if (p != null) {
 					List actsLegs = p.getActsLegs();
 					int max = actsLegs.size();
-					for (int i = 0; i < max; i++) {
+					for (int i = 0; i < max; i++)
 						if (i % 2 == 0) {
 							Act a = (Act) actsLegs.get(i);
 							nextTmpLinkId = a.getLink().getId().toString();
-							if ((tmpLinkId != null) && (nextTmpLinkId != null)) {
+							if (tmpLinkId != null && nextTmpLinkId != null)
 								if (tmpLinkId.equals(nextTmpLinkId)) {
-									this.actLocCount++;
-									this.actsAtSameLink = true;
-									this.agentLinks.add(new AgentLinkPair(person
+									actLocCount++;
+									actsAtSameLink = true;
+									agentLinks.add(new AgentLinkPair(person
 											.getId().toString(), tmpLinkId,
 											((Leg) actsLegs.get(i - 1))
 													.getNum()));
 								}
-							}
 							tmpLinkId = nextTmpLinkId;
 						}
-					}
-					if (this.actsAtSameLink) {
-						this.personCount++;
-					}
+					if (actsAtSameLink)
+						personCount++;
 				}
 			}
 		}
@@ -120,26 +117,26 @@ public class Wait2Link_2Acts1LinkTest {
 		 * @return the agentLinks
 		 */
 		public Set<AgentLinkPair> getAgentLinks() {
-			return this.agentLinks;
+			return agentLinks;
 		}
 
 		/**
 		 * @return the actLocCount
 		 */
 		public int getActLocCount() {
-			return this.actLocCount;
+			return actLocCount;
 		}
 
 		/**
 		 * @return the personCount
 		 */
 		public int getPersonCount() {
-			return this.personCount;
+			return personCount;
 		}
 	}
 
 	public static class Wait2Link implements EventHandlerAgentWait2LinkI {
-		private Set<AgentLinkPair> agentLinksPairs;
+		private final Set<AgentLinkPair> agentLinksPairs;
 		private BufferedWriter writer;
 		private int overlapCount;
 
@@ -148,41 +145,40 @@ public class Wait2Link_2Acts1LinkTest {
 		 *            a map<String agentId,String linkId> of the agentId-linkId
 		 *            pair from SameActLoc
 		 */
-		public Wait2Link(Set<AgentLinkPair> agentLinkPairs,
-				String outputFilename) {
-			this.agentLinksPairs = agentLinkPairs;
+		public Wait2Link(final Set<AgentLinkPair> agentLinkPairs,
+				final String outputFilename) {
+			agentLinksPairs = agentLinkPairs;
 			try {
-				this.writer = IOUtils.getBufferedWriter(outputFilename);
-				this.writer.write("time\tagentId\tLinkId\n");
+				writer = IOUtils.getBufferedWriter(outputFilename);
+				writer.write("time\tagentId\tLinkId\n");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			this.overlapCount = 0;
+			overlapCount = 0;
 		}
 
-		public void handleEvent(EventAgentWait2Link event) {
-			for (AgentLinkPair alp : this.agentLinksPairs) {
+		public void handleEvent(final EventAgentWait2Link event) {
+			for (AgentLinkPair alp : agentLinksPairs)
 				if (alp.agentId.equals(event.agentId)
 						&& alp.linkId.equals(event.linkId)
-						&& (alp.legNr == event.legId)) {
+						&& alp.legNr == event.legId) {
 					try {
-						this.writer.write(alp.toString());
+						writer.write(alp.toString());
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					this.overlapCount++;
+					overlapCount++;
 				}
-			}
 		}
 
-		public void reset(int iteration) {
-			this.agentLinksPairs.clear();
+		public void reset(final int iteration) {
+			agentLinksPairs.clear();
 		}
 
 		public void end() {
 			try {
-				this.writer.write("-->overlapCount = " + this.overlapCount);
-				this.writer.close();
+				writer.write("-->overlapCount = " + overlapCount);
+				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -190,7 +186,7 @@ public class Wait2Link_2Acts1LinkTest {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	public Wait2Link_2Acts1LinkTest() {
 
@@ -199,7 +195,7 @@ public class Wait2Link_2Acts1LinkTest {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = "../data/ivtch/input/network.xml";
@@ -207,8 +203,7 @@ public class Wait2Link_2Acts1LinkTest {
 		final String eventsFilename = "../data/ivtch/carPt_opt_run266/ITERS/it.100/100.events.txt.gz";
 		final String outputFilename = "../data/ivtch/Wait2Links_2Acts1Link.txt.gz";
 
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();

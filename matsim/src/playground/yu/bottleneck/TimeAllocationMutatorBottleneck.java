@@ -24,8 +24,9 @@ import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
 public class TimeAllocationMutatorBottleneck extends MultithreadedModuleA {
-//-----------------------------MEMBER VARIABLE------------------------------
-	private final int mutationRange = 1800;
+	// -----------------------------MEMBER
+	// VARIABLE------------------------------
+	private static final int mutationRange = 1800;
 
 	/*
 	 * ////////////////////////// // public TimeAllocationMutatorBottleneck() { //
@@ -44,7 +45,7 @@ public class TimeAllocationMutatorBottleneck extends MultithreadedModuleA {
 	 */
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
-		return new PlanMutateTimeAllocationBottleneck(this.mutationRange);
+		return new PlanMutateTimeAllocationBottleneck(mutationRange);
 	}
 
 }

@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -42,17 +41,17 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class Wait2LinkCheckTest {
 	public static class Wait2LinkCheck extends PersonAlgorithm {
 		private BufferedWriter writer;
 
-		public Wait2LinkCheck(String filename) {
+		public Wait2LinkCheck(final String filename) {
 			try {
-				this.writer = IOUtils.getBufferedWriter(filename);
-				this.writer.write("personId\tlinkId\tactIdx\n");
-				this.writer.flush();
+				writer = IOUtils.getBufferedWriter(filename);
+				writer.write("personId\tlinkId\tactIdx\n");
+				writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -62,35 +61,32 @@ public class Wait2LinkCheckTest {
 
 		public void end() {
 			try {
-				this.writer.close();
+				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
 		@Override
-		public void run(Person person) {
+		public void run(final Person person) {
 			String tmpLinkId = null;
 			String nextTmpLinkId = null;
 			if (person != null) {
 				Plan p = person.getSelectedPlan();
-				if (p != null) {
+				if (p != null)
 					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
 						nextTmpLinkId = ai.next().getLink().getId().toString();
-						if ((tmpLinkId != null) && (nextTmpLinkId != null)) {
-							if (!tmpLinkId.equals(nextTmpLinkId)) {
+						if (tmpLinkId != null && nextTmpLinkId != null)
+							if (!tmpLinkId.equals(nextTmpLinkId))
 								try {
-									this.writer.write(person.getId().toString()
+									writer.write(person.getId().toString()
 											+ "\t" + tmpLinkId + "\n");
-									this.writer.flush();
+									writer.flush();
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
-							}
-						}
 						tmpLinkId = nextTmpLinkId;
 					}
-				}
 			}
 		}
 	}
@@ -98,7 +94,7 @@ public class Wait2LinkCheckTest {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/ivtch/input/network.xml";
 		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
@@ -110,8 +106,7 @@ public class Wait2LinkCheckTest {
 		final String outFilename = "../data/ivtch/carPt_opt_run266/wait2linkTest.txt.gz";
 
 		Gbl.startMeasurement();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		World world = Gbl.getWorld();
 

@@ -24,11 +24,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.HashSet;
-import java.util.Set;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.VisConfig;
@@ -40,9 +36,9 @@ import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 
 public class LinkSetRenderer extends RendererA {
 
-	private final boolean RANDOMIZE_LANES = false;
+	private static final boolean RANDOMIZE_LANES = false;
 
-	private final boolean RENDER_CELL_CONTOURS = true;
+	private static final boolean RENDER_CELL_CONTOURS = true;
 
 	private final ValueColorizer colorizer = new ValueColorizer();
 
@@ -50,27 +46,26 @@ public class LinkSetRenderer extends RendererA {
 
 	private double laneWidth;
 
-	public LinkSetRenderer(VisConfig visConfig, DisplayNet network) {
+	public LinkSetRenderer(final VisConfig visConfig, final DisplayNet network) {
 		super(visConfig);
 		this.network = network;
 
-		this.laneWidth = DisplayLink.LANE_WIDTH
-				* visConfig.getLinkWidthFactor();
+		laneWidth = DisplayLink.LANE_WIDTH * visConfig.getLinkWidthFactor();
 	}
 
 	@Override
-	public void setTargetComponent(NetJComponent comp) {
+	public void setTargetComponent(final NetJComponent comp) {
 		super.setTargetComponent(comp);
 	}
 
 	// -------------------- RENDERING --------------------
 
 	@Override
-	protected synchronized void myRendering(Graphics2D display,
-			AffineTransform boxTransform) {
+	protected synchronized void myRendering(final Graphics2D display,
+			final AffineTransform boxTransform) {
 		String test = getVisConfig().get("ShowAgents");
 		boolean drawAgents = test == null || test.equals("true");
-		this.laneWidth = DisplayLink.LANE_WIDTH
+		laneWidth = DisplayLink.LANE_WIDTH
 				* getVisConfig().getLinkWidthFactor();
 
 		NetJComponent comp = getNetJComponent();
@@ -82,9 +77,8 @@ public class LinkSetRenderer extends RendererA {
 		for (DisplayableLinkI link : network.getLinks().values()) {
 			if (!comp.checkLineInClip(link.getStartEasting(), link
 					.getStartNorthing(), link.getEndEasting(), link
-					.getEndNorthing())) {
+					.getEndNorthing()))
 				continue;
-			}
 
 			if (link.getStartEasting() == link.getEndEasting()
 					&& link.getStartNorthing() == link.getEndNorthing())
@@ -101,7 +95,8 @@ public class LinkSetRenderer extends RendererA {
 
 			display.setTransform(linkTransform);
 
-			final int lanes = link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+			final int lanes = link
+					.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 			final int cellLength_m = (int) Math.round(link.getLength_m()
 					/ link.getDisplayValueCount());
 			final int cellWidth_m = (int) Math.round(laneWidth * lanes);
@@ -968,8 +963,7 @@ public class LinkSetRenderer extends RendererA {
 			final double agentWidth = laneWidth;
 			final double agentLength = agentWidth;
 
-			final boolean flip = (link.getStartEasting() <= link
-					.getEndEasting());
+			final boolean flip = link.getStartEasting() <= link.getEndEasting();
 
 			if (flip) {
 				AffineTransform flipTransform = AffineTransform
@@ -980,8 +974,8 @@ public class LinkSetRenderer extends RendererA {
 
 			if (link.getMovingAgents() != null && drawAgents)
 				for (DrawableAgentI agent : link.getMovingAgents()) {
-					final int lane = (RANDOMIZE_LANES ? (agent.hashCode()
-							% lanes + 1) : agent.getLane());
+					final int lane = RANDOMIZE_LANES ? agent.hashCode() % lanes
+							+ 1 : agent.getLane();
 
 					final int x = (int) Math.round(agent.getPosInLink_m() - 0.5
 							* agentLength);

@@ -23,7 +23,6 @@
  */
 package playground.yu.analysis;
 
-import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -35,14 +34,14 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class TravelTimeModalSplitTest {
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final String netFilename = "../data/ivtch/input/network.xml";
 		final String plansFilename = "../data/ivtch/input/analysis/carActTime100.plans.xml.gz";
 		final String eventsFilename = "../data/ivtch/input/analysis/carActTime100.events.txt.gz";
@@ -60,8 +59,7 @@ public class TravelTimeModalSplitTest {
 		// final String outFilename = "./test/yu/test/output/3ktt.txt.gz";
 
 		Gbl.startMeasurement();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		World world = Gbl.getWorld();
 

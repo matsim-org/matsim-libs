@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -42,7 +41,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class SameActLocTest {
 	public static class SameActLoc extends PersonAlgorithm {
@@ -51,11 +50,11 @@ public class SameActLocTest {
 		private int actLocCount = 0, personCount = 0, carActLocCount = 0,
 				ptActLocCount = 0;
 
-		public SameActLoc(String filename) {
+		public SameActLoc(final String filename) {
 			try {
-				this.writer = IOUtils.getBufferedWriter(filename);
-				this.writer.write("personId\tlinkId\tactIdx\n");
-				this.writer.flush();
+				writer = IOUtils.getBufferedWriter(filename);
+				writer.write("personId\tlinkId\tactIdx\n");
+				writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -65,25 +64,25 @@ public class SameActLocTest {
 
 		public void end() {
 			try {
-				this.writer
+				writer
 						.write("------------------------------------\nacts at same link: "
-								+ this.actLocCount
+								+ actLocCount
 								+ "\namong them "
-								+ this.carActLocCount
+								+ carActLocCount
 								+ " car-legs and "
-								+ this.ptActLocCount
+								+ ptActLocCount
 								+ " pt-legs;"
 								+ "\npersons, who has such acts: "
-								+ this.personCount);
-				this.writer.close();
+								+ personCount);
+				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
 		@Override
-		public void run(Person person) {
-			this.actsAtSameLink = false;
+		public void run(final Person person) {
+			actsAtSameLink = false;
 			String tmpLinkId = null;
 			String nextTmpLinkId = null;
 			int i = 0;
@@ -93,33 +92,30 @@ public class SameActLocTest {
 					Plan.Type planType = p.getType();
 					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
 						nextTmpLinkId = ai.next().getLink().getId().toString();
-						if ((tmpLinkId != null) && (nextTmpLinkId != null)) {
+						if (tmpLinkId != null && nextTmpLinkId != null)
 							if (tmpLinkId.equals(nextTmpLinkId)) {
-								this.actLocCount++;
-								if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
-									if (planType.equals(Plan.Type.CAR)) {
-										this.carActLocCount++;
-									} else if (planType.equals(Plan.Type.PT)) {
-										this.ptActLocCount++;
-									}
-								}
-								this.actsAtSameLink = true;
+								actLocCount++;
+								if (planType != null
+										&& Plan.Type.UNDEFINED != planType)
+									if (planType.equals(Plan.Type.CAR))
+										carActLocCount++;
+									else if (planType.equals(Plan.Type.PT))
+										ptActLocCount++;
+								actsAtSameLink = true;
 								try {
-									this.writer.write(person.getId().toString()
+									writer.write(person.getId().toString()
 											+ "\t" + tmpLinkId + "\t" + i
 											+ "\n");
-									this.writer.flush();
+									writer.flush();
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
 							}
-						}
 						tmpLinkId = nextTmpLinkId;
 						i++;
 					}
-					if (this.actsAtSameLink) {
-						this.personCount++;
-					}
+					if (actsAtSameLink)
+						personCount++;
 				}
 			}
 		}
@@ -128,7 +124,7 @@ public class SameActLocTest {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/ivtch/input/network.xml";
 		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
@@ -140,8 +136,7 @@ public class SameActLocTest {
 		final String outFilename = "../data/ivtch/carPt_opt_run266/actLoc.txt";
 
 		Gbl.startMeasurement();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		World world = Gbl.getWorld();
 

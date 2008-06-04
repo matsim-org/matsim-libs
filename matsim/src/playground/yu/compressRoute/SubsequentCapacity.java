@@ -24,11 +24,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
@@ -40,68 +38,72 @@ import org.matsim.writer.MatsimXmlWriter;
 /**
  * (like Subsequent) calculates the "default next" linkId of a current link in
  * MATSim networkfile with respect to Capacity (i.e. BEAT=1) and Geometry
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class SubsequentCapacity extends MatsimXmlWriter {
 
-	private Map<Id, ? extends Link> links;
+	private final Map<Id, ? extends Link> links;
 
 	/**
-	 * (arg0) - ssLinkId
-	 * (arg1) - linkId
+	 * (arg0) - ssLinkId (arg1) - linkId
 	 */
-	private TreeMap<String, String> ssLinks = new TreeMap<String, String>();
+	private final TreeMap<String, String> ssLinks = new TreeMap<String, String>();
 
 	Map<String, Link> outLinksMap = new TreeMap<String, Link>();
 
-	public SubsequentCapacity(NetworkLayer network) {
-		this.links = network.getLinks();
+	public SubsequentCapacity(final NetworkLayer network) {
+		links = network.getLinks();
 	}
 
 	/**
 	 * @return Returns the ssLinks.
 	 */
 	public TreeMap<String, String> getSsLinks() {
-		return this.ssLinks;
+		return ssLinks;
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	public void compute() {
 		Map<String, Double> caps = new TreeMap<String, Double>();
 		List<String> toCompareAngles = new ArrayList<String>();
 
-		for (Link l : this.links.values()) {
+		for (Link l : links.values()) {
 			caps.clear();
 			toCompareAngles.clear();
-			this.outLinksMap.clear();
+			outLinksMap.clear();
 
 			Node to = l.getToNode();
 			Collection<? extends Link> outLinks = to.getOutLinks().values();
 
 			for (Link outLink : outLinks) {
 				String outLinkId = outLink.getId().toString();
-				caps.put(outLinkId, outLink.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
-				this.outLinksMap.put(outLinkId, outLink);
+				caps
+						.put(
+								outLinkId,
+								outLink
+										.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+				outLinksMap.put(outLinkId, outLink);
 				// TODO: can man delete outLinksMap?
 			}
 			String nextOutLinkId = "";
-			if (caps.size() == 1) {
-				nextOutLinkId = this.outLinksMap.keySet().iterator().next();
-			} else if (caps.size() > 1) {
+			if (caps.size() == 1)
+				nextOutLinkId = outLinksMap.keySet().iterator().next();
+			else if (caps.size() > 1) {
 				Collection<Double> capsValues = caps.values();
 				double maxCap = Collections.max(capsValues);
 				double minCap = Collections.min(capsValues);
-				double lCap = l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+				double lCap = l
+						.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 
 				if (lCap >= maxCap) {
 					// choose the max, when over 1 max, compare angles.
-					for (String linkId : caps.keySet())
-						if (caps.get(linkId).doubleValue() == maxCap)
-							toCompareAngles.add(linkId);
+					for (Map.Entry<String, Double> cap : caps.entrySet())
+						if (cap.getValue() == maxCap)
+							toCompareAngles.add(cap.getKey());
 					// compare angles
 					nextOutLinkId = compareAngles(l, toCompareAngles);
 				} else if (lCap <= minCap) {
@@ -111,27 +113,29 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 				} else {
 					// choose the links with bigger Capacities than l has, then
 					// compare angles.
-					for (String linkId : caps.keySet())
-						if (caps.get(linkId).doubleValue() >= lCap)
-							toCompareAngles.add(linkId);
+					for (Map.Entry<String, Double> cap : caps.entrySet())
+						if (cap.getValue() >= lCap)
+							toCompareAngles.add(cap.getKey());
 					// compare angles
 					nextOutLinkId = compareAngles(l, toCompareAngles);
 				}
 			}
 
-			this.ssLinks.put(nextOutLinkId, l.getId().toString());
+			ssLinks.put(nextOutLinkId, l.getId().toString());
 		}
 	}
 
 	/**
 	 * Calculates the "default next" LinkId with respect to Geometry i.e.
 	 * angles, if there is 2 outLinks with the same Capacity
-	 *
-	 * @param l - the current link
-	 * @param nextLinksIds - a list of outLinks with the same Capacity, size <= 2
+	 * 
+	 * @param l -
+	 *            the current link
+	 * @param nextLinksIds -
+	 *            a list of outLinks with the same Capacity, size <= 2
 	 * @return the "default next" LinkId
 	 */
-	public String compareAngles(Link l, List<String> nextLinksIds) {
+	public String compareAngles(final Link l, final List<String> nextLinksIds) {
 		Map<String, Double> thetas = new TreeMap<String, Double>();
 		List<String> minThetas = new ArrayList<String>();
 		String resultLinkId = "";
@@ -149,7 +153,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 			resultLinkId = nextLinksIds.get(0);
 		else if (nextLinksIds.size() > 1) {
 			for (String nextLinkId : nextLinksIds) {
-				Coord cNextTo = this.outLinksMap.get(nextLinkId).getToNode()
+				Coord cNextTo = outLinksMap.get(nextLinkId).getToNode()
 						.getCoord();
 				double outLinkTheta = Math.atan2(cNextTo.getY() - yTo, cNextTo
 						.getX()
@@ -162,14 +166,13 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 				thetas.put(nextLinkId, Math.abs(deltaTheta));
 			}
 			double minTheta = Collections.min(thetas.values());
-			for (String outLinkId : thetas.keySet())
-				if (thetas.get(outLinkId).doubleValue() == minTheta)
-					minThetas.add(outLinkId);
-
+			for (Map.Entry<String, Double> theta : thetas.entrySet())
+				if (theta.getValue() == minTheta)
+					minThetas.add(theta.getKey());
 			if (minThetas.size() == 1)
 				resultLinkId = minThetas.get(0);
 			else if (minThetas.size() == 2)
-				resultLinkId = (Math.random() < 0.5) ? minThetas.get(0)
+				resultLinkId = Math.random() < 0.5 ? minThetas.get(0)
 						: minThetas.get(1);
 		}
 		return resultLinkId;
@@ -177,6 +180,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 
 	/**
 	 * see also: org.matsim.playground.yu.Subsequent
+	 * 
 	 * @param filename
 	 * @throws IOException
 	 */
@@ -190,18 +194,17 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 
 	/**
 	 * see also: org.matsim.playground.yu.Subsequent
+	 * 
 	 * @throws IOException
 	 */
 	private void write() throws IOException {
-		this.writer.write("<subsequent>\n");
+		writer.write("<subsequent>\n");
 		// links
-		this.writer.write("\t<links>\n");
-		for (Iterator<Entry<String, String>> it = this.ssLinks.entrySet().iterator(); it.hasNext();) {
-			Entry<String, String> next = it.next();
-			this.writer.write("\t\t<link id=\"" + next.getValue()
+		writer.write("\t<links>\n");
+		for (Map.Entry<String, String> next : ssLinks.entrySet())
+			writer.write("\t\t<link id=\"" + next.getValue()
 					+ "\" subsequentLinkId=\"" + next.getKey() + "\" />\n");
-		}
-		this.writer.write("\t</links>\n" + "</subsequent>");
+		writer.write("\t</links>\n" + "</subsequent>");
 		System.out.println("@write done.");
 	}
 }

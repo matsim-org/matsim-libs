@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -44,17 +43,17 @@ import org.matsim.world.World;
 
 /**
  * @author yu
- *
+ * 
  */
 public class ScoreVariance extends PersonAlgorithm implements PlanAlgorithmI {
-	private List<Double> scores = new ArrayList<Double>();
+	private final List<Double> scores = new ArrayList<Double>();
 	private BufferedWriter writer;
-	private String outputFilename;
+	private final String outputFilename;
 
-	public ScoreVariance(String outputFilename) {
+	public ScoreVariance(final String outputFilename) {
 		this.outputFilename = outputFilename;
 		try {
-			this.writer = IOUtils.getBufferedWriter(outputFilename);
+			writer = IOUtils.getBufferedWriter(outputFilename);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -63,22 +62,21 @@ public class ScoreVariance extends PersonAlgorithm implements PlanAlgorithmI {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		run(person.getSelectedPlan());
 	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		// final String netFilename = "../data/ivtch/input/network.xml";
 		final String netFilename = "../data/schweiz/input/ch.xml";
 		final String plansFilename = "../data/schweiz/input/Run410.output.plans.xml.gz";
 		final String outputFilename = "../data/schweiz/variance/Run410variance.txt";
 
 		Gbl.startMeasurement();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		World world = Gbl.getWorld();
 
@@ -102,48 +100,47 @@ public class ScoreVariance extends PersonAlgorithm implements PlanAlgorithmI {
 		System.exit(0);
 	}
 
-	public void run(Plan plan) {
-		this.scores.add(plan.getScore());
+	public void run(final Plan plan) {
+		scores.add(plan.getScore());
 	}
 
 	public void writeVariance() {
-		int size = this.scores.size();
-		if ((this.scores == null) || (size == 0)) {
+		int size = scores.size();
+		if (size == 0) {
 			try {
-				this.writer
-						.write(this.outputFilename
+				writer
+						.write(outputFilename
 								+ "\nERROR: there is not data for calculating Variance!");
-				this.writer.close();
+				writer.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 			System.exit(1);
 		}
 		double[] scoreArray = new double[size];
-		for (int i = 0; i < size; i++) {
-			scoreArray[i] = this.scores.get(i);
-		}
+		for (int i = 0; i < size; i++)
+			scoreArray[i] = scores.get(i);
 		double var = getVariance(scoreArray);
 		try {
-			this.writer.write(this.outputFilename + "\ncount = " + scoreArray.length
+			writer.write(outputFilename + "\ncount = " + scoreArray.length
 					+ "\navg. = " + getAverage(scoreArray)
 					+ "\nScoreVariance = " + var + "\nStandard deviation = "
 					+ getStandardDeviation(var));
-			this.writer.close();
+			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static double getStandardDeviation(double variance) {
+	public static double getStandardDeviation(final double variance) {
 		return Math.sqrt(variance);
 	}
 
-	public static double getStandardDeviation(double[] inputData) {
+	public static double getStandardDeviation(final double[] inputData) {
 		return Math.sqrt(getVariance(inputData));
 	}
 
-	public static double getVariance(double[] inputData) {
+	public static double getVariance(final double[] inputData) {
 		double average = getAverage(inputData);
 		if (average == -1) {
 			System.err.println("avg. = " + -1);
@@ -153,32 +150,30 @@ public class ScoreVariance extends PersonAlgorithm implements PlanAlgorithmI {
 				* average;
 	}
 
-	public static int getCount(double[] inputData) {
-		return (inputData == null) ? -1 : inputData.length;
+	public static int getCount(final double[] inputData) {
+		return inputData == null ? -1 : inputData.length;
 	}
 
-	public static double getAverage(double[] inputData) {
-		return ((inputData == null) || (inputData.length == 0)) ? -1
+	public static double getAverage(final double[] inputData) {
+		return inputData == null || inputData.length == 0 ? -1
 				: getSum(inputData) / inputData.length;
 	}
 
-	public static double getSum(double[] inputData) {
-		if ((inputData == null) || (inputData.length == 0))
+	public static double getSum(final double[] inputData) {
+		if (inputData == null || inputData.length == 0)
 			return -1;
 		double sum = 0;
-		for (int i = 0; i < inputData.length; i++) {
-			sum += inputData[i];
-		}
+		for (double element : inputData)
+			sum += element;
 		return sum;
 	}
 
-	public static double getSquareSum(double[] inputData) {
-		if ((inputData == null) || (inputData.length == 0))
+	public static double getSquareSum(final double[] inputData) {
+		if (inputData == null || inputData.length == 0)
 			return -1;
 		double sqrsum = 0.0;
-		for (int i = 0; i < inputData.length; i++) {
-			sqrsum += inputData[i] * inputData[i];
-		}
+		for (double element : inputData)
+			sqrsum += element * element;
 		return sqrsum;
 	}
 }

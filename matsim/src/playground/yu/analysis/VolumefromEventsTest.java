@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -40,9 +39,7 @@ public class VolumefromEventsTest {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		// final String plansFilename = "./examples/equil/plans100.xml";
 		final String eventsFilename = "./test/yu/test/input/miv_zrh30km_10pct100.events.txt.gz";
-		final String volumeTestFilename = "./test/yu/test/output/miv_zrh30km_10pct100.eventsVolumeTest.txt.gz";
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null
+		Gbl.createConfig(null
 		// new String[] { "./test/yu/test/configTest.xml" }
 				);
 
@@ -63,7 +60,7 @@ public class VolumefromEventsTest {
 		Map<String, Double> vol7s = new HashMap<String, Double>();
 		for (Link ql : network.getLinks().values()) {
 			int[] v = volumes.getVolumesForLink(ql.getId().toString());
-			vol7s.put(ql.getId().toString(), (double) ((v != null) ? v[7] : 0));
+			vol7s.put(ql.getId().toString(), (double) (v != null ? v[7] : 0));
 		}
 		System.out.println("-> Done!");
 		System.exit(0);

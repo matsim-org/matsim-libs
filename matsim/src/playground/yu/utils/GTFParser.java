@@ -60,27 +60,27 @@ public class GTFParser extends MatsimXmlParser {
 	/**
 	 * 
 	 */
-	public GTFParser(Map<String, HashMap<Double, Double>> gtfsMap) {
+	public GTFParser(final Map<String, HashMap<Double, Double>> gtfsMap) {
 		linkgtfsMap = gtfsMap;
-		this.setValidating(false);
+		setValidating(false);
 	}
 
 	@Override
-	public void endTag(String name, String content, Stack<String> context) {
-		if (LINKGTFS.equals(name)) {
+	public void endTag(final String name, final String content,
+			final Stack<String> context) {
+		if (LINKGTFS.equals(name))
 			endLinkGTFs();
-		}
 	}
 
 	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (GREENTIMEFRACTIONS.equals(name)) {
+	public void startTag(final String name, final Attributes atts,
+			final Stack<String> context) {
+		if (GREENTIMEFRACTIONS.equals(name))
 			startGreentimefractions(atts);
-		} else if (LINKGTFS.equals(name)) {
+		else if (LINKGTFS.equals(name))
 			startLinkGTFs(atts);
-		} else if (GTF.equals(name)) {
+		else if (GTF.equals(name))
 			startGTF(atts);
-		}
 	}
 
 	private void endLinkGTFs() {
@@ -94,7 +94,7 @@ public class GTFParser extends MatsimXmlParser {
 	private void startLinkGTFs(final Attributes meta) {
 		crtLinkId = meta.getValue("id");
 		HashMap<Double, Double> gtfs = linkgtfsMap.get(crtLinkId);
-		crtLinkGTFs = (gtfs == null) ? new HashMap<Double, Double>() : gtfs;
+		crtLinkGTFs = gtfs == null ? new HashMap<Double, Double>() : gtfs;
 	}
 
 	private void startGTF(final Attributes meta) {
@@ -122,7 +122,7 @@ public class GTFParser extends MatsimXmlParser {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		GTFParser g = new GTFParser(
 				new TreeMap<String, HashMap<Double, Double>>());
 		g.readFile("../schweiz-ivtch/greentimes/ivtch.xml");
@@ -131,29 +131,27 @@ public class GTFParser extends MatsimXmlParser {
 		System.out.println("done!");
 	}
 
-	public double getAvgGtfs(String linkId) {
+	public double getAvgGtfs(final String linkId) {
 		double avgGtfs = -1;
 		if (linkgtfsMap != null) {
 			HashMap<Double, Double> linkGtfs = linkgtfsMap.get(linkId);
 			if (linkGtfs != null) {
 				double d = 0;
 				for (Iterator<Double> i = linkGtfs.values().iterator(); i
-						.hasNext();) {
+						.hasNext();)
 					d += i.next();
-				}
-				avgGtfs = d / (double) linkGtfs.size();
+				avgGtfs = d / linkGtfs.size();
 			}
 		}
 		return avgGtfs;
 	}
 
-	public double getGtfs(double time, String linkId) {
+	public double getGtfs(final double time, final String linkId) {
 		double gtfs = -1;
 		if (linkgtfsMap != null) {
 			HashMap<Double, Double> linkGtfs = linkgtfsMap.get(linkId);
-			if (linkGtfs != null) {
-				gtfs = linkGtfs.get(((int) time / 3600) * 3600.0);
-			}
+			if (linkGtfs != null)
+				gtfs = linkGtfs.get((int) time / 3600 * 3600.0);
 		}
 		return gtfs;
 	}

@@ -23,7 +23,6 @@
  */
 package playground.yu.test;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -36,45 +35,42 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class PersonCounter extends PersonAlgorithm {
 	private int cnt, nullCnt;
 
 	/**
-	 *
+	 * 
 	 */
 	public PersonCounter() {
-		this.cnt = 0;
-		this.nullCnt = 0;
+		cnt = 0;
+		nullCnt = 0;
 	}
 
 	@Override
-	public void run(Person person) {
-		if (person != null) {
-			this.cnt++;
-		} else {
-			this.nullCnt++;
-		}
+	public void run(final Person person) {
+		if (person != null)
+			cnt++;
+		else
+			nullCnt++;
 	}
 
 	@Override
 	public String toString() {
-		return "There are " + this.cnt + " persons and " + this.nullCnt
+		return "There are " + cnt + " persons and " + nullCnt
 				+ " (null)persons";
 	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		final String plansFilename = "./test/yu/test/input/10pctZrhCarPtPlans.xml.gz";
 
 		World world = Gbl.getWorld();
-		@SuppressWarnings("unused")
-		Config config = Gbl
-				.createConfig(new String[] { "./test/yu/test/configTest.xml" });
+		Gbl.createConfig(new String[] { "./test/yu/test/configTest.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

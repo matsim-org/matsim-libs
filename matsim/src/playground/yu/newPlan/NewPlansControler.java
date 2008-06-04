@@ -23,7 +23,6 @@ package playground.yu.newPlan;
 /*
  * $Id: NewPlansControler.java,v 1.7 2007/11/23 13:04:04 ychen Exp $
  */
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -43,9 +42,7 @@ public class NewPlansControler {
 		final String netFilename = "./test/yu/newPlans/equil_net.xml";
 		final String plansFilename = "./test/yu/newPlans/equil_plans1k.xml";
 
-		@SuppressWarnings("unused")
-		Config config = Gbl
-				.createConfig(new String[] { "./test/yu/newPlans/config.xml" });
+		Gbl.createConfig(new String[] { "./test/yu/newPlans/config.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

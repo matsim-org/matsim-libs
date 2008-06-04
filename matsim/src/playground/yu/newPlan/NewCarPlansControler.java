@@ -20,7 +20,6 @@
 
 package playground.yu.newPlan;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -31,9 +30,9 @@ import org.matsim.world.World;
 
 /**
  * test of NewAgentPtPlan
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class NewCarPlansControler {
 
@@ -42,7 +41,7 @@ public class NewCarPlansControler {
 		final String plansFilename = "./test/yu/newPlans/input/10pctZrhPlans.xml.gz";
 
 		World world = Gbl.getWorld();
-		Config config = Gbl
+		Gbl
 				.createConfig(new String[] { "./test/yu/newPlans/configMake10pctZrhCarPlans.xml" });
 
 		NetworkLayer network = new NetworkLayer();

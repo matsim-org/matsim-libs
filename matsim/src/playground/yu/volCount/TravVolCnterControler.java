@@ -18,12 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
- package playground.yu.volCount;
+package playground.yu.volCount;
+
 /*
  * $Id: TravVolCnterControler.java,v 1.4 2007/11/23 13:04:04 ychen Exp $
  */
 
-import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueSimulation;
@@ -34,20 +34,20 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.world.World;
 
-
 /**
  * test for TraVolCnter
+ * 
  * @author ychen
- *
+ * 
  */
 public class TravVolCnterControler {
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final String netFilename = "./equil/equil_net.xml";
 		final String plansFilename = "./equil/equil_plans.xml";
 
 		World world = Gbl.getWorld();
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

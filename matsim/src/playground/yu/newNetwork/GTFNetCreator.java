@@ -26,7 +26,6 @@ package playground.yu.newNetwork;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -37,15 +36,15 @@ import playground.yu.utils.GTFParser;
 
 /**
  * @author yu
- *
+ * 
  */
 public class GTFNetCreator {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch-changed.xml";
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
@@ -56,20 +55,28 @@ public class GTFNetCreator {
 		for (String linkId : g.getLinkgtfsMap().keySet()) {
 			Link l = network.getLink(linkId);
 			if (l != null) {
-				System.out.println("#a-->linkId:\t" + linkId + "\tcapacity:\t"
-						+ l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+				System.out
+						.println("#a-->linkId:\t"
+								+ linkId
+								+ "\tcapacity:\t"
+								+ l
+										.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 				System.out.println("greentimefraction:\t"
 						+ g.getAvgGtfs(linkId));
-				l.setCapacity(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * g.getAvgGtfs(linkId));
-				System.out.println("#b-->linkId:\t" + linkId + "\tcapacity:\t"
-						+ network.getLink(linkId).getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+				l.setCapacity(l
+						.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+						* g.getAvgGtfs(linkId));
+				System.out.println("#b-->linkId:\t"
+						+ linkId
+						+ "\tcapacity:\t"
+						+ network.getLink(linkId).getCapacity(
+								org.matsim.utils.misc.Time.UNDEFINED_TIME));
 				System.out.println("-------------------------");
 			}
 		}
 
 		new NetworkWriter(network,
-				"../schweiz-ivtch/network/ivtch-changed-with-GTF.xml")
-				.write();
+				"../schweiz-ivtch/network/ivtch-changed-with-GTF.xml").write();
 
 		System.out.println("done!");
 	}

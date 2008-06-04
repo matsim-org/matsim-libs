@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -42,7 +41,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class LegCountTest {
 	public static class LegCount extends PersonAlgorithm {
@@ -52,11 +51,11 @@ public class LegCountTest {
 		private int carUserCount = 0, carLegCount = 0, ptUserCount = 0,
 				ptLegCount = 0;
 
-		public LegCount(String filename) {
+		public LegCount(final String filename) {
 			try {
-				this.writer = IOUtils.getBufferedWriter(filename);
-				this.writer.write("personId\tLegNumber\n");
-				this.writer.flush();
+				writer = IOUtils.getBufferedWriter(filename);
+				writer.write("personId\tLegNumber\n");
+				writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -66,56 +65,54 @@ public class LegCountTest {
 
 		public void end() {
 			try {
-				this.writer.write("------------------------------------\ncarUser:\t"
-						+ this.carUserCount + ";\tcarLegs:\t" + this.carLegCount + ";\t"
-						+ (double) this.carLegCount / (double) this.carUserCount
-						+ "\tLegs pro carUser." + "\nptUser:\t" + this.ptUserCount
-						+ ";\tptLegs:\t" + this.ptLegCount + ";\t"
-						+ (double) this.ptLegCount / (double) this.ptUserCount
+				writer.write("------------------------------------\ncarUser:\t"
+						+ carUserCount + ";\tcarLegs:\t" + carLegCount + ";\t"
+						+ (double) carLegCount / (double) carUserCount
+						+ "\tLegs pro carUser." + "\nptUser:\t" + ptUserCount
+						+ ";\tptLegs:\t" + ptLegCount + ";\t"
+						+ (double) ptLegCount / (double) ptUserCount
 						+ "\tLegs pro ptUser.");
-				this.writer.flush();
-				this.writer.close();
+				writer.flush();
+				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-		public static int getLegsNumber(Plan selectedPlan) {
+		public static int getLegsNumber(final Plan selectedPlan) {
 			int i = 0;
-			for (LegIterator li = selectedPlan.getIteratorLeg(); li.hasNext();) {
+			for (LegIterator li = selectedPlan.getIteratorLeg(); li.hasNext();)
 				i = li.next().getNum();
-			}
 			i++;
 			return i;
 		}
 
-		private void carAppend(int legsNumber) {
-			this.carUserCount++;
-			this.carLegCount += legsNumber;
+		private void carAppend(final int legsNumber) {
+			carUserCount++;
+			carLegCount += legsNumber;
 		}
 
 		@Override
-		public void run(Person person) {
+		public void run(final Person person) {
 			Plan p = person.getSelectedPlan();
 			if (p != null) {
 				int nLegs = getLegsNumber(p);
 				try {
-					this.writer.write(person.getId() + "\t" + nLegs + "\n");
-					this.writer.flush();
+					writer.write(person.getId() + "\t" + nLegs + "\n");
+					writer.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				Plan.Type planType = p.getType();
-				if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
-					if (planType.equals(Plan.Type.CAR)) {
+				if (planType != null && Plan.Type.UNDEFINED != planType) {
+					if (planType.equals(Plan.Type.CAR))
 						carAppend(nLegs);
-					} else if (planType.equals(Plan.Type.PT)) {
-						this.ptUserCount++;
-						this.ptLegCount += nLegs;
+					else if (planType.equals(Plan.Type.PT)) {
+						ptUserCount++;
+						ptLegCount += nLegs;
 					}
-				} else {
+				} else
 					carAppend(nLegs);
-				}
 			}
 		}
 	}
@@ -123,7 +120,7 @@ public class LegCountTest {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/ivtch/input/network.xml";
 		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
@@ -135,8 +132,7 @@ public class LegCountTest {
 		final String outFilename = "../data/ivtch/legCount/263.legsCount.txt";
 
 		Gbl.startMeasurement();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		World world = Gbl.getWorld();
 

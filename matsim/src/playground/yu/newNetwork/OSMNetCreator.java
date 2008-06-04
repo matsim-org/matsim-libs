@@ -22,7 +22,6 @@ package playground.yu.newNetwork;
 
 import java.util.Set;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -77,7 +76,7 @@ public class OSMNetCreator {
 		final String OSMPatchFilename = "test/yu/utils/osmpatch.xml";
 		final String outputNetFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
 		// final String outputNetFilename = "test/yu/utils/ivtch-osm.1.3.xml";
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		// (1) -----------links in Circle---------------------------

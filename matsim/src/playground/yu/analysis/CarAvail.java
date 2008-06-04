@@ -27,7 +27,6 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -41,7 +40,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class CarAvail extends PersonAlgorithm {
 	private int never_hasCar, always_hasCar, sometimes_hasCar,
@@ -49,29 +48,29 @@ public class CarAvail extends PersonAlgorithm {
 			always_but_pt_plan, sometimes_but_car_plan, sometimes_but_pt_plan;
 
 	/**
-	 *
+	 * 
 	 */
 	public CarAvail() {
-		this.never_but_car_plan = 0;
-		this.never_but_pt_plan = 0;
-		this.never_hasCar = 0;
-		this.always_but_car_plan = 0;
-		this.always_but_pt_plan = 0;
-		this.always_hasCar = 0;
-		this.sometimes_but_car_plan = 0;
-		this.sometimes_but_pt_plan = 0;
-		this.sometimes_hasCar = 0;
+		never_but_car_plan = 0;
+		never_but_pt_plan = 0;
+		never_hasCar = 0;
+		always_but_car_plan = 0;
+		always_but_pt_plan = 0;
+		always_hasCar = 0;
+		sometimes_but_car_plan = 0;
+		sometimes_but_pt_plan = 0;
+		sometimes_hasCar = 0;
 	}
 
-	public void write(String outputFilename) {
+	public void write(final String outputFilename) {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputFilename);
 			writer.write("\tpersons\tcar-plans\tpt-plans\nnever\t"
-					+ this.never_hasCar + "\t" + this.never_but_car_plan + "\t"
-					+ this.never_but_pt_plan + "\nalways\t" + this.always_hasCar + "\t"
-					+ this.always_but_car_plan + "\t" + this.always_but_pt_plan
-					+ "\nsometimes\t" + this.sometimes_hasCar + "\t"
-					+ this.sometimes_but_car_plan + "\t" + this.sometimes_but_pt_plan
+					+ never_hasCar + "\t" + never_but_car_plan + "\t"
+					+ never_but_pt_plan + "\nalways\t" + always_hasCar + "\t"
+					+ always_but_car_plan + "\t" + always_but_pt_plan
+					+ "\nsometimes\t" + sometimes_hasCar + "\t"
+					+ sometimes_but_car_plan + "\t" + sometimes_but_pt_plan
 					+ "\n");
 			writer.close();
 		} catch (FileNotFoundException e) {
@@ -82,49 +81,44 @@ public class CarAvail extends PersonAlgorithm {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		String carAvail = person.getCarAvail();
 		if (carAvail != null) {
 			Plan.Type planType = person.getSelectedPlan().getType();
-			if ((planType != null) && (planType != Plan.Type.UNDEFINED)) {
+			if (planType != null && planType != Plan.Type.UNDEFINED)
 				if (carAvail.equals("never")) {
-					this.never_hasCar++;
-					if (planType == Plan.Type.CAR) {
-						this.never_but_car_plan++;
-					} else if (planType.equals(Plan.Type.PT)) {
-						this.never_but_pt_plan++;
-					}
+					never_hasCar++;
+					if (planType == Plan.Type.CAR)
+						never_but_car_plan++;
+					else if (planType.equals(Plan.Type.PT))
+						never_but_pt_plan++;
 				} else if (carAvail.equals("always")) {
-					this.always_hasCar++;
-					if (planType.equals(Plan.Type.PT)) {
-						this.always_but_pt_plan++;
-					} else if (planType.equals(Plan.Type.CAR)) {
-						this.always_but_car_plan++;
-					}
+					always_hasCar++;
+					if (planType.equals(Plan.Type.PT))
+						always_but_pt_plan++;
+					else if (planType.equals(Plan.Type.CAR))
+						always_but_car_plan++;
 				} else if (carAvail.equals("sometimes")) {
-					this.sometimes_hasCar++;
-					if (planType.equals(Plan.Type.PT)) {
-						this.sometimes_but_pt_plan++;
-					} else if (planType.equals(Plan.Type.CAR)) {
-						this.sometimes_but_car_plan++;
-					}
+					sometimes_hasCar++;
+					if (planType.equals(Plan.Type.PT))
+						sometimes_but_pt_plan++;
+					else if (planType.equals(Plan.Type.CAR))
+						sometimes_but_car_plan++;
 				}
-			}
 		}
 	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = "../data/ivtch/input/network.xml";
 		final String plansFilename = "../data/ivtch/run271/ITERS/it.100/100.plans.xml.gz";
 		final String outputFilename = "../data/ivtch/run271/CarAvail.txt";
 
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		World world = Gbl.getWorld();
 

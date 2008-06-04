@@ -23,7 +23,6 @@
  */
 package playground.yu.newNetwork;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -31,34 +30,34 @@ import org.matsim.network.NetworkWriter;
 
 /**
  * @author yu
- *
+ * 
  */
-public class DoublePermlanesNetwork{
-//
-//	/**
-//	 * @param network
-//	 */
-//	public DoublePermlanesNetwork(NetworkLayer network) {
-//		super(network);
-//		// TODO Auto-generated constructor stub
-//	}
-//
-//	/**
-//	 * @param network
-//	 * @param filename
-//	 */
-//	public DoublePermlanesNetwork(NetworkLayer network, String filename) {
-//		super(network, filename);
-//		// TODO Auto-generated constructor stub
-//	}
+public class DoublePermlanesNetwork {
+	//
+	// /**
+	// * @param network
+	// */
+	// public DoublePermlanesNetwork(NetworkLayer network) {
+	// super(network);
+	// // TODO Auto-generated constructor stub
+	// }
+	//
+	// /**
+	// * @param network
+	// * @param filename
+	// */
+	// public DoublePermlanesNetwork(NetworkLayer network, String filename) {
+	// super(network, filename);
+	// // TODO Auto-generated constructor stub
+	// }
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final String inputNetFilename = "../schweiz-ivtch/network/ivtch-changed-wu.xml";
 		final String outputNetFilename = "../schweiz-ivtch/tmp/ivtch-changed-wu.xml";
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetFilename);
 		new NetworkWriter(network, outputNetFilename).write();

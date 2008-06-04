@@ -35,10 +35,10 @@ public class TraVolCal extends FinalEventFilterA {
 		if (enter instanceof EventLinkEnter) {
 			count();
 			long hour = (long) (enter.time / 3600);
-			if (hour > this.timeBinMax)
-				this.timeBinMax = hour;
-			if (hour < this.timeBinMin)
-				this.timeBinMin = hour;
+			if (hour > timeBinMax)
+				timeBinMax = hour;
+			if (hour < timeBinMin)
+				timeBinMin = hour;
 			EventLinkEnter ele = rebuildEventLinkEnter((EventLinkEnter) enter);
 			String linkId = null;
 			try {
@@ -49,14 +49,14 @@ public class TraVolCal extends FinalEventFilterA {
 			if (linkId != null) {
 				Map<Long, Double> inside;
 				int traVol = 0;
-				if (this.traVols.containsKey(linkId)) {
-					inside = this.traVols.get(linkId);
+				if (traVols.containsKey(linkId)) {
+					inside = traVols.get(linkId);
 					if (inside.containsKey(hour))
 						traVol = inside.get(hour).intValue();
 				} else
 					inside = new TreeMap<Long, Double>();
 				inside.put(hour, Double.valueOf(++traVol));
-				this.traVols.put(linkId, inside);
+				traVols.put(linkId, inside);
 			}
 		}
 	}
@@ -75,17 +75,17 @@ public class TraVolCal extends FinalEventFilterA {
 	/*-----------------OVERRIDE METHODS OF ABSTRACTED---------------- */
 	@Override
 	public List<UserDefAtt> UDAexport() {
-		if (this.udas.size() > 0)
-			return this.udas;
-		for (long i = this.timeBinMin; i <= this.timeBinMax; i++) {
+		if (udas.size() > 0)
+			return udas;
+		for (long i = timeBinMin; i <= timeBinMax; i++) {
 			UserDefAtt uda = new UserDefAtt("LINK", i + "TO"
 					+ Long.toString(i + 1) + "TRAVOL", i + "to"
 					+ Long.toString(i + 1) + "Travol", i + "-"
 					+ Long.toString(i + 1) + "Travol", UserDefAtt.DatenTyp.Int,
 					0, UserDefAtt.SparseDocu.duenn);
-			this.udas.add(uda);
+			udas.add(uda);
 		}
-		return this.udas;
+		return udas;
 	}
 
 	/**
@@ -95,33 +95,33 @@ public class TraVolCal extends FinalEventFilterA {
 	 * 
 	 * @return a list of UserDefAtt for Noise evaluation
 	 */
-	public List<UserDefAtt> LmUDAexport() {
-		if (this.udas.size() > 0)
-			return this.udas;
-		for (long i = this.timeBinMin; i <= this.timeBinMax; i++) {
+	public List<UserDefAtt> lmUDAexport() {
+		if (udas.size() > 0)
+			return udas;
+		for (long i = timeBinMin; i <= timeBinMax; i++) {
 			UserDefAtt uda = new UserDefAtt("LINK", i + "TO"
 					+ Long.toString(i + 1) + "LAERM", i + "to"
 					+ Long.toString(i + 1) + "Laerm", i + "-"
 					+ Long.toString(i + 1) + "Laerm", UserDefAtt.DatenTyp.Int,
 					2, UserDefAtt.SparseDocu.duenn);
-			this.udas.add(uda);
+			udas.add(uda);
 		}
-		return this.udas;
+		return udas;
 	}
 
 	@Override
 	public Map<String, List<Double>> UDAWexport() {
-		if (this.udaws.size() > 0)
-			return this.udaws;
-		for (String linkID : this.traVols.keySet()) {
+		if (udaws.size() > 0)
+			return udaws;
+		for (String linkID : traVols.keySet()) {
 			List<Double> udaw = new ArrayList<Double>();
-			for (UserDefAtt uda : this.udas) {
+			for (UserDefAtt uda : udas) {
 				String[] s = uda.getATTID().split("TO");
-				udaw.add(this.traVols.get(linkID).get(Long.parseLong(s[0])));
+				udaw.add(traVols.get(linkID).get(Long.parseLong(s[0])));
 			}
-			this.udaws.put(linkID, udaw);
+			udaws.put(linkID, udaw);
 		}
-		return this.udaws;
+		return udaws;
 	}
 
 	/**
@@ -132,20 +132,20 @@ public class TraVolCal extends FinalEventFilterA {
 	 * @return the TreeMap of values of attributs defined by VISUM9.3-user, but
 	 *         only for noise evaluation
 	 */
-	public Map<String, List<Double>> LmUDAWexport() {
-		if (this.udaws.size() > 0)
-			return this.udaws;
-		for (String linkID : this.traVols.keySet()) {
+	public Map<String, List<Double>> lmUDAWexport() {
+		if (udaws.size() > 0)
+			return udaws;
+		for (String linkID : traVols.keySet()) {
 			List<Double> udaw = new ArrayList<Double>();
-			for (UserDefAtt uda : this.udas) {
+			for (UserDefAtt uda : udas) {
 				String[] s = uda.getATTID().split("TO");
-				double Lm = 37.3 + 10.0 * Math.log10(this.traVols.get(linkID)
-						.get(Integer.parseInt(s[0]))
+				double Lm = 37.3 + 10.0 * Math.log10(traVols.get(linkID).get(
+						Integer.parseInt(s[0]))
 						* (1.0 + 0.082 * 0.1));
 				udaw.add(Lm);
 			}
-			this.udaws.put(linkID, udaw);
+			udaws.put(linkID, udaw);
 		}
-		return this.udaws;
+		return udaws;
 	}
 }

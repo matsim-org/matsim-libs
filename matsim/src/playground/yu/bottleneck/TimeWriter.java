@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.matsim.config.Config;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.Events;
@@ -42,7 +41,7 @@ import org.matsim.world.World;
 
 /**
  * prepare Departure time- arrival Time- Diagramm
- *
+ * 
  * @author ychen
  */
 public class TimeWriter implements EventHandlerAgentDepartureI,
@@ -51,8 +50,8 @@ public class TimeWriter implements EventHandlerAgentDepartureI,
 	// VARIABLES---------------------------------
 	private BufferedWriter out = null;
 	private HashMap<String, Double> agentDepTimes;
-	private List<Double> depTimes = new ArrayList<Double>();
-	private List<Double> arrTimes = new ArrayList<Double>();
+	private final List<Double> depTimes = new ArrayList<Double>();
+	private final List<Double> arrTimes = new ArrayList<Double>();
 
 	// --------------------------CONSTRUCTOR-------------------------------------
 	public TimeWriter(final String filename) {
@@ -64,9 +63,8 @@ public class TimeWriter implements EventHandlerAgentDepartureI,
 	 * (agentDepTimes).
 	 */
 	public void handleEvent(final EventAgentDeparture event) {
-		if (event.legId == 0) {
-			this.agentDepTimes.put(event.agentId, event.time);
-		}
+		if (event.legId == 0)
+			agentDepTimes.put(event.agentId, event.time);
 	}
 
 	/**
@@ -75,14 +73,14 @@ public class TimeWriter implements EventHandlerAgentDepartureI,
 	 */
 	public void handleEvent(final EventAgentArrival event) {
 		String agentId = event.agentId;
-		if (this.agentDepTimes.containsKey(agentId)) {
-			int depT = (int) this.agentDepTimes.remove(agentId).doubleValue();
-			this.depTimes.add((double) depT);
+		if (agentDepTimes.containsKey(agentId)) {
+			int depT = (int) agentDepTimes.remove(agentId).doubleValue();
+			depTimes.add((double) depT);
 			int depH = depT / 3600;
 			int depMin = (depT - depH * 3600) / 60;
 			int depSec = depT - depH * 3600 - depMin * 60;
 			int time = (int) event.time;
-			this.arrTimes.add((double) time);
+			arrTimes.add((double) time);
 			int h = time / 3600;
 			int min = (time - h * 3600) / 60;
 			int sec = time - h * 3600 - min * 60;
@@ -92,64 +90,62 @@ public class TimeWriter implements EventHandlerAgentDepartureI,
 	}
 
 	public void init(final String outfilename) {
-		if (this.out != null) {
+		if (out != null)
 			try {
-				this.out.close();
-				this.out = null;
+				out.close();
+				out = null;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
 		try {
-			this.out = IOUtils.getBufferedWriter(outfilename);
+			out = IOUtils.getBufferedWriter(outfilename);
 			writeLine("agentId\tdepTime\tarrTime");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.agentDepTimes = new HashMap<String, Double>();
+		agentDepTimes = new HashMap<String, Double>();
 	}
 
 	private void writeLine(final String line) {
 		try {
-			this.out.write(line);
-			this.out.write("\n");
+			out.write(line);
+			out.write("\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void writeChart(String chartFilename) {
+	public void writeChart(final String chartFilename) {
 		XYScatterChart chart = new XYScatterChart("departure and arrival Time",
 				"departureTime", "arrivalTime");
-		double[] dTArray = new double[this.depTimes.size()];
-		double[] aTArray = new double[this.arrTimes.size()];
-		for (int i = 0; i < this.depTimes.size(); i++) {
-			dTArray[i] = this.depTimes.get(i).doubleValue();
-			aTArray[i] = this.arrTimes.get(i).doubleValue();
+		double[] dTArray = new double[depTimes.size()];
+		double[] aTArray = new double[arrTimes.size()];
+		for (int i = 0; i < depTimes.size(); i++) {
+			dTArray[i] = depTimes.get(i).doubleValue();
+			aTArray[i] = arrTimes.get(i).doubleValue();
 		}
 		chart.addSeries("depTime/arrTime", dTArray, aTArray);
 		chart.saveAsPng(chartFilename, 1024, 768);
 	}
 
 	public void reset(final int iteration) {
-		this.agentDepTimes.clear();
+		agentDepTimes.clear();
 	}
 
 	public void closefile() {
-		if (this.out != null) {
+		if (out != null)
 			try {
-				this.out.close();
-				this.out = null;
+				out.close();
+				out = null;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-//		final String netFilename = "./test/yu/ivtch/input/network.xml";
+		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "./test/yu/equil_test/equil_net.xml";
 		// final String eventsFilename =
 		// "./test/yu/test/input/run265opt100.events.txt.gz";
@@ -157,8 +153,7 @@ public class TimeWriter implements EventHandlerAgentDepartureI,
 		final String outputFilename = "./test/yu/test/output/7-9-6.times.txt.gz";
 		final String chartFilename = "./test/yu/test/output/7-9-6.times.png";
 
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();

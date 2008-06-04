@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -37,12 +36,11 @@ public class CapacityTest {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch-osm-wu.xml";
 		final String outputFilename = "test/yu/test/captest.txt";
 		World world = Gbl.getWorld();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
@@ -51,7 +49,12 @@ public class CapacityTest {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outputFilename);
 			for (Link link : network.getLinks().values()) {
-				out.write(link.getId() + "\t" + link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\n");
+				out
+						.write(link.getId()
+								+ "\t"
+								+ link
+										.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+								+ "\n");
 				out.flush();
 			}
 			out.close();

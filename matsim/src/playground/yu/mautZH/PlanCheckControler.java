@@ -23,7 +23,6 @@
  */
 package playground.yu.mautZH;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -34,7 +33,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class PlanCheckControler {
 	public static void main(final String[] args) {
@@ -42,8 +41,8 @@ public class PlanCheckControler {
 		final String plansFilename = "./test/yu/schweiz/input/100ITERs_pt-6t-6output_plans.xml";
 		final String planCheckFilename = "./test/yu/schweiz/output/planCheck.txt";
 		World world = Gbl.getWorld();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(new String[] { "./test/yu/schweiz/multipleIterations_.xml" });
+		Gbl
+				.createConfig(new String[] { "./test/yu/schweiz/multipleIterations_.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);

@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.config.Config;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
@@ -277,8 +276,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		final String outputFilename = "../runs/run467/AvgSpeed.txt.gz";
 		final String chartFilename = "../runs/run467/cityAreaAvgSpeed.png";
 
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
@@ -300,5 +298,4 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		Gbl.printElapsedTime();
 		System.exit(0);
 	}
-
 }

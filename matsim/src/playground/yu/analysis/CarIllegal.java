@@ -23,7 +23,6 @@
  */
 package playground.yu.analysis;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -36,7 +35,7 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class CarIllegal extends PersonAlgorithm {
 	private int count = 0;
@@ -48,14 +47,12 @@ public class CarIllegal extends PersonAlgorithm {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		if (person != null) {
-			this.planType = person.getSelectedPlan().getType();
-			if (!((this.planType != null) && (this.planType != Plan.Type.CAR))) {
-				if ((person.getAge() < 18) || person.getLicense().equals("no")) {
-					this.count++;
-				}
-			}
+			planType = person.getSelectedPlan().getType();
+			if (!(planType != null && planType != Plan.Type.CAR))
+				if (person.getAge() < 18 || person.getLicense().equals("no"))
+					count++;
 		}
 	}
 
@@ -63,12 +60,13 @@ public class CarIllegal extends PersonAlgorithm {
 	 * @return the count
 	 */
 	public int getCount() {
-		return this.count;
+		return count;
 	}
+
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../data/ivtch/input/network.xml";
 		// final String netFilename = "./test/yu/equil_test/equil_net.xml";
@@ -81,8 +79,8 @@ public class CarIllegal extends PersonAlgorithm {
 		// "../data/ivtch/carPt_opt_run266/legsCount.txt";
 
 		Gbl.startMeasurement();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+
+		Gbl.createConfig(null);
 		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();

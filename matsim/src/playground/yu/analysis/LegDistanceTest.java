@@ -23,7 +23,6 @@
  */
 package playground.yu.analysis;
 
-import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -33,14 +32,14 @@ import org.matsim.world.World;
 
 /**
  * @author ychen
- *
+ * 
  */
 public class LegDistanceTest {
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final String netFilename = "../schweiz-ivtch/network/ivtch.xml";
 		final String eventsFilename = "../runs/run265/100.events.txt.gz";
 		final String chartFilename = "./output/run265legDistance";
@@ -53,8 +52,7 @@ public class LegDistanceTest {
 		// final String outFilename = "./test/yu/test/output/3klegDist.txt.gz";
 
 		Gbl.startMeasurement();
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 
 		World world = Gbl.getWorld();
 

@@ -22,7 +22,6 @@ package playground.yu.test;
 
 import java.io.IOException;
 
-import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -38,9 +37,7 @@ public class PtCheckTest {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		final String plansFilename = "./test/yu/test/input/10pctZrhCarPt100.plans.xml.gz";
 		final String ptcheckFilename = "./test/yu/test/output/ptCheck100.10pctZrhCarPt.txt";
-
-		@SuppressWarnings("unused")
-		Config config = Gbl
+		Gbl
 				.createConfig(new String[] { "./test/yu/test/configPtcheckTest.xml" });
 
 		World world = Gbl.getWorld();
@@ -59,7 +56,9 @@ public class PtCheckTest {
 
 			pc.write(100);
 			pc.writeEnd();
-		} catch (IOException e) {e.printStackTrace();}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		System.out.println("-->Done!!");
 	}

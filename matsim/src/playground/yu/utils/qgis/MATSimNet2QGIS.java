@@ -38,7 +38,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.basic.v01.Id;
-import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerI;
@@ -68,14 +67,14 @@ public class MATSimNet2QGIS {
 	 * 
 	 */
 	public static class ShapeFileWriter2 {
-		public static void writeGeometries(Collection<Feature> features,
-				String filename) throws IOException, FactoryException,
+		public static void writeGeometries(final Collection<Feature> features,
+				final String filename) throws IOException, FactoryException,
 				SchemaException {
 			ShapefileDataStore datastore = new ShapefileDataStore((new File(
 					filename)).toURI().toURL());
-			FeatureType ft = (features.iterator().next()).getFeatureType();
+			FeatureType ft = features.iterator().next().getFeatureType();
 			datastore.createSchema(ft);
-			((FeatureStore) (datastore.getFeatureSource(ft.getTypeName())))
+			((FeatureStore) datastore.getFeatureSource(ft.getTypeName()))
 					.addFeatures(DataUtilities.reader(features));
 		}
 	}
@@ -85,10 +84,10 @@ public class MATSimNet2QGIS {
 	protected CoordinateReferenceSystem crs = null;
 	private Network2PolygonGraph n2g;
 
-	public void readNetwork(String netFilename) {
-		Config config = Gbl.createConfig(null);
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(this.network).readFile(netFilename);
+	public void readNetwork(final String netFilename) {
+		Gbl.createConfig(null);
+		network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
 		Gbl.getWorld().setNetworkLayer(network);
 	}
 
@@ -96,20 +95,20 @@ public class MATSimNet2QGIS {
 	 * @param crs
 	 *            the crs to set
 	 */
-	public void setCrs(String wkt) {
+	public void setCrs(final String wkt) {
 		try {
-			this.crs = CRS.parseWKT(wkt);
+			crs = CRS.parseWKT(wkt);
 		} catch (FactoryException e) {
 			e.printStackTrace();
 		}
-		this.n2g = new Network2PolygonGraph(this.network, this.crs);
+		n2g = new Network2PolygonGraph(network, crs);
 	}// TODO override
 
 	/**
 	 * @param flowCapFactor
 	 *            the flowCapFactor to set
 	 */
-	public static void setFlowCapFactor(double flowCapacityFactor) {
+	public static void setFlowCapFactor(final double flowCapacityFactor) {
 		flowCapFactor = flowCapacityFactor;
 	}
 
@@ -117,10 +116,9 @@ public class MATSimNet2QGIS {
 	 * @param ShapeFilename
 	 *            where the shapefile will be saved
 	 */
-	public void writeShapeFile(String ShapeFilename) {
+	public void writeShapeFile(final String ShapeFilename) {
 		try {
-			ShapeFileWriter2.writeGeometries(this.n2g.getFeatures(),
-					ShapeFilename);
+			ShapeFileWriter2.writeGeometries(n2g.getFeatures(), ShapeFilename);
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (SchemaException e) {
@@ -135,9 +133,9 @@ public class MATSimNet2QGIS {
 	}
 
 	// /////////////////////////////
-	public void addParameter(String paraName, Class<?> clazz,
-			Map<Id, ?> parameters) {
-		this.n2g.addParameter(paraName, clazz, parameters);
+	public void addParameter(final String paraName, final Class<?> clazz,
+			final Map<Id, ?> parameters) {
+		n2g.addParameter(paraName, clazz, parameters);
 	}
 
 	// /////////////////////////////
@@ -145,16 +143,17 @@ public class MATSimNet2QGIS {
 	 * @return the network
 	 */
 	public NetworkLayer getNetwork() {
-		return this.network;
+		return network;
 	}
 
-	public void readEvents(String eventsFilename, EventHandlerI handler) {
+	public void readEvents(final String eventsFilename,
+			final EventHandlerI handler) {
 		Events events = new Events();
 		events.addHandler(handler);
 		new MatsimEventsReader(events).readFile(eventsFilename);
 	}
 
-	public void readPlans(String plansFilename, PersonAlgorithm pa) {
+	public void readPlans(final String plansFilename, final PersonAlgorithm pa) {
 		Plans population = new Plans();
 		population.addAlgorithm(pa);
 		new MatsimPlansReader(population).readFile(plansFilename);
@@ -165,7 +164,7 @@ public class MATSimNet2QGIS {
 	 * @param n2g
 	 *            the n2g to set
 	 */
-	public void setN2g(Network2PolygonGraph n2g) {
+	public void setN2g(final Network2PolygonGraph n2g) {
 		this.n2g = n2g;
 	}
 }

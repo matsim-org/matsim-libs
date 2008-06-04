@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.config.Config;
 import org.matsim.events.EventAgentWait2Link;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
@@ -39,11 +38,11 @@ public class EventsWait2LinkTest {
 	public static class EventsWait2Link implements EventHandlerAgentWait2LinkI {
 		private BufferedWriter writer = null;
 
-		public EventsWait2Link(String outputFilename) {
+		public EventsWait2Link(final String outputFilename) {
 			try {
-				this.writer = IOUtils.getBufferedWriter(outputFilename);
-				this.writer.write("personId\tlinkId\n");
-				this.writer.flush();
+				writer = IOUtils.getBufferedWriter(outputFilename);
+				writer.write("personId\tlinkId\n");
+				writer.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -51,10 +50,10 @@ public class EventsWait2LinkTest {
 			}
 		}
 
-		public void handleEvent(EventAgentWait2Link event) {
+		public void handleEvent(final EventAgentWait2Link event) {
 			try {
-				this.writer.write(event.agentId + "\t" + event.linkId + "\n");
-				this.writer.flush();
+				writer.write(event.agentId + "\t" + event.linkId + "\n");
+				writer.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -62,21 +61,21 @@ public class EventsWait2LinkTest {
 
 		public void end() {
 			try {
-				this.writer.close();
+				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-		public void reset(int iteration) {
-			this.writer = null;
+		public void reset(final int iteration) {
+			writer = null;
 		}
 	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = "./test/yu/ivtch/input/network.xml";
@@ -85,8 +84,7 @@ public class EventsWait2LinkTest {
 		final String eventsFilename = "../runs/run266/100.events.txt.gz";
 		final String outputFilename = "../runs/run266/Wait2Link.events.txt.gz";
 
-		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Gbl.createConfig(null);
 		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
