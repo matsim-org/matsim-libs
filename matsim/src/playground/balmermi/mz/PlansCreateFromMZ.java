@@ -396,6 +396,12 @@ public class PlansCreateFromMZ {
 			p.getPlans().clear();
 			p.addPlan(plan2);
 			p.setSelectedPlan(plan2);
+			
+			// complete the last act with time info
+			if (p.getSelectedPlan().getActsLegs().size() == 1) {
+				Act act = (Act)p.getSelectedPlan().getActsLegs().get(0);
+				act.setStartTime(0); act.setDur(24*3600); act.setEndTime(24*3600);
+			}
 		}
 		System.out.println("        # round trips removed (with same act types) = " + cnt_sametypes);
 		System.out.println("        # round trips removed (with diff act types) = " + cnt_difftypes);
@@ -457,6 +463,17 @@ public class PlansCreateFromMZ {
 				Act act = (Act)plan.getActsLegs().get(i);
 				if (act.getEndTime()<act.getStartTime()) { ids.add(p.getId()); }
 			}
+		}
+		return ids;
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+
+	private final Set<Id> identifySingleActPlans(final Plans plans, final Map<Id,String> person_strings) {
+		Set<Id> ids = new HashSet<Id>();
+		for (Person p : plans.getPersons().values()) {
+			Plan plan = p.getSelectedPlan();
+			if (plan.getActsLegs().size() <= 1) { ids.add(p.getId()); }
 		}
 		return ids;
 	}
@@ -685,6 +702,24 @@ public class PlansCreateFromMZ {
 		System.out.println("      # persons left        = " + plans.getPersons().size());
 		System.out.println("      # person_strings left = " + person_strings.size());
 		System.out.println();
+
+		//////////////////////////////////////////////////////////////////////
+
+//		System.out.println("      identify single activity plans...");
+//		pids = this.identifySingleActPlans(plans,person_strings);
+//		System.out.println("      done.");
+//
+//		System.out.println("      # persons        = " + plans.getPersons().size());
+//		System.out.println("      # person_strings = " + person_strings.size());
+//		System.out.println("      # persons with single activity plans = " + pids.size());
+//
+//		System.out.println("      removing persons with single activity plans...");
+//		this.removePlans(plans,person_strings,pids);
+//		System.out.println("      done.");
+//
+//		System.out.println("      # persons left        = " + plans.getPersons().size());
+//		System.out.println("      # person_strings left = " + person_strings.size());
+//		System.out.println();
 
 		//////////////////////////////////////////////////////////////////////
 

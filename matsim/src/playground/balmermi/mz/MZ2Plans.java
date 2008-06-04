@@ -56,9 +56,11 @@ public class MZ2Plans {
 		System.out.println("  done.");
 
 		System.out.println("  running plans modules... ");
-//		new PlansCreateFromMZ(indir+"/wegeketten_new_small.dat",outdir+"/output_wegeketten_new_small.dat").run(plans);
-		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",7,7).run(plans);
-//		new PlansCreateFromMZ(outdir+"/output_wegeketten_new.dat",outdir+"/output_wegeketten_new_new.dat").run(plans);
+		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",1,7).run(plans);
+//		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",1,5).run(plans);
+//		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",6,6).run(plans);
+//		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",6,7).run(plans);
+//		new PlansCreateFromMZ(indir+"/wegeketten_new.dat",outdir+"/output_wegeketten_new.dat",7,7).run(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -68,10 +70,10 @@ public class MZ2Plans {
 		plans_writer.write();
 		System.out.println("  done.");
 
-		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
-		config_writer.write();
-		System.out.println("  done.");
+//		System.out.println("  writing config xml file... ");
+//		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+//		config_writer.write();
+//		System.out.println("  done.");
 
 		System.out.println("done.");
 		System.out.println();
