@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFVis.java
+ * CompareSelectedPlansTable.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -53,7 +53,10 @@ public class CompareSelectedPlansTable {
 
 	/**
 	 * @param args array with 4 entries:
-	 * {path to plans file 0, path to plans file 1, name of output file, path to network file}
+	 * - path to plans file 0,
+	 * - path to plans file 1,
+	 * - name of output file,
+	 * - path to network file
 	 */
 	public static void main(final String[] args) {
 
