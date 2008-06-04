@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.ShutdownEvent;
@@ -33,7 +32,6 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.utils.charts.XYLineChart;
@@ -74,7 +72,7 @@ public class TravelTimeandDistanceStats implements StartupListener, IterationEnd
 	private final static Logger log = Logger.getLogger(TravelTimeandDistanceStats.class);
 
 	/**
-	 * Creates a new ScoreStats instance.
+	 * Creates a new TravelTimeandDistanceStats instance.
 	 *
 	 * @param population
 	 * @param filename
@@ -87,6 +85,7 @@ public class TravelTimeandDistanceStats implements StartupListener, IterationEnd
 		this.createPNG = createPNG;
 		this.out = IOUtils.getBufferedWriter(filename);
 		this.out.write("ITERATION\tavg. plantraveltime\tavg. plantraveldistance\tavg. legtraveltime\tavg. legtraveldistance\n");
+
 	}
 
 	public void notifyStartup(final StartupEvent event) {
@@ -105,29 +104,28 @@ public class TravelTimeandDistanceStats implements StartupListener, IterationEnd
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		double sumPlanTraveltime = 0.0;
 		double sumPlanTraveldistance = 0.0;
-		double sumLegTraveltime = 0.0;
-		double sumLegTraveldistance = 0.0;
+		int sumNumberOfLegs=0;
 
 
 		for (Person person : this.population.getPersons().values()) {
-			sumPlanTraveltime+=this.getTravelTime(person);
-			sumPlanTraveldistance+=this.getTravelDist(person);
-			sumLegTraveltime+=this.getTravelTime(person)/this.getNumberOfTrips(person);
-			sumLegTraveldistance+=this.getTravelDist(person)/this.getNumberOfTrips(person);
+			PersonTimeDistanceCalculator.run(person);
+			sumPlanTraveltime+=PersonTimeDistanceCalculator.getPlanTravelTime();
+			sumPlanTraveldistance+=PersonTimeDistanceCalculator.getPlanTravelDistance();
+			sumNumberOfLegs+=PersonTimeDistanceCalculator.getNumberOfLegs();
 		}
 
 		int nr_persons=this.population.getPersons().size();
 
 		log.info("-- avg. plan traveltime of the selected plan: " + sumPlanTraveltime / nr_persons);
 		log.info("-- avg. plan traveldistance of the selected plan: "  + sumPlanTraveldistance / nr_persons);
-		log.info("-- avg. leg traveltime of the selected plan: "  + sumLegTraveltime / nr_persons);
-		log.info("-- avg. leg traveldistance of the selected plan: "  + sumLegTraveldistance / nr_persons);
+		log.info("-- avg. leg traveltime of the selected plan: "  + sumPlanTraveltime / (sumNumberOfLegs * nr_persons));
+		log.info("-- avg. leg traveldistance of the selected plan: "  + sumPlanTraveldistance / (sumNumberOfLegs * nr_persons));
 
 
 		try {
 			this.out.write(event.getIteration() + "\t" + (sumPlanTraveltime / nr_persons) + "\t" +
-					(sumPlanTraveldistance / nr_persons) + "\t" + (sumLegTraveltime / nr_persons) + "\t" +
-					(sumLegTraveldistance / nr_persons) + "\n");
+					(sumPlanTraveldistance / nr_persons) + "\t" + (sumPlanTraveltime / (sumNumberOfLegs * nr_persons)) + "\t" +
+					(sumPlanTraveldistance / (sumNumberOfLegs * nr_persons)) + "\n");
 			this.out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -137,27 +135,37 @@ public class TravelTimeandDistanceStats implements StartupListener, IterationEnd
 			int index = event.getIteration() - this.minIteration;
 			this.history[INDEX_PLANTT][index] = (sumPlanTraveltime / nr_persons);
 			this.history[INDEX_PLANTD][index] = (sumPlanTraveldistance / nr_persons);
-			this.history[INDEX_LEGTT][index] = (sumLegTraveltime / nr_persons);
-			this.history[INDEX_LEGTD][index] = (sumLegTraveldistance / nr_persons);
+			this.history[INDEX_LEGTT][index] = (sumPlanTraveltime / (sumNumberOfLegs * nr_persons));
+			this.history[INDEX_LEGTD][index] = (sumPlanTraveldistance / (sumNumberOfLegs * nr_persons));
 
 			if (event.getIteration() != this.minIteration) {
 				// create chart when data of more than one iteration is available.
-				XYLineChart chart = new XYLineChart("TT and TD Statistics", "iteration", " avg time");
-				double[] iterations = new double[index + 1];
+				XYLineChart chart_time = new XYLineChart("Travel Time Statistics", "iteration", " avg time");
+				double[] iterations_time = new double[index + 1];
 				for (int i = 0; i <= index; i++) {
-					iterations[i] = i + this.minIteration;
+					iterations_time[i] = i + this.minIteration;
 				}
 				double[] values = new double[index + 1];
 				System.arraycopy(this.history[INDEX_PLANTT], 0, values, 0, index + 1);
-				chart.addSeries("avg. plan travel time", iterations, values);
-				System.arraycopy(this.history[INDEX_PLANTD], 0, values, 0, index + 1);
-				chart.addSeries("avg. plan travel distance score", iterations, values);
+				chart_time.addSeries("avg. plan travel time", iterations_time, values);
 				System.arraycopy(this.history[INDEX_LEGTT], 0, values, 0, index + 1);
-				chart.addSeries("avg. leg travel time", iterations, values);
-				System.arraycopy(this.history[INDEX_LEGTD], 0, values, 0, index + 1);
-				chart.addSeries("avg. leg travel distance", iterations, values);
-				chart.addMatsimLogo();
-				chart.saveAsPng(Controler.getOutputFilename("timedistancestats.png"), 800, 600);
+				chart_time.addSeries("avg. leg travel time", iterations_time, values);
+				chart_time.addMatsimLogo();
+				chart_time.saveAsPng(Controler.getOutputFilename("timestats.png"), 800, 600);
+
+
+				XYLineChart chart_distance = new XYLineChart("Travel Distance Statistics", "iteration", " avg distance");
+				double[] iterations_distance = new double[index + 1];
+				for (int i = 0; i <= index; i++) {
+					iterations_distance[i] = i + this.minIteration;
+				}
+				double[] values_distance = new double[index + 1];
+				System.arraycopy(this.history[INDEX_PLANTD], 0, values_distance, 0, index + 1);
+				chart_distance.addSeries("avg. plan travel distance", iterations_distance, values_distance);
+				System.arraycopy(this.history[INDEX_LEGTD], 0, values_distance, 0, index + 1);
+				chart_distance.addSeries("avg. leg travel distance", iterations_distance, values_distance);
+				chart_distance.addMatsimLogo();
+				chart_distance.saveAsPng(Controler.getOutputFilename("distancestats.png"), 800, 600);
 			}
 			if (index == this.history[0].length) {
 				// we cannot store more information, so disable the graph feature.
@@ -180,39 +188,5 @@ public class TravelTimeandDistanceStats implements StartupListener, IterationEnd
 	 */
 	public double[][] getHistory() {
 		return this.history.clone();
-	}
-
-	private double getTravelTime(final Person person) {
-
-		double travelTime=0.0;
-		final LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-		while (leg_it.hasNext()) {
-			final Leg leg = (Leg)leg_it.next();
-			travelTime+=leg.getTravTime();
-		}
-		return travelTime;
-	}
-
-	private double getTravelDist(final Person person) {
-
-		double travelDist=0.0;
-		final LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-
-		while (leg_it.hasNext()) {
-			final Leg leg = (Leg)leg_it.next();
-			travelDist+=leg.getRoute().getDist();
-		}
-		return travelDist;
-	}
-
-	private int getNumberOfTrips(final Person person) {
-
-		int numberOfLegs=0;
-		final LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
-		while (leg_it.hasNext()) {
-			leg_it.next();
-			numberOfLegs++;
-		}
-		return numberOfLegs;
 	}
 }
