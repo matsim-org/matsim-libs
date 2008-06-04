@@ -1,0 +1,57 @@
+package playground.mmoyo.pttest;
+
+import java.util.Iterator;
+import java.util.List;
+
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkWriter;
+import org.matsim.network.Node;
+
+
+public class PTNetwork2View extends NetworkLayer {
+	private NetworkLayer cityNet;
+
+	public PTNetwork2View(NetworkLayer cityNet) {
+		super();
+		this.cityNet = cityNet;
+	}
+
+	public PTNetwork2View() {
+		super();
+	}
+
+	public void CreatePTNView(List<PTLine> ptLineList) {
+		for (Iterator<PTLine> iterPTLines = ptLineList.iterator(); iterPTLines.hasNext();) {
+			PTLine ptLine = iterPTLines.next();
+			boolean firstLink = true;
+			for (Iterator<String> iter = ptLine.strLinksRoute2.iterator(); iter.hasNext();) {
+				Link l = this.cityNet.getLink(iter.next());
+				if (firstLink) {
+					AddNode(l.getFromNode());
+				}
+				AddNode(l.getToNode());
+				AddLink(l);
+				firstLink = false;
+			}// for iter
+		}// for iterPTlines
+		writePTNetwork();
+	}//CreatePTNView
+
+	private void AddNode(Node node) {
+		if (this.getNode(node.getId().toString()) == null) {
+			this.createNode(node.getId().toString(), Double.toString(node.getCoord().getX()), Double.toString(node.getCoord().getY()), node.getType());
+		}
+	}
+
+	private void AddLink(Link l) {
+		if (this.getLink(l.getId().toString()) == null) {
+			this.createLink(l.getId().toString(), l.getFromNode().getId().toString(), l.getToNode().getId().toString(), String.valueOf(l.getLength()), String.valueOf(l.getFreespeed(0)), String.valueOf(l.getCapacity(0)), String.valueOf(l.getLanesAsInt(0)), l.getOrigId(), l.getType());
+		}
+	}
+
+	public void writePTNetwork() {
+		NetworkWriter networkWriter = new NetworkWriter(this,"c://PTnetwork.xml");
+		networkWriter.write();
+	}
+}
