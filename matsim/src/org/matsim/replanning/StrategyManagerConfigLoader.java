@@ -20,6 +20,10 @@
 
 package org.matsim.replanning;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.controler.Controler;
@@ -44,7 +48,6 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherMT;
 import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherSM;
 
 /**
@@ -55,6 +58,8 @@ import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherSM;
  * @author mrieser
  */
 public class StrategyManagerConfigLoader {
+	
+	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 
 	/**
 	 * Reads and instantiates the strategy modules specified in the config-object.
@@ -147,6 +152,35 @@ public class StrategyManagerConfigLoader {
 //				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherMT(network, travelCostCalc, travelTimeCalc);
 				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherSM(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
+			}
+			//if none of the strategies above could be selected we try to load the class by name
+			else {
+				//classes loaded by name must not be part of the matsim core
+				if (classname.startsWith("org.matsim")) {
+					log.error("Strategies in the org.matsim package must not be loaded by name!");
+				}
+				else {
+					try {
+						Class[] args = {Controler.class};
+						Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(classname);
+						Constructor<? extends PlanStrategy> c = klas.getConstructor(args);
+						strategy = c.newInstance(controler);
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					} catch (InstantiationException e) {
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (SecurityException e) {
+						e.printStackTrace();
+					} catch (NoSuchMethodException e) {
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 
 			if (strategy == null) {
