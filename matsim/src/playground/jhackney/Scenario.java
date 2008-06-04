@@ -72,7 +72,7 @@ public abstract class Scenario {
 
 		config.config().setOutputFile(output_directory + "output_config.xml");
 
-		config.world().setInputFile(input_directory + "world.xml");
+		config.world().setInputFile(input_directory + "raster3000.xml");
 		config.world().setOutputFile(output_directory + "output_world.xml");
 
 		config.network().setInputFile(input_directory + "network.xml");
@@ -84,13 +84,23 @@ public abstract class Scenario {
 		config.matrices().setInputFile(input_directory + "matrices.xml");
 		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
-		config.plans().setInputFile(input_directory + "plans.xml");
+		config.plans().setInputFile(input_directory + "activityspace_plans.xml");
 		config.plans().setOutputFile(output_directory + "output_plans.xml");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
 		
 		config.counts().setCountsFileName(input_directory + "counts.xml");
 		config.counts().setOutputFile(output_directory + "output_counts.xml.gz");
+		
+		config.socnetmodule().setInDirName(input_directory);
+		config.socnetmodule().setSocNetLinkRemovalP("0");
+		config.socnetmodule().setSocNetLinkRemovalAge("0");
+		config.socnetmodule().setDegSat("0");
+		config.socnetmodule().setSocNetGraphAlgo("read");
+		config.socnetmodule().setEdgeType("UNDIRECTED");
+		config.socnetmodule().setInitIter("10");
+		config.socnetmodule().setReadMentalMap("true");
+		
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -114,6 +124,7 @@ public abstract class Scenario {
 	
 	public static final NetworkLayer readNetwork() {
 		System.out.println("  reading the network xml file...");
+		System.out.println(Gbl.getConfig().network().getInputFile());
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		System.out.println("  done.");
@@ -138,6 +149,7 @@ public abstract class Scenario {
 	public static final Plans readPlans() {
 		System.out.println("  reading plans xml file... ");
 		Plans plans = new Plans();
+		System.out.println(Gbl.getConfig().plans().getInputFile());
 		new MatsimPlansReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
 
 		System.out.println("  done.");
