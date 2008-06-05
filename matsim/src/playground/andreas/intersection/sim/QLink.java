@@ -2,6 +2,7 @@ package playground.andreas.intersection.sim;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -218,6 +219,8 @@ public class QLink extends QueueLink {
 				this.nodePseudoLinksList.add(pseudoLink);								
 			}
 		}
+		
+		Collections.sort(this.pseudoLinksList);
 		
 //		for (PseudoLink pseudoLink : nodePseudoLinksList){
 //			this.pseudoLinksList.remove(pseudoLink);

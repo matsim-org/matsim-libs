@@ -59,17 +59,17 @@ public class PlansGeneratorControler extends Controler {
 		LinkedList <Link> fromLinks = new LinkedList<Link>();
 		LinkedList <Link> toLinks = new LinkedList<Link>();
 		
-		fromLinks.add(this.network.getLink("20"));
-		fromLinks.add(this.network.getLink("40"));
-		fromLinks.add(this.network.getLink("60"));
-		fromLinks.add(this.network.getLink("80"));
+		fromLinks.add(this.network.getLink("5"));
+//		fromLinks.add(this.network.getLink("40"));
+//		fromLinks.add(this.network.getLink("60"));
+//		fromLinks.add(this.network.getLink("80"));
 		
-		toLinks.add(this.network.getLink("101"));
-		toLinks.add(this.network.getLink("201"));
-		toLinks.add(this.network.getLink("301"));
-		toLinks.add(this.network.getLink("401"));
+		toLinks.add(this.network.getLink("3"));
+//		toLinks.add(this.network.getLink("201"));
+//		toLinks.add(this.network.getLink("301"));
+//		toLinks.add(this.network.getLink("401"));
 		
-		for(int i=0; i<10; i++){
+		for(int i=0; i < 5000; i++){
 			for (Link fromLink : fromLinks) {
 				
 				for (Link toLink : toLinks) {
@@ -115,7 +115,7 @@ public class PlansGeneratorControler extends Controler {
 
 		Config config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/config.xml" });
 		
-		String netFileName = "src/playground/andreas/intersection/test/data/net_4a.xml.gz";
+		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
 		config.network().setInputFile(netFileName);
 		
 		final PlansGeneratorControler controler = new PlansGeneratorControler(config);

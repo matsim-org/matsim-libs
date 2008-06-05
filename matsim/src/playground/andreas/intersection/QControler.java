@@ -36,9 +36,9 @@ public class QControler extends Controler {
 	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QControler.class);
 	
-	final String signalSystems = "./src/playground/andreas/intersection/test/data/signalSystemConfig_4a.xml";
-	final String groupDefinitions = "./src/playground/andreas/intersection/test/data/signalGroupDefinition_4a.xml";
-	final static Boolean useOTF = false;
+	final String signalSystems = "./src/playground/andreas/intersection/test/data/signalSystemConfig_2a_alt.xml";
+	final String groupDefinitions = "./src/playground/andreas/intersection/test/data/signalGroupDefinition_2a_alt.xml";
+	final static boolean useOTF = false;
 
 	public QControler(final Config config) {
 		super(config);
@@ -97,11 +97,11 @@ public class QControler extends Controler {
 		controler.run();
 //		controler.makeVis();
 		
-		if (QControler.useOTF){
-//			OTFVis.main(new String [] {"./output/ITERS/it.0/0.otfvis.mvi"});
-		} else {
-			NetVis.main(new String[]{"./output/ITERS/it.0/Snapshot"});
-		}
+//		if (QControler.useOTF){
+////			OTFVis.main(new String [] {"./output/ITERS/it.0/0.otfvis.mvi"});
+//		} else {
+//			NetVis.main(new String[]{"./output/ITERS/it.0/Snapshot"});
+//		}
 	}
 
 }

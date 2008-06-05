@@ -10,14 +10,14 @@
 <config>
 
 	<module name="network">
-		<!--<param name="inputNetworkFile" value="&INPUTBASE;/4armig.xml" />-->
-		<param name="inputNetworkFile" value="&INPUTBASE;/test/data/net_4a.xml.gz" />
+<!--		<param name="inputNetworkFile" value="&INPUTBASE;/test/data/net_4a.xml.gz" />-->
+		<param name="inputNetworkFile" value="&INPUTBASE;/test/data/net_2a_alt.xml.gz" />
 		<param name="outputNetworkFile" value="&OUTPUTBASE;/network.xml" />
 	</module>
 
 	<module name="plans">
-<!--		<param name="inputPlansFile" value="&INPUTBASE;/plane.xml" />-->
-		<param name="inputPlansFile" value="&INPUTBASE;/test/data/plans_4a_160ue.xml.gz" />
+		<param name="inputPlansFile" value="&INPUTBASE;/test/data/plans_2a_2500.xml.gz" />
+<!--		<param name="inputPlansFile" value="&INPUTBASE;/test/data/plans_4a_160ue.xml.gz" />-->
 		<param name="outputPlansFile" value="&OUTPUTBASE;/plans.xml" />
 		<param name="outputVersion" value="v4" />
 	</module>
@@ -25,7 +25,8 @@
 	<module name="controler">
 		<param name="outputDirectory" value="&OUTPUTBASE;" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="0" />
+		<param name="lastIteration" value="10" />
+		<param name="travelTimeCalculator" value="TravelTimeCalculatorTrafficLight" />
 	</module>
 
 	<module name="simulation">
@@ -70,8 +71,12 @@
 		<param name="ModuleProbability_1" value="0.9" />
 		<param name="Module_1" value="BestScore" />
 
+<!--		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute" />-->
+		
 		<param name="ModuleProbability_2" value="0.1" />
-		<param name="Module_2" value="ReRoute" />
+		<param name="Module_2" value="playground.andreas.SignalSystemRoutePlanStrategy" />
+
 	</module>
 
 	<module name="vis">

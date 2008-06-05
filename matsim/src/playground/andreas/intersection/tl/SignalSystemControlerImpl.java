@@ -21,7 +21,7 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 	public SignalGroupSettings[] getGreenInLinks(double time) {
 		
 		if(this.signalSystemConfiguration == null){
-			System.err.println(this.signalSystemConfiguration.getId() + " got no signalSystemConfiguation");
+			System.err.println(this.signalSystemConfiguration.getId() + " got no signalSystemConfiguration");
 		}
 		
 		List<SignalSystemPlan> plan = ((PlanbasedSignalSystemControlInfoImpl) this.signalSystemConfiguration.getSignalSystemControler()).getSignalSystemPlans();
@@ -30,7 +30,7 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 		// TODO [an] Es wird nur der erste Plan genommen, aber nicht ausgewählt
 		SignalSystemPlan signalSystemPlan = plan.get(0);
 		
-		int currentSecondInPlan = (int) (time % signalSystemPlan.getCirculationTime());		
+		int currentSecondInPlan = 1 + ((int) (time % signalSystemPlan.getCirculationTime()));		
 		
 		// Debug only
 //		System.out.println(currentSecondInPlan);

@@ -21,7 +21,7 @@ import org.matsim.plans.Leg;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
-public class PseudoLink {
+public class PseudoLink implements Comparable<PseudoLink>{
 
 	/** Logger */
 	@SuppressWarnings("unused")
@@ -164,10 +164,6 @@ public class PseudoLink {
 			this.flowCapacityFractionalRest += this.flowCapacityFraction;
 		}
 		
-//		if(!this.hasFlowQueueSpace() && this.amIOriginalLink == false && meterFromLinkEnd == 0 && this.flowCapacityFractionalRest > 1.0){
-//			this.flowCapacityFractionalRest = 1.0;
-//		}
-
 	}
 
 	private boolean hasFlowQueueSpace() {
@@ -428,6 +424,17 @@ public class PseudoLink {
 			positions.add(position);
 		}			
 
+	}
+
+	public int compareTo(PseudoLink otherPseudoLink) {
+		
+		if (this.meterFromLinkEnd < otherPseudoLink.meterFromLinkEnd){
+			return -1;
+		} else if (this.meterFromLinkEnd > otherPseudoLink.meterFromLinkEnd){
+			return 1;
+		} else{
+			return 0;
+		}		
 	}
 
 }

@@ -59,7 +59,7 @@ public class QNode extends QueueNode{
 						
 						while (!pseudoLink.flowQueueIsEmpty()) {
 							Vehicle veh = pseudoLink.getFirstFromBuffer();
-							if (!moveVehicleOverNode(veh, now, pseudoLink)) {
+							if (!moveVehicleOverNode(veh, pseudoLink)) {
 								break;
 							}
 						}
@@ -83,7 +83,7 @@ public class QNode extends QueueNode{
 				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
 					while (!pseudoLink.flowQueueIsEmpty()) {
 						Vehicle veh = pseudoLink.getFirstFromBuffer();
-						if (!moveVehicleOverNode(veh, now, pseudoLink)) {
+						if (!moveVehicleOverNode(veh, pseudoLink)) {
 							break;
 						}
 					}
@@ -94,9 +94,9 @@ public class QNode extends QueueNode{
 
 	}
 
-	/** Simple moveNode, Complex one can be found in {@link QueueLink}
+	/** Simple moveNode, Complex one can be found in {@link QueueNode}
 	 * @param pseudoLink */
-	public boolean moveVehicleOverNode(final Vehicle veh, final double now, PseudoLink pseudoLink) {
+	public boolean moveVehicleOverNode(final Vehicle veh, PseudoLink pseudoLink) {
 		// veh has to move over node
 		Link nextLink = ((QVehicle)veh).chooseNextLink();
 		
