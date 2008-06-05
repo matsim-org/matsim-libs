@@ -153,7 +153,7 @@ public class StrategyManagerConfigLoader {
 //				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherMT(network, travelCostCalc, travelTimeCalc);
 				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherSM(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
-			}else if (classname.equals("TimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
+			}else if (classname.equals("FacilitiesTimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				strategy.addStrategyModule(new FacilitiesTimeAllocationMutator(7200));
 				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
