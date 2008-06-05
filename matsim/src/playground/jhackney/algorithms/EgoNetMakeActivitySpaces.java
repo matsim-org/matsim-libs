@@ -117,7 +117,7 @@ public class EgoNetMakeActivitySpaces {
 //		plans.addAlgorithm(new PersonCalcActivitySpace("education"));
 		PersonWriteActivitySpaceTable pwast = new PersonWriteActivitySpaceTable();
 		socialPlans.addAlgorithm(pwast);
-		socialPlans.addAlgorithm(new PersonDrawActivtiySpaces());
+		socialPlans.addAlgorithm(new PersonDrawActivitySpace());
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

@@ -433,27 +433,27 @@ public class EgoNetPlansMakeKML {
 		case 'h':
 			styleUrl = homeStyle.getStyleUrl();
 			if (act.getStartTime() == 0.0) {
-				fullActName = "morning home "+myPerson.getId()+" "+act.getRefId();
+				fullActName = "morning home "+myPerson.getId();
 			} else {
-				fullActName = "evening home "+myPerson.getId()+" "+act.getRefId();
+				fullActName = "evening home "+myPerson.getId();
 				System.out.println(fullActName);
 			}
 			break;
 		case 's':
 			styleUrl = shopStyle.getStyleUrl();
-			fullActName = "shop"+myPerson.getId()+" "+act.getRefId();
+			fullActName = "shop"+myPerson.getId();
 			break;
 		case 'l':
 			styleUrl = leisureStyle.getStyleUrl();
-			fullActName = "leisure"+myPerson.getId()+" "+act.getRefId();
+			fullActName = "leisure"+myPerson.getId();
 			break;
 		case 'w':
 			styleUrl = workStyle.getStyleUrl();
-			fullActName = "work"+myPerson.getId()+" "+act.getRefId();
+			fullActName = "work"+myPerson.getId();
 			break;
 		case 'e':
 			styleUrl = educStyle.getStyleUrl();
-			fullActName = "education"+myPerson.getId()+" "+act.getRefId();
+			fullActName = "education"+myPerson.getId();
 			break;
 		}
 

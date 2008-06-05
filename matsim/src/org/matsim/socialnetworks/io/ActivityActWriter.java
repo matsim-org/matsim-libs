@@ -64,18 +64,20 @@ public class ActivityActWriter {
 			for (int i=0;i<myPersonPlans.size();i++){
 				Plan myPlan = myPersonPlans.get(i);
 				ArrayList<Object> actsLegs=myPlan.getActsLegs();
+				int actIndex=0;
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					Act myAct= (Act) actsLegs.get(j);
 					Activity myActivity= myKnowledge.map.getActivity(myAct);
 //					System.out.println(" AAW DEBUG J=: "+j);
 					try {
-						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+myAct.getRefId());
+						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+actIndex);
 						out.newLine();
 
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					actIndex++;
 				}
 			}
 		}

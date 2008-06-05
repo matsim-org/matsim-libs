@@ -168,28 +168,13 @@ public class MentalMap {
 			}else
 				Gbl.errorMsg("Activity type "+ typechar +" not known");
 			myAct.setType(type);
-
-			if(myAct.getRefId()==Integer.MIN_VALUE){
-				myAct.setRefId(actId);
-//				this.actIdAct.put(actId,myAct);
-				actId++;
-			}else{
-//				this.actIdAct.put(myAct.getRefId(),myAct);
-			}
 		}
 	}
 	public void learnActsActivities (Act myAct, Activity myactivity){
 
-//		int myActId = myAct.getRefId();
 		this.mapActivityAct.put(myactivity,myAct);
 		this.mapActActivityId.put(myAct,myactivity.getFacility().getId());
 
-		// Drop (myActId,myAct)
-//		System.out.println("Removing act number: "+myActId);
-//		this.actIdAct.remove(myActId);
-//		System.out.println("Adding act index "+myActId+" "+myAct);
-//		this.actIdAct.put(myActId,myAct);
-		
 		setActivityScore(myactivity);
 
 		this.knowledge.addActivity(myactivity);
@@ -222,14 +207,14 @@ public class MentalMap {
 		if(this.knowledge.getActivities().size()>max){
 			// Mark the activities associated with all plans in memory
 			// so that they won't be deleted
-			ArrayList<Integer> currentActs = new ArrayList<Integer>();
+			ArrayList<Act> currentActs = new ArrayList<Act>();
 			Iterator<Plan> planIter = myPlans.iterator();
 			while(planIter.hasNext()){
 				Plan myPlan = (Plan) planIter.next();
 				ActIterator actIter = myPlan.getIteratorAct();
 				while( actIter.hasNext() ){
 					Act act = (Act) actIter.next();
-					currentActs.add(act.getRefId());
+					currentActs.add(act);
 				}
 			}
 
@@ -278,7 +263,7 @@ public class MentalMap {
 				//If the activity is assigned to an act
 				if(myact != null){
 					// If the act is not in the current list, delete the mapping
-					if(!(currentActs.contains(myact.getRefId()))){
+					if(!(currentActs.contains(myact))){
 						forgetActsActivities(myact, myactivity);
 					}else{// If the act is in the current list, then map the act to a second activity if possible, and delete the first activity
 						if(mapActToNewActivity(myact, myactivity)){

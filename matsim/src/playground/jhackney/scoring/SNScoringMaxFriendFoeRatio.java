@@ -339,18 +339,8 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 			Activity myActivity=p1.getKnowledge().map.getActivity(act);
 
 			if(socialPlansMap.get(myActivity)== null){
-				System.out.println("Person: "+p1.getId()+" Act number:"+act.getRefId()+" type:"+act.getType()+" at link: "+myActivity.getFacility().getLink());
-//				Hashtable<Integer,Act> myActs= p1.getKnowledge().map.getActIdAct();
-				Object myActs[] = p1.getKnowledge().map.getActs().toArray();
-//				for (int iii = 0; iii<myActs.size();iii++){
-//					System.out.println(iii+" "+myActs.get(iii).getRefId()+" "+myActs.get(iii));					
-//				}
-				for (int iii = 0; iii<myActs.length;iii++){
-					System.out.println(iii+" "+((Act) (myActs[iii])).getRefId()+" "+myActs[iii]);					
-				}
-
-				
-				Gbl.errorMsg("BUG");
+			
+				Gbl.errorMsg(this.getClass()+" BUG No Activity for the Act");
 			}
 			Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
 			//for all agents in (social.plans.get(act){
