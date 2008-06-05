@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney.replanning;
+package org.matsim.socialnetworks.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
@@ -43,12 +43,12 @@ import org.matsim.utils.misc.Time;
  * 
  * Modified to update the mapping between Act and Facility: only works if such a mapping exists, NOT failsafe -- jhackney
  */
-public class SecLocPlanMutateTimeAllocation implements PlanAlgorithmI {
+public class FacilitiesPlanMutateTimeAllocation implements PlanAlgorithmI {
 
 	private final int mutationRange;
-	private final Logger log = Logger.getLogger(SecLocPlanMutateTimeAllocation.class);
+	private final Logger log = Logger.getLogger(FacilitiesPlanMutateTimeAllocation.class);
 
-	public SecLocPlanMutateTimeAllocation(final int mutationRange) {
+	public FacilitiesPlanMutateTimeAllocation(final int mutationRange) {
 		this.mutationRange = mutationRange;
 	}
 

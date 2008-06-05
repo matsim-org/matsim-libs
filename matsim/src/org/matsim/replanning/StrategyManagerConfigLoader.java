@@ -48,6 +48,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.socialnetworks.replanning.FacilitiesTimeAllocationMutator;
 import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherSM;
 
 /**
@@ -152,7 +153,13 @@ public class StrategyManagerConfigLoader {
 //				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherMT(network, travelCostCalc, travelTimeCalc);
 				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherSM(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
-			}
+			}else if (classname.equals("TimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy.addStrategyModule(new FacilitiesTimeAllocationMutator(7200));
+				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+				preProcessRoutingData.run(network);
+				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+				}
 			//if none of the strategies above could be selected we try to load the class by name
 			else {
 				//classes loaded by name must not be part of the matsim core
