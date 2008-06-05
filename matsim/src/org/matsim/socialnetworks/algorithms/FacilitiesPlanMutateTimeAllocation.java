@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.socialnetworks.replanning;
+package org.matsim.socialnetworks.algorithms;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;

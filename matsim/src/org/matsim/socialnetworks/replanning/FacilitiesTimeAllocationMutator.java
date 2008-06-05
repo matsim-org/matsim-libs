@@ -25,6 +25,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.StrategyModuleI;
+import org.matsim.socialnetworks.algorithms.FacilitiesPlanMutateTimeAllocation;
 
 /**
  * Wraps the {@link org.matsim.plans.algorithms.PlanMutateTimeAllocation}-
