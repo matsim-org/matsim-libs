@@ -458,18 +458,25 @@ public class SocialNetwork {
 
 	/**
 	 * Removes links each iteration of the socializing dynamic.
+	 * Each algorithm flags edges for removal, which are removed in a call to {@link removeFlaggedLinks}. Removal automatically handles either DIRECTED or UNDIRECTED graphs.
+	 * <br><br>
+	 * Error message results for situations in which the flagging algorithm has not yet been tested (i.e. DIRECTED networks in some algorithms).
+	 * <br><br>
 	 * The linkRemovalCondition determines the algorithm for removing the links,
 	 * using parameters set in the configuration file, see
 	 * {@link org.matsim.config.groups.SocNetConfigGroup.java}.
-	 * 
+	 * <br><br>
 	 * Each algorithm uses the parameter remove_age (measured in iterations) as a threshold
-	 * under which no link is removed and above which the algorithm begins processing links.
+	 * under which no link is flagged and above which the algorithm begins processing links.
+	 * <br><br>
 	 * 
 	 *  <li>"none": no removal</li>
-	 *  <li>"random": removes links with probability remove_p
-	 *  <li>"random_node_degree" removes links proportional to degree times probability remove_p</li>
-	 *  <li>"random_link_age" removes links proportional to age times probability remove_p</li>
-	 * 
+	 *  <li>"random": iterates through edges and removes each with a probability "remove_p"
+	 *  <li>"random_node_degree" iterates through edges and removes each with probability proportional to the normalized degree of the "From" person times the probability "remove_p". Degree is normalized by dividing by the graph maximimum degree.</li>
+	 *  <li>"random_link_age" iterates through edges and removes each with probability proportional to the normalized link age times probability remove_p. Link age is normalized by dividing by the iteration number.</li>
+	 *  <li>"random_constant_kbar" keeps average degree constant. First calculates the number of edges to remove, then randomly picks this number of random edge indices and removes these edges.
+	 *  </li> 
+	 * <br><br>
 	 * @param iteration
 	 *                 The iteration of the socializing dynamic
 	 * @author jhackney
@@ -500,7 +507,6 @@ public class SocialNetwork {
 			// Implemented in Jin, Girvan, Newman 2001
 
 			log.info("  Removing links older than "+remove_age+" proportional to degree times probability "+remove_p);
-			log.warn("Implementation is wrong"); //JH 07.05.08
 			log.info("  Number of links before removal: "+this.getLinks().size());
 			int maxDeg=this.getMaxDegree();
 			Iterator<SocialNetEdge> it_link = this.getLinks().iterator();
@@ -508,6 +514,9 @@ public class SocialNetwork {
 				SocialNetEdge myLink = it_link.next();
 				double randremove=Gbl.random.nextDouble();
 				int degree =myLink.getPersonFrom().getKnowledge().egoNet.getOutDegree();
+				if(degree > maxDeg){
+					Gbl.errorMsg(this.getClass()+" degree of person "+myLink.getPersonFrom().getId()+" = "+degree+" > maxDegree="+maxDeg);
+				}
 				if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*((double)degree/(double)maxDeg)) {
 					linksToRemove.add(myLink);
 				}
@@ -524,7 +533,10 @@ public class SocialNetwork {
 				SocialNetEdge myLink = it_link.next();
 				double randremove=Gbl.random.nextDouble();
 				int age =iteration - myLink.getTimeLastUsed();
-				if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*age ) {
+				if(age > iteration){
+				Gbl.errorMsg(this.getClass()+" age of edge from "+myLink.getPersonFrom().getId()+" to "+ myLink.getPersonTo().getId()+" = "+age+" > iteration ="+iteration);
+				}
+				if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*((double)age/(double)iteration) ) {
 					linksToRemove.add(myLink);
 				}
 			}
@@ -542,19 +554,23 @@ public class SocialNetwork {
 				for(int i=0;i<nRemove;i++){
 					int index = Gbl.random.nextInt(this.getLinks().size());
 					SocialNetEdge edge = (SocialNetEdge) this.getLinks().get(index);
-					removeLink(edge);
-
-					SocialNetEdge myOpposingLink=edge.getPersonTo().getKnowledge().egoNet.getEgoLink(edge.getPersonFrom());
-					this.removeLink(myOpposingLink);
+//					removeLink(edge);
+//
+//					SocialNetEdge myOpposingLink=edge.getPersonTo().getKnowledge().egoNet.getEgoLink(edge.getPersonFrom());
+//					this.removeLink(myOpposingLink);
+					if ((iteration - edge.getTimeLastUsed()) > remove_age ) {
+						linksToRemove.add(edge);
+					}
 					numRemoved++;
 				}
 			}else if(!UNDIRECTED){
-				Gbl.errorMsg(this.getClass()+" does not support DIRECTED networks.");
-			}		
+				Gbl.errorMsg(this.getClass()+" does not support DIRECTED networks yet.");
+			}	
 			log.info("  Number of links after removal: "+(this.getLinks().size()));
 		}else{
-			Gbl.errorMsg("Supported removal algorithms: \"none\""+","+"\"random_link_age\""+", \"random_node_degree\""+", \"random\"");
+			Gbl.errorMsg("Supported removal algorithms: \"none\""+","+"\"random_link_age\""+", \"random_node_degree\""+", \"random\""+", \"random_constant_kbar\"");
 		}
+		removeFlaggedLinks(linksToRemove);
 	}
 	private int getMaxDegree() {
 		// TODO Auto-generated method stub
