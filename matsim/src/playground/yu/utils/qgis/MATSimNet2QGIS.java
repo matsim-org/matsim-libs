@@ -79,7 +79,7 @@ public class MATSimNet2QGIS {
 		}
 	}
 
-	protected static double flowCapFactor = 1.0;
+	static double flowCapFactor = 1.0;
 	protected NetworkLayer network;
 	protected CoordinateReferenceSystem crs = null;
 	private Network2PolygonGraph n2g;

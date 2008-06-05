@@ -115,7 +115,8 @@ public class ScoreVariance extends PersonAlgorithm implements PlanAlgorithmI {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			System.exit(1);
+			throw new RuntimeException(
+					"ERROR: there is not data for calculating Variance!");
 		}
 		double[] scoreArray = new double[size];
 		for (int i = 0; i < size; i++)

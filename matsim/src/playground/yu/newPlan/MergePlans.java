@@ -37,44 +37,44 @@ import org.matsim.world.World;
  */
 public class MergePlans {
 	public static class CopyPlans extends PersonAlgorithm {
-		private PlansWriter writer;
+		private final PlansWriter writer;
 
-		public CopyPlans(PlansWriter writer) {
+		public CopyPlans(final PlansWriter writer) {
 			this.writer = writer;
 		}
 
 		@Override
-		public void run(Person person) {
+		public void run(final Person person) {
 			writer.writePerson(person);
 		}
 	}
 
 	private static final class PersonIdCopyPlans extends CopyPlans {
-		private int lower_limit;
+		private final int lower_limit;
 
-		public PersonIdCopyPlans(PlansWriter writer, int lower_limit) {
+		public PersonIdCopyPlans(final PlansWriter writer, final int lower_limit) {
 			super(writer);
 			this.lower_limit = lower_limit;
 		}
 
-		public void run(Person person) {
-			if (Integer.parseInt(person.getId().toString()) > lower_limit) {
+		@Override
+		public void run(final Person person) {
+			if (Integer.parseInt(person.getId().toString()) >= lower_limit)
 				super.run(person);
-			}
 		}
 	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final String path = "../data/ivtch/input/";
 		final String netFilename = path + "ivtch-osm.xml";
-		final String plansFilenameA = path + "plans_all_zrh30km_10pct.xml.gz";
+		final String plansFilenameA = path + "plans_all_zrh30km_100pct.xml.gz";
 		final String plansFilenameB = path
-				+ "plans_miv_zrh30km_transitincl_10pct.xml.gz";
+				+ "plans_miv_zrh30km_transitincl_100pct_not_direct_2_use.xml.gz";
 		final String outputPlansFilename = path
-				+ "plans_all_zrh30km_transitincl_10pct.xml.gz";
+				+ "plans_all_zrh30km_transitincl_100pct.xml.gz";
 
 		// final String path = "test/yu/equil_test/";
 		// final String netFilename = path + "equil_net.xml";

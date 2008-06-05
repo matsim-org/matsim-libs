@@ -40,40 +40,28 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 
-	public static List<Map<Id, Integer>> createVolumes(NetworkLayer net,
-			VolumesAnalyzer va) {
+	public static List<Map<Id, Integer>> createVolumes(final NetworkLayer net,
+			final VolumesAnalyzer va) {
 		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
-		for (int i = 0; i < 24; i++) {
+		for (int i = 0; i < 24; i++)
 			volumes.add(i, null);
-		}
-		for (Link link : (net.getLinks()).values()) {
+		for (Link link : net.getLinks().values()) {
 			Id linkId = link.getId();
 			int[] v = va.getVolumesForLink(linkId.toString());
 			for (int i = 0; i < 24; i++) {
 				Map<Id, Integer> m = volumes.get(i);
-				// if (m != null) {
-				// m.put(linkId, (int)(((double)((v != null) ? v[i] :
-				// 0))/flowCapFactor));
-				// } else if (m == null) {
-				// m = new HashMap<Id, Integer>();
-				// m.put(linkId, ((v != null) ? v[i] : 0) * 10);
-				// volumes.add(i, m);
-				// }
 				if (m == null) {
 					m = new HashMap<Id, Integer>();
 					volumes.add(i, m);
 				}
-				m
-						.put(
-								linkId,
-								(int) (((double) ((v != null) ? v[i] : 0)) / flowCapFactor));
+				m.put(linkId, (int) ((v != null ? v[i] : 0) / flowCapFactor));
 			}
 		}
 		return volumes;
 	}
 
-	public void setCrs(String wkt, NetworkLayer network,
-			CoordinateReferenceSystem crs) {
+	public void setCrs(final String wkt, final NetworkLayer network,
+			final CoordinateReferenceSystem crs) {
 		super.setCrs(wkt);
 		setN2g(new Volume2PolygonGraph(network, crs));
 	}
@@ -81,9 +69,9 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
-		//		String netFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
+		// String netFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
 		// String netFilename = "test/yu/test/equil_net.xml";
 		String netFilename = "../swiss-advest/ch.cut.640000.200000.740000.310000.xml";
 		// ////////////////////////////////////////

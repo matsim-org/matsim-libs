@@ -24,7 +24,7 @@ import playground.yu.visum.filter.finalFilters.FinalEventFilterA;
 public class PrintStreamUDANET extends PrintStreamVisum9_3A implements
 		PrintStreamVisum9_3I {
 	/*---------------------------CONSTRUCTOR-----------------*/
-	public PrintStreamUDANET(String fileName) {
+	public PrintStreamUDANET(final String fileName) {
 		if (fileName.endsWith(".net"))
 			try {
 				out = new DataOutputStream(new BufferedOutputStream(
@@ -52,7 +52,8 @@ public class PrintStreamUDANET extends PrintStreamVisum9_3A implements
 			}
 		else {
 			System.err.println("please write the fileName with \".net\"");
-			System.exit(0);
+			throw new IllegalArgumentException(
+					"please write the fileName with \".net\"");
 		}
 	}
 
@@ -66,7 +67,7 @@ public class PrintStreamUDANET extends PrintStreamVisum9_3A implements
 	 *            org.matsim.playground.filters.writer.UserDefAttI and whose
 	 *            fundamental contents will be printed
 	 */
-	public void printUserDefAtt(UserDefAtt uda) {
+	public void printUserDefAtt(final UserDefAtt uda) {
 		try {
 			out.writeBytes(uda.toString());
 		} catch (IOException e) {
@@ -75,7 +76,8 @@ public class PrintStreamUDANET extends PrintStreamVisum9_3A implements
 	}
 
 	/*-----------------------------IMPLEMENTING METHOD------------------------------*/
-	public void output(FinalEventFilterA fef) {
+	@Override
+	public void output(final FinalEventFilterA fef) {
 		for (UserDefAtt uda : fef.UDAexport())
 			printUserDefAtt(uda);
 	}

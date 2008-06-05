@@ -16,7 +16,7 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 		duenn(1), dick(0);
 		private final int nr;
 
-		SparseDocu(int nr) {
+		SparseDocu(final int nr) {
 			this.nr = nr;
 		}
 
@@ -30,7 +30,7 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 		 */
 		@Override
 		public String toString() {
-			return Integer.toString(this.nr);
+			return Integer.toString(nr);
 		}
 	};
 
@@ -42,18 +42,18 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 		Bool("Bool"), Filename("Filename"), Int("Int"), Double("Double"), ShortLength(
 				"ShortLength"), LongLength("LongLength"), Text("Text"), Duration(
 				"Duration"), Timepoint("Timepoint");
-		DatenTyp(String datenTypName) {
+		DatenTyp(final String datenTypName) {
 		}
 	};
 
 	/* -------------------------MEMBER VARIABLES--------------------------- */
-	private String OBJID;
-	private String ATTID;
-	private String CODE;
-	private String NAME;
-	private DatenTyp DATENTYP;
-	private int NACHKOMMASTELLEN;
-	private SparseDocu DUENN;
+	private final String OBJID;
+	private final String ATTID;
+	private final String CODE;
+	private final String NAME;
+	private final DatenTyp DATENTYP;
+	private final int NACHKOMMASTELLEN;
+	private final SparseDocu DUENN;
 
 	private String pattern = "##0";
 
@@ -67,19 +67,20 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 	 * @param nachKommaStellen
 	 * @param duenn
 	 */
-	public UserDefAtt(String objid, String attid, String code, String name,
-			DatenTyp datentyp, int nachKommaStellen, SparseDocu duenn) {
-		this.OBJID = objid;
-		this.ATTID = attid;
-		this.CODE = code;
-		this.NAME = name;
-		this.DATENTYP = datentyp;
-		this.NACHKOMMASTELLEN = nachKommaStellen;
-		this.DUENN = duenn;
+	public UserDefAtt(final String objid, final String attid,
+			final String code, final String name, final DatenTyp datentyp,
+			final int nachKommaStellen, final SparseDocu duenn) {
+		OBJID = objid;
+		ATTID = attid;
+		CODE = code;
+		NAME = name;
+		DATENTYP = datentyp;
+		NACHKOMMASTELLEN = nachKommaStellen;
+		DUENN = duenn;
 		// attID = uda.getATTID();
 		// datenTyp = uda.getDATENTYP();
 		// nachKommaStellen = uda.getNACHKOMMASTELLEN();
-		if (this.NACHKOMMASTELLEN > 0)
+		if (NACHKOMMASTELLEN > 0)
 			setPattern();
 	}
 
@@ -89,7 +90,7 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 	 * @uml.property name="aTTID"
 	 */
 	public String getATTID() {
-		return this.ATTID;
+		return ATTID;
 	}
 
 	/**
@@ -99,7 +100,7 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 	 * @uml.property name="dATENTYP"
 	 */
 	public DatenTyp getDATENTYP() {
-		return this.DATENTYP;
+		return DATENTYP;
 	}
 
 	/**
@@ -109,7 +110,7 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 	 * @uml.property name="oBJID"
 	 */
 	public String getOBJID() {
-		return this.OBJID;
+		return OBJID;
 	}
 
 	/**
@@ -117,15 +118,14 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 	 * @uml.property name="nACHKOMMASTELLEN"
 	 */
 	public int getNACHKOMMASTELLEN() {
-		return this.NACHKOMMASTELLEN;
+		return NACHKOMMASTELLEN;
 	}
 
 	/* ------------------------------OVERRIDE METHODS------------------------- */
 	@Override
 	public String toString() {
-		return this.OBJID + ";" + this.ATTID + ";" + this.CODE + ";"
-				+ this.NAME + ";" + this.DATENTYP + ";" + this.NACHKOMMASTELLEN
-				+ ";" + this.DUENN + "\n";
+		return OBJID + ";" + ATTID + ";" + CODE + ";" + NAME + ";" + DATENTYP
+				+ ";" + NACHKOMMASTELLEN + ";" + DUENN + "\n";
 	}
 
 	/**
@@ -136,15 +136,15 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 	 * @return the result of the comparing between ATTIDs of 2
 	 *         UserDefAtt-objects
 	 */
-	public int compareTo(UserDefAtt arg0) {
-		return this.ATTID.compareTo(arg0.ATTID);
+	public int compareTo(final UserDefAtt arg0) {
+		return ATTID.compareTo(arg0.ATTID);
 	}
 
 	/**
 	 * @return the pattern.
 	 */
 	public String getPattern() {
-		return this.pattern;
+		return pattern;
 	}
 
 	/* ----------------------------SETTER--------------------- */
@@ -156,10 +156,10 @@ public class UserDefAtt implements Comparable<UserDefAtt> {
 	 *            that this function really does what it should do... -marcel
 	 */
 	public void setPattern() {
-		StringBuffer sb = new StringBuffer(this.pattern);
+		StringBuffer sb = new StringBuffer(pattern);
 		sb.append(".");
-		for (int ii = 0; ii < this.NACHKOMMASTELLEN; ii++)
+		for (int ii = 0; ii < NACHKOMMASTELLEN; ii++)
 			sb.append("0");
-		this.pattern = sb.toString();
+		pattern = sb.toString();
 	}
 }
