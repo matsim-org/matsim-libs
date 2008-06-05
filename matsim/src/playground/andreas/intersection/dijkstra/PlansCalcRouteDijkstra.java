@@ -1,0 +1,92 @@
+package playground.andreas.intersection.dijkstra;
+
+import java.util.ArrayList;
+
+import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
+import org.matsim.plans.Act;
+import org.matsim.plans.Leg;
+import org.matsim.plans.Route;
+import org.matsim.router.Dijkstra;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.TravelCostI;
+import org.matsim.router.util.TravelTimeI;
+
+/**
+ * A PersonAlgorithm that calculates and sets the routes of a person's activities using {@link Dijkstra}.
+ *
+ * @author mrieser, aneumann
+ */
+public class PlansCalcRouteDijkstra extends PlansCalcRoute {
+	
+	NetworkLayer network;
+
+	public PlansCalcRouteDijkstra(final NetworkLayer network, final TravelCostI costCalculator, final TravelTimeI timeCalculator) {
+		this(network, costCalculator, timeCalculator, new FreespeedTravelTimeCost());
+	}
+
+	private PlansCalcRouteDijkstra(final NetworkLayer network, final TravelCostI costCalculator, final TravelTimeI timeCalculator,
+			final FreespeedTravelTimeCost freespeedTimeCost) {
+		super(new Dijkstra(network, costCalculator, timeCalculator),
+				new Dijkstra(network, freespeedTimeCost, freespeedTimeCost));
+		this.network = network;
+	}	
+	
+	@Override
+	protected double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+		double travTime = 0;
+		Link fromLink = fromAct.getLink();
+		Link toLink = toAct.getLink();
+		if (fromLink == null) throw new RuntimeException("fromLink missing.");
+		if (toLink == null) throw new RuntimeException("toLink missing.");
+
+		Node startNode = this.network.getNode(fromLink.getId().toString());	// start at the end of the "current" link
+		Node endNode = this.network.getNode(toLink.getId().toString()); // the target is the start of the link
+
+		Route route = null;
+		if (toLink != fromLink) {
+			// do not drive/walk around, if we stay on the same link
+			route = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
+			if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			
+			NetworkLayer realNetwork = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+			ArrayList<Node> realRouteNodeList = new ArrayList<Node>();
+			
+			for (Node node : route.getRoute()) {
+				realRouteNodeList.add(realNetwork.getLink(node.getId().toString()).getToNode());
+			}
+			
+			realRouteNodeList.remove(realRouteNodeList.size() - 1);
+			
+			Route wrappedRoute = new Route();
+			wrappedRoute.setRoute(realRouteNodeList);
+			wrappedRoute.setDist(route.getDist());
+			wrappedRoute.setTravTime(route.getTravTime());
+			
+			leg.setRoute(wrappedRoute);
+			travTime = route.getTravTime();
+		} else {
+			// create an empty route == staying on place if toLink == endLink
+			route = new Route();
+			route.setTravTime(0);
+			leg.setRoute(route);
+			travTime = 0;
+		}
+
+		leg.setDepTime(depTime);
+		leg.setTravTime(travTime);
+		leg.setArrTime(depTime + travTime);
+		return travTime;
+	}
+	
+	@Override
+	protected double handlePtLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+		// currently: calc route in empty street network, use twice the traveltime
+		// TODO [MR] later: use special pt-router
+		// TODO [an] what to do about this one here, has nothing to do with car traffic? 
+		return super.handlePtLeg(leg, fromAct, toAct, depTime);
+	}
+}
