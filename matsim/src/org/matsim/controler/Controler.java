@@ -39,6 +39,7 @@ import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
+import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
@@ -120,6 +121,7 @@ public class Controler {
 	private static final String FILENAME_EVENTS = "events.txt.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt";
 	public static final String FILENAME_SCORESTATS = "scorestats.txt";
+	public static final String FILENAME_TRAVELDISTANCESTATS="traveldistancestats.txt";
 
 	private enum ControlerState {Init, Running, Shutdown, Finished}
 	private ControlerState state = ControlerState.Init;
@@ -174,6 +176,7 @@ public class Controler {
 	private ScenarioData scenarioData = null;
 	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
+	private TravelDistanceStats travelDistanceStats = null;
 
 	/*package*/ static final Logger log = Logger.getLogger(Controler.class);
 
@@ -580,6 +583,17 @@ public class Controler {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+
+		// optional: travel distance stats
+		try {
+			this.travelDistanceStats = new TravelDistanceStats(this.population, getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
+			this.addControlerListener(this.travelDistanceStats);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
 
 		// load counts, if requested
 		if (this.config.counts().getCountsFileName() != null) {
