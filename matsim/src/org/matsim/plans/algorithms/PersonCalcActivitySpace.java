@@ -47,8 +47,8 @@ public class PersonCalcActivitySpace extends PersonAlgorithm {
 	// ellipse, bean, cassini, superellipse
 //	private static final String activity_shape = EllipseObjective.OBJECTIVE_NAME;
 	private String activity_shape = null;
-	private static final String [] activity_shapes = {CassiniObjective.OBJECTIVE_NAME,BeanObjective.OBJECTIVE_NAME,SuperEllipseObjective.OBJECTIVE_NAME,EllipseObjective.OBJECTIVE_NAME};
-//	private static final String [] activity_shapes = {EllipseObjective.OBJECTIVE_NAME};
+//	private static final String [] activity_shapes = {CassiniObjective.OBJECTIVE_NAME,BeanObjective.OBJECTIVE_NAME,SuperEllipseObjective.OBJECTIVE_NAME,EllipseObjective.OBJECTIVE_NAME};
+	private static final String [] activity_shapes = {EllipseObjective.OBJECTIVE_NAME};
 	private static final double theta_stepsize = Math.PI / 8.0;
 	// all, home, work, education, shop, leisure
 	private String activity_type = null;
