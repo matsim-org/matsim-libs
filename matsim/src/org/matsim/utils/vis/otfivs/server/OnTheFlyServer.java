@@ -27,6 +27,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -375,5 +376,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 
 		return updateQuad.buffer;
+	}
+
+	public Collection<Double> getTimeSteps() throws RemoteException {
+		// There are no timesteps implemented here right now, so we return null instead 
+		return null;
 	}
 }

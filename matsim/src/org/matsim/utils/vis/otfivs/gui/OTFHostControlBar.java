@@ -40,6 +40,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -343,12 +344,12 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	// ---------- IMPLEMENTATION OF ActionListener INTERFACE ----------
 
-	private void stopMovie() {
+	public void stopMovie() {
 		if (movieTimer != null) {
 			movieTimer.terminate();
 			movieTimer.setActive(false);
 			movieTimer = null;
-			playButton.setSelected(false);
+			playButton.setIcon(playIcon);
 		}
 	}
 
@@ -359,7 +360,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private void pressed_PAUSE() throws IOException {
 		stopMovie();
 		host.pause();
-		playButton.setIcon(playIcon);
 	}
 
 	private void pressed_PLAY() throws IOException {
@@ -436,7 +436,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		try {
 			if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER))
 				requestTimeStep(gotoTime, OTFServerRemote.TimePreference.LATER);
-			progressBar.terminate = true;
+			if (progressBar != null) progressBar.terminate = true;
 			simTime = host.getLocalTime();
 			updateTimeLabel();
 		} catch (IOException e) {
@@ -445,10 +445,17 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
+	public void setNEWTime(int newTime_s) {
+		if (newTime_s == simTime) return;
+		
+		stopMovie();
+		gotoTime = newTime_s;
+		gotoTime();
+	}
+	
 	private void changed_SET_TIME(ActionEvent event) throws IOException {
 		String newTime = ((JFormattedTextField)event.getSource()).getText();
 		int newTime_s = (int)Time.parseTime(newTime);
-		stopMovie();
 		progressBar  = new OTFAbortGoto(host, newTime_s);
 		progressBar.start();
 		gotoTime = newTime_s;
@@ -547,7 +554,40 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		repaint();
 		//networkScrollPane.repaint();
 	}
+	public Collection<Double> getTimeSteps() {
+		try {
+			Collection<Double> ret = this.host.getTimeSteps();
+			return ret;
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public double getTime() {
+		try {
+			return host.getLocalTime();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	int loopStart = 0;
+	int loopEnd = Integer.MAX_VALUE;
 
+	/**
+	 *  sets the loop that the movieplayer should loop
+	 * @param min either sec for startloop or -1 for leave unchanged default =0
+	 * @param max either sec for endloop or -1 for leave unchanged default = Integer.MAX_VALUE
+	 */
+	public void setLoopBounds(int min, int max) {
+		if(min != -1) loopStart = min;
+		if(max != -1) loopEnd = max;
+	}
+	
 	class MovieTimer extends Thread {
 		boolean isActive = false;
 		boolean terminate = false;
@@ -590,8 +630,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				try {
 					sleep(30);
 					if (isActive && synchronizedPlay) {
-						if(!host.requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))
-							host.requestNewTime(0, OTFServerRemote.TimePreference.LATER);
+						if(simTime >= loopEnd || !host.requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))
+							host.requestNewTime(loopStart, OTFServerRemote.TimePreference.LATER);
 					}
 
 					actTime = simTime;

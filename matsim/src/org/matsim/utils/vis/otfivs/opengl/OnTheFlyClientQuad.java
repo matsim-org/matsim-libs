@@ -142,6 +142,7 @@ public class OnTheFlyClientQuad extends Thread {
 			pane.setLeftComponent(drawer.getComponent());
 			//pane.setRightComponent(drawer2.getCanvas());
 			if(hostControl.isLiveHost()) frame.getContentPane().add(new OTFQueryControlBar("test", (OTFQueryHandler)drawer), BorderLayout.SOUTH);
+			
 
 			frame.setSize(1024, 600);
 			drawer.invalidate(0);

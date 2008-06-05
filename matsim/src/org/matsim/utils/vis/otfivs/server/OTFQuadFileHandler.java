@@ -34,6 +34,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -243,12 +244,13 @@ public class OTFQuadFileHandler {
 		//public ByteArrayOutputStream out = null;
 		protected double intervall_s = -1, nextTime = -1;
 
-		TreeMap<Integer, Long> timesteps = new TreeMap<Integer, Long>();
+		TreeMap<Double, Long> timesteps = new TreeMap<Double, Long>();
 
 		public void scanZIPFile() throws IOException {
 			this.nextTime = -1;
 			// Create an enumeration of the entries in the zip file
 			Enumeration zipFileEntries = this.zipFile.entries();
+			System.out.println("Scanning timesteps:");
 
 			Gbl.startMeasurement();
 
@@ -259,22 +261,27 @@ public class OTFQuadFileHandler {
 				ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
 
 				String currentEntry = entry.getName();
-				System.out.println("Found: " + entry);
 				if(currentEntry.contains("step")) {
 					String regex = "";
 					String [] spliti = StringUtils.explode(currentEntry, '.', 10);
 
-					int time_s = Integer.parseInt(spliti[1]);
+					double time_s = Double.parseDouble(spliti[1]);
 					if (this.nextTime == -1) this.nextTime = time_s;
 					this.timesteps.put(time_s,  entry.getSize());
+					System.out.print(time_s);
+					System.out.print(", ");
 				}
 			}
+			System.out.println("");
+			System.out.println("Nr of timesteps: " + timesteps.size());
+			
 			Gbl.printElapsedTime();
 			Gbl.printMemoryUsage();
 		}
 
-		public byte [] readTimeStep(int time_s) throws IOException {
-			ZipEntry entry = this.zipFile.getEntry("step." + time_s + ".bin");
+		public byte [] readTimeStep(double time_s) throws IOException {
+			int time_string = (int)time_s;
+			ZipEntry entry = this.zipFile.getEntry("step." + time_string + ".bin");
 			byte [] buffer = new byte [(int)this.timesteps.get(time_s).longValue()]; //DS TODO Might be bigger than int??
 
 			this.inFile = new DataInputStream(new BufferedInputStream(this.zipFile.getInputStream(entry)));
@@ -325,6 +332,8 @@ public class OTFQuadFileHandler {
 				config.setFileVersion(version);
 				config.setFileMinorVersion(minorversion);
 
+				scanZIPFile();
+
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -359,7 +368,6 @@ public class OTFQuadFileHandler {
 		
 		public void readQuad() {
 			try {
-				scanZIPFile();
 				// we do not chache anymore ...readZIPFile();
 				ZipEntry quadEntry = this.zipFile.getEntry("quad.bin");
 				BufferedInputStream is =  new BufferedInputStream(this.zipFile.getInputStream(quadEntry));
@@ -475,13 +483,13 @@ public class OTFQuadFileHandler {
 		public byte[] getStateBuffer() throws RemoteException {
 			byte[] buffer = null;
 			try {
-				buffer = readTimeStep((int)this.nextTime);
+				buffer = readTimeStep(this.nextTime);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			int time = 0;
-			Iterator<Integer> it =  this.timesteps.keySet().iterator();
+			double time = 0;
+			Iterator<Double> it =  this.timesteps.keySet().iterator();
 			while(it.hasNext() && (time <= this.nextTime)) time = it.next();
 			if (time == this.nextTime) {
 				time = this.timesteps.firstKey();
@@ -491,9 +499,9 @@ public class OTFQuadFileHandler {
 		}
 
 		public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
-			int lastTime = -1;
-			int foundTime = -1;
-			for(Integer timestep : this.timesteps.keySet()) {
+			double lastTime = -1;
+			double foundTime = -1;
+			for(Double timestep : this.timesteps.keySet()) {
 				if (searchDirection == TimePreference.EARLIER){
 					if(timestep >= time) {
 						// take next lesser time than requested, if not exacty the same
@@ -515,6 +523,9 @@ public class OTFQuadFileHandler {
 			return true;
 		}
 
+		public Collection<Double> getTimeSteps() {
+			return this.timesteps.keySet();
+		}
 	}
 
 }

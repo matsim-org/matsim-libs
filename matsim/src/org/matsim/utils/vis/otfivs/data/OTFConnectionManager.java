@@ -162,9 +162,9 @@ public class OTFConnectionManager implements Cloneable {
 				Object o = entry.to.newInstance();
 				Object p = entry.from.newInstance();
 			} catch (InstantiationException e) {
-				log.warn("For Writer class" + entry.from.getCanonicalName()+ "or " + entry.to.getCanonicalName() + " instance could not be generated");
+				log.warn("For Writer class" + entry.from.getCanonicalName()+ " or " + entry.to.getCanonicalName() + " instance could not be generated");
 			} catch (IllegalAccessException e) {
-				log.warn("For Writer class" + entry.from.getCanonicalName()+ "or " + entry.to.getCanonicalName() + " instance could not be accessed");
+				log.warn("For Writer class" + entry.from.getCanonicalName()+ " or " + entry.to.getCanonicalName() + " instance could not be accessed");
 			}
 			
 			// check for both classes, if they need to be replaced

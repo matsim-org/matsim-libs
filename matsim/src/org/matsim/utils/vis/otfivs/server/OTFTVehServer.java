@@ -24,6 +24,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
@@ -50,6 +53,7 @@ public class OTFTVehServer implements OTFServerRemote{
 	private static final int BUFFERSIZE = 100000000;
 	BufferedReader reader = null;
 	private double nextTime = -1;
+	private List<Double> times = null;
 	TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
 	//private byte[] actBuffer = null;
 
@@ -77,8 +81,53 @@ public class OTFTVehServer implements OTFServerRemote{
 		this.quad = new OTFServerQuad(qnet);
 		this.quad.fillQuadTree(new OTFDefaultNetWriterFactoryImpl());
 		this.quad.addAdditionalElement(this.writer);
+		
+//		this.times = buildTimesList(); // Does not work very smoothly, therefore we leave it out until there is demand for this
+		this.times =null;
+		
 		open();
 		readOneStep();
+	}
+
+	private List<Double>  buildTimesList() {
+		Gbl.startMeasurement();
+		System.out.println("Scanning timesteps:");
+
+		// Get time Structure
+		List<Double> times = new ArrayList<Double>(); 
+		open();
+		String line = null;
+		boolean lineFound = false;
+		String lasttime = "-1";
+
+		try {
+			line = this.reader.readLine();
+			while ( !lineFound && (line != null)) {
+				line = line.substring(line.indexOf('\t')+1);
+				String tt = line.substring(0, line.indexOf('\t'));
+				if(!tt.equals(lasttime)) {
+					double time = Double.parseDouble(tt);
+					times.add(time);
+					lasttime = tt;
+					System.out.print(tt);
+					System.out.print(", ");
+				}
+				line = this.reader.readLine();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("");
+		System.out.println("Nr of timesteps: " + times.size());
+		try {
+			reader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Gbl.printElapsedTime();
+		return times;
 	}
 
 	ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
@@ -304,6 +353,10 @@ public class OTFTVehServer implements OTFServerRemote{
 		this.nextTime = foundTime;
 		//this.actBuffer = null;
 		return true;
+	}
+
+	public Collection<Double> getTimeSteps() throws RemoteException {
+		return times;
 	}
 
 }

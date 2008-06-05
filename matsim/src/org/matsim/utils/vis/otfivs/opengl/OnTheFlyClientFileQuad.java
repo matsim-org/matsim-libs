@@ -42,6 +42,7 @@ import org.matsim.utils.vis.otfivs.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfivs.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfivs.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfivs.opengl.drawer.OTFOGLDrawer;
+import org.matsim.utils.vis.otfivs.opengl.gui.OTFTimeLine;
 import org.matsim.utils.vis.otfivs.opengl.layer.ColoredStaticNetLayer;
 import org.matsim.utils.vis.otfivs.opengl.layer.OGLAgentPointLayer;
 import org.matsim.utils.vis.otfivs.opengl.layer.SimpleStaticNetLayer;
@@ -134,6 +135,8 @@ public class OnTheFlyClientFileQuad extends Thread {
 			pane.setOneTouchExpandable(true);
 			frame.getContentPane().add(pane);
 			PreferencesDialog.buildMenu(frame, visconf, this.hostControl);
+
+			if(!hostControl.isLiveHost()) frame.getContentPane().add(new OTFTimeLine("time", hostControl), BorderLayout.SOUTH);
 
 
 			// Maybe later: connect.add(QueueLink.class, OTFDefaultLinkHandler.Writer.class);

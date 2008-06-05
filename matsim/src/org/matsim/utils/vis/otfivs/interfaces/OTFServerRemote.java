@@ -22,6 +22,7 @@ package org.matsim.utils.vis.otfivs.interfaces;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Collection;
 
 import org.matsim.plans.Plan;
 import org.matsim.utils.collections.QuadTree;
@@ -42,5 +43,6 @@ public interface OTFServerRemote extends Remote {
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException;
 	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException;
 	public boolean isLive() throws RemoteException;
+	public Collection<Double> getTimeSteps() throws RemoteException;
 }
 

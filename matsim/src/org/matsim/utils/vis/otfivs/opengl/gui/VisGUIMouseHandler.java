@@ -194,7 +194,7 @@ implements MouseWheelListener{
 				int deltax = Math.abs(start.x - e.getX());
 				int deltay = Math.abs(start.y - e.getY());
 				double ratio = Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
-				System.out.println(ratio);
+				//System.out.println(ratio);
 				Point3f newPos = new Point3f((float)currentRect.getCenterX(),(float)currentRect.getCenterY(),(float)(cameraStart.getZ()*ratio));
 				scrollToNewPos(newPos);
 				//InfoText.showText("Zoom", newPos.getX(),newPos.getY(),newPos.getZ());

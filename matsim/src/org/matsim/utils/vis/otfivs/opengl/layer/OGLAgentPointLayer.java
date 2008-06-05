@@ -86,7 +86,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		protected void setAgentSize() {
 			float agentSize = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getAgentSize();
 
-		    if (gl.isFunctionAvailable("glPointParameterfvARB")) {
+		    if (gl.isFunctionAvailable("glPointParameterf")) {
 				// Query for the max point size supported by the hardware
 			    float [] maxSize = {0.0f};
 			    gl.glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );

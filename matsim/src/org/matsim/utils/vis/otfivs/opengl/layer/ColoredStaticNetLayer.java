@@ -98,7 +98,7 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 			clientQ.execute(null, counter);
 			double linkcount = counter.getCount();
 
-			System.out.println("Count: " + linkcount);
+			//System.out.println("Count: " + linkcount);
 			int size = (int)(Math.sqrt(linkcount)+ 1);
 			this.linkTexWidth = size;
 			this.linkTexBuffer = new byte [size*size*4];
@@ -146,9 +146,7 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 		public void setColor(float coloridx) {
 			Color color = colorizer.getColor(coloridx);
 			if (coloridx == 0.0) color = Color.WHITE;
-			else {
-				System.out.println(coloridx);
-			}
+			
 
 			int texPos = this.texIdx*4;
 			actLayer.linkTexBuffer[texPos + 0] = (byte)(color.getRed());
@@ -169,9 +167,7 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 
 			Color color = colorizerLinkSpeed.getColor(coloridx);
 			if (coloridx == 0.0) color = Color.WHITE;
-			else {
-				System.out.println(coloridx);
-			}
+			
 
 			int texPos = this.texIdx*4;
 			actLayer.linkTexBuffer[texPos + 0] = (byte)(color.getRed());
