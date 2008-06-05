@@ -92,7 +92,7 @@ public class PersonSubtourHandler {
 				else if (mode == WALK) {modechoice=4;}
 				if (sub.getMode() > modechoice) {sub.setMode(modechoice);}
 			}
-			
+			System.out.println("subtour mode = " + sub.getMode());
 			sub.setPurpose(mainpurpose);
 			if (prev.getX()>0 & prev.getY()>0) {d = d + start.calcDistance(prev);}// In the for-cycle the trip to home is not accounted
 			d = d/1000.0; // distance in the model is in Km
@@ -102,7 +102,7 @@ public class PersonSubtourHandler {
 			 // The sub-tour starts at the agent's home location
 			int prev_subtour = -1;
 			System.out.println("subtour first node = " + subtour.get(0));
-			if (subtour.get(0) == 0) {prev_subtour = 5;}
+			if (subtour.get(0) == 0) {prev_subtour = -1;}
 			else {
 				for (int j=subtours.size()-1; j>=0; j=j-1) {
 					if (subtours.get(j).contains(subtour.get(0))) {
@@ -112,9 +112,31 @@ public class PersonSubtourHandler {
 				}  
 			}
 			sub.setPrev_subtour(prev_subtour);
+			System.out.println ("prev_subtour = " + prev_subtour);
 			pers_sub.setSubtour(sub);
-			System.out.println ("prev_subtour idx = " + sub.getPrev_subtour());
+			
+
+			//System.out.println ("prev_subtour idx = " + sub.getPrev_subtour());
+			System.out .println ("index i = " + i);
+			System.out .println ("subtours size = " + pers_sub.getSubtours().size());
 		}
+		for (int i=0; i<=pers_sub.getSubtours().size()-1;i=i+1) {
+			int prev_sub = pers_sub.getSubtours().get(i).getPrev_subtour();
+			System.out.println ("prev_subtour idx = " + prev_sub);
+			if (prev_sub>=0) {
+				for (int j=0;j<=pers_sub.getSubtours().size()-1;j=j+1){
+					if (pers_sub.getSubtours().get(j).getId()==prev_sub) {
+						int prev_mode = pers_sub.getSubtours().get(j).getMode();
+						System.out.println ("prev_mode = " + prev_mode);
+						pers_sub.getSubtours().get(i).setPrev_mode(prev_mode);
+					}
+				}	
+			}
+			else {
+				pers_sub.getSubtours().get(i).setPrev_mode(-1);
+			}
+		}
+	
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -132,5 +154,5 @@ public class PersonSubtourHandler {
 	public PersonSubtour getPers_sub() {
 		return pers_sub;
 	}
-		
+
 }

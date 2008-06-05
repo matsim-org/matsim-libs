@@ -60,7 +60,7 @@ public class PersonInitDemandSummaryTable {
 			fw = new FileWriter(outfile);
 			System.out.println(outfile);
 			out = new BufferedWriter(fw);
-			out.write("pid \t subtour_id \t purpose\t prev_subtour\t prev_mode\t start_x \t start_y \t mode \t start_udeg\t distance\t trips\n");
+			out.write("pid \t subtour_id \t purpose\t prev_subtour\t mode \t prev_mode\t start_x \t start_y \t start_udeg\t distance\t trips\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -100,10 +100,10 @@ public class PersonInitDemandSummaryTable {
 					out.write(subtour.getId()+ "\t");
 					out.write(subtour.getPurpose()+"\t");
 					out.write(subtour.getPrev_subtour()+"\t");
+					out.write(subtour.getMode()+"\t");
 					out.write(subtour.getPrev_mode()+"\t");
 					out.write(subtour.getStart_coord().getX()+"\t");
 					out.write(subtour.getStart_coord().getY()+"\t");
-					out.write(subtour.getMode()+"\t");
 					out.write(subtour.getStart_udeg()+"\t");
 					out.write(subtour.getDistance()+"\t");
 					out.write(subtour.getNodes().size()-1 + "\n");

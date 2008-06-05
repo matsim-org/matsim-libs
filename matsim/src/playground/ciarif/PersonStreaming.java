@@ -22,6 +22,7 @@ package playground.ciarif;
 
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
@@ -41,6 +42,7 @@ public class PersonStreaming {
 
 		//Config config = Gbl.createConfig(args);
 		Scenario.setUpScenarioConfig();
+		Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		
 		//////////////////////////////////////////////////////////////////////
 		
@@ -80,7 +82,7 @@ public class PersonStreaming {
 		System.out.println("  reading, processing, writing plans...");
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		//plansReader.readFile ("input/plans.xml");
+		//plansReader.readFile ("input/output_plans.xml");
 		plans.printPlansCount();
 		//PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt", pmcm.getPersonSubtours());
 		//pidst.write();
