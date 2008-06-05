@@ -188,7 +188,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 
 			if (event.getIteration() != this.minIteration) {
 				// create chart when data of more than one iteration is available.
-				XYLineChart chart = new XYLineChart("Leg Travel Distance Statistics", "iteration", "avg. leg travel");
+				XYLineChart chart = new XYLineChart("Leg Travel Distance Statistics", "iteration", "avg. leg travel time");
 				double[] iterations = new double[index + 1];
 				for (int i = 0; i <= index; i++) {
 					iterations[i] = i + this.minIteration;
