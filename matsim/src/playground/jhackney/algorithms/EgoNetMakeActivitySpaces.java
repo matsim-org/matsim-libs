@@ -105,8 +105,8 @@ public class EgoNetMakeActivitySpaces {
 //		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 //		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
 //		new PersonsRandomizeId(plans);
-//		Person ego=plans.getPerson("21924270");
-		Person ego=plans.getPerson("21927135");
+		Person ego=plans.getPerson("21924270");
+//		Person ego=plans.getPerson("21927135");
 		Plans socialPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
 		// make the set of plans to use as EgoNet
 		socialPlans.addAlgorithm(new PersonCalcActivitySpace("all"));

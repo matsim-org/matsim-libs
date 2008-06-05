@@ -68,9 +68,9 @@ public class EgoNetPlansItersMakeKML {
 //	, coloredLinkKML;
 	private static Document myKMLDocument;
 //	, coloredLinkKMLDocument;
-	
+
 	private static Folder networkFolder=null;
-	
+
 	private static Style workStyle, leisureStyle, blueLineStyle,
 	educStyle, shopStyle, homeStyle;//, agentLinkStyle;
 	private static HashMap<String,Style> facStyle= new HashMap<String,Style>();
@@ -234,7 +234,9 @@ public class EgoNetPlansItersMakeKML {
 	public static void loadData(Person myPerson, int i, int nColors, int iter) {
 
 		System.out.println("    loading Plan data. Processing person ...");
-
+//			TODO make one file per agent and put in the routes and acts each iteration
+//			TODO ensure that each agent has a unique color by using the P_ID (?how to quickly find min/max for scaling the colors?)
+		
 		Plan myPlan = myPerson.getSelectedPlan();
 
 //		Color color = setColor(i, nColors+1);
@@ -249,18 +251,16 @@ public class EgoNetPlansItersMakeKML {
 			myKMLDocument.addStyle(agentLinkStyle);
 		}else// Set a constant color for each agent for all iterations
 			agentLinkStyle=myKMLDocument.getStyle("agentLinkStyle"+myPerson.getId().toString());
-		
+
 //		Style agentLinkStyle = new Style("agentLinkStyle"+myPerson.getId().toString());
-//		
+
 //		// Set a constant color for each agent for all iterations
 //		if(!myKMLDocument.containsStyle(agentLinkStyle.toString())){
-//			myKMLDocument.addStyle(agentLinkStyle);
-//			agentLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 14));
+//		myKMLDocument.addStyle(agentLinkStyle);
+//		agentLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 14));
 //		}else
-//			agentLinkStyle=myKMLDocument.getStyle(agentLinkStyle.getId());
+//		agentLinkStyle=myKMLDocument.getStyle(agentLinkStyle.getId());
 
-
-		//Put all the agents into one folder? or have one folder per agent, like the facilities above
 		Folder agentFolder = new Folder(
 				"agent "+myPlan.getPerson().getId().toString()+"-"+iter,
 				"agent "+myPlan.getPerson().getId().toString()+"-"+iter,
@@ -287,8 +287,10 @@ public class EgoNetPlansItersMakeKML {
 //				new TimeStamp(new GregorianCalendar(1970, 0, 1, iter, 0, 0))
 				new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
 //		myKMLDocument.addFeature(facilitiesFolder);
-		agentFolder.addFeature(facilitiesFolder);
-		
+		if(!agentFolder.containsFeature(facilitiesFolder.getId())){
+			agentFolder.addFeature(facilitiesFolder);
+		}
+
 		ActLegIterator actLegIter = myPlan.getIterator();
 		Act act0 = (Act) actLegIter.nextAct();
 		makeActKML(myPerson, act0, agentFolder, agentLinkStyle);
@@ -451,7 +453,7 @@ public class EgoNetPlansItersMakeKML {
 
 		Placemark pl = new Placemark(
 				fullActName,
-				null,
+				(actType+String.valueOf(act.getRefId())),
 				fullActName+": "+Time.writeTime(act.getStartTime()) + " - " + Time.writeTime(actEndTime),
 				Feature.DEFAULT_ADDRESS,
 				Feature.DEFAULT_LOOK_AT,
@@ -555,10 +557,10 @@ public class EgoNetPlansItersMakeKML {
 		myKMLDocumentWriter = new KMLWriter(myKML, mainKMLFilename, KMLWriter.DEFAULT_XMLNS, useCompression);
 
 		try {
-		//add the matsim logo to the kml
-		networkFolder.addFeature(new MatsimKMLLogo(myKMZDocumentWriter));
+			//add the matsim logo to the kml
+			networkFolder.addFeature(new MatsimKMLLogo(myKMZDocumentWriter));
 		} catch (IOException e) {
-		log.error("Cannot add logo to the KMZ file.", e);
+			log.error("Cannot add logo to the KMZ file.", e);
 		}
 
 		myKMZDocumentWriter.writeMainKml(myKML);
