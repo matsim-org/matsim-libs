@@ -167,13 +167,6 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 			}
 		}
 		log.info("-- avg. leg travel time of the executed plan of each agent: " + (sumLegTravelDistanceExecuted / nofLegTravelDistanceExecuted));
-		log.info("-- number of executed plans: "  + nofLegTravelDistanceExecuted);
-		log.info("-- number of executed iv plans: "  + nofExecutedIvPlans);
-		log.info("-- number of executed oev plans: "  + nofExecutedOevPlans);
-		log.info("-- modal split iv: "  + ((nofLegTravelDistanceExecuted == 0) ? 0 : ((double)nofExecutedIvPlans / (double)nofLegTravelDistanceExecuted * 100d)) +
-				" % oev: " + ((nofLegTravelDistanceExecuted == 0) ? 0 : ((double)nofExecutedOevPlans / (double)nofLegTravelDistanceExecuted * 100d)) + " %");
-
-
 		log.info("-- avg. leg travel time of the worst plan of each agent: " + (sumLegTravelDistanceWorst / nofLegTravelDistanceWorst));
 		log.info("-- avg. of the avg. leg travel time per agent: " + (sumLegTravelDistanceAvg / nofLegTravelDistanceAvg));
 		log.info("-- avg. leg travel time of the best plan of each agent: " + (sumLegTravelDistanceBest / nofLegTravelDistanceBest));
@@ -195,22 +188,22 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 
 			if (event.getIteration() != this.minIteration) {
 				// create chart when data of more than one iteration is available.
-				XYLineChart chart = new XYLineChart("Leg Travel Distance Statistics", "iteration", "time");
+				XYLineChart chart = new XYLineChart("Leg Travel Distance Statistics", "iteration", "avg. leg travel");
 				double[] iterations = new double[index + 1];
 				for (int i = 0; i <= index; i++) {
 					iterations[i] = i + this.minIteration;
 				}
 				double[] values = new double[index + 1];
 				System.arraycopy(this.history[INDEX_WORST], 0, values, 0, index + 1);
-				chart.addSeries("avg. leg travel time worst plan", iterations, values);
+				chart.addSeries("worst plan", iterations, values);
 				System.arraycopy(this.history[INDEX_BEST], 0, values, 0, index + 1);
-				chart.addSeries("avg. leg travel time best plan", iterations, values);
+				chart.addSeries("best plan", iterations, values);
 				System.arraycopy(this.history[INDEX_AVERAGE], 0, values, 0, index + 1);
-				chart.addSeries("avg. leg travel time avg. of plans'", iterations, values);
+				chart.addSeries("avg. of plans'", iterations, values);
 				System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
-				chart.addSeries("avg. leg travel time executed plan", iterations, values);
+				chart.addSeries("executed plan", iterations, values);
 				chart.addMatsimLogo();
-				chart.saveAsPng(Controler.getOutputFilename("distancestats.png"), 800, 600);
+				chart.saveAsPng(Controler.getOutputFilename("traveldistancestats.png"), 800, 600);
 			}
 			if (index == this.history[0].length) {
 				// we cannot store more information, so disable the graph feature.
