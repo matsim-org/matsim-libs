@@ -465,8 +465,8 @@ public class Controler {
 				}
 			}
 		} else {
-			if (!outputDir.mkdir()) {
-				throw new RuntimeException("The output directory " + outputPath + " could not be created. Does it's parent directory exist?");
+			if (!outputDir.mkdirs()) {
+				throw new RuntimeException("The output directory path " + outputPath + " could not be created. Check pathname and permissions!");
 			}
 		}
 
