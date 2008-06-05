@@ -1,0 +1,75 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://www.matsim.org/files/dtd"
+xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
+xmlns:xml="http://www.w3.org/XML/1998/namespace" 
+xml:lang="en">
+<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+<!--   -->
+
+<xs:annotation>
+  <xs:documentation>
+    This xml schema contains enumeration types for the population schema within the MATSim framework.
+    The population schema is considered as stable file-format. Changes in the population_vXXX.xsd
+    imply major changes in the code. As extensions in the enumerations of this schema are normally
+    reflected by minor changes only, this is a separate file.    
+  </xs:documentation>
+</xs:annotation>
+
+<xs:complexType name="travelcardType">
+  <xs:attribute name="type">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="ch-GA" />
+        <xs:enumeration value="ch-HT" />
+        <xs:enumeration value="ch-HT-1y" />
+        <xs:enumeration value="ch-HT-2y" />
+        <xs:enumeration value="ch-HT-mobility" />
+        <xs:enumeration value="unknown" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+</xs:complexType>
+
+
+<xs:simpleType name="carAvailType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="always" />
+    <xs:enumeration value="sometimes" />
+    <xs:enumeration value="never" />
+  </xs:restriction>
+</xs:simpleType>
+
+
+<xs:simpleType name="legType.modeType">
+  <xs:restriction base="xs:string>
+    <xs:enumeration value="miv" />
+    <xs:enumeration value="car" />
+    <xs:enumeration value="ride" />
+    <xs:enumeration value="motorbike" />
+    <xs:enumeration value="pt" />
+    <xs:enumeration value="train" />
+    <xs:enumeration value="bus" />
+    <xs:enumeration value="tram" />
+    <xs:enumeration value="bike" />
+    <xs:enumeration value="walk" />
+    <xs:enumeration value="undef" />
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="dayType">
+  <xs:restriction base="xs:string" >
+    <xs:enumeration value="mon" />
+    <xs:enumeration value="tue" />
+    <xs:enumeration value="wed" />
+    <xs:enumeration value="thu" />
+    <xs:enumeration value="fri" />
+    <xs:enumeration value="sat" />
+    <xs:enumeration value="sun" />
+    <xs:enumeration value="wkday" />
+    <xs:enumeration value="wkend" />
+    <xs:enumeration value="wk" />
+  </xs:restriction>
+</xs:simpleType>
+
+
+</xs:schema>

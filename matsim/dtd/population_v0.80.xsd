@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- marcel: plan.type raus(done), legType bleibt(done), route als links mit anonymem element für ggf. erweiterung um nodes -->
+<!-- michi: actType location rausziehen -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 targetNamespace="http://www.matsim.org/files/dtd"
 xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
@@ -6,13 +8,38 @@ xmlns:xml="http://www.w3.org/XML/1998/namespace"
 xml:lang="en">
 <!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
 <!-- This xml schema contains xml definitions for population information within the MATSim framework  -->
-<!-- All types are defined in their order of appearance, reading from left to right, top to bottom ;)-->
 
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/populationEnumTypes.xsd"/>
 
-<!-- xxx remove namespace if lang is not required attribute -->
+<!-- xxx remove namespace if lang is not required attribute 
 <xs:import namespace="http://www.w3.org/XML/1998/namespace"
-            schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+            schemaLocation="http://www.w3.org/2001/xml.xsd"/>-->
+<xs:annotation>
+  <xs:documentation>
+    This population schema is considered as stable file-format. Changes in this schema
+    imply major changes in the code. All enumeration types needed by the data format are
+    declared in a separate file as extensions in the enumerations are normally
+    reflected by minor changes only.
+  </xs:documentation>
+  <xs:appinfo xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:creator>
+      Dominik Grether
+    </dc:creator>
+    <dc:title>
+      Population Schema for MATSim
+    </dc:title>  
+    <dc:date>
+      2008-06-05
+    </dc:date>
+    <dc:subject>
+      matsim, synthetic population, transportation, multiagent simulation 
+    </dc:subject>
+    <dc:description>
+      This xml schema contains xml definitions for population information within the MATSim framework
+    </dc:description>
+  </xs:appinfo>
+</xs:annotation>
 
 <xs:element name="population">
   <xs:complexType>
@@ -20,9 +47,6 @@ xml:lang="en">
       <xs:element name="person" type="personType" minOccurs="1" maxOccurs="unbounded" />
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="optional" />
-    <!-- xxx why do we need the following 2 attributes??? -->
- 		<xs:attribute name="reference_layer" type="xs:string" use="optional" />
- 		<xs:attribute ref="xml:lang" use="optional" default="de-CH" />
   </xs:complexType>
 </xs:element>
 
@@ -37,33 +61,15 @@ xml:lang="en">
     <xs:attribute name="sex" type="sexType" use="optional" />
     <xs:attribute name="age" type="xs:integer" use="optional" />
     <xs:attribute name="license" type="xs:boolean" use="optional" />
-    <!-- xxx car availability should be given by the householdsdefinition??? -->
-    <xs:attribute name="car_avail" type="carAvailType" use="optional" />
+    <xs:attribute name="carAvailable" type="carAvailType" use="optional" />
     <xs:attribute name="employed" type="xs:boolean" use="optional" />
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>
 
-<!-- xxx as this type seems to be not complete and changes are more or less conceivable it should be removed to a own file -->
-<xs:complexType name="travelcardType">
-  <xs:attribute name="type">
-    <xs:simpleType>
-      <xs:restriction base="xs:string">
-        <xs:enumeration value="ch-GA" />
-        <xs:enumeration value="ch-HT" />
-        <xs:enumeration value="ch-HT-1y" />
-        <xs:enumeration value="ch-HT-2y" />
-        <xs:enumeration value="ch-HT-mobility" />
-        <xs:enumeration value="unknown" />
-      </xs:restriction>
-    </xs:simpleType>
-  </xs:attribute>
-</xs:complexType>
-
 <xs:complexType name="knowledgeType">
   <xs:sequence>
-    <xs:element name="activityspace" type="activityspaceType" minOccurs="0" maxOccurs="unbounded" />   
-    <xs:element name="activity" type="activityType" minOuccurs="0" maxOccurs="unbounded" />
+    <xs:element name="activity" type="activityType" minOccurs="0" maxOccurs="unbounded" />
   </xs:sequence>
   <xs:attribute name="desc" type="xs:string" use="optional" />
 </xs:complexType>
@@ -87,10 +93,7 @@ xml:lang="en">
     </xs:element>
   </xs:sequence>
   <xs:attribute name="score" type="xs:decimal" use="optional" />
-  <!-- xxx age was removed cause no java pendant could be found! -->
-  <!-- <xs:attribute name="age" type="xs:nonNegativeInteger???" />  -->
-  <xs:attribute name="type" type="planTypeType" use=optional" />
-  <xs:attribute name="selected" type="xs:boolean" use="no" />
+  <xs:attribute name="selected" type="xs:boolean" default="false" />
 </xs:complexType>
 
 <xs:simpleType name="sexType">
@@ -100,24 +103,7 @@ xml:lang="en">
   </xs:restriction>
 </xs:simpleType>
 
-<!-- xxx is this type really needed -->
-<xs:simpleType name="carAvailType">
-  <xs:restriction base="xs:string">
-    <xs:enumeration value="always" />
-    <xs:enumeration value="sometimes" />
-    <xs:enumeration value="never" />
-  </xs:restriction>
-</xs:simpleType>
 
-
-<xs:complexType name="activityspaceType">
-  <xs:sequence>
-    <!-- xxx why is minouccurs set to one? this is a generic attribute so nobody can really rely on the content when using typesafe programming languages! Such things should be avoided in the main dataformats  -->
-    <xs:element name="param" type="matsimParamType" minOccurs="1" maxOccurs="unbounded"/>
-  </xs:sequence>
-  <xs:attribute name="type" type="activityspaceTypeType" use="required" />
-  <xs:attribute name="activity_type" type="activityTypeType" use="required" />
-</xs:complexType>
 
 <xs:complexType name="activityType">
   <xs:sequence>
@@ -128,15 +114,18 @@ xml:lang="en">
 
 <xs:complexType name="actType">
   <xs:attribute name="type" type="xs:string" use="required" />
+<!-- wird zu location aber optional  -->
   <xs:attribute name="x" type="xs:decimal" use="optional" />
   <xs:attribute name="y" type="xs:decimal" use="optional" />
   <xs:attribute name="link" type="matsimIdType" use="optional" />
   <xs:attribute name="facility" type="matsimIdType" use="optional" />
-  <xs:attribute name="start_time" type="xs:time" use="optional" />
-  <xs:attribute name="end_time" type="xs:time" use="optional" />
+<!-- location -->
+  <xs:attribute name="startTime" type="xs:time" use="optional" />
+  <xs:attribute name="endTime" type="xs:time" use="optional" />
   <!-- this could be coded with the xs:duration type would however be a change in the schema -->
-  <xs:attribute name="dur" type="xs:time" use="optional" />
-  <xs:attribute name="ref_id" type="xs:integer" use="optional" />
+  <xs:attribute name="duration" type="xs:time" use="optional" />
+  <!-- xxx do we need this??? -->
+  <xs:attribute name="refId" type="xs:integer" use="optional" />
 </xs:complexType>
 
 <xs:complexType name="legType">
@@ -145,44 +134,11 @@ xml:lang="en">
   </xs:sequence>
   <!-- xxx as this type seems to be not complete and changes are more or less conceivable it should be removed to a own file -->
   <xs:attribute name="mode" type="legType.modeType" use="required" />
-  <xs:attribute name="num" type="xs:integer" use="optional" />
-  <xs:attribute name="dep_time" type="xs:time" use="optional" /> 
-  <xs:attribute name="trav_time" type="xs:time" use="optional" />
-  <xs:attribute name="arr_time" type="xs:time" use="optional" />
+  <xs:attribute name="departureTime" type="xs:time" use="optional" /> 
+  <xs:attribute name="travelTime" type="xs:time" use="optional" />
+  <xs:attribute name="arrivalTime" type="xs:time" use="optional" />
 </xs:complexType>
 
-
-<!-- xxx as this type seems to be not complete and changes are more or less conceivable it should be removed to a own file -->
-<xs:simpleType name="planTypeType">
-  <xs:restriction base="xs:string">
-    <xs:enumeration value="car" />
-    <xs:enumeration value="pt" />
-    <xs:enumeration value="ride" />
-    <xs:enumeration value="bike" />
-    <xs:enumeration value="walk" />
-    <xs:enumeration value="undefined" />
-  </xs:restriction>
-</xs:simpleType>
-
-<xs:simpleType name="activityspaceTypeType">
-  <xs:restriction base="xs:string">
-    <xs:enumeration value="ellipse" />
-    <xs:enumeration value="cassini" />
-    <xs:enumeration value="superellipse" />
-    <xs:enumeration value="bean" />
-  </xs:restriction>
-</xs:simpleType>
-
-<xs:simpleType name="activityTypeType">
-  <xs:restriction base="xs:string">
-    <xs:enumeration value="all" />
-    <xs:enumeration value="home" />
-    <xs:enumeration value="work" />
-    <xs:enumeration value="education" />
-    <xs:enumeration value="shop" />
-    <xs:enumeration value="leisure" />
-  </xs:restriction>
-</xs:simpleType>
 
 <xs:complexType name="activityType.locationType">
   <xs:sequence>
@@ -192,47 +148,23 @@ xml:lang="en">
         <xs:attribute name="value" type="xs:integer" />
       </xs:complexType>
     </xs:element>
-    <xs:element name="opentime" minOccurs="0" maxOccurs="unbounded" >
+    <xs:element name="openingTime" minOccurs="0" maxOccurs="unbounded" >
       <xs:complexType>
         <xs:attribute name="day" type="dayType" default="wk" />
-        <xs:attribute name="start_time" type="xs:time" use="required" />
-        <xs:attribute name="end_time" type="xs:time" use="required" />
+        <xs:attribute name="startTime" type="xs:time" use="required" />
+        <xs:attribute name="endTime" type="xs:time" use="required" />
       </xs:complexType>
     </xs:element>
   </xs:sequence>
 </xs:complexType>
 
-<!-- xxx this type is somehow a bit messy: what's the difference to planTypeType??? -->
-<xs:simpleType name="legType.modeType">
-  <xs:restriction base="xs:string>
-    <xs:enumeration value="miv" />
-    <xs:enumeration value="car" />
-    <xs:enumeration value="ride" />
-    <xs:enumeration value="motorbike" />
-    <xs:enumeration value="pt" />
-    <xs:enumeration value="train" />
-    <xs:enumeration value="bus" />
-    <xs:enumeration value="tram" />
-    <xs:enumeration value="bike" />
-    <xs:enumeration value="walk" />
-    <xs:enumeration value="undef" />
-  </xs:restriction>
-</xs:simpleType>
-
-<xs:simpleType name="dayType">
-  <xs:restriction base="xs:string" >
-    <xs:enumeration value="mon" />
-    <xs:enumeration value="tue" />
-    <xs:enumeration value="wed" />
-    <xs:enumeration value="thu" />
-    <xs:enumeration value="fri" />
-    <xs:enumeration value="sat" />
-    <xs:enumeration value="sun" />
-    <xs:enumeration value="wkday" />
-    <xs:enumeration value="wkend" />
-    <xs:enumeration value="wk" />
-  </xs:restriction>
-</xs:simpleType>
+<xs:complexType name="routeType">
+  <xs:sequence>
+    <xs:element name="link" type="idRefType" minOccurs="0" maxOccurs="unbounded" />
+  </xs:sequence>
+  <xs:attribute name="distance" type="xs:decimal" use="optional" />
+  <xs:attribute name="travelTime" type="xs:decimal" use="optional" />
+</xs:complexType>
 
 
 
