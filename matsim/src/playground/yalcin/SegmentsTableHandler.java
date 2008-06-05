@@ -118,7 +118,7 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 	}
 
 	private void handleTrip() throws IOException {
-		if (this.cntPuTSegments > 0) {
+		if (this.cntPuTSegments > 0 || this.cntRailSegments > 0) {
 			// the last trip had at least one public transport segment, so write the person out
 			final Collection<VisumNetwork.Stop> startStops = this.vNetwork.findStops(this.startCoord, this.searchRadius);
 			final Collection<VisumNetwork.Stop> endStops = this.vNetwork.findStops(this.endCoord, this.searchRadius);

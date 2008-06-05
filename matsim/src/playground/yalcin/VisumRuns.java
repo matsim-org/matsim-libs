@@ -37,7 +37,7 @@ public class VisumRuns {
 		// read visum network
 		final VisumNetwork vNetwork = new VisumNetwork();
 		try {
-			new VisumNetworkReader(vNetwork).read("../mystudies/yalcin/ptzh_orig.net");
+			new VisumNetworkReader(vNetwork).read("C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/ptzh_orig.net");
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
@@ -55,7 +55,7 @@ public class VisumRuns {
 		// read visum network
 		final VisumNetwork vNetwork = new VisumNetwork();
 		try {
-			new VisumNetworkReader(vNetwork).read("../mystudies/yalcin/ptzh_orig.net");
+			new VisumNetworkReader(vNetwork).read("C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/ptzh_orig.net");
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
@@ -72,9 +72,9 @@ public class VisumRuns {
 		 */
 		final TabularFileParser parser = new TabularFileParser();
 		final TabularFileParserConfig parserConfig = new TabularFileParserConfig();
-		parserConfig.setFileName("../mystudies/yalcin/WalkAndPuTSegmentsYalcin_ZHl.txt");
+		parserConfig.setFileName("C:\\Users\\yalcin\\Desktop\\Zurich\\Zurichdata\\Nadie\\Nadie_10.04.2008\\New FolderWalkAndPuTSegmentsYalcin_WithTime\\WalkAndPuTSegmentsYalcin_ZH/WalkAndPuTSegmentsYalcin_ZHl.txt");
 		parserConfig.setDelimiterTags(new String[] { "\t" });
-		SegmentsTableHandler handler = new SegmentsTableHandler(vNetwork, 0.4, "../mystudies/yalcin/results.txt");
+		SegmentsTableHandler handler = new SegmentsTableHandler(vNetwork, 0.6, "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/results10.txt");
 
 		try {
 			// this will read the file AND write out the looked up data
@@ -89,6 +89,7 @@ public class VisumRuns {
 	public static void main(final String args[]) {
 //		findNearestStopExample();
 		findNearestStops();
+		
 	}
 
 }
