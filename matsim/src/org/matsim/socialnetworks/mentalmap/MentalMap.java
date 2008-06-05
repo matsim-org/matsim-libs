@@ -256,7 +256,7 @@ public class MentalMap {
 				if(this.getActUsingId(myactivity)== null){
 //					log.info("the Act is null");
 //					forgetList.add(myactivity);
-					counter++;
+//					counter++;
 				}
 			}
 			// If there are still too many activities 
