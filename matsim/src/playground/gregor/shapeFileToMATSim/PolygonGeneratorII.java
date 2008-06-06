@@ -53,11 +53,13 @@ public class PolygonGeneratorII {
 	private QuadTree<Feature> lineTree;
 	private HashSet<Polygon> polygons;
 	private HashMap<Integer, LineString> lineStrings;
+	private HashMap<Integer, Feature> lineStringFeatures;
 	private FeatureSource featureSourcePolygon;
 	private FeatureSource featureSourceLineString;
 	private FeatureCollection collectionLineString;
 	private List<Feature> featureList;
 	private Collection<Feature> retPolygons;
+	private Collection<Feature> retLineStrings;
 	private GeometryFactory geofac;
 	static final double CATCH_RADIUS = 0.2;
 	static final double DEFAULT_DISTANCE = 10;
@@ -76,6 +78,7 @@ public class PolygonGeneratorII {
 		this.featureSourceLineString = ls;
 		this.geofac = new GeometryFactory();
 		this.retPolygons = new ArrayList<Feature>();
+		this.retLineStrings = new ArrayList<Feature>();
 		Envelope o = null;
 		try {
 			o = this.featureSourcePolygon.getBounds();
@@ -88,6 +91,7 @@ public class PolygonGeneratorII {
 		this.polygons = new HashSet<Polygon>();
 		this.polygonTree = new QuadTree<Polygon>(o.getMinX(), o.getMinY(), o.getMaxX() + (o.getMaxX() - o.getMinX()), o.getMaxY() + (o.getMaxY()-o.getMinY()));
 		this.lineStrings = new HashMap<Integer, LineString>();
+		this.lineStringFeatures = new HashMap<Integer, Feature>();
 		this.lineTree = new QuadTree<Feature>(o.getMinX(), o.getMinY(), o.getMaxX() + (o.getMaxX() - o.getMinX()), o.getMaxY() + (o.getMaxY()-o.getMinY()));
 //		log.setLevel(Level.ERROR);
 		initFeatureGenerator();
@@ -99,6 +103,7 @@ public class PolygonGeneratorII {
 		this.geofac = new GeometryFactory();
 		this.graph = true;
 		this.retPolygons = new ArrayList<Feature>();
+		this.retLineStrings = new ArrayList<Feature>();
 		Envelope o = null;
 		try {
 			o = this.featureSourcePolygon.getBounds();
@@ -107,10 +112,11 @@ public class PolygonGeneratorII {
 			e.printStackTrace();
 		}
 		this.envelope = o;
-		this.lineStringTree= new QuadTree<LineString>(o.getMinX(), o.getMinY(), o.getMaxX() + (o.getMaxX() - o.getMinX()), o.getMaxY() + (o.getMaxY()-o.getMinY()));
+		this.lineStringTree= new QuadTree<LineString>(o.getMinX()-5000, o.getMinY()-5000, o.getMaxX() + (o.getMaxX() - o.getMinX()), o.getMaxY() + (o.getMaxY()-o.getMinY()));
 		this.polygons = new HashSet<Polygon>();
 		this.polygonTree = new QuadTree<Polygon>(o.getMinX(), o.getMinY(), o.getMaxX() + (o.getMaxX() - o.getMinX()), o.getMaxY() + (o.getMaxY()-o.getMinY()));
 		this.lineStrings = new HashMap<Integer, LineString>();
+		this.lineStringFeatures = new HashMap<Integer, Feature>();
 		this.lineTree = new QuadTree<Feature>(o.getMinX(), o.getMinY(), o.getMaxX() + (o.getMaxX() - o.getMinX()), o.getMaxY() + (o.getMaxY()-o.getMinY()));
 //		log.setLevel(Level.ERROR);
 		initFeatureGenerator();
@@ -151,21 +157,26 @@ public class PolygonGeneratorII {
 //		return(genPolygonFeatureCollection(mergePolygons()));	
 //		HashMap<Integer, Polygon> tmpPolygons = mergePolygons();
 //		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
-		HashMap<Integer, Polygon> merged = new PolygonMerger(this,"./padang/converter/d_p_merged.shp").getMergedPolygons();
-//		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
+//		HashMap<Integer, Polygon> merged = new PolygonMerger(this,"./padang/converter/d_p_merged.shp").getMergedPolygons();
+//		HashMap<Integer, Polygon> merged = new PolygonMerger(this).getMergedPolygons();
+		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
 		
 		
 //		QuadTree<Polygon> polygonNodes = getPolygonNodes(merged);
-		QuadTree<Feature> nodeFeatures = new PolygonNodesGenerator(this,"./padang/converter/d_p_nodes.shp").getPolygonNodes(merged);
-//		QuadTree<Feature> nodeFeatures = new PolygonNodesGenerator("./padang/converter/d_p_nodes.shp").getPolygonNodes(merged);
+//		QuadTree<Feature> nodeFeatures = new PolygonNodesGenerator(this,"./padang/converter/d_p_nodes.shp").getPolygonNodes(merged);
+//		QuadTree<Feature> nodeFeatures = new PolygonNodesGenerator(this,"./padang/converter/d_p_nodes.shp").getPolygonNodes(merged);
+		QuadTree<Feature> nodeFeatures = new PolygonNodesGenerator("./padang/converter/d_p_nodes.shp").getPolygonNodes(merged);
 		
 		new PolygonLinksGenerator(this, "./padang/converter/d_p_links.shp").getPolygonLinks(nodeFeatures,merged);
 		
 //		cutPolygons(this.lineStrings,);
 //		createPolygonFeatures(cutPolygons(this.lineStrings,mergePolygons()));
 //		createPolygonFeatures(mergePolygons());
+		log.info("saving debugging stuff");
+		ShapeFileWriter.writeGeometries(this.retLineStrings, "./padang/converter/debugg_ls.shp");
+		ShapeFileWriter.writeGeometries(this.retPolygons, "./padang/converter/debugg_p.shp");
 		
-		
+		log.info("done.");
 		log.info("leaving polygonGenerator");		
 		return this.retPolygons;
 		
@@ -176,311 +187,6 @@ public class PolygonGeneratorII {
 
 
 
-//	@Deprecated
-//	private HashMap<Integer, Polygon> cutPolygons(HashMap<Integer, LineString> lineStrings, HashMap<Integer, Polygon> returnPolys){
-//		
-//		int countlines = 0;
-//		int cCP = 0;
-//		int countInter = 0;
-//		
-//		HashMap<Integer, Polygon> controlPolys = new HashMap<Integer, Polygon>();
-//		HashMap<Integer, Polygon> debugPolys = new HashMap<Integer, Polygon>();
-//		
-//
-//		CoordinateArraySequence s1 = new CoordinateArraySequence(new Coordinate[] {new Coordinate(651048.912,9893489.699)});
-//		Point p1 = new Point(s1,this.geofac);
-//		CoordinateArraySequence s2 = new CoordinateArraySequence(new Coordinate[] {new Coordinate(650854.77,9893215.73)});
-//		Point p2 = new Point(s2,this.geofac);
-//		
-//		
-//		log.info("cutting polygons ...");
-//		HashMap<Integer, Polygon> fPoly = new HashMap<Integer, Polygon>();
-//			
-//		 	for(Iterator<Entry<Integer, LineString>> lsIter = lineStrings.entrySet().iterator() ; lsIter.hasNext() ; ){
-//		
-//				Entry<Integer, LineString> lsEntry  = lsIter.next();
-//				int lsId = lsEntry.getKey();
-//				LineString currLs = lsEntry.getValue();
-// 				List<Point> po = new ArrayList<Point>();
-//				po.add(currLs.getStartPoint());
-//				po.add(currLs.getEndPoint());
-//				
-//		
-//				for(Point currPoint : po){
-//					
-//					countlines++;
-////					log.info(countlines+": " + " lsId: "+lsId + " " +  currLs.getStartPoint().getCoordinate().toString() + " "+ currLs.getEndPoint().getCoordinate().toString());
-//					
-//				
-//					Coordinate currPointCoor = currPoint.getCoordinate();
-//					Collection<LineString> lines = this.lineStringTree.get(currPoint.getX(), currPoint.getY(), CATCH_RADIUS);
-//					
-//					if (lines.size() == 2) {
-////						throw new RuntimeException("fragmented LineString! This should not happen!! LineString:" + currLs);
-//						continue;
-//					}
-//					
-//					//dead end
-//					if(lines.size()== 1){
-//						continue;
-//					}  
-//					
-//					Polygon poly; 
-//					if(fPoly.containsKey(lsId)){
-//						poly = fPoly.get(lsId);
-//					}else if (returnPolys.containsKey(lsId)) {
-//						poly  = returnPolys.get(lsId);
-//					
-//					
-////						///////
-////						Coordinate [] c = currLs.getCoordinates();
-////						
-////						for(int i = 0 ; i < c.length-1 ; i++){
-////							Coordinate [] c1 = new Coordinate[]{c[i],c[i+1]};
-////							CoordinateSequence seq4 = new CoordinateArraySequence(c1);
-////							LineString li = new LineString(seq4, geofac);	
-////						
-////							if(poly.intersects(li)){
-////								
-////								
-////								Geometry g = poly.intersection(li);
-////								Coordinate co [] = g.getCoordinates();
-////								
-////								for(int ii = 0 ; ii < co.length ; ii++){
-////									
-////									Coordinate [] c3 = new Coordinate[]{co[ii]};
-////									CoordinateSequence seq5 = new CoordinateArraySequence(c3);
-////									Point p = new Point(seq5, geofac);
-////									
-////									
-////									
-////									if(!p.within(poly)){
-//////										log.warn(countlines+": LineString intersects polygon "+c.length+" times");
-////										interPoints.put((countInter), p);
-////										countInter++;
-////									}
-////								}
-////								
-//////								continue;
-////							}
-////							
-////							
-////						}
-////						/////////
-//										
-//					}else {
-////						log.warn(countlines+": LineString has no poly");
-////						createPolygonFeature(returnPolys.get(lsId), 1);
-//						continue;
-//					}
-//						
-//					if (!currPoint.within(poly)){
-//						log.warn(countlines+": Point is not covered by its polygon");
-//						
-////						polygon = setAdditionalIntersects(polygon,ls.getEndPoint());
-//						
-////						createPolygonFeature(poly, 2, lsId);
-//						if (fPoly.containsKey(lsId)){
-//							fPoly.remove(lsId);
-//						} else {
-//							returnPolys.remove(lsId);
-//						}
-//						
-//						break;
-//					}
-//					
-//					
-//					
-//					Coordinate [] coor = poly.getCoordinates();	
-//					
-//					List<Point> points = new ArrayList<Point>();				
-//											
-//					SortedMap<Double, LineString> sortedLines = sortLines(lines,currPoint);
-//					
-//					LineString [] l = new LineString[0];
-//					LineString [] lineArr = sortedLines.values().toArray(l);
-//					Double [] d = new Double[0];
-//					Double [] angleArr = sortedLines.keySet().toArray(d);
-//					
-//					for (int i = 0 ; i < lineArr.length ; i++ ){
-//												
-//						Polygon controlPoly = getControlPoly(currPointCoor, lineArr, angleArr, i);
-////						if (!controlPoly.isValid()) {
-////							continue;
-////						}
-//						
-//						controlPolys.put(cCP, controlPoly);
-//						cCP++;
-//						
-//						boolean found = false;
-//						Envelope o = poly.getEnvelopeInternal();
-//						QuadTree<Coordinate> polyCoor = new QuadTree<Coordinate>(o.getMinX(), o.getMinY(), o.getMaxX()+o.getMaxX()-o.getMinX(), 
-//								o.getMaxY()+o.getMaxY()-o.getMinY());
-//						for(int ii = 0 ; ii < coor.length ; ii++ ){
-//							polyCoor.put(coor[ii].x, coor[ii].y, coor[ii]);
-//						}
-//						while(!found){
-//							
-//							Coordinate pp = polyCoor.get(currPointCoor.x, currPointCoor.y);
-//							
-//							Coordinate [] cpp = new Coordinate[]{pp};
-//							CoordinateSequence seq10 = new CoordinateArraySequence(cpp);
-//							Point cppPoint = new Point(seq10, geofac);
-//							
-//							
-//							if(pp == null || (currPoint.distance(cppPoint) > 10)){
-//								
-//								
-////								log.warn(countlines+": polyCoor is empty: no point found. ControlPoly: " + controlPoly.toString());
-//								
-//								
-//								
-//								///////////////////////////////
-//								LineString lineI = lineArr[i];
-//								double angleI = angleArr[i];
-//								LineString lineII;
-//								double angleII;
-//								double deltaAngle;
-//								if (i == ( lineArr.length -1) ) {	
-//									lineII = lineArr[0];
-//									angleII = angleArr[0];
-//									
-//									if ( (angleII - angleI) <= -180 ){
-//										deltaAngle = 60;
-//									}else{
-//										deltaAngle = 270;
-//									}
-//
-//								}else {
-//									lineII = lineArr[i+1];
-//									angleII = angleArr[i+1];
-//									deltaAngle = angleII - angleI;
-//								}
-//								
-//								Coordinate bisecCoor = getBisectingLine(lineII, lineI);
-//								
-//								if (deltaAngle > 180 ){
-//									Coordinate co = subCoord(currPointCoor, bisecCoor); 
-//									bisecCoor = addCoord(currPointCoor, co);
-//								}
-//								///
-//								
-//								Coordinate cb = subCoord(currPointCoor, bisecCoor); 
-//								Coordinate bisecCoorII = addCoord(currPointCoor, multiCoord(cb,50 ));
-//								
-//								
-//								Coordinate [] ccc = new Coordinate[]{bisecCoorII, bisecCoor};
-//								CoordinateSequence seq6 = new CoordinateArraySequence(ccc);
-//								LineString interLine = new LineString(seq6, geofac);
-//								
-//								SortedMap<Double, Coordinate> lengths = new TreeMap<Double, Coordinate>();
-//								
-//								Coordinate [] inter = null;
-//								
-////								if(poly.intersects(interLine)){
-//									
-//									inter = poly.intersection(interLine).getCoordinates();
-//									
-//									
-//									for(int iii = 0 ; iii < inter.length ; iii++ ){
-//										lengths.put(inter[iii].distance(currPointCoor),inter[iii]);								
-////										log.info(inter[iii].toString());
-//									}
-////								}
-//								
-//								
-//								
-//								
-//								for(int iii = 0 ; iii < inter.length ; iii++ ){
-//									
-//									Coordinate ppp = lengths.get(lengths.firstKey());
-//				
-//									if(ppp == null){
-//										log.warn(countlines+": polyCoor is empty: no intersection found.");
-//										break;
-//									}
-//									
-//									Coordinate [] cccc = new Coordinate[]{currPointCoor, ppp};
-//									CoordinateSequence seq4 = new CoordinateArraySequence(cccc);
-//									LineString line2 = new LineString(seq4, geofac);
-//
-//									if(controlPoly.contains(line2) || line2.crosses(controlPoly)  ){
-//										Coordinate [] p = new Coordinate[] {lengths.get(lengths.firstKey())};
-//										CoordinateSequence seqII = new CoordinateArraySequence(p);
-//										Point poi = new Point(seqII, geofac);
-//
-//										if (pp == null || (currPoint.distance(cppPoint) > currPoint.distance(poi))){
-//											points.add(poi);
-//											found = true;
-//											break;
-//										}
-//
-//									}else{
-//										lengths.remove(lengths.firstKey());
-//									}
-//
-//
-//
-//								}
-//								if (found){break;}
-//							}
-//							
-//							Coordinate [] cc = new Coordinate[]{currPointCoor, pp};
-//							CoordinateSequence seq2 = new CoordinateArraySequence(cc);
-//							LineString line = new LineString(seq2, geofac);
-//
-//								if(controlPoly.contains(line) || line.crosses(controlPoly)  ){ 
-//
-//									
-//									Coordinate [] p = new Coordinate[]{pp};
-//
-//									CoordinateSequence seqII = new CoordinateArraySequence(p);
-//									Point poi = new Point(seqII, geofac);
-//									points.add(poi);
-//
-//									found = true;
-//									break;
-//								}else{
-//									polyCoor.remove(pp.x, pp.y, pp);
-//								}
-//						}	
-//						
-//					}
-//					
-//					if(points.size()<3){
-//						continue;
-//					}
-//					
-//					HashSet<Polygon> cutPolys = null;
-//					try {
-//						cutPolys = separatePoly(poly, points);
-//					} catch (RuntimeException e) {
-//						e.printStackTrace();
-//						continue;
-//					}
-//
-////					int p2409 = 5;					
-//					for(Polygon polygon : cutPolys){
-////						if (lsId == 2409) {
-////							createPolygonFeature(polygon, p2409++, lsId);
-////						}
-//						if(currLs.crosses(polygon) || polygon.contains(currLs) ){	//
-//							
-////							log.info(polygon.toString());
-//							
-//							if(fPoly.containsKey(lsId)){
-//								fPoly.remove(lsId);
-//							}
-//							fPoly.put(lsId, polygon);
-//							if (p1.equalsExact(po.get(0),0.5) && p2.equalsExact(po.get(1),0.5)) debugPolys.put(61, polygon);
-//						}						
-//					}
-//				}
-//			}
-//		log.info("done.");
-//		return fPoly;
-////		return controlPolys;
-//	}
 
 	
 
@@ -529,7 +235,7 @@ public class PolygonGeneratorII {
 					log.warn("ls consists of <= 1 point! This should not Happen!!");
 					continue;
 				}
-				this.add(id, lineString);
+				this.add(id, lineString,feature);
 				
 				
 //				for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
@@ -554,7 +260,7 @@ public class PolygonGeneratorII {
 					log.warn("ls consists of <= 1 point! This should not Happen!!");
 					continue;
 				}
-				this.add(id, lineString);
+				this.add(id, lineString,feature);
 				
 				
 //				for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
@@ -575,13 +281,14 @@ public class PolygonGeneratorII {
 		this.polygonTree.put(p.getX(), p.getY(), po);
 	}
 	
-	private void add(Integer id,  LineString ls) throws Exception {
+	private void add(Integer id,  LineString ls, Feature feature) throws Exception {
 		this.lineStrings.put(id , ls);
-		Feature ft = genLineStringFeature(id, ls,-3);
+		this.lineStringFeatures.put(id,feature);
+		
 		Point ep = ls.getEndPoint();
-		this.lineTree.put(ep.getX(), ep.getY(), ft);
+		this.lineTree.put(ep.getX(), ep.getY(), feature);
 		Point sp = ls.getStartPoint();
-		this.lineTree.put(sp.getX(), sp.getY(), ft);
+		this.lineTree.put(sp.getX(), sp.getY(), feature);
 		this.lineStringTree.put(ep.getX(), ep.getY(), ls);
 		this.lineStringTree.put(sp.getX(), sp.getY(), ls);
 		
@@ -603,14 +310,28 @@ public class PolygonGeneratorII {
 		Feature ft = null;
 		try {
 			ft = this.ftPolygon.create(new Object [] {new MultiPolygon(new Polygon []{ polygon  },this.geofac), id, from, to, min_width, area, info},"network");
-			this.retPolygons.add(ft);
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}		
 		return ft;
 	}
 	
+	void createLineStringFeature(LineString ls, int id, String info) {
+		this.retLineStrings.add(getLineStringFeature(ls,id,info));
+		log.info("created new debug ls with id " + id);
+		
+	}
 	
+	private Feature getLineStringFeature(LineString ls, int id, String info) {
+		Feature ft = null;
+		try {
+			ft = this.ftLineString.create(new Object[] {ls,id,info});
+		} catch (IllegalAttributeException e1) {
+			e1.printStackTrace();
+		}
+		return ft;
+	}
+
 	private void createPolygonFeatures(HashMap<Integer, Polygon> polygons) {
 
 		try {
@@ -1015,7 +736,7 @@ public QuadTree<Coordinate> getCoordinateQuatTree(Polygon p) {
 		
 		
 		boolean start = l.getStartPoint().equalsExact(point, PolygonGeneratorII.CATCH_RADIUS);
-		LineString vec = separateLine(l, start);
+		LineString vec = separateLine(l, start, point.getCoordinate());
 		lines.add(vec);
 	}
 	for (LineString line : lines){
@@ -1082,7 +803,7 @@ public static double skalarMultiCoord(Coordinate coordI, Coordinate coordII){
 
 //Returns the first (start == true) or last (start == false) segment of a lineString
 //The first point of the returned lineString is the start or end point of the original lineString
-public LineString separateLine(LineString ls, boolean start) throws Exception{
+public LineString separateLine(LineString ls, boolean start, Coordinate c) throws Exception{
 	
 	LineString vec;
 	Coordinate [] lineIcoor = ls.getCoordinates();
@@ -1090,15 +811,15 @@ public LineString separateLine(LineString ls, boolean start) throws Exception{
 	int length = lineIcoor.length;
 	
 	
-	if(lineIcoor[0] == lineIcoor[1]){
+	if(lineIcoor[0].distance(lineIcoor[1]) <= 0.5){
 		 coor = new Coordinate [length-1];
 		 for(int i = 0 ; i < length-1 ; i++){
 			 coor[i] = lineIcoor[i+1];
 			 }
 		 lineIcoor = coor;
 	}
-	
-	else if(lineIcoor[length -1] == lineIcoor[length -2]){
+
+	else if(lineIcoor[length -1].distance(lineIcoor[length -2]) <= 0.5 ){
 		 coor = new Coordinate [length-1];
 		 for(int i = 0 ; i < length-1 ; i++){
 			 coor[i] = lineIcoor[i];
@@ -1108,11 +829,13 @@ public LineString separateLine(LineString ls, boolean start) throws Exception{
 	
 	
 	if(start){
-		CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(lineIcoor[0]), new Coordinate(lineIcoor[1])});
+//		CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(lineIcoor[0]), new Coordinate(lineIcoor[1])});
+		CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(c), new Coordinate(lineIcoor[1])});
 		vec = new LineString(seqd, geofac);
 	} else {
 		
-		CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(lineIcoor[lineIcoor.length-1]), new Coordinate(lineIcoor[lineIcoor.length-2])});
+//		CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(lineIcoor[lineIcoor.length-1]), new Coordinate(lineIcoor[lineIcoor.length-2])});
+		CoordinateSequence seqd = new CoordinateArraySequence(new Coordinate[]{new Coordinate(c), new Coordinate(lineIcoor[lineIcoor.length-2])});
 		vec = new LineString(seqd, geofac);		
 	}
 	return vec;
@@ -1127,6 +850,10 @@ public LineString separateLine(LineString ls, boolean start) throws Exception{
 	public HashMap<Integer, LineString> getLineStringsMap() {
 		return this.lineStrings;
 	}
+	public HashMap<Integer, Feature> getLineStringFeatures() {
+		return this.lineStringFeatures;
+	}
+	
 	public QuadTree<LineString> getLineStringsQuadTree() {
 		return this.lineStringTree;
 	}

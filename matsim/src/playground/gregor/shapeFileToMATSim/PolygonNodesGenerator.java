@@ -113,23 +113,28 @@ public class PolygonNodesGenerator {
 	private void createPolygonNodes(HashMap<Integer, Polygon> mergedPolygons) {
 		log.info("generating polygon nodes ...");
 		this.nodes = new QuadTree<Feature>(this.pg.getEnvelope().getMinX(), this.pg.getEnvelope().getMinY(), this.pg.getEnvelope().getMaxX() + (this.pg.getEnvelope().getMaxX() - this.pg.getEnvelope().getMinX()), this.pg.getEnvelope().getMaxY() + (this.pg.getEnvelope().getMaxY()-this.pg.getEnvelope().getMinY()));
-		int nodeId = 0;
+		Integer nodeId = 0;
 	
 	 	for(Iterator<Entry<Integer, LineString>> lsIter = this.pg.getLineStringsMap().entrySet().iterator() ; lsIter.hasNext() ; ){
 			
 	 		
 			Entry<Integer, LineString> lsEntry  = lsIter.next();
 			int lsId = lsEntry.getKey();
+
 			LineString currLs = lsEntry.getValue();
+//			if (currLs.getLength() < 8)	this.pg.createLineStringFeature(currLs, lsId, "");
 			List<Point> po = new ArrayList<Point>();
 			po.add(currLs.getStartPoint());
 			po.add(currLs.getEndPoint());
+			
+			nodeId = (Integer) this.pg.getLineStringFeatures().get(lsId).getAttribute(2);
 			
 			for (Point currPoint : po) {
 
 				
 				
 				if (this.nodes.get(currPoint.getX(), currPoint.getY(), PolygonGeneratorII.CATCH_RADIUS).size() > 0) {
+					nodeId = (Integer) this.pg.getLineStringFeatures().get(lsId).getAttribute(3);
 					continue;
 				}
 				
@@ -145,6 +150,7 @@ public class PolygonNodesGenerator {
 					tmpPoly = mergedPolygons.get(lsId);
 				}else  {
 					log.warn("No corresponding Polygon found for LineString: " + lsId + " !");
+//					this.pg.createLineStringFeature(currLs, lsId, "");
 					break;
 				}
 				
@@ -154,6 +160,7 @@ public class PolygonNodesGenerator {
 					sortedLs = this.pg.sortLines(tmpLs,currPoint);
 				} catch (Exception e) {
 					log.warn("could not sort line strings");
+					nodeId = (Integer) this.pg.getLineStringFeatures().get(lsId).getAttribute(3);
 					continue;
 				}
 				
@@ -164,6 +171,8 @@ public class PolygonNodesGenerator {
 				org.matsim.utils.collections.gnuclasspath.TreeMap<Double,LineString> sortedLsTree = new org.matsim.utils.collections.gnuclasspath.TreeMap<Double,LineString>(sortedLs);
 				if (sortedLsTree.values().size() < 3) {
 					log.warn("intersection with only: " + sortedLsTree.values().size() + " LineString found, this should not happen!" );
+//					this.pg.createLineStringFeature(currLs, lsId, "");
+					nodeId = (Integer) this.pg.getLineStringFeatures().get(lsId).getAttribute(3);
 					continue;
 				}
 //				Coordinate [] nodeC = new Coordinate[sortedLsTree.values().size()+1];
@@ -171,6 +180,14 @@ public class PolygonNodesGenerator {
 
 				for (double angle : sortedLs.keySet()) {
 					Polygon p = getControlPolygon(currPoint, angle,sortedLsTree);
+					
+//					try {
+//						//DEBUG
+//						this.pg.createPolygonFeature(p, -10,lsId, 0, 0, 0., 0.);
+//					} catch (RuntimeException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} 
 	
 					if (p == null) {
 						break;
@@ -195,6 +212,7 @@ public class PolygonNodesGenerator {
 				}
 				if (nodeC.size() < 3) {
 //					log.warn("could not craete polygon node for ls:" + lsId);
+					nodeId = (Integer) this.pg.getLineStringFeatures().get(lsId).getAttribute(3);
 					continue;
 				}
 				nodeC.add(nodeC.get(0));
@@ -204,9 +222,9 @@ public class PolygonNodesGenerator {
 				Polygon p = this.pg.getGeofac().createPolygon(lr, null);
 			
 				
-				Feature ft = this.pg.getPolygonFeature(p, 0, nodeId++, 0, 0, currPoint.getX(), currPoint.getY());
+				Feature ft = this.pg.getPolygonFeature(p, 0, nodeId, 0, 0, currPoint.getX(), currPoint.getY());
 				this.nodes.put(currPoint.getX(), currPoint.getY(), ft);
-				
+				nodeId = (Integer) this.pg.getLineStringFeatures().get(lsId).getAttribute(3);
 				//DEBUG
 //				this.pg.createPolygonFeature(p, 1, lsId,0,0,0,0);
 

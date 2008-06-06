@@ -131,7 +131,7 @@ public class PolygonMerger {
 			LineString ls = this.pg.getLineStringsMap().get(id);
 			
 			HashSet<Polygon> neighborhood = new HashSet<Polygon>();
-			Collection<Polygon> polys = this.pg.getPolygonQuadTree().get(ls.getCentroid().getX(),ls.getCentroid().getY() ,1000);
+			Collection<Polygon> polys = this.pg.getPolygonQuadTree().get(ls.getCentroid().getX(),ls.getCentroid().getY() ,2000);
 
 			
 			for (Polygon po : polys){
@@ -191,10 +191,11 @@ public class PolygonMerger {
 					}
 				}
    			}catch(Exception e){
-   				this.optid--;
-   				for (Polygon tmp : extNeighborhood) {
-   					this.pg.createPolygonFeature(tmp, this.optid, id,0,0,0,0);	
-   				}
+   				
+//   				this.pg.createLineStringFeature(ls,this.optid--, -1 + "");
+//   				for (Polygon tmp : extNeighborhood) {
+//   					this.pg.createPolygonFeature(tmp, this.optid, id,0,0,0,0);	
+//   				}
    				
    				e.printStackTrace();
    			}

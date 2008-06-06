@@ -68,29 +68,75 @@ public class GraphGenerator {
 
 	private HashSet<LineString> lineStrings;
 	private QuadTree<LineString> tree;
+	private QuadTree<Node> nodes;
 
 	private GeometryFactory geofac;
 	
-	private final static double MIN_LENGTH = 1.01;	
+	private final static double MIN_LENGTH =3.81;	
 
 	public GraphGenerator(FeatureSource featureSource) {
 		this.geofac = new GeometryFactory();
 		this.featureSource = featureSource;
+	
 		log.setLevel(Level.INFO);
 
 	}
 
 	public Collection<Feature> createGraph() throws Exception {
 		parseLineStrings();
-//		 deleteToShortLineStrings();
+		 deleteToShortLineStrings();
 		cleanUpLineStrings();
 		checkForIntersectionsToSplit();
 		simplifyNetwork();
 		mergeNodes();
+		generateNodes();
 
 		return genFeatureCollection();
 	}
 	
+	private void generateNodes() {
+		log.info("generating nodes ...");
+		int id = 0;
+		ConcurrentLinkedQueue<LineString> lineStringsQueue = new ConcurrentLinkedQueue<LineString>(this.lineStrings);
+		HashSet<Point> finished = new HashSet<Point>();
+		while (lineStringsQueue.peek() != null) {
+			LineString ls = lineStringsQueue.poll();
+			Collection<Point> po = new ArrayList<Point>(); 
+			po.add(ls.getStartPoint());
+			po.add(ls.getEndPoint());
+			for (Point p : po) {
+				if (finished.contains(p)) {
+					continue;
+				}
+				if (this.nodes.get(p.getX(), p.getY(),GISToMatsimConverter.CATCH_RADIUS).size() > 0) {
+					continue;
+				}
+				
+				Collection<LineString> tmp = this.tree.get(p.getX(), p.getY(), GISToMatsimConverter.CATCH_RADIUS);
+				Node node = new Node();
+				node.id = id++;
+				node.x = p.getX();
+				node.y = p.getY();
+				this.nodes.put(node.x, node.y, node);
+				for (LineString l : tmp) {
+					if (l.getStartPoint().equalsExact(p,GISToMatsimConverter.CATCH_RADIUS)) {
+						finished.add(l.getStartPoint());
+					} else if (l.getEndPoint().equalsExact(p,GISToMatsimConverter.CATCH_RADIUS)) {
+						finished.add(l.getEndPoint());						
+					} else {
+					log.error("this should not happen: " + id);
+					}
+				}
+				
+			}
+			
+			
+			
+		}
+		
+		log.info("done");
+	}
+
 	private void deleteToShortLineStrings(){
 //		int rm = 0;
 		
@@ -211,7 +257,7 @@ public class GraphGenerator {
 					remove(neighbor);
 					LineString union = catAtTouchPoint(ls, neighbor);
 					add(union);
-					lineStringsQueue.add(union);
+//					lineStringsQueue.add(union);
 
 				}
 
@@ -319,7 +365,8 @@ public class GraphGenerator {
 		this.lineStrings = new HashSet<LineString>();
 		this.tree = new QuadTree<LineString>(o.getMinX(), o.getMinY(), o
 				.getMaxX(), o.getMaxY());
-
+		this.nodes = new QuadTree<Node>(o.getMinX(), o.getMinY(), o
+		.getMaxX(), o.getMaxY());
 		FeatureIterator it = collection.features();
 		while (it.hasNext()) {
 			Feature feature = it.next();
@@ -340,7 +387,8 @@ public class GraphGenerator {
 
 	private Collection<Feature> genFeatureCollection() throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
 		
-		
+		Node dummy = new Node();
+		dummy.id = -1;
 		Collection<Feature> features = new ArrayList<Feature>();
 		
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiLineString",MultiLineString.class, true, null, null, this.featureSource.getSchema().getDefaultGeometry().getCoordinateSystem());
@@ -354,7 +402,24 @@ public class GraphGenerator {
 				new AttributeType[] { geom, id, fromNode, toNode }, "link");
 		int ID = 0;
 		for (LineString ls : this.lineStrings){
-			Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},this.geofac) , ID++, -1,-1},"network");
+			
+			Collection<Node> nodes = this.nodes.get(ls.getStartPoint().getX(), ls.getStartPoint().getY(), 0.1);
+			Node from = null;
+			if (nodes.size() != 1) {
+				from = dummy;
+			} else {
+				from = nodes.iterator().next();
+			}
+
+			nodes = this.nodes.get(ls.getEndPoint().getX(), ls.getEndPoint().getY(), 0.1);
+			Node to = null;
+			if (nodes.size() != 1) {
+				to = dummy;
+			} else {
+				to = nodes.iterator().next();
+			}
+			
+			Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},this.geofac) , ID++, from.id,to.id},"network");
 			features.add(ft);
 				
 		}
@@ -382,10 +447,7 @@ public class GraphGenerator {
 		Coordinate[] carray = new Coordinate[ls1.getNumPoints() + ls2.getNumPoints() - 1];
 		boolean reverseLs = false;
 		boolean reverseNeighbor = false;
-		if (ls1.getStartPoint().equalsExact(ls2.getStartPoint(),
-				GISToMatsimConverter.CATCH_RADIUS)
-				|| ls1.getStartPoint().equalsExact(ls2.getEndPoint(),
-						GISToMatsimConverter.CATCH_RADIUS)) {
+		if (ls1.getStartPoint().equalsExact(ls2.getStartPoint(), GISToMatsimConverter.CATCH_RADIUS) || ls1.getStartPoint().equalsExact(ls2.getEndPoint(),	GISToMatsimConverter.CATCH_RADIUS)) {
 			reverseLs = true;
 			if (ls1.getStartPoint().equalsExact(ls2.getEndPoint(),
 					GISToMatsimConverter.CATCH_RADIUS)) {
@@ -448,4 +510,18 @@ public class GraphGenerator {
 
 	}
 	
+	private static class Node {
+		int id;
+		double x;
+		double y;
+		
+	}		
+		
+		
+		
+		
+		
+		
+		
+		
 }
