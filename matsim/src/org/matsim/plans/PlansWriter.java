@@ -38,7 +38,7 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 
 	private PlansWriterHandler handler = null;
 	private final Plans population;
-	
+
 	private final static Logger log = Logger.getLogger(PlansWriter.class);
 
 	/**
@@ -46,19 +46,19 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 	 * as specified in the {@linkplain org.matsim.config.groups.PlansConfigGroup configuration}.
 	 * If plans-streaming is on, the file will already be opened and the file-header be written.
 	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
-	 * 
+	 *
 	 * @param population the population to write to file
 	 */
 	public PlansWriter(final Plans population) {
 		this(population, Gbl.getConfig().plans().getOutputFile(), Gbl.getConfig().plans().getOutputVersion());
 	}
-	
+
 	/**
-	 * Creates a new PlansWriter to write out the specified plans to the specified file and with 
+	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
 	 * the specified version.
 	 * If plans-streaming is on, the file will already be opened and the file-header be written.
 	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
-	 * 
+	 *
 	 * @param population the population to write to file
 	 * @param filename the filename where to write the data
 	 * @param version specifies the file-format
@@ -69,12 +69,40 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 		this.outfile = filename;
 		this.write_person_percentage = Gbl.getConfig().plans().getOutputSample();
 		createHandler(version);
-		
+
 		if (this.population.isStreaming()) {
 			// write the file head if it is used with streaming.
 			writeStartPlans();
 		}
 	}
+
+
+	/**
+	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
+	 * the specified version.
+	 * If plans-streaming is on, the file will already be opened and the file-header be written.
+	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
+	 *
+	 * @param population the population to write to file
+	 * @param filename the filename where to write the data
+	 * @param version specifies the file-format
+	 * @param percent of persons to write to the plans file
+	 */
+	public PlansWriter(final Plans population, final String filename, final String version,
+			final double write_person_percentage) {
+		super();
+		this.population = population;
+		this.outfile = filename;
+		this.write_person_percentage = write_person_percentage;
+		createHandler(version);
+
+		if (this.population.isStreaming()) {
+			// write the file head if it is used with streaming.
+			writeStartPlans();
+		}
+	}
+
+
 
 	/**
 	 * Just a helper method to instantiate the correct handler
