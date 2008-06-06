@@ -119,7 +119,8 @@ public class PlanRandomizeLocations {
 	}
 
 	private void writePlans() {
-		new PlansWriter(this.plans, "./output/plans_randomized.xml.gz", "v4").write();
+		new PlansWriter(this.plans, "./output/plans_randomized.xml.gz", "v4", 1.0).write();
+		log.info("plans written to:  ./output/plans_randomized.xml.gz ");
 	}
 
 
