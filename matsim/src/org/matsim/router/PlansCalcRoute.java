@@ -158,7 +158,7 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		}
 	}
 
-	private double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	protected double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		double travTime = 0;
 		Link fromLink = fromAct.getLink();
 		Link toLink = toAct.getLink();
@@ -191,7 +191,7 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 
 	private double handleRideLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		// handle a ride exactly the same was as a car
-		// the simulation has to take car that this leg is not really simulated as a stand-alone driver
+		// the simulation has to take care that this leg is not really simulated as a stand-alone driver
 		return handleCarLeg(leg, fromAct, toAct, depTime);
 	}
 
