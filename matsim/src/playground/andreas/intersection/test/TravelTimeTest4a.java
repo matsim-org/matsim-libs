@@ -22,10 +22,10 @@ import playground.andreas.intersection.sim.QSim;
  */
 public class TravelTimeTest4a extends MatsimTestCase implements	EventHandlerLinkLeaveI, EventHandlerLinkEnterI {
 
-  private Map<Id, Double> agentTravelTimes;
+  private Map<Id, Double> agentTravelTimes = new HashMap<Id, Double>();
   
 	public void testTrafficLightIntersection4arms() {
-		this.agentTravelTimes = new HashMap<Id, Double>();
+		
 		Config conf = loadConfig("src/playground/andreas/intersection/test/config.xml");
 		String popFileName = "src/playground/andreas/intersection/test/data/plans_4a_16.xml.gz";
 		String netFileName = "src/playground/andreas/intersection/test/data/net_4a.xml.gz";

@@ -29,10 +29,9 @@ import playground.andreas.intersection.sim.QSim;
  */
 public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLinkLeaveI, EventHandlerLinkEnterI {
 
-	MeasurePoint beginningOfLink2 = null;
-	
+	MeasurePoint beginningOfLink2 = null;	
 
-	final int timeToWaitBeforeMeasure = 498; // Make sure measurement starts with second 0 in signalsystemplan 
+	final static int timeToWaitBeforeMeasure = 498; // Make sure measurement starts with second 0 in signalsystemplan 
 	
 	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60(){
   		
@@ -54,15 +53,16 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 		
 		TreeMap<Integer, MeasurePoint> results = new TreeMap<Integer, MeasurePoint>();		
 		
-		for (int i = 2; i <= 60; i++) {
+		int umlaufzeit = 60;
+		
+		for (int i = 2; i <= umlaufzeit; i++) {
 
 			try {
 				
 				this.beginningOfLink2 = null;
-
+				
 				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(signalSystems)));
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile)));
-
 				boolean moveOn = true;
 
 				while(moveOn){
@@ -73,7 +73,11 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 
 						if(line.contains("<dropping sec=")){
 							writer.write("<dropping sec=\"" + i + "\" />" + "\n");		
-						} else {
+						} else if (line.contains("<circulationTime sec=")){
+							writer.write("<circulationTime sec=\"" + umlaufzeit + "\" />");
+						}
+						
+						else {
 							writer.write(line + "\n");
 						}				
 
@@ -103,7 +107,7 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 		int j = 2;
 		
 		for (MeasurePoint resMeasurePoint : results.values()) {
-			System.out.println(this.beginningOfLink2.timeToStartMeasurement + ", " + j + ", " + resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ + ", " + resMeasurePoint.numberOfVehPassed_ + ", " + resMeasurePoint.firstVehPassTime_s + ", " + resMeasurePoint.lastVehPassTime_s);
+			System.out.println(j + ", " + resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ + ", " + resMeasurePoint.numberOfVehPassed_ + ", " + this.beginningOfLink2.timeToStartMeasurement + ", " + resMeasurePoint.firstVehPassTime_s + ", " + resMeasurePoint.lastVehPassTime_s + ", " + (resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ - j * 2000 / umlaufzeit));
 			j++;
 			assertEquals(5000.0, resMeasurePoint.numberOfVehPassed_, EPSILON);
 		}
@@ -141,7 +145,8 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 		// circle time is 60s, green 60s
 		assertEquals(5000.0, qSim.numberOfVehPassed_, EPSILON);
 		
-		// QSim is 4s slower than QueueSim
+		// Vehicle in QSim need 3 more seconds due to the fact that they are inserted in the original
+		// links flowQueue which starts 45m in front of the links end. FreeSpeed is 13.88 m/s > 3.24s
 		assertEquals(qSim.firstVehPassTime_s - 3, queueSimulation.firstVehPassTime_s, EPSILON);
 		assertEquals(qSim.numberOfVehPassed_, queueSimulation.numberOfVehPassed_, EPSILON);
 		assertEquals(qSim.numberOfVehPassedDuringTimeToMeasure_, queueSimulation.numberOfVehPassedDuringTimeToMeasure_, EPSILON);
@@ -153,7 +158,7 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 		if (event.linkId.equalsIgnoreCase("2")) {
 			
 			if (this.beginningOfLink2 == null){				
-				this.beginningOfLink2 = new MeasurePoint(event.time + this.timeToWaitBeforeMeasure);
+				this.beginningOfLink2 = new MeasurePoint(event.time + TravelTimeTest2a.timeToWaitBeforeMeasure);
 			}
 			
 			this.beginningOfLink2.numberOfVehPassed_++;
