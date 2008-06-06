@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountsAnalyser.java
+ * LinkStatsAnalyser.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -25,7 +25,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Vector;
 
 import org.matsim.analysis.CalcLinkStats;
@@ -45,7 +44,7 @@ import org.matsim.utils.geometry.transformations.TransformationFactory;
 
 /**
  * This class is able to produce a crapy kml file to compare the link volumes
- * on selected links given two linkStats files. The results are written to 
+ * on selected links given two linkStats files. The results are written to
  * a kmz file.
  */
 public class LinkStatsAnalyser {
@@ -64,7 +63,7 @@ public class LinkStatsAnalyser {
 	private CalcLinkStats linkStats1;
 
 	private String coordSystem=null;
-	
+
 	private String linksAttributeFilename0;
 	private String linksAttributeFilename1;
 	private String selectedLinksFilename;
@@ -81,7 +80,7 @@ public class LinkStatsAnalyser {
 	 *
 	 * @param config
 	 */
-	
+
 	private void init(final String[] args){
 		try {
 			this.linksAttributeFilename0=args[0];
@@ -91,50 +90,50 @@ public class LinkStatsAnalyser {
 			this.networkFilename=args[4];
 			this.scaleFactor=Double.parseDouble(args[5]);
 			this.vol_scale_factor= Double.parseDouble(args[6]);
-			
+
 			//this.iterationNumber=0;
 			this.iterationNumber=new Integer(args[7]);
 			//this.coordSystem="CH1903_LV03";
 			this.coordSystem=args[8];
-			
+
 			this.selectedLinks=readSelectedLinks();
-			
+
 			System.out.println("  reading network...");
 			this.network = loadNetwork();
 			System.out.println("  done.");
-			
+
 			System.out.println("  Coordinate System: " + this.coordSystem);
-			System.out.println("  reading LinkAttributes from: " + linksAttributeFilename0 + " with vol_scale factor = " + vol_scale_factor);
+			System.out.println("  reading LinkAttributes from: " + this.linksAttributeFilename0 + " with vol_scale factor = " + this.vol_scale_factor);
 			this.linkStats0 = new CalcLinkStats(this.network,this.vol_scale_factor);
-			this.linkStats0.readFile(linksAttributeFilename0);
-			
-			System.out.println("  reading LinkAttributes from: " + linksAttributeFilename1 + " with vol_scale factor = " + vol_scale_factor);
+			this.linkStats0.readFile(this.linksAttributeFilename0);
+
+			System.out.println("  reading LinkAttributes from: " + this.linksAttributeFilename1 + " with vol_scale factor = " + this.vol_scale_factor);
 			this.linkStats1 = new CalcLinkStats(this.network,this.vol_scale_factor);
-			this.linkStats1.readFile(linksAttributeFilename1);
-			
-			
+			this.linkStats1.readFile(this.linksAttributeFilename1);
+
+
 			System.out.println("  Scale Factor set to: " + this.scaleFactor);
 			System.out.println("  Iteration Number set to : " + this.iterationNumber);
 
 			System.out.println("  done.");
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Init aborted!");
 		}
 	}
-	
+
 	private List<Id> readSelectedLinks() {
 		List<Id> links=new Vector<Id>();
-		
+
 		try {
 			FileReader file_reader = new FileReader(this.selectedLinksFilename);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
 
 			// Skip header
-			String curr_line = buffered_reader.readLine(); 
-			
-			while ((curr_line = buffered_reader.readLine()) != null) {			
+			String curr_line = buffered_reader.readLine();
+
+			while ((curr_line = buffered_reader.readLine()) != null) {
 				links.add(new IdImpl(curr_line.trim()));
 			}
 
@@ -142,8 +141,8 @@ public class LinkStatsAnalyser {
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		
-		
+
+
 		return links;
 	}
 
@@ -158,25 +157,25 @@ public class LinkStatsAnalyser {
 		// create a Counts object, which holds the old sim values.
 		// That is clearly a violation, but it is needed for WU
 		Counts counts = new Counts();
-		
-		
-		
+
+
+
 		for (Id linkId: this.selectedLinks) {
 			Count count = counts.createCount(new IdImpl(linkId.toString()), "-");
 			double linkVolumes []=this.linkStats0.getAvgLinkVolumes(linkId.toString());
-			
-			for (int i=0; i<24; i++) {		
+
+			for (int i=0; i<24; i++) {
 				count.createVolume(i+1, linkVolumes[i] );
 				count.setCoord(new Coord(this.network.getLink(linkId).getCenter().getX(),
 						this.network.getLink(linkId).getCenter().getY()));
 			}
 		}
-			
-		
+
+
 		// processing counts
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(this.linkStats1,
 				counts, this.network);
-		
+
 		cca.setCountsScaleFactor(this.scaleFactor);
 		cca.run(counts);
 		return cca.getComparison();
@@ -200,7 +199,7 @@ public class LinkStatsAnalyser {
 
 	/**
 	 * load the network
-	 * 
+	 *
 	 * @return the network layer
 	 */
 	protected NetworkLayer loadNetwork() {
@@ -269,7 +268,7 @@ public class LinkStatsAnalyser {
 		if (args.length != 9) {
 			printHelp();
 		}
-		else {			
+		else {
 			linkStatsAnalyzer = new LinkStatsAnalyser();
 			linkStatsAnalyzer.init(args);
 			linkStatsAnalyzer.writeCountsComparisonList(linkStatsAnalyzer.outputFilename);
