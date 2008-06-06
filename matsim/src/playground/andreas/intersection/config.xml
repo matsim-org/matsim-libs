@@ -26,7 +26,6 @@
 		<param name="outputDirectory" value="&OUTPUTBASE;" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorTrafficLight" />
 	</module>
 
 	<module name="simulation">

@@ -29,6 +29,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.netvis.NetVis;
 
+import playground.andreas.intersection.dijkstra.TravelTimeCalculatorTrafficLight;
 import playground.andreas.intersection.sim.QSim;
 
 public class QControler extends Controler {
@@ -49,6 +50,14 @@ public class QControler extends Controler {
 		QSim sim = new QSim(this.events, this.population, this.network,
 				this.signalSystems, this.groupDefinitions, useOTF);
 		sim.run();
+	}
+
+	@Override
+	protected void setup() {
+		// TODO Auto-generated method stub
+		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
+		this.travelTimeCalculator = new TravelTimeCalculatorTrafficLight(this.network, getTraveltimeBinSize(), (int) endTime);
+		super.setup();
 	}
 
 	/** Conversion of events -> snapshots */
