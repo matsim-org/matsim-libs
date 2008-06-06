@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -14,11 +15,12 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.MatsimPlansReader;
+import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.plans.Person;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
+import org.matsim.utils.misc.Counter;
 
 public class PlanRandomizeLocations {
 
@@ -28,6 +30,7 @@ public class PlanRandomizeLocations {
 	private final TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
 	private final TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
 
+	private final static Logger log = Logger.getLogger(PlanRandomizeLocations.class);
 
 	/**
 	 * @param:
@@ -60,13 +63,14 @@ public class PlanRandomizeLocations {
 
 	private void run(final String plansfilePath, final String networkfilePath, final String facilitiesfilePath) {
 		this.init(plansfilePath, networkfilePath, facilitiesfilePath);
-		this.randomizeLocations(this.plans);
+		this.randomizeLocations();
 	}
 
 	private void init(final String plansfilePath, final String networkfilePath, final String facilitiesfilePath) {
 
 		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
+		log.info("network reading done");
 
 		this.facilities=new Facilities();
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
@@ -79,17 +83,24 @@ public class PlanRandomizeLocations {
 		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_gastro"));
 		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_culture"));
 		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_sports"));
+		log.info("facilities reading done");
+
 
 		this.plans=new Plans(false);
 		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
 		plansReader.readFile(plansfilePath);
+		log.info("plans reading done");
 	}
 
-	private  void randomizeLocations(final Plans plans) {
+	private  void randomizeLocations() {
 
-		Iterator<Person> person_iter = plans.getPersons().values().iterator();
+		log.info("running randomize locations:");
+		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+		Counter counter = new Counter(" person # ");
 		while (person_iter.hasNext()) {
 			Person person = person_iter.next();
+				counter.incCounter();
+
 				Iterator<Plan> plan_iter = person.getPlans().iterator();
 				while (plan_iter.hasNext()) {
 					Plan plan = plan_iter.next();
@@ -104,6 +115,7 @@ public class PlanRandomizeLocations {
 
 				}
 		}
+		log.info("randomize locations done.");
 	}
 
 	private void writePlans() {
