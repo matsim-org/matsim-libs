@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas;
+package playground.andreas.intersection.dijkstra;
 
 import org.matsim.controler.Controler;
 import org.matsim.replanning.PlanStrategy;

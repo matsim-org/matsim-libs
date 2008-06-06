@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas;
+package playground.andreas.intersection.dijkstra;
 
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
@@ -25,8 +25,6 @@ import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 
-import playground.andreas.intersection.dijkstra.NetworkWrapper;
-import playground.andreas.intersection.dijkstra.PlansCalcRouteDijkstra;
 
 
 /**

@@ -21,7 +21,7 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 	public SignalGroupSettings[] getGreenInLinks(double time) {
 		
 		if(this.signalSystemConfiguration == null){
-			System.err.println(this.signalSystemConfiguration.getId() + " got no signalSystemConfiguration");
+			System.err.println("Got no signalSystemConfiguration");
 		}
 		
 		List<SignalSystemPlan> plan = ((PlanbasedSignalSystemControlInfoImpl) this.signalSystemConfiguration.getSignalSystemControler()).getSignalSystemPlans();
