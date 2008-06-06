@@ -65,9 +65,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		private ByteBuffer colorsIN = null;
 		private FloatBuffer vertexIN = null;
 		
-		private ByteBuffer colors =  null;
-		private FloatBuffer vertex =  null;
-		
 		private final  ArrayList<FloatBuffer> posBuffers= new ArrayList<FloatBuffer>();
 		private final  ArrayList<ByteBuffer> colBuffers= new ArrayList<ByteBuffer>();
 		
@@ -120,16 +117,19 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 				texture.bind();	        	
 	        }
 
+			ByteBuffer colors =  null;
+			FloatBuffer vertex =  null;
 			
+		
 			for(int i = 0; i < posBuffers.size(); i++) {
 				colors = colBuffers.get(i);
 				vertex = posBuffers.get(i);
-				int count = vertex.limit() / 2;
+				int remain = Math.min(vertex.limit() / 2, count - i*BUFFERSIZE);
 				colors.position(0);
 				vertex.position(0);
 		        gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
 		        gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);      
-		        gl.glDrawArrays (GL.GL_POINTS, 0, count);
+		        gl.glDrawArrays (GL.GL_POINTS, 0, remain);
 			}
 
 	        gl.glDisableClientState (GL.GL_COLOR_ARRAY);
@@ -141,6 +141,34 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	        
 	        gl.glDisable(GL.GL_POINT_SPRITE_ARB);
 		
+		}
+		public int getNearestAgent(Point2D.Double point) {
+			FloatBuffer vertex =  null;
+			
+			int idx = 0;
+			int result = -1;
+			double mindist = Double.MAX_VALUE;
+			double dist = 0;
+			
+			for(int i = 0; i < posBuffers.size(); i++) {
+				vertex = posBuffers.get(i);
+				vertex.position(0);
+				while (vertex.hasRemaining() && idx < count) {
+					float x = vertex.get();
+					float y = vertex.get();
+					// DS We do not need z value here but need to fetch it from buffer!
+					float z =  vertex.get();
+					
+					// Manhattan dist reicht uns hier
+					dist = Math.abs(x-point.x) + Math.abs(y-point.y);
+					if ( dist < mindist) {
+						mindist = dist;
+						result = idx;
+					}
+					idx++;
+				}
+			}
+			return result;
 		}
 
 		public void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){
@@ -170,44 +198,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			addAgent(id, startX, startY, mycolor, true);
 		}
 
-		public void compress() {
-			if (vertexIN == null) return;
-			
-			vertexIN.limit(vertexIN.position());
-			colorsIN.limit(colorsIN.position());
-//			
-//			if (vertexIN.position() == 0) return;
-//			
-//			int newVSize = 0, newCSize = 0;
-//			if (vertex != null) {
-//				newVSize = vertex.capacity();
-//				newCSize = colors.capacity();
-//			}
-//
-//			newVSize += vertexIN.position();
-//			newCSize += colorsIN.position();
-//			
-//			FloatBuffer newVertex = BufferUtil.newFloatBuffer(newVSize);
-//			ByteBuffer newColor = BufferUtil.newByteBuffer(newCSize);
-//			if (vertex != null) {
-//				vertex.position(0);
-//				newVertex.put(vertex);
-//				colors.position(0);
-//				newColor.put(colors);
-//			}
-//			vertexIN.limit(vertexIN.position());
-//			vertexIN.position(0);
-//			newVertex.put(vertexIN);
-//			colorsIN.limit(colorsIN.position());
-//			colorsIN.position(0);
-//			newColor.put(colorsIN);
-//			
-//			colors = newColor;
-//			vertex = newVertex;
-//			vertexIN.clear();
-//			colorsIN.clear();
-		}
-		
 	}
 	
 	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgent.Receiver {
@@ -284,7 +274,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 	@Override
 	public void finish() {
-		drawer.compress();
 	}
 
 	@Override
@@ -308,27 +297,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	}
 
 	public int getAgentIndex(Point2D.Double point) {
-		int count = 0;
-		int result = -1;
-		double mindist = Double.MAX_VALUE;
-		double dist = 0;
-		
-		drawer.vertex.position(0);
-		while (drawer.vertex.hasRemaining()) {
-			float x = drawer.vertex.get();
-			float y = drawer.vertex.get();
-			// DS We do not need z value here but need to fetch it from buffer!
-			float z =  drawer.vertex.get();
-			
-			// Manhattan dist reicht uns hier
-			dist = Math.abs(x-point.x) + Math.abs(y-point.y);
-			if ( dist < mindist) {
-				mindist = dist;
-				result = count;
-			}
-			count++;
-		}
-		return result;
+		return drawer.getNearestAgent(point);
 	}
 	
 	
@@ -338,8 +307,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		int idNr = Arrays.hashCode(id);
 		Integer i = drawer.id2coord.get(idNr);
 		if (i != null) {
-			float x = drawer.vertex.get(i*3);
-			float y = drawer.vertex.get(i*3+1);
+			FloatBuffer vertex = drawer.posBuffers.get(i / BUFFERSIZE);
+			int innerIdx = i % BUFFERSIZE;
+			float x = vertex.get(innerIdx*2);
+			float y = vertex.get(innerIdx*2+1);
 			return new Point2D.Double(x,y);
 		} else return null;
 		
