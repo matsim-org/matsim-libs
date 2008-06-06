@@ -35,6 +35,15 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 		this.network = network;
 	}	
 	
+	/*
+	 * Need to override it here, to ensure correct route conversion to wrapped network and vice versa.
+	 * That's why I had to change visibility to protected.
+	 * 
+	 * TODO [an] No other transport means are implemented, yet.
+	 * 
+	 * (non-Javadoc)
+	 * @see org.matsim.router.PlansCalcRoute#handleCarLeg(org.matsim.plans.Leg, org.matsim.plans.Act, org.matsim.plans.Act, double)
+	 */
 	@Override
 	protected double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		double travTime = 0;
@@ -80,13 +89,5 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 		leg.setTravTime(travTime);
 		leg.setArrTime(depTime + travTime);
 		return travTime;
-	}
-	
-	@Override
-	protected double handlePtLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
-		// currently: calc route in empty street network, use twice the traveltime
-		// TODO [MR] later: use special pt-router
-		// TODO [an] what to do about this one here, has nothing to do with car traffic? 
-		return super.handlePtLeg(leg, fromAct, toAct, depTime);
 	}
 }
