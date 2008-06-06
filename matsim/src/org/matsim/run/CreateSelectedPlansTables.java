@@ -225,9 +225,8 @@ public class CreateSelectedPlansTables {
 		}
 	}
 
-	/*  TODO: Put the next three methods into a "stats" class and use
-	 *  traveltime, numberOfTrips and traveldist as attributes.
-	 *  At the moment it is "nicer" to have everything in one single class */
+	/*  TODO: Combine the following three methods and make one method.
+	 *  See playground.anhorni.locationchoice.analysis.PersonTimeDistanceCalculator */
 
 	private double getTravelTime(final Person person) {
 
