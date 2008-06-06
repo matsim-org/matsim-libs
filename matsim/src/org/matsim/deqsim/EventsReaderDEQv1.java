@@ -64,6 +64,7 @@ public class EventsReaderDEQv1 {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
+		this.events.printEventsCount();
 	}
 
 	private void readEventsSingleCPU(final String iterationEventsFile) throws FileNotFoundException, IOException {
