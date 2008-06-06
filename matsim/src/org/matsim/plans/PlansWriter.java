@@ -64,18 +64,8 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 	 * @param version specifies the file-format
 	 */
 	public PlansWriter(final Plans population, final String filename, final String version) {
-		super();
-		this.population = population;
-		this.outfile = filename;
-		this.write_person_percentage = Gbl.getConfig().plans().getOutputSample();
-		createHandler(version);
-
-		if (this.population.isStreaming()) {
-			// write the file head if it is used with streaming.
-			writeStartPlans();
-		}
+		this(population, filename, version, Gbl.getConfig().plans().getOutputSample());
 	}
-
 
 	/**
 	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
@@ -86,14 +76,14 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 	 * @param population the population to write to file
 	 * @param filename the filename where to write the data
 	 * @param version specifies the file-format
-	 * @param percent of persons to write to the plans file
+	 * @param percentage of persons to write to the plans file
 	 */
 	public PlansWriter(final Plans population, final String filename, final String version,
-			final double write_person_percentage) {
+			final double percentage) {
 		super();
 		this.population = population;
 		this.outfile = filename;
-		this.write_person_percentage = write_person_percentage;
+		this.write_person_percentage = percentage;
 		createHandler(version);
 
 		if (this.population.isStreaming()) {
@@ -101,8 +91,6 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 			writeStartPlans();
 		}
 	}
-
-
 
 	/**
 	 * Just a helper method to instantiate the correct handler
