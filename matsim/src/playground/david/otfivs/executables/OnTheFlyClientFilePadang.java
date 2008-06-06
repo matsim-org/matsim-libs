@@ -7,21 +7,21 @@ import java.rmi.RemoteException;
 import javax.swing.JFrame;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.vis.otfivs.data.OTFClientQuad;
-import org.matsim.utils.vis.otfivs.data.OTFConnectionManager;
-import org.matsim.utils.vis.otfivs.gui.OTFVisConfig;
-import org.matsim.utils.vis.otfivs.handler.OTFAgentsListHandler;
-import org.matsim.utils.vis.otfivs.handler.OTFDefaultNodeHandler;
-import org.matsim.utils.vis.otfivs.handler.OTFLinkAgentsHandler;
-import org.matsim.utils.vis.otfivs.handler.OTFLinkAgentsNoParkingHandler;
-import org.matsim.utils.vis.otfivs.interfaces.OTFDrawer;
-import org.matsim.utils.vis.otfivs.opengl.OnTheFlyClientFileQuad;
-import org.matsim.utils.vis.otfivs.opengl.OnTheFlyClientQuad;
-import org.matsim.utils.vis.otfivs.opengl.drawer.OTFOGLDrawer;
-import org.matsim.utils.vis.otfivs.opengl.drawer.SimpleBackgroundDrawer;
-import org.matsim.utils.vis.otfivs.opengl.layer.OGLAgentPointLayer;
-import org.matsim.utils.vis.otfivs.opengl.layer.OGLSimpleBackgroundLayer;
-import org.matsim.utils.vis.otfivs.opengl.layer.SimpleStaticNetLayer;
+import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
+import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.utils.vis.otfvis.handler.OTFDefaultNodeHandler;
+import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
+import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
+import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
+import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.utils.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
+import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.utils.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
+import org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 
 public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{

@@ -1,7 +1,7 @@
 package playground.kai.otfvis;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.vis.otfivs.opengl.OnTheFlyClientQuad;
+import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
 
 public class OnTheFlyClientFileTveh {
 

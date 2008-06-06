@@ -30,7 +30,7 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.otfivs.server.OTFQuadFileHandler;
+import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.world.World;
 
 import playground.david.otfivs.executables.OnTheFlyQueueSim;

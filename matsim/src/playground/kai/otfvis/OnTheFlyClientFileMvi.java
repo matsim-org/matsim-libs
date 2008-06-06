@@ -1,6 +1,6 @@
 package playground.kai.otfvis;
 
-import org.matsim.utils.vis.otfivs.opengl.OnTheFlyClientFileQuad;
+import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 
 public class OnTheFlyClientFileMvi 
 {

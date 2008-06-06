@@ -24,7 +24,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.vis.otfivs.executables.OTFEvent2MVI;
+import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
 import org.matsim.world.World;
 
 

@@ -45,7 +45,7 @@ import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
-import org.matsim.utils.vis.otfivs.server.OTFQuadFileHandler;
+import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;

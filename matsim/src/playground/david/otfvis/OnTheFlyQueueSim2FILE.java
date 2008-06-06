@@ -33,8 +33,8 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.NetVis;
-import org.matsim.utils.vis.otfivs.server.OTFQuadFileHandler;
-import org.matsim.utils.vis.otfivs.server.OnTheFlyServer;
+import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
+import org.matsim.utils.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 

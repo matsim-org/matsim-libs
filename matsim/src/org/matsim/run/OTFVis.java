@@ -27,9 +27,9 @@ import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.ScenarioData;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.vis.otfivs.opengl.OnTheFlyClientFileQuad;
-import org.matsim.utils.vis.otfivs.opengl.OnTheFlyClientQuad;
-import org.matsim.utils.vis.otfivs.opengl.OnTheFlyQueueSimQuad;
+import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
+import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.utils.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 
 
 /**

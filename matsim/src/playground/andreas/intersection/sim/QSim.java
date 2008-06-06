@@ -44,11 +44,11 @@ import org.matsim.trafficlights.data.SignalGroupDefinitionParser;
 import org.matsim.trafficlights.data.SignalSystemConfiguration;
 import org.matsim.trafficlights.data.SignalSystemConfigurationParser;
 import org.matsim.trafficlights.data.TrafficLightsManager;
-import org.matsim.utils.vis.otfivs.executables.OnTheFlyClientQuadSwing;
-import org.matsim.utils.vis.otfivs.gui.PreferencesDialog;
-import org.matsim.utils.vis.otfivs.opengl.OnTheFlyClientQuad;
-import org.matsim.utils.vis.otfivs.opengl.gui.PreferencesDialog2;
-import org.matsim.utils.vis.otfivs.server.OnTheFlyServer;
+import org.matsim.utils.vis.otfvis.executables.OnTheFlyClientQuadSwing;
+import org.matsim.utils.vis.otfvis.gui.PreferencesDialog;
+import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;
+import org.matsim.utils.vis.otfvis.server.OnTheFlyServer;
 import org.xml.sax.SAXException;
 
 import playground.andreas.intersection.tl.SignalSystemControlerImpl;
