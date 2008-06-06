@@ -48,7 +48,7 @@ public class PlanRandomizeLocations {
 		String facilitiesfilePath=args[2];
 		*/
 		String plansfilePath="./input/plans.xml.gz";
-		String networkfilePath="./input/ivt-changed-wu.xml";
+		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
 
 
