@@ -23,19 +23,19 @@ package org.matsim.basic.v01;
 import org.matsim.facilities.Facility;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.utils.geometry.CoordI;
+
 /**
  *
  * @author dgrether
- *
  */
 public interface BasicAct {
 
 	public BasicLink getLink();
 
 	public void setLink(final BasicLink link);
-	
+
 	public Facility getFacility();
-	
+
 	public void setFacility(final Facility facility);
 
 	public double getEndTime();
@@ -43,24 +43,19 @@ public interface BasicAct {
 	public void setEndTime(final double endTime);
 
 	public String getType();
-	
+
 	public void setType(final String type);
 
 	public CoordI getCoord();
-	
-	public void setCoord(CoordI coordinates);
-	
-	public double getStartTime();
-	
-	public void setStartTime(double time);
-	
-//	public double getDuration();
-	
-//	public void setDuration(double duration);
-	
-	public int getRefId();
-	
-	public void setRefId(final int refId);
 
-	
+	public void setCoord(CoordI coordinates);
+
+	public double getStartTime();
+
+	public void setStartTime(double time);
+
+//	public double getDuration();
+
+//	public void setDuration(double duration);
+
 }

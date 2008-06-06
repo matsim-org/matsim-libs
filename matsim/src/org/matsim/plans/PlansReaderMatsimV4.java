@@ -254,7 +254,7 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 			double score = Double.parseDouble(scoreString);
 			this.currplan.setScore(score);
 		}
-		
+
 		String type = atts.getValue("type");
 		if (type == null) {
 			this.currplan.setType(Plan.Type.UNDEFINED);
@@ -287,9 +287,6 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 		try {
 			this.curract = this.currplan.createAct(atts.getValue("type"), atts.getValue("x"), atts.getValue("y"), atts.getValue("link"),
 																						 atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"),null);
-			if (atts.getValue("ref_id") != null) {
-				this.curract.setRefId(Integer.parseInt(atts.getValue("ref_id")));
-			}
 			if (atts.getValue("facility") != null) {
 				this.curract.setFacility(atts.getValue("facility"));
 			}

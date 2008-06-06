@@ -33,9 +33,8 @@ public class BasicActImpl implements BasicAct {
 	protected BasicLink link = null;
 	protected Facility facility = null;
 
-	private int refId = Integer.MIN_VALUE;
 	private CoordI coord = null;
-	
+
 	protected double startTime = Time.UNDEFINED_TIME;
 	protected double dur = Time.UNDEFINED_TIME;
 
@@ -50,7 +49,7 @@ public class BasicActImpl implements BasicAct {
 	public BasicLink getLink() {
 		return this.link;
 	}
-	
+
 	public Facility getFacility() {
 		return this.facility;
 	}
@@ -66,7 +65,7 @@ public class BasicActImpl implements BasicAct {
 	public final void setLink(final BasicLink link) {
 		this.link = link;
 	}
-	
+
 	public final void setFacility(final Facility facility) {
 		this.facility = facility;
 	}
@@ -75,17 +74,8 @@ public class BasicActImpl implements BasicAct {
 		return this.coord;
 	}
 
-	public final int getRefId() {
-		return this.refId;
-	}
-
-
 	public void setCoord(final CoordI coord) {
 		this.coord = coord;
-	}
-
-	public final void setRefId(final int refId) {
-		this.refId = refId;
 	}
 
 	public final double getStartTime() {
@@ -97,14 +87,14 @@ public class BasicActImpl implements BasicAct {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (!(o instanceof BasicAct)) {
 			return false;
 		}
 		BasicAct other = (BasicAct) o;
 
 		// now it's getting complicated, as link is optional
-		if (((other.getLink() == null) && (this.link != null)) 
+		if (((other.getLink() == null) && (this.link != null))
 				|| ((other.getLink() != null) && (this.link == null))) {
 			// one of the link's is null, the other not, so the acts cannot be equal
 			return false;
@@ -125,5 +115,5 @@ public class BasicActImpl implements BasicAct {
 		return this.type.hashCode() ^ this.link.getId().toString().hashCode(); // XOR of two hashes
 	}
 
-	
+
 }

@@ -37,7 +37,7 @@ public class PlansReaderKutter implements PlansReaderI {
 
 	private final static double ANTEIL = 10; // (1/ANTEIL) of the kutter-data will be used; 1 = 100%, 2 = 50%, 10 = 10%
 
-	private final Plans population;
+	/*package*/ final Plans population;
 	private final PersonRowHandler rowHandler = new PersonRowHandler();
 	private final TabularFileParser parser = new TabularFileParser();
 	private final TabularFileParserConfig parserConfig = new TabularFileParserConfig();
@@ -185,7 +185,7 @@ public class PlansReaderKutter implements PlansReaderI {
 			this.cnt = 0;
 		}
 
-		private final Person parsePerson(final String[] row) {
+		private final Person parsePerson() {
 			String id = Long.toString(this.idCnt);
 			this.idCnt++;
 			this.cnt++;
@@ -229,8 +229,7 @@ public class PlansReaderKutter implements PlansReaderI {
 				if (!skipActivity) {
 					this.currPlan.createLeg(mode, this.currTime, travTime, arrTime);
 					this.currTime = this.currTime + duration;
-					Act act = this.currPlan.createAct(activity, coord.getX(), coord.getY(), null/*link*/, arrTime, this.currTime, duration, false);
-					act.setRefId(cellid);
+					this.currPlan.createAct(activity, coord.getX(), coord.getY(), null/*link*/, arrTime, this.currTime, duration, false);
 				}
 			} catch (Exception e) {
 				Gbl.errorMsg(e);
@@ -287,8 +286,7 @@ public class PlansReaderKutter implements PlansReaderI {
 				}
 
 
-				Act act = this.currPlan.createAct("home", this.currHome.getX(), this.currHome.getY(), null/*link*/, 0, (int)duration, (int)duration, false);
-				act.setRefId(Integer.parseInt(homeCell));
+				this.currPlan.createAct("home", this.currHome.getX(), this.currHome.getY(), null/*link*/, 0, (int)duration, (int)duration, false);
 				this.currTime = (int)duration;
 			} catch (Exception e) {
 				Gbl.errorMsg(e);
@@ -343,7 +341,7 @@ public class PlansReaderKutter implements PlansReaderI {
 
 			this.currentSum = this.currentSum + freq;
 			while (this.currentSum >= ANTEIL) {
-				this.currPerson = parsePerson(row);
+				this.currPerson = parsePerson();
 				parsePlan(row);
 				try {
 					PlansReaderKutter.this.population.addPerson(this.currPerson);
@@ -359,5 +357,5 @@ public class PlansReaderKutter implements PlansReaderI {
 				this.currentSum -= ANTEIL;
 			}
 		}
-	};
+	}
 }

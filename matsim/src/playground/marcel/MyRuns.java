@@ -1364,60 +1364,6 @@ public class MyRuns {
 		System.out.println();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// calcODMatrices
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcODMatrix(final String[] args) {
-
-		System.out.println("RUN: calcODMatrix");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.getWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final Plans plans = new Plans(Plans.USE_STREAMING);
-		final PlansReaderI plansReader = new MatsimPlansReader(plans);
-		final ODMatrix calcOD = new ODMatrix("od_0-24");
-		plans.addAlgorithm(calcOD);
-		System.out.println("  done.");
-
-		System.out.println("  reading, processing plans...");
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
-		System.out.println("  done.");
-
-		System.out.println("  writing matrices... ");
-		final MatricesWriter matrices_writer = new MatricesWriter(Matrices.getSingleton());
-		matrices_writer.write();
-		System.out.println("  done.");
-
-		System.out.println("  writing VISUM file... ");
-		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
-		final Set<Id> ids = new TreeSet<Id>();
-		for (final Iterator<? extends Location> iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
-			final Location loc = iter.next();
-			ids.add(loc.getId());
-		}
-		final VisumMatrixWriter writer = new VisumMatrixWriter(calcOD.getMatrix());
-		writer.setIds(ids);
-		writer.writeFile(calcOD.getMatrix().getId() + ".fma");
-		System.out.println("  done.");
-
-		System.out.println("RUN: calcODMatrix finished.");
-		System.out.println();
-	}
 
 	//////////////////////////////////////////////////////////////////////
 	// calcODMatrices
@@ -1441,15 +1387,6 @@ public class MyRuns {
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
-		Plans population = null;
-
-		System.out.println("  reading plans...");
-		population = new Plans(Plans.NO_STREAMING);
-		final PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(config.plans().getInputFile());
-		population.printPlansCount();
-		System.out.println("  done.");
-
 		// events
 		System.out.println("  creating events object... ");
 		final Events events = new Events();
@@ -1459,7 +1396,7 @@ public class MyRuns {
 		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
 		final ArrayList<CalcODMatrices> odcalcs = new ArrayList<CalcODMatrices>();
 		for (int i = 0; i < 30; i++) {
-			final CalcODMatrices odcalc = new CalcODMatrices(network, tvz, population, "od_" + i + "-" + (i + 1));
+			final CalcODMatrices odcalc = new CalcODMatrices(network, tvz, "od_" + i + "-" + (i + 1));
 			odcalc.setTimeRange(i*3600, (i+1)*3600);
 			events.addHandler(odcalc);
 			odcalcs.add(odcalc);
@@ -1493,141 +1430,6 @@ public class MyRuns {
 		System.out.println("RUN: calc1hODMatrices finished.");
 		System.out.println();
 	}
-
-
-	//////////////////////////////////////////////////////////////////////
-	// calcODMatrixBezirke
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calcODMatrixBezirke(final String[] args) {
-
-		System.out.println("RUN: calcODMatrixBezirke");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.getWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final Plans plans = new Plans(Plans.USE_STREAMING);
-		final PlansReaderI plansReader = new MatsimPlansReader(plans);
-		final ODMatrixBezirke calcOD = new ODMatrixBezirke("od_0-24");
-		plans.addAlgorithm(calcOD);
-		System.out.println("  done.");
-
-		System.out.println("  reading, processing plans...");
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
-		System.out.println("  done.");
-
-		System.out.println("  writing matrices... ");
-		final MatricesWriter matrices_writer = new MatricesWriter(Matrices.getSingleton());
-		matrices_writer.write();
-		System.out.println("  done.");
-
-		System.out.println("  writing VISUM file... ");
-		final ZoneLayer tvz = (ZoneLayer)world.getLayer("bezirke");
-		final Set<Id> ids = new TreeSet<Id>();
-		for (final Iterator<? extends Location> iter = tvz.getLocations().values().iterator(); iter.hasNext(); ) {
-			final Location loc = iter.next();
-			if (Integer.parseInt(loc.getId().toString()) < 24) {
-				ids.add(loc.getId());
-			}
-		}
-		final VisumMatrixWriter writer = new VisumMatrixWriter(calcOD.getMatrix());
-		writer.setIds(ids);
-		writer.writeFile(calcOD.getMatrix().getId() + ".fma");
-		System.out.println("  done.");
-
-		System.out.println("RUN: calcODMatrixBezirke finished.");
-		System.out.println();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// calc1hODMatrixBezirke
-	//////////////////////////////////////////////////////////////////////
-
-	public static void calc1hODMatricesBezirke(final String[] args) {
-
-		System.out.println("RUN: calc1hODMatricesBezirke");
-
-		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.getWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		Plans population = null;
-
-		System.out.println("  reading plans...");
-		population = new Plans(Plans.NO_STREAMING);
-		final PlansReaderI plansReader = new MatsimPlansReader(population);
-		plansReader.readFile(config.plans().getInputFile());
-		population.printPlansCount();
-		System.out.println("  done.");
-
-		// events
-		System.out.println("  creating events object... ");
-		final Events events = new Events();
-		System.out.println("  done.");
-
-		System.out.println("  adding events algorithms...");
-		final ZoneLayer tvz = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
-		final ArrayList<CalcODMatricesBezirke> odcalcs = new ArrayList<CalcODMatricesBezirke>();
-		for (int i = 0; i < 30; i++) {
-			final CalcODMatricesBezirke odcalc = new CalcODMatricesBezirke(network, tvz, population, "od_" + i + "-" + (i + 1));
-			odcalc.setTimeRange(i*3600, (i+1)*3600);
-			events.addHandler(odcalc);
-			odcalcs.add(odcalc);
-		}
-		System.out.println("  done");
-
-		// read file, run algos if streaming is on
-		System.out.println("  reading events file and analyzing volumes...");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  writing matrices files... ");
-		final MatricesWriter matrices_writer = new MatricesWriter(Matrices.getSingleton());
-		matrices_writer.write();
-		final ZoneLayer bezirke = (ZoneLayer)world.getLayer(new IdImpl("bezirke"));
-		final Set<Id> ids = new TreeSet<Id>();
-		for (final Iterator<? extends Location> iter = bezirke.getLocations().values().iterator(); iter.hasNext(); ) {
-			final Location loc = iter.next();
-			if (Integer.parseInt(loc.getId().toString()) < 24) {
-				ids.add(loc.getId());
-			}
-		}
-		for (final CalcODMatricesBezirke odcalc : odcalcs) {
-			final String filename = odcalc.getMatrix().getId() + ".fma";
-			System.out.println("    writing file: " + filename + "   (" + odcalc.counter + ")");
-			final VisumMatrixWriter writer = new VisumMatrixWriter(odcalc.getMatrix());
-			writer.setIds(ids);
-			writer.writeFile(filename);
-		}
-		System.out.println("  done.");
-
-		System.out.println("RUN: calc1hODMatricesBezirke finished.");
-		System.out.println();
-	}
-
 
 	//////////////////////////////////////////////////////////////////////
 	// convertMatrices
@@ -2644,10 +2446,7 @@ public class MyRuns {
 /* ***   A N A L Y S I S   *** */
 
 		/* ***   VOLUMES   *** */
-//		calcODMatrix(args); // calcs OD matrix 0-24h from Plans, using 1004 tvz from Berlin
 //		calc1hODMatrices(args);		// calcs 1h OD matrices from plans and events, using 1004 tvz from Berlin
-//		calcODMatrixBezirke(args);	// calcs OD matrix 0-24h from Plans, using Bezirke 1-23 instead of tvz within Berlin
-//		calc1hODMatricesBezirke(args);	// calcs OD matrix for single hours from Plans, using Bezirke 1-23 instead of tvz within Berlin
 
 		/* ***   PLANS   *** */
 //		calcPlanStatistics(args);

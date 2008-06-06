@@ -23,8 +23,6 @@ package org.matsim.events.algorithms;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
@@ -34,10 +32,6 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
 import org.matsim.world.ZoneLayer;
@@ -46,7 +40,6 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 
 	private final NetworkLayer network;
 	private final ZoneLayer tvzLayer;
-	private final Plans population;
 	private final TreeMap<String, Location> agents = new TreeMap<String, Location>(); // <AgentID, StartLoc>
 	private final TreeMap<String, Double> agentstime = new TreeMap<String, Double>();
 	private final Matrix matrix;
@@ -54,12 +47,9 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 	private double maxTime = Double.POSITIVE_INFINITY;//Integer.MAX_VALUE;
 	public int counter = 0;
 
-	private final static Logger log = Logger.getLogger(CalcODMatrices.class);
-
-	public CalcODMatrices(final NetworkLayer network, final ZoneLayer tvzLayer, final Plans population, final String id) {
+	public CalcODMatrices(final NetworkLayer network, final ZoneLayer tvzLayer, final String id) {
 		this.network = network;
 		this.tvzLayer = tvzLayer;
-		this.population = population;
 		this.matrix = Matrices.getSingleton().createMatrix(id, tvzLayer, "od for miv");
 	}
 
@@ -72,7 +62,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 		if ((time < this.minTime) || (time >= this.maxTime)) {
 			return;
 		}
-		Location fromLoc = getLocation(event.agentId, event.linkId);
+		Location fromLoc = getLocation(event.linkId);
 		if (fromLoc != null) {
 			String agentId = event.agentId;
 			this.agents.put(agentId, fromLoc);
@@ -91,7 +81,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 			// we have no information on where the agent started
 			return;
 		}
-		Location toLoc = getLocation(event.agentId, event.linkId);
+		Location toLoc = getLocation(event.linkId);
 		if (toLoc != null) {
 			this.agents.remove(agentId);
 			Entry entry = this.matrix.getEntry(fromLoc, toLoc);
@@ -121,27 +111,12 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 	}
 
 	public void reset(final int iteration) {
+		// nothing to do
 	}
 
-
-	private Location getLocation(final String agentId, final String linkId) {
+	private Location getLocation(final String linkId) {
 		Link link = (Link)this.network.getLocation(linkId);
 
-		if (this.population != null) {
-			// let's try to find the cell from the plans
-			Person person = this.population.getPerson(agentId);
-			if (person != null) {
-				Plan plan = person.getSelectedPlan();
-				for (int i = 0, max = plan.getActsLegs().size(); i < max; i += 2) {
-					Act act = (Act)plan.getActsLegs().get(i);
-					if (act.getLink().getId().equals(new IdImpl(linkId)) && (act.getRefId() != Integer.MIN_VALUE)) {
-						return this.tvzLayer.getLocation(act.getRefId());
-					}
-				}
-			}
-			log.warn("No tvz-cell found for link " + linkId + " and agent " + agentId);
-		}
-		// okay, we did not find the cell from the plans, so just get the nearest one.
 		ArrayList<Location> locs = this.tvzLayer.getNearestLocations(link.getCenter(), null);
 		if (locs.size() > 0) {
 			return locs.get(0);

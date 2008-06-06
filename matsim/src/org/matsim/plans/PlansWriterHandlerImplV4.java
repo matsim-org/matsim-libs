@@ -254,8 +254,6 @@ public class PlansWriterHandlerImplV4 implements PlansWriterHandler {
 			out.write(" dur=\"" + Time.writeTime(act.getDur()) + "\"");
 		if (act.getEndTime() != Time.UNDEFINED_TIME)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
-		if (act.getRefId() != Integer.MIN_VALUE)
-			out.write(" ref_id=\"" + act.getRefId() + "\"");
 		out.write(" />\n");
 	}
 

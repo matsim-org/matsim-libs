@@ -99,7 +99,6 @@ public class Act extends BasicActImpl implements Serializable {
 		this.endTime = act.endTime;
 		this.dur = act.dur;
 		this.isPrimary = act.isPrimary;
-		this.setRefId(act.getRefId());
 		this.setFacility(act.getFacility());
 	}
 
@@ -121,14 +120,14 @@ public class Act extends BasicActImpl implements Serializable {
 		this.facility = (Facility)facilities.getLocation(f_id);
 		if (this.facility == null) { throw new RuntimeException("facility id="+f_id+" does not exist"); }
 	}
-	
+
 	protected void setLinkFromString(final String link) {
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		if (network == null) {
 			throw new RuntimeException("Network layer does not exist");
 		}
 		this.link = (Link)network.getLocation(link);
-		
+
 		if (this.link == null) {
 			throw new RuntimeException("link=" + link +" does not exist");
 		}
