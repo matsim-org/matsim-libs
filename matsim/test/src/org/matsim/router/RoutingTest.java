@@ -38,6 +38,7 @@ import org.matsim.router.util.TravelMinCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
+import org.matsim.world.World;
 
 public class RoutingTest extends MatsimTestCase {
 
@@ -111,7 +112,7 @@ public class RoutingTest extends MatsimTestCase {
 
 	private void doTest(final RouterProvider provider) {
 		Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
-		init(config);
+		init(config, Gbl.createWorld());
 
 		String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
 
@@ -125,10 +126,10 @@ public class RoutingTest extends MatsimTestCase {
 		System.out.println();
 	}
 
-	private void init(final Config config) {
+	private void init(final Config config, final World world) {
 		if (this.initRan) return;
 
-		this.network = readNetwork(config.network().getInputFile());
+		this.network = readNetwork(config.network().getInputFile(), world);
 		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		this.population = readPlans(inPlansName);
 		this.referenceChecksum = CRCChecksum.getCRCFromGZFile(inPlansName);
@@ -145,9 +146,9 @@ public class RoutingTest extends MatsimTestCase {
 		return plans;
 	}
 
-	private NetworkLayer readNetwork(final String filename) {
+	private NetworkLayer readNetwork(final String filename, final World world) {
 		System.out.println("  reading the network...");
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = (NetworkLayer) world.createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(filename);
 		System.out.println("  done.");
 		return network;

@@ -46,8 +46,8 @@ public class EventFilterTestLaerm {
 	 */
 	public static void testRunTraVolCal() throws IOException {
 
-		World world = Gbl.getWorld();
 		Config config = Gbl.getConfig();
+		final World world = Gbl.createWorld();
 
 		// network
 		System.out.println("  creating network object... ");

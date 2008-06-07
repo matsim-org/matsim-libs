@@ -53,7 +53,7 @@ public class TriangleTest extends MatsimTestCase {
 	//////////////////////////////////////////////////////////////////////
 
 	private Config config = null;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -115,8 +115,8 @@ public class TriangleTest extends MatsimTestCase {
 
 		System.out.println("running testParserWriter1()...");
 
-		final World world = Gbl.getWorld();
-		
+		final World world = Gbl.createWorld();
+
 		System.out.println("  reading world xml file... ");
 		new MatsimWorldReader(world).readFile(this.config.world().getInputFile());
 		System.out.println("  done.");
@@ -134,14 +134,14 @@ public class TriangleTest extends MatsimTestCase {
 		System.out.println();
 		System.out.println("1. VALIDATE AND COMPLETE THE WORLD");
 		System.out.println();
-		
+
 		System.out.println("  running world modules... ");
 		new WorldCheck().run(world);
 		new WorldBottom2TopCompletion().run(world);
 		new WorldValidation().run(world);
 		new WorldCheck().run(world);
 		System.out.println("  done.");
-		
+
 		System.out.println();
 		System.out.println("2. SUMMARY INFORMATION OF THE NETWORK");
 		System.out.println();

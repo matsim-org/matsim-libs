@@ -20,7 +20,6 @@
 
 package org.matsim.plans.filters;
 
-import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -32,12 +31,13 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.Route;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.world.World;
 
 public class RouteLinkFilterTest extends MatsimTestCase {
 
 	public void testRouteLinkFilter() {
 		loadConfig(null); // used to set the default dtd-location
-		Plans population = getTestPopulation();
+		Plans population = getTestPopulation(Gbl.createWorld());
 
 		TestAlgorithm tester = new TestAlgorithm();
 
@@ -50,10 +50,11 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		assertEquals(2, linkFilter.getCount());
 	}
 
-	private Plans getTestPopulation() {
+	private Plans getTestPopulation(final
+			World world) {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
-		Gbl.getWorld().setNetworkLayer(network);
+		world.setNetworkLayer(network);
 
 		Plans population = new Plans(Plans.NO_STREAMING);
 

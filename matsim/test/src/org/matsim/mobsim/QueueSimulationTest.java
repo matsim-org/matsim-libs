@@ -26,7 +26,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.events.EventLinkEnter;
@@ -56,7 +55,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Config config = Gbl.createConfig(null);
 		config.simulation().setFlowCapFactor(1.0);
 		config.simulation().setStorageCapFactor(1.0);
-		World world = Gbl.getWorld();
+		World world = Gbl.createWorld();
 
 		/* build network */
 		NetworkLayer network = new NetworkLayer();
@@ -143,7 +142,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Config config = Gbl.createConfig(null);
 		config.simulation().setFlowCapFactor(1.0);
 		config.simulation().setStorageCapFactor(1.0);
-		World world = Gbl.getWorld();
+		World world = Gbl.createWorld();
 
 		/* build network */
 		NetworkLayer network = new NetworkLayer();
@@ -219,7 +218,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Config config = Gbl.createConfig(null);
 		config.simulation().setFlowCapFactor(1.0);
 		config.simulation().setStorageCapFactor(1.0);
-		World world = Gbl.getWorld();
+		World world = Gbl.createWorld();
 
 		/* build network */
 		NetworkLayer network = new NetworkLayer();
@@ -363,7 +362,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Config config = Gbl.createConfig(null);
 		config.simulation().setFlowCapFactor(1.0);
 		config.simulation().setStorageCapFactor(1.0);
-		World world = Gbl.getWorld();
+		World world = Gbl.createWorld();
 
 		/* build network */
 		NetworkLayer network = new NetworkLayer();

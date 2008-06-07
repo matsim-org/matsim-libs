@@ -38,6 +38,7 @@ import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
 
 public class KtiSpeedTest {
 
@@ -56,21 +57,22 @@ public class KtiSpeedTest {
 
 		System.out.println("RUN: calcRouteMTwithTimes");
 
-		Config config = Gbl.createConfig(args);
+		final Config config = Gbl.createConfig(args);
+		final World world = Gbl.createWorld();
 
 		System.out.println("  reading world... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
+		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 

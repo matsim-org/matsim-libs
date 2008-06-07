@@ -28,6 +28,7 @@ import org.matsim.plans.Plans;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.world.World;
 
 /**
  * Tests {@link RoadPricingScoringFunction} that it correctly scores the executed plans, respecting eventual tolls.
@@ -44,9 +45,10 @@ public class RoadPricingScoringFunctionTest extends MatsimTestCase {
 
 	public void testDistanceToll() {
 		final String tollFile = this.getClassInputDirectory() + "/roadpricing1.xml";
+		final World world = Gbl.createWorld();
 
-		Plans referencePopulation = Fixture.createReferencePopulation1();
-		Plans population = runTollSimulation(tollFile, "distance");
+		Plans referencePopulation = Fixture.createReferencePopulation1(world);
+		Plans population = runTollSimulation(tollFile, "distance", world);
 
 		compareScores(
 				referencePopulation.getPerson("1").getPlans().get(0).getScore(),
@@ -72,9 +74,10 @@ public class RoadPricingScoringFunctionTest extends MatsimTestCase {
 
 	public void testAreaToll() {
 		final String tollFile = this.getClassInputDirectory() + "/roadpricing2.xml";
+		final World world = Gbl.createWorld();
 
-		Plans referencePopulation = Fixture.createReferencePopulation1();
-		Plans population = runTollSimulation(tollFile, "area");
+		Plans referencePopulation = Fixture.createReferencePopulation1(world);
+		Plans population = runTollSimulation(tollFile, "area", world);
 
 		compareScores(
 				referencePopulation.getPerson("1").getPlans().get(0).getScore(),
@@ -112,9 +115,10 @@ public class RoadPricingScoringFunctionTest extends MatsimTestCase {
 
 	public void testCordonToll() {
 		final String tollFile = this.getClassInputDirectory() + "/roadpricing3.xml";
+		final World world = Gbl.createWorld();
 
-		Plans referencePopulation = Fixture.createReferencePopulation1();
-		Plans population = runTollSimulation(tollFile, "cordon");
+		Plans referencePopulation = Fixture.createReferencePopulation1(world);
+		Plans population = runTollSimulation(tollFile, "cordon", world);
 
 		compareScores(
 				referencePopulation.getPerson("1").getPlans().get(0).getScore(),
@@ -153,9 +157,9 @@ public class RoadPricingScoringFunctionTest extends MatsimTestCase {
 		assertEquals(expectedToll, scoreWithoutToll - scoreWithToll, 1e-8);
 	}
 
-	private Plans runTollSimulation(final String tollFile, final String tollType) {
+	private Plans runTollSimulation(final String tollFile, final String tollType, final World world) {
 		NetworkLayer network = Fixture.createNetwork1();
-		Gbl.getWorld().setNetworkLayer(network);
+		world.setNetworkLayer(network);
 
 		try {
 			RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(network);

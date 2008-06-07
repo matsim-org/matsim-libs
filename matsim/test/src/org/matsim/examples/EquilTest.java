@@ -45,7 +45,7 @@ public class EquilTest extends MatsimTestCase {
 		String eventsFileName = getOutputDirectory() + "eventsFile.xml";
 		String referenceFileName = getInputDirectory() + "events.xml.gz";
 
-		World world = Gbl.getWorld();
+		World world = Gbl.createWorld();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);

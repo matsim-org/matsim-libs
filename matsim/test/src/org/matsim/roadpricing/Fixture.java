@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -35,6 +34,7 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.Route;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
+import org.matsim.world.World;
 
 /**
  * Some static methods to set up the road pricing scenarios in the test cases.
@@ -177,11 +177,11 @@ public class Fixture {
 		return person;
 	}
 
-	public static Plans createReferencePopulation1() {
+	public static Plans createReferencePopulation1(final World world) {
 		// run mobsim once without toll and get score for network1/population1
 		try {
 			NetworkLayer network = createNetwork1();
-			Gbl.getWorld().setNetworkLayer(network);
+			world.setNetworkLayer(network);
 			Plans referencePopulation = Fixture.createPopulation1();
 			Events events = new Events();
 			EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory());

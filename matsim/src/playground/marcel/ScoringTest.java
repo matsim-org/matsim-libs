@@ -39,7 +39,7 @@ public class ScoringTest {
 		Gbl.createConfig(new String[] {"../mystudies/scoringtest/config.xml"});
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("examples/equil/network.xml");
-		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.createWorld().setNetworkLayer(network);
 		Plans population = new Plans(Plans.NO_STREAMING);
 		new MatsimPlansReader(population).readFile("../mystudies/scoringtest/plans.xml");
 

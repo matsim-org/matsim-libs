@@ -33,6 +33,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriterHandlerImplTLinks;
 import org.matsim.network.NetworkWriterHandlerImplTNodes;
+import org.matsim.world.World;
 
 public class CreateTransimsNetwork {
 
@@ -63,13 +64,14 @@ public class CreateTransimsNetwork {
 			return;
 		}
 
-		Config config = Gbl.createConfig(null);
+		final Config config = Gbl.createConfig(null);
 		config.addCoreModules();
 		config.global().setLocalDtdBase("dtd/");
+		final World world = Gbl.createWorld();
 
 		System.out.println("reading network from " + this.networkFileName);
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(this.networkFileName);
 
 		if (network.getNode("0") != null) {

@@ -62,6 +62,7 @@ import org.xml.sax.SAXException;
  * to debug. We would thus prefer if Gbl.getConfig() could be removed in
  * the longer term and the config-object, or single params from the config,
  * could be handed as parameters where needed. // VSP/mrieser, 11sep2007
+ * The same holds true for Gbl.getConfig(). // VSP/mrieser, 06jun2008
  */
 
 public abstract class Gbl {

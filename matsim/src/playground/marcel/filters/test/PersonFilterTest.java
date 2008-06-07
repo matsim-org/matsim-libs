@@ -43,7 +43,7 @@ public class PersonFilterTest {
 		System.out.println("TEST RUN ---FilterTest---:");
 		// reading all available input
 		System.out.println("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
+		NetworkLayer network = (NetworkLayer) Gbl.createWorld().createLayer(
 				NetworkLayer.LAYER_TYPE, null);
 		System.out.println("  done.");
 

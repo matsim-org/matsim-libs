@@ -45,8 +45,8 @@ public class EventFilterTestTraVol_mit_Maut {
 
 	public static void testRunTraVolCal_mit_Maut() throws IOException {
 
-		World world = Gbl.getWorld();
-		Config config = Gbl.getConfig();
+		final Config config = Gbl.getConfig();
+		final World world = Gbl.createWorld();
 
 		// network
 		System.out.println("  creating network object... ");

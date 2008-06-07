@@ -23,7 +23,6 @@ package org.matsim.integration.timevariantnetworks;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
@@ -46,6 +45,7 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.Route;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
+import org.matsim.world.World;
 
 /**
  * Tests that the QueueSimulation takes a TimeVariant Network into account.
@@ -56,12 +56,13 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 
 	public void testFreespeed() throws Exception {
 		loadConfig(null);
+		World world = Gbl.createWorld();
 
-		NetworkLayer network = createNetwork();
+		NetworkLayer network = createNetwork(world);
 		Link link1 = network.getLink("1");
 		Link link2 = network.getLink("2");
 		Link link3 = network.getLink("3");
-		
+
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
 		change.addLink(link2);
@@ -74,7 +75,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		Person person2 = createPersons(9*3600, link1, link3, 1).get(0);
 		plans.addPerson(person1);
 		plans.addPerson(person2);
-		
+
 		// run the simulation with the timevariant network and the two persons
 		Events events = new Events();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2);
@@ -90,17 +91,18 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	/**
 	 * Test the queue simulation for correct behavior if capacity of links is
 	 * reduced during the run.
-	 * 
+	 *
 	 * @throws Exception
 	 * @author illenberger
 	 */
 	public void testCapacity() throws Exception {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
-		
-		loadConfig(null);
 
-		NetworkLayer network = createNetwork();
+		loadConfig(null);
+		final World world = Gbl.createWorld();
+
+		NetworkLayer network = createNetwork(world);
 		Link link1 = network.getLink("1");
 		Link link2 = network.getLink("2");
 		Link link3 = network.getLink("3");
@@ -126,7 +128,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		for(Person p : persons1)
 			plans.addPerson(p);
 		Person person1 = persons1.get(personsPerWave - 1);
-		
+
 		List<Person> persons2 = createPersons(3600, link1, link3, personsPerWave);
 		for(Person p : persons2)
 			plans.addPerson(p);
@@ -149,21 +151,22 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		assertEquals("Person 2 should travel for 11 seconds.", 10.0 + 1.0, ttcalc.person2leaveTime - ttcalc.person2enterTime, EPSILON);
 
 	}
-	
+
 	/**
 	 * Creates a network with three links of length 100 m, capacity 3600 veh/h
 	 * and freespeed 10 m/s.
-	 * 
+	 *
+	 * @param world the world the network should belong to
 	 * @return a network.
 	 * @author illenberger
 	 */
-	private NetworkLayer createNetwork() {
+	private NetworkLayer createNetwork(final World world) {
 		// create a network
 		NetworkFactory nf = new NetworkFactory();
 		nf.setLinkPrototype(TimeVariantLinkImpl.class);
 		final NetworkLayer network = new NetworkLayer(nf);
 		network.setCapacityPeriod(3600.0);
-		Gbl.getWorld().setNetworkLayer(network);
+		world.setNetworkLayer(network);
 
 		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
 		network.createNode("1", "0", "0", null);
@@ -176,7 +179,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 
 		return network;
 	}
-	
+
 	/**
 	 * Creates <tt>count</tt> persons with departure time
 	 * <tt>depTime<tt> + index(person).
@@ -188,7 +191,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @throws Exception
 	 * @author illenberger
 	 */
-	private List<Person> createPersons(double depTime, final Link depLink, final Link destLink, 
+	private List<Person> createPersons(double depTime, final Link depLink, final Link destLink,
 			final int count) throws Exception {
 		List<Person> persons = new ArrayList<Person>(count);
 		for(int i = 0; i < count; i++) {
@@ -200,7 +203,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			route.setRoute("2 3");
 			leg1.setRoute(route);
 			plan1.createAct("w", 300, 0, destLink, depTime+10, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, true);
-			
+
 			persons.add(person);
 			depTime++;
 		}

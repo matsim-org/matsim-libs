@@ -56,7 +56,7 @@ public class ControlerTest extends MatsimTestCase {
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
 		NetworkLayer network = new NetworkLayer();
-		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.createWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
 		network.createNode("1",  "-100.0", "0.0", null);
 		network.createNode("2",     "0.0", "0.0", null);
@@ -148,7 +148,7 @@ public class ControlerTest extends MatsimTestCase {
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
 		NetworkLayer network = new NetworkLayer();
-		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.createWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
 		network.createNode("1",  "-100.0", "0.0", null);
 		network.createNode("2",     "0.0", "0.0", null);
@@ -223,7 +223,7 @@ public class ControlerTest extends MatsimTestCase {
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
 		NetworkLayer network = new NetworkLayer();
-		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.createWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
 		network.createNode("1",  "-100.0", "0.0", null);
 		network.createNode("2",     "0.0", "0.0", null);

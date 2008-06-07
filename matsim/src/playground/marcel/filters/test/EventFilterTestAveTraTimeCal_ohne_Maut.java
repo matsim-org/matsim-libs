@@ -46,8 +46,8 @@ public class EventFilterTestAveTraTimeCal_ohne_Maut {
 
 	public static void testRunAveTraTimeCal() throws IOException {
 
-		World world = Gbl.getWorld();
 		Config config = Gbl.getConfig();
+		final World world = Gbl.createWorld();
 
 		// network
 		System.out.println("  creating network object... ");

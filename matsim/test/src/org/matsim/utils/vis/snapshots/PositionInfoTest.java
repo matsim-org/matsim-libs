@@ -40,7 +40,7 @@ public class PositionInfoTest extends MatsimTestCase {
 	public void testDistanceOnLink_shortLink() {
 
 		NetworkLayer network = new NetworkLayer();
-		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.createWorld().setNetworkLayer(network);
 		network.createNode("1", "0", "0", null);
 		network.createNode("2", "1000", "1000", null);
 		Link link1 = network.createLink("1", "1", "2", "1000", "10", "9999", "1", null, null);
@@ -60,7 +60,7 @@ public class PositionInfoTest extends MatsimTestCase {
 	public void testDistanceOnLink_longLink() {
 
 		NetworkLayer network = new NetworkLayer();
-		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.createWorld().setNetworkLayer(network);
 		network.createNode("1", "0", "0", null);
 		network.createNode("2", "1000", "1000", null);
 		Link link1 = network.createLink("1", "1", "2", "2000", "10", "9999", "1", null, null);

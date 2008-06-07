@@ -38,7 +38,7 @@ import org.matsim.world.World;
 public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(OnePercentBerlin10sTest.class);
-	
+
 	public void testOnePercent10s() {
 		Config config = loadConfig(null);
 		String netFileName = "test/scenarios/berlin/network.xml";
@@ -48,7 +48,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		Gbl.random.setSeed(7411L);
 
-		World world = Gbl.getWorld();
+		World world = Gbl.createWorld();
 		// this needs to be done before reading the network
 		// because QueueLinks timeCap dependents on SIM_TICK_TIME_S
 		config.simulation().setTimeStepSize(10.0);

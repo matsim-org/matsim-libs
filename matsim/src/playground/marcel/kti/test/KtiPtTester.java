@@ -49,7 +49,7 @@ public class KtiPtTester {
 
 	public KtiPtTester(final String[] args) {
 		this.config = Gbl.createConfig(args);
-		this.world = Gbl.getWorld();
+		this.world = Gbl.createWorld();
 		this.data = new ScenarioData(this.config);
 	}
 
