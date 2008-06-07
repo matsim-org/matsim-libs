@@ -166,10 +166,10 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 				nofLegTravelDistanceAvg++;
 			}
 		}
-		log.info("-- avg. leg travel time of the executed plan of each agent: " + (sumLegTravelDistanceExecuted / nofLegTravelDistanceExecuted));
-		log.info("-- avg. leg travel time of the worst plan of each agent: " + (sumLegTravelDistanceWorst / nofLegTravelDistanceWorst));
-		log.info("-- avg. of the avg. leg travel time per agent: " + (sumLegTravelDistanceAvg / nofLegTravelDistanceAvg));
-		log.info("-- avg. leg travel time of the best plan of each agent: " + (sumLegTravelDistanceBest / nofLegTravelDistanceBest));
+		log.info("-- avg. leg travel distance of the executed plan of each agent: " + (sumLegTravelDistanceExecuted / nofLegTravelDistanceExecuted));
+		log.info("-- avg. leg travel distance of the worst plan of each agent: " + (sumLegTravelDistanceWorst / nofLegTravelDistanceWorst));
+		log.info("-- avg. of the avg. leg travel distance per agent: " + (sumLegTravelDistanceAvg / nofLegTravelDistanceAvg));
+		log.info("-- avg. leg travel distance of the best plan of each agent: " + (sumLegTravelDistanceBest / nofLegTravelDistanceBest));
 
 		try {
 			this.out.write(event.getIteration() + "\t" + (sumLegTravelDistanceExecuted / nofLegTravelDistanceExecuted) + "\t" +
@@ -199,7 +199,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 				System.arraycopy(this.history[INDEX_BEST], 0, values, 0, index + 1);
 				chart.addSeries("best plan", iterations, values);
 				System.arraycopy(this.history[INDEX_AVERAGE], 0, values, 0, index + 1);
-				chart.addSeries("avg. of plans'", iterations, values);
+				chart.addSeries("avg. of plans", iterations, values);
 				System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
 				chart.addSeries("executed plan", iterations, values);
 				chart.addMatsimLogo();
