@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
-import playground.gregor.shapeFileToMATSim.ShapeFileReader;
+import playground.gregor.gis.shapeFileProcessing.ShapeFileReader;
 
 public class EvacuationAreaFileGenerator {
 	
