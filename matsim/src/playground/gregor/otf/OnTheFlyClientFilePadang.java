@@ -26,7 +26,8 @@ import org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	
-	private static final String BG_IMG_ROOT = "../vsp-cvs/studies/padang/imagery/sliced/";
+	private static final String CVSROOT = "../vsp-cvs";
+	private static final String BG_IMG_ROOT = CVSROOT + "/studies/padang/imagery/sliced/";
 	
 	public OnTheFlyClientFilePadang(String filename2, OTFConnectionManager connect, boolean split) {
 		super(filename2, connect, split);
@@ -101,8 +102,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 
 		
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
-		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
-//		String filename = "../vsp-cvs/runs/run306/output/ITERS/it.100/100.movie.mvi";
+//		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
+		String filename = "../vsp-cvs/runs/run306/output/ITERS/it.100/100.movie.mvi";
 //		String filename = "./jam/jam.mvi";
 
 		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
