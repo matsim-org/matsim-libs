@@ -27,8 +27,9 @@ public class PlanAssignInitialLocations {
 	private Plans plans=null;
 	private NetworkLayer network=null;
 	private Facilities  facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
-	private final TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
-	private final TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
+	private TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
+	private TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
+	private String outputpath="";
 
 	private final static Logger log = Logger.getLogger(PlanAssignInitialLocations.class);
 
@@ -37,6 +38,7 @@ public class PlanAssignInitialLocations {
 	 * - path to plans file
 	 * - path to network file
 	 * - path to facilities file
+	 * - 0: assign one loc 1: randomize locs
 	 */
 	public static void main(final String[] args) {
 
@@ -49,25 +51,35 @@ public class PlanAssignInitialLocations {
 		String plansfilePath=args[0];
 		String networkfilePath=args[1];
 		String facilitiesfilePath=args[2];
+		int randomize=args[3];
 		*/
+		int randomize=0;
+
 		String plansfilePath="./input/plans.xml.gz";
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
 
 
 		PlanAssignInitialLocations randomizer=new PlanAssignInitialLocations();
-		randomizer.run(plansfilePath, networkfilePath, facilitiesfilePath);
+		randomizer.run(plansfilePath, networkfilePath, facilitiesfilePath, randomize);
 		randomizer.writePlans();
 	}
 
 
-	private void run(final String plansfilePath, final String networkfilePath, final String facilitiesfilePath) {
-		this.init(plansfilePath, networkfilePath, facilitiesfilePath);
-		//this.randomizeLocations();
-		this.assignOneLocation();
+	private void run(final String plansfilePath, final String networkfilePath,
+			final String facilitiesfilePath, final int randomize) {
+		this.init(plansfilePath, networkfilePath, facilitiesfilePath, randomize);
+
+		if (randomize==1) {
+			this.randomizeLocations();
+		}
+		else {
+			this.assignOneLocation();
+		}
 	}
 
-	private void init(final String plansfilePath, final String networkfilePath, final String facilitiesfilePath) {
+	private void init(final String plansfilePath, final String networkfilePath,
+			final String facilitiesfilePath, final int randomize) {
 
 		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
@@ -90,6 +102,14 @@ public class PlanAssignInitialLocations {
 		this.plans=new Plans(false);
 		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
 		plansReader.readFile(plansfilePath);
+
+		if (randomize==1) {
+			this.outputpath="./output/plans_randomized.xml.gz";
+		}
+		else {
+			this.outputpath="./output/plans_oneloc.xml.gz";
+		}
+
 		log.info("plans reading done");
 	}
 
@@ -147,8 +167,8 @@ public class PlanAssignInitialLocations {
 
 
 	private void writePlans() {
-		new PlansWriter(this.plans, "./output/plans_randomized.xml.gz", "v4", 1.0).write();
-		log.info("plans written to:  ./output/plans_randomized.xml.gz ");
+		new PlansWriter(this.plans, this.outputpath , "v4", 1.0).write();
+		log.info("plans written to: " + this.outputpath);
 	}
 
 
