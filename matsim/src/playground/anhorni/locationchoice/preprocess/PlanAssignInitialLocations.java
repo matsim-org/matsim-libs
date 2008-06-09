@@ -60,7 +60,7 @@ public class PlanAssignInitialLocations {
 		String facilitiesfilePath=args[2];
 		int randomize=args[3];
 		*/
-		int type=3;
+		int type=2;
 
 		String plansfilePath="./input/plans.xml.gz";
 		String networkfilePath="./input/network.xml";
