@@ -58,7 +58,7 @@ public class PlanAssignInitialLocations {
 		String plansfilePath=args[0];
 		String networkfilePath=args[1];
 		String facilitiesfilePath=args[2];
-		int randomize=args[3];
+		int type=args[3];
 		*/
 		int type=2;
 
@@ -74,6 +74,7 @@ public class PlanAssignInitialLocations {
 
 	private void run(final String plansfilePath, final String networkfilePath,
 			final String facilitiesfilePath, final int type) {
+
 		this.init(plansfilePath, networkfilePath, facilitiesfilePath, type);
 
 		if (type==0) {
@@ -121,8 +122,8 @@ public class PlanAssignInitialLocations {
 		}
 		else if (type==2){
 			this.outputpath="./output/plans_onelocinarea.xml.gz";
-			this.builFacQuadTree(this.shopFacQuadTree, this.shop_facilities);
-			this.builFacQuadTree(this.leisFacQuadTree, this.leisure_facilities);
+			this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
+			this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);
 		}
 
 		log.info("plans reading done");
@@ -142,11 +143,11 @@ public class PlanAssignInitialLocations {
 					Plan plan = plan_iter.next();
 
 					if (this.shop_facilities.size()>0) {
-						exchangeFacilities("s",this.shop_facilities, plan);
+						exchangeFacilities("s",this.shop_facilities, plan, -1);
 					}
 
 					if (this.leisure_facilities.size()>0) {
-						exchangeFacilities("l",this.leisure_facilities, plan);
+						exchangeFacilities("l",this.leisure_facilities, plan, -1);
 					}
 
 				}
@@ -168,11 +169,11 @@ public class PlanAssignInitialLocations {
 					Plan plan = plan_iter.next();
 
 					if (this.shop_facilities.size()>0) {
-						exchangeFacility("s",this.shop_facilities, plan, 0);
+						exchangeFacilities("s",this.shop_facilities, plan, 0);
 					}
 
 					if (this.leisure_facilities.size()>0) {
-						exchangeFacility("l",this.leisure_facilities, plan, 0);
+						exchangeFacilities("l",this.leisure_facilities, plan, 0);
 					}
 
 				}
@@ -194,13 +195,12 @@ public class PlanAssignInitialLocations {
 					Plan plan = plan_iter.next();
 
 					if (this.shop_facilities.size()>0) {
-						exchangeFacilities("s", plan);
+						exchangeFacilities("s", this.shop_facilities, plan, -2);
 					}
 
 					if (this.leisure_facilities.size()>0) {
-						exchangeFacilities("l", plan);
+						exchangeFacilities("l", this.leisure_facilities, plan, -2);
 					}
-
 				}
 		}
 		log.info("... done.");
@@ -211,15 +211,30 @@ public class PlanAssignInitialLocations {
 		log.info("plans written to: " + this.outputpath);
 	}
 
-	private void exchangeFacilities(final String type, final TreeMap<Id,Facility>  exchange_facilities, final Plan plan) {
+	private void exchangeFacilities(final String type, final TreeMap<Id,Facility>  exchange_facilities,
+			final Plan plan, int index) {
 
 			final ArrayList<?> actslegs = plan.getActsLegs();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final Act act = (Act)actslegs.get(j);
 				if (act.getType().startsWith(type)) {
 
-					final Facility facility=(Facility)exchange_facilities.values().toArray()[
+					Facility facility=null;
+					if (index==-1) {
+						facility=(Facility)exchange_facilities.values().toArray()[
 					           Gbl.random.nextInt(exchange_facilities.size()-1)];
+					}
+					else if (index==-2) {
+						if (type.equals("s")) {
+							facility=findCloseFacility(type, plan, this.shopFacQuadTree, exchange_facilities);
+						}
+						if (type.equals("l")) {
+							facility=findCloseFacility(type, plan, this.leisFacQuadTree, exchange_facilities);
+						}
+					}
+					else {
+						facility=(Facility)exchange_facilities.values().toArray()[index];
+					}
 					act.setFacility(facility);
 					act.setLink(this.network.getNearestLink(facility.getCenter()));
 					act.setCoord(facility.getCenter());
@@ -234,66 +249,14 @@ public class PlanAssignInitialLocations {
 			}
 		}
 
-	private void exchangeFacilities(final String type, final Plan plan) {
-
-		final ArrayList<?> actslegs = plan.getActsLegs();
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Act act = (Act)actslegs.get(j);
-			if (act.getType().startsWith(type)) {
-
-				Facility facility=null;
-				double homex=plan.getFirstActivity().getCoord().getX();
-				double homey=plan.getFirstActivity().getCoord().getY();
-				double radius=30000; //30km
-				if (type.equals("s")) {
-					facility=(Facility)this.shopFacQuadTree.get(homex, homey, radius).toArray()[0];
-				}
-				if (type.equals("l")) {
-					facility=(Facility)this.leisFacQuadTree.get(homex, homey, radius).toArray()[0];
-				}
-				act.setFacility(facility);
-				act.setLink(this.network.getNearestLink(facility.getCenter()));
-				act.setCoord(facility.getCenter());
-			}
-		}
-
-		// loop over all <leg>s, remove route-information
-		// routing is done after location choice
-		for (int j = 1; j < actslegs.size(); j=j+2) {
-			final Leg leg = (Leg)actslegs.get(j);
-			leg.setRoute(null);
-		}
-	}
-
-	private void exchangeFacility(final String type, final TreeMap<Id,Facility>  exchange_facilities, final Plan plan, final int index) {
-
-		final ArrayList<?> actslegs = plan.getActsLegs();
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Act act = (Act)actslegs.get(j);
-			if (act.getType().startsWith(type)) {
-				final Facility facility=(Facility)exchange_facilities.values().toArray()[index];
-				act.setFacility(facility);
-				act.setLink(this.network.getNearestLink(facility.getCenter()));
-				act.setCoord(facility.getCenter());
-			}
-		}
-
-		// loop over all <leg>s, remove route-information
-		// routing is done after location choice
-		for (int j = 1; j < actslegs.size(); j=j+2) {
-			final Leg leg = (Leg)actslegs.get(j);
-			leg.setRoute(null);
-		}
-	}
-
-	private void builFacQuadTree(QuadTree<Facility> quadtree, TreeMap<Id,Facility> facilities_of_type) {
+	private QuadTree<Facility> builFacQuadTree(TreeMap<Id,Facility> facilities_of_type) {
 		Gbl.startMeasurement();
 		System.out.println("      building facility quad tree...");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (final Facility f : this.shop_facilities.values()) {
+		for (final Facility f : facilities_of_type.values()) {
 			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
 			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
@@ -304,14 +267,42 @@ public class PlanAssignInitialLocations {
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		quadtree = new QuadTree<Facility>(minx, miny, maxx, maxy);
+		QuadTree<Facility> quadtree = new QuadTree<Facility>(minx, miny, maxx, maxy);
 		for (final Facility f : facilities_of_type.values()) {
 			quadtree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 		}
 		System.out.println("      done.");
 		Gbl.printRoundTime();
+		return quadtree;
 	}
 
+	private Facility findCloseFacility(String type, Plan plan,
+			QuadTree<Facility> quadtree, TreeMap<Id,Facility> facilities_type ) {
 
+		Facility facility=null;
+		double homex=plan.getFirstActivity().getCoord().getX();
+		double homey=plan.getFirstActivity().getCoord().getY();
+		double radius=30000;
+		int maxCounter=0;
 
+		while (facility==null && maxCounter<10) {
+			Object [] facility_array=quadtree.get(homex, homey, radius).toArray();
+
+			if (facility_array.length>0) {
+				int index=0;
+				if (facility_array.length>1) {
+					index=Gbl.random.nextInt(facility_array.length-1);
+				}
+				facility=(Facility)facility_array[index];
+			}
+
+			radius*=1.5;
+			maxCounter++;
+		}
+		if (facility==null) {
+			log.info(plan.getPerson().getId()+ ": no location found");
+			facility=(Facility)facilities_type.values().toArray()[0];
+		}
+		return facility;
+	}
 }
