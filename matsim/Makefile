@@ -138,6 +138,11 @@ LIBS := $(LIBS):libs/geotools/xml-apis-xerces-2.7.1.jar
 LIBS := $(LIBS):libs/geotools/xsd-2.1.1.jar
 LIBS := $(LIBS):libs/geotools/xsdlib-20050614.jar
 
+# libs required for OTFVis:
+LIBS := $(LIBS):libs/TimingFramework-0.53.jar
+LIBS := $(LIBS):libs/jogl-1.1.0/gluegen-rt.jar
+LIBS := $(LIBS):libs/jogl-1.1.0/jogl.jar
+
 CLASSPATH = classes
 SOURCEPATH = src
 JAVA = java -classpath $(LIBS):$(CLASSPATH)
