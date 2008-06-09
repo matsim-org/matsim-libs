@@ -20,6 +20,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
+import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.misc.Counter;
 
 public class PlanAssignInitialLocations {
@@ -31,6 +32,9 @@ public class PlanAssignInitialLocations {
 	private TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
 	private String outputpath="";
 
+	private QuadTree<Facility> shopFacQuadTree = null;
+	private QuadTree<Facility> leisFacQuadTree = null;
+
 	private final static Logger log = Logger.getLogger(PlanAssignInitialLocations.class);
 
 	/**
@@ -38,7 +42,10 @@ public class PlanAssignInitialLocations {
 	 * - path to plans file
 	 * - path to network file
 	 * - path to facilities file
-	 * - 0: assign one loc 1: randomize locs
+	 * - type:
+	 * 		0: assign one loc
+	 * 		1: randomize locs
+	 * 		2: assign one random loc of area
 	 */
 	public static void main(final String[] args) {
 
@@ -53,7 +60,7 @@ public class PlanAssignInitialLocations {
 		String facilitiesfilePath=args[2];
 		int randomize=args[3];
 		*/
-		int randomize=0;
+		int type=3;
 
 		String plansfilePath="./input/plans.xml.gz";
 		String networkfilePath="./input/network.xml";
@@ -61,25 +68,28 @@ public class PlanAssignInitialLocations {
 
 
 		PlanAssignInitialLocations randomizer=new PlanAssignInitialLocations();
-		randomizer.run(plansfilePath, networkfilePath, facilitiesfilePath, randomize);
+		randomizer.run(plansfilePath, networkfilePath, facilitiesfilePath, type);
 		randomizer.writePlans();
 	}
 
-
 	private void run(final String plansfilePath, final String networkfilePath,
-			final String facilitiesfilePath, final int randomize) {
-		this.init(plansfilePath, networkfilePath, facilitiesfilePath, randomize);
+			final String facilitiesfilePath, final int type) {
+		this.init(plansfilePath, networkfilePath, facilitiesfilePath, type);
 
-		if (randomize==1) {
+		if (type==0) {
 			this.randomizeLocations();
 		}
-		else {
+		else if (type==1) {
 			this.assignOneLocation();
 		}
+		else if (type==2) {
+			this.assignOneRandomLocOfArea();
+		}
+
 	}
 
 	private void init(final String plansfilePath, final String networkfilePath,
-			final String facilitiesfilePath, final int randomize) {
+			final String facilitiesfilePath, final int type) {
 
 		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
@@ -103,11 +113,16 @@ public class PlanAssignInitialLocations {
 		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
 		plansReader.readFile(plansfilePath);
 
-		if (randomize==1) {
+		if (type==0) {
 			this.outputpath="./output/plans_randomized.xml.gz";
 		}
-		else {
+		else if (type==1) {
 			this.outputpath="./output/plans_oneloc.xml.gz";
+		}
+		else if (type==2){
+			this.outputpath="./output/plans_onelocinarea.xml.gz";
+			this.builFacQuadTree(this.shopFacQuadTree, this.shop_facilities);
+			this.builFacQuadTree(this.leisFacQuadTree, this.leisure_facilities);
 		}
 
 		log.info("plans reading done");
@@ -165,12 +180,36 @@ public class PlanAssignInitialLocations {
 		log.info("assignOneLocation done.");
 	}
 
+	private  void assignOneRandomLocOfArea() {
+
+		log.info("running assignOneRandomLocOfArea:");
+		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+		Counter counter = new Counter(" person # ");
+		while (person_iter.hasNext()) {
+			Person person = person_iter.next();
+				counter.incCounter();
+
+				Iterator<Plan> plan_iter = person.getPlans().iterator();
+				while (plan_iter.hasNext()) {
+					Plan plan = plan_iter.next();
+
+					if (this.shop_facilities.size()>0) {
+						exchangeFacilities("s", plan);
+					}
+
+					if (this.leisure_facilities.size()>0) {
+						exchangeFacilities("l", plan);
+					}
+
+				}
+		}
+		log.info("... done.");
+	}
 
 	private void writePlans() {
 		new PlansWriter(this.plans, this.outputpath , "v4", 1.0).write();
 		log.info("plans written to: " + this.outputpath);
 	}
-
 
 	private void exchangeFacilities(final String type, final TreeMap<Id,Facility>  exchange_facilities, final Plan plan) {
 
@@ -195,6 +234,37 @@ public class PlanAssignInitialLocations {
 			}
 		}
 
+	private void exchangeFacilities(final String type, final Plan plan) {
+
+		final ArrayList<?> actslegs = plan.getActsLegs();
+		for (int j = 0; j < actslegs.size(); j=j+2) {
+			final Act act = (Act)actslegs.get(j);
+			if (act.getType().startsWith(type)) {
+
+				Facility facility=null;
+				double homex=plan.getFirstActivity().getCoord().getX();
+				double homey=plan.getFirstActivity().getCoord().getY();
+				double radius=30000; //30km
+				if (type.equals("s")) {
+					facility=(Facility)this.shopFacQuadTree.get(homex, homey, radius).toArray()[0];
+				}
+				if (type.equals("l")) {
+					facility=(Facility)this.leisFacQuadTree.get(homex, homey, radius).toArray()[0];
+				}
+				act.setFacility(facility);
+				act.setLink(this.network.getNearestLink(facility.getCenter()));
+				act.setCoord(facility.getCenter());
+			}
+		}
+
+		// loop over all <leg>s, remove route-information
+		// routing is done after location choice
+		for (int j = 1; j < actslegs.size(); j=j+2) {
+			final Leg leg = (Leg)actslegs.get(j);
+			leg.setRoute(null);
+		}
+	}
+
 	private void exchangeFacility(final String type, final TreeMap<Id,Facility>  exchange_facilities, final Plan plan, final int index) {
 
 		final ArrayList<?> actslegs = plan.getActsLegs();
@@ -215,5 +285,33 @@ public class PlanAssignInitialLocations {
 			leg.setRoute(null);
 		}
 	}
+
+	private void builFacQuadTree(QuadTree<Facility> quadtree, TreeMap<Id,Facility> facilities_of_type) {
+		Gbl.startMeasurement();
+		System.out.println("      building facility quad tree...");
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		for (final Facility f : this.shop_facilities.values()) {
+			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
+			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
+			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
+			if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+		}
+		minx -= 1.0;
+		miny -= 1.0;
+		maxx += 1.0;
+		maxy += 1.0;
+		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+		quadtree = new QuadTree<Facility>(minx, miny, maxx, maxy);
+		for (final Facility f : facilities_of_type.values()) {
+			quadtree.put(f.getCenter().getX(),f.getCenter().getY(),f);
+		}
+		System.out.println("      done.");
+		Gbl.printRoundTime();
+	}
+
+
 
 }
