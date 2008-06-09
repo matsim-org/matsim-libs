@@ -10,6 +10,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
@@ -42,10 +43,6 @@ public class PlanAssignInitialLocations {
 	 * - path to plans file
 	 * - path to network file
 	 * - path to facilities file
-	 * - type:
-	 * 		0: assign one loc
-	 * 		1: randomize locs
-	 * 		2: assign one random loc of area
 	 */
 	public static void main(final String[] args) {
 
@@ -60,7 +57,6 @@ public class PlanAssignInitialLocations {
 		String facilitiesfilePath=args[2];
 		int type=args[3];
 		*/
-		int type=2;
 
 		String plansfilePath="./input/plans.xml.gz";
 		String networkfilePath="./input/network.xml";
@@ -68,29 +64,29 @@ public class PlanAssignInitialLocations {
 
 
 		PlanAssignInitialLocations randomizer=new PlanAssignInitialLocations();
-		randomizer.run(plansfilePath, networkfilePath, facilitiesfilePath, type);
-		randomizer.writePlans();
+		randomizer.run(plansfilePath, networkfilePath, facilitiesfilePath);
 	}
 
 	private void run(final String plansfilePath, final String networkfilePath,
-			final String facilitiesfilePath, final int type) {
+			final String facilitiesfilePath) {
 
-		this.init(plansfilePath, networkfilePath, facilitiesfilePath, type);
+			this.init(plansfilePath, networkfilePath, facilitiesfilePath);
 
-		if (type==0) {
+			this.outputpath="./output/plans_randomized.xml.gz";
 			this.randomizeLocations();
-		}
-		else if (type==1) {
-			this.assignOneLocation();
-		}
-		else if (type==2) {
-			this.assignOneRandomLocOfArea();
-		}
+			this.writePlans();
 
+			this.outputpath="./output/plans_oneloc.xml.gz";
+			this.assignOneLocation();
+			this.writePlans();
+
+			this.outputpath="./output/plans_onelocinarea.xml.gz";
+			this.assignOneRandomLocOfArea();
+			this.writePlans();
 	}
 
 	private void init(final String plansfilePath, final String networkfilePath,
-			final String facilitiesfilePath, final int type) {
+			final String facilitiesfilePath) {
 
 		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
@@ -114,17 +110,8 @@ public class PlanAssignInitialLocations {
 		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
 		plansReader.readFile(plansfilePath);
 
-		if (type==0) {
-			this.outputpath="./output/plans_randomized.xml.gz";
-		}
-		else if (type==1) {
-			this.outputpath="./output/plans_oneloc.xml.gz";
-		}
-		else if (type==2){
-			this.outputpath="./output/plans_onelocinarea.xml.gz";
-			this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
-			this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);
-		}
+		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
+		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);
 
 		log.info("plans reading done");
 	}
@@ -235,9 +222,10 @@ public class PlanAssignInitialLocations {
 					else {
 						facility=(Facility)exchange_facilities.values().toArray()[index];
 					}
-					act.setFacility(facility);
-					act.setLink(this.network.getNearestLink(facility.getCenter()));
-					act.setCoord(facility.getCenter());
+					//act.setFacility(facility);
+					Link nearestLink=this.network.getNearestLink(facility.getCenter());
+					act.setLink(nearestLink);
+					act.setCoord(nearestLink.getCenter());
 				}
 			}
 
