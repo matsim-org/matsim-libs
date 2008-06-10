@@ -53,13 +53,6 @@ import org.matsim.utils.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
-import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFDefaultLinkHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFDefaultNodeHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFLinkTravelTimesHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFNoDynLinkHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
@@ -350,16 +343,15 @@ public class OTFQuadFileHandler {
 			protected Class resolveClass(ObjectStreamClass desc)
 			throws IOException, ClassNotFoundException {
 				String name = desc.getName();
+				System.out.println("try to resolve "+ name);
+				// 
 				if(name.equals("playground.david.vis.data.OTFServerQuad")) return OTFServerQuad.class;
-				else if(name.equals("playground.david.vis.handler.OTFDefaultNodeHandler$Writer")) return OTFDefaultNodeHandler.Writer.class;
-				else if(name.equals("playground.david.vis.handler.OTFDefaultLinkHandler$Writer")) return OTFDefaultLinkHandler.Writer.class;
-				else if(name.equals("playground.david.vis.handler.OTFLinkAgentsHandler$Writer")) return OTFLinkAgentsHandler.Writer.class;
-				else if(name.equals("playground.david.vis.handler.OTFLinkAgentsNoParkingHandler$Writer")) return OTFLinkAgentsNoParkingHandler.Writer.class;
-				else if(name.equals("playground.david.vis.handler.OTFLinkTravelTimesHandler$Writer")) return OTFLinkTravelTimesHandler.Writer.class;
-				else if(name.equals("playground.david.vis.handler.OTFNoDynLinkHandler$Writer")) return OTFNoDynLinkHandler.Writer.class;
-				else if(name.equals("playground.david.vis.handler.OTFAgentsListHandler$Writer")) return OTFAgentsListHandler.Writer.class;
 				else if (name.startsWith("playground.david.vis")){
 					name = name.replaceFirst("playground.david.vis", "org.matsim.utils.vis.otfvis");
+				    return Class.forName(name);
+				}
+				else if (name.startsWith("org.matsim.utils.vis.otfivs")){
+					name = name.replaceFirst("org.matsim.utils.vis.otfivs", "org.matsim.utils.vis.otfvis");
 				    return Class.forName(name);
 				}
 				return super.resolveClass(desc);
