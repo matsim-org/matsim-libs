@@ -20,29 +20,41 @@
 
 package playground.balmermi;
 
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
-import org.matsim.plans.algorithms.XY2Links;
-import org.matsim.router.PlansCalcRouteLandmarks;
-import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.PreProcessLandmarks;
-
-import playground.balmermi.algos.DoAndUndo;
-import playground.balmermi.algos.PersonLinkRoutesTable;
+import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldValidation;
 
 public class PersonStreaming {
 
-	public static void run(String[] args) {
+	public static void run() {
 
 		System.out.println("person streaming...");
 		
-		Gbl.createConfig(args);
-//		Scenario.setUpScenarioConfig();
-		NetworkLayer network = Scenario.readNetwork();
+		System.out.println("  reading facilities xml file... ");
+		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		Gbl.getWorld().complete();
+		System.out.println("  done.");
+
+		System.out.println("  reading the network xml file...");
+		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		Gbl.getWorld().complete();
+		System.out.println("  done.");
+
+		new WorldCheck().run(Gbl.getWorld());
+		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		new WorldValidation().run(Gbl.getWorld());
+		new WorldCheck().run(Gbl.getWorld());
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -63,19 +75,19 @@ public class PersonStreaming {
 //		PersonTripSummaryTable ptst = new PersonTripSummaryTable("output/output_trip-summary-table.txt");
 //		plans.addAlgorithm(ptst);
 		
-		DoAndUndo dau = new DoAndUndo();
-		plans.addAlgorithm(dau);
+//		DoAndUndo dau = new DoAndUndo();
+//		plans.addAlgorithm(dau);
 
-		plans.addAlgorithm(new XY2Links(network));
-		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
-		preprocess.run(network);
-		plans.addAlgorithm(new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc));
+//		plans.addAlgorithm(new XY2Links(network));
+//		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+//		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
+//		preprocess.run(network);
+//		plans.addAlgorithm(new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc));
 		
-		plans.addAlgorithm(dau);
+//		plans.addAlgorithm(dau);
 
-		PersonLinkRoutesTable plrt = new PersonLinkRoutesTable("output/linkroutes");
-		plans.addAlgorithm(plrt);
+//		PersonLinkRoutesTable plrt = new PersonLinkRoutesTable("output/linkroutes");
+//		plans.addAlgorithm(plrt);
 		System.out.println("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
@@ -96,7 +108,7 @@ public class PersonStreaming {
 //		psta.writeSubtourDistVsModeDistSum("output/SubtourDistVsModeDistSum.txt");
 //		pidst.close();
 //		ptst.close();
-		plrt.close();
+//		plrt.close();
 //		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -112,7 +124,10 @@ public class PersonStreaming {
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 
-		run(args);
+		Gbl.createConfig(args);
+		Gbl.createWorld();
+
+		run();
 
 		Gbl.printElapsedTime();
 	}
