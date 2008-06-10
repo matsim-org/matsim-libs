@@ -34,6 +34,9 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.utils.collections.QuadTree;
 
+import playground.gregor.gis.utils.ShapeFileReader;
+import playground.gregor.gis.utils.ShapeFileWriter;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
@@ -140,6 +143,17 @@ public class PolygonNodesGenerator {
 				
 				Collection<LineString> tmpLs = this.pg.getLineStringQuadTree().get(currPoint.getX(), currPoint.getY(), PolygonGeneratorII.CATCH_RADIUS);
 				
+				if (tmpLs.size() == 1) {
+					//seems to be a dead end node
+					Polygon deadendp = getDeadEndNode(currPoint);
+					Feature ft = this.pg.getPolygonFeature(deadendp, 0, nodeId, 0, 0, currPoint.getX(), currPoint.getY());
+					this.nodes.put(currPoint.getX(), currPoint.getY(), ft);
+					nodeId = (Integer) this.pg.getLineStringFeatures().get(lsId).getAttribute(3);
+				}
+				
+				
+				
+				
 				
 				if (tmpLs.size() <= 2) {
 					continue;
@@ -241,6 +255,12 @@ public class PolygonNodesGenerator {
 
 	
 
+	private Polygon getDeadEndNode(Point currPoint) {
+		Coordinate c0 = currPoint.getCoordinate();
+		Coordinate [] coords = new Coordinate [] {c0, new Coordinate(c0.x+0.01,c0.y), new Coordinate(c0.x,c0.y+0.01), c0}; 
+		
+		return this.pg.getGeofac().createPolygon(this.pg.getGeofac().createLinearRing(coords), null);
+	}
 	private Polygon getControlPolygon(Point p, double angle1, org.matsim.utils.collections.gnuclasspath.TreeMap<Double, LineString> sortedLs) {
 		
 		LineString ls1 = sortedLs.get(angle1);

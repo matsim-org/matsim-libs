@@ -65,8 +65,8 @@ import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.world.World;
 import org.opengis.referencing.FactoryException;
 
-import playground.gregor.gis.shapeFileProcessing.ShapeFileReader;
-import playground.gregor.gis.shapeFileProcessing.ShapeFileWriter;
+import playground.gregor.gis.utils.ShapeFileReader;
+import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

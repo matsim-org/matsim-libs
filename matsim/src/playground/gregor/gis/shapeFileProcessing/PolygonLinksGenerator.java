@@ -37,6 +37,8 @@ import org.geotools.feature.SchemaException;
 import org.matsim.utils.collections.QuadTree;
 import org.opengis.referencing.FactoryException;
 
+import playground.gregor.gis.utils.ShapeFileWriter;
+
 import com.sun.opengl.impl.Java2D;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -136,12 +138,20 @@ public class PolygonLinksGenerator {
 			List<Integer> nodeIds  = new ArrayList<Integer>(2);
 			
 			for (Point currPoint : po) {
-				Feature ftNode = nodeFeatures.get(currPoint.getX(), currPoint.getY());
-				if (ftNode == null) {
-					log.warn("no polygon node found for LineString" + id + "!"); 
-					this.pg.createLineStringFeature(currLs, id, "");
+				
+				Collection<Feature> ftNodes = nodeFeatures.get(currPoint.getX(), currPoint.getY(),GISToMatsimConverter.CATCH_RADIUS);
+				if (ftNodes.size() != 1 ) {
+					pLink = null;
 					break;
 				}
+				Feature ftNode = ftNodes.iterator().next();
+				
+//				Feature ftNode = nodeFeatures.get(currPoint.getX(), currPoint.getY());
+//				if (ftNode == null) {
+//					log.warn("no polygon node found for LineString" + id + "!"); 
+//					this.pg.createLineStringFeature(currLs, id, "");
+//					break;
+//				}
 				nodeIds.add((Integer) ftNode.getAttribute(1));
 				
 				
@@ -152,6 +162,12 @@ public class PolygonLinksGenerator {
 					continue;
 				}
 				Polygon pNode = (Polygon) mpNode.getGeometryN(0);
+				
+				if (pNode.getArea() <= 0.1) {
+					//seems to be a dead end node
+					continue;
+				}
+				
 				
 				Collection<Polygon> separated =  separatePoly(pLink, pNode);
 				int found = 0;
@@ -201,7 +217,7 @@ public class PolygonLinksGenerator {
 			
 			double minWidth = Math.max(getMinWidth(pLink,currLs), 0.71);
 			
-			Feature ftLink = this.pg.getPolygonFeature(pLink, 0, id, nodeIds.get(0), nodeIds.get(1), minWidth, pLink.getArea());
+			Feature ftLink = this.pg.getPolygonFeature(pLink, currLs.getLength(), id, nodeIds.get(0), nodeIds.get(1), minWidth, pLink.getArea());
 			this.ftLinks.put(id, ftLink);
 	 	}
 		
@@ -218,8 +234,9 @@ public class PolygonLinksGenerator {
 			}
 			
 		}
-		
-		
+		if (minWidth == Double.POSITIVE_INFINITY) {
+			return 0;
+		}
 		
 		return minWidth;
 	}

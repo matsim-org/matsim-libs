@@ -62,8 +62,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
-import playground.gregor.gis.shapeFileProcessing.ShapeFileReader;
-import playground.gregor.gis.shapeFileProcessing.ShapeFileWriter;
+import playground.gregor.gis.utils.ShapeFileReader;
+import playground.gregor.gis.utils.ShapeFileWriter;
 
 public class EgressAnalysis {
 	private static final Logger log = Logger.getLogger(DistanceAnalysis.class);

@@ -30,6 +30,8 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.utils.collections.QuadTree;
 
+import playground.gregor.gis.utils.ShapeFileWriter;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
@@ -132,9 +134,10 @@ public class PolygonGeneratorII {
 		AttributeType to = AttributeTypeFactory.newAttributeType("to", Integer.class);
 		AttributeType width = AttributeTypeFactory.newAttributeType("min_width", Double.class);
 		AttributeType area = AttributeTypeFactory.newAttributeType("area", Double.class);
+		AttributeType length = AttributeTypeFactory.newAttributeType("length", Double.class);
 		AttributeType info = AttributeTypeFactory.newAttributeType("info", String.class);
 		try {
-			this.ftPolygon = FeatureTypeFactory.newFeatureType(new AttributeType[] {polygon, id, from, to, width, area, info }, "linkShape");
+			this.ftPolygon = FeatureTypeFactory.newFeatureType(new AttributeType[] {polygon, id, from, to, width, area, length }, "linkShape");
 			this.ftPoint = FeatureTypeFactory.newFeatureType(new AttributeType[] {point, id, info }, "pointShape");
 			this.ftLineString = FeatureTypeFactory.newFeatureType(new AttributeType[] {linestring, id, info }, "linString");			
 		} catch (FactoryRegistryException e) {
@@ -157,9 +160,9 @@ public class PolygonGeneratorII {
 //		return(genPolygonFeatureCollection(mergePolygons()));	
 //		HashMap<Integer, Polygon> tmpPolygons = mergePolygons();
 //		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
-		HashMap<Integer, Polygon> merged = new PolygonMerger(this,"./padang/converter/d_p_merged.shp").getMergedPolygons();
+//		HashMap<Integer, Polygon> merged = new PolygonMerger(this,"./padang/converter/d_p_merged.shp").getMergedPolygons();
 //		HashMap<Integer, Polygon> merged = new PolygonMerger(this).getMergedPolygons();
-//		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
+		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
 		
 		
 //		QuadTree<Polygon> polygonNodes = getPolygonNodes(merged);
@@ -300,16 +303,16 @@ public class PolygonGeneratorII {
 	///////////////////////////////////////////////////////////
 	
 	
-	void createPolygonFeature(Polygon polygon, int info, int id, int from, int to, double min_width, double area) {
+	void createPolygonFeature(Polygon polygon, double length, int id, int from, int to, double min_width, double area) {
 		
-		this.retPolygons.add(getPolygonFeature(polygon, info, id, from, to,min_width,  area));
+		this.retPolygons.add(getPolygonFeature(polygon, length, id, from, to,min_width,  area));
 		log.info("created new debug polygon with id " + id);
 	}
 	
-	public Feature getPolygonFeature(Polygon polygon, int info, int id, int from, int to,double min_width, double area ){
+	public Feature getPolygonFeature(Polygon polygon, double length, int id, int from, int to,double min_width, double area ){
 		Feature ft = null;
 		try {
-			ft = this.ftPolygon.create(new Object [] {new MultiPolygon(new Polygon []{ polygon  },this.geofac), id, from, to, min_width, area, info},"network");
+			ft = this.ftPolygon.create(new Object [] {new MultiPolygon(new Polygon []{ polygon  },this.geofac), id, from, to, min_width, area, length},"network");
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}		

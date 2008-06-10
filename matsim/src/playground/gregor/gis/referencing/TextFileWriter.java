@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ShapeFileReader.java
+ * TextFileWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,46 +18,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.gis.shapeFileProcessing;
+package playground.gregor.gis.referencing;
 
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
-import org.apache.log4j.Logger;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
+import org.matsim.utils.io.IOUtils;
 
-
-
-public class ShapeFileReader {
-
-	private static final Logger log = Logger.getLogger(ShapeFileReader.class);
-//	public static String WKT_WGS84 = "GEOGCS[\"WGS84\", DATUM[\"WGS84\", SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], PRIMEM[\"Greenwich\", 0.0], UNIT[\"degree\",0.017453292519943295], AXIS[\"Longitude\",EAST], AXIS[\"Latitude\",NORTH]]";
-
-
-	public static FeatureSource readDataFile(String fileName) throws Exception {
-
-		log.info("reading features from: " + fileName);
-
-		File dataFile = new File(fileName);
-
-		HashMap<String,URL> connect = new HashMap<String,URL>();
-		connect.put( "url", dataFile.toURL() );
-
-		DataStore dataStore = DataStoreFinder.getDataStore( connect );
-		String[] typeNames = dataStore.getTypeNames ();
-		String typeName = typeNames[0];
-		FeatureSource fs = dataStore.getFeatureSource( typeName ); 
-
-		log.info("done.");
-
-		return fs;
-
-
-
+public class TextFileWriter {
+	private BufferedWriter out = null;	
+	public TextFileWriter(final String filename){
+		try {
+			this.out = IOUtils.getBufferedWriter(filename, true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
+	public void writeLine(final String [] line){
+		StringBuffer buff = new StringBuffer();
+		buff.append(line[0]);
+		for (int i = 1; i < line.length; i++){
+			buff.append("\t");
+			buff.append(line[i]);
+		}
+		buff.append("\n");
+		try {
+			this.out.write(buff.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
+	public void finish() {
+		if (this.out != null) {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
