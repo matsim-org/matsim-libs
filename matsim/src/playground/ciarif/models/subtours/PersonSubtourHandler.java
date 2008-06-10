@@ -77,7 +77,7 @@ public class PersonSubtourHandler {
 					else if (type.equals(S)) {mainpurpose = 2;}
 				} 
 				CoordI curr = ((Act)plan.getActsLegs().get(subtour.get(k))).getCoord();
-				if (curr.getX()>0 & curr.getY()>0) {d = d + curr.calcDistance(prev);}
+				if (curr.getX()>0 && curr.getY()>0) {d = d + curr.calcDistance(prev);}
 				prev = curr;
 				
 				// Getting the main mode at the sub-tour level
@@ -94,7 +94,7 @@ public class PersonSubtourHandler {
 			}
 			System.out.println("subtour mode = " + sub.getMode());
 			sub.setPurpose(mainpurpose);
-			if (prev.getX()>0 & prev.getY()>0) {d = d + start.calcDistance(prev);}// In the for-cycle the trip to home is not accounted
+			if (prev.getX()>0 && prev.getY()>0) {d = d + start.calcDistance(prev);}// In the for-cycle the trip to home is not accounted
 			d = d/1000.0; // distance in the model is in Km
 			sub.setDistance(d);
 			
