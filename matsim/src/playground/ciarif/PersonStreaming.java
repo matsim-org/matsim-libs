@@ -72,7 +72,7 @@ public class PersonStreaming {
 //		persons.households = hhs;
 		persons.persons.put(person.p_id,person);
 		
-		//PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons);
+		//PersonModeChoiceModel pmcm = new PersonModeChoiceModel(persons);
 		//plans.addAlgorithm(pmcm);
 		
 		System.out.println("  done.");

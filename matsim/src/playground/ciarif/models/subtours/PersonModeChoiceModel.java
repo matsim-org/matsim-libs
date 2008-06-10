@@ -151,15 +151,15 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 				// at the houshold level or something similar 
 			}
 			
-			boolean pt = true;			
-//			boolean pt = false; // Should be substituted with actual access to pt;
-//			double rd3 = Gbl.random.nextDouble (); 
-//			if (plan.getPerson().getCarAvail().equals("always")) {
-//				if (rd3 < 0.40) {pt = true; System.out.println("random = " + rd3);}
-//				System.out.println("pt = " + pt );
-//			}
-//			else if (rd3 < 0.90) {pt =true;}
-//			//else {pt =true;}	
+			//boolean pt = true;			
+			boolean pt = false; // Should be substituted with actual access to pt;
+			double rd3 = Gbl.random.nextDouble (); 
+			if (plan.getPerson().getCarAvail().equals("always")) {
+				if (rd3 < 0.40) {pt = true; System.out.println("random = " + rd3);}
+				System.out.println("pt = " + pt );
+			}
+			else if (rd3 < 0.90) {pt =true;}
+			//else {pt =true;}	
 			
 			if (sub.getPrev_subtour()>=0){
 				if (i>=1) {
@@ -183,19 +183,21 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			model.setBike(has_bike);
 			model.setMale (plan.getPerson().getSex());
 			//model.setHHDimension(p.getHousehold().getPersonCount());
-			int udeg = 1; // // Da cambiare per PersonStreaming
-			double rd4 = Gbl.random.nextDouble();
-			if (rd4<=0.81) {udeg=2;}
-			if (rd4<0.70) {udeg=3;}
-			if (rd4<0.63) {udeg=4;}
-			if (rd4<.30) {udeg=5;}
+			
+			// To be used when mun data is not available in order to have a reasonable distributions of starting points
+//			int udeg = 1; // // Da cambiare per PersonStreaming
+//			double rd4 = Gbl.random.nextDouble();
+//			if (rd4<=0.81) {udeg=2;}
+//			if (rd4<0.70) {udeg=3;}
+//			if (rd4<0.63) {udeg=4;}
+//			if (rd4<.30) {udeg=5;}
 					
 			
-			//Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
-			//ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
-			//Location loc = locs.get(Gbl.random.nextInt(locs.size()));
-			//Municipality m = municipalities.getMunicipality(new Integer(loc.getId().toString()));
-			//int udeg = m.getRegType();
+			Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
+			ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
+			Location loc = locs.get(Gbl.random.nextInt(locs.size()));
+			Municipality m = municipalities.getMunicipality(new Integer(loc.getId().toString()));
+			int udeg = m.getRegType();
 			//System.out.println ("udeg");
 			//Iterator<Location> l_it = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY).getLocations().values().iterator(); //TODO controllare se serve!!!!!
 			
@@ -245,7 +247,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		PersonSubtour personSubtour = new PersonSubtour(); //TODO Change the constructor and place it below the psh.run
 		psh.run(plan,subtours,subtour_idx);
 		personSubtour = psh.getPers_sub();
-		//this.setUpModeChoice(plan,personSubtour);
+		this.setUpModeChoice(plan,personSubtour);
 		personSubtour.setPerson_id(person.getId());	
 		this.personSubtours.add(personSubtour);	
 	}
