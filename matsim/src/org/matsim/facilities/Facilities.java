@@ -83,7 +83,7 @@ public class Facilities extends Layer {
 		this.counter++;
 		if (this.counter % this.nextMsg == 0) {
 			this.nextMsg *= 2;
-			System.out.println("    facility # " + this.counter);
+			printFacilitiesCount();
 		}
 
 		return f;
@@ -179,5 +179,9 @@ public class Facilities extends Layer {
 	public final String toString() {
 		return super.toString() +
 		"[nof_algorithms=" + this.algorithms.size() + "]";
+	}
+	
+	public final void printFacilitiesCount() {
+		log.info("    facility # " + this.counter);
 	}
 }
