@@ -33,6 +33,8 @@ import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldValidation;
 
+import playground.balmermi.algos.PersonXY2Facility;
+
 public class PersonStreaming {
 
 	public static void run() {
@@ -67,6 +69,7 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
+		plans.addAlgorithm(new PersonXY2Facility(facilities));
 //		PersonSubTourAnalysis psta = new PersonSubTourAnalysis();
 //		plans.addAlgorithm(psta);
 //		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt");
