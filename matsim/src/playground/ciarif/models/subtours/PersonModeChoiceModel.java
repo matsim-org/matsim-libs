@@ -141,7 +141,9 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 //			boolean has_bike = true;
 			boolean has_bike = false;
 			if (Gbl.random.nextDouble() < 0.54) { has_bike = true; }			
-//			
+
+			////////////////////////////////////////////////////////////////////////////////
+			// TODO [balmermi]: Check for antoher probability
 //			boolean ride_possible = true;
 			boolean ride_possible = false;
 			double rd2 = Gbl.random.nextDouble ();
@@ -150,7 +152,10 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 				if (rd2 < 0.54) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership 
 				// at the houshold level or something similar 
 			}
+			////////////////////////////////////////////////////////////////////////////////
 			
+			////////////////////////////////////////////////////////////////////////////////
+			// TODO [balmermi]: Check for antoher probability
 			//boolean pt = true;			
 			boolean pt = false; // Should be substituted with actual access to pt;
 			double rd3 = Gbl.random.nextDouble (); 
@@ -160,6 +165,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			}
 			else if (rd3 < 0.90) {pt =true;}
 			//else {pt =true;}	
+			////////////////////////////////////////////////////////////////////////////////
 			
 			if (sub.getPrev_subtour()>=0){
 				if (i>=1) {
