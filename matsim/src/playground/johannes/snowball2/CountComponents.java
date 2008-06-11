@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UserDataKeys.java
+ * CountComponents.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,36 +21,28 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.snowball2;
 
-import edu.uci.ics.jung.utils.UserDataContainer;
+import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
+import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
+import edu.uci.ics.jung.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public interface UserDataKeys {
+public class CountComponents implements GraphStatistic {
+	
+	private WeakComponentClusterer wcc = new WeakComponentClusterer();
+	
+	private ClusterSet cSet;
 
-//	public static final String PERSON_KEY = "person";
-	
-	public static final String ID = "person_id";
-	
-	public static final String X_COORD = "x";
-	
-	public static final String Y_COORD = "y";
-	
-//	public static final String WAVE_KEY = "wave";
-	
-	public static final String SAMPLED_KEY = "sampled";
-	
-	public static final String DETECTED_KEY = "detected";
-	
-//	public static final String PARTICIPATE_KEY = "participate";
-	
-	public static final String ANONYMOUS_KEY = "anonymous";
-	
-	public static final String SAMPLE_PROBA_KEY = "sampleprobability";
-	
-	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
+	public double run(Graph g) {
+		cSet = wcc.extract(g);
+		return cSet.size();
+	}
 
+	public ClusterSet getClusterSet() {
+		return cSet;
+	}
 }

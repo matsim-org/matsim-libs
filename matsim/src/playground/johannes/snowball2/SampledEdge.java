@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UserDataKeys.java
+ * SampledEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,36 +21,28 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.snowball2;
 
+import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
 import edu.uci.ics.jung.utils.UserDataContainer;
 
 /**
  * @author illenberger
  *
  */
-public interface UserDataKeys {
+public class SampledEdge extends UndirectedSparseEdge {
 
-//	public static final String PERSON_KEY = "person";
+	private static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
 	
-	public static final String ID = "person_id";
+	private static final String WAVE_SAMPLED_KEY = "wavesampled";
 	
-	public static final String X_COORD = "x";
+	public SampledEdge(Vertex from, Vertex to, int waveSampled) {
+		super(from, to);
+		addUserDatum(WAVE_SAMPLED_KEY, waveSampled, COPY_ACT);
+	}
 	
-	public static final String Y_COORD = "y";
-	
-//	public static final String WAVE_KEY = "wave";
-	
-	public static final String SAMPLED_KEY = "sampled";
-	
-	public static final String DETECTED_KEY = "detected";
-	
-//	public static final String PARTICIPATE_KEY = "participate";
-	
-	public static final String ANONYMOUS_KEY = "anonymous";
-	
-	public static final String SAMPLE_PROBA_KEY = "sampleprobability";
-	
-	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
-
+	public int getWaveSampled() {
+		return (Integer)getUserDatum(WAVE_SAMPLED_KEY);
+	}
 }

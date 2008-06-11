@@ -42,6 +42,7 @@ import edu.uci.ics.jung.graph.impl.SparseGraph;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
 import edu.uci.ics.jung.utils.Pair;
+import edu.uci.ics.jung.utils.UserDataDelegate;
 
 /**
  * @author illenberger
@@ -59,6 +60,7 @@ public class Sampler {
 	
 	public Sampler(long randomSeed) {
 		seed = randomSeed;
+		rnd = new Random(seed);
 	}
 
 	public void setPTieNamed(double p) {
@@ -69,7 +71,7 @@ public class Sampler {
 		pParticipate = p;
 	}
 	
-	private void init(Graph g) {
+	public void init(Graph g) {
 		for(Object v : g.getVertices()) {
 			((Vertex)v).removeUserDatum(UserDataKeys.SAMPLED_KEY);
 			((Vertex)v).removeUserDatum(UserDataKeys.DETECTED_KEY);
@@ -82,7 +84,6 @@ public class Sampler {
 	}
 	
 	public void run(Graph g, int waves, int initialEgos) {
-		rnd = new Random(seed);
 		init(g);
 		Collection<Vertex> egos = selectedIntialEgos(g, initialEgos);
 
@@ -101,13 +102,18 @@ public class Sampler {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection<Vertex> selectedIntialEgos(Graph g, int count) {
-		List<Vertex> edges = new LinkedList<Vertex>(g.getVertices());
-		Collections.shuffle(edges, rnd);
-		return edges.subList(0, count);
+	public Collection<Vertex> selectedIntialEgos(Graph g, int count) {
+		List<Vertex> vertices = new LinkedList<Vertex>(g.getVertices());
+		Collections.shuffle(vertices, rnd);
+		
+		List<Vertex> egos = vertices.subList(0, count);
+		for (Vertex ego : egos) {
+			tagAsDetected(ego);
+		}
+		return egos;
 	}
 
-	private Collection<Vertex> runWave(Collection<Vertex> egos, int wave) {
+	public Collection<Vertex> runWave(Collection<Vertex> egos, int wave) {
 		Collection<Vertex> alters = new LinkedHashSet<Vertex>();
 		/*
 		 * Expand to each ego's alters.
@@ -306,6 +312,59 @@ public class Sampler {
 		
 		for(Vertex v : vertices)
 			g.removeVertex(v);
+	}
+	
+	public void calculateSampleProbas(Graph g, double fracSampled) {
+		Set<Vertex> vertices = new HashSet<Vertex>(g.getVertices());
+		
+		for(Vertex v : vertices) {
+			if(v.getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null) {
+				Double proba = (Double)v.getUserDatum(UserDataKeys.SAMPLE_PROBA_KEY);
+				if(proba == null) {
+					double p = 1 - Math.pow(1 - fracSampled, v.degree());
+					v.addUserDatum(UserDataKeys.SAMPLE_PROBA_KEY, p, UserDataKeys.COPY_ACT);
+				}
+			}
+		}
+		
+//		for(Vertex v : vertices) {
+//			v.removeUserDatum(UserDataKeys.SAMPLE_PROBA_KEY);
+//			double[] sampleProbas = new double[wave];
+//			sampleProbas[0] = seedProba;
+//			v.addUserDatum(UserDataKeys.SAMPLE_PROBA_KEY, sampleProbas, UserDataKeys.COPY_ACT);
+//		}
+		
+//		for(int i = 1; i < wave; i++) {
+//			for(Vertex v : vertices) {
+//				double[] sampleProbas = (double[])v.getUserDatum(UserDataKeys.SAMPLE_PROBA_KEY);
+//				double accumulatetProba = 1;
+//				for(int k = 0; k < i; k++) {
+//					double product = 1;
+//					for(Object neighbour : v.getNeighbors()) {
+//						if(((Vertex)neighbour).getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null) {
+//							double[] sampleProbasNeighb =   (double[])((UserDataDelegate)neighbour).getUserDatum(UserDataKeys.SAMPLE_PROBA_KEY);
+//							product *= (1 - sampleProbasNeighb[k]);
+//						}
+//					}
+//					accumulatetProba *= product;	
+//				}
+//				sampleProbas[i] = 1 - accumulatetProba;
+//			}
+//		}
+		
+//		for(int i = 1; i < wave; i++) {
+//			for(Vertex v : vertices) {
+//				double[] sampleProbas = (double[])v.getUserDatum(UserDataKeys.SAMPLE_PROBA_KEY);
+//				double product = 1;
+//				for(Object neighbour : v.getNeighbors()) {
+//					if(((Vertex)neighbour).getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null) {
+//						double[] sampleProbasNeighb = (double[])((UserDataDelegate)neighbour).getUserDatum(UserDataKeys.SAMPLE_PROBA_KEY);
+//						product *= (1 - sampleProbasNeighb[i-1]);
+//					}
+//				}
+//				sampleProbas[i] = 1 - product;
+//			}
+//		}
 	}
 	
 //	public static void main(String args[]) {

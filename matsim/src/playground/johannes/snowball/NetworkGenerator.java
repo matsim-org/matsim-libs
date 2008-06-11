@@ -90,7 +90,7 @@ public class NetworkGenerator {
 		int n = g.numVertices();
 		int m = g.numEdges();
 		float density = m/((float)(n*(n-1))*0.5f);
-		float k = (float) GraphStatistics.createDegreeHistogram(g, -1, -1, 0).mean();
+		float k = (float) GraphStatistics.createDegreeHistogram(g, -1, -1, 0).getMean();
 		float C = (float)GraphStatistics.createClusteringCoefficientsHistogram(g, -1, -1, 0).mean();
 		float n_iso = GraphStatistics.countIsolates(g);
 		logger.info(String.format("n = %1$s, m = %2$s, density = %3$s, k = %4$s, C = %5$s, n_isolates = %6$s.", n, m, density, k, C, n_iso));

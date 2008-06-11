@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UserDataKeys.java
+ * VertexStatistic.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,36 +21,17 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.snowball2;
 
-import edu.uci.ics.jung.utils.UserDataContainer;
+import playground.johannes.snowball.Histogram;
 
 /**
  * @author illenberger
  *
  */
-public interface UserDataKeys {
-
-//	public static final String PERSON_KEY = "person";
+public interface VertexStatistic extends GraphStatistic {
 	
-	public static final String ID = "person_id";
+	public Histogram getHistogram();
 	
-	public static final String X_COORD = "x";
-	
-	public static final String Y_COORD = "y";
-	
-//	public static final String WAVE_KEY = "wave";
-	
-	public static final String SAMPLED_KEY = "sampled";
-	
-	public static final String DETECTED_KEY = "detected";
-	
-//	public static final String PARTICIPATE_KEY = "participate";
-	
-	public static final String ANONYMOUS_KEY = "anonymous";
-	
-	public static final String SAMPLE_PROBA_KEY = "sampleprobability";
-	
-	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
-
+	public Histogram getHistogram(double min, double max);
 }

@@ -46,9 +46,11 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.io.IOUtils;
 
+import playground.johannes.snowball.Histogram;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
 import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
@@ -58,7 +60,6 @@ import edu.uci.ics.jung.algorithms.importance.NodeRanking;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.statistics.DegreeDistributions;
 import edu.uci.ics.jung.utils.Pair;
 
 /**
@@ -67,21 +68,60 @@ import edu.uci.ics.jung.utils.Pair;
  */
 public class GraphStatistics {
 
-	static public Histogram1D createDegreeHistogram(Graph g, int min, int max, int ignoreWave) {
+	public static double fracVertices = 1;
+	
+	public static String outputDir;
+	
+	static public Histogram createDegreeHistogram(Graph g, int min, int max, int ignoreWave) {
 		Set<Vertex> vertices = new HashSet<Vertex>();
 		for(Object o : g.getVertices()) {
 			if(((Vertex)o).getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null)
 				vertices.add((Vertex) o);
 		}
-		DoubleArrayList values = DegreeDistributions.getDegreeValues(vertices);
-		if(min < 0 && max < 0) {
-			values.sort();
-			min = (int)values.get(0);
-			max = (int)values.get(values.size()-1);
+
+		DoubleArrayList values = new DoubleArrayList(vertices.size());
+		DoubleArrayList weights = new DoubleArrayList(vertices.size());
+
+		try {
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir + ignoreWave + ".weights.txt");
+		
+		for(Vertex v : vertices) {
+			int k = v.degree();
+			values.add(k);
+			writer.write(String.valueOf(k));
+			writer.write("\t");
+			Integer wave = (Integer) v.getUserDatum(UserDataKeys.SAMPLED_KEY);
+			double w = 1;
+			if(wave == null || k == 0)
+				weights.add(1);
+			else {
+//				w = 1 / (1 - Math.pow((1 - fracVertices),k));
+				w = 1;// / (Double)v.getUserDatum(UserDataKeys.SAMPLE_PROBA_KEY);
+				weights.add(w);
+			}
+			writer.write(String.valueOf(w));
+			writer.newLine();
+			writer.flush();
+		}
+		writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
+		if(min < 0 && max < 0) {
+			DoubleArrayList copy = values.copy();
+			copy.sort();
+			min = (int)copy.get(0);
+			max = (int)copy.get(values.size()-1);
+		}
+
+		Histogram hist = new Histogram(1.0, 0, max);
+		for(int i = 0; i < values.size(); i++) {
+			hist.add(values.get(i), weights.get(i));
+		}
 		System.out.println("Gamma exponent is estimated to " + estimatePowerLawExponent(values));
-		return createHistogram(values, min, max, "Degree distribution");
+		
+		return hist;
 	}
 	
 	static public Histogram1D createClusteringCoefficientsHistogram(Graph g, double min, double max, int ignoreWave) {
@@ -159,6 +199,23 @@ public class GraphStatistics {
 		return histogram;
 	}
 	
+	private static Histogram1D createWeightedHistogram(DoubleArrayList values, DoubleArrayList weights, double min, double max, String title) {
+		if(max <= min) {
+			/*
+			 * Should never occur, but to avoid an exception...
+			 */
+			min = 0;
+			max = 1;
+		}
+		Histogram1D histogram = new Histogram1D(title, 100, min, max);
+		
+		int cnt = values.size();
+		for(int i = 0; i < cnt; i++) {
+			histogram.fill(values.get(i), weights.get(i));
+		}
+		return histogram;
+	}
+	
 	static public int countIsolates(Graph g) {
 		int sum = 0;
 		for(Object v : g.getVertices()) {
@@ -226,23 +283,33 @@ public class GraphStatistics {
 		int product = 0;
 		int sum = 0;
 		int squareSum = 0;
-		
-		for(Object e : g.getEdges()) {
-			Pair p = ((Edge)e).getEndpoints();
-			int d_v1 = ((Vertex)p.getFirst()).degree();
-			int d_v2 = ((Vertex)p.getSecond()).degree();
+		double edges = 0;
+		for (Object e : g.getEdges()) {
+			Pair p = ((Edge) e).getEndpoints();
+			Vertex v1 = (Vertex) p.getFirst();
+			Vertex v2 = (Vertex) p.getSecond();
 			
-			sum += (d_v1 + d_v2);
-			squareSum += (Math.pow(d_v1, 2) + Math.pow(d_v2, 2));
-			product += (d_v1 * d_v2);
+			if (v1.getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null
+					&& v2.getUserDatum(UserDataKeys.ANONYMOUS_KEY) == null) {
+				int d_v1 = v1.degree();
+				int d_v2 = v2.degree();
+
+				double w = 1;//1 - Math.pow(1 - fracVertices, d_v1 + d_v2);
+				
+				sum += (d_v1 + d_v2) / w;
+				squareSum += (Math.pow(d_v1, 2) + Math.pow(d_v2, 2)) / w;
+				product += (d_v1 * d_v2) / w;
+				
+				edges += 1;
+			}
 		}
-		
-		double M_minus1 = 1/(double)g.numEdges();
+//		double M_minus1 = 1 / (double) g.numEdges();
+		double M_minus1 = 1 / (double) edges;
 		double normSumSquare = Math.pow((M_minus1 * 0.5 * sum), 2);
 		double numerator = (M_minus1 * product) - normSumSquare;
 		double denumerator = (M_minus1 * 0.5 * squareSum) - normSumSquare;
-		
-		return numerator/denumerator;
+
+		return numerator / denumerator;
 	}
 	
 	public static JFreeChart makeChart(Histogram1D hist, String title) {

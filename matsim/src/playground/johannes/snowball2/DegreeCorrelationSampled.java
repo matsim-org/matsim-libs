@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UserDataKeys.java
+ * DegreeCorrelationSampled.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,36 +21,49 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.snowball2;
 
-import edu.uci.ics.jung.utils.UserDataContainer;
+import edu.uci.ics.jung.graph.Edge;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.utils.Pair;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public interface UserDataKeys {
+public class DegreeCorrelationSampled implements GraphStatistic {
 
-//	public static final String PERSON_KEY = "person";
-	
-	public static final String ID = "person_id";
-	
-	public static final String X_COORD = "x";
-	
-	public static final String Y_COORD = "y";
-	
-//	public static final String WAVE_KEY = "wave";
-	
-	public static final String SAMPLED_KEY = "sampled";
-	
-	public static final String DETECTED_KEY = "detected";
-	
-//	public static final String PARTICIPATE_KEY = "participate";
-	
-	public static final String ANONYMOUS_KEY = "anonymous";
-	
-	public static final String SAMPLE_PROBA_KEY = "sampleprobability";
-	
-	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
+	public double run(Graph g) {
+		if (g instanceof SampledGraph) {
+			int product = 0;
+			int sum = 0;
+			int squareSum = 0;
+			double edges = 0;
+			for (Object e : g.getEdges()) {
+				Pair p = ((Edge) e).getEndpoints();
+				SampledVertex v1 = (SampledVertex) p.getFirst();
+				SampledVertex v2 = (SampledVertex) p.getSecond();
 
+				if (!v1.isAnonymous() && !v2.isAnonymous()) {
+					int d_v1 = v1.degree();
+					int d_v2 = v2.degree();
+
+					sum += d_v1 + d_v2;
+					squareSum += Math.pow(d_v1, 2) + Math.pow(d_v2, 2);
+					product += d_v1 * d_v2;
+
+					edges += 1;
+				}
+			}
+			double M_minus1 = 1 / (double) edges;
+			double normSumSquare = Math.pow((M_minus1 * 0.5 * sum), 2);
+			double numerator = (M_minus1 * product) - normSumSquare;
+			double denumerator = (M_minus1 * 0.5 * squareSum) - normSumSquare;
+
+			return numerator / denumerator;
+		} else {
+			throw new IllegalArgumentException(
+					"Graph must be instance of SampledGraph!");
+		}
+	}
 }

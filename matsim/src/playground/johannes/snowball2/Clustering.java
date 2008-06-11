@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UserDataKeys.java
+ * Clustering.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,36 +21,49 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.snowball2;
 
-import edu.uci.ics.jung.utils.UserDataContainer;
+import java.util.Map;
+
+import playground.johannes.snowball.Histogram;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.statistics.GraphStatistics;
 
 /**
  * @author illenberger
  *
  */
-public interface UserDataKeys {
+public class Clustering implements VertexStatistic {
 
-//	public static final String PERSON_KEY = "person";
+	protected Map<Vertex, Double> values;
 	
-	public static final String ID = "person_id";
-	
-	public static final String X_COORD = "x";
-	
-	public static final String Y_COORD = "y";
-	
-//	public static final String WAVE_KEY = "wave";
-	
-	public static final String SAMPLED_KEY = "sampled";
-	
-	public static final String DETECTED_KEY = "detected";
-	
-//	public static final String PARTICIPATE_KEY = "participate";
-	
-	public static final String ANONYMOUS_KEY = "anonymous";
-	
-	public static final String SAMPLE_PROBA_KEY = "sampleprobability";
-	
-	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
+	public Histogram getHistogram() {
+		Histogram histogram = new Histogram(100);
+		for(Double d : values.values())
+			histogram.add(d);
+		return histogram;
+	}
+
+	public Histogram getHistogram(double min, double max) {
+		Histogram histogram = new Histogram(100, min, max);
+		for(Double d : values.values())
+			histogram.add(d);
+		return histogram;
+	}
+
+	public double run(Graph g) {
+		values = GraphStatistics.clusteringCoefficients(g);
+		
+		double sum = 0;
+		for(Vertex v : values.keySet()) {
+			if(v.degree() == 1)
+				values.put(v, 0.0);
+			
+			sum += values.get(v);
+		}
+		
+		return sum/(double)values.size();
+	}
 
 }

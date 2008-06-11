@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UserDataKeys.java
+ * DegreeSampled.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,36 +21,47 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.snowball2;
 
-import edu.uci.ics.jung.utils.UserDataContainer;
+import java.util.HashMap;
+import java.util.Set;
+
+import playground.johannes.snowball.Histogram;
+
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public interface UserDataKeys {
+public class DegreeSampled extends Degree {
 
-//	public static final String PERSON_KEY = "person";
-	
-	public static final String ID = "person_id";
-	
-	public static final String X_COORD = "x";
-	
-	public static final String Y_COORD = "y";
-	
-//	public static final String WAVE_KEY = "wave";
-	
-	public static final String SAMPLED_KEY = "sampled";
-	
-	public static final String DETECTED_KEY = "detected";
-	
-//	public static final String PARTICIPATE_KEY = "participate";
-	
-	public static final String ANONYMOUS_KEY = "anonymous";
-	
-	public static final String SAMPLE_PROBA_KEY = "sampleprobability";
-	
-	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
+	@Override
+	public double run(Graph g) {
+		if (g instanceof SampledGraph) {
+			values = new HashMap<Vertex, Integer>();
+			int sum = 0;
+			double wsum = 0;
+			Set<SampledVertex> vertices = ((SampledGraph) g).getVertices();
+			for (SampledVertex v : vertices) {
+				if (!v.isAnonymous()) {
+					sum += v.degree() * 1 / v.getSampleProbability();
+					wsum += 1 /v.getSampleProbability();
+					values.put(v, v.degree());
+				}
+			}
+			return sum / wsum;
+		} else {
+			throw new IllegalArgumentException(
+					"Graph must be an instance of SampledGrah!");
+		}
+	}
 
+	@Override
+	protected void fillHistogram(Histogram histogram) {
+		for(Vertex v : values.keySet()) {
+			histogram.add(v.degree(), 1 / ((SampledVertex)v).getSampleProbability());
+		}
+	}
 }

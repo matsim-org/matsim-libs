@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UserDataKeys.java
+ * SampledGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,36 +21,28 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.snowball2;
 
-import edu.uci.ics.jung.utils.UserDataContainer;
+import java.util.Set;
+
+import edu.uci.ics.jung.graph.impl.UndirectedSparseGraph;
 
 /**
  * @author illenberger
  *
  */
-public interface UserDataKeys {
+public class SampledGraph extends UndirectedSparseGraph {
 
-//	public static final String PERSON_KEY = "person";
-	
-	public static final String ID = "person_id";
-	
-	public static final String X_COORD = "x";
-	
-	public static final String Y_COORD = "y";
-	
-//	public static final String WAVE_KEY = "wave";
-	
-	public static final String SAMPLED_KEY = "sampled";
-	
-	public static final String DETECTED_KEY = "detected";
-	
-//	public static final String PARTICIPATE_KEY = "participate";
-	
-	public static final String ANONYMOUS_KEY = "anonymous";
-	
-	public static final String SAMPLE_PROBA_KEY = "sampleprobability";
-	
-	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<SampledVertex> getVertices() {
+		return super.getVertices();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<SampledEdge> getEdges() {
+		return super.getEdges();
+	}
 
 }

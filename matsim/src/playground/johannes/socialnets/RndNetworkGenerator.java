@@ -62,6 +62,8 @@ public class RndNetworkGenerator {
 		 * Create a vertex for each person.
 		 */
 		logger.info("Creating vertices...");
+		long randomSeed = Gbl.getConfig().global().getRandomSeed();
+		Random rnd = new Random(randomSeed);
 		for(Person p : plans.getPersons().values()) {
 			UndirectedSparseVertex v =  new UndirectedSparseVertex();
 			g.addVertex(v);
@@ -69,13 +71,18 @@ public class RndNetworkGenerator {
 			Act act = p.getSelectedPlan().getFirstActivity();
 			v.addUserDatum(UserDataKeys.X_COORD, act.getCoord().getX(), UserDataKeys.COPY_ACT);
 			v.addUserDatum(UserDataKeys.Y_COORD, act.getCoord().getY(), UserDataKeys.COPY_ACT);
+			if(0.5 <= rnd.nextDouble()) {
+				v.addUserDatum("type", 1, UserDataKeys.COPY_ACT);
+			} else {
+				v.addUserDatum("type", 2, UserDataKeys.COPY_ACT);
+			}
 		}
 		logger.info(String.format("Created %1$s vertices.", g.numVertices()));
 		/*
 		 * Insert random ties between persons.
 		 */
 		logger.info("Creating edges...");
-		long randomSeed = Gbl.getConfig().global().getRandomSeed();
+		
 		int numThreads = 1;//Runtime.getRuntime().availableProcessors();
 		
 		int i = 0;
@@ -91,7 +98,7 @@ public class RndNetworkGenerator {
 			threads[i].join();
 		}
 		
-		Set<Vertex> vertices = new HashSet<Vertex>();
+		Set<Vertex> vertices = new HashSet<Vertex>(g.getVertices());
 		for(Vertex v : vertices) {
 			if(v.degree() == 0)
 				g.removeVertex(v);
@@ -102,7 +109,7 @@ public class RndNetworkGenerator {
 				g.numVertices(),
 				g.numEdges(),
 				g.numEdges()/((double)(g.numVertices() * (g.numVertices()-1))),
-				GraphStatistics.createDegreeHistogram(g, -1, -1, 0).mean(),
+				GraphStatistics.createDegreeHistogram(g, -1, -1, 0).getMean(),
 				new WeakComponentClusterer().extract(g).size()));
 		return g;
 	}
@@ -116,8 +123,19 @@ public class RndNetworkGenerator {
 		CoordI c2 = new Coord(x2,y2);
 		
 		double dist = c1.calcDistance(c2)/1000.0;
+		int dv1 = v1.degree();
+		if(dv1 == 0)
+			dv1 = 1;
+		int dv2 = v2.degree();
+		if(dv2 == 0)
+			dv2 = 1;
+		double dSquareSum = Math.pow(dv1, 2) + Math.pow(dv2, 2);
 		
-		return alpha * 1/Math.pow(dist,2);
+		int type1 = (Integer)v1.getUserDatum("type");
+		int type2 = (Integer)v2.getUserDatum("type");
+		double mixing = 1 - Math.abs(type1 - type2);
+		
+		return alpha * 1/Math.pow(dist,2) * dSquareSum;
 //		return alpha * 1/dist;
 	}
 	

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UserDataKeys.java
+ * Degree.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,36 +21,50 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.snowball2;
 
-import edu.uci.ics.jung.utils.UserDataContainer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import playground.johannes.snowball.Histogram;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public interface UserDataKeys {
+public class Degree implements VertexStatistic {
 
-//	public static final String PERSON_KEY = "person";
+	protected Map<Vertex, Integer> values;
 	
-	public static final String ID = "person_id";
+	public Histogram getHistogram() {
+		Histogram histogram = new Histogram(1.0);
+		fillHistogram(histogram);
+		return histogram;
+	}
+
+	public Histogram getHistogram(double min, double max) {
+		Histogram histogram = new Histogram(1.0, min, max);
+		fillHistogram(histogram);
+		return histogram;
+	}
+
+	protected void fillHistogram(Histogram histogram) {
+		for(Integer i : values.values())
+			histogram.add(i);
+	}
 	
-	public static final String X_COORD = "x";
-	
-	public static final String Y_COORD = "y";
-	
-//	public static final String WAVE_KEY = "wave";
-	
-	public static final String SAMPLED_KEY = "sampled";
-	
-	public static final String DETECTED_KEY = "detected";
-	
-//	public static final String PARTICIPATE_KEY = "participate";
-	
-	public static final String ANONYMOUS_KEY = "anonymous";
-	
-	public static final String SAMPLE_PROBA_KEY = "sampleprobability";
-	
-	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
+	public double run(Graph g) {
+		values = new HashMap<Vertex, Integer>();
+		int sum = 0;
+		Set<Vertex> vertices = g.getVertices();
+		for(Vertex v : vertices) {
+			sum += v.degree();
+			values.put(v, v.degree());
+		}
+		return sum/(double)vertices.size();
+	}
 
 }

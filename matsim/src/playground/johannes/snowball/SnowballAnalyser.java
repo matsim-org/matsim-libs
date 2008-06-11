@@ -30,7 +30,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -104,6 +106,8 @@ public class SnowballAnalyser {
 		new File(outDir + APL_DIR).mkdirs();
 		new File(outDir + PAJEK_DIR).mkdirs();
 		new File(outDir + DISTANCE_DIR).mkdirs();
+		
+		GraphStatistics.outputDir = outDir;
 		/*
 		 * Load the social network...
 		 */
@@ -153,16 +157,22 @@ public class SnowballAnalyser {
 		Sampler sampler = new Sampler(randomseed);
 		sampler.setPParticipate(pParticipate);
 		sampler.setPTieNamed(pTieNamed);
-			
+		sampler.init(g);
+		Collection<Vertex> egos = sampler.selectedIntialEgos(g, seeds);
+		
+		double fracSmapled = 1;
 		for(int wave = 1; wave <= waves; wave++) {
-			logger.info("Sampling with " + wave + " waves...");
-			sampler.run(g, wave, seeds);
-			
+			logger.info("Sampling wave " + wave + "...");
+			egos = sampler.runWave(egos, wave);
+						
 			logger.info("Extracting sampled graph...");
 			Graph sample = sampler.extractSampledGraph(g, false);
 		
+			sampler.calculateSampleProbas(sample, fracSmapled);
+			
 			logger.info("Computing sampled graph statistics...");
-			dumpGraphStatistics(sample, obsGraphStats, meanWriter, outDir, wave, extendedAnalysis);
+			GraphStatsContainer c = dumpGraphStatistics(sample, obsGraphStats, meanWriter, outDir, wave, extendedAnalysis);
+			fracSmapled = c.sampledVertices/(double)obsGraphStats.g.numVertices();
 		}
 	}
 	
@@ -200,22 +210,21 @@ public class SnowballAnalyser {
 		ClusteringThread clusteringThread = null;
 		CoverageThread coverageThread = new CoverageThread(g, wave);
 		AssortativityThread assortativityThread = new AssortativityThread(g);
-		ComponentsThread componentsThread = new ComponentsThread(g);
+//		ComponentsThread componentsThread = new ComponentsThread(g);
 		BetweenessThread betweenessThread = null;
 		APLThread aplThread = null;
 		DistanceThread distanceThread = null;
-//		DegreeSampleThread dSampleThread = new DegreeSampleThread(g,0,0,0);
 		
 		if(wave == 0) {
-			degreeThread = new DegreeHistogramThread(g, wave, -1, -1);
+			degreeThread = new DegreeHistogramThread(g, wave, 1, 100);
 			clusteringThread = new ClusteringThread(g, wave, -1, -1);
 			betweenessThread = new BetweenessThread(g, wave, -1, -1);
 			aplThread = new APLThread(g, wave, -1, -1);
 			distanceThread = new DistanceThread(g, wave, -1, -1);
 		} else {
 			degreeThread = new DegreeHistogramThread(g, wave, 
-					(int)stats.degreeHistogram.xAxis().lowerEdge(),
-					(int)stats.degreeHistogram.xAxis().upperEdge());
+					0,
+					(int)stats.degreeHistogram.getMax());
 			clusteringThread = new ClusteringThread(g, wave,
 					stats.clusteringHistogram.xAxis().lowerEdge(),
 					stats.clusteringHistogram.xAxis().upperEdge());
@@ -237,13 +246,12 @@ public class SnowballAnalyser {
 		threads.add(degreeThread);
 		threads.add(clusteringThread);
 		threads.add(assortativityThread);
-		threads.add(componentsThread);
+//		threads.add(componentsThread);
 		threads.add(distanceThread);
 		if(extendedAnalysis) {
 			threads.add(betweenessThread);
 			threads.add(aplThread);
 		}
-//		threads.add(dSampleThread);
 		
 		for(Thread t : threads)
 			t.start();
@@ -256,6 +264,7 @@ public class SnowballAnalyser {
 			}
 		}
 		
+		GraphStatistics.fracVertices = coverageThread.getNumVertices()/(float)stats.g.numVertices();
 		
 		meanWriter.write(String.valueOf(wave));
 		meanWriter.write("\t");
@@ -273,13 +282,14 @@ public class SnowballAnalyser {
 		meanWriter.write("\t");
 		meanWriter.write(String.valueOf(coverageThread.numIsolatedVertices));
 		meanWriter.write("\t");
-		meanWriter.write(String.valueOf((float)degreeThread.getHistogram().mean()));
+		meanWriter.write(String.valueOf((float)degreeThread.histogram.getMean()));
 		meanWriter.write("\t");
 		meanWriter.write(String.valueOf((float)clusteringThread.getHistogram().mean()));
 		meanWriter.write("\t");
 		meanWriter.write(String.valueOf((float)assortativityThread.getAssortativity()));
 		meanWriter.write("\t");
-		meanWriter.write(String.valueOf(componentsThread.getNumComponents()));
+//		meanWriter.write(String.valueOf(componentsThread.getNumComponents()));
+		meanWriter.write("n.a.");
 		meanWriter.write("\t");
 		meanWriter.write(String.valueOf((float)distanceThread.getHistogram().mean()));
 		if(extendedAnalysis) {
@@ -293,9 +303,10 @@ public class SnowballAnalyser {
 		meanWriter.newLine();
 		meanWriter.flush();
 		
-		GraphStatistics.plotHistogram(degreeThread.getHistogram(), outDir + DEGREE_DIR + wave +".degree.png");
-		GraphStatistics.writeHistogramNormalized(degreeThread.getHistogram(),  outDir + DEGREE_DIR + wave +".degree.norm.txt");
-		GraphStatistics.writeHistogram(degreeThread.getHistogram(),  outDir + DEGREE_DIR + wave +".degree.txt");
+//		GraphStatistics.plotHistogram(degreeThread.getHistogram(), outDir + DEGREE_DIR + wave +".degree.png");
+		degreeThread.histogram.plot(outDir + DEGREE_DIR + wave +".degree.png", "Degree distribution");
+//		GraphStatistics.writeHistogramNormalized(degreeThread.getHistogram(),  outDir + DEGREE_DIR + wave +".degree.norm.txt");
+//		GraphStatistics.writeHistogram(degreeThread.getHistogram(),  outDir + DEGREE_DIR + wave +".degree.txt");
 		
 		GraphStatistics.plotHistogram(clusteringThread.getHistogram(), outDir + CLUSTERING_DIR + wave + ".clustering.png");
 		GraphStatistics.plotHistogram(distanceThread.getHistogram(), outDir + DISTANCE_DIR + wave + ".distance.png");
@@ -304,21 +315,19 @@ public class SnowballAnalyser {
 			GraphStatistics.plotHistogram(aplThread.getHistogram(), outDir + APL_DIR + wave +".apl.png");
 		}
 		
-//		GraphStatistics.plotHistogram(dSampleThread.getHistogram(), outDir + wave + "sampleDegree.png");
-		
-		
 		PajekVisWriter pajekWriter = new PajekVisWriter();
 		pajekWriter.write(g, outDir + PAJEK_DIR + wave + ".sampled.net");
 		
 		GraphStatsContainer container = new GraphStatsContainer();
 		container.g = g;
-		container.degreeHistogram = degreeThread.getHistogram();
+		container.degreeHistogram = degreeThread.histogram;
 		container.clusteringHistogram = clusteringThread.getHistogram();
 		container.distanceHistogram = distanceThread.getHistogram();
 		if(extendedAnalysis) {
 			container.betweenessHistogram = betweenessThread.getHistogram();
 			container.aplHistogram = aplThread.getHistogram();
 		}
+		container.sampledVertices = coverageThread.getNumVertices();
 		
 		return container;
 	}
@@ -411,6 +420,8 @@ public class SnowballAnalyser {
 	
 	private static class DegreeHistogramThread extends HistogramThread {
 	
+		protected Histogram histogram;
+		
 		public DegreeHistogramThread(Graph g, int wave, double min, double max) {
 			super(g, wave, min, max);
 		}
@@ -513,48 +524,13 @@ public class SnowballAnalyser {
 		}
 	}
 	
-	private static class DegreeSampleThread extends HistogramThread {
-		
-		public DegreeSampleThread(Graph g, int wave, double min, double max) {
-			super(g, wave, min, max);
-		}
-
-		public void run() {
-			Set<Vertex> vertices = g.getVertices();
-			Histogram1D samples = new Histogram1D("degree vs. detects", 100, 0, 100);
-			for(Vertex v : vertices) {
-				Integer detects = (Integer) v.getUserDatum(UserDataKeys.DETECTED_KEY);
-				if(detects != null) {
-					int k = v.degree();
-					for(int i = 1; i < detects; i++)
-						samples.fill(k);
-				}
-			}
-			
-			Histogram1D degree = GraphStatistics.createDegreeHistogram(g, 0, 100, wave);
-			
-			histogram = new Histogram1D("",100,0,100);
-			for(int i = 0; i < 100; i++) {
-				double num_k = degree.binHeight(i);
-				double num_sample = samples.binHeight(i);
-//				System.out.println(num_k);
-//				System.out.println(num_sample);
-				int count = 0;
-				if(num_sample > 0)
-					count = (int) ((num_k/num_sample)*1000);
-//				System.out.println(count);
-				for(int k = 0; k < count; k++) {
-					histogram.fill(i);
-				}
-			}
-		}
-	}
-	
 	private static class GraphStatsContainer {
 		
 		public Graph g;
 		
-		public Histogram1D degreeHistogram;
+		public int sampledVertices = 1;
+		
+		public Histogram degreeHistogram;
 		
 		public Histogram1D clusteringHistogram;
 		
