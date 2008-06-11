@@ -28,6 +28,8 @@ import java.util.Map;
 
 import org.geotools.feature.Feature;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 public class CRN {
 
 	final private static int MAX_LETTERS = 64;
@@ -44,7 +46,7 @@ public class CRN {
 		createTranslationTable();
 		buildActivationMatrix();
 		buildCaseNodes(ft);
-		selfTest(ft);
+//		selfTest(ft);
 	}
 
 	private void createTranslationTable() {
@@ -59,20 +61,20 @@ public class CRN {
 		
 	}
 
-	private void selfTest(Collection<Feature> fts) {
-		for (Feature ft : fts) {
-			String expression = ((String) ft.getAttribute(3)).toLowerCase();
-			CaseNode resp = getCase(expression);
-			if (resp == null) continue; 
-			
-			
-			if (!resp.getExpression().equals(expression)) {
-				System.err.println("Query: " + expression + "  Resp: " + resp.getExpression());
-				
-			}
-			
-		}
-	}
+//	private void selfTest(Collection<Feature> fts) {
+//		for (Feature ft : fts) {
+//			String expression = ((String) ft.getAttribute(3)).toLowerCase();
+//			CaseNode resp = getCase(expression);
+//			if (resp == null) continue; 
+//			
+//			
+//			if (!resp.getExpression().equals(expression)) {
+//				System.err.println("Query: " + expression + "  Resp: " + resp.getExpression());
+//				
+//			}
+//			
+//		}
+//	}
 
 	private void buildCaseNodes(Collection<Feature> fts) { 
 		for (Feature ft : fts) {
@@ -81,7 +83,7 @@ public class CRN {
 				continue;
 			}
 			this.expr.add(expression.toLowerCase());
-			this.caseNodes.add(new CaseNode(expression));
+			this.caseNodes.add(new CaseNode(expression,ft.getDefaultGeometry().getCentroid().getCoordinate()));
 		}
 		
 		
@@ -227,9 +229,10 @@ public class CRN {
 		private double [] weights;
 		private double activation;
 		private double sW = 0;
+		private Coordinate coord;
 
-		public CaseNode(String input) {
-			
+		public CaseNode(String input, Coordinate coordinate) {
+			this.coord = coordinate;
 			this.expression = input.toLowerCase();
 			linkCaseNode();			
 			if (!checkIt()) {
@@ -253,6 +256,10 @@ public class CRN {
 			return activation / (1+Math.abs(ql-this.length)); 
 		}
 
+		public Coordinate getCoordinate() {
+			return this.coord;
+		}
+		
 		public String getExpression() {
 			return this.expression;
 		}
