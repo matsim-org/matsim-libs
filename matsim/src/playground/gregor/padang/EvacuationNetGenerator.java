@@ -38,6 +38,7 @@ import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 
 public class EvacuationNetGenerator {
@@ -231,14 +232,15 @@ public class EvacuationNetGenerator {
 		world.complete();
 		log.info("done.");
 
+		String evacfile = "networks/padang_evacuationarea_v20080608.xml.gz";
 		
 //		log.info("loading evacuationarea from " + Gbl.getConfig().evacuation().getEvacuationAreaFile());
-		log.info("loading evacuationarea from " + "evac.xml.gz");
+		log.info("loading evacuationarea from " + evacfile);
 		HashMap<Id,EvacuationAreaLink> el = new HashMap<Id,EvacuationAreaLink>();
 		
 		try {
 //			new EvacuationAreaFileReader(el).readFile(Gbl.getConfig().evacuation().getEvacuationAreaFile());
-			new EvacuationAreaFileReader(el).readFile("evac.xml.gz");
+			new EvacuationAreaFileReader(el).readFile(evacfile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -246,6 +248,6 @@ public class EvacuationNetGenerator {
 		new EvacuationNetGenerator().generateEvacuationNet(network, el);
 		
 		new NetworkWriter(network,"test_evac.xml").write();
-		
+
 	}
 }
