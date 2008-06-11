@@ -29,7 +29,7 @@ public class TextFileWriter {
 	private BufferedWriter out = null;	
 	public TextFileWriter(final String filename){
 		try {
-			this.out = IOUtils.getBufferedWriter(filename, true);
+			this.out = IOUtils.getBufferedWriter(filename, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

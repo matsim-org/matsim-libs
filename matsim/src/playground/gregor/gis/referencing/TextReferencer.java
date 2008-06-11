@@ -60,9 +60,13 @@ public class TextReferencer {
 	private FeatureSource featureSource;
 	private GeometryFactory geofac;
 
-	public TextReferencer(FeatureSource featureSource) {
-		this.featureSource = featureSource;
-		Collection<Feature> ft = getFeatures(featureSource);
+	public TextReferencer(ArrayList<FeatureSource> fts) {
+		this.featureSource = fts.get(0);
+		Collection<Feature> ft = new ArrayList<Feature>();
+		for (FeatureSource f : fts) {
+			ft.addAll(getFeatures(f));
+		}
+
 		this.referenced = ft;
 		this.crn = new CRN(ft);
 		this.geofac = new GeometryFactory();
@@ -80,6 +84,9 @@ public class TextReferencer {
 		
 		while (line != null) {
 			String query = line[6];
+			if (query.toLowerCase().contains(", kampung")){
+				int i = 0; i++;
+			}
 			CaseNode resp = this.crn.getCase(query);
 			if (resp == null){ 
 				line = tfr.readLine();
@@ -121,7 +128,10 @@ public class TextReferencer {
 		Object [] obj = new Object [input.length+1];
 		obj[0] = this.geofac.createPoint(c);
 		for (int i = 1; i < input.length+1; i++) {
-
+			if (input[i-1].equals("")) {
+				obj[i] = "0";
+				continue;
+			}
 			
 			switch (i) {
 			case 1:
@@ -135,7 +145,7 @@ public class TextReferencer {
 				try {
 					obj[i] = Integer.parseInt(input[i-1]);
 				} catch (NumberFormatException e) {
-					obj[i] = -1;
+					obj[i] = 9999;
 				}
 				break;
 			case 3:
@@ -246,30 +256,26 @@ private void initFeatureGenerator(){
 		attrib[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.featureSource.getSchema().getDefaultGeometry().getCoordinateSystem());
 //		AttributeType linestring = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
 		attrib[1]= AttributeTypeFactory.newAttributeType("ID", String.class);
-		attrib[2] = AttributeTypeFactory.newAttributeType("QR1.5", Integer.class);
+		attrib[2] = AttributeTypeFactory.newAttributeType("QR15", Integer.class);
 		attrib[3] = AttributeTypeFactory.newAttributeType("ACT", String.class);
 		attrib[4] = AttributeTypeFactory.newAttributeType("NOACT", Integer.class);
-		attrib[5] = AttributeTypeFactory.newAttributeType("QR2.1", String.class);
-		attrib[6] = AttributeTypeFactory.newAttributeType("QR2.1s", String.class);
-		attrib[7] = AttributeTypeFactory.newAttributeType("QR2.2s", String.class);
-		attrib[8] = AttributeTypeFactory.newAttributeType("QR2.3", String.class);
-		attrib[9] = AttributeTypeFactory.newAttributeType("QR2.3s", String.class);
-		attrib[10] = AttributeTypeFactory.newAttributeType("QR2.4.1", Double.class);
-		attrib[11] = AttributeTypeFactory.newAttributeType("QR2.4.2", Double.class);
-		attrib[12] = AttributeTypeFactory.newAttributeType("QR2.5.1", Double.class);
-		attrib[13] = AttributeTypeFactory.newAttributeType("QR2.5.2", Double.class);
-		attrib[14] = AttributeTypeFactory.newAttributeType("QR2.6", String.class);
-		attrib[15] = AttributeTypeFactory.newAttributeType("QR2.6s", String.class);
-		attrib[16] = AttributeTypeFactory.newAttributeType("QI1.13", String.class);
-		attrib[17] = AttributeTypeFactory.newAttributeType("QI1.14", Integer.class);
-		attrib[18] = AttributeTypeFactory.newAttributeType("QI1.15", String.class);
-		attrib[19] = AttributeTypeFactory.newAttributeType("QI1.125", String.class);
+		attrib[5] = AttributeTypeFactory.newAttributeType("QR21", String.class);
+		attrib[6] = AttributeTypeFactory.newAttributeType("QR21s", String.class);
+		attrib[7] = AttributeTypeFactory.newAttributeType("QR22s", String.class);
+		attrib[8] = AttributeTypeFactory.newAttributeType("QR23", String.class);
+		attrib[9] = AttributeTypeFactory.newAttributeType("QR23s", String.class);
+		attrib[10] = AttributeTypeFactory.newAttributeType("QR241", Double.class);
+		attrib[11] = AttributeTypeFactory.newAttributeType("QR242", Double.class);
+		attrib[12] = AttributeTypeFactory.newAttributeType("QR251", Double.class);
+		attrib[13] = AttributeTypeFactory.newAttributeType("QR252", Double.class);
+		attrib[14] = AttributeTypeFactory.newAttributeType("QR26", String.class);
+		attrib[15] = AttributeTypeFactory.newAttributeType("QR26s", String.class);
+		attrib[16] = AttributeTypeFactory.newAttributeType("QI113", String.class);
+		attrib[17] = AttributeTypeFactory.newAttributeType("QI114", Integer.class);
+		attrib[18] = AttributeTypeFactory.newAttributeType("QI115", String.class);
+		attrib[19] = AttributeTypeFactory.newAttributeType("QI1125", String.class);
 		
-		AttributeType to = AttributeTypeFactory.newAttributeType("to", Integer.class);
-		AttributeType width = AttributeTypeFactory.newAttributeType("min_width", Double.class);
-		AttributeType area = AttributeTypeFactory.newAttributeType("area", Double.class);
-		AttributeType length = AttributeTypeFactory.newAttributeType("length", Double.class);
-		AttributeType info = AttributeTypeFactory.newAttributeType("info", String.class);
+		
 		try {
 //			this.ftPolygon = FeatureTypeFactory.newFeatureType(new AttributeType[] {polygon, id, from, to, width, area, length }, "linkShape");
 			this.ftPoint = FeatureTypeFactory.newFeatureType(attrib, "pointShape");
@@ -283,11 +289,28 @@ private void initFeatureGenerator(){
 	}
 	
 	public static void main(String [] args) throws Exception {
-		String referenced =  "./padang/referencing/referenced.shp";
+		String referenced1 =  "./padang/referencing/referenced.shp";
+		String referenced2 =  "./padang/referencing/referenced2.shp";
+		String referenced3 =  "./padang/referencing/referenced3.shp";
+		String referenced4 =  "./padang/referencing/referenced4.shp";
+		String referenced5 =  "./padang/referencing/referenced5.shp";
+		String referenced6 =  "./padang/referencing/referenced6.shp";
+		String referenced7 =  "./padang/referencing/referenced7.shp";
+		
+		
 		String unclassified = "./padang/referencing/unclassified.txt";
 	
 		
-		new TextReferencer(ShapeFileReader.readDataFile(referenced)).classify(unclassified);
+		ArrayList<FeatureSource> fts = new ArrayList<FeatureSource>();
+		fts.add(ShapeFileReader.readDataFile(referenced1));
+		fts.add(ShapeFileReader.readDataFile(referenced2));
+		fts.add(ShapeFileReader.readDataFile(referenced3));
+		fts.add(ShapeFileReader.readDataFile(referenced4));
+		fts.add(ShapeFileReader.readDataFile(referenced5));
+		fts.add(ShapeFileReader.readDataFile(referenced6));
+		fts.add(ShapeFileReader.readDataFile(referenced7));
+		
+		new TextReferencer(fts).classify(unclassified);
 		
 		
 		

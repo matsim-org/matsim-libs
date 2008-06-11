@@ -214,8 +214,11 @@ public class PolygonLinksGenerator {
 				this.pg.createLineStringFeature(currLs, id, "");
 				continue;
 			}
+
 			
-			double minWidth = Math.max(getMinWidth(pLink,currLs), 0.71);
+			//double minWidth = Math.max(getMinWidth(pLink,currLs), 0.71);
+			double minWidth = getMinWidth(pLink,currLs);
+
 			
 			Feature ftLink = this.pg.getPolygonFeature(pLink, currLs.getLength(), id, nodeIds.get(0), nodeIds.get(1), minWidth, pLink.getArea());
 			this.ftLinks.put(id, ftLink);
@@ -235,7 +238,17 @@ public class PolygonLinksGenerator {
 			
 		}
 		if (minWidth == Double.POSITIVE_INFINITY) {
-			return 0;
+			for (int i = 1; i < coords.length-1; i++) {
+				Coordinate c1 = coords[i-1];
+				Coordinate c2 = coords[i];
+				Coordinate c = new Coordinate (c1.x+(c2.x-c1.x)/2, c1.y + (c2.y-c1.y)/2);
+				
+				double t = getWidth2(c,p,l);
+				if (t < minWidth) {
+					minWidth = t;
+				}
+				
+			}
 		}
 		
 		return minWidth;
@@ -246,7 +259,7 @@ public class PolygonLinksGenerator {
 		double dx = c.x - perp.x;
 		double dy = c.y - perp.y;
 		double distPerp = c.distance(perp);
-		double scale = (l.getLength()/2)/distPerp;
+		double scale = (100)/distPerp;
 		Coordinate c1 = new Coordinate(c.x + dx*scale, c.y + dy*scale);
 		Coordinate c2 = new Coordinate(c.x - dx*scale, c.y - dy*scale);
 		
@@ -285,7 +298,7 @@ public class PolygonLinksGenerator {
 			
 			double width = lwidth.getLength();
 			
-//			this.pg.createLineStringFeature(lwidth,1, width +"");
+			this.pg.createLineStringFeature(lwidth,1, width +"");
 			return width;			
 
 		}

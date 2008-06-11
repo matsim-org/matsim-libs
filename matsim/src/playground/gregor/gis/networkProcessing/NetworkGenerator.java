@@ -73,13 +73,14 @@ public class NetworkGenerator {
 			double area = (Double) link.getAttribute(5);
 			double length = (Double) link.getAttribute(6);
 			double avgWidth = Math.max(area/length, minWidth);
-			double permlanes = avgWidth / 0.71;
-
-			double flowcap = Math.max(minWidth / 0.71,1);
-			if (minWidth == 0 ){
+			
+			if (minWidth < 0.71 ){
 				log.warn("wrong flowcap!");
-				continue;
+				minWidth = 200;
 			}
+			double permlanes = Math.max(avgWidth,minWidth) / 0.71;
+			double flowcap = Math.max(minWidth / 0.71,1);
+
 			this.network.createLink(Integer.toString(id), Integer.toString(from), Integer.toString(to), Double.toString(length), "1.66", Double.toString(flowcap), Double.toString(permlanes), Integer.toString(id), "");
 			
 			this.network.createLink(Integer.toString(id+100000), Integer.toString(to), Integer.toString(from), Double.toString(length), "1.66", Double.toString(flowcap), Double.toString(permlanes), Integer.toString(id), "");

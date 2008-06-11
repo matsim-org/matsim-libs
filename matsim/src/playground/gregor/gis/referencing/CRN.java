@@ -35,19 +35,39 @@ public class CRN {
 	final private static int MAX_LETTERS = 64;
 	private double[][] activationMatrix;
 	private Collection<CaseNode> caseNodes; 
-	private final double [] spreading = new double [] {0.0,0.5,1,0.5,0.0};
+//	private final double [] spreading = new double [] {0.7,0.75,1,0.75,0.7};
+	private final double [] spreading = new double [] {0.0,0.75,1,0.75,0.0};
 	private Map<String,String> nT2 = new HashMap<String,String>();
 	private Map<String,String> nT3 = new HashMap<String,String>();
 	private Map<String,String> nT4 = new HashMap<String,String>();
 	private HashSet<String> expr = new HashSet<String>();
+	private HashMap<Integer,SimilarityLink> simLinks = new HashMap<Integer,SimilarityLink>();
 	
 	public CRN(Collection<Feature> ft) {
 		this.caseNodes = new ArrayList<CaseNode>();
 		createTranslationTable();
+		createMappingTable();
 		buildActivationMatrix();
 		buildCaseNodes(ft);
 //		selfTest(ft);
 	}
+
+	
+	private void createMappingTable() {
+		addSimLink('a','e',0.75);
+		addSimLink('s','z',0.75);
+		addSimLink('c','k',0.75);
+		addSimLink('y','i',0.75);
+		addSimLink('u','i',0.75);
+		addSimLink('m','n',0.75);
+		
+	}
+	
+	private void addSimLink(int c, int d, double e) {
+		this.simLinks.put(c, new SimilarityLink(d,e))	;
+		this.simLinks.put(d, new SimilarityLink(c,e))	;
+	}
+
 
 	private void createTranslationTable() {
 		this.nT3.put(" iii", " 3");
@@ -58,6 +78,10 @@ public class CRN {
 		this.nT2.put(" vi", " 6");
 		this.nT2.put(" ix", " 9");
 		this.nT2.put(" xi", " 11");
+		this.nT3.put("rs ", "rumah sakit ");
+		this.nT3.put("jl.", "jalan ");
+		this.nT4.put("jln ", "jalan ");
+		this.nT3.put("jl ", "jalan ");
 		
 	}
 
@@ -142,6 +166,13 @@ public class CRN {
 	}
 
 	private void spreadActivation(int i, int c) {
+		SimilarityLink l = this.simLinks.get(c);
+		if (l != null) {
+			this.activationMatrix[i][l.entry] = l.similarity * this.activationMatrix[i][c]; 
+		}
+		
+		
+		
 		if (i >= 2) {
 			this.activationMatrix[i-2][c] += this.spreading[0] * this.activationMatrix[i][c];
 			this.activationMatrix[i-1][c] += this.spreading[1] * this.activationMatrix[i][c];
@@ -221,6 +252,15 @@ public class CRN {
 		return expression;
 	}
 
+	
+	private class SimilarityLink {
+		int entry;
+		double similarity;
+		public SimilarityLink(int entry, double sim) {
+			this.entry = entry;
+			this.similarity = sim;
+		}
+	}
 
 	public class CaseNode{
 		private String expression;
