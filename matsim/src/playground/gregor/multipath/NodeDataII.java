@@ -210,7 +210,7 @@ public class NodeDataII {
 //	}
 
 	public void rmShadow(NodeDataII del) {
-		this.shadowNodes.remove(del);
+		this.shadowNodes.remove(del.getShadowID());
 	}
 	
 	
