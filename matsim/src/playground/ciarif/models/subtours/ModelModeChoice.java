@@ -43,7 +43,7 @@ public abstract class ModelModeChoice {
 	protected String car; // availability of car (Always, Sometimes, Never)
 	protected String male; // 0-[unlimited]
 	protected boolean bike; // bike ownership
-	protected double prev_mode; // 1= car; 2= Pt; 3= Car passenger; 4= Bike; 5= Walk;
+	protected double prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
 	protected CoordI home_coord; //Coordinates of the home facility of the agent
 	protected boolean ride; // states if a car lift is possible, to avoid too much ride instead of pt, to check the reason it works like this
 	protected boolean pt; // pt possible 
@@ -64,7 +64,7 @@ public abstract class ModelModeChoice {
 		this.bike = false;
 		this.ride= false;
 		this.pt= false;
-		this.prev_mode = -1.0;
+		this.prev_mode = -2.0; //(because -1 means the subtour is starting from home)
 		//this.home_coord.setXY(-1.0,-1.0);
 		Gbl.random.nextDouble();
 	}
@@ -139,7 +139,7 @@ public abstract class ModelModeChoice {
 	}
 	
 	public final boolean setPrevMode(int prev_mode) {
-		if ((prev_mode < 0) || (5 < prev_mode)) { return false; }
+		if ((prev_mode < -1) || (4 < prev_mode)) { return false; }
 		this.prev_mode = prev_mode;
 		return true;
 	}
