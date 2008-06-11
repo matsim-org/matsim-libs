@@ -23,6 +23,7 @@
  */
 package playground.johannes.snowball2;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,6 +66,8 @@ public class Sampler {
 	private Collection<Vertex> lastSampledVertices;
 	
 	private final int numSeeds;
+	
+	private List<Map<Integer, Integer>> verticesPerDegree = new ArrayList<Map<Integer,Integer>>();
 	
 	public Sampler(Graph g, int nSeeds, long randomSeed) {
 		rnd = new Random(randomSeed);
@@ -228,6 +231,18 @@ public class Sampler {
 		double growth = (numVertex1 - numVertex2)/(double)numVertexTotal;
 		Map<Integer, Double> probas = new HashMap<Integer, Double>();
 		
+		Set<Vertex> vertices = g.getVertices();
+		Map<Integer, Integer> degreeOccurence = new HashMap<Integer, Integer>();
+		for(Vertex v : vertices) {
+			Integer count = degreeOccurence.get(v.degree());
+			int cnt = 0;
+			if(count != null)
+				cnt = count;
+			cnt++;
+			degreeOccurence.put(v.degree(), cnt);
+		}
+		verticesPerDegree.add(degreeOccurence);
+		
 //		for(SampledVertex v : g.getVertices()) {
 //			if(v.getWaveSampled() == 0) {
 //				v.setSampleProbability(1);
@@ -237,7 +252,7 @@ public class Sampler {
 //			}
 //		}
 		
-		Set<Vertex> vertices = g.getVertices();
+		
 		for(Vertex v : vertices) {
 			double p;
 			if(currentWave == 0) {
@@ -246,7 +261,10 @@ public class Sampler {
 				
 			} else {
 				double p_minus1 = (Double)v.getUserDatum(SAMPLE_PROBA);
+				
 				double p_w = 1 - Math.pow((1 - growth), v.degree());
+				
+				
 				p = p_minus1 + p_w - (p_minus1 * p_w);
 				v.setUserDatum(SAMPLE_PROBA, p, UserDataKeys.COPY_ACT);
 			}

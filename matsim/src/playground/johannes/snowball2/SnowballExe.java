@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +40,10 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 
-import cern.colt.list.IntArrayList;
-
 import playground.johannes.snowball.Histogram;
+import cern.colt.list.IntArrayList;
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.io.GraphMLFile;
 
 /**
@@ -288,17 +289,17 @@ public class SnowballExe {
 	}
 	
 	private void makeCoverageCharts(SampledGraph sample, int numWaves) {
-		IntArrayList totalNumVertices = new IntArrayList();
+		IntArrayList numVPerDegree = new IntArrayList();
 		Map<Integer, IntArrayList> curves = new LinkedHashMap<Integer, IntArrayList>();
-		IntArrayList samplesPerWave = new IntArrayList();
-		samplesPerWave.setSize(numWaves + 1);
-		int totalVertices = sample.numVertices();
+		IntArrayList numVPerWave = new IntArrayList();
+		numVPerWave.setSize(numWaves + 1);
+		int numTotalV = sample.numVertices();
 		
 		for(SampledVertex v : sample.getVertices()) {
 			int idx = v.degree();
-			if(totalNumVertices.size() <= idx)
-				totalNumVertices.setSize(idx+1);
-			totalNumVertices.set(idx, totalNumVertices.get(idx) + 1);
+			if(numVPerDegree.size() <= idx)
+				numVPerDegree.setSize(idx+1);
+			numVPerDegree.set(idx, numVPerDegree.get(idx) + 1);
 			
 			IntArrayList curve = curves.get(v.degree());
 			if(curve == null) {
@@ -311,7 +312,7 @@ public class SnowballExe {
 //				curve.setSize(wave + 1);
 			curve.set(wave, curve.get(wave) + 1);
 			
-			samplesPerWave.set(wave, samplesPerWave.get(wave) + 1);
+			numVPerWave.set(wave, numVPerWave.get(wave) + 1);
 		}
 		
 		try {
@@ -335,7 +336,7 @@ public class SnowballExe {
 					int count = curves.get(k).get(i);
 					int sum = count + sums.get(k);
 					sums.put(k, sum);
-					int total = totalNumVertices.get(k);
+					int total = numVPerDegree.get(k);
 					writer.write(String.valueOf(sum/(double)total));
 				}
 				writer.newLine();
@@ -351,31 +352,44 @@ public class SnowballExe {
 			}
 			writer.newLine();
 			
-			int[] sampleSums = new int[samplesPerWave.size()];
-			for(int i = 0; i < samplesPerWave.size(); i++) {
+			int[] numVPerWaveAccum = new int[numVPerWave.size()];
+			for(int i = 0; i < numVPerWave.size(); i++) {
 				for(int k = i; k > -1; k--)
-					sampleSums[i] += samplesPerWave.get(k);
+					numVPerWaveAccum[i] += numVPerWave.get(k);
 			}
-			Map<Integer, Double> probas = new HashMap<Integer, Double>();
+			Map<Integer, Double> probasPerWaveAccum = new HashMap<Integer, Double>();
+			Map<Integer, Integer> numVPerDegreeCatAccum = new HashMap<Integer, Integer>();
 			
 			for(int i = 0; i< numWaves; i++) {
 				writer.write(String.valueOf(i));
+
 				for(Integer k : curves.keySet()) {
 					if(i == 0) {
 						writer.write("\t");
-						double p = numSeeds/(double)totalVertices;
+						double p = numSeeds/(double)numTotalV;
 						writer.write(String.valueOf(p));
-						probas.put(k, p);
+						probasPerWaveAccum.put(k, p);
 					} else {
+//						double p = 1 - Math.pow(1 - (sampleSums[i-1]/(double)totalVertices), k);
+
+						double product = 1;
+						for(Integer k_cat : numVPerDegreeCatAccum.keySet()) {
+							int numVPerK_cat = numVPerDegreeCatAccum.get(k_cat);
+							double base = 1 - (numVPerK_cat/(double)numTotalV);
+							double exp = (numVPerK_cat / (double)numVPerWaveAccum[i-1]) * k; 
+							product *= Math.pow(base, exp);
+						}
+						double p = 1 - product;
 						
-						double p = 1 - Math.pow(1 - (sampleSums[i-1]/(double)totalVertices), k);
-						double p_minus1 = (Double)probas.get(k);
+						double p_minus1 = (Double)probasPerWaveAccum.get(k);
 						double p_accum = p + p_minus1 - (p * p_minus1);
-						probas.put(k, p_accum);
+						probasPerWaveAccum.put(k, p_accum);
+						
 						writer.write("\t");
 						writer.write(String.valueOf(p_accum));
 					}
 				}
+				numVPerDegreeCatAccum = countSamplesPerDegree(sample, i, numVPerDegreeCatAccum);
 				writer.newLine();
 			}
 			writer.close();
@@ -386,5 +400,29 @@ public class SnowballExe {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private Map<Integer, Integer> countSamplesPerDegree(SampledGraph sample,
+			int wave, Map<Integer, Integer> samplesPerDegree) {
+		Map<Integer, Integer> samples = new HashMap<Integer, Integer>(samplesPerDegree);
+		for (SampledVertex v : sample.getVertices()) {
+			if (!v.isAnonymous() && v.getWaveSampled() == wave) {
+				Integer count = samples.get(v.degree());
+				if (count == null)
+					count = 0;
+				count++;
+				samples.put(v.degree(), count);
+			}
+		}
+
+		return samples;
+	}
+	
+	private Set<Integer> incidentDegrees(Vertex v) {
+		Set<Integer> degrees = new HashSet<Integer>();
+		for(Object v2 : v.getNeighbors()) {
+			degrees.add(((Vertex)v2).degree());
+		}
+		return degrees;
 	}
 }
