@@ -40,7 +40,7 @@ public class DblLinkDetect {
 	public static void main(String [] args) {
 		
 		
-		String file = "./networks/network.xml";
+		String file = "./networks/padang_net_v20080608.xml";
 		Config conf = Gbl.createConfig(null);
 		World world = Gbl.createWorld();
 
