@@ -73,11 +73,9 @@ public class PTLinesReader extends MatsimXmlParser {
 	}
 
 	private void endLine() {
-		PTLine ptLine = new PTLine(idPTLine, "Bus", false, lineRoute);
-		this.ptLineList.add(ptLine);
+		this.ptLineList.add(new PTLine(idPTLine, "Bus", false, lineRoute));
 		idPTLine = null;
 		lineRoute = "";
-		ptLine = null;
 	}
 
 	private void endLines() {
@@ -92,18 +90,3 @@ public class PTLinesReader extends MatsimXmlParser {
 		}
 	}
 }// class
-
-/*
- * Another version to validate chars 
- * public void characters (char ch[], int  start, int length) { 
- * 		for (int i = start; i < start + length; i++) 
- * 	{ switch (ch[i]) 
- * { case '\\': System.out.print("\\\\"); break; 
- * case '"':  System.out.print("\\\""); break; 
- * case '\n': System.out.print("\\n"); break;
- * case '\r': System.out.print("\\r"); break; 
- * case '\t':
- * System.out.print("\\t"); break; default: System.out.print(ch[i]); break;
- * }
- * switch } }
- */

@@ -12,6 +12,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
+//TODO: Change name, this is actually a PTNetcreator
 public class PTNetworkLayer extends NetworkLayer {
 	// TODO: Get these values out from the city network
 	// These are temporary values for the 5x5 scenario
@@ -28,7 +29,7 @@ public class PTNetworkLayer extends NetworkLayer {
 	// This map stores the children nodes of each father node, necessary to
 	// create the transfer between them
 	public Map<IdImpl, ArrayList<String>> childrenList = new TreeMap<IdImpl, ArrayList<String>>();
-
+		
 	private List<Id> transferLList;
 	private List<Id> transferNList;
 
@@ -202,7 +203,7 @@ public class PTNetworkLayer extends NetworkLayer {
 			}
 			i = ++maxLinkKey;
 			IdImpl IdImplLink = new IdImpl(String.valueOf(i));
-			// TODO: for the time being is the cost 1
+			// TODO: for the time being the cost is 1
 			// This must not be so!!
 			this.createLink(IdImplLink.toString(), idFromNode, idToNode, "1.0",	"25.185185185185187", "25900.20064", "1", "0", "??");
 			this.transferLList.add(IdImplLink);
@@ -227,7 +228,7 @@ public class PTNetworkLayer extends NetworkLayer {
  * 		for (Iterator <String> iter =  ptLine.strLinksRoute2.iterator(); iter.hasNext();) { 
  * 			String strLink = iter.next(); 
  * 			AddNode(this.cityNet.getLink(strLink).getFromNode()); //FromNode
- * 			AddNode(this.cityNet.getLink(strLink).getToNode());//ToNode
+ 												* 			AddNode(this.cityNet.getLink(strLink).getToNode());//ToNode
  * 			AddLink(this.cityNet.getLink(strLink)); 
  * 		} 
  * }//Fill
@@ -238,7 +239,7 @@ public class PTNetworkLayer extends NetworkLayer {
  * 		public Children(String idFather){ 
  * 			this.idFather= idFather; 
  * 		} 
- * }
+ * }//This class was nos executed becase we use a array of children istead
  * 
  * public void CleanTransfers(){ 
  * 		for (int i = 0; i< transferLList.size(); i++) {

@@ -9,6 +9,7 @@ public class PTLink extends LinkImpl {
 	private String idPTLine;
 	private boolean isBusStop;
 	private String ptType;  // (PT, Transfer, Walking) 
+	private int nextDepature;
 
 	public PTLink(String id, Node from, Node to, NetworkLayer network,double length, double freespeed, double capacity, double permlanes) {
 		super(new IdImpl(id), from, to, network, length, freespeed, capacity, permlanes);

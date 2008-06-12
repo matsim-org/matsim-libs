@@ -16,12 +16,10 @@ public class MiniDijkstra {
 		int endPosition = nodeList.indexOf(DestinationNode);
 
 		if (iniPosition == -1) {
-			//throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
-			System.out.println("The Origin Node does not not exist");
+			throw new NullPointerException("The Origin Node does not exist");
 		}
 		if (endPosition == -1) {
-			//throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
-			System.out.println("The Destination Node does not not exist");
+			throw new NullPointerException("The Destination Node does not exist");
 		}
 
 		List<Integer> nodePath = new ArrayList<Integer>();
