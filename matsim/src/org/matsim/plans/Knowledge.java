@@ -44,7 +44,7 @@ public class Knowledge {
 
 	private final ArrayList<Activity> activities = new ArrayList<Activity>();
 	private final TreeMap<Id,Facility> facilities = new TreeMap<Id,Facility>();
-	private final ArrayList<ActivitySpace> act_spaces = new ArrayList<ActivitySpace>();
+	private ArrayList<ActivitySpace> activitySpaces = null;// = new ArrayList<ActivitySpace>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -71,7 +71,10 @@ public class Knowledge {
 		} else {
 			Gbl.errorMsg("[type="+type+" not allowed]");
 		}
-		this.act_spaces.add(asp);
+		if (this.activitySpaces == null) {
+			this.activitySpaces = new ArrayList<ActivitySpace>(1);
+		}
+		this.activitySpaces.add(asp);
 		return asp;
 	}
 
@@ -199,9 +202,12 @@ public class Knowledge {
 	public final String getDesc() {
 		return this.desc;
 	}
-
+	/**
+	 * 
+	 * @return List, may be null
+	 */
 	public final ArrayList<ActivitySpace> getActivitySpaces() {
-		return this.act_spaces;
+		return this.activitySpaces;
 	}
 
 	//////////////////////////////////////////////////////////////////////

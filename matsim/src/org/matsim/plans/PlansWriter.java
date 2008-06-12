@@ -137,17 +137,20 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 		try {
 			this.handler.startPerson(p,this.out);
 			// travelcards
+			if (p.getTravelcards() != null) {
 			Iterator<String> t_it = p.getTravelcards().iterator();
 			while (t_it.hasNext()) {
 				String t = t_it.next();
 				this.handler.startTravelCard(t,this.out);
 				this.handler.endTravelCard(this.out);
 			}
+			}
 			// knowledge
 			if (p.getKnowledge() != null) {
 				Knowledge k = p.getKnowledge();
 				this.handler.startKnowledge(k, this.out);
 				// activity spaces
+				if (k.getActivitySpaces() != null) {
 				Iterator<ActivitySpace> as_it = k.getActivitySpaces().iterator();
 				while (as_it.hasNext()) {
 					ActivitySpace as = as_it.next();
@@ -164,6 +167,7 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 						this.handler.endParam(this.out);
 					}
 					this.handler.endActivitySpace(this.out);
+				}
 				}
 				// activities
 				Iterator<String> at_it = k.getActivityTypes().iterator();

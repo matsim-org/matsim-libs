@@ -42,7 +42,7 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	private String carAvail;
 	private String employed;
 
-	private final TreeSet<String> travelcards = new TreeSet<String>();
+	private TreeSet<String> travelcards = null; 
 	private Knowledge knowledge = null;
 
 	public BasicPersonImpl(final Id id) {
@@ -162,6 +162,9 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	
 
 	public final void addTravelcard(final String type) {
+		if (this.travelcards == null) {
+			this.travelcards = new TreeSet<String>();
+		}
 		if (this.travelcards.contains(type)) {
 			log.info(this + "[type=" + type + " already exists]");
 		} else {
