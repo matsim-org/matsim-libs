@@ -74,10 +74,13 @@ public class StaticPopulationGenerator {
 	public void createPopulation() {
 		int id = 0;
 		Plans population = new Plans();
+		int inhabitants_all = 0;
+		int lost = 0;
 		for (Feature zone : zones) {
 			Polygon p = (Polygon) zone.getDefaultGeometry().getGeometryN(0);
 			Envelope e = zone.getBounds();
 			long inhabitants = (Long)zone.getAttribute(7);
+			inhabitants_all += inhabitants;
 			Collection<Link> links = new ArrayList<Link>();
 			this.linksTree.get(e.getMinX(), e.getMinY(),e.getMaxX(), e.getMaxY(),links);
 			ArrayList<Link> tmp = new ArrayList<Link>();
@@ -88,6 +91,7 @@ public class StaticPopulationGenerator {
 				}
 			}
 			if (tmp.size() == 0) {
+				lost += inhabitants;
 				continue;
 			}
 			if (tmp.size() >= links.size() ) {
@@ -117,8 +121,8 @@ public class StaticPopulationGenerator {
 			System.out.println("Diff: " +  (inhabitants - all));
 			
 		}
-		
-		new PlansWriter(population,"pagan_plans_v20080608.xml.gz", "v4").write();
+		System.err.println("inh:" + inhabitants_all + " agents:" + id + " lost:" + lost);
+		new PlansWriter(population,"padang_plans_v20080608.xml.gz", "v4").write();
 		
 	}
 	
@@ -164,7 +168,7 @@ public class StaticPopulationGenerator {
 			MultiPolygon multiPolygon = (MultiPolygon) feature.getDefaultGeometry();
 			if (multiPolygon.getNumGeometries() > 1) {
 				log.warn("MultiPolygons with more then 1 Geometry ignored!");
-				continue;
+//				continue;
 			}
 			Polygon polygon = (Polygon) multiPolygon.getGeometryN(0);
 			polygons.add(feature);

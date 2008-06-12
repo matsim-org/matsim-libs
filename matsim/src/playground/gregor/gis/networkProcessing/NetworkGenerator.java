@@ -26,21 +26,35 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.utils.geometry.geotools.MGC;
+import org.opengis.referencing.FactoryException;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 
 import playground.gregor.gis.utils.ShapeFileReader;
+import playground.gregor.gis.utils.ShapeFileWriter;
 
 public class NetworkGenerator {
 	private static final Logger log = Logger.getLogger(NetworkGenerator.class);
@@ -119,7 +133,7 @@ public class NetworkGenerator {
 		
 	}
 
-	public static void main(String [] args) {
+	public static void main(String [] args) throws FactoryRegistryException, IOException, FactoryException, SchemaException, IllegalAttributeException, Exception {
 		String nodes = "./padang/network_v20080608/nodes.shp";
 		String links = "./padang/network_v20080608/links.shp";
 		
@@ -148,10 +162,40 @@ public class NetworkGenerator {
 		new NetworkGenerator(pn, pl , network).constructNetwork();
 		
 		new NetworkWriter(network,"pdg_new.xml").write();
+		ShapeFileWriter.writeGeometries(genFeatureCollection((Collection<Link>) network.getLinks().values(), n),"./padang/network_v20080608/matsim_net.shp" );
 		
 	}
 
+	private static Collection<Feature> genFeatureCollection(Collection<Link> links, FeatureSource fs) throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
+		
 
+//		dummy.id = -1;
+		GeometryFactory geofac = new GeometryFactory();
+		Collection<Feature> features = new ArrayList<Feature>();
+		
+		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiLineString",MultiLineString.class, true, null, null, fs.getSchema().getDefaultGeometry().getCoordinateSystem());
+		AttributeType id = AttributeTypeFactory.newAttributeType(
+				"ID", Integer.class);
+		AttributeType fromNode = AttributeTypeFactory.newAttributeType(
+				"fromID", Integer.class);
+		AttributeType toNode = AttributeTypeFactory.newAttributeType(
+				"toID", Integer.class);		
+		FeatureType ftRoad = FeatureTypeFactory.newFeatureType(
+				new AttributeType[] { geom, id, fromNode, toNode }, "link");
+		int ID = 0;
+		for (Link link : links){
+			Coordinate c1 = MGC.coord2Coordinate(link.getFromNode().getCoord());
+			Coordinate c2 = MGC.coord2Coordinate(link.getToNode().getCoord());
+			LineString ls = geofac.createLineString(new Coordinate[] {c1,c2});
+			
+			Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},geofac) , ID++, link.getFromNode().getId(),link.getToNode().getId()},"network");
+			features.add(ft);
+				
+		}
+
+
+		return features;
+	}
 
 	private static Collection<Feature> getPolygons(FeatureSource n) {
 		Collection<Feature> polygons = new ArrayList<Feature>();

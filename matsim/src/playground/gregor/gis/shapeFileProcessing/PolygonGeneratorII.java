@@ -160,9 +160,9 @@ public class PolygonGeneratorII {
 //		return(genPolygonFeatureCollection(mergePolygons()));	
 //		HashMap<Integer, Polygon> tmpPolygons = mergePolygons();
 //		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
-//		HashMap<Integer, Polygon> merged = new PolygonMerger(this,"./padang/converter/d_p_merged.shp").getMergedPolygons();
+		HashMap<Integer, Polygon> merged = new PolygonMerger(this,"./padang/converter/d_p_merged.shp").getMergedPolygons();
 //		HashMap<Integer, Polygon> merged = new PolygonMerger(this).getMergedPolygons();
-		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
+//		HashMap<Integer, Polygon> merged = new PolygonMerger("./padang/converter/d_p_merged.shp").getMergedPolygons();
 		
 		
 //		QuadTree<Polygon> polygonNodes = getPolygonNodes(merged);

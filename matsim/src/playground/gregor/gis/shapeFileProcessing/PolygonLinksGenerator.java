@@ -218,7 +218,10 @@ public class PolygonLinksGenerator {
 			
 			//double minWidth = Math.max(getMinWidth(pLink,currLs), 0.71);
 			double minWidth = getMinWidth(pLink,currLs);
-
+			if (minWidth  < 0.71) {
+//				this.pg.createLineStringFeature(currLs,-23, "");
+				continue;
+			}
 			
 			Feature ftLink = this.pg.getPolygonFeature(pLink, currLs.getLength(), id, nodeIds.get(0), nodeIds.get(1), minWidth, pLink.getArea());
 			this.ftLinks.put(id, ftLink);
@@ -250,6 +253,29 @@ public class PolygonLinksGenerator {
 				
 			}
 		}
+		
+		if (minWidth == Double.POSITIVE_INFINITY) {
+			minWidth = 0;
+			for (int i = 0; i < coords.length-2; i++) {
+				for (int j = i+1; j < coords.length -1; j++) {
+					
+				
+					Coordinate c1 = coords[i];
+					Coordinate c2 = coords[j];
+				
+				
+				double t = c1.distance(c2);
+				
+				if (t > minWidth) {
+					Coordinate [] c1c2 = new Coordinate [] {c1,c2};
+					LineString lc1c2 = this.pg.getGeofac().createLineString(c1c2);
+//					this.pg.createLineStringFeature(lc1c2,-23, minWidth +"");
+					minWidth = t;
+				}
+				}
+			}
+		}
+		
 		
 		return minWidth;
 	}
@@ -298,7 +324,7 @@ public class PolygonLinksGenerator {
 			
 			double width = lwidth.getLength();
 			
-			this.pg.createLineStringFeature(lwidth,1, width +"");
+//			this.pg.createLineStringFeature(lwidth,1, width +"");
 			return width;			
 
 		}
