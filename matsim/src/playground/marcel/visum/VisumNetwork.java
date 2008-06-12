@@ -57,6 +57,13 @@ public class VisumNetwork {
 		return this.stopsQT.get(coord.getX(), coord.getY(), distance);
 	}
 
+	public Stop findNearestStop(final CoordI coord) {
+		if (this.stopsQT == null) {
+			this.cacheStops();
+		}
+		return this.stopsQT.get(coord.getX(), coord.getY());
+	}
+	
 	private synchronized void cacheStops() {
 		if (this.stopsQT != null) {
 			return;

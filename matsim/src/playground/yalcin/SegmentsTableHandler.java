@@ -30,8 +30,11 @@ import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
 
 import playground.marcel.visum.VisumNetwork;
+import playground.marcel.visum.VisumNetwork.Stop;
 
 public class SegmentsTableHandler implements TabularFileHandlerI {
+
+	private static final String TAB = "\t";
 
 	// the visum network to do the lookups
 	private final VisumNetwork vNetwork;
@@ -53,17 +56,22 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 	private int cntSegments = 0;
 	private int cntPuTSegments = 0;
 	private int cntRailSegments = 0;
+	private double sumSegmentDistance = 0.0;
+	private final CodesTableReader codes;
+	private boolean onlyWriteCodedTrips = false;
 
 	private int line =  0;
 
 	/**
 	 * @param vNetwork VisumNetwork for looking up stops
 	 * @param searchRadius the search radius for stops in kilometers
+	 * @param codesTable the lookupTable for codes
 	 * @param filename name of a file where to write the results into
 	 */
-	public SegmentsTableHandler(final VisumNetwork vNetwork, final double searchRadius, final String filename) {
+	public SegmentsTableHandler(final VisumNetwork vNetwork, final double searchRadius, final CodesTableReader codesTable, final String filename) {
 		this.vNetwork = vNetwork;
 		this.searchRadius = searchRadius;
+		this.codes = codesTable;
 		try {
 			this.writer = IOUtils.getBufferedWriter(filename);
 		} catch (FileNotFoundException e) {
@@ -72,13 +80,17 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public void setOnlyWriteCodedTrips(final boolean onlyWriteCodedTrips) {
+		this.onlyWriteCodedTrips = onlyWriteCodedTrips;
+	}
 
 	public void startRow(final String[] row) {
 		this.line++;
 		if (this.line == 1) {
 			// header
 			try {
-				this.writer.write("PersonID\tTripID\tSegments\tPutSegments\tRailSegments\tXStartingPoint\tYStartingPoint\tStartingDate\tStartingTime\tXEndingPoint\tYEndingPoint\tEndingDate\tEndingTime\tStartStopId\tStartStopDistance\tEndStopID\tEndStopDistance\n");
+				this.writer.write("Code\tPersonID\tTripID\tSegments\tPutSegments\tRailSegments\tXStartingPoint\tYStartingPoint\tStartingDate\tStartingTime\tXEndingPoint\tYEndingPoint\tEndingDate\tEndingTime\tTotalDistance\tStartStopId\tStartStopDistance\tEndStopID\tEndStopDistance\tFoundStartStops\tFoundEndStops\tNearestStartStop\tNearestStartStopDistance\tNearestEndStop\tNearestEndStopDistance\n");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -103,6 +115,7 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 			this.cntSegments = 0;
 			this.cntPuTSegments = 0;
 			this.cntRailSegments = 0;
+			this.sumSegmentDistance = Double.parseDouble(row[13]);
 		}
 
 		this.endDate = row[11];
@@ -115,6 +128,7 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 		if (Double.parseDouble(row[19]) >= 0.5) {
 			this.cntRailSegments++;
 		}
+		this.sumSegmentDistance += Double.parseDouble(row[13]);
 	}
 
 	private void handleTrip() throws IOException {
@@ -122,22 +136,64 @@ public class SegmentsTableHandler implements TabularFileHandlerI {
 			// the last trip had at least one public transport segment, so write the person out
 			final Collection<VisumNetwork.Stop> startStops = this.vNetwork.findStops(this.startCoord, this.searchRadius);
 			final Collection<VisumNetwork.Stop> endStops = this.vNetwork.findStops(this.endCoord, this.searchRadius);
+			// write code if available
+			String code = this.codes.getCode(this.personId, this.tripId);
+			if (code != null) {
+				this.writer.write(code);
+			} else if (onlyWriteCodedTrips) {
+				// this line has no code, and we should only write lines that contain a code...
+				return;
+			}
+			
 			// write basic information
-			this.writer.write(this.personId + "\t" + this.tripId + "\t" + this.cntSegments + "\t" + this.cntPuTSegments + "\t" + this.cntRailSegments
-					+ "\t" + this.startCoord.getX() * 1000.0 + "\t" + this.startCoord.getY()*1000.0 + "\t" + this.startDate+ "\t" + this.startTime
-					+ "\t" + this.endCoord.getX() * 1000.0 + "\t" + this.endCoord.getY() * 1000.0 + "\t" + this.endDate+ "\t" + this.endTime);
+			this.writer.write(TAB + this.personId + TAB + this.tripId + TAB + this.cntSegments + TAB + this.cntPuTSegments + TAB + this.cntRailSegments
+					+ TAB + this.startCoord.getX() * 1000.0 + TAB + this.startCoord.getY()*1000.0 + TAB + this.startDate+ TAB + this.startTime
+					+ TAB + this.endCoord.getX() * 1000.0 + TAB + this.endCoord.getY() * 1000.0 + TAB + this.endDate+ TAB + this.endTime
+					+ TAB + this.sumSegmentDistance);
+			this.writer.write("\tSTART-ID\tstart-distance\tEND-ID\tend-distance");
+			// FoundStartStops
+			this.writer.write(TAB);
+			if (startStops.size() > 0) {
+				this.writer.write("1");
+			} else {
+				this.writer.write("0");
+			}
+			//FoundEndStops
+			this.writer.write(TAB);
+			if (endStops.size() > 0) {
+				this.writer.write("1");
+			} else {
+				this.writer.write("0");
+			}
+			//NearestStartStop
+			Stop nearestStartStop = this.vNetwork.findNearestStop(this.startCoord);
+			this.writer.write(TAB);
+			this.writer.write(nearestStartStop.id.toString());
+			
+			//NearestStartStopDistance
+			this.writer.write(TAB);
+			this.writer.write(Double.toString(this.startCoord.calcDistance(nearestStartStop.coord)));
+			
+			//NearestEndStop
+			Stop nearestEndStop = this.vNetwork.findNearestStop(this.endCoord);
+			this.writer.write(TAB);
+			this.writer.write(nearestEndStop.id.toString());
+			
+			//NearestEndStopDistance
+			this.writer.write(TAB);
+			this.writer.write(Double.toString(this.endCoord.calcDistance(nearestEndStop.coord)));
 
+			this.writer.write('\n');
 			// write possible starting stops
-			this.writer.write("\tSTART-ID\tstart-distance\tEND-ID\tend-distance\n");
 			for (VisumNetwork.Stop stop : startStops) {
-				this.writer.write("\t\t\t\t\t\t\t\t\t\t\t\t\t");
+				this.writer.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
 				this.writer.write(stop.id.toString() + "\t");
 				this.writer.write(Double.toString(this.startCoord.calcDistance(stop.coord)));
 				this.writer.write("\n");
 			}
 			// write possible ending stops
 			for (VisumNetwork.Stop stop : endStops) {
-				this.writer.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+				this.writer.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
 				this.writer.write(stop.id.toString() + "\t");
 				this.writer.write(Double.toString(this.endCoord.calcDistance(stop.coord)));
 				this.writer.write("\n");

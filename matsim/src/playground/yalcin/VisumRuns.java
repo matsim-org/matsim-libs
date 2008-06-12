@@ -37,16 +37,18 @@ public class VisumRuns {
 		// read visum network
 		final VisumNetwork vNetwork = new VisumNetwork();
 		try {
-			new VisumNetworkReader(vNetwork).read("C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/ptzh_orig.net");
+			new VisumNetworkReader(vNetwork).read("C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/ptzh_orig.net"); // yalcin
+//			new VisumNetworkReader(vNetwork).read("../mystudies/yalcin/ptzh_orig.net"); // marcel
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		final Collection<VisumNetwork.Stop> stops = vNetwork.findStops(new Coord(683.5, 248.0), 0.8);
+		final Coord location = new Coord(682.247, 251.044);
+		final Collection<VisumNetwork.Stop> stops = vNetwork.findStops(location, 0.4);
 		System.out.println("found the following stops:");
 		for (VisumNetwork.Stop stop : stops) {
-			System.out.println("id=" + stop.id + " x=" + stop.coord.getX() + " y=" + stop.coord.getY() + " name=" + stop.name);
+			System.out.println("id=" + stop.id + " x=" + stop.coord.getX() + " y=" + stop.coord.getY() + " name=" + stop.name + " dist=" + stop.coord.calcDistance(location));
 		}
 	}
 
@@ -55,9 +57,24 @@ public class VisumRuns {
 		// read visum network
 		final VisumNetwork vNetwork = new VisumNetwork();
 		try {
-			new VisumNetworkReader(vNetwork).read("C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/ptzh_orig.net");
+			new VisumNetworkReader(vNetwork).read("C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/ptzh_orig.net"); // yalcin
+//			new VisumNetworkReader(vNetwork).read("../mystudies/yalcin/ptzh_orig.net"); // marcel
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+		/* read test file with codes */
+		final TabularFileParser codesParser = new TabularFileParser();
+		final TabularFileParserConfig codesParserConfig = new TabularFileParserConfig();
+		codesParserConfig.setFileName("codes.txt"); // yalcin
+//		codesParserConfig.setFileName("../mystudies/yalcin/codes.txt"); // marcel
+		codesParserConfig.setDelimiterTags(new String[] { "\t" });
+		CodesTableReader codesHandler = new CodesTableReader();
+
+		try {
+			codesParser.parse(codesParserConfig, codesHandler);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -72,10 +89,13 @@ public class VisumRuns {
 		 */
 		final TabularFileParser parser = new TabularFileParser();
 		final TabularFileParserConfig parserConfig = new TabularFileParserConfig();
-		parserConfig.setFileName("C:\\Users\\yalcin\\Desktop\\Zurich\\Zurichdata\\Nadie\\Nadie_10.04.2008\\New FolderWalkAndPuTSegmentsYalcin_WithTime\\WalkAndPuTSegmentsYalcin_ZH/WalkAndPuTSegmentsYalcin_ZHl.txt");
+		parserConfig.setFileName("C:\\Users\\yalcin\\Desktop\\Zurich\\Zurichdata\\Nadie\\Nadie_10.04.2008\\New FolderWalkAndPuTSegmentsYalcin_WithTime\\WalkAndPuTSegmentsYalcin_ZH/WalkAndPuTSegmentsYalcin_ZHl.txt"); // yalcin
+//		parserConfig.setFileName("../mystudies/yalcin/WalkAndPuTSegmentsYalcin_ZHl.txt"); // marcel
 		parserConfig.setDelimiterTags(new String[] { "\t" });
-		SegmentsTableHandler handler = new SegmentsTableHandler(vNetwork, 0.6, "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/results10.txt");
-
+		SegmentsTableHandler handler = new SegmentsTableHandler(vNetwork, 0.6, codesHandler, "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/results10.txt"); // yalcin
+//		SegmentsTableHandler handler = new SegmentsTableHandler(vNetwork, 0.6, codesHandler, "../mystudies/yalcin/results.txt"); // marcel
+		handler.setOnlyWriteCodedTrips(false);
+		
 		try {
 			// this will read the file AND write out the looked up data
 			parser.parse(parserConfig, handler);
@@ -89,7 +109,6 @@ public class VisumRuns {
 	public static void main(final String args[]) {
 //		findNearestStopExample();
 		findNearestStops();
-		
 	}
 
 }
