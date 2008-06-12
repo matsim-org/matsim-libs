@@ -44,7 +44,7 @@ public class CRCChecksum {
 			check = crc.getValue();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		finally {
 			try { in.close(); } catch (IOException e) { e.printStackTrace(); }
@@ -58,9 +58,8 @@ public class CRCChecksum {
 			in = new BufferedInputStream(new FileInputStream(filename));
 			return getCRCFromStream(in);
 		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+			throw new RuntimeException(e1);
 		}
-		return 0L;
 	}
 
 	public static long getCRCFromGZFile(final String filename) {
@@ -73,8 +72,7 @@ public class CRCChecksum {
 			}
 			return getCRCFromStream(in);
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			throw new RuntimeException(e1);
 		}
-		return 0L;
 	}
 }
