@@ -75,6 +75,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 	private double flowCapacityFraction = Double.NaN;
 
 	private double flowCapacityFractionalRest = 1.0;
+	private boolean thisTimeStepIsGreen = false;
 	
 	/** For Visualization only */
 	int lane = 1;
@@ -91,16 +92,18 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		this.length_m = length_m;
 		this.meterFromLinkEnd = meterFromLinkEnd_m;
 
-		this.freeSpeedTravelTime = length_m / freeSpeed_m_s;
+		this.freeSpeedTravelTime = this.length_m / freeSpeed_m_s;
 
 		this.flowCapacity = flowCapacityFromNetFile_Veh_h * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
 
 		this.flowCapacityCeil = (int) Math.ceil(this.flowCapacity);
 		this.flowCapacityFraction = this.flowCapacity - (int) this.flowCapacity;
 
-		this.storageCapacity = (length_m * numberOfLanes) / effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
+		this.storageCapacity = (this.length_m * numberOfLanes) / effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
 
 		this.storageCapacity = Math.max(this.storageCapacity, this.flowCapacityCeil);
+		
+		this.flowCapacityFractionalRest = (this.flowCapacityFraction == 0.0 ? 0.0 : 1.0);
 
 		if (this.storageCapacity < this.freeSpeedTravelTime * this.flowCapacity) {
 			this.storageCapacity = this.freeSpeedTravelTime * this.flowCapacity;
@@ -111,13 +114,27 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		}
 
 	}
+	
+	public void setThisTimeStepIsGreen(boolean isGreen){
+		this.thisTimeStepIsGreen = isGreen;
+	}
 
 	public void movePseudoLink(final double now){
+
+		if(this.meterFromLinkEnd == 0.0){			
+			if(this.thisTimeStepIsGreen == true){
+				updateBufferCapacity(now);
+			}
+		} else {
+			updateBufferCapacity(now);
+		}
 
 		if (this.amIOriginalLink){ moveParkingQueueToParkToLinkQueue(now); }
 		moveFlowQueueToNextPseudoLink();
 		moveStorageQueueToFlowQueue(now);
 		if (this.amIOriginalLink){ moveParkToLinkQueueToFlowQueue(now); }
+		
+		this.setThisTimeStepIsGreen(false);
 
 	}
 
@@ -158,16 +175,19 @@ public class PseudoLink implements Comparable<PseudoLink>{
 			} else {
 				break;
 			}
-		}
-
+		}		
+	}
+	
+	private void updateBufferCapacity(final double time) {
+//		this.flowCapacity = this.realLink.getSimulatedFlowCapacity();
 		if (this.flowCapacityFractionalRest < 1.0) {
 			this.flowCapacityFractionalRest += this.flowCapacityFraction;
 		}
-		
 	}
 
 	private boolean hasFlowQueueSpace() {
-		return (this.flowQueue.size() < this.flowCapacityCeil);
+//		return (this.flowQueue.size() < this.flowCapacityCeil);
+		return ((this.flowQueue.size() < this.flowCapacityCeil) && ((this.flowCapacity >= 1.0) || (this.flowCapacityFractionalRest >= 1.0)));
 	}
 
 	private void addToFlowQueue(final QVehicle veh, final double now) {

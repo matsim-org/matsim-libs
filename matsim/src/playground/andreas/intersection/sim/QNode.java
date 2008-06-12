@@ -57,6 +57,8 @@ public class QNode extends QueueNode{
 
 					for (PseudoLink pseudoLink : qLink.getNodePseudoLinks(toLinks)) {
 						
+						pseudoLink.setThisTimeStepIsGreen(true);
+						
 						while (!pseudoLink.flowQueueIsEmpty()) {
 							Vehicle veh = pseudoLink.getFirstFromBuffer();
 							if (!moveVehicleOverNode(veh, pseudoLink)) {
@@ -81,6 +83,9 @@ public class QNode extends QueueNode{
 				
 
 				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
+					
+					pseudoLink.setThisTimeStepIsGreen(true);
+					
 					while (!pseudoLink.flowQueueIsEmpty()) {
 						Vehicle veh = pseudoLink.getFirstFromBuffer();
 						if (!moveVehicleOverNode(veh, pseudoLink)) {

@@ -39,8 +39,7 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 		
 		for (SignalGroupSettings signalGroupSetting : signalSystemPlan.getSignalGroupSettings().values()) {
 			
-			// TODO check whether it should be <= instead of <
-			if ( signalGroupSetting.getRoughCast() < currentSecondInPlan && currentSecondInPlan < signalGroupSetting.getDropping()){
+			if ( signalGroupSetting.getRoughCast() < currentSecondInPlan && currentSecondInPlan <= signalGroupSetting.getDropping()){
 				// Debug only
 //				System.out.println("green " + signalGroupSetting.getSignalGroupDefinition().toString());
 				
