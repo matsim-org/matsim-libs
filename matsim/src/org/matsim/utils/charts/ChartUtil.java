@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Image;
 import java.awt.MediaTracker;
-import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 
@@ -35,6 +34,7 @@ import org.jfree.chart.title.Title;
 import org.jfree.ui.HorizontalAlignment;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.VerticalAlignment;
+import org.matsim.gbl.MatsimResource;
 
 /**
  * An abstract class to simplify the creation of JFreeCharts.
@@ -76,7 +76,7 @@ public abstract class ChartUtil {
 	 * Adds the MATSim Logo in the lower right corner of the chart.
 	 */
 	public void addMatsimLogo() {
-		Image image = Toolkit.getDefaultToolkit().getImage("./res/matsim_logo_transparent_small.png");
+		Image image = MatsimResource.getAsImage("matsim_logo_transparent_small.png");
 		// make sure the image is really loaded. See JavaDoc for ImageTitle.
     MediaTracker mediaTracker = new MediaTracker(new Container());
     mediaTracker.addImage(image, 0);

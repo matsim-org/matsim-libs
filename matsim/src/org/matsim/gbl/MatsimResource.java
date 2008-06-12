@@ -55,7 +55,7 @@ public abstract class MatsimResource {
 	private static final String RES_PATH_JARFILE = "/res/";
 	
 	/** The path where resources are located in a local file system. */ 
-	private static final String RES_PATH_LOCAL = "./res/";
+	private static final String RES_PATH_LOCAL = "./res/";  //NOPMD // this line should be ignored for PMD analysis
 	
 	private static final Logger log = Logger.getLogger(MatsimResource.class);
 

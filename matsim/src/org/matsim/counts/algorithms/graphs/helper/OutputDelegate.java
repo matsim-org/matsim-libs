@@ -26,6 +26,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
@@ -39,6 +40,7 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.entity.StandardEntityCollection;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
+import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.io.IOUtils;
 
 import com.lowagie.text.Document;
@@ -112,38 +114,39 @@ public class OutputDelegate {
 		if (htmlset) {
 			writeHtml(null, this.iterPath_, true);
 			try {
-					new File(this.iterPath_+"/div").mkdir();
-
-					File file1=new File("./res/style1.css");
-					File file2=new File(this.iterPath_+"/div/style1.css");
-					IOUtils.copyFile(file1, file2);
-
-					File file3=new File("./res/logo.png");
-					File file4=new File(this.iterPath_+"/div/logo.png");
-					IOUtils.copyFile(file3, file4);
-
-					File file5=new File("./res/overlib.js");
-					File file6=new File(this.iterPath_+"/div/overlib.js");
-					IOUtils.copyFile(file5, file6);
-
-					File file7=new File("./res/title.png");
-					File file8=new File(this.iterPath_+"/div/title.png");
-					IOUtils.copyFile(file7, file8);
-
+				new File(this.iterPath_+"/div").mkdir();
+				copyResourceToFile("style1.css", this.iterPath_ + "/div/style1.css");
+				copyResourceToFile("logo.png", this.iterPath_ + "/div/logo.png");
+				copyResourceToFile("overlib.js", this.iterPath_ + "/div/overlib.js");
+				copyResourceToFile("title.png", this.iterPath_ + "/div/title.png");
 			}
 			catch (IOException e) {
-		        System.out.println(e.toString());
-		        e.printStackTrace();
-		    }//catch
+				System.out.println(e.toString());
+				e.printStackTrace();
+			}//catch
 		}//if
 	}
-
+	
+	private void copyResourceToFile(final String resourceFilename, final String destinationFilename) throws IOException {
+		final InputStream inStream = MatsimResource.getAsInputStream(resourceFilename);
+		final OutputStream outStream = new FileOutputStream(destinationFilename);
+		IOUtils.copyStream(inStream, outStream);
+		try {
+			inStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			outStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	private void writeHtml(final CountsGraph cg, final String iter_path, boolean indexFile){
 		/* we want landscape, thus exchange width / height */
 		int width=(int)PageSize.A4.getHeight();
 		int height=(int)PageSize.A4.getWidth();
-
 
 		JFreeChart chart=null;
 		String fileName="";
