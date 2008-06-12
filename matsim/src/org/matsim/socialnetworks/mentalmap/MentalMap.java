@@ -28,7 +28,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -132,7 +131,7 @@ public class MentalMap {
 		while(planActIter.hasNext()){
 			Act myAct = (Act) planActIter.next();
 			Id myActivityId = aar.getNextActivityId();
-			Activity myActivity = knowledge.getFacilities().get(myActivityId).getActivity(myAct.getType());
+			Activity myActivity = knowledge.getActivity(myActivityId);
 			if(myActivity!=null){
 				learnActsActivities(myAct,myActivity);
 			}	
@@ -364,14 +363,12 @@ public class MentalMap {
 		
 		
 		Id myActivityId= this.mapActActivityId.get(myAct);
-		TreeMap<Id,Facility> facilities=this.knowledge.getFacilities();
 
 		if(myActivityId == null){
 			System.out.println("DEbug mentalmap2");
 			Gbl.errorMsg(this.knowledge.egoNet.getEgoLinks().get(0).person1.getId().toString());
 		}
-		Facility myFacility=facilities.get(myActivityId);
-		Activity myActivity=myFacility.getActivity(myAct.getType());
+		Activity myActivity = knowledge.getActivity(myActivityId);
 
 		return myActivity;
 	}

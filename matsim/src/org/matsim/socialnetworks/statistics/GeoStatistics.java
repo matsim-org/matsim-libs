@@ -51,8 +51,10 @@ public class GeoStatistics {
 			Vertex v;
 			Person aPerson = iperson.next();
 //			Choose the first "home" location in the sorted set and assume it's where the person lives
-			Facility aHome= aPerson.getKnowledge().getFacilities("home").get(aPerson.getKnowledge().getFacilities("home").firstKey());
-//			Each facility should only have one location but UpMapping is a TreeMap so pick the first entry
+//			Facility aHome= aPerson.getKnowledge().getFacilities("home").get(aPerson.getKnowledge().getFacilities("home").firstKey());
+			//dg june 2008 the line above was replaced by the line below, please check correctness
+			Facility aHome = aPerson.getKnowledge().getActivities("home").get(0).getFacility();
+			//			Each facility should only have one location but UpMapping is a TreeMap so pick the first entry
 			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			if(this.locVertex.containsKey(aLoc)){
 				v=this.locVertex.get(aLoc);
@@ -75,8 +77,12 @@ public class GeoStatistics {
 			Person personA = link.getPersonFrom();
 			Person personB = link.getPersonTo();
 
-			Facility aHome= personA.getKnowledge().getFacilities("home").get(personA.getKnowledge().getFacilities("home").firstKey());
-			Facility bHome= personB.getKnowledge().getFacilities("home").get(personB.getKnowledge().getFacilities("home").firstKey());
+//			Facility aHome= personA.getKnowledge().getFacilities("home").get(personA.getKnowledge().getFacilities("home").firstKey());
+			//dg june 2008 the line above was replaced by the line below, please check correctness
+			Facility aHome = personA.getKnowledge().getActivities("home").get(0).getFacility();
+//			Facility bHome= personB.getKnowledge().getFacilities("home").get(personB.getKnowledge().getFacilities("home").firstKey());
+			//dg june 2008 the line above was replaced by the line below, please check correctness
+			Facility bHome = personB.getKnowledge().getActivities("home").get(0).getFacility();
 
 			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			Location bLoc = bHome.getUpMapping().get(bHome.getUpMapping().firstKey());

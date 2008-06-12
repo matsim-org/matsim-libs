@@ -53,11 +53,6 @@ public class PersonRemoveReferences extends PersonAlgorithm {
 
 	@Override
 	public void run(final Person person) {
-		if (person.getKnowledge() != null) {
-			if(!person.getKnowledge().removeAllFacilities()) {
-				Gbl.errorMsg("Could not remove all facilities!");
-			}
-		}
 		Iterator<Plan> p_it = person.getPlans().iterator();
 		while (p_it.hasNext()) {
 			Plan p = p_it.next();

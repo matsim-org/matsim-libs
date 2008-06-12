@@ -21,9 +21,6 @@
 package org.matsim.plans;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.basic.v01.Id;
@@ -43,7 +40,6 @@ public class Knowledge {
 	private String desc = null;
 
 	private final ArrayList<Activity> activities = new ArrayList<Activity>();
-	private final TreeMap<Id,Facility> facilities = new TreeMap<Id,Facility>();
 	private ArrayList<ActivitySpace> activitySpaces = null;// = new ArrayList<ActivitySpace>();
 
 	//////////////////////////////////////////////////////////////////////
@@ -78,15 +74,26 @@ public class Knowledge {
 		return asp;
 	}
 
+	public Activity getActivity(Id facilityId) {
+		for (Activity a : this.activities) {
+			if (a.getFacility().getId().equals(facilityId)) {
+				return a;
+			}
+		}
+		return null;
+	}
+
+	
 	//////////////////////////////////////////////////////////////////////
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
 	public final boolean addActivity(final Activity activity) {
-		if (!this.activities.contains(activity)) { this.activities.add(activity); }
-		Facility f = activity.getFacility();
-		this.facilities.put(f.getId(), f);
-		return true;
+		if (!this.activities.contains(activity)) { 
+			this.activities.add(activity);
+			return true;
+		}
+		return false;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -101,7 +108,6 @@ public class Knowledge {
 				Facility other = this.activities.get(i).getFacility();
 				if (other.equals(f)) { return true; }
 			}
-			this.facilities.remove(f.getId());
 			return true;
 		}
 		return false;
@@ -119,63 +125,12 @@ public class Knowledge {
 		return removed;
 	}
 
-	public final boolean removeFacility(final Facility facility) {
-		Facility f_removed = this.facilities.remove(facility.getId());
-		if (f_removed == null) { return false; }
-		if (f_removed != facility) { Gbl.errorMsg("Something is completely wrong!"); }
-		ArrayList<Activity> to_be_removed = new ArrayList<Activity>();
-		for (int i=0; i<this.activities.size(); i++) {
-			Activity a = this.activities.get(i);
-			if (a.getFacility() == f_removed) { to_be_removed.add(a); }
-		}
-		return this.activities.removeAll(to_be_removed);
-	}
-
-	public final boolean removeAllFacilities() {
-		Collection<Facility> facs = this.facilities.values();
-		Iterator<Facility> f_it = facs.iterator();
-		while (f_it.hasNext()) {
-			Facility f = f_it.next();
-			boolean b = this.removeFacility(f);
-			if (!b) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
 	public void setDesc(String desc) {
 		this.desc = desc;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// query methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final boolean containsFacility(final Id id) {
-		return this.facilities.containsKey(id);
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final TreeMap<Id,Facility> getFacilities() {
-		return this.facilities;
-	}
-
-	public final TreeMap<Id,Facility> getFacilities(final String act_type) {
-		TreeMap<Id,Facility> facs = new TreeMap<Id, Facility>();
-		for (int i=0; i<this.activities.size(); i++) {
-			Activity a = this.activities.get(i);
-			Facility f = a.getFacility();
-			if (a.getType().equals(act_type)) { facs.put(f.getId(),f); }
-		}
-		return facs;
 	}
 
 	public final ArrayList<Activity> getActivities() {
@@ -220,4 +175,5 @@ public class Knowledge {
 	}
 	public MentalMap map = new MentalMap(this);
 	public EgoNet egoNet = new EgoNet();
+
 }
