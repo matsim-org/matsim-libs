@@ -22,6 +22,7 @@ package org.matsim.utils.vis.matsimkml;
 
 import java.io.IOException;
 
+import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Icon;
@@ -41,9 +42,9 @@ public class MatsimKmlStyleFactory {
 
 	public static final String DEFAULTNODEICON ="icon18.png";
 	/**
-	 *
+	 * the resource to be used as icon
 	 */
-	public static final String DEFAULTNODEICONLOCATION = "res/icon18.png";
+	public static final String DEFAULTNODEICONRESOURCE = "icon18.png";
 	/**
 	 * the scale for the icons
 	 */
@@ -80,13 +81,12 @@ public class MatsimKmlStyleFactory {
 		this.document = document;
 	}
 
-
 	public Style createDefaultNetworkNodeStyle() throws IOException {
 		if (this.defaultnetworknodestyle == null) {
 			this.defaultnetworknodestyle = new Style("defaultnetworknodestyle");
 			Icon icon = new Icon(DEFAULTNODEICON);
 
-			this.writer.addNonKMLFile(DEFAULTNODEICONLOCATION, DEFAULTNODEICON);
+			this.writer.addNonKMLFile(MatsimResource.getAsInputStream(DEFAULTNODEICONRESOURCE), DEFAULTNODEICON);
 			IconStyle iStyle = new IconStyle(icon, MATSIMRED, IconStyle.DEFAULT_COLOR_MODE, ICONSCALE);
 			this.defaultnetworknodestyle.setIconStyle(iStyle);
 			this.document.addStyle(this.defaultnetworknodestyle);
@@ -101,7 +101,7 @@ public class MatsimKmlStyleFactory {
 			this.defaultnetworklinkstyle = new Style("defaultnetworklinkstyle");
 			Icon icon = new Icon(DEFAULTLINKICON);
 
-			this.writer.addNonKMLFile(DEFAULTNODEICONLOCATION, DEFAULTLINKICON);
+			this.writer.addNonKMLFile(MatsimResource.getAsInputStream(DEFAULTNODEICONRESOURCE), DEFAULTLINKICON);
 			IconStyle iStyle = new IconStyle(icon, MATSIMWHITE, IconStyle.DEFAULT_COLOR_MODE, ICONSCALE);
 			this.defaultnetworklinkstyle.setIconStyle(iStyle);
 			LineStyle lineStyle = new LineStyle(MATSIMGREY, ColorStyle.DEFAULT_COLOR_MODE, 12);
@@ -110,10 +110,5 @@ public class MatsimKmlStyleFactory {
 		}
 		return this.defaultnetworklinkstyle;
 	}
-
-
-
-
-
 
 }

@@ -22,6 +22,7 @@ package org.matsim.utils.vis.matsimkml;
 
 import java.io.IOException;
 
+import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.vis.kml.Icon;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.kml.ScreenOverlay;
@@ -41,7 +42,7 @@ public class MatsimKMLLogo extends ScreenOverlay {
 	 */
 	public MatsimKMLLogo(final KMZWriter writer) throws IOException {
 		super("matsimlogo");
-		writer.addNonKMLFile("res/matsim_logo_transparent.png", "matsimLogo.png");
+		writer.addNonKMLFile(MatsimResource.getAsInputStream("matsim_logo_transparent.png"), "matsimLogo.png");
 		Icon icon = new Icon("./matsimLogo.png");
     this.setIcon(icon);
     this.setName("Matsim Logo");

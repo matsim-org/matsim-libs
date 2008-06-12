@@ -50,6 +50,7 @@ public class AllTests {
 		suite.addTest(org.matsim.evacuation.AllTests.suite());
 		suite.addTest(org.matsim.events.AllTests.suite());
 		suite.addTest(org.matsim.facilities.AllTests.suite());
+		suite.addTest(org.matsim.gbl.AllTests.suite());
 		suite.addTest(org.matsim.mobsim.AllTests.suite());
 		suite.addTest(org.matsim.network.AllTests.suite());
 		suite.addTest(org.matsim.plans.AllTests.suite());

@@ -49,6 +49,7 @@ import org.jdesktop.animation.timing.interpolation.KeyFrames;
 import org.jdesktop.animation.timing.interpolation.KeyValues;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
@@ -295,36 +296,34 @@ implements MouseWheelListener{
 	    
 	public void drawElements(GL gl){
 		if((currentRect != null) && (alpha >= 0.f)){
-			if(marker == null) marker = OTFOGLDrawer.createTexture("res/otfvis/marker.png");
+			if(marker == null) marker = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("otfvis/marker.png"));
 
-			float z = 20f;
-	        gl.glEnable(GL_BLEND);
-	        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			gl.glEnable(GL_BLEND);
+			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-	        renderFace(gl, marker);
+			renderFace(gl, marker);
 			gl.glDisable(GL_BLEND);
 		} else {
 			currentRect = null;
 			alpha = 1.0f;
 		}
-		
+
 	}
 
-	   public void setFrustrum(GL gl) {
-		   
-		   GLU glu = new GLU();
-	       gl.glMatrixMode(GL_PROJECTION);
-	       gl.glLoadIdentity();
-	       glu.gluPerspective(45.0, aspectRatio, 1.0, cameraStart.getZ()*1.1);
+	public void setFrustrum(GL gl) {
 
-	       gl.glMatrixMode(GL_MODELVIEW);
-	       gl.glLoadIdentity();
-	       
-	       camera.setup(gl, glu);
-		   updateMatrices(gl);
+		GLU glu = new GLU();
+		gl.glMatrixMode(GL_PROJECTION);
+		gl.glLoadIdentity();
+		glu.gluPerspective(45.0, aspectRatio, 1.0, cameraStart.getZ()*1.1);
 
-	   }
+		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glLoadIdentity();
 
+		camera.setup(gl, glu);
+		updateMatrices(gl);
+
+	}
 
 	public void scaleNetworkRelative(float scale) {
 		this.scale *= scale;
@@ -335,18 +334,17 @@ implements MouseWheelListener{
 		viewBounds = viewBounds.scale(effectiveScale, effectiveScale);
 		setToNewPos(new Point3f(cameraStart.getX(),cameraStart.getY(),(float)zPos));
 	}
-	
+
 	public void scaleNetwork(float scale) {
 		this.scale = scale;
-    	float test = bounds.height*0.7f;
+		float test = bounds.height*0.7f;
 		float zPos = (test*scale);
 		if (zPos < minZoom) zPos =minZoom;
 		if (zPos > maxZoom) zPos =maxZoom;
 		setToNewPos(new Point3f(cameraStart.getX(),cameraStart.getY(),zPos));
 	}
-	
-	synchronized public Point3f getOGLPos(int x, int y)
-	{
+
+	synchronized public Point3f getOGLPos(int x, int y) {
 		double[] obj_pos = new double[3];
 		float winX, winY;//, winZ = cameraStart.getZ();
 		float posX, posY;//, posZ;

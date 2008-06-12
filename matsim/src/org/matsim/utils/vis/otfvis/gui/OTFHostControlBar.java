@@ -24,17 +24,14 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -59,6 +56,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
@@ -264,12 +262,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		this.setFloatable(false);
 		
-		URL imageURL = resourceHandler != null ? resourceHandler.getResource("res/otfvis/buttonPlay.png") : null;
-		Image image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage("res/otfvis/buttonPlay.png");
-    playIcon = new ImageIcon(image, "Play");
-    imageURL = resourceHandler != null ? resourceHandler.getResource("res/otfvis/buttonPause.png") : null;
-    image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage("res/otfvis/buttonPause.png");
-    pauseIcon = new ImageIcon(image, "Pause");
+    playIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPlay.png"), "Play");
+    pauseIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPause.png"), "Pause");
 
 		add(createButton("Restart", STOP, "buttonRestart", "restart the server/simulation"));
 		if (!this.liveHost) {
@@ -320,22 +314,19 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	  button.setBorderPainted(false);
 	  button.setMargin(new Insets(0, 0, 0, 0));
 
-	    if (imageName != null ) {                      //image found
-			//Look for the image.
-		    String imgLocation = "res/otfvis/"
-		                         + imageName
-		                         + ".png";
+	  if (imageName != null) {
+	  	// with image
+	  	//Look for the image.
+	  	String imgLocation = "otfvis/" + imageName + ".png";
+	  	ImageIcon icon =new ImageIcon(MatsimResource.getAsImage(imgLocation), altText);
+	  	if(icon.getIconHeight() != -1) button.setIcon(icon);
+	  	else button.setText(altText);
+	  } else {
+	  	// without image
+	  	button.setText(altText);
+	  }
 
-		    URL imageURL = resourceHandler != null ? resourceHandler.getResource(imgLocation) : null;
-			Image image = imageURL != null ? Toolkit.getDefaultToolkit().getImage(imageURL):Toolkit.getDefaultToolkit().getImage(imgLocation);
-	    	ImageIcon icon =new ImageIcon(image, altText);
-	        if(icon.getIconHeight() != -1) button.setIcon(icon);
-	        else button.setText(altText);
-	    } else {                                     //no image found
-	        button.setText(altText);
-	    }
-
-		return button;
+	  return button;
 	}
 
 	public void updateTimeLabel() {

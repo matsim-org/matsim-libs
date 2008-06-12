@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -146,8 +147,9 @@ public class KMZWriter {
 			e.printStackTrace();
 		}
 	}
+
 	/**
-	 * Adds a file to the kmz which is not a kml file
+	 * Adds a file to the kmz which is not a kml file.
 	 * @param filename the path to the file, relative or absolute
 	 * @param inZipFilename the filename used for the file in the kmz file
 	 * @throws IOException
@@ -159,39 +161,47 @@ public class KMZWriter {
 			return;
 		}
 		this.nonKmlFiles.put(filename, inZipFilename);
-		FileInputStream inStream = null;
+		addNonKMLFile(new FileInputStream(filename), inZipFilename);
+	}
+
+	/**
+	 * Adds some data as a file to the kmz.
+	 * @param data the data to add to the kmz
+	 * @param inZipFilename the filename used for the file in the kmz file
+	 * @throws IOException
+	 */
+	public void addNonKMLFile(final InputStream data, final String inZipFilename) throws IOException {
 		try {
-			inStream = new FileInputStream(filename);
 			// Allocate a buffer for reading the input files.
-			byte[] buffer = new byte[1024];
+			byte[] buffer = new byte[4096];
 			int bytesRead;
 			// Create a zip entry and add it to the zip.
 			ZipEntry entry = new ZipEntry(inZipFilename);
 			this.zipOut.putNextEntry(entry);
 
 			// Read the file the file and write it to the zip.
-			while ((bytesRead = inStream.read(buffer)) != -1) {
+			while ((bytesRead = data.read(buffer)) != -1) {
 				this.zipOut.write(buffer, 0, bytesRead);
 			}
 			log.info(entry.getName() + " added to kmz.");
 		} finally {
-			if (inStream != null) {
-				inStream.close();
+			if (data != null) {
+				data.close();
 			}
 		}
 	}
-
+	
 	/**
 	 * Adds a file (in form of a byte array) to a kml file.
-	 * @param file
+	 * @param data
 	 * @param inZipFilename inZipFilename the filename used for the file in the kmz file
 	 * @throws IOException
 	 */
-	public void addNonKMLFile(final byte[] file, final String inZipFilename) throws IOException {
+	public void addNonKMLFile(final byte[] data, final String inZipFilename) throws IOException {
 		// Create a zip entry and add it to the zip.
 		ZipEntry entry = new ZipEntry(inZipFilename);
 		this.zipOut.putNextEntry(entry);
-		this.zipOut.write(file);
+		this.zipOut.write(data);
 		log.info(entry.getName() + " added to kmz.");
 	}
 
@@ -209,7 +219,7 @@ public class KMZWriter {
 			ze.setMethod(ZipEntry.DEFLATED);
 			this.zipOut.putNextEntry(ze);
 
-			this.writeXMLDeclaration(this.out);
+			this.writeXMLDeclaration();
 
 			int offset = 0;
 			String offsetString = "  ";
@@ -222,9 +232,9 @@ public class KMZWriter {
 		}
 	}
 
-	private void writeXMLDeclaration(final BufferedWriter out) throws IOException {
-		out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		out.newLine();
+	private void writeXMLDeclaration() throws IOException {
+		this.out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		this.out.newLine();
 	}
 
 

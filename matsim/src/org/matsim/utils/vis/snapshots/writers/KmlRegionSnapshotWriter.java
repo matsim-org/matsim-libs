@@ -25,6 +25,7 @@ import java.util.GregorianCalendar;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.gbl.MatsimResource;
 import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
@@ -99,10 +100,10 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 		//set car style
 		Icon icon;
 		try {
-			this.writer.addNonKMLFile("res/car.png", "data/car.png");
+			this.writer.addNonKMLFile(MatsimResource.getAsInputStream("car.png"), "data/car.png");
 			icon = new Icon("./car.png");
 			//TODO think about that  and check comments in catch
-			this.writer.addNonKMLFile(MatsimKmlStyleFactory.DEFAULTNODEICONLOCATION, MatsimKmlStyleFactory.DEFAULTNODEICON);
+			this.writer.addNonKMLFile(MatsimResource.getAsInputStream(MatsimKmlStyleFactory.DEFAULTNODEICONRESOURCE), MatsimKmlStyleFactory.DEFAULTNODEICON);
 		} catch (IOException e1) {
 			log.warn("Cannot write car icon to kmz, trying to use icon from http://maps.google.com/mapfiles/kml/pal4/icon15.png");
 			icon = new Icon("http://maps.google.com/mapfiles/kml/pal4/icon15.png");

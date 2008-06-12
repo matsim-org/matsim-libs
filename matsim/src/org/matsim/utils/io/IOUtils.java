@@ -29,7 +29,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -86,7 +88,7 @@ public class IOUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public static BufferedWriter getBufferedWriter(final String filename, boolean useCompression) throws FileNotFoundException, IOException {
+	public static BufferedWriter getBufferedWriter(final String filename, final boolean useCompression) throws FileNotFoundException, IOException {
 		if (filename == null) {
 			throw new FileNotFoundException("No filename given (filename == null)");
 		}
@@ -217,16 +219,12 @@ public class IOUtils {
 	 * @author mrieser
 	 */
 	public static void copyFile(final File fromFile, final File toFile) throws FileNotFoundException, IOException {
-		FileInputStream from = null;
-		FileOutputStream to = null;
+		InputStream from = null;
+		OutputStream to = null;
 		try {
 			from = new FileInputStream(fromFile);
 			to = new FileOutputStream(toFile);
-			byte[] buffer = new byte[4096];
-			int bytesRead;
-			while ((bytesRead = from.read(buffer)) != -1) {
-				to.write(buffer, 0, bytesRead);
-			}
+			copyStream(from, to);
 		} finally {
 			if (from != null) {
 				try {
@@ -238,6 +236,23 @@ public class IOUtils {
 					to.close();
 				} catch (IOException ignored) {}
 			}
+		}
+	}
+
+	/**
+	 * Copies the content from one stream to another stream.
+	 *
+	 * @param fromStream The stream containing the data to be copied
+	 * @param toStream The stream the data should be written to
+	 * @throws IOException
+	 *
+	 * @author mrieser
+	 */
+	public static void copyStream(final InputStream fromStream, final OutputStream toStream) throws IOException {
+		byte[] buffer = new byte[4096];
+		int bytesRead;
+		while ((bytesRead = fromStream.read(buffer)) != -1) {
+			toStream.write(buffer, 0, bytesRead);
 		}
 	}
 

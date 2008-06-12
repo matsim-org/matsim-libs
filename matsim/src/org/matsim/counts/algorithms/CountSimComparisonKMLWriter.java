@@ -38,6 +38,7 @@ import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24Graph;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
+import org.matsim.gbl.MatsimResource;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
@@ -285,8 +286,8 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 		try {
 			// copy required icons to the kmz
-			this.writer.addNonKMLFile("res/icons/plus.png", CROSSICON);
-			this.writer.addNonKMLFile("res/icons/minus.png", MINUSICON);
+			this.writer.addNonKMLFile(MatsimResource.getAsInputStream("icons/plus.png"), CROSSICON);
+			this.writer.addNonKMLFile(MatsimResource.getAsInputStream("icons/minus.png"), MINUSICON);
 		} catch (IOException e) {
 			log.error("Could not copy copy plus-/minus-icons to the KMZ.", e);
 		}
@@ -360,7 +361,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @throws IOException
 	 */
 	private ScreenOverlay createLegend() throws IOException {
-		this.writer.addNonKMLFile("res/countsKml/countsLegend240x300.png", "countsLegend.png");
+		this.writer.addNonKMLFile(MatsimResource.getAsInputStream("countsKml/countsLegend240x300.png"), "countsLegend.png");
 		ScreenOverlay overlay = new ScreenOverlay("Legend");
 		Icon icon = new Icon("./countsLegend.png");
     overlay.setIcon(icon);

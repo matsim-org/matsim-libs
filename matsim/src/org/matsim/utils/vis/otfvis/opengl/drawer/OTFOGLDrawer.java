@@ -33,6 +33,7 @@ import java.awt.Font;
 import java.awt.geom.Point2D;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,7 @@ import javax.swing.JFrame;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
@@ -101,10 +103,6 @@ abstract class OGLSceneLayerImpl implements SceneLayer{
 	}
 
 }
-
-
-
-
 
 public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener, OGLProvider{
 	private static int linkTexWidth = 0;
@@ -298,7 +296,6 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 			final float width = laneWidth*1.5f;
 			final float length = laneWidth*1.5f;
 
-
 			setColor(gl);
 
 			if (true) {
@@ -313,10 +310,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 			gl.glTexCoord2f(0,1); gl.glVertex3f(this.startX + length, this.startY - width, z);
 			gl.glEnd();
 		}
-
 	}
-
-
 
 	protected static volatile GLContext motherContext = null;
 
@@ -442,11 +436,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 //		Gbl.printElapsedTime();
 	}
 
-
-	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged,
-			boolean deviceChanged) {
-
-
+	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
 	}
 
 	public void init(GLAutoDrawable drawable) {
@@ -460,9 +450,9 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 
 		this.mouseMan.init(this.gl);
 
-		AgentDrawer.carjpg = createTexture("res/car.png");
-		AgentDrawer.wavejpg = createTexture("res/square.png");
-		AgentDrawer.pedpng = createTexture("res/ped.png");
+		AgentDrawer.carjpg = createTexture(MatsimResource.getAsInputStream("car.png"));
+		AgentDrawer.wavejpg = createTexture(MatsimResource.getAsInputStream("square.png"));
+		AgentDrawer.pedpng = createTexture(MatsimResource.getAsInputStream("ped.png"));
 
 		int test = this.gl.glGetError();
 		System.out.println("GLerror = " + test);
@@ -546,15 +536,14 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 		this.canvas.display();
 	}
 
+	private final Object blockRefresh = new Object();
+	private SceneGraph actGraph = null;
+
 	/***
 	 * invalidate, gets the actual correct data from the host, to display the given rect
 	 * This method is used in most cases
 	 * @throws RemoteException
 	 */
-
-	private final Object blockRefresh = new Object();
-	private SceneGraph actGraph = null;
-
 	public void invalidate(int time) throws RemoteException {
 
 		agentSize = Float.parseFloat(Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.AGENT_SIZE));
@@ -628,8 +617,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 	public SceneGraph getActGraph() {
 		return this.actGraph;
 	}
-	
-	
+
 	static public Texture createTexture(String filename) {
 		Texture t = null;
 		try {
@@ -638,15 +626,25 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 			t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		} catch (IOException e) {
-			System.err.println("Error loading " + filename);
+			System.err.println("Error loading " + filename); // TODO switch to Log4J, include exception-message to output
 		}
 		return t;
 	}
 
-	public void clearCache() {
-		if(clientQ != null) clientQ.clearCache();
+	static public Texture createTexture(final InputStream data) {
+		Texture t = null;
+		try {
+			t = TextureIO.newTexture(data, true, null);
+			t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		} catch (IOException e) {
+			System.err.println("Error loading Texture from stream: " + e.getMessage());
+		}
+		return t;
 	}
-
-
+	
+	public void clearCache() {
+		if (clientQ != null) clientQ.clearCache();
+	}
 
 }
