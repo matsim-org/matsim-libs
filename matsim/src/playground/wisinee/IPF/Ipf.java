@@ -13,15 +13,15 @@ public class Ipf {
 	double[][]initialRij;
 	double[][]finalRij;
 	
-	public void getFixRow(double[] r,int nr){
+	public void setFixRow(double[] r,int nr){
 		fixedR = new double[nr];
 		fixedR = r; 
 	}
-	public void getFixColumn(double[] c,int nc){
+	public void setFixColumn(double[] c,int nc){
 		fixedC = new double[nc];
 		fixedC = c; 
 	}
-	public void getInitialMatrix(double[][] rij,int nr, int nc){
+	public void setInitialMatrix(double[][] rij,int nr, int nc){
 		initialRij = new double[nr][nc];
 		initialRij = rij; 
 	}
