@@ -165,7 +165,7 @@ public class Opentime implements Comparable<Opentime> {
 	@Override
 	public final String toString() {
 		return "[day=" + this.day + "]" +
-				"[startTime=" + this.startTime + "]" +
-				"[endTime=" + this.endTime + "]";
+				"[startTime=" + Time.writeTime(this.startTime) + "]" +
+				"[endTime=" + Time.writeTime(this.endTime) + "]";
 	}
 }
