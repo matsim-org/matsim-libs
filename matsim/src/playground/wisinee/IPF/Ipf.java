@@ -34,22 +34,17 @@ public class Ipf {
 				
 		double[] totalR = new double[nr];
 		double[] totalC = new double[nc];
-		double[] ftotalR = new double[nr];
-		double[] ftotalC = new double[nc];
 		double[][] rij = new double[nr][nc];
 		
 		
 		//initialize variables
 		for (int i = 0; i < nr; i++) {
-			ftotalR[i] = fixedR[i];
 			for (int j = 0; j < nc; j++){
 				rij[i][j] = initialRij[i][j];
-				ftotalC[j] = fixedC[j];
 			}
 		}	
 		initialRij = null;
-		fixedR = null;
-		fixedC = null;
+
 		double[][] cij = new double[nr][nc];		
 		
 		//start ipf calculation
@@ -63,7 +58,7 @@ public class Ipf {
 
 			for (int i = 0; i < nr; i++){
 				for (int j = 0; j < nc; j++) {
-					if (totalR[i]>0) rij[i][j] = rij[i][j]*ftotalR[i]/totalR[i];
+					if (totalR[i]>0) rij[i][j] = rij[i][j]*fixedR[i]/totalR[i];
 					else rij[i][j] = 0;
 				}			
 			}			
@@ -83,7 +78,7 @@ public class Ipf {
 			
 			for (int j = 0; j < nc; j++){
 				for (int i = 0; i < nr; i++) {
-					if (totalC[j] > 0)  cij[i][j] = cij[i][j]*ftotalC[j]/totalC[j];
+					if (totalC[j] > 0)  cij[i][j] = cij[i][j]*fixedC[j]/totalC[j];
 					else cij[i][j] = 0;
 				}			
 			}	
