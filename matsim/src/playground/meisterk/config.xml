@@ -43,4 +43,11 @@
 
 <!-- ====================================================================== -->
 
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&INPUTBASE;/facilities_test.xml" />
+<!--		<param name="inputFacilitiesFile" value="&INPUTBASE;/facilities.xml.gz" />-->
+	</module>
+	
+<!-- ====================================================================== -->
+
 </config>

@@ -1,0 +1,3 @@
+MAINCLASS=playground/meisterk/portland/GenerateDemand
+CONFIG=src/playground/meisterk/portland/config.xml
+MEMORY = -Xms2000m -Xmx4000m

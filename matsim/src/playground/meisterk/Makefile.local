@@ -1,0 +1,3 @@
+MAINCLASS = playground/meisterk/MyRuns
+CONFIG = src/playground/meisterk/config.xml
+MEMORY = -Xms2048M -Xmx4096M

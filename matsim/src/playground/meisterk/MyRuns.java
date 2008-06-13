@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -43,6 +45,10 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerI;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.Facility;
+import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -135,13 +141,14 @@ public class MyRuns {
 //		MyRuns.planomatStandAloneDemo();
 //		MyRuns.testReplanningRate();
 //		MyRuns.testDepartureDelayCalculator();
-		MyRuns.testTravelTimeEstimator();
+//		MyRuns.testTravelTimeEstimator();
 //		MyRuns.testTravelTimeI();
 //		MyRuns.testCharyparNagelFitnessFunction();
 //		MyRuns.conversionSpeedTest();
 //		MyRuns.convertPlansV0ToPlansV4();
-		MyRuns.produceSTRC2007KML();
-
+//		MyRuns.produceSTRC2007KML();
+		MyRuns.facilityActivities();
+		
 		System.out.println();
 
 	}
@@ -171,6 +178,60 @@ public class MyRuns {
 
 	}
 
+	private static void facilityActivities() {
+		
+		String actType = "s13";
+		
+		System.out.println("Reading facilities...");
+		Facilities facilityLayer = new Facilities();
+		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilityLayer);
+		//facilities_reader.setValidating(false);
+		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
+		facilityLayer.printFacilitiesCount();
+		Gbl.getWorld().setFacilityLayer(facilityLayer);
+		System.out.println("Reading facilities...done.");
+
+		boolean foundAct = false;
+		
+		Facility facility = ((Facility) facilityLayer.getLocation("10000017"));
+		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
+		String facilityActType = null;
+		// first is opening time, second is closing time
+		double[] openingInterval = new double[]{Double.MAX_VALUE, Double.MIN_VALUE};
+//		double openingTime = Double.MAX_VALUE;
+//		double closingTime = Double.MIN_VALUE;
+		
+		while (facilityActTypeIterator.hasNext() && !foundAct) {
+
+			facilityActType = facilityActTypeIterator.next();
+			System.out.println(facilityActType);
+			if (actType.substring(0, 1).equals(facilityActType.substring(0, 1))) {
+				foundAct = true;
+				System.out.println("We'll use the following facility activity type: ");
+				System.out.println("\t" + facilityActType);
+
+				TreeSet<Opentime> opentimes = facility.getActivity(facilityActType).getOpentimes("wed");
+				System.out.println("We'll use wednesday's open times objects: ");
+				for (Opentime opentime : opentimes) {
+					System.out.println(opentime.toString());
+					// ignoring lunch breaks with the following procedure
+					openingInterval[0] = Math.min(openingInterval[0], opentime.getStartTime());
+					openingInterval[1] = Math.max(openingInterval[1], opentime.getEndTime());
+				}
+
+				System.out.println("Final opening times: ");
+				System.out.println("Open: " + Time.writeTime(openingInterval[0]));
+				System.out.println("Close: " + Time.writeTime(openingInterval[1]));
+				
+			}
+			
+		}
+		
+		if (!foundAct) {
+			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
+		}
+		
+	}
 
 	private static void produceSTRC2007KML() {
 

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE facilities SYSTEM "http://www.matsim.org/files/dtd/facilities_v1.dtd">
+
+<facilities name="Facilities KTI Year 2">
+
+<!-- ====================================================================== -->
+
+        <facility id="10000017" x="486994.8141739675" y="112271.30484907502">
+                <activity type="shop_other">
+                        <capacity value="34" />
+                        <opentime day="fri" start_time="13:30:00" end_time="18:45:00" />
+                        <opentime day="fri" start_time="08:00:00" end_time="12:15:00" />
+                        <opentime day="mon" start_time="13:30:00" end_time="18:45:00" />
+                        <opentime day="mon" start_time="08:00:00" end_time="12:15:00" />
+                        <opentime day="sat" start_time="08:00:00" end_time="17:00:00" />
+                        <opentime day="thu" start_time="13:30:00" end_time="18:45:00" />
+                        <opentime day="thu" start_time="08:00:00" end_time="12:15:00" />
+                        <opentime day="tue" start_time="13:30:00" end_time="18:45:00" />
+                        <opentime day="tue" start_time="08:00:00" end_time="12:15:00" />
+                        <opentime day="wed" start_time="13:30:00" end_time="18:45:00" />
+                        <opentime day="wed" start_time="08:00:00" end_time="12:15:00" />
+                </activity>
+
+                <activity type="work_sector3">
+                        <capacity value="2" />
+                        <opentime day="fri" start_time="13:30:00" end_time="18:45:00" />
+                        <opentime day="fri" start_time="08:00:00" end_time="12:15:00" />
+                        <opentime day="mon" start_time="13:30:00" end_time="18:45:00" />
+                        <opentime day="mon" start_time="08:00:00" end_time="12:15:00" />
+                        <opentime day="sat" start_time="08:00:00" end_time="17:00:00" />
+                        <opentime day="thu" start_time="13:30:00" end_time="18:45:00" />
+                        <opentime day="thu" start_time="08:00:00" end_time="12:15:00" />
+                        <opentime day="tue" start_time="13:30:00" end_time="18:45:00" />
+                        <opentime day="tue" start_time="08:00:00" end_time="12:15:00" />
+                        <opentime day="wed" start_time="13:30:00" end_time="18:45:00" />
+                        <opentime day="wed" start_time="08:00:00" end_time="12:15:00" />
+                </activity>
+
+        </facility>
+
+<!-- ====================================================================== -->
+
+</facilities>
