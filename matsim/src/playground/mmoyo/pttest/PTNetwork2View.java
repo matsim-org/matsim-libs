@@ -10,6 +10,7 @@ import org.matsim.network.Node;
 
 
 public class PTNetwork2View extends NetworkLayer {
+	private static final String NETWORKFILENAME="c://PTnetwork.xml";
 	private NetworkLayer cityNet;
 
 	public PTNetwork2View(NetworkLayer cityNet) {
@@ -38,7 +39,7 @@ public class PTNetwork2View extends NetworkLayer {
 		writePTNetwork();
 	}//CreatePTNView
 
-	private void AddNode(Node node) {
+	private void AddNode(Node node){
 		if (this.getNode(node.getId().toString()) == null) {
 			this.createNode(node.getId().toString(), Double.toString(node.getCoord().getX()), Double.toString(node.getCoord().getY()), node.getType());
 		}
@@ -51,7 +52,21 @@ public class PTNetwork2View extends NetworkLayer {
 	}
 
 	public void writePTNetwork() {
-		NetworkWriter networkWriter = new NetworkWriter(this,"c://PTnetwork.xml");
+		NetworkWriter networkWriter = new NetworkWriter(this,NETWORKFILENAME);
 		networkWriter.write();
 	}
+	
+	public void PrintLinks() {
+		//TODO: This method does not work anymore!!!
+		// Console quick visualization of links with from and to nodes
+		//System.out.println(getLinks().size());
+		//for (org.matsim.network.Link l :// ptNetworkLayer.getLinks().values()) {
+			// This one is the normal displayer
+			 //System.out.println("(" + l.getFromNode().getId().toString()+ ")----" + l.getId().toString() + "--->(" +  l.getToNode().getId().toString()+ ") ");
+			// System.out.println (((PTNode)l.getFromNode()).getIdFather().toString() + "-------- " +((PTNode)l.getToNode()).getIdFather().toString()); 
+			// This display also the id of the father node
+			//System.out.println("(" + l.getFromNode().getId().toString() + ")----" + l.getId().toString() + "--->(" + l.getToNode().getId().toString() + ")   " + "      (" + ((PTNode) l.getFromNode()).getIdFather().toString()+ ")----" + l.getId().toString() + "--->(" + ((PTNode) l.getToNode()).getIdFather().toString() + ")");
+		//}
+	}
+	
 }

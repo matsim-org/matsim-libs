@@ -43,8 +43,6 @@ public class PTLinesReader extends MatsimXmlParser {
 			startLines();
 		} else if (LINE.equals(name)) {
 			startLine(atts);
-		} else if (ROUTE.equals(name)) {
-			startRoute(atts);
 		}
 	}
 
@@ -64,9 +62,6 @@ public class PTLinesReader extends MatsimXmlParser {
 
 	private void startLine(final Attributes atts) {
 		idPTLine = new IdImpl(atts.getValue("id"));
-	}
-
-	private void startRoute(final Attributes atts) {
 	}
 
 	private void endRoute() {

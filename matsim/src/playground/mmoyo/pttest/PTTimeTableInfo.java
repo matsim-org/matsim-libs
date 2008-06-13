@@ -1,29 +1,55 @@
 package playground.mmoyo.pttest;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import org.matsim.basic.v01.IdImpl;
+
+/*TODO: resolvar si el mapa de rutas se guarda tambien en cada nodo o solo en una lista general
+*/
 public class PTTimeTableInfo {
-	private List<PTTimeTable> timeTable;
+	private Map <IdImpl, List<PTTimeTable>> timeTableMap = new TreeMap <IdImpl, List<PTTimeTable>>();		
 	
-	public PTTimeTableInfo(List<PTTimeTable> timeTable){
-		this.timeTable =timeTable;
-		//System.out.println(ToString(NextDeparture("09:15",timeTable.get(0).getDeparture())));		
+	public PTTimeTableInfo(Map <IdImpl, List<PTTimeTable>> timeTable){
+		this.timeTableMap =timeTable;
+		//printTimeTable();
+		System.out.println(ToString(NextDeparture(new IdImpl("1"),ToSeconds("13:15"))) );		
 	}
+	
+	public void printTimeTable() {
+		Iterator iter = timeTableMap.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry entry = (Map.Entry) iter.next();
+			List tl = (ArrayList)entry.getValue();
+			for (Iterator<PTTimeTable> iter2 = tl.iterator(); iter2.hasNext();) {
+				PTTimeTable tt= (PTTimeTable)iter2.next();
+				System.out.println("\n Node:"+ entry.getKey() + " = Line:" +	tt.getIdPtLine().toString());
+				for (int x=0; x< tt.getDeparture().length; x++){
+					System.out.print(tt.getDeparture()[x]+ " ");	
+				}//for x
+			}//for iterator
+		}//while
+		iter = null;
+	}// showmap
 
-	public void printTimetable(){
-		for (Iterator<PTTimeTable> iter = timeTable.iterator(); iter.hasNext();) {
-			PTTimeTable ptTimeTable = iter.next();
-			System.out.println("\n" + ptTimeTable.getIdNode().toString()+ "-" + ptTimeTable.getIdPtLine().toString() + "-" ); //+ 
-			for (int x= 0; x < ptTimeTable.getDeparture().length; x++){
-				System.out.print(ToString(ptTimeTable.getDeparture()[x]) + " " );
-			}
-		}
-	}
+	private int NextDeparture(IdImpl idNode, int time){ 		//for Matsim
+		List tl =timeTableMap.get(idNode);
+		int x2 = Integer.MAX_VALUE;
+		for (Iterator<PTTimeTable> iter = tl.iterator(); iter.hasNext();) {
+			PTTimeTable tt= (PTTimeTable)iter.next();
+			
+			int x = LoopDepartures(time,tt.getDeparture());
+			if  (x < x2) {
+				x2= x;
+				}
+		}//for iterator
+		return x2;
+	} 
 	
-	
-	public int NextDeparture(String strTime1,int[] arrDep){  //,
-		int intTime1 = ToSeconds(strTime1);
+	public int LoopDepartures(int intTime1,int[] arrDep){  //,
 		int x=0;
 		while (arrDep[x] < intTime1){
 			x++;
@@ -33,7 +59,7 @@ public class PTTimeTableInfo {
 		}	
 		return arrDep[x];
 	}
-		
+	
 	private int ToSeconds(String strDeparture){
 		String[] strTime = strDeparture.split(":");  //if we had seconds:  + (departure + ":00").split(":");   //
 		return ((Integer.parseInt(strTime[0]) * 3600) + (Integer.parseInt(strTime[1]))*60) ;  	////if we had seconds:   + Integer.parseInt(strTime[2] 
@@ -41,9 +67,12 @@ public class PTTimeTableInfo {
 	
 	private String ToString(int intDeparture){
 		//Converts integers into format "hh:mm"
-		//TODO: force format "00:00"
-		int hour =intDeparture/3600;
-		int min = (intDeparture%3600)/60;
-		return String.valueOf(hour) + ":" + String.valueOf(min);
+		StringBuffer buffer = new StringBuffer(5);
+		buffer.append(String.format("%02d", intDeparture/3600));
+		buffer.append(":");
+		buffer.append(String.format("%02d", (intDeparture%3600)/60));
+		buffer.append(" ");
+		return  buffer.toString(); 
 	}	
+	
 }

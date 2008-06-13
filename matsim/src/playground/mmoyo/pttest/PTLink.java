@@ -38,5 +38,13 @@ public class PTLink extends LinkImpl {
 	public void setPtType(String ptType) {
 		this.ptType = ptType;
 	}
+
+	public int getNextDepature() {
+		return nextDepature;
+	}
+
+	public void setNextDepature(int nextDepature) {
+		this.nextDepature = nextDepature;
+	}
 	
 }// class

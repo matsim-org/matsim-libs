@@ -210,6 +210,10 @@ public class PTNetworkLayer extends NetworkLayer {
 		}
 		return ptNode;
 	}// CreateTransfer
+	
+	
+	
+	
 
 }// Class
 
@@ -233,22 +237,5 @@ public class PTNetworkLayer extends NetworkLayer {
  * 		} 
  * }//Fill
  * 
- * class Children{ 
- * 		String idFather; 
- * 		ArrayList<String> childrenList = new ArrayList <String>(); 
- * 		public Children(String idFather){ 
- * 			this.idFather= idFather; 
- * 		} 
- * }//This class was nos executed becase we use a array of children istead
- * 
- * public void CleanTransfers(){ 
- * 		for (int i = 0; i< transferLList.size(); i++) {
- * 			this.getLinks().remove(transferLList.get(i)); //Link 
- * 			l = this.getLinks().get(transferLList.get(i)); 
- * 			//System.out.println("value of trasferlList:" + transferLList.get(i)); 
- * 		}
- *  	for (int i =0; i < transferNList.size();i++){
- * 			this.nodes.remove(transferNList.get(i)); 
- * 		}
- * }
+
  */

@@ -11,18 +11,35 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
 public class PTControler {
-	private static final String NETWORKFILENAME="./network.xml";
-	private static final String PTLINES = "./ptLines.xml";
+	private static final String NETWORKFILENAME="C://Users/manuel/Desktop/berlinOEV/network.xml";
+	private static final String PTLINES = "C://Users/manuel/Desktop/berlinOEV/ptLines.xml";
+	private static final String PTLINESTIMETABLE = "C://Users/manuel/Desktop/berlinOEV/ptLinesSchedule.xml";
 	private static NetworkLayer cityNetworkLayer = null;
 	private static PTNetworkLayer ptNetworkLayer = null;
 	private static PTLinesReader ptLinesReader = new PTLinesReader();
-
+	private static PTTimeTableReader ptLinesScheduleReader = new PTTimeTableReader();
+		
 	public static void main(String[] args) {
-		readCityNetwork();
-		ptLinesReader.readFile(PTLINES);
-		// CreatePTView();
-		Route();
-	}// main
+		int option = 2;
+	    switch (option) {
+	    	case 0:   //routing of passengers  
+	        	readCityNetwork();
+	    		ptLinesReader.readFile(PTLINES);
+	    		Route();
+	            break;
+	    	case 1:   	//creation of PTNetwork to visualize
+	    	 	readCityNetwork();
+	    		ptLinesReader.readFile(PTLINES);
+	    		CreatePTView(); 
+	            break;
+	    	case 2:     //Creation of Timetables
+	    		ptLinesScheduleReader.readFile(PTLINESTIMETABLE);
+	    		PTTimeTableInfo ptnDepartureInforman = new PTTimeTableInfo(ptLinesScheduleReader.GetTimeTable());   
+	    		//ptnDepartureInforman.printTimetable(); 
+	            
+	    		break;
+	        }
+	}//main
 
 	private static void Route(){
 		ptNetworkLayer = new PTNetworkLayer(cityNetworkLayer);
@@ -39,7 +56,7 @@ public class PTControler {
 	private static void CreatePTView() {
 		PTNetwork2View ptNetwork2view = new PTNetwork2View(cityNetworkLayer);
 		ptNetwork2view.writePTNetwork();
-		PrintLinks();
+		ptNetwork2view.PrintLinks();
 	}
 
 	private static void OptimalPTPath() {
@@ -86,14 +103,27 @@ public class PTControler {
 		}//for i
 	}//OptimalPath
 
-	private static void PrintLinks() {
-		// Console quick visualization of links with from and to nodes
-		for (org.matsim.network.Link l : ptNetworkLayer.getLinks().values()) {
-			// This one is the normal displayer
-			// System.out.println("(" + l.getFromNode().getId().toString()+ ")----" + l.getId().toString() + "--->(" +  l.getToNode().getId().toString()+ ") ");
-			// System.out.println (((PTNode)l.getFromNode()).getIdFather().toString() + "-------- " +((PTNode)l.getToNode()).getIdFather().toString()); 
-			// This display also the id of the father node
-			System.out.println("(" + l.getFromNode().getId().toString() + ")----" + l.getId().toString() + "--->(" + l.getToNode().getId().toString() + ")   " + "      (" + ((PTNode) l.getFromNode()).getIdFather().toString()+ ")----" + l.getId().toString() + "--->(" + ((PTNode) l.getToNode()).getIdFather().toString() + ")");
-		}
-	}
+	
 }// class
+
+// Old code
+/*
+ * //This is not longer necessary now because the PTNetwork is independent with own nodes and links 
+ * public static int MaxNodeKey(NetworkLayer net){ 
+ * 		int key = 0;
+ * 		while (net.getNodes().keySet().contains(new IdImpl(String.valueOf(key)))){
+ * 			key++; 
+ * 		} 
+ * 		net=null; 
+ * 		return key-1; 
+ * }
+ * 
+ * public static int MaxLinkKey(NetworkLayer net){ 
+ * 		int key = 0; 
+ * 		while(net.getLinks().keySet().contains(new IdImpl(String.valueOf(key)))){ 
+ * 			key++; 
+ * 		}
+ * 		net=null; 
+ * 		return key-1; 
+ * }
+ */
