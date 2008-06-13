@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -38,12 +39,12 @@ import org.matsim.network.Node;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 /**
+ * QueueNetworkLayer is responsible for creating the QueueLinks/Nodes and for
+ * implementing doSim
+ *
  * @author david
  * @author mrieser
  * @author dgrether
- *
- * QueueNetworkLayer is responsible for creating the QueueLinks/Nodes and for
- * implementing doSim
  */
 public class QueueNetworkLayer /* extends NetworkLayer */{
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
@@ -56,7 +57,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 	private final static boolean simulateAllLinks = false;
 
 	/** This is the collection of links that have to be moved in the simulation */
-	private final ArrayList<QueueLink> simLinksArray = new ArrayList<QueueLink>();
+	private final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
 	private QueueNode[] simNodesArrayCache = new QueueNode[0];
 	/** This is the collection of links that have to be activated in the current time step */
@@ -80,7 +81,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 		this(networkLayer, new DefaultQueueNetworkFactory());
 	}
 
-	public QueueNetworkLayer(NetworkLayer networkLayer, QueueNetworkFactory factory) {
+	public QueueNetworkLayer(NetworkLayer networkLayer, QueueNetworkFactory<QueueNode, QueueLink> factory) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
 		this.links = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
@@ -138,7 +139,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 	}
 
 	protected void moveLinks(final double time) {
-		ListIterator<QueueLink> links = this.simLinksArray.listIterator();
+		ListIterator<QueueLink> simLinks = this.simLinksArray.listIterator();
 		QueueLink link;
 		boolean isActive;
 
@@ -157,21 +158,21 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 
 		if (this.moveWaitFirst) {
 
-			while (links.hasNext()) {
-				link = links.next();
+			while (simLinks.hasNext()) {
+				link = simLinks.next();
 				isActive = link.moveLinkWaitFirst(time);
 				if (!isActive && !simulateAllLinks) {
-					links.remove();
+					simLinks.remove();
 				}
 			}
 
 		} else {
 
-			while (links.hasNext()) {
-				link = links.next();
+			while (simLinks.hasNext()) {
+				link = simLinks.next();
 				isActive = link.moveLink(time);
 				if (!isActive && !simulateAllLinks) {
-					links.remove();
+					simLinks.remove();
 				}
 			}
 
