@@ -336,7 +336,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 			int friend=0;
 			int foe=0;
 			Person p1=plan.getPerson();
-			Activity myActivity=p1.getKnowledge().map.getActivity(act);
+			Activity myActivity=p1.getKnowledge().getMentalMap().getActivity(act);
 
 			if(socialPlansMap.get(myActivity)== null){
 			
@@ -348,7 +348,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 //			System.out.print("### "+othersThere.size());
 			while(e.hasMoreElements()){
 				Person p2 =(Person) e.nextElement();
-				if(p1.getKnowledge().egoNet.knows(p2)){
+				if(p1.getKnowledge().getEgoNet().knows(p2)){
 					friend++;
 				}else{
 					foe++;

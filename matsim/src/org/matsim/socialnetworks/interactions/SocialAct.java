@@ -58,7 +58,7 @@ public class SocialAct {
 		}
 //		Act myAct = person.getKnowledge().map.getAct(this.activity);
 
-		Act myAct = person.getKnowledge().map.getActUsingId(this.activity);
+		Act myAct = person.getKnowledge().getMentalMap().getActUsingId(this.activity);
 
 		arrivalTimes.put(person,myAct.getStartTime());
 		departureTimes.put(person,myAct.getEndTime());

@@ -164,7 +164,7 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 
-				k.map.learnActsActivities(newAct,fFromKnowledge.getActivity(factype));
+				k.getMentalMap().learnActsActivities(newAct,fFromKnowledge.getActivity(factype));
 				person.setSelectedPlan(newPlan);
 //				System.out.println("   ### new location for "+person.getId()+" "+newAct.getType());
 

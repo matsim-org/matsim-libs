@@ -67,7 +67,7 @@ public class ActivityActWriter {
 				int actIndex=0;
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					Act myAct= (Act) actsLegs.get(j);
-					Activity myActivity= myKnowledge.map.getActivity(myAct);
+					Activity myActivity= myKnowledge.getMentalMap().getActivity(myAct);
 //					System.out.println(" AAW DEBUG J=: "+j);
 					try {
 						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+actIndex);

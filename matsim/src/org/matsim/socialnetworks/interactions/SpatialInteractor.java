@@ -116,7 +116,7 @@ public class SpatialInteractor {
 						}
 					}
 				}
-				if(p1.getKnowledge().egoNet.knows(nextInQueue)){
+				if(p1.getKnowledge().getEgoNet().knows(nextInQueue)){
 				} else {
 					// If the two do not already know each other,
 					net.makeSocialContact(p1,nextInQueue,iteration,"new"+event.activity.getType());
@@ -137,7 +137,7 @@ public class SpatialInteractor {
 				int size = persons.size();
 				for(int i=0; i<size;i++){
 					Person p2=persons.get(i);
-					if(p1.getKnowledge().egoNet.knows(p2)){
+					if(p1.getKnowledge().getEgoNet().knows(p2)){
 					} else {
 						// If the two do not already know each other,
 
@@ -160,7 +160,7 @@ public class SpatialInteractor {
 			Person p2 = event.getRandomAttendee(p1);
 
 			// If they know each other, probability is 1.0 that the relationship is reinforced
-			if (p1.getKnowledge().egoNet.knows(p2)) {
+			if (p1.getKnowledge().getEgoNet().knows(p2)) {
 				net.makeSocialContact(p1,p2,iteration,"renew"+event.activity.getType());
 				System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 			} else {
@@ -183,7 +183,7 @@ public class SpatialInteractor {
 			Person p2 = event.getRandomAttendeeInTimeWindow(p1, StartTime, EndTime);
 			if(p2==null) return;
 			// If they know each other, probability is 1.0 that the relationship is reinforced
-			if (p1.getKnowledge().egoNet.knows(p2)) {
+			if (p1.getKnowledge().getEgoNet().knows(p2)) {
 				net.makeSocialContact(p1,p2,iteration,"renew"+event.activity.getType());
 
 			} else {
@@ -208,7 +208,7 @@ public class SpatialInteractor {
 				int size = persons.size();
 				for(int i=0; i<size;i++){
 					Person p2=persons.get(i);
-					if(p1.getKnowledge().egoNet.knows(p2)){
+					if(p1.getKnowledge().getEgoNet().knows(p2)){
 					} else {
 						// If the two do not already know each other,
 

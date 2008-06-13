@@ -366,7 +366,7 @@ public class MentalMap {
 
 		if(myActivityId == null){
 			System.out.println("DEbug mentalmap2");
-			Gbl.errorMsg(this.knowledge.egoNet.getEgoLinks().get(0).person1.getId().toString());
+			Gbl.errorMsg(this.knowledge.getEgoNet().getEgoLinks().get(0).person1.getId().toString());
 		}
 		Activity myActivity = knowledge.getActivity(myActivityId);
 

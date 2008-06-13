@@ -62,7 +62,7 @@ public class MakeSocialNetworkFromFile {
 						Person person1 = plans.getPerson(egoId);
 						Person person2 = plans.getPerson(alterId);
 						snet.makeSocialContact(person1, person2, 0, purpose);
-						SocialNetEdge thisEdge = person1.getKnowledge().egoNet.getEgoLink(person2);
+						SocialNetEdge thisEdge = person1.getKnowledge().getEgoNet().getEgoLink(person2);
 						thisEdge.setNumberOfTimesMet(timesmet);
 					}
 				}

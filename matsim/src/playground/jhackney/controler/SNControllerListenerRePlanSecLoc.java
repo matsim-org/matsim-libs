@@ -299,7 +299,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 //				acts per plan times the number of plans in memory
 				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
 //				this.log.info("NOTE that manageMemory is turned off");
-				p.getKnowledge().map.manageMemory(max_memory, p.getPlans());
+				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
 			}
 			this.log.info(" ... done");
 
@@ -357,12 +357,12 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);
 
-				k.map.prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
+				k.getMentalMap().prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
 //				Note that this crashes if I am using an output plans file with a lot of activities.
 //				The activities and acts are not associated correctly.
 //				does this mean that the act.RefId() needs to be unique per act AND plan?
-				k.map.initializeActActivityMapRandom(plan);
-				k.map.initializeActActivityMapFromFile(plan,aar);
+				k.getMentalMap().initializeActActivityMapRandom(plan);
+				k.getMentalMap().initializeActActivityMapFromFile(plan,aar);
 			}
 		}
 		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){

@@ -252,7 +252,7 @@ public class EgoNetPlansMakeKML {
 		loadData(myPerson, 0, 1);
 
 		// Proceed to the EgoNet of myPerson
-		ArrayList<Person> persons = myPerson.getKnowledge().egoNet.getAlters();
+		ArrayList<Person> persons = myPerson.getKnowledge().getEgoNet().getAlters();
 		Iterator<Person> altersIt= persons.iterator();
 
 		while(altersIt.hasNext()){
@@ -333,7 +333,7 @@ public class EgoNetPlansMakeKML {
 			Placemark aFacility = new Placemark(
 					myAct.getType()+" facility",
 					myAct.getType()+" facility",
-					myPerson.getKnowledge().map.getActivity(myAct).getFacility().toString(),
+					myPerson.getKnowledge().getMentalMap().getActivity(myAct).getFacility().toString(),
 					"address",
 					Feature.DEFAULT_LOOK_AT,
 					myStyle.getStyleUrl(),

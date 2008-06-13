@@ -40,9 +40,9 @@ public class InitializeKnowledge {
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);
 
-				k.map.prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
-				k.map.initializeActActivityMapRandom(plan);
-				k.map.initializeActActivityMapFromFile(plan,aar);
+				k.getMentalMap().prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
+				k.getMentalMap().initializeActActivityMapRandom(plan);
+				k.getMentalMap().initializeActActivityMapFromFile(plan,aar);
 			}
 		}
 		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){

@@ -53,14 +53,14 @@ public class SpatialSocialOpportunityTracker implements SocialActGeneratorI {
 		for( Person person : plans.getPersons().values() ){
 //			System.out.println("SSOgen Person "+person.getId()+" ");
 			
-			person.getKnowledge().map.clearDates();
+			person.getKnowledge().getMentalMap().clearDates();
 
 			Plan plan = person.getSelectedPlan();
 			ActIterator it = plan.getIteratorAct();
 			while( it.hasNext() ){
 
 				Act act = (Act) it.next();
-				Activity myActivity = person.getKnowledge().map.getActivity(act);
+				Activity myActivity = person.getKnowledge().getMentalMap().getActivity(act);
 
 				if( myActivity == null ){
 					System.out.println(" Act "+act.getLinkId()+" "+act.getType()+" no activity");
@@ -72,7 +72,7 @@ public class SpatialSocialOpportunityTracker implements SocialActGeneratorI {
 				}
 				event.addAttendee(person);
 			}
-			person.getKnowledge().map.addDate(event);
+			person.getKnowledge().getMentalMap().addDate(event);
 		}
 		return events.values();
 	}
@@ -84,14 +84,14 @@ public class SpatialSocialOpportunityTracker implements SocialActGeneratorI {
 		for( Person person : plans.getPersons().values() ){
 //			System.out.println("SSOgen Person "+person.getId()+" ");
 			
-			person.getKnowledge().map.clearDates();
+			person.getKnowledge().getMentalMap().clearDates();
 
 			Plan plan = person.getSelectedPlan();
 			ActIterator it = plan.getIteratorAct();
 			while( it.hasNext() ){
 
 				Act act = (Act) it.next();
-				Activity myActivity = person.getKnowledge().map.getActivity(act);
+				Activity myActivity = person.getKnowledge().getMentalMap().getActivity(act);
 
 				if( myActivity == null ){
 					System.out.println(" Act "+act.getLinkId()+" "+act.getType()+" no activity");
@@ -103,7 +103,7 @@ public class SpatialSocialOpportunityTracker implements SocialActGeneratorI {
 				}
 				event.addAttendee(person);
 			}
-			person.getKnowledge().map.addDate(event);
+			person.getKnowledge().getMentalMap().addDate(event);
 		}
 		return events;
 	}

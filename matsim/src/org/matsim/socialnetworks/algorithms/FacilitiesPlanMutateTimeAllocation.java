@@ -108,7 +108,7 @@ public class FacilitiesPlanMutateTimeAllocation implements PlanAlgorithmI {
 					act.setEndTime(Time.UNDEFINED_TIME);
 
 				}
-				MentalMap map = plan.getPerson().getKnowledge().map;
+				MentalMap map = plan.getPerson().getKnowledge().getMentalMap();
 				Activity myactivity = map.getActivity(oldAct);
 //				this.log.info(act.getType()+" "+act.getStartTime()+" "+act.getEndTime()+" "+act.getLinkId()+" "+myactivity.getFacility().getLink().getId());
 				map.learnActsActivities(act, myactivity);

@@ -60,15 +60,15 @@ public class PersonExchangeKnowledge {
 		List<Activity> act2List = k2.getActivities(facType);
 		if(act2List.size()>=1){
 			Activity activity2=act2List.get(Gbl.random.nextInt( act2List.size()));
-			k1.map.addActivity(activity2);
+			k1.getMentalMap().addActivity(activity2);
 		}
 
 //		If person2 has an edge pointed toward person1, let p1 share information with p2
-		if(p2.getKnowledge().egoNet.knows(p1)){
+		if(p2.getKnowledge().getEgoNet().knows(p1)){
 			List<Activity> act1List = k1.getActivities(facType);
 			if(act1List.size()>=1){
 				Activity activity1=act1List.get(Gbl.random.nextInt( act1List.size()));
-				k2.map.addActivity(activity1);
+				k2.getMentalMap().addActivity(activity1);
 			}
 		}
 	}
@@ -84,8 +84,8 @@ public class PersonExchangeKnowledge {
 		Person myEgo = myLink.getPersonFrom();
 		Knowledge k0 = myEgo.getKnowledge();
 
-		Person friend1 = k0.egoNet.getRandomPerson(myEgo);
-		Person friend2 = k0.egoNet.getRandomPerson(myEgo);
+		Person friend1 = k0.getEgoNet().getRandomPerson(myEgo);
+		Person friend2 = k0.getEgoNet().getRandomPerson(myEgo);
 		if ((friend1 != null) && (friend2 != null)) {
 
 			net.makeSocialContact(friend1, friend2, iteration, "fof");

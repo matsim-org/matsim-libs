@@ -260,7 +260,7 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 //				Remember a number of activities equal to at least the number of
 //				acts per plan times the number of plans in memory
 				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
-				p.getKnowledge().map.manageMemory(max_memory, p.getPlans());
+				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
 			}
 			this.log.info(" ... done");
 
@@ -303,9 +303,9 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 			}
 
 			Plan plan = person.getSelectedPlan();
-			k.map.prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
-			k.map.initializeActActivityMapRandom(plan);
-			k.map.initializeActActivityMapFromFile(plan,aar);
+			k.getMentalMap().prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
+			k.getMentalMap().initializeActActivityMapRandom(plan);
+			k.getMentalMap().initializeActActivityMapFromFile(plan,aar);
 //			}
 			
 		}

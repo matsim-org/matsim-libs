@@ -19,7 +19,7 @@ public PersonGetEgoNetGetPlans(){
 		Plans socialPlans=new Plans();
 		
 		socialPlans.addPerson(ego);
-		ArrayList<Person> alters = ego.getKnowledge().egoNet.getAlters();
+		ArrayList<Person> alters = ego.getKnowledge().getEgoNet().getAlters();
 		Iterator<Person> a_it=alters.iterator();
 		while(a_it.hasNext()){
 			socialPlans.addPerson((Person) a_it.next());
