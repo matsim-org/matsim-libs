@@ -23,9 +23,7 @@ package playground.gregor.multipath;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.PriorityQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -39,9 +37,10 @@ import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.vis.routervis.RouterNetStateWriter;
 import org.matsim.utils.vis.routervis.VisLeastCostPathCalculator;
 
-import playground.gregor.multipath.NodeDataII.ComparatorNodeDataII;
+import playground.gregor.multipath.NodeData.ComparatorNodeData;
 
-public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPathCalculator{
+
+abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPathCalculator{
 	
 	
 	private static final Logger log = Logger.getLogger(MultiPathRouter.class);
@@ -71,10 +70,10 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 * Comparator that defines how to order the nodes in the pending nodes queue
 	 * during routing.
 	 */
-	protected ComparatorNodeDataII comparator;
+	protected ComparatorNodeData comparator;
 
 
-	final private HashMap<Id, NodeDataII> nodeData;
+	final private HashMap<Id, NodeData> nodeData;
 
 	/**
 	 * Provides an unique id (loop number) for each routing request, so we don't
@@ -99,12 +98,11 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 
 	private BeelineDifferenceTracer tracer;
 	
-	private CLogitSelector selector = new CLogitSelector();
-	
+	protected LogitSelector selector;	
 	//TODO DEBUGGING STUFF
 	private  boolean debug = true;
 	protected RouterNetStateWriter netStateWriter = null;
-	final private int slowDown = 100000;
+//	final private int slowDown = 100000;
 
 	private int dumpCounter;
 
@@ -117,9 +115,11 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
 
-		this.nodeData = new HashMap<Id, NodeDataII>((int)(network.getNodes().size() * 1.1), 0.95f);
-		this.comparator = new ComparatorNodeDataII(this.nodeData);
+		this.nodeData = new HashMap<Id, NodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
+		this.comparator = new ComparatorNodeData(this.nodeData);
 
+		initSelector();
+		
 		//TODO DEBUGGING STUFF
 		if (this.debug){
 			this.netStateWriter = writer;
@@ -128,9 +128,11 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	
 }
 
+	
+	abstract void initSelector();
 
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
-		PriorityQueue<NodeDataII> pendingNodes = new PriorityQueue<NodeDataII>(500, this.comparator);
+		PriorityQueue<NodeData> pendingNodes = new PriorityQueue<NodeData>(500, this.comparator);
 
 		double minCost = Double.MAX_VALUE;
 		
@@ -142,10 +144,10 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 
 		// The forward path - spans the Dijkstra like shortest path tree
 
-		ArrayList<NodeDataII> toNodes = new ArrayList<NodeDataII>();
+		ArrayList<NodeData> toNodes = new ArrayList<NodeData>();
 
 		
-			int count = 0;
+//			int count = 0;
 			boolean foundRoute = false;
 			boolean stillSearching = true;
 
@@ -156,7 +158,7 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 
 			while (stillSearching) {
 
-				NodeDataII outNodeD = pendingNodes.poll();
+				NodeData outNodeD = pendingNodes.poll();
 
 
 				if (outNodeD == null || (outNodeD.getCost()/minCost >= OUTPRICED_CRITERION)) {
@@ -168,12 +170,12 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 
 
 
-				if (this.debug) {
-					if (count++ >= this.slowDown){
-						count = 0;
-						doSnapshot();
-					}					
-				}
+//				if (this.debug) {
+//					if (count++ >= this.slowDown){
+//						count = 0;
+//						doSnapshot();
+//					}					
+//				}
 
 
 				if (outNodeD.getId() == toNode.getId()){
@@ -209,7 +211,7 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 		return null;
 		
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
-		NodeDataII tmpNode = getData(toNode);
+		NodeData tmpNode = getData(toNode);
 		double cost  = 0;
 		while (tmpNode.getId() != fromNode.getId()) {
 			routeNodes.add(0, tmpNode.getMatsimNode());
@@ -251,7 +253,7 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	void relaxNode(final NodeDataII outNodeD,final PriorityQueue<NodeDataII> pendingNodes) {
+	void relaxNode(final NodeData outNodeD,final PriorityQueue<NodeData> pendingNodes) {
 
 
 		double currTime = outNodeD.getTime();
@@ -281,7 +283,7 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	private void relaxShadowNode(NodeDataII outNodeD,PriorityQueue<NodeDataII> pendingNodes) {
+	private void relaxShadowNode(NodeData outNodeD,PriorityQueue<NodeData> pendingNodes) {
 		double currTime = outNodeD.getTime();
 		double currCost = outNodeD.getCost();
 		
@@ -320,12 +322,12 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 * @param fromNodeData
 	 *            The NodeData from which we came to n.
 	 */
-	private void addToPendingNodes(final Link l, final Node n, final PriorityQueue<NodeDataII> pendingNodes, final double currTime, final double currCost, final NodeDataII fromNodeData) {
+	private void addToPendingNodes(final Link l, final Node n, final PriorityQueue<NodeData> pendingNodes, final double currTime, final double currCost, final NodeData fromNodeData) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
 
-		NodeDataII toNodeData = getData(n);
+		NodeData toNodeData = getData(n);
 		double trace = this.tracer.getTrace(fromNodeData.getTrace(),fromNodeData.getMatsimNode().getCoord(), l.getLength(), n.getCoord());
 
 		if (!toNodeData.isVisited(getIterationID())){
@@ -365,11 +367,11 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 * @param fromNodeData
 	 *            The NodeData from which we came to n.
 	 */
-	private void addShadowToPendingNodes(Link l, Node n,	PriorityQueue<NodeDataII> pendingNodes, double currTime, double currCost, NodeDataII fromNodeData) {
+	private void addShadowToPendingNodes(Link l, Node n,	PriorityQueue<NodeData> pendingNodes, double currTime, double currCost, NodeData fromNodeData) {
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
 
-		NodeDataII toNodeData = getData(n);
+		NodeData toNodeData = getData(n);
 		double shadowCost = travelCost + currCost;
 		
 		if (shadowCost/toNodeData.getCost() > OUTPRICED_CRITERION) {
@@ -383,8 +385,8 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 		
 		double trace = this.tracer.getTrace(fromNodeData.getTrace(),fromNodeData.getMatsimNode().getCoord(), l.getLength(), n.getCoord());
 		
-		ArrayList<NodeDataII> toDelete = new ArrayList<NodeDataII>();
-		for (NodeDataII temp : toNodeData.getShadowNodes())  {
+		ArrayList<NodeData> toDelete = new ArrayList<NodeData>();
+		for (NodeData temp : toNodeData.getShadowNodes())  {
 			if (!fromNodeData.containsShadowNode(temp.getShadowID())) {
 						if (!this.tracer.tracesDiffer(trace, temp.getTrace())) {
 						if (temp.getCost() < shadowCost) {
@@ -396,11 +398,11 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 					}
 				}
 		}
-		for (NodeDataII del : toDelete) {
+		for (NodeData del : toDelete) {
 			toNodeData.rmShadow(del);
 		}
 		
-		NodeDataII shadow = new NodeDataII(n,true);
+		NodeData shadow = new NodeData(n,true);
 		shadow.visitShadow(fromNodeData, currCost + travelCost, currTime + travelTime, this.iterationID, trace,fromNodeData.getShadowID());
 		toNodeData.addShadow(shadow);
 		pendingNodes.add(shadow);
@@ -423,7 +425,7 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 * @param fromNodeData
 	 *            The NodeData from which we came visiting toNodeData.
 	 */
-	private void visitNode(final NodeDataII toNodeData, final PriorityQueue<NodeDataII> pendingNodes, final double time, final double cost, final NodeDataII fromNodeData, final double trace) {
+	private void visitNode(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace) {
 		toNodeData.visit(fromNodeData, cost, time, getIterationID(), trace);
 		pendingNodes.add(toNodeData);
 		this.visitNodeCount++;
@@ -444,10 +446,10 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 * @param fromNodeData
 	 *            The NodeData from which we came visiting toNodeData.
 	 */
-	private void revisitNode(final NodeDataII toNodeData, final PriorityQueue<NodeDataII> pendingNodes, final double time, final double cost, final NodeDataII fromNodeData, final double trace) {
+	private void revisitNode(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace) {
 
 		pendingNodes.add(toNodeData.getPrev());
-		for (NodeDataII n : toNodeData.getShadowNodes()) {
+		for (NodeData n : toNodeData.getShadowNodes()) {
 			pendingNodes.add(n);
 		}
 
@@ -481,10 +483,10 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 * @param fromNodeData
 	 *            The NodeData from which we came visiting toNodeData.
 	 */
-	private void touchNode(final NodeDataII toNodeData, final PriorityQueue<NodeDataII> pendingNodes, final double time, final double cost, final NodeDataII fromNodeData, final double trace) {
+	private void touchNode(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace) {
 
-		ArrayList<NodeDataII> toDelete = new ArrayList<NodeDataII>();
-		for (NodeDataII temp : toNodeData.getShadowNodes()) {
+		ArrayList<NodeData> toDelete = new ArrayList<NodeData>();
+		for (NodeData temp : toNodeData.getShadowNodes()) {
 			if (!this.tracer.tracesDiffer(trace, temp.getTrace())) {
 				if (temp.getCost() < cost) {
 					log.info("there is already a similar shadow node with lower costs - giving up");
@@ -494,10 +496,10 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 				}
 			}
 		}
-		for (NodeDataII del : toDelete) {
+		for (NodeData del : toDelete) {
 			toNodeData.rmShadow(del);
 		}
-		NodeDataII shadow = new NodeDataII(toNodeData.getMatsimNode(),true);
+		NodeData shadow = new NodeData(toNodeData.getMatsimNode(),true);
 		shadow.visitShadow(fromNodeData, cost, time, this.iterationID, trace, this.shadowID++);
 		toNodeData.addShadow(shadow);
 		pendingNodes.add(shadow);
@@ -544,8 +546,8 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 *            The pending nodes so far.
 	 */
 	void initFromNode(final Node fromNode, final Node toNode, final double startTime,
-			final PriorityQueue<NodeDataII> pendingNodes) {
-		NodeDataII data = getData(fromNode);
+			final PriorityQueue<NodeData> pendingNodes) {
+		NodeData data = getData(fromNode);
 		data.reset();
 		data.visitInitNode(startTime,this.iterationID);
 		pendingNodes.add(data);
@@ -572,7 +574,7 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 */
 	private void resetNetworkVisited() {
 		for (Node node : this.network.getNodes().values()) {
-			NodeDataII data = getData(node);
+			NodeData data = getData(node);
 			data.reset();
 		}
 	}
@@ -585,26 +587,31 @@ public class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPa
 	 *            The Node for which to return the data.
 	 * @return The data for the given Node
 	 */
-	protected NodeDataII getData(Node n) {
-		NodeDataII r = this.nodeData.get(n.getId());
+	protected NodeData getData(Node n) {
+		NodeData r = this.nodeData.get(n.getId());
 		if (null == r) {
-			r = new NodeDataII(n, false);
+			r = new NodeData(n, false);
 			this.nodeData.put(n.getId(), r);
 		}
 		return r;
 	}
 	
 	
+	/**
+	 * 
+	 * 
+	 */
+	
 	
 	//RouterVis - stuff
 	
-	private void colorizePaths(ArrayList<NodeDataII> toNodes, Node fromNode) {
+	private void colorizePaths(ArrayList<NodeData> toNodes, Node fromNode) {
 		
 		log.info("found " + toNodes.size() + " paths!");
-		doSnapshot();
 		this.netStateWriter.reset();
+		doSnapshot();
 		double color = 0.1;
-			for (NodeDataII node : toNodes) {
+			for (NodeData node : toNodes) {
 				double prob = node.getProb();
 				while (node.getId() != fromNode.getId()) {
 					for (Link l : node.getMatsimNode().getInLinks().values()) {

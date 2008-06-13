@@ -21,43 +21,32 @@
 package playground.gregor.multipath;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Node;
 
-public class NodeDataII {
-	private static final Logger log = Logger.getLogger(NodeDataII.class);
+public class NodeData {
 	private final Node node;
 	private double cost;
-//	private int numPaths;
 	private double time;
-//	private Set<Node> fromMatSimNodes;
 	private Node fromMatSimNode;
 	private int iterationID;
 	private double trace;
-//	private List<NodeDataII> prev;
-	private NodeDataII prev = null;
+	private NodeData prev = null;
 	private boolean isHead;
 	private final boolean isShadow;
-	private HashMap<Integer,NodeDataII> shadowNodes;
+	private HashMap<Integer,NodeData> shadowNodes;
 	private int shadowID = Integer.MIN_VALUE;
 	private double prob;
 	
-	public NodeDataII(final Node n,final  boolean isShadow) {
+	public NodeData(final Node n,final  boolean isShadow) {
 		this.node = n;
-//		this.numPaths = 0;
 		this.cost = Double.POSITIVE_INFINITY;
-//		this.fromMatSimNodes = new HashSet<Node>(3);
-		this.shadowNodes = new HashMap<Integer,NodeDataII>();
+		this.shadowNodes = new HashMap<Integer,NodeData>();
 		this.isShadow = isShadow;
 
 	}
@@ -85,15 +74,12 @@ public class NodeDataII {
 		return this.time;
 	}
 	
-//	public List<NodeDataII> getPrev() {
-//		return this.prev;
-//	}
 	
-	public Collection<NodeDataII> getShadowNodes() {
+	public Collection<NodeData> getShadowNodes() {
 		return this.shadowNodes.values();
 	}
 	
-	public NodeDataII getPrev() {
+	public NodeData getPrev() {
 		return this.prev;
 	}
 	
@@ -121,9 +107,6 @@ public class NodeDataII {
 		return this.prob;
 	}
 	
-//	public int getNumPaths() {
-//		return this.numPaths;
-//	}
 
 	//////////////////////////////////////////////////////////////////////
 	// setter
@@ -132,7 +115,7 @@ public class NodeDataII {
 		this.isHead = isHead;
 	}
 
-	public void addShadow(NodeDataII shadow) {
+	public void addShadow(NodeData shadow) {
 		this.shadowNodes.put(shadow.getShadowID(), shadow);
 		
 	}
@@ -145,21 +128,13 @@ public class NodeDataII {
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public NodeDataII drawNode() {
+	public NodeData drawNode() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-//	public void resetVisited() {
-//		this.numPaths = 0;
-//		this.cost = Double.POSITIVE_INFINITY;
-//	}
-	
-
-	
 	public void visitInitNode(double startTime, int iterationID) {
 		this.cost = 0;
-//		this.numPaths = 1;
 		this.time = startTime;
 		this.iterationID = iterationID;
 		this.trace = 0;
@@ -174,20 +149,17 @@ public class NodeDataII {
 		return (iterationID == this.iterationID);
 	}
 	
-	public void visit(NodeDataII fromNodeData, double cost, double time, int iterationID, double trace) {
+	public void visit(NodeData fromNodeData, double cost, double time, int iterationID, double trace) {
 		this.time = time;
 		this.cost = cost;
 		this.iterationID = iterationID;
 		this.trace = trace;
-//		this.prev.add(fromNodeData);
 		this.prev = fromNodeData;
 		this.isHead = true;
-//		this.fromMatSimNodes.add(fromNodeData.getMatsimNode());
 		this.fromMatSimNode = fromNodeData.getMatsimNode();
-//		this.numPaths = 1;
 	}
 	
-	public void visitShadow(NodeDataII fromNodeData, double cost,	double time, int iterationID, double trace, int shadowID) {
+	public void visitShadow(NodeData fromNodeData, double cost,	double time, int iterationID, double trace, int shadowID) {
 		this.shadowID = shadowID;
 		visit(fromNodeData, cost, time, iterationID, trace);
 		
@@ -199,41 +171,32 @@ public class NodeDataII {
 		this.fromMatSimNode = null;
 		this.cost = Double.POSITIVE_INFINITY;
 	}
-	
-//	public void touch(NodeDataII fromNodeData) {
-////		this.prev.add(fromNodeData);
-////		this.fromMatSimNodes.add(fromNodeData.getMatsimNode());
-//	}
-	
-//	public void enlargeNumPaths(int paths) {
-//		this.numPaths += paths;
-//	}
 
-	public void rmShadow(NodeDataII del) {
+	public void rmShadow(NodeData del) {
 		this.shadowNodes.remove(del.getShadowID());
 	}
 	
 	
-	public static class ComparatorNodeDataII implements Comparator<NodeDataII>, Serializable {
+	public static class ComparatorNodeData implements Comparator<NodeData>, Serializable {
 
 		private static final long serialVersionUID = 1L;
 
 		private boolean checkIDs = false;
 
-		protected Map<Id, ? extends NodeDataII> nodeData;
+		protected Map<Id, ? extends NodeData> nodeData;
 
-		public ComparatorNodeDataII(Map<Id, ? extends NodeDataII> nodeData) {
+		public ComparatorNodeData(Map<Id, ? extends NodeData> nodeData) {
 			this.nodeData = nodeData;
 		}
 
-		public int compare(NodeDataII n1, NodeDataII n2) {
+		public int compare(NodeData n1, NodeData n2) {
 			double c1 = getKey(n1); // if a node
 			double c2 = getKey(n2);
 
 			return compare(n1, c1, n2, c2);
 		}
 
-		private int compare(NodeDataII n1, double c1, NodeDataII n2, double c2) {
+		private int compare(NodeData n1, double c1, NodeData n2, double c2) {
 			if (c1 < c2) {
 				return -1;
 			} else if (c1 == c2) {
@@ -250,7 +213,7 @@ public class NodeDataII {
 			this.checkIDs = flag;
 		}
 
-		public double getKey(NodeDataII node) {
+		public double getKey(NodeData node) {
 			return node.getCost();
 		}
 	}

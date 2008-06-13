@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PSLSelector.java
+ * PSLogitRouter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,44 +20,22 @@
 
 package playground.gregor.multipath;
 
-import java.util.ArrayList;
+import org.matsim.network.NetworkLayer;
+import org.matsim.router.util.TravelCostI;
+import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.vis.routervis.RouterNetStateWriter;
 
-public class CLogitSelector extends LogitSelector {
+public class PSLogitRouter extends MultiPathRouter {
 
-	private final  static double BETA = 4;
-	private final static double THETA = 2;
-	
+	public PSLogitRouter(NetworkLayer network, TravelCostI costFunction,
+			TravelTimeI timeFunction, RouterNetStateWriter writer) {
+		super(network, costFunction, timeFunction, writer);
+	}
 
-	protected void calcProbabilities(ArrayList<NodeData> toNodes) {
-		ArrayList<Double> g_all = new ArrayList<Double>();
-		double all = 0;
-		for (NodeData toNode : toNodes) {
-			NodeData curr = toNode;
-			double CF_k = 0;
-			do {
-				String key = curr.getPrev().getId().toString() + " " + curr.getId().toString();
-				LogitLink l = this.pathTree.get(key);
-				CF_k += l.numPaths * l.cost / toNode.getCost();
-				if (Double.isNaN(CF_k)) {
-					int i=0; i++;
-				}
-				curr = curr.getPrev();
-			} while (curr.getPrev() != null);
-			CF_k = -BETA * Math.log(CF_k);
-			double w = Math.exp(-toNode.getCost()/THETA + CF_k); 
-		
-			g_all.add(w);
-			all += w;
-			
-		}
-		
-		for (int i = 0; i < g_all.size(); i++) {
-			toNodes.get(i).setProb(g_all.get(i)/all);
-		}
+	@Override
+	void initSelector() {
+		this.selector = new PSLogitSelector();
 		
 	}
 
-
-
 }
-

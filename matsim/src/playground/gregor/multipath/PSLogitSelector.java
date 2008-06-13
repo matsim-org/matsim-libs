@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PSLSelector.java
+ * PSLogitSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,42 +22,35 @@ package playground.gregor.multipath;
 
 import java.util.ArrayList;
 
-public class CLogitSelector extends LogitSelector {
-
-	private final  static double BETA = 4;
-	private final static double THETA = 2;
+public class PSLogitSelector extends LogitSelector {
 	
-
+	
+	protected final  static double BETA = 4;
+	protected final static double THETA = 2;
+	
+	
 	protected void calcProbabilities(ArrayList<NodeData> toNodes) {
-		ArrayList<Double> g_all = new ArrayList<Double>();
-		double all = 0;
+		ArrayList<Double> weights = new ArrayList<Double>(toNodes.size());
+		double w_all = 0;
 		for (NodeData toNode : toNodes) {
 			NodeData curr = toNode;
-			double CF_k = 0;
+			double w = 0;
 			do {
-				String key = curr.getPrev().getId().toString() + " " + curr.getId().toString();
+				NodeData prev = curr.getPrev(); 
+				String key = prev.getId().toString() + " " + curr.getId().toString();
 				LogitLink l = this.pathTree.get(key);
-				CF_k += l.numPaths * l.cost / toNode.getCost();
-				if (Double.isNaN(CF_k)) {
-					int i=0; i++;
-				}
-				curr = curr.getPrev();
+				w += l.cost/(toNode.getCost()* l.numPaths);
+				
+				curr = prev;
 			} while (curr.getPrev() != null);
-			CF_k = -BETA * Math.log(CF_k);
-			double w = Math.exp(-toNode.getCost()/THETA + CF_k); 
-		
-			g_all.add(w);
-			all += w;
-			
+				w = Math.exp(-THETA * toNode.getCost()) + Math.pow(w, BETA); ///toNodes.get(0).getCost();
+				weights.add(w);
+				w_all += w; 
 		}
 		
-		for (int i = 0; i < g_all.size(); i++) {
-			toNodes.get(i).setProb(g_all.get(i)/all);
-		}
+		for (int i = 0; i < weights.size(); i++) {
+			toNodes.get(i).setProb(weights.get(i)/w_all);
+		}		
 		
 	}
-
-
-
 }
-
