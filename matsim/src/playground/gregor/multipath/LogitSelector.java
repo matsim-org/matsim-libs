@@ -93,26 +93,21 @@ public abstract class LogitSelector {
 	static class LogitLink {
 		private HashSet <LogitLink> pred;
 		private HashSet <LogitLink> succ;
-		private Node from;
-		private Node to;
+//		private Node from;
+//		private Node to;
 		int numPaths;
 		private String id;
 		double cost = Double.MAX_VALUE;
-		private double weight;
+//		private double weight;
 		
 		
 		public LogitLink(Node from, Node to, String id){
 			this.pred = new HashSet<LogitLink>();
 			this.succ = new HashSet<LogitLink>();
-			this.from = from;
-			this.to = to;
+//			this.from = from;
+//			this.to = to;
 			this.numPaths = 0;
 			this.id = id;
-		}
-		
-		public void setWeight(double w) {
-			this.weight = w;
-			
 		}
 
 		public void addPred(LogitLink  pred) {
