@@ -201,7 +201,7 @@ public class RouterVis {
 		final File outputDir = new File(Gbl.getConfig().controler().getOutputDirectory());
 		
 		if (!outputDir.exists()){
-			outputDir.mkdir();
+			outputDir.mkdirs();
 		} else if (outputDir.list().length > 0) {
 			log.error("The output directory " + outputDir + " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
 			System.exit(-1);
