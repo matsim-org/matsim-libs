@@ -6,6 +6,7 @@ xml:lang="en">
 <!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
 <!-- This xml schema contains xml definitions used in the MATSim framework  -->
 
+
 <xs:simpleType name="matsimIdType">
 	<xs:annotation>
 		<xs:documentation>A Id in the MATSim framework is a string with no leading and trailing white
@@ -37,30 +38,8 @@ xml:lang="en">
   <xs:attribute name="refId" type="matsimIdType" use="required" />
 </xs:complexType>
 
-<xs:complexType name="locationType">
-  <xs:annotation>
-    <xs:documentation>This type can be used for all georeferenced data within the 
-    framework. As we try to avoid reimplementing GIS functionality this is a very 
-    limited basic type without spatial reference system information. However it
-    seems to be useful to have a common type for such information, which can
-    be extended if needed.</xs:documentation>
-  </xs:annotation>
-  <xs:choice>
-    <xs:sequence>
-      <xs:element name="xCoord" type="xs:decimal" minOccurs="1" maxOccurs="1"/>
-      <xs:element name="yCoord" type="xs:decimal" minOccurs="1" maxOccurs="1"/>
-    </xs:sequence>
-    <xs:element name="facility" >
-      <xs:complexType>
-        <xs:complexContent>
-          <xs:extension base="idRefType" />
-        </xs:complexContent>
-      </xs:complexType>
-    </xs:element>
-  </xs:choice>
-</xs:complexType>
 
-<xs:complexType name="matsimParamType">
+<xs:complexType name="matsimParameterType">
   <xs:annotation>
     <xs:documentation> This type is unfortunately quite central for the MATSim framework. One can
     store any type of parameter in the well-known, however redoubtable name/value format.
@@ -70,5 +49,90 @@ xml:lang="en">
   <xs:attribute name="name" type="xs:string" use="required"/>
   <xs:attribute name="value" type="xs:string" use="required" />
 </xs:complexType>
+
+
+<xs:complexType name="coordinateType">
+  <xs:annotation>
+    <xs:documentation>This type can be used for all georeferenced data within the 
+    framework. As we try to avoid reimplementing GIS functionality this is a very 
+    limited basic type without spatial reference system information. However it
+    seems to be useful to have a common type for such information, which can
+    be extended if needed.</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+    <xs:element name="xCoord" type="xs:decimal" minOccurs="1" maxOccurs="1"/>
+    <xs:element name="yCoord" type="xs:decimal" minOccurs="1" maxOccurs="1"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:element name="facilityId">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="idRefType" />
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="linkId">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="idRefType" />
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="coordinate" type="coordinateType" />
+</xs:element>
+
+<xs:complexType name="actLocationType">
+  <!-- at least a facility or a link or both -->
+  <xs:choice>
+    <!-- at least one of them -->
+    <xs:element>
+      <xs:complexType>
+        <xs:choice>
+          <xs:element ref="facilityId" />
+          <xs:element ref="linkId" />
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+    <!-- or both must be present -->
+    <xs:element>
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element ref="facilityId" minOccurs="1" maxOccurs="1" />
+          <xs:element ref="linkId" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+      </xs:complexType>    
+    </xs:element>
+  </xs:choice>
+ </xs:complexType>
+
+
+<xs:element name="location">
+  <xs:complexType>
+    <!-- at least one location or coordinate or both -->
+    <xs:choice>
+      <!-- at least one -->
+      <xs:element>
+        <xs:complexType>
+          <xs:choice>
+            <xs:element ref="coordinate"/>
+            <xs:element name="actLocation" type="actLocationType"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <!-- or both -->
+      <xs:element>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="coordinate" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="actLocation" type="locationType" minOccurs="1" maxOccurs="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+</xs:element>
 
 </xs:schema>

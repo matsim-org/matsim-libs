@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- marcel: plan.type raus(done), legType bleibt(done), route als links mit anonymem element für ggf. erweiterung um nodes -->
-<!-- michi: actType location rausziehen -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 targetNamespace="http://www.matsim.org/files/dtd"
 xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
 xmlns:xml="http://www.w3.org/XML/1998/namespace" 
 xml:lang="en">
-<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
-<!-- This xml schema contains xml definitions for population information within the MATSim framework  -->
+
+<!-- @ michi: households in population oder außerhalb -->
 
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/populationEnumTypes.xsd"/>
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/households.xsd" />
 
-<!-- xxx remove namespace if lang is not required attribute 
-<xs:import namespace="http://www.w3.org/XML/1998/namespace"
-            schemaLocation="http://www.w3.org/2001/xml.xsd"/>-->
 <xs:annotation>
   <xs:documentation>
+    This xml schema contains xml definitions for population information within the MATSim framework.
     This population schema is considered as stable file-format. Changes in this schema
     imply major changes in the code. All enumeration types needed by the data format are
     declared in a separate file as extensions in the enumerations are normally
@@ -24,7 +21,7 @@ xml:lang="en">
   </xs:documentation>
   <xs:appinfo xmlns:dc="http://purl.org/dc/elements/1.1/">
     <dc:creator>
-      Dominik Grether
+      Dominik Grether, VSP, Berlin Institute of Technology
     </dc:creator>
     <dc:title>
       Population Schema for MATSim
@@ -45,6 +42,7 @@ xml:lang="en">
   <xs:complexType>
     <xs:sequence>
       <xs:element name="person" type="personType" minOccurs="1" maxOccurs="unbounded" />
+      <xs:element ref=household" minOccurs="0" maxOccurs="unbounded" />
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="optional" />
   </xs:complexType>
@@ -59,10 +57,10 @@ xml:lang="en">
       <xs:element name="plan" type="planType" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="sex" type="sexType" use="optional" />
-    <xs:attribute name="age" type="xs:integer" use="optional" />
+    <xs:attribute name="age" type="xs:nonNegativeInteger" use="optional" />
     <xs:attribute name="license" type="xs:boolean" use="optional" />
     <xs:attribute name="carAvailable" type="carAvailType" use="optional" />
-    <xs:attribute name="employed" type="xs:boolean" use="optional" />
+    <xs:attribute name="isEmployed" type="xs:boolean" use="optional" />
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>
@@ -79,18 +77,12 @@ xml:lang="en">
     <xs:element minOccurs="0" maxOccurs="unbounded" >
       <xs:complexType>
         <xs:sequence>
-          <xs:element minOccurs="0" maxOccurs="unbounded" >
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="act" type="actType" minOccurs="1" maxOccurs="1" />
-                <xs:element name="leg" type="legtype" minOccurs="1" maxOccurs="1"/>      
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
           <xs:element name="act" type="actType" minOccurs="1" maxOccurs="1" />
+          <xs:element name="leg" type="legType" minOccurs="1" maxOccurs="1"/>      
         </xs:sequence>
       </xs:complexType>
     </xs:element>
+    <xs:element name="act" type="actType" minOccurs="1" maxOccurs="1" />
   </xs:sequence>
   <xs:attribute name="score" type="xs:decimal" use="optional" />
   <xs:attribute name="selected" type="xs:boolean" default="false" />
@@ -107,45 +99,38 @@ xml:lang="en">
 
 <xs:complexType name="activityType">
   <xs:sequence>
-    <xs:element name="location" type="activityType.locationType" minOccurs="1" maxOccurs="unbounded" />
+    <xs:element name="activityLocationInformation" type="activityLocationInformationType" minOccurs="1" maxOccurs="unbounded" />
   </xs:sequence>
-  <xs:attribute name="type" type="xs:string" use="required" />
 </xs:complexType>
 
 <xs:complexType name="actType">
+	<xs:sequence>
+    <xs:element ref="location" minOccurs="0" maxOccurs="1"/>
+	</xs:sequence>
   <xs:attribute name="type" type="xs:string" use="required" />
-<!-- wird zu location aber optional  -->
-  <xs:attribute name="x" type="xs:decimal" use="optional" />
-  <xs:attribute name="y" type="xs:decimal" use="optional" />
-  <xs:attribute name="link" type="matsimIdType" use="optional" />
-  <xs:attribute name="facility" type="matsimIdType" use="optional" />
-<!-- location -->
   <xs:attribute name="startTime" type="xs:time" use="optional" />
   <xs:attribute name="endTime" type="xs:time" use="optional" />
   <!-- this could be coded with the xs:duration type would however be a change in the schema -->
   <xs:attribute name="duration" type="xs:time" use="optional" />
-  <!-- xxx do we need this??? -->
-  <xs:attribute name="refId" type="xs:integer" use="optional" />
 </xs:complexType>
 
 <xs:complexType name="legType">
   <xs:sequence>
     <xs:element name="route" type="routeType" minOccurs="0" maxOccurs="1" />
   </xs:sequence>
-  <!-- xxx as this type seems to be not complete and changes are more or less conceivable it should be removed to a own file -->
-  <xs:attribute name="mode" type="legType.modeType" use="required" />
+  <xs:attribute name="mode" type="legModeType" use="required" />
   <xs:attribute name="departureTime" type="xs:time" use="optional" /> 
   <xs:attribute name="travelTime" type="xs:time" use="optional" />
   <xs:attribute name="arrivalTime" type="xs:time" use="optional" />
 </xs:complexType>
 
 
-<xs:complexType name="activityType.locationType">
+<xs:complexType name="activityLocationInformationType">
   <xs:sequence>
+    <xs:element ref="location" minOccurs="1" maxOccurs="1" />
     <xs:element name="capacity" minOccurs="0" maxOccurs="1">
       <xs:complexType>
-        <!-- xxx the name of this attribute should have a more semantic meaning, i.e. value should be replaced by the name of the unit -->
-        <xs:attribute name="value" type="xs:integer" />
+        <xs:attribute name="persons" type="xs:nonNegativeInteger" />
       </xs:complexType>
     </xs:element>
     <xs:element name="openingTime" minOccurs="0" maxOccurs="unbounded" >
@@ -156,6 +141,11 @@ xml:lang="en">
       </xs:complexType>
     </xs:element>
   </xs:sequence>
+  <xs:attribute name="frequency" type="xs:nonNegativeInteger">
+    <xs:annotation>
+      <xs:documentation>defines how often the person was at that place (in one year)</xs:documentation>
+    </xs:annotation>
+  </xs:attribute>
 </xs:complexType>
 
 <xs:complexType name="routeType">
@@ -165,18 +155,5 @@ xml:lang="en">
   <xs:attribute name="distance" type="xs:decimal" use="optional" />
   <xs:attribute name="travelTime" type="xs:decimal" use="optional" />
 </xs:complexType>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </xs:schema>

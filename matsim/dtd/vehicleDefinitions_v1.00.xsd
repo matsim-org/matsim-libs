@@ -8,6 +8,14 @@ xml:lang="en">
 
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 
+<xs:element name="vehicleDefinitionId">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="idRefType" />
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
 <xs:element name="vehicleDefinitions">
   <xs:complexType>
     <xs:sequence>
