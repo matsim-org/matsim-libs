@@ -103,7 +103,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
-		String filename = "../vsp-cvs/runs/run306/output/ITERS/it.100/100.movie.mvi";
+		String filename = "../vsp-cvs/runs/run308/output/ITERS/it.100/100.movie.mvi";
 //		String filename = "./jam/jam.mvi";
 
 		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
@@ -111,8 +111,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		connect1.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect1.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		connect1.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		connect1.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangTimeDrawer.class);
-		connect1.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
+		connect1.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangRegionDrawer.class);
+		connect1.add(OGLAgentPointLayer.AgentPadangRegionDrawer.class, OGLAgentPointLayer.class);
 		connect1.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
 		
 		

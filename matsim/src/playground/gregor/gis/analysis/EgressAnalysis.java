@@ -138,6 +138,10 @@ public class EgressAnalysis {
 		double length = 1000;
 		
 		for (EgressNode e : this.egressNodes.values()) {
+			
+				if (e.num_current == 0) {
+					continue;
+				}
 				try {
 					length = Math.max(100,e.num_current / 50);
 					this.features.add(getPolyFeature(MGC.coord2Coordinate(e.node.getCoord()),e.num_current,e.num_shortest,length));
@@ -150,17 +154,22 @@ public class EgressAnalysis {
 		return null;
 	}
 
-
-
+	private void initFeatureCollection() throws FactoryRegistryException, SchemaException {
+		
+		this.features = new ArrayList<Feature>();
+		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
+		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
+		AttributeType shortest = AttributeTypeFactory.newAttributeType("shortest", Integer.class);
+		AttributeType current = AttributeTypeFactory.newAttributeType("current", Integer.class);
+		AttributeType deviance = AttributeTypeFactory.newAttributeType("diffsc", Integer.class);
+		this.ftDistrictShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id,   current, shortest, deviance}, "egressShape");
+	}
 
 	private Feature getPolyFeature(Coordinate coord2Coordinate,
 			int num_current, int num_shortest, double length) throws IllegalAttributeException {
 		Polygon p = this.gth.getSquare(coord2Coordinate, length);
 		int diff = num_current - num_shortest;
-		Feature ft = this.ftDistrictShape.create(new Object [] {new MultiPolygon(new Polygon []{p},this.geofac),0,num_current, num_shortest, diff, diff*diff, },"egress");
-		
-
-		
+		Feature ft = this.ftDistrictShape.create(new Object [] {new MultiPolygon(new Polygon []{p},this.geofac),0,num_current, num_shortest, diff},"egress");
 		return ft;
 	}
 
@@ -202,6 +211,8 @@ public class EgressAnalysis {
 				Id id = link.getFromNode().getId();
 				EgressNode  e = new EgressNode();
 				e.node = link.getFromNode();
+				e.num_shortest = 0;
+				e.num_current = 0;
 				this.egressNodes.put(id, e);
 			}
 		}
@@ -209,19 +220,7 @@ public class EgressAnalysis {
 	}
 
 
-	private void initFeatureCollection() throws FactoryRegistryException, SchemaException {
-		
-		this.features = new ArrayList<Feature>();
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
-		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
-		AttributeType shortest = AttributeTypeFactory.newAttributeType("shortest_path", Integer.class);
-		AttributeType current = AttributeTypeFactory.newAttributeType("current_path", Integer.class);
-		AttributeType deviance = AttributeTypeFactory.newAttributeType("diff_shortest_current", Integer.class);
-		AttributeType devianceSqr = AttributeTypeFactory.newAttributeType("square_diff_shortest_current", Integer.class);
-		this.ftDistrictShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id,   current, shortest, deviance, devianceSqr }, "egressShape");
 
-
-	}
 
 	public static void main(String [] args) {
 

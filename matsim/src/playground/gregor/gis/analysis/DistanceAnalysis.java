@@ -180,9 +180,10 @@ public class DistanceAnalysis {
 			double length_selected = dists[0] / num_pers;
 			double evac_time = (-dists[2] * 10) / num_pers;  
 			double varK = dists[3];
+			int dest = (int) dists[4];
 			
 			try {
-				this.features.add(getFeature(polygon, meanDeviance, length_shortest, length_selected, num_pers, id++, evac_time,varK));
+				this.features.add(getFeature(polygon, meanDeviance, length_shortest, length_selected, num_pers, id++, evac_time,varK, dest));
 			} catch (IllegalAttributeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -197,16 +198,21 @@ public class DistanceAnalysis {
 
 	private double[] handlePersons(Collection<Person> persons) {
 
-		double [] dist = {0., 0.,0., 0.}; 
+		double [] dist = {0., 0.,0., 0., 0.}; 
 		double diff = 0;
 		double [] diffAll = new double [persons.size()];
 		int i = 0;
+		int [] dests = new int [100]; 
 		
-
 		
 		for (Person person : persons) {
 			Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
 			double l1 = leg.getRoute().getDist();
+			Link [] ls = leg.getRoute().getLinkRoute();
+			Link l = ls[ls.length-1];
+			String destS  = l.getId().toString().replace("el", "");
+			int dest = Integer.parseInt(destS);
+			dests[dest]++;
 			
 			dist[0] +=  l1;
 			dist[2] += person.getSelectedPlan().getScore(); 
@@ -231,6 +237,17 @@ public class DistanceAnalysis {
 		double sd = Math.sqrt(var);
 		double varK = sd / mean;
 		dist[3] = varK;
+		
+		int max = 0;
+		int dest = 0;
+		for (int ii = 0; ii < 100; ii++) {
+			if (dests[ii] > max) {
+				max = dests[ii];
+				dest = ii;
+			}
+			
+		}
+		dist[4] = dest;
 		return dist;
 
 	}
@@ -285,9 +302,9 @@ public class DistanceAnalysis {
 	}
 
 	private Feature getFeature(Polygon polygon, double meanDeviance,
-			double length_shortest, double length_selected, int num_pers, int id, double evac_time, double varK ) throws IllegalAttributeException {
+			double length_shortest, double length_selected, int num_pers, int id, double evac_time, double varK, int dest ) throws IllegalAttributeException {
 
-		return this.ftDistrictShape.create(new Object [] {new MultiPolygon(new Polygon []{polygon },this.geofac),id,num_pers, length_shortest, length_selected, meanDeviance, meanDeviance*meanDeviance,evac_time, varK},"network");
+		return this.ftDistrictShape.create(new Object [] {new MultiPolygon(new Polygon []{polygon },this.geofac),id,num_pers, length_shortest, length_selected, meanDeviance, meanDeviance*meanDeviance,evac_time, varK, dest},"network");
 
 	}
 
@@ -303,7 +320,8 @@ public class DistanceAnalysis {
 		AttributeType devianceSqr = AttributeTypeFactory.newAttributeType("square_diff_shortest_current", Double.class);
 		AttributeType evac_time = AttributeTypeFactory.newAttributeType("evac_time", Double.class);
 		AttributeType varK = AttributeTypeFactory.newAttributeType("varK", Double.class);
-		this.ftDistrictShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id, inhabitants, shortest, current, deviance, devianceSqr, evac_time, varK }, "gridShape");
+		AttributeType dest = AttributeTypeFactory.newAttributeType("dest", Integer.class);
+		this.ftDistrictShape = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id, inhabitants, shortest, current, deviance, devianceSqr, evac_time, varK, dest }, "gridShape");
 
 
 	}
