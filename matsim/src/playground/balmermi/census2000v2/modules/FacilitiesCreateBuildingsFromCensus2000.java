@@ -30,7 +30,6 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -39,7 +38,7 @@ import org.matsim.world.Location;
 
 import playground.balmermi.census2000v2.data.CAtts;
 
-public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm {
+public class FacilitiesCreateBuildingsFromCensus2000 {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -66,7 +65,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final int getMinFacilityId(Facilities facilities) {
+	private final int getMinFacilityId(final Facilities facilities) {
 		int min_id = Integer.MAX_VALUE;
 		for (Id id : facilities.getFacilities().keySet()) {
 			int f_id = Integer.parseInt(id.toString());
@@ -74,15 +73,15 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 		}
 		return min_id;
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Facilities facilities) {
+	public void run(final Facilities facilities) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		log.info("      # facilities = " + facilities.getFacilities().size());
-		
+
 		int min_id_given = this.getMinFacilityId(facilities);
 		log.info("      min_f_id = " + min_id_given);
 
@@ -102,7 +101,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 				String[] entries = curr_line.split("\t", -1);
 				// ZGDE  GEBAEUDE_ID  ...  XACH  YACH
 				// 1     2                 170   171
-				
+
 				// check for existing municipality
 				Id zone_id = new IdImpl(entries[CAtts.I_ZGDE]);
 				Location zone = this.municipalities.getLocation(zone_id);
@@ -120,7 +119,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 					f = facilities.createFacility(f_id,coord);
 					Activity act = f.createActivity(CAtts.ACT_HOME);
 					act.setCapacity(1);
-					
+
 					// store some info
 					home_fac_cnt++;
 					int id = Integer.parseInt(f.getId().toString());
@@ -132,15 +131,15 @@ public class FacilitiesCreateBuildingsFromCensus2000 extends FacilitiesAlgorithm
 					if ((coord.getX() != f.getCenter().getX()) || coord.getY() != f.getCenter().getY()) {
 						Gbl.errorMsg("Line "+line_cnt+": facility id="+f_id+" already exists and has another coordinate!");
 					}
-					
+
 					// add 1 to capacity
 					Activity act = f.getActivity(CAtts.ACT_HOME);
 					act.setCapacity(act.getCapacity()+1);
-					
+
 					// store some info
 					if (act.getCapacity()>max_home_cap) { max_home_cap = act.getCapacity(); }
 				}
-				
+
 				// progress report
 				if (line_cnt % 100000 == 0) {
 					log.info("    Line " + line_cnt + ": # facilities = " + facilities.getFacilities().size());

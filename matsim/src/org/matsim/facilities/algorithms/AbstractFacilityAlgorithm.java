@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilityAlgorithmI.java
+ * FacilityAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,8 +20,15 @@
 
 package org.matsim.facilities.algorithms;
 
+import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 
-public interface FacilityAlgorithmI {
-	public void run(Facility facility);
+public abstract class AbstractFacilityAlgorithm implements FacilityAlgorithm {
+
+	public void run(final Facilities facilities) {
+		for (Facility f : facilities) {
+			run(f);
+		}
+	}
+
 }

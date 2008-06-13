@@ -21,15 +21,14 @@
 package org.matsim.facilities.filters;
 
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.algorithms.FacilityAlgorithmI;
-import org.matsim.plans.Plan;
+import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.plans.filters.FilterI;
 
 /**
  * @author meisterk
  *
  */
-public interface FacilityFilter extends FacilityAlgorithmI, FilterI {
+public interface FacilityFilter extends FacilityAlgorithm, FilterI {
 
 	/**
 	 * Judges whether the facility will be selected or not.
@@ -38,7 +37,7 @@ public interface FacilityFilter extends FacilityAlgorithmI, FilterI {
 	 * @return true if the facility meets the criterion of the filter.
 	 */
 	boolean judge(Facility facility);
-	
+
 	/**
 	 * Sends the facility to the next algorithm
 	 *

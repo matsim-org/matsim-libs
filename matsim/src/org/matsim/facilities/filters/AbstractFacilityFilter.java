@@ -21,15 +21,14 @@
 package org.matsim.facilities.filters;
 
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
-import org.matsim.facilities.algorithms.FacilityAlgorithmI;
+import org.matsim.facilities.algorithms.FacilityAlgorithm;
 
-public abstract class AbstractFacilityFilter extends FacilitiesAlgorithm implements FacilityFilter {
+public abstract class AbstractFacilityFilter implements FacilityAlgorithm, FacilityFilter {
 
-	protected FacilityAlgorithmI nextAlgorithm = null;
+	protected FacilityAlgorithm nextAlgorithm = null;
 	private int count = 0;
 
-	public void run(Facility facility) {
+	public void run(final Facility facility) {
 		if (judge(facility)) {
 			count();
 			this.nextAlgorithm.run(facility);

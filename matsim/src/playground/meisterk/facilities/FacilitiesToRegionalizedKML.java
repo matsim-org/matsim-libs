@@ -31,7 +31,7 @@ import javax.xml.bind.Marshaller;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
-import org.matsim.facilities.algorithms.FacilityAlgorithm;
+import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -58,13 +58,13 @@ import com.google.earth.kml._2.TimeSpanType;
  * facilities are directly converted to TimeSpan attributes of the placemarks.
  * Multiple activities in a facility result in multiple placemarks
  * at the same location.
- * 
+ *
  * Don't forget to call init() and finish().
- * 
+ *
  * @author meisterk
  *
  */
-public class FacilitiesToRegionalizedKML extends FacilityAlgorithm {
+public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 
 	public static final String ACTIVITY_TYPE_SHOP = "shop";
 	public static final String SHOP_STYLE = ACTIVITY_TYPE_SHOP + "Style";
@@ -75,19 +75,19 @@ public class FacilitiesToRegionalizedKML extends FacilityAlgorithm {
 
 	private static final Logger log = Logger.getLogger(FacilitiesToRegionalizedKML.class);
 	private static final Day[] days = Day.values();
-	
+
 	// documentName should become the facilities::name
 	private String documentName = null;
 	private double iconScale = 1.0;
 	private String outputFilename = null;
-	
+
 	private JAXBContext jaxbContext = null;
 	private ObjectFactory kmlJAXBFactory = null;
 	private KmlType kml = null;
 	private DocumentType document = null;
-	
-	public FacilitiesToRegionalizedKML(String documentName, double iconScale,
-			String outputFilename) {
+
+	public FacilitiesToRegionalizedKML(final String documentName, final double iconScale,
+			final String outputFilename) {
 		super();
 		this.documentName = documentName;
 		this.iconScale = iconScale;
@@ -99,52 +99,51 @@ public class FacilitiesToRegionalizedKML extends FacilityAlgorithm {
 	}
 
 	public void init() {
-		
+
 		log.info("Initializing KML... ");
 
 		// kml and document
 		try {
-			jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
+			this.jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
 		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		kmlJAXBFactory = new ObjectFactory();
-		
-		kml = kmlJAXBFactory.createKmlType();
-		document = kmlJAXBFactory.createDocumentType();
-		document.setName(documentName);
-		kml.setAbstractFeatureGroup(kmlJAXBFactory.createDocument(document));
+		this.kmlJAXBFactory = new ObjectFactory();
+
+		this.kml = this.kmlJAXBFactory.createKmlType();
+		this.document = this.kmlJAXBFactory.createDocumentType();
+		this.document.setName(this.documentName);
+		this.kml.setAbstractFeatureGroup(this.kmlJAXBFactory.createDocument(this.document));
 
 		// styles
-		StyleType shopStyle = kmlJAXBFactory.createStyleType();
-		document.getAbstractStyleSelectorGroup().add(kmlJAXBFactory.createStyle(shopStyle));
+		StyleType shopStyle = this.kmlJAXBFactory.createStyleType();
+		this.document.getAbstractStyleSelectorGroup().add(this.kmlJAXBFactory.createStyle(shopStyle));
 		shopStyle.setId(FacilitiesToRegionalizedKML.SHOP_STYLE);
-		IconStyleType shopIconStyle = kmlJAXBFactory.createIconStyleType();
+		IconStyleType shopIconStyle = this.kmlJAXBFactory.createIconStyleType();
 		shopStyle.setIconStyle(shopIconStyle);
-		BasicLinkType shopIconLink = kmlJAXBFactory.createBasicLinkType();
+		BasicLinkType shopIconLink = this.kmlJAXBFactory.createBasicLinkType();
 		shopIconStyle.setIcon(shopIconLink);
-		shopIconStyle.setScale(iconScale);
+		shopIconStyle.setScale(this.iconScale);
 		shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
 		log.info("Initializing KML...done.");
 
 	}
-	
-	@Override
-	public void run(Facility facility) {
-		
+
+	public void run(final Facility facility) {
+
 		PlacemarkType aShopOpeningPeriod = null;
 		PointType aPointType = null;
 		TimeSpanType aTimeSpanType = null;
-		
+
 		String facilityId = facility.getId().toString();
 
-		FolderType aShop = kmlJAXBFactory.createFolderType();
-		document.getAbstractFeatureGroup().add(kmlJAXBFactory.createFolder(aShop));
+		FolderType aShop = this.kmlJAXBFactory.createFolderType();
+		this.document.getAbstractFeatureGroup().add(this.kmlJAXBFactory.createFolder(aShop));
 		aShop.setName(facilityId.split("_", 2)[0]);
 		aShop.setDescription(facilityId);
-		
+
 		// transform coordinates incl. toggle easting and northing
 		CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
 		CoordI northWestCH1903 = new Coord(facility.getCenter().getX(), facility.getCenter().getY());
@@ -159,21 +158,21 @@ public class FacilitiesToRegionalizedKML extends FacilityAlgorithm {
 					for (Opentime opentime : dailyOpentimes) {
 
 						// build up placemark structure
-						aShopOpeningPeriod = kmlJAXBFactory.createPlacemarkType();
-						aShop.getAbstractFeatureGroup().add(kmlJAXBFactory.createPlacemark(aShopOpeningPeriod));
+						aShopOpeningPeriod = this.kmlJAXBFactory.createPlacemarkType();
+						aShop.getAbstractFeatureGroup().add(this.kmlJAXBFactory.createPlacemark(aShopOpeningPeriod));
 						aShopOpeningPeriod.setStyleUrl(SHOP_STYLE);
 						aShopOpeningPeriod.setName(facilityId.split("_", 2)[0]);
 						aShopOpeningPeriod.setDescription(facilityId);
 
-						aPointType = kmlJAXBFactory.createPointType();
-						aShopOpeningPeriod.setAbstractGeometryGroup(kmlJAXBFactory.createPoint(aPointType));
+						aPointType = this.kmlJAXBFactory.createPointType();
+						aShopOpeningPeriod.setAbstractGeometryGroup(this.kmlJAXBFactory.createPoint(aPointType));
 						aPointType.getCoordinates().add(northWestWGS84.getX() + "," + northWestWGS84.getY() + ",0.0");
 
 						// transform opening times to GE time primitives
-						aTimeSpanType = kmlJAXBFactory.createTimeSpanType();
-						aShopOpeningPeriod.setAbstractTimePrimitiveGroup(kmlJAXBFactory.createAbstractTimePrimitiveGroup(aTimeSpanType));
-						aTimeSpanType.setBegin("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getStartTime()) + "+01:00");
-						aTimeSpanType.setEnd("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getEndTime()) + "+01:00");
+						aTimeSpanType = this.kmlJAXBFactory.createTimeSpanType();
+						aShopOpeningPeriod.setAbstractTimePrimitiveGroup(this.kmlJAXBFactory.createAbstractTimePrimitiveGroup(aTimeSpanType));
+						aTimeSpanType.setBegin("2008-04-" + Integer.toString(this.MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getStartTime()) + "+01:00");
+						aTimeSpanType.setEnd("2008-04-" + Integer.toString(this.MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getEndTime()) + "+01:00");
 					}
 				}
 			}
@@ -182,12 +181,12 @@ public class FacilitiesToRegionalizedKML extends FacilityAlgorithm {
 	}
 
 	public void finish() {
-		
+
 		log.info("Writing out KML...");
 		try {
-			Marshaller marshaller = jaxbContext.createMarshaller();
+			Marshaller marshaller = this.jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.marshal(kmlJAXBFactory.createKml(kml), new FileOutputStream(outputFilename));
+			marshaller.marshal(this.kmlJAXBFactory.createKml(this.kml), new FileOutputStream(this.outputFilename));
 		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -198,5 +197,5 @@ public class FacilitiesToRegionalizedKML extends FacilityAlgorithm {
 		log.info("Writing out KML...done.");
 
 	}
-	
+
 }

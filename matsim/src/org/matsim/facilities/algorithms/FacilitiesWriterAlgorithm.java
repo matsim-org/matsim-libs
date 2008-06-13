@@ -26,22 +26,21 @@ import org.matsim.facilities.Facility;
 
 /**
  * Use this facilities writer when streaming facilities.
- * 
+ *
  * @author meisterk
  *
  */
-public class FacilitiesWriterAlgorithm extends FacilityAlgorithm {
+public class FacilitiesWriterAlgorithm extends AbstractFacilityAlgorithm {
 
 	private FacilitiesWriter facilitiesWriter = null;
-	
-	public FacilitiesWriterAlgorithm(Facilities facilities) {
+
+	public FacilitiesWriterAlgorithm(final Facilities facilities) {
 		super();
 		this.facilitiesWriter = new FacilitiesWriter(facilities);
 		this.facilitiesWriter.writeOpenAndInit();
 	}
-	
-	@Override
-	public void run(Facility facility) {
+
+	public void run(final Facility facility) {
 		this.facilitiesWriter.writeFacility(facility);
 	}
 
@@ -52,5 +51,5 @@ public class FacilitiesWriterAlgorithm extends FacilityAlgorithm {
 	public void finish() {
 		this.facilitiesWriter.writeFinish();
 	}
-	
+
 }

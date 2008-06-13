@@ -31,22 +31,22 @@ import org.matsim.facilities.FacilitiesProductionKTI;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
-import org.matsim.facilities.algorithms.FacilityAlgorithm;
+import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.utils.misc.Day;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
 
 /**
  * Assign every shop an opening time based on shopsOf2005 survey.
- * 
+ *
  * @author meisterk
  *
  */
-public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
+public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
-	private Facilities shopsOf2005 = new Facilities("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
+	private final Facilities shopsOf2005 = new Facilities("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
 
-	private String shopsOf2005Filename = "/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/facilities_shopsOf2005.xml";
+	private final String shopsOf2005Filename = "/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/facilities_shopsOf2005.xml";
 
 	public FacilitiesOpentimesKTIYear2() {
 		super();
@@ -56,14 +56,13 @@ public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
 	public void init() {
 
 		System.out.println("Reading shops Of 2005 xml file... ");
-		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(shopsOf2005);
-		facilities_reader.readFile(shopsOf2005Filename);
+		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.shopsOf2005);
+		facilities_reader.readFile(this.shopsOf2005Filename);
 		System.out.println("Reading shops Of 2005 xml file...done.");
 
 	}
 
-	@Override
-	public void run(Facility facility) {
+	public void run(final Facility facility) {
 
 		Day[] days = Day.values();
 		double startTime = -1.0;
@@ -71,7 +70,7 @@ public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
 
 		TreeMap<String, TreeSet<Opentime>> closestShopOpentimes = new TreeMap<String, TreeSet<Opentime>>();
 
-		ArrayList<Location> closestShops = shopsOf2005.getNearestLocations(facility.getCenter());
+		ArrayList<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCenter());
 		Activity shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpentimes();
@@ -91,8 +90,8 @@ public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
 							day.equals(Day.THURSDAY) ||
 							day.equals(Day.FRIDAY)) {
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR2).createOpentime(
-								day.getAbbrevEnglish(), 
-								Time.writeTime(7.0 * 3600), 
+								day.getAbbrevEnglish(),
+								Time.writeTime(7.0 * 3600),
 								Time.writeTime(18.0 * 3600));
 					}
 				}
@@ -105,10 +104,10 @@ public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
 						switch(dailyOpentime.size()) {
 						case 2:
 							startTime = Math.min(
-									((Opentime) dailyOpentime.toArray()[0]).getStartTime(), 
+									((Opentime) dailyOpentime.toArray()[0]).getStartTime(),
 									((Opentime) dailyOpentime.toArray()[1]).getStartTime());
 							endTime = Math.max(
-									((Opentime) dailyOpentime.toArray()[0]).getEndTime(), 
+									((Opentime) dailyOpentime.toArray()[0]).getEndTime(),
 									((Opentime) dailyOpentime.toArray()[1]).getEndTime());
 							break;
 						case 1:
@@ -118,7 +117,7 @@ public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
 						}
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
 								day.getAbbrevEnglish(),
-								Time.writeTime(startTime), 
+								Time.writeTime(startTime),
 								Time.writeTime(endTime));
 					}
 				}
@@ -141,16 +140,16 @@ public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
 								day.equals(Day.THURSDAY) ||
 								day.equals(Day.FRIDAY)) {
 							activities.get(activityType).createOpentime(
-									day.getAbbrevEnglish(), 
-									Time.writeTime(8.0 * 3600), 
+									day.getAbbrevEnglish(),
+									Time.writeTime(8.0 * 3600),
 									Time.writeTime(12.0 * 3600));
 							activities.get(activityType).createOpentime(
-									day.getAbbrevEnglish(), 
-									Time.writeTime(13.5 * 3600), 
+									day.getAbbrevEnglish(),
+									Time.writeTime(13.5 * 3600),
 									Time.writeTime(17.0 * 3600));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
-									day.getAbbrevEnglish(), 
-									Time.writeTime(8.0 * 3600), 
+									day.getAbbrevEnglish(),
+									Time.writeTime(8.0 * 3600),
 									Time.writeTime(17.0 * 3600));
 						}
 					}
@@ -165,12 +164,12 @@ public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
 								day.equals(Day.THURSDAY) ||
 								day.equals(Day.FRIDAY)) {
 							activities.get(activityType).createOpentime(
-									day.getAbbrevEnglish(), 
-									Time.writeTime(8.0 * 3600), 
+									day.getAbbrevEnglish(),
+									Time.writeTime(8.0 * 3600),
 									Time.writeTime(18.0 * 3600));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
-									day.getAbbrevEnglish(), 
-									Time.writeTime(8.0 * 3600), 
+									day.getAbbrevEnglish(),
+									Time.writeTime(8.0 * 3600),
 									Time.writeTime(18.0 * 3600));
 						}
 					}
@@ -184,21 +183,21 @@ public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
 								day.equals(Day.THURSDAY) ||
 								day.equals(Day.FRIDAY)) {
 							activities.get(activityType).createOpentime(
-									day.getAbbrevEnglish(), 
-									Time.writeTime(7.0 * 3600), 
+									day.getAbbrevEnglish(),
+									Time.writeTime(7.0 * 3600),
 									Time.writeTime(22.0 * 3600));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
-									day.getAbbrevEnglish(), 
-									Time.writeTime(7.0 * 3600), 
+									day.getAbbrevEnglish(),
+									Time.writeTime(7.0 * 3600),
 									Time.writeTime(22.0 * 3600));
 						} else if (day.equals(Day.SATURDAY)) {
 							activities.get(activityType).createOpentime(
-									day.getAbbrevEnglish(), 
-									Time.writeTime(8.0 * 3600), 
+									day.getAbbrevEnglish(),
+									Time.writeTime(8.0 * 3600),
 									Time.writeTime(12.0 * 3600));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
-									day.getAbbrevEnglish(), 
-									Time.writeTime(8.0 * 3600), 
+									day.getAbbrevEnglish(),
+									Time.writeTime(8.0 * 3600),
 									Time.writeTime(12.0 * 3600));
 						}
 					}
@@ -220,12 +219,12 @@ public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
 							endTime = 18.0 * 3600;
 						}
 						activities.get(activityType).createOpentime(
-								day.getAbbrevEnglish(), 
-								Time.writeTime(startTime), 
+								day.getAbbrevEnglish(),
+								Time.writeTime(startTime),
 								Time.writeTime(endTime));
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
-								day.getAbbrevEnglish(), 
-								Time.writeTime(startTime), 
+								day.getAbbrevEnglish(),
+								Time.writeTime(startTime),
 								Time.writeTime(endTime));
 					}
 				} else if (
@@ -234,31 +233,31 @@ public class FacilitiesOpentimesKTIYear2 extends FacilityAlgorithm {
 						startTime = 9.0 * 3600;
 						endTime = 24.0 * 3600;
 						activities.get(activityType).createOpentime(
-								day.getAbbrevEnglish(), 
-								Time.writeTime(startTime), 
+								day.getAbbrevEnglish(),
+								Time.writeTime(startTime),
 								Time.writeTime(endTime));
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
-								day.getAbbrevEnglish(), 
-								Time.writeTime(startTime), 
+								day.getAbbrevEnglish(),
+								Time.writeTime(startTime),
 								Time.writeTime(endTime));
-					}					
+					}
 				} else if (
 						Pattern.matches(FacilitiesProductionKTI.LEISURE_CULTURE, activityType)) {
 					for (Day day : days) {
 						startTime = 14.0 * 3600;
 						endTime = 24.0 * 3600;
 						activities.get(activityType).createOpentime(
-								day.getAbbrevEnglish(), 
-								Time.writeTime(startTime), 
+								day.getAbbrevEnglish(),
+								Time.writeTime(startTime),
 								Time.writeTime(endTime));
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
-								day.getAbbrevEnglish(), 
-								Time.writeTime(startTime), 
+								day.getAbbrevEnglish(),
+								Time.writeTime(startTime),
 								Time.writeTime(endTime));
-					}					
+					}
 				}
 			}
 		}
 	}
-	
+
 }

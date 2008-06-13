@@ -25,30 +25,29 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.algorithms.FacilityAlgorithmI;
+import org.matsim.facilities.algorithms.FacilityAlgorithm;
 
 /**
  * Keeps all facilities if they contain one OR more of the specified activities.
- * 
+ *
  * @author meisterk
  *
  */
 public class FacilitiesActTypeFilter extends AbstractFacilityFilter {
 
-	private Set<String> actTypePatterns = new TreeSet<String>();
+	private final Set<String> actTypePatterns = new TreeSet<String>();
 
-	public FacilitiesActTypeFilter(FacilityAlgorithmI nextAlgorithm) {
+	public FacilitiesActTypeFilter(final FacilityAlgorithm nextAlgorithm) {
 		super();
 		this.nextAlgorithm = nextAlgorithm;
 	}
 
-	public void addActTypePattern(String actTypePattern) {
+	public void addActTypePattern(final String actTypePattern) {
 		this.actTypePatterns.add(actTypePattern);
 	}
 
-	public boolean judge(Facility facility) {
+	public boolean judge(final Facility facility) {
 
 		Iterator<String> activityIterator = facility.getActivities().keySet().iterator();
 		while (activityIterator.hasNext()) {
@@ -60,11 +59,6 @@ public class FacilitiesActTypeFilter extends AbstractFacilityFilter {
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public void run(Facilities facilities) {
-		// TODO Auto-generated method stub
 	}
 
 }

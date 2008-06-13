@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilityAlgorithm.java
+ * FacilityAlgorithmI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,20 +20,8 @@
 
 package org.matsim.facilities.algorithms;
 
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 
-public abstract class FacilityAlgorithm extends FacilitiesAlgorithm implements FacilityAlgorithmI {
-
-	@Override
-	public void run(Facilities facilities) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void run(Facility facility) {
-		// TODO Auto-generated method stub
-
-	}
-
+public interface FacilityAlgorithm {
+	public void run(Facility facility);
 }

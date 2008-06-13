@@ -26,9 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
 
-public class FacilitiesRenameAndRemoveNOGAActTypes extends FacilitiesAlgorithm {
+public class FacilitiesRenameAndRemoveNOGAActTypes {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -50,7 +49,7 @@ public class FacilitiesRenameAndRemoveNOGAActTypes extends FacilitiesAlgorithm {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Facilities facilities) {
+	public void run(final Facilities facilities) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		log.info("      # facilities = " + facilities.getFacilities().size());
 
@@ -66,7 +65,7 @@ public class FacilitiesRenameAndRemoveNOGAActTypes extends FacilitiesAlgorithm {
 			Facility ff = facilities.createFacility(f.getId(),f.getCenter());
 			ff.getActivities().putAll(f.getActivities());
 		}
-		
+
 		log.info("      # facilities = " + facilities.getFacilities().size());
 		log.info("    done.");
 	}

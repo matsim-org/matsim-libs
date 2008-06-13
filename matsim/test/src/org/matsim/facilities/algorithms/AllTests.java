@@ -29,7 +29,7 @@ public class AllTests {
 
 		TestSuite suite = new TestSuite("Tests for org.matsim.facilities.algorithms");
 		//$JUnit-BEGIN$
-//		suite.addTestSuite(FacilityAlgorithmTest.class); // FIXME [KM,MR] test disabled as it does not yet work
+		suite.addTestSuite(AbstractFacilityAlgorithmTest.class);
 		//$JUnit-END$
 		return suite;
 	}

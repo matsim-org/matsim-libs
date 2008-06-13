@@ -28,14 +28,13 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.algorithms.FacilitiesAlgorithm;
-import org.matsim.facilities.algorithms.FacilityAlgorithmI;
+import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Layer;
 
-public class Facilities extends Layer {
+public class Facilities extends Layer implements Iterable<Facility> {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -43,7 +42,7 @@ public class Facilities extends Layer {
 
 	public static final Id LAYER_TYPE = new IdImpl("facility");
 
-	private final ArrayList<FacilitiesAlgorithm> algorithms = new ArrayList<FacilitiesAlgorithm>();
+	private final ArrayList<FacilityAlgorithm> algorithms = new ArrayList<FacilityAlgorithm>();
 
 	private long counter = 0;
 	private long nextMsg = 1;
@@ -60,10 +59,13 @@ public class Facilities extends Layer {
 	//////////////////////////////////////////////////////////////////////
 
 	public Facilities(final String name, final boolean isStreaming) {
-		super(LAYER_TYPE,name);
+		super(LAYER_TYPE, name);
 		this.isStreaming = isStreaming;
 	}
 
+	/**
+	 * Creates a new Facilities object with streaming switched off.
+	 */
 	public Facilities() {
 		this(null, false);
 	}
@@ -97,7 +99,7 @@ public class Facilities extends Layer {
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void addAlgorithm(final FacilitiesAlgorithm algo) {
+	public final void addAlgorithm(final FacilityAlgorithm algo) {
 		this.algorithms.add(algo);
 	}
 
@@ -108,8 +110,10 @@ public class Facilities extends Layer {
 	public final void runAlgorithms() {
 		if (!this.isStreaming) {
 			for (int i = 0; i < this.algorithms.size(); i++) {
-				FacilitiesAlgorithm algo = this.algorithms.get(i);
-				algo.run(this);
+				FacilityAlgorithm algo = this.algorithms.get(i);
+				for (Facility f : this) {
+					algo.run(f);
+				}
 			}
 		} else {
 			log.info("Facilities streaming is on. Algos were run during parsing");
@@ -120,19 +124,14 @@ public class Facilities extends Layer {
 	// finish methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void finishFacility(Facility f) {
+	public final void finishFacility(final Facility f) {
 		if (this.isStreaming) {
 			// run algorithms
-			for (FacilitiesAlgorithm facilitiesAlgo : this.algorithms) {
-				if (facilitiesAlgo instanceof FacilityAlgorithmI) {
-					((FacilityAlgorithmI) facilitiesAlgo).run(f);
-				}
+			for (FacilityAlgorithm facilitiesAlgo : this.algorithms) {
+				facilitiesAlgo.run(f);
 			}
-
 			// remove facility because we are streaming
 			this.locations.remove(f.getId());
-		} else {
-			// do nothing
 		}
 	}
 
@@ -160,9 +159,9 @@ public class Facilities extends Layer {
 	//Added 27.03.08 JH for random secondary location changes
 	public final TreeMap<Id,Facility> getFacilities(final String act_type) {
 		TreeMap<Id,Facility> facs = new TreeMap<Id, Facility>();
-		Iterator<? extends Facility> lit = this.getFacilities().values().iterator();
-		while(lit.hasNext()){
-			Facility f = (Facility) lit.next();
+		Iterator<? extends Facility> iter = this.getFacilities().values().iterator();
+		while (iter.hasNext()){
+			Facility f = iter.next();
 			TreeMap<String, Activity> a = f.getActivities();
 			if(a.containsKey(act_type)){
 				facs.put(f.getId(),f);
@@ -180,8 +179,14 @@ public class Facilities extends Layer {
 		return super.toString() +
 		"[nof_algorithms=" + this.algorithms.size() + "]";
 	}
-	
+
 	public final void printFacilitiesCount() {
 		log.info("    facility # " + this.counter);
+	}
+
+	// implementation of Iterable
+	@SuppressWarnings("unchecked")
+	public final Iterator<Facility> iterator() {
+		return (Iterator<Facility>) getFacilities().values().iterator();
 	}
 }

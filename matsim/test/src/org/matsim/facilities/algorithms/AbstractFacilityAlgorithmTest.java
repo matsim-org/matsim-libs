@@ -26,7 +26,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.shared.Coord;
 
-public class FacilityAlgorithmTest extends MatsimTestCase {
+public class AbstractFacilityAlgorithmTest extends MatsimTestCase {
 
 	public void testRunAlgorithms() {
 		final Facilities facilities = new Facilities();
@@ -34,19 +34,18 @@ public class FacilityAlgorithmTest extends MatsimTestCase {
 		facilities.createFacility(new IdImpl(1), new Coord(1.0, 1.0));
 		facilities.createFacility(new IdImpl(2), new Coord(2.0, 2.0));
 		// create an algo and let it run over the facilities
-		MockAlgo algo = new MockAlgo();
-		algo.run(facilities);
-		assertEquals("TestAlgo should have handled 2 facilities.", 2, algo.getCounter());
+		MockAlgo1 algo1 = new MockAlgo1();
+		algo1.run(facilities);
+		assertEquals("TestAlgo should have handled 2 facilities.", 2, algo1.getCounter());
 	}
-	
-	/*package*/ static class MockAlgo extends FacilityAlgorithm {
+
+	/*package*/ static class MockAlgo1 extends AbstractFacilityAlgorithm {
 		private int counter = 0;
-		
-		@Override
+
 		public void run(final Facility facility) {
 			this.counter++;
 		}
-		
+
 		public int getCounter() {
 			return this.counter;
 		}
