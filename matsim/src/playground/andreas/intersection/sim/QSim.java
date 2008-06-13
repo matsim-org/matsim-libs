@@ -143,7 +143,10 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 		}
 		
 //		log.info("prepareSim");
-		readSignalSystemControler();
+		
+		if(this.signalSystems != null && this.groupDefinitions != null){
+			readSignalSystemControler();
+		}
 	}
 
 	@Override

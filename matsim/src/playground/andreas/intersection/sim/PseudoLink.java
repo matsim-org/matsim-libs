@@ -87,9 +87,9 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		this.amIOriginalLink = amIOriginalLink;
 	}
 
-	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double length_m, int numberOfLanes, double freeSpeed_m_s, double flowCapacityFromNetFile_Veh_h, double effectiveCellSize){
+	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double lengthOfPseudoLink_m, int numberOfLanes, double freeSpeed_m_s, double flowCapacityFromNetFile_Veh_h, double effectiveCellSize){
 
-		this.length_m = length_m;
+		this.length_m = lengthOfPseudoLink_m;
 		this.meterFromLinkEnd = meterFromLinkEnd_m;
 
 		this.freeSpeedTravelTime = this.length_m / freeSpeed_m_s;
@@ -455,6 +455,10 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		} else{
 			return 0;
 		}		
+	}
+
+	public double getFreeSpeedTravelTime() {
+		return this.freeSpeedTravelTime;
 	}
 
 }

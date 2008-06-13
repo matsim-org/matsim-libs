@@ -144,10 +144,8 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 				
 		// circle time is 60s, green 60s
 		assertEquals(5000.0, qSim.numberOfVehPassed_, EPSILON);
-		
-		// Vehicle in QSim need 3 more seconds due to the fact that they are inserted in the original
-		// links flowQueue which starts 45m in front of the links end. FreeSpeed is 13.88 m/s > 3.24s
-		assertEquals(qSim.firstVehPassTime_s - 4, queueSimulation.firstVehPassTime_s, EPSILON);
+
+		assertEquals(qSim.firstVehPassTime_s, queueSimulation.firstVehPassTime_s, EPSILON);
 		assertEquals(qSim.numberOfVehPassed_, queueSimulation.numberOfVehPassed_, EPSILON);
 		assertEquals(qSim.numberOfVehPassedDuringTimeToMeasure_, queueSimulation.numberOfVehPassedDuringTimeToMeasure_, EPSILON);
 		
