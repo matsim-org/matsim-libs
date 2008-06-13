@@ -32,15 +32,15 @@ import java.net.URL;
 import org.apache.log4j.Logger;
 
 /**
- * Helper class to load data from files in the resource directory 
- * (<code>./res/</code>). Because the resource directory may be included into 
+ * Helper class to load data from files in the resource directory
+ * (<code>./res/</code>). Because the resource directory may be included into
  * jar-files in releases, one must not directly access them with the hard-coded
- * path (e.g. <code>new File("res/foo.bar");</code>), as the file would not be 
- * found if it is inside a jar-file. Instead, use the methods in this class to 
- * access files in the resource directory. The methods in this class ensure 
+ * path (e.g. <code>new File("res/foo.bar");</code>), as the file would not be
+ * found if it is inside a jar-file. Instead, use the methods in this class to
+ * access files in the resource directory. The methods in this class ensure
  * that the files can be loaded no matter whether they are inside a jar-file or
  * not.<br>
- * 
+ *
  * All filenames must be given relative to the resource directory. This means,
  * that the name of the resource-directory must not be part of the filenames
  * passed to the methods. E.g., to access the file <code>res/foo/bar.txt</code>,
@@ -53,10 +53,10 @@ public abstract class MatsimResource {
 
 	/** The path where resources are located in jar-files. */
 	private static final String RES_PATH_JARFILE = "/res/";
-	
-	/** The path where resources are located in a local file system. */ 
+
+	/** The path where resources are located in a local file system. */
 	private static final String RES_PATH_LOCAL = "./res/";  //NOPMD // this line should be ignored for PMD analysis
-	
+
 	private static final Logger log = Logger.getLogger(MatsimResource.class);
 
 	/**
@@ -70,12 +70,15 @@ public abstract class MatsimResource {
 			try {
 				return file.toURL();
 			} catch (MalformedURLException e) {
-				log.warn("Found resource-file, but could not return URL for it.", e);
-				// just continue, maybe we have more luck in the classpath
+				log.warn("Found resource-file, but could not return URL for it.", e);				// just continue, maybe we have more luck in the classpath
 			}
 		}
 		// maybe we find the file in the classpath, possibly inside a jar-file
-		return MatsimResource.class.getResource(RES_PATH_JARFILE + filename);
+		URL url = MatsimResource.class.getResource(RES_PATH_JARFILE + filename);
+		if (url == null) {
+			log.warn("Resource '" + filename + "' not found!");
+		}
+		return url;
 	}
 
 	/**
@@ -87,11 +90,15 @@ public abstract class MatsimResource {
 		try {
 			return new FileInputStream(RES_PATH_LOCAL + filename);
 		} catch (FileNotFoundException e) {
-			log.info("Resource not found locally. May not be fatal", e);
+			log.info("Resource '" + filename + "' not found locally. May not be fatal.");
 			// just continue, maybe we have more luck in the classpath
 		}
 		// maybe we find the file in the classpath, possibly inside a jar-file
-		return MatsimResource.class.getResourceAsStream(RES_PATH_JARFILE + filename);
+		InputStream stream = MatsimResource.class.getResourceAsStream(RES_PATH_JARFILE + filename);
+		if (stream == null) {
+			log.warn("Resource '" + filename + "' not found!");
+		}
+		return stream;
 	}
 
 	/**
