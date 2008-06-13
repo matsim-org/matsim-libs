@@ -41,14 +41,14 @@ import org.matsim.router.util.TravelTimeI;
  */
 public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, VisLeastCostPathCalculator {
 
-	private RouterNetStateWriter writer;
+	private final RouterNetStateWriter writer;
 
-	private final int DUMP_INTERVAL = 1;
+	private final static int DUMP_INTERVAL = 1;
 
 	private int explCounter;
 	private int dumpCounter;
 
-	public VisDijkstra(NetworkLayer network, TravelCostI costFunction, TravelTimeI timeFunction, RouterNetStateWriter writer) {
+	public VisDijkstra(final NetworkLayer network, final TravelCostI costFunction, final TravelTimeI timeFunction, final RouterNetStateWriter writer) {
 		super(network, costFunction, timeFunction);
 		this.writer = writer;
 		this.explCounter = 0;
@@ -70,10 +70,10 @@ public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, Vi
 	@Override
 	public Route calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 		doSnapshot();
-		Route route = super.calcLeastCostPath(fromNode, toNode, startTime);
+		final Route route = super.calcLeastCostPath(fromNode, toNode, startTime);
 
 		this.writer.reset();
-		Link [] links = route.getLinkRoute();
+		final Link [] links = route.getLinkRoute();
 		for (int i =0; i < links.length; i++){
 			this.writer.setLinkColor(links[i].getId(), 0.1);
 			doSnapshot();
@@ -105,12 +105,12 @@ public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, Vi
 	protected boolean addToPendingNodes(final Link l, final Node n,
 			final PriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node outNode, final Node toNode) {
-		boolean succ = super.addToPendingNodes(l, n, pendingNodes, currTime, currCost, outNode, toNode);
+		final boolean succ = super.addToPendingNodes(l, n, pendingNodes, currTime, currCost, outNode, toNode);
 
 		if (succ) {
 			/* test if the node was revisited - if so the former shortest
 			 * path has to be canceled... */
-			for (Link link : l.getToNode().getInLinks().values()) {
+			for (final Link link : l.getToNode().getInLinks().values()) {
 				if (this.writer.getLinkDisplValue(link,0) == 0.25) {
 					this.writer.setLinkColor(link.getId(), 0.9);
 				}
@@ -122,7 +122,7 @@ public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, Vi
 
 		this.explCounter++;
 
-		if (this.explCounter >= this.DUMP_INTERVAL) {
+		if (this.explCounter >= DUMP_INTERVAL) {
 			this.explCounter = 0;
 			doSnapshot();
 		}
@@ -133,7 +133,7 @@ public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, Vi
 	private void doSnapshot() {
 		try {
 			this.writer.dump(this.dumpCounter++);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}

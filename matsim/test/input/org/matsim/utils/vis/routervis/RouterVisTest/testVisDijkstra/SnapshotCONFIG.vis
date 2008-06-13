@@ -12,7 +12,7 @@
 	 -->
 
     <module name="general">
-    	<param name="netfile" value="test/input/org/matsim/utils/vis/routervis/RouterVisTest/testRouterVis/network.xml"/>
+    	<param name="netfile" value="test/input/org/matsim/utils/vis/routervis/RouterVisTest/network.xml"/>
     </module>
 
     <module name="temporal">

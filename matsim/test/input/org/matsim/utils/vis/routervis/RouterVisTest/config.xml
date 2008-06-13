@@ -3,7 +3,7 @@
 <config>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/input/org/matsim/utils/vis/routervis/RouterVisTest/testRouterVis/network.xml" />
+		<param name="inputNetworkFile" value="test/input/org/matsim/utils/vis/routervis/RouterVisTest/network.xml" />
 	</module>
 
 </config>

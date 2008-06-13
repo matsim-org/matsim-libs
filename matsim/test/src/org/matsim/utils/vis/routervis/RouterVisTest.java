@@ -31,6 +31,8 @@ import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
+import org.matsim.utils.vis.routervis.multipathrouter.CLogitRouter;
+import org.matsim.utils.vis.routervis.multipathrouter.PSLogitRouter;
 
 /**
  * @author glaemmel
@@ -39,37 +41,109 @@ public class RouterVisTest extends MatsimTestCase {
 	
 	private static final Logger log = Logger.getLogger(RouterVisTest.class);
 	
-	public void testRouterVis(){
-		Config config = loadConfig(getInputDirectory() + "config.xml");
+	public void testVisDijkstra(){
+		final Config config = loadConfig(getInputDirectory() + "../config.xml");
 		// read network
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		final NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		// calculate reference checksums
-		String visConfigFile = getInputDirectory() + "SnapshotCONFIG.vis";
-		long referenceChecksumConfig = CRCChecksum.getCRCFromFile(visConfigFile);
+		final String visConfigFile = getInputDirectory() + "SnapshotCONFIG.vis";
+		final long referenceChecksumConfig = CRCChecksum.getCRCFromFile(visConfigFile);
 		log.info("Reference checksum config = " + referenceChecksumConfig + " file: " + visConfigFile);
 
-		String visSnapshotFile = getInputDirectory() + "Snapshot00-00-00.vis";
-		long referenceChecksumSnapshot = CRCChecksum.getCRCFromFile(visSnapshotFile);
+		final String visSnapshotFile = getInputDirectory() + "Snapshot00-00-00.vis";
+		final long referenceChecksumSnapshot = CRCChecksum.getCRCFromFile(visSnapshotFile);
 		log.info("Reference checksum snapshot = " + referenceChecksumSnapshot + " file: " + visSnapshotFile);
 
 		// run test
-		Node fromNode = network.getNode("13");
-		Node toNode = network.getNode("7");
+		final Node fromNode = network.getNode("13");
+		final Node toNode = network.getNode("7");
 
-		TravelTimeI costCalc = new FreespeedTravelTimeCost();
-		RouterVis routerVis = new RouterVis(network, (TravelCostI) costCalc, costCalc);
+		final TravelTimeI costCalc = new FreespeedTravelTimeCost();
+		final RouterVis routerVis = new RouterVis(network, (TravelCostI) costCalc, costCalc, VisDijkstra.class);
 
 		routerVis.runRouter(fromNode, toNode, 0.0);
 
 		// check results
-		String outDir = getOutputDirectory();
-		String outConfig = outDir + "SnapshotCONFIG.vis";
-		long checksumConfig = CRCChecksum.getCRCFromFile(outConfig);
+		final String outDir = getOutputDirectory();
+		final String outConfig = outDir + "SnapshotCONFIG.vis";
+		final long checksumConfig = CRCChecksum.getCRCFromFile(outConfig);
 
-		String outSnapshot = outDir + "Snapshot00-00-00.vis";
-		long checksumSnapshot = CRCChecksum.getCRCFromFile(outSnapshot);
+		final String outSnapshot = outDir + "Snapshot00-00-00.vis";
+		final long checksumSnapshot = CRCChecksum.getCRCFromFile(outSnapshot);
+
+		assertEquals("different config files", referenceChecksumConfig, checksumConfig);
+		assertEquals("different snapshot files", referenceChecksumSnapshot, checksumSnapshot);
+	}
+	
+	public void testVisCLogit(){
+		final Config config = loadConfig(getInputDirectory() + "../config.xml");
+		// read network
+		final NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+
+		// calculate reference checksums
+		final String visConfigFile = getInputDirectory() + "SnapshotCONFIG.vis";
+		final long referenceChecksumConfig = CRCChecksum.getCRCFromFile(visConfigFile);
+		log.info("Reference checksum config = " + referenceChecksumConfig + " file: " + visConfigFile);
+
+		final String visSnapshotFile = getInputDirectory() + "Snapshot00-00-00.vis";
+		final long referenceChecksumSnapshot = CRCChecksum.getCRCFromFile(visSnapshotFile);
+		log.info("Reference checksum snapshot = " + referenceChecksumSnapshot + " file: " + visSnapshotFile);
+
+		// run test
+		final Node fromNode = network.getNode("13");
+		final Node toNode = network.getNode("7");
+
+		final TravelTimeI costCalc = new FreespeedTravelTimeCost();
+		final RouterVis routerVis = new RouterVis(network, (TravelCostI) costCalc, costCalc, CLogitRouter.class);
+
+		routerVis.runRouter(fromNode, toNode, 0.0);
+
+		// check results
+		final String outDir = getOutputDirectory();
+		final String outConfig = outDir + "SnapshotCONFIG.vis";
+		final long checksumConfig = CRCChecksum.getCRCFromFile(outConfig);
+
+		final String outSnapshot = outDir + "Snapshot00-00-00.vis";
+		final long checksumSnapshot = CRCChecksum.getCRCFromFile(outSnapshot);
+
+		assertEquals("different config files", referenceChecksumConfig, checksumConfig);
+		assertEquals("different snapshot files", referenceChecksumSnapshot, checksumSnapshot);
+	}
+	
+	public void testVisPSLogit(){
+		final Config config = loadConfig(getInputDirectory() + "../config.xml");
+		// read network
+		final NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+
+		// calculate reference checksums
+		final String visConfigFile = getInputDirectory()  + "SnapshotCONFIG.vis";
+		final long referenceChecksumConfig = CRCChecksum.getCRCFromFile(visConfigFile);
+		log.info("Reference checksum config = " + referenceChecksumConfig + " file: " + visConfigFile);
+
+		final String visSnapshotFile = getInputDirectory()  + "Snapshot00-00-00.vis";
+		final long referenceChecksumSnapshot = CRCChecksum.getCRCFromFile(visSnapshotFile);
+		log.info("Reference checksum snapshot = " + referenceChecksumSnapshot + " file: " + visSnapshotFile);
+
+		// run test
+		final Node fromNode = network.getNode("13");
+		final Node toNode = network.getNode("7");
+
+		final TravelTimeI costCalc = new FreespeedTravelTimeCost();
+		final RouterVis routerVis = new RouterVis(network, (TravelCostI) costCalc, costCalc, PSLogitRouter.class);
+
+		routerVis.runRouter(fromNode, toNode, 0.0);
+
+		// check results
+		final String outDir = getOutputDirectory();
+		final String outConfig = outDir + "SnapshotCONFIG.vis";
+		final long checksumConfig = CRCChecksum.getCRCFromFile(outConfig);
+
+		final String outSnapshot = outDir + "Snapshot00-00-00.vis";
+		final long checksumSnapshot = CRCChecksum.getCRCFromFile(outSnapshot);
 
 		assertEquals("different config files", referenceChecksumConfig, checksumConfig);
 		assertEquals("different snapshot files", referenceChecksumSnapshot, checksumSnapshot);

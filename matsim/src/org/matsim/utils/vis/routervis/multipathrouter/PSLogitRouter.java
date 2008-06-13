@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VisLeastCostPathCalculator.java
+ * PSLogitRouter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,17 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.routervis;
+package org.matsim.utils.vis.routervis.multipathrouter;
 
-import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.network.NetworkLayer;
+import org.matsim.router.util.TravelCostI;
+import org.matsim.router.util.TravelTimeI;
+import org.matsim.utils.vis.routervis.RouterNetStateWriter;
 
+public class PSLogitRouter extends MultiPathRouter {
 
-/**
- * 
- * 
- * @author laemmel
- *
- */
-public abstract interface VisLeastCostPathCalculator extends LeastCostPathCalculator {
+	public PSLogitRouter(final NetworkLayer network, final TravelCostI costFunction,
+			final TravelTimeI timeFunction, final RouterNetStateWriter writer) {
+		super(network, costFunction, timeFunction, writer);
+	}
+
+	
+	@Override
+	void initSelector() {
+		this.selector = new PSLogitSelector();
+		
+	}
 
 }

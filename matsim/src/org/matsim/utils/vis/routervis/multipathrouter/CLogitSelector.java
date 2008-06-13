@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VisLeastCostPathCalculator.java
+ * PSLSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,17 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.routervis;
+package org.matsim.utils.vis.routervis.multipathrouter;
 
-import org.matsim.router.util.LeastCostPathCalculator;
+import java.util.ArrayList;
+
+public class CLogitSelector extends LogitSelector {
+
+	private final  static double BETA = 4;
+	private final static double THETA = 2;
+	
+	
+	@Override
+	protected void calcProbabilities(final ArrayList<NodeData> toNodes) {
+		final ArrayList<Double> g_all = new ArrayList<Double>();
+		double all = 0;
+		for (final NodeData toNode : toNodes) {
+			NodeData curr = toNode;
+			double CF_k = 0;
+			do {
+				final String key = curr.getPrev().getId().toString() + " " + curr.getId().toString();
+				final LogitLink l = this.pathTree.get(key);
+				CF_k += l.numPaths * l.cost / toNode.getCost();
+				if (Double.isNaN(CF_k)) {
+					int i=0; i++;
+				}
+				curr = curr.getPrev();
+			} while (curr.getPrev() != null);
+			CF_k = -BETA * Math.log(CF_k);
+			final double w = Math.exp(-toNode.getCost()/THETA + CF_k); 
+		
+			g_all.add(w);
+			all += w;
+			
+		}
+		
+		for (int i = 0; i < g_all.size(); i++) {
+			toNodes.get(i).setProb(g_all.get(i)/all);
+		}
+		
+	}
 
 
-/**
- * 
- * 
- * @author laemmel
- *
- */
-public abstract interface VisLeastCostPathCalculator extends LeastCostPathCalculator {
 
 }
+

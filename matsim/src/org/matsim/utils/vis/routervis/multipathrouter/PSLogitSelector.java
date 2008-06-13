@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VisLeastCostPathCalculator.java
+ * PSLogitSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,17 +18,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.routervis;
+package org.matsim.utils.vis.routervis.multipathrouter;
 
-import org.matsim.router.util.LeastCostPathCalculator;
+import java.util.ArrayList;
 
-
-/**
- * 
- * 
- * @author laemmel
- *
- */
-public abstract interface VisLeastCostPathCalculator extends LeastCostPathCalculator {
-
+public class PSLogitSelector extends LogitSelector {
+	
+	
+	protected final  static double BETA = 4;
+	protected final static double THETA = 2;
+	
+	
+	
+	@Override
+	protected void calcProbabilities(final ArrayList<NodeData> toNodes) {
+		final ArrayList<Double> weights = new ArrayList<Double>(toNodes.size());
+		double w_all = 0;
+		for (final NodeData toNode : toNodes) {
+			NodeData curr = toNode;
+			double w = 0;
+			do {
+				final NodeData prev = curr.getPrev(); 
+				final String key = prev.getId().toString() + " " + curr.getId().toString();
+				final LogitLink l = this.pathTree.get(key);
+				w += l.cost/(toNode.getCost()* l.numPaths);
+				
+				curr = prev;
+			} while (curr.getPrev() != null);
+				w = Math.exp(-THETA * toNode.getCost()) + Math.pow(w, BETA); ///toNodes.get(0).getCost();
+				weights.add(w);
+				w_all += w; 
+		}
+		
+		for (int i = 0; i < weights.size(); i++) {
+			toNodes.get(i).setProb(weights.get(i)/w_all);
+		}		
+		
+	}
 }
