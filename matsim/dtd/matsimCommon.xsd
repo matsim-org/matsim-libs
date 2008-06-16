@@ -81,7 +81,7 @@ xml:lang="en">
   </xs:complexType>
 </xs:element>
 
-<xs:element name="coordinate" type="coordinateType" />
+<xs:element name="coordinate" type="coordinateType" >
 </xs:element>
 
 <xs:complexType name="actLocationType">
