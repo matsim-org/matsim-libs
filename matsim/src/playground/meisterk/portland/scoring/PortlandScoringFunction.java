@@ -139,7 +139,7 @@ public class PortlandScoringFunction implements ScoringFunction {
 		if (initialized) return;
 
 		log.info("Initializing PortlandScoringFunction with CharyparNagelScoring parameters...");
-		
+
 		CharyparNagelScoringConfigGroup params = Gbl.getConfig().charyparNagelScoring();
 		marginalUtilityOfWaiting = params.getWaiting() / 3600.0;
 		marginalUtilityOfLateArrival = params.getLateArrival() / 3600.0;
@@ -163,8 +163,8 @@ public class PortlandScoringFunction implements ScoringFunction {
 
 	private final double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
 
-		log.info("Calculating an act score with PortlandScoringFunction...");
-		
+//		log.info("Calculating an act score with PortlandScoringFunction...");
+
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
@@ -240,7 +240,7 @@ public class PortlandScoringFunction implements ScoringFunction {
 
 		if (duration > 0) {
 			double utilPerf = marginalUtilityOfPerforming * typicalDuration
-					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
+			* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
 			double utilWait = marginalUtilityOfWaiting * duration;
 			score += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
@@ -364,46 +364,59 @@ public class PortlandScoringFunction implements ScoringFunction {
 		this.score += calcLegScore(this.lastTime, time, leg);
 		this.index++;
 	}
-	
+
 	private double[] getOpeningInterval(final Act act) {
-		
+
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{Double.MAX_VALUE, Double.MIN_VALUE};
+		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
 
 		boolean foundAct = false;
-		
+
 		Facility facility = act.getFacility();
 		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
 		String facilityActType = null;
-	
+		TreeSet<Opentime> opentimes = null;
+
 		while (facilityActTypeIterator.hasNext() && !foundAct) {
 
 			facilityActType = facilityActTypeIterator.next();
 			if (act.getType().substring(0, 1).equals(facilityActType.substring(0, 1))) {
 				foundAct = true;
 
-				TreeSet<Opentime> opentimes = facility.getActivity(facilityActType).getOpentimes("wed");
-				for (Opentime opentime : opentimes) {
-
-					// ignoring lunch breaks with the following procedure:
-					// if there is only one wednesday open time interval, use it
-					// if there are two or more, use the earliest start time and the latest end time
-					openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
-					openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+				// choose appropriate opentime:
+				// either wed or wkday
+				// if none is given, use undefined opentimes
+				opentimes = facility.getActivity(facilityActType).getOpentimes("wed");
+				if (opentimes == null) {
+					opentimes = facility.getActivity(facilityActType).getOpentimes("wkday");
 				}
-				
+				if (opentimes != null) {
+					// ignoring lunch breaks with the following procedure:
+					// if there is only one wed/wkday open time interval, use it
+					// if there are two or more, use the earliest start time and the latest end time
+					openInterval[0] = Double.MAX_VALUE;
+					openInterval[1] = Double.MIN_VALUE;
+					
+					for (Opentime opentime : opentimes) {
+
+						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
+						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+					}
+					
+				}
+
 			}
-			
+
 		}
-		
+
 		if (!foundAct) {
 			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
 		}
-		
+
 		return openInterval;
-		
+
 	}
-	
+
 }

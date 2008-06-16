@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -45,8 +44,11 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerI;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesProductionKTI;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
@@ -148,7 +150,7 @@ public class MyRuns {
 //		MyRuns.convertPlansV0ToPlansV4();
 //		MyRuns.produceSTRC2007KML();
 		MyRuns.facilityActivities();
-		
+
 		System.out.println();
 
 	}
@@ -179,8 +181,9 @@ public class MyRuns {
 	}
 
 	private static void facilityActivities() {
-		
+
 		String actType = "s13";
+		String shopId = "";
 		
 		System.out.println("Reading facilities...");
 		Facilities facilityLayer = new Facilities();
@@ -191,46 +194,113 @@ public class MyRuns {
 		Gbl.getWorld().setFacilityLayer(facilityLayer);
 		System.out.println("Reading facilities...done.");
 
-		boolean foundAct = false;
+		// does every facility activity have a wednesday opentime?
+		TreeSet<String> wednesdayLessActivityTypes = new TreeSet<String>();
+
+		// IGNORE HOME!!!
+		// tta -> wkday
+		TreeSet<Opentime> opentimes = null;
+		TreeMap<String, TreeSet<Opentime>> closestShopOpentimes = new TreeMap<String, TreeSet<Opentime>>();
 		
-		Facility facility = ((Facility) facilityLayer.getLocation("10000017"));
-		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
-		String facilityActType = null;
-		// first is opening time, second is closing time
-		double[] openingInterval = new double[]{Double.MAX_VALUE, Double.MIN_VALUE};
-//		double openingTime = Double.MAX_VALUE;
-//		double closingTime = Double.MIN_VALUE;
-		
-		while (facilityActTypeIterator.hasNext() && !foundAct) {
+		for (Facility f : facilityLayer.getFacilities().values()) {
 
-			facilityActType = facilityActTypeIterator.next();
-			System.out.println(facilityActType);
-			if (actType.substring(0, 1).equals(facilityActType.substring(0, 1))) {
-				foundAct = true;
-				System.out.println("We'll use the following facility activity type: ");
-				System.out.println("\t" + facilityActType);
-
-				TreeSet<Opentime> opentimes = facility.getActivity(facilityActType).getOpentimes("wed");
-				System.out.println("We'll use wednesday's open times objects: ");
-				for (Opentime opentime : opentimes) {
-					System.out.println(opentime.toString());
-					// ignoring lunch breaks with the following procedure
-					openingInterval[0] = Math.min(openingInterval[0], opentime.getStartTime());
-					openingInterval[1] = Math.max(openingInterval[1], opentime.getEndTime());
-				}
-
-				System.out.println("Final opening times: ");
-				System.out.println("Open: " + Time.writeTime(openingInterval[0]));
-				System.out.println("Close: " + Time.writeTime(openingInterval[1]));
-				
-			}
+//			Activity shopActivity = f.getActivity("shop");
+//			if (shopActivity == null) {
+//				shopActivity = f.createActivity("shop");
+//				
+//				if (f.getId().toString().startsWith("Denner")) {
+//					shopId = "Denner____8050_Zürich_REGENSBERGSTR. 309";
+//				} else if (f.getId().toString().startsWith("Migros")) {
+//					shopId = "Migros__Zürich-Affoltern-ZH_Migros Zürich_8046_Zürich_Jonas-Furrerstrasse 21";
+//				}
+//				
+//				closestShopOpentimes = ((Facility) facilityLayer.getLocation(shopId)).getActivity("shop").getOpentimes();
+//				shopActivity.setOpentimes(closestShopOpentimes);
+//			}
 			
+			for (Activity a : f.getActivities().values()) {
+
+				if (!a.getType().equals("home") && !a.getType().startsWith("B01")) {
+					opentimes = a.getOpentimes("wkday");
+					if (opentimes == null) {
+						opentimes = a.getOpentimes("wed");
+					}
+					if (opentimes == null) {
+						
+//						if (f.getId().toString().startsWith("Pick")) {
+//							// for the missing pickpay opentimes, use a random pickpay shop
+//							// let's use the one close to my home :-)
+//							shopId = "Pick Pay__Affoltern__8046_Zürich_In Böden 174";
+//						} else {
+//							// for the missing coop opentimes, use a random coop shop
+//							// let's use the one close to my home :-)
+//							shopId = "Coop_CC_Wehntalerstrasse_Coop Zürich_8046_Zürich_Wehntalerstrasse 549";
+//						}
+//						
+//						Activity shopsOf2005ShopAct = ((Facility) facilityLayer.getLocation(shopId)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
+//						if (shopsOf2005ShopAct != null) {
+//							closestShopOpentimes = shopsOf2005ShopAct.getOpentimes();
+//						}
+//						a.setOpentimes(closestShopOpentimes);
+						wednesdayLessActivityTypes.add(f.getId() + "_" + a.getType());
+					}
+				}	
+			}
+
 		}
-		
-		if (!foundAct) {
-			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
+
+		System.out.println("Facility activity types without a wed or wkday opening interval: ");
+		System.out.println();
+		for (String str : wednesdayLessActivityTypes) {
+			System.out.println(str);
 		}
-		
+		System.out.println();
+
+//		System.out.println("Writing facilities xml file... ");
+//		FacilitiesWriter facilities_writer = new FacilitiesWriter(facilityLayer);
+//		facilities_writer.write();
+//		System.out.println("Writing facilities xml file...done.");
+
+//		boolean foundAct = false;
+
+//		Facility facility = ((Facility) facilityLayer.getLocation("10000017"));
+//		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
+//		String facilityActType = null;
+//		// first is opening time, second is closing time
+//		double[] openingInterval = new double[]{Double.MAX_VALUE, Double.MIN_VALUE};
+////		double openingTime = Double.MAX_VALUE;
+////		double closingTime = Double.MIN_VALUE;
+
+//		while (facilityActTypeIterator.hasNext() && !foundAct) {
+
+//		facilityActType = facilityActTypeIterator.next();
+//		System.out.println(facilityActType);
+//		if (actType.substring(0, 1).equals(facilityActType.substring(0, 1))) {
+//		foundAct = true;
+//		System.out.println("We'll use the following facility activity type: ");
+//		System.out.println("\t" + facilityActType);
+
+//		TreeSet<Opentime> opentimes = facility.getActivity(facilityActType).getOpentimes("wed");
+//		System.out.println("We'll use wednesday's open times objects: ");
+//		for (Opentime opentime : opentimes) {
+//		System.out.println(opentime.toString());
+//		// ignoring lunch breaks with the following procedure
+//		openingInterval[0] = Math.min(openingInterval[0], opentime.getStartTime());
+//		openingInterval[1] = Math.max(openingInterval[1], opentime.getEndTime());
+//		}
+
+//		System.out.println("Final opening times: ");
+//		System.out.println("Open: " + Time.writeTime(openingInterval[0]));
+//		System.out.println("Close: " + Time.writeTime(openingInterval[1]));
+
+//		}
+
+//		}
+
+//		if (!foundAct) {
+//		Gbl.errorMsg("No suitable facility activity type found. Aborting...");
+//		}
+
 	}
 
 	private static void produceSTRC2007KML() {
@@ -297,7 +367,7 @@ public class MyRuns {
 				Feature.DEFAULT_TIME_PRIMITIVE);
 		myKMLDocument.addFeature(populationFolder);
 
-		 CoordinateTransformationI trafo = TransformationFactory.getCoordinateTransformation(
+		CoordinateTransformationI trafo = TransformationFactory.getCoordinateTransformation(
 				TransformationFactory.CH1903_LV03, TransformationFactory.WGS84);
 
 		for (Person person : matsimAgentPopulation.getPersons().values()) {
@@ -315,9 +385,9 @@ public class MyRuns {
 					Feature.DEFAULT_ADDRESS,
 					Feature.DEFAULT_LOOK_AT,
 					(person.getSex().equals("m")) ? maleHomeStyle.getStyleUrl() : femaleHomeStyle.getStyleUrl(),
-					Feature.DEFAULT_VISIBILITY,
-					Feature.DEFAULT_REGION,
-					Feature.DEFAULT_TIME_PRIMITIVE);
+							Feature.DEFAULT_VISIBILITY,
+							Feature.DEFAULT_REGION,
+							Feature.DEFAULT_TIME_PRIMITIVE);
 			populationFolder.addFeature(pl);
 
 			Point agentPoint = new Point(geometryCoord.getX(), geometryCoord.getY(), 0.0);
@@ -1257,7 +1327,7 @@ public class MyRuns {
 	}
 
 	private static void writeAnArray(int[][] anArray, String filename) {
-		
+
 		File outFile = null;
 		BufferedWriter out = null;
 
@@ -1274,11 +1344,11 @@ public class MyRuns {
 				out.write(Activities.values()[ii] + "\t");
 			}
 			out.newLine();
-			
+
 			while (timesAvailable) {
 
 				timesAvailable = false;
-				
+
 				out.write(Time.writeTime(timeIndex * TIME_BIN_SIZE) + "\t");
 				for (int aa=0; aa < anArray.length; aa++) {
 

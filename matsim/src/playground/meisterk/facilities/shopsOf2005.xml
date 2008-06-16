@@ -47,8 +47,8 @@
 
 <config>
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="&OUTPUTBASE;/facilities_KTIYear2_activities.xml.gz" />
-		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/facilities_KTIYear2.xml.gz" />
+		<param name="inputFacilitiesFile" value="/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/facilities_KTIYear2.xml.gz" />
+		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/output_facilities_KTIYear2.xml.gz" />
 	</module>
 </config>
 

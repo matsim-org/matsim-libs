@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesProductionKTI;
@@ -47,6 +48,8 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 	private final Facilities shopsOf2005 = new Facilities("shopsOf2005", Facilities.FACILITIES_NO_STREAMING);
 
 	private final String shopsOf2005Filename = "/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/facilities_shopsOf2005.xml";
+
+	private static final Logger log = Logger.getLogger(FacilitiesOpentimesKTIYear2.class);
 
 	public FacilitiesOpentimesKTIYear2() {
 		super();
@@ -74,9 +77,16 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 		Activity shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpentimes();
+		} else {
+			log.info("shop activity object of closest shop facility is null.");
 		}
 		TreeMap<String, Activity> activities = facility.getActivities();
 
+		// remove all existing opentimes
+		for (Activity a : activities.values()) {
+			a.setOpentimes(new TreeMap<String, TreeSet<Opentime>>());
+		}
+		
 		// if only presence code and work are present
 		switch(activities.size()){
 		case 2:

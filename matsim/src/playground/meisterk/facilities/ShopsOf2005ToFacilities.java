@@ -1805,16 +1805,8 @@ public class ShopsOf2005ToFacilities {
 
 		FacilitiesWriterAlgorithm writerAlgo = new FacilitiesWriterAlgorithm(facilities_output);
 
-//		FacilitiesToRegionalizedKML facilitiesToRegionalizedKML = new FacilitiesToRegionalizedKML();
-//		facilitiesToRegionalizedKML.init();
-//
-
-		//		FacilitiesActTypeFilter shopFilter = null;
-		for (FacilityAlgorithm facilityAlgorithm : new FacilityAlgorithm[]{facilitiesOpentimesKTIYear2, writerAlgo/*, facilitiesToRegionalizedKML*/}) {
-//			shopFilter = new FacilitiesActTypeFilter((FacilityAlgorithmI) facilitiesAlgorithm);
-//			shopFilter.addActTypePattern("shop.*");
-//			facilities_input.addAlgorithm((FacilitiesAlgorithm) shopFilter);
-			facilities_input.addAlgorithm(facilityAlgorithm);
+		for (FacilityAlgorithm facilitiesAlgorithm : new FacilityAlgorithm[]{facilitiesOpentimesKTIYear2, writerAlgo}) {
+			facilities_input.addAlgorithm(facilitiesAlgorithm);
 		}
 
 		System.out.println("Streaming Facilities KTI Year 2 file... ");
@@ -1824,7 +1816,6 @@ public class ShopsOf2005ToFacilities {
 		System.out.println("Streaming Facilities KTI Year 2 file...done.");
 
 		writerAlgo.finish();
-//		facilitiesToRegionalizedKML.finish();
 
 	}
 
