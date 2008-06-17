@@ -58,15 +58,15 @@ public class PlanomatControlerListener implements StartupListener, IterationStar
 
 		TravelTimeI linkTravelTimeEstimator = null;
 
-		String travelTimeIName = Gbl.getConfig().planomat().getLinkTravelTimeEstimatorName();
-
-		if (travelTimeIName.equalsIgnoreCase("org.matsim.trafficmonitoring.TravelTimeCalculatorArray")) {
-			linkTravelTimeEstimator = new TravelTimeCalculatorArray(network);
-		} else if (travelTimeIName.equalsIgnoreCase("org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator")) {
-			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
-		} else {
-			Gbl.errorMsg("Invalid name of implementation of TravelTimeI: " + travelTimeIName);
-		}
+//		String travelTimeIName = Gbl.getConfig().planomat().getLinkTravelTimeEstimatorName();
+//
+//		if (travelTimeIName.equalsIgnoreCase("org.matsim.trafficmonitoring.TravelTimeCalculatorArray")) {
+//			linkTravelTimeEstimator = new TravelTimeCalculatorArray(network);
+//		} else if (travelTimeIName.equalsIgnoreCase("org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator")) {
+//			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
+//		} else {
+//			Gbl.errorMsg("Invalid name of implementation of TravelTimeI: " + travelTimeIName);
+//		}
 
 		return linkTravelTimeEstimator;
 	}
