@@ -33,6 +33,7 @@ import org.matsim.config.groups.FacilitiesConfigGroup;
 import org.matsim.config.groups.GlobalConfigGroup;
 import org.matsim.config.groups.MatricesConfigGroup;
 import org.matsim.config.groups.NetworkConfigGroup;
+import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.config.groups.PlansConfigGroup;
 import org.matsim.config.groups.RoadPricingConfigGroup;
 import org.matsim.config.groups.SimulationConfigGroup;
@@ -68,6 +69,7 @@ public class Config {
 	private WorldConfigGroup world = null;
 	private NetworkConfigGroup network = null;
 	private PlansConfigGroup plans = null;
+	private PlanomatConfigGroup planomat = null;
 	private FacilitiesConfigGroup facilities = null;
 	private MatricesConfigGroup matrices = null;
 	private EventsConfigGroup events = null;
@@ -123,6 +125,9 @@ public class Config {
 		this.plans = new PlansConfigGroup();
 		this.modules.put(PlansConfigGroup.GROUP_NAME, this.plans);
 
+		this.planomat = new PlanomatConfigGroup();
+		this.modules.put(PlanomatConfigGroup.GROUP_NAME, this.planomat);
+		
 		this.facilities = new FacilitiesConfigGroup();
 		this.modules.put(FacilitiesConfigGroup.GROUP_NAME, this.facilities);
 
@@ -360,4 +365,8 @@ public class Config {
 		return this.socnetmodule;
 	}
 
+	public PlanomatConfigGroup planomat() {
+		return planomat;
+	}
+	
 }
