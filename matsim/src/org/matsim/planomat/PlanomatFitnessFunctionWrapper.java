@@ -18,11 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.planomat.costestimators;
+package org.matsim.planomat;
 
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
@@ -30,7 +31,14 @@ import org.matsim.plans.Route;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.world.Location;
 
-public class CharyparNagelFitnessFunction extends FitnessFunction {
+/**
+ * This class connects the JGAP FitnessFunction class with the MATSim ScoringFunction interface.
+ * This is done in order to use the MATSim scoring function in a JGAP optimization procedure like planomat.
+ * 
+ * @author meisterk
+ *
+ */
+public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 	public static final double FITNESS_OFFSET = 10000.0;
 	
@@ -43,7 +51,7 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 	private LegTravelTimeEstimator legTravelTimeEstimator;
 	private ScoringFunction sf;
 
-	public CharyparNagelFitnessFunction(ScoringFunction sf, Plan plan, LegTravelTimeEstimator legTravelTimeEstimator) {
+	public PlanomatFitnessFunctionWrapper(ScoringFunction sf, Plan plan, LegTravelTimeEstimator legTravelTimeEstimator) {
 		super();
 		this.sf = sf;
 		this.plan = plan;
@@ -81,7 +89,7 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 		// - make sure a fitness value will be >= 0, but
 		// - see that the fitness landscape will not be distorted too much by this, so we will add an offset (this s**ks, but works)
 		// - could become a problem if some calculation in the GA is based on score ratio (e.g. the calculation of a selection probability)
-		return Math.max(0.0, planScore + CharyparNagelFitnessFunction.FITNESS_OFFSET);
+		return Math.max(0.0, planScore + PlanomatFitnessFunctionWrapper.FITNESS_OFFSET);
 	}
 
 }

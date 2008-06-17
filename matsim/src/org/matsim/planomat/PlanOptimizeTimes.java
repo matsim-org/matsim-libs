@@ -37,14 +37,12 @@ import org.jgap.impl.DoubleGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
 import org.matsim.gbl.Gbl;
-import org.matsim.planomat.costestimators.CharyparNagelFitnessFunction;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.scoring.CharyparNagelScoringFunction;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
 
@@ -74,7 +72,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 	public void run(final Plan plan) {
 
 		// distinguish for optimization tools
-		String optiToolboxName = PlanomatConfig.getOptimizationToolboxName();
+		String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
 		if (optiToolboxName.equals("jgap")) {
 
 			Genotype initialGAPopulation = PlanOptimizeTimes.initJGAP(plan, this.legTravelTimeEstimator);
@@ -96,7 +94,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 
 		Genotype jgapGAPopulation = null;
 
-		int popSize = PlanomatConfig.getPopSize();
+		int popSize = Gbl.getConfig().planomat().getPopSize();
 		// put all the parameters in the config file later
 		double planLength = 24.0 * 3600;
 
@@ -152,10 +150,9 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 			jgapConfiguration.setSampleChromosome( sampleChromosome );
 
 			// initialize scoring function
-			CharyparNagelScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory();
-			CharyparNagelScoringFunction sf = (CharyparNagelScoringFunction) sfFactory.getNewScoringFunction(plan);
-
-			CharyparNagelFitnessFunction fitnessFunction = new CharyparNagelFitnessFunction( sf, plan, estimator );
+			ScoringFunction sf = Gbl.getConfig().planomat().getScoringFunctionFactory().getNewScoringFunction(plan);
+			
+			PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( sf, plan, estimator );
 			jgapConfiguration.setFitnessFunction( fitnessFunction );
 
 			// elitist selection (DeJong, 1975)
@@ -178,7 +175,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 	private static IChromosome evolveAndReturnFittest(final Genotype population) {
 
 		double travelPenalty = Math.abs(Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling"))) / 3600;
-		double minDiff = travelPenalty * PlanomatConfig.getIndifference();
+		double minDiff = travelPenalty * Gbl.getConfig().planomat().getIndifference();
 //		System.out.println(minDiff);
 
 		IChromosome fittest = null;
@@ -186,7 +183,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 		boolean cancelEvolution = false;
 		int generation = 0;
 
-		int maxNumGenerations = PlanomatConfig.getJgapMaxGenerations();
+		int maxNumGenerations = Gbl.getConfig().planomat().getJgapMaxGenerations();
 		int percentEvolution = maxNumGenerations / 10;
 
 		while (cancelEvolution == false) {
@@ -199,7 +196,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 				oldmax = fittest.getFitnessValue();
 			} else if ((generation > 0) && (generation % percentEvolution == 0)) {
 				max = fittest.getFitnessValue();
-				if (PlanomatConfig.isBeVerbose()) {
+				if (Gbl.getConfig().planomat().isBeVerbose()) {
 					avg = PlanOptimizeTimes.getAverageFitness(population);
 					System.out.println(" [Planomat] Generation " + generation + ":\t" + avg + "\t" + max);
 				}
@@ -217,7 +214,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 		}
 
 		fittest = population.getFittestChromosome();
-		if (PlanomatConfig.isBeVerbose()) {
+		if (Gbl.getConfig().planomat().isBeVerbose()) {
 			double fitness = fittest.getFitnessValue();
 			System.out.println("Currently fittest Chromosome has fitness " + fitness);
 		}

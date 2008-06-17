@@ -21,7 +21,6 @@
 package org.matsim.replanning.modules;
 
 import org.matsim.planomat.PlanOptimizeTimes;
-import org.matsim.planomat.PlanomatConfig;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 
@@ -37,7 +36,7 @@ public class PlanomatOptimizeTimes extends MultithreadedModuleA {
 
 	public PlanomatOptimizeTimes(final LegTravelTimeEstimator estimator) {
 		this.estimator = estimator;
-		PlanomatConfig.init();
+//		PlanomatConfig.init();
 	}
 
 	@Override

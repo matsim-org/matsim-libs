@@ -129,7 +129,7 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
-				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
+//				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
