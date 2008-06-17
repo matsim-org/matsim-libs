@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountComponents.java
+ * SparseGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,60 +23,49 @@
  */
 package playground.johannes.snowball2;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.utils.io.IOUtils;
-
-import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
-import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
-import edu.uci.ics.jung.graph.Graph;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author illenberger
  *
  */
-public class CountComponents implements GraphStatistic {
-	
-	private WeakComponentClusterer wcc = new WeakComponentClusterer();
-	
-	private ClusterSet cSet;
+public class SparseGraph {
 
-	public double run(Graph g) {
-		cSet = wcc.extract(g);
-		return cSet.size();
-	}
-
-	public ClusterSet getClusterSet() {
-		return cSet;
+	private List<SparseVertex> vertices;
+	
+	private List<SparseEdge> edges;
+	
+	public SparseGraph(int numVertex, int numEdge) {
+		vertices = new ArrayList<SparseVertex>(numVertex);
+		edges = new ArrayList<SparseEdge>(numEdge);
 	}
 	
-	public void dumpComponentSummary(String filename) {
-		if(cSet != null) {
-			Map<Integer, Integer> clusters = new HashMap<Integer, Integer>();
-			for(int i = 0; i < cSet.size(); i++) {
-				int size = cSet.getCluster(i).size();
-				Integer count = clusters.get(size);
-				if(count == null)
-					count = 0;
-				count++;
-				clusters.put(size, count);
-			}
-			
-			try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			for(Integer size : clusters.keySet()) {
-				writer.write(String.valueOf(clusters.get(size)));
-				writer.write(" x size ");
-				writer.write(String.valueOf(size));
-				writer.newLine();
-			}
-			writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+	protected void addVertex(SparseVertex v) {
+		vertices.add(v);
+	}
+	
+	protected void addEdge(SparseVertex v1, SparseVertex v2) {
+		SparseEdge e = newEdge(v1,  v2);
+		v1.addEdge(e);
+		v2.addEdge(e);
+		edges.add(e);
+	}
+	
+	protected SparseVertex newVertex() {
+		return new SparseVertex();
+	}
+	
+	protected SparseEdge newEdge(SparseVertex v1, SparseVertex v2) {
+		return new SparseEdge(v1, v2);
+	}
+	
+	public Collection<SparseVertex> getVertices() {
+		return vertices;
+	}
+	
+	public Collection<SparseEdge> getEdges() {
+		return edges;
 	}
 }

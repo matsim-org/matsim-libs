@@ -55,6 +55,19 @@ public class ExtractBiggestComponent {
 		ClusterSet clusters = wcc.extract(g);
 		logger.info(String.format("Graph has %1$s components.", clusters.size()));
 		clusters.sort();
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("Component summary:\n");
+		for(int i = 0; i < clusters.size(); i++) {
+			Set cluster = clusters.getCluster(i);
+			builder.append("\t");
+			builder.append(String.valueOf(i));
+			builder.append(" : ");
+			builder.append(String.valueOf(cluster.size()));
+			builder.append("\n");
+		}
+		logger.info(builder.toString());
+		
 		Graph g2 = clusters.getClusterAsNewSubGraph(0);
 		
 		logger.info(String.format("Graph has %1$s vertices, %2$s edges, density = %3$s, mean degree = %4$s.",

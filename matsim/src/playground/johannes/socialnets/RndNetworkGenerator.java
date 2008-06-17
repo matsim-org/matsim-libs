@@ -36,14 +36,16 @@ import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 
+import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
 import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
+import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
 import edu.uci.ics.jung.io.GraphMLFile;
-import edu.uci.ics.jung.io.GraphMLFileHandler;
+import edu.uci.ics.jung.utils.Pair;
 
 public class RndNetworkGenerator {
 	
@@ -64,6 +66,7 @@ public class RndNetworkGenerator {
 		logger.info("Creating vertices...");
 		long randomSeed = Gbl.getConfig().global().getRandomSeed();
 		Random rnd = new Random(randomSeed);
+		int type1 = 0;
 		for(Person p : plans.getPersons().values()) {
 			UndirectedSparseVertex v =  new UndirectedSparseVertex();
 			g.addVertex(v);
@@ -71,13 +74,15 @@ public class RndNetworkGenerator {
 			Act act = p.getSelectedPlan().getFirstActivity();
 			v.addUserDatum(UserDataKeys.X_COORD, act.getCoord().getX(), UserDataKeys.COPY_ACT);
 			v.addUserDatum(UserDataKeys.Y_COORD, act.getCoord().getY(), UserDataKeys.COPY_ACT);
-			if(0.5 <= rnd.nextDouble()) {
+			if(0.1 <= rnd.nextDouble()) {
 				v.addUserDatum("type", 1, UserDataKeys.COPY_ACT);
+				type1++;
 			} else {
 				v.addUserDatum("type", 2, UserDataKeys.COPY_ACT);
 			}
 		}
 		logger.info(String.format("Created %1$s vertices.", g.numVertices()));
+		logger.info(String.format("%1$s vertices of type 1, %2$s vertices of type 2.", type1, g.numVertices() - type1));
 		/*
 		 * Insert random ties between persons.
 		 */
@@ -105,12 +110,37 @@ public class RndNetworkGenerator {
 		}
 		
 		logger.info(String.format("Inserted %1$s edges.", g.numEdges()));
+		ClusterSet clusters = new WeakComponentClusterer().extract(g); 
 		logger.info(String.format("Graph has %1$s vertices, %2$s edges, density = %3$s, mean degree = %4$s and %5$s components.",
 				g.numVertices(),
 				g.numEdges(),
 				g.numEdges()/((double)(g.numVertices() * (g.numVertices()-1))),
 				GraphStatistics.createDegreeHistogram(g, -1, -1, 0).getMean(),
-				new WeakComponentClusterer().extract(g).size()));
+				clusters.size()));
+		StringBuilder builder = new StringBuilder();
+		builder.append("Component summary:\n");
+		
+		for(i = 0; i < clusters.size(); i++) {
+			Set cluster = clusters.getCluster(i);
+			builder.append("\t");
+			builder.append(String.valueOf(i));
+			builder.append(" : ");
+			builder.append(String.valueOf(cluster.size()));
+			builder.append("\n");
+		}
+		logger.info(builder.toString());
+		
+		Set<Edge> edges = g.getEdges();
+		int count = 0;
+		for(Edge e : edges) {
+			Pair p = e.getEndpoints();
+			Integer v1 = (Integer)((Vertex)p.getFirst()).getUserDatum("type");
+			Integer v2 = (Integer)((Vertex)p.getSecond()).getUserDatum("type");
+			if(!v1.equals(v2))
+				count++;
+			
+		}
+		logger.info(String.format("%1$s edges of %2$s between vertices of different type.", count, g.numEdges()));
 		return g;
 	}
 	
@@ -133,9 +163,9 @@ public class RndNetworkGenerator {
 		
 		int type1 = (Integer)v1.getUserDatum("type");
 		int type2 = (Integer)v2.getUserDatum("type");
-		double mixing = 1 - Math.abs(type1 - type2);
+		double mixing = 1 - (0.9999 *Math.abs(type1 - type2));
 		
-		return alpha * 1/Math.pow(dist,2) * dSquareSum;
+		return alpha * 1/Math.pow(dist,2) * mixing;
 //		return alpha * 1/dist;
 	}
 	
@@ -194,8 +224,8 @@ public class RndNetworkGenerator {
 		Plans plans = data.getPopulation();
 		Graph g = createGraph(plans, alpha);
 		
-		GraphMLFileHandler gmlHandler = new PersonGraphMLFileHandler();
-		GraphMLFile gmlFile = new GraphMLFile(gmlHandler);
+//		GraphMLFileHandler gmlHandler = new PersonGraphMLFileHandler();
+		GraphMLFile gmlFile = new GraphMLFile();
 		logger.info("Saving social network...");
 		gmlFile.save(g, config.getParam("randomGraphGenerator", "outputFile"));
 		logger.info("Done.");

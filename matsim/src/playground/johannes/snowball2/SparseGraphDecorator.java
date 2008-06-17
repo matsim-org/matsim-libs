@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountComponents.java
+ * SparseGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,60 +23,64 @@
  */
 package playground.johannes.snowball2;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
-import org.matsim.utils.io.IOUtils;
-
-import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
-import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
+import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.utils.Pair;
 
 /**
  * @author illenberger
  *
  */
-public class CountComponents implements GraphStatistic {
-	
-	private WeakComponentClusterer wcc = new WeakComponentClusterer();
-	
-	private ClusterSet cSet;
+public class SparseGraphDecorator {
 
-	public double run(Graph g) {
-		cSet = wcc.extract(g);
-		return cSet.size();
-	}
-
-	public ClusterSet getClusterSet() {
-		return cSet;
-	}
+	private Map<SparseVertex, Vertex> vertexMappings = new LinkedHashMap<SparseVertex, Vertex>();
 	
-	public void dumpComponentSummary(String filename) {
-		if(cSet != null) {
-			Map<Integer, Integer> clusters = new HashMap<Integer, Integer>();
-			for(int i = 0; i < cSet.size(); i++) {
-				int size = cSet.getCluster(i).size();
-				Integer count = clusters.get(size);
-				if(count == null)
-					count = 0;
-				count++;
-				clusters.put(size, count);
-			}
-			
-			try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			for(Integer size : clusters.keySet()) {
-				writer.write(String.valueOf(clusters.get(size)));
-				writer.write(" x size ");
-				writer.write(String.valueOf(size));
-				writer.newLine();
-			}
-			writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	private Map<Vertex, SparseVertex> vertexMappingsReverse = new LinkedHashMap<Vertex, SparseVertex>();
+	
+	private SparseGraph sparseGraph;
+	
+	public SparseGraphDecorator(Graph g) {
+		sparseGraph = newGraph(g.numVertices(), g.numEdges());
+		Set<Vertex> vertices = g.getVertices();
+		for(Vertex v: vertices) {
+			SparseVertex sv = sparseGraph.newVertex();
+			vertexMappings.put(sv, v);
+			vertexMappingsReverse.put(v, sv);
+			sparseGraph.addVertex(sv);
 		}
+		
+		Set<Edge> edges = g.getEdges();
+		for(Edge e : edges) {
+			Pair p = e.getEndpoints();
+			SparseVertex v1 = vertexMappingsReverse.get(p.getFirst());
+			SparseVertex v2 = vertexMappingsReverse.get(p.getSecond());
+			sparseGraph.addEdge(v1, v2);
+		}
+	}
+	
+	public SparseGraph getSparseGraph() {
+		return sparseGraph;
+	}
+	
+	protected SparseGraph newGraph(int numVertex, int numEdges) {
+		return new SparseGraph(numVertex, numEdges);
+	}
+	
+	public Set<SparseVertex> getVertices() {
+		return vertexMappings.keySet();
+	}
+	
+	public SparseVertex getVertex(Vertex v) {
+		return vertexMappingsReverse.get(v);
+	}
+	
+	public Vertex getVertex(SparseVertex v) {
+		return vertexMappings.get(v);
 	}
 }

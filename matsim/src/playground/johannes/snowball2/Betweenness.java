@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountComponents.java
+ * Betweenness.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,60 +23,34 @@
  */
 package playground.johannes.snowball2;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.utils.io.IOUtils;
-
-import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
-import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
+import playground.johannes.snowball.Histogram;
 import edu.uci.ics.jung.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public class CountComponents implements GraphStatistic {
+public class Betweenness implements VertexStatistic {
+
+	private Centrality centrality;
 	
-	private WeakComponentClusterer wcc = new WeakComponentClusterer();
+	public Betweenness(Centrality centrality) {
+		this.centrality = centrality;
+	}
 	
-	private ClusterSet cSet;
+	public Histogram getHistogram() {
+		return centrality.getBetweennessHistogram();
+	}
+
+	public Histogram getHistogram(double min, double max) {
+		return centrality.getBetweennessHistogram(min, max);
+	}
 
 	public double run(Graph g) {
-		cSet = wcc.extract(g);
-		return cSet.size();
+		if(!centrality.didRun())
+			centrality.run(g);
+		
+		return centrality.getGraphBetweenness();
 	}
 
-	public ClusterSet getClusterSet() {
-		return cSet;
-	}
-	
-	public void dumpComponentSummary(String filename) {
-		if(cSet != null) {
-			Map<Integer, Integer> clusters = new HashMap<Integer, Integer>();
-			for(int i = 0; i < cSet.size(); i++) {
-				int size = cSet.getCluster(i).size();
-				Integer count = clusters.get(size);
-				if(count == null)
-					count = 0;
-				count++;
-				clusters.put(size, count);
-			}
-			
-			try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			for(Integer size : clusters.keySet()) {
-				writer.write(String.valueOf(clusters.get(size)));
-				writer.write(" x size ");
-				writer.write(String.valueOf(size));
-				writer.newLine();
-			}
-			writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 }

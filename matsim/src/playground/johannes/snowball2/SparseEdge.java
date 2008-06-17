@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountComponents.java
+ * SparseEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,60 +23,29 @@
  */
 package playground.johannes.snowball2;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.utils.io.IOUtils;
-
-import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
-import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
-import edu.uci.ics.jung.graph.Graph;
-
 /**
  * @author illenberger
  *
  */
-public class CountComponents implements GraphStatistic {
-	
-	private WeakComponentClusterer wcc = new WeakComponentClusterer();
-	
-	private ClusterSet cSet;
+public class SparseEdge {
 
-	public double run(Graph g) {
-		cSet = wcc.extract(g);
-		return cSet.size();
-	}
-
-	public ClusterSet getClusterSet() {
-		return cSet;
+	private SparseVertex[] endPoints = new SparseVertex[2];
+	
+	protected SparseEdge(SparseVertex v1, SparseVertex v2) {
+		endPoints[0] = v1;
+		endPoints[1] = v2;
 	}
 	
-	public void dumpComponentSummary(String filename) {
-		if(cSet != null) {
-			Map<Integer, Integer> clusters = new HashMap<Integer, Integer>();
-			for(int i = 0; i < cSet.size(); i++) {
-				int size = cSet.getCluster(i).size();
-				Integer count = clusters.get(size);
-				if(count == null)
-					count = 0;
-				count++;
-				clusters.put(size, count);
-			}
-			
-			try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			for(Integer size : clusters.keySet()) {
-				writer.write(String.valueOf(clusters.get(size)));
-				writer.write(" x size ");
-				writer.write(String.valueOf(size));
-				writer.newLine();
-			}
-			writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+	public SparseVertex[] getEndPoints() {
+		return endPoints;
+	}
+	
+	public SparseVertex getOpposite(SparseVertex v) {
+		if(v == endPoints[0])
+			return endPoints[1];
+		else if(v == endPoints[1])
+			return endPoints[0];
+		else
+			return null;
 	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountComponents.java
+ * SparseVertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,60 +23,37 @@
  */
 package playground.johannes.snowball2;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.utils.io.IOUtils;
-
-import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
-import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
-import edu.uci.ics.jung.graph.Graph;
-
 /**
  * @author illenberger
  *
  */
-public class CountComponents implements GraphStatistic {
-	
-	private WeakComponentClusterer wcc = new WeakComponentClusterer();
-	
-	private ClusterSet cSet;
+public class SparseVertex {
 
-	public double run(Graph g) {
-		cSet = wcc.extract(g);
-		return cSet.size();
-	}
-
-	public ClusterSet getClusterSet() {
-		return cSet;
-	}
+	private SparseEdge[] edges = new SparseEdge[0];
 	
-	public void dumpComponentSummary(String filename) {
-		if(cSet != null) {
-			Map<Integer, Integer> clusters = new HashMap<Integer, Integer>();
-			for(int i = 0; i < cSet.size(); i++) {
-				int size = cSet.getCluster(i).size();
-				Integer count = clusters.get(size);
-				if(count == null)
-					count = 0;
-				count++;
-				clusters.put(size, count);
-			}
-			
-			try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			for(Integer size : clusters.keySet()) {
-				writer.write(String.valueOf(clusters.get(size)));
-				writer.write(" x size ");
-				writer.write(String.valueOf(size));
-				writer.newLine();
-			}
-			writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	private SparseVertex[] neighbours = new SparseVertex[0];
+	
+	protected void addEdge(SparseEdge e) {
+		SparseEdge[] newEdges = new SparseEdge[edges.length + 1];
+		SparseVertex[] newNeighbours = new SparseVertex[edges.length + 1];
+		
+		for(int i = 0; i < edges.length; i++) {
+			newEdges[i] = edges[i];
+			newNeighbours[i] = neighbours[i];
 		}
+		
+		newEdges[edges.length] = e;
+		newNeighbours[neighbours.length] = e.getOpposite(this);
+		
+		edges = newEdges;
+		neighbours = newNeighbours;	
+	}
+	
+	public SparseEdge[] getEdges() {
+		return edges;
+	}
+	
+	public SparseVertex[] getNeighbours() {
+		return neighbours;
 	}
 }

@@ -80,6 +80,13 @@ public class Sampler {
 		List<Vertex> vertices = new LinkedList<Vertex>(g.getVertices());
 		Collections.shuffle(vertices, rnd);
 		
+//		for(Vertex v : vertices) {
+//			if(v.getUserDatum("type").equals("1")) {
+//				lastSampledVertices = new ArrayList<Vertex>();
+//				lastSampledVertices.add(v);
+//				break;
+//			}
+//		}
 		lastSampledVertices = vertices.subList(0, nSeeds);
 		sampledGraph = new SampledGraph();
 		for(Vertex v : lastSampledVertices) {
@@ -89,6 +96,7 @@ public class Sampler {
 			vSampled.addUserDatum(UserDataKeys.Y_COORD, v.getUserDatum(UserDataKeys.Y_COORD), UserDataKeys.COPY_ACT);
 			sampledGraph.addVertex(vSampled);
 			v.setUserDatum(SAMPLED_ELEMENT_KEY, vSampled, UserDataKeys.COPY_ACT);
+			System.out.println("Type of seed is " + v.getUserDatum("type"));
 		}
 		currentWave = -1;
 	}
@@ -228,20 +236,20 @@ public class Sampler {
 	}
 
 	public void calculateSampleProbas(Graph g, int numVertex1, int numVertex2, int numVertexTotal) {
-		double growth = (numVertex1 - numVertex2)/(double)numVertexTotal;
-		Map<Integer, Double> probas = new HashMap<Integer, Double>();
+//		double growth = (numVertex1 - numVertex2)/(double)numVertexTotal;
+//		Map<Integer, Double> probas = new HashMap<Integer, Double>();
 		
 		Set<Vertex> vertices = g.getVertices();
-		Map<Integer, Integer> degreeOccurence = new HashMap<Integer, Integer>();
-		for(Vertex v : vertices) {
-			Integer count = degreeOccurence.get(v.degree());
-			int cnt = 0;
-			if(count != null)
-				cnt = count;
-			cnt++;
-			degreeOccurence.put(v.degree(), cnt);
-		}
-		verticesPerDegree.add(degreeOccurence);
+//		Map<Integer, Integer> degreeOccurence = new HashMap<Integer, Integer>();
+//		for(Vertex v : vertices) {
+//			Integer count = degreeOccurence.get(v.degree());
+//			int cnt = 0;
+//			if(count != null)
+//				cnt = count;
+//			cnt++;
+//			degreeOccurence.put(v.degree(), cnt);
+//		}
+//		verticesPerDegree.add(degreeOccurence);
 		
 //		for(SampledVertex v : g.getVertices()) {
 //			if(v.getWaveSampled() == 0) {
@@ -260,20 +268,21 @@ public class Sampler {
 				v.setUserDatum(SAMPLE_PROBA, p, UserDataKeys.COPY_ACT);
 				
 			} else {
-				double p_minus1 = (Double)v.getUserDatum(SAMPLE_PROBA);
+//				double p_minus1 = (Double)v.getUserDatum(SAMPLE_PROBA);
 				
-				double p_w = 1 - Math.pow((1 - growth), v.degree());
+				double p_w = 1 - Math.pow((1 - (numVertex1/(double)numVertexTotal)), v.degree());
 				
 				
-				p = p_minus1 + p_w - (p_minus1 * p_w);
-				v.setUserDatum(SAMPLE_PROBA, p, UserDataKeys.COPY_ACT);
+//				p = p_minus1 + p_w - (p_minus1 * p_w);
+				p =p_w;
+				v.setUserDatum(SAMPLE_PROBA, p_w, UserDataKeys.COPY_ACT);
 			}
 			SampledVertex sample = (SampledVertex) v.getUserDatum(SAMPLED_ELEMENT_KEY);
 			if(sample != null) {
 //				if(sample.getWaveSampled() == currentWave)
 					sample.setSampleProbability(p);
 			}
-			probas.put(v.degree(), p);
+//			probas.put(v.degree(), p);
 		}
 //		System.out.println(probas.toString());
 	}

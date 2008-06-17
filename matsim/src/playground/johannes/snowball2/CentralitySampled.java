@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountComponents.java
+ * CentralitySampled.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,60 +23,54 @@
  */
 package playground.johannes.snowball2;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
-import org.matsim.utils.io.IOUtils;
-
-import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
-import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class CountComponents implements GraphStatistic {
-	
-	private WeakComponentClusterer wcc = new WeakComponentClusterer();
-	
-	private ClusterSet cSet;
+public class CentralitySampled extends Centrality {
 
-	public double run(Graph g) {
-		cSet = wcc.extract(g);
-		return cSet.size();
+	@Override
+	public void run(Graph g) {
+		if(g instanceof SampledGraph)
+			super.run(g);
+		else
+			throw new IllegalArgumentException("Graph must be instance of SampledGraph.");
 	}
 
-	public ClusterSet getClusterSet() {
-		return cSet;
-	}
-	
-	public void dumpComponentSummary(String filename) {
-		if(cSet != null) {
-			Map<Integer, Integer> clusters = new HashMap<Integer, Integer>();
-			for(int i = 0; i < cSet.size(); i++) {
-				int size = cSet.getCluster(i).size();
-				Integer count = clusters.get(size);
-				if(count == null)
-					count = 0;
-				count++;
-				clusters.put(size, count);
-			}
-			
-			try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			for(Integer size : clusters.keySet()) {
-				writer.write(String.valueOf(clusters.get(size)));
-				writer.write(" x size ");
-				writer.write(String.valueOf(size));
-				writer.newLine();
-			}
-			writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+	@Override
+	protected void calcBetweenness() {
+		betweennessValues = new LinkedHashMap<Vertex, Double>();
+		graphBetweenness = 0;
+		double norm = (graph.getVertices().size() - 1) * (graph.getVertices().size() - 2) * 0.5; 
+		for(SparseVertex v : graph.getVertices()) {
+			SampledVertex delegate = (SampledVertex) graphDecorator.getVertex(v);
+			if(!delegate.isAnonymous()) {
+				double bc = ((CentralityVertex)v).getBetweenness() / norm;
+				betweennessValues.put(delegate, bc);
+				graphBetweenness += bc;
 			}
 		}
+		
+		graphBetweenness = graphBetweenness/(double)graph.getVertices().size();
 	}
+
+	@Override
+	protected void calcCloseness() {
+		closenessValues = new LinkedHashMap<Vertex, Double>();
+		graphCloseness = 0;
+		for(SparseVertex v : graph.getVertices()) {
+			SampledVertex delegate = (SampledVertex) graphDecorator.getVertex(v);
+			if(!delegate.isAnonymous()) {
+				closenessValues.put(delegate, ((CentralityVertex)v).getCloseness());
+				graphCloseness+= ((CentralityVertex)v).getCloseness();
+			}
+		}
+		graphCloseness = graphCloseness/ (double)graph.getVertices().size();
+	}
+
 }

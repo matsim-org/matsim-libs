@@ -45,6 +45,7 @@ import cern.colt.list.IntArrayList;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.io.GraphMLFile;
+import edu.uci.ics.jung.utils.Pair;
 
 /**
  * @author illenberger
@@ -79,6 +80,8 @@ public class SnowballExe {
 	private static final String CLUSTERING_KEY = "clustering";
 	
 	private static final String BETWEENNESS_KEY = "betweenness";
+	
+	private static final String CLOSENESS_KEY = "closeness";
 	
 	private static final String COMPONENTS_KEY = "components";
 	
@@ -122,6 +125,8 @@ public class SnowballExe {
 		Map<String, GraphStatistic> statistics = new LinkedHashMap<String, GraphStatistic>();
 		Map<String, GraphStatistic> sampleStatistics = new LinkedHashMap<String, GraphStatistic>();
 		
+		Centrality centrality = new Centrality();
+		Centrality centralitySampled = new CentralitySampled();
 		for(String key : statsKeys) {
 			if(ISOLATES_KEY.equalsIgnoreCase(key)) {
 				statistics.put(key, new CountIsolates());
@@ -130,8 +135,11 @@ public class SnowballExe {
 				statistics.put(key, new Degree());
 				sampleStatistics.put(key, new DegreeSampled());
 			} else if(BETWEENNESS_KEY.equalsIgnoreCase(key)) {
-				statistics.put(key, new BetweennessRScript(rExePath, tmpDir));
-				sampleStatistics.put(key, new BetweennessRScript(rExePath, tmpDir));
+				statistics.put(key, new Betweenness(centrality));
+				sampleStatistics.put(key, new Betweenness(centralitySampled));
+			} else if(CLOSENESS_KEY.equalsIgnoreCase(key)) {
+				statistics.put(key, new Closeness(centrality));
+				sampleStatistics.put(key, new Closeness(centralitySampled));
 			} else if(CLUSTERING_KEY.equalsIgnoreCase(key)) {
 				statistics.put(key, new Clustering());
 				sampleStatistics.put(key, new ClusteringSampled());
@@ -213,6 +221,9 @@ public class SnowballExe {
 			}
 			lastNumSampledVertices2 = lastNumSampledVertices;
 			lastNumSampledVertices = numSampledVertices;
+			
+			centrality.reset();
+			centralitySampled.reset();
 		}
 		meanWriter.close();
 		logger.info("Making coverage chart...");
@@ -227,6 +238,7 @@ public class SnowballExe {
 	private Map<String, Double> computeStatistics(Graph g, Map<String, GraphStatistic> statistics, Map<String, double[]> references, int iteration) {
 		Map<String, Double> meanValues = new LinkedHashMap<String, Double>();
 		for(String key : statistics.keySet()) {
+			logger.info(String.format("Calculating statistics... %1$s.", key));
 			GraphStatistic s = statistics.get(key);
 			meanValues.put(key, s.run(g));
 		}
@@ -255,6 +267,9 @@ public class SnowballExe {
 				}
 				
 				meanValues.put(key + "_gamma", calcGammaExponent(hist));
+			}
+			if(s instanceof CountComponents) {
+				((CountComponents)s).dumpComponentSummary(String.format("%1$s%2$s/%3$s%4$s.txt", outputDir, key, iteration, key));
 			}
 		}
 		
@@ -329,9 +344,11 @@ public class SnowballExe {
 			for(Integer k : curves.keySet()) {
 				sums.put(k, 0);
 			}
-			for(int i = 0; i< numWaves; i++) {
+			for(int i = 0; i<= numWaves; i++) {
 				writer.write(String.valueOf(i));
 				for(Integer k : curves.keySet()) {
+					if(k == 1)
+						System.out.println();
 					writer.write("\t");
 					int count = curves.get(k).get(i);
 					int sum = count + sums.get(k);
@@ -343,6 +360,9 @@ public class SnowballExe {
 			}
 			writer.close();
 			
+			/*
+			 * ============================================================================
+			 */
 			
 			writer = IOUtils.getBufferedWriter(outputDir + "coverage.analytical.txt");
 			writer.write("it");
@@ -358,38 +378,85 @@ public class SnowballExe {
 					numVPerWaveAccum[i] += numVPerWave.get(k);
 			}
 			Map<Integer, Double> probasPerWaveAccum = new HashMap<Integer, Double>();
-			Map<Integer, Integer> numVPerDegreeCatAccum = new HashMap<Integer, Integer>();
+//			Map<Integer, Integer> numVPerDegreeCatAccum = new HashMap<Integer, Integer>();
 			
-			for(int i = 0; i< numWaves; i++) {
+			List<int[]> numNeighboursPerDegreeWave = new ArrayList<int[]>();
+			for(int i = 0; i<= numWaves; i++) {
 				writer.write(String.valueOf(i));
-
+//				Map<Integer, Integer> neighbourPorbas = getNeighbourProba(sample, i);
+//				int[][] correlationMatrix = getCorrelationMatrix(sample, numVPerDegree, i);
+				
+				int[] numVerticesPerDegree = getNumVertexPerDegree(sample, i+1);
+				int[][] degreeCorrelation = getDegreeCorrelation(sample, i+1, numVPerDegree.size()- 1);
+				int[] numNeighboursPerDegree = getNeighboursPerDegree(degreeCorrelation);
+				numNeighboursPerDegreeWave.add(numNeighboursPerDegree);
+				
 				for(Integer k : curves.keySet()) {
 					if(i == 0) {
 						writer.write("\t");
 						double p = numSeeds/(double)numTotalV;
 						writer.write(String.valueOf(p));
 						probasPerWaveAccum.put(k, p);
+//					} else if(i == 1 || i ==2) {
+//						writer.write("\t");
+////						double p = 1 - Math.pow(1 - numSeeds/(double)numTotalV, k);
+//						double p = 1 - Math.pow(1 - (numVPerWaveAccum[i-1]/(double)numTotalV), k);
+//						
+//						double p_minus1 = (Double)probasPerWaveAccum.get(k);
+//						double p_accum = p + p_minus1 - (p * p_minus1);
+//						probasPerWaveAccum.put(k, p_accum);
+//						writer.write(String.valueOf(p_accum));
 					} else {
-//						double p = 1 - Math.pow(1 - (sampleSums[i-1]/(double)totalVertices), k);
+						/*
+						 * Original form ===================================================================
+						 */
+						double p = 1 - Math.pow(1 - (numVPerWaveAccum[i-1]/(double)numTotalV), k);
 
-						double product = 1;
-						for(Integer k_cat : numVPerDegreeCatAccum.keySet()) {
-							int numVPerK_cat = numVPerDegreeCatAccum.get(k_cat);
-							double base = 1 - (numVPerK_cat/(double)numTotalV);
-							double exp = (numVPerK_cat / (double)numVPerWaveAccum[i-1]) * k; 
-							product *= Math.pow(base, exp);
-						}
-						double p = 1 - product;
-						
+						/*
+						 * Degree categorization ===================================================================
+						 */
+//						double product = 1;
+//						for(Integer k_cat : numVPerDegreeCatAccum.keySet()) {
+//							int numVPerK_cat = numVPerDegreeCatAccum.get(k_cat);
+//							double base = 1 - (numVPerK_cat/(double)numTotalV);
+//							double exp = (numVPerK_cat / (double)numVPerWaveAccum[i-1]) * k;
+////							double exp = correlationMatrix[k][k_cat] ;
+//							product *= Math.pow(base, exp);
+//						}
+//						double p = 1 - product;
+					
+						/*
+						 * Neighbour proba ===================================================================
+						 */
+//						if(k==6 && i ==3)
+//							System.out.print(true);
+//						double p = 0;
+//						int numNeighbours = numNeighboursPerDegree[k];
+//						if (numNeighbours > 0) {
+//							double sum = numNeighboursPerDegree[k];
+//							for (int k2 = 0; k2 < numVerticesPerDegree.length; k2++) {
+////								int numVertexPerDegree = numVerticesPerDegree[k2];
+//								int numVertexNeighbours = degreeCorrelation[k2][k];
+////								sum += numVertexPerDegree * numVertexNeighbours;
+//								sum += numVertexNeighbours;
+//							}
+//							p = 1 - Math.pow(1 - (sum / (double)(numTotalV * numNeighbours)), k);
+//							p = 1 - Math.pow(1 - (sum / (double)(numTotalV)), k);
+//							p = 1 - Math.pow(1 - ((numNeighboursPerDegreeWave.get(i-1)[k]/(double)numTotalV) / (numNeighboursPerDegree[k]/(double)numVPerWaveAccum[i])), k);
+//						}
+						/*
+						 * accumulate
+						 */
 						double p_minus1 = (Double)probasPerWaveAccum.get(k);
 						double p_accum = p + p_minus1 - (p * p_minus1);
 						probasPerWaveAccum.put(k, p_accum);
 						
 						writer.write("\t");
-						writer.write(String.valueOf(p_accum));
+//						writer.write(String.valueOf(p_accum));
+						writer.write(String.valueOf(p));
 					}
 				}
-				numVPerDegreeCatAccum = countSamplesPerDegree(sample, i, numVPerDegreeCatAccum);
+//				numVPerDegreeCatAccum = countSamplesPerDegree(sample, i, numVPerDegreeCatAccum);
 				writer.newLine();
 			}
 			writer.close();
@@ -424,5 +491,137 @@ public class SnowballExe {
 			degrees.add(((Vertex)v2).degree());
 		}
 		return degrees;
+	}
+	
+	private int[][] getCorrelationMatrix(SampledGraph graph, IntArrayList numVPerDegree, int wave) {
+		int dim = numVPerDegree.size();
+		int[][] numNeighbours = new int[dim][dim];
+		
+		Set<SampledVertex> vertices = graph.getVertices();
+		for(SampledVertex v : vertices) {
+			if(!v.isAnonymous() && v.getWaveSampled() < wave) {
+				Set<SampledVertex> neighbours = v.getNeighbors();
+				for(SampledVertex v2 : neighbours) {
+					if(!v2.isAnonymous() && v2.getWaveSampled() < wave) {
+						numNeighbours[v.degree()][v2.degree()]++;
+					}
+				}
+			}
+		}
+		
+//		double[][] correlationMatrix = new double[dim][dim];
+//		for(int i = 0; i < dim; i++) {
+//			for(int k = 0; k < dim; k++) {
+////				double num_k = (double)numVPerDegree.get(k);
+//				double num_i = (double)numVPerDegree.get(i);
+//				if(num_i != 0)
+////					correlationMatrix[i][k] = (numNeighbours[i][k] /num_k) / num_i;
+//					correlationMatrix[i][k] = (numNeighbours[i][k] /num_i);
+//				else
+//					correlationMatrix[i][k] = 0;
+//			}
+//		}
+//		
+//		return correlationMatrix;
+		return numNeighbours;
+	}
+	
+	private Map<Integer, Integer> getNeighbourProba(SampledGraph graph, int wave) {
+		Map<Integer, Integer> neighboursPerDegree = new HashMap<Integer, Integer>();
+		
+		Set<SampledVertex> vertices = graph.getVertices();
+		int numVertices = 0;
+		for(SampledVertex v : vertices) {
+			if(!v.isAnonymous() && v.getWaveSampled() < wave) {
+				numVertices++;
+				Set<SampledVertex> neighbours = v.getNeighbors();
+				for(SampledVertex v2 : neighbours) {
+					if(!v2.isAnonymous() && v2.getWaveSampled() < wave) {
+						Integer count = neighboursPerDegree.get(v2.degree());
+						int cnt = 0;
+						if(count != null)
+							cnt = count;
+						cnt++;
+						neighboursPerDegree.put(v2.degree(), cnt);
+					}
+				}
+			}
+		}
+		
+//		Map<Integer, Double> neighbourProbas = new HashMap<Integer, Double>();
+//		for(Integer k : neighboursPerDegree.keySet()) {
+//			Integer count = neighboursPerDegree.get(k);
+//			double proba = count / (double)numVertices;
+//			neighbourProbas.put(k, proba);
+//		}
+//		
+//		return neighbourProbas;
+		return neighboursPerDegree;
+	}
+	
+	private int[] getNumVertexPerDegree(SampledGraph g, int wave) {
+		IntArrayList verticesPerDegree = new IntArrayList();
+		Set<SampledVertex> vertices = g.getVertices();
+		for(SampledVertex v : vertices) {
+			if(v.getWaveSampled() < wave && !v.isAnonymous()) {
+				int idx = v.degree();
+				if(verticesPerDegree.size() <= idx)
+					verticesPerDegree.setSize(idx+1);
+				int count =	verticesPerDegree.get(idx);
+				count++;
+				verticesPerDegree.set(idx, count);
+			}
+		}
+		
+		int[] counts = new int[verticesPerDegree.size()];
+		for(int i = 0; i < verticesPerDegree.size(); i++) {
+			counts[i] = verticesPerDegree.get(i);
+		}
+		return counts;
+	}
+	
+	private int[][] getDegreeCorrelation(SampledGraph g, int wave, int maxDegree) {
+		int[][] numVertices = new int[maxDegree + 1][maxDegree + 1];
+		Set<SampledVertex> vertices = g.getVertices();
+		for (SampledVertex v1 : vertices) {
+			
+			if (v1.getWaveSampled() < wave && !v1.isAnonymous()) {
+				Set<SampledVertex> neighbours = v1.getNeighbors();
+				Set<Integer> degreesFound = new HashSet<Integer>();
+				
+				for (SampledVertex v2 : neighbours) {
+					if(v2.getWaveSampled() < wave && !v2.isAnonymous()) {
+						degreesFound.add(v2.degree());
+					}
+				}
+				
+				for(Integer k : degreesFound) {
+					numVertices[v1.degree()][k]++;
+				}
+			}
+		}
+//		for(SampledEdge e : g.getEdges()) {
+//			Pair p = e.getEndpoints();
+//			SampledVertex v1 = (SampledVertex) p.getFirst();
+//			SampledVertex v2 = (SampledVertex) p.getSecond();
+//			if(v1.getWaveSampled() < wave && !v1.isAnonymous() && v2.getWaveSampled() < wave && !v2.isAnonymous()) {
+//				numVertices[v1.degree()][v2.degree()]++;
+//				numVertices[v2.degree()][v1.degree()]++;
+//			}
+//		}
+		
+		return numVertices;
+	}
+	
+	private int[] getNeighboursPerDegree(int[][] degreeCorrelation) {
+		int[] numVertices = new int[degreeCorrelation.length];
+		for(int k = 0; k < degreeCorrelation.length; k++) {
+			int sum = 0;
+			for(int i = 0; i < degreeCorrelation.length; i++)
+				sum += degreeCorrelation[i][k];
+			numVertices[k] = sum;
+		}
+		
+		return numVertices;
 	}
 }
