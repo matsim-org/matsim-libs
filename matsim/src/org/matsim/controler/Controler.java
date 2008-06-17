@@ -79,7 +79,6 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.Simulation;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.planomat.PlanomatConfig;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -380,7 +379,7 @@ public class Controler {
 		this.writeEvents = this.externalMobsim == null; // do not write events when using an external mobsim
 
 		this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
-
+		
 		this.strategyManager = loadStrategyManager();
 	}
 
@@ -404,7 +403,7 @@ public class Controler {
 		/* it would be nice to load the estimator via reflection,
 		 * but if we just use make instead of Eclipse (as usual on a remote server)
 		 * only classes occurring in the code are compiled, so we do it the classic way. */
-		String estimatorName = PlanomatConfig.getLegTravelTimeEstimatorName();
+		String estimatorName = Gbl.getConfig().planomat().getLegTravelTimeEstimatorName();
 		if (estimatorName == null) {
 			return null;
 		}

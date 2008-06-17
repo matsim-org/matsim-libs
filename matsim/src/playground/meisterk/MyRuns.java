@@ -57,11 +57,10 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
-import org.matsim.planomat.PlanomatConfig;
+import org.matsim.planomat.PlanomatFitnessFunctionWrapper;
 import org.matsim.planomat.PlanomatStrategyManagerConfigLoader;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.CharyparNagelFitnessFunction;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator;
@@ -875,7 +874,7 @@ public class MyRuns {
 		System.out.println();
 
 		// optimization method
-		String optimizationToolboxName = Gbl.getConfig().getParam(PlanomatConfig.PLANOMAT, PlanomatConfig.PLANOMAT_OPTIMIZATION_TOOLBOX);
+		String optimizationToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
 
 		if (optimizationToolboxName.equals("jgap")) {
 			System.out.println("    Using JGAP optimization toolbox.");
@@ -970,14 +969,14 @@ public class MyRuns {
 
 		TravelTimeI linkTravelTimeEstimator = null;
 
-		String travelTimeIName = Gbl.getConfig().getParam(PlanomatConfig.PLANOMAT, PlanomatConfig.PLANOMAT_LINK_TRAVEL_TIME_ESTIMATOR);
-		if (travelTimeIName.equalsIgnoreCase("org.matsim.demandmodeling.events.algorithms.TravelTimeCalculator")) {
-			linkTravelTimeEstimator = new TravelTimeCalculatorArray(network);
-		} else if (travelTimeIName.equalsIgnoreCase("org.matsim.playground.meisterk.planomat.LinearInterpolatingTTCalculator")) {
-			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
-		} else {
-			Gbl.errorMsg("Invalid name of implementation of TravelTimeI: " + travelTimeIName);
-		}
+//		String travelTimeIName = Gbl.getConfig().planomat().getLinkTravelTimeEstimatorName();
+//		if (travelTimeIName.equalsIgnoreCase("org.matsim.demandmodeling.events.algorithms.TravelTimeCalculator")) {
+//			linkTravelTimeEstimator = new TravelTimeCalculatorArray(network);
+//		} else if (travelTimeIName.equalsIgnoreCase("org.matsim.playground.meisterk.planomat.LinearInterpolatingTTCalculator")) {
+//			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
+//		} else {
+//			Gbl.errorMsg("Invalid name of implementation of TravelTimeI: " + travelTimeIName);
+//		}
 
 		return linkTravelTimeEstimator;
 
@@ -993,7 +992,7 @@ public class MyRuns {
 		// but if we just use make instead of Eclipse (as usual on a remote server)
 		// only classes occuring in the code are compiled,
 		// so we do it without reflection
-		String estimatorName = Gbl.getConfig().getParam(PlanomatConfig.PLANOMAT, PlanomatConfig.PLANOMAT_LEG_TRAVEL_TIME_ESTIMATOR);
+		String estimatorName = Gbl.getConfig().planomat().getLegTravelTimeEstimatorName();
 		if (estimatorName.equalsIgnoreCase("MyRecentEventsBasedEstimator")) {
 			estimator = new MyRecentEventsBasedEstimator();
 			events.addHandler((EventHandlerI) estimator);
@@ -1068,8 +1067,8 @@ public class MyRuns {
 		//   use fixed default mutation rate from Herrera Et Al, later use a variable mutation rate
 		int mutationRate = 20; // 1/0.005
 		//   use population size of 50 as in previous planomat implentation
-		int popSize = Integer.parseInt(Gbl.getConfig().getParam(PlanomatConfig.PLANOMAT, PlanomatConfig.PLANOMAT_POPSIZE));
-		int numEvolutions = Integer.parseInt(Gbl.getConfig().getParam(PlanomatConfig.PLANOMAT, PlanomatConfig.PLANOMAT_JGAP_MAX_GENERATIONS));
+		int popSize = Gbl.getConfig().planomat().getPopSize();
+		int numEvolutions = Gbl.getConfig().planomat().getJgapMaxGenerations();
 		int percentEvolution = numEvolutions / 10;
 
 		Configuration jgapConfiguration = null;
@@ -1124,7 +1123,7 @@ public class MyRuns {
 				CharyparNagelScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory();
 				CharyparNagelScoringFunction sf = (CharyparNagelScoringFunction) sfFactory.getNewScoringFunction(plan);
 
-				CharyparNagelFitnessFunction fitFunc = new CharyparNagelFitnessFunction( sf, plan, ltte );
+				PlanomatFitnessFunctionWrapper fitFunc = new PlanomatFitnessFunctionWrapper( sf, plan, ltte );
 
 				jgapConfiguration.setFitnessFunction( fitFunc );
 
