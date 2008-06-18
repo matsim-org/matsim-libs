@@ -36,12 +36,14 @@ import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
+import org.matsim.basic.v01.BasicPlan.Type;
 import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.plans.algorithms.PlanMutateTimeAllocation;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
@@ -71,16 +73,25 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 
 	public void run(final Plan plan) {
 
-		// distinguish for optimization tools
-		String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
-		if (optiToolboxName.equals("jgap")) {
+		// mode differentiation is short-term solution for Portland TRB Conference paper
+		if (!plan.getType().equals(Type.PT)) {
+			// only optimize non-public transport plans
+			
+			// distinguish for optimization tools
+			String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
+			if (optiToolboxName.equals("jgap")) {
 
-			Genotype initialGAPopulation = PlanOptimizeTimes.initJGAP(plan, this.legTravelTimeEstimator);
-			IChromosome fittest = PlanOptimizeTimes.evolveAndReturnFittest(initialGAPopulation);
-			PlanOptimizeTimes.writeChromosome2Plan(fittest, plan, this.legTravelTimeEstimator);
+				Genotype initialGAPopulation = PlanOptimizeTimes.initJGAP(plan, this.legTravelTimeEstimator);
+				IChromosome fittest = PlanOptimizeTimes.evolveAndReturnFittest(initialGAPopulation);
+				PlanOptimizeTimes.writeChromosome2Plan(fittest, plan, this.legTravelTimeEstimator);
 
+			}
+		} else {
+			// for public transport, apply the time allocation mutator
+			PlanMutateTimeAllocation tam = new PlanMutateTimeAllocation(1800);
+			tam.run(plan);
+			
 		}
-
 	}
 
 	/**
@@ -151,7 +162,7 @@ public class PlanOptimizeTimes implements PlanAlgorithmI {
 
 			// initialize scoring function
 			ScoringFunction sf = Gbl.getConfig().planomat().getScoringFunctionFactory().getNewScoringFunction(plan);
-			
+
 			PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( sf, plan, estimator );
 			jgapConfiguration.setFitnessFunction( fitnessFunction );
 
