@@ -55,7 +55,7 @@ public class UnweightedDijkstra {
 		this.g = new DijkstraGraph(centralityGraph);
 	}
 	
-	public void run(CentralityVertex v) {
+	public List<CentralityVertex> run(CentralityVertex v) {
 		DijkstraVertex source = g.getVertex(v); 
 		unsettledVertices = new PriorityQueue<DijkstraVertex>(g.getVertices().size());
 		for(SparseVertex dv : g.getVertices())
@@ -93,22 +93,28 @@ public class UnweightedDijkstra {
 		
 		int numVertex = 0;
 		int numPathsTotal = 0;
-		for(SparseVertex target : g.getVertices()) {
-			if(target != source) {
-				List<DijkstraVertex> vertexSet = new LinkedList<DijkstraVertex>();//(g.getVertices().size()*10);
+		List<CentralityVertex> reachedVertices = new LinkedList<CentralityVertex>();
+		for (SparseVertex target : g.getVertices()) {
+			if (target != source) {
+				List<DijkstraVertex> vertexSet = new LinkedList<DijkstraVertex>();// (g.getVertices().size()*10);
 				int[] paths = getPaths((DijkstraVertex) target, vertexSet);
-				vertexSet.remove(0);
-				
-				numPathsTotal++;				
-				numVertex += paths[1];
+				if (!vertexSet.isEmpty()) {
+					vertexSet.remove(0);
+					reachedVertices.add(((DijkstraVertex)target).getDelegate());
 
-				for(DijkstraVertex node : vertexSet) {
-					node.getDelegate().addBetweenness(1 / (double)paths[0]);
+					numPathsTotal++;
+					numVertex += paths[1];
+
+					for (DijkstraVertex node : vertexSet) {
+						node.getDelegate().addBetweenness(1 / (double) paths[0]);
+					}
 				}
 			}
 		}
 		
 		v.setCloseness(numVertex / (double)numPathsTotal);
+		
+		return reachedVertices;
 	}
 	
 	private int[] getPaths(DijkstraVertex target, Collection<DijkstraVertex> vertexSet) {

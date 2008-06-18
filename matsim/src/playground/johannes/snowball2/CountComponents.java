@@ -25,13 +25,19 @@ package playground.johannes.snowball2;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import org.matsim.utils.io.IOUtils;
 
-import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
-import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
+import playground.johannes.snowball2.Centrality.CentralityGraph;
+import playground.johannes.snowball2.Centrality.CentralityGraphDecorator;
+import playground.johannes.snowball2.Centrality.CentralityVertex;
 import edu.uci.ics.jung.graph.Graph;
 
 /**
@@ -40,24 +46,33 @@ import edu.uci.ics.jung.graph.Graph;
  */
 public class CountComponents implements GraphStatistic {
 	
-	private WeakComponentClusterer wcc = new WeakComponentClusterer();
-	
-	private ClusterSet cSet;
+	private Collection<Collection<CentralityVertex>> cSet;
 
 	public double run(Graph g) {
-		cSet = wcc.extract(g);
+		cSet = new HashSet<Collection<CentralityVertex>>();
+		CentralityGraphDecorator graphDecorator = new CentralityGraphDecorator(g);
+		UnweightedDijkstra dijkstra = new UnweightedDijkstra((CentralityGraph) graphDecorator.getSparseGraph());
+		Queue<CentralityVertex> vertices = new LinkedList<CentralityVertex>((Collection<? extends CentralityVertex>) graphDecorator.getSparseGraph().getVertices());
+		CentralityVertex source;
+		while((source = vertices.poll()) != null) {
+			List<CentralityVertex> reached = dijkstra.run(source);
+			reached.add(source);
+			cSet.add(reached);
+			vertices.removeAll(reached);
+		}
+		
 		return cSet.size();
 	}
 
-	public ClusterSet getClusterSet() {
+	public Collection<Collection<CentralityVertex>> getClusterSet() {
 		return cSet;
 	}
 	
 	public void dumpComponentSummary(String filename) {
 		if(cSet != null) {
 			Map<Integer, Integer> clusters = new HashMap<Integer, Integer>();
-			for(int i = 0; i < cSet.size(); i++) {
-				int size = cSet.getCluster(i).size();
+			for(Collection<CentralityVertex> cluster : cSet) {
+				int size = cluster.size();
 				Integer count = clusters.get(size);
 				if(count == null)
 					count = 0;

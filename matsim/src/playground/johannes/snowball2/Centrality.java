@@ -66,6 +66,7 @@ public class Centrality {
 		int numThreads = Runtime.getRuntime().availableProcessors();
 		List<DijkstraThread> threads = new ArrayList<DijkstraThread>(numThreads);
 		
+		DijkstraThread.count = 0;
 		for(int i = 0; i < numThreads; i++) {
 			threads.add(new DijkstraThread(graph, vertices));
 		}
