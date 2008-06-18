@@ -6,12 +6,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
 
-import playground.meisterk.portland.scoring.PortlandScoringFunctionFactory;
-
 public class PlanomatConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "planomat";
-	
+
 	public static final String SCORING_FUNCTION = "scoringFunction";
 	public static final String LEG_TRAVEL_TIME_ESTIMATOR = "legTravelTimeEstimator";
 //	public static final String LINK_TRAVEL_TIME_ESTIMATOR = "linkTravelTimeEstimator";
@@ -24,7 +22,7 @@ public class PlanomatConfigGroup extends Module {
 	public static final String CHARYPAR_NAGEL_SCORING_FUNCTION = "CharyparNagel";
 	public static final String PORTLAND_SCORING_FUNCTION = "Portland";
 	public static final String OPTIMIZATION_TOOLBOX_JGAP = "jgap";
-	
+
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 	private String legTravelTimeEstimatorName = null;
 //	private String linkTravelTimeEstimatorName = null;
@@ -41,17 +39,18 @@ public class PlanomatConfigGroup extends Module {
 	}
 
 	@Override
-	public void addParam(String param_name, String value) {
+	public void addParam(final String param_name, final String value) {
 		if (SCORING_FUNCTION.equals(param_name)) {
 
 			if (CHARYPAR_NAGEL_SCORING_FUNCTION.equals(value)) {
 				this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 			} else if (PORTLAND_SCORING_FUNCTION.equals(value)) {
-				this.scoringFunctionFactory = new PortlandScoringFunctionFactory();
+				Gbl.errorMsg("used a class from a playground. Disabled. mrieser/18jun2008");
+				// this.scoringFunctionFactory = new PortlandScoringFunctionFactory();
 			} else {
 				Gbl.errorMsg("Unknown scoring function identifier. Aborting...");
 			}
-			
+
 		} else if (LEG_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
 			this.setLegTravelTimeEstimatorName(value);
 //		} else if (LINK_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
@@ -72,14 +71,14 @@ public class PlanomatConfigGroup extends Module {
 			this.setBeVerbose(Boolean.parseBoolean(value));
 		}
 	}
-	
+
 	// getters/setters
 
 	public String getLegTravelTimeEstimatorName() {
-		return legTravelTimeEstimatorName;
+		return this.legTravelTimeEstimatorName;
 	}
 
-	public void setLegTravelTimeEstimatorName(String legTravelTimeEstimatorName) {
+	public void setLegTravelTimeEstimatorName(final String legTravelTimeEstimatorName) {
 		this.legTravelTimeEstimatorName = legTravelTimeEstimatorName;
 	}
 
@@ -92,52 +91,52 @@ public class PlanomatConfigGroup extends Module {
 //	}
 
 	public int getJgapMaxGenerations() {
-		return jgapMaxGenerations;
+		return this.jgapMaxGenerations;
 	}
 
-	public void setJgapMaxGenerations(int jgapMaxGenerations) {
+	public void setJgapMaxGenerations(final int jgapMaxGenerations) {
 		this.jgapMaxGenerations = jgapMaxGenerations;
 	}
 
 	public String getOptimizationToolbox() {
-		return optimizationToolbox;
+		return this.optimizationToolbox;
 	}
 
-	public void setOptimizationToolbox(String optimizationToolbox) {
+	public void setOptimizationToolbox(final String optimizationToolbox) {
 		this.optimizationToolbox = optimizationToolbox;
 	}
 
 	public double getIndifference() {
-		return indifference;
+		return this.indifference;
 	}
 
-	public void setIndifference(double indifference) {
+	public void setIndifference(final double indifference) {
 		this.indifference = indifference;
 	}
 
 	public int getPopSize() {
-		return popSize;
+		return this.popSize;
 	}
 
-	public void setPopSize(int popSize) {
+	public void setPopSize(final int popSize) {
 		this.popSize = popSize;
 	}
 
 	public boolean isBeVerbose() {
-		return beVerbose;
+		return this.beVerbose;
 	}
 
-	public void setBeVerbose(boolean beVerbose) {
+	public void setBeVerbose(final boolean beVerbose) {
 		this.beVerbose = beVerbose;
 	}
 
 	public ScoringFunctionFactory getScoringFunctionFactory() {
-		return scoringFunctionFactory;
+		return this.scoringFunctionFactory;
 	}
 
 	public void setScoringFunctionFactory(
-			ScoringFunctionFactory scoringFunctionFactory) {
+			final ScoringFunctionFactory scoringFunctionFactory) {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
-	
+
 }
