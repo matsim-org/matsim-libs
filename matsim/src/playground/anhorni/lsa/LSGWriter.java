@@ -69,6 +69,8 @@ public class LSGWriter {
 
 	private void writeLSG() {
 
+		List<Id> lsanodes=new Vector<Id>();
+
 		try {
 			System.out.println("writing LSG");
 			BufferedWriter out =IOUtils.getBufferedWriter("./output/LSG.txt");
@@ -78,7 +80,8 @@ public class LSGWriter {
 			Iterator<? extends Link> l_it = this.network.getLinks().values().iterator();
 			while (l_it.hasNext()) {
 				Link link = l_it.next();
-				if (this.lsalinks.contains(link.getId())) {
+				if (this.lsalinks.contains(link.getId()) && !lsanodes.contains(link.getToNode().getId())) {
+					lsanodes.add(link.getToNode().getId());
 					out.write(counter +"\t" + link.getToNode().getId().toString() + "\n");
 					counter++;
 				}
