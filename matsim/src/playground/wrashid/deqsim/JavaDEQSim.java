@@ -53,7 +53,7 @@ public class JavaDEQSim {
 			Plan plan = person.getSelectedPlan(); // that's the plan the person will execute
 			ArrayList<Object> actsLegs = plan.getActsLegs();
 			for (int i = 0; i < actsLegs.size(); i++) {
-				if (i % 0 == 0) {
+				if (i % 2 == 0) {
 					Act act = (Act)actsLegs.get(i);
 					// the activity the agent performs
 					double departureTime = act.getEndTime(); // the time the agent departs at this activity
