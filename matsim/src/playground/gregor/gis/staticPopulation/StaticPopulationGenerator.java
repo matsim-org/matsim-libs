@@ -23,7 +23,6 @@ package playground.gregor.gis.staticPopulation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
@@ -39,15 +38,12 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
-import org.matsim.plans.PlansWriterHandlerImplV4;
 import org.matsim.utils.collections.QuadTree;
 
-import playground.gregor.gis.networkProcessing.NetworkGenerator;
 import playground.gregor.gis.utils.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -55,37 +51,37 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class StaticPopulationGenerator {
 	private static final Logger log = Logger.getLogger(StaticPopulationGenerator.class);
-	private NetworkLayer network;
-	private Collection<Feature> zones;
-	private QuadTree<Link> linksTree;
-	private GeometryFactory geofac;
+	private final NetworkLayer network;
+	private final Collection<Feature> zones;
+	private final QuadTree<Link> linksTree;
+	private final GeometryFactory geofac;
 	
-	public StaticPopulationGenerator(NetworkLayer network,
-			Collection<Feature> zones) {
+	public StaticPopulationGenerator(final NetworkLayer network,
+			final Collection<Feature> zones) {
 		this.network = network;
 		this.zones = zones;
 		this.geofac  = new GeometryFactory();
 		this.linksTree = new QuadTree<Link>(646000,9800000,674000,9999000);
-		for (Link link : network.getLinks().values()) {
+		for (final Link link : network.getLinks().values()) {
 			this.linksTree.put(link.getCenter().getX(), link.getCenter().getY(), link);
 		}
 	}
 
 	public void createPopulation() {
 		int id = 0;
-		Plans population = new Plans();
+		final Plans population = new Plans();
 		int inhabitants_all = 0;
 		int lost = 0;
-		for (Feature zone : zones) {
-			Polygon p = (Polygon) zone.getDefaultGeometry().getGeometryN(0);
-			Envelope e = zone.getBounds();
-			long inhabitants = (Long)zone.getAttribute(7);
+		for (final Feature zone : this.zones) {
+			final Polygon p = (Polygon) zone.getDefaultGeometry().getGeometryN(0);
+			final Envelope e = zone.getBounds();
+			final long inhabitants = (Long)zone.getAttribute(7);
 			inhabitants_all += inhabitants;
 			Collection<Link> links = new ArrayList<Link>();
 			this.linksTree.get(e.getMinX(), e.getMinY(),e.getMaxX(), e.getMaxY(),links);
-			ArrayList<Link> tmp = new ArrayList<Link>();
-			for (Link link : links) {
-				Point point = this.geofac.createPoint(new Coordinate(link.getCenter().getX(),link.getCenter().getY()));
+			final ArrayList<Link> tmp = new ArrayList<Link>();
+			for (final Link link : links) {
+				final Point point = this.geofac.createPoint(new Coordinate(link.getCenter().getX(),link.getCenter().getY()));
 				if (p.contains(point)) {
 					tmp.add(link);
 				}
@@ -98,21 +94,21 @@ public class StaticPopulationGenerator {
 				log.error("something went wrong!!");
 			}
 			links = tmp;
-			double overalllength = getOALength(links);
+			final double overalllength = getOALength(links);
 			int all = 0;
-			for (Link link : links) {
-				double fraction = link.getLength() / overalllength;
-				int li = (int) Math.round(inhabitants * fraction);
+			for (final Link link : links) {
+				final double fraction = link.getLength() / overalllength;
+				final int li = (int) Math.round(inhabitants * fraction);
 				all += li;
 				for (int i = 0; i < li ; i++) {
-					Person pers = new Person(new IdImpl(id++));
-					Plan plan = new Plan(pers);
-					Act act = new Act("h",link.getCenter().getX(),link.getCenter().getY(),link,3 * 3600.0,3 *3600.0,0,true);
+					final Person pers = new Person(new IdImpl(id++));
+					final Plan plan = new Plan(pers);
+					final Act act = new Act("h",link.getCenter().getX(),link.getCenter().getY(),link,3 * 3600.0,3 *3600.0,0,true);
 					plan.addAct(act);
 					pers.addPlan(plan);
 					try {
 						population.addPerson(pers);
-					} catch (Exception e1) {
+					} catch (final Exception e1) {
 						e1.printStackTrace();
 					}
 					
@@ -122,55 +118,55 @@ public class StaticPopulationGenerator {
 			
 		}
 		System.err.println("inh:" + inhabitants_all + " agents:" + id + " lost:" + lost);
-		new PlansWriter(population,"padang_plans_v20080608.xml.gz", "v4").write();
+		new PlansWriter(population,"padang_plans_v20080618.xml.gz", "v4").write();
 		
 	}
 	
-	private double getOALength(Collection<Link> links) {
+	private double getOALength(final Collection<Link> links) {
 		double l = 0;
-		for (Link link : links) {
+		for (final Link link : links) {
 			l += link.getLength();
 		}
 		return l;
 	}
 
-	public static void main(String [] args) {
-		String netFile = "./networks/padang_net_v20080608.xml";
-		String zonesFile = "./padang/zones.shp";
+	public static void main(final String [] args) {
+		final String netFile = "./networks/padang_net_v20080618.xml";
+		final String zonesFile = "./padang/zones.shp";
 		
 		Gbl.createWorld();
 		Gbl.createConfig(null);
 		Collection<Feature> zones = null;
 		try {
 			zones=  getPolygons(ShapeFileReader.readDataFile(zonesFile));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		
-		NetworkLayer network = new NetworkLayer();
+		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFile);
 		
 		new StaticPopulationGenerator(network,zones).createPopulation();
 	}
 	
-	private static Collection<Feature> getPolygons(FeatureSource n) {
-		Collection<Feature> polygons = new ArrayList<Feature>();
+	private static Collection<Feature> getPolygons(final FeatureSource n) {
+		final Collection<Feature> polygons = new ArrayList<Feature>();
 		FeatureIterator it = null;
 		try {
 			it = n.getFeatures().features();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		while (it.hasNext()) {
-			Feature feature = it.next();
-			int id = (Integer) feature.getAttribute(1);
-			MultiPolygon multiPolygon = (MultiPolygon) feature.getDefaultGeometry();
+			final Feature feature = it.next();
+			final int id = (Integer) feature.getAttribute(1);
+			final MultiPolygon multiPolygon = (MultiPolygon) feature.getDefaultGeometry();
 			if (multiPolygon.getNumGeometries() > 1) {
 				log.warn("MultiPolygons with more then 1 Geometry ignored!");
 //				continue;
 			}
-			Polygon polygon = (Polygon) multiPolygon.getGeometryN(0);
+			final Polygon polygon = (Polygon) multiPolygon.getGeometryN(0);
 			polygons.add(feature);
 	}
 	

@@ -36,8 +36,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
@@ -45,25 +43,24 @@ import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 
+import playground.gregor.gis.utils.ShapeFileReader;
+import playground.gregor.gis.utils.ShapeFileWriter;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
-
-
-import playground.gregor.gis.utils.ShapeFileReader;
-import playground.gregor.gis.utils.ShapeFileWriter;
 
 public class NetworkGenerator {
 	private static final Logger log = Logger.getLogger(NetworkGenerator.class);
-	private NetworkLayer network;
-	private Collection<Feature> pn;
-	private Collection<Feature> pl;
+	private final NetworkLayer network;
+	private final Collection<Feature> pn;
+	private final Collection<Feature> pl;
+	public static String VERSION = "v20080618";
 	
-	public NetworkGenerator(Collection<Feature> pn, Collection<Feature> pl,
-			NetworkLayer network) {
+	
+	public NetworkGenerator(final Collection<Feature> pn, final Collection<Feature> pl,
+			final NetworkLayer network) {
 		this.network = network;
 		this.pn = pn;
 		this.pl = pl;
@@ -72,28 +69,28 @@ public class NetworkGenerator {
 	private NetworkLayer constructNetwork() {
 		createNodes2();
 		createLinks();
-		new NetworkCleaner().run(network);
+		new NetworkCleaner().run(this.network);
 		
 		return this.network;
 	}
 	
 	private void createLinks() {
-		for (Feature link : this.pl) {
-			int id = (Integer) link.getAttribute(1);
+		for (final Feature link : this.pl) {
+			final int id = (Integer) link.getAttribute(1);
 
-			int from = (Integer) link.getAttribute(2);
-			int to = (Integer) link.getAttribute(3);
+			final int from = (Integer) link.getAttribute(2);
+			final int to = (Integer) link.getAttribute(3);
 			double minWidth = (Double) link.getAttribute(4);
-			double area = (Double) link.getAttribute(5);
-			double length = (Double) link.getAttribute(6);
-			double avgWidth = Math.max(area/length, minWidth);
+			final double area = (Double) link.getAttribute(5);
+			final double length = (Double) link.getAttribute(6);
+			final double avgWidth = Math.max(area/length, minWidth);
 			
 			if (minWidth < 0.71 ){
 				log.warn("wrong flowcap!");
 				minWidth = 200;
 			}
-			double permlanes = Math.max(avgWidth,minWidth) / 0.71;
-			double flowcap = Math.max(minWidth / 0.71,1);
+			final double permlanes = Math.max(avgWidth,minWidth) / 0.71;
+			final double flowcap = Math.max(minWidth / 0.71,1);
 
 			this.network.createLink(Integer.toString(id), Integer.toString(from), Integer.toString(to), Double.toString(length), "1.66", Double.toString(flowcap), Double.toString(permlanes), Integer.toString(id), "");
 			
@@ -105,9 +102,9 @@ public class NetworkGenerator {
 	}
 
 	private void createNodes2() {
-		for (Feature node : this.pn) {
-			Coordinate c = node.getDefaultGeometry().getGeometryN(0).getCoordinate();
-			Integer id = (Integer) node.getAttribute(1);
+		for (final Feature node : this.pn) {
+			final Coordinate c = node.getDefaultGeometry().getGeometryN(0).getCoordinate();
+			final Integer id = (Integer) node.getAttribute(1);
 			this.network.createNode(id.toString(),Double.toString(c.x), Double.toString(c.y), "");
 		}
 		
@@ -115,12 +112,12 @@ public class NetworkGenerator {
 	}
 	
 	private void createNodes() {
-		for (Feature link : this.pn) {
-			LineString ls = (LineString) link.getDefaultGeometry().getGeometryN(0); 
-			Integer from = (Integer)link.getAttribute(2);
-			Integer to = (Integer)link.getAttribute(3);
-			Coordinate fromC = ls.getStartPoint().getCoordinate();
-			Coordinate toC = ls.getEndPoint().getCoordinate();
+		for (final Feature link : this.pn) {
+			final LineString ls = (LineString) link.getDefaultGeometry().getGeometryN(0); 
+			final Integer from = (Integer)link.getAttribute(2);
+			final Integer to = (Integer)link.getAttribute(3);
+			final Coordinate fromC = ls.getStartPoint().getCoordinate();
+			final Coordinate toC = ls.getEndPoint().getCoordinate();
 			if ( this.network.getNode(from.toString()) == null){
 				this.network.createNode(from.toString(),Double.toString(fromC.x), Double.toString(fromC.y), "");
 			}
@@ -133,62 +130,64 @@ public class NetworkGenerator {
 		
 	}
 
-	public static void main(String [] args) throws FactoryRegistryException, IOException, FactoryException, SchemaException, IllegalAttributeException, Exception {
-		String nodes = "./padang/network_v20080608/nodes.shp";
-		String links = "./padang/network_v20080608/links.shp";
+	public static void main(final String [] args) throws FactoryRegistryException, IOException, FactoryException, SchemaException, IllegalAttributeException, Exception {
+		
+		
+		final String nodes = "./padang/network_"+ VERSION + "/nodes.shp";
+		final String links = "./padang/network_" + VERSION + "/links.shp";
 		
 	
 		FeatureSource n = null;
 		try {
 			n = ShapeFileReader.readDataFile(nodes);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		Collection<Feature>pn = getPolygons(n);
+		final Collection<Feature>pn = getPolygons(n);
 		
 		FeatureSource l = null;
 		try {
 			l = ShapeFileReader.readDataFile(links);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		Collection<Feature> pl = getPolygons(l);
+		final Collection<Feature> pl = getPolygons(l);
 		
 		
-		NetworkLayer network = new NetworkLayer();
+		final NetworkLayer network = new NetworkLayer();
 		network.setEffectiveCellSize(0.26);
 		network.setEffectiveLaneWidth(0.71);
 		network.setCapacityPeriod(1);
 		new NetworkGenerator(pn, pl , network).constructNetwork();
 		
 		new NetworkWriter(network,"pdg_new.xml").write();
-		ShapeFileWriter.writeGeometries(genFeatureCollection((Collection<Link>) network.getLinks().values(), n),"./padang/network_v20080608/matsim_net.shp" );
+		ShapeFileWriter.writeGeometries(genFeatureCollection((Collection<Link>) network.getLinks().values(), n),"./padang/network_" + VERSION + "/matsim_net.shp" );
 		
 	}
 
-	private static Collection<Feature> genFeatureCollection(Collection<Link> links, FeatureSource fs) throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
+	private static Collection<Feature> genFeatureCollection(final Collection<Link> links, final FeatureSource fs) throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
 		
 
 //		dummy.id = -1;
-		GeometryFactory geofac = new GeometryFactory();
-		Collection<Feature> features = new ArrayList<Feature>();
+		final GeometryFactory geofac = new GeometryFactory();
+		final Collection<Feature> features = new ArrayList<Feature>();
 		
-		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiLineString",MultiLineString.class, true, null, null, fs.getSchema().getDefaultGeometry().getCoordinateSystem());
-		AttributeType id = AttributeTypeFactory.newAttributeType(
+		final AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiLineString",MultiLineString.class, true, null, null, fs.getSchema().getDefaultGeometry().getCoordinateSystem());
+		final AttributeType id = AttributeTypeFactory.newAttributeType(
 				"ID", Integer.class);
-		AttributeType fromNode = AttributeTypeFactory.newAttributeType(
+		final AttributeType fromNode = AttributeTypeFactory.newAttributeType(
 				"fromID", Integer.class);
-		AttributeType toNode = AttributeTypeFactory.newAttributeType(
+		final AttributeType toNode = AttributeTypeFactory.newAttributeType(
 				"toID", Integer.class);		
-		FeatureType ftRoad = FeatureTypeFactory.newFeatureType(
+		final FeatureType ftRoad = FeatureTypeFactory.newFeatureType(
 				new AttributeType[] { geom, id, fromNode, toNode }, "link");
 		int ID = 0;
-		for (Link link : links){
-			Coordinate c1 = MGC.coord2Coordinate(link.getFromNode().getCoord());
-			Coordinate c2 = MGC.coord2Coordinate(link.getToNode().getCoord());
-			LineString ls = geofac.createLineString(new Coordinate[] {c1,c2});
+		for (final Link link : links){
+			final Coordinate c1 = MGC.coord2Coordinate(link.getFromNode().getCoord());
+			final Coordinate c2 = MGC.coord2Coordinate(link.getToNode().getCoord());
+			final LineString ls = geofac.createLineString(new Coordinate[] {c1,c2});
 			
-			Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},geofac) , ID++, link.getFromNode().getId(),link.getToNode().getId()},"network");
+			final Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},geofac) , ID++, link.getFromNode().getId(),link.getToNode().getId()},"network");
 			features.add(ft);
 				
 		}
@@ -197,17 +196,17 @@ public class NetworkGenerator {
 		return features;
 	}
 
-	private static Collection<Feature> getPolygons(FeatureSource n) {
-		Collection<Feature> polygons = new ArrayList<Feature>();
+	private static Collection<Feature> getPolygons(final FeatureSource n) {
+		final Collection<Feature> polygons = new ArrayList<Feature>();
 		FeatureIterator it = null;
 		try {
 			it = n.getFeatures().features();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		while (it.hasNext()) {
-			Feature feature = it.next();
+			final Feature feature = it.next();
 //			int id = (Integer) feature.getAttribute(1);
 //			MultiPolygon multiPolygon = (MultiPolygon) feature.getDefaultGeometry();
 //			if (multiPolygon.getNumGeometries() > 1) {

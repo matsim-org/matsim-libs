@@ -34,16 +34,16 @@ public class CRN {
 
 	final private static int MAX_LETTERS = 64;
 	private double[][] activationMatrix;
-	private Collection<CaseNode> caseNodes; 
+	private final Collection<CaseNode> caseNodes; 
 //	private final double [] spreading = new double [] {0.7,0.75,1,0.75,0.7};
 	private final double [] spreading = new double [] {0.0,0.75,1,0.75,0.0};
-	private Map<String,String> nT2 = new HashMap<String,String>();
-	private Map<String,String> nT3 = new HashMap<String,String>();
-	private Map<String,String> nT4 = new HashMap<String,String>();
-	private HashSet<String> expr = new HashSet<String>();
-	private HashMap<Integer,SimilarityLink> simLinks = new HashMap<Integer,SimilarityLink>();
+	private final Map<String,String> nT2 = new HashMap<String,String>();
+	private final Map<String,String> nT3 = new HashMap<String,String>();
+	private final Map<String,String> nT4 = new HashMap<String,String>();
+	private final HashSet<String> expr = new HashSet<String>();
+	private final HashMap<Integer,SimilarityLink> simLinks = new HashMap<Integer,SimilarityLink>();
 	
-	public CRN(Collection<Feature> ft) {
+	public CRN(final Collection<Feature> ft) {
 		this.caseNodes = new ArrayList<CaseNode>();
 		createTranslationTable();
 		createMappingTable();
@@ -63,7 +63,7 @@ public class CRN {
 		
 	}
 	
-	private void addSimLink(int c, int d, double e) {
+	private void addSimLink(final int c, final int d, final double e) {
 		this.simLinks.put(c, new SimilarityLink(d,e))	;
 		this.simLinks.put(d, new SimilarityLink(c,e))	;
 	}
@@ -81,6 +81,9 @@ public class CRN {
 		this.nT3.put("rs ", "rumah sakit ");
 		this.nT3.put("jl.", "jalan ");
 		this.nT4.put("jln ", "jalan ");
+		this.nT4.put("jln.", "jalan ");
+		this.nT4.put("jal ", "jalan ");
+		this.nT4.put("gedung", "");
 		this.nT3.put("jl ", "jalan ");
 		
 	}
@@ -100,9 +103,9 @@ public class CRN {
 //		}
 //	}
 
-	private void buildCaseNodes(Collection<Feature> fts) { 
-		for (Feature ft : fts) {
-			String expression = (String) ft.getAttribute(3);
+	private void buildCaseNodes(final Collection<Feature> fts) { 
+		for (final Feature ft : fts) {
+			final String expression = (String) ft.getAttribute(3);
 			if (this.expr.contains(expression.toLowerCase())){
 				continue;
 			}
@@ -131,18 +134,18 @@ public class CRN {
 	
 	
 	private void restCaseNodes() {
-		for (CaseNode n : this.caseNodes) {
+		for (final CaseNode n : this.caseNodes) {
 			n.rest();
 		}
 	}
 
-	private CaseNode getCaseWithHighestActivity(int length) {
+	private CaseNode getCaseWithHighestActivity(final int length) {
 		
 		CaseNode mostSim = null;
 		double activation = 0;
 		
-		for (CaseNode n : this.caseNodes) {
-			double tmp = n.getActivation(length);
+		for (final CaseNode n : this.caseNodes) {
+			final double tmp = n.getActivation(length);
 			if (tmp > activation) {
 				activation = tmp;
 				mostSim = n;
@@ -154,19 +157,19 @@ public class CRN {
 		
 	}
 
-	private void activateMatrix(String query) {
+	private void activateMatrix(final String query) {
 		for (int i = 0; i < query.length(); i++) {
-			int c = query.charAt(i);
+			final int c = query.charAt(i);
 			activateZell(i,c);
 		}
 		for (int i = 0; i < query.length(); i++) {
-			int c = query.charAt(i);
+			final int c = query.charAt(i);
 			spreadActivation(i,c);
 		}
 	}
 
-	private void spreadActivation(int i, int c) {
-		SimilarityLink l = this.simLinks.get(c);
+	private void spreadActivation(final int i, final int c) {
+		final SimilarityLink l = this.simLinks.get(c);
 		if (l != null) {
 			this.activationMatrix[i][l.entry] = l.similarity * this.activationMatrix[i][c]; 
 		}
@@ -189,7 +192,7 @@ public class CRN {
 		
 	}
 
-	private void activateZell(int i, int c) {
+	private void activateZell(final int i, final int c) {
 		this.activationMatrix[i][c] = 1;
 	}
 
@@ -204,16 +207,16 @@ public class CRN {
 		
 		expression = toArabic(expression);
 		
-		ArrayList<Character>  chars = new ArrayList<Character>();
+		final ArrayList<Character>  chars = new ArrayList<Character>();
 		for (int i = 0; i < expression.length(); i++) {
-			char c = expression.charAt(i);
+			final char c = expression.charAt(i);
 			if (c >= 'a' && c <='z' || c >= '0' && c <= '9') {
 				chars.add(c);
 			}
 			
 		}
 		
-		char [] c = new char [chars.size()];
+		final char [] c = new char [chars.size()];
 		for (int i = 0; i < chars.size(); i++) {
 			c[i] = chars.get(i);
 		}
@@ -221,7 +224,7 @@ public class CRN {
 		return new String (c);
 	}
 	
-	private double getWeight(char charAt) {
+	private double getWeight(final char charAt) {
 		if (charAt >= 'a' && charAt <= 'z') {
 			return 1.0;
 		}
@@ -233,17 +236,17 @@ public class CRN {
 	}
 	
 	private String toArabic(String expression) {
-		for (String arab : this.nT4.keySet()) {
+		for (final String arab : this.nT4.keySet()) {
 			if (expression.contains(arab)) {
 				expression = expression.replaceFirst(arab, this.nT4.get(arab));
 			}
 		}
-		for (String arab : this.nT3.keySet()) {
+		for (final String arab : this.nT3.keySet()) {
 			if (expression.contains(arab)) {
 				expression = expression.replaceFirst(arab, this.nT3.get(arab));
 			}
 		}
-		for (String arab : this.nT2.keySet()) {
+		for (final String arab : this.nT2.keySet()) {
 			if (expression.contains(arab)) {
 				expression = expression.replaceFirst(arab, this.nT2.get(arab));
 			}
@@ -256,22 +259,22 @@ public class CRN {
 	private class SimilarityLink {
 		int entry;
 		double similarity;
-		public SimilarityLink(int entry, double sim) {
+		public SimilarityLink(final int entry, final double sim) {
 			this.entry = entry;
 			this.similarity = sim;
 		}
 	}
 
 	public class CaseNode{
-		private String expression;
+		private final String expression;
 		private int length;
 		private int[] links;
 		private double [] weights;
 		private double activation;
 		private double sW = 0;
-		private Coordinate coord;
+		private final Coordinate coord;
 
-		public CaseNode(String input, Coordinate coordinate) {
+		public CaseNode(final String input, final Coordinate coordinate) {
 			this.coord = coordinate;
 			this.expression = input.toLowerCase();
 			linkCaseNode();			
@@ -285,10 +288,10 @@ public class CRN {
 			
 		}
 
-		public double getActivation(int ql) {
+		public double getActivation(final int ql) {
 			double activation = 0;
 			for (int i = 0; i < this.length; i++) {
-				activation += activationMatrix[i][links[i]]*this.weights[i];
+				activation += CRN.this.activationMatrix[i][this.links[i]]*this.weights[i];
 				
 			}
 			
@@ -307,14 +310,14 @@ public class CRN {
 			return this.activation;
 		}
 		private void linkCaseNode() {
-			String clean = cleanUp(this.expression);
+			final String clean = cleanUp(this.expression);
 			this.length = clean.length();
 			this.links = new int [this.length];
 			this.weights = new double[this.length];
 			for (int i = 0; i < this.length; i++) {
-				links[i] = clean.charAt(i) ; //- 'a';
-				weights[i] = getWeight(clean.charAt(i));
-				this.sW += weights[i];
+				this.links[i] = clean.charAt(i) ; //- 'a';
+				this.weights[i] = getWeight(clean.charAt(i));
+				this.sW += this.weights[i];
 			}
 		}
 		
@@ -324,12 +327,12 @@ public class CRN {
 
 		private boolean checkIt(){
 			
-			char [] couple = new char [this.length];
+			final char [] couple = new char [this.length];
 			for (int i = 0; i < this.length; i++) {
-				char c = (char) (this.links[i] ); //+ 'a');
+				final char c = (char) (this.links[i] ); //+ 'a');
 				couple[i] = c;
 			}
-			String test = new String(couple);
+			final String test = new String(couple);
 			
 			return test.equals(cleanUp(this.expression));
 		}

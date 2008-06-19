@@ -38,7 +38,6 @@ import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 
 public class EvacuationNetGenerator {
@@ -78,15 +77,15 @@ public class EvacuationNetGenerator {
 		/* TODO [GL] the capacity of the evacuation links should be a very high value but for unknown reason Double.MAX_VALUE
 		 * does not work, may be the better solution will be to implement a method in QueueLink to set the spaceCap to infinity
 		 *anyway, this solution is just a workaround the spaceCap problem should be solved in an other way - gl */
-		String capacity ="99999999999999999999"; // (new Double (Double.MAX_VALUE)).toString();
+		final String capacity ="99999999999999999999"; // (new Double (Double.MAX_VALUE)).toString();
 		network.createLink(saveLinkId, saveNodeAId, saveNodeBId, "10", "100000", capacity, "1", null, null);
 
 		int linkId = 1;
-		for (Node node : network.getNodes().values()) {
-			String nodeId =  node.getId().toString();
+		for (final Node node : network.getNodes().values()) {
+			final String nodeId =  node.getId().toString();
 			if (isSaveNode(node) && !nodeId.equals(saveNodeAId) && !nodeId.equals(saveNodeBId)){
 				linkId++;
-				String sLinkID = "el" + Integer.toString(linkId);
+				final String sLinkID = "el" + Integer.toString(linkId);
 				network.createLink(sLinkID, nodeId, saveNodeAId, "10", "100000", capacity, "1", null, null);
 			}
 		}
@@ -139,9 +138,9 @@ public class EvacuationNetGenerator {
 		 * 2: save nodes, can be reached from evacuation area
 		 * 3: "normal" nodes within the evacuation area
 		 */
-		for (Node node : network.getNodes().values()) {
+		for (final Node node : network.getNodes().values()) {
 			int inCat = 0;
-			for (Link link : node.getInLinks().values()) {
+			for (final Link link : node.getInLinks().values()) {
 				if (this.evacuationAreaLinks.containsKey(link.getId())) {
 					if ((inCat == 0) || (inCat == 3)) {
 						inCat = 3;
@@ -181,8 +180,8 @@ public class EvacuationNetGenerator {
 	 */
 	private void cleanUpNetwork(final NetworkLayer network) {
 
-		ConcurrentLinkedQueue<Link> l = new ConcurrentLinkedQueue<Link>();
-		for (Link link : network.getLinks().values()) {
+		final ConcurrentLinkedQueue<Link> l = new ConcurrentLinkedQueue<Link>();
+		for (final Link link : network.getLinks().values()) {
 			if (!this.evacuationAreaLinks.containsKey(link.getId())) {
 				l.add(link);
 			}
@@ -194,8 +193,8 @@ public class EvacuationNetGenerator {
 			link = l.poll();
 		}
 
-		ConcurrentLinkedQueue<Node> n = new ConcurrentLinkedQueue<Node>();
-		for (Node node : network.getNodes().values()) {
+		final ConcurrentLinkedQueue<Node> n = new ConcurrentLinkedQueue<Node>();
+		for (final Node node : network.getNodes().values()) {
 			if (isRedundantNode(node)) {
 				n.add(node);
 			}
@@ -212,7 +211,7 @@ public class EvacuationNetGenerator {
 	
 
 	
-	public static void main(String [] args) {
+	public static void main(final String [] args) {
 		
 		if (args.length != 1) {
 			throw new RuntimeException("wrong number of arguments! Pleas run EvacuationAreaFileGenerator config.xml" );
@@ -220,28 +219,28 @@ public class EvacuationNetGenerator {
 			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 		}
 
-		World world = Gbl.createWorld();
+		final World world = Gbl.createWorld();
 
 		log.info("loading network from " + Gbl.getConfig().network().getInputFile());
-		NetworkFactory fc = new NetworkFactory();
+		final NetworkFactory fc = new NetworkFactory();
 		fc.setLinkPrototype(TimeVariantLinkImpl.class);
 		
-		NetworkLayer network = new NetworkLayer(fc);
+		final NetworkLayer network = new NetworkLayer(fc);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		world.setNetworkLayer(network);
 		world.complete();
 		log.info("done.");
 
-		String evacfile = "networks/padang_evacuationarea_v20080608.xml.gz";
+		final String evacfile = "networks/padang_evacuationarea_v20080618.xml.gz";
 		
 //		log.info("loading evacuationarea from " + Gbl.getConfig().evacuation().getEvacuationAreaFile());
 		log.info("loading evacuationarea from " + evacfile);
-		HashMap<Id,EvacuationAreaLink> el = new HashMap<Id,EvacuationAreaLink>();
+		final HashMap<Id,EvacuationAreaLink> el = new HashMap<Id,EvacuationAreaLink>();
 		
 		try {
 //			new EvacuationAreaFileReader(el).readFile(Gbl.getConfig().evacuation().getEvacuationAreaFile());
 			new EvacuationAreaFileReader(el).readFile(evacfile);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		log.info("done.");
