@@ -37,6 +37,8 @@ import edu.uci.ics.jung.graph.Vertex;
  */
 public class DegreeSampled extends Degree {
 
+	private boolean biasCorrection;
+	
 	@Override
 	public double run(Graph g) {
 		if (g instanceof SampledGraph) {
@@ -44,10 +46,14 @@ public class DegreeSampled extends Degree {
 			int sum = 0;
 			double wsum = 0;
 			Set<SampledVertex> vertices = ((SampledGraph) g).getVertices();
+			double weight = 1;
 			for (SampledVertex v : vertices) {
 				if (!v.isAnonymous()) {
-					sum += v.degree() * 1 / v.getSampleProbability();
-					wsum += 1 /v.getSampleProbability();
+					if(biasCorrection)
+						weight = 1 / v.getSampleProbability();
+					
+					sum += v.degree() * weight;
+					wsum += weight;
 					values.put(v, v.degree());
 				}
 			}
@@ -63,5 +69,9 @@ public class DegreeSampled extends Degree {
 		for(Vertex v : values.keySet()) {
 			histogram.add(v.degree(), 1 / ((SampledVertex)v).getSampleProbability());
 		}
+	}
+	
+	public void setBiasCorrection(boolean flag) {
+		biasCorrection = flag;
 	}
 }

@@ -46,11 +46,11 @@ public class CentralitySampled extends Centrality {
 	protected void calcBetweenness() {
 		betweennessValues = new LinkedHashMap<Vertex, Double>();
 		graphBetweenness = 0;
-		double norm = (graph.getVertices().size() - 1) * (graph.getVertices().size() - 2) * 0.5; 
+//		double norm = (graph.getVertices().size() - 1) * (graph.getVertices().size() - 2) * 0.5; 
 		for(SparseVertex v : graph.getVertices()) {
 			SampledVertex delegate = (SampledVertex) graphDecorator.getVertex(v);
 			if(!delegate.isAnonymous()) {
-				double bc = ((CentralityVertex)v).getBetweenness() / norm;
+				double bc = ((CentralityVertex)v).getBetweenness();// / norm;
 				betweennessValues.put(delegate, bc);
 				graphBetweenness += bc;
 			}

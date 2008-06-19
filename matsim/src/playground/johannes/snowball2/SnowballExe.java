@@ -77,6 +77,8 @@ public class SnowballExe {
 	
 	private static final String DEGREE_KEY = "degree";
 	
+	private static final String W_DEGREE_KEY = "wdegree";
+	
 	private static final String CLUSTERING_KEY = "clustering";
 	
 	private static final String BETWEENNESS_KEY = "betweenness";
@@ -128,12 +130,18 @@ public class SnowballExe {
 		Centrality centrality = new Centrality();
 		Centrality centralitySampled = new CentralitySampled();
 		for(String key : statsKeys) {
+			new File(outputDir + key).mkdirs();
 			if(ISOLATES_KEY.equalsIgnoreCase(key)) {
 				statistics.put(key, new CountIsolates());
 				sampleStatistics.put(key, new CountIsolates());
 			} else if(DEGREE_KEY.equalsIgnoreCase(key)) {
 				statistics.put(key, new Degree());
 				sampleStatistics.put(key, new DegreeSampled());
+			} else if(W_DEGREE_KEY.equalsIgnoreCase(key)) {
+				statistics.put(key, new Degree());
+				DegreeSampled ds = new DegreeSampled();
+				ds.setBiasCorrection(true);
+				sampleStatistics.put(key, ds);
 			} else if(BETWEENNESS_KEY.equalsIgnoreCase(key)) {
 				statistics.put(key, new Betweenness(centrality));
 				sampleStatistics.put(key, new Betweenness(centralitySampled));
@@ -144,7 +152,7 @@ public class SnowballExe {
 				statistics.put(key, new Clustering());
 				sampleStatistics.put(key, new ClusteringSampled());
 			} else if(COMPONENTS_KEY.equalsIgnoreCase(key)) {
-				CountComponents cc = new CountComponents();
+				CountComponents cc = new CountComponents(outputDir+key+"/", g);
 				statistics.put(key, cc);
 				sampleStatistics.put(key, cc);
 			} else if(DEGREE_CORRELATION_KEY.equalsIgnoreCase(key)) {
@@ -153,8 +161,10 @@ public class SnowballExe {
 			} else {
 				logger.warn(String.format("No class found for statistics \"%1$s\"!", key));
 			}
-			new File(outputDir + key).mkdirs();
+			
 		}
+		
+		
 		
 		Map<String, double[]> references = new HashMap<String, double[]>();
 		logger.info("Computing original network statistics...");
@@ -184,16 +194,31 @@ public class SnowballExe {
 		sampler.setPResponse(pResponse);
 		sampler.setPFOF(pFOF);
 		
+		PajekVisWriter visWriter = new PajekVisWriter();
+		new File(outputDir + "pajek").mkdirs();
+		
 		int numSampledVertices = 0;
+		int numVisitedVertices = 0;
 		int lastNumSampledVertices = 0;
 		int lastNumSampledVertices2 = 0;
+		int lastNumVisitedVertices = 0;
+		int deltaLastVisited = 0;
 		SampledGraph sample = null;
 		while(numSampledVertices < g.numVertices()) {
 			logger.info(String.format("Running iteration %1$s...", sampler.getCurrentWave() + 1));
 			sample = sampler.runWave();
+			
 			logger.info("Computing sampled network statistics...");
 			numSampledVertices = countSampledVertices(sample);
+			numVisitedVertices = countVisitedVertices(sample);
+			
 			logger.info("Sampled " + (numSampledVertices/(float)g.numVertices()) + " % of all vertices.");
+			
+			int deltaSampled = numSampledVertices - lastNumSampledVertices;
+			int deltaVisited = numVisitedVertices - lastNumVisitedVertices;
+			float efficiency = deltaSampled/(float)deltaLastVisited;
+			deltaLastVisited = deltaVisited;
+			logger.info("Sampling efficiency is " + efficiency);
 			
 			sampler.calculateSampleProbas(g, lastNumSampledVertices, lastNumSampledVertices2, g.numVertices());
 			
@@ -215,12 +240,16 @@ public class SnowballExe {
 			meanWriter.newLine();
 			meanWriter.flush();
 			
+			visWriter.write(sample, outputDir + "pajek/" + sampler.getCurrentWave() + "pajek.net");
+			
 			if(lastNumSampledVertices == numSampledVertices) {
 				logger.warn("Aborted sampling because the maximum amount of vertices that can be sampled have been sampled!");
 				break;
 			}
+			
 			lastNumSampledVertices2 = lastNumSampledVertices;
 			lastNumSampledVertices = numSampledVertices;
+			lastNumVisitedVertices = numVisitedVertices;
 			
 			centrality.reset();
 			centralitySampled.reset();
@@ -286,6 +315,15 @@ public class SnowballExe {
 		return numSampledVertices;
 	}
 	
+	private int countVisitedVertices(SampledGraph g) {
+		int numVisitedVertices = 0;
+		Set<SampledVertex> vertices = g.getVertices();
+		for(SampledVertex v : vertices) {
+				numVisitedVertices += v.getVisited();
+		}
+		return numVisitedVertices;
+	}
+	
 	private double calcGammaExponent(Histogram hist) {
 		double minVal = hist.getBinLowerBound(hist.getMaxBin());
 		if(minVal == 0)
@@ -347,8 +385,6 @@ public class SnowballExe {
 			for(int i = 0; i<= numWaves; i++) {
 				writer.write(String.valueOf(i));
 				for(Integer k : curves.keySet()) {
-					if(k == 1)
-						System.out.println();
 					writer.write("\t");
 					int count = curves.get(k).get(i);
 					int sum = count + sums.get(k);

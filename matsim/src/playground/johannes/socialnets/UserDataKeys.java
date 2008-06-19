@@ -51,6 +51,8 @@ public interface UserDataKeys {
 	
 	public static final String SAMPLE_PROBA_KEY = "sampleprobability";
 	
+	public static final String TYPE_KEY = "type";
+	
 	public static final UserDataContainer.CopyAction.Shared COPY_ACT = new UserDataContainer.CopyAction.Shared();
 
 }

@@ -80,14 +80,14 @@ public class Sampler {
 		List<Vertex> vertices = new LinkedList<Vertex>(g.getVertices());
 		Collections.shuffle(vertices, rnd);
 		
-//		for(Vertex v : vertices) {
-//			if(v.getUserDatum("type").equals("1")) {
-//				lastSampledVertices = new ArrayList<Vertex>();
-//				lastSampledVertices.add(v);
-//				break;
-//			}
-//		}
-		lastSampledVertices = vertices.subList(0, nSeeds);
+		for(Vertex v : vertices) {
+			if(v.getUserDatum("type").equals("2")) {
+				lastSampledVertices = new ArrayList<Vertex>();
+				lastSampledVertices.add(v);
+				break;
+			}
+		}
+//		lastSampledVertices = vertices.subList(0, nSeeds);
 		sampledGraph = new SampledGraph();
 		for(Vertex v : lastSampledVertices) {
 			SampledVertex vSampled = new SampledVertex(currentWave);
@@ -143,28 +143,31 @@ public class Sampler {
 	private Collection<Vertex> expand(Vertex ego) {
 		SampledVertex sampledEgo = (SampledVertex) ego.getUserDatum(SAMPLED_ELEMENT_KEY);
 		sampledEgo.setSampled(currentWave);
+//		sampledEgo.increaseVisited();
 		ego.addUserDatum(SAMPLED_KEY, true, UserDataKeys.COPY_ACT);
 		
 		Set<Vertex> detectedAlters = new LinkedHashSet<Vertex>();
 		Set<Edge> ties = ego.getOutEdges();
 
 		for (Edge e : ties) {
-			if (e.getUserDatum(SAMPLED_KEY) == null) {
-				e.setUserDatum(SAMPLED_KEY, true, UserDataKeys.COPY_ACT);
-				Vertex alter = e.getOpposite(ego);
+			Vertex alter = e.getOpposite(ego);
+//			if (e.getUserDatum(SAMPLED_KEY) == null) {
+				e.setUserDatum(SAMPLED_KEY, true, UserDataKeys.COPY_ACT);				
 				/*
 				 * Ties may not be named.
 				 */
 				rnd.nextDouble();
 				if (getProbaTieNamed(ego, alter) >= rnd.nextDouble()) {
-					SampledVertex sampledAlter;
+					SampledVertex sampledAlter = (SampledVertex) alter.getUserDatum(SAMPLED_ELEMENT_KEY);
+					if(sampledAlter != null) {
+						sampledAlter.increaseVisited();
+					}
 					/*
 					 * Do not sample alters twice.
 					 */
 					if (alter.getUserDatum(UserDataKeys.SAMPLED_KEY) == null) {
 						detectedAlters.add(alter);
-						
-						sampledAlter = (SampledVertex) alter.getUserDatum(SAMPLED_ELEMENT_KEY);
+
 						if(sampledAlter == null) {
 							/*
 							 * Create a new vertex in the sampled graph.
@@ -179,6 +182,11 @@ public class Sampler {
 							sampledAlter.addUserDatum(UserDataKeys.Y_COORD, alter
 								.getUserDatum(UserDataKeys.Y_COORD),
 								UserDataKeys.COPY_ACT);
+							
+							String type = (String)alter.getUserDatum(UserDataKeys.TYPE_KEY);
+							if(type != null)
+								sampledAlter.addUserDatum(UserDataKeys.TYPE_KEY, type, UserDataKeys.COPY_ACT);
+							
 							sampledGraph.addVertex(sampledAlter);
 							alter.setUserDatum(SAMPLED_ELEMENT_KEY, sampledAlter,
 								UserDataKeys.COPY_ACT);
@@ -188,7 +196,7 @@ public class Sampler {
 							 */
 							sampledAlter = (SampledVertex) alter
 							.getUserDatum(SAMPLED_ELEMENT_KEY);
-						}
+						}			
 						/*
 						 * Add the sampled edge, if it has not been sampled yet, i.e.,
 						 * through FOF knowledge.
@@ -201,7 +209,11 @@ public class Sampler {
 						}
 					}
 				}
-			}
+//			} else {
+//				SampledVertex sampledAlter = (SampledVertex) alter.getUserDatum(SAMPLED_ELEMENT_KEY);
+//				if(sampledAlter != null)
+//					sampledAlter.increaseVisited();
+//			}
 		}
 
 		List<Vertex> v2set = new LinkedList(detectedAlters);

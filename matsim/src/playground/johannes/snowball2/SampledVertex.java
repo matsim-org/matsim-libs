@@ -44,9 +44,12 @@ public class SampledVertex extends UndirectedSparseVertex {
 	
 	private static final String SAMPLE_PROBA_KEY = "sampleproba";
 	
+	private static final String VISITED_KEY = "visited";
+	
 	public SampledVertex(int waveDeteceted) {
 		super();
 		addUserDatum(WAVE_DETECTED_KEY, waveDeteceted, COPY_ACT);
+		addUserDatum(VISITED_KEY, 1, COPY_ACT);
 	}
 	
 	public void setSampled(int wave) {
@@ -81,5 +84,13 @@ public class SampledVertex extends UndirectedSparseVertex {
 	
 	public double getSampleProbability() {
 		return (Double)getUserDatum(SAMPLE_PROBA_KEY);
+	}
+	
+	public int getVisited() {
+		return (Integer)getUserDatum(VISITED_KEY);
+	}
+	
+	public void increaseVisited() {
+		setUserDatum(VISITED_KEY, getVisited() + 1, COPY_ACT);
 	}
 }

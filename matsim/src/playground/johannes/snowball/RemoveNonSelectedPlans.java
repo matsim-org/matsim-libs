@@ -78,7 +78,7 @@ public class RemoveNonSelectedPlans {
 		
 		System.out.println("Removing persons...");
 		int size = plans.getPersons().size();
-		int targetSize = size;
+		int targetSize = 10000;
 		double frac = targetSize/(double)size;
 		List<Person> remove = new LinkedList<Person>();
 		for(Person p : plans) {

@@ -53,7 +53,7 @@ public class DegreeCorrelation implements GraphStatistic {
 				squareSum += Math.pow(d_v1, 2) + Math.pow(d_v2, 2);
 				product += d_v1 * d_v2;
 				
-				edges ++;
+				edges++;
 
 		}
 		double M_minus1 = 1 / (double) edges;
