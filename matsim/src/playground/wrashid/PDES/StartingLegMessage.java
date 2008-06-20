@@ -17,19 +17,23 @@ public class StartingLegMessage extends SelfhandleMessage {
 	private int linkIndex;
 	// the link, at which the leg starts
 	private Link startingLink;
+	// TODO: remove this scheduler from here
+	// to somewhere else...
+	Scheduler scheduler;
 
-	public StartingLegMessage(Leg leg,Vehicle vehicle, int legIndex, int linkIndex, Link startingLink) {
+	public StartingLegMessage(Scheduler scheduler,Leg leg,Vehicle vehicle, int legIndex, int linkIndex, Link startingLink) {
 		super();
 		this.leg = leg;
 		this.vehicle = vehicle;
 		this.legIndex = legIndex;
 		this.linkIndex=linkIndex;
 		this.startingLink=startingLink;
+		this.scheduler=scheduler;
 	}
 
 	@Override
 	public void printMessageLogString() {
-		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + startingLink.getId().toString() + "; Description=enter " );
+		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + startingLink.getId().toString() + "; Description=starting " );
 		//TODO: There is a difference in the link I get here and the one, which is used in DEQSim, because the one is using start link and the other is using end link
 		// use the following normally: leg.getRoute().getLinkRoute()[linkIndex].getId().toString()
 	}
@@ -44,11 +48,11 @@ public class StartingLegMessage extends SelfhandleMessage {
 
 	@Override
 	public void selfhandleMessage() {
-		printMessageLogString();
 		
 		// attempt to enter street.
 		Road road=Road.allRoads.get(startingLink.getId().toString());
-		road.enterRequest(vehicle);
+		double nextAvailableTimeForEnteringStreet=road.enterRequest(vehicle);
+		sendMessage(scheduler,new EnterRoadMessage(leg,vehicle,legIndex,linkIndex,startingLink), road.getUnitNo(), nextAvailableTimeForEnteringStreet);
 		
 	}
 	
