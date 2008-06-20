@@ -52,7 +52,7 @@ public class PlanModifications {
 		String plansfilePath="./input/plans_withoutlinkinfo.xml.gz";
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
-		String worldfilePath="./input/world.xml.gz";
+		String worldfilePath="./input/world.xml";
 		int type=1;
 
 		PlanModifications plansModifier=new PlanModifications();
@@ -97,6 +97,7 @@ public class PlanModifications {
 
 
 		System.out.println("  reading world xml file... ");
+		this.world=new World();
 		final MatsimWorldReader worldReader = new MatsimWorldReader(this.world);
 		worldReader.readFile(worldfilePAth);
 		System.out.println("  done.");
@@ -106,10 +107,17 @@ public class PlanModifications {
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		log.info("network reading done");
 
-		this.facilities=(Facilities)this.world.getLayer(Facilities.LAYER_TYPE);
-		this.facilities=new Facilities();
+		//this.facilities=new Facilities();
+		this.facilities=(Facilities)this.world.createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
+
+		this.world.complete();
+		new WorldCheck().run(this.world);
+		new WorldBottom2TopCompletion().run(this.world);
+		new WorldValidation().run(this.world);
+		new WorldCheck().run(this.world);
+		log.info("world checking done.");
 
 
 		this.plans=new Plans(false);
@@ -121,14 +129,6 @@ public class PlanModifications {
 		this.modifier.init(this.plans, this.network, this.facilities);
 		log.info("init modifier done");
 
-		this.world.complete();
-
-		System.out.println("  running world modules... ");
-		new WorldCheck().run(this.world);
-		new WorldBottom2TopCompletion().run(this.world);
-		new WorldValidation().run(this.world);
-		new WorldCheck().run(this.world);
-		System.out.println("  done.");
 
 	}
 
