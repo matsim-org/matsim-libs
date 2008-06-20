@@ -10,11 +10,17 @@ import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.plans.PlansWriter;
+import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
+import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldValidation;
 
 public class PlanModifications {
 
 	private Plans plans=null;
 	private NetworkLayer network=null;
+	private World world=null;
 	private Facilities  facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 	private String outputpath="";
 	private Modifier modifier=null;
@@ -26,11 +32,12 @@ public class PlanModifications {
 	 * - path to plans file
 	 * - path to network file
 	 * - path to facilities file
+	 * - path to the world file
 	 */
 	public static void main(final String[] args) {
 
 		/*
-		if (args.length < 3 || args.length > 3 ) {
+		if (args.length < 5 || args.length > 5 ) {
 			System.out.println("Too few arguments. Exit");
 			System.exit(1);
 		}
@@ -38,23 +45,28 @@ public class PlanModifications {
 		String plansfilePath=args[0];
 		String networkfilePath=args[1];
 		String facilitiesfilePath=args[2];
+		String worldfilePath=args[3];
+		int type=args[4];
 		*/
 
 
 		String plansfilePath="./input/plans_withoutlinkinfo.xml.gz";
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
+		String worldfilePath="./input/world.xml.gz";
 		int type=1;
 
 		PlanModifications plansModifier=new PlanModifications();
 		if (type==0) {
 			LocationModifier locationmodifier=new LocationModifier();
-			plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, locationmodifier);
+			plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, worldfilePath,
+					locationmodifier);
 			plansModifier.runLocationModification();
 		}
 		else if (type==1) {
 			FacilitiesV3Modifier facilitiesV3Modifier=new FacilitiesV3Modifier();
-			plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, facilitiesV3Modifier);
+			plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, worldfilePath,
+					facilitiesV3Modifier);
 			plansModifier.runAssignFacilitiesV3();
 		}
 	}
@@ -82,7 +94,14 @@ public class PlanModifications {
 	}
 
 	public void init(final String plansfilePath, final String networkfilePath,
-			final String facilitiesfilePath, Modifier modifier) {
+			final String facilitiesfilePath, final String worldfilePAth, Modifier modifier) {
+
+
+		System.out.println("  reading world xml file... ");
+		final MatsimWorldReader worldReader = new MatsimWorldReader(this.world);
+		worldReader.readFile(worldfilePAth);
+		System.out.println("  done.");
+
 
 		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
@@ -101,6 +120,16 @@ public class PlanModifications {
 		this.modifier=modifier;
 		this.modifier.init(this.plans, this.network, this.facilities);
 		log.info("init modifier done");
+
+		this.world.complete();
+
+		System.out.println("  running world modules... ");
+		new WorldCheck().run(this.world);
+		new WorldBottom2TopCompletion().run(this.world);
+		new WorldValidation().run(this.world);
+		new WorldCheck().run(this.world);
+		System.out.println("  done.");
+
 	}
 
 	private void writePlans() {
