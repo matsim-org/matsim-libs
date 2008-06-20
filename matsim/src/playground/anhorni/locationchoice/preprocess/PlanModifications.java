@@ -40,20 +40,23 @@ public class PlanModifications {
 		String facilitiesfilePath=args[2];
 		*/
 
-		String plansfilePath="./input/plans.xml.gz";
+
+		String plansfilePath="./input/plans_withoutlinkinfo.xml.gz";
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
-
+		int type=1;
 
 		PlanModifications plansModifier=new PlanModifications();
-		LocationModifier locationmodifier=new LocationModifier();
-		plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, locationmodifier);
-		plansModifier.runLocationModification();
-
-		FacilitiesV3Modifier facilitiesV3Modifier=new FacilitiesV3Modifier();
-		plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, facilitiesV3Modifier);
-		plansModifier.runAssignFacilitiesV3();
-
+		if (type==0) {
+			LocationModifier locationmodifier=new LocationModifier();
+			plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, locationmodifier);
+			plansModifier.runLocationModification();
+		}
+		else if (type==1) {
+			FacilitiesV3Modifier facilitiesV3Modifier=new FacilitiesV3Modifier();
+			plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, facilitiesV3Modifier);
+			plansModifier.runAssignFacilitiesV3();
+		}
 	}
 
 
@@ -77,7 +80,6 @@ public class PlanModifications {
 		this.modifier.modify(0);
 		this.writePlans();
 	}
-
 
 	public void init(final String plansfilePath, final String networkfilePath,
 			final String facilitiesfilePath, Modifier modifier) {
