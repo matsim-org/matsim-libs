@@ -88,23 +88,15 @@ xml:lang="en">
   <!-- at least a facility or a link or both -->
   <xs:choice>
     <!-- at least one of them -->
-    <xs:element>
-      <xs:complexType>
-        <xs:choice>
-          <xs:element ref="facilityId" />
-          <xs:element ref="linkId" />
-        </xs:choice>
-      </xs:complexType>
-    </xs:element>
+      <xs:choice>
+        <xs:element ref="facilityId" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="linkId" minOccurs="1" maxOccurs="1"/>
+      </xs:choice>
     <!-- or both must be present -->
-    <xs:element>
-      <xs:complexType>
-        <xs:sequence>
-          <xs:element ref="facilityId" minOccurs="1" maxOccurs="1" />
-          <xs:element ref="linkId" minOccurs="1" maxOccurs="1" />
-        </xs:sequence>
-      </xs:complexType>    
-    </xs:element>
+      <xs:sequence>
+        <xs:element ref="facilityId" minOccurs="1" maxOccurs="1" />
+        <xs:element ref="linkId" minOccurs="1" maxOccurs="1" />
+      </xs:sequence>
   </xs:choice>
  </xs:complexType>
 
@@ -114,23 +106,15 @@ xml:lang="en">
     <!-- at least one location or coordinate or both -->
     <xs:choice>
       <!-- at least one -->
-      <xs:element>
-        <xs:complexType>
-          <xs:choice>
-            <xs:element ref="coordinate"/>
-            <xs:element name="actLocation" type="actLocationType"/>
-          </xs:choice>
-        </xs:complexType>
-      </xs:element>
+        <xs:choice>
+          <xs:element ref="coordinate" minOccurs="1" maxOccurs="1"/>
+          <xs:element name="actLocation" type="actLocationType" minOccurs="1" maxOccurs="1"/>
+        </xs:choice>
       <!-- or both -->
-      <xs:element>
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element ref="coordinate" minOccurs="1" maxOccurs="1"/>
-            <xs:element name="actLocation" type="locationType" minOccurs="1" maxOccurs="1"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
+        <xs:sequence>
+          <xs:element ref="coordinate" minOccurs="1" maxOccurs="1"/>
+          <xs:element name="actLocation" type="actLocationType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
     </xs:choice>
   </xs:complexType>
 </xs:element>
