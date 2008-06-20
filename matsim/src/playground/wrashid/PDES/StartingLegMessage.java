@@ -1,31 +1,56 @@
 package playground.wrashid.PDES;
 
+import java.util.ArrayList;
+
+import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
+import org.matsim.plans.Plan;
 
-public class StartingLegMessage extends Message {
+public class StartingLegMessage extends SelfhandleMessage {
 	private Leg leg=null;
-	private String vehicleId;
+	private Vehicle vehicle;
 	// at which position in plan.getActsLegs(), the current Leg is located
 	// this is needed for finding out, which leg to take next
 	private int legIndex;
 	// A route is made up of several links. So we need the index of the link here.
 	private int linkIndex;
+	// the link, at which the leg starts
+	private Link startingLink;
 
-	public StartingLegMessage(Leg leg,String vehicleId, int legIndex, int linkIndex) {
+	public StartingLegMessage(Leg leg,Vehicle vehicle, int legIndex, int linkIndex, Link startingLink) {
 		super();
 		this.leg = leg;
-		this.vehicleId = vehicleId;
+		this.vehicle = vehicle;
 		this.legIndex = legIndex;
 		this.linkIndex=linkIndex;
+		this.startingLink=startingLink;
 	}
 
 	@Override
 	public void printMessageLogString() {
-		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicleId + "; LinkId=" + leg.getRoute().getLinkRoute()[linkIndex].getId().toString() + "; Description=enter " + leg);
+		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + startingLink.getId().toString() + "; Description=enter " );
+		//TODO: There is a difference in the link I get here and the one, which is used in DEQSim, because the one is using start link and the other is using end link
+		// use the following normally: leg.getRoute().getLinkRoute()[linkIndex].getId().toString()
 	}
 
 	public int getLegIndex() {
 		return legIndex;
 	}
+
+	public int getLinkIndex() {
+		return linkIndex;
+	}
+
+	@Override
+	public void selfhandleMessage() {
+		printMessageLogString();
+		
+		// attempt to enter street.
+		Road road=Road.allRoads.get(startingLink.getId().toString());
+		road.enterRequest(vehicle);
+		
+	}
+	
+	
 }

@@ -26,7 +26,11 @@ public class Scheduler {
 		while(queue.hasElement() && simTime<SimulationParameters.simulationLength){
 			m=queue.getNextMessage();
 			simTime=m.getMessageArrivalTime();
-			m.receivingUnit.handleMessage(m);
+			if (m instanceof SelfhandleMessage){
+				((SelfhandleMessage) m).selfhandleMessage();
+			} else {
+				m.receivingUnit.handleMessage(m);
+			}
 		}
 	}
 	

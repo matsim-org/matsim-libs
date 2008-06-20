@@ -22,6 +22,7 @@ package playground.wrashid.deqsim;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.basic.v01.Id;
@@ -36,6 +37,7 @@ import org.matsim.plans.Plans;
 
 import playground.wrashid.PDES.Road;
 import playground.wrashid.PDES.Scheduler;
+import playground.wrashid.PDES.SimulationParameters;
 import playground.wrashid.PDES.Vehicle;
 
 public class JavaDEQSim {
@@ -47,16 +49,18 @@ public class JavaDEQSim {
 		// constructor
 		this.population = population;
 		this.network = network;
-		
+		SimulationParameters.linkCapacityPeriod=network.getCapacityPeriod();
 	}
 	
 	public void run() {
 		Scheduler scheduler=new Scheduler();
+		Road.allRoads=new HashMap<String,Road>();
 		
 		// initialize network
 		Road road=null;
 		for (Link link: network.getLinks().values()){
 			road= new Road(scheduler,link);
+			Road.allRoads.put(link.getId().toString(), road);
 		}
 		
 		
