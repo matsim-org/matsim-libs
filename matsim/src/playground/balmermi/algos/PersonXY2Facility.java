@@ -163,10 +163,10 @@ public class PersonXY2Facility extends PersonAlgorithm implements PlanAlgorithmI
 			else { Gbl.errorMsg("act type ="+act.getType()+"not known!"); }
 
 			Facility f = qt.get(coord.getX(),coord.getY());
-			if (f == null) { Gbl.errorMsg("something is wrong!"); }
-			
+			if (f == null) { Gbl.errorMsg("Coordinates == null; something is wrong!"); }
+
 			Link l = f.getLink();
-			if (l == null) { Gbl.errorMsg("something is wrong!"); }
+			if (l == null) { Gbl.errorMsg("Link == null; something is wrong!"); }
 
 			act.setFacility(f);
 			act.setLink(l);
