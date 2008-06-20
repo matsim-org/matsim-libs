@@ -59,7 +59,7 @@ public class Vehicle extends SimUnit {
 		Leg leg = (Leg)actsLegs.get(1);
 		// the leg the agent performs
 		double departureTime = leg.getDepTime(); // the time the agent departs at this activity
-		sendMessage(new StartingLegMessage(leg,this,1,0,((Act)actsLegs.get(0)).getLink()), this.unitNo, departureTime);
+		sendMessage(new StartingLegMessage(scheduler,leg,this,1,0,((Act)actsLegs.get(0)).getLink()), this.unitNo, departureTime);
 	}
 
 	public Person getOwnerPerson() {
