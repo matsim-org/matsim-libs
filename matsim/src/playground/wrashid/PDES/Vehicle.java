@@ -30,13 +30,13 @@ public class Vehicle extends SimUnit {
 	@Override
 	public void handleMessage(Message m) {
 		m.printMessageLogString();
-		if (m instanceof EndActionMessage){
-			EndActionMessage endActionMessage=(EndActionMessage) m;
+		if (m instanceof StartingLegMessage){
+			StartingLegMessage endActionMessage=(StartingLegMessage) m;
 			Plan plan = ownerPerson.getSelectedPlan(); // that's the plan the person will execute
 			ArrayList<Object> actsLegs = plan.getActsLegs();
-			if (actsLegs.size()>endActionMessage.getActionLegIndex()+1){
+			if (actsLegs.size()>endActionMessage.getLegIndex()+1){
 				// it is clear that after an action comes a leg
-				Leg leg = (Leg)actsLegs.get(endActionMessage.getActionLegIndex()+1);
+				Leg leg = (Leg)actsLegs.get(endActionMessage.getLegIndex()+1);
 				if ("car".equals(leg.getMode())) { // we only simulate car traffic
 					Link[] route = leg.getRoute().getLinkRoute(); // these are the links the agent will drive along one after the other.
 				}
@@ -52,10 +52,10 @@ public class Vehicle extends SimUnit {
 		Plan plan = ownerPerson.getSelectedPlan(); // that's the plan the person will execute
 		ArrayList<Object> actsLegs = plan.getActsLegs();
 		// the assumption here 
-		Act act = (Act)actsLegs.get(0);
-		// the activity the agent performs
-		double departureTime = act.getEndTime(); // the time the agent departs at this activity
-		sendMessage(new EndActionMessage(act,ownerPerson.getId().toString(),0), this.unitNo, departureTime);
+		Leg leg = (Leg)actsLegs.get(1);
+		// the leg the agent performs
+		double departureTime = leg.getDepTime(); // the time the agent departs at this activity
+		sendMessage(new StartingLegMessage(leg,ownerPerson.getId().toString(),1,0), this.unitNo, departureTime);
 	}
 
 	public Person getOwnerPerson() {
