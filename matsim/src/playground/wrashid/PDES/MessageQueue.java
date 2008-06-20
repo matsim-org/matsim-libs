@@ -31,7 +31,7 @@ public class MessageQueue {
 		return !queue.isEmpty();
 	}
 	
-	public static String feedWithZeros(long x){
+	public static String feedWithZeros(double x){
 		String result="";
 		long j=Long.MAX_VALUE;
 		
@@ -41,7 +41,7 @@ public class MessageQueue {
 			}
 			j/=10;
 		}
-		result=result.concat(new Long(x).toString());
+		result=result.concat(new Double(x).toString());
 		return result;
 	}
 	

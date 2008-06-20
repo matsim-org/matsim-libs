@@ -1,9 +1,9 @@
 package playground.wrashid.PDES;
 
-public class Message {
+public abstract class Message {
 	
 	private static long messageCounter=0;
-	public long messageArrivalTime=0;
+	public double messageArrivalTime=0;
 	public SimUnit sendingUnit;
 	public SimUnit receivingUnit;
 	public long messageType;
@@ -16,12 +16,15 @@ public class Message {
 		messageCounter++;
 	}
 	
-	public long getMessageArrivalTime() {
+	public double getMessageArrivalTime() {
 		return messageArrivalTime;
 	}
 	
-	public void setMessageArrivalTime(long messageArrivalTime) {
+	public void setMessageArrivalTime(double messageArrivalTime) {
 		this.messageArrivalTime = messageArrivalTime;
 	}
+	
+	public abstract void printMessageLogString();
+	
 
 }

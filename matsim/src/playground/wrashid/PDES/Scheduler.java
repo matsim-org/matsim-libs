@@ -3,9 +3,9 @@ package playground.wrashid.PDES;
 import java.util.HashMap;
 
 public class Scheduler {
-	static long simTime=0;
+	static double simTime=0;
 	static MessageQueue queue=new MessageQueue();
-	static HashMap<Long,SimUnit> simUnits=new HashMap<Long, SimUnit>();
+	HashMap<Long,SimUnit> simUnits=new HashMap<Long, SimUnit>();
 
 
 	
@@ -19,7 +19,7 @@ public class Scheduler {
 	}
 	
 	
-	public static void startSimulation(){
+	public void startSimulation(){
 		initializeSimulation();
 		
 		Message m;
@@ -31,11 +31,11 @@ public class Scheduler {
 	}
 	
 	
-	public static void register(SimUnit su){
+	public void register(SimUnit su){
 		simUnits.put(new Long(su.unitNo), su);
 	}
 	
-	public static Object getSimUnit(long unitId){
+	public Object getSimUnit(long unitId){
 		return simUnits.get(new Long(unitId));
 	}
 	
@@ -43,7 +43,7 @@ public class Scheduler {
 	// attention: this procedure only invokes
 	// the initialization method of objects, which
 	// exist at the beginning of the simulation
-	public static void initializeSimulation(){
+	public void initializeSimulation(){
 		Object[] objects=simUnits.values().toArray();
 		SimUnit su;
 		
@@ -54,12 +54,12 @@ public class Scheduler {
 	}
 
 
-	public static long getSimTime() {
+	public double getSimTime() {
 		return simTime;
 	}
 
 
-	public static void unregister(SimUnit unit) {
+	public void unregister(SimUnit unit) {
 		simUnits.remove(new Long(unit.unitNo));
 	}
 	

@@ -1,13 +1,23 @@
 package playground.wrashid.PDES;
 
+import java.util.ArrayList;
+
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
+
+import org.matsim.network.Link;
+import org.matsim.plans.Act;
+import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
+
+import sun.security.jca.GetInstance.Instance;
 
 public class Vehicle extends SimUnit {
 
 	private Person ownerPerson = null;
 
-	public Vehicle(Person ownerPerson) {
-		super();
+	public Vehicle(Scheduler scheduler, Person ownerPerson) {
+		super(scheduler);
 		this.ownerPerson = ownerPerson;
 	}
 
@@ -19,14 +29,37 @@ public class Vehicle extends SimUnit {
 
 	@Override
 	public void handleMessage(Message m) {
-		// TODO Auto-generated method stub
-
+		m.printMessageLogString();
+		if (m instanceof EndActionMessage){
+			EndActionMessage endActionMessage=(EndActionMessage) m;
+			Plan plan = ownerPerson.getSelectedPlan(); // that's the plan the person will execute
+			ArrayList<Object> actsLegs = plan.getActsLegs();
+			if (actsLegs.size()>endActionMessage.getActionLegIndex()+1){
+				// it is clear that after an action comes a leg
+				Leg leg = (Leg)actsLegs.get(endActionMessage.getActionLegIndex()+1);
+				if ("car".equals(leg.getMode())) { // we only simulate car traffic
+					Link[] route = leg.getRoute().getLinkRoute(); // these are the links the agent will drive along one after the other.
+				}
+				// when nicht car, was dann?????????????????????????????
+			}
+		}
 	}
 
 	@Override
+	// put the first event of each person is action completed. 
+	// this is put into the MessageQueue 
 	public void initialize() {
-		// TODO Auto-generated method stub
+		Plan plan = ownerPerson.getSelectedPlan(); // that's the plan the person will execute
+		ArrayList<Object> actsLegs = plan.getActsLegs();
+		// the assumption here 
+		Act act = (Act)actsLegs.get(0);
+		// the activity the agent performs
+		double departureTime = act.getEndTime(); // the time the agent departs at this activity
+		sendMessage(new EndActionMessage(act,ownerPerson.getId().toString(),0), this.unitNo, departureTime);
+	}
 
+	public Person getOwnerPerson() {
+		return ownerPerson;
 	}
 
 }

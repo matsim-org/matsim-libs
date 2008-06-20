@@ -6,13 +6,16 @@ package playground.wrashid.PDES;
 public abstract class SimUnit {
 	
 	static int unitCounter=0;
+	Scheduler scheduler=null;
 	String label;
 	
 	long unitNo;
 
 	int messageType=0;
 	
-	public SimUnit(){
+	// every sim unit should invoke this method, before doing anything else
+	public SimUnit(Scheduler scheduler){
+		this.scheduler=scheduler;
 		initializeObject();
 	}
 	
@@ -20,10 +23,10 @@ public abstract class SimUnit {
 	
 	public abstract void handleMessage(Message m);
 	
-	public void sendMessage(Message m, long targetUnitId, long messageArrivalTime){
+	public void sendMessage(Message m, long targetUnitId, double messageArrivalTime){
 		m.sendingUnit=this;
 		
-		SimUnit targetUnit=(SimUnit) Scheduler.getSimUnit(targetUnitId);
+		SimUnit targetUnit=(SimUnit) scheduler.getSimUnit(targetUnitId);
 		m.receivingUnit=targetUnit;
 		
 		m.setMessageArrivalTime(messageArrivalTime);
@@ -33,7 +36,7 @@ public abstract class SimUnit {
 	
 	// Message m can be a new message, 
 	// and its fields do not need to be initialized.
-	public void setTimer(long timeOut, Message m){
+	public void setTimer(double timeOut, Message m){
 		
 		m.setMessageArrivalTime(Scheduler.simTime+timeOut);
 		m.sendingUnit=this;
@@ -46,7 +49,7 @@ public abstract class SimUnit {
 	private void initializeObject(){
 		label="["+ this.getClass().getSimpleName() + " " + unitCounter + "]";
 		unitNo=unitCounter;
-		Scheduler.register(this);
+		scheduler.register(this);
 		unitCounter++;
 	}
 	
@@ -54,10 +57,14 @@ public abstract class SimUnit {
 	public abstract void finalize();
 	
 	public void unregisterFromEventHeap(){
-		Scheduler.unregister(this);
+		scheduler.unregister(this);
 	}
 
 	public long getUnitNo() {
 		return unitNo;
+	}
+
+	public void setScheduler(Scheduler scheduler) {
+		this.scheduler = scheduler;
 	}
 }

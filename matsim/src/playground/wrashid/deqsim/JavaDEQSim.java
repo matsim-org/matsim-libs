@@ -21,7 +21,10 @@
 package playground.wrashid.deqsim;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -31,25 +34,40 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 
+import playground.wrashid.PDES.Road;
+import playground.wrashid.PDES.Scheduler;
+import playground.wrashid.PDES.Vehicle;
+
 public class JavaDEQSim {
 
 	final Plans population;
+	final NetworkLayer network;
 	
 	public JavaDEQSim(final NetworkLayer network, final Plans population, final Events events) {
 		// constructor
 		this.population = population;
+		this.network = network;
+		
 	}
 	
 	public void run() {
-		// do something
+		Scheduler scheduler=new Scheduler();
 		
-		/* Das folgende ist einfach ein Beispiel, wie auf die Population zugegriffen 
-		 * werden kann und wie man herauskriegt, welche Route die Agenten abfahren
-		 * sollen. Dieser Code wird bestimmt nicht hier so stehen bleiben, sondern
-		 * spaeter in anderen Klassen verwendet werden.
-		 */
+		// initialize network
+		Road road=null;
+		for (Link link: network.getLinks().values()){
+			road= new Road(scheduler,link);
+		}
 		
+		
+		
+		// initialize vehicles
+		
+		
+		Vehicle vehicle=null;
 		for (Person person : this.population.getPersons().values()) {
+			vehicle =new Vehicle(scheduler,person);
+			/*
 			Plan plan = person.getSelectedPlan(); // that's the plan the person will execute
 			ArrayList<Object> actsLegs = plan.getActsLegs();
 			for (int i = 0; i < actsLegs.size(); i++) {
@@ -65,6 +83,9 @@ public class JavaDEQSim {
 					}
 				}
 			}
+			*/
 		}
+		
+		scheduler.startSimulation();
 	}
 }
