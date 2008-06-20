@@ -8,12 +8,13 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.misc.Counter;
 
 public class LocationModifier extends Modifier {
@@ -52,7 +53,7 @@ public class LocationModifier extends Modifier {
 			this.randomizeLocations();
 		}
 		else if (option==1) {
-			this.assignOneLocation();
+			this.assignXLocations();
 		}
 		else if (option==2) {
 			this.assignOneRandomLocOfArea();
@@ -76,11 +77,11 @@ public class LocationModifier extends Modifier {
 					Plan plan = plan_iter.next();
 
 					if (this.shop_facilities.size()>0) {
-						exchangeFacilities("s",this.shop_facilities, plan, -1);
+						exchangeFacilities("s",this.shop_facilities, plan, -1, null);
 					}
 
 					if (this.leisure_facilities.size()>0) {
-						exchangeFacilities("l",this.leisure_facilities, plan, -1);
+						exchangeFacilities("l",this.leisure_facilities, plan, -1, null);
 					}
 
 				}
@@ -88,11 +89,17 @@ public class LocationModifier extends Modifier {
 		log.info("randomize locations done.");
 	}
 
-	private  void assignOneLocation() {
+	private  void assignXLocations() {
 
-		log.info("running assignOneLocation:");
+		log.info("running assignXLocations:");
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
+
+		int leisure_ind = 0;
+		int shop_ind = 0;
+		CoordI [] shop_facility_coords={new Coord(1.0, 1.0)};
+		CoordI []  leisure_facility_coords={new Coord(1.0, 1.0)};
+
 		while (person_iter.hasNext()) {
 			Person person = person_iter.next();
 				counter.incCounter();
@@ -102,16 +109,18 @@ public class LocationModifier extends Modifier {
 					Plan plan = plan_iter.next();
 
 					if (this.shop_facilities.size()>0) {
-						exchangeFacilities("s",this.shop_facilities, plan, 0);
+						exchangeFacilities("s",this.shop_facilities, plan, -3, shop_facility_coords[shop_ind]);
+						shop_ind=(shop_ind++) % 10;
 					}
 
 					if (this.leisure_facilities.size()>0) {
-						exchangeFacilities("l",this.leisure_facilities, plan, 0);
+						exchangeFacilities("l",this.leisure_facilities, plan, -3, leisure_facility_coords[leisure_ind]);
+						leisure_ind=(leisure_ind++) % 10;
 					}
 
 				}
 		}
-		log.info("assignOneLocation done.");
+		log.info("assignXLocations done.");
 	}
 
 	private  void assignOneRandomLocOfArea() {
@@ -128,11 +137,11 @@ public class LocationModifier extends Modifier {
 					Plan plan = plan_iter.next();
 
 					if (this.shop_facilities.size()>0) {
-						exchangeFacilities("s", this.shop_facilities, plan, -2);
+						exchangeFacilities("s", this.shop_facilities, plan, -2, null);
 					}
 
 					if (this.leisure_facilities.size()>0) {
-						exchangeFacilities("l", this.leisure_facilities, plan, -2);
+						exchangeFacilities("l", this.leisure_facilities, plan, -2, null);
 					}
 				}
 		}
@@ -140,7 +149,7 @@ public class LocationModifier extends Modifier {
 	}
 
 	private void exchangeFacilities(final String type, final TreeMap<Id,Facility>  exchange_facilities,
-			final Plan plan, int index) {
+			final Plan plan, int key, CoordI coords) {
 
 			final ArrayList<?> actslegs = plan.getActsLegs();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -148,11 +157,11 @@ public class LocationModifier extends Modifier {
 				if (act.getType().startsWith(type)) {
 
 					Facility facility=null;
-					if (index==-1) {
+					if (key==-1) {
 						facility=(Facility)exchange_facilities.values().toArray()[
 					           Gbl.random.nextInt(exchange_facilities.size()-1)];
 					}
-					else if (index==-2) {
+					else if (key==-2) {
 						if (type.equals("s")) {
 							facility=findCloseFacility(type, plan, this.shopFacQuadTree, exchange_facilities);
 						}
@@ -161,12 +170,20 @@ public class LocationModifier extends Modifier {
 						}
 					}
 					else {
-						facility=(Facility)exchange_facilities.values().toArray()[index];
+						if (type.equals("s")){
+							facility=this.shopFacQuadTree.get(coords.getX(), coords.getY());
+							log.info("Shop Facility:" + facility.getId()+ "cords: x=" +
+									facility.getCenter().getX()+" y="+ facility.getCenter().getY());
+						}
+						if (type.equals("l")){
+							facility=this.leisFacQuadTree.get(coords.getX(), coords.getY());
+							log.info("Leisure Facility:" + facility.getId()+ "cords: x=" +
+									facility.getCenter().getX()+" y="+ facility.getCenter().getY());
+						}
 					}
-					//act.setFacility(facility);
-					Link nearestLink=this.network.getNearestLink(facility.getCenter());
-					act.setLink(nearestLink);
-					act.setCoord(nearestLink.getCenter());
+					act.setFacility(facility);
+					act.setLink(facility.getLink());
+					act.setCoord(facility.getCenter());
 				}
 			}
 

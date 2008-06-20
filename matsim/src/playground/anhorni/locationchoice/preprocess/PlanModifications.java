@@ -73,17 +73,19 @@ public class PlanModifications {
 
 	public void runLocationModification() {
 
-			this.outputpath="./output/plans_randomized.xml.gz";
-			this.modifier.modify(0);
+			this.outputpath="./output/plans_setToXLocs.xml.gz";
+			this.modifier.modify(1);
 			this.writePlans();
 
-			this.outputpath="./output/plans_oneloc.xml.gz";
-			this.modifier.modify(1);
+		/*
+			this.outputpath="./output/plans_randomized.xml.gz";
+			this.modifier.modify(0);
 			this.writePlans();
 
 			this.outputpath="./output/plans_onelocinarea.xml.gz";
 			this.modifier.modify(2);
 			this.writePlans();
+		*/
 	}
 
 	public void runAssignFacilitiesV3() {
@@ -136,8 +138,5 @@ public class PlanModifications {
 		new PlansWriter(this.plans, this.outputpath , "v4", 1.0).write();
 		log.info("plans written to: " + this.outputpath);
 	}
-
-
-
 
 }
