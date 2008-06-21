@@ -3,6 +3,7 @@ package playground.anhorni.locationchoice.preprocess;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -48,57 +49,22 @@ public class LocationModifier extends Modifier {
 	}
 
 	@Override
-	public void modify(int option){
-		if (option==0) {
-			this.randomizeLocations();
-		}
-		else if (option==1) {
-			this.assignXLocations();
-		}
-		else if (option==2) {
-			this.assignOneRandomLocOfArea();
-		}
-		else {
-			log.error("option must be 0,1 or 2");
-		}
+	public void modify(){
+		/* assign a random location around Bellevue with a radius of 30km
+		 * -> tailored for WU project
+		 */
+		this.assignRandomLocation(new Coord(683508.50, 246832.91), 30000);
 	}
 
-	private  void randomizeLocations() {
 
-		log.info("running randomize locations:");
-		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
-		Counter counter = new Counter(" person # ");
-		while (person_iter.hasNext()) {
-			Person person = person_iter.next();
-				counter.incCounter();
+	private void assignRandomLocation(CoordI coords, double radius) {
 
-				Iterator<Plan> plan_iter = person.getPlans().iterator();
-				while (plan_iter.hasNext()) {
-					Plan plan = plan_iter.next();
-
-					if (this.shop_facilities.size()>0) {
-						exchangeFacilities("s",this.shop_facilities, plan, -1, null);
-					}
-
-					if (this.leisure_facilities.size()>0) {
-						exchangeFacilities("l",this.leisure_facilities, plan, -1, null);
-					}
-
-				}
-		}
-		log.info("randomize locations done.");
-	}
-
-	private  void assignXLocations() {
-
-		log.info("running assignXLocations:");
+		log.info("running assignRandomLocation:");
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 
-		int leisure_ind = 0;
-		int shop_ind = 0;
-		CoordI [] shop_facility_coords={new Coord(1.0, 1.0)};
-		CoordI []  leisure_facility_coords={new Coord(1.0, 1.0)};
+		Vector<Facility> zhShopFacilities = (Vector<Facility>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
+		Vector<Facility> zhLeisureFacilities = (Vector<Facility>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
 
 		while (person_iter.hasNext()) {
 			Person person = person_iter.next();
@@ -109,84 +75,34 @@ public class LocationModifier extends Modifier {
 					Plan plan = plan_iter.next();
 
 					if (this.shop_facilities.size()>0) {
-						exchangeFacilities("s",this.shop_facilities, plan, -3, shop_facility_coords[shop_ind]);
-						shop_ind=(shop_ind++) % 10;
+						exchangeFacilities("s", zhShopFacilities, plan);
 					}
 
 					if (this.leisure_facilities.size()>0) {
-						exchangeFacilities("l",this.leisure_facilities, plan, -3, leisure_facility_coords[leisure_ind]);
-						leisure_ind=(leisure_ind++) % 10;
+						exchangeFacilities("l", zhLeisureFacilities, plan);
 					}
 
 				}
 		}
-		log.info("assignXLocations done.");
+		log.info("assignRandomLocation done.");
 	}
 
-	private  void assignOneRandomLocOfArea() {
-
-		log.info("running assignOneRandomLocOfArea:");
-		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
-		Counter counter = new Counter(" person # ");
-		while (person_iter.hasNext()) {
-			Person person = person_iter.next();
-				counter.incCounter();
-
-				Iterator<Plan> plan_iter = person.getPlans().iterator();
-				while (plan_iter.hasNext()) {
-					Plan plan = plan_iter.next();
-
-					if (this.shop_facilities.size()>0) {
-						exchangeFacilities("s", this.shop_facilities, plan, -2, null);
-					}
-
-					if (this.leisure_facilities.size()>0) {
-						exchangeFacilities("l", this.leisure_facilities, plan, -2, null);
-					}
-				}
-		}
-		log.info("... done.");
-	}
-
-	private void exchangeFacilities(final String type, final TreeMap<Id,Facility>  exchange_facilities,
-			final Plan plan, int key, CoordI coords) {
+	private void exchangeFacilities(final String type, Vector<Facility>  exchange_facilities,
+			final Plan plan) {
 
 			final ArrayList<?> actslegs = plan.getActsLegs();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final Act act = (Act)actslegs.get(j);
 				if (act.getType().startsWith(type)) {
 
-					Facility facility=null;
-					if (key==-1) {
-						facility=(Facility)exchange_facilities.values().toArray()[
-					           Gbl.random.nextInt(exchange_facilities.size()-1)];
-					}
-					else if (key==-2) {
-						if (type.equals("s")) {
-							facility=findCloseFacility(type, plan, this.shopFacQuadTree, exchange_facilities);
-						}
-						if (type.equals("l")) {
-							facility=findCloseFacility(type, plan, this.leisFacQuadTree, exchange_facilities);
-						}
-					}
-					else {
-						if (type.equals("s")){
-							facility=this.shopFacQuadTree.get(coords.getX(), coords.getY());
-							log.info("Shop Facility:" + facility.getId()+ "cords: x=" +
-									facility.getCenter().getX()+" y="+ facility.getCenter().getY());
-						}
-						if (type.equals("l")){
-							facility=this.leisFacQuadTree.get(coords.getX(), coords.getY());
-							log.info("Leisure Facility:" + facility.getId()+ "cords: x=" +
-									facility.getCenter().getX()+" y="+ facility.getCenter().getY());
-						}
-					}
+					Facility facility=exchange_facilities.get(
+							Gbl.random.nextInt(exchange_facilities.size()-1));
+
 					act.setFacility(facility);
 					act.setLink(facility.getLink());
 					act.setCoord(facility.getCenter());
 				}
 			}
-
 			// loop over all <leg>s, remove route-information
 			// routing is done after location choice
 			for (int j = 1; j < actslegs.size(); j=j+2) {
@@ -222,7 +138,61 @@ public class LocationModifier extends Modifier {
 		return quadtree;
 	}
 
-	private Facility findCloseFacility(String type, Plan plan,
+
+
+	/* DEPR: ------------------------------------------------------------------------------------------
+	 * private  void assignOneRandomLocOfArea() {
+
+		log.info("running assignOneRandomLocOfArea:");
+		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+		Counter counter = new Counter(" person # ");
+		while (person_iter.hasNext()) {
+			Person person = person_iter.next();
+				counter.incCounter();
+
+				Iterator<Plan> plan_iter = person.getPlans().iterator();
+				while (plan_iter.hasNext()) {
+					Plan plan = plan_iter.next();
+
+					if (this.shop_facilities.size()>0) {
+						exchangeFacilities("s", this.shop_facilities, plan, -2, null);
+					}
+
+					if (this.leisure_facilities.size()>0) {
+						exchangeFacilities("l", this.leisure_facilities, plan, -2, null);
+					}
+				}
+		}
+		log.info("... done.");
+	}
+
+	private  void randomizeLocations() {
+
+		log.info("running randomize locations:");
+		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+		Counter counter = new Counter(" person # ");
+		while (person_iter.hasNext()) {
+			Person person = person_iter.next();
+				counter.incCounter();
+
+				Iterator<Plan> plan_iter = person.getPlans().iterator();
+				while (plan_iter.hasNext()) {
+					Plan plan = plan_iter.next();
+
+					if (this.shop_facilities.size()>0) {
+						exchangeFacilities("s",this.shop_facilities, plan, -1, null);
+					}
+
+					if (this.leisure_facilities.size()>0) {
+						exchangeFacilities("l",this.leisure_facilities, plan, -1, null);
+					}
+
+				}
+		}
+		log.info("randomize locations done.");
+	}
+
+		private Facility findCloseFacility(String type, Plan plan,
 			QuadTree<Facility> quadtree, TreeMap<Id,Facility> facilities_type ) {
 
 		Facility facility=null;
@@ -251,4 +221,7 @@ public class LocationModifier extends Modifier {
 		}
 		return facility;
 	}
+
+	 */
+
 }

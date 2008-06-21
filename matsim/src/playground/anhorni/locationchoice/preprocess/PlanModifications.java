@@ -29,79 +29,58 @@ public class PlanModifications {
 	/**
 	 * @param:
 	 * - path to plans file
-	 * - path to network file
-	 * - path to facilities file
-	 * - path to the world file
 	 */
 	public static void main(final String[] args) {
 
-		/*
-		if (args.length < 5 || args.length > 5 ) {
-			System.out.println("Too few arguments. Exit");
+
+		if (args.length < 1 || args.length > 1 ) {
+			System.out.println("Too few or too many arguments. Exit");
 			System.exit(1);
 		}
-
 		String plansfilePath=args[0];
-		String networkfilePath=args[1];
-		String facilitiesfilePath=args[2];
-		String worldfilePath=args[3];
-		int type=args[4];
-		*/
 
-
-		String plansfilePath="./input/plans_withoutlinkinfo.xml.gz";
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
 		String worldfilePath="./input/world.xml";
-		int type=1;
 
 		PlanModifications plansModifier=new PlanModifications();
-		if (type==0) {
-			LocationModifier locationmodifier=new LocationModifier();
-			plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, worldfilePath,
-					locationmodifier);
-			plansModifier.runLocationModification();
-		}
-		else if (type==1) {
-			FacilitiesV3Modifier facilitiesV3Modifier=new FacilitiesV3Modifier();
-			plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, worldfilePath,
-					facilitiesV3Modifier);
-			plansModifier.runAssignFacilitiesV3();
-		}
+
+		// use facilities v3
+		plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, worldfilePath);
+		plansModifier.setModifier(new FacilitiesV3Modifier());
+		plansModifier.runAssignFacilitiesV3();
+
+		// modify the activity locations
+		plansModifier.setModifier(new LocationModifier());
+		plansModifier.runLocationModification();
 	}
 
-
-	public void runLocationModification() {
-
-			this.outputpath="./output/plans_setToXLocs.xml.gz";
-			this.modifier.modify(1);
-			this.writePlans();
-
-		/*
-			this.outputpath="./output/plans_randomized.xml.gz";
-			this.modifier.modify(0);
-			this.writePlans();
-
-			this.outputpath="./output/plans_onelocinarea.xml.gz";
-			this.modifier.modify(2);
-			this.writePlans();
-		*/
+	private void setModifier(Modifier modifier) {
+		this.modifier=modifier;
 	}
 
-	public void runAssignFacilitiesV3() {
+	private void runLocationModification() {
+			this.outputpath="./output/plans_randomizedzhlocs.xml.gz";
+			this.modifier.init(this.plans, this.network, this.facilities);
+			this.modifier.modify();
+			this.writePlans();
+	}
+
+	private void runAssignFacilitiesV3() {
 		this.outputpath="./output/plans_facilitiesV3.xml.gz";
-		this.modifier.modify(0);
+		this.modifier.init(this.plans, this.network, this.facilities);
+		this.modifier.modify();
 		this.writePlans();
 	}
 
-	public void init(final String plansfilePath, final String networkfilePath,
-			final String facilitiesfilePath, final String worldfilePAth, Modifier modifier) {
+	private void init(final String plansfilePath, final String networkfilePath,
+			final String facilitiesfilePath, final String worldfilePath) {
 
 
 		System.out.println("  reading world xml file... ");
 		this.world=new World();
 		final MatsimWorldReader worldReader = new MatsimWorldReader(this.world);
-		worldReader.readFile(worldfilePAth);
+		worldReader.readFile(worldfilePath);
 		System.out.println("  done.");
 
 
@@ -126,12 +105,6 @@ public class PlanModifications {
 		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
-
-		this.modifier=modifier;
-		this.modifier.init(this.plans, this.network, this.facilities);
-		log.info("init modifier done");
-
-
 	}
 
 	private void writePlans() {

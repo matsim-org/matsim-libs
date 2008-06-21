@@ -20,6 +20,6 @@ public abstract class Modifier {
 		this.facilities=facilities;
 	}
 
-	public abstract void modify(int option);
+	public abstract void modify();
 
 }

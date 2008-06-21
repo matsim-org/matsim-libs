@@ -14,7 +14,7 @@ public class FacilitiesV3Modifier extends Modifier {
 	private final static Logger log = Logger.getLogger(FacilitiesV3Modifier.class);
 
 	@Override
-	public void modify(int option) {
+	public void modify() {
 		this.removeInfos();
 		this.setFacilitiesV3();
 	}
