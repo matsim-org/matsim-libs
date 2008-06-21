@@ -36,6 +36,10 @@ public class Facility extends AbstractLocation {
 
 	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
 
+	// Will soon be changed to be dynamic w/ respect to time.
+	// At the moment it tells the total number of visitors per day.
+	private int numberOfVisitors=0;
+
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
@@ -43,7 +47,7 @@ public class Facility extends AbstractLocation {
 	protected Facility(final Facilities layer, final Id id, final CoordI center) {
 		super(layer,id,center);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
@@ -70,6 +74,13 @@ public class Facility extends AbstractLocation {
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
+	public void setNumberOfVisitors(int numberOfVisitors) {
+		this.numberOfVisitors = numberOfVisitors;
+	}
+
+	public void incNumberOfVisitor() {
+		this.numberOfVisitors++;
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// get methods
@@ -88,7 +99,11 @@ public class Facility extends AbstractLocation {
 		if (this.down_mapping.size() > 1) { Gbl.errorMsg("Something is wrong!!! A facility contains at most one Link (as specified for the moment)!"); }
 		return (Link)this.getDownMapping().get(this.down_mapping.firstKey());
 	}
-	
+
+	public int getNumberOfVisitors() {
+		return this.numberOfVisitors;
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
