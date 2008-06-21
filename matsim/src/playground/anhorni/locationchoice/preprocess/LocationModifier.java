@@ -65,6 +65,9 @@ public class LocationModifier extends Modifier {
 
 		Vector<Facility> zhShopFacilities = (Vector<Facility>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
 		Vector<Facility> zhLeisureFacilities = (Vector<Facility>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
+		log.info("Total number of zh shop facilities:" + zhShopFacilities.size());
+		log.info("Total number of zh leisure facilities:" + zhLeisureFacilities.size());
+
 
 		while (person_iter.hasNext()) {
 			Person person = person_iter.next();
