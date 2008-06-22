@@ -11,10 +11,7 @@ public abstract class Modifier {
 	protected Facilities  facilities=null;
 
 
-	public Modifier() {
-	}
-
-	public void init(Plans plans, NetworkLayer network, Facilities  facilities){
+	public Modifier(Plans plans, NetworkLayer network, Facilities  facilities) {
 		this.plans=plans;
 		this.network=network;
 		this.facilities=facilities;

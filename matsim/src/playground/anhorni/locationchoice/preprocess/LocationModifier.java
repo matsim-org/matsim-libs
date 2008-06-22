@@ -7,12 +7,15 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -27,8 +30,8 @@ public class LocationModifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(LocationModifier.class);
 
-	public LocationModifier() {
-		super();
+	public LocationModifier(Plans plans, NetworkLayer network, Facilities  facilities) {
+		super(plans, network, facilities);
 		this.initShopLeisure();
 	}
 
@@ -45,7 +48,6 @@ public class LocationModifier extends Modifier {
 
 		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
 		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);
-
 	}
 
 	@Override
@@ -55,7 +57,6 @@ public class LocationModifier extends Modifier {
 		 */
 		this.assignRandomLocation(new Coord(683508.50, 246832.91), 30000);
 	}
-
 
 	private void assignRandomLocation(CoordI coords, double radius) {
 

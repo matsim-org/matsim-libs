@@ -3,8 +3,11 @@ package playground.anhorni.locationchoice.preprocess;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.facilities.Facilities;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
 import org.matsim.utils.misc.Counter;
 
 import playground.balmermi.algos.PersonXY2Facility;
@@ -12,6 +15,11 @@ import playground.balmermi.algos.PersonXY2Facility;
 public class FacilitiesV3Modifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(FacilitiesV3Modifier.class);
+
+	public FacilitiesV3Modifier(Plans plans, NetworkLayer network, Facilities  facilities){
+		super(plans, network, facilities);
+	}
+
 
 	@Override
 	public void modify() {

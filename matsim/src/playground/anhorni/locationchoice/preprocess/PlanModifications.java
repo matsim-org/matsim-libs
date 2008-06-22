@@ -44,33 +44,36 @@ public class PlanModifications {
 		String worldfilePath="./input/world.xml";
 
 		PlanModifications plansModifier=new PlanModifications();
+		plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, worldfilePath);
+		plansModifier.runModifications();
+	}
+
+	private void runModifications() {
 
 		// use facilities v3
-		plansModifier.init(plansfilePath, networkfilePath, facilitiesfilePath, worldfilePath);
-		plansModifier.setModifier(new FacilitiesV3Modifier());
-		plansModifier.runAssignFacilitiesV3();
+		this.setModifier(new FacilitiesV3Modifier(this.plans, this.network, this.facilities));
+		this.runAssignFacilitiesV3();
 
 		// modify the activity locations
-		plansModifier.setModifier(new LocationModifier());
-		plansModifier.runLocationModification();
+		this.setModifier(new LocationModifier(this.plans, this.network, this.facilities));
+		this.runLocationModification();
+
 	}
 
 	private void setModifier(Modifier modifier) {
 		this.modifier=modifier;
 	}
 
-	private void runLocationModification() {
-			this.outputpath="./output/plans_randomizedzhlocs.xml.gz";
-			this.modifier.init(this.plans, this.network, this.facilities);
-			this.modifier.modify();
-			this.writePlans();
-	}
-
 	private void runAssignFacilitiesV3() {
 		this.outputpath="./output/plans_facilitiesV3.xml.gz";
-		this.modifier.init(this.plans, this.network, this.facilities);
 		this.modifier.modify();
 		this.writePlans();
+	}
+
+	private void runLocationModification() {
+			this.outputpath="./output/plans_randomizedzhlocs.xml.gz";
+			this.modifier.modify();
+			this.writePlans();
 	}
 
 	private void init(final String plansfilePath, final String networkfilePath,
