@@ -3,7 +3,6 @@ package playground.anhorni.locationchoice.preprocess;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -64,11 +63,11 @@ public class LocationModifier extends Modifier {
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 
-		Vector<Facility> zhShopFacilities = (Vector<Facility>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
-		Vector<Facility> zhLeisureFacilities = (Vector<Facility>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
+		ArrayList<Facility> zhShopFacilities = (ArrayList<Facility>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
+		ArrayList<Facility> zhLeisureFacilities = (ArrayList<Facility>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
 		log.info("Total number of zh shop facilities:" + zhShopFacilities.size());
 		log.info("Total number of zh leisure facilities:" + zhLeisureFacilities.size());
-
+		
 
 		while (person_iter.hasNext()) {
 			Person person = person_iter.next();
@@ -91,7 +90,7 @@ public class LocationModifier extends Modifier {
 		log.info("assignRandomLocation done.");
 	}
 
-	private void exchangeFacilities(final String type, Vector<Facility>  exchange_facilities,
+	private void exchangeFacilities(final String type, ArrayList<Facility>  exchange_facilities,
 			final Plan plan) {
 
 			final ArrayList<?> actslegs = plan.getActsLegs();
