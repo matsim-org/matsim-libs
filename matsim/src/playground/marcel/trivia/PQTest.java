@@ -30,7 +30,7 @@ import java.util.PriorityQueue;
 public class PQTest {
 
 	static class Entry implements Comparable<Entry> {
-		public int key;
+		public double key;
 		public int data;
 		
 		public Entry(int key, int data) {
@@ -75,7 +75,8 @@ public class PQTest {
 		// so let's try that:		
 //		e[9].key = 1; // doesn't work, but we try to modify the "head" of the queue, which may be a special case
 //		e[11].key = 5; // works luckily
-		e[11].key = 3; // doesn't work
+		e[11].key = 3.5; // doesn't work
+		pq.add(e[11]) ; // yyyy: adding element again.
 		
 		Entry ee;
 		while ((ee = pq.poll()) != null) {
