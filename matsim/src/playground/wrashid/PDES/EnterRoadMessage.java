@@ -5,11 +5,7 @@ import org.matsim.plans.Leg;
 
 public class EnterRoadMessage extends SelfhandleMessage {
 
-	private Leg leg;
 	private Vehicle vehicle;
-	private int legIndex;
-	private int linkIndex;
-	private Link currentLink;
 	private Scheduler scheduler; // remove later from here...
 
 	@Override
@@ -21,13 +17,13 @@ public class EnterRoadMessage extends SelfhandleMessage {
 		
 		
 		
+		// enter the road and find out the time for leaving the street
 		
 		
-		
-		Road road=Road.allRoads.get(currentLink.getId().toString());
+		Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
 		double nextAvailableTimeForLeavingStreet=road.enterRoad(vehicle);
 		if (nextAvailableTimeForLeavingStreet>0){
-			sendMessage(scheduler,new EndRoadMessage(scheduler,leg,vehicle,legIndex,linkIndex,currentLink), road.getUnitNo(), nextAvailableTimeForLeavingStreet);
+			sendMessage(scheduler,new EndRoadMessage(scheduler,vehicle), road.getUnitNo(), nextAvailableTimeForLeavingStreet);
 		}
 		
 		
@@ -35,19 +31,15 @@ public class EnterRoadMessage extends SelfhandleMessage {
 		
 	}
 
-	public EnterRoadMessage(Scheduler scheduler,Leg leg,Vehicle vehicle, int legIndex, int linkIndex, Link currentLink) {
+	public EnterRoadMessage(Scheduler scheduler,Vehicle vehicle) {
 		super();
-		this.leg = leg;
 		this.vehicle = vehicle;
-		this.legIndex = legIndex;
-		this.linkIndex=linkIndex;
-		this.currentLink=currentLink;
 		this.scheduler=scheduler;
 	}
 	
 	@Override
 	public void printMessageLogString() {
-		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + currentLink.getId().toString() + "; Description=enter " );
+		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + vehicle.getCurrentLink().getId().toString() + "; Description=enter " );
 		
 	}
 
