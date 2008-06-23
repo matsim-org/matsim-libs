@@ -34,18 +34,41 @@ public class Facility extends AbstractLocation {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+
 	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
+	private int numberOfVisitorsPerDay=0;
 
-	// Will soon be changed to be dynamic w/ respect to time.
-	// At the moment it tells the total number of visitors per day.
-	private int numberOfVisitors=0;
+	// TODO: Set number of time bins using parameterization
+	private final int numberOfTimeBins=4*24;
 
-	//////////////////////////////////////////////////////////////////////
-	// constructor
-	//////////////////////////////////////////////////////////////////////
+	/* 15 min. time bins at the moment.
+	*  Every agent is at the loc. for at least 15 min. That means we have to count
+	*  the arrivals and the departues using 2 variables to reduce "discretization effects".
+	*/
+	private int [] arrivals=null;
+	private int [] departures=null;
+	private int [] load=null;
+
+	// Calculates the attractivity dependend on the shop size.
+	// Will soon be replaced by more sophisticated models.
+	private double attractivityFactor=1.0;
+
+	// Calculates a penalty reflecting capcity restraints.
+	// Again: will soon be replaced by more sophisticated models.
+	private double capacityPenaltyFactor=1.0;
+
 
 	protected Facility(final Facilities layer, final Id id, final CoordI center) {
 		super(layer,id,center);
+		this.arrivals = new int [this.numberOfTimeBins];
+		this.departures = new int [this.numberOfTimeBins];
+		this.load = new int [this.numberOfTimeBins];
+
+		for (int i=0; i<this.numberOfTimeBins; i++){
+			this.arrivals[i]=0;
+			this.departures[i]=0;
+			this.load[i]=0;
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -55,6 +78,51 @@ public class Facility extends AbstractLocation {
 	@Override
 	public double calcDistance(CoordI coord) {
 		return this.center.calcDistance(coord);
+	}
+
+	public void calculateFacilityLoad24() {
+		int numberOfVisitors=0;
+		for (int i=0; i<this.numberOfTimeBins; i++) {
+			numberOfVisitors+=this.arrivals[i];
+			this.load[i]=numberOfVisitors;
+			numberOfVisitors-=this.departures[i];
+		}
+	}
+
+	// TODO: Remove this hardcoded parameterization asap
+	public void calculateCapPenaltyFactor(int timeBinIndex) {
+		//BPR
+		final double a=0.8;
+		final double b=8.0;
+		this.capacityPenaltyFactor = a*Math.pow(this.load[timeBinIndex], b);
+	}
+
+	// TODO: Remove this hardcoded parameterization asap
+	private void calculateAttractivityFactor() {
+
+		final double a=Math.log(1.0/2500.0);
+
+		if (this.activities.containsValue("shop_retail_lt100sqm")) {
+			this.attractivityFactor = 1.0;
+		}
+		else if (this.activities.containsValue("shop_retail_get100sqm")) {
+			this.attractivityFactor = a*Math.log(100.0);
+		}
+		else if (this.activities.containsValue("shop_retail_get400sqm")) {
+			this.attractivityFactor = a*Math.log(400.0);
+		}
+		else if (this.activities.containsValue("shop_retail_get1000sqm")) {
+			this.attractivityFactor = a*Math.log(1000.0);
+		}
+		else if (this.activities.containsValue("shop_retail_get2500sqm")) {
+			this.attractivityFactor = a*Math.log(2500.0);
+		}
+		else if (this.activities.containsValue("shop_other")) {
+			this.attractivityFactor = 1.0;
+		}
+		else {
+			this.attractivityFactor = 1.0;
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -75,12 +143,29 @@ public class Facility extends AbstractLocation {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 	public void setNumberOfVisitors(int numberOfVisitors) {
-		this.numberOfVisitors = numberOfVisitors;
+		this.numberOfVisitorsPerDay = numberOfVisitors;
 	}
 
-	public void incNumberOfVisitor() {
-		this.numberOfVisitors++;
+	public void incNumberOfVisitorsPerDay() {
+		this.numberOfVisitorsPerDay++;
 	}
+
+	public void setAttractivityFactor(double attractivityFactor) {
+		this.attractivityFactor = attractivityFactor;
+	}
+
+	// time in seconds from midnight
+	public void addArrival(double time) {
+		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(900)));
+		this.arrivals[timeBinIndex]+=1;
+		this.incNumberOfVisitorsPerDay();
+	}
+
+	public void addDeparture(double time) {
+		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(900)));
+		this.departures[timeBinIndex]+=1;
+	}
+
 
 	//////////////////////////////////////////////////////////////////////
 	// get methods
@@ -100,8 +185,29 @@ public class Facility extends AbstractLocation {
 		return (Link)this.getDownMapping().get(this.down_mapping.firstKey());
 	}
 
-	public int getNumberOfVisitors() {
-		return this.numberOfVisitors;
+	public int getNumberOfVisitorsPerDay() {
+		return this.numberOfVisitorsPerDay;
+	}
+
+	public double getAttractivityFactor() {
+		this.calculateAttractivityFactor();
+		return this.attractivityFactor;
+	}
+
+	// arg: time in seconds from midnight
+	public double getCapacityPenaltyFactor(double time) {
+		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(900)));
+		this.calculateCapPenaltyFactor(timeBinIndex);
+		return this.capacityPenaltyFactor;
+	}
+
+	// ----------------------------------------------------
+	public void reset() {
+		for (int i=0; i<this.numberOfTimeBins; i++) {
+			this.arrivals[i]=0;
+			this.departures[i]=0;
+			this.load[i]=0;
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
