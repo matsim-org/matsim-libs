@@ -26,13 +26,21 @@ public class EndRoadMessage extends SelfhandleMessage {
 		if (vehicle.getCurrentLeg().getRoute().getLinkRoute().length==vehicle.getLinkIndex()+1){
 			// the leg is completed, try to enter the last link but do not enter it 
 			// (just wait, until you have clearance for enter and then leave the road)
+			
+			vehicle.initiateEndingLegMode();
+			
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
 			// person will execute
 			ArrayList<Object> actsLegs = plan.getActsLegs();
 			vehicle.setCurrentLink(((Act) actsLegs.get(vehicle.getLegIndex()+1)).getLink());
 			
-			System.out.println(vehicle.getCurrentLink().getId().toString());
+			//System.out.println(vehicle.getCurrentLink().getId().toString());
 			
+			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
+			double nextAvailableTimeForEnteringStreet=road.enterRequest(vehicle);
+			if (nextAvailableTimeForEnteringStreet>0){
+				sendMessage(scheduler,new EndLegMessage(scheduler,vehicle), road.getUnitNo(), nextAvailableTimeForEnteringStreet);
+			}
 			
 		} else if (vehicle.getCurrentLeg().getRoute().getLinkRoute().length>vehicle.getLinkIndex()+1){
 			// if leg is not finished yet
@@ -49,25 +57,7 @@ public class EndRoadMessage extends SelfhandleMessage {
 				sendMessage(scheduler,new EnterRoadMessage(scheduler,vehicle), nextRoad.getUnitNo(), nextAvailableTimeForEnteringStreet);
 			}
 		} else {
-			// start next leg
-			// assumption: actions and legs are alternating in plans file
-			vehicle.setLegIndex(vehicle.getLegIndex()+2);
-			vehicle.setLinkIndex(-1);
-
-			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
-														// person will execute
-			ArrayList<Object> actsLegs = plan.getActsLegs();
-			vehicle.setCurrentLeg((Leg) actsLegs.get(vehicle.getLegIndex()));
-			// the leg the agent performs
-			double departureTime = vehicle.getCurrentLeg().getDepTime(); // the time the agent
-															// departs at this
-															// activity
-
 			
-			// this is the link, where the first activity took place
-			vehicle.setCurrentLink(((Act) actsLegs.get(vehicle.getLegIndex()-1)).getLink());
-
-			sendMessage(scheduler,new StartingLegMessage(scheduler, vehicle), vehicle.unitNo, departureTime);
 		}
 	}
 

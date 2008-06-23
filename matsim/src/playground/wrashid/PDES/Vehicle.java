@@ -19,6 +19,7 @@ public class Vehicle extends SimUnit {
 	private int legIndex;
 	private Link currentLink = null;
 	private int linkIndex;
+	
 
 	public Vehicle(Scheduler scheduler, Person ownerPerson) {
 		super(scheduler);
@@ -112,5 +113,19 @@ public class Vehicle extends SimUnit {
 	public void setLinkIndex(int linkIndex) {
 		this.linkIndex = linkIndex;
 	}
-
+	
+	// findes out, if the vehical is in endingLegMode
+	// this means, that the vehical is just waiting until it can enter the
+	// last link (without entering it) and then ends the leg
+	public boolean isEndingLegMode(){
+		if (getCurrentLeg().getRoute().getLinkRoute().length==getLinkIndex()){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public void initiateEndingLegMode(){
+			linkIndex=getCurrentLeg().getRoute().getLinkRoute().length;
+	}
 }
