@@ -113,7 +113,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 				final Act act = (Act)actslegs.get(j);
 
 				if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
-					act.getFacility().incNumberOfVisitor();
+					act.getFacility().incNumberOfVisitorsPerDay();
 				}
 			}
 		}
@@ -134,9 +134,9 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 			while (iter.hasNext()){
 				Facility facility = iter.next();
 
-				if (facility.getNumberOfVisitors()>0) {
+				if (facility.getNumberOfVisitorsPerDay()>0) {
 					out.write(facility.getId().toString()+"\t"+ String.valueOf(facility.getCenter().getX())+"\t"+
-					String.valueOf(facility.getCenter().getY())+"\t"+String.valueOf(facility.getNumberOfVisitors()));
+					String.valueOf(facility.getCenter().getY())+"\t"+String.valueOf(facility.getNumberOfVisitorsPerDay()));
 					out.newLine();
 				}
 				out.flush();
