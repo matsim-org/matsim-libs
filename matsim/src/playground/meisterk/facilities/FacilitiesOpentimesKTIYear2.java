@@ -132,7 +132,8 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 					}
 				}
 			}
-		// if presence code, work and one other imputed activity are present
+			break;
+			// if presence code, work and one other imputed activity are present
 		case 3:
 			for (String activityType : activities.keySet()) {
 				if (
