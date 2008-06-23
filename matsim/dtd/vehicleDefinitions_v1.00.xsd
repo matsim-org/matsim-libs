@@ -7,6 +7,7 @@ xml:lang="en">
 <!-- This xml schema contains xml definitions for household information in the MATSim framework  -->
 
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/vehicleDefinitionsEnumTypes.xsd"/>
 
 <xs:element name="vehicleDefinitionId">
   <xs:complexType>
@@ -44,6 +45,7 @@ xml:lang="en">
       <xs:attribute name="meterPerSecond" type="xs:decimal" use="optional" default="1"/>
       </xs:complexType>
     </xs:element>
+    <xs:element name="engineInformation" type="engineInformationType" minOccurs="0" maxOccurs="1" />    
   </xs:sequence>
   <xs:attribute name="typeName" type="xs:string" use="optional" />
 </xs:complexType>
@@ -59,6 +61,30 @@ xml:lang="en">
       <xs:complexType>
         <xs:attribute name="persons" type="xs:nonNegativeInteger"/>
       </xs:complexType>
+    </xs:element>
+    <xs:element name="freightCapacity" minOccurs="0" maxOccurs="1">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="volume" >
+            <xs:complexType>
+              <xs:attribute name="cubicMeters" type="xs:double" />
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="engineInformationType">
+  <xs:sequence>
+    <xs:element name="fuelType" type="fuelTypeType" minOccurs="1" maxOccurs="1">
+    </xs:element>
+    <xs:element name="gasConsumption" minOccurs="1" maxOccurs="1">
+      <xs:complexType>
+        <xs:attribute name="literPerMeter" type="xs:decimal">
+        </xs:attribute>
+      </xs:complexType>    
     </xs:element>
   </xs:sequence>
 </xs:complexType>
