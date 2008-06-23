@@ -29,35 +29,34 @@ import javax.media.opengl.GL;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureCoords;
 
-public class SimpleBackgroundDrawer extends OTFGLDrawableImpl {
+public class SimpleBackgroundDrawer extends AbstractBackgroundDrawer {
 	private Texture picture = null;
 	private final Rectangle2D.Float abskoords;
 	private final String name;
-	private double offsetEast; 
-	private double offsetNorth;
+
 	
-	public SimpleBackgroundDrawer(String picturePath, Rectangle2D.Float koords) {
+	public SimpleBackgroundDrawer(final String picturePath, final Rectangle2D.Float koords) {
 		this.abskoords = koords;
-		name = picturePath;
+		this.name = picturePath;
 	}
 
-	public void onDraw(GL gl) {
-		if (picture == null) this.picture = OTFOGLDrawer.createTexture(name);
-		if (picture == null) return;
-        TextureCoords tc = picture.getImageTexCoords();
-        float tx1 = tc.left();
-        float ty1 = tc.top();
-        float tx2 = tc.right();
-        float ty2 = tc.bottom();
+	public void onDraw(final GL gl) {
+		if (this.picture == null) this.picture = OTFOGLDrawer.createTexture(this.name);
+		if (this.picture == null) return;
+        final TextureCoords tc = this.picture.getImageTexCoords();
+        final float tx1 = tc.left();
+        final float ty1 = tc.top();
+        final float tx2 = tc.right();
+        final float ty2 = tc.bottom();
 
 
-        float z = 1.1f;
-        picture.enable();
-        picture.bind();
+        final float z = 1.1f;
+        this.picture.enable();
+        this.picture.bind();
 
         gl.glColor4f(1,1,1,1);
 
-		Rectangle2D.Float koords = new Rectangle2D.Float((float)(abskoords.x - offsetEast), (float)(abskoords.y- offsetNorth), abskoords.width, abskoords.height);
+		final Rectangle2D.Float koords = new Rectangle2D.Float((float)(this.abskoords.x - this.offsetEast), (float)(this.abskoords.y- this.offsetNorth), this.abskoords.width, this.abskoords.height);
 		
         gl.glBegin(GL_QUADS);
         gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(koords.x, koords.y, z);
@@ -66,13 +65,10 @@ public class SimpleBackgroundDrawer extends OTFGLDrawableImpl {
         gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(koords.x + koords.width, koords.y, z);
         gl.glEnd();
         
-        picture.disable();
+        this.picture.disable();
 	}
 
-	public void setOffset(double offsetEast, double offsetNorth) {
-		this.offsetEast = offsetEast;
-		this.offsetNorth = offsetNorth;
-	}
+
 	
 }
 

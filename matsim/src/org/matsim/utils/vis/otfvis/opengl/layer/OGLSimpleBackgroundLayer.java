@@ -27,19 +27,19 @@ import org.matsim.utils.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFData.Receiver;
-import org.matsim.utils.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
+import org.matsim.utils.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 
 
 public class OGLSimpleBackgroundLayer extends DefaultSceneLayer{
 
 	private static double offsetEast;
 	private static double offsetNorth;
-	private final static List<SimpleBackgroundDrawer> items = new ArrayList<SimpleBackgroundDrawer>();
+	private final static List<AbstractBackgroundDrawer> items = new ArrayList<AbstractBackgroundDrawer>();
 
 	@Override
-	public void init(SceneGraph graph) {
+	public void init(final SceneGraph graph) {
 		if (graph.getDrawer() != null) {
-			OTFClientQuad quad = graph.getDrawer().getQuad();
+			final OTFClientQuad quad = graph.getDrawer().getQuad();
 			
 			offsetEast = quad.offsetEast;
 			offsetNorth = quad.offsetNorth;
@@ -50,12 +50,12 @@ public class OGLSimpleBackgroundLayer extends DefaultSceneLayer{
 	 * @see playground.david.vis.data.PersistentSceneLayer#addItem(playground.david.vis.data.OTFData.Receiver)
 	 */
 	@Override
-	public void addItem(Receiver item) {
-		SimpleBackgroundDrawer drawer = (SimpleBackgroundDrawer)item;
+	public void addItem(final Receiver item) {
+		final AbstractBackgroundDrawer drawer = (AbstractBackgroundDrawer)item;
 		items.add(drawer);
 	}
 	
-	public static void addPersistentItem(SimpleBackgroundDrawer drawer) {
+	public static void addPersistentItem(final AbstractBackgroundDrawer drawer) {
 		items.add(drawer);
 	}
 
@@ -64,7 +64,7 @@ public class OGLSimpleBackgroundLayer extends DefaultSceneLayer{
 	 */
 	@Override
 	public void draw() {
-		for(SimpleBackgroundDrawer item : items) {
+		for(final AbstractBackgroundDrawer item : items) {
 			item.setOffset(offsetEast, offsetNorth);
 			item.draw();
 		}
