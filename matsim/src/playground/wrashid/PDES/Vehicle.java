@@ -72,9 +72,17 @@ public class Vehicle extends SimUnit {
 
 		
 		// this is the link, where the first activity took place
-		currentLink = ((Act) actsLegs.get(0)).getLink();
+		currentLink = ((Act) actsLegs.get(legIndex-1)).getLink();
 
 		sendMessage(new StartingLegMessage(scheduler, this), this.unitNo, departureTime);
+	}
+
+	public void setCurrentLeg(Leg currentLeg) {
+		this.currentLeg = currentLeg;
+	}
+
+	public void setLegIndex(int legIndex) {
+		this.legIndex = legIndex;
 	}
 
 	public Person getOwnerPerson() {

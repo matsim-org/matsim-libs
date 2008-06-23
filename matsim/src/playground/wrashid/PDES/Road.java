@@ -73,13 +73,14 @@ public class Road extends SimUnit {
 			Vehicle nextVehicle=interestedInEnteringRoad.removeFirst();
 			double nextAvailableTimeForEnteringStreet=this.enterRequest(nextVehicle);
 			if (nextAvailableTimeForEnteringStreet>0){
-				sendMessage(new EnterRoadMessage(scheduler,vehicle), this.getUnitNo(), nextAvailableTimeForEnteringStreet);
+				sendMessage(new EnterRoadMessage(scheduler,nextVehicle), this.getUnitNo(), nextAvailableTimeForEnteringStreet);
 			}
 		}
 		
 		// tell the car behind the fist car (which is the first car now), when it can leave the street
 		if (carsOnTheRoad.size()>0){
-			sendMessage(new EndRoadMessage(scheduler,vehicle), this.getUnitNo(), Math.max(earliestDepartureTimeOfCar.getFirst() ,timeOfLastLeavingVehicle+inverseFlowCapacity));
+			Vehicle nextVehicle=carsOnTheRoad.getFirst();
+			sendMessage(new EndRoadMessage(scheduler,nextVehicle), this.getUnitNo(), Math.max(earliestDepartureTimeOfCar.getFirst() ,timeOfLastLeavingVehicle+inverseFlowCapacity));
 		}
 		
 	}
@@ -90,7 +91,7 @@ public class Road extends SimUnit {
 	// TODO: instead of returning the scheduling time, just schedule messages here...
 	public double enterRoad(Vehicle vehicle){
 		double nextAvailableTimeForLeavingStreet=Double.MIN_VALUE;
-		nextAvailableTimeForLeavingStreet=link.getLength()/link.getFreespeed(SimulationParameters.linkCapacityPeriod);
+		nextAvailableTimeForLeavingStreet=Scheduler.simTime+ link.getLength()/link.getFreespeed(SimulationParameters.linkCapacityPeriod);
 		carsOnTheRoad.add(vehicle);
 		earliestDepartureTimeOfCar.add(nextAvailableTimeForLeavingStreet);
 		
