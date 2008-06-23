@@ -53,7 +53,7 @@ xml:lang="en">
       <xs:element name="travelcard" type="travelcardType" minOccurs="0" maxOccurs="unbounded" />
       <xs:element name="knowledge" type="knowledgeType" minOccurs="0" maxOccurs="1" />
       <xs:element name="plan" type="planType" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="fiscalHouseholdId" type="householdId" minOccurs="0" maxOccurs="1" />
+      <xs:element name="fiscalHouseholdId" type="householdIdType" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
     <xs:attribute name="sex" type="sexType" use="optional" />
     <xs:attribute name="age" type="xs:nonNegativeInteger" use="optional" />

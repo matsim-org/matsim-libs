@@ -11,6 +11,12 @@ xml:lang="en">
 
 <xs:element name="household" type="householdType"/>
 
+<xs:complexType name="householdIdType">
+  <xs:complexContent>
+    <xs:extension base="idRefType"/>
+  </xs:complexContent>
+</xs:complexType>
+
 <xs:complexType name="householdType">
   <xs:annotation>
     <xs:documentation>This type contains all information to describe a MATSim household.</xs:documentation>
@@ -33,11 +39,11 @@ xml:lang="en">
 				  <xs:attribute name="name" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="1" />        
     </xs:sequence>
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>
+
 
 <xs:complexType name="incomeType">
   <xs:simpleContent>
