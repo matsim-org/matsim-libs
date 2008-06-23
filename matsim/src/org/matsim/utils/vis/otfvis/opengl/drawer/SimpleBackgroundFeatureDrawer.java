@@ -26,55 +26,71 @@ import javax.media.opengl.GL;
 
 import org.geotools.feature.Feature;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 
 
-public class SimpleBackgroundPolygonDrawer extends AbstractBackgroundDrawer {
+public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer {
 
-	final OTFPolygon polygon;
-	
-	public SimpleBackgroundPolygonDrawer(final Feature feature){
-		this.polygon = getPolygon(feature);
+	final OTFFeature feature;
+		
+	public SimpleBackgroundFeatureDrawer(final Feature feature, final float [] color){
+		this.feature = getOTFFeature(feature, color);
 	}
 	
 	
-	private OTFPolygon getPolygon(final Feature feature) {
+	private OTFFeature getOTFFeature(final Feature feature, final float[] color) {
 		final Geometry geo = feature.getDefaultGeometry();
-		final Polygon p;
+		final LineString ls;
+		final int glType;
 		if (geo instanceof Polygon) {
-			p = (Polygon) geo;
+			ls = ((Polygon) geo).getExteriorRing();
+			glType = GL.GL_POLYGON;
 		}else if (geo instanceof MultiPolygon) {
-			p = (Polygon)((MultiPolygon)geo).getGeometryN(0);
+			ls = ((Polygon)((MultiPolygon)geo).getGeometryN(0)).getExteriorRing();
+			glType = GL.GL_POLYGON;
+		} else if (geo instanceof LineString) {
+				ls = (LineString) geo;
+				glType = GL.GL_LINE_STRIP;
+		} else if (geo instanceof MultiLineString) {
+			ls = (LineString)((MultiLineString) geo).getGeometryN(0);
+			glType = GL.GL_LINE_STRIP;
+		}else if (geo instanceof Point) {
+				final GeometryFactory geofac  = new GeometryFactory();
+				ls = geofac.createLineString(new Coordinate [] {geo.getCoordinate()});
+				glType = GL.GL_POINTS;
 		} else {
-			throw new RuntimeException("Could not read Polygon from Feature!!");
+			throw new RuntimeException("Could not read Geometry from Feature!!");
 		}
-		final LineString ls = p.getExteriorRing();
 		final int npoints = ls.getNumPoints();
 		final float [] xpoints = new float[npoints];
 		final float [] ypoints = new float[npoints];
-		final float [] color = new float [] {.5f,.1f,.1f,.8f};
+//		final float [] color = new float [] {.5f,.1f,.1f,.8f};
 		for (int i = 0; i < npoints; i++) {
 			xpoints[i] = (float) (ls.getPointN(i).getCoordinate().x);
 			ypoints[i] = (float) (ls.getPointN(i).getCoordinate().y);
 		}
-		return new OTFPolygon(xpoints,ypoints,npoints, color);
+		return new OTFFeature(xpoints,ypoints,npoints, color,glType);
 	}
 
 
 	@Override
 	public void onDraw(final GL gl) {
 		
-		if (!this.polygon.converted) {
-			this.polygon.setOffset((float)this.offsetEast, (float)this.offsetNorth);
+		if (!this.feature.converted) {
+			this.feature.setOffset((float)this.offsetEast, (float)this.offsetNorth);
 		}
-		gl.glColor4f(this.polygon.color[0],this.polygon.color[1],this.polygon.color[2],this.polygon.color[3]);
-		gl.glBegin(GL.GL_POLYGON);
-		for (int i =  0; i < this.polygon.npoints; i++) {
-			gl.glVertex3d(this.polygon.xpoints[i], this.polygon.ypoints[i], 10);	
+		gl.glColor4f(this.feature.color[0],this.feature.color[1],this.feature.color[2],this.feature.color[3]);
+		gl.glBegin(this.feature.glType);
+		for (int i =  0; i < this.feature.npoints; i++) {
+			gl.glVertex3d(this.feature.xpoints[i], this.feature.ypoints[i], 10);	
 			
 		}
 		gl.glEnd();
@@ -82,16 +98,18 @@ public class SimpleBackgroundPolygonDrawer extends AbstractBackgroundDrawer {
 	}
 
 	
-	private static class OTFPolygon {
+	private static class OTFFeature {
 		
 		boolean converted = false;
 		final int npoints;
 		float [] xpoints;
 		float [] ypoints;
 		final float[] color;
-		public OTFPolygon(final float [] xpoints, final float [] ypoints, final int npoints, final float[] color) {
+		final  int glType;
+		public OTFFeature(final float [] xpoints, final float [] ypoints, final int npoints, final float[] color, final int glType) {
 			this.npoints = npoints;
 			this.color = color;
+			this.glType = glType;
 			this.xpoints = Arrays.copyOf(xpoints, npoints);
 			this.ypoints = Arrays.copyOf(ypoints, npoints);
 		}
