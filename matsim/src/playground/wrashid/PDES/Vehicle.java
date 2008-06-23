@@ -59,7 +59,9 @@ public class Vehicle extends SimUnit {
 		Leg leg = (Leg)actsLegs.get(1);
 		// the leg the agent performs
 		double departureTime = leg.getDepTime(); // the time the agent departs at this activity
-		sendMessage(new StartingLegMessage(scheduler,leg,this,1,0,((Act)actsLegs.get(0)).getLink()), this.unitNo, departureTime);
+		// we must start with linkIndex -1, because the first link on which the start activity resides is not
+		// in the Leg. So, for being consistent with the rest of the simulation, we start with linkIndex -1
+		sendMessage(new StartingLegMessage(scheduler,leg,this,1,-1,((Act)actsLegs.get(0)).getLink()), this.unitNo, departureTime);
 	}
 
 	public Person getOwnerPerson() {

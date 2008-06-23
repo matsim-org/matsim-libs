@@ -14,20 +14,23 @@ public class Road extends SimUnit {
 	private LinkedList car=new LinkedList();
 	private LinkedList interestedInEnteringRoad=new LinkedList();
 	private double timeOfLastEnteringVehicle=Double.MIN_VALUE;
-	private int numberOfVehiclesOnTheRoad=0;
+	private double timeOfLastLeavingVehicle=Double.MAX_VALUE;
+	
 	// the inverseFlowCapacity is simple the inverse
 	// of the capacity meaning, the minimal time between two cars entering/leaving the road
 	private double inverseFlowCapacity=0;
 	// how many cars can be parked on the street
 	// size of one car is assumed 7.5m
-	private long maxNumberOfCars=0;
+	private long maxNumberOfCarsOnRoad=0;
 	// CONTINUE here.
+	private LinkedList<Vehicle> carsOnTheRoad=new LinkedList<Vehicle>();
+	private LinkedList<Double> earliestDepartureTimeOfCar=new LinkedList<Double>();
 
 	public Road(Scheduler scheduler, Link link) {
 		super(scheduler);
 		this.link = link;
 		Math.round(33.0);
-		maxNumberOfCars=Math.round(link.getLength()*link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)/7.5);
+		maxNumberOfCarsOnRoad=Math.round(link.getLength()*link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)/7.5);
 		//System.out.println(maxNumberOfCars);
 		inverseFlowCapacity=1/link.getCapacity(SimulationParameters.linkCapacityPeriod);
 	}
@@ -50,6 +53,33 @@ public class Road extends SimUnit {
 		
 	}
 	
+	
+	// returns the time, when the car reaches the end of the road
+	// TODO: instead of returning the scheduling time, just schedule messages here...
+	public double enterRoad(Vehicle vehicle){
+		double nextAvailableTimeForLeavingStreet=Double.MIN_VALUE;
+		nextAvailableTimeForLeavingStreet=link.getLength()/link.getFreespeed(SimulationParameters.linkCapacityPeriod);
+		carsOnTheRoad.add(vehicle);
+		earliestDepartureTimeOfCar.add(nextAvailableTimeForLeavingStreet);
+		
+		// if we are in the front of the queue, then we can just drive with free speed 
+		// to the front and have to have at least inverseFlowCapacity time-distance to the
+		// previous car
+		if (carsOnTheRoad.size()==1){
+			nextAvailableTimeForLeavingStreet=Math.max(nextAvailableTimeForLeavingStreet,timeOfLastLeavingVehicle+inverseFlowCapacity);
+			return nextAvailableTimeForLeavingStreet;
+		} else {
+			// this car is not the front car in the street queue
+			// when the cars infront of the current car leave the street and this car becomes the 
+			// front car, it will be waken up...
+			return -1.0;
+		}
+		
+	}
+	
+	
+	
+	
 	// gives back the time, when the car can enter the road
 	// it returns -1, if there is no space in the street and the car will be handled later
 	// => TODO: remove the return value. Scheduling the car etc. should be done by the vehicle
@@ -58,8 +88,8 @@ public class Road extends SimUnit {
 		double nextAvailableTimeForEnteringStreet=Double.MIN_VALUE;
 		System.out.println("enter request");
 		interestedInEnteringRoad.add(vehicle);
-		assert(maxNumberOfCars>=numberOfVehiclesOnTheRoad);
-		if (numberOfVehiclesOnTheRoad==maxNumberOfCars){
+		assert maxNumberOfCarsOnRoad>=carsOnTheRoad.size() : "There are more cars on the road, than its capacity!";
+		if (maxNumberOfCarsOnRoad==carsOnTheRoad.size()){
 			// the road is full, check if there are any gaps available
 			if (gap.size()>0){
 				nextAvailableTimeForEnteringStreet=Math.max((Double)gap.get(0),timeOfLastEnteringVehicle+inverseFlowCapacity);
@@ -79,10 +109,10 @@ public class Road extends SimUnit {
 			// of course, if the last car entered the road more than inverseFlowCapacity time ago, then
 			// the current car should be able to enter the road immediatly
 			nextAvailableTimeForEnteringStreet=Math.max(timeOfLastEnteringVehicle+inverseFlowCapacity,scheduler.simTime);
+			return nextAvailableTimeForEnteringStreet;
 		}
-		// the following code should never be executed!!!!!
-		assert(false);
-		return -1;
+		
+
 	}
 	
 	// remove all gaps, which are in the past

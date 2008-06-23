@@ -52,8 +52,9 @@ public class StartingLegMessage extends SelfhandleMessage {
 		// attempt to enter street.
 		Road road=Road.allRoads.get(startingLink.getId().toString());
 		double nextAvailableTimeForEnteringStreet=road.enterRequest(vehicle);
-		sendMessage(scheduler,new EnterRoadMessage(leg,vehicle,legIndex,linkIndex,startingLink), road.getUnitNo(), nextAvailableTimeForEnteringStreet);
-		
+		if (nextAvailableTimeForEnteringStreet>0){
+			sendMessage(scheduler,new EnterRoadMessage(scheduler,leg,vehicle,legIndex,linkIndex,startingLink), road.getUnitNo(), nextAvailableTimeForEnteringStreet);
+		}
 	}
 	
 	
