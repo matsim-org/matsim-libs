@@ -46,7 +46,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	public OTFTVeh2MVI(QueueNetworkLayer net, String vehFileName, String outFileName, double startTime, double intervall_s) {
+	public OTFTVeh2MVI(final QueueNetworkLayer net, final String vehFileName, final String outFileName, final double startTime, final double intervall_s) {
 		super(intervall_s, net, outFileName);
 		this.vehFileName = vehFileName;
 		//this.outFileName = outFileName;
@@ -99,7 +99,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		BufferedReader reader = null;
 		try {
 			reader = IOUtils.getBufferedReader(this.vehFileName);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 			return;
 		}
@@ -110,26 +110,26 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 			while ( (line = reader.readLine()) != null) {
 
 
-				String[] result = StringUtils.explode(line, '\t', 16);//line.split("\t");
+				final String[] result = StringUtils.explode(line, '\t', 16);//line.split("\t");
 				if (result.length == 16) {
-					double easting = Double.parseDouble(result[11]);
-					double northing = Double.parseDouble(result[12]);
+					final double easting = Double.parseDouble(result[11]);
+					final double northing = Double.parseDouble(result[12]);
 
 					if ((easting >= this.quad.getMinEasting()) && (easting <= this.quad.getMaxEasting()) && (northing >= this.quad.getMinNorthing()) && (northing <= this.quad.getMaxNorthing())) {
-						String agent = result[0];
-						String time = result[1];
+						final String agent = result[0];
+						final String time = result[1];
 //					String dist = result[5];
-						String speed = result[6];
-						String elevation = result[13];
-						String azimuth = result[14];
+						final String speed = result[6];
+						final String elevation = result[13];
+						final String azimuth = result[14];
 						//String type = result[7];
-						ExtendedPositionInfo position = new ExtendedPositionInfo(new IdImpl(agent), easting, northing,
+						final ExtendedPositionInfo position = new ExtendedPositionInfo(new IdImpl(agent), easting, northing,
 								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
 						addVehicle(Double.parseDouble(time), position);
 					}
 				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 			return;
 		}
@@ -137,7 +137,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		finish();
 	}
 
-	private void addVehicle(double time, ExtendedPositionInfo position) {
+	private void addVehicle(final double time, final ExtendedPositionInfo position) {
 		this.cntPositions++;
 
 		// Init lastTime with first occurence of time!
@@ -156,7 +156,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 				try {
 					dump((int)this.lastTime);
 					this.writer.positions.clear();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -177,7 +177,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 	}
 
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 //		String netFileName = "../studies/schweiz/2network/ch.xml";
 //		String vehFileName = "../runs/run168/run168.it210.T.veh";
@@ -185,22 +185,22 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 //		String vehFileName = "../../tmp/studies/ivtch/T.veh";
 //		String outFileName = "output/testSWI2.mvi.gz";
 
-		String netFileName = "./networks/padang_net_v20080608.xml";
-		String vehFileName = "./output/colorizedT.veh.txt.gz";
+		final String netFileName = "./networks/padang_net_v20080618.xml";
+		final String vehFileName = "./output/colorizedT.veh.txt.gz";
 //		String vehFileName = "../runs/run301/output/100.T.veh.gz";
-		String outFileName = "./output/ITERS/it.100/100.movie.mvi";
-		int intervall_s = 60;
+		final String outFileName = "./output/ITERS/it.100/100.movie.mvi";
+		final int intervall_s = 60;
 
 		Gbl.createConfig(null);
 		Gbl.startMeasurement();
-		World world = Gbl.createWorld();
+		final World world = Gbl.createWorld();
 
-		NetworkLayer net = new NetworkLayer();
+		final NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
-		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
+		final QueueNetworkLayer qnet = new QueueNetworkLayer(net);
 
-		OTFTVeh2MVI test  = new OTFTVeh2MVI(qnet, vehFileName, outFileName, 0, intervall_s);
+		final OTFTVeh2MVI test  = new OTFTVeh2MVI(qnet, vehFileName, outFileName, 0, intervall_s);
 		test.convert();
 	}
 
