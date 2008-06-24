@@ -14,7 +14,7 @@ public class Scheduler {
 		if (m.getMessageArrivalTime()>=simTime){
 			queue.putMessage(m);
 		} else {
-			System.out.println("WARNING: You tried to put message in the past. Request discarded.");
+			System.out.println("WARNING: You tried to send a message in the past. Request discarded.");
 		}
 	}
 	

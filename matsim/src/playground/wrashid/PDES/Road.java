@@ -18,9 +18,11 @@ public class Road extends SimUnit {
 	// the inverseFlowCapacity is simple the inverse
 	// of the capacity meaning, the minimal time between two cars
 	// entering/leaving the road
-	private double inverseFlowCapacity = 0;
+	private double inverseInFlowCapacity = 0;
+	private double inverseOutFlowCapacity = 0;
+	
 	// how many cars can be parked on the street
-	// size of one car is assumed 7.5m
+
 	private long maxNumberOfCarsOnRoad = 0;
 
 	// the time it takes for a gap to get to the back of the road
@@ -32,14 +34,25 @@ public class Road extends SimUnit {
 	public Road(Scheduler scheduler, Link link) {
 		super(scheduler);
 		this.link = link;
-		Math.round(33.0);
+		
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
-				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)
-				/ 7.5);
+				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod*SimulationParameters.storageCapacityFactor)
+				/ SimulationParameters.carSize);
 		// System.out.println(maxNumberOfCars);
-		inverseFlowCapacity = 1 / link
-				.getCapacity(SimulationParameters.linkCapacityPeriod);
 
+		double minInverseInFlowCapacity = 3600/ (SimulationParameters.minimumInFlowCapacity *SimulationParameters.flowCapacityFactor);
+		
+		inverseOutFlowCapacity = 1 / (link
+				.getFlowCapacity(SimulationParameters.linkCapacityPeriod)*SimulationParameters.flowCapacityFactor);
+		
+		
+		if (inverseOutFlowCapacity>minInverseInFlowCapacity){
+			inverseInFlowCapacity=minInverseInFlowCapacity;
+		} else {
+			inverseInFlowCapacity=inverseOutFlowCapacity;
+		}
+		
+		
 		gapTravelTime = link.getLength() / SimulationParameters.gapTravelSpeed;
 
 	}
@@ -98,7 +111,7 @@ public class Road extends SimUnit {
 			sendMessage(new EndRoadMessage(scheduler, nextVehicle), this
 					.getUnitNo(), Math
 					.max(earliestDepartureTimeOfCar.getFirst(),
-							timeOfLastLeavingVehicle + inverseFlowCapacity));
+							timeOfLastLeavingVehicle + inverseOutFlowCapacity));
 		}
 
 	}
@@ -122,7 +135,7 @@ public class Road extends SimUnit {
 		if (carsOnTheRoad.size() == 1) {
 			nextAvailableTimeForLeavingStreet = Math.max(
 					nextAvailableTimeForLeavingStreet, timeOfLastLeavingVehicle
-							+ inverseFlowCapacity);
+							+ inverseInFlowCapacity);
 			return nextAvailableTimeForLeavingStreet;
 		} else {
 			// this car is not the front car in the street queue
@@ -149,7 +162,7 @@ public class Road extends SimUnit {
 			if (gap.size() > 0) {
 				nextAvailableTimeForEnteringStreet = Math.max(
 						gap.removeFirst(), timeOfLastEnteringVehicle
-								+ inverseFlowCapacity);
+								+ inverseInFlowCapacity);
 
 				return nextAvailableTimeForEnteringStreet;
 			} else {
@@ -168,8 +181,10 @@ public class Road extends SimUnit {
 			// inverseFlowCapacity time ago, then
 			// the current car should be able to enter the road immediatly
 			nextAvailableTimeForEnteringStreet = Math.max(
-					timeOfLastEnteringVehicle + inverseFlowCapacity,
+					timeOfLastEnteringVehicle + inverseInFlowCapacity,
 					scheduler.simTime);
+			// if another request arrives, it must conform to inverseFlowCapacity
+			timeOfLastEnteringVehicle=nextAvailableTimeForEnteringStreet;
 			return nextAvailableTimeForEnteringStreet;
 		}
 
