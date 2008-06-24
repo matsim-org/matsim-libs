@@ -36,26 +36,26 @@ public class Facility extends AbstractLocation {
 
 
 	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
-	private int numberOfVisitorsPerDay=0;
+	private int numberOfVisitorsPerDay = 0;
 
 	// TODO: Set number of time bins using parameterization
-	private final int numberOfTimeBins=4*24;
+	private final int numberOfTimeBins = 4*24;
 
 	/* 15 min. time bins at the moment.
 	*  Every agent is at the loc. for at least 15 min. That means we have to count
-	*  the arrivals and the departues using 2 variables to reduce "discretization effects".
+	*  the arrivals and the departures using 2 variables to reduce "discr. effects".
 	*/
-	private int [] arrivals=null;
-	private int [] departures=null;
-	private int [] load=null;
+	private int [] arrivals = null;
+	private int [] departures = null;
+	private int [] load = null;
 
-	// Calculates the attractivity dependend on the shop size.
+	// Calculates the attractiveness dependent on the shop size.
 	// Will soon be replaced by more sophisticated models.
-	private double attractivityFactor=1.0;
+	private double attrFactor = 1.0;
 
-	// Calculates a penalty reflecting capcity restraints.
+	// Calculates a penalty reflecting capacity restraints.
 	// Again: will soon be replaced by more sophisticated models.
-	private double capacityPenaltyFactor=1.0;
+	private double capacityPenaltyFactor = 1.0;
 
 
 	protected Facility(final Facilities layer, final Id id, final CoordI center) {
@@ -65,9 +65,9 @@ public class Facility extends AbstractLocation {
 		this.load = new int [this.numberOfTimeBins];
 
 		for (int i=0; i<this.numberOfTimeBins; i++){
-			this.arrivals[i]=0;
-			this.departures[i]=0;
-			this.load[i]=0;
+			this.arrivals[i] = 0;
+			this.departures[i] = 0;
+			this.load[i] = 0;
 		}
 	}
 
@@ -81,15 +81,15 @@ public class Facility extends AbstractLocation {
 	}
 
 	public void calculateFacilityLoad24(int scaleNumberOfPersons) {
-		int numberOfVisitors=0;
+		int numberOfVisitors = 0;
 		for (int i=0; i<this.numberOfTimeBins; i++) {
-			numberOfVisitors+=this.arrivals[i];
-			this.load[i]=numberOfVisitors*scaleNumberOfPersons;
-			numberOfVisitors-=this.departures[i];
+			numberOfVisitors += this.arrivals[i];
+			this.load[i] = numberOfVisitors*scaleNumberOfPersons;
+			numberOfVisitors -= this.departures[i];
 		}
 	}
 
-	// TODO: Remove this hardcoded parameterization asap
+	// TODO: Remove this hard-coded parameterization asap
 	public void calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
 		//BPR
 		final double a=0.8;
@@ -97,34 +97,35 @@ public class Facility extends AbstractLocation {
 		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
 			this.capacityPenaltyFactor += a*Math.pow(this.load[i], b);
 		}
-		this.capacityPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex);
+		this.capacityPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
+		this.capacityPenaltyFactor = Math.min(1.0, this.capacityPenaltyFactor);
 	}
 
-	// TODO: Remove this hardcoded parameterization asap
-	private void calculateAttractivityFactor() {
+	// TODO: Remove this hard-coded parameterization asap
+	private void calculateAttrFactor() {
 
-		final double a=Math.log(1.0/2500.0);
+		final double a=1.0/Math.log(2500.0);
 
 		if (this.activities.containsKey("shop_retail_lt100sqm")) {
-			this.attractivityFactor = 1.0;
+			this.attrFactor = 1.0;
 		}
 		else if (this.activities.containsKey("shop_retail_get100sqm")) {
-			this.attractivityFactor = a*Math.log(100.0);
+			this.attrFactor = 1.0+a*Math.log(100.0);
 		}
 		else if (this.activities.containsKey("shop_retail_get400sqm")) {
-			this.attractivityFactor = a*Math.log(400.0);
+			this.attrFactor = 1.0+a*Math.log(400.0);
 		}
 		else if (this.activities.containsKey("shop_retail_get1000sqm")) {
-			this.attractivityFactor = a*Math.log(1000.0);
+			this.attrFactor = 1.0+a*Math.log(1000.0);
 		}
 		else if (this.activities.containsKey("shop_retail_get2500sqm")) {
-			this.attractivityFactor = a*Math.log(2500.0);
+			this.attrFactor = 1.0+a*Math.log(2500.0);
 		}
 		else if (this.activities.containsKey("shop_other")) {
-			this.attractivityFactor = 1.0;
+			this.attrFactor = 1.0;
 		}
 		else {
-			this.attractivityFactor = 1.0;
+			this.attrFactor = 1.0;
 		}
 	}
 
@@ -153,8 +154,8 @@ public class Facility extends AbstractLocation {
 		this.numberOfVisitorsPerDay++;
 	}
 
-	public void setAttractivityFactor(double attractivityFactor) {
-		this.attractivityFactor = attractivityFactor;
+	public void setAttrFactor(double attrFactor) {
+		this.attrFactor = attrFactor;
 	}
 
 
@@ -193,15 +194,15 @@ public class Facility extends AbstractLocation {
 		return this.numberOfVisitorsPerDay;
 	}
 
-	public double getAttractivityFactor() {
-		this.calculateAttractivityFactor();
-		return this.attractivityFactor;
+	public double getAttrFactor() {
+		this.calculateAttrFactor();
+		return this.attrFactor;
 	}
 
 	// arg: time in seconds from midnight
 	public double getCapacityPenaltyFactor(double startTime, double endTime) {
-		int startTimeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(startTime/(900)));
-		int endTimeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(endTime/(900)));
+		int startTimeBinIndex = Math.min(this.numberOfTimeBins-1, (int)(startTime/(900)));
+		int endTimeBinIndex = Math.min(this.numberOfTimeBins-1, (int)(endTime/(900)));
 		this.calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
 		return this.capacityPenaltyFactor;
 	}
@@ -209,9 +210,9 @@ public class Facility extends AbstractLocation {
 	// ----------------------------------------------------
 	public void reset() {
 		for (int i=0; i<this.numberOfTimeBins; i++) {
-			this.arrivals[i]=0;
-			this.departures[i]=0;
-			this.load[i]=0;
+			this.arrivals[i] = 0;
+			this.departures[i] = 0;
+			this.load[i] = 0;
 		}
 	}
 
