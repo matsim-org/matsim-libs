@@ -20,8 +20,6 @@
 
 package org.matsim.utils.vis.otfvis.opengl.drawer;
 
-import java.util.Arrays;
-
 import javax.media.opengl.GL;
 
 import org.geotools.feature.Feature;
@@ -81,7 +79,7 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer {
 	}
 
 
-	@Override
+
 	public void onDraw(final GL gl) {
 		
 		if (!this.feature.converted) {
@@ -110,8 +108,8 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer {
 			this.npoints = npoints;
 			this.color = color;
 			this.glType = glType;
-			this.xpoints = Arrays.copyOf(xpoints, npoints);
-			this.ypoints = Arrays.copyOf(ypoints, npoints);
+			this.xpoints = xpoints; 
+			this.ypoints = ypoints;
 		}
 		
 		public void setOffset(final float offsetEast, final float offsetNorth) {
