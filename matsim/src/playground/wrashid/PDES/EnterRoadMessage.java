@@ -39,7 +39,7 @@ public class EnterRoadMessage extends SelfhandleMessage {
 	
 	@Override
 	public void printMessageLogString() {
-		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + vehicle.getCurrentLink().getId().toString() + "; Description=enter " );
+		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + vehicle.getCurrentLink().getId().toString() + "; Description=enter link" );
 		
 	}
 

@@ -70,7 +70,7 @@ public class EndRoadMessage extends SelfhandleMessage {
 	@Override
 	public void printMessageLogString() {
 		// the end of the road has been reached (this does not mean, that we can leave the road now...
-		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + vehicle.getCurrentLink().getId().toString() + "; Description=leaving " );
+		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + vehicle.getCurrentLink().getId().toString() + "; Description=leave link" );
 	}
 
 }

@@ -20,7 +20,7 @@ public class EndLegMessage extends SelfhandleMessage {
 
 	@Override
 	public void printMessageLogString() {
-		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + vehicle.getCurrentLink().getId().toString() + "; Description=end" );
+		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + vehicle.getCurrentLink().getId().toString() + "; Description=end leg" );
 	}
 
 	@Override
