@@ -13,3 +13,5 @@ xml:lang="en">
     <xs:enumeration value="biodiesel" />
   </xs:restriction>
 </xs:simpleType>
+
+</xs:schema>

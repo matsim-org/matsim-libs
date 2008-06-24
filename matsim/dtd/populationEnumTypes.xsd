@@ -41,7 +41,7 @@ xml:lang="en">
 
 
 <xs:simpleType name="legModeType">
-  <xs:restriction base="xs:string>
+  <xs:restriction base="xs:string">
     <xs:enumeration value="miv" />
     <xs:enumeration value="car" />
     <xs:enumeration value="ride" />

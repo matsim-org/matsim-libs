@@ -7,7 +7,7 @@ xml:lang="en">
 
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/populationEnumTypes.xsd"/>
-<xs:include schemaLocation="http://www.matsim.org/files/dtd/households.xsd" />
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/households_v1.00.xsd" />
 
 <xs:annotation>
   <xs:documentation>
@@ -33,14 +33,14 @@ xml:lang="en">
     <dc:description>
       This xml schema contains xml definitions for population information within the MATSim framework
     </dc:description>
-  </xs:appinfo>
+  </xs:appinfo>   
 </xs:annotation>
 
 <xs:element name="population">
   <xs:complexType>
     <xs:sequence>
       <xs:element name="person" type="personType" minOccurs="1" maxOccurs="unbounded" />
-      <xs:element ref=household" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element ref="household" minOccurs="0" maxOccurs="unbounded" />
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="optional" />
   </xs:complexType>
@@ -49,18 +49,18 @@ xml:lang="en">
 <xs:complexType name="personType">
   <xs:complexContent>
     <xs:extension base="matsimObjectType">
-    <xs:sequence>
-      <xs:element name="travelcard" type="travelcardType" minOccurs="0" maxOccurs="unbounded" />
-      <xs:element name="knowledge" type="knowledgeType" minOccurs="0" maxOccurs="1" />
-      <xs:element name="plan" type="planType" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="fiscalHouseholdId" type="householdIdType" minOccurs="0" maxOccurs="1" />
-    </xs:sequence>
-    <xs:attribute name="sex" type="sexType" use="optional" />
-    <xs:attribute name="age" type="xs:nonNegativeInteger" use="optional" />
-    <xs:attribute name="license" type="xs:boolean" use="optional" />
-    <xs:attribute name="carAvailable" type="carAvailType" use="optional" />
-    <xs:attribute name="isEmployed" type="xs:boolean" use="optional" />
-    </xs:extension>
+     <xs:sequence>
+       <xs:element name="travelcard" type="travelcardType" minOccurs="0" maxOccurs="unbounded" />
+       <xs:element name="knowledge" type="knowledgeType" minOccurs="0" maxOccurs="1" />
+       <xs:element name="plan" type="planType" minOccurs="0" maxOccurs="unbounded"/>
+       <xs:element name="fiscalHouseholdId" type="householdIdType" minOccurs="0" maxOccurs="1" />
+     </xs:sequence>
+     <xs:attribute name="sex" type="sexType" use="optional" />
+     <xs:attribute name="age" type="xs:nonNegativeInteger" use="optional" />
+     <xs:attribute name="license" type="xs:boolean" use="optional" />
+     <xs:attribute name="carAvailable" type="carAvailType" use="optional" />
+     <xs:attribute name="isEmployed" type="xs:boolean" use="optional" />
+   </xs:extension>
   </xs:complexContent>
 </xs:complexType>
 
@@ -73,14 +73,10 @@ xml:lang="en">
 
 <xs:complexType name="planType" >
   <xs:sequence>
-    <xs:element minOccurs="0" maxOccurs="unbounded" >
-      <xs:complexType>
-        <xs:sequence>
-          <xs:element name="act" type="actType" minOccurs="1" maxOccurs="1" />
-          <xs:element name="leg" type="legType" minOccurs="1" maxOccurs="1"/>      
-        </xs:sequence>
-      </xs:complexType>
-    </xs:element>
+    <xs:sequence>
+      <xs:element name="act" type="actType" minOccurs="1" maxOccurs="1" />
+      <xs:element name="leg" type="legType" minOccurs="1" maxOccurs="1"/>      
+    </xs:sequence>
     <xs:element name="act" type="actType" minOccurs="1" maxOccurs="1" />
   </xs:sequence>
   <xs:attribute name="score" type="xs:decimal" use="optional" />

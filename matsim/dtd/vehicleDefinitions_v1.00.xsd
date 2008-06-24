@@ -32,12 +32,12 @@ xml:lang="en">
     <xs:element name="capacity" type="capacityType" minOccurs="1" maxOccurs="1"/>
     <xs:element name="length">  
       <xs:complexType>
-        <xs:attribute name="meter" type="xs:decimal" use="required" default="7.5"/>
+        <xs:attribute name="meter" type="xs:decimal" default="7.5"/>
       </xs:complexType>
     </xs:element>
     <xs:element name="width">  
       <xs:complexType>
-        <xs:attribute name="meter" type="xs:decimal" use="required" default="1"/>
+        <xs:attribute name="meter" type="xs:decimal" default="1"/>
       </xs:complexType>
     </xs:element>
     <xs:element name="maximumVelocity">

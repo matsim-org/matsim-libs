@@ -51,6 +51,9 @@ xml:lang="en">
 </xs:complexType>
 
 
+<xs:element name="coordinate" type="coordinateType" />
+
+
 <xs:complexType name="coordinateType">
   <xs:annotation>
     <xs:documentation>This type can be used for all georeferenced data within the 
@@ -81,41 +84,20 @@ xml:lang="en">
   </xs:complexType>
 </xs:element>
 
-<xs:element name="coordinate" type="coordinateType" >
-</xs:element>
-
 <xs:complexType name="actLocationType">
-  <!-- at least a facility or a link or both -->
-  <xs:choice>
-    <!-- at least one of them -->
-      <xs:choice>
-        <xs:element ref="facilityId" minOccurs="1" maxOccurs="1"/>
-        <xs:element ref="linkId" minOccurs="1" maxOccurs="1"/>
-      </xs:choice>
-    <!-- or both must be present -->
-      <xs:sequence>
-        <xs:element ref="facilityId" minOccurs="1" maxOccurs="1" />
-        <xs:element ref="linkId" minOccurs="1" maxOccurs="1" />
-      </xs:sequence>
-  </xs:choice>
- </xs:complexType>
+  <xs:sequence>
+        <xs:element ref="facilityId" minOccurs="0" maxOccurs="1" />
+        <xs:element ref="linkId" minOccurs="0" maxOccurs="1" />
+  </xs:sequence>
+</xs:complexType>
 
 
 <xs:element name="location">
   <xs:complexType>
-    <!-- at least one location or coordinate or both -->
-    <xs:choice>
-      <!-- at least one -->
-        <xs:choice>
-          <xs:element ref="coordinate" minOccurs="1" maxOccurs="1"/>
-          <xs:element name="actLocation" type="actLocationType" minOccurs="1" maxOccurs="1"/>
-        </xs:choice>
-      <!-- or both -->
-        <xs:sequence>
-          <xs:element ref="coordinate" minOccurs="1" maxOccurs="1"/>
-          <xs:element name="actLocation" type="actLocationType" minOccurs="1" maxOccurs="1"/>
-        </xs:sequence>
-    </xs:choice>
+    <xs:sequence>
+      <xs:element ref="coordinate" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="actLocation" type="actLocationType" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
   </xs:complexType>
 </xs:element>
 
