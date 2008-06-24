@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.StartupEvent;
@@ -33,6 +34,9 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
+import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldValidation;
 
 /**
  *  Basically it integrates the
@@ -45,6 +49,8 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 
 	private EventsToFacilityLoad eventsToFacilityLoadCalculator;
 
+	private final static Logger log = Logger.getLogger(FacilitiesLoadCalculator.class);
+
 	// scales the load of the facilities (for e.g. 10 % runs)
 	// assume that only integers can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
 	// TODO: this has to be taken from the config.
@@ -54,6 +60,17 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 		Controler controler = event.getControler();
 		this.eventsToFacilityLoadCalculator = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons);
 		event.getControler().getEvents().addHandler(this.eventsToFacilityLoadCalculator);
+
+		// correctly initalize the world.
+		//TODO: Move this to the controler
+		controler.getWorld().complete();
+		new WorldCheck().run(controler.getWorld());
+		new WorldBottom2TopCompletion().run(controler.getWorld());
+		new WorldValidation().run(controler.getWorld());
+		new WorldCheck().run(controler.getWorld());
+		log.info("world checking done.");
+
+
 	}
 
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
