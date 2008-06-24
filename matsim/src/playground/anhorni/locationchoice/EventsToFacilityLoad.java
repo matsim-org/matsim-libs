@@ -37,10 +37,12 @@ import org.matsim.facilities.Facility;
 public class EventsToFacilityLoad implements EventHandlerAgentArrivalI, EventHandlerAgentDepartureI {
 
 	private Facilities facilities = null;
+	private int scaleNumberOfPersons = 1;
 
-	public EventsToFacilityLoad(final Facilities facilities) {
+	public EventsToFacilityLoad(final Facilities facilities, int scaleNumberOfPersons) {
 		super();
 		this.facilities = facilities;
+		this.scaleNumberOfPersons = scaleNumberOfPersons;
 	}
 
 	public void handleEvent(final EventAgentDeparture event) {
@@ -57,7 +59,7 @@ public class EventsToFacilityLoad implements EventHandlerAgentArrivalI, EventHan
 		Iterator<? extends Facility> iter = this.facilities.getFacilities().values().iterator();
 		while (iter.hasNext()){
 			Facility f = iter.next();
-			f.calculateFacilityLoad24();
+			f.calculateFacilityLoad24(this.scaleNumberOfPersons);
 		}
 	}
 

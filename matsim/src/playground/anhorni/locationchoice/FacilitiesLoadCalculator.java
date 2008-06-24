@@ -37,9 +37,14 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 
 	private EventsToFacilityLoad facilityLoadCalculator;
 
+	// scales the load of the facilities (for e.g. 10 % runs)
+	// assume that only integers can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
+	// TODO: this has to be taken from the config.
+	private int scaleNumberOfPersons=10;
+
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
-		this.facilityLoadCalculator = new EventsToFacilityLoad(controler.getFacilities());
+		this.facilityLoadCalculator = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons);
 		event.getControler().getEvents().addHandler(this.facilityLoadCalculator);
 	}
 
