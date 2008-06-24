@@ -63,6 +63,7 @@ public class EventsToFacilityLoad implements EventHandlerAgentArrivalI, EventHan
 		}
 	}
 
+
 	public void reset(final int iteration) {
 		Iterator<? extends Facility> iter = this.facilities.getFacilities().values().iterator();
 		while (iter.hasNext()){

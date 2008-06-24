@@ -20,11 +20,19 @@
 
 package playground.anhorni.locationchoice;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Iterator;
+
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.controler.listener.StartupListener;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.Facility;
+import org.matsim.gbl.Gbl;
+import org.matsim.utils.io.IOUtils;
 
 /**
  *  Basically it integrates the
@@ -35,7 +43,7 @@ import org.matsim.controler.listener.StartupListener;
  */
 public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimListener {
 
-	private EventsToFacilityLoad facilityLoadCalculator;
+	private EventsToFacilityLoad eventsToFacilityLoadCalculator;
 
 	// scales the load of the facilities (for e.g. 10 % runs)
 	// assume that only integers can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
@@ -44,11 +52,37 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
-		this.facilityLoadCalculator = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons);
-		event.getControler().getEvents().addHandler(this.facilityLoadCalculator);
+		this.eventsToFacilityLoadCalculator = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons);
+		event.getControler().getEvents().addHandler(this.eventsToFacilityLoadCalculator);
 	}
 
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
-		this.facilityLoadCalculator.reset(event.getIteration());
+		Controler controler = event.getControler();
+		Facilities facilities = controler.getFacilities();
+		this.printStatistics(facilities, controler.getIterationPath(), event.getIteration());
+		this.eventsToFacilityLoadCalculator.reset(event.getIteration());
+	}
+
+	private void printStatistics(Facilities facilities, String iterationPath, int iteration) {
+
+		try {
+			final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay";
+			final BufferedWriter out = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
+
+			out.write(header);
+
+			Iterator<? extends Facility> iter = facilities.getFacilities().values().iterator();
+			while (iter.hasNext()){
+				Facility facility = iter.next();
+				out.write(facility.getId().toString()+"\t"+ String.valueOf(facility.getCenter().getX())+"\t"+
+				String.valueOf(facility.getCenter().getY())+"\t"+String.valueOf(facility.getNumberOfVisitorsPerDay()));
+				out.newLine();
+			}
+			out.flush();
+			out.close();
+		}
+		catch (final IOException e) {
+			Gbl.errorMsg(e);
+		}
 	}
 }
