@@ -47,12 +47,12 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
 	}
 
-	public void handleEvent(final EventActivityEnd event) {
+	public void handleEvent(final EventActivityStart event) {
 		Facility facility = event.act.getFacility();
-		facility.addArrival(event.time);
+		facility.addArrival(event.time, this.scaleNumberOfPersons);
 	}
 
-	public void handleEvent(final EventActivityStart event) {
+	public void handleEvent(final EventActivityEnd event) {
 		Facility facility = event.act.getFacility();
 		facility.addDeparture(event.time);
 	}
