@@ -40,14 +40,14 @@ public class Road extends SimUnit {
 				/ SimulationParameters.carSize);
 		// System.out.println(maxNumberOfCars);
 
-		double minInverseInFlowCapacity = 3600/ (SimulationParameters.minimumInFlowCapacity *SimulationParameters.flowCapacityFactor);
+		double maxInverseInFlowCapacity = 3600/ (SimulationParameters.minimumInFlowCapacity *SimulationParameters.flowCapacityFactor);
 		
 		inverseOutFlowCapacity = 1 / (link
 				.getFlowCapacity(SimulationParameters.linkCapacityPeriod)*SimulationParameters.flowCapacityFactor);
 		
 		
-		if (inverseOutFlowCapacity>minInverseInFlowCapacity){
-			inverseInFlowCapacity=minInverseInFlowCapacity;
+		if (inverseOutFlowCapacity>maxInverseInFlowCapacity){
+			inverseInFlowCapacity=maxInverseInFlowCapacity;
 		} else {
 			inverseInFlowCapacity=inverseOutFlowCapacity;
 		}
@@ -135,7 +135,7 @@ public class Road extends SimUnit {
 		if (carsOnTheRoad.size() == 1) {
 			nextAvailableTimeForLeavingStreet = Math.max(
 					nextAvailableTimeForLeavingStreet, timeOfLastLeavingVehicle
-							+ inverseInFlowCapacity);
+							+ inverseOutFlowCapacity);
 			return nextAvailableTimeForLeavingStreet;
 		} else {
 			// this car is not the front car in the street queue
@@ -153,6 +153,7 @@ public class Road extends SimUnit {
 	// => TODO: remove the return value. Scheduling the car etc. should be done
 	// by the vehicle
 	public double enterRequest(Vehicle vehicle) {
+		//System.out.println("cars on the road="+carsOnTheRoad.size());
 		shrinkGapQueue();
 		double nextAvailableTimeForEnteringStreet = Double.MIN_VALUE;
 
@@ -163,7 +164,7 @@ public class Road extends SimUnit {
 				nextAvailableTimeForEnteringStreet = Math.max(
 						gap.removeFirst(), timeOfLastEnteringVehicle
 								+ inverseInFlowCapacity);
-
+				System.out.println("gap used");
 				return nextAvailableTimeForEnteringStreet;
 			} else {
 				// at the moment, the road is full and no gap is available
