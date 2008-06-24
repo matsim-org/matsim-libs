@@ -80,21 +80,23 @@ public class Facility extends AbstractLocation {
 		return this.center.calcDistance(coord);
 	}
 
-	public void calculateFacilityLoad24() {
+	public void calculateFacilityLoad24(int scaleNumberOfPersons) {
 		int numberOfVisitors=0;
 		for (int i=0; i<this.numberOfTimeBins; i++) {
 			numberOfVisitors+=this.arrivals[i];
-			this.load[i]=numberOfVisitors;
+			this.load[i]=numberOfVisitors*scaleNumberOfPersons;
 			numberOfVisitors-=this.departures[i];
 		}
 	}
 
 	// TODO: Remove this hardcoded parameterization asap
-	public void calculateCapPenaltyFactor(int timeBinIndex) {
+	public void calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
 		//BPR
 		final double a=0.8;
 		final double b=8.0;
-		this.capacityPenaltyFactor = a*Math.pow(this.load[timeBinIndex], b);
+		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
+			this.capacityPenaltyFactor += a*Math.pow(this.load[i], b);
+		}
 	}
 
 	// TODO: Remove this hardcoded parameterization asap
@@ -102,22 +104,22 @@ public class Facility extends AbstractLocation {
 
 		final double a=Math.log(1.0/2500.0);
 
-		if (this.activities.containsValue("shop_retail_lt100sqm")) {
+		if (this.activities.containsKey("shop_retail_lt100sqm")) {
 			this.attractivityFactor = 1.0;
 		}
-		else if (this.activities.containsValue("shop_retail_get100sqm")) {
+		else if (this.activities.containsKey("shop_retail_get100sqm")) {
 			this.attractivityFactor = a*Math.log(100.0);
 		}
-		else if (this.activities.containsValue("shop_retail_get400sqm")) {
+		else if (this.activities.containsKey("shop_retail_get400sqm")) {
 			this.attractivityFactor = a*Math.log(400.0);
 		}
-		else if (this.activities.containsValue("shop_retail_get1000sqm")) {
+		else if (this.activities.containsKey("shop_retail_get1000sqm")) {
 			this.attractivityFactor = a*Math.log(1000.0);
 		}
-		else if (this.activities.containsValue("shop_retail_get2500sqm")) {
+		else if (this.activities.containsKey("shop_retail_get2500sqm")) {
 			this.attractivityFactor = a*Math.log(2500.0);
 		}
-		else if (this.activities.containsValue("shop_other")) {
+		else if (this.activities.containsKey("shop_other")) {
 			this.attractivityFactor = 1.0;
 		}
 		else {
@@ -153,6 +155,7 @@ public class Facility extends AbstractLocation {
 	public void setAttractivityFactor(double attractivityFactor) {
 		this.attractivityFactor = attractivityFactor;
 	}
+
 
 	// time in seconds from midnight
 	public void addArrival(double time) {
@@ -195,9 +198,10 @@ public class Facility extends AbstractLocation {
 	}
 
 	// arg: time in seconds from midnight
-	public double getCapacityPenaltyFactor(double time) {
-		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(900)));
-		this.calculateCapPenaltyFactor(timeBinIndex);
+	public double getCapacityPenaltyFactor(double startTime, double endTime) {
+		int startTimeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(startTime/(900)));
+		int endTimeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(endTime/(900)));
+		this.calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
 		return this.capacityPenaltyFactor;
 	}
 
