@@ -42,8 +42,10 @@ import org.matsim.utils.misc.Time;
 /* Scoring function factoring in:
  * - opentimes
  * - facility attractivity
- * - capacity restraints for arrival to departure time not act start to act end time,
+ * - capacity restraints:
+ *  TODO: should be done for for arrival to departure time not act start to act end time,
  *  because seraching for a parking lot possibly happens before the opening time
+ *  see EventsToFacilityLoad
  *
  *  TODO: extend CharyparNagel sf. instead of doing copy paste.
  *  Need to change some private members to protected members.

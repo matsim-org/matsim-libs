@@ -22,11 +22,11 @@ package playground.anhorni.locationchoice;
 
 import java.util.Iterator;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
+import org.apache.log4j.Logger;
+import org.matsim.events.EventActivityEnd;
+import org.matsim.events.EventActivityStart;
+import org.matsim.events.handler.EventHandlerActivityEndI;
+import org.matsim.events.handler.EventHandlerActivityStartI;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 
@@ -34,10 +34,12 @@ import org.matsim.facilities.Facility;
  *
  * @author anhorni
  */
-public class EventsToFacilityLoad implements EventHandlerAgentArrivalI, EventHandlerAgentDepartureI {
+public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHandlerActivityEndI {
 
 	private Facilities facilities = null;
 	private int scaleNumberOfPersons = 1;
+
+	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
 
 	public EventsToFacilityLoad(final Facilities facilities, int scaleNumberOfPersons) {
 		super();
@@ -45,13 +47,13 @@ public class EventsToFacilityLoad implements EventHandlerAgentArrivalI, EventHan
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
 	}
 
-	public void handleEvent(final EventAgentDeparture event) {
-		Facility facility=(Facility)event.link.getUpLocation(new IdImpl(event.linkId));
+	public void handleEvent(final EventActivityEnd event) {
+		Facility facility = event.act.getFacility();
 		facility.addArrival(event.time);
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
-		Facility facility=(Facility)event.link.getUpLocation(new IdImpl(event.linkId));
+	public void handleEvent(final EventActivityStart event) {
+		Facility facility = event.act.getFacility();
 		facility.addDeparture(event.time);
 	}
 
@@ -61,6 +63,7 @@ public class EventsToFacilityLoad implements EventHandlerAgentArrivalI, EventHan
 			Facility f = iter.next();
 			f.calculateFacilityLoad24(this.scaleNumberOfPersons);
 		}
+		log.info("EventsToFacilityLoad finished");
 	}
 
 

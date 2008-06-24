@@ -69,8 +69,6 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 		new WorldValidation().run(controler.getWorld());
 		new WorldCheck().run(controler.getWorld());
 		log.info("world checking done.");
-
-
 	}
 
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
