@@ -85,6 +85,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 			final BufferedWriter out = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
 
 			out.write(header);
+			out.newLine();
 
 			Iterator<? extends Facility> iter = facilities.getFacilities().values().iterator();
 			while (iter.hasNext()){
