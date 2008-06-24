@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -44,6 +44,9 @@ import org.matsim.utils.misc.Time;
  * - facility attractivity
  * - capacity restraints for arrival to departure time not act start to act end time,
  *  because seraching for a parking lot possibly happens before the opening time
+ *
+ *  TODO: extend CharyparNagel sf. instead of doing copy paste.
+ *  Need to change some private members to protected members.
  */
 
 public class LocationChoiceScoringFunction implements ScoringFunction {
@@ -154,7 +157,9 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 			return;
 		}
 
+		// TODO: change name
 		CharyparNagelScoringConfigGroup params = Gbl.getConfig().charyparNagelScoring();
+
 		marginalUtilityOfWaiting = params.getWaiting() / 3600.0;
 		marginalUtilityOfLateArrival = params.getLateArrival() / 3600.0;
 		marginalUtilityOfEarlyDeparture = params.getEarlyDeparture() / 3600.0;
