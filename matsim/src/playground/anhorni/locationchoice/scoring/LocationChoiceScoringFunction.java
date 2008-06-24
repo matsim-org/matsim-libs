@@ -261,7 +261,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 			double utilPerf = marginalUtilityOfPerforming * typicalDuration
 					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
 
-			utilPerf *= act.getFacility().getAttractivityFactor();
+			utilPerf *= act.getFacility().getAttrFactor();
 			utilPerf *= (1.0 - act.getFacility().getCapacityPenaltyFactor(arrivalTime, departureTime));
 
 			double utilWait = marginalUtilityOfWaiting * duration;
