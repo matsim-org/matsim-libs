@@ -97,6 +97,7 @@ public class Facility extends AbstractLocation {
 		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
 			this.capacityPenaltyFactor += a*Math.pow(this.load[i], b);
 		}
+		this.capacityPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex);
 	}
 
 	// TODO: Remove this hardcoded parameterization asap
