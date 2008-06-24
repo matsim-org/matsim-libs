@@ -113,7 +113,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 				final Act act = (Act)actslegs.get(j);
 
 				if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
-					act.getFacility().incNumberOfVisitorsPerDay();
+					act.getFacility().addVisitorsPerDay(1);
 				}
 			}
 		}
