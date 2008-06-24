@@ -192,10 +192,8 @@ public class Road extends SimUnit {
 
 	// remove all gaps, which are in the past
 	private void shrinkGapQueue() {
-		while (gap.size() > 0) {
-			if ((Double) gap.get(0) < Scheduler.simTime) {
-				gap.remove(0);
-			}
+		while (gap.size() > 0 && (Double) gap.get(0) < Scheduler.simTime) {
+			gap.remove(0);
 		}
 	}
 

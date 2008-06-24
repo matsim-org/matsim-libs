@@ -26,28 +26,29 @@ public class EndLegMessage extends SelfhandleMessage {
 	@Override
 	public void selfhandleMessage() {
 		
-		// schedule next leg, if there are more legs, end trip (TODO)
+		// schedule next leg, if there are more legs, else end trip (TODO)
 		
 		// start next leg
 		// assumption: actions and legs are alternating in plans file
 		vehicle.setLegIndex(vehicle.getLegIndex()+2);
 		vehicle.setLinkIndex(-1);
-
-		Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
-													// person will execute
-		ArrayList<Object> actsLegs = plan.getActsLegs();
-		vehicle.setCurrentLeg((Leg) actsLegs.get(vehicle.getLegIndex()));
-		// the leg the agent performs
-		double departureTime = vehicle.getCurrentLeg().getDepTime(); // the time the agent
-														// departs at this
-														// activity
-
 		
-		// this is the link, where the first activity took place
-		vehicle.setCurrentLink(((Act) actsLegs.get(vehicle.getLegIndex()-1)).getLink());
-
-		sendMessage(scheduler,new StartingLegMessage(scheduler, vehicle), vehicle.unitNo, departureTime);
-		
+			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
+														// person will execute
+			ArrayList<Object> actsLegs = plan.getActsLegs();
+		if ((actsLegs.size()>vehicle.getLegIndex())){	
+			vehicle.setCurrentLeg((Leg) actsLegs.get(vehicle.getLegIndex()));
+			// the leg the agent performs
+			double departureTime = vehicle.getCurrentLeg().getDepTime(); // the time the agent
+															// departs at this
+															// activity
+	
+			
+			// this is the link, where the first activity took place
+			vehicle.setCurrentLink(((Act) actsLegs.get(vehicle.getLegIndex()-1)).getLink());
+	
+			sendMessage(scheduler,new StartingLegMessage(scheduler, vehicle), vehicle.unitNo, departureTime);
+		}
 		
 	}
 	
