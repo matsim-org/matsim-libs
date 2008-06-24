@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.snapshots.postprocessor.processors;
+package playground.gregor.snapshots.postprocessor.processors;
 
 import java.util.HashMap;
 

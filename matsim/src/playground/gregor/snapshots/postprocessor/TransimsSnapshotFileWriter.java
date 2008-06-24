@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.snapshots.postprocessor;
+package playground.gregor.snapshots.postprocessor;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

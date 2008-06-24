@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TimeDependentColorizer.java
+ * EvacuationLinksTeleporter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,24 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.snapshots.postprocessor.processors;
+package playground.gregor.snapshots.postprocessor.processors;
 
-import org.matsim.plans.Plans;
+public class EvacuationLinksTeleporter implements PostProcessorI{
 
-public class TimeDependentColorizer implements PostProcessorI{
-
-	private Plans plans;
-
-	public TimeDependentColorizer(Plans plans) {
-		this.plans = plans;
-	}
-
-	public String[] processEvent(String[] event){
-		String id = event[0];
-		int time =  (int) (-60 * this.plans.getPerson(id).getSelectedPlan().getScore() / 6);
-		event[7] = Integer.toString(time);
+	private final static double TELEPORTATION_SPEED = 1000.0;
+	private final static String TELEPORTATION_X = "0.0";
+	private final static String TELEPORTATION_Y = "0.0";
+	public String[] processEvent(String[] event) {
+		double  velocity = Double.parseDouble(event[6]);
+		if (velocity >= TELEPORTATION_SPEED){
+			event[11] = TELEPORTATION_X;
+			event[12] = TELEPORTATION_Y;
+		}
 		return event;
 	}
-	
-	
+
 }

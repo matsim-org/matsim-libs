@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EvacuationLinksTeleporter.java
+ * PostProcessorI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.snapshots.postprocessor.processors;
+package playground.gregor.snapshots.postprocessor.processors;
 
-public class EvacuationLinksTeleporter implements PostProcessorI{
+public interface PostProcessorI {
 
-	private final static double TELEPORTATION_SPEED = 1000.0;
-	private final static String TELEPORTATION_X = "0.0";
-	private final static String TELEPORTATION_Y = "0.0";
-	public String[] processEvent(String[] event) {
-		double  velocity = Double.parseDouble(event[6]);
-		if (velocity >= TELEPORTATION_SPEED){
-			event[11] = TELEPORTATION_X;
-			event[12] = TELEPORTATION_Y;
-		}
-		return event;
-	}
-
+	public String[] processEvent(String [] event);
 }

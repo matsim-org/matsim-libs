@@ -25,7 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.vis.snapshots.postprocessor.TransimsSnapshotFileReader;
+
+import playground.gregor.snapshots.postprocessor.TransimsSnapshotFileReader;
 
 public class TvehHomeTest {
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PostProcessorI.java
+ * TimeDependentColorizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,9 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.snapshots.postprocessor.processors;
+package playground.gregor.snapshots.postprocessor.processors;
 
-public interface PostProcessorI {
+import org.matsim.plans.Plans;
 
-	public String[] processEvent(String [] event);
+public class TimeDependentColorizer implements PostProcessorI{
+
+	private Plans plans;
+
+	public TimeDependentColorizer(Plans plans) {
+		this.plans = plans;
+	}
+
+	public String[] processEvent(String[] event){
+		String id = event[0];
+		int time =  (int) (-60 * this.plans.getPerson(id).getSelectedPlan().getScore() / 6);
+		event[7] = Integer.toString(Math.min(time,255));
+		return event;
+	}
+	
+	
 }
