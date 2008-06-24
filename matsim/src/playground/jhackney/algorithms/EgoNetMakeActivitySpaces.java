@@ -21,6 +21,7 @@
 package playground.jhackney.algorithms;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.plans.algorithms.PersonCalcActivitySpace;
@@ -30,6 +31,7 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.Scenario;
+import playground.jhackney.kml.EgoNetPlansItersMakeKML2;
 
 public class EgoNetMakeActivitySpaces {
 
@@ -45,7 +47,7 @@ public class EgoNetMakeActivitySpaces {
 
 		Scenario.readWorld();
 		Scenario.readFacilities();
-		Scenario.readNetwork();
+		NetworkLayer network =Scenario.readNetwork();
 		Plans plans = Scenario.readPlans();
 		//read in social network
 		System.out.println(" Initializing the social network ...");
@@ -106,9 +108,9 @@ public class EgoNetMakeActivitySpaces {
 //		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
 //		new PersonsRandomizeId(plans);
 		Person ego=plans.getPerson("21924270");
-//		Person ego=plans.getPerson("21927135");
+
 		Plans socialPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
-		// make the set of plans to use as EgoNet
+//		// make the set of plans to use as EgoNet
 		socialPlans.addAlgorithm(new PersonCalcActivitySpace("all"));
 //		plans.addAlgorithm(new PersonCalcActivitySpace("leisure"));
 //		plans.addAlgorithm(new PersonCalcActivitySpace("work"));
@@ -120,6 +122,15 @@ public class EgoNetMakeActivitySpaces {
 		socialPlans.addAlgorithm(new PersonDrawActivitySpace());
 		System.out.println("  done.");
 
+		
+		System.out.println("  Initializing the KML output");
+//		this.kmlOut=new EgoNetPlansMakeKML(this.controler.getConfig());
+//		EgoNetPlansMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
+//		EgoNetPlansMakeKML.generateStyles();
+
+		System.out.println("... done");
+		
+		
 		//////////////////////////////////////////////////////////////////////
 
 //		System.out.println("  running matrices algos... ");
