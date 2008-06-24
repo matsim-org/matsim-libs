@@ -146,12 +146,12 @@ public class Facility extends AbstractLocation {
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
-	public void setNumberOfVisitors(int numberOfVisitors) {
-		this.numberOfVisitorsPerDay = numberOfVisitors;
+	public void setNumberOfVisitorsPerDay(int numberOfVisitorsPerDay) {
+		this.numberOfVisitorsPerDay = numberOfVisitorsPerDay;
 	}
 
-	public void incNumberOfVisitorsPerDay() {
-		this.numberOfVisitorsPerDay++;
+	public void addVisitorsPerDay(int scaleNumberOfPersons) {
+		this.numberOfVisitorsPerDay += scaleNumberOfPersons;
 	}
 
 	public void setAttrFactor(double attrFactor) {
@@ -160,10 +160,10 @@ public class Facility extends AbstractLocation {
 
 
 	// time in seconds from midnight
-	public void addArrival(double time) {
+	public void addArrival(double time, int scaleNumberOfPersons) {
 		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(900)));
 		this.arrivals[timeBinIndex]+=1;
-		this.incNumberOfVisitorsPerDay();
+		this.addVisitorsPerDay(scaleNumberOfPersons);
 	}
 
 	public void addDeparture(double time) {
