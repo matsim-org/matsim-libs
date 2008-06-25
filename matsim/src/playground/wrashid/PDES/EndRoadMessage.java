@@ -22,7 +22,7 @@ public class EndRoadMessage extends SelfhandleMessage {
 		
 		
 	
-		// enter next road link or start next leg
+		
 		if (vehicle.getCurrentLeg().getRoute().getLinkRoute().length==vehicle.getLinkIndex()+1){
 			// the leg is completed, try to enter the last link but do not enter it 
 			// (just wait, until you have clearance for enter and then leave the road)
