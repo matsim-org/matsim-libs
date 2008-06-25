@@ -35,10 +35,10 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 
-import playground.wrashid.PDES.Road;
-import playground.wrashid.PDES.Scheduler;
-import playground.wrashid.PDES.SimulationParameters;
-import playground.wrashid.PDES.Vehicle;
+import playground.wrashid.DES.Road;
+import playground.wrashid.DES.Scheduler;
+import playground.wrashid.DES.SimulationParameters;
+import playground.wrashid.DES.Vehicle;
 
 public class JavaDEQSim {
 
