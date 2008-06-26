@@ -42,6 +42,14 @@ public class EndLegMessage extends SelfhandleMessage {
 			double departureTime = vehicle.getCurrentLeg().getDepTime(); // the time the agent
 															// departs at this
 															// activity
+			
+			
+			// if the departureTime for the leg is in the past, then set it to the current simulation time
+			// this avoids that messages in the past are put into the scheduler
+			if (departureTime<scheduler.getSimTime()){
+				departureTime=scheduler.getSimTime();
+			}
+			
 	
 			
 			// this is the link, where the first activity took place
