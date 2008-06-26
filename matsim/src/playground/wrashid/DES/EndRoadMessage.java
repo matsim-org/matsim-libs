@@ -38,7 +38,16 @@ public class EndRoadMessage extends SelfhandleMessage {
 			
 			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
 			double nextAvailableTimeForEnteringStreet=road.enterRequest(vehicle);
+			
+			
+			
+			
+			
 			if (nextAvailableTimeForEnteringStreet>0){
+				
+				// attention: as we are not actually entering the road, we need to give back the promised space to the road
+				// else a precondition of the enterRequest would not be correct any more (which involves the noOfCarsPromisedToEnterRoad variable)
+				road.giveBackPromisedSpaceToRoad();
 				sendMessage(scheduler,new EndLegMessage(scheduler,vehicle), road.getUnitNo(), nextAvailableTimeForEnteringStreet);
 			}
 			
