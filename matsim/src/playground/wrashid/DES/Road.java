@@ -21,6 +21,13 @@ public class Road extends SimUnit {
 	private double inverseInFlowCapacity = 0;
 	private double inverseOutFlowCapacity = 0;
 	
+	// also we keep track of the number of cars on the road, there is a problem:
+	// if we schedule a car, that it may enter the road at time x, then must
+	// keept track of the number of those cars, so that we can decide in enterRequest
+	// how much space we have
+	private int noOfCarsPromisedToEnterRoad=0;
+	
+	
 	// how many cars can be parked on the street
 
 	private long maxNumberOfCarsOnRoad = 0;
@@ -38,6 +45,15 @@ public class Road extends SimUnit {
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)*SimulationParameters.storageCapacityFactor
 				/ SimulationParameters.carSize);
+		
+		
+		// this is an assumption made her: a road must at least have the space capacity to park one car
+		// so that the backwar propagation of gaps can work
+		if (maxNumberOfCarsOnRoad==0){
+			maxNumberOfCarsOnRoad=1;
+		}
+		
+		
 		// System.out.println(maxNumberOfCars);
 
 		double maxInverseInFlowCapacity = 3600/ (SimulationParameters.minimumInFlowCapacity *SimulationParameters.flowCapacityFactor);
@@ -124,9 +140,9 @@ public class Road extends SimUnit {
 		nextAvailableTimeForLeavingStreet = Scheduler.simTime
 				+ link.getLength()
 				/ link.getFreespeed(SimulationParameters.linkCapacityPeriod);
+		
+		noOfCarsPromisedToEnterRoad--;
 		carsOnTheRoad.add(vehicle);
-		System.out.println("maxNumberOfCarsOnRoad" + maxNumberOfCarsOnRoad );
-		System.out.println("carsOnTheRoad.size()"  + carsOnTheRoad.size());
 		
 		assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are more cars on the road, than its capacity!";
 		earliestDepartureTimeOfCar.add(nextAvailableTimeForLeavingStreet);
@@ -162,7 +178,13 @@ public class Road extends SimUnit {
 		double nextAvailableTimeForEnteringStreet = Double.MIN_VALUE;
 
 		assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are more cars on the road, than its capacity!";
-		if (maxNumberOfCarsOnRoad == carsOnTheRoad.size()) {
+		assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size()+noOfCarsPromisedToEnterRoad : "You promised too many cars, that they can enter the street!";
+		
+		// enter this case, if the road is full (or planed to be full through promises)
+		if (maxNumberOfCarsOnRoad == carsOnTheRoad.size()+noOfCarsPromisedToEnterRoad) {
+			System.out.println("########################################");
+			System.out.print(maxNumberOfCarsOnRoad);
+			System.out.print(link.getId().toString());
 			// the road is full, check if there are any gaps available
 			if (gap.size() > 0) {
 				nextAvailableTimeForEnteringStreet = Math.max(
@@ -175,6 +197,7 @@ public class Road extends SimUnit {
 				// => put this car into the interestedInEnteringRoad LinkedList
 				// so, when a car leaves, we assign that slot to this car
 				interestedInEnteringRoad.add(vehicle);
+				System.out.println();
 				return -1.0;
 			}
 		} else {
@@ -190,6 +213,7 @@ public class Road extends SimUnit {
 					scheduler.simTime);
 			// if another request arrives, it must conform to inverseFlowCapacity
 			timeOfLastEnteringVehicle=nextAvailableTimeForEnteringStreet;
+			noOfCarsPromisedToEnterRoad++;
 			return nextAvailableTimeForEnteringStreet;
 		}
 
