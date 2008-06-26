@@ -36,7 +36,7 @@ public class Road extends SimUnit {
 		this.link = link;
 		
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
-				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod*SimulationParameters.storageCapacityFactor)
+				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)*SimulationParameters.storageCapacityFactor
 				/ SimulationParameters.carSize);
 		// System.out.println(maxNumberOfCars);
 
@@ -125,6 +125,10 @@ public class Road extends SimUnit {
 				+ link.getLength()
 				/ link.getFreespeed(SimulationParameters.linkCapacityPeriod);
 		carsOnTheRoad.add(vehicle);
+		System.out.println("maxNumberOfCarsOnRoad" + maxNumberOfCarsOnRoad );
+		System.out.println("carsOnTheRoad.size()"  + carsOnTheRoad.size());
+		
+		assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are more cars on the road, than its capacity!";
 		earliestDepartureTimeOfCar.add(nextAvailableTimeForLeavingStreet);
 
 		// if we are in the front of the queue, then we can just drive with free
