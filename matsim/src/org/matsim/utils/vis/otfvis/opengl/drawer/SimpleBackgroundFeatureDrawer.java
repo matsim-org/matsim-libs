@@ -88,7 +88,7 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer {
 		gl.glColor4f(this.feature.color[0],this.feature.color[1],this.feature.color[2],this.feature.color[3]);
 		gl.glBegin(this.feature.glType);
 		for (int i =  0; i < this.feature.npoints; i++) {
-			gl.glVertex3d(this.feature.xpoints[i], this.feature.ypoints[i], 10);	
+			gl.glVertex3d(this.feature.xpoints[i], this.feature.ypoints[i], 0);	
 			
 		}
 		gl.glEnd();
