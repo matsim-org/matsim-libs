@@ -11,10 +11,11 @@ public class Scheduler {
 	
 	
 	public static void schedule(Message m){		
-		if (m.getMessageArrivalTime()>=simTime){
+		if (m.getMessageArrivalTime()>=simTime){	
 			queue.putMessage(m);
 		} else {
-			System.out.println("WARNING: You tried to send a message in the past. Request discarded.");
+			System.out.println("WARNING: You tried to send a message in the past. Message discarded.");
+			//System.out.println(m.getClass());
 		}
 	}
 	

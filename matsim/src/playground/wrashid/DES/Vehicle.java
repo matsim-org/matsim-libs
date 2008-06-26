@@ -47,6 +47,7 @@ public class Vehicle extends SimUnit {
 		 * leg.getRoute().getLinkRoute()[startingLegMessage.getLinkIndex()+1]; //
 		 * these are the links the agent will drive along one after the other.
 		 *  } // when nicht car, was dann????????????????????????????? } }
+		 *  => delete this 'comment', as soon tests are written and run
 		 */
 	}
 

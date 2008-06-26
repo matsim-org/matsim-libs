@@ -10,6 +10,6 @@ public class SimulationParameters {
 	public static double storageCapacityFactor=0.33;
 	public static double carSize=7.5; // in meter
 	public static double minimumInFlowCapacity=1800; // diese konstante ist hardcodiert bei der C++ simulation (in Frz/stunde)
-
+													// diese wird auch skaliert mit dem flowCapacityFactor
 	
 }

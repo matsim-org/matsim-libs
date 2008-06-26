@@ -182,9 +182,6 @@ public class Road extends SimUnit {
 		
 		// enter this case, if the road is full (or planed to be full through promises)
 		if (maxNumberOfCarsOnRoad == carsOnTheRoad.size()+noOfCarsPromisedToEnterRoad) {
-			System.out.println("########################################");
-			System.out.print(maxNumberOfCarsOnRoad);
-			System.out.print(link.getId().toString());
 			// the road is full, check if there are any gaps available
 			if (gap.size() > 0) {
 				nextAvailableTimeForEnteringStreet = Math.max(
@@ -197,7 +194,6 @@ public class Road extends SimUnit {
 				// => put this car into the interestedInEnteringRoad LinkedList
 				// so, when a car leaves, we assign that slot to this car
 				interestedInEnteringRoad.add(vehicle);
-				System.out.println();
 				return -1.0;
 			}
 		} else {

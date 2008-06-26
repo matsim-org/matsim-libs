@@ -13,8 +13,8 @@ public class MessageQueue {
 	// This means, it is not possible to insert two messages into the queue, keyed with
 	// the same time
 	// Inorder to prevent this, a counter is attached to the time, for "assuring" uniqueness
-	// (if more than 2^64 events are scheduled for the same time, than the uniqueness will not hold anymore...)
-	// (but this is quite an impossible case: very very huge simulation... - which would not run on a normal computer anyway)
+	// (if more than 2^64 (approx. 10^19) events are scheduled for the same time, than the uniqueness will not hold anymore...)
+	// (although this case seems quite impossible, never the less it is mentioned as a precondition for using this scheduler)
 	void putMessage(Message m){
 		long rlong=counter++;
 		// padding with zeros is needed, inorder to be able to use firstKey property of the queue
