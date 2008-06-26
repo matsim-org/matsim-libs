@@ -10,7 +10,7 @@ public class Road extends SimUnit {
 
 	public static HashMap<String, Road> allRoads;
 	private Link link;
-	private LinkedList<Double> gap = new LinkedList<Double>();
+	private LinkedList<Double> gap; // see enterRequest for a detailed description of variable 'gap'
 	private LinkedList<Vehicle> interestedInEnteringRoad = new LinkedList<Vehicle>();
 	private double timeOfLastEnteringVehicle = Double.MIN_VALUE;
 	private double timeOfLastLeavingVehicle = Double.MIN_VALUE;
@@ -23,7 +23,7 @@ public class Road extends SimUnit {
 	
 	// also we keep track of the number of cars on the road, there is a problem:
 	// if we schedule a car, that it may enter the road at time x, then must
-	// keept track of the number of those cars, so that we can decide in enterRequest
+	// kept track of the number of those cars, so that we can decide in enterRequest
 	// how much space we have
 	private int noOfCarsPromisedToEnterRoad=0;
 	
@@ -38,6 +38,10 @@ public class Road extends SimUnit {
 	private LinkedList<Vehicle> carsOnTheRoad = new LinkedList<Vehicle>();
 	private LinkedList<Double> earliestDepartureTimeOfCar = new LinkedList<Double>();
 
+	//private double oldestUnusedGapTime=Double.MIN_VALUE;
+	
+	
+	
 	public Road(Scheduler scheduler, Link link) {
 		super(scheduler);
 		this.link = link;
@@ -46,15 +50,12 @@ public class Road extends SimUnit {
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)*SimulationParameters.storageCapacityFactor
 				/ SimulationParameters.carSize);
 		
-		
 		// this is an assumption made her: a road must at least have the space capacity to park one car
-		// so that the backwar propagation of gaps can work
+		// so that the backward propagation of gaps can work
 		if (maxNumberOfCarsOnRoad==0){
 			maxNumberOfCarsOnRoad=1;
 		}
 		
-		
-		// System.out.println(maxNumberOfCars);
 
 		double maxInverseInFlowCapacity = 3600/ (SimulationParameters.minimumInFlowCapacity *SimulationParameters.flowCapacityFactor);
 		
@@ -71,6 +72,8 @@ public class Road extends SimUnit {
 		
 		gapTravelTime = link.getLength() / SimulationParameters.gapTravelSpeed;
 		
+		// gap must be initialized to null because of the application logic
+		gap=null;
 	}
 
 	@Override
@@ -95,9 +98,8 @@ public class Road extends SimUnit {
 		carsOnTheRoad.removeFirst();
 		earliestDepartureTimeOfCar.removeFirst();
 		timeOfLastLeavingVehicle = Scheduler.simTime;
-
-		// produce a gap on the road
-		gap.add(Scheduler.simTime + gapTravelTime);
+		
+		
 
 		// the next car waiting for entering the road should now be alloted a
 		// time for entering the road
@@ -119,11 +121,21 @@ public class Road extends SimUnit {
 							.getUnitNo(), nextAvailableTimeForEnteringStreet);
 				}
 			} else {
-				//System.out.println("###: " + nextAvailableTimeForEnteringStreet);
 				if (nextAvailableTimeForEnteringStreet > 0){
 				sendMessage(new EnterRoadMessage(scheduler, nextVehicle),
 							this.getUnitNo(),
 							nextAvailableTimeForEnteringStreet);
+				}
+			}
+		} else {
+			if (gap!=null){
+				// as long as the road is not full once, there is no need to keep track of the gaps
+				gap.add(Scheduler.simTime + gapTravelTime);
+				
+				// if no one is interested in entering this road (precondition) and there are no cars on the road, then reset gap
+				// (this is required, for enterRequest to function properly)
+				if (carsOnTheRoad.size()==0){
+					gap=null;
 				}
 			}
 		}
@@ -151,8 +163,6 @@ public class Road extends SimUnit {
 		
 		noOfCarsPromisedToEnterRoad--;
 		carsOnTheRoad.add(vehicle);
-		//System.out.println("carsOnTheRoad:" + carsOnTheRoad.size());
-		//System.out.println("maxNumberOfCarsOnRoad:" + maxNumberOfCarsOnRoad);
 		
 		assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are more cars on the road, than its capacity!";
 		earliestDepartureTimeOfCar.add(nextAvailableTimeForLeavingStreet);
@@ -183,92 +193,59 @@ public class Road extends SimUnit {
 	// => TODO: remove the return value. Scheduling the car etc. should be done
 	// by the vehicle
 	public double enterRequest(Vehicle vehicle) {
-		//System.out.println("cars on the road="+carsOnTheRoad.size());
-		shrinkGapQueue();
 		double nextAvailableTimeForEnteringStreet = Double.MIN_VALUE;
 
 		//assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are more cars on the road, than its capacity!";
 		assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size()+noOfCarsPromisedToEnterRoad : "You promised too many cars, that they can enter the street!";
-		
-		/*
-		// enter this case, if the road is full (or planed to be full through promises)
-		if (maxNumberOfCarsOnRoad == carsOnTheRoad.size()+noOfCarsPromisedToEnterRoad) {
-			// the road is full, check if there are any gaps available
-			if (gap.size() > 0) {
-				nextAvailableTimeForEnteringStreet = Math.max(
-						gap.removeFirst(), timeOfLastEnteringVehicle
-								+ inverseInFlowCapacity);
-				System.out.println("gap used");
-				noOfCarsPromisedToEnterRoad++;
-				return nextAvailableTimeForEnteringStreet;
-			} else {
-				// at the moment, the road is full and no gap is available
-				// => put this car into the interestedInEnteringRoad LinkedList
-				// so, when a car leaves, we assign that slot to this car
-				interestedInEnteringRoad.add(vehicle);
-				return -1.0;
-			}
-		} else {
-			// there is space on the road for more cars
-			// simple check, that the time distance between two cars should be
-			// at least
-			// inverseFlowCapacity
-			// of course, if the last car entered the road more than
-			// inverseFlowCapacity time ago, then
-			// the current car should be able to enter the road immediately
-			nextAvailableTimeForEnteringStreet = Math.max(
-					timeOfLastEnteringVehicle + inverseInFlowCapacity,
-					scheduler.simTime);
-			// if another request arrives, it must conform to inverseFlowCapacity
-			timeOfLastEnteringVehicle=nextAvailableTimeForEnteringStreet;
-			noOfCarsPromisedToEnterRoad++;
-			return nextAvailableTimeForEnteringStreet;
-		}
-		*/
-		
+
 		
 		if (carsOnTheRoad.size()+noOfCarsPromisedToEnterRoad<maxNumberOfCarsOnRoad){
-			// there is some space on the road (e.g. gaps)
+			
+			// - check, if the gap needs to be considered for entering the road
+			// - we can find out, the time since when we have a free road for entrance for sure:
+			//   
+			
+			// the gap queue will only be empty in the beginning
+			double arrivalTimeOfGap=Double.MIN_VALUE;
+			// if the road has been full recently then find out, when the next gap arrives
+			if (gap!=null && gap.size()>0){
+				arrivalTimeOfGap=gap.remove();
+			}
+			
 			noOfCarsPromisedToEnterRoad++;
-			//if (gap.size() > 0) {
-			//	nextAvailableTimeForEnteringStreet = Math.max(
-			//			gap.removeFirst(), timeOfLastEnteringVehicle
-			//					+ inverseInFlowCapacity);
-			//} else {
-				// - the gaps have expired, so there must be some place in the street
-				//   immediately
-				// - the max of simTime is taken, because in the beginning the timeOfLastEnteringVehicle
-				//   is Double.MIN_VALUE
-				nextAvailableTimeForEnteringStreet = Math.max(
+				nextAvailableTimeForEnteringStreet = Math.max(Math.max(
 						timeOfLastEnteringVehicle + inverseInFlowCapacity,
-						scheduler.simTime);
-			//}
+						scheduler.simTime),arrivalTimeOfGap);
+			
 			timeOfLastEnteringVehicle=nextAvailableTimeForEnteringStreet;
 			return nextAvailableTimeForEnteringStreet;
 		} else {
 			// at the moment, the road is full and no gap is available
 			// => put this car into the interestedInEnteringRoad LinkedList
 			// When cars leave the road, a gap slot will eventually be alloted to this car
-			System.out.println("street full");
+			
+			
+			// - if the road was empty then create a new queue else empty the old queue
+			//   As long as the gap is null, the road is not full (and there is no reason to keep track of the gaps => see leaveRoad)
+			//   But when the road gets full once, we need to start keeping track of the gaps
+			//   Once the road is empty again, gap is reset to null (see leaveRoad).
+			//   
+			//   The gap variable in only needed for the situation, where the street has been full recently, but the interestedInEnteringRoad is
+			//   is empty and a new car arrives (or a few). So, if the street is long, it takes time for the gap to come back.
+			//
+			//   As long as interestedInEnteringRoad is not empty, newly generated gaps get used by the new cars (see leaveRoad)
+			if (gap==null){
+				gap=new LinkedList<Double>();
+			} else {
+				gap.clear();
+			}
+			
 			interestedInEnteringRoad.add(vehicle);
 			return -1.0;
 		}
-		
-		
-		
-		
-		
-		
-		
-
 	}
 
-	// remove all gaps, which are in the past
-	private void shrinkGapQueue() {
-		while (gap.size() > 0 && (Double) gap.get(0) < Scheduler.simTime) {
-			gap.remove(0);
-		}
-	}
+
 	
 	public void giveBackPromisedSpaceToRoad(){
 		noOfCarsPromisedToEnterRoad--;
