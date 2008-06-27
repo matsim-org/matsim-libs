@@ -55,6 +55,7 @@ public class JavaDEQSim {
 	public void run() {
 		Scheduler scheduler=new Scheduler();
 		Road.allRoads=new HashMap<String,Road>();
+
 		
 		// initialize network
 		Road road=null;
@@ -63,33 +64,29 @@ public class JavaDEQSim {
 			Road.allRoads.put(link.getId().toString(), road);
 		}
 		
-		
-		
 		// initialize vehicles
 		
 		
 		Vehicle vehicle=null;
 		for (Person person : this.population.getPersons().values()) {
 			vehicle =new Vehicle(scheduler,person);
-			/*
-			Plan plan = person.getSelectedPlan(); // that's the plan the person will execute
-			ArrayList<Object> actsLegs = plan.getActsLegs();
-			for (int i = 0; i < actsLegs.size(); i++) {
-				if (i % 2 == 0) {
-					Act act = (Act)actsLegs.get(i);
-					// the activity the agent performs
-					double departureTime = act.getEndTime(); // the time the agent departs at this activity
-				} else {
-					Leg leg = (Leg)actsLegs.get(i);
-					// the leg the agent performs
-					if ("car".equals(leg.getMode())) { // we only simulate car traffic
-						Link[] route = leg.getRoute().getLinkRoute(); // these are the links the agent will drive along one after the other.
-					}
-				}
-			}
-			*/
 		}
 		
+		
+
+		
 		scheduler.startSimulation();
+		
+		
+
+		
+		
+		
+		
+		// print output
+		//for(int i=0;i<SimulationParameters.eventOutputLog.size();i++) {
+		//	SimulationParameters.eventOutputLog.get(i).print();
+		//}
+		
 	}
 }

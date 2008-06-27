@@ -108,7 +108,7 @@ public class Road extends SimUnit {
 			double nextAvailableTimeForEnteringStreet = Math.max(
 					timeOfLastEnteringVehicle + inverseInFlowCapacity,
 					Scheduler.simTime + gapTravelTime);
-			timeOfLastEnteringVehicle=nextAvailableTimeForEnteringStreet;
+			
 			noOfCarsPromisedToEnterRoad++;
 			
 			assert nextAvailableTimeForEnteringStreet > 0 : "ERROR: A car just left the street, so there should be at least a gap available (in future) to use the street!";
@@ -122,6 +122,7 @@ public class Road extends SimUnit {
 				}
 			} else {
 				if (nextAvailableTimeForEnteringStreet > 0){
+				timeOfLastEnteringVehicle=nextAvailableTimeForEnteringStreet;
 				sendMessage(new EnterRoadMessage(scheduler, nextVehicle),
 							this.getUnitNo(),
 							nextAvailableTimeForEnteringStreet);

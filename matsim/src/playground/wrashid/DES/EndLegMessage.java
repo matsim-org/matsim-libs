@@ -7,20 +7,11 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 
-public class EndLegMessage extends SelfhandleMessage {
-	private Vehicle vehicle;
-
-	Scheduler scheduler;
+public class EndLegMessage extends EventMessage {
 
 	public EndLegMessage(Scheduler scheduler,Vehicle vehicle) {
-		super();
-		this.vehicle = vehicle;
-		this.scheduler=scheduler;
-	}
-
-	@Override
-	public void printMessageLogString() {
-		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + vehicle.getCurrentLink().getId().toString() + "; Description=end leg" );
+		super(scheduler,vehicle);
+		eventType=SimulationParameters.END_LEG;
 	}
 
 	@Override

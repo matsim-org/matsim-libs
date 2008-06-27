@@ -1,5 +1,7 @@
 package playground.wrashid.DES;
 
+import java.util.ArrayList;
+
 public class SimulationParameters {
 	// EventHeap
 	
@@ -11,5 +13,12 @@ public class SimulationParameters {
 	public static double carSize=7.5; // in meter
 	public static double minimumInFlowCapacity=1800; // diese konstante ist hardcodiert bei der C++ simulation (in Frz/stunde)
 													// diese wird auch skaliert mit dem flowCapacityFactor
+	
+	public static ArrayList<EventLog> eventOutputLog=new ArrayList<EventLog>();
+	
+	public static final String START_LEG="start leg";
+	public static final String END_LEG="end leg";
+	public static final String ENTER_LINK="enter link";
+	public static final String LEAVE_LINK="leave link";
 	
 }

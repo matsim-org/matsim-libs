@@ -7,9 +7,8 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 
-public class EndRoadMessage extends SelfhandleMessage {
-	private Vehicle vehicle;
-	private Scheduler scheduler; // remove later from here...
+public class EndRoadMessage extends EventMessage {
+
 
 	@Override
 	public void selfhandleMessage() {
@@ -71,15 +70,10 @@ public class EndRoadMessage extends SelfhandleMessage {
 	}
 
 	public EndRoadMessage(Scheduler scheduler,Vehicle vehicle) {
-		super();
-		this.vehicle = vehicle;
-		this.scheduler=scheduler;
+		super(scheduler,vehicle);
+		eventType=SimulationParameters.LEAVE_LINK;
 	}
 	
-	@Override
-	public void printMessageLogString() {
-		// the end of the road has been reached (this does not mean, that we can leave the road now...
-		System.out.println("arrivalTime="+this.getMessageArrivalTime() + "; VehicleId=" + vehicle.getOwnerPerson().getId().toString() + "; LinkId=" + vehicle.getCurrentLink().getId().toString() + "; Description=leave link" );
-	}
+
 
 }
