@@ -39,21 +39,12 @@ public class Test2 extends MatsimTestCase {
 		//Test2.main(null);
 		String baseDir="src/playground/wrashid/test/test2/";
 		String[] args=new String[1];
-			
-		System.out.println("A");
-		try {Thread.sleep(100);} catch (InterruptedException e) {}
 		
 		args[0]= baseDir + "config.xml";
 		DEQSimStarter.main(args);
 		
-		System.out.println("B");
-		try {Thread.sleep(100);} catch (InterruptedException e) {}
-		
 		args[0]= baseDir + "deq_events.txt";
 		CppEventFileParser.main(args);
-		
-		System.out.println("C");
-		try {Thread.sleep(100);} catch (InterruptedException e) {}
 		
 		ArrayList<EventLog> eventLog1= SimulationParameters.eventOutputLog;
 		
