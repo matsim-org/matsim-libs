@@ -40,7 +40,6 @@ public class TXTExtractor {
 	 * 
 	 */
 	public TXTExtractor() {
-
 	}
 
 	private static void printUsage() {
@@ -52,7 +51,8 @@ public class TXTExtractor {
 		System.out.println("usage: TXTExtractor args");
 		System.out.println(" arg 0: path to the old .txt-file (required)");
 		System.out.println(" arg 1: path to the new .txt-file (required)");
-		System.out.println(" arg 2: the specified sequence of char values (required)");
+		System.out
+				.println(" arg 2: the specified sequence of char values (required)");
 		System.out.println("----------------");
 	}
 
@@ -64,17 +64,20 @@ public class TXTExtractor {
 	 * @param args2
 	 *            the String, man is looking for
 	 */
-	public static void main(String[] args) {
-		if (args.length != 3)
+	public static void main(final String[] args) {
+		if (args.length < 3)
 			printUsage();
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(args[0]);
 			BufferedWriter writer = IOUtils.getBufferedWriter(args[1]);
+			StringBuilder sb = new StringBuilder();
+			for (int i = 2; i < args.length; i++)
+				sb.append(" " + args[i]);
 			String line = "";
 			do {
 				line = reader.readLine();
 				if (line != null)
-					if (line.contains(args[2]))
+					if (line.contains(sb))
 						writer.write(line + "\n");
 			} while (line != null);
 			reader.close();

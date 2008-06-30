@@ -45,15 +45,6 @@ public class OnRouteModalSplitTest {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void main(final String[] args) {
-		// final String netFilename = "./test/yu/test/input/equil_net.xml";
-		// final String plansFilename =
-		// "./test/yu/test/input/3k.100.plans.xml.gz";
-		// final String eventsFilename =
-		// "./test/yu/test/input/3k.100.events.txt.gz";
-		// final String volumeTestFilename =
-		// "./test/yu/test/output/3kVolumeTest.txt.gz";
-		// final String chartFilename = "./test/yu/test/output/3kChart.png";
-		// final String legFilename = "./test/yu/test/output/3kLeg.txt.gz";
 		final String netFilename = args[0];
 		final String plansFilename = args[1];
 		final String eventsFilename = args[2];

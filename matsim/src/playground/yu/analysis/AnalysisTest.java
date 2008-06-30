@@ -55,7 +55,7 @@ public class AnalysisTest {
 				.println(" arg 0: name incl. path to net file (.xml[.gz])(required)");
 		System.out
 				.println(" arg 1: name incl. to events file (.txt[.gz])(required)");
-		System.out.println(" arg 2: path to output file (.txt[.gz])(required)");
+		System.out.println(" arg 2: path to output file (required)");
 		System.out
 				.println(" arg 3: name incl. path to plans file (.xml[.gz])(optional)");
 		System.out.println("----------------");

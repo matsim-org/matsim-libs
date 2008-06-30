@@ -73,9 +73,10 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public PtRate(final Plans population, final String filename, int maxIters,
-			String BetaTraveling, String BetaTravelingPt)
-			throws FileNotFoundException, IOException {
+	public PtRate(final Plans population, final String filename,
+			final int maxIters, final String BetaTraveling,
+			final String BetaTravelingPt) throws FileNotFoundException,
+			IOException {
 		this.population = population;
 		this.maxIters = maxIters;
 		this.BetaTraveling = BetaTraveling;
@@ -89,7 +90,7 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 	/**
 	 * writes .txt-file and paints 2 .png-picture
 	 */
-	public void notifyIterationEnds(IterationEndsEvent event) {
+	public void notifyIterationEnds(final IterationEndsEvent event) {
 		int idx = event.getIteration();
 		if (idx % 10 == 0) {
 			Config cf = event.getControler().getConfig();
@@ -105,9 +106,8 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 			}
 			if (idx == maxIters) {
 				double[] x = new double[maxIters + 1];
-				for (int i = 0; i < maxIters / 10 + 1; i++) {
+				for (int i = 0; i < maxIters / 10 + 1; i++)
 					x[i] = i * 10;
-				}
 				XYLineChart ptRateChart = new XYLineChart("Schweiz: PtRate, "
 						+ maxIters + "ITERs, BetaTraveling=" + BetaTraveling
 						+ ", BetaTravelingPt=" + BetaTravelingPt
@@ -116,13 +116,8 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 						+ ", flowCapacityFactor="
 						+ cf.getParam("simulation", "flowCapacityFactor")
 						+ ", storageCapacityFactor="
-						+ cf.getParam("simulation", "storageCapacityFactor")
-						+ ", " + cf.getParam("strategy", "ModuleProbability_2")
-						+ "-ReRoute_Landmarks, "
-						+ cf.getParam("strategy", "ModuleProbability_3")
-						+ "-TimeAllocationMutator, "
-						+ cf.getParam("strategy", "ModuleProbability_1")
-						+ "-SelectExpBeta", "Iterations", "Pt-Rate");
+						+ cf.getParam("simulation", "storageCapacityFactor"),
+						"Iterations", "Pt-Rate");
 				ptRateChart.addSeries("PtRate", x, yPtRate);
 				ptRateChart.saveAsPng(
 						Controler.getOutputFilename("PtRate.png"), 800, 600);
@@ -140,25 +135,8 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 										"flowCapacityFactor")
 								+ ", storageCapacityFactor="
 								+ cf.getParam("simulation",
-										"storageCapacityFactor")
-								+ ", "
-								+ cf
-										.getParam("strategy",
-												"ModuleProbability_2")
-								+ "-"
-								+ cf.getParam("strategy", "Module_2")
-								+ ", "
-								+ cf
-										.getParam("strategy",
-												"ModuleProbability_3")
-								+ "-"
-								+ cf.getParam("strategy", "Module_3")
-								+ ", "
-								+ cf
-										.getParam("strategy",
-												"ModuleProbability_1") + "-"
-								+ cf.getParam("strategy", "Module_1"),
-						"Iterations", "PtUser/Persons");
+										"storageCapacityFactor"), "Iterations",
+						"PtUser/Persons");
 				personsChart.addSeries("PtUser", x, yPtUser);
 				personsChart.addSeries("Persons", x, yPersons);
 				personsChart.saveAsPng(Controler
@@ -168,7 +146,7 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 		}
 	}
 
-	public void notifyShutdown(ShutdownEvent event) {
+	public void notifyShutdown(final ShutdownEvent event) {
 		try {
 			check.writeEnd();
 		} catch (IOException e) {

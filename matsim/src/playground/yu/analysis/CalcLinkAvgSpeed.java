@@ -27,7 +27,10 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.events.EventAgentArrival;
@@ -39,9 +42,12 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
+import org.xml.sax.SAXException;
 
 /**
  * @author ychen
@@ -102,9 +108,16 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 				.getLinks(x, y, radius);
 	}
 
+	public CalcLinkAvgSpeed(final NetworkLayer network,
+			final RoadPricingScheme toll) {
+		this(network);
+		interestLinks = new HashSet<Link>(toll.getLinks());
+	}
+
 	public static class SpeedCounter {
 		private final double[] lengthSum;
 		private final double[] timeSum;
+		private final double[] freeSpeeds;
 		/**
 		 * @param arg0 -
 		 *            agentId;
@@ -117,9 +130,10 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		 * @param nofBins -
 		 *            number of bins.
 		 */
-		public SpeedCounter(final int nofBins) {
+		public SpeedCounter(final int nofBins, final double[] freeSpeeds) {
 			lengthSum = new double[nofBins];
 			timeSum = new double[nofBins];
+			this.freeSpeeds = freeSpeeds;
 		}
 
 		public void lengthSumAppend(final int timeBin, final double length) {
@@ -132,7 +146,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 
 		public double getSpeed(final int timeBin) {
 			return timeSum[timeBin] != 0.0 ? lengthSum[timeBin]
-					/ timeSum[timeBin] * 3.6 : 0.0;
+					/ timeSum[timeBin] * 3.6 : freeSpeeds[timeBin] * 3.6;
 		}
 
 		public void setTmpEnterTime(final String agentId,
@@ -151,7 +165,8 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 
 	public double getAvgSpeed(final Id linkId, final double time) {
 		SpeedCounter sc = speedCounters.get(linkId.toString());
-		return sc != null ? sc.getSpeed(getBinIdx(time)) : 0.0;
+		return sc != null ? sc.getSpeed(getBinIdx(time)) : network.getLink(
+				linkId).getFreespeed(time) * 3.6;
 	}
 
 	@Override
@@ -165,8 +180,13 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	public void handleEvent(final EventLinkEnter enter) {
 		String linkId = enter.linkId;
 		SpeedCounter sc = speedCounters.get(linkId);
-		if (sc == null)
-			sc = new SpeedCounter(nofBins);
+		if (sc == null) {
+			double[] freeSpeeds = new double[nofBins];
+			for (int i = 0; i < nofBins; i++)
+				freeSpeeds[i] = network.getLink(linkId).getFreespeed(
+						i * 86400.0 / nofBins);
+			sc = new SpeedCounter(nofBins, freeSpeeds);
+		}
 		sc.setTmpEnterTime(enter.agentId, enter.time);
 		speedCounters.put(linkId, sc);
 	}
@@ -263,18 +283,27 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	/**
-	 * @param args
+	 * @param arg0
+	 *            networkFilename;
+	 * @param arg1
+	 *            eventsFilename;
+	 * @param arg2
+	 *            roadpricingFilename;
+	 * @param arg3
+	 *            outpath;
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
 	 */
 	@SuppressWarnings( { "unchecked", "unchecked" })
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws SAXException,
+			ParserConfigurationException, IOException {
 		Gbl.startMeasurement();
 
-		final String netFilename = "../schweiz-ivtch/network/ivtch-osm-wu-flama.xml";
-		// final String eventsFilename =
-		// "./test/yu/test/input/run265opt100.events.txt.gz";
-		final String eventsFilename = "../runs/run467/500.events.txt.gz";
-		final String outputFilename = "../runs/run467/AvgSpeed.txt.gz";
-		final String chartFilename = "../runs/run467/cityAreaAvgSpeed.png";
+		final String netFilename = args[0];
+		final String eventsFilename = args[1];
+		final String roadPricingFilename = args[2];
+		final String outputPath = args[3];
 
 		Gbl.createConfig(null);
 		World world = Gbl.getWorld();
@@ -285,14 +314,16 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 
 		Events events = new Events();
 
-		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(network, 682845.0,
-				247388.0, 2000.0);
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
+		tollReader.parse(roadPricingFilename);
+		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(network, tollReader
+				.getScheme());
 		events.addHandler(clas);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
-		clas.write(outputFilename);
-		clas.writeChart(chartFilename);
+		clas.write(outputPath + "avgSpeed.txt.gz");
+		clas.writeChart(outputPath + "avgSpeed.png");
 
 		System.out.println("-> Done!");
 		Gbl.printElapsedTime();

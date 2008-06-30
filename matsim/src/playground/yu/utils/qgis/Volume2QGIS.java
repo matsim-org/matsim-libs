@@ -126,17 +126,17 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 		 */
 		mn2q.readNetwork(netFilename);
 		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile("../runs/run478/qgis/478.net.shp");
+		mn2q.writeShapeFile("../runs/run494/qgis/494.net.shp");
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1,
 				mn2q.network);
-		mn2q.readEvents("../runs/run478/99.events.txt.gz", va);
+		mn2q.readEvents("../runs/run494/99.events.txt.gz", va);
 		List<Map<Id, Integer>> vols = createVolumes(mn2q.network, va);
 		for (int i = 0; i < 24; i++) {
 			Volume2QGIS v2q = new Volume2QGIS();
 			v2q.setCrs(ch1903, mn2q.network, mn2q.crs);
 			String index = "vol" + i + "-" + (i + 1) + "h";
 			v2q.addParameter(index, Integer.class, vols.get(i));
-			v2q.writeShapeFile("../runs/run478/qgis/99." + index + ".shp");
+			v2q.writeShapeFile("../runs/run494/qgis/99." + index + ".shp");
 		}
 	}
 }

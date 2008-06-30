@@ -26,9 +26,9 @@ public class FilterPlansWithRouteInArea {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		MyRuns.filterPlansWithRouteInArea(
-				new String[] { "../data/ivtch/configMake10pctZrhPlans.xml" },
+				new String[] { "../data/ivtch/make100pctZrh30kmPlans.xml" },
 				683518.0, 246836.0, 30000.0);
 	}
 }
