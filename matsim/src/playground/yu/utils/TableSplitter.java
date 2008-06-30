@@ -22,15 +22,25 @@ package playground.yu.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.utils.io.IOUtils;
 
 public class TableSplitter {
 	private final String regex;
 	private final BufferedReader reader;
+	/**
+	 * @param arg0
+	 *            code
+	 * @param arg1
+	 *            matrix-counter
+	 */
+	private final Map<String, Integer> odMatrixs = new HashMap<String, Integer>();
 
 	public TableSplitter(final String regex, final String tableFileName)
 			throws IOException {
@@ -50,9 +60,42 @@ public class TableSplitter {
 		reader.close();
 	}
 
+	public int getMatrixCnt(final String code) {
+		return odMatrixs.get(code).intValue();
+	}
+
+	public void countMatrix(final String code) {
+		Integer cnt = odMatrixs.get(code);
+		odMatrixs.put(code, (cnt != null)?cnt.intValue() + 1:0);
+	}
+
+	private void writeMatrixHead(final BufferedWriter writer) {
+		try {
+			writer.write("$ON;D3;Y5\n" + "*  \n"
+					+ "*Orig      Dest         Number  \n"
+					+ "*Zone       Zone         Trips \n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void writeMatrix(final String matrixName, final String matrix) {
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(matrixName);
+			writeMatrixHead(writer);
+			writer.write(matrix);
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(final String[] args) throws IOException {
 		TableSplitter ts = new TableSplitter("\t", "test/yu/test/odtext.txt");
 		String outputFileName = "test/yu/test/odtext_output.txt";
+		String outputPath = "test/yu/test/yalcin/";
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFileName);
 		String[] head = ts.split(ts.readLine());
 		for (int i = 0; i <= 5; i++)
@@ -63,41 +106,41 @@ public class TableSplitter {
 		List<String> starts = new LinkedList<String>();
 		List<String> ends = new LinkedList<String>();
 		String readedLine = null;
+		String code = null;
 		do {
 			readedLine = ts.readLine();
 			if (readedLine != null)
 				line = ts.split(readedLine);
+			StringBuilder od = null;
 			if (!line[0].equals("")) {
-				// System.out.println("starts size was " + starts.size());
-				if (starts.size() > 0)
-					for (int j = 0; j < starts.size(); j++) {
-						System.out.println("ends size was " + ends.size());
+				if (starts.size() > 0) {
+					od = new StringBuilder();
+					for (int j = 0; j < starts.size(); j++)
 						for (int k = 0; k < ends.size(); k++) {
 							String start = starts.get(j);
 							String end = ends.get(k);
-							// System.out.println("start: " + start + "\tend: "
-							// + end);
 							if (!start.equals(end)) {
 								for (int i = 0; i <= 7; i++)
 									writer.write("\t");
 								writer.write(start + "\t" + end + "\n");
+								od.append(start + "\t" + end + "\t1\n");
 							}
 						}
-					}
+					ts.writeMatrix(outputPath + "odmatrix" + code + " ("
+							+ ts.getMatrixCnt(code) + ").mtx", od.toString());
+				}
 				starts.clear();
-				// System.out.println("starts was cleared!");
 				ends.clear();
 				for (int i = 0; i <= 5; i++)
 					writer.write(line[i] + "\t");
+				code = line[0];
+				ts.countMatrix(code);
 				writer.write(line[8] + "\t" + line[9] + "\t" + line[15] + "\t"
 						+ line[17] + "\n");
 			} else if (!line[15].equals(""))
 				starts.add(line[15]);
-			// System.out.println("starts added " + line[15]);
-			else if (!line[17].equals("")) {
+			else if (!line[17].equals(""))
 				ends.add(line[17]);
-				System.out.println("ends added " + line[17]);
-			}
 		} while (readedLine != null);
 		ts.closeReader();
 		writer.close();
