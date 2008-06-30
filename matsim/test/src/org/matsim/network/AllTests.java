@@ -30,6 +30,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for org.matsim.network");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(NetworkParserWriterTest.class);
+		suite.addTestSuite(NetworkChangeEventsParserWriterTest.class);
 		suite.addTestSuite(LinkImplTest.class);
 		suite.addTestSuite(TimeVariantLinkImplTest.class);
 		suite.addTest(org.matsim.network.algorithms.AllTests.suite());
