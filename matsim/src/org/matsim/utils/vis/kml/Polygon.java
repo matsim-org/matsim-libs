@@ -85,7 +85,7 @@ public class Polygon extends Geometry {
 	 * Adds a LinearRing object to the innerBoundaries of this Polygon
 	 * @param boundary
 	 */
-	public void addInnerBoudary(LinearRing boundary) {
+	public void addInnerBoundary(LinearRing boundary) {
 		if (this.innerBoundaries == null)
 			this.innerBoundaries = new Vector<LinearRing>();
 
