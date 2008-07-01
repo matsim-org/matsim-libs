@@ -68,7 +68,7 @@ public class TextReferencer {
 	private FeatureType ftHome;
 	private ArrayList<String> homeRelated;
 	
-	private final  static GeotoolsTransformation GT = new GeotoolsTransformation("WGS84_UTM47S", "WGS84");
+	private final  static GeotoolsTransformation GT = new GeotoolsTransformation("WGS84_UTM47S", "WGS84_UTM47S");
 	
 	public TextReferencer(final ArrayList<FeatureSource> fts, final FeatureSource others, final FeatureSource zonesl, final FeatureSource homelocations, final String unclassified) {
 		this.featureSource = fts.get(0);
@@ -110,6 +110,13 @@ public class TextReferencer {
 		excludes.add("rawang");
 		excludes.add("rumah");
 		excludes.add("tetangga");
+		excludes.add("dekat");
+		excludes.add("sekitart");
+		excludes.add("depan rumah");
+		excludes.add("warung");
+		excludes.add("di kelurahan");
+		excludes.add("istirahat");
+		
 		this.homeRelated = excludes;
 		final TextFileReader tfr = new TextFileReader(this.unclassified);
 		String [] line = tfr.readLine();
@@ -243,7 +250,11 @@ public class TextReferencer {
 			} else if (isHomeRelated(location)) {
 				ft = classifyAsHome(id,line);
 			} else {
-				final CaseNode resp = this.crn.getCase(location);
+				CaseNode resp = this.crn.getCase(location);
+				if (resp == null || resp.getActivation() <= 0.96) {
+					resp = this.crn.getCase("jalan " + location);
+				}
+				
 				if (resp != null && resp.getActivation() > 0.96) {
 					ft =getPointFeature(resp.getCoordinate(), line);
 				} else if (resp == null) {
@@ -619,7 +630,8 @@ public class TextReferencer {
 		final Coordinate c2 = new Coordinate(coord.x + r1, coord.y + r2);
 		final Coordinate transformed = MGC.coord2Coordinate(GT.transform(MGC.coordinate2Coord(c2)));
 		
-		final Point p = this.geofac.createPoint(transformed);
+//		final Point p = this.geofac.createPoint(transformed);
+		final Point p = this.geofac.createPoint(coord);
 		try {
 			this.classified.add(this.ftHome.create(new Object[] {p,id,i,type}, "activity"));
 		} catch (final IllegalAttributeException e) {

@@ -80,6 +80,7 @@ public class CRN {
 		this.nT2.put(" xi", " 11");
 		this.nT3.put("rs ", "rumah sakit ");
 		this.nT3.put("jl.", "jalan ");
+		this.nT4.put("jl,", "jalan ");
 		this.nT4.put("jln ", "jalan ");
 		this.nT4.put("jln.", "jalan ");
 		this.nT4.put("jal ", "jalan ");
