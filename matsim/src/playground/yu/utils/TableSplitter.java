@@ -106,12 +106,14 @@ public class TableSplitter {
 		for (int i = 0; i <= 5; i++)
 			writer.write(head[i] + "\t");
 		writer.write(head[8] + "\t" + head[9] + "\t" + head[15] + "\t"
-				+ head[17] + "\n");
+				+ head[17] + "\tstatus\n");
 		String[] line = null;
 		List<String> starts = new LinkedList<String>();
 		List<String> ends = new LinkedList<String>();
 		String readedLine = null;
 		String code = null;
+		StringBuilder title = null;
+		StringBuilder content = null;
 		do {
 			readedLine = ts.readLine();
 			if (readedLine != null)
@@ -120,14 +122,15 @@ public class TableSplitter {
 			if (!line[0].equals("")) {
 				if (starts.size() > 0 && ends.size() > 0) {
 					od = new StringBuilder();
+					content = new StringBuilder();
 					for (int j = 0; j < starts.size(); j++)
 						for (int k = 0; k < ends.size(); k++) {
 							String start = starts.get(j);
 							String end = ends.get(k);
 							if (!start.equals(end)) {
 								for (int i = 0; i <= 7; i++)
-									writer.write("\t");
-								writer.write(start + "\t" + end + "\n");
+									content.append("\t");
+								content.append(start + "\t" + end + "\n");
 								od.append(start + "\t" + end + "\t1\n");
 							}
 						}
@@ -136,16 +139,18 @@ public class TableSplitter {
 						ts.writeMatrix(outputPath + "odmatrix" + code + " ("
 								+ ts.getMatrixCnt(code) + ").mtx", od
 								.toString());
-					}
+						writer.write(title + "OK\n" + content);
+					} else
+						writer.write(title + "DELETED\n");
 				}
 				starts.clear();
 				ends.clear();
+				title = new StringBuilder();
 				for (int i = 0; i <= 5; i++)
-					writer.write(line[i] + "\t");
+					title.append(line[i] + "\t");
 				code = line[0];
-
-				writer.write(line[8] + "\t" + line[9] + "\t" + line[15] + "\t"
-						+ line[17] + "\n");
+				title.append(line[8] + "\t" + line[9] + "\t" + line[15] + "\t"
+						+ line[17] + "\t");
 			} else if (!line[15].equals(""))
 				starts.add(line[15]);
 			else if (!line[17].equals(""))
