@@ -17,7 +17,10 @@ public class Test6 extends MatsimTestCase {
 	 * @param args
 	 */
 	
-
+	public static void main(String[] args) {
+		Test6 t6=new Test6();
+		t6.testTest6();
+	}
 	
 	public void testTest6() {
 		String baseDir="src/playground/wrashid/test/test6/";
