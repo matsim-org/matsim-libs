@@ -75,6 +75,8 @@ public class ActivityActWriter {
 
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
+						System.out.println(myActivity.toString());
+						System.out.println(myAct.toString());
 						e.printStackTrace();
 					}
 					actIndex++;
