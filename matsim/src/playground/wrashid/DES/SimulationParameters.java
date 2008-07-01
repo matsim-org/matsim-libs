@@ -21,4 +21,8 @@ public class SimulationParameters {
 	public static final String ENTER_LINK="enter link";
 	public static final String LEAVE_LINK="leave link";
 	
+	
+	
+	
+	public static final boolean debugMode=true;
 }

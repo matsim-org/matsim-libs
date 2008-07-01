@@ -1,4 +1,4 @@
-package playground.wrashid.test.test1;
+package playground.wrashid.test.test4;
 
 import java.util.ArrayList;
 
@@ -9,34 +9,16 @@ import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.test.CppEventFileParser;
 
-public class Test1 extends MatsimTestCase {
+public class Test4 extends MatsimTestCase {
 
 	/**
 	 * @param args
 	 */
 	
-	public static void main(String[] args) {
-		// the config file comes as input
-		
-		String baseDir="src/playground/wrashid/test/test1/";
-		args=new String[1];
-			
-		args[0]= baseDir + "config.xml";
-		DEQSimStarter.main(args);
-		
-		args[0]= baseDir + "deq_events.txt";
-		CppEventFileParser.main(args);
-		
-		ArrayList<EventLog> eventLog1= SimulationParameters.eventOutputLog;
-		
-		ArrayList<EventLog> eventLog2= CppEventFileParser.eventLog;
-		System.out.println("here...");
-		assertEquals(EventLog.compare(eventLog1,eventLog2),true);
-	}
 
 	
-	public void testTest1() {
-		String baseDir="src/playground/wrashid/test/test1/";
+	public void testTest4() {
+		String baseDir="src/playground/wrashid/test/test4/";
 		String[] args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
@@ -49,6 +31,9 @@ public class Test1 extends MatsimTestCase {
 		
 		ArrayList<EventLog> eventLog2= CppEventFileParser.eventLog;
 		System.out.println("here...");
+		
+		EventLog.print(eventLog1);
+		
 		assertEquals(EventLog.compare(eventLog1,eventLog2),true);
 	}
 }

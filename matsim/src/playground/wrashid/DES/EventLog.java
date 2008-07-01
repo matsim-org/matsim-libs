@@ -92,8 +92,7 @@ public class EventLog {
 	}
 	
 	public static boolean compare(ArrayList<EventLog> eventLog1, ArrayList<EventLog> eventLog2){
-		System.out.println(eventLog1.size());
-		System.out.println(eventLog2.size());
+		int NoOfNotEqualEvents=0;
 		
 		assert eventLog1.size()==eventLog2.size():"The size of both eventLogs must be the same!";
 		for(int i=0;i<eventLog1.size();i++) {
@@ -104,8 +103,16 @@ public class EventLog {
 			
 			if (!equals(eventLog1.get(i),eventLog2.get(i))){
 				//return false; // TODO: uncomment this, when bug is fixed!
+				NoOfNotEqualEvents++;
 			}
 		}
+		
+		if (SimulationParameters.debugMode){
+			System.out.println("# Events Java: " + eventLog1.size());
+			System.out.println("# Events C++: " + eventLog2.size());
+			System.out.println("NoOfNotEqualEvents: " + NoOfNotEqualEvents);
+		}
+		
 		return true;
 	}
 	
@@ -121,5 +128,11 @@ public class EventLog {
 			System.out.println("=========");
 		}
 		return false;
+	}
+	
+	public static void print(ArrayList<EventLog> eventLog){
+		for(int i=0;i<eventLog.size();i++) {
+			eventLog.get(i).print();
+		}
 	}
 }

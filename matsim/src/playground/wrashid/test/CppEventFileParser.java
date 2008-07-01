@@ -39,36 +39,43 @@ public class CppEventFileParser {
 	}
 
 	public ArrayList<EventLog> parseFile(String filePath) {
+		int counter=0;
 		ArrayList<EventLog> rows = new ArrayList<EventLog>();
 		try {
 			FileReader fr = new FileReader(filePath);
 			BufferedReader br = new BufferedReader(fr);
 			String line = null;
-			StringTokenizer tonckenizer = null;
+			StringTokenizer tokenizer = null;
 			line = br.readLine();
 			while (line != null) {
+				counter++;
 				
-				tonckenizer = new StringTokenizer(line);
+				if (SimulationParameters.debugMode && counter % 1000000==0){
+					System.out.println("noOfLines Read:" + counter);
+				}
+				
+				
+				tokenizer = new StringTokenizer(line);
 				String token = null;
-				token = tonckenizer.nextToken();
+				token = tokenizer.nextToken();
 				double first = Double.parseDouble(token);
-				token = tonckenizer.nextToken();
+				token = tokenizer.nextToken();
 				int second = Integer.parseInt(token);
-				token = tonckenizer.nextToken();
+				token = tokenizer.nextToken();
 				int third = Integer.parseInt(token);
-				token = tonckenizer.nextToken();
+				token = tokenizer.nextToken();
 				int fourth = Integer.parseInt(token);
-				token = tonckenizer.nextToken();
+				token = tokenizer.nextToken();
 				int fifth = Integer.parseInt(token);
-				token = tonckenizer.nextToken();
+				token = tokenizer.nextToken();
 				int sixth = Integer.parseInt(token);
-				token = tonckenizer.nextToken();
+				token = tokenizer.nextToken();
 				String eventType = token;
 				
 				
 				// there is one eventType called 'enter net' => it is split into two tockens, so need to take that into account
-				if (tonckenizer.hasMoreTokens()){
-					token = tonckenizer.nextToken();
+				if (tokenizer.hasMoreTokens()){
+					token = tokenizer.nextToken();
 					eventType += " " + token;
 				}
 				

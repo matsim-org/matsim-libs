@@ -53,10 +53,6 @@ public class Test2 extends MatsimTestCase {
 		assertEquals(EventLog.compare(eventLog1,eventLog2),true);
 	}
 	
-	public void testTest1() {
-		//Test2.main(null);
-		
-		assertEquals(true,true);
-	}
+	
 
 }
