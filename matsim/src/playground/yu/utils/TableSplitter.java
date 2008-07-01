@@ -142,7 +142,8 @@ public class TableSplitter {
 						writer.write(title + "OK\n" + content);
 					} else
 						writer.write(title + "DELETED\n");
-				}
+				} else
+					writer.write(title + "DELETED\n");
 				starts.clear();
 				ends.clear();
 				title = new StringBuilder();
