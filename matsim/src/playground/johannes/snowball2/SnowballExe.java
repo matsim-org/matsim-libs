@@ -32,9 +32,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
@@ -45,7 +47,7 @@ import cern.colt.list.IntArrayList;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.io.GraphMLFile;
-import edu.uci.ics.jung.utils.Pair;
+import gnu.trove.TObjectDoubleHashMap;
 
 /**
  * @author illenberger
@@ -61,17 +63,15 @@ public class SnowballExe {
 	
 	private String graphFile;
 	
-	private String rExePath;
-	
-	private String tmpDir;
-	
 	private int numSeeds;
 	
 	private double pResponse;
 	
 	private double pFOF;
 	
-	private List<String> statsKeys;
+	private List<String> statisticsKeys;
+	
+	private boolean calcOriginalStats;
 	
 	private static final String ISOLATES_KEY = "isolates";
 	
@@ -88,6 +88,12 @@ public class SnowballExe {
 	private static final String COMPONENTS_KEY = "components";
 	
 	private static final String DEGREE_CORRELATION_KEY = "dcorrelation";
+	
+	private static final String TYPE_CLUSTERS_KEY = "typeClusters";
+	
+	private static final String COMPONENT_STATS_KEY = "componentStats";
+	
+	private static final String MUTUALITY_KEY = "mutuality";
 	
 	/**
 	 * @param args
@@ -107,95 +113,106 @@ public class SnowballExe {
 		
 		exe.outputDir = config.getParam(MODULE_NAME, "outputDir");
 		exe.randomSeed = config.global().getRandomSeed();
-		exe.rExePath = config.getParam(MODULE_NAME, "RExePath");
-		exe.tmpDir = config.getParam(MODULE_NAME, "tmpDir");
+		exe.calcOriginalStats = Boolean.parseBoolean(config.getParam(MODULE_NAME, "calcOriginalStats"));
 		
 		String str = config.getParam(MODULE_NAME, "statistics");
 		String[] tokens = str.split(",");
-		exe.statsKeys = new ArrayList<String>(tokens.length);
+		exe.statisticsKeys = new ArrayList<String>(tokens.length);
 		for(String token : tokens) {
-			exe.statsKeys.add(token.trim());
+			exe.statisticsKeys.add(token.trim());
 		}
 		
 		exe.run();
 	}
 	
 	public void run() throws FileNotFoundException, IOException {
+		/*
+		 * (1) Load graph...
+		 */
 		logger.info("Loading network...");
 		Graph g = loadGraph(graphFile);
-		
+		/*
+		 * (2) Initialize the sampler...
+		 */
+		Sampler sampler = new Sampler(g, numSeeds, randomSeed);
+		sampler.setPResponse(pResponse);
+		sampler.setPFOF(pFOF);
+		/*
+		 * (3) Load statistical property classes...
+		 */
 		Map<String, GraphStatistic> statistics = new LinkedHashMap<String, GraphStatistic>();
-		Map<String, GraphStatistic> sampleStatistics = new LinkedHashMap<String, GraphStatistic>();
-		
 		Centrality centrality = new Centrality();
-		Centrality centralitySampled = new CentralitySampled();
-		for(String key : statsKeys) {
+		
+		for(String key : statisticsKeys) {
 			new File(outputDir + key).mkdirs();
 			if(ISOLATES_KEY.equalsIgnoreCase(key)) {
-				statistics.put(key, new CountIsolates());
-				sampleStatistics.put(key, new CountIsolates());
+				statistics.put(key, new CountIsolates(outputDir + key));
 			} else if(DEGREE_KEY.equalsIgnoreCase(key)) {
-				statistics.put(key, new Degree());
-				sampleStatistics.put(key, new DegreeSampled());
+				statistics.put(key, new Degree(outputDir + key));
 			} else if(W_DEGREE_KEY.equalsIgnoreCase(key)) {
-				statistics.put(key, new Degree());
-				DegreeSampled ds = new DegreeSampled();
-				ds.setBiasCorrection(true);
-				sampleStatistics.put(key, ds);
+				Degree d = new Degree(outputDir + key);
+				d.setBiasCorrection(true);
+				statistics.put(key, d);			
 			} else if(BETWEENNESS_KEY.equalsIgnoreCase(key)) {
-				statistics.put(key, new Betweenness(centrality));
-				sampleStatistics.put(key, new Betweenness(centralitySampled));
+				statistics.put(key, new Betweenness(centrality, outputDir + key));
 			} else if(CLOSENESS_KEY.equalsIgnoreCase(key)) {
-				statistics.put(key, new Closeness(centrality));
-				sampleStatistics.put(key, new Closeness(centralitySampled));
+				statistics.put(key, new Closeness(centrality, outputDir + key));
 			} else if(CLUSTERING_KEY.equalsIgnoreCase(key)) {
-				statistics.put(key, new Clustering());
-				sampleStatistics.put(key, new ClusteringSampled());
+				statistics.put(key, new Clustering(outputDir + key));
 			} else if(COMPONENTS_KEY.equalsIgnoreCase(key)) {
-				CountComponents cc = new CountComponents(outputDir+key+"/", g);
-				statistics.put(key, cc);
-				sampleStatistics.put(key, cc);
+				statistics.put(key, new CountComponents(outputDir + key));
 			} else if(DEGREE_CORRELATION_KEY.equalsIgnoreCase(key)) {
-				statistics.put(key, new DegreeCorrelation());
-				sampleStatistics.put(key, new DegreeCorrelationSampled());
+				statistics.put(key, new DegreeCorrelation(outputDir + key));
+			} else if(TYPE_CLUSTERS_KEY.equalsIgnoreCase(key)) {
+				statistics.put(key, new TypeClusters(outputDir + key));
+			} else if(COMPONENT_STATS_KEY.equalsIgnoreCase(key)) {
+				statistics.put(key, new ComponentsStats(sampler.getSeeds(), outputDir + key));
+			} else if(MUTUALITY_KEY.equalsIgnoreCase(key)) {
+				statistics.put(key, new Mutuality(outputDir + key));
 			} else {
 				logger.warn(String.format("No class found for statistics \"%1$s\"!", key));
 			}
 			
 		}
-		
-		
-		
-		Map<String, double[]> references = new HashMap<String, double[]>();
-		logger.info("Computing original network statistics...");
-		Map<String, Double> meanValues = computeStatistics(g, statistics, references, -1);
-		
-		BufferedWriter meanWriter = IOUtils.getBufferedWriter(outputDir + "meanValues.txt");
-		meanWriter.write("it");
-		meanWriter.write("\tnVertex");
-		meanWriter.write("\tnEdges");
-		meanWriter.write("\tfVertex");
-		meanWriter.write("\tfEdges");
-		for(String key : meanValues.keySet()) {
-			meanWriter.write("\t");
-			meanWriter.write(key);
-		}
-		meanWriter.newLine();
-		
-		meanWriter.write(String.format("-1\t%1$s\t%2$s\t1\t1", g.numVertices(), g.numEdges()));
-		for(String key : meanValues.keySet()) {
-			meanWriter.write("\t");
-			meanWriter.write(String.valueOf((float)(double)meanValues.get(key)));
-		}
-		meanWriter.newLine();
-		meanWriter.flush();
-//		System.exit(0);
-		Sampler sampler = new Sampler(g, numSeeds, randomSeed);
-		sampler.setPResponse(pResponse);
-		sampler.setPFOF(pFOF);
-		
+		/*
+		 * (3b) Write the sampled graph after each wave as pajek file.
+		 */
 		PajekVisWriter visWriter = new PajekVisWriter();
 		new File(outputDir + "pajek").mkdirs();
+		/*
+		 * (4) Open writer for statistical summary.
+		 */
+		BufferedWriter summaryWriter = IOUtils.getBufferedWriter(outputDir + "meanValues.txt");
+		summaryWriter.write("it");
+		summaryWriter.write("\tnVertex");
+		summaryWriter.write("\tnEdges");
+		summaryWriter.write("\tfVertex");
+		summaryWriter.write("\tfEdges");
+		summaryWriter.write("\tgrowth");
+		summaryWriter.write("\tefficiency");
+		for(String key : statisticsKeys) {
+			summaryWriter.write("\t");
+			summaryWriter.write(key);
+		}
+		summaryWriter.newLine();
+		/*
+		 * (5) Compute the statistical properties of the original network.
+		 */
+		Map<String, DescriptiveStatistics> references = new HashMap<String, DescriptiveStatistics>();
+		TObjectDoubleHashMap<String> meanValues;
+		if (calcOriginalStats) {
+			logger.info("Computing original network statistics...");
+			meanValues = computeStatistics(g, statistics, references, -1);
+
+			summaryWriter.write(String.format("-1\t%1$s\t%2$s\t1\t1\t0\t0", g
+					.numVertices(), g.numEdges()));
+			for (String key : statisticsKeys) {
+				summaryWriter.write("\t");
+				summaryWriter.write(String.format(Locale.US, "%1.4f", meanValues.get(key)));
+			}
+			summaryWriter.newLine();
+			summaryWriter.flush();
+		}
 		
 		int numSampledVertices = 0;
 		int numVisitedVertices = 0;
@@ -204,57 +221,74 @@ public class SnowballExe {
 		int lastNumVisitedVertices = 0;
 		int deltaLastVisited = 0;
 		SampledGraph sample = null;
+		/*
+		 * (6) Run waves...
+		 */
 		while(numSampledVertices < g.numVertices()) {
+			/*
+			 * (6a) Run one wave.
+			 */
 			logger.info(String.format("Running iteration %1$s...", sampler.getCurrentWave() + 1));
 			sample = sampler.runWave();
-			
-			logger.info("Computing sampled network statistics...");
+			/*
+			 * (6b) Calculate basic properties.
+			 */
 			numSampledVertices = countSampledVertices(sample);
 			numVisitedVertices = countVisitedVertices(sample);
-			
-			logger.info("Sampled " + (numSampledVertices/(float)g.numVertices()) + " % of all vertices.");
+			logger.info(String.format(Locale.US, "Sampled %1.4f percent of all vertices.", (numSampledVertices/(double)g.numVertices())));
 			
 			int deltaSampled = numSampledVertices - lastNumSampledVertices;
 			int deltaVisited = numVisitedVertices - lastNumVisitedVertices;
-			float efficiency = deltaSampled/(float)deltaLastVisited;
+			double efficiency = deltaSampled/(double)deltaLastVisited;
 			deltaLastVisited = deltaVisited;
-			logger.info("Sampling efficiency is " + efficiency);
+			logger.info(String.format(Locale.US, "Sampling efficiency is %1.4f", efficiency));
 			
 			sampler.calculateSampleProbas(g, lastNumSampledVertices, lastNumSampledVertices2, g.numVertices());
 			
-			meanWriter.write(String.valueOf(sampler.getCurrentWave()));
-			meanWriter.write("\t");
-			meanWriter.write(String.valueOf(numSampledVertices));
-			meanWriter.write("\t");
-			meanWriter.write(String.valueOf(sample.numEdges()));
-			meanWriter.write("\t");
-			meanWriter.write(String.valueOf(numSampledVertices/(float)g.numVertices()));
-			meanWriter.write("\t");
-			meanWriter.write(String.valueOf(sample.numEdges()/(float)g.numEdges()));
-			
-			meanValues = computeStatistics(sample, sampleStatistics, references, sampler.getCurrentWave());
-			for(String key : meanValues.keySet()) {
-				meanWriter.write("\t");
-				meanWriter.write(String.valueOf((float)(double)meanValues.get(key)));
+			summaryWriter.write(String.valueOf(sampler.getCurrentWave()));
+			summaryWriter.write("\t");
+			summaryWriter.write(String.valueOf(numSampledVertices));
+			summaryWriter.write("\t");
+			summaryWriter.write(String.valueOf(sample.numEdges()));
+			summaryWriter.write("\t");
+			summaryWriter.write(String.format(Locale.US, "%1.4f", numSampledVertices/(double)g.numVertices()));
+			summaryWriter.write("\t");
+			summaryWriter.write(String.format(Locale.US, "%1.4f", sample.numEdges()/(double)g.numEdges()));
+			summaryWriter.write("\t");
+			summaryWriter.write(String.format(Locale.US, "%1.4f", numSampledVertices/(double)lastNumSampledVertices));
+			summaryWriter.write("\t");
+			summaryWriter.write(String.format(Locale.US, "%1.4f", efficiency));
+			/*
+			 * (6c) Calculate network properties.
+			 */
+			logger.info("Computing sampled network statistics...");
+			meanValues = computeStatistics(sample, statistics, references, sampler.getCurrentWave());
+			for(String key : statisticsKeys) {
+				summaryWriter.write("\t");
+				summaryWriter.write(String.format(Locale.US, "%1.4f", meanValues.get(key)));
 			}
-			meanWriter.newLine();
-			meanWriter.flush();
-			
+			summaryWriter.newLine();
+			summaryWriter.flush();
+			/*
+			 * (6d) Write sampled graph as pajek file.
+			 */
 			visWriter.write(sample, outputDir + "pajek/" + sampler.getCurrentWave() + "pajek.net");
-			
+			/*
+			 * (6e) Check if we sampled all reachable vertices. 
+			 */
 			if(lastNumSampledVertices == numSampledVertices) {
-				logger.warn("Aborted sampling because the maximum amount of vertices that can be sampled have been sampled!");
+				logger.warn("Aborted sampling because all reachable vertices have been sampled!");
 				break;
 			}
-			
 			lastNumSampledVertices2 = lastNumSampledVertices;
 			lastNumSampledVertices = numSampledVertices;
 			lastNumVisitedVertices = numVisitedVertices;
-			
-			centrality.reset();
-			centralitySampled.reset();
+			/*
+			 * (6f) Important! Reset the centrality measure.
+			 */
+//			centrality.reset();
 		}
-		meanWriter.close();
+		summaryWriter.close();
 		logger.info("Making coverage chart...");
 		makeCoverageCharts(sample, sampler.getCurrentWave());
 		logger.info("Sampling done.");
@@ -264,41 +298,20 @@ public class SnowballExe {
 		return new GraphMLFile().load(filename); 
 	}
 	
-	private Map<String, Double> computeStatistics(Graph g, Map<String, GraphStatistic> statistics, Map<String, double[]> references, int iteration) {
-		Map<String, Double> meanValues = new LinkedHashMap<String, Double>();
-		for(String key : statistics.keySet()) {
+	private TObjectDoubleHashMap<String> computeStatistics(Graph g, Map<String, GraphStatistic> statistics, Map<String, DescriptiveStatistics> references, int iteration) {
+		TObjectDoubleHashMap<String> meanValues = new TObjectDoubleHashMap<String>();
+		for(String key : statisticsKeys) {
 			logger.info(String.format("Calculating statistics... %1$s.", key));
 			GraphStatistic s = statistics.get(key);
-			meanValues.put(key, s.run(g));
-		}
-		
-		for(String key : statistics.keySet()) {
-			GraphStatistic s = statistics.get(key);
-			if(s instanceof VertexStatistic) {
-				double[] ref = references.get(key);
-				Histogram hist;
-				if(ref == null) {
-					hist = ((VertexStatistic)s).getHistogram();
-					ref = new double[3];
-					double[] minmax = hist.getMinMax();
-					ref[0] = hist.getMean();
-					ref[1] = minmax[0];
-					ref[2] = minmax[1];
-					references.put(key, ref);
-				} else {
-					hist = ((VertexStatistic)s).getHistogram(ref[1], ref[2]);
-				}
-				String filename = String.format("%1$s%2$s/%3$s%4$s.png", outputDir, key, iteration, key);
-				try {
-					hist.plot(filename, key);
-				} catch (IOException e) {
-					logger.warn("Plotting histogram failed!", e);
-				}
-				
-				meanValues.put(key + "_gamma", calcGammaExponent(hist));
-			}
-			if(s instanceof CountComponents) {
-				((CountComponents)s).dumpComponentSummary(String.format("%1$s%2$s/%3$s%4$s.txt", outputDir, key, iteration, key));
+			if(s != null) {
+			DescriptiveStatistics ref = references.get(key);
+			DescriptiveStatistics stats = s.calculate(g, iteration, ref);
+			if(ref == null && iteration == -1)
+				references.put(key, stats);
+
+			meanValues.put(key, stats.getMean());
+			} else {
+				meanValues.put(key, Double.NaN);
 			}
 		}
 		

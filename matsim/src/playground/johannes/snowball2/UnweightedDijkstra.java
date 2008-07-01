@@ -112,7 +112,10 @@ public class UnweightedDijkstra {
 			}
 		}
 		
-		v.setCloseness(numVertex / (double)numPathsTotal);
+		if(numPathsTotal == 0)
+			v.setCloseness(0);
+		else
+			v.setCloseness(numVertex / (double)numPathsTotal);
 		
 		return reachedVertices;
 	}
@@ -176,7 +179,7 @@ public class UnweightedDijkstra {
 //
 //		}
 		Centrality centrality = new Centrality();
-		centrality.run(g);
+		centrality.run(g, 0);
 		System.out.println("Done. (" + (System.currentTimeMillis() - time)/1000.0f + " sec)");
 		System.out.println("APL = " + centrality.getGraphCloseness());
 		

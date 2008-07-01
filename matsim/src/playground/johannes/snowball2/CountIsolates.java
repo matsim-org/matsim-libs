@@ -25,6 +25,8 @@ package playground.johannes.snowball2;
 
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 
@@ -32,15 +34,24 @@ import edu.uci.ics.jung.graph.Vertex;
  * @author illenberger
  *
  */
-public class CountIsolates implements GraphStatistic {
+public class CountIsolates extends GraphStatistic {
 
-	public double run(Graph g) {
+	public CountIsolates(String outputDir) {
+		super(outputDir);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public DescriptiveStatistics calculate(Graph g, int iteration,
+			DescriptiveStatistics reference) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
 		Set<Vertex> vertices = g.getVertices();
 		int count = 0;
 		for(Vertex v : vertices)
 			if(v.degree() == 0)
 				count++;
-		return count;
+		stats.addValue(count);
+		return stats;
 	}
 
 }

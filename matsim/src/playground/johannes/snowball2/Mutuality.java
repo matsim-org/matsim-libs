@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VertexStatistic.java
+ * Mutuality.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,15 +23,59 @@
  */
 package playground.johannes.snowball2;
 
-import playground.johannes.snowball.Histogram;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.statistics.GraphStatistics;
 
 /**
  * @author illenberger
  *
  */
-public interface VertexStatistic extends GraphStatistic {
-	
-	public Histogram getHistogram();
-	
-	public Histogram getHistogram(double min, double max);
+public class Mutuality extends GraphStatistic {
+
+	public Mutuality(String outputDir) {
+		super(outputDir);
+	}
+
+	@SuppressWarnings("unchecked")
+	public DescriptiveStatistics calculate(Graph g, int iteration,
+			DescriptiveStatistics reference) {
+		Map<Vertex, Double> clustering = GraphStatistics.clusteringCoefficients(g);
+		Set<Vertex> vertices = g.getVertices();
+		double z = 0;
+		double m = 0;
+		
+		boolean isSampled = false;
+		if(g instanceof SampledGraph)
+			isSampled = true;
+		
+		for(Vertex v : vertices) {
+			if(isSampled) {
+				if(!((SampledVertex)v).isAnonymous()) {
+					z += v.degree();
+					double c = clustering.get(v);
+					m += v.degree() /(double) (1 + Math.pow(c, 2) * (v.degree() - 1));
+				}
+			} else {
+				z += v.degree();
+				double c = clustering.get(v);
+				m += v.degree() /(double) (1 + Math.pow(c, 2) * (v.degree() - 1));
+			}
+		}
+		z = z / (double)vertices.size();
+		m = m / (double)vertices.size();
+		
+		double result = m / z;
+		
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		stats.addValue(result);
+		return stats;
+	}
+
+
 }

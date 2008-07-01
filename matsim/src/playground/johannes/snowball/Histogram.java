@@ -214,9 +214,28 @@ public class Histogram {
 		final XYSeriesCollection data = new XYSeriesCollection();
 		final XYSeries wave = new XYSeries(title, false, true);
 		
-		int size = bins.size();
-		for (int i = 0; i < size; i++) {
-			wave.add(i, bins.get(i));
+		double min, max, width;
+//		int size;
+		
+		if(bounds != null) {
+			min = bounds[0];
+			max = bounds[1];					
+		} else {
+			double minmax[] = getMinMax();
+			min = minmax[0];
+			max = minmax[1];
+		}
+		if(binWidth > 0) {
+//			size = (int)Math.ceil((max - min)/(double)binWidth);
+			width = binWidth;
+		} else {
+//			size = bincount;
+			width = (max - min)/(double)bincount;
+		}
+		
+		int cnt = bins.size();
+		for (int i = 0; i < cnt; i++) {
+			wave.add(i * width + min, bins.get(i));
 		}
 
 		data.addSeries(wave);

@@ -23,48 +23,101 @@
  */
 package playground.johannes.snowball2;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import playground.johannes.snowball.Histogram;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
+import gnu.trove.TDoubleArrayList;
+import gnu.trove.TObjectDoubleHashMap;
 
 /**
  * @author illenberger
  *
  */
-public class Degree implements VertexStatistic {
+public class Degree extends GraphStatistic {
 
-	protected Map<Vertex, Integer> values;
+	private boolean biasCorrection;
 	
-	public Histogram getHistogram() {
-		Histogram histogram = new Histogram(1.0);
-		fillHistogram(histogram);
-		return histogram;
-	}
-
-	public Histogram getHistogram(double min, double max) {
-		Histogram histogram = new Histogram(1.0, min, max);
-		fillHistogram(histogram);
-		return histogram;
-	}
-
-	protected void fillHistogram(Histogram histogram) {
-		for(Integer i : values.values())
-			histogram.add(i);
-	}
+	private double gamma;
 	
-	public double run(Graph g) {
-		values = new HashMap<Vertex, Integer>();
-		int sum = 0;
-		Set<Vertex> vertices = g.getVertices();
-		for(Vertex v : vertices) {
-			sum += v.degree();
-			values.put(v, v.degree());
+	public Degree(String outputDir) {
+		super(outputDir);
+	}
+
+	public void setBiasCorrection(boolean flag) {
+		biasCorrection = flag;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public DescriptiveStatistics calculate(Graph g, int iteration, DescriptiveStatistics reference) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		TDoubleArrayList values = new TDoubleArrayList(g.numVertices());
+		TDoubleArrayList weights = new TDoubleArrayList(g.numVertices());
+		
+		
+		if(g instanceof SampledGraph) {
+			Set<SampledVertex> vertices = g.getVertices();
+			
+			double wsum = 0.0;
+			for(SampledVertex v : vertices) {
+				if(!v.isAnonymous()) {
+					values.add(v.degree());
+					if(biasCorrection) {
+						weights.add(1 / v.getSampleProbability());
+						wsum += 1 / v.getSampleProbability();
+					} else {
+						weights.add(1.0);
+						wsum++;
+					}
+				}
+			}
+			double k = values.size() / wsum;
+			for(int i = 0; i < weights.size(); i++) {
+				weights.setQuick(i, weights.getQuick(i) * k);
+				stats.addValue(values.getQuick(i) * weights.getQuick(i));
+			}
+				
+		} else {
+			Set<Vertex> vertices = g.getVertices();
+			for (Vertex v : vertices) {
+				stats.addValue(v.degree());
+				values.add(v.degree());
+				weights.add(1.0);
+			}
 		}
-		return sum/(double)vertices.size();
+		
+		gamma = calcGammaExponent(values.toNativeArray(), weights.toNativeArray(), 1.0);
+		
+		dumpStatistics(getStatisticsMap(stats), iteration);
+		
+		
+		if(reference != null) {
+			Histogram hist = new Histogram(1.0, reference.getMin(), reference.getMax());
+			plotHistogram(values.toNativeArray(), weights.toNativeArray(), hist, iteration);
+		} else {
+			plotHistogram(values.toNativeArray(), weights.toNativeArray(), new Histogram(1.0), iteration);
+		}
+		
+		return stats;
 	}
 
+	@Override
+	protected List<String> getStatisticsKeys() {
+		List<String> keys = super.getStatisticsKeys();
+		keys.add("gamma");
+		return keys;
+	}
+
+	@Override
+	protected TObjectDoubleHashMap<String> getStatisticsMap(
+			DescriptiveStatistics stats) {
+		TObjectDoubleHashMap<String> statsMap = super.getStatisticsMap(stats);
+		statsMap.put("gamma", gamma);
+		return statsMap;
+	}
 }

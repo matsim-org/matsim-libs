@@ -25,6 +25,8 @@ package playground.johannes.snowball2;
 
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
 import playground.johannes.snowball.Histogram;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -34,36 +36,46 @@ import edu.uci.ics.jung.statistics.GraphStatistics;
  * @author illenberger
  *
  */
-public class Clustering implements VertexStatistic {
+public class Clustering extends GraphStatistic {
 
-	protected Map<Vertex, Double> values;
-	
-	public Histogram getHistogram() {
-		Histogram histogram = new Histogram(100);
-		for(Double d : values.values())
-			histogram.add(d);
-		return histogram;
+	public Clustering(String outputDir) {
+		super(outputDir);
 	}
 
-	public Histogram getHistogram(double min, double max) {
-		Histogram histogram = new Histogram(100, min, max);
-		for(Double d : values.values())
-			histogram.add(d);
-		return histogram;
-	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public DescriptiveStatistics calculate(Graph g, int iteration, DescriptiveStatistics reference) {
+		Map<Vertex, Double> values = GraphStatistics.clusteringCoefficients(g);
+		DescriptiveStatistics stats = new DescriptiveStatistics();
 
-	public double run(Graph g) {
-		values = GraphStatistics.clusteringCoefficients(g);
+		if (g instanceof SampledGraph) {
+			for (Vertex v : values.keySet()) {
+				if (!((SampledVertex) v).isAnonymous()) {
+					if (v.degree() == 1)
+						stats.addValue(0.0);
+					else
+						stats.addValue(values.get(v));
+				}
+			}
+		} else {
+			for (Vertex v : values.keySet()) {
+				if (v.degree() == 1)
+					stats.addValue(0.0);
+				else
+					stats.addValue(values.get(v));
+			}
+		}
+
+		dumpStatistics(getStatisticsMap(stats), iteration);
 		
-		double sum = 0;
-		for(Vertex v : values.keySet()) {
-			if(v.degree() == 1)
-				values.put(v, 0.0);
-			
-			sum += values.get(v);
+		if(reference != null) {
+			Histogram hist = new Histogram(100, reference.getMin(), reference.getMax());
+			plotHistogram(stats.getValues(), hist, iteration);
+		} else {
+			plotHistogram(stats.getValues(), new Histogram(100), iteration);
 		}
 		
-		return sum/(double)values.size();
+		return stats;
 	}
 
 }

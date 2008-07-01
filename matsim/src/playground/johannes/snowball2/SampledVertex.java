@@ -46,6 +46,8 @@ public class SampledVertex extends UndirectedSparseVertex {
 	
 	private static final String VISITED_KEY = "visited";
 	
+	private static final String IS_NON_RESPONDING_KEY = "isnonresponding";
+	
 	public SampledVertex(int waveDeteceted) {
 		super();
 		addUserDatum(WAVE_DETECTED_KEY, waveDeteceted, COPY_ACT);
@@ -92,5 +94,13 @@ public class SampledVertex extends UndirectedSparseVertex {
 	
 	public void increaseVisited() {
 		setUserDatum(VISITED_KEY, getVisited() + 1, COPY_ACT);
+	}
+	
+	public boolean isNonResponding() {
+		return (Boolean)getUserDatum(IS_NON_RESPONDING_KEY);
+	}
+	
+	public void setIsNonResponding(boolean flag) {
+		setUserDatum(IS_NON_RESPONDING_KEY, flag, COPY_ACT);
 	}
 }

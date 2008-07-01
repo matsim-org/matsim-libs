@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DegreeSampled.java
+ * ExtractBiggestComponent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,55 +23,53 @@
  */
 package playground.johannes.snowball2;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
-import playground.johannes.snowball.Histogram;
+import org.apache.log4j.Logger;
 
+import playground.johannes.socialnets.PersonGraphMLFileHandler;
+import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.io.GraphMLFile;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class DegreeSampled extends Degree {
+public class TruncateDegree {
 
-	private boolean biasCorrection;
-	
-	@Override
-	public double run(Graph g) {
-		if (g instanceof SampledGraph) {
-			values = new HashMap<Vertex, Integer>();
-			int sum = 0;
-			double wsum = 0;
-			Set<SampledVertex> vertices = ((SampledGraph) g).getVertices();
-			double weight = 1;
-			for (SampledVertex v : vertices) {
-				if (!v.isAnonymous()) {
-					if(biasCorrection)
-						weight = 1 / v.getSampleProbability();
-					
-					sum += v.degree() * weight;
-					wsum += weight;
-					values.put(v, v.degree());
+	private static final Logger logger = Logger.getLogger(TruncateDegree.class);
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		logger.info("Loading social network from file...");
+		PersonGraphMLFileHandler fileHandler = new PersonGraphMLFileHandler();
+		GraphMLFile gmlFile = new GraphMLFile(fileHandler);
+		Graph g = gmlFile.load(args[0]);
+		
+		int maxDegree = Integer.parseInt(args[1]);
+		Set<Vertex> vertices = new HashSet<Vertex>(g.getVertices());
+		for(Vertex v : vertices) {
+			if(v.degree() > maxDegree) {
+				Set<Edge> edges = v.getIncidentEdges();
+				for(Edge e : edges) {
+					g.removeEdge(e);
 				}
+				g.removeVertex(v);
 			}
-			return sum / wsum;
-		} else {
-			throw new IllegalArgumentException(
-					"Graph must be an instance of SampledGrah!");
 		}
+		logger.info(String.format("Graph has %1$s vertices, %2$s edges, density = %3$s, mean degree = %4$s, clustering = %5$s.",
+				g.numVertices(),
+				g.numEdges(),
+				g.numEdges()/((double)(g.numVertices() * (g.numVertices()-1))),
+				playground.johannes.statistics.GraphStatistics.getDegreeStatistics(g).getMean(),
+				playground.johannes.statistics.GraphStatistics.getClusteringStatistics(g).getMean()));
+		logger.info("Saving social network...");
+		gmlFile.save(g, args[0]);
+		logger.info("Done.");
 	}
 
-	@Override
-	protected void fillHistogram(Histogram histogram) {
-		for(Vertex v : values.keySet()) {
-			histogram.add(v.degree(), 1 / ((SampledVertex)v).getSampleProbability());
-		}
-	}
-	
-	public void setBiasCorrection(boolean flag) {
-		biasCorrection = flag;
-	}
 }

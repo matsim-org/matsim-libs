@@ -21,7 +21,9 @@
 package playground.johannes.socialnets;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -38,9 +40,13 @@ import org.matsim.plans.Plans;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 
+import com.sun.tools.xjc.model.CPluginCustomization;
+
 import playground.johannes.snowball2.Clustering;
 import playground.johannes.snowball2.CountComponents;
 import playground.johannes.snowball2.Degree;
+import playground.johannes.snowball2.TypeClusters;
+import playground.johannes.statistics.GraphStatistics;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -48,17 +54,24 @@ import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
 import edu.uci.ics.jung.io.GraphMLFile;
+import edu.uci.ics.jung.utils.GraphUtils;
 import edu.uci.ics.jung.utils.Pair;
 
 public class RndNetworkGenerator {
 	
 	private static final Logger logger = Logger.getLogger(RndNetworkGenerator.class);
 	
+	private static double distExponent;
+	
 	private static double kDist;
 	
 	private static double kMixing;
 	
-	private static double kMixingRatio;
+//	private static double kMixingRatio;
+	
+	private static int numHeteroEdges;
+	
+	private static int mixingRadius;
 	
 	private static double kClustering;
 	
@@ -75,6 +88,15 @@ public class RndNetworkGenerator {
 		logger.info("Creating vertices...");
 		long randomSeed = Gbl.getConfig().global().getRandomSeed();
 		Random rnd = new Random(randomSeed);
+		
+		CoordI center = getMean(plans);
+		double radius = mixingRadius;
+		CoordI min = new Coord(center.getX() - radius, center.getY() - radius);
+		CoordI max = new Coord(center.getX() + radius, center.getY() + radius);
+		
+		List<Vertex> cluster1 = new LinkedList<Vertex>();
+		List<Vertex> cluster2 = new LinkedList<Vertex>();
+		
 		int type1 = 0;
 		for(Person p : plans.getPersons().values()) {
 			UndirectedSparseVertex v =  new UndirectedSparseVertex();
@@ -86,13 +108,17 @@ public class RndNetworkGenerator {
 			attr.y = act.getCoord().getY();
 			v.addUserDatum(UserDataKeys.X_COORD, act.getCoord().getX(), UserDataKeys.COPY_ACT);
 			v.addUserDatum(UserDataKeys.Y_COORD, act.getCoord().getY(), UserDataKeys.COPY_ACT);
-			if(kMixingRatio <= rnd.nextDouble()) {
-				attr.type = 1;
-				v.addUserDatum(UserDataKeys.TYPE_KEY, 1, UserDataKeys.COPY_ACT);
-				type1++;
-			} else {
+			
+			if (!((attr.x < max.getX()) && (min.getX() < attr.x) && (attr.y < max.getY()) && (min.getY() < attr.y))) {
+//			if(kMixingRatio <= rnd.nextDouble()) {
+				cluster1.add(v);
 				attr.type = 2;
-				v.addUserDatum(UserDataKeys.TYPE_KEY, 2, UserDataKeys.COPY_ACT);
+				v.addUserDatum(UserDataKeys.TYPE_KEY, "2", UserDataKeys.COPY_ACT);
+			} else {			
+				cluster2.add(v);
+				attr.type = 1;
+				v.addUserDatum(UserDataKeys.TYPE_KEY, "1", UserDataKeys.COPY_ACT);
+				type1++;
 			}
 			v.addUserDatum(ATTRIBUTES_KEY, attr, UserDataKeys.COPY_ACT);
 		}
@@ -138,42 +164,81 @@ public class RndNetworkGenerator {
 		
 		logger.info("Closing triangles...");
 		closeTriangles(g, new Random(randomSeed * numThreads));
-		
 		logger.info(String.format("Inserted %1$s edges.", g.numEdges()));
-		CountComponents cc = new CountComponents(null, null);
-		cc.run(g);
-		Collection clusters = cc.getClusterSet();  
+		
+		logger.info("Extracting clusters...");
+//		CountComponents cc = new CountComponents(null, null);
+//		cc.calculate(g, 0, null);
+		Collection<Collection<Vertex>> clusters = GraphStatistics.getDisconnectedComponents(g);
+		
+		logger.info("Connecting clusters...");
+		Iterator<Collection<Vertex>> iterator = clusters.iterator();
+		connectComponents(g, iterator.next(), iterator.next(), numHeteroEdges, rnd);
+		
+//		cc = new CountComponents(null, null);
+//		cc.calculate(g, 0, null);
+//		clusters = cc.getClusterSet();
+		clusters = GraphStatistics.getDisconnectedComponents(g);
+		
+		
+		logger.info(String.format("Graph has %1$s components.", clusters.size()));
+		logger.info("Extracting giant component.");
+		int size = Integer.MIN_VALUE;
+		Collection<Vertex> giantComponent = null;
+		for(Collection<Vertex> cluster : clusters) {
+			if(cluster.size() > size) {
+				size = cluster.size();
+				giantComponent = cluster;
+			}
+		}
+		g = (UndirectedSparseGraph) GraphStatistics.extractGraphFromCluster(giantComponent);
+		
+		  
 		logger.info(String.format("Graph has %1$s vertices, %2$s edges, density = %3$s, mean degree = %4$s, mean clusterin = %5$s and %6$s components.",
 				g.numVertices(),
 				g.numEdges(),
 				g.numEdges()/((double)(g.numVertices() * (g.numVertices()-1))),
-				new Degree().run(g),
-				new Clustering().run(g),
+				GraphStatistics.getDegreeStatistics(g).getMean(),
+				GraphStatistics.getClusteringStatistics(g).getMean(),
 				clusters.size()));
-		StringBuilder builder = new StringBuilder();
-		builder.append("Component summary:\n");
 		
-		for(Object cluster : clusters) {
-			builder.append("\t");
-			builder.append(String.valueOf(i));
-			builder.append(" : ");
-			builder.append(String.valueOf(((Collection) cluster).size()));
-			builder.append("\n");
-		}
-		logger.info(builder.toString());
+		new TypeClusters(null).calculate(g, 0, null);
+//		StringBuilder builder = new StringBuilder();
+//		builder.append("Component summary:\n");
+//		
+//		for(Object cluster : clusters) {
+//			builder.append("\t");
+//			builder.append("size = ");
+//			builder.append(String.valueOf(((Collection) cluster).size()));
+//			builder.append("\n");
+//		}
+//		logger.info(builder.toString());
 		
 		Set<Edge> edges = g.getEdges();
 		int count = 0;
 		for(Edge e : edges) {
 			Pair p = e.getEndpoints();
-			Integer v1 = (Integer)((Vertex)p.getFirst()).getUserDatum(UserDataKeys.TYPE_KEY);
-			Integer v2 = (Integer)((Vertex)p.getSecond()).getUserDatum(UserDataKeys.TYPE_KEY);
+			String v1 = (String)((Vertex)p.getFirst()).getUserDatum(UserDataKeys.TYPE_KEY);
+			String v2 = (String)((Vertex)p.getSecond()).getUserDatum(UserDataKeys.TYPE_KEY);
 			if(!v1.equals(v2))
 				count++;
 			
 		}
 		logger.info(String.format("%1$s edges of %2$s between vertices of different type.", count, g.numEdges()));
 		return g;
+	}
+	
+	private static CoordI getMean(Plans plans) {
+		double sumX = 0;
+		double sumY = 0;
+		for(Person p : plans) {
+			sumX += p.getSelectedPlan().getFirstActivity().getCoord().getX();
+			sumY += p.getSelectedPlan().getFirstActivity().getCoord().getY();
+		}
+		double x = sumX/(double)plans.getPersons().size();
+		double y = sumY/(double)plans.getPersons().size();
+		
+		return new Coord(x, y);
 	}
 	
 	private static double getTieProba(Vertex v1, Vertex v2) {
@@ -199,7 +264,7 @@ public class RndNetworkGenerator {
 		int type2 = attr2.type;//(Integer)v2.getUserDatum(UserDataKeys.TYPE_KEY);
 		double mixing = 1 - (kMixing * Math.abs(type1 - type2));
 		
-		return kDist * 1/Math.pow(dist,2) * mixing;
+		return kDist * 1/Math.pow(dist, distExponent) * mixing;
 //		return alpha * 1/Math.pow(dist,2);
 //		return alpha * 1/dist;
 	}
@@ -237,6 +302,35 @@ public class RndNetworkGenerator {
 			} catch (Exception ex) {
 //				logger.warn("Tried to insert a duplicated edge.");
 			}
+		}
+	}
+	
+	private static void connectComponents(Graph g, Collection<Vertex> c1, Collection<Vertex> c2, int numEdges, Random rnd) {
+		Set<Vertex> vertices = g.getVertices();
+//		List<Vertex> cluster1 = new LinkedList<Vertex>();
+//		List<Vertex> cluster2 = new LinkedList<Vertex>();
+//		for(Vertex v : vertices) {
+//			VertexAttributes attr = (VertexAttributes) v.getUserDatum(ATTRIBUTES_KEY);
+//			if(attr.type == 1)
+//				cluster1.add(v);
+//			else if(attr.type == 2)
+//				cluster2.add(v);
+//		}
+		if (c1.size() >= numEdges && c2.size() >= numEdges) {
+			List<Vertex> cluster1 = new LinkedList<Vertex>(c1);
+			List<Vertex> cluster2 = new LinkedList<Vertex>(c2);
+			Collections.shuffle(cluster1, rnd);
+			Collections.shuffle(cluster2, rnd);
+			Iterator<Vertex> it1 = cluster1.iterator();
+			Iterator<Vertex> it2 = cluster2.iterator();
+			for(int i = 0; i < numEdges; i++) {
+				Vertex v1 = it1.next();
+				Vertex v2 = it2.next();
+				UndirectedSparseEdge e = new UndirectedSparseEdge(v1, v2);
+				g.addEdge(e);
+			}
+		} else {
+			throw new IllegalArgumentException();
 		}
 	}
 	
@@ -298,9 +392,12 @@ public class RndNetworkGenerator {
 	public static void main(String args[]) throws InterruptedException {
 		Config config = Gbl.createConfig(args);
 		ScenarioData data = new ScenarioData(config);
+		distExponent = Double.parseDouble(config.getParam("randomGraphGenerator", "distexponent"));
 		kDist = Double.parseDouble(config.getParam("randomGraphGenerator", "kDist"));
 		kMixing = Double.parseDouble(config.getParam("randomGraphGenerator", "kMixing"));
-		kMixingRatio = Double.parseDouble(config.getParam("randomGraphGenerator", "kMixingRatio"));
+//		kMixingRatio = Double.parseDouble(config.getParam("randomGraphGenerator", "kMixingRatio"));
+		mixingRadius = Integer.parseInt(config.getParam("randomGraphGenerator", "mixingRadius"));
+		numHeteroEdges = Integer.parseInt(config.getParam("randomGraphGenerator", "numHeteroEdges"));
 		kClustering = Double.parseDouble(config.getParam("randomGraphGenerator", "kClustering"));
 		Plans plans = data.getPopulation();
 		Graph g = createGraph(plans);

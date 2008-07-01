@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DegreeCorrelationSampled.java
+ * SnowballAnalytic.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,47 +23,47 @@
  */
 package playground.johannes.snowball2;
 
-import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.utils.Pair;
-
 /**
  * @author illenberger
- * 
+ *
  */
-public class DegreeCorrelationSampled implements GraphStatistic {
+public class SnowballAnalytic {
 
-	public double run(Graph g) {
-		if (g instanceof SampledGraph) {
-			int product = 0;
-			int sum = 0;
-			int squareSum = 0;
-			double edges = 0;
-			for (Object e : g.getEdges()) {
-				Pair p = ((Edge) e).getEndpoints();
-				SampledVertex v1 = (SampledVertex) p.getFirst();
-				SampledVertex v2 = (SampledVertex) p.getSecond();
-
-				if (!v1.isAnonymous() && !v2.isAnonymous()) {
-					int d_v1 = v1.degree();
-					int d_v2 = v2.degree();
-
-					sum += d_v1 + d_v2;
-					squareSum += Math.pow(d_v1, 2) + Math.pow(d_v2, 2);
-					product += d_v1 * d_v2;
-
-					edges += 1;
-				}
-			}
-			double M_minus1 = 1 / (double) edges;
-			double normSumSquare = Math.pow((M_minus1 * 0.5 * sum), 2);
-			double numerator = (M_minus1 * product) - normSumSquare;
-			double denumerator = (M_minus1 * 0.5 * squareSum) - normSumSquare;
-
-			return numerator / denumerator;
-		} else {
-			throw new IllegalArgumentException(
-					"Graph must be instance of SampledGraph!");
+	private static double z = 12;
+	
+	private static double c = 0.08;
+	
+	private static double M = 0.9;
+	
+	private static double N = 8700;
+	
+	private static double n_0 = 5;
+	
+	private static double n_total;
+	
+	public static void main(String args[]) {
+		System.out.println("0 : " + n_0);
+		n_total = n_0;
+		double n = calcNumVertex(1, 0);
+		n_total += n;
+		int i = 1;
+		System.out.println(i + " : " + n_total);
+		while(n_total < N) {
+			i++;
+			n = calcNumVertex(i, n_total);
+			n_total += n;
+			System.out.println(i + " : " + n_total);
 		}
+	}
+	
+	private static double calcNumVertex(int i, double n) {
+		if(i == 1) {
+			return n_0 * z;
+//		} else if(i == 2) {
+//			return Math.ceil((n * (z-1) * (1-c)));// * Math.pow((1 - n_total/(double)N),1)));
+		} else {
+			return ((n * M * (z-1) * (1-c) * Math.pow((1 - n_total/(double)N),1)));
+		}
+			
 	}
 }

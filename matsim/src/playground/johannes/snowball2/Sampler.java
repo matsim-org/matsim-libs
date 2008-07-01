@@ -26,7 +26,7 @@ package playground.johannes.snowball2;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,6 +51,8 @@ public class Sampler {
 	
 	private static final String SAMPLE_PROBA = "sampleproba";
 	
+	private static final String NON_RESPONDING = "nonresponding";
+	
 	private Random rnd;
 	
 	private double pTieNamed = 1;
@@ -64,6 +66,8 @@ public class Sampler {
 	private int currentWave;
 	
 	private Collection<Vertex> lastSampledVertices;
+	
+	private Collection<Vertex> seeds;
 	
 	private final int numSeeds;
 	
@@ -80,27 +84,45 @@ public class Sampler {
 		List<Vertex> vertices = new LinkedList<Vertex>(g.getVertices());
 		Collections.shuffle(vertices, rnd);
 		
-		for(Vertex v : vertices) {
-			if(v.getUserDatum("type").equals("2")) {
-				lastSampledVertices = new ArrayList<Vertex>();
-				lastSampledVertices.add(v);
-				break;
-			}
-		}
-//		lastSampledVertices = vertices.subList(0, nSeeds);
+//		for(Vertex v : vertices) {
+//			if(v.getUserDatum("type").equals("1")) {
+//				lastSampledVertices = new ArrayList<Vertex>();
+//				lastSampledVertices.add(v);
+//				break;
+//			}
+//		}
+//		int i = 0;
+//		for(Vertex v : vertices) {
+//			if(v.getUserDatum("type").equals("2")) {
+////				lastSampledVertices = new ArrayList<Vertex>();
+//				lastSampledVertices.add(v);
+//				i++;
+//				if(i == 2)
+//					break;
+//			}
+//		}
+		
+		lastSampledVertices = vertices.subList(0, nSeeds);
 		sampledGraph = new SampledGraph();
+		seeds = new LinkedList<Vertex>();
 		for(Vertex v : lastSampledVertices) {
 			SampledVertex vSampled = new SampledVertex(currentWave);
-			vSampled.addUserDatum(UserDataKeys.ID, v.getUserDatum(UserDataKeys.ID), UserDataKeys.COPY_ACT);
-			vSampled.addUserDatum(UserDataKeys.X_COORD, v.getUserDatum(UserDataKeys.X_COORD), UserDataKeys.COPY_ACT);
-			vSampled.addUserDatum(UserDataKeys.Y_COORD, v.getUserDatum(UserDataKeys.Y_COORD), UserDataKeys.COPY_ACT);
+			for(Iterator<String> it = v.getUserDatumKeyIterator(); it.hasNext();) {
+				String key = it.next();
+				vSampled.addUserDatum(key, v.getUserDatum(key), UserDataKeys.COPY_ACT);
+			}
 			sampledGraph.addVertex(vSampled);
+			seeds.add(vSampled);
 			v.setUserDatum(SAMPLED_ELEMENT_KEY, vSampled, UserDataKeys.COPY_ACT);
 			System.out.println("Type of seed is " + v.getUserDatum("type"));
 		}
 		currentWave = -1;
 	}
 
+	public Collection<Vertex> getSeeds() {
+		return seeds;
+	}
+	
 	public void setPTieNamed(double p) {
 		pTieNamed = p;
 	}
@@ -125,12 +147,19 @@ public class Sampler {
 			 * The initial egos (first wave) always participate.
 			 */
 			if(currentWave == 0 || getProbaParticipate(ego) >= rnd.nextDouble()) {
-				if(ego.getUserDatum(UserDataKeys.SAMPLED_KEY) == null) {
-					/*
-					 * FIXME: Dunno why this happends?
-					 */
-					alters.addAll(expand(ego));
+				Boolean nonResponding = (Boolean) ego.getUserDatum(NON_RESPONDING);
+				if (nonResponding == null || !nonResponding) {
+					ego.setUserDatum(NON_RESPONDING, false, UserDataKeys.COPY_ACT);
+					
+					if (ego.getUserDatum(UserDataKeys.SAMPLED_KEY) == null) {
+						/*
+						 * FIXME: Dunno why this happends?
+						 */
+						alters.addAll(expand(ego));
+					}
 				}
+			} else {
+				ego.setUserDatum(NON_RESPONDING, true, UserDataKeys.COPY_ACT);
 			}
 		}
 
@@ -173,19 +202,10 @@ public class Sampler {
 							 * Create a new vertex in the sampled graph.
 							 */
 							sampledAlter = new SampledVertex(currentWave);
-							sampledAlter.addUserDatum(UserDataKeys.ID, alter
-								.getUserDatum(UserDataKeys.ID),
-								UserDataKeys.COPY_ACT);
-							sampledAlter.addUserDatum(UserDataKeys.X_COORD, alter
-								.getUserDatum(UserDataKeys.X_COORD),
-								UserDataKeys.COPY_ACT);
-							sampledAlter.addUserDatum(UserDataKeys.Y_COORD, alter
-								.getUserDatum(UserDataKeys.Y_COORD),
-								UserDataKeys.COPY_ACT);
-							
-							String type = (String)alter.getUserDatum(UserDataKeys.TYPE_KEY);
-							if(type != null)
-								sampledAlter.addUserDatum(UserDataKeys.TYPE_KEY, type, UserDataKeys.COPY_ACT);
+							for(Iterator<String> it = alter.getUserDatumKeyIterator(); it.hasNext();) {
+								String key = it.next();
+								sampledAlter.addUserDatum(key, alter.getUserDatum(key), UserDataKeys.COPY_ACT);
+							}
 							
 							sampledGraph.addVertex(sampledAlter);
 							alter.setUserDatum(SAMPLED_ELEMENT_KEY, sampledAlter,

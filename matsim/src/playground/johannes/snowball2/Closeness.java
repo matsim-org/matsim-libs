@@ -23,34 +23,47 @@
  */
 package playground.johannes.snowball2;
 
-import playground.johannes.snowball.Histogram;
+import java.io.IOException;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
 import edu.uci.ics.jung.graph.Graph;
 
 /**
  * @author illenberger
  *
  */
-public class Closeness implements VertexStatistic {
+public class Closeness extends GraphStatistic {
 
 	private Centrality centrality;
 	
-	public Closeness(Centrality centrality) {
+	public Closeness(Centrality centrality, String outputDir) {
+		super(outputDir);
 		this.centrality = centrality;
 	}
 	
-	public Histogram getHistogram() {
-		return centrality.getClosenessHistogram();
-	}
-
-	public Histogram getHistogram(double min, double max) {
-		return centrality.getBetweennessHistogram(min, max);
-	}
-
-	public double run(Graph g) {
-		if(!centrality.didRun())
-			centrality.run(g);
+	@Override
+	public DescriptiveStatistics calculate(Graph g, int iteration,
+			DescriptiveStatistics reference) {
+		centrality.run(g, iteration);
 		
-		return centrality.getGraphCloseness();
+		dumpStatistics(getStatisticsMap(centrality.closenessValues), iteration);
+		if(reference != null) {
+			try {
+				centrality.getClosenessHistogram(reference.getMin(), reference.getMax()).
+					plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				centrality.getClosenessHistogram().
+					plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return centrality.closenessValues;
 	}
 
 }

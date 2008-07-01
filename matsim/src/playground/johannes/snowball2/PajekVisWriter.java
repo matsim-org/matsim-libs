@@ -33,7 +33,6 @@ import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.socialnets.UserDataKeys;
 import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.utils.Pair;
 
