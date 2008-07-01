@@ -22,6 +22,7 @@ package playground.jhackney;
 
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
+import org.matsim.config.Module;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
@@ -100,7 +101,7 @@ public abstract class Scenario {
 		config.socnetmodule().setEdgeType("UNDIRECTED");
 		config.socnetmodule().setInitIter("10");
 		config.socnetmodule().setReadMentalMap("true");
-		
+	
 	}
 
 	//////////////////////////////////////////////////////////////////////

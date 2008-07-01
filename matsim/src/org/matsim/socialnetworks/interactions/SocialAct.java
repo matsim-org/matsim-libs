@@ -29,10 +29,17 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 
 /**
- * SocializingOpportunity is an object encapsulating an activity type, a
- * particular facility (building), a group of people attending or frequenting,
- * and the timing of the opportunity.
+ * SocialAct is an object encompassing an activity type, a
+ * particular facility (building), a group of people intending to attend or frequent,
+ * and the intended timing of the opportunity.
  * Note that it has attributes of acts and activities
+ * 
+ * A SocialEvent should be written encompassing an activity type,
+ * a particular facility (building), the group of people actually attending or frequenting,
+ * and the actual timing of the opportunity.
+ * This would have attributes of events and activities.
+ * 
+ * 
  * @author jhackney, fmarchal
  *
  */
@@ -56,10 +63,13 @@ public class SocialAct {
 		if(!attendees.contains(person)){
 			attendees.add( person );
 		}
-//		Act myAct = person.getKnowledge().map.getAct(this.activity);
+//		Act myAct = person.getKnowledge().getMentalMap().getAct(this.activity);
 
 		Act myAct = person.getKnowledge().getMentalMap().getActUsingId(this.activity);
 
+		if(myAct==null){
+			System.out.println();
+		}
 		arrivalTimes.put(person,myAct.getStartTime());
 		departureTimes.put(person,myAct.getEndTime());
 	}

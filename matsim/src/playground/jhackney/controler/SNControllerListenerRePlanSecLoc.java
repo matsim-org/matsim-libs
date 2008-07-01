@@ -27,9 +27,9 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
@@ -41,10 +41,7 @@ import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
-import org.matsim.socialnetworks.algorithms.PersonSNSecLocRandomReRoute;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
@@ -56,9 +53,8 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
-import playground.jhackney.kml.EgoNetPlansMakeKML;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML2;
-import playground.jhackney.scoring.*;
+import playground.jhackney.scoring.SNScoringGeneralFactory;
 
 
 /**
@@ -233,8 +229,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 //        Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
 		EgoNetPlansItersMakeKML2.loadData(testP,event.getIteration());
 		if (event.getIteration() == this.controler.getLastIteration()){	
-//			EgoNetPlansMakeKML.loadData(testP);
-//			EgoNetPlansMakeKML.write();
+
 			EgoNetPlansItersMakeKML2.write();
 		}
 	}
