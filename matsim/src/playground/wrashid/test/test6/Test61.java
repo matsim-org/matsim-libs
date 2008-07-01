@@ -2,7 +2,7 @@ package playground.wrashid.test.test6;
 
 import java.util.ArrayList;
 
-import org.matsim.testcases.MatsimTestCase;
+
 
 import playground.wrashid.DES.EventLog;
 import playground.wrashid.DES.SimulationParameters;
@@ -58,6 +58,6 @@ public class Test61 {
 		
 		//EventLog.print(eventLog1);
 		
-		assertEquals(EventLog.compare(eventLog1,eventLog2),true);
+		EventLog.compare(eventLog1,eventLog2);
 	}
 }
