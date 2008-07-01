@@ -89,7 +89,7 @@ public class MentalMap {
 	public void initializeActActivityMapRandom (Plan myPlan){
 
 //		Associate each act in the plan with a random facility on the link
-		
+
 		ActIterator planActIter = myPlan.getIteratorAct();
 
 		while(planActIter.hasNext()){
@@ -144,11 +144,10 @@ public class MentalMap {
 //		Tidy the acts up so they correspond to the expectations of the social net module.
 //		First, change the types to be the same as the facility types.
 //		Should not have to be done: adapt SocialNetworks code to use only the first letter
-//		or else some standard MATSim "type", if this exists
-//		Next, make sure each act has a number within the plan
+//		or else a standard MATSim "type" when this becomes established
 
 		ActIterator planActIter = myPlan.getIteratorAct();
-		int actId = 0;
+
 		while(planActIter.hasNext()){
 			Act myAct = (Act) planActIter.next();
 
@@ -190,9 +189,14 @@ public class MentalMap {
 
 			this.mapActActivityId.remove(myAct);
 		}
+
 		if(this.activityScore.containsKey(myactivity)){
 			this.activityScore.remove(myactivity);
 		}
+		//TODO JH 6.2008 if you remove an activity from Knowledge you must reset the facility of ALL
+		// acts pointing to it, not just the one passed in, here. This is not checked, here. Make sure
+		// you have checked your mapping before removing the Activity or you will get null pointers
+		// from Act --> Facility.
 		this.knowledge.removeActivity(myactivity);
 	}
 
@@ -202,11 +206,12 @@ public class MentalMap {
 			Gbl.errorMsg(this.getClass()+
 					" Number of activites an agent needs to remember for his plans is greater than his memory! MAX = "+max+" "+myPlans.get(0).getActsLegs().size()*myPlans.size()/2+" "+this.knowledge.getActivities().size());
 		}
-
+//		System.out.println(this.getClass()+" NumActivities1 "+this.knowledge.getActivities().size()+" "+this.activityScore.values().size());
 		if(this.knowledge.getActivities().size()>max){
 			// Mark the activities associated with all plans in memory
 			// so that they won't be deleted
 			ArrayList<Act> currentActs = new ArrayList<Act>();
+			ArrayList<Id> currentActivities = new ArrayList<Id>();
 			Iterator<Plan> planIter = myPlans.iterator();
 			while(planIter.hasNext()){
 				Plan myPlan = (Plan) planIter.next();
@@ -214,6 +219,7 @@ public class MentalMap {
 				while( actIter.hasNext() ){
 					Act act = (Act) actIter.next();
 					currentActs.add(act);
+					currentActivities.add(mapActActivityId.get(act));
 				}
 			}
 
@@ -223,32 +229,20 @@ public class MentalMap {
 
 			// Remove activities if there are too many, but keep one activity
 			// for each act type in the current plan. Iterator goes by score.
-			int numToForget= this.activityScore.values().size()-max;
+			int numToForget= this.knowledge.getActivities().size()-max;
 
 			// Avoid concurrent modification errors
 			// Add to the "forgetlist" the correct number of activities to forget
 			// Since these activities are sorted by score, just take the first ones
 			ArrayList<Activity> forgetList=new ArrayList<Activity>();
 			int counter=0;
-			for (Enumeration<Activity> e = sortedScores.keys() ; e.hasMoreElements() ;) {
-				Activity myactivity=e.nextElement();
-//				double score=(Double) sortedScores.get(myactivity);
-				// note which activity to forget
-				
-				// JH 21.05.2008 I don't know what happens if a Plan is deleted, along with its
-				// Acts. Make sure no null Acts are kept
-				if(this.getActUsingId(myactivity)== null){
-//					log.info("the Act is null");
-//					forgetList.add(myactivity);
-//					counter++;
-				}
-			}
+
 			// If there are still too many activities 
 			for (Enumeration<Activity> e = sortedScores.keys() ; e.hasMoreElements() ;) {
 				Activity myactivity=e.nextElement();
 //				double score=(Double) sortedScores.get(myactivity);
 				// note which activity to forget
-				
+
 				if(counter<=numToForget){
 					forgetList.add(myactivity);
 					counter++;
@@ -264,41 +258,62 @@ public class MentalMap {
 					// If the act is not in the current list, delete the mapping
 					if(!(currentActs.contains(myact))){
 						forgetActsActivities(myact, myactivity);
-					}else{// If the act is in the current list, then map the act to a second activity if possible, and delete the first activity
-						if(mapActToNewActivity(myact, myactivity)){
-						}else{//there is no alternative activity here. leave the mapping as-is
-						}
 					}
+//					else{// If the act is in the current list,
+//						//it would be consistent with "forgetting" to re-map the act
+//						//to another activity, and to delete the activity in the originall mapping.
+//						//However, this activity could be mapped to other acts in other non-active plans.
+//						//Since it doesn't make sense to forget the location of an Act in an active plan,
+//						//do not do anything if the activity is mapped to an Act
+//						if(mapActToNewActivity(myact, myactivity)){
+////							System.out.println(this.getClass()+" act moved to new facility");
+//						}
+//						else{//there is no alternative activity here. leave the mapping as-is
+////							System.out.println(this.getClass()+" act not moved to new facility");
+//						}
+//					}
 				}else{//If the activity is not assigned to an act, forget it
+
+					if(this.activityScore.containsKey(myactivity)){
+						this.activityScore.remove(myactivity);
+					}
 					this.knowledge.removeActivity(myactivity);
 				}
 			}
-//			}
 		}
+//		System.out.println(this.getClass()+" NumActivities2 "+this.knowledge.getActivities().size()+" "+this.activityScore.values().size());
 	}
 
+	/**
+	 * The idea here is to re-associate Facilities and Acts.
+	 * The Act is remapped at random to a Facility of matching type from Knowledge.
+	 * If there is only 1 Facility of corresponding type in Knowledge, the Act is not remapped and
+	 * nothing changes.
+	 * 
+	 * @author jhackney
+	 * @param myAct
+	 * @param oldActivity
+	 * @return
+	 */
 	private boolean mapActToNewActivity(Act myAct, Activity oldActivity) {
-		Random rnd = new Random(111);
+		// TODO This causes havoc if oldActivity is mapped additionally to an act
+		// other than myAct. Check for this first before calling this method. JH Jun 2008
+		
 		boolean remapped = false;
-		// Associate one act with a random facility on the link
-//		System.out.println(this.getClass()+" WARNING WARNING WARNING assignment is not the same between runs. Use a new Gbl.random(seed) here!");
+		// Associate one act with a random facility
 		Activity newActivity = null;
-		Link myLink = myAct.getLink();
-		// These Locations are facilities by the new convention
-		Collection<Location> locations = myLink.getUpMapping().values();
-		// These Objects are facilities by convention
-		Object[] facs =  locations.toArray();
+
+		// Get new facilities
+		ArrayList<Activity> facs = this.knowledge.getActivities(myAct.getType());
 		// Assign a new random activity (a facility) on the link to the act
-		if(facs.length>1){
-//			int k = Gbl.random.nextInt(facs.length);
-			int k = rnd.nextInt(facs.length);
+		if(facs.size()>1){
+			int k = Gbl.random.nextInt(facs.size());
 			int i=0;
-			while((i<facs.length) && (remapped==false)){
-				Facility f = (Facility) facs[(k+i)%facs.length];
-				newActivity = f.getActivity(myAct.getType());
-				// If a new facility of the correct type is found, remap the act to it
-				if((newActivity!=null) && (newActivity!=oldActivity)){
-					forgetActsActivities(myAct,newActivity);
+			while((i<facs.size()) && (remapped==false)){
+				newActivity = (Activity) facs.get((k+i)%facs.size());
+
+				if((newActivity!=null)){
+					forgetActsActivities(myAct,oldActivity);
 					learnActsActivities(myAct,newActivity);
 					remapped= true;
 				}
@@ -307,7 +322,7 @@ public class MentalMap {
 		}else remapped= false;// keep mapping of act to activity if there is only one activity
 		return remapped;
 	}
-
+	
 	public void addActivity(Activity myActivity){
 		// Adds unmapped activity to mental map without associating it with an act
 		this.knowledge.addActivity(myActivity);
@@ -332,50 +347,38 @@ public class MentalMap {
 
 	public Act getActUsingId (Activity myActivity){
 		Act myAct =  this.mapActivityAct.get(myActivity);
+
 		if(myAct==null){
 			return null;
 		}else{
 //			return this.actIdAct.get(myActId);
 			return myAct;
-			
+
 		}
 
 	}
-
+/**
+ * 
+ * @param myAct
+ * @return
+ * 
+ * Use act.getFacility() instead.
+ */
 	public Activity getActivity (Act myAct){
 
-		// Debugging test
-		
-		Object mycollect[]=mapActActivityId.keySet().toArray();
-		boolean matchFound=false;
-		for(int jjj = 0; jjj<mycollect.length;jjj++){
-			
-//			System.out.println("MentalMap2 Act "+mycollect[jjj].toString());
-//			System.out.println("   "+(mycollect[jjj].equals(myAct)));
-			if(mycollect[jjj].equals(myAct)){
-				matchFound=true;
-			}
-		}
-		if(matchFound==false){
-			System.out.println("MentalMap2 myAct "+myAct.toString());
-			System.out.println("MentalMap2 Act stop");
-		}
-		
-		
-		Id myActivityId= this.mapActActivityId.get(myAct);
+		Activity myActivity;
+		Id myActivityId;
+
+		myActivityId= this.mapActActivityId.get(myAct);
 
 		if(myActivityId == null){
-			System.out.println("DEbug mentalmap2");
 			Gbl.errorMsg(this.knowledge.getEgoNet().getEgoLinks().get(0).person1.getId().toString());
 		}
-		Activity myActivity = knowledge.getActivity(myActivityId);
+		myActivity = knowledge.getActivity(myActivityId);
 
 		return myActivity;
 	}
-	
-//	public Hashtable<Integer,Act> getActIdAct(){
-//		return this.actIdAct;
-//	}
+
 
 	public void addDate(SocialAct date){
 		this.socializingOpportunities.add(date);
