@@ -69,6 +69,11 @@ public class TableSplitter {
 		odMatrixs.put(code, cnt != null ? cnt.intValue() + 1 : 0);
 	}
 
+	public void deCountMatrix(final String code) {
+		Integer cnt = odMatrixs.get(code);
+		odMatrixs.put(code, cnt.intValue() - 1);
+	}
+
 	private void writeMatrixHead(final BufferedWriter writer) {
 		try {
 			writer.write("$ON;D3;Y5\n" + "*  \n"
@@ -126,17 +131,19 @@ public class TableSplitter {
 								od.append(start + "\t" + end + "\t1\n");
 							}
 						}
-					if (od.length() > 0)
+					if (od != null && od.length() > 0) {
+						ts.countMatrix(code);
 						ts.writeMatrix(outputPath + "odmatrix" + code + " ("
 								+ ts.getMatrixCnt(code) + ").mtx", od
 								.toString());
+					}
 				}
 				starts.clear();
 				ends.clear();
 				for (int i = 0; i <= 5; i++)
 					writer.write(line[i] + "\t");
 				code = line[0];
-				ts.countMatrix(code);
+
 				writer.write(line[8] + "\t" + line[9] + "\t" + line[15] + "\t"
 						+ line[17] + "\n");
 			} else if (!line[15].equals(""))
