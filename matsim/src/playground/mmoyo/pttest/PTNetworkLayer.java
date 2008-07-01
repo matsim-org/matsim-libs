@@ -12,7 +12,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
-//TODO: Change name, this is actually a PTNetcreator
+//TODO: Change name, this is actually a PTNetCreator
 public class PTNetworkLayer extends NetworkLayer {
 	// TODO: Get these values out from the city network
 	// These are temporary values for the 5x5 scenario
@@ -20,26 +20,15 @@ public class PTNetworkLayer extends NetworkLayer {
 	int maxLinkKey = 79;
 
 	private NetworkLayer cityNet;
-	// TODO!!!!: make a Quadtree structure according to Marcel suggestion to
-	// optimize the bus stop search
-
-	// TODO!!!!: Create a cost function, this s only the first test
-	String length = "5.0";
+	// TODO!!!!: make a Quadtree structure according to Marcel suggestion to optimize the bus stop search
 
 	// This map stores the children nodes of each father node, necessary to
 	// create the transfer between them
 	public Map<IdImpl, ArrayList<String>> childrenList = new TreeMap<IdImpl, ArrayList<String>>();
 		
-	private List<Id> transferLList;
-	private List<Id> transferNList;
-
 	public PTNetworkLayer(NetworkLayer cityNet) {
 		super();
 		this.cityNet = cityNet;
-	}
-
-	public PTNetworkLayer() {
-		super();
 	}
 
 	public void CreatePTNetwork(List<PTLine> ptLineList) {
@@ -53,27 +42,19 @@ public class PTNetworkLayer extends NetworkLayer {
 				Link l = this.cityNet.getLink(iter.next());
 				idFromNode = AddToSubwayPTN(l, idFromNode, firstLink, ptLine.getId());
 				firstLink = false;
-			}// for iter
-		}// for iterPTLines
-		CreateTransferlinks();
-	}// CreatePTNetwork
-
-	private void AddPTNodeV(Node original) {
-		PTNode ptNode = new PTNode(new IdImpl(original.getId().toString()),	String.valueOf(original.getCoord().getX()), String.valueOf(original.getCoord().getY()), original.getType());
-		if (this.nodes.containsKey(original.getId())) {
-			throw new IllegalArgumentException(this + "[id=" + original.getId().toString() + " already exists]");
+			}
 		}
-		this.nodes.put(original.getId(), ptNode);
+		CreateTransferlinks();
 	}
 
 	public String AddToSubwayPTN(Link l, String idFromNode, boolean firstLink,IdImpl IdPTLine) {
 		// Create the "Metro underground paths" related to the city network
-
+		
 		// Create FromNode
 		if (firstLink) {
 			maxNodekey++;
 			idFromNode = String.valueOf(maxNodekey);
-			AddPTNode(idFromNode, l.getFromNode(), IdPTLine);// FromNode
+			AddPTNode(idFromNode, l.getFromNode(), IdPTLine);
 		}
 
 		// Create ToNode
@@ -83,9 +64,22 @@ public class PTNetworkLayer extends NetworkLayer {
 
 		// Create the Link
 		maxLinkKey++;
-		this.createLink(String.valueOf(maxLinkKey), idFromNode, idToNode,String.valueOf(l.getLength()), String.valueOf(l.getFreespeed(0)), String.valueOf(l.getCapacity(0)), String.valueOf(l.getLanesAsInt(0)), l.getOrigId(), l.getType());
+		this.createLink(maxLinkKey, idFromNode, idToNode, "Standard");
+
 		return idToNode;
 	}// AddToSub
+	
+	private void AddWalkingNode(IdImpl idImpl) {
+		if (this.nodes.containsKey(idImpl)) {
+			throw new IllegalArgumentException(this + "[id=" + idImpl + " already exists]");
+		}
+		Node n = this.cityNet.getNode(idImpl);
+		PTNode node = new PTNode(idImpl,	String.valueOf(n.getCoord().getX()), String.valueOf(n.getCoord().getY()), n.getType());
+		node.setIdFather(idImpl);        //All ptnodes must have a father, including fathers (themselves)
+		node.setIdPTLine(new IdImpl("Walk"));
+		this.nodes.put(idImpl, node);
+		n= null;
+	}
 
 	private void AddPTNode(String id, Node original, IdImpl IdPTLine) {
 		// Creates a underground clone of a node with a different ID
@@ -110,8 +104,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		idFather = null;
 		ptNode = null;
 		i = null;
-
-	}// AddPTN
+	}
 
 	// To print nodes and his respective children
 	public static void showMap(Map map) {
@@ -131,91 +124,98 @@ public class PTNetworkLayer extends NetworkLayer {
 			List chList1 = (ArrayList) pairs.getValue();
 			List chList2 = (ArrayList) pairs.getValue();
 
-			AddPTNodeV(this.cityNet.getNode(pairs.getKey().toString()));
-
 			if (chList1.size() > 1) {
 				String n1 = "";
 				String n2 = "";
 				for (Iterator<String> iter1 = chList1.iterator(); iter1.hasNext();) {
 					n1 = iter1.next();
-					// walking links with value null between the node father and the clones
-					maxLinkKey++;
-					this.createLink(String.valueOf(maxLinkKey), n1, pairs.getKey().toString(), "1", "1.0", "1.0", "1", "0","??");
-					maxLinkKey++;
-					this.createLink(String.valueOf(maxLinkKey), pairs.getKey().toString(), n1, "1", "1.0", "1.0", "1", "0", "??");
-
 					// Create links between children nodes lines
 					for (Iterator<String> iter2 = chList2.iterator(); iter2.hasNext();) {
 						n2 = iter2.next();
 						if (n1 != n2) {
 							maxLinkKey++;
-							this.createLink(String.valueOf(maxLinkKey), n1, n2,length, "25.185185185185187", "25900.20064", "1", "0", "??");
-						}
-					}
+							this.createLink(maxLinkKey, n1, n2,"Transfer");
+						}//if n1
+					}//for iter2
 				}// for iter1
+				n1= null;
+				n2= null;
 			}// if chlist
 		}// while
 		it = null;
 	}// CreateTransfer
 
-	public PTNode CreateWalkingLinks(Node original, boolean to) {
-		this.transferLList = new ArrayList<Id>();
-		this.transferNList = new ArrayList<Id>();
-		int i = ++maxNodekey;
 
-		IdImpl idImpl = new IdImpl(String.valueOf(i));
-		IdImpl idFather= null;
+	public List<String> CreateWalkingLinks(IdImpl idFromNode, IdImpl idToNode ){
+		//Adds temporary the origin and destination node and create new temporary links between 
+		//between them  and its respective children to the routing process
 		
-		try {
-			idFather = new IdImpl(original.getId().toString());
-		} catch (NullPointerException e) {
-			System.out.println("El nodo no existe" +  e.toString());
-			return null;
-		}
+		AddWalkingNode(idFromNode);
+		AddWalkingNode(idToNode);
+				
+		int i = 0;
+		List<String> WalkingLinkList = new ArrayList<String>(); 
 		
-		IdImpl idPTLine = new IdImpl(" ");
-		PTNode ptNode = new PTNode(idImpl, String.valueOf(original.getCoord().getX()), String.valueOf(original.getCoord().getY()), original.getType(), idFather, idPTLine);
-
-		if (this.nodes.containsKey(idImpl)) {
-			throw new IllegalArgumentException(this + "[id=" + idImpl + " already exists]");
-		}
-		this.nodes.put(idImpl, ptNode);
-		this.transferNList.add(idImpl);
-
-		// link Representing the distance the origin to the next bus stop
-		// Buscar el nodo real en la lista de padres de los ptn
-		ArrayList uChildren = this.childrenList.get(idFather);
-
-		String idFromNode = "";
-		String idToNode = "";
-
-		if (to) {
-			idFromNode = ptNode.getId().toString();
-		} else {
-			idToNode = ptNode.getId().toString();
-		}
-
+		//Starting links
+		List<String> uChildren = this.childrenList.get(idFromNode);
 		for (Iterator<String> iter = uChildren.iterator(); iter.hasNext();) {
-			if (to) {
-				idToNode = iter.next();
-			} else {
-				idFromNode = iter.next();
-			}
-			i = ++maxLinkKey;
-			IdImpl IdImplLink = new IdImpl(String.valueOf(i));
-			// TODO: for the time being the cost is 1
-			// This must not be so!!
-			this.createLink(IdImplLink.toString(), idFromNode, idToNode, "1.0",	"25.185185185185187", "25900.20064", "1", "0", "??");
-			this.transferLList.add(IdImplLink);
+			this.createLink(--i, idFromNode.toString(), iter.next(), "Walking");
+			WalkingLinkList.add(String.valueOf(i));
 		}
-		return ptNode;
-	}// CreateTransfer
+		
+		//Endings links
+		uChildren = this.childrenList.get(idToNode);
+		for (Iterator<String> iter = uChildren.iterator(); iter.hasNext();) {
+			this.createLink(--i, iter.next(), idToNode.toString(), "Walking");
+			WalkingLinkList.add(String.valueOf(i));
+		}
+		return WalkingLinkList;
+	}
 	
+	public void RemoveWalkinkLinks(List<String> WalkingLinkList){
+		//Removes temporal links at the end of the ruting process
+		for (Iterator<String> iter = WalkingLinkList.iterator(); iter.hasNext();) {
+			this.removeLink(this.getLink(iter.next()));
+		}
+	}
 	
-	
-	
-
-}// Class
+	public void RemoveWalkingNodes(IdImpl node1, IdImpl node2){
+		//Removes temporal links at the end of the routing process
+		this.removeNode(this.getNode(node1));
+		this.removeNode(this.getNode(node2));
+	}
+		
+	private void createLink(int id, String from, String to, String ptType ){
+		// Creates only irrelevant values to create a PTLink. Actually the cost is calculated on other parameters
+		//TODO: Check later if this affect the simulation
+		String length = "5";
+		String freespeed= "1";
+		String capacity = "1";
+		String permlanes = "1";
+		String origid = "0";
+		this.createLink(String.valueOf(id), from, to, length, freespeed, capacity, permlanes, origid, ptType);
+	}
+		
+	public void PrintLinks() {
+		//Displays a quick visualization of links with from- and to- nodes
+		for (org.matsim.network.Link l : this.getLinks().values()) {
+			System.out.print("\n(" ); 
+			System.out.print(l.getFromNode().getId().toString()); 
+			System.out.print( ")----" ); 
+			System.out.print( l.getId().toString() ); 
+			System.out.print( "--->("); 
+			System.out.print( l.getToNode().getId().toString() ); 
+			System.out.print( ")   " + l.getType() ); 
+			System.out.print( "      (" ); 
+			System.out.print( ((PTNode) l.getFromNode()).getIdFather().toString()); 
+			System.out.print( ")----" ); 
+			System.out.print( l.getId().toString() ); 
+			System.out.print( "--->(" ); 
+			System.out.print( ((PTNode) l.getToNode()).getIdFather().toString() ); 
+			System.out.print( ")");
+		}
+	}
+}
 
 /*
  * Old CODE
@@ -227,15 +227,5 @@ public class PTNetworkLayer extends NetworkLayer {
  *		this.maxLinkKey = maxLinkKey;
  * }
  * 
- * public void Fill(PTLine ptLine){ 
- * //Read the route of every PTline and adds the corresponding links and nodes 
- * 		for (Iterator <String> iter =  ptLine.strLinksRoute2.iterator(); iter.hasNext();) { 
- * 			String strLink = iter.next(); 
- * 			AddNode(this.cityNet.getLink(strLink).getFromNode()); //FromNode
- 												* 			AddNode(this.cityNet.getLink(strLink).getToNode());//ToNode
- * 			AddLink(this.cityNet.getLink(strLink)); 
- * 		} 
- * }//Fill
- * 
+*/
 
- */

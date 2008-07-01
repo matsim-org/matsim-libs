@@ -1,8 +1,8 @@
 package playground.mmoyo.pttest;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
+//import java.util.Map;
+//import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Node;
@@ -11,7 +11,7 @@ public class PTNode extends Node {
 	private IdImpl idFather;
 	private IdImpl IdPTLine;
 	// Encapsulate??
-	public Map<IdImpl, ArrayList<Integer>> Timetable = new TreeMap<IdImpl, ArrayList<Integer>>();
+	//public Map<IdImpl, ArrayList<Integer>> Timetable = new TreeMap<IdImpl, ArrayList<Integer>>();
 	
 	public PTNode(IdImpl idImpl, final String x, final String y, final String type, IdImpl idFather, IdImpl IdPtLine) {
 		super(idImpl, x, y, type);
@@ -33,5 +33,9 @@ public class PTNode extends Node {
 
 	public IdImpl getIdPTLine() {
 		return IdPTLine;
+	}
+
+	public void setIdPTLine(IdImpl idPTLine) {
+		IdPTLine = idPTLine;
 	}
 }

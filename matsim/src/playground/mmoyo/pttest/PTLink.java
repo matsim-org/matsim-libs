@@ -5,14 +5,15 @@ import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
+//Is this class really necessary?
 public class PTLink extends LinkImpl {
 	private String idPTLine;
 	private boolean isBusStop;
-	private String ptType;  // (PT, Transfer, Walking) 
+	private String ptType;  // (Standard, Transfer, Walking) 
 	private int nextDepature;
 
-	public PTLink(String id, Node from, Node to, NetworkLayer network,double length, double freespeed, double capacity, double permlanes) {
-		super(new IdImpl(id), from, to, network, length, freespeed, capacity, permlanes);
+	public PTLink(IdImpl id, Node from, Node to, NetworkLayer network,double length, double freespeed, double capacity, double permlanes) {
+		super(id, from, to, network, length, freespeed, capacity, permlanes);
 	}
 
 	public String getIdPTLine() {

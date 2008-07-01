@@ -4,11 +4,11 @@ import org.matsim.basic.v01.IdImpl;
 
 public class PTTimeTable {
 	private IdImpl idPtLine;
-	private int[] departure;
+	private int[] departureTime;
 	
 	public PTTimeTable(IdImpl idPtLine,int[] departures) {
 		this.idPtLine= idPtLine;
-		this.departure = departures;
+		this.departureTime = departures;
 	}
 
 	public IdImpl getIdPtLine() {
@@ -19,11 +19,11 @@ public class PTTimeTable {
 		this.idPtLine = idPtLine;
 	}
 
-	public int[] getDeparture() {
-		return departure;
+	public int[] getDepartureTime() {
+		return departureTime;
 	}
 
-	public void setDeparture(int[] departure) {
-		this.departure = departure;
+	public void setDeparture(int[] departureTime) {
+		this.departureTime = departureTime;
 	}
 }

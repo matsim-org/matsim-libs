@@ -7,12 +7,11 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class PTTimeTableReader extends MatsimXmlParser {
 	private final static String SCHEDULE = "schedule";
@@ -20,14 +19,11 @@ public class PTTimeTableReader extends MatsimXmlParser {
 	private final static String PTLINE = "ptLine";
 	private final static String DEPARTURE = "departure";
 	
-	private StringBuffer bufferDeparture;
+	private StringBuffer bufferDeparture = null;
 	private String strIdNode="";
 	private String strIdPTLine="";
-	//we will have a single file PTLines reader with schedules in the future
-	//private String lineRoute = "";
 	
-	private Map <IdImpl, List<PTTimeTable>> nodeTimeTableMap = new TreeMap <IdImpl, List<PTTimeTable>>();
-	private List<PTTimeTable> timeTableList;
+	private Map <IdImpl, Map<IdImpl,int[]>> nodeTimeTableMap = new TreeMap <IdImpl, Map<IdImpl,int[]>>();
 	IdImpl idNode = null;
 	PTTimeTable ptTimeTable = null;
 	
@@ -91,8 +87,7 @@ public class PTTimeTableReader extends MatsimXmlParser {
 	}
 
 	private void endPTLine(){
-	    AddTimeTable(strIdNode, strIdPTLine, bufferDeparture.toString());  //strDeparture
-		//strDeparture = "";
+	    AddTimeTable(strIdNode, strIdPTLine, bufferDeparture.toString());
 	    bufferDeparture=null;
 	}
 
@@ -103,7 +98,6 @@ public class PTTimeTableReader extends MatsimXmlParser {
 	public void characters(char ch[], int start, int length) {
 		bufferDeparture = new StringBuffer(length);
 		for (int i = start; i < start + length; i++) {
-			//strDeparture = strDeparture + ch[i];
 			bufferDeparture.append(ch[i]);
 		}
 	}
@@ -111,20 +105,21 @@ public class PTTimeTableReader extends MatsimXmlParser {
 	/////////////Extra methods///////////////////////////////////////
 	private void AddTimeTable(String idnode, String idPTLine, String departure){  
 		idNode = new IdImpl(idnode);
-		ptTimeTable = new PTTimeTable(new IdImpl(idPTLine), Departures(departure));
+		ptTimeTable = new PTTimeTable(new IdImpl(idPTLine), DeparturesToArray(departure));		
 		
 		if (!nodeTimeTableMap.containsKey(idNode)){
-			timeTableList= new ArrayList<PTTimeTable>();
-			timeTableList.add(ptTimeTable);
-			nodeTimeTableMap.put(idNode,timeTableList);
+			Map<IdImpl,int[]> map2 = new TreeMap <IdImpl,int[]>();
+			map2.put(new IdImpl(idPTLine), DeparturesToArray(departure));
+			nodeTimeTableMap.put(idNode,  map2);
+		
 		}else{
-			nodeTimeTableMap.get(idNode).add(ptTimeTable);
+			nodeTimeTableMap.get(idNode).put(new IdImpl(idPTLine), DeparturesToArray(departure));
 		}	
 		idNode= null;
 		ptTimeTable= null;
 	}
 	
-	private int[] Departures(String dep){
+	private int[] DeparturesToArray(String dep){
 		String[] strDep = dep.split(" ");
 		int [] intDep= new int[strDep.length];
 		for (int x= 0; x < strDep.length; x++){
@@ -138,7 +133,8 @@ public class PTTimeTableReader extends MatsimXmlParser {
 		return ((Integer.parseInt(strTime[0]) * 3600) + (Integer.parseInt(strTime[1]))*60) ;  	////if we had seconds:   + Integer.parseInt(strTime[2] 
 	}
 	
-	public Map <IdImpl, List<PTTimeTable>> GetTimeTable(){
-		return this.nodeTimeTableMap ;
+	public Map <IdImpl, Map<IdImpl,int[]>> GetTimeTable(){
+		return this.nodeTimeTableMap;
 	}
+
 }// class

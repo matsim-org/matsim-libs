@@ -10,9 +10,8 @@ public class PTLine {
 	private String type;
 	private boolean withDedicatedTracks;
 
-	private String strLinksRoute = null; // ja
-	public List<String> strLinksRoute2 = new ArrayList<String>(); // ja
-	private List<PTLink> ptLinksRoute = new ArrayList<PTLink>();
+	private String strLinksRoute = null;
+	public List<String> strLinksRoute2 = new ArrayList<String>();
 
 	public PTLine(IdImpl id, String type, boolean withDedicatedTracks, String strlinksRoute) {
 		this.id = id;
@@ -54,29 +53,14 @@ public class PTLine {
 		this.strLinksRoute = strLinksRoute;
 	}
 
-	public List<PTLink> getLinksRoute() {
-		return ptLinksRoute;
-	}
-
-	public void setLinksRoute(List<PTLink> linksRoute) {
-		this.ptLinksRoute = linksRoute;
-	}
-
 	private void FillRouteLinksList() {
-		// TODO Optimize with code from matsim/plans/route.java
-		String idLink = "";
-		for (int i = 0; i < this.strLinksRoute.length(); i++) {
-			// TODO: Improve in order to validate fewer times.
-			if (this.strLinksRoute.charAt(i) == ' ') {
-				strLinksRoute2.add(idLink);
-				idLink = "";
-			} else if (i == ((this.strLinksRoute.length()) - 1)) {
-				idLink = idLink + this.strLinksRoute.charAt(i);
-				strLinksRoute2.add(idLink);
-			} else {
-				idLink = idLink + this.strLinksRoute.charAt(i);
-			}
-		}// for
-	}// CreateLinksRoute
-
+		// According to code from matsim/plans/route.java
+		String [] tempRoute = strLinksRoute.split("[ \t\n]+");
+		int ini = 0;
+		if ((tempRoute.length > 0) && (tempRoute[0].equals(""))) { ini = 1; }
+		for (int i = ini; i < tempRoute.length; i++) {
+			this.strLinksRoute2.add(tempRoute[i]);
+		}
+	}
+		 
 }// class

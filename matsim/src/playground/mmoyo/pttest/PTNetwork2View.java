@@ -34,10 +34,10 @@ public class PTNetwork2View extends NetworkLayer {
 				AddNode(l.getToNode());
 				AddLink(l);
 				firstLink = false;
-			}// for iter
-		}// for iterPTlines
+			}
+		}
 		writePTNetwork();
-	}//CreatePTNView
+	}
 
 	private void AddNode(Node node){
 		if (this.getNode(node.getId().toString()) == null) {
@@ -57,16 +57,9 @@ public class PTNetwork2View extends NetworkLayer {
 	}
 	
 	public void PrintLinks() {
-		//TODO: This method does not work anymore!!!
-		// Console quick visualization of links with from and to nodes
-		//System.out.println(getLinks().size());
-		//for (org.matsim.network.Link l :// ptNetworkLayer.getLinks().values()) {
-			// This one is the normal displayer
-			 //System.out.println("(" + l.getFromNode().getId().toString()+ ")----" + l.getId().toString() + "--->(" +  l.getToNode().getId().toString()+ ") ");
-			// System.out.println (((PTNode)l.getFromNode()).getIdFather().toString() + "-------- " +((PTNode)l.getToNode()).getIdFather().toString()); 
-			// This display also the id of the father node
-			//System.out.println("(" + l.getFromNode().getId().toString() + ")----" + l.getId().toString() + "--->(" + l.getToNode().getId().toString() + ")   " + "      (" + ((PTNode) l.getFromNode()).getIdFather().toString()+ ")----" + l.getId().toString() + "--->(" + ((PTNode) l.getToNode()).getIdFather().toString() + ")");
-		//}
+		for (org.matsim.network.Link l : this.getLinks().values()) {
+			System.out.println("(" + l.getFromNode().getId().toString() + ")----" + l.getId().toString() + "--->(" + l.getToNode().getId().toString() + ")   " + "      (" + ((PTNode) l.getFromNode()).getIdFather().toString()+ ")----" + l.getId().toString() + "--->(" + ((PTNode) l.getToNode()).getIdFather().toString() + ")");
+		}
 	}
 	
 }

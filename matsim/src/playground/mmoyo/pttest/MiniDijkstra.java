@@ -7,19 +7,23 @@ import java.util.List;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 
+//TODO: use iterators
 public class MiniDijkstra {
 	public PTNode[] route;
+	private int time;
+	public int tripTime=0;
+		
+	public MiniDijkstra(List<Node> nodeList, List<Link> linkList, Node OriginNode, Node DestinationNode, PTLinkCostCalculator ptLinkCostCalculator, int iniTime) {
 
-	public MiniDijkstra(List<Node> nodeList, List<Link> linkList, Node OriginNode, Node DestinationNode) {
-
+		this.time = iniTime;
 		int iniPosition = nodeList.indexOf(OriginNode);
 		int endPosition = nodeList.indexOf(DestinationNode);
 
 		if (iniPosition == -1) {
-			throw new NullPointerException("The Origin Node does not exist");
+			throw new IllegalArgumentException("The Origin Node " + OriginNode.getId().toString() + " does not exist");
 		}
 		if (endPosition == -1) {
-			throw new NullPointerException("The Destination Node does not exist");
+			throw new IllegalArgumentException("The Destination Node " + DestinationNode.getId().toString() + " does not exist");
 		}
 
 		List<Integer> nodePath = new ArrayList<Integer>();
@@ -42,8 +46,12 @@ public class MiniDijkstra {
 		for (int i = 0; i < linkList.size(); i++) {
 			int r = nodeList.indexOf(linkList.get(i).getFromNode());
 			int c = nodeList.indexOf(linkList.get(i).getToNode());
-			linkArray[r][c] = Cost(linkList.get(i));
-			linkArray[c][r] = Cost(linkList.get(i));
+			//System.out.println(linkList.get(i).getId().toString());
+			//TODO: update time
+			boolean IsExtreme = (linkList.get(i).getFromNode().equals(OriginNode) || linkList.get(i).getToNode().equals(DestinationNode));
+			int cost=ptLinkCostCalculator.Cost(linkList.get(i),iniTime,IsExtreme);
+			linkArray[r][c] = cost; 
+			linkArray[c][r] = cost;
 		}
 
 		as[iniPosition] = 1;
@@ -110,17 +118,6 @@ public class MiniDijkstra {
 		else {
 			System.out.println("There is no path from node " + OriginNode.getId().toString() + " to node " + OriginNode.getId().toString());
 		}// else
-	}// Router
-
-	private int Cost(Link link) {
-		// TODO:!!! get here the real cost of travel through this link
-		/*
-		 * switch (linktype){ 
-		 * case 1: Cost= Traveltime; 	//NormalPtlink 
-		 * case 2: cost= TransferRate; 	//Transferlin 
-		 * case 3: Cost= 0; 			//Walking Link: }
-		 */
-		return (int) link.getLength();
-	}// Cost
+	}// MiniDijkstra
 
 }// Class
