@@ -130,10 +130,6 @@ public class TableSplitter {
 						ts.writeMatrix(outputPath + "odmatrix" + code + " ("
 								+ ts.getMatrixCnt(code) + ").mtx", od
 								.toString());
-					if (od.length() == 0)
-						System.out.println(outputPath + "odmatrix" + code
-								+ " (" + ts.getMatrixCnt(code) + ").mtx :\t"
-								+ od.toString());
 				}
 				starts.clear();
 				ends.clear();
