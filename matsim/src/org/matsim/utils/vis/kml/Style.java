@@ -81,7 +81,17 @@ public class Style extends Object {
 		this.lineStyle = lineStyle;
 
 	}
+	/**
+	 * Gets the <a href="http://earth.google.com/kml/kml_tags.html#linestyle">
+	 * line style</a> of a <code>Style</code>.
+	 *
+	 * @param lineStyle
+	 */
+	public LineStyle getLineStyle() {
 
+		return this.lineStyle;
+
+	}
 	/**
 	 * Sets the <a href="http://earth.google.com/kml/kml_tags.html#polystyle">
 	 * poly style</a> of a <code>Style</code>.
