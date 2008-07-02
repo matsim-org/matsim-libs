@@ -32,6 +32,7 @@ import org.matsim.plans.Plan;
 public class ExpBetaPlanChanger implements PlanSelectorI {
 
 	private final double beta;
+	static boolean betaFlag = true ;
 
 	public ExpBetaPlanChanger() {
 		this.beta = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
@@ -54,6 +55,10 @@ public class ExpBetaPlanChanger implements PlanSelectorI {
 		double currentScore = currentPlan.getScore();
 		double otherScore = otherPlan.getScore();
 
+		if ( betaFlag ) {
+			System.err.println( "ExpBetaPlanChanger: The following beta should be replaced by beta/2.  Not fatal.") ; // ask kai.  Jul08
+			betaFlag = false ;
+		}
 		double weight = Math.exp( this.beta * (otherScore - currentScore) );
 		// (so far, this is >1 if otherScore>currentScore, and <=1 otherwise)
 		// (beta is the slope (strength) of the operation: large beta means strong reaction)
