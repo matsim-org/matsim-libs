@@ -100,7 +100,6 @@ import org.matsim.plans.algorithms.PlansFilterArea;
 import org.matsim.plans.algorithms.PlansFilterByLegMode;
 import org.matsim.plans.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.plans.algorithms.XY2Links;
-import org.matsim.plans.filters.PersonIntersectAreaFilter;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -410,11 +409,11 @@ public class MyRuns {
 
 		final Config config = Gbl.createConfig(args);
 		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
+//
+//		System.out.println("  reading world xml file... ");
+//		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+//		worldReader.readFile(config.world().getInputFile());
+//		System.out.println("  done.");
 
 		System.out.println("  reading the network..." + (new Date()));
 		NetworkLayer network = null;
@@ -434,21 +433,21 @@ public class MyRuns {
 		System.out.println("  done. ");
 		System.out.println("  aoi contains: " + areaOfInterest.size() + " links.");
 
-		System.out.println("  reading, filtering and writing population... at " + (new Date()));
-		final Plans population = new Plans(Plans.USE_STREAMING);
-
-		PlansReaderI plansReader = new MatsimPlansReader(population);
-		final PlansWriter plansWriter = new PlansWriter(population);
-		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter, areaOfInterest);
-		filter.setAlternativeAOI(center, radius);
-		population.addAlgorithm(filter);
-
-		plansReader.readFile(config.plans().getInputFile());
-
-		plansWriter.writeEndPlans();
-		population.printPlansCount();
-		System.out.println("  done. " + (new Date()));
-		System.out.println("  filtered persons: " + filter.getCount());
+//		System.out.println("  reading, filtering and writing population... at " + (new Date()));
+//		final Plans population = new Plans(Plans.USE_STREAMING);
+//
+//		PlansReaderI plansReader = new MatsimPlansReader(population);
+//		final PlansWriter plansWriter = new PlansWriter(population);
+//		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter, areaOfInterest);
+//		filter.setAlternativeAOI(center, radius);
+//		population.addAlgorithm(filter);
+//
+//		plansReader.readFile(config.plans().getInputFile());
+//
+//		plansWriter.writeEndPlans();
+//		population.printPlansCount();
+//		System.out.println("  done. " + (new Date()));
+//		System.out.println("  filtered persons: " + filter.getCount());
 
 		System.out.println("RUN: filterPlansWithRouteInArea finished");
 	}
@@ -2425,7 +2424,7 @@ public class MyRuns {
 //		filterSelectedPlans(args);
 //		filterPlansInArea(args, 4582000, 5939000, 4653000, 5850000);  // uckermark
 //		filterPlansInArea(args, 4580000, 5807000, 4617000, 5835000);  // berlin
-//		filterPlansWithRouteInArea(args, 683518.0, 246836.0, 30000.0); // Bellevue Zrh, 30km
+		filterPlansWithRouteInArea(args, 683518.0, 246836.0, 30000.0); // Bellevue Zrh, 30km
 //		filterPlansWithRouteInArea(args, 4595406.5, 5821171.5, 1000.0); // Berlin Mitte, 1km
 //		filterPlansInNetworkArea(args);
 //		filterPlansPassingLink(args, 4022);

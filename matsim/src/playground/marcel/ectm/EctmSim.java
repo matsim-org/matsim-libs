@@ -66,7 +66,7 @@ public class EctmSim extends ExternalMobsim {
 
 	@Override
 	protected void runExe(final String iterationConfigFile) throws FileNotFoundException, IOException {
-		String cmd = this.executable + " " + iterationConfigFile + " " + this.eventsFile + " " + Controler.getIterationPath() + "/netvis";
+		String cmd = this.executable + " " + iterationConfigFile + " " + this.eventsFile;// + " " + Controler.getIterationPath() + "/netvis";
 		log.info("running command: \"" + cmd);
 		Gbl.printMemoryUsage();
 		String logfileName = Controler.getIterationFilename("mobsim.log");
