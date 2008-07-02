@@ -22,7 +22,7 @@ public class PCppEventFileParser extends Thread {
 			lock.notify();
 		}
 		
-		System.out.print("event files read");
+		System.out.println("cpp event file read completed.");
 	}
 
 	public PCppEventFileParser(String fileName, Lock lock) {

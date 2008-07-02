@@ -1,4 +1,4 @@
-package playground.wrashid.test.test5;
+package playground.wrashid.test.test8;
 
 import java.util.ArrayList;
 
@@ -9,7 +9,7 @@ import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.test.CppEventFileParser;
 
-public class Test5 extends MatsimTestCase {
+public class Test8 extends MatsimTestCase {
 
 	/**
 	 * @param args
@@ -17,8 +17,8 @@ public class Test5 extends MatsimTestCase {
 	
 
 	
-	public void testTest5() {
-		String baseDir="src/playground/wrashid/test/test5/";
+	public void testTest8() {
+		String baseDir="src/playground/wrashid/test/test8/";
 		String[] args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
@@ -31,7 +31,7 @@ public class Test5 extends MatsimTestCase {
 		
 		ArrayList<EventLog> eventLog2= CppEventFileParser.eventLog;
 		
-		//EventLog.print(eventLog1);
+		EventLog.print(eventLog1);
 		
 		assertEquals(EventLog.absAverageLinkDiff(eventLog1,eventLog2)<SimulationParameters.maxAbsLinkAverage,true);
 		

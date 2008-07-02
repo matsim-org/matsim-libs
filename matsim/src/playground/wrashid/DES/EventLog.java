@@ -1,6 +1,8 @@
 package playground.wrashid.DES;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class EventLog {
 	double time = 0.0;
@@ -135,4 +137,84 @@ public class EventLog {
 			eventLog.get(i).print();
 		}
 	}
+	
+	// For each link in the event list, find out how long a car has been on that link
+	// Then compare the usage time of each link for the two different Event logs
+	// print the average(absolute difference): absSumLink
+	// and the sum (absolute difference) in seconds: absAverageLinkDiff
+	public static double absAverageLinkDiff(ArrayList<EventLog> eventLog1, ArrayList<EventLog> eventLog2){
+		HashMap<Integer,Double[]> hm=new HashMap<Integer,Double[]>(); // key: int (linkId) 
+		                          // value: double[4] (startCurrentLink1,totalUsageDurationLink1,startCurrentLink2,totalUsageDurationLink2) 
+		
+		assert eventLog1.size()==eventLog2.size():"The size of both eventLogs must be the same!";
+		for(int i=0;i<eventLog1.size();i++) {
+			
+			int link1=eventLog1.get(i).getLinkId();
+			if (!hm.containsKey(link1)){
+				Double[] d= new Double[4];
+				d[0]=0d;
+				d[1]=0d;
+				d[2]=0d;
+				d[3]=0d;
+				hm.put(link1, d);
+			}
+			hm.get(link1)[1]=eventLog1.get(i).time-hm.get(link1)[0];
+			
+			
+			
+			int link2=eventLog2.get(i).getLinkId();
+			if (!hm.containsKey(link2)){
+				Double[] d= new Double[4];
+				d[0]=0d;
+				d[1]=0d;
+				d[2]=0d;
+				d[3]=0d;
+				hm.put(link2, d);
+			}
+			hm.get(link2)[3]=eventLog2.get(i).time-hm.get(link2)[2];
+			
+			System.out.println("link:" + link2 + "; diff" + (hm.get(link2)[1]-hm.get(link2)[3]));
+		}
+		
+		
+		
+		
+		double absSum=0;
+		double absAverage=0;
+		for (Double[] d: hm.values()){
+			System.out.println("eventLog1-eventLog2:" + (d[1]-d[3]));
+			absSum+=Math.abs(d[1]-d[3]);
+		}
+		
+		absAverage=absSum/hm.size();
+		System.out.println("absSumLink:" + absSum);
+		System.out.println("absAverageLinkDiff:" + absAverage);
+		return absAverage;
+	}
+	
+	public static void filterEvents(int linkId,ArrayList<EventLog> eventLog1,ArrayList<EventLog> eventLog2){
+		LinkedList<EventLog> list1,list2;
+		list1= new LinkedList<EventLog>();
+		list2= new LinkedList<EventLog>();
+		assert eventLog1.size()==eventLog2.size():"The size of both eventLogs must be the same!";
+		for(int i=0;i<eventLog1.size();i++) {
+			if (eventLog1.get(i).linkId==linkId){
+				list1.add(eventLog1.get(i));
+			}
+			if (eventLog2.get(i).linkId==linkId){
+				list2.add(eventLog2.get(i));
+			}	
+		}
+		assert list1.size()==list2.size():"Inconsistent list size!";
+		int noOfDifferentTimes=0;
+		for (int i=0;i<list1.size();i++){
+			if (list1.get(i).time!=list2.get(i).time){
+				//System.out.println("1.time:" + list1.get(i).time + "2.time:" + list2.get(i).time + "1.type:" + list1.get(i).type + "2.type:" + list2.get(i).type);
+				noOfDifferentTimes++;
+			}
+		}
+		System.out.println("noOfDifferentTimes:"+noOfDifferentTimes);
+	}
+	
+	
 }

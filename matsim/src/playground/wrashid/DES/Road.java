@@ -74,6 +74,10 @@ public class Road extends SimUnit {
 		
 		// gap must be initialized to null because of the application logic
 		gap=null;
+		
+		if (link.getId().toString().equalsIgnoreCase("110915")){
+			System.out.println("sdfa");
+		}
 	}
 
 	@Override
@@ -99,7 +103,9 @@ public class Road extends SimUnit {
 		earliestDepartureTimeOfCar.removeFirst();
 		timeOfLastLeavingVehicle = Scheduler.simTime;
 		
-		
+		if (link.getId().toString().equalsIgnoreCase("110915")){
+			System.out.println("leave road: "+ Scheduler.simTime);
+		}
 
 		// the next car waiting for entering the road should now be alloted a
 		// time for entering the road
@@ -110,8 +116,6 @@ public class Road extends SimUnit {
 					Scheduler.simTime + gapTravelTime);
 			
 			noOfCarsPromisedToEnterRoad++;
-			
-			assert nextAvailableTimeForEnteringStreet > 0 : "ERROR: A car just left the street, so there should be at least a gap available (in future) to use the street!";
 			
 			// if the car is in ending leg mode, then it should give back its space on the street
 			if (vehicle.isEndingLegMode()) {
@@ -148,7 +152,7 @@ public class Road extends SimUnit {
 			sendMessage(new EndRoadMessage(scheduler, nextVehicle), this
 					.getUnitNo(), Math
 					.max(earliestDepartureTimeOfCar.getFirst(),
-							timeOfLastLeavingVehicle + inverseOutFlowCapacity));
+							timeOfLastLeavingVehicle + inverseOutFlowCapacity));			
 		}
 
 	}
@@ -157,6 +161,11 @@ public class Road extends SimUnit {
 	// TODO: instead of returning the scheduling time, just schedule messages
 	// here...
 	public double enterRoad(Vehicle vehicle) {
+		
+		if (link.getId().toString().equalsIgnoreCase("110915")){
+			System.out.println("enter Road:" + Scheduler.simTime);
+		}
+		
 		double nextAvailableTimeForLeavingStreet = Double.MIN_VALUE;
 		nextAvailableTimeForLeavingStreet = Scheduler.simTime
 				+ link.getLength()
@@ -199,8 +208,15 @@ public class Road extends SimUnit {
 		//assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are more cars on the road, than its capacity!";
 		assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size()+noOfCarsPromisedToEnterRoad : "You promised too many cars, that they can enter the street!";
 
+		if (link.getId().toString().equalsIgnoreCase("110915")){
+			System.out.print("enterRequest");
+		}
 		
 		if (carsOnTheRoad.size()+noOfCarsPromisedToEnterRoad<maxNumberOfCarsOnRoad){
+			
+			if (link.getId().toString().equalsIgnoreCase("110915")){
+				System.out.println("normal");
+			}
 			
 			// - check, if the gap needs to be considered for entering the road
 			// - we can find out, the time since when we have a free road for entrance for sure:
@@ -221,6 +237,11 @@ public class Road extends SimUnit {
 			timeOfLastEnteringVehicle=nextAvailableTimeForEnteringStreet;
 			return nextAvailableTimeForEnteringStreet;
 		} else {
+			
+			if (link.getId().toString().equalsIgnoreCase("110915")){
+				System.out.println("road full: "+ Scheduler.simTime);
+			}
+			
 			// at the moment, the road is full and no gap is available
 			// => put this car into the interestedInEnteringRoad LinkedList
 			// When cars leave the road, a gap slot will eventually be alloted to this car

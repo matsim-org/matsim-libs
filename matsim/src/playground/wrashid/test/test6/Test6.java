@@ -58,6 +58,8 @@ public class Test6 extends MatsimTestCase {
 		
 		//EventLog.print(eventLog1);
 		
-		assertEquals(EventLog.compare(eventLog1,eventLog2),true);
+		assertEquals(EventLog.absAverageLinkDiff(eventLog1,eventLog2)<SimulationParameters.maxAbsLinkAverage,true);
+		
+		//assertEquals(EventLog.compare(eventLog1,eventLog2),true);
 	}
 }

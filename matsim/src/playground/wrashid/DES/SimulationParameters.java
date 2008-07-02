@@ -25,4 +25,5 @@ public class SimulationParameters {
 	
 	
 	public static final boolean debugMode=true;
+	public static final double maxAbsLinkAverage=0.01; // how far can the average usage of links differ for a test to pass
 }

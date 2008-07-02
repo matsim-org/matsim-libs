@@ -50,6 +50,12 @@ public class Test2 extends MatsimTestCase {
 		
 		ArrayList<EventLog> eventLog2= CppEventFileParser.eventLog;
 		
+		EventLog.print(eventLog1);
+		
+		//assertEquals(EventLog.absAverageLinkDiff(eventLog1,eventLog2)<SimulationParameters.maxAbsLinkAverage,true);
+		
+		//EventLog.filterEvents(106733,eventLog1,eventLog2);
+		
 		assertEquals(EventLog.compare(eventLog1,eventLog2),true);
 	}
 	
