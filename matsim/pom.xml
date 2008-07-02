@@ -60,6 +60,20 @@
   </repositories>
   <dependencies>
     <dependency>
+      <groupId>commons-math</groupId>
+      <artifactId>commonsMath</artifactId>
+      <version>1.2</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/commons-math-1.2/commons-math-1.2.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>trove</groupId>
+      <artifactId>trove</artifactId>
+      <version>2.0.3</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/trove-2.0.3/lib/trove-2.0.3.jar</systemPath>
+    </dependency>
+    <dependency>
       <groupId>org.jgap</groupId>
       <artifactId>jgap</artifactId>
       <version>3.1</version>
