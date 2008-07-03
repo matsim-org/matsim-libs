@@ -1,14 +1,16 @@
 package playground.anhorni.locationchoice.preprocess;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
-import org.matsim.utils.misc.Counter;
 
 public class RemoveBorderCrossingTraffic extends Modifier {
 
@@ -24,18 +26,25 @@ public class RemoveBorderCrossingTraffic extends Modifier {
 		this.removeBorderCrossingPersonsTraffic();
 	}
 
-
 	private void removeBorderCrossingPersonsTraffic() {
 
+		List<Id> toRemoveList=new Vector<Id>();
+
+		// find border crossing persons
 		log.info("running removeBorderCrossingPersonsTraffic:");
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
-		Counter counter = new Counter(" person # ");
 		while (person_iter.hasNext()) {
 			Person person = person_iter.next();
-			counter.incCounter();
 			if (person.getId().compareTo(new IdImpl(1000000000))>0) {
-				this.plans.getPersons().remove(person.getId());
+				toRemoveList.add(person.getId());
 			}
+		}
+
+		//and remove them
+		Iterator<Id> id_it = toRemoveList.iterator();
+		while (id_it.hasNext()) {
+			Id id = id_it.next();
+			this.plans.getPersons().remove(id);
 		}
 		log.info("RemoveBorderCrossingTraffic done.");
 	}
