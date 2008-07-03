@@ -96,7 +96,9 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 				String.valueOf(facility.getCenter().getX())+"\t"+
 				String.valueOf(facility.getCenter().getY())+"\t"+
 				String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-				String.valueOf(facility.getCapacityForShoppingAndLeisure()));
+				String.valueOf(facility.getCapacity()));
+
+				log.info(String.valueOf(facility.getCapacity()));
 
 				out.newLine();
 			}

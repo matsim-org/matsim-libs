@@ -139,7 +139,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 					String.valueOf(facility.getCenter().getX())+"\t"+
 					String.valueOf(facility.getCenter().getY())+"\t"+
 					String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-					String.valueOf(facility.getCapacityForShoppingAndLeisure()));
+					String.valueOf(facility.getCapacity()));
 					out.newLine();
 				}
 				out.flush();
