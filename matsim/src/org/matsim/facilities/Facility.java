@@ -117,7 +117,7 @@ public class Facility extends AbstractLocation {
 			final double a=0.8;
 			final double b=8.0;
 			for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
-				this.capacityPenaltyFactor += a*Math.pow(this.load[i]/this.capacity, b);
+				this.capacityPenaltyFactor += a*Math.pow(this.load[i]/(this.capacity/this.numberOfTimeBins), b);
 			}
 
 			this.capacityPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
