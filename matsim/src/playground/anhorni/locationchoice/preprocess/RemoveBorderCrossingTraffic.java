@@ -34,7 +34,7 @@ public class RemoveBorderCrossingTraffic extends Modifier {
 			Person person = person_iter.next();
 			counter.incCounter();
 			if (person.getId().compareTo(new IdImpl(1000000000))>0) {
-				this.plans.getPersons().remove(person);
+				this.plans.getPersons().remove(person.getId());
 			}
 		}
 		log.info("RemoveBorderCrossingTraffic done.");
