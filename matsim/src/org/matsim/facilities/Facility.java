@@ -269,6 +269,7 @@ public class Facility extends AbstractLocation {
 			this.arrivals[i] = 0;
 			this.departures[i] = 0;
 			this.load[i] = 0;
+			this.numberOfVisitorsPerDay = 0;
 		}
 	}
 
