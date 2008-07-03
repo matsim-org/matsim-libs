@@ -20,6 +20,7 @@
 
 package org.matsim.facilities;
 
+import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
@@ -33,6 +34,21 @@ public class Facility extends AbstractLocation {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
+	/*
+	 * TODO:
+	 * 1.	At the moment a facility has activities and an activity has a capacity.
+	 * 		We have to define this more precise:
+	 * 		For work and home in the same facility we need two independent capacities
+	 * 		(-> could be done in Activity)
+	 * 		But shopping and leisure in a shopping mall with cinemas has to be treated with one cap
+	 * 		(-> so it is better handled in Facility)
+	 *
+	 * 		At the moment I need only shopping and leisure thus I only use one cap.
+	 * 		(The smallest of all shopping and leisure activities of the facility).
+	 *
+	 * 2.	The mobsim handles times > 24 h
+	 *		Facility load has to be handled for hour 0..24 only (acc. to M.B.)
+	 */
 
 
 	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
@@ -91,14 +107,22 @@ public class Facility extends AbstractLocation {
 
 	// TODO: Remove this hard-coded parameterization asap
 	public void calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
-		//BPR
-		final double a=0.8;
-		final double b=8.0;
-		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
-			this.capacityPenaltyFactor += a*Math.pow(this.load[i], b);
+
+		int capacity=this.getCapacityForShoppingAndLeisure();
+		if (capacity>0) {
+			//BPR
+			final double a=0.8;
+			final double b=8.0;
+			for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
+				this.capacityPenaltyFactor += a*Math.pow(this.load[i]/capacity, b);
+			}
+
+			this.capacityPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
+			this.capacityPenaltyFactor = Math.min(1.0, this.capacityPenaltyFactor);
 		}
-		this.capacityPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
-		this.capacityPenaltyFactor = Math.min(1.0, this.capacityPenaltyFactor);
+		else {
+			this.capacityPenaltyFactor=1.0;
+		}
 	}
 
 	// TODO: Remove this hard-coded parameterization asap
@@ -128,6 +152,7 @@ public class Facility extends AbstractLocation {
 			this.attrFactor = 1.0;
 		}
 	}
+
 
 	//////////////////////////////////////////////////////////////////////
 	// create methods
@@ -161,12 +186,22 @@ public class Facility extends AbstractLocation {
 
 	// time in seconds from midnight
 	public void addArrival(double time, int scaleNumberOfPersons) {
+		// we do not handle times > 24h
+		// we do not care about #arrivals==#departures after the last time bin
+		if (time > 24.0*3600.0) {
+			return;
+		}
 		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(900)));
 		this.arrivals[timeBinIndex]+=1;
 		this.addVisitorsPerDay(scaleNumberOfPersons);
 	}
 
 	public void addDeparture(double time) {
+		// we do not handle times > 24h
+		// we do not care about #arrivals==#departures after the last time bin
+		if (time > 24.0*3600.0) {
+			return;
+		}
 		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(900)));
 		this.departures[timeBinIndex]+=1;
 	}
@@ -201,10 +236,31 @@ public class Facility extends AbstractLocation {
 
 	// arg: time in seconds from midnight
 	public double getCapacityPenaltyFactor(double startTime, double endTime) {
+		if (startTime>24.0*3600.0 && endTime>24.0*3600.0) {
+			return 0.0;
+		}
+		else if (endTime>24.0*3600.0) {
+			endTime=24.0*3600.0;
+		}
+
 		int startTimeBinIndex = Math.min(this.numberOfTimeBins-1, (int)(startTime/(900)));
 		int endTimeBinIndex = Math.min(this.numberOfTimeBins-1, (int)(endTime/(900)));
 		this.calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
 		return this.capacityPenaltyFactor;
+	}
+
+	public int getCapacityForShoppingAndLeisure() {
+		int capacity=Integer.MAX_VALUE;;
+		Iterator<Activity> act_it=this.activities.values().iterator();
+		while (act_it.hasNext()){
+			Activity activity = act_it.next();
+			if (activity.getType().startsWith("s") || activity.getType().startsWith("l")) {
+				if (activity.getCapacity()<capacity) {
+					capacity=activity.getCapacity();
+				}
+			}
+		}
+		return capacity;
 	}
 
 	// ----------------------------------------------------
