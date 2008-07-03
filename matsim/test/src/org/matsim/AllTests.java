@@ -47,6 +47,7 @@ public class AllTests {
 		suite.addTest(org.matsim.config.AllTests.suite());
 		suite.addTest(org.matsim.controler.AllTests.suite());
 		suite.addTest(org.matsim.counts.AllTests.suite());
+		suite.addTest(org.matsim.demandmodeling.AllTests.suite());
 		suite.addTest(org.matsim.evacuation.AllTests.suite());
 		suite.addTest(org.matsim.events.AllTests.suite());
 		suite.addTest(org.matsim.facilities.AllTests.suite());
