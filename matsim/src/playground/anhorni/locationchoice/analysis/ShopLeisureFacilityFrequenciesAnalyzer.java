@@ -133,6 +133,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 			Iterator<? extends Facility> iter = this.facilities.iterator();
 			while (iter.hasNext()){
 				Facility facility = iter.next();
+				facility.finish();
 
 				if (facility.getNumberOfVisitorsPerDay()>0) {
 					out.write(facility.getId().toString()+"\t"+
