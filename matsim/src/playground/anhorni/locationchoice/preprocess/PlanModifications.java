@@ -50,6 +50,10 @@ public class PlanModifications {
 
 	private void runModifications() {
 
+		// remove border crossing traffic
+		this.setModifier(new RemoveBorderCrossingTraffic(this.plans, this.network, this.facilities));
+		this.modifier.modify();
+
 		// use facilities v3
 		this.setModifier(new FacilitiesV3Modifier(this.plans, this.network, this.facilities));
 		this.runAssignFacilitiesV3();
