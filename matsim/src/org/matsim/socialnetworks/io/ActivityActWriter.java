@@ -67,7 +67,11 @@ public class ActivityActWriter {
 				int actIndex=0;
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					Act myAct= (Act) actsLegs.get(j);
-					Activity myActivity= myKnowledge.getMentalMap().getActivity(myAct);
+//					Activity myActivity= myKnowledge.getMentalMap().getActivity(myAct);
+					//Above line calls code that results in a null pointer. Test
+					// michi's new change. Note the Act.setFacility() might not
+					// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008
+					Activity myActivity=myAct.getFacility().getActivity(myAct.getType());
 //					System.out.println(" AAW DEBUG J=: "+j);
 					try {
 						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+actIndex);

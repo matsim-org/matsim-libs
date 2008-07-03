@@ -219,7 +219,7 @@ public class MentalMap {
 				while( actIter.hasNext() ){
 					Act act = (Act) actIter.next();
 					currentActs.add(act);
-					currentActivities.add(mapActActivityId.get(act));
+					currentActivities.add(act.getFacility().getId());
 				}
 			}
 

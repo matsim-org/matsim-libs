@@ -68,7 +68,7 @@ public class SocialAct {
 		Act myAct = person.getKnowledge().getMentalMap().getActUsingId(this.activity);
 
 		if(myAct==null){
-			System.out.println();
+			System.out.println("SocialAct: !!!Act is null");
 		}
 		arrivalTimes.put(person,myAct.getStartTime());
 		departureTimes.put(person,myAct.getEndTime());

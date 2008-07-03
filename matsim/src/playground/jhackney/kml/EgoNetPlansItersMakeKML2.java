@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.config.Config;
+import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -372,11 +373,16 @@ public class EgoNetPlansItersMakeKML2 {
 		ActIterator aIter = myPlan.getIteratorAct();
 		while(aIter.hasNext()){
 			Act myAct = (Act) aIter.next();
+//			Activity myActivity =myPerson.getKnowledge().getMentalMap().getActivity(myAct).getFacility().toString();
+			String myActivity=myAct.getFacility().getActivity(myAct.getType()).toString();
+			//Above lines call code that results in a null pointer. Test
+			// michi's new change. Note the Act.setFacility() might not
+			// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008
 			Style myStyle=facStyle.get(myAct.getType());
 			Placemark aFacility = new Placemark(
 					myAct.getType().substring(0, 1),
 					null,
-					myPerson.getKnowledge().getMentalMap().getActivity(myAct).getFacility().toString(),
+					myActivity,
 					"address",
 					Feature.DEFAULT_LOOK_AT,
 					myStyle.getStyleUrl(),
