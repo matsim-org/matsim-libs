@@ -333,7 +333,7 @@ public class EgoNetPlansMakeKML {
 			Placemark aFacility = new Placemark(
 					myAct.getType()+" facility",
 					myAct.getType()+" facility",
-					myPerson.getKnowledge().getMentalMap().getActivity(myAct).getFacility().toString(),
+					myAct.getFacility().getActivity(myAct.getType()).toString(),
 					"address",
 					Feature.DEFAULT_LOOK_AT,
 					myStyle.getStyleUrl(),

@@ -65,7 +65,7 @@ public class SocialAct {
 		}
 //		Act myAct = person.getKnowledge().getMentalMap().getAct(this.activity);
 
-		Act myAct = person.getKnowledge().getMentalMap().getActUsingId(this.activity);
+		Act myAct = person.getKnowledge().getMentalMap().getActFromActivity(person, this.activity);
 
 		if(myAct==null){
 			System.out.println("SocialAct: !!!Act is null");

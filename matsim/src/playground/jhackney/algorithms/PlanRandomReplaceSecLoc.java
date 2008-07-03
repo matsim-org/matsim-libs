@@ -157,21 +157,21 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
 //					Act lastAct = (Act) plan.getActsLegs().get(plan.getActsLegs().size()-1);
 					lastAct.setLink(f.getLink());
-					Coord newCoord = (Coord) f.getCenter();
-					lastAct.setCoord(newCoord);
+					lastAct.setCoord(f.getCenter());
+					lastAct.setFacility(f);
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if(newAct.getType() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getType() && newAct.getLink() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getLink()){
 					Act firstAct = (Act) newPlan.getFirstActivity();
 					firstAct.setLink(f.getLink());
-					Coord newCoord = (Coord) f.getCenter();
-					firstAct.setCoord(newCoord);
+					firstAct.setCoord(f.getCenter());
+					firstAct.setFacility(f);
 				}
 				// Change the activity
 //				System.out.println("  ##### Act "+newAct.getRefId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
 				newAct.setLink(f.getLink());
-				Coord newCoord = (Coord) f.getCenter();
-				newAct.setCoord(newCoord);
+				newAct.setCoord(f.getCenter());
+				newAct.setFacility(f);
 				changed = true;
 			}
 
@@ -188,7 +188,8 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 				
 				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
 
-				k.getMentalMap().learnActsActivities(newAct,f.getActivity(factype));
+//				Not needed with new change to Act --> Facility JH 7.2008
+//				k.getMentalMap().learnActsActivities(newAct,f.getActivity(factype));
 				person.setSelectedPlan(newPlan);
 //				person.setSelectedPlan(plan);
 				// Remove previous plan

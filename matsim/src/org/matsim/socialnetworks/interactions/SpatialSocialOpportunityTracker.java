@@ -53,7 +53,7 @@ public class SpatialSocialOpportunityTracker implements SocialActGeneratorI {
 
 		for( Person person : plans.getPersons().values() ){
 //			System.out.println("SSOgen Person "+person.getId()+" ");
-			
+
 			person.getKnowledge().getMentalMap().clearDates();
 
 			Plan plan = person.getSelectedPlan();
@@ -61,8 +61,8 @@ public class SpatialSocialOpportunityTracker implements SocialActGeneratorI {
 			while( it.hasNext() ){
 
 				Act act = (Act) it.next();
-				Activity myActivity = person.getKnowledge().getMentalMap().getActivity(act);
-
+//				Activity myActivity = person.getKnowledge().getMentalMap().getActivity(act);
+				Activity myActivity = act.getFacility().getActivity(act.getType());
 				if( myActivity == null ){
 					System.out.println(" Act "+act.getLinkId()+" "+act.getType()+" no activity");
 					continue;}
@@ -77,14 +77,14 @@ public class SpatialSocialOpportunityTracker implements SocialActGeneratorI {
 		}
 		return events.values();
 	}
-	
+
 	public HashMap<Activity, SocialAct> generateMap(Plans plans) {
 		HashMap<Activity, SocialAct> events = new HashMap<Activity, SocialAct>();
 		SocialAct event = null;
 
 		for( Person person : plans.getPersons().values() ){
 //			System.out.println("SSOgen Person "+person.getId()+" ");
-			
+
 			person.getKnowledge().getMentalMap().clearDates();
 
 			Plan plan = person.getSelectedPlan();
@@ -97,7 +97,7 @@ public class SpatialSocialOpportunityTracker implements SocialActGeneratorI {
 				// michi's new change. Note the Act.setFacility() might not
 				// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008
 				Activity myActivity = act.getFacility().getActivity(act.getType());
-				
+
 				if( myActivity == null ){
 					System.out.println(" Act "+act.getLinkId()+" "+act.getType()+" no activity");
 					continue;}

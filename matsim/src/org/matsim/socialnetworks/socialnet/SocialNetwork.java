@@ -551,7 +551,9 @@ public class SocialNetwork {
 			if (UNDIRECTED) {
 				int nRemove=this.getLinks().size()-(int) ((double) kbar/2.*this.persons.size());
 				log.info("  Number of links to remove: "+nRemove);
-				for(int i=0;i<nRemove;i++){
+				int i=0;
+				while(i<nRemove){
+//				for(int i=0;i<nRemove;i++){
 					int index = Gbl.random.nextInt(this.getLinks().size());
 					SocialNetEdge edge = (SocialNetEdge) this.getLinks().get(index);
 //					removeLink(edge);
@@ -562,6 +564,7 @@ public class SocialNetwork {
 						SocialNetEdge opposite_edge=edge.getPersonTo().getKnowledge().getEgoNet().getEgoLink(edge.getPersonFrom());
 						if(!(linksToRemove.contains(opposite_edge) || linksToRemove.contains(edge))){
 							linksToRemove.add(edge);
+							i++;
 						}
 					}
 //					numRemoved++;

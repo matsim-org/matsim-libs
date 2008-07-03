@@ -336,7 +336,7 @@ public class SocialNetworkStatistics {
 			try {
 				aout.write(iter + " " + id + " " + homeId + " " + deg + " " + aSd1
 						+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
-						+ " " + myPerson.getKnowledge().getMentalMap().getNumKnownFacilities());
+						+ " " + myPerson.getKnowledge().getActivities().size());
 				aout.newLine();
 			} catch (IOException e) {
 
