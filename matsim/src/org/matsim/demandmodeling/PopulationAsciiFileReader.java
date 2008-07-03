@@ -23,15 +23,26 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.utils.WorldUtils;
+import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.world.Zone;
+import org.matsim.world.ZoneLayer;
 
 
 /**
+ * Reads a simple initial demand from a tab seperated ascii file
+ * that has to contain the following columns:
+ * PersonId	HomeLocation	Age	Gender	Income	PrimaryActivityType	PrimaryActivityLocation
+ * 
+ * A simple example of such a table can be seen in: 
+ * test/input/org/matsim/demandmodeling/PopulationAsciiFileReader/asciipopulation.txt
  * @author dgrether
  *
  */
@@ -47,7 +58,10 @@ public class PopulationAsciiFileReader implements TabularFileHandlerI {
 	
 	private boolean isFirstLine = true;
 	
-	public PopulationAsciiFileReader() {
+	private ZoneLayer zoneLayer;
+	
+	public PopulationAsciiFileReader(ZoneLayer zoneLayer) {
+		this.zoneLayer = zoneLayer;
 		this.tabFileParserConfig = new TabularFileParserConfig();
 		plans = new Plans(Plans.NO_STREAMING);
 	}
@@ -85,9 +99,14 @@ public class PopulationAsciiFileReader implements TabularFileHandlerI {
 			p.setSex(row[3]);
 			log.warn("Income is not supported by the current version of MATSim. Column 5 will be ignored");
 			Plan plan = p.createPlan(true);
+			Zone homeZone = (Zone)this.zoneLayer.getLocation(new IdImpl(row[1]));
+			CoordI homeCoord = WorldUtils.getRandomCoordInZone(homeZone, this.zoneLayer);
+			Zone primaryZone = (Zone)this.zoneLayer.getLocation(new IdImpl(row[6]));
+			CoordI primaryCoord = WorldUtils.getRandomCoordInZone(primaryZone, this.zoneLayer);
 			try {
-				plan.createAct("h", 0.0, 0.0, row[1], null, "06:00:00", null, "false");
-				plan.createAct(row[5], 0.0, 0.0,row[6], null, null, null, "true");
+				plan.createAct("h", homeCoord.getX(), homeCoord.getY(), null, null, "06:00:00", null, "false");
+				plan.createLeg(Leg.CARMODE, 0.0, 0.0, 0.0);
+				plan.createAct(row[5], primaryCoord.getX(), primaryCoord.getY(), null, null, null, null, "true");
 				this.plans.addPerson(p);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -109,10 +128,5 @@ public class PopulationAsciiFileReader implements TabularFileHandlerI {
 		return this.plans;
 	}
 	
-	
-	public static void main(String[] args) throws IOException {
-		new PopulationAsciiFileReader().readFile(args[0]);
-	}
-
 
 }
