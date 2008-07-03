@@ -69,6 +69,7 @@ public class SocialAct {
 
 		if(myAct==null){
 			System.out.println("SocialAct: !!!Act is null");
+			System.out.println(person.getId()+" "+this.activity.getType()+ " "+this.activity.getFacility().getId());
 		}
 		arrivalTimes.put(person,myAct.getStartTime());
 		departureTimes.put(person,myAct.getEndTime());
