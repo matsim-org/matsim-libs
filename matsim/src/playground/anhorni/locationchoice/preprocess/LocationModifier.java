@@ -47,6 +47,10 @@ public class LocationModifier extends Modifier {
 
 		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
 		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);
+		
+		log.info("Total number of ch shop facilities:" + this.shop_facilities.size());
+		log.info("Total number of ch leisure facilities:" + this.leisure_facilities.size());
+		
 	}
 
 	@Override

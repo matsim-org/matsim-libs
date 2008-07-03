@@ -110,6 +110,7 @@ public class PlanModifications {
 		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
+		log.info(this.plans.getPersons().size() + " persons");
 	}
 
 	private void writePlans() {
