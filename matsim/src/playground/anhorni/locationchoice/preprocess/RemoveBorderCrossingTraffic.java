@@ -6,7 +6,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
@@ -35,7 +34,8 @@ public class RemoveBorderCrossingTraffic extends Modifier {
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 		while (person_iter.hasNext()) {
 			Person person = person_iter.next();
-			if (person.getId().compareTo(new IdImpl(1000000000))>0) {
+			//if (person.getId().compareTo(new IdImpl(1000000000))>0) {
+			if (Integer.valueOf(person.getId().toString())>1000000000) {
 				toRemoveList.add(person.getId());
 			}
 		}
