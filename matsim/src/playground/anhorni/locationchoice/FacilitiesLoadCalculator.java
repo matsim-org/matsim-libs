@@ -83,7 +83,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	private void printStatistics(Facilities facilities, String iterationPath, int iteration) {
 
 		try {
-			final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay";
+			final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tCapacity";
 			final BufferedWriter out = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
 
 			out.write(header);
@@ -92,8 +92,12 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 			Iterator<? extends Facility> iter = facilities.getFacilities().values().iterator();
 			while (iter.hasNext()){
 				Facility facility = iter.next();
-				out.write(facility.getId().toString()+"\t"+ String.valueOf(facility.getCenter().getX())+"\t"+
-				String.valueOf(facility.getCenter().getY())+"\t"+String.valueOf(facility.getNumberOfVisitorsPerDay()));
+				out.write(facility.getId().toString()+"\t"+
+				String.valueOf(facility.getCenter().getX())+"\t"+
+				String.valueOf(facility.getCenter().getY())+"\t"+
+				String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
+				String.valueOf(facility.getCapacityForShoppingAndLeisure()));
+
 				out.newLine();
 			}
 			out.flush();
