@@ -40,17 +40,17 @@ public class Coord implements Serializable, CoordI {
 		this(Double.parseDouble(x), Double.parseDouble(y));
 	}
 
-	public Coord(CoordI coord) {
+	public Coord(final CoordI coord) {
 		this.x = coord.getX();
 		this.y = coord.getY();
 	}
 
 	public final double calcDistance(final CoordI other) {
-		//depending on the coordinate system that is used, determining the 
+		//depending on the coordinate system that is used, determining the
 		//distance based on the euclidean distance will lead to wrong results.
 		//however, if the distance is not to large (<1km) this will be a usable distance estimation.
 		//Another comfortable way to calculate correct distances would be, to use the distance functions
-		//provided by geotools lib. May be we need to discuss what part of GIS functionality we should implement 
+		//provided by geotools lib. May be we need to discuss what part of GIS functionality we should implement
 		//by our own and for what part we could use an existing GIS like geotools. We need to discuss this in terms
 		//of code robustness, performance and so on ... [gl]
 		double xDiff = other.getX()-this.x;
@@ -59,24 +59,38 @@ public class Coord implements Serializable, CoordI {
 	}
 
 	public double getX() {
-		return x;
+		return this.x;
 	}
 
 	public double getY() {
-		return y;
+		return this.y;
 	}
 
-	public void setX(double x) {
+	public void setX(final double x) {
 		this.x = x;
 	}
 
-	public void setY(double y) {
+	public void setY(final double y) {
 		this.y = y;
 	}
 
-	public void setXY(double x, double y) {
+	public void setXY(final double x, final double y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	@Override
+	public boolean equals(final Object other) {
+		if (!(other instanceof CoordI)) {
+			return false;
+		}
+		CoordI o = (CoordI)other;
+		return ((this.x == o.getX()) && (this.y == o.getY()));
+	}
+
+	@Override
+	public int hashCode() {
+		return (int)(this.x - this.y);
 	}
 
 	@Override
