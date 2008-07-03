@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.gbl.Gbl;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -32,6 +33,7 @@ import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
@@ -51,6 +53,11 @@ public class PopulationAsciiFileReader implements TabularFileHandlerI {
 	private static final Logger log = Logger.getLogger(PopulationAsciiFileReader.class);
 	
 	private static final String[] HEADER = {"PersonId", "HomeLocation", "Age", "IsFemale", "Income", "PrimaryActivityType", "PrimaryActivityLocation"};
+	
+	private static final double SIXOCLOCK = 6.0 * 3600.0;
+	private static final double TWOHOURS = 2.0  * 3600.0;
+	private static final double WORKDURATION = 8.0 * 3600.0;
+
 	
 	private TabularFileParserConfig tabFileParserConfig;
 	
@@ -103,10 +110,14 @@ public class PopulationAsciiFileReader implements TabularFileHandlerI {
 			CoordI homeCoord = WorldUtils.getRandomCoordInZone(homeZone, this.zoneLayer);
 			Zone primaryZone = (Zone)this.zoneLayer.getLocation(new IdImpl(row[6]));
 			CoordI primaryCoord = WorldUtils.getRandomCoordInZone(primaryZone, this.zoneLayer);
+			double homeEndTime = SIXOCLOCK + Gbl.random.nextDouble() * TWOHOURS;
+			String homeEndTimeString = Time.writeTime(homeEndTime, Time.TIMEFORMAT_HHMMSS);
 			try {
-				plan.createAct("h", homeCoord.getX(), homeCoord.getY(), null, null, "06:00:00", null, "false");
+				plan.createAct("h", homeCoord.getX(), homeCoord.getY(), null, null, homeEndTimeString, null, "false");
 				plan.createLeg(Leg.CARMODE, 0.0, 0.0, 0.0);
-				plan.createAct(row[5], primaryCoord.getX(), primaryCoord.getY(), null, null, null, null, "true");
+				plan.createAct(row[5], primaryCoord.getX(), primaryCoord.getY(), null, null, Time.writeTime(WORKDURATION, Time.TIMEFORMAT_HHMMSS), null, "true");
+				plan.createLeg(Leg.CARMODE, 0.0, 0.0, 0.0);
+				plan.createAct("h", homeCoord.getX(), homeCoord.getY(), null, null, null, null, "false");
 				this.plans.addPerson(p);
 			} catch (Exception e) {
 				e.printStackTrace();
