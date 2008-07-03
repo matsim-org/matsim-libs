@@ -123,7 +123,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 
 		try {
 
-			final String header="Facility_id\tx\ty\tNumberOfVisitors";
+			final String header="Facility_id\tx\ty\tNumberOfVisitors\tCapacity";
 
 			final BufferedWriter out = IOUtils.getBufferedWriter("./output/facFrequencies.txt");
 			out.write(header);
@@ -135,8 +135,11 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 				Facility facility = iter.next();
 
 				if (facility.getNumberOfVisitorsPerDay()>0) {
-					out.write(facility.getId().toString()+"\t"+ String.valueOf(facility.getCenter().getX())+"\t"+
-					String.valueOf(facility.getCenter().getY())+"\t"+String.valueOf(facility.getNumberOfVisitorsPerDay()));
+					out.write(facility.getId().toString()+"\t"+
+					String.valueOf(facility.getCenter().getX())+"\t"+
+					String.valueOf(facility.getCenter().getY())+"\t"+
+					String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
+					String.valueOf(facility.getCapacityForShoppingAndLeisure()));
 					out.newLine();
 				}
 				out.flush();
