@@ -61,6 +61,7 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 		Iterator<? extends Facility> iter = this.facilities.getFacilities().values().iterator();
 		while (iter.hasNext()){
 			Facility f = iter.next();
+			f.finish();
 			f.calculateFacilityLoad24(this.scaleNumberOfPersons);
 		}
 		log.info("EventsToFacilityLoad finished");
