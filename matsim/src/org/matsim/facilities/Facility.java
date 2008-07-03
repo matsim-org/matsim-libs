@@ -59,7 +59,7 @@ public class Facility extends AbstractLocation {
 	private final int numberOfTimeBins = 4*24;
 
 	// for the moment use just one capacity TODO: See point 1. in the remark on top.
-	private int capacity=0;
+	private int capacity = 0;
 
 	/* 15 min. time bins at the moment.
 	*  Every agent is at the loc. for at least 15 min. That means we have to count
@@ -89,8 +89,6 @@ public class Facility extends AbstractLocation {
 			this.departures[i] = 0;
 			this.load[i] = 0;
 		}
-
-		this.capacity=this.getCapacityForShoppingAndLeisure();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -114,7 +112,7 @@ public class Facility extends AbstractLocation {
 	// TODO: Remove this hard-coded parameterization asap
 	public void calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
 
-		if (this.capacity>0) {
+		if (this.capacity > 0) {
 			//BPR
 			final double a=0.8;
 			final double b=8.0;
@@ -244,6 +242,7 @@ public class Facility extends AbstractLocation {
 
 	// arg: time in seconds from midnight
 	public double getCapacityPenaltyFactor(double startTime, double endTime) {
+
 		if (startTime>24.0*3600.0 && endTime>24.0*3600.0) {
 			return 0.0;
 		}
@@ -258,17 +257,18 @@ public class Facility extends AbstractLocation {
 	}
 
 	private int getCapacityForShoppingAndLeisure() {
-		int capacity=Integer.MAX_VALUE;;
+		int cap = Integer.MAX_VALUE;
+
 		Iterator<Activity> act_it=this.activities.values().iterator();
 		while (act_it.hasNext()){
 			Activity activity = act_it.next();
 			if (activity.getType().startsWith("s") || activity.getType().startsWith("l")) {
-				if (activity.getCapacity()<capacity) {
-					capacity=activity.getCapacity();
+				if (activity.getCapacity() < cap) {
+					cap = activity.getCapacity();
 				}
 			}
 		}
-		return capacity;
+		return cap;
 	}
 
 	public int getCapacity() {
@@ -283,6 +283,10 @@ public class Facility extends AbstractLocation {
 			this.load[i] = 0;
 			this.numberOfVisitorsPerDay = 0;
 		}
+	}
+
+	public void finish() {
+		this.capacity = this.getCapacityForShoppingAndLeisure();
 	}
 
 	//////////////////////////////////////////////////////////////////////
