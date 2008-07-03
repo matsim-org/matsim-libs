@@ -23,6 +23,7 @@ package org.matsim.facilities;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -49,13 +50,16 @@ public class Facility extends AbstractLocation {
 	 * 2.	The mobsim handles times > 24 h
 	 *		Facility load has to be handled for hour 0..24 only (acc. to M.B.)
 	 */
-
+	private final static Logger log = Logger.getLogger(Facility.class);
 
 	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
 	private int numberOfVisitorsPerDay = 0;
 
 	// TODO: Set number of time bins using parameterization
 	private final int numberOfTimeBins = 4*24;
+
+	// for the moment use just one capacity TODO: See point 1. in the remark on top.
+	private int capacity=0;
 
 	/* 15 min. time bins at the moment.
 	*  Every agent is at the loc. for at least 15 min. That means we have to count
@@ -85,6 +89,8 @@ public class Facility extends AbstractLocation {
 			this.departures[i] = 0;
 			this.load[i] = 0;
 		}
+
+		this.capacity=this.getCapacityForShoppingAndLeisure();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -108,13 +114,12 @@ public class Facility extends AbstractLocation {
 	// TODO: Remove this hard-coded parameterization asap
 	public void calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
 
-		int capacity=this.getCapacityForShoppingAndLeisure();
-		if (capacity>0) {
+		if (this.capacity>0) {
 			//BPR
 			final double a=0.8;
 			final double b=8.0;
 			for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
-				this.capacityPenaltyFactor += a*Math.pow(this.load[i]/capacity, b);
+				this.capacityPenaltyFactor += a*Math.pow(this.load[i]/this.capacity, b);
 			}
 
 			this.capacityPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
@@ -183,6 +188,9 @@ public class Facility extends AbstractLocation {
 		this.attrFactor = attrFactor;
 	}
 
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+	}
 
 	// time in seconds from midnight
 	public void addArrival(double time, int scaleNumberOfPersons) {
@@ -249,7 +257,7 @@ public class Facility extends AbstractLocation {
 		return this.capacityPenaltyFactor;
 	}
 
-	public int getCapacityForShoppingAndLeisure() {
+	private int getCapacityForShoppingAndLeisure() {
 		int capacity=Integer.MAX_VALUE;;
 		Iterator<Activity> act_it=this.activities.values().iterator();
 		while (act_it.hasNext()){
@@ -261,6 +269,10 @@ public class Facility extends AbstractLocation {
 			}
 		}
 		return capacity;
+	}
+
+	public int getCapacity() {
+		return this.capacity;
 	}
 
 	// ----------------------------------------------------
