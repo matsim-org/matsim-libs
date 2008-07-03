@@ -3,6 +3,7 @@ package org.matsim.config.groups;
 import org.apache.log4j.Logger;
 import org.matsim.config.Module;
 import org.matsim.gbl.Gbl;
+import org.matsim.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
 
@@ -20,7 +21,7 @@ public class PlanomatConfigGroup extends Module {
 	public static final String BE_VERBOSE = "beVerbose";
 
 	public static final String CHARYPAR_NAGEL_SCORING_FUNCTION = "CharyparNagel";
-	public static final String PORTLAND_SCORING_FUNCTION = "Portland";
+	public static final String CHARYPAR_NAGEL_OPEN_TIMES_SCORING_FUNCTION = "CharyparNagelOpenTimes";
 	public static final String OPTIMIZATION_TOOLBOX_JGAP = "jgap";
 
 	private ScoringFunctionFactory scoringFunctionFactory = null;
@@ -44,9 +45,8 @@ public class PlanomatConfigGroup extends Module {
 
 			if (CHARYPAR_NAGEL_SCORING_FUNCTION.equals(value)) {
 				this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
-			} else if (PORTLAND_SCORING_FUNCTION.equals(value)) {
-				Gbl.errorMsg("used a class from a playground. Disabled. mrieser/18jun2008");
-				// this.scoringFunctionFactory = new PortlandScoringFunctionFactory();
+			} else if (CHARYPAR_NAGEL_OPEN_TIMES_SCORING_FUNCTION.equals(value)) {
+				this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory();
 			} else {
 				Gbl.errorMsg("Unknown scoring function identifier. Aborting...");
 			}

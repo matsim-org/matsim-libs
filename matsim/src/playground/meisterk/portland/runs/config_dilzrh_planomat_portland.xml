@@ -16,15 +16,15 @@
 <!-- ====================================================================== -->
 
 	<module name="config" >
-		<param name="outputConfigFile" value="&OUTPUTBASE;/run_planomat_portland/output_config.xml.gz" />
+		<param name="outputConfigFile" value="&OUTPUTBASE;/run_planomat_portland_ignorept/output_config.xml.gz" />
 	</module>
 
 <!-- ====================================================================== -->
 
 	<module name="controler" >
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="1" />
-		<param name="outputDirectory" value="&OUTPUTBASE;/run_planomat_portland" />
+		<param name="lastIteration" value="100" />
+		<param name="outputDirectory" value="&OUTPUTBASE;/run_planomat_portland_ignorept" />
 		<param name="travelTimeBinSize" value="900" />
 		<param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
 	</module>
@@ -39,7 +39,7 @@
 		<param name="iterationNumber" value="null" />
 		<param name="linkattributes" value="null" />
 		<param name="outputCountsFile" value="null" />
-		<param name="outputformat" value="kml" />
+		<param name="outputformat" value="kml,txt" />
 		<param name="timeFilter" value="null" />
 		<param name="visibleTimeStep" value="null" />
 	</module>

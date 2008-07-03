@@ -252,8 +252,11 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		 * assume O <= C
 		 * assume A <= D
 		 */
-		double openingTime = params.getOpeningTime();
-		double closingTime = params.getClosingTime();
+		
+		double[] openingInterval = this.getOpeningInterval(act);
+		double openingTime = openingInterval[0];
+		double closingTime = openingInterval[1];
+
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
 
@@ -314,6 +317,24 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		}
 
 		return score;
+	}
+
+	protected double[] getOpeningInterval(Act act) {
+
+		ActUtilityParameters params = utilParams.get(act.getType());
+		if (params == null) {
+			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
+		}
+
+		double openingTime = params.getOpeningTime();
+		double closingTime = params.getClosingTime();
+		
+		// openInterval has two values
+		// openInterval[0] will be the opening time
+		// openInterval[1] will be the closing time
+		double[] openInterval = new double[]{openingTime, closingTime};
+
+		return openInterval;
 	}
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {

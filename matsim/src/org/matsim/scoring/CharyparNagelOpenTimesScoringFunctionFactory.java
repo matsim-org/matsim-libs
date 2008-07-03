@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * CharyparNagelOpenTimesScoringFunctionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,18 +20,20 @@
 
 package org.matsim.scoring;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.plans.Plan;
 
-public class AllTests {
+/**
+ * Generates {@link CharyparNagelScoringOpenTimesFunction}s.
+ * 
+ * @author meisterk
+ *
+ */
+public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.scoring");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(CharyparNagelScoringFunctionTest.class);
-		suite.addTestSuite(CharyparNagelOpenTimesScoringFunctionTest.class);
-		//$JUnit-END$
-		return suite;
+	public ScoringFunction getNewScoringFunction(Plan plan) {
+		return new CharyparNagelOpenTimesScoringFunction(plan);
 	}
 
+	
+	
 }
