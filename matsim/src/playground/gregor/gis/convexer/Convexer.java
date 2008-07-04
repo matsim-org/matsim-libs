@@ -30,9 +30,9 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.utils.gis.ShapeFileReader;
 import org.opengis.referencing.FactoryException;
 
-import playground.gregor.gis.utils.ShapeFileReader;
 import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Geometry;

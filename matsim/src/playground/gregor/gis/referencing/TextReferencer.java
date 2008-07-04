@@ -40,9 +40,9 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.utils.gis.ShapeFileReader;
 
 import playground.gregor.gis.referencing.CRN.CaseNode;
-import playground.gregor.gis.utils.ShapeFileReader;
 import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;

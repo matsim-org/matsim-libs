@@ -35,6 +35,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
+import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.misc.ArgumentParser;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
@@ -42,7 +43,6 @@ import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
 import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
 
-import playground.gregor.gis.utils.ShapeFileReader;
 
 /**
  * Converts  an events file to a snapshot file.

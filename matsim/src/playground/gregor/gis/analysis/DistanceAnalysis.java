@@ -62,10 +62,10 @@ import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.geotools.MGC;
+import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.world.World;
 import org.opengis.referencing.FactoryException;
 
-import playground.gregor.gis.utils.ShapeFileReader;
 import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;

@@ -36,22 +36,22 @@ import org.opengis.referencing.FactoryException;
 
 public class ShapeFileWriter {
 	private static final Logger log = Logger.getLogger(ShapeFileWriter.class);
-	
-	
-	public static void writeGeometries(Collection<Feature> features, String filename) throws IOException, FactoryException, SchemaException{
-		
+
+
+	public static void writeGeometries(final Collection<Feature> features, final String filename) throws IOException, FactoryException, SchemaException{
+
 		log.info("writing features to: " + filename);
 		URL fileURL = (new File(filename)).toURL();
 		ShapefileDataStore datastore = new ShapefileDataStore(fileURL);
-		Feature feature = (Feature) features.iterator().next();
+		Feature feature = features.iterator().next();
 		datastore.createSchema(feature.getFeatureType());
-	    
+
 //		Feature [] featuresArray = new Feature [features.size()];
 //		features.toArray(featuresArray);
 		FeatureStore featureStore = (FeatureStore)(datastore.getFeatureSource(feature.getFeatureType().getTypeName()));
 		FeatureReader aReader = DataUtilities.reader(features);
-		
-		featureStore. addFeatures( aReader);
+
+		featureStore.addFeatures( aReader);
 		log.info("done");
 	}
 }

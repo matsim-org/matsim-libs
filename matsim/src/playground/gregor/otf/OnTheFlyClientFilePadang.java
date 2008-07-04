@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
@@ -27,7 +28,6 @@ import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.utils.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
-import playground.gregor.gis.utils.ShapeFileReader;
 
 
 public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{

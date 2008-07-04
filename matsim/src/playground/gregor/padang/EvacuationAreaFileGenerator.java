@@ -43,6 +43,7 @@ import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.world.World;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -51,7 +52,6 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
-import playground.gregor.gis.utils.ShapeFileReader;
 
 public class EvacuationAreaFileGenerator {
 	

@@ -53,6 +53,7 @@ import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.geotools.MGC;
+import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.world.World;
 import org.opengis.referencing.FactoryException;
 
@@ -62,7 +63,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
-import playground.gregor.gis.utils.ShapeFileReader;
 import playground.gregor.gis.utils.ShapeFileWriter;
 
 public class EgressAnalysis {

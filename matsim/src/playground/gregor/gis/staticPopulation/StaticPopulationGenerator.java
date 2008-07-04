@@ -39,8 +39,8 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansWriter;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.utils.gis.ShapeFileReader;
 
-import playground.gregor.gis.utils.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

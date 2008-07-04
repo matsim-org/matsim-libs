@@ -33,8 +33,8 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.utils.gis.ShapeFileReader;
 
-import playground.gregor.gis.utils.ShapeFileReader;
 import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
