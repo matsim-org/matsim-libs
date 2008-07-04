@@ -50,6 +50,8 @@ import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherSM;
 
+//import playground.anhorni.locationchoice.LocationChoice;
+
 /**
  * Loads the strategy modules specified in the config-file. This class offers
  * backwards-compatibility to the old StrategyManager where the complete class-
@@ -58,7 +60,7 @@ import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherSM;
  * @author mrieser
  */
 public class StrategyManagerConfigLoader {
-	
+
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 
 	/**
@@ -74,14 +76,16 @@ public class StrategyManagerConfigLoader {
 		TravelCostI travelCostCalc = controler.getTravelCostCalculator();
 		TravelTimeI travelTimeCalc = controler.getTravelTimeCalculator();
 		LegTravelTimeEstimator legTravelTimeEstimator = controler.getLegTravelTimeEstimator();
-		
+
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
 		int externalCounter = 0;
 
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 			double rate = settings.getProbability();
-			if (rate == 0.0) continue;
+			if (rate == 0.0) {
+				continue;
+			}
 			String classname = settings.getModuleName();
 
 			if (classname.startsWith("org.matsim.demandmodeling.plans.strategies.")) {
@@ -152,7 +156,18 @@ public class StrategyManagerConfigLoader {
 //				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherMT(network, travelCostCalc, travelTimeCalc);
 				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherSM(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
+			} /*else if (classname.equals("LocationChoice")) {
+		    	strategy = new PlanStrategy(new RandomPlanSelector());
+		    	strategy.addStrategyModule(new LocationChoice(
+				controler.getNetwork(),
+				controler.getTravelCostCalculator(),
+				controler.getLinkTravelTimes()));
+
+				final PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+				preProcessRoutingData.run(network);
+				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
 			}
+			*/
 			//if none of the strategies above could be selected we try to load the class by name
 			else {
 				//classes loaded by name must not be part of the matsim core
