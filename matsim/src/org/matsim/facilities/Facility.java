@@ -44,8 +44,8 @@ public class Facility extends AbstractLocation {
 	 * 		But shopping and leisure in a shopping mall with cinemas has to be treated with one cap
 	 * 		(-> so it is better handled in Facility)
 	 *
-	 * 		At the moment I need only shopping and leisure thus I only use one cap.
-	 * 		(The smallest of all shopping and leisure activities of the facility).
+	 * 		At the moment I need only shopping (and leisure) thus I only use one cap.
+	 * 		(The smallest of all shopping (and leisure) activities of the facility).
 	 *
 	 * 2.	The mobsim handles times > 24 h
 	 *		Facility load has to be handled for hour 0..24 only (acc. to M.B.)
@@ -256,6 +256,7 @@ public class Facility extends AbstractLocation {
 		return this.capacityPenaltyFactor;
 	}
 
+	//we do not have shopping and leisure acts in ONE facility
 	private int getCapacityForShoppingAndLeisure() {
 		int cap = Integer.MAX_VALUE;
 
@@ -268,7 +269,7 @@ public class Facility extends AbstractLocation {
 				}
 			}
 		}
-		return cap;
+		return Math.max(1 , cap);
 	}
 
 	public int getCapacity() {
