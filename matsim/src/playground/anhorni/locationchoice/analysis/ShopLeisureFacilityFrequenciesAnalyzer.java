@@ -125,7 +125,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 
 	private void writeFacilityFrequencies(String type) {
 
-		log.info("writting " + type + "facilities");
+		log.info("writting " + type + " facilities");
 		
 		try {
 
