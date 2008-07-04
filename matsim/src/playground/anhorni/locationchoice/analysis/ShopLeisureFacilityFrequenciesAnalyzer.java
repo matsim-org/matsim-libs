@@ -74,14 +74,13 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 
 		log.info(plansfilePath);
 
-		for (int i=0; i<2; i++) {
-			ShopLeisureFacilityFrequenciesAnalyzer analyzer = new ShopLeisureFacilityFrequenciesAnalyzer();
-			analyzer.init(plansfilePath, networkfilePath, facilitiesfilePath);
+		ShopLeisureFacilityFrequenciesAnalyzer analyzer = new ShopLeisureFacilityFrequenciesAnalyzer();
+		analyzer.init(plansfilePath, networkfilePath, facilitiesfilePath);
+		analyzer.checkShopANDLeisure();
+		
+		for (int i=0; i<2; i++) {		
 			analyzer.collectAgents(type[i]);
 			analyzer.writeFacilityFrequencies(type[i]);
-			if (i == 0) {
-				analyzer.checkShopANDLeisure();
-			}
 		}	
 	}
 
