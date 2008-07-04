@@ -74,12 +74,14 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 
 		log.info(plansfilePath);
 
-		for (int i = 0; i<2; i++) {
+		for (int i=0; i<2; i++) {
 			ShopLeisureFacilityFrequenciesAnalyzer analyzer = new ShopLeisureFacilityFrequenciesAnalyzer();
 			analyzer.init(plansfilePath, networkfilePath, facilitiesfilePath);
 			analyzer.collectAgents(type[i]);
 			analyzer.writeFacilityFrequencies(type[i]);
-			analyzer.checkShopANDLeisure();
+			if (i == 0) {
+				analyzer.checkShopANDLeisure();
+			}
 		}	
 	}
 
@@ -124,6 +126,8 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 
 	private void writeFacilityFrequencies(String type) {
 
+		log.info("writting " + type + "facilities");
+		
 		try {
 
 			final String header="Facility_id\tx\ty\tNumberOfVisitors\tCapacity";
@@ -157,12 +161,15 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 	
 	private void checkShopANDLeisure() {
 		
-		boolean shop = false;
-		boolean leisure = false;
-		
+		log.info("checking if a facility has shop AND leisure activities");
+				
 		Iterator<? extends Facility> iter = this.facilities.iterator();
 		while (iter.hasNext()){
 			Facility facility = iter.next();
+			
+			boolean shop = false;
+			boolean leisure = false;
+			
 			Iterator<Activity> act_it=facility.getActivities().values().iterator();
 			while (act_it.hasNext()){
 				Activity activity = act_it.next();
