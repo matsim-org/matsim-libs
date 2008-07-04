@@ -108,6 +108,12 @@ import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 
+/*
+//anhorni
+import playground.anhorni.locationchoice.facilityLoad.FacilitiesLoadCalculator;
+import playground.anhorni.locationchoice.scoring.LocationChoiceScoringFunctionFactory;
+*/
+
 /**
  * The Controler is responsible for complete simulation runs, including
  * the initialization of all required data, running the iterations and
@@ -381,7 +387,12 @@ public class Controler {
 
 		this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 //		this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory();
-		
+
+		/*
+		//anhorni
+		this.scoringFunctionFactory = new LocationChoiceScoringFunctionFactory();
+		*/
+
 		this.strategyManager = loadStrategyManager();
 	}
 
@@ -595,6 +606,11 @@ public class Controler {
 			throw new RuntimeException(e);
 		}
 
+		/*
+		// anhorni: calculate the load of the facilities
+		// used to penalize visitors of overcrowded facilities
+		this.addControlerListener(new FacilitiesLoadCalculator());
+		*/
 
 		// load counts, if requested
 		if (this.config.counts().getCountsFileName() != null) {
