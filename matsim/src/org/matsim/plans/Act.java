@@ -216,4 +216,35 @@ public class Act extends BasicActImpl implements Serializable {
 		return this.link.getId();
 	}
 
+	
+	/**
+	 * This method calculates the duration of the activity from the start and endtimes if set.
+	 * If neither end nor starttime is set, but the duration is stored in the attribute of the
+	 * class the duration is returned. 
+	 * If only start time is set, assume this is the last activity of the day.
+	 * If only the end time is set, assume this is the first activity of the day.
+	 * If the duration could neither be calculated nor the act.dur attribute is set to a value
+	 * not equal to Time.UNDEFINED_TIME an exception is thrown.
+	 * @return the duration in seconds
+	 */
+	public double calculateDuration() {
+		if (this.startTime == Time.UNDEFINED_TIME && this.endTime == Time.UNDEFINED_TIME) {
+			if (this.dur != Time.UNDEFINED_TIME) {
+				return this.dur;
+			}
+			throw new IllegalArgumentException("No valid time set to calculate duration of activity: StartTime: " + this.startTime + " EndTime : " + this.endTime + " Duration: " + this.dur);
+		}
+		//if only start time is set, assume this is the last activity of the day
+		else if (this.startTime != Time.UNDEFINED_TIME && this.endTime == Time.UNDEFINED_TIME) {
+			return Time.MIDNIGHT - this.startTime;
+		}
+		//if only the end time is set, assume this is the first activity of the day
+		else if (this.startTime == Time.UNDEFINED_TIME && this.endTime != Time.UNDEFINED_TIME) {
+			return this.endTime;
+		}
+		else {
+			return this.endTime - this.startTime;
+		}
+	}
+
 }

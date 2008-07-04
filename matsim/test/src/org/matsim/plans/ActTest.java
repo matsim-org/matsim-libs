@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.plans;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.misc.Time;
 
-public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.plans");
+/**
+ * Test for convenience methods of Act.
+ * @author dgrether
+ *
+ */
+public class ActTest extends MatsimTestCase {
 
-		suite.addTestSuite(PersonTest.class);
-		suite.addTestSuite(ActTest.class);
-		suite.addTest(org.matsim.plans.algorithms.AllTests.suite());
-		suite.addTest(org.matsim.plans.filters.AllTests.suite());
+	private Act testee;
+	
+	/**
+	 * @see org.matsim.testcases.MatsimTestCase#setUp()
+	 */
+	protected void setUp() throws Exception {
+		super.setUp();
 		
-		return suite;
+		testee = new Act("h", 0.0, 0.0, null, 0.0, 0.0, 0.0, false);
+		
 	}
+	
+	
+	public void testCalculateDuration() {
+		assertNotNull(testee);
+		assertEquals(0.0, testee.calculateDuration());
+		testee.setEndTime(5.5 * 3600.0);
+		assertEquals(5.5 * 3600.0, testee.calculateDuration());
+		testee.setStartTime(Time.UNDEFINED_TIME);
+		assertEquals(5.5 * 3600.0, testee.calculateDuration());
+		testee.setEndTime(Time.UNDEFINED_TIME);
+		assertEquals(0.0, testee.calculateDuration());
+		testee.setDur(Time.UNDEFINED_TIME);
+		Exception e = null;
+		try {
+			testee.calculateDuration();
+		} catch (RuntimeException ex) {
+			e = ex;
+		}
+		assertNotNull(e);
+		testee.setStartTime(17 * 3600.0);
+		assertEquals(7 * 3600.0, testee.calculateDuration());
+	}
+	
+	
 
 }

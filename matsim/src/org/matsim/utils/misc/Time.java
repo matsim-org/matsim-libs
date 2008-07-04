@@ -28,7 +28,11 @@ public class Time {
 	 * to this should result to "greater" for some algorithms to work
 	 * still we found the name "UNDEFINED" more suitable than TIME_MIN_VALUE */
 	public final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
-
+	/**
+	 * The end of a day in MATSim in seconds
+	 */
+	public final static double MIDNIGHT = 24 * 3600.0;
+	
 	public static final String TIMEFORMAT_HHMM = "HH:mm";
 	public static final String TIMEFORMAT_HHMMSS = "HH:mm:ss";
 	public static final String TIMEFORMAT_SSSS = "ssss";
