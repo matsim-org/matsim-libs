@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.Facility;
@@ -49,8 +50,6 @@ import org.matsim.utils.misc.Counter;
 
 public class ShopLeisureFacilityFrequenciesAnalyzer {
 
-
-
 	private Plans plans=null;
 	private NetworkLayer network=null;
 	private Facilities  facilities =null;
@@ -64,20 +63,24 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 	 */
 	public static void main(String[] args) {
 
-		if (args.length < 1 || args.length > 1 ) {
+		if (args.length < 2 || args.length > 2 ) {
 			System.out.println("Too few or too many arguments. Exit");
 			System.exit(1);
 		}
-		String plansfilePath=args[0];
+		String plansfilePath = args[0];
+		String type = args[1];
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
 
 		log.info(plansfilePath);
 
-		ShopLeisureFacilityFrequenciesAnalyzer analyzer = new ShopLeisureFacilityFrequenciesAnalyzer();
-		analyzer.init(plansfilePath, networkfilePath, facilitiesfilePath);
-		analyzer.collectAgents();
-		analyzer.writeFacilityFrequencies();
+		for (int i = 0; i<2; i++) {
+			ShopLeisureFacilityFrequenciesAnalyzer analyzer = new ShopLeisureFacilityFrequenciesAnalyzer();
+			analyzer.init(plansfilePath, networkfilePath, facilitiesfilePath);
+			analyzer.collectAgents(type);
+			analyzer.writeFacilityFrequencies(type);
+			analyzer.checkShopANDLeisure();
+		}	
 	}
 
 	private void init(final String plansfilePath, final String networkfilePath,
@@ -99,7 +102,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 		log.info("plans reading done");
 	}
 
-	private void collectAgents() {
+	private void collectAgents(String type) {
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 		while (person_iter.hasNext()) {
@@ -112,20 +115,20 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final Act act = (Act)actslegs.get(j);
 
-				if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
+				if (act.getType().startsWith(type)) {
 					act.getFacility().addVisitorsPerDay(1);
 				}
 			}
 		}
 	}
 
-	private void writeFacilityFrequencies() {
+	private void writeFacilityFrequencies(String type) {
 
 		try {
 
 			final String header="Facility_id\tx\ty\tNumberOfVisitors\tCapacity";
 
-			final BufferedWriter out = IOUtils.getBufferedWriter("./output/facFrequencies.txt");
+			final BufferedWriter out = IOUtils.getBufferedWriter("./output/facFrequencies_"+type+".txt");
 			out.write(header);
 			out.newLine();
 
@@ -135,7 +138,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 				Facility facility = iter.next();
 				facility.finish();
 
-				if (facility.getNumberOfVisitorsPerDay()>0) {
+				if (facility.getNumberOfVisitorsPerDay() > 0) {
 					out.write(facility.getId().toString()+"\t"+
 					String.valueOf(facility.getCenter().getX())+"\t"+
 					String.valueOf(facility.getCenter().getY())+"\t"+
@@ -149,6 +152,34 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 		}
 		catch (final IOException e) {
 			Gbl.errorMsg(e);
+		}
+	}
+	
+	private void checkShopANDLeisure() {
+		
+		boolean shop = false;
+		boolean leisure = false;
+		
+		Iterator<? extends Facility> iter = this.facilities.iterator();
+		while (iter.hasNext()){
+			Facility facility = iter.next();
+			Iterator<Activity> act_it=facility.getActivities().values().iterator();
+			while (act_it.hasNext()){
+				Activity activity = act_it.next();
+				if (activity.getType().startsWith("s")) {
+					shop = true;
+				}
+			}
+			act_it=facility.getActivities().values().iterator();
+			while (act_it.hasNext()){
+				Activity activity = act_it.next();
+				if (activity.getType().startsWith("l")) {
+					leisure = true;
+				}
+			}
+			if (shop && leisure) {
+				log.info(facility.getId() + " has shop AND leisure activities");
+			}
 		}
 	}
 }
