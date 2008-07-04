@@ -142,12 +142,23 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 				facility.finish();
 
 				if (facility.getNumberOfVisitorsPerDay() > 0) {
-					out.write(facility.getId().toString()+"\t"+
-					String.valueOf(facility.getCenter().getX())+"\t"+
-					String.valueOf(facility.getCenter().getY())+"\t"+
-					String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-					String.valueOf(facility.getCapacity()));
-					out.newLine();
+					
+					boolean type_ok = false;
+					Iterator<Activity> act_it=facility.getActivities().values().iterator();
+					while (act_it.hasNext()){
+						Activity activity = act_it.next();
+						if (activity.getType().startsWith(type)) {
+							type_ok = true;
+						}
+					}
+					if (type_ok) {
+						out.write(facility.getId().toString()+"\t"+
+							String.valueOf(facility.getCenter().getX())+"\t"+
+							String.valueOf(facility.getCenter().getY())+"\t"+
+							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
+							String.valueOf(facility.getCapacity()));
+						out.newLine();
+					}
 				}
 				out.flush();
 			}
