@@ -100,7 +100,6 @@ import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
@@ -380,8 +379,10 @@ public class Controler {
 		this.externalMobsim = this.config.simulation().getExternalExe();
 		this.writeEvents = this.externalMobsim == null; // do not write events when using an external mobsim
 
-		this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
+		if (this.scoringFunctionFactory == null) {
+			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 //		this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory();
+		}
 
 		this.strategyManager = loadStrategyManager();
 	}

@@ -33,6 +33,9 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.Route;
+import org.matsim.scoring.CharyparNagelScoringFunction;
+import org.matsim.scoring.ScoringFunction;
+import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ControlerTest extends MatsimTestCase {
@@ -128,6 +131,34 @@ public class ControlerTest extends MatsimTestCase {
 		// test that the plans have the correct times
 		assertEquals("ReRoute seems to have wrong travel times.",
 				151.0, ((Leg) (person1.getPlans().get(1).getActsLegs().get(1))).getTravTime(), 0.0);
+	}
+
+	/**
+	 * Tests that a custom scoring function factory doesn't get overwritten
+	 * in the initialization process of the Controler.
+	 */
+	public void testSetScoringFunctionFactory() {
+		final Config config = loadConfig(null);
+		config.controler().setLastIteration(0);
+
+		NetworkLayer network = new NetworkLayer();
+		network.createNode("1", "0", "0", null);
+		network.createNode("2", "100", "0", null);
+		network.createNode("3", "200", "0", null);
+		network.createLink("1", "1", "2", "100", "1", "3600", "1", null, null);
+		network.createLink("2", "2", "3", "100", "1", "3600", "1", null, null);
+		Plans population = new Plans(Plans.NO_STREAMING); // empty population
+
+		final Controler controler = new Controler(config, network, population);
+		controler.setCreateGraphs(false);
+		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
+		assertTrue("Custom ScoringFunctionFactory was not set.",
+				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
+
+		controler.run();
+
+		assertTrue("Custom ScoringFunctionFactory got overwritten.",
+				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
 	}
 
 	/**
@@ -288,6 +319,18 @@ public class ControlerTest extends MatsimTestCase {
 		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
 		assertNotNull(leg1.getRoute());
 		assertNotNull(leg2.getRoute());
+	}
+
+	/** A helper class for testSetScoringFunctionFactory() */
+	private static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
+		public DummyScoringFunctionFactory() {
+			/* empty public constructor for private inner class */
+		}
+
+		public ScoringFunction getNewScoringFunction(final Plan plan) {
+			return new CharyparNagelScoringFunction(plan);
+		}
+
 	}
 
 }
