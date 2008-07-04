@@ -1369,6 +1369,62 @@ public class MyRuns {
 
 
 	//////////////////////////////////////////////////////////////////////
+	// subNetwork
+	//////////////////////////////////////////////////////////////////////
+	public static void subNetwork(final String[] args, final double x, final double y, final double minRadius, final double radiusStep, final double maxRadius) {
+		System.out.println("RUN: subNetwork");
+
+		final Coord center = new Coord(x, y);
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+
+		final Config config = Gbl.createConfig(args);
+		final World world = Gbl.createWorld();
+//
+//		System.out.println("  reading world xml file... ");
+//		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+//		worldReader.readFile(config.world().getInputFile());
+//		System.out.println("  done.");
+
+		System.out.println("  reading the network... " + (new Date()));
+		NetworkLayer network = null;
+		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		System.out.println("  done.");
+
+//		System.out.println("  reading population... " + (new Date()));
+//		final Plans population = new Plans(Plans.NO_STREAMING);
+//		PlansReaderI plansReader = new MatsimPlansReader(population);
+//		plansReader.readFile(config.plans().getInputFile());
+
+		System.out.println("  finding sub-networks... " + (new Date()));
+		for (double radius = minRadius; radius <= maxRadius; radius += radiusStep) {
+			for (Link link : network.getLinks().values()) {
+				final Node from = link.getFromNode();
+				final Node to = link.getToNode();
+				if ((from.getCoord().calcDistance(center) <= radius) || (to.getCoord().calcDistance(center) <= radius)) {
+					areaOfInterest.put(link.getId(),link);
+				}
+			}
+			System.out.println("  aoi with radius=" + radius + " contains " + areaOfInterest.size() + " links.");
+			areaOfInterest.clear();
+		}
+		System.out.println("  done. ");
+
+//		final PlansWriter plansWriter = new PlansWriter(population);
+//		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter, areaOfInterest);
+//		filter.setAlternativeAOI(center, radius);
+//		population.addAlgorithm(filter);
+//
+//
+//		plansWriter.writeEndPlans();
+//		population.printPlansCount();
+//		System.out.println("  done. " + (new Date()));
+//		System.out.println("  filtered persons: " + filter.getCount());
+
+		System.out.println("RUN: subNetwork finished");
+	}
+
+	//////////////////////////////////////////////////////////////////////
 	// calcODMatrices
 	//////////////////////////////////////////////////////////////////////
 
@@ -2424,7 +2480,7 @@ public class MyRuns {
 //		filterSelectedPlans(args);
 //		filterPlansInArea(args, 4582000, 5939000, 4653000, 5850000);  // uckermark
 //		filterPlansInArea(args, 4580000, 5807000, 4617000, 5835000);  // berlin
-		filterPlansWithRouteInArea(args, 683518.0, 246836.0, 30000.0); // Bellevue Zrh, 30km
+//		filterPlansWithRouteInArea(args, 683518.0, 246836.0, 30000.0); // Bellevue Zrh, 30km
 //		filterPlansWithRouteInArea(args, 4595406.5, 5821171.5, 1000.0); // Berlin Mitte, 1km
 //		filterPlansInNetworkArea(args);
 //		filterPlansPassingLink(args, 4022);
@@ -2447,6 +2503,7 @@ public class MyRuns {
 //		cleanNetwork(args);
 //		calcNofLanes(args);
 //		falsifyNetwork(args);
+		subNetwork(args, 683518.0, 246836.0, 1000.0, 1000.0, 50000.0); // Belleue Zrh, 1-50km
 
 /* ***   M A T R I C E S   *** */
 //		visumMatrixTest(args);
