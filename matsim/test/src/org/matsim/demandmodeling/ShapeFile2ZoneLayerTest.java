@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * Shape2ZoneLayerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,18 +20,37 @@
 
 package org.matsim.demandmodeling;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.io.IOException;
 
-public class AllTests {
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.gbl.Gbl;
+import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.CRCChecksum;
+import org.matsim.world.World;
+import org.matsim.world.WorldWriter;
+import org.matsim.world.ZoneLayer;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.demandmodeling");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(PopulationAsciiFileReaderTest.class);
-		suite.addTestSuite(ShapeFile2ZoneLayerTest.class);
-		//$JUnit-END$
-		return suite;
+/**
+ * Creates a simple world with zones taken from an ESRI shape file. The created
+ * zones only have a center coordinate defined, but no extent.
+ *
+ * @author mrieser
+ */
+public class ShapeFile2ZoneLayerTest extends MatsimTestCase {
+
+	public void testShp2ZoneLayer() throws IOException {
+		final World world = Gbl.createWorld();
+		final ZoneLayer layer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "zones");
+		final String shpFileName = getInputDirectory() + "zones.shp";
+		final String worldFileName = getOutputDirectory() + "zones.xml";
+		final String referenceFileName = getInputDirectory() + "zones.xml";
+
+		ShapeFile2ZoneLayer shp2zl = new ShapeFile2ZoneLayer();
+		shp2zl.shp2ZoneLayer(shpFileName, layer);
+		world.complete();
+		new WorldWriter(world, worldFileName).write();
+		
+		assertEquals("Created world does not match reference file.", 
+				CRCChecksum.getCRCFromFile(worldFileName), CRCChecksum.getCRCFromFile(referenceFileName));
 	}
-
 }
