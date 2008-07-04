@@ -23,7 +23,7 @@ package org.matsim.facilities;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -50,7 +50,7 @@ public class Facility extends AbstractLocation {
 	 * 2.	The mobsim handles times > 24 h
 	 *		Facility load has to be handled for hour 0..24 only (acc. to M.B.)
 	 */
-	private final static Logger log = Logger.getLogger(Facility.class);
+	//private final static Logger log = Logger.getLogger(Facility.class);
 
 	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
 	private int numberOfVisitorsPerDay = 0;
