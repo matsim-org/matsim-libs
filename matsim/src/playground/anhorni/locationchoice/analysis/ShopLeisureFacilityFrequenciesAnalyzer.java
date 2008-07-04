@@ -63,12 +63,12 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 	 */
 	public static void main(String[] args) {
 
-		if (args.length < 2 || args.length > 2 ) {
+		if (args.length < 1 || args.length > 1 ) {
 			System.out.println("Too few or too many arguments. Exit");
 			System.exit(1);
 		}
 		String plansfilePath = args[0];
-		String type = args[1];
+		String type[] = {"s", "l"};
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
 
@@ -77,8 +77,8 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 		for (int i = 0; i<2; i++) {
 			ShopLeisureFacilityFrequenciesAnalyzer analyzer = new ShopLeisureFacilityFrequenciesAnalyzer();
 			analyzer.init(plansfilePath, networkfilePath, facilitiesfilePath);
-			analyzer.collectAgents(type);
-			analyzer.writeFacilityFrequencies(type);
+			analyzer.collectAgents(type[i]);
+			analyzer.writeFacilityFrequencies(type[i]);
 			analyzer.checkShopANDLeisure();
 		}	
 	}
