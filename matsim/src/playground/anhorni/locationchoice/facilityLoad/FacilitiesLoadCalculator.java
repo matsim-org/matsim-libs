@@ -30,6 +30,7 @@ import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.controler.listener.StartupListener;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -84,26 +85,53 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 
 		try {
 			final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tCapacity";
-			final BufferedWriter out = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
+			final BufferedWriter out_shop = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_shop.txt");
+			final BufferedWriter out_leisure = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_leisure.txt");
 
-			out.write(header);
-			out.newLine();
+			out_shop.write(header);
+			out_shop.newLine();
+			
+			out_leisure.write(header);
+			out_leisure.newLine();
 
 			Iterator<? extends Facility> iter = facilities.getFacilities().values().iterator();
 			while (iter.hasNext()){
 				Facility facility = iter.next();
-				out.write(facility.getId().toString()+"\t"+
-				String.valueOf(facility.getCenter().getX())+"\t"+
-				String.valueOf(facility.getCenter().getY())+"\t"+
-				String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-				String.valueOf(facility.getCapacity()));
-
-				log.info(String.valueOf(facility.getCapacity()));
-
-				out.newLine();
+				
+				// check if this is a shopping facility
+				Iterator<Activity> act_it=facility.getActivities().values().iterator();
+				while (act_it.hasNext()){
+					Activity activity = act_it.next();
+					if (activity.getType().startsWith("s")) {
+						out_shop.write(facility.getId().toString()+"\t"+
+							String.valueOf(facility.getCenter().getX())+"\t"+
+							String.valueOf(facility.getCenter().getY())+"\t"+
+							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
+							String.valueOf(facility.getCapacity()));
+						out_shop.newLine();						
+						break;
+					}
+				}
+				//or a leisure facility
+				while (act_it.hasNext()){
+					Activity activity = act_it.next();
+					if (activity.getType().startsWith("l")) {
+						out_leisure.write(facility.getId().toString()+"\t"+
+							String.valueOf(facility.getCenter().getX())+"\t"+
+							String.valueOf(facility.getCenter().getY())+"\t"+
+							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
+							String.valueOf(facility.getCapacity()));
+						out_leisure.newLine();
+							
+						break;
+					}
+				}
 			}
-			out.flush();
-			out.close();
+			out_shop.flush();
+			out_shop.close();
+			
+			out_leisure.flush();
+			out_leisure.close();
 		}
 		catch (final IOException e) {
 			Gbl.errorMsg(e);

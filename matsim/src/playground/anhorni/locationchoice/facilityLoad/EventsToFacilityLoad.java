@@ -49,12 +49,16 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 
 	public void handleEvent(final EventActivityStart event) {
 		Facility facility = event.act.getFacility();
-		facility.addArrival(event.time, this.scaleNumberOfPersons);
+		if (event.acttype.startsWith("s") || event.acttype.startsWith("l")) {
+			facility.addArrival(event.time, this.scaleNumberOfPersons);
+		}
 	}
 
 	public void handleEvent(final EventActivityEnd event) {
 		Facility facility = event.act.getFacility();
-		facility.addDeparture(event.time);
+		if (event.acttype.startsWith("s") || event.acttype.startsWith("l")) {
+			facility.addDeparture(event.time);
+		}
 	}
 
 	public void finish() {
