@@ -45,7 +45,7 @@ import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
-import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
+import org.matsim.socialnetworks.interactions.SpatialSocialActTracker;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
@@ -108,7 +108,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
-	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
+	SpatialSocialActTracker gen2 = new SpatialSocialActTracker();
 	HashMap<Activity, SocialAct> socialPlansMap=null;
 	Collection<SocialAct> socialPlans=null;
 	SNScoringGeneralFactory  factory=null;

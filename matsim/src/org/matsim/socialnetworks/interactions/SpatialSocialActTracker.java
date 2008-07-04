@@ -33,9 +33,9 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 
-public class SpatialSocialOpportunityTracker implements SocialActGeneratorI {
+public class SpatialSocialActTracker implements SocialActGeneratorI {
 
-	public SpatialSocialOpportunityTracker(){
+	public SpatialSocialActTracker(){
 
 	}
 

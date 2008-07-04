@@ -44,7 +44,7 @@ import org.matsim.socialnetworks.algorithms.PersonSNSecLocRandomReRoute;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
-import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
+import org.matsim.socialnetworks.interactions.SpatialSocialActTracker;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
@@ -103,7 +103,7 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 	String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
-	SpatialSocialOpportunityTracker gen2 = new SpatialSocialOpportunityTracker();
+	SpatialSocialActTracker gen2 = new SpatialSocialActTracker();
 	Collection<SocialAct> socialPlans=null;
 
 	private final Logger log = Logger.getLogger(SNControllerListenerSecLoc.class);
