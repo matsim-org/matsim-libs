@@ -380,8 +380,7 @@ public class Controler {
 		this.writeEvents = this.externalMobsim == null; // do not write events when using an external mobsim
 
 		if (this.scoringFunctionFactory == null) {
-			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
-//		this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory();
+			this.scoringFunctionFactory = loadScoringFunctionFactory();
 		}
 
 		this.strategyManager = loadStrategyManager();
@@ -539,6 +538,18 @@ public class Controler {
 		return manager;
 	}
 
+	/**
+	 * Loads the {@link ScoringFunctionFactory} to be used for plans-scoring. This
+	 * method will only be called if the user has not yet manually set a custom scoring
+	 * function with {@link #setScoringFunctionFactory(ScoringFunctionFactory)}.
+	 *
+	 * @return The ScoringFunctionFactory to be used for plans-scoring.
+	 */
+	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		return new CharyparNagelScoringFunctionFactory();
+//	return new CharyparNagelOpenTimesScoringFunctionFactory();
+	}
+
 	/** Loads a default set of {@link org.matsim.controler.listener ControlerListener} to provide basic functionality.
 	 * <b>Note:</b> Be very careful if you overwrite this method! The order how the listeners are added is very important.
 	 * Check the comments in the source file before overwriting this method!
@@ -568,6 +579,7 @@ public class Controler {
 		this.addCoreControlerListener(new PlansReplanning());
 		this.addCoreControlerListener(new PlansDumping());
 	}
+
 	/**
 	 * Loads the default set of {@link org.matsim.controler.listener ControlerListener} to provide some more basic functionality.
 	 * Unlike the core ControlerListeners the order in which the listeners of this method are added must not affect
@@ -670,22 +682,6 @@ public class Controler {
 			}
 		}
 	}
-
-	/**
-	 * Removes a core ControlerListener from the Controler instance
-	 *
-	 * @param l
-	 */
-	@SuppressWarnings("unchecked")
-	protected final void removeCoreControlerListener(final ControlerListener l) {
-		Class[] interfaces = l.getClass().getInterfaces();
-		for (int i = 0; i < interfaces.length; i++) {
-			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
-				this.coreListenerList.remove(interfaces[i], l);
-			}
-		}
-	}
-
 
 	/* ===================================================================
 	 * methods for ControlerListeners
