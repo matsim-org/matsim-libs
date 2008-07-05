@@ -141,13 +141,12 @@ public class ControlerTest extends MatsimTestCase {
 		final Config config = loadConfig(null);
 		config.controler().setLastIteration(0);
 
+		// create a very simple network with one link only and an empty population
 		NetworkLayer network = new NetworkLayer();
 		network.createNode("1", "0", "0", null);
 		network.createNode("2", "100", "0", null);
-		network.createNode("3", "200", "0", null);
 		network.createLink("1", "1", "2", "100", "1", "3600", "1", null, null);
-		network.createLink("2", "2", "3", "100", "1", "3600", "1", null, null);
-		Plans population = new Plans(Plans.NO_STREAMING); // empty population
+		Plans population = new Plans(Plans.NO_STREAMING);
 
 		final Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
