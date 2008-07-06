@@ -73,9 +73,7 @@ public class Facility extends AbstractLocation {
 	// Will soon be replaced by more sophisticated models.
 	private double attrFactor = 1.0;
 
-	// Calculates a penalty reflecting capacity restraints.
-	// Again: will soon be replaced by more sophisticated models.
-	private double capacityPenaltyFactor = 1.0;
+	private double sumCapacityPenaltyFactor = 0.0;
 
 
 	protected Facility(final Facilities layer, final Id id, final CoordI center) {
@@ -110,23 +108,26 @@ public class Facility extends AbstractLocation {
 	}
 
 	// TODO: Remove this hard-coded parameterization asap
-	public void calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
+	public double calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
 
+		double capPenaltyFactor = 0.0;
 		if (this.capacity > 0) {
 			//BPR
 			final double a=0.8;
 			final double b=8.0;
 			for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
-				this.capacityPenaltyFactor += a*Math.pow(
+				capPenaltyFactor += a*Math.pow(
 						(double)this.load[i]/((double)this.capacity/(double)this.numberOfTimeBins), b);
 			}
 
-			this.capacityPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
-			this.capacityPenaltyFactor = Math.min(1.0, this.capacityPenaltyFactor);
+			capPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
+			capPenaltyFactor = Math.min(1.0, capPenaltyFactor);
 		}
 		else {
-			this.capacityPenaltyFactor=1.0;
+			capPenaltyFactor = 1.0;
 		}
+		this.sumCapacityPenaltyFactor += capPenaltyFactor;
+		return capPenaltyFactor;
 	}
 
 	// TODO: Remove this hard-coded parameterization asap
@@ -213,7 +214,9 @@ public class Facility extends AbstractLocation {
 		this.departures[timeBinIndex]+=1;
 	}
 
-
+	public void setSumCapacityPenaltyFactor(double sumCapacityPenaltyFactor) {
+		this.sumCapacityPenaltyFactor = sumCapacityPenaltyFactor;
+	}
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
@@ -253,8 +256,7 @@ public class Facility extends AbstractLocation {
 
 		int startTimeBinIndex = Math.min(this.numberOfTimeBins-1, (int)(startTime/(900)));
 		int endTimeBinIndex = Math.min(this.numberOfTimeBins-1, (int)(endTime/(900)));
-		this.calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
-		return this.capacityPenaltyFactor;
+		return calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
 	}
 
 	//we do not have shopping and leisure acts in ONE facility
@@ -276,6 +278,10 @@ public class Facility extends AbstractLocation {
 	public int getCapacity() {
 		return this.capacity;
 	}
+	
+	public double getSumCapacityPenaltyFactor() {
+		return sumCapacityPenaltyFactor;
+	}
 
 	// ----------------------------------------------------
 	public void reset() {
@@ -284,6 +290,7 @@ public class Facility extends AbstractLocation {
 			this.departures[i] = 0;
 			this.load[i] = 0;
 			this.numberOfVisitorsPerDay = 0;
+			this.sumCapacityPenaltyFactor = 0.0;
 		}
 	}
 
@@ -300,4 +307,7 @@ public class Facility extends AbstractLocation {
 		return super.toString() +
 		       "[nof_activities=" + this.activities.size() + "]";
 	}
+
+	
+
 }
