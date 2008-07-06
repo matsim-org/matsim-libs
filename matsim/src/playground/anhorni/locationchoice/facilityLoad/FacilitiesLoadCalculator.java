@@ -107,7 +107,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 							String.valueOf(facility.getCenter().getX())+"\t"+
 							String.valueOf(facility.getCenter().getY())+"\t"+
 							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-							String.valueOf(facility.getCapacity())+"\t"+
+							String.valueOf(facility.getDailyCapacity())+"\t"+
 							String.valueOf(facility.getAttrFactor()+"\t"+
 							String.valueOf(facility.getSumCapacityPenaltyFactor()/facility.getNumberOfVisitorsPerDay())));
 						out_shop.newLine();						
@@ -122,7 +122,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 							String.valueOf(facility.getCenter().getX())+"\t"+
 							String.valueOf(facility.getCenter().getY())+"\t"+
 							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-							String.valueOf(facility.getCapacity())+"\t"+
+							String.valueOf(facility.getDailyCapacity())+"\t"+
 							String.valueOf(1.0)+"\t"+
 							String.valueOf(0.0));
 						
