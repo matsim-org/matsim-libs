@@ -57,9 +57,8 @@ public class Facility extends AbstractLocation {
 
 	// TODO: Set number of time bins using parameterization
 	private final int numberOfTimeBins = 4*24;
+	private int dailyCapacity = 0;
 
-	// for the moment use just one capacity TODO: See point 1. in the remark on top.
-	private int capacity = 0;
 
 	/* 15 min. time bins at the moment.
 	*  Every agent is at the loc. for at least 15 min. That means we have to count
@@ -68,11 +67,11 @@ public class Facility extends AbstractLocation {
 	private int [] arrivals = null;
 	private int [] departures = null;
 	private int [] load = null;
+	private double [] capacity = null;
 
 	// Calculates the attractiveness dependent on the shop size.
 	// Will soon be replaced by more sophisticated models.
 	private double attrFactor = 1.0;
-
 	private double sumCapacityPenaltyFactor = 0.0;
 
 
@@ -111,21 +110,23 @@ public class Facility extends AbstractLocation {
 	public double calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
 
 		double capPenaltyFactor = 0.0;
-		if (this.capacity > 0) {
-			//BPR
-			final double a=0.8;
-			final double b=8.0;
-			for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
-				capPenaltyFactor += a*Math.pow(
-						(double)this.load[i]/((double)this.capacity/(double)this.numberOfTimeBins), b);
+		//BPR
+		final double a=0.8;
+		final double b=8.0;
+		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
+			if (this.capacity[i] > 0) {
+			capPenaltyFactor += a*Math.pow(
+					(double)this.load[i]/(this.capacity[i]/(double)this.numberOfTimeBins), b);
 			}
+			else {
+				// do nothing:
+				// is penalized by costs for waiting time
+			}
+		}
 
-			capPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
-			capPenaltyFactor = Math.min(1.0, capPenaltyFactor);
-		}
-		else {
-			capPenaltyFactor = 1.0;
-		}
+		capPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
+		capPenaltyFactor = Math.min(1.0, capPenaltyFactor);
+
 		this.sumCapacityPenaltyFactor += capPenaltyFactor;
 		return capPenaltyFactor;
 	}
@@ -188,9 +189,6 @@ public class Facility extends AbstractLocation {
 		this.attrFactor = attrFactor;
 	}
 
-	public void setCapacity(int capacity) {
-		this.capacity = capacity;
-	}
 
 	// time in seconds from midnight
 	public void addArrival(double time, int scaleNumberOfPersons) {
@@ -261,34 +259,59 @@ public class Facility extends AbstractLocation {
 
 	// We do not have shopping and leisure acts in ONE facility
 	// Give a constant cap at the moment, cap from facilitiesV3 are not useful.
-	// peak cap = 10 % of day cap
-	private int getCapacityForShoppingAndLeisure() {
-		int cap = Integer.MAX_VALUE;
+	// time dyn. der. from micro census, table G3.4
 
+	private void setCapacityForShoppingAndLeisure() {
+
+		int shopCapacity24 = 24;
+		int leisureCapacity24 = 62;
+		
 		Iterator<Activity> act_it=this.activities.values().iterator();
 		while (act_it.hasNext()){
 			Activity activity = act_it.next();
 			if (activity.getType().startsWith("s")) {
-				cap = 234;
-				/*
-				if (activity.getCapacity() < cap) {
-					cap = activity.getCapacity();
-				}
-				*/
+				for (int i=0; i<this.numberOfTimeBins; i++) {
+					if (i < 7*this.numberOfTimeBins) {
+						this.capacity[i] = 0.0;
+					}
+					else if (i >=7*this.numberOfTimeBins && i < 9*this.numberOfTimeBins) {
+						this.capacity[i] = 0.05;
+					}
+					else if (i >= 9*this.numberOfTimeBins && i < 12*this.numberOfTimeBins) {
+						this.capacity[i] = 0.1;
+					}
+					else if (i >= 12*this.numberOfTimeBins && i < 14*this.numberOfTimeBins) {
+						this.capacity[i] = 0.075;
+					}
+					else if (i >= 14*this.numberOfTimeBins && i < 17*this.numberOfTimeBins) {
+						this.capacity[i] = 0.1;
+					}
+					else if (i >= 17*this.numberOfTimeBins && i < 20*this.numberOfTimeBins) {
+						this.capacity[i] = 0.05;
+					}
+					else if (i >= 20*this.numberOfTimeBins) {
+						this.capacity[i] = 0.0;
+					}
+					this.capacity[i] *= shopCapacity24;
+				}	
+				this.dailyCapacity = shopCapacity24;
 			}
 			if (activity.getType().startsWith("l")) {
-				cap = 615;
+				for (int i=0; i<this.numberOfTimeBins; i++) {
+					// no penalty at the moment
+					this.capacity[i] = leisureCapacity24/24.0;
+				}
+				this.dailyCapacity = leisureCapacity24;
 			}
 		}
-		return Math.max(10 , cap);
-	}
-
-	public int getCapacity() {
-		return this.capacity;
 	}
 	
 	public double getSumCapacityPenaltyFactor() {
 		return sumCapacityPenaltyFactor;
+	}
+	
+	public int getDailyCapacity() {
+		return dailyCapacity;
 	}
 
 	// ----------------------------------------------------
@@ -303,7 +326,7 @@ public class Facility extends AbstractLocation {
 	}
 
 	public void finish() {
-		this.capacity = this.getCapacityForShoppingAndLeisure();
+		this.setCapacityForShoppingAndLeisure();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -315,7 +338,4 @@ public class Facility extends AbstractLocation {
 		return super.toString() +
 		       "[nof_activities=" + this.activities.size() + "]";
 	}
-
-	
-
 }
