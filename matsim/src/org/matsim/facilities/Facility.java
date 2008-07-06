@@ -267,21 +267,32 @@ public class Facility extends AbstractLocation {
 	// We do not have shopping and leisure acts in ONE facility
 	// Give a constant cap at the moment, cap from facilitiesV3 are not useful.
 	// time dyn. der. from micro census, table G3.4
+	// summing up to shopCapacity24 * 1.0
 
 	private void setCapacityForShopping() {
 
-		int shopCapacity24 = 0;
+		double shopCapacity24 = 148.0;
 		
-		Iterator<Activity> act_it = this.getActivities().values().iterator();
-		while (act_it.hasNext()){
-			Activity activity = act_it.next();
-			if (activity.getType().startsWith("s")) {
-				shopCapacity24 = activity.getCapacity();
-				break;
-			}
+		final double a=1.0/Math.log(2500.0);
+
+		if (this.activities.containsKey("shop_retail_lt100sqm")) {
+			shopCapacity24 *= 1.0;
 		}
-		
-		act_it=this.activities.values().iterator();
+		else if (this.activities.containsKey("shop_retail_get100sqm")) {
+			shopCapacity24 *= 1.0+a*Math.log(100.0);
+		}
+		else if (this.activities.containsKey("shop_retail_get400sqm")) {
+			shopCapacity24 *= 1.0+a*Math.log(400.0);
+		}
+		else if (this.activities.containsKey("shop_retail_get1000sqm")) {
+			shopCapacity24 *= 1.0+a*Math.log(1000.0);
+		}
+		else if (this.activities.containsKey("shop_retail_gt2500sqm")) {
+			shopCapacity24 *= 1.0+a*Math.log(2500.0);
+		}
+	
+			
+		Iterator<Activity> act_it=this.activities.values().iterator();
 		while (act_it.hasNext()){
 			Activity activity = act_it.next();
 			if (activity.getType().startsWith("s")) {
@@ -309,7 +320,7 @@ public class Facility extends AbstractLocation {
 					}
 					this.capacity[i] *= shopCapacity24;
 				}	
-				this.dailyCapacity = shopCapacity24;
+				this.dailyCapacity = (int)shopCapacity24;
 			break;
 			}
 		}
