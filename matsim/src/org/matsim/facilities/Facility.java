@@ -54,6 +54,8 @@ public class Facility extends AbstractLocation {
 
 	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
 	private int numberOfVisitorsPerDay = 0;
+	
+	private int scaleNumberOfPersons = 1;
 
 	// TODO: Set number of time bins using parameterization
 	private final int numberOfTimeBins = 4*24;
@@ -99,11 +101,11 @@ public class Facility extends AbstractLocation {
 		return this.center.calcDistance(coord);
 	}
 
-	public void calculateFacilityLoad24(int scaleNumberOfPersons) {
+	private void calculateFacilityLoad24() {
 		int numberOfVisitors = 0;
 		for (int i=0; i<this.numberOfTimeBins; i++) {
 			numberOfVisitors += this.arrivals[i];
-			this.load[i] = numberOfVisitors*scaleNumberOfPersons;
+			this.load[i] = numberOfVisitors*this.scaleNumberOfPersons;
 			numberOfVisitors -= this.departures[i];
 		}
 	}
@@ -217,6 +219,10 @@ public class Facility extends AbstractLocation {
 	public void setSumCapacityPenaltyFactor(double sumCapacityPenaltyFactor) {
 		this.sumCapacityPenaltyFactor = sumCapacityPenaltyFactor;
 	}
+	
+	public void setScaleNumberOfPersons(int scaleNumberOfPersons) {
+		this.scaleNumberOfPersons = scaleNumberOfPersons;
+	}
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
@@ -266,26 +272,16 @@ public class Facility extends AbstractLocation {
 
 		int shopCapacity24 = 0;
 		
-		if (this.activities.containsKey("shop_retail_lt100sqm")) {
-			shopCapacity24 = 1;
-		}
-		else if (this.activities.containsKey("shop_retail_get100sqm")) {
-			shopCapacity24 = 1;
-		}
-		else if (this.activities.containsKey("shop_retail_get400sqm")) {
-			shopCapacity24 = 1;
-		}
-		else if (this.activities.containsKey("shop_retail_get1000sqm")) {
-			shopCapacity24 = 1;
-		}
-		else if (this.activities.containsKey("shop_retail_gt2500sqm")) {
-			shopCapacity24 = 1;
-		}
-		else {
-			shopCapacity24 = 1;
+		Iterator<Activity> act_it = this.getActivities().values().iterator();
+		while (act_it.hasNext()){
+			Activity activity = act_it.next();
+			if (activity.getType().startsWith("s")) {
+				shopCapacity24 = activity.getCapacity();
+				break;
+			}
 		}
 		
-		Iterator<Activity> act_it=this.activities.values().iterator();
+		act_it=this.activities.values().iterator();
 		while (act_it.hasNext()){
 			Activity activity = act_it.next();
 			if (activity.getType().startsWith("s")) {
@@ -314,6 +310,7 @@ public class Facility extends AbstractLocation {
 					this.capacity[i] *= shopCapacity24;
 				}	
 				this.dailyCapacity = shopCapacity24;
+			break;
 			}
 		}
 	}
@@ -340,6 +337,7 @@ public class Facility extends AbstractLocation {
 	public void finish() {
 		this.calculateAttrFactor();
 		this.setCapacityForShopping();
+		this.calculateFacilityLoad24();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -351,4 +349,5 @@ public class Facility extends AbstractLocation {
 		return super.toString() +
 		       "[nof_activities=" + this.activities.size() + "]";
 	}
+
 }

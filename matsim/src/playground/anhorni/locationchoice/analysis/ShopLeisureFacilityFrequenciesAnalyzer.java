@@ -129,7 +129,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 		
 		try {
 
-			final String header="Facility_id\tx\ty\tNumberOfVisitors\tCapacity";
+			final String header="Facility_id\tx\ty\tNumberOfVisitors\tDailyCapacity\tAttrFactor";
 
 			final BufferedWriter out = IOUtils.getBufferedWriter("./output/facFrequencies_"+type+".txt");
 			out.write(header);
