@@ -141,26 +141,26 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 				Facility facility = iter.next();
 				facility.finish();
 
-				if (facility.getNumberOfVisitorsPerDay() > 0) {
+				//if (facility.getNumberOfVisitorsPerDay() > 0) {
 					
-					boolean type_ok = false;
-					Iterator<Activity> act_it=facility.getActivities().values().iterator();
-					while (act_it.hasNext()){
-						Activity activity = act_it.next();
-						if (activity.getType().startsWith(type)) {
-							type_ok = true;
-						}
-					}
-					if (type_ok) {
-						out.write(facility.getId().toString()+"\t"+
-							String.valueOf(facility.getCenter().getX())+"\t"+
-							String.valueOf(facility.getCenter().getY())+"\t"+
-							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-							String.valueOf(facility.getDailyCapacity())+"\t"+
-							String.valueOf(facility.getAttrFactor()));
-						out.newLine();
+				boolean type_ok = false;
+				Iterator<Activity> act_it=facility.getActivities().values().iterator();
+				while (act_it.hasNext()){
+					Activity activity = act_it.next();
+					if (activity.getType().startsWith(type)) {
+						type_ok = true;
 					}
 				}
+				if (type_ok) {
+					out.write(facility.getId().toString()+"\t"+
+						String.valueOf(facility.getCenter().getX())+"\t"+
+						String.valueOf(facility.getCenter().getY())+"\t"+
+						String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
+						String.valueOf(facility.getDailyCapacity())+"\t"+
+						String.valueOf(facility.getAttrFactor()));
+					out.newLine();
+				}
+				//}
 				out.flush();
 			}
 			out.close();
