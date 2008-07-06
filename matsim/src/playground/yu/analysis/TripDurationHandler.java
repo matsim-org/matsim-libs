@@ -83,7 +83,12 @@ public class TripDurationHandler implements EventHandlerAgentDepartureI,
 			travelTimes += travelTime;
 			arrCount++;
 			tmpDptTimes.remove(agentId);
-			event.rebuild(plans, network);
+
+			if (event.agent == null) {
+				// rebuild event
+				event.agent = this.plans.getPerson(event.agentId);
+			}
+
 			Type planType = event.agent.getSelectedPlan().getType();
 			if (planType != null && Plan.Type.UNDEFINED != planType) {
 				if (planType.equals(Plan.Type.CAR)) {

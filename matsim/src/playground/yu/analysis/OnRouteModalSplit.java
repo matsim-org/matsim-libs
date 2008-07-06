@@ -138,7 +138,12 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 			int[] carCount, int[] ptCount, int[] otherCount) {
 		int binIdx = getBinIndex(ae.time);
 		allCount[binIdx]++;
-		ae.rebuild(this.plans, this.network);
+
+		if (ae.agent == null) {
+			// rebuild event
+			ae.agent = this.plans.getPerson(ae.agentId);
+		}
+		
 		Plan.Type planType = ae.agent.getSelectedPlan().getType();
 		if (Integer.parseInt(ae.agentId) > 1000000000)
 			otherCount[binIdx]++;

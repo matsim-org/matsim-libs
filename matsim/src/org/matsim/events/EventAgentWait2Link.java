@@ -21,10 +21,8 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -51,11 +49,6 @@ public class EventAgentWait2Link extends AgentEvent {
 	@Override
 	public String toString() {
 		return asString() + "4\twait2link";
-	}
-
-	@Override
-	public void rebuild(Plans population, NetworkLayer network) {
-		rebuildAgentData(population,network);
 	}
 
 }

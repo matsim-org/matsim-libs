@@ -10,11 +10,11 @@ import java.util.Map;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.EventLinkEnter;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
 
 import playground.yu.visum.filter.EventFilterA;
-import playground.yu.visum.filter.EventFilterI;
 import playground.yu.visum.writer.UserDefAtt;
 
 /**
@@ -23,8 +23,7 @@ import playground.yu.visum.writer.UserDefAtt;
  * 
  * @author ychen
  */
-public abstract class FinalEventFilterA extends EventFilterA implements
-		EventFilterI {
+public abstract class FinalEventFilterA extends EventFilterA {
 	/*-----------------------MEMBER VARIABLES---------------------*/
 	protected Plans plans;
 
@@ -63,8 +62,8 @@ public abstract class FinalEventFilterA extends EventFilterA implements
 	public EventLinkEnter rebuildEventLinkEnter(EventLinkEnter enter) {
 		// very important to rebuild LinkEventData Object: event, aim to get
 		// the id and the length of the right link
-		enter.rebuild(plans, network);
-		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		enter.agent = this.plans.getPerson(enter.agentId);
+		enter.link = (Link)network.getLocation(enter.linkId);
 		return enter;
 	}
 

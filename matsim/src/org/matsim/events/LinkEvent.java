@@ -26,7 +26,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.xml.sax.helpers.AttributesImpl;
 
-abstract class LinkEvent extends BasicEvent {
+public abstract class LinkEvent extends BasicEvent {
 
 	public String linkId;
 	public transient Link link;
@@ -51,8 +51,8 @@ abstract class LinkEvent extends BasicEvent {
 	protected AttributesImpl getAttributesImpl() {
 		AttributesImpl attr = new AttributesImpl();
 
-		long time = (long)this.time; // TODO [DS] switch to double for times
-		attr.addAttribute("","","time", "", Long.toString(time));
+		long lTime = (long)this.time; // TODO [DS] switch to double for times
+		attr.addAttribute("","","time", "", Long.toString(lTime));
 		attr.addAttribute("","","agent", "", this.agentId);
 		attr.addAttribute("","","link", "", this.linkId);
 		attr.addAttribute("","","leg", "", Integer.toString(this.legId));

@@ -20,9 +20,7 @@
 
 package org.matsim.events;
 
-import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 
@@ -42,8 +40,6 @@ public abstract class BasicEvent {
 	public abstract Attributes getAttributes();
 	@Override
 	public abstract String toString();
-
-	public abstract void rebuild(Plans population, NetworkLayer network);
 
 	protected static String getTimeString(final double time) {
 		if (time != timeCache) {

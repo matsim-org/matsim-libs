@@ -117,7 +117,12 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 			travelTimes[binIdx] += travelTime;
 			arrCount[binIdx]++;
 			tmpDptTimes.remove(agentId);
-			ae.rebuild(plans, network);
+
+			if (ae.agent == null) {
+				// rebuild event
+				ae.agent = this.plans.getPerson(ae.agentId);
+			}
+
 			Plan.Type planType = ae.agent.getSelectedPlan().getType();
 			if (planType != null && Plan.Type.UNDEFINED != planType) {
 				if (planType.equals(Plan.Type.CAR)) {

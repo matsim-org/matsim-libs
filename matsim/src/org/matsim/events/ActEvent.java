@@ -21,10 +21,8 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
 import org.xml.sax.helpers.AttributesImpl;
 
 abstract class ActEvent extends BasicEvent {
@@ -54,8 +52,8 @@ abstract class ActEvent extends BasicEvent {
 	protected AttributesImpl getAttributesImpl() {
 		AttributesImpl attr = new AttributesImpl();
 
-		long time = (long)this.time; // TODO [DS] output sollte auf "double" umgestellt werden
-		attr.addAttribute("", "", "time", "", Long.toString(time));
+		long lTime = (long)this.time; // TODO [DS] output sollte auf "double" umgestellt werden
+		attr.addAttribute("", "", "time", "", Long.toString(lTime));
 		attr.addAttribute("", "", "agent", "", this.agentId);
 		attr.addAttribute("", "", "link", "", this.linkId);
 		attr.addAttribute("", "", "activity", "", Integer.toString(this.actId));
@@ -67,9 +65,4 @@ abstract class ActEvent extends BasicEvent {
 		return getTimeString(this.time) + this.agentId + "\t0\t"+ this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
 	}
 
-	protected void rebuildActData(final Plans population, final NetworkLayer network) {
-		this.agent = population.getPerson(this.agentId);
-		this.link = (Link)network.getLocation(this.linkId);
-		this.act = (Act)this.agent.getSelectedPlan().getActsLegs().get(this.actId*2);
-	}
 }

@@ -21,10 +21,8 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -53,9 +51,4 @@ public class EventActivityStart extends ActEvent {
 		return asString() + "7\tactstart"+ " " + this.acttype;
 	}
 
-	@Override
-	public void rebuild(Plans population, NetworkLayer network) {
-		rebuildActData(population,network);
-
-	}
 }

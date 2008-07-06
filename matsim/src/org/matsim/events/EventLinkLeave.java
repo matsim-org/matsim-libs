@@ -21,9 +21,7 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -49,11 +47,6 @@ public class EventLinkLeave extends LinkEvent {
 	@Override
 	public String toString() {
 		return asString() + "2\tleft link";
-	}
-
-	@Override
-	public void rebuild(final Plans population, final NetworkLayer network) {
-		rebuildLinkData(population, network);
 	}
 
 }
