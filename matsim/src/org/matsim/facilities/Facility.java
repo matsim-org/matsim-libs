@@ -115,8 +115,8 @@ public class Facility extends AbstractLocation {
 
 		double capPenaltyFactor = 0.0;
 		//BPR
-		final double a=0.8;
-		final double b=8.0;
+		final double a=0.1;
+		final double b=2.0;
 		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
 			if (this.capacity[i] > 0) {
 			capPenaltyFactor += a*Math.pow(
@@ -271,7 +271,8 @@ public class Facility extends AbstractLocation {
 
 	private void setCapacityForShopping() {
 
-		double shopCapacity24 = 148.0;
+		// give a res. of 50%
+		double shopCapacity24 = 1.5*148.0;
 		
 		final double a=1.0/Math.log(2500.0);
 
