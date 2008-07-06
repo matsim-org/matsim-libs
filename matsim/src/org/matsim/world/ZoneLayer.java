@@ -59,16 +59,20 @@ public class ZoneLayer extends Layer {
 
 	public final Zone createZone(final String id, final String center_x, final String center_y,
 	                             final String min_x, final String min_y, final String max_x, final String max_y,
-	                             final String area, final String name) {
+	                             final String area, final String zoneName) {
 		Id i = new IdImpl(id);
 		if (this.locations.containsKey(i)) { Gbl.errorMsg(this.toString() + "[zone id=" + id + " already exists]"); }
 		CoordI center = null;
 		CoordI min = null;
 		CoordI max = null;
-		if ((center_x != null) && (center_y != null)) { center = new Coord(center_x,center_y); }
-		if ((min_x != null) && (min_y != null)) { min = new Coord(min_x,min_y); }
-		if ((max_x != null) && (max_y != null)) { max = new Coord(max_x,max_y); }
-		Zone z = new Zone(this,id,center,min,max,area,name);
+		if ((center_x != null) && (center_y != null)) { center = new Coord(center_x, center_y); }
+		if ((min_x != null) && (min_y != null)) { min = new Coord(min_x, min_y); }
+		if ((max_x != null) && (max_y != null)) { max = new Coord(max_x, max_y); }
+		Zone z = new Zone(this, new IdImpl(id), center, min, max);
+		if (area != null) {
+			z.setArea(Double.parseDouble(area));
+		}
+		z.setName(zoneName);
 		this.locations.put(i,z);
 		return z;
 	}

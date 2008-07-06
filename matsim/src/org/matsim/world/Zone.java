@@ -61,20 +61,16 @@ public class Zone extends AbstractLocation {
 		this.setName(null);
 	}
 
-	public Zone(final ZoneLayer layer, final Id id, final CoordI center,
-	               final CoordI min, final CoordI max, final double area, final String name) {
-		super(layer,id,center);
+	protected Zone(final ZoneLayer layer, final Id id, final CoordI center,
+			final CoordI min, final CoordI max) {
+		this(layer, id, center);
 		this.setMin(min);
 		this.setMax(max);
-		this.setArea(area);
-		this.setName(name);
 	}
 
-	protected Zone(final ZoneLayer layer, final String id, final CoordI center,
-	               final CoordI min, final CoordI max, final String area, final String name) {
-		super(layer,id,center);
-		this.setMin(min);
-		this.setMax(max);
+	public Zone(final ZoneLayer layer, final Id id, final CoordI center,
+	               final CoordI min, final CoordI max, final double area, final String name) {
+		this(layer, id, center, min, max);
 		this.setArea(area);
 		this.setName(name);
 	}
@@ -172,20 +168,6 @@ public class Zone extends AbstractLocation {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// reset methods
-	//////////////////////////////////////////////////////////////////////
-
-	// even it is written by myself, i do not like that...
-	// especially about the center. I start thinking that a center must be always defined.
-	// that would help in many aspects... well... will see. balmermi
-//	public final void resetAttributes() {
-//		this.center = null;
-//		this.min = null;
-//		this.max = null;
-//		this.area = Double.NaN;
-//	}
-
-	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
@@ -194,42 +176,18 @@ public class Zone extends AbstractLocation {
 		this.area = area;
 	}
 
-	public final void setArea(final String area) {
-		if (area != null) { this.setArea(Double.parseDouble(area)); }
-	}
-
 	public final void setName(final String name) {
 		this.name = name;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-
 	public final void setMin(final CoordI min) {
 		if ((min != null) && (min.getX() <= this.center.getX()) && (min.getY() <= this.center.getY())) { this.min = min; }
-		else { this.min = center; }
+		else { this.min = this.center; }
 	}
-
-	public final void setMin(final double x, final double y) {
-		this.setMin(new Coord(x,y));
-	}
-
-	protected final void setMin(final String x, final String y) {
-		if ((x != null) && (y != null)) { this.setMin(new Coord(x,y)); }
-	}
-
-	//////////////////////////////////////////////////////////////////////
 
 	public final void setMax(final CoordI max) {
 		if ((max != null) && (max.getX() >= this.center.getX()) && (max.getY() >= this.center.getY())) { this.max = max; }
-		else { this.max = center; }
-	}
-
-	public final void setMax(final double x, final double y) {
-		this.setMax(new Coord(x,y));
-	}
-
-	protected final void setMax(final String x, final String y) {
-		if ((x != null) && (y != null)) { this.setMax(new Coord(x,y)); }
+		else { this.max = this.center; }
 	}
 
 	//////////////////////////////////////////////////////////////////////
