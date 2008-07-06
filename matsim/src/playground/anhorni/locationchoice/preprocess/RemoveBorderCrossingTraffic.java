@@ -46,7 +46,7 @@ public class RemoveBorderCrossingTraffic extends Modifier {
 			Id id = id_it.next();
 			this.plans.getPersons().remove(id);
 		}
-		log.info("Removed " + toRemoveList.size()+ "persons");
+		log.info("Removed " + toRemoveList.size()+ " persons");
 		log.info("RemoveBorderCrossingTraffic done.");
 	}
 }
