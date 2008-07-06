@@ -113,7 +113,7 @@ public class Knowledge {
 		return false;
 	}
 
-	public final boolean removeActivites(final String act_type) {
+	public final boolean removeActivities(final String act_type) {
 		boolean removed = false;
 		for (int i=0; i<this.activities.size(); i++) {
 			Activity a = this.activities.get(i);
