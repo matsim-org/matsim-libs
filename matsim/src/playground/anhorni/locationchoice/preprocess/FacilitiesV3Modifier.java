@@ -10,8 +10,6 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.misc.Counter;
 
-import playground.balmermi.algos.PersonXY2Facility;
-
 public class FacilitiesV3Modifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(FacilitiesV3Modifier.class);
@@ -35,7 +33,7 @@ public class FacilitiesV3Modifier extends Modifier {
 	}
 
 	private void setFacilitiesV3() {
-		PersonXY2Facility personXY2Facility=new PersonXY2Facility(this.facilities);
+		PersonXY2Facilitychanged personXY2Facility=new PersonXY2Facilitychanged(this.facilities);
 
 		log.info("running FacilitiesV3Modifier:");
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();

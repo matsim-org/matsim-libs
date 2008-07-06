@@ -35,11 +35,13 @@ public class LocationModifier extends Modifier {
 	}
 
 	private void initShopLeisure(){
+		
 		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_gt2500sqm"));
 		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get1000sqm"));
 		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get400sqm"));
 		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get100sqm"));
-		this.shop_facilities.putAll(this.facilities.getFacilities("shop_other"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_lt100sqm"));
+		//this.shop_facilities.putAll(this.facilities.getFacilities("shop_other"));
 
 		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_gastro"));
 		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_culture"));
