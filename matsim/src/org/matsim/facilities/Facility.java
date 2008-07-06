@@ -272,7 +272,7 @@ public class Facility extends AbstractLocation {
 				}
 			}
 		}
-		return Math.max(1 , cap);
+		return Math.max(10 , cap);
 	}
 
 	public int getCapacity() {
