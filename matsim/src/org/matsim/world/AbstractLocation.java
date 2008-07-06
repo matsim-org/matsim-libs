@@ -24,12 +24,10 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Basic geographical class in MATSim.
@@ -79,54 +77,16 @@ public abstract class AbstractLocation implements Location {
 		}
 	}
 
-	/**
-	 * A unique location for a given layer.
-	 * @param layer The layer the location belongs to.
-	 * @param id The unique id of that location.
-	 * @param center_x
-	 * @param center_y
-	 */
-	protected AbstractLocation(final Layer layer, final Id id, final double center_x, final double center_y) {
-		this(layer,id,new Coord(center_x,center_y));
-	}
-
-	/**
-	 * A unique location for a given layer.
-	 * @param layer The layer the location belongs to.
-	 * @param id The unique id of that location.
-	 * @param center_x
-	 * @param center_y
-	 */
-	protected AbstractLocation(final Layer layer, final String id, final String center_x, final String center_y) {
-		this(layer,id,new Coord(center_x,center_y));
-	}
-
-	/**
-	 * A unique location for a given layer.
-	 * @param layer The layer the location belongs to.
-	 * @param id The unique id of that location.
-	 * @param center The center of that location. Does not have to be the middle of the location object.
-	 */
-	protected AbstractLocation(final Layer layer, final String id, final CoordI center) {
-		this(layer,new IdImpl(id),center);
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#calcDistance(org.matsim.utils.geometry.CoordI)
-	 */
 	public abstract double calcDistance(final CoordI coord);
 
 	//////////////////////////////////////////////////////////////////////
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
-	/* (non-Javadoc)
-	 * @see org.matsim.world.Location#addUpMapping(org.matsim.world.Location)
-	 */
 	public final void addUpMapping(final Location other) {
 		if (this.layer.getUpRule() == null) {
 			Gbl.errorMsg(this.toString() + "[other=" + other + " has no up_rule]");

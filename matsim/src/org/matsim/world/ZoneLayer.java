@@ -45,12 +45,8 @@ public class ZoneLayer extends Layer {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected ZoneLayer(final String type, final String name) {
-		super(type,name);
-	}
-
 	protected ZoneLayer(final Id type, final String name) {
-		super(type,name);
+		super(type, name);
 	}
 
 	//////////////////////////////////////////////////////////////////////

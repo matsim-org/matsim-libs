@@ -24,6 +24,7 @@ import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.AbstractLocation;
 
 public class BasicLinkImpl
@@ -45,8 +46,9 @@ implements BasicLink
 	// by the to- and from-node, they HAVE to contain a coordinate. (see also BasicNode)
 	// If this is not O.K., then the BasicLink must not extend Location.
 	public BasicLinkImpl(final NetworkLayer network, final Id id, final BasicNode from, final BasicNode to) {
-		super(network,id,0.5*(from.getCoord().getX()+to.getCoord().getX()),
-		                 0.5*(from.getCoord().getY()+to.getCoord().getY()));
+		super(network, id, 
+				new Coord(0.5*(from.getCoord().getX() + to.getCoord().getX()), 0.5*(from.getCoord().getY() + to.getCoord().getY()))
+		);
 		this.from = from;
 		this.to = to;
 	}

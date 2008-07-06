@@ -46,7 +46,7 @@ public class PolygonZoneLayer extends Layer{
 	//////////////////////////////////////////////////////////////////////
 
 	protected PolygonZoneLayer(final String type, final String name) {
-		super(type,name);
+		super(new IdImpl(type),name);
 	}
 
 	protected PolygonZoneLayer(final Id type, final String name) {
