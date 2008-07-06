@@ -261,6 +261,7 @@ public class Facility extends AbstractLocation {
 
 	// We do not have shopping and leisure acts in ONE facility
 	// Give a constant cap at the moment, cap from facilitiesV3 are not useful.
+	// peak cap = 10 % of day cap
 	private int getCapacityForShoppingAndLeisure() {
 		int cap = Integer.MAX_VALUE;
 
@@ -268,7 +269,7 @@ public class Facility extends AbstractLocation {
 		while (act_it.hasNext()){
 			Activity activity = act_it.next();
 			if (activity.getType().startsWith("s")) {
-				cap = 24;
+				cap = 234;
 				/*
 				if (activity.getCapacity() < cap) {
 					cap = activity.getCapacity();
@@ -276,7 +277,7 @@ public class Facility extends AbstractLocation {
 				*/
 			}
 			if (activity.getType().startsWith("l")) {
-				cap = 62;
+				cap = 615;
 			}
 		}
 		return Math.max(10 , cap);
