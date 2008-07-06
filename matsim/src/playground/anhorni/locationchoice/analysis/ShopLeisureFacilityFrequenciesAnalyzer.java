@@ -24,8 +24,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -39,6 +41,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
+import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Counter;
 
@@ -53,6 +56,10 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 	private Plans plans=null;
 	private NetworkLayer network=null;
 	private Facilities  facilities =null;
+	private TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
+	private TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
+	private QuadTree<Facility> shopFacQuadTree = null;
+	private QuadTree<Facility> leisFacQuadTree = null;
 
 	private final static Logger log = Logger.getLogger(ShopLeisureFacilityFrequenciesAnalyzer.class);
 
@@ -63,11 +70,12 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 	 */
 	public static void main(String[] args) {
 
-		if (args.length < 1 || args.length > 1 ) {
+		if (args.length < 2 || args.length > 2 ) {
 			System.out.println("Too few or too many arguments. Exit");
 			System.exit(1);
 		}
 		String plansfilePath = args[0];
+		String reducedArea = args[1];
 		String type[] = {"s", "l"};
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
@@ -80,7 +88,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 		
 		for (int i=0; i<2; i++) {		
 			analyzer.collectAgents(type[i]);
-			analyzer.writeFacilityFrequencies(type[i]);
+			analyzer.writeFacilityFrequencies(type[i], reducedArea);
 		}	
 	}
 
@@ -96,6 +104,23 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 		this.facilities=(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
+		
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_gt2500sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get1000sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get400sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_get100sqm"));
+		this.shop_facilities.putAll(this.facilities.getFacilities("shop_retail_lt100sqm"));
+		//this.shop_facilities.putAll(this.facilities.getFacilities("shop_other"));
+
+		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_gastro"));
+		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_culture"));
+		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_sports"));
+
+		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
+		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);
+		
+		log.info("Total number of ch shop facilities:" + this.shop_facilities.size());
+		log.info("Total number of ch leisure facilities:" + this.leisure_facilities.size());
 
 		this.plans=new Plans(false);
 		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
@@ -103,6 +128,9 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 		log.info("plans reading done");
 	}
 
+	
+	
+	
 	private void collectAgents(String type) {
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
@@ -123,7 +151,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 		}
 	}
 
-	private void writeFacilityFrequencies(String type) {
+	private void writeFacilityFrequencies(String type, String reducedArea) {
 
 		log.info("writting " + type + " facilities");
 		
@@ -135,8 +163,21 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 			out.write(header);
 			out.newLine();
 
-			// take all facilities which are not 0. Change to getFac(type)
-			Iterator<? extends Facility> iter = this.facilities.iterator();
+			Iterator<? extends Facility> iter = null;
+			if (reducedArea.equals("0")) {
+				log.info("complete area");
+				iter = this.facilities.iterator();
+			}
+			else {
+				if (type.equals("s")) {
+					log.info("reduced area: shop facilities");
+					iter = this.shopFacQuadTree.get(683508.50, 246832.91, 30000).iterator();
+				}
+				else {
+					log.info("reduced area: leisure facilities");
+					iter = this.leisFacQuadTree.get(683508.50, 246832.91, 30000).iterator();
+				}
+			}
 			while (iter.hasNext()){
 				Facility facility = iter.next();
 				facility.finish();
@@ -200,4 +241,32 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 			}
 		}
 	}
+
+	private QuadTree<Facility> builFacQuadTree(TreeMap<Id,Facility> facilities_of_type) {
+		Gbl.startMeasurement();
+		System.out.println("      building facility quad tree...");
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		for (final Facility f : facilities_of_type.values()) {
+			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
+			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
+			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
+			if (f.getCenter().getY() > maxy) { maxy = f.getCenter().getY(); }
+		}
+		minx -= 1.0;
+		miny -= 1.0;
+		maxx += 1.0;
+		maxy += 1.0;
+		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+		QuadTree<Facility> quadtree = new QuadTree<Facility>(minx, miny, maxx, maxy);
+		for (final Facility f : facilities_of_type.values()) {
+			quadtree.put(f.getCenter().getX(),f.getCenter().getY(),f);
+		}
+		System.out.println("      done.");
+		Gbl.printRoundTime();
+		return quadtree;
+	}
 }
+
