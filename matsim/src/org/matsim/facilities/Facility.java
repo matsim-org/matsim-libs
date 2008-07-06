@@ -80,11 +80,13 @@ public class Facility extends AbstractLocation {
 		this.arrivals = new int [this.numberOfTimeBins];
 		this.departures = new int [this.numberOfTimeBins];
 		this.load = new int [this.numberOfTimeBins];
+		this.capacity = new double [this.numberOfTimeBins];
 
 		for (int i=0; i<this.numberOfTimeBins; i++){
 			this.arrivals[i] = 0;
 			this.departures[i] = 0;
 			this.load[i] = 0;
+			this.capacity[i] = 0.0;
 		}
 	}
 
@@ -148,7 +150,7 @@ public class Facility extends AbstractLocation {
 		else if (this.activities.containsKey("shop_retail_get1000sqm")) {
 			this.attrFactor = 1.0+a*Math.log(1000.0);
 		}
-		else if (this.activities.containsKey("shop_retail_get2500sqm")) {
+		else if (this.activities.containsKey("shop_retail_gt2500sqm")) {
 			this.attrFactor = 1.0+a*Math.log(2500.0);
 		}
 		else if (this.activities.containsKey("shop_other")) {
@@ -238,7 +240,6 @@ public class Facility extends AbstractLocation {
 	}
 
 	public double getAttrFactor() {
-		this.calculateAttrFactor();
 		return this.attrFactor;
 	}
 
@@ -261,10 +262,28 @@ public class Facility extends AbstractLocation {
 	// Give a constant cap at the moment, cap from facilitiesV3 are not useful.
 	// time dyn. der. from micro census, table G3.4
 
-	private void setCapacityForShoppingAndLeisure() {
+	private void setCapacityForShopping() {
 
-		int shopCapacity24 = 24;
-		int leisureCapacity24 = 62;
+		int shopCapacity24 = 0;
+		
+		if (this.activities.containsKey("shop_retail_lt100sqm")) {
+			shopCapacity24 = 1;
+		}
+		else if (this.activities.containsKey("shop_retail_get100sqm")) {
+			shopCapacity24 = 1;
+		}
+		else if (this.activities.containsKey("shop_retail_get400sqm")) {
+			shopCapacity24 = 1;
+		}
+		else if (this.activities.containsKey("shop_retail_get1000sqm")) {
+			shopCapacity24 = 1;
+		}
+		else if (this.activities.containsKey("shop_retail_gt2500sqm")) {
+			shopCapacity24 = 1;
+		}
+		else {
+			shopCapacity24 = 1;
+		}
 		
 		Iterator<Activity> act_it=this.activities.values().iterator();
 		while (act_it.hasNext()){
@@ -296,13 +315,6 @@ public class Facility extends AbstractLocation {
 				}	
 				this.dailyCapacity = shopCapacity24;
 			}
-			if (activity.getType().startsWith("l")) {
-				for (int i=0; i<this.numberOfTimeBins; i++) {
-					// no penalty at the moment
-					this.capacity[i] = leisureCapacity24/24.0;
-				}
-				this.dailyCapacity = leisureCapacity24;
-			}
 		}
 	}
 	
@@ -326,7 +338,8 @@ public class Facility extends AbstractLocation {
 	}
 
 	public void finish() {
-		this.setCapacityForShoppingAndLeisure();
+		this.calculateAttrFactor();
+		this.setCapacityForShopping();
 	}
 
 	//////////////////////////////////////////////////////////////////////
