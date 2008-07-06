@@ -84,7 +84,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	private void printStatistics(Facilities facilities, String iterationPath, int iteration) {
 
 		try {
-			final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tCapacity";
+			final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tCapacity\tAttrFactor\tavgPenaltyFactor";
 			final BufferedWriter out_shop = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_shop.txt");
 			final BufferedWriter out_leisure = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_leisure.txt");
 
@@ -107,7 +107,9 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 							String.valueOf(facility.getCenter().getX())+"\t"+
 							String.valueOf(facility.getCenter().getY())+"\t"+
 							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-							String.valueOf(facility.getCapacity()));
+							String.valueOf(facility.getCapacity())+"\t"+
+							String.valueOf(facility.getAttrFactor()+"\t"+
+							String.valueOf(facility.getSumCapacityPenaltyFactor()/facility.getNumberOfVisitorsPerDay())));
 						out_shop.newLine();						
 						break;
 					}
@@ -120,7 +122,10 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 							String.valueOf(facility.getCenter().getX())+"\t"+
 							String.valueOf(facility.getCenter().getY())+"\t"+
 							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-							String.valueOf(facility.getCapacity()));
+							String.valueOf(facility.getCapacity())+"\t"+
+							String.valueOf(1.0)+"\t"+
+							String.valueOf(0.0));
+						
 						out_leisure.newLine();
 							
 						break;
