@@ -259,17 +259,24 @@ public class Facility extends AbstractLocation {
 		return calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
 	}
 
-	//we do not have shopping and leisure acts in ONE facility
+	// We do not have shopping and leisure acts in ONE facility
+	// Give a constant cap at the moment, cap from facilitiesV3 are not useful.
 	private int getCapacityForShoppingAndLeisure() {
 		int cap = Integer.MAX_VALUE;
 
 		Iterator<Activity> act_it=this.activities.values().iterator();
 		while (act_it.hasNext()){
 			Activity activity = act_it.next();
-			if (activity.getType().startsWith("s") || activity.getType().startsWith("l")) {
+			if (activity.getType().startsWith("s")) {
+				cap = 24;
+				/*
 				if (activity.getCapacity() < cap) {
 					cap = activity.getCapacity();
 				}
+				*/
+			}
+			if (activity.getType().startsWith("l")) {
+				cap = 62;
 			}
 		}
 		return Math.max(10 , cap);
