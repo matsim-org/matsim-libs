@@ -115,8 +115,8 @@ public class Facility extends AbstractLocation {
 
 		double capPenaltyFactor = 0.0;
 		//BPR
-		final double a=0.1;
-		final double b=2.0;
+		final double a=1.0/Math.pow(1.5, 5);
+		final double b=5.0;
 		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
 			if (this.capacity[i] > 0) {
 			capPenaltyFactor += a*Math.pow(
