@@ -1,11 +1,16 @@
 package org.matsim.utils.vis.otfvis.opengl.gui;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 
@@ -16,12 +21,14 @@ import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 
+// DS TODO should not be an OTFDrawer, need to handle invalidate better
 public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, ItemListener, ChangeListener {
 
 	/**
@@ -30,6 +37,8 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	private static final long serialVersionUID = 1L;
 	private final OTFHostControlBar hostControl;
 	private JSlider times;
+	Collection<Integer> cachedTime =  new ArrayList<Integer>();
+	
     Hashtable<Integer, JLabel> labelTable = 
         new Hashtable<Integer, JLabel>();
 	
@@ -44,19 +53,43 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		button.setText("[");
 		button.setActionCommand("setLoopStart");
 		button.addActionListener(this);
-	    button.setToolTipText("Sets the loop times");
+	    button.setToolTipText("Sets the loop start time");
 	    add(button);
 	    
 		button = new JButton();
 		button.setText("]");
 		button.setActionCommand("setLoopEnd");
 		button.addActionListener(this);
-	    button.setToolTipText("Sets the loop times");
+	    button.setToolTipText("Sets the loop end time");
 
 	    add(button);
 	    this.setVisible(true);
 	}
 
+	public class MyJSlider extends JSlider {
+		public MyJSlider(int horizontal, int intValue, int intValue2, int time) {
+			super(horizontal,intValue, intValue2, time);
+		}
+
+		@Override
+		public void paint(Graphics g) {
+	       Graphics2D g2 = (Graphics2D) g;
+	        super.paint(g);
+	        Rectangle bounds = g.getClipBounds();
+	        bounds.grow(-32, 0);
+	        
+	        BasicSliderUI ui = (BasicSliderUI)getUI();
+	        double delta = getMaximum() - getMinimum();
+	        // get cached timesteps fomr hostctrl and draw them
+	        synchronized (cachedTime) {
+		        for(Integer time : cachedTime) {
+		        	g.setColor(Color.LIGHT_GRAY);
+		        	g.fillRect(bounds.x + (int)(bounds.width*((time- getMinimum())/delta)), (int)bounds.getCenterY(), 5, 5);
+		        }
+	        }
+	}
+	}
+	  
 	void replaceLabel(String label, int newEnd) {
 		for (Integer i : labelTable.keySet() ) {
 			JLabel value = labelTable.get(i);
@@ -105,10 +138,10 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		   Collection<Double> steps = hostControl.getTimeSteps();
 		   Double[] dsteps = steps.toArray(new Double[0]);
 	       
-		   times = new JSlider(JSlider.HORIZONTAL,  dsteps[0].intValue(), dsteps[dsteps.length-1].intValue(), (int)hostControl.getTime());
+		   times = new MyJSlider(JSlider.HORIZONTAL,  dsteps[0].intValue(), dsteps[dsteps.length-1].intValue(), (int)hostControl.getTime());
 	        
 	        times.addChangeListener(this);
-	        times.setMajorTickSpacing(dsteps[0].intValue()-dsteps[dsteps.length-1].intValue()/10);
+	        times.setMajorTickSpacing((dsteps[0].intValue()-dsteps[dsteps.length-1].intValue())/10);
 	        times.setPaintTicks(true);
 	        
 	        //Create the label table.
@@ -154,8 +187,29 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		
 	}
 
+	public void handleClick(Rectangle currentRect, int button) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public void invalidate(int time) throws RemoteException {
-		times.setValue(time);
+		if(time >= 0) times.setValue(time);
+		else {
+	        synchronized (cachedTime) {
+				cachedTime.add(-time);
+				  times.repaint();
+	        }
+		}
+	}
+
+	public void setCachedTime(int time) throws RemoteException {
+		if(time == -1) cachedTime.clear();
+		else {
+	        synchronized (cachedTime) {
+				cachedTime.add(time);
+				  times.repaint();
+	        }
+		}
 	}
 
 	public void redraw() {

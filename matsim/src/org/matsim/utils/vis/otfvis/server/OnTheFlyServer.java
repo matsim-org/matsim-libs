@@ -81,11 +81,11 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private final Object paused = new Object();
 	private final Object stepDone = new Object();
 	private final Object updateFinished = new Object();
-	public boolean updateState = false;
 	private int localTime = 0;
 
 	private final Map<String, QuadStorage> quads = new HashMap<String, QuadStorage>();
 	public Set<String> updateThis = new HashSet<String>();
+	public Set<OTFQuery> queryThis = new HashSet<OTFQuery>();
 
 	private final OTFNetHandler handler = null;
 	private transient Plans pop = null;
@@ -179,23 +179,28 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 	private double lastTime = -1.0;
 	public void updateOut(double time) {
-			for(String id : updateThis) {
-				buf.position(0);
-				QuadStorage act = quads.get(id);
-				act.quad.writeDynData(act.rect, buf);
-				act.buffer = buf.array();
-			}
-			updateThis.clear();
+		for(String id : updateThis) {
+			buf.position(0);
+			QuadStorage act = quads.get(id);
+			act.quad.writeDynData(act.rect, buf);
+			act.buffer = buf.array();
+		}
+		updateThis.clear();
+
+		for(OTFQuery query : queryThis) {
+			query.query(network, pop, events);
+		}
+		queryThis.clear();
+		
 		lastTime = time;
 	}
 
 	public int updateStatus(double time){
 		localTime = (int)time;
 
-		if (updateThis.size() != 0) {
+		if (updateThis.size() != 0 || queryThis.size() != 0 ) {
 			synchronized (updateFinished) {
 				updateOut(time);
-				updateState = false;
 				updateFinished.notifyAll();
 			}
 		}
@@ -284,37 +289,12 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		status = PAUSE;
 	}
 
-	public  byte[] getStateBuffer() throws RemoteException {
-		updateState = true;
-		if (status == PAUSE) step();
-
-		if (updateState) {
-			try {
-				synchronized (updateFinished) {
-					updateFinished.wait();
-				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		byte [] result;
-		synchronized (out) {
-			result = out.toByteArray();
-		}
-		return result;
-	}
 
 	public int getLocalTime() throws RemoteException {
 		return localTime;
 	}
 	
 
-	public OTFQuery answerQuery(org.matsim.utils.vis.otfvis.interfaces.OTFQuery query) throws RemoteException {
-		query.query(network, pop, events);
-		return query;
-	}
-	
 
 	public boolean isLive() {
 		return true;
@@ -378,6 +358,25 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		return updateQuad.buffer;
 	}
 
+	public OTFQuery answerQuery(org.matsim.utils.vis.otfvis.interfaces.OTFQuery query) throws RemoteException {
+		if (status == PAUSE) {
+			query.query(network, pop, events);
+		} else {
+			// otherwise == PLAY, we need to sort this into the array of demanding queries and then they will be answered next in getStatus is called
+			try {
+				synchronized (updateFinished) {
+					queryThis.add(query);
+					updateFinished.wait();
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return query;
+	}
+	
 	public Collection<Double> getTimeSteps() throws RemoteException {
 		// There are no timesteps implemented here right now, so we return null instead 
 		return null;

@@ -40,7 +40,7 @@ public class QueryAgentActivityStatus implements OTFQuery{
 	 */
 	private static final long serialVersionUID = -8532403277319196797L;
 
-	public final String agentID;
+	public String agentID;
 
 	boolean calcOffset = true;
 
@@ -48,11 +48,6 @@ public class QueryAgentActivityStatus implements OTFQuery{
 	//out
 	int activityNr = -1;
 	double finished = 0;
-
-	public QueryAgentActivityStatus(String agentID, double d) {
-		this.agentID = agentID;
-		this.now = d;
-	}
 
 	public void query(QueueNetworkLayer net, Plans plans, Events events) {
 		Person person = plans.getPerson(this.agentID);
@@ -90,4 +85,19 @@ public class QueryAgentActivityStatus implements OTFQuery{
 
 	}
 
+	public boolean isAlive() {
+		return false;
+	}
+
+	public Type getType() {
+		return OTFQuery.Type.AGENT;
+	}
+
+	public void setId(String id) {
+		this.agentID = id;
+	}
+
+	public void setNow(double now) {
+		this.now = now;
+	}
 }

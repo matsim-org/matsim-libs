@@ -88,10 +88,10 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private double minEasting;
-	private double maxEasting;
-	private double minNorthing;
-	private double maxNorthing;
+	protected double minEasting;
+	protected double maxEasting;
+	protected double minNorthing;
+	protected double maxNorthing;
 	transient private QueueNetworkLayer net;
 
 	// Change this, find better way to transport this info into Writers

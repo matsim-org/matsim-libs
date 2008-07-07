@@ -35,9 +35,6 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 
-import org.matsim.utils.vis.otfvis.opengl.gl.InfoText;
-
-
 import com.sun.opengl.util.j2d.TextRenderer;
 
 public  class InfoText {
@@ -176,7 +173,7 @@ public  class InfoText {
 	public static void drawInfoTexts(GLAutoDrawable drawable) {
 		for (InfoText text : elements) {
 			text.y += 1;
-			text.setAlpha(text.getAlpha() - 0.02f);
+			text.setAlpha(Math.max(text.getAlpha() - 0.02f, 0));
 			if (renderer != null) text.draw(drawable);
 		}
 		

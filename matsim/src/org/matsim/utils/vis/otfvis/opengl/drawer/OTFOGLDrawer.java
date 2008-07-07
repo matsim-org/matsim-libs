@@ -30,7 +30,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +49,6 @@ import javax.media.opengl.GLContext;
 import javax.media.opengl.GLEventListener;
 import javax.swing.JFrame;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.collections.QuadTree;
@@ -60,15 +61,10 @@ import org.matsim.utils.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.utils.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.utils.vis.otfvis.opengl.gui.VisGUIMouseHandler;
-import org.matsim.utils.vis.otfvis.opengl.queries.QueryAgentId;
-import org.matsim.utils.vis.otfvis.opengl.queries.QueryAgentPlan;
-import org.matsim.utils.vis.otfvis.opengl.queries.QueryLinkId;
-import org.matsim.utils.vis.otfvis.opengl.queries.QuerySpinne;
 
 import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
@@ -104,7 +100,7 @@ abstract class OGLSceneLayerImpl implements SceneLayer{
 
 }
 
-public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener, OGLProvider{
+public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	private static int linkTexWidth = 0;
 	private static float agentSize = 10.f;
 	//private static float scaledAgentSize = 10.f;
@@ -122,7 +118,6 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 	private final List<OTFGLDrawable> netItems = new ArrayList<OTFGLDrawable>();
 	private final List<OTFGLDrawable> agentItems = new ArrayList<OTFGLDrawable>();
 	//private final List<OTFGLDrawable> otherItems = new ArrayList<OTFGLDrawable>();
-	private final List<OTFQuery> queryItems = new ArrayList<OTFQuery>();
 
 	//private final SimpleBackgroundDrawer background = null;
 
@@ -131,6 +126,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 	private StatusTextDrawer statusDrawer = null;
 
 	private OTFVisConfig config = null;
+	private OTFQueryHandler queryHandler = null;
 
 	public static class StatusTextDrawer {
 
@@ -172,18 +168,6 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 
 	}
 
-	synchronized public void addQuery(OTFQuery query) {
-		this.queryItems.add(query);
-		redraw();
-	}
-
-	synchronized public void removeQueries(){
-		for(OTFQuery query : this.queryItems){
-			if(query != null) query.remove();
-		}
-		this.queryItems.clear();
-		redraw();
-	}
 
 	public static class FastColorizer {
 
@@ -314,6 +298,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 
 	protected static volatile GLContext motherContext = null;
 
+	
 	public OTFOGLDrawer(JFrame frame, OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
 		GLCapabilities caps = new GLCapabilities();
@@ -344,7 +329,7 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 		linkTexWidth = size;
 
 		this.config = (OTFVisConfig) Gbl.getConfig().getModule("otfvis");
-	}
+		}
 
 	public static void addItem(OTFGLDrawable item) {
 		newItems.add(item);
@@ -397,8 +382,8 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 
 		if ( this.actGraph != null) this.actGraph.draw();
 
-		for(OTFQuery query : this.queryItems) query.draw(this);
-
+		if(queryHandler != null) queryHandler.drawQueries(this);
+		
 //		if(background != null) {
 //			background.onDraw(gl);
 //		}
@@ -478,53 +463,15 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 		this.statusDrawer = new StatusTextDrawer(drawable);
 	}
 
-	public void handleIdQuery(String id, String query) {
-		OTFQuery marked = null;
-		if (query.equals("Agent")) {
-			marked = this.clientQ.doQuery(new QueryAgentPlan(id));
-		} else if (query.equals("Spinne")) {
-				marked =  this.clientQ.doQuery(new QuerySpinne(new IdImpl(id)));
-		}
-
-		if (marked != null) {
-			boolean clearSelected = !((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).isMultipleSelect();
-			if (clearSelected) removeQueries();
-			this.queryItems.add(marked);
-		}
-		redraw();
-	}
-	
-	public OTFQuery handleQuery(OTFQuery query) {
-		return clientQ.doQuery(query);
-	}
 
 	public void handleClick(Point2D.Double point, int mouseButton) {
-		if (mouseButton == 3) {
-			removeQueries();
-			redraw();
-		} else if (mouseButton == 1) {
-			String query = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getQueryType();
+		Point2D.Double origPoint = new Point2D.Double(point.x + this.clientQ.offsetEast, point.y + this.clientQ.offsetNorth);
+		if(queryHandler != null) queryHandler.handleClick(origPoint, mouseButton);
+	}
 
-			if (query.equals("Agent")) {
-				Point2D.Double origPoint = new Point2D.Double(point.x + this.clientQ.offsetEast, point.y + this.clientQ.offsetNorth);
-				QueryAgentId agentIdQuery = (QueryAgentId)this.clientQ.doQuery(new QueryAgentId(origPoint.x, origPoint.y));
-				if ((agentIdQuery != null) && (agentIdQuery.agentId != null)) {
-					System.out.println("AgentId = " + agentIdQuery.agentId);
-					handleIdQuery(agentIdQuery.agentId, query);
-				} else {
-					System.out.println("No AgentId found!");
-				}
-			} else if (query.equals("Spinne")) {
-				Point2D.Double origPoint = new Point2D.Double(point.x + this.clientQ.offsetEast, point.y + this.clientQ.offsetNorth);
-				QueryLinkId linkIdQuery = (QueryLinkId)this.clientQ.doQuery(new QueryLinkId(origPoint.x, origPoint.y));
-				if ((linkIdQuery != null) && (linkIdQuery.linkId != null)) {
-					System.out.println("LinkId = " + linkIdQuery.linkId);
-					handleIdQuery(linkIdQuery.linkId, query);
-				} else {
-					System.out.println("No LinkId found!");
-				}
-			}
-		}
+	public void handleClick(Rectangle currentRect, int button) {
+		Rectangle2D.Double origRect = new Rectangle2D.Double(currentRect.x + this.clientQ.offsetEast, currentRect.y + this.clientQ.offsetNorth, currentRect.width, currentRect.height);
+		if(queryHandler != null) queryHandler.handleClick(origRect, button);
 	}
 
 	/***
@@ -586,8 +533,8 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 		}
 		// Todo put drawing to displyLists here and in
 		// display(gl) we only display the two lists
-
-
+		
+		if(queryHandler != null) queryHandler.updateQueries();
         //this.isValid = false;
 		redraw();
 	}
@@ -646,5 +593,13 @@ public class OTFOGLDrawer implements OTFDrawer, OTFQueryHandler, GLEventListener
 	public void clearCache() {
 		if (clientQ != null) clientQ.clearCache();
 	}
+
+	/**
+	 * @param queryHandler the queryHandler to set
+	 */
+	public void setQueryHandler(OTFQueryHandler queryHandler) {
+		if(queryHandler != null) this.queryHandler = queryHandler;
+	}
+
 
 }

@@ -162,6 +162,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 			//InfoText.showText("Loaded...");
 
+			hostControl.finishedInitialisition();
 
 
 		}catch (RemoteException e) {
@@ -184,8 +185,10 @@ public class OnTheFlyClientFileQuad extends Thread {
 			filename = args[0];
 		} else {
 //			filename = "../MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi.gz";
-			filename = "/TU Berlin/workspace/MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi";
-//			filename = "test/OTFV1.1_QuadfileNoParking10p_wip.mvi";
+//			filename = "output/OTFQuadfile.mvi";
+//			filename = "../../tmp/1000.events.mvi";
+//			filename = "/TU Berlin/workspace/MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi";
+			filename = "/TU Berlin/workspace/MatsimJ/otfvisSwitzerland10p.mvi";
 		}
 
 		

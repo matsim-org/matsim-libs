@@ -48,5 +48,19 @@ public class QueryToggleShowParking implements OTFQuery {
 	public void remove() {
 		
 	}
+	
+	public boolean isAlive() {
+		return false;
+	}
+	public Type getType() {
+		return OTFQuery.Type.OTHER;
+	}
+
+	public void setId(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 }

@@ -36,7 +36,6 @@ import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -480,13 +479,13 @@ public class OTFQuadFileHandler {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			double time = 0;
-			Iterator<Double> it =  this.timesteps.keySet().iterator();
-			while(it.hasNext() && (time <= this.nextTime)) time = it.next();
-			if (time == this.nextTime) {
-				time = this.timesteps.firstKey();
-			}
-			this.nextTime = time;
+//			double time = 0;
+//			Iterator<Double> it =  this.timesteps.keySet().iterator();
+//			while(it.hasNext() && (time <= this.nextTime)) time = it.next();
+//			if (time == this.nextTime) {
+//				time = this.timesteps.firstKey();
+//			}
+//			this.nextTime = time;
 			return buffer;
 		}
 

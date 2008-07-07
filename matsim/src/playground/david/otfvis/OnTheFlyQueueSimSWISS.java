@@ -24,14 +24,12 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Plans;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.world.World;
-
-import playground.david.otfivs.executables.OnTheFlyQueueSim;
 
 
 /**
@@ -41,7 +39,7 @@ import playground.david.otfivs.executables.OnTheFlyQueueSim;
 public class OnTheFlyQueueSimSWISS {
 
 	public static void main(String[] args) {
-		OnTheFlyQueueSim sim;
+		QueueSimulation sim;
 		NetworkLayer net;
 		Plans population;
 		Events events;
@@ -65,11 +63,13 @@ public class OnTheFlyQueueSimSWISS {
 
 		events = new Events();
 
+		config.simulation().setSnapshotFormat("otfvis");
+		config.simulation().setSnapshotPeriod(600);
+		config.simulation().setSnapshotFile("output/OTFQuadfileSCHWEIZ2.mvi");
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		config.simulation().setEndTime(Time.parseTime("00:00:11"));
 		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
-		sim = new OnTheFlyQueueSim(net, population, events);
-		sim.setOtfwriter(new OTFQuadFileHandler.Writer (600,qnet,"output/OTFQuadfileSCHWEIZ2.mvi"));
+		sim = new QueueSimulation(net, population, events);
 
 
 		sim.run();

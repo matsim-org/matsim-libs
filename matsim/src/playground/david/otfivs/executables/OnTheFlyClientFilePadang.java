@@ -90,8 +90,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		//clientQ2.setCachingAllowed(false);
 
 		OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
-		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
-		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
+		//loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
+		//loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
 		
 		return drawer2;
 	}

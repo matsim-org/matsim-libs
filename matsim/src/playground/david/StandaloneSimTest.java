@@ -22,8 +22,6 @@ package playground.david;
 
 import org.matsim.config.Config;
 import org.matsim.events.Events;
-import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
@@ -31,15 +29,16 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
-import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 
 public class StandaloneSimTest {
 
 	public static void main(final String[] args) {
-		String netFileName = "test/simple/equil_net.xml";
-		String popFileName = "test/simple/equil_plans.xml";
+//		String netFileName = "test/simple/equil_net.xml";
+//		String popFileName = "test/simple/equil_plans.xml";
+		String netFileName = "/TU Berlin/workspace/berlin-wip/network/wip_net.xml";
+		String popFileName = "/TU Berlin/workspace/berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml";
 
 		Gbl.startMeasurement();
 		final Config config = Gbl.createConfig(args);
@@ -58,20 +57,21 @@ public class StandaloneSimTest {
 		plansReader.readFile(popFileName);
 
 		Events events = new Events() ;
-		events.addHandler(new EventWriterXML("MatSimJEventsXML.txt"));
-		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
+//		events.addHandler(new EventWriterXML("MatSimJEventsXML.txt"));
+//		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
 
-		config.simulation().setStartTime(Time.parseTime("05:55:00"));
-		config.simulation().setEndTime(Time.parseTime("08:00:00"));
+//		config.simulation().setStartTime(Time.parseTime("05:55:00"));
+//		config.simulation().setEndTime(Time.parseTime("08:00:00"));
+//		config.simulation().setStartTime(Time.parseTime("05:55:00"));
 
-		config.simulation().setStuckTime(10);
+		config.simulation().setStuckTime(100);
 		config.simulation().removeStuckVehicles(false);
 		config.simulation().removeStuckVehicles(true);
 
 //		QueueLink link = (QueueLink)network.getLinks().get("15");
 //		link.setCapacity()
 		QueueSimulation sim = new QueueSimulation(network, population, events);
-		sim.openNetStateWriter("testWrite", netFileName, 10);
+		//sim.openNetStateWriter("testWrite", netFileName, 10);
 
 		sim.run();
 

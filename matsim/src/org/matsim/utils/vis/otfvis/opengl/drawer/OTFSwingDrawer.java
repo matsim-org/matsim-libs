@@ -21,6 +21,7 @@
 package org.matsim.utils.vis.otfvis.opengl.drawer;
 
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.geom.Point2D.Double;
 import java.rmi.RemoteException;
 
@@ -52,6 +53,11 @@ public class OTFSwingDrawer extends JComponent implements OTFDrawer {
 	public void handleClick(Double point, int mouseButton) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void handleClick(Rectangle currentRect, int button) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public void invalidate(int time) throws RemoteException {

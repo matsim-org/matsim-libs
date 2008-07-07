@@ -20,6 +20,8 @@
 
 package org.matsim.utils.vis.otfvis.opengl.queries;
 
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,9 +29,11 @@ import org.matsim.events.Events;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Plans;
+import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 
 
 public class QueryAgentId implements OTFQuery {
@@ -39,11 +43,20 @@ public class QueryAgentId implements OTFQuery {
 	private static final long serialVersionUID = -4466967514266968254L;
 	double x;
 	double y;
-	public String agentId;
+	double width = 0;
+	double height = 0;
+	public List<String> agentIds = new ArrayList<String>();
 
 	public QueryAgentId(double x,double y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	public QueryAgentId(Rectangle2D.Double rect) {
+		this.x = rect.x;
+		this.y = rect.y;
+		this.width = rect.width;
+		this.height = rect.height;
 	}
 
 	public void draw(OTFDrawer drawer) {
@@ -55,13 +68,24 @@ public class QueryAgentId implements OTFQuery {
 			List<PositionInfo> positions = new LinkedList<PositionInfo>();
 			qlink.getVehiclePositions(positions);
 			for(PositionInfo info : positions) {
-				//if (info.getVehicleState() == VehicleState.Parking) continue;
-				double xDist = this.x - info.getEasting();
-				double yDist = this.y - info.getNorthing();
-				dist = Math.sqrt(xDist*xDist + yDist*yDist);
-				if(dist < minDist){
-					minDist = dist;
-					this.agentId = info.getAgentId().toString();
+				
+				if (info.getVehicleState()== VehicleState.Parking && !OTFLinkAgentsHandler.showParked) continue;
+
+				double xDist = info.getEasting() - this.x;
+				double yDist = info.getNorthing() - this.y;
+				if (this.width == 0) {
+					// search for NEAREST agent to given POINT
+					dist = Math.sqrt(xDist*xDist + yDist*yDist);
+					if(dist < minDist){
+						minDist = dist;
+						this.agentIds.clear();
+						this.agentIds.add(info.getAgentId().toString());
+					}
+				} else {
+					// search for all agents in given RECT
+					if( (xDist < width) && (yDist < height) && (xDist >= 0) && (yDist >= 0) ) {
+						this.agentIds.add(info.getAgentId().toString());
+					}
 				}
 			}
 		}
@@ -70,6 +94,19 @@ public class QueryAgentId implements OTFQuery {
 	public void remove() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public boolean isAlive() {
+		return false;
+	}
+
+	public Type getType() {
+		return OTFQuery.Type.OTHER;
+	}
+
+	public void setId(String id) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

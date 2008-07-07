@@ -172,7 +172,7 @@ implements MouseWheelListener{
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (button == 1)
+		if (button == 1 || button == 4)
 			updateSize(e);
 		else if (button == 2) {
 			int deltax = start.x - e.getX();
@@ -191,13 +191,14 @@ implements MouseWheelListener{
 		Rectangle screenRect = new Rectangle(start);
 		screenRect.add(e.getPoint());
 		if ((screenRect.getHeight() > 10)&& (screenRect.getWidth() > 10)) {
-			if (button == 1) {
+			if (button == 1 || button == 4) {
 				int deltax = Math.abs(start.x - e.getX());
 				int deltay = Math.abs(start.y - e.getY());
 				double ratio = Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
 				//System.out.println(ratio);
 				Point3f newPos = new Point3f((float)currentRect.getCenterX(),(float)currentRect.getCenterY(),(float)(cameraStart.getZ()*ratio));
-				scrollToNewPos(newPos);
+				if (button == 1) scrollToNewPos(newPos);
+				else clickHandler.handleClick(currentRect, button);
 				//InfoText.showText("Zoom", newPos.getX(),newPos.getY(),newPos.getZ());
 		        // Cube fader
 		        Animator rectFader = PropertySetter.createAnimator(2020, this, "alpha", 1.0f, 0.f);
@@ -268,7 +269,8 @@ implements MouseWheelListener{
 	        t.enable();
 	        t.bind();
 
-	        gl.glColor4f(alpha, alpha, alpha, alpha);
+	        if (button==4) gl.glColor4f(0.8f, 0.2f, 0.2f, alpha);
+	        else gl.glColor4f(alpha, alpha, alpha, alpha);
 
 	        gl.glBegin(GL_QUADS);
 	        gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(currentRect.x, currentRect.y, z);
@@ -298,32 +300,34 @@ implements MouseWheelListener{
 		if((currentRect != null) && (alpha >= 0.f)){
 			if(marker == null) marker = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("otfvis/marker.png"));
 
-			gl.glEnable(GL_BLEND);
-			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			float z = 20f;
+	        gl.glEnable(GL_BLEND);
+	        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-			renderFace(gl, marker);
+	        renderFace(gl, marker);
 			gl.glDisable(GL_BLEND);
 		} else {
 			currentRect = null;
 			alpha = 1.0f;
 		}
-
+		
 	}
 
-	public void setFrustrum(GL gl) {
+	   public void setFrustrum(GL gl) {
+		   
+		   GLU glu = new GLU();
+	       gl.glMatrixMode(GL_PROJECTION);
+	       gl.glLoadIdentity();
+	       glu.gluPerspective(45.0, aspectRatio, 1.0, cameraStart.getZ()*1.1);
 
-		GLU glu = new GLU();
-		gl.glMatrixMode(GL_PROJECTION);
-		gl.glLoadIdentity();
-		glu.gluPerspective(45.0, aspectRatio, 1.0, cameraStart.getZ()*1.1);
+	       gl.glMatrixMode(GL_MODELVIEW);
+	       gl.glLoadIdentity();
+	       
+	       camera.setup(gl, glu);
+		   updateMatrices(gl);
 
-		gl.glMatrixMode(GL_MODELVIEW);
-		gl.glLoadIdentity();
+	   }
 
-		camera.setup(gl, glu);
-		updateMatrices(gl);
-
-	}
 
 	public void scaleNetworkRelative(float scale) {
 		this.scale *= scale;
@@ -334,17 +338,18 @@ implements MouseWheelListener{
 		viewBounds = viewBounds.scale(effectiveScale, effectiveScale);
 		setToNewPos(new Point3f(cameraStart.getX(),cameraStart.getY(),(float)zPos));
 	}
-
+	
 	public void scaleNetwork(float scale) {
 		this.scale = scale;
-		float test = bounds.height*0.7f;
+    	float test = bounds.height*0.7f;
 		float zPos = (test*scale);
 		if (zPos < minZoom) zPos =minZoom;
 		if (zPos > maxZoom) zPos =maxZoom;
 		setToNewPos(new Point3f(cameraStart.getX(),cameraStart.getY(),zPos));
 	}
-
-	synchronized public Point3f getOGLPos(int x, int y) {
+	
+	synchronized public Point3f getOGLPos(int x, int y)
+	{
 		double[] obj_pos = new double[3];
 		float winX, winY;//, winZ = cameraStart.getZ();
 		float posX, posY;//, posZ;

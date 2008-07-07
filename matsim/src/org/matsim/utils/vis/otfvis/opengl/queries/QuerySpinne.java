@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.media.opengl.GL;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
@@ -54,7 +55,7 @@ public class QuerySpinne implements OTFQuery {
 	 * 
 	 */
 	private static final long serialVersionUID = -749787121253826794L;
-	private final Id linkId;
+	protected Id linkId;
 	private transient Map<Link,Integer> drivenLinks = null;
 	private float[] vertex = null;
 	private int[] count = null;
@@ -63,17 +64,13 @@ public class QuerySpinne implements OTFQuery {
 //	private transient FloatBuffer cnt;
 	private transient ByteBuffer colors =  null;
 
-	public QuerySpinne(Id linkID) {
-		this.linkId = linkID;
-	}
-
 	private void addLink(Link driven) {
 		Integer count = this.drivenLinks.get(driven);
 		if (count == null) this.drivenLinks.put(driven, 1);
 		else  this.drivenLinks.put(driven, count + 1);
 	}
 
-	protected List<Plan> getPersons(Plans plans) {
+	protected List<Plan> getPersons(Plans plans, QueueNetworkLayer net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
 
 		for (Person person : plans.getPersons().values()) {
@@ -111,7 +108,7 @@ public class QuerySpinne implements OTFQuery {
 //		String start = link.getLink().getFromNode().getId().toString();
 //		String end = link.getLink().getToNode().getId().toString();
 		
-		List<Plan> actPersons = getPersons(plans);
+		List<Plan> actPersons = getPersons(plans, net);
 
 		for (Plan plan : actPersons) {
 			List actslegs = plan.getActsLegs();
@@ -200,7 +197,7 @@ public class QuerySpinne implements OTFQuery {
 
 		GL gl = drawer.getGL();
 		Color color = Color.ORANGE;
-		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.5);
+		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.3);
 		gl.glEnable(GL.GL_BLEND);
 		gl.glEnable(GL.GL_LINE_SMOOTH);
         gl.glEnableClientState (GL.GL_COLOR_ARRAY);
@@ -219,4 +216,17 @@ public class QuerySpinne implements OTFQuery {
 	public void remove() {
 		if (this.agentText != null) InfoText.removeTextPermanent(this.agentText);
 	}
+	
+	public boolean isAlive() {
+		return false;
+	}
+	public Type getType() {
+		return OTFQuery.Type.LINK;
+	}
+
+	public void setId(String id) {
+		this.linkId = new IdImpl(id);
+	}
+
+
 }

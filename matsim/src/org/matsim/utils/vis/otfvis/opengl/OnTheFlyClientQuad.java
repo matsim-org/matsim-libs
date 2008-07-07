@@ -44,7 +44,6 @@ import org.matsim.utils.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.utils.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
@@ -141,7 +140,11 @@ public class OnTheFlyClientQuad extends Thread {
 
 			pane.setLeftComponent(drawer.getComponent());
 			//pane.setRightComponent(drawer2.getCanvas());
-			if(hostControl.isLiveHost()) frame.getContentPane().add(new OTFQueryControlBar("test", (OTFQueryHandler)drawer), BorderLayout.SOUTH);
+			if(hostControl.isLiveHost()) {
+				OTFQueryControlBar queryControl = new OTFQueryControlBar("test", hostControl);
+				frame.getContentPane().add(queryControl, BorderLayout.SOUTH);
+				((OTFOGLDrawer)drawer).setQueryHandler(queryControl);
+			}
 			
 
 			frame.setSize(1024, 600);

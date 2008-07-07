@@ -50,13 +50,13 @@ public class OTFVisConfig extends Module {
 	private  float agentSize = 100.f;
 	private  String middleMouseFunc = "Pan";
 	private  String leftMouseFunc = "Zoom";
-	private  String rightMouseFunc = "Menu";
+	private  String rightMouseFunc = "Select";
 	private int fileVersion = OTFQuadFileHandler.VERSION;
 	private int fileMinorVersion = OTFQuadFileHandler.MINORVERSION;
 
 	private int bigTimeStep = 600;
 	private final int timeStep = 1;
-	private String queryType = "Agent";
+	private String queryType = "agentPlan";
 	private boolean multipleSelect = true;
 	private boolean showParking = false;
 	private Color backgroundColor = new Color(230, 230, 230, 0);

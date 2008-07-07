@@ -27,6 +27,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -40,16 +44,47 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQueryHandler;
+import org.matsim.utils.vis.otfvis.opengl.queries.QueryAgentEvents;
+import org.matsim.utils.vis.otfvis.opengl.queries.QueryAgentId;
+import org.matsim.utils.vis.otfvis.opengl.queries.QueryAgentPlan;
+import org.matsim.utils.vis.otfvis.opengl.queries.QueryLinkId;
+import org.matsim.utils.vis.otfvis.opengl.queries.QuerySpinne;
+import org.matsim.utils.vis.otfvis.opengl.queries.QuerySpinneNOW;
 
 
-public class OTFQueryControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener {
+public class OTFQueryControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener, OTFQueryHandler {
 
-	private final OTFQueryHandler handler;
-	private String queryType = "Agent";
-	private transient final OTFVisConfig cfg;
+	public static class QueryEntry {
+		public QueryEntry(String string, String string2, Class class1) {
+			this.shortName = string;
+			this.toolTip = string2;
+			this.clazz = class1;
+		}
+		@Override
+		public String toString() { return shortName;};
+		
+		public String shortName;
+		public String toolTip;
+		public Class clazz;
+	}
+
+	public static QueryEntry[] queries = {
+		new QueryEntry("agentPlan", "show the actual plan of an agent", QueryAgentPlan.class),
+		new QueryEntry("agentEvents", "show the actual events of an agent", QueryAgentEvents.class),
+		new QueryEntry("linkSpinneALL", "show Spinne of ALL traffic", QuerySpinne.class),
+		new QueryEntry("linkSpinneNOW", "show Spinne of all veh on the link NOW", QuerySpinneNOW.class)
+	};
 	
-	public OTFQueryControlBar(String name, OTFQueryHandler handler) {
+	private final OTFHostControlBar handler;
+	private final  String queryType = "Agent";
+	private transient final OTFVisConfig cfg;
+	private final List<OTFQuery> queryItems = new ArrayList<OTFQuery>();
+
+	
+	public OTFQueryControlBar(String name, OTFHostControlBar handler) {
 		super(name);
 		this.handler = handler;
 		this.cfg = (OTFVisConfig)Gbl.getConfig().getModule("otfvis");
@@ -60,10 +95,9 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 			jLabel3.setBounds(344, 45, 36, 31);
 		}
 		{
-			ComboBoxModel leftMFuncModel = 
-				new DefaultComboBoxModel(
-						new String[] { "Agent", "Spinne", "None" });
-			leftMFuncModel.setSelectedItem(queryType);
+			ComboBoxModel leftMFuncModel =	new DefaultComboBoxModel(queries);
+			leftMFuncModel.setSelectedItem(queries[0]);
+	        ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setQueryType(queries[0].clazz.getCanonicalName());
 			JComboBox queryType = new JComboBox();
 			add(queryType);
 			queryType.setActionCommand("type_changed");
@@ -71,7 +105,8 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 			queryType.setBounds(57, 76, 92, 27);
 			queryType.setMaximumSize(new Dimension(250,60));
 			queryType.addActionListener(this);
-		}
+			queryType.setToolTipText(queries[0].toolTip);
+	}
 		{
 			JLabel jLabel3 = new JLabel();
 			add(jLabel3);
@@ -108,16 +143,18 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		if("id_changed".equals(command)) {
 			String id = ((JTextField)e.getSource()).getText();
 			
-			if (!cfg.isMultipleSelect())handler.removeQueries();
+			if (!cfg.isMultipleSelect())removeQueries();
 			
-			handler.handleIdQuery(id, cfg.getQueryType());
+			handleIdQuery(id, cfg.getQueryType());
 		} else if ("type_changed".equals(command)) {
 			JComboBox cb = (JComboBox)e.getSource();
-	        queryType = (String)cb.getSelectedItem();
-	        cfg.setQueryType(queryType);
-	        handler.removeQueries();
+	        QueryEntry queryType = (QueryEntry)cb.getSelectedItem();
+	        cfg.setQueryType(queryType.clazz.getCanonicalName());
+	        ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setQueryType(queryType.clazz.getCanonicalName());
+	        removeQueries();
+	        cb.setToolTipText(queryType.toolTip);
 		} else if ("clear".equals(command)) {
-			handler.removeQueries();
+			removeQueries();
 		}
         
 	}
@@ -133,4 +170,102 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 
 	}
 	
+	
+	public void handleIdQuery(String id, String queryName) {
+		OTFQuery marked = null;
+		marked = createQuery(queryName);
+		if (marked != null) {
+			marked.setId(id);
+			marked = handler.doQuery(marked);
+			this.queryItems.add(marked);
+		}
+	}
+	
+	public void handleIdQuery(List<String> list, String queryName) {
+
+		boolean clearSelected = !((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).isMultipleSelect();
+		if (clearSelected) removeQueries();
+		
+		for(String id : list) {
+				handleIdQuery(id, queryName);
+		}
+
+		handler.redrawHandlers();
+	}
+	
+	public OTFQuery handleQuery(OTFQuery query) {
+		return handler.doQuery(query);
+	}
+
+	public void handleClick(Point2D.Double point, int mouseButton) {
+		Rectangle2D.Double origRect = new Rectangle2D.Double(point.x, point.y ,0,0);
+		// Only handle clicks with the main == zoom button
+		if (mouseButton==1) handleClick(origRect, mouseButton);
+	}
+
+	private OTFQuery createQuery(String className) {
+		OTFQuery query = null;
+	      try {
+	          Class classDefinition = Class.forName(className);
+	          query = (OTFQuery)classDefinition.newInstance();
+	      } catch (InstantiationException e) {
+	          System.out.println(e);
+	      } catch (IllegalAccessException e) {
+	          System.out.println(e);
+	      } catch (ClassNotFoundException e) {
+	          System.out.println(e);
+	      }
+	      return query;
+	}
+	
+	public void handleClick(Rectangle2D.Double origRect, int mouseButton) {
+		if (mouseButton == 3) {
+			removeQueries();
+			handler.redrawHandlers();
+		} else {
+			String queryName = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getQueryType();
+			OTFQuery query = createQuery(queryName);
+			
+			if (query.getType() == OTFQuery.Type.AGENT) {
+				QueryAgentId agentIdQuery = (QueryAgentId)handler.doQuery(new QueryAgentId(origRect));
+				if ((agentIdQuery != null) && (agentIdQuery.agentIds.size() != 0)) {
+					System.out.println("AgentId = " + agentIdQuery.agentIds);
+					handleIdQuery(agentIdQuery.agentIds, queryName);
+				} else {
+					System.out.println("No AgentId found!");
+				}
+			} else if (query.getType() == OTFQuery.Type.LINK) {
+				QueryLinkId linkIdQuery = (QueryLinkId)handler.doQuery(new QueryLinkId(origRect));
+				if ((linkIdQuery != null) && (linkIdQuery.linkIds.size() != 0)) {
+					System.out.println("LinkId = " + linkIdQuery.linkIds);
+					handleIdQuery(linkIdQuery.linkIds, queryName);
+				} else {
+					System.out.println("No LinkId found!");
+				}
+			}
+		}
+	}
+	
+	synchronized public void addQuery(OTFQuery query) {
+		this.queryItems.add(query);
+		handler.redrawHandlers();
+	}
+
+	synchronized public void removeQueries(){
+		for(OTFQuery query : this.queryItems){
+			if(query != null) query.remove();
+		}
+		this.queryItems.clear();
+		handler.redrawHandlers();
+	}
+
+	public void drawQueries(OTFDrawer drawer) {
+		for(OTFQuery query : this.queryItems) query.draw(drawer);
+	}
+
+	public void updateQueries() {
+		for(OTFQuery query : queryItems) if (query.isAlive()) handleQuery(query);
+	}
+
+
 }

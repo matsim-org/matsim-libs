@@ -27,8 +27,12 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.plans.Plans;
 
 public interface OTFQuery extends Serializable{
-
+	public enum Type {AGENT,LINK,OTHER};
+	public void setId(String id);
+	// while this returns true, the query is send to the server EVERY Tick
+	public boolean isAlive();
 	public void query(QueueNetworkLayer net, Plans plans, Events events) ;
 	public void remove();
 	public void draw(OTFDrawer drawer);
+	public Type getType();
 }

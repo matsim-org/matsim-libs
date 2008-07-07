@@ -340,11 +340,6 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		return quad;
 	}
 
-	public void handleClick(Double point, int mouseButton) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	public void invalidate(int time) throws RemoteException {
 		this.sceneGraph = quad.getSceneGraph(time, null, this);
 		redraw();
@@ -579,6 +574,16 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 	
 	public void clearCache() {
 		if(quad != null) quad.clearCache();
+	}
+
+	public void handleClick(Double point, int mouseButton) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleClick(Rectangle currentRect, int button) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

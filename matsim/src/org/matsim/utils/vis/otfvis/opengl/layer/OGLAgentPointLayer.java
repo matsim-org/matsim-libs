@@ -24,9 +24,10 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.media.opengl.GL;
@@ -65,8 +66,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		private ByteBuffer colorsIN = null;
 		private FloatBuffer vertexIN = null;
 		
-		private final  ArrayList<FloatBuffer> posBuffers= new ArrayList<FloatBuffer>();
-		private final  ArrayList<ByteBuffer> colBuffers= new ArrayList<ByteBuffer>();
+		private final  List<FloatBuffer> posBuffers= new LinkedList<FloatBuffer>();
+		private final  List<ByteBuffer> colBuffers= new LinkedList<ByteBuffer>();
 		
 				
 		private final Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
@@ -91,8 +92,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			    gl.glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
 
 			    gl.glPointSize(agentSize/10.f);
-		        gl.glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 5.f);
-		        gl.glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, agentSize*10.f);
+		        gl.glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 1.f);
+		        gl.glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, agentSize*30.f);
 		    	
 		    } else {
 		    	gl.glPointSize(agentSize/10);
@@ -120,11 +121,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			ByteBuffer colors =  null;
 			FloatBuffer vertex =  null;
 			
-		
 			for(int i = 0; i < posBuffers.size(); i++) {
 				colors = colBuffers.get(i);
 				vertex = posBuffers.get(i);
-				int remain = Math.min(vertex.limit() / 2, count - i*BUFFERSIZE);
+				int remain = i == posBuffers.size()-1 ? count %BUFFERSIZE : BUFFERSIZE; //Math.min(vertex.limit() / 2, count - i*BUFFERSIZE);
 				colors.position(0);
 				vertex.position(0);
 		        gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
@@ -132,6 +132,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		        gl.glDrawArrays (GL.GL_POINTS, 0, remain);
 			}
 
+			// for possibly adding data
+			vertex.position((count % BUFFERSIZE) * 2);
+			colors.position((count % BUFFERSIZE) * 4);
+			
 	        gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 	        gl.glDisableClientState (GL.GL_VERTEX_ARRAY); 
 	        if (texture != null ) {

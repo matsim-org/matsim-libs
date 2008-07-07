@@ -193,6 +193,15 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	public void clearCache() {
 		cachedTimes.clear();
 	}
+	
+	synchronized public SceneGraph preloadTime(double time, Rect rect, OTFDrawer drawer) throws RemoteException {
+		SceneGraph result = new SceneGraph(rect, time, connect, drawer);
+		getDynData(rect, result, true);
+		// fill with elements
+		invalidate(rect, result);
+		return result;
+	}
+	
 
 	/*
 	 * new getScenegraph(time, rect) called from either OGLDrawer or (for caching) from builderThread
@@ -207,9 +216,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	 *  store scenegraph according to time
 	 *  
 	 */
-	public synchronized SceneGraph getSceneGraph(int time, Rect rect, OTFDrawer drawer) throws RemoteException {
-		if (time == -1) time = host.getLocalTime();
-		
+	
+	private SceneGraph lastGraph = null;
+	
+	public synchronized SceneGraph getSceneGraphNoCache(int time, Rect rect, OTFDrawer drawer) throws RemoteException {
 		List<Rect> rects = new LinkedList<Rect>();		
 		
 		SceneGraph cachedResult = cachedTimes.get(time);
@@ -250,10 +260,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		
 		SceneGraph result;
 		if ( cachedResult == null) {
-			result = new SceneGraph(rect, time, connect, drawer);
-			getDynData(rect, result, true);
-			// fill with elements
-			invalidate(rect, result);
+			result = preloadTime(time, rect, drawer);
 		} else {
 			result = cachedResult;
 			result.setRect(rect);
@@ -268,6 +275,12 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		result.finish();
 		if (isCachingAllowed()) cachedTimes.put(time, result);
 		return result;
+	}
+	
+	public synchronized SceneGraph getSceneGraph(int time, Rect rect, OTFDrawer drawer) throws RemoteException {
+		if (time == -1 && lastGraph != null) return lastGraph;
+		lastGraph = getSceneGraphNoCache(time, rect, drawer);
+		return lastGraph;
 	}
 	
 	synchronized private void invalidate(Rect rect, SceneGraph result) {

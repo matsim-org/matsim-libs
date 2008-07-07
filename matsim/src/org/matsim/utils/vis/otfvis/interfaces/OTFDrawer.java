@@ -21,6 +21,7 @@
 package org.matsim.utils.vis.otfvis.interfaces;
 
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.rmi.RemoteException;
 
@@ -34,4 +35,5 @@ public interface OTFDrawer {
 	public OTFClientQuad getQuad();
 	public Component getComponent();
 	public void clearCache();
+	public void handleClick(Rectangle currentRect, int button);
 }
