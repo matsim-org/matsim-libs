@@ -45,6 +45,12 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 
 class MyCAVeh {
 	int speed ;
+	int maxSpeed ;
+	boolean truck=false ;
+
+	public boolean isTruck() {
+		return truck;
+	}
 
 	public int getSpeed() {
 		return speed;
@@ -53,24 +59,49 @@ class MyCAVeh {
 	public void setSpeed(int speed) {
 		this.speed = speed;
 	}
+
+	public int getMaxSpeed() {
+		return maxSpeed;
+	}
+
+	public MyCAVeh ( int maxSpeed ) {
+		this.maxSpeed = maxSpeed ; 
+	}
+
+	public void setTruck(boolean truck) {
+		this.truck = truck;
+	}
 }
 
 class CALink extends QueueLink {
 	public static boolean ueberholverbot = false;
-	
+
 	public static int LINKLEN = 1000;
-	public static int LANECOUNT = 5;
-	
+	public static int LANECOUNT = 2;
+
 	int VMAX=5 ;
-	
+
 	MyCAVeh[][] cells = new MyCAVeh[LANECOUNT][LINKLEN] ; 
 
 	public CALink(Link l, QueueNetworkLayer queueNetworkLayer, QueueNode toNode) {
 		super(l, queueNetworkLayer, toNode);
+		MyCAVeh veh = new MyCAVeh(3) ;
+		veh.setTruck(true) ;
+		cells[0][0] = veh ;
 		for ( int lane=0 ; lane<LANECOUNT; lane++ ) {
-			for ( int len=0 ; len<LINKLEN ; len++ ) {
-				if ( Math.random() < 0.2 ) {
-					cells[lane][len] = new MyCAVeh() ;
+			for ( int len=1 ; len<LINKLEN ; len++ ) {
+				if ( Math.random() < 0.1 ) {
+					if ( Math.random() < 0.2 ) {
+						veh = new MyCAVeh(3) ;
+						veh.setTruck(true) ;
+						cells[lane][len] = veh ;
+					} else {
+						if ( Math.random() < 0.5 ) {
+							cells[lane][len] = new MyCAVeh(5) ;
+						} else {
+							cells[lane][len] = new MyCAVeh(4) ;
+						}
+					}
 				} else {
 					cells[lane][len] = null ;
 				}
@@ -84,12 +115,27 @@ class CALink extends QueueLink {
 			for ( int len=0 ; len<LINKLEN ; len++ ) {
 				if ( cells[lane][len] != null ) {
 					MyCAVeh veh = cells[lane][len] ;
-					double speed = 10.*veh.getSpeed() ;
-					positions.add( new PositionInfo(new IdImpl("0"),this.getLink(), len, lane+1, speed, VehicleState.Driving, ""));
+					double speed = 4.*veh.getSpeed() ;
+					if ( veh.isTruck() ) {
+						positions.add( new PositionInfo(new IdImpl("1"),this.getLink(), len, 5*lane+2, speed, VehicleState.Driving, ""));
+					} else {
+						positions.add( new PositionInfo(new IdImpl("0"),this.getLink(), len, 5*lane+2, speed, VehicleState.Driving, ""));
+					}
 				}
 			}
 		}
 		return positions;
+	}
+
+	int getGap ( int lane, int len, int speed ) {
+		int gap = 0 ;
+		while ( gap < speed ) {
+			if ( cells[lane][(len+gap+1)%LINKLEN] != null ) {
+				break ;
+			}
+			gap++ ;
+		}
+		return gap ;
 	}
 
 	/* (non-Javadoc)
@@ -97,57 +143,159 @@ class CALink extends QueueLink {
 	 */
 	@Override
 	protected boolean moveLink(double now) {
+		// #############################
+		// lane changing:
+		
+		final int MODE = 1 ;
+		if ( LANECOUNT >= 2 ) {
+			int mainLane = 0 ;
+			int otherLane = 1 ;
+			if ( now%2==1 ) {
+				mainLane = 1 ;
+				otherLane = 0 ;
+			}
+
+			for ( int len=0 ; len<LINKLEN ; len++ ) {
+				if ( cells[mainLane][len] != null ) {
+					MyCAVeh veh = cells[mainLane][len] ;
+
+					// incentive:
+					int otherGap = getGap( otherLane, len, veh.getSpeed()+1 ) ;
+					if ( MODE==0 ) { // symmetric
+						int thisGap = getGap( mainLane, len, veh.getSpeed()+1 ) ;
+						if ( thisGap >= otherGap ) {
+							continue ; // next cell
+						}
+					} else if ( MODE==1 ) {
+						int rightGap = getGap( 1, len, veh.getSpeed()+1 ) ;
+						int leftGap = getGap( 0, len, veh.getSpeed()+1 ) ;
+						if ( rightGap > leftGap && mainLane == 1 ) {
+							continue ;
+						} else if ( Math.random() < 0.5 ) {
+							continue ;
+						} else if ( ueberholverbot && mainLane!=0 && veh.isTruck() ) {
+							continue ;
+						}
+					} else {
+						System.err.println( " MODE not defined. Abort " ) ;
+						System.exit(-1) ;
+					}
+					// safety
+					int backGap = 0 ;
+					while ( backGap < VMAX ) {
+						if ( cells[otherLane][(len-backGap+LINKLEN)%LINKLEN] != null ) {
+							break ;
+						}
+						backGap++ ;
+					}
+					if ( backGap < VMAX ) {
+						continue ;
+					}
+
+					cells[otherLane][len] = veh ;
+					cells[mainLane][len] = null ;
+
+				}
+			}
+		}
+
+		// #############################
+		// #############################
+		// speed:
+
 		for ( int lane=0 ; lane<LANECOUNT; lane++ ) {
 			for ( int len=0 ; len<LINKLEN ; len++ ) {
 				if ( cells[lane][len] != null ) {
 					MyCAVeh veh = cells[lane][len] ;
-					int speed = veh.getSpeed() ;
-					speed++ ;
-					if ( speed > VMAX ) { speed = VMAX ; }
-					int ii = 1 ;
-					for (  ; ii<=speed+1 ; ii++ ) {
-						if ( cells[lane][(len+ii)%LINKLEN] != null  ) {
-							break ;
-						}
+					int origSpeed = veh.getSpeed() ;
+					int speed = origSpeed+1 ;
+					int gap = getGap( lane, len, speed ) ;
+					if ( speed > veh.getMaxSpeed() ) { speed = veh.getMaxSpeed() ; }
+					if ( speed > gap ) { speed = gap ; }
+
+					if ( origSpeed==0 ) {
+						if ( speed >= 1 && Math.random() < 0.5 ) { speed -- ; }
+					} else {
+						if ( speed >= 1 && Math.random() < 0.05*lane ) { speed -- ; }
 					}
-					if ( Math.random() < 0.5 && ii <=2 ) { ii-- ; }
-					cells[lane][(len+ii-1)%LINKLEN] = veh ;
 					veh.setSpeed(speed) ;
-					cells[lane][len] = null ;
-					len+=ii+1 ;
 				}
 			}
 		}		
+		
+		// #############################
+		// #############################
+		// forward movement:
+
+		for ( int lane=0 ; lane<LANECOUNT; lane++ ) {
+			for ( int len=0 ; len<LINKLEN ; len++ ) {
+				if ( cells[lane][len] != null ) {
+					MyCAVeh veh = cells[lane][len] ;
+					if ( veh.getSpeed() > 0 ) {
+						cells[lane][(len+veh.getSpeed())%LINKLEN] = veh ;
+						cells[lane][len] = null ;
+						len+=veh.getSpeed() ;
+					}
+				}
+			}
+		}
+		
+		// #############################
+		// #############################
+		// tty:
+
+//		for ( int lane=0 ; lane<LANECOUNT; lane++ ) {
+//			StringBuilder str = new StringBuilder() ;
+//			for ( int len=0 ; len<LINKLEN ; len++ ) {
+//				if ( cells[lane][len] != null ) {
+//					MyCAVeh veh = cells[lane][len] ;
+//					if ( veh.isTruck() ) {
+//						str.append('X') ;
+//					} else {
+//						str.append(veh.getSpeed()) ;
+//					}
+//				} else {
+//					str.append('.') ;
+//				}
+//			}
+//			System.out.println ( str ) ;
+//		}
+//		System.out.println() ;
+
 		return true;
 	}
-	
+
 };
+
+// (end of class)
+//###########################################
+//###########################################
 
 class OTFServerQUADCA extends OTFServerQuad {
 
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	public CALink link;
-	
+
 	public OTFServerQUADCA(double minX, double minY, double maxX, double maxY) {
 		super(minX, minY, maxX, maxY);
 		NetworkLayer net = new NetworkLayer();
 		BasicNode node1 = net.createNode("0","0","500","");
 		BasicNode node2 = net.createNode("1",new Integer(CALink.LINKLEN).toString(),"500","");
-		
+
 		Link lk = new LinkImpl(new IdImpl("0"), node1, node2, net, CALink.LINKLEN,0,0, CALink.LANECOUNT);
 		link = new CALink(lk, null, null);
 	}
-	
+
 	@Override
 	public void fillQuadTree(OTFNetWriterFactory writers) {
 		OTFLinkAgentsHandler.Writer writer = new OTFLinkAgentsHandler.Writer();
 		writer.setSrc(link);
 		put(CALink.LINKLEN/2, 500, writer);
 	}
-	
-	
+
+
 }
 
 class CALiveServer implements OTFLiveServerRemote{
@@ -170,14 +318,14 @@ class CALiveServer implements OTFLiveServerRemote{
 		buf.position(0);
 		if(isConst) quad.writeConstData(buf); 
 		else quad.writeDynData(null, buf);
-		
+
 		byte [] result;
 		synchronized (buf) {
 			result = buf.array();
 		}
 		return result;
 	}
-	
+
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException {
 		return getQuadStateBuffer(true);
 	}	
@@ -218,14 +366,14 @@ class CALiveServer implements OTFLiveServerRemote{
 }
 
 public class CALinkOTFVis extends Thread { 
-	
+
 	public static class  MyControlBar extends OTFHostControlBar {
 		JButton verbot;
-		
+
 		public MyControlBar(String address, Class res) throws RemoteException, InterruptedException, NotBoundException {
 			super(address, res);
 			this.DELAYSIM = 20;
-			
+
 			verbot = createButton("†-Verbot ist AUS", "vb", null, "toggle †berholverbot");
 			verbot.putClientProperty("JButton.buttonType","text");
 			verbot.setBorderPainted(true);
@@ -267,28 +415,28 @@ public class CALinkOTFVis extends Thread {
 		}
 
 		private static final long serialVersionUID = 1L;
-		
+
 	}	
-	
-	
+
+
 	@Override
 	public void run() {
 		if (Gbl.getConfig() == null) Gbl.createConfig(null);
-		
+
 		OTFVisConfig visconf = (OTFVisConfig) Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 		if (visconf == null) {
 			visconf = new OTFVisConfig();
 			Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
 		}
-	
-		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setAgentSize(30.f);
-		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setLinkWidth(3.75f*CALink.LANECOUNT +5);
-		
+
+		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setAgentSize(100.f);
+		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setLinkWidth(17.5f*CALink.LANECOUNT +5);
+
 		MyControlBar hostControl;
 		try {
 			hostControl = new MyControlBar("", CALinkOTFVis.class);
 			JFrame frame = new JFrame("MATSim OTFVis");
-			
+
 			boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 			if (isMac) {
 				frame.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
@@ -320,11 +468,11 @@ public class CALinkOTFVis extends Thread {
 			drawer2.invalidate(0);
 
 			hostControl.finishedInitialisition();
-	        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			frame.setSize(screenSize.width/2,screenSize.height/2);
 			frame.setVisible(true);
 
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -342,5 +490,5 @@ public class CALinkOTFVis extends Thread {
 		CALinkOTFVis me = new CALinkOTFVis();
 		me.run();
 	}
-	
+
 }
