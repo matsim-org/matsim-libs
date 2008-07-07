@@ -42,19 +42,53 @@ import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDra
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 
+
+class MyCAVeh {
+	int speed ;
+
+	public int getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+}
+
 class CALink extends QueueLink {
 	public static boolean ueberholverbot = false;
 	
-	public static int LINKLEN = 500;
+	public static int LINKLEN = 1000;
 	public static int LANECOUNT = 5;
+	
+	int VMAX=5 ;
+	
+	MyCAVeh[][] cells = new MyCAVeh[LANECOUNT][LINKLEN] ; 
 
 	public CALink(Link l, QueueNetworkLayer queueNetworkLayer, QueueNode toNode) {
 		super(l, queueNetworkLayer, toNode);
+		for ( int lane=0 ; lane<LANECOUNT; lane++ ) {
+			for ( int len=0 ; len<LINKLEN ; len++ ) {
+				if ( Math.random() < 0.2 ) {
+					cells[lane][len] = new MyCAVeh() ;
+				} else {
+					cells[lane][len] = null ;
+				}
+			}
+		}
 	}
 
 	@Override
 	public Collection<PositionInfo> getVehiclePositions(Collection<PositionInfo> positions) {
-		for(int i=0;i<100;i++)positions.add( new PositionInfo(new IdImpl("0"),this.getLink(), Math.random()*LINKLEN, Gbl.random.nextInt(LANECOUNT) + 1, Gbl.random.nextInt(100), VehicleState.Driving, ""));
+		for ( int lane=0 ; lane<LANECOUNT; lane++ ) {
+			for ( int len=0 ; len<LINKLEN ; len++ ) {
+				if ( cells[lane][len] != null ) {
+					MyCAVeh veh = cells[lane][len] ;
+					double speed = 10.*veh.getSpeed() ;
+					positions.add( new PositionInfo(new IdImpl("0"),this.getLink(), len, lane+1, speed, VehicleState.Driving, ""));
+				}
+			}
+		}
 		return positions;
 	}
 
@@ -63,6 +97,27 @@ class CALink extends QueueLink {
 	 */
 	@Override
 	protected boolean moveLink(double now) {
+		for ( int lane=0 ; lane<LANECOUNT; lane++ ) {
+			for ( int len=0 ; len<LINKLEN ; len++ ) {
+				if ( cells[lane][len] != null ) {
+					MyCAVeh veh = cells[lane][len] ;
+					int speed = veh.getSpeed() ;
+					speed++ ;
+					if ( speed > VMAX ) { speed = VMAX ; }
+					int ii = 1 ;
+					for (  ; ii<=speed+1 ; ii++ ) {
+						if ( cells[lane][(len+ii)%LINKLEN] != null  ) {
+							break ;
+						}
+					}
+					if ( Math.random() < 0.5 && ii <=2 ) { ii-- ; }
+					cells[lane][(len+ii-1)%LINKLEN] = veh ;
+					veh.setSpeed(speed) ;
+					cells[lane][len] = null ;
+					len+=ii+1 ;
+				}
+			}
+		}		
 		return true;
 	}
 	
@@ -169,7 +224,7 @@ public class CALinkOTFVis extends Thread {
 		
 		public MyControlBar(String address, Class res) throws RemoteException, InterruptedException, NotBoundException {
 			super(address, res);
-			this.DELAYSIM = 50;
+			this.DELAYSIM = 20;
 			
 			verbot = createButton("†-Verbot ist AUS", "vb", null, "toggle †berholverbot");
 			verbot.putClientProperty("JButton.buttonType","text");
