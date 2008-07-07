@@ -37,7 +37,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
 /**
  * Calculates the k minimal cost paths from a start to an end node,
@@ -101,7 +101,7 @@ public class KShortestPathGenerator {
 	 * @see #KShortestPathGenerator(NetworkLayer, TravelCostI, TravelTimeI)
 	 */
 	public KShortestPathGenerator(NetworkLayer network) {
-		this(network, new FreespeedTravelTimeCost(), new TravelTimeCalculatorArray(network));
+		this(network, new FreespeedTravelTimeCost(), new TravelTimeCalculator(network));
 	}
 
 	/**

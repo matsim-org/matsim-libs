@@ -38,7 +38,7 @@ import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 
@@ -76,7 +76,7 @@ public class MyControler5 {
 		strategyManager.addStrategy(strategy1, 0.9);
 		strategyManager.addStrategy(strategy2, 0.1);
 
-		TravelTimeCalculatorArray ttimeCalc = new TravelTimeCalculatorArray(network);
+		TravelTimeCalculator ttimeCalc = new TravelTimeCalculator(network);
 		TravelTimeDistanceCostCalculator costCalc = new TravelTimeDistanceCostCalculator(ttimeCalc);
 		strategy2.addStrategyModule(new ReRouteDijkstra(network, costCalc, ttimeCalc));
 		events.addHandler(ttimeCalc);

@@ -48,7 +48,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessEuclidean;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.world.Location;
 
 public class MyRunsLoechl extends MyRuns {
@@ -151,7 +151,7 @@ public class MyRunsLoechl extends MyRuns {
 				new FreespeedTravelTimeCost());
 		preRouter.run(network);
 		LeastCostPathCalculator router = new AStarLandmarks(network, preRouter,
-				new TravelTimeCalculatorArray(network));
+				new TravelTimeCalculator(network));
 
 		String filename = outputPath
 				+ (new File(Gbl.getConfig().facilities().getInputFile())).getName() + "_" + arg
@@ -231,7 +231,7 @@ public class MyRunsLoechl extends MyRuns {
 		PreProcessLandmarks preRouter = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		preRouter.run(network);
 		LeastCostPathCalculator router = new AStarLandmarks(network,
-				preRouter, new TravelTimeCalculatorArray(network));
+				preRouter, new TravelTimeCalculator(network));
 
 		BufferedWriter out;
 		String filename = outputPath
@@ -331,7 +331,7 @@ public class MyRunsLoechl extends MyRuns {
 			this.ptStop = ptStop;
 			this.railstation = railstation;
 			this.cityCenter = cityCenter;
-			this.router = new AStarEuclidean(network, preRouter, new TravelTimeCalculatorArray(network));
+			this.router = new AStarEuclidean(network, preRouter, new TravelTimeCalculator(network));
 			this.id = id;
 			this.type = type;
 		}

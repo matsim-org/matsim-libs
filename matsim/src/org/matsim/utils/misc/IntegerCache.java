@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * IntegerCache.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.trafficmonitoring;
+package org.matsim.utils.misc;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.apache.log4j.Logger;
 
+public class IntegerCache {
+	
+	private final static Logger log = Logger.getLogger(IntegerCache.class);
+		
+	
+	private static final int MIN_VALUE = 0;
+	private static final int MAX_VALUE = 4096;
+	
+	private static boolean initialized = false;
+	private static Integer [] cache;
 
-public class AllTests {
+	public static Integer getInteger(int i) {
+		
+		if (!initialized) {
+			init();
+		}
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.trafficmonitoring");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(LinkSensorManagerTest.class);
-		suite.addTestSuite(TravelTimeCalculatorTest.class);
-//		suite.addTestSuite(TravelTimeCalculatorHashMapTest.class);
-		//$JUnit-END$
-		return suite;
+		if ( i <= MAX_VALUE && i >= MIN_VALUE) {
+			return cache[i + MIN_VALUE];
+		}
+		
+		return Integer.valueOf(i);
 	}
-
+	
+	synchronized private static void init() {
+		if (initialized == true) {
+			log.warn("IntegerCache has already been initialized.");
+			return;
+		}
+		
+		log.info("Initializing IntegerCache ...");
+		cache = new Integer [MAX_VALUE - MIN_VALUE];
+		for (int i = 0; i < (MAX_VALUE - MIN_VALUE); i++) {
+			cache[i] = Integer.valueOf(i - MIN_VALUE);
+		}
+		log.info("done.");
+		initialized = true;
+	}
+	
 }

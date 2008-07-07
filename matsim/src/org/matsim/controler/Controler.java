@@ -102,7 +102,7 @@ import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
-import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -150,7 +150,7 @@ public class Controler {
 	protected NetworkLayer network = null;
 	protected Plans population = null;
 
-	protected AbstractTravelTimeCalculator travelTimeCalculator = null;
+	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCostI travelCostCalculator = null;
 	protected LegTravelTimeEstimator legTravelTimeEstimator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;

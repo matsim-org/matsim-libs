@@ -110,7 +110,7 @@ import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -922,7 +922,7 @@ public class MyRuns {
 		Gbl.startMeasurement();
 		System.out.println("  reading events, calculating travel times...");
 		final Events events = new Events();
-		final TravelTimeCalculatorArray ttime = new TravelTimeCalculatorArray(network, 15*60);
+		final TravelTimeCalculator ttime = new TravelTimeCalculator(network, 15*60);
 		events.addHandler(ttime);
 		new MatsimEventsReader(events).readFile(config.events().getInputFile());
 		events.printEventsCount();
@@ -2307,7 +2307,7 @@ public class MyRuns {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/networks/ivtch/network_r1.1.xml");
 		Events events = new Events();
-		TravelTimeCalculatorArray ttimeCalc = new TravelTimeCalculatorArray(network, 15*60, 30*3600);
+		TravelTimeCalculator ttimeCalc = new TravelTimeCalculator(network, 15*60, 30*3600);
 		VolumesAnalyzer vol = new VolumesAnalyzer(3600, 30*3600, network);
 		CalcLinkStats linkStats = new CalcLinkStats(network);
 		int[] volumes;

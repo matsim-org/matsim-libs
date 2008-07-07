@@ -33,7 +33,7 @@ import org.matsim.router.AStarLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
 public class RouteSetGenerator {
 
@@ -52,7 +52,7 @@ public class RouteSetGenerator {
 
 	public RouteSetGenerator(NetworkLayer network) {
 		this.network = network;
-		this.timeFunction = new TravelTimeCalculatorArray(network);
+		this.timeFunction = new TravelTimeCalculator(network);
 		this.preProcessData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessData.run(network);
 		this.router = new AStarLandmarks(this.network,this.preProcessData,this.timeFunction);

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractTravelTimeCalculator.java
+ * TravelTimeAggregator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,30 +20,42 @@
 
 package org.matsim.trafficmonitoring;
 
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
-import org.matsim.router.util.TravelTimeI;
+public abstract class AbstractTravelTimeAggregator {
+
+	private final int travelTimeBinSize;
+	private final int numSlots;
 
 
-/**
- * @author laemmel
- */
-public abstract class AbstractTravelTimeCalculator implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, 
-		EventHandlerAgentArrivalI, TravelTimeI {
-
-
-	public AbstractTravelTimeCalculator() {
+	public AbstractTravelTimeAggregator(int numSlots, int travelTimeBinSize) {
+		this.numSlots = numSlots;
+		this.travelTimeBinSize = travelTimeBinSize;
+	}
+	
+	
+	protected int getTimeSlotIndex(final double time) {
+		int slice = ((int) time)/this.travelTimeBinSize;
+		if (slice >= this.numSlots) slice = this.numSlots - 1;
+		return slice;
 	}
 
-	/**
-	 * Resets the travel times information on all links
-	 */
-	public abstract void resetTravelTimes();
+
+	protected abstract void addTravelTime(TravelTimeRole travelTimeRole, double enterTime,
+			double leaveTime);
 
 
-	@Override
-	public String toString() {
-		return this.getClass().getSimpleName();
+	public void addStuckEventTravelTime(TravelTimeRole travelTimeRole,
+			double enterTime, double stuckEventTime) {
+		//here is the right place to handle StuckEvents (just overwrite this method) 
 	}
+	
+
+	protected double getTravelTime(TravelTimeRole travelTimeRole, double time) {
+		final int timeSlot = getTimeSlotIndex(time);
+		return travelTimeRole.getTravelTime(timeSlot, time);
+	}
+
+
+
+		
+
 }

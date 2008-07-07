@@ -86,7 +86,7 @@ import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -1057,7 +1057,7 @@ public class MyRuns {
 		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
-		TravelTimeI tTravelCalc = new TravelTimeCalculatorArray(network);
+		TravelTimeI tTravelCalc = new TravelTimeCalculator(network);
 		LegTravelTimeEstimator ltte = MyRuns.createLegTravelTimeEstimator(events, network, tTravelCalc);
 		events.printEventHandlers();
 		MyRuns.readEvents(events, network);

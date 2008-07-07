@@ -26,12 +26,9 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.handler.EventHandlerI;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
 
 public class PlanomatControlerListener implements StartupListener, IterationStartsListener {
 

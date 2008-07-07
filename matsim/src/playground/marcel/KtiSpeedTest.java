@@ -36,7 +36,7 @@ import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
-import org.matsim.trafficmonitoring.TravelTimeCalculatorArray;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 
@@ -88,7 +88,7 @@ public class KtiSpeedTest {
 
 		System.out.println("  reading events, calculating travel times...");
 		final Events events = new Events();
-		final TravelTimeCalculatorArray ttime = new TravelTimeCalculatorArray(network, 15*60);
+		final TravelTimeCalculator ttime = new TravelTimeCalculator(network, 15*60);
 		events.addHandler(ttime);
 
 //		events.addHandler(new VolumesAnalyzer(3600, 24*3600-1, network));

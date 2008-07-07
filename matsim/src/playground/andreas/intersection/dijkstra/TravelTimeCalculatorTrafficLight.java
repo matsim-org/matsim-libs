@@ -1,14 +1,15 @@
 package playground.andreas.intersection.dijkstra;
 
 import java.util.HashMap;
+
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.trafficmonitoring.AbstractTravelTimeCalculator;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
-public class TravelTimeCalculatorTrafficLight extends AbstractTravelTimeCalculator {
+public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
@@ -27,6 +28,7 @@ public class TravelTimeCalculatorTrafficLight extends AbstractTravelTimeCalculat
 	}
 
 	public TravelTimeCalculatorTrafficLight(final NetworkLayer network, final int timeslice, final int maxTime) {
+		super(network, timeslice);
 		this.network = network;
 		this.timeslice = timeslice;
 		this.numSlots = (maxTime / this.timeslice) + 1;
@@ -45,6 +47,7 @@ public class TravelTimeCalculatorTrafficLight extends AbstractTravelTimeCalculat
 		this.enterEvents.clear();
 	}
 
+	@Override
 	public void reset(final int iteration) {
 		/* DO NOT CALL resetTravelTimes here!
 		 * reset(iteration) is called at the beginning of an iteration, but we still
@@ -58,6 +61,7 @@ public class TravelTimeCalculatorTrafficLight extends AbstractTravelTimeCalculat
 	// Implementation of EventAlgorithmI
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
 	public void handleEvent(final EventLinkEnter event) {
 
 		if (event.link == null) {
@@ -76,6 +80,7 @@ public class TravelTimeCalculatorTrafficLight extends AbstractTravelTimeCalculat
 		this.enterEvents.put(event.agentId, newEvent);
 	}
 
+	@Override
 	public void handleEvent(final EventLinkLeave event) {
 //		EnterEvent e = this.enterEvents.remove(event.agentId);
 //		if ((e != null) && e.linkId.equals(event.linkId)) {
@@ -87,6 +92,7 @@ public class TravelTimeCalculatorTrafficLight extends AbstractTravelTimeCalculat
 //		}
 	}
 
+	@Override
 	public void handleEvent(final EventAgentArrival event) {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
@@ -124,6 +130,7 @@ public class TravelTimeCalculatorTrafficLight extends AbstractTravelTimeCalculat
 	/* (non-Javadoc)
 	 * @see org.matsim.network.TravelCostI#getLinkTravelTime(org.matsim.network.Link, int)
 	 */
+	@Override
 	public double getLinkTravelTime(final Link link, final double time) {
 		return getTravelTimeRole(this.network.getLink(link.getFromNode().getId().toString()), this.network.getLink(link.getToNode().getId().toString())).getTravelTime(time);
 	}

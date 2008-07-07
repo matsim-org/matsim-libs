@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ProgressiveTravelTimeCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,20 +20,31 @@
 
 package org.matsim.trafficmonitoring;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+public class PessimisticTravelTimeAggregator extends AbstractTravelTimeAggregator {
 
-
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.trafficmonitoring");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(LinkSensorManagerTest.class);
-		suite.addTestSuite(TravelTimeCalculatorTest.class);
-//		suite.addTestSuite(TravelTimeCalculatorHashMapTest.class);
-		//$JUnit-END$
-		return suite;
+	public PessimisticTravelTimeAggregator(int travelTimeBinSize, int numSlots) {
+		super(travelTimeBinSize, numSlots);
 	}
+
+	@Override
+	protected void addTravelTime(TravelTimeRole travelTimeRole,
+			double enterTime, double leaveTime) {
+
+		double ttime = leaveTime - enterTime;
+		for (int slot = getTimeSlotIndex(enterTime); slot <= getTimeSlotIndex(leaveTime); slot++ ){
+			travelTimeRole.addTravelTime(slot, ttime);
+		}
+				
+	}
+
+	@Override
+	public void addStuckEventTravelTime(TravelTimeRole travelTimeRole,
+			double enterTime, double stuckEventTime) {
+		double ttime = Double.POSITIVE_INFINITY;
+		for (int slot = getTimeSlotIndex(enterTime); slot <= getTimeSlotIndex(stuckEventTime); slot++ ){
+			travelTimeRole.addTravelTime(slot, ttime);
+		}
+	}
+	
 
 }

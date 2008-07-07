@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * OptimisticTravelTimeAggregator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,20 +20,22 @@
 
 package org.matsim.trafficmonitoring;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+public class OptimisticTravelTimeAggregator extends AbstractTravelTimeAggregator {
 
-
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.trafficmonitoring");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(LinkSensorManagerTest.class);
-		suite.addTestSuite(TravelTimeCalculatorTest.class);
-//		suite.addTestSuite(TravelTimeCalculatorHashMapTest.class);
-		//$JUnit-END$
-		return suite;
+	public OptimisticTravelTimeAggregator(int numSlots, int travelTimeBinSize) {
+		super(numSlots, travelTimeBinSize);
 	}
+
+
+	@Override
+	protected void addTravelTime(TravelTimeRole travelTimeRole,
+			double enterTime, double leaveTime) {
+
+		final int timeSlot = getTimeSlotIndex(enterTime);
+		travelTimeRole.addTravelTime(timeSlot, leaveTime - enterTime);
+	
+	}
+
+	
 
 }

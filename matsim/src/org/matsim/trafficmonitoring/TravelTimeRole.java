@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * TravelTimeRole.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,20 +20,12 @@
 
 package org.matsim.trafficmonitoring;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+public interface TravelTimeRole {
 
+	public abstract void resetTravelTimes();
 
-public class AllTests {
+	abstract void addTravelTime(final int timeSlot, final double traveltime);
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.trafficmonitoring");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(LinkSensorManagerTest.class);
-		suite.addTestSuite(TravelTimeCalculatorTest.class);
-//		suite.addTestSuite(TravelTimeCalculatorHashMapTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+	abstract double getTravelTime(final int timeSlot, final double now);
 
 }
