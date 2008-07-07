@@ -20,10 +20,6 @@
 
 package org.matsim.plans;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,16 +31,15 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
 
-public class Route extends BasicRouteImpl<Node> implements  Serializable{
+public class Route extends BasicRouteImpl<Node> /*implements Serializable*/ {
 
-	private static final long serialVersionUID = -3615114784178389239L;
+//	private static final long serialVersionUID = -3615114784178389239L;
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
 	private double cost = Double.NaN;
-	private static NodeBuilder nodeBuilder = new NodeBuilder();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -103,11 +98,6 @@ public class Route extends BasicRouteImpl<Node> implements  Serializable{
 		setRoute(route);
 		super.setTravTime(travelTime);
 		this.cost = travelCost;
-	}
-
-
-	public static void setNodeBuilder(final NodeBuilder builder) {
-		nodeBuilder = builder;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -195,7 +185,7 @@ public class Route extends BasicRouteImpl<Node> implements  Serializable{
 	 * till toNode. If from or twoNode are not found in this, an IllegalArgumentException is thrown.
 	 * @param fromNode
 	 * @param toNode
-	 * @return A flat copy of the original Route
+	 * @return A flat copy of the original Route  // FIXME reading the doc above, this clearly does NOT return a flat copy of the original Route! 
 	 */
 	public Route getSubRoute(final Node fromNode, final Node toNode) {
 		int fromIndex = this.route.indexOf(fromNode);
@@ -209,54 +199,45 @@ public class Route extends BasicRouteImpl<Node> implements  Serializable{
 		return ret;
 	}
 
-
-	// This routebuilder could be exchanged for suppliing other
-	//kinds of network e.g. in OnTheFlyClient
-	public static class NodeBuilder {
-		private static NetworkLayer network = null;
-
-		public void addNode(final List<Node> route, final String nodeId) {
-			if (network == null) {
-				network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-				if (network == null) {
-					Gbl.errorMsg(this + "[network layer does not exist]");
-				}
-			}
-
-			Node node = network.getNode(nodeId);
-			route.add(node);
-		}
-	}
-
-
-
   /////////////////////////////////////////////////////////////////
-	//output methods
+	// I/O methods
   /////////////////////////////////////////////////////////////////
-
+	
+	/* seems the code below is nowhere really used, so I commented it out. Additionally,
+	 * I think it doesn't work correctly, as it serializes the route manually, but the route
+	 * is not declared transient, so it would be serialized anyway, and now twice!
+	 * If nobody needs this code, I will delete it soon.   marcel/7jul2008
+	 * TODO [MR] delete code
+	 */
+/*
 	private void readObject(final ObjectInputStream s)
 	  throws IOException, ClassNotFoundException
 	{
 		// the `standard' fields.
 		s.defaultReadObject();
-		this.route = new ArrayList<Node>();
 
+		System.out.println("read route from stream. " + (this.route == null ? "null" : "" + this.route.size()));
+		// the `route'.
 		int size = s.readInt();
-		for( int i = 0; i < size; i++) {
-			nodeBuilder.addNode(this.route, (String)s.readObject());
-		};
+		this.route = new ArrayList<Node>(size);
+		for (int i = 0; i < size; i++) {
+			NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+			Node node = network.getNode((String)s.readObject());
+			this.route.add(node);
+		}
 	}
 
 	private void writeObject(final ObjectOutputStream s) throws IOException {
 	    // The standard non-transient fields.
+		System.out.println("write route to stream.");
 	  s.defaultWriteObject();
 	  s.writeInt(this.route.size());
-	  for( int i = 0; i < this.route.size(); i++) {
+	  for (int i = 0; i < this.route.size(); i++) {
 		  Node node = this.route.get(i);
 		  s.writeObject(node.getId().toString());
-		};
+		}
 	}
-
+*/
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
