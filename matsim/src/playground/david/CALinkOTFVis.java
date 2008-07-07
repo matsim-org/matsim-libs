@@ -226,7 +226,7 @@ public class CALinkOTFVis extends Thread {
 			Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
 		}
 	
-		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setAgentSize(10.f);
+		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setAgentSize(30.f);
 		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setLinkWidth(3.75f*CALink.LANECOUNT +5);
 		
 		MyControlBar hostControl;
