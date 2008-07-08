@@ -74,16 +74,17 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 		log.info("world checking done.");
 	}
 
-	public void notifyAfterMobsim(final AfterMobsimEvent event) {
-		Controler controler = event.getControler();
-		Facilities facilities = controler.getFacilities();
-		this.eventsToFacilityLoadCalculator.finish();
-		if (event.getIteration() % 10 == 0) {
-			this.printStatistics(facilities, controler.getIterationPath(), event.getIteration());
-		}	
+	public void notifyAfterMobsim(final AfterMobsimEvent event) {	
+		this.eventsToFacilityLoadCalculator.finish();		
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		Controler controler = event.getControler();
+		Facilities facilities = controler.getFacilities();
+		
+		if (event.getIteration() % 10 == 0) {
+			this.printStatistics(facilities, controler.getIterationPath(), event.getIteration());
+		}	
 		this.eventsToFacilityLoadCalculator.resetAll(event.getIteration());
 	}
 
