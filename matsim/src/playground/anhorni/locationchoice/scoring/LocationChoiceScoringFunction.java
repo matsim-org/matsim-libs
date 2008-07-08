@@ -266,6 +266,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 			if (act.getType().startsWith("s")){
 				utilPerf *= (1.0 - act.getFacility().getCapacityPenaltyFactor(arrivalTime, departureTime));
 			}
+			log.info("doing scooooring");
 
 			double utilWait = marginalUtilityOfWaiting * duration;
 			score += Math.max(0, Math.max(utilPerf, utilWait));

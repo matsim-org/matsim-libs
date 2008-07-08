@@ -50,7 +50,7 @@ import org.matsim.world.algorithms.WorldValidation;
  */
 public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimListener, IterationEndsListener {
 
-	private EventsToFacilityLoad eventsToFacilityLoadCalculator;
+	private EventsToFacilityLoad eventsToFacilityLoad;
 
 	private final static Logger log = Logger.getLogger(FacilitiesLoadCalculator.class);
 
@@ -61,8 +61,8 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
-		this.eventsToFacilityLoadCalculator = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons);
-		event.getControler().getEvents().addHandler(this.eventsToFacilityLoadCalculator);
+		this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons);
+		event.getControler().getEvents().addHandler(this.eventsToFacilityLoad);
 
 		// correctly initalize the world.
 		//TODO: Move this to the controler
@@ -75,7 +75,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	}
 
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {	
-		this.eventsToFacilityLoadCalculator.finish();		
+		this.eventsToFacilityLoad.finish();		
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -85,7 +85,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 		if (event.getIteration() % 10 == 0) {
 			this.printStatistics(facilities, controler.getIterationPath(), event.getIteration());
 		}	
-		this.eventsToFacilityLoadCalculator.resetAll(event.getIteration());
+		this.eventsToFacilityLoad.resetAll(event.getIteration());
 	}
 
 	private void printStatistics(Facilities facilities, String iterationPath, int iteration) {
