@@ -345,7 +345,7 @@ class CALiveServer implements OTFLiveServerRemote{
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
 		if(time > this.time) this.time++;
 		quad.link.moveLink(this.time);
-		return false;
+		return true;
 	}
 
 	// not needed
@@ -431,6 +431,8 @@ public class CALinkOTFVis extends Thread {
 
 		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setAgentSize(100.f);
 		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setLinkWidth(17.5f*CALink.LANECOUNT +5);
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(0xeeeeee));
+		OGLAgentPointLayer.AgentArrayDrawer.setAlpha(255);
 
 		MyControlBar hostControl;
 		try {
