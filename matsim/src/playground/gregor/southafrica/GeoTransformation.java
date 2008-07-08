@@ -48,6 +48,7 @@ public class GeoTransformation {
 	    final CoordinateReferenceSystem sourceCRS = CRS.parseWKT(SourceWKT);
 	    System.out.println("Target WKT:\n" + WGS84_UTM34S);
 	    final CoordinateReferenceSystem targetCRS = CRS.parseWKT( WGS84_UTM34S);
+	    
 	    final MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
 		final Collection<Feature> transformed = new ArrayList<Feature>();
 		final Iterator it = fs.getFeatures().iterator();
