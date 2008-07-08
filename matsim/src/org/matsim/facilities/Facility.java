@@ -328,11 +328,11 @@ public class Facility extends AbstractLocation {
 	}
 	
 	public double getSumCapacityPenaltyFactor() {
-		return sumCapacityPenaltyFactor;
+		return this.sumCapacityPenaltyFactor;
 	}
 	
 	public int getDailyCapacity() {
-		return dailyCapacity;
+		return this.dailyCapacity;
 	}
 
 	// ----------------------------------------------------
