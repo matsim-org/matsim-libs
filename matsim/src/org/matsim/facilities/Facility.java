@@ -50,7 +50,7 @@ public class Facility extends AbstractLocation {
 	 * 2.	The mobsim handles times > 24 h
 	 *		Facility load has to be handled for hour 0..24 only (acc. to M.B.)
 	 */
-	//private final static Logger log = Logger.getLogger(Facility.class);
+	private final static Logger log = Logger.getLogger(Facility.class);
 
 	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
 	private int numberOfVisitorsPerDay = 0;
@@ -107,11 +107,12 @@ public class Facility extends AbstractLocation {
 			numberOfVisitors += this.arrivals[i];
 			this.load[i] = numberOfVisitors*this.scaleNumberOfPersons;
 			numberOfVisitors -= this.departures[i];
+			log.debug("calculateFacilityLoad24 fid="+this.id + ": load["+i+"]="+load[i]);
 		}
 	}
 
 	// TODO: Remove this hard-coded parameterization asap
-	public double calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
+	private double calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
 
 		double capPenaltyFactor = 0.0;
 		//BPR
@@ -120,7 +121,7 @@ public class Facility extends AbstractLocation {
 		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
 			if (this.capacity[i] > 0) {
 			capPenaltyFactor += a*Math.pow(
-					(double)this.load[i]/(this.capacity[i]/(double)this.numberOfTimeBins), b);
+					(double)this.load[i]/(this.capacity[i]/(double)this.numberOfTimeBins), b);			
 			}
 			else {
 				// do nothing:
@@ -129,8 +130,7 @@ public class Facility extends AbstractLocation {
 		}
 
 		capPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
-		capPenaltyFactor = Math.min(1.0, capPenaltyFactor);
-
+		capPenaltyFactor = Math.min(1.0, capPenaltyFactor);		
 		this.sumCapacityPenaltyFactor += capPenaltyFactor;
 		return capPenaltyFactor;
 	}
@@ -260,7 +260,7 @@ public class Facility extends AbstractLocation {
 		}
 
 		int startTimeBinIndex = Math.min(this.numberOfTimeBins-1, (int)(startTime/(900)));
-		int endTimeBinIndex = Math.min(this.numberOfTimeBins-1, (int)(endTime/(900)));
+		int endTimeBinIndex = Math.min(this.numberOfTimeBins-1, (int)(endTime/(900)));	
 		return calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
 	}
 
