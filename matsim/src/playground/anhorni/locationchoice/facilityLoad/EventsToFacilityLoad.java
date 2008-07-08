@@ -78,7 +78,7 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 
 
 	public void reset(final int iteration) {
-		// 
+		log.info("EventsToFacilityLoad resetted"); 
 	}
 	
 	public void resetAll(final int iteration) {
@@ -87,5 +87,6 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 			Facility f = iter.next();
 			f.reset();
 		}
+		log.info("EventsToFacilityLoad resetted");
 	}
 }
