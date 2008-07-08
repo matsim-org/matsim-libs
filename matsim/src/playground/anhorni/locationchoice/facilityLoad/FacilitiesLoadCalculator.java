@@ -84,7 +84,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		this.eventsToFacilityLoadCalculator.reset(event.getIteration());
+		this.eventsToFacilityLoadCalculator.resetAll(event.getIteration());
 	}
 
 	private void printStatistics(Facilities facilities, String iterationPath, int iteration) {

@@ -52,7 +52,6 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 		if (event.acttype.startsWith("s") || event.acttype.startsWith("l")) {
 			facility.addArrival(event.time, this.scaleNumberOfPersons);
 		}
-		log.info("haaandled arrival");
 	}
 
 	public void handleEvent(final EventActivityEnd event) {
@@ -74,6 +73,10 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 
 
 	public void reset(final int iteration) {
+		// 
+	}
+	
+	public void resetAll(final int iteration) {
 		Iterator<? extends Facility> iter = this.facilities.getFacilities().values().iterator();
 		while (iter.hasNext()){
 			Facility f = iter.next();
