@@ -48,9 +48,10 @@ import com.sun.opengl.util.texture.Texture;
 public class OGLAgentPointLayer extends DefaultSceneLayer {
 	private final static int BUFFERSIZE = 25000;
 	
-	private final static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
+	private static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 50.}, new Color[] {
 					Color.RED, Color.YELLOW, Color.GREEN});
+	
 	// for Padang time-based agents
 	private final static OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 120., 255. ,256.}, new Color[] {	Color.GREEN, Color.YELLOW, Color.RED, Color.RED, Color.BLUE});
@@ -82,6 +83,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		
 		protected void setTexture() {
 			this.texture = AgentDrawer.carjpg;
+		}
+		
+		public static void setColorizer(OTFOGLDrawer.FastColorizer newcolors) {
+			colorizer = newcolors;
 		}
 		
 		protected void setAgentSize() {
