@@ -21,6 +21,7 @@
 package org.matsim.utils.vis.otfvis.opengl;
 
 import java.awt.BorderLayout;
+import java.awt.GraphicsDevice;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
@@ -32,7 +33,6 @@ import org.matsim.mobsim.QueueLink;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;
-import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.utils.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.utils.vis.otfvis.gui.OTFQueryControlBar;
@@ -88,9 +88,7 @@ public class OnTheFlyClientQuad extends Thread {
 	@Override
 	public void run() {
 		String id1 = "test1";
-		String id2 = "test2";
-		OTFServerQuad servQ;
-
+		boolean fullscreen = false;
 
 		// Maybe later: connect.add(QueueLink.class, OTFDefaultLinkHandler.Writer.class);
 		// connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
@@ -107,6 +105,13 @@ public class OnTheFlyClientQuad extends Thread {
 		}
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JFrame.setDefaultLookAndFeelDecorated(true);
+		
+		if (fullscreen) {
+			GraphicsDevice gd = frame.getGraphicsConfiguration().getDevice();
+			frame.setUndecorated(true);
+			gd.setFullScreenWindow(frame);
+		}
+
 		//frame.setLayout( new GridLayout(0,2,10,10) ); 
 		//frame.setLayout( new FlowLayout() ); 
 		JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -146,8 +151,10 @@ public class OnTheFlyClientQuad extends Thread {
 				((OTFOGLDrawer)drawer).setQueryHandler(queryControl);
 			}
 			
-
-			frame.setSize(1024, 600);
+			if (!fullscreen) {
+				// only set custom frame size if not in fullscreen mode
+				frame.setSize(1024, 600);
+			}
 			drawer.invalidate(0);
 			frame.setVisible(true);
 			//drawer2.invalidate();
@@ -160,16 +167,12 @@ public class OnTheFlyClientQuad extends Thread {
 		}
 		//host.play();
 		catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
