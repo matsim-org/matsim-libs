@@ -28,7 +28,7 @@ import org.matsim.events.algorithms.EventWriterTXT;
 
 public class BinaryEvents2TextEvents {
 
-	private static void convert(final String fromFilename, final String toFilename) {
+	public static void convert(final String fromFilename, final String toFilename) {
 		final Events events = new Events();
 
 		events.addHandler(new CalcLegNumber());
