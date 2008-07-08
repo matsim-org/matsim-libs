@@ -45,6 +45,12 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 		super();
 		this.facilities = facilities;
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
+		
+		Iterator<? extends Facility> iter = this.facilities.getFacilities().values().iterator();
+		while (iter.hasNext()){
+			Facility f = iter.next();
+			f.setScaleNumberOfPersons(this.scaleNumberOfPersons);
+		}
 	}
 
 	public void handleEvent(final EventActivityStart event) {
@@ -65,7 +71,6 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 		Iterator<? extends Facility> iter = this.facilities.getFacilities().values().iterator();
 		while (iter.hasNext()){
 			Facility f = iter.next();
-			f.setScaleNumberOfPersons(this.scaleNumberOfPersons);
 			f.finish();
 		}
 		log.info("EventsToFacilityLoad finished");
