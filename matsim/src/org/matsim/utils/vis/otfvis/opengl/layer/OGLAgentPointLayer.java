@@ -62,6 +62,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 
 		public int count = 0;
+		private static int alpha =120;
 		
 		private ByteBuffer colorsIN = null;
 		private FloatBuffer vertexIN = null;
@@ -70,6 +71,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		private final  List<ByteBuffer> colBuffers= new LinkedList<ByteBuffer>();
 		
 				
+		public static void setAlpha(int alp) { alpha = alp;};
+		
 		private final Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
 		protected Texture texture;
 		
@@ -190,7 +193,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			colorsIN.put( (byte)mycolor.getRed());
 			colorsIN.put( (byte)mycolor.getGreen());
 			colorsIN.put((byte)mycolor.getBlue());
-			colorsIN.put( (byte)120);
+			colorsIN.put( (byte)alpha);
 			
 			count++;
 			
