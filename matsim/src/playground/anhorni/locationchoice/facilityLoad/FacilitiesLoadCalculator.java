@@ -75,6 +75,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		Controler controler = event.getControler();
 		Facilities facilities = controler.getFacilities();
+		this.eventsToFacilityLoadCalculator.finish();
 		if (event.getIteration() % 10 == 0) {
 			this.printStatistics(facilities, controler.getIterationPath(), event.getIteration());
 		}
@@ -84,7 +85,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	private void printStatistics(Facilities facilities, String iterationPath, int iteration) {
 
 		try {
-			final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tCapacity\tAttrFactor\tavgPenaltyFactor";
+			final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tCapacity\tAttrFactor\tsumPenaltyFactor";
 			final BufferedWriter out_shop = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_shop.txt");
 			final BufferedWriter out_leisure = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_leisure.txt");
 
@@ -109,7 +110,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
 							String.valueOf(facility.getDailyCapacity())+"\t"+
 							String.valueOf(facility.getAttrFactor()+"\t"+
-							String.valueOf(facility.getSumCapacityPenaltyFactor()/facility.getNumberOfVisitorsPerDay())));
+							String.valueOf(facility.getSumCapacityPenaltyFactor())));
 						out_shop.newLine();						
 						break;
 					}
@@ -124,10 +125,8 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
 							String.valueOf(facility.getDailyCapacity())+"\t"+
 							String.valueOf(1.0)+"\t"+
-							String.valueOf(0.0));
-						
-						out_leisure.newLine();
-							
+							String.valueOf(0.0));						
+						out_leisure.newLine();							
 						break;
 					}
 				}
