@@ -52,6 +52,7 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 		if (event.acttype.startsWith("s") || event.acttype.startsWith("l")) {
 			facility.addArrival(event.time, this.scaleNumberOfPersons);
 		}
+		log.info("haaandled arrival");
 	}
 
 	public void handleEvent(final EventActivityEnd event) {

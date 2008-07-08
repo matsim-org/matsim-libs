@@ -27,8 +27,10 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.AfterMobsimEvent;
+import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.AfterMobsimListener;
+import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
@@ -46,7 +48,7 @@ import org.matsim.world.algorithms.WorldValidation;
  *
  * @author anhorni
  */
-public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimListener {
+public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimListener, IterationEndsListener {
 
 	private EventsToFacilityLoad eventsToFacilityLoadCalculator;
 
@@ -78,7 +80,10 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 		this.eventsToFacilityLoadCalculator.finish();
 		if (event.getIteration() % 10 == 0) {
 			this.printStatistics(facilities, controler.getIterationPath(), event.getIteration());
-		}
+		}	
+	}
+	
+	public void notifyIterationEnds(IterationEndsEvent event) {
 		this.eventsToFacilityLoadCalculator.reset(event.getIteration());
 	}
 
@@ -98,11 +103,11 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 			Iterator<? extends Facility> iter = facilities.getFacilities().values().iterator();
 			while (iter.hasNext()){
 				Facility facility = iter.next();
-				
-				// check if this is a shopping facility
+							
 				Iterator<Activity> act_it=facility.getActivities().values().iterator();
 				while (act_it.hasNext()){
 					Activity activity = act_it.next();
+					// check if this is a shopping facility
 					if (activity.getType().startsWith("s")) {
 						out_shop.write(facility.getId().toString()+"\t"+
 							String.valueOf(facility.getCenter().getX())+"\t"+
@@ -114,10 +119,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 						out_shop.newLine();						
 						break;
 					}
-				}
-				//or a leisure facility
-				while (act_it.hasNext()){
-					Activity activity = act_it.next();
+					//or a leisure facility
 					if (activity.getType().startsWith("l")) {
 						out_leisure.write(facility.getId().toString()+"\t"+
 							String.valueOf(facility.getCenter().getX())+"\t"+
