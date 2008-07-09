@@ -46,7 +46,7 @@ public class Plan extends BasicPlanImpl {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private transient Person person = null;
+	private Person person = null;
 
 	public PlanStatsI firstPlanStatsAlgorithm = null;
 
@@ -91,11 +91,7 @@ public class Plan extends BasicPlanImpl {
 
 	public final Leg createLeg(final String mode, final String depTime, final String travTime,
 														 final String arrTime) throws Exception {
-		verifyCreateLeg();
-		int legnumber = (this.actsLegs.size()-1) /2;
-		Leg l = new Leg(legnumber, mode, depTime, travTime, arrTime);
-		this.actsLegs.add(l);
-		return l;
+		return createLeg(mode, Time.parseTime(depTime), Time.parseTime(travTime), Time.parseTime(arrTime));
 	}
 
 	public final Leg createLeg(final String mode, final double depTime, final double travTime,
@@ -206,7 +202,6 @@ public class Plan extends BasicPlanImpl {
 		return this.actsLegs;
 	}
 
-
 	public final Person getPerson() {
 		return this.person;
 	}
@@ -279,7 +274,9 @@ public class Plan extends BasicPlanImpl {
 				"[nof_acts_legs=" + this.actsLegs.size() + "]";
 	}
 
-	// loads a copy of an existing plan
+	/** loads a copy of an existing plan
+	 * @param in a plan who's data will be loaded into this plan
+	 **/
 	public void copyPlan(final Plan in) {
 		setScore(in.getScore());
 		this.firstPlanStatsAlgorithm = null;
