@@ -115,6 +115,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 	private static final double INITIAL_SCORE = 0.0;
 
 //	private HashMap<Activity, SocialAct> socialPlansMap= SNScoringGeneralFactory.getSocialActsMap();
+	private SpatialScorer spatialScorer = SNScoringGeneralFactory.getScorer();
 	private String factype = SNScoringGeneralFactory.getFacType();// Type of activity in which social group matters to Person;
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
@@ -331,7 +332,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 		//FIRST call SOCIAL.PLANS.GENERATOR AGAIN
 		// get the random act
 		// for all acts of type "factype"
-//		if(act.getType().equals(factype)){
+		if(act.getType().equals(factype)){
 //			int friend=0;
 //			int foe=0;
 //			Person p1=plan.getPerson();
@@ -354,8 +355,9 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 //			if(ratio>0. && ratio <= 1.){
 //
 //				if(myActivity.getType().equals("leisure")){
-//					score+=10.*(double)friend/(double)foe;					
-//				}
+//					score+=10.*(double)friend/(double)foe;
+		score+=10.*spatialScorer.scoreFriendtoFoeInTimeWindow(plan);
+				}
 //			}else{
 //
 //			}

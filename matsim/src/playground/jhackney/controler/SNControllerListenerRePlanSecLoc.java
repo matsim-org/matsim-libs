@@ -53,6 +53,7 @@ import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.kml.EgoNetPlansItersMakeKML2;
 import playground.jhackney.scoring.SNScoringGeneralFactory;
+import playground.jhackney.scoring.SpatialScorer;
 
 
 /**
@@ -161,14 +162,11 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 	public void notifyAfterMobSimEvent(final AfterMobsimEvent event){
 		
-//		this.log.info("  Generating realized [Spatial] Social Acts base on current MobSim iteration...");
-//		this.log.info("   Makes a map of time/place windows for all encounters between the agents");
-//		this.socialPlansMap=this.gen2.generateMap(this.controler.getPopulation());
-//		this.socialPlans = socialPlansMap.values();
-//		this.log.info("...finished.");
 		
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
-//		factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
+		SpatialScorer spatialScorer = new SpatialScorer();
+		spatialScorer.scoreActs(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
+		factory = new SNScoringGeneralFactory("leisure", spatialScorer);
 		this.log.info("... done");
 
 		if(factory!=null){

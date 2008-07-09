@@ -8,9 +8,11 @@ import org.matsim.scoring.ScoringFunctionFactory;
 public class SNScoringGeneralFactory implements ScoringFunctionFactory {
 
 	private static String factype="";
+	private static SpatialScorer scorer;
 
-	public SNScoringGeneralFactory(String factype) {
-			SNScoringGeneralFactory.factype=factype;
+	public SNScoringGeneralFactory(String factype, SpatialScorer scorer) {
+		SNScoringGeneralFactory.factype=factype;
+		this.scorer=scorer;
 
 	}
 
@@ -20,5 +22,7 @@ public class SNScoringGeneralFactory implements ScoringFunctionFactory {
 	public static String getFacType(){
 		return factype;
 	}
-
+	public static SpatialScorer getScorer(){
+		return scorer;
+	}
 }
