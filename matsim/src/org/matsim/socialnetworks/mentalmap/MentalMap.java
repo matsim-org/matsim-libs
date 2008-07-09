@@ -27,7 +27,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -41,7 +40,6 @@ import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.socialnetworks.algorithms.SortHashtableByValue;
-import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.world.Location;
 
@@ -72,8 +70,6 @@ public class MentalMap {
 //	Map of act and activity ID numbers. Reverse of above. Acts change so we use Id's
 //	private Hashtable<Act,Id> mapActActivityId = new Hashtable<Act,Id>();
 
-	// Socializing opportunities are face-to-face meetings of the agents
-	private ArrayList<SocialAct> socializingOpportunities = new ArrayList<SocialAct>();
 
 //	The activity score
 	private Hashtable<Activity, Double> activityScore = new Hashtable<Activity, Double>();
@@ -287,18 +283,6 @@ public class MentalMap {
 			}
 		}
 		return myAct;
-	}
-
-	public void addDate(SocialAct date){
-		this.socializingOpportunities.add(date);
-	}
-
-	public void dropDate(SocialAct date){
-		this.socializingOpportunities.remove(date);
-	}
-
-	public void clearDates(){
-		this.socializingOpportunities.clear();
 	}
 
 }

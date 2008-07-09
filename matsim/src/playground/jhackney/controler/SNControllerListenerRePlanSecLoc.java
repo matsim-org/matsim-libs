@@ -43,10 +43,7 @@ import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
-import org.matsim.socialnetworks.interactions.SocialAct;
-import org.matsim.socialnetworks.interactions.SpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialInteractorActsFast;
-import org.matsim.socialnetworks.interactions.SpatialSocialActTracker;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
@@ -256,7 +253,6 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				// Agents' planned interactions
 				this.log.info("  Agents planned social interactions, respectively their meetings based on last MobSim iteration ...");
 				this.log.info("  Agents' relationships are updated to reflect these interactions! ...");
-//				this.plansInteractorS.interact(this.socialPlans, this.rndEncounterProbs, snIter);
 				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
 			} else {
 				this.log.info("     (none)");

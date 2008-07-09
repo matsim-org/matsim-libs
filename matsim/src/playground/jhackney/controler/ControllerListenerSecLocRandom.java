@@ -42,9 +42,7 @@ import org.matsim.plans.Plans;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.algorithms.PersonSNSecLocRandomReRoute;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
-import org.matsim.socialnetworks.interactions.SocialAct;
-import org.matsim.socialnetworks.interactions.SpatialInteractor;
-import org.matsim.socialnetworks.interactions.SpatialSocialActTracker;
+import org.matsim.socialnetworks.interactions.SpatialInteractorActsFast;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
@@ -90,14 +88,12 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 	ActivityActReader aar = null;
 	PajekWriter pjw;
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
-	SpatialInteractor plansInteractorS;//spatial (face to face)
+	SpatialInteractorActsFast plansInteractorS;//spatial (face to face)
+
 	int max_sn_iter;
 	int snIter;
 	String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
-
-	SpatialSocialActTracker gen2 = new SpatialSocialActTracker();
-	Collection<SocialAct> socialPlans=null;
 
 	private final Logger log = Logger.getLogger(ControllerListenerSecLocRandom.class);
 
@@ -204,18 +200,10 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 
 			if (total_spatial_fraction(this.fractionS) > 0) { // only generate the map if spatial meeting is important in this experiment
 
-				//if(Events have just changed or if no events are yet available and if there is an interest in the planned interactions)
-				this.log.info("  Generating planned [Spatial] socializing opportunities ...");
-				this.log.info("   Makes a map of time/place windows for all planned encounters between the agents");
-				this.socialPlans = this.gen2.generateValues(this.controler.getPopulation());
-				this.log.info("...finished.");
-
-				//}// end if
-
 				// Agents' planned interactions
 				this.log.info("  Agents planned social interactions ...");
 				this.log.info("  Agents' relationships are updated to reflect these interactions! ...");
-				this.plansInteractorS.interact(this.socialPlans, this.rndEncounterProbs, snIter);
+				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
 
 			}else{
 				this.log.info("     (none)");
@@ -363,7 +351,8 @@ public class ControllerListenerSecLocRandom implements StartupListener, Iteratio
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
-		this.plansInteractorS=new SpatialInteractor(this.snet);
+
+		this.plansInteractorS=new SpatialInteractorActsFast(this.snet);
 		this.log.info("... done");
 
 		this.snIter = this.controler.getFirstIteration();

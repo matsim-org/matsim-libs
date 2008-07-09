@@ -115,10 +115,11 @@ public class SpatialInteractorActsFast {
 		}else if(interaction_type.equals("timewindowall")){
 			encounterAllPersonsFaceToFaceInTimeWindow(rndEncounterProb,iteration);
 		}else if(interaction_type.equals("MarchalNagelChain")){
-			makeSocialLinkBetweenLastTwo(rndEncounterProb,iteration);
+			Gbl.errorMsg("Spatial interactions "+interaction_type+" Not supported in new Act search algorithm "+ this.getClass());
+//			makeSocialLinkBetweenLastTwo(rndEncounterProb,iteration);
 		} else {
 			Gbl.errorMsg(" Spatial interaction type is \"" + interaction_type
-					+ "\". Only \"random\" and \"timewindow\" are supported at this time.");
+					+ "\". Only \"random\", \"meetall\", \"timewindowrandom\", and \"timewindowall\" are supported at this time.");
 		}
 		System.out.println("...finished");
 	}
