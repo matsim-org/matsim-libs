@@ -39,7 +39,6 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
 import org.matsim.scoring.ScoringFunction;
-import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -115,7 +114,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
 
-	private HashMap<Activity, SocialAct> socialPlansMap= SNScoringGeneralFactory.getSocialActsMap();
+//	private HashMap<Activity, SocialAct> socialPlansMap= SNScoringGeneralFactory.getSocialActsMap();
 	private String factype = SNScoringGeneralFactory.getFacType();// Type of activity in which social group matters to Person;
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
@@ -332,36 +331,36 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 		//FIRST call SOCIAL.PLANS.GENERATOR AGAIN
 		// get the random act
 		// for all acts of type "factype"
-		if(act.getType().equals(factype)){
-			int friend=0;
-			int foe=0;
-			Person p1=plan.getPerson();
-//			Activity myActivity=p1.getKnowledge().getMentalMap().getActivity(act);
-			Activity myActivity = act.getFacility().getActivity(act.getType());
-
-			Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
-			//for all agents in (social.plans.get(act){
-			Enumeration<Person> e = othersThere.elements();
-//			System.out.print("### "+othersThere.size());
-			while(e.hasMoreElements()){
-				Person p2 =(Person) e.nextElement();
-				if(p1.getKnowledge().getEgoNet().knows(p2)){
-					friend++;
-				}else{
-					foe++;
-				}
-			}
-			double ratio = (double)friend/(double)foe;
-			if(ratio>0. && ratio <= 1.){
-				//utility=utility+(double)friend/(double)foe * const
-//				System.out.println("### test scoring "+ratio);
-				if(myActivity.getType().equals("leisure")){
-					score+=10.*(double)friend/(double)foe;					
-				}
-			}else{
-//				System.out.println();
-			}
-		}
+//		if(act.getType().equals(factype)){
+//			int friend=0;
+//			int foe=0;
+//			Person p1=plan.getPerson();
+////			Activity myActivity=p1.getKnowledge().getMentalMap().getActivity(act);
+//			Activity myActivity = act.getFacility().getActivity(act.getType());
+//
+//			Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
+//			//for all agents in (social.plans.get(act){
+//			Enumeration<Person> e = othersThere.elements();
+//
+//			while(e.hasMoreElements()){
+//				Person p2 =(Person) e.nextElement();
+//				if(p1.getKnowledge().getEgoNet().knows(p2)){
+//					friend++;
+//				}else{
+//					foe++;
+//				}
+//			}
+//			double ratio = (double)friend/(double)foe;
+//			if(ratio>0. && ratio <= 1.){
+//
+//				if(myActivity.getType().equals("leisure")){
+//					score+=10.*(double)friend/(double)foe;					
+//				}
+//			}else{
+//
+//			}
+//			// JH end
+//		}
 		return score;
 	}
 
