@@ -87,30 +87,6 @@ public class BasicActImpl implements BasicAct {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
-		if (!(o instanceof BasicAct)) {
-			return false;
-		}
-		BasicAct other = (BasicAct) o;
-
-		// now it's getting complicated, as link is optional
-		if (((other.getLink() == null) && (this.link != null))
-				|| ((other.getLink() != null) && (this.link == null))) {
-			// one of the link's is null, the other not, so the acts cannot be equal
-			return false;
-		}
-		if ((other.getLink() != null) && (this.link != null)) {
-			if (!(other.getLink().getId().equals(this.link.getId()))) {
-				return false;
-			}
-		}
-		// the two links are the same (either both null, or both the same id), so compare the rest
-		return ((other.getType().equals(this.type))
-				&& (other.getStartTime() == this.startTime)
-				&& (other.getEndTime() == this.endTime));
-	}
-
-	@Override
 	public int hashCode() {
 		return this.type.hashCode() ^ this.link.getId().toString().hashCode(); // XOR of two hashes
 	}
