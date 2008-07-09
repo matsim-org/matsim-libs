@@ -18,7 +18,7 @@ public class Test5 extends MatsimTestCase {
 
 	
 	public void testTest5() {
-		String baseDir="src/playground/wrashid/test/test5/";
+		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test5/";
 		String[] args=new String[1];
 			
 		args[0]= baseDir + "config.xml";

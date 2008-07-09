@@ -23,7 +23,7 @@ public class Test6 extends MatsimTestCase {
 	}
 	
 	public void testTest6() {
-		String baseDir="src/playground/wrashid/test/test6/";
+		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test6/";
 		String[] args=new String[1];
 		
 		
