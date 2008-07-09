@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
-<plans">
+<plans>
 <person id="0">
 	<plan selected="no">
 		<act type="h" link="1" start_time="00:00:00" dur="07:00:00" end_time="07:00:00" />
