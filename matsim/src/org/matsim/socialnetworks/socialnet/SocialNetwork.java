@@ -342,8 +342,6 @@ public class SocialNetwork {
 
 		if (!person1.equals(person2)) {
 
-//			NOTE this could be made more efficient by directly accessing
-//			the link and testing for null
 			if(person1.getKnowledge().getEgoNet().knows(person2)){
 
 				newLink = person1.getKnowledge().getEgoNet().getEgoLink(person2);
