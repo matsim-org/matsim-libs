@@ -112,15 +112,11 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 			handleAct(time);
 		}
 		this.lastTime = time;
-		
-		log.info("startLeg");
 	}
 
 	public void endLeg(final double time) {
 		handleLeg(time);
 		this.lastTime = time;
-		
-		log.info("end leg");
 	}
 
 	public void agentStuck(final double time) {
@@ -140,6 +136,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 			this.score -=penalty.getPenalty();
 			log.info(penalty.getPenalty());
 		}
+		log.info("finish LocationChoiceScoringFunction");
 	}
 
 	public double getScore() {
@@ -199,9 +196,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 	}
 
 	private final double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
-
-		log.info("calculating act score");
-		
+	
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
