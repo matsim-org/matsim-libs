@@ -11,14 +11,14 @@ import playground.wrashid.test.CppEventFileParser;
 import playground.wrashid.test.Lock;
 import playground.wrashid.test.PCppEventFileParser;
 
-public class Test61 {
+public class Test6_1 {
 
 	/**
 	 * @param args
 	 */
 	
 	public static void main(String[] args) {
-		Test61 t6=new Test61();
+		Test6_1 t6=new Test6_1();
 		t6.testTest6();
 	}
 	

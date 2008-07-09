@@ -22,6 +22,11 @@ package playground.wrashid.test;
 
 import playground.wrashid.test.test1.Test1;
 import playground.wrashid.test.test2.Test2;
+import playground.wrashid.test.test4.Test4;
+import playground.wrashid.test.test5.Test5;
+import playground.wrashid.test.test6.Test6;
+import playground.wrashid.test.test6.Test6_1;
+import playground.wrashid.test.test8.Test8;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -32,6 +37,10 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(Test1.class);
 		suite.addTestSuite(Test2.class);
+		suite.addTestSuite(Test4.class);
+		suite.addTestSuite(Test5.class);
+		suite.addTestSuite(Test6_1.class);
+		suite.addTestSuite(Test8.class);
 		//$JUnit-END$
 		return suite;
 	}
