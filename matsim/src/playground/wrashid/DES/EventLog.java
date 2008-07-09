@@ -173,7 +173,7 @@ public class EventLog {
 			}
 			hm.get(link2)[3]=eventLog2.get(i).time-hm.get(link2)[2];
 			
-			System.out.println("link:" + link2 + "; diff" + (hm.get(link2)[1]-hm.get(link2)[3]));
+			//System.out.println("link:" + link2 + "; diff" + (hm.get(link2)[1]-hm.get(link2)[3]));
 		}
 		
 		
@@ -182,7 +182,7 @@ public class EventLog {
 		double absSum=0;
 		double absAverage=0;
 		for (Double[] d: hm.values()){
-			System.out.println("eventLog1-eventLog2:" + (d[1]-d[3]));
+			//System.out.println("eventLog1-eventLog2:" + (d[1]-d[3]));
 			absSum+=Math.abs(d[1]-d[3]);
 		}
 		

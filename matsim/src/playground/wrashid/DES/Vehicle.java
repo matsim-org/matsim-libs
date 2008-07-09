@@ -19,7 +19,6 @@ public class Vehicle extends SimUnit {
 	private int legIndex;
 	private Link currentLink = null;
 	private int linkIndex;
-	
 
 	public Vehicle(Scheduler scheduler, Person ownerPerson) {
 		super(scheduler);
@@ -45,9 +44,9 @@ public class Vehicle extends SimUnit {
 		 * get the next leg if ("car".equals(leg.getMode())) { // we only
 		 * simulate car traffic Link nextLink =
 		 * leg.getRoute().getLinkRoute()[startingLegMessage.getLinkIndex()+1]; //
-		 * these are the links the agent will drive along one after the other.
-		 *  } // when nicht car, was dann????????????????????????????? } }
-		 *  => delete this 'comment', as soon tests are written and run
+		 * these are the links the agent will drive along one after the other. } //
+		 * when nicht car, was dann????????????????????????????? } } => delete
+		 * this 'comment', as soon tests are written and run
 		 */
 	}
 
@@ -63,20 +62,20 @@ public class Vehicle extends SimUnit {
 		linkIndex = -1;
 
 		Plan plan = ownerPerson.getSelectedPlan(); // that's the plan the
-													// person will execute
+		// person will execute
 		ArrayList<Object> actsLegs = plan.getActsLegs();
 		// the assumption here
 		currentLeg = (Leg) actsLegs.get(legIndex);
 		// the leg the agent performs
 		double departureTime = currentLeg.getDepTime(); // the time the agent
-														// departs at this
-														// activity
+		// departs at this
+		// activity
 
-		
 		// this is the link, where the first activity took place
-		currentLink = ((Act) actsLegs.get(legIndex-1)).getLink();
+		currentLink = ((Act) actsLegs.get(legIndex - 1)).getLink();
 
-		sendMessage(new StartingLegMessage(scheduler, this), this.unitNo, departureTime);
+		Road road=Road.allRoads.get(getCurrentLink().getId().toString());
+		scheduleStartingLegMessage(departureTime, road);
 	}
 
 	public void setCurrentLeg(Leg currentLeg) {
@@ -114,19 +113,100 @@ public class Vehicle extends SimUnit {
 	public void setLinkIndex(int linkIndex) {
 		this.linkIndex = linkIndex;
 	}
-	
+
 	// findes out, if the vehical is in endingLegMode
 	// this means, that the vehical is just waiting until it can enter the
 	// last link (without entering it) and then ends the leg
-	public boolean isEndingLegMode(){
-		if (getCurrentLeg().getRoute().getLinkRoute().length==getLinkIndex()){
+	public boolean isEndingLegMode() {
+		if (getCurrentLeg().getRoute().getLinkRoute().length == getLinkIndex()) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
-	public void initiateEndingLegMode(){
-			linkIndex=getCurrentLeg().getRoute().getLinkRoute().length;
+
+	public void initiateEndingLegMode() {
+		linkIndex = getCurrentLeg().getRoute().getLinkRoute().length;
 	}
+
+	// public void leavePreviousRoad(){
+	// leave previous road (if there is a previous road)
+	// if (this.getLinkIndex()>=1){
+	// Link
+	// previousLink=this.getCurrentLeg().getRoute().getLinkRoute()[this.getLinkIndex()-1];
+	// Road previousRoad=Road.allRoads.get(previousLink.getId().toString());
+	// previousRoad.leaveRoad(this);
+	// EventMessage.printLogMessage(Scheduler.simTime,
+	// Integer.parseInt(getOwnerPerson().getId().toString()),getLegIndex()-1,Integer.parseInt(previousLink.getId().toString()),Integer.parseInt(previousLink.getFromNode().getId().toString()),Integer.parseInt(previousLink.getToNode().getId().toString()),SimulationParameters.LEAVE_LINK);
+	// }
+	// }
+
+	public void scheduleEnterRoadMessage(double scheduleTime, Road road) {
+		// before entering the new road, we musst leave the previous road (if there is a previous road)
+		if (this.getLinkIndex()>=0){
+			// the first link does not need to be left (which has index -1)
+			scheduleLeavePreviousRoadMessage(scheduleTime);
+		}
+		
+		if (isEndingLegMode()) {
+			// attention: as we are not actually entering the road, we need to
+			// give back the promised space to the road
+			// else a precondition of the enterRequest would not be correct any
+			// more (which involves the noOfCarsPromisedToEnterRoad variable)
+			road.giveBackPromisedSpaceToRoad(); // next road
+			scheduleEndLegMessage(scheduleTime, road);
+		} else {
+			sendMessage(new EnterRoadMessage(road.scheduler, this), road
+					.getUnitNo(), scheduleTime);
+		}
+	}
+
+	public void scheduleLeavePreviousRoadMessage(double scheduleTime) {
+		
+		Road previousRoad=null;
+		Link previousLink=null;
+		if (this.getLinkIndex()==0){
+			Plan plan = ownerPerson.getSelectedPlan(); 
+			ArrayList<Object> actsLegs = plan.getActsLegs();
+			previousLink = ((Act) actsLegs.get(legIndex - 1)).getLink();
+			//System.out.println("AscheduleLeavePreviousRoadMessage:"+previousLink.getId().toString());
+			previousRoad=Road.allRoads.get(previousLink.getId().toString());
+		} else if (this.getLinkIndex()>=1){
+			previousLink=this.getCurrentLeg().getRoute().getLinkRoute()[this.getLinkIndex()-1];
+			//System.out.println("BscheduleLeavePreviousRoadMessage:"+previousLink.getId().toString());
+			previousRoad=Road.allRoads.get(previousLink.getId().toString());
+		}
+		
+		scheduleLeaveRoadMessage(scheduleTime, previousRoad);
+		
+		//
+		/*
+		if (this.getLinkIndex()>=1){
+			// the first link does not need to be left (which has index -1)
+			Road previousRoad=Road.allRoads.get(this.getCurrentLink().getId().toString());
+			scheduleLeaveRoadMessage(scheduleTime, previousRoad);
+		}	
+		*/
+	}
+
+	public void scheduleEndRoadMessage(double scheduleTime, Road road) {
+		sendMessage(new EndRoadMessage(road.scheduler, this), road.getUnitNo(),
+				scheduleTime);
+	}
+
+	public void scheduleLeaveRoadMessage(double scheduleTime, Road road) {
+		sendMessage(new LeaveRoadMessage(road.scheduler, this), road
+				.getUnitNo(), scheduleTime);
+	}
+
+	public void scheduleEndLegMessage(double scheduleTime, Road road) {
+		sendMessage(new EndLegMessage(road.scheduler, this), road.getUnitNo(),
+				scheduleTime);
+	}
+	
+	public void scheduleStartingLegMessage(double scheduleTime, Road road) {
+		sendMessage(new StartingLegMessage(road.scheduler, this), road.getUnitNo(),
+				scheduleTime);
+	}
+
 }

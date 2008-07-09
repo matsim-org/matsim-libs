@@ -15,11 +15,7 @@ public class EnterRoadMessage extends EventMessage {
 		// enter the road and find out the time for leaving the street
 		
 		Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
-		double nextAvailableTimeForLeavingStreet=road.enterRoad(vehicle);
-		if (nextAvailableTimeForLeavingStreet>0){
-			sendMessage(scheduler,new EndRoadMessage(scheduler,vehicle), road.getUnitNo(), nextAvailableTimeForLeavingStreet);
-		}
-		
+		road.enterRoad(vehicle);
 	}
 	
 	public EnterRoadMessage(Scheduler scheduler,Vehicle vehicle) {

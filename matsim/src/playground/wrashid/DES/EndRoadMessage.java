@@ -16,8 +16,8 @@ public class EndRoadMessage extends EventMessage {
 		
 		
 		// leave previous road
-		Road previousRoad=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
-		previousRoad.leaveRoad(vehicle);
+		//Road previousRoad=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
+		//previousRoad.leaveRoad(vehicle);
 		
 		
 	
@@ -36,34 +36,15 @@ public class EndRoadMessage extends EventMessage {
 			//System.out.println(vehicle.getCurrentLink().getId().toString());
 			
 			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
-			double nextAvailableTimeForEnteringStreet=road.enterRequest(vehicle);
-			
-			
-			
-			
-			
-			if (nextAvailableTimeForEnteringStreet>0){
-				
-				// attention: as we are not actually entering the road, we need to give back the promised space to the road
-				// else a precondition of the enterRequest would not be correct any more (which involves the noOfCarsPromisedToEnterRoad variable)
-				road.giveBackPromisedSpaceToRoad();
-				sendMessage(scheduler,new EndLegMessage(scheduler,vehicle), road.getUnitNo(), nextAvailableTimeForEnteringStreet);
-			}
-			
+			road.enterRequest(vehicle);	
 		} else if (vehicle.getCurrentLeg().getRoute().getLinkRoute().length>vehicle.getLinkIndex()+1){
 			// if leg is not finished yet
 			vehicle.setLinkIndex(vehicle.getLinkIndex()+1);
 			Link nextLink=vehicle.getCurrentLeg().getRoute().getLinkRoute()[vehicle.getLinkIndex()];
 			
 			Road nextRoad=Road.allRoads.get(nextLink.getId().toString());
-			double nextAvailableTimeForEnteringStreet=nextRoad.enterRequest(vehicle);
-			
 			vehicle.setCurrentLink(nextLink);
-			
-			
-			if (nextAvailableTimeForEnteringStreet>0){
-				sendMessage(scheduler,new EnterRoadMessage(scheduler,vehicle), nextRoad.getUnitNo(), nextAvailableTimeForEnteringStreet);
-			}
+			nextRoad.enterRequest(vehicle);
 		} else {
 			
 		}
@@ -71,7 +52,8 @@ public class EndRoadMessage extends EventMessage {
 
 	public EndRoadMessage(Scheduler scheduler,Vehicle vehicle) {
 		super(scheduler,vehicle);
-		eventType=SimulationParameters.LEAVE_LINK;
+		eventType="";
+		logMessage=false;
 	}
 	
 

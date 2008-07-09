@@ -16,6 +16,9 @@ public class EndLegMessage extends EventMessage {
 
 	@Override
 	public void selfhandleMessage() {
+		//vehicle.leavePreviousRoad();
+		
+		
 		
 		// schedule next leg, if there are more legs, else end trip (TODO)
 		
@@ -46,7 +49,8 @@ public class EndLegMessage extends EventMessage {
 			// this is the link, where the first activity took place
 			vehicle.setCurrentLink(((Act) actsLegs.get(vehicle.getLegIndex()-1)).getLink());
 	
-			sendMessage(scheduler,new StartingLegMessage(scheduler, vehicle), vehicle.unitNo, departureTime);
+			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
+			vehicle.scheduleStartingLegMessage(departureTime, road);
 		}
 		
 	}

@@ -19,10 +19,7 @@ public class StartingLegMessage extends EventMessage {
 		
 		// attempt to enter street.
 		Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
-		double nextAvailableTimeForEnteringStreet=road.enterRequest(vehicle);
-		if (nextAvailableTimeForEnteringStreet>0){
-			sendMessage(scheduler,new EnterRoadMessage(scheduler,vehicle), road.getUnitNo(), nextAvailableTimeForEnteringStreet);
-		}
+		road.enterRequest(vehicle);
 	}
 	
 	
