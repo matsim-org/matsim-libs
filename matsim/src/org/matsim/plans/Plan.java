@@ -33,7 +33,12 @@ import org.matsim.utils.misc.Time;
 
 public class Plan extends BasicPlanImpl {
 
-	private static final long serialVersionUID = 1L;
+	/* removed serialization because I think nobody uses it. If someone does,
+	 * please complain, otherwise I'll soon delete these lines permanently.
+	 * marcel/9jul2008
+	 * TODO [MR] delete code
+	 */
+//	private static final long serialVersionUID = 1L;
 
 	private final static Logger log = Logger.getLogger(Plan.class);
 

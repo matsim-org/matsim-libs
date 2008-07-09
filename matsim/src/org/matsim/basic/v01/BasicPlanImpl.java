@@ -20,7 +20,6 @@
 
 package org.matsim.basic.v01;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -31,9 +30,14 @@ import org.apache.log4j.Logger;
  * @author david
  *
  */
-public class BasicPlanImpl implements Serializable, BasicPlan {
+public class BasicPlanImpl implements /*Serializable, */BasicPlan {
 	
-	private static final long serialVersionUID = 1L;
+	/* removed serialization because I think nobody uses it. If someone does,
+	 * please complain, otherwise I'll soon delete these lines permanently.
+	 * marcel/9jul2008
+	 * TODO [MR] delete code
+	 */
+//	private static final long serialVersionUID = 1L;
 
 	private final static Logger log = Logger.getLogger(BasicPlanImpl.class);
 

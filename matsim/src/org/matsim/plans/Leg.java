@@ -20,19 +20,14 @@
 
 package org.matsim.plans;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicNodeImpl;
 import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.utils.misc.Time;
 
-public class Leg extends BasicLegImpl implements Serializable{
+public class Leg extends BasicLegImpl /*implements Serializable*/{
 
-	private static final long serialVersionUID = 5123937717277263980L;
+//	private static final long serialVersionUID = 5123937717277263980L;
 
 	public Leg(final int num, final String mode, final String depTime, final String travTime, final String arrTime) {
 		this.num = num;
@@ -115,8 +110,14 @@ public class Leg extends BasicLegImpl implements Serializable{
 				"[route=" + this.route + "]";
 	}
 
+	/* seems the code below is nowhere really used, so I commented it out. Additionally,
+	 * I think it doesn't work correctly, as it serializes some non-transient members 
+	 * manually, so they are basically serialized twice.
+	 * If nobody needs this code, I will delete it soon.   marcel/9jul2008
+	 * TODO [MR] delete code
+	 */
 	// BasicLeg is not yet serializable, so we have to serialize it by hand
-	private void writeObject(final ObjectOutputStream s) throws IOException
+/*	private void writeObject(final ObjectOutputStream s) throws IOException
 	{
 	    // The standard non-transient fields.
 	  s.defaultWriteObject();
@@ -134,5 +135,5 @@ public class Leg extends BasicLegImpl implements Serializable{
 	  setMode((String)s.readObject());
 	  setRoute((Route)s.readObject());
 	}
-
+*/
 }

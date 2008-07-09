@@ -20,11 +20,6 @@
 
 package org.matsim.plans;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
@@ -36,9 +31,9 @@ import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.misc.Time;
 
-public class Act extends BasicActImpl implements Serializable {
+public class Act extends BasicActImpl /*implements Serializable*/ {
 
-	private static final long serialVersionUID = 1L;
+//	private static final long serialVersionUID = 1L;
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -149,9 +144,19 @@ public class Act extends BasicActImpl implements Serializable {
 	}
 
 
+	/* seems the code below is nowhere really used, so I commented it out. Additionally,
+	 * I think it doesn't work correctly, as it serializes some non-transient members 
+	 * manually, so they are basically serialized twice.
+	 * If nobody needs this code, I will delete it soon.   marcel/9jul2008
+	 * TODO [MR] delete code
+	 */
 	// BasicAct is not yet serializable, so we have to serialize it by hand
 	// plus Link Reference serialized as ID int
-	private void writeObject(final ObjectOutputStream s) throws IOException {
+	/* not sure about that: BasicAct is not serializable, but Act inherits from BasicAct, and is serializable.
+	 * Thus when serializing an Act, it should include the inherited members... at least that's my guess...
+	 * Anybody ever tried that?  marcel/9jul2008
+	 */
+/*	private void writeObject(final ObjectOutputStream s) throws IOException {
 	    // The standard non-transient fields.
 	  s.defaultWriteObject();
 	  s.writeDouble(getStartTime());
@@ -161,31 +166,6 @@ public class Act extends BasicActImpl implements Serializable {
 	  s.writeObject(this.link.getId().toString());
 	}
 
-	// This routebuilder could be exchanged for suppliing other
-	//kinds of network e.g. in OnTheFlyClient
-	public static class LinkBuilder {
-		private NetworkLayer network = null;
-
-		public void addLink(final Act act, final String linkId) {
-			if (this.network == null) {
-				this.network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-				if (this.network == null) {
-					throw new RuntimeException("Network layer does not exist.");
-				}
-			}
-			act.link = (Link)this.network.getLocation(linkId);
-			if (act.link == null) {
-				throw new RuntimeException("link=" + linkId +" does not exist.");
-			}
-		}
-	}
-
-	private static LinkBuilder linkBuilder = new LinkBuilder();
-
-	public static void setLinkBuilder(final LinkBuilder builder) {
-		linkBuilder = builder;
-	}
-
 	private void readObject(final ObjectInputStream s) throws IOException, ClassNotFoundException {
 	  // the `size' field.
 	  s.defaultReadObject();
@@ -193,14 +173,15 @@ public class Act extends BasicActImpl implements Serializable {
 	  setDur(s.readDouble());
 	  setEndTime(s.readDouble());
 	  setType((String)s.readObject());
-	  linkBuilder.addLink(this,(String)s.readObject());
+	  String linkId = (String)s.readObject();
+	  NetworkLayer network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+	  this.link = (Link) network.getLocation(linkId);
 	}
-
+*/
 
 	public final double getDur() {
 		return this.dur;
 	}
-
 
 	public final void setDur(final double dur) {
 		this.dur = dur;
