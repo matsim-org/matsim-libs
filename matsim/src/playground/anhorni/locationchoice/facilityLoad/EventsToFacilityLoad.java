@@ -54,7 +54,7 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 	}
 
 	public void handleEvent(final EventActivityStart event) {
-		Facility facility = event.act.getFacility();
+		Facility facility = event.act.getFacility();		
 		if (event.acttype.startsWith("s") || event.acttype.startsWith("l")) {
 			facility.addArrival(event.time, this.scaleNumberOfPersons);
 		}

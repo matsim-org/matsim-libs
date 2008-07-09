@@ -21,8 +21,10 @@
 package playground.anhorni.locationchoice.scoring;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
@@ -61,6 +63,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 	private int index; // the current position in plan.actslegs
 	private double firstActTime;
 	private final int lastActIndex;
+	private List<Penalty> penalty = null;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
 	private static final int INITIAL_INDEX = 0;
@@ -86,6 +89,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		this.plan = plan;
 		this.person = this.plan.getPerson();
 		this.lastActIndex = this.plan.getActsLegs().size() - 1;
+		this.penalty = new Vector<Penalty>();
 	}
 
 	public void reset() {
@@ -108,11 +112,15 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 			handleAct(time);
 		}
 		this.lastTime = time;
+		
+		log.info("startLeg");
 	}
 
 	public void endLeg(final double time) {
 		handleLeg(time);
 		this.lastTime = time;
+		
+		log.info("end leg");
 	}
 
 	public void agentStuck(final double time) {
@@ -123,6 +131,14 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 	public void finish() {
 		if (this.index == this.lastActIndex) {
 			handleAct(24*3600); // handle the last act
+		}
+		
+		// reduce score by penalty from capacity restraints
+		Iterator<Penalty> pen_it = this.penalty.iterator();
+		while (pen_it.hasNext()){
+			Penalty penalty = pen_it.next();
+			this.score -=penalty.getPenalty();
+			log.info(penalty.getPenalty());
 		}
 	}
 
@@ -184,6 +200,8 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 
 	private final double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
 
+		log.info("calculating act score");
+		
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
@@ -263,11 +281,6 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 
 			utilPerf *= act.getFacility().getAttrFactor();
 			
-			if (act.getType().startsWith("s")){
-				utilPerf *= (1.0 - act.getFacility().getCapacityPenaltyFactor(arrivalTime, departureTime));
-			}
-			log.info("doing scooooring");
-
 			double utilWait = marginalUtilityOfWaiting * duration;
 			score += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
@@ -289,6 +302,10 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		double minimalDuration = params.getMinimalDuration();
 		if (minimalDuration >= 0 && duration < minimalDuration) {
 			score += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
+		}
+		
+		if (act.getType().startsWith("s")){
+			this.penalty.add(new Penalty(arrivalTime, departureTime, act.getFacility(), score));
 		}
 
 		return score;
