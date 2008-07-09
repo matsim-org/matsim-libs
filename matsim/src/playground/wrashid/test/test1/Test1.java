@@ -18,7 +18,7 @@ public class Test1 extends MatsimTestCase {
 	public static void main(String[] args) {
 		// the config file comes as input
 		
-		String baseDir="src/playground/wrashid/test/test1/";
+		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test1/";
 		args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
@@ -36,7 +36,7 @@ public class Test1 extends MatsimTestCase {
 
 	
 	public void testTest1() {
-		String baseDir="src/playground/wrashid/test/test1/";
+		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test1/";
 		String[] args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
