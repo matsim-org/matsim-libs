@@ -120,11 +120,7 @@ public class Facility extends AbstractLocation {
 		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
 			if (this.capacity[i] > 0) {
 			capPenaltyFactor += a*Math.pow(
-					(double)this.load[i]/(this.capacity[i]/(double)this.numberOfTimeBins), b);
-			
-			if (this.load[0]>0) {
-				log.info("load[i] " +this.load[i]);
-			}
+					(double)this.load[i]/(this.capacity[i]), b);
 			}
 			else {
 				// do nothing:
@@ -302,25 +298,25 @@ public class Facility extends AbstractLocation {
 			Activity activity = act_it.next();
 			if (activity.getType().startsWith("s")) {
 				for (int i=0; i<this.numberOfTimeBins; i++) {
-					if (i < 7*this.numberOfTimeBins) {
+					if (i < 7*4) {
 						this.capacity[i] = 0.0;
 					}
-					else if (i >=7*this.numberOfTimeBins && i < 9*this.numberOfTimeBins) {
+					else if (i >=7*4 && i < 9*4) {
 						this.capacity[i] = 0.05;
 					}
-					else if (i >= 9*this.numberOfTimeBins && i < 12*this.numberOfTimeBins) {
+					else if (i >= 9*4 && i < 12*4) {
 						this.capacity[i] = 0.1;
 					}
-					else if (i >= 12*this.numberOfTimeBins && i < 14*this.numberOfTimeBins) {
+					else if (i >= 12*4 && i < 14*4) {
 						this.capacity[i] = 0.075;
 					}
-					else if (i >= 14*this.numberOfTimeBins && i < 17*this.numberOfTimeBins) {
+					else if (i >= 14*4 && i < 17*4) {
 						this.capacity[i] = 0.1;
 					}
-					else if (i >= 17*this.numberOfTimeBins && i < 20*this.numberOfTimeBins) {
+					else if (i >= 17*4 && i < 20*4) {
 						this.capacity[i] = 0.05;
 					}
-					else if (i >= 20*this.numberOfTimeBins) {
+					else if (i >= 20*4) {
 						this.capacity[i] = 0.0;
 					}
 					this.capacity[i] *= shopCapacity24;
