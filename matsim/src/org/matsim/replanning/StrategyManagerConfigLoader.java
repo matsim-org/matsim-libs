@@ -48,6 +48,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
+import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherMT;
 import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherSM;
 
 //import playground.anhorni.locationchoice.LocationChoice;
@@ -151,10 +152,10 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new PathSizeLogitSelector());
 				// JH
 			} else if (classname.equals("SNSecLoc")){
-				System.out.println(" #### Choosing social network replanning algorithm");
+//				System.out.println(" #### Choosing social network replanning algorithm");
 				strategy = new PlanStrategy(new RandomPlanSelector());
-//				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherMT(network, travelCostCalc, travelTimeCalc);
-				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherSM(network, travelCostCalc, travelTimeCalc);
+				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherMT(network, travelCostCalc, travelTimeCalc);
+//				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherSM(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} /*else if (classname.equals("LocationChoice")) {
 		    	strategy = new PlanStrategy(new RandomPlanSelector());
