@@ -54,7 +54,7 @@ public class DegreeCorrection {
 		Graph g = gmlFile.load(args[0]);
 		
 		
-		final int targetMeanDegree = 15;
+		final int targetMeanDegree = Integer.parseInt(args[2]);
 		
 		Map<Vertex, Integer> targetDegrees = new LinkedHashMap<Vertex, Integer>();
 		Set<Vertex> vertices = new LinkedHashSet<Vertex>(g.getVertices());

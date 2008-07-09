@@ -73,6 +73,8 @@ public class SnowballExe {
 	
 	private boolean calcOriginalStats;
 	
+	private double maxSamplingFraction;
+	
 	private static final String ISOLATES_KEY = "isolates";
 	
 	private static final String DEGREE_KEY = "degree";
@@ -114,6 +116,7 @@ public class SnowballExe {
 		exe.outputDir = config.getParam(MODULE_NAME, "outputDir");
 		exe.randomSeed = config.global().getRandomSeed();
 		exe.calcOriginalStats = Boolean.parseBoolean(config.getParam(MODULE_NAME, "calcOriginalStats"));
+		exe.maxSamplingFraction = Double.parseDouble(config.getParam(MODULE_NAME, "maxSamplingFraction"));
 		
 		String str = config.getParam(MODULE_NAME, "statistics");
 		String[] tokens = str.split(",");
@@ -278,6 +281,10 @@ public class SnowballExe {
 			 */
 			if(lastNumSampledVertices == numSampledVertices) {
 				logger.warn("Aborted sampling because all reachable vertices have been sampled!");
+				break;
+			}
+			if(numSampledVertices/(double)g.numVertices() >= maxSamplingFraction) {
+				logger.info("Reached maximum sampling fraction.");
 				break;
 			}
 			lastNumSampledVertices2 = lastNumSampledVertices;
