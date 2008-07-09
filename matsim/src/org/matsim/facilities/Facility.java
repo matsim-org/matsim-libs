@@ -107,7 +107,6 @@ public class Facility extends AbstractLocation {
 			numberOfVisitors += this.arrivals[i];
 			this.load[i] = numberOfVisitors*this.scaleNumberOfPersons;
 			numberOfVisitors -= this.departures[i];
-			log.debug("calculateFacilityLoad24 fid="+this.id + ": load["+i+"]="+load[i]);
 		}
 	}
 
