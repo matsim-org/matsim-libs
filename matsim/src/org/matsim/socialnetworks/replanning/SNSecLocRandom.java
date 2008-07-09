@@ -49,7 +49,7 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 	private TravelCostI tcost;
 	private TravelTimeI ttime;
 	private String[] factypes;
-	
+
 	public SNSecLocRandom(String[] factypes, NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
@@ -73,12 +73,13 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 		//
 		//
 		//
+//		System.out.println("########## SNSecLocRandom ");
 		String factype=null;// facility type to switch out
 		Person person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
 		Plan newPlan = person.copySelectedPlan();
-		
+
 		// Note that it is not changed, yet
 		boolean changed = false;
 
@@ -124,31 +125,33 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 //			Pick a random ACTIVITY of this type from knowledge
 
 			List<Activity> actList = k.getActivities(factype);
-			Facility fFromKnowledge = actList.get(Gbl.random.nextInt( actList.size())).getFacility();
+			if(actList.size()>0){
+				Facility fFromKnowledge = actList.get(Gbl.random.nextInt( actList.size())).getFacility();
 
-//			And replace the activity in the chain with it (only changes the facility)
+//				And replace the activity in the chain with it (only changes the facility)
 
-			if(newAct.getLinkId()!=fFromKnowledge.getLink().getId()){
-				// If the first activity was chosen, make sure the last activity is also changed
-				if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
-					Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
-					lastAct.setLink(fFromKnowledge.getLink());
-					lastAct.setCoord(fFromKnowledge.getCenter());
-					lastAct.setFacility(fFromKnowledge);
+				if(newAct.getLinkId()!=fFromKnowledge.getLink().getId()){
+					// If the first activity was chosen, make sure the last activity is also changed
+					if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
+						Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
+						lastAct.setLink(fFromKnowledge.getLink());
+						lastAct.setCoord(fFromKnowledge.getCenter());
+						lastAct.setFacility(fFromKnowledge);
+					}
+					// If the last activity was chosen, make sure the first activity is also changed
+					if(newAct.getType() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getType() && newAct.getLink() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getLink()){
+						Act firstAct = (Act) newPlan.getFirstActivity();
+						firstAct.setLink(fFromKnowledge.getLink());
+						firstAct.setCoord(fFromKnowledge.getCenter());
+						firstAct.setFacility(fFromKnowledge);
+					}
+					// Change the activity
+//					System.out.println("  ##### Act at "+newAct.getFacility().getId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
+					newAct.setLink(fFromKnowledge.getLink());
+					newAct.setCoord(fFromKnowledge.getCenter());
+					newAct.setFacility(fFromKnowledge);
+					changed = true;
 				}
-				// If the last activity was chosen, make sure the first activity is also changed
-				if(newAct.getType() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getType() && newAct.getLink() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getLink()){
-					Act firstAct = (Act) newPlan.getFirstActivity();
-					firstAct.setLink(fFromKnowledge.getLink());
-					firstAct.setCoord(fFromKnowledge.getCenter());
-					firstAct.setFacility(fFromKnowledge);
-				}
-				// Change the activity
-//				System.out.println("  ##### Act "+newAct.getRefId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
-				newAct.setLink(fFromKnowledge.getLink());
-				newAct.setCoord(fFromKnowledge.getCenter());
-				newAct.setFacility(fFromKnowledge);
-				changed = true;
 			}
 
 			if(changed){
@@ -160,7 +163,7 @@ public class SNSecLocRandom  implements PlanAlgorithmI{
 				}
 //				Reset the score.
 				newPlan.setScore(Plan.UNDEF_SCORE);
-				
+
 				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 
