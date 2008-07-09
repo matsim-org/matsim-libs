@@ -45,6 +45,7 @@ import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocialAct;
 import org.matsim.socialnetworks.interactions.SpatialInteractor;
+import org.matsim.socialnetworks.interactions.SpatialInteractorActsFast;
 import org.matsim.socialnetworks.interactions.SpatialSocialActTracker;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
@@ -101,16 +102,15 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	ActivityActReader aar = null;
 	PajekWriter pjw;
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
-	SpatialInteractor plansInteractorS;//spatial (face to face)
-//	EgoNetPlansMakeKML kmlOut;
+	SpatialInteractorActsFast plansInteractorS;//spatial (face to face)
 	int max_sn_iter;
 	int snIter;
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
-	SpatialSocialActTracker gen2 = new SpatialSocialActTracker();
-	HashMap<Activity, SocialAct> socialPlansMap=null;
-	Collection<SocialAct> socialPlans=null;
+//	SpatialSocialActTracker gen2 = new SpatialSocialActTracker();
+//	HashMap<Activity, SocialAct> socialPlansMap=null;
+//	Collection<SocialAct> socialPlans=null;
 	SNScoringGeneralFactory  factory=null;
 
 	private final Logger log = Logger.getLogger(SNControllerListenerRePlanSecLoc.class);
@@ -164,11 +164,11 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 	public void notifyAfterMobSimEvent(final AfterMobsimEvent event){
 		
-		this.log.info("  Generating realized [Spatial] Social Acts base on current MobSim iteration...");
-		this.log.info("   Makes a map of time/place windows for all encounters between the agents");
-		this.socialPlansMap=this.gen2.generateMap(this.controler.getPopulation());
-		this.socialPlans = socialPlansMap.values();
-		this.log.info("...finished.");
+//		this.log.info("  Generating realized [Spatial] Social Acts base on current MobSim iteration...");
+//		this.log.info("   Makes a map of time/place windows for all encounters between the agents");
+//		this.socialPlansMap=this.gen2.generateMap(this.controler.getPopulation());
+//		this.socialPlans = socialPlansMap.values();
+//		this.log.info("...finished.");
 		
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
 //		factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
@@ -213,7 +213,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 			if(event.getIteration()%1==0){
 				this.log.info(" Writing out social network for iteration " + snIter + " ...");
 				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
-				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
+//				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
 				this.log.info(" ... done");
 			}
 		}
@@ -225,13 +225,13 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		}
 //		Write out the KML for the EgoNet of a chosen agent
 //		if ((event.getIteration()-1)%replan_interval == 0){
-		Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
-//        Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
-		EgoNetPlansItersMakeKML2.loadData(testP,event.getIteration());
-		if (event.getIteration() == this.controler.getLastIteration()){	
-
-			EgoNetPlansItersMakeKML2.write();
-		}
+//		Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
+////        Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
+//		EgoNetPlansItersMakeKML2.loadData(testP,event.getIteration());
+//		if (event.getIteration() == this.controler.getLastIteration()){	
+//
+//			EgoNetPlansItersMakeKML2.write();
+//		}
 	}
 
 	public void notifyIterationStarts(final IterationStartsEvent event) {
@@ -247,16 +247,17 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 			if (total_spatial_fraction(this.fractionS) > 0) { // only generate the map if spatial meeting is important in this experiment
 
-				this.log.info("  Generating planned [Spatial] Social Acts base on last MobSim iteration...");
-				this.log.info("   Makes a map of time/place windows for all encounters between the agents");
-				this.socialPlansMap=this.gen2.generateMap(this.controler.getPopulation());
-				this.socialPlans = socialPlansMap.values();
-				this.log.info("...finished.");
+//				this.log.info("  Generating planned [Spatial] Social Acts base on last MobSim iteration...");
+//				this.log.info("   Makes a map of time/place windows for all encounters between the agents");
+//				this.socialPlansMap=this.gen2.generateMap(this.controler.getPopulation());
+//				this.socialPlans = socialPlansMap.values();
+//				this.log.info("...finished.");
 
 				// Agents' planned interactions
 				this.log.info("  Agents planned social interactions, respectively their meetings based on last MobSim iteration ...");
 				this.log.info("  Agents' relationships are updated to reflect these interactions! ...");
-				this.plansInteractorS.interact(this.socialPlans, this.rndEncounterProbs, snIter);
+//				this.plansInteractorS.interact(this.socialPlans, this.rndEncounterProbs, snIter);
+				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
 			} else {
 				this.log.info("     (none)");
 			}
@@ -298,26 +299,8 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 			}
 			this.log.info(" ... done");
 
-//			this.log.info(" ### HERE MODIFY THE PLANS WITH NEW KNOWLEDGE. Make this a person algorithm");
-//			Iterator<Person> itreplan = this.controler.getPopulation().getPersons().values().iterator();
-//			while (itreplan.hasNext()) {
-//			Plan p = itreplan.next().getSelectedPlan();
-//			new PersonSNSecLocRandomReRoute(activityTypesForEncounters, controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()).run(p);
-//			}
-//			this.log.info(" ... done");
-
-
-//			this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
-//			factory = new SNScoringGeneralFactory("leisure", socialPlansMap);
-//			this.log.info("... done");
 			snIter++;
 		}
-//		if(factory!=null){
-//		this.log.info("  Instantiating social network EventsToScore for scoring the plans");
-//		EventsToScore scoring = new EventsToScore(this.controler.getPopulation(), factory);
-//		this.controler.getEvents().addHandler(scoring);
-//		this.log.info(" ... Instantiation of social network scoring done");
-//		}
 	}
 
 	/* ===================================================================
@@ -407,13 +390,11 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 //			this.log.info(" ... done");
 		}
 
-		this.log.info("  Initializing the KML output");
-//		this.kmlOut=new EgoNetPlansMakeKML(this.controler.getConfig());
-//		EgoNetPlansMakeKML.setUp(this.controler.getConfig(), this.controler.getNetwork());
-//		EgoNetPlansMakeKML.generateStyles();
-		EgoNetPlansItersMakeKML2.setUp(this.controler.getConfig(), this.controler.getNetwork());
-		EgoNetPlansItersMakeKML2.generateStyles();
-		this.log.info("... done");
+//		this.log.info("  Initializing the KML output");
+//
+//		EgoNetPlansItersMakeKML2.setUp(this.controler.getConfig(), this.controler.getNetwork());
+//		EgoNetPlansItersMakeKML2.generateStyles();
+//		this.log.info("... done");
 
 		this.log.info(" Writing out the initial social network ...");
 		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getFirstIteration());
@@ -424,7 +405,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
-		this.plansInteractorS=new SpatialInteractor(this.snet);
+		this.plansInteractorS=new SpatialInteractorActsFast(this.snet);
 		this.log.info("... done");
 
 		this.snIter = this.controler.getFirstIteration();
