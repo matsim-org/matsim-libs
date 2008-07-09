@@ -120,7 +120,11 @@ public class Facility extends AbstractLocation {
 		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
 			if (this.capacity[i] > 0) {
 			capPenaltyFactor += a*Math.pow(
-					(double)this.load[i]/(this.capacity[i]/(double)this.numberOfTimeBins), b);			
+					(double)this.load[i]/(this.capacity[i]/(double)this.numberOfTimeBins), b);
+			
+			if (this.load[0]>0) {
+				log.info("load[i] " +this.load[i]);
+			}
 			}
 			else {
 				// do nothing:
@@ -195,9 +199,7 @@ public class Facility extends AbstractLocation {
 
 	// time in seconds from midnight
 	public void addArrival(double time, int scaleNumberOfPersons) {
-		
-		log.info("addingArrival");
-		
+				
 		// we do not handle times > 24h
 		// we do not care about #arrivals==#departures after the last time bin
 		if (time > 24.0*3600.0) {
