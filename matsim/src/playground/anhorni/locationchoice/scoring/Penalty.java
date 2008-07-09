@@ -34,12 +34,7 @@ public class Penalty {
 	}
 		
 	public double getPenalty() {
-		
-		log.info("startTime " +startTime);
-		log.info("endTime " +endTime);
-		
 		this.facility.finish();
-		log.info(this.facility.getCapacityPenaltyFactor(startTime, endTime));
 		return this.score * this.facility.getCapacityPenaltyFactor(startTime, endTime);
 	}
 }

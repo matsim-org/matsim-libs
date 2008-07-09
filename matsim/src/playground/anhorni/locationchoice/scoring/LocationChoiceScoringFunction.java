@@ -134,8 +134,6 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		while (pen_it.hasNext()){
 			Penalty penalty = pen_it.next();
 			this.score -=penalty.getPenalty();
-			log.info(" penalty: "+ penalty.getPenalty());
-			log.info("score " + penalty.getScore());
 		}
 		log.info("finish LocationChoiceScoringFunction");
 	}
