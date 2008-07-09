@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -98,7 +99,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 	
 	private void startOpentime(final Attributes atts) {
-		this.curractivity.createOpentime(atts.getValue("day"),atts.getValue("start_time"),atts.getValue("end_time"));
+		this.curractivity.createOpentime(atts.getValue("day"), Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time")));
 	}
 
 	

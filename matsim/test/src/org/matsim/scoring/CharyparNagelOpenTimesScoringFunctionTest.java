@@ -5,7 +5,6 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
@@ -25,6 +24,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
+		super.setUp();
 
 		// create facilities, activities in it and open times
 		Facilities facilities = new Facilities();
@@ -34,29 +34,27 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		Facility testFacility = facilities.createFacility(new IdImpl(0), defaultCoord);
 		
 		Activity noWedAndWkDay = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.UNUSED_OPENTIME_ACTIVITY_TYPE);
-		noWedAndWkDay.createOpentime("fri", Time.writeTime(8.0 * 3600), Time.writeTime(16.0 * 3600));
+		noWedAndWkDay.createOpentime("fri", 8.0 * 3600, 16.0 * 3600);
 		
 		Activity wkdayActivity = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.ONE_WKDAY_ACTIVITY_TYPE);
-		wkdayActivity.createOpentime("wkday", Time.writeTime(7.5 * 3600), Time.writeTime(18.0 * 3600));
+		wkdayActivity.createOpentime("wkday", 7.5 * 3600, 18.0 * 3600);
 		
 		Activity wednesdayActivity = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.TWO_WEDNESDAY_ACTIVITY_TYPE);
-		wednesdayActivity.createOpentime("wed", Time.writeTime(6.0 * 3600), Time.writeTime(11.0 * 3600));
-		wednesdayActivity.createOpentime("wed", Time.writeTime(13.0 * 3600), Time.writeTime(19.0 * 3600));
+		wednesdayActivity.createOpentime("wed", 6.0 * 3600, 11.0 * 3600);
+		wednesdayActivity.createOpentime("wed", 13.0 * 3600, 19.0 * 3600);
 		// this one should be ignored
-		wednesdayActivity.createOpentime("wkday", Time.writeTime(4.0 * 3600), Time.writeTime(20.0 * 3600));
+		wednesdayActivity.createOpentime("wkday", 4.0 * 3600, 20.0 * 3600);
 		
 		// here, we don't test the scoring function itself, but just the method to retrieve opening times
 		// we don't really need persons and plans, they're just used to initialize the ScoringFunction object
 		this.person = new Person(new IdImpl(1));
 		this.plan = person.createPlan(true);
 
-		Link link = null;
-		
 		Act act = plan.createAct(
 				"no type", 
 				defaultCoord.getX(),
 				defaultCoord.getY(),
-				link,
+				null/*link*/,
 				8.0 * 3600,
 				16.0 * 3600,
 				8.0 * 3600,
@@ -78,23 +76,22 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		
 		openInterval = testee.getOpeningInterval(act);
 		
-		assertEquals(openInterval[0], Time.UNDEFINED_TIME);
-		assertEquals(openInterval[1], Time.UNDEFINED_TIME);
+		assertEquals(openInterval[0], Time.UNDEFINED_TIME, EPSILON);
+		assertEquals(openInterval[1], Time.UNDEFINED_TIME, EPSILON);
 		
 		act.setType(CharyparNagelOpenTimesScoringFunctionTest.ONE_WKDAY_ACTIVITY_TYPE);
 		
 		openInterval = testee.getOpeningInterval(act);
 
-		assertEquals(openInterval[0], 7.5 * 3600);
-		assertEquals(openInterval[1], 18.0 * 3600);
+		assertEquals(openInterval[0], 7.5 * 3600, EPSILON);
+		assertEquals(openInterval[1], 18.0 * 3600, EPSILON);
 		
 		act.setType(CharyparNagelOpenTimesScoringFunctionTest.TWO_WEDNESDAY_ACTIVITY_TYPE);
 		
 		openInterval = testee.getOpeningInterval(act);
 
-		assertEquals(openInterval[0], 6.0 * 3600);
-		assertEquals(openInterval[1], 19.0 * 3600);
-		
+		assertEquals(openInterval[0], 6.0 * 3600, EPSILON);
+		assertEquals(openInterval[1], 19.0 * 3600, EPSILON);
 	}
 	
 }

@@ -38,9 +38,13 @@ public class Opentime implements Comparable<Opentime> {
 	//////////////////////////////////////////////////////////////////////
 
 	public Opentime(final String day, final String start_time, final String end_time) {
+		this(day, Time.parseTime(start_time), Time.parseTime(end_time));
+	}
+
+	public Opentime(final String day, final double startTime, final double endTime) {
 		this.day = day;
-		this.startTime = Time.parseTime(start_time);
-		this.endTime = Time.parseTime(end_time);
+		this.startTime = startTime;
+		this.endTime = endTime;
 		this.acceptTimes();
 	}
 

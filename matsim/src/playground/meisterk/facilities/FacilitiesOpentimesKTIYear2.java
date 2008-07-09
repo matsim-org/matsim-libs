@@ -34,7 +34,6 @@ import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.utils.misc.Day;
-import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
 
 /**
@@ -101,8 +100,8 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 							day.equals(Day.FRIDAY)) {
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR2).createOpentime(
 								day.getAbbrevEnglish(),
-								Time.writeTime(7.0 * 3600),
-								Time.writeTime(18.0 * 3600));
+								7.0 * 3600,
+								18.0 * 3600);
 					}
 				}
 				// open times of the closest shop for services sector
@@ -127,8 +126,8 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 						}
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
 								day.getAbbrevEnglish(),
-								Time.writeTime(startTime),
-								Time.writeTime(endTime));
+								startTime,
+								endTime);
 					}
 				}
 			}
@@ -152,16 +151,16 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 								day.equals(Day.FRIDAY)) {
 							activities.get(activityType).createOpentime(
 									day.getAbbrevEnglish(),
-									Time.writeTime(8.0 * 3600),
-									Time.writeTime(12.0 * 3600));
+									8.0 * 3600,
+									12.0 * 3600);
 							activities.get(activityType).createOpentime(
 									day.getAbbrevEnglish(),
-									Time.writeTime(13.5 * 3600),
-									Time.writeTime(17.0 * 3600));
+									13.5 * 3600,
+									17.0 * 3600);
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
 									day.getAbbrevEnglish(),
-									Time.writeTime(8.0 * 3600),
-									Time.writeTime(17.0 * 3600));
+									8.0 * 3600,
+									17.0 * 3600);
 						}
 					}
 				} else if (
@@ -176,12 +175,12 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 								day.equals(Day.FRIDAY)) {
 							activities.get(activityType).createOpentime(
 									day.getAbbrevEnglish(),
-									Time.writeTime(8.0 * 3600),
-									Time.writeTime(18.0 * 3600));
+									8.0 * 3600,
+									18.0 * 3600);
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
 									day.getAbbrevEnglish(),
-									Time.writeTime(8.0 * 3600),
-									Time.writeTime(18.0 * 3600));
+									8.0 * 3600,
+									18.0 * 3600);
 						}
 					}
 				} else if (
@@ -195,21 +194,21 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 								day.equals(Day.FRIDAY)) {
 							activities.get(activityType).createOpentime(
 									day.getAbbrevEnglish(),
-									Time.writeTime(7.0 * 3600),
-									Time.writeTime(22.0 * 3600));
+									7.0 * 3600,
+									22.0 * 3600);
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
 									day.getAbbrevEnglish(),
-									Time.writeTime(7.0 * 3600),
-									Time.writeTime(22.0 * 3600));
+									7.0 * 3600,
+									22.0 * 3600);
 						} else if (day.equals(Day.SATURDAY)) {
 							activities.get(activityType).createOpentime(
 									day.getAbbrevEnglish(),
-									Time.writeTime(8.0 * 3600),
-									Time.writeTime(12.0 * 3600));
+									8.0 * 3600,
+									12.0 * 3600);
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
 									day.getAbbrevEnglish(),
-									Time.writeTime(8.0 * 3600),
-									Time.writeTime(12.0 * 3600));
+									8.0 * 3600,
+									12.0 * 3600);
 						}
 					}
 				} else if (
@@ -231,12 +230,12 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 						}
 						activities.get(activityType).createOpentime(
 								day.getAbbrevEnglish(),
-								Time.writeTime(startTime),
-								Time.writeTime(endTime));
+								startTime,
+								endTime);
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
 								day.getAbbrevEnglish(),
-								Time.writeTime(startTime),
-								Time.writeTime(endTime));
+								startTime,
+								endTime);
 					}
 				} else if (
 						Pattern.matches(FacilitiesProductionKTI.LEISURE_GASTRO, activityType)) {
@@ -245,12 +244,12 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 						endTime = 24.0 * 3600;
 						activities.get(activityType).createOpentime(
 								day.getAbbrevEnglish(),
-								Time.writeTime(startTime),
-								Time.writeTime(endTime));
+								startTime,
+								endTime);
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
 								day.getAbbrevEnglish(),
-								Time.writeTime(startTime),
-								Time.writeTime(endTime));
+								startTime,
+								endTime);
 					}
 				} else if (
 						Pattern.matches(FacilitiesProductionKTI.LEISURE_CULTURE, activityType)) {
@@ -259,12 +258,12 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 						endTime = 24.0 * 3600;
 						activities.get(activityType).createOpentime(
 								day.getAbbrevEnglish(),
-								Time.writeTime(startTime),
-								Time.writeTime(endTime));
+								startTime,
+								endTime);
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
 								day.getAbbrevEnglish(),
-								Time.writeTime(startTime),
-								Time.writeTime(endTime));
+								startTime,
+								endTime);
 					}
 				}
 			}
