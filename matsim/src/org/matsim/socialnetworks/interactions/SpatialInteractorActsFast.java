@@ -1,0 +1,448 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * SpatialInteractorActsFast.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.socialnetworks.interactions;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.Vector;
+
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.facilities.Activity;
+import org.matsim.gbl.Gbl;
+import org.matsim.plans.Act;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
+import org.matsim.socialnetworks.algorithms.CompareActs;
+import org.matsim.socialnetworks.socialnet.SocialNetwork;
+
+
+public class SpatialInteractorActsFast {
+
+	SocialNetwork net;
+
+	double pBecomeFriends = Double.parseDouble(Gbl.getConfig().socnetmodule().getPBefriend());// [0.0,1.0]
+
+//	double pct_interacting = Double.parseDouble(Gbl.getConfig().socnetmodule().getFractSInteract());// [0.0,1.0]
+
+	String interaction_type = Gbl.getConfig().socnetmodule().getSocNetInteractor2();
+
+	Hashtable<Activity,ArrayList<Person>> activityMap;
+	Hashtable<Act,ArrayList<Person>> actMap=new Hashtable<Act,ArrayList<Person>>();
+
+	public SpatialInteractorActsFast(SocialNetwork snet) {
+		this.net = snet;
+	}
+	/**
+	 * The Plans contain all agents who are chosen to participate in social interactions.
+	 * Generally all agents in the population participate, each replanning_iter number of iterations.
+	 * <br><br>
+	 * <code>interact</code> looks through each selected Plan and Act. For each Act it compares the
+	 * Facility Id to that of all other Acts in the other Plans. If the Facility Ids are the same between
+	 * the two Acts, then the two Persons passed through the same Facility at some point.
+	 * The first Act and all the Persons having visited that Facility Id are recorded in crossPaths.
+	 * The Plan/Person must be recorded rather than the Act because there is no pointer from Act to Plan/Person.
+	 * Also, the Facility Id is recorded separately in an ArrayList.
+	 * 
+	 * To use this information, iterate through the ArrayList of Facilities and the table of Acts to
+	 * find the agents who passed through the Facility. Call up the list of agents and process their
+	 * Plans according to the spatial interaction desired.
+	 * 
+	 * Note that one list records Facilities and the other records Acts. There could be several Acts
+	 * matching a given Facility, thus if it is desired to ascertain all spatial encounters at a
+	 * Facilit, it will be necessary to test all Acts. 
+	 * 
+	 * @param plans
+	 * @param rndEncounterProb
+	 * @param iteration
+	 */
+	public void interact(Plans plans, HashMap<String, Double> rndEncounterProb, int iteration) {
+
+		System.out.println(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
+
+		if(interaction_type.equals("random")||interaction_type.equals("meetall")){
+			// These interactions suggest that agents who visit the same place
+			// for the same purpose might know each other, regardless of whether they are there in
+			// the same time window. They need a list of Activity <-> Persons
+
+			activityMap = new Hashtable<Activity,ArrayList<Person>>(); 
+			activityMap= makeActivityMap(plans);
+		}else if (interaction_type.equals("timewindowrandom")||interaction_type.equals("timewindowall")||interaction_type.equals("MarchalNagelChain")){
+			// These interactions rely on overlapping time windows to determine
+			// whether agents interact, and need a record of acts: Act <-> Persons
+//			actMap = makeActMap(plans);
+			activityMap = new Hashtable<Activity,ArrayList<Person>>(); 
+			activityMap= makeActivityMap(plans);
+		}
+
+
+		// Activity-(facility)-based interactions
+
+		if (interaction_type.equals("random")) {
+			encounterOnePersonRandomlyPerActivity(rndEncounterProb, iteration);
+		}else if (interaction_type.equals("meetall")){
+			makeSocialLinkToAll(rndEncounterProb,iteration);
+
+//			Act-based interactions
+
+		}else if(interaction_type.equals("timewindowrandom")){
+			encounterOnePersonRandomlyFaceToFaceInTimeWindow(rndEncounterProb,iteration);
+		}else if(interaction_type.equals("timewindowall")){
+			encounterAllPersonsFaceToFaceInTimeWindow(rndEncounterProb,iteration);
+		}else if(interaction_type.equals("MarchalNagelChain")){
+			makeSocialLinkBetweenLastTwo(rndEncounterProb,iteration);
+		} else {
+			Gbl.errorMsg(" Spatial interaction type is \"" + interaction_type
+					+ "\". Only \"random\" and \"timewindow\" are supported at this time.");
+		}
+		System.out.println("...finished");
+	}
+	/**
+	 * Makes a list of Activity (== Facility + activity type) and the Persons (Plans --> Acts) carrying
+	 * out an Act there. Only Acts need be stored, but since there is no way to link to a Person from
+	 * an Act, we store the Plan.
+	 * 
+	 * Note that a single Person may have multiple Acts which take place at a Facility (e.g. Morning Home,
+	 * Evening Home). Thus storing the Person is a way to store all of these Acts.
+	 * 
+	 *  We search through the Acts at a later stage when using this Map.
+	 *  
+	 * @param plans
+	 * @return
+	 */
+	private Hashtable<Activity,ArrayList<Person>> makeActivityMap(Plans plans){
+		System.out.println("Making a new activity map for spatial interactions");
+		Hashtable<Activity,ArrayList<Person>> activityMap=new Hashtable<Activity,ArrayList<Person>>();
+		Iterator<Person> p1Iter=plans.iterator();
+		while(p1Iter.hasNext()){
+			Plan plan1= ((Person) p1Iter.next()).getSelectedPlan();
+			Person p1=plan1.getPerson();
+			ActIterator a1Iter =plan1.getIteratorAct();
+			while(a1Iter.hasNext()){
+				Act act1 = (Act) a1Iter.next();
+				Activity activity1=act1.getFacility().getActivity(act1.getType());
+				ArrayList<Person> actList=new ArrayList<Person>();
+
+				if(!activityMap.keySet().contains(activity1)){
+					activityMap.put(activity1,actList);	
+				}
+				if(activityMap.keySet().contains(activity1)){
+					ArrayList<Person> myList=activityMap.get(activity1);
+					myList.add(p1);
+				}	
+			}
+		}
+		return activityMap;
+	}
+	/**
+	 * Based on Marchal and Nagel 2007, TRR 1935
+	 * Person p1 meets and befriends the person who arrived just before him, if
+	 * this person is still at the SocialAct.
+	 * 
+	 * Cycle through all the agents who were co-present with p1 at the SocialAct
+	 * and find the agent whose arrival time is closest to and less than that of p1
+	 * Subject to the likelihood of a meeting taking place in a given facility type
+	 */
+	private void makeSocialLinkBetweenLastTwo(HashMap<String, Double> rndEncounterProbability, int iteration) {
+
+
+//		Person nextInQueue=null;
+//		if(Gbl.random.nextDouble() <rndEncounterProbability.get(act1.activity.getType())){
+
+//		Vector<Person> persons = event.getAttendeesInTimeWindow(p1,startTime,endTime);
+//		int size = persons.size();
+//		nextInQueue = event.getAttendeeInTimeWindow(p1,startTime,endTime,0);
+//		for(int i=0; i<size;i++){
+//		Person p2 = event.getAttendeeInTimeWindow(p1, startTime, endTime, i);
+//		if(event.getArrivalTime(p2)<=event.getArrivalTime(p1)){
+//		if(event.getArrivalTime(p2)<=event.getArrivalTime(nextInQueue)){
+//		nextInQueue=p2;
+//		}
+//		}
+//		}
+//		if(p1.getKnowledge().getEgoNet().knows(nextInQueue)){
+//		} else {
+//		// If the two do not already know each other,
+//		net.makeSocialContact(p1,nextInQueue,iteration,"new"+event.activity.getType());
+//		}
+//		}
+	}
+	/**
+	 * Time-independent chance of spatial encounter during each activity:
+	 * 
+	 * This is not actually a "spatial" interaction but a test of shared
+	 * knowledge and could be accomplished via a search of Knowledge.Activities().
+	 * 
+	 * Each person visiting a Facility to perform an Activity has a chance
+	 * to meet every other person who was at that Facility doing the same thing.
+	 * <br><br>
+	 * This models the chance that two people who do the same thing at the same
+	 * place, but who may not have been present in the same time window because
+	 * of bad luck or bad planning, might still know each other.
+	 * <br><br>
+	 * For every two people, person1 and person2, who visited the same facility
+	 * and performed the same activity there, regardless of when, there is a probability
+	 * that they know each other.
+	 * <br><br>
+	 * This probability depends only on the activity type, "rndEncounterProbability(activity type)",
+	 * and not on any additional "friendliness" parameter.
+	 * <br><br>
+	 * The conditions of adding network links apply:
+	 * {@link org.matsim.socialnetworks.socialnet.SocialNetwork.makeSocialContact}
+	 * 
+	 * @param plans
+	 * @param rndEncounterProbability
+	 * @param iteration
+	 */
+	private void makeSocialLinkToAll(HashMap<String, Double> rndEncounterProbability, int iteration) {
+		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
+			Activity myActivity=myActivities.nextElement();
+			ArrayList<Person> visitors=activityMap.get(myActivity);
+			// Go through the list of Persons and for each one pick one friend randomly
+			// Must be double loop
+			Iterator<Person> vIt1=visitors.iterator();
+			while(vIt1.hasNext()){
+				Person p1= vIt1.next();
+				Iterator<Person> vIt2=visitors.iterator();
+				while(vIt2.hasNext()){
+					Person p2= vIt2.next();
+
+					if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
+
+						// If they know each other, probability is 1.0 that the relationship is reinforced
+						if (p1.getKnowledge().getEgoNet().knows(p2)) {
+							net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
+//							System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
+						} else {
+							// If the two do not already know each other,
+							net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
+//							System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Time-independent chance of spatial encounter at each activity.
+	 * 
+	 * This is not actually a "spatial" interaction but a test of shared
+	 * knowledge and could be accomplished via a search of Knowledge.Activities().
+	 * 
+	 * Each person visiting a Facility to perform an Activity has a chance
+	 * to meet ONE other person who was at that Facility doing the same thing.
+	 * <br><br>
+	 * If person1 and person2 visited the same facility and performed the same
+	 * activity there, regardless of when, then there is a probability
+	 * "rndEncounterProbability(activity type)" that they encounter one another.
+	 * If they know each other, their friendship is reinforced.
+	 * <br><br>
+	 * If they do not, they befriend with probability <code>pBecomeFriends</code>.
+	 * 
+	 * The conditions of "becoming friends" apply:
+	 * {@link org.matsim.socialnetworks.socialnet.SocialNetwork.makeSocialContact}
+	 * 
+	 * 
+	 * @param p1
+	 * @param p2
+	 * @param rndEncounterProbability
+	 * @param iteration
+	 */
+	private void encounterOnePersonRandomlyPerActivity(HashMap<String, Double> rndEncounterProbability, int iteration) {
+
+//		Enumeration<Activity> myActivities=pList.keys();
+
+		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
+			Activity myActivity=myActivities.nextElement();
+			ArrayList<Person> visitors=activityMap.get(myActivity);
+			// Go through the list of Persons and for each one pick one friend randomly
+			// Must be double loop
+			Iterator<Person> vIt1=visitors.iterator();
+			while(vIt1.hasNext()){
+				Person p1= vIt1.next();
+
+				Person p2 = visitors.get(Gbl.random.nextInt(visitors.size()));
+				if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
+
+					// If they know each other, probability is 1.0 that the relationship is reinforced
+					if (p1.getKnowledge().getEgoNet().knows(p2)) {
+						net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
+//						System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
+					} else {
+						// If the two do not already know each other,
+
+						if(Gbl.random.nextDouble() < pBecomeFriends){
+							net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
+//							System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * This interaction is based on Acts and as such counts things like the Morning Home and
+	 * Evening Home activity as separate social phenomena. To avoid this, use the interactions
+	 * based on Activity.
+	 * 
+	 * Each agent may randomly encounter (and have the chance to befriend) ONE other agent during
+	 * an Act in which they are both present. Uses a time window. The duration of the time
+	 * window is not relevant in this method.
+	 * 
+	 * @param plans
+	 * @param rndEncounterProbability
+	 * @param iteration
+	 */
+	private void encounterOnePersonRandomlyFaceToFaceInTimeWindow(HashMap<String, Double> rndEncounterProbability, int iteration) {
+
+		Hashtable<Person,Act> personList=new Hashtable<Person,Act>();
+		Hashtable<Person,ArrayList<Person>> othersList = new Hashtable<Person,ArrayList<Person>>();
+
+		// First identify the overlapping Acts and the Persons involved
+		
+		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
+			Activity myActivity=myActivities.nextElement();
+			ArrayList<Person> visitors=activityMap.get(myActivity);
+			Iterator<Person> vIt1=visitors.iterator();
+			while(vIt1.hasNext()){
+				Person p1= vIt1.next();
+				Plan plan1=p1.getSelectedPlan();
+				ArrayList<Person> others = new ArrayList<Person>();
+				ActIterator act1It=plan1.getIteratorAct();
+				othersList.put(p1,others);
+				while(act1It.hasNext()){
+					Act act1 = (Act) act1It.next();
+					personList.put(p1,act1);
+					Iterator<Person> vIt2=visitors.iterator();
+					//randomize the order of picking the person
+					while(vIt2.hasNext()){
+						Person p2= vIt2.next();
+						Plan plan2=p2.getSelectedPlan();
+						ActIterator act2It=plan2.getIteratorAct();
+						while(act2It.hasNext()){
+							Act act2 = (Act) act2It.next();
+							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
+								//agents encounter and may befriend
+								others.add(p2);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Using the two TreeMaps of Who did What and Who Else Did It, for each Person, randomly pick 
+		// ONE other Person at each act and make them have an encounter.
+		
+		Iterator<Person> pIt=personList.keySet().iterator();
+		
+		while(pIt.hasNext()){
+			Person p1=pIt.next();
+			if(othersList.get(p1).size()>0){
+			Person p2=othersList.get(p1).get(Gbl.random.nextInt(othersList.get(p1).size()));
+			Activity myActivity=personList.get(p1).getFacility().getActivity(personList.get(p1).getType());
+			if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
+
+				// If they know each other, probability is 1.0 that the relationship is reinforced
+				if (p1.getKnowledge().getEgoNet().knows(p2)) {
+					net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
+					System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
+				} else {
+					// If the two do not already know each other,
+
+					if(Gbl.random.nextDouble() < pBecomeFriends){
+						net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
+						System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
+					}
+				}
+			}
+			}
+		}
+	}
+
+
+	/**
+	 * For each Act of each SelectedPlan() of each Person, this method tests all other Acts
+	 * at the Activity to see if they are in the same place at the same time (Act overlap). If so,
+	 * the agents are linked in a social network with Activity-dependent probability,
+	 * <code>rndEncounterProbability(activity type)</code>. If the agents were already linked,
+	 * their link is reinforced.
+	 * <br><br>
+	 * 
+	 * There is no other probability adjustment in this method.
+	 * 
+	 * @param plans
+	 * @param rndEncounterProbability
+	 * @param iteration
+	 */
+	private void encounterAllPersonsFaceToFaceInTimeWindow(HashMap<String, Double> rndEncounterProbability,
+			int iteration) {
+
+		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
+			Activity myActivity=myActivities.nextElement();
+			ArrayList<Person> visitors=activityMap.get(myActivity);
+			Iterator<Person> vIt1=visitors.iterator();
+			while(vIt1.hasNext()){
+				Person p1= vIt1.next();
+				Plan plan1=p1.getSelectedPlan();
+				ActIterator act1It=plan1.getIteratorAct();
+				while(act1It.hasNext()){
+					Act act1 = (Act) act1It.next();
+					Iterator<Person> vIt2=visitors.iterator();
+					while(vIt2.hasNext()){
+						Person p2= vIt2.next();
+						Plan plan2=p2.getSelectedPlan();
+						ActIterator act2It=plan2.getIteratorAct();
+						while(act2It.hasNext()){
+							Act act2 = (Act) act2It.next();
+							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
+								//agents encoutner and may befriend
+								if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
+
+									// If they know each other, probability is 1.0 that the relationship is reinforced
+									if (p1.getKnowledge().getEgoNet().knows(p2)) {
+										net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
+//										System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
+									} else {
+										// If the two do not already know each other,
+
+										net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
+//										System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
+
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
