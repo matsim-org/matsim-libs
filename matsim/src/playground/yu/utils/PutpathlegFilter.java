@@ -61,10 +61,12 @@ public class PutpathlegFilter extends TableSplitter {
 		private final List<String> inputFilenames = new ArrayList<String>();
 		private final List<String> minDepTimes = new ArrayList<String>();
 		private final List<String> maxDepTimes = new ArrayList<String>();
+		private final String attFilepath;
 
-		public IndexFileReader(final String regex, final String tableFileName)
-				throws IOException {
+		public IndexFileReader(final String regex, final String tableFileName,
+				final String attFilepath) throws IOException {
 			super(regex, tableFileName);
+			this.attFilepath = attFilepath;
 		}
 
 		public void makeParams(final String line) {
@@ -75,7 +77,8 @@ public class PutpathlegFilter extends TableSplitter {
 		}
 
 		public String getInputFilename(final int i) {
-			return inputFilenames.get(i);
+			return attFilepath + "AttList11 (" + inputFilenames.get(i)
+					+ ").att";
 		}
 
 		public String getMinDepTime(final int i) {
@@ -120,6 +123,18 @@ public class PutpathlegFilter extends TableSplitter {
 		}
 	}
 
+	public void writeNewLine(final String line) {
+		try {
+			String[] words = split(line);
+			StringBuilder word = new StringBuilder();
+			for (String element : words)
+				word.append(element);
+			writer.write(words + "\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void closeWriter() {
 		try {
 			writer.close();
@@ -153,9 +168,10 @@ public class PutpathlegFilter extends TableSplitter {
 	 */
 	public static void main(final String[] args) {
 		String inputFilename = "";
+		String attFilePath = "";
 		IndexFileReader ifr = null;
 		try {
-			ifr = new IndexFileReader("\t", inputFilename);
+			ifr = new IndexFileReader("\t", inputFilename, attFilePath);
 			String line = ifr.readLine();
 			while (line != null) {
 				line = ifr.readLine();
@@ -184,10 +200,12 @@ public class PutpathlegFilter extends TableSplitter {
 
 					do {
 						line = pf.readLine();
-						pf.writeLine(line);
 						if (PutpathlegFilter.isHead(line))
 							break;
+						pf.writeLine(line);
 					} while (line != null);
+
+					pf.writeNewLine(line);
 
 					boolean writeable = false;
 					do {
@@ -196,12 +214,12 @@ public class PutpathlegFilter extends TableSplitter {
 						if (line != null)
 							if (line.startsWith(";")) {
 								if (writeable)
-									pf.writeLine(line);
+									pf.writeNewLine(line);
 							} else {
 								String[] firstLines = pf.split(line);
 								if (firstLines.length == 13)
 									if (pf.rightDepTime(firstLines[11])) {
-										pf.writeLine(line);
+										pf.writeNewLine(line);
 										writeable = true;
 									} else
 										writeable = false;
