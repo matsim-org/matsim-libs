@@ -43,7 +43,6 @@ public class SpatialScorer {
 	SocialNetwork net;
 
 	Hashtable<Activity,ArrayList<Person>> activityMap;
-	Hashtable<Act,ArrayList<Person>> actMap=new Hashtable<Act,ArrayList<Person>>();
 
 	public SpatialScorer() {
 		
@@ -109,8 +108,8 @@ public class SpatialScorer {
 				ArrayList<Person> actList=new ArrayList<Person>();
 
 				if(!activityMap.keySet().contains(activity1)){
-					activityMap.put(activity1,actList);	
 					actList.add(p1);
+					activityMap.put(activity1,actList);	
 				}
 				if(activityMap.keySet().contains(activity1)){
 					ArrayList<Person> myList=activityMap.get(activity1);
@@ -185,6 +184,12 @@ public class SpatialScorer {
 			Act act1 = (Act) ait.next();
 			Activity myActivity=act1.getFacility().getActivity(act1.getType());
 			ArrayList<Person> visitors=activityMap.get(myActivity);
+			if(!activityMap.keySet().contains(myActivity)){
+				Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
+			}
+			if(!(visitors.size()>0)){
+				Gbl.errorMsg(this.getClass()+" number of visitors not >0");
+			}
 			// Go through the list of Persons and for each one pick one friend randomly
 			Iterator<Person> vIt=visitors.iterator();
 			while(vIt.hasNext()){
