@@ -67,8 +67,8 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_culture"));
 		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_sports"));
 		
-		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
-		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);
+		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities, this.shop_facilities);
+		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities, this.shop_facilities);
 		
 		this.zhShopFacilities = (ArrayList<Facility>)this.shopFacQuadTree.get(683508.50, 246832.91, 30000);
 		this.zhLeisureFacilities = (ArrayList<Facility>)this.leisFacQuadTree.get(683508.50, 246832.91, 30000);
@@ -86,8 +86,8 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 			Facility f = lfac_it.next();
 			treemapLeisure.put(f.getId(), f);
 		}	
-		this.zhShopFacQuadTree = this.builFacQuadTree(treemapShop);
-		this.zhLeisureFacQuadTree = this.builFacQuadTree(treemapLeisure);
+		this.zhShopFacQuadTree = this.builFacQuadTree(treemapShop, this.shop_facilities);
+		this.zhLeisureFacQuadTree = this.builFacQuadTree(treemapLeisure, this.shop_facilities);
 	}
 
 	public void handlePlan(final Plan plan){
@@ -121,14 +121,16 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 		handlePlan(plan);
 	}
 	
-	private QuadTree<Facility> builFacQuadTree(TreeMap<Id,Facility> facilities_of_type) {
+	private QuadTree<Facility> builFacQuadTree(TreeMap<Id,Facility> facilities_of_type, 
+			TreeMap<Id,Facility> swissFacilities) {
 		Gbl.startMeasurement();
 		System.out.println("      building facility quad tree...");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (final Facility f : facilities_of_type.values()) {
+		// the boundaries must be taken for whole of Switzerland!
+		for (final Facility f : swissFacilities.values()) {
 			if (f.getCenter().getX() < minx) { minx = f.getCenter().getX(); }
 			if (f.getCenter().getY() < miny) { miny = f.getCenter().getY(); }
 			if (f.getCenter().getX() > maxx) { maxx = f.getCenter().getX(); }
