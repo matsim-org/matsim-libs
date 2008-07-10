@@ -98,7 +98,8 @@ public class ActChainsPlansAnalyzer {
 					if (act.getType().startsWith("s") || act.getType().startsWith("s")) {
 						countSL++;
 					}
-					else if (act.getType().startsWith("h") || act.getType().startsWith("s")) {
+					else if (act.getType().startsWith("h") || act.getType().startsWith("w")|| 
+							act.getType().startsWith("e")) {
 						out.write(person.getId().toString()+"\t"+String.valueOf(countSL));
 						countSL = 0;
 					}
