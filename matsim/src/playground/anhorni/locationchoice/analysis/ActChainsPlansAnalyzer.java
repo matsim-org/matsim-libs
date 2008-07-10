@@ -86,7 +86,7 @@ public class ActChainsPlansAnalyzer {
 	private void analyze() {
 		
 		try {
-			final String header="Person_id\tActDuration";
+			final String header="Person_id\tnumberOfSL";
 			final BufferedWriter out = IOUtils.getBufferedWriter("./output/actchainsplananalysis.txt");
 			out.write(header);
 			out.newLine();
@@ -109,7 +109,7 @@ public class ActChainsPlansAnalyzer {
 					else if (act.getType().startsWith("h") || act.getType().startsWith("w")|| 
 							act.getType().startsWith("e")) {
 						if (countSL > 0) {
-							out.write(person.getId().toString()+"\t"+String.valueOf(countSL));
+							out.write(person.getId().toString()+"\t"+String.valueOf(countSL)+"\n");
 							countSL = 0;
 						}
 					}
