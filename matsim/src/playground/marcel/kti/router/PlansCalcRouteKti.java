@@ -61,10 +61,11 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 				new AStarLandmarks(network, preProcessData, timeCostCalc, timeCostCalc));
 		this.ptTravelTimes = ptTravelTimes;
 		this.haltestellen = haltestellen;
-		this.municipalities = municipalities;		
+		this.municipalities = municipalities;
 	}
 
-	protected double handleLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+	@Override
+	public double handleLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		if ("pt".equals(leg.getMode())) {
 			return handleSwissPtLeg(fromAct, leg, toAct);
 		}
@@ -74,7 +75,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	public double handleSwissPtLeg(final Act fromAct, final Leg leg, final Act toAct) {
 		CoordI fromStop = this.haltestellen.getClosestLocation(fromAct.getCoord());
 		CoordI toStop = this.haltestellen.getClosestLocation(toAct.getCoord());
-		
+
 		final List<Location> froms = this.municipalities.getNearestLocations(fromStop);
 		final List<Location> tos = this.municipalities.getNearestLocations(toStop);
 		Location from = froms.get(0);
