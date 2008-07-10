@@ -42,8 +42,9 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 
 	protected void handleSubChains(final Plan plan, List<SubChain> subChains) {
 		
-		//initially using 60 km/h, 16.7 m/s
-		double speed = 60.0/3.6;
+		//initially using 25 km/h + 10 %
+		// mikrozensus 2005
+		double speed = 27.5/3.6;
 		
 		Iterator<SubChain> sc_it = subChains.iterator();
 		while (sc_it.hasNext()) {
@@ -62,7 +63,8 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		ArrayList<Facility> choiceSet = this.computeChoiceSet
 		(startCoord, endCoord, radius, act.getType());
-		//log.info("radius "+radius);
+		log.info("radius "+radius);
+		log.info("coord "+startCoord.toString() + " " + endCoord.toString());
 		//log.info("ChoiceSetSize "+ choiceSet.size());
 		
 		if (choiceSet.size()>1) {
