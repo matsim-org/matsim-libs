@@ -3,7 +3,6 @@ package playground.anhorni.locationchoice.choiceset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
@@ -82,53 +81,24 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 	
 	protected List<SubChain> calcActChains(final Plan plan) {
 		
-		List<SubChain> subChains = new Vector<SubChain>();
-					
-		boolean chainStarted = false;
-		boolean sl_found = false;
-		double actDur = 0.0;
-		double slStartTime = 0.0;
-		double slEndTime = 0.0;
-		
-		int subChainIndex = -1;
-		
+		ManageSubchains manager = new ManageSubchains();
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);	
-			if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
-				// no plan starts with s or l !
-				subChains.get(subChainIndex).addAct(act);
-				actDur += act.getDur();
-				sl_found = true;
-			}
-			else if (act.getType().startsWith("h") || act.getType().startsWith("w")|| 
-				act.getType().startsWith("e")) {
 			
-				if (!chainStarted) {
-					subChains.add(new SubChain());
-					subChainIndex++;
-					subChains.get(subChainIndex).setFirstPrimAct(act);
-					subChains.get(subChainIndex).setStartCoord(act.getCoord());
-					slStartTime = act.getEndTime();
-					chainStarted = true;
-				}
-				else {
-					if (sl_found) {
-						slEndTime = act.getStartTime();
-						subChains.get(subChainIndex).setTtBudget(slEndTime-slStartTime - actDur);
-						subChains.get(subChainIndex).setEndCoord(act.getCoord());
-					}
-					else {
-						subChains.remove(subChainIndex++);
-					}
-					sl_found = false;
-					chainStarted = false;
-					actDur = 0.0;
-				}
+			// found shopping or leisure activity
+			if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
+				manager.slActivityFound(act);
+			}
+			
+			// found home, work or education activity
+			else if (act.getType().startsWith("h") || act.getType().startsWith("w") || 
+					act.getType().startsWith("e")) {
+				manager.hweActivityFound(act, (j == actslegs.size()-2));
 			}
 		}
-		return subChains;
+		return manager.getSubChains();
 	}
 	
 	
