@@ -121,12 +121,13 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		double slStartTime = 0.0;
 		double slEndTime = 0.0;
 		
-		int subChainIndex = 0;
+		int subChainIndex = -1;
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);	
 			if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
+				// no plan starts with s or l !
 				subChains.get(subChainIndex).addAct(act);
 				actDur += act.getDur();	
 			}
@@ -135,6 +136,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			
 				if (!chainStarted) {
 					subChains.add(new SubChain());
+					subChainIndex++;
 					subChains.get(subChainIndex).setFirstPrimAct(act);
 					subChains.get(subChainIndex).setStartCoord(act.getCoord());
 					slStartTime = act.getEndTime();
@@ -142,7 +144,6 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 				}
 				else {
 					slEndTime = act.getStartTime();
-					subChainIndex++;
 					subChains.get(subChainIndex).setTtBudget(slEndTime-slStartTime - actDur);
 					subChains.get(subChainIndex).setEndCoord(act.getCoord());
 					chainStarted = false;
