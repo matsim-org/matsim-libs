@@ -4,17 +4,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Act;
+import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PersonAlgorithm;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.utils.collections.QuadTree;
+
+import playground.anhorni.locationchoice.choiceset.LocationMutatorwChoiceSet;
 
 
 public abstract class LocationMutator extends PersonAlgorithm implements PlanAlgorithmI {
@@ -33,6 +38,8 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 	
 	protected ArrayList<Facility> zhShopFacilities = null;
 	protected ArrayList<Facility> zhLeisureFacilities = null;
+	
+	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
 
 	public LocationMutator(final NetworkLayer network, final Controler controler) {
@@ -97,6 +104,19 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 	}
 
 	public void run(final Plan plan) {
+		
+		ArrayList<?> actslegs = plan.getActsLegs();
+		for (int j = 0; j < actslegs.size(); j=j+2) {
+			final Act act = (Act)actslegs.get(j);
+			log.info("act dur "+ act.getDur());
+		}
+		actslegs = plan.getActsLegs();
+		for (int j = 1; j < actslegs.size(); j=j+2) {
+			final Leg leg = (Leg)actslegs.get(j);
+			log.info("leg tt "+ leg.getTravTime());
+		}
+		
+		
 		handlePlan(plan);
 	}
 	

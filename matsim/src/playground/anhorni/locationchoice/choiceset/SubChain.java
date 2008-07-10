@@ -9,6 +9,7 @@ import org.matsim.utils.geometry.CoordI;
 public class SubChain {
 	
 	private Act firstPrimAct = null;
+	private Act lastPrimAct = null;
 	
 	private List<Act> slActs = null;
 	private double ttBudget = 0.0;
@@ -65,6 +66,14 @@ public class SubChain {
 
 	public void setFirstPrimAct(Act firstPrimAct) {
 		this.firstPrimAct = firstPrimAct;
+	}
+
+	public Act getLastPrimAct() {
+		return lastPrimAct;
+	}
+
+	public void setLastPrimAct(Act lastPrimAct) {
+		this.lastPrimAct = lastPrimAct;
 	}
 		
 }

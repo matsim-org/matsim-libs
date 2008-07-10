@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.plans.Act;
+import org.matsim.plans.Leg;
 
 public class ManageSubchains {
 	
@@ -16,30 +17,25 @@ public class ManageSubchains {
 	boolean chainStarted = false;
 	boolean sl_found = false;
 
-	private double actDur = 0.0;
-	private double slStartTime = 0.0;
-	private double slEndTime = 0.0;
+	private double ttBudget = 0.0;
 	
-	public void slActivityFound(Act act) {
+	public void slActivityFound(Act act, Leg leg) {
 		// no plan starts with s or l !
 		this.subChains.get(subChainIndex).addAct(act);
 		this.sl_found = true;	
-		this.actDur += act.getDur();
+		this.ttBudget += leg.getTravTime();
 
 		log.info("found s/l act");	
 	}
 	
-	public void hweActivityFound(Act act, boolean lastAct) {
-
-		log.info("found hwe act");
-		
+	public void hweActivityFound(Act act, Leg leg) {
+		log.info("found hwe act");	
 		// close chain
 		if (chainStarted) {
 			if (sl_found) {
-				this.slEndTime = act.getStartTime();
-				log.info(slEndTime-slStartTime - actDur);
-				this.subChains.get(subChainIndex).setTtBudget(slEndTime-slStartTime - actDur);
+				this.subChains.get(subChainIndex).setTtBudget(this.ttBudget);
 				this.subChains.get(subChainIndex).setEndCoord(act.getCoord());
+				this.subChains.get(subChainIndex).setLastPrimAct(act);
 			}
 			else {
 				this.subChains.remove(subChainIndex);
@@ -48,7 +44,7 @@ public class ManageSubchains {
 			}
 		}
 		
-		if (!lastAct) {
+		if (!(leg == null)) {
 			//open chain
 			this.subChains.add(new SubChain());
 			this.subChainIndex++;
@@ -56,7 +52,7 @@ public class ManageSubchains {
 			this.subChains.get(subChainIndex).setStartCoord(act.getCoord());
 			this.chainStarted = true;
 			this.sl_found = false;
-			this.actDur = 0.0;
+			this.ttBudget = leg.getTravTime();
 			log.info("chain startet");
 		}			
 	}

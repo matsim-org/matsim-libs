@@ -19,7 +19,7 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 	}
 	
 	@Override
-	protected void handleSubChain(SubChain subChain, double speed, int trialNr) {
+	protected void handleSubChain(SubChain subChain, double speed, int trialNr, double ttFactor) {
 		
 		if (trialNr > 10) {
 			log.info("Could not do location choice");
@@ -42,15 +42,21 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 		while (act_it.hasNext()) {
 			Act act = act_it.next();
 			
-			double radius = ttBudget * speed;	
+			double radius = ttBudget * speed * ttFactor;	
 			
-			this.modifyLocation(act, startCoord, endCoord, radius);
-			startCoord = act.getCoord();
-					
+			log.info("radius " + radius);
+			log.info("ttBudget " + ttBudget);
+			
+			boolean locationModified = this.modifyLocation(act, startCoord, endCoord, radius);
+			if (!locationModified) {
+				this.handleSubChain(subChain, speed * 1.1, trialNr++, ttFactor);
+				return;
+			}		
+			startCoord = act.getCoord();				
 			ttBudget -= this.computeTravelTime(prevAct, act);
 			
 			if (ttBudget <= 0.0) {
-				this.handleSubChain(subChain, speed * 0.9, trialNr++);
+				this.handleSubChain(subChain, speed * 0.9, trialNr++, ttFactor);
 				return;
 			}
 			prevAct = act;

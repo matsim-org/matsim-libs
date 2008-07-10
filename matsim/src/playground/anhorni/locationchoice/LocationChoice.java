@@ -32,6 +32,7 @@ public class LocationChoice extends MultithreadedModuleA {
 
 	private NetworkLayer network=null;
 	private Controler controler = null;
+	
 
 	public LocationChoice() {
 	}

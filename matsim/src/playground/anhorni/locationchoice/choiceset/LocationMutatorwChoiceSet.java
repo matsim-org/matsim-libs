@@ -48,27 +48,38 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		Iterator<SubChain> sc_it = subChains.iterator();
 		while (sc_it.hasNext()) {
 			SubChain sc = sc_it.next();
-			this.handleSubChain(sc, speed, 0);			
+			
+			// a ttFactor (1.0) should be calculated for faster convergence
+			this.handleSubChain(sc, speed, 0, 1.0);
 		}
 	}
 	
 	
-	protected void handleSubChain(SubChain subChain, double speed, int trialNr) {
+	protected void handleSubChain(SubChain subChain, double speed, int trialNr, double ttFactor) {
 	}
 	
-	protected void modifyLocation(Act act, CoordI startCoord, CoordI endCoord, double radius) {
+	protected boolean modifyLocation(Act act, CoordI startCoord, CoordI endCoord, double radius) {
 		
 		ArrayList<Facility> choiceSet = this.computeChoiceSet
 		(startCoord, endCoord, radius, act.getType());
+		log.info("radius "+radius);
+		log.info("ChoiceSetSize "+ choiceSet.size());
 		
-		final Facility facility=(Facility)choiceSet.toArray()[
-			           Gbl.random.nextInt(choiceSet.size()-1)];
-			// plans: link, coords
-			// facilities: coords
-			// => use coords
-		act.setLink(this.network.getNearestLink(facility.getCenter()));
-		act.setCoord(facility.getCenter());
-		
+		if (choiceSet.size()>1) {
+			final Facility facility=(Facility)choiceSet.toArray()[
+           			           Gbl.random.nextInt(choiceSet.size()-1)];
+           			// plans: link, coords
+           			// facilities: coords
+           			// => use coords
+       		act.setLink(this.network.getNearestLink(facility.getCenter()));
+       		act.setCoord(facility.getCenter());
+       		return true;
+		}
+		else {
+			log.info("Choice set too small. Doing nothing!");
+			return false; 
+			
+		}	
 	}
 	
 	protected double computeTravelTime(Act fromAct, Act toAct) {	
@@ -77,8 +88,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
 		return leg.getTravTime();
 	}
-	
-	
+		
 	protected List<SubChain> calcActChains(final Plan plan) {
 		
 		ManageSubchains manager = new ManageSubchains();
@@ -89,13 +99,19 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 			
 			// found shopping or leisure activity
 			if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
-				manager.slActivityFound(act);
+				manager.slActivityFound(act, (Leg)actslegs.get(j+1));
 			}
 			
 			// found home, work or education activity
 			else if (act.getType().startsWith("h") || act.getType().startsWith("w") || 
 					act.getType().startsWith("e")) {
-				manager.hweActivityFound(act, (j == actslegs.size()-2));
+				
+				if (j == (actslegs.size()-1)) {
+					manager.hweActivityFound(act, null);
+				}
+				else {
+					manager.hweActivityFound(act, (Leg)actslegs.get(j+1));
+				}
 			}
 		}
 		return manager.getSubChains();
