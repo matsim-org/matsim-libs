@@ -27,6 +27,8 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Person;
@@ -44,6 +46,7 @@ import org.matsim.utils.misc.Counter;
 public class ActChainsPlansAnalyzer {
 
 	private Plans plans=null;
+	private NetworkLayer network=null;
 	private final static Logger log = Logger.getLogger(ActChainsPlansAnalyzer.class);
 
 
@@ -59,14 +62,19 @@ public class ActChainsPlansAnalyzer {
 		}
 		String plansfilePath = args[0];
 		log.info(plansfilePath);
+		
+		String networkfilePath="./input/network.xml";
 
 		ActChainsPlansAnalyzer analyzer = new ActChainsPlansAnalyzer();
-		analyzer.init(plansfilePath);
+		analyzer.init(plansfilePath, networkfilePath);
 		analyzer.analyze();
 	}
 
-	private void init(final String plansfilePath) {
+	private void init(final String plansfilePath, final String networkfilePath) {
 
+		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(this.network).readFile(networkfilePath);
+		log.info("network reading done");
 
 		this.plans=new Plans(false);
 		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
