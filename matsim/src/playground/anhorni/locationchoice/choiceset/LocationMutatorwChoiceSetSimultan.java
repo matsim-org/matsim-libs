@@ -43,10 +43,7 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			Act act = act_it.next();
 			
 			double radius = ttBudget * speed * ttFactor;	
-			
-			log.info("radius " + radius);
-			log.info("ttBudget " + ttBudget);
-			
+		
 			this.modifyLocation(act, startCoord, endCoord, radius, 0);
 					
 			startCoord = act.getCoord();				
