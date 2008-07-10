@@ -58,7 +58,7 @@ public class PutpathlegFilter extends TableSplitter {
 	 */
 
 	private static class IndexFileReader extends TableSplitter {
-		private final List<String> inputFilenames = new ArrayList<String>();
+		private final List<String> inputFileIndexs = new ArrayList<String>();
 		private final List<String> minDepTimes = new ArrayList<String>();
 		private final List<String> maxDepTimes = new ArrayList<String>();
 		private final String attFilepath;
@@ -71,13 +71,13 @@ public class PutpathlegFilter extends TableSplitter {
 
 		public void makeParams(final String line) {
 			String[] params = split(line);
-			inputFilenames.add(params[0]);
+			inputFileIndexs.add(params[0]);
 			minDepTimes.add(params[1]);
 			maxDepTimes.add(params[2]);
 		}
 
 		public String getInputFilename(final int i) {
-			return attFilepath + "AttList11 (" + inputFilenames.get(i)
+			return attFilepath + "AttList11 (" + inputFileIndexs.get(i)
 					+ ").att";
 		}
 
