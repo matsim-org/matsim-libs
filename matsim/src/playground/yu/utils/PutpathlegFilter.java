@@ -27,7 +27,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.matsim.utils.io.IOUtils;
 
@@ -37,6 +39,7 @@ import org.matsim.utils.io.IOUtils;
  */
 public class PutpathlegFilter extends TableSplitter {
 	public static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+
 	// //////////////////////////////////////////////////////////////////////////////
 	/*
 	 * // private static class PutPathLeg{ // private String
@@ -53,6 +56,36 @@ public class PutpathlegFilter extends TableSplitter {
 	 * StringBuilder(line+"\n"); // for(int i=0;i<followings.size();i++){ //
 	 * sb.append(followings.get(i)); // } // return sb.toString(); // } // }
 	 */
+
+	private static class IndexFileReader extends TableSplitter {
+		private final List<String> inputFilenames = new ArrayList<String>();
+		private final List<String> minDepTimes = new ArrayList<String>();
+		private final List<String> maxDepTimes = new ArrayList<String>();
+
+		public IndexFileReader(final String regex, final String tableFileName)
+				throws IOException {
+			super(regex, tableFileName);
+		}
+
+		public void makeParams(final String line) {
+			String[] params = split(line);
+			inputFilenames.add(params[0]);
+			minDepTimes.add(params[1]);
+			maxDepTimes.add(params[2]);
+		}
+
+		public String getInputFilename(final int i) {
+			return inputFilenames.get(i);
+		}
+
+		public String getMinDepTime(final int i) {
+			return minDepTimes.get(i);
+		}
+
+		public String getMaxDepTime(final int i) {
+			return maxDepTimes.get(i);
+		}
+	}
 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	private final Date minDepTime, maxDepTime;
@@ -105,6 +138,10 @@ public class PutpathlegFilter extends TableSplitter {
 				&& (depDate.before(maxDepTime) || depDate.equals(maxDepTime));
 	}
 
+	public void run(final int i) {
+
+	}
+
 	/*
 	 * // public void putPutpathleg(PutPathLeg ppl){ //
 	 * putpathlegs.put(ppl.getOrigZoneNo()+ppl.getDestZoneNo(), ppl); // } //
@@ -115,49 +152,72 @@ public class PutpathlegFilter extends TableSplitter {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String putpathlegTableFilename = "test/yu/test/yalcin/MyFirstAttList11 (9).att";
-		String minDepTime = "15:50:00", maxDepTime = "16:20:00";
-		String outputFilename = "test/yu/test/yalcin/MyFirstAttList11 (9)_output.att";
+		String inputFilename = "";
+		IndexFileReader ifr = null;
 		try {
-			PutpathlegFilter pf = new PutpathlegFilter(";",
-					putpathlegTableFilename, minDepTime, maxDepTime,
-					outputFilename);
-			String line;
+			ifr = new IndexFileReader("\t", inputFilename);
+			String line = ifr.readLine();
+			while (line != null) {
+				line = ifr.readLine();
+				ifr.makeParams(line);
+			}
+			ifr.closeReader();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
-			do {
-				line = pf.readLine();
-				pf.writeLine(line);
-				if (PutpathlegFilter.isHead(line))
-					break;
-			} while (line != null);
+		for (int i = 0; i <= 1000; i++) {
 
-			boolean writeable = false;
-			do {
+			String putpathlegTableFilename, minDepTime, maxDepTime, outputFilename;
+			if (ifr != null) {
+				putpathlegTableFilename = ifr.getInputFilename(i);
+				minDepTime = ifr.getMinDepTime(i);
+				maxDepTime = ifr.getMaxDepTime(i);
+				outputFilename = putpathlegTableFilename.split(".")[0]
+						+ "_output.att";
 
-				line = pf.readLine();
-				if (line != null)
-					if (line.startsWith(";")) {
-						if (writeable)
-							pf.writeLine(line);
-					} else {
-						String[] firstLines = pf.split(line);
-						if (firstLines.length == 13)
-							if (pf.rightDepTime(firstLines[11])) {
-								pf.writeLine(line);
-								writeable = true;
-							} else
-								writeable = false;
-					}
+				try {
+					PutpathlegFilter pf = new PutpathlegFilter(";",
+							putpathlegTableFilename, minDepTime, maxDepTime,
+							outputFilename);
+					String line;
 
-			} while (line != null);
+					do {
+						line = pf.readLine();
+						pf.writeLine(line);
+						if (PutpathlegFilter.isHead(line))
+							break;
+					} while (line != null);
 
-			pf.closeReader();
-			pf.closeWriter();
+					boolean writeable = false;
+					do {
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
+						line = pf.readLine();
+						if (line != null)
+							if (line.startsWith(";")) {
+								if (writeable)
+									pf.writeLine(line);
+							} else {
+								String[] firstLines = pf.split(line);
+								if (firstLines.length == 13)
+									if (pf.rightDepTime(firstLines[11])) {
+										pf.writeLine(line);
+										writeable = true;
+									} else
+										writeable = false;
+							}
+
+					} while (line != null);
+
+					pf.closeReader();
+					pf.closeWriter();
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 }
