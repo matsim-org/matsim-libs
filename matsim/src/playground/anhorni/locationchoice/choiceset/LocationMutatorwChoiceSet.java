@@ -84,12 +84,14 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		List<SubChain> subChains = new Vector<SubChain>();
 					
-		boolean chainStarted = false;	
+		boolean chainStarted = false;
+		boolean sl_found = false;
 		double actDur = 0.0;
 		double slStartTime = 0.0;
 		double slEndTime = 0.0;
 		
 		int subChainIndex = -1;
+		
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -97,7 +99,8 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 			if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
 				// no plan starts with s or l !
 				subChains.get(subChainIndex).addAct(act);
-				actDur += act.getDur();	
+				actDur += act.getDur();
+				sl_found = true;
 			}
 			else if (act.getType().startsWith("h") || act.getType().startsWith("w")|| 
 				act.getType().startsWith("e")) {
@@ -111,9 +114,15 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 					chainStarted = true;
 				}
 				else {
-					slEndTime = act.getStartTime();
-					subChains.get(subChainIndex).setTtBudget(slEndTime-slStartTime - actDur);
-					subChains.get(subChainIndex).setEndCoord(act.getCoord());
+					if (sl_found) {
+						slEndTime = act.getStartTime();
+						subChains.get(subChainIndex).setTtBudget(slEndTime-slStartTime - actDur);
+						subChains.get(subChainIndex).setEndCoord(act.getCoord());
+					}
+					else {
+						subChains.remove(subChainIndex++);
+					}
+					sl_found = false;
 					chainStarted = false;
 					actDur = 0.0;
 				}
