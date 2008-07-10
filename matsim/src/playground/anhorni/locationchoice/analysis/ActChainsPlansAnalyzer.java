@@ -95,7 +95,7 @@ public class ActChainsPlansAnalyzer {
 				int countSL = 0;
 				for (int j = 0; j < actslegs.size(); j=j+2) {
 					final Act act = (Act)actslegs.get(j);	
-					if (act.getType().startsWith("s") || act.getType().startsWith("s")) {
+					if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
 						countSL++;
 					}
 					else if (act.getType().startsWith("h") || act.getType().startsWith("w")|| 
