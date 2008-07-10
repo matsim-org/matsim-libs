@@ -68,7 +68,7 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 		this.leisure_facilities.putAll(this.facilities.getFacilities("leisure_sports"));
 		
 		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities, this.shop_facilities);
-		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities, this.shop_facilities);
+		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities, this.leisure_facilities);
 		
 		this.zhShopFacilities = (ArrayList<Facility>)this.shopFacQuadTree.get(683508.50, 246832.91, 30000);
 		this.zhLeisureFacilities = (ArrayList<Facility>)this.leisFacQuadTree.get(683508.50, 246832.91, 30000);
@@ -87,7 +87,7 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 			treemapLeisure.put(f.getId(), f);
 		}	
 		this.zhShopFacQuadTree = this.builFacQuadTree(treemapShop, this.shop_facilities);
-		this.zhLeisureFacQuadTree = this.builFacQuadTree(treemapLeisure, this.shop_facilities);
+		this.zhLeisureFacQuadTree = this.builFacQuadTree(treemapLeisure, this.leisure_facilities);
 	}
 
 	public void handlePlan(final Plan plan){
