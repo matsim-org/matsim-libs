@@ -57,7 +57,7 @@ public class JavaDEQSim {
 		SimulationParameters.linkCapacityPeriod=network.getCapacityPeriod();
 		SimulationParameters.events=events;
 		
-		
+	
 
 	}
 	
