@@ -39,6 +39,7 @@ import playground.wrashid.DES.Road;
 import playground.wrashid.DES.Scheduler;
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.DES.Vehicle;
+import playground.wrashid.DES.utils.Timer;
 
 public class JavaDEQSim {
 
@@ -47,13 +48,24 @@ public class JavaDEQSim {
 	
 	public JavaDEQSim(final NetworkLayer network, final Plans population, final Events events) {
 		// constructor
+		
+
+
+		
 		this.population = population;
 		this.network = network;
 		SimulationParameters.linkCapacityPeriod=network.getCapacityPeriod();
 		SimulationParameters.events=events;
+		
+		
+
 	}
 	
 	public void run() {
+		Timer t=new Timer();
+		t.startTimer();
+		
+		
 		Scheduler scheduler=new Scheduler();
 		Road.allRoads=new HashMap<String,Road>();
 
@@ -82,6 +94,8 @@ public class JavaDEQSim {
 
 		
 		
+		t.endTimer();
+		t.printMeasuredTime("Time needed for one iteration (only DES part): ");
 		
 		
 		// print output
