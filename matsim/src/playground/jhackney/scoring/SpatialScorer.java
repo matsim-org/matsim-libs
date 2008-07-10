@@ -110,6 +110,7 @@ public class SpatialScorer {
 
 				if(!activityMap.keySet().contains(activity1)){
 					activityMap.put(activity1,actList);	
+					actList.add(p1);
 				}
 				if(activityMap.keySet().contains(activity1)){
 					ArrayList<Person> myList=activityMap.get(activity1);
