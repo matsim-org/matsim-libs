@@ -1,0 +1,212 @@
+package playground.jhackney.scoring;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * SpatialScorer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.facilities.Activity;
+import org.matsim.gbl.Gbl;
+import org.matsim.plans.Act;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
+import org.matsim.socialnetworks.algorithms.CompareActs;
+import org.matsim.socialnetworks.socialnet.EgoNet;
+import org.matsim.socialnetworks.socialnet.SocialNetwork;
+
+
+public class SpatialScorer {
+
+	SocialNetwork net;
+
+	Hashtable<Activity,ArrayList<Person>> activityMap;
+	Hashtable<Act,ArrayList<Person>> actMap=new Hashtable<Act,ArrayList<Person>>();
+
+	public SpatialScorer() {
+		
+	}
+	/**
+	 * The Plans contain all agents who are chosen to get scores for social interactions.
+	 * Generally all agents in the population get scored.
+	 * <br><br>
+	 * <code>summarizeActs</code> looks through each selected Plan and Act. For each Act it compares the
+	 * Facility Id to that of all other Acts in the other Plans. If the Facility Ids are the same between
+	 * the two Acts, then the two Persons passed through the same Facility at some point.
+	 * The first Act and all the Persons having visited that Facility Id are recorded in activityMap.
+	 * The Plan/Person must be recorded rather than the Act because there is no pointer from Act to Plan/Person.
+	 * Also, the Facility Id is recorded separately in an ArrayList.
+	 * 
+	 * To use this information, iterate through the ArrayList of Facilities and the table of Acts to
+	 * find the agents who passed through the Facility. Call up the list of agents and process their
+	 * Plans according to the spatial interaction desired.
+	 * 
+	 * Note that there could be several Acts
+	 * matching a given Facility, thus if it is desired to ascertain all spatial encounters at a
+	 * Facility, it will be necessary to test all Acts. 
+	 * 
+	 * @param plans
+	 * @param rndEncounterProb
+	 * @param iteration
+	 * 
+	 */
+	public void scoreActs(Plans plans, HashMap<String, Double> rndEncounterProb, int iteration) {
+
+		System.out.println(" "+ this.getClass()+" Looking through plans and mapping social interactions for scoring "+iteration);
+
+		activityMap = new Hashtable<Activity,ArrayList<Person>>(); 
+		activityMap= makeActivityMap(plans);
+
+		System.out.println("...finished");
+
+	}
+	/**
+	 * Makes a list of Activity (== Facility + activity type) and the Persons (Plans --> Acts) carrying
+	 * out an Act there. Only Acts need be stored, but since there is no way to link to a Person from
+	 * an Act, we store the Plan.
+	 * 
+	 * Note that a single Person may have multiple Acts which take place at a Facility (e.g. Morning Home,
+	 * Evening Home). Thus storing the Person is a way to store all of these Acts.
+	 * 
+	 *  We search through the Acts at a later stage when using this Map.
+	 *  
+	 * @param plans
+	 * @return activityMap
+	 */
+	private Hashtable<Activity,ArrayList<Person>> makeActivityMap(Plans plans){
+		System.out.println("Making a new activity map for spatial scores");
+		Hashtable<Activity,ArrayList<Person>> activityMap=new Hashtable<Activity,ArrayList<Person>>();
+		Iterator<Person> p1Iter=plans.iterator();
+		while(p1Iter.hasNext()){
+			Plan plan1= ((Person) p1Iter.next()).getSelectedPlan();
+			Person p1=plan1.getPerson();
+			ActIterator a1Iter =plan1.getIteratorAct();
+			while(a1Iter.hasNext()){
+				Act act1 = (Act) a1Iter.next();
+				Activity activity1=act1.getFacility().getActivity(act1.getType());
+				ArrayList<Person> actList=new ArrayList<Person>();
+
+				if(!activityMap.keySet().contains(activity1)){
+					activityMap.put(activity1,actList);	
+				}
+				if(activityMap.keySet().contains(activity1)){
+					ArrayList<Person> myList=activityMap.get(activity1);
+					myList.add(p1);
+				}	
+			}
+		}
+		return activityMap;
+	}
+
+	/**
+	 * Time-independent spatial collocation:
+	 * 
+	 * This is not actually a "spatial" interaction but a test of shared
+	 * knowledge and could be accomplished via a search of Knowledge.Activities().
+	 * 
+	 * Each person visiting a Facility to perform an Activity has a chance
+	 * to meet every other person who was at that Facility doing the same thing.
+	 * <br><br>
+	 * This models the chance that two people who do the same thing at the same
+	 * place, but who may not have been present in the same time window because
+	 * of bad luck or bad planning, might still know each other.
+	 * <br><br>
+	 * For every two people, person1 and person2, who visited the same facility
+	 * and performed the same activity there, regardless of when, there is a score
+	 * <br><br>
+	 * This score depends only on the activity type, "rndEncounterProbability(activity type)".
+	 * <br><br>
+	 * @param plans
+	 * @param rndEncounterProbability
+	 * @param iteration
+	 * @return score
+	 */
+	public double scoreAllFriendsInAct(Plan plan) {
+		double score = 0;
+		ActIterator ait=plan.getIteratorAct();
+		while(ait.hasNext()){
+			Act act = (Act) ait.next();
+			Activity myActivity=act.getFacility().getActivity(act.getType());
+			ArrayList<Person> visitors=activityMap.get(myActivity);
+			// Go through the list of Persons and for each one pick one friend randomly
+			// Must be double loop
+			Iterator<Person> vIt=visitors.iterator();
+			while(vIt.hasNext()){
+				Person p2= vIt.next();
+//				TODO do something to score JH
+				// Person p1=plan.getPerson(); EgoNet net = p1.getMap().getEgoNet(); if(net.getAlters().contains(p2){friend++}else{foe++}; etc.
+
+			}
+		}
+		return score;
+	}
+
+	/**
+	 * For the Act, this method tests all other Acts
+	 * at the Activity to see if they are in the same place at the same time (Act overlap). If so,
+	 * the agent is scored accordingly.
+	 * <br><br>
+	 * 
+	 * 
+	 * @param plans
+	 * @param rndEncounterProbability
+	 * @param iteration
+	 */
+	public double scoreFriendtoFoeInTimeWindow(Plan plan) {
+
+		double friend=0.;
+		double foe=0.;
+		ActIterator ait=plan.getIteratorAct();
+		Person p1=plan.getPerson();
+		while(ait.hasNext()){
+			Act act1 = (Act) ait.next();
+			Activity myActivity=act1.getFacility().getActivity(act1.getType());
+			ArrayList<Person> visitors=activityMap.get(myActivity);
+			// Go through the list of Persons and for each one pick one friend randomly
+			Iterator<Person> vIt=visitors.iterator();
+			while(vIt.hasNext()){
+				Person p2= vIt.next();
+				Plan plan2=p2.getSelectedPlan();
+				ActIterator act2It=plan2.getIteratorAct();
+				while(act2It.hasNext()){
+					Act act2 = (Act) act2It.next();
+					if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
+						EgoNet net = p1.getKnowledge().getEgoNet();
+						if(net.getAlters().contains(p2)){
+							friend++;
+						}else{
+							foe++;
+						}
+					}
+				}
+			}
+		}
+		if((friend+foe)==0){
+			return 0;
+		}else
+		return friend/(foe+.1*(friend+foe));
+	}
+}
+

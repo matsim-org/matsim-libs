@@ -30,9 +30,12 @@ import org.matsim.controler.Controler;
 import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.events.ScoringEvent;
 import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
+import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
@@ -88,7 +91,7 @@ import playground.jhackney.scoring.SpatialScorer;
  * @author jhackney
  *
  */
-public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener {
+public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  AfterMobsimListener{
 
 	private static final boolean CALCSTATS = true;
 	private static final String DIRECTORY_SN = "socialnets/";
@@ -160,7 +163,8 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		snsetup();
 	}
 
-	public void notifyAfterMobSimEvent(final AfterMobsimEvent event){
+	public void notifyAfterMobsim(final AfterMobsimEvent event){
+//	public void notifyScoring(final ScoringEvent event){
 		
 		
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
@@ -521,6 +525,5 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	public final static String getSNIterationPath(final int iteration, final int snIter) {
 		return Controler.getOutputFilename("ITERS/" + snIter + "/it." + iteration);
 	}
-
 }
 

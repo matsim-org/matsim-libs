@@ -65,7 +65,7 @@ public class SpatialInteractorActsFast {
 	 * <code>interact</code> looks through each selected Plan and Act. For each Act it compares the
 	 * Facility Id to that of all other Acts in the other Plans. If the Facility Ids are the same between
 	 * the two Acts, then the two Persons passed through the same Facility at some point.
-	 * The first Act and all the Persons having visited that Facility Id are recorded in crossPaths.
+	 * The first Act and all the Persons having visited that Facility Id are recorded in activityMap
 	 * The Plan/Person must be recorded rather than the Act because there is no pointer from Act to Plan/Person.
 	 * Also, the Facility Id is recorded separately in an ArrayList.
 	 * 
@@ -324,7 +324,7 @@ public class SpatialInteractorActsFast {
 	private void encounterOnePersonRandomlyFaceToFaceInTimeWindow(HashMap<String, Double> rndEncounterProbability, int iteration) {
 
 		Hashtable<Person,Act> personList=new Hashtable<Person,Act>();
-		Hashtable<Person,ArrayList<Person>> othersList = new Hashtable<Person,ArrayList<Person>>();
+//		Hashtable<Person,ArrayList<Person>> othersList = new Hashtable<Person,ArrayList<Person>>();
 
 		// First identify the overlapping Acts and the Persons involved
 		
@@ -337,12 +337,12 @@ public class SpatialInteractorActsFast {
 				Plan plan1=p1.getSelectedPlan();
 				ArrayList<Person> others = new ArrayList<Person>();
 				ActIterator act1It=plan1.getIteratorAct();
-				othersList.put(p1,others);
+//				othersList.put(p1,others);
+
 				while(act1It.hasNext()){
 					Act act1 = (Act) act1It.next();
-					personList.put(p1,act1);
+//					personList.put(p1,act1);
 					Iterator<Person> vIt2=visitors.iterator();
-					//randomize the order of picking the person
 					while(vIt2.hasNext()){
 						Person p2= vIt2.next();
 						Plan plan2=p2.getSelectedPlan();
@@ -356,36 +356,54 @@ public class SpatialInteractorActsFast {
 						}
 					}
 				}
-			}
-		}
+				if(others.size()>0){
+					Person p2=others.get(Gbl.random.nextInt(others.size()));
+					if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
-		// Using the two TreeMaps of Who did What and Who Else Did It, for each Person, randomly pick 
-		// ONE other Person at each act and make them have an encounter.
-		
-		Iterator<Person> pIt=personList.keySet().iterator();
-		
-		while(pIt.hasNext()){
-			Person p1=pIt.next();
-			if(othersList.get(p1).size()>0){
-			Person p2=othersList.get(p1).get(Gbl.random.nextInt(othersList.get(p1).size()));
-			Activity myActivity=personList.get(p1).getFacility().getActivity(personList.get(p1).getType());
-			if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
+						// If they know each other, probability is 1.0 that the relationship is reinforced
+						if (p1.getKnowledge().getEgoNet().knows(p2)) {
+							net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
+//							System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
+						} else {
+							// If the two do not already know each other,
 
-				// If they know each other, probability is 1.0 that the relationship is reinforced
-				if (p1.getKnowledge().getEgoNet().knows(p2)) {
-					net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
-					System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
-				} else {
-					// If the two do not already know each other,
-
-					if(Gbl.random.nextDouble() < pBecomeFriends){
-						net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
-						System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
+							if(Gbl.random.nextDouble() < pBecomeFriends){
+								net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
+//								System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
+							}
+						}
 					}
 				}
 			}
-			}
 		}
+//
+//		// Using the two TreeMaps of Who did What and Who Else Did It, for each Person, randomly pick 
+//		// ONE other Person at each act and make them have an encounter.
+//		
+//		Iterator<Person> pIt=personList.keySet().iterator();
+//		
+//		while(pIt.hasNext()){
+//			Person p1=pIt.next();
+//			if(othersList.get(p1).size()>0){
+//			Person p2=othersList.get(p1).get(Gbl.random.nextInt(othersList.get(p1).size()));
+//			Activity myActivity=personList.get(p1).getFacility().getActivity(personList.get(p1).getType());
+//			if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
+//
+//				// If they know each other, probability is 1.0 that the relationship is reinforced
+//				if (p1.getKnowledge().getEgoNet().knows(p2)) {
+//					net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
+////					System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
+//				} else {
+//					// If the two do not already know each other,
+//
+//					if(Gbl.random.nextDouble() < pBecomeFriends){
+//						net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
+////						System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
+//					}
+//				}
+//			}
+//			}
+//		}
 	}
 
 

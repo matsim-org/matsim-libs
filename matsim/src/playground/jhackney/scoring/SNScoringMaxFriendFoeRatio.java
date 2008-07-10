@@ -87,8 +87,8 @@ import org.matsim.utils.misc.Time;
  * early will be subtracted from the score.</dd>
  * <dt>social context</dt>
  * <dd>A location is more attractive if more friends of the agent are there.
- * In this function, the ratio of friends/unknown others ([0,1]) is scaled
- * and added to the score.</dd>
+ * In this function, the ratio of friends/unknown others ([0,INF)) at activity
+ * with type == facType is added to the score.</dd>
  * </dl>
  *
  * @author mrieser, jhackney
@@ -329,40 +329,15 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 
 		//JH add positive utility for the ratio of friends to non-friends at
 		// a factype activity
-		//FIRST call SOCIAL.PLANS.GENERATOR AGAIN
-		// get the random act
-		// for all acts of type "factype"
+
 		if(act.getType().equals(factype)){
-//			int friend=0;
-//			int foe=0;
-//			Person p1=plan.getPerson();
-////			Activity myActivity=p1.getKnowledge().getMentalMap().getActivity(act);
-//			Activity myActivity = act.getFacility().getActivity(act.getType());
-//
-//			Vector<Person> othersThere = socialPlansMap.get(myActivity).getAttendeesInTimeWindow(p1, activityStart, activityEnd);
-//			//for all agents in (social.plans.get(act){
-//			Enumeration<Person> e = othersThere.elements();
-//
-//			while(e.hasMoreElements()){
-//				Person p2 =(Person) e.nextElement();
-//				if(p1.getKnowledge().getEgoNet().knows(p2)){
-//					friend++;
-//				}else{
-//					foe++;
-//				}
-//			}
-//			double ratio = (double)friend/(double)foe;
-//			if(ratio>0. && ratio <= 1.){
-//
-//				if(myActivity.getType().equals("leisure")){
-//					score+=10.*(double)friend/(double)foe;
-		score+=10.*spatialScorer.scoreFriendtoFoeInTimeWindow(plan);
-				}
-//			}else{
-//
-//			}
-//			// JH end
-//		}
+			double add=spatialScorer.scoreFriendtoFoeInTimeWindow(plan);
+			score+=10.*add;
+			System.out.println(this.getClass()+" "+score+" "+add);
+		}
+
+		// JH end
+
 		return score;
 	}
 
