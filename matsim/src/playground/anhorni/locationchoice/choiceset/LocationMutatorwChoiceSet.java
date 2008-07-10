@@ -107,10 +107,10 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
 		if (type.startsWith("s")) {
-			return (ArrayList<Facility>) super.zhShopFacQuadTree.get(midPointX, midPointY, radius);
+			return (ArrayList<Facility>) this.zhShopFacQuadTree.get(midPointX, midPointY, radius);
 		}
 		else {
-			return (ArrayList<Facility>) this.zhLeisFacQuadTree.get(midPointX, midPointY, radius);
+			return (ArrayList<Facility>) this.zhLeisureFacQuadTree.get(midPointX, midPointY, radius);
 		}
 	}
 }

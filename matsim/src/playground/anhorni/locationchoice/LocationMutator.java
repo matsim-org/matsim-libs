@@ -29,7 +29,7 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 	protected QuadTree<Facility> leisFacQuadTree = null;
 	
 	protected QuadTree<Facility> zhShopFacQuadTree = null;
-	protected QuadTree<Facility> zhLeisFacQuadTree = null;
+	protected QuadTree<Facility> zhLeisureFacQuadTree = null;
 	
 	protected ArrayList<Facility> zhShopFacilities = null;
 	protected ArrayList<Facility> zhLeisureFacilities = null;
@@ -63,24 +63,24 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities);
 		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities);
 		
-		zhShopFacilities = (ArrayList<Facility>)this.shopFacQuadTree.get(683508.50, 246832.91, 30000);
-		zhLeisureFacilities = (ArrayList<Facility>)this.leisFacQuadTree.get(683508.50, 246832.91, 30000);
+		this.zhShopFacilities = (ArrayList<Facility>)this.shopFacQuadTree.get(683508.50, 246832.91, 30000);
+		this.zhLeisureFacilities = (ArrayList<Facility>)this.leisFacQuadTree.get(683508.50, 246832.91, 30000);
 		
 		TreeMap<Id, Facility> treemapShop = new TreeMap<Id, Facility>();
-		Iterator<Facility> sfac_it = zhShopFacilities.iterator();
+		Iterator<Facility> sfac_it = this.zhShopFacilities.iterator();
 		while (sfac_it.hasNext()) {
 			Facility f = sfac_it.next();
 			treemapShop.put(f.getId(), f);
 		}
 		
 		TreeMap<Id, Facility> treemapLeisure = new TreeMap<Id, Facility>();
-		Iterator<Facility> lfac_it = zhLeisureFacilities.iterator();
+		Iterator<Facility> lfac_it = this.zhLeisureFacilities.iterator();
 		while (lfac_it.hasNext()) {
 			Facility f = lfac_it.next();
 			treemapLeisure.put(f.getId(), f);
 		}	
 		this.zhShopFacQuadTree = this.builFacQuadTree(treemapShop);
-		this.zhShopFacQuadTree = this.builFacQuadTree(treemapLeisure);
+		this.zhLeisureFacQuadTree = this.builFacQuadTree(treemapLeisure);
 	}
 
 	public void handlePlan(final Plan plan){
