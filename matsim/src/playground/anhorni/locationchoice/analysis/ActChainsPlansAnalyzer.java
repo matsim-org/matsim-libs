@@ -100,8 +100,10 @@ public class ActChainsPlansAnalyzer {
 					}
 					else if (act.getType().startsWith("h") || act.getType().startsWith("w")|| 
 							act.getType().startsWith("e")) {
-						out.write(person.getId().toString()+"\t"+String.valueOf(countSL));
-						countSL = 0;
+						if (countSL > 0) {
+							out.write(person.getId().toString()+"\t"+String.valueOf(countSL));
+							countSL = 0;
+						}
 					}
 				}	
 			}
