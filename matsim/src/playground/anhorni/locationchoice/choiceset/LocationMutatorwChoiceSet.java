@@ -62,8 +62,8 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		ArrayList<Facility> choiceSet = this.computeChoiceSet
 		(startCoord, endCoord, radius, act.getType());
-		log.info("radius "+radius);
-		log.info("ChoiceSetSize "+ choiceSet.size());
+		//log.info("radius "+radius);
+		//log.info("ChoiceSetSize "+ choiceSet.size());
 		
 		if (choiceSet.size()>1) {
 			final Facility facility=(Facility)choiceSet.toArray()[

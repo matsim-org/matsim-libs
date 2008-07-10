@@ -3,13 +3,13 @@ package playground.anhorni.locationchoice.choiceset;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 
 public class ManageSubchains {
 	
-	private static final Logger log = Logger.getLogger(ManageSubchains.class);
+	//private static final Logger log = Logger.getLogger(ManageSubchains.class);
 	
 	private List<SubChain> subChains = new Vector<SubChain>();
 	
@@ -25,11 +25,11 @@ public class ManageSubchains {
 		this.sl_found = true;	
 		this.ttBudget += leg.getTravTime();
 
-		log.info("found s/l act");	
+		//log.info("found s/l act");	
 	}
 	
 	public void hweActivityFound(Act act, Leg leg) {
-		log.info("found hwe act");	
+		//log.info("found hwe act");	
 		// close chain
 		if (chainStarted) {
 			if (sl_found) {
@@ -40,7 +40,7 @@ public class ManageSubchains {
 			else {
 				this.subChains.remove(subChainIndex);
 				this.subChainIndex--;
-				log.info("chain removed");
+				//log.info("chain removed");
 			}
 		}
 		
@@ -53,7 +53,7 @@ public class ManageSubchains {
 			this.chainStarted = true;
 			this.sl_found = false;
 			this.ttBudget = leg.getTravTime();
-			log.info("chain startet");
+			//log.info("chain startet");
 		}			
 	}
 

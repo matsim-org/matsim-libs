@@ -44,8 +44,8 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			
 			double radius = ttBudget * speed * ttFactor;	
 			
-			log.info("radius " + radius);
-			log.info("ttBudget " + ttBudget);
+			//log.info("radius " + radius);
+			//log.info("ttBudget " + ttBudget);
 			
 			boolean locationModified = this.modifyLocation(act, startCoord, endCoord, radius);
 			if (!locationModified) {
