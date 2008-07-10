@@ -75,7 +75,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
        		return;
 		}
 		else {
-			this.modifyLocation(act, startCoord, endCoord, radius*1.1, trialNr++);
+			this.modifyLocation(act, startCoord, endCoord, (radius + 1000.0)*1.1, trialNr++);
 			return; 			
 		}	
 	}
