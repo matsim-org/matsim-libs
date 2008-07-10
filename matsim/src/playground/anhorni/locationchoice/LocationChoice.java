@@ -25,7 +25,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
-import playground.anhorni.locationchoice.choiceset.LocationMutatorwChoiceSet;
+import playground.anhorni.locationchoice.choiceset.LocationMutatorwChoiceSetSimultan;
 
 
 public class LocationChoice extends MultithreadedModuleA {
@@ -56,7 +56,7 @@ public class LocationChoice extends MultithreadedModuleA {
 
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
-		return new RandomLocationMutator(this.network);
-		//return new LocationMutatorwChoiceSet(this.network, this.controler);
+		//return new RandomLocationMutator(this.network);
+		return new LocationMutatorwChoiceSetSimultan(this.network, this.controler);
 	}
 }
