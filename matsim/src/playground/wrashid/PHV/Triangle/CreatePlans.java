@@ -30,7 +30,7 @@ public class CreatePlans {
 		args=new String[1];
 		args[0]="C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/config.xml";
 		Gbl.createConfig(args);
-		Gbl.getConfig().plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/plans.xml");
+		Gbl.getConfig().plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/5000plan/plans.xml");
 		final World world = Gbl.getWorld();
 		
 		// read facilities
@@ -60,7 +60,7 @@ public class CreatePlans {
 		
 		
 		// create 100 persons
-		for (int i=0;i<100;i++){
+		for (int i=0;i<5000;i++){
 			Person person = new Person(new IdImpl(i));
 			plans.addPerson(person);
 			

@@ -103,7 +103,7 @@ public class Road extends SimUnit {
 	public void leaveRoad(Vehicle vehicle) {
 		carsOnTheRoad.removeFirst();
 		earliestDepartureTimeOfCar.removeFirst();
-		timeOfLastLeavingVehicle = Scheduler.simTime;
+		timeOfLastLeavingVehicle = scheduler.simTime;
 
 		if (link.getId().toString().equalsIgnoreCase("110915")) {
 			//System.out.println("leave road: " + Scheduler.simTime);
@@ -115,7 +115,7 @@ public class Road extends SimUnit {
 			Vehicle nextVehicle = interestedInEnteringRoad.removeFirst();
 			double nextAvailableTimeForEnteringStreet = Math.max(
 					timeOfLastEnteringVehicle + inverseInFlowCapacity,
-					Scheduler.simTime + gapTravelTime);
+					scheduler.simTime + gapTravelTime);
 
 			noOfCarsPromisedToEnterRoad++;
 
@@ -125,7 +125,7 @@ public class Road extends SimUnit {
 			if (gap != null) {
 				// as long as the road is not full once, there is no need to
 				// keep track of the gaps
-				gap.add(Scheduler.simTime + gapTravelTime);
+				gap.add(scheduler.simTime + gapTravelTime);
 
 				// if no one is interested in entering this road (precondition)
 				// and there are no cars on the road, then reset gap
@@ -161,7 +161,7 @@ public class Road extends SimUnit {
 		}
 
 		double nextAvailableTimeForLeavingStreet = Double.MIN_VALUE;
-		nextAvailableTimeForLeavingStreet = Scheduler.simTime
+		nextAvailableTimeForLeavingStreet = scheduler.simTime
 				+ link.getLength()
 				/ link.getFreespeed(SimulationParameters.linkCapacityPeriod);
 

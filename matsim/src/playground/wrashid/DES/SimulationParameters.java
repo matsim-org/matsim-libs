@@ -8,10 +8,10 @@ public class SimulationParameters {
 	// EventHeap
 	
 	static long simulationLength=Long.MAX_VALUE; //in ms
-	public static long linkCapacityPeriod=0; // wird initializiert im JavaDEQSim.java
+	public static long linkCapacityPeriod=0; // 
 	public static double gapTravelSpeed=15.0; // in m/s
-	public static double flowCapacityFactor=0.33;
-	public static double storageCapacityFactor=0.33;
+	public static double flowCapacityFactor=1.0;
+	public static double storageCapacityFactor=1.0;
 	public static double carSize=7.5; // in meter
 	public static double minimumInFlowCapacity=1800; // diese konstante ist hardcodiert bei der C++ simulation (in Frz/stunde)
 													// diese wird auch skaliert mit dem flowCapacityFactor
@@ -31,6 +31,8 @@ public class SimulationParameters {
 
 
 	public static Events events=null; // this is the simulation events object
-
+	public static double stuckTime=Double.MAX_VALUE; // - this time is used for deadlock prevention.
+														   // - when a car waits for more than 'stuckTime' for 
+														   //   entering next road, it will enter the next 
 
 }

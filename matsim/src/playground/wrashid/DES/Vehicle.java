@@ -76,6 +76,7 @@ public class Vehicle extends SimUnit {
 
 		Road road=Road.allRoads.get(getCurrentLink().getId().toString());
 		scheduleStartingLegMessage(departureTime, road);
+		//System.out.println("departureTime:"+departureTime+";simTime:"+scheduler.simTime);
 	}
 
 	public void setCurrentLeg(Leg currentLeg) {

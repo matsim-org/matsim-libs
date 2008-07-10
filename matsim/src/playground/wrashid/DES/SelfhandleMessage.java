@@ -11,7 +11,7 @@ public abstract class SelfhandleMessage extends Message {
 		m.receivingUnit=targetUnit;
 		
 		m.setMessageArrivalTime(messageArrivalTime);
-		Scheduler.schedule(m);
+		scheduler.schedule(m);
 	}
 
 }

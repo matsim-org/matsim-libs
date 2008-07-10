@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
@@ -54,14 +55,20 @@ public class JavaDEQSim {
 		
 		this.population = population;
 		this.network = network;
+		
+		
+		
+		// initialize Simulation parameters
 		SimulationParameters.linkCapacityPeriod=network.getCapacityPeriod();
 		SimulationParameters.events=events;
+		SimulationParameters.stuckTime= Double.parseDouble(Gbl.getConfig().getParam("simulation", "stuckTime"));
+		SimulationParameters.flowCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "flowCapacityFactor"));
+		SimulationParameters.flowCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "storageCapacityFactor"));
 		
-	
-
 	}
 	
 	public void run() {
+		//System.out.println("JavaDEQSim.run");
 		Timer t=new Timer();
 		t.startTimer();
 		

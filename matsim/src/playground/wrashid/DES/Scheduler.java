@@ -3,19 +3,22 @@ package playground.wrashid.DES;
 import java.util.HashMap;
 
 public class Scheduler {
-	static double simTime=0;
-	static MessageQueue queue=new MessageQueue();
+	double simTime=0;
+	MessageQueue queue=new MessageQueue();
 	HashMap<Long,SimUnit> simUnits=new HashMap<Long, SimUnit>();
 
 
 	
 	
-	public static void schedule(Message m){		
+	public void schedule(Message m){		
 		if (m.getMessageArrivalTime()>=simTime){	
 			queue.putMessage(m);
 		} else {
 			System.out.println("WARNING: You tried to send a message in the past. Message discarded.");
+			//System.out.println("m.getMessageArrivalTime():"+m.getMessageArrivalTime());
+			//System.out.println("simTime:"+simTime);
 			//System.out.println(m.getClass());
+			assert(false); // for backtracing, where a wrong message has been scheduled
 		}
 	}
 	
