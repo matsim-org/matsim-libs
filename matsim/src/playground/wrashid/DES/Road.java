@@ -78,7 +78,7 @@ public class Road extends SimUnit {
 		gap = null;
 
 		if (link.getId().toString().equalsIgnoreCase("110915")) {
-			System.out.println("sdfa");
+			//System.out.println("sdfa");
 		}
 	}
 
@@ -106,7 +106,7 @@ public class Road extends SimUnit {
 		timeOfLastLeavingVehicle = Scheduler.simTime;
 
 		if (link.getId().toString().equalsIgnoreCase("110915")) {
-			System.out.println("leave road: " + Scheduler.simTime);
+			//System.out.println("leave road: " + Scheduler.simTime);
 		}
 
 		// the next car waiting for entering the road should now be alloted a
@@ -157,7 +157,7 @@ public class Road extends SimUnit {
 		// vehicle.leavePreviousRoad();
 
 		if (link.getId().toString().equalsIgnoreCase("110915")) {
-			System.out.println("enter Road:" + Scheduler.simTime);
+			//System.out.println("enter Road:" + Scheduler.simTime);
 		}
 
 		double nextAvailableTimeForLeavingStreet = Double.MIN_VALUE;
@@ -205,13 +205,13 @@ public class Road extends SimUnit {
 				+ noOfCarsPromisedToEnterRoad : "You promised too many cars, that they can enter the street!";
 
 		if (link.getId().toString().equalsIgnoreCase("110915")) {
-			System.out.print("enterRequest");
+			//System.out.print("enterRequest");
 		}
 
 		if (carsOnTheRoad.size() + noOfCarsPromisedToEnterRoad < maxNumberOfCarsOnRoad) {
 
 			if (link.getId().toString().equalsIgnoreCase("110915")) {
-				System.out.println("normal");
+				//System.out.println("normal");
 			}
 
 			// - check, if the gap needs to be considered for entering the road
@@ -238,7 +238,7 @@ public class Road extends SimUnit {
 		} else {
 
 			if (link.getId().toString().equalsIgnoreCase("110915")) {
-				System.out.println("road full: " + Scheduler.simTime);
+				//System.out.println("road full: " + Scheduler.simTime);
 			}
 
 			// at the moment, the road is full and no gap is available

@@ -2,13 +2,16 @@ package playground.wrashid.DES;
 
 import java.util.ArrayList;
 
+import org.matsim.events.BasicEvent;
+import org.matsim.events.EventLinkLeave;
 import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Plan;
 
 public class EndRoadMessage extends EventMessage {
-
+// TODO: This is not a normal Event message, perhaps I should redesign it and put it somewhere else
+	// in the class hierarchy
 
 	@Override
 	public void selfhandleMessage() {
@@ -56,6 +59,8 @@ public class EndRoadMessage extends EventMessage {
 		logMessage=false;
 	}
 	
-
+	public void logEvent() {
+		// do not schedule any message
+	}
 
 }

@@ -50,6 +50,7 @@ public class JavaDEQSim {
 		this.population = population;
 		this.network = network;
 		SimulationParameters.linkCapacityPeriod=network.getCapacityPeriod();
+		SimulationParameters.events=events;
 	}
 	
 	public void run() {

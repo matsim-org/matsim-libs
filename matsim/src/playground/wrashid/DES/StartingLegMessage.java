@@ -2,6 +2,9 @@ package playground.wrashid.DES;
 
 import java.util.ArrayList;
 
+import org.matsim.events.BasicEvent;
+import org.matsim.events.EventAgentArrival;
+import org.matsim.events.EventAgentDeparture;
 import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
@@ -22,5 +25,14 @@ public class StartingLegMessage extends EventMessage {
 		road.enterRequest(vehicle);
 	}
 	
+	public void logEvent() {
+		BasicEvent event=null;
+		
+		if (eventType.equalsIgnoreCase(SimulationParameters.START_LEG)){
+			event=new EventAgentDeparture(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getLegIndex()-1,vehicle.getCurrentLink().getToNode().getId().toString());
+		}
+		
+		SimulationParameters.events.processEvent(event);
+	}
 	
 }
