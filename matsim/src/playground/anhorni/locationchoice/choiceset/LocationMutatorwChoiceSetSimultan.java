@@ -27,7 +27,7 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			Iterator<Act> act_it = subChain.getSlActs().iterator();
 			while (act_it.hasNext()) {
 				Act act = act_it.next();
-				this.modifyLocation(act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE);
+				this.modifyLocation(act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE, 0);
 			}
 			return;
 		}
@@ -44,14 +44,11 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			
 			double radius = ttBudget * speed * ttFactor;	
 			
-			//log.info("radius " + radius);
-			//log.info("ttBudget " + ttBudget);
+			log.info("radius " + radius);
+			log.info("ttBudget " + ttBudget);
 			
-			boolean locationModified = this.modifyLocation(act, startCoord, endCoord, radius);
-			if (!locationModified) {
-				this.handleSubChain(subChain, speed * 1.1, trialNr++, ttFactor);
-				return;
-			}		
+			this.modifyLocation(act, startCoord, endCoord, radius, 0);
+					
 			startCoord = act.getCoord();				
 			ttBudget -= this.computeTravelTime(prevAct, act);
 			

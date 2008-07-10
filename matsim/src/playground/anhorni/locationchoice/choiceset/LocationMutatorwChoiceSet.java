@@ -59,28 +59,24 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 	protected void handleSubChain(SubChain subChain, double speed, int trialNr, double ttFactor) {
 	}
 	
-	protected boolean modifyLocation(Act act, CoordI startCoord, CoordI endCoord, double radius) {
+	protected void modifyLocation(Act act, CoordI startCoord, CoordI endCoord, double radius, int trialNr) {
 		
+		if (trialNr > 10) {
+			radius = Double.MAX_VALUE;
+		}
 		ArrayList<Facility> choiceSet = this.computeChoiceSet
 		(startCoord, endCoord, radius, act.getType());
-		log.info("radius "+radius);
-		log.info("coord "+startCoord.toString() + " " + endCoord.toString());
-		//log.info("ChoiceSetSize "+ choiceSet.size());
 		
 		if (choiceSet.size()>1) {
 			final Facility facility=(Facility)choiceSet.toArray()[
            			           Gbl.random.nextInt(choiceSet.size()-1)];
-           			// plans: link, coords
-           			// facilities: coords
-           			// => use coords
        		act.setLink(this.network.getNearestLink(facility.getCenter()));
        		act.setCoord(facility.getCenter());
-       		return true;
+       		return;
 		}
 		else {
-			log.info("Choice set too small. Doing nothing!");
-			return false; 
-			
+			this.modifyLocation(act, startCoord, endCoord, radius*1.1, trialNr++);
+			return; 			
 		}	
 	}
 	
