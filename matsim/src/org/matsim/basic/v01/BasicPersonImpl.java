@@ -38,9 +38,9 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	protected Id id;
 	private String sex;
 	private int age = Integer.MIN_VALUE;
-	private String license;
+	private String hasLicense;
 	private String carAvail;
-	private String employed;
+	private String isEmployed;
 
 	private TreeSet<String> travelcards = null; 
 	private Knowledge knowledge = null;
@@ -111,11 +111,11 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	}
 
 	public final String getLicense() {
-		return this.license;
+		return this.hasLicense;
 	}
 
 	public final boolean hasLicense() {
-		return ("yes".equals(this.license));
+		return ("yes".equals(this.hasLicense));
 	}
 
 	public final String getCarAvail() {
@@ -123,11 +123,11 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	}
 
 	public final String getEmployed() {
-		return this.employed;
+		return this.isEmployed;
 	}
 
 	public final boolean isEmpoyed() {
-		return ("yes".equals(this.employed));
+		return ("yes".equals(this.isEmployed));
 	}
 
 	public void setAge(final int age) {
@@ -142,7 +142,7 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	}
 
 	public final void setLicence(final String licence) {
-		this.license = (licence == null) ? null : licence.intern();
+		this.hasLicense = (licence == null) ? null : licence.intern();
 	}
 
 	public final void setCarAvail(final String carAvail) {
@@ -150,7 +150,7 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	}
 
 	public final void setEmployed(final String employed) {
-		this.employed = (employed == null) ? null : employed.intern();
+		this.isEmployed = (employed == null) ? null : employed.intern();
 	}
 
 	public final Knowledge createKnowledge(final String desc) {
