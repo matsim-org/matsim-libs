@@ -20,17 +20,11 @@
 
 package playground.jhackney.scoring;
 
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.ActUtilityParameters;
@@ -113,7 +107,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 	private static final int INITIAL_INDEX = 0;
 	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
-
+	
 //	private HashMap<Activity, SocialAct> socialPlansMap= SNScoringGeneralFactory.getSocialActsMap();
 	private SpatialScorer spatialScorer = SNScoringGeneralFactory.getScorer();
 	private String factype = SNScoringGeneralFactory.getFacType();// Type of activity in which social group matters to Person;
@@ -333,7 +327,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 		if(act.getType().equals(factype)){
 			double add=spatialScorer.scoreFriendtoFoeInTimeWindow(plan);
 			score+=10.*add;
-			System.out.println(this.getClass()+" "+score+" "+add);
+			log.info(" "+score+" "+add);
 		}
 
 		// JH end

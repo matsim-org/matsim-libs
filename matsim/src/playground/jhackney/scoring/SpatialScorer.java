@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
@@ -33,6 +34,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.socialnetworks.algorithms.CompareActs;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
@@ -43,10 +45,11 @@ public class SpatialScorer {
 	SocialNetwork net;
 
 	Hashtable<Activity,ArrayList<Person>> activityMap;
+	static final private Logger log = Logger.getLogger(SpatialScorer.class);
 
-	public SpatialScorer() {
-		
-	}
+//	public SpatialScorer() {
+//		
+//	}
 	/**
 	 * The Plans contain all agents who are chosen to get scores for social interactions.
 	 * Generally all agents in the population get scored.
@@ -73,12 +76,12 @@ public class SpatialScorer {
 	 */
 	public void scoreActs(Plans plans, HashMap<String, Double> rndEncounterProb, int iteration) {
 
-		System.out.println(" "+ this.getClass()+" Looking through plans and mapping social interactions for scoring "+iteration);
+		log.info(" Looking through plans and mapping social interactions for scoring "+iteration);
 
 		activityMap = new Hashtable<Activity,ArrayList<Person>>(); 
 		activityMap= makeActivityMap(plans);
 
-		System.out.println("...finished");
+		log.info("...finished");
 
 	}
 	/**
@@ -95,8 +98,8 @@ public class SpatialScorer {
 	 * @return activityMap
 	 */
 	private Hashtable<Activity,ArrayList<Person>> makeActivityMap(Plans plans){
-		System.out.println("Making a new activity map for spatial scores");
-		Hashtable<Activity,ArrayList<Person>> activityMap=new Hashtable<Activity,ArrayList<Person>>();
+		log.info("Making a new activity map for spatial scores");
+//		Hashtable<Activity,ArrayList<Person>> activityMap=new Hashtable<Activity,ArrayList<Person>>();
 		Iterator<Person> p1Iter=plans.iterator();
 		while(p1Iter.hasNext()){
 			Plan plan1= ((Person) p1Iter.next()).getSelectedPlan();
