@@ -21,6 +21,7 @@
 package org.matsim.plans;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPersonImpl;
@@ -48,6 +49,16 @@ public class Person extends BasicPersonImpl<Plan>{
 		// Make sure there is a selected plan if there is at least one plan
 		if (this.selectedPlan == null) this.selectedPlan = p;
 		return p;
+	}
+	
+	public final void removeUnselectedPlans() {
+		Iterator<Plan> plan_it = this.plans.iterator();
+		while (plan_it.hasNext()) {
+			Plan plan = plan_it.next();
+			if (!plan.isSelected()) {
+				this.plans.remove(plan);
+			}
+		}
 	}
 
 	/**
