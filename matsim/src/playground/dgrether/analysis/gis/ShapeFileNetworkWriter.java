@@ -22,9 +22,6 @@ package playground.dgrether.analysis.gis;
 import org.matsim.controler.ScenarioData;
 import org.matsim.network.NetworkLayer;
 
-import playground.yu.utils.qgis.MATSimNet2QGIS;
-import playground.yu.utils.qgis.X2QGIS;
-
 
 /**
  * @author dgrether
@@ -51,12 +48,13 @@ public class ShapeFileNetworkWriter {
 	
 	
 	public void writeNetwork(NetworkLayer network, String outfile) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
-		MATSimNet2QGIS.setFlowCapFactor(0.1);
-		mn2q.setNetwork(network);
-		mn2q.setCrs(X2QGIS.ch1903);
-		mn2q.writeShapeFile(outfile);
-		System.out.println("Network written to " + outfile);
+		//uncomment the following lines to let the tool work
+//		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
+//		MATSimNet2QGIS.setFlowCapFactor(0.1);
+//		mn2q.setNetwork(network);
+//		mn2q.setCrs(X2QGIS.ch1903);
+//		mn2q.writeShapeFile(outfile);
+//		System.out.println("Network written to " + outfile);
 	}
 	
 	
