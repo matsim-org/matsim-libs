@@ -71,7 +71,7 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 
 	protected Node(final Id id, final CoordI coord, final String type) {
 		super(id, coord);
-		this.type = type.intern();
+		this.type = type == null ? null : type.intern();
 	}
 
 	/** @deprecated please use the other Constructor which takes a Coord-object instead of x and y */
