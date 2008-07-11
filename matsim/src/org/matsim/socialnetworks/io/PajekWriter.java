@@ -63,7 +63,6 @@ public class PajekWriter {
 
 	public PajekWriter(String dir, Facilities facilities){
 		this.dir=dir;
-		//String pjoutdir = Gbl.getConfig().findParam(Gbl.getConfig().SOCNET, Gbl.getConfig().SOCNET_OUT_DIR);
 		File pjDir=new File(dir+"pajek/");
 		System.out.println("PajekWriter1 make dir "+dir + "pajek/");
 		if(!(pjDir.mkdir())&& !pjDir.exists()){
@@ -82,17 +81,17 @@ public class PajekWriter {
 	}
 
 	public void write(ArrayList<SocialNetEdge> links, Plans plans, int iter) {
-		BufferedWriter pjout = null;
+		BufferedWriter pjnet = null;
 
 		// from config
 
-		String pjoutfile = this.dir+"pajek/test"+iter+".net";
-		log.info("PajekWriter1 filename "+pjoutfile);
+		String pjnetfile = this.dir+"pajek/test"+iter+".net";
+		log.info("PajekWriter1 filename "+pjnetfile);
 
 		try {
 
-			pjout = new BufferedWriter(new FileWriter(pjoutfile));
-			log.info(" Successfully opened pjoutfile "+pjoutfile);
+			pjnet = new BufferedWriter(new FileWriter(pjnetfile));
+			log.info(" Successfully opened pjnetfile "+pjnetfile);
 
 		} catch (final IOException ex) {
 			ex.printStackTrace();
@@ -103,7 +102,7 @@ public class PajekWriter {
 
 		try {
 //			System.out.print(" *Vertices " + numPersons + " \n");
-			pjout.write("*Vertices " + numPersons+"\r\n");
+			pjnet.write("*Vertices " + numPersons+"\r\n");
 
 			Iterator<Person> itPerson = plans.getPersons().values().iterator();
 			int iperson = 1;
@@ -116,14 +115,14 @@ public class PajekWriter {
 				Coord xy = (Coord) ((Act) p.getSelectedPlan().getActsLegs().get(0)).getCoord();
 				double x=(xy.getX()-this.minCoord.getX())/(this.maxCoord.getX()-this.minCoord.getX());
 				double y=(xy.getY()-this.minCoord.getY())/(this.maxCoord.getY()-this.minCoord.getY());
-				pjout.write(iperson + " \"" + p.getId() + "\" "+x +" "+y+"\r\n");
+				pjnet.write(iperson + " \"" + p.getId() + "\" "+x +" "+y+"\r\n");
 
 //				log.info(iperson + " " + p.getId() + " ["+xy.getX() +" "+xy.getY()+"]\n");
 				this.pajekIndex.put(p.getId(),iperson);
 				iperson++;
 
 			}
-			pjout.write("*Edges\r\n");
+			pjnet.write("*Edges\r\n");
 
 //			log.info("*Edges\n");
 			Iterator<SocialNetEdge> itLink = links.iterator();
@@ -137,8 +136,8 @@ public class PajekWriter {
 				Coord xy2 = (Coord) ((Act) printPerson2.getSelectedPlan().getActsLegs().get(0)).getCoord();
 				double dist = xy1.calcDistance(xy2);
 
-				pjout.write(" " + this.pajekIndex.get(printPerson1.getId()) + " "+ this.pajekIndex.get(printPerson2.getId())+" "+dist+" "+age+"\r\n");
-//				pjout.write(" " + printPerson1.getId() + " "+ printPerson2.getId());
+				pjnet.write(" " + this.pajekIndex.get(printPerson1.getId()) + " "+ this.pajekIndex.get(printPerson2.getId())+" "+dist+" "+age+"\r\n");
+//				pjnet.write(" " + printPerson1.getId() + " "+ printPerson2.getId());
 
 //				System.out.print(" " +iter+" "+printLink.getLinkId()+" "+ printPerson1.getId() + " "
 //				+ printPerson2.getId() + " "
@@ -150,8 +149,8 @@ public class PajekWriter {
 		}
 
 		try {
-			pjout.close();
-			System.out.println(" Successfully closed pjoutfile "+pjoutfile);
+			pjnet.close();
+			System.out.println(" Successfully closed pjnetfile "+pjnetfile);
 		} catch (IOException ex2) {
 			ex2.printStackTrace();
 		}
@@ -162,17 +161,17 @@ public class PajekWriter {
 		GeoStatistics gstat = new GeoStatistics(plans, snet);
 		Graph g = gstat.makeJungGraph();
 
-		BufferedWriter pjout = null;
+		BufferedWriter pjnet = null;
 
 		// from config
 
-		String pjoutfile = this.dir+"pajek/testGeo"+iter+".net";
-		log.info("PajekWriter1 Geofilename "+pjoutfile);
+		String pjnetfile = this.dir+"pajek/testGeo"+iter+".net";
+		log.info("PajekWriter1 Geofilename "+pjnetfile);
 
 		try {
 
-			pjout = new BufferedWriter(new FileWriter(pjoutfile));
-			log.info(" Successfully opened pjoutfile "+pjoutfile);
+			pjnet = new BufferedWriter(new FileWriter(pjnetfile));
+			log.info(" Successfully opened pjnetfile "+pjnetfile);
 
 		} catch (final IOException ex) {
 			ex.printStackTrace();
@@ -184,7 +183,7 @@ public class PajekWriter {
 		try {
 			log.info("##### Write Geoaggregated Social Network Output");
 			log.info(" *Vertices " + numVertices + " \n");
-			pjout.write("*Vertices " + numVertices+"\r\n");
+			pjnet.write("*Vertices " + numVertices+"\r\n");
 
 			Iterator<Vertex> iVert = g.getVertices().iterator();
 			HashMap<Vertex,Location> vertLoc = gstat.getVertexLoc();
@@ -197,14 +196,14 @@ public class PajekWriter {
 				Coord xy = (Coord) zone.getCenter();
 				double x=(xy.getX()-this.minCoord.getX())/(this.maxCoord.getX()-this.minCoord.getX());
 				double y=(xy.getY()-this.minCoord.getY())/(this.maxCoord.getY()-this.minCoord.getY());
-				pjout.write(vertexcounter + " \"" + zone.getId() + "\" "+x +" "+y+"\r\n");
+				pjnet.write(vertexcounter + " \"" + zone.getId() + "\" "+x +" "+y+"\r\n");
 
 //				System.out.print(iperson + " " + p.getId() + " ["+xy.getX() +" "+xy.getY()+"]\n");
 				this.pajekIndex.put(zone.getId(),vertexcounter);
 				vertexcounter++;
 
 			}
-			pjout.write("*Edges\r\n");
+			pjnet.write("*Edges\r\n");
 
 //			System.out.print("*Edges\n");
 			Iterator<Edge> itLink = g.getEdges().iterator();
@@ -218,7 +217,7 @@ public class PajekWriter {
 //				double dist = xy1.calcDistance(xy2);
 				double strength = (Double)printLink.getUserDatum("strength");
 //				double strength = gstat.getEdgeStrength().get(printLink);
-				pjout.write(" " + this.pajekIndex.get(aLoc.getId()) + " "+ this.pajekIndex.get(bLoc.getId())+" "+strength+"\r\n");
+				pjnet.write(" " + this.pajekIndex.get(aLoc.getId()) + " "+ this.pajekIndex.get(bLoc.getId())+" "+strength+"\r\n");
 
 			}
 
@@ -226,8 +225,67 @@ public class PajekWriter {
 			ex1.printStackTrace();
 		}
 		try {
-			pjout.close();
-			System.out.println(" Successfully closed pjoutfile "+pjoutfile);
+			pjnet.close();
+			System.out.println(" Successfully closed pjnetfile "+pjnetfile);
+		} catch (IOException ex2) {
+			ex2.printStackTrace();
+		}
+
+		// Write out a Pajek vector file of the geographically aggregated population for
+		// normalizing the graphs in the Pajek display and other analyses
+
+		BufferedWriter pjvec1 = null;
+		BufferedWriter pjvec2 = null;
+		// from config
+
+		String pjvec1file = this.dir+"pajek/testGeo"+iter+".vec";
+		log.info("PajekWriter1 Geofilename "+pjvec1file);
+		String pjvec2file = this.dir+"pajek/testGeoDegPop"+iter+".vec";
+		log.info("PajekWriter1 Geofilename "+pjvec2file);
+
+		
+		try {
+
+			pjvec1 = new BufferedWriter(new FileWriter(pjvec1file));
+			log.info(" Successfully opened pjvecfile "+pjvec1file);
+
+			pjvec2 = new BufferedWriter(new FileWriter(pjvec2file));
+			log.info(" Successfully opened pjvecfile "+pjvec2file);
+
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+			return;
+		}
+
+		try {
+			//Writes a *.vec file with the population of each geo-zone 
+			log.info("##### Write Geoaggregated Population Vector");
+			log.info(" *Vertices " + numVertices + " \n");
+			pjvec1.write("*Vertices " + numVertices+"\r\n");
+
+			log.info("##### Write Geoaggregated Degree/Population Vector");
+			log.info(" *Vertices " + numVertices + " \n");
+			pjvec2.write("*Vertices " + numVertices+"\r\n");
+			
+			Iterator<Vertex> iVert = g.getVertices().iterator();
+			while (iVert.hasNext()) {
+				Vertex v = iVert.next();
+				int pop = (Integer) v.getUserDatum("population");
+				int deg = v.degree();
+				pjvec1.write( pop + "\r\n");
+				pjvec2.write(((double) deg / (double) pop) + "\r\n");
+			}
+
+
+
+		} catch (IOException ex1) {
+			ex1.printStackTrace();
+		}
+		try {
+			pjvec1.close();
+			System.out.println(" Successfully closed pjvecfile "+pjvec1file);
+			pjvec2.close();
+			System.out.println(" Successfully closed pjvecfile "+pjvec2file);
 		} catch (IOException ex2) {
 			ex2.printStackTrace();
 		}
