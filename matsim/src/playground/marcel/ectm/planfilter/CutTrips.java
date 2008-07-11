@@ -20,15 +20,19 @@
 
 package playground.marcel.ectm.planfilter;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
+import org.matsim.network.Node;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+import org.matsim.plans.Route;
 import org.matsim.plans.algorithms.PersonAlgorithmI;
 
 public class CutTrips implements PersonAlgorithmI {
@@ -42,111 +46,139 @@ public class CutTrips implements PersonAlgorithmI {
 	}
 
 	public void run(final Person person) {
-
 		List<Plan> plans = person.getPlans();
 		if (plans.size() != 1) {
 			throw new RuntimeException("only 1 plan per person supported!");
 		}
 		Plan plan = plans.get(0);
 
-		for (int i = 1, n = plan.getActsLegs().size(); i < n; i+=2) {
-			Leg leg = (Leg) plan.getActsLegs().get(i);
+		/* First, we will go through all links of all legs and remember when is the
+		 * first time we enter the AOI, and when we leave it again. After we leave
+		 * it, we can break out of the loop. Additionally, we try to figure out the
+		 * exact times we enter/leave the AOI.
+		 */
+
+		int firstInsideLeg = -1;
+		Link firstInsideLink = null;
+		int firstOutsideLeg = -1;
+		Link firstOutsideLink = null;
+
+		boolean startInside = this.aoi.containsKey(((Act) plan.getActsLegs().get(0)).getLink().getId());
+
+		for (int legNr = 1, n = plan.getActsLegs().size(); legNr < n; legNr += 2) {
+			Leg leg = (Leg) plan.getActsLegs().get(legNr);
 			if (leg.getRoute() == null) {
 				throw new RuntimeException("route is null. person=" + person.getId().toString());
 			}
 
-			Link depLink = ((Act) plan.getActsLegs().get(i-1)).getLink();
-			Link arrLink = ((Act) plan.getActsLegs().get(i+1)).getLink();
+			Link depLink = ((Act) plan.getActsLegs().get(legNr - 1)).getLink();
+			Link arrLink = ((Act) plan.getActsLegs().get(legNr + 1)).getLink();
 
-			// start at departure link
-			if (this.aoi.containsKey(depLink.getId())) {
-				boolean leftAOI = false;
-				// start inside AOI
-				Link lastInsideLink = depLink;
-				Link[] links = leg.getRoute().getLinkRoute();
-				for (Link link : links) {
-					if (this.aoi.containsKey(link.getId())) {
-						// still inside, remember link
-						lastInsideLink = link;
-					} else {
-						// we're leaving the aoi, shorten this route and delete all legs afterwards
-						leftAOI = true;
-						break; // step out of this for-loop
-					}
+			// test departure link
+			if (this.aoi.containsKey(depLink.getId()) && firstInsideLink == null) {
+				firstInsideLink = depLink;
+				firstInsideLeg = legNr;
+			}
+			if (firstInsideLink != null && !this.aoi.containsKey(depLink.getId())) {
+				firstOutsideLink = depLink;
+				firstOutsideLeg = legNr;
+				break;
+			}
+
+			// test links of route
+			Link[] links = leg.getRoute().getLinkRoute();
+			for (Link link : links) {
+				if (this.aoi.containsKey(link.getId()) && firstInsideLink == null) {
+					firstInsideLink = link;
+					firstInsideLeg = legNr;
 				}
-				if (leftAOI || !this.aoi.containsKey(arrLink)) {
-					// shorten route such that lastInsideLink is no longer part of it
-					// TODO
-
-					// move act-location to lastInsideLink
-					// TODO
-
-					// remove the route from all legs after that one, and move all following activities to the lastInsideLink
-					// TODO
-
-					break; // step out of for-loop for legs
+				if (firstInsideLink != null && !this.aoi.containsKey(link.getId())) {
+					firstOutsideLink = link;
+					firstOutsideLeg = legNr;
+					break;
 				}
+			}
 
-			} else {
-				boolean enteredAOI = false;
-				boolean leftAOIagain = false;
-				// start outside AOI
-				Link lastOutsideLink = depLink;
-				Link firstInsideLink = null;
-				Link[] links = leg.getRoute().getLinkRoute();
-				for (Link link : links) {
-					if (!this.aoi.containsKey(link.getId())) {
-						if (enteredAOI) {
-							// we're out again
-							leftAOIagain = true;
-							break; // step out of this for-loop
-						}
-						// still inside, remember link
-						lastOutsideLink = link;
-					} else {
-						if (!enteredAOI) {
-							// we're entering the aoi
-							enteredAOI = true;
-							firstInsideLink = link;
-						}
-					}
+			// test arrival link
+			if (this.aoi.containsKey(arrLink.getId()) && firstInsideLink == null) {
+				firstInsideLink = arrLink;
+				firstInsideLeg = legNr;
+			}
+			if (firstInsideLink != null && !this.aoi.containsKey(arrLink.getId())) {
+				firstOutsideLink = arrLink;
+				firstOutsideLeg = legNr;
+				break;
+			}
+		}
+
+		/* In the second step, we move all activities before firstInsideLeg to the
+		 * firstInsideLink, and move all activities after firstOutsideLeg to the
+		 * firstOutsideLink. Additionally, we have to adapt the routes of
+		 * firstInsideLeg and firstOutsideLeg as their from or to activity might
+		 * have changed its location.
+		 */
+
+		if (startInside && (firstOutsideLink == null)) {
+			// agent is never outside the area, nothing to do
+			return;
+		}
+
+		if (!startInside) {
+			// move all acts before firstInsideLeg to firstInsideLink
+			for (int actNr = 0; actNr < firstInsideLeg; actNr += 2) {
+				Act act = (Act) plan.getActsLegs().get(actNr);
+				act.setLink(firstInsideLink);
+			}
+			// remove all routes from legs before firstInsideLeg, as they are now all at the same location
+			for (int legNr = 1; legNr < firstInsideLeg; legNr += 2) {
+				Leg leg = (Leg) plan.getActsLegs().get(legNr);
+				leg.createRoute("0.0", "00:00:00");
+			}
+			// adapt route of the leg that leads into the AOI
+			Leg leg = (Leg) plan.getActsLegs().get(firstInsideLeg);
+			Route route = leg.getRoute();
+			ArrayList<Node> nodes = route.getRoute();
+			Iterator<Node> iter = nodes.iterator();
+			while (iter.hasNext()) {
+				Node node = iter.next();
+				if (node.equals(firstInsideLink.getToNode())) {
+					break;
 				}
-				if (!this.aoi.containsKey(arrLink)) {
-					if (enteredAOI) {
-						leftAOIagain = true;
-					}
+				iter.remove();
+			}
+		}
+
+		if (firstOutsideLink != null) {
+			// move all acts after firstOutsideLeg to firstOutsideLink
+			for (int actNr = firstOutsideLeg+1; actNr < plan.getActsLegs().size(); actNr += 2) {
+				Act act = (Act) plan.getActsLegs().get(actNr);
+				act.setLink(firstOutsideLink);
+			}
+
+			// remove all routes from legs after firstOutsideLeg, as they are now all at the same location
+			for (int legNr = firstOutsideLeg + 2; legNr < plan.getActsLegs().size(); legNr += 2) {
+				Leg leg = (Leg) plan.getActsLegs().get(legNr);
+				leg.createRoute("0.0", "00:00:00");
+			}
+
+			// adapt route of leg that leads out of the AOI
+			boolean removing = false;
+			Leg leg = (Leg) plan.getActsLegs().get(firstInsideLeg);
+			Route route = leg.getRoute();
+			ArrayList<Node> nodes = route.getRoute();
+			Iterator<Node> iter = nodes.iterator();
+			while (iter.hasNext()) {
+				Node node = iter.next();
+				if (node.equals(firstOutsideLink.getFromNode())) {
+					removing = true;
 				}
-				if (enteredAOI) {
-					// move from-act to firstInsideLink
-					// TODO
-
-					// shorten route such that all links up to firstInsideLink are no longer part of it
-					// TODO
-
-					if (leftAOIagain) {
-						// shorten route such that lastInsideLink is no longer part of it
-						// TODO
-
-						// move to-act-location to lastInsideLink
-						// TODO
-
-						// remove all legs after that one
-						// TODO
-
-						break; // step out of for-loop for legs
-					}
-				} else {
-					// route never entered the aoi
-					// remove this leg completely
-					// or remove route and move from-act to the firstInsideLink of a following route
-					// TODO
+				if (removing) {
+					iter.remove();
 				}
 			}
 		}
 
-		if (plan.getActsLegs().size() > 2) {
-			// there is still at least one leg in that plan
-			this.nextAlgorithm.run(person);
-		}
+		this.nextAlgorithm.run(person);
 	}
+
 }
