@@ -61,24 +61,33 @@ public class PutpathlegFilter extends TableSplitter {
 		private final List<String> inputFileIndexs = new ArrayList<String>();
 		private final List<String> minDepTimes = new ArrayList<String>();
 		private final List<String> maxDepTimes = new ArrayList<String>();
-		private final String attFilepath;
+		private final String attFilepath, outputAttFilepath;
 
 		public IndexFileReader(final String regex, final String tableFileName,
-				final String attFilepath) throws IOException {
+				final String attFilepath, final String outputAttFilepath)
+				throws IOException {
 			super(regex, tableFileName);
 			this.attFilepath = attFilepath;
+			this.outputAttFilepath = outputAttFilepath;
 		}
 
 		public void makeParams(final String line) {
-			String[] params = split(line);
-			inputFileIndexs.add(params[0]);
-			minDepTimes.add(params[1]);
-			maxDepTimes.add(params[2]);
+			if (line != null) {
+				String[] params = split(line);
+				inputFileIndexs.add(params[0]);
+				minDepTimes.add(params[1]);
+				maxDepTimes.add(params[2]);
+			}
 		}
 
 		public String getInputFilename(final int i) {
-			return attFilepath + "AttList11 (" + inputFileIndexs.get(i)
-					+ ").att";
+			return attFilepath + "MyFirstAttList22R24 ("
+					+ inputFileIndexs.get(i) + ").att";
+		}
+
+		public String getOutputFilename(final int i) {
+			return outputAttFilepath + "MyFirstAttList22R24 ("
+					+ inputFileIndexs.get(i) + ").att";
 		}
 
 		public String getMinDepTime(final int i) {
@@ -126,10 +135,16 @@ public class PutpathlegFilter extends TableSplitter {
 	public void writeNewLine(final String line) {
 		try {
 			String[] words = split(line);
+			// System.out.println("line="+line);
 			StringBuilder word = new StringBuilder();
-			for (String element : words)
-				word.append(element);
-			writer.write(words + "\n");
+			word.append(words[0]);
+			for (int i = 1; i < words.length; i++) {
+				word.append("\t");
+				word.append(words[i]);
+				// System.out.println(words[i]);
+			}
+			writer.write(word + "\n");
+			// System.out.println(word.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -167,11 +182,13 @@ public class PutpathlegFilter extends TableSplitter {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String inputFilename = "";
-		String attFilePath = "";
+		String inputFilename = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\DepTimeIndex22.txt";
+		String attFilePath = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\Att22R24\\";
+		String outputFilePath = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\Att22R24\\output\\";
 		IndexFileReader ifr = null;
 		try {
-			ifr = new IndexFileReader("\t", inputFilename, attFilePath);
+			ifr = new IndexFileReader("\t", inputFilename, attFilePath,
+					outputFilePath);
 			String line = ifr.readLine();
 			while (line != null) {
 				line = ifr.readLine();
@@ -182,15 +199,14 @@ public class PutpathlegFilter extends TableSplitter {
 			e1.printStackTrace();
 		}
 
-		for (int i = 0; i <= 1000; i++) {
+		for (int i = 0; i <= 9; i++) {
 
 			String putpathlegTableFilename, minDepTime, maxDepTime, outputFilename;
 			if (ifr != null) {
 				putpathlegTableFilename = ifr.getInputFilename(i);
 				minDepTime = ifr.getMinDepTime(i);
 				maxDepTime = ifr.getMaxDepTime(i);
-				outputFilename = putpathlegTableFilename.split(".")[0]
-						+ "_output.att";
+				outputFilename = ifr.getOutputFilename(i);
 
 				try {
 					PutpathlegFilter pf = new PutpathlegFilter(";",
@@ -209,7 +225,6 @@ public class PutpathlegFilter extends TableSplitter {
 
 					boolean writeable = false;
 					do {
-
 						line = pf.readLine();
 						if (line != null)
 							if (line.startsWith(";")) {
@@ -217,14 +232,14 @@ public class PutpathlegFilter extends TableSplitter {
 									pf.writeNewLine(line);
 							} else {
 								String[] firstLines = pf.split(line);
-								if (firstLines.length == 13)
-									if (pf.rightDepTime(firstLines[11])) {
+								if (firstLines.length > 1)
+									if (pf
+											.rightDepTime(firstLines[firstLines.length - 3])) {
 										pf.writeNewLine(line);
 										writeable = true;
 									} else
 										writeable = false;
 							}
-
 					} while (line != null);
 
 					pf.closeReader();
