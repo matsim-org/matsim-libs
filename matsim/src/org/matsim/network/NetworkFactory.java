@@ -23,8 +23,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * @author dgrether
@@ -49,9 +49,8 @@ public class NetworkFactory {
 		}
 	}
 
-	protected Node newNode(final String id, final String x, final String y,
-			final String type) {
-		return new Node(new IdImpl(id), x, y, type);
+	protected Node newNode(final Id id, final Coord coord, final String type) {
+		return new Node(id, coord, type);
 	}
 
 	protected Link newLink(final Id id, Node from, Node to,
@@ -60,7 +59,7 @@ public class NetworkFactory {
 		Link ret;
 		Exception ex;
 		try {
-			ret = (Link) this.prototypeContructor.newInstance(new Object[] { id,
+			ret = this.prototypeContructor.newInstance(new Object[] { id,
 					from, to, network, length, freespeedTT, capacity, lanes });
 			return ret;
 		} catch (InstantiationException e) {
@@ -99,7 +98,7 @@ public class NetworkFactory {
 		}
 
 	}
-	
+
 	public boolean isTimeVariant() {
 		return (this.prototypeContructor.getDeclaringClass() == TimeVariantLinkImpl.class);
 	}

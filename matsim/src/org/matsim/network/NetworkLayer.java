@@ -85,15 +85,24 @@ public class NetworkLayer extends Layer implements BasicNet {
 
 	// ////////////////////////////////////////////////////////////////////
 	// create methods
-	// overload newNode/newLink in your own classes for supplying other nodes
 	// ////////////////////////////////////////////////////////////////////
 
 
+	/** Usage of this method is discouraged, as the method will soon be deprecated. */
 	public final Node createNode(final String id, final String x, final String y, final String type) {
-		Id i = new IdImpl(id);
-		if (this.nodes.containsKey(i)) { throw new IllegalArgumentException(this + "[id=" + id + " already exists]"); }
-		Node n = this.factory.newNode(id, x, y, type);
-		this.nodes.put(i, n);
+		return createNode(new IdImpl(id), new Coord(x, y), type);
+	}
+
+	public final Node createNode(final Id id, final Coord coord) {
+		return createNode(id, coord, null);
+	}
+
+	public final Node createNode(final Id id, final Coord coord, final String nodeType) {
+		if (this.nodes.containsKey(id)) {
+			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
+		}
+		Node n = this.factory.newNode(id, coord, nodeType);
+		this.nodes.put(id, n);
 		if (this.nodeQuadTree != null) {
 			// we changed the nodes, invalidate the quadTree
 			this.nodeQuadTree.clear();
@@ -101,7 +110,6 @@ public class NetworkLayer extends Layer implements BasicNet {
 		}
 		return n;
 	}
-
 
 	public final Link createLink(final String id, final String from, final String to, final String length,
 	                             final String freespeed, final String capacity, final String permlanes,
@@ -169,7 +177,7 @@ public class NetworkLayer extends Layer implements BasicNet {
 	 * Sets the network change events and replaces existing events. Before
 	 * events are applied to their corresponding links, all links are reset to
 	 * their initial state. Pass an empty event list to reset the complete network.
-	 * 
+	 *
 	 * @param events a list of events.
 	 */
 	public final void setNetworkChangeEvents(final List<NetworkChangeEvent> events) {
@@ -177,11 +185,11 @@ public class NetworkLayer extends Layer implements BasicNet {
 			throw new RuntimeException(
 					"Trying to set NetworkChangeEvents but NetworkFactory is not time variant");
 		}
-		
+
 		for(Link link : getLinks().values()) {
 			((TimeVariantLinkImpl)link).clearEvents();
 		}
-		
+
 		this.networkChangeEvents = events;
 		for (NetworkChangeEvent event : events) {
 			for (Link link : event.getLinks()) {
@@ -189,11 +197,11 @@ public class NetworkLayer extends Layer implements BasicNet {
 			}
 		}
 	}
-	
+
 	/**
 	 * Adds a single network change event and applies it to the corresponding
 	 * links.
-	 * 
+	 *
 	 * @param event
 	 *            a network change event.
 	 */
@@ -202,15 +210,15 @@ public class NetworkLayer extends Layer implements BasicNet {
 			throw new RuntimeException(
 					"Trying to set NetworkChangeEvents but NetworkFactory is not time variant");
 		}
-		
+
 		if (this.networkChangeEvents == null) {
 			this.networkChangeEvents = new ArrayList<NetworkChangeEvent>();
 		}
-		
+
 		this.networkChangeEvents.add(event);
 		for (Link link : event.getLinks()) {
 			((TimeVariantLinkImpl)link).applyEvent(event);
-		}		
+		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -240,7 +248,7 @@ public class NetworkLayer extends Layer implements BasicNet {
 	public final Node getNode(Id id) {
 		return this.nodes.get(id);
 	}
-	
+
 	/**
 	 * Finds the (approx.) nearest link to a given point on the map.<br />
 	 * It searches first for the nearest node, and then for the nearest link
@@ -400,11 +408,11 @@ public class NetworkLayer extends Layer implements BasicNet {
 		return this.nodeQuadTree.get(coord.getX(), coord.getY(), distance);
 	}
 
-	
+
 	public Collection<NetworkChangeEvent> getNetworkChangeEvents() {
 		return this.networkChangeEvents;
 	}
-	
+
 	// ////////////////////////////////////////////////////////////////////
 	// remove methods
 	// ////////////////////////////////////////////////////////////////////
