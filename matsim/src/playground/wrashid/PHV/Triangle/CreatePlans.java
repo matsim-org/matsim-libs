@@ -21,7 +21,7 @@ public class CreatePlans {
 
 	/**
 	 * @param args
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 		// TODO: am schluss alle meiste pfade in config.xml reintun...
@@ -32,12 +32,12 @@ public class CreatePlans {
 		Gbl.createConfig(args);
 		Gbl.getConfig().plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/5000plan/plans.xml");
 		final World world = Gbl.getWorld();
-		
+
 		// read facilities
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/facilities/facilities.xml");
-		
-		
+
+
 		// get home and work activity
 		Activity home=null;
 		Activity work=null;
@@ -53,44 +53,44 @@ public class CreatePlans {
 				}
 			}
 		}
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
 		// create 100 persons
 		for (int i=0;i<5000;i++){
 			Person person = new Person(new IdImpl(i));
 			plans.addPerson(person);
-			
-			
+
+
 			Knowledge k = person.createKnowledge("");
 			k.addActivity(home);
 			k.addActivity(work);
-			
-			Plan plan = person.createPlan(null, "yes");
+
+			Plan plan = person.createPlan(true);
 			Facility home_facility = person.getKnowledge().getActivities("home").get(0).getFacility();
 			Facility work_facility = person.getKnowledge().getActivities("work").get(0).getFacility();
 			ArrayList<Activity> acts = person.getKnowledge().getActivities();
-			
+
 			double depTime=3600*8;
 			double duration=3600*8;
-			
+
 			plan.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),0.0,depTime,duration,false);
 			plan.createLeg("car",depTime,0.0,depTime);
 			plan.createAct("work",work_facility.getCenter().getX(),work_facility.getCenter().getY(),work_facility.getLink(),depTime,depTime+duration,duration,false);
 			plan.createLeg("car",depTime+duration,0.0,depTime+duration);
 			plan.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),depTime+duration,3600*24,duration,false);
 			// assign home-work-home activities to each person
-			
-		
+
+
 			Leg l=null;
-			
+
 		}
 
-		
-		
+
+
 		new PlansWriter(plans).write();
 	}
 
