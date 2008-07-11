@@ -34,7 +34,7 @@ public class PlanRemoveUnselected {
 	public static void main(final String[] args) {
 
 
-		String plansfilePath="./input/plans_randomizedzhlocs.sml.gz";
+		String plansfilePath="./input/plans_randomizedzhlocs_TAROU.xml.gz";
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
 		String worldfilePath="./input/world.xml";
