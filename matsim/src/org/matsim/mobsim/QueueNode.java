@@ -170,28 +170,28 @@ public class QueueNode {
 			buildCache();
 		}
 
-		int tempCounter = 0;
-		double tempCap = 0.0;
+		int inLinksCounter = 0;
+		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
 		for (QueueLink link : this.inLinksArrayCache) {
 			if (!link.bufferIsEmpty()) {
-				this.tempLinks[tempCounter] = link;
-				tempCounter++;
-				tempCap += link.getLink().getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+				this.tempLinks[inLinksCounter] = link;
+				inLinksCounter++;
+				inLinksCapSum += link.getLink().getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 			}
 		}
 
-		if (tempCounter == 0) {
+		if (inLinksCounter == 0) {
 			this.active = false;
 			return; // Nothing to do
 		}
 
 		int auxCounter = 0;
 		// randomize based on capacity
-		while (auxCounter < tempCounter) {
-			double rndNum = Gbl.random.nextDouble() * tempCap;
+		while (auxCounter < inLinksCounter) {
+			double rndNum = Gbl.random.nextDouble() * inLinksCapSum;
 			double selCap = 0.0;
-			for (int i = 0; i < tempCounter; i++) {
+			for (int i = 0; i < inLinksCounter; i++) {
 				QueueLink link = this.tempLinks[i];
 				if (link == null)
 					continue;
@@ -199,7 +199,7 @@ public class QueueNode {
 				if (selCap >= rndNum) {
 					this.auxLinks[auxCounter] = link;
 					auxCounter++;
-					tempCap -= link.getLink().getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+					inLinksCapSum -= link.getLink().getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 					this.tempLinks[i] = null;
 					break;
 				}
