@@ -34,7 +34,12 @@ public class PlanRemoveUnselected {
 	public static void main(final String[] args) {
 
 
-		String plansfilePath="./input/plans_randomizedzhlocs_TAROU.xml.gz";
+		if (args.length < 1 || args.length > 1 ) {
+			System.out.println("Too few or too many arguments. Exit");
+			System.exit(1);
+		}
+		String plansfilePath=args[0];
+		
 		String networkfilePath="./input/network.xml";
 		String facilitiesfilePath="./input/facilities.xml.gz";
 		String worldfilePath="./input/world.xml";
