@@ -33,7 +33,7 @@ public class GeoStatistics {
 	HashMap<Location, Vertex> locVertex = new HashMap<Location, Vertex>();
 	HashMap<Vertex, Location> vertexLoc = new HashMap<Vertex,Location>();
 	HashMap<Edge, Double> edgeStrength = new HashMap<Edge,Double>();
-	Collection<Location> locations;
+//	Collection<Location> locations;
 
 	public GeoStatistics(Plans plans, SocialNetwork snet) {
 
@@ -51,16 +51,17 @@ public class GeoStatistics {
 			Vertex v;
 			Person aPerson = iperson.next();
 //			Choose the first location in the plan and assume it's where the person lives
-//			Facility aHome = aPerson.getKnowledge().getMentalMap().getActivity(aPerson.getSelectedPlan().getFirstActivity()).getFacility();
-			//Above line calls code that results in a null pointer. Test
-			// michi's new change. Note the Act.setFacility() might not
-			// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008
+
 			Facility aHome = aPerson.getSelectedPlan().getFirstActivity().getFacility();
 			//			Each facility should only have one location but UpMapping is a TreeMap so pick the first entry
 			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			if(this.locVertex.containsKey(aLoc)){
 				v=this.locVertex.get(aLoc);
 //				System.out.println("  ### GEOSTAT: Graph contains vertex "+ v+" "+aLoc.getId());
+				//and its population should be increased by 1
+				int pop = Integer.parseInt(v.getUserDatum("population").toString())+1;
+				v.removeUserDatum("population");
+				v.addUserDatum("population", pop, UserData.SHARED);
 			}else{
 				v = new UndirectedSparseVertex();
 //				System.out.println("   ### GEOSTAT: Making new vertex "+v+" "+aLoc.getId());
@@ -68,6 +69,7 @@ public class GeoStatistics {
 				this.vertexLoc.put(v,aLoc);
 				// Add the Person ID to the user data container for the vertex
 				v.addUserDatum("locationId", aLoc.getId(), UserData.SHARED);
+				v.addUserDatum("population", 1, UserData.SHARED);
 				// Add the vertex to the graph
 				g.addVertex(v);
 			}
@@ -79,11 +81,6 @@ public class GeoStatistics {
 			Person personA = link.getPersonFrom();
 			Person personB = link.getPersonTo();
 
-//			Facility aHome = personA.getKnowledge().getMentalMap().getActivity(personA.getSelectedPlan().getFirstActivity()).getFacility();
-//			Facility bHome = personB.getKnowledge().getMentalMap().getActivity(personB.getSelectedPlan().getFirstActivity()).getFacility();
-			//Above lines call code that results in a null pointer. Test
-			// michi's new change. Note the Act.setFacility() might not
-			// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008
 			Facility aHome=personA.getSelectedPlan().getFirstActivity().getFacility();
 			Facility bHome=personB.getSelectedPlan().getFirstActivity().getFacility();
 			Location aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
