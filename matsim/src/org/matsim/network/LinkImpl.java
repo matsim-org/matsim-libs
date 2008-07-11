@@ -69,7 +69,7 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		this.freespeedTravelTime = this.getLength()	/ this.getFreespeed(Time.UNDEFINED_TIME);
 		this.flowCapacity = this.capacity / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
 	
-		this.euklideanDist = ((Node)this.from).getCoord().calcDistance(((Node)this.to).getCoord());
+		this.euklideanDist = this.from.getCoord().calcDistance(this.to.getCoord());
 		
 		// do some semantic checks
 		if (this.from.equals(this.to)) { log.warn("[from=to=" + this.to + " link is a loop]"); }
