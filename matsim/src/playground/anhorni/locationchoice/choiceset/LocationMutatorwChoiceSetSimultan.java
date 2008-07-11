@@ -21,6 +21,10 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 	@Override
 	protected void handleSubChain(SubChain subChain, double speed, int trialNr, double ttFactor) {
 		
+		if (subChain.getTtBudget() < 1.0) {
+			log.info("Could not do location choice, TTBudget too small");
+		}
+		
 		if (trialNr > 10) {
 			log.info("Could not do location choice");
 			
