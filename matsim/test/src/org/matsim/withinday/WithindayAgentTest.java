@@ -31,6 +31,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.SimulationTimer;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -38,6 +39,7 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Route;
+import org.matsim.utils.misc.Time;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
@@ -129,15 +131,15 @@ public class WithindayAgentTest extends TestCase {
 		return sign;
 	}
 
-	private WithindayAgent createAgent(final String homeLink, final String workLink) {
+	private WithindayAgent createAgent(final Link homeLink, final Link workLink) {
 		Person p = new Person(new IdImpl("1"));
 		this.plan = new Plan(p);
 		p.addPlan(this.plan);
 		this.leg = null;
 		try {
-			this.plan.createAct("h", 0.0, 0.0, homeLink, "00:00", "00:00", "00:00", "false");
+			this.plan.createAct("h", 0.0, 0.0, homeLink, Time.parseTime("00:00"), Time.parseTime("00:00"), Time.parseTime("00:00"), false);
 			this.leg = this.plan.createLeg("car", "00:00", "00:00", "00:00");
-			this.plan.createAct("work", 0.0, 0.0, workLink, "00:00", "00:00", "00:00", "false");
+			this.plan.createAct("work", 0.0, 0.0, workLink, Time.parseTime("00:00"), Time.parseTime("00:00"), Time.parseTime("00:00"), false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -172,7 +174,7 @@ public class WithindayAgentTest extends TestCase {
 	 * {@link org.matsim.withinday.WithindayAgent#replan()}.
 	 */
 	public void testReplan() {
-		WithindayAgent agent = createAgent("2", "7");
+		WithindayAgent agent = createAgent(this.network.getLink(new IdImpl("2")), this.network.getLink(new IdImpl("7")));
 		agent.replan();
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());
 		//going into the details
@@ -192,7 +194,7 @@ public class WithindayAgentTest extends TestCase {
 		//enlarge scenario
 		ArrayList<Node> list = this.agentRoute.getRoute();
 		list.add(0, this.network.getNode("2"));
-		agent = createAgent("1", "7");
+		agent = createAgent(this.network.getLink(new IdImpl("1")), this.network.getLink(new IdImpl("7")));
 		agent.replan();
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());
 		//going into the details
@@ -211,7 +213,7 @@ public class WithindayAgentTest extends TestCase {
 
 		//again enlarge scenario
 		list.add(this.network.getNode("5"));
-		agent = createAgent("1", "8");
+		agent = createAgent(this.network.getLink(new IdImpl("1")), this.network.getLink(new IdImpl("8")));
 		agent.replan();
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());
 		//going into the details

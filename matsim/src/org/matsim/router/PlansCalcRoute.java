@@ -205,15 +205,18 @@ public class PlansCalcRoute extends PersonAlgorithm implements PlanAlgorithmI {
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
-		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
 		Route route = null;
 		if (toLink != fromLink) {
+			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
+			Node endNode = toLink.getFromNode(); // the target is the start of the link
 			// do not drive/walk around, if we stay on the same link
 			route = this.routeAlgoFreeflow.calcLeastCostPath(startNode, endNode, depTime);
 			if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			travTime = route.getTravTime() * 2;
+			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
+			// so let's calculate the final part.
+			double travelTimeLastLink = toLink.getFreespeedTravelTime(depTime + route.getTravTime());
+			travTime = (route.getTravTime() + travelTimeLastLink) * 2.0;
 			route.setTravTime(travTime);
 			leg.setRoute(route);
 		} else {
