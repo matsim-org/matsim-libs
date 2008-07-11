@@ -169,7 +169,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 				}
 				else {
 					//test the time
-//				this is the version used in speech:	agentTwoTime = agentTwoTime + 108.0 * 60.0; // Where does that 108 come from?? marcel/11jul2008
+//				this is the version used in speech:	agentTwoTime = agentTwoTime + 78.0 * 60.0;
 					//this is the version used in code:
 					this.agentTwoTime = this.agentTwoTime + 4678.0; // 78.0 * 60.0 - 2.0
 					assertEquals(this.agentTwoTime, e.time, EPSILON);
