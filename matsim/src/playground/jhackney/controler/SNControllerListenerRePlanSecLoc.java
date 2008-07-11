@@ -91,7 +91,7 @@ import playground.jhackney.scoring.SpatialScorer;
  * @author jhackney
  *
  */
-public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  AfterMobsimListener{
+public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
 
 	private static final boolean CALCSTATS = true;
 	private static final String DIRECTORY_SN = "socialnets/";
@@ -163,8 +163,8 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		snsetup();
 	}
 
-	public void notifyAfterMobsim(final AfterMobsimEvent event){
-//	public void notifyScoring(final ScoringEvent event){
+//	public void notifyAfterMobsim(final AfterMobsimEvent event){
+	public void notifyScoring(final ScoringEvent event){
 		
 		
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
