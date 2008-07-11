@@ -272,7 +272,7 @@ public class Facility extends AbstractLocation {
 	private void setCapacityForShopping() {
 
 		// give a res. of 50%
-		double shopCapacity24 = 1.5*148.0;
+		double shopCapacity24 = 1.2*148.0;
 		
 		final double a=1.0/Math.log(2500.0);
 
