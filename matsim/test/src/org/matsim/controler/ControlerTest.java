@@ -27,6 +27,7 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -37,6 +38,7 @@ import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.geometry.shared.Coord;
 
 public class ControlerTest extends MatsimTestCase {
 
@@ -61,13 +63,13 @@ public class ControlerTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		Gbl.createWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
-		network.createNode("1",  "-100.0", "0.0", null);
-		network.createNode("2",     "0.0", "0.0", null);
-		network.createNode("3", "+1000.0", "0.0", null);
-		network.createNode("4", "+1100.0", "0.0", null);
-		network.createLink("1", "1", "2",  "100", "10", "7200", "1", null, null);
-		Link link2 = network.createLink("2", "2", "3", "1000", "10",  "36", "1", null, null);
-		network.createLink("3", "3", "4",  "100", "10", "7200", "1", null, null);
+		Node node1 = network.createNode(new IdImpl(1), new Coord(-100.0, 0.0));
+		Node node2 = network.createNode(new IdImpl(2), new Coord(0.0, 0.0));
+		Node node3 = network.createNode(new IdImpl(3), new Coord(1000.0, 0.0));
+		Node node4 = network.createNode(new IdImpl(4), new Coord(1100.0, 0.0));
+		network.createLink(new IdImpl(1), node1, node2, 100, 10, 7200, 1);
+		Link link2 = network.createLink(new IdImpl(2), node2, node3, 1000, 10, 36, 1);
+		network.createLink(new IdImpl(3), node3, node4, 100, 10, 7200, 1);
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
@@ -143,9 +145,9 @@ public class ControlerTest extends MatsimTestCase {
 
 		// create a very simple network with one link only and an empty population
 		NetworkLayer network = new NetworkLayer();
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "100", "0", null);
-		network.createLink("1", "1", "2", "100", "1", "3600", "1", null, null);
+		Node node1 = network.createNode(new IdImpl(1), new Coord(0, 0));
+		Node node2 = network.createNode(new IdImpl(2), new Coord(100, 0));
+		network.createLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
 		Plans population = new Plans(Plans.NO_STREAMING);
 
 		final Controler controler = new Controler(config, network, population);
@@ -180,13 +182,13 @@ public class ControlerTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		Gbl.createWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
-		network.createNode("1",  "-100.0", "0.0", null);
-		network.createNode("2",     "0.0", "0.0", null);
-		network.createNode("3", "+1000.0", "0.0", null);
-		network.createNode("4", "+1100.0", "0.0", null);
-		network.createLink("1", "1", "2",  "100", "10", "7200", "1", null, null);
-		network.createLink("2", "2", "3", "1000", "10",  "36", "1", null, null);
-		network.createLink("3", "3", "4",  "100", "10", "7200", "1", null, null);
+		Node node1 = network.createNode(new IdImpl(1), new Coord(-100.0, 0.0));
+		Node node2 = network.createNode(new IdImpl(2), new Coord(0.0, 0.0));
+		Node node3 = network.createNode(new IdImpl(3), new Coord(1000.0, 0.0));
+		Node node4 = network.createNode(new IdImpl(4), new Coord(1100.0, 0.0));
+		network.createLink(new IdImpl(1), node1, node2,  100, 10, 7200, 1);
+		network.createLink(new IdImpl(2), node2, node3, 1000, 10,   36, 1);
+		network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Plans population = new Plans(Plans.NO_STREAMING);
@@ -255,13 +257,13 @@ public class ControlerTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		Gbl.createWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
-		network.createNode("1",  "-100.0", "0.0", null);
-		network.createNode("2",     "0.0", "0.0", null);
-		network.createNode("3", "+1000.0", "0.0", null);
-		network.createNode("4", "+1100.0", "0.0", null);
-		Link link1 = network.createLink("1", "1", "2",  "100", "10", "7200", "1", null, null);
-		network.createLink("2", "2", "3", "1000", "10",  "36", "1", null, null);
-		Link link3 = network.createLink("3", "3", "4",  "100", "10", "7200", "1", null, null);
+		Node node1 = network.createNode(new IdImpl(1), new Coord(-100.0, 0.0));
+		Node node2 = network.createNode(new IdImpl(2), new Coord(0.0, 0.0));
+		Node node3 = network.createNode(new IdImpl(3), new Coord(+1000.0, 0.0));
+		Node node4 = network.createNode(new IdImpl(4), new Coord(+1100.0, 0.0));
+		Link link1 = network.createLink(new IdImpl(1), node1, node2, 100, 10, 7200, 1);
+		network.createLink(new IdImpl(2), node2, node3, 1000, 10, 36, 1);
+		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Plans population = new Plans(Plans.NO_STREAMING);
