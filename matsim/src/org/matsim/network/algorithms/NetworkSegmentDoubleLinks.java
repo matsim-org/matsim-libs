@@ -121,7 +121,7 @@ public class NetworkSegmentDoubleLinks {
 		String capacity = Double.toString(link.getCapacity(Time.UNDEFINED_TIME));
 		String permlanes = Double.toString(link.getLanes(Time.UNDEFINED_TIME));
 		String type = null;
-		String median = this.network.createNode(getNewNodeId().toString(), Double.toString(link.getCenter().getX()), Double.toString(link.getCenter().getY()), null).getId().toString();
+		String median = this.network.createNode(getNewNodeId(), link.getCenter()).getId().toString();
 		String l1Id = link.getId().toString();
 		this.network.createLink(l1Id, from, median, length, freespeed, capacity, permlanes, l1Id, type);
 		String l2Id = getNewLinkId().toString();

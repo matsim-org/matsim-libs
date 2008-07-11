@@ -28,6 +28,7 @@ import org.matsim.basic.v01.BasicNodeImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.misc.ResizableArray;
 
@@ -68,7 +69,7 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected Node(final Id id, final Coord coord, final String type) {
+	protected Node(final Id id, final CoordI coord, final String type) {
 		super(id, coord);
 		this.type = type.intern();
 	}

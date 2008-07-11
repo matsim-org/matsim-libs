@@ -93,11 +93,11 @@ public class NetworkLayer extends Layer implements BasicNet {
 		return createNode(new IdImpl(id), new Coord(x, y), type);
 	}
 
-	public final Node createNode(final Id id, final Coord coord) {
+	public final Node createNode(final Id id, final CoordI coord) {
 		return createNode(id, coord, null);
 	}
 
-	public final Node createNode(final Id id, final Coord coord, final String nodeType) {
+	public final Node createNode(final Id id, final CoordI coord, final String nodeType) {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
@@ -111,29 +111,38 @@ public class NetworkLayer extends Layer implements BasicNet {
 		return n;
 	}
 
-	public final Link createLink(final String id, final String from, final String to, final String length,
+	/** Usage of this method is discouraged, as the method will soon be deprecated. */
+	public final Link createLink(final String id, final String fromTo, final String toNode, final String length,
 	                             final String freespeed, final String capacity, final String permlanes,
 	                             final String origid, String type) {
-		IdImpl f = new IdImpl(from);
-		Node from_node = this.nodes.get(f);
-		if (from_node == null) { throw new IllegalArgumentException(this+"[from="+from+" does not exist]"); }
+		return createLink(new IdImpl(id), this.nodes.get(fromTo), this.nodes.get(toNode), Double.parseDouble(length),
+				Double.parseDouble(freespeed), Double.parseDouble(capacity), Double.parseDouble(permlanes),
+				origid, type);
+	}
 
-		IdImpl t = new IdImpl(to);
-		Node to_node = this.nodes.get(t);
-		if (to_node == null) { throw new IllegalArgumentException(this+"[to="+to+" does not exist]"); }
-		Id linkId = new IdImpl(id);
-		if (this.locations.containsKey(linkId)) { throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!"); }
+	public final Link createLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
+		return createLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
+	}
 
-		double dlength = Double.parseDouble(length);
-		double dfreespeed = Double.parseDouble(freespeed);
-		double dcapacity = Double.parseDouble(capacity);
-		double dpermlanes = Double.parseDouble(permlanes);
+	public final Link createLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes, final String origId, final String type) {
 
-		Link link = this.factory.newLink(linkId,from_node,to_node, this, dlength, dfreespeed, dcapacity, dpermlanes);
+		if (this.nodes.get(fromNode.getId()) == null) {
+			throw new IllegalArgumentException(this+"[from="+fromNode+" does not exist]");
+		}
+
+		if (this.nodes.get(toNode.getId()) == null) {
+			throw new IllegalArgumentException(this+"[to="+toNode+" does not exist]");
+		}
+
+		if (this.locations.containsKey(id)) {
+			throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!");
+		}
+
+		Link link = this.factory.newLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
 		link.setType(type);
-		link.setOrigId(origid);
-		from_node.addOutLink(link);
-		to_node.addInLink(link);
+		link.setOrigId(origId);
+		fromNode.addOutLink(link);
+		toNode.addInLink(link);
 		this.locations.put(link.getId(),link);
 		return link;
 	}
