@@ -115,7 +115,7 @@ public class NetworkLayer extends Layer implements BasicNet {
 	public final Link createLink(final String id, final String fromTo, final String toNode, final String length,
 	                             final String freespeed, final String capacity, final String permlanes,
 	                             final String origid, String type) {
-		return createLink(new IdImpl(id), this.nodes.get(fromTo), this.nodes.get(toNode), Double.parseDouble(length),
+		return createLink(new IdImpl(id), this.nodes.get(new IdImpl(fromTo)), this.nodes.get(new IdImpl(toNode)), Double.parseDouble(length),
 				Double.parseDouble(freespeed), Double.parseDouble(capacity), Double.parseDouble(permlanes),
 				origid, type);
 	}
