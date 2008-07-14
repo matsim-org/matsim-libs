@@ -21,6 +21,10 @@
 package playground.gregor.withinday_evac.mobsim;
 
 import org.matsim.events.Events;
+import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.QueueNetworkFactory;
+import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNode;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.network.NetworkLayer;
@@ -28,6 +32,7 @@ import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 
 import playground.gregor.withinday_evac.BDIAgent;
+import playground.gregor.withinday_evac.information.InformationExchanger;
 
 /**
  * This extension of the QueueSimulation is used for withinday replanning. It contains functionality
@@ -40,13 +45,18 @@ import playground.gregor.withinday_evac.BDIAgent;
 public class WithindayQueueSimulation extends QueueSimulation {
 
 	private final playground.gregor.withinday_evac.WithindayControler controler;
+	private final InformationExchanger informationExchanger;
 
 
 	public WithindayQueueSimulation(final NetworkLayer net,
 			final Plans plans, final Events events, final playground.gregor.withinday_evac.WithindayControler withindayControler) {
 		super(net, plans, events);
+		final QueueNetworkFactory< QueueNode, QueueLink> factory = new WithindayQueueNetworkFactory();
+		final QueueNetworkLayer qNet = new QueueNetworkLayer(net,factory);
+		this.network = qNet;
 		this.controler = withindayControler;
 		this.setVehiclePrototye(OccupiedVehicle.class);
+		this.informationExchanger = new InformationExchanger(net);
 	}
 	
 	@Override
@@ -62,7 +72,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	 * @param veh
 	 */
 	private void createAgent(final Person person, final OccupiedVehicle veh) {
-		new BDIAgent(person, veh);
+		new BDIAgent(person, veh, this.informationExchanger);
 	}
 
 

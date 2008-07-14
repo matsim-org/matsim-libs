@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OccupiedVehicle.java
+ * WithindayQueueNetworkFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,71 +20,23 @@
 
 package playground.gregor.withinday_evac.mobsim;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.mobsim.Vehicle;
+import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.QueueNetworkFactory;
+import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNode;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 
-import playground.gregor.withinday_evac.BDIAgent;
+public class WithindayQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink>{
 
-/**
- * @author dgrether
- *
- */
-public class OccupiedVehicle extends Vehicle {
-
-//	private static final Logger log = Logger.getLogger(OccupiedVehicle.class);
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private BDIAgent agent;
-
-	public OccupiedVehicle() {
-		super();
+	public QueueLink newQueueLink(final Link link, final QueueNetworkLayer queueNetwork,
+			final QueueNode toQueueNode) {
+		return new QueueLink(link, queueNetwork, toQueueNode);
 	}
 
-
-	public Link chooseNextLink(final double now, final Id nodeId) {
-		final Link l = this.agent.replan(now, nodeId);
-		 
-//			super.chooseNextLink();
-		super.cachedNextLink = l;
-//		log.trace("vehicle : " + this.driverId + " next choosen link:" + l.getId().asString());
-		return l;
-	}
-
-//	public void exchangeActsLegs(final ArrayList<Object> actslegs) {
-//		this.cachedNextLink = null;
-//		final int index = this.actslegs.indexOf(this.currentLeg);
-//		if (index != -1) {
-//			this.actslegs = actslegs;
-//			this.currentLeg = (BasicLeg) this.actslegs.get(index);
-//		}
-//		else {
-//			throw new IllegalArgumentException("Current leg: " + this.currentLeg
-//					+ " can not be found in actslegs list!");
-//		}
-//	}
-
-	/**
-	 * @return the agent
-	 */
-	public BDIAgent getAgent() {
-		return this.agent;
-	}
-
-	/**
-	 * @param agent
-	 *          the agent to set
-	 */
-	public void setAgent(final BDIAgent agent) {
-		this.agent = agent;
-	}
-
-	public Node getCurrentNode() {
-		return this.currentLink.getToNode();
+	public QueueNode newQueueNode(final Node node, final QueueNetworkLayer queueNetwork) {
+		// TODO Auto-generated method stub
+		return  new WithindayQueueNode(node, queueNetwork);
 	}
 
 }
