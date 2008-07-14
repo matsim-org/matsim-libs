@@ -42,7 +42,7 @@ public class EndLegMessage extends EventMessage {
 			
 			
 			// if the departureTime for the leg is in the past, then set it to the current simulation time
-			// this avoids that messages in the past are put into the scheduler
+			// this avoids that messages in the past are put into the scheduler (which makes no sense anyway)
 			if (departureTime<scheduler.getSimTime()){
 				departureTime=scheduler.getSimTime();
 			}

@@ -76,6 +76,14 @@ public class Vehicle extends SimUnit {
 
 		Road road=Road.allRoads.get(getCurrentLink().getId().toString());
 		scheduleStartingLegMessage(departureTime, road);
+		
+		//TODO: Das hier noch einbauchen
+		//if ("car".equals(leg.getMode())) { // we only simulate car traffic
+		//	Link[] route = leg.getRoute().getLinkRoute(); // these are the links the agent will drive along one after the other.
+		//}
+		
+		
+		
 		//System.out.println("departureTime:"+departureTime+";simTime:"+scheduler.simTime);
 	}
 
@@ -210,4 +218,10 @@ public class Vehicle extends SimUnit {
 				scheduleTime);
 	}
 
+	public DeadlockPreventionMessage scheduleDeadlockPreventionMessage(double scheduleTime, Road road) {
+		DeadlockPreventionMessage dpMessage=new DeadlockPreventionMessage(road.scheduler, this);
+		sendMessage(dpMessage, road.getUnitNo(),scheduleTime);
+		return dpMessage;
+	}
+	
 }

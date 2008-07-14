@@ -43,6 +43,10 @@ public class Road extends SimUnit {
 	private LinkedList<Vehicle> carsOnTheRoad = new LinkedList<Vehicle>();
 	private LinkedList<Double> earliestDepartureTimeOfCar = new LinkedList<Double>();
 
+	
+	private LinkedList<DeadlockPreventionMessage> deadlockPreventionMessages= new LinkedList<DeadlockPreventionMessage>();
+	
+	
 	// private double oldestUnusedGapTime=Double.MIN_VALUE;
 
 	public Road(Scheduler scheduler, Link link) {
@@ -81,6 +85,8 @@ public class Road extends SimUnit {
 			//System.out.println("sdfa");
 		}
 	}
+	
+
 
 	@Override
 	public void finalize() {
@@ -113,6 +119,12 @@ public class Road extends SimUnit {
 		// time for entering the road
 		if (interestedInEnteringRoad.size() > 0) {
 			Vehicle nextVehicle = interestedInEnteringRoad.removeFirst();
+			Message m=deadlockPreventionMessages.removeFirst();
+			
+			// TODO: continue here: es muss eine neue Methode her im Scheduler, die die Saubere
+			// Entfernung von Messages aus der MessageQueue vornimmt
+			//scheduler.queue.queue.remove(arg0)
+			
 			double nextAvailableTimeForEnteringStreet = Math.max(
 					timeOfLastEnteringVehicle + inverseInFlowCapacity,
 					scheduler.simTime + gapTravelTime);
@@ -201,8 +213,10 @@ public class Road extends SimUnit {
 
 		// assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are
 		// more cars on the road, than its capacity!";
-		assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size()
-				+ noOfCarsPromisedToEnterRoad : "You promised too many cars, that they can enter the street!";
+		// This assert has been commented out for deadlock prevention:
+		// If a car waits too long, it is alloud to enter the road.
+		//assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size()
+			//	+ noOfCarsPromisedToEnterRoad : "You promised too many cars, that they can enter the street!";
 
 		if (link.getId().toString().equalsIgnoreCase("110915")) {
 			//System.out.print("enterRequest");
@@ -270,6 +284,7 @@ public class Road extends SimUnit {
 			}
 
 			interestedInEnteringRoad.add(vehicle);
+			deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(scheduler.simTime+SimulationParameters.stuckTime, this));
 		}
 	}
 

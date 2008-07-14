@@ -60,7 +60,7 @@ public class EndRoadMessage extends EventMessage {
 	}
 	
 	public void logEvent() {
-		// do not schedule any message
+		// don't do anything
 	}
 
 }
