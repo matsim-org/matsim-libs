@@ -20,7 +20,6 @@
 
 package org.matsim.mobsim;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +36,7 @@ import org.matsim.plans.Route;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 
-public class Vehicle implements Serializable, DrawableAgentI {
-
-	private static final long serialVersionUID = 1L;
+public class Vehicle implements DrawableAgentI {
 
 	static private int globalID = 0;
 	public double lastMoveTime = 0;
@@ -61,17 +58,12 @@ public class Vehicle implements Serializable, DrawableAgentI {
 
 	private final int id = globalID++; // TODO change to IdI instead of int
 
-	public  Vehicle() {
-
-	}
-
-
 	/**
 	 * @return zero-based leg number.
 	 */
 	public int getCurrentLegNumber() {
 		return ((this.nextActivity - 2)/ 2);
-	};
+	}
 
 	public double getDepartureTime_s() {
 		return this.currentDepartureTime;
@@ -152,8 +144,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 					+ ", but is on link " + this.currentLink.getId().toString() + ". Removing the agent from the simulation.");
 			return false;
 		}
-//		dg[march2008] if the condition above is true this is not needed!
-//		this.currentLink = (QueueLink) act.getLink();
 
 		if (this.nextActivity == this.actslegs.size()-1) {
 			// if this is the last activity, then stop vehicle
@@ -188,7 +178,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 		this.cachedNextLink = null;
 		this.nextActivity += 2;
 
-
 		return true;
 	}
 
@@ -205,14 +194,6 @@ public class Vehicle implements Serializable, DrawableAgentI {
 			return true;
 		}
 		return false;
-	}
-
-	public void rebuildVeh(final Link link) {
-		this.currentLink = link;
-		this.destinationLink = ((Act)this.actslegs.get(this.nextActivity)).getLink();
-		Leg actleg = (Leg) this.actslegs.get(this.nextActivity-1);
-		this.currentLeg = actleg;
-		this.cachedNextLink = null;
 	}
 
 	public Leg getCurrentLeg() {
@@ -272,7 +253,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	}
 
 	public double getPosInLink_m() {
-		
+
 		double dur = this.currentLink.getFreespeedTravelTime(SimulationTimer.getTime());
 		double mytime = getDepartureTime_s() - SimulationTimer.getTime();
 		if (mytime<0) {
@@ -317,6 +298,7 @@ public class Vehicle implements Serializable, DrawableAgentI {
 	 * Notifies the agent that it reaches its aspired activity location.
 	 *
 	 * @param now the current time
+	 * @param currentQueueLink
 	 */
 	 protected void reachActivity(final double now, QueueLink currentQueueLink) {
 		Act act = (Act)this.actslegs.get(this.nextActivity);
