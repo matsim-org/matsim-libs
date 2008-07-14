@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * NextLinkMessage.java
+ * Perceptor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,19 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.information;
+package playground.gregor.withinday_evac.beliefs;
 
-import org.matsim.network.Link;
+import playground.gregor.withinday_evac.information.FollowGuideMessage;
+import playground.gregor.withinday_evac.information.NextLinkMessage;
 
-public class LinkMessage implements Message {
-
-	private final Link link;
-
-	public LinkMessage(Link link) {
-		this.link = link;
+public abstract class Perceptor {
+	
+	public void addPerception(NextLinkMessage msg) {
+		
 	}
 	
-	public Link getLink() {
-		return this.link;
+	public void addPerception(FollowGuideMessage msg) {
+		
 	}
+	
+	
+	
+	public abstract void reset();
+
 }
