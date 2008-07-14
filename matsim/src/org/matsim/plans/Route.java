@@ -71,7 +71,7 @@ public class Route extends BasicRouteImpl<Node> /*implements Serializable*/ {
 	public final void setRoute(final String route) {
 		NetworkLayer layer = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		if (layer == null) {
-			Gbl.errorMsg(this.toString() + "[layer=" + NetworkLayer.LAYER_TYPE + " does not exist]");
+			throw new RuntimeException("NetworkLayer does not exist in world.");
 		}
 
 		String[] parts = route.split("[ \t\n]+");
@@ -88,6 +88,9 @@ public class Route extends BasicRouteImpl<Node> /*implements Serializable*/ {
 
 		for (int i = min; i < parts.length; i++) {
 			Node n = layer.getNode(parts[i]);
+			if (n == null) {
+				throw new RuntimeException("Node not found in network. node id = " + parts[i]);
+			}
 			this.route.add(n);
 		}
 		this.route.trimToSize();
@@ -157,7 +160,7 @@ public class Route extends BasicRouteImpl<Node> /*implements Serializable*/ {
 					}
 				}
 				if (!linkFound) {
-					Gbl.errorMsg("No link found from node " + prevNode.getId() + " to node " + node.getId());
+					throw new RuntimeException("No link found from node " + prevNode.getId() + " to node " + node.getId());
 				}
 			} else {
 				notfirst = true;
@@ -185,7 +188,7 @@ public class Route extends BasicRouteImpl<Node> /*implements Serializable*/ {
 	 * till toNode. If from or twoNode are not found in this, an IllegalArgumentException is thrown.
 	 * @param fromNode
 	 * @param toNode
-	 * @return A flat copy of the original Route  // FIXME reading the doc above, this clearly does NOT return a flat copy of the original Route! 
+	 * @return A flat copy of the original Route  // FIXME reading the doc above, this clearly does NOT return a flat copy of the original Route!
 	 */
 	public Route getSubRoute(final Node fromNode, final Node toNode) {
 		int fromIndex = this.route.indexOf(fromNode);
@@ -202,7 +205,7 @@ public class Route extends BasicRouteImpl<Node> /*implements Serializable*/ {
   /////////////////////////////////////////////////////////////////
 	// I/O methods
   /////////////////////////////////////////////////////////////////
-	
+
 	/* seems the code below is nowhere really used, so I commented it out. Additionally,
 	 * I think it doesn't work correctly, as it serializes the route manually, but the route
 	 * is not declared transient, so it would be serialized anyway, and now twice!
