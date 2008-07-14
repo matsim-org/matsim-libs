@@ -39,7 +39,7 @@ public class AllTests {
 		suite.addTestSuite(Test2.class);
 		suite.addTestSuite(Test4.class);
 		suite.addTestSuite(Test5.class);
-		suite.addTestSuite(Test6_1.class);
+		suite.addTestSuite(Test6.class);
 		suite.addTestSuite(Test8.class);
 		//$JUnit-END$
 		return suite;

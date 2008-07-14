@@ -2,7 +2,9 @@ package playground.wrashid.test.test6;
 
 import java.util.ArrayList;
 
-import org.matsim.testcases.MatsimTestCase;
+import junit.framework.TestCase;
+
+
 
 import playground.wrashid.DES.EventLog;
 import playground.wrashid.DES.SimulationParameters;
@@ -11,7 +13,7 @@ import playground.wrashid.test.CppEventFileParser;
 import playground.wrashid.test.Lock;
 import playground.wrashid.test.PCppEventFileParser;
 
-public class Test6 extends MatsimTestCase {
+public class Test6 extends TestCase {
 
 	/**
 	 * @param args

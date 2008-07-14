@@ -2,14 +2,16 @@ package playground.wrashid.test.test4;
 
 import java.util.ArrayList;
 
-import org.matsim.testcases.MatsimTestCase;
+import junit.framework.TestCase;
+
+
 
 import playground.wrashid.DES.EventLog;
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.test.CppEventFileParser;
 
-public class Test4 extends MatsimTestCase {
+public class Test4 extends TestCase {
 
 	/**
 	 * @param args
