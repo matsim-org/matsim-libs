@@ -52,8 +52,9 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 					
 			startCoord = act.getCoord();				
 			ttBudget -= this.computeTravelTime(prevAct, act);
+			double tt2Anchor = this.computeTravelTime(act, subChain.getLastPrimAct());
 			
-			if (ttBudget <= 0.0) {
+			if ((ttBudget - tt2Anchor) <= 0.0) {
 				this.handleSubChain(subChain, speed * 0.9, trialNr++, ttFactor);
 				return;
 			}
