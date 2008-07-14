@@ -29,17 +29,17 @@ import playground.gregor.withinday_evac.mobsim.WithindayQueueSimulation;
 
 public class WithindayControler extends EvacuationQSimControler {
 
-	public WithindayControler(String[] args) {
+	public WithindayControler(final String[] args) {
 		super(args);
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected void runMobSim() {
-		log.info("Starting withinday replanning iteration...");
+//		log.info("Starting withinday replanning iteration...");
 
 		//build the queuesim
-		WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
+		final WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
 		//run the simulation
 		sim.run();
 	}
