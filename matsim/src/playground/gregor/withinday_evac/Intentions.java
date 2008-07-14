@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TunrsPerceptor.java
+ * Intentsion.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,21 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.beliefs;
+package playground.gregor.withinday_evac;
 
-import playground.gregor.withinday_evac.information.NextLinkMessage;
+import org.matsim.network.Node;
 
-public class TurnsPerceptor extends Perceptor {
+public class Intentions {
+	
+	private Node destination;
 
-	public void addPerception(NextLinkMessage msg) {
-		// TODO Auto-generated method stub
-		
+	public void setDestination(final Node destination) {
+		this.destination = destination;
 	}
 
-	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
-		
+	public Node getDestination() {
+		return this.destination;
 	}
-
+	
+	
 }

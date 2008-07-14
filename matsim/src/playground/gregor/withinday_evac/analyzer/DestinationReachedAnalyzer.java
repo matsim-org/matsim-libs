@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * NextLinkMessage.java
+ * DestinationReachedAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,19 +18,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.information;
+package playground.gregor.withinday_evac.analyzer;
 
-import org.matsim.network.Link;
+import playground.gregor.withinday_evac.Intentions;
+import playground.gregor.withinday_evac.beliefs.Beliefs;
 
-public class NextLinkMessage implements Message {
+public class DestinationReachedAnalyzer implements Analyzer {
 
-	private final Link link;
+	private final Beliefs beliefs;
+	private final Intentions intentions;
 
-	public NextLinkMessage(Link link) {
-		this.link = link;
+	public DestinationReachedAnalyzer(final Beliefs beliefs, final Intentions intentions) {
+		this.beliefs = beliefs;
+		this.intentions = intentions;
 	}
 	
-	public Link getLink() {
-		return this.link;
+	public Action getAction(final double now) {
+		if (this.beliefs.getCurrentLink().getToNode().getId() == this.intentions.getDestination().getId()) {
+			return new NextLinkAction(null,1);
+		}
+
+		return null;
 	}
+
 }

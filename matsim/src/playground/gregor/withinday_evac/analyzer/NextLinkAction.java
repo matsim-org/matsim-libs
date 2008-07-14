@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GuidePerceptor.java
+ * NextLinkAction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.beliefs;
+package playground.gregor.withinday_evac.analyzer;
 
-import playground.gregor.withinday_evac.information.FollowGuideMessage;
+import org.matsim.network.Link;
 
+public class NextLinkAction extends Action {
 
-public class GuidePerceptor extends Perceptor {
+	private final Link link;
+	
 
-	public void addPerception(FollowGuideMessage msg) {
-		// TODO Auto-generated method stub
-		
+	public NextLinkAction(final Link link, final double conf) {
+		this.link = link;
+		this.conf = conf;
 	}
-
-	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
-		
+	
+	public Link getNextLink() {
+		return this.link;
 	}
-
+	
+	
+	
 }

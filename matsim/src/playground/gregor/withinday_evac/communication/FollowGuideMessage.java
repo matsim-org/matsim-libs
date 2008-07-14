@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OutputMsgBuffer.java
+ * FollowGuideMessage.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,8 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac;
+package playground.gregor.withinday_evac.communication;
 
-public class OutputMsgBuffer {
+import org.matsim.network.Link;
 
+public class FollowGuideMessage implements Message{
+
+	private final Link link;
+
+	public FollowGuideMessage(Link link) {
+		this.link = link;
+	}
+	
+	public Link getLink() {
+		return this.link;
+	}
 }

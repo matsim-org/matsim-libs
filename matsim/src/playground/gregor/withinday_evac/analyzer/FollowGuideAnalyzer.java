@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Beliefs.java
+ * FollowGuideAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,56 +18,73 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.beliefs;
+package playground.gregor.withinday_evac.analyzer;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.matsim.network.Link;
 
+import playground.gregor.withinday_evac.beliefs.Beliefs;
+import playground.gregor.withinday_evac.communication.FollowGuideMessage;
 import playground.gregor.withinday_evac.communication.InformationEntity;
 import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;
 
-public class Beliefs {
-	
-	
-	HashMap<MSG_TYPE,ArrayList<InformationEntity>> infos = new HashMap<MSG_TYPE,ArrayList<InformationEntity>>(); 
-	private Link currentLink;
-//	public Beliefs() {
-//		
-//	}
+public class FollowGuideAnalyzer implements Analyzer {
 
-	public void update(final Collection<InformationEntity> information) {
-		this.infos.clear();
+	private final Beliefs beliefs;
+
+	public FollowGuideAnalyzer(final Beliefs beliefs) {
+		this.beliefs = beliefs;
+	}
+	
+	public Action getAction(final double now) {
+		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.FOLLOW_ME);
+		if (ies == null) {
+			return new NextLinkAction(null,0);
+		}
+		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();
+		for (final InformationEntity ie : ies) {
+			final FollowGuideMessage m = (FollowGuideMessage) ie.getMsg();
+			final Counter c = counts.get(m.getLink().getId());
+			if (c != null) {
+				c.value++;
+				
+			} else {
+				counts.put(m.getLink(), new Counter(1));
+			}
+			
+		}
 		
-		for (final InformationEntity ie : information){
-			addIE(ie);
+		int max_val = 0;
+		Link link = null;
+		
+		for (final Entry<Link, Counter> e : counts.entrySet()) {
+			if (e.getValue().value > max_val) {
+				max_val = e.getValue().value;
+				link = e.getKey();
+			}
+		}
+		
+		
+		return new NextLinkAction(link,1);
+	}
+	
+	
+	
+	
+	private static class Counter {
+		int value;
+		public Counter(final int i) {
+			this.value = i;
+		}
+		
+		@Override
+		public String toString(){
+			return this.value + "";
 		}
 		
 	}
 	
-	public void addIE(final InformationEntity ie) {
-		final MSG_TYPE type = ie.getMsgType();
-
-		ArrayList<InformationEntity> info = this.infos.get(type);
-		if (info == null) {
-			info = new ArrayList<InformationEntity>();
-			this.infos.put(type, info);
-		}
-		info.add(ie);
-	}
-	
-	public HashMap<MSG_TYPE,ArrayList<InformationEntity>> getInfos() {
-		return this.infos;
-	}
-
-	public void setCurrentLink(final Link currentLink) {
-		this.currentLink = currentLink;
-	}
-
-	public Link getCurrentLink() {
-		return this.currentLink;
-	}
-
 }

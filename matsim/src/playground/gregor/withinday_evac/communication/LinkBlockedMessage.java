@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Perceptor.java
+ * LinkBlockedMessage.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,23 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.beliefs;
+package playground.gregor.withinday_evac.communication;
 
-import playground.gregor.withinday_evac.information.FollowGuideMessage;
-import playground.gregor.withinday_evac.information.NextLinkMessage;
+import org.matsim.network.Link;
 
-public abstract class Perceptor {
-	
-	public void addPerception(NextLinkMessage msg) {
-		
+public class LinkBlockedMessage implements Message{
+
+
+	private final Link link;
+
+	public LinkBlockedMessage(final Link link) {
+		this.link = link;
 	}
 	
-	public void addPerception(FollowGuideMessage msg) {
-		
+	public Link getLink() {
+		return this.link;
 	}
-	
-	
-	
-	public abstract void reset();
-
 }

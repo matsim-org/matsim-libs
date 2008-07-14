@@ -30,6 +30,7 @@ import org.matsim.mobsim.QueueNode;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.network.Node;
 
+
 public class WithindayQueueNode extends QueueNode {
 	private static final Logger log = Logger.getLogger(WithindayQueueNode.class);
 	
@@ -42,7 +43,8 @@ public class WithindayQueueNode extends QueueNode {
 	// ////////////////////////////////////////////////////////////////////
 	@Override
 	public boolean moveVehicleOverNode(final Vehicle veh, final double now) {
-		((OccupiedVehicle)veh).chooseNextLink(now,this.getNode().getId());
+		((OccupiedVehicle)veh).setNextLink(now,this.getNode().getId());
+		
 		return super.moveVehicleOverNode(veh, now);
 
 	}

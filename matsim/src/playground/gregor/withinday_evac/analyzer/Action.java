@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InformationStorage.java
+ * Action.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,41 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.information;
+package playground.gregor.withinday_evac.analyzer;
 
-import java.util.Collection;
-import java.util.PriorityQueue;
+public abstract class Action {
 
-public class InformationStorage {
+	double conf;
 	
-	private final PriorityQueue<InformationEntity> infos;
-	private double lastUpdate = 0.;
-	
-	public InformationStorage() {
-		this.infos = new PriorityQueue<InformationEntity>();
+	public double getConfidence() {
+		return this.conf;
 	}
-	
-	public void addInformationEntity(InformationEntity ie) {
-		this.infos.add(ie);
-	}
-	
-	private synchronized void update(double now) {
-		
-		if (this.infos.size() == 0) {
-			this.lastUpdate = now;
-			return;
-		}
-		while (this.infos.peek().getEndTime() < now) {
-			this.infos.poll();
-		}
-		this.lastUpdate = now;
-	}
-	
-	public Collection<InformationEntity> getInformation(double now) {
-		if (now > this.lastUpdate) {
-			update(now);
-		}
-		return this.infos;
-	}
-
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InformationExchanger.java
+ * InformationStorage.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.information;
+package playground.gregor.withinday_evac.communication;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
+import java.util.PriorityQueue;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
-
-public class InformationExchanger {
+public class InformationStorage {
 	
+	private final PriorityQueue<InformationEntity> infos;
+	private double lastUpdate = 0.;
 	
-	private final NetworkLayer network;
-	private final Map<Id, InformationStorage> informationStorages;
-
-	public InformationExchanger(NetworkLayer network) {
-		this.network = network;
-		this.informationStorages = new HashMap<Id,InformationStorage>();
-		init();
+	public InformationStorage() {
+		this.infos = new PriorityQueue<InformationEntity>();
 	}
-
-	private void init() {
-		for(Node node : this.network.getNodes().values()) {
-			this.informationStorages.put(node.getId(), new InformationStorage());
+	
+	public void addInformationEntity(final InformationEntity ie) {
+		this.infos.add(ie);
+	}
+	
+	private synchronized void update(final double now) {
+		
+		while (this.infos.size() > 0 && this.infos.peek().getEndTime() < now) {
+			this.infos.poll();
 		}
-	}
-
-	public InformationStorage getInformationStorage(Id id) {
-		return this.informationStorages.get(id);
+		this.lastUpdate = now;
 	}
 	
+	public Collection<InformationEntity> getInformation(final double now) {
+		if (now > this.lastUpdate) {
+			update(now);
+		}
+		return this.infos;
+	}
+
 }
-;

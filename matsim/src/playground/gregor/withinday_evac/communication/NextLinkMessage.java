@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Beliefs.java
+ * NextLinkMessage.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,56 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.beliefs;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+package playground.gregor.withinday_evac.communication;
 
 import org.matsim.network.Link;
 
-import playground.gregor.withinday_evac.communication.InformationEntity;
-import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;
+public class NextLinkMessage implements Message {
 
-public class Beliefs {
-	
-	
-	HashMap<MSG_TYPE,ArrayList<InformationEntity>> infos = new HashMap<MSG_TYPE,ArrayList<InformationEntity>>(); 
-	private Link currentLink;
-//	public Beliefs() {
-//		
-//	}
+	private final Link link;
 
-	public void update(final Collection<InformationEntity> information) {
-		this.infos.clear();
-		
-		for (final InformationEntity ie : information){
-			addIE(ie);
-		}
-		
+	public NextLinkMessage(Link link) {
+		this.link = link;
 	}
 	
-	public void addIE(final InformationEntity ie) {
-		final MSG_TYPE type = ie.getMsgType();
-
-		ArrayList<InformationEntity> info = this.infos.get(type);
-		if (info == null) {
-			info = new ArrayList<InformationEntity>();
-			this.infos.put(type, info);
-		}
-		info.add(ie);
+	public Link getLink() {
+		return this.link;
 	}
-	
-	public HashMap<MSG_TYPE,ArrayList<InformationEntity>> getInfos() {
-		return this.infos;
-	}
-
-	public void setCurrentLink(final Link currentLink) {
-		this.currentLink = currentLink;
-	}
-
-	public Link getCurrentLink() {
-		return this.currentLink;
-	}
-
 }

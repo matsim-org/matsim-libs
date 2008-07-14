@@ -18,7 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.information;
+package playground.gregor.withinday_evac.communication;
+
+import org.matsim.gbl.Gbl;
 
 public class InformationEntity implements Comparable<InformationEntity> {
 	
@@ -36,12 +38,13 @@ public class InformationEntity implements Comparable<InformationEntity> {
 	private final double endTime;
 	private final MSG_TYPE msgType;
 	private final Message msg;
+	private boolean resend = false;
 	
-	public InformationEntity(double time, MSG_TYPE msgType, Message msg){
-		this(DEFAULT_TTL,time,msgType, msg);
+	public InformationEntity(final double time, final MSG_TYPE msgType, final Message msg){
+		this(DEFAULT_TTL/Gbl.getConfig().simulation().getFlowCapFactor(),time,msgType, msg);
 	}
 	
-	public InformationEntity(double ttl, double time, MSG_TYPE msgType, Message msg) {
+	public InformationEntity(final double ttl, final double time, final MSG_TYPE msgType, final Message msg) {
 		this.ttl = ttl;
 		this.initTime = time;
 		this.endTime = time + ttl;
@@ -50,7 +53,7 @@ public class InformationEntity implements Comparable<InformationEntity> {
 	}
 	
 	
-	public boolean stillLiving(double now) {
+	public boolean stillLiving(final double now) {
 		if ((now - this.initTime) > this.ttl) {
 			return false;
 		}
@@ -75,13 +78,21 @@ public class InformationEntity implements Comparable<InformationEntity> {
 
 	
 	
-	public int compareTo(InformationEntity o) {
+	public int compareTo(final InformationEntity o) {
 		if (this.endTime > o.getEndTime()) {
 			return 1;
 		} else if (this.endTime < o.getEndTime()) {
 			return -1;
 		}
 		return 0;
+	}
+
+	public void setResend(final boolean resend) {
+		this.resend = resend;
+	}
+
+	public boolean isResend() {
+		return this.resend;
 	}
 
 

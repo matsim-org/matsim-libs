@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Beliefs.java
+ * NextLinkBlockedAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,56 +18,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.beliefs;
+package playground.gregor.withinday_evac.analyzer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 
 import org.matsim.network.Link;
+import org.matsim.network.TimeVariantLinkImpl;
 
+import playground.gregor.withinday_evac.beliefs.Beliefs;
 import playground.gregor.withinday_evac.communication.InformationEntity;
+import playground.gregor.withinday_evac.communication.LinkBlockedMessage;
 import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;
 
-public class Beliefs {
-	
-	
-	HashMap<MSG_TYPE,ArrayList<InformationEntity>> infos = new HashMap<MSG_TYPE,ArrayList<InformationEntity>>(); 
-	private Link currentLink;
-//	public Beliefs() {
-//		
-//	}
+public class BlockedLinksAnalyzer implements Analyzer {
 
-	public void update(final Collection<InformationEntity> information) {
-		this.infos.clear();
-		
-		for (final InformationEntity ie : information){
-			addIE(ie);
+	private final Beliefs beliefs;
+	
+	private final HashSet<Link> blockedLinks = new HashSet<Link>();
+	
+	public BlockedLinksAnalyzer(final Beliefs beliefs) {
+		this.beliefs = beliefs;
+	}
+	
+	public void update(final double now) {
+		this.blockedLinks.clear();
+		for (final Link link : this.beliefs.getCurrentLink().getToNode().getOutLinks().values()) {
+			if (((TimeVariantLinkImpl)link).getFreespeed(now) <= 0.){
+				final InformationEntity ie = new InformationEntity(now,MSG_TYPE.LINK_BLOCKED,new LinkBlockedMessage(link));
+				ie.setResend(true);
+				this.beliefs.addIE(ie);
+				this.blockedLinks.add(link);
+			}
 		}
-		
-	}
-	
-	public void addIE(final InformationEntity ie) {
-		final MSG_TYPE type = ie.getMsgType();
-
-		ArrayList<InformationEntity> info = this.infos.get(type);
-		if (info == null) {
-			info = new ArrayList<InformationEntity>();
-			this.infos.put(type, info);
-		}
-		info.add(ie);
-	}
-	
-	public HashMap<MSG_TYPE,ArrayList<InformationEntity>> getInfos() {
-		return this.infos;
 	}
 
-	public void setCurrentLink(final Link currentLink) {
-		this.currentLink = currentLink;
+	public boolean isLinkBlocked(final Link link) {
+		return this.blockedLinks.contains(link);
 	}
-
-	public Link getCurrentLink() {
-		return this.currentLink;
-	}
-
 }

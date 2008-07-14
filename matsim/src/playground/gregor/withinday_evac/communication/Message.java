@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Beliefs.java
+ * Message.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,56 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.beliefs;
+package playground.gregor.withinday_evac.communication;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-
-import org.matsim.network.Link;
-
-import playground.gregor.withinday_evac.communication.InformationEntity;
-import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;
-
-public class Beliefs {
-	
-	
-	HashMap<MSG_TYPE,ArrayList<InformationEntity>> infos = new HashMap<MSG_TYPE,ArrayList<InformationEntity>>(); 
-	private Link currentLink;
-//	public Beliefs() {
-//		
-//	}
-
-	public void update(final Collection<InformationEntity> information) {
-		this.infos.clear();
-		
-		for (final InformationEntity ie : information){
-			addIE(ie);
-		}
-		
-	}
-	
-	public void addIE(final InformationEntity ie) {
-		final MSG_TYPE type = ie.getMsgType();
-
-		ArrayList<InformationEntity> info = this.infos.get(type);
-		if (info == null) {
-			info = new ArrayList<InformationEntity>();
-			this.infos.put(type, info);
-		}
-		info.add(ie);
-	}
-	
-	public HashMap<MSG_TYPE,ArrayList<InformationEntity>> getInfos() {
-		return this.infos;
-	}
-
-	public void setCurrentLink(final Link currentLink) {
-		this.currentLink = currentLink;
-	}
-
-	public Link getCurrentLink() {
-		return this.currentLink;
-	}
+public interface Message {
 
 }

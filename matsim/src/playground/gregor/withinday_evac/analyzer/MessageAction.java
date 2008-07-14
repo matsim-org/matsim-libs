@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Message.java
+ * MessageAction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,8 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.information;
+package playground.gregor.withinday_evac.analyzer;
 
-public interface Message {
+public class MessageAction extends Action{
+	
 
 }

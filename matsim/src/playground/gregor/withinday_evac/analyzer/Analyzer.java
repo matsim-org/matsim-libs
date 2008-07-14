@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FollowGuideMessage.java
+ * Analyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,19 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.information;
+package playground.gregor.withinday_evac.analyzer;
 
-import org.matsim.network.Link;
-
-public class FollowGuideMessage implements Message{
-
-	private final Link link;
-
-	public FollowGuideMessage(Link link) {
-		this.link = link;
-	}
+public interface Analyzer {
 	
-	public Link getLink() {
-		return this.link;
-	}
+	
 }

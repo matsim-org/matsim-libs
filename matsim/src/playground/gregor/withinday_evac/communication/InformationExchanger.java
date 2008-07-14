@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Beliefs.java
+ * InformationExchanger.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,56 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.beliefs;
+package playground.gregor.withinday_evac.communication;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.matsim.network.Link;
+import org.matsim.basic.v01.Id;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 
-import playground.gregor.withinday_evac.communication.InformationEntity;
-import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;
-
-public class Beliefs {
+public class InformationExchanger {
 	
 	
-	HashMap<MSG_TYPE,ArrayList<InformationEntity>> infos = new HashMap<MSG_TYPE,ArrayList<InformationEntity>>(); 
-	private Link currentLink;
-//	public Beliefs() {
-//		
-//	}
+	private final NetworkLayer network;
+	private final Map<Id, InformationStorage> informationStorages;
 
-	public void update(final Collection<InformationEntity> information) {
-		this.infos.clear();
-		
-		for (final InformationEntity ie : information){
-			addIE(ie);
+	public InformationExchanger(NetworkLayer network) {
+		this.network = network;
+		this.informationStorages = new HashMap<Id,InformationStorage>();
+		init();
+	}
+
+	private void init() {
+		for(Node node : this.network.getNodes().values()) {
+			this.informationStorages.put(node.getId(), new InformationStorage());
 		}
-		
+	}
+
+	public InformationStorage getInformationStorage(Id id) {
+		return this.informationStorages.get(id);
 	}
 	
-	public void addIE(final InformationEntity ie) {
-		final MSG_TYPE type = ie.getMsgType();
-
-		ArrayList<InformationEntity> info = this.infos.get(type);
-		if (info == null) {
-			info = new ArrayList<InformationEntity>();
-			this.infos.put(type, info);
-		}
-		info.add(ie);
-	}
-	
-	public HashMap<MSG_TYPE,ArrayList<InformationEntity>> getInfos() {
-		return this.infos;
-	}
-
-	public void setCurrentLink(final Link currentLink) {
-		this.currentLink = currentLink;
-	}
-
-	public Link getCurrentLink() {
-		return this.currentLink;
-	}
-
 }
+;

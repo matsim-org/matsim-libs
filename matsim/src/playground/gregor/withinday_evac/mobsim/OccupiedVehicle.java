@@ -46,13 +46,16 @@ public class OccupiedVehicle extends Vehicle {
 	}
 
 
-	public Link chooseNextLink(final double now, final Id nodeId) {
+	public void setNextLink(final double now, final Id nodeId) {
 		final Link l = this.agent.replan(now, nodeId);
-		 
-//			super.chooseNextLink();
 		super.cachedNextLink = l;
-//		log.trace("vehicle : " + this.driverId + " next choosen link:" + l.getId().asString());
-		return l;
+
+	}
+
+	
+	@Override
+	public Link chooseNextLink() {
+		return super.chooseNextLink();
 	}
 
 //	public void exchangeActsLegs(final ArrayList<Object> actslegs) {
@@ -67,6 +70,8 @@ public class OccupiedVehicle extends Vehicle {
 //					+ " can not be found in actslegs list!");
 //		}
 //	}
+
+
 
 	/**
 	 * @return the agent
