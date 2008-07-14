@@ -28,8 +28,6 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class EventAgentWait2Link extends AgentEvent {
 
-	private static final long serialVersionUID = 1867692305873299962L;
-
 	public EventAgentWait2Link(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
 		super(time, agentId, legId, linkId, agent, leg, link);
 	}

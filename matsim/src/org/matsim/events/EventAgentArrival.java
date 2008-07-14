@@ -28,8 +28,6 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class EventAgentArrival extends AgentEvent {
 
-	private static final long serialVersionUID = -975513797122449530L;
-
 	public EventAgentArrival(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
 		super(time, agentId, legId, linkId, agent, leg, link);
 	}

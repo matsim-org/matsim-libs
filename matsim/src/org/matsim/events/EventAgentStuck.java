@@ -28,8 +28,6 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class EventAgentStuck extends AgentEvent {
 
-	private static final long serialVersionUID = -1627465087230781914L;
-
 	public EventAgentStuck(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
 		super(time, agentId, legId, linkId, agent, leg, link);
 	}

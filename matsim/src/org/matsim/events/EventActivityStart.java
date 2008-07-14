@@ -28,8 +28,6 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class EventActivityStart extends ActEvent {
 
-	private static final long serialVersionUID = -7687869105781741116L;
-
 	public EventActivityStart(double time, String agentId, Person agent, Link link, Act act) {
 		super(time, agentId, agent, link, act);
 	}

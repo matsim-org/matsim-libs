@@ -27,8 +27,6 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class EventLinkEnter extends LinkEvent {
 
-	private static final long serialVersionUID = 1L;
-
 	public EventLinkEnter(final double time, final String agentId, final int legNumber, final String linkId, final Person agent, final Link link) {
 		super(time, agentId, linkId, agent, legNumber, link);
 	}
