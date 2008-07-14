@@ -40,28 +40,12 @@ import org.matsim.utils.io.IOUtils;
 public class PutpathlegFilter extends TableSplitter {
 	public static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
-	// //////////////////////////////////////////////////////////////////////////////
-	/*
-	 * // private static class PutPathLeg{ // private String
-	 * origZoneNo,destZoneNo; // private Date depTime; // private String line; //
-	 * private List<String> followings=new ArrayList<String>(); // public
-	 * PutPathLeg(final String origZoneNo, final String destZoneNo, final String
-	 * depTime, final String line) throws ParseException{ //
-	 * this.origZoneNo=origZoneNo; // this.destZoneNo=destZoneNo; //
-	 * this.depTime=sdf.parse(depTime); // this.line=line; // } // public void
-	 * addFollowingline(String line){ // followings.add(line); // } // public
-	 * String getOrigZoneNo() { // return origZoneNo; // } // public String
-	 * getDestZoneNo() { // return destZoneNo; // } // public Date getDepTime() { //
-	 * return depTime; // } // public String toString(){ // StringBuilder sb=new
-	 * StringBuilder(line+"\n"); // for(int i=0;i<followings.size();i++){ //
-	 * sb.append(followings.get(i)); // } // return sb.toString(); // } // }
-	 */
-
-	private static class IndexFileReader extends TableSplitter {
+	static class IndexFileReader extends TableSplitter {
 		private final List<String> inputFileIndexs = new ArrayList<String>();
 		private final List<String> minDepTimes = new ArrayList<String>();
 		private final List<String> maxDepTimes = new ArrayList<String>();
 		private final String attFilepath, outputAttFilepath;
+		private int cnt = 0;
 
 		public IndexFileReader(final String regex, final String tableFileName,
 				final String attFilepath, final String outputAttFilepath)
@@ -77,6 +61,7 @@ public class PutpathlegFilter extends TableSplitter {
 				inputFileIndexs.add(params[0]);
 				minDepTimes.add(params[1]);
 				maxDepTimes.add(params[2]);
+				cnt++;
 			}
 		}
 
@@ -97,14 +82,19 @@ public class PutpathlegFilter extends TableSplitter {
 		public String getMaxDepTime(final int i) {
 			return maxDepTimes.get(i);
 		}
+
+		/**
+		 * @return the cnt
+		 */
+		public int getCnt() {
+			return cnt;
+		}
 	}
 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	private final Date minDepTime, maxDepTime;
 	private final BufferedWriter writer;
 
-	// private Map<String, PutPathLeg> putpathlegs=new HashMap<String,
-	// PutPathLeg>();
 	/**
 	 * @param regex
 	 * @param tableFilename
@@ -135,16 +125,13 @@ public class PutpathlegFilter extends TableSplitter {
 	public void writeNewLine(final String line) {
 		try {
 			String[] words = split(line);
-			// System.out.println("line="+line);
 			StringBuilder word = new StringBuilder();
 			word.append(words[0]);
 			for (int i = 1; i < words.length; i++) {
 				word.append("\t");
 				word.append(words[i]);
-				// System.out.println(words[i]);
 			}
 			writer.write(word + "\n");
-			// System.out.println(word.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -172,12 +159,6 @@ public class PutpathlegFilter extends TableSplitter {
 
 	}
 
-	/*
-	 * // public void putPutpathleg(PutPathLeg ppl){ //
-	 * putpathlegs.put(ppl.getOrigZoneNo()+ppl.getDestZoneNo(), ppl); // } //
-	 * public PutPathLeg getPutpathleg(String origDestZoneNo){ // return
-	 * putpathlegs.get(origDestZoneNo); // }
-	 */
 	/**
 	 * @param args
 	 */
@@ -221,16 +202,18 @@ public class PutpathlegFilter extends TableSplitter {
 						pf.writeLine(line);
 					} while (line != null);
 
-					pf.writeNewLine(line);
+					pf.writeNewLine(line);// writes "$P...."
 
 					boolean writeable = false;
+
 					do {
 						line = pf.readLine();
 						if (line != null)
-							if (line.startsWith(";")) {
+							if (line.startsWith(";")) {// the line is not
+								// firstLine
 								if (writeable)
 									pf.writeNewLine(line);
-							} else {
+							} else {// the line is firstLine
 								String[] firstLines = pf.split(line);
 								if (firstLines.length > 1)
 									if (pf
