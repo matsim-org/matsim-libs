@@ -31,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.config.Config;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
