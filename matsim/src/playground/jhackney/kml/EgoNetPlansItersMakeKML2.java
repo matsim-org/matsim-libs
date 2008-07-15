@@ -20,8 +20,6 @@
 
 package playground.jhackney.kml;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -34,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.config.Config;
-import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -59,7 +56,6 @@ import org.matsim.utils.vis.kml.Geometry;
 import org.matsim.utils.vis.kml.Icon;
 import org.matsim.utils.vis.kml.IconStyle;
 import org.matsim.utils.vis.kml.KML;
-import org.matsim.utils.vis.kml.KMLWriter;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.kml.LabelStyle;
 import org.matsim.utils.vis.kml.LineString;
@@ -90,7 +86,7 @@ public class EgoNetPlansItersMakeKML2 {
 
 	private static String mainKMLFilename;
 //	private static String coloredLinkKMLFilename;
-	private static boolean useCompression = false;
+//	private static boolean useCompression = false;
 
 	private static KML myKML;
 //	, coloredLinkKML;
@@ -107,6 +103,7 @@ public class EgoNetPlansItersMakeKML2 {
 	private static final Logger log = Logger.getLogger(EgoNetPlansItersMakeKML.class);
 
 	private static TreeMap<String,Folder> agentMap = new TreeMap<String,Folder>();
+	private static Person ego;
 
 	public static void setUp(Config config, NetworkLayer network) {
 		EgoNetPlansItersMakeKML2.config=config;
@@ -127,22 +124,21 @@ public class EgoNetPlansItersMakeKML2 {
 //		SEP +
 //		config.getParam(KML21_MODULE, CONFIG_OUTPUT_KML_DEMO_COLORED_LINK_FILE);
 
-		if (config.getParam(KML21_MODULE, CONFIG_USE_COMPRESSION).equals("true")) {
-			useCompression = true;
-		} else if(config.getParam(KML21_MODULE, CONFIG_USE_COMPRESSION).equals("false")) {
-			useCompression = false;
-		} else {
-			Gbl.errorMsg(
-					"Invalid value for config parameter " + CONFIG_USE_COMPRESSION +
-					" in module " + KML21_MODULE +
-					": \"" + config.getParam(KML21_MODULE, CONFIG_USE_COMPRESSION) + "\"");
-		}
+//		if (config.getParam(KML21_MODULE, CONFIG_USE_COMPRESSION).equals("true")) {
+//		useCompression = true;
+//		} else if(config.getParam(KML21_MODULE, CONFIG_USE_COMPRESSION).equals("false")) {
+//		useCompression = false;
+//		} else {
+//		Gbl.errorMsg(
+//		"Invalid value for config parameter " + CONFIG_USE_COMPRESSION +
+//		" in module " + KML21_MODULE +
+//		": \"" + config.getParam(KML21_MODULE, CONFIG_USE_COMPRESSION) + "\"");
+//		}
 
 		myKML = new KML();
 		myKMLDocument = new Document("the root document");
 		myKML.setFeature(myKMLDocument);
 
-		// TODO initialize time stamp here?
 //		coloredLinkKML = new KML();
 //		coloredLinkKMLDocument = new Document("network main feature");
 //		coloredLinkKML.setFeature(coloredLinkKMLDocument);
@@ -240,13 +236,14 @@ public class EgoNetPlansItersMakeKML2 {
 
 	public static void loadData(Person myPerson, int iter){
 
+		ego=myPerson;
 		if(config.getModule(KML21_MODULE)==null) return;
 
 		System.out.println("    loading Plan data. Processing EgoNet ...");
 
 		// load Data into KML folders for myPerson
 		int i=0;
-		loadData(myPerson, 0, 1, iter);
+		loadData(ego, 0, 1, iter);
 
 		// Proceed to the EgoNet of myPerson
 		ArrayList<Person> persons = myPerson.getKnowledge().getEgoNet().getAlters();
@@ -261,50 +258,42 @@ public class EgoNetPlansItersMakeKML2 {
 
 		System.out.println(" ... done.");
 	}
-	public static void loadData(Person myPerson, int i, int nColors, int iter) {
+	public static void loadData(Person alter, int i, int nColors, int iter) {
 
 		System.out.println("    loading Plan data. Processing person ...");
 //		TODO make one file per agent and put in the routes and acts each iteration
 //		TODO ensure that each agent has a unique color by using the P_ID (?how to quickly find min/max for scaling the colors?)
 
-		Plan myPlan = myPerson.getSelectedPlan();
+		Plan myPlan = alter.getSelectedPlan();
 
 //		Color color = setColor(i, nColors+1);
 		Color color = setColor(i, (int)(nColors*1.5) + 1);// make 50% more colors than alters in case the social net is bigger in some iterations
-//		setFacStyles(color);
+
 
 
 		Style agentLinkStyle =null;
-		if(!myKMLDocument.containsStyle("agentLinkStyle"+myPerson.getId().toString())){
-			agentLinkStyle = new Style("agentLinkStyle"+myPerson.getId().toString());
+		if(!myKMLDocument.containsStyle("agentLinkStyle"+alter.getId().toString())){
+			agentLinkStyle = new Style("agentLinkStyle"+alter.getId().toString());
 			agentLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 14));
 			myKMLDocument.addStyle(agentLinkStyle);
 		}else// Set a constant color for each agent for all iterations
-			agentLinkStyle=myKMLDocument.getStyle("agentLinkStyle"+myPerson.getId().toString());
+			agentLinkStyle=myKMLDocument.getStyle("agentLinkStyle"+alter.getId().toString());
 
-//		Style agentLinkStyle = new Style("agentLinkStyle"+myPerson.getId().toString());
 
-//		// Set a constant color for each agent for all iterations
-//		if(!myKMLDocument.containsStyle(agentLinkStyle.toString())){
-//		myKMLDocument.addStyle(agentLinkStyle);
-//		agentLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 14));
-//		}else
-//		agentLinkStyle=myKMLDocument.getStyle(agentLinkStyle.getId());
 		Folder agentFolder;
 		if(!myKMLDocument.containsFeature("agent "+myPlan.getPerson().getId().toString())){
-		agentFolder = new Folder(
-				"agent "+myPlan.getPerson().getId().toString(),
-				"agent "+myPlan.getPerson().getId().toString(),
-				"Contains one agent",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				true,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-//		new TimeStamp(new GregorianCalendar(1970, 0, 1, iter, 0, 0))
-//		new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
-		
+			agentFolder = new Folder(
+					"agent "+myPlan.getPerson().getId().toString(),
+					"agent "+myPlan.getPerson().getId().toString(),
+					"Contains one agent",
+					Feature.DEFAULT_ADDRESS,
+					Feature.DEFAULT_LOOK_AT,
+					Feature.DEFAULT_STYLE_URL,
+					true,
+					Feature.DEFAULT_REGION,
+					Feature.DEFAULT_TIME_PRIMITIVE);
+
+
 			System.out.println("MAKING NEW KML AGENT FOLDER FOR "+ agentFolder.getId());
 			myKMLDocument.addFeature(agentFolder);
 			agentMap.put(agentFolder.getId(),agentFolder);
@@ -328,8 +317,10 @@ public class EgoNetPlansItersMakeKML2 {
 
 		// put the activity space polygon into the planFolder
 //		makeActivitySpaceKML_Poly(myPerson, iter, planFolder, color);
-		makeActivitySpaceKML_Line(myPerson,iter,planFolder,agentLinkStyle);
+		makeActivitySpaceKML_Line(alter,iter,planFolder,agentLinkStyle);
 
+		makeSocialLinkKML(alter,iter,agentFolder,agentLinkStyle);
+		
 		// put facilities in a folder, one facilities folder for each Plan
 		Folder facilitiesFolder = new Folder(
 				"facilities "+myPlan.getPerson().getId().toString()+"-"+iter,
@@ -341,14 +332,14 @@ public class EgoNetPlansItersMakeKML2 {
 				false,
 				Feature.DEFAULT_REGION,
 				new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
-//		myKMLDocument.addFeature(facilitiesFolder);
+
 		if(!planFolder.containsFeature(facilitiesFolder.getId())){
 			planFolder.addFeature(facilitiesFolder);
 		}
 
 		ActLegIterator actLegIter = myPlan.getIterator();
 		Act act0 = (Act) actLegIter.nextAct();
-		makeActKML(myPerson, act0, 0, planFolder, agentLinkStyle);
+		makeActKML(alter, act0, 0, planFolder, agentLinkStyle);
 		int actNumber=0;
 		while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
 
@@ -363,7 +354,7 @@ public class EgoNetPlansItersMakeKML2 {
 			}
 			Act act = (Act) actLegIter.nextAct();
 			actNumber++;
-			makeActKML(myPerson, act,actNumber, planFolder,agentLinkStyle);
+			makeActKML(alter, act,actNumber, planFolder,agentLinkStyle);
 		}
 
 
@@ -405,18 +396,42 @@ public class EgoNetPlansItersMakeKML2 {
 		System.out.println("    done.");
 
 	}
+	
+	private static void makeSocialLinkKML(Person myPerson, int i,
+			Folder folder, Style agentLinkStyle){
+		// Add a line from the alter's home to the ego's home in the color of the alter
+		String id = myPerson.getId().toString();
+		Placemark socialLink =  new Placemark(
+				id+ego.getId().toString()+"_"+i,
+				"Social link_"+i,
+				Feature.DEFAULT_DESCRIPTION,
+				Feature.DEFAULT_ADDRESS,
+				Feature.DEFAULT_LOOK_AT,
+				agentLinkStyle.getId(),
+				Feature.DEFAULT_VISIBILITY,
+				Feature.DEFAULT_REGION,
+				Feature.DEFAULT_TIME_PRIMITIVE);
+
+		CoordI coordFrom = trafo.transform((Coord)((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Point pointFrom= new Point(coordFrom.getX(),coordFrom.getY(), 0.0);
+		CoordI coordTo = trafo.transform((Coord)((Act)ego.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Point pointTo= new Point(coordTo.getX(),coordTo.getY(), 0.0);
+		socialLink.setGeometry(new LineString(pointFrom, pointTo));
+		folder.addFeature(socialLink);
+	}
 
 	private static void makeActivitySpaceKML_Line(Person myPerson, int i,
 			Folder planFolder, Style agentLinkStyle) {
-		// TODO Auto-generated method stub
+
 		String id = myPerson.getId().toString();
+
 //		String spaceName="P"+id+" activity space Iter= "+i;
 		Style activitySpaceStyle=null;
 		activitySpaceStyle=myKMLDocument.getStyle("agentLinkStyle"+myPerson.getId().toString());
 		Color color = agentLinkStyle.getLineStyle().getColor();
 		activitySpaceStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 4));
-		
-		
+
+
 		Folder as = new Folder(
 				"activity space "+id+"-"+i,
 				"activity space "+id+"-"+i,
@@ -432,7 +447,7 @@ public class EgoNetPlansItersMakeKML2 {
 			planFolder.addFeature(as);
 		}	
 
-		
+
 		// make the activity spaces
 		new PersonCalcActivitySpace("all").run(myPerson);
 		new PersonDrawActivitySpace().run(myPerson);
@@ -471,9 +486,9 @@ public class EgoNetPlansItersMakeKML2 {
 							Feature.DEFAULT_VISIBILITY,
 							Feature.DEFAULT_REGION,
 							Feature.DEFAULT_TIME_PRIMITIVE);
-				
-							linkPlacemark.setGeometry(new LineString(oldPoint, pointOut));
-							as.addFeature(linkPlacemark);
+
+					linkPlacemark.setGeometry(new LineString(oldPoint, pointOut));
+					as.addFeature(linkPlacemark);
 				}
 				oldPoint=pointOut;
 			}
