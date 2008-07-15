@@ -3,10 +3,18 @@ package playground.wrashid.DES;
 public class DeadlockPreventionMessage extends EventMessage {
 
 	@Override
-	// let enter the car into the road
+	// let enter the car into the road immediatly
 	public void selfhandleMessage() {
-		// TODO Auto-generated method stub
 		
+		Road road=(Road)scheduler.getSimUnit(this.receivingUnit.unitNo);
+		
+		road.incrementPromisedToEnterRoad(); // this will be decremented in enter road
+		road.setTimeOfLastEnteringVehicle(scheduler.simTime);
+		road.removeFirstDeadlockPreventionMessage();
+		
+		
+		vehicle.scheduleEnterRoadMessage(scheduler.simTime, road);
+		System.out.println("Deadlock prevention happend");
 	}
 
 	@Override

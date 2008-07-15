@@ -21,7 +21,9 @@ public class LeaveRoadMessage extends EventMessage {
 		Road road=(Road)scheduler.getSimUnit(this.receivingUnit.unitNo);
 		
 		if (logMessage){
-			SimulationParameters.eventOutputLog.add(new EventLog(this.getMessageArrivalTime(),Integer.parseInt(vehicle.getOwnerPerson().getId().toString()),vehicle.getLegIndex()-1,Integer.parseInt(road.getLink().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getFromNode().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getToNode().getId().toString()),eventType));
+			EventLog ev=new EventLog(this.getMessageArrivalTime(),Integer.parseInt(vehicle.getOwnerPerson().getId().toString()),vehicle.getLegIndex()-1,Integer.parseInt(road.getLink().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getFromNode().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getToNode().getId().toString()),eventType);
+			SimulationParameters.eventOutputLog.add(ev);
+			ev.print();
 		}
 		logEvent();
 	}

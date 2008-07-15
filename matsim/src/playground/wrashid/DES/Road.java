@@ -107,6 +107,8 @@ public class Road extends SimUnit {
 	}
 
 	public void leaveRoad(Vehicle vehicle) {
+		System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
+		assert(carsOnTheRoad.getFirst()==vehicle);
 		carsOnTheRoad.removeFirst();
 		earliestDepartureTimeOfCar.removeFirst();
 		timeOfLastLeavingVehicle = scheduler.simTime;
@@ -120,10 +122,7 @@ public class Road extends SimUnit {
 		if (interestedInEnteringRoad.size() > 0) {
 			Vehicle nextVehicle = interestedInEnteringRoad.removeFirst();
 			Message m=deadlockPreventionMessages.removeFirst();
-			
-			// TODO: continue here: es muss eine neue Methode her im Scheduler, die die Saubere
-			// Entfernung von Messages aus der MessageQueue vornimmt
-			//scheduler.queue.queue.remove(arg0)
+			scheduler.unschedule(m);
 			
 			double nextAvailableTimeForEnteringStreet = Math.max(
 					timeOfLastEnteringVehicle + inverseInFlowCapacity,
@@ -180,7 +179,8 @@ public class Road extends SimUnit {
 		noOfCarsPromisedToEnterRoad--;
 		carsOnTheRoad.add(vehicle);
 
-		assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are more cars on the road, than its capacity!";
+		// need to remove this assertion because of deadlock prevention
+		//assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are more cars on the road, than its capacity!";
 		earliestDepartureTimeOfCar.add(nextAvailableTimeForLeavingStreet);
 
 		// if we are in the front of the queue, then we can just drive with free
@@ -291,9 +291,23 @@ public class Road extends SimUnit {
 	public void giveBackPromisedSpaceToRoad() {
 		noOfCarsPromisedToEnterRoad--;
 	}
+	
+	public void incrementPromisedToEnterRoad(){
+		noOfCarsPromisedToEnterRoad++;
+	}
 
 	public Link getLink() {
 		return link;
+	}
+
+
+
+	public void setTimeOfLastEnteringVehicle(double timeOfLastEnteringVehicle) {
+		this.timeOfLastEnteringVehicle = timeOfLastEnteringVehicle;
+	}
+	
+	public void removeFirstDeadlockPreventionMessage(){
+		deadlockPreventionMessages.removeFirst();
 	}
 
 }

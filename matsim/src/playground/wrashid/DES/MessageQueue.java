@@ -19,12 +19,16 @@ public class MessageQueue {
 		long rlong=counter++;
 		// padding with zeros is needed, inorder to be able to use firstKey property of the queue
 		String zeroPadded=feedWithZeros(m.getMessageArrivalTime());
-		queue.put(zeroPadded.concat((new Long(rlong)).toString()),m);
+		m.queueKey=zeroPadded.concat((new Long(rlong)).toString());
+		queue.put(m.queueKey,m);
 		
 		if (SimulationParameters.debugMode && (counter % 1000000 == 0)){
 			System.out.println("MessageQueue.counter:"+ counter);
 		}
-		
+	}
+	
+	void removeMessage(Message m){
+		queue.remove(m.queueKey);
 	}
 	
 	Message getNextMessage(){

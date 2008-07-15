@@ -8,6 +8,7 @@ public abstract class Message {
 	public SimUnit receivingUnit;
 	public long messageType;
 	public long messageId;
+	public String queueKey=""; // only used because of implementation convenience (might be removed in future, if not needed)
 	
 	// all inheriting or extending modules must
 	// invoke this Constructer first

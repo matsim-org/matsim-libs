@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Scheduler {
 	double simTime=0;
-	MessageQueue queue=new MessageQueue();
+	private MessageQueue queue=new MessageQueue();
 	HashMap<Long,SimUnit> simUnits=new HashMap<Long, SimUnit>();
 
 
@@ -20,6 +20,10 @@ public class Scheduler {
 			//System.out.println(m.getClass());
 			assert(false); // for backtracing, where a wrong message has been scheduled
 		}
+	}
+	
+	public void unschedule(Message m){
+		queue.removeMessage(m);
 	}
 	
 	
