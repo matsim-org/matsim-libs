@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 
 import org.matsim.network.Link;
 
-import playground.gregor.withinday_evac.beliefs.Beliefs;
+import playground.gregor.withinday_evac.Beliefs;
 import playground.gregor.withinday_evac.communication.FollowGuideMessage;
 import playground.gregor.withinday_evac.communication.InformationEntity;
 import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;

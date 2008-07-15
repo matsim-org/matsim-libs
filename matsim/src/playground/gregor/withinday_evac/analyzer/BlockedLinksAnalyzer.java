@@ -25,7 +25,7 @@ import java.util.HashSet;
 import org.matsim.network.Link;
 import org.matsim.network.TimeVariantLinkImpl;
 
-import playground.gregor.withinday_evac.beliefs.Beliefs;
+import playground.gregor.withinday_evac.Beliefs;
 import playground.gregor.withinday_evac.communication.InformationEntity;
 import playground.gregor.withinday_evac.communication.LinkBlockedMessage;
 import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;

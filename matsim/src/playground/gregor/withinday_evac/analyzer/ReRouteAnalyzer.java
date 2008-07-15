@@ -29,8 +29,8 @@ import org.matsim.plans.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
+import playground.gregor.withinday_evac.Beliefs;
 import playground.gregor.withinday_evac.Intentions;
-import playground.gregor.withinday_evac.beliefs.Beliefs;
 import playground.gregor.withinday_evac.communication.InformationEntity;
 import playground.gregor.withinday_evac.communication.LinkBlockedMessage;
 import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;

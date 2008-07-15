@@ -36,7 +36,6 @@ import playground.gregor.withinday_evac.analyzer.DestinationReachedAnalyzer;
 import playground.gregor.withinday_evac.analyzer.FollowGuideAnalyzer;
 import playground.gregor.withinday_evac.analyzer.HerdAnalyzer;
 import playground.gregor.withinday_evac.analyzer.ReRouteAnalyzer;
-import playground.gregor.withinday_evac.beliefs.Beliefs;
 import playground.gregor.withinday_evac.communication.FollowGuideMessage;
 import playground.gregor.withinday_evac.communication.InformationEntity;
 import playground.gregor.withinday_evac.communication.InformationExchanger;

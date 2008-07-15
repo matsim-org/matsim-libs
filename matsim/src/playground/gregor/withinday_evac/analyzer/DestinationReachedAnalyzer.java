@@ -20,8 +20,8 @@
 
 package playground.gregor.withinday_evac.analyzer;
 
+import playground.gregor.withinday_evac.Beliefs;
 import playground.gregor.withinday_evac.Intentions;
-import playground.gregor.withinday_evac.beliefs.Beliefs;
 
 public class DestinationReachedAnalyzer implements Analyzer {
 

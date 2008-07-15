@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.beliefs;
+package playground.gregor.withinday_evac;
 
 import java.util.ArrayList;
 import java.util.Collection;
