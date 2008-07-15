@@ -56,7 +56,7 @@ public class SNScoringFriendFoeRatio implements ScoringFunction{
 	public void finish() {
 		this.scoringFunction.finish();
 //		this.toll = this.paidToll.getAgentToll(this.person.getId().toString());
-System.out.println("#######SNSCoring function finish");
+//System.out.println("#######SNSCoring function finish");
 		ActIterator ait = this.plan.getIteratorAct();
 		while(ait.hasNext()){
 			Act act = (Act)ait.next();
