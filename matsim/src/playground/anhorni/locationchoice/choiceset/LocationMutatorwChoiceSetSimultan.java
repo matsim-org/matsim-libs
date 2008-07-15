@@ -47,7 +47,7 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			Act act = act_it.next();
 			
 			double hypotenuse = (ttBudget * speed) / 2.0;
-			double cathetus = prevAct.getCoord().calcDistance(act.getCoord());
+			double cathetus = prevAct.getCoord().calcDistance(subChain.getLastPrimAct().getCoord());
 			double radius = Math.sqrt(Math.pow(hypotenuse, 2.0) - Math.pow(cathetus, 2.0));	
 		
 			this.modifyLocation(act, startCoord, endCoord, radius, 0);
