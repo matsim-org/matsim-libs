@@ -1,4 +1,4 @@
-package playground.jhackney.scoring;
+package org.matsim.socialnetworks.scoring;
 
 import org.matsim.plans.Plan;
 import org.matsim.roadpricing.CalcPaidToll;

@@ -53,12 +53,12 @@ import org.matsim.socialnetworks.interactions.SpatialInteractorActsFast;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
+import org.matsim.socialnetworks.scoring.SNScoringGeneralFactory;
+import org.matsim.socialnetworks.scoring.SpatialScorer;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
-import playground.jhackney.scoring.SNScoringGeneralFactory;
-import playground.jhackney.scoring.SpatialScorer;
 
 
 /**

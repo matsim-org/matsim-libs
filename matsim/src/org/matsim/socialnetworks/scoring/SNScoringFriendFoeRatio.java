@@ -1,4 +1,4 @@
-package playground.jhackney.scoring;
+package org.matsim.socialnetworks.scoring;
 
 /* *********************************************************************** *
  * project: org.matsim.*
