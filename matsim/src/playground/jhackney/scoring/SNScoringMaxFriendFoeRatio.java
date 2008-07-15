@@ -109,8 +109,8 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 	private static final double INITIAL_SCORE = 0.0;
 	
 //	private HashMap<Activity, SocialAct> socialPlansMap= SNScoringGeneralFactory.getSocialActsMap();
-	private SpatialScorer spatialScorer = SNScoringGeneralFactory.getScorer();
-	private String factype = SNScoringGeneralFactory.getFacType();// Type of activity in which social group matters to Person;
+	private SpatialScorer spatialScorer;
+	private String factype;// Type of activity in which social group matters to Person;
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
 	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
@@ -124,12 +124,14 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 
 	private static final Logger log = Logger.getLogger(SNScoringMaxFriendFoeRatio.class);
 
-	public SNScoringMaxFriendFoeRatio(final Plan plan) {
+	public SNScoringMaxFriendFoeRatio(final Plan plan, String factype, SpatialScorer spatialScorer) {
 		init();
 		this.reset();
 
 		this.plan = plan;
 		this.person = this.plan.getPerson();
+		this.factype=factype;
+		this.spatialScorer=spatialScorer;
 		this.lastActIndex = this.plan.getActsLegs().size() - 1;
 	}
 
@@ -326,7 +328,7 @@ public class SNScoringMaxFriendFoeRatio implements ScoringFunction {
 
 		if(act.getType().equals(factype)){
 			double add=spatialScorer.scoreFriendtoFoeInTimeWindow(plan);
-			score+=10.*add;
+			score+=1000.*add;
 			log.info(" "+score+" "+add);
 		}
 

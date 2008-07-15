@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
+import org.matsim.controler.corelisteners.PlansScoring;
 import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
@@ -37,13 +38,15 @@ import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Knowledge;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.roadpricing.CalcPaidToll;
+import org.matsim.roadpricing.RoadPricingScoringFunctionFactory;
+import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialInteractorActsFast;
@@ -54,7 +57,6 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
-import playground.jhackney.kml.EgoNetPlansItersMakeKML2;
 import playground.jhackney.scoring.SNScoringGeneralFactory;
 import playground.jhackney.scoring.SpatialScorer;
 
@@ -92,6 +94,9 @@ import playground.jhackney.scoring.SpatialScorer;
  *
  */
 public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
+//	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  AfterMobsimListener{
+//	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener{
+
 
 	private static final boolean CALCSTATS = true;
 	private static final String DIRECTORY_SN = "socialnets/";
@@ -109,10 +114,8 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
-//	SpatialSocialActTracker gen2 = new SpatialSocialActTracker();
-//	HashMap<Activity, SocialAct> socialPlansMap=null;
-//	Collection<SocialAct> socialPlans=null;
-	SNScoringGeneralFactory  factory=null;
+	private SpatialScorer spatialScorer=null;
+	private EventsToScore scoring =null; 
 
 	private final Logger log = Logger.getLogger(SNControllerListenerRePlanSecLoc.class);
 
@@ -147,41 +150,37 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
-		//loadSocialNetwork();
-		// if (this.config.socialnet().getInputFile() == null) {
-		//this.log.info("Loading initial social network");
-		// also initializes knowledge.map.egonet
-		//}
 
 		this.log.info(" Initializing agent knowledge about geography ...");
-		this.log.info(" If scoring crashes later it may be because this only initializes knowledge for the selected plan. This will happen if there are more than one initial plan");
+
 		initializeKnowledge(this.controler.getPopulation());
 		this.log.info("... done");
 
 		/* code previously in startup() */
 
+
+		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
+		this.spatialScorer = new SpatialScorer();
+		this.spatialScorer.scoreActs(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
+		SNScoringGeneralFactory factory = new SNScoringGeneralFactory
+		("leisure", this.spatialScorer, controler.getScoringFunctionFactory());
+		this.controler.setScoringFunctionFactory(factory);
+		this.log.info("... done");
+
+		this.log.info("  Instantiating social network EventsToScore for scoring the plans");
+		scoring = new EventsToScore(this.controler.getPopulation(), factory);
+		this.controler.getEvents().addHandler(scoring);
+		this.log.info(" ... Instantiation of social network scoring done");
+
 		snsetup();
 	}
 
-//	public void notifyAfterMobsim(final AfterMobsimEvent event){
 	public void notifyScoring(final ScoringEvent event){
-		
-		
-		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
-		SpatialScorer spatialScorer = new SpatialScorer();
-		spatialScorer.scoreActs(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
-		factory = new SNScoringGeneralFactory("leisure", spatialScorer);
-		this.log.info("... done");
 
-		if(factory!=null){
-			this.log.info("  Instantiating social network EventsToScore for scoring the plans");
-			EventsToScore scoring = new EventsToScore(this.controler.getPopulation(), factory);
-			this.controler.getEvents().addHandler(scoring);
-			this.log.info(" ... Instantiation of social network scoring done");
-		}
-		
+		this.log.info("scoring");
+		scoring.finish();
 	}
-	
+
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		/* code previously in finishIteration() */
 		this.log.info("finishIteration ... "+event.getIteration());
@@ -225,12 +224,13 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 //		Write out the KML for the EgoNet of a chosen agent
 //		if ((event.getIteration()-1)%replan_interval == 0){
 //		Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
-////        Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
+////		Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
 //		EgoNetPlansItersMakeKML2.loadData(testP,event.getIteration());
 //		if (event.getIteration() == this.controler.getLastIteration()){	
-//
-//			EgoNetPlansItersMakeKML2.write();
+
+//		EgoNetPlansItersMakeKML2.write();
 //		}
+
 	}
 
 	public void notifyIterationStarts(final IterationStartsEvent event) {
@@ -389,7 +389,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		}
 
 //		this.log.info("  Initializing the KML output");
-//
+
 //		EgoNetPlansItersMakeKML2.setUp(this.controler.getConfig(), this.controler.getNetwork());
 //		EgoNetPlansItersMakeKML2.generateStyles();
 //		this.log.info("... done");
