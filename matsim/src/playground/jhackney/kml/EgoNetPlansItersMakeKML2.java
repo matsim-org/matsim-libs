@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.config.Config;
@@ -104,6 +105,8 @@ public class EgoNetPlansItersMakeKML2 {
 
 	private static TreeMap<String,Folder> agentMap = new TreeMap<String,Folder>();
 	private static Person ego;
+	private static TreeMap<Id,Color> colors = new TreeMap<Id,Color>();
+	private static TimeStamp timeStamp;
 
 	public static void setUp(Config config, NetworkLayer network) {
 		EgoNetPlansItersMakeKML2.config=config;
@@ -267,8 +270,15 @@ public class EgoNetPlansItersMakeKML2 {
 		Plan myPlan = alter.getSelectedPlan();
 
 //		Color color = setColor(i, nColors+1);
-		Color color = setColor(i, (int)(nColors*1.5) + 1);// make 50% more colors than alters in case the social net is bigger in some iterations
-
+		Color color = new Color("0","0","0","0");
+		if(colors.keySet().contains(alter.getId())){
+			color=colors.get(alter.getId());
+		}else{
+			color = setColor(i, (int)(nColors*1.5) + 1);// make 50% more colors than alters in case the social net is bigger in some iterations
+			colors.put(alter.getId(), color);
+		}
+		
+		timeStamp = new TimeStamp(new GregorianCalendar(1970, 0, 1, iter, 0, 0));
 
 
 		Style agentLinkStyle =null;
@@ -292,6 +302,7 @@ public class EgoNetPlansItersMakeKML2 {
 					true,
 					Feature.DEFAULT_REGION,
 					Feature.DEFAULT_TIME_PRIMITIVE);
+//					new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
 
 
 			System.out.println("MAKING NEW KML AGENT FOLDER FOR "+ agentFolder.getId());
@@ -311,7 +322,7 @@ public class EgoNetPlansItersMakeKML2 {
 				Feature.DEFAULT_STYLE_URL,
 				true,
 				Feature.DEFAULT_REGION,
-				new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
+				timeStamp);
 		System.out.println("MAKING NEW KML PLAN FOLDER "+planFolder.getId()+" FOR AGENT "+agentFolder.getId());
 		agentFolder.addFeature(planFolder);
 
@@ -320,7 +331,7 @@ public class EgoNetPlansItersMakeKML2 {
 		makeActivitySpaceKML_Line(alter,iter,planFolder,agentLinkStyle);
 
 		makeSocialLinkKML(alter,iter,agentFolder,agentLinkStyle);
-		
+
 		// put facilities in a folder, one facilities folder for each Plan
 		Folder facilitiesFolder = new Folder(
 				"facilities "+myPlan.getPerson().getId().toString()+"-"+iter,
@@ -331,7 +342,7 @@ public class EgoNetPlansItersMakeKML2 {
 				Feature.DEFAULT_STYLE_URL,
 				false,
 				Feature.DEFAULT_REGION,
-				new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
+				timeStamp);
 
 		if(!planFolder.containsFeature(facilitiesFolder.getId())){
 			planFolder.addFeature(facilitiesFolder);
@@ -339,7 +350,7 @@ public class EgoNetPlansItersMakeKML2 {
 
 		ActLegIterator actLegIter = myPlan.getIterator();
 		Act act0 = (Act) actLegIter.nextAct();
-		makeActKML(alter, act0, 0, planFolder, agentLinkStyle);
+		makeActKML(alter, act0, 0, planFolder, agentLinkStyle, iter);
 		int actNumber=0;
 		while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
 
@@ -347,14 +358,14 @@ public class EgoNetPlansItersMakeKML2 {
 
 			Link[] routeLinks = (leg).getRoute().getLinkRoute();
 			for (Link routeLink : routeLinks) {
-				Placemark agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
+				Placemark agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo, iter);
 				if(!planFolder.containsFeature(agentLinkL.getId())){
 					planFolder.addFeature(agentLinkL);
 				}
 			}
 			Act act = (Act) actLegIter.nextAct();
 			actNumber++;
-			makeActKML(alter, act,actNumber, planFolder,agentLinkStyle);
+			makeActKML(alter, act,actNumber, planFolder,agentLinkStyle, iter);
 		}
 
 
@@ -379,7 +390,7 @@ public class EgoNetPlansItersMakeKML2 {
 					myStyle.getStyleUrl(),
 					true,
 					Feature.DEFAULT_REGION,
-					Feature.DEFAULT_TIME_PRIMITIVE);
+					timeStamp);
 			if(!facilitiesFolder.containsFeature(aFacility.getId())){
 				facilitiesFolder.addFeature(aFacility);
 			}
@@ -396,7 +407,7 @@ public class EgoNetPlansItersMakeKML2 {
 		System.out.println("    done.");
 
 	}
-	
+
 	private static void makeSocialLinkKML(Person myPerson, int i,
 			Folder folder, Style agentLinkStyle){
 		// Add a line from the alter's home to the ego's home in the color of the alter
@@ -410,7 +421,7 @@ public class EgoNetPlansItersMakeKML2 {
 				agentLinkStyle.getId(),
 				Feature.DEFAULT_VISIBILITY,
 				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
+				timeStamp);
 
 		CoordI coordFrom = trafo.transform((Coord)((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
 		Point pointFrom= new Point(coordFrom.getX(),coordFrom.getY(), 0.0);
@@ -441,7 +452,7 @@ public class EgoNetPlansItersMakeKML2 {
 				Feature.DEFAULT_STYLE_URL,
 				true,
 				Feature.DEFAULT_REGION,
-				new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, i)));
+				timeStamp);
 
 		if(!planFolder.containsFeature(as.getId())){
 			planFolder.addFeature(as);
@@ -485,7 +496,7 @@ public class EgoNetPlansItersMakeKML2 {
 							agentLinkStyle.getId(),
 							Feature.DEFAULT_VISIBILITY,
 							Feature.DEFAULT_REGION,
-							Feature.DEFAULT_TIME_PRIMITIVE);
+							timeStamp);
 
 					linkPlacemark.setGeometry(new LineString(oldPoint, pointOut));
 					as.addFeature(linkPlacemark);
@@ -551,7 +562,7 @@ public class EgoNetPlansItersMakeKML2 {
 				spaceStyle.getId(),
 				Feature.DEFAULT_VISIBILITY,
 				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
+				timeStamp);
 
 		// make the polygon feature
 		Polygon polygon = new Polygon(true,true,Geometry.DEFAULT_ALTITUDE_MODE);
@@ -565,7 +576,7 @@ public class EgoNetPlansItersMakeKML2 {
 
 	}
 
-	private static void makeActKML(Person myPerson, Act act, int actNo, Folder planFolder, Style agentLinkStyle) {
+	private static void makeActKML(Person myPerson, Act act, int actNo, Folder planFolder, Style agentLinkStyle, int iter) {
 		// TODO Auto-generated method stub
 
 		String styleUrl = null;
@@ -615,7 +626,7 @@ public class EgoNetPlansItersMakeKML2 {
 				styleUrl,
 				Feature.DEFAULT_VISIBILITY,
 				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
+				timeStamp);
 		if(!planFolder.containsFeature(pl.getId())){
 			planFolder.addFeature(pl);
 		}
@@ -672,6 +683,7 @@ public class EgoNetPlansItersMakeKML2 {
 	}
 
 	private static Color setColor(int i, int intervals) {
+
 		// returns a color as a function of integer i
 		int alpha = 255;
 
@@ -759,6 +771,34 @@ public class EgoNetPlansItersMakeKML2 {
 
 		return linkPlacemark;
 	}
+	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformationI trafo, int iter) {
 
+		Placemark linkPlacemark = null;
+
+		Node fromNode = link.getFromNode();
+		org.matsim.utils.geometry.shared.Coord fromNodeWorldCoord = fromNode.getCoord();
+		org.matsim.utils.geometry.shared.Coord fromNodeGeometryCoord = (Coord) trafo.transform(new Coord(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
+		Point fromPoint = new Point(fromNodeGeometryCoord.getX(), fromNodeGeometryCoord.getY(), 0.0);
+
+		Node toNode = link.getToNode();
+		org.matsim.utils.geometry.shared.Coord toNodeWorldCoord = toNode.getCoord();
+		org.matsim.utils.geometry.shared.Coord toNodeGeometryCoord = (Coord) trafo.transform(new Coord(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
+		Point toPoint = new Point(toNodeGeometryCoord.getX(), toNodeGeometryCoord.getY(), 0.0);
+
+		linkPlacemark = new Placemark(
+				"link" + link.getId(),
+				Feature.DEFAULT_NAME,
+				Feature.DEFAULT_DESCRIPTION,
+				Feature.DEFAULT_ADDRESS,
+				Feature.DEFAULT_LOOK_AT,
+				style.getStyleUrl(),
+				Feature.DEFAULT_VISIBILITY,
+				Feature.DEFAULT_REGION,
+				timeStamp);
+
+		linkPlacemark.setGeometry(new LineString(fromPoint, toPoint));
+
+		return linkPlacemark;
+	}
 }
 
