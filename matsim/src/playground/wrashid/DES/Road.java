@@ -107,7 +107,7 @@ public class Road extends SimUnit {
 	}
 
 	public void leaveRoad(Vehicle vehicle) {
-		System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
+		//System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
 		assert(carsOnTheRoad.getFirst()==vehicle);
 		carsOnTheRoad.removeFirst();
 		earliestDepartureTimeOfCar.removeFirst();
@@ -308,6 +308,10 @@ public class Road extends SimUnit {
 	
 	public void removeFirstDeadlockPreventionMessage(){
 		deadlockPreventionMessages.removeFirst();
+	}
+	
+	public void removeFromInterestedInEnteringRoad(){
+		interestedInEnteringRoad.removeFirst();
 	}
 
 }

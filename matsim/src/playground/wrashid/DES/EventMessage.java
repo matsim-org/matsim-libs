@@ -22,7 +22,9 @@ public abstract class EventMessage extends SelfhandleMessage {
 		if (logMessage){
 			EventLog ev=new EventLog(this.getMessageArrivalTime(),Integer.parseInt(vehicle.getOwnerPerson().getId().toString()),vehicle.getLegIndex()-1,Integer.parseInt(vehicle.getCurrentLink().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getFromNode().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getToNode().getId().toString()),eventType);
 			SimulationParameters.eventOutputLog.add(ev);
-			ev.print();
+			if (SimulationParameters.debugMode){
+				ev.print();
+			}
 		}
 		logEvent();
 	}
