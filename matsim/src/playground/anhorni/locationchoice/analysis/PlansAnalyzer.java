@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -47,6 +49,7 @@ public class PlansAnalyzer {
 
 	private Plans plans=null;
 	private NetworkLayer network=null;
+	private Facilities  facilities =null;
 
 	private final static Logger log = Logger.getLogger(PlansAnalyzer.class);
 
@@ -65,45 +68,57 @@ public class PlansAnalyzer {
 		String type[] = {"s", "l"};
 		
 		String networkfilePath="./input/network.xml";
+		String facilitiesfilePath="./input/facilities.xml.gz";
 
 		log.info(plansfilePath);
 
 		PlansAnalyzer analyzer = new PlansAnalyzer();
-		analyzer.init(plansfilePath, networkfilePath);
+		log.info("Initialize analysis:");
+		analyzer.init(plansfilePath, networkfilePath, facilitiesfilePath);
 		
+		log.info("Doing analysis");
 		for (int i=0; i<2; i++) {		
-			analyzer.analyze(type[i]);
-		}	
+			analyzer.analyzeActDuration(type[i]);		
+		}
+		analyzer.analyzeTotalNumberOfActivities();
+		analyzer.analyzeSLBetweenPrimary();
+		log.info("finished analysis");
 	}
 
-	private void init(final String plansfilePath, final String networkfilePath) {
+	private void init(final String plansfilePath, final String networkfilePath, final String facilitiesfilePath) {
 
 		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		log.info("network reading done");
+		
+		this.facilities=(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
+		log.info("facilities reading done");
 
 		this.plans=new Plans(false);
 		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
-		
-		
+			
 	}
 
 	
-	private void analyze(String type) {
+	private void analyzeActDuration(String type) {
 		
 		try {
 			final String header="Person_id\tActDuration\tTypicalDuration";
 			final BufferedWriter out = IOUtils.getBufferedWriter("./output/plananalysis"+type+".txt");
 			out.write(header);
 			out.newLine();
+					
+			int numberOfPersonsDoingType = 0;
 			
 			Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 			Counter counter = new Counter(" person # ");
 			while (person_iter.hasNext()) {
 				Person person = person_iter.next();
 				counter.incCounter();
+				boolean personSet = false;
 	
 				Plan selectedPlan = person.getSelectedPlan();
 	
@@ -115,15 +130,92 @@ public class PlansAnalyzer {
 								String.valueOf(act.getDur())+"\t"+
 								act.getType().substring(1));
 						out.newLine();
+						
+						if (!personSet) {
+							numberOfPersonsDoingType++;
+						}
 					}
 				}
 				out.flush();
 			}			
+			log.info("Number of persons doing "+type+" :"+ numberOfPersonsDoingType +"\n");
 			out.close();
 			}
 			catch (final IOException e) {
 				Gbl.errorMsg(e);
 			}
 		}
+	
+	private void analyzeTotalNumberOfActivities() {	
+		int countS = 0;
+		int countL = 0;
+		int countPrim = 0;
+	
+		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+		Counter counter = new Counter(" person # ");
+		while (person_iter.hasNext()) {
+			Person person = person_iter.next();
+			counter.incCounter();
+			Plan selectedPlan = person.getSelectedPlan();
+			final ArrayList<?> actslegs = selectedPlan.getActsLegs();
+			
+			
+			for (int j = 0; j < actslegs.size(); j=j+2) {
+				final Act act = (Act)actslegs.get(j);	
+				if (act.getType().startsWith("s")) {
+					countS++;
+				}
+				else if (act.getType().startsWith("l")) {
+					countL++;
+				}
+				else if (act.getType().startsWith("h") || act.getType().startsWith("w")|| 
+						act.getType().startsWith("e")) {
+					countPrim++;
+				}
+			}	
+		}
+		log.info("Total number of Shop Activities "+ countS);
+		log.info("Total number of Leisure Activities "+ countL);
+		log.info("Total number of Primary Activities "+ countPrim);	
+	}
+	
+	private void analyzeSLBetweenPrimary() {
+		
+		try {
+			final String header="Person_id\tnumberOfSL";
+			final BufferedWriter out = IOUtils.getBufferedWriter("./output/actchainsplananalysis.txt");
+			out.write(header);
+			out.newLine();
+		
+		
+			Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
+			Counter counter = new Counter(" person # ");
+			while (person_iter.hasNext()) {
+				Person person = person_iter.next();
+				counter.incCounter();
+				Plan selectedPlan = person.getSelectedPlan();
+				final ArrayList<?> actslegs = selectedPlan.getActsLegs();
+				
+				int countSL = 0;
+				for (int j = 0; j < actslegs.size(); j=j+2) {
+					final Act act = (Act)actslegs.get(j);	
+					if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
+						countSL++;
+					}
+					else if (act.getType().startsWith("h") || act.getType().startsWith("w")|| 
+							act.getType().startsWith("e")) {
+						if (countSL > 0) {
+							out.write(person.getId().toString()+"\t"+String.valueOf(countSL)+"\n");
+							countSL = 0;
+						}
+					}
+				}	
+			}
+			out.close();
+		}
+		catch (final IOException e) {
+			Gbl.errorMsg(e);
+		}	
+	}
 }
 
