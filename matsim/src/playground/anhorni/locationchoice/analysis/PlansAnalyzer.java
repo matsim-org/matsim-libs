@@ -84,7 +84,7 @@ public class PlansAnalyzer {
 	private void analyze(String type) {
 		
 		try {
-			final String header="Person_id\tActDuration";
+			final String header="Person_id\tActDuration\tTypicalDuration";
 			final BufferedWriter out = IOUtils.getBufferedWriter("./output/plananalysis"+type+".txt");
 			out.write(header);
 			out.newLine();
@@ -102,7 +102,8 @@ public class PlansAnalyzer {
 					final Act act = (Act)actslegs.get(j);	
 					if (act.getType().startsWith(type)) {
 						out.write(person.getId().toString()+"\t"+
-								String.valueOf(act.getDur()));
+								String.valueOf(act.getDur())+"\t"+
+								act.getType().substring(1));
 						out.newLine();
 					}
 				}
