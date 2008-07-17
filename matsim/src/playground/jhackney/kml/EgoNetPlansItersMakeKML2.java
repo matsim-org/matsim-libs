@@ -107,12 +107,14 @@ public class EgoNetPlansItersMakeKML2 {
 	private static Person ego;
 	private static TreeMap<Id,Color> colors = new TreeMap<Id,Color>();
 	private static TimeStamp timeStamp;
+	private static int nColors;
+	private static Person ai;
 
 	public static void setUp(Config config, NetworkLayer network) {
 		EgoNetPlansItersMakeKML2.config=config;
 		if(config.getModule(KML21_MODULE)==null) return;
 
-		System.out.println("    Set up...");
+		log.info("    Set up...");
 
 		trafo = TransformationFactory.getCoordinateTransformation(
 				TransformationFactory.CH1903_LV03, TransformationFactory.WGS84);
@@ -121,7 +123,7 @@ public class EgoNetPlansItersMakeKML2 {
 			config.getParam(KML21_MODULE, CONFIG_OUTPUT_DIRECTORY) +
 			SEP +
 			config.getParam(KML21_MODULE, CONFIG_OUTPUT_KML_DEMO_MAIN_FILE);
-		System.out.println(mainKMLFilename);
+		log.info(mainKMLFilename);
 //		coloredLinkKMLFilename =
 //		config.getParam(KML21_MODULE, CONFIG_OUTPUT_DIRECTORY) +
 //		SEP +
@@ -146,14 +148,14 @@ public class EgoNetPlansItersMakeKML2 {
 //		coloredLinkKMLDocument = new Document("network main feature");
 //		coloredLinkKML.setFeature(coloredLinkKMLDocument);
 
-		System.out.println("    done.");
+		log.info("    done.");
 
 		///////////////////////////
 		// display road network
 		///////////////////////////
 		Style linkStyle = new Style("defaultLinkStyle");
 		myKMLDocument.addStyle(linkStyle);
-		linkStyle.setLineStyle(new LineStyle(new Color("ff", "00", "00", "00"), ColorStyle.DEFAULT_COLOR_MODE, 2));
+		linkStyle.setLineStyle(new LineStyle(new Color("ff", "00", "00", "00"), ColorStyle.DEFAULT_COLOR_MODE, 1));
 
 		networkFolder = new Folder(
 				"network used",
@@ -177,7 +179,7 @@ public class EgoNetPlansItersMakeKML2 {
 
 		if(config.getModule(KML21_MODULE)==null) return;
 
-		System.out.println("    generating styles...");
+		log.info("    generating styles...");
 
 //		agentLinkStyle = new Style("agentLinkStyle");
 //		myKMLDocument.addStyle(agentLinkStyle);
@@ -233,37 +235,50 @@ public class EgoNetPlansItersMakeKML2 {
 		facStyle.put("leisure",leisureStyle);
 		facStyle.put("work",workStyle);
 
-		System.out.println("    done.");
+		log.info("    done.");
+		
+		nColors=36;
+		log.info("Setting nColors = "+ nColors);
 	}
 
 
 	public static void loadData(Person myPerson, int iter){
 
 		ego=myPerson;
+		ai=myPerson;
 		if(config.getModule(KML21_MODULE)==null) return;
 
-		System.out.println("    loading Plan data. Processing EgoNet ...");
+		log.info("    loading Plan data. Processing EgoNet ...");
 
 		// load Data into KML folders for myPerson
 		int i=0;
-		loadData(ego, 0, 1, iter);
+		ArrayList<Person> persons = myPerson.getKnowledge().getEgoNet().getAlters();
+		
+		// more colors than in current egonet to allow for adding agents to egonet without repeating colors
+//		nColors=persons.size()*2;
+		
+		loadData(ego, 0, iter);
 
 		// Proceed to the EgoNet of myPerson
-		ArrayList<Person> persons = myPerson.getKnowledge().getEgoNet().getAlters();
+		
 		Iterator<Person> altersIt= persons.iterator();
 
 		while(altersIt.hasNext()){
 			Person p = altersIt.next();
 			i++;
-			System.out.println("CALLING KML FOR EGONET PERSON "+p.getId());
-			loadData(p,i,persons.size(), iter);
+			log.info("CALLING KML FOR EGONET PERSON "+p.getId());
+			loadData(p,i, iter);
+
+			// Two persons in EgoNet are compared, agent i and agent j>i, to see if they know each other
+			// Update ai each iteration
+			ai=p;
 		}
 
-		System.out.println(" ... done.");
+		log.info(" ... done.");
 	}
-	public static void loadData(Person alter, int i, int nColors, int iter) {
+	public static void loadData(Person alter, int i, int iter) {
 
-		System.out.println("    loading Plan data. Processing person ...");
+		log.info("    loading Plan data. Processing person ...");
 //		TODO make one file per agent and put in the routes and acts each iteration
 //		TODO ensure that each agent has a unique color by using the P_ID (?how to quickly find min/max for scaling the colors?)
 
@@ -274,7 +289,7 @@ public class EgoNetPlansItersMakeKML2 {
 		if(colors.keySet().contains(alter.getId())){
 			color=colors.get(alter.getId());
 		}else{
-			color = setColor(i, (int)(nColors*1.5) + 1);// make 50% more colors than alters in case the social net is bigger in some iterations
+			color = setColor(i, nColors + 1);
 			colors.put(alter.getId(), color);
 		}
 		
@@ -305,7 +320,7 @@ public class EgoNetPlansItersMakeKML2 {
 //					new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
 
 
-			System.out.println("MAKING NEW KML AGENT FOLDER FOR "+ agentFolder.getId());
+			log.info("MAKING NEW KML AGENT FOLDER FOR "+ agentFolder.getId());
 			myKMLDocument.addFeature(agentFolder);
 			agentMap.put(agentFolder.getId(),agentFolder);
 		}else{
@@ -323,14 +338,21 @@ public class EgoNetPlansItersMakeKML2 {
 				true,
 				Feature.DEFAULT_REGION,
 				timeStamp);
-		System.out.println("MAKING NEW KML PLAN FOLDER "+planFolder.getId()+" FOR AGENT "+agentFolder.getId());
+		log.info("MAKING NEW KML PLAN FOLDER "+planFolder.getId()+" FOR AGENT "+agentFolder.getId());
 		agentFolder.addFeature(planFolder);
 
 		// put the activity space polygon into the planFolder
 //		makeActivitySpaceKML_Poly(myPerson, iter, planFolder, color);
 		makeActivitySpaceKML_Line(alter,iter,planFolder,agentLinkStyle);
 
-		makeSocialLinkKML(alter,iter,agentFolder,agentLinkStyle);
+		makeCoreSocialLinkKML(alter,iter,planFolder,agentLinkStyle);
+		log.info("");
+		if(!(ai.equals(ego))){
+			if(!(ai.equals(alter))){
+			log.info("Making tangential social link in grey");
+		makeTangentialSocialLinkKML(alter,iter,planFolder);
+		}
+		}
 
 		// put facilities in a folder, one facilities folder for each Plan
 		Folder facilitiesFolder = new Folder(
@@ -404,17 +426,46 @@ public class EgoNetPlansItersMakeKML2 {
 			aFacility.setLookAt(new LookAt(geometryCoord.getX(),geometryCoord.getY()));
 		}
 
-		System.out.println("    done.");
+		log.info("    done.");
 
 	}
 
-	private static void makeSocialLinkKML(Person myPerson, int i,
+	private static void makeTangentialSocialLinkKML(Person myPerson, int i,
+			Folder folder){
+		
+		
+		Style tangentialLinkStyle=new Style("tangentialLinkStyle"+myPerson.getId().toString());
+		Color color = new Color(255,128,128,128);
+		tangentialLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 14));
+		// Add a line from the alter's home to another alter's home in the color grey
+		String id = myPerson.getId().toString();
+		Placemark socialLink =  new Placemark(
+				id+ai.getId().toString()+"_"+i,
+				"Tangential social link_"+i,
+				Feature.DEFAULT_DESCRIPTION,
+				Feature.DEFAULT_ADDRESS,
+				Feature.DEFAULT_LOOK_AT,
+				tangentialLinkStyle.getId(),
+				Feature.DEFAULT_VISIBILITY,
+				Feature.DEFAULT_REGION,
+				timeStamp);
+
+		CoordI coordFrom = trafo.transform((Coord)((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Point pointFrom= new Point(coordFrom.getX(),coordFrom.getY(), 0.0);
+		CoordI coordTo = trafo.transform((Coord)((Act)ai.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Point pointTo= new Point(coordTo.getX(),coordTo.getY(), 0.0);
+		socialLink.setGeometry(new LineString(pointFrom, pointTo));
+		folder.addFeature(socialLink);
+		log.info("Feature added: grey social link from alter "+ai.getId()+" to alter "+myPerson.getId());
+	}
+	
+	private static void makeCoreSocialLinkKML(Person myPerson, int i,
 			Folder folder, Style agentLinkStyle){
 		// Add a line from the alter's home to the ego's home in the color of the alter
 		String id = myPerson.getId().toString();
 		Placemark socialLink =  new Placemark(
 				id+ego.getId().toString()+"_"+i,
-				"Social link_"+i,
+				"Core social link_"+i,
 				Feature.DEFAULT_DESCRIPTION,
 				Feature.DEFAULT_ADDRESS,
 				Feature.DEFAULT_LOOK_AT,
@@ -590,7 +641,7 @@ public class EgoNetPlansItersMakeKML2 {
 				fullActName = "morning home "+myPerson.getId();
 			} else {
 				fullActName = "evening home "+myPerson.getId();
-//				System.out.println(fullActName);
+//				log.info(fullActName);
 			}
 			break;
 		case 's':
@@ -688,11 +739,11 @@ public class EgoNetPlansItersMakeKML2 {
 		int alpha = 255;
 
 		int r = (int)(127.0 * (Math.sin((i * 2 * Math.PI) / intervals) + 1));
-//		System.out.println(r);
+//		log.info(r);
 		int g = (int)(127.0 * (Math.cos((i * 2 * Math.PI) / intervals) + 1));
-//		System.out.println(g);
+//		log.info(g);
 		int b = (int)(127.0 * (Math.sin((i * 2 * Math.PI) / intervals) * (-1) + 1));
-//		System.out.println(b);
+//		log.info(b);
 
 		String aStr = Integer.toHexString(alpha);
 		if (aStr.length() == 1) {
@@ -718,7 +769,7 @@ public class EgoNetPlansItersMakeKML2 {
 	public static void write() {
 
 		if(config.getModule(KML21_MODULE)==null) return;
-		System.out.println("    writing KML files out...");
+		log.info("    writing KML files out...");
 
 //		KMLWriter myKMLDocumentWriter;
 		KMZWriter myKMZDocumentWriter;
@@ -727,7 +778,8 @@ public class EgoNetPlansItersMakeKML2 {
 
 		try {
 			//add the matsim logo to the kml
-			networkFolder.addFeature(new MatsimKMLLogo(myKMZDocumentWriter));
+			myKMLDocument.addFeature(new MatsimKMLLogo(myKMZDocumentWriter));
+//			networkFolder.addFeature(new MatsimKMLLogo(myKMZDocumentWriter));
 		} catch (IOException e) {
 			log.error("Cannot add logo to the KMZ file.", e);
 		}
@@ -738,7 +790,7 @@ public class EgoNetPlansItersMakeKML2 {
 //		myKMLDocumentWriter = new KMLWriter(coloredLinkKML, coloredLinkKMLFilename, KMLWriter.DEFAULT_XMLNS, useCompression);
 
 
-		System.out.println("    done.");
+		log.info("    done.");
 
 	}
 
