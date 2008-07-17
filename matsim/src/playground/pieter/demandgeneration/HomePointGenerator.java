@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class HomePointGenerator {
-	
+
 	private Collection<Feature> polygons;
 	private String inputPersons;
 	private HashMap<String,MultiPolygon> polygonHashMap;
@@ -46,7 +46,8 @@ public class HomePointGenerator {
 	private Collection<Feature> pointCollection;
 	private String outputShape;
 	private TAZContainer tazContainer;
-	
+	private boolean checkForTAZ;
+
 
 	public HomePointGenerator(Collection<Feature> polygons, String inputPersons, CoordinateReferenceSystem coordinateReferenceSystem, String outputShape){
 		this.polygons = polygons;
@@ -56,6 +57,7 @@ public class HomePointGenerator {
 		this.coordRefSystem = coordinateReferenceSystem;
 		this.random = new Random(0);
 		this.outputShape = outputShape;
+		this.checkForTAZ = false;
 		initFeatures();
 	}
 	//overloaded in case you want to find TAZ
@@ -69,10 +71,11 @@ public class HomePointGenerator {
 		this.outputShape = outputShape;
 		initFeatures();
 		this.tazContainer = new TAZContainer(TAZShape);
+		this.checkForTAZ = true;
 	}
-	
-		
-	
+
+
+
 	private void initFeatures() {
 		//define the point collection with its attributes
 		final AttributeType[] homes = new AttributeType[4];
@@ -83,22 +86,21 @@ public class HomePointGenerator {
 
 		try {
 			this.ftHome = FeatureTypeFactory.newFeatureType(homes, "home");
-//						
+//
 		} catch (final FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (final SchemaException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void run() throws IllegalAttributeException, IOException, FactoryException, SchemaException {
-		
+
 		indexPolygons();
 		this.pointCollection = new ArrayList<Feature>();
 		//reads the input file which lists SP_CODE , number of persons in SP who travel by car
 		Scanner inputReader = new Scanner(new File(this.inputPersons));
 		int persId = 0;
-		boolean checkForTAZ = !this.tazContainer.equals(null);
 		while (inputReader.hasNext()) {
 			//reads SP_CODE as string, same as hashmap keys
 			String SP_CODE = inputReader.next();
@@ -108,12 +110,12 @@ public class HomePointGenerator {
 				//in case the text file references a SP we dont have in  shapefile
 				continue;
 			}
-			
+
 			for (int i = 0; i < numberOfPeopleInSP; i++) {
 				//create point geometry in the polygon
 				Point point = getRandomizedCoord(multiPoly);
 				String homeTAZ = "9999";
-				if(checkForTAZ){
+				if(this.checkForTAZ){
 					homeTAZ = tazContainer.findContainerID(point);
 				}
 				Object [] fta = {point,persId++,Integer.parseInt(SP_CODE),Integer.parseInt(homeTAZ)};
@@ -124,7 +126,7 @@ public class HomePointGenerator {
 		}
 		ShapeFileWriter.writeGeometries(this.pointCollection, this.outputShape);
 	}
-	
+
 	private Point getRandomizedCoord(MultiPolygon mp) {
 		Polygon bounds = (Polygon)mp.getEnvelope();
 		//get the opposing corner coords from the bounding box
@@ -136,12 +138,12 @@ public class HomePointGenerator {
 		do {
 
 			double offsetX = this.random.nextDouble() * dMaxX;
-			double offsetY = this.random.nextDouble() * dMaxY;		
+			double offsetY = this.random.nextDouble() * dMaxY;
 			p = this.geofac.createPoint(new Coordinate(min.x+offsetX,min.y+offsetY));
 
 		} while (!mp.contains(p)); //keep doing this until the point falls inside the multipoly
 
-		return p; 
+		return p;
 	}
 
 	private void indexPolygons() {
@@ -163,7 +165,7 @@ public class HomePointGenerator {
 	}
 
 	public static Collection<Feature> getFeatures(final FeatureSource n) {
-		
+
 		final Collection<Feature> featColl = new ArrayList<Feature>();
 		org.geotools.feature.FeatureIterator ftIterator = null;
 		try {
@@ -194,8 +196,10 @@ public class HomePointGenerator {
 			e.printStackTrace();
 		}
 		final Collection<Feature> inputFeatureCollection = getFeatures(featSrc);
-		
-		new HomePointGenerator(inputFeatureCollection,inputPersons,featSrc.getSchema().getDefaultGeometry().getCoordinateSystem(),outputShape, TAZShape).run();
+		//use this if you have a taz shapefile
+		//new HomePointGenerator(inputFeatureCollection,inputPersons,featSrc.getSchema().getDefaultGeometry().getCoordinateSystem(),outputShape, TAZShape).run();
+		//and this if not
+		new HomePointGenerator(inputFeatureCollection,inputPersons,featSrc.getSchema().getDefaultGeometry().getCoordinateSystem(),outputShape).run();
 		System.out.printf("Done! Point shapefile output to %s", outputShape);
 	}
 //end Class
