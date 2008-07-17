@@ -14,11 +14,11 @@ public class Test1 extends TestCase {
 	/**
 	 * @param args
 	 */
-	
+	/*
 	public static void main(String[] args) {
 		// the config file comes as input
 		
-		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test1/";
+		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test6/";
 		args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
@@ -35,10 +35,10 @@ public class Test1 extends TestCase {
 		
 		//assertEquals(EventLog.compare(eventLog1,eventLog2),true);
 	}
-
+*/
 	
 	public void testTest1() {
-		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test1/";
+		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test6/";
 		String[] args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
@@ -49,11 +49,9 @@ public class Test1 extends TestCase {
 		
 		ArrayList<EventLog> eventLog1= SimulationParameters.eventOutputLog;
 		
-		//EventLog.print(eventLog1);
+		EventLog.print(eventLog1);
 		
 		ArrayList<EventLog> eventLog2= CppEventFileParser.eventLog;
-		
-		
 		
 		
 		assertEquals(EventLog.absAverageLinkDiff(eventLog1,eventLog2)<SimulationParameters.maxAbsLinkAverage,true);

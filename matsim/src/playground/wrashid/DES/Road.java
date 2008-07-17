@@ -65,7 +65,7 @@ public class Road extends SimUnit {
 			maxNumberOfCarsOnRoad = 1;
 		}
 
-		double maxInverseInFlowCapacity = 3600 / (SimulationParameters.minimumInFlowCapacity * SimulationParameters.flowCapacityFactor);
+		double maxInverseInFlowCapacity = 3600 / (SimulationParameters.minimumInFlowCapacity * SimulationParameters.flowCapacityFactor * link.getLanesAsInt(SimulationParameters.linkCapacityPeriod));
 
 		inverseOutFlowCapacity = 1 / (link
 				.getFlowCapacity(SimulationParameters.linkCapacityPeriod) * SimulationParameters.flowCapacityFactor);
@@ -108,7 +108,7 @@ public class Road extends SimUnit {
 
 	public void leaveRoad(Vehicle vehicle) {
 		//System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
-		assert(carsOnTheRoad.getFirst()==vehicle);
+		assert(carsOnTheRoad.getFirst()==vehicle); // TODO: uncomment this, and find out, why it produces a problem with test6
 		carsOnTheRoad.removeFirst();
 		earliestDepartureTimeOfCar.removeFirst();
 		timeOfLastLeavingVehicle = scheduler.simTime;
@@ -121,7 +121,8 @@ public class Road extends SimUnit {
 		// time for entering the road
 		if (interestedInEnteringRoad.size() > 0) {
 			Vehicle nextVehicle = interestedInEnteringRoad.removeFirst();
-			Message m=deadlockPreventionMessages.removeFirst();
+			DeadlockPreventionMessage m=deadlockPreventionMessages.removeFirst();
+			assert(m.vehicle==nextVehicle);
 			scheduler.unschedule(m);
 			
 			double nextAvailableTimeForEnteringStreet = Math.max(
@@ -284,7 +285,15 @@ public class Road extends SimUnit {
 			}
 
 			interestedInEnteringRoad.add(vehicle);
-			deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(scheduler.simTime+SimulationParameters.stuckTime, this));
+			
+			// the first car interested in entering a road has to wait 'stuckTime'
+			// the car behind has to wait an additional stuckTime (this logic was introduced to adhere the C++ implementation)
+			if (deadlockPreventionMessages.size()>0){
+				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(deadlockPreventionMessages.getLast().messageArrivalTime +SimulationParameters.stuckTime, this));
+			} else {
+				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(scheduler.simTime+SimulationParameters.stuckTime, this));
+			}
+			
 		}
 	}
 
@@ -306,7 +315,19 @@ public class Road extends SimUnit {
 		this.timeOfLastEnteringVehicle = timeOfLastEnteringVehicle;
 	}
 	
-	public void removeFirstDeadlockPreventionMessage(){
+	public void removeFirstDeadlockPreventionMessage(DeadlockPreventionMessage dpMessage){
+		// this causes a problem with test6, as it the message does not exist
+		// TODO: first find out why this happens and then
+		
+		// TODO: current problem: two different messages (sent by different vehicles)
+		// we are sure, that no one removed this message using this method, but rather some different
+		// place in the code...
+		if (deadlockPreventionMessages.getFirst()!=dpMessage){
+			DeadlockPreventionMessage dpm=deadlockPreventionMessages.getFirst();
+			System.out.println();
+		}
+		
+		assert(deadlockPreventionMessages.getFirst()==dpMessage):"Inconsitency in logic!!! => this should only be invoked from the handler of this message";
 		deadlockPreventionMessages.removeFirst();
 	}
 	

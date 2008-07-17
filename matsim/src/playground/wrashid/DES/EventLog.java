@@ -146,7 +146,8 @@ public class EventLog {
 		HashMap<Integer,Double[]> hm=new HashMap<Integer,Double[]>(); // key: int (linkId) 
 		                          // value: double[4] (startCurrentLink1,totalUsageDurationLink1,startCurrentLink2,totalUsageDurationLink2) 
 		
-		assert eventLog1.size()==eventLog2.size():"The size of both eventLogs must be the same!";
+		assert eventLog1.size()==eventLog2.size():"The size of both eventLogs must be the same!" + eventLog1.size() + " - "+ eventLog2.size();
+		
 		for(int i=0;i<eventLog1.size();i++) {
 			
 			int link1=eventLog1.get(i).getLinkId();

@@ -15,6 +15,7 @@ public class SimulationParameters {
 	public static double carSize=7.5; // in meter
 	public static double minimumInFlowCapacity=1800; // diese konstante ist hardcodiert bei der C++ simulation (in Frz/stunde)
 													// diese wird auch skaliert mit dem flowCapacityFactor
+													// Attention: This is 1800 per lane!!!!
 	
 	public static ArrayList<EventLog> eventOutputLog=new ArrayList<EventLog>();
 	

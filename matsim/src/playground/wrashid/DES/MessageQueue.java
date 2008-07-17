@@ -18,9 +18,12 @@ public class MessageQueue {
 	void putMessage(Message m){
 		long rlong=counter++;
 		// padding with zeros is needed, inorder to be able to use firstKey property of the queue
-		String zeroPadded=feedWithZeros(m.getMessageArrivalTime());
-		m.queueKey=zeroPadded.concat((new Long(rlong)).toString());
+		//String zeroPadded=feedWithZeros(m.getMessageArrivalTime());
+		String zeroPadded=Double.toString(m.getMessageArrivalTime());
+		m.queueKey=zeroPadded.concat("."+(new Long(rlong)).toString());
 		queue.put(m.queueKey,m);
+		
+
 		
 		if (SimulationParameters.debugMode && (counter % 1000000 == 0)){
 			System.out.println("MessageQueue.counter:"+ counter);
@@ -33,6 +36,7 @@ public class MessageQueue {
 	
 	Message getNextMessage(){
 		Message m=(Message) queue.remove(queue.firstKey());
+		//System.out.println(m.queueKey);
 		return m;
 	}
 	
