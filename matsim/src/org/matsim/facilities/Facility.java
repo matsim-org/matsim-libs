@@ -339,6 +339,17 @@ public class Facility extends AbstractLocation {
 		}
 	}
 	
+	// hour 0..23
+	public double getLoadPerHour(int hour) {
+		double hourlyLoad = 0.0;
+
+		for (int i = 0; i<4 ; i++) {
+			int index = hour*4 + i;
+			hourlyLoad += this.load[index];
+		}
+		return hourlyLoad;
+	}
+	
 	
 
 	public double getSumCapacityPenaltyFactor() {
