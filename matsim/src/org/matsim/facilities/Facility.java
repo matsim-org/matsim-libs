@@ -53,7 +53,12 @@ public class Facility extends AbstractLocation {
 	private final static Logger log = Logger.getLogger(Facility.class);
 
 	private final TreeMap<String, Activity> activities = new TreeMap<String, Activity>();
+	
+	// visitors which are included in the penalty calculation
 	private int numberOfVisitorsPerDay = 0;
+	
+	// including visitors which arrive after 24:00
+	private int allVisitors = 0;
 	
 	private int scaleNumberOfPersons = 1;
 
@@ -220,6 +225,10 @@ public class Facility extends AbstractLocation {
 	public void addVisitorsPerDay(int scaleNumberOfPersons) {
 		this.numberOfVisitorsPerDay += scaleNumberOfPersons;
 	}
+	
+	public void addAllVisitors(int scaleNumberOfPersons) {
+		this.allVisitors += scaleNumberOfPersons;
+	}
 
 	public void setAttrFactor(double attrFactor) {
 		this.attrFactor = attrFactor;
@@ -228,7 +237,8 @@ public class Facility extends AbstractLocation {
 
 	// time in seconds from midnight
 	public void addArrival(double time, int scaleNumberOfPersons) {
-				
+		
+		this.addAllVisitors(scaleNumberOfPersons);
 		// we do not handle times > 24h
 		// we do not care about #arrivals==#departures after the last time bin
 		if (time > 24.0*3600.0) {
@@ -385,6 +395,14 @@ public class Facility extends AbstractLocation {
 	public final String toString() {
 		return super.toString() +
 		       "[nof_activities=" + this.activities.size() + "]";
+	}
+
+	public int getAllVisitors() {
+		return allVisitors;
+	}
+
+	public void setAllVisitors(int allVisitors) {
+		this.allVisitors = allVisitors;
 	}
 
 }
