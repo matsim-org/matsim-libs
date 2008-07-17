@@ -151,12 +151,16 @@ public class PlansAnalyzer {
 		int countS = 0;
 		int countL = 0;
 		int countPrim = 0;
+		
+		int numberOfPersonsDoingSL = 0;
 	
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 		while (person_iter.hasNext()) {
 			Person person = person_iter.next();
 			counter.incCounter();
+			boolean personSet = false;
+			
 			Plan selectedPlan = person.getSelectedPlan();
 			final ArrayList<?> actslegs = selectedPlan.getActsLegs();
 			
@@ -165,9 +169,17 @@ public class PlansAnalyzer {
 				final Act act = (Act)actslegs.get(j);	
 				if (act.getType().startsWith("s")) {
 					countS++;
+					if (!personSet) {
+						numberOfPersonsDoingSL++;
+						personSet = true;
+					}
 				}
 				else if (act.getType().startsWith("l")) {
 					countL++;
+					if (!personSet) {
+						numberOfPersonsDoingSL++;
+						personSet = true;
+					}
 				}
 				else if (act.getType().startsWith("h") || act.getType().startsWith("w")|| 
 						act.getType().startsWith("e")) {
@@ -178,6 +190,7 @@ public class PlansAnalyzer {
 		log.info("Total number of Shop Activities "+ countS);
 		log.info("Total number of Leisure Activities "+ countL);
 		log.info("Total number of Primary Activities "+ countPrim);	
+		log.info("Number of Persons Doing Shop or Leisure "+ numberOfPersonsDoingSL);	
 	}
 	
 	private void analyzeSLBetweenPrimary() {
