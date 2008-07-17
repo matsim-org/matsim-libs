@@ -82,7 +82,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
 		Facilities facilities = controler.getFacilities();
-		
+				
 		if (event.getIteration() % 10 == 0) {
 			this.printStatistics(facilities, controler.getIterationPath(), event.getIteration());
 		}	
@@ -111,12 +111,12 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 				
 				Coord bellevue = new Coord(683508.50, 246832.91);
 				if (facility.getCenter().calcDistance(bellevue) <= 30000) {
-							
+												
 					Iterator<Activity> act_it=facility.getActivities().values().iterator();
 					while (act_it.hasNext()){
 						Activity activity = act_it.next();
 						// check if this is a shopping facility
-						if (activity.getType().startsWith("s")) {
+						if (activity.getType().startsWith("s") && !activity.getType().equals("shop_other")) {
 							out_shop.write(facility.getId().toString()+"\t"+
 								String.valueOf(facility.getCenter().getX())+"\t"+
 								String.valueOf(facility.getCenter().getY())+"\t"+
