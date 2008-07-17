@@ -142,7 +142,8 @@ public class PlansAnalyzer {
 				out.flush();
 			}			
 			log.info("Number of persons doing "+type+" :"+ numberOfPersonsDoingType +"\n");
-			log.info("Avg number of trips per person: "+numberOfTrips/(this.plans.getPersons().size()));
+			double avgNumberOfTrips = (double)numberOfTrips/(double)this.plans.getPersons().size();
+			log.info("Avg number of trips per person: "+avgNumberOfTrips);
 			out.close();
 			}
 			catch (final IOException e) {
