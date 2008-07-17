@@ -94,12 +94,15 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 			final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tCapacity\tAttrFactor\tsumPenaltyFactor";
 			final BufferedWriter out_shop = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_shop.txt");
 			final BufferedWriter out_leisure = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_leisure.txt");
+			final BufferedWriter out_shop_summary = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_summary.txt");
 
 			out_shop.write(header);
 			out_shop.newLine();
 			
 			out_leisure.write(header);
 			out_leisure.newLine();
+			
+			double loadPerHourSum[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 			Iterator<? extends Facility> iter = facilities.getFacilities().values().iterator();
 			while (iter.hasNext()){
@@ -117,7 +120,12 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 							String.valueOf(facility.getDailyCapacity())+"\t"+
 							String.valueOf(facility.getAttrFactor()+"\t"+
 							String.valueOf(facility.getSumCapacityPenaltyFactor())));
-						out_shop.newLine();						
+						out_shop.newLine();	
+						
+						for (int i = 0; i<24; i++) {
+							loadPerHourSum[i] += facility.getLoadPerHour(i);
+						}
+						
 						break;
 					}
 					//or a leisure facility
@@ -139,6 +147,15 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 			
 			out_leisure.flush();
 			out_leisure.close();
+			
+			out_shop_summary.write("Hour\tLoad");
+			for (int i = 0; i<24; i++) {
+				out_shop_summary.write(String.valueOf(i)+"\t"+String.valueOf(loadPerHourSum[i]));
+				out_leisure.newLine();
+				out_shop_summary.flush();
+			}
+			out_shop_summary.close();
+			
 		}
 		catch (final IOException e) {
 			Gbl.errorMsg(e);
