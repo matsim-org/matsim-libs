@@ -149,9 +149,10 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 			out_leisure.close();
 			
 			out_shop_summary.write("Hour\tLoad");
+			out_shop_summary.newLine();
 			for (int i = 0; i<24; i++) {
 				out_shop_summary.write(String.valueOf(i)+"\t"+String.valueOf(loadPerHourSum[i]));
-				out_leisure.newLine();
+				out_shop_summary.newLine();
 				out_shop_summary.flush();
 			}
 			out_shop_summary.close();
