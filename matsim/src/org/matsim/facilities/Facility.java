@@ -331,7 +331,7 @@ public class Facility extends AbstractLocation {
 			if (activity.getType().startsWith("s")) {
 				for (int i=0; i<this.numberOfTimeBins; i++) {
 					int index = (int)(i / 4);
-					this.capacity[i] *= (this.capacitiesPerHour[index]/this.capacitySum) * shopCapacity24;
+					this.capacity[i] = (this.capacitiesPerHour[index]/this.capacitySum) * shopCapacity24;
 				}	
 				this.dailyCapacity = (int)shopCapacity24;
 			break;
