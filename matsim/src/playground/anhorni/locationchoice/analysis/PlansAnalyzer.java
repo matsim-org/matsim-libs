@@ -133,6 +133,7 @@ public class PlansAnalyzer {
 						
 						if (!personSet) {
 							numberOfPersonsDoingType++;
+							personSet = true;
 						}
 					}
 				}
