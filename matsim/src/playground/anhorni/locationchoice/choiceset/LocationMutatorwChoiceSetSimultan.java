@@ -19,15 +19,8 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 	}
 	
 	@Override
-	protected void handleSubChain(SubChain subChain, double speed, int trialNr) {
-		
-		if (subChain.getTtBudget() < 1.0) {
-			log.info("Could not do location choice, TTBudget too small");
-		}
-		
-		if (trialNr % 10 == 0 && trialNr > 0) {
-			speed *= 0.9;
-		}
+	protected boolean handleSubChain(SubChain subChain, double speed, int trialNr) {
+				
 		if (trialNr > 100) {
 			log.info("Could not do location choice");
 			
@@ -36,7 +29,7 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 				Act act = act_it.next();
 				this.modifyLocation(act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE, 0);
 			}
-			return;
+			return true;
 		}
 		
 		CoordI startCoord = subChain.getStartCoord();
@@ -50,8 +43,7 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			Act act = act_it.next();
 			double radius = (ttBudget * speed) / 2.0;	
 			if (!this.modifyLocation(act, startCoord, endCoord, radius, 0)) {
-				this.handleSubChain(subChain, speed, trialNr++);
-				return;
+				return false;
 			}
 					
 			startCoord = act.getCoord();				
@@ -59,10 +51,10 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			double tt2Anchor = this.computeTravelTime(act, subChain.getLastPrimAct());
 			
 			if ((ttBudget - tt2Anchor) <= 0.0) {
-				this.handleSubChain(subChain, speed, trialNr++);
-				return;
+				return false;
 			}
 			prevAct = act;
 		}
+		return true;
 	}
 }

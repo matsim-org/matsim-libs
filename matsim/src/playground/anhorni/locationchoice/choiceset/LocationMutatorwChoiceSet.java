@@ -50,14 +50,26 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		while (sc_it.hasNext()) {
 			SubChain sc = sc_it.next();
 			
-			// a ttFactor (1.0) should be calculated for faster convergence
-			this.handleSubChain(sc, speed, 0);
+			if (sc.getTtBudget() < 1.0) {
+				log.info("Could not do location choice, TTBudget too small");
+			}
+					
+			int nrOfTrials = 0;
+			boolean successful = false;
+			while (!successful) {
+				
+				if (nrOfTrials % 10 == 0 && nrOfTrials > 0) {
+					speed *= 0.9;
+				}
+				
+				successful = this.handleSubChain(sc, speed, nrOfTrials);
+				nrOfTrials++;
+			}
 		}
 	}
 	
 	
-	protected void handleSubChain(SubChain subChain, double speed, int trialNr) {
-	}
+	protected abstract boolean handleSubChain(SubChain subChain, double speed, int trialNr);
 	
 	protected boolean modifyLocation(Act act, CoordI startCoord, CoordI endCoord, double radius, int trialNr) {
 		

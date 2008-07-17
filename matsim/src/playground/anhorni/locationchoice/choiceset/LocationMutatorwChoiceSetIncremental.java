@@ -16,7 +16,8 @@ public class LocationMutatorwChoiceSetIncremental extends LocationMutatorwChoice
 	}
 	
 	@Override
-	protected void handleSubChain(SubChain subChain, double speed, int trialNr) {
+	protected boolean handleSubChain(SubChain subChain, double speed, int trialNr) {
 		log.info("handleSubChain");
+		return true;
 	}
 }
