@@ -163,7 +163,7 @@ public class Facility extends AbstractLocation {
 
 		capPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
 		capPenaltyFactor = Math.min(1.0, capPenaltyFactor);		
-		this.sumCapacityPenaltyFactor += capPenaltyFactor;
+		this.sumCapacityPenaltyFactor += capPenaltyFactor * this.scaleNumberOfPersons;
 		return capPenaltyFactor;
 	}
 
