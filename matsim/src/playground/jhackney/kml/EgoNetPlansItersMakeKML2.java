@@ -512,7 +512,7 @@ public class EgoNetPlansItersMakeKML2 {
 
 		// make the activity spaces
 		new PersonCalcActivitySpace("all").run(myPerson);
-		new PersonDrawActivitySpace().run(myPerson);
+//		new PersonDrawActivitySpace().run(myPerson);
 		// add the points of the activity space to the polygon
 		ActivitySpace space = myPerson.getKnowledge().getActivitySpaces().get(0);
 		if (space instanceof ActivitySpaceEllipse) {
