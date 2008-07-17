@@ -112,6 +112,7 @@ public class PlansAnalyzer {
 			out.newLine();
 					
 			int numberOfPersonsDoingType = 0;
+			int numberOfTrips = 0;
 			
 			Iterator<Person> person_iter = this.plans.getPersons().values().iterator();
 			Counter counter = new Counter(" person # ");
@@ -137,9 +138,11 @@ public class PlansAnalyzer {
 						}
 					}
 				}
+				numberOfTrips += (actslegs.size()-1)/2;
 				out.flush();
 			}			
 			log.info("Number of persons doing "+type+" :"+ numberOfPersonsDoingType +"\n");
+			log.info("Avg number of trips per person: "+numberOfTrips/(this.plans.getPersons().size()));
 			out.close();
 			}
 			catch (final IOException e) {
