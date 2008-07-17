@@ -36,6 +36,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
@@ -107,38 +108,42 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 			Iterator<? extends Facility> iter = facilities.getFacilities().values().iterator();
 			while (iter.hasNext()){
 				Facility facility = iter.next();
+				
+				Coord bellevue = new Coord(683508.50, 246832.91);
+				if (facility.getCenter().calcDistance(bellevue) <= 30000) {
 							
-				Iterator<Activity> act_it=facility.getActivities().values().iterator();
-				while (act_it.hasNext()){
-					Activity activity = act_it.next();
-					// check if this is a shopping facility
-					if (activity.getType().startsWith("s")) {
-						out_shop.write(facility.getId().toString()+"\t"+
-							String.valueOf(facility.getCenter().getX())+"\t"+
-							String.valueOf(facility.getCenter().getY())+"\t"+
-							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-							String.valueOf(facility.getDailyCapacity())+"\t"+
-							String.valueOf(facility.getAttrFactor()+"\t"+
-							String.valueOf(facility.getSumCapacityPenaltyFactor())));
-						out_shop.newLine();	
-						
-						for (int i = 0; i<24; i++) {
-							loadPerHourSum[i] += facility.getLoadPerHour(i);
+					Iterator<Activity> act_it=facility.getActivities().values().iterator();
+					while (act_it.hasNext()){
+						Activity activity = act_it.next();
+						// check if this is a shopping facility
+						if (activity.getType().startsWith("s")) {
+							out_shop.write(facility.getId().toString()+"\t"+
+								String.valueOf(facility.getCenter().getX())+"\t"+
+								String.valueOf(facility.getCenter().getY())+"\t"+
+								String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
+								String.valueOf(facility.getDailyCapacity())+"\t"+
+								String.valueOf(facility.getAttrFactor()+"\t"+
+								String.valueOf(facility.getSumCapacityPenaltyFactor())));
+							out_shop.newLine();	
+							
+							for (int i = 0; i<24; i++) {
+								loadPerHourSum[i] += facility.getLoadPerHour(i);
+							}
+							
+							break;
 						}
-						
-						break;
-					}
-					//or a leisure facility
-					if (activity.getType().startsWith("l")) {
-						out_leisure.write(facility.getId().toString()+"\t"+
-							String.valueOf(facility.getCenter().getX())+"\t"+
-							String.valueOf(facility.getCenter().getY())+"\t"+
-							String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-							String.valueOf(facility.getDailyCapacity())+"\t"+
-							String.valueOf(1.0)+"\t"+
-							String.valueOf(0.0));						
-						out_leisure.newLine();							
-						break;
+						//or a leisure facility
+						if (activity.getType().startsWith("l")) {
+							out_leisure.write(facility.getId().toString()+"\t"+
+								String.valueOf(facility.getCenter().getX())+"\t"+
+								String.valueOf(facility.getCenter().getY())+"\t"+
+								String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
+								String.valueOf(facility.getDailyCapacity())+"\t"+
+								String.valueOf(1.0)+"\t"+
+								String.valueOf(0.0));						
+							out_leisure.newLine();							
+							break;
+						}
 					}
 				}
 			}
