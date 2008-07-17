@@ -66,7 +66,7 @@ public class Facility extends AbstractLocation {
 	private final int numberOfTimeBins = 4*24;
 	private int dailyCapacity = 0;
 	
-	private final double baseCapacity24 = 1.2*225.61;
+	private final double baseCapacity24 = 1.5*225.61;
 	
 	private final double capacitiesPerHour[] = {
 			0.0000,
