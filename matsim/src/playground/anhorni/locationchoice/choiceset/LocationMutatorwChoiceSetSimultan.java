@@ -19,13 +19,16 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 	}
 	
 	@Override
-	protected void handleSubChain(SubChain subChain, double speed, int trialNr, double ttFactor) {
+	protected void handleSubChain(SubChain subChain, double speed, int trialNr) {
 		
 		if (subChain.getTtBudget() < 1.0) {
 			log.info("Could not do location choice, TTBudget too small");
 		}
 		
-		if (trialNr > 10) {
+		if (trialNr % 10 == 0 && trialNr > 0) {
+			speed *= 0.9;
+		}
+		if (trialNr > 100) {
 			log.info("Could not do location choice");
 			
 			Iterator<Act> act_it = subChain.getSlActs().iterator();
@@ -45,19 +48,18 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 		Iterator<Act> act_it = subChain.getSlActs().iterator();
 		while (act_it.hasNext()) {
 			Act act = act_it.next();
-			
-			double hypotenuse = (ttBudget * speed) / 2.0;
-			double cathetus = prevAct.getCoord().calcDistance(subChain.getLastPrimAct().getCoord());
-			double radius = Math.sqrt(Math.pow(hypotenuse, 2.0) - Math.pow(cathetus, 2.0));	
-		
-			this.modifyLocation(act, startCoord, endCoord, radius, 0);
+			double radius = (ttBudget * speed) / 2.0;	
+			if (!this.modifyLocation(act, startCoord, endCoord, radius, 0)) {
+				this.handleSubChain(subChain, speed, trialNr++);
+				return;
+			}
 					
 			startCoord = act.getCoord();				
 			ttBudget -= this.computeTravelTime(prevAct, act);
 			double tt2Anchor = this.computeTravelTime(act, subChain.getLastPrimAct());
 			
 			if ((ttBudget - tt2Anchor) <= 0.0) {
-				this.handleSubChain(subChain, speed * 0.9, trialNr++, ttFactor);
+				this.handleSubChain(subChain, speed, trialNr++);
 				return;
 			}
 			prevAct = act;

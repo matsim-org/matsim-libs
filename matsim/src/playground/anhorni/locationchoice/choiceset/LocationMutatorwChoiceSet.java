@@ -42,28 +42,25 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 
 	protected void handleSubChains(final Plan plan, List<SubChain> subChains) {
 		
-		//initially using 25 km/h + 10 %
-		// mikrozensus 2005
-		double speed = 27.5/3.6;
+		//initially using 25.3 km/h + 10 %
+		// mikro census 2005
+		double speed = 27.8/3.6;
 		
 		Iterator<SubChain> sc_it = subChains.iterator();
 		while (sc_it.hasNext()) {
 			SubChain sc = sc_it.next();
 			
 			// a ttFactor (1.0) should be calculated for faster convergence
-			this.handleSubChain(sc, speed, 0, 1.0);
+			this.handleSubChain(sc, speed, 0);
 		}
 	}
 	
 	
-	protected void handleSubChain(SubChain subChain, double speed, int trialNr, double ttFactor) {
+	protected void handleSubChain(SubChain subChain, double speed, int trialNr) {
 	}
 	
-	protected void modifyLocation(Act act, CoordI startCoord, CoordI endCoord, double radius, int trialNr) {
+	protected boolean modifyLocation(Act act, CoordI startCoord, CoordI endCoord, double radius, int trialNr) {
 		
-		if (trialNr > 10) {
-			radius = Double.MAX_VALUE;
-		}
 		ArrayList<Facility> choiceSet = this.computeChoiceSet
 		(startCoord, endCoord, radius, act.getType());
 		
@@ -72,11 +69,10 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
            			           Gbl.random.nextInt(choiceSet.size()-1)];
        		act.setLink(this.network.getNearestLink(facility.getCenter()));
        		act.setCoord(facility.getCenter());
-       		return;
+       		return true;
 		}
 		else {
-			this.modifyLocation(act, startCoord, endCoord, (radius + 1000.0)*1.1, trialNr++);
-			return; 			
+			return false; 			
 		}	
 	}
 	
