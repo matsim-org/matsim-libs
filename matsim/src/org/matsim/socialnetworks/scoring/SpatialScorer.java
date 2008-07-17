@@ -48,7 +48,7 @@ public class SpatialScorer {
 	static final private Logger log = Logger.getLogger(SpatialScorer.class);
 
 //	public SpatialScorer() {
-//		
+
 //	}
 	/**
 	 * The Plans contain all agents who are chosen to get scores for social interactions.
@@ -177,7 +177,7 @@ public class SpatialScorer {
 	 * @param rndEncounterProbability
 	 * @param iteration
 	 */
-	public double scoreFriendtoFoeInTimeWindow(Plan plan) {
+	public double calculateFriendtoFoeInTimeWindow(Plan plan) {
 
 		double friend=0.;
 		double foe=0.;
@@ -215,7 +215,70 @@ public class SpatialScorer {
 		if((friend+foe)==0){
 			return 0;
 		}else
-		return friend/(foe+.1*(friend+foe));
+			return friend/(foe+.1*(friend+foe));
+	}
+	/**
+	 * Calculates a set of statistics about the face to face interactions
+	 * at a social event
+	 * @param plan
+	 * @return
+	 */
+	public ArrayList<Double> calculateTimeWindowStats(Plan plan) {
+
+		ArrayList<Double> stats=new ArrayList<Double>();
+		// stats(0)=friendFoeRatio
+		// stats(1)=nFriends
+		// stats(2)=totalTimeWithFriends
+		double friend=0.;
+		double foe=0.;
+		double totalTimeWithFriends=0;
+
+		ActIterator ait=plan.getIteratorAct();
+		Person p1=plan.getPerson();
+		while(ait.hasNext()){
+			Act act1 = (Act) ait.next();
+			Activity myActivity=act1.getFacility().getActivity(act1.getType());
+			ArrayList<Person> visitors=activityMap.get(myActivity);
+			if(!activityMap.keySet().contains(myActivity)){
+				Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
+			}
+			if(!(visitors.size()>0)){
+				Gbl.errorMsg(this.getClass()+" number of visitors not >0");
+			}
+			// Go through the list of Persons and for each one pick one friend randomly
+			Iterator<Person> vIt=visitors.iterator();
+			while(vIt.hasNext()){
+				Person p2= vIt.next();
+				Plan plan2=p2.getSelectedPlan();
+				ActIterator act2It=plan2.getIteratorAct();
+				while(act2It.hasNext()){
+					Act act2 = (Act) act2It.next();
+					if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
+						EgoNet net = p1.getKnowledge().getEgoNet();
+						if(net.getAlters().contains(p2)){
+							friend++;
+							totalTimeWithFriends+=getTimeWindowDuration(act1,act2);
+						}else{
+							foe++;
+						}
+					}
+				}
+			}
+		}
+		if((friend+foe)==0){
+			stats.add((double) 0);
+		}else{
+			stats.add(friend/(foe+.1*(friend+foe)));
+		}
+		stats.add(friend);
+		stats.add(totalTimeWithFriends);
+
+		return stats;
+	}
+	private double getTimeWindowDuration(Act act1, Act act2) {
+		double duration=0.;
+		duration = Math.min(act1.getEndTime(),act2.getEndTime())-Math.max(act1.getStartTime(),act2.getStartTime());
+		return duration;
 	}
 }
 

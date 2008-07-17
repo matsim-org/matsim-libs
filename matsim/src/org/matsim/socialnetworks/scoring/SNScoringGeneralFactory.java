@@ -22,7 +22,7 @@ public class SNScoringGeneralFactory implements ScoringFunctionFactory {
 
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
 //		return new SNScoringMaxFriendFoeRatio(plan, this.factype, this.scorer);
-		return new SNScoringFriendFoeRatio(plan, this.factory.getNewScoringFunction(plan), factype, scorer);
+		return new SocializingScoringFunction(plan, this.factory.getNewScoringFunction(plan), factype, scorer);
 	}
 	
 

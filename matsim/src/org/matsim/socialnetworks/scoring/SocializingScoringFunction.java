@@ -20,7 +20,10 @@ package org.matsim.socialnetworks.scoring;
  *                                                                         *
  * *********************************************************************** */
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.config.groups.SocNetConfigGroup;
+import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
@@ -33,38 +36,56 @@ import org.matsim.scoring.ScoringFunction;
  *
  * @author mrieser
  */
-public class SNScoringFriendFoeRatio implements ScoringFunction{
+public class SocializingScoringFunction implements ScoringFunction{
 
-//	private final CalcPaidToll paidToll;
+	static final private Logger log = Logger.getLogger(SocializingScoringFunction.class);
 	private final ScoringFunction scoringFunction;
 	private final Plan plan;
 	private final SpatialScorer spatialScorer;
 	private final String factype;
 
 //	private double toll = 0.0;
-	private double socialPlanAdjustment=0.;
+	private double friendFoeRatio=0.;
+	private double nFriends=0;
+	private double timeWithFriends=0;
+	
+	private SocNetConfigGroup socnetConfig = Gbl.getConfig().socnetmodule();
 
-	public SNScoringFriendFoeRatio(final Plan plan, final ScoringFunction scoringFunction, String factype, SpatialScorer spatialScorer) {
+	private double betaFriendFoe = Double.parseDouble(socnetConfig.getBeta1());
+	private double betaNFriends= Double.parseDouble(socnetConfig.getBeta2());
+	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
+	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
+
+	public SocializingScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, SpatialScorer spatialScorer) {
 //		this.paidToll = paidToll;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;
 		this.spatialScorer=spatialScorer;
 		this.factype=factype;
-//		System.out.println("#### SNSCoring function initialized");
+		if(this.betaNFriends!= 0 && this.betaLogNFriends!=0){
+			log.warn("Utility function values linear AND log number of Friends in spatial meeting");
+		}
+
 	}
 
+	/**
+	 * Totals the act scores, including socializing during acts, for the entire plan
+	 * 
+	 * @see org.matsim.scoring.ScoringFunction#finish()
+	 */
 	public void finish() {
 		this.scoringFunction.finish();
-//		this.toll = this.paidToll.getAgentToll(this.person.getId().toString());
-//System.out.println("#######SNSCoring function finish");
+
 		ActIterator ait = this.plan.getIteratorAct();
 		while(ait.hasNext()){
 			Act act = (Act)ait.next();
 			if(act.getType().equals(factype)){
-				this.socialPlanAdjustment+=this.spatialScorer.scoreFriendtoFoeInTimeWindow(plan);
+//				this.friendFoeRatio+=this.spatialScorer.calculateFriendtoFoeInTimeWindow(plan);
+				this.friendFoeRatio+=this.spatialScorer.calculateTimeWindowStats(plan).get(0);
+				this.nFriends+=this.spatialScorer.calculateTimeWindowStats(plan).get(1);
+				this.timeWithFriends+=this.spatialScorer.calculateTimeWindowStats(plan).get(2);
 			}
 		}
-
 	}
 
 	public void agentStuck(final double time) {
@@ -80,7 +101,12 @@ public class SNScoringFriendFoeRatio implements ScoringFunction{
 	}
 
 	public double getScore() {
-		return this.scoringFunction.getScore() + 10.*this.socialPlanAdjustment;
+		log.info("FFR "+this.friendFoeRatio+" NF "+this.nFriends+" LNF "+Math.log(this.nFriends+1));
+		return this.scoringFunction.getScore() +
+		betaFriendFoe*this.friendFoeRatio+
+		betaNFriends * this.nFriends +
+		betaLogNFriends * Math.log(this.nFriends+1) +
+		betaTimeWithFriends * timeWithFriends;
 	}
 
 	public void reset() {

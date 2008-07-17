@@ -53,6 +53,11 @@ public class SocNetConfigGroup extends Module {
 	private static final String INPUT_SN_DIR = "inputSocNetDir";
 	private static final String INIT_ITER = "inputIter";
 	private static final String READ_MENTALMAP = "readMentalMap";
+	private static final String BETA1 ="betafriendfoe";
+	private static final String BETA2 =	"betanfriends"; 
+	private static final String BETA3 ="betalognfriends";
+	private static final String BETA4 ="betatimewithfriends";
+
 
 	private String graphalgo = null;
 	private String linkstrengthalgo = null;
@@ -79,6 +84,10 @@ public class SocNetConfigGroup extends Module {
 	private String input_sn_dir=null;// String
 	private String init_iter=null;// int
 	private String read_mm=null;// boolean
+	private String beta1=null;//double
+	private String beta2=null;//double
+	private String beta3=null;//double
+	private String beta4=null;//double
 
 
 	public SocNetConfigGroup() {
@@ -136,6 +145,14 @@ public class SocNetConfigGroup extends Module {
 			setInitIter(value);
 		}else if (READ_MENTALMAP.equals(key)){
 			setReadMentalMap(value);
+		}else if (BETA1.equals(key)){
+			setBeta1(value);
+		}else if (BETA2.equals(key)){
+			setBeta2(value);
+		}else if (BETA3.equals(key)){
+			setBeta3(value);
+		}else if (BETA4.equals(key)){
+			setBeta4(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -194,6 +211,14 @@ public class SocNetConfigGroup extends Module {
 			return getInitIter();
 		}else if (READ_MENTALMAP.equals(key)){
 			return getReadMentalMap();
+		}else if (BETA1.equals(key)){
+			return getBeta1();
+		}else if (BETA2.equals(key)){
+			return getBeta2();
+		}else if (BETA3.equals(key)){
+			return getBeta3();
+		}else if (BETA4.equals(key)){
+			return getBeta4();
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -384,5 +409,29 @@ public class SocNetConfigGroup extends Module {
 	}
 	public void setReadMentalMap(final String read_mm){
 		this.read_mm = read_mm;
+	}
+	public String getBeta1(){
+		return this.beta1;
+	}
+	public void setBeta1(final String beta1){
+		this.beta1 = beta1;
+	}
+	public String getBeta2(){
+		return this.beta2;
+	}
+	public void setBeta2(final String beta2){
+		this.beta2 = beta2;
+	}
+	public String getBeta3(){
+		return this.beta3;
+	}
+	public void setBeta3(final String beta3){
+		this.beta3 = beta3;
+	}
+	public String getBeta4(){
+		return this.beta4;
+	}
+	public void setBeta4(final String beta4){
+		this.beta4 = beta4;
 	}
 }
