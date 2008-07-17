@@ -60,6 +60,39 @@ public class Facility extends AbstractLocation {
 	// TODO: Set number of time bins using parameterization
 	private final int numberOfTimeBins = 4*24;
 	private int dailyCapacity = 0;
+	
+	private final double baseCapacity24 = 1.2*225.61;
+	
+	private final double capacitiesPerHour[] = {
+			0.0000,
+			0.0000,
+			0.0000,
+			0.0000,
+			0.7292,
+			24.0446,
+			107.3120,
+			523.8978,
+			1511.1337,
+			2338.8756,
+			2243.7741,
+			1599.4199,
+			1140.4440,
+			1612.8217,
+			2054.7026,
+			2151.1582,
+			2031.1861,
+			1663.3538,
+			827.5453,
+			324.4117,
+			136.0974,
+			57.6891,
+			29.0825,
+			16.9828
+	};
+	
+	private final double capacitySum = 20394.6621;
+	// give a res. of 20%
+	
 
 
 	/* 15 min. time bins at the moment.
@@ -271,8 +304,7 @@ public class Facility extends AbstractLocation {
 
 	private void setCapacityForShopping() {
 
-		// give a res. of 50%
-		double shopCapacity24 = 1.2*148.0;
+		double shopCapacity24 = this.baseCapacity24;
 		
 		final double a=1.0/Math.log(2500.0);
 
@@ -298,28 +330,8 @@ public class Facility extends AbstractLocation {
 			Activity activity = act_it.next();
 			if (activity.getType().startsWith("s")) {
 				for (int i=0; i<this.numberOfTimeBins; i++) {
-					if (i < 7*4) {
-						this.capacity[i] = 0.0;
-					}
-					else if (i >=7*4 && i < 9*4) {
-						this.capacity[i] = 0.05;
-					}
-					else if (i >= 9*4 && i < 12*4) {
-						this.capacity[i] = 0.1;
-					}
-					else if (i >= 12*4 && i < 14*4) {
-						this.capacity[i] = 0.075;
-					}
-					else if (i >= 14*4 && i < 17*4) {
-						this.capacity[i] = 0.1;
-					}
-					else if (i >= 17*4 && i < 20*4) {
-						this.capacity[i] = 0.05;
-					}
-					else if (i >= 20*4) {
-						this.capacity[i] = 0.0;
-					}
-					this.capacity[i] *= shopCapacity24;
+					int index = (int)(i / 4);
+					this.capacity[i] *= (this.capacitiesPerHour[index]/this.capacitySum) * shopCapacity24;
 				}	
 				this.dailyCapacity = (int)shopCapacity24;
 			break;
@@ -327,6 +339,8 @@ public class Facility extends AbstractLocation {
 		}
 	}
 	
+	
+
 	public double getSumCapacityPenaltyFactor() {
 		return this.sumCapacityPenaltyFactor;
 	}
