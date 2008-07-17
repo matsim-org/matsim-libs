@@ -289,7 +289,11 @@ public class Road extends SimUnit {
 			// the first car interested in entering a road has to wait 'stuckTime'
 			// the car behind has to wait an additional stuckTime (this logic was introduced to adhere the C++ implementation)
 			if (deadlockPreventionMessages.size()>0){
+				if (deadlockPreventionMessages.getLast().messageArrivalTime +SimulationParameters.stuckTime<scheduler.simTime){
+					System.out.println();	
+				}
 				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(deadlockPreventionMessages.getLast().messageArrivalTime +SimulationParameters.stuckTime, this));
+				
 			} else {
 				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(scheduler.simTime+SimulationParameters.stuckTime, this));
 			}

@@ -2,6 +2,8 @@ package playground.wrashid.DES;
 
 import java.util.TreeMap;
 
+import org.matsim.plans.Person;
+
 
 
 public class MessageQueue {
@@ -19,7 +21,8 @@ public class MessageQueue {
 		long rlong=counter++;
 		// padding with zeros is needed, inorder to be able to use firstKey property of the queue
 		//String zeroPadded=feedWithZeros(m.getMessageArrivalTime());
-		String zeroPadded=Double.toString(m.getMessageArrivalTime());
+		String zeroPadded=padWithZeros(m.getMessageArrivalTime());
+		//String zeroPadded=Double.toString(m.getMessageArrivalTime());
 		m.queueKey=zeroPadded.concat("."+(new Long(rlong)).toString());
 		queue.put(m.queueKey,m);
 		
@@ -28,6 +31,18 @@ public class MessageQueue {
 		if (SimulationParameters.debugMode && (counter % 1000000 == 0)){
 			System.out.println("MessageQueue.counter:"+ counter);
 		}
+		
+		/*
+		if (counter> 500000){
+			 
+			for (String key : queue.keySet()) {
+				System.out.println("key=" + key);
+			}
+			
+			System.out.println();
+		}
+		*/
+		
 	}
 	
 	void removeMessage(Message m){
@@ -35,7 +50,7 @@ public class MessageQueue {
 	}
 	
 	Message getNextMessage(){
-		Message m=(Message) queue.remove(queue.firstKey());
+		Message m= queue.remove(queue.firstKey());
 		//System.out.println(m.queueKey);
 		return m;
 	}
@@ -44,8 +59,11 @@ public class MessageQueue {
 		return !queue.isEmpty();
 	}
 	
-	public static String feedWithZeros(double x){
+	// this is nesseary for comparison of strings,
+	// because with string comparison 91 is bigger than 231 (because only 2 and 9 are compared)
+	public static String feedWithZeros(double xd){
 		String result="";
+		long x=Math.round(Math.floor(xd));
 		long j=Long.MAX_VALUE;
 		
 		while (j>0){
@@ -54,7 +72,22 @@ public class MessageQueue {
 			}
 			j/=10;
 		}
-		result=result.concat(new Double(x).toString());
+		result=result.concat(new Double(xd).toString());
+		return result;
+	}
+	
+	
+	// TODO: Make this part more efficient, as it is used in each iteration
+	public static String padWithZeros(double xd){
+		String result="";
+		long x=Math.round(Math.floor(xd));
+		int noOfDigitsMaxLong=19; // max long is 9223372036854775807 (signed version) and it has 19 digits
+		
+		for (int i=0;i<noOfDigitsMaxLong-Long.toString(x).length();i++){
+			result=result.concat("0");
+		}
+		
+		result=result.concat(new Double(xd).toString());
 		return result;
 	}
 	
