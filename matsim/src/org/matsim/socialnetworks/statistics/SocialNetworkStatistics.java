@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -33,8 +34,11 @@ import java.util.Vector;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
+import org.matsim.plans.ActivitySpace;
+import org.matsim.plans.ActivitySpaceEllipse;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -43,6 +47,9 @@ import org.matsim.socialnetworks.algorithms.PlanEuclideanLength;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.world.Location;
+
+import playground.jhackney.algorithms.PersonCalcEgoSpace;
 
 import cern.colt.list.DoubleArrayList;
 import edu.uci.ics.jung.graph.Edge;
@@ -109,13 +116,13 @@ public class SocialNetworkStatistics {
 
 		try {
 			eout = new BufferedWriter(new FileWriter(eoutfile));
-			eout.write("iter tlast tfirst dist egoid alterid purpose timesmet\n");
+			eout.write("iter tlast tfirst dist egoid alterid purpose timesmet\r\n");
 			aout = new BufferedWriter(new FileWriter(aoutfile));
 			// aout.write("tstep egoid egozone egodeg egoasd egoclust egoaccess
-			// lastactivity rseed var\n");
-			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype numknown\n");
+			// lastactivity rseed var\r\n");
+			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype placesknown a b x y theta pop\r\n");
 			gout = new BufferedWriter(new FileWriter(goutfile));
-			gout.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age meet_freq\n");
+			gout.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age meet_freq\r\n");
 		} catch (IOException ex) {
 		}
 	}
@@ -135,13 +142,13 @@ public class SocialNetworkStatistics {
 
 		try {
 			eout = new BufferedWriter(new FileWriter(eoutfile));
-			eout.write("iter tlast tfirst dist egoid alterid purpose timesmet\n");
+			eout.write("iter tlast tfirst dist egoid alterid purpose timesmet\r\n");
 			aout = new BufferedWriter(new FileWriter(aoutfile));
 			// aout.write("tstep egoid egozone egodeg egoasd egoclust egoaccess
-			// lastactivity rseed var\n");
-			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype numknown\n");
+			// lastactivity rseed var\r\n");
+			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype placesknown a b x y theta pop\r\n");
 			gout = new BufferedWriter(new FileWriter(goutfile));
-			gout.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age meet_freq\n");
+			gout.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age meet_freq\r\n");
 		} catch (IOException ex) {
 		}
 	}
@@ -159,9 +166,9 @@ public class SocialNetworkStatistics {
 		fillGraph(this.g, snet, plans);
 
 		System.out
-				.println("   MatSim social network converted into a JUNG graph for analysis");
+		.println("   MatSim social network converted into a JUNG graph for analysis");
 		System.out
-				.println("     >> See Palla et al for k-clustering calculations or check JUNG");
+		.println("     >> See Palla et al for k-clustering calculations or check JUNG");
 		// Now you can run whatever statistics you want on g, its vertices, or
 		// its edges
 
@@ -175,7 +182,7 @@ public class SocialNetworkStatistics {
 		// Graph statistics
 		// Calcualted and output in Person and Edge statistics
 		// Persons statistics
-		runPersonStatistics(iteration, plans);
+		runPersonStatistics(iteration, plans, snet);
 		// Edge statistics
 		runEdgeStatistics(iteration, plans);
 	}
@@ -242,7 +249,7 @@ public class SocialNetworkStatistics {
 		Vertex vTo = (Vertex) myEdge.getEndpoints().getSecond();
 		Person pTo = plans.getPerson(vTo.getUserDatum("personId").toString());
 		Coord toCoord = (Coord) ((Act) pTo.getSelectedPlan().getActsLegs().get(0))
-				.getCoord();
+		.getCoord();
 		dist = fromCoord.calcDistance(toCoord);
 		return dist;
 	}
@@ -267,7 +274,7 @@ public class SocialNetworkStatistics {
 		return 2. * g.numEdges() / g.numVertices();
 	}
 
-	private void runPersonStatistics(int iter, Plans plans) {
+	private void runPersonStatistics(int iter, Plans plans, SocialNetwork snet) {
 
 		double clusteringRatio = 0.;
 		double clusterCoef = 0.;
@@ -278,16 +285,16 @@ public class SocialNetworkStatistics {
 		StatisticalMoments smASD2 = new StatisticalMoments();
 		StatisticalMoments smASD3 = new StatisticalMoments();
 		PlanEuclideanLength len = new PlanEuclideanLength();
+		GeoStatistics gstat = new GeoStatistics(plans, snet);
+		Graph g = gstat.makeJungGraph();
 
-		Set vertices = this.g.getVertices();
-		Iterator ivert = vertices.iterator();
+		Set<Vertex> vertices = this.g.getVertices();
+		Iterator<Vertex> ivert = vertices.iterator();
 		StringBuilder planTypeString;
 		while (ivert.hasNext()) {
 
 			Vertex myVert = (Vertex) ivert.next();
-			Person myPerson = plans.getPerson(myVert.getUserDatum("personId")
-					.toString());
-			// Agent ID
+			Person myPerson = plans.getPerson(myVert.getUserDatum("personId").toString());
 			int id = Integer.parseInt(myVert.getUserDatum("personId").toString());
 			// Agent's Home Location ID
 			Act myAct = (Act) myPerson.getSelectedPlan().getActsLegs().get(0);
@@ -297,7 +304,32 @@ public class SocialNetworkStatistics {
 			// Agent's approx activity space diamter (radius to all activities)
 			double aSd2 = pcasd1.getPersonASD2(myPerson.getSelectedPlan());
 			// Agent's approx activity space 2, length of plan
+			//TODO access the TravelDistanceStats object and get the plan's length including routes
 			double aSd3 = len.getPlanLength(myPerson.getSelectedPlan());
+			
+			//calculate the ego space and record xcen,ycen,a,b,theta
+			double esa=0;
+			double esb=0;
+			double esx=0;
+			double esy=0;
+			double est=0;
+//			new PersonCalcEgoSpace().run(myPerson);
+//			ActivitySpace space = myPerson.getKnowledge().getActivitySpaces().get(0);
+//			if(space instanceof ActivitySpaceEllipse){
+//				esa=space.getParams().get("a");
+//				esb=space.getParams().get("b");
+//				esx=space.getParams().get("x");
+//				esy=space.getParams().get("y");
+//				est=space.getParams().get("theta");
+//			}
+//			myPerson.getKnowledge().clearActivitySpaces();
+			
+			//Geographical aggregation
+			Facility myHome=((Act)(myPerson.getSelectedPlan().getActsLegs().get(0))).getFacility();
+			Location myLoc=myHome.getUpMapping().get(myHome.getUpMapping().firstKey());
+			Vertex myVertex=gstat.getLocVertex().get(myLoc);
+			double pop=(double) (Integer) myVertex.getUserDatum("population");
+			
 			// Agent's Plan Type
 			Plan thisPlan = myPerson.getSelectedPlan();
 			Plan.Type planType = thisPlan.getType();
@@ -306,7 +338,7 @@ public class SocialNetworkStatistics {
 				ActIterator a_it = thisPlan.getIteratorAct();
 				while (a_it.hasNext()) {
 					Act nextAct = (Act) a_it.next();
-						planTypeString.append(nextAct.getType().charAt(0));
+					planTypeString.append(nextAct.getType().charAt(0));
 				}
 				// 10.03.08 JH If Plan.getType() is to be called in social nets in the future, for example
 //				to compare some statistics across plan types, remove this comment. However this
@@ -322,7 +354,7 @@ public class SocialNetworkStatistics {
 			int deg = myVert.degree();
 			// Agent's clustering coeff
 			// Note that the JUNG algorithm counts a node with degree = 1 as having
-			// clustering = 1 and other algorithms do not. For comparison with other
+			// clustering = 1 and other implementations do not. For comparison with other
 			// measures, e.g. in Pajek, replace this 1 with 0
 			clusterCoef = Double.parseDouble(this.clusterMap.get(myVert).toString());
 			if ((deg < 2) && (clusterCoef == 1)) {
@@ -336,7 +368,8 @@ public class SocialNetworkStatistics {
 			try {
 				aout.write(iter + " " + id + " " + homeId + " " + deg + " " + aSd1
 						+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
-						+ " " + myPerson.getKnowledge().getActivities().size());
+						+ " " + myPerson.getKnowledge().getActivities().size() + " "+
+						esa+" "+esb+" "+esx+" "+esy+" "+est+" "+pop);
 				aout.newLine();
 			} catch (IOException e) {
 
