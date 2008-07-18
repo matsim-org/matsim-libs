@@ -13,6 +13,7 @@ public class SubChain {
 	
 	private List<Act> slActs = null;
 	private double ttBudget = 0.0;
+	private double totalTravelDistance = 0.0;
 	
 	private CoordI startCoord = null;
 	private CoordI endCoord = null;
@@ -74,6 +75,14 @@ public class SubChain {
 
 	public void setLastPrimAct(Act lastPrimAct) {
 		this.lastPrimAct = lastPrimAct;
+	}
+
+	public double getTotalTravelDistance() {
+		return totalTravelDistance;
+	}
+
+	public void setTotalTravelDistance(double totalTravelDistance) {
+		this.totalTravelDistance = totalTravelDistance;
 	}
 		
 }

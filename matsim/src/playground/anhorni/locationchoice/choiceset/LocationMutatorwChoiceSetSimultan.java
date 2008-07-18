@@ -68,7 +68,7 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			ttBudget -= this.computeTravelTime(prevAct, act);
 			double tt2Anchor = this.computeTravelTime(act, subChain.getLastPrimAct());
 			
-			if ((ttBudget - tt2Anchor) <= 0.0) {
+			if ((ttBudget - tt2Anchor) < 0.0) {
 				return false;
 			}
 			prevAct = act;
