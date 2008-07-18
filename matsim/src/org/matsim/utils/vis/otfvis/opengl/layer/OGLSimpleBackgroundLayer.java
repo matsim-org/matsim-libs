@@ -30,31 +30,28 @@ import org.matsim.utils.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.utils.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 
 
-public class OGLSimpleBackgroundLayer extends DefaultSceneLayer{
+public class OGLSimpleBackgroundLayer extends DefaultSceneLayer {
 
-	private static double offsetEast;
-	private static double offsetNorth;
+	private double offsetEast;
+	private double offsetNorth;
 	private final static List<AbstractBackgroundDrawer> items = new ArrayList<AbstractBackgroundDrawer>();
 
 	@Override
 	public void init(final SceneGraph graph) {
 		if (graph.getDrawer() != null) {
 			final OTFClientQuad quad = graph.getDrawer().getQuad();
-			
+
 			offsetEast = quad.offsetEast;
 			offsetNorth = quad.offsetNorth;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.david.vis.data.PersistentSceneLayer#addItem(playground.david.vis.data.OTFData.Receiver)
-	 */
 	@Override
 	public void addItem(final Receiver item) {
 		final AbstractBackgroundDrawer drawer = (AbstractBackgroundDrawer)item;
 		items.add(drawer);
 	}
-	
+
 	public static void addPersistentItem(final AbstractBackgroundDrawer drawer) {
 		items.add(drawer);
 	}
