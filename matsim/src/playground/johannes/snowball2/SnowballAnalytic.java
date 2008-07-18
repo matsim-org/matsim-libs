@@ -29,15 +29,15 @@ package playground.johannes.snowball2;
  */
 public class SnowballAnalytic {
 
-	private static double z = 12;
+	private static double z = 8;
 	
-	private static double c = 0.08;
+	private static double c = 0.4733;
 	
-	private static double M = 0.9;
+	private static double M = 0.6475;
 	
-	private static double N = 8700;
+	private static double N = 70000;
 	
-	private static double n_0 = 5;
+	private static double n_0 = 10;
 	
 	private static double n_total;
 	
@@ -58,11 +58,13 @@ public class SnowballAnalytic {
 	
 	private static double calcNumVertex(int i, double n) {
 		if(i == 1) {
-			return n_0 * z;
+			return n_0 * (z-1);
 //		} else if(i == 2) {
 //			return Math.ceil((n * (z-1) * (1-c)));// * Math.pow((1 - n_total/(double)N),1)));
 		} else {
-			return ((n * M * (z-1) * (1-c) * Math.pow((1 - n_total/(double)N),1)));
+			return Math.ceil((n * M * (z-1) * (1-c) *  Math.pow((1 - n_total/(double)N),1)));
+//			return Math.ceil((n * M * (z-1-(z*c)) *  Math.pow((1 - n_total/(double)N),1)));
+//			return Math.ceil((M * Math.pow((z-1),i-1) * z * (1-c) *  Math.pow((1 - n_total/(double)N),1)));
 		}
 			
 	}

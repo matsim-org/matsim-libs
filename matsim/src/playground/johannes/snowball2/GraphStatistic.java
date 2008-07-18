@@ -137,6 +137,7 @@ public abstract class GraphStatistic {
 		hist.addAll(values);
 		try {
 			hist.plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+			hist.dumpRawData(String.format("%1$s/%2$s.histogram.txt", outputDir, iteration));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -146,6 +147,7 @@ public abstract class GraphStatistic {
 		hist.addAll(values, weights);
 		try {
 			hist.plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+			hist.dumpRawData(String.format("%1$s/%2$s.histogram.txt", outputDir, iteration));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

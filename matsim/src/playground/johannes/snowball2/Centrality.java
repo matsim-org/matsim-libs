@@ -125,10 +125,8 @@ public class Centrality {
 			} else {
 				betweennessValues.addValue(((CentralityVertex) v)
 						.getBetweenness());
-				
-				double p = ((SampledVertex) graphDecorator.getVertex(v)).getSampleProbability();
-				betweennessWeighted += ((CentralityVertex) v).getBetweenness() / p;
-				wsum += 1/p;
+				betweennessWeighted += ((CentralityVertex) v).getBetweenness();
+				wsum ++;
 			}
 		}
 		

@@ -23,6 +23,7 @@
  */
 package playground.johannes.snowball2;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,40 +43,73 @@ public class Mutuality extends GraphStatistic {
 		super(outputDir);
 	}
 
-	@SuppressWarnings("unchecked")
+//	@SuppressWarnings("unchecked")
+//	public DescriptiveStatistics calculate(Graph g, int iteration,
+//			DescriptiveStatistics reference) {
+//		Map<Vertex, Double> clustering = GraphStatistics.clusteringCoefficients(g);
+//		Set<Vertex> vertices = g.getVertices();
+//		double z = 0;
+//		double m = 0;
+//		
+//		boolean isSampled = false;
+//		if(g instanceof SampledGraph)
+//			isSampled = true;
+//		
+//		for(Vertex v : vertices) {
+//			if(isSampled) {
+//				if(!((SampledVertex)v).isAnonymous()) {
+//					z += v.degree();
+//					double c = clustering.get(v);
+//					m += v.degree() /(double) (1 + Math.pow(c, 2) * (v.degree() - 1));
+//				}
+//			} else {
+//				z += v.degree();
+//				double c = clustering.get(v);
+//				m += v.degree() /(double) (1 + Math.pow(c, 2) * (v.degree() - 1));
+//			}
+//		}
+//		z = z / (double)vertices.size();
+//		m = m / (double)vertices.size();
+//		
+//		double result = m / z;
+//		
+//		DescriptiveStatistics stats = new DescriptiveStatistics();
+//		stats.addValue(result);
+//		return stats;
+//	}
+
 	public DescriptiveStatistics calculate(Graph g, int iteration,
 			DescriptiveStatistics reference) {
-		Map<Vertex, Double> clustering = GraphStatistics.clusteringCoefficients(g);
 		Set<Vertex> vertices = g.getVertices();
-		double z = 0;
-		double m = 0;
-		
 		boolean isSampled = false;
 		if(g instanceof SampledGraph)
 			isSampled = true;
 		
+		int len2Paths = 0;
+		int nVertex2Steps = 0;
 		for(Vertex v : vertices) {
-			if(isSampled) {
-				if(!((SampledVertex)v).isAnonymous()) {
-					z += v.degree();
-					double c = clustering.get(v);
-					m += v.degree() /(double) (1 + Math.pow(c, 2) * (v.degree() - 1));
+			if(!isSampled || (isSampled && !((SampledVertex)v).isAnonymous())) {
+				
+				Set<Vertex> n1Set = v.getNeighbors();
+				Set<Vertex> n2Set = new HashSet<Vertex>();
+				for(Vertex n1 : n1Set) {
+					Set<Vertex> neighbours = n1.getNeighbors();
+					for(Vertex neighbour : neighbours) {
+						if(neighbour != v && !n1Set.contains(neighbour)) {
+							n2Set.add(neighbour);
+							len2Paths++;
+						}
+					}
 				}
-			} else {
-				z += v.degree();
-				double c = clustering.get(v);
-				m += v.degree() /(double) (1 + Math.pow(c, 2) * (v.degree() - 1));
+				
+				nVertex2Steps += n2Set.size();
 			}
 		}
-		z = z / (double)vertices.size();
-		m = m / (double)vertices.size();
 		
-		double result = m / z;
+		double mutality = nVertex2Steps/(double)len2Paths;
 		
 		DescriptiveStatistics stats = new DescriptiveStatistics();
-		stats.addValue(result);
+		stats.addValue(mutality);
 		return stats;
 	}
-
-
 }

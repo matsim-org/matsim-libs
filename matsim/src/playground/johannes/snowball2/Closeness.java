@@ -27,6 +27,8 @@ import java.io.IOException;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
+import playground.johannes.snowball.Histogram;
+
 import edu.uci.ics.jung.graph.Graph;
 
 /**
@@ -50,15 +52,17 @@ public class Closeness extends GraphStatistic {
 		dumpStatistics(getStatisticsMap(centrality.closenessValues), iteration);
 		if(reference != null) {
 			try {
-				centrality.getClosenessHistogram(reference.getMin(), reference.getMax()).
-					plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+				Histogram hist = centrality.getClosenessHistogram(reference.getMin(), reference.getMax()); 
+				hist.plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+				hist.dumpRawData(String.format("%1$s/%2$s.histogram.txt", outputDir, iteration));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else {
 			try {
-				centrality.getClosenessHistogram().
-					plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+				Histogram hist = centrality.getClosenessHistogram(); 
+				hist.plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+				hist.dumpRawData(String.format("%1$s/%2$s.histogram.txt", outputDir, iteration));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

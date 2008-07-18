@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
+import playground.johannes.snowball.Histogram;
 import edu.uci.ics.jung.graph.Graph;
 import gnu.trove.TObjectDoubleHashMap;
 
@@ -59,15 +60,17 @@ public class Betweenness extends GraphStatistic {
 		
 		if(reference != null) {
 			try {
-				centrality.getBetweennessHistogram(reference.getMin(), reference.getMax()).
-					plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+				Histogram hist = centrality.getBetweennessHistogram(reference.getMin(), reference.getMax()); 
+				hist.plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+				hist.dumpRawData(String.format("%1$s/%2$s.histogram.txt", outputDir, iteration));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else {
 			try {
-				centrality.getBetweennessHistogram().
-					plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+				Histogram hist = centrality.getBetweennessHistogram(); 
+				hist.plot(String.format("%1$s/%2$s.histogram.png", outputDir, iteration), "Histogram");
+				hist.dumpRawData(String.format("%1$s/%2$s.histogram.txt", outputDir, iteration));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
