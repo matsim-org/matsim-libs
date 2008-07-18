@@ -23,9 +23,13 @@
  */
 package playground.johannes.snowball;
 
+import gnu.trove.TDoubleDoubleHashMap;
+
 import java.awt.Font;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -36,6 +40,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.utils.io.IOUtils;
 
 import cern.colt.list.DoubleArrayList;
 
@@ -254,5 +259,35 @@ public class Histogram {
 		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
 		plot.setDomainAxis(new NumberAxis("y"));
 		ChartUtilities.saveChartAsPNG(new File(filename), chart, 1024, 768);
+	}
+	
+	public void dumpRawData(String filename) throws IOException {
+		fillBins();
+		double min, max, width;
+		
+		if(bounds != null) {
+			min = bounds[0];
+			max = bounds[1];					
+		} else {
+			double minmax[] = getMinMax();
+			min = minmax[0];
+			max = minmax[1];
+		}
+		if(binWidth > 0) {
+			width = binWidth;
+		} else {
+			width = (max - min)/(double)bincount;
+		}
+		
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+		writer.write("bin\tvalue");
+		writer.newLine();
+		
+		int cnt = bins.size();
+		for (int i = 0; i < cnt; i++) {
+			writer.write(String.format(Locale.US, "%1$s\t%2$s", i * width + min, bins.get(i)));
+			writer.newLine();
+		}
+		writer.close();
 	}
 }
