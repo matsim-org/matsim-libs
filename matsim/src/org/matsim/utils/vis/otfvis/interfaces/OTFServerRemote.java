@@ -29,12 +29,11 @@ import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 
-
 public interface OTFServerRemote extends Remote {
-	public enum TimePreference{EARLIER, LATER};
-	public void setStatus(int status) throws RemoteException;;
-	public void step() throws RemoteException;;
-	public void play() throws RemoteException;;
+	public enum TimePreference{EARLIER, LATER}
+	public void setStatus(int status) throws RemoteException;
+	public void step() throws RemoteException;
+	public void play() throws RemoteException;
 	public void pause() throws RemoteException;
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException;
 	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException;
@@ -45,4 +44,3 @@ public interface OTFServerRemote extends Remote {
 	public boolean isLive() throws RemoteException;
 	public Collection<Double> getTimeSteps() throws RemoteException;
 }
-
