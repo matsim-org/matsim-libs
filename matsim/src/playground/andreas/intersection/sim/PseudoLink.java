@@ -75,6 +75,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 	private double flowCapacityFraction = Double.NaN;
 
 	private double flowCapacityFractionalRest = 1.0;
+	private double maximumFlowCapacity = 0.;
 	private boolean thisTimeStepIsGreen = false;
 	
 	/** For Visualization only */
@@ -128,10 +129,12 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		} else {
 			updateBufferCapacity(now);
 		}
+		
+		this.maximumFlowCapacity = this.flowCapacity;
 
 		if (this.amIOriginalLink){ moveParkingQueueToParkToLinkQueue(now); }
-		moveFlowQueueToNextPseudoLink();
 		moveStorageQueueToFlowQueue(now);
+		moveFlowQueueToNextPseudoLink();
 		if (this.amIOriginalLink){ moveParkToLinkQueueToFlowQueue(now); }
 		
 		this.setThisTimeStepIsGreen(false);
@@ -140,11 +143,9 @@ public class PseudoLink implements Comparable<PseudoLink>{
 
 	private void moveStorageQueueToFlowQueue(final double now) {
 
-		double maximumFlowCapacity = this.flowCapacity;
-
 		QVehicle veh;
 		while ((veh = this.storageQueue.peek()) != null) {
-			if (veh.getDepartureTime_s() > now) {
+			if (Math.floor(veh.getDepartureTime_s()) > now) {
 				break;
 			}
 
@@ -161,14 +162,14 @@ public class PseudoLink implements Comparable<PseudoLink>{
 				break;
 			}
 
-			if (maximumFlowCapacity >= 1.0) {
-				maximumFlowCapacity--;
+			if (this.maximumFlowCapacity >= 1.0) {
+//				this.maximumFlowCapacity--;
 				addToFlowQueue(veh, now);
 				this.storageQueue.poll();
 				continue;
 
 			} else if (this.flowCapacityFractionalRest >= 1.0) {
-				this.flowCapacityFractionalRest--;
+//				this.flowCapacityFractionalRest--;
 				addToFlowQueue(veh, now);
 				this.storageQueue.poll();
 				break;
@@ -191,6 +192,15 @@ public class PseudoLink implements Comparable<PseudoLink>{
 	}
 
 	private void addToFlowQueue(final QVehicle veh, final double now) {
+		
+		if (this.maximumFlowCapacity >= 1.0) {
+			this.maximumFlowCapacity--;
+		} else if (this.flowCapacityFractionalRest >= 1.0) {
+			this.flowCapacityFractionalRest--;
+		} else {
+//			throw new RuntimeException("Buffer of link " + this.link.getId() + " has no space left!");
+		}
+		
 		this.flowQueue.add(veh);
 		veh.setLastMovedTime(now);
 	}
@@ -237,7 +247,36 @@ public class PseudoLink implements Comparable<PseudoLink>{
 
 	public void addVehicle(QVehicle vehicle){
 		this.storageQueue.add(vehicle);
-		vehicle.setDepartureTime_s((int) (SimulationTimer.getTime() + this.freeSpeedTravelTime));
+
+//		if(this.amIOriginalLink && this.meterFromLinkEnd != 0){
+//			// It's the original link, but there are other pseudo links
+//			// so we need to start with a 'clean' freeSpeedTravelTime
+//			vehicle.setDepartureTime_s(SimulationTimer.getTime() + this.freeSpeedTravelTime);
+//		} else if (this.amIOriginalLink && this.meterFromLinkEnd == 0){
+//			
+//		} else if(this.meterFromLinkEnd == 0){
+//			// It's not original link, but there are other pseudo links
+//			vehicle.setDepartureTime_s(Math.floor((SimulationTimer.getTime() + this.freeSpeedTravelTime + vehicle.getDepartureTime_s() - Math.floor(vehicle.getDepartureTime_s()))));
+//		} else {	
+//			vehicle.setDepartureTime_s(SimulationTimer.getTime() + this.freeSpeedTravelTime + vehicle.getDepartureTime_s() - Math.floor(vehicle.getDepartureTime_s()));
+//		}
+		
+		
+		if(this.amIOriginalLink){
+			// It's the original link,
+			// so we need to start with a 'clean' freeSpeedTravelTime
+			vehicle.setDepartureTime_s(SimulationTimer.getTime() + this.freeSpeedTravelTime);
+		} else {
+			// It's not original link,
+			// so there is a fractional rest we add to this link's freeSpeedTravelTime
+			vehicle.setDepartureTime_s(SimulationTimer.getTime() + this.freeSpeedTravelTime + vehicle.getDepartureTime_s() - Math.floor(vehicle.getDepartureTime_s()));
+		}
+		
+		if (this.meterFromLinkEnd == 0){
+			// It's a nodePseudoLink,
+			// so we have floor the freeLinkTravelTime in order the get the same results compared to the old mobSim
+			vehicle.setDepartureTime_s(Math.floor(vehicle.getDepartureTime_s()));
+		}
 	}
 
 	private void moveParkingQueueToParkToLinkQueue(final double now) {

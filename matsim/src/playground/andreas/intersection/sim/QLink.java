@@ -98,7 +98,7 @@ public class QLink extends QueueLink {
 		veh.setCurrentLink(this.getLink());
 		this.originalLink.addVehicle((QVehicle)veh);
 				
-		veh.setDepartureTime_s((int) (now + this.originalLink.getFreeSpeedTravelTime()));
+//		veh.setDepartureTime_s((int) (now + this.originalLink.getFreeSpeedTravelTime()));
 		QSim.getEvents().processEvent(
 				new EventLinkEnter(now, veh.getDriver().getId().toString(),	veh.getCurrentLegNumber(),
 						this.getLink().getId().toString(), veh.getDriver(), this.getLink()));
