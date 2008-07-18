@@ -20,8 +20,6 @@
 
 package org.matsim.plans;
 
-import org.matsim.gbl.Gbl;
-
 public class ActUtilityParameters {
 
 	private final String type;
@@ -49,7 +47,7 @@ public class ActUtilityParameters {
 		this.zeroUtilityDuration = (typicalDuration / 3600.0)
 				* Math.exp( -10.0 / (typicalDuration / 3600.0) / priority );
 		if (this.zeroUtilityDuration <= 0.0) {
-			Gbl.errorMsg("zeroUtilityDuration must be greater than 0.0");
+			throw new RuntimeException("zeroUtilityDuration of type " + type + " must be greater than 0.0. Did you forget to specify the typicalDuration?");
 		}
 	}
 
