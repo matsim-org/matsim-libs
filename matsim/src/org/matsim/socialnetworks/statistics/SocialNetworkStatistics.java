@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -37,8 +36,6 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
-import org.matsim.plans.ActivitySpace;
-import org.matsim.plans.ActivitySpaceEllipse;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -48,8 +45,6 @@ import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.Location;
-
-import playground.jhackney.algorithms.PersonCalcEgoSpace;
 
 import cern.colt.list.DoubleArrayList;
 import edu.uci.ics.jung.graph.Edge;
@@ -293,7 +288,7 @@ public class SocialNetworkStatistics {
 		StringBuilder planTypeString;
 		while (ivert.hasNext()) {
 
-			Vertex myVert = (Vertex) ivert.next();
+			Vertex myVert = ivert.next();
 			Person myPerson = plans.getPerson(myVert.getUserDatum("personId").toString());
 			int id = Integer.parseInt(myVert.getUserDatum("personId").toString());
 			// Agent's Home Location ID
@@ -306,7 +301,7 @@ public class SocialNetworkStatistics {
 			// Agent's approx activity space 2, length of plan
 			//TODO access the TravelDistanceStats object and get the plan's length including routes
 			double aSd3 = len.getPlanLength(myPerson.getSelectedPlan());
-			
+
 			//calculate the ego space and record xcen,ycen,a,b,theta
 			double esa=0;
 			double esb=0;
@@ -323,13 +318,13 @@ public class SocialNetworkStatistics {
 //				est=space.getParams().get("theta");
 //			}
 //			myPerson.getKnowledge().clearActivitySpaces();
-			
+
 			//Geographical aggregation
 			Facility myHome=((Act)(myPerson.getSelectedPlan().getActsLegs().get(0))).getFacility();
 			Location myLoc=myHome.getUpMapping().get(myHome.getUpMapping().firstKey());
 			Vertex myVertex=gstat.getLocVertex().get(myLoc);
-			double pop=(double) (Integer) myVertex.getUserDatum("population");
-			
+			double pop=(Integer) myVertex.getUserDatum("population");
+
 			// Agent's Plan Type
 			Plan thisPlan = myPerson.getSelectedPlan();
 			Plan.Type planType = thisPlan.getType();
