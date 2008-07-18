@@ -22,7 +22,7 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 	protected boolean handleSubChain(SubChain subChain, double speed, int trialNr) {
 				
 		if (trialNr > 100) {
-			log.info("Could not do location choice");
+			log.info("Could not do location choice. ttBudget" + subChain.getTtBudget());
 			
 			Iterator<Act> act_it = subChain.getSlActs().iterator();
 			while (act_it.hasNext()) {

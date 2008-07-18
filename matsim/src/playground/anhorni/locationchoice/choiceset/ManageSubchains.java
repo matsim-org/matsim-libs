@@ -33,7 +33,8 @@ public class ManageSubchains {
 		// close chain
 		if (chainStarted) {
 			if (sl_found) {
-				this.subChains.get(subChainIndex).setTtBudget(this.ttBudget);
+				double travelTimeBudget = this.ttBudget;
+				this.subChains.get(subChainIndex).setTtBudget(travelTimeBudget);
 				this.subChains.get(subChainIndex).setEndCoord(act.getCoord());
 				this.subChains.get(subChainIndex).setLastPrimAct(act);
 			}
@@ -44,6 +45,7 @@ public class ManageSubchains {
 			}
 		}
 		
+		// it is not the second home act
 		if (!(leg == null)) {
 			//open chain
 			this.subChains.add(new SubChain());
