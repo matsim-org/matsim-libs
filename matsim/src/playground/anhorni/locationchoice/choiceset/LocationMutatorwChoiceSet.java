@@ -21,6 +21,7 @@ import playground.anhorni.locationchoice.LocationMutator;
 public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 	
 	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
+	protected int unsuccessfullLC = 0;
 	
 	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler) {
 		super(network, controler);
@@ -38,6 +39,11 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 			final Leg leg = (Leg)actslegs.get(j);
 			leg.setRoute(null);
 		}	
+	}
+	
+	public void finish() {
+		log.info("No location choice done for :" + unsuccessfullLC+ " persons in this iteration");
+		this.unsuccessfullLC = 0;
 	}
 
 	protected void handleSubChains(final Plan plan, List<SubChain> subChains) {

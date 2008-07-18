@@ -32,6 +32,7 @@ public class LocationChoice extends MultithreadedModuleA {
 
 	private NetworkLayer network=null;
 	private Controler controler = null;
+	private PlanAlgorithmI  planAlgoInstance = null;
 	
 
 	public LocationChoice() {
@@ -53,11 +54,17 @@ public class LocationChoice extends MultithreadedModuleA {
 		this.network = network;
 		this.network.connect();
 	}
+	
+	public void finish() {
+		super.finish();
+		((LocationMutatorwChoiceSetSimultan)this.planAlgoInstance).finish();
+	}
 
 
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
-		//return new RandomLocationMutator(this.network);
-		return new LocationMutatorwChoiceSetSimultan(this.network, this.controler);
+		//this.planAlgoInstance = new RandomLocationMutator(this.network);
+		this.planAlgoInstance = new LocationMutatorwChoiceSetSimultan(this.network, this.controler);
+		return this.planAlgoInstance;
 	}
 }
