@@ -39,7 +39,6 @@ import java.util.Enumeration;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.matsim.gbl.Gbl;
@@ -66,11 +65,12 @@ public class OTFQuadFileHandler {
 	// minor version increase does not break compatibility
 	public static final int MINORVERSION = 3;
 
-	public static class Writer implements SimStateWriterI, SnapshotWriterI{
+	public static class Writer implements SimStateWriterI, SnapshotWriterI {
 		protected QueueNetworkLayer net = null;
 		protected OTFServerQuad quad = null;
 		private final String fileName;
-		protected double intervall_s = 1, nextTime = -1;;
+		protected double intervall_s = 1;
+		protected double nextTime = -1;
 
 		private ZipOutputStream zos = null;
 		private DataOutputStream outFile;
@@ -78,7 +78,7 @@ public class OTFQuadFileHandler {
 
 		private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
 
-		public Writer(double intervall_s, QueueNetworkLayer network, String fileName){
+		public Writer(double intervall_s, QueueNetworkLayer network, String fileName) {
 			this.net = network;
 			this.intervall_s = intervall_s;
 			this.fileName = fileName;
@@ -107,7 +107,7 @@ public class OTFQuadFileHandler {
 		}
 
 		protected void onAdditionalQuadData() {
-
+			// intentionally left blank for inheriting classes to overwrite
 		}
 
 		private void writeQuad() throws IOException {
@@ -158,7 +158,7 @@ public class OTFQuadFileHandler {
 			//open zip file
 			//
 			isOpen = true;
-			
+
 			try {
 				this.zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(this.fileName),BUFFERSIZE));
 			} catch (FileNotFoundException e1) {
@@ -197,23 +197,19 @@ public class OTFQuadFileHandler {
 			try {
 				dump((int)time);
 			} catch (IOException e) {
-				
+
 				e.printStackTrace();
 			}
 		}
 
 		public void endSnapshot() {
 			// TODO Auto-generated method stub
-			
 		}
 
 		public void finish() {
 			close();
-			
 		}
-
 	}
-
 
 	public static class Reader implements OTFServerRemote {
 
@@ -222,11 +218,10 @@ public class OTFQuadFileHandler {
 		public Reader(String fname) {
 			this.fileName = fname;
 			openAndReadInfo();
-
 		}
+
 		private ZipFile zipFile = null;
 
-		private final ZipInputStream inStream = null;
 		private DataInputStream inFile;
 
 		protected OTFServerQuad quad = null;
@@ -238,7 +233,7 @@ public class OTFQuadFileHandler {
 
 		TreeMap<Double, Long> timesteps = new TreeMap<Double, Long>();
 
-		public void scanZIPFile() throws IOException {
+		public void scanZIPFile() {
 			this.nextTime = -1;
 			// Create an enumeration of the entries in the zip file
 			Enumeration zipFileEntries = this.zipFile.entries();
@@ -254,7 +249,6 @@ public class OTFQuadFileHandler {
 
 				String currentEntry = entry.getName();
 				if(currentEntry.contains("step")) {
-					String regex = "";
 					String [] spliti = StringUtils.explode(currentEntry, '.', 10);
 
 					double time_s = Double.parseDouble(spliti[1]);
@@ -266,7 +260,7 @@ public class OTFQuadFileHandler {
 			}
 			System.out.println("");
 			System.out.println("Nr of timesteps: " + timesteps.size());
-			
+
 			Gbl.printElapsedTime();
 			Gbl.printMemoryUsage();
 		}
@@ -278,34 +272,10 @@ public class OTFQuadFileHandler {
 
 			this.inFile = new DataInputStream(new BufferedInputStream(this.zipFile.getInputStream(entry)));
 			readStateBuffer(buffer);
-			
+
 			//Gbl.printMemoryUsage();
-			
+
 			return buffer;
-		}
-
-		public void readZIPFile2() throws IOException {
-			// Create an enumeration of the entries in the zip file
-			Enumeration zipFileEntries = this.zipFile.entries();
-
-			// Process each entry
-			while (zipFileEntries.hasMoreElements())
-			{
-				// grab a zip file entry
-				ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
-
-				String currentEntry = entry.getName();
-				System.out.println("Extracting: " + entry);
-				if(currentEntry.contains("step")) {
-					//String regex = "";
-					//String [] spliti = StringUtils.explode(currentEntry, '.', 10);
-
-					//int time_s = Integer.parseInt(spliti[1]);
-					//byte [] buffer = timesteps.get(time_s);
-					//inFile = new DataInputStream(new BufferedInputStream(zipFile.getInputStream(entry)));
-					//readStateBuffer(buffer);
-				}
-			}
 		}
 
 		private void openAndReadInfo() {
@@ -331,7 +301,7 @@ public class OTFQuadFileHandler {
 				e1.printStackTrace();
 			}
 		}
-		
+
 		public static class OTFObjectInputStream extends ObjectInputStream {
 			public OTFObjectInputStream(InputStream in) throws IOException {
 				super(in);
@@ -343,7 +313,7 @@ public class OTFQuadFileHandler {
 			throws IOException, ClassNotFoundException {
 				String name = desc.getName();
 				System.out.println("try to resolve "+ name);
-				// 
+				//
 				if(name.equals("playground.david.vis.data.OTFServerQuad")) return OTFServerQuad.class;
 				else if (name.startsWith("playground.david.vis")){
 					name = name.replaceFirst("playground.david.vis", "org.matsim.utils.vis.otfvis");
@@ -356,7 +326,7 @@ public class OTFQuadFileHandler {
 				return super.resolveClass(desc);
 			}
 		}
-		
+
 		public void readQuad() {
 			try {
 				// we do not chache anymore ...readZIPFile();
@@ -378,14 +348,11 @@ public class OTFQuadFileHandler {
 		}
 
 		public boolean hasNextTimeStep() {
-			return this.timesteps.get((int)this.nextTime) != null;
+			return this.timesteps.get(Double.valueOf(this.nextTime)) != null;
 //			if (nextTime < timeSteps.lastKey()) return true
 //			return false;
 		}
 
-		public void getNextTimeStep() {
-
-		}
 
 		public Plan getAgentPlan(String id) throws RemoteException {
 			return null;
@@ -395,9 +362,9 @@ public class OTFQuadFileHandler {
 			return (int)this.nextTime;
 		}
 
-	
-		public void readStateBuffer(byte[] result) throws RemoteException {
-			int size =  0 ;
+
+		public void readStateBuffer(byte[] result) {
+			int size =  0;
 
 			try {
 				double timenextTime = this.inFile.readDouble();
@@ -432,15 +399,13 @@ public class OTFQuadFileHandler {
 		}
 
 		public void step() throws RemoteException {
-			// re(trieve lat)est buffer and set appropriate time
+			// retrieve latest buffer and set appropriate time
 			this.actBuffer = null;
 		}
 
 		public boolean isLive() {
 			return false;
 		}
-
-
 
 		public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException {
 			if (writers != null) throw new RemoteException("writers need to be NULL, when reading from file");
@@ -471,7 +436,7 @@ public class OTFQuadFileHandler {
 			return this.actBuffer;
 		}
 
-		public byte[] getStateBuffer() throws RemoteException {
+		public byte[] getStateBuffer() {
 			byte[] buffer = null;
 			try {
 				buffer = readTimeStep(this.nextTime);
