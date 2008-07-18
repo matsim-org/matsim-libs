@@ -42,13 +42,14 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 
 	protected void handleSubChains(final Plan plan, List<SubChain> subChains) {
 		
-		//initially using 25.3 km/h + 10 %
-		// mikro census 2005
-		double speed = 27.8/3.6;
-		
+			
 		Iterator<SubChain> sc_it = subChains.iterator();
 		while (sc_it.hasNext()) {
 			SubChain sc = sc_it.next();
+			
+			//initially using 25.3 km/h + 10 %
+			// mikro census 2005
+			double speed = 27.8/3.6;
 			
 			if (sc.getTtBudget() < 1.0) {
 				continue;
