@@ -33,7 +33,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -72,7 +71,7 @@ import org.matsim.utils.vis.kml.TimeStamp;
 import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 
-import playground.jhackney.algorithms.PersonDrawActivitySpace;
+import playground.jhackney.algorithms.PersonCalcEgoSpace;
 
 public class EgoNetPlansItersMakeKML {
 
@@ -107,7 +106,7 @@ public class EgoNetPlansItersMakeKML {
 	private static Person ego;
 	private static TreeMap<Id,Color> colors = new TreeMap<Id,Color>();
 	private static TimeStamp timeStamp;
-	private static int nColors;
+	private static int nColors=36;
 	private static Person ai;
 
 	public static void setUp(Config config, NetworkLayer network) {
@@ -236,8 +235,7 @@ public class EgoNetPlansItersMakeKML {
 		facStyle.put("work",workStyle);
 
 		log.info("    done.");
-		
-		nColors=36;
+
 		log.info("Setting nColors = "+ nColors);
 	}
 
@@ -253,13 +251,11 @@ public class EgoNetPlansItersMakeKML {
 		// load Data into KML folders for myPerson
 		int i=0;
 		ArrayList<Person> persons = myPerson.getKnowledge().getEgoNet().getAlters();
-		
+
 		// more colors than in current egonet to allow for adding agents to egonet without repeating colors
 //		nColors=persons.size()*2;
-		
-		loadData(ego, 0, iter);
 
-		// Proceed to the EgoNet of myPerson
+		loadData(ego, 0, iter);
 		
 		Iterator<Person> altersIt= persons.iterator();
 
@@ -292,14 +288,14 @@ public class EgoNetPlansItersMakeKML {
 			color = setColor(i, nColors + 1);
 			colors.put(alter.getId(), color);
 		}
-		
+
 		timeStamp = new TimeStamp(new GregorianCalendar(1970, 0, 1, iter, 0, 0));
 
 
 		Style agentLinkStyle =null;
 		if(!myKMLDocument.containsStyle("agentLinkStyle"+alter.getId().toString())){
 			agentLinkStyle = new Style("agentLinkStyle"+alter.getId().toString());
-			agentLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 14));
+			agentLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 10));
 			myKMLDocument.addStyle(agentLinkStyle);
 		}else// Set a constant color for each agent for all iterations
 			agentLinkStyle=myKMLDocument.getStyle("agentLinkStyle"+alter.getId().toString());
@@ -317,7 +313,7 @@ public class EgoNetPlansItersMakeKML {
 					true,
 					Feature.DEFAULT_REGION,
 					Feature.DEFAULT_TIME_PRIMITIVE);
-//					new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
+//			new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
 
 
 			log.info("MAKING NEW KML AGENT FOLDER FOR "+ agentFolder.getId());
@@ -346,14 +342,19 @@ public class EgoNetPlansItersMakeKML {
 		makeActivitySpaceKML_Line(alter,iter,planFolder,agentLinkStyle);
 
 		makeCoreSocialLinkKML(alter,iter,planFolder,agentLinkStyle);
+		
+		// Proceed to the EgoNet of myPerson
+		if(i==0){
+			makeEgoSpaceKML_Line(iter, planFolder, color);
+		}
 		log.info("");
 		if(!(ai.equals(ego))){
 			if(!(ai.equals(alter))){
-			log.info("Making tangential social link in grey");
-		makeTangentialSocialLinkKML(alter,iter,planFolder);
+				log.info("Making tangential social link in grey");
+				makeTangentialSocialLinkKML(alter,iter,planFolder);
+			}
 		}
-		}
-
+		
 		// put facilities in a folder, one facilities folder for each Plan
 		Folder facilitiesFolder = new Folder(
 				"facilities "+myPlan.getPerson().getId().toString()+"-"+iter,
@@ -430,13 +431,85 @@ public class EgoNetPlansItersMakeKML {
 
 	}
 
+	private static void makeEgoSpaceKML_Line(int iter, Folder planFolder, Color color) {
+
+		String id = ego.getId().toString();
+
+		Style egoSpaceStyle=new Style("ego space "+id+"-"+iter);
+		
+		egoSpaceStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 2));
+System.out.println(" # # # # makeEgoSpaceKML_Line "+color.toString());
+
+		Folder es = new Folder(
+				"ego space "+id+"-"+iter,
+				"ego space "+id+"-"+iter,
+				"Contains one agent's ego space in one iteration",
+				Feature.DEFAULT_ADDRESS,
+				Feature.DEFAULT_LOOK_AT,
+				egoSpaceStyle.getId(),
+				true,
+				Feature.DEFAULT_REGION,
+				timeStamp);
+
+		if(!planFolder.containsFeature(es.getId())){
+			planFolder.addFeature(es);
+		}	
+
+
+		// make the activity spaces
+		new PersonCalcEgoSpace().run(ego);
+
+		// add the points of the activity space to the polygon
+		ActivitySpace space = ego.getKnowledge().getActivitySpaces().get(1);
+		if (space instanceof ActivitySpaceEllipse) {
+
+//			calculate the circumference points (boundary)
+			double a = space.getParam("a").doubleValue();
+			double b = space.getParam("b").doubleValue();
+			double theta = space.getParam("theta").doubleValue();
+			double x = space.getParam("x").doubleValue();
+			double y = space.getParam("y").doubleValue();
+			Point oldPoint=null;
+			for (double t=0.0; t<2.0*Math.PI; t=t+2.0*Math.PI/360.0) {
+				// "a*((cos(t)))*cos(phi) - b*((sin(t)))*sin(phi) + x0"
+				double p_xOut = a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta) + x;
+//				double p_xIn = 0.9*(a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta)) + x;
+				// "a*((cos(t)))*sin(phi) + b*((sin(t)))*cos(phi) + y0"
+				double p_yOut = a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta) + y;
+//				double p_yIn = 0.9*(a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta)) + y;
+				CoordI coordOut = trafo.transform(new Coord(p_xOut, p_yOut));
+				Point pointOut= new Point(coordOut.getX(),coordOut.getY(), 0.0);
+//				CoordI coordIn = trafo.transform(new Coord(p_xIn, p_yIn));
+//				Point pointIn= new Point(coordIn.getX(),coordIn.getY(), 0.0);
+
+				if(t>0.0){
+
+					Placemark linkPlacemark = new Placemark(
+							Double.toString(t),
+							Feature.DEFAULT_NAME,
+							Feature.DEFAULT_DESCRIPTION,
+							Feature.DEFAULT_ADDRESS,
+							Feature.DEFAULT_LOOK_AT,
+							egoSpaceStyle.getId(),
+							Feature.DEFAULT_VISIBILITY,
+							Feature.DEFAULT_REGION,
+							timeStamp);
+
+					linkPlacemark.setGeometry(new LineString(oldPoint, pointOut));
+					es.addFeature(linkPlacemark);
+				}
+				oldPoint=pointOut;
+			}
+		}	
+	}
+
 	private static void makeTangentialSocialLinkKML(Person myPerson, int i,
 			Folder folder){
-		
-		
+
+
 		Style tangentialLinkStyle=new Style("tangentialLinkStyle"+myPerson.getId().toString());
 		Color color = new Color(255,128,128,128);
-		tangentialLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 14));
+		tangentialLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 5));
 		// Add a line from the alter's home to another alter's home in the color grey
 		String id = myPerson.getId().toString();
 		Placemark socialLink =  new Placemark(
@@ -458,18 +531,22 @@ public class EgoNetPlansItersMakeKML {
 		folder.addFeature(socialLink);
 		log.info("Feature added: grey social link from alter "+ai.getId()+" to alter "+myPerson.getId());
 	}
-	
+
 	private static void makeCoreSocialLinkKML(Person myPerson, int i,
 			Folder folder, Style agentLinkStyle){
 		// Add a line from the alter's home to the ego's home in the color of the alter
 		String id = myPerson.getId().toString();
+		Color color = agentLinkStyle.getLineStyle().getColor();
+		Style socialLinkStyle=new Style(id+ego.getId().toString());
+		socialLinkStyle.setLineStyle(new LineStyle(color, LineStyle.DEFAULT_COLOR_MODE,5));
+
 		Placemark socialLink =  new Placemark(
 				id+ego.getId().toString()+"_"+i,
 				"Core social link_"+i,
 				Feature.DEFAULT_DESCRIPTION,
 				Feature.DEFAULT_ADDRESS,
 				Feature.DEFAULT_LOOK_AT,
-				agentLinkStyle.getId(),
+				socialLinkStyle.getId(),
 				Feature.DEFAULT_VISIBILITY,
 				Feature.DEFAULT_REGION,
 				timeStamp);
@@ -500,7 +577,7 @@ public class EgoNetPlansItersMakeKML {
 				"Contains one agent's activity space in one iteration",
 				Feature.DEFAULT_ADDRESS,
 				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
+				activitySpaceStyle.getId(),
 				true,
 				Feature.DEFAULT_REGION,
 				timeStamp);
@@ -544,7 +621,7 @@ public class EgoNetPlansItersMakeKML {
 							Feature.DEFAULT_DESCRIPTION,
 							Feature.DEFAULT_ADDRESS,
 							Feature.DEFAULT_LOOK_AT,
-							agentLinkStyle.getId(),
+							activitySpaceStyle.getId(),
 							Feature.DEFAULT_VISIBILITY,
 							Feature.DEFAULT_REGION,
 							timeStamp);
@@ -571,7 +648,7 @@ public class EgoNetPlansItersMakeKML {
 
 		// make the activity spaces
 		new PersonCalcActivitySpace("all").run(myPerson);
-		new PersonDrawActivitySpace().run(myPerson);
+//		new PersonDrawActivitySpace().run(myPerson);
 		// add the points of the activity space to the polygon
 		ActivitySpace space = myPerson.getKnowledge().getActivitySpaces().get(0);
 
