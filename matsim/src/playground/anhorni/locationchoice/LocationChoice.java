@@ -30,7 +30,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
-import playground.anhorni.locationchoice.choiceset.LocationMutatorwChoiceSet;
 import playground.anhorni.locationchoice.choiceset.LocationMutatorwChoiceSetSimultan;
 
 
@@ -44,7 +43,7 @@ public class LocationChoice extends MultithreadedModuleA {
 	
 	// temporaray hack:
 	// 0: random 1: with choice set
-	int variant = 1;
+	int variant = 0;
 	
 
 	public LocationChoice() {
