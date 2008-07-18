@@ -24,8 +24,8 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 				
 		if (trialNr > 50) {
 			
-			log.info("Could not do location choice. ttBudget " + subChain.getTtBudget());
-			
+			/*
+			log.info("Could not do location choice. ttBudget " + subChain.getTtBudget());		
 			log.info("start " +subChain.getFirstPrimAct().getCoord().toString());
 			log.info("end "+subChain.getLastPrimAct().getCoord().toString());
 			log.info("distance s-e "+subChain.getLastPrimAct().getCoord().calcDistance(subChain.getFirstPrimAct().getCoord()));
@@ -38,6 +38,7 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			log.info("trial nr " + trialNr);
 			double tt = this.computeTravelTime(subChain.getFirstPrimAct(), subChain.getLastPrimAct());
 			log.info("travel time s-e: "+tt);
+			*/
 			
 			super.unsuccessfullLC += 1;
 			
