@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -35,7 +35,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
 
-
 /**
  * This algorithm handles double links (two links with same from and to node) by splitting
  * one of the link and adding an additional node. This is necessary, since the routes in MATSim
@@ -46,7 +45,7 @@ import org.matsim.utils.misc.Time;
 public class NetworkSegmentDoubleLinks {
 	private static final Logger log = Logger.getLogger(NetworkSegmentDoubleLinks.class);
 
-	private NetworkLayer network;
+	private NetworkLayer network = null;
 
 	private int dblLinks = 0;
 	private int trblLinks = 0; // what does trbl stand for?? please document! TODO [GL] documentation
@@ -114,18 +113,13 @@ public class NetworkSegmentDoubleLinks {
 
 	private void splitLink(Link link) {
 		this.network.removeLink(link);
-		String from = link.getFromNode().getId().toString();
-		String to = link.getToNode().getId().toString();
-		String length = Double.toString(link.getLength()/2);
-		String freespeed = Double.toString(link.getFreespeed(Time.UNDEFINED_TIME));
-		String capacity = Double.toString(link.getCapacity(Time.UNDEFINED_TIME));
-		String permlanes = Double.toString(link.getLanes(Time.UNDEFINED_TIME));
-		String type = null;
-		String median = this.network.createNode(getNewNodeId(), link.getCenter()).getId().toString();
-		String l1Id = link.getId().toString();
-		this.network.createLink(l1Id, from, median, length, freespeed, capacity, permlanes, l1Id, type);
-		String l2Id = getNewLinkId().toString();
-		this.network.createLink(l2Id, median, to, length, freespeed, capacity, permlanes, l2Id, type);
+		double length = link.getLength()/2.0;
+		double freespeed = link.getFreespeed(Time.UNDEFINED_TIME);
+		double capacity = link.getCapacity(Time.UNDEFINED_TIME);
+		double permlanes = link.getLanes(Time.UNDEFINED_TIME);
+		Node medianNode = this.network.createNode(getNewNodeId(), link.getCenter());
+		this.network.createLink(link.getId(), link.getFromNode(), medianNode, length, freespeed, capacity, permlanes);
+		this.network.createLink(getNewLinkId(), medianNode, link.getToNode(), length, freespeed, capacity, permlanes);
 	}
 
 	private Id getNewLinkId() {
