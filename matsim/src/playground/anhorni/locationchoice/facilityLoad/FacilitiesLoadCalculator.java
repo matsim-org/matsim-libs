@@ -110,8 +110,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 				Facility facility = iter.next();
 				
 				Coord bellevue = new Coord(683508.50, 246832.91);
-				//if (facility.getCenter().calcDistance(bellevue) <= 30000) {
-				if (facility.getCenter().calcDistance(bellevue) <= 60000) {
+				if (facility.getCenter().calcDistance(bellevue) <= 30000) {
 												
 					Iterator<Activity> act_it=facility.getActivities().values().iterator();
 					while (act_it.hasNext()){

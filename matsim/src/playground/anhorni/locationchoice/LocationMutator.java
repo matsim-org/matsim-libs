@@ -70,10 +70,9 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 		this.shopFacQuadTree=this.builFacQuadTree(this.shop_facilities, this.shop_facilities);
 		this.leisFacQuadTree=this.builFacQuadTree(this.leisure_facilities, this.leisure_facilities);
 		
-		//this.zhShopFacilities = (ArrayList<Facility>)this.shopFacQuadTree.get(683508.50, 246832.91, 30000);
-		//this.zhLeisureFacilities = (ArrayList<Facility>)this.leisFacQuadTree.get(683508.50, 246832.91, 30000);
-		this.zhShopFacilities = (ArrayList<Facility>)this.shopFacQuadTree.get(683508.50, 246832.91, 60000);
-		this.zhLeisureFacilities = (ArrayList<Facility>)this.leisFacQuadTree.get(683508.50, 246832.91, 60000);
+		double radius = 30000;
+		this.zhShopFacilities = (ArrayList<Facility>)this.shopFacQuadTree.get(683508.50, 246832.91, radius);
+		this.zhLeisureFacilities = (ArrayList<Facility>)this.leisFacQuadTree.get(683508.50, 246832.91, radius);
 		
 		TreeMap<Id, Facility> treemapShop = new TreeMap<Id, Facility>();
 		Iterator<Facility> sfac_it = this.zhShopFacilities.iterator();
