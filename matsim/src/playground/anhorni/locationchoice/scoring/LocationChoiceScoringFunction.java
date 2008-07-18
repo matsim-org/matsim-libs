@@ -297,6 +297,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 			score += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
 		
+		// used arrival and departure time because of parking cap restr. before act actually starts
 		if (act.getType().startsWith("s")){
 			this.penalty.add(new Penalty(arrivalTime, departureTime, act.getFacility(), score));
 		}
