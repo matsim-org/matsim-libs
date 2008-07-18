@@ -171,11 +171,13 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 			else {
 				if (type.equals("s")) {
 					log.info("reduced area: shop facilities");
-					iter = this.shopFacQuadTree.get(683508.50, 246832.91, 30000).iterator();
+					//iter = this.shopFacQuadTree.get(683508.50, 246832.91, 30000).iterator();
+					iter = this.shopFacQuadTree.get(683508.50, 246832.91, 60000).iterator();
 				}
 				else {
 					log.info("reduced area: leisure facilities");
-					iter = this.leisFacQuadTree.get(683508.50, 246832.91, 30000).iterator();
+					//iter = this.leisFacQuadTree.get(683508.50, 246832.91, 30000).iterator();
+					iter = this.leisFacQuadTree.get(683508.50, 246832.91, 60000).iterator();
 				}
 			}
 			while (iter.hasNext()){
