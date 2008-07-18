@@ -47,9 +47,9 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		while (sc_it.hasNext()) {
 			SubChain sc = sc_it.next();
 			
-			//initially using 25.3 km/h + 10 %
+			//initially using 25.3 km/h + 50 %
 			// mikro census 2005
-			double speed = 27.8/3.6;
+			double speed = 37.95/3.6;
 			
 			if (sc.getTtBudget() < 1.0) {
 				continue;
