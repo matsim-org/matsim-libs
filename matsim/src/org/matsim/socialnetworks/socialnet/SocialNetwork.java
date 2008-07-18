@@ -172,7 +172,7 @@ public class SocialNetwork {
 
 
 				if (Gbl.random.nextInt()<pIJ){
-					if(makeSocialContactNotify(pI, pJ, 0, "random")==2){
+					if(makeSocialContactNotify(pI, pJ, 0, "Barabasi-Albert")==2){
 						met=true;
 						j++;
 //						log.info(" "+pJ.getId()+" "+pJ.getKnowledge().egoNet.getOutDegree());

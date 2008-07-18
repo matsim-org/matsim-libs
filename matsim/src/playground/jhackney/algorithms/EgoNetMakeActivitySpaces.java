@@ -31,7 +31,7 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.Scenario;
-import playground.jhackney.kml.EgoNetPlansItersMakeKML2;
+import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 
 public class EgoNetMakeActivitySpaces {
 

@@ -237,11 +237,11 @@ public class SpatialInteractorActsFast {
 
 						// If they know each other, probability is 1.0 that the relationship is reinforced
 						if (p1.getKnowledge().getEgoNet().knows(p2)) {
-							net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
+							net.makeSocialContact(p1,p2,iteration,"renew_"+myActivity.getType());
 //							System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 						} else {
 							// If the two do not already know each other,
-							net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
+							net.makeSocialContact(p1,p2,iteration,"new_"+myActivity.getType());
 //							System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
 						}
 					}
@@ -293,13 +293,13 @@ public class SpatialInteractorActsFast {
 
 					// If they know each other, probability is 1.0 that the relationship is reinforced
 					if (p1.getKnowledge().getEgoNet().knows(p2)) {
-						net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
+						net.makeSocialContact(p1,p2,iteration,"renew_"+myActivity.getType());
 //						System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 					} else {
 						// If the two do not already know each other,
 
 						if(Gbl.random.nextDouble() < pBecomeFriends){
-							net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
+							net.makeSocialContact(p1,p2,iteration,"new_"+myActivity.getType());
 //							System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
 						}
 					}
@@ -362,13 +362,13 @@ public class SpatialInteractorActsFast {
 
 						// If they know each other, probability is 1.0 that the relationship is reinforced
 						if (p1.getKnowledge().getEgoNet().knows(p2)) {
-							net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
+							net.makeSocialContact(p1,p2,iteration,"renew_"+myActivity.getType());
 //							System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 						} else {
 							// If the two do not already know each other,
 
 							if(Gbl.random.nextDouble() < pBecomeFriends){
-								net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
+								net.makeSocialContact(p1,p2,iteration,"new_"+myActivity.getType());
 //								System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
 							}
 						}
@@ -447,12 +447,12 @@ public class SpatialInteractorActsFast {
 
 									// If they know each other, probability is 1.0 that the relationship is reinforced
 									if (p1.getKnowledge().getEgoNet().knows(p2)) {
-										net.makeSocialContact(p1,p2,iteration,"renew"+myActivity.getType());
+										net.makeSocialContact(p1,p2,iteration,"renew_"+myActivity.getType());
 //										System.out.println("Person "+p1.getId()+" renews with Person "+ p2.getId());
 									} else {
 										// If the two do not already know each other,
 
-										net.makeSocialContact(p1,p2,iteration,"new"+myActivity.getType());
+										net.makeSocialContact(p1,p2,iteration,"new_"+myActivity.getType());
 //										System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
 
 									}
