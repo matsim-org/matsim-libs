@@ -20,11 +20,17 @@
 
 package playground.anhorni.locationchoice;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
+import playground.anhorni.locationchoice.choiceset.LocationMutatorwChoiceSet;
 import playground.anhorni.locationchoice.choiceset.LocationMutatorwChoiceSetSimultan;
 
 
@@ -32,7 +38,9 @@ public class LocationChoice extends MultithreadedModuleA {
 
 	private NetworkLayer network=null;
 	private Controler controler = null;
-	private PlanAlgorithmI  planAlgoInstance = null;
+	private List<PlanAlgorithmI>  planAlgoInstances = new Vector<PlanAlgorithmI>();
+	
+	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	
 	// temporaray hack:
 	// 0: random 1: with choice set
@@ -62,7 +70,15 @@ public class LocationChoice extends MultithreadedModuleA {
 	public void finish() {
 		super.finish();
 		if (variant == 1) {
-			((LocationMutatorwChoiceSetSimultan)this.planAlgoInstance).finish();
+			
+			int unsuccessfull = 0;
+			
+			Iterator<PlanAlgorithmI> planAlgo_it = this.planAlgoInstances.iterator();
+			while (planAlgo_it.hasNext()) {
+				PlanAlgorithmI plan_algo = planAlgo_it.next();
+				unsuccessfull += ((LocationMutatorwChoiceSetSimultan)plan_algo).getNumberOfUnsuccessfull();				
+			}		
+			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);		
 		}
 	}
 
@@ -70,11 +86,11 @@ public class LocationChoice extends MultithreadedModuleA {
 	@Override
 	public PlanAlgorithmI getPlanAlgoInstance() {
 		if (variant == 0) {
-			this.planAlgoInstance = new RandomLocationMutator(this.network);
+			this.planAlgoInstances.add(new RandomLocationMutator(this.network));
 		}
 		else {
-			this.planAlgoInstance = new LocationMutatorwChoiceSetSimultan(this.network, this.controler);
+			this.planAlgoInstances.add(new LocationMutatorwChoiceSetSimultan(this.network, this.controler));
 		}		
-		return this.planAlgoInstance;
+		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
 }

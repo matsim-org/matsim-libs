@@ -41,8 +41,11 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		}	
 	}
 	
-	public void finish() {
-		log.info("No location choice done for :" + unsuccessfullLC+ " persons in this iteration");
+	public int getNumberOfUnsuccessfull() {
+		return this.unsuccessfullLC;		
+	}
+	
+	public void resetUnsuccsessfull() {
 		this.unsuccessfullLC = 0;
 	}
 
