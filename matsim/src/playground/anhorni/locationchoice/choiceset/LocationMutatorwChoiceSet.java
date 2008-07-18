@@ -51,7 +51,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 			SubChain sc = sc_it.next();
 			
 			if (sc.getTtBudget() < 1.0) {
-				log.info("Could not do location choice, TTBudget too small");
+				continue;
 			}
 					
 			int nrOfTrials = 0;
