@@ -501,7 +501,13 @@ public class NetworkLayer extends Layer implements BasicNet {
 		buildQuadTree();
 	}
 
-	private void buildQuadTree() {
+	synchronized private void buildQuadTree() {
+		/* the method must be synchronized to ensure we only build one quadTree
+		 * in case that multiple threads call a method that requires the quadTree.
+		 */
+		if (this.nodeQuadTree != null) {
+			return;
+		}
 		double startTime = System.currentTimeMillis();
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
@@ -518,10 +524,14 @@ public class NetworkLayer extends Layer implements BasicNet {
 		maxx += 1.0;
 		maxy += 1.0;
 		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.nodeQuadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
+		QuadTree<Node> quadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
 		for (Node n : this.nodes.values()) {
-			this.nodeQuadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
+			quadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
 		}
+		/* assign the quadTree at the very end, when it is complete.
+		 * otherwise, other threads may already start working on an incomplete quadtree
+		 */
+		this.nodeQuadTree = quadTree;
 		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
 	}
 
