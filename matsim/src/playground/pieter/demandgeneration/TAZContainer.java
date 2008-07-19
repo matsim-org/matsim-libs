@@ -37,13 +37,13 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class TAZContainer {
 	//TAZ object with all relevant methods to find if point is in a TAZ
-	
+
 	private Collection<Feature> polygons;
 	private HashMap<String,MultiPolygon> polygonHashMap;
 	private HashMap<String,Polygon> envelopeHashMap;
 	private String TAZShapeFile;
 	private GeometryFactory geofac;
-	
+
 	public TAZContainer(String shapeFile) {
 		this.TAZShapeFile = shapeFile;
 		FeatureSource featSrc = null;
@@ -52,15 +52,15 @@ public class TAZContainer {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		this.polygons = HomePointGenerator.getFeatures(featSrc);
+		this.polygons = SAInitialDemandGenerator.getFeatures(featSrc);
 		this.polygonHashMap = new HashMap<String, MultiPolygon>();
 		this.envelopeHashMap = new HashMap<String, Polygon>();
 		this.geofac = new GeometryFactory();
 		indexPolygons();
 	}
-	
+
 	private void indexPolygons() {
-		//goes through the collection of polygons, 
+		//goes through the collection of polygons,
 		for (Feature ft : this.polygons){
 			Geometry geo = ft.getDefaultGeometry();
 			//converts geometry to Multipolygon, if not already
@@ -78,7 +78,7 @@ public class TAZContainer {
 			this.envelopeHashMap.put(ID,(Polygon)multiPoly.getEnvelope());
 		}
 	}
-	
+
 	 String findContainerID(Point point){
 		//returns the container Multipolygon ID
 		Collection<String> possibleCandidates = new ArrayList<String>();
@@ -93,7 +93,7 @@ public class TAZContainer {
 		//check if there are any candidates, else the point isn't in any polygon
 		if(possibleCandidates.isEmpty()){
 			System.out.println("Point not in any polygon");
-			return "9999";
+			return "3099";
 		}
 		//got list of candidates, now check their geometries
 		for(String ID : possibleCandidates){
@@ -103,8 +103,12 @@ public class TAZContainer {
 		}
 		//if the method hasn't exited already, the point isn't in any polygon
 		System.out.println("Point not in any polygon");
-		return "9999";
+		return "3099";
 	}
-	
+
+	public HashMap<String, MultiPolygon> getTAZHAshMap() {
+		return this.polygonHashMap;
+	}
+
 
 }

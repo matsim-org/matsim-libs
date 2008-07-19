@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class HomePointGenerator {
+public class TenPercentHomePointGenerator {
 
 	private Collection<Feature> polygons;
 	private String inputPersons;
@@ -49,7 +49,7 @@ public class HomePointGenerator {
 	private boolean checkForTAZ;
 
 
-	public HomePointGenerator(Collection<Feature> polygons, String inputPersons, CoordinateReferenceSystem coordinateReferenceSystem, String outputShape){
+	public TenPercentHomePointGenerator(Collection<Feature> polygons, String inputPersons, CoordinateReferenceSystem coordinateReferenceSystem, String outputShape){
 		this.polygons = polygons;
 		this.inputPersons = inputPersons;
 		this.polygonHashMap = new HashMap<String, MultiPolygon>();
@@ -61,7 +61,7 @@ public class HomePointGenerator {
 		initFeatures();
 	}
 	//overloaded in case you want to find TAZ
-	public HomePointGenerator(Collection<Feature> polygons, String inputPersons, CoordinateReferenceSystem coordinateReferenceSystem, String outputShape, String TAZShape){
+	public TenPercentHomePointGenerator(Collection<Feature> polygons, String inputPersons, CoordinateReferenceSystem coordinateReferenceSystem, String outputShape, String TAZShape){
 		this.polygons = polygons;
 		this.inputPersons = inputPersons;
 		this.polygonHashMap = new HashMap<String, MultiPolygon>();
@@ -104,7 +104,9 @@ public class HomePointGenerator {
 		while (inputReader.hasNext()) {
 			//reads SP_CODE as string, same as hashmap keys
 			String SP_CODE = inputReader.next();
-			int numberOfPeopleInSP = inputReader.nextInt();
+////////////////////////////////////////////////////////////////////////////////////////////
+			int numberOfPeopleInSP = inputReader.nextInt()/10;
+////////////////////////////////////////////////////////////////////////////////////////////
 			MultiPolygon multiPoly = this.polygonHashMap.get(SP_CODE);
 			if (multiPoly == null) {
 				//in case the text file references a SP we dont have in  shapefile
@@ -199,7 +201,7 @@ public class HomePointGenerator {
 		//use this if you have a taz shapefile
 		//new HomePointGenerator(inputFeatureCollection,inputPersons,featSrc.getSchema().getDefaultGeometry().getCoordinateSystem(),outputShape, TAZShape).run();
 		//and this if not
-		new HomePointGenerator(inputFeatureCollection,inputPersons,featSrc.getSchema().getDefaultGeometry().getCoordinateSystem(),outputShape).run();
+		new TenPercentHomePointGenerator(inputFeatureCollection,inputPersons,featSrc.getSchema().getDefaultGeometry().getCoordinateSystem(),outputShape).run();
 		System.out.printf("Done! Point shapefile output to %s", outputShape);
 	}
 //end Class
