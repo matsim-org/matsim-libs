@@ -38,7 +38,7 @@ public class BasicNodeImpl implements BasicNode {
 	 * defined. See also BasicLink. If this is not O.K., then the BasicLink must
 	 * not extend Location. */
 	protected final CoordI coord;
-	protected Id id;
+	protected final Id id;
 
 	public BasicNodeImpl(Id id, CoordI coord) {
 		this.id = id;
@@ -51,17 +51,14 @@ public class BasicNodeImpl implements BasicNode {
 		return true;
 	}
 
-
 	public boolean addOutLink(BasicLink link) {
 		this.outlinks.put(link.getId(), link);
 		return true;
 	}
 
-
 	public Map<Id, ? extends BasicLink> getInLinks() {
 		return this.inlinks;
 	}
-
 
 	public Map<Id, ? extends BasicLink> getOutLinks() {
 		return this.outlinks;
@@ -72,12 +69,7 @@ public class BasicNodeImpl implements BasicNode {
 		return this.coord;
 	}
 
-
 	public Id getId() {
 		return this.id;
-	}
-
-	public void setId(final Id id) {
-		this.id = id;
 	}
 }
