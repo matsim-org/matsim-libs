@@ -22,15 +22,18 @@ package org.matsim.socialnetworks.socialnet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
+import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plans;
 import org.matsim.socialnetworks.io.MakeSocialNetworkFromFile;
+import org.matsim.utils.geometry.CoordI;
 
 public class SocialNetwork {
 
@@ -84,6 +87,9 @@ public class SocialNetwork {
 		} else if (sNAlgorithmName_.equals("barabasialbert")) {
 			log.info("Setting up the " + sNAlgorithmName_ + " algorithm.");
 			initBASocialNetwork(plans);
+		}else if (sNAlgorithmName_.equals("euclidrandom")){
+			log.info("Setting up the " + sNAlgorithmName_ +" algorithm.");
+			initEuclidRandomNetwork(plans);
 
 		} else if (sNAlgorithmName_.equals("read")){
 			log.info("Preparing to read in the social network");
@@ -96,6 +102,50 @@ public class SocialNetwork {
 					+ " < is not known. Poor choice of input parameter in module "
 					+ SocNetConfigGroup.GROUP_NAME
 					+ ". Check spelling or choose from: random, wattssmallworld, jingirnew, barabasialbert, empty, read");
+		}
+	}
+
+	/**
+	 * Generates a Bernoulli (Erdös/Renyi) network with link
+	 * probability modified by the distance between alters
+	 *
+	 * 
+	 * Need to change this algorithm so that it doesn't choose to link to random people
+	 *  if the qualifications are met, but to choose two people given qualifications
+	 *  and to link them; stratified sampling.
+	 * @param plans
+	 */
+	private void initEuclidRandomNetwork(Plans plans) {
+
+		int kbar = Integer.parseInt(socnetConfig.getSocNetKbar());
+		log.info("Links the Persons together in UNDIRECTED distance-dependent Erdos/Renyi random graph.");
+		Person[] personList = new Person[1];
+		personList = plans.getPersons().values().toArray( personList );
+
+		int numLinks = (int) ((kbar * personList.length) / 2.);
+		
+		double p0=1.;
+		double rmin=1000.;
+		double rmax=100000.;
+		double alpha=1.5;
+		double c=p0/(Math.pow(rmin,-alpha));
+		System.out.println(alpha+" "+c+" "+p0+" "+rmin);
+		int i=0;
+		while(i<numLinks){
+//			for (int i = 0; i < numLinks; i++) {
+			Person person1 = personList[Gbl.random.nextInt(personList.length)];
+			Person person2 = personList[Gbl.random.nextInt(personList.length)];
+			CoordI home1=((Act)person1.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
+			CoordI home2=((Act)person2.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
+			double distance = home1.calcDistance(home2);
+			double pdist=c*Math.pow((distance+rmin),-alpha);
+
+			if(Gbl.random.nextDouble()<pdist){
+				if(makeSocialContactNotify(person1, person2, 0, "random")==2){//new link made
+					System.out.println("new link made dist "+distance+" "+pdist);
+					i++;
+				}
+			}
 		}
 	}
 
@@ -204,12 +254,21 @@ public class SocialNetwork {
 		personList = plans.getPersons().values().toArray( personList );
 
 		int numLinks = (int) ((kbar * personList.length) / 2.);
-		for (int i = 0; i < numLinks; i++) {
+		double pdist=2.*(double)numLinks/((personList.length*(personList.length-1)));
+		int i=0;
+		while(i<numLinks){
+//		for (int i = 0; i < numLinks; i++) {
 			Person person1 = personList[Gbl.random.nextInt(personList.length)];
 			Person person2 = personList[Gbl.random.nextInt(personList.length)];
-
+			CoordI home1=((Act)person1.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
+			CoordI home2=((Act)person2.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
+			double distance = home1.calcDistance(home2);
+			
 //			makeSocialContact( person1, person2, -1);
-			makeSocialContact(person1, person2, 0, "random");
+			if(makeSocialContactNotify(person1, person2, 0, "random")==2){
+			System.out.println("new link made dist "+distance+" "+pdist);
+			i++;
+			}
 		}
 	}
 
@@ -551,7 +610,7 @@ public class SocialNetwork {
 				log.info("  Number of links to remove: "+nRemove);
 				int i=0;
 				while(i<nRemove){
-//				for(int i=0;i<nRemove;i++){
+//					for(int i=0;i<nRemove;i++){
 					int index = Gbl.random.nextInt(this.getLinks().size());
 					SocialNetEdge edge = (SocialNetEdge) this.getLinks().get(index);
 //					removeLink(edge);

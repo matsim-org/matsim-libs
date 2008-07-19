@@ -101,7 +101,7 @@ public class SocializingScoringFunction implements ScoringFunction{
 	}
 
 	public double getScore() {
-		log.info("FFR "+this.friendFoeRatio+" NF "+this.nFriends+" LNF "+Math.log(this.nFriends+1));
+//		log.info("FFR "+this.friendFoeRatio+" NF "+this.nFriends+" LNF "+Math.log(this.nFriends+1));
 		return this.scoringFunction.getScore() +
 		betaFriendFoe*this.friendFoeRatio+
 		betaNFriends * this.nFriends +
