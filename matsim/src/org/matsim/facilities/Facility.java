@@ -378,6 +378,7 @@ public class Facility extends AbstractLocation {
 			this.load[i] = 0;
 			this.numberOfVisitorsPerDay = 0;
 			this.sumCapacityPenaltyFactor = 0.0;
+			this.allVisitors = 0;
 		}
 	}
 
