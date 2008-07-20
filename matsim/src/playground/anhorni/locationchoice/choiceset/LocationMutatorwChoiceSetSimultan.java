@@ -8,12 +8,10 @@ import org.matsim.controler.Controler;
 import org.matsim.network.NetworkLayer;
 import org.matsim.plans.Act;
 import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
-
 
 public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet {
 	
-	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSetSimultan.class);
+	//private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSetSimultan.class);
 	
 	public LocationMutatorwChoiceSetSimultan(final NetworkLayer network, Controler controler) {
 		super(network, controler);
@@ -67,9 +65,13 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 					
 			startCoord = act.getCoord();				
 			ttBudget -= this.computeTravelTime(prevAct, act);
-			double tt2Anchor = this.computeTravelTime(act, subChain.getLastPrimAct());
 			
-			if ((ttBudget - tt2Anchor) < 0.0) {
+			if (!act_it.hasNext()) {
+				double tt2Anchor = this.computeTravelTime(act, subChain.getLastPrimAct());
+				ttBudget -= tt2Anchor;
+			}
+			
+			if (ttBudget < 0.0) {
 				return false;
 			}
 			prevAct = act;
