@@ -81,7 +81,6 @@ public class LocationChoice extends MultithreadedModuleA {
 			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);	
 				
 		}
-		log.info("numberOfPlanAlgoInstances :"+ this.planAlgoInstances.size());
 		this.planAlgoInstances.clear();
 	}
 

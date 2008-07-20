@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facilities;
@@ -39,7 +39,7 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 	protected ArrayList<Facility> zhShopFacilities = null;
 	protected ArrayList<Facility> zhLeisureFacilities = null;
 	
-	private static final Logger log = Logger.getLogger(LocationMutator.class);
+//	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
 
 	public LocationMutator(final NetworkLayer network, final Controler controler) {
