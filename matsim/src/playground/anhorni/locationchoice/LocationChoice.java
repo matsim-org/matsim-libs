@@ -75,10 +75,14 @@ public class LocationChoice extends MultithreadedModuleA {
 			Iterator<PlanAlgorithmI> planAlgo_it = this.planAlgoInstances.iterator();
 			while (planAlgo_it.hasNext()) {
 				PlanAlgorithmI plan_algo = planAlgo_it.next();
-				unsuccessfull += ((LocationMutatorwChoiceSetSimultan)plan_algo).getNumberOfUnsuccessfull();				
+				unsuccessfull += ((LocationMutatorwChoiceSetSimultan)plan_algo).getNumberOfUnsuccessfull();
+				((LocationMutatorwChoiceSetSimultan)plan_algo).resetUnsuccsessfull();
 			}		
-			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);		
+			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);	
+				
 		}
+		log.info("numberOfPlanAlgoInstances :"+ this.planAlgoInstances.size());
+		this.planAlgoInstances.clear();
 	}
 
 

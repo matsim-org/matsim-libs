@@ -28,8 +28,8 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 	protected NetworkLayer network = null;
 	protected Controler controler = null;
 	private final Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
-	protected final TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
-	protected final TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
+	protected TreeMap<Id,Facility> shop_facilities = null;
+	protected TreeMap<Id,Facility> leisure_facilities = null;
 	protected QuadTree<Facility> shopFacQuadTree = null;
 	protected QuadTree<Facility> leisFacQuadTree = null;
 	
@@ -39,18 +39,22 @@ public abstract class LocationMutator extends PersonAlgorithm implements PlanAlg
 	protected ArrayList<Facility> zhShopFacilities = null;
 	protected ArrayList<Facility> zhLeisureFacilities = null;
 	
-	//private static final Logger log = Logger.getLogger(LocationMutator.class);
+	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
 
 	public LocationMutator(final NetworkLayer network, final Controler controler) {
-		this.init(network, controler);
+		this.initialize(network, controler);
 	}
 	
 	public LocationMutator(final NetworkLayer network) {
-		this.init(network, null);
+		this.initialize(network, null);
 	}
 
-	private void init(final NetworkLayer network, Controler controler) {
+	private void initialize(final NetworkLayer network, Controler controler) {
+	
+		this.shop_facilities=new TreeMap<Id,Facility>();
+		this.leisure_facilities=new TreeMap<Id,Facility>();
+		
 		this.network = network;
 		this.controler = controler;
 
