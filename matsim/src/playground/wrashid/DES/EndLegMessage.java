@@ -16,6 +16,7 @@ public class EndLegMessage extends EventMessage {
 		super(scheduler,vehicle);
 		eventType=SimulationParameters.END_LEG;
 	}
+	
 
 	@Override
 	public void selfhandleMessage() {

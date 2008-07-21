@@ -36,4 +36,12 @@ public class SimulationParameters {
 														   // - when a car waits for more than 'stuckTime' for 
 														   //   entering next road, it will enter the next 
 
+	
+	
+	// simulation internal parameters
+	
+	// specifies the minimal queue length for using in all message static constructers
+    // this parameter needs to be set to avoid race conditions
+	public static final int minQueueLength=Runtime.getRuntime().availableProcessors()*10;
+	
 }

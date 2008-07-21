@@ -29,6 +29,10 @@ public abstract class EventMessage extends SelfhandleMessage {
 		logEvent();
 	}
 
+	public void resetMessage(Scheduler scheduler,Vehicle vehicle){
+		this.scheduler=scheduler;
+		this.vehicle=vehicle;
+	}
 	
 
 }
