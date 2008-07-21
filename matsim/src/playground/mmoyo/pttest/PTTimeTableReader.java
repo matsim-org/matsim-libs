@@ -1,8 +1,6 @@
 package playground.mmoyo.pttest;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -13,6 +11,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 
+/** 
+ * Parses the xml file with the information of departures
+ */
 public class PTTimeTableReader extends MatsimXmlParser {
 	private final static String SCHEDULE = "schedule";
 	private final static String NODE = "node";
@@ -23,9 +24,9 @@ public class PTTimeTableReader extends MatsimXmlParser {
 	private String strIdNode="";
 	private String strIdPTLine="";
 	
-	private Map <IdImpl, Map<IdImpl,int[]>> nodeTimeTableMap = new TreeMap <IdImpl, Map<IdImpl,int[]>>();
+	//private Map <IdImpl, Map<IdImpl,int[]>> nodeTimeTableMap = new TreeMap <IdImpl, Map<IdImpl,int[]>>();
 	IdImpl idNode = null;
-	PTTimeTable ptTimeTable = null;
+	private PTTimeTable ptTimeTable = new PTTimeTable();
 	
 	public PTTimeTableReader() {
 		super();
@@ -87,7 +88,8 @@ public class PTTimeTableReader extends MatsimXmlParser {
 	}
 
 	private void endPTLine(){
-	    AddTimeTable(strIdNode, strIdPTLine, bufferDeparture.toString());
+	    //addTimeTable(strIdNode, strIdPTLine, bufferDeparture.toString());
+	    this.ptTimeTable.addDepartures(strIdNode, strIdPTLine, bufferDeparture.toString());
 	    bufferDeparture=null;
 	}
 
@@ -102,39 +104,41 @@ public class PTTimeTableReader extends MatsimXmlParser {
 		}
 	}
 	
-	/////////////Extra methods///////////////////////////////////////
-	private void AddTimeTable(String idnode, String idPTLine, String departure){  
-		idNode = new IdImpl(idnode);
-		ptTimeTable = new PTTimeTable(new IdImpl(idPTLine), DeparturesToArray(departure));		
-		
-		if (!nodeTimeTableMap.containsKey(idNode)){
-			Map<IdImpl,int[]> map2 = new TreeMap <IdImpl,int[]>();
-			map2.put(new IdImpl(idPTLine), DeparturesToArray(departure));
-			nodeTimeTableMap.put(idNode,  map2);
-		
-		}else{
-			nodeTimeTableMap.get(idNode).put(new IdImpl(idPTLine), DeparturesToArray(departure));
-		}	
-		idNode= null;
-		ptTimeTable= null;
+	public PTTimeTable getTimeTable(){
+		return this.ptTimeTable;
 	}
-	
-	private int[] DeparturesToArray(String dep){
-		String[] strDep = dep.split(" ");
-		int [] intDep= new int[strDep.length];
-		for (int x= 0; x < strDep.length; x++){
-			intDep[x] = ToSeconds(strDep[x]);
-		}
-		return intDep;
-	}
-	
-	private int ToSeconds(String strDeparture){
-		String[] strTime = strDeparture.split(":");  //if we had seconds:  + (departure + ":00").split(":");   //
-		return ((Integer.parseInt(strTime[0]) * 3600) + (Integer.parseInt(strTime[1]))*60) ;  	////if we had seconds:   + Integer.parseInt(strTime[2] 
-	}
-	
-	public Map <IdImpl, Map<IdImpl,int[]>> GetTimeTable(){
-		return this.nodeTimeTableMap;
-	}
-
 }// class
+
+
+/////////////OLD CODE///////////////////////////////////////
+/*private void addTimeTable(String idnode, String idPTLine, String departure){  
+*	idNode = new IdImpl(idnode);	
+*	
+*	if (!nodeTimeTableMap.containsKey(idNode)){
+*		Map<IdImpl,int[]> map2 = new TreeMap <IdImpl,int[]>();
+*		map2.put(new IdImpl(idPTLine), departuresToArray(departure));
+*		nodeTimeTableMap.put(idNode,  map2);
+*	}else{
+*		nodeTimeTableMap.get(idNode).put(new IdImpl(idPTLine), departuresToArray(departure));
+*	}	
+*	idNode= null;
+*	}
+*	private int[] departuresToArray(String dep){
+*	String[] strDep = dep.split(" ");
+*	int [] intDep= new int[strDep.length];
+*	for (int x= 0; x < strDep.length; x++){
+*		intDep[x] = toSeconds(strDep[x]);
+*	}
+*	return intDep;
+*}
+*	
+*	private int toSeconds(String strDeparture){
+*	String[] strTime = strDeparture.split(":");  //if we had seconds:  + (departure + ":00").split(":");   //
+*	return ((Integer.parseInt(strTime[0]) * 3600) + (Integer.parseInt(strTime[1]))*60) ;  	////if we had seconds:   + Integer.parseInt(strTime[2] 
+*}
+
+/*
+public Map <IdImpl, Map<IdImpl,int[]>> getTimeTable(){
+	return this.nodeTimeTableMap;
+}
+*/

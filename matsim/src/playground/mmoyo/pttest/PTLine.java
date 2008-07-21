@@ -5,20 +5,21 @@ import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
 
+/** 
+ * Describes a Public Transport Network Line
+ * @param id  Unique Identifier 
+ * @param type Describes if the line is Bus, Trolley, Subway. etc.
+ * @param withDedicatedTracks Points out if the line has own rails or interacts with normal city traffic
+ */
 public class PTLine {
 	private IdImpl id;
-	private String type;
-	private boolean withDedicatedTracks;
+	private PTLineType ptLineType;
+	private List<String> route = new ArrayList<String>();
 
-	private String strLinksRoute = null;
-	public List<String> strLinksRoute2 = new ArrayList<String>();
-
-	public PTLine(IdImpl id, String type, boolean withDedicatedTracks, String strlinksRoute) {
+	public PTLine(IdImpl id, char lineType, List<String> route) {
 		this.id = id;
-		this.type = type;
-		this.withDedicatedTracks = withDedicatedTracks;
-		this.strLinksRoute = strlinksRoute;
-		FillRouteLinksList();
+		this.ptLineType = new PTLineType(lineType);
+		this.route = route;
 	}
 
 	public IdImpl getId() {
@@ -29,38 +30,16 @@ public class PTLine {
 		this.id = id;
 	}
 
-	public String getType() {
-		return type;
+	public PTLineType getPtLineType() {
+		return ptLineType;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setPtLineType(PTLineType ptLineType) {
+		this.ptLineType = ptLineType;
 	}
 
-	public boolean isWithDedicatedTracks() {
-		return this.withDedicatedTracks;
+	public List<String> getRoute() {
+		return route;
 	}
 
-	public void setWithDedicatedTracks(boolean withDedicatedTracks) {
-		this.withDedicatedTracks = withDedicatedTracks;
-	}
-
-	public String getStrLinksRoute() {
-		return strLinksRoute;
-	}
-
-	public void setStrLinksRoute(String strLinksRoute) {
-		this.strLinksRoute = strLinksRoute;
-	}
-
-	private void FillRouteLinksList() {
-		// According to code from matsim/plans/route.java
-		String [] tempRoute = strLinksRoute.split("[ \t\n]+");
-		int ini = 0;
-		if ((tempRoute.length > 0) && (tempRoute[0].equals(""))) { ini = 1; }
-		for (int i = ini; i < tempRoute.length; i++) {
-			this.strLinksRoute2.add(tempRoute[i]);
-		}
-	}
-		 
 }// class

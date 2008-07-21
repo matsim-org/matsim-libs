@@ -5,7 +5,7 @@ import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
-//Is this class really necessary?
+//Validate the need of this class
 public class PTLink extends LinkImpl {
 	private String idPTLine;
 	private boolean isBusStop;

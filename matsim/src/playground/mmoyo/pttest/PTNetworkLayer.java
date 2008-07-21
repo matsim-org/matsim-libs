@@ -12,7 +12,12 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
-//TODO: Change name, this is actually a PTNetCreator
+/** 
+ * Represent a network layer with independent route with special (transfer) links at intersections 
+ * *
+ * @param cityNet complete network from which the PT network is extracted
+ */
+
 public class PTNetworkLayer extends NetworkLayer {
 	// TODO: Get these values out from the city network
 	// These are temporary values for the 5x5 scenario
@@ -31,36 +36,36 @@ public class PTNetworkLayer extends NetworkLayer {
 		this.cityNet = cityNet;
 	}
 
-	public void CreatePTNetwork(List<PTLine> ptLineList) {
+	public void createPTNetwork(List<PTLine> ptLineList) {
 		// Read the route of every PTline and adds the corresponding links and
 		// nodes
 		for (Iterator<PTLine> iterPTLines = ptLineList.iterator(); iterPTLines.hasNext();) {
 			PTLine ptLine = iterPTLines.next();
 			boolean firstLink = true;
 			String idFromNode = "";
-			for (Iterator<String> iter = ptLine.strLinksRoute2.iterator(); iter.hasNext();) {
+			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
 				Link l = this.cityNet.getLink(iter.next());
-				idFromNode = AddToSubwayPTN(l, idFromNode, firstLink, ptLine.getId());
+				idFromNode = addToSubwayPTN(l, idFromNode, firstLink, ptLine.getId());
 				firstLink = false;
 			}
 		}
-		CreateTransferlinks();
+		createTransferlinks();
 	}
 
-	public String AddToSubwayPTN(Link l, String idFromNode, boolean firstLink,IdImpl IdPTLine) {
+	public String addToSubwayPTN(Link l, String idFromNode, boolean firstLink,IdImpl IdPTLine) {
 		// Create the "Metro underground paths" related to the city network
 		
 		// Create FromNode
 		if (firstLink) {
 			maxNodekey++;
 			idFromNode = String.valueOf(maxNodekey);
-			AddPTNode(idFromNode, l.getFromNode(), IdPTLine);
+			addPTNode(idFromNode, l.getFromNode(), IdPTLine);
 		}
 
 		// Create ToNode
 		maxNodekey++;
 		String idToNode = String.valueOf(maxNodekey);
-		AddPTNode(idToNode, l.getToNode(), IdPTLine);// ToNode
+		addPTNode(idToNode, l.getToNode(), IdPTLine);// ToNode
 
 		// Create the Link
 		maxLinkKey++;
@@ -69,10 +74,13 @@ public class PTNetworkLayer extends NetworkLayer {
 		return idToNode;
 	}// AddToSub
 	
-	private void AddWalkingNode(IdImpl idImpl) {
+	private void addWalkingNode(IdImpl idImpl) {
+		//System.out.print(idImpl.toString() + " " + this.nodes.containsKey(idImpl) + " " );
+		
 		if (this.nodes.containsKey(idImpl)) {
 			throw new IllegalArgumentException(this + "[id=" + idImpl + " already exists]");
 		}
+		
 		Node n = this.cityNet.getNode(idImpl);
 		PTNode node = new PTNode(idImpl,	String.valueOf(n.getCoord().getX()), String.valueOf(n.getCoord().getY()), n.getType());
 		node.setIdFather(idImpl);        //All ptnodes must have a father, including fathers (themselves)
@@ -81,7 +89,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		n= null;
 	}
 
-	private void AddPTNode(String id, Node original, IdImpl IdPTLine) {
+	private void addPTNode(String id, Node original, IdImpl IdPTLine) {
 		// Creates a underground clone of a node with a different ID
 		IdImpl idImpl = new IdImpl(id);
 		IdImpl idFather = new IdImpl(original.getId().toString());
@@ -116,7 +124,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		iter = null;
 	}
 
-	private void CreateTransferlinks() {
+	private void createTransferlinks() {
 		// (like stairs between lines in a subway station)
 		Iterator it = childrenList.entrySet().iterator();
 		while (it.hasNext()) {
@@ -146,13 +154,13 @@ public class PTNetworkLayer extends NetworkLayer {
 	}// CreateTransfer
 
 
-	public List<String> CreateWalkingLinks(IdImpl idFromNode, IdImpl idToNode ){
+	public List<String> createWalkingLinks(IdImpl idFromNode, IdImpl idToNode ){
 		//Adds temporary the origin and destination node and create new temporary links between 
 		//between them  and its respective children to the routing process
 		
-		AddWalkingNode(idFromNode);
-		AddWalkingNode(idToNode);
-				
+		addWalkingNode(idFromNode);
+		addWalkingNode(idToNode);
+		
 		int i = 0;
 		List<String> WalkingLinkList = new ArrayList<String>(); 
 		
@@ -172,22 +180,22 @@ public class PTNetworkLayer extends NetworkLayer {
 		return WalkingLinkList;
 	}
 	
-	public void RemoveWalkinkLinks(List<String> WalkingLinkList){
+	public void removeWalkinkLinks(List<String> WalkingLinkList){
 		//Removes temporal links at the end of the ruting process
 		for (Iterator<String> iter = WalkingLinkList.iterator(); iter.hasNext();) {
 			this.removeLink(this.getLink(iter.next()));
 		}
 	}
 	
-	public void RemoveWalkingNodes(IdImpl node1, IdImpl node2){
+	public void removeWalkingNodes(IdImpl node1, IdImpl node2){
 		//Removes temporal links at the end of the routing process
 		this.removeNode(this.getNode(node1));
 		this.removeNode(this.getNode(node2));
 	}
-		
+	
+	// Creates only irrelevant values to create a PTLink. Actually the cost is calculated on other parameters
+	//TODO: Check later if this affect the simulation
 	private void createLink(int id, String from, String to, String ptType ){
-		// Creates only irrelevant values to create a PTLink. Actually the cost is calculated on other parameters
-		//TODO: Check later if this affect the simulation
 		String length = "5";
 		String freespeed= "1";
 		String capacity = "1";
@@ -196,7 +204,7 @@ public class PTNetworkLayer extends NetworkLayer {
 		this.createLink(String.valueOf(id), from, to, length, freespeed, capacity, permlanes, origid, ptType);
 	}
 		
-	public void PrintLinks() {
+	public void printLinks() {
 		//Displays a quick visualization of links with from- and to- nodes
 		for (org.matsim.network.Link l : this.getLinks().values()) {
 			System.out.print("\n(" ); 

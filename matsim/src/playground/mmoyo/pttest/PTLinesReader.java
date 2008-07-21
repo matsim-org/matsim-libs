@@ -12,13 +12,19 @@ import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+/** 
+ * Parses the xml file of PTLines
+ *
+ */
 public class PTLinesReader extends MatsimXmlParser {
 	private final static String PTLINES = "ptLines";
 	private final static String LINE = "ptLine";
 	private final static String ROUTE = "route";
 
 	private IdImpl idPTLine;
-	private String lineRoute = "";
+	private char type;
+	private StringBuffer bufferLineRoute = new StringBuffer();
+	
 	public List<PTLine> ptLineList = new ArrayList<PTLine>();
 
 	public PTLinesReader() {
@@ -62,26 +68,41 @@ public class PTLinesReader extends MatsimXmlParser {
 
 	private void startLine(final Attributes atts) {
 		idPTLine = new IdImpl(atts.getValue("id"));
+		type = atts.getValue("id").charAt(0);
+		bufferLineRoute = new StringBuffer();
 	}
 
 	private void endRoute() {
 	}
 
 	private void endLine() {
-		this.ptLineList.add(new PTLine(idPTLine, "Bus", false, lineRoute));
-		idPTLine = null;
-		lineRoute = "";
+		this.ptLineList.add(new PTLine(idPTLine, type, convertBufferToList()));
+		this.idPTLine = null;
+		type = '\u0000'; //null
+		this.bufferLineRoute=null;
 	}
 
 	private void endLines() {
-		idPTLine = null;
-		lineRoute = null;
 	}
 
 	@Override
 	public void characters(char ch[], int start, int length) {
 		for (int i = start; i < start + length; i++) {
-			lineRoute = lineRoute + ch[i];
+			this.bufferLineRoute.append(ch[i]);
 		}
 	}
+	
+	private List<String> convertBufferToList() {
+		List<String> lstRoute = new ArrayList <String>();
+		
+		String [] strRoute = bufferLineRoute.toString().split("[ \t\n]+");
+		int ini = 0;
+		if ((strRoute.length > 0) && (strRoute[0].equals(""))) { ini = 1; }
+		for (int i = ini; i < strRoute.length; i++) {
+			lstRoute.add(strRoute[i]);
+		}
+		return lstRoute;
+	}
+	
+	
 }// class
