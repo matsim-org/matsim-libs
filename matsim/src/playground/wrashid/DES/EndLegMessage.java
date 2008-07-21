@@ -63,7 +63,7 @@ public class EndLegMessage extends EventMessage {
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.END_LEG)){
-			event=new EventAgentArrival(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getLegIndex()-1,vehicle.getCurrentLink().getToNode().getId().toString());
+			event=new EventAgentArrival(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getLegIndex()-1,vehicle.getCurrentLink().getId().toString());
 		}
 		
 		SimulationParameters.events.processEvent(event);
