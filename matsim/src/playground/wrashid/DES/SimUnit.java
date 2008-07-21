@@ -7,11 +7,11 @@ public abstract class SimUnit {
 	
 	static int unitCounter=0;
 	Scheduler scheduler=null;
-	String label;
+	//String label;
 	
 	long unitNo;
 
-	int messageType=0;
+	//int messageType=0;
 	
 	// every sim unit should invoke this method, before doing anything else
 	public SimUnit(Scheduler scheduler){
@@ -47,7 +47,7 @@ public abstract class SimUnit {
 	
 	// initializationMethod
 	private void initializeObject(){
-		label="["+ this.getClass().getSimpleName() + " " + unitCounter + "]";
+		//label="["+ this.getClass().getSimpleName() + " " + unitCounter + "]";
 		unitNo=unitCounter;
 		scheduler.register(this);
 		unitCounter++;

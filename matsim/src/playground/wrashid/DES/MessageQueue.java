@@ -2,6 +2,7 @@ package playground.wrashid.DES;
 
 import java.util.TreeMap;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 
 
@@ -32,16 +33,11 @@ public class MessageQueue {
 			System.out.println("MessageQueue.counter:"+ counter);
 		}
 		
-		/*
-		if (counter> 500000){
-			 
-			for (String key : queue.keySet()) {
-				System.out.println("key=" + key);
-			}
-			
-			System.out.println();
+		
+		if (counter % 10000==0){ 
+			Gbl.printMemoryUsage();
 		}
-		*/
+		
 		
 	}
 	
