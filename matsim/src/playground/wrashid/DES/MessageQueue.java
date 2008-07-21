@@ -34,9 +34,7 @@ public class MessageQueue {
 		}
 		
 		
-		if (counter % 10000==0){ 
-			Gbl.printMemoryUsage();
-		}
+	
 		
 		
 	}

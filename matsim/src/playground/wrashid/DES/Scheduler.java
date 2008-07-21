@@ -2,6 +2,8 @@ package playground.wrashid.DES;
 
 import java.util.HashMap;
 
+import org.matsim.gbl.Gbl;
+
 public class Scheduler {
 	double simTime=0;
 	private MessageQueue queue=new MessageQueue();
@@ -28,9 +30,12 @@ public class Scheduler {
 	
 	
 	public void startSimulation(){
+		long simulationStart=System.currentTimeMillis();
+		
 		initializeSimulation();
 		
 		Message m;
+		
 		while(queue.hasElement() && simTime<SimulationParameters.simulationLength){
 			m=queue.getNextMessage();
 			simTime=m.getMessageArrivalTime();
@@ -40,6 +45,18 @@ public class Scheduler {
 			} else {
 				m.receivingUnit.handleMessage(m);
 			}
+			
+			
+			
+			
+			// debug
+			if ((queue.counter % 100000 == 0)){
+				System.out.println("s/r:"+simTime/(System.currentTimeMillis()-simulationStart)*1000);
+				Gbl.printMemoryUsage();
+			}
+			
+			
+			
 		}
 	}
 	
