@@ -37,11 +37,11 @@ import playground.gregor.gis.utils.ShapeFileWriter;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeoTransformation {
-	private final static String WGS84_UTM34S = "PROJCS[\"WGS_1984_UTM_Zone_34S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",21],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
+	private final static String WGS84_UTM34S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
 	
 
 	public static void main(final String [] args) throws Exception {
-		final String filename = "./southafrica/gt_str_h.shp";
+		final String filename = "F:\\Pieter Fourie\\workspace\\matsim\\southafrica\\GP_Input_shapes\\gt_str_h.shp";
 		final FeatureSource fs = ShapeFileReader.readDataFile(filename);
 	    final String SourceWKT = fs.getSchema().getDefaultGeometry().getCoordinateSystem().toString();
 	    System.out.println("Source WKT:\n" + SourceWKT);

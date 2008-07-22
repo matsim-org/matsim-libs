@@ -89,6 +89,8 @@ public class NetworkFromRawData {
 	
 	private void createNet() {
 		for(Feature ft : this.l) {
+			//this variable is used to skip features such as railways, walkways, restricted access roads
+			boolean writeThisLink = true;
 			
 			LineString geo = (LineString)((MultiLineString)ft.getDefaultGeometry()).getGeometryN(0);
 			Coordinate fromC = geo.getStartPoint().getCoordinate();
@@ -126,35 +128,36 @@ public class NetworkFromRawData {
 				permlanes =3;
 			}else if (roadType.equals("NATIONAL ROAD")) {
 				capacity = 2000;
-				permlanes =2;
-			} else {
+				permlanes =2;			
+			}else if (roadType.equals("PEDESTRIAN WALKWAY") || 
+					  roadType.equals("RESTRICTED ACCESS ROAD")) {
+				writeThisLink = false;
+			}else {
 				throw new RuntimeException("Unknown road type: " + roadType);
 			}
 			
-			
-			Node fromNode = getNode(fromC,from_el);
-			Node toNode = getNode(toC,to_el);
-			
-			if (fromNode == toNode) {
-				int i = 0 ; i++;
+			if(writeThisLink){
+				Node fromNode = getNode(fromC,from_el);
+				Node toNode = getNode(toC,to_el);
+
+				if (fromNode == toNode) {
+					int i = 0 ; i++;
+				}
+				if (oneWay.equals("B")) {
+					this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
+					this.network.createLink((1000000+id) + "", toNode.getId().toString(), fromNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
+				} else if (oneWay.equals("FT")) {
+					this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");	
+				} else if (oneWay.equals("TF")) {
+					this.network.createLink(id + "", toNode.getId().toString(), fromNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
+				} else	if (oneWay.equals("N")) {
+					this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
+					this.network.createLink((1000000+id) + "", toNode.getId().toString(), fromNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
+				} else {
+					throw new RuntimeException("Unknown directional information: " + oneWay);
+				}
 			}
-			if (oneWay.equals("B")) {
-				this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
-				this.network.createLink((1000000+id) + "", toNode.getId().toString(), fromNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
-			} else if (oneWay.equals("FT")) {
-				this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");	
-			} else if (oneWay.equals("TF")) {
-				this.network.createLink(id + "", toNode.getId().toString(), fromNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
-			} else {
-				throw new RuntimeException("Unknown directional information: " + oneWay);
-			}
-			
-					
-				
-		
-			
 		}
-		
 	}
 	
 	private Node getNode(Coordinate c, int ele) {
@@ -200,7 +203,7 @@ public class NetworkFromRawData {
 		
 		
 
-		final String links = "./southafrica/gt_str_h_transformed.shp";
+		final String links = "./southafrica/SA_UTM/streets_UTM.shp";
 		
 		FeatureSource l = null;
 		try {
@@ -218,7 +221,7 @@ public class NetworkFromRawData {
 		new NetworkFromRawData(ls, network, e).constructNetwork();
 //		new NetworkCleaner().run(network);
 		
-		new NetworkWriter(network,"southafrica/matsim_net.xml").write();
+		//new NetworkWriter(network,"southafrica/matsim_net.xml").write();
 //		ShapeFileWriter.writeGeometries(genFeatureCollection((Collection<Link>) network.getLinks().values(), n),"./padang/network_" + VERSION + "/matsim_net.shp" );
 		
 	}
