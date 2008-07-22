@@ -28,14 +28,15 @@ import org.matsim.utils.geometry.CoordinateTransformationI;
  * @author mrieser
  *
  */
-public class TransformationFactory {
+public abstract class TransformationFactory {
 
 	public final static String WGS84 = "WGS84";
 	public final static String CH1903_LV03 = "CH1903_LV03";
 	public final static String GK4 = "GK4";
 	public final static String ATLANTIS = "Atlantis";
 	public final static String WGS84_UTM47S = "WGS84_UTM47S";
-	
+	public final static String WGS84_UTM35S = "WGS84_UTM35S";
+
 	/**
 	 * Returns a coordinate transformation to transform coordinates from one
 	 * coordinate system to another one.
@@ -45,13 +46,16 @@ public class TransformationFactory {
 	 * @return Coordinate Transformation
 	 * @throws IllegalArgumentException if no matching coordinate transformation can be found.
 	 */
-	public static CoordinateTransformationI getCoordinateTransformation(String fromSystem, String toSystem) {
+	public static CoordinateTransformationI getCoordinateTransformation(final String fromSystem, final String toSystem) {
 		if (fromSystem.equals(toSystem)) return new IdentityTransformation();
-		if (CH1903_LV03.equals(fromSystem) && WGS84.equals(toSystem)) return new CH1903LV03toWGS84();
 		if (WGS84.equals(fromSystem) && (CH1903_LV03.equals(toSystem))) return new WGS84toCH1903LV03();
-		if (GK4.equals(fromSystem) && WGS84.equals(toSystem)) return new GK4toWGS84();
-		if (ATLANTIS.equals(fromSystem) && WGS84.equals(toSystem)) return new AtlantisToWGS84();
-		if (WGS84_UTM47S.equals(fromSystem) && WGS84.equals(toSystem)) return new GeotoolsTransformation(WGS84_UTM47S,WGS84);
+		if (WGS84.equals(toSystem)) {
+			if (CH1903_LV03.equals(fromSystem)) return new CH1903LV03toWGS84();
+			if (GK4.equals(fromSystem)) return new GK4toWGS84();
+			if (ATLANTIS.equals(fromSystem)) return new AtlantisToWGS84();
+			// pass any other coord-system to Geotools:
+			return new GeotoolsTransformation(fromSystem, WGS84);
+		}
 		throw new IllegalArgumentException(
 				"No coordinate-transformation found for transforming from " + fromSystem + " to " + toSystem);
 	}
