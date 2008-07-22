@@ -59,7 +59,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 	/** This is the collection of links that have to be moved in the simulation */
 	private final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
-	private QueueNode[] simNodesArrayCache = new QueueNode[0];
+	private final QueueNode[] simNodesArray;
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
 	/** This is a queue of links and times, at which the links will have to be activated again. This queue is mostly used
@@ -69,13 +69,13 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 	// set to true to move vehicles from waitingList before vehQueue
 	private boolean moveWaitFirst = false;
 
-	private Map<Id, QueueLink> links;
+	private final Map<Id, QueueLink> links;
 
-	private Map<Id, QueueNode> nodes;
+	private final Map<Id, QueueNode> nodes;
 
-	private NetworkLayer networkLayer;
+	private final NetworkLayer networkLayer;
 
-	private QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
+	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
 
 	public QueueNetworkLayer(NetworkLayer networkLayer) {
 		this(networkLayer, new DefaultQueueNetworkFactory());
@@ -92,29 +92,22 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 		for (Link l : networkLayer.getLinks().values()) {
 			this.links.put(l.getId(), queueNetworkFactory.newQueueLink(l, this, this.nodes.get(l.getToNode().getId())));
 		}
-	}
 
+		this.simNodesArray = this.nodes.values().toArray(new QueueNode[this.nodes.size()]);
+		//dg[april08] as the order of nodes has an influence on the simulation
+		//results they are sorted to avoid indeterministic simulations
+		Arrays.sort(this.simNodesArray, new Comparator<QueueNode>() {
+			public int compare(final QueueNode o1, final QueueNode o2) {
+				return o1.getNode().compareTo(o2.getNode());
+			}
+		});
+	}
 
 	public NetworkLayer getNetworkLayer() {
 		return this.networkLayer;
 	}
 
 	public void beforeSim() {
-
-		// if simNodesArrayCache was invalidated before, it needs to be reinitialized
-		if (this.simNodesArrayCache == null) {
-			this.simNodesArrayCache = new QueueNode[0];
-		}
-
-		this.simNodesArrayCache = this.nodes.values().toArray(this.simNodesArrayCache);
-		//dg[april08] as the order of nodes has an influence on the simulation
-		//results they are sorted to avoid indeterministic simulations
-		Arrays.sort(this.simNodesArrayCache, new Comparator<QueueNode>() {
-			public int compare(final QueueNode o1, final QueueNode o2) {
-				return o1.getNode().compareTo(o2.getNode());
-			}
-		});
-
 		this.simLinksArray.clear();
 		if (simulateAllLinks) {
 			this.simLinksArray.addAll(this.links.values());
@@ -131,7 +124,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 	 * @param time The current time in the simulation.
 	 */
 	public void simStep(final double time) {
-		for (QueueNode node : this.simNodesArrayCache) {
+		for (QueueNode node : this.simNodesArray) {
 			node.moveNode(time);
 		}
 		reactivateLinks(time);
@@ -202,7 +195,7 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 	 * @return Returns the simNodesArray.
 	 */
 	public Collection<QueueNode> getSimulatedNodes() {
-		return Arrays.asList(this.simNodesArrayCache);
+		return Arrays.asList(this.simNodesArray);
 	}
 
 	public void afterSim() {
