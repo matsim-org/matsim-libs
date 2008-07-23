@@ -63,6 +63,11 @@ the simulation -->
 					<xs:documentation>Optional argument capturing the length of this lane in meter.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+      <xs:attribute name="numberOfRepresentedLanes" type="xs:positiveInteger" default="1">
+        <xs:annotation>
+          <xs:documentation>Number of lanes in reality represented by this signal lane.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
 		</xs:extension>
 	</xs:complexContent>
 </xs:complexType>

@@ -36,6 +36,8 @@ public class SignalLane {
 
 	private boolean isMixedLane;
 
+	private int numberOfRepresentedLanes;
+	
 	public SignalLane(Id laneId, Id linkId) {
 		this.id = laneId;
 		this.linkId = linkId;
@@ -65,4 +67,14 @@ public class SignalLane {
 		return this.isMixedLane;
 	}
 
+	public int getNumberOfRepresentedLanes() {
+		return numberOfRepresentedLanes;
+	}
+
+	
+	public void setNumberOfRepresentedLanes(int numberOfRepresentedLanes) {
+		this.numberOfRepresentedLanes = numberOfRepresentedLanes;
+	}
+
+	
 }

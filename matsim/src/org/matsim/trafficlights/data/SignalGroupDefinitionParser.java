@@ -56,10 +56,12 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 
 	private static final String REFID = "refId";
 
-	private static final String LANES = "lanes";
+//	private static final String LANES = "lanes";
 
 	private static final String LENGTH = "length";
 
+	private static final String NUMBEROFREPRESENTEDLANES = "numberOfRepresentedLanes";
+	
 	private List<SignalGroupDefinition> signalGroups;
 
 	private SignalGroupDefinition currentSignalGroup;
@@ -75,6 +77,8 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 	 * respectively.
 	 */
 	private Map<Tuple<Id, Id>, SignalLane> linkLaneMap = new HashMap<Tuple<Id, Id>, SignalLane>();
+
+	private int currentNumberOfRepresentedLanes;
 
 	public SignalGroupDefinitionParser(List<SignalGroupDefinition> signalGroups) {
 		this.signalGroups = signalGroups;
@@ -115,6 +119,7 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 		else if (FROMLANE.equalsIgnoreCase(name) || TOLANE.equalsIgnoreCase(name)) {
 			this.currentLaneId = new IdImpl(atts.getValue(ID));
 			this.currentLaneLength = Double.parseDouble(atts.getValue(LENGTH));
+			this.currentNumberOfRepresentedLanes = Integer.parseInt(atts.getValue(NUMBEROFREPRESENTEDLANES));
 		}
 		else if (LINK.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(REFID));
@@ -123,6 +128,7 @@ public class SignalGroupDefinitionParser extends MatsimXmlParser {
 			if (this.currentLane == null) {
 				this.currentLane = new SignalLane(this.currentLaneId, id);
 				this.currentLane.setLength(this.currentLaneLength);
+				this.currentLane.setNumberOfRepresentedLanes(this.currentNumberOfRepresentedLanes);
 				this.linkLaneMap.put(key, this.currentLane);
 			}
 			else {

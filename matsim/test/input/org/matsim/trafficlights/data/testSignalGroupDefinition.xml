@@ -8,7 +8,7 @@
     <fromLane id="1" >
     	<link refId="23" />
     </fromLane>
-    <fromLane id="2" >
+    <fromLane id="2" numberOfRepresentedLanes="2">
     	<link refId="23" />
     </fromLane>
     <toLane id="1">

@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
@@ -39,7 +40,11 @@ public class SignalGroupDefinitionTest extends MatsimTestCase {
 
   private static final String TESTXML  = "testSignalGroupDefinition.xml";
 
-	/**
+  private Id id1 = new IdImpl("1");
+  
+  private Id id2 = new IdImpl("2");
+
+  /**
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
@@ -58,12 +63,15 @@ public class SignalGroupDefinitionTest extends MatsimTestCase {
 			assertEquals(0, current.getId().compareTo(new IdImpl("123")));
 			assertEquals(2, current.getFromLanes().size());
 			for (SignalLane s : current.getFromLanes()) {
-				assertTrue(s.getId().equals(new IdImpl("1")) || s.getId().equals(new IdImpl("2")));
+				assertTrue(s.getId().equals(id1) || s.getId().equals(id2));
 				assertEquals(new IdImpl("23"), s.getLinkId());
+				if (s.getId().equals(id2)) {
+					assertEquals(2, s.getNumberOfRepresentedLanes());				
+				}
 			}
 			assertEquals(2, current.getToLanes().size());
 			for (SignalLane s : current.getFromLanes()) {
-				assertTrue(s.getId().equals(new IdImpl("1")) || s.getId().equals(new IdImpl("2")));
+				assertTrue(s.getId().equals(id1) || s.getId().equals(id2));
 				assertEquals(new IdImpl("23"), s.getLinkId());
 			}
 			assertEquals(false, current.isTurnIfRed());
@@ -78,8 +86,6 @@ public class SignalGroupDefinitionTest extends MatsimTestCase {
 			assertEquals(23.3d, current.getToSignalLane(new IdImpl("3")).getLength());
 			assertEquals(true, current.isTurnIfRed());
 			assertEquals(15, current.getPassingClearingTime());
-
-
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
