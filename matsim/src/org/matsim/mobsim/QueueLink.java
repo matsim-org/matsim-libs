@@ -93,7 +93,7 @@ public class QueueLink {
 
 	private double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
 
-	private int flowCapCeil; // optimization, cache Math.ceil(simulatedFlowCap)
+	private int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
 
 	private double flowCapFraction; // optimization, cache simulatedFlowCap - (int)simulatedFlowCap
 
@@ -159,7 +159,7 @@ public class QueueLink {
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
-		this.flowCapCeil = (int) Math.ceil(this.simulatedFlowCapacity);
+		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
@@ -167,7 +167,7 @@ public class QueueLink {
 				/ ((NetworkLayer) this.link.getLayer()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
-		this.storageCapacity = Math.max(this.storageCapacity, this.flowCapCeil);
+		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
 
 		/*
 		 * If speed on link is relatively slow, then we need MORE cells than the
@@ -189,8 +189,8 @@ public class QueueLink {
 	}
 
 	/**
-	 * This method is deprecated and should be removed in future ...  
-	 * 
+	 * This method is deprecated and should be removed in future ...
+	 *
 	 * This method will scale the simulated flow capacity by the given factor, and
 	 * recalculate the timeCapCeil and Fraction attributes of QueueLink.
 	 * Furthermore it checks the storage Capacity of the link and change it if
@@ -205,8 +205,8 @@ public class QueueLink {
 		initFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 		recalcCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 	}
-	
-	
+
+
 	public void recalcTimeVariantAttributes(final double now) {
 		initFlowCapacity(now);
 		recalcCapacity(now);
@@ -485,7 +485,7 @@ public class QueueLink {
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
 	private boolean hasBufferSpace() {
-		return ((this.buffer.size() < this.flowCapCeil) && ((this.bufferCap >= 1.0) || (this.buffercap_accumulate >= 1.0)));
+		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.bufferCap >= 1.0) || (this.buffercap_accumulate >= 1.0)));
 	}
 
 	/**
@@ -568,7 +568,7 @@ public class QueueLink {
 		double queueEnd = this.link.getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 		double vehLen = Math.min( // the length of a vehicle in visualization
-				this.link.getLength() / (this.storageCapacity + this.flowCapCeil), // all vehicles must have place on the link
+				this.link.getLength() / (this.storageCapacity + this.bufferStorageCapacity), // all vehicles must have place on the link
 				((NetworkLayer)this.link.getLayer()).getEffectiveCellSize() / storageCapFactor); // a vehicle should not be larger than it's actual size
 
 		// put all cars in the buffer one after the other
