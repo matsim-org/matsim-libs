@@ -14,27 +14,39 @@ public class MessageFactory {
 	
 	
 	public static void disposeEndLegMessage(EndLegMessage message){
-		endLegMessageQueue.add(message);
+		if (endLegMessageQueue.size()<SimulationParameters.maxQueueLength){
+			endLegMessageQueue.add(message);
+		}
 	}
 	
 	public static void disposeEnterRoadMessage(EnterRoadMessage message){
-		enterRoadMessageQueue.add(message);
+		if (enterRoadMessageQueue.size()<SimulationParameters.maxQueueLength){
+			enterRoadMessageQueue.add(message);
+		}
 	}
 	
 	public static void disposeStartingLegMessage(StartingLegMessage message){
-		startingLegMessageQueue.add(message);
+		if (startingLegMessageQueue.size()<SimulationParameters.maxQueueLength){
+			startingLegMessageQueue.add(message);
+		}
 	}
 	
 	public static void disposeLeaveRoadMessage(LeaveRoadMessage message){
-		leaveRoadMessageQueue.add(message);
+		if (leaveRoadMessageQueue.size()<SimulationParameters.maxQueueLength){
+			leaveRoadMessageQueue.add(message);
+		}
 	}
 	
 	public static void disposeEndRoadMessage(EndRoadMessage message){
-		endRoadMessage.add(message);
+		if (endRoadMessage.size()<SimulationParameters.maxQueueLength){
+			endRoadMessage.add(message);
+		}
 	}
 	
 	public static void disposeDeadlockPreventionMessage(DeadlockPreventionMessage message){
-		deadlockPreventionMessageQueue.add(message);
+		if (deadlockPreventionMessageQueue.size()<SimulationParameters.maxQueueLength){
+			deadlockPreventionMessageQueue.add(message);
+		}
 	}
 
 

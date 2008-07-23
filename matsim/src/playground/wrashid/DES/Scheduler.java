@@ -31,12 +31,13 @@ public class Scheduler {
 	
 	public void startSimulation(){
 		long simulationStart=System.currentTimeMillis();
+		double hourlyLogTime=3600;
 		
 		initializeSimulation();
 		
 		Message m;
 		
-		while(queue.hasElement() && simTime<SimulationParameters.simulationLength){
+		while(queue.hasElement() && simTime<SimulationParameters.maxSimulationLength){
 			m=queue.getNextMessage();
 			simTime=m.getMessageArrivalTime();
 			m.printMessageLogString();
@@ -47,14 +48,23 @@ public class Scheduler {
 			}
 			
 			
-			
-			
-			// debug
-			if ((queue.counter % 100000 == 0)){
+			// print output each hour
+			if (simTime / hourlyLogTime > 1){
+				hourlyLogTime = simTime + 3600;
+				System.out.print("Simulation at " + simTime/3600 + "[h]; ");
 				System.out.println("s/r:"+simTime/(System.currentTimeMillis()-simulationStart)*1000);
 				Gbl.printMemoryUsage();
 			}
 			
+			
+			
+			// debug - don't needed anymore remove after some time...
+			/*
+			if ((queue.counter % 100000 == 0)){
+				System.out.println("s/r:"+simTime/(System.currentTimeMillis()-simulationStart)*1000);
+				Gbl.printMemoryUsage();
+			}
+			*/
 			
 			
 		}

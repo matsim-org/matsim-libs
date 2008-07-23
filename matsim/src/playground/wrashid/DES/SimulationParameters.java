@@ -7,7 +7,7 @@ import org.matsim.events.Events;
 public class SimulationParameters {
 	// EventHeap
 	
-	static long simulationLength=Long.MAX_VALUE; //in ms
+	static long maxSimulationLength=800000; //in s 
 	public static long linkCapacityPeriod=0; // 
 	public static double gapTravelSpeed=15.0; // in m/s
 	public static double flowCapacityFactor=1.0;
@@ -43,5 +43,7 @@ public class SimulationParameters {
 	// specifies the minimal queue length for using in all message static constructers
     // this parameter needs to be set to avoid race conditions
 	public static final int minQueueLength=Runtime.getRuntime().availableProcessors()*10;
+	// if a lot of messages are not needed any more, then GC should be allowed
+	public static final int maxQueueLength=10000;
 	
 }
