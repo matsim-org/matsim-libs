@@ -37,8 +37,8 @@ public class QControler extends Controler {
 	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QControler.class);
 	
-	final String signalSystems = "./src/playground/andreas/intersection/test/data/signalSystemConfig_2a_alt.xml";
-	final String groupDefinitions = "./src/playground/andreas/intersection/test/data/signalGroupDefinition_2a_alt.xml";
+	final String signalSystems = "./src/playground/andreas/intersection/test/data/signalSystemConfig_4a_test.xml";
+	final String groupDefinitions= "./src/playground/andreas/intersection/test/data/signalGroupDefinition_4a_test.xml";
 	final static boolean useOTF = false;
 
 	public QControler(final Config config) {
@@ -102,6 +102,7 @@ public class QControler extends Controler {
 		final QControler controler = new QControler(config);
 		controler.setOverwriteFiles(true);
 		controler.setWriteEvents(true);
+//		controler.setTraveltimeBinSize(30*60);
 
 		controler.run();
 //		controler.makeVis();

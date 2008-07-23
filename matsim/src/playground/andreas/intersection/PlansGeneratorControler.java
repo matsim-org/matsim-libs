@@ -50,6 +50,74 @@ public class PlansGeneratorControler extends Controler {
 	@Override
 	protected Plans loadPopulation() {
 		
+		return generate4wPersons();
+//		return generateSimplePlans();
+	}
+	
+	private Plans generate4wPersons(){
+		
+		int numberOfPlans = 1;
+		Plans pop = new Plans(Plans.NO_STREAMING);
+		log.info("  generating plans... ");
+		
+		for (int i = 0; i < 314; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("200"), this.network.getLink("9"), pop);
+			numberOfPlans++;
+		}
+		for (int i = 0; i < 948; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("201"), this.network.getLink("7"), pop);
+			numberOfPlans++;
+		}
+		
+		for (int i = 0; i < 196; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("202"), this.network.getLink("5"), pop);
+			numberOfPlans++;
+		}
+		
+		for (int i = 0; i < 56; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("210"), this.network.getLink("3"), pop);
+			numberOfPlans++;
+		}
+		for (int i = 0; i < 192; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("211"), this.network.getLink("9"), pop);
+			numberOfPlans++;
+		}
+		for (int i = 0; i < 185; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("212"), this.network.getLink("7"), pop);
+			numberOfPlans++;
+		}
+		
+		for (int i = 0; i < 170; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("220"), this.network.getLink("5"), pop);
+			numberOfPlans++;
+		}
+		for (int i = 0; i < 799; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("221"), this.network.getLink("3"), pop);
+			numberOfPlans++;
+		}
+		for (int i = 0; i < 147; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("222"), this.network.getLink("9"), pop);
+			numberOfPlans++;
+		}
+		
+		for (int i = 0; i < 150; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("230"), this.network.getLink("7"), pop);
+			numberOfPlans++;
+		}
+		for (int i = 0; i < 166; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("231"), this.network.getLink("5"), pop);
+			numberOfPlans++;
+		}
+		for (int i = 0; i < 341; i++) {
+			generatePerson(numberOfPlans, this.network.getLink("232"), this.network.getLink("3"), pop);
+			numberOfPlans++;
+		}
+		
+		log.info("  generated " + (numberOfPlans - 1) + " plans... ");
+		return pop;		
+	}
+	
+	private Plans generateSimplePlans(){
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
@@ -59,17 +127,12 @@ public class PlansGeneratorControler extends Controler {
 		LinkedList <Link> fromLinks = new LinkedList<Link>();
 		LinkedList <Link> toLinks = new LinkedList<Link>();
 		
-		fromLinks.add(this.network.getLink("5"));
-//		fromLinks.add(this.network.getLink("40"));
-//		fromLinks.add(this.network.getLink("60"));
-//		fromLinks.add(this.network.getLink("80"));
+		fromLinks.add(this.network.getLink("200"));
 		
 		toLinks.add(this.network.getLink("3"));
-//		toLinks.add(this.network.getLink("201"));
-//		toLinks.add(this.network.getLink("301"));
-//		toLinks.add(this.network.getLink("401"));
 		
-		for(int i=0; i < 5000; i++){
+		
+		for(int i=0; i < 950; i++){
 			for (Link fromLink : fromLinks) {
 				
 				for (Link toLink : toLinks) {
@@ -86,13 +149,10 @@ public class PlansGeneratorControler extends Controler {
 			
 		}
 		
-		
-		
-//		generatePerson(numberOfPlans, this.network.getLink("30"), this.network.getLink("201"), pop);
-
+		log.info("  generated " + (numberOfPlans - 1) + " plans... ");
 		return pop;
-
 	}
+	
 
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Plans population) {
@@ -115,7 +175,7 @@ public class PlansGeneratorControler extends Controler {
 
 		Config config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/config.xml" });
 		
-		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
+		String netFileName = "src/playground/andreas/intersection/test/data/net_4a_test.xml";
 		config.network().setInputFile(netFileName);
 		
 		final PlansGeneratorControler controler = new PlansGeneratorControler(config);
