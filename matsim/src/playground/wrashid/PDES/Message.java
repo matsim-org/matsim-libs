@@ -9,6 +9,9 @@ public abstract class Message implements Comparable {
 	public long messageType;
 	public long messageId;
 	public String queueKey=""; // only used because of implementation convenience (might be removed in future, if not needed)
+	public Object firstLock=null;
+	public Object secondLock=null;
+	
 	
 	// all inheriting or extending modules must
 	// invoke this Constructer first

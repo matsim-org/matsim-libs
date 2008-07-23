@@ -39,12 +39,17 @@ public class Scheduler {
 		initializeSimulation();
 		
 		Message m;
+		Executor executor = Executors.newFixedThreadPool(2);
 		
 		while(queue.hasElement() && simTime<SimulationParameters.maxSimulationLength){
 			m=queue.getNextMessage();
 			
-			Executor executor = Executors.newFixedThreadPool(2);
-			executor.execute (new MessageExecutor (m));
+			MessageExecutor me= new MessageExecutor (m);
+			executor.execute (me);
+			
+			while (!me.hasAqiredLocks){
+				// TODO: improve this later... (burning cpu power).
+			}
 			
 			/*
 			simTime=m.getMessageArrivalTime();
