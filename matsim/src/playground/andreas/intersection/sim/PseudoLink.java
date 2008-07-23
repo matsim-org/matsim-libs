@@ -88,14 +88,14 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		this.amIOriginalLink = amIOriginalLink;
 	}
 
-	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double lengthOfPseudoLink_m, int numberOfLanes, double freeSpeed_m_s, double flowCapacityFromNetFile_Veh_h, double effectiveCellSize){
+	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double lengthOfPseudoLink_m, int numberOfLanes, double freeSpeed_m_s, double averageSimulatedFlowCapacityPerLane_Veh_s, double effectiveCellSize){
 
 		this.length_m = lengthOfPseudoLink_m;
 		this.meterFromLinkEnd = meterFromLinkEnd_m;
 
 		this.freeSpeedTravelTime = this.length_m / freeSpeed_m_s;
 
-		this.flowCapacity = flowCapacityFromNetFile_Veh_h * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
+		this.flowCapacity = numberOfLanes * averageSimulatedFlowCapacityPerLane_Veh_s * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
 
 		this.flowCapacityCeil = (int) Math.ceil(this.flowCapacity);
 		this.flowCapacityFraction = this.flowCapacity - (int) this.flowCapacity;

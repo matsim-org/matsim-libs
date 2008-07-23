@@ -132,12 +132,14 @@ public class QLink extends QueueLink {
 	public void reconfigure(TrafficLightsManager trafficLightsManager) {
 
 		boolean firstNodeLinkInitialized = false;
+		
+		double averageSimulatedFlowCapacityPerLane_Veh_s = this.getSimulatedFlowCapacity() / this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 
 		for (SignalLane signalLane : trafficLightsManager.getFromLanes(this.getLink().getId())) {
 
-			int numberOfLanes_ = 1;
+			int numberOfLanes_ = signalLane.getNumberOfRepresentedLanes();
 			double freeSpeed_m_s = this.getLink().getFreespeed(Time.UNDEFINED_TIME);
-			double flowCapacity_Veh_h = this.getSimulatedFlowCapacity();
+//			double flowCapacity_Veh_h = this.getSimulatedFlowCapacity();
 
 			//TODO [an] has to be checked, not sure about it
 
@@ -155,8 +157,8 @@ public class QLink extends QueueLink {
 					this.originalLink.addDestLink(link);
 				}
 
-				newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h, this.effectiveCelleSize);
-				this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getSimulatedFlowCapacity(),this.effectiveCelleSize);
+				newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, averageSimulatedFlowCapacityPerLane_Veh_s, this.effectiveCelleSize);
+				this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), averageSimulatedFlowCapacityPerLane_Veh_s ,this.effectiveCelleSize);
 
 				this.pseudoLinksList.add(newNodePseudoLink);
 				firstNodeLinkInitialized = true;
@@ -194,7 +196,7 @@ public class QLink extends QueueLink {
 					}
 
 					// Only need to fix properties of new link. Original link hasn't changed
-					newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, flowCapacity_Veh_h,this.effectiveCelleSize);
+					newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, averageSimulatedFlowCapacityPerLane_Veh_s ,this.effectiveCelleSize);
 
 					this.pseudoLinksList.add(newNodePseudoLink);
 
