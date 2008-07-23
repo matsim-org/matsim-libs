@@ -19,6 +19,7 @@ public class Vehicle extends SimUnit {
 	private int legIndex;
 	private Link currentLink = null;
 	private int linkIndex;
+	private Link[] currentLinkRoute=null;
 
 	public Vehicle(Scheduler scheduler, Person ownerPerson) {
 		super(scheduler);
@@ -65,9 +66,9 @@ public class Vehicle extends SimUnit {
 		// person will execute
 		ArrayList<Object> actsLegs = plan.getActsLegs();
 		// the assumption here
-		currentLeg = (Leg) actsLegs.get(legIndex);
+		setCurrentLeg((Leg) actsLegs.get(legIndex));
 		// the leg the agent performs
-		double departureTime = currentLeg.getDepTime(); // the time the agent
+		double departureTime = getCurrentLeg().getDepTime(); // the time the agent
 		// departs at this
 		// activity
 
@@ -89,7 +90,13 @@ public class Vehicle extends SimUnit {
 
 	public void setCurrentLeg(Leg currentLeg) {
 		this.currentLeg = currentLeg;
+		currentLinkRoute=currentLeg.getRoute().getLinkRoute();
 	}
+	
+	public Link[] getCurrentLinkRoute(){
+		return currentLinkRoute;
+	}
+	
 
 	public void setLegIndex(int legIndex) {
 		this.legIndex = legIndex;
@@ -127,7 +134,7 @@ public class Vehicle extends SimUnit {
 	// this means, that the vehical is just waiting until it can enter the
 	// last link (without entering it) and then ends the leg
 	public boolean isEndingLegMode() {
-		if (getCurrentLeg().getRoute().getLinkRoute().length == getLinkIndex()) {
+		if (getCurrentLinkRoute().length == getLinkIndex()) {
 			return true;
 		} else {
 			return false;
@@ -135,7 +142,7 @@ public class Vehicle extends SimUnit {
 	}
 
 	public void initiateEndingLegMode() {
-		linkIndex = getCurrentLeg().getRoute().getLinkRoute().length;
+		linkIndex = getCurrentLinkRoute().length;
 	}
 
 	// public void leavePreviousRoad(){
@@ -181,7 +188,7 @@ public class Vehicle extends SimUnit {
 			//System.out.println("AscheduleLeavePreviousRoadMessage:"+previousLink.getId().toString());
 			previousRoad=Road.allRoads.get(previousLink.getId().toString());
 		} else if (this.getLinkIndex()>=1){
-			previousLink=this.getCurrentLeg().getRoute().getLinkRoute()[this.getLinkIndex()-1];
+			previousLink=this.getCurrentLinkRoute()[this.getLinkIndex()-1];
 			//System.out.println("BscheduleLeavePreviousRoadMessage:"+previousLink.getId().toString());
 			previousRoad=Road.allRoads.get(previousLink.getId().toString());
 		}

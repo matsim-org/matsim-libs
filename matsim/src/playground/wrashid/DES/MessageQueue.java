@@ -30,9 +30,9 @@ public class MessageQueue {
 		
 
 		
-		if (SimulationParameters.debugMode && (counter % 1000000 == 0)){
-			System.out.println("MessageQueue.counter:"+ counter);
-		}
+		//if (SimulationParameters.debugMode && (counter % 1000000 == 0)){
+		//	System.out.println("MessageQueue.counter:"+ counter);
+		//}
 		
 		
 	
@@ -111,7 +111,7 @@ public class MessageQueue {
 			j/=10;
 		}
 		
-		result = result.concat(zeros[numberOfDigits]);
+		result = result.concat(zeros[noOfDigitsMaxLong-numberOfDigits]);
 		
 		result=result.concat(xd.toString());
 		return result;
@@ -120,7 +120,7 @@ public class MessageQueue {
 	public static void main(String[] args){
 		Random r=new Random();
 		double d=0;
-		for (int i=0;i<1000000;i++){
+		for (int i=0;i<10000000;i++){
 			d=r.nextDouble();
 			//System.out.println(padWithZeros(d) + " - " + feedWithZeros(d));
 			//String s=padWithZeros(d);

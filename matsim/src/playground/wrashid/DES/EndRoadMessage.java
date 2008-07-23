@@ -23,9 +23,8 @@ public class EndRoadMessage extends EventMessage {
 		//previousRoad.leaveRoad(vehicle);
 		
 		
-	
 		
-		if (vehicle.getCurrentLeg().getRoute().getLinkRoute().length==vehicle.getLinkIndex()+1){
+		if (vehicle.getCurrentLinkRoute().length==vehicle.getLinkIndex()+1){
 			// the leg is completed, try to enter the last link but do not enter it 
 			// (just wait, until you have clearance for enter and then leave the road)
 			
@@ -40,10 +39,10 @@ public class EndRoadMessage extends EventMessage {
 			
 			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
 			road.enterRequest(vehicle);	
-		} else if (vehicle.getCurrentLeg().getRoute().getLinkRoute().length>vehicle.getLinkIndex()+1){
+		} else if (vehicle.getCurrentLinkRoute().length>vehicle.getLinkIndex()+1){
 			// if leg is not finished yet
 			vehicle.setLinkIndex(vehicle.getLinkIndex()+1);
-			Link nextLink=vehicle.getCurrentLeg().getRoute().getLinkRoute()[vehicle.getLinkIndex()];
+			Link nextLink=vehicle.getCurrentLinkRoute()[vehicle.getLinkIndex()];
 			
 			Road nextRoad=Road.allRoads.get(nextLink.getId().toString());
 			vehicle.setCurrentLink(nextLink);
