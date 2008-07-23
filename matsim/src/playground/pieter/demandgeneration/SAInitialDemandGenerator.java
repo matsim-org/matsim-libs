@@ -114,7 +114,7 @@ public class SAInitialDemandGenerator {
 //			System.out.print( ((Integer(person.getAttribute(1)%100 == 0)?((person.getAttribute(1)%2900 == 0)?(person.getAttribute(1) + "\n"):(person.getAttribute(1) + " ")):"") );
 			Feature personFeature = this.ftPerson.create(workFeature);
 			this.workLocationCollection.add(personFeature);
-			
+
 		}
 	}
 	private void createHomeLocations() throws FileNotFoundException, IllegalAttributeException {
@@ -163,7 +163,7 @@ public class SAInitialDemandGenerator {
 			double workY = (Double)person.getAttribute(8);
 			String xmlEntry = String.format("\t<person id = \"%d\">\n",ID);
 			xmlEntry += "\t\t<plan>\n";
-			xmlEntry += String.format("\t\t\t<act type=\"home\" x=\"%f\" y=\"%f\" endtime=\"06:00:00\"/>\n",homeX,homeY );
+			xmlEntry += String.format("\t\t\t<act type=\"home\" x=\"%f\" y=\"%f\" end_time=\"06:00:00\"/>\n",homeX,homeY );
 			xmlEntry += "\t\t\t<leg mode=\"car\"/>\n";
 			xmlEntry += String.format("\t\t\t<act type=\"work\" x=\"%f\" y=\"%f\" dur=\"08:00:00\"/>\n",workX,workY );
 			xmlEntry += "\t\t\t<leg mode=\"car\"/>\n";
