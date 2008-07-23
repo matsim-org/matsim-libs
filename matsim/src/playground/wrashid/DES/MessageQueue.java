@@ -1,5 +1,7 @@
 package playground.wrashid.DES;
 
+import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.TreeMap;
 
@@ -7,7 +9,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 
 public class MessageQueue {
-	TreeMap<String, Message> queue = new TreeMap<String, Message>();
+	//TreeMap<String, Message> queue = new TreeMap<String, Message>();
+	PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
 	long counter = 0;
 
 	// A Map (TreeMap, HashMap, etc.) can only contain one value for the same
@@ -26,29 +29,32 @@ public class MessageQueue {
 		// padding with zeros is needed, inorder to be able to use firstKey
 		// property of the queue
 		// String zeroPadded=feedWithZeros(m.getMessageArrivalTime());
+		/*
 		String zeroPadded = padWithZeros(m.getMessageArrivalTime());
-		// String zeroPadded=Double.toString(m.getMessageArrivalTime());
+
 		m.queueKey = zeroPadded.concat("." + (new Long(rlong)).toString());
 		queue.put(m.queueKey, m);
-
-		// if (SimulationParameters.debugMode && (counter % 1000000 == 0)){
-		// System.out.println("MessageQueue.counter:"+ counter);
-		// }
+*/
+		
+		queue1.add(m);
 
 	}
+	
 
 	void removeMessage(Message m) {
-		queue.remove(m.queueKey);
+		//queue.remove(m.queueKey);
+		queue1.remove(m);
 	}
 
 	Message getNextMessage() {
-		Message m = queue.remove(queue.firstKey());
-		// System.out.println(m.queueKey);
+		//Message m = queue.remove(queue.firstKey());
+		Message m = queue1.poll();
 		return m;
 	}
 
 	public boolean hasElement() {
-		return !queue.isEmpty();
+		//return !queue.isEmpty();
+		return !queue1.isEmpty();
 	}
 
 	// this is nesseary for comparison of strings,

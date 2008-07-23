@@ -1,6 +1,6 @@
 package playground.wrashid.DES;
 
-public abstract class Message {
+public abstract class Message implements Comparable {
 	
 	private static long messageCounter=0;
 	public double messageArrivalTime=0;
@@ -26,6 +26,17 @@ public abstract class Message {
 	}
 	
 	public abstract void printMessageLogString();
-	
+
+	// two messages can not be equal!!!
+	public int compareTo(Object obj){
+		Message otherMessage= (Message) obj;
+		if (messageArrivalTime>otherMessage.messageArrivalTime){
+			return 1;
+		} else if (messageArrivalTime<otherMessage.messageArrivalTime) {
+			return -1;
+		} else {
+			return (int)(messageId-otherMessage.messageId);
+		}
+	}
 
 }
