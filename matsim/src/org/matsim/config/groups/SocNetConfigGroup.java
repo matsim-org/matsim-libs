@@ -252,6 +252,10 @@ public class SocNetConfigGroup extends Module {
 		addNotNullParameterToMap(map, INPUT_SN_DIR);
 		addNotNullParameterToMap(map, INIT_ITER);
 		addNotNullParameterToMap(map, READ_MENTALMAP);
+		addNotNullParameterToMap(map, BETA1);
+		addNotNullParameterToMap(map, BETA2);
+		addNotNullParameterToMap(map, BETA3);
+		addNotNullParameterToMap(map, BETA4);
 		return map;
 	}
 	/* direct access */
