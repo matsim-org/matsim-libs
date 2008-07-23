@@ -4,13 +4,14 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Person;
 
 public class MessageQueue {
 	//TreeMap<String, Message> queue = new TreeMap<String, Message>();
-	PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
+	PriorityBlockingQueue<Message> queue1 = new PriorityBlockingQueue<Message>();
 	long counter = 0;
 
 	// A Map (TreeMap, HashMap, etc.) can only contain one value for the same

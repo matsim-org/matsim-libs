@@ -37,7 +37,7 @@ public abstract class SimUnit {
 	// and its fields do not need to be initialized.
 	public void setTimer(double timeOut, Message m){
 		
-		m.setMessageArrivalTime(scheduler.simTime+timeOut);
+		m.setMessageArrivalTime(MessageExecutor.getSimTime()+timeOut);
 		m.sendingUnit=this;
 		m.receivingUnit=this;
 		scheduler.schedule(m);

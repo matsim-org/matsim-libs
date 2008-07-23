@@ -1,11 +1,13 @@
 package playground.wrashid.PDES;
 
 import java.util.HashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.matsim.gbl.Gbl;
 
 public class Scheduler {
-	double simTime=0;
+	private double simTime=0;
 	private MessageQueue queue=new MessageQueue();
 	HashMap<Long,SimUnit> simUnits=new HashMap<Long, SimUnit>();
 
@@ -30,6 +32,7 @@ public class Scheduler {
 	
 	
 	public void startSimulation(){
+		
 		long simulationStart=System.currentTimeMillis();
 		double hourlyLogTime=3600;
 		
@@ -39,6 +42,11 @@ public class Scheduler {
 		
 		while(queue.hasElement() && simTime<SimulationParameters.maxSimulationLength){
 			m=queue.getNextMessage();
+			
+			Executor executor = Executors.newFixedThreadPool(2);
+			executor.execute (new MessageExecutor (m));
+			
+			/*
 			simTime=m.getMessageArrivalTime();
 			m.printMessageLogString();
 			if (m instanceof SelfhandleMessage){
@@ -46,7 +54,7 @@ public class Scheduler {
 			} else {
 				m.receivingUnit.handleMessage(m);
 			}
-			
+			*/
 			
 			// print output each hour
 			if (simTime / hourlyLogTime > 1){
@@ -94,9 +102,9 @@ public class Scheduler {
 	}
 
 
-	public double getSimTime() {
-		return simTime;
-	}
+	//public double getSimTime() {
+	//	return simTime;
+	//}
 
 
 	public void unregister(SimUnit unit) {

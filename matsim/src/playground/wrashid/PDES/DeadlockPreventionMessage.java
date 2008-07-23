@@ -9,11 +9,11 @@ public class DeadlockPreventionMessage extends EventMessage {
 		Road road=(Road)scheduler.getSimUnit(this.receivingUnit.unitNo);
 		
 		road.incrementPromisedToEnterRoad(); // this will be decremented in enter road
-		road.setTimeOfLastEnteringVehicle(scheduler.simTime);
+		road.setTimeOfLastEnteringVehicle(MessageExecutor.getSimTime());
 		road.removeFirstDeadlockPreventionMessage(this);
 		road.removeFromInterestedInEnteringRoad();
 		
-		vehicle.scheduleEnterRoadMessage(scheduler.simTime, road);
+		vehicle.scheduleEnterRoadMessage(MessageExecutor.getSimTime(), road);
 		//System.out.println("Deadlock prevention happend");
 	}
 
