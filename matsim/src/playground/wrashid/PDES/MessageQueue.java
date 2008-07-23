@@ -11,7 +11,7 @@ import org.matsim.plans.Person;
 
 public class MessageQueue {
 	//TreeMap<String, Message> queue = new TreeMap<String, Message>();
-	PriorityBlockingQueue<Message> queue1 = new PriorityBlockingQueue<Message>();
+	PriorityBlockingQueue<Message> queue1 = new PriorityBlockingQueue<Message>(10000);
 	long counter = 0;
 
 	// A Map (TreeMap, HashMap, etc.) can only contain one value for the same

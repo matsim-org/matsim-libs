@@ -39,7 +39,7 @@ public class Scheduler {
 		initializeSimulation();
 		
 		Message m;
-		Executor executor = Executors.newFixedThreadPool(2);
+		Executor executor = Executors.newFixedThreadPool(3);
 		
 		while(queue.hasElement() && simTime<SimulationParameters.maxSimulationLength){
 			m=queue.getNextMessage();
@@ -48,7 +48,13 @@ public class Scheduler {
 			executor.execute (me);
 			
 			while (!me.hasAqiredLocks){
-				// TODO: improve this later... (burning cpu power).
+				/*
+				try {
+					Thread.currentThread().sleep(1);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				*/
 			}
 			
 			/*
@@ -62,13 +68,14 @@ public class Scheduler {
 			*/
 			
 			// print output each hour
+			/*
 			if (simTime / hourlyLogTime > 1){
 				hourlyLogTime = simTime + 3600;
 				System.out.print("Simulation at " + simTime/3600 + "[h]; ");
 				System.out.println("s/r:"+simTime/(System.currentTimeMillis()-simulationStart)*1000);
 				Gbl.printMemoryUsage();
 			}
-			
+			*/
 			
 			
 			// debug - don't needed anymore remove after some time...
