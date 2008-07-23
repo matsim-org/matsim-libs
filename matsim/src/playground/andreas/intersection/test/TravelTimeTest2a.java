@@ -108,6 +108,7 @@ public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLink
 		
 		for (MeasurePoint resMeasurePoint : results.values()) {
 			System.out.println(j + ", " + resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ + ", " + resMeasurePoint.numberOfVehPassed_ + ", " + this.beginningOfLink2.timeToStartMeasurement + ", " + resMeasurePoint.firstVehPassTime_s + ", " + resMeasurePoint.lastVehPassTime_s + ", " + (resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ - j * 2000 / umlaufzeit));
+			assertEquals((j * 2000 / umlaufzeit), resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_, 1);
 			j++;
 			assertEquals(5000.0, resMeasurePoint.numberOfVehPassed_, EPSILON);
 		}

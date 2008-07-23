@@ -1,6 +1,6 @@
 package playground.andreas.intersection.test;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.basic.v01.Id;
@@ -22,7 +22,7 @@ import playground.andreas.intersection.sim.QSim;
  */
 public class TravelTimeTest4a extends MatsimTestCase implements	EventHandlerLinkLeaveI, EventHandlerLinkEnterI {
 
-  private Map<Id, Double> agentTravelTimes = new HashMap<Id, Double>();
+  private Map<Id, Double> agentTravelTimes = new LinkedHashMap<Id, Double>();
   
 	public void testTrafficLightIntersection4arms() {
 		

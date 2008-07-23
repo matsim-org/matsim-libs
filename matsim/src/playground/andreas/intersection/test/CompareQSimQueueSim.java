@@ -66,12 +66,15 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	EventHandlerL
 			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 			this.writer.flush();
 			this.writer.close();
+			
+			assertEquals(CRCChecksum.getCRCFromFile("qsim_events.txt"),	CRCChecksum.getCRCFromFile("queuesim_events.txt"));
+			
+			new File("qsim_events.txt").delete();
+			new File("queuesim_events.txt").delete();
 
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		
-		assertEquals(CRCChecksum.getCRCFromFile("qsim_events.txt"),	CRCChecksum.getCRCFromFile("queuesim_events.txt"));
+		}		
 		
   	}  	
 
