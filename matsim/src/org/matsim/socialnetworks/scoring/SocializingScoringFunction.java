@@ -2,7 +2,7 @@ package org.matsim.socialnetworks.scoring;
 
 /* *********************************************************************** *
  * project: org.matsim.*
- *  SNScoringFriendFoeRatio.java
+ *  SocializingScoringFunction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,15 +26,14 @@ import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.scoring.ScoringFunction;
 
 /**
- * A special {@linkplain ScoringFunction scoring function} that takes the paid tolls by the agents into
- * account when calculating the score of a plan.
+ * A special {@linkplain ScoringFunction scoring function} that takes the face to face encounters
+ * between the agents into account when calculating the score of a plan.
  *
- * @author mrieser
+ * @author jhackney
  */
 public class SocializingScoringFunction implements ScoringFunction{
 
@@ -102,6 +101,7 @@ public class SocializingScoringFunction implements ScoringFunction{
 
 	public double getScore() {
 //		log.info("FFR "+this.friendFoeRatio+" NF "+this.nFriends+" LNF "+Math.log(this.nFriends+1));
+
 		return this.scoringFunction.getScore() +
 		betaFriendFoe*this.friendFoeRatio+
 		betaNFriends * this.nFriends +
