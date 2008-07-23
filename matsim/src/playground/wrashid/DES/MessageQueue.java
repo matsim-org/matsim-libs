@@ -1,5 +1,6 @@
 package playground.wrashid.DES;
 
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
@@ -72,17 +73,61 @@ public class MessageQueue {
 	
 	
 	// TODO: Make this part more efficient, as it is used in each iteration
-	public static String padWithZeros(double xd){
+	public static String padWithZeros(Double xd){
 		String result="";
+		final String zeros[] = new String[]{
+				"",
+				"0",
+				"00",
+				"000",
+				"0000",
+				"00000",
+				"000000",
+				"0000000",
+				"00000000",
+				"000000000",
+				"0000000000",
+				"00000000000",
+				"000000000000",
+				"0000000000000",
+				"00000000000000",
+				"000000000000000",
+				"0000000000000000",
+		        "00000000000000000",
+		        "000000000000000000",
+		        "0000000000000000000",
+		        "00000000000000000000"};
+		
 		long x=Math.round(Math.floor(xd));
 		int noOfDigitsMaxLong=19; // max long is 9223372036854775807 (signed version) and it has 19 digits
 		
-		for (int i=0;i<noOfDigitsMaxLong-Long.toString(x).length();i++){
-			result=result.concat("0");
+		int numberOfDigits=0;
+		long j=Long.MAX_VALUE;
+		
+		while (j>0){
+			if (x/j<=0){
+				numberOfDigits++;
+			}
+			j/=10;
 		}
 		
-		result=result.concat(new Double(xd).toString());
+		result = result.concat(zeros[numberOfDigits]);
+		
+		result=result.concat(xd.toString());
 		return result;
+	}
+	
+	public static void main(String[] args){
+		Random r=new Random();
+		double d=0;
+		for (int i=0;i<1000000;i++){
+			d=r.nextDouble();
+			//System.out.println(padWithZeros(d) + " - " + feedWithZeros(d));
+			//String s=padWithZeros(d);
+			padWithZeros(d);
+			feedWithZeros(d);
+			//assert(padWithZeros(d).equalsIgnoreCase(feedWithZeros(d))==true);
+		}
 	}
 	
 }
