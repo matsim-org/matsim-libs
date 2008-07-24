@@ -16,7 +16,8 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 	private NetworkLayer network = null;
 	private final String LINK_ID = "1";
 	private final String PERSON_ID = "1";
-	
+	private static final int TIME_BIN_SIZE = 900;
+
 	@Override
 	protected void setUp() throws Exception {
 
@@ -44,8 +45,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		double depDelay = 0.0;
 
 		Events events = new Events();
-		int timeBinSize = ((int) (0.25 * 3600));
-		DepartureDelayAverageCalculator testee = new DepartureDelayAverageCalculator(network, timeBinSize);
+		DepartureDelayAverageCalculator testee = new DepartureDelayAverageCalculator(network, TIME_BIN_SIZE);
 		events.addHandler(testee);
 		events.printEventHandlers();
 		
