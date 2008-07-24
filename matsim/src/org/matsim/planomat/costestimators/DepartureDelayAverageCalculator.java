@@ -31,6 +31,12 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
+/**
+ * Computes average departure delay on a link in a given time slot.
+ * 
+ * @author meisterk
+ *
+ */
 public class DepartureDelayAverageCalculator implements EventHandlerAgentDepartureI, EventHandlerLinkLeaveI {
 
 	private NetworkLayer network;

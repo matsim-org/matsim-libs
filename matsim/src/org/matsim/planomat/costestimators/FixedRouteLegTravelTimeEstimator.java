@@ -33,8 +33,7 @@ import org.matsim.world.Location;
  * @author meisterk
  *
  */
-public abstract class FixedRouteLegTravelTimeEstimator implements
-		LegTravelTimeEstimator {
+public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator {
 
 	protected TravelTimeI linkTravelTimeEstimator;
 	protected DepartureDelayAverageCalculator tDepDelayCalc;
@@ -48,9 +47,15 @@ public abstract class FixedRouteLegTravelTimeEstimator implements
 
 	}
 
-	public abstract double getLegTravelTimeEstimation(Id personId,
+	public double getLegTravelTimeEstimation(Id personId,
 			double departureTime, Location origin, Location destination,
-			Route route, String mode);
+			Route route, String mode) {
+		
+		double legTravelTimeEstimation = 0.0;
+		
+		return legTravelTimeEstimation;
+		
+	}
 
 	protected double processDeparture(final Link link, final double start) {
 
