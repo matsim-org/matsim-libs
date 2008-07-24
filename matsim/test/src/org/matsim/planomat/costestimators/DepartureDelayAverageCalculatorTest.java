@@ -14,7 +14,8 @@ import org.matsim.utils.geometry.shared.Coord;
 public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 
 	private NetworkLayer network = null;
-	private final String linkId = "1";
+	private final String LINK_ID = "1";
+	private final String PERSON_ID = "1";
 	
 	@Override
 	protected void setUp() throws Exception {
@@ -28,8 +29,14 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		double toY = 200.0;
 		Node fromNode = network.createNode(new IdImpl("1"), new Coord(fromX, fromY));
 		Node toNode = network.createNode(new IdImpl("2"), new Coord(toX, toY));
-		network.createLink(new IdImpl(linkId), fromNode, toNode, 999.9, 50.0 / 3.6, 1000, 1);
+		network.createLink(new IdImpl(LINK_ID), fromNode, toNode, 999.9, 50.0 / 3.6, 1000, 1);
 		
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		Gbl.reset();
 	}
 
 	public void testGetLinkDepartureDelay() {
@@ -42,11 +49,9 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		events.addHandler(testee);
 		events.printEventHandlers();
 		
-		String dummyPersonId = "1";
-		
 		// this gives a delay of 36s
-		EventAgentDeparture depEvent = new EventAgentDeparture(6.01 * 3600, dummyPersonId, 0, linkId);
-		EventLinkLeave leaveEvent = new EventLinkLeave(6.02 * 3600, dummyPersonId, 0, linkId);
+		EventAgentDeparture depEvent = new EventAgentDeparture(6.01 * 3600, PERSON_ID, 0, LINK_ID);
+		EventLinkLeave leaveEvent = new EventLinkLeave(6.02 * 3600, PERSON_ID, 0, LINK_ID);
 		
 		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -56,8 +61,8 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		assertEquals(depDelay, 36.0);
 		
 		// let's add another delay of 72s, should result in an average of 54s
-		depEvent = new EventAgentDeparture(6.02 * 3600, dummyPersonId, 0, linkId);
-		leaveEvent = new EventLinkLeave(6.04 * 3600, dummyPersonId, 0, linkId);
+		depEvent = new EventAgentDeparture(6.02 * 3600, PERSON_ID, 0, LINK_ID);
+		leaveEvent = new EventLinkLeave(6.04 * 3600, PERSON_ID, 0, LINK_ID);
 		
 		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
