@@ -141,7 +141,6 @@ public class MyRuns {
 //		MyRuns.writeGUESSFile();
 //		MyRuns.planomatStandAloneDemo();
 //		MyRuns.testReplanningRate();
-//		MyRuns.testDepartureDelayCalculator();
 //		MyRuns.testTravelTimeEstimator();
 //		MyRuns.testTravelTimeI();
 //		MyRuns.testCharyparNagelFitnessFunction();
@@ -677,70 +676,6 @@ public class MyRuns {
 
 		System.out.println();
 		System.out.println();
-
-	}
-
-	private static void testDepartureDelayCalculator() {
-
-		String mode = "car";
-
-		// initialize scenario with events from a given events file
-		// - network
-		NetworkLayer network = MyRuns.initWorldNetwork();
-		// - population
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
-		// - events
-		Events events = new Events();
-		DepartureDelayAverageCalculator delayCalc = new DepartureDelayAverageCalculator(network, 900);
-		events.addHandler(delayCalc);
-		events.printEventHandlers();
-		MyRuns.readEvents(events, network);
-
-		Person person = matsimAgentPopulation.getPerson("2");
-		Plan plan = person.getSelectedPlan();
-		Act originAct = null;
-		ActIterator ia = plan.getIteratorAct();
-		originAct = (Act) ia.next();
-		Link originLink = originAct.getLink();
-		System.out.println("Analysing departure delays for link # " + originLink.getId());
-
-		String outputDir = "/Users/meisterk/Documents/workspace/matsimJ/output/";
-		String eventsFilename = Gbl.getConfig().getParam("events", "inputFile");
-		System.out.println(eventsFilename);
-		String iterationNr = eventsFilename.substring(eventsFilename.lastIndexOf("/") + 1);
-		iterationNr = iterationNr.substring(0, iterationNr.indexOf("."));
-		System.out.println("Iteration to be analyzed: " + iterationNr);
-
-		String departureDelayFilename = outputDir;
-		departureDelayFilename += delayCalc.toString();
-		departureDelayFilename += "-" + iterationNr + ".txt";
-
-
-		try {
-			BufferedWriter departureDelayFile = new BufferedWriter(new FileWriter(departureDelayFilename));
-			departureDelayFile.write("#T_dep\tt_delay");
-			departureDelayFile.newLine();
-
-			// 1 minute step size
-			double stepsize = 1.0/60;
-
-			for (double tDep = 4.0; tDep < 10.0; tDep += stepsize) {
-
-				double departureDelay = delayCalc.getLinkDepartureDelay(originLink, tDep * 3600);
-
-				departureDelayFile.write(
-						tDep + "\t" +
-						departureDelay);
-				departureDelayFile.newLine();
-
-			}
-
-			departureDelayFile.close();
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 	}
 
