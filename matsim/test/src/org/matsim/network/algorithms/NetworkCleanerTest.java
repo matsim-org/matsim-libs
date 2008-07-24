@@ -33,7 +33,7 @@ import org.matsim.network.NetworkLayer;
  */
 public class NetworkCleanerTest extends TestCase {
 
-	public void testNetworkCleaner() {
+	public void testSink() {
 		// create a simple network
 		NetworkLayer network = new NetworkLayer();
 		network.createNode("1",   "0",   "0", null);
@@ -46,10 +46,87 @@ public class NetworkCleanerTest extends TestCase {
 		network.createLink("3", "3", "4", "100", "100", "100", "1", null, null);
 		network.createLink("4", "4", "1", "100", "100", "100", "1", null, null);
 		network.createLink("5", "3", "5", "100", "100", "100", "1", null, null);
-		// link 5 is a dead end!
+		// link 5 is a sink / dead end!
 
 		assertEquals("# nodes", 5, network.getNodes().size());
 		assertEquals("# links", 5, network.getLinks().size());
+
+		NetworkCleaner cleaner = new NetworkCleaner();
+		cleaner.run(network);
+
+		assertEquals("# nodes", 4, network.getNodes().size());
+		assertEquals("# links", 4, network.getLinks().size());
+	}
+
+	public void testDoubleSink() {
+		// create a simple network
+		NetworkLayer network = new NetworkLayer();
+		network.createNode("1",   "0",   "0", null);
+		network.createNode("2", "100",   "0", null);
+		network.createNode("3", "100", "100", null);
+		network.createNode("4",   "0", "100", null);
+		network.createNode("5", "200", "200", null);
+		network.createLink("1", "1", "2", "100", "100", "100", "1", null, null);
+		network.createLink("2", "2", "3", "100", "100", "100", "1", null, null);
+		network.createLink("3", "3", "4", "100", "100", "100", "1", null, null);
+		network.createLink("4", "4", "1", "100", "100", "100", "1", null, null);
+		network.createLink("5", "3", "5", "100", "100", "100", "1", null, null);
+		network.createLink("6", "2", "5", "100", "100", "100", "1", null, null);
+		// link 5 is a sink / dead end!
+
+		assertEquals("# nodes", 5, network.getNodes().size());
+		assertEquals("# links", 6, network.getLinks().size());
+
+		NetworkCleaner cleaner = new NetworkCleaner();
+		cleaner.run(network);
+
+		assertEquals("# nodes", 4, network.getNodes().size());
+		assertEquals("# links", 4, network.getLinks().size());
+	}
+
+	public void testSource() {
+		// create a simple network
+		NetworkLayer network = new NetworkLayer();
+		network.createNode("1",   "0",   "0", null);
+		network.createNode("2", "100",   "0", null);
+		network.createNode("3", "100", "100", null);
+		network.createNode("4",   "0", "100", null);
+		network.createNode("5", "200", "200", null);
+		network.createLink("1", "1", "2", "100", "100", "100", "1", null, null);
+		network.createLink("2", "2", "3", "100", "100", "100", "1", null, null);
+		network.createLink("3", "3", "4", "100", "100", "100", "1", null, null);
+		network.createLink("4", "4", "1", "100", "100", "100", "1", null, null);
+		network.createLink("5", "5", "3", "100", "100", "100", "1", null, null);
+		// link 5 is a source / dead end!
+
+		assertEquals("# nodes", 5, network.getNodes().size());
+		assertEquals("# links", 5, network.getLinks().size());
+
+		NetworkCleaner cleaner = new NetworkCleaner();
+		cleaner.run(network);
+
+		assertEquals("# nodes", 4, network.getNodes().size());
+		assertEquals("# links", 4, network.getLinks().size());
+	}
+
+	public void testDoubleSource() {
+		// create a simple network
+		NetworkLayer network = new NetworkLayer();
+		network.createNode("1",   "0",   "0", null);
+		network.createNode("2", "100",   "0", null);
+		network.createNode("3", "100", "100", null);
+		network.createNode("4",   "0", "100", null);
+		network.createNode("5", "200", "200", null);
+		network.createLink("1", "1", "2", "100", "100", "100", "1", null, null);
+		network.createLink("2", "2", "3", "100", "100", "100", "1", null, null);
+		network.createLink("3", "3", "4", "100", "100", "100", "1", null, null);
+		network.createLink("4", "4", "1", "100", "100", "100", "1", null, null);
+		network.createLink("5", "5", "3", "100", "100", "100", "1", null, null);
+		network.createLink("6", "5", "4", "100", "100", "100", "1", null, null);
+		// link 5 is a source / dead end!
+
+		assertEquals("# nodes", 5, network.getNodes().size());
+		assertEquals("# links", 6, network.getLinks().size());
 
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(network);
