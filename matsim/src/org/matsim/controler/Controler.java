@@ -1050,10 +1050,16 @@ public class Controler {
 	}
 
 	public final World getWorld() {
+		if (this.scenarioData == null) {
+			return null;
+		}
 		return this.scenarioData.getWorld();
 	}
 
 	public final Facilities getFacilities() {
+		if (this.scenarioData == null) {
+			return null;
+		}
 		return this.scenarioData.getFacilities();
 	}
 
