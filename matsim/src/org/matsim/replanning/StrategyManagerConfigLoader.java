@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.controler.Controler;
+import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -48,8 +49,8 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherMT;
-import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherSM;
+import org.matsim.socialnetworks.replanning.RandomFacilitySwitcher;
+import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcher;
 
 //import playground.anhorni.locationchoice.LocationChoice;
 
@@ -77,7 +78,8 @@ public class StrategyManagerConfigLoader {
 		TravelCostI travelCostCalc = controler.getTravelCostCalculator();
 		TravelTimeI travelTimeCalc = controler.getTravelTimeCalculator();
 		LegTravelTimeEstimator legTravelTimeEstimator = controler.getLegTravelTimeEstimator();
-
+		Facilities facilities = controler.getFacilities();
+		
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
 		int externalCounter = 0;
@@ -154,9 +156,13 @@ public class StrategyManagerConfigLoader {
 			} else if (classname.equals("SNSecLoc")){
 //				System.out.println(" #### Choosing social network replanning algorithm");
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherMT(network, travelCostCalc, travelTimeCalc);
-//				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherSM(network, travelCostCalc, travelTimeCalc);
+				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcher(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
+			} else if (classname.equals("SecLoc")){
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				StrategyModuleI socialNetStrategyModule= new RandomFacilitySwitcher(network, travelCostCalc, travelTimeCalc, facilities);
+				strategy.addStrategyModule(socialNetStrategyModule);
+			
 			} /*else if (classname.equals("LocationChoice")) {
 		    	strategy = new PlanStrategy(new RandomPlanSelector());
 		    	strategy.addStrategyModule(new LocationChoice(
