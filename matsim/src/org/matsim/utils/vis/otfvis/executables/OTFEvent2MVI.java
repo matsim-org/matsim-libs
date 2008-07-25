@@ -33,21 +33,14 @@ import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
 
-
 public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
-	private final   String netFileName = "";
-	private  String vehFileName = "";
-	//private  String outFileName = "";
-	private static final int BUFFERSIZE = 100000000;
-
+	private final String eventFileName;
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	public OTFEvent2MVI(QueueNetworkLayer net, String EventFileName, String outFileName, double startTime, double intervall_s) {
-		super(intervall_s, net, outFileName);
-		this.vehFileName = EventFileName;
-		//this.outFileName = outFileName;
-		this.intervall_s = intervall_s;
+	public OTFEvent2MVI(QueueNetworkLayer net, String eventFileName, String outFileName, double interval_s) {
+		super(interval_s, net, outFileName);
+		this.eventFileName = eventFileName;
 	}
 
 	@Override
@@ -55,31 +48,20 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 		this.quad.addAdditionalElement(this.writer);
 	}
 
-	//ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
-	//private final int cntPositions=0;
 	private double lastTime=-1;
-	//private final int cntTimesteps=0;
 
 	public void convert() {
-
 		open();
-		// read and convert data from veh-file
 
 		// create SnapshotGenerator
-		Gbl.startMeasurement();
 		Gbl.getConfig().simulation().setSnapshotFormat("none");
-		Gbl.getConfig().simulation().setSnapshotPeriod(this.intervall_s);
+		Gbl.getConfig().simulation().setSnapshotPeriod(this.interval_s);
 		Events2Snapshot app = new Events2Snapshot();
 		app.addExternalSnapshotWriter(this);
-		app.run(new File(this.vehFileName), Gbl.getConfig(), this.net.getNetworkLayer());
-		finishIT();
-	}
+		app.run(new File(this.eventFileName), Gbl.getConfig(), this.net.getNetworkLayer());
 
-
-	private void finishIT() {
 		close();
 	}
-
 
 	public static void main(String[] args) {
 
@@ -100,13 +82,13 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 		eventFile = "output/current/ITERS/it.0/0.events.txt.gz";
 		eventFile = "../../tmp/studies/berlin-wip/run125/200.events.txt.gz";
 
-		OTFEvent2MVI test  = new OTFEvent2MVI(qnet, eventFile, "output/ds_fromEvent.mvi",0 , 600);
+		OTFEvent2MVI test  = new OTFEvent2MVI(qnet, eventFile, "output/ds_fromEvent.mvi",600);
 		test.convert();
 	}
 
 	@Override
 	public void addAgent(PositionInfo position) {
-		//drop all parking vehicles 
+		//drop all parking vehicles
 		if (position.getVehicleState() == PositionInfo.VehicleState.Parking) return;
 
 		this.writer.positions.add(new OTFAgentsListHandler.ExtendedPositionInfo(position, 0,0));
@@ -123,7 +105,6 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 		try {
 			dump((int)this.lastTime);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -131,8 +112,6 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 	@Override
 	public void finish() {
 		// TODO Auto-generated method stub
-
 	}
-
 
 }

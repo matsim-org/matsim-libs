@@ -47,7 +47,7 @@ public class PadangEventConverter {
 
 		String eventFile = Gbl.getConfig().getParam("events","outputFile");
 		eventFile = "../../tmp/studies/padang/0.events.txt.gz";
-		OTFEvent2MVI test = new OTFEvent2MVI(qnet, eventFile, "../../tmp/studies/padang/ds_fromEvent.vis", 0,10);
+		OTFEvent2MVI test = new OTFEvent2MVI(qnet, eventFile, "../../tmp/studies/padang/ds_fromEvent.vis", 10);
 		test.convert();
 	}
 }
