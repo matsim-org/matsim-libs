@@ -41,16 +41,14 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 	//private final   String netFileName = "";
 	private  String vehFileName = "";
 	//private  String outFileName = "";
-	private static final int BUFFERSIZE = 100000000;
 
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	public OTFTVeh2MVI(final QueueNetworkLayer net, final String vehFileName, final String outFileName, final double startTime, final double intervall_s) {
+	public OTFTVeh2MVI(final QueueNetworkLayer net, final String vehFileName, final String outFileName, final double intervall_s) {
 		super(intervall_s, net, outFileName);
 		this.vehFileName = vehFileName;
 		//this.outFileName = outFileName;
-		this.intervall_s = intervall_s;
 	}
 
 	@Override
@@ -200,7 +198,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		world.setNetworkLayer(net);
 		final QueueNetworkLayer qnet = new QueueNetworkLayer(net);
 
-		final OTFTVeh2MVI test  = new OTFTVeh2MVI(qnet, vehFileName, outFileName, 0, intervall_s);
+		final OTFTVeh2MVI test  = new OTFTVeh2MVI(qnet, vehFileName, outFileName, intervall_s);
 		test.convert();
 	}
 

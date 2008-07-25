@@ -40,15 +40,15 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 public class OTFAgentsListHandler extends OTFDataReader {
 	static boolean prevV1_1 = OTFDataReader.setPreviousVersion(OTFAgentsListHandler.class.getCanonicalName() + "V1.1", ReaderV1_2.class);
 	static boolean prevV1_2 = OTFDataReader.setPreviousVersion(OTFAgentsListHandler.class.getCanonicalName() + "V1.2", ReaderV1_2.class);
-	
+
 	protected Class agentReceiverClass = null;
-	
+
 	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	public static class ExtendedPositionInfo extends PositionInfo {
 
 		int type = 0;
 		int user = 0;
-		
+
 		public ExtendedPositionInfo(Id driverId, double easting, double northing, double elevation, double azimuth, double speed, VehicleState vehicleState, int type, int userdata) {
 			super(driverId, easting, northing, elevation, azimuth, speed, vehicleState, "");
 			this.type = type;
@@ -59,26 +59,21 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			this.type = type;
 			this.user = userdata;
 		}
-		
+
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	static public class Writer extends  OTFDataWriter {
+	static public class Writer extends OTFDataWriter {
 
-
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -6368752578878835954L;
-		
+
 		public transient Collection<ExtendedPositionInfo> positions = new ArrayList<ExtendedPositionInfo>();
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
 		}
 
-
-		public void writeAgent(ExtendedPositionInfo pos, ByteBuffer out) throws IOException {
+		public void writeAgent(ExtendedPositionInfo pos, ByteBuffer out) {
 			String id = pos.getAgentId().toString();
 			out.putInt(id.length());
 			for (int i=0; i<id.length(); i++) out.putChar(id.charAt(i));
@@ -89,7 +84,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			out.putInt(pos.user);
 			out.putFloat((float)pos.getSpeed());
 		}
-		
+
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
 			// Write additional agent data
@@ -105,9 +100,9 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		}
 
 	}
-	
+
 	static char[] idBuffer = new char[100];
-	
+
 	public void readAgent(ByteBuffer in, SceneGraph graph) throws IOException {
 		int length = in.getInt();
 		idBuffer = new char[length];
@@ -116,7 +111,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		float y = in.getFloat();
 		int type = in.getInt();
 		int user = in.getInt();
-		// Convert to km/h 
+		// Convert to km/h
 		float speed = in.getFloat()*3.6f;
 
 			OTFDataSimpleAgent.Receiver drawer = null;
@@ -133,13 +128,13 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			} //factoryAgent.getOne();
 
  	}
-	
+
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 		// read additional agent data
 		agents.clear();
-		
+
 		int count = in.getInt();
 		for(int i= 0; i< count; i++) readAgent(in, graph);
 	}
@@ -162,7 +157,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 	}
 
-	
+
 	@Override
 	public void invalidate(SceneGraph graph) {
 		// invalidate agent receivers
@@ -176,7 +171,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	 *
 	 */
 	public static final class ReaderV1_2 extends OTFAgentsListHandler {
-		
+
 		@Override
 		public void readAgent(ByteBuffer in, SceneGraph graph) throws IOException {
 			int length = in.getInt();
@@ -185,7 +180,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			float x = in.getFloat();
 			float y = in.getFloat();
 			int state = in.getInt();
-			// Convert to km/h 
+			// Convert to km/h
 			float color = in.getFloat()*3.6f;
 
 				OTFDataSimpleAgent.Receiver drawer = null;
@@ -203,7 +198,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 				// at this version, only userdata was defined... aka state
 
 	 	}
-		
+
 
 	}
 }
