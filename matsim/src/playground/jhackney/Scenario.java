@@ -50,9 +50,9 @@ public abstract class Scenario {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final String output_directory = "output/";
-	private static final String input_directory = "input/";
-
+	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB5/postprocessing/";
+	private static final String input_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB5/";
+	private static final Config config= Gbl.createConfig(null);;
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -69,17 +69,17 @@ public abstract class Scenario {
 	//////////////////////////////////////////////////////////////////////
 
 	public static final void setUpScenarioConfig() {
-		final Config config = Gbl.createConfig(null);
+//		config = Gbl.createConfig(null);
 
 		config.config().setOutputFile(output_directory + "output_config.xml");
 
-		config.world().setInputFile(input_directory + "raster3000.xml");
+		config.world().setInputFile(input_directory + "output_world.xml");
 		config.world().setOutputFile(output_directory + "output_world.xml");
 
-		config.network().setInputFile(input_directory + "network.xml");
+		config.network().setInputFile(input_directory + "output_network.xml");
 		config.network().setOutputFile(output_directory + "output_network.xml");
 
-		config.facilities().setInputFile(input_directory + "facilities.xml");
+		config.facilities().setInputFile(input_directory + "output_facilities.xml");
 		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
 
 		config.matrices().setInputFile(input_directory + "matrices.xml");
@@ -94,14 +94,22 @@ public abstract class Scenario {
 		config.counts().setOutputFile(output_directory + "output_counts.xml.gz");
 		
 		config.socnetmodule().setInDirName(input_directory);
+		config.socnetmodule().setOutDir(output_directory);
+		config.socnetmodule().setSocNetGraphAlgo("read");
 		config.socnetmodule().setSocNetLinkRemovalP("0");
 		config.socnetmodule().setSocNetLinkRemovalAge("0");
 		config.socnetmodule().setDegSat("0");
 		config.socnetmodule().setSocNetGraphAlgo("read");
 		config.socnetmodule().setEdgeType("UNDIRECTED");
-		config.socnetmodule().setInitIter("10");
+		config.socnetmodule().setInitIter("500");
 		config.socnetmodule().setReadMentalMap("true");
-	
+		
+		config.createModule("kml21");
+		config.getModule("kml21").addParam("outputDirectory", output_directory);
+		config.getModule("kml21").addParam("outputEgoNetPlansKMLMainFile","egoNetKML" );
+		config.getModule("kml21").addParam("outputKMLDemoColoredLinkFile", "egoNetLinkColorFile");
+		config.getModule("kml21").addParam("useCompression", "true");
+
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -201,6 +209,12 @@ public abstract class Scenario {
 		System.out.println("  writing config xml file... ");
 		new ConfigWriter(Gbl.getConfig()).write();
 		System.out.println("  done.");
+	}
+	public static Config getConfig(){
+		return config;
+	}
+	public static String getSNOutDir(){
+		return output_directory;
 	}
 }
 
