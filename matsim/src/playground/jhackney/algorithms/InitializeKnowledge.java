@@ -24,7 +24,7 @@ public class InitializeKnowledge {
 			System.out.println("  Opening the file to read in the map of Acts to Facilities");
 			aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
 
-			String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "/ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
+			String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
 			aar.openFile(fileName);
 			System.out.println(" ... done");
 		}
