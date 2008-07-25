@@ -66,10 +66,10 @@ public class OTFQuadFileHandler {
 	public static final int MINORVERSION = 3;
 
 	public static class Writer implements SimStateWriterI, SnapshotWriterI {
-		protected QueueNetworkLayer net = null;
+		protected final QueueNetworkLayer net;
 		protected OTFServerQuad quad = null;
 		private final String fileName;
-		protected double intervall_s = 1;
+		protected final double interval_s;
 		protected double nextTime = -1;
 
 		private ZipOutputStream zos = null;
@@ -80,7 +80,7 @@ public class OTFQuadFileHandler {
 
 		public Writer(double intervall_s, QueueNetworkLayer network, String fileName) {
 			this.net = network;
-			this.intervall_s = intervall_s;
+			this.interval_s = intervall_s;
 			this.fileName = fileName;
 		}
 
@@ -88,7 +88,7 @@ public class OTFQuadFileHandler {
 			if (time_s >= this.nextTime) {
 				// dump time
 				writeDynData(time_s);
-				this.nextTime = time_s + this.intervall_s;
+				this.nextTime = time_s + this.interval_s;
 				return true;
 			}
 			return false;
@@ -101,7 +101,7 @@ public class OTFQuadFileHandler {
 			this.outFile.writeInt(VERSION);
 			this.outFile.writeInt(MINORVERSION);
 
-			this.outFile.writeDouble(this.intervall_s);
+			this.outFile.writeDouble(this.interval_s);
 			//outFile.writeUTF("fromFile");
 			this.zos.closeEntry();
 		}
@@ -114,13 +114,15 @@ public class OTFQuadFileHandler {
 			this.zos.putNextEntry(new ZipEntry("quad.bin"));
 			Gbl.startMeasurement();
 			this.quad = new OTFServerQuad(this.net);
-			System.out.print("build Quad on Server: "); Gbl.printElapsedTime();
+			System.out.print("build Quad on Server: ");
+			Gbl.printElapsedTime();
 
 			onAdditionalQuadData();
 
 			Gbl.startMeasurement();
 			this.quad.fillQuadTree(new OTFDefaultNetWriterFactoryImpl());
-			System.out.print("fill writer Quad on Server: "); Gbl.printElapsedTime();
+			System.out.print("fill writer Quad on Server: ");
+			Gbl.printElapsedTime();
 			Gbl.startMeasurement();
 			new ObjectOutputStream(this.zos).writeObject(this.quad);
 			this.zos.closeEntry();
@@ -145,18 +147,15 @@ public class OTFQuadFileHandler {
 			this.buf.position(0);
 			this.outFile.writeDouble(time_s);
 			// get State
-			//Gbl.startMeasurement();
 			this.quad.writeDynData(null, this.buf);
 			this.outFile.writeInt(this.buf.position());
 			this.outFile.write(this.buf.array(), 0, this.buf.position());
 			// dump State
-			//Gbl.printElapsedTime();
 			this.zos.closeEntry();
 		}
 
 		public void open() {
 			//open zip file
-			//
 			isOpen = true;
 
 			try {
@@ -272,8 +271,6 @@ public class OTFQuadFileHandler {
 
 			this.inFile = new DataInputStream(new BufferedInputStream(this.zipFile.getInputStream(entry)));
 			readStateBuffer(buffer);
-
-			//Gbl.printMemoryUsage();
 
 			return buffer;
 		}
