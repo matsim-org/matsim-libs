@@ -160,7 +160,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		this.spatialScorer = new SpatialScorer();
 		this.spatialScorer.scoreActs(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
 		SNScoringGeneralFactory factory = new SNScoringGeneralFactory
-		                    ("leisure", this.spatialScorer, controler.getScoringFunctionFactory());
+		("leisure", this.spatialScorer, controler.getScoringFunctionFactory());
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");
 
@@ -210,6 +210,13 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
 				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
 				this.log.info(" ... done");
+				
+//				Write out the KML for the EgoNet of a chosen agent
+				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
+				Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
+//				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
+				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
+				this.log.info(" ... done");
 			}
 		}
 		if (event.getIteration() == this.controler.getLastIteration()) {
@@ -218,14 +225,10 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				this.snetstat.closeFiles();
 			}
 		}
-//		Write out the KML for the EgoNet of a chosen agent
 
-		Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
-//		Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
-		EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
 		if (event.getIteration() == this.controler.getLastIteration()){	
 
-		EgoNetPlansItersMakeKML.write();
+			EgoNetPlansItersMakeKML.write();
 		}
 
 	}
@@ -304,7 +307,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 			aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
 
 //			Change to make this the input directory -- JH
-			String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "/ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
+			String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
 			aar.openFile(fileName);
 			this.log.info(" ... done");
 		}

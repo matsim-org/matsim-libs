@@ -106,7 +106,7 @@ public class EgoNetPlansItersMakeKML {
 	private static Person ego;
 	private static TreeMap<Id,Color> colors = new TreeMap<Id,Color>();
 	private static TimeStamp timeStamp;
-	private static int nColors=36;
+	private static int nColors=13;//36
 	private static Person ai;
 
 	public static void setUp(Config config, NetworkLayer network) {
@@ -256,7 +256,7 @@ public class EgoNetPlansItersMakeKML {
 //		nColors=persons.size()*2;
 
 		loadData(ego, 0, iter);
-		
+
 		Iterator<Person> altersIt= persons.iterator();
 
 		while(altersIt.hasNext()){
@@ -272,6 +272,8 @@ public class EgoNetPlansItersMakeKML {
 
 		log.info(" ... done.");
 	}
+
+
 	public static void loadData(Person alter, int i, int iter) {
 
 		log.info("    loading Plan data. Processing person ...");
@@ -342,7 +344,7 @@ public class EgoNetPlansItersMakeKML {
 		makeActivitySpaceKML_Line(alter,iter,planFolder,agentLinkStyle);
 
 		makeCoreSocialLinkKML(alter,iter,planFolder,agentLinkStyle);
-		
+
 		// Proceed to the EgoNet of myPerson
 		if(i==0){
 			makeEgoSpaceKML_Line(iter, planFolder, color);
@@ -354,7 +356,7 @@ public class EgoNetPlansItersMakeKML {
 				makeTangentialSocialLinkKML(alter,iter,planFolder);
 			}
 		}
-		
+
 		// put facilities in a folder, one facilities folder for each Plan
 		Folder facilitiesFolder = new Folder(
 				"facilities "+myPlan.getPerson().getId().toString()+"-"+iter,
@@ -436,9 +438,9 @@ public class EgoNetPlansItersMakeKML {
 		String id = ego.getId().toString();
 
 		Style egoSpaceStyle=new Style("ego space "+id+"-"+iter);
-		
+
 		egoSpaceStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 2));
-System.out.println(" # # # # makeEgoSpaceKML_Line "+color.toString());
+		System.out.println(" # # # # makeEgoSpaceKML_Line "+color.toString());
 
 		Folder es = new Folder(
 				"ego space "+id+"-"+iter,
@@ -460,47 +462,50 @@ System.out.println(" # # # # makeEgoSpaceKML_Line "+color.toString());
 		new PersonCalcEgoSpace().run(ego);
 
 		// add the points of the activity space to the polygon
-		ActivitySpace space = ego.getKnowledge().getActivitySpaces().get(1);
-		if (space instanceof ActivitySpaceEllipse) {
+		// if PersonCalcEgoSpace() failed to give an activity space, ...
+		if((ego.getKnowledge().getActivitySpaces().size()>1)){
+			ActivitySpace space = ego.getKnowledge().getActivitySpaces().get(1);
+			if (space instanceof ActivitySpaceEllipse) {
 
-//			calculate the circumference points (boundary)
-			double a = space.getParam("a").doubleValue();
-			double b = space.getParam("b").doubleValue();
-			double theta = space.getParam("theta").doubleValue();
-			double x = space.getParam("x").doubleValue();
-			double y = space.getParam("y").doubleValue();
-			Point oldPoint=null;
-			for (double t=0.0; t<2.0*Math.PI; t=t+2.0*Math.PI/360.0) {
-				// "a*((cos(t)))*cos(phi) - b*((sin(t)))*sin(phi) + x0"
-				double p_xOut = a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta) + x;
-//				double p_xIn = 0.9*(a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta)) + x;
-				// "a*((cos(t)))*sin(phi) + b*((sin(t)))*cos(phi) + y0"
-				double p_yOut = a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta) + y;
-//				double p_yIn = 0.9*(a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta)) + y;
-				CoordI coordOut = trafo.transform(new Coord(p_xOut, p_yOut));
-				Point pointOut= new Point(coordOut.getX(),coordOut.getY(), 0.0);
-//				CoordI coordIn = trafo.transform(new Coord(p_xIn, p_yIn));
-//				Point pointIn= new Point(coordIn.getX(),coordIn.getY(), 0.0);
+//				calculate the circumference points (boundary)
+				double a = space.getParam("a").doubleValue();
+				double b = space.getParam("b").doubleValue();
+				double theta = space.getParam("theta").doubleValue();
+				double x = space.getParam("x").doubleValue();
+				double y = space.getParam("y").doubleValue();
+				Point oldPoint=null;
+				for (double t=0.0; t<2.0*Math.PI; t=t+2.0*Math.PI/360.0) {
+					// "a*((cos(t)))*cos(phi) - b*((sin(t)))*sin(phi) + x0"
+					double p_xOut = a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta) + x;
+//					double p_xIn = 0.9*(a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta)) + x;
+					// "a*((cos(t)))*sin(phi) + b*((sin(t)))*cos(phi) + y0"
+					double p_yOut = a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta) + y;
+//					double p_yIn = 0.9*(a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta)) + y;
+					CoordI coordOut = trafo.transform(new Coord(p_xOut, p_yOut));
+					Point pointOut= new Point(coordOut.getX(),coordOut.getY(), 0.0);
+//					CoordI coordIn = trafo.transform(new Coord(p_xIn, p_yIn));
+//					Point pointIn= new Point(coordIn.getX(),coordIn.getY(), 0.0);
 
-				if(t>0.0){
+					if(t>0.0){
 
-					Placemark linkPlacemark = new Placemark(
-							Double.toString(t),
-							Feature.DEFAULT_NAME,
-							Feature.DEFAULT_DESCRIPTION,
-							Feature.DEFAULT_ADDRESS,
-							Feature.DEFAULT_LOOK_AT,
-							egoSpaceStyle.getId(),
-							Feature.DEFAULT_VISIBILITY,
-							Feature.DEFAULT_REGION,
-							timeStamp);
+						Placemark linkPlacemark = new Placemark(
+								Double.toString(t),
+								Feature.DEFAULT_NAME,
+								Feature.DEFAULT_DESCRIPTION,
+								Feature.DEFAULT_ADDRESS,
+								Feature.DEFAULT_LOOK_AT,
+								egoSpaceStyle.getId(),
+								Feature.DEFAULT_VISIBILITY,
+								Feature.DEFAULT_REGION,
+								timeStamp);
 
-					linkPlacemark.setGeometry(new LineString(oldPoint, pointOut));
-					es.addFeature(linkPlacemark);
+						linkPlacemark.setGeometry(new LineString(oldPoint, pointOut));
+						es.addFeature(linkPlacemark);
+					}
+					oldPoint=pointOut;
 				}
-				oldPoint=pointOut;
-			}
-		}	
+			}	
+		}
 	}
 
 	private static void makeTangentialSocialLinkKML(Person myPerson, int i,
@@ -588,10 +593,22 @@ System.out.println(" # # # # makeEgoSpaceKML_Line "+color.toString());
 
 
 		// make the activity spaces
+		// If knowledge already has activity spaces, erase them all and replace them with
+		// the new one, to be sure what this activity space corresponds with the plan
+		// in the iteration. The activity spaces added to knowledge should be plan (iteration)
+		// attributes, not knowledge attributes and it's not certain what iteration each
+		// activity space pertains to.
+		// For the KMZ animations you can overwrite (erase, replace) the activity space
+		// each iteration.
+
+		if(!(myPerson.getKnowledge().getActivitySpaces()==null)){
+			myPerson.getKnowledge().getActivitySpaces().clear();
+		}
 		new PersonCalcActivitySpace("all").run(myPerson);
 //		new PersonDrawActivitySpace().run(myPerson);
 		// add the points of the activity space to the polygon
 		ActivitySpace space = myPerson.getKnowledge().getActivitySpaces().get(0);
+
 		if (space instanceof ActivitySpaceEllipse) {
 
 //			calculate the circumference points (boundary)
