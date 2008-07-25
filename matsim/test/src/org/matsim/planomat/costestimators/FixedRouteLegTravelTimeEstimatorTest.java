@@ -41,6 +41,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 	
 	protected void setUp() throws Exception {
 
+		super.setUp();
+		
 		Config config = super.loadConfig(FixedRouteLegTravelTimeEstimatorTest.CONFIGFILE);
 
 		log.info("Reading network xml file...");
@@ -60,12 +62,6 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		
 		testee = new FixedRouteLegTravelTimeEstimator(linkTravelTimeEstimator, tDepDelayCalc);
 		
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		Gbl.reset();
 	}
 
 	public void testGetLegTravelTimeEstimation() {

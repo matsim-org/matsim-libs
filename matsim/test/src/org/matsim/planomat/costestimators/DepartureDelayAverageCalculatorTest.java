@@ -21,6 +21,8 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 
+		super.setUp();
+		
 		// we need a network with just one link
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 
@@ -32,12 +34,6 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		Node toNode = network.createNode(new IdImpl("2"), new Coord(toX, toY));
 		network.createLink(new IdImpl(LINK_ID), fromNode, toNode, 999.9, 50.0 / 3.6, 1000, 1);
 		
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		Gbl.reset();
 	}
 
 	public void testGetLinkDepartureDelay() {
