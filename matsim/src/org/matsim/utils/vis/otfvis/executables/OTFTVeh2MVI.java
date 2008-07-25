@@ -36,21 +36,14 @@ import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
 
-
-public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
-	//private final   String netFileName = "";
+public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 	private  String vehFileName = "";
-	//private  String outFileName = "";
-	private static final int BUFFERSIZE = 100000000;
-
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	public OTFTVeh2MVI(QueueNetworkLayer net, String vehFileName, String outFileName, double startTime, double intervall_s) {
-		super(intervall_s, net, outFileName);
+	public OTFTVeh2MVI(QueueNetworkLayer net, String vehFileName, String outFileName, double interval_s) {
+		super(interval_s, net, outFileName);
 		this.vehFileName = vehFileName;
-		//this.outFileName = outFileName;
-		this.intervall_s = intervall_s;
 	}
 
 	@Override
@@ -58,38 +51,9 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		this.quad.addAdditionalElement(this.writer);
 	}
 
-//	public static double myParseDouble(String rep) {
-//		double result = 0;
-//		int exp = 1;
-//		double factor = 1;
-//		double before= 0;
-//		double after = 0;
-//		String [] parts = StringUtils.explode(rep, 'E');
-//		if(parts.length == 2) {
-//			exp = Integer.parseInt(parts[1]);
-//			while (exp-- >0) factor *=10.;
-//		} else {
-//
-//		}
-//		parts = StringUtils.explode(parts[0], '.');
-//		before = Long.parseLong(parts[0]);
-//		if(parts.length == 2) {
-//			after = Long.parseLong(parts[1]);
-//			double divider = 1;
-//			int stellen = parts[1].length();
-//			while (stellen-- >0) divider *=10.;
-//			after /= divider;
-//		} else {
-//
-//		}
-//		result = (before + after)* factor;
-//		return result;
-//	}
-
-	//ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
-	private int cntPositions=0;
-	private double lastTime=-1;
-	private int cntTimesteps=0;
+	private int cntPositions = 0;
+	private double lastTime = -1;
+	private int cntTimesteps = 0;
 
 	private void convert() {
 
@@ -108,9 +72,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 			reader.readLine(); // header, we do not use it
 			String line = null;
 			while ( (line = reader.readLine()) != null) {
-
-
-				String[] result = StringUtils.explode(line, '\t', 16);//line.split("\t");
+				String[] result = StringUtils.explode(line, '\t', 16);
 				if (result.length == 16) {
 					double easting = Double.parseDouble(result[11]);
 					double northing = Double.parseDouble(result[12]);
@@ -162,7 +124,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 				}
 			this.lastTime = time;
 		}
-// I do not realyy know which second will be written, as it might be any second AFTER nextTime, when NOTHING has happened on "nextTime", as the if-clause will be executed only then
+// I do not really know which second will be written, as it might be any second AFTER nextTime, when NOTHING has happened on "nextTime", as the if-clause will be executed only then
 // still I can collect all vehicles, as to every time change it will get erased...
 //		if (time == nextTime) {
 			this.writer.positions.add(position);
@@ -200,9 +162,8 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		world.setNetworkLayer(net);
 		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
 
-		OTFTVeh2MVI test  = new OTFTVeh2MVI(qnet, vehFileName, outFileName, 0, intervall_s);
+		OTFTVeh2MVI test  = new OTFTVeh2MVI(qnet, vehFileName, outFileName, intervall_s);
 		test.convert();
 	}
-
 
 }
