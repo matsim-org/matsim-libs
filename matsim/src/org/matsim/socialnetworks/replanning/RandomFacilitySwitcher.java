@@ -20,14 +20,12 @@
 
 package org.matsim.socialnetworks.replanning;
 
-
+import org.matsim.facilities.Facilities;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plan;
 import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.replanning.modules.StrategyModuleI;
+import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-
 /**
  * The social network replanning StrategyModule is not multi-threaded because each
  * agent could refer to and alter other agent objects in a random manner.
@@ -36,47 +34,31 @@ import org.matsim.router.util.TravelTimeI;
  *
  */
 
-public class SNRandomFacilitySwitcherSM implements StrategyModuleI {
-//public class SNRandomFacilitySwitcherMT extends MultithreadedModuleA {
+public class RandomFacilitySwitcher extends MultithreadedModuleA {
 	private NetworkLayer network=null;
 	private TravelCostI tcost=null;
 	private TravelTimeI ttime=null;
+	private Facilities facs=null;
 	/** 
 	 * TODO [JH] this is hard-coded here but has to match the standard facility types
 	 * in the facilities object. Need to make this change in the SNControllers, too.
 	 */
 	private String[] factypes={"home","work","shop","education","leisure"};
 	
-    public SNRandomFacilitySwitcherSM(NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
+    public RandomFacilitySwitcher(NetworkLayer network, TravelCostI tcost, TravelTimeI ttime, Facilities facs) {
 
-		System.out.println("initializing SNRandomFacilitySwitcher");
+		System.out.println("initializing RandomFacilitySwitcher");
     	this.network=network;
     	this.tcost = tcost;
     	this.ttime = ttime;
-
+    	this.facs = facs;
     }
 
     public PlanAlgorithmI getPlanAlgoInstance() {
 //	return new SNSecLocShortest(factypes, network, tcost, ttime);
-	return new SNSecLocRandom(factypes, network, tcost, ttime);
+	return new SecLocRandom(factypes, network, tcost, ttime, facs);
     }
-
-		public void finish() {
-			// TODO Auto-generated method stub
-			
-		}
-
-		public void handlePlan(Plan plan) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		public void init() {
-			// TODO Auto-generated method stub
-			
-		}
-
-
 
 
 }
+

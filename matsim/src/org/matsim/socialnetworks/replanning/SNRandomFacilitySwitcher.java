@@ -33,7 +33,7 @@ import org.matsim.router.util.TravelTimeI;
  *
  */
 
-public class SNRandomFacilitySwitcherMT extends MultithreadedModuleA {
+public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
 	private NetworkLayer network=null;
 	private TravelCostI tcost=null;
 	private TravelTimeI ttime=null;
@@ -43,7 +43,7 @@ public class SNRandomFacilitySwitcherMT extends MultithreadedModuleA {
 	 */
 	private String[] factypes={"home","work","shop","education","leisure"};
 	
-    public SNRandomFacilitySwitcherMT(NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
+    public SNRandomFacilitySwitcher(NetworkLayer network, TravelCostI tcost, TravelTimeI ttime) {
 
 		System.out.println("initializing SNRandomFacilitySwitcher");
     	this.network=network;
