@@ -33,6 +33,8 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		testSuite.addTestSuite(DepartureDelayAverageCalculatorTest.class);
 		testSuite.addTestSuite(FixedRouteLegTravelTimeEstimatorTest.class);
+		testSuite.addTestSuite(CetinCompatibleLegTravelTimeEstimatorTest.class);
+		testSuite.addTestSuite(CharyparEtAlCompatibleLegTravelTimeEstimatorTest.class);
 		//$JUnit-END$
 
 		System.out.println("Running org.matsim.planomat.costestimators.AllTests.suite()...done.");
