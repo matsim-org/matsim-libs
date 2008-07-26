@@ -182,7 +182,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 		this.log.info("finishIteration ... "+event.getIteration());
 //		snIter = event.getIteration();
-
+		this.spatialScorer.scoreActs(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
 		if( event.getIteration()%replan_interval==0){
 			// Removing the social links here rather than before the replanning and assignment lets you use the actual encounters in a social score
 			this.log.info(" Removing social links ...");
