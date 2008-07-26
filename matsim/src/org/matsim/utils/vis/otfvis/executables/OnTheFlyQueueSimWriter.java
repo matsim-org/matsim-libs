@@ -81,7 +81,7 @@ public class OnTheFlyQueueSimWriter extends QueueSimulation{
 		String studiesRoot = "../";
 		String localDtdBase = "../matsimJ/dtd/";
 
-
+		// FIXME hard-coded filenames
 		String netFileName = studiesRoot + "berlin-wip/network/wip_net.xml";
 		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter001car_hwh.routes_wip.plans.xml.gz"; // 15931 agents
 //		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml.gz"; // 160171 agents

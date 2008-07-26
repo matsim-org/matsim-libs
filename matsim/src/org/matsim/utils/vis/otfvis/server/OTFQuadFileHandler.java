@@ -235,7 +235,7 @@ public class OTFQuadFileHandler {
 		public void scanZIPFile() {
 			this.nextTime = -1;
 			// Create an enumeration of the entries in the zip file
-			Enumeration zipFileEntries = this.zipFile.entries();
+			Enumeration<? extends ZipEntry> zipFileEntries = this.zipFile.entries();
 			System.out.println("Scanning timesteps:");
 
 			Gbl.startMeasurement();
@@ -244,7 +244,7 @@ public class OTFQuadFileHandler {
 			while (zipFileEntries.hasMoreElements())
 			{
 				// grab a zip file entry
-				ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
+				ZipEntry entry = zipFileEntries.nextElement();
 
 				String currentEntry = entry.getName();
 				if(currentEntry.contains("step")) {

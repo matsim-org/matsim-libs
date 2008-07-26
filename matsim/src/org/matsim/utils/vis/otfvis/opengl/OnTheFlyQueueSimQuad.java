@@ -21,8 +21,6 @@
 package org.matsim.utils.vis.otfvis.opengl;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.matsim.config.Config;
 import org.matsim.events.Events;
@@ -33,7 +31,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.utils.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.utils.vis.otfvis.server.OnTheFlyServer;
@@ -46,7 +43,6 @@ import org.matsim.world.World;
  *
  */
 public class OnTheFlyQueueSimQuad extends QueueSimulation{
-	private final List<SimStateWriterI> writers = new ArrayList<SimStateWriterI>();
 	private OnTheFlyServer myOTFServer = null;
 
 	@Override
@@ -84,7 +80,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 
 	public OnTheFlyQueueSimQuad(NetworkLayer net, Plans plans, Events events) {
 		super(net, plans, events);
-		
+
 		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 		if (isMac) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -96,7 +92,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		String studiesRoot = "../";
 		String localDtdBase = "../matsimJ/dtd/";
 
-
+		// FIXME hard-coded filenames
 		String netFileName = studiesRoot + "berlin-wip/network/wip_net.xml";
 		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter001car_hwh.routes_wip.plans.xml.gz"; // 15931 agents
 //		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml.gz"; // 160171 agents

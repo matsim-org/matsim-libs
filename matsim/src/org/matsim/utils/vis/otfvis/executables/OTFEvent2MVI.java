@@ -112,6 +112,10 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 	@Override
 	public void finish() {
 		// TODO Auto-generated method stub
+		/* FIXME must this method really be overwritten? it does NOT call super.finish(), even that
+		 * there is something done. So if this method is here to explicitely NOT call super.finish(), please
+		 * add comment. Otherwise one might remove this method completely...
+		 */
 	}
 
 }

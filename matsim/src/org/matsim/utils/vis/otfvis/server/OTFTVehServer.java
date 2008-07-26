@@ -45,23 +45,15 @@ import org.matsim.utils.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.world.World;
 
-
-public class OTFTVehServer implements OTFServerRemote{
-	//private final   String netFileName = "";
+public class OTFTVehServer implements OTFServerRemote {
 	private  String vehFileName = "";
-	//private final  String outFileName = "";
 	private static final int BUFFERSIZE = 100000000;
 	BufferedReader reader = null;
 	private double nextTime = -1;
 	private List<Double> times = null;
 	TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
-	//private byte[] actBuffer = null;
-
-
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
-	//private final ByteArrayOutputStream out;
-	//private QueueNetworkLayer net;
 	public OTFServerQuad quad;
 
 	public OTFTVehServer(String netFileName, String vehFileName) {
@@ -77,14 +69,13 @@ public class OTFTVehServer implements OTFServerRemote{
 		world.setNetworkLayer(net);
 		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
 
-		//this.out = new ByteArrayOutputStream(20000000);
 		this.quad = new OTFServerQuad(qnet);
 		this.quad.fillQuadTree(new OTFDefaultNetWriterFactoryImpl());
 		this.quad.addAdditionalElement(this.writer);
-		
+
 //		this.times = buildTimesList(); // Does not work very smoothly, therefore we leave it out until there is demand for this
 		this.times =null;
-		
+
 		open();
 		readOneStep();
 	}
@@ -94,7 +85,7 @@ public class OTFTVehServer implements OTFServerRemote{
 		System.out.println("Scanning timesteps:");
 
 		// Get time Structure
-		List<Double> times = new ArrayList<Double>(); 
+		List<Double> times = new ArrayList<Double>();
 		open();
 		String line = null;
 		boolean lineFound = false;
@@ -106,8 +97,7 @@ public class OTFTVehServer implements OTFServerRemote{
 				line = line.substring(line.indexOf('\t')+1);
 				String tt = line.substring(0, line.indexOf('\t'));
 				if(!tt.equals(lasttime)) {
-					double time = Double.parseDouble(tt);
-					times.add(time);
+					times.add(Double.valueOf(tt));
 					lasttime = tt;
 					System.out.print(tt);
 					System.out.print(", ");
@@ -118,7 +108,7 @@ public class OTFTVehServer implements OTFServerRemote{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("");
+		System.out.println();
 		System.out.println("Nr of timesteps: " + times.size());
 		try {
 			reader.close();
@@ -228,8 +218,6 @@ public class OTFTVehServer implements OTFServerRemote{
 		Gbl.startMeasurement();
 		try {
 			this.reader = IOUtils.getBufferedReader(this.vehFileName);
-//			reader = new BufferedReader(new FileReader(this.vehFileName),500000);
-//			reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(this.vehFileName),50000000))));
 			this.reader.readLine(); // Read the commentary line
 		} catch (IOException e) {
 			e.printStackTrace();
