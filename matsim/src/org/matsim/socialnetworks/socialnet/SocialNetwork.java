@@ -142,7 +142,7 @@ public class SocialNetwork {
 
 			if(Gbl.random.nextDouble()<pdist){
 				if(makeSocialContactNotify(person1, person2, 0, "random")==2){//new link made
-					System.out.println("new link made dist "+distance+" "+pdist);
+//					System.out.println("new link made dist "+distance+" "+pdist);
 					i++;
 				}
 			}
