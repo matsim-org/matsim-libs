@@ -132,12 +132,13 @@ public class OTFVis {
 			printUsage();
 			return;
 		}
+		Gbl.createConfig(null);
 		String eventFile = args[1];
 		String networkFile = args[2];
 		String mviFile = args[3];
 		int snapshotPeriod = 600;
 		if (args.length == 5) {
-			snapshotPeriod = Integer.parseInt(args[5]);
+			snapshotPeriod = Integer.parseInt(args[4]);
 		}
 
 		NetworkLayer net = new NetworkLayer();
