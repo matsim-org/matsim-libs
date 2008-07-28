@@ -54,7 +54,7 @@ public class CountsKMLWriterTest extends MatsimTestCase {
 		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
 				cca.getComparison(), this.fixture.getNetwork(), TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84 ));
 		kmlWriter.setIterationNumber(0);
-		kmlWriter.write(filename);
+		kmlWriter.writeFile(filename);
 
 		assertTrue(new File(filename).length() > 0);
 	}
