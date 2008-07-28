@@ -28,6 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.plans.algorithms");
 		suite.addTestSuite(ParallelPersonAlgorithmRunnerTest.class);
+		suite.addTestSuite(PlanAnalyzeSubtoursTest.class);
 		return suite;
 	}
 
