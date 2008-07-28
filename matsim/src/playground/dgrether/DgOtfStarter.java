@@ -52,7 +52,7 @@ public class DgOtfStarter {
 //		String file = "585/run585.it800.T.mvi";
 		
 		//base case stuck=false, no earlyDeparture
-		String file = "596/it.500/500.T.mvi";
+//		String file = "596/it.500/500.T.mvi";
 //		String file = "596/it.550/550.T.mvi";
 		
 		//base case portland beta_pt = -6 (nearly 499!)
@@ -60,6 +60,17 @@ public class DgOtfStarter {
 		
 //	portland roadpricing 2 euro/km
 //	String file = "555/500.T.mvi
+		
+		//cmcf runs for tobias harks
+//		String file = "608/it.100/100.events.mvi";
+		
+		//cmcf runs full activity chains no time first route cmcf
+		String file = "610/it.100/100.events.mvi";
+		//cmcf runs full activity chains no time no cmcf routes
+//		String file = "612/it.100/100.events.mvi";
+		
+		
+		
 
 		
 		String filename = base + file;

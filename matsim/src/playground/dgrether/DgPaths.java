@@ -32,5 +32,7 @@ public interface DgPaths {
 	
 	final String VSPCVSBASE = "/Volumes/data/work/cvsRep/vsp-cvs/";
 	
+	final String IVTCHNET = VSPSVNBASE + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
+	
 	
 }

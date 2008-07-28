@@ -17,26 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package playground.dgrether.cmcf;
 
-import org.matsim.utils.misc.Time;
+import org.matsim.utils.vis.netvis.NetVis;
 
 
 /**
  * @author dgrether
  *
  */
-public class TestMain {
+public class CMCFNetVis {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		System.out.println(Double.MAX_VALUE);
-//		System.out.println(Integer.MAX_VALUE);
-
-		System.out.println(Time.writeTime(4000.0));
-		
+		NetVis.main(new String[] {});
 	}
 
 }

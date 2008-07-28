@@ -17,26 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package playground.dgrether.cmcf;
 
-import org.matsim.utils.misc.Time;
+import org.apache.log4j.Logger;
+import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Leg;
+import org.matsim.plans.Person;
+import org.matsim.plans.Plan;
+import org.matsim.plans.Plans;
+
+import playground.dgrether.DgPaths;
+import playground.dgrether.utils.MatsimIo;
 
 
 /**
  * @author dgrether
  *
  */
-public class TestMain {
+public class CMCFPlansMerger {
 
+	
+	private static final Logger log = Logger.getLogger(CMCFPlansMerger.class);
+	
+  private static final String cmcfPlansFile = DgPaths.VSPSVNBASE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_simplified_acts_types_reduced_cmcf.xml";
+	
+  private static final String plansFile = DgPaths.VSPSVNBASE + "studies/schweiz-ivtch/baseCase/plans/plans_miv_zrh30km_10pct.xml.gz";
+  
+  private static final String outPlansFile = DgPaths.VSPSVNBASE + "studies/schweiz-ivtch/cmcf/plans/plans_miv_zrh30km_10pct_cmcf_first_act.xml.gz";
+  
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		System.out.println(Double.MAX_VALUE);
-//		System.out.println(Integer.MAX_VALUE);
-
-		System.out.println(Time.writeTime(4000.0));
+		NetworkLayer net = MatsimIo.loadNetwork(DgPaths.IVTCHNET);
+		Plans plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
+		Plans plans = MatsimIo.loadPlans(plansFile);
+		for (Person p : plans.getPersons().values()) {
+			Plan pl = p.getSelectedPlan();
+			Leg l = pl.getNextLeg(pl.getFirstActivity());
+			Plan plcmcf = plansCmcf.getPerson(p.getId()).getSelectedPlan();
+			Leg lcmcf = plcmcf.getNextLeg(plcmcf.getFirstActivity());
+			l.setRoute(lcmcf.getRoute());
+		}
+		MatsimIo.writePlans(plans, outPlansFile);
 		
+		log.info("done");
 	}
 
 }

@@ -32,6 +32,8 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.plans.Route;
+import org.matsim.utils.misc.Time;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.IdFactory;
@@ -48,12 +50,30 @@ public class CMCFScenarioGenerator {
 	private static final Logger log = Logger
 			.getLogger(CMCFScenarioGenerator.class);
 		
-	private static final String networkFile = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoNetwork.xml";
+	private static final String networkFileOld = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoNetworkOldRenamed.xml";
+	
+	public static final String networkFileNew = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoNetwork.xml";
+	
+	public static final String networkFile 	= networkFileOld;
 
-	private static final String plansOut = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoPlans.xml";
+	private static final String plans1Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoPlans.xml";
 
-	public static final String configOut = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfig.xml";
+	private static final String plans2Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoPlansAltRoute.xml";
 
+	public static final String config1Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfig.xml";
+
+	public static final String config2Out = DgPaths.VSPSVNBASE + "studies/dgrether/cmcf/daganzoConfigAltRoute.xml";
+
+	public static String configOut, plansOut;
+
+	private static final boolean isAlternativeRouteEnabled = true;
+	
+	private static final int iterations = 500;
+	
+	private static final int iterations2 = 50;
+	
+//	private static final int iterations = 1;
+	
 	private Plans plans;
 
 	private Config config;
@@ -69,7 +89,7 @@ public class CMCFScenarioGenerator {
 		config.plans().setInputFile(plansOut);
 		//configure scoring for plans
 		config.charyparNagelScoring().setLateArrival(0.0);
-		config.charyparNagelScoring().setPerforming(0.0);
+		config.charyparNagelScoring().setPerforming(6.0);
 		//this is unfortunately not working at all....
 		ActivityParams homeParams = new ActivityParams("h");
 //		homeParams.setOpeningTime(0);
@@ -79,8 +99,12 @@ public class CMCFScenarioGenerator {
 		config.charyparNagelScoring().addParam("activityTypicalDuration_0", "24:00:00");
 		
 		//configure controler
-		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory(DgPaths.WSBASE + "testData/output/cmcf");
+		config.controler().setLastIteration(iterations + iterations2);
+		if (isAlternativeRouteEnabled)
+			config.controler().setOutputDirectory(DgPaths.WSBASE + "testData/output/cmcfAltRoute");
+		else 
+			config.controler().setOutputDirectory(DgPaths.WSBASE + "testData/output/cmcf");
+			
 		//configure simulation and snapshot writing
 		config.simulation().setSnapshotFormat("otfvis");
 		config.simulation().setSnapshotFile("cmcf.mvi");
@@ -95,6 +119,7 @@ public class CMCFScenarioGenerator {
 		StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
 		reRoute.setProbability(0.1);
 		reRoute.setModuleName("ReRoute");
+		reRoute.setDisableAfter(iterations);
 		config.strategy().addStrategySettings(reRoute);
 		
 		MatsimIo.writerConfig(config, configOut);
@@ -103,6 +128,14 @@ public class CMCFScenarioGenerator {
 	}
 
 	private void init() {
+		if (isAlternativeRouteEnabled) {
+			plansOut = plans2Out;
+			configOut = config2Out;
+		}
+		else {
+			plansOut = plans1Out;
+			configOut = config1Out;			
+		}
 		config = new Config();
 		Gbl.setConfig(config);
 		config.addCoreModules();
@@ -115,7 +148,8 @@ public class CMCFScenarioGenerator {
 
 	private void createPlans() throws Exception {
 		this.plans = new Plans(false);
-		int homeEndtime = 6 * 3600;
+		int firstHomeEndTime = 0;//6 * 3600;
+		int homeEndTime = firstHomeEndTime;
 		Link l1 = network.getLink(IdFactory.get(1));
 		Link l6 = network.getLink(IdFactory.get(6));
 		
@@ -124,20 +158,21 @@ public class CMCFScenarioGenerator {
 			Plan plan = new Plan(p);
 			p.addPlan(plan);
 			//home
-			homeEndtime += i - 1;
-			plan.createAct("h", l1.getCenter().getX(), l1.getCenter().getY(), l1, 0.0, homeEndtime, i, false);
+			homeEndTime = firstHomeEndTime +  ((i - 1) % 3);
+			plan.createAct("h", l1.getCenter().getX(), l1.getCenter().getY(), l1, Time.UNDEFINED_TIME, homeEndTime, Time.UNDEFINED_TIME, false);
 			//leg to home
 			Leg leg = plan.createLeg("car", null, null, null);
-//			Route route = new Route();
-//			route.setRoute("2 4 5");
-//			leg.setRoute(route);
-			plan.createAct("h", l6.getCenter().getX(), l6.getCenter().getY(), l6, 0.0, 0.0, 0.0, false);
+			Route route = new Route();
+			if (isAlternativeRouteEnabled) {
+				route.setRoute("2 3 4 5 6");
+			}
+			else {
+				route.setRoute("2 3 5 6");
+			}
+			leg.setRoute(route);				
+			plan.createAct("h", l6.getCenter().getX(), l6.getCenter().getY(), l6, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
 			this.plans.addPerson(p);
 		}
-
-
-
-
 	}
 
 
