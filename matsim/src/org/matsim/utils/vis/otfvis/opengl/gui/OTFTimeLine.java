@@ -75,7 +75,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 
 			BasicSliderUI ui = (BasicSliderUI)getUI();
 			double delta = getMaximum() - getMinimum();
-			// get cached timesteps fomr hostctrl and draw them
+			// get cached timesteps for hostctrl and draw them
 			synchronized (cachedTime) {
 				for(Integer time : cachedTime) {
 					g.setColor(Color.LIGHT_GRAY);
@@ -143,17 +143,17 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		//Create the label table.
 		//PENDING: could use images, but we don't have any good ones.
 		labelTable.put(Integer.valueOf( dsteps[0].intValue() ),
-				new JLabel(Time.writeTime(dsteps[0])));
+				new JLabel(Time.writeTime(dsteps[0], Time.TIMEFORMAT_HHMM)));
 		//new JLabel(createImageIcon("images/stop.gif")) );
 		labelTable.put(Integer.valueOf( dsteps[dsteps.length-1].intValue() ),
-				new JLabel(Time.writeTime(dsteps[dsteps.length-1])) );
+				new JLabel(Time.writeTime(dsteps[dsteps.length-1], Time.TIMEFORMAT_HHMM)) );
 		//new JLabel(createImageIcon("images/fast.gif")) );
 
 		int n = dsteps.length/10;
 
 		for(int i= n; i< dsteps.length-1; i+=n) {
 			labelTable.put(Integer.valueOf( dsteps[i].intValue() ),
-					new JLabel(Time.writeTime(dsteps[i])) );
+					new JLabel(Time.writeTime(dsteps[i], Time.TIMEFORMAT_HHMM)) );
 		}
 		times.setLabelTable(labelTable);
 
