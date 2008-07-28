@@ -256,7 +256,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 *
 	 * @param filename
 	 */
-	public void write(final String filename) {
+	public void writeFile(final String filename) {
 		Folder subfolder;
 		// init kml
 		this.mainKml = new KML();

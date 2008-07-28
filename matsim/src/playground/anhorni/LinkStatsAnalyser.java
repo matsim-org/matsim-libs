@@ -192,9 +192,9 @@ public class LinkStatsAnalyser {
 		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
 				countsComparisonList, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
 		kmlWriter.setIterationNumber(this.iterationNumber);
-		kmlWriter.write(filename);
+		kmlWriter.writeFile(filename);
 		CountSimComparisonTableWriter txtWriter = new CountSimComparisonTableWriter(countsComparisonList,null);
-		txtWriter.write(filename+".txt");
+		txtWriter.writeFile(filename+".txt");
 	}
 
 	/**

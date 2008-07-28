@@ -88,13 +88,13 @@ public class CountControlerListener implements StartupListener,
 				CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
 						cca.getComparison(), controler.getNetwork(), TransformationFactory.getCoordinateTransformation(this.config.global().getCoordinateSystem(), TransformationFactory.WGS84 ));
 				kmlWriter.setIterationNumber(event.getIteration());
-				kmlWriter.write(filename);
+				kmlWriter.writeFile(filename);
 			}
 			if (this.config.counts().getOutputFormat().contains("txt")||
 					this.config.counts().getOutputFormat().contains("all")) {
 				String filename = Controler.getIterationFilename("countscompare.txt");
 				CountSimComparisonTableWriter ctw=new CountSimComparisonTableWriter(cca.getComparison(),Locale.ENGLISH);
-				ctw.write(filename);
+				ctw.writeFile(filename);
 			}
 			controler.stopwatch.endOperation("compare with counts");
 		}

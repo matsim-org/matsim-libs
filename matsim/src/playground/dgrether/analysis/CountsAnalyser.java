@@ -220,12 +220,12 @@ public class CountsAnalyser {
 					countsComparisonList, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
 			kmlWriter.setTimeFilter(this.timeFilter);
 			kmlWriter.setIterationNumber(this.iterationNumber);
-			kmlWriter.write(filename);
+			kmlWriter.writeFile(filename);
 		}
 		else if (format.compareToIgnoreCase("txt") == 0) {
 			CountSimComparisonTableWriter writer = new CountSimComparisonTableWriter(countsComparisonList, Locale.US);
 			writer.setTimeFilter(this.timeFilter);
-			writer.write(filename);
+			writer.writeFile(filename);
 		}
 		else {
 			throw new IllegalArgumentException("Output format must be txt or kml");

@@ -45,6 +45,9 @@ public abstract class CountSimComparisonWriter {
 		this.countComparisonFilter = new CountSimComparisonTimeFilter(countSimCompList);
 	}
 
+	public abstract void writeFile(final String filename);
+	
+	
 	/**
 	 * Sets the time filter
 	 * 

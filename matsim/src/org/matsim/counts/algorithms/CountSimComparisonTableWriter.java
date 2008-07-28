@@ -86,7 +86,7 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 	 * by the parameter.
 	 * @param filename
 	 */
-	public void write(final String filename) {
+	public void writeFile(final String filename) {
 		log.info("Writing CountsSimComparison to " + filename);
 		BufferedWriter out = null;
 		try {
