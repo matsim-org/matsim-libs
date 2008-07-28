@@ -27,7 +27,7 @@ import org.matsim.basic.v01.Id;
 /**
  * A topological network representation.
  */
-public interface BasicNet {
+public interface BasicNet<N extends BasicNode, L extends BasicLink> {
 
     /**
      * Connects this network in the following sense: After a call to this
@@ -42,7 +42,7 @@ public interface BasicNet {
      *
      * @return a set of this network's nodes
      */
-    public Map<Id, ? extends BasicNode> getNodes();
+		public Map<Id, N> getNodes();
 
     /**
      * Returns a set of this network's links. This set might be empty, but it
@@ -50,6 +50,6 @@ public interface BasicNet {
      *
      * @return a set of this network's links
      */
-    public Map<Id, ? extends BasicLink> getLinks();
+    public Map<Id, L> getLinks();
 
 }

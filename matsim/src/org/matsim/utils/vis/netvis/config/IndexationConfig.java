@@ -82,7 +82,7 @@ public class IndexationConfig extends DefaultHandler {
 
     // -------------------- MEMBER VARIABLES --------------------
 
-    private BasicNet network; // only for xml parsing
+    private BasicNet<BasicNode, BasicLink> network; // only for xml parsing
 
     private List<BasicNode> nodes;
 
@@ -105,7 +105,7 @@ public class IndexationConfig extends DefaultHandler {
      * @param network
      * @param fileName
      */
-    public IndexationConfig(BasicNet network, String fileName) {
+    public IndexationConfig(BasicNet<BasicNode, BasicLink> network, String fileName) {
         this.network = network;
         read(fileName);
         this.network = null;
@@ -116,7 +116,7 @@ public class IndexationConfig extends DefaultHandler {
      * <code>network</code>.
      * @param network
      */
-    public IndexationConfig(BasicNet network) {
+    public IndexationConfig(BasicNet<BasicNode, BasicLink> network) {
         createNodeIndices(new ArrayList<BasicNode>(network.getNodes().values()));
         createLinkIndices(new ArrayList<BasicLink>(network.getLinks().values()));
     }
@@ -309,7 +309,7 @@ public class IndexationConfig extends DefaultHandler {
      * @param strict
      * @return see description
      */
-    public boolean indexes(BasicNet net, boolean strict) {
+    public boolean indexes(BasicNet<BasicNode, BasicLink> net, boolean strict) {
         if (strict && net.getNodes().size() != nodes.size())
             return false;
         if (strict && net.getLinks().size() != links.size())

@@ -37,7 +37,7 @@ import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
-public class NetworkLayer extends Layer implements BasicNet {
+public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 
 	// ////////////////////////////////////////////////////////////////////
 	// member variables
@@ -536,7 +536,7 @@ public class NetworkLayer extends Layer implements BasicNet {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Id, ? extends Link> getLinks() {
+	public Map<Id, Link> getLinks() {
 		return (Map<Id, Link>) this.getLocations();
 	}
 
