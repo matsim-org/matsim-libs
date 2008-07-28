@@ -36,6 +36,8 @@ import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.network.Link;
+import org.matsim.network.Node;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.io.IOUtils;
 
@@ -67,7 +69,7 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		BasicNet network = event.getControler().getNetwork();
+		BasicNet<Node, Link> network = event.getControler().getNetwork();
 		LinkTTStats linkStats = new LinkTTStats(network, travelTimes, startTime, endTime, binsize);
 	
 		for(BasicLink link : network.getLinks().values()) {
