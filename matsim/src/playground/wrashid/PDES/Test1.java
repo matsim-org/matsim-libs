@@ -24,7 +24,7 @@ public class Test1 extends TestCase {
 	}
 	
 	public void testTest1() {
-		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test8/";
+		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test6/";
 		String[] args=new String[1];
 			
 		args[0]= baseDir + "config.xml";

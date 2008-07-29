@@ -1,8 +1,13 @@
 package playground.wrashid.PDES;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.matsim.gbl.Gbl;
 
@@ -10,8 +15,9 @@ public class Scheduler {
 	private double simTime=0;
 	private MessageQueue queue=new MessageQueue();
 	HashMap<Long,SimUnit> simUnits=new HashMap<Long, SimUnit>();
-
-
+	ConcurrentLinkedQueue<MessageExecutor> messageExecutors= new ConcurrentLinkedQueue<MessageExecutor>();
+	public Lock schedulerLock=new ReentrantLock();
+	public Condition emtpyMessageExecutorQueue=schedulerLock.newCondition();
 	
 	
 	public void schedule(Message m){		
@@ -39,23 +45,61 @@ public class Scheduler {
 		initializeSimulation();
 		
 		Message m;
-		Executor executor = Executors.newFixedThreadPool(3);
+		//Executor executor = Executors.newFixedThreadPool(3);
 		
 		while(queue.hasElement() && simTime<SimulationParameters.maxSimulationLength){
+			//System.out.println("hereS");
 			m=queue.getNextMessage();
 			
-			MessageExecutor me= new MessageExecutor (m);
-			executor.execute (me);
-			
-			while (!me.hasAqiredLocks){
+			while (messageExecutors.isEmpty()){
+				//System.out.println("alarm...");
 				/*
 				try {
-					Thread.currentThread().sleep(1);
+					schedulerLock.lock();
+					System.out.println("here...");
+					emtpyMessageExecutorQueue.awaitNanos(10); //a deadline must be set here, because a deadlock can occur
+					schedulerLock.unlock();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+				*/
+			}
+			
+			//System.out.println("kurz vor dem poll");
+			MessageExecutor me=messageExecutors.poll();
+			me.setMessage(m);
+			me.setScheduler(this);
+			
+			
+			me.lock1.lock();
+			me.lock2.lock();
+			me.mayStart.signal();
+			
+			try {
+				//System.out.println("ich schlafe ein...");
+				me.lock2.unlock();
+				me.hasAcquiredLock.await();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//System.out.println("ich wurde aufgeweckt");
+			//me.lock.unlock();
+			
+			//System.out.println("restarting loop...");
+			
+			
+			/*
+			System.out.println("just before going to sleep");
+			synchronized (this){
+				try {
+					this.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				*/
 			}
+			*/
 			
 			/*
 			simTime=m.getMessageArrivalTime();
@@ -104,6 +148,15 @@ public class Scheduler {
 	// the initialization method of objects, which
 	// exist at the beginning of the simulation
 	public void initializeSimulation(){
+		
+		
+		// create message executors and start them
+		for (int i=0;i<Runtime.getRuntime().availableProcessors()-1;i++){
+			MessageExecutor me= new MessageExecutor (i);
+			me.start();
+			messageExecutors.add(me);
+		}
+		
 		Object[] objects=simUnits.values().toArray();
 		SimUnit su;
 		
@@ -123,5 +176,10 @@ public class Scheduler {
 		simUnits.remove(new Long(unit.unitNo));
 	}
 	
-	
+	public void queueMessageExecutor(MessageExecutor me){
+		messageExecutors.add(me);
+		//schedulerLock.lock();
+		//emtpyMessageExecutorQueue.signal();
+		//schedulerLock.unlock();
+	}
 }
