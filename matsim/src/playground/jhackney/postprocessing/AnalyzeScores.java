@@ -55,7 +55,7 @@ public class AnalyzeScores {
 
 	public static void run() throws Exception {
 
-		System.out.println("Make activity spaces for egoNet:");
+		System.out.println("Make friend face to face scores each 10 iters:");
 
 
 		Scenario.setUpScenarioConfig();
@@ -69,8 +69,8 @@ public class AnalyzeScores {
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 
 		for(int i=500; i<510; i+=10){
-			config.socnetmodule().setInitIter(Integer.toString(i));
-//			config.socnetmodule().setInitIter(Integer.toString(0));
+//			config.socnetmodule().setInitIter(Integer.toString(i));
+			config.socnetmodule().setInitIter(Integer.toString(0));
 			double totalscore=0;
 			int n=0;
 			Plans plans = Scenario.readPlans(i);
