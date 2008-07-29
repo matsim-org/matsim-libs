@@ -73,8 +73,6 @@ public class AnalyzeScores {
 		for(int i=0; i<501; i+=10){
 			config.socnetmodule().setInitIter(Integer.toString(i));
 //			config.socnetmodule().setInitIter(Integer.toString(500));
-			double totalscore=0;
-			int n=0;
 			Plans plans = Scenario.readPlans(i);
 			//read in social network
 			System.out.println(" Initializing the social network ...");
@@ -204,6 +202,8 @@ public class AnalyzeScores {
 //			Scenario.writeWorld(Gbl.getWorld());
 //			Scenario.writeConfig();
 
+			double totaliterationscore=0;
+			int numplans=0;
 			SpatialScorer scorer =new SpatialScorer();
 			scorer.scoreActs(plans, i);
 			//for each plan this is how it is calculated in the TRB runs, which is incorrect!!
@@ -221,11 +221,10 @@ public class AnalyzeScores {
 						planscore+=nFriends;
 					}
 				}
-				totalscore+=planscore;
-				n++;
+				totaliterationscore+=Math.log(planscore+1);
+				numplans++;
 			}
-			double avgscore=totalscore/((double) n);
-			avgscore=100.*Math.log(avgscore+1);
+			double avgscore=100.*totaliterationscore/((double) numplans);
 			System.out.println("##Result "+i+" "+avgscore);
 		}
 		System.out.println("TEST SUCCEEDED.");
