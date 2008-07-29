@@ -72,7 +72,7 @@ public class AnalyzeScores {
 
 		for(int i=0; i<501; i+=10){
 //			config.socnetmodule().setInitIter(Integer.toString(i));
-			config.socnetmodule().setInitIter(Integer.toString(500));
+			config.socnetmodule().setInitIter(Integer.toString(0));
 			Plans plans = Scenario.readPlans(i);
 			//read in social network
 			System.out.println(" Initializing the social network ...");
