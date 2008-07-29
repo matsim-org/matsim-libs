@@ -21,11 +21,13 @@ package playground.jhackney.postprocessing;
 
 import java.util.Iterator;
 
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.config.Config;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
+import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
@@ -204,40 +206,44 @@ public class AnalyzeScores {
 
 			SpatialScorer scorer =new SpatialScorer();
 			scorer.scoreActs(plans, i);
-			//for each plan
+			//for each plan this is how it is calculated in the TRB runs, which is incorrect!!
 			Iterator planiter=plans.iterator();
 			while(planiter.hasNext()){
 				//
 				Person p = (Person) planiter.next();
 				Plan plan = p.getSelectedPlan();
-				double nFriends=scorer.calculateTimeWindowStats(plan).get(1);
-				double betaLogNFriends= 100.;
-				totalscore+=betaLogNFriends*Math.log(nFriends+1);
-				n++;
-//				System.out.println(i+" "+nFriends+" "+Math.log(nFriends+1)+" "+betaLogNFriends*Math.log(nFriends+1));
-				//print nFriends and log(nFriends)
-				//Maybe calculate it wrong, here, like in SocialzingSociringFunction, to be consistent
-				//write it out Iter, NFriends, logNFriends, betaLogNFriends * logNFRiends
+				ActIterator ait = plan.getIteratorAct();
+				double planscore=0;
+				while(ait.hasNext()){
+					Act act = (Act)ait.next();
+					if(act.getType().equals("leisure")){
+						double nFriends=scorer.calculateTimeWindowStats(plan).get(1);
+						planscore+=nFriends;
+					}
+					totalscore+=planscore;
+					n++;
+				}
+				double avgscore=totalscore/((double) n);
+				avgscore=100.*Math.log(avgscore+1);
+				System.out.println("##Result "+i+" "+avgscore);
 			}
-			double avgscore=totalscore/((double) n);
-			System.out.println("##Result "+i+" "+avgscore);
+			System.out.println("TEST SUCCEEDED.");
+			System.out.println();
 		}
-		System.out.println("TEST SUCCEEDED.");
-		System.out.println();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// main
-	//////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////
+		// main
+		//////////////////////////////////////////////////////////////////////
 
-	public static void main(final String[] args) throws Exception {
+		public static void main(final String[] args) throws Exception {
 
-		Gbl.startMeasurement();
+			Gbl.startMeasurement();
 
-		run();
+			run();
 
-		Gbl.printElapsedTime();
+			Gbl.printElapsedTime();
+		}
+
 	}
-
-}
 
