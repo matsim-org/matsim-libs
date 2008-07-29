@@ -55,10 +55,10 @@ public abstract class Scenario {
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB5/";
 	
 	//For TRB run analyses of 500 iterations
-//	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB22/";
-//	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB22/";
-	private static final String output_directory="output/Analyses/TRB22/";
-	private static final String input_directory="output/TRB22/";
+	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB7/";
+	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB7/";
+//	private static final String output_directory="output/Analyses/TRB22/";
+//	private static final String input_directory="output/TRB22/";
 	
 	
 	private static final Config config= Gbl.createConfig(null);;
@@ -94,8 +94,8 @@ public abstract class Scenario {
 		config.matrices().setInputFile(input_directory + "matrices.xml");
 		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
-//		config.plans().setInputFile(input_directory + "output_plans.xml");
-		config.plans().setInputFile("plans.xml.gz");
+		config.plans().setInputFile(input_directory + "output_plans.xml");
+//		config.plans().setInputFile("plans.xml.gz");
 		config.plans().setOutputFile(output_directory + "output_plans.xml");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
@@ -105,12 +105,12 @@ public abstract class Scenario {
 		
 		config.socnetmodule().setInDirName(input_directory);
 		config.socnetmodule().setOutDir(output_directory);
-		config.socnetmodule().setSocNetGraphAlgo("read");
+		config.socnetmodule().setSocNetGraphAlgo("none");
 		config.socnetmodule().setSocNetLinkRemovalP("0");
 		config.socnetmodule().setSocNetLinkRemovalAge("0");
 		config.socnetmodule().setDegSat("0");
 		config.socnetmodule().setEdgeType("UNDIRECTED");
-		config.socnetmodule().setInitIter("500");
+		config.socnetmodule().setInitIter("0");
 		config.socnetmodule().setReadMentalMap("false");
 		
 		config.createModule("kml21");

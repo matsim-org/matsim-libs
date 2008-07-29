@@ -42,6 +42,7 @@ import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.Scenario;
 import playground.jhackney.algorithms.InitializeKnowledge;
+import playground.jhackney.algorithms.PersonCalcASD2;
 import playground.jhackney.algorithms.PersonGetEgoNetGetPlans;
 import playground.jhackney.algorithms.PlansPlotScoreDistance;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
@@ -61,8 +62,6 @@ public class AnalyzeActivitySpaces {
 		Scenario.setUpScenarioConfig();
 		Config config =Gbl.getConfig();
 
-//		config.plans().setInputFile(Scenario.getSNInDir() + "output_plans"+i+".xml");
-
 		Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
@@ -70,14 +69,14 @@ public class AnalyzeActivitySpaces {
 
 		Plans plans = Scenario.readPlans();
 			//read in social network
-		System.out.println(" Initializing the social network ...");
-		SocialNetwork snet=new SocialNetwork(plans);
-
-		System.out.println("... done");
+//		System.out.println(" Initializing the social network ...");
+//		SocialNetwork snet=new SocialNetwork(plans);
+//
+//		System.out.println("... done");
 
 			//read in facilities knowledge
-		config.socnetmodule().setReadMentalMap("true");
-		new InitializeKnowledge(plans);
+//		config.socnetmodule().setReadMentalMap("true");
+//		new InitializeKnowledge(plans);
 
 			//////////////////////////////////////////////////////////////////////
 
@@ -135,23 +134,23 @@ public class AnalyzeActivitySpaces {
 //			ppsd.plot(Gbl.getConfig().socnetmodule().getOutDir(), "TRB5");
 
 
-		Person ego=plans.getPerson("21924270");//1pct
-//		Person ego=this.controler.getPopulation().getPerson("21462061");//10pct
-
-//			Write out the KML for the EgoNet of a chosen agent
-			System.out.println("  Initializing the KML output");
-
-			EgoNetPlansItersMakeKML.setUp(Scenario.getConfig(), network);
-			EgoNetPlansItersMakeKML.generateStyles();
-
-			System.out.println("... done");
-
-			System.out.println(" Writing out KMZ activity spaces and day plans for agent's egoNet");
-
-			EgoNetPlansItersMakeKML.loadData(ego,500);
-			EgoNetPlansItersMakeKML.write();
-
-			System.out.println(" ... done");
+//		Person ego=plans.getPerson("21924270");//1pct
+////		Person ego=this.controler.getPopulation().getPerson("21462061");//10pct
+//
+////			Write out the KML for the EgoNet of a chosen agent
+//			System.out.println("  Initializing the KML output");
+//
+//			EgoNetPlansItersMakeKML.setUp(Scenario.getConfig(), network);
+//			EgoNetPlansItersMakeKML.generateStyles();
+//
+//			System.out.println("... done");
+//
+//			System.out.println(" Writing out KMZ activity spaces and day plans for agent's egoNet");
+//
+//			EgoNetPlansItersMakeKML.loadData(ego,500);
+//			EgoNetPlansItersMakeKML.write();
+//
+//			System.out.println(" ... done");
 
 
 			// social network statistics
@@ -175,7 +174,9 @@ public class AnalyzeActivitySpaces {
 			//Extract the ego's social net for more analyses
 //			Plans socialPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
 //
-//			socialPlans.addAlgorithm(new PersonCalcActivitySpace("all"));
+//			plans.addAlgorithm(new PersonCalcActivitySpace("all"));
+		PersonCalcASD2 pcalasd2=new PersonCalcASD2();
+			plans.addAlgorithm(pcalasd2);
 //
 //			System.out.println("  done.");
 
@@ -188,9 +189,11 @@ public class AnalyzeActivitySpaces {
 
 			//////////////////////////////////////////////////////////////////////
 //			System.out.println("  finishing person algorithms...");
-//			socialPlans.runAlgorithms();
+			plans.runAlgorithms();
+			double xxx=pcalasd2.smASD2.average();
+			System.out.println("##Result "+xxx);
 //			pwast.close();
-//			System.out.println("  done.");
+			System.out.println("  done.");
 
 //			Scenario.writePlans(socialPlans);
 //			Scenario.writeNetwork(network);
