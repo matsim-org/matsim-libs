@@ -20,25 +20,30 @@ public class NetworkPruner {
 	private final double minLength = 100;
 	private String inFile;
 	private String outFile;
+	private NetworkCleaner netCleaner = new NetworkCleaner();
+	private NetworkSummary netSummary = new NetworkSummary();
 
 	public NetworkPruner(String inFile, String outFile) {
 		this.network = new NetworkLayer();
 		this.inFile = inFile;
 		this.outFile = outFile;
 		new MatsimNetworkReader(network).readFile(this.inFile);
+
+		new NetworkSummary().run(network);
 	}
 
 
 	public void run(){
-		new NetworkCleaner().run(network);
-		new NetworkSummary().run(network);
+		this.netCleaner.run(network);
+		this.netSummary.run(network);
 		pruneIslands();
 		joinOneWayLinks();
 		System.out.println("  running Network cleaner modules... ");
-		new NetworkCleaner().run(network);
+		this.netCleaner.run(network);
 		new NetworkMergeDoubleLinks().run(network);
 		new NetworkCalcTopoType().run(network);
 		new NetworkSummary().run(network);
+
 		System.out.println("  done.");
 		new NetworkWriter(this.network,this.outFile).write();
 	}
@@ -88,8 +93,8 @@ public class NetworkPruner {
 	}
 
 	public static void main(String args[]){
-		String inFile = "./southafrica/network/network.xml";
-		String outFile = "./southafrica/network/output_network.xml.gz";
+		String inFile = "./southafrica/network/routes_network.xml";
+		String outFile = "./southafrica/network/output_network.xml";
 		new NetworkPruner(inFile,outFile).run();
 
 	}

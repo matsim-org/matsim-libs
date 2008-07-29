@@ -59,6 +59,11 @@ public class SAInitialDemandGenerator {
 	private final int TAZ_OFFSET = 3000;
 	private final int PERSON_SCALER = 1; //this will create 1/PERSON_SCALER # of persons
 
+	public SAInitialDemandGenerator(){
+
+		this.random = new Random(12);
+
+	}
 
 	public SAInitialDemandGenerator(Collection<Feature> polygons, String inputPersons, CoordinateReferenceSystem coordinateReferenceSystem, String outputShape){
 		this.polygons = polygons;
@@ -163,7 +168,8 @@ public class SAInitialDemandGenerator {
 			double workY = (Double)person.getAttribute(8);
 			String xmlEntry = String.format("\t<person id = \"%d\">\n",ID);
 			xmlEntry += "\t\t<plan>\n";
-			xmlEntry += String.format("\t\t\t<act type=\"home\" x=\"%f\" y=\"%f\" end_time=\"06:00:00\"/>\n",homeX,homeY );
+			String endTime = getRandomHomeDepartureTime();
+			xmlEntry += String.format("\t\t\t<act type=\"home\" x=\"%f\" y=\"%f\" end_time=\"%s\"/>\n",homeX,homeY,endTime  );
 			xmlEntry += "\t\t\t<leg mode=\"car\"/>\n";
 			xmlEntry += String.format("\t\t\t<act type=\"work\" x=\"%f\" y=\"%f\" dur=\"08:00:00\"/>\n",workX,workY );
 			xmlEntry += "\t\t\t<leg mode=\"car\"/>\n";
@@ -174,6 +180,11 @@ public class SAInitialDemandGenerator {
 		}
 		output.write("</plans>");
 		output.close();
+	}
+	public String getRandomHomeDepartureTime() {
+		int hour = random.nextInt(2) +5;
+		int minute = random.nextInt(60);
+		return String.format("%02d:%02d:00",hour,minute);
 	}
 	public static Collection<Feature> getFeatures(final FeatureSource n) {
 
@@ -294,10 +305,10 @@ public class SAInitialDemandGenerator {
 	}
 
 	public static void main( String[] args ) throws Exception {
-		final String inputShape = "./southafrica/SA_UTM/SP_UTM.shp";
+		final String inputShape = "./southafrica/GP_UTM/SP_UTM.shp";
 		String inputPersons = "./southafrica/SP_drive_to_work.csv";
-		String outputPath = "./southafrica/initialDemandOutput/";
-		String TAZShape = "./southafrica/rough_TAZs.shp";
+		String outputPath = "./southafrica/initialDemand/";
+		String TAZShape = "./southafrica/TAZ/rough_TAZs.shp";
 		String ODMatrix = "./southafrica/ODMATRIX.txt";
 
 		//read in shapefile, create a feature collection
