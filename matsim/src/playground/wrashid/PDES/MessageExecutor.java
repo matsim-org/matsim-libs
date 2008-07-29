@@ -34,51 +34,17 @@ public class MessageExecutor extends Thread {
 	}
 
 	public void run() {
-		while (true){
-			//System.out.println("start me" + id);
-			synchronized (this){
-				try {
-					lock2.lock();
-					mayStart.await();
-					//lock.unlock();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			//System.out.println("continue me" + id);
-			
+		MessageExecutor.setSimTime(0);
+		
+		while (scheduler.queue.hasElement() && getSimTime()<SimulationParameters.maxSimulationLength){
+			message=scheduler.queue.getNextMessage();
 			if (message.firstLock!=null){
 				synchronized (message.firstLock){
-					lock1.lock();
-					hasAcquiredLock.signal();
-					lock1.unlock();
-					//hasAqiredLocks=true;
 					executeMessage();
-					message.firstLock.notify(); // TODO: tidy up this code logic...
 				}
-			} else {
-				lock1.lock();
-				hasAcquiredLock.signal();
-				lock1.unlock();
-				executeMessage();
 			}
-			scheduler.queueMessageExecutor(this);
-			
-			//System.out.println("end me" + id);
 		}
-		
-		/*
-		if (message.firstLock!=null){
-			synchronized (message.firstLock){
-				hasAqiredLocks=true;
-				executeMessage();
-			}
-		} else {
-			hasAqiredLocks=true;
-			executeMessage();
-		}
-		*/
+
 	}
 
 	private void executeMessage(){
