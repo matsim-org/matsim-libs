@@ -50,10 +50,17 @@ public abstract class Scenario {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	// For KMZ drawings of final iteration: needs ActivityActMap500.txt, edge and agent.txt (for iter 500)
 //	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB5/postprocessing/";
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB5/";
-	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB22/";
-	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB22/";
+	
+	//For TRB run analyses of 500 iterations
+//	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB22/";
+//	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB22/";
+	private static final String output_directory="output/Analyses/TRB33/";
+	private static final String input_directory="output/TRB33/";
+	
+	
 	private static final Config config= Gbl.createConfig(null);;
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -102,7 +109,6 @@ public abstract class Scenario {
 		config.socnetmodule().setSocNetLinkRemovalP("0");
 		config.socnetmodule().setSocNetLinkRemovalAge("0");
 		config.socnetmodule().setDegSat("0");
-		config.socnetmodule().setSocNetGraphAlgo("read");
 		config.socnetmodule().setEdgeType("UNDIRECTED");
 		config.socnetmodule().setInitIter("500");
 		config.socnetmodule().setReadMentalMap("false");
