@@ -36,13 +36,22 @@ public class MessageExecutor extends Thread {
 	public void run() {
 		MessageExecutor.setSimTime(0);
 		
-		while (scheduler.queue.hasElement() && getSimTime()<SimulationParameters.maxSimulationLength){
+		// of course here is a problem:
+		// we first check if empty and then try to get the element. For this reason
+		// several threads may try to get the same message
+		// TODO: in order to improve this, we could leave out this check and instead make a try/catch
+		// This would also improve performance.
+		try{
+		while (getSimTime()<SimulationParameters.maxSimulationLength){
 			message=scheduler.queue.getNextMessage();
 			if (message.firstLock!=null){
 				synchronized (message.firstLock){
 					executeMessage();
 				}
 			}
+		}
+		} catch (java.lang.NullPointerException npe){
+			// ignore, because it comes from the fact, that we do not check 'scheduler.queue.hasElement()'
 		}
 
 	}
