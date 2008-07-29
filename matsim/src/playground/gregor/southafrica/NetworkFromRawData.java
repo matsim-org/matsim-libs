@@ -40,6 +40,10 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
+import org.matsim.network.algorithms.NetworkCalcTopoType;
+import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
+import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
@@ -52,19 +56,19 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 
 public class NetworkFromRawData {
-	
-	
+
+
 	private static final Logger log = Logger.getLogger(NetworkFromRawData.class);
 	private static final double CATCH_RADIUS = 1;
 	private final NetworkLayer network;
 	private final Collection<Feature> l;
-	
+
 	private final QuadTree<Node> el1;
 	private final QuadTree<Node> el2;
 	private final QuadTree<Node> el3;
-	
+
 	private Integer nodeID = 0;
-	
+
 	public NetworkFromRawData(final Collection<Feature> l, final NetworkLayer network, Envelope e) {
 		this.el1 = new QuadTree<Node>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
 		this.el2 = new QuadTree<Node>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
@@ -76,41 +80,47 @@ public class NetworkFromRawData {
 	private NetworkLayer constructNetwork() {
 		createNet();
 //		new NetworkCleaner().run(this.network);
-		
+
 		return this.network;
 	}
-	
 
 
-	
-	
-	
-	
-	
+
+
+
+
+
+
+	/**
+	 * 
+	 */
 	private void createNet() {
 		for(Feature ft : this.l) {
 			//this variable is used to skip features such as railways, walkways, restricted access roads
 			boolean writeThisLink = true;
-			
+
 			LineString geo = (LineString)((MultiLineString)ft.getDefaultGeometry()).getGeometryN(0);
 			Coordinate fromC = geo.getStartPoint().getCoordinate();
 			Coordinate toC = geo.getEndPoint().getCoordinate();
 
 			int from_el = (Integer) ft.getAttribute(16);
-			int id = ((Integer) ft.getAttribute(28));
+			int id = ((Integer) ft.getAttribute(24));
 			int to_el = ((Integer) ft.getAttribute(17));
 			double length = ((Double) ft.getAttribute(22));
 			String oneWay = (String) ft.getAttribute(18);
 			String roadType = (String) ft.getAttribute(9);
-			double freespeed = ((Integer) ft.getAttribute(23));
+			double freespeed = ((Integer) ft.getAttribute(23)*10/36);
 			double capacity = 0;
 			double permlanes = 1;
 			if (roadType.equals("STREET")) {
 				capacity = 1000;
 				permlanes =1;
+
+//				writeThisLink = false;
 			} else if (roadType.equals("SECONDARY ROAD")) {
 				capacity = 1500;
-				permlanes =1;				
+				permlanes =1;
+//				writeThisLink = false;
 			} else if (roadType.equals("MAIN ROAD")) {
 				capacity = 2000;
 				permlanes =2;
@@ -120,22 +130,26 @@ public class NetworkFromRawData {
 			} else if (roadType.equals("OTHER ROAD")) {
 				capacity = 1000;
 				permlanes =1;
+//				writeThisLink = false;
 			} else if (roadType.equals("PUBLIC ACCESS ROAD")) {
 				capacity = 2000;
 				permlanes =2;
+//				writeThisLink = false;
 			}else if (roadType.equals("NATIONAL HIGHWAY")) {
 				capacity = 3000;
 				permlanes =3;
 			}else if (roadType.equals("NATIONAL ROAD")) {
 				capacity = 2000;
-				permlanes =2;			
-			}else if (roadType.equals("PEDESTRIAN WALKWAY") || 
+				permlanes =2;
+			}else if (roadType.equals("PEDESTRIAN WALKWAY") ||
 					  roadType.equals("RESTRICTED ACCESS ROAD")) {
 				writeThisLink = false;
 			}else {
+				writeThisLink = false;
+			}/*else{
 				throw new RuntimeException("Unknown road type: " + roadType);
-			}
-			
+			}*/
+
 			if(writeThisLink){
 				Node fromNode = getNode(fromC,from_el);
 				Node toNode = getNode(toC,to_el);
@@ -147,7 +161,7 @@ public class NetworkFromRawData {
 					this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
 					this.network.createLink((1000000+id) + "", toNode.getId().toString(), fromNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
 				} else if (oneWay.equals("FT")) {
-					this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");	
+					this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
 				} else if (oneWay.equals("TF")) {
 					this.network.createLink(id + "", toNode.getId().toString(), fromNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
 				} else	if (oneWay.equals("N")) {
@@ -159,9 +173,9 @@ public class NetworkFromRawData {
 			}
 		}
 	}
-	
+
 	private Node getNode(Coordinate c, int ele) {
-		
+
 		Node node = null;
 		if (ele  == 0) {
 			Collection<Node> nodes = this.el1.get(c.x, c.y, CATCH_RADIUS);
@@ -171,7 +185,7 @@ public class NetworkFromRawData {
 			} else {
 				node = this.el1.get(c.x,c.y);
 			}
-			
+
 		} else if (ele == 1) {
 			Collection<Node> nodes = this.el2.get(c.x, c.y, CATCH_RADIUS);
 			if (nodes.size() == 0) {
@@ -191,20 +205,20 @@ public class NetworkFromRawData {
 		} else {
 			throw new RuntimeException("ele = " + ele);
 		}
-		
-		
+
+
 //		this.network.createNode((this.nodeID++).toString(), Double.toString(c.x), Double.toString(c.y), "");
-		
-		
+
+
 		return node;
 	}
 
 	public static void main(final String [] args) throws FactoryRegistryException, IOException, FactoryException, SchemaException, IllegalAttributeException, Exception {
-		
-		
 
-		final String links = "./southafrica/SA_UTM/streets_UTM.shp";
-		
+
+
+		final String links = "./southafrica/GP_UTM/routes_UTM.shp";
+
 		FeatureSource l = null;
 		try {
 			l = ShapeFileReader.readDataFile(links);
@@ -212,34 +226,37 @@ public class NetworkFromRawData {
 			e.printStackTrace();
 		}
 		final Collection<Feature> ls = getPolygons(l);
-		
+
 		Envelope e = l.getBounds();
-		
+
 		final NetworkLayer network = new NetworkLayer();
 
-		network.setCapacityPeriod(1);
+		network.setCapacityPeriod(3600);
 		new NetworkFromRawData(ls, network, e).constructNetwork();
 //		new NetworkCleaner().run(network);
-		
-		//new NetworkWriter(network,"southafrica/matsim_net.xml").write();
+//		new NetworkCleaner().run(network);
+		new NetworkMergeDoubleLinks().run(network);
+		new NetworkCalcTopoType().run(network);
+		new NetworkSummary().run(network);
+		new NetworkWriter(network,"southafrica/network/routes_networkRAW.xml").write();
 //		ShapeFileWriter.writeGeometries(genFeatureCollection((Collection<Link>) network.getLinks().values(), n),"./padang/network_" + VERSION + "/matsim_net.shp" );
-		
+
 	}
 
 	private static Collection<Feature> genFeatureCollection(final Collection<Link> links, final FeatureSource fs) throws FactoryRegistryException, SchemaException, IllegalAttributeException, Exception{
-		
+
 
 //		dummy.id = -1;
 		final GeometryFactory geofac = new GeometryFactory();
 		final Collection<Feature> features = new ArrayList<Feature>();
-		
+
 		final AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiLineString",MultiLineString.class, true, null, null, fs.getSchema().getDefaultGeometry().getCoordinateSystem());
 		final AttributeType id = AttributeTypeFactory.newAttributeType(
 				"ID", Integer.class);
 		final AttributeType fromNode = AttributeTypeFactory.newAttributeType(
 				"fromID", Integer.class);
 		final AttributeType toNode = AttributeTypeFactory.newAttributeType(
-				"toID", Integer.class);		
+				"toID", Integer.class);
 		final FeatureType ftRoad = FeatureTypeFactory.newFeatureType(
 				new AttributeType[] { geom, id, fromNode, toNode }, "link");
 		int ID = 0;
@@ -247,10 +264,10 @@ public class NetworkFromRawData {
 			final Coordinate c1 = MGC.coord2Coordinate(link.getFromNode().getCoord());
 			final Coordinate c2 = MGC.coord2Coordinate(link.getToNode().getCoord());
 			final LineString ls = geofac.createLineString(new Coordinate[] {c1,c2});
-			
+
 			final Feature ft = ftRoad.create(new Object [] {new MultiLineString(new LineString []{ls},geofac) , ID++, link.getFromNode().getId(),link.getToNode().getId()},"network");
 			features.add(ft);
-				
+
 		}
 
 
@@ -277,11 +294,11 @@ public class NetworkFromRawData {
 //			Polygon polygon = (Polygon) multiPolygon.getGeometryN(0);
 			polygons.add(feature);
 	}
-	
+
 		return polygons;
 	}
-	
-	
+
+
 
 }
 
