@@ -158,7 +158,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
 		this.spatialScorer = new SpatialScorer();
-		this.spatialScorer.scoreActs(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
+		this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
 		SNScoringGeneralFactory factory = new SNScoringGeneralFactory
 		("leisure", this.spatialScorer, controler.getScoringFunctionFactory());
 		this.controler.setScoringFunctionFactory(factory);
@@ -176,7 +176,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 		this.log.info("scoring");
 		
-		this.spatialScorer.scoreActs(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
+		this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
 
 		scoring.finish();
 	}
