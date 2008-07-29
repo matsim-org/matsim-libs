@@ -68,7 +68,7 @@ public class AnalyzeScores {
 		NetworkLayer network =Scenario.readNetwork();
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 
-		for(int i=500; i<510; i+=10){
+		for(int i=0; i<501; i+=10){
 //			config.socnetmodule().setInitIter(Integer.toString(i));
 			config.socnetmodule().setInitIter(Integer.toString(500));
 			double totalscore=0;
