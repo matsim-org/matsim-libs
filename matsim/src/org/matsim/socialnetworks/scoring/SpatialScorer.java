@@ -68,11 +68,10 @@ public class SpatialScorer {
 	 * Facility, it will be necessary to test all Acts. 
 	 * 
 	 * @param plans
-	 * @param rndEncounterProb
 	 * @param iteration
 	 * 
 	 */
-	public void scoreActs(Plans plans, HashMap<String, Double> rndEncounterProb, int iteration) {
+	public void scoreActs(Plans plans, int iteration) {
 
 		log.info(" Looking through plans and mapping social interactions for scoring "+iteration);
 
@@ -137,10 +136,8 @@ public class SpatialScorer {
 	 * For every two people, person1 and person2, who visited the same facility
 	 * and performed the same activity there, regardless of when, there is a score
 	 * <br><br>
-	 * This score depends only on the activity type, "rndEncounterProbability(activity type)".
-	 * <br><br>
+	 * 
 	 * @param plans
-	 * @param rndEncounterProbability
 	 * @param iteration
 	 * @return score
 	 */
@@ -243,7 +240,7 @@ public class SpatialScorer {
 			if(!(visitors.size()>0)){
 				Gbl.errorMsg(this.getClass()+" number of visitors not >0");
 			}
-			// Go through the list of Persons and for each one pick one friend randomly
+			// Go through the list of Persons
 			Iterator<Person> vIt=visitors.iterator();
 			while(vIt.hasNext()){
 				Person p2= vIt.next();

@@ -50,8 +50,10 @@ public abstract class Scenario {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB5/postprocessing/";
-	private static final String input_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB5/";
+//	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB5/postprocessing/";
+//	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB5/";
+	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB22/";
+	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB22/";
 	private static final Config config= Gbl.createConfig(null);;
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -73,19 +75,20 @@ public abstract class Scenario {
 
 		config.config().setOutputFile(output_directory + "output_config.xml");
 
-		config.world().setInputFile(input_directory + "output_world.xml");
+		config.world().setInputFile(input_directory + "output_world.xml.gz");
 		config.world().setOutputFile(output_directory + "output_world.xml");
 
-		config.network().setInputFile(input_directory + "output_network.xml");
+		config.network().setInputFile(input_directory + "output_network.xml.gz");
 		config.network().setOutputFile(output_directory + "output_network.xml");
 
-		config.facilities().setInputFile(input_directory + "output_facilities.xml");
+		config.facilities().setInputFile(input_directory + "output_facilities.xml.gz");
 		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
 
 		config.matrices().setInputFile(input_directory + "matrices.xml");
 		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
-		config.plans().setInputFile(input_directory + "output_plans.xml");
+//		config.plans().setInputFile(input_directory + "output_plans.xml");
+		config.plans().setInputFile("plans.xml.gz");
 		config.plans().setOutputFile(output_directory + "output_plans.xml");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
@@ -102,7 +105,7 @@ public abstract class Scenario {
 		config.socnetmodule().setSocNetGraphAlgo("read");
 		config.socnetmodule().setEdgeType("UNDIRECTED");
 		config.socnetmodule().setInitIter("500");
-		config.socnetmodule().setReadMentalMap("true");
+		config.socnetmodule().setReadMentalMap("false");
 		
 		config.createModule("kml21");
 		config.getModule("kml21").addParam("outputDirectory", output_directory);
@@ -164,6 +167,18 @@ public abstract class Scenario {
 		System.out.println("  done.");
 		return plans;
 	}
+	public static final Plans readPlans(int i) {
+		System.out.println("  reading plans xml file... ");
+		Plans plans = new Plans();
+		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
+//		System.out.println(Gbl.getConfig().plans().getInputFile());
+//		new MatsimPlansReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
+		System.out.println(filename);
+		new MatsimPlansReader(plans).readFile(filename);
+		
+		System.out.println("  done.");
+		return plans;
+	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// write output
@@ -215,6 +230,9 @@ public abstract class Scenario {
 	}
 	public static String getSNOutDir(){
 		return output_directory;
+	}
+	public static String getSNInDir(){
+		return input_directory;
 	}
 }
 

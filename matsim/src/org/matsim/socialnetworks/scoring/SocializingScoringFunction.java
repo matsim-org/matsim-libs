@@ -76,6 +76,10 @@ public class SocializingScoringFunction implements ScoringFunction{
 		this.scoringFunction.finish();
 
 		ActIterator ait = this.plan.getIteratorAct();
+		//TODO why does this iterate over acts here and again in spatialScorer?
+		//It should sent the act AND the plan and only return the value for the act.
+		//If there are more than one acts of type factype in the plan, this is
+		//counting the score once per instance of this activity!!!  JH
 		while(ait.hasNext()){
 			Act act = (Act)ait.next();
 			if(act.getType().equals(factype)){
