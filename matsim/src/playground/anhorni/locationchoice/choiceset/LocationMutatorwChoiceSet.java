@@ -89,6 +89,9 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		if (choiceSet.size()>1) {
 			final Facility facility=(Facility)choiceSet.toArray()[
            			           Gbl.random.nextInt(choiceSet.size()-1)];
+			
+			// facility needs to be set!!!
+			
        		act.setLink(this.network.getNearestLink(facility.getCenter()));
        		act.setCoord(facility.getCenter());
        		return true;

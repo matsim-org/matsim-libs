@@ -43,6 +43,9 @@ public class RandomLocationMutator extends LocationMutator {
 				// plans: link, coords
 				// facilities: coords
 				// => use coords
+				
+				// facility needs to be set!!!
+				
 				act.setLink(this.network.getNearestLink(facility.getCenter()));
 				act.setCoord(facility.getCenter());
 			}
