@@ -51,6 +51,7 @@ public class Scheduler {
 			//System.out.println("hereS");
 			m=queue.getNextMessage();
 			
+			int loopCounter=0;
 			while (messageExecutors.isEmpty()){
 				//System.out.println("alarm...");
 				/*
@@ -132,6 +133,7 @@ public class Scheduler {
 			
 			
 		}
+		
 	}
 	
 	
@@ -153,6 +155,7 @@ public class Scheduler {
 		// create message executors and start them
 		for (int i=0;i<Runtime.getRuntime().availableProcessors()-1;i++){
 			MessageExecutor me= new MessageExecutor (i);
+			me.setDaemon(true);
 			me.start();
 			messageExecutors.add(me);
 		}

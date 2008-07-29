@@ -15,7 +15,7 @@ public class Test1 extends TestCase {
 	public static void main(String[] args) {
 		// the config file comes as input
 		
-		String baseDir="/home/wrashid/matsim2/input/";
+		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test12/";
 		args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
@@ -24,7 +24,7 @@ public class Test1 extends TestCase {
 	}
 	
 	public void testTest1() {
-		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test6/";
+		String baseDir="C:/data/SandboxCVS/ivt/studies/wrashid/test/test12/";
 		String[] args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
