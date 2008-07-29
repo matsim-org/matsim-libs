@@ -69,8 +69,8 @@ public class AnalyzeScores {
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 
 		for(int i=0; i<501; i+=10){
-//			config.socnetmodule().setInitIter(Integer.toString(i));
-			config.socnetmodule().setInitIter(Integer.toString(500));
+			config.socnetmodule().setInitIter(Integer.toString(i));
+//			config.socnetmodule().setInitIter(Integer.toString(500));
 			double totalscore=0;
 			int n=0;
 			Plans plans = Scenario.readPlans(i);

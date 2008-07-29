@@ -57,8 +57,8 @@ public abstract class Scenario {
 	//For TRB run analyses of 500 iterations
 //	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB22/";
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB22/";
-	private static final String output_directory="output/Analyses/TRB44/";
-	private static final String input_directory="output/TRB44/";
+	private static final String output_directory="output/Analyses/TRB55/";
+	private static final String input_directory="output/TRB55/";
 	
 	
 	private static final Config config= Gbl.createConfig(null);;
