@@ -220,16 +220,16 @@ public class AnalyzeScores {
 						double nFriends=scorer.calculateTimeWindowStats(plan).get(1);
 						planscore+=nFriends;
 					}
-					totalscore+=planscore;
-					n++;
 				}
-				double avgscore=totalscore/((double) n);
-				avgscore=100.*Math.log(avgscore+1);
-				System.out.println("##Result "+i+" "+avgscore);
+				totalscore+=planscore;
+				n++;
 			}
-			System.out.println("TEST SUCCEEDED.");
-			System.out.println();
+			double avgscore=totalscore/((double) n);
+			avgscore=100.*Math.log(avgscore+1);
+			System.out.println("##Result "+i+" "+avgscore);
 		}
+		System.out.println("TEST SUCCEEDED.");
+		System.out.println();
 	}
 
 		//////////////////////////////////////////////////////////////////////
