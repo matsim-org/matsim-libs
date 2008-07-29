@@ -350,6 +350,8 @@ public class Facility extends AbstractLocation {
 	}
 	
 	// hour 0..23
+	// has to be corrected!!!
+	
 	public double getLoadPerHour(int hour) {
 		double hourlyLoad = 0.0;
 
