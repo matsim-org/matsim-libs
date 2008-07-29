@@ -223,7 +223,7 @@ public class AnalyzeScores {
 				}
 				totaliterationscore+=Math.log(planscore+1);
 				numplans++;
-				System.out.println("TOTAL "+totaliterationscore+" "+numplans);
+//				System.out.println("TOTAL "+totaliterationscore+" "+numplans);
 			}
 			double avgscore=100.*totaliterationscore/((double) numplans);
 			System.out.println("##Result "+i+" "+avgscore);
