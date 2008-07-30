@@ -3,7 +3,7 @@ package playground.wrashid.PDES;
 public abstract class SelfhandleMessage extends Message {
 
 	public abstract void selfhandleMessage();
-	
+	/*
 	public void sendMessage(Scheduler scheduler,Message m, SimUnit targetUnit, double messageArrivalTime){
 		m.sendingUnit=null;
 		
@@ -12,5 +12,6 @@ public abstract class SelfhandleMessage extends Message {
 		m.setMessageArrivalTime(messageArrivalTime);
 		scheduler.schedule(m);
 	}
+	*/
 
 }

@@ -44,19 +44,19 @@ public class MessageExecutor extends Thread {
 		
 		try{
 			while (getSimTime()<SimulationParameters.maxSimulationLength){
-				System.out.println(scheduler.queue.queue1.size());
+				System.out.println("id:" + id + " - " + scheduler.queue.queue1.size());
 				message=scheduler.queue.getNextMessage();
-				System.out.println(scheduler.queue.queue1.size());
+				System.out.println("id:" + id + " - " + scheduler.queue.queue1.size());
 				
 				if (message.firstLock!=null){
 					synchronized (message.firstLock){
-						System.out.println("executeMessage");
+						System.out.println("id:" + id + " - " + "executeMessage");
 						executeMessage();
 					}
 				} else {
-					System.out.println("ERROR");
+					System.out.println("id:" + id + " - " + "ERROR");
 				}
-				System.out.println("getSimTime()"+getSimTime());
+				System.out.println("id:" + id + " - " + "getSimTime()"+getSimTime());
 			}
 		} catch (java.lang.NullPointerException npe){
 			// ignore, because it comes from the fact, that we do not check 'scheduler.queue.hasElement()'
@@ -64,19 +64,19 @@ public class MessageExecutor extends Thread {
 		} catch (Exception e){
 			e.printStackTrace();
 		} finally {
-			System.out.println("sdfasf");
+			System.out.println("id:" + id + " - " + "sdfasf");
 		}
-		System.out.println("f:"+ scheduler.queue.queue1.size());
+		System.out.println("FFFid:" + id + " - " + scheduler.queue.queue1.size());
 	}
 
 	private void executeMessage(){
 		MessageExecutor.setSimTime(message.getMessageArrivalTime());
 		message.printMessageLogString();
 		if (message instanceof SelfhandleMessage){
-			System.out.println("selfhandleMessage");
+			System.out.println("id:" + id + " - " + "selfhandleMessage");
 			((SelfhandleMessage) message).selfhandleMessage();
 		} else {
-			System.out.println("recevingUnit handle");
+			System.out.println("id:" + id + " - " + "recevingUnit handle");
 			message.receivingUnit.handleMessage(message);
 		}
 	}
