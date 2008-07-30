@@ -119,7 +119,9 @@ public class Road extends SimUnit {
 
 	 public void leaveRoad(Vehicle vehicle) {
 		//System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
-		assert(carsOnTheRoad.getFirst()==vehicle); // TODO: uncomment this, and find out, why it produces a problem with test6
+		
+		assert(carsOnTheRoad.getFirst()==vehicle):"road:"+link.getId()+  " - " + this + " - " + lock; // TODO: uncomment this, and find out, why it produces a problem with test6
+	 	
 		carsOnTheRoad.removeFirst();
 		earliestDepartureTimeOfCar.removeFirst();
 		timeOfLastLeavingVehicle = MessageExecutor.getSimTime();

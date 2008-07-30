@@ -76,7 +76,7 @@ public class Scheduler {
 		
 		
 		// create message executors and start them
-		for (int i=1;i<Runtime.getRuntime().availableProcessors()+10;i++){
+		for (int i=1;i<Runtime.getRuntime().availableProcessors()*3;i++){
 			MessageExecutor me= new MessageExecutor (i);
 			me.setDaemon(false);
 			me.setScheduler(this);

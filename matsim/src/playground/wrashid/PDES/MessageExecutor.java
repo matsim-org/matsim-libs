@@ -35,7 +35,6 @@ public class MessageExecutor extends Thread {
 
 	public void run() {
 		MessageExecutor.setSimTime(0);
-		boolean acquiredLock=false;
 		
 		// of course here is a problem:
 		// we first check if empty and then try to get the element. For this reason
@@ -72,30 +71,34 @@ public class MessageExecutor extends Thread {
 				
 				 //Method, which should function, but does not...
 				// improve through await and increasing number of threads? 
-				acquiredLock=false;
 				synchronized (scheduler){
 					message=scheduler.queue.getNextMessage();
 					if (message==null){
 						break;
 					}
-					acquiredLock=message.lock.tryLock();
-					if (!acquiredLock){
-						((Road)message.receivingUnit).waitingOnLock.add(message);
-						//System.out.println("couldn't aquire lock"+id+" - "+message.receivingUnit);
-						//System.out.println("couldn't aquire lock"+id+" - "+message.lock);
-					} else {
-						//System.out.println("aquire lock at first attempt "+id+" - "+message.receivingUnit);
+					((Road)message.receivingUnit).waitingOnLock.add(message);
+				}
+				
+				
+
+				while(((Road)message.receivingUnit).waitingOnLock.peek()!=message){
+					try {
+						Thread.currentThread().sleep(1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
-				
-				
-				if (!acquiredLock){
-					while(((Road)message.receivingUnit).waitingOnLock.peek()!=message){}
-					while (!message.lock.tryLock()){}
-					//System.out.println("aquired lock"+id+" - "+message.receivingUnit);
-					//System.out.println("aquired lock"+id+" - "+message.lock);
-					((Road)message.receivingUnit).waitingOnLock.poll();
+				while (!message.lock.tryLock()){
+					try {
+						Thread.currentThread().sleep(1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
+				((Road)message.receivingUnit).waitingOnLock.poll();
+				
 				
 				executeMessage();
 				message.lock.unlock();
