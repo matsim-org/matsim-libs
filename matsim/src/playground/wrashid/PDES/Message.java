@@ -2,7 +2,6 @@ package playground.wrashid.PDES;
 
 import java.util.concurrent.locks.Lock;
 
-import playground.wrashid.PDES.util.FairLock;
 
 public abstract class Message implements Comparable {
 	
