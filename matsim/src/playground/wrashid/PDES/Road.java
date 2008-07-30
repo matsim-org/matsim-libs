@@ -121,7 +121,12 @@ public class Road extends SimUnit {
 		// time for entering the road
 		if (interestedInEnteringRoad.size() > 0) {
 			Vehicle nextVehicle = interestedInEnteringRoad.removeFirst();
-			DeadlockPreventionMessage m=deadlockPreventionMessages.removeFirst();
+			DeadlockPreventionMessage m=null;
+			try{
+				m=deadlockPreventionMessages.removeFirst();
+			} catch (Exception e){
+				System.out.println("road:"+link.getId()+ "  -  " + "vehicle " + nextVehicle.getOwnerPerson().getId());
+			}
 			assert(m.vehicle==nextVehicle);
 			scheduler.unschedule(m);
 			
@@ -336,7 +341,11 @@ public class Road extends SimUnit {
 	}
 	
 	public void removeFromInterestedInEnteringRoad(){
-		interestedInEnteringRoad.removeFirst();
+		try{
+			interestedInEnteringRoad.removeFirst();
+		} catch (Exception e){
+			System.out.println("road:"+link.getId());
+		}
 	}
 
 }

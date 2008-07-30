@@ -11,10 +11,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.matsim.gbl.Gbl;
 
+import playground.wrashid.DES.utils.Timer;
+
 public class Scheduler {
 	private double simTime=0;
 	public MessageQueue queue=new MessageQueue();
 	LinkedList<SimUnit> simUnits=new LinkedList<SimUnit>();
+	Timer timer=new Timer();
 	
 	public void schedule(Message m){		
 		if (m.getMessageArrivalTime()>=simTime){	
@@ -34,12 +37,18 @@ public class Scheduler {
 	
 	
 	public void startSimulation(){
-		
+		timer.startTimer();
 		long simulationStart=System.currentTimeMillis();
 		double hourlyLogTime=3600;
 		
 		initializeSimulation();
 		
+		try {
+			Thread.currentThread().sleep(1000000000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	

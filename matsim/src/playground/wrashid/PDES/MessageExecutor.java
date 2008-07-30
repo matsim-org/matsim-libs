@@ -43,40 +43,48 @@ public class MessageExecutor extends Thread {
 		// This would also improve performance.
 		
 		try{
-			while (getSimTime()<SimulationParameters.maxSimulationLength){
-				System.out.println("id:" + id + " - " + scheduler.queue.queue1.size());
-				message=scheduler.queue.getNextMessage();
-				System.out.println("id:" + id + " - " + scheduler.queue.queue1.size());
-				
-				if (message.firstLock!=null){
-					synchronized (message.firstLock){
-						System.out.println("id:" + id + " - " + "executeMessage");
-						executeMessage();
+			while (true || getSimTime()<SimulationParameters.maxSimulationLength){
+				/*
+				while (scheduler.queue.getCounter()%(this.id+1)!=0 && !scheduler.queue.isEmpty()){
+					try {
+						Thread.currentThread().sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				} else {
-					System.out.println("id:" + id + " - " + "ERROR");
 				}
-				System.out.println("id:" + id + " - " + "getSimTime()"+getSimTime());
+				*/
+				
+				message=scheduler.queue.getNextMessage();
+				if (message==null){
+					break;
+				}
+				synchronized (scheduler){
+					//synchronized (message.firstLock){
+					//	synchronized (message.secondLock){
+							executeMessage();
+					//	}
+					//}
+				}
 			}
 		} catch (java.lang.NullPointerException npe){
-			// ignore, because it comes from the fact, that we do not check 'scheduler.queue.hasElement()'
+			// ignore this exception, because it comes from the fact, that we do not check 'scheduler.queue.isEmpty()'
 			npe.printStackTrace();
 		} catch (Exception e){
 			e.printStackTrace();
 		} finally {
-			System.out.println("id:" + id + " - " + "sdfasf");
 		}
-		System.out.println("FFFid:" + id + " - " + scheduler.queue.queue1.size());
+		
+		scheduler.timer.endTimer();
+		scheduler.timer.printMeasuredTime("ThreadId-"+id + ": ");
 	}
 
 	private void executeMessage(){
 		MessageExecutor.setSimTime(message.getMessageArrivalTime());
 		message.printMessageLogString();
 		if (message instanceof SelfhandleMessage){
-			System.out.println("id:" + id + " - " + "selfhandleMessage");
 			((SelfhandleMessage) message).selfhandleMessage();
 		} else {
-			System.out.println("id:" + id + " - " + "recevingUnit handle");
 			message.receivingUnit.handleMessage(message);
 		}
 	}
