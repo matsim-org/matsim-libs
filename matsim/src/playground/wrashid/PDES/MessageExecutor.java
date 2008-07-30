@@ -44,7 +44,7 @@ public class MessageExecutor extends Thread {
 		// This would also improve performance.
 		
 		try{
-			while (true || getSimTime()<SimulationParameters.maxSimulationLength){
+			while (getSimTime()<SimulationParameters.maxSimulationLength){
 				// this is needed, because for the same street the lock should happen before the next road can do the lock
 				
 				//while (scheduler.queue.getCounter()%(this.id+1)!=0 && !scheduler.queue.isEmpty()){
@@ -54,7 +54,8 @@ public class MessageExecutor extends Thread {
 				
 				// attention: race condition. It might happen, that before we do the lock, the later message aquires the lock (because we go sleeping)
 				
-				
+				/*
+				 // Version 1: only one message is processed at a time
 				acquiredLock=false;
 				synchronized (scheduler){
 					message=scheduler.queue.getNextMessage();
@@ -63,13 +64,14 @@ public class MessageExecutor extends Thread {
 					}
 					executeMessage();
 				}				
-				
+				*/
 				
 
 				
 				
-				/*
+				
 				 //Method, which should function, but does not...
+				// improve through await and increasing number of threads? 
 				acquiredLock=false;
 				synchronized (scheduler){
 					message=scheduler.queue.getNextMessage();
@@ -79,6 +81,10 @@ public class MessageExecutor extends Thread {
 					acquiredLock=message.lock.tryLock();
 					if (!acquiredLock){
 						((Road)message.receivingUnit).waitingOnLock.add(message);
+						//System.out.println("couldn't aquire lock"+id+" - "+message.receivingUnit);
+						//System.out.println("couldn't aquire lock"+id+" - "+message.lock);
+					} else {
+						//System.out.println("aquire lock at first attempt "+id+" - "+message.receivingUnit);
 					}
 				}
 				
@@ -86,13 +92,15 @@ public class MessageExecutor extends Thread {
 				if (!acquiredLock){
 					while(((Road)message.receivingUnit).waitingOnLock.peek()!=message){}
 					while (!message.lock.tryLock()){}
+					//System.out.println("aquired lock"+id+" - "+message.receivingUnit);
+					//System.out.println("aquired lock"+id+" - "+message.lock);
 					((Road)message.receivingUnit).waitingOnLock.poll();
 				}
 				
 				executeMessage();
 				message.lock.unlock();
-				
-*/
+				//System.out.println("unlocked"+id+" - "+message.lock);
+
 
 
 				/*

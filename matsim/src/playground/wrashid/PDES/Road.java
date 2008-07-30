@@ -3,6 +3,7 @@ package playground.wrashid.PDES;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -23,7 +24,7 @@ public class Road extends SimUnit {
 	private Link link;
 	private LinkedList<Double> gap; // see enterRequest for a detailed
 	// description of variable 'gap'
-	private LinkedList<Vehicle> interestedInEnteringRoad = new LinkedList<Vehicle>();
+	//private LinkedList<Vehicle> interestedInEnteringRoad = new LinkedList<Vehicle>();
 	private double timeOfLastEnteringVehicle = Double.MIN_VALUE;
 	private double timeOfLastLeavingVehicle = Double.MIN_VALUE;
 
@@ -129,14 +130,16 @@ public class Road extends SimUnit {
 
 		// the next car waiting for entering the road should now be alloted a
 		// time for entering the road
-		if (interestedInEnteringRoad.size() > 0) {
-			Vehicle nextVehicle = interestedInEnteringRoad.removeFirst();
+		if (deadlockPreventionMessages.size() > 0) {
+			
 			DeadlockPreventionMessage m=null;
+			Vehicle nextVehicle=null;
 			try{
-				m=deadlockPreventionMessages.removeFirst();
+				m=deadlockPreventionMessages.poll();
+				nextVehicle = m.vehicle;
 				assert(m.vehicle==nextVehicle);
 			} catch (Exception e){
-				System.out.println("road:"+link.getId()+ "  -  " + "vehicle " + nextVehicle.getOwnerPerson().getId());
+				System.out.println("road:"+link.getId()+  " - " + this + "  -  " + "vehicle " + nextVehicle.getOwnerPerson().getId() + " - " + lock);
 			}
 
 			scheduler.unschedule(m);
@@ -300,14 +303,14 @@ public class Road extends SimUnit {
 				gap.clear();
 			}
 
-			interestedInEnteringRoad.add(vehicle);
+			//interestedInEnteringRoad.add(vehicle);
 			
 			// the first car interested in entering a road has to wait 'stuckTime'
 			// the car behind has to wait an additional stuckTime (this logic was introduced to adhere the C++ implementation)
 			if (deadlockPreventionMessages.size()>0){
-				if (deadlockPreventionMessages.getLast().messageArrivalTime +SimulationParameters.stuckTime<MessageExecutor.getSimTime()){
-					System.out.println();	
-				}
+				//if (deadlockPreventionMessages. getLast().messageArrivalTime +SimulationParameters.stuckTime<MessageExecutor.getSimTime()){
+				//	System.out.println();	
+				//}
 				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(deadlockPreventionMessages.getLast().messageArrivalTime +SimulationParameters.stuckTime, this));
 				
 			} else {
@@ -335,28 +338,38 @@ public class Road extends SimUnit {
 		this.timeOfLastEnteringVehicle = timeOfLastEnteringVehicle;
 	}
 	
-	public void removeFirstDeadlockPreventionMessage(DeadlockPreventionMessage dpMessage){
+	public void removeDeadlockPreventionMessage(DeadlockPreventionMessage dpMessage){
 		// this causes a problem with test6, as it the message does not exist
 		// TODO: first find out why this happens and then
 		
 		// TODO: current problem: two different messages (sent by different vehicles)
 		// we are sure, that no one removed this message using this method, but rather some different
 		// place in the code...
-		if (deadlockPreventionMessages.getFirst()!=dpMessage){
-			DeadlockPreventionMessage dpm=deadlockPreventionMessages.getFirst();
+		if (deadlockPreventionMessages.peek()!=dpMessage){
+			DeadlockPreventionMessage dpm=deadlockPreventionMessages.peek();
 			System.out.println();
 		}
 		
-		assert(deadlockPreventionMessages.getFirst()==dpMessage):"Inconsitency in logic!!! => this should only be invoked from the handler of this message";
-		deadlockPreventionMessages.removeFirst();
+		// TODO: uncomment assertion again, because this indicates, that there is some out of sync behaviour!!!!!!!!!!
+		// Answer: if we use a PriorityQueue instead, the problem would be solved, but the implementation gets harder, because we
+		// need the last element (that function is not available with PriorityQueue)
+		//assert(deadlockPreventionMessages.peek()==dpMessage):"Inconsitency in logic!!! => this should only be invoked from the handler of this message";
+		
+		//deadlockPreventionMessages.removeFirst();
+		// the code line above was replaced, because of time causality, there could be a problem
+		deadlockPreventionMessages.remove(dpMessage);
 	}
 	
-	public void removeFromInterestedInEnteringRoad(){
+	/*
+	public void removeFromInterestedInEnteringRoad(Vehicle vehicle){
 		try{
-			interestedInEnteringRoad.removeFirst();
+			//interestedInEnteringRoad.removeFirst();
+			// the code line above was replaced, because of time causality, there could be a problem
+			interestedInEnteringRoad.remove(vehicle);
 		} catch (Exception e){
-			System.out.println("road:"+link.getId());
+			System.out.println("road:"+link.getId() + " - " + this + " - " + lock);
 		}
 	}
+	*/
 
 }

@@ -45,7 +45,7 @@ public class Scheduler {
 		initializeSimulation();
 		
 		try {
-			Thread.currentThread().sleep(100000);
+			Thread.currentThread().sleep(150000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -76,7 +76,7 @@ public class Scheduler {
 		
 		
 		// create message executors and start them
-		for (int i=0;i<Runtime.getRuntime().availableProcessors()+10;i++){
+		for (int i=1;i<Runtime.getRuntime().availableProcessors()+10;i++){
 			MessageExecutor me= new MessageExecutor (i);
 			me.setDaemon(false);
 			me.setScheduler(this);

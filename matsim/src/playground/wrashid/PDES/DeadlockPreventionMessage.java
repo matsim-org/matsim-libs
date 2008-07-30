@@ -10,8 +10,8 @@ public class DeadlockPreventionMessage extends EventMessage {
 		
 		road.incrementPromisedToEnterRoad(); // this will be decremented in enter road
 		road.setTimeOfLastEnteringVehicle(MessageExecutor.getSimTime());
-		road.removeFirstDeadlockPreventionMessage(this);
-		road.removeFromInterestedInEnteringRoad();
+		road.removeDeadlockPreventionMessage(this);
+		//road.removeFromInterestedInEnteringRoad(vehicle);
 		
 		vehicle.scheduleEnterRoadMessage(MessageExecutor.getSimTime(), road);
 		//System.out.println("Deadlock prevention happend");
