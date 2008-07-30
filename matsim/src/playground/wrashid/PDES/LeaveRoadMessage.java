@@ -8,7 +8,7 @@ public class LeaveRoadMessage extends EventMessage {
 
 	@Override
 	public void selfhandleMessage() {
-		Road road=(Road)scheduler.getSimUnit(this.receivingUnit.unitNo);
+		Road road=(Road)this.receivingUnit;
 		road.leaveRoad(vehicle);
 	}
 
@@ -18,7 +18,7 @@ public class LeaveRoadMessage extends EventMessage {
 	}
 	
 	public void printMessageLogString() {
-		Road road=(Road)scheduler.getSimUnit(this.receivingUnit.unitNo);
+		Road road=(Road)this.receivingUnit;
 		
 		if (logMessage){
 			EventLog ev=new EventLog(this.getMessageArrivalTime(),Integer.parseInt(vehicle.getOwnerPerson().getId().toString()),vehicle.getLegIndex()-1,Integer.parseInt(road.getLink().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getFromNode().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getToNode().getId().toString()),eventType);
@@ -32,7 +32,7 @@ public class LeaveRoadMessage extends EventMessage {
 
 	@Override
 	public void logEvent() {
-		Road road=(Road)scheduler.getSimUnit(this.receivingUnit.unitNo);
+		Road road=(Road)this.receivingUnit;
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.LEAVE_LINK)){

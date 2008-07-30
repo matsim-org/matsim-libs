@@ -41,27 +41,42 @@ public class MessageExecutor extends Thread {
 		// several threads may try to get the same message
 		// TODO: in order to improve this, we could leave out this check and instead make a try/catch
 		// This would also improve performance.
+		
 		try{
-		while (getSimTime()<SimulationParameters.maxSimulationLength){
-			message=scheduler.queue.getNextMessage();
-			if (message.firstLock!=null){
-				synchronized (message.firstLock){
-					executeMessage();
+			while (getSimTime()<SimulationParameters.maxSimulationLength){
+				System.out.println(scheduler.queue.queue1.size());
+				message=scheduler.queue.getNextMessage();
+				System.out.println(scheduler.queue.queue1.size());
+				
+				if (message.firstLock!=null){
+					synchronized (message.firstLock){
+						System.out.println("executeMessage");
+						executeMessage();
+					}
+				} else {
+					System.out.println("ERROR");
 				}
+				System.out.println("getSimTime()"+getSimTime());
 			}
-		}
 		} catch (java.lang.NullPointerException npe){
 			// ignore, because it comes from the fact, that we do not check 'scheduler.queue.hasElement()'
+			npe.printStackTrace();
+		} catch (Exception e){
+			e.printStackTrace();
+		} finally {
+			System.out.println("sdfasf");
 		}
-
+		System.out.println("f:"+ scheduler.queue.queue1.size());
 	}
 
 	private void executeMessage(){
 		MessageExecutor.setSimTime(message.getMessageArrivalTime());
 		message.printMessageLogString();
 		if (message instanceof SelfhandleMessage){
+			System.out.println("selfhandleMessage");
 			((SelfhandleMessage) message).selfhandleMessage();
 		} else {
+			System.out.println("recevingUnit handle");
 			message.receivingUnit.handleMessage(message);
 		}
 	}

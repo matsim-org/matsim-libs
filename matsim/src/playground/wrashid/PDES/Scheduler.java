@@ -14,11 +14,7 @@ import org.matsim.gbl.Gbl;
 public class Scheduler {
 	private double simTime=0;
 	public MessageQueue queue=new MessageQueue();
-	HashMap<Long,SimUnit> simUnits=new HashMap<Long, SimUnit>();
-	ConcurrentLinkedQueue<MessageExecutor> messageExecutors= new ConcurrentLinkedQueue<MessageExecutor>();
-	public Lock schedulerLock=new ReentrantLock();
-	public Condition emtpyMessageExecutorQueue=schedulerLock.newCondition();
-	
+	LinkedList<SimUnit> simUnits=new LinkedList<SimUnit>();
 	
 	public void schedule(Message m){		
 		if (m.getMessageArrivalTime()>=simTime){	
@@ -48,13 +44,9 @@ public class Scheduler {
 	
 	
 	public void register(SimUnit su){
-		simUnits.put(new Long(su.unitNo), su);
+		simUnits.add(su);
 	}
-	
-	public Object getSimUnit(long unitId){
-		return simUnits.get(new Long(unitId));
-	}
-	
+		
 	
 	// attention: this procedure only invokes
 	// the initialization method of objects, which
@@ -64,7 +56,7 @@ public class Scheduler {
 		
 		
 		
-		Object[] objects=simUnits.values().toArray();
+		Object[] objects=simUnits.toArray();
 		SimUnit su;
 		
 		for (int i=0;i<objects.length;i++){
@@ -74,7 +66,7 @@ public class Scheduler {
 		
 		
 		// create message executors and start them
-		for (int i=0;i<Runtime.getRuntime().availableProcessors();i++){
+		for (int i=0;i<Runtime.getRuntime().availableProcessors()+10;i++){
 			MessageExecutor me= new MessageExecutor (i);
 			me.setDaemon(false);
 			me.setScheduler(this);
@@ -89,13 +81,7 @@ public class Scheduler {
 
 
 	public void unregister(SimUnit unit) {
-		simUnits.remove(new Long(unit.unitNo));
+		simUnits.remove(unit.unitNo);
 	}
 	
-	public void queueMessageExecutor(MessageExecutor me){
-		messageExecutors.add(me);
-		//schedulerLock.lock();
-		//emtpyMessageExecutorQueue.signal();
-		//schedulerLock.unlock();
-	}
 }
