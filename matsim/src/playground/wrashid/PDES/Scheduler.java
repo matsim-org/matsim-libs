@@ -44,7 +44,7 @@ public class Scheduler {
 		initializeSimulation();
 		
 		try {
-			Thread.currentThread().sleep(1000000000);
+			Thread.currentThread().sleep(100000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
