@@ -175,6 +175,7 @@ public class Vehicle extends SimUnit {
 			Message m=MessageFactory.getEnterRoadMessage(road.scheduler, this);
 			m.firstLock=road;
 			m.secondLock=this;
+			m.lock=road.lock;
 			sendMessage(m, road, scheduleTime);
 		}
 	}
@@ -211,6 +212,7 @@ public class Vehicle extends SimUnit {
 		Message m=MessageFactory.getEndRoadMessage(road.scheduler, this);
 		m.firstLock=road;
 		m.secondLock=this;
+		m.lock=road.lock;
 		sendMessage(m, road,scheduleTime);
 	}
 
@@ -218,6 +220,7 @@ public class Vehicle extends SimUnit {
 		Message m=MessageFactory.getLeaveRoadMessage(road.scheduler, this);
 		m.firstLock=road;
 		m.secondLock=this;
+		m.lock=road.lock;
 		sendMessage(m, road, scheduleTime);
 	}
 
@@ -225,6 +228,7 @@ public class Vehicle extends SimUnit {
 		Message m=MessageFactory.getEndLegMessage(road.scheduler, this);
 		m.firstLock=road;
 		m.secondLock=this;
+		m.lock=road.lock;
 		sendMessage(m, road,scheduleTime);
 	}
 	
@@ -232,6 +236,7 @@ public class Vehicle extends SimUnit {
 		Message m=MessageFactory.getStartingLegMessage(road.scheduler, this);
 		m.firstLock=road;
 		m.secondLock=this;
+		m.lock=road.lock;
 		sendMessage(m, road,scheduleTime);
 	}
 
@@ -239,6 +244,7 @@ public class Vehicle extends SimUnit {
 		Message m=MessageFactory.getDeadlockPreventionMessage(road.scheduler, this);
 		m.firstLock=road;
 		m.secondLock=this;
+		m.lock=road.lock;
 		sendMessage(m, road,scheduleTime);
 		return (DeadlockPreventionMessage) m;
 	}

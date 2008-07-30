@@ -3,12 +3,19 @@ package playground.wrashid.PDES;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.matsim.network.Link;
 import org.matsim.plans.Act;
 import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
+
+import playground.wrashid.PDES.util.FairLock;
+
+
 
 public class Road extends SimUnit {
 
@@ -46,6 +53,9 @@ public class Road extends SimUnit {
 	
 	private LinkedList<DeadlockPreventionMessage> deadlockPreventionMessages= new LinkedList<DeadlockPreventionMessage>();
 	
+	Lock lock=new ReentrantLock();
+	public ConcurrentLinkedQueue<Message> waitingOnLock=new ConcurrentLinkedQueue<Message>();
+	//FairLock lock=new FairLock();
 	
 	// private double oldestUnusedGapTime=Double.MIN_VALUE;
 
@@ -106,7 +116,7 @@ public class Road extends SimUnit {
 
 	}
 
-	public void leaveRoad(Vehicle vehicle) {
+	 public void leaveRoad(Vehicle vehicle) {
 		//System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
 		assert(carsOnTheRoad.getFirst()==vehicle); // TODO: uncomment this, and find out, why it produces a problem with test6
 		carsOnTheRoad.removeFirst();
@@ -124,10 +134,11 @@ public class Road extends SimUnit {
 			DeadlockPreventionMessage m=null;
 			try{
 				m=deadlockPreventionMessages.removeFirst();
+				assert(m.vehicle==nextVehicle);
 			} catch (Exception e){
 				System.out.println("road:"+link.getId()+ "  -  " + "vehicle " + nextVehicle.getOwnerPerson().getId());
 			}
-			assert(m.vehicle==nextVehicle);
+
 			scheduler.unschedule(m);
 			
 			double nextAvailableTimeForEnteringStreet = Math.max(

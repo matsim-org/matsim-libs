@@ -28,11 +28,13 @@ public class MessageQueue {
 
 
 	synchronized void removeMessage(Message m) {
-		counter++;
 		queue1.remove(m);
 	}
 
 	synchronized Message getNextMessage() {
+		counter++;
+
+		
 		Message m = queue1.poll();
 		return m;
 	}

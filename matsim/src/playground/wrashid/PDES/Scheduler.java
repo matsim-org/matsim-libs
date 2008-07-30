@@ -18,6 +18,7 @@ public class Scheduler {
 	public MessageQueue queue=new MessageQueue();
 	LinkedList<SimUnit> simUnits=new LinkedList<SimUnit>();
 	Timer timer=new Timer();
+	Lock lock=new ReentrantLock();
 	
 	public void schedule(Message m){		
 		if (m.getMessageArrivalTime()>=simTime){	

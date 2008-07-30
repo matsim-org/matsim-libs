@@ -1,5 +1,9 @@
 package playground.wrashid.PDES;
 
+import java.util.concurrent.locks.Lock;
+
+import playground.wrashid.PDES.util.FairLock;
+
 public abstract class Message implements Comparable {
 	
 	private static long messageCounter=0;
@@ -11,7 +15,8 @@ public abstract class Message implements Comparable {
 	public String queueKey=""; // only used because of implementation convenience (might be removed in future, if not needed)
 	public Object firstLock=null;
 	public Object secondLock=null;
-	
+	public Lock lock=null;
+	//public FairLock lock=null;
 	
 	// all inheriting or extending modules must
 	// invoke this Constructer first

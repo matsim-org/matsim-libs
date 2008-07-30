@@ -35,6 +35,7 @@ public class MessageExecutor extends Thread {
 
 	public void run() {
 		MessageExecutor.setSimTime(0);
+		boolean acquiredLock=false;
 		
 		// of course here is a problem:
 		// we first check if empty and then try to get the element. For this reason
@@ -44,28 +45,69 @@ public class MessageExecutor extends Thread {
 		
 		try{
 			while (true || getSimTime()<SimulationParameters.maxSimulationLength){
+				// this is needed, because for the same street the lock should happen before the next road can do the lock
+				
+				//while (scheduler.queue.getCounter()%(this.id+1)!=0 && !scheduler.queue.isEmpty()){
+					
+				//}
+				
+				
+				// attention: race condition. It might happen, that before we do the lock, the later message aquires the lock (because we go sleeping)
+				
+				
+				acquiredLock=false;
+				synchronized (scheduler){
+					message=scheduler.queue.getNextMessage();
+					if (message==null){
+						break;
+					}
+					executeMessage();
+				}				
+				
+				
+
+				
+				
 				/*
-				while (scheduler.queue.getCounter()%(this.id+1)!=0 && !scheduler.queue.isEmpty()){
-					try {
-						Thread.currentThread().sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				 //Method, which should function, but does not...
+				acquiredLock=false;
+				synchronized (scheduler){
+					message=scheduler.queue.getNextMessage();
+					if (message==null){
+						break;
+					}
+					acquiredLock=message.lock.tryLock();
+					if (!acquiredLock){
+						((Road)message.receivingUnit).waitingOnLock.add(message);
 					}
 				}
-				*/
 				
-				message=scheduler.queue.getNextMessage();
-				if (message==null){
-					break;
+				
+				if (!acquiredLock){
+					while(((Road)message.receivingUnit).waitingOnLock.peek()!=message){}
+					while (!message.lock.tryLock()){}
+					((Road)message.receivingUnit).waitingOnLock.poll();
 				}
-				synchronized (scheduler){
-					//synchronized (message.firstLock){
-					//	synchronized (message.secondLock){
-							executeMessage();
-					//	}
-					//}
+				
+				executeMessage();
+				message.lock.unlock();
+				
+*/
+
+
+				/*
+				scheduler.lock.lock();
+				
+				System.out.println("start:"+id);
+				
+				for (int i=0;i<100000000;i++){
+					
 				}
+				
+				System.out.println("end:"+id);
+				
+				scheduler.lock.unlock();
+				*/
 			}
 		} catch (java.lang.NullPointerException npe){
 			// ignore this exception, because it comes from the fact, that we do not check 'scheduler.queue.isEmpty()'
