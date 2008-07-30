@@ -21,7 +21,11 @@
 package org.matsim.plans.algorithms;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.plans.Act;
 import org.matsim.plans.Plan;
@@ -39,71 +43,84 @@ import org.matsim.plans.Plan;
  */
 public class PlanAnalyzeSubtours implements PlanAlgorithmI {
 
-	private int numSubtours;
-
 	/**
 	 * Maps leg numbers to subtour ids.
 	 */
-	private int[] subtours = null; 
+	private HashSet<Integer> subtours = null;
 
-	private ArrayList<Id> locationIds = new ArrayList<Id>();
+	private ArrayList<Id> locationIds = null;
+
+	private static Logger log = Logger.getLogger(PlanAnalyzeSubtours.class);
 
 	public PlanAnalyzeSubtours() {
 		super();
-		this.numSubtours = Integer.MIN_VALUE;
 	}
 
 	public int getNumSubtours() {
-		if (numSubtours == Integer.MIN_VALUE) {
-			for (int legId = 0; legId < subtours.length; legId++) {
-				if (subtours[legId] > numSubtours) {
-					numSubtours = subtours[legId];
-				}
-			}
-		}
-		// number of subtours is highest subtour index + 1
-		return numSubtours + 1;
+
+		return this.subtours.size();
+
 	}
 
 	public void run(Plan plan) {
 
+		locationIds = new ArrayList<Id>();
+
 		ArrayList<Object> actsLegs = plan.getActsLegs();
-		for (int ii=0; ii < actsLegs.size(); ii+=2) {
-			locationIds.add(((Act) actsLegs.get(ii)).getLinkId());
+		for (int ii=0; ii < actsLegs.size(); ii++) {
+			if (actsLegs.get(ii).getClass().equals(Act.class)) {
+				locationIds.add(((Act) actsLegs.get(ii)).getLinkId());
+			}
 		}
 
-		this.subtours = new int[locationIds.size()];
+		this.subtours = new HashSet<Integer>();
 
-		this.extractSubtours(0, locationIds.size() - 1, 0);
+		this.extractSubtours(0, locationIds.size() - 1);
 
 		this.printSubtours();
 
 	}
 
-	protected void extractSubtours(final int startIndex, final int endIndex, final int subtourId) {
+	protected void extractSubtours(final int startIndex, final int endIndex) {
 
-		if (startIndex == endIndex) {
-			return;
-		}
+		log.info("startIndex: " + startIndex);
+		log.info("endIndex: " + endIndex);
 
-		subtours[startIndex] = subtourId;
-		for (int ii = startIndex + 1; ii <= endIndex; ii++) {
-			subtours[ii] = subtourId;
-			// subtour found
-			if (locationIds.get(ii).equals(locationIds.get(startIndex))) {
-				// analyse locations in between for subtours
-				this.extractSubtours(startIndex + 1, ii - 1, subtourId + 1);
+//		TreeMap<Id, Integer> locationEnumerator = new TreeMap<Id, Integer>();
+
+		ArrayList<Id> locationEnumerator = new ArrayList<Id>();
+		
+		int ii = startIndex;
+		int newStartIndex = startIndex;
+		while(ii <= endIndex) {
+			Id currentLinkId = locationIds.get(ii);
+			if (locationEnumerator.contains(currentLinkId)) {
+				int lastLinkIndex = locationEnumerator.indexOf(currentLinkId) + newStartIndex;
+				//				int lastLinkIndex = locationEnumerator.get(currentLinkId);
+				// two consecutive equal locations do NOT constitute a tour
+				if ((ii - lastLinkIndex) > 1) {
+					subtours.add(lastLinkIndex);
+					log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
+					this.extractSubtours((lastLinkIndex + 1), (ii - 1));
+					// this is probably wrong
+					for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
+						locationEnumerator.remove(lastLinkIndex - newStartIndex);
+					}
+					//locationEnumerator.clear();
+					newStartIndex = ii;
+				}
 			}
+//			locationEnumerator.put(currentLinkId, ii);
+			locationEnumerator.add(currentLinkId);
+			ii++;
 		}
 
 	}
 
 	protected void printSubtours() {
-
-		for (int legId = 0; legId < subtours.length; legId++) {
-			System.out.println(legId + "->" + subtours[legId]);
+		for (Integer startLinkIndex : subtours) {
+			System.out.println(startLinkIndex);
 		}
-
 	}
 
 }
