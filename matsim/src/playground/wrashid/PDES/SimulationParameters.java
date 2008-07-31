@@ -46,7 +46,8 @@ public class SimulationParameters {
 	public static final int minQueueLength=Runtime.getRuntime().availableProcessors()*10;
 	// if a lot of messages are not needed any more, then GC should be allowed
 	public static final int maxQueueLength=10000;
-	public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()*3;
+	// optimal: numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()+1
+	public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()+1;
 	
 	synchronized public static void processEvent(BasicEvent event){
 		SimulationParameters.events.processEvent(event);
