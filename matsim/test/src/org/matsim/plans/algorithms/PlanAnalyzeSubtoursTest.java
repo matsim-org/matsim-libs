@@ -72,22 +72,25 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		Plan plan = person.getPlans().get(0);
 		
 		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours();
-//		testee.run(plan);
-//		assertEquals(1, testee.getNumSubtours());
+		testee.run(plan);
+		assertEquals(1, testee.getNumSubtours());
 		
 		person = new Person(new IdImpl("1000"));
 
 		// now let's test different types of activity plans
-		TreeMap<String, Integer> versuchsKaninchen = new TreeMap<String, Integer>();
-		versuchsKaninchen.put("1 2 1", 1);
-		versuchsKaninchen.put("1 2 20 1", 1);
-		versuchsKaninchen.put("1 2 1 2 1", 2);
-		versuchsKaninchen.put("1 2 1 3 1", 2);
-		versuchsKaninchen.put("1 2 2 1", 1);
-//		versuchsKaninchen.put("1 2 2 2 2 2 2 2 1", 1);
-//		versuchsKaninchen.put("1 2 3 2 1", 2);
+		TreeMap<String, Integer> versuchskaninchen = new TreeMap<String, Integer>();
+		versuchskaninchen.put("1 2 1", 1);
+		versuchskaninchen.put("1 2 20 1", 1);
+		versuchskaninchen.put("1 2 1 2 1", 2);
+		versuchskaninchen.put("1 2 1 3 1", 2);
+		versuchskaninchen.put("1 2 2 1", 1);
+		versuchskaninchen.put("1 2 2 2 2 2 2 2 1", 1);
+		versuchskaninchen.put("1 2 3 2 1", 2);
+		versuchskaninchen.put("1 2 14 2 14 2 1", 3);
+		versuchskaninchen.put("1 2 14 14 2 14 2 1", 3);
+		versuchskaninchen.put("1 2 3 4", 0);
 		
-		for (String linkString : versuchsKaninchen.keySet()) {
+		for (String linkString : versuchskaninchen.keySet()) {
 
 			log.info("Testing location sequence: " + linkString);
 			
@@ -113,7 +116,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 				}
 			}
 			testee.run(plan);
-			Integer expectedNumSubtours = versuchsKaninchen.get(linkString);
+			Integer expectedNumSubtours = versuchskaninchen.get(linkString);
 			int actualNumSubtours = testee.getNumSubtours();
 			assertEquals(expectedNumSubtours.intValue(), actualNumSubtours);
 			

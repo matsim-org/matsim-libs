@@ -27,6 +27,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.plans.Act;
 import org.matsim.plans.Plan;
 
@@ -42,6 +43,8 @@ import org.matsim.plans.Plan;
  *
  */
 public class PlanAnalyzeSubtours implements PlanAlgorithmI {
+
+	private static final Id INVALID_ID = new IdImpl(Integer.MIN_VALUE);
 
 	/**
 	 * Maps leg numbers to subtour ids.
@@ -86,31 +89,25 @@ public class PlanAnalyzeSubtours implements PlanAlgorithmI {
 		log.info("startIndex: " + startIndex);
 		log.info("endIndex: " + endIndex);
 
-//		TreeMap<Id, Integer> locationEnumerator = new TreeMap<Id, Integer>();
-
 		ArrayList<Id> locationEnumerator = new ArrayList<Id>();
-		
+
 		int ii = startIndex;
-		int newStartIndex = startIndex;
 		while(ii <= endIndex) {
 			Id currentLinkId = locationIds.get(ii);
 			if (locationEnumerator.contains(currentLinkId)) {
-				int lastLinkIndex = locationEnumerator.indexOf(currentLinkId) + newStartIndex;
-				//				int lastLinkIndex = locationEnumerator.get(currentLinkId);
+				int lastLinkIndex = locationEnumerator.lastIndexOf(currentLinkId) + startIndex;
 				// two consecutive equal locations do NOT constitute a tour
 				if ((ii - lastLinkIndex) > 1) {
 					subtours.add(lastLinkIndex);
-					log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
-					this.extractSubtours((lastLinkIndex + 1), (ii - 1));
-					// this is probably wrong
-					for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
-						locationEnumerator.remove(lastLinkIndex - newStartIndex);
+					if (!locationEnumerator.get(lastLinkIndex + 1).equals(INVALID_ID)) {
+						log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
+						this.extractSubtours((lastLinkIndex + 1), (ii - 1));
+						for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
+							locationEnumerator.set(removeMe, INVALID_ID);
+						}
 					}
-					//locationEnumerator.clear();
-					newStartIndex = ii;
 				}
 			}
-//			locationEnumerator.put(currentLinkId, ii);
 			locationEnumerator.add(currentLinkId);
 			ii++;
 		}
