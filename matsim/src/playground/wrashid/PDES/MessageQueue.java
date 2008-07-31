@@ -15,8 +15,10 @@ public class MessageQueue {
 	// PriorityQueue is better for performance than PriorityBlockingQueue, but requires all methods of this class
 	// to be set synchronized
 	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>(10000);
+	private LinkedList<Message> messageBuffer=new LinkedList<Message>();
 	private volatile static int counter=0;
 	public volatile double arrivalTimeOfLastRemovedMessage=0;
+	private Object bufferLock=new Object();
 
 	synchronized public void putMessage(Message m) {
 		assert(!queue1.contains(m)):"inconsistency";
@@ -39,12 +41,17 @@ public class MessageQueue {
 
 	synchronized public void removeMessage(Message m) {
 		//assert(queue1.contains(m)):"inconsistency";
-		if (!queue1.contains(m)){
+		//if (!queue1.contains(m)){
 			// if the message (e.g. DeadlockPreventionMessage) has already been fetched, it should not be allowed
 			// to execute!!!
-			m.killMessage(); 
-		}
+		//	m.killMessage(); 
+		//}
 		
+		
+		// in case the message is in the buffer and not in the queue yet
+		synchronized(bufferLock){
+			messageBuffer.remove(m);
+		}
 		
 		
 		queue1.remove(m);
@@ -72,4 +79,17 @@ public class MessageQueue {
 		}
 	}
 
+	public void bufferMessage(Message m){
+		synchronized(bufferLock){
+			messageBuffer.add(m);
+		}
+	}
+	
+	public void emptyBuffer(){
+		synchronized(bufferLock){
+			while (!messageBuffer.isEmpty()){
+				queue1.add(messageBuffer.poll());
+			}
+		}
+	}
 }

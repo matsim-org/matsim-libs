@@ -22,15 +22,21 @@ public class Scheduler {
 	Lock lock=new ReentrantLock();
 	private volatile int noOfAliveThreads=0;
 	public MessageQueue[] threadMessageQueues=new MessageQueue[SimulationParameters.numberOfMessageExecutorThreads];
+	public MessageExecutor[] messageExecutors=new MessageExecutor[SimulationParameters.numberOfMessageExecutorThreads];
 	public CyclicBarrier barrier=new CyclicBarrier(SimulationParameters.numberOfMessageExecutorThreads);
 	volatile public boolean simulationTerminated=false;
 	// actually this is not the right one, because it could be, that the min outflow cap is on the same
 	// thread (adjacent links)
 	public double minInverseOutflowCapacity=Double.MAX_VALUE;
+	volatile public double timeOfNextBarrier=1;
 	
 	public void schedule(Message m){		
-		if (m.getMessageArrivalTime()>=simTime){	
-			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].putMessage(m);
+		if (m.getMessageArrivalTime()>=simTime){
+			if (timeOfNextBarrier>=m.messageArrivalTime){
+				threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].putMessage(m);
+			} else {
+				threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].bufferMessage(m);
+			}
 		} else {
 			System.out.println("WARNING: You tried to send a message in the past. Message discarded.");
 			//System.out.println("m.getMessageArrivalTime():"+m.getMessageArrivalTime());
@@ -115,6 +121,7 @@ public class Scheduler {
 		// create message executors and start them (precondition: all sim units need to be initialized at this point)
 		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
 			MessageExecutor me= new MessageExecutor (i);
+			messageExecutors[i-1]=me;
 			me.setDaemon(false);
 			me.setScheduler(this);
 			me.start();

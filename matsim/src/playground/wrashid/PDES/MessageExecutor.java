@@ -13,6 +13,7 @@ public class MessageExecutor extends Thread {
 	public Lock lock2=new ReentrantLock();
 	public Condition hasAcquiredLock=lock1.newCondition();
 	public Condition mayStart=lock2.newCondition();
+	
 
     private static ThreadLocal simTime = new ThreadLocal();
 
@@ -24,6 +25,7 @@ public class MessageExecutor extends Thread {
     	simTime.set(obj);
     }
 
+   
 
 	public MessageExecutor(Message message){
 		this.message=message;
@@ -44,11 +46,11 @@ public class MessageExecutor extends Thread {
 		
 		
 		double arrivalTimeOfLastProcessedMessage=0;
-		double timeOfNexBarrier=1;
+		
 		Message nullMessage=new NullMessage();
 		nullMessage.firstLock=nullMessage; // TODO: remove this nonsense (just needed for assertion problem)
 		
-		nullMessage.messageArrivalTime=timeOfNexBarrier;
+		nullMessage.messageArrivalTime=scheduler.timeOfNextBarrier;
 		scheduler.threadMessageQueues[id-1].putMessage(nullMessage);
 		try{
 			while (getSimTime()<SimulationParameters.maxSimulationLength){
@@ -98,9 +100,10 @@ public class MessageExecutor extends Thread {
 				//}
 				
 				
-				while (message==null){
-					message=scheduler.getNextMessage(id);
-				}
+				//while (message==null){
+					
+				//}
+				message=scheduler.getNextMessage(id);
 				if (scheduler.simulationTerminated){
 					break;
 				}
@@ -110,10 +113,13 @@ public class MessageExecutor extends Thread {
 				
 				
 				if (message==nullMessage){
+					if (id==1){
+						scheduler.timeOfNextBarrier+=1;
+					}
 					scheduler.barrier.await();
-					timeOfNexBarrier+=1;
-					nullMessage.messageArrivalTime=timeOfNexBarrier;
+					nullMessage.messageArrivalTime=scheduler.timeOfNextBarrier;
 					scheduler.threadMessageQueues[id-1].putMessage(nullMessage);
+					scheduler.threadMessageQueues[id-1].emptyBuffer();
 				} else {
 					executeMessage();
 				}
