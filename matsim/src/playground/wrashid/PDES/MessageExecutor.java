@@ -82,20 +82,26 @@ public class MessageExecutor extends Thread {
 				
 
 				while(((Road)message.receivingUnit).peekOfWaitingOnLock()!=message){
+					// instead of sleeping, it is better to do nothing, because the context switching makes suffer
+					// performance
+					/*
 					try {
-						Thread.currentThread().sleep(1);
+						Thread.currentThread().sleep(100);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					*/
 				}
 				while (!message.lock.tryLock()){
+					/*
 					try {
-						Thread.currentThread().sleep(1);
+						Thread.currentThread().sleep(100);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					*/
 				}
 				((Road)message.receivingUnit).pollWaitingOnLock();
 				
