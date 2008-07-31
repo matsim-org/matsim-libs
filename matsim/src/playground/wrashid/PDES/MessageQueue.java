@@ -47,6 +47,10 @@ public class MessageQueue {
 	synchronized public Message getNextMessage() {
 		counter++;
 
+		if (counter % 10000==0){
+			System.out.println("event:" + counter);
+		}
+		
 		
 		Message m = queue1.poll();
 		return m;
