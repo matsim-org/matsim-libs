@@ -60,12 +60,16 @@ public class MessageQueue {
 		
 		
 		Message m = queue1.poll();
-		arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
+		//arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 		return m;
 	}
 
 	synchronized public boolean isEmpty() {
-		return !queue1.isEmpty();
+		if (queue1.isEmpty() || queue1.peek() instanceof NullMessage){
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

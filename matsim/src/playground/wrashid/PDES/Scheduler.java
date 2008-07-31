@@ -3,6 +3,7 @@ package playground.wrashid.PDES;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
@@ -21,10 +22,11 @@ public class Scheduler {
 	Lock lock=new ReentrantLock();
 	private volatile int noOfAliveThreads=0;
 	public MessageQueue[] threadMessageQueues=new MessageQueue[SimulationParameters.numberOfMessageExecutorThreads];
-	
+	public CyclicBarrier barrier=new CyclicBarrier(SimulationParameters.numberOfMessageExecutorThreads);
+	volatile public boolean simulationTerminated=false;
 	// actually this is not the right one, because it could be, that the min outflow cap is on the same
 	// thread (adjacent links)
-	public double[] minInverseOutflowCapacities=new double[SimulationParameters.numberOfMessageExecutorThreads];
+	public double minInverseOutflowCapacity=Double.MAX_VALUE;
 	
 	public void schedule(Message m){		
 		if (m.getMessageArrivalTime()>=simTime){	
@@ -58,9 +60,24 @@ public class Scheduler {
 		
 		initializeSimulation();
 		
+		System.out.println("minInverseOutflowCapacity: "+minInverseOutflowCapacity);
+		
+		
 		try {
-			while (noOfAliveThreads>0){
-				Thread.currentThread().sleep(10000);
+			while (true){
+				boolean allEmpty=true;
+				for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
+					if (!threadMessageQueues[i-1].isEmpty()){
+						allEmpty=false;
+					}
+				}
+				if (!allEmpty){
+					Thread.currentThread().sleep(3000);
+				} else {
+					simulationTerminated=true;
+					Thread.currentThread().sleep(3000);
+					break;
+				}
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

@@ -44,6 +44,12 @@ public class MessageExecutor extends Thread {
 		
 		
 		double arrivalTimeOfLastProcessedMessage=0;
+		double timeOfNexBarrier=1;
+		Message nullMessage=new NullMessage();
+		nullMessage.firstLock=nullMessage; // TODO: remove this nonsense (just needed for assertion problem)
+		
+		nullMessage.messageArrivalTime=timeOfNexBarrier;
+		scheduler.threadMessageQueues[id-1].putMessage(nullMessage);
 		try{
 			while (getSimTime()<SimulationParameters.maxSimulationLength){
 				// this is needed, because for the same street the lock should happen before the next road can do the lock
@@ -75,23 +81,45 @@ public class MessageExecutor extends Thread {
 				// improve through await and increasing number of threads? 
 
 				message=null;
-					
 				
-				while(getLeastTimeOfNextMessageOfAllAdjacentProcessors()<arrivalTimeOfLastProcessedMessage-getMinOutflowCapacityOfAllAdjacentProcessors()){
+				
+				//while(getLeastTimeOfNextMessageOfAllAdjacentProcessors()<arrivalTimeOfLastProcessedMessage-getMinOutflowCapacityOfAllAdjacentProcessors()){
 				
 				//while(getLeastTimeOfNextMessageOfAllAdjacentProcessors()<arrivalTimeOfLastProcessedMessage-20){
 				
-				}
+				//}
 				
+				
+				
+				
+				
+				//while (message==null && !scheduler.simulationTerminated){
+				//	message=scheduler.getNextMessage(id);
+				//}
 				
 				
 				while (message==null){
 					message=scheduler.getNextMessage(id);
 				}
-
-				arrivalTimeOfLastProcessedMessage=message.messageArrivalTime;
+				if (scheduler.simulationTerminated){
+					break;
+				}
 				
-				executeMessage();
+				
+				
+				
+				
+				if (message==nullMessage){
+					scheduler.barrier.await();
+					timeOfNexBarrier+=1;
+					nullMessage.messageArrivalTime=timeOfNexBarrier;
+					scheduler.threadMessageQueues[id-1].putMessage(nullMessage);
+				} else {
+					executeMessage();
+				}
+					
+				
+				
 
 				/*
 				scheduler.lock.lock();
@@ -138,21 +166,6 @@ public class MessageExecutor extends Thread {
 		this.scheduler = scheduler;
 	}
 	
-	// TODO: implementation is not right
-	public double getLeastTimeOfNextMessageOfAllAdjacentProcessors(){
-		if (id == 1){
-			return scheduler.threadMessageQueues[1].arrivalTimeOfLastRemovedMessage;
-		} else {
-			return scheduler.threadMessageQueues[0].arrivalTimeOfLastRemovedMessage;
-		}
-	}
 	
-	public double getMinOutflowCapacityOfAllAdjacentProcessors(){
-		if (id == 1){
-			return scheduler.minInverseOutflowCapacities[1];
-		} else {
-			return scheduler.minInverseOutflowCapacities[0];
-		}
-	}
 
 }

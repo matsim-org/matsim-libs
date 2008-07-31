@@ -100,8 +100,8 @@ public class Road extends SimUnit {
 			//System.out.println("sdfa");
 		}
 		
-		if (scheduler.minInverseOutflowCapacities[belongsToMessageExecutorThreadId-1]>inverseOutFlowCapacity){
-			scheduler.minInverseOutflowCapacities[belongsToMessageExecutorThreadId-1]=inverseOutFlowCapacity;
+		if (scheduler.minInverseOutflowCapacity>inverseOutFlowCapacity){
+			scheduler.minInverseOutflowCapacity=inverseOutFlowCapacity;
 		}
 	}
 	
