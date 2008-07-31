@@ -42,6 +42,8 @@ public class MessageExecutor extends Thread {
 		// TODO: in order to improve this, we could leave out this check and instead make a try/catch
 		// This would also improve performance.
 		
+		
+		double arrivalTimeOfLastProcessedMessage=0;
 		try{
 			while (getSimTime()<SimulationParameters.maxSimulationLength){
 				// this is needed, because for the same street the lock should happen before the next road can do the lock
@@ -71,46 +73,25 @@ public class MessageExecutor extends Thread {
 				
 				 //Method, which should function, but does not...
 				// improve through await and increasing number of threads? 
-				synchronized (scheduler){
-					message=scheduler.queue.getNextMessage();
-					if (message==null){
-						break;
-					}
-					((Road)message.receivingUnit).addWaitingOnLock(message);
-				}
-				
-				
 
-				while(((Road)message.receivingUnit).peekOfWaitingOnLock()!=message){
-					// instead of sleeping, it is better to do nothing, because the context switching makes suffer
-					// performance
-					/*
-					try {
-						Thread.currentThread().sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					*/
-				}
-				while (!message.lock.tryLock()){
-					/*
-					try {
-						Thread.currentThread().sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					*/
-				}
-				((Road)message.receivingUnit).pollWaitingOnLock();
+				message=null;
+					
 				
+				while(getLeastTimeOfNextMessageOfAllAdjacentProcessors()<arrivalTimeOfLastProcessedMessage-getMinOutflowCapacityOfAllAdjacentProcessors()){
+				
+				//while(getLeastTimeOfNextMessageOfAllAdjacentProcessors()<arrivalTimeOfLastProcessedMessage-20){
+				
+				}
+				
+				
+				
+				while (message==null){
+					message=scheduler.getNextMessage(id);
+				}
+
+				arrivalTimeOfLastProcessedMessage=message.messageArrivalTime;
 				
 				executeMessage();
-				message.lock.unlock();
-				//System.out.println("unlocked"+id+" - "+message.lock);
-
-
 
 				/*
 				scheduler.lock.lock();
@@ -155,6 +136,23 @@ public class MessageExecutor extends Thread {
 
 	public void setScheduler(Scheduler scheduler) {
 		this.scheduler = scheduler;
+	}
+	
+	// TODO: implementation is not right
+	public double getLeastTimeOfNextMessageOfAllAdjacentProcessors(){
+		if (id == 1){
+			return scheduler.threadMessageQueues[1].arrivalTimeOfLastRemovedMessage;
+		} else {
+			return scheduler.threadMessageQueues[0].arrivalTimeOfLastRemovedMessage;
+		}
+	}
+	
+	public double getMinOutflowCapacityOfAllAdjacentProcessors(){
+		if (id == 1){
+			return scheduler.minInverseOutflowCapacities[1];
+		} else {
+			return scheduler.minInverseOutflowCapacities[0];
+		}
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,7 +20,7 @@ import org.matsim.plans.Plan;
 
 
 public class Road extends SimUnit {
-
+	private int belongsToMessageExecutorThreadId=0;
 	public static HashMap<String, Road> allRoads;
 	private Link link;
 	private LinkedList<Double> gap; // see enterRequest for a detailed
@@ -65,6 +66,7 @@ public class Road extends SimUnit {
 	public Road(Scheduler scheduler, Link link) {
 		super(scheduler);
 		this.link = link;
+		belongsToMessageExecutorThreadId = new Random().nextInt(SimulationParameters.numberOfMessageExecutorThreads)+1;
 
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)
@@ -96,6 +98,10 @@ public class Road extends SimUnit {
 
 		if (link.getId().toString().equalsIgnoreCase("110915")) {
 			//System.out.println("sdfa");
+		}
+		
+		if (scheduler.minInverseOutflowCapacities[belongsToMessageExecutorThreadId-1]>inverseOutFlowCapacity){
+			scheduler.minInverseOutflowCapacities[belongsToMessageExecutorThreadId-1]=inverseOutFlowCapacity;
 		}
 	}
 	
@@ -408,5 +414,15 @@ public class Road extends SimUnit {
 	synchronized public void addWaitingOnLock(Message m){
 		waitingOnLock.add(m);
 	}
+
+
+
+	public int getBelongsToMessageExecutorThreadId() {
+		return belongsToMessageExecutorThreadId;
+	}
+
+
+
+
 	
 }

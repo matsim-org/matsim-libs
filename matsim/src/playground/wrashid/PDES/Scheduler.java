@@ -20,10 +20,15 @@ public class Scheduler {
 	Timer timer=new Timer();
 	Lock lock=new ReentrantLock();
 	private volatile int noOfAliveThreads=0;
+	public MessageQueue[] threadMessageQueues=new MessageQueue[SimulationParameters.numberOfMessageExecutorThreads];
+	
+	// actually this is not the right one, because it could be, that the min outflow cap is on the same
+	// thread (adjacent links)
+	public double[] minInverseOutflowCapacities=new double[SimulationParameters.numberOfMessageExecutorThreads];
 	
 	public void schedule(Message m){		
 		if (m.getMessageArrivalTime()>=simTime){	
-			queue.putMessage(m);
+			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].putMessage(m);
 		} else {
 			System.out.println("WARNING: You tried to send a message in the past. Message discarded.");
 			//System.out.println("m.getMessageArrivalTime():"+m.getMessageArrivalTime());
@@ -32,10 +37,17 @@ public class Scheduler {
 			assert(false); // for backtracing, where a wrong message has been scheduled
 		}
 		
+		
+		
+		
 	}
 	
 	public void unschedule(Message m){
-		queue.removeMessage(m);
+		threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].removeMessage(m);
+	}
+	
+	public Message getNextMessage(int threadId){
+		return threadMessageQueues[threadId-1].getNextMessage();
 	}
 	
 	
@@ -67,7 +79,10 @@ public class Scheduler {
 	// exist at the beginning of the simulation
 	public void initializeSimulation(){
 		
-		
+		// initialize MessageQueue array
+		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
+			threadMessageQueues[i-1]=new MessageQueue();
+		}
 		
 		
 		Object[] objects=simUnits.toArray();
@@ -79,7 +94,8 @@ public class Scheduler {
 		}
 		
 		
-		// create message executors and start them
+		
+		// create message executors and start them (precondition: all sim units need to be initialized at this point)
 		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
 			MessageExecutor me= new MessageExecutor (i);
 			me.setDaemon(false);
@@ -87,6 +103,10 @@ public class Scheduler {
 			me.start();
 		}
 		noOfAliveThreads=SimulationParameters.numberOfMessageExecutorThreads;
+		
+		
+		
+		
 	}
 
 

@@ -16,6 +16,7 @@ public class MessageQueue {
 	// to be set synchronized
 	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>(10000);
 	private volatile static int counter=0;
+	public volatile double arrivalTimeOfLastRemovedMessage=0;
 
 	synchronized public void putMessage(Message m) {
 		assert(!queue1.contains(m)):"inconsistency";
@@ -26,6 +27,9 @@ public class MessageQueue {
 	}
 	
 	
+	synchronized public double getArrivalTimeOfNextMessage(){
+		return queue1.peek().messageArrivalTime;
+	}
 	
 
 	public static int getCounter() {
@@ -41,6 +45,8 @@ public class MessageQueue {
 			m.killMessage(); 
 		}
 		
+		
+		
 		queue1.remove(m);
 	}
 
@@ -52,7 +58,9 @@ public class MessageQueue {
 		//}
 		
 		
+		
 		Message m = queue1.poll();
+		arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 		return m;
 	}
 
