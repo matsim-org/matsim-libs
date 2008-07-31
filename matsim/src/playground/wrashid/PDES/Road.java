@@ -150,6 +150,7 @@ public class Road extends SimUnit {
 				System.out.println("road:"+link.getId()+  " - " + this + "  -  " + "vehicle " + nextVehicle.getOwnerPerson().getId() + " - " + lock);
 			}
 
+			
 			scheduler.unschedule(m);
 			
 			double nextAvailableTimeForEnteringStreet = Math.max(

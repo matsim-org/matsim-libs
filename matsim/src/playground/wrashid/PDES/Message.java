@@ -15,6 +15,7 @@ public abstract class Message implements Comparable {
 	public Object firstLock=null;
 	public Object secondLock=null;
 	public Lock lock=null;
+	private volatile boolean isAlive=true;
 	//public FairLock lock=null;
 	
 	// all inheriting or extending modules must
@@ -48,6 +49,18 @@ public abstract class Message implements Comparable {
 	synchronized public static long getMessageCounterAndIncrement() {
 		messageCounter++;
 		return messageCounter-1;
+	}
+	
+	public void killMessage(){
+		isAlive=false;
+	}
+	
+	public void reviveMessage(){
+		isAlive=true;
+	}
+	
+	public boolean isAlive(){
+		return isAlive;
 	}
 
 }

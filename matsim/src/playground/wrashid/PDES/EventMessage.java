@@ -33,7 +33,9 @@ public abstract class EventMessage extends SelfhandleMessage {
 		this.scheduler=scheduler;
 		this.vehicle=vehicle;
 		messageId=getMessageCounterAndIncrement();
+		reviveMessage();
 	}
+	
 	
 
 }

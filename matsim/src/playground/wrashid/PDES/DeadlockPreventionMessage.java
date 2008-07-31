@@ -1,20 +1,21 @@
 package playground.wrashid.PDES;
 
 public class DeadlockPreventionMessage extends EventMessage {
-
+	
 	@Override
 	// let enter the car into the road immediatly
 	public void selfhandleMessage() {
-		
-		Road road=(Road)this.receivingUnit;
-		
-		road.incrementPromisedToEnterRoad(); // this will be decremented in enter road
-		road.setTimeOfLastEnteringVehicle(MessageExecutor.getSimTime());
-		road.removeDeadlockPreventionMessage(this);
-		//road.removeFromInterestedInEnteringRoad(vehicle);
-		
-		vehicle.scheduleEnterRoadMessage(MessageExecutor.getSimTime(), road);
-		//System.out.println("Deadlock prevention happend");
+		if (isAlive()){
+			Road road=(Road)this.receivingUnit;
+			
+			road.incrementPromisedToEnterRoad(); // this will be decremented in enter road
+			road.setTimeOfLastEnteringVehicle(MessageExecutor.getSimTime());
+			road.removeDeadlockPreventionMessage(this);
+			//road.removeFromInterestedInEnteringRoad(vehicle);
+			
+			vehicle.scheduleEnterRoadMessage(MessageExecutor.getSimTime(), road);
+			//System.out.println("Deadlock prevention happend");
+		}
 	}
 
 	@Override
@@ -33,4 +34,7 @@ public class DeadlockPreventionMessage extends EventMessage {
 		// don't do anything
 	}
 
+	
+	
+	
 }
