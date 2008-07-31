@@ -116,6 +116,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 				}
 			}
 			testee.run(plan);
+			testee.printSubtours();
 			Integer expectedNumSubtours = versuchskaninchen.get(linkString);
 			int actualNumSubtours = testee.getNumSubtours();
 			assertEquals(expectedNumSubtours.intValue(), actualNumSubtours);

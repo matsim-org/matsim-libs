@@ -49,7 +49,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithmI {
 	/**
 	 * Maps leg numbers to subtour ids.
 	 */
-	private HashSet<Integer> subtours = null;
+	private TreeSet<Integer> subtours = null;
 
 	private ArrayList<Id> locationIds = null;
 
@@ -76,19 +76,17 @@ public class PlanAnalyzeSubtours implements PlanAlgorithmI {
 			}
 		}
 
-		this.subtours = new HashSet<Integer>();
+		this.subtours = new TreeSet<Integer>();
 
 		this.extractSubtours(0, locationIds.size() - 1);
-
-		this.printSubtours();
 
 	}
 
 	protected void extractSubtours(final int startIndex, final int endIndex) {
 
-		log.info("startIndex: " + startIndex);
-		log.info("endIndex: " + endIndex);
-
+//		log.info("startIndex: " + startIndex);
+//		log.info("endIndex: " + endIndex);
+//
 		ArrayList<Id> locationEnumerator = new ArrayList<Id>();
 
 		int ii = startIndex;
@@ -100,7 +98,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithmI {
 				if ((ii - lastLinkIndex) > 1) {
 					subtours.add(lastLinkIndex);
 					if (!locationEnumerator.get(lastLinkIndex + 1).equals(INVALID_ID)) {
-						log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
+//						log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
 						this.extractSubtours((lastLinkIndex + 1), (ii - 1));
 						for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
 							locationEnumerator.set(removeMe, INVALID_ID);
@@ -115,9 +113,17 @@ public class PlanAnalyzeSubtours implements PlanAlgorithmI {
 	}
 
 	protected void printSubtours() {
+		
+		String str = "Subtours start at activities # ";
+		
 		for (Integer startLinkIndex : subtours) {
-			System.out.println(startLinkIndex);
+
+			str = str.concat(startLinkIndex.toString()).concat(" "); 
+			
 		}
+		
+		log.info(str);
+		
 	}
 
 }
