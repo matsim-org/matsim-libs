@@ -40,7 +40,7 @@ public class LeaveRoadMessage extends EventMessage {
 		}
 		
 		//SimulationParameters.events.processEvent(event);
-		SimulationParameters.processEvent(event);
+		//SimulationParameters.processEvent(event);
 	}
 	
 }
