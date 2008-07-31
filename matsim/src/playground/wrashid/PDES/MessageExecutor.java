@@ -130,6 +130,7 @@ public class MessageExecutor extends Thread {
 		
 		scheduler.timer.endTimer();
 		scheduler.timer.printMeasuredTime("ThreadId-"+id + ": ");
+		scheduler.decrementNoOfAliveThreads();
 	}
 
 	private void executeMessage(){

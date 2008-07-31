@@ -19,6 +19,7 @@ public class Scheduler {
 	LinkedList<SimUnit> simUnits=new LinkedList<SimUnit>();
 	Timer timer=new Timer();
 	Lock lock=new ReentrantLock();
+	private volatile int noOfAliveThreads=0;
 	
 	public void schedule(Message m){		
 		if (m.getMessageArrivalTime()>=simTime){	
@@ -46,7 +47,9 @@ public class Scheduler {
 		initializeSimulation();
 		
 		try {
-			Thread.currentThread().sleep(150000);
+			while (noOfAliveThreads>0){
+				Thread.currentThread().sleep(10000);
+			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -77,12 +80,13 @@ public class Scheduler {
 		
 		
 		// create message executors and start them
-		for (int i=1;i<Runtime.getRuntime().availableProcessors()*5;i++){
+		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads;i++){
 			MessageExecutor me= new MessageExecutor (i);
 			me.setDaemon(false);
 			me.setScheduler(this);
 			me.start();
 		}
+		noOfAliveThreads=SimulationParameters.numberOfMessageExecutorThreads-1;
 	}
 
 
@@ -93,6 +97,10 @@ public class Scheduler {
 
 	public void unregister(SimUnit unit) {
 		simUnits.remove(unit.unitNo);
+	}
+	
+	synchronized void decrementNoOfAliveThreads(){
+		noOfAliveThreads--;
 	}
 	
 }
