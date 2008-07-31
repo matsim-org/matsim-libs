@@ -76,12 +76,12 @@ public class MessageExecutor extends Thread {
 					if (message==null){
 						break;
 					}
-					((Road)message.receivingUnit).waitingOnLock.add(message);
+					((Road)message.receivingUnit).addWaitingOnLock(message);
 				}
 				
 				
 
-				while(((Road)message.receivingUnit).waitingOnLock.peek()!=message){
+				while(((Road)message.receivingUnit).peekOfWaitingOnLock()!=message){
 					try {
 						Thread.currentThread().sleep(1);
 					} catch (InterruptedException e) {
@@ -97,7 +97,7 @@ public class MessageExecutor extends Thread {
 						e.printStackTrace();
 					}
 				}
-				((Road)message.receivingUnit).waitingOnLock.poll();
+				((Road)message.receivingUnit).pollWaitingOnLock();
 				
 				
 				executeMessage();

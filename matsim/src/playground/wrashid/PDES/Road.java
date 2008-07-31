@@ -56,7 +56,8 @@ public class Road extends SimUnit {
 	private PriorityQueue<DeadlockPreventionMessage> testDeadlockPreventionMessages= new PriorityQueue<DeadlockPreventionMessage>();
 	
 	Lock lock=new ReentrantLock();
-	public ConcurrentLinkedQueue<Message> waitingOnLock=new ConcurrentLinkedQueue<Message>();
+	//public ConcurrentLinkedQueue<Message> waitingOnLock=new ConcurrentLinkedQueue<Message>();
+	private LinkedList<Message> waitingOnLock=new LinkedList<Message>();
 	//FairLock lock=new FairLock();
 	
 	// private double oldestUnusedGapTime=Double.MIN_VALUE;
@@ -396,4 +397,16 @@ public class Road extends SimUnit {
 	}
 	*/
 
+	synchronized public Message peekOfWaitingOnLock(){
+		return waitingOnLock.peek();
+	}
+	
+	synchronized public Message pollWaitingOnLock(){
+		return waitingOnLock.poll();
+	}
+	
+	synchronized public void addWaitingOnLock(Message m){
+		waitingOnLock.add(m);
+	}
+	
 }
