@@ -21,8 +21,6 @@
 package org.matsim.plans.algorithms;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -84,9 +82,9 @@ public class PlanAnalyzeSubtours implements PlanAlgorithmI {
 
 	protected void extractSubtours(final int startIndex, final int endIndex) {
 
-//		log.info("startIndex: " + startIndex);
-//		log.info("endIndex: " + endIndex);
-//
+		log.info("startIndex: " + startIndex);
+		log.info("endIndex: " + endIndex);
+
 		ArrayList<Id> locationEnumerator = new ArrayList<Id>();
 
 		int ii = startIndex;
@@ -98,11 +96,11 @@ public class PlanAnalyzeSubtours implements PlanAlgorithmI {
 				if ((ii - lastLinkIndex) > 1) {
 					subtours.add(lastLinkIndex);
 					if (!locationEnumerator.get(lastLinkIndex + 1).equals(INVALID_ID)) {
-//						log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
+						log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
 						this.extractSubtours((lastLinkIndex + 1), (ii - 1));
-						for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
-							locationEnumerator.set(removeMe, INVALID_ID);
-						}
+					}
+					for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
+						locationEnumerator.set(removeMe, INVALID_ID);
 					}
 				}
 			}
