@@ -20,8 +20,7 @@ public abstract class Message implements Comparable {
 	// all inheriting or extending modules must
 	// invoke this Constructer first
 	public Message() {
-		messageId=messageCounter;
-		messageCounter++;
+		messageId=getMessageCounterAndIncrement();
 	}
 	
 	public double getMessageArrivalTime() {
@@ -44,6 +43,11 @@ public abstract class Message implements Comparable {
 		} else {
 			return (int)(messageId-otherMessage.messageId);
 		}
+	}
+
+	synchronized public static long getMessageCounterAndIncrement() {
+		messageCounter++;
+		return messageCounter-1;
 	}
 
 }

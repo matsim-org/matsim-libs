@@ -15,8 +15,10 @@ public class MessageQueue {
 	private volatile static int counter=0;
 
 	synchronized void putMessage(Message m) {
+		assert(!queue1.contains(m)):"inconsistency";
 		assert(m.firstLock!=null);
 		queue1.add(m);
+		assert(queue1.contains(m)):"inconsistency";
 	}
 	
 	
@@ -28,6 +30,7 @@ public class MessageQueue {
 
 
 	synchronized void removeMessage(Message m) {
+		assert(queue1.contains(m)):"inconsistency";
 		queue1.remove(m);
 	}
 

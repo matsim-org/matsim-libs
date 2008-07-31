@@ -158,7 +158,7 @@ public class Vehicle extends SimUnit {
 	// }
 
 	public void scheduleEnterRoadMessage(double scheduleTime, Road road) {
-		// before entering the new road, we musst leave the previous road (if there is a previous road)
+		// before entering the new road, we must leave the previous road (if there is a previous road)
 		if (this.getLinkIndex()>=0){
 			// the first link does not need to be left (which has index -1)
 			scheduleLeavePreviousRoadMessage(scheduleTime);

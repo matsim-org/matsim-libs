@@ -53,6 +53,7 @@ public class Road extends SimUnit {
 
 	
 	private LinkedList<DeadlockPreventionMessage> deadlockPreventionMessages= new LinkedList<DeadlockPreventionMessage>();
+	private PriorityQueue<DeadlockPreventionMessage> testDeadlockPreventionMessages= new PriorityQueue<DeadlockPreventionMessage>();
 	
 	Lock lock=new ReentrantLock();
 	public ConcurrentLinkedQueue<Message> waitingOnLock=new ConcurrentLinkedQueue<Message>();
@@ -122,6 +123,8 @@ public class Road extends SimUnit {
 		
 		assert(carsOnTheRoad.getFirst()==vehicle):"road:"+link.getId()+  " - " + this + " - " + lock; // TODO: uncomment this, and find out, why it produces a problem with test6
 	 	
+		
+		
 		carsOnTheRoad.removeFirst();
 		earliestDepartureTimeOfCar.removeFirst();
 		timeOfLastLeavingVehicle = MessageExecutor.getSimTime();
@@ -134,12 +137,15 @@ public class Road extends SimUnit {
 		// time for entering the road
 		if (deadlockPreventionMessages.size() > 0) {
 			
+			assert(deadlockPreventionMessages.getFirst()==testDeadlockPreventionMessages.peek()):"inconsistency";
+			assert(deadlockPreventionMessages.size()==testDeadlockPreventionMessages.size()):"inconsistency";
+			
 			DeadlockPreventionMessage m=null;
 			Vehicle nextVehicle=null;
 			try{
 				m=deadlockPreventionMessages.poll();
+				testDeadlockPreventionMessages.poll();
 				nextVehicle = m.vehicle;
-				assert(m.vehicle==nextVehicle);
 			} catch (Exception e){
 				System.out.println("road:"+link.getId()+  " - " + this + "  -  " + "vehicle " + nextVehicle.getOwnerPerson().getId() + " - " + lock);
 			}
@@ -307,17 +313,28 @@ public class Road extends SimUnit {
 
 			//interestedInEnteringRoad.add(vehicle);
 			
+			DeadlockPreventionMessage dpm=null;
+			
 			// the first car interested in entering a road has to wait 'stuckTime'
 			// the car behind has to wait an additional stuckTime (this logic was introduced to adhere the C++ implementation)
 			if (deadlockPreventionMessages.size()>0){
+				assert(deadlockPreventionMessages. getLast().messageArrivalTime +SimulationParameters.stuckTime>=MessageExecutor.getSimTime());
 				//if (deadlockPreventionMessages. getLast().messageArrivalTime +SimulationParameters.stuckTime<MessageExecutor.getSimTime()){
 				//	System.out.println();	
 				//}
-				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(deadlockPreventionMessages.getLast().messageArrivalTime +SimulationParameters.stuckTime, this));
+				dpm=vehicle.scheduleDeadlockPreventionMessage(deadlockPreventionMessages.getLast().messageArrivalTime +SimulationParameters.stuckTime, this);
+				deadlockPreventionMessages.add(dpm);
+				testDeadlockPreventionMessages.add(dpm);
 				
 			} else {
-				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(MessageExecutor.getSimTime()+SimulationParameters.stuckTime, this));
+				dpm=vehicle.scheduleDeadlockPreventionMessage(MessageExecutor.getSimTime()+SimulationParameters.stuckTime, this);
+				deadlockPreventionMessages.add(dpm);
+				testDeadlockPreventionMessages.add(dpm);
 			}
+			assert(deadlockPreventionMessages.getFirst()==testDeadlockPreventionMessages.peek()):"inconsistency";
+			assert(deadlockPreventionMessages.size()==testDeadlockPreventionMessages.size()):"inconsistency";
+			assert(testDeadlockPreventionMessages.contains(dpm)):"inconsistency";
+			assert(deadlockPreventionMessages.contains(dpm)):"inconsistency";
 			
 		}
 	}
@@ -347,18 +364,22 @@ public class Road extends SimUnit {
 		// TODO: current problem: two different messages (sent by different vehicles)
 		// we are sure, that no one removed this message using this method, but rather some different
 		// place in the code...
-		if (deadlockPreventionMessages.peek()!=dpMessage){
-			DeadlockPreventionMessage dpm=deadlockPreventionMessages.peek();
-			System.out.println();
-		}
+		//if (deadlockPreventionMessages.peek()!=dpMessage){
+		//	DeadlockPreventionMessage dpm=deadlockPreventionMessages.peek();
+		//	System.out.println();
+		//}
 		
 		// TODO: uncomment assertion again, because this indicates, that there is some out of sync behaviour!!!!!!!!!!
 		// Answer: if we use a PriorityQueue instead, the problem would be solved, but the implementation gets harder, because we
 		// need the last element (that function is not available with PriorityQueue)
 		//assert(deadlockPreventionMessages.peek()==dpMessage):"Inconsitency in logic!!! => this should only be invoked from the handler of this message";
+		assert(testDeadlockPreventionMessages.contains(dpMessage)):"inconsistency";
+		assert(deadlockPreventionMessages.contains(dpMessage)):"Something is really wrong here";
+		
 		
 		//deadlockPreventionMessages.removeFirst();
 		// the code line above was replaced, because of time causality, there could be a problem
+		testDeadlockPreventionMessages.remove(dpMessage);
 		deadlockPreventionMessages.remove(dpMessage);
 	}
 	
