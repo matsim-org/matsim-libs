@@ -80,13 +80,13 @@ public class Scheduler {
 		
 		
 		// create message executors and start them
-		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads;i++){
+		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
 			MessageExecutor me= new MessageExecutor (i);
 			me.setDaemon(false);
 			me.setScheduler(this);
 			me.start();
 		}
-		noOfAliveThreads=SimulationParameters.numberOfMessageExecutorThreads-1;
+		noOfAliveThreads=SimulationParameters.numberOfMessageExecutorThreads;
 	}
 
 
