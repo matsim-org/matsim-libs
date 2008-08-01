@@ -85,7 +85,9 @@ public class Scheduler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println("XMedian:"+SimulationParameters.sumXCoordinate/SimulationParameters.noOfCars);
 	}
+	
 	
 	
 	public void register(SimUnit su){

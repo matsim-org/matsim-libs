@@ -67,7 +67,13 @@ public class Road extends SimUnit {
 		super(scheduler);
 		this.link = link;
 		belongsToMessageExecutorThreadId = new Random().nextInt(SimulationParameters.numberOfMessageExecutorThreads)+1;
-
+		/*
+		if (getXCoordinate()>680237){
+			belongsToMessageExecutorThreadId = 1;
+		} else {
+			belongsToMessageExecutorThreadId = 2;
+		}
+		*/
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)
 				* SimulationParameters.storageCapacityFactor
@@ -254,7 +260,13 @@ public class Road extends SimUnit {
 	// by the vehicle
 	public void enterRequest(Vehicle vehicle) {
 		double nextAvailableTimeForEnteringStreet = Double.MIN_VALUE;
-
+		
+		// attention: do not use in multi thread solution (might return false result)
+		SimulationParameters.sumXCoordinate+=getXCoordinate();
+		SimulationParameters.noOfCars++;
+		
+		
+		
 		// assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are
 		// more cars on the road, than its capacity!";
 		// This assert has been commented out for deadlock prevention:
@@ -430,7 +442,9 @@ public class Road extends SimUnit {
 	}
 
 
-
+	public double getXCoordinate(){
+		return (link.getFromNode().getCoord().getX()+link.getToNode().getCoord().getX())/2;
+	}
 
 	
 }
