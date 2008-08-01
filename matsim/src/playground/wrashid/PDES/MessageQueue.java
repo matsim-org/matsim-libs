@@ -47,14 +47,9 @@ public class MessageQueue {
 		//	m.killMessage(); 
 		//}
 		
+
 		
-		// in case the message is in the buffer and not in the queue yet
-		synchronized(deleteBuffer){
-			deleteBuffer.add(m);
-		}
-		
-		
-		//queue1.remove(m);
+		queue1.remove(m);
 	}
 
 	synchronized public Message getNextMessage() {
@@ -64,8 +59,8 @@ public class MessageQueue {
 		//	System.out.println("event:" + counter);
 		//}
 		
-		emptyBuffers();
 		
+		emptyBuffers();
 		Message m = queue1.poll();
 		//arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 		return m;
@@ -79,7 +74,7 @@ public class MessageQueue {
 		}
 	}
 
-	public void bufferMessage(Message m){
+	public void addBuffer(Message m){
 		synchronized(addBuffer){
 			addBuffer.add(m);
 		}
@@ -92,14 +87,18 @@ public class MessageQueue {
 	}
 	
 	public void emptyBuffers(){
-		synchronized(addBuffer){
-			while (!addBuffer.isEmpty()){
-				queue1.add(addBuffer.poll());
+		if (!addBuffer.isEmpty()){
+			synchronized(addBuffer){
+				while (!addBuffer.isEmpty()){
+					queue1.add(addBuffer.poll());
+				}
 			}
 		}
-		synchronized(deleteBuffer){
-			while (!deleteBuffer.isEmpty()){
-				queue1.remove(deleteBuffer.poll());
+		if (!deleteBuffer.isEmpty()){
+			synchronized(deleteBuffer){
+				while (!deleteBuffer.isEmpty()){
+					queue1.remove(deleteBuffer.poll());
+				}
 			}
 		}
 	}

@@ -38,22 +38,19 @@ public class Scheduler {
 			// of the buffer
 			// ERRRRRROR: It produces also an error for large +xy. => find out why
 			// the error will disappear, if we do not use the buffer. Find out why...
-			if (timeOfNextBarrier>=m.messageArrivalTime){
-				threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].putMessage(m);
-			} else {
-				threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].bufferMessage(m);
-			}
+			//if (timeOfNextBarrier>=m.messageArrivalTime){
+			//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].putMessage(m);
+			//} else {
+				threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m);
+			//}
 	}
 	
 	public void unschedule(Message m){
-		threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].removeMessage(m);
-	
-		if (timeOfNextBarrier>=m.messageArrivalTime){
-			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].removeMessage(m);
-		} else {
+		//if (timeOfNextBarrier>=m.messageArrivalTime){
+		//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].removeMessage(m);
+		//} else {
 			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].deleteBuffer(m);
-		}
-	
+		//}
 	}
 	
 	public Message getNextMessage(int threadId){

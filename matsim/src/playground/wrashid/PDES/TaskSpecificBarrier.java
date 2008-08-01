@@ -25,7 +25,7 @@ public class TaskSpecificBarrier extends CyclicBarrier {
 	
 	public void useCPUCycles(int threadId) {
 		if (threadId!=-1){
-			//scheduler.threadMessageQueues[threadId-1].emptyBuffers();
+			scheduler.threadMessageQueues[threadId-1].emptyBuffers();
 		}
 	}
 	
