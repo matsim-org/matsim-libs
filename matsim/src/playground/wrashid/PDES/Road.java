@@ -66,7 +66,9 @@ public class Road extends SimUnit {
 	public Road(Scheduler scheduler, Link link) {
 		super(scheduler);
 		this.link = link;
+		// random cut
 		belongsToMessageExecutorThreadId = new Random().nextInt(SimulationParameters.numberOfMessageExecutorThreads)+1;
+		
 		/*
 		 // two processor cut
 		if (getXCoordinate()>680237){
