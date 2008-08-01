@@ -67,7 +67,7 @@ public class Road extends SimUnit {
 		super(scheduler);
 		this.link = link;
 		// random cut
-		belongsToMessageExecutorThreadId = new Random().nextInt(SimulationParameters.numberOfMessageExecutorThreads)+1;
+		//belongsToMessageExecutorThreadId = new Random().nextInt(SimulationParameters.numberOfMessageExecutorThreads)+1;
 		
 		/*
 		 // two processor cut
@@ -77,7 +77,7 @@ public class Road extends SimUnit {
 			belongsToMessageExecutorThreadId = 2;
 		}
 		*/
-		/*
+		
 		// 4 processor cut
 		if (getXCoordinate()>=695638){
 			belongsToMessageExecutorThreadId = 1;
@@ -88,7 +88,7 @@ public class Road extends SimUnit {
 		} else if (getXCoordinate()>=680237 && getXCoordinate()<695638){
 			belongsToMessageExecutorThreadId = 4;
 		}
-		*/
+		
 		
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)
