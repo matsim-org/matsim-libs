@@ -75,6 +75,7 @@ public class Road extends SimUnit {
 			belongsToMessageExecutorThreadId = 2;
 		}
 		*/
+		/*
 		// 4 processor cut
 		if (getXCoordinate()>=695638){
 			belongsToMessageExecutorThreadId = 1;
@@ -85,7 +86,7 @@ public class Road extends SimUnit {
 		} else if (getXCoordinate()>=680237 && getXCoordinate()<695638){
 			belongsToMessageExecutorThreadId = 4;
 		}
-		
+		*/
 		
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)
