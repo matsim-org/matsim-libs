@@ -68,12 +68,25 @@ public class Road extends SimUnit {
 		this.link = link;
 		belongsToMessageExecutorThreadId = new Random().nextInt(SimulationParameters.numberOfMessageExecutorThreads)+1;
 		/*
+		 // two processor cut
 		if (getXCoordinate()>680237){
 			belongsToMessageExecutorThreadId = 1;
 		} else {
 			belongsToMessageExecutorThreadId = 2;
 		}
 		*/
+		// 4 processor cut
+		if (getXCoordinate()>=695638){
+			belongsToMessageExecutorThreadId = 1;
+		} else if (getXCoordinate()<=651666) {
+			belongsToMessageExecutorThreadId = 2;
+		} else if (getXCoordinate()>651666 && getXCoordinate()<680237){
+			belongsToMessageExecutorThreadId = 3;
+		} else if (getXCoordinate()>=680237 && getXCoordinate()<695638){
+			belongsToMessageExecutorThreadId = 4;
+		}
+		
+		
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)
 				* SimulationParameters.storageCapacityFactor
@@ -264,6 +277,14 @@ public class Road extends SimUnit {
 		// attention: do not use in multi thread solution (might return false result)
 		SimulationParameters.sumXCoordinate+=getXCoordinate();
 		SimulationParameters.noOfCars++;
+		
+		if (getXCoordinate()>680237){
+			SimulationParameters.sumXCoordinateRight+=getXCoordinate();
+			SimulationParameters.noOfCarsRight++;
+		} else {
+			SimulationParameters.sumXCoordinateLeft+=getXCoordinate();
+			SimulationParameters.noOfCarsLeft++;
+		}
 		
 		
 		

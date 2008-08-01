@@ -48,13 +48,17 @@ public class SimulationParameters {
 	public static final int maxQueueLength=10000;
 	// optimal: numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()
 	//public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
-	public static final int numberOfMessageExecutorThreads=15;
+	public static final int numberOfMessageExecutorThreads=4;
 	
 	synchronized public static void processEvent(BasicEvent event){
 		SimulationParameters.events.processEvent(event);
 	}
 	
 	public static double sumXCoordinate=0;
+	public static double sumXCoordinateLeft=0;
+	public static double sumXCoordinateRight=0;
+	public static double noOfCarsLeft=0;
+	public static double noOfCarsRight=0;
 	public static double noOfCars=0;
 	
 }

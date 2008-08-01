@@ -86,6 +86,8 @@ public class Scheduler {
 			e.printStackTrace();
 		}
 		System.out.println("XMedian:"+SimulationParameters.sumXCoordinate/SimulationParameters.noOfCars);
+		System.out.println("XMedianLeft:"+SimulationParameters.sumXCoordinateLeft/SimulationParameters.noOfCarsLeft);
+		System.out.println("XMedianRight:"+SimulationParameters.sumXCoordinateRight/SimulationParameters.noOfCarsRight);
 	}
 	
 	
