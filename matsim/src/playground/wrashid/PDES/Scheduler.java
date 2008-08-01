@@ -41,16 +41,22 @@ public class Scheduler {
 			//if (timeOfNextBarrier>=m.messageArrivalTime){
 			//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].putMessage(m);
 			//} else {
-				threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m);
+			//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m);
 			//}
+		if (Thread.currentThread() instanceof MessageExecutor){
+			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m, MessageExecutor.getThreadId());
+		} else {
+			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m,1);
+		}
 	}
 	
 	public void unschedule(Message m){
 		//if (timeOfNextBarrier>=m.messageArrivalTime){
 		//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].removeMessage(m);
 		//} else {
-			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].deleteBuffer(m);
+		//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].deleteBuffer(m);
 		//}
+		threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].deleteBuffer(m,MessageExecutor.getThreadId());
 	}
 	
 	public Message getNextMessage(int threadId){

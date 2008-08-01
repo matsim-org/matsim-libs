@@ -20,7 +20,9 @@ public class MessageQueue {
 	private volatile static int counter=0;
 	public volatile double arrivalTimeOfLastRemovedMessage=0;
 	private Object bufferLock=new Object();
-
+	private LinkedList<Message>[] addMessageBuffer=new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
+	private LinkedList<Message>[] deleteMessageBuffer=new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
+	
 	synchronized public void putMessage(Message m) {
 		assert(!queue1.contains(m)):"inconsistency";
 		assert(m.firstLock!=null);
@@ -29,6 +31,12 @@ public class MessageQueue {
 		// This assertion was removed, because of concurrent access this might be violated
 	}
 	
+	public MessageQueue(){
+		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
+			addMessageBuffer[i-1]=new LinkedList<Message>();
+			deleteMessageBuffer[i-1]=new LinkedList<Message>();
+		}
+	}
 	
 	synchronized public double getArrivalTimeOfNextMessage(){
 		return queue1.peek().messageArrivalTime;
@@ -60,7 +68,6 @@ public class MessageQueue {
 		//}
 		
 		
-		emptyBuffers();
 		Message m = queue1.poll();
 		//arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 		return m;
@@ -86,7 +93,24 @@ public class MessageQueue {
 		}
 	}
 	
+	public void addBuffer(Message m,int threadId){
+		synchronized(addMessageBuffer[threadId-1]){
+			addMessageBuffer[threadId-1].add(m);
+		}
+	}
+	
+	public void deleteBuffer(Message m,int threadId){
+		synchronized(deleteMessageBuffer[threadId-1]){
+			deleteMessageBuffer[threadId-1].add(m);
+		}
+	}
+	
+	
+	
+	
+	
 	public void emptyBuffers(){
+		/*
 		if (!addBuffer.isEmpty()){
 			synchronized(addBuffer){
 				while (!addBuffer.isEmpty()){
@@ -98,6 +122,24 @@ public class MessageQueue {
 			synchronized(deleteBuffer){
 				while (!deleteBuffer.isEmpty()){
 					queue1.remove(deleteBuffer.poll());
+				}
+			}
+		}
+		*/
+		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){             
+             if (!addMessageBuffer[i-1].isEmpty()){
+     			synchronized(addMessageBuffer[i-1]){
+     				while (!addMessageBuffer[i-1].isEmpty()){
+     					queue1.add(addMessageBuffer[i-1].poll());
+     				}
+     			}
+     		}
+
+			if (!deleteMessageBuffer[i-1].isEmpty()){
+				synchronized(deleteMessageBuffer[i-1]){
+					while (!deleteMessageBuffer[i-1].isEmpty()){
+						queue1.remove(deleteMessageBuffer[i-1].poll());
+					}
 				}
 			}
 		}

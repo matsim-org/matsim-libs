@@ -5,7 +5,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MessageExecutor extends Thread {
-	int id=0;
+	private int threadId=0;
 	private Message message;
 	private Scheduler scheduler;
 	//public volatile boolean hasAqiredLocks=false;
@@ -14,6 +14,16 @@ public class MessageExecutor extends Thread {
 	public Condition hasAcquiredLock=lock1.newCondition();
 	public Condition mayStart=lock2.newCondition();
 	
+	private static ThreadLocal tId = new ThreadLocal();
+
+    public static int getThreadId(){
+        return  ((Integer) (tId.get())).intValue();
+        
+    }
+
+    public static void setThreadId(int obj) {
+    	tId.set(obj);
+    }
 
     private static ThreadLocal simTime = new ThreadLocal();
 
@@ -32,12 +42,12 @@ public class MessageExecutor extends Thread {
 	}
 	
 	public MessageExecutor(int id){
-		this.id=id;
+		threadId=id;
 	}
 
 	public void run() {
 		MessageExecutor.setSimTime(0);
-		
+		MessageExecutor.setThreadId(threadId);
 		// of course here is a problem:
 		// we first check if empty and then try to get the element. For this reason
 		// several threads may try to get the same message
@@ -51,7 +61,7 @@ public class MessageExecutor extends Thread {
 		nullMessage.firstLock=nullMessage; // TODO: remove this nonsense (just needed for assertion problem)
 		
 		nullMessage.messageArrivalTime=scheduler.timeOfNextBarrier;
-		scheduler.threadMessageQueues[id-1].putMessage(nullMessage);
+		scheduler.threadMessageQueues[threadId-1].putMessage(nullMessage);
 		int barrierRound=0;
 		try{
 			while (getSimTime()<SimulationParameters.maxSimulationLength){
@@ -104,7 +114,7 @@ public class MessageExecutor extends Thread {
 				//while (message==null){
 					
 				//}
-				message=scheduler.getNextMessage(id);
+				message=scheduler.getNextMessage(threadId);
 				if (scheduler.simulationTerminated){
 					break;
 				}
@@ -114,12 +124,12 @@ public class MessageExecutor extends Thread {
 				
 				
 				if (message==nullMessage){
-					if (id==1){
+					if (threadId==1){
 						scheduler.timeOfNextBarrier+=scheduler.barrierDelta;
 					}
-					scheduler.barrier.awaitT(id);
+					scheduler.barrier.awaitT(threadId);
 					nullMessage.messageArrivalTime=scheduler.timeOfNextBarrier;
-					scheduler.threadMessageQueues[id-1].putMessage(nullMessage);
+					scheduler.threadMessageQueues[threadId-1].putMessage(nullMessage);
 				} else {
 					executeMessage();
 				}
@@ -150,7 +160,7 @@ public class MessageExecutor extends Thread {
 		}
 		
 		scheduler.timer.endTimer();
-		scheduler.timer.printMeasuredTime("ThreadId-"+id + ": ");
+		scheduler.timer.printMeasuredTime("ThreadId-"+tId + ": ");
 		scheduler.decrementNoOfAliveThreads();
 	}
 
