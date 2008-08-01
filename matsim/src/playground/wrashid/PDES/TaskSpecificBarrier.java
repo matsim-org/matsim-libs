@@ -23,8 +23,10 @@ public class TaskSpecificBarrier extends CyclicBarrier {
 		//scheduler.timeOfNextBarrier+=scheduler.barrierDelta;
 	}
 	
-	public void useCPUCycles() {
-		
+	public void useCPUCycles(int threadId) {
+		if (threadId!=-1){
+			//scheduler.threadMessageQueues[threadId-1].emptyBuffers();
+		}
 	}
 	
 	

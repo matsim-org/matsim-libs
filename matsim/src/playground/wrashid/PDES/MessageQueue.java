@@ -15,7 +15,8 @@ public class MessageQueue {
 	// PriorityQueue is better for performance than PriorityBlockingQueue, but requires all methods of this class
 	// to be set synchronized
 	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>(10000);
-	private LinkedList<Message> messageBuffer=new LinkedList<Message>();
+	private LinkedList<Message> addBuffer=new LinkedList<Message>();
+	private LinkedList<Message> deleteBuffer=new LinkedList<Message>();
 	private volatile static int counter=0;
 	public volatile double arrivalTimeOfLastRemovedMessage=0;
 	private Object bufferLock=new Object();
@@ -38,7 +39,6 @@ public class MessageQueue {
 		return counter;
 	}
 
-
 	synchronized public void removeMessage(Message m) {
 		//assert(queue1.contains(m)):"inconsistency";
 		//if (!queue1.contains(m)){
@@ -49,12 +49,12 @@ public class MessageQueue {
 		
 		
 		// in case the message is in the buffer and not in the queue yet
-		synchronized(bufferLock){
-			messageBuffer.remove(m);
+		synchronized(deleteBuffer){
+			deleteBuffer.add(m);
 		}
 		
 		
-		queue1.remove(m);
+		//queue1.remove(m);
 	}
 
 	synchronized public Message getNextMessage() {
@@ -64,13 +64,15 @@ public class MessageQueue {
 		//	System.out.println("event:" + counter);
 		//}
 		
+		emptyBuffers();
+		
 		Message m = queue1.poll();
 		//arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 		return m;
 	}
 
 	synchronized public boolean isEmpty() {
-		if (queue1.isEmpty() || queue1.peek() instanceof NullMessage && queue1.size()==0){
+		if ((queue1.isEmpty() && addBuffer.size()==0)  || (queue1.peek() instanceof NullMessage && queue1.size()==1 && addBuffer.size()==0)){
 			return true;
 		} else {
 			return false;
@@ -78,15 +80,26 @@ public class MessageQueue {
 	}
 
 	public void bufferMessage(Message m){
-		synchronized(bufferLock){
-			messageBuffer.add(m);
+		synchronized(addBuffer){
+			addBuffer.add(m);
 		}
 	}
 	
-	public void emptyBuffer(){
-		synchronized(bufferLock){
-			while (!messageBuffer.isEmpty()){
-				queue1.add(messageBuffer.poll());
+	public void deleteBuffer(Message m){
+		synchronized(deleteBuffer){
+			deleteBuffer.add(m);
+		}
+	}
+	
+	public void emptyBuffers(){
+		synchronized(addBuffer){
+			while (!addBuffer.isEmpty()){
+				queue1.add(addBuffer.poll());
+			}
+		}
+		synchronized(deleteBuffer){
+			while (!deleteBuffer.isEmpty()){
+				queue1.remove(deleteBuffer.poll());
 			}
 		}
 	}

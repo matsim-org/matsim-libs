@@ -38,15 +38,22 @@ public class Scheduler {
 			// of the buffer
 			// ERRRRRROR: It produces also an error for large +xy. => find out why
 			// the error will disappear, if we do not use the buffer. Find out why...
-			//if (timeOfNextBarrier>=m.messageArrivalTime){
+			if (timeOfNextBarrier>=m.messageArrivalTime){
 				threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].putMessage(m);
-			//} else {
-			//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].bufferMessage(m);
-			//}
+			} else {
+				threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].bufferMessage(m);
+			}
 	}
 	
 	public void unschedule(Message m){
 		threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].removeMessage(m);
+	
+		if (timeOfNextBarrier>=m.messageArrivalTime){
+			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].removeMessage(m);
+		} else {
+			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].deleteBuffer(m);
+		}
+	
 	}
 	
 	public Message getNextMessage(int threadId){
@@ -118,12 +125,18 @@ public class Scheduler {
 			su.initialize();
 		}
 		
+		// empty all buffer queues
+		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
+			threadMessageQueues[i-1].emptyBuffers();
+		}
+		
 		
 		// intitialize variables (precondition: message queue intialized and its buffer emptied)
 		barrierDelta=minInverseInOutflowCapacity;
 		timeOfNextBarrier=Double.MAX_VALUE;
 		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
 			if (threadMessageQueues[i-1].getArrivalTimeOfNextMessage()<timeOfNextBarrier)
+				
 				timeOfNextBarrier=threadMessageQueues[i-1].getArrivalTimeOfNextMessage();
 		}
 		timeOfNextBarrier+=barrierDelta;
