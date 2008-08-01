@@ -48,7 +48,7 @@ public class SimulationParameters {
 	public static final int maxQueueLength=10000;
 	// optimal: numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()
 	//public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
-	public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
+	public static final int numberOfMessageExecutorThreads=1;
 	
 	synchronized public static void processEvent(BasicEvent event){
 		SimulationParameters.events.processEvent(event);

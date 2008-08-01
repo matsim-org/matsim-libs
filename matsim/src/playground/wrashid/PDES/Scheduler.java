@@ -27,27 +27,22 @@ public class Scheduler {
 	volatile public boolean simulationTerminated=false;
 	// actually this is not the right one, because it could be, that the min outflow cap is on the same
 	// thread (adjacent links)
-	public double minInverseOutflowCapacity=Double.MAX_VALUE;
-	volatile public double timeOfNextBarrier=1;
+	public double minInverseInOutflowCapacity=Double.MAX_VALUE;
+	public double barrierDelta=0;
+	volatile public double timeOfNextBarrier=0;
 	
-	public void schedule(Message m){		
-		if (m.getMessageArrivalTime()>=simTime){
-			if (timeOfNextBarrier>=m.messageArrivalTime){
+	public void schedule(Message m){
+			// TODO: find out the magic behind this number:
+			// if the +xy value is small, then it produces an error, else not.
+			// Problem: I need to keep this value small, because else there is no use
+			// of the buffer
+			// ERRRRRROR: It produces also an error for large +xy. => find out why
+			// the error will disappear, if we do not use the buffer. Find out why...
+			//if (timeOfNextBarrier>=m.messageArrivalTime){
 				threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].putMessage(m);
-			} else {
-				threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].bufferMessage(m);
-			}
-		} else {
-			System.out.println("WARNING: You tried to send a message in the past. Message discarded.");
-			//System.out.println("m.getMessageArrivalTime():"+m.getMessageArrivalTime());
-			//System.out.println("simTime:"+simTime);
-			//System.out.println(m.getClass());
-			assert(false); // for backtracing, where a wrong message has been scheduled
-		}
-		
-		
-		
-		
+			//} else {
+			//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].bufferMessage(m);
+			//}
 	}
 	
 	public void unschedule(Message m){
@@ -66,10 +61,11 @@ public class Scheduler {
 		
 		initializeSimulation();
 		
-		System.out.println("minInverseOutflowCapacity: "+minInverseOutflowCapacity);
+		System.out.println("minInverseOutflowCapacity: "+minInverseInOutflowCapacity);
 		
 		
 		try {
+			//Thread.currentThread().sleep(20000);
 			while (true){
 				boolean allEmpty=true;
 				for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
@@ -101,6 +97,10 @@ public class Scheduler {
 	// the initialization method of objects, which
 	// exist at the beginning of the simulation
 	public void initializeSimulation(){
+		
+		// intitialize variables
+		barrierDelta=minInverseInOutflowCapacity;
+		timeOfNextBarrier=barrierDelta;
 		
 		// initialize MessageQueue array
 		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){

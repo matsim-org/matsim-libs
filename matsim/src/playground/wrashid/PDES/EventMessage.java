@@ -18,7 +18,7 @@ public abstract class EventMessage extends SelfhandleMessage {
 	public abstract void logEvent();
 	
 	public void printMessageLogString() {
-
+		/*
 		if (logMessage){
 			EventLog ev=new EventLog(this.getMessageArrivalTime(),Integer.parseInt(vehicle.getOwnerPerson().getId().toString()),vehicle.getLegIndex()-1,Integer.parseInt(vehicle.getCurrentLink().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getFromNode().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getToNode().getId().toString()),eventType);
 			SimulationParameters.eventOutputLog.add(ev);
@@ -26,6 +26,7 @@ public abstract class EventMessage extends SelfhandleMessage {
 				ev.print();
 			}
 		}
+		*/
 		logEvent();
 	}
 

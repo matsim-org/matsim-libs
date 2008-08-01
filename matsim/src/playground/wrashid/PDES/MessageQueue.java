@@ -64,15 +64,13 @@ public class MessageQueue {
 		//	System.out.println("event:" + counter);
 		//}
 		
-		
-		
 		Message m = queue1.poll();
 		//arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 		return m;
 	}
 
 	synchronized public boolean isEmpty() {
-		if (queue1.isEmpty() || queue1.peek() instanceof NullMessage){
+		if (queue1.isEmpty() || queue1.peek() instanceof NullMessage && queue1.size()==0){
 			return true;
 		} else {
 			return false;

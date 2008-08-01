@@ -100,9 +100,13 @@ public class Road extends SimUnit {
 			//System.out.println("sdfa");
 		}
 		
-		if (scheduler.minInverseOutflowCapacity>inverseOutFlowCapacity){
-			scheduler.minInverseOutflowCapacity=inverseOutFlowCapacity;
+		if (scheduler.minInverseInOutflowCapacity>inverseOutFlowCapacity){
+			scheduler.minInverseInOutflowCapacity=inverseOutFlowCapacity;
 		}
+		if (scheduler.minInverseInOutflowCapacity>inverseInFlowCapacity){
+			scheduler.minInverseInOutflowCapacity=inverseInFlowCapacity;
+		}
+		
 	}
 	
 
@@ -128,6 +132,10 @@ public class Road extends SimUnit {
 	 public void leaveRoad(Vehicle vehicle) {
 		//System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
 		
+		 if (carsOnTheRoad.isEmpty()){
+			 System.out.println();
+		 }
+		 
 		assert(carsOnTheRoad.getFirst()==vehicle):"road:"+link.getId()+  " - " + this + " - " + lock; // TODO: uncomment this, and find out, why it produces a problem with test6
 	 	
 		

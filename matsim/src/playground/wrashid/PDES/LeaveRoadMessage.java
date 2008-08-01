@@ -18,6 +18,7 @@ public class LeaveRoadMessage extends EventMessage {
 	}
 	
 	public void printMessageLogString() {
+		/*
 		Road road=(Road)this.receivingUnit;
 		
 		if (logMessage){
@@ -27,6 +28,7 @@ public class LeaveRoadMessage extends EventMessage {
 				ev.print();
 			}
 		}
+		*/
 		logEvent();
 	}
 
