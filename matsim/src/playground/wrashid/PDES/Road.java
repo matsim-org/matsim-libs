@@ -66,14 +66,14 @@ public class Road extends SimUnit {
 	public Road(Scheduler scheduler, Link link) {
 		super(scheduler);
 		this.link = link;
-		belongsToMessageExecutorThreadId = new Random().nextInt(SimulationParameters.numberOfMessageExecutorThreads)+1;
-		/*
+		//belongsToMessageExecutorThreadId = new Random().nextInt(SimulationParameters.numberOfMessageExecutorThreads)+1;
+		
 		if (getXCoordinate()>680237){
 			belongsToMessageExecutorThreadId = 1;
 		} else {
 			belongsToMessageExecutorThreadId = 2;
 		}
-		*/
+		
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)
 				* SimulationParameters.storageCapacityFactor
