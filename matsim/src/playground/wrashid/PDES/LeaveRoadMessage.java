@@ -41,8 +41,8 @@ public class LeaveRoadMessage extends EventMessage {
 			event=new EventLinkLeave(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getLegIndex()-1,road.getLink().getId().toString());
 		}
 		
-		//SimulationParameters.events.processEvent(event);
-		SimulationParameters.processEvent(event);
+		SimulationParameters.events.processEvent(event);
+		//SimulationParameters.processEvent(event);
 	}
 	
 }
