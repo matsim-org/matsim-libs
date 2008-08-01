@@ -23,7 +23,7 @@ public class Scheduler {
 	private volatile int noOfAliveThreads=0;
 	public MessageQueue[] threadMessageQueues=new MessageQueue[SimulationParameters.numberOfMessageExecutorThreads];
 	public MessageExecutor[] messageExecutors=new MessageExecutor[SimulationParameters.numberOfMessageExecutorThreads];
-	public CyclicBarrier barrier=new CyclicBarrier(SimulationParameters.numberOfMessageExecutorThreads);
+	public TaskSpecificBarrier barrier=new TaskSpecificBarrier(SimulationParameters.numberOfMessageExecutorThreads,this);
 	volatile public boolean simulationTerminated=false;
 	// actually this is not the right one, because it could be, that the min outflow cap is on the same
 	// thread (adjacent links)
@@ -102,9 +102,7 @@ public class Scheduler {
 	// exist at the beginning of the simulation
 	public void initializeSimulation(){
 		
-		// intitialize variables
-		barrierDelta=minInverseInOutflowCapacity;
-		timeOfNextBarrier=barrierDelta;
+		
 		
 		// initialize MessageQueue array
 		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
@@ -121,6 +119,14 @@ public class Scheduler {
 		}
 		
 		
+		// intitialize variables (precondition: message queue intialized and its buffer emptied)
+		barrierDelta=minInverseInOutflowCapacity;
+		timeOfNextBarrier=Double.MAX_VALUE;
+		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
+			if (threadMessageQueues[i-1].getArrivalTimeOfNextMessage()<timeOfNextBarrier)
+				timeOfNextBarrier=threadMessageQueues[i-1].getArrivalTimeOfNextMessage();
+		}
+		timeOfNextBarrier+=barrierDelta;
 		
 		// create message executors and start them (precondition: all sim units need to be initialized at this point)
 		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){

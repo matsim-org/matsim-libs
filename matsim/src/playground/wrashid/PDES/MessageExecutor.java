@@ -117,7 +117,6 @@ public class MessageExecutor extends Thread {
 					if (id==1){
 						scheduler.timeOfNextBarrier+=scheduler.barrierDelta;
 					}
-					//scheduler.barrier.await();
 					scheduler.barrier.await();
 					nullMessage.messageArrivalTime=scheduler.timeOfNextBarrier;
 					scheduler.threadMessageQueues[id-1].putMessage(nullMessage);

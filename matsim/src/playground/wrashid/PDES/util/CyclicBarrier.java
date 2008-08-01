@@ -1,6 +1,8 @@
 package playground.wrashid.PDES.util;
 
-public class CyclicBarrier {
+import playground.wrashid.PDES.SimulationParameters;
+
+public abstract class CyclicBarrier {
 	
 	protected int noOfParities;
 	protected volatile int counter=0;
@@ -8,17 +10,22 @@ public class CyclicBarrier {
 	private Object lock=new Object();
 	private Object lock2=new Object();
 	
-	synchronized public int informBarrier(){
+	synchronized private int informBarrier(){
 		counter++;
 		if (counter==noOfParities){
 			counter=0;
+			doWhenAllAtBarrier();
 			return round++;
 		}
 		return round;
 	}
 	
-	public void await(int threadRound){
+	public abstract void doWhenAllAtBarrier();
+	public abstract void useCPUCycles();
+
+	private void await(int threadRound){
 		while (threadRound==round && counter>0){
+			useCPUCycles();
 		}
 	}
 	
@@ -32,6 +39,12 @@ public class CyclicBarrier {
 		this.noOfParities=noOfParities;
 	}
 
+	
+	
+	
+	
+	
+	
 	 
 	/*
 	public void reset() {
