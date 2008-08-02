@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 
+import playground.wrashid.PDES.util.ConcurrentList;
+
 public class SimulationParameters {
 	// EventHeap
 	
@@ -49,7 +51,7 @@ public class SimulationParameters {
 	public static final int maxQueueLength=10000;
 	// optimal: numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()
 	//public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
-	public static final int numberOfMessageExecutorThreads=1;
+	public static final int numberOfMessageExecutorThreads=2;
 	
 	synchronized public static void processEvent(BasicEvent event){
 		SimulationParameters.events.processEvent(event);
@@ -60,14 +62,14 @@ public class SimulationParameters {
 	}
 	
 	public static void processEventBuffer(){
-		while (!eventBuffer.isEmpty()){
-			SimulationParameters.events.processEvent(eventBuffer.poll());
+		BasicEvent be=eventBuffer.remove();
+		while (be!=null){
+			SimulationParameters.events.processEvent(be);
+			be=eventBuffer.remove();
 		}
 	}
 	
-	public static boolean eventBufferIsEmpty(){
-		return eventBuffer.isEmpty();
-	}
+	
 	
 	public static double sumXCoordinate=0;
 	public static double sumXCoordinateLeft=0;
@@ -75,6 +77,6 @@ public class SimulationParameters {
 	public static double noOfCarsLeft=0;
 	public static double noOfCarsRight=0;
 	public static double noOfCars=0;
-	public static ConcurrentLinkedQueue<BasicEvent> eventBuffer=new ConcurrentLinkedQueue<BasicEvent>(); 
+	public static ConcurrentList<BasicEvent> eventBuffer=new ConcurrentList<BasicEvent>(); 
 	
 }
