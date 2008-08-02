@@ -32,6 +32,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.statistics.GraphStatistics;
+import gnu.trove.TObjectDoubleHashMap;
 
 /**
  * @author illenberger
@@ -87,9 +88,13 @@ public class Mutuality extends GraphStatistic {
 		
 		int len2Paths = 0;
 		int nVertex2Steps = 0;
+		
+//		double pathProbaSum = 0;
+//		double neighbourProbaSum = 0;
 		for(Vertex v : vertices) {
 			if(!isSampled || (isSampled && !((SampledVertex)v).isAnonymous())) {
-				
+//				TObjectDoubleHashMap<Vertex> neighbourProbas = new TObjectDoubleHashMap<Vertex>();
+				int paths = 0;
 				Set<Vertex> n1Set = v.getNeighbors();
 				Set<Vertex> n2Set = new HashSet<Vertex>();
 				for(Vertex n1 : n1Set) {
@@ -97,12 +102,23 @@ public class Mutuality extends GraphStatistic {
 					for(Vertex neighbour : neighbours) {
 						if(neighbour != v && !n1Set.contains(neighbour)) {
 							n2Set.add(neighbour);
-							len2Paths++;
+//							double proba_accum = neighbourProbas.get(neighbour);
+//							if(proba_accum == 0)
+//								proba_accum = 1;
+//							double proba = ((SampledVertex)n1).getSampleProbability() * ((SampledVertex)neighbour).getSampleProbability(); 
+//							
+//							neighbourProbas.put(neighbour, proba_accum * (1-proba));
+							
+							paths++;
 						}
 					}
 				}
 				
-				nVertex2Steps += n2Set.size();
+//				for(Vertex n2 : n2Set)
+//					nVertex2Steps += 1/(1 - neighbourProbas.get(n2));
+				
+				nVertex2Steps += n2Set.size() * 1/((SampledVertex)v).getSampleProbability();
+				len2Paths += paths * 1/((SampledVertex)v).getSampleProbability();
 			}
 		}
 		

@@ -23,14 +23,21 @@
  */
 package playground.johannes.snowball2;
 
+import java.io.BufferedWriter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.snowball.Histogram;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.statistics.GraphStatistics;
+import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TIntIntHashMap;
+import gnu.trove.TObjectDoubleHashMap;
 
 /**
  * @author illenberger
@@ -38,6 +45,8 @@ import edu.uci.ics.jung.statistics.GraphStatistics;
  */
 public class Clustering extends GraphStatistic {
 
+	private double wMean;
+	
 	public Clustering(String outputDir) {
 		super(outputDir);
 	}
@@ -48,24 +57,78 @@ public class Clustering extends GraphStatistic {
 		Map<Vertex, Double> values = GraphStatistics.clusteringCoefficients(g);
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 
+		TIntDoubleHashMap degreeClustering = new TIntDoubleHashMap();
+		TIntIntHashMap numDegree = new TIntIntHashMap();
+		
+		double sum = 0;
+		double wsum = 0;
+		
 		if (g instanceof SampledGraph) {
 			for (Vertex v : values.keySet()) {
+				int k = v.degree();
+				
 				if (!((SampledVertex) v).isAnonymous()) {
-					if (v.degree() == 1)
+					double cc = degreeClustering.get(k);
+					
+					
+					
+					if (v.degree() == 1) {
 						stats.addValue(0.0);
-					else
-						stats.addValue(values.get(v));
+//						sum += (cc / ((SampledVertex)v).getSampleProbability());
+					} else {
+						double C = values.get(v);
+						stats.addValue(C);
+						cc += C; 
+						sum += (C / ((SampledVertex)v).getSampleProbability());
+					}
+					degreeClustering.put(k, cc);
+					numDegree.put(k, numDegree.get(k) + 1);
+					
+					wsum += (1 / ((SampledVertex)v).getSampleProbability());
 				}
 			}
 		} else {
 			for (Vertex v : values.keySet()) {
+				int k = v.degree();
+				double cc = degreeClustering.get(k);
+				
+				
+				wsum ++;
+				
 				if (v.degree() == 1)
 					stats.addValue(0.0);
-				else
-					stats.addValue(values.get(v));
+				else {
+					double C = values.get(v);
+					stats.addValue(C);
+					cc += C;
+					sum += C;
+				}
+				
+				degreeClustering.put(k, cc);
+				numDegree.put(k, numDegree.get(k) + 1);
 			}
 		}
 
+		wMean = sum / wsum;
+		
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(String.format("%1$s/%2$s.degreeDependency.txt", outputDir, iteration));
+			int[] keys = numDegree.keys();
+			Arrays.sort(keys);
+			for (int k : keys) {
+				double bc = degreeClustering.get(k);
+				int numV = numDegree.get(k);
+
+				writer.write(String.valueOf(k));
+				writer.write("\t");
+				writer.write(String.valueOf(bc / (double) numV));
+				writer.newLine();
+			}
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		dumpStatistics(getStatisticsMap(stats), iteration);
 		
 		if(reference != null) {
@@ -78,4 +141,18 @@ public class Clustering extends GraphStatistic {
 		return stats;
 	}
 
+	@Override
+	protected List<String> getStatisticsKeys() {
+		List<String> keys = super.getStatisticsKeys();
+		keys.add("wMean");
+		return keys;
+	}
+
+	@Override
+	protected TObjectDoubleHashMap<String> getStatisticsMap(
+			DescriptiveStatistics stats) {
+		TObjectDoubleHashMap<String> statsMap = super.getStatisticsMap(stats);
+		statsMap.put("wMean", wMean);
+		return statsMap;
+	}
 }

@@ -23,15 +23,15 @@
  */
 package playground.johannes.snowball;
 
-import java.util.Set;
+import java.util.Collection;
+import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
 
-import playground.johannes.socialnets.GraphStatistics;
 import playground.johannes.socialnets.PersonGraphMLFileHandler;
-import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
-import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
+import playground.johannes.statistics.GraphStatistics;
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.io.GraphMLFile;
 
 /**
@@ -50,16 +50,17 @@ public class ExtractBiggestComponent {
 		GraphMLFile gmlFile = new GraphMLFile(fileHandler);
 		Graph g = gmlFile.load(args[0]);
 		
-		WeakComponentClusterer wcc = new WeakComponentClusterer();
+		
 		logger.info("Extacting components...");
-		ClusterSet clusters = wcc.extract(g);
+		SortedSet<Collection<Vertex>> clusters = playground.johannes.statistics.GraphStatistics.getDisconnectedComponents(g);
 		logger.info(String.format("Graph has %1$s components.", clusters.size()));
-		clusters.sort();
+		
 		
 		StringBuilder builder = new StringBuilder();
 		builder.append("Component summary:\n");
-		for(int i = 0; i < clusters.size(); i++) {
-			Set cluster = clusters.getCluster(i);
+		int i = 0;
+		for(Collection<Vertex> cluster : clusters) {
+			i++;
 			builder.append("\t");
 			builder.append(String.valueOf(i));
 			builder.append(" : ");
@@ -68,13 +69,13 @@ public class ExtractBiggestComponent {
 		}
 		logger.info(builder.toString());
 		
-		Graph g2 = clusters.getClusterAsNewSubGraph(0);
+		Graph g2 = GraphStatistics.extractGraphFromCluster(clusters.first());
 		
 		logger.info(String.format("Graph has %1$s vertices, %2$s edges, density = %3$s, mean degree = %4$s.",
 				g2.numVertices(),
 				g2.numEdges(),
 				g2.numEdges()/((double)(g2.numVertices() * (g2.numVertices()-1))),
-				GraphStatistics.createDegreeHistogram(g2, -1, -1, 0).getMean()));
+				GraphStatistics.getDegreeStatistics(g2).getMean()));
 		logger.info("Saving social network...");
 		gmlFile.save(g2, args[1]);
 		logger.info("Done.");

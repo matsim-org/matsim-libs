@@ -23,16 +23,22 @@
  */
 package playground.johannes.snowball2;
 
+import java.io.BufferedWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.snowball.Histogram;
 import edu.uci.ics.jung.graph.Graph;
+import gnu.trove.TDoubleArrayList;
+import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TIntIntHashMap;
 
 /**
  * @author illenberger
@@ -48,7 +54,13 @@ public class Centrality {
 
 	protected DescriptiveStatistics betweennessValues;
 	
+	protected TDoubleArrayList betweennessWValues;
+	
+	protected TDoubleArrayList betweennessWeights;
+	
 	private double betweennessWeighted;
+	
+	private double closenessWeighted;
 
 	private int lastIteration = Integer.MIN_VALUE;
 
@@ -95,6 +107,8 @@ public class Centrality {
 	}
 
 	protected void calcCloseness() {
+		double sum = 0;
+		double wsum = 0;
 		closenessValues = new DescriptiveStatistics();
 		for (SparseVertex v : graph.getVertices()) {
 			if (isSampled) {
@@ -102,16 +116,25 @@ public class Centrality {
 						.isAnonymous())
 					closenessValues.addValue(((CentralityVertex) v)
 							.getCloseness());
+				double p = ((SampledVertex) graphDecorator.getVertex(v)).getSampleProbability();
+				sum += ((CentralityVertex) v).getCloseness() / p;
+				wsum += 1/p;
 			} else {
 				closenessValues.addValue(((CentralityVertex) v).getCloseness());
+				sum += ((CentralityVertex) v).getCloseness();
+				wsum++;
 			}
 		}
+		
+		closenessWeighted = sum/wsum;
 	}
 
 	protected void calcBetweenness() {
 		betweennessWeighted = 0;
 		double wsum = 0;
 		betweennessValues = new DescriptiveStatistics();
+		betweennessWValues = new TDoubleArrayList(graph.getVertices().size());
+		betweennessWeights = new TDoubleArrayList(graph.getVertices().size());
 		for (SparseVertex v : graph.getVertices()) {
 			if (isSampled) {
 				if (!((SampledVertex) graphDecorator.getVertex(v))
@@ -121,12 +144,18 @@ public class Centrality {
 					double p = ((SampledVertex) graphDecorator.getVertex(v)).getSampleProbability();
 					betweennessWeighted += ((CentralityVertex) v).getBetweenness() / p;
 					wsum += 1/p;
+					
+					betweennessWValues.add(((CentralityVertex) v).getBetweenness() / p);
+					betweennessWeights.add(1/p);
 				}
 			} else {
 				betweennessValues.addValue(((CentralityVertex) v)
 						.getBetweenness());
 				betweennessWeighted += ((CentralityVertex) v).getBetweenness();
 				wsum ++;
+				
+				betweennessWValues.add(((CentralityVertex) v).getBetweenness());
+				betweennessWeights.add(1.0);
 			}
 		}
 		
@@ -135,6 +164,10 @@ public class Centrality {
 	
 	public double getBetweennessWeighted() {
 		return betweennessWeighted;
+	}
+	
+	public double getClosenessWeighted() {
+		return closenessWeighted;
 	}
 
 	public double getGraphCloseness() {
@@ -158,17 +191,55 @@ public class Centrality {
 	}
 
 	public Histogram getBetweennessHistogram() {
-		Histogram histogram = new Histogram(100);
+		Histogram histogram = new Histogram(0.01, 0, 100);
 		histogram.addAll(betweennessValues.getValues());
 		return histogram;
 	}
 
 	public Histogram getBetweennessHistogram(double min, double max) {
-		Histogram histogram = new Histogram(100, min, max);
+		Histogram histogram = new Histogram(0.01, 0, 100);
 		histogram.addAll(betweennessValues.getValues());
 		return histogram;
 	}
 
+	public void dumpDegreeCorrelation(String filename, String type) {
+		TIntDoubleHashMap values = new TIntDoubleHashMap();
+		TIntIntHashMap degrees = new TIntIntHashMap();
+		
+		for (SparseVertex v : graph.getVertices()) {
+			int k = v.getEdges().length;
+			double c = 0;
+			if(type.equals("betweenness"))
+				c = ((CentralityVertex) v).getBetweenness();
+			else if(type.equals("closeness"))
+				c = ((CentralityVertex) v).getCloseness();
+			
+			double val = values.get(k);
+			values.put(k, val + c);
+			
+			int freqDegree = degrees.get(k);
+			degrees.put(k, freqDegree + 1);
+		}
+		
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+			int[] keys = values.keys();
+			Arrays.sort(keys);
+			for (int k : keys) {
+				double bc = values.get(k);
+				int numV = degrees.get(k);
+
+				writer.write(String.valueOf(k));
+				writer.write("\t");
+				writer.write(String.valueOf(bc / (double) numV));
+				writer.newLine();
+			}
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private static class DijkstraThread extends Thread {
 
 		private static int count = 0;
@@ -197,6 +268,8 @@ public class Centrality {
 					System.out.println(String.format(
 							"Processed %1$s of %2$s vertices. (%3$s)", count,
 							total, count / (float) total * 100));
+					System.out.println(String.format(
+							"Path ratio is %1$s", dijkstra.ratioSum/(double)count));
 				}
 			}
 

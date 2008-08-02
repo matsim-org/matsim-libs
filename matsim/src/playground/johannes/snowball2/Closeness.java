@@ -24,12 +24,14 @@
 package playground.johannes.snowball2;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import playground.johannes.snowball.Histogram;
 
 import edu.uci.ics.jung.graph.Graph;
+import gnu.trove.TObjectDoubleHashMap;
 
 /**
  * @author illenberger
@@ -67,7 +69,24 @@ public class Closeness extends GraphStatistic {
 				e.printStackTrace();
 			}
 		}
+		
+		centrality.dumpDegreeCorrelation(String.format("%1$s/%2$s.degreeCloseness.txt", outputDir, iteration), "closeness");
+		
 		return centrality.closenessValues;
 	}
 
+	@Override
+	protected List<String> getStatisticsKeys() {
+		List<String> keys = super.getStatisticsKeys();
+		keys.add("wMean");
+		return keys;
+	}
+
+	@Override
+	protected TObjectDoubleHashMap<String> getStatisticsMap(
+			DescriptiveStatistics stats) {
+		TObjectDoubleHashMap<String> statsMap = super.getStatisticsMap(stats);
+		statsMap.put("wMean", centrality.getClosenessWeighted());
+		return statsMap;
+	}
 }

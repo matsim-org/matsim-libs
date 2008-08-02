@@ -268,7 +268,7 @@ public class SnowballExe {
 			meanValues = computeStatistics(sample, statistics, references, sampler.getCurrentWave());
 			for(String key : statisticsKeys) {
 				summaryWriter.write("\t");
-				summaryWriter.write(String.format(Locale.US, "%1.4f", meanValues.get(key)));
+				summaryWriter.write(String.format(Locale.US, "%1.8f", meanValues.get(key)));
 			}
 			summaryWriter.newLine();
 			summaryWriter.flush();
@@ -411,6 +411,8 @@ public class SnowballExe {
 					sums.put(k, sum);
 					int total = numVPerDegree.get(k);
 					writer.write(String.valueOf(sum/(double)total));
+//					writer.write("\t");
+//					writer.write(String.valueOf(sum));
 				}
 				writer.newLine();
 			}
@@ -442,7 +444,7 @@ public class SnowballExe {
 //				Map<Integer, Integer> neighbourPorbas = getNeighbourProba(sample, i);
 //				int[][] correlationMatrix = getCorrelationMatrix(sample, numVPerDegree, i);
 				
-				int[] numVerticesPerDegree = getNumVertexPerDegree(sample, i+1);
+				int[] numVerticesPerDegree = getNumVertexPerDegree(sample, i);
 				int[][] degreeCorrelation = getDegreeCorrelation(sample, i+1, numVPerDegree.size()- 1);
 				int[] numNeighboursPerDegree = getNeighboursPerDegree(degreeCorrelation);
 				numNeighboursPerDegreeWave.add(numNeighboursPerDegree);
@@ -452,6 +454,10 @@ public class SnowballExe {
 						writer.write("\t");
 						double p = numSeeds/(double)numTotalV;
 						writer.write(String.valueOf(p));
+//						if(k >= numVerticesPerDegree.length)
+//							writer.write("0");
+//						else
+//							writer.write(String.valueOf(numVerticesPerDegree[k]*p));
 						probasPerWaveAccum.put(k, p);
 //					} else if(i == 1 || i ==2) {
 //						writer.write("\t");
@@ -503,13 +509,19 @@ public class SnowballExe {
 						/*
 						 * accumulate
 						 */
-						double p_minus1 = (Double)probasPerWaveAccum.get(k);
-						double p_accum = p + p_minus1 - (p * p_minus1);
-						probasPerWaveAccum.put(k, p_accum);
+//						double p_minus1 = (Double)probasPerWaveAccum.get(k);
+//						double p_accum = p + p_minus1 - (p * p_minus1);
+//						probasPerWaveAccum.put(k, p_accum);
+						probasPerWaveAccum.put(k, p);
 						
 						writer.write("\t");
 //						writer.write(String.valueOf(p_accum));
 						writer.write(String.valueOf(p));
+//						writer.write("\t");
+//						if(k >= numVerticesPerDegree.length)
+//							writer.write("0");
+//						else
+//							writer.write(String.valueOf(numVerticesPerDegree[k]*p));
 					}
 				}
 //				numVPerDegreeCatAccum = countSamplesPerDegree(sample, i, numVPerDegreeCatAccum);

@@ -58,6 +58,7 @@ public class Degree extends GraphStatistic {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		TDoubleArrayList values = new TDoubleArrayList(g.numVertices());
 		TDoubleArrayList weights = new TDoubleArrayList(g.numVertices());
+		TDoubleArrayList normWeights = new TDoubleArrayList(g.numVertices());
 		
 		
 		if(g instanceof SampledGraph) {
@@ -78,8 +79,8 @@ public class Degree extends GraphStatistic {
 			}
 			double k = values.size() / wsum;
 			for(int i = 0; i < weights.size(); i++) {
-				weights.setQuick(i, weights.getQuick(i) * k);
-				stats.addValue(values.getQuick(i) * weights.getQuick(i));
+				normWeights.add(weights.getQuick(i) * k);
+				stats.addValue(values.getQuick(i) * normWeights.getQuick(i));
 			}
 				
 		} else {
@@ -91,7 +92,7 @@ public class Degree extends GraphStatistic {
 			}
 		}
 		
-		gamma = calcGammaExponent(values.toNativeArray(), weights.toNativeArray(), 1.0);
+		gamma = calcGammaExponent(values.toNativeArray(), weights.toNativeArray(), 1.0, 0);
 		
 		dumpStatistics(getStatisticsMap(stats), iteration);
 		

@@ -46,6 +46,8 @@ import edu.uci.ics.jung.statistics.GraphStatistics;
  *
  */
 public class UnweightedDijkstra {
+	
+	public static double ratioSum;
 
 	private Queue<DijkstraVertex> unsettledVertices;
 	
@@ -94,6 +96,9 @@ public class UnweightedDijkstra {
 		int numVertex = 0;
 		int numPathsTotal = 0;
 		List<CentralityVertex> reachedVertices = new LinkedList<CentralityVertex>();
+		
+		int numPahts = 0;
+		
 		for (SparseVertex target : g.getVertices()) {
 			if (target != source) {
 				List<DijkstraVertex> vertexSet = new LinkedList<DijkstraVertex>();// (g.getVertices().size()*10);
@@ -104,7 +109,9 @@ public class UnweightedDijkstra {
 
 					numPathsTotal++;
 					numVertex += paths[1];
-
+					
+					numPahts += paths[0];
+					
 					for (DijkstraVertex node : vertexSet) {
 						node.getDelegate().addBetweenness(1 / (double) paths[0]);
 					}
@@ -117,7 +124,10 @@ public class UnweightedDijkstra {
 		else
 			v.setCloseness(numVertex / (double)numPathsTotal);
 		
+//		System.out.println("Ration of path to vertices is " + numPathsTotal/(double)numPahts);
+		ratioSum += numPathsTotal/(double)numPahts;
 		return reachedVertices;
+//		return numPathsTotal/(double)numPahts;
 	}
 	
 	private int[] getPaths(DijkstraVertex target, Collection<DijkstraVertex> vertexSet) {

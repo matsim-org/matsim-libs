@@ -153,17 +153,17 @@ public abstract class GraphStatistic {
 		}
 	}
 	
-	protected double calcGammaExponent(double[] values, double fixedBinSize) {
+	protected double calcGammaExponent(double[] values, double fixedBinSize, double minVal) {
 		double[] weights = new double[values.length];
 		Arrays.fill(weights, 1.0);
-		return calcGammaExponent(values, weights, fixedBinSize);
+		return calcGammaExponent(values, weights, fixedBinSize, minVal);
 	}
 	
-	protected double calcGammaExponent(double[] values, double[] weights, double fixedBinSize) {
+	protected double calcGammaExponent(double[] values, double[] weights, double fixedBinSize, double minVal) {
 		/*
 		 * (1) Determine probability distribution.
 		 */
-		int numBins = 100;
+		int numBins = 1000;//values.length / 10;
 		double min = StatUtils.min(values);
 		double max = StatUtils.max(values);
 		
@@ -194,18 +194,25 @@ public abstract class GraphStatistic {
 		double minPowerLawVal = (maxHeightBinIdx * binSize) + min;
 		if(minPowerLawVal == 0)
 			minPowerLawVal = Double.MIN_VALUE;
+		
+		//=======================================================
+		if(minVal > 0)
+			minPowerLawVal = minVal;
 		/*
 		 * (3) Calculate gamma with maximum likelihood estimator.
 		 */
 		double logsum = 0;
 		double wsum = 0;
+		int count = 0;
 		for(int i = 0; i < values.length; i++) {
 			if(values[i] >= minPowerLawVal) {
-				logsum += Math.log(values[i]/minPowerLawVal) * weights[i];
+				logsum += Math.log((values[i]/minPowerLawVal)) * weights[i];
 				wsum += weights[i];
+//				wsum++;
+				count++;
 			}
 		}
-		
+		System.out.println("Count = " +count+"; wsum = " + wsum);
 		return 1 + (wsum/logsum);
 	}
 	
