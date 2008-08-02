@@ -102,7 +102,7 @@ public class JavaPDEQSim {
 		
 		
 		t.endTimer();
-		t.printMeasuredTime("Time needed for one iteration (only DES part): ");
+		t.printMeasuredTime("Time needed for one iteration (only PDES part): ");
 		
 		
 		// print output

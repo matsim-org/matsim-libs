@@ -1,6 +1,7 @@
 package playground.wrashid.PDES;
 
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
@@ -48,10 +49,24 @@ public class SimulationParameters {
 	public static final int maxQueueLength=10000;
 	// optimal: numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()
 	//public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
-	public static final int numberOfMessageExecutorThreads=2;
+	public static final int numberOfMessageExecutorThreads=1;
 	
 	synchronized public static void processEvent(BasicEvent event){
 		SimulationParameters.events.processEvent(event);
+	}
+	
+	public static void bufferEvent(BasicEvent event){
+		eventBuffer.add(event);
+	}
+	
+	public static void processEventBuffer(){
+		while (!eventBuffer.isEmpty()){
+			SimulationParameters.events.processEvent(eventBuffer.poll());
+		}
+	}
+	
+	public static boolean eventBufferIsEmpty(){
+		return eventBuffer.isEmpty();
 	}
 	
 	public static double sumXCoordinate=0;
@@ -60,5 +75,6 @@ public class SimulationParameters {
 	public static double noOfCarsLeft=0;
 	public static double noOfCarsRight=0;
 	public static double noOfCars=0;
+	public static ConcurrentLinkedQueue<BasicEvent> eventBuffer=new ConcurrentLinkedQueue<BasicEvent>(); 
 	
 }

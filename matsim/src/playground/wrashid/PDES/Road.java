@@ -425,9 +425,8 @@ public class Road extends SimUnit {
 		// Answer: if we use a PriorityQueue instead, the problem would be solved, but the implementation gets harder, because we
 		// need the last element (that function is not available with PriorityQueue)
 		//assert(deadlockPreventionMessages.peek()==dpMessage):"Inconsitency in logic!!! => this should only be invoked from the handler of this message";
-		assert(testDeadlockPreventionMessages.contains(dpMessage)):"inconsistency";
 		assert(deadlockPreventionMessages.contains(dpMessage)):"Something is really wrong here";
-		
+		assert(testDeadlockPreventionMessages.contains(dpMessage)):"inconsistency";
 		
 		//deadlockPreventionMessages.removeFirst();
 		// the code line above was replaced, because of time causality, there could be a problem

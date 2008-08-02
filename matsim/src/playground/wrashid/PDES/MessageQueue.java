@@ -15,10 +15,10 @@ public class MessageQueue {
 	// PriorityQueue is better for performance than PriorityBlockingQueue, but requires all methods of this class
 	// to be set synchronized
 	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>(10000);
-	private LinkedList<Message> addBuffer=new LinkedList<Message>();
-	private LinkedList<Message> deleteBuffer=new LinkedList<Message>();
+	//private LinkedList<Message> addBuffer=new LinkedList<Message>();
+	//private LinkedList<Message> deleteBuffer=new LinkedList<Message>();
 	private volatile static int counter=0;
-	public volatile double arrivalTimeOfLastRemovedMessage=0;
+	public double arrivalTimeOfLastRemovedMessage=0;
 	private Object bufferLock=new Object();
 	private LinkedList<Message>[] addMessageBuffer=new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
 	private LinkedList<Message>[] deleteMessageBuffer=new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
@@ -26,6 +26,7 @@ public class MessageQueue {
 	synchronized public void putMessage(Message m) {
 		assert(!queue1.contains(m)):"inconsistency";
 		assert(m.firstLock!=null);
+		assert(m.messageArrivalTime>=arrivalTimeOfLastRemovedMessage):"big inconsistency!";
 		queue1.add(m);
 		//assert(queue1.contains(m)):"inconsistency";
 		// This assertion was removed, because of concurrent access this might be violated
@@ -54,7 +55,7 @@ public class MessageQueue {
 			// to execute!!!
 		//	m.killMessage(); 
 		//}
-		
+
 
 		
 		queue1.remove(m);
@@ -68,19 +69,31 @@ public class MessageQueue {
 		//}
 		
 		
+		emptyBuffers();
+		
 		Message m = queue1.poll();
-		//arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
+		if (m!=null){
+			arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
+		}
 		return m;
 	}
 
 	synchronized public boolean isEmpty() {
-		if ((queue1.isEmpty() && addBuffer.size()==0)  || (queue1.peek() instanceof NullMessage && queue1.size()==1 && addBuffer.size()==0)){
+		boolean allBuffersEmpty=true;
+		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
+			if (!addMessageBuffer[i-1].isEmpty()){
+				allBuffersEmpty=false; break;
+			}
+		}
+		
+		if (queue1.isEmpty() && allBuffersEmpty){
 			return true;
 		} else {
 			return false;
 		}
 	}
 
+	/*
 	public void addBuffer(Message m){
 		synchronized(addBuffer){
 			addBuffer.add(m);
@@ -92,6 +105,7 @@ public class MessageQueue {
 			deleteBuffer.add(m);
 		}
 	}
+	*/
 	
 	public void addBuffer(Message m,int threadId){
 		synchronized(addMessageBuffer[threadId-1]){

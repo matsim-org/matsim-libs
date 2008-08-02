@@ -41,8 +41,9 @@ public class StartingLegMessage extends EventMessage {
 			event=new EventAgentDeparture(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getLegIndex()-1,vehicle.getCurrentLink().getId().toString());
 		}
 		
-		SimulationParameters.events.processEvent(event);
+		//SimulationParameters.events.processEvent(event);
 		//SimulationParameters.processEvent(event);
+		SimulationParameters.bufferEvent(event);
 	}
 	
 }

@@ -56,6 +56,9 @@ public class Scheduler {
 		//} else {
 		//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].deleteBuffer(m);
 		//}
+		
+		
+		//threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].removeMessage(m);
 		threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].deleteBuffer(m,MessageExecutor.getThreadId());
 	}
 	
@@ -76,6 +79,10 @@ public class Scheduler {
 		
 		try {
 			//Thread.currentThread().sleep(20000);
+			
+			
+			
+			
 			while (true){
 				boolean allEmpty=true;
 				for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
@@ -84,10 +91,16 @@ public class Scheduler {
 					}
 				}
 				if (!allEmpty){
-					Thread.currentThread().sleep(3000);
+					Gbl.printMemoryUsage();
+					SimulationParameters.processEventBuffer();
+					Thread.currentThread().sleep(1000);
 				} else {
 					simulationTerminated=true;
-					Thread.currentThread().sleep(3000);
+					SimulationParameters.processEventBuffer();
+					Thread.currentThread().sleep(1000);
+					for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
+						messageExecutors[i-1].stop();
+					}
 					break;
 				}
 			}
@@ -95,6 +108,9 @@ public class Scheduler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		
 		System.out.println("XMedian:"+SimulationParameters.sumXCoordinate/SimulationParameters.noOfCars);
 		System.out.println("XMedianLeft:"+SimulationParameters.sumXCoordinateLeft/SimulationParameters.noOfCarsLeft);
 		System.out.println("XMedianRight:"+SimulationParameters.sumXCoordinateRight/SimulationParameters.noOfCarsRight);
