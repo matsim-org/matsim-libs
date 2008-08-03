@@ -56,7 +56,6 @@ public abstract class TransformationFactory {
 			// pass any other coord-system to Geotools:
 			return new GeotoolsTransformation(fromSystem, WGS84);
 		}
-		throw new IllegalArgumentException(
-				"No coordinate-transformation found for transforming from " + fromSystem + " to " + toSystem);
+		return new GeotoolsTransformation(fromSystem, toSystem);
 	}
 }

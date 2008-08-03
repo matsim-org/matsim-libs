@@ -37,10 +37,9 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import com.vividsolutions.jts.geom.Point;
 
 /**
- * A transformation factory for various coordinate systems using the geotools
+ * A transformation factory for various coordinate systems using the GeoTools.
  *
  * @author laemmel
- *
  */
 public class GeotoolsTransformation implements CoordinateTransformationI {
 
@@ -57,6 +56,18 @@ public class GeotoolsTransformation implements CoordinateTransformationI {
 				"PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]");
 	}
 
+
+	/**
+	 * Creates a new coordinate transformation that makes use of GeoTools.
+	 * The coordinate systems to translate from and to can either be specified as
+	 * shortened names, as defined in {@link TransformationFactory}, or as
+	 * Well-Known-Text (WKT) as supported by the GeoTools.
+	 *
+	 * @param from Specifies the origin coordinate reference system
+	 * @param to Specifies the destination coordinate reference system
+	 *
+	 * @see <a href="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT specifications</a>
+	 */
 	public GeotoolsTransformation(String from, String to) {
 		CoordinateReferenceSystem sourceCRS = getCRS(from);
 		CoordinateReferenceSystem targetCRS = getCRS(to);
@@ -83,13 +94,13 @@ public class GeotoolsTransformation implements CoordinateTransformationI {
 	private CoordinateReferenceSystem getCRS(String crsString) {
 		String wkt_CRS = transformations.get(crsString);
 		if (wkt_CRS == null) {
-			throw new IllegalArgumentException("Coordinate system " + crsString + " is not known!");
+			wkt_CRS = crsString;
 		}
 
 		try {
 			return CRS.parseWKT(wkt_CRS);
 		} catch (FactoryException e) {
-			throw new RuntimeException(e);
+			throw new IllegalArgumentException(e);
 		}
 	}
 
