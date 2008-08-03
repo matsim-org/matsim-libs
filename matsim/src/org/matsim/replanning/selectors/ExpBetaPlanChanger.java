@@ -57,9 +57,10 @@ public class ExpBetaPlanChanger implements PlanSelectorI {
 
 		if ( betaFlag ) {
 			System.err.println( "ExpBetaPlanChanger: The following beta should be replaced by beta/2.  Not fatal.") ; // ask kai.  Jul08
+			System.err.println( "(This has now been done.  If you have used expBetaPlanChanger before, double the beta in your config file.)") ; // ask kai.  Jul08
 			betaFlag = false ;
 		}
-		double weight = Math.exp( this.beta * (otherScore - currentScore) );
+		double weight = Math.exp( 0.5 * this.beta * (otherScore - currentScore) );
 		// (so far, this is >1 if otherScore>currentScore, and <=1 otherwise)
 		// (beta is the slope (strength) of the operation: large beta means strong reaction)
 
