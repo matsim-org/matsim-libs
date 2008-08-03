@@ -73,7 +73,6 @@ public class ConcurrentList<T> {
 
 static class ARunnable implements Runnable{
 	ConcurrentList<Integer> cList=new ConcurrentList<Integer>();
-	@Override
 	public void run() {
 		Timer timer=new Timer();
 		timer.startTimer();
@@ -91,7 +90,7 @@ static class ARunnable implements Runnable{
 
 static class BRunnable implements Runnable{
 	ConcurrentList<Integer> cList=new ConcurrentList<Integer>();
-	@Override
+
 	public void run() {
 		Timer timer=new Timer();
 		timer.startTimer();
@@ -119,7 +118,6 @@ static class BRunnable implements Runnable{
 
 static class CRunnable implements Runnable{
 	ConcurrentLinkedQueue<Integer> cList=new ConcurrentLinkedQueue<Integer>();
-	@Override
 	public void run() {
 		Timer timer=new Timer();
 		timer.startTimer();
@@ -137,7 +135,6 @@ static class CRunnable implements Runnable{
 
 static class DRunnable implements Runnable{
 	ConcurrentLinkedQueue<Integer> cList=new ConcurrentLinkedQueue<Integer>();
-	@Override
 	public void run() {
 		Timer timer=new Timer();
 		timer.startTimer();
