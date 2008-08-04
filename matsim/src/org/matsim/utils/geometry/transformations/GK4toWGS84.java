@@ -35,48 +35,57 @@ import org.matsim.utils.geometry.shared.Coord;
  */
 public class GK4toWGS84 implements CoordinateTransformationI {
 
-	public CoordI transform(final CoordI coord) {
+	/*
+	 * GK4 is a specially parameterized version of the Transverse Mercator coordinate system.
+	 * Thus, the transformation from Transverse Mercator to WGS84 can be used to convert
+	 * GK4 to WGS84.
+	 *
+	 * see http://www.epsg.org/guides/docs/G7-2.pdf, chapter on Transverse Mercator,
+	 * for the conversion.
+	 */
 
-		/*
-		 * GK4 is a specially parameterized version of the Transverse Mercator coordinate system.
-		 * Thus, the transformation from Transverse Mercator to WGS84 can be used to convert
-		 * GK4 to WGS84.
-		 *
-		 * see http://www.epsg.org/guides/docs/G7-2.pdf, chapter on Transverse Mercator,
-		 * for the conversion.
-		 */
+	// ellipsoid: bessel 1841
+	private static final double a = 6377397.155;
+	// private static final double f = 1/299.15281; // flattening of bessel 1841, not used here
+	private static final double e = 0.081696831;
+
+	private static final double falseEasting = 4500110.0;
+	private static final double falseNorthing = 116.0;
+	private static final double k0 = 1.0;
+	// private static final double projectionLatitude = 0.0;
+	private static final double projectionLongitude = 12.0 * Math.PI / 180.0;
+
+	private static final double e2 = e*e;
+	private static final double e_2 = e2 / (1 - e2);
+	private static final double e1 = (1 - Math.pow(1 - e2, 0.5)) / (1 + Math.pow(1 - e2, 0.5));
+	private static final double M0 = 0.0;
+	private static final double MU1_DIVISOR = a * (1 - e2*(1.0/4.0 - e2*(3.0/64.0) - e2*(5.0/256.0)));
+
+	private static final double[] PHI1_DIVIDENS = {
+		(3 * e1 / 2 - 27 * Math.pow(e1, 3) / 32),
+		(21 * Math.pow(e1, 2) / 16 - 55 * Math.pow(e1, 4) / 32),
+		(151 * Math.pow(e1, 3) / 96),
+		(1097 * Math.pow(e1, 4) / 512)
+	};
+
+	public CoordI transform(final CoordI coord) {
 
 		double easting = coord.getX();
 		double northing = coord.getY();
 
-		// ellipsoid: bessel 1841
-		double a = 6377397.155;
-//		double f = 1/299.15281; // flattening of bessel 1841, not used here
-		double e = 0.081696831;
-
-		double falseEasting = 4500110.0;
-		double falseNorthing = 116.0;
-		double k0 = 1.0;
-//		double projectionLatitude = 0.0;
-		double projectionLongitude = 12.0 * Math.PI / 180.0;
-
-		double e2 = e*e;
-		double e1 = (1 - Math.pow(1 - e2, 0.5)) / (1 + Math.pow(1 - e2, 0.5));
-		double M0 = 0.0;
 		double M1 = M0 + (northing - falseNorthing) / k0;
-		double mu1 = M1 / (a * (1 - e2*(1.0/4.0 - e2*(3.0/64.0) - e2*(5.0/256.0))));
+		double mu1 = M1 / MU1_DIVISOR;
 
 		double phi1 = mu1
-				+ (3 * e1 / 2 - 27 * Math.pow(e1, 3) / 32) * Math.sin(2 * mu1)
-				+ (21 * Math.pow(e1, 2) / 16 - 55 * Math.pow(e1, 4) / 32) * Math.sin(4 * mu1)
-				+ (151 * Math.pow(e1, 3) / 96) * Math.sin(6 * mu1)
-				+ (1097 * Math.pow(e1, 4) / 512) * Math.sin(8 * mu1);
+				+ PHI1_DIVIDENS[0] * Math.sin(2 * mu1)
+				+ PHI1_DIVIDENS[1] * Math.sin(4 * mu1)
+				+ PHI1_DIVIDENS[2] * Math.sin(6 * mu1)
+				+ PHI1_DIVIDENS[3] * Math.sin(8 * mu1);
 
 		double cosphi1 = Math.cos(phi1);
 		double sinphi1 = Math.sin(phi1);
 		double tanphi1 = Math.tan(phi1);
 
-		double e_2 = e2 / (1 - e2);
 		double C1 = e_2 * cosphi1 * cosphi1;
 		double T1 = Math.pow(tanphi1, 2);
 		double rho1 = a * (1 - e2) / Math.pow((1 - e2 * sinphi1 * sinphi1), 1.5);
