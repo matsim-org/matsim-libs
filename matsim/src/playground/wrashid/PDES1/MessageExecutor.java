@@ -64,7 +64,7 @@ public class MessageExecutor extends Thread {
 		//scheduler.threadMessageQueues[threadId-1].putMessage(nullMessage);
 		int barrierRound=0;
 		try{
-			while (true){
+			while (getSimTime()<100000){
 				// this is needed, because for the same street the lock should happen before the next road can do the lock
 				
 				//while (scheduler.queue.getCounter()%(this.id+1)!=0 && !scheduler.queue.isEmpty()){
