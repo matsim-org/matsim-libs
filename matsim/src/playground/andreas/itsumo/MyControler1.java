@@ -324,7 +324,7 @@ public class MyControler1 extends Controler {
 	public static void main(final String[] args) {
 
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./test/shared/itsumo-sesam-scenario/config.xml"});
+			Gbl.createConfig(new String[] {"./examples/itsumo-sesam-scenario/config.xml"});
 		} else {
 			Gbl.createConfig(args) ;
 		}
