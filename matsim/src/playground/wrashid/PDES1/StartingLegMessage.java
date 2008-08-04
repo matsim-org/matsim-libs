@@ -24,7 +24,8 @@ public class StartingLegMessage extends EventMessage {
 		
 		if (vehicle.getCurrentLeg().getMode().equalsIgnoreCase("car")){
 			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
-			road.enterRequest(vehicle);
+			//road.enterRequest(vehicle);
+			road.roadEntryHandler.registerEnterRequestMessage(road, vehicle, messageArrivalTime);
 		} else {
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
 			ArrayList<Object> actsLegs = plan.getActsLegs();
@@ -44,6 +45,11 @@ public class StartingLegMessage extends EventMessage {
 		//SimulationParameters.events.processEvent(event);
 		//SimulationParameters.processEvent(event);
 		SimulationParameters.bufferEvent(event);
+	}
+
+	@Override
+	public void recycleMessage() {
+		MessageFactory.disposeStartingLegMessage(this);		
 	}
 	
 }

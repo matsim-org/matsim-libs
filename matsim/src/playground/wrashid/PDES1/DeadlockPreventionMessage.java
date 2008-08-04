@@ -34,6 +34,11 @@ public class DeadlockPreventionMessage extends EventMessage {
 		// don't do anything
 	}
 
+	@Override
+	public void recycleMessage() {
+		MessageFactory.disposeDeadlockPreventionMessage(this);		
+	}
+
 	
 	
 	

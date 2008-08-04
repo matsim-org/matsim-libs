@@ -57,14 +57,14 @@ public class MessageExecutor extends Thread {
 		
 		double arrivalTimeOfLastProcessedMessage=0;
 		
-		Message nullMessage=new NullMessage();
-		nullMessage.firstLock=nullMessage; // TODO: remove this nonsense (just needed for assertion problem)
+		//Message nullMessage=new NullMessage();
+		//nullMessage.firstLock=nullMessage; // TODO: remove this nonsense (just needed for assertion problem)
 		
-		nullMessage.messageArrivalTime=scheduler.timeOfNextBarrier;
-		scheduler.threadMessageQueues[threadId-1].putMessage(nullMessage);
+		//nullMessage.messageArrivalTime=scheduler.timeOfNextBarrier;
+		//scheduler.threadMessageQueues[threadId-1].putMessage(nullMessage);
 		int barrierRound=0;
 		try{
-			while (getSimTime()<SimulationParameters.maxSimulationLength){
+			while (true){
 				// this is needed, because for the same street the lock should happen before the next road can do the lock
 				
 				//while (scheduler.queue.getCounter()%(this.id+1)!=0 && !scheduler.queue.isEmpty()){
@@ -93,7 +93,7 @@ public class MessageExecutor extends Thread {
 				 //Method, which should function, but does not...
 				// improve through await and increasing number of threads? 
 
-				message=null;
+
 				
 				
 				//while(getLeastTimeOfNextMessageOfAllAdjacentProcessors()<arrivalTimeOfLastProcessedMessage-getMinOutflowCapacityOfAllAdjacentProcessors()){
@@ -114,25 +114,19 @@ public class MessageExecutor extends Thread {
 				//while (message==null){
 					
 				//}
-				message=scheduler.getNextMessage(threadId);
+				
 				if (scheduler.simulationTerminated){
 					break;
 				}
 				
 				
 				
-				
-				
-				if (message==nullMessage){
-					if (threadId==1){
-						scheduler.timeOfNextBarrier+=scheduler.barrierDelta;
-					}
-					scheduler.barrier.awaitT(threadId);
-					nullMessage.messageArrivalTime=scheduler.timeOfNextBarrier;
-					scheduler.threadMessageQueues[threadId-1].putMessage(nullMessage);
-				} else {
+				message=scheduler.getNextMessage(threadId);
+				if (message!=null){
 					executeMessage();
 				}
+				
+				
 					
 				
 				
@@ -172,6 +166,7 @@ public class MessageExecutor extends Thread {
 		} else {
 			message.receivingUnit.handleMessage(message);
 		}
+		message.recycleMessage();
 	}
 
 	public void setMessage(Message message) {

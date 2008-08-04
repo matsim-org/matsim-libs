@@ -6,8 +6,7 @@ import java.util.ArrayList;
 
 import playground.wrashid.DES.EventLog;
 import playground.wrashid.DES.SimulationParameters;
-import playground.wrashid.deqsim.DEQSimStarter;
-import playground.wrashid.deqsim.PDESStarter;
+import playground.wrashid.deqsim.PDESStarter1;
 import playground.wrashid.test.CppEventFileParser;
 
 public class Test2 {
@@ -19,7 +18,7 @@ public class Test2 {
 		args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
-		PDESStarter.main(args);
+		PDESStarter1.main(args);
 		//assertEquals(EventLog.compare(eventLog1,eventLog2),true);
 	}
 }

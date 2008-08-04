@@ -39,6 +39,13 @@ public class SimulationParameters {
 	public static double stuckTime=Double.MAX_VALUE; // - this time is used for deadlock prevention.
 														   // - when a car waits for more than 'stuckTime' for 
 														   //   entering next road, it will enter the next 
+	
+	
+	public static double delta=0.001; // this delta is used to correct any wrong messages (e.g. if a null message is sent, that there
+	// cannot be any vehicle until time x. And exactly at time x there is a vehicle, then we could have a problem in the simulation.
+	// For this reason, this delta is introduced: All null messages are corrected by this delta value;
+	// especially at the beginning of the simulation this is possible, as all roads have a null message (and possibly some enterRequest messages).
+	
 
 	
 	
@@ -51,7 +58,7 @@ public class SimulationParameters {
 	public static final int maxQueueLength=10000;
 	// optimal: numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()
 	//public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
-	public static final int numberOfMessageExecutorThreads=1;
+	public static final int numberOfMessageExecutorThreads=2;
 	
 	synchronized public static void processEvent(BasicEvent event){
 		SimulationParameters.events.processEvent(event);

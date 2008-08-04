@@ -59,6 +59,7 @@ public class EndLegMessage extends EventMessage {
 		
 	}
 	
+	
 	public void logEvent() {
 		BasicEvent event=null;
 		
@@ -69,6 +70,12 @@ public class EndLegMessage extends EventMessage {
 		//SimulationParameters.events.processEvent(event);
 		//SimulationParameters.processEvent(event);
 		SimulationParameters.bufferEvent(event);
+	}
+
+
+	@Override
+	public void recycleMessage() {
+		MessageFactory.disposeEndLegMessage(this);		
 	}
 	
 }

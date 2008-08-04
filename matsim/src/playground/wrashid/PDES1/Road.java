@@ -28,12 +28,14 @@ public class Road extends SimUnit {
 	//private LinkedList<Vehicle> interestedInEnteringRoad = new LinkedList<Vehicle>();
 	private double timeOfLastEnteringVehicle = Double.MIN_VALUE;
 	private double timeOfLastLeavingVehicle = Double.MIN_VALUE;
-
+	public RoadEntryHandler roadEntryHandler = null;
+	
+	
 	// the inverseFlowCapacity is simple the inverse
 	// of the capacity meaning, the minimal time between two cars
 	// entering/leaving the road
 	private double inverseInFlowCapacity = 0;
-	private double inverseOutFlowCapacity = 0;
+	public double inverseOutFlowCapacity = 0;
 
 	// also we keep track of the number of cars on the road, there is a problem:
 	// if we schedule a car, that it may enter the road at time x, then must
@@ -59,6 +61,7 @@ public class Road extends SimUnit {
 	Lock lock=new ReentrantLock();
 	//public ConcurrentLinkedQueue<Message> waitingOnLock=new ConcurrentLinkedQueue<Message>();
 	private LinkedList<Message> waitingOnLock=new LinkedList<Message>();
+	public double linkTravelTime=0; // time needed to pass the link, when traveling with free speed
 	//FairLock lock=new FairLock();
 	
 	// private double oldestUnusedGapTime=Double.MIN_VALUE;
@@ -89,6 +92,19 @@ public class Road extends SimUnit {
 			belongsToMessageExecutorThreadId = 4;
 		}
 		*/
+		
+		
+		// send a null message to all other nodes at the beginning of the simulation
+		// this is important for the whole process to start
+		
+		
+		roadEntryHandler = new RoadEntryHandler(this);
+		
+		
+		
+		linkTravelTime= link.getLength()  / link.getFreespeed(SimulationParameters.linkCapacityPeriod);
+		
+		
 		
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)
@@ -122,12 +138,12 @@ public class Road extends SimUnit {
 			//System.out.println("sdfa");
 		}
 		
-		if (scheduler.minInverseInOutflowCapacity>inverseOutFlowCapacity){
-			scheduler.minInverseInOutflowCapacity=inverseOutFlowCapacity;
-		}
-		if (scheduler.minInverseInOutflowCapacity>inverseInFlowCapacity){
-			scheduler.minInverseInOutflowCapacity=inverseInFlowCapacity;
-		}
+		//if (scheduler.minInverseInOutflowCapacity>inverseOutFlowCapacity){
+		//	scheduler.minInverseInOutflowCapacity=inverseOutFlowCapacity;
+		//}
+		//if (scheduler.minInverseInOutflowCapacity>inverseInFlowCapacity){
+		//	scheduler.minInverseInOutflowCapacity=inverseInFlowCapacity;
+		//}
 		
 	}
 	
@@ -239,8 +255,7 @@ public class Road extends SimUnit {
 
 		double nextAvailableTimeForLeavingStreet = Double.MIN_VALUE;
 		nextAvailableTimeForLeavingStreet = MessageExecutor.getSimTime()
-				+ link.getLength()
-				/ link.getFreespeed(SimulationParameters.linkCapacityPeriod);
+				+ linkTravelTime;
 
 		noOfCarsPromisedToEnterRoad--;
 		carsOnTheRoad.add(vehicle);

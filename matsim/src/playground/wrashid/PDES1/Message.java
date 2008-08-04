@@ -62,5 +62,7 @@ public abstract class Message implements Comparable {
 	public boolean isAlive(){
 		return isAlive;
 	}
+	
+	public abstract void recycleMessage();
 
 }

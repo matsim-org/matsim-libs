@@ -27,9 +27,9 @@ public class Scheduler {
 	volatile public boolean simulationTerminated=false;
 	// actually this is not the right one, because it could be, that the min outflow cap is on the same
 	// thread (adjacent links)
-	public double minInverseInOutflowCapacity=Double.MAX_VALUE;
-	public double barrierDelta=0;
-	volatile public double timeOfNextBarrier=0;
+	//public double minInverseInOutflowCapacity=Double.MAX_VALUE;
+	//public double barrierDelta=0;
+	//volatile public double timeOfNextBarrier=0;
 	
 	public void schedule(Message m){
 			// TODO: find out the magic behind this number:
@@ -43,11 +43,16 @@ public class Scheduler {
 			//} else {
 			//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m);
 			//}
+		
+		/*
 		if (Thread.currentThread() instanceof MessageExecutor){
 			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m, MessageExecutor.getThreadId());
 		} else {
 			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m,1);
 		}
+		*/
+		threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].putMessage(m);
+		
 	}
 	
 	public void unschedule(Message m){
@@ -74,7 +79,7 @@ public class Scheduler {
 		
 		initializeSimulation();
 		
-		System.out.println("minInverseOutflowCapacity: "+minInverseInOutflowCapacity);
+		//System.out.println("minInverseOutflowCapacity: "+minInverseInOutflowCapacity);
 		
 		
 		try {
@@ -91,12 +96,12 @@ public class Scheduler {
 					}
 				}
 				if (!allEmpty){
-					if (timeOfNextBarrier / hourlyLogTime > 1){
-						hourlyLogTime = timeOfNextBarrier + 3600;
-						System.out.print("Simulation at " + timeOfNextBarrier/3600 + "[h]; ");
-						System.out.println("s/r:"+timeOfNextBarrier/(System.currentTimeMillis()-simulationStart)*1000);
+					//if (timeOfNextBarrier / hourlyLogTime > 1){
+					//	hourlyLogTime = timeOfNextBarrier + 3600;
+					//	System.out.print("Simulation at " + timeOfNextBarrier/3600 + "[h]; ");
+					//	System.out.println("s/r:"+timeOfNextBarrier/(System.currentTimeMillis()-simulationStart)*1000);
 						Gbl.printMemoryUsage();
-					}
+					//}
 					SimulationParameters.processEventBuffer();
 					Thread.currentThread().sleep(1000);
 				} else {
@@ -156,14 +161,14 @@ public class Scheduler {
 		
 		
 		// intitialize variables (precondition: message queue intialized and its buffer emptied)
-		barrierDelta=minInverseInOutflowCapacity;
-		timeOfNextBarrier=Double.MAX_VALUE;
-		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
-			if (threadMessageQueues[i-1].getArrivalTimeOfNextMessage()<timeOfNextBarrier)
+		//barrierDelta=minInverseInOutflowCapacity;
+		//timeOfNextBarrier=Double.MAX_VALUE;
+		//for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
+		//	if (threadMessageQueues[i-1].getArrivalTimeOfNextMessage()<timeOfNextBarrier)
 				
-				timeOfNextBarrier=threadMessageQueues[i-1].getArrivalTimeOfNextMessage();
-		}
-		timeOfNextBarrier+=barrierDelta;
+		//		timeOfNextBarrier=threadMessageQueues[i-1].getArrivalTimeOfNextMessage();
+		//}
+		//timeOfNextBarrier+=barrierDelta;
 		
 		// create message executors and start them (precondition: all sim units need to be initialized at this point)
 		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
@@ -176,6 +181,10 @@ public class Scheduler {
 		noOfAliveThreads=SimulationParameters.numberOfMessageExecutorThreads;
 		
 		
+		// schedule a null message on all roads
+		for (Road road:Road.allRoads.values()){
+			NullMessage.scheduleNullMessage(road, 0);
+		}
 		
 		
 	}

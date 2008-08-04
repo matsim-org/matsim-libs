@@ -12,6 +12,23 @@ public class MessageFactory {
 	
 	private static ConcurrentLinkedQueue<DeadlockPreventionMessage> deadlockPreventionMessageQueue=new ConcurrentLinkedQueue<DeadlockPreventionMessage>();
 	
+	private static ConcurrentLinkedQueue<NullMessage> nullMessageQueue=new ConcurrentLinkedQueue<NullMessage>();
+	private static ConcurrentLinkedQueue<EnterRequestMessage> enterRequestMessageQueue=new ConcurrentLinkedQueue<EnterRequestMessage>();
+	
+	
+	public static void disposeNullMessage(NullMessage message){
+		if (nullMessageQueue.size()<SimulationParameters.maxQueueLength){
+			nullMessageQueue.add(message);
+		}
+	}
+	
+	public static void disposeEnterRequestMessage(EnterRequestMessage message){
+		if (enterRequestMessageQueue.size()<SimulationParameters.maxQueueLength){
+			enterRequestMessageQueue.add(message);
+		}
+	}
+	
+	
 	
 	public static void disposeEndLegMessage(EndLegMessage message){
 		if (endLegMessageQueue.size()<SimulationParameters.maxQueueLength){
@@ -107,6 +124,8 @@ public class MessageFactory {
 		}
 	}
 	
+	
+	
 	public static DeadlockPreventionMessage getDeadlockPreventionMessage(Scheduler scheduler,Vehicle vehicle){
 		if (deadlockPreventionMessageQueue.size()<SimulationParameters.minQueueLength){
 			return new DeadlockPreventionMessage(scheduler,vehicle);
@@ -114,6 +133,23 @@ public class MessageFactory {
 			DeadlockPreventionMessage message=deadlockPreventionMessageQueue.poll();
 			message.resetMessage(scheduler, vehicle);
 			return message;
+		}
+	}
+	
+	public static NullMessage getNullMessage(){
+		if (nullMessageQueue.size()<SimulationParameters.minQueueLength){
+			return new NullMessage();
+		} else {
+			return nullMessageQueue.poll();
+		}
+	}
+	
+	
+	public static EnterRequestMessage getEnterRequestMessage(){
+		if (nullMessageQueue.size()<SimulationParameters.minQueueLength){
+			return new EnterRequestMessage();
+		} else {
+			return enterRequestMessageQueue.poll();
 		}
 	}
 	

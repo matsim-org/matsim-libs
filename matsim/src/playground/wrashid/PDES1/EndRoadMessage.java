@@ -28,6 +28,9 @@ public class EndRoadMessage extends EventMessage {
 			// the leg is completed, try to enter the last link but do not enter it 
 			// (just wait, until you have clearance for enter and then leave the road)
 			
+			
+			Road previousRoad=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
+			
 			vehicle.initiateEndingLegMode();
 			
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
@@ -38,7 +41,8 @@ public class EndRoadMessage extends EventMessage {
 			//System.out.println(vehicle.getCurrentLink().getId().toString());
 			
 			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
-			road.enterRequest(vehicle);	
+			//road.enterRequest(vehicle);	
+			road.roadEntryHandler.registerEnterRequestMessage(previousRoad, vehicle, messageArrivalTime);
 		} else if (vehicle.getCurrentLinkRoute().length>vehicle.getLinkIndex()+1){
 			// if leg is not finished yet
 			vehicle.setLinkIndex(vehicle.getLinkIndex()+1);
@@ -60,6 +64,11 @@ public class EndRoadMessage extends EventMessage {
 	
 	public void logEvent() {
 		// don't do anything
+	}
+
+	@Override
+	public void recycleMessage() {
+		MessageFactory.disposeEndRoadMessage(this);
 	}
 
 }
