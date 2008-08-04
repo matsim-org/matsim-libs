@@ -25,8 +25,9 @@ public class MessageQueue {
 	
 	synchronized public void putMessage(Message m) {
 		assert(!queue1.contains(m)):"inconsistency";
-		assert(m.firstLock!=null);
-		assert(m.messageArrivalTime>=arrivalTimeOfLastRemovedMessage):"big inconsistency!";
+		assert(m.messageArrivalTime>=0):"simulation time cannot be negative";
+		//assert(m.firstLock!=null);
+		//assert(m.messageArrivalTime>=arrivalTimeOfLastRemovedMessage):"big inconsistency!"; // this condition does not hold anymore!!!
 		queue1.add(m);
 		//assert(queue1.contains(m)):"inconsistency";
 		// This assertion was removed, because of concurrent access this might be violated
@@ -64,9 +65,9 @@ public class MessageQueue {
 	synchronized public Message getNextMessage() {
 		counter++;
 
-		//if (counter % 10000==0){
-		//	System.out.println("event:" + counter);
-		//}
+		if (counter % 100000==0){
+			System.out.println("event:" + counter);
+		}
 		
 		
 		emptyBuffers();
@@ -74,6 +75,15 @@ public class MessageQueue {
 		Message m = queue1.poll();
 		if (m!=null){
 			arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
+			
+				
+			//if (queue1.size() % 1000 ==0){
+			if (arrivalTimeOfLastRemovedMessage>100){	
+				//System.out.println(queue1.size());
+				//System.out.println(arrivalTimeOfLastRemovedMessage);
+			}
+			
+			assert(arrivalTimeOfLastRemovedMessage>=0):"simulation time cannot be negative";
 		}
 		return m;
 	}

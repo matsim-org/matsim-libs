@@ -103,8 +103,11 @@ public class Road extends SimUnit {
 		
 		
 		linkTravelTime= link.getLength()  / link.getFreespeed(SimulationParameters.linkCapacityPeriod);
-		
-		
+		if (linkTravelTime<1){
+			//System.out.println(linkTravelTime);
+		}
+		assert(link.getLength()>0);
+		assert(linkTravelTime>0);
 		
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)

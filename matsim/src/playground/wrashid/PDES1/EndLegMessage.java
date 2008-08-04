@@ -23,7 +23,6 @@ public class EndLegMessage extends EventMessage {
 		//vehicle.leavePreviousRoad();
 		
 		
-		
 		// schedule next leg, if there are more legs, else end trip (TODO)
 		
 		// start next leg

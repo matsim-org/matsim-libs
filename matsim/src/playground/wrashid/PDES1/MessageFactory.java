@@ -145,9 +145,9 @@ public class MessageFactory {
 	}
 	
 	
-	public static EnterRequestMessage getEnterRequestMessage(){
-		if (nullMessageQueue.size()<SimulationParameters.minQueueLength){
-			return new EnterRequestMessage();
+	public static EnterRequestMessage getEnterRequestMessage(Vehicle vehicle){
+		if (enterRequestMessageQueue.size()<SimulationParameters.minQueueLength){
+			return new EnterRequestMessage(vehicle);
 		} else {
 			return enterRequestMessageQueue.poll();
 		}

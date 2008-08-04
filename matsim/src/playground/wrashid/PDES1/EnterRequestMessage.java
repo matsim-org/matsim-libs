@@ -2,8 +2,11 @@ package playground.wrashid.PDES1;
 
 public class EnterRequestMessage extends SelfhandleMessage {
 
+	Vehicle vehicle;
+	
 	@Override
 	public void selfhandleMessage() {
+		
 		Vehicle vehicle=(Vehicle) sendingUnit;
 		Road toRoad=(Road) receivingUnit;
 		
@@ -16,8 +19,9 @@ public class EnterRequestMessage extends SelfhandleMessage {
 		
 	}
 	
-	public EnterRequestMessage(){
+	public EnterRequestMessage(Vehicle vehicle){
 		super();
+		this.vehicle=vehicle;
 	}
 
 	@Override

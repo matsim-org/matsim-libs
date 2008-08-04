@@ -1,5 +1,6 @@
 package playground.wrashid.PDES1;
 
+import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.LinkedList;
 import org.matsim.network.Link;
@@ -39,8 +40,10 @@ public class RoadEntryHandler {
 				pendingMessagesFromRoads.add(fromRoad);
 			}
 			
-			EnterRequestMessage erm=new EnterRequestMessage();
-			erm.sendingUnit = vehicle;
+			
+			
+			EnterRequestMessage erm=MessageFactory.getEnterRequestMessage(vehicle);
+			erm.sendingUnit = fromRoad;
 			erm.receivingUnit=belongsToRoad;
 			erm.messageArrivalTime=simTime;
 			messageQueue.add(erm);
@@ -61,7 +64,22 @@ public class RoadEntryHandler {
 		while (pendingMessagesFromRoads.size()==this.numberOfIncomingRoads){
 			// as long as all roads have messages on them, take the least message 
 			Message m=messageQueue.poll();
-			pendingMessagesFromRoads.remove(m.sendingUnit);
+			
+			// if there is no other message with the same sendingUnit, remove the sendingUnit from pendingMessages from Road
+			boolean hasNoMoreMessagesFromSameSource=true;
+			Iterator<Message> iter=messageQueue.iterator();
+			
+			while (iter.hasNext()){
+				Message message=iter.next();
+				if (message.sendingUnit==m.sendingUnit){
+					hasNoMoreMessagesFromSameSource=false;
+				}
+			}
+			
+			if (hasNoMoreMessagesFromSameSource){
+				pendingMessagesFromRoads.remove(m.sendingUnit);
+			}
+			
 			belongsToRoad.scheduler.schedule(m);
 		}
 	}
