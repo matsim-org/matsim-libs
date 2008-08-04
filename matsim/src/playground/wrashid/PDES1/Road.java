@@ -174,7 +174,7 @@ public class Road extends SimUnit {
 		//System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
 		
 		 if (carsOnTheRoad.isEmpty()){
-			 System.out.println();
+			 //System.out.println();
 		 }
 		 
 		assert(carsOnTheRoad.getFirst()==vehicle):"road:"+link.getId()+  " - " + this + " - " + lock; // TODO: uncomment this, and find out, why it produces a problem with test6

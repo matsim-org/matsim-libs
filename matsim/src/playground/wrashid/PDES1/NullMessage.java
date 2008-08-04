@@ -27,7 +27,7 @@ public class NullMessage extends SelfhandleMessage {
 			nm.receivingUnit=outRoad;
 			nm.messageArrivalTime=messageArrivalTime+currentRoad.linkTravelTime-SimulationParameters.delta;
 			if (nm.messageArrivalTime<0){
-				System.out.println();
+				//System.out.println();
 			}
 			assert(nm.messageArrivalTime>=0);
 			outRoad.roadEntryHandler.registerNullMessage(nm);
