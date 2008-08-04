@@ -65,7 +65,7 @@ public class MessageQueue {
 	synchronized public Message getNextMessage() {
 		counter++;
 
-		if (counter % 100000==0){
+		if (counter % 10000000==0){
 			System.out.println("event:" + counter);
 			System.out.println(arrivalTimeOfLastRemovedMessage);
 		}
