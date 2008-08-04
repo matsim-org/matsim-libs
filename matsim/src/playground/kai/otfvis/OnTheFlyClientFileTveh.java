@@ -19,7 +19,7 @@ public class OnTheFlyClientFileTveh {
 		
 		String netFileName = "/Users/nagel/eclipse/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml" ;
 //		String vehFileName = "/home/nagel/vsp-cvs/runs/run465/0.T.veh.gz" ; 
-		String vehFileName = "/home/nagel/vsp-cvs/runs/run458/200.T.veh.gz" ;
+		String vehFileName = "/home/nagel/vsp-cvs/runs/run465/500.T.veh.gz" ;
 //		String vehFileName = "/home/nagel/vsp-cvs/runs/run465/500.T.veh.gz" ; // current (may08) base case
 //		String vehFileName = "/home/nagel/vsp-cvs/runs/run487/100.T.veh.gz" ; 
 //		String vehFileName = "../matsim-trunk/output/myrun/ITERS/it.99/99.T.veh.gz" ;
