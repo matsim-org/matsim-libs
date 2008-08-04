@@ -67,6 +67,7 @@ public class MessageQueue {
 
 		if (counter % 100000==0){
 			System.out.println("event:" + counter);
+			System.out.println(arrivalTimeOfLastRemovedMessage);
 		}
 		
 		
