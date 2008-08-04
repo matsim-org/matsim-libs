@@ -7,6 +7,8 @@ public class EnterRequestMessage extends SelfhandleMessage {
 	@Override
 	public void selfhandleMessage() {
 		
+		System.out.println("enter Request message");
+		
 		Vehicle vehicle=(Vehicle) sendingUnit;
 		Road toRoad=(Road) receivingUnit;
 		

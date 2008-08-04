@@ -31,6 +31,15 @@ public class MessageQueue {
 		queue1.add(m);
 		//assert(queue1.contains(m)):"inconsistency";
 		// This assertion was removed, because of concurrent access this might be violated
+	
+		if (!(m instanceof NullMessage)){
+			System.out.println(m + " - " + m.messageArrivalTime + " - " + arrivalTimeOfLastRemovedMessage);
+		}
+		
+		
+		if (m.messageArrivalTime>2000){	
+			//System.out.println("m.messageArrivalTime:"+m.messageArrivalTime);
+		}
 	}
 	
 	public MessageQueue(){
@@ -71,21 +80,39 @@ public class MessageQueue {
 		}
 		
 		
+		
+		
 		emptyBuffers();
 		
 		Message m = queue1.poll();
 		if (m!=null){
 			arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 			
-				
-			//if (queue1.size() % 1000 ==0){
-			if (arrivalTimeOfLastRemovedMessage>100){	
+			
+			if (arrivalTimeOfLastRemovedMessage>1000){	
 				//System.out.println(queue1.size());
-				//System.out.println(arrivalTimeOfLastRemovedMessage);
+				//System.out.println("the time has come:" + 1000);
+			}
+			
+			//if (queue1.size() % 1000 ==0){
+			if (arrivalTimeOfLastRemovedMessage>27000){	
+				//System.out.println(queue1.size());
+				//System.out.println("the time has come:" + 27000);
 			}
 			
 			assert(arrivalTimeOfLastRemovedMessage>=0):"simulation time cannot be negative";
+		
+		
+			if (!(m instanceof NullMessage)){
+				System.out.println(m + " - " + m.messageArrivalTime + " - " + arrivalTimeOfLastRemovedMessage);
+			}
+		
 		}
+		
+		
+		
+		
+		
 		return m;
 	}
 

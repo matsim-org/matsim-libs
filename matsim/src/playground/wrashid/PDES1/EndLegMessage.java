@@ -22,6 +22,7 @@ public class EndLegMessage extends EventMessage {
 	public void selfhandleMessage() {
 		//vehicle.leavePreviousRoad();
 		
+		System.out.println("end leg message");
 		
 		// schedule next leg, if there are more legs, else end trip (TODO)
 		

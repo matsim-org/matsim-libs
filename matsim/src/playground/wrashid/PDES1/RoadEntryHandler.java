@@ -11,6 +11,7 @@ public class RoadEntryHandler {
 	private int numberOfIncomingRoads=0;
 	private LinkedList<Road> pendingMessagesFromRoads=new LinkedList<Road>();
 	private PriorityQueue<Message> messageQueue=new PriorityQueue<Message>();
+	private double test_timeOfLastScheduledMessage=0;
 	
 	RoadEntryHandler(Road belongsToRoad){
 		this.belongsToRoad = belongsToRoad;
@@ -25,6 +26,7 @@ public class RoadEntryHandler {
 					pendingMessagesFromRoads.add((Road)nm.sendingUnit);
 				}	
 				
+				assert(nm.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + nm.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
 				
 				messageQueue.add(nm);
 				
@@ -40,13 +42,15 @@ public class RoadEntryHandler {
 				pendingMessagesFromRoads.add(fromRoad);
 			}
 			
-			
+			System.out.println("register entry road");
 			
 			EnterRequestMessage erm=MessageFactory.getEnterRequestMessage(vehicle);
 			erm.sendingUnit = fromRoad;
 			erm.receivingUnit=belongsToRoad;
 			erm.messageArrivalTime=simTime;
 			messageQueue.add(erm);
+			
+			assert(erm.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + erm.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
 			
 			processMessageQueue();
 		}
@@ -55,7 +59,12 @@ public class RoadEntryHandler {
 		for (Link otherLinks:fromRoad.getLink().getToNode().getOutLinks().values()){
 			Road otherRoad=Road.allRoads.get(otherLinks.getId().toString());
 			if (otherRoad!=belongsToRoad){
-				NullMessage.scheduleNullMessage(otherRoad,simTime + belongsToRoad.inverseOutFlowCapacity - SimulationParameters.delta);
+				NullMessage nm=MessageFactory.getNullMessage();
+				nm.sendingUnit=fromRoad;
+				nm.receivingUnit=otherRoad;
+				nm.messageArrivalTime=simTime + fromRoad.inverseOutFlowCapacity - SimulationParameters.delta;
+				assert(nm.messageArrivalTime>=0):"negative simTime...";
+				otherRoad.roadEntryHandler.registerNullMessage(nm);
 			}
 		}
 	}
@@ -80,6 +89,10 @@ public class RoadEntryHandler {
 				pendingMessagesFromRoads.remove(m.sendingUnit);
 			}
 			
+			//System.out.println("sdfasdf: " + m.messageArrivalTime);
+			
+			assert(m.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + m.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
+			test_timeOfLastScheduledMessage=m.messageArrivalTime;
 			belongsToRoad.scheduler.schedule(m);
 		}
 	}

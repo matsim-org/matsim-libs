@@ -14,7 +14,7 @@ public class EnterRoadMessage extends EventMessage {
 	public void selfhandleMessage() {
 		//Ask road to really enter the road
 		// => Road will then let us enter the road and tell us, when we can leave the road.
-
+		System.out.println("enter road message");
 		// enter the road and find out the time for leaving the street
 		
 		Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
