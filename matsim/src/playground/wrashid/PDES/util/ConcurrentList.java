@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import playground.wrashid.DES.utils.Timer;
 // optimized for single producer, single consumer
+// it can be used by multiple producers, but it is not optimized for that case
 public class ConcurrentList<T> {
 	private LinkedList<T> inputBuffer=new LinkedList<T>();
 	private LinkedList<T> outputBuffer=new LinkedList<T>(); 
