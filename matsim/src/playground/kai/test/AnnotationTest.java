@@ -1,10 +1,12 @@
 package playground.kai.test;
 
-import demo.DemoAnnotation;
-import demo.TypeGeneratingAnnotation;
+// commented out the code below as it does not compile. /Marcel, 4aug2008
 
-//@DemoAnnotation(what = "spam")
-@TypeGeneratingAnnotation
-public class AnnotationTest {
-
-}
+//import demo.DemoAnnotation;
+//import demo.TypeGeneratingAnnotation;
+//
+////@DemoAnnotation(what = "spam")
+//@TypeGeneratingAnnotation
+//public class AnnotationTest {
+//
+//}
