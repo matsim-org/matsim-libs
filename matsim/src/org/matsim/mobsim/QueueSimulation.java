@@ -34,7 +34,6 @@ import org.matsim.controler.Controler;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentStuck;
 import org.matsim.events.Events;
-import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
@@ -52,7 +51,7 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
 import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
 
-public class QueueSimulation extends Simulation {
+public class QueueSimulation {
 
 	private int snapshotPeriod = Integer.MAX_VALUE;
 
@@ -61,8 +60,7 @@ public class QueueSimulation extends Simulation {
 	private final Config config;
 	protected final Plans plans;
 	protected QueueNetworkLayer network;
-
-	protected EventWriterTXT myeventwriter = null;
+	protected NetworkLayer networkLayer;
 
 	protected static Events events = null; // TODO [MR] instead of making this static and Links/Nodes using QueueSimulation.getEvents(), Gbl should hold a global events-object
 	protected  SimStateWriterI netStateWriter = null;
@@ -70,8 +68,6 @@ public class QueueSimulation extends Simulation {
 	private final List<SnapshotWriterI> snapshotWriters = new ArrayList<SnapshotWriterI>();
 
 	private Class<? extends Vehicle> vehiclePrototype = Vehicle.class;
-
-	protected NetworkLayer networkLayer;
 
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 
@@ -81,10 +77,14 @@ public class QueueSimulation extends Simulation {
  	 */
 	private static PriorityQueue<Vehicle> teleportationList = new PriorityQueue<Vehicle>(30, new VehicleDepartureTimeComparator());
 
+	private Date starttime = new Date();
+
+	private double stopTime = 100*3600;
+
 	final private static Logger log = Logger.getLogger(QueueSimulation.class);
 
 	public QueueSimulation(final NetworkLayer network, final Plans plans, final Events events) {
-		super();
+		Simulation.reset();
 		this.config = Gbl.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
 		setEvents(events);
@@ -94,8 +94,23 @@ public class QueueSimulation extends Simulation {
 		this.networkLayer = network;
 	}
 
-	protected final void createAgents() {
+	public final void run() {
+		prepareSim();
+		//do iterations
+		boolean cont = true;
+		while (cont) {
+			double time = SimulationTimer.getTime();
+			beforeSimStep(time);
+			cont = doSimStep(time);
+			afterSimStep(time);
+			if (cont) {
+				SimulationTimer.incTime();
+			}
+		}
+		cleanupSim();
+	}
 
+	protected final void createAgents() {
 		if (this.plans == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
@@ -190,10 +205,10 @@ public class QueueSimulation extends Simulation {
 
 				this.netStateWriter = new QueueNetStateWriter(this.network, this.network.getNetworkLayer(), networkFile.getAbsolutePath(), myvisconf, snapshotFile, this.snapshotPeriod, buffers);
 				this.netStateWriter.open();
-			} 
-			if(snapshotFormat.contains("otfvis")){
+			}
+			if (snapshotFormat.contains("otfvis")) {
 				String snapshotFile = Controler.getIterationFilename("otfvis.mvi");
-				
+
 				this.snapshotWriters.add(new OTFQuadFileHandler.Writer(this.snapshotPeriod, this.network, snapshotFile));
 			}
 		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
@@ -204,12 +219,11 @@ public class QueueSimulation extends Simulation {
 				this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(this.networkLayer.getNetworkChangeEvents());
 			}
 	}
-	
+
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
 	 */
-	@Override
-	protected void  prepareSim() {
+	protected void prepareSim() {
 		if (events == null) {
 			throw new RuntimeException("No valid Events Object (events == null)");
 		}
@@ -232,18 +246,14 @@ public class QueueSimulation extends Simulation {
 		SimulationTimer.setTime(SimulationTimer.getSimStartTime());
 
 		createSnapshotwriter();
-		
+
 		prepareNetworkChangeEventsQueue();
 	}
 
-
-
-	//////////////////////////////////////////////////////////////////////
-	// close any files, etc.
-	//////////////////////////////////////////////////////////////////////
-	@Override
+	/**
+	 * Close any files, etc.
+	 */
 	protected void cleanupSim() {
-
 		this.network.afterSim();
 		double now = SimulationTimer.getTime();
 		for (Vehicle veh : teleportationList) {
@@ -253,7 +263,6 @@ public class QueueSimulation extends Simulation {
 		}
 		teleportationList.clear();
 
-		if (this.myeventwriter != null) this.myeventwriter.reset(0);
 		for (SnapshotWriterI writer : this.snapshotWriters) {
 			writer.finish();
 		}
@@ -266,26 +275,21 @@ public class QueueSimulation extends Simulation {
 			}
 			this.netStateWriter = null;
 		}
-
 	}
 
-	@Override
-	public void beforeSimStep(final double time) {
-		
+	protected void beforeSimStep(final double time) {
 		if (this.networkChangeEventsQueue != null && this.networkChangeEventsQueue.size() > 0){
 			handleNetworkChangeEvents(time);
 		}
 	}
 
-
-
 	/**
 	 * Do one step of the simulation run.
 	 *
+	 * @param time the current time in seconds after midnight
 	 * @return true if the simulation needs to continue
 	 */
-	@Override
-	public boolean doSimStep(final double time) {
+	protected boolean doSimStep(final double time) {
 		this.moveVehiclesWithUnknownLegMode(time);
 		this.network.simStep(time);
 
@@ -294,21 +298,19 @@ public class QueueSimulation extends Simulation {
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
 			double diffsim  = time - SimulationTimer.getSimStartTime();
 			int nofActiveLinks = this.network.getSimulatedLinks().size();
-			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + getLiving() + " lost=" + getLost() + " #links=" + nofActiveLinks
+			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 			Gbl.printMemoryUsage();
 		}
 
-		return isLiving() && (this.stopTime >= time);
+		return Simulation.isLiving() && (this.stopTime >= time);
 	}
 
-	@Override
-	public void afterSimStep(final double time) {
+	protected void afterSimStep(final double time) {
 		if (time % this.snapshotPeriod == 0) {
 			doSnapshot(time);
 		}
 	}
-
 
 	private void doSnapshot(final double time) {
 		if (!this.snapshotWriters.isEmpty()) {
@@ -367,7 +369,7 @@ public class QueueSimulation extends Simulation {
 			}
 		}
 	}
-	
+
 	public boolean addSnapshotWriter(final SnapshotWriterI writer) {
 		return this.snapshotWriters.add(writer);
 	}

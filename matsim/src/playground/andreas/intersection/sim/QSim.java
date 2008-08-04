@@ -59,53 +59,53 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 	final private static Logger log = Logger.getLogger(QueueLink.class);
 
 	protected static final int INFO_PERIOD = 3600;
-	
+
 	final String signalSystems;
 	final String groupDefinitions;
-	
+
 	protected OnTheFlyServer myOTFServer = null;
 	protected boolean useOTF = true;
 	protected LegHistogram hist = null;
 
 	public QSim(Events events, Plans population, NetworkLayer network, String signalSystems, String groupDefinitions, boolean useOTF) {
 		super(network, population, events);
-		
+
 		this.network = new QueueNetworkLayer(this.networkLayer, new TrafficLightQueueNetworkFactory());
 		this.signalSystems = signalSystems;
 		this.groupDefinitions = groupDefinitions;
 		this.useOTF = useOTF;
-		
+
 		this.setVehiclePrototye(QVehicle.class);
 	}
-	
+
 	private void readSignalSystemControler(){
-		
+
 		Map<Id, SignalSystemConfiguration> signalSystemConfigurations = null;
-						
+
 		try {
 			List<SignalGroupDefinition> signalGroups = new LinkedList<SignalGroupDefinition>();
-			
+
 			SignalGroupDefinitionParser groupParser = new SignalGroupDefinitionParser(signalGroups);
 			groupParser.parse(this.groupDefinitions);
 			SignalSystemConfigurationParser signalParser = new SignalSystemConfigurationParser(signalGroups);
 			signalParser.parse(this.signalSystems);
-		
+
 			signalSystemConfigurations = signalParser.getSignalSystemConfigurations();
-			
+
 			for (SignalSystemConfiguration signalSystemConfiguration : signalSystemConfigurations.values()) {
-				
+
 				TrafficLightsManager trafficLightManager = new TrafficLightsManager(signalSystemConfiguration.getSignalGroupDefinitions(), this.networkLayer);
 
 				QNode qNode = (QNode) this.network.getNodes().get(signalSystemConfiguration.getId());
 				qNode.setSignalSystemControler(new SignalSystemControlerImpl(signalSystemConfiguration));
-				
+
 				for (Iterator<? extends Link> iterator = qNode.getNode().getInLinks().values().iterator(); iterator.hasNext();) {
 					Link link = iterator.next();
 					QLink qLink = (QLink) this.network.getQueueLink(link.getId());
 					qLink.reconfigure(trafficLightManager);
 				}
 			}
-		
+
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -115,21 +115,21 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
 	}
 
 	@Override
 	protected void prepareSim() {
-		
+
 		if (this.useOTF){
 			this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.plans, events, false);
 		}
 		super.prepareSim();
-		
+
 		if (this.useOTF){
 			this.hist = new LegHistogram(300);
 			events.addHandler(this.hist);
-			
+
 			// FOR TESTING ONLY!
 			PreferencesDialog.preDialogClass = PreferencesDialog2.class;
 			OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019");
@@ -141,9 +141,9 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 				e.printStackTrace();
 			}
 		}
-		
+
 //		log.info("prepareSim");
-		
+
 		if(this.signalSystems != null && this.groupDefinitions != null){
 			readSignalSystemControler();
 		}
@@ -163,7 +163,7 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 //	}
 //
 	@Override
-	public void afterSimStep(final double time) {
+	protected void afterSimStep(final double time) {
 		super.afterSimStep(time);
 		if (this.useOTF){
 			this.myOTFServer.updateStatus(time);

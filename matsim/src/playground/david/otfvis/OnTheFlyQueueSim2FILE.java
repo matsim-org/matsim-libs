@@ -70,7 +70,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 	}
 
 	@Override
-	public void afterSimStep(double time) {
+	protected void afterSimStep(double time) {
 		super.afterSimStep(time);
 
 		try {

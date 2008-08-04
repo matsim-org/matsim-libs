@@ -78,7 +78,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 	}
 
 	@Override
-	public void afterSimStep(double time) {
+	protected void afterSimStep(double time) {
 		super.afterSimStep(time);
 
 		this.myOTFServer.updateStatus(time);

@@ -57,13 +57,13 @@ public class WithindayQueueSimulation extends QueueSimulation {
 		this.controler = controler;
 		this.setVehiclePrototye(OccupiedVehicle.class);
 	}
-	
+
 	@Override
 	protected void initVehicle(final Vehicle veh) {
 		super.initVehicle(veh);
 		createAgent(veh.getDriver(), (OccupiedVehicle)veh);
 	}
-	
+
 	/**
 	 * Is currently used to create the WithindayAgent objects with the default belief and desire (intentions are still fixed by
 	 * the game theory plans) modules.
@@ -86,7 +86,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	}
 
 	@Override
-	public void beforeSimStep(final double time) {
+	protected void beforeSimStep(final double time) {
 		super.beforeSimStep(time);
   	//check capacity change whishes for pending items
 		doCapacityChanges(time);

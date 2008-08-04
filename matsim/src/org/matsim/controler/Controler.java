@@ -76,7 +76,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.ExternalMobsim;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
-import org.matsim.mobsim.Simulation;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
@@ -656,7 +655,7 @@ public class Controler {
 
 	protected void runMobSim() {
 		if (this.externalMobsim == null) {
-			Simulation sim = new QueueSimulation(this.network, this.population, this.events);
+			QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);
 			sim.run();
 		} else {
 			ExternalMobsim sim = new ExternalMobsim(this.population, this.events);
