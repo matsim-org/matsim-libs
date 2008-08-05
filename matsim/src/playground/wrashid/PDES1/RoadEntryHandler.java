@@ -12,6 +12,8 @@ public class RoadEntryHandler {
 	private LinkedList<Road> pendingMessagesFromRoads=new LinkedList<Road>();
 	private PriorityQueue<Message> messageQueue=new PriorityQueue<Message>();
 	private double test_timeOfLastScheduledMessage=0;
+	private volatile int test_wrongMessages=0;
+	private LinkedList<Message> test_scheduledMessages=new LinkedList<Message>();
 	
 	RoadEntryHandler(Road belongsToRoad){
 		this.belongsToRoad = belongsToRoad;
@@ -30,11 +32,16 @@ public class RoadEntryHandler {
 				
 				
 				if (nm.messageArrivalTime<test_timeOfLastScheduledMessage){
-					//System.out.println();
+					System.out.println(++test_wrongMessages);
 				}
 				
+				if (numberOfIncomingRoads==1){
+					//System.out.println("");
+				}
+				
+				
 				//TODO: enable this assertion again after some time (problem at the moment not found
-				assert(nm.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + nm.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
+				assert(nm.messageArrivalTime>test_timeOfLastScheduledMessage): "new: " + nm.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
 				
 				messageQueue.add(nm);
 				
@@ -105,11 +112,24 @@ public class RoadEntryHandler {
 			// TODO: enable this assertion again after some time (problem at the moment not found
 			assert(m.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + m.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
 			
+			if (!test_scheduledMessages.isEmpty()){
+
+				if (test_scheduledMessages.getLast().messageArrivalTime>m.messageArrivalTime){
+					System.out.println("current message: "+ m.messageArrivalTime);
+					for (int i=0;i<test_scheduledMessages.size();i++){
+						System.out.println(test_scheduledMessages.get(0).messageArrivalTime);
+					}
+				}
+				assert(test_scheduledMessages.getLast().messageArrivalTime<=m.messageArrivalTime);
+				
+				
+			}
 			
-			if (m.messageArrivalTime>=test_timeOfLastScheduledMessage){
+			//if (m.messageArrivalTime>=test_timeOfLastScheduledMessage){
 				test_timeOfLastScheduledMessage=m.messageArrivalTime;
 				belongsToRoad.scheduler.schedule(m);
-			}
+				test_scheduledMessages.addLast(m);
+			//}
 		}
 	}
 	
