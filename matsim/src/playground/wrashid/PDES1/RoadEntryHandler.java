@@ -41,7 +41,7 @@ public class RoadEntryHandler {
 				
 				
 				//TODO: enable this assertion again after some time (problem at the moment not found
-				assert(nm.messageArrivalTime>test_timeOfLastScheduledMessage): "new: " + nm.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
+				assert(nm.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + nm.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
 				
 				messageQueue.add(nm);
 				
@@ -119,8 +119,11 @@ public class RoadEntryHandler {
 					for (int i=0;i<test_scheduledMessages.size();i++){
 						System.out.println(test_scheduledMessages.get(0).messageArrivalTime);
 					}
+					System.out.println("test_timeOfLastScheduledMessage:"+test_timeOfLastScheduledMessage);
 				}
-				assert(test_scheduledMessages.getLast().messageArrivalTime<=m.messageArrivalTime);
+				
+				// This problem can be solved perhaps by repairing the Message Factory
+				assert(test_scheduledMessages.getLast().messageArrivalTime<=m.messageArrivalTime):  "new: " + m.messageArrivalTime + "; last: " + test_scheduledMessages.getLast().messageArrivalTime;
 				
 				
 			}
