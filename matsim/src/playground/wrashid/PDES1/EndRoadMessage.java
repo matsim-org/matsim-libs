@@ -16,7 +16,7 @@ public class EndRoadMessage extends EventMessage {
 	@Override
 	public void selfhandleMessage() {
 		// Find out, when this vehicle can enter the next road
-		
+	
 		
 		// leave previous road
 		//Road previousRoad=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
