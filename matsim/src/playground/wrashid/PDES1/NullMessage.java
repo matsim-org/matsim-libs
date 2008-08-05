@@ -16,7 +16,7 @@ public class NullMessage extends SelfhandleMessage {
 
 	@Override
 	public void selfhandleMessage() {
-		// send a null message to 
+		// send a null message to all roads ahead
 		Road currentRoad = (Road) receivingUnit;
 		for (Link outLink:currentRoad.getLink().getToNode().getOutLinks().values()){
 			assert(messageArrivalTime>=0);
@@ -29,7 +29,7 @@ public class NullMessage extends SelfhandleMessage {
 			if (nm.messageArrivalTime<0){
 				//System.out.println();
 			}
-			assert(nm.messageArrivalTime>=0);
+			assert(nm.messageArrivalTime>=messageArrivalTime);
 			outRoad.roadEntryHandler.registerNullMessage(nm);
 		}
 		

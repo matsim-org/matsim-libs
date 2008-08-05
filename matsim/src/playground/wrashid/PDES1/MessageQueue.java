@@ -80,7 +80,7 @@ public class MessageQueue {
 		}
 		
 		
-		
+		System.out.println(arrivalTimeOfLastRemovedMessage);
 		
 		emptyBuffers();
 		
