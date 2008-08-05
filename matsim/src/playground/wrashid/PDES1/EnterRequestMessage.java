@@ -9,7 +9,7 @@ public class EnterRequestMessage extends SelfhandleMessage {
 		
 		System.out.println("enter Request message");
 		
-		Vehicle vehicle=(Vehicle) sendingUnit;
+		Vehicle vehicle=this.vehicle;
 		Road toRoad=(Road) receivingUnit;
 		
 		toRoad.enterRequest(vehicle);

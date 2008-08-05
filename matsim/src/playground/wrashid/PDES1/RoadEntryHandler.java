@@ -34,7 +34,7 @@ public class RoadEntryHandler {
 				}
 				
 				//TODO: enable this assertion again after some time (problem at the moment not found
-				//assert(nm.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + nm.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
+				assert(nm.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + nm.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
 				
 				messageQueue.add(nm);
 				
@@ -103,7 +103,7 @@ public class RoadEntryHandler {
 			
 			//System.out.println("sdfasdf: " + m.messageArrivalTime);
 			// TODO: enable this assertion again after some time (problem at the moment not found
-			//assert(m.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + m.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
+			assert(m.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + m.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
 			
 			
 			if (m.messageArrivalTime>=test_timeOfLastScheduledMessage){
