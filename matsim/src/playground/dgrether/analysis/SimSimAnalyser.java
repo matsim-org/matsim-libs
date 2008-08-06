@@ -24,19 +24,16 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.ScenarioData;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
-import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
+import org.matsim.counts.algorithms.ComparisionErrorStatsCalculator;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
-import org.matsim.network.filter.NetworkFilterManager;
-import org.matsim.network.filter.NetworkLinkDistanceFilter;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.utils.DoubleArrayTableWriter;
 
 
 /**
@@ -77,11 +74,11 @@ public class SimSimAnalyser {
 	public void runAnalysis(String networkFile, String linkAttributes1, String linkAttributes2, String srs, String outfile) {
 		loadData(networkFile, linkAttributes1, linkAttributes2);
 		
-		NetworkFilterManager netFilter = new NetworkFilterManager(this.network);
-		Node center = this.network.getNode(new IdImpl("2531"));
-		NetworkLinkDistanceFilter distFilter = new NetworkLinkDistanceFilter(30000.0, center); 
-		netFilter.addLinkFilter(distFilter);
-		this.network = (NetworkLayer) netFilter.applyFilters();
+//		NetworkFilterManager netFilter = new NetworkFilterManager(this.network);
+//		Node center = this.network.getNode(new IdImpl("2531"));
+//		NetworkLinkDistanceFilter distFilter = new NetworkLinkDistanceFilter(30000.0, center); 
+//		netFilter.addLinkFilter(distFilter);
+//		this.network = (NetworkLayer) netFilter.applyFilters();
 		
 		this.coordSystem = srs;
 		
@@ -102,10 +99,22 @@ public class SimSimAnalyser {
 			}
 		}
 		
-		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-				countSimComp, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
+//		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
+//				countSimComp, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
+//		kmlWriter.writeFile(outfile);
 
-		kmlWriter.writeFile(outfile);
+		ComparisionErrorStatsCalculator errorStats = new ComparisionErrorStatsCalculator();
+		errorStats.calculateErrorStats(countSimComp);
+		
+		double[] hours = new double[24];
+		for (int i = 1; i < 25; i++) {
+			hours[i-1] = i;
+		}
+		DoubleArrayTableWriter tableWriter = new DoubleArrayTableWriter();
+		tableWriter.addColumn(hours);
+		tableWriter.addColumn(errorStats.getMeanRelError());
+		tableWriter.writeFile(outfile + "errortable.txt");
+		
 		
 	}
 	
@@ -115,9 +124,20 @@ public class SimSimAnalyser {
 	 */
 	public static void main(String[] args) {
 		String net = DgPaths.IVTCHNET;
-		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run610/it.100/100.linkstats.txt.gz";
-		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run612/it.100/100.linkstats.txt.gz";		
-		String outfile = DgPaths.VSPCVSBASE + "runs/run612/traffic612vs610.kmz";
+//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run610/it.100/100.linkstats.txt.gz";
+//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run612/it.100/100.linkstats.txt.gz";		
+//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run610/it.200/200.linkstats.txt.gz";
+//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run612/it.200/200.linkstats.txt.gz";		
+//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run610/it.500/500.linkstats.txt.gz";
+//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run612/it.500/500.linkstats.txt.gz";		
+//		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run610/it.550/550.linkstats.txt.gz";
+//		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run612/it.550/550.linkstats.txt.gz";		
+//		String outfile = DgPaths.VSPCVSBASE + "runs/run612/traffic612vs610.550";
+		String linkstats1 = DgPaths.VSPCVSBASE + "runs/run612/it.500/500.linkstats.txt.gz";
+		String linkstats2 = DgPaths.VSPCVSBASE + "runs/run620/it.500/500.linkstats.txt.gz";		
+		String outfile = DgPaths.VSPCVSBASE + "runs/run620/traffic612vs620.500";
+
+		
 		String srs = TransformationFactory.CH1903_LV03;
 		
 		

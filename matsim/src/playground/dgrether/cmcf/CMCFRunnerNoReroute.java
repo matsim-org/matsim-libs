@@ -25,13 +25,14 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.run.OTFVis;
-import org.matsim.trafficmonitoring.LinkSensorManager;
 
 import playground.dgrether.utils.MatsimIo;
 
@@ -40,33 +41,43 @@ import playground.dgrether.utils.MatsimIo;
  * @author dgrether
  *
  */
-public class CMCFRunner {
+public class CMCFRunnerNoReroute {
 	
-	private static final Logger log = Logger.getLogger(CMCFRunner.class);
+	private static final Logger log = Logger.getLogger(CMCFRunnerNoReroute.class);
 	
-	private static final boolean visualizationOnly = true ;
+	private static final boolean visualizationOnly = false ;
+	
+	private class MyIterationStartsEndsListener implements IterationEndsListener, IterationStartsListener {
+		
+		TTInOutflowEventHandler handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
+		TTInOutflowEventHandler handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
+
+		
+		public void notifyIterationStarts(IterationStartsEvent event) {
+			if (event.getIteration() == event.getControler().getConfig().controler().getLastIteration()) {
+				
+				event.getControler().getEvents().addHandler(handler3);
+				event.getControler().getEvents().addHandler(handler4);
+			}
+		}
+
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			if (event.getIteration() == event.getControler().getConfig().controler().getLastIteration()) {
+				
+			}
+		}
+	};
 	
 	
-	public CMCFRunner() {
+	public CMCFRunnerNoReroute() {
 		Config config = null;
-		CMCFScenarioGenerator.main(null);
+		CMCFScenarioGeneratorNoReroute.main(null);
 		final TTInOutflowEventHandler myHandler = new TTInOutflowEventHandler(new IdImpl("4"));
 		
-		if (!visualizationOnly) {			
-			Controler controler = new Controler(CMCFScenarioGenerator.configOut);
-			final LinkSensorManager lsm = new LinkSensorManager();
-			lsm.addLinkSensor("3");
-			lsm.addLinkSensor("4");
+		if (!visualizationOnly) {		
+			
+			Controler controler = new Controler(CMCFScenarioGeneratorNoReroute.configOut);
 			controler.setOverwriteFiles(true);
-//			controler.addControlerListener(new StartupListener() {
-//				public void notifyStartup(StartupEvent e) {
-//					e.getControler().getEvents().addHandler(lsm);
-//					LinkTravelTimeCounter.init(e.getControler().getEvents(), e.getControler().getNetwork().getLinks().size());
-//					
-////					e.getControler().getEvents().addHandler(myHandler);
-//				}});
-			
-			
 
 			final TTInOutflowEventHandler handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
 			final TTInOutflowEventHandler handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
@@ -96,7 +107,7 @@ public class CMCFRunner {
 				}
 				
 			});
-	
+			
 			
 			controler.run();
 			NetworkLayer net = controler.getNetwork();
@@ -105,6 +116,7 @@ public class CMCFRunner {
 			Link link4 = net.getLink(new IdImpl("4"));
 			Link link5 = net.getLink(new IdImpl("5"));
 
+			
 //			double tt2 = controler.getTravelTimeCalculator().getLinkTravelTime(link2, 7.0 * 3600.0);
 //			double tt3 = controler.getTravelTimeCalculator().getLinkTravelTime(link3, 7.0 * 3600.0);
 //			double tt4 = controler.getTravelTimeCalculator().getLinkTravelTime(link4, 7.0 * 3600.0);
@@ -112,14 +124,7 @@ public class CMCFRunner {
 //			log.info("avg tt on link 2 at 7:00: " + tt2);
 //			log.info("avg tt on link 3 at 7:00: " + tt3);
 //			log.info("avg tt on link 4 at 7:00: " + tt4);
-//			
-//			
-//			log.info("traffic on link 3: " + lsm.getLinkTraffic("3"));		
-//			log.info("traffic on link 4: " + lsm.getLinkTraffic("4"));
-//			
-//			log.info("Last travel time on 2: " + LinkTravelTimeCounter.getInstance().getLastLinkTravelTime("2"));
-//			log.info("Last travel time on 3: " + LinkTravelTimeCounter.getInstance().getLastLinkTravelTime("3"));
-//			log.info("Last travel time on 4: " + LinkTravelTimeCounter.getInstance().getLastLinkTravelTime("4"));
+
 			for (int i = 1; i <= 3600; i++) {
 				double tt = controler.getTravelTimeCalculator().getLinkTravelTime(link4, i);
 				double tt3 = controler.getTravelTimeCalculator().getLinkTravelTime(link3, i);
@@ -129,7 +134,6 @@ public class CMCFRunner {
 				log.info("tt on link 5 at time: " + i + " " + tt5);
 				
 			}
-			
 			config = controler.getConfig();
 		  
 //			writeGraphs(myHandler, config.controler().getOutputDirectory());
@@ -137,7 +141,7 @@ public class CMCFRunner {
 		if (config == null) {
 			config = new Config();
 			config.addCoreModules();
-			config = MatsimIo.loadConfig(config, CMCFScenarioGenerator.configOut);
+			config = MatsimIo.loadConfig(config, CMCFScenarioGeneratorNoReroute.configOut);
 		}
 		
 		System.out.println(config.controler());
@@ -160,7 +164,7 @@ public class CMCFRunner {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new CMCFRunner();
+		new CMCFRunnerNoReroute();
 		
 	}
 

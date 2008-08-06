@@ -29,6 +29,7 @@ import org.matsim.config.Config;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.counts.algorithms.ComparisionErrorStatsCalculator;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
@@ -36,6 +37,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
+
+import playground.dgrether.utils.DoubleArrayTableWriter;
 
 /**
  * This class is able to compare traffic counts with traffic in the simulation.
@@ -230,6 +233,17 @@ public class CountsAnalyser {
 		else {
 			throw new IllegalArgumentException("Output format must be txt or kml");
 		}
+		ComparisionErrorStatsCalculator errorStats = new ComparisionErrorStatsCalculator();
+		errorStats.calculateErrorStats(countsComparisonList);
+		
+		double[] hours = new double[24];
+		for (int i = 1; i < 25; i++) {
+			hours[i-1] = i;
+		}
+		DoubleArrayTableWriter tableWriter = new DoubleArrayTableWriter();
+		tableWriter.addColumn(hours);
+		tableWriter.addColumn(errorStats.getMeanRelError());
+		tableWriter.writeFile(filename + "errortable.txt");
 	}
 
 	/**
@@ -303,7 +317,11 @@ public class CountsAnalyser {
 	 *
 	 * @param args
 	 */
-	public static void main(final String[] args) {
+	public static void main(String[] args) {
+//		String [] args2 = {"/Volumes/data/work/svnWorkspace/testData/schweiz-ivtch/ivtch-config620linkstats.xml"};
+		String [] args2 = {"/Volumes/data/work/svnWorkspace/testData/schweiz-ivtch/ivtch-config621linkstats.xml"};
+		args = args2;
+		
 		CountsAnalyser ca = null;
 		if (args.length != 1) {
 			printHelp();
