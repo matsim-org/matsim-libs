@@ -10,7 +10,7 @@ public class CompareActsEvents implements EventHandlerAgentArrivalI {
 	double endtime=0;
 	/**
 	 * If parts of the acts take place at the same time
-	 * 
+	 *
 	 * @param act1
 	 * @param act2
 	 * @return
@@ -26,7 +26,7 @@ public class CompareActsEvents implements EventHandlerAgentArrivalI {
 	}
 	/**
 	 * If the acts take place at the same facility and overlap in time
-	 * 
+	 *
 	 * @param act1
 	 * @param act2
 	 * @return
@@ -45,7 +45,7 @@ public class CompareActsEvents implements EventHandlerAgentArrivalI {
 	/**
 	 * If the acts take place at the same facility and overlap in time
 	 * and are the same type
-	 * 
+	 *
 	 * @param act1
 	 * @param act2
 	 * @return
@@ -68,15 +68,15 @@ public class CompareActsEvents implements EventHandlerAgentArrivalI {
 		}
 		return overlap;
 	}
-	@Override
+
 	public void handleEvent(EventAgentArrival event) {
 		// TODO Auto-generated method stub
 		this.starttime=event.time;
 	}
-	@Override
+
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
 
