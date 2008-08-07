@@ -29,7 +29,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -85,7 +85,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
 		Population population2 = new Population(Population.NO_STREAMING);
-		new MatsimPlansReader(population2).parse(PLANS_FILE_TESTOUTPUT);
+		new MatsimPopulationReader(population2).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
 		Person person2 = population2.getPerson(new IdImpl("1"));
 		assertNotNull("person 1 missing", person2);

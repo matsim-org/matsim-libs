@@ -34,7 +34,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -95,7 +95,7 @@ public class ActivityDurationAnalyser {
 		
 		for (String file : plansFiles) {
 			Population plans = new Population(Population.NO_STREAMING);
-			MatsimPlansReader plansParser = new MatsimPlansReader(plans);
+			MatsimPopulationReader plansParser = new MatsimPopulationReader(plans);
 			plansParser.readFile(file);	
 			ActivityDurationCounter adc = new ActivityDurationCounter();
 			System.out.println("Handling plans: " + file);

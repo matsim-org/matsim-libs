@@ -208,7 +208,7 @@ public class GeneratePlansTestExtendedDistribution {
 		Gbl.getWorld().setNetworkLayer(network);
 
 		Population population = new Population(Population.NO_STREAMING);
-		// new MatsimPlansReader(population).readFile(plansFile);
+		// new MatsimPopulationReader(population).readFile(plansFile);
 
 		GeneratePlansTestExtendedDistribution.createCOOPERSSpecificVehicles(population, network);
 		System.out.println("Population with uneven traffic distribution created");

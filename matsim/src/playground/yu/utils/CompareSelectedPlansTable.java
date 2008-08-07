@@ -11,7 +11,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
@@ -68,11 +68,11 @@ public class CompareSelectedPlansTable {
 
 	private void readFiles(String plansfilePath0, String plansfilePath1) {
 		System.out.println("  reading file " + plansfilePath0);
-		PopulationReader plansReader0 = new MatsimPlansReader(this.plans0);
+		PopulationReader plansReader0 = new MatsimPopulationReader(this.plans0);
 		plansReader0.readFile(plansfilePath0);
 
 		System.out.println("  reading file " + plansfilePath1);
-		PopulationReader plansReader1 = new MatsimPlansReader(this.plans1);
+		PopulationReader plansReader1 = new MatsimPopulationReader(this.plans1);
 		plansReader1.readFile(plansfilePath1);
 	}
 

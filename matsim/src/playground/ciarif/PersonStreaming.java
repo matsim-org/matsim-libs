@@ -23,7 +23,7 @@ package playground.ciarif;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -53,7 +53,7 @@ public class PersonStreaming {
 		Population plans = new Population(Population.USE_STREAMING);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		//SubtoursWriteTable subtoursWriteTable = new SubtoursWriteTable ("output/output_persons_subtours.txt");
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

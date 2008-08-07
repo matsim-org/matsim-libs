@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimPlansReader.java
+ * MatsimPopulationReader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class MatsimPlansReader extends MatsimXmlParser implements PopulationReader {
+public class MatsimPopulationReader extends MatsimXmlParser implements PopulationReader {
 
 	private final static String PLANS    = "plans.dtd"; // a special, inofficial case, handle it like plans_v0
 	private final static String PLANS_V0 = "plans_v0.dtd";
@@ -46,14 +46,14 @@ public class MatsimPlansReader extends MatsimXmlParser implements PopulationRead
 	private final Population plans;
 	private MatsimXmlParser delegate = null;
 
-	private static final Logger log = Logger.getLogger(MatsimPlansReader.class);
+	private static final Logger log = Logger.getLogger(MatsimPopulationReader.class);
 
 	/**
 	 * Creates a new reader for MATSim plans (population) files.
 	 *
 	 * @param plans The data structure where to store the persons with their plans.
 	 */
-	public MatsimPlansReader(final Population plans) {
+	public MatsimPopulationReader(final Population plans) {
 		this.plans = plans;
 	}
 

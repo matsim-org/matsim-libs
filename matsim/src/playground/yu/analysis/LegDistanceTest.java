@@ -62,7 +62,7 @@ public class LegDistanceTest {
 
 		// Plans population = new Plans();
 		// System.out.println("-->reading plansfile: " + plansFilename);
-		// new MatsimPlansReader(population).readFile(plansFilename);
+		// new MatsimPopulationReader(population).readFile(plansFilename);
 		// world.setPopulation(population);
 
 		Events events = new Events();

@@ -23,7 +23,7 @@ package org.matsim.replanning.modules;
 import org.matsim.config.Module;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -62,7 +62,7 @@ public class PlanomatExe extends ExternalModule {
 
 	@Override
 	protected PopulationReader getPlansReader(final Population plans) {
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		return plansReader;
 	}
 

@@ -29,7 +29,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
@@ -148,7 +148,7 @@ public class PlanComparator {
 		Population plans = new Population(Population.NO_STREAMING);
 
 		printNote("", "  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(filename);
 		plans.printPlansCount();
 		printNote("", "  done");

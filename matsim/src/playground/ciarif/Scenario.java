@@ -35,7 +35,7 @@ import org.matsim.matrices.MatsimMatricesReader;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
@@ -137,7 +137,7 @@ public abstract class Scenario {
 	public static final Population readPlans() {
 		System.out.println("  reding plans xml file... ");
 		Population plans = new Population();
-		new MatsimPlansReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 		return plans;
 	}

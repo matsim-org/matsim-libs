@@ -36,7 +36,7 @@ import org.matsim.matrices.MatsimMatricesReader;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -168,7 +168,7 @@ public abstract class Scenario {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new Population();
 		System.out.println(Gbl.getConfig().plans().getInputFile());
-		new MatsimPlansReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
 
 		System.out.println("  done.");
 		return plans;
@@ -178,9 +178,9 @@ public abstract class Scenario {
 		Population plans = new Population();
 		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
 //		System.out.println(Gbl.getConfig().plans().getInputFile());
-//		new MatsimPlansReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
+//		new MatsimPopulationReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
 		System.out.println(filename);
-		new MatsimPlansReader(plans).readFile(filename);
+		new MatsimPopulationReader(plans).readFile(filename);
 		
 		System.out.println("  done.");
 		return plans;

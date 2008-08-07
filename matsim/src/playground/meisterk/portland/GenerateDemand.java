@@ -25,7 +25,7 @@ import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -67,7 +67,7 @@ public class GenerateDemand {
 		System.out.println("Setting up plans objects...");
 		Population plans = new Population(Population.USE_STREAMING);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("Setting up plans objects...done.");
 
 		System.out.println("Setting up person modules...");

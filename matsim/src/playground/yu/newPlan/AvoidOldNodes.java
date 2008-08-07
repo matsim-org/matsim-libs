@@ -33,7 +33,7 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -109,7 +109,7 @@ public class AvoidOldNodes extends NewPlan {
 			aon.addLink(Integer.toString(i));
 		}
 		population.addAlgorithm(aon);
-		new MatsimPlansReader(population).readFile(config.plans()
+		new MatsimPopulationReader(population).readFile(config.plans()
 				.getInputFile());
 		population.runAlgorithms();
 		aon.writeEndPlans();

@@ -27,7 +27,7 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
@@ -69,7 +69,7 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 		Gbl.printElapsedTime();
 
 		population = new Population();
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(popFileName);
 
 		events = new Events();

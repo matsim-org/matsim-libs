@@ -38,7 +38,7 @@ import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.charts.BarChart;
@@ -89,7 +89,7 @@ public class EventModeActivityDurationAnalyser {
 		Gbl.getWorld().setNetworkLayer((NetworkLayer) net);
 
 		Population plans = new Population(Population.NO_STREAMING);
-		MatsimPlansReader plansParser = new MatsimPlansReader(plans);
+		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans);
 		plansParser.readFile(PLANSFILE);
 		
 		Events events = new Events();

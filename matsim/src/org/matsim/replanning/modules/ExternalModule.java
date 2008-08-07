@@ -34,7 +34,7 @@ import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -189,7 +189,7 @@ public class ExternalModule implements StrategyModule {
 	}
 
 	protected PopulationReader getPlansReader(final Population plans) {
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		return plansReader;
 	}
 

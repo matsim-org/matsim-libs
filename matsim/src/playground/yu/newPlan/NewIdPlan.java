@@ -27,7 +27,7 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 
@@ -64,7 +64,7 @@ public class NewIdPlan extends NewPlan {
 		Population plans = new Population();
 		NewIdPlan nip = new NewIdPlan(plans);
 		plans.addAlgorithm(nip);
-		new MatsimPlansReader(plans).readFile(config.plans().getInputFile());
+		new MatsimPopulationReader(plans).readFile(config.plans().getInputFile());
 		plans.runAlgorithms();
 		nip.writeEndPlans();
 	}

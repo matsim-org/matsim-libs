@@ -37,7 +37,7 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.io.IOUtils;
@@ -154,7 +154,7 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 
 		Population population = new Population();
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPlansReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population).readFile(plansFilename);
 
 		Events events = new Events();
 

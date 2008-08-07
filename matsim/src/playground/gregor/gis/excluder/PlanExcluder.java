@@ -31,7 +31,7 @@ import org.geotools.feature.FeatureIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
@@ -115,7 +115,7 @@ public class PlanExcluder {
 		
 		
 		final Population population = new Population();
-		new MatsimPlansReader(population).readFile(Gbl.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(population).readFile(Gbl.getConfig().plans().getInputFile());
 		
 		Population toSave = new PlanExcluder(network,population,ls).run();
 		new PopulationWriter(toSave,"padang_plans_v20080618_reduced.xml.gz", "v4").write();

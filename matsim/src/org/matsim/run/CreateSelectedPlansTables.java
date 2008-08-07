@@ -29,7 +29,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
@@ -108,7 +108,7 @@ public class CreateSelectedPlansTables {
 
 	private void readPlansFile(final String plansfilePath, final Population plans) {
 		System.out.println("  reading file "+plansfilePath);
-		final PopulationReader plansReader = new MatsimPlansReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(plansfilePath);
 	}
 

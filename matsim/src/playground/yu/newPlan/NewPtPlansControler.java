@@ -24,7 +24,7 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 
 /**
@@ -46,7 +46,7 @@ public class NewPtPlansControler {
 		Population population = new Population();
 		NewAgentPtPlan nap = new NewAgentPtPlan(population);
 		population.addAlgorithm(nap);
-		new MatsimPlansReader(population).readFile(config.plans()
+		new MatsimPopulationReader(population).readFile(config.plans()
 				.getInputFile());
 		population.runAlgorithms();
 		nap.writeEndPlans();

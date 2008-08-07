@@ -26,7 +26,7 @@ package playground.yu.newPlan;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 
@@ -51,7 +51,7 @@ public class NewPlansControler {
 		Population population = new Population();
 		NewAgentPtPlan nap = new NewAgentPtPlan(population);
 		population.addAlgorithm(nap);
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(plansFilename);
 		population.runAlgorithms();
 		nap.writeEndPlans();

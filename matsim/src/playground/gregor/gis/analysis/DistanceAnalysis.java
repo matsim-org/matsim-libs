@@ -47,7 +47,7 @@ import org.matsim.network.Node;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.network.algorithms.NetworkSegmentDoubleLinks;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -368,7 +368,7 @@ public class DistanceAnalysis {
 
 		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
 		Population population = new Population();
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 //		plansReader.readFile("./badPersons.xml");
 		log.info("done.");

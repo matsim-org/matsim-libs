@@ -37,7 +37,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -290,7 +290,7 @@ public class MyRuns {
 
 	protected static Population readPlans() {
 		Population plans = new Population();
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		return plans;
 	}

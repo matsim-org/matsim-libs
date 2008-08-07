@@ -25,7 +25,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -67,7 +67,7 @@ public class ActivitySpaceDrawing {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans, running person-algos and writing the xml file... ");
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		plans_writer.write();
 		System.out.println("  done.");

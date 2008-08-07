@@ -26,7 +26,7 @@ package playground.yu.analysis;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -84,7 +84,7 @@ public class License extends AbstractPersonAlgorithm {
 		population.addAlgorithm(l);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPlansReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population).readFile(plansFilename);
 
 		population.runAlgorithms();
 

@@ -21,7 +21,7 @@
 package playground.jhackney;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
@@ -71,7 +71,7 @@ public class ScenarioParsing {
 //
 //		System.out.println("  reading plans xml file... ");
 //		Plans plans = new Plans();
-//		PlansReaderI plansReader = new MatsimPlansReader(plans);
+//		PlansReaderI plansReader = new MatsimPopulationReader(plans);
 //		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 //		System.out.println("  done.");
 

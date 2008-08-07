@@ -68,7 +68,7 @@ import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -684,7 +684,7 @@ public class MyRuns {
 				}
 			}
 		}
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(inputFilename);
 		population.printPlansCount();
 		System.out.println("  done.");
@@ -1053,7 +1053,7 @@ public class MyRuns {
 		plansAlgos.add(pa);
 
 		Population matsimAgentPopulation = new Population(Population.USE_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(matsimAgentPopulation);
+		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		matsimAgentPopulation.printPlansCount();
 		int[][] numDeps = ((PersonAnalyseTimesByActivityType) pa).getNumDeps();

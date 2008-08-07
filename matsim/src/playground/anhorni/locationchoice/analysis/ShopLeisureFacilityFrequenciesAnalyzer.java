@@ -36,7 +36,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -123,7 +123,7 @@ public class ShopLeisureFacilityFrequenciesAnalyzer {
 		log.info("Total number of ch leisure facilities:" + this.leisure_facilities.size());
 
 		this.plans=new Population(false);
-		final PopulationReader plansReader = new MatsimPlansReader(this.plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(this.plans);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
 	}

@@ -44,7 +44,7 @@ import org.matsim.events.handler.EventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.opengis.referencing.FactoryException;
@@ -156,7 +156,7 @@ public class MATSimNet2QGIS {
 	public void readPlans(final String plansFilename, final AbstractPersonAlgorithm pa) {
 		Population population = new Population();
 		population.addAlgorithm(pa);
-		new MatsimPlansReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population).readFile(plansFilename);
 		population.runAlgorithms();
 	}
 

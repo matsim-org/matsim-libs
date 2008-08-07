@@ -30,7 +30,7 @@ import org.matsim.config.MatsimConfigReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -76,7 +76,7 @@ public class MatsimIo {
 	public static Population loadPlans(String filename) {
 		Population plans = new Population(Population.NO_STREAMING);
 		log.info("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(filename);
 		plans.printPlansCount();
 		log.info("  done");

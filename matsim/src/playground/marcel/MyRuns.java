@@ -80,7 +80,7 @@ import org.matsim.network.algorithms.NetworkFalsifier;
 import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -267,7 +267,7 @@ public class MyRuns {
 		final Population plans = new Population(Population.USE_STREAMING);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  reading and writing plans...");
@@ -295,7 +295,7 @@ public class MyRuns {
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.gc();System.gc();System.gc();
@@ -345,7 +345,7 @@ public class MyRuns {
 		plans.addAlgorithm(new PersonFilterSelectedPlan());
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  reading and writing plans...");
@@ -384,7 +384,7 @@ public class MyRuns {
 		final Population plans = new Population(Population.NO_STREAMING);
 
 		System.out.println("  reading plans...");
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		System.out.println("  done.");
@@ -440,7 +440,7 @@ public class MyRuns {
 //		System.out.println("  reading, filtering and writing population... at " + (new Date()));
 //		final Plans population = new Plans(Plans.USE_STREAMING);
 //
-//		PlansReaderI plansReader = new MatsimPlansReader(population);
+//		PlansReaderI plansReader = new MatsimPopulationReader(population);
 //		final PlansWriter plansWriter = new PlansWriter(population);
 //		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter, areaOfInterest);
 //		filter.setAlternativeAOI(center, radius);
@@ -484,7 +484,7 @@ public class MyRuns {
 		final Population plans = new Population(Population.NO_STREAMING);
 
 		System.out.println("  reading plans...");
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		System.out.println("  done.");
@@ -523,7 +523,7 @@ public class MyRuns {
 
 		System.out.println("  reading plans...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		System.out.println("  done.");
@@ -598,7 +598,7 @@ public class MyRuns {
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 
 		System.out.println("  reading plans...");
 		plansReader.readFile(config.plans().getInputFile());
@@ -638,7 +638,7 @@ public class MyRuns {
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 
 		System.out.println("  reading plans...");
 		plansReader.readFile(config.plans().getInputFile());
@@ -680,7 +680,7 @@ public class MyRuns {
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  reading, processing, writing plans...");
@@ -718,7 +718,7 @@ public class MyRuns {
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  reading, processing, writing plans...");
@@ -764,7 +764,7 @@ public class MyRuns {
 
 		System.out.println("  setting up plans objects...");
 		final Population population = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPlansReader(population);
+		final PopulationReader plansReader = new MatsimPopulationReader(population);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
@@ -810,7 +810,7 @@ public class MyRuns {
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.USE_STREAMING);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		final PopulationReader plansReader = new MatsimPlansReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  adding plans algorithm... ");
@@ -856,7 +856,7 @@ public class MyRuns {
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPlansReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  adding plans algorithm... ");
@@ -918,7 +918,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
-		final PopulationReader plansReader = new MatsimPlansReader(population);
+		final PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");
@@ -1004,7 +1004,7 @@ public class MyRuns {
 
 		System.out.println("  reading plans...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPlansReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		System.out.println("  done.");
@@ -1169,7 +1169,7 @@ public class MyRuns {
 
 		System.out.println("  reading plans...");
 		final Population population = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPlansReader(population);
+		final PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");
@@ -1222,7 +1222,7 @@ public class MyRuns {
 
 		System.out.println("  reading plans...");
 		final Population population = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPlansReader(population);
+		final PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");
@@ -1397,7 +1397,7 @@ public class MyRuns {
 
 //		System.out.println("  reading population... " + (new Date()));
 //		final Plans population = new Plans(Plans.NO_STREAMING);
-//		PlansReaderI plansReader = new MatsimPlansReader(population);
+//		PlansReaderI plansReader = new MatsimPopulationReader(population);
 //		plansReader.readFile(config.plans().getInputFile());
 
 		System.out.println("  finding sub-networks... " + (new Date()));
@@ -1557,7 +1557,7 @@ public class MyRuns {
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.USE_STREAMING);
-		final PopulationReader plansReader = new MatsimPlansReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  adding plans algorithm... ");
@@ -1598,7 +1598,7 @@ public class MyRuns {
 
 		System.out.println("  reading plans...");
 		final Plans plans = new Plans(Plans.NO_STREAMING);
-		final PlansReaderI plansReader = new MatsimPlansReader(plans);
+		final PlansReaderI plansReader = new MatsimPopulationReader(plans);
 		plansReader.readfile(Gbl.getConfig().plans().getInputFile());
 		plans.printPlansCount();
 		System.out.println("  done.");
@@ -1636,7 +1636,7 @@ public class MyRuns {
 
 		System.out.println("  reading plans...");
 		final Population plans = new Population(Population.USE_STREAMING);
-		final PopulationReader plansReader = new MatsimPlansReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans);
 		final CalcAverageTripLength catl = new CalcAverageTripLength();
 		plans.addAlgorithm(catl);
 		plansReader.readFile(config.plans().getInputFile());
@@ -1763,7 +1763,7 @@ public class MyRuns {
 		final Population plans = new Population(Population.USE_STREAMING);
 		final PlanPlotActLocations plotter = new PlanPlotActLocations("locations.T.veh", new String[] {"home", "edu", "uni", "work1", "work2", "work3", "shop1", "shop2", "leisure1", "leisure2", "home2"});
 		plans.addAlgorithm(plotter);
-		final PopulationReader plansReader = new MatsimPlansReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans and running algorithms...");
@@ -1807,7 +1807,7 @@ public class MyRuns {
 		final Population plans = new Population(Population.USE_STREAMING);
 		final VisumWriteRoutes writer = new VisumWriteRoutes("routen.rim", tvz);
 		plans.addAlgorithm(writer);
-		final PopulationReader plansReader = new MatsimPlansReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans and running algorithms...");
@@ -1841,7 +1841,7 @@ public class MyRuns {
 
 		System.out.println("  reading plans...");
 		final Population population = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPlansReader(population);
+		final PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");
@@ -1946,7 +1946,7 @@ public class MyRuns {
 		System.out.println("  processing plans...");
 		final Population population = new Population(Population.USE_STREAMING);
 		final PopulationWriter plansWriter = new PopulationWriter(population);
-		final PopulationReader plansReader = new MatsimPlansReader(population);
+		final PopulationReader plansReader = new MatsimPopulationReader(population);
 		population.addAlgorithm(new ActLocationFalsifier(200));
 		population.addAlgorithm(new XY2Links(network));
 		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost();
@@ -2047,7 +2047,7 @@ public class MyRuns {
 
 			System.out.println("  reading plans...");
 			final Population plans = new Population(Population.USE_STREAMING);
-			final PopulationReader plansReader = new MatsimPlansReader(plans);
+			final PopulationReader plansReader = new MatsimPopulationReader(plans);
 			plans.addAlgorithm(
 					new AbstractPersonAlgorithm() {
 

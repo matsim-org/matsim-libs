@@ -37,7 +37,7 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.utils.geometry.Coord;
@@ -108,7 +108,7 @@ private static final String PERSON_KEY = "person";
 
 	private static Population loadPopulation(String file) {
 		Population plans = new Population();
-		MatsimPlansReader reader = new MatsimPlansReader(plans);
+		MatsimPopulationReader reader = new MatsimPopulationReader(plans);
 		try {
 			reader.parse(file);
 		} catch (SAXException e) {

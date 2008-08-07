@@ -25,7 +25,7 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.world.World;
 
@@ -61,7 +61,7 @@ public class OnRouteModalSplitTest {
 		world.setNetworkLayer(network);
 
 		Population population = new Population();
-		new MatsimPlansReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population).readFile(plansFilename);
 
 		Events events = new Events();
 

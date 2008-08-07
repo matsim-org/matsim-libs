@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.world.World;
 
@@ -51,7 +51,7 @@ public class PtCheckTest {
 			PtCheck2 pc = new PtCheck2(ptcheckFilename);
 
 			population.addAlgorithm(pc);
-			new MatsimPlansReader(population).readFile(plansFilename);
+			new MatsimPopulationReader(population).readFile(plansFilename);
 			population.runAlgorithms();
 
 			pc.write(100);

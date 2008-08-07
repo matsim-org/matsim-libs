@@ -34,7 +34,7 @@ import org.matsim.network.NetworkChangeEventsParser;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.TimeVariantLinkImpl;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.world.MatsimWorldReader;
@@ -167,7 +167,7 @@ public class ScenarioData {
 			getFacilities();
 
 			log.info("loading population from " + this.populationFileName);
-			PopulationReader plansReader = new MatsimPlansReader(this.population);
+			PopulationReader plansReader = new MatsimPopulationReader(this.population);
 			plansReader.readFile(this.populationFileName);
 			this.population.printPlansCount();
 

@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.geometry.Coord;
@@ -163,7 +163,7 @@ public class TransimsSnapshotFilePostProcessor {
 
 		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
 		Population population = new Population();
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		log.info("done.");
 

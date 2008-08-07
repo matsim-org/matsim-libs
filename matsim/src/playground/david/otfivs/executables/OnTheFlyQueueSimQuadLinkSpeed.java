@@ -11,7 +11,7 @@ import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
@@ -139,7 +139,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 		world.setNetworkLayer(net);
 
 		Population population = new Population();
-		MatsimPlansReader plansReader = new MatsimPlansReader(population);
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(popFileName);
 		population.printPlansCount();
 

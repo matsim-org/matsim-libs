@@ -32,7 +32,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -67,7 +67,7 @@ public class PlanFilter {
 
 		System.out.println("  reading population... " + (new Date()));
 		final Population population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 
@@ -135,7 +135,7 @@ public class PlanFilter {
 
 		System.out.println("  reading population... " + (new Date()));
 		final Population population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 

@@ -39,7 +39,7 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -130,7 +130,7 @@ public class LinkSetRendererRoutes extends RendererA {
 
 		System.out.println("  setting up plans objects...");
 		Population plans = new Population(Population.USE_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		plans.addAlgorithm(new RouteLinkMarker(this.linkValues));
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();

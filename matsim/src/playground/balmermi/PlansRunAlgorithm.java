@@ -26,7 +26,7 @@ import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -55,7 +55,7 @@ public class PlansRunAlgorithm {
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");

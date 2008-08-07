@@ -36,7 +36,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -83,7 +83,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		log.info("Reading plans xml file...");
 		population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		log.info("Reading plans xml file...done.");

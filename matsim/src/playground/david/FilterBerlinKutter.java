@@ -31,7 +31,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -117,7 +117,7 @@ public class FilterBerlinKutter {
 
 		relevantPopulation = new Population(false);
 		Population population = new MyPopulation();
-		MatsimPlansReader plansReader = new MatsimPlansReader(population);
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
 		population.addAlgorithm(new FilterPersons());
 		plansReader.readFile(popFileName);
 //		population.runAlgorithms();

@@ -23,7 +23,7 @@ package playground.yu.newPlan;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.world.World;
@@ -50,7 +50,7 @@ public class SelectedPlansControler {
 		Population population = new Population();
 		SelectedPlans sp = new SelectedPlans(population);
 		population.addAlgorithm(sp);
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(plansFilename);
 		population.runAlgorithms();
 		sp.writeEndPlans();

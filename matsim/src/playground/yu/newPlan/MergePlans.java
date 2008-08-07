@@ -24,7 +24,7 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
@@ -97,12 +97,12 @@ public class MergePlans {
 		Population plansA = new Population();
 		PopulationWriter pw = new PopulationWriter(plansA);
 		plansA.addAlgorithm(new CopyPlans(pw));
-		new MatsimPlansReader(plansA).readFile(plansFilenameA);
+		new MatsimPopulationReader(plansA).readFile(plansFilenameA);
 		plansA.runAlgorithms();
 
 		Population plansB = new Population();
 		plansB.addAlgorithm(new PersonIdCopyPlans(pw, lower_limit));
-		new MatsimPlansReader(plansB).readFile(plansFilenameB);
+		new MatsimPopulationReader(plansB).readFile(plansFilenameB);
 		plansB.runAlgorithms();
 		pw.write();
 	}

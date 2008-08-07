@@ -28,7 +28,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -110,7 +110,7 @@ public class ModeChoicePlan extends NewPlan {
 		Population population = new Population();
 		ModeChoicePlan mcp = new ModeChoicePlan(population);
 		population.addAlgorithm(mcp);
-		new MatsimPlansReader(population).readFile(config.plans()
+		new MatsimPopulationReader(population).readFile(config.plans()
 				.getInputFile());
 		population.runAlgorithms();
 		mcp.writeEndPlans();

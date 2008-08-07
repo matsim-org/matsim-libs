@@ -39,7 +39,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -596,7 +596,7 @@ public class MyRunsRouting extends MyRuns {
 		if (Gbl.getConfig().plans().switchOffPlansStreaming()) {
 			plans.runAlgorithms();
 		} else {
-			PopulationReader plansReader = new MatsimPlansReader(plans);
+			PopulationReader plansReader = new MatsimPopulationReader(plans);
 			plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		}
 
@@ -624,7 +624,7 @@ public class MyRunsRouting extends MyRuns {
 
 			System.out.println("  setting up plans objects...");
 			Population plans = new Population();
-			PopulationReader plansReader = new MatsimPlansReader(plans);
+			PopulationReader plansReader = new MatsimPopulationReader(plans);
 			System.out.println("  done.");
 
 			System.out.println("  running plans algorithm... ");
@@ -678,7 +678,7 @@ public class MyRunsRouting extends MyRuns {
 	public static void compareRoute(final String[] args) {
 		Population plans = new Population();
 
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost();
 		LeastCostPathCalculator routingAlgo = getRoutingAlgo(args,

@@ -31,7 +31,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.cppdeqsim.EventsReaderDEQv1;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
@@ -81,7 +81,7 @@ public class KtiSpeedTest {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");

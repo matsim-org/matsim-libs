@@ -20,7 +20,7 @@ import org.matsim.mobsim.cppdeqsim.EventsReaderDEQv1;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
@@ -335,7 +335,7 @@ public class CompareScenariosWestumfahrung {
 
 			//Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null);
 			Population plans = new Population(false);
-			PopulationReader plansReader = new MatsimPlansReader(plans);
+			PopulationReader plansReader = new MatsimPopulationReader(plans);
 			plansReader.readFile(plansInputFilenames.get(scenarioName));
 			plans.printPlansCount();
 

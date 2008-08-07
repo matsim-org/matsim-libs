@@ -30,7 +30,7 @@ import java.io.IOException;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -132,7 +132,7 @@ public class CarAvail extends AbstractPersonAlgorithm {
 		population.addAlgorithm(ca);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPlansReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population).readFile(plansFilename);
 
 		population.runAlgorithms();
 

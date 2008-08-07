@@ -6,7 +6,7 @@ import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -107,7 +107,7 @@ public class PlanModifications {
 
 
 		this.plans=new Population(false);
-		final PopulationReader plansReader = new MatsimPlansReader(this.plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(this.plans);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
 		log.info(this.plans.getPersons().size() + " persons");

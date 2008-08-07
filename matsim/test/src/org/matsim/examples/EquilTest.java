@@ -27,7 +27,7 @@ import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.testcases.MatsimTestCase;
@@ -52,7 +52,7 @@ public class EquilTest extends MatsimTestCase {
 		world.setNetworkLayer(network);
 
 		Population population = new Population();
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events();

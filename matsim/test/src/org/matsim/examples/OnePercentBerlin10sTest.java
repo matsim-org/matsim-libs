@@ -29,7 +29,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.testcases.MatsimTestCase;
@@ -62,7 +62,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		world.setNetworkLayer(network);
 
 		Population population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(popFileName);
 		population.printPlansCount();
 

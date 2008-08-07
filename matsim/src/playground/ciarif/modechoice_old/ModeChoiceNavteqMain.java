@@ -22,7 +22,7 @@ package playground.ciarif.modechoice_old;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -83,9 +83,9 @@ public class ModeChoiceNavteqMain {
 //		plans.runAlgorithms();
 //		System.out.println("  done.");
 		
-//		PlansParser plansParser = new MatsimPlansReader(plans);
+//		PlansParser plansParser = new MatsimPopulationReader(plans);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 		System.out.println("  done.");
 		System.out.println("  adding plans algorithm... ");
 		//plans.addAlgorithm (new ModeChoiceAlgorithm2 ());

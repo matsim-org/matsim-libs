@@ -24,7 +24,7 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.world.World;
@@ -54,7 +54,7 @@ public class MakeHwhPlansControler {
 		HwhPlansMaker hpm = new HwhPlansMaker(network, config, population);
 		population.addAlgorithm(hpm);
 
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(plansFilename);
 
 		population.runAlgorithms();

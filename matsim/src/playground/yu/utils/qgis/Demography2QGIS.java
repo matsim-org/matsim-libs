@@ -33,7 +33,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -85,7 +85,7 @@ public class Demography2QGIS {
 
 	private void readFiles(String plansfilePath) {
 		System.out.println("  reading file " + plansfilePath);
-		PopulationReader plansReader0 = new MatsimPlansReader(this.plans);
+		PopulationReader plansReader0 = new MatsimPopulationReader(this.plans);
 		plansReader0.readFile(plansfilePath);
 	}
 

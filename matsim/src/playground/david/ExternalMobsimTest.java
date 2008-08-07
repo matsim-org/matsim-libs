@@ -27,7 +27,7 @@ import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 
@@ -49,7 +49,7 @@ public class ExternalMobsimTest {
 
 		//load pop from popfile
 		System.out.println("[External MOBSIM"  + "] loading plansfile: " + args[0]);
-		PopulationReader plansReader = new MatsimPlansReader(population_);
+		PopulationReader plansReader = new MatsimPopulationReader(population_);
 		plansReader.readFile(args[0]);
 		population_.printPlansCount();
 		System.out.println("[External MOBSIM"  + "]...done");

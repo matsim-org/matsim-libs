@@ -64,7 +64,7 @@ public class ScenarioParsing {
 
 //		System.out.println("  reding plans xml file... ");
 //		Plans plans = new Plans();
-//		PlansReaderI plansReader = new MatsimPlansReader(plans);
+//		PlansReaderI plansReader = new MatsimPopulationReader(plans);
 //		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 //		System.out.println("  done.");
 

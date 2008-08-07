@@ -26,7 +26,7 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.world.MatsimWorldReader;
@@ -66,7 +66,7 @@ public class CompressRouteControler {
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.USE_STREAMING);
-		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans);
 //		compress routes
 		CompressRoute cr=new CompressRoute(ss.getSsLinks(), plans,
 		"./test/yu/output/linkrout_capacity.txt");

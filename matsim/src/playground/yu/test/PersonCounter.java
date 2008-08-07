@@ -26,7 +26,7 @@ package playground.yu.test;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
@@ -79,7 +79,7 @@ public class PersonCounter extends AbstractPersonAlgorithm {
 		Population population = new Population();
 		PersonCounter pc = new PersonCounter();
 		population.addAlgorithm(pc);
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(plansFilename);
 		population.runAlgorithms();
 		System.out.println(pc.toString());

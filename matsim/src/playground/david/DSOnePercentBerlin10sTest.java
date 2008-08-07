@@ -32,7 +32,7 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAverageScore;
@@ -85,7 +85,7 @@ public class DSOnePercentBerlin10sTest {
 
 		Population population = new Population() ;
 		// Read plans file with special dtd version
-		PopulationReader plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events();

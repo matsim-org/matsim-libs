@@ -26,7 +26,7 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
@@ -125,7 +125,7 @@ public class InitRoutes {
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 
 		final Population plans = new Population(Population.USE_STREAMING);
-		final PopulationReader plansReader = new MatsimPlansReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);

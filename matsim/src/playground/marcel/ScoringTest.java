@@ -23,7 +23,7 @@ package playground.marcel;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -41,7 +41,7 @@ public class ScoringTest {
 		new MatsimNetworkReader(network).readFile("examples/equil/network.xml");
 		Gbl.createWorld().setNetworkLayer(network);
 		Population population = new Population(Population.NO_STREAMING);
-		new MatsimPlansReader(population).readFile("../mystudies/scoringtest/plans.xml");
+		new MatsimPopulationReader(population).readFile("../mystudies/scoringtest/plans.xml");
 
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getPlans().get(0);
