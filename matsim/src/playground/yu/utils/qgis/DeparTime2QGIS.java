@@ -32,7 +32,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author yu
@@ -40,7 +40,7 @@ import org.matsim.population.algorithms.PlanAlgorithmI;
  */
 public class DeparTime2QGIS implements X2QGIS {
 	public static class LinkDeparTime extends AbstractPersonAlgorithm implements
-			PlanAlgorithmI {
+			PlanAlgorithm {
 		/**
 		 * @param arg0
 		 *            a linkId

@@ -21,7 +21,7 @@
 package org.matsim.replanning.modules;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRouteDijkstra;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
@@ -44,7 +44,7 @@ public class ReRouteDijkstra extends MultithreadedModuleA {
 	}
 
 	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
+	public PlanAlgorithm getPlanAlgoInstance() {
 		return new PlansCalcRouteDijkstra(this.network, this.costCalculator, this.timeCalculator);
 	}
 

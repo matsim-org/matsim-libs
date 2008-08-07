@@ -45,7 +45,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.MultithreadedModuleA;
@@ -375,13 +375,13 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 		
 		@Override
-		public PlanAlgorithmI getPlanAlgoInstance() {
+		public PlanAlgorithm getPlanAlgoInstance() {
 			return new PlanMutateTimeAllocationBottleneck(1800);
 		}
 	}
 
 	/** A special variant of the TimeAllocationMutator, suitable for the Bottleneck Analysis */
-	private static class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
+	private static class PlanMutateTimeAllocationBottleneck implements PlanAlgorithm {
 
 		private final int mutationRange;
 

@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.matsim.controler.Controler;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
@@ -85,7 +85,7 @@ public class KtiControler extends Controler {
 	}
 	
 	@Override
-	public PlanAlgorithmI getRoutingAlgorithm(final TravelCostI travelCosts, final TravelTimeI travelTimes) {
+	public PlanAlgorithm getRoutingAlgorithm(final TravelCostI travelCosts, final TravelTimeI travelTimes) {
 		synchronized (this) {
 			if (this.commonRoutingData == null) {
 				this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());

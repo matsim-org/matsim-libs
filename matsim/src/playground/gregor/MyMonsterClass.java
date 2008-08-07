@@ -58,7 +58,7 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.ActLocationFalsifier;
-import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.population.algorithms.PlansFilterActInArea;
 import org.matsim.population.algorithms.XY2Links;
@@ -621,7 +621,7 @@ int three=0;
 
 
 		Population population = new Population(Population.USE_STREAMING);
-		PersonAlgorithmI algo = new PlansFilterActInArea(subNetwork,"w");
+		PersonAlgorithm algo = new PlansFilterActInArea(subNetwork,"w");
 		population.addAlgorithm(algo);
 
 		System.out.println("reading plans xml file... ");

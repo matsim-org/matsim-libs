@@ -28,7 +28,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.population.Act;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.filters.AbstractPlanFilter;
 
 /**
@@ -43,7 +43,7 @@ public class ActLinkFilter extends AbstractPlanFilter {
 	private final Set<Id> linkIds;
 	private final String actTypePattern;
 
-	public ActLinkFilter(final String actTypePattern, final PlanAlgorithmI nextAlgo) {
+	public ActLinkFilter(final String actTypePattern, final PlanAlgorithm nextAlgo) {
 		this.nextAlgorithm = nextAlgo;
 		this.linkIds = new HashSet<Id>();
 		this.actTypePattern = actTypePattern;

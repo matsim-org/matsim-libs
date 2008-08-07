@@ -32,7 +32,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
@@ -41,7 +41,7 @@ import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
-public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

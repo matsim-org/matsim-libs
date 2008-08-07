@@ -29,7 +29,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.filters.AbstractPersonFilter;
 
 /**
@@ -39,7 +39,7 @@ public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 
 	private final Map<Id, Link> areaOfInterest;
 
-	public PersonLeavesAreaFilter(final PersonAlgorithmI nextAlgorithm, final Map<Id, Link> areaOfInterest) {
+	public PersonLeavesAreaFilter(final PersonAlgorithm nextAlgorithm, final Map<Id, Link> areaOfInterest) {
 		this.nextAlgorithm = nextAlgorithm;
 		this.areaOfInterest = areaOfInterest;
 	}

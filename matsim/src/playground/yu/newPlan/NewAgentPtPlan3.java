@@ -29,7 +29,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -39,7 +39,7 @@ import org.matsim.population.algorithms.PersonAlgorithmI;
  * @author ychen
  * 
  */
-public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithmI {
+public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 
 	private final List<Plan> copyPlans = new ArrayList<Plan>();
 

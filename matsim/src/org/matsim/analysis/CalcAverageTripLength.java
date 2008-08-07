@@ -26,9 +26,9 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class CalcAverageTripLength extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class CalcAverageTripLength extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private double sumLength = 0.0;
 	private int cntTrips = 0;

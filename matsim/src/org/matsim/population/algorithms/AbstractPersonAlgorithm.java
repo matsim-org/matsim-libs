@@ -25,7 +25,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.utils.misc.Counter;
 
-public abstract class AbstractPersonAlgorithm implements PersonAlgorithmI {
+public abstract class AbstractPersonAlgorithm implements PersonAlgorithm {
 
 	private final static Logger log = Logger.getLogger(AbstractPersonAlgorithm.class);
 

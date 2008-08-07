@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.misc.Counter;
 
 /**
@@ -56,7 +56,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	private boolean isStreaming;
 
 	// algorithms over plans
-	private final ArrayList<PersonAlgorithmI> personAlgos = new ArrayList<PersonAlgorithmI>();
+	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<PersonAlgorithm>();
 
 	private static final Logger log = Logger.getLogger(Population.class);
 
@@ -102,7 +102,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 			this.persons.put(p.getId(), p);
 
 			// run algos
-			for (PersonAlgorithmI algo : this.personAlgos) {
+			for (PersonAlgorithm algo : this.personAlgos) {
 				algo.run(p);
 			}
 
@@ -125,7 +125,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	public final void runAlgorithms() {
 		if (!this.isStreaming) {
 			for (int i=0; i<this.personAlgos.size(); i++) {
-				PersonAlgorithmI algo = this.personAlgos.get(i);
+				PersonAlgorithm algo = this.personAlgos.get(i);
 				log.info("running algorithm " + algo.getClass().getName());
 				Counter counter = new Counter(" person # ");
 				for (Person person : this.persons.values()) {
@@ -148,7 +148,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 		this.personAlgos.clear();
 	}
 
-	public boolean removeAlgorithm(final PersonAlgorithmI algo) {
+	public boolean removeAlgorithm(final PersonAlgorithm algo) {
 		return this.personAlgos.remove(algo);
 	}
 
@@ -157,7 +157,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	//////////////////////////////////////////////////////////////////////
 
 
-	public final void addAlgorithm(final PersonAlgorithmI algo) {
+	public final void addAlgorithm(final PersonAlgorithm algo) {
 		this.personAlgos.add(algo);
 	}
 

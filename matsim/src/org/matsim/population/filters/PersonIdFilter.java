@@ -23,7 +23,7 @@ package org.matsim.population.filters;
 import java.util.regex.Pattern;
 
 import org.matsim.population.Person;
-import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
  * Filters persons whose id matches a certain pattern (regular expression).
@@ -34,7 +34,7 @@ public class PersonIdFilter extends AbstractPersonFilter {
 
 	private String personIdPattern = null;
 	
-	public PersonIdFilter(String personIdPattern, PersonAlgorithmI nextAlgorithm) {
+	public PersonIdFilter(String personIdPattern, PersonAlgorithm nextAlgorithm) {
 		super();
 		this.personIdPattern = personIdPattern;
 		this.nextAlgorithm = nextAlgorithm;

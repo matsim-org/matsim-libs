@@ -32,7 +32,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
@@ -40,7 +40,7 @@ import org.matsim.world.Zone;
 
 import playground.balmermi.census2000.data.Persons;
 
-public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

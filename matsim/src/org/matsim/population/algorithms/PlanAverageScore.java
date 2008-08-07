@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private double sumScores = 0.0;
 	private long cntScores = 0;

@@ -24,7 +24,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-public class PlanCalcType extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PlanCalcType extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(Person person) {

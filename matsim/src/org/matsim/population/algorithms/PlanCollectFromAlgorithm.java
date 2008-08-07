@@ -29,7 +29,7 @@ import org.matsim.population.Plan;
  * @author dgrether
  *
  */
-public class PlanCollectFromAlgorithm implements PlanAlgorithmI {
+public class PlanCollectFromAlgorithm implements PlanAlgorithm {
 
 	private Set<Plan> plans;
 
@@ -39,7 +39,7 @@ public class PlanCollectFromAlgorithm implements PlanAlgorithmI {
 
 	/**
 	 * Just collects all plans in a set.
-	 * @see org.matsim.population.algorithms.PlanAlgorithmI#run(org.matsim.population.Plan)
+	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.population.Plan)
 	 */
 	public void run(Plan plan) {
 		this.plans.add(plan);

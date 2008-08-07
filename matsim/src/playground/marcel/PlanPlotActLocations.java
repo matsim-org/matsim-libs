@@ -29,9 +29,9 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class PlanPlotActLocations extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PlanPlotActLocations extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private BufferedWriter out = null;
 	private int cnt = 0;

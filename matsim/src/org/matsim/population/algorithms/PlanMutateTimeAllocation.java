@@ -36,7 +36,7 @@ import org.matsim.utils.misc.Time;
  *
  * @author mrieser
  */
-public class PlanMutateTimeAllocation implements PlanAlgorithmI {
+public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private final int mutationRange;
 

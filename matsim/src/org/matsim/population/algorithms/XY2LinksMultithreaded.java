@@ -33,7 +33,7 @@ public class XY2LinksMultithreaded extends MultithreadedModuleA {
 	}
 	
 	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
+	public PlanAlgorithm getPlanAlgoInstance() {
 		return new XY2Links(network);
 	}
 }

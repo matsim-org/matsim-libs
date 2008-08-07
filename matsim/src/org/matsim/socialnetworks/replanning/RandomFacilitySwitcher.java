@@ -22,7 +22,7 @@ package org.matsim.socialnetworks.replanning;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
@@ -54,7 +54,7 @@ public class RandomFacilitySwitcher extends MultithreadedModuleA {
     	this.facs = facs;
     }
 
-    public PlanAlgorithmI getPlanAlgoInstance() {
+    public PlanAlgorithm getPlanAlgoInstance() {
 //	return new SNSecLocShortest(factypes, network, tcost, ttime);
 	return new SecLocRandom(factypes, network, tcost, ttime, facs);
     }

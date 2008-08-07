@@ -21,9 +21,9 @@
 package org.matsim.population.filters;
 
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
-public interface PlanFilter extends PlanAlgorithmI, FilterI {
+public interface PlanFilter extends PlanAlgorithm, Filter {
 
 	/**
 	 * Judges whether the plan will be selected or not.

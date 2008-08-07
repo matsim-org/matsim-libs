@@ -31,10 +31,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.geometry.Coord;
 
-public class PlansCalcHectarPopulation extends AbstractPersonAlgorithm implements PersonAlgorithmI {
+public class PlansCalcHectarPopulation extends AbstractPersonAlgorithm implements PersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -28,11 +28,11 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
 
-public class PopulationWriter extends Writer implements PersonAlgorithmI {
+public class PopulationWriter extends Writer implements PersonAlgorithm {
 
 	private final double write_person_percentage;
 	private boolean fileOpened = false;
@@ -266,7 +266,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithmI {
 		return this.handler;
 	}
 
-	// implementation of PersonAlgorithmI
+	// implementation of PersonAlgorithm
 	// this is primarily to use the PlansWriter with filters and other algorithms.
 	public void run(final Person person) {
 		writePerson(person);

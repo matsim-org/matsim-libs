@@ -32,7 +32,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author ychen
@@ -44,7 +44,7 @@ public class PtRate2QGIS implements X2QGIS {
 	 * 
 	 */
 	public static class LinkPtRate extends AbstractPersonAlgorithm implements
-			PlanAlgorithmI {
+			PlanAlgorithm {
 		private Map<Id, Integer> ptUsers;
 		private Map<Id, Integer> agents;
 

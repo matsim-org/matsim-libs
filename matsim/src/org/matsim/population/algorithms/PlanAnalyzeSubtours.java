@@ -40,7 +40,7 @@ import org.matsim.population.Plan;
  * @author meisterk
  *
  */
-public class PlanAnalyzeSubtours implements PlanAlgorithmI {
+public class PlanAnalyzeSubtours implements PlanAlgorithm {
 
 	private static final Id INVALID_ID = new IdImpl(Integer.MIN_VALUE);
 

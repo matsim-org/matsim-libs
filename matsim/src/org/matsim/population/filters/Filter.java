@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterI.java
+ * Filter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,34 +20,25 @@
 
 package org.matsim.population.filters;
 
-import org.matsim.population.Person;
-import org.matsim.population.algorithms.PersonAlgorithmI;
-
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
- *
+ * this interface offers the basic functions for
+ * org.matsim.playground.filters.filter.Filter und its subclasses.
+ * 
  * @author ychen
- *
+ * 
  */
-public interface PersonFilterI extends FilterI, PersonAlgorithmI {
+public interface Filter {
 	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
+	 * Counts, how many persons (org.matsim.demandmodeling.plans.Person) or
+	 * events(org.matsim.demandmodeling.events.BasicEvent) were selected
 	 */
-	boolean judge(Person person);
+	void count();
 
 	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
-	 *
-	 * @param person -
-	 *            a person being run
+	 * Returns how many persons (org.matsim.demandmodeling.plans.Person) or
+	 * events(org.matsim.demandmodeling.events.BasicEvent) were selected
+	 * @return how many persons (org.matsim.demandmodeling.plans.Person) or
+	 * events(org.matsim.demandmodeling.events.BasicEvent) were selected
 	 */
-	void run(Person person);
-
+	int getCount();
 }

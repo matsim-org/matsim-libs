@@ -25,7 +25,7 @@ package playground.johannes.eut;
 
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.PlansCalcRoute;
 
@@ -62,7 +62,7 @@ public class EUTReRoute extends MultithreadedModuleA {
 	}
 	
 	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
+	public PlanAlgorithm getPlanAlgoInstance() {
 		EUTRouter router = new EUTRouter(network, provider, utilFunction);
 		router.setAnalyzer(analyzer);
 		return new PlanAlgorithmDecorator(new PlansCalcRoute(router, router));
@@ -74,11 +74,11 @@ public class EUTReRoute extends MultithreadedModuleA {
 //		super.handlePlan(plan);
 //	}
 
-	private class PlanAlgorithmDecorator implements PlanAlgorithmI {
+	private class PlanAlgorithmDecorator implements PlanAlgorithm {
 
-		private PlanAlgorithmI algo;
+		private PlanAlgorithm algo;
 		
-		public PlanAlgorithmDecorator(PlanAlgorithmI algo) {
+		public PlanAlgorithmDecorator(PlanAlgorithm algo) {
 			this.algo = algo;
 		}
 		

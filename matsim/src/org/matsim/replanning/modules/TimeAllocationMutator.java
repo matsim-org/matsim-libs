@@ -22,7 +22,7 @@ package org.matsim.replanning.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
 /**
@@ -68,7 +68,7 @@ public class TimeAllocationMutator extends MultithreadedModuleA {
 	}
 
 	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
+	public PlanAlgorithm getPlanAlgoInstance() {
 		return new PlanMutateTimeAllocation(mutationRange);
 	}
 

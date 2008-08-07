@@ -37,7 +37,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -45,7 +45,7 @@ import org.matsim.world.World;
  * @author yu
  * 
  */
-public class ScoreVariance extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class ScoreVariance extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	private final List<Double> scores = new ArrayList<Double>();
 	private BufferedWriter writer;
 	private final String outputFilename;

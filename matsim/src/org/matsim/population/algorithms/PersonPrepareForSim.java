@@ -43,12 +43,12 @@ import org.matsim.population.Plan;
  */
 public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
-	private final PlanAlgorithmI router;
+	private final PlanAlgorithm router;
 	private final XY2Links xy2links;
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 
-	public PersonPrepareForSim(final PlanAlgorithmI router, final NetworkLayer network) {
+	public PersonPrepareForSim(final PlanAlgorithm router, final NetworkLayer network) {
 		super();
 		this.router = router;
 		this.xy2links = new XY2Links(network);

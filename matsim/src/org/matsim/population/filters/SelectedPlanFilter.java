@@ -21,13 +21,13 @@
 package org.matsim.population.filters;
 
 import org.matsim.population.Person;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class SelectedPlanFilter extends AbstractPersonFilter {
 
-	private final PlanAlgorithmI nextAlgo;
+	private final PlanAlgorithm nextAlgo;
 
-	public SelectedPlanFilter(final PlanAlgorithmI nextAlgo) {
+	public SelectedPlanFilter(final PlanAlgorithm nextAlgo) {
 		this.nextAlgo = nextAlgo;
 	}
 

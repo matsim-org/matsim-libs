@@ -28,13 +28,13 @@ import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class RouteLinkFilter extends AbstractPlanFilter {
 
 	private final Set<Id> linkIds;
 
-	public RouteLinkFilter(final PlanAlgorithmI nextAlgo) {
+	public RouteLinkFilter(final PlanAlgorithm nextAlgo) {
 		this.nextAlgorithm = nextAlgo;
 		this.linkIds = new HashSet<Id>();
 	}

@@ -29,10 +29,10 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.Coord;
 
-public class PersonSetNearestFacCoord extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PersonSetNearestFacCoord extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

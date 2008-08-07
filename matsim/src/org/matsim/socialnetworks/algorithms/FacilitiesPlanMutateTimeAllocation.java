@@ -26,7 +26,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.utils.misc.Time;
 
@@ -43,7 +43,7 @@ import org.matsim.utils.misc.Time;
  * 
  * Modified to update the mapping between Act and Facility: only works if such a mapping exists, NOT failsafe -- jhackney
  */
-public class FacilitiesPlanMutateTimeAllocation implements PlanAlgorithmI {
+public class FacilitiesPlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private final int mutationRange;
 	private final Logger log = Logger.getLogger(FacilitiesPlanMutateTimeAllocation.class);

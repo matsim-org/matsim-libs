@@ -30,7 +30,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.Location;
 import org.matsim.world.ZoneLayer;
 
@@ -41,7 +41,7 @@ import org.matsim.world.ZoneLayer;
  * should be able to read. This can be used to analyze routes, origin
  * and destination of simulated traffic in VISUM.
  */
-public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private BufferedWriter out = null;
 	private ZoneLayer tvzLayer = null;

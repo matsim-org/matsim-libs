@@ -32,10 +32,10 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.Coord;
 
-public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

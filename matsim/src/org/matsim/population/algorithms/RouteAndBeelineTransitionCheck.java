@@ -38,7 +38,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
  *
  * @author glaemmel
  */
-public class RouteAndBeelineTransitionCheck implements PlanAlgorithmI {
+public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 
 	private NetworkLayer network = null;
 	private Set<Id> aOI = new HashSet<Id>();

@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
@@ -47,7 +47,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler = new TestControler(config);
 		controler.run();
 		assertNull("RoadPricing must not be loaded in case case.", controler.getRoadPricing());
-		PlanAlgorithmI router = controler.getRoutingAlgorithm();
+		PlanAlgorithm router = controler.getRoutingAlgorithm();
 		assertFalse("BaseCase must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
 		assertFalse("BaseCase must not use roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
@@ -62,7 +62,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler = new TestControler(config);
 		controler.run();
 		assertNotNull("RoadPricing must be loaded in distance toll case.", controler.getRoadPricing());
-		PlanAlgorithmI router = controler.getRoutingAlgorithm();
+		PlanAlgorithm router = controler.getRoutingAlgorithm();
 		assertFalse("Distance toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
 		assertTrue("Distance toll must use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
@@ -77,7 +77,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler = new TestControler(config);
 		controler.run();
 		assertNotNull("RoadPricing must be loaded in cordon toll case.", controler.getRoadPricing());
-		PlanAlgorithmI router = controler.getRoutingAlgorithm();
+		PlanAlgorithm router = controler.getRoutingAlgorithm();
 		assertFalse("Cordon toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
 		assertTrue("Cordon toll must use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
@@ -92,7 +92,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Controler controler = new TestControler(config);
 		controler.run();
 		assertNotNull("RoadPricing should be loaded in area toll case.", controler.getRoadPricing());
-		PlanAlgorithmI router = controler.getRoutingAlgorithm();
+		PlanAlgorithm router = controler.getRoutingAlgorithm();
 		assertTrue("Area toll should use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
 		assertTrue("Area toll must use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);

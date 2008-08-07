@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FilterI.java
+ * PlanAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,27 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.filters;
+package org.matsim.population.algorithms;
 
-/**
- * this interface offers the basic functions for
- * org.matsim.playground.filters.filter.Filter und its subclasses.
- * 
- * @author ychen
- * 
- */
-public interface FilterI {
-	/**
-	 * Counts, how many persons (org.matsim.demandmodeling.plans.Person) or
-	 * events(org.matsim.demandmodeling.events.BasicEvent) were selected
-	 */
-	void count();
+import org.matsim.population.Plan;
 
-	/**
-	 * Returns how many persons (org.matsim.demandmodeling.plans.Person) or
-	 * events(org.matsim.demandmodeling.events.BasicEvent) were selected
-	 * @return how many persons (org.matsim.demandmodeling.plans.Person) or
-	 * events(org.matsim.demandmodeling.events.BasicEvent) were selected
-	 */
-	int getCount();
+public interface PlanAlgorithm {
+	public abstract void run(Plan plan);
 }

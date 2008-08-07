@@ -34,7 +34,7 @@ import org.matsim.utils.misc.Time;
  *
  * @author mrieser
  */
-public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

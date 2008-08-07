@@ -38,12 +38,12 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 
-public class SecLocRandom  implements PlanAlgorithmI{
+public class SecLocRandom  implements PlanAlgorithm{
 	private final String weights;
 
 	private double[] cum_p_factype;

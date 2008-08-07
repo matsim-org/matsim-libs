@@ -21,7 +21,7 @@
 package org.matsim.replanning.modules;
 
 import org.matsim.controler.Controler;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * Uses the routing algorithm provided by the {@linkplain Controler} for 
@@ -38,7 +38,7 @@ public class ReRoute extends MultithreadedModuleA {
 	}
 
 	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
+	public PlanAlgorithm getPlanAlgoInstance() {
 		return this.controler.getRoutingAlgorithm();
 	}
 

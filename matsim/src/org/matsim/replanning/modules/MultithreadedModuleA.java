@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * An abstract strategy module for running multiple plan algorithms in parallel.
@@ -49,7 +49,7 @@ abstract public class MultithreadedModuleA implements StrategyModuleI {
 
 	private PlanAlgoThread[] algothreads = null;
 	private Thread[] threads = null;
-	private PlanAlgorithmI directAlgo = null;
+	private PlanAlgorithm directAlgo = null;
 	private String name = null;
 
 	private int counter = 0;
@@ -57,7 +57,7 @@ abstract public class MultithreadedModuleA implements StrategyModuleI {
 
 	static final private Logger log = Logger.getLogger(MultithreadedModuleA.class);
 
-	abstract public PlanAlgorithmI getPlanAlgoInstance();
+	abstract public PlanAlgorithm getPlanAlgoInstance();
 
 	public MultithreadedModuleA() {
 		this.numOfThreads = Gbl.getConfig().global().getNumberOfThreads();
@@ -123,7 +123,7 @@ abstract public class MultithreadedModuleA implements StrategyModuleI {
 
 		// setup threads
 		for (int i = 0; i < this.numOfThreads; i++) {
-			PlanAlgorithmI algo = getPlanAlgoInstance();
+			PlanAlgorithm algo = getPlanAlgoInstance();
 			if (i == 0) {
 				this.name = algo.getClass().getSimpleName();
 			}
@@ -145,10 +145,10 @@ abstract public class MultithreadedModuleA implements StrategyModuleI {
 	private class PlanAlgoThread implements Runnable {
 
 		public final int threadId;
-		private final PlanAlgorithmI planAlgo;
+		private final PlanAlgorithm planAlgo;
 		private final List<Plan> plans = new LinkedList<Plan>();
 
-		public PlanAlgoThread(final int i, final PlanAlgorithmI algo) {
+		public PlanAlgoThread(final int i, final PlanAlgorithm algo) {
 			this.threadId = i;
 			this.planAlgo = algo;
 		}

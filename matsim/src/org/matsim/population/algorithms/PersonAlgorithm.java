@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanAlgorithmI.java
+ * PersonAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,8 +20,8 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.population.Plan;
+import org.matsim.population.Person;
 
-public interface PlanAlgorithmI {
-	public abstract void run(Plan plan);
+public interface PersonAlgorithm {
+	public void run(Person person);
 }

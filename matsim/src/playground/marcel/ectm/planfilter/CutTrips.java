@@ -33,15 +33,15 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
-import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.misc.Time;
 
-public class CutTrips implements PersonAlgorithmI {
+public class CutTrips implements PersonAlgorithm {
 
-	private PersonAlgorithmI nextAlgorithm;
+	private PersonAlgorithm nextAlgorithm;
 	private final Map<Id, Link> aoi;
 
-	public CutTrips(final PersonAlgorithmI nextAlgorithm, final Map<Id, Link> aoi) {
+	public CutTrips(final PersonAlgorithm nextAlgorithm, final Map<Id, Link> aoi) {
 		this.nextAlgorithm = nextAlgorithm;
 		this.aoi = aoi;
 	}

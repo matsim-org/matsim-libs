@@ -21,11 +21,11 @@
 package org.matsim.population.filters;
 
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
-public abstract class AbstractPlanFilter implements PlanFilter, PlanAlgorithmI {
+public abstract class AbstractPlanFilter implements PlanFilter, PlanAlgorithm {
 
-	protected PlanAlgorithmI nextAlgorithm = null;
+	protected PlanAlgorithm nextAlgorithm = null;
 	private int count = 0;
 
 	abstract public boolean judge(Plan plan);

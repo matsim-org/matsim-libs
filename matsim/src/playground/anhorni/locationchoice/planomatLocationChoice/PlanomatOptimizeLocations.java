@@ -48,7 +48,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRouteDijkstra;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
@@ -60,7 +60,7 @@ import playground.anhorni.locationchoice.planomatLocationChoice.costestimators.C
 /**
  *
  */
-public class PlanomatOptimizeLocations implements PlanAlgorithmI {
+public class PlanomatOptimizeLocations implements PlanAlgorithm {
 
 	private NetworkLayer network=null;
 	private TravelTimeI travelTimeCalculator = null;

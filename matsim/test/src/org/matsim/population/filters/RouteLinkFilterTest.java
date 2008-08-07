@@ -29,7 +29,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
 import org.matsim.testcases.MatsimTestCase;
@@ -102,7 +102,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		return population;
 	}
 
-	/*package*/ static class TestAlgorithm implements PlanAlgorithmI {
+	/*package*/ static class TestAlgorithm implements PlanAlgorithm {
 
 		public void run(final Plan plan) {
 			assertTrue("1".equals(plan.getPerson().getId().toString())

@@ -22,11 +22,11 @@ package org.matsim.population.filters;
 
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
-public abstract class AbstractPersonFilter implements PersonAlgorithmI, PersonFilterI {
+public abstract class AbstractPersonFilter implements PersonAlgorithm, PersonFilter {
 
-	protected PersonAlgorithmI nextAlgorithm = null;
+	protected PersonAlgorithm nextAlgorithm = null;
 	private int count = 0;
 	
 	abstract public boolean judge(Person person);

@@ -37,7 +37,7 @@ import org.matsim.population.Plan;
  * @author lnicolas
  *
  */
-public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	public FromToSummary() {
 		super();
@@ -123,7 +123,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	}
 
 	/**
-	 * @see org.matsim.population.algorithms.PlanAlgorithmI#run(org.matsim.population.Plan)
+	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.population.Plan)
 	 */
 	public void run(Plan plan) {
 		ArrayList actslegs = plan.getActsLegs();

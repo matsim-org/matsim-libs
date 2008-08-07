@@ -30,7 +30,7 @@ import org.matsim.population.Plan;
  *
  * @author mrieser
  */
-public class PlanReplaceLegModes extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PlanReplaceLegModes extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private final String[] fromMode;
 	private final String[] toMode;

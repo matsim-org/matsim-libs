@@ -31,10 +31,10 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.util.LeastCostPathCalculator;
 
-public class PlansCalcAndCompareRoute extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PlansCalcAndCompareRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

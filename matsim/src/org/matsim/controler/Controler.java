@@ -89,7 +89,7 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
@@ -1000,21 +1000,21 @@ public class Controler {
 	 * =================================================================== */
 
 	/**
-	 * @return a new instance of a {@link PlanAlgorithmI} to calculate the routes of plans with the default
+	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes of plans with the default
 	 * (= the current from the last or current iteration) travel costs and travel times. Only to be used by
 	 * a single thread, use multiple instances for multiple threads!
 	 */
-	public PlanAlgorithmI getRoutingAlgorithm() {
+	public PlanAlgorithm getRoutingAlgorithm() {
 		return getRoutingAlgorithm(this.getTravelCostCalculator(), this.getTravelTimeCalculator());
 	}
 
 	/**
 	 * @param travelCosts the travel costs to be used for the routing
 	 * @param travelTimes the travel times to be used for the routing
-	 * @return a new instance of a {@link PlanAlgorithmI} to calculate the routes of plans with the specified
+	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes of plans with the specified
 	 * travelCosts and travelTimes. Only to be used by a single thread, use multiple instances for multiple threads!
 	 */
-	public PlanAlgorithmI getRoutingAlgorithm(final TravelCostI travelCosts, final TravelTimeI travelTimes) {
+	public PlanAlgorithm getRoutingAlgorithm(final TravelCostI travelCosts, final TravelTimeI travelTimes) {
 		synchronized (this) {
 			if (this.commonRoutingData == null) {
 				this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());

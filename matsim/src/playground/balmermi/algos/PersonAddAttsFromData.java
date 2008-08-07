@@ -25,11 +25,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.balmermi.census2000.data.Persons;
 
-public class PersonAddAttsFromData extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PersonAddAttsFromData extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

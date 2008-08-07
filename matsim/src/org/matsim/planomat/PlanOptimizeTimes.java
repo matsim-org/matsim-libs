@@ -42,7 +42,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
@@ -60,7 +60,7 @@ import org.matsim.world.Location;
  * @author meisterk
  *
  */
-public class PlanOptimizeTimes implements PlanAlgorithmI {
+public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	private LegTravelTimeEstimator legTravelTimeEstimator = null;
 

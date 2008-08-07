@@ -30,13 +30,13 @@ import java.util.TreeSet;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.balmermi.census2000.data.Household;
 import playground.balmermi.census2000.data.Municipality;
 import playground.balmermi.census2000.data.Persons;
 
-public class PersonMunicipalitySummaryTable extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public class PersonMunicipalitySummaryTable extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

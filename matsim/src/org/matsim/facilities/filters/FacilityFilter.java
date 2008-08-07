@@ -22,13 +22,13 @@ package org.matsim.facilities.filters;
 
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
-import org.matsim.population.filters.FilterI;
+import org.matsim.population.filters.Filter;
 
 /**
  * @author meisterk
  *
  */
-public interface FacilityFilter extends FacilityAlgorithm, FilterI {
+public interface FacilityFilter extends FacilityAlgorithm, Filter {
 
 	/**
 	 * Judges whether the facility will be selected or not.

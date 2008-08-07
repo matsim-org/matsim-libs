@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonAlgorithmI.java
+ * PersonFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,10 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package org.matsim.population.filters;
 
 import org.matsim.population.Person;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
-public interface PersonAlgorithmI {
-	public void run(Person person);
+/**
+ * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
+ * and offers important functions for
+ * org.matsim.playground.filters.filter.PersonFilterA
+ *
+ * @author ychen
+ *
+ */
+public interface PersonFilter extends Filter, PersonAlgorithm {
+	/**
+	 * judges whether the Person will be selected or not
+	 *
+	 * @param person -
+	 *            who is being judged
+	 * @return true if the Person meets the criterion of the PersonFilterA
+	 */
+	boolean judge(Person person);
+
+	/**
+	 * sends the person to the next PersonFilterA
+	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
+	 *
+	 * @param person -
+	 *            a person being run
+	 */
+	void run(Person person);
+
 }

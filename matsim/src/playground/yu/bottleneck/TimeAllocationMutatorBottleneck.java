@@ -20,7 +20,7 @@
 
 package playground.yu.bottleneck;
 
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
 public class TimeAllocationMutatorBottleneck extends MultithreadedModuleA {
@@ -44,7 +44,7 @@ public class TimeAllocationMutatorBottleneck extends MultithreadedModuleA {
 	 * /////////////////////////////////////////////////
 	 */
 	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
+	public PlanAlgorithm getPlanAlgoInstance() {
 		return new PlanMutateTimeAllocationBottleneck(mutationRange);
 	}
 

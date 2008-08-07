@@ -27,7 +27,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
 import playground.anhorni.locationchoice.choiceset.LocationMutatorwChoiceSetSimultan;
@@ -37,7 +37,7 @@ public class LocationChoice extends MultithreadedModuleA {
 
 	private NetworkLayer network=null;
 	private Controler controler = null;
-	private List<PlanAlgorithmI>  planAlgoInstances = new Vector<PlanAlgorithmI>();
+	private List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	
@@ -72,9 +72,9 @@ public class LocationChoice extends MultithreadedModuleA {
 			
 			int unsuccessfull = 0;
 			
-			Iterator<PlanAlgorithmI> planAlgo_it = this.planAlgoInstances.iterator();
+			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
 			while (planAlgo_it.hasNext()) {
-				PlanAlgorithmI plan_algo = planAlgo_it.next();
+				PlanAlgorithm plan_algo = planAlgo_it.next();
 				unsuccessfull += ((LocationMutatorwChoiceSetSimultan)plan_algo).getNumberOfUnsuccessfull();
 				((LocationMutatorwChoiceSetSimultan)plan_algo).resetUnsuccsessfull();
 			}		
@@ -86,7 +86,7 @@ public class LocationChoice extends MultithreadedModuleA {
 
 
 	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
+	public PlanAlgorithm getPlanAlgoInstance() {
 		if (variant == 0) {
 			this.planAlgoInstances.add(new RandomLocationMutator(this.network));
 		}

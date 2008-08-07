@@ -16,13 +16,13 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.collections.QuadTree;
 
 //import playground.anhorni.locationchoice.choiceset.LocationMutatorwChoiceSet;
 
 
-public abstract class LocationMutator extends AbstractPersonAlgorithm implements PlanAlgorithmI {
+public abstract class LocationMutator extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	// parameters of the specific selector ----------------------
 	protected NetworkLayer network = null;

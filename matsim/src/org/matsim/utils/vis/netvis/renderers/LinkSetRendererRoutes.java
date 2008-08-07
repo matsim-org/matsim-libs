@@ -46,7 +46,7 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.ControlToolbar;
@@ -212,7 +212,7 @@ public class LinkSetRendererRoutes extends RendererA {
 		this.toolbar = toolbar;
 	}
 
-	public static class RouteLinkMarker extends  AbstractPersonAlgorithm implements PlanAlgorithmI {
+	public static class RouteLinkMarker extends  AbstractPersonAlgorithm implements PlanAlgorithm {
 
 		private final TreeMap<Id, Integer> linkValues;
 

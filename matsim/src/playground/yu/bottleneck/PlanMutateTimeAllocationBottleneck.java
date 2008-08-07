@@ -24,7 +24,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -32,7 +32,7 @@ import org.matsim.utils.misc.Time;
  * @author yu
  *
  */
-public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithmI {
+public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithm {
 	//------------------------------MEMBER VARIABLE---------------------------
 	private final int mutationRange;
 

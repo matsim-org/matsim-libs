@@ -22,7 +22,7 @@ package org.matsim.replanning.modules;
 
 import org.matsim.planomat.PlanOptimizeTimes;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * This class is just a multithreading wrapper for instances of the
@@ -40,9 +40,9 @@ public class PlanomatOptimizeTimes extends MultithreadedModuleA {
 	}
 
 	@Override
-	public PlanAlgorithmI getPlanAlgoInstance() {
+	public PlanAlgorithm getPlanAlgoInstance() {
 
-		PlanAlgorithmI planomatAlgorithm = null;
+		PlanAlgorithm planomatAlgorithm = null;
 		planomatAlgorithm =  new PlanOptimizeTimes(this.estimator);
 
 		return planomatAlgorithm;
