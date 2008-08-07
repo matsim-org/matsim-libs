@@ -20,6 +20,9 @@ package org.matsim.socialnetworks.scoring;
  *                                                                         *
  * *********************************************************************** */
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.config.groups.SocNetConfigGroup;
@@ -76,19 +79,21 @@ public class SocializingScoringFunction implements ScoringFunction{
 		this.scoringFunction.finish();
 
 		ActIterator ait = this.plan.getIteratorAct();
-		//TODO why does this iterate over acts here and again in spatialScorer?
-		//It should sent the act AND the plan and only return the value for the act.
-		//If there are more than one acts of type factype in the plan, this is
-		//counting the score once per instance of this activity!!!  JH
+
+		Hashtable<Act,ArrayList<Double>> actStats = this.spatialScorer.calculateTimeWindowActStats(plan);
+//		ArrayList<Double> stats = this.spatialScorer.calculateTimeWindowStats(plan);
 		while(ait.hasNext()){
 			Act act = (Act)ait.next();
 			if(act.getType().equals(factype)){
-//				this.friendFoeRatio+=this.spatialScorer.calculateFriendtoFoeInTimeWindow(plan);
-				this.friendFoeRatio+=this.spatialScorer.calculateTimeWindowStats(plan).get(0);
-				this.nFriends+=this.spatialScorer.calculateTimeWindowStats(plan).get(1);
-				this.timeWithFriends+=this.spatialScorer.calculateTimeWindowStats(plan).get(2);
+//				this.friendFoeRatio+=stats.get(0);
+//				this.nFriends+=stats.get(1);
+//				this.timeWithFriends+=stats.get(2);
+				this.friendFoeRatio+=actStats.get(act).get(0);
+				this.nFriends+=actStats.get(act).get(1);
+				this.timeWithFriends+=actStats.get(act).get(2);
 			}
 		}
+		log.info("Person "+plan.getPerson().getId()+" meets nFriends "+this.nFriends+" for "+this.timeWithFriends+" at activity "+ factype);
 	}
 
 	public void agentStuck(final double time) {
