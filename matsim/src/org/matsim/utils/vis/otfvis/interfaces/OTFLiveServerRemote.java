@@ -23,6 +23,9 @@ package org.matsim.utils.vis.otfvis.interfaces;
 import java.rmi.RemoteException;
 
 public interface OTFLiveServerRemote extends OTFServerRemote {
+	public void pause() throws RemoteException;
+	public void play() throws RemoteException;
+	
 	public OTFQuery answerQuery(org.matsim.utils.vis.otfvis.interfaces.OTFQuery query) throws RemoteException;
 	
 }

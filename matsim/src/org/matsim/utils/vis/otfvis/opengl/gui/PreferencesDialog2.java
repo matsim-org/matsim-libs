@@ -56,14 +56,23 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 		{
 			JPanel panel = new JPanel(null);
 			getContentPane().add(panel);
-			panel.setBorder(BorderFactory.createTitledBorder("Colors"));
-			panel.setBounds(240, 130, 220, 60);
+			panel.setBorder(BorderFactory.createTitledBorder("Switches"));
+			panel.setBounds(240, 130, 220, 80);
 
 			JCheckBox SynchBox = new JCheckBox("show parked vehicles");
 //			SynchBox.setMnemonic(KeyEvent.VK_M);
 			SynchBox.setSelected(cfg.isShowParking());
 			SynchBox.addItemListener(this);
 			SynchBox.setBounds(10, 20, 200, 31);
+			SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
+
+			SynchBox = new JCheckBox("show link Ids");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.drawLinkIds());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 40, 200, 31);
 			SynchBox.setVisible(true);
 			//SynchBox.setMaximumSize(new Dimension(250,60));
 			panel.add(SynchBox);
@@ -80,6 +89,9 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 				host.clearCaches();
 				host.invalidateHandlers();
 			}
+		} else if (source.getText().equals("show link Ids")) {
+			// toggle draw link Ids
+			cfg.setDrawLinkIds(!cfg.drawLinkIds());
 		}
 	}
 	

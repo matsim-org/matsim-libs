@@ -43,7 +43,6 @@ import java.util.zip.ZipOutputStream;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.plans.Plan;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
@@ -351,10 +350,6 @@ public class OTFQuadFileHandler {
 		}
 
 
-		public Plan getAgentPlan(String id) throws RemoteException {
-			return null;
-		}
-
 		public int getLocalTime() throws RemoteException {
 			return (int)this.nextTime;
 		}
@@ -384,20 +379,6 @@ public class OTFQuadFileHandler {
 			} catch (IOException e) {
 				System.out.println(e.toString());
 			}
-		}
-
-		public void pause() throws RemoteException {
-		}
-
-		public void play() throws RemoteException {
-		}
-
-		public void setStatus(int status) throws RemoteException {
-		}
-
-		public void step() throws RemoteException {
-			// retrieve latest buffer and set appropriate time
-			this.actBuffer = null;
 		}
 
 		public boolean isLive() {

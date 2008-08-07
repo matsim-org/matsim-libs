@@ -112,6 +112,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 					panel.add(getLeftMFunc());
 					this.leftMFunc.setModel(leftMFuncModel);
 					this.leftMFunc.setBounds(70, 20, 120, 27);
+					this.leftMFunc.addActionListener(this);
 				}
 				{
 					ComboBoxModel jComboBox1Model = new DefaultComboBoxModel(
@@ -121,6 +122,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 					panel.add(this.middleMFunc);
 					this.middleMFunc.setModel(jComboBox1Model);
 					this.middleMFunc.setBounds(70, 50, 120, 27);
+					this.middleMFunc.addActionListener(this);
 				}
 				{
 					ComboBoxModel jComboBox2Model = new DefaultComboBoxModel(

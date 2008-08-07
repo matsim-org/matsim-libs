@@ -29,7 +29,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.plans.MatsimPlansReader;
 import org.matsim.plans.Plans;
 import org.matsim.plans.PlansReaderI;
-import org.matsim.utils.vis.netvis.NetVis;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
 public class StandaloneSimTest {
@@ -61,7 +61,7 @@ public class StandaloneSimTest {
 //		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
 
 //		config.simulation().setStartTime(Time.parseTime("05:55:00"));
-//		config.simulation().setEndTime(Time.parseTime("08:00:00"));
+		config.simulation().setEndTime(Time.parseTime("24:00:00"));
 //		config.simulation().setStartTime(Time.parseTime("05:55:00"));
 
 		config.simulation().setStuckTime(100);
@@ -78,9 +78,9 @@ public class StandaloneSimTest {
 		events.resetHandlers(1); //for closing files etc..
 
 		Gbl.printElapsedTime();
-
-		String[] visargs = {"testWrite"};
-		NetVis.main(visargs);
+//
+//		String[] visargs = {"testWrite"};
+//		NetVis.main(visargs);
 	}
 
 }

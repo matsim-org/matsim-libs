@@ -38,7 +38,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.media.opengl.GL;
@@ -52,6 +54,8 @@ import javax.swing.JFrame;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.utils.collections.QuadTree.Rect;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.caching.SceneLayer;
@@ -65,6 +69,7 @@ import org.matsim.utils.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.utils.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.utils.vis.otfvis.opengl.gui.VisGUIMouseHandler;
+import org.matsim.utils.vis.otfvis.opengl.queries.QueryLinkId;
 
 import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
@@ -360,7 +365,58 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		//System.out.println("CLIENT DRAWER DRAWED  == " + netItems.size()  +"objects time");
 	}
 
+
 	//private String lastTime = "";
+	public void displayLinkIds() {
+		// Check for linewidth of street
+		final double cellWidth = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
+		final double pixelsizeStreet = 5;
+		Rectangle2D test = new InfoText("0000000").getBounds();
+		
+		Coord size  = mouseMan.getPixelsize();
+		if(size.getX()*pixelsizeStreet < cellWidth && size.getX()*pixelsizeStreet < cellWidth) {
+			Map<Coord, Boolean> xymap = new HashMap<Coord, Boolean>();
+			// Query linkIds
+			Rect rect = mouseMan.getBounds();
+			Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX + clientQ.offsetEast, rect.minY + clientQ.offsetNorth, rect.maxX - rect.minX, rect.maxY - rect.minY);
+			QueryLinkId linkIdQuery = (QueryLinkId)clientQ.doQuery(new QueryLinkId(dest));
+			double xRaster = test.getWidth(), yRaster = test.getHeight();
+			
+			for( Coord coord : linkIdQuery.linkIds.keySet()) {
+				// draw linkId
+				float east = (float)coord.getX() -(float)getQuad().offsetEast;
+				float north = (float)coord.getY() - (float)getQuad().offsetNorth;
+				
+				float textX = (float) (((int)(east / xRaster) +1)*xRaster);
+				float textY = north -(float)(north % yRaster) +80;
+				Coord text = new Coord(textX,textY);
+				int i = 1;
+				
+				while (xymap.get(text) != null) {
+					text = new Coord(textX,  i* (float)yRaster + textY);
+					if(xymap.get(text) == null) break;
+					text = new Coord(textX + i* (float)xRaster, textY);
+					if(xymap.get(text) == null) break;
+//					text = new Coord(textX - i* (float)xRaster, textY);
+//					if(xymap.get(text) == null) break;
+//					text = new Coord(textX,  -i* (float)yRaster + textY);
+//					if(xymap.get(text) == null) break;
+					i++;
+				}
+				xymap.put(text, new Boolean(true));
+				
+				InfoText.showTextOnce(linkIdQuery.linkIds.get(coord), (float)text.getX(), (float)text.getY(), 1.f);
+				gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
+				gl.glLineWidth(2);
+				gl.glBegin(GL.GL_LINE_STRIP);
+				gl.glVertex3d(east, north,0);
+				gl.glVertex3d((float)text.getX(), (float)text.getY(),0);
+				gl.glEnd();
+
+			}
+		}
+
+	}
 	
 	synchronized public void display(GLAutoDrawable drawable) {
 //		Gbl.startMeasurement();
@@ -409,8 +465,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 //			}
 //		}
 //
+		if(((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).drawLinkIds()) displayLinkIds();
+
 		this.gl.glDisable(GL.GL_BLEND);
 
+		
 		InfoText.drawInfoTexts(drawable);
 
 		this.mouseMan.drawElements(this.gl);

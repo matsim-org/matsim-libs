@@ -178,7 +178,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		for (String name : liste) {
 			if (name.indexOf("DSOTFServer_") != -1){
 				this.host = (OTFServerRemote)registry.lookup(name);
-				host.pause();
+				((OTFLiveServerRemote)host).pause();
 			}
 		}
 		return host;
@@ -192,7 +192,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		for (String name : liste) {
 			if (name.indexOf("DSOTFServer_") != -1){
 				this.host = (OTFServerRemote)registry.lookup(name);
-				host.pause();
+				((OTFLiveServerRemote)host).pause();
 			}
 		}
 		return host;
@@ -204,14 +204,12 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 	private OTFServerRemote openFile( String fileName) throws RemoteException {
 		OTFServerRemote host = new OTFQuadFileHandler.Reader(fileName);
-		host.pause();
 		Gbl.printMemoryUsage();
 		return host;
 	}
 
 	private OTFServerRemote openTVehFile(String netname, String vehname) throws RemoteException {
 		OTFServerRemote host = new OTFTVehServer(netname,vehname);
-		host.pause();
 		return host;
 	}
 
@@ -402,7 +400,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private void pressed_PAUSE() throws IOException {
 		stopMovie();
-		host.pause();
+		if(host.isLive())((OTFLiveServerRemote)host).pause();
 	}
 
 	private void pressed_PLAY() throws IOException {
@@ -654,8 +652,10 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			if (!isActive) return;
 
 			try {
-				if (synchronizedPlay) host.pause();
-				else host.play();
+				if(!host.isLive()) return;
+				// this is only calles for Live Servers!
+				if (synchronizedPlay) ((OTFLiveServerRemote)host).pause();
+				else ((OTFLiveServerRemote)host).play();
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}

@@ -235,10 +235,6 @@ public class OTFTVehServer implements OTFServerRemote {
 	}
 
 
-	public Plan getAgentPlan(String id) throws RemoteException {
-		return null;
-	}
-
 	public int getLocalTime() throws RemoteException {
 		return (int)this.nextTime;
 	}
@@ -275,16 +271,6 @@ public class OTFTVehServer implements OTFServerRemote {
 	public boolean isLive() throws RemoteException {
 		return false;
 	}
-
-	public void pause() throws RemoteException {
-	}
-
-	public void play() throws RemoteException {
-	}
-
-	public void setStatus(int status) throws RemoteException {
-	}
-
 
 	public static void main(String[] args) {
 

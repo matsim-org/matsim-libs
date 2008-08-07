@@ -41,6 +41,7 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
@@ -102,7 +103,7 @@ public class QuerySpinne implements OTFQuery {
 		return actPersons;
 	}
 	
-	public void query(QueueNetworkLayer net, Plans plans, Events events) {
+	public void query(QueueNetworkLayer net, Plans plans, Events events, OTFServerQuad quad) {
 		this.drivenLinks = new HashMap<Link,Integer> ();
 //		QueueLink link = net.getQueueLink(this.linkId);
 //		String start = link.getLink().getFromNode().getId().toString();

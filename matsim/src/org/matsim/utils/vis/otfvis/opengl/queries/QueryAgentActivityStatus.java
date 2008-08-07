@@ -30,6 +30,7 @@ import org.matsim.plans.Act;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 
@@ -49,7 +50,7 @@ public class QueryAgentActivityStatus implements OTFQuery{
 	int activityNr = -1;
 	double finished = 0;
 
-	public void query(QueueNetworkLayer net, Plans plans, Events events) {
+	public void query(QueueNetworkLayer net, Plans plans, Events events, OTFServerQuad quad) {
 		Person person = plans.getPerson(this.agentID);
 		if (person == null) return;
 

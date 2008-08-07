@@ -53,14 +53,17 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 			gl.glEnd();
 		}
 
-		Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end){
-			double dx = end.y - start.y;
-			double dy = end.x -start.x;
-			double sqr1 = Math.sqrt(dx*dx +dy*dy);
-			final double cellWidth_m = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
+		public static Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end){
+			return calcOrtho(start.x, start.y, end.x, end.y, SimpleStaticNetLayer.cellWidth_m);
+		}
 
-			dx = dx*cellWidth_m/sqr1;
-			dy = -dy*cellWidth_m/sqr1;
+		public static Point2D.Float calcOrtho(double startx, double starty, double endx, double endy, double len){
+			double dx = endy - starty;
+			double dy = endx -startx;
+			double sqr1 = Math.sqrt(dx*dx +dy*dy);
+
+			dx = dx*len/sqr1;
+			dy = -dy*len/sqr1;
 
 			return new Point2D.Float((float)dx,(float)dy);
 		}
@@ -68,7 +71,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 		public void setQuad(float startX, float startY, float endX, float endY) {
 			this.quad[0] = new Point2D.Float(startX, startY);
 			this.quad[1] = new Point2D.Float(endX, endY);
-			final Point2D.Float ortho = calcOrtho(this.quad[0], this.quad[1]);
+			final Point2D.Float ortho = calcOrtho(startX, startY,endX, endY, SimpleStaticNetLayer.cellWidth_m);
 			this.quad[2] = new Point2D.Float(startX + ortho.x, startY + ortho.y);
 			this.quad[3] = new Point2D.Float(endX + ortho.x, endY + ortho.y);
 		}
@@ -81,6 +84,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	protected OGLProvider myDrawer;
 	protected static final Map<OGLProvider, Integer> netDisplListMap = new HashMap<OGLProvider, Integer>(); // not yet defined
 	protected int netDisplList = -1;
+	private static float cellWidth_m;
 
 	@Override
 	public void addItem(Receiver item) {
@@ -126,6 +130,7 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 	 */
 	@Override
 	public void init(SceneGraph graph) {
+		cellWidth_m = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
 		myDrawer = (OGLProvider)graph.getDrawer();
 		if (netDisplListMap.containsKey(myDrawer)) netDisplList = netDisplListMap.get(myDrawer);
 		else  netDisplListMap.put(myDrawer, -1);

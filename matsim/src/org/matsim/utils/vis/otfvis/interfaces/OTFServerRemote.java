@@ -24,23 +24,21 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
-import org.matsim.plans.Plan;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 
 public interface OTFServerRemote extends Remote {
-	public enum TimePreference{EARLIER, LATER}
-	public void setStatus(int status) throws RemoteException;
-	public void step() throws RemoteException;
-	public void play() throws RemoteException;
-	public void pause() throws RemoteException;
+	public enum TimePreference{EARLIER, LATER};
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException;
+	
 	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException;
-	public int getLocalTime() throws RemoteException;
-	public Plan getAgentPlan(String id) throws RemoteException;
 	public byte[] getQuadConstStateBuffer(String id) throws RemoteException;
 	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException;
+
+	public int getLocalTime() throws RemoteException;
 	public boolean isLive() throws RemoteException;
+	
 	public Collection<Double> getTimeSteps() throws RemoteException;
 }
+

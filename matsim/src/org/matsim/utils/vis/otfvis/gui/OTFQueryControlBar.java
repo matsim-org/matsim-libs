@@ -30,6 +30,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.ComboBoxModel;
@@ -80,6 +81,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	
 	private final OTFHostControlBar handler;
 	private final  String queryType = "Agent";
+	private JTextField text;
 	private transient final OTFVisConfig cfg;
 	private final List<OTFQuery> queryItems = new ArrayList<OTFQuery>();
 
@@ -111,7 +113,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 			JLabel jLabel3 = new JLabel();
 			add(jLabel3);
 			jLabel3.setText(" Id:");
-			JTextField text = new JTextField();
+			text = new JTextField();
 			add(text);
 			text.setActionCommand("id_changed");
 			text.setMaximumSize(new Dimension(350,40));
@@ -181,15 +183,21 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		}
 	}
 	
-	public void handleIdQuery(List<String> list, String queryName) {
+	public void handleIdQuery(Collection<String> list, String queryName) {
 
 		boolean clearSelected = !((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).isMultipleSelect();
 		if (clearSelected) removeQueries();
 		
+		String all = text.getText();
+		
 		for(String id : list) {
-				handleIdQuery(id, queryName);
+			if ( all.length() != 0) all += ", ";
+			all += id;
+			handleIdQuery(id, queryName);
+				
 		}
-
+		
+		text.setText(all);
 		handler.redrawHandlers();
 	}
 	
@@ -200,7 +208,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	public void handleClick(Point2D.Double point, int mouseButton) {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(point.x, point.y ,0,0);
 		// Only handle clicks with the main == zoom button
-		if (mouseButton==1) handleClick(origRect, mouseButton);
+		if (mouseButton==1 || mouseButton==4) handleClick(origRect, mouseButton);
 	}
 
 	private OTFQuery createQuery(String className) {
@@ -238,7 +246,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 				QueryLinkId linkIdQuery = (QueryLinkId)handler.doQuery(new QueryLinkId(origRect));
 				if ((linkIdQuery != null) && (linkIdQuery.linkIds.size() != 0)) {
 					System.out.println("LinkId = " + linkIdQuery.linkIds);
-					handleIdQuery(linkIdQuery.linkIds, queryName);
+					handleIdQuery(linkIdQuery.linkIds.values(), queryName);
 				} else {
 					System.out.println("No LinkId found!");
 				}
@@ -256,6 +264,8 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 			if(query != null) query.remove();
 		}
 		this.queryItems.clear();
+		text.setText("");
+		
 		handler.redrawHandlers();
 	}
 

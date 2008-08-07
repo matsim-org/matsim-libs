@@ -1,6 +1,7 @@
 package playground.david;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -22,7 +23,6 @@ import org.matsim.mobsim.QueueNode;
 import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plan;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
@@ -117,7 +117,7 @@ class CALink extends QueueLink {
 					MyCAVeh veh = cells[lane][len] ;
 					double speed = 4.*veh.getSpeed() ;
 					if ( veh.isTruck() ) {
-						positions.add( new PositionInfo(new IdImpl("1"),this.getLink(), len, 5*lane+2, speed, VehicleState.Driving, ""));
+						positions.add( new PositionInfo(new IdImpl("1"),this.getLink(), len, 5*lane+2, 500, VehicleState.Driving, ""));
 					} else {
 						positions.add( new PositionInfo(new IdImpl("0"),this.getLink(), len, 5*lane+2, speed, VehicleState.Driving, ""));
 					}
@@ -351,15 +351,10 @@ class CALiveServer implements OTFLiveServerRemote{
 	// not needed
 	public void pause() throws RemoteException {
 	}
+
 	public void play() throws RemoteException {
 	}
-	public void setStatus(int status) throws RemoteException {
-	}
-	public void step() throws RemoteException {
-	}
-	public Plan getAgentPlan(String id) throws RemoteException {
-		return null;
-	}
+
 	public OTFQuery answerQuery(OTFQuery query) throws RemoteException {
 		return null;
 	}
@@ -418,6 +413,11 @@ public class CALinkOTFVis extends Thread {
 
 	}	
 
+	private static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
+			new double[] { 0.0, 30., 50., 500}, new Color[] {
+					Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE});
+	
+
 
 	@Override
 	public void run() {
@@ -433,6 +433,7 @@ public class CALinkOTFVis extends Thread {
 		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setLinkWidth(17.5f*CALink.LANECOUNT +5);
 //		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(0xeeeeee));
 		OGLAgentPointLayer.AgentArrayDrawer.setAlpha(255);
+		OGLAgentPointLayer.AgentArrayDrawer.setColorizer(colorizer);
 
 		MyControlBar hostControl;
 		try {
@@ -463,13 +464,15 @@ public class CALinkOTFVis extends Thread {
 
 
 			OTFClientQuad clientQ2 = hostControl.createNewView(null, null, connectR);
-
+			clientQ2.setCachingAllowed(false);
+			
 			OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
 			pane.setRightComponent(drawer2.getComponent());
 			hostControl.addHandler("test2", drawer2);
 			drawer2.invalidate(0);
 
 			hostControl.finishedInitialisition();
+			
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			frame.setSize(screenSize.width/2,screenSize.height/2);
 			frame.setVisible(true);

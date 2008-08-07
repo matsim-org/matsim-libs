@@ -62,6 +62,7 @@ public class OTFVisConfig extends Module {
 	private Color backgroundColor = new Color(230, 230, 230, 0);
 	private Color networkColor = new Color(128, 128, 190, 200);
 	private float linkWidth = 30;
+	private boolean drawLinkIds = false;
 
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
@@ -245,6 +246,20 @@ public class OTFVisConfig extends Module {
 	 */
 	public void setShowParking(boolean showParking) {
 		this.showParking = showParking;
+	}
+
+	/**
+	 * @return the drawLinkIds
+	 */
+	public boolean drawLinkIds() {
+		return drawLinkIds;
+	}
+
+	/**
+	 * @param drawLinkIds the drawLinkIds to set
+	 */
+	public void setDrawLinkIds(boolean drawLinkIds) {
+		this.drawLinkIds = drawLinkIds;
 	}
 
 }

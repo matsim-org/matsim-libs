@@ -44,8 +44,9 @@ public  class InfoText {
 	
 	String line = null;
 	public float x=30,y=10,z = -1, size = 1.0f, fill = 0.0f;
-	boolean isValid = true;
+	public boolean isValid = true;
 	public boolean draw2D = false;
+	public boolean decorated = true;
 	public Color color = new Color(50, 50, 128, 200);
 	public boolean isValid() {return isValid;};
 	
@@ -85,44 +86,46 @@ public  class InfoText {
         Rectangle2D rect = renderer.getBounds(line);
         float halfh = (float)rect.getHeight()/2; 
 
-        gl.glPushMatrix();
-        gl.glEnable(GL.GL_BLEND);
-        gl.glColor4f(0.9f, 0.9f, 0.9f, (color.getAlpha()/255.f));
-        gl.glTranslatef(x , y, z);
-        gl.glScalef(size, size, 1);
-        gl.glTranslatef(-border , halfh , 0);
-        GLUquadric quad1 = glu.gluNewQuadric();
-        glu.gluPartialDisk(quad1, 0, halfh, 12, 2, 180, 180);
-        glu.gluDeleteQuadric(quad1);
-        gl.glBegin(GL_QUADS);
-        gl.glVertex3d(0, -halfh, 0);
-        gl.glVertex3d(0, halfh, 0);
-        gl.glVertex3d(rect.getWidth() + 2*border, halfh, 0);
-        gl.glVertex3d(rect.getWidth() + 2*border, -halfh, 0);
-        gl.glEnd();
-        if (fill > 0.0f) {
-            gl.glColor4f(0.9f, 0.7f, 0.7f, (color.getAlpha()/255.f));
+        if(decorated) {
+            gl.glPushMatrix();
+            gl.glEnable(GL.GL_BLEND);
+            gl.glColor4f(0.9f, 0.9f, 0.9f, (color.getAlpha()/255.f));
+            gl.glTranslatef(x , y, z);
+            gl.glScalef(size, size, 1);
+            gl.glTranslatef(-border , halfh , 0);
+            GLUquadric quad1 = glu.gluNewQuadric();
+            glu.gluPartialDisk(quad1, 0, halfh, 12, 2, 180, 180);
+            glu.gluDeleteQuadric(quad1);
             gl.glBegin(GL_QUADS);
             gl.glVertex3d(0, -halfh, 0);
-            gl.glVertex3d(0, -halfh -7, 0);
-            gl.glVertex3d(rect.getWidth() + 2*border, -halfh -7, 0);
+            gl.glVertex3d(0, halfh, 0);
+            gl.glVertex3d(rect.getWidth() + 2*border, halfh, 0);
             gl.glVertex3d(rect.getWidth() + 2*border, -halfh, 0);
             gl.glEnd();
-            gl.glColor4f(0.9f, 0.5f, 0.5f, 0.9f);
-            gl.glBegin(GL_QUADS);
-            gl.glVertex3d(0, -halfh, 0);
-            gl.glVertex3d(0, -halfh -7, 0);
-            gl.glVertex3d(rect.getWidth()*fill + 2*border, -halfh -7, 0);
-            gl.glVertex3d(rect.getWidth()*fill + 2*border, -halfh, 0);
-            gl.glEnd();
-            gl.glColor4f(0.9f, 0.9f, 0.9f, (color.getAlpha()/255.f));
+            if (fill > 0.0f) {
+                gl.glColor4f(0.9f, 0.7f, 0.7f, (color.getAlpha()/255.f));
+                gl.glBegin(GL_QUADS);
+                gl.glVertex3d(0, -halfh, 0);
+                gl.glVertex3d(0, -halfh -7, 0);
+                gl.glVertex3d(rect.getWidth() + 2*border, -halfh -7, 0);
+                gl.glVertex3d(rect.getWidth() + 2*border, -halfh, 0);
+                gl.glEnd();
+                gl.glColor4f(0.9f, 0.5f, 0.5f, 0.9f);
+                gl.glBegin(GL_QUADS);
+                gl.glVertex3d(0, -halfh, 0);
+                gl.glVertex3d(0, -halfh -7, 0);
+                gl.glVertex3d(rect.getWidth()*fill + 2*border, -halfh -7, 0);
+                gl.glVertex3d(rect.getWidth()*fill + 2*border, -halfh, 0);
+                gl.glEnd();
+                gl.glColor4f(0.9f, 0.9f, 0.9f, (color.getAlpha()/255.f));
+            }
+            GLUquadric quad2 = glu.gluNewQuadric();
+            gl.glTranslatef(2*border + (float)rect.getWidth() , 0,0);
+            glu.gluPartialDisk(quad2, 0, halfh, 12, 2, 0, 180);
+            glu.gluDeleteQuadric(quad2);
+            gl.glPopMatrix();
+            gl.glDisable(GL.GL_BLEND);
         }
-        GLUquadric quad2 = glu.gluNewQuadric();
-        gl.glTranslatef(2*border + (float)rect.getWidth() , 0,0);
-        glu.gluPartialDisk(quad2, 0, halfh, 12, 2, 0, 180);
-        glu.gluDeleteQuadric(quad2);
-        gl.glPopMatrix();
-        gl.glDisable(GL.GL_BLEND);
         
         renderer.begin3DRendering();
 //        gl.glEnable(GL.GL_BLEND);
@@ -155,9 +158,17 @@ public  class InfoText {
 		elements.add(new InfoText(text));
 	}
 
-	public static void showText (String text, float x, float y, float z) {
-		elements.addFirst(new InfoText(text, x,y,z));
+	public static void showText (String text, float x, float y, float size) {
+		elements.addFirst(new InfoText(text, x,y,0,size));
 	}
+
+	public static void showTextOnce (String text, float x, float y, float size) {
+		InfoText tt = new InfoText(text, x,y,0,size);
+		tt.isValid = false;
+		tt.decorated = false;
+		elements.addFirst(tt);
+	}
+
 
 	public static InfoText showTextPermanent (String text, float x, float y, float size) {
 		InfoText tt = null;

@@ -41,6 +41,10 @@ public abstract class OTFDataWriter<SrcData> implements Serializable {
 		this.src = src;
 	}
 	
+	public SrcData getSrc() {
+		return this.src;
+	}
+	
 	public static void setServer(OnTheFlyServer onTheFlyServer) {
 		server = onTheFlyServer;
 	}

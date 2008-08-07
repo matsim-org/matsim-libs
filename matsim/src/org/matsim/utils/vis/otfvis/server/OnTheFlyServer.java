@@ -38,7 +38,6 @@ import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Rect;
@@ -46,6 +45,7 @@ import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.interfaces.OTFLiveServerRemote;
+import org.matsim.utils.vis.otfvis.interfaces.OTFNetHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 
 
@@ -84,6 +84,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private final Set<String> updateThis = new HashSet<String>();
 	private final Set<OTFQuery> queryThis = new HashSet<OTFQuery>();
 
+	private final OTFNetHandler handler = null;
 	private transient Plans pop = null;
 	public transient ByteArrayOutputStream out = null;
 	public transient QueueNetworkLayer network = null;
@@ -108,9 +109,13 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		this.events = events;
 	}
 
+	public static boolean useSSL = true;
+	
 	public static OnTheFlyServer createInstance(String ReadableName, QueueNetworkLayer network, Plans population, Events events, boolean useSSL) {
 		OnTheFlyServer result = null;
-
+		
+		OnTheFlyServer.useSSL = useSSL;
+		
 		if (useSSL) {
 			System.setProperty("javax.net.ssl.keyStore", "input/keystore");
 			System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
@@ -142,7 +147,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			// Bind this object instance to the name "HelloServer"
 			registry.bind("DSOTFServer_" + ReadableName, result);
 
-//			String[] liste = registry.list();
+			// THIS Line is important, as this checks, if registry is REALLY connected "late binding"
+			String[] liste = registry.list();
 			System.out.println("OTFServer bound in registry");
 		} catch (Exception e) {
 			System.out.println("OTFServer err: " + e.getMessage());
@@ -162,11 +168,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 	}
 
-	public synchronized void setStatus(int status) throws RemoteException {
-		this.status = status;
-	}
-
+	private double lastTime = -1.0;
 	public void updateOut(double time) {
+		
 		for(String id : updateThis) {
 			buf.position(0);
 			QuadStorage act = quads.get(id);
@@ -175,10 +179,14 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 		updateThis.clear();
 
+		OTFServerQuad quad = quads.values().iterator().next().quad;
+		
 		for(OTFQuery query : queryThis) {
-			query.query(network, pop, events);
+			query.query(network, pop, events, quad);
 		}
 		queryThis.clear();
+		
+		lastTime = time;
 	}
 
 	public int updateStatus(double time) {
@@ -232,48 +240,33 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	double stepToTime = 0;
-
-	public void step() throws RemoteException {
-		// leave Status on pause but let one step run (if one is waiting)
-		synchronized(paused) {
-			status = STEP;
-			paused.notifyAll();
-		}
-		synchronized (stepDone) {
-			if (status == PAUSE) return;
-			try {
-				stepDone.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
+	
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
 		// if requested time lies in the past, sorry we cannot do that right now
 		if (time < localTime) {
+			time = localTime;
 			stepToTime = 0;
 			// if forward search is OK, then the actual timestep is the BEST fit
-			return (searchDirection != TimePreference.EARLIER);
+			if (searchDirection == TimePreference.EARLIER) return false;
+			else return true; 
 		}
-		if (time == localTime) {
-			return true;
-		}
+		if (time == localTime) return true;
 
 		doStep(time - localTime);
 		return true;
 	}
 
-	public void play() throws RemoteException {
+	public void pause()  throws RemoteException{
+		status = PAUSE;
+	}
+
+	public void play()  throws RemoteException{
 		synchronized(paused) {
 			status = PLAY;
 			paused.notifyAll();
 		}
 	}
 
-	public void pause() throws RemoteException {
-		status = PAUSE;
-	}
 
 	public int getLocalTime() throws RemoteException {
 		return localTime;
@@ -281,12 +274,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	public boolean isLive() {
 		return true;
-	}
-
-	public Plan getAgentPlan(String id) throws RemoteException {
-		if (id.length()==0)return null;
-		Plan plan = pop.getPerson(id).getSelectedPlan();
-		return plan;
 	}
 
 	public OTFServerQuad getQuad(String id, OTFNetWriterFactory writers) throws RemoteException {
@@ -341,7 +328,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	public OTFQuery answerQuery(org.matsim.utils.vis.otfvis.interfaces.OTFQuery query) throws RemoteException {
 		if (status == PAUSE) {
-			query.query(network, pop, events);
+			OTFServerQuad quad = quads.values().iterator().next().quad;
+			query.query(network, pop, events, quad);
 		} else {
 			// otherwise == PLAY, we need to sort this into the array of demanding queries and then they will be answered next when updateStatus() is called
 			try {

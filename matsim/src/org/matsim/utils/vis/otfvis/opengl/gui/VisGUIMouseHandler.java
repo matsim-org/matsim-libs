@@ -51,6 +51,7 @@ import org.jdesktop.animation.timing.interpolation.PropertySetter;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -82,7 +83,7 @@ implements MouseWheelListener{
 	public Rectangle currentRect = null;
 	public float scale = 1.f;
 
-	public int button = 0;
+	private int button = 0;
 	private final OTFDrawer clickHandler;
 	
 	public VisGUIMouseHandler(OTFDrawer clickHandler) {
@@ -269,6 +270,7 @@ implements MouseWheelListener{
 	        t.enable();
 	        t.bind();
 
+	        //System.out.println("b:" + button);
 	        if (button==4) gl.glColor4f(0.8f, 0.2f, 0.2f, alpha);
 	        else gl.glColor4f(alpha, alpha, alpha, alpha);
 
@@ -373,6 +375,12 @@ implements MouseWheelListener{
 		//posZ = (float)obj_pos[2];
 		// maintain z-pos == zoom level
 		return new Point3f(posX, posY, cameraStart.getZ());
+	}
+	
+	public Coord getPixelsize() {
+		Point3f p1 = getOGLPos(300,300);
+		Point3f p2 = getOGLPos(301,301);
+		return new Coord(Math.abs(p2.x-p1.x), Math.abs(p2.y-p1.y));
 	}
 
 	public float getScale() {

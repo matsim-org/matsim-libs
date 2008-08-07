@@ -39,6 +39,7 @@ import org.matsim.plans.Leg;
 import org.matsim.plans.Person;
 import org.matsim.plans.Plan;
 import org.matsim.plans.Plans;
+import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
@@ -115,7 +116,7 @@ public class QueryAgentPlan implements OTFQuery {
 		return vertex;
 	}
 	
-	public void query(QueueNetworkLayer net, Plans plans, Events events) {
+	public void query(QueueNetworkLayer net, Plans plans, Events events, OTFServerQuad quad) {
 		Person person = plans.getPerson(this.agentID);
 		if (person == null) return;
 
