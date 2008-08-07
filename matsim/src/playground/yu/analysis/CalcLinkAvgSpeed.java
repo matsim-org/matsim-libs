@@ -34,7 +34,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
@@ -177,7 +177,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	@Override
-	public void handleEvent(final LinkEnterEnter enter) {
+	public void handleEvent(final LinkEnterEvent enter) {
 		String linkId = enter.linkId;
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc == null) {

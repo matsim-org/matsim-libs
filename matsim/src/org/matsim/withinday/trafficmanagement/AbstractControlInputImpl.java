@@ -28,7 +28,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
@@ -181,7 +181,7 @@ public abstract class AbstractControlInputImpl implements ControlInput, AgentDep
 	}
 
 	// memorize linkEnterEvents on the first links of the two alternative routes:
-	public void handleEvent(final LinkEnterEnter event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		// count the agents on the route links
 
 		if (event.linkId.equals(this.firstLinkOnMainRoute)) {

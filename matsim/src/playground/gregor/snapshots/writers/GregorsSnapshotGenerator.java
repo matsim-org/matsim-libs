@@ -33,7 +33,7 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
@@ -105,7 +105,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 		this.eventLinks.get(event.linkId).arrival(getEventAgent(event));
 	}
 
-	public void handleEvent(final LinkEnterEnter event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		testForSnapshot(event.time);
 		this.eventLinks.get(event.linkId).enter(getEventAgent(event));
 	}

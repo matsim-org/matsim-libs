@@ -20,7 +20,7 @@
 
 package playground.yu.analysis;
 
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -39,7 +39,7 @@ public class CalcTrafficPerformance implements LinkEnterEventHandler {
 		this.network = network;
 	}
 
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		Link l = event.link;
 		if (l == null) {
 			l = this.network.getLink(event.linkId);

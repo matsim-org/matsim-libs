@@ -26,7 +26,7 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -88,7 +88,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 		private double agentOneScore, agentTwoScore;
 
-		public void handleEvent(final LinkEnterEnter e) {
+		public void handleEvent(final LinkEnterEvent e) {
 			// TODO [DG,MR,performance] do not create new IdImpl for every event, but do it once as static members.
 			System.out.println("Enter Link:" + e.linkId + " at Time: " + e.time);
 			if (e.link.getId().equals(new IdImpl("6"))) {

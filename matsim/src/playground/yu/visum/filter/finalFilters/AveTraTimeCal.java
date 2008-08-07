@@ -2,7 +2,7 @@ package playground.yu.visum.filter.finalFilters;
 
 import java.util.List;
 
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
@@ -55,7 +55,7 @@ public class AveTraTimeCal extends LinkAveCalA {
 	 * org.matsim.playground.filters.filter.finalFilters.LinkAveCalA.handleEvent(BasicEvent
 	 * event)
 	 */
-	public void compute(LinkEnterEnter enter, double leaveTime_s) {
+	public void compute(LinkEnterEvent enter, double leaveTime_s) {
 		double tt = leaveTime_s - enter.time;
 		try {
 			computeInside(tt, rebuildEventLinkEnter(enter).linkId,

@@ -23,7 +23,7 @@ package org.matsim.planomat.costestimators;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.network.Link;
@@ -111,7 +111,7 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		BasicEvent event = null;
 		for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
 			for (int linkCnt = 0; linkCnt < links.length; linkCnt++) {
-				event = new LinkEnterEnter(
+				event = new LinkEnterEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]), 
 						TEST_PERSON_ID, 
 						TEST_LEG_NR, 

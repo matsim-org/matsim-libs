@@ -23,7 +23,7 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -212,7 +212,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 		resetTravelTimes();
 	}
 
-	public void handleEvent(final LinkEnterEnter event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
 		this.enterEvents.put(e, event.time);
 	}

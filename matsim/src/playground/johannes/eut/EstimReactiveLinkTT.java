@@ -30,7 +30,7 @@ import java.util.TreeSet;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
@@ -75,7 +75,7 @@ public class EstimReactiveLinkTT implements
 		this.linkTTCalculators = new LinkedHashMap<BasicLink, LinkTTCalculator>();
 	}
 
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		increaseCount(event.link, event.agent, event.time);
 	}
 

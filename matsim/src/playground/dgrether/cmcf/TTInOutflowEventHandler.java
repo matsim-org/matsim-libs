@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
@@ -35,7 +35,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 
 	private Id linkIdIn;
 
-	private Map<Id, LinkEnterEnter> enterEvents;
+	private Map<Id, LinkEnterEvent> enterEvents;
 	
 	private SortedMap<Double, Integer> inflow;
 	
@@ -53,7 +53,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	public TTInOutflowEventHandler(Id linkIdIn, Id linkIdOut) {
 		this.linkIdIn = linkIdIn;
 		this.linkIdOut = linkIdOut;
-		this.enterEvents = new HashMap<Id, LinkEnterEnter>();
+		this.enterEvents = new HashMap<Id, LinkEnterEvent>();
 		this.inflow = new TreeMap<Double, Integer>();
 		this.outflow =  new TreeMap<Double, Integer>();
 		this.travelTimes = new TreeMap<Double, Double>();
@@ -64,7 +64,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 		return this.linkIdIn;
 	}
 	
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		Id id = new IdImpl(event.linkId);
 		if (linkIdIn.equals(id)) {
 			Integer in = getInflowMap().get(event.time);
@@ -94,7 +94,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 				getOutflowMap().put(event.time, out);
 			}
 			
-			LinkEnterEnter enterEvent = this.enterEvents.get(new IdImpl(event.agentId));
+			LinkEnterEvent enterEvent = this.enterEvents.get(new IdImpl(event.agentId));
 			double tt = event.time - enterEvent.time;
 			Double ttravel = getTravelTimesMap().get(enterEvent.time);
 			if (ttravel == null) {

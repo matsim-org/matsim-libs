@@ -27,7 +27,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -187,7 +187,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		
 		for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
 			for (int linkCnt = 0; linkCnt < links.length; linkCnt++) {
-				event = new LinkEnterEnter(
+				event = new LinkEnterEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]), 
 						testPerson.getId().toString(), 
 						testLeg.getNum(), 
@@ -244,7 +244,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		events.printEventHandlers();
 
 		// we have one agent on this link, taking 1 minute and 48 seconds
-		LinkEnterEnter enterEvent = new LinkEnterEnter(Time.parseTime("06:05:00"), TEST_PERSON_ID, 0, linkId.toString());
+		LinkEnterEvent enterEvent = new LinkEnterEvent(Time.parseTime("06:05:00"), TEST_PERSON_ID, 0, linkId.toString());
 		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(Time.parseTime("06:06:48"), TEST_PERSON_ID, 0, linkId.toString());
 
 		for (BasicEvent event : new BasicEvent[]{enterEvent, leaveEvent}) {

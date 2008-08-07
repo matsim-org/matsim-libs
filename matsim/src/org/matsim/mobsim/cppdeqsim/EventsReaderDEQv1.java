@@ -36,7 +36,7 @@ import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 
@@ -161,7 +161,7 @@ public class EventsReaderDEQv1 {
 				event = new LinkLeaveEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
 				break;
 			case 5:
-				event = new LinkEnterEnter(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new LinkEnterEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
 				break;
 			case 4:
 				event = new AgentWait2LinkEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));

@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -68,7 +68,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 	// instance methods
 	// =====================================================================
 
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		Key2d<String, String> key = new Key2d<String, String>(event.linkId,
 				event.agentId);
 		this.enterEvents.put(key, event.time);

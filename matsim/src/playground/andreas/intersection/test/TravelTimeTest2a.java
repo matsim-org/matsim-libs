@@ -13,7 +13,7 @@ import java.util.TreeMap;
 
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -152,7 +152,7 @@ public class TravelTimeTest2a extends MatsimTestCase implements	LinkLeaveEventHa
 		
   	}  	
 
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		
 		if (event.linkId.equalsIgnoreCase("2")) {
 			

@@ -28,7 +28,7 @@ import java.util.Set;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
@@ -99,7 +99,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 		return (int) seconds / (60 * 60 * 24 / TIMESTEPS);
 	}
 
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		Link link = event.link;
 		int hour = getTimestep(event.time);
 		if (link == null) {

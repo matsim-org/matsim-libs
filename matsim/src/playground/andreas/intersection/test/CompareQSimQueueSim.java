@@ -12,7 +12,7 @@ import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.ActEndEventHandler;
@@ -78,7 +78,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		
   	}  	
 
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();

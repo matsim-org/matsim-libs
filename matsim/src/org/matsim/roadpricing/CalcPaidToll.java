@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.network.Link;
@@ -66,7 +66,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 		}
 	}
 
-	public void handleEvent(final LinkEnterEnter event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		Link link = event.link;
 		if (link == null) {
 			link = (Link) this.network.getLocation(event.linkId);

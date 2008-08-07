@@ -1,7 +1,7 @@
 package playground.yu.visum.filter;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.utils.misc.Time;
 
@@ -20,7 +20,7 @@ public class LinkAveCalEventTimeFilter extends EventFilterA {
 
 	@Override
 	public boolean judge(BasicEvent event) {
-		if ((event.getClass() == (LinkEnterEnter.class))
+		if ((event.getClass() == (LinkEnterEvent.class))
 				|| (event.getClass() == (LinkLeaveEvent.class))) {
 			return judgeTime(event.time);
 		}

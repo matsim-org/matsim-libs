@@ -2,7 +2,7 @@ package tutorial;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
@@ -35,7 +35,7 @@ public class MyEventHandler implements LinkEnterEventHandler,
 		this.travelTime = 0.0;
 	}
 
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		this.travelTime -= event.time;
 	}
 

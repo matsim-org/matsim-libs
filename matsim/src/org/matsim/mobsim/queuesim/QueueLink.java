@@ -33,7 +33,7 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -414,7 +414,7 @@ public class QueueLink {
 		this.vehQueue.add(veh);
 		veh.setDepartureTime_s((int) (now + this.getLink().getFreespeedTravelTime(now)));
 		QueueSimulation.getEvents().processEvent(
-				new LinkEnterEnter(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+				new LinkEnterEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 						this.link.getId().toString(), veh.getDriver(), this.link));
 	}
 

@@ -25,7 +25,7 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -82,7 +82,7 @@ public class QVDiagramm implements LinkEnterEventHandler, LinkLeaveEventHandler,
 		this.linkLength = link.getLength();
 	}
 
-	public void handleEvent(final LinkEnterEnter event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		// Store the enter time of this agent if it's on the link we're interested in.
 		if (this.linkId.equals(event.linkId)) {
 			this.agents.put(event.agentId, Double.valueOf(event.time));

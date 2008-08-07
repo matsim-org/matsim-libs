@@ -237,8 +237,8 @@ public class Events {
 		} else if (klass == LinkLeaveEvent.class) {
 			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
 			return true;
-		} else if (klass == LinkEnterEnter.class) {
-			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEnter)ev);
+		} else if (klass == LinkEnterEvent.class) {
+			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEvent)ev);
 			return true;
 		} else if (klass == ActEndEvent.class) {
 			((ActEndEventHandler)handler).handleEvent((ActEndEvent)ev);

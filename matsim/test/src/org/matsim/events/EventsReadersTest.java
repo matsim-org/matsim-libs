@@ -26,7 +26,7 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.EventsReaderTXTv1;
@@ -87,7 +87,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("5", event.linkId);
 		}
 
-		public void handleEvent(final LinkEnterEnter event) {
+		public void handleEvent(final LinkEnterEvent event) {
 			this.eventCounter++;
 			assertEquals("expected linkleave-Event to be event #5", 5, this.eventCounter);
 			assertEquals(21650.0, event.time, 0.0);

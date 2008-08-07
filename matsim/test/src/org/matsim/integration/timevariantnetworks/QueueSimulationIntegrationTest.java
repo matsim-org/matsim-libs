@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -231,7 +231,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			this.link = link;
 		}
 
-		public void handleEvent(final LinkEnterEnter event) {
+		public void handleEvent(final LinkEnterEvent event) {
 			if (event.link != this.link) {
 				return;
 			}

@@ -26,7 +26,7 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
@@ -48,7 +48,7 @@ public class LinkQueueStats implements LinkEnterEventHandler, LinkLeaveEventHand
 		this.linkId = linkId;
 	}
 
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		if (event.linkId.equals(this.linkId)) {
 			enterTimes.add(event.time);
 		}

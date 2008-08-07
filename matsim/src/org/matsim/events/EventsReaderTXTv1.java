@@ -66,7 +66,7 @@ public class EventsReaderTXTv1 {
 				data = new LinkLeaveEvent(time, agentId, legNumber, linkId);
 				break;
 			case 5:
-				data = new LinkEnterEnter(time, agentId, legNumber, linkId);
+				data = new LinkEnterEvent(time, agentId, legNumber, linkId);
 				break;
 			case 3:
 				data = new AgentStuckEvent(time, agentId, legNumber, linkId);

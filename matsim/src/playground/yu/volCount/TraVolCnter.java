@@ -27,7 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
@@ -54,7 +54,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 	 * 
 	 * @see org.matsim.demandmodeling.events.handler.EventHandlerLinkEnterI#handleEvent(org.matsim.demandmodeling.events.EventLinkEnter)
 	 */
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		// TODO save entertime into agentTimer
 		String agentId = event.agentId;
 		if (!agentTimer.containsKey(agentId))

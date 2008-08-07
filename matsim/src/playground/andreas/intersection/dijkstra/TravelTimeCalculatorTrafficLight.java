@@ -3,7 +3,7 @@ package playground.andreas.intersection.dijkstra;
 import java.util.HashMap;
 
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -62,7 +62,7 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void handleEvent(final LinkEnterEnter event) {
+	public void handleEvent(final LinkEnterEvent event) {
 
 		if (event.link == null) {
 			event.link = (Link)this.network.getLocation(event.linkId);

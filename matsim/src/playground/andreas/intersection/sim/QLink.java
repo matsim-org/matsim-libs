@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
@@ -100,7 +100,7 @@ public class QLink extends QueueLink {
 				
 //		veh.setDepartureTime_s((int) (now + this.originalLink.getFreeSpeedTravelTime()));
 		QSim.getEvents().processEvent(
-				new LinkEnterEnter(now, veh.getDriver().getId().toString(),	veh.getCurrentLegNumber(),
+				new LinkEnterEvent(now, veh.getDriver().getId().toString(),	veh.getCurrentLegNumber(),
 						this.getLink().getId().toString(), veh.getDriver(), this.getLink()));
 	}
 

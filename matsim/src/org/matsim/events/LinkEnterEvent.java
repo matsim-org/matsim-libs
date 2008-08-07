@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkEnterEnter.java
+ * LinkEnterEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -25,13 +25,13 @@ import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class LinkEnterEnter extends LinkEvent {
+public class LinkEnterEvent extends LinkEvent {
 
-	public LinkEnterEnter(final double time, final String agentId, final int legNumber, final String linkId, final Person agent, final Link link) {
+	public LinkEnterEvent(final double time, final String agentId, final int legNumber, final String linkId, final Person agent, final Link link) {
 		super(time, agentId, linkId, agent, legNumber, link);
 	}
 
-	public LinkEnterEnter(final double time, final String agentId, final int legNumber, final String linkId) {
+	public LinkEnterEvent(final double time, final String agentId, final int legNumber, final String linkId) {
 		super(time, agentId, legNumber, linkId);
 	}
 

@@ -31,7 +31,7 @@ import java.util.HashMap;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -101,7 +101,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		this(300, network);
 	}
 
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		String linkId = event.linkId;
 		Link l = this.network.getLink(linkId);
 		String agentId = event.agentId;

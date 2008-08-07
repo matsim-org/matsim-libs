@@ -26,7 +26,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -96,7 +96,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), EPSILON);
 	}
 
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.agent.getId());
 		if (travelTimes == null) {
 			travelTimes = new HashMap<Id, Double>();

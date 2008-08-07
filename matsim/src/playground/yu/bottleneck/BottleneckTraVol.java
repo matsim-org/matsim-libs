@@ -23,7 +23,7 @@ package playground.yu.bottleneck;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
@@ -53,7 +53,7 @@ public class BottleneckTraVol implements LinkEnterEventHandler, LinkLeaveEventHa
 	/**
 	 * measures the amount of the agents on the link with bottleneck by every "entering"-Event
 	 */
-	public void handleEvent(final LinkEnterEnter event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		if (event.linkId.equals("15")) {
 			writeLine(Time.writeTime(event.time - 1) + "\t" + cnt);
 			writeLine(Time.writeTime(event.time) + "\t" + (++cnt));

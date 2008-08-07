@@ -26,7 +26,7 @@ package playground.yu.analysis;
 import java.util.TreeMap;
 
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -64,7 +64,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 		this.enterTimes = new TreeMap<String, Double>();
 	}
 
-	public void handleEvent(LinkEnterEnter enter) {
+	public void handleEvent(LinkEnterEvent enter) {
 		// if (enter.agent.getSelectedPlan().getType().equals("car")) {
 		this.enterTimes.put(enter.agentId, enter.time);
 		// }

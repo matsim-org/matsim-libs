@@ -33,7 +33,7 @@ import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.utils.io.IOUtils;
 
@@ -45,7 +45,7 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 
 	private int count;
 	
-	private List<LinkEnterEnter> events;
+	private List<LinkEnterEvent> events;
 	
 	private BufferedWriter writer;
 	
@@ -69,7 +69,7 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 			e.printStackTrace();
 		}
 	}
-	public void handleEvent(LinkEnterEnter event) {
+	public void handleEvent(LinkEnterEvent event) {
 		if(firstEvent == 0)
 			firstEvent = (int) event.time;
 		
@@ -81,7 +81,7 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 	}
 
 	public void reset(int iteration) {
-		events = new LinkedList<LinkEnterEnter>();
+		events = new LinkedList<LinkEnterEvent>();
 		firstEvent = 0;
 		lastEvent = 0;
 	}
@@ -90,7 +90,7 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 		int binsize = 60;
 		int bincount = (lastEvent-firstEvent)/binsize;
 		int[] bins = new int[bincount];
-		for(LinkEnterEnter e : events) {
+		for(LinkEnterEvent e : events) {
 			int idx = ((int)e.time - firstEvent)/binsize;
 			bins[idx]++;
 		}

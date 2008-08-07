@@ -31,7 +31,7 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
@@ -82,7 +82,7 @@ public class CalcLegNumber implements AgentDepartureEventHandler, AgentArrivalEv
 		setLegNumber(event);
 	}
 
-	public void handleEvent(final LinkEnterEnter event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		Integer counter = this.legCounters.get(new IdImpl(event.agentId));
 		if (counter == null) {
 			log.warn("Cannot find leg counter for agent " + event.agentId + " for event at time " + event.time + ". Most likely, a departure-event is missing for this agent.");

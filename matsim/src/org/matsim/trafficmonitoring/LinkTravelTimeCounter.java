@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.AgentArrivalEventHandler;
@@ -54,7 +54,7 @@ AgentArrivalEventHandler {
 		events.addHandler(instance);
 	}
 
-	public void handleEvent(final LinkEnterEnter event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		this.enterEvents.put(event.agentId, Double.valueOf(event.time));
 	}
 

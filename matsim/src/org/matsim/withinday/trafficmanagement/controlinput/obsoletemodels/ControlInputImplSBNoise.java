@@ -34,7 +34,7 @@ import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
@@ -237,7 +237,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 
 	// memorize linkEnterEvents on the first links of the two alternative routes:
 	@Override
-	public void handleEvent(final LinkEnterEnter event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		super.handleEvent(event);
 
 		// handle flows on outLinks

@@ -2,7 +2,7 @@ package playground.wrashid.PDES;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.network.Link;
 import org.matsim.population.Leg;
 
@@ -30,7 +30,7 @@ public class EnterRoadMessage extends EventMessage {
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.ENTER_LINK)){
-			event=new LinkEnterEnter(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getLegIndex()-1,vehicle.getCurrentLink().getId().toString());
+			event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getLegIndex()-1,vehicle.getCurrentLink().getId().toString());
 		}
 		
 		//SimulationParameters.events.processEvent(event);

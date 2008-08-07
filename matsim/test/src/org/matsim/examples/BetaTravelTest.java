@@ -35,7 +35,7 @@ import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
@@ -167,7 +167,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.leaveTimes.clear();
 		}
 
-		public void handleEvent(final LinkEnterEnter event) {
+		public void handleEvent(final LinkEnterEvent event) {
 			if (event.linkId.equals(this.linkId)) {
 				this.enterTimes.add(Double.valueOf(event.time));
 				if (event.time < this.firstCarEnter) this.firstCarEnter = event.time;

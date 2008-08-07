@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
@@ -83,9 +83,9 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 
 	/* ------------------------MEMBER VARIABLE------------------------------ */
 	/**
-	 * String - AgentID LinkEnterEnter - an event of LinkEnterEnter
+	 * String - AgentID LinkEnterEvent - an event of LinkEnterEvent
 	 */
-	private Map<String, LinkEnterEnter> enters = new HashMap<String, LinkEnterEnter>();
+	private Map<String, LinkEnterEvent> enters = new HashMap<String, LinkEnterEvent>();
 
 	protected long timeBinMinimum = -1;
 
@@ -117,9 +117,9 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	 */
 	@Override
 	public void handleEvent(BasicEvent event) {
-		if (event instanceof LinkEnterEnter) { // event.getClass().equals(LinkEnterEnter.class))
+		if (event instanceof LinkEnterEvent) { // event.getClass().equals(LinkEnterEvent.class))
 												// {
-			this.enters.put(event.agentId, (LinkEnterEnter) event);
+			this.enters.put(event.agentId, (LinkEnterEvent) event);
 		} else if (event instanceof LinkLeaveEvent) { // event.getClass().equals(LinkLeaveEvent.class))
 														// {
 			String agentId = event.agentId;
@@ -262,7 +262,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	 *            the point of time of the event called "leaving a link" with
 	 *            unit second
 	 */
-	public abstract void compute(LinkEnterEnter enter, double leaveTime_s);
+	public abstract void compute(LinkEnterEvent enter, double leaveTime_s);
 
 	/**
 	 * This function does nothing and must be overridden by subclasses and
