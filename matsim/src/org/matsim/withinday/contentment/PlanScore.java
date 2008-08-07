@@ -26,8 +26,8 @@ import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.withinday.WithindayAgent;
 
 /**
@@ -35,7 +35,7 @@ import org.matsim.withinday.WithindayAgent;
  * @author dgrether
  *
  */
-public class PlanScore implements AgentContentmentI {
+public class PlanScore implements AgentContentment {
 
 	private static final Logger log = Logger.getLogger(PlanScore.class);
 
@@ -118,8 +118,8 @@ public class PlanScore implements AgentContentmentI {
 	}
 
 	private double calcContentment(final Leg leg, final double time) {
-		TravelCostI travelCost = this.agent.getBeliefs();
-		TravelTimeI travelTime = this.agent.getBeliefs();
+		TravelCost travelCost = this.agent.getBeliefs();
+		TravelTime travelTime = this.agent.getBeliefs();
 		if (travelCost == null) {
 			log.warn("aaent: " + this.agent + " has no TravelCostProvider");
 			return 0;

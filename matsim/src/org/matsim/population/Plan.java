@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.stats.algorithms.PlanStatsI;
+import org.matsim.stats.algorithms.PlanStats;
 import org.matsim.utils.misc.Time;
 
 
@@ -48,7 +48,7 @@ public class Plan extends BasicPlanImpl {
 
 	private Person person = null;
 
-	public PlanStatsI firstPlanStatsAlgorithm = null;
+	public PlanStats firstPlanStatsAlgorithm = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors

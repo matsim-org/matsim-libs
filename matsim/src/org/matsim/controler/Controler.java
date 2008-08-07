@@ -98,8 +98,8 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
@@ -151,7 +151,7 @@ public class Controler {
 	protected Population population = null;
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
-	protected TravelCostI travelCostCalculator = null;
+	protected TravelCost travelCostCalculator = null;
 	protected LegTravelTimeEstimator legTravelTimeEstimator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
@@ -390,7 +390,7 @@ public class Controler {
 	 * private methods
 	 * =================================================================== */
 
-	private LegTravelTimeEstimator initLegTravelTimeEstimator(final TravelTimeI linkTravelTimeCalculator) {
+	private LegTravelTimeEstimator initLegTravelTimeEstimator(final TravelTime linkTravelTimeCalculator) {
 		/* TODO [MR] move this method somewhere else, it should be more general instead just being here in the
 		 * Controler. Think of a bigger picture: this estimator as well as travel time / cost calculators
 		 * are all kind of singletons, and all have similar requirements (plans, network, events). Maybe this
@@ -954,15 +954,15 @@ public class Controler {
 	 * Optional setters that allow to overwrite some default algorithms used
 	 * =================================================================== */
 
-	public final void setTravelCostCalculator(final TravelCostI travelCostCalculator) {
+	public final void setTravelCostCalculator(final TravelCost travelCostCalculator) {
 		this.travelCostCalculator = travelCostCalculator;
 	}
 
-	public final TravelCostI getTravelCostCalculator() {
+	public final TravelCost getTravelCostCalculator() {
 		return this.travelCostCalculator;
 	}
 
-	public final TravelTimeI getTravelTimeCalculator() {
+	public final TravelTime getTravelTimeCalculator() {
 		return this.travelTimeCalculator;
 	}
 
@@ -1014,7 +1014,7 @@ public class Controler {
 	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes of plans with the specified
 	 * travelCosts and travelTimes. Only to be used by a single thread, use multiple instances for multiple threads!
 	 */
-	public PlanAlgorithm getRoutingAlgorithm(final TravelCostI travelCosts, final TravelTimeI travelTimes) {
+	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
 		synchronized (this) {
 			if (this.commonRoutingData == null) {
 				this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
@@ -1079,7 +1079,7 @@ public class Controler {
 		return this.linkStats;
 	}
 
-	public final TravelTimeI getLinkTravelTimes() {
+	public final TravelTime getLinkTravelTimes() {
 		return this.travelTimeCalculator;
 	}
 

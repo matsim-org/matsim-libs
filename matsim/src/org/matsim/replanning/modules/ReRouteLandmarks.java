@@ -24,15 +24,15 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 public class ReRouteLandmarks extends ReRouteDijkstra {
 
 	private PreProcessLandmarks commonRouterData = null;
 
-	public ReRouteLandmarks(NetworkLayer network, TravelCostI costCalculator,
-			TravelTimeI timeCalculator, PreProcessLandmarks commonRouterData) {
+	public ReRouteLandmarks(NetworkLayer network, TravelCost costCalculator,
+			TravelTime timeCalculator, PreProcessLandmarks commonRouterData) {
 		super(network, costCalculator, timeCalculator);
 		this.commonRouterData  = commonRouterData;
 	}

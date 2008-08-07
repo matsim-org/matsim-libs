@@ -52,7 +52,7 @@ import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
-import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
+import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
 
 
 public class OTFQuadFileHandler {
@@ -64,7 +64,7 @@ public class OTFQuadFileHandler {
 	// minor version increase does not break compatibility
 	public static final int MINORVERSION = 3;
 
-	public static class Writer implements SimStateWriterI, SnapshotWriterI {
+	public static class Writer implements SimStateWriterI, SnapshotWriter {
 		protected final QueueNetwork net;
 		protected OTFServerQuad quad = null;
 		private final String fileName;

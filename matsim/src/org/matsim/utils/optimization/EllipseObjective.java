@@ -47,7 +47,7 @@ import org.matsim.utils.geometry.Coord;
  * cover-percentage. The ellipse will be enlarged until it contains at
  * least the specified percentage of all points.
  */
-public class EllipseObjective implements ObjectiveI {
+public class EllipseObjective implements Objective {
 
 	//////////////////////////////////////////////////////////////////////
 	// member constants

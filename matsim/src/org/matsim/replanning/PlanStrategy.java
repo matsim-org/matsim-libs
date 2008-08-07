@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.replanning.modules.StrategyModuleI;
-import org.matsim.replanning.selectors.PlanSelectorI;
+import org.matsim.replanning.modules.StrategyModule;
+import org.matsim.replanning.selectors.PlanSelector;
 
 /**
  * A strategy defines how an agent can be modified during re-planning.
@@ -36,9 +36,9 @@ import org.matsim.replanning.selectors.PlanSelectorI;
  */
 public class PlanStrategy {
 
-	private PlanSelectorI planSelector = null;
-	private StrategyModuleI firstModule = null;
-	private final ArrayList<StrategyModuleI> modules = new ArrayList<StrategyModuleI>();
+	private PlanSelector planSelector = null;
+	private StrategyModule firstModule = null;
+	private final ArrayList<StrategyModule> modules = new ArrayList<StrategyModule>();
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
 	private long counter = 0;
 	private final static Logger log = Logger.getLogger(PlanStrategy.class);
@@ -48,7 +48,7 @@ public class PlanStrategy {
 	 *
 	 * @param planSelector
 	 */
-	public PlanStrategy(final PlanSelectorI planSelector) {
+	public PlanStrategy(final PlanSelector planSelector) {
 		this.planSelector = planSelector;
 	}
 
@@ -57,7 +57,7 @@ public class PlanStrategy {
 	 *
 	 * @param module
 	 */
-	public void addStrategyModule(final StrategyModuleI module) {
+	public void addStrategyModule(final StrategyModule module) {
 		if (this.firstModule == null) {
 			this.firstModule = module;
 		} else {
@@ -110,7 +110,7 @@ public class PlanStrategy {
 			// finish the first module
 			this.firstModule.finish();
 			// now work through the others
-			for (StrategyModuleI module : this.modules) {
+			for (StrategyModule module : this.modules) {
 				module.init();
 				for (Plan plan : this.plans) {
 					module.handlePlan(plan);
@@ -124,7 +124,7 @@ public class PlanStrategy {
 	}
 
 	/** Returns a descriptive name for this strategy, based on the class names on the used
-	 * {@link PlanSelectorI plan selector} and {@link StrategyModuleI strategy modules}.
+	 * {@link PlanSelector plan selector} and {@link StrategyModule strategy modules}.
 	 *
 	 * @return An automatically generated name for this strategy.
 	 */
@@ -135,7 +135,7 @@ public class PlanStrategy {
 		if (this.firstModule != null) {
 			name.append('_');
 			name.append(this.firstModule.getClass().getSimpleName());
-			for (StrategyModuleI module : this.modules) {
+			for (StrategyModule module : this.modules) {
 				name.append('_');
 				name.append(module.getClass().getSimpleName());
 			}

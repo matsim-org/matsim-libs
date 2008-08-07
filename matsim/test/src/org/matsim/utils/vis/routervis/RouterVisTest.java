@@ -27,8 +27,8 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.utils.vis.routervis.multipathrouter.CLogitRouter;
@@ -60,8 +60,8 @@ public class RouterVisTest extends MatsimTestCase {
 		final Node fromNode = network.getNode("13");
 		final Node toNode = network.getNode("7");
 
-		final TravelTimeI costCalc = new FreespeedTravelTimeCost();
-		final RouterVis routerVis = new RouterVis(network, (TravelCostI) costCalc, costCalc, VisDijkstra.class);
+		final TravelTime costCalc = new FreespeedTravelTimeCost();
+		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, VisDijkstra.class);
 
 		routerVis.runRouter(fromNode, toNode, 0.0);
 
@@ -96,8 +96,8 @@ public class RouterVisTest extends MatsimTestCase {
 		final Node fromNode = network.getNode("13");
 		final Node toNode = network.getNode("7");
 
-		final TravelTimeI costCalc = new FreespeedTravelTimeCost();
-		final RouterVis routerVis = new RouterVis(network, (TravelCostI) costCalc, costCalc, CLogitRouter.class);
+		final TravelTime costCalc = new FreespeedTravelTimeCost();
+		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, CLogitRouter.class);
 
 		routerVis.runRouter(fromNode, toNode, 0.0);
 
@@ -132,8 +132,8 @@ public class RouterVisTest extends MatsimTestCase {
 		final Node fromNode = network.getNode("13");
 		final Node toNode = network.getNode("7");
 
-		final TravelTimeI costCalc = new FreespeedTravelTimeCost();
-		final RouterVis routerVis = new RouterVis(network, (TravelCostI) costCalc, costCalc, PSLogitRouter.class);
+		final TravelTime costCalc = new FreespeedTravelTimeCost();
+		final RouterVis routerVis = new RouterVis(network, (TravelCost) costCalc, costCalc, PSLogitRouter.class);
 
 		routerVis.runRouter(fromNode, toNode, 0.0);
 

@@ -22,20 +22,20 @@ package org.matsim.roadpricing;
 
 import org.matsim.network.Link;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
-import org.matsim.router.util.TravelCostI;
+import org.matsim.router.util.TravelCost;
 
 /**
  * Calculates the travel costs for links, including tolls. Currently supports distance, cordon and area tolls.
  *
  * @author mrieser
  */
-public class TollTravelCostCalculator implements TravelCostI {
+public class TollTravelCostCalculator implements TravelCost {
 
 	/*package*/ final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
-	private final TravelCostI costHandler;
+	private final TravelCost costHandler;
 
-	public TollTravelCostCalculator(final TravelCostI costCalculator, final RoadPricingScheme scheme) {
+	public TollTravelCostCalculator(final TravelCost costCalculator, final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 		this.costHandler = costCalculator;
 

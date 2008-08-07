@@ -34,8 +34,8 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
@@ -57,7 +57,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansCalcRoute(final NetworkLayer network, final TravelCostI costCalculator, final TravelTimeI timeCalculator) {
+	public PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		super();
 		this.routeAlgo = new Dijkstra(network, costCalculator, timeCalculator);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();

@@ -92,7 +92,7 @@ public class TabularFileParser {
      * @throws IOException
      */
     public void parse(TabularFileParserConfig config,
-            TabularFileHandlerI handler) throws IOException {
+            TabularFileHandler handler) throws IOException {
         if (config == null)
             throw new NullPointerException(
                     "TabularFileParser requires a non-null configuration.");

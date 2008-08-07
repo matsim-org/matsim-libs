@@ -26,9 +26,9 @@ package org.matsim.stats.algorithms;
  * @author laemmel
  *
  */
-public abstract class AbstractPlanStatsAlgorithm implements PlanStatsI {
+public abstract class AbstractPlanStatsAlgorithm implements PlanStats {
 
-	protected PlanStatsI nextAlgorithm = null;
+	protected PlanStats nextAlgorithm = null;
 	
 	abstract public void update(double score, int iteration);
 	
@@ -58,7 +58,7 @@ public abstract class AbstractPlanStatsAlgorithm implements PlanStatsI {
 			this.nextAlgorithm.print();
 	}
 	
-	public void setAlgorithm(PlanStatsI nextAlgo){
+	public void setAlgorithm(PlanStats nextAlgo){
 		nextAlgorithm = nextAlgo;
 	}
 

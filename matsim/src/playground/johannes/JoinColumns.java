@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
+import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
 
@@ -100,7 +100,7 @@ public class JoinColumns {
 		writer.close();
 	}
 	
-	private static class Handler implements TabularFileHandlerI {
+	private static class Handler implements TabularFileHandler {
 		
 		public int col;
 		

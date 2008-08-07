@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CoordinateTransformationI.java
+ * CoordinateTransformation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,7 +27,7 @@ package org.matsim.utils.geometry;
  *
  * @author mrieser
  */
-public interface CoordinateTransformationI {
+public interface CoordinateTransformation {
 
 	/**
 	 * Transforms the given coordinate from one coordinate system to the other.
@@ -36,5 +36,5 @@ public interface CoordinateTransformationI {
 	 * @return The transformed coordinate.
 	 */
 	public Coord transform(Coord coord);
-	
+
 }

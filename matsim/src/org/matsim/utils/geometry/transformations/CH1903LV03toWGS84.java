@@ -22,7 +22,7 @@ package org.matsim.utils.geometry.transformations;
 
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 
 /**
  * Transforms coordinates from the Swiss-Grid coordinate system to WGS84. 
@@ -33,7 +33,7 @@ import org.matsim.utils.geometry.CoordinateTransformationI;
  * @see <a href="http://de.wikipedia.org/wiki/WGS84">de.wikipedia.org/wiki/WGS84</a>
  * @see <a href="http://www.swisstopo.ch/pub/down/basics/geo/system/ch1903_wgs84_de.pdf">Swisstopo Umrechnungen (PDF)</a>
  */
-public class CH1903LV03toWGS84 implements CoordinateTransformationI {
+public class CH1903LV03toWGS84 implements CoordinateTransformation {
 
 	public Coord transform(Coord coord) {
 		

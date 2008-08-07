@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnapshotWriterI.java
+ * SnapshotWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,7 +23,7 @@ package org.matsim.utils.vis.snapshots.writers;
 /**
  * Interface to implement custom snapshot writers. A snapshot contains information
  * about agents (location, speed) at a specific moment in time. Depending on the
- * format, multiple snapshts can be stored in one file. A snapshot writer should
+ * format, multiple snapshots can be stored in one file. A snapshot writer should
  * implement a custom constructor to initialize it. For each snapshot, first the
  * method <code>beginSnapshot()</code> will be called, followed by several calls
  * to <code>addAgent()</code> and a final call to <code>endSnapshot()</code>. When
@@ -31,7 +31,7 @@ package org.matsim.utils.vis.snapshots.writers;
  *
  * @author mrieser
  */
-public interface SnapshotWriterI {
+public interface SnapshotWriter {
 
 		/**
 		 * Tells the snapshot writer that a new snapshot begins at the specified time.
@@ -44,14 +44,14 @@ public interface SnapshotWriterI {
 		 * Tells the snapshot writer that no more vehicles will be added to the current snapshot.
 		 */
 		public void endSnapshot();
-		
+
 		/**
 		 * Adds an agent to the current snapshot.
 		 *
 		 * @param position The position, id, and speed of the agent.
 		 */
 		public void addAgent(PositionInfo position);
-		
+
 		/**
 		 * Tells the snapshot writer that no more snapshots will be added ("destructor").
 		 */

@@ -44,7 +44,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
-abstract public class MultithreadedModuleA implements StrategyModuleI {
+abstract public class MultithreadedModuleA implements StrategyModule {
 	private final int numOfThreads;
 
 	private PlanAlgoThread[] algothreads = null;

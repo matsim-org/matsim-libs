@@ -25,13 +25,13 @@ import java.util.Iterator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 
 public class NetworkTransform {
 
-	private final CoordinateTransformationI transformer;
+	private final CoordinateTransformation transformer;
 
-	public NetworkTransform(final CoordinateTransformationI transformer) {
+	public NetworkTransform(final CoordinateTransformation transformer) {
 		super();
 		this.transformer = transformer;
 	}

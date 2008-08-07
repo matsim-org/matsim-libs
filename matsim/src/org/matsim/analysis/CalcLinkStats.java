@@ -30,7 +30,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
@@ -76,7 +76,7 @@ public class CalcLinkStats {
 		this.volScaleFactor = vol_scale_factor;
 	}
 
-	public void addData(final VolumesAnalyzer analyzer, final TravelTimeI ttimes) {
+	public void addData(final VolumesAnalyzer analyzer, final TravelTime ttimes) {
 		this.count++;
 		// TODO verify analyzer and ttimes have hourly timeBin-Settings
 		for (String linkId : this.linkData.keySet()) {

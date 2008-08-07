@@ -31,12 +31,12 @@ import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
 
 public class TravelTimeCalculatorImpl3 implements LinkEnterEventHandler,
-LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTimeI {
+LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTime {
 
 // EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
@@ -122,7 +122,7 @@ return slice;
 
 
 //////////////////////////////////////////////////////////////////////
-// Implementation of TravelTimeI
+// Implementation of TravelTime
 //////////////////////////////////////////////////////////////////////
 
 /* (non-Javadoc)

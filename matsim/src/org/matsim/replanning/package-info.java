@@ -11,9 +11,9 @@ divided by the sum of all strategies' weights.</p>
 
 <p>A {@link org.matsim.replanning.Strategy} always consists
 of exactly one <code>PlanSelector</code> and zero or more <code>StrategyModule</code>s.
-A {@link org.matsim.replanning.selectors.PlanSelectorI
+A {@link org.matsim.replanning.selectors.PlanSelector
 PlanSelector} selects one of the agents' existing plans, while
-a {@link org.matsim.replanning.modules.StrategyModuleI
+a {@link org.matsim.replanning.modules.StrategyModule
 StrategyModule} modifies a plan. A <code>StrategyModule</code> can
 change the route information, time information, change the sequence of
 activities, change locations of activities and so on.</p>

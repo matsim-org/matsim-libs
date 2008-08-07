@@ -22,8 +22,8 @@ package org.matsim.router.costcalculators;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.router.util.TravelMinCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelMinCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -31,7 +31,7 @@ import org.matsim.utils.misc.Time;
  *
  * @author mrieser
  */
-public class FreespeedTravelTimeCost implements TravelMinCostI, TravelTimeI {
+public class FreespeedTravelTimeCost implements TravelMinCost, TravelTime {
 	private final double travelCostFactor;
 
 	public FreespeedTravelTimeCost() {

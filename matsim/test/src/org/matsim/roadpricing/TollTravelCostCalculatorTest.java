@@ -33,7 +33,7 @@ import org.matsim.router.PlansCalcRouteDijkstra;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
+import org.matsim.router.util.TravelCost;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -58,7 +58,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 			toll.addLink("11");
 			Population population = Fixture.createPopulation2();
 			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-			TravelCostI costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
+			TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
 			PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 			commonRouterData.run(network);
@@ -113,7 +113,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 			toll.addLink("11");
 			Population population = Fixture.createPopulation2();
 			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-			TravelCostI costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
+			TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
 			PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 			commonRouterData.run(network);

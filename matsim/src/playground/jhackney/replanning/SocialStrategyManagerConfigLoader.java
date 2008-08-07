@@ -31,7 +31,7 @@ import org.matsim.replanning.modules.PlanomatExe;
 import org.matsim.replanning.modules.PlanomatOptimizeTimes;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
-import org.matsim.replanning.modules.StrategyModuleI;
+import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.modules.TimeAllocationMutator;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.ExpBetaPlanChanger;
@@ -41,8 +41,8 @@ import org.matsim.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -64,7 +64,7 @@ public class SocialStrategyManagerConfigLoader {
 	 * @param legTravelTimeEstimator an estimator for travel times between two locations
 	 */
 	public static void load(final Config config, final StrategyManager manager, final NetworkLayer network,
-			final TravelCostI travelCostCalc, final TravelTimeI travelTimeCalc, final LegTravelTimeEstimator legTravelTimeEstimator) {
+			final TravelCost travelCostCalc, final TravelTime travelTimeCalc, final LegTravelTimeEstimator legTravelTimeEstimator) {
 
 		String maxvalue = config.findParam("strategy", "maxAgentPlanMemorySize");
 		if (maxvalue != null){
@@ -121,12 +121,12 @@ public class SocialStrategyManagerConfigLoader {
 				strategy.addStrategyModule(new PlanomatExe(exePath));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
 				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
 				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 				preProcessRoutingData.run(network);

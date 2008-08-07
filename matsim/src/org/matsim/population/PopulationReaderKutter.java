@@ -27,7 +27,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
+import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.world.World;
@@ -94,7 +94,7 @@ public class PopulationReaderKutter implements PopulationReader {
 		System.out.println("    done.");
 	}
 
-	private final class PersonRowHandler implements TabularFileHandlerI {
+	private final class PersonRowHandler implements TabularFileHandler {
 
 		private double currentSum = 0.0;
 

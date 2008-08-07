@@ -28,9 +28,9 @@ import java.util.List;
 
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
+import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 
-public class PuT_trip_finder_handler implements TabularFileHandlerI {
+public class PuT_trip_finder_handler implements TabularFileHandler {
 
 	// the search radius
 	private final double searchRadius;

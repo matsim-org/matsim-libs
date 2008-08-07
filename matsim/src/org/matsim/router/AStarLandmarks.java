@@ -28,8 +28,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -51,7 +51,7 @@ import org.matsim.utils.misc.Time;
  * nodes we would need 2*8*16*400'000 bytes = about 100MB of additional memory.<br>
  * Conditions: The same as for AStarEuclidean.<br>
  * Code example:<br>
- * <code><br> TravelMinCostI costFunction = ...<br>
+ * <code><br> TravelMinCost costFunction = ...<br>
  * PreProcessLandmarks preProcessData = new PreProcessLandmarks(costFunction);<br>
  * preProcessData.run(network);<br>...<br>
  * LeastCostPathCalculator routingAlgo = new AStarLandmarks(network, preProcessData);
@@ -78,7 +78,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param costFunction Calculates the travel cost on links.
 	 */
 	public AStarLandmarks(NetworkLayer network, PreProcessLandmarks preProcessData,
-			TravelCostI costFunction, TravelTimeI timeFunction) {
+			TravelCost costFunction, TravelTime timeFunction) {
 		this(network, preProcessData, costFunction, timeFunction, 1);
 	}
 
@@ -89,7 +89,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param timeFunction Calculates the travel time on links.
 	 */
 	public AStarLandmarks(NetworkLayer network, PreProcessLandmarks preProcessData,
-			TravelTimeI timeFunction) {
+			TravelTime timeFunction) {
 		this(network, preProcessData, preProcessData.getCostFunction(), timeFunction, 1);
 	}
 
@@ -103,10 +103,10 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * i.e. it visits less nodes during routing and is thus faster, but for an
 	 * overdo factor > 1, it is not guaranteed that the router returns the
 	 * least-cost paths. Rather it tends to return distance-minimal paths.
-	 * @see #AStarLandmarks(NetworkLayer, PreProcessLandmarks, TravelTimeI)
+	 * @see #AStarLandmarks(NetworkLayer, PreProcessLandmarks, TravelTime)
 	 */
 	public AStarLandmarks(NetworkLayer network, PreProcessLandmarks preProcessData,
-			TravelCostI costFunction, TravelTimeI timeFunction, double overdoFactor) {
+			TravelCost costFunction, TravelTime timeFunction, double overdoFactor) {
 		super(network, preProcessData, costFunction, timeFunction, overdoFactor);
 
 		this.landmarks = preProcessData.getLandmarks();

@@ -23,8 +23,8 @@ package org.matsim.router;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 /**
  * A AbstractPersonAlgorithm that calculates and sets the routes of a person's activities using {@link AStarLandmarks}.
@@ -34,12 +34,12 @@ import org.matsim.router.util.TravelTimeI;
 public class PlansCalcRouteLandmarks extends PlansCalcRoute {
 
 	public PlansCalcRouteLandmarks(final NetworkLayer network, final PreProcessLandmarks preProcessData,
-			final TravelCostI costCalculator, final TravelTimeI timeCalculator) {
+			final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(network, preProcessData, costCalculator, timeCalculator, new FreespeedTravelTimeCost());
 	}
 
 	private PlansCalcRouteLandmarks(final NetworkLayer network, final PreProcessLandmarks preProcessData,
-			final TravelCostI costCalculator, final TravelTimeI timeCalculator,
+			final TravelCost costCalculator, final TravelTime timeCalculator,
 			final FreespeedTravelTimeCost timeCostCalc) {
 		super(new AStarLandmarks(network, preProcessData, costCalculator, timeCalculator),
 				new AStarLandmarks(network, preProcessData, timeCostCalc, timeCostCalc));

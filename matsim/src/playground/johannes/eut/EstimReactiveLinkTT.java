@@ -41,7 +41,7 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.population.Person;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -53,7 +53,7 @@ public class EstimReactiveLinkTT implements
 		LinkLeaveEventHandler,
 		AgentArrivalEventHandler,
 		AgentWait2LinkEventHandler,
-		TravelTimeI {
+		TravelTime {
 
 //	private QueueNetwork queueNetwork;
 	

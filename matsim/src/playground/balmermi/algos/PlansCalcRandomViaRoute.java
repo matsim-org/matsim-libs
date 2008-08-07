@@ -36,8 +36,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
@@ -55,7 +55,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansCalcRandomViaRoute(NetworkLayer network, TravelCostI costCalculator, TravelTimeI timeCalculator) {
+	public PlansCalcRandomViaRoute(NetworkLayer network, TravelCost costCalculator, TravelTime timeCalculator) {
 		this.network = network;
 		this.routeAlgo = new Dijkstra(network, costCalculator, timeCalculator);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();

@@ -28,7 +28,7 @@ import org.matsim.population.Plan;
  * 
  * @author mrieser
  */
-public class KeepSelected implements PlanSelectorI {
+public class KeepSelected implements PlanSelector {
 
 	/**
 	 * returns the already selected plan for this person

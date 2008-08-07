@@ -37,7 +37,7 @@ public class PlanScoreTrajectory extends AbstractPlanStatsAlgorithm {
 		init();
 	}
 	
-	public PlanScoreTrajectory(PlanStatsI nextAlgo,int iters, int minIter){
+	public PlanScoreTrajectory(PlanStats nextAlgo,int iters, int minIter){
 		minIteration = minIter;
 		iterations = iters;		
 		this.nextAlgorithm = nextAlgo;

@@ -29,7 +29,7 @@ import org.matsim.utils.collections.Tuple;
 import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.WithindayAgentLogicFactory;
 import org.matsim.withinday.beliefs.AgentBeliefs;
-import org.matsim.withinday.contentment.AgentContentmentI;
+import org.matsim.withinday.contentment.AgentContentment;
 import org.matsim.withinday.coopers.cooperscontentment.CoopersContentment;
 import org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider;
 import org.matsim.withinday.percepts.AgentPercepts;
@@ -55,7 +55,7 @@ public class CoopersAgentLogicFactory extends WithindayAgentLogicFactory {
 	 * @see org.matsim.withinday.WithindayAgentLogicFactory#createAgentContentment(org.matsim.withinday.WithindayAgent)
 	 */
 	@Override
-	public AgentContentmentI createAgentContentment(final WithindayAgent agent) {
+	public AgentContentment createAgentContentment(final WithindayAgent agent) {
 		return new CoopersContentment();
 	}
 

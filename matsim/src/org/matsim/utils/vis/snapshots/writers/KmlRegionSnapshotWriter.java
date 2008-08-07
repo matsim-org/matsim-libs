@@ -30,7 +30,7 @@ import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
@@ -56,7 +56,7 @@ import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
  * @author dgrether
  *
  */
-public class KmlRegionSnapshotWriter implements SnapshotWriterI {
+public class KmlRegionSnapshotWriter implements SnapshotWriter {
 	private KML mainKml = null;
 	private Document mainDoc = null;
 	private Folder mainFolder = null;
@@ -70,7 +70,7 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 
 	private KMZWriter writer = null;
 
-	private CoordinateTransformationI coordTransform = null;
+	private CoordinateTransformation coordTransform = null;
 
 	private final TreeMap<Double, NetworkLink> timeLinks = new TreeMap<Double, NetworkLink>();
 
@@ -86,7 +86,7 @@ public class KmlRegionSnapshotWriter implements SnapshotWriterI {
 	 * @param coordTransform
 	 * @param network
 	 */
-	public KmlRegionSnapshotWriter(final String filename, final CoordinateTransformationI coordTransform, final NetworkLayer network) {
+	public KmlRegionSnapshotWriter(final String filename, final CoordinateTransformation coordTransform, final NetworkLayer network) {
 		this.network = network;
 		this.coordTransform = coordTransform;
 		//the kmz writer

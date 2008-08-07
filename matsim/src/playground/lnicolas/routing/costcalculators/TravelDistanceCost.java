@@ -21,14 +21,14 @@
 package playground.lnicolas.routing.costcalculators;
 
 import org.matsim.network.Link;
-import org.matsim.router.util.TravelMinCostI;
+import org.matsim.router.util.TravelMinCost;
 import org.matsim.utils.misc.Time;
 
 /**
  * @author niclefeb
  * CostCalculator for Links based on length of the links
  */
-public class TravelDistanceCost implements TravelMinCostI {
+public class TravelDistanceCost implements TravelMinCost {
 
 	public TravelDistanceCost() {
 

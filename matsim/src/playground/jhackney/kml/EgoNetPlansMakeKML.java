@@ -37,7 +37,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.fields.Color;
@@ -66,7 +66,7 @@ public class EgoNetPlansMakeKML {
 	private static Style workStyle, leisureStyle, blueLineStyle,
 	educStyle, shopStyle, homeStyle;//, agentLinkStyle;
 	private static HashMap<String,Style> facStyle= new HashMap<String,Style>();
-	private static CoordinateTransformationI trafo;
+	private static CoordinateTransformation trafo;
 	private static Config config = null;
 
 
@@ -573,7 +573,7 @@ public class EgoNetPlansMakeKML {
 
 	}
 
-	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformationI trafo) {
+	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformation trafo) {
 
 		Placemark linkPlacemark = null;
 

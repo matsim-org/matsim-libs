@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 
 /**
  * @author illenberger
@@ -22,7 +22,7 @@ public class TravelTimeMemory {
 
 	private double learningrate = 0.1;
 
-	public TimevariantTTStorage makeTTStorage(TravelTimeI ttcalc, NetworkLayer network, int binsize, int starttime, int endtime) {
+	public TimevariantTTStorage makeTTStorage(TravelTime ttcalc, NetworkLayer network, int binsize, int starttime, int endtime) {
 		TimevariantTTStorage storage = new TimevariantTTStorage(network, starttime, endtime, binsize);
 
 		for(Link link : network.getLinks().values()) {
@@ -70,12 +70,12 @@ public class TravelTimeMemory {
 		return this.storageList;
 	}
 
-	public TravelTimeI getMeanTravelTimes() {
+	public TravelTime getMeanTravelTimes() {
 		return new MeanLinkCost(this.storageList);
 
 	}
 
-	private class MeanLinkCost implements TravelTimeI {
+	private class MeanLinkCost implements TravelTime {
 
 		private List<TimevariantTTStorage> linkcosts;
 
@@ -85,7 +85,7 @@ public class TravelTimeMemory {
 
 		public double getLinkTravelTime(Link link, double time) {
 			double sum = 0;
-			for(TravelTimeI linkcost : this.linkcosts)
+			for(TravelTime linkcost : this.linkcosts)
 				sum += linkcost.getLinkTravelTime(link, time);
 
 			return sum/this.linkcosts.size();

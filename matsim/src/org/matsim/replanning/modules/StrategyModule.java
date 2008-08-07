@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanStatsI.java
+ * StrategyModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,18 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.stats.algorithms;
+package org.matsim.replanning.modules;
 
+import org.matsim.population.Plan;
 
 /**
- * @author laemmel
- *
+ * A module which modifies a single plan.
+ * 
+ * @author mrieser
  */
-public interface PlanStatsI {
+public interface StrategyModule {
 
-	public void run(double score, int iteration);
+	/**
+	 * Initializes this module before handling plans. Modules using an external
+	 * routine could e.g. open a file here to write the plans out and pass them to
+	 * the external routines. Multi-threaded modules could initialize and start
+	 * their threads in this method.
+	 */
+	public void init();
 	
-	public void print();
+	/**
+	 * Tells this module to handle the specified plan. It is not required that
+	 * the plan must immediately be handled, e.g. modules calling external 
+	 * routines could just collect the plans here and start the external routine
+	 * in {@link #finish()}, or multi-threaded modules could just add the
+	 * plan to a synchronized queue for the threads.
+	 *
+	 * @param plan
+	 * @see #finish()
+	 */
+	public void handlePlan(Plan plan);
 	
-	public String printStr();
+	/**
+	 * Indicates that no additional plans will be handed to this module and waits
+	 * until this module has finished handling all plans. Modules calling external
+	 * routines can call those here, or multi-threaded modules can wait here until
+	 * all threads are finished with their work.
+	 * 
+	 * @see #handlePlan(Plan)
+	 */
+	public void finish();
 }

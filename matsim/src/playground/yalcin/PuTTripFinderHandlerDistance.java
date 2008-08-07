@@ -8,9 +8,9 @@ import java.util.List;
 
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
+import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 
-public class PuTTripFinderHandlerDistance implements TabularFileHandlerI {
+public class PuTTripFinderHandlerDistance implements TabularFileHandler {
 
 	// the search radius
 	private final double searchRadius;

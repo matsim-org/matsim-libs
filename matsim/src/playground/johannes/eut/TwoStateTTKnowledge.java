@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.network.Link;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 
 /**
  * @author illenberger
@@ -70,11 +70,11 @@ public class TwoStateTTKnowledge extends TravelTimeMemory {
 	}
 
 	@Override
-	public TravelTimeI getMeanTravelTimes() {
+	public TravelTime getMeanTravelTimes() {
 		return new MeanLinkCost(getStorageList());
 	}
 
-	private class MeanLinkCost implements TravelTimeI {
+	private class MeanLinkCost implements TravelTime {
 
 		private List<TimevariantTTStorage> linkcosts;
 

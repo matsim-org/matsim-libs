@@ -30,8 +30,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.TreeMultiMap;
 
 public class NetworkDijkstra implements LeastCostPathCalculator {
@@ -39,8 +39,8 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 //	private final static String ROLE_NAME = "NetworkDijkstra";
 
 	private final NetworkLayer network;
-	private final TravelCostI costFunction_;
-	private final TravelTimeI timeFunction_;
+	private final TravelCost costFunction_;
+	private final TravelTime timeFunction_;
 	private static int roleIndex_ = -1;
 
 	long totalResetVisitedTime = 0;
@@ -56,8 +56,8 @@ public class NetworkDijkstra implements LeastCostPathCalculator {
 	 */
 	final int exportedMarkedNodeSize = 1024;
 
-	public NetworkDijkstra(final NetworkLayer network, final TravelCostI costFunction,
-			final TravelTimeI timeFunction) {
+	public NetworkDijkstra(final NetworkLayer network, final TravelCost costFunction,
+			final TravelTime timeFunction) {
 		this.network = network;
 		this.costFunction_ = costFunction;
 		this.timeFunction_ = timeFunction;

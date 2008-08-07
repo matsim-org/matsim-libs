@@ -23,12 +23,12 @@ package playground.lnicolas.routing.costcalculators;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelMinCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelMinCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
-public class PeakTravTimeCalc implements TravelCostI, TravelTimeI, TravelMinCostI {
+public class PeakTravTimeCalc implements TravelCost, TravelTime, TravelMinCost {
 	private int[] travTimeDelta;
 	private double[] amplFactor;
 	private double[] travTimeFactor;

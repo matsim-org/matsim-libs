@@ -58,7 +58,7 @@ import org.matsim.utils.misc.ExeRunner;
  * @author dstrippgen
  * @author mrieser
  */
-public class ExternalModule implements StrategyModuleI {
+public class ExternalModule implements StrategyModule {
 
 	protected static final String ExternalInFileName = "plans.in.xml";
 	protected static final String ExternalOutFileName = "plans.out.xml";

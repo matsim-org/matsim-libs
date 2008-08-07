@@ -21,14 +21,14 @@
 package playground.gregor.multipath;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.vis.routervis.RouterNetStateWriter;
 
 public class CLogitRouter extends MultiPathRouter {
 
-	public CLogitRouter(NetworkLayer network, TravelCostI costFunction,
-			TravelTimeI timeFunction, RouterNetStateWriter writer) {
+	public CLogitRouter(NetworkLayer network, TravelCost costFunction,
+			TravelTime timeFunction, RouterNetStateWriter writer) {
 		super(network, costFunction, timeFunction, writer);
 	}
 

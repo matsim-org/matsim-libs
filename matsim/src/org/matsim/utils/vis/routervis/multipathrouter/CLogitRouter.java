@@ -21,14 +21,14 @@
 package org.matsim.utils.vis.routervis.multipathrouter;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.vis.routervis.RouterNetStateWriter;
 
 public class CLogitRouter extends MultiPathRouter {
 
-	public CLogitRouter(final NetworkLayer network, final TravelCostI costFunction,
-			final TravelTimeI timeFunction, final RouterNetStateWriter writer) {
+	public CLogitRouter(final NetworkLayer network, final TravelCost costFunction,
+			final TravelTime timeFunction, final RouterNetStateWriter writer) {
 		super(network, costFunction, timeFunction, writer);
 	}
 

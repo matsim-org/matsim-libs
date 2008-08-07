@@ -25,7 +25,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.replanning.selectors.PlanSelectorI;
+import org.matsim.replanning.selectors.PlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -198,7 +198,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		int counter = 0;
 
-		public StrategyCounter(final PlanSelectorI selector) {
+		public StrategyCounter(final PlanSelector selector) {
 			super(selector);
 		}
 
@@ -223,7 +223,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	static private class TestPlanSelector implements PlanSelectorI {
+	static private class TestPlanSelector implements PlanSelector {
 
 		public TestPlanSelector() {
 		}

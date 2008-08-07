@@ -35,7 +35,7 @@ public final class SimplexOptimization {
 
 	private static final double EPSILON = 0.1;
 
-	public static final ParamPoint getBestParams(final ObjectiveI objective) {
+	public static final ParamPoint getBestParams(final Objective objective) {
 		// prepare simplex algorithm
 		int dimension = objective.getNewParamPoint().getDimension();
 		ArrayList<ParamPoint> points = new ArrayList<ParamPoint>(dimension + 1);
@@ -141,9 +141,9 @@ public final class SimplexOptimization {
 	public static class ResponseComparator implements Comparator<ParamPoint>, Serializable {
 
 		private static final long serialVersionUID = 1L;
-		private final ObjectiveI objective;
+		private final Objective objective;
 
-		protected ResponseComparator(final ObjectiveI objective) {
+		protected ResponseComparator(final Objective objective) {
 			this.objective = objective;
 		}
 

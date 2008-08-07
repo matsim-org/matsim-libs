@@ -44,7 +44,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -99,7 +99,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 				double totaltravelcosts = 0;
 				double totaltraveltime = 0;
 				
-//				for (TravelTimeI traveltimes : ttKnowledge.getTravelTimes()) {
+//				for (TravelTime traveltimes : ttKnowledge.getTravelTimes()) {
 //					double traveltime = calcTravTime(traveltimes, route, leg.getDepTime());
 //					totaltraveltime += traveltime;
 //					double travelcosts = utilFunc.evaluate(traveltime);
@@ -182,7 +182,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 
 	}
 
-	private double calcTravTime(TravelTimeI traveltimes, Route route,
+	private double calcTravTime(TravelTime traveltimes, Route route,
 			double starttime) {
 		double totaltt = 0;
 		for (Link link : route.getLinkRoute()) {

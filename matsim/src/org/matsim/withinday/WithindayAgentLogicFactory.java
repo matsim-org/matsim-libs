@@ -30,7 +30,7 @@ import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.withinday.beliefs.AgentBeliefs;
 import org.matsim.withinday.beliefs.AgentBeliefsImpl;
-import org.matsim.withinday.contentment.AgentContentmentI;
+import org.matsim.withinday.contentment.AgentContentment;
 import org.matsim.withinday.contentment.PlanScore;
 import org.matsim.withinday.percepts.AgentPercepts;
 import org.matsim.withinday.percepts.NextLinkTravelTimePerception;
@@ -60,7 +60,7 @@ public class WithindayAgentLogicFactory {
 		return new HierarchicalRouteProvider(this.aStarRouteProvider);
 	}
 
-	public AgentContentmentI createAgentContentment(final WithindayAgent agent) {
+	public AgentContentment createAgentContentment(final WithindayAgent agent) {
 		return new PlanScore(agent, this.scoringConfig.getPerforming(), this.scoringConfig.getLateArrival());
 	}
 	

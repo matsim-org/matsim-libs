@@ -28,23 +28,23 @@ import java.util.List;
 
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.network.Link;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 
 /**
  * @author illenberger
  *
  */
-public class TTDecorator implements TravelTimeI {
+public class TTDecorator implements TravelTime {
 
-	private TravelTimeI meantts;
+	private TravelTime meantts;
 
 	private List<BasicLink> accidantLinks = new LinkedList<BasicLink>();
 
-//	public TTDecorator(TravelTimeI traveltimes) {
+//	public TTDecorator(TravelTime traveltimes) {
 //		this.meantts = traveltimes;
 //	}
 
-	public void setMeanTravelTimes(TravelTimeI meantts) {
+	public void setMeanTravelTimes(TravelTime meantts) {
 		this.meantts = meantts;
 	}
 

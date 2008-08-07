@@ -43,7 +43,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
-	protected PlanSelectorI getPlanSelector() {
+	protected PlanSelector getPlanSelector() {
 		return new ExpBetaPlanSelector();
 	}
 

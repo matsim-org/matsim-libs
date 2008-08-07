@@ -33,7 +33,7 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.optimization.BeanObjective;
 import org.matsim.utils.optimization.CassiniObjective;
 import org.matsim.utils.optimization.EllipseObjective;
-import org.matsim.utils.optimization.ObjectiveI;
+import org.matsim.utils.optimization.Objective;
 import org.matsim.utils.optimization.ParamPoint;
 import org.matsim.utils.optimization.SimplexOptimization;
 import org.matsim.utils.optimization.SuperEllipseObjective;
@@ -136,7 +136,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 
 			// initialize the objective function
 			
-			ObjectiveI objFunc = null;
+			Objective objFunc = null;
 			double theta_start = Double.MIN_VALUE;
 			double theta_end = Double.MAX_VALUE;
 
@@ -455,7 +455,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 		
 //		while(theta > -1*Math.PI/4.0)
 //		{
-//			ObjectiveI objFunc = new EllipseObjective(coords, cover, theta);
+//			Objective objFunc = new EllipseObjective(coords, cover, theta);
 
 //			ParamPoint p0 = objFunc.getNewParamPoint();
 //			p0.setValue(((EllipseObjective)objFunc).X_idx,cenX);
@@ -631,7 +631,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 //		
 //		while(theta >= -1*Math.PI/2.0)
 //		{
-//			ObjectiveI objFunc = new CassiniObjective(coords, cover, theta);
+//			Objective objFunc = new CassiniObjective(coords, cover, theta);
 //			
 //			// calc dist center_of_mass <--> farest location
 //			
@@ -807,7 +807,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 //	
 //	while(theta >=-Math.PI/4.0)
 //	{
-//		ObjectiveI objFunc = new SuperEllipseObjective(coords, cover, theta);
+//		Objective objFunc = new SuperEllipseObjective(coords, cover, theta);
 //
 //		ParamPoint p0 = objFunc.getNewParamPoint();
 //		p0.setValue(((SuperEllipseObjective)objFunc).X_idx,cenX);
@@ -997,7 +997,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 //	
 //	while(theta >=-Math.PI)
 //	{
-//		ObjectiveI objFunc = new BeanObjective(coords, cover, theta);
+//		Objective objFunc = new BeanObjective(coords, cover, theta);
 //
 //		ParamPoint p0 = objFunc.getNewParamPoint();
 //		p0.setValue(((BeanObjective)objFunc).X_idx,cenX);

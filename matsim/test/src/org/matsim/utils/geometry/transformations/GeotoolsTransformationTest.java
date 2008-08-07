@@ -23,7 +23,7 @@ package org.matsim.utils.geometry.transformations;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 
 /**
  * @author laemmel
@@ -44,7 +44,7 @@ public class GeotoolsTransformationTest extends MatsimTestCase {
 		
 		Coord coordWGS84UTM47S = new CoordImpl(x,y);
 		
-		CoordinateTransformationI transform = new GeotoolsTransformation(fromCRS,toCRS);
+		CoordinateTransformation transform = new GeotoolsTransformation(fromCRS,toCRS);
 		Coord coordWGS84 = transform.transform(coordWGS84UTM47S);
 		double xWGS84 = coordWGS84.getX();
 		double yWGS84 = coordWGS84.getY();

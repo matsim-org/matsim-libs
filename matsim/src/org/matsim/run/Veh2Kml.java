@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
@@ -48,7 +48,7 @@ public class Veh2Kml {
 	private double minY = Double.NEGATIVE_INFINITY;
 	private double maxX = Double.POSITIVE_INFINITY;
 	private double maxY = Double.POSITIVE_INFINITY;
-	private CoordinateTransformationI coordTransform = new IdentityTransformation();
+	private CoordinateTransformation coordTransform = new IdentityTransformation();
 	
 	private KmlSnapshotWriter writer = null;
 	

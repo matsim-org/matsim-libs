@@ -35,7 +35,7 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
 
 	@Override
-	protected PlanSelectorI getPlanSelector() {
+	protected PlanSelector getPlanSelector() {
 		return new RandomPlanSelector();
 	}
 

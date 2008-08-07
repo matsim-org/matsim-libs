@@ -46,7 +46,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
-	protected PlanSelectorI getPlanSelector() {
+	protected PlanSelector getPlanSelector() {
 		return new PathSizeLogitSelector();
 	}
 

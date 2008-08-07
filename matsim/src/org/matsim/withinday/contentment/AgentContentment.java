@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentContentmentI.java
+ * AgentContentment.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,28 +21,28 @@
 package org.matsim.withinday.contentment;
 
 /**
- * An instance of AgentContentmentI is an object that models the agent's
+ * An instance of AgentContentment is an object that models the agent's
  * contentment. The contentment is represented by scalar value between -1 and 1,
  * while -1 means the agent is displeased, 0 means the agent is indifferent and
  * 1 means the agent is content.
- * 
+ *
  * @author illenberger
- * 
+ *
  */
-public interface AgentContentmentI {
+public interface AgentContentment {
 
 	/**
 	 * Retruns a value that represents the agent's current contentment where
 	 * positive values denote the agent is pleased and negative values denote
 	 * the agent is displeased. Values should be in the range of -1 to 1.
-	 * 
+	 *
 	 * @return A value representing the agent's current contentment.
 	 */
 	public double getContentment();
 
 	/**
 	 * Tells the module that the agent performed a replan.
-	 * 
+	 *
 	 * @param modified
 	 *            <tt>true</tt> if the plan was modified upon replanning,
 	 *            <tt>false</tt> otherwise.

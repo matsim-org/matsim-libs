@@ -50,8 +50,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRouteDijkstra;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 
@@ -63,23 +63,23 @@ import playground.anhorni.locationchoice.planomatLocationChoice.costestimators.C
 public class PlanomatOptimizeLocations implements PlanAlgorithm {
 
 	private NetworkLayer network=null;
-	private TravelTimeI travelTimeCalculator = null;
-	private TravelCostI travelCostCalculator = null;
+	private TravelTime travelTimeCalculator = null;
+	private TravelCost travelCostCalculator = null;
 
 	private final TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
 	private final TreeMap<Id,Facility> leisure_facilities=new TreeMap<Id,Facility>();
 
 	public PlanomatOptimizeLocations(
 			final NetworkLayer network,
-			final TravelCostI travelCostCalculator,
-			final TravelTimeI travelTimeCalculator) {
+			final TravelCost travelCostCalculator,
+			final TravelTime travelTimeCalculator) {
 		super();
 		this.init(network, travelCostCalculator, travelTimeCalculator);
 
 	}
 
-	private void init(final NetworkLayer network, final TravelCostI travelCostCalculator,
-			final TravelTimeI travelTimeCalculator) {
+	private void init(final NetworkLayer network, final TravelCost travelCostCalculator,
+			final TravelTime travelTimeCalculator) {
 
 		this.network=network;
 		this.travelCostCalculator=travelCostCalculator;
@@ -138,8 +138,8 @@ public class PlanomatOptimizeLocations implements PlanAlgorithm {
 	 */
 	private Genotype initJGAP(final Plan plan,
 			final NetworkLayer network,
-			final TravelCostI travelCostCalculator,
-			final TravelTimeI travelTimeCalculator,
+			final TravelCost travelCostCalculator,
+			final TravelTime travelTimeCalculator,
 			final TreeMap<Id,Facility> shop_facilities) {
 
 		Genotype jgapGAPopulation = null;
@@ -298,8 +298,8 @@ public class PlanomatOptimizeLocations implements PlanAlgorithm {
 			final Plan plan,
 			final TreeMap<Id,Facility> shop_facilities,
 			final NetworkLayer network,
-			final TravelCostI travelCostCalculator,
-			final TravelTimeI travelTimeCalculator) {
+			final TravelCost travelCostCalculator,
+			final TravelTime travelTimeCalculator) {
 
 		// get now routes and times ----------------------------------------------
 		// change locations:

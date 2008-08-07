@@ -48,7 +48,7 @@ import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
-import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
+import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
 
 public class QueueSimulation {
@@ -65,7 +65,7 @@ public class QueueSimulation {
 	protected static Events events = null; // TODO [MR] instead of making this static and Links/Nodes using QueueSimulation.getEvents(), Gbl should hold a global events-object
 	protected  SimStateWriterI netStateWriter = null;
 
-	private final List<SnapshotWriterI> snapshotWriters = new ArrayList<SnapshotWriterI>();
+	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 
 	private Class<? extends Vehicle> vehiclePrototype = Vehicle.class;
 
@@ -263,7 +263,7 @@ public class QueueSimulation {
 		}
 		teleportationList.clear();
 
-		for (SnapshotWriterI writer : this.snapshotWriters) {
+		for (SnapshotWriter writer : this.snapshotWriters) {
 			writer.finish();
 		}
 
@@ -315,7 +315,7 @@ public class QueueSimulation {
 	private void doSnapshot(final double time) {
 		if (!this.snapshotWriters.isEmpty()) {
 			Collection<PositionInfo> positions = this.network.getVehiclePositions();
-			for (SnapshotWriterI writer : this.snapshotWriters) {
+			for (SnapshotWriter writer : this.snapshotWriters) {
 				writer.beginSnapshot(time);
 				for (PositionInfo position : positions) {
 					writer.addAgent(position);
@@ -370,11 +370,11 @@ public class QueueSimulation {
 		}
 	}
 
-	public boolean addSnapshotWriter(final SnapshotWriterI writer) {
+	public boolean addSnapshotWriter(final SnapshotWriter writer) {
 		return this.snapshotWriters.add(writer);
 	}
 
-	public boolean removeSnapshotWriter(final SnapshotWriterI writer) {
+	public boolean removeSnapshotWriter(final SnapshotWriter writer) {
 		return this.snapshotWriters.remove(writer);
 	}
 

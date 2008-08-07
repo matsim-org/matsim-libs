@@ -32,8 +32,8 @@ import org.matsim.router.AStarLandmarks;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
@@ -48,13 +48,13 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	private final Layer municipalities;
 
 	public PlansCalcRouteKti(final NetworkLayer network, final PreProcessLandmarks preProcessData,
-			final TravelCostI costCalculator, final TravelTimeI timeCalculator,
+			final TravelCost costCalculator, final TravelTime timeCalculator,
 			final Matrix ptTravelTimes, final SwissHaltestellen haltestellen, final Layer municipalities) {
 		this(network, preProcessData, costCalculator, timeCalculator, new FreespeedTravelTimeCost(), ptTravelTimes, haltestellen, municipalities);
 	}
 
 	private PlansCalcRouteKti(final NetworkLayer network, final PreProcessLandmarks preProcessData,
-			final TravelCostI costCalculator, final TravelTimeI timeCalculator,
+			final TravelCost costCalculator, final TravelTime timeCalculator,
 			final FreespeedTravelTimeCost timeCostCalc,
 			final Matrix ptTravelTimes, final SwissHaltestellen haltestellen, final Layer municipalities) {
 		super(new AStarLandmarks(network, preProcessData, costCalculator, timeCalculator),

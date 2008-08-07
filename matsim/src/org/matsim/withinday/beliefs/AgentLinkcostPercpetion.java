@@ -26,11 +26,11 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 import org.matsim.withinday.WithindayAgent;
 
-public class AgentLinkcostPercpetion implements TravelTimeI {
+public class AgentLinkcostPercpetion implements TravelTime {
 
 	private static final Logger log = Logger
 			.getLogger(AgentLinkcostPercpetion.class);
@@ -43,9 +43,9 @@ public class AgentLinkcostPercpetion implements TravelTimeI {
 
 	private WithindayAgent agent;
 
-	private TravelTimeI histProvider;
+	private TravelTime histProvider;
 
-	private TravelTimeI reactProvider;
+	private TravelTime reactProvider;
 
 	private double w_t;
 
@@ -54,11 +54,11 @@ public class AgentLinkcostPercpetion implements TravelTimeI {
 	private double phi_2 = this.random.nextGaussian();
 
 	public AgentLinkcostPercpetion(final WithindayAgent agent,
-			final TravelTimeI histProvider, final TravelTimeI reactProvider) {
+			final TravelTime histProvider, final TravelTime reactProvider) {
 		this.agent = agent;
 		if ((histProvider == null) || (reactProvider == null)) {
 			throw new IllegalArgumentException(
-					"The implementations of the TravelTimeI parameters must not be null");
+					"The implementations of the TravelTime parameters must not be null");
 		}
 		this.histProvider = histProvider;
 		this.reactProvider = reactProvider;

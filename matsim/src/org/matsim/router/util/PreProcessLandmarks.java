@@ -51,11 +51,11 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 
 	private static final Logger log = Logger.getLogger(PreProcessLandmarks.class);
 
-	public PreProcessLandmarks(final TravelMinCostI costFunction) {
+	public PreProcessLandmarks(final TravelMinCost costFunction) {
 		this(costFunction, new Rectangle2D.Double());
 	}
 
-	public PreProcessLandmarks(final TravelMinCostI costFunction, final int landmarkCount) {
+	public PreProcessLandmarks(final TravelMinCost costFunction, final int landmarkCount) {
 		this(costFunction, new Rectangle2D.Double(), landmarkCount);
 	}
 
@@ -67,7 +67,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * pass the travel zone to this constructor. Narrowing the zone where the landmarks should
 	 * be put normally improves the routing speed of {@link org.matsim.router.AStarLandmarks}.
 	 */
-	public PreProcessLandmarks(final TravelMinCostI costFunction,
+	public PreProcessLandmarks(final TravelMinCost costFunction,
 			final Rectangle2D.Double travelZone) {
 		this(costFunction, travelZone, 16);
 	}
@@ -81,7 +81,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * be put normally improves the routing speed of {@link org.matsim.router.AStarLandmarks}.
 	 * @param landmarkCount
 	 */
-	public PreProcessLandmarks(final TravelMinCostI costFunction, final Rectangle2D.Double travelZone, final int landmarkCount) {
+	public PreProcessLandmarks(final TravelMinCost costFunction, final Rectangle2D.Double travelZone, final int landmarkCount) {
 		super(costFunction);
 
 		this.travelZone = travelZone;

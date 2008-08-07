@@ -26,7 +26,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;
 import org.matsim.utils.vis.kml.KMZWriter;
@@ -53,7 +53,7 @@ public class KmlPlansWriter {
 
 	private Style networkNodeStyle;
 
-	public KmlPlansWriter(final NetworkLayer network, final CoordinateTransformationI coordTransform, KMZWriter writer,  Document doc) {
+	public KmlPlansWriter(final NetworkLayer network, final CoordinateTransformation coordTransform, KMZWriter writer,  Document doc) {
 		this.network = network;
 		this.styleFactory = new MatsimKmlStyleFactory(writer, doc);
 		this.featureFactory = new NetworkFeatureFactory(coordTransform);

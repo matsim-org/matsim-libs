@@ -117,7 +117,7 @@ import org.matsim.scoring.EventsToScore;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.misc.Time;
@@ -2002,11 +2002,11 @@ public class MyRuns {
 	// buildKML2
 	//////////////////////////////////////////////////////////////////////
 
-	private static Geometry getNetworkAsKml(final NetworkLayer network, final CoordinateTransformationI coordTransform) {
+	private static Geometry getNetworkAsKml(final NetworkLayer network, final CoordinateTransformation coordTransform) {
 		return getNetworkAsKml(network, new TreeMap<Id, Integer>(), coordTransform);
 	}
 
-	private static Geometry getNetworkAsKml(final NetworkLayer network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformationI coordTransform) {
+	private static Geometry getNetworkAsKml(final NetworkLayer network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformation coordTransform) {
 		final MultiGeometry networkGeom = new MultiGeometry();
 
 		for (Link link : network.getLinks().values()) {

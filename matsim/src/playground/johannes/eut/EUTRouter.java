@@ -30,7 +30,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 
 /**
  * @author illenberger
@@ -87,7 +87,7 @@ public class EUTRouter implements LeastCostPathCalculator {
 			double totaltravelcosts = 0;
 			double totalIndiffCosts = 0;
 			
-			for (TravelTimeI traveltimes : ttKnowledge.getTravelTimes()) {
+			for (TravelTime traveltimes : ttKnowledge.getTravelTimes()) {
 				double traveltime = calcTravTime(traveltimes, route, starttime);
 				double travelcosts = utilFunc.evaluate(traveltime);
 				totaltravelcosts += travelcosts;
@@ -116,7 +116,7 @@ public class EUTRouter implements LeastCostPathCalculator {
 		return bestRoute;
 	}
 
-	private double calcTravTime(TravelTimeI traveltimes, Route route,
+	private double calcTravTime(TravelTime traveltimes, Route route,
 			double starttime) {
 		double totaltt = 0;
 		for (Link link : route.getLinkRoute()) {

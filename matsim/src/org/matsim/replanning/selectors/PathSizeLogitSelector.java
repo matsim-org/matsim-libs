@@ -41,7 +41,7 @@ import org.matsim.population.Route;
  *
  * @author laemmel
   */
-public class PathSizeLogitSelector implements PlanSelectorI {
+public class PathSizeLogitSelector implements PlanSelector {
 
 	private final double beta;
 	private final double tau;

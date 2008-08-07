@@ -26,7 +26,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.Feature;
 import org.matsim.utils.vis.kml.Folder;
@@ -43,7 +43,7 @@ public class NetworkFeatureFactory {
 
 	private static final Logger log = Logger.getLogger(NetworkFeatureFactory.class);
 
-	private CoordinateTransformationI coordTransform;
+	private CoordinateTransformation coordTransform;
 	/**
 	 * constant for the link description
 	 */
@@ -93,7 +93,7 @@ public class NetworkFeatureFactory {
 	 */
 	public static final String ENDLI = "</li>";
 
-	public NetworkFeatureFactory(CoordinateTransformationI coordTransform) {
+	public NetworkFeatureFactory(CoordinateTransformation coordTransform) {
 		this.coordTransform = coordTransform;
 	}
 

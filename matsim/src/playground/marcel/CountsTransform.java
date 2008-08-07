@@ -11,11 +11,11 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
+import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
 
-public class CountsTransform implements TabularFileHandlerI{
+public class CountsTransform implements TabularFileHandler{
 
 	HashMap<Integer, CoordImpl> xYCoords = new HashMap<Integer, CoordImpl>();
 

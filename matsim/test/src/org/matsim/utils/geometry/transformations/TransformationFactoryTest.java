@@ -22,7 +22,7 @@ package org.matsim.utils.geometry.transformations;
 
 import org.apache.log4j.Logger;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 
 public class TransformationFactoryTest extends MatsimTestCase {
 
@@ -33,7 +33,7 @@ public class TransformationFactoryTest extends MatsimTestCase {
 	 * be instantiated.
 	 */
 	public final void testKnownCustomTransformation() {
-		CoordinateTransformationI transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.GK4, TransformationFactory.WGS84);
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.GK4, TransformationFactory.WGS84);
 		assertNotNull(transformation);
 		assertTrue(transformation instanceof GK4toWGS84);
 	}
@@ -42,7 +42,7 @@ public class TransformationFactoryTest extends MatsimTestCase {
 	 * Test if GeoTools handles the requested coordinate transformation.
 	 */
 	public final void testKnownGeotoolsTransformation() {
-		CoordinateTransformationI transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84);
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84);
 		assertNotNull(transformation);
 		assertTrue(transformation instanceof GeotoolsTransformation);
 	}
@@ -54,10 +54,10 @@ public class TransformationFactoryTest extends MatsimTestCase {
 	public final void testUnknownWellTransformation() {
 		final String wgs84utm35s = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
 		final String wgs84 = "GEOGCS[\"WGS84\", DATUM[\"WGS84\", SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], PRIMEM[\"Greenwich\", 0.0], UNIT[\"degree\",0.017453292519943295], AXIS[\"Longitude\",EAST], AXIS[\"Latitude\",NORTH]]";
-		CoordinateTransformationI transformation1 = TransformationFactory.getCoordinateTransformation(wgs84utm35s, TransformationFactory.WGS84);
+		CoordinateTransformation transformation1 = TransformationFactory.getCoordinateTransformation(wgs84utm35s, TransformationFactory.WGS84);
 		assertNotNull(transformation1);
 		assertTrue(transformation1 instanceof GeotoolsTransformation);
-		CoordinateTransformationI transformation2 = TransformationFactory.getCoordinateTransformation(wgs84utm35s, wgs84);
+		CoordinateTransformation transformation2 = TransformationFactory.getCoordinateTransformation(wgs84utm35s, wgs84);
 		assertNotNull(transformation2);
 		assertTrue(transformation2 instanceof GeotoolsTransformation);
 	}

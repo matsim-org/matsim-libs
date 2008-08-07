@@ -36,7 +36,7 @@ import org.matsim.network.Link;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.BestPlanSelector;
-import org.matsim.replanning.selectors.PlanSelectorI;
+import org.matsim.replanning.selectors.PlanSelector;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
@@ -107,7 +107,7 @@ public class EUTController extends WithindayControler {
 		 */
 		StrategyManager manager = new StrategyManager();
 		manager.setMaxPlansPerAgent(1);
-		PlanSelectorI selector = new BestPlanSelector();
+		PlanSelector selector = new BestPlanSelector();
 		/*
 		 * Add one EUTRouter and one empty module.
 		 */

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanSelectorI.java
+ * TabularFileHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,24 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.replanning.selectors;
-
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
+package org.matsim.utils.io.tabularFileParser;
 
 /**
- * select a plan of a person
+ * An implementation of this interface is expected by the
+ * <code>TabularFileParser</code> for row-by-row handling of parsed files.
  *
- * @author mrieser
+ * @author gunnar
+ *
  */
-public interface PlanSelectorI {
+public interface TabularFileHandler {
 
-	/**
-	 * Select and return a plan of a person.
-	 *
-	 * @param person
-	 * @return selected plan, or null if the person has no plans.
-	 */
-	public Plan selectPlan(Person person);
+    /**
+     * Is called by the <code>TabularFileParser</code> whenever a row has been
+     * parsed
+     *
+     * @param row
+     *            a <code>String[]</code> representation of the parsed row's
+     *            columns
+     */
+    public void startRow(String[] row);
 
 }

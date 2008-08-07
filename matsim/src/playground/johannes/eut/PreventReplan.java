@@ -23,16 +23,16 @@
  */
 package playground.johannes.eut;
 
-import org.matsim.withinday.contentment.AgentContentmentI;
+import org.matsim.withinday.contentment.AgentContentment;
 
 /**
  * @author illenberger
  *
  */
-public class PreventReplan implements AgentContentmentI {
+public class PreventReplan implements AgentContentment {
 
 	/* (non-Javadoc)
-	 * @see org.matsim.withinday.contentment.AgentContentmentI#didReplan(boolean)
+	 * @see org.matsim.withinday.contentment.AgentContentment#didReplan(boolean)
 	 */
 	public void didReplan(boolean modified) {
 		// TODO Auto-generated method stub
@@ -40,7 +40,7 @@ public class PreventReplan implements AgentContentmentI {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.matsim.withinday.contentment.AgentContentmentI#getContentment()
+	 * @see org.matsim.withinday.contentment.AgentContentment#getContentment()
 	 */
 	public double getContentment() {
 		return 1;

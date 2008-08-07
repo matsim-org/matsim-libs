@@ -29,8 +29,8 @@ import java.util.LinkedList;
 
 // matsim imports
 import org.matsim.network.*;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 //import org.matsim.utils.identifiers.IdI;
 import org.matsim.basic.v01.Id;
 
@@ -82,8 +82,8 @@ public class MoreMultiSourceEAF {
 		if (source == null || sink == null) {
 			System.out.println("nicht da");
 		} else {
-			TravelCostI travelcost = new FakeTravelTimeCost();
-			TravelTimeI traveltime = (TravelTimeI) travelcost;
+			TravelCost travelcost = new FakeTravelTimeCost();
+			TravelTime traveltime = (TravelTime) travelcost;
 
 			MooreBellmanFordMoreDynamic routingAlgo = new MooreBellmanFordMoreDynamic(network, travelcost, traveltime, flow, timeHorizon);
 			routeLinks = routingAlgo.calcLeastCostLinkRoute(source, sink, 0.0);

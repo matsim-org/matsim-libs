@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelMinCostI.java
+ * TravelCost.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,15 +22,21 @@ package org.matsim.router.util;
 
 import org.matsim.network.Link;
 
+
 /**
- * @author lnicolas
+ * A simple interface to retrieve the generalized costs to travel on links.
  *
+ * @author mrieser
  */
-public interface TravelMinCostI extends TravelCostI {
+public interface TravelCost {
 
 	/**
-	 * @param link the link for which the minimal travel cost over all time slots is calculated
-	 * @return Minimal costs to travel over the link <pre>link</pre>, departing at time <pre>time</pre>
+	 * Returns the generalized cost to travel on the specified link at the specified time.
+	 *
+	 * @param link The link for which the travel cost is calculated.
+	 * @param time The departure time (in seconds since 00:00) at the beginning of the link for which the cost is calculated.
+	 * @return The costs to travel over the link <code>link</code>, departing at time <code>time</code>.
 	 */
-	public double getLinkMinimumTravelCost(Link link);
+	public double getLinkTravelCost(Link link, double time);
+
 }

@@ -39,7 +39,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
@@ -274,7 +274,7 @@ public class TollSchemeGenerator {
 		String[] coords3d = this.usedGoogleEarthCoords.split(" ");
 		String[] singleCoords;
 		double x, y;
-		CoordinateTransformationI transform = TransformationFactory
+		CoordinateTransformation transform = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84, config
 						.global().getCoordinateSystem());
 		Coord c, coord;
@@ -317,7 +317,7 @@ public class TollSchemeGenerator {
 			MatsimKMLLogo logo = new MatsimKMLLogo(writer);
 			mainFolder.addFeature(logo);
 			//create coordinate transformation for wgs84
-			CoordinateTransformationI transform = TransformationFactory
+			CoordinateTransformation transform = TransformationFactory
 					.getCoordinateTransformation(this.config.global()
 							.getCoordinateSystem(), TransformationFactory.WGS84);
 			//write the network

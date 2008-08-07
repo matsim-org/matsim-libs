@@ -26,15 +26,15 @@ package playground.johannes.eut;
 import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
 /**
  * @author illenberger
  *
  */
-public class TimevariantTTStorage extends TimevariantValueStorage implements TravelTimeI, TravelCostI {
+public class TimevariantTTStorage extends TimevariantValueStorage implements TravelTime, TravelCost {
 
 	private static final Logger logger = Logger.getLogger(TimevariantTTStorage.class);
 

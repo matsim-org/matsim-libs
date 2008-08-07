@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeI.java
+ * PlanSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,26 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.router.util;
+package org.matsim.replanning.selectors;
 
-import org.matsim.network.Link;
-
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 
 /**
- * A simple interface to retrieve the travel time on links.
+ * select a plan of a person
  *
  * @author mrieser
  */
-public interface TravelTimeI {
+public interface PlanSelector {
 
 	/**
-	 * Returns the travel time for the specified link at the specified time.
+	 * Select and return a plan of a person.
 	 *
-	 * @param link The link for which the travel time is calculated.
-	 * @param time The departure time (in seconds since 00:00) at the beginning
-	 * 		of the link for which the travel time is calculated.
-	 * @return The time (in seconds) needed to travel over the link
-	 * 		<code>link</code>, departing at time <code>time</code>.
+	 * @param person
+	 * @return selected plan, or null if the person has no plans.
 	 */
-	public double getLinkTravelTime(Link link, double time);
+	public Plan selectPlan(Person person);
+
 }

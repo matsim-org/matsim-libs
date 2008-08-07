@@ -26,7 +26,7 @@ import org.matsim.utils.geometry.Coord;
 
 /**
  * A helper class to store information about agents (id, position, speed), mainly used to create
- * {@link SnapshotWriterI snapshots}.
+ * {@link SnapshotWriter snapshots}.
  *
  * @author mrieser
  */

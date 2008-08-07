@@ -28,7 +28,7 @@ import org.matsim.population.Plan;
  *
  * @author mrieser
  */
-public class RandomPlanSelector implements PlanSelectorI {
+public class RandomPlanSelector implements PlanSelector {
 
 	/**
 	 * Choose a random plan from the person and return it.

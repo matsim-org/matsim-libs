@@ -22,7 +22,7 @@ package org.matsim.utils.geometry.transformations;
 
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 
 /**
  * Transforms coordinates from a synthetic coordinate system to WGS84. The 
@@ -34,7 +34,7 @@ import org.matsim.utils.geometry.CoordinateTransformationI;
  * 
  * @see <a href="http://en.wikipedia.org/wiki/Atlantis">Atlantis</a>
  */
-public class AtlantisToWGS84 implements CoordinateTransformationI {
+public class AtlantisToWGS84 implements CoordinateTransformation {
 
 	public Coord transform(Coord coord) {
 		double latitude = coord.getY() / 10000.0 + 10.0;

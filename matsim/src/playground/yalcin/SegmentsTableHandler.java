@@ -27,12 +27,12 @@ import java.util.Collection;
 
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
+import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 
 import playground.marcel.visum.VisumNetwork;
 import playground.marcel.visum.VisumNetwork.Stop;
 
-public class SegmentsTableHandler implements TabularFileHandlerI {
+public class SegmentsTableHandler implements TabularFileHandler {
 
 	private static final String TAB = "\t";
 

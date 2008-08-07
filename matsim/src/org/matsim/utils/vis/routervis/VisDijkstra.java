@@ -32,8 +32,8 @@ import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 /**
  * @author laemmel
@@ -48,7 +48,7 @@ public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, Vi
 	private int explCounter;
 	private int dumpCounter;
 
-	public VisDijkstra(final NetworkLayer network, final TravelCostI costFunction, final TravelTimeI timeFunction, final RouterNetStateWriter writer) {
+	public VisDijkstra(final NetworkLayer network, final TravelCost costFunction, final TravelTime timeFunction, final RouterNetStateWriter writer) {
 		super(network, costFunction, timeFunction);
 		this.writer = writer;
 		this.explCounter = 0;

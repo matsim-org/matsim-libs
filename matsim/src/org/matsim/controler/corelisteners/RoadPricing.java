@@ -78,7 +78,7 @@ public class RoadPricing implements StartupListener, IterationEndsListener {
 		log.debug("Loaded RoadPricingScoringFunctionFactory and set in controler");
 		// replace the travelCostCalculator with a toll-dependent one if required
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
-			// area-toll requires a regular TravelCostI, no toll-specific one.
+			// area-toll requires a regular TravelCost, no toll-specific one.
 			controler.setTravelCostCalculator(new TollTravelCostCalculator(controler.getTravelCostCalculator(), this.scheme));
 		}
 

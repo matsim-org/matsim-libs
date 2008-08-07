@@ -28,7 +28,7 @@ import org.matsim.population.Plan;
  *
  * @author mrieser
  */
-public class BestPlanSelector implements PlanSelectorI {
+public class BestPlanSelector implements PlanSelector {
 
 	/**
 	 * selects the plan with the highest score from the person

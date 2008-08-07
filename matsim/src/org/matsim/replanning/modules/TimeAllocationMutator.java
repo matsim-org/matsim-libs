@@ -27,7 +27,7 @@ import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
 /**
  * Wraps the {@link org.matsim.population.algorithms.PlanMutateTimeAllocation}-
- * PlanAlgorithm into a {@link StrategyModuleI} so it can be used for plans
+ * PlanAlgorithm into a {@link StrategyModule} so it can be used for plans
  * replanning. Supports multiple threads.
  *
  * @author mrieser

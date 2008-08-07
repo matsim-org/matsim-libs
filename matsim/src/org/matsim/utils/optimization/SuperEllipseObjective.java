@@ -49,7 +49,7 @@ import org.matsim.utils.geometry.Coord;
  * cover-percentage. The superellipse will be enlarged until it contains at
  * least the specified percentage of all points.
  */
-public class SuperEllipseObjective implements ObjectiveI {
+public class SuperEllipseObjective implements Objective {
 
 	//////////////////////////////////////////////////////////////////////
 	// member constants

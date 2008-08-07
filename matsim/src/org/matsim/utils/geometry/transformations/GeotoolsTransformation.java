@@ -26,7 +26,7 @@ import java.util.Map;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Point;
  *
  * @author laemmel
  */
-public class GeotoolsTransformation implements CoordinateTransformationI {
+public class GeotoolsTransformation implements CoordinateTransformation {
 
 	private MathTransform transform;
 

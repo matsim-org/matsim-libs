@@ -31,7 +31,7 @@ import org.matsim.replanning.modules.PlanomatExe;
 import org.matsim.replanning.modules.PlanomatOptimizeTimes;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
-import org.matsim.replanning.modules.StrategyModuleI;
+import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.modules.TimeAllocationMutator;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.ExpBetaPlanSelector;
@@ -39,8 +39,8 @@ import org.matsim.replanning.selectors.KeepSelected;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 /**
  * @deprecated the planomat-stuff is now integrated into the regular StrategyManagerConfigLoader
@@ -52,8 +52,8 @@ public class PlanomatStrategyManagerConfigLoader {
 			final Config config,
 			final StrategyManager manager,
 			final NetworkLayer network,
-			final TravelCostI travelCostCalc,
-			final TravelTimeI travelTimeCalc,
+			final TravelCost travelCostCalc,
+			final TravelTime travelTimeCalc,
 			final LegTravelTimeEstimator legTravelTimeEstimator) {
 
 		String maxvalue = Gbl.getConfig().findParam("strategy", "maxAgentPlanMemorySize");
@@ -116,7 +116,7 @@ public class PlanomatStrategyManagerConfigLoader {
 				strategy.addStrategyModule(new PlanomatExe(exePath));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
 
 				int controlerFirstIteration = Gbl.getConfig().controler().getFirstIteration();
@@ -131,7 +131,7 @@ public class PlanomatStrategyManagerConfigLoader {
 
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
 
 				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());

@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
@@ -49,7 +49,7 @@ import org.matsim.utils.vis.kml.TimeStamp;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
 
-public class KmlSnapshotWriter implements SnapshotWriterI {
+public class KmlSnapshotWriter implements SnapshotWriter {
 
 	private KML mainKml = null;
 	private Document mainDoc = null;
@@ -64,7 +64,7 @@ public class KmlSnapshotWriter implements SnapshotWriterI {
 
 	private KMZWriter writer = null;
 
-	private CoordinateTransformationI coordTransform = null;
+	private CoordinateTransformation coordTransform = null;
 
 	private final TreeMap<Double, NetworkLink> timeLinks = new TreeMap<Double, NetworkLink>();
 
@@ -72,7 +72,7 @@ public class KmlSnapshotWriter implements SnapshotWriterI {
 	
 	private final static Logger log = Logger.getLogger(KmlSnapshotWriter.class);
 
-	public KmlSnapshotWriter(final String filename, final CoordinateTransformationI coordTransform) {
+	public KmlSnapshotWriter(final String filename, final CoordinateTransformation coordTransform) {
 		this.coordTransform = coordTransform;
 		//the kmz writer
 		this.writer = new KMZWriter(filename, KMLWriter.DEFAULT_XMLNS);

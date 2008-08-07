@@ -28,8 +28,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
@@ -42,7 +42,7 @@ public class ReactRouteGuidance implements RouteProvider {
 
 	private RoutableLinkCost linkcost;
 
-	public ReactRouteGuidance(NetworkLayer network, TravelTimeI traveltimes) {
+	public ReactRouteGuidance(NetworkLayer network, TravelTime traveltimes) {
 		this.linkcost = new RoutableLinkCost();
 		this.linkcost.traveltimes = traveltimes;
 		this.algorithm = new Dijkstra(network, this.linkcost, this.linkcost);
@@ -66,9 +66,9 @@ public class ReactRouteGuidance implements RouteProvider {
 
 	}
 
-	private class RoutableLinkCost implements TravelTimeI, TravelCostI {
+	private class RoutableLinkCost implements TravelTime, TravelCost {
 
-		private TravelTimeI traveltimes;
+		private TravelTime traveltimes;
 
 		public double getLinkTravelTime(Link link, double time) {
 			return this.traveltimes.getLinkTravelTime(link, time);

@@ -35,8 +35,8 @@ import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 /**
  * Implementation of <a
@@ -57,7 +57,7 @@ import org.matsim.router.util.TravelTimeI;
  * <p>
  * <code>PreProcessDijkstra preProcessData = new PreProcessDijkstra();<br>
  * preProcessData.run(network);<br>
- * TravelCostI costFunction = ...<br>
+ * TravelCost costFunction = ...<br>
  * LeastCostPathCalculator routingAlgo = new Dijkstra(network, costFunction, preProcessData);<br>
  * routingAlgo.calcLeastCostPath(fromNode, toNode, startTime);</code>
  * </p>
@@ -87,12 +87,12 @@ public class Dijkstra implements LeastCostPathCalculator {
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
-	final TravelCostI costFunction;
+	final TravelCost costFunction;
 
 	/**
 	 * The travel time calculator. Provides the travel time for each link and time step.
 	 */
-	final TravelTimeI timeFunction;
+	final TravelTime timeFunction;
 
 	final private HashMap<Id, DijkstraNodeData> nodeData;
 
@@ -154,7 +154,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param timeFunction
 	 *            Determines the travel time on links.
 	 */
-	public Dijkstra(final NetworkLayer network, final TravelCostI costFunction, final TravelTimeI timeFunction) {
+	public Dijkstra(final NetworkLayer network, final TravelCost costFunction, final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
 	}
 
@@ -170,7 +170,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param preProcessData
 	 *            The pre processing data used during the routing phase.
 	 */
-	public Dijkstra(final NetworkLayer network, final TravelCostI costFunction, final TravelTimeI timeFunction,
+	public Dijkstra(final NetworkLayer network, final TravelCost costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
 
 		this.network = network;

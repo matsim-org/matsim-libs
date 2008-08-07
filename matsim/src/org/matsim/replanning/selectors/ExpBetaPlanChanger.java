@@ -30,7 +30,7 @@ import org.matsim.population.Plan;
  *
  * @author kn based on mrieser
  */
-public class ExpBetaPlanChanger implements PlanSelectorI {
+public class ExpBetaPlanChanger implements PlanSelector {
 
 	private final double beta;
 	static boolean betaFlag = true ;

@@ -29,8 +29,8 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.router.util.PreProcessEuclidean;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 /**
  * Implements the <a href="http://en.wikipedia.org/wiki/A%2A">A* router algorithm</a>
@@ -51,13 +51,13 @@ import org.matsim.router.util.TravelTimeI;
  * <li>The length stored in the links must be greater or equal to the euclidean distance of the
  * link's start and end node, otherwise the algorithm is not guaranteed to deliver least-cost paths.
  * In this case PreProcessEuclidean gives out a warning message.</li>
- * <li>The CostCalculator which calculates the cost for each link must implement the TravelMinCostI
+ * <li>The CostCalculator which calculates the cost for each link must implement the TravelMinCost
  * interface, i.e. it must implement the function getLinkMinimumTravelCost(Link link).
  * The TravelTimeCalculator class does implement it.</li></p>
  * <p><code> PreProcessEuclidean.run() </code>is very fast and needs (almost) no additional
  * memory.<code><br />
  * </code> Code Example:<code><br />
- * TravelMinCostI costFunction = ...<br />
+ * TravelMinCost costFunction = ...<br />
  * PreProcessEuclidean preProcessData = new PreProcessEuclidean(costFunction);<br />
  * preProcessData.run(network);<br />...<br />
  * LeastCostPathCalculator routingAlgo = new AStarEuclidean(network, preProcessData);<br />
@@ -89,7 +89,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param timeFunction
 	 */
 	public AStarEuclidean(NetworkLayer network, PreProcessEuclidean preProcessData,
-			TravelTimeI timeFunction) {
+			TravelTime timeFunction) {
 		this(network, preProcessData, timeFunction, 1);
 	}
 
@@ -104,7 +104,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * least-cost paths. Rather it tends to return distance-minimal paths.
 	 */
 	public AStarEuclidean(NetworkLayer network, PreProcessEuclidean preProcessData,
-			TravelTimeI timeFunction, double overdoFactor) {
+			TravelTime timeFunction, double overdoFactor) {
 		this(network, preProcessData, preProcessData.getCostFunction(),
 				timeFunction, overdoFactor);
 
@@ -123,7 +123,7 @@ public class AStarEuclidean extends Dijkstra {
 	 */
 	public AStarEuclidean(NetworkLayer network,
 			PreProcessEuclidean preProcessData,
-			TravelCostI costFunction, TravelTimeI timeFunction, double overdoFactor) {
+			TravelCost costFunction, TravelTime timeFunction, double overdoFactor) {
 		super(network, costFunction, timeFunction, preProcessData);
 
 		setMinTravelCostPerLength(preProcessData.getMinTravelCostPerLength());

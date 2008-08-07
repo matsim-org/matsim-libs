@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StrategyModuleI.java
+ * TravelMinCost.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,44 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.replanning.modules;
+package org.matsim.router.util;
 
-import org.matsim.population.Plan;
+import org.matsim.network.Link;
 
 /**
- * A module which modifies a single plan.
- * 
- * @author mrieser
+ * @author lnicolas
+ *
  */
-public interface StrategyModuleI {
+public interface TravelMinCost extends TravelCost {
 
 	/**
-	 * Initializes this module before handling plans. Modules using an external
-	 * routine could e.g. open a file here to write the plans out and pass them to
-	 * the external routines. Multi-threaded modules could initialize and start
-	 * their threads in this method.
+	 * @param link the link for which the minimal travel cost over all time slots is calculated
+	 * @return Minimal costs to travel over the link <pre>link</pre>, departing at time <pre>time</pre>
 	 */
-	public void init();
-	
-	/**
-	 * Tells this module to handle the specified plan. It is not required that
-	 * the plan must immediately be handled, e.g. modules calling external 
-	 * routines could just collect the plans here and start the external routine
-	 * in {@link #finish()}, or multi-threaded modules could just add the
-	 * plan to a synchronized queue for the threads.
-	 *
-	 * @param plan
-	 * @see #finish()
-	 */
-	public void handlePlan(Plan plan);
-	
-	/**
-	 * Indicates that no additional plans will be handed to this module and waits
-	 * until this module has finished handling all plans. Modules calling external
-	 * routines can call those here, or multi-threaded modules can wait here until
-	 * all threads are finished with their work.
-	 * 
-	 * @see #handlePlan(Plan)
-	 */
-	public void finish();
+	public double getLinkMinimumTravelCost(Link link);
 }

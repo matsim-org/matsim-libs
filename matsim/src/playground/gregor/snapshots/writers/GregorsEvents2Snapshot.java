@@ -40,7 +40,7 @@ import org.matsim.utils.misc.ArgumentParser;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
-import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
+import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
 
 
@@ -59,7 +59,7 @@ public class GregorsEvents2Snapshot {
 	private String configfile = null;
 	private String dtdfile = null;
 	private String eventsfile;
-	private SnapshotWriterI writer = null;
+	private SnapshotWriter writer = null;
 
 	/**
 	 * Parses all arguments and sets the corresponding members.
@@ -221,7 +221,7 @@ public class GregorsEvents2Snapshot {
 		return fa;
 	}
 
-	public void addExternalSnapshotWriter(final SnapshotWriterI writer) {
+	public void addExternalSnapshotWriter(final SnapshotWriter writer) {
 		this.writer = writer;
 	}
 

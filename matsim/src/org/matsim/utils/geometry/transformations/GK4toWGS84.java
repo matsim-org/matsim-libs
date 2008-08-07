@@ -22,7 +22,7 @@ package org.matsim.utils.geometry.transformations;
 
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 
 /**
  * Transforms coordinates from Gauss Krueger 4 to WGS84
@@ -33,7 +33,7 @@ import org.matsim.utils.geometry.CoordinateTransformationI;
  * @see <a href="http://remotesensing.org/geotiff/proj_list/transverse_mercator.html">remotesensing.org, transverse mercator</a>
  * @see <a href="www.epsg.org/guides/docs/G7-2.pdf">OGP Surveying and Positioning Guidance Note number 7, part 2</a>
  */
-public class GK4toWGS84 implements CoordinateTransformationI {
+public class GK4toWGS84 implements CoordinateTransformation {
 
 	/*
 	 * GK4 is a specially parameterized version of the Transverse Mercator coordinate system.

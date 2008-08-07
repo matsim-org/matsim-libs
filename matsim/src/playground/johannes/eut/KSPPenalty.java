@@ -16,8 +16,8 @@ import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 /**
  * @author illenberger
@@ -143,7 +143,7 @@ public class KSPPenalty {
 	 *         identified. The first path in the list is always the best path!
 	 */
 	public List<Route> getPaths(Node departure, Node destination, double time,
-			int count, TravelTimeI travelTimes) {
+			int count, TravelTime travelTimes) {
 		/*
 		 * (1) Set the plain linkcost object and set the extended linkcost
 		 * object for the bestpath algo.
@@ -261,9 +261,9 @@ public class KSPPenalty {
 	 * Dummy class that for the best path algo. Applies the impedance to certain
 	 * links.
 	 */
-	private class PenaltyLinkcost implements TravelTimeI, TravelCostI {
+	private class PenaltyLinkcost implements TravelTime, TravelCost {
 
-		private TravelTimeI linkcost;
+		private TravelTime linkcost;
 
 		public double getLinkTravelTime(Link link, double time) {
 			Double impedance = KSPPenalty.this.linkPenalties.get(link);

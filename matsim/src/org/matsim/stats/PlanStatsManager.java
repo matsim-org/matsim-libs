@@ -31,7 +31,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.stats.algorithms.BasicPlanStats;
 import org.matsim.stats.algorithms.PlanScoreTrajectory;
-import org.matsim.stats.algorithms.PlanStatsI;
+import org.matsim.stats.algorithms.PlanStats;
 import org.matsim.writer.MatsimWriter;
 
 /**
@@ -46,10 +46,10 @@ public class PlanStatsManager  {
 	public int minIteration;
 	public int maxIteration;
 	private final int iters;
-	private HashMap<Id, ArrayList<PlanStatsI>> stats = null;
+	private HashMap<Id, ArrayList<PlanStats>> stats = null;
 
 	public PlanStatsManager(){
-		this.stats = new HashMap<Id, ArrayList<PlanStatsI>>();
+		this.stats = new HashMap<Id, ArrayList<PlanStats>>();
 		this.minIteration = Gbl.getConfig().controler().getFirstIteration();
 		this.maxIteration = Gbl.getConfig().controler().getLastIteration();
 		this.iters = 1 + this.maxIteration - this.minIteration;
@@ -79,7 +79,7 @@ public class PlanStatsManager  {
 
 	public void print(final Person person) {
 		Id persId = person.getId();
-		for (PlanStatsI plan : this.stats.get(persId)){
+		for (PlanStats plan : this.stats.get(persId)){
 			System.out.print("stats " + persId);
 			plan.print();
 			System.out.println();
@@ -92,7 +92,7 @@ public class PlanStatsManager  {
 		wrt.openFile(Gbl.getConfig().getParam(STATS_MODULE, STATS_FILE));
 		for (Person pers : population.getPersons().values()) {
 			Id persId = pers.getId();
-			for (PlanStatsI plan : this.stats.get(persId)){
+			for (PlanStats plan : this.stats.get(persId)){
 				String str = persId + plan.printStr() + "\n";
 				wrt.write(str);
 			}
@@ -104,9 +104,9 @@ public class PlanStatsManager  {
 		plan.firstPlanStatsAlgorithm = new BasicPlanStats(new PlanScoreTrajectory(this.iters, this.minIteration));
 		Id persId = plan.getPerson().getId();
 
-		ArrayList<PlanStatsI> plans  = this.stats.get(persId);
+		ArrayList<PlanStats> plans  = this.stats.get(persId);
 		if (this.stats.get(persId) == null){
-			plans = new ArrayList<PlanStatsI>();
+			plans = new ArrayList<PlanStats>();
 			this.stats.put(persId,plans);
 		}
 		plans.add(plan.firstPlanStatsAlgorithm);

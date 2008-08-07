@@ -34,8 +34,8 @@ import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
 import org.matsim.router.util.PreProcessEuclidean;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelMinCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelMinCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.world.World;
@@ -51,7 +51,7 @@ public class RoutingTest extends MatsimTestCase {
 
 	private interface RouterProvider {
 		public String getName();
-		public LeastCostPathCalculator getRouter(NetworkLayer network, TravelMinCostI costCalc, TravelTimeI timeCalc);
+		public LeastCostPathCalculator getRouter(NetworkLayer network, TravelMinCost costCalc, TravelTime timeCalc);
 	}
 
 	public void testDijkstra() {
@@ -59,7 +59,7 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "Dijkstra";
 			}
-			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCostI costCalc, final TravelTimeI timeCalc) {
+			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				return new Dijkstra(network, costCalc, timeCalc, null);
 			}
 		});
@@ -70,7 +70,7 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "DijkstraPruneDeadends";
 			}
-			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCostI costCalc, final TravelTimeI timeCalc) {
+			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 				long now = System.currentTimeMillis();
 				preProcessData.run(network);
@@ -85,7 +85,7 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "AStarEuclidean";
 			}
-			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCostI costCalc, final TravelTimeI timeCalc) {
+			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessEuclidean preProcessData = new PreProcessEuclidean(costCalc);
 				long now = System.currentTimeMillis();
 				preProcessData.run(network);
@@ -100,7 +100,7 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "AStarLandmarks";
 			}
-			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCostI costCalc, final TravelTimeI timeCalc) {
+			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessLandmarks preProcessData = new PreProcessLandmarks(costCalc);
 				long now = System.currentTimeMillis();
 				preProcessData.run(network);

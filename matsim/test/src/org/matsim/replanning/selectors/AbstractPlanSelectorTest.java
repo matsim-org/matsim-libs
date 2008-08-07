@@ -26,7 +26,7 @@ import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
- * An abstract TestCase to test basic requirements every implementation of {@link PlanSelectorI}
+ * An abstract TestCase to test basic requirements every implementation of {@link PlanSelector}
  * should fulfull. Every inherited class must override the method <code>getPlanSelector()</code>
  * to provide instances of the specific PlanSelector implementations to test and can define
  * additional tests to ensure the intended behavior of the specific PlanSelector.
@@ -47,7 +47,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 */
 	public void testUndefinedScore() {
 		Person person;
-		PlanSelectorI selector = getPlanSelector();
+		PlanSelector selector = getPlanSelector();
 		Plan plan;
 		
 		// test 1: exactly one plan, with undefined score
@@ -82,7 +82,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	/**
 	 * Test how a plan selector reacts when a person has no plans at all. The correct behavior would be
 	 * to just return null, as stated in
-	 * {@link PlanSelectorI#selectPlan(org.matsim.population.Person) PlanSelectorI.selectPlan(Person)}
+	 * {@link PlanSelector#selectPlan(org.matsim.population.Person) PlanSelector.selectPlan(Person)}
 	 *
 	 * @author mrieser
 	 */
@@ -98,7 +98,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testNegativeScore() {
-		PlanSelectorI selector = getPlanSelector();
+		PlanSelector selector = getPlanSelector();
 		Plan plan;
 		// test with only one plan...
 		Person person = new Person(new IdImpl(1));
@@ -136,7 +136,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * This test only ensures that a plan is returned and no Exception occurred when selecting a plan.
 	 */
 	public void testZeroScore() {
-		PlanSelectorI selector = getPlanSelector();
+		PlanSelector selector = getPlanSelector();
 		Plan plan;
 		Person person = new Person(new IdImpl(1));
 		plan = person.createPlan(false);
@@ -145,7 +145,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	}
 
 	/**
-	 * @return A new instance of a specific implementation of {@link PlanSelectorI} for testing.
+	 * @return A new instance of a specific implementation of {@link PlanSelector} for testing.
 	 */
-	protected abstract PlanSelectorI getPlanSelector();
+	protected abstract PlanSelector getPlanSelector();
 }

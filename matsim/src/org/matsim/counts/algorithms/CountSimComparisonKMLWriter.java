@@ -43,7 +43,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;
@@ -145,7 +145,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * the srs transformation used
 	 */
-	private CoordinateTransformationI coordTransform = null;
+	private CoordinateTransformation coordTransform = null;
 	/**
 	 * main kml, doc and folder
 	 */
@@ -208,7 +208,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param network
 	 * @param coordTransform
 	 */
-	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final NetworkLayer network, final CoordinateTransformationI coordTransform) {
+	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final NetworkLayer network, final CoordinateTransformation coordTransform) {
 		super(countSimCompList);
 		this.network = network;
 		this.coordTransform = coordTransform;

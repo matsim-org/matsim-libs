@@ -23,7 +23,7 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 
 /**
  * @author illenberger
@@ -31,7 +31,7 @@ import org.matsim.router.util.TravelTimeI;
  */
 public interface AgentBeliefs {
 	
-	public abstract TravelTimeI getTravelTimes();
+	public abstract TravelTime getTravelTimes();
 	
 	public abstract void update();
 }

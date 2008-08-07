@@ -47,7 +47,7 @@ import org.matsim.utils.geometry.Coord;
  * cover-percentage. The bean curve will be enlarged until it contains at
  * least the specified percentage of all points.
  */
-public class BeanObjective implements ObjectiveI {
+public class BeanObjective implements Objective {
 
 	//////////////////////////////////////////////////////////////////////
 	// member constants

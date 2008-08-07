@@ -23,12 +23,12 @@ package playground.yalcin;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
+import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 
 /* Reads a file containing:
  *   code  |  personId  |  tripId  |  additional data gets ignored ... 
  */
-public class CodesTableReader implements TabularFileHandlerI {
+public class CodesTableReader implements TabularFileHandler {
 
 	/** LookupTable: PersonId-TripId ==> Code */
 	final Map<String, String> lookupTable = new TreeMap<String, String>();

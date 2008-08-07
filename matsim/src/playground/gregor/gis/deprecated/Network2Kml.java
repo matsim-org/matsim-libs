@@ -8,7 +8,7 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
@@ -59,7 +59,7 @@ public class Network2Kml {
 	}
 	private void generateKmlData() throws MismatchedDimensionException, TransformException {
 
-		CoordinateTransformationI transform = TransformationFactory.getCoordinateTransformation("WGS84_UTM47S", "WGS84");
+		CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation("WGS84_UTM47S", "WGS84");
 
 
 		String key = "link";

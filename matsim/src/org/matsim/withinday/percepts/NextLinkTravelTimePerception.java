@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.trafficmonitoring.LinkTravelTimeCounter;
 
 
@@ -35,7 +35,7 @@ import org.matsim.trafficmonitoring.LinkTravelTimeCounter;
  * @author dgrether
  *
  */
-public class NextLinkTravelTimePerception implements TravelTimeI, AgentPercepts {
+public class NextLinkTravelTimePerception implements TravelTime, AgentPercepts {
 
 
 	Map<Link, Double> linkMap;
@@ -49,7 +49,7 @@ public class NextLinkTravelTimePerception implements TravelTimeI, AgentPercepts 
 	}
 
 	/**
-	 * @see org.matsim.router.util.TravelTimeI#getLinkTravelTime(org.matsim.network.LinkImpl, double)
+	 * @see org.matsim.router.util.TravelTime#getLinkTravelTime(org.matsim.network.LinkImpl, double)
 	 */
 	public double getLinkTravelTime(final Link link, final double time) {
 		Double travelTime = this.linkMap.get(link);

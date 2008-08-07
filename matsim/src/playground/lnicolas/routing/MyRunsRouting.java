@@ -55,9 +55,9 @@ import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
 import org.matsim.router.util.PreProcessEuclidean;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelMinCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelMinCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.misc.Time;
 
@@ -719,7 +719,7 @@ public class MyRunsRouting extends MyRuns {
 
 		System.out.println("RUN: calcRoute");
 
-		TravelMinCostI calculator;
+		TravelMinCost calculator;
 		if (args[args.length - 1].equals("ptc")) {
 			calculator = new PeakTravTimeCalc(network);
 		} else {
@@ -739,7 +739,7 @@ public class MyRunsRouting extends MyRuns {
 		}
 
 		LeastCostPathCalculator routingAlgo = getRoutingAlgo(args, preProcessData,
-				(TravelCostI)calculator, (TravelTimeI)calculator);
+				(TravelCost)calculator, (TravelTime)calculator);
 
 //		PlansWriter plansWriter = new PlansWriter(plans);
 //		plans.setPlansWriter(plansWriter);
@@ -799,7 +799,7 @@ public class MyRunsRouting extends MyRuns {
 	}
 
 	private static PreProcessDijkstra getPreProcessData(final String[] args,
-			final TravelMinCostI calculator) {
+			final TravelMinCost calculator) {
 		PreProcessDijkstra preProcessData = null;
 		final String dijkstraString = "dijkstra";
 		final String aStarString = "aStar";
@@ -842,7 +842,7 @@ public class MyRunsRouting extends MyRuns {
 	}
 
 //	private static LeastCostPathCalculator getTestingRoutingAlgo(String[] args,
-//			TravelMinCostI calculator) {
+//			TravelMinCost calculator) {
 //		final String aStarString = "aStar";
 //		final String aStarLandmarkString = "aStarL";
 //
@@ -856,8 +856,8 @@ public class MyRunsRouting extends MyRuns {
 //	}
 
 	private static LeastCostPathCalculator getRoutingAlgo(final String[] args,
-			final PreProcessDijkstra preProcessData, final TravelCostI costCalc,
-			final TravelTimeI timeCalc) {
+			final PreProcessDijkstra preProcessData, final TravelCost costCalc,
+			final TravelTime timeCalc) {
 		final String dijkstraOldString = "dijkstraOld";
 		final String dijkstraString = "dijkstra";
 		final String dijkstraPruneDeadEndsString = "dijkstraP";

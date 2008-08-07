@@ -36,7 +36,7 @@ import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.withinday.beliefs.AgentBeliefs;
-import org.matsim.withinday.contentment.AgentContentmentI;
+import org.matsim.withinday.contentment.AgentContentment;
 import org.matsim.withinday.mobsim.OccupiedVehicle;
 import org.matsim.withinday.percepts.AgentPercepts;
 import org.matsim.withinday.routeprovider.RouteProvider;
@@ -57,7 +57,7 @@ public class WithindayAgent {
 
 	private RouteProvider desireGenerationFunction;
 
-	private AgentContentmentI contentment;
+	private AgentContentment contentment;
 
 	private ScoringFunctionFactory scoringFunctionFactory;
 
@@ -256,7 +256,7 @@ public class WithindayAgent {
 		return this.person;
 	}
 
-	public void setAgentContentment(final AgentContentmentI contentment) {
+	public void setAgentContentment(final AgentContentment contentment) {
 		this.contentment = contentment;
 	}
 

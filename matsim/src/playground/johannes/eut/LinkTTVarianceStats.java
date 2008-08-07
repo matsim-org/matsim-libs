@@ -38,7 +38,7 @@ import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -49,7 +49,7 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 	
 	private Map<BasicLink, List<Double>> linkSamples;
 	
-	private TravelTimeI travelTimes;
+	private TravelTime travelTimes;
 	
 	private int startTime;
 	
@@ -59,7 +59,7 @@ public class LinkTTVarianceStats implements IterationEndsListener, ShutdownListe
 	
 	private SummaryWriter summaryWriter;
 	
-	public LinkTTVarianceStats(TravelTimeI travelTimes, int start, int end, int binsize, SummaryWriter summaryWriter) {
+	public LinkTTVarianceStats(TravelTime travelTimes, int start, int end, int binsize, SummaryWriter summaryWriter) {
 		this.summaryWriter = summaryWriter;
 		this.travelTimes = travelTimes;
 		this.startTime = start;

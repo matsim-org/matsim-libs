@@ -22,7 +22,7 @@ package org.matsim.router.costcalculators;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.router.util.TravelCostI;
+import org.matsim.router.util.TravelCost;
 
 /**
  * This travelcost-calculator takes another travelcost-calculator as base
@@ -33,12 +33,12 @@ import org.matsim.router.util.TravelCostI;
  * This takes the freespeed-velocity implicitly in account too, as high-cap
  * links are more likely to have a higher velocity than low-cap links.
  */
-public class CalcAdjustedLinkCost implements TravelCostI {
+public class CalcAdjustedLinkCost implements TravelCost {
 
-	private final TravelCostI baseCost;
+	private final TravelCost baseCost;
 	private final double flowCapFactor;
 
-	public CalcAdjustedLinkCost(final TravelCostI baseCost) {
+	public CalcAdjustedLinkCost(final TravelCost baseCost) {
 		this.baseCost = baseCost;
 		this.flowCapFactor = Gbl.getConfig().simulation().getFlowCapFactor();
 	}

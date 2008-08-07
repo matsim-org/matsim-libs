@@ -32,8 +32,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.vis.routervis.RouterNetStateWriter;
 import org.matsim.utils.vis.routervis.VisLeastCostPathCalculator;
 
@@ -58,12 +58,12 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
-	protected final TravelCostI costFunction;
+	protected final TravelCost costFunction;
 
 	/**
 	 * The travel time calculator. Provides the travel time for each link and time step.
 	 */
-	final TravelTimeI timeFunction;
+	final TravelTime timeFunction;
 
 
 	/**
@@ -110,7 +110,7 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 
 
 
-	public MultiPathRouter(NetworkLayer network, TravelCostI costFunction, TravelTimeI timeFunction, RouterNetStateWriter writer){
+	public MultiPathRouter(NetworkLayer network, TravelCost costFunction, TravelTime timeFunction, RouterNetStateWriter writer){
 		this.network = network;
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;

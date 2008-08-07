@@ -21,7 +21,7 @@
 package org.matsim.utils.geometry.transformations;
 
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 
 /**
  * A very simple coordinate transformation which always returns the same coordinate
@@ -29,7 +29,7 @@ import org.matsim.utils.geometry.CoordinateTransformationI;
  *
  * @author mrieser
  */
-public class IdentityTransformation implements CoordinateTransformationI {
+public class IdentityTransformation implements CoordinateTransformation {
 
 	public Coord transform(Coord coord) {
 		return coord;

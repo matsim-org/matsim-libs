@@ -34,8 +34,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.routervis.multipathrouter.CLogitRouter;
@@ -67,11 +67,11 @@ public class RouterVis {
 	 * @param timeCalculator
 	 * @param router 
 	 */
-	public RouterVis(final NetworkLayer network, final TravelCostI costCalculator,
-			final TravelTimeI timeCalculator, final Class<? extends VisLeastCostPathCalculator> router){
+	public RouterVis(final NetworkLayer network, final TravelCost costCalculator,
+			final TravelTime timeCalculator, final Class<? extends VisLeastCostPathCalculator> router){
 		this.writer = getNetStateWriter(network);
 		final Class[] prototypeConstructor = { NetworkLayer.class,
-				TravelCostI.class, TravelTimeI.class, RouterNetStateWriter.class};
+				TravelCost.class, TravelTime.class, RouterNetStateWriter.class};
 		Exception ex = null;
 		try {
 			this.router = router.getConstructor(prototypeConstructor).newInstance(new Object [] {network, costCalculator, timeCalculator, this.writer});
@@ -209,8 +209,8 @@ public class RouterVis {
 		log.info( "done");
 
 		log.info("  creating RouterVis object.");
-		final TravelTimeI costCalc = new FreespeedTravelTimeCost();
-		final RouterVis vis = new RouterVis(network,(TravelCostI) costCalc,costCalc,router);
+		final TravelTime costCalc = new FreespeedTravelTimeCost();
+		final RouterVis vis = new RouterVis(network,(TravelCost) costCalc,costCalc,router);
 		log.info("  done.");
 
 		log.info("  running RouterVis.");

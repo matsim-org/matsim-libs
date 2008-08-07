@@ -21,14 +21,14 @@
 package playground.dressler.ea_flow;
 
 import org.matsim.network.Link;
-import org.matsim.router.util.TravelMinCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelMinCost;
+import org.matsim.router.util.TravelTime;
 
 /**
  * always returns traveltime = 0 to avoid time expansion
  * travelcost is the actual freespeed time, rounded down to integers 
  */
-public class FakeTravelTimeCost implements TravelMinCostI, TravelTimeI {
+public class FakeTravelTimeCost implements TravelMinCost, TravelTime {
 		
 	public FakeTravelTimeCost() {
 				

@@ -20,7 +20,7 @@
 
 package org.matsim.utils.geometry.transformations;
 
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 
 /**
  * A factory to instantiate a specific coordinate transformation.
@@ -46,7 +46,7 @@ public abstract class TransformationFactory {
 	 * @return Coordinate Transformation
 	 * @throws IllegalArgumentException if no matching coordinate transformation can be found.
 	 */
-	public static CoordinateTransformationI getCoordinateTransformation(final String fromSystem, final String toSystem) {
+	public static CoordinateTransformation getCoordinateTransformation(final String fromSystem, final String toSystem) {
 		if (fromSystem.equals(toSystem)) return new IdentityTransformation();
 		if (WGS84.equals(fromSystem) && (CH1903_LV03.equals(toSystem))) return new WGS84toCH1903LV03();
 		if (WGS84.equals(toSystem)) {

@@ -23,7 +23,7 @@ package org.matsim.planomat.costestimators;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.population.Route;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.world.Location;
 
 /**
@@ -35,11 +35,11 @@ import org.matsim.world.Location;
  */
 public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator {
 
-	protected TravelTimeI linkTravelTimeEstimator;
+	protected TravelTime linkTravelTimeEstimator;
 	protected DepartureDelayAverageCalculator tDepDelayCalc;
 
 	public FixedRouteLegTravelTimeEstimator(
-			TravelTimeI linkTravelTimeEstimator,
+			TravelTime linkTravelTimeEstimator,
 			DepartureDelayAverageCalculator depDelayCalc) {
 
 		this.linkTravelTimeEstimator = linkTravelTimeEstimator;

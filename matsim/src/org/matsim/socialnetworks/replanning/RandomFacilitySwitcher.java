@@ -24,8 +24,8 @@ import org.matsim.facilities.Facilities;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 /**
  * The social network replanning StrategyModule is not multi-threaded because each
  * agent could refer to and alter other agent objects in a random manner.
@@ -36,8 +36,8 @@ import org.matsim.router.util.TravelTimeI;
 
 public class RandomFacilitySwitcher extends MultithreadedModuleA {
 	private NetworkLayer network=null;
-	private TravelCostI tcost=null;
-	private TravelTimeI ttime=null;
+	private TravelCost tcost=null;
+	private TravelTime ttime=null;
 	private Facilities facs=null;
 	/** 
 	 * TODO [JH] this is hard-coded here but has to match the standard facility types
@@ -45,7 +45,7 @@ public class RandomFacilitySwitcher extends MultithreadedModuleA {
 	 */
 	private String[] factypes={"home","work","shop","education","leisure"};
 	
-    public RandomFacilitySwitcher(NetworkLayer network, TravelCostI tcost, TravelTimeI ttime, Facilities facs) {
+    public RandomFacilitySwitcher(NetworkLayer network, TravelCost tcost, TravelTime ttime, Facilities facs) {
 
 		System.out.println("initializing RandomFacilitySwitcher");
     	this.network=network;

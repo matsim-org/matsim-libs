@@ -18,7 +18,7 @@ import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
 
@@ -31,7 +31,7 @@ import org.matsim.utils.misc.Time;
  * @author illenberger
  *
  */
-public class EventBasedTTProvider implements TravelTimeI, LinkEnterEventHandler, LinkLeaveEventHandler,
+public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, LinkLeaveEventHandler,
 		AgentArrivalEventHandler {
 
 	// =====================================================================
@@ -105,7 +105,7 @@ public class EventBasedTTProvider implements TravelTimeI, LinkEnterEventHandler,
 		this.lastCall = -1;
 	}
 
-	public TravelTimeI requestLinkCost() {
+	public TravelTime requestLinkCost() {
 		/*
 		 * Average the travel times only if there are new events available.
 		 */

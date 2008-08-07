@@ -28,11 +28,11 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 
 public class PlanomatControlerListener implements StartupListener, IterationStartsListener {
 
-	private TravelTimeI linkTravelTimeCalculatorForPlanomat = null;
+	private TravelTime linkTravelTimeCalculatorForPlanomat = null;
 	private DepartureDelayAverageCalculator tDepDelayCalc = null;
 
 	public void notifyStartup(final StartupEvent event) {
@@ -51,9 +51,9 @@ public class PlanomatControlerListener implements StartupListener, IterationStar
 		((EventHandler) this.linkTravelTimeCalculatorForPlanomat).reset(event.getIteration());
 	}
 
-	private TravelTimeI initTravelTimeIForPlanomat(final NetworkLayer network) {
+	private TravelTime initTravelTimeIForPlanomat(final NetworkLayer network) {
 
-		TravelTimeI linkTravelTimeEstimator = null;
+		TravelTime linkTravelTimeEstimator = null;
 
 //		String travelTimeIName = Gbl.getConfig().planomat().getLinkTravelTimeEstimatorName();
 //
@@ -62,7 +62,7 @@ public class PlanomatControlerListener implements StartupListener, IterationStar
 //		} else if (travelTimeIName.equalsIgnoreCase("org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator")) {
 //			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
 //		} else {
-//			Gbl.errorMsg("Invalid name of implementation of TravelTimeI: " + travelTimeIName);
+//			Gbl.errorMsg("Invalid name of implementation of TravelTime: " + travelTimeIName);
 //		}
 
 		return linkTravelTimeEstimator;

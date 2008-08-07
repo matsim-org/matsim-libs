@@ -35,13 +35,13 @@ import org.matsim.population.Route;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
 /**
  * Calculates the k minimal cost paths from a start to an end node,
- * on a given network, based on a given TravelMinCostI object.
+ * on a given network, based on a given TravelMinCost object.
  *
  * The algorithm works as follows:
  * <ol>
@@ -71,8 +71,8 @@ import org.matsim.trafficmonitoring.TravelTimeCalculator;
 public class KShortestPathGenerator {
 
 	private NetworkLayer network;
-	private TravelCostI costFunction;
-	private TravelTimeI timeFunction;
+	private TravelCost costFunction;
+	private TravelTime timeFunction;
 	private ArrayList<Link[]> linkRoutes = new ArrayList<Link[]>();
 	private PreProcessLandmarks preProcessData;
 
@@ -84,7 +84,7 @@ public class KShortestPathGenerator {
 	 * @param timeFunction Determines the travel time on each link in the network.
 	 */
 	public KShortestPathGenerator(NetworkLayer network,
-			TravelCostI costFunction, TravelTimeI timeFunction) {
+			TravelCost costFunction, TravelTime timeFunction) {
 
 		this.network = network;
 		this.costFunction = costFunction;
@@ -98,7 +98,7 @@ public class KShortestPathGenerator {
 	 * Constructor.
 	 * Takes the TravelTimeCalculator by default as costFunction.
 	 * @param network The network on which the routing should be performed.
-	 * @see #KShortestPathGenerator(NetworkLayer, TravelCostI, TravelTimeI)
+	 * @see #KShortestPathGenerator(NetworkLayer, TravelCost, TravelTime)
 	 */
 	public KShortestPathGenerator(NetworkLayer network) {
 		this(network, new FreespeedTravelTimeCost(), new TravelTimeCalculator(network));

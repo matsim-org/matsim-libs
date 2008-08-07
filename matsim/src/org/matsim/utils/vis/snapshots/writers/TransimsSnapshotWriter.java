@@ -31,7 +31,7 @@ import org.matsim.utils.io.IOUtils;
  *
  * @author mrieser
  */
-public class TransimsSnapshotWriter implements SnapshotWriterI {
+public class TransimsSnapshotWriter implements SnapshotWriter {
 	private BufferedWriter out = null;
 	private double currentTime = -1;
 

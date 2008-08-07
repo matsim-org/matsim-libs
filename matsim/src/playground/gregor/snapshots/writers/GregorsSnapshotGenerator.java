@@ -51,7 +51,7 @@ import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
-import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
+import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
 
 public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
 		LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentStuckEventHandler {
@@ -61,7 +61,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 	private final double snapshotPeriod;
 	protected final HashMap<String, EventLink> eventLinks;
 	private final HashMap<String, EventAgent> eventAgents;
-	private final List<SnapshotWriterI> snapshotWriters = new ArrayList<SnapshotWriterI>();
+	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	private final double capCorrectionFactor;
 	private final String snapshotStyle;
 	public static LineStringTree lst;
@@ -87,11 +87,11 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 		reset(-1);
 	}
 	
-	public void addSnapshotWriter(final SnapshotWriterI writer) {
+	public void addSnapshotWriter(final SnapshotWriter writer) {
 		this.snapshotWriters.add(writer);
 	}
 
-	public boolean removeSnapshotWriter(final SnapshotWriterI writer) {
+	public boolean removeSnapshotWriter(final SnapshotWriter writer) {
 		return this.snapshotWriters.remove(writer);
 	}
 
@@ -160,7 +160,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 		System.out.println("create snapshot at " + Time.writeTime(time));
 		if (!this.snapshotWriters.isEmpty()) {
 			final Collection<GregorsPositionInfo> positions = getVehiclePositions(time);
-			for (final SnapshotWriterI writer : this.snapshotWriters) {
+			for (final SnapshotWriter writer : this.snapshotWriters) {
 				writer.beginSnapshot(time);
 				for (final GregorsPositionInfo position : positions) {
 					writer.addAgent(position);
@@ -187,7 +187,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 	}
 
 	public void finish() {
-		for (final SnapshotWriterI writer : this.snapshotWriters) {
+		for (final SnapshotWriter writer : this.snapshotWriters) {
 			writer.finish();
 		}
 	}
@@ -480,14 +480,14 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 		}
 	}
 
-	private class NetStateWriter extends DisplayNetStateWriter implements SnapshotWriterI {
+	private class NetStateWriter extends DisplayNetStateWriter implements SnapshotWriter {
 
 		public NetStateWriter(final BasicNet network, final String networkFileName,
 				final VisConfig visConfig, final String filePrefix, final int timeStepLength_s, final int bufferSize) {
 			super(network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
 		}
 
-		/* implementation of SnapshotWriterI */
+		/* implementation of SnapshotWriter */
 		public void addAgent(final PositionInfo position) {
 		}
 

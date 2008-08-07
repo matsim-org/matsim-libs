@@ -22,8 +22,8 @@ package org.matsim.router.costcalculators;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.router.util.TravelMinCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelMinCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -31,13 +31,13 @@ import org.matsim.utils.misc.Time;
  *
  * @author mrieser
  */
-public class TravelTimeDistanceCostCalculator implements TravelMinCostI {
+public class TravelTimeDistanceCostCalculator implements TravelMinCost {
 
-	protected final TravelTimeI timeCalculator;
+	protected final TravelTime timeCalculator;
 	private final double travelCostFactor;
 	private final double distanceCost;
 
-	public TravelTimeDistanceCostCalculator(final TravelTimeI timeCalculator) {
+	public TravelTimeDistanceCostCalculator(final TravelTime timeCalculator) {
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.

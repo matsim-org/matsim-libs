@@ -33,8 +33,8 @@ import org.matsim.router.AStarLandmarks;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -46,7 +46,7 @@ import org.matsim.utils.misc.Time;
 public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 
 	private final RoadPricingScheme scheme;
-	private final TravelTimeI timeCalculator;
+	private final TravelTime timeCalculator;
 	private final LeastCostPathCalculator tollRouter;
 
 	/**
@@ -54,11 +54,11 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 	 *
 	 * @param network
 	 * @param preProcessData common data for the A*-Landmarks algorithm
-	 * @param costCalculator This must be a normal implementation of TravelCostI that does not take care of the area toll!
+	 * @param costCalculator This must be a normal implementation of TravelCost that does not take care of the area toll!
 	 * @param timeCalculator
 	 * @param scheme
 	 */
-	public PlansCalcAreaTollRoute(final NetworkLayer network, final PreProcessLandmarks preProcessData, final TravelCostI costCalculator, final TravelTimeI timeCalculator, final RoadPricingScheme scheme) {
+	public PlansCalcAreaTollRoute(final NetworkLayer network, final PreProcessLandmarks preProcessData, final TravelCost costCalculator, final TravelTime timeCalculator, final RoadPricingScheme scheme) {
 		super(network, preProcessData, costCalculator, timeCalculator);
 		this.scheme = scheme;
 		this.timeCalculator = timeCalculator;

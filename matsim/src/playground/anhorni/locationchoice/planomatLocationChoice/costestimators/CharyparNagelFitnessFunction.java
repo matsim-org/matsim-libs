@@ -38,8 +38,8 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.router.PlansCalcRouteDijkstra;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.ScoringFunction;
 
 public class CharyparNagelFitnessFunction extends FitnessFunction {
@@ -50,8 +50,8 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 	private  ScoringFunction sf=null;
 	private  Plan plan=null;
 	private  NetworkLayer network = null;
-	private  TravelCostI travelCostCalculator = null;
-	private  TravelTimeI travelTimeCalculator = null;
+	private  TravelCost travelCostCalculator = null;
+	private  TravelTime travelTimeCalculator = null;
 
 	final Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 	final TreeMap<Id,Facility> shop_facilities=new TreeMap<Id,Facility>();
@@ -61,8 +61,8 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 			final ScoringFunction sf,
 			final Plan plan,
 			final NetworkLayer network,
-			final TravelCostI travelCostCalculator,
-			final TravelTimeI travelTimeCalculator) {
+			final TravelCost travelCostCalculator,
+			final TravelTime travelTimeCalculator) {
 		super();
 		this.init(sf, plan, network, travelCostCalculator, travelTimeCalculator);
 	}
@@ -71,8 +71,8 @@ public class CharyparNagelFitnessFunction extends FitnessFunction {
 			final ScoringFunction sf,
 			final Plan plan,
 			final NetworkLayer network,
-			final TravelCostI travelCostCalculator,
-			final TravelTimeI travelTimeCalculator) {
+			final TravelCost travelCostCalculator,
+			final TravelTime travelTimeCalculator) {
 
 		this.sf = sf;
 		this.plan = plan;

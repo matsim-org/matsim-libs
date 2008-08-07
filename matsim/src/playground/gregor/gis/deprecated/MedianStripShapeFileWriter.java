@@ -41,7 +41,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.utils.io.IOUtils;
@@ -145,7 +145,7 @@ public class MedianStripShapeFileWriter {
 
 	private void createGeometries() {
 
-		CoordinateTransformationI transform = new GeotoolsTransformation("WGS84_UTM47S","WGS84_UTM47S");
+		CoordinateTransformation transform = new GeotoolsTransformation("WGS84_UTM47S","WGS84_UTM47S");
 
 		this.geos = new Geometry[this.links.size()];
 		PrecisionModel pm = new PrecisionModel(10);

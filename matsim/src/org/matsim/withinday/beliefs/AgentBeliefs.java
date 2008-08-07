@@ -20,16 +20,16 @@
 
 package org.matsim.withinday.beliefs;
 
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 
 /**
  * @author dgrether
  *
  */
-public interface AgentBeliefs extends TravelTimeI, TravelCostI {
+public interface AgentBeliefs extends TravelTime, TravelCost {
 
 	
-	public void addTravelTimePerception(final TravelTimeI travelTimePerception);
+	public void addTravelTimePerception(final TravelTime travelTimePerception);
 }

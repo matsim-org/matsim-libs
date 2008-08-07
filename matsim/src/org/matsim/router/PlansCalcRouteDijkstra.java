@@ -22,8 +22,8 @@ package org.matsim.router;
 
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 /**
  * A AbstractPersonAlgorithm that calculates and sets the routes of a person's activities using {@link Dijkstra}.
@@ -32,11 +32,11 @@ import org.matsim.router.util.TravelTimeI;
  */
 public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 
-	public PlansCalcRouteDijkstra(final NetworkLayer network, final TravelCostI costCalculator, final TravelTimeI timeCalculator) {
+	public PlansCalcRouteDijkstra(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(network, costCalculator, timeCalculator, new FreespeedTravelTimeCost());
 	}
 
-	private PlansCalcRouteDijkstra(final NetworkLayer network, final TravelCostI costCalculator, final TravelTimeI timeCalculator,
+	private PlansCalcRouteDijkstra(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator,
 			final FreespeedTravelTimeCost freespeedTimeCost) {
 		super(new Dijkstra(network, costCalculator, timeCalculator),
 				new Dijkstra(network, freespeedTimeCost, freespeedTimeCost));

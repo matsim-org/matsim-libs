@@ -35,8 +35,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 // import org.apache.log4j.Logger;
 // import org.matsim.utils.identifiers.IdI;
@@ -64,13 +64,13 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
-	final TravelCostI costFunction;
+	final TravelCost costFunction;
 
 	/**
 	 * The travel time calculator. Provides the travel time for each link and
 	 * time step. This is ignored.
 	 */
-	final TravelTimeI timeFunction;
+	final TravelTime timeFunction;
 
 	private HashMap<Link, EdgeIntervalls> flow;
 
@@ -101,7 +101,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            Determines the travel time on links. This is ignored!
 	 */
 	public MooreBellmanFordMoreDynamic(final NetworkLayer network,
-			final TravelCostI costFunction, final TravelTimeI timeFunction,
+			final TravelCost costFunction, final TravelTime timeFunction,
 			HashMap<Link, EdgeIntervalls> flow) {
 
 		this.network = network;
@@ -134,7 +134,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 *            Determines the travel time on links. This is ignored!
 	 */
 	public MooreBellmanFordMoreDynamic(final NetworkLayer network,
-			final TravelCostI costFunction, final TravelTimeI timeFunction,
+			final TravelCost costFunction, final TravelTime timeFunction,
 			HashMap<Link, EdgeIntervalls> flow, int timeHorizon) {
 
 		this.network = network;

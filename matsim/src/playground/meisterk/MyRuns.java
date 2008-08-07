@@ -81,15 +81,15 @@ import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activit
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.PlanomatOptimizeTimes;
-import org.matsim.replanning.modules.StrategyModuleI;
+import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.RandomPlanSelector;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
@@ -363,7 +363,7 @@ public class MyRuns {
 				Feature.DEFAULT_TIME_PRIMITIVE);
 		myKMLDocument.addFeature(populationFolder);
 
-		CoordinateTransformationI trafo = TransformationFactory.getCoordinateTransformation(
+		CoordinateTransformation trafo = TransformationFactory.getCoordinateTransformation(
 				TransformationFactory.CH1903_LV03, TransformationFactory.WGS84);
 
 		for (Person person : matsimAgentPopulation.getPersons().values()) {
@@ -550,7 +550,7 @@ public class MyRuns {
 
 	}
 
-	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformationI trafo) {
+	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformation trafo) {
 
 		Placemark linkPlacemark = null;
 
@@ -630,7 +630,7 @@ public class MyRuns {
 		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
-		TravelTimeI tTravelCalc = MyRuns.initTravelTimeIForPlanomat(network);
+		TravelTime tTravelCalc = MyRuns.initTravelTimeIForPlanomat(network);
 		LegTravelTimeEstimator ltte = MyRuns.createLegTravelTimeEstimator(events, network, tTravelCalc);
 		events.printEventHandlers();
 		MyRuns.readEvents(events, network);
@@ -696,7 +696,7 @@ public class MyRuns {
 
 		StrategyManager strategyManager = new StrategyManager();
 		PlanStrategy simplePlanomatStrategy = new PlanStrategy(new RandomPlanSelector());
-		StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(estimator/*, matsimAgentPopulation*/);
+		StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(estimator/*, matsimAgentPopulation*/);
 		simplePlanomatStrategy.addStrategyModule(planomatStrategyModule);
 		strategyManager.addStrategy(simplePlanomatStrategy, 1.0);
 
@@ -705,9 +705,9 @@ public class MyRuns {
 		return strategyManager;
 	}
 
-	private static TravelTimeI initTravelTimeIForPlanomat(NetworkLayer network) {
+	private static TravelTime initTravelTimeIForPlanomat(NetworkLayer network) {
 
-		TravelTimeI linkTravelTimeEstimator = null;
+		TravelTime linkTravelTimeEstimator = null;
 
 //		String travelTimeIName = Gbl.getConfig().planomat().getLinkTravelTimeEstimatorName();
 //		if (travelTimeIName.equalsIgnoreCase("org.matsim.demandmodeling.events.algorithms.TravelTimeCalculator")) {
@@ -715,14 +715,14 @@ public class MyRuns {
 //		} else if (travelTimeIName.equalsIgnoreCase("org.matsim.playground.meisterk.planomat.LinearInterpolatingTTCalculator")) {
 //			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
 //		} else {
-//			Gbl.errorMsg("Invalid name of implementation of TravelTimeI: " + travelTimeIName);
+//			Gbl.errorMsg("Invalid name of implementation of TravelTime: " + travelTimeIName);
 //		}
 
 		return linkTravelTimeEstimator;
 
 	}
 
-	private static LegTravelTimeEstimator createLegTravelTimeEstimator(Events events, NetworkLayer network, TravelTimeI linkTravelTimeEstimator) {
+	private static LegTravelTimeEstimator createLegTravelTimeEstimator(Events events, NetworkLayer network, TravelTime linkTravelTimeEstimator) {
 
 		LegTravelTimeEstimator estimator = null;
 
@@ -797,7 +797,7 @@ public class MyRuns {
 		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
-		TravelTimeI tTravelCalc = new TravelTimeCalculator(network);
+		TravelTime tTravelCalc = new TravelTimeCalculator(network);
 		LegTravelTimeEstimator ltte = MyRuns.createLegTravelTimeEstimator(events, network, tTravelCalc);
 		events.printEventHandlers();
 		MyRuns.readEvents(events, network);

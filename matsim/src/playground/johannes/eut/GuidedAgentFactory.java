@@ -33,11 +33,11 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelTime;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.WithindayAgentLogicFactory;
-import org.matsim.withinday.contentment.AgentContentmentI;
+import org.matsim.withinday.contentment.AgentContentment;
 import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
@@ -68,7 +68,7 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	 * @param scoringConfig
 	 */
 	public GuidedAgentFactory(NetworkLayer network,
-			CharyparNagelScoringConfigGroup scoringConfig, TravelTimeI reactTTs, double fraction) {
+			CharyparNagelScoringConfigGroup scoringConfig, TravelTime reactTTs, double fraction) {
 		super(network, scoringConfig);
 		router = new ReactRouteGuidance(network, reactTTs);
 		equipmentFraction = fraction;
@@ -83,7 +83,7 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {
 	}
 	
 	@Override
-	public AgentContentmentI createAgentContentment(WithindayAgent agent) {
+	public AgentContentment createAgentContentment(WithindayAgent agent) {
 		random.nextDouble();
 		if(random.nextDouble() < equipmentFraction) {
 			if(analyzer != null)

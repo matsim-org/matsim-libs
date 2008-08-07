@@ -45,7 +45,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.geometry.CoordinateTransformationI;
+import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
@@ -98,7 +98,7 @@ public class EgoNetPlansItersMakeKML {
 	private static Style workStyle, leisureStyle,
 	educStyle, shopStyle, homeStyle;//, agentLinkStyle;
 	private static HashMap<String,Style> facStyle= new HashMap<String,Style>();
-	private static CoordinateTransformationI trafo;
+	private static CoordinateTransformation trafo;
 	private static Config config = null;
 	private static final Logger log = Logger.getLogger(EgoNetPlansItersMakeKML.class);
 
@@ -888,7 +888,7 @@ public class EgoNetPlansItersMakeKML {
 
 	}
 
-	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformationI trafo) {
+	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformation trafo) {
 
 		Placemark linkPlacemark = null;
 
@@ -917,7 +917,7 @@ public class EgoNetPlansItersMakeKML {
 
 		return linkPlacemark;
 	}
-	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformationI trafo, int iter) {
+	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformation trafo, int iter) {
 
 		Placemark linkPlacemark = null;
 

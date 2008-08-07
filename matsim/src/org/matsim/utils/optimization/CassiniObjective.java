@@ -47,7 +47,7 @@ import org.matsim.utils.geometry.Coord;
  * cover-percentage. The Cassini will be enlarged until it contains at
  * least the specified percentage of all points.
  */
-public class CassiniObjective implements ObjectiveI {
+public class CassiniObjective implements Objective {
 
 	//////////////////////////////////////////////////////////////////////
 	// member constants

@@ -37,7 +37,7 @@ import org.matsim.replanning.modules.PlanomatOptimizeTimes;
 import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
-import org.matsim.replanning.modules.StrategyModuleI;
+import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.modules.TimeAllocationMutator;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.ExpBetaPlanChanger;
@@ -47,8 +47,8 @@ import org.matsim.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.socialnetworks.replanning.RandomFacilitySwitcher;
 import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcher;
 
@@ -75,8 +75,8 @@ public class StrategyManagerConfigLoader {
 	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
 
 		NetworkLayer network = controler.getNetwork();
-		TravelCostI travelCostCalc = controler.getTravelCostCalculator();
-		TravelTimeI travelTimeCalc = controler.getTravelTimeCalculator();
+		TravelCost travelCostCalc = controler.getTravelCostCalculator();
+		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		LegTravelTimeEstimator legTravelTimeEstimator = controler.getLegTravelTimeEstimator();
 		Facilities facilities = controler.getFacilities();
 		
@@ -133,12 +133,12 @@ public class StrategyManagerConfigLoader {
 				strategy.addStrategyModule(new PlanomatExe(exePath));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
 //				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
 				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
@@ -156,11 +156,11 @@ public class StrategyManagerConfigLoader {
 			} else if (classname.equals("SNSecLoc")){
 //				System.out.println(" #### Choosing social network replanning algorithm");
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcher(network, travelCostCalc, travelTimeCalc);
+				StrategyModule socialNetStrategyModule= new SNRandomFacilitySwitcher(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} else if (classname.equals("SecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI socialNetStrategyModule= new RandomFacilitySwitcher(network, travelCostCalc, travelTimeCalc, facilities);
+				StrategyModule socialNetStrategyModule= new RandomFacilitySwitcher(network, travelCostCalc, travelTimeCalc, facilities);
 				strategy.addStrategyModule(socialNetStrategyModule);
 			
 			} /*else if (classname.equals("LocationChoice")) {

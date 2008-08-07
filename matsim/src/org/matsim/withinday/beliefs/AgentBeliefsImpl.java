@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.matsim.network.Link;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 
 
 /**
@@ -35,26 +35,26 @@ import org.matsim.router.util.TravelTimeI;
  */
 public class AgentBeliefsImpl implements AgentBeliefs {
 
-	private List<TravelTimeI> travelTimePerceptions;
+	private List<TravelTime> travelTimePerceptions;
 
-	private List<TravelCostI> travelCostPerceptions;
+	private List<TravelCost> travelCostPerceptions;
 
 	private FreespeedTravelTimeCost freespeedTimeCost;
 
 
 	public AgentBeliefsImpl() {
-		this.travelTimePerceptions = new LinkedList<TravelTimeI>();
+		this.travelTimePerceptions = new LinkedList<TravelTime>();
 		this.freespeedTimeCost = new FreespeedTravelTimeCost();
-	  this.travelCostPerceptions = new LinkedList<TravelCostI>();
+	  this.travelCostPerceptions = new LinkedList<TravelCost>();
 	}
 
 	/**
 	 *
-	 * @see org.matsim.router.util.TravelTimeI#getLinkTravelTime(org.matsim.network.LinkImpl, double)
+	 * @see org.matsim.router.util.TravelTime#getLinkTravelTime(org.matsim.network.LinkImpl, double)
 	 */
 	public double getLinkTravelTime(final Link link, final double time) {
 		double ttime = 0.0;
-		for (TravelTimeI tt : this.travelTimePerceptions) {
+		for (TravelTime tt : this.travelTimePerceptions) {
 			ttime = tt.getLinkTravelTime(link, time);
 			if (ttime > 0) {
 				return ttime;
@@ -65,11 +65,11 @@ public class AgentBeliefsImpl implements AgentBeliefs {
 
 
 	/**
-	 * @see org.matsim.router.util.TravelCostI#getLinkTravelCost(org.matsim.network.LinkImpl, double)
+	 * @see org.matsim.router.util.TravelCost#getLinkTravelCost(org.matsim.network.LinkImpl, double)
 	 */
 	public double getLinkTravelCost(final Link link, final double time) {
 		double tcost = 0.0;
-		for (TravelCostI tc : this.travelCostPerceptions) {
+		for (TravelCost tc : this.travelCostPerceptions) {
 			tcost = tc.getLinkTravelCost(link, time);
 			if (tcost > 0) {
 				return tcost;
@@ -78,7 +78,7 @@ public class AgentBeliefsImpl implements AgentBeliefs {
 		return this.freespeedTimeCost.getLinkTravelCost(link, time);
 	}
 
-	public void addTravelTimePerception(final TravelTimeI travelTimePerception) {
+	public void addTravelTimePerception(final TravelTime travelTimePerception) {
 		this.travelTimePerceptions.add(travelTimePerception);
 	}
 

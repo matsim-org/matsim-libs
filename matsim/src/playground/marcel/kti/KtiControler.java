@@ -29,8 +29,8 @@ import org.matsim.matrices.Matrix;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.visum.VisumMatrixReader;
 
 import playground.marcel.kti.router.PlansCalcRouteKti;
@@ -85,7 +85,7 @@ public class KtiControler extends Controler {
 	}
 	
 	@Override
-	public PlanAlgorithm getRoutingAlgorithm(final TravelCostI travelCosts, final TravelTimeI travelTimes) {
+	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
 		synchronized (this) {
 			if (this.commonRoutingData == null) {
 				this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());

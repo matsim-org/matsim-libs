@@ -35,7 +35,7 @@ public class BasicPlanStats extends AbstractPlanStatsAlgorithm  {
 		init();
 	}
 	
-	public BasicPlanStats(PlanStatsI nextAlgo){
+	public BasicPlanStats(PlanStats nextAlgo){
 		this.nextAlgorithm = nextAlgo;
 		init();
 	}

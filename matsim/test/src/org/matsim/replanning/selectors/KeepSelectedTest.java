@@ -32,7 +32,7 @@ import org.matsim.population.Plan;
 public class KeepSelectedTest extends AbstractPlanSelectorTest {
 
 	@Override
-	protected PlanSelectorI getPlanSelector() {
+	protected PlanSelector getPlanSelector() {
 		return new KeepSelected();
 	}
 

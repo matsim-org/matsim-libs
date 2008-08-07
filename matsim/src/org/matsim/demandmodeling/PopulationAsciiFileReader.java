@@ -30,7 +30,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
+import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.utils.misc.Time;
@@ -48,7 +48,7 @@ import org.matsim.world.ZoneLayer;
  * @author dgrether
  *
  */
-public class PopulationAsciiFileReader implements TabularFileHandlerI {
+public class PopulationAsciiFileReader implements TabularFileHandler {
 
 	private static final Logger log = Logger.getLogger(PopulationAsciiFileReader.class);
 	

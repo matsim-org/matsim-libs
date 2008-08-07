@@ -34,7 +34,7 @@ import org.matsim.utils.misc.Time;
  * @author glaemmel
  *
  */
-public class PlansFileSnapshotWriter implements SnapshotWriterI {
+public class PlansFileSnapshotWriter implements SnapshotWriter {
 
 	private String filePrefix;
 	private String fileSuffix;

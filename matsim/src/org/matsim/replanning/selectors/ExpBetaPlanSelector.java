@@ -32,7 +32,7 @@ import org.matsim.population.Plan;
  *
  * @author mrieser
  */
-public class ExpBetaPlanSelector implements PlanSelectorI {
+public class ExpBetaPlanSelector implements PlanSelector {
 
 	private static double MIN_WEIGHT = Double.MIN_VALUE;
 	private final double beta;

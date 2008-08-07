@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TabularFileHandlerI.java
+ * PlanStats.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,25 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.io.tabularFileParser;
+package org.matsim.stats.algorithms;
+
 
 /**
- * An implementation of this interface is expected by the
- * <code>TabularFileParser</code> for row-by-row handling of parsed files.
- * 
- * @author gunnar
- * 
+ * @author laemmel
+ *
  */
-public interface TabularFileHandlerI {
+public interface PlanStats {
 
-    /**
-     * Is called by the <code>TabularFileParser</code> whenever a row has been
-     * parsed
-     * 
-     * @param row
-     *            a <code>String[]</code> representation of the parsed row's
-     *            columns
-     */
-    public void startRow(String[] row);
+	public void run(double score, int iteration);
 
+	public void print();
+
+	public String printStr();
 }
