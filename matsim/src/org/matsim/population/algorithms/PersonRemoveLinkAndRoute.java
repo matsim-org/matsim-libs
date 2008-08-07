@@ -25,7 +25,7 @@ import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-public class PersonRemoveLinkAndRoute extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	public PersonRemoveLinkAndRoute() {
 		super();

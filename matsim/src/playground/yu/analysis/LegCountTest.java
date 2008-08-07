@@ -35,7 +35,7 @@ import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -44,7 +44,7 @@ import org.matsim.world.World;
  * 
  */
 public class LegCountTest {
-	public static class LegCount extends PersonAlgorithm {
+	public static class LegCount extends AbstractPersonAlgorithm {
 		private BufferedWriter writer;
 		// private BasicLeg tmpLeg;
 		// private boolean actsAtSameLink;

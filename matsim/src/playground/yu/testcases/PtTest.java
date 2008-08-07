@@ -44,7 +44,7 @@ import playground.yu.analysis.PtCheck;
 public class PtTest extends MatsimTestCase {
 
 	/**
-	 * Responsible for the verification of the tests. It adds a PersonAlgorithm
+	 * Responsible for the verification of the tests. It adds a AbstractPersonAlgorithm
 	 * (PtCheck) and checks their result (number of ptUsers) in some specific
 	 * iterations.
 	 * 

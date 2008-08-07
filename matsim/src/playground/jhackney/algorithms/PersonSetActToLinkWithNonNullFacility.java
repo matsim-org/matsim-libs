@@ -30,11 +30,11 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.Coord;
 
-public class PersonSetActToLinkWithNonNullFacility extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonSetActToLinkWithNonNullFacility extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -29,7 +29,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
 
 /**
@@ -39,7 +39,7 @@ import org.matsim.world.World;
  * @author ychen
  * 
  */
-public class License extends PersonAlgorithm {
+public class License extends AbstractPersonAlgorithm {
 	private int hasLicenseCount;
 
 	/**

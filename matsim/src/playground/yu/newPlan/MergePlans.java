@@ -28,7 +28,7 @@ import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
 
 /**
@@ -36,7 +36,7 @@ import org.matsim.world.World;
  * 
  */
 public class MergePlans {
-	public static class CopyPlans extends PersonAlgorithm {
+	public static class CopyPlans extends AbstractPersonAlgorithm {
 		private final PopulationWriter writer;
 
 		public CopyPlans(final PopulationWriter writer) {

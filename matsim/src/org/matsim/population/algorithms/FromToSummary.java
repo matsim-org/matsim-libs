@@ -37,7 +37,7 @@ import org.matsim.population.Plan;
  * @author lnicolas
  *
  */
-public class FromToSummary extends PersonAlgorithm implements PlanAlgorithmI {
+public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	public FromToSummary() {
 		super();

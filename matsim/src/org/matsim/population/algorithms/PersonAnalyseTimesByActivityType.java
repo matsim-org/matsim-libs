@@ -35,7 +35,7 @@ import org.matsim.utils.misc.Time;
  * @author meisterk
  *
  */
-public class PersonAnalyseTimesByActivityType extends PersonAlgorithm {
+public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 
 	public enum Activities {
 

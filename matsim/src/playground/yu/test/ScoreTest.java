@@ -35,7 +35,7 @@ import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -43,7 +43,7 @@ import org.matsim.world.World;
  * @author ychen
  * 
  */
-public class ScoreTest extends PersonAlgorithm {
+public class ScoreTest extends AbstractPersonAlgorithm {
 	private double sumScoreWorst = 0.0, sumScoreBest = 0.0, sumAvgScores = 0.0,
 			sumExecutedScores = 0.0;
 	private int nofScoreWorst = 0, nofScoreBest = 0, nofAvgScores = 0,

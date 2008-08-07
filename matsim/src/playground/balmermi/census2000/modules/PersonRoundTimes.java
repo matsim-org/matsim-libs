@@ -29,11 +29,11 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.misc.Time;
 
-public class PersonRoundTimes extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -30,7 +30,7 @@ import org.matsim.population.Act;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.optimization.BeanObjective;
@@ -41,7 +41,7 @@ import org.matsim.utils.optimization.ParamPoint;
 import org.matsim.utils.optimization.SimplexOptimization;
 import org.matsim.utils.optimization.SuperEllipseObjective;
 
-public class PersonCalcEgoSpace extends PersonAlgorithm {
+public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member constants

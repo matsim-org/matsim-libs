@@ -34,7 +34,7 @@ import org.matsim.population.Plan;
  *
  * @author mrieser
  */
-public class XY2Links extends PersonAlgorithm implements PlanAlgorithmI {
+public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	private final NetworkLayer network;
 

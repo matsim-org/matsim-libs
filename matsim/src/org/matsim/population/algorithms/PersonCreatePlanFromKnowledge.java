@@ -28,7 +28,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-public class PersonCreatePlanFromKnowledge extends PersonAlgorithm {
+public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

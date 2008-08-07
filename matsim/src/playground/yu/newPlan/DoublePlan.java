@@ -46,7 +46,7 @@ public class DoublePlan extends NewPlan {
 	/**
 	 * writes an old Person and also new Persons in new plansfile.
 	 * 
-	 * @see org.matsim.population.algorithms.PersonAlgorithm#run(org.matsim.population.Person)
+	 * @see org.matsim.population.algorithms.AbstractPersonAlgorithm#run(org.matsim.population.Person)
 	 */
 	@Override
 	public void run(Person person) {

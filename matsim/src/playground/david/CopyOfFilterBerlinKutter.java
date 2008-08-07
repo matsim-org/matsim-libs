@@ -33,10 +33,10 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
 
-class FilterPersonsNonCarMode extends PersonAlgorithm{
+class FilterPersonsNonCarMode extends AbstractPersonAlgorithm{
 
 	public static Set<Node> relevantFromNodes = new HashSet<Node>();
 	public static Set<Node> relevantToNodes = new HashSet<Node>();

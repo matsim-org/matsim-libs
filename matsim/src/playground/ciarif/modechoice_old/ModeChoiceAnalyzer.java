@@ -31,14 +31,14 @@ import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 
 /**
  * @author ciarif
  *
  */
-public class ModeChoiceAnalyzer extends PersonAlgorithm {
+public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors

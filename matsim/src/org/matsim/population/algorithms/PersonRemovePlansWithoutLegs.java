@@ -31,7 +31,7 @@ import org.matsim.population.Plan;
  * the number of persons in plans which would not be simulated anyway and
  * thus speeding up reading, handling, and writing of plans.
  */
-public class PersonRemovePlansWithoutLegs extends PersonAlgorithm {
+public class PersonRemovePlansWithoutLegs extends AbstractPersonAlgorithm {
 
 	public PersonRemovePlansWithoutLegs() {
 		super();

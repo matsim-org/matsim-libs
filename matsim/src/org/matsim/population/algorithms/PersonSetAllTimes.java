@@ -27,7 +27,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.utils.misc.Time;
 
-public class PersonSetAllTimes extends PersonAlgorithm {
+public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// menber variables

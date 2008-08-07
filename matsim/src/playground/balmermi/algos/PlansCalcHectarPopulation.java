@@ -30,11 +30,11 @@ import org.matsim.basic.v01.BasicPlan;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.utils.geometry.Coord;
 
-public class PlansCalcHectarPopulation extends PersonAlgorithm implements PersonAlgorithmI {
+public class PlansCalcHectarPopulation extends AbstractPersonAlgorithm implements PersonAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

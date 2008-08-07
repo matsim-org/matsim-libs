@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-public class PlanAverageScore extends PersonAlgorithm implements PlanAlgorithmI {
+public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	private double sumScores = 0.0;
 	private long cntScores = 0;
@@ -46,7 +46,7 @@ public class PlanAverageScore extends PersonAlgorithm implements PlanAlgorithmI 
 		this.limit = limit;
 	}
 
-	// TODO PlanCalcScore should NOT inherit from PersonAlgorithm, because it is a PlanAlgorithm
+	// TODO PlanCalcScore should NOT inherit from AbstractPersonAlgorithm, because it is a PlanAlgorithm
 	// this functionality is only provided a.t.m. until the complete PlanAlgorithm-API is ready.
 	@Override
 	public void run(Person person) {

@@ -22,13 +22,13 @@ package playground.balmermi.census2000.modules;
 
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 
 import playground.balmermi.census2000.data.Persons;
 import playground.balmermi.census2000.models.ModelLicenseOwnership;
 
-public class PersonLicenseModel extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonLicenseModel extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

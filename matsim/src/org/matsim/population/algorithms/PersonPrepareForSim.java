@@ -41,7 +41,7 @@ import org.matsim.population.Plan;
  *
  * @author mrieser
  */
-public class PersonPrepareForSim extends PersonAlgorithm {
+public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private final PlanAlgorithmI router;
 	private final XY2Links xy2links;

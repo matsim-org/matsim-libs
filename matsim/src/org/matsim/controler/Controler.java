@@ -87,7 +87,7 @@ import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.StrategyManager;
@@ -1173,7 +1173,7 @@ public class Controler {
 			final Controler c = event.getControler();
 			// make sure all routes are calculated.
 			ParallelPersonAlgorithmRunner.run(c.getPopulation(), c.config.global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-				public PersonAlgorithm getPersonAlgorithm() {
+				public AbstractPersonAlgorithm getPersonAlgorithm() {
 					return new PersonPrepareForSim(c.getRoutingAlgorithm(), c.getNetwork());
 				}
 			});

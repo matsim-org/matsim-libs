@@ -29,10 +29,10 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 
-public class PlansRouteSummary extends PersonAlgorithm implements PlanAlgorithmI {
+public class PlansRouteSummary extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	private long routesCount = 0;
 	private double avgRouteDist = 0;

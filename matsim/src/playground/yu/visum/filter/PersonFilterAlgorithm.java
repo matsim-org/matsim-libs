@@ -1,12 +1,12 @@
 package playground.yu.visum.filter;
 
 import org.matsim.population.Person;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author yu
  */
-public class PersonFilterAlgorithm extends PersonAlgorithm implements
+public class PersonFilterAlgorithm extends AbstractPersonAlgorithm implements
 		PersonFilterI {
 	private PersonFilterI nextFilter = null;
 

@@ -29,9 +29,9 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
-public class ModeAlgo extends PersonAlgorithm{
+public class ModeAlgo extends AbstractPersonAlgorithm{
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors

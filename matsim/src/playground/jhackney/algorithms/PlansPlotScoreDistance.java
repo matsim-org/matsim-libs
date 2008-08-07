@@ -5,11 +5,11 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.utils.charts.XYScatterChart;
 
-public class PlansPlotScoreDistance extends PersonAlgorithm implements PersonAlgorithmI{
+public class PlansPlotScoreDistance extends AbstractPersonAlgorithm implements PersonAlgorithmI{
 	double[] dist=null;
 	double[] score=null;
 	int i=0;

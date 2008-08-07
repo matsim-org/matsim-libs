@@ -30,14 +30,14 @@ import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
 
 /**
  * @author ychen
  * 
  */
-public class PersonCounter extends PersonAlgorithm {
+public class PersonCounter extends AbstractPersonAlgorithm {
 	private int cnt, nullCnt;
 
 	/**

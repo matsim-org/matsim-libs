@@ -27,14 +27,14 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 
 /**
  * @author ciarif
  *
  */
-public class ModeChoiceAlgorithm extends PersonAlgorithm {
+public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors

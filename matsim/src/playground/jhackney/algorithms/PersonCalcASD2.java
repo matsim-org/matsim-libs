@@ -1,12 +1,12 @@
 package playground.jhackney.algorithms;
 
 import org.matsim.population.Person;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.socialnetworks.algorithms.PersonCalculateActivitySpaces;
 
 import edu.uci.ics.jung.statistics.StatisticalMoments;
 
-public class PersonCalcASD2  extends PersonAlgorithm{
+public class PersonCalcASD2  extends AbstractPersonAlgorithm{
 	PersonCalculateActivitySpaces pcasd1 = new PersonCalculateActivitySpaces();
 	public StatisticalMoments smASD2 = new StatisticalMoments();
 

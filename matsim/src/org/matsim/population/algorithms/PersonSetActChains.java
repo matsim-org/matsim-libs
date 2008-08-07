@@ -27,7 +27,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-public class PersonSetActChains extends PersonAlgorithm {
+public class PersonSetActChains extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// menber variables

@@ -30,14 +30,14 @@ import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
 
 /**
  * @author ychen
  * 
  */
-public class CarIllegal extends PersonAlgorithm {
+public class CarIllegal extends AbstractPersonAlgorithm {
 	private int count = 0;
 	private Plan.Type planType = null;
 

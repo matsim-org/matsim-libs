@@ -27,7 +27,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
@@ -35,7 +35,7 @@ import org.matsim.utils.geometry.CoordImpl;
 import playground.balmermi.census2000.data.Persons;
 import playground.balmermi.census2000.models.ModelMobiliyTools;
 
-public class PersonMobilityToolModel extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -28,7 +28,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.misc.Time;
 
@@ -47,7 +47,7 @@ import org.matsim.utils.misc.Time;
  * org.matsim.demandmodeling.plans.algorithms, but to my own playground...
  * marcel, end of june 2006
  */
-public class PlanFilterEmptyRoutes extends PersonAlgorithm implements PlanAlgorithmI {
+public class PlanFilterEmptyRoutes extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	public PlanFilterEmptyRoutes() {
 		super();

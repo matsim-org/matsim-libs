@@ -27,7 +27,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -94,12 +94,12 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 */
 	private static class PersonAlgoProviderTester implements ParallelPersonAlgorithmRunner.PersonAlgorithmProvider {
 		public int counter = 0;
-		private PersonAlgorithm algo;
+		private AbstractPersonAlgorithm algo;
 
-		public PersonAlgoProviderTester(final PersonAlgorithm algo) {
+		public PersonAlgoProviderTester(final AbstractPersonAlgorithm algo) {
 			this.algo = algo;
 		}
-		public PersonAlgorithm getPersonAlgorithm() {
+		public AbstractPersonAlgorithm getPersonAlgorithm() {
 			counter++;
 			return algo;
 		}		
@@ -110,7 +110,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private static class PersonAlgorithmTester extends PersonAlgorithm {
+	private static class PersonAlgorithmTester extends AbstractPersonAlgorithm {
 		public final ArrayList<Id> personIds = new ArrayList<Id>(100);
 		
 		public PersonAlgorithmTester() {

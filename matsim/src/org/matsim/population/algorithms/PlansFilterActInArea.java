@@ -30,7 +30,7 @@ import org.matsim.population.Population;
  * @author laemmel
  *
  */
-public class PlansFilterActInArea extends PersonAlgorithm {
+public class PlansFilterActInArea extends AbstractPersonAlgorithm {
 
 	private final NetworkLayer network;
 	private final Population plans;

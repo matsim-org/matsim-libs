@@ -34,7 +34,7 @@ import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -42,7 +42,7 @@ import org.matsim.world.World;
  * @author ychen
  * 
  */
-public class CarAvail extends PersonAlgorithm {
+public class CarAvail extends AbstractPersonAlgorithm {
 	private int never_hasCar, always_hasCar, sometimes_hasCar,
 			never_but_car_plan, never_but_pt_plan, always_but_car_plan,
 			always_but_pt_plan, sometimes_but_car_plan, sometimes_but_pt_plan;

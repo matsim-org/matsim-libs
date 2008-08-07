@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonAlgorithm.java
+ * AbstractPersonAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -25,9 +25,9 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.utils.misc.Counter;
 
-public abstract class PersonAlgorithm implements PersonAlgorithmI {
+public abstract class AbstractPersonAlgorithm implements PersonAlgorithmI {
 
-	private final static Logger log = Logger.getLogger(PersonAlgorithm.class);
+	private final static Logger log = Logger.getLogger(AbstractPersonAlgorithm.class);
 
 	public final void run(final Population plans) {
 		log.info("running " + this.getClass().getName() + " algorithm...");

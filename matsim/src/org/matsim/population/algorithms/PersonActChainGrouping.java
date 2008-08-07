@@ -30,7 +30,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-public class PersonActChainGrouping extends PersonAlgorithm {
+public class PersonActChainGrouping extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

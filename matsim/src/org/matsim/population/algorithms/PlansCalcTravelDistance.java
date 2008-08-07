@@ -31,7 +31,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
 
-public class PlansCalcTravelDistance extends PersonAlgorithm implements PlanAlgorithmI {
+public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

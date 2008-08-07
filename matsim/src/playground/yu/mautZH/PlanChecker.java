@@ -37,13 +37,13 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author yu
  * 
  */
-public class PlanChecker extends PersonAlgorithm {
+public class PlanChecker extends AbstractPersonAlgorithm {
 
 	private DataOutputStream out, out14, out41;
 	private final HashMap<String, Integer> hm;

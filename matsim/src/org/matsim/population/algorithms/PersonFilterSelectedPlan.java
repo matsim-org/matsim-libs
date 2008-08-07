@@ -29,7 +29,7 @@ import org.matsim.population.Plan;
  *
  * @author mrieser
  */
-public class PersonFilterSelectedPlan extends PersonAlgorithm {
+public class PersonFilterSelectedPlan extends AbstractPersonAlgorithm {
 
 	public PersonFilterSelectedPlan() {
 		super();

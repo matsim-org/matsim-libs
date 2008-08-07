@@ -26,13 +26,13 @@ package playground.yu.newPlan;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author yu
  * 
  */
-public abstract class NewPlan extends PersonAlgorithm {
+public abstract class NewPlan extends AbstractPersonAlgorithm {
 	protected PopulationWriter pw;
 	protected NetworkLayer net;
 

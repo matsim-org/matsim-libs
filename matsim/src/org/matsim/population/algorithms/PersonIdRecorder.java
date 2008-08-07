@@ -26,7 +26,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-public class PersonIdRecorder extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonIdRecorder extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	private HashSet<Id> ids = new HashSet<Id>();
 

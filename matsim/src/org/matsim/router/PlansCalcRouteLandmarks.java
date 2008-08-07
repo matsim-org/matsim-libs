@@ -27,7 +27,7 @@ import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
 
 /**
- * A PersonAlgorithm that calculates and sets the routes of a person's activities using {@link AStarLandmarks}.
+ * A AbstractPersonAlgorithm that calculates and sets the routes of a person's activities using {@link AStarLandmarks}.
  *
  * @author lnicolas
  */

@@ -29,10 +29,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 
-public class PersonTripSummaryTable extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonTripSummaryTable extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

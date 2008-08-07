@@ -32,7 +32,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
@@ -40,7 +40,7 @@ import org.matsim.world.ZoneLayer;
 
 import playground.balmermi.census2000.data.Persons;
 
-public class PersonZoneSummary extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

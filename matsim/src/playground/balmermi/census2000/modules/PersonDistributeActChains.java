@@ -26,13 +26,13 @@ import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.misc.Time;
 
 import playground.balmermi.census2000.data.ActChains;
 
-public class PersonDistributeActChains extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonDistributeActChains extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

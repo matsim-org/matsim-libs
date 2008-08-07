@@ -29,10 +29,10 @@ import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 
-public class PersonsSummaryTable extends PersonAlgorithm implements PlanAlgorithmI {
+public class PersonsSummaryTable extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

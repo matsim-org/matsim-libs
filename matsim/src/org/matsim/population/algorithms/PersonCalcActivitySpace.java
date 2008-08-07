@@ -38,7 +38,7 @@ import org.matsim.utils.optimization.ParamPoint;
 import org.matsim.utils.optimization.SimplexOptimization;
 import org.matsim.utils.optimization.SuperEllipseObjective;
 
-public class PersonCalcActivitySpace extends PersonAlgorithm {
+public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member constants

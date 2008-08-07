@@ -27,9 +27,9 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
-public class PersonPrintLinks extends PersonAlgorithm {
+public class PersonPrintLinks extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

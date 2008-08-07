@@ -25,7 +25,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
 
-public class PersonRemoveCertainActs extends PersonAlgorithm {
+public class PersonRemoveCertainActs extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors

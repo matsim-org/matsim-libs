@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 
-public class PlanPlotActLocations extends PersonAlgorithm implements PlanAlgorithmI {
+public class PlanPlotActLocations extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	private BufferedWriter out = null;
 	private int cnt = 0;

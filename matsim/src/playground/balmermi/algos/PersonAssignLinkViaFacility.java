@@ -31,12 +31,12 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.Coord;
 
 
-public class PersonAssignLinkViaFacility extends PersonAlgorithm {
+public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

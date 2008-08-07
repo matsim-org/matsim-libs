@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -34,7 +34,7 @@ import org.matsim.utils.io.IOUtils;
  * @author ychen
  * 
  */
-public class PtCheck extends PersonAlgorithm {
+public class PtCheck extends AbstractPersonAlgorithm {
 	// ----------------------MEMBER VARIABLES----------------------------
 	/**
 	 * Counter of all read persons

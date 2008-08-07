@@ -36,7 +36,7 @@ import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.utils.geometry.Coord;
 
-public class PersonDrawActivtiySpaces extends PersonAlgorithm {
+public class PersonDrawActivtiySpaces extends AbstractPersonAlgorithm {
 
 	// ////////////////////////////////////////////////////////////////////
 	// member constants

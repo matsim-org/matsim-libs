@@ -41,7 +41,7 @@ import org.matsim.utils.optimization.CassiniObjective;
 import org.matsim.utils.optimization.EllipseObjective;
 import org.matsim.utils.optimization.SuperEllipseObjective;
 
-public class PersonWriteActivitySpaceTable extends PersonAlgorithm {
+public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member constants

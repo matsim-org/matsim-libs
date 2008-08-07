@@ -35,7 +35,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * this Class counts and writes the amount of "new" filtered links as well as
@@ -45,7 +45,7 @@ import org.matsim.population.algorithms.PersonAlgorithm;
  * @author ychen
  *
  */
-public class CompressRoute extends PersonAlgorithm {
+public class CompressRoute extends AbstractPersonAlgorithm {
 	/**
 	 * (arg0) - ssLinkId: the id of the "default next" link of the current link
 	 * (arg1) - linkId: the id of a current link
@@ -75,7 +75,7 @@ public class CompressRoute extends PersonAlgorithm {
 	 * counts and writes the amount of "old" links and that of "new" filtered
 	 * links
 	 *
-	 * @see org.matsim.population.algorithms.PersonAlgorithm#run(org.matsim.population.Person)
+	 * @see org.matsim.population.algorithms.AbstractPersonAlgorithm#run(org.matsim.population.Person)
 	 */
 	@Override
 	public void run(final Person person) {

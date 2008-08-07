@@ -34,10 +34,10 @@ import org.matsim.population.ActivitySpaceEllipse;
 import org.matsim.population.ActivitySpaceSuperEllipse;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.geometry.Coord;
 
-public class PersonDrawActivitySpace extends PersonAlgorithm {
+public class PersonDrawActivitySpace extends AbstractPersonAlgorithm {
 
 	// ////////////////////////////////////////////////////////////////////
 	// member constants

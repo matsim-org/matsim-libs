@@ -30,7 +30,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
 
-public class PersonRemoveReferences extends PersonAlgorithm {
+public class PersonRemoveReferences extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

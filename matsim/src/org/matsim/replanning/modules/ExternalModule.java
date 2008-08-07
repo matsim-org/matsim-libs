@@ -42,7 +42,7 @@ import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandler;
 import org.matsim.population.Route;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonCalcTimes;
 import org.matsim.utils.misc.ExeRunner;
 
@@ -193,7 +193,7 @@ public class ExternalModule implements StrategyModuleI {
 		return plansReader;
 	}
 
-	private static class UpdatePlansAlgo extends PersonAlgorithm {
+	private static class UpdatePlansAlgo extends AbstractPersonAlgorithm {
 
 		private final TreeMap<Id, Person> persons;
 

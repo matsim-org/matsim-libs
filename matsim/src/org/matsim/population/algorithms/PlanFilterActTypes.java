@@ -29,7 +29,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-public class PlanFilterActTypes extends PersonAlgorithm {
+public class PlanFilterActTypes extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

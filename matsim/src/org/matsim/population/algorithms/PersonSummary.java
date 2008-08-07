@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-public class PersonSummary extends PersonAlgorithm {
+public class PersonSummary extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

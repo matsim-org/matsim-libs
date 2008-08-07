@@ -47,7 +47,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
  * or edu) has a duration of exactly 8 hours, and the final activity goes on
  * until midnight.
  */
-public class PlanSimplifyForDebug extends PersonAlgorithm {
+public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 
 	// ////////////////////////////////////////////////////////////////////
 	// member variables

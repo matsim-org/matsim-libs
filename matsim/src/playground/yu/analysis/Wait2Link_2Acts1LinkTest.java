@@ -42,7 +42,7 @@ import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -69,7 +69,7 @@ public class Wait2Link_2Acts1LinkTest {
 		}
 	}
 
-	public static class SameActLoc extends PersonAlgorithm {
+	public static class SameActLoc extends AbstractPersonAlgorithm {
 		private boolean actsAtSameLink;
 		private int actLocCount = 0, personCount = 0;
 		/**

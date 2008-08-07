@@ -29,14 +29,14 @@ import org.matsim.population.Population;
 import org.matsim.utils.misc.Counter;
 
 /**
- * An abstract/static helper class for running {@link PersonAlgorithm}s in parallel using threads.
+ * An abstract/static helper class for running {@link AbstractPersonAlgorithm}s in parallel using threads.
  *
  * @author mrieser
  */
 public abstract class ParallelPersonAlgorithmRunner {
 
 	public interface PersonAlgorithmProvider {
-		public PersonAlgorithm getPersonAlgorithm();
+		public AbstractPersonAlgorithm getPersonAlgorithm();
 	}
 
 	/**
@@ -48,19 +48,19 @@ public abstract class ParallelPersonAlgorithmRunner {
 	 * @param numberOfThreads
 	 * @param algorithm
 	 */
-	public static void run(final Population population, final int numberOfThreads, final PersonAlgorithm algorithm) {
+	public static void run(final Population population, final int numberOfThreads, final AbstractPersonAlgorithm algorithm) {
 		run(population, numberOfThreads, new PersonAlgorithmProvider() {
-			public PersonAlgorithm getPersonAlgorithm() {
+			public AbstractPersonAlgorithm getPersonAlgorithm() {
 				return algorithm;
 			}
 		});
 	}
 	
 	/**
-	 * Handles each person of the given <code>population</code> with a PersonAlgorithm provided by <code>algoProvider</code>,
+	 * Handles each person of the given <code>population</code> with a AbstractPersonAlgorithm provided by <code>algoProvider</code>,
 	 * using up to <code>numberOfThreads</code> threads to speed things up. This method will request a new instance of the
-	 * PersonAlgorithm for each thread it allocates, thus enabling the parallel use of non-thread-safe algorithms.
-	 * For thread-safe algorithms, {@link #run(Population, int, PersonAlgorithm)} may be an easier method to use.
+	 * AbstractPersonAlgorithm for each thread it allocates, thus enabling the parallel use of non-thread-safe algorithms.
+	 * For thread-safe algorithms, {@link #run(Population, int, AbstractPersonAlgorithm)} may be an easier method to use.
 	 * 
 	 * @param population
 	 * @param numberOfThreads
@@ -75,7 +75,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 		
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) {
-			PersonAlgorithm algo = algoProvider.getPersonAlgorithm();
+			AbstractPersonAlgorithm algo = algoProvider.getPersonAlgorithm();
 			if (i == 0) {
 				name = algo.getClass().getSimpleName();
 				counter = new Counter("[" + name + "] handled person # ");
@@ -115,11 +115,11 @@ public abstract class ParallelPersonAlgorithmRunner {
 	private static class PersonAlgoThread implements Runnable {
 
 		public final int threadId;
-		private final PersonAlgorithm personAlgo;
+		private final AbstractPersonAlgorithm personAlgo;
 		private final List<Person> persons = new LinkedList<Person>();
 		private final Counter counter;
 
-		public PersonAlgoThread(final int i, final PersonAlgorithm algo, final Counter counter) {
+		public PersonAlgoThread(final int i, final AbstractPersonAlgorithm algo, final Counter counter) {
 			this.threadId = i;
 			this.personAlgo = algo;
 			this.counter = counter;

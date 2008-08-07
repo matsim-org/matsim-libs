@@ -35,7 +35,7 @@ import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -44,7 +44,7 @@ import org.matsim.world.World;
  * 
  */
 public class SameActLocTest {
-	public static class SameActLoc extends PersonAlgorithm {
+	public static class SameActLoc extends AbstractPersonAlgorithm {
 		private BufferedWriter writer;
 		private boolean actsAtSameLink;
 		private int actLocCount = 0, personCount = 0, carActLocCount = 0,

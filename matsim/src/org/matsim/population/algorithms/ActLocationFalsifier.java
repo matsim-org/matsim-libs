@@ -39,7 +39,7 @@ import org.matsim.utils.geometry.Coord;
  *
  * @author mrieser
  */
-public class ActLocationFalsifier extends PersonAlgorithm implements PlanAlgorithmI {
+public class ActLocationFalsifier extends AbstractPersonAlgorithm implements PlanAlgorithmI {
 
 	private final double totalDistance;
 

@@ -89,7 +89,7 @@ import org.matsim.population.PopulationReaderKutter;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.ActLocationFalsifier;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonFilterSelectedPlan;
 import org.matsim.population.algorithms.PersonRemoveCertainActs;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
@@ -2049,7 +2049,7 @@ public class MyRuns {
 			final Population plans = new Population(Population.USE_STREAMING);
 			final PopulationReader plansReader = new MatsimPlansReader(plans);
 			plans.addAlgorithm(
-					new PersonAlgorithm() {
+					new AbstractPersonAlgorithm() {
 
 						@Override
 						public void run(final Person person) {

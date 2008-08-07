@@ -25,9 +25,9 @@ package playground.ciarif.modechoice_old;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
-public class TicketAlgo extends PersonAlgorithm {
+public class TicketAlgo extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
